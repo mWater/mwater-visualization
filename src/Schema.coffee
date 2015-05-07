@@ -54,6 +54,10 @@ module.exports = class Schema
         name = col.name
         desc = col.desc
 
+      # Filter by type
+      if options.types and col.type not in options.types
+        continue
+        
       tree.push({
         id: col.id
         name: name

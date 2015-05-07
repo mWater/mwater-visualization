@@ -42,6 +42,7 @@ describe "Schema", ->
       @schema.addTable({ id: "a", name: "A" })
       @schema.addColumn("a", { id: "x", name: "X", type: "uuid", primary: true })
       @schema.addColumn("a", { id: "y", name: "Y", type: "text" })
+      @schema.addColumn("a", { id: "z", name: "Z", type: "integer" })
 
       @schema.addTable({ id: "b", name: "B" })
       @schema.addColumn("b", { id: "q", name: "Q", type: "uuid", primary: true })
@@ -83,9 +84,7 @@ describe "Schema", ->
       joinItem = _.last(@atree)
       assert not joinItem.expr
 
-      
-
-
-
-
-
+    it "filters by types", ->
+      atree = @schema.getJoinExprTree({ baseTableId: "a", types: ["integer"] })
+      assert.isUndefined _.findWhere(atree, name: "Y")
+      assert.isDefined _.findWhere(atree, name: "Z")
