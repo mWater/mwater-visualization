@@ -7,6 +7,7 @@ HoverMixin = require './HoverMixin'
 H = React.DOM
 
 Schema = require './Schema'
+DesignValidator = require './DesignValidator'
 
 JoinExprTreeComponent = require './JoinExprTreeComponent' 
 
@@ -59,17 +60,83 @@ createSchema = ->
   return schema
 
 $ ->
+  `
+  var freezer = new Freezer({ x: 1 });
+  var trans = freezer.get().transact();
+  trans.x = 2;
+  freezer.get().run();
+  freezer.get().getListener().once('update', function(val) {
+    console.log("Why does this get called?");
+    });
+
+  `
+
+  return
+  onUpdate = (expr) =>
+    # Clean
+    transExpr = expr.transact()
+    transExpr.x = 2
+    console.log transExpr
+    newExpr = expr.run()
+    console.log newExpr
+    freezer.get().getListener().once("update", onUpdate)
+
+  # Listen to changes
+  listener.once("update", onUpdate)
+
+  freezer.get().set(x:3)
+
+
+  listener = freezer.get().getListener()
+
+  onUpdate = (expr) =>
+    # Clean
+    transExpr = expr.transact()
+    transExpr.x = 2
+    console.log transExpr
+    newExpr = expr.run()
+    console.log newExpr
+    freezer.get().getListener().once("update", onUpdate)
+
+  # Listen to changes
+  listener.once("update", onUpdate)
+
+  freezer.get().set(x:3)
+
+  return
+
+  # freezer = new Freezer({ x: { y: 4 }})
+  # # Listen to changes
+  # freezer.get().getListener().on("update", (ev) => 
+  #   console.log(ev)
+  # )
+  # freezer.get().set(x: { y: 4 })
+  # freezer.get().set(x:5)
+  # freezer.get().set(x:6)
+
   # $("body").css("background-color", "#EEE")
   # Create simple schema
   schema = createSchema()
+  designValidator = new DesignValidator(schema)
 
   expr = { type: "scalar", baseTableId: "a" }
   Holder = React.createClass {
     getInitialState: ->
       freezer = new Freezer(expr)
 
+      listener = freezer.get().getListener()
+
+      onUpdate = (expr) =>
+        # Clean
+        transExpr = expr.transact()
+        designValidator.cleanExpr(transExpr)
+        newExpr = expr.run()
+        console.log newExpr
+        @setState(expr: freezer.get())
+        freezer.get().getListener().once("update", onUpdate)
+
       # Listen to changes
-      freezer.get().getListener().on("update", (expr) => @setState(expr: expr))
+      listener.once("update", onUpdate)
 
       return { expr: freezer.get() }
 
