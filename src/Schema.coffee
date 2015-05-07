@@ -57,14 +57,16 @@ module.exports = class Schema
       # Filter by type
       if options.types and col.type not in options.types
         continue
-        
+
       tree.push({
         id: col.id
         name: name
         desc: col.desc
         type: col.type
-        joinIds: joinIds
-        expr: { type: "field", tableId: baseTable.id, columnId: col.id }
+        value: {
+          joinIds: joinIds
+          expr: { type: "field", tableId: baseTable.id, columnId: col.id }
+          }
         })
 
     # Add joins
@@ -75,6 +77,9 @@ module.exports = class Schema
             id: join.id
             name: join.name
             desc: join.desc
+            value: {
+              joinIds: joinIds
+              }
             getChildren: =>
               return @getJoinExprTree({ baseTableId: join.toTableId, joinIds: joinIds.concat([join.id]) })
             })

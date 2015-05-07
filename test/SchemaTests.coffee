@@ -67,10 +67,10 @@ describe "Schema", ->
       assert.equal subtree[0].name, "Number of B"
 
     it "has joins list", ->
-      assert.deepEqual @atree[0].joinIds, []
+      assert.deepEqual @atree[0].value.joinIds, []
 
     it "has field expressions for leaf nodes", ->
-      assert.deepEqual @atree[0].expr, { type: "field", tableId: "a", columnId: "y" }
+      assert.deepEqual @atree[0].value.expr, { type: "field", tableId: "a", columnId: "y" }
 
     it "joins are inserted at end", ->
       assert.equal _.last(@btree).name, "BA"
@@ -78,7 +78,7 @@ describe "Schema", ->
     it "gets children for joins", ->
       joinItem = _.last(@atree)
       assert joinItem.getChildren().length > 0
-      assert.deepEqual joinItem.getChildren()[0].joinIds, ["ab"]
+      assert.deepEqual joinItem.getChildren()[0].value.joinIds, ["ab"]
 
     it "has no field expressions for joins", ->
       joinItem = _.last(@atree)

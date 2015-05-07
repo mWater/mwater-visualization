@@ -3,7 +3,45 @@ SaveCancelModalComponent = require './SaveCancelModalComponent'
 ListComponent = require './ListComponent'
 ReactSelect = require 'react-select'
 React = require 'react'
+HoverMixin = require './HoverMixin'
 H = React.DOM
+
+Schema = require './Schema'
+
+JoinExprTreeComponent = require './JoinExprTreeComponent' 
+
+createSchema = ->
+  # Create simple schema with subtree
+  schema = new Schema()
+  schema.addTable({ id: "a", name: "A" })
+  schema.addColumn("a", { id: "x", name: "X", type: "uuid", primary: true })
+  schema.addColumn("a", { id: "y", name: "Y", type: "text" })
+  schema.addColumn("a", { id: "z", name: "Z", type: "integer" })
+
+  schema.addTable({ id: "b", name: "B" })
+  schema.addColumn("b", { id: "q", name: "Q", type: "uuid", primary: true })
+  schema.addColumn("b", { id: "r", name: "R", type: "text" })
+  schema.addColumn("b", { id: "s", name: "S", type: "uuid" }) # a ref
+
+  schema.addJoin({ id: "ab", name: "AB", fromTableId: "a", fromColumnId: "x", toTableId: "b", toColumnId: "s", op: "=", multiple: true })
+  schema.addJoin({ id: "ba", name: "BA", fromTableId: "b", fromColumnId: "s", toTableId: "a", toColumnId: "x", op: "=", multiple: false })
+
+  return schema
+
+$ ->
+  $("body").css("background-color", "#EEE")
+  # Create simple schema
+  schema = createSchema()
+  tree = schema.getJoinExprTree({ baseTableId: "a" })
+
+  TreeHolder = React.createClass {
+    getInitialState: -> { joinExpr: null }
+    render: ->
+      React.createElement(JoinExprTreeComponent, tree: tree, onSelect: ((je) => @setState(joinExpr: je)), selectedValue: @state.joinExpr)
+  }
+
+  sample = React.createElement(TreeHolder, tree: tree)
+  React.render(sample, document.getElementById('root'))
 
 Child = React.createClass {
   handleClick: ->
@@ -120,15 +158,3 @@ HoverEditComponent = React.createClass {
           #   }
           #   className: "glyphicon glyphicon-pencil"
 } 
-
-$ ->
-  sample = React.createElement(Sample)
-  # sample = React.createElement(ListControl, { items: [
-  #   { id: "a", display: "A" }
-  #   { id: "b", display: "B" }
-  #   ], selected: "a", onSelect: (id) -> console.log(id) })
-  React.render(sample, document.getElementById('root'))
-
-
-
-
