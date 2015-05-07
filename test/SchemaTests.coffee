@@ -35,7 +35,7 @@ describe "Schema", ->
     schema.addJoin(join)
     assert.deepEqual schema.getJoins()[0], join
   
-  describe "tree", ->
+  describe "with schema", ->
     before ->
       # Create simple schema with subtree
       @schema = new Schema()
@@ -54,37 +54,73 @@ describe "Schema", ->
 
       @atree = @schema.getJoinExprTree({ baseTableId: "a" })
       @btree = @schema.getJoinExprTree({ baseTableId: "b" })
-      
-    it "doesn't include primary keys at root", ->
-      assert.equal @atree[0].name, "Y"
+    
+    describe "getJoinExprTree", ->
+      it "doesn't include primary keys at root", ->
+        assert.equal @atree[0].name, "Y"
 
-    it "skips uuids", ->
-      assert.isUndefined _.findWhere(@btree, name: "S")
+      it "skips uuids", ->
+        assert.isUndefined _.findWhere(@btree, name: "S")
 
-    it "includes primary key as count", ->
-      joinItem = _.last(@atree)
-      subtree = joinItem.getChildren()
-      assert.equal subtree[0].name, "Number of B"
+      it "includes primary key as count", ->
+        joinItem = _.last(@atree)
+        subtree = joinItem.getChildren()
+        assert.equal subtree[0].name, "Number of B"
 
-    it "has joins list", ->
-      assert.deepEqual @atree[0].value.joinIds, []
+      it "has joins list", ->
+        assert.deepEqual @atree[0].value.joinIds, []
 
-    it "has field expressions for leaf nodes", ->
-      assert.deepEqual @atree[0].value.expr, { type: "field", tableId: "a", columnId: "y" }
+      it "has field expressions for leaf nodes", ->
+        assert.deepEqual @atree[0].value.expr, { type: "field", tableId: "a", columnId: "y" }
 
-    it "joins are inserted at end", ->
-      assert.equal _.last(@btree).name, "BA"
+      it "joins are inserted at end", ->
+        assert.equal _.last(@btree).name, "BA"
 
-    it "gets children for joins", ->
-      joinItem = _.last(@atree)
-      assert joinItem.getChildren().length > 0
-      assert.deepEqual joinItem.getChildren()[0].value.joinIds, ["ab"]
+      it "gets children for joins", ->
+        joinItem = _.last(@atree)
+        assert joinItem.getChildren().length > 0
+        assert.deepEqual joinItem.getChildren()[0].value.joinIds, ["ab"]
 
-    it "has no field expressions for joins", ->
-      joinItem = _.last(@atree)
-      assert not joinItem.expr
+      it "has no field expressions for joins", ->
+        joinItem = _.last(@atree)
+        assert not joinItem.expr
 
-    it "filters by types", ->
-      atree = @schema.getJoinExprTree({ baseTableId: "a", types: ["integer"] })
-      assert.isUndefined _.findWhere(atree, name: "Y")
-      assert.isDefined _.findWhere(atree, name: "Z")
+      it "filters by types", ->
+        atree = @schema.getJoinExprTree({ baseTableId: "a", types: ["integer"] })
+        assert.isUndefined _.findWhere(atree, name: "Y")
+        assert.isDefined _.findWhere(atree, name: "Z")
+
+    describe "getExprType", ->
+      it 'gets field type', ->
+        assert.equal @schema.getExprType({ type: "field", tableId: "a", columnId: "z" }), "integer"
+
+    describe "getAggrs", ->
+      it "includes latest if has natural ordering", ->
+        schema = new Schema()
+        schema.addTable({ id: "a", name: "A", ordering: "z" })
+        schema.addColumn("a", { id: "x", name: "X", type: "uuid", primary: true })
+        schema.addColumn("a", { id: "y", name: "Y", type: "text" })
+        schema.addColumn("a", { id: "z", name: "Z", type: "integer" })
+
+        field = { type: "field", tableId: "a", columnId: "y" }
+        assert.equal _.findWhere(schema.getAggrs(field), id: "last").type, "text"
+
+      it "doesn't include most recent normally", ->
+        field = { type: "field", tableId: "a", columnId: "z" }
+        assert.isUndefined _.findWhere(@schema.getAggrs(field), id: "last")
+
+      it "includes count for text", ->
+        field = { type: "field", tableId: "a", columnId: "y" }
+        aggrs = @schema.getAggrs(field)
+
+        assert.equal _.findWhere(aggrs, id: "count").type, "integer"
+        assert.isUndefined _.findWhere(aggrs, id: "sum")
+        assert.isUndefined _.findWhere(aggrs, id: "avg")
+
+      it "includes sum, avg, etc for integer, decimal", ->
+        field = { type: "field", tableId: "a", columnId: "z" }
+        aggrs = @schema.getAggrs(field)
+
+        assert.equal _.findWhere(aggrs, id: "sum").type, "integer"
+        assert.equal _.findWhere(aggrs, id: "avg").type, "decimal"
+        # TODO etc

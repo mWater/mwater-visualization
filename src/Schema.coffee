@@ -7,7 +7,7 @@ module.exports = class Schema
 
   # Add table with id, name, desc, icon
   addTable: (options) ->
-    table = _.pick(options, "id", "name", "desc", "icon")
+    table = _.pick(options, "id", "name", "desc", "icon", "ordering")
     table.columns = []
     @tables.push(table)
 
@@ -22,6 +22,10 @@ module.exports = class Schema
   getColumns: (tableId) ->
     table = @getTable(tableId)
     return table.columns
+
+  getColumn: (tableId, columnId) ->
+    table = @getTable(tableId)
+    return _.findWhere(table.columns, { id: columnId })
 
   # id, name, fromTableId, fromColumnId, toTableId, toColumnId, op, multiple
   addJoin: (options) ->
@@ -84,3 +88,39 @@ module.exports = class Schema
               return @getJoinExprTree({ baseTableId: join.toTableId, joinIds: joinIds.concat([join.id]) })
             })
     return tree
+
+  # Gets the type of an expression
+  getExprType: (expr) ->
+    switch expr.type
+      when "field"
+        column = @getColumn(expr.tableId, expr.columnId)
+        return column.type
+      else
+        throw new Error("Not implemented")
+
+  # Gets the table of an expression (null if none)
+  getExprTable: (expr) ->
+    switch expr.type
+      when "field"
+        return @getTable(expr.tableId)
+      else
+        throw new Error("Not implemented")
+
+  # Gets available aggregations [{id, name}]
+  getAggrs: (expr) ->
+    aggrs = []
+
+    type = @getExprType(expr)
+    
+    table = @getExprTable(expr)
+    if table and table.ordering
+      aggrs.push({ id: "last", name: "Latest", type: type })
+
+    aggrs.push({ id: "count", name: "Count", type: "integer" })
+
+    switch type
+      when "integer", "decimal"
+        aggrs.push({ id: "sum", name: "Total", type: type })
+        aggrs.push({ id: "avg", name: "Average", type: "decimal" })
+
+    return aggrs
