@@ -10,6 +10,36 @@ Schema = require './Schema'
 
 JoinExprTreeComponent = require './JoinExprTreeComponent' 
 
+ScalarExprEditorComponent = React.createClass {
+  handleJoinExprSelect: (joinExpr) ->
+    @props.scalar.set(expr: joinExpr.expr, joinIds: joinExpr.joinIds)
+
+  handleAggrSelect: (aggrId) ->
+    @props.scalar.set(aggrId: aggrId)
+
+  render: ->
+    # Create tree 
+    tree = @props.schema.getJoinExprTree({ baseTableId: @props.scalar.baseTableId })
+
+    # Create list of aggregates
+    if @props.scalar.expr and @props.schema.isAggrNeeded(@props.scalar.joinIds)
+      options = _.map(@props.schema.getAggrs(@props.scalar.expr), (aggr) -> { value: aggr.id, label: aggr.name })
+      aggrs = H.div null,
+        H.br()
+        H.br()
+        H.label null, "Aggregate by"
+        React.createElement(ReactSelect, { 
+          value: @props.scalar.aggrId, 
+          options: options 
+          onChange: @handleAggrSelect
+        })
+
+    H.div null, 
+      H.label null, "Expression"
+      React.createElement(JoinExprTreeComponent, tree: tree, onSelect: @handleJoinExprSelect, selectedValue: { expr: @props.scalar.expr, joinIds: @props.scalar.joinIds })
+      H.div style: { width: "20em" }, aggrs
+}
+
 createSchema = ->
   # Create simple schema with subtree
   schema = new Schema()
@@ -23,24 +53,31 @@ createSchema = ->
   schema.addColumn("b", { id: "r", name: "R", type: "text" })
   schema.addColumn("b", { id: "s", name: "S", type: "uuid" }) # a ref
 
-  schema.addJoin({ id: "ab", name: "AB", fromTableId: "a", fromColumnId: "x", toTableId: "b", toColumnId: "s", op: "=", multiple: true })
-  schema.addJoin({ id: "ba", name: "BA", fromTableId: "b", fromColumnId: "s", toTableId: "a", toColumnId: "x", op: "=", multiple: false })
+  schema.addJoin({ id: "ab", name: "AB", fromTableId: "a", fromColumnId: "x", toTableId: "b", toColumnId: "s", op: "=", oneToMany: true })
+  schema.addJoin({ id: "ba", name: "BA", fromTableId: "b", fromColumnId: "s", toTableId: "a", toColumnId: "x", op: "=", oneToMany: false })
 
   return schema
 
 $ ->
-  $("body").css("background-color", "#EEE")
+  # $("body").css("background-color", "#EEE")
   # Create simple schema
   schema = createSchema()
-  tree = schema.getJoinExprTree({ baseTableId: "a" })
 
-  TreeHolder = React.createClass {
-    getInitialState: -> { joinExpr: null }
+  expr = { type: "scalar", baseTableId: "a" }
+  Holder = React.createClass {
+    getInitialState: ->
+      freezer = new Freezer(expr)
+
+      # Listen to changes
+      freezer.get().getListener().on("update", (expr) => @setState(expr: expr))
+
+      return { expr: freezer.get() }
+
     render: ->
-      React.createElement(JoinExprTreeComponent, tree: tree, onSelect: ((je) => @setState(joinExpr: je)), selectedValue: @state.joinExpr)
+      React.createElement(ScalarExprEditorComponent, schema: schema, scalar: @state.expr)
   }
 
-  sample = React.createElement(TreeHolder, tree: tree)
+  sample = React.createElement(Holder)
   React.render(sample, document.getElementById('root'))
 
 Child = React.createClass {

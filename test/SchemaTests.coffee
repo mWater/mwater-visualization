@@ -31,7 +31,7 @@ describe "Schema", ->
     schema.addTable({ id: "b" })
     schema.addColumn("b", { id: "y", type: "uuid" })
 
-    join = { id: "ab", name: "AB", fromTableId: "a", fromColumnId: "x", toTableId: "b", toColumnId: "y", op: "=", multiple: true }
+    join = { id: "ab", name: "AB", fromTableId: "a", fromColumnId: "x", toTableId: "b", toColumnId: "y", op: "=", oneToMany: true }
     schema.addJoin(join)
     assert.deepEqual schema.getJoins()[0], join
   
@@ -49,8 +49,8 @@ describe "Schema", ->
       @schema.addColumn("b", { id: "r", name: "R", type: "text" })
       @schema.addColumn("b", { id: "s", name: "S", type: "uuid" }) # a ref
 
-      @schema.addJoin({ id: "ab", name: "AB", fromTableId: "a", fromColumnId: "x", toTableId: "b", toColumnId: "s", op: "=", multiple: true })
-      @schema.addJoin({ id: "ba", name: "BA", fromTableId: "b", fromColumnId: "s", toTableId: "a", toColumnId: "x", op: "=", multiple: false })
+      @schema.addJoin({ id: "ab", name: "AB", fromTableId: "a", fromColumnId: "x", toTableId: "b", toColumnId: "s", op: "=", oneToMany: true })
+      @schema.addJoin({ id: "ba", name: "BA", fromTableId: "b", fromColumnId: "s", toTableId: "a", toColumnId: "x", op: "=", oneToMany: false })
 
       @atree = @schema.getJoinExprTree({ baseTableId: "a" })
       @btree = @schema.getJoinExprTree({ baseTableId: "b" })
@@ -65,7 +65,7 @@ describe "Schema", ->
       it "includes primary key as count", ->
         joinItem = _.last(@atree)
         subtree = joinItem.getChildren()
-        assert.equal subtree[0].name, "Number of B"
+        assert.equal subtree[0].name, "Count of B"
 
       it "has joins list", ->
         assert.deepEqual @atree[0].value.joinIds, []
@@ -124,3 +124,13 @@ describe "Schema", ->
         assert.equal _.findWhere(aggrs, id: "sum").type, "integer"
         assert.equal _.findWhere(aggrs, id: "avg").type, "decimal"
         # TODO etc
+
+    describe "isAggrNeeded", ->
+      it "false for no joins", ->
+        assert.isFalse @schema.isAggrNeeded([])
+
+      it "true for oneToMany join", ->
+        assert.isTrue @schema.isAggrNeeded(["ab"])
+
+      it "false for non-oneToMany join", ->
+        assert.isFalse @schema.isAggrNeeded(["ba"])

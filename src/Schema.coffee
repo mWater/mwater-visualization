@@ -27,11 +27,13 @@ module.exports = class Schema
     table = @getTable(tableId)
     return _.findWhere(table.columns, { id: columnId })
 
-  # id, name, fromTableId, fromColumnId, toTableId, toColumnId, op, multiple
+  # id, name, fromTableId, fromColumnId, toTableId, toColumnId, op, oneToMany
   addJoin: (options) ->
-    @joins.push(_.pick(options, "id", "name", "fromTableId", "fromColumnId", "toTableId", "toColumnId", "op", "multiple"))
+    @joins.push(_.pick(options, "id", "name", "fromTableId", "fromColumnId", "toTableId", "toColumnId", "op", "oneToMany"))
 
   getJoins: -> @joins
+
+  getJoin: (joinId) -> _.findWhere(@joins, { id: joinId })
 
   # Pass baseTableId and joinIds (optional)
   getJoinExprTree: (options) ->
@@ -52,7 +54,7 @@ module.exports = class Schema
         continue
 
       if col.primary
-        name = "Number of #{baseTable.name}"
+        name = "Count of #{baseTable.name}"
         desc = ""
       else 
         name = col.name
@@ -120,7 +122,11 @@ module.exports = class Schema
 
     switch type
       when "integer", "decimal"
-        aggrs.push({ id: "sum", name: "Total", type: type })
+        aggrs.push({ id: "sum", name: "Sum", type: type })
         aggrs.push({ id: "avg", name: "Average", type: "decimal" })
 
     return aggrs
+
+  # Determines if aggregation is needed for joins
+  isAggrNeeded: (joinIds) ->
+    return _.any(joinIds, (j) => @getJoin(j).oneToMany)
