@@ -1,0 +1,18 @@
+{
+    "framework": "mocha",
+    "serve_files": [ 
+        "bower_components/jquery/dist/jquery.js",
+        "bower_components/underscore/underscore.js",
+        "bower_components/backbone/backbone.js",
+        "test/browserified.js"
+     ],
+    "src_files": [
+        "src/*.coffee",
+        "test/*Tests.coffee"
+    ],
+    "launchers": {
+    },
+    "before_tests": "gulp prepare_tests",
+    "on_exit": "rm test/browserified.js",
+    "launch_in_dev": [ ]
+}

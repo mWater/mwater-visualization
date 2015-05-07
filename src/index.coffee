@@ -65,11 +65,16 @@ Sample = React.createClass {
       "Data Source: "
       React.createElement HoverEditComponent, 
         editor: editor
-        @state.selected or H.i(null, "Select...")
+        @state.selected or H.i(null, "None")
+}
+
+GreenArrow = React.createClass {
+  render: ->
+    H.span className: "glyphicon glyphicon-arrow-left", style: { color: "#0A0", paddingLeft: 5}
 }
 
 options = [
-  { id: 'one', display: 'One' }
+  { id: 'one', display: H.div(null, H.span(className:"glyphicon glyphicon-pencil"), ' One')}
   { id: 'two', display: 'Two' }
 ]
 
@@ -103,17 +108,17 @@ HoverEditComponent = React.createClass {
           display: "inline-block"
           padding: 3
           cursor: "pointer"
-          border: if highlighted then "solid 1px rgba(128, 128, 128, 0.3)" else "solid 1px transparent"
+          # border: if highlighted then "solid 1px rgba(128, 128, 128, 0.3)" else "solid 1px transparent"
           borderRadius: 4
-          backgroundColor: if highlighted then "rgba(128, 128, 128, 0.03)"
+          backgroundColor: if highlighted then "rgba(0, 0, 0, 0.1)"
         },
           @props.children
-          H.span 
-            style: { 
-              color: if highlighted then "#08A" else "transparent"
-              paddingLeft: 7
-            }
-            className: "glyphicon glyphicon-pencil"
+          # H.span 
+          #   style: { 
+          #     color: if highlighted then "#08A" else "transparent"
+          #     paddingLeft: 7
+          #   }
+          #   className: "glyphicon glyphicon-pencil"
 } 
 
 $ ->

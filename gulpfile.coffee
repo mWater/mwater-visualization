@@ -1,5 +1,6 @@
 gulp = require 'gulp'
 gutil = require 'gulp-util'
+glob = require 'glob'
 browserify = require 'browserify'
 source = require 'vinyl-source-stream'
 concat = require 'gulp-concat'
@@ -51,6 +52,15 @@ gulp.task "index_css", ->
 gulp.task 'copy_assets', ->
   return gulp.src("assets/**/*")
     .pipe(gulp.dest('dist/'))
+
+gulp.task 'prepare_tests', ->
+  files = glob.sync("./test/**/*Tests.coffee")
+  bundler = browserify({ entries: files, extensions: [".js", ".coffee"], debug: true })
+  return bundler.bundle()
+    .on('error', gutil.log)
+    .on('error', -> throw "Failed")
+    .pipe(source('browserified.js'))
+    .pipe(gulp.dest('./test'))
 
 gulp.task "watch", ->
   return gulp.watch("./src/**", ["build"])
