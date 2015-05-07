@@ -82,6 +82,7 @@ shim = (instance) ->
     lodash: './lodash-shim'
     underscore: './lodash-shim'
     backbone: './backbone-shim' 
+    react: './react-shim'
   }
 
   # Add shims

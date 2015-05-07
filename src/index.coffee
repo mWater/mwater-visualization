@@ -1,5 +1,9 @@
-H = React.DOM
 Freezer = require 'freezer-js'
+SaveCancelModalComponent = require './SaveCancelModalComponent'
+ListComponent = require './ListComponent'
+ReactSelect = require 'react-select'
+React = require 'react'
+H = React.DOM
 
 Child = React.createClass {
   handleClick: ->
@@ -13,83 +17,111 @@ Child = React.createClass {
         "Button " + @props.data.x
 }
 
-ModalPopup = React.createClass {
-  getInitialState: ->
-    # Create temporary freezer for child
-    freezer = new Freezer(@props.data.toJS())
 
-    # Listen to changes
-    freezer.get().getListener().on("update", => @setState(changed: true))
+# Sample = React.createClass {
+#   getInitialState: ->
+#     freezer = new Freezer({ x: 1 })
+#     freezer.get().getListener().on 'update', (q) => 
+#       @setState(data: q)
 
-    return { changed: false, freezer: freezer }
+#     freezer.get().reset(x:2)
+#     return { editing: false, data: freezer.get() }
 
-  handleSave: (e) ->
-    # Send changes
-    @props.data.reset(@state.freezer.get().toJS())
+#   handleEditClick: ->
+#     @setState(editing: !@state.editing)
 
-    @props.onClose()
+#   render: ->
+#     if @state.editing
+#       modal = React.createElement(SaveCancelModalComponent, { 
+#         title: "Title"
+#         data: @state.data
+#         onClose: => @setState(editing: false)
+#         createContent: (data) => React.createElement(Child, data: data)
+#         })
 
-  handleCancel: (e) ->
-    @props.onClose()
-
-  componentDidMount: ->
-    $(React.findDOMNode(@refs.modal)).modal({ show: true, backdrop: "static", keyboard: false })
-
-  componentWillUnmount: ->
-    $(React.findDOMNode(@refs.modal)).modal("hide")    
-
-  render: ->
-    H.div ref: "modal", className: "modal fade",
-      H.div className: "modal-dialog",
-        H.div className: "modal-content",
-          H.div className: "modal-header",
-            H.h4 className: "modal-title", @props.title
-          H.div className: "modal-body",
-            @props.createContent(@state.freezer.get())
-          H.div className: "modal-footer",
-            H.button 
-              ref: "cancel"
-              type: "button"
-              onClick: @handleCancel
-              className: "btn btn-default", 
-                if @state.changed then "Cancel" else "Close"
-            if @state.changed then H.button 
-              type: "button"
-              ref: "save"
-              onClick: @handleSave
-              className: "btn btn-primary",
-               "Save"
-}
+#     H.div null, 
+#       H.button className: "btn btn-default", onClick: @handleEditClick, "Edit"
+#       H.div null, @state.data.x
+#       modal
+# }
 
 Sample = React.createClass {
   getInitialState: ->
-    freezer = new Freezer({ x: 1 })
-    freezer.get().getListener().on 'update', (q) => 
-      @setState(data: q)
-
-    freezer.get().reset(x:2)
-    return { editing: false, data: freezer.get() }
-
-  handleEditClick: ->
-    @setState(editing: !@state.editing)
+    { selected: null }
 
   render: ->
-    if @state.editing
-      modal = React.createElement(ModalPopup, { 
-        title: "Title"
-        data: @state.data
-        onClose: => @setState(editing: false)
-        createContent: (data) => React.createElement(Child, data: data)
-        })
+    editor = React.createElement(SaveCancelModalComponent, { 
+      title: "Select Data Source"
+      data: { selected: @state.selected }
+      onSave: (data) => @setState(selected: data.selected)
+      createContent: (data) => 
+        React.createElement(ListComponent, 
+          items: options,
+          selected: data.selected,
+          onSelect: (id) => data.set({selected: id}))
+      })
 
     H.div null, 
-      H.button className: "btn btn-default", onClick: @handleEditClick, "Edit"
-      H.div null, @state.data.x
-      modal
+      "Data Source: "
+      React.createElement HoverEditComponent, 
+        editor: editor
+        @state.selected or H.i(null, "Select...")
 }
 
+options = [
+  { id: 'one', display: 'One' }
+  { id: 'two', display: 'Two' }
+]
+
+Sample2 = React.createClass {
+  render: ->
+    H.div null,
+      "test"
+      React.createElement(ReactSelect, { name: "x", value: "one", options: options })
+}
+
+
+HoverEditComponent = React.createClass {
+  getInitialState: -> { hover: false, editing: false }
+  mouseOver: -> @setState(hover: true)
+  mouseOut: -> @setState(hover: false)
+
+  handleEditorClose: -> @setState(editing: false)
+  render: ->
+    if @state.editing
+      editor = React.cloneElement(@props.editor, onClose: @handleEditorClose)
+
+    highlighted = @state.hover or @state.editing
+
+    H.div style: { display: "inline-block" },
+      editor
+      H.div
+        onMouseOver: @mouseOver
+        onMouseOut: @mouseOut
+        onClick: => @setState(editing: true)
+        style: { 
+          display: "inline-block"
+          padding: 3
+          cursor: "pointer"
+          border: if highlighted then "solid 1px rgba(128, 128, 128, 0.3)" else "solid 1px transparent"
+          borderRadius: 4
+          backgroundColor: if highlighted then "rgba(128, 128, 128, 0.03)"
+        },
+          @props.children
+          H.span 
+            style: { 
+              color: if highlighted then "#08A" else "transparent"
+              paddingLeft: 7
+            }
+            className: "glyphicon glyphicon-pencil"
+} 
+
 $ ->
-  sample = React.createElement(Sample, title: "Test")
+  sample = React.createElement(Sample)
+  # sample = React.createElement(ListControl, { items: [
+  #   { id: "a", display: "A" }
+  #   { id: "b", display: "B" }
+  #   ], selected: "a", onSelect: (id) -> console.log(id) })
   React.render(sample, document.getElementById('root'))
 
 
