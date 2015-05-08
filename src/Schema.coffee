@@ -54,7 +54,7 @@ module.exports = class Schema
         continue
 
       if col.primary
-        name = "Count of #{baseTable.name}"
+        name = "Number of #{baseTable.name}"
         desc = ""
       else 
         name = col.name
@@ -118,12 +118,13 @@ module.exports = class Schema
     if table and table.ordering
       aggrs.push({ id: "last", name: "Latest", type: type })
 
-    aggrs.push({ id: "count", name: "Count", type: "integer" })
-
     switch type
       when "integer", "decimal"
         aggrs.push({ id: "sum", name: "Sum", type: type })
         aggrs.push({ id: "avg", name: "Average", type: "decimal" })
+
+    # Count is always last option
+    aggrs.push({ id: "count", name: "Number", type: "integer" })
 
     return aggrs
 

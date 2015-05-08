@@ -65,7 +65,7 @@ describe "Schema", ->
       it "includes primary key as count", ->
         joinItem = _.last(@atree)
         subtree = joinItem.getChildren()
-        assert.equal subtree[0].name, "Count of B"
+        assert.equal subtree[0].name, "Number of B"
 
       it "has joins list", ->
         assert.deepEqual @atree[0].value.joinIds, []
