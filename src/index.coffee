@@ -1,47 +1,13 @@
 SaveCancelModalComponent = require './SaveCancelModalComponent'
 ListComponent = require './ListComponent'
-ReactSelect = require 'react-select'
 React = require 'react'
 HoverMixin = require './HoverMixin'
 H = React.DOM
 
 Schema = require './Schema'
+
 DesignValidator = require './DesignValidator'
-
-JoinExprTreeComponent = require './JoinExprTreeComponent' 
-
-ScalarExprEditorComponent = React.createClass {
-  handleJoinExprSelect: (joinExpr) ->
-    @props.scalar.expr = joinExpr.expr
-    @props.scalar.joinIds = joinExpr.joinIds
-    @props.onChange()
-
-  handleAggrSelect: (aggrId) ->
-    @props.scalar.aggrId = aggrId
-    @props.onChange()
-
-  render: ->
-    # Create tree 
-    tree = @props.schema.getJoinExprTree({ baseTableId: @props.scalar.baseTableId })
-
-    # Create list of aggregates
-    if @props.scalar.expr and @props.schema.isAggrNeeded(@props.scalar.joinIds)
-      options = _.map(@props.schema.getAggrs(@props.scalar.expr), (aggr) -> { value: aggr.id, label: aggr.name })
-      aggrs = H.div null,
-        H.br()
-        H.br()
-        H.label null, "Aggregate by"
-        React.createElement(ReactSelect, { 
-          value: @props.scalar.aggr, 
-          options: options 
-          onChange: @handleAggrSelect
-        })
-
-    H.div null, 
-      H.label null, "Expression"
-      React.createElement(JoinExprTreeComponent, tree: tree, onSelect: @handleJoinExprSelect, selectedValue: { expr: @props.scalar.expr, joinIds: @props.scalar.joinIds })
-      H.div style: { width: "20em" }, aggrs
-}
+ScalarExprEditorComponent = require './ScalarExprEditorComponent'
 
 createSchema = ->
   # Create simple schema with subtree
@@ -71,20 +37,35 @@ $ ->
 
   Holder = React.createClass {
     getInitialState: ->
-      { expr: _.cloneDeep(expr) }
+      { expr: _.cloneDeep(@props.expr) }
 
     handleChange: ->
       # Clean first
-      designValidator.cleanExpr(@state.expr)
+      designValidator.validateExpr(@state.expr)
 
       # Clone and set
       @setState(expr: _.cloneDeep(@state.expr))
 
     render: ->
-      React.createElement(ScalarExprEditorComponent, schema: schema, scalar: @state.expr, onChange: @handleChange)
+      editor = React.createElement(SaveCancelModalComponent, { 
+        title: "Select Expression to Color By"
+        data: @state.expr
+        onSave: (data) => 
+          @state.expr = data
+          @handleChange()
+        createContent: (data, onChange) => 
+          React.createElement(ScalarExprEditorComponent, schema: schema, scalar: data, onChange: onChange)
+        onValidate: (data) =>
+          designValidator.validateExpr(data)
+        })
+
+      React.createElement HoverEditComponent, 
+        editor: editor
+        JSON.stringify(@state.expr)
+
   }
 
-  sample = React.createElement(Holder)
+  sample = React.createElement(Holder, expr: expr)
   React.render(sample, document.getElementById('root'))
 
 # Child = React.createClass {
@@ -168,37 +149,35 @@ $ ->
 # }
 
 
-# HoverEditComponent = React.createClass {
-#   getInitialState: -> { hover: false, editing: false }
-#   mouseOver: -> @setState(hover: true)
-#   mouseOut: -> @setState(hover: false)
+HoverEditComponent = React.createClass {
+  mixins: [HoverMixin]
 
-#   handleEditorClose: -> @setState(editing: false)
-#   render: ->
-#     if @state.editing
-#       editor = React.cloneElement(@props.editor, onClose: @handleEditorClose)
+  getInitialState: -> { editing: false }
+  handleEditorClose: -> @setState(editing: false)
 
-#     highlighted = @state.hover or @state.editing
+  render: ->
+    if @state.editing
+      editor = React.cloneElement(@props.editor, onClose: @handleEditorClose)
 
-#     H.div style: { display: "inline-block" },
-#       editor
-#       H.div
-#         onMouseOver: @mouseOver
-#         onMouseOut: @mouseOut
-#         onClick: => @setState(editing: true)
-#         style: { 
-#           display: "inline-block"
-#           padding: 3
-#           cursor: "pointer"
-#           # border: if highlighted then "solid 1px rgba(128, 128, 128, 0.3)" else "solid 1px transparent"
-#           borderRadius: 4
-#           backgroundColor: if highlighted then "rgba(0, 0, 0, 0.1)"
-#         },
-#           @props.children
-#           # H.span 
-#           #   style: { 
-#           #     color: if highlighted then "#08A" else "transparent"
-#           #     paddingLeft: 7
-#           #   }
-#           #   className: "glyphicon glyphicon-pencil"
-# } 
+    highlighted = @state.hovered or @state.editing
+
+    H.div style: { display: "inline-block" },
+      editor
+      H.div
+        onClick: => @setState(editing: true)
+        style: { 
+          display: "inline-block"
+          padding: 3
+          cursor: "pointer"
+          # border: if highlighted then "solid 1px rgba(128, 128, 128, 0.3)" else "solid 1px transparent"
+          borderRadius: 4
+          backgroundColor: if highlighted then "rgba(0, 0, 0, 0.1)"
+        },
+          @props.children
+          # H.span 
+          #   style: { 
+          #     color: if highlighted then "#08A" else "transparent"
+          #     paddingLeft: 7
+          #   }
+          #   className: "glyphicon glyphicon-pencil"
+} 

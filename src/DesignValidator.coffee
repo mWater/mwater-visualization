@@ -4,12 +4,12 @@ module.exports = class DesignValidator
   constructor: (schema) ->
     @schema = schema
 
-  cleanExpr: (expr) ->
+  validateExpr: (expr) ->
     switch expr.type
       when "scalar"
-        @cleanScalarExpr(expr)
+        @validateScalarExpr(expr)
 
-  cleanScalarExpr: (scalar) ->
+  validateScalarExpr: (scalar) ->
     # Clean aggregate
     if scalar.expr
       aggrs = @schema.getAggrs(scalar.expr)
@@ -21,3 +21,6 @@ module.exports = class DesignValidator
       # Set if needed to first
       if @schema.isAggrNeeded(scalar.joinIds)
         scalar.aggr = aggrs[0].id
+      else
+        scalar.aggr = null
+

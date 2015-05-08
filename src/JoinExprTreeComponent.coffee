@@ -89,7 +89,7 @@ JoinExprNodeComponent = React.createClass {
         React.createElement(JoinExprTreeComponent, tree: @props.item.getChildren(), onSelect: @props.onSelect, selectedValue: @props.selectedValue)
 
     H.div null,
-      H.div onClick: @handleArrowClick, style: { cursor: "pointer", padding: 4},
+      H.div onClick: @handleArrowClick, style: { cursor: "pointer", padding: 4 },
         H.span style: { color: "#AAA", cursor: "pointer", paddingRight: 3 }, arrow
         @props.item.name
       children
