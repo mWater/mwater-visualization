@@ -31,6 +31,7 @@ module.exports = ScalarExprEditorComponent = React.createClass {
 
     H.div null, 
       H.label null, "Expression"
-      React.createElement(JoinExprTreeComponent, tree: tree, onSelect: @handleJoinExprSelect, selectedValue: { expr: @props.scalar.expr, joinIds: @props.scalar.joinIds })
+      H.div style: { overflowY: "scroll", height: 350 },
+        React.createElement(JoinExprTreeComponent, tree: tree, onSelect: @handleJoinExprSelect, selectedValue: { expr: @props.scalar.expr, joinIds: @props.scalar.joinIds })
       H.div style: { width: "20em" }, aggrs
 }

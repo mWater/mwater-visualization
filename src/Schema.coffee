@@ -131,3 +131,4 @@ module.exports = class Schema
   # Determines if aggregation is needed for joins
   isAggrNeeded: (joinIds) ->
     return _.any(joinIds, (j) => @getJoin(j).oneToMany)
+
