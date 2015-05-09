@@ -33,7 +33,7 @@ $ ->
   schema = createSchema()
   designValidator = new DesignValidator(schema)
 
-  expr = { type: "scalar", baseTableId: "a" }
+  expr = { type: "scalar", baseTableId: "a", joinIds: [] }
 
   Holder = React.createClass {
     getInitialState: ->
@@ -61,7 +61,7 @@ $ ->
 
       React.createElement HoverEditComponent, 
         editor: editor
-        JSON.stringify(@state.expr)
+        schema.summarizeExpr(@state.expr)
 
   }
 
@@ -153,7 +153,7 @@ HoverEditComponent = React.createClass {
   mixins: [HoverMixin]
 
   getInitialState: -> { editing: false }
-  handleEditorClose: -> @setState(editing: false)
+  handleEditorClose: -> @setState(editing: false, hovered: false)
 
   render: ->
     if @state.editing

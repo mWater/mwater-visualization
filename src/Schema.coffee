@@ -132,3 +132,27 @@ module.exports = class Schema
   isAggrNeeded: (joinIds) ->
     return _.any(joinIds, (j) => @getJoin(j).oneToMany)
 
+  # Summarizes expression as text
+  summarizeExpr: (expr) ->
+    if not expr
+      return "None"
+    switch expr.type
+      when "scalar"
+        return @summarizeScalarExpr(expr)
+      when "field"
+        return @getColumn(expr.tableId, expr.columnId).name
+      else
+        throw new Error("Unsupported type #{expr.type}")
+
+  summarizeScalarExpr: (expr) ->
+    str = @summarizeExpr(expr.expr)
+
+    # Add aggr
+    if expr.aggr
+      str = _.findWhere(@getAggrs(expr.expr), { id: expr.aggr }).name + " " + str
+
+    # Add ofs (reverse joins)
+    for joinId in expr.joinIds.slice().reverse()
+      str = str + " of " + @getJoin(joinId).name
+
+    return str

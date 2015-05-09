@@ -134,3 +134,30 @@ describe "Schema", ->
 
       it "false for non-oneToMany join", ->
         assert.isFalse @schema.isAggrNeeded(["ba"])
+
+    describe "summarizeExpr", ->
+      it "summarizes null"
+      it "summarizes field expr", ->
+        expr = { type: "field", tableId: "a", columnId: "y" }
+        assert.equal @schema.summarizeExpr(expr), "Y"
+
+      it "summarizes simple scalar expr", ->
+        fieldExpr = { type: "field", tableId: "a", columnId: "y" }
+        scalarExpr = { type: "scalar", expr: fieldExpr, joinIds: [] }
+        assert.equal @schema.summarizeExpr(scalarExpr), "Y"
+
+      it "summarizes simple scalar expr", ->
+        fieldExpr = { type: "field", tableId: "a", columnId: "y" }
+        scalarExpr = { type: "scalar", baseTableId: "a", expr: fieldExpr, joinIds: [] }
+        assert.equal @schema.summarizeExpr(scalarExpr), "Y"
+
+      it "summarizes joined scalar expr", ->
+        fieldExpr = { type: "field", tableId: "a", columnId: "y" }
+        scalarExpr = { type: "scalar", baseTableId: "b", expr: fieldExpr, joinIds: ['ba'] }
+        assert.equal @schema.summarizeExpr(scalarExpr), "Y of BA"
+
+      it "summarizes joined aggr scalar expr", ->
+        fieldExpr = { type: "field", tableId: "b", columnId: "r" }
+        scalarExpr = { type: "scalar", baseTableId: "a", expr: fieldExpr, joinIds: ['ab'], aggr: "count" }
+        assert.equal @schema.summarizeExpr(scalarExpr), "Number R of AB"
+
