@@ -7,7 +7,7 @@ DesignValidator = require './DesignValidator'
 
 Schema = require './Schema'
 
-ScalarExprEditorComponent = require './ScalarExprEditorComponent'
+ScalarExprComponent = require './ScalarExprComponent'
 
 createSchema = ->
   # Create simple schema with subtree
@@ -45,19 +45,11 @@ $ ->
       @setState(expr: expr)
 
     render: ->
-      editor = React.createElement(SaveCancelModalComponent, { 
-        title: "Select Expression to Color By"
-        initialValue: @state.expr
+      React.createElement ScalarExprComponent, 
+        schema: schema,
+        baseTableId: "a",
+        expr: @state.expr, 
         onChange: @handleChange
-        # onValidate: (data) =>
-        #   designValidator.validateExpr(data)
-        },
-          React.createElement(ScalarExprEditorComponent, schema: schema, baseTableId: "a")
-      )
-
-      React.createElement HoverEditComponent, 
-        editor: editor,
-          schema.summarizeExpr(@state.expr)
   }
 
   sample = React.createElement(Holder, initialExpr: expr)
@@ -144,35 +136,3 @@ $ ->
 # }
 
 
-HoverEditComponent = React.createClass {
-  mixins: [HoverMixin]
-
-  getInitialState: -> { editing: false }
-  handleEditorClose: -> @setState(editing: false, hovered: false)
-
-  render: ->
-    if @state.editing
-      editor = React.cloneElement(@props.editor, onClose: @handleEditorClose)
-
-    highlighted = @state.hovered or @state.editing
-
-    H.div style: { display: "inline-block" },
-      editor
-      H.div
-        onClick: => @setState(editing: true)
-        style: { 
-          display: "inline-block"
-          padding: 3
-          cursor: "pointer"
-          # border: if highlighted then "solid 1px rgba(128, 128, 128, 0.3)" else "solid 1px transparent"
-          borderRadius: 4
-          backgroundColor: if highlighted then "rgba(0, 0, 0, 0.1)"
-        },
-          @props.children
-          # H.span 
-          #   style: { 
-          #     color: if highlighted then "#08A" else "transparent"
-          #     paddingLeft: 7
-          #   }
-          #   className: "glyphicon glyphicon-pencil"
-} 

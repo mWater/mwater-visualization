@@ -2,8 +2,27 @@ H = React.DOM
 JoinExprTreeComponent = require './JoinExprTreeComponent' 
 ReactSelect = require 'react-select'
 DesignValidator = require './DesignValidator'
+SaveCancelModalComponent = require './SaveCancelModalComponent'
+HoverEditComponent = require './HoverEditComponent'
 
-module.exports = ScalarExprEditorComponent = React.createClass {
+module.exports = ScalarExprComponent = React.createClass {
+  render: ->
+    editor = React.createElement(SaveCancelModalComponent, { 
+        title: "Select Expression"
+        initialValue: @props.expr
+        onChange: @props.onChange
+        # onValidate: (data) =>
+        #   designValidator.validateExpr(data)
+        },
+          React.createElement(ScalarExprEditorComponent, schema: @props.schema, baseTableId: @props.baseTableId)
+      )
+
+    React.createElement HoverEditComponent, 
+      editor: editor,
+        H.input className: "form-control input-sm", type: "text", value: @props.schema.summarizeExpr(@props.expr)  
+}
+
+ScalarExprEditorComponent = React.createClass {
   handleJoinExprSelect: (joinExpr) ->
     # Create new expr
     scalar = _.extend({}, @props.value, { type: "scalar", baseTableId: @props.baseTableId, expr: joinExpr.expr, joinIds: joinExpr.joinIds })

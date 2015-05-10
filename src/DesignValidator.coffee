@@ -9,8 +9,10 @@ module.exports = class DesignValidator
       when "scalar"
         returh @cleanScalarExpr(expr)
 
-  cleanScalarExpr: (scalar) ->
+  cleanScalarExpr: (scalar, baseTable) ->
     if not scalar then return scalar
+
+    # TODO toast if baseTable wrong
 
     # Clean aggregate
     if scalar.expr
