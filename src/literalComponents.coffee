@@ -1,23 +1,24 @@
+H = React.DOM
 
-exports.TextLiteralComponent = React.createClass {
+exports.TextComponent = React.createClass {
   propTypes: {
     expr: React.PropTypes.object
     onChange: React.PropTypes.func.isRequired 
   }
 
   onChange: (ev) ->
-    @props.onChange({ type: "literal", value: ev.target.value })
+    @props.onChange({ type: "text", value: ev.target.value })
 
   render: ->
     H.input 
       className: "form-control input-sm",
-      style: { width: "20em" },
+      style: { width: "20em", display: "inline-block" },
       type: "text", 
       onChange: @handleChange
       value: if @props.expr then @props.expr.value
 }
 
-exports.DecimalLiteralComponent = React.createClass {
+exports.DecimalComponent = React.createClass {
   propTypes: {
     expr: React.PropTypes.object
     onChange: React.PropTypes.func.isRequired 
@@ -37,22 +38,24 @@ exports.DecimalLiteralComponent = React.createClass {
       return @setState(invalid: true, invalidText: ev.target.value)
 
     @setState(invalid: false, invalidText: null)
-    @props.onChange({ type: "literal", value: val })
+    @props.onChange({ type: "decimal", value: val })
     
   render: ->
     console.log @state.invalid
     console.log @state.invalidText
 
-    H.div className: (if @state.invalid then "has-error"),
-      H.input 
-        className: "form-control input-sm",
-        type: "text", 
-        style: { width: "6em" },
-        onChange: @handleChange,
-        value: (if @state.invalid then @state.invalidText) or (if @props.expr then @props.expr.value)
+    H.div 
+      className: (if @state.invalid then "has-error")
+      style: { width: "6em", display: "inline-block" },
+        H.input 
+          className: "form-control input-sm",
+          type: "text", 
+          style: { width: "6em", display: "inline-block" },
+          onChange: @handleChange,
+          value: (if @state.invalid then @state.invalidText) or (if @props.expr then @props.expr.value)
 }
 
-exports.IntegerLiteralComponent = React.createClass {
+exports.IntegerComponent = React.createClass {
   propTypes: {
     expr: React.PropTypes.object
     onChange: React.PropTypes.func.isRequired 
@@ -72,19 +75,20 @@ exports.IntegerLiteralComponent = React.createClass {
       return @setState(invalid: true, invalidText: ev.target.value)
 
     @setState(invalid: false, invalidText: null)
-    @props.onChange({ type: "literal", value: val })
+    @props.onChange({ type: "integer", value: val })
     
   render: ->
     console.log @state.invalid
     console.log @state.invalidText
 
-    H.div className: (if @state.invalid then "has-error"),
-      H.input 
-        className: "form-control input-sm",
-        type: "text", 
-        style: { width: "6em" },
-        onChange: @handleChange,
-        value: (if @state.invalid then @state.invalidText) or (if @props.expr then @props.expr.value)
+    H.div 
+      className: (if @state.invalid then "has-error")
+      style: { width: "6em", display: "inline-block" },
+        H.input 
+          className: "form-control input-sm",
+          type: "text", 
+          onChange: @handleChange,
+          value: (if @state.invalid then @state.invalidText) or (if @props.expr then @props.expr.value)
 }
 
-exports.EnumLiteralComponent = 
+# exports.EnumLiteralComponent = 

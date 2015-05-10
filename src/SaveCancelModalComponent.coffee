@@ -4,7 +4,7 @@ H = React.DOM
 module.exports = React.createClass {
   propTypes: {
     title: React.PropTypes.string # Title of modal
-    initialValue: React.PropTypes.object.isRequired # Initial value
+    initialValue: React.PropTypes.any # Initial value
     onClose: React.PropTypes.func # Called when modal is closed. Called during save too
     onChange: React.PropTypes.func # Called when value is changed with new value. 
     onValidate: React.PropTypes.func # Called with value to validate. Non-null for error

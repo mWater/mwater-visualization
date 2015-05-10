@@ -9,6 +9,8 @@ Schema = require './Schema'
 
 ScalarExprComponent = require './ScalarExprComponent'
 
+literalComponents = require './literalComponents'
+
 createSchema = ->
   # Create simple schema with subtree
   schema = new Schema()
@@ -48,6 +50,7 @@ ComparisonExprComponent = React.createClass {
   render: ->
     # Create LHS
     lhsControl = React.createElement(ScalarExprComponent, 
+      key: "lhs",
       schema: @props.schema, 
       baseTableId: @props.baseTableId, 
       expr: @props.expr.lhs,
@@ -58,6 +61,7 @@ ComparisonExprComponent = React.createClass {
     if lhsType
       ops = @props.schema.getComparisonOps(lhsType)
       opControl = H.select 
+        key: "op",
         className: "form-control input-sm",
         style: { width: "auto", display: "inline-block" }
         value: @props.expr.op
@@ -68,11 +72,11 @@ ComparisonExprComponent = React.createClass {
       rhsType = @props.schema.getComparisonRhsType(lhsType, @props.expr.op)
       switch rhsType
         when "text"
-          rhsControl = React.createElement(TextLiteralComponent, expr: @props.rhs, onChange: @handleRhsChange)
+          rhsControl = React.createElement(literalComponents.TextComponent, key: "rhs", expr: @props.expr.rhs, onChange: @handleRhsChange)
         when "integer"
-          rhsControl = React.createElement(IntegerLiteralComponent, expr: @props.rhs, onChange: @handleRhsChange)
+          rhsControl = React.createElement(literalComponents.IntegerComponent, key: "rhs", expr: @props.expr.rhs, onChange: @handleRhsChange)
         when "decimal"
-          rhsControl = React.createElement(DecimalLiteralComponent, expr: @props.rhs, onChange: @handleRhsChange)
+          rhsControl = React.createElement(literalComponents.DecimalComponent, key: "rhs", expr: @props.expr.rhs, onChange: @handleRhsChange)
 
     return H.div null,
       lhsControl,
@@ -87,25 +91,27 @@ $ ->
   schema = createSchema()
   designValidator = new DesignValidator(schema)
 
-  expr = {}
+  expr = { type: "comparison" }
 
   Holder = React.createClass {
     getInitialState: ->
       { expr: @props.initialExpr }
 
     handleChange: (expr) ->
-      # # Clean first
-      # expr = designValidator.cleanExpr(expr)
+      # Clean first
+      expr = designValidator.cleanExpr(expr)
       console.log expr
       @setState(expr: expr)
 
     render: ->
-      React.createElement(IntegerLiteralComponent, expr: @state.expr, onChange: @handleChange)
-      # React.createElement ComparisonExprComponent, 
-      #   schema: schema,
-      #   baseTableId: "a",
-      #   expr: @state.expr, 
-      #   onChange: @handleChange
+      console.log "Expression: "
+      console.log @state.expr
+      # React.createElement(literalComponents.DecimalComponent, expr: @state.expr, onChange: @handleChange)
+      React.createElement ComparisonExprComponent, 
+        schema: schema,
+        baseTableId: "a",
+        expr: @state.expr, 
+        onChange: @handleChange
   }
 
   sample = React.createElement(Holder, initialExpr: expr)

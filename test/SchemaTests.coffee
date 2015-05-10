@@ -103,11 +103,10 @@ describe "Schema", ->
         assert.equal @schema.getExprType(expr), "integer"
 
       it "gets literal types", ->
-        assert.equal @schema.getExprType({ type: "literal", value: "x" }), "text"
-        assert.equal @schema.getExprType({ type: "literal", value: true }), "boolean"
-        assert.equal @schema.getExprType({ type: "literal", value: false }), "boolean"
-        assert.equal @schema.getExprType({ type: "literal", value: 2.23 }), "decimal"
-        assert.equal @schema.getExprType({ type: "literal", value: 34 }), "integer"
+        assert.equal @schema.getExprType({ type: "text", value: "x" }), "text"
+        assert.equal @schema.getExprType({ type: "boolean", value: true }), "boolean"
+        assert.equal @schema.getExprType({ type: "decimal", value: 2.23 }), "decimal"
+        assert.equal @schema.getExprType({ type: "integer", value: 34 }), "integer"
 
     describe "getAggrs", ->
       it "includes latest if has natural ordering", ->

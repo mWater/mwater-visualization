@@ -102,16 +102,8 @@ module.exports = class Schema
         return column.type
       when "scalar"
         return @getExprType(expr.expr)
-      when "literal"
-        if _.isString(expr.value)
-          return "text"
-        if _.isNumber(expr.value)
-          if expr.value % 1 == 0
-            return "integer"
-          return "decimal"
-        if expr.value == true or expr.value == false
-          return "boolean"
-        throw new Error("Unknown literal type")
+      when "text", "integer", "boolean", "decimal"
+        return expr.type
       else
         throw new Error("Not implemented")
 

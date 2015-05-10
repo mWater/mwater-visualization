@@ -30,23 +30,18 @@ describe "DesignValidator", ->
       assert not expr.op
 
     it "removes rhs if no op", ->
-      expr = { type: "comparison", lhs: { type: "field", tableId: "t1", columnId: "text" }, rhs: { type: "literal", value: "x" } }
+      expr = { type: "comparison", lhs: { type: "field", tableId: "t1", columnId: "text" }, rhs: { type: "text", value: "x" } }
       expr = @dv.cleanComparisonExpr(expr)
       assert not expr.rhs
 
     it "removes rhs if wrong type", ->
-      expr = { type: "comparison", lhs: { type: "field", tableId: "t1", columnId: "text" }, op: "~*", rhs: { type: "literal", value: "x" } }
+      expr = { type: "comparison", lhs: { type: "field", tableId: "t1", columnId: "text" }, op: "~*", rhs: { type: "text", value: "x" } }
       expr = @dv.cleanComparisonExpr(expr)
       assert expr.rhs, "should keep"
 
-      expr = { type: "comparison", lhs: { type: "field", tableId: "t1", columnId: "text" }, op: "~*", rhs: { type: "literal", value: 3 } }
+      expr = { type: "comparison", lhs: { type: "field", tableId: "t1", columnId: "text" }, op: "~*", rhs: { type: "integer", value: 3 } }
       expr = @dv.cleanComparisonExpr(expr)
       assert not expr.rhs, "should remove"
-
-    it "allows integer rhs for decimal", ->
-      expr = { type: "comparison", lhs: { type: "field", tableId: "t1", columnId: "decimal" }, op: ">=", rhs: { type: "literal", value: 3 } }
-      expr = @dv.cleanComparisonExpr(expr)
-      assert expr.rhs, "should keep"
 
     it "defaults op", ->
       expr = { type: "comparison", lhs: { type: "field", tableId: "t1", columnId: "text" } }

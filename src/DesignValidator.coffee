@@ -51,11 +51,7 @@ module.exports = class DesignValidator
 
     # Remove rhs if wrong type
     if expr.op and expr.rhs and expr.lhs
-      rhsShouldBe = @schema.getComparisonRhsType(@schema.getExprType(expr.lhs), expr.op)
-      rhsType = @schema.getExprType(expr.rhs)
-
-      # Allow decimal integer
-      if rhsShouldBe != rhsType and (rhsType != "integer" or rhsShouldBe != "decimal")
+      if @schema.getComparisonRhsType(@schema.getExprType(expr.lhs), expr.op) != @schema.getExprType(expr.rhs)
         expr = _.omit(expr, "rhs")        
 
     # Default op
