@@ -102,6 +102,13 @@ describe "Schema", ->
         }
         assert.equal @schema.getExprType(expr), "integer"
 
+      it "gets literal types", ->
+        assert.equal @schema.getExprType({ type: "literal", value: "x" }), "text"
+        assert.equal @schema.getExprType({ type: "literal", value: true }), "boolean"
+        assert.equal @schema.getExprType({ type: "literal", value: false }), "boolean"
+        assert.equal @schema.getExprType({ type: "literal", value: 2.23 }), "decimal"
+        assert.equal @schema.getExprType({ type: "literal", value: 34 }), "integer"
+
     describe "getAggrs", ->
       it "includes latest if has natural ordering", ->
         schema = new Schema()
@@ -146,7 +153,7 @@ describe "Schema", ->
     describe "summarizeExpr", ->
       it "summarizes null", ->
         assert.equal @schema.summarizeExpr(null), "None"
-        
+
       it "summarizes field expr", ->
         expr = { type: "field", tableId: "a", columnId: "y" }
         assert.equal @schema.summarizeExpr(expr), "Y"
@@ -176,3 +183,13 @@ describe "Schema", ->
       schema = new Schema()
       assert.include _.pluck(schema.getComparisonOps("text"), "id"), "is not null" 
 
+  describe "getComparisonRhsType", ->
+    before ->
+      @schema = new Schema()
+    
+    it "null for unary", ->
+      assert.isNull @schema.getComparisonRhsType("text", "is not null")
+
+    it "same for binary", ->
+      assert.equal @schema.getComparisonRhsType("decimal", "="), "decimal"
+  

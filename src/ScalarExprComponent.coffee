@@ -19,7 +19,12 @@ module.exports = ScalarExprComponent = React.createClass {
 
     React.createElement HoverEditComponent, 
       editor: editor,
-        H.input className: "form-control input-sm", type: "text", value: @props.schema.summarizeExpr(@props.expr)  
+        H.input 
+          className: "form-control input-sm",
+          readOnly: true, 
+          type: "text", 
+          style: { backgroundColor: "white" }
+          value: @props.schema.summarizeExpr(@props.expr)  
 }
 
 ScalarExprEditorComponent = React.createClass {

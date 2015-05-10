@@ -27,13 +27,78 @@ createSchema = ->
 
   return schema
 
+ComparisonExprComponent = React.createClass {
+  propTypes: {
+    expr: React.PropTypes.object.isRequired
+    onChange: React.PropTypes.func.isRequired 
+    schema: React.PropTypes.object.isRequired
+    baseTableId: React.PropTypes.string.isRequired 
+  }
+
+  handleLhsChange: (lhs) ->
+    @props.onChange(_.extend({}, @props.expr, lhs: lhs))
+
+  handleOpChange: (ev) ->
+    @props.onChange(_.extend({}, @props.expr, op: ev.target.value))
+
+  handleRhsChange: (rhs) ->
+    @props.onChange(_.extend({}, @props.expr, rhs: rhs))
+
+  render: ->
+    # Create LHS
+    lhsControl = React.createElement(ScalarExprComponent, 
+      schema: @props.schema, 
+      baseTableId: @props.baseTableId, 
+      expr: @props.expr.lhs,
+      onChange: @handleLhsChange)
+
+    # Create op if LHS present
+    lhsType = @props.schema.getExprType(@props.expr.lhs)
+    if lhsType
+      ops = @props.schema.getComparisonOps(lhsType)
+      opControl = H.select 
+        className: "form-control input-sm",
+        style: { width: "auto", display: "inline-block" }
+        value: @props.expr.op
+        onChange: @handleOpChange,
+          _.map(ops, (op) -> H.option(value: op.id, op.name))
+
+    if lhsType and @props.expr.op
+      rhsType = @props.schema.getComparisonRhsType(lhsType, @props.expr.op)
+      switch rhsType
+        when "text"
+          rhsControl = React.createElement(TextLiteralComponent, expr: @props.rhs, onChange: @handleRhsChange)
+
+    return H.div null,
+      lhsControl,
+      opControl,
+      rhsControl
+}
+
+TextLiteralComponent = React.createClass {
+  propTypes: {
+    expr: React.PropTypes.object
+    onChange: React.PropTypes.func.isRequired 
+  }
+
+  onChange: (ev) ->
+    @props.onChange({ type: "literal", value: ev.target.value })
+    
+  render: ->
+    H.input 
+      className: "form-control input-sm",
+      type: "text", 
+      onChange: @handleChange
+      value: if @props.expr then @props.expr.value
+}
+
 $ ->
   # $("body").css("background-color", "#EEE")
   # Create simple schema
   schema = createSchema()
   designValidator = new DesignValidator(schema)
 
-  expr = null
+  expr = {}
 
   Holder = React.createClass {
     getInitialState: ->
@@ -45,7 +110,7 @@ $ ->
       @setState(expr: expr)
 
     render: ->
-      React.createElement ScalarExprComponent, 
+      React.createElement ComparisonExprComponent, 
         schema: schema,
         baseTableId: "a",
         expr: @state.expr, 

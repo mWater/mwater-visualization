@@ -95,13 +95,23 @@ module.exports = class Schema
   getExprType: (expr) ->
     if not expr?
       return null
-      
+
     switch expr.type
       when "field"
         column = @getColumn(expr.tableId, expr.columnId)
         return column.type
       when "scalar"
         return @getExprType(expr.expr)
+      when "literal"
+        if _.isString(expr.value)
+          return "text"
+        if _.isNumber(expr.value)
+          if expr.value % 1 == 0
+            return "integer"
+          return "decimal"
+        if expr.value == true or expr.value == false
+          return "boolean"
+        throw new Error("Unknown literal type")
       else
         throw new Error("Not implemented")
 
@@ -183,3 +193,11 @@ module.exports = class Schema
     ops.push({ id: "is not null", name: "has a value"})
 
     return ops
+
+  getComparisonRhsType: (lhsType, op) ->
+    if op in ['= true', '= false', 'is null', 'is not null']
+      return null
+
+    return lhsType
+
+  isUnary: (op) ->
