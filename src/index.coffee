@@ -15,7 +15,8 @@ createSchema = ->
   schema.addTable({ id: "a", name: "A" })
   schema.addColumn("a", { id: "x", name: "X", type: "uuid", primary: true })
   schema.addColumn("a", { id: "y", name: "Y", type: "text" })
-  schema.addColumn("a", { id: "z", name: "Z", type: "integer" })
+  schema.addColumn("a", { id: "integer", name: "Integer", type: "integer" })
+  schema.addColumn("a", { id: "decimal", name: "Decimal", type: "decimal" })
 
   schema.addTable({ id: "b", name: "B" })
   schema.addColumn("b", { id: "q", name: "Q", type: "uuid", primary: true })
@@ -68,6 +69,10 @@ ComparisonExprComponent = React.createClass {
       switch rhsType
         when "text"
           rhsControl = React.createElement(TextLiteralComponent, expr: @props.rhs, onChange: @handleRhsChange)
+        when "integer"
+          rhsControl = React.createElement(IntegerLiteralComponent, expr: @props.rhs, onChange: @handleRhsChange)
+        when "decimal"
+          rhsControl = React.createElement(DecimalLiteralComponent, expr: @props.rhs, onChange: @handleRhsChange)
 
     return H.div null,
       lhsControl,
@@ -75,22 +80,6 @@ ComparisonExprComponent = React.createClass {
       rhsControl
 }
 
-TextLiteralComponent = React.createClass {
-  propTypes: {
-    expr: React.PropTypes.object
-    onChange: React.PropTypes.func.isRequired 
-  }
-
-  onChange: (ev) ->
-    @props.onChange({ type: "literal", value: ev.target.value })
-    
-  render: ->
-    H.input 
-      className: "form-control input-sm",
-      type: "text", 
-      onChange: @handleChange
-      value: if @props.expr then @props.expr.value
-}
 
 $ ->
   # $("body").css("background-color", "#EEE")
@@ -107,14 +96,16 @@ $ ->
     handleChange: (expr) ->
       # # Clean first
       # expr = designValidator.cleanExpr(expr)
+      console.log expr
       @setState(expr: expr)
 
     render: ->
-      React.createElement ComparisonExprComponent, 
-        schema: schema,
-        baseTableId: "a",
-        expr: @state.expr, 
-        onChange: @handleChange
+      React.createElement(IntegerLiteralComponent, expr: @state.expr, onChange: @handleChange)
+      # React.createElement ComparisonExprComponent, 
+      #   schema: schema,
+      #   baseTableId: "a",
+      #   expr: @state.expr, 
+      #   onChange: @handleChange
   }
 
   sample = React.createElement(Holder, initialExpr: expr)
