@@ -1,35 +1,27 @@
 H = React.DOM
-Freezer = require 'freezer-js'
 
+# Child must be react element with value and onChange props
 module.exports = React.createClass {
   propTypes: {
     title: React.PropTypes.string # Title of modal
-    data: React.PropTypes.object.isRequired # Initial data 
+    initialValue: React.PropTypes.object.isRequired # Initial value
     onClose: React.PropTypes.func # Called when modal is closed. Called during save too
-    onSave: React.PropTypes.func # Called when data is changed with new data. 
-    createContent: React.PropTypes.func.isRequired # Called with (data, onChange) to create content elements
-    onValidate: React.PropTypes.func # Called with data to validate. Non-null for error
+    onChange: React.PropTypes.func # Called when value is changed with new value. 
+    onValidate: React.PropTypes.func # Called with value to validate. Non-null for error
   }
 
-  getInitialState: ->
-    # Clone data for state
-    return { data: _.cloneDeep(@props.data) }
+  getInitialState: -> { value: @props.initialValue }
 
   handleSave: (e) ->
     # Apply changes
-    @props.onSave(@state.data)
+    @props.onChange(@state.value)
     if @props.onClose then @props.onClose()
 
   handleCancel: (e) ->
     if @props.onClose then @props.onClose()
 
-  handleChange: ->
-    # Validate
-    if @props.onValidate
-      @props.onValidate(@state.data)
-
-    # Deep copy data
-    @setState(data: _.cloneDeep(@state.data))
+  handleChange: (value) ->
+    @setState(value: value)
 
   componentDidMount: ->
     $(React.findDOMNode(@refs.modal)).modal({ 
@@ -42,7 +34,9 @@ module.exports = React.createClass {
     $(React.findDOMNode(@refs.modal)).modal("hide")    
 
   render: ->
-    changed = not _.isEqual(@props.data, @state.data)
+    # TODO validate
+
+    changed = @props.initialValue != @state.value
 
     H.div ref: "modal", className: "modal",
       H.div className: "modal-dialog",
@@ -50,8 +44,8 @@ module.exports = React.createClass {
           H.div className: "modal-header",
             H.h4 className: "modal-title", @props.title
           H.div className: "modal-body",
-            # Create content with data and onChange
-            @props.createContent(@state.data, @handleChange)
+            # Create content with value and onChange
+            React.cloneElement(React.Children.only(@props.children), { value: @state.value, onChange: @handleChange })
           H.div className: "modal-footer",
             H.button 
               ref: "cancel"

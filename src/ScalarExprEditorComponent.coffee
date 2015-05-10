@@ -1,30 +1,40 @@
 H = React.DOM
 JoinExprTreeComponent = require './JoinExprTreeComponent' 
 ReactSelect = require 'react-select'
+DesignValidator = require './DesignValidator'
 
 module.exports = ScalarExprEditorComponent = React.createClass {
   handleJoinExprSelect: (joinExpr) ->
-    @props.scalar.expr = joinExpr.expr
-    @props.scalar.joinIds = joinExpr.joinIds
-    @props.onChange()
+    # Create new expr
+    scalar = _.extend({}, @props.value, { type: "scalar", baseTableId: @props.baseTableId, expr: joinExpr.expr, joinIds: joinExpr.joinIds })
+
+    # Clean
+    scalar = new DesignValidator(@props.schema).cleanScalarExpr(scalar)
+
+    @props.onChange(scalar)
 
   handleAggrSelect: (aggr) ->
-    @props.scalar.aggr = aggr
-    @props.onChange()
+    # Create new expr
+    scalar = _.extend({}, @props.value, { aggr: aggr })
+
+    # Clean
+    scalar = new DesignValidator(@props.schema).cleanScalarExpr(scalar)
+    
+    @props.onChange(scalar)
 
   render: ->
     # Create tree 
-    tree = @props.schema.getJoinExprTree({ baseTableId: @props.scalar.baseTableId })
+    tree = @props.schema.getJoinExprTree({ baseTableId: @props.baseTableId })
 
     # Create list of aggregates
-    if @props.scalar.expr and @props.schema.isAggrNeeded(@props.scalar.joinIds)
-      options = _.map(@props.schema.getAggrs(@props.scalar.expr), (aggr) -> { value: aggr.id, label: aggr.name })
+    if @props.value and @props.schema.isAggrNeeded(@props.value.joinIds)
+      options = _.map(@props.schema.getAggrs(@props.value.expr), (aggr) -> { value: aggr.id, label: aggr.name })
       aggrs = H.div null,
         H.br()
         H.br()
         H.label null, "Aggregate by"
         React.createElement(ReactSelect, { 
-          value: @props.scalar.aggr, 
+          value: @props.value.aggr, 
           options: options 
           onChange: @handleAggrSelect
         })
@@ -32,6 +42,9 @@ module.exports = ScalarExprEditorComponent = React.createClass {
     H.div null, 
       H.label null, "Expression"
       H.div style: { overflowY: "scroll", height: 350 },
-        React.createElement(JoinExprTreeComponent, tree: tree, onSelect: @handleJoinExprSelect, selectedValue: { expr: @props.scalar.expr, joinIds: @props.scalar.joinIds })
+        React.createElement(JoinExprTreeComponent, 
+          tree: tree, 
+          onSelect: @handleJoinExprSelect, 
+          selectedValue: (if @props.value then { expr: @props.value.expr, joinIds: @props.value.joinIds }))
       H.div style: { width: "20em" }, aggrs
 }

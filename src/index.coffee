@@ -3,10 +3,10 @@ ListComponent = require './ListComponent'
 React = require 'react'
 HoverMixin = require './HoverMixin'
 H = React.DOM
+DesignValidator = require './DesignValidator'
 
 Schema = require './Schema'
 
-DesignValidator = require './DesignValidator'
 ScalarExprEditorComponent = require './ScalarExprEditorComponent'
 
 createSchema = ->
@@ -33,39 +33,34 @@ $ ->
   schema = createSchema()
   designValidator = new DesignValidator(schema)
 
-  expr = { type: "scalar", baseTableId: "a", joinIds: [] }
+  expr = null
 
   Holder = React.createClass {
     getInitialState: ->
-      { expr: _.cloneDeep(@props.expr) }
+      { expr: @props.initialExpr }
 
-    handleChange: ->
-      # Clean first
-      designValidator.validateExpr(@state.expr)
-
-      # Clone and set
-      @setState(expr: _.cloneDeep(@state.expr))
+    handleChange: (expr) ->
+      # # Clean first
+      # expr = designValidator.cleanExpr(expr)
+      @setState(expr: expr)
 
     render: ->
       editor = React.createElement(SaveCancelModalComponent, { 
         title: "Select Expression to Color By"
-        data: @state.expr
-        onSave: (data) => 
-          @state.expr = data
-          @handleChange()
-        createContent: (data, onChange) => 
-          React.createElement(ScalarExprEditorComponent, schema: schema, scalar: data, onChange: onChange)
-        onValidate: (data) =>
-          designValidator.validateExpr(data)
-        })
+        initialValue: @state.expr
+        onChange: @handleChange
+        # onValidate: (data) =>
+        #   designValidator.validateExpr(data)
+        },
+          React.createElement(ScalarExprEditorComponent, schema: schema, baseTableId: "a")
+      )
 
       React.createElement HoverEditComponent, 
-        editor: editor
-        schema.summarizeExpr(@state.expr)
-
+        editor: editor,
+          schema.summarizeExpr(@state.expr)
   }
 
-  sample = React.createElement(Holder, expr: expr)
+  sample = React.createElement(Holder, initialExpr: expr)
   React.render(sample, document.getElementById('root'))
 
 # Child = React.createClass {
