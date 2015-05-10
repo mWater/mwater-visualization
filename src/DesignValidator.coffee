@@ -7,7 +7,7 @@ module.exports = class DesignValidator
   cleanExpr: (expr) ->
     switch expr.type
       when "scalar"
-        returh @cleanScalarExpr(expr)
+        return @cleanScalarExpr(expr)
 
   cleanScalarExpr: (scalar, baseTable) ->
     if not scalar then return scalar

@@ -93,10 +93,15 @@ module.exports = class Schema
 
   # Gets the type of an expression
   getExprType: (expr) ->
+    if not expr?
+      return null
+      
     switch expr.type
       when "field"
         column = @getColumn(expr.tableId, expr.columnId)
         return column.type
+      when "scalar"
+        return @getExprType(expr.expr)
       else
         throw new Error("Not implemented")
 
@@ -156,3 +161,25 @@ module.exports = class Schema
       str = str + " of " + @getJoin(joinId).name
 
     return str
+
+  getComparisonOps: (lhsType) ->
+    ops = []
+    switch lhsType
+      when "integer", "decimal"
+        ops.push({ id: "=", name: "=" })
+        ops.push({ id: ">", name: ">" })
+        ops.push({ id: ">=", name: ">=" })
+        ops.push({ id: "<", name: "<" })
+        ops.push({ id: "<=", name: "<=" })
+      when "text"
+        ops.push({ id: "~*", name: "matches" })
+      when "enum"
+        ops.push({ id: "=", name: "is" })
+      when "boolean"
+        ops.push({ id: "= true", name: "is true"})
+        ops.push({ id: "= false", name: "is false"})
+
+    ops.push({ id: "is null", name: "has no value"})
+    ops.push({ id: "is not null", name: "has a value"})
+
+    return ops

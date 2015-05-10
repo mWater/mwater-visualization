@@ -1,5 +1,5 @@
 assert = require('chai').assert
-
+_ = require 'lodash'
 Schema = require '../src/Schema'
 
 describe "Schema", ->
@@ -94,6 +94,14 @@ describe "Schema", ->
       it 'gets field type', ->
         assert.equal @schema.getExprType({ type: "field", tableId: "a", columnId: "z" }), "integer"
 
+      it 'gets scalar type', ->
+        expr = {
+          type: "scalar"
+          expr: { type: "field", tableId: "a", columnId: "z" }
+          joinIds: []
+        }
+        assert.equal @schema.getExprType(expr), "integer"
+
     describe "getAggrs", ->
       it "includes latest if has natural ordering", ->
         schema = new Schema()
@@ -136,7 +144,9 @@ describe "Schema", ->
         assert.isFalse @schema.isAggrNeeded(["ba"])
 
     describe "summarizeExpr", ->
-      it "summarizes null"
+      it "summarizes null", ->
+        assert.equal @schema.summarizeExpr(null), "None"
+        
       it "summarizes field expr", ->
         expr = { type: "field", tableId: "a", columnId: "y" }
         assert.equal @schema.summarizeExpr(expr), "Y"
@@ -160,4 +170,9 @@ describe "Schema", ->
         fieldExpr = { type: "field", tableId: "b", columnId: "r" }
         scalarExpr = { type: "scalar", baseTableId: "a", expr: fieldExpr, joinIds: ['ab'], aggr: "count" }
         assert.equal @schema.summarizeExpr(scalarExpr), "Number R of AB"
+
+  describe "getComparisonOps", ->
+    it "includes is not null", ->
+      schema = new Schema()
+      assert.include _.pluck(schema.getComparisonOps("text"), "id"), "is not null" 
 
