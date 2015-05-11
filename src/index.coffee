@@ -8,8 +8,8 @@ DesignValidator = require './DesignValidator'
 Schema = require './Schema'
 
 ScalarExprComponent = require './ScalarExprComponent'
-
 literalComponents = require './literalComponents'
+ComparisonExprComponent = require './ComparisonExprComponent'
 
 createSchema = ->
   # Create simple schema with subtree
@@ -30,7 +30,7 @@ createSchema = ->
 
   return schema
 
-ComparisonExprComponent = React.createClass {
+LogicalExprComponent = React.createClass {
   propTypes: {
     expr: React.PropTypes.object.isRequired
     onChange: React.PropTypes.func.isRequired 
@@ -38,50 +38,43 @@ ComparisonExprComponent = React.createClass {
     baseTableId: React.PropTypes.string.isRequired 
   }
 
-  handleLhsChange: (lhs) ->
-    @props.onChange(_.extend({}, @props.expr, lhs: lhs))
+  handleExprChange: (i, expr) ->
+    # Replace exprs
+    exprs = @props.expr.exprs.slice()
+    exprs[i] = expr
+    @props.onChange(_.extend({}, @props.expr, exprs: exprs))
 
-  handleOpChange: (ev) ->
-    @props.onChange(_.extend({}, @props.expr, op: ev.target.value))
+  handleAdd: ->
+    expr = @props.expr or { type: "logical", op: "and", exprs: [] }
+    exprs = expr.exprs.concat([{ type: "comparison" }])
+    @props.onChange(_.extend({}, expr, exprs: exprs))
 
-  handleRhsChange: (rhs) ->
-    @props.onChange(_.extend({}, @props.expr, rhs: rhs))
+  handleRemove: (i) ->
+    exprs = @props.expr.exprs.slice()
+    exprs.splice(i, 1)
+    @props.onChange(_.extend({}, @props.expr, exprs: exprs))    
 
   render: ->
-    # Create LHS
-    lhsControl = React.createElement(ScalarExprComponent, 
-      key: "lhs",
-      schema: @props.schema, 
-      baseTableId: @props.baseTableId, 
-      expr: @props.expr.lhs,
-      onChange: @handleLhsChange)
+    if @props.expr
+      childElems = _.map @props.expr.exprs, (e, i) =>
+        H.div null,
+          React.createElement(ComparisonExprComponent, 
+            expr: e, 
+            schema: @props.schema, 
+            baseTableId: @props.baseTableId, 
+            onChange: @handleExprChange.bind(null, i))
+          H.button 
+            type: "button", 
+            className: "btn btn-sm btn-link", 
+            onClick: @handleRemove.bind(null, i),
+              H.span(className: "glyphicon glyphicon-remove")
 
-    # Create op if LHS present
-    lhsType = @props.schema.getExprType(@props.expr.lhs)
-    if lhsType
-      ops = @props.schema.getComparisonOps(lhsType)
-      opControl = H.select 
-        key: "op",
-        className: "form-control input-sm",
-        style: { width: "auto", display: "inline-block" }
-        value: @props.expr.op
-        onChange: @handleOpChange,
-          _.map(ops, (op) -> H.option(value: op.id, op.name))
-
-    if lhsType and @props.expr.op
-      rhsType = @props.schema.getComparisonRhsType(lhsType, @props.expr.op)
-      switch rhsType
-        when "text"
-          rhsControl = React.createElement(literalComponents.TextComponent, key: "rhs", expr: @props.expr.rhs, onChange: @handleRhsChange)
-        when "integer"
-          rhsControl = React.createElement(literalComponents.IntegerComponent, key: "rhs", expr: @props.expr.rhs, onChange: @handleRhsChange)
-        when "decimal"
-          rhsControl = React.createElement(literalComponents.DecimalComponent, key: "rhs", expr: @props.expr.rhs, onChange: @handleRhsChange)
-
-    return H.div null,
-      lhsControl,
-      opControl,
-      rhsControl
+    # Render all expressions (comparisons for now)
+    H.div null,
+      childElems
+      H.button className: "btn btn-sm btn-link", type: "button", onClick: @handleAdd,
+        H.span className: "glyphicon glyphicon-plus"
+        " Add Filter"
 }
 
 
@@ -91,7 +84,7 @@ $ ->
   schema = createSchema()
   designValidator = new DesignValidator(schema)
 
-  expr = { type: "comparison" }
+  expr = null
 
   Holder = React.createClass {
     getInitialState: ->
@@ -100,18 +93,17 @@ $ ->
     handleChange: (expr) ->
       # Clean first
       expr = designValidator.cleanExpr(expr)
-      console.log expr
       @setState(expr: expr)
 
     render: ->
-      console.log "Expression: "
-      console.log @state.expr
-      # React.createElement(literalComponents.DecimalComponent, expr: @state.expr, onChange: @handleChange)
-      React.createElement ComparisonExprComponent, 
-        schema: schema,
-        baseTableId: "a",
-        expr: @state.expr, 
-        onChange: @handleChange
+      H.div null,
+        # React.createElement(literalComponents.DecimalComponent, expr: @state.expr, onChange: @handleChange)
+        React.createElement LogicalExprComponent, 
+          schema: schema,
+          baseTableId: "a",
+          expr: @state.expr, 
+          onChange: @handleChange
+        H.pre null, JSON.stringify(@state.expr, null, 2)
   }
 
   sample = React.createElement(Holder, initialExpr: expr)

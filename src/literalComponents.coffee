@@ -41,9 +41,6 @@ exports.DecimalComponent = React.createClass {
     @props.onChange({ type: "decimal", value: val })
     
   render: ->
-    console.log @state.invalid
-    console.log @state.invalidText
-
     H.div 
       className: (if @state.invalid then "has-error")
       style: { width: "6em", display: "inline-block" },
@@ -78,9 +75,6 @@ exports.IntegerComponent = React.createClass {
     @props.onChange({ type: "integer", value: val })
     
   render: ->
-    console.log @state.invalid
-    console.log @state.invalidText
-
     H.div 
       className: (if @state.invalid then "has-error")
       style: { width: "6em", display: "inline-block" },

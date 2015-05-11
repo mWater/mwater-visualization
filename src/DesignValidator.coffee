@@ -13,10 +13,12 @@ module.exports = class DesignValidator
         return @cleanScalarExpr(expr)
       when "comparison"
         return @cleanComparisonExpr(expr)
+      when "logical"
+        return @cleanLogicalExpr(expr)
 
     return expr
 
-  cleanScalarExpr: (scalar, baseTable) ->
+  cleanScalarExpr: (scalar, baseTable) =>
     if not scalar then return scalar
 
     # TODO toast if baseTable wrong
@@ -37,7 +39,7 @@ module.exports = class DesignValidator
 
     return scalar
 
-  cleanComparisonExpr: (expr) ->
+  cleanComparisonExpr: (expr) =>
     # TODO always creates new
     expr = _.extend({}, expr, lhs: @cleanExpr(expr.lhs))
 
@@ -60,4 +62,7 @@ module.exports = class DesignValidator
     return expr
 
 
+  cleanLogicalExpr: (expr) =>
+    # TODO always makes new
+    expr = _.extend({}, expr, exprs: _.map(expr.exprs, @cleanComparisonExpr))
 
