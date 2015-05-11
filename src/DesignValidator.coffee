@@ -36,7 +36,7 @@ module.exports = class DesignValidator
     # TODO
     return null
 
-  cleanExpr: (expr) ->
+  cleanExpr: (expr, baseTableId) ->
     if not expr or not expr.type
       return expr
 
@@ -50,10 +50,11 @@ module.exports = class DesignValidator
 
     return expr
 
-  cleanScalarExpr: (scalar, baseTable) =>
+  cleanScalarExpr: (scalar, baseTableId) =>
     if not scalar then return scalar
 
-    # TODO toast if baseTable wrong
+    # If baseTable wrong, set null
+    # TODO
 
     # Clean aggregate
     if scalar.expr
@@ -69,9 +70,13 @@ module.exports = class DesignValidator
       else if not scalar.aggrId
         scalar = _.extend({}, scalar, { aggrId: aggrs[0].id })
 
+    # Clean where
+    if scalar.where
+      scalar = _.extend({}, scalar, { where: @cleanExpr(scalar.where, @schema.getExprTable(scalar.expr).id) })
+
     return scalar
 
-  cleanComparisonExpr: (expr) =>
+  cleanComparisonExpr: (expr, baseTableId) =>
     # TODO always creates new
     expr = _.extend({}, expr, lhs: @cleanExpr(expr.lhs))
 
@@ -83,18 +88,25 @@ module.exports = class DesignValidator
     if not expr.op and expr.rhs
       expr = _.omit(expr, "rhs")
 
-    # Remove rhs if wrong type
     if expr.op and expr.rhs and expr.lhs
+      # Remove rhs if wrong type
       if @schema.getComparisonRhsType(@schema.getExprType(expr.lhs), expr.op) != @schema.getExprType(expr.rhs)
         expr = _.omit(expr, "rhs")        
+      # Remove rhs if wrong enum
+      else if @schema.getComparisonRhsType(@schema.getExprType(expr.lhs), expr.op) == "enum" and expr.rhs.type == "enum" and expr.rhs.value not in _.pluck(@schema.getExprValues(expr.lhs), "id")
+        expr = _.omit(expr, "rhs")
 
     # Default op
     if expr.lhs and not expr.op
       expr = _.extend({}, expr, op: @schema.getComparisonOps(@schema.getExprType(expr.lhs))[0].id)
+
+    # Default rhs enum
+    if expr.lhs and expr.op and not expr.rhs and @schema.getComparisonRhsType(@schema.getExprType(expr.lhs), expr.op) == "enum"
+      expr = _.extend({}, expr, rhs: { type: "enum", value: @schema.getExprValues(expr.lhs)[0].id })
+
     return expr
 
-
-  cleanLogicalExpr: (expr) =>
+  cleanLogicalExpr: (expr, baseTableId) =>
     # TODO always makes new
-    expr = _.extend({}, expr, exprs: _.map(expr.exprs, @cleanComparisonExpr))
+    expr = _.extend({}, expr, exprs: _.map(expr.exprs, (e) => @cleanComparisonExpr(e, baseTableId)))
 

@@ -7,6 +7,7 @@ exports.simpleSchema = ->
   schema.addColumn("t1", { id: "text", name: "Text", type: "text" })
   schema.addColumn("t1", { id: "integer", name: "Integer", type: "integer" })
   schema.addColumn("t1", { id: "decimal", name: "Decimal", type: "decimal" })
+  schema.addColumn("t1", { id: "enum", name: "Enum", type: "enum", values: [{ id: "a", name: "A"}, { id: "b", name: "B"}] })
 
   schema.addTable({ id: "t2", name: "T2", ordering: "integer" })
   schema.addColumn("t2", { id: "primary", name: "Primary", type: "uuid", primary: true })

@@ -22,6 +22,9 @@ describe "DesignValidator", ->
       expr = { type: "scalar", baseTableId: "t1", joinIds: ['1-2'], expr: { type: "field", tableId: "t2", columnId: "text" }, aggrId: "sum" }
       expr = @dv.cleanScalarExpr(expr)
       assert.equal expr.aggrId, "last"
+
+    it "removes if base table wrong with no joins"
+    it "removes if base table wrong with joins"
   
   describe "cleanComparisonExpr", ->
     it "removes op if no lhs", ->
@@ -44,12 +47,23 @@ describe "DesignValidator", ->
       assert not expr.rhs, "should remove"
 
     it "removes rhs if invalid enum", ->
-      assert.fail()
+      expr = { type: "comparison", lhs: { type: "field", tableId: "t1", columnId: "enum" }, op: "=", rhs: { type: "enum", value: "a" } }
+      expr = @dv.cleanComparisonExpr(expr)
+      assert expr.rhs, "should keep"
+
+      expr = { type: "comparison", lhs: { type: "field", tableId: "t1", columnId: "enum" }, op: "=", rhs: { type: "enum", value: "x" } }
+      expr = @dv.cleanComparisonExpr(expr)
+      assert.equal expr.rhs.value, "a", "should default"
 
     it "defaults op", ->
       expr = { type: "comparison", lhs: { type: "field", tableId: "t1", columnId: "text" } }
       expr = @dv.cleanComparisonExpr(expr)
       assert.equal expr.op, "~*"
+
+    it "defaults enum", ->
+      expr = { type: "comparison", lhs: { type: "field", tableId: "t1", columnId: "enum" }, op: "=" }
+      expr = @dv.cleanComparisonExpr(expr)
+      assert.deepEqual expr.rhs, { type: "enum", value: "a" }
 
   describe "validateComparisonExpr", ->
     it "null for valid", ->

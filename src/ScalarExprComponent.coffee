@@ -37,9 +37,18 @@ ScalarExprEditorComponent = React.createClass {
 
     @props.onChange(scalar)
 
-  handleAggrSelect: (aggrId) ->
+  handleAggrChange: (aggrId) ->
     # Create new expr
     scalar = _.extend({}, @props.value, { aggrId: aggrId })
+
+    # Clean
+    scalar = new DesignValidator(@props.schema).cleanScalarExpr(scalar)
+    
+    @props.onChange(scalar)
+
+  handleWhereChange: (where) ->
+    # Create new expr
+    scalar = _.extend({}, @props.value, { where: where })
 
     # Clean
     scalar = new DesignValidator(@props.schema).cleanScalarExpr(scalar)
@@ -60,8 +69,17 @@ ScalarExprEditorComponent = React.createClass {
         React.createElement(ReactSelect, { 
           value: @props.value.aggrId, 
           options: options 
-          onChange: @handleAggrSelect
+          onChange: @handleAggrChange
         })
+
+    if @props.value
+      LogicalExprComponent = require './LogicalExprComponent'
+      whereElem = React.createElement(LogicalExprComponent, 
+        schema: @props.schema, 
+        baseTableId: @props.schema.getExprTable(@props.value.expr).id,
+        expr: @props.value.where
+        onChange: @handleWhereChange
+        )
 
     H.div null, 
       H.label null, "Expression"
@@ -71,4 +89,5 @@ ScalarExprEditorComponent = React.createClass {
           onSelect: @handleJoinExprSelect, 
           selectedValue: (if @props.value then { expr: @props.value.expr, joinIds: @props.value.joinIds }))
       H.div style: { width: "20em" }, aggrs
+      whereElem
 }
