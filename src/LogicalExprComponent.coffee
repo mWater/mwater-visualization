@@ -39,7 +39,7 @@ module.exports = LogicalExprComponent = React.createClass {
             className: "btn btn-sm btn-link", 
             onClick: @handleRemove.bind(null, i),
               H.span(className: "glyphicon glyphicon-remove")
-
+ 
     # Render all expressions (comparisons for now)
     H.div null,
       childElems
