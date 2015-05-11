@@ -8,7 +8,7 @@ exports.simpleSchema = ->
   schema.addColumn("t1", { id: "integer", name: "Integer", type: "integer" })
   schema.addColumn("t1", { id: "decimal", name: "Decimal", type: "decimal" })
 
-  schema.addTable({ id: "t2", name: "T2" })
+  schema.addTable({ id: "t2", name: "T2", ordering: "integer" })
   schema.addColumn("t2", { id: "primary", name: "Primary", type: "uuid", primary: true })
   schema.addColumn("t2", { id: "t1", name: "T1", type: "uuid" })
   schema.addColumn("t2", { id: "text", name: "Text", type: "text" })

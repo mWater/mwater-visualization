@@ -27,16 +27,77 @@ module.exports = class DesignCompiler
   compileScalarExpr: (options) ->
     expr = options.expr
 
-    # TODO perform joins
+    where = null
+    from = null
+    orderBy = null
+    limit = null
 
     exprBaseTableId = options.baseTableId
     exprBaseTableAlias = options.baseTableAlias
 
+    # Perform joins
+    # First join is in where clause
+    if expr.joinIds and expr.joinIds.length > 0
+      join = @schema.getJoin(expr.joinIds[0])
+
+      where = { 
+        type: "op", op: join.op
+        exprs: [
+          { type: "field", tableAlias: "j1", column: join.toColumnId }
+          { type: "field", tableAlias: options.baseTableAlias, column: join.fromColumnId }
+        ]
+       }
+
+      from = {
+        type: "table"
+        table: join.toTableId
+        alias: "j1"
+      }
+
+      # We are now at j1, which is the to of the first join
+      exprBaseTableId = join.toTableId
+      exprBaseTableAlias = "j1"
+
+
     # TODO where  
-    # TODO aggr
+
+    scalarExpr = @compileExpr(expr: expr.expr, baseTableId: exprBaseTableId, baseTableAlias: exprBaseTableAlias)
+    
+    # Aggregate
+    if expr.aggrId
+      switch expr.aggrId
+        when "latest"
+          # Get ordering
+          ordering = @schema.getTable(exprBaseTableId).ordering
+          if not ordering
+            throw new Error("No ordering defined")
+
+          # Limit
+          limit = 1
+
+          # order descending
+          orderBy = [{ type: "field", tableAlias: exprBaseTableAlias, column: ordering }]
+        when "sum", "count", "avg", "max", "min", "stdev", "stdevp"
+          scalarExpr = { type: "op", op: expr.aggrId, exprs: [scalarExpr] }
+        else
+          throw new Error("Unknown aggregation #{expr.aggrId}")
 
     # Create scalar
-    return {
+    scalar = {
       type: "scalar"
-      expr: @compileExpr(expr: expr.expr, baseTableId: exprBaseTableId, baseTableAlias: exprBaseTableAlias)
+      expr: scalarExpr
     }
+
+    if from
+      scalar.from = from
+
+    if where
+      scalar.where = where
+
+    if orderBy
+      scalar.orderBy = orderBy
+
+    if limit
+      scalar.limit = limit
+
+    return scalar
