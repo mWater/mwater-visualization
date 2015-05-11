@@ -48,5 +48,23 @@ describe "DesignValidator", ->
       expr = @dv.cleanComparisonExpr(expr)
       assert.equal expr.op, "~*"
 
+  describe "validateComparisonExpr", ->
+    it "null for valid", ->
+      expr = { type: "comparison", lhs: { type: "field", tableId: "t1", columnId: "text" }, op: "~*", rhs: { type: "text", value: "x" } }
+      assert.isNull @dv.validateComparisonExpr(expr)
+
+    it "requires lhs", ->
+      expr = { type: "comparison", op: "~*", rhs: { type: "text", value: "x" } }
+      assert.isNotNull @dv.validateComparisonExpr(expr)
+
+    it "requires op", ->
+      expr = { type: "comparison", lhs: { type: "field", tableId: "t1", columnId: "text" }, rhs: { type: "text", value: "x" } }
+      assert.isNotNull @dv.validateComparisonExpr(expr)
+
+    it "requires rhs if has type"
+    it "requires rhs type to match"
+
+  describe "validateLogicalExpr", ->
+    it "checks all exprs"
 
   # describe "defaultExpr", ->

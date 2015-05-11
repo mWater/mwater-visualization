@@ -47,24 +47,25 @@ JoinExprLeafComponent = React.createClass {
     typeElemStyle = {
       color: "#999"
       fontStyle: "italic"
-      width: 20
       fontSize: "60%"
-      paddingRight: 4
       display: "inline-block"
+      paddingLeft: 6
     }
     switch @props.item.type
       when "uuid"
         typeElemText = "#"
-      when "number"
+      when "decimal"
         typeElemText = "123.4"
       when "integer"
         typeElemText = "123"
       when "text"
         typeElemText = "abc"
+      when "enum"
+        typeElemText = "choice"
 
     H.div style: style, onClick: @handleClick, 
-      H.div style: typeElemStyle, typeElemText
       @props.item.name
+      H.div style: typeElemStyle, typeElemText
 }
 
 JoinExprNodeComponent = React.createClass {

@@ -4,6 +4,38 @@ module.exports = class DesignValidator
   constructor: (schema) ->
     @schema = schema
 
+  # Returns null if ok, message if bad
+  validateExpr: (expr) ->
+    # Empty is ok
+    if not expr
+      return null
+
+    switch expr.type
+      when "scalar"
+        return @validateScalarExpr(expr)
+      when "comparison"
+        return @validateComparisonExpr(expr)
+      when "logical"
+        return @validateLogicalExpr(expr)
+    return null
+
+  validateComparisonExpr: (expr) ->
+    if not expr.lhs then return "Missing lhs"
+    if not expr.op then return "Missing op"
+    if @schema.getComparisonRhsType(@schema.getExprType(expr.lhs), expr.op) and not expr.rhs then return "Missing rhs"
+
+    return @validateExpr(expr.lhs) or @validateExpr(expr.rhs)
+
+  validateLogicalExpr: (expr) ->
+    error = null
+    for subexpr in expr.exprs
+      error = error or @validateExpr(subexpr)
+    return error
+
+  validateScalarExpr: (expr) ->
+    # TODO
+    return null
+
   cleanExpr: (expr) ->
     if not expr or not expr.type
       return expr

@@ -23,7 +23,7 @@ module.exports = ScalarExprComponent = React.createClass {
           className: "form-control input-sm",
           readOnly: true, 
           type: "text", 
-          style: { backgroundColor: "white" }
+          style: { backgroundColor: "white", cursor: "pointer" }
           value: @props.schema.summarizeExpr(@props.expr)  
 }
 

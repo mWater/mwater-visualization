@@ -6,7 +6,7 @@ exports.TextComponent = React.createClass {
     onChange: React.PropTypes.func.isRequired 
   }
 
-  onChange: (ev) ->
+  handleChange: (ev) ->
     @props.onChange({ type: "text", value: ev.target.value })
 
   render: ->
