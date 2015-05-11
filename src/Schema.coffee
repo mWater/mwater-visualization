@@ -17,7 +17,7 @@ module.exports = class Schema
 
   addColumn: (tableId, options) ->
     table = @getTable(tableId)
-    table.columns.push(_.pick(options, "id", "primary", "name", "desc", "type", "values"))
+    table.columns.push(_.defaults(_.pick(options, "id", "primary", "name", "desc", "type", "values"), { primary: false }))
 
   getColumns: (tableId) ->
     table = @getTable(tableId)
@@ -102,7 +102,7 @@ module.exports = class Schema
         return column.type
       when "scalar"
         return @getExprType(expr.expr)
-      when "text", "integer", "boolean", "decimal"
+      when "text", "integer", "boolean", "decimal", "enum", "date"
         return expr.type
       else
         throw new Error("Not implemented")

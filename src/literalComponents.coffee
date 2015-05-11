@@ -92,6 +92,9 @@ exports.EnumComponent = React.createClass {
     enumValues: React.PropTypes.array.isRequired
   }
 
+  handleChange: (ev) ->
+    @props.onChange({ type: "enum", value: ev.target.value })
+
   render: ->
     H.select 
       className: "form-control input-sm",
@@ -99,5 +102,4 @@ exports.EnumComponent = React.createClass {
       value: if @props.expr then @props.expr.value
       onChange: @handleChange,
         _.map(@props.enumValues, (val) -> H.option(key: val.id, value: val.id, val.name))
-
 }

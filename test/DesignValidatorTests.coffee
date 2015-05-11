@@ -43,6 +43,9 @@ describe "DesignValidator", ->
       expr = @dv.cleanComparisonExpr(expr)
       assert not expr.rhs, "should remove"
 
+    it "removes rhs if invalid enum", ->
+      assert.fail()
+
     it "defaults op", ->
       expr = { type: "comparison", lhs: { type: "field", tableId: "t1", columnId: "text" } }
       expr = @dv.cleanComparisonExpr(expr)

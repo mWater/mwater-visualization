@@ -86,7 +86,7 @@ JoinExprNodeComponent = React.createClass {
       arrow = H.span className: "glyphicon glyphicon-triangle-bottom"
 
     if @state.collapse == "open"
-      children = H.div style: { paddingLeft: 15 },
+      children = H.div style: { paddingLeft: 25 },
         React.createElement(JoinExprTreeComponent, tree: @props.item.getChildren(), onSelect: @props.onSelect, selectedValue: @props.selectedValue)
 
     H.div null,
