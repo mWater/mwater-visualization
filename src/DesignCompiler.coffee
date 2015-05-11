@@ -3,7 +3,7 @@ module.exports = class DesignCompiler
   constructor: (schema) ->
     @schema = schema
 
-  compileExpr: (options) ->
+  compileExpr: (options) =>
     expr = options.expr
 
     switch expr.type 
@@ -11,6 +11,49 @@ module.exports = class DesignCompiler
         return @compileFieldExpr(options)
       when "scalar"
         return @compileScalarExpr(options)
+      when "comparison"
+        return @compileComparisonExpr(options)
+      when "logical"
+        return @compileLogicalExpr(options)
+      when "text", "integer", "decimal", "boolean", "enum"
+        return { type: "literal", value: expr.value }
+      else
+        throw new Error("Expr type #{expr.type} not supported")
+
+  compileComparisonExpr: (options) ->
+    expr = options.expr
+
+    exprs = [@compileExpr(expr: expr.lhs, baseTableId: options.baseTableId, baseTableAlias: options.baseTableAlias)]
+    if expr.rhs
+      exprs.push(@compileExpr(expr: expr.rhs, baseTableId: options.baseTableId, baseTableAlias: options.baseTableAlias))
+
+    # Handle special cases 
+    if expr.op == '= true'
+      return { type: "op", op: "=", exprs: [exprs[0], { type: "literal", value: true }]}
+    else if expr.op == '= false'
+      return { type: "op", op: "=", exprs: [exprs[0], { type: "literal", value: false }]}
+
+    return { 
+      type: "op"
+      op: expr.op
+      exprs: exprs
+    }
+
+  compileLogicalExpr: (options) ->
+    expr = options.expr
+
+    # Simplify
+    if expr.exprs.length == 1
+      return @compileExpr(expr: expr.exprs[0], baseTableId: options.baseTableId, baseTableAlias: options.baseTableAlias)
+
+    if expr.exprs.length == 0
+      return null
+
+    return { 
+      type: "op"
+      op: expr.op
+      exprs: _.map(expr.exprs, (e) => @compileExpr(expr: e, baseTableId: options.baseTableId, baseTableAlias: options.baseTableAlias))
+    }
 
   compileFieldExpr: (options) ->
     expr = options.expr
@@ -58,8 +101,38 @@ module.exports = class DesignCompiler
       exprBaseTableId = join.toTableId
       exprBaseTableAlias = "j1"
 
+    # Perform remaining joins
+    if expr.joinIds.length > 1
+      for i in [1...expr.joinIds.length]
+        join = @schema.getJoin(expr.joinIds[i])
+        from = {
+          type: "join"
+          left: from
+          right: { type: "table", table: join.toTableId, alias: "j#{i+1}" }
+          kind: "left"
+          on: { 
+            type: "op"
+            op: "="
+            exprs: [
+              { type: "field", tableAlias: "j#{i}", column: join.fromColumnId }
+              { type: "field", tableAlias: "j#{i+1}", column: join.toColumnId }
+            ]
+          }
+        }
 
-    # TODO where  
+        # We are now at jn
+        exprBaseTableId = join.toTableId
+        exprBaseTableAlias = "j#{i+1}"
+
+    # Compile where clause
+    if expr.where
+      extraWhere = @compileExpr(expr: expr.where, baseTableId: exprBaseTableId, baseTableAlias: exprBaseTableAlias)
+
+      # Add to existing 
+      if where
+        where = { type: "op", op: "and", exprs: [where, extraWhere]}
+      else
+        where = extraWhere
 
     scalarExpr = @compileExpr(expr: expr.expr, baseTableId: exprBaseTableId, baseTableAlias: exprBaseTableAlias)
     
@@ -81,6 +154,10 @@ module.exports = class DesignCompiler
           scalarExpr = { type: "op", op: expr.aggrId, exprs: [scalarExpr] }
         else
           throw new Error("Unknown aggregation #{expr.aggrId}")
+
+    # If no where, from, orderBy or limit, just return expr for simplicity
+    if not from and not where and not orderBy and not limit
+      return scalarExpr
 
     # Create scalar
     scalar = {

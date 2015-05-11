@@ -5,7 +5,7 @@ module.exports = class Schema
     @tables = []
     @joins = []
 
-  # Add table with id, name, desc, icon
+  # Add table with id, name, desc, icon, ordering (column with natural order)
   addTable: (options) ->
     table = _.pick(options, "id", "name", "desc", "icon", "ordering")
     table.columns = []
