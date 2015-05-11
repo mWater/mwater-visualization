@@ -37,9 +37,9 @@ ScalarExprEditorComponent = React.createClass {
 
     @props.onChange(scalar)
 
-  handleAggrSelect: (aggr) ->
+  handleAggrSelect: (aggrId) ->
     # Create new expr
-    scalar = _.extend({}, @props.value, { aggr: aggr })
+    scalar = _.extend({}, @props.value, { aggrId: aggrId })
 
     # Clean
     scalar = new DesignValidator(@props.schema).cleanScalarExpr(scalar)
@@ -58,7 +58,7 @@ ScalarExprEditorComponent = React.createClass {
         H.br()
         H.label null, "Aggregate by"
         React.createElement(ReactSelect, { 
-          value: @props.value.aggr, 
+          value: @props.value.aggrId, 
           options: options 
           onChange: @handleAggrSelect
         })

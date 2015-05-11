@@ -9,19 +9,19 @@ describe "DesignValidator", ->
 
   describe "cleanScalarExpr", ->
     it "removes unnecessary aggr", ->
-      expr = { type: "scalar", baseTableId: "t1", joinIds: [], expr: { type: "field", tableId: "t1", columnId: "text" }, aggr: "sum" }
+      expr = { type: "scalar", baseTableId: "t1", joinIds: [], expr: { type: "field", tableId: "t1", columnId: "text" }, aggrId: "sum" }
       expr = @dv.cleanScalarExpr(expr)
-      assert not expr.aggr
+      assert not expr.aggrId
 
     it "adds first aggr", ->
       expr = { type: "scalar", baseTableId: "t1", joinIds: ['1-2'], expr: { type: "field", tableId: "t2", columnId: "text" } }
       expr = @dv.cleanScalarExpr(expr)
-      assert.equal expr.aggr, "count"
+      assert.equal expr.aggrId, "count"
 
     it "removes invalid aggr, selecting first", ->
-      expr = { type: "scalar", baseTableId: "t1", joinIds: ['1-2'], expr: { type: "field", tableId: "t2", columnId: "text" }, aggr: "sum" }
+      expr = { type: "scalar", baseTableId: "t1", joinIds: ['1-2'], expr: { type: "field", tableId: "t2", columnId: "text" }, aggrId: "sum" }
       expr = @dv.cleanScalarExpr(expr)
-      assert.equal expr.aggr, "count"
+      assert.equal expr.aggrId, "count"
   
   describe "cleanComparisonExpr", ->
     it "removes op if no lhs", ->

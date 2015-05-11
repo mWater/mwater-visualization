@@ -185,7 +185,7 @@ describe "Schema", ->
 
       it "summarizes joined aggr scalar expr", ->
         fieldExpr = { type: "field", tableId: "b", columnId: "r" }
-        scalarExpr = { type: "scalar", baseTableId: "a", expr: fieldExpr, joinIds: ['ab'], aggr: "count" }
+        scalarExpr = { type: "scalar", baseTableId: "a", expr: fieldExpr, joinIds: ['ab'], aggrId: "count" }
         assert.equal @schema.summarizeExpr(scalarExpr), "Number R of AB"
 
   describe "getComparisonOps", ->

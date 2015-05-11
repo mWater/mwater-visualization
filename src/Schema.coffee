@@ -155,8 +155,8 @@ module.exports = class Schema
     str = @summarizeExpr(expr.expr)
 
     # Add aggr
-    if expr.aggr
-      str = _.findWhere(@getAggrs(expr.expr), { id: expr.aggr }).name + " " + str
+    if expr.aggrId
+      str = _.findWhere(@getAggrs(expr.expr), { id: expr.aggrId }).name + " " + str
 
     # Add ofs (reverse joins)
     for joinId in expr.joinIds.slice().reverse()

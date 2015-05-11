@@ -28,14 +28,14 @@ module.exports = class DesignValidator
       aggrs = @schema.getAggrs(scalar.expr)
 
       # Remove if wrong
-      if scalar.aggr not in _.pluck(aggrs, "id")
-        scalar = _.omit(scalar, "aggr")
+      if scalar.aggrId not in _.pluck(aggrs, "id")
+        scalar = _.omit(scalar, "aggrId")
 
       # Set if needed to first
       if not @schema.isAggrNeeded(scalar.joinIds)
-        scalar = _.omit(scalar, "aggr")
-      else if not scalar.aggr
-        scalar = _.extend({}, scalar, { aggr: aggrs[0].id })
+        scalar = _.omit(scalar, "aggrId")
+      else if not scalar.aggrId
+        scalar = _.extend({}, scalar, { aggrId: aggrs[0].id })
 
     return scalar
 
