@@ -24,7 +24,7 @@ module.exports = ScalarExprComponent = React.createClass {
           readOnly: true, 
           type: "text", 
           style: { backgroundColor: "white", cursor: "pointer" }
-          value: @props.schema.summarizeExpr(@props.expr)  
+          value: if @props.expr then @props.schema.summarizeExpr(@props.expr) else "Select..."
 }
 
 ScalarExprEditorComponent = React.createClass {
@@ -83,7 +83,7 @@ ScalarExprEditorComponent = React.createClass {
 
     H.div null, 
       H.label null, "Expression"
-      H.div style: { overflowY: "scroll", height: 350 },
+      H.div style: { overflowY: "scroll", height: 350, border: "solid 1px #CCC" },
         React.createElement(JoinExprTreeComponent, 
           tree: tree, 
           onSelect: @handleJoinExprSelect, 

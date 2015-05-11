@@ -122,7 +122,7 @@ module.exports = class Schema
     type = @getExprType(expr)
     
     table = @getExprTable(expr)
-    if table and table.ordering
+    if table and table.ordering and type != "uuid"
       aggrs.push({ id: "last", name: "Latest", type: type })
 
     switch type

@@ -120,7 +120,7 @@ describe "Schema", ->
         assert.equal @schema.getExprType({ type: "integer", value: 34 }), "integer"
 
     describe "getAggrs", ->
-      it "includes last if has natural ordering", ->
+      it "includes last if has natural ordering and is not primary", ->
         schema = new Schema()
         schema.addTable({ id: "a", name: "A", ordering: "z" })
         schema.addColumn("a", { id: "x", name: "X", type: "uuid", primary: true })
@@ -129,6 +129,9 @@ describe "Schema", ->
 
         field = { type: "field", tableId: "a", columnId: "y" }
         assert.equal _.findWhere(schema.getAggrs(field), id: "last").type, "text"
+
+        field = { type: "field", tableId: "a", columnId: "x" }
+        assert not _.findWhere(schema.getAggrs(field), id: "last")
 
       it "doesn't include most recent normally", ->
         field = { type: "field", tableId: "a", columnId: "z" }
