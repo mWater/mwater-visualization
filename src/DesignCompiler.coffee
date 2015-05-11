@@ -139,7 +139,7 @@ module.exports = class DesignCompiler
     # Aggregate
     if expr.aggrId
       switch expr.aggrId
-        when "latest"
+        when "last"
           # Get ordering
           ordering = @schema.getTable(exprBaseTableId).ordering
           if not ordering

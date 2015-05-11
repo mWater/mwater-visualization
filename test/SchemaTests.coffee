@@ -120,7 +120,7 @@ describe "Schema", ->
         assert.equal @schema.getExprType({ type: "integer", value: 34 }), "integer"
 
     describe "getAggrs", ->
-      it "includes latest if has natural ordering", ->
+      it "includes last if has natural ordering", ->
         schema = new Schema()
         schema.addTable({ id: "a", name: "A", ordering: "z" })
         schema.addColumn("a", { id: "x", name: "X", type: "uuid", primary: true })

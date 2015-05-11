@@ -53,8 +53,8 @@ describe "DesignCompiler", ->
         ]}
     }), JSON.stringify(jql, null, 2)
 
-  it "compiles scalar with one join and latest aggr", ->
-    expr = { type: "scalar", expr: { type: "field", tableId: "t2", columnId: "integer" }, joinIds: ["1-2"], aggrId: "latest" }
+  it "compiles scalar with one join and last aggr", ->
+    expr = { type: "scalar", expr: { type: "field", tableId: "t2", columnId: "integer" }, joinIds: ["1-2"], aggrId: "last" }
     jql = @dc.compileExpr(expr: expr, baseTableId: "t1", baseTableAlias: "T1")
 
     refJql = {

@@ -16,12 +16,12 @@ describe "DesignValidator", ->
     it "adds first aggr", ->
       expr = { type: "scalar", baseTableId: "t1", joinIds: ['1-2'], expr: { type: "field", tableId: "t2", columnId: "text" } }
       expr = @dv.cleanScalarExpr(expr)
-      assert.equal expr.aggrId, "count"
+      assert.equal expr.aggrId, "last"
 
     it "removes invalid aggr, selecting first", ->
       expr = { type: "scalar", baseTableId: "t1", joinIds: ['1-2'], expr: { type: "field", tableId: "t2", columnId: "text" }, aggrId: "sum" }
       expr = @dv.cleanScalarExpr(expr)
-      assert.equal expr.aggrId, "count"
+      assert.equal expr.aggrId, "last"
   
   describe "cleanComparisonExpr", ->
     it "removes op if no lhs", ->
