@@ -76,7 +76,7 @@ module.exports = class DesignCompiler
           limit = 1
 
           # order descending
-          orderBy = [{ type: "field", tableAlias: exprBaseTableAlias, column: ordering }]
+          orderBy = [{ expr: { type: "field", tableAlias: exprBaseTableAlias, column: ordering }, direction: "desc" }]
         when "sum", "count", "avg", "max", "min", "stdev", "stdevp"
           scalarExpr = { type: "op", op: expr.aggrId, exprs: [scalarExpr] }
         else
