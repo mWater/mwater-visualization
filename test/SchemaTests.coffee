@@ -34,7 +34,7 @@ describe "Schema", ->
     join = { id: "ab", name: "AB", fromTableId: "a", fromColumnId: "x", toTableId: "b", toColumnId: "y", op: "=", oneToMany: true }
     schema.addJoin(join)
     assert.deepEqual schema.getJoins()[0], join
-  
+
   describe "with schema", ->
     before ->
       # Create simple schema with subtree
@@ -48,12 +48,23 @@ describe "Schema", ->
       @schema.addColumn("b", { id: "q", name: "Q", type: "uuid", primary: true })
       @schema.addColumn("b", { id: "r", name: "R", type: "text" })
       @schema.addColumn("b", { id: "s", name: "S", type: "uuid" }) # a ref
+      @schema.addColumn("b", { id: "t", name: "T", type: "enum", values: [{ id: "a1", name: "A1"}, { id: "a2", name: "A2"}] })
 
       @schema.addJoin({ id: "ab", name: "AB", fromTableId: "a", fromColumnId: "x", toTableId: "b", toColumnId: "s", op: "=", oneToMany: true })
       @schema.addJoin({ id: "ba", name: "BA", fromTableId: "b", fromColumnId: "s", toTableId: "a", toColumnId: "x", op: "=", oneToMany: false })
 
       @atree = @schema.getJoinExprTree({ baseTableId: "a" })
       @btree = @schema.getJoinExprTree({ baseTableId: "b" })
+    
+    describe "getExprValues", ->
+      it "gets for field", ->
+        expr = { type: "field", tableId: "b", columnId: "t" }
+        assert.deepEqual _.pluck(@schema.getExprValues(expr), "id"), ["a1", "a2"]
+
+      it "gets for scalar", ->
+        expr = { type: "field", tableId: "b", columnId: "t" }
+        expr = { type: "scalar", expr: expr, joinIds: []}
+        assert.deepEqual _.pluck(@schema.getExprValues(expr), "id"), ["a1", "a2"]
     
     describe "getJoinExprTree", ->
       it "doesn't include primary keys at root", ->

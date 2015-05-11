@@ -10,6 +10,7 @@ Schema = require './Schema'
 ScalarExprComponent = require './ScalarExprComponent'
 literalComponents = require './literalComponents'
 ComparisonExprComponent = require './ComparisonExprComponent'
+LogicalExprComponent = require './LogicalExprComponent'
 
 createSchema = ->
   # Create simple schema with subtree
@@ -19,6 +20,10 @@ createSchema = ->
   schema.addColumn("a", { id: "y", name: "Y", type: "text" })
   schema.addColumn("a", { id: "integer", name: "Integer", type: "integer" })
   schema.addColumn("a", { id: "decimal", name: "Decimal", type: "decimal" })
+  schema.addColumn("a", { id: "enum", name: "Enum", type: "enum", values: [
+    { id: "apple", name: "Apple" }
+    { id: "banana", name: "Banana" }
+    ] })
 
   schema.addTable({ id: "b", name: "B" })
   schema.addColumn("b", { id: "q", name: "Q", type: "uuid", primary: true })
@@ -29,53 +34,6 @@ createSchema = ->
   schema.addJoin({ id: "ba", name: "BA", fromTableId: "b", fromColumnId: "s", toTableId: "a", toColumnId: "x", op: "=", oneToMany: false })
 
   return schema
-
-LogicalExprComponent = React.createClass {
-  propTypes: {
-    expr: React.PropTypes.object.isRequired
-    onChange: React.PropTypes.func.isRequired 
-    schema: React.PropTypes.object.isRequired
-    baseTableId: React.PropTypes.string.isRequired 
-  }
-
-  handleExprChange: (i, expr) ->
-    # Replace exprs
-    exprs = @props.expr.exprs.slice()
-    exprs[i] = expr
-    @props.onChange(_.extend({}, @props.expr, exprs: exprs))
-
-  handleAdd: ->
-    expr = @props.expr or { type: "logical", op: "and", exprs: [] }
-    exprs = expr.exprs.concat([{ type: "comparison" }])
-    @props.onChange(_.extend({}, expr, exprs: exprs))
-
-  handleRemove: (i) ->
-    exprs = @props.expr.exprs.slice()
-    exprs.splice(i, 1)
-    @props.onChange(_.extend({}, @props.expr, exprs: exprs))    
-
-  render: ->
-    if @props.expr
-      childElems = _.map @props.expr.exprs, (e, i) =>
-        H.div null,
-          React.createElement(ComparisonExprComponent, 
-            expr: e, 
-            schema: @props.schema, 
-            baseTableId: @props.baseTableId, 
-            onChange: @handleExprChange.bind(null, i))
-          H.button 
-            type: "button", 
-            className: "btn btn-sm btn-link", 
-            onClick: @handleRemove.bind(null, i),
-              H.span(className: "glyphicon glyphicon-remove")
-
-    # Render all expressions (comparisons for now)
-    H.div null,
-      childElems
-      H.button className: "btn btn-sm btn-link", type: "button", onClick: @handleAdd,
-        H.span className: "glyphicon glyphicon-plus"
-        " Add Filter"
-}
 
 
 $ ->

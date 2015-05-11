@@ -192,4 +192,9 @@ module.exports = class Schema
 
     return lhsType
 
-  isUnary: (op) ->
+  getExprValues: (expr) ->
+    if expr.type == "field"
+      column = @getColumn(expr.tableId, expr.columnId)
+      return column.values
+    if expr.type == "scalar"
+      return @getExprValues(expr.expr)

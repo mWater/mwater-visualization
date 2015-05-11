@@ -38,7 +38,7 @@ module.exports = ComparisonExprComponent = React.createClass {
         style: { width: "auto", display: "inline-block" }
         value: @props.expr.op
         onChange: @handleOpChange,
-          _.map(ops, (op) -> H.option(value: op.id, op.name))
+          _.map(ops, (op) -> H.option(key: op.id, value: op.id, op.name))
 
     if lhsType and @props.expr.op
       rhsType = @props.schema.getComparisonRhsType(lhsType, @props.expr.op)
@@ -49,6 +49,12 @@ module.exports = ComparisonExprComponent = React.createClass {
           rhsControl = React.createElement(literalComponents.IntegerComponent, key: "rhs", expr: @props.expr.rhs, onChange: @handleRhsChange)
         when "decimal"
           rhsControl = React.createElement(literalComponents.DecimalComponent, key: "rhs", expr: @props.expr.rhs, onChange: @handleRhsChange)
+        when "enum"
+          rhsControl = React.createElement(literalComponents.EnumComponent, 
+            key: "rhs", 
+            expr: @props.expr.rhs, 
+            enumValues: @props.schema.getExprValues(@props.expr.lhs)
+            onChange: @handleRhsChange)
 
     return H.div style: { display: "inline-block" },
       lhsControl,

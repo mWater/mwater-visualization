@@ -85,4 +85,19 @@ exports.IntegerComponent = React.createClass {
           value: (if @state.invalid then @state.invalidText) or (if @props.expr then @props.expr.value)
 }
 
-# exports.EnumLiteralComponent = 
+exports.EnumComponent = React.createClass {
+  propTypes: {
+    expr: React.PropTypes.object
+    onChange: React.PropTypes.func.isRequired 
+    enumValues: React.PropTypes.array.isRequired
+  }
+
+  render: ->
+    H.select 
+      className: "form-control input-sm",
+      style: { width: "auto", display: "inline-block" }
+      value: if @props.expr then @props.expr.value
+      onChange: @handleChange,
+        _.map(@props.enumValues, (val) -> H.option(key: val.id, value: val.id, val.name))
+
+}
