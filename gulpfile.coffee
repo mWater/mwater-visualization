@@ -8,9 +8,21 @@ rework = require 'gulp-rework'
 reworkNpm = require 'rework-npm'
 browserSync = require 'browser-sync'
 reload = browserSync.reload
+coffee = require 'gulp-coffee' 
+
+# Compile coffeescript to js in lib/
+gulp.task 'coffee', ->
+  gulp.src('./src/*.coffee')
+    .pipe(coffee({ bare: true }))
+    .pipe(gulp.dest('./lib/'))
+
+# Copy non-coffeescript files
+gulp.task 'copy', ->
+  gulp.src(['./src/**/*.js', './src/**/*.css'])
+    .pipe(gulp.dest('./lib/'))
 
 gulp.task "browserify", ->
-  shim(browserify("./index.coffee",
+  shim(browserify("./demo.coffee",
     extensions: [".coffee"]
     basedir: "./src/"
   )).bundle()
@@ -83,7 +95,7 @@ gulp.task 'serve', gulp.series([
   ])
 ])
 
-gulp.task "default", gulp.series("build")
+gulp.task "default", gulp.series("copy", "coffee")
 
 # Shim non-browserify friendly libraries to allow them to be 'require'd
 shim = (instance) ->
