@@ -101,6 +101,8 @@ module.exports = class Schema
         column = @getColumn(expr.tableId, expr.columnId)
         return column.type
       when "scalar"
+        if expr.aggrId == "count"
+          return "integer"
         return @getExprType(expr.expr)
       when "text", "integer", "boolean", "decimal", "enum", "date"
         return expr.type
@@ -154,8 +156,11 @@ module.exports = class Schema
   summarizeScalarExpr: (expr) ->
     str = @summarizeExpr(expr.expr)
 
+    # Handle case of primary key
+    if @getExprType(expr.expr) == "uuid"
+      str = "Number"
     # Add aggr
-    if expr.aggrId
+    else if expr.aggrId
       str = _.findWhere(@getAggrs(expr.expr), { id: expr.aggrId }).name + " " + str
 
     # Add ofs (reverse joins)

@@ -113,6 +113,15 @@ describe "Schema", ->
         }
         assert.equal @schema.getExprType(expr), "integer"
 
+      it 'gets scalar type with aggr', ->
+        expr = {
+          type: "scalar"
+          expr: { type: "field", tableId: "a", columnId: "x" }
+          aggrId: "count"
+          joinIds: []
+        }
+        assert.equal @schema.getExprType(expr), "integer"
+
       it "gets literal types", ->
         assert.equal @schema.getExprType({ type: "text", value: "x" }), "text"
         assert.equal @schema.getExprType({ type: "boolean", value: true }), "boolean"
@@ -190,6 +199,11 @@ describe "Schema", ->
         fieldExpr = { type: "field", tableId: "b", columnId: "r" }
         scalarExpr = { type: "scalar", baseTableId: "a", expr: fieldExpr, joinIds: ['ab'], aggrId: "count" }
         assert.equal @schema.summarizeExpr(scalarExpr), "Number R of AB"
+
+      it "summarizes joined number aggr scalar expr", ->
+        fieldExpr = { type: "field", tableId: "b", columnId: "q" }
+        scalarExpr = { type: "scalar", baseTableId: "a", expr: fieldExpr, joinIds: ['ab'], aggrId: "count" }
+        assert.equal @schema.summarizeExpr(scalarExpr), "Number of AB"
 
   describe "getComparisonOps", ->
     it "includes is not null", ->

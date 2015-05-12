@@ -64,7 +64,6 @@ ScalarExprEditorComponent = React.createClass {
       options = _.map(@props.schema.getAggrs(@props.value.expr), (aggr) -> { value: aggr.id, label: aggr.name })
       aggrs = H.div null,
         H.br()
-        H.br()
         H.label null, "Aggregate by"
         React.createElement(ReactSelect, { 
           value: @props.value.aggrId, 
@@ -74,12 +73,15 @@ ScalarExprEditorComponent = React.createClass {
 
     if @props.value
       LogicalExprComponent = require './LogicalExprComponent'
-      whereElem = React.createElement(LogicalExprComponent, 
-        schema: @props.schema, 
-        baseTableId: @props.schema.getExprTable(@props.value.expr).id,
-        expr: @props.value.where
-        onChange: @handleWhereChange
-        )
+      whereElem = H.div null,
+        H.br()
+        H.label null, "Filter"
+        React.createElement(LogicalExprComponent, 
+          schema: @props.schema, 
+          baseTableId: @props.schema.getExprTable(@props.value.expr).id,
+          expr: @props.value.where
+          onChange: @handleWhereChange
+          )
 
     H.div null, 
       H.label null, "Expression"
@@ -89,5 +91,6 @@ ScalarExprEditorComponent = React.createClass {
           onSelect: @handleJoinExprSelect, 
           selectedValue: (if @props.value then { expr: @props.value.expr, joinIds: @props.value.joinIds }))
       H.div style: { width: "20em" }, aggrs
+      H.br()
       whereElem
 }
