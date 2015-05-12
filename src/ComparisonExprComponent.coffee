@@ -35,7 +35,7 @@ module.exports = ComparisonExprComponent = React.createClass {
       opControl = H.select 
         key: "op",
         className: "form-control input-sm",
-        style: { width: "auto", display: "inline-block" }
+        style: { width: "auto", display: "inline-block", marginRight: 3 }
         value: @props.expr.op
         onChange: @handleOpChange,
           _.map(ops, (op) -> H.option(key: op.id, value: op.id, op.name))
@@ -49,6 +49,8 @@ module.exports = ComparisonExprComponent = React.createClass {
           rhsControl = React.createElement(literalComponents.IntegerComponent, key: "rhs", expr: @props.expr.rhs, onChange: @handleRhsChange)
         when "decimal"
           rhsControl = React.createElement(literalComponents.DecimalComponent, key: "rhs", expr: @props.expr.rhs, onChange: @handleRhsChange)
+        when "date"
+          rhsControl = React.createElement(literalComponents.DateComponent, key: "rhs", expr: @props.expr.rhs, onChange: @handleRhsChange)
         when "enum"
           rhsControl = React.createElement(literalComponents.EnumComponent, 
             key: "rhs", 

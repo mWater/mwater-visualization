@@ -15,7 +15,7 @@ module.exports = class DesignCompiler
         return @compileComparisonExpr(options)
       when "logical"
         return @compileLogicalExpr(options)
-      when "text", "integer", "decimal", "boolean", "enum"
+      when "text", "integer", "decimal", "boolean", "enum", "date"
         return { type: "literal", value: expr.value }
       else
         throw new Error("Expr type #{expr.type} not supported")

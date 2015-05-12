@@ -60,7 +60,8 @@ ScalarExprEditorComponent = React.createClass {
     tree = @props.schema.getJoinExprTree({ baseTableId: @props.baseTableId })
 
     # Create list of aggregates
-    if @props.value and @props.schema.isAggrNeeded(@props.value.joinIds)
+    # Hide if uuid expression as can only be counted (TODO: use primary key instead?)
+    if @props.value and @props.schema.isAggrNeeded(@props.value.joinIds) and @props.schema.getExprType(@props.value.expr) != "uuid"
       options = _.map(@props.schema.getAggrs(@props.value.expr), (aggr) -> { value: aggr.id, label: aggr.name })
       aggrs = H.div null,
         H.br()
@@ -71,11 +72,12 @@ ScalarExprEditorComponent = React.createClass {
           onChange: @handleAggrChange
         })
 
-    if @props.value
+    # TODO remove as well as hide this
+    if @props.value and @props.schema.isAggrNeeded(@props.value.joinIds)
       LogicalExprComponent = require './LogicalExprComponent'
       whereElem = H.div null,
         H.br()
-        H.label null, "Filter"
+        H.label null, "Filter Aggregation"
         React.createElement(LogicalExprComponent, 
           schema: @props.schema, 
           baseTableId: @props.schema.getExprTable(@props.value.expr).id,

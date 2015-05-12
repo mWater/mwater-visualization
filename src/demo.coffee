@@ -55,7 +55,7 @@ $ ->
 
     render: ->
       H.div null,
-        # React.createElement(literalComponents.DecimalComponent, expr: @state.expr, onChange: @handleChange)
+        # React.createElement(literalComponents.DateComponent, expr: @state.expr, onChange: @handleChange)
         React.createElement LogicalExprComponent, 
           schema: schema,
           baseTableId: "a",

@@ -128,9 +128,15 @@ module.exports = class Schema
       aggrs.push({ id: "last", name: "Latest", type: type })
 
     switch type
+      when "date"
+        aggrs.push({ id: "max", name: "Maximum", type: type })
+        aggrs.push({ id: "min", name: "Minimum", type: type })
+
       when "integer", "decimal"
         aggrs.push({ id: "sum", name: "Sum", type: type })
         aggrs.push({ id: "avg", name: "Average", type: "decimal" })
+        aggrs.push({ id: "max", name: "Maximum", type: type })
+        aggrs.push({ id: "min", name: "Minimum", type: type })
 
     # Count is always last option
     aggrs.push({ id: "count", name: "Number", type: "integer" })
@@ -180,6 +186,9 @@ module.exports = class Schema
         ops.push({ id: "<=", name: "<=" })
       when "text"
         ops.push({ id: "~*", name: "matches" })
+      when "date"
+        ops.push({ id: ">", name: "after" })
+        ops.push({ id: "<", name: "before" })
       when "enum"
         ops.push({ id: "=", name: "is" })
       when "boolean"

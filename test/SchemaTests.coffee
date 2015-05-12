@@ -127,6 +127,7 @@ describe "Schema", ->
         assert.equal @schema.getExprType({ type: "boolean", value: true }), "boolean"
         assert.equal @schema.getExprType({ type: "decimal", value: 2.23 }), "decimal"
         assert.equal @schema.getExprType({ type: "integer", value: 34 }), "integer"
+        assert.equal @schema.getExprType({ type: "date", value: "2010-07-28" }), "date"
 
     describe "getAggrs", ->
       it "includes last if has natural ordering and is not primary", ->
@@ -209,6 +210,10 @@ describe "Schema", ->
     it "includes is not null", ->
       schema = new Schema()
       assert.include _.pluck(schema.getComparisonOps("text"), "id"), "is not null" 
+
+    it "includes > for date", ->
+      schema = new Schema()
+      assert.include _.pluck(schema.getComparisonOps("date"), "id"), ">" 
 
   describe "getComparisonRhsType", ->
     before ->
