@@ -16,74 +16,63 @@ class Widget extends React.Component
       padding: 5
       position: "absolute"
     }
+
+    handleStyle = {
+      position: "absolute"
+      right: 0
+      bottom: 0
+      backgroundColor: "green"
+      width: 20
+      height: 20
+    }
+
     return @props.connectDragSource(
       H.div style: style,
         "Hello!"
+        @props.connectResizeSource(
+          H.div style: handleStyle
+          )
       )
 
-widgetSpec = {
-  beginDrag: (props) -> {}
+dragSpec = {
+  beginDrag: (props) -> { type: "drag" }
 }
 
-widgetCollect = (connect, monitor) ->
+dragCollect = (connect, monitor) ->
   return { connectDragSource: connect.dragSource() }
 
-DragWidget = DragSource("widget", widgetSpec, widgetCollect)(Widget)
+DragWidget = DragSource("widget", dragSpec, dragCollect)(Widget)
 
-# class GridSquare extends React.Component
-#   render: ->
-#     console.log "OOPS"
-#     @props.connectDropTarget(
-#       H.div style: { 
-#         position: "absolute", 
-#         top: @props.height/12*@props.y
-#         left: @props.width/12*@props.x,
-#         width: @props.width/12, 
-#         height: @props.height/12
-#         border: if @props.isOver then "solid 1px #F00" else "solid 1px #EEE"
-#         }
-#       )
+resizeSpec = {
+  beginDrag: (props) -> { type: "resize" }
+}
 
-#   componentWillReceiveProps: (nextProps) ->
-#     console.log nextProps
+resizeCollect = (connect, monitor) ->
+  return { connectResizeSource: connect.dragSource() }
 
-# gridSpec = {
-#   drop: (props, monitor, component) ->
-#     console.log arguments
-#   hover: (props, monitor, component) ->
-#     console.log monitor.getClientOffset()
-# }
-
-# gridCollect = (connect, monitor) ->
-#   return {
-#     connectDropTarget: connect.dropTarget()
-#     isOver: monitor.isOver()
-#     clientOffset: monitor.getClientOffset()
-#   }
-
-# DropGridSquare = DropTarget("widget", gridSpec, gridCollect)(GridSquare)
+DragResizeWidget = DragSource("widget-resize", resizeSpec, resizeCollect)(DragWidget)
 
 class Container extends React.Component
   constructor: (props) ->
     super
     @state = {}
 
-  renderWidget: (x,y) ->
+  renderWidget: (x, y, w, h) ->
     H.div style: { 
       position: "absolute", 
       top: @props.height/12*y
       left: @props.width/12*x },
-      React.createElement(DragWidget, 
-        width: @props.width/12*2, 
-        height: @props.height/12*2)
+      React.createElement(DragResizeWidget, 
+        width: @props.width/12*w, 
+        height: @props.height/12*h)
 
-  renderPlaceholder: (x,y) ->
+  renderPlaceholder: (x, y, w, h) ->
     H.div style: { 
       position: "absolute", 
       top: @props.height/12*y
       left: @props.width/12*x
-      width: @props.width/12*2
-      height: @props.height/12*2
+      width: @props.width/12*w
+      height: @props.height/12*h
       border: "dashed 3px #DDD"
       borderRadius: 10
       padding: 5
@@ -97,30 +86,44 @@ class Container extends React.Component
       position: "relative"
     }
 
-    if @state.pos
-      snappedX = Math.round(@state.pos.x/@props.width*12)
-      snappedY = Math.round(@state.pos.y/@props.height*12)
+    if @state.drag
+      snappedX = Math.round(@state.drag.x/@props.width*12)
+      snappedY = Math.round(@state.drag.y/@props.height*12)
       if snappedX < 0 then snappedX = 0
       if snappedY < 0 then snappedY = 0
 
-      snapped = @renderPlaceholder(snappedX, snappedY)
-    console.log @state
+      snapped = @renderPlaceholder(snappedX, snappedY, 3, 2)
+
+    if @state.resize
+      snappedX = Math.round(@state.resize.x/@props.width*12)
+      snappedY = Math.round(@state.resize.y/@props.height*12)
+
+      snapped = @renderPlaceholder(2, 2, snappedX + 3, snappedY + 2)
+
+    console.log @state.resize
+
     @props.connectDropTarget(
       H.div style: style, 
         if not snapped
-          @renderWidget(2,2)
+          @renderWidget(2,2, 3, 2)
         snapped
     )
 
 targetSpec = {
   drop: (props, monitor, component) ->
     console.log arguments
-    component.setState(pos: null)
+    component.setState(drag: null, resize: null)
   hover: (props, monitor, component) ->
-    component.setState(pos: {
-      x: monitor.getClientOffset().x - (monitor.getInitialClientOffset().x - monitor.getInitialSourceClientOffset().x)
-      y: monitor.getClientOffset().y - (monitor.getInitialClientOffset().y - monitor.getInitialSourceClientOffset().y)
-      })
+    if monitor.getItemType() == "widget"
+      component.setState(drag: {
+        x: monitor.getClientOffset().x - (monitor.getInitialClientOffset().x - monitor.getInitialSourceClientOffset().x)
+        y: monitor.getClientOffset().y - (monitor.getInitialClientOffset().y - monitor.getInitialSourceClientOffset().y)
+        })
+    if monitor.getItemType() == "widget-resize"
+      component.setState(resize: {
+        x: monitor.getDifferenceFromInitialOffset().x
+        y: monitor.getDifferenceFromInitialOffset().y
+        })
 }
 
 targetCollect = (connect, monitor) ->
@@ -130,7 +133,7 @@ targetCollect = (connect, monitor) ->
     clientOffset: monitor.getClientOffset()
   }
 
-DropContainer = DropTarget("widget", targetSpec, targetCollect)(Container)
+DropContainer = DropTarget(["widget", "widget-resize"], targetSpec, targetCollect)(Container)
 
 
 class Root extends React.Component
