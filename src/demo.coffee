@@ -12,12 +12,12 @@ class Widget extends React.Component
       height: @props.height
       border: "solid 3px #35A"
       backgroundColor: "white"
-      borderRadius: 10
+      borderRadius: 5
       padding: 5
       position: "absolute"
     }
 
-    handleStyle = {
+    resizeHandleStyle = {
       position: "absolute"
       right: 0
       bottom: 0
@@ -26,45 +26,65 @@ class Widget extends React.Component
       height: 20
     }
 
-    return @props.connectDragSource(
+    return @props.connectMoveHandle(
       H.div style: style,
         "Hello!"
-        @props.connectResizeSource(
-          H.div style: handleStyle
+        @props.connectResizeHandle(
+          H.div style: resizeHandleStyle
           )
       )
 
-dragSpec = {
-  beginDrag: (props) -> { type: "drag" }
+class Block extends React.Component
+  render: ->
+    return @props.widgetFactory(
+      widget: @props.widget
+      width: @props.width
+      height: @props.height
+      connectMoveHandle: @props.connectMoveHandle
+      connectResizeHandle: @props.connectResizeHandle
+      )
+
+moveSpec = {
+  beginDrag: (props) -> 
+    props.onBeginMove()
+    return { type: "block" } # TODO
+  endDrag: (props, monitor, component) ->
+    props.onEndMove(monitor.didDrop())
 }
 
-dragCollect = (connect, monitor) ->
-  return { connectDragSource: connect.dragSource() }
+moveCollect = (connect, monitor) ->
+  return { connectMoveHandle: connect.dragSource() }
 
-DragWidget = DragSource("widget", dragSpec, dragCollect)(Widget)
+MoveBlock = DragSource("widget", moveSpec, moveCollect)(Block)
 
 resizeSpec = {
   beginDrag: (props) -> { type: "resize" }
 }
 
 resizeCollect = (connect, monitor) ->
-  return { connectResizeSource: connect.dragSource() }
+  return { connectResizeHandle: connect.dragSource() }
 
-DragResizeWidget = DragSource("widget-resize", resizeSpec, resizeCollect)(DragWidget)
+MoveResizeBlock = DragSource("widget-resize", resizeSpec, resizeCollect)(MoveBlock)
 
+# Container contains blocks, each with a widget inside
 class Container extends React.Component
   constructor: (props) ->
     super
     @state = {}
 
-  renderWidget: (x, y, w, h) ->
+  renderBlock: (block) ->
     H.div style: { 
       position: "absolute", 
-      top: @props.height/12*y
-      left: @props.width/12*x },
-      React.createElement(DragResizeWidget, 
-        width: @props.width/12*w, 
-        height: @props.height/12*h)
+      top: @props.height/12*block.y
+      left: @props.width/12*block.x },
+      React.createElement(MoveResizeBlock, 
+        onBeginMove: -> console.log "BEGIN"
+        onEndMove: (success) -> console.log "END #{success}"
+        width: @props.width/12*block.width, 
+        height: @props.height/12*block.height
+        widgetFactory: @props.widgetFactory
+        widget: block.widget
+        )
 
   renderPlaceholder: (x, y, w, h) ->
     H.div style: { 
@@ -74,7 +94,7 @@ class Container extends React.Component
       width: @props.width/12*w
       height: @props.height/12*h
       border: "dashed 3px #DDD"
-      borderRadius: 10
+      borderRadius: 5
       padding: 5
       position: "absolute"
     }
@@ -100,18 +120,18 @@ class Container extends React.Component
 
       snapped = @renderPlaceholder(2, 2, snappedX + 3, snappedY + 2)
 
-    console.log @state.resize
+    blockElems = _.map @props.blocks, (block) =>
+      @renderBlock(block)
 
     @props.connectDropTarget(
       H.div style: style, 
-        if not snapped
-          @renderWidget(2,2, 3, 2)
+        blockElems
         snapped
     )
 
 targetSpec = {
   drop: (props, monitor, component) ->
-    console.log arguments
+    console.log "DROP"
     component.setState(drag: null, resize: null)
   hover: (props, monitor, component) ->
     if monitor.getItemType() == "widget"
@@ -138,8 +158,24 @@ DropContainer = DropTarget(["widget", "widget-resize"], targetSpec, targetCollec
 
 class Root extends React.Component
   render: ->
+    blocks = [
+      { x: 1, y: 2, width: 3, height: 2, widget: { text: "A" }}
+    ]
+
+    widgetFactory = (options) =>
+      return React.createElement(Widget, 
+        text: options.widget.text, 
+        width: options.width, 
+        height: options.height
+        connectMoveHandle: options.connectMoveHandle
+        connectResizeHandle: options.connectResizeHandle)
+
     H.div null, 
-      React.createElement(DropContainer, width: 600, height: 400)
+      React.createElement(DropContainer, 
+        width: 600, 
+        height: 400, 
+        blocks: blocks,
+        widgetFactory: widgetFactory)
 
 DragDropRoot = DragDropContext(HTML5Backend)(Root)
 
