@@ -28,7 +28,7 @@ class Widget extends React.Component
 
     return @props.connectMoveHandle(
       H.div style: style,
-        "Hello!"
+        "Hello! #{@props.text}"
         @props.connectResizeHandle(
           H.div style: resizeHandleStyle
           )
@@ -45,26 +45,40 @@ class Block extends React.Component
       )
 
 moveSpec = {
-  beginDrag: (props) -> 
-    props.onBeginMove()
-    return { type: "block" } # TODO
+  beginDrag: (props, monitor, component) -> 
+    # props.onBeginMove()
+
+    return { 
+      block: props.block
+      width: props.width
+      height: props.height
+    }
   endDrag: (props, monitor, component) ->
-    props.onEndMove(monitor.didDrop())
+    # props.onEndMove(monitor.didDrop())
 }
 
 moveCollect = (connect, monitor) ->
   return { connectMoveHandle: connect.dragSource() }
 
-MoveBlock = DragSource("widget", moveSpec, moveCollect)(Block)
+MoveBlock = DragSource("block-move", moveSpec, moveCollect)(Block)
 
 resizeSpec = {
-  beginDrag: (props) -> { type: "resize" }
+  beginDrag: (props, monitor, component) ->
+    return { 
+      block: props.block
+      width: props.width
+      height: props.height
+    }
+    # # props.onBeginResize()
+    # return { type: "resize" } # TODO
+  endDrag: (props, monitor, component) ->
+    # props.onEndResize(monitor.didDrop())
 }
 
 resizeCollect = (connect, monitor) ->
   return { connectResizeHandle: connect.dragSource() }
 
-MoveResizeBlock = DragSource("widget-resize", resizeSpec, resizeCollect)(MoveBlock)
+MoveResizeBlock = DragSource("block-resize", resizeSpec, resizeCollect)(MoveBlock)
 
 # Container contains blocks, each with a widget inside
 class Container extends React.Component
@@ -72,32 +86,57 @@ class Container extends React.Component
     super
     @state = {}
 
-  renderBlock: (block) ->
+  renderBlock: (block, hidden) ->
     H.div style: { 
       position: "absolute", 
-      top: @props.height/12*block.y
-      left: @props.width/12*block.x },
+      display: if hidden then "none" else "block"
+      top: @props.height / @props.blocksAcross * block.y
+      left: @props.width / @props.blocksAcross * block.x },
       React.createElement(MoveResizeBlock, 
-        onBeginMove: -> console.log "BEGIN"
-        onEndMove: (success) -> console.log "END #{success}"
-        width: @props.width/12*block.width, 
-        height: @props.height/12*block.height
+        # onBeginMove: @handleBeginMoveBlock.bind(this, block)
+        # onEndMove: @handleEndMoveBlock
+        # onBeginResize: -> console.log "BEGIN"
+        # onEndResize: (success) -> console.log "END #{success}"
+        width: @props.width / @props.blocksAcross * block.width, 
+        height: @props.height / @props.blocksAcross * block.height
         widgetFactory: @props.widgetFactory
         widget: block.widget
+        block: block
         )
 
-  renderPlaceholder: (x, y, w, h) ->
+  renderPlaceholder: (x, y, width, height) ->
     H.div style: { 
       position: "absolute", 
-      top: @props.height/12*y
-      left: @props.width/12*x
-      width: @props.width/12*w
-      height: @props.height/12*h
+      left: @props.width/@props.blocksAcross*x
+      top: @props.height/@props.blocksAcross*y
+      width: @props.width/@props.blocksAcross*width
+      height: @props.height/@props.blocksAcross*height
       border: "dashed 3px #DDD"
       borderRadius: 5
       padding: 5
       position: "absolute"
     }
+
+  # # Move block to new x, y
+  # setMoveBlock: (block, x, y) ->
+  #   return
+  componentWillReceiveProps: (nextProps) ->
+    # Reset hover blocks if not over
+    if not nextProps.isOver
+      if @state.moveHover
+        @setState(moveHover: null)
+      if @state.resizeHover
+        @setState(resizeHover: null)
+
+  setMoveHover: (dragInfo) ->
+    @setState(moveHover: dragInfo)
+
+  setResizeHover: (dragInfo) ->
+    @setState(resizeHover: dragInfo)
+
+  dropBlock: (dragInfo) ->
+    # TODO
+    console.log dragInfo
 
   render: ->
     style = {
@@ -106,43 +145,60 @@ class Container extends React.Component
       position: "relative"
     }
 
-    if @state.drag
-      snappedX = Math.round(@state.drag.x/@props.width*12)
-      snappedY = Math.round(@state.drag.y/@props.height*12)
+    if @state.moveHover
+      snappedX = Math.round(@state.moveHover.x/@props.width*12)
+      snappedY = Math.round(@state.moveHover.y/@props.height*12)
       if snappedX < 0 then snappedX = 0
       if snappedY < 0 then snappedY = 0
 
-      snapped = @renderPlaceholder(snappedX, snappedY, 3, 2)
+      placeholder = @renderPlaceholder(snappedX, snappedY, 3, 2)
 
-    if @state.resize
-      snappedX = Math.round(@state.resize.x/@props.width*12)
-      snappedY = Math.round(@state.resize.y/@props.height*12)
+    # if @state.resize
+    #   snappedX = Math.round(@state.resize.x/@props.width*12)
+    #   snappedY = Math.round(@state.resize.y/@props.height*12)
 
-      snapped = @renderPlaceholder(2, 2, snappedX + 3, snappedY + 2)
+    #   snapped = @renderPlaceholder(2, 2, snappedX + 3, snappedY + 2)
 
-    blockElems = _.map @props.blocks, (block) =>
-      @renderBlock(block)
+    # Skip rendering moving blocks
+    blocks = @props.blocks
+
+    blockElems = _.map blocks, (block) =>
+      if @state.moveHover
+        hoverBlock = @state.moveHover.block
+      if @state.resizeHover
+        hoverBlock = @state.resizeHover.block
+      @renderBlock(block, block == hoverBlock)
 
     @props.connectDropTarget(
       H.div style: style, 
-        blockElems
-        snapped
+        if blockElems.length > 0 then blockElems
+        placeholder
     )
 
 targetSpec = {
   drop: (props, monitor, component) ->
-    console.log "DROP"
-    component.setState(drag: null, resize: null)
-  hover: (props, monitor, component) ->
-    if monitor.getItemType() == "widget"
-      component.setState(drag: {
+    if monitor.getItemType() == "block-move"
+      component.dropMoveBlock(
         x: monitor.getClientOffset().x - (monitor.getInitialClientOffset().x - monitor.getInitialSourceClientOffset().x)
         y: monitor.getClientOffset().y - (monitor.getInitialClientOffset().y - monitor.getInitialSourceClientOffset().y)
-        })
-    if monitor.getItemType() == "widget-resize"
-      component.setState(resize: {
-        x: monitor.getDifferenceFromInitialOffset().x
-        y: monitor.getDifferenceFromInitialOffset().y
+        width: monitor.getItem().width
+        height: monitor.getItem().height
+        block: monitor.getItem().block
+        )
+  hover: (props, monitor, component) ->
+    if monitor.getItemType() == "block-move"
+      component.setMoveHover(
+        block: monitor.getItem().block
+        x: monitor.getClientOffset().x - (monitor.getInitialClientOffset().x - monitor.getInitialSourceClientOffset().x)
+        y: monitor.getClientOffset().y - (monitor.getInitialClientOffset().y - monitor.getInitialSourceClientOffset().y)
+        width: monitor.getItem().width
+        height: monitor.getItem().height
+        )
+    if monitor.getItemType() == "block-resize"
+      component.setResizeHover({
+        block: monitor.getItem().block
+        width: monitor.getItem().width + monitor.getDifferenceFromInitialOffset().x
+        height: monitor.getItem().width + monitor.getDifferenceFromInitialOffset().y
         })
 }
 
@@ -153,7 +209,7 @@ targetCollect = (connect, monitor) ->
     clientOffset: monitor.getClientOffset()
   }
 
-DropContainer = DropTarget(["widget", "widget-resize"], targetSpec, targetCollect)(Container)
+DropContainer = DropTarget(["block-move", "block-resize"], targetSpec, targetCollect)(Container)
 
 
 class Root extends React.Component
@@ -174,6 +230,7 @@ class Root extends React.Component
       React.createElement(DropContainer, 
         width: 600, 
         height: 400, 
+        blocksAcross: 12
         blocks: blocks,
         widgetFactory: widgetFactory)
 
