@@ -134,7 +134,11 @@ class Container extends React.Component
   setResizeHover: (dragInfo) ->
     @setState(resizeHover: dragInfo)
 
-  dropBlock: (dragInfo) ->
+  dropMoveBlock: (dragInfo) ->
+    # TODO
+    console.log dragInfo
+
+  dropResizeBlock: (dragInfo) ->
     # TODO
     console.log dragInfo
 
@@ -185,6 +189,12 @@ targetSpec = {
         height: monitor.getItem().height
         block: monitor.getItem().block
         )
+    if monitor.getItemType() == "block-resize"
+      component.dropResizeBlock({
+        block: monitor.getItem().block
+        width: monitor.getItem().width + monitor.getDifferenceFromInitialOffset().x
+        height: monitor.getItem().width + monitor.getDifferenceFromInitialOffset().y
+        })
   hover: (props, monitor, component) ->
     if monitor.getItemType() == "block-move"
       component.setMoveHover(
