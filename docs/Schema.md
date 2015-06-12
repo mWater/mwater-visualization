@@ -13,7 +13,7 @@ Joins are included as a column type as they have a natural order within the othe
 
 ## Column types
 
-`key`: Primary key. Opaque and used for counting number of rows. 
+`id`: Primary key. Opaque and used for counting number of rows. 
 `text`: text string
 `decimal`: Floating point
 `integer`: Integer
@@ -21,7 +21,6 @@ Joins are included as a column type as they have a natural order within the othe
 `boolean`: true/false
 `enum`: fixed values. See values definition
 `join`: Reference to another table, either one to many or many to one ?? join or ref?
-
 
 ## Column properties
 

@@ -64,24 +64,61 @@ barChartData = [
 ];
 
 
+data = [
+  { key: "Asadfsdfa", values: [
+    { x: "apple", y: 10 }
+    { x: "banana", y: 20 }
+    ]}
+  { key: "sdfsdf", values: [
+    { x: "apple", y: 14 }
+    { x: "banana", y: 25 }
+    ]}
+]
+
+negative_test_data = new d3.range(0,3).map((d,i) ->
+        return {
+            key: 'Stream' + i,
+            values: new d3.range(0,11).map( (f,j) ->
+                return {
+                    y: 10 + Math.random()*100 * (Math.floor(Math.random()*100)%2 ? 1 : -1),
+                    x: "X: " + j
+                }
+            )
+        })
+
+console.log _.cloneDeep(negative_test_data)
+
 class BarChartComponent extends React.Component
 
   componentDidMount: ->
     el = React.findDOMNode(@refs.chart)
 
+    # nv.addGraph =>
+    #   chart = nv.models.discreteBarChart()
+    #       .x((d) -> d.label)
+    #       .y((d) -> d.value)
+    #       .staggerLabels(true)
+    #       #.staggerLabels(historicalBarChart[0].values.length > 8)
+    #       .showValues(true)
+    #       .duration(250)
+    #       # .height(200)
+    #       # .width(300)
     nv.addGraph =>
-      chart = nv.models.discreteBarChart()
-          .x((d) -> d.label)
-          .y((d) -> d.value)
-          .staggerLabels(true)
+      chart = nv.models.multiBarChart()
+          # .x((d) -> d.label)
+          # .y((d) -> d.value)
+          # .staggerLabels(true)
           #.staggerLabels(historicalBarChart[0].values.length > 8)
-          .showValues(true)
+          # .showValues(true)
+          .stacked(true)
+          .showControls(false)
           .duration(250)
           # .height(200)
           # .width(300)
+
           
       d3.select(el)
-          .datum(barChartData)
+          .datum(data)
           .call(chart)
       # nv.utils.windowResize(chart.update)
       return ChartTestComponent
