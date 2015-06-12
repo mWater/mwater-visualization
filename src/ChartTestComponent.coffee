@@ -2,12 +2,19 @@ H = React.DOM
 BarChartDesignerComponent = require './BarChartDesignerComponent'
 
 module.exports = class ChartTestComponent extends React.Component
+  constructor: ->
+    super
+    @state = { design: {} }
+
   render: ->
     H.div className: "row",
       H.div className: "col-xs-8",
         React.createElement(BarChartComponent, width: "100%", height: 500)
       H.div className: "col-xs-4",
-        React.createElement(BarChartDesignerComponent, schema: @props.schema)
+        React.createElement(BarChartDesignerComponent, 
+          schema: @props.schema, 
+          value: @state.design
+          onChange: (design) => @setState(design: design) )
 
 barChartData = [
     {
