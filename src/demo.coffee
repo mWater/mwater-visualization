@@ -30,41 +30,41 @@ createSchema = ->
   schema.addColumn("b", { id: "r", name: "R", type: "text" })
   schema.addColumn("b", { id: "s", name: "S", type: "uuid" }) # a ref
 
-  schema.addJoin({ id: "ab", name: "AB", fromTableId: "a", fromColumnId: "x", toTableId: "b", toColumnId: "s", op: "=", oneToMany: true })
-  schema.addJoin({ id: "ba", name: "BA", fromTableId: "b", fromColumnId: "s", toTableId: "a", toColumnId: "x", op: "=", oneToMany: false })
+  # schema.addJoin({ id: "ab", name: "AB", fromTableId: "a", fromColumnId: "x", toTableId: "b", toColumnId: "s", op: "=", oneToMany: true })
+  # schema.addJoin({ id: "ba", name: "BA", fromTableId: "b", fromColumnId: "s", toTableId: "a", toColumnId: "x", op: "=", oneToMany: false })
 
   return schema
 
 
 $ ->
-  # $("body").css("background-color", "#EEE")
   # Create simple schema
   schema = createSchema()
   designValidator = new DesignValidator(schema)
 
   expr = null
 
-  Holder = React.createClass {
-    getInitialState: ->
-      { expr: @props.initialExpr }
+  # Holder = React.createClass {
+  #   getInitialState: ->
+  #     { expr: @props.initialExpr }
 
-    handleChange: (expr) ->
-      # Clean first
-      expr = designValidator.cleanExpr(expr)
-      @setState(expr: expr)
+  #   handleChange: (expr) ->
+  #     # Clean first
+  #     expr = designValidator.cleanExpr(expr)
+  #     @setState(expr: expr)
 
-    render: ->
-      H.div null,
-        # React.createElement(literalComponents.DateComponent, expr: @state.expr, onChange: @handleChange)
-        React.createElement LogicalExprComponent, 
-          schema: schema,
-          baseTableId: "a",
-          expr: @state.expr, 
-          onChange: @handleChange
-        H.pre null, JSON.stringify(@state.expr, null, 2)
-  }
+  #   render: ->
+  #     H.div null,
+  #       # React.createElement(literalComponents.DateComponent, expr: @state.expr, onChange: @handleChange)
+  #       React.createElement LogicalExprComponent, 
+  #         schema: schema,
+  #         baseTableId: "a",
+  #         expr: @state.expr, 
+  #         onChange: @handleChange
+  #       H.pre null, JSON.stringify(@state.expr, null, 2)
+  # }
 
-  sample = React.createElement(Holder, initialExpr: expr)
+  sample = H.div className: "container",
+    React.createElement(require("./ChartTestComponent"))
   React.render(sample, document.getElementById('root'))
 
 # Child = React.createClass {

@@ -34,6 +34,7 @@ gulp.task "libs_css", ->
   return gulp.src([
     "./bower_components/bootstrap/dist/css/bootstrap.css"
     "./bower_components/bootstrap/dist/css/bootstrap-theme.css"
+    "./bower_components/nvd3/build/nv.d3.css"
   ]).pipe(concat("libs.css"))
     .pipe(gulp.dest("./dist/css/"))
 
@@ -44,6 +45,8 @@ gulp.task "libs_js", ->
     "./bower_components/lodash/dist/lodash.js"
     "./bower_components/backbone/backbone.js"
     "./bower_components/react/react-with-addons.js"
+    "./bower_components/d3/d3.js"
+    "./bower_components/nvd3/build/nv.d3.js"
   ]).pipe(concat("libs.js"))
     .pipe(gulp.dest("./dist/js/"))
 
@@ -87,7 +90,7 @@ gulp.task "build", gulp.parallel([
   "index_css"
 ])
 
-gulp.task 'serve', gulp.series([
+gulp.task 'watch', gulp.series([
   'build'
   gulp.parallel([
     -> browserSync({ server: "./dist" })
