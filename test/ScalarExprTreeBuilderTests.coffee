@@ -19,7 +19,7 @@ describe "ScalarExprTreeBuilder", ->
     nodes = new ScalarExprTreeBuilder(@schema).getTree()
     subnodes = nodes[0].children()
     assert.deepEqual _.pluck(subnodes, "name"), ["C1"]
-    assert _.isEqual(subnodes[0].expr, { table: "t1", path: ["c1"]}), JSON.stringify(subnodes[0].expr)
+    assert _.isEqual(subnodes[0].value, { table: "t1", path: ["c1"]}), JSON.stringify(subnodes[0].value)
 
   it "follows joins", ->
     # Join column
@@ -30,7 +30,7 @@ describe "ScalarExprTreeBuilder", ->
     # Go to first table, 2nd child
     subnode = nodes[0].children()[1]
 
-    assert _.isEqual(subnode.chidren()[0].expr, { table: "t1", path: ["c2", "c1"]})
+    assert _.isEqual(subnode.chidren()[0].value, { table: "t1", path: ["c2", "c1"]})
 
   it "limits to one table", ->
     nodes = new ScalarExprTreeBuilder(@schema).getTree({ startTable: "t1" })

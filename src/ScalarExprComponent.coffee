@@ -1,13 +1,14 @@
 H = React.DOM
-JoinExprTreeComponent = require './JoinExprTreeComponent' 
 ReactSelect = require 'react-select'
 DesignValidator = require './DesignValidator'
 ActionCancelModalComponent = require './ActionCancelModalComponent'
+ScalarExprTreeBuilder = require './ScalarExprTreeBuilder'
+ScalarExprTreeComponent = require './ScalarExprTreeComponent'
 
 module.exports = class ScalarExprComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired
-    expressionBuilder: React.PropTypes.object.isRequired
+    # expressionBuilder: React.PropTypes.object.isRequired
     editorTitle: React.PropTypes.string # Title of editor popup
     
     value: React.PropTypes.object # Current value of expression
@@ -22,19 +23,26 @@ module.exports = class ScalarExprComponent extends React.Component
 
   handleEditorCancel: => @setState(editing: null)
 
+  handleEditorChange: (val) => @setState(editing: val)
+
   handleEditorSave: =>
     # TODO validate
     @props.onChange(@state.editing)
     @setState(editing: null)
 
   render: ->
+    # Display editor modal if editing
     if @state.editing
       editor = React.createElement(ActionCancelModalComponent, { 
           title: @props.editorTitle
           onAction: @handleEditorSave
           onCancel: @handleEditorCancel
           },
-            React.createElement(ScalarExprEditorComponent, schema: @props.schema, startTable: @props.baseTableId)
+            React.createElement(ScalarExprEditorComponent, 
+              schema: @props.schema, 
+              startTable: @props.baseTableId, 
+              value: @state.editing
+              onChange: @handleEditorChange)
         )
 
     H.div null, 
@@ -49,10 +57,41 @@ module.exports = class ScalarExprComponent extends React.Component
         onClick: @handleEditorOpen
 
 
-ScalarExprEditorComponent = React.createClass {
+class ScalarExprEditorComponent extends React.Component
+  @propTypes:
+    schema: React.PropTypes.object.isRequired
+    value: React.PropTypes.object.isRequired
+
+  handleTreeChange: (val) =>
+    # Set table and path
+    newVal = _.extend({}, { type: "scalar" }, val)
+
+    # Clean 
+    console.log "TODO!"
+
+    @props.onChange(newVal)
+
+  renderTree: ->
+    # Create tree 
+    treeBuilder = new ScalarExprTreeBuilder(@props.schema)
+    tree = treeBuilder.getTree()
+    console.log tree[0].children()
+
+    # Create tree component with value of table and path
+    return React.createElement(ScalarExprTreeComponent, 
+      tree: tree,
+      value: _.pick(@props.value, "table", "path")
+      onChange: @handleTreeChange
+      )
+
+
   render: ->
-    H.div null, "TODO"
-}
+    H.div null, 
+      H.label null, "Select Field"
+      H.div style: { overflowY: "scroll", height: 350, border: "solid 1px #CCC" },
+        @renderTree()
+
+
 #   handleJoinExprSelect: (joinExpr) ->
 #     # Create new expr
 #     scalar = _.extend({}, @props.value, { type: "scalar", baseTableId: @props.baseTableId, expr: joinExpr.expr, joinIds: joinExpr.joinIds })

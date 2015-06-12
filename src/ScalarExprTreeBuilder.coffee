@@ -1,5 +1,5 @@
-# Builds a tree for selecting table + path of a scalar expression
-# Organizes columns, and follows joins
+# Builds a tree for selecting table + path of a scalar expression#p
+ Organizes columns, and follows joins
 module.exports = class ScalarExprTreeBuilder
   constructor: (schema) ->
     @schema = schema
@@ -8,7 +8,7 @@ module.exports = class ScalarExprTreeBuilder
   # { 
   #   name: name of item, 
   #   desc: description of item, 
-  #   expr: { table, path } - partial scalar expression, null if not selectable node
+  #   value: { table, path } - partial scalar expression, null if not selectable node
   #   children: function which returns children nodes
   #   initiallyOpen: true if children should display initially
   # }
@@ -54,71 +54,16 @@ module.exports = class ScalarExprTreeBuilder
 
         # If join, add children
         if column.type == "join"
-          node.chidren = =>
+          node.children = =>
             # Add column to path
             path = options.initialPath.slice()
             path.push(column.id)
-            @createChildNodes(startTable: options.startTable, table: column.join.toTable, initialPath: path)
+            return @createChildNodes(startTable: options.startTable, table: column.join.toTable, initialPath: path)
         else
           path = options.initialPath.slice()
           path.push(column.id)
-          node.expr = { table: options.startTable, path: path } 
-
+          node.value = { table: options.startTable, path: path } 
+        console.log node
         nodes.push(node)
 
     return nodes
-    # 
-    # # Get base table
-    # baseTable = @getTable(options.baseTableId)
-
-    # tree = []
-    # joinIds = options.joinIds or []
-    
-    # # Add columns
-    # for col in baseTable.columns
-    #   # Skip primary key if no joins
-    #   if joinIds.length == 0 and col.primary
-    #     continue 
-
-    #   # Skip uuid fields unless primary
-    #   if col.type == "uuid" and not col.primary
-    #     continue
-
-    #   if col.primary
-    #     name = "Number of #{baseTable.name}"
-    #     desc = ""
-    #   else 
-    #     name = col.name
-    #     desc = col.desc
-
-    #   # Filter by type
-    #   if options.types and col.type not in options.types
-    #     continue
-
-    #   tree.push({
-    #     id: col.id
-    #     name: name
-    #     desc: col.desc
-    #     type: col.type
-    #     value: {
-    #       joinIds: joinIds
-    #       expr: { type: "field", tableId: baseTable.id, columnId: col.id }
-    #       }
-    #     })
-
-    # # Add joins
-    # for join in @joins
-    #   do (join) =>
-    #     if join.startTableId == baseTable.id
-    #       tree.push({
-    #         id: join.id
-    #         name: join.name
-    #         desc: join.desc
-    #         value: {
-    #           joinIds: joinIds
-    #           }
-    #         getChildren: =>
-    #           return @getJoinExprTree({ baseTableId: join.toTableId, joinIds: joinIds.concat([join.id]) })
-    #         })
-    # return tree
-
