@@ -1,5 +1,5 @@
-# Builds a tree for selecting table + path of a scalar expression#p
- Organizes columns, and follows joins
+# Builds a tree for selecting table + path of a scalar expression
+# Organizes columns, and follows joins
 module.exports = class ScalarExprTreeBuilder
   constructor: (schema) ->
     @schema = schema

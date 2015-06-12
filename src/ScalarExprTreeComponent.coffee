@@ -1,4 +1,4 @@
-HoverMixin = require './HoverMixin'
+HoverComponent = require './HoverComponent'
 H = React.DOM
 
 # Shows a tree that selects table + path of a scalar expression
@@ -14,9 +14,13 @@ module.exports = class ScalarExprTreeComponent extends React.Component
     # Get tree
     for item in @props.tree
       if item.children
-        elems.push(React.createElement(ScalarExprTreeNodeComponent, key: item.name, item: item, onChange: @props.onChange, value: @props.value))
+        elems.push(
+          React.createElement(HoverComponent, null,
+            React.createElement(ScalarExprTreeNodeComponent, key: item.name, item: item, onChange: @props.onChange, value: @props.value)))
       else 
-        elems.push(React.createElement(ScalarExprTreeLeafComponent, key: item.name, item: item, onChange: @props.onChange, value: @props.value))
+        elems.push(
+          React.createElement(HoverComponent, null,
+            React.createElement(ScalarExprTreeLeafComponent, key: item.name, item: item, onChange: @props.onChange, value: @props.value)))
 
     H.div null, 
       elems
@@ -38,7 +42,7 @@ class ScalarExprTreeLeafComponent extends React.Component
       style.color = "#EEE"
       style.backgroundColor = if @props.hovered then "#286090" else "#337AB7"
     else if @props.hovered
-      style.backgroundColor = "#CCC"
+      style.backgroundColor = "#EEE"
 
     H.div style: style, onClick: @handleClick, 
       @props.item.name
