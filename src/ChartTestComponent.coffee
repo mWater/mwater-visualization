@@ -1,4 +1,5 @@
 H = React.DOM
+BarChartDesignerComponent = require './BarChartDesignerComponent'
 
 module.exports = class ChartTestComponent extends React.Component
   render: ->
@@ -6,22 +7,7 @@ module.exports = class ChartTestComponent extends React.Component
       H.div className: "col-xs-8",
         React.createElement(BarChartComponent, width: "100%", height: 500)
       H.div className: "col-xs-4",
-        React.createElement(BarChartDesignerComponent)
-
-
-class BarChartDesignerComponent extends React.Component
-  render: ->
-    H.div null,
-      H.div className: "form-group",
-        H.label null, "Bar size"
-        H.input type: "text", className: "form-control", placeholder: "Click to select..."
-        H.p className: "help-block", "Data to control the size of the bars"
-
-      H.div className: "form-group",
-        H.label null, "Group By"
-        H.input type: "text", className: "form-control", placeholder: "Click to select..."
-
-
+        React.createElement(BarChartDesignerComponent, schema: @props.schema)
 
 barChartData = [
     {
