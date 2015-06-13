@@ -9,6 +9,8 @@ module.exports = class ScalarExprComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired
     # expressionBuilder: React.PropTypes.object.isRequired
+
+    startTable: React.PropTypes.string # Optional start table to restrict selections to
     editorTitle: React.PropTypes.string # Title of editor popup
     
     value: React.PropTypes.object # Current value of expression
@@ -40,7 +42,7 @@ module.exports = class ScalarExprComponent extends React.Component
           },
             React.createElement(ScalarExprEditorComponent, 
               schema: @props.schema, 
-              startTable: @props.baseTableId, 
+              startTable: @props.startTable, 
               value: @state.editing
               onChange: @handleEditorChange)
         )

@@ -16,7 +16,7 @@ module.exports = class BarChartDesignerComponent extends React.Component
         schema: @props.schema
         onChange: @handleYAxisChange
         value: null)
-      H.p className: "help-block", "Data to control the size of the bars"
+      H.p className: "help-block", "Field to use for the size of the bars"
 
   renderXAxis: ->
     # If no y axis, hide
@@ -28,6 +28,7 @@ module.exports = class BarChartDesignerComponent extends React.Component
       React.createElement(ScalarExprComponent, 
         editorTitle: "Bar size"
         schema: @props.schema
+        startTable: @props.value.yAxis.table
         onChange: @handleXAxisChange
         value: null)
       H.p className: "help-block", "Data to control the size of the bars"
