@@ -32,7 +32,7 @@ module.exports = class ScalarExprTreeBuilder
 
         # Create nodes for each column of a table
         node.children = =>
-          @createChildNodes(startTable: table.id, table: table.id, initialPath: [])
+          @createChildNodes(startTable: table.id, table: table.id, joins: [])
         nodes.push(node)
 
     return nodes
@@ -40,7 +40,7 @@ module.exports = class ScalarExprTreeBuilder
   # Options:
   # startTable: table id that started from
   # table: table id to get nodes for
-  # initialPath: append path to this
+  # joins: joins for child nodes
   createChildNodes: (options) ->
     nodes = []
 
@@ -55,15 +55,12 @@ module.exports = class ScalarExprTreeBuilder
         # If join, add children
         if column.type == "join"
           node.children = =>
-            # Add column to path
-            path = options.initialPath.slice()
-            path.push(column.id)
-            return @createChildNodes(startTable: options.startTable, table: column.join.toTable, initialPath: path)
+            # Add column to joins
+            joins = options.joins.slice()
+            joins.push(column.id)
+            return @createChildNodes(startTable: options.startTable, table: column.join.toTable, joins: joins)
         else
-          path = options.initialPath.slice()
-          path.push(column.id)
-          node.value = { table: options.startTable, path: path } 
-        console.log node
+          node.value = { table: options.startTable, joins: options.joins, expr: { type: "field", table: options.table, column: column.id } } 
         nodes.push(node)
 
     return nodes

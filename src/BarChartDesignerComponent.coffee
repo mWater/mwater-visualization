@@ -23,6 +23,7 @@ module.exports = class BarChartDesignerComponent extends React.Component
     if not @props.value.yAxis
       return null
 
+    # Expression is limited to same table as y-axis
     return H.div className: "form-group",
       H.label null, "Bar size"
       React.createElement(ScalarExprComponent, 

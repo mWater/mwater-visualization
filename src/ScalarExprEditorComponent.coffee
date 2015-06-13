@@ -11,8 +11,8 @@ module.exports = class ScalarExprEditorComponent extends React.Component
     startTable: React.PropTypes.string # Optional start table to restrict selections to
 
   handleTreeChange: (val) =>
-    # Set table and path
-    newVal = _.extend({}, { type: "scalar" }, val)
+    # Set table and joins and expr
+    newVal = _.extend({}, @props.value or { type: "scalar" }, val,)
 
     # Clean 
     console.log "TODO!"
@@ -28,7 +28,7 @@ module.exports = class ScalarExprEditorComponent extends React.Component
     # Create tree component with value of table and path
     return React.createElement(ScalarExprTreeComponent, 
       tree: tree,
-      value: _.pick(@props.value, "table", "path")
+      value: _.pick(@props.value, "table", "joins", "expr")
       onChange: @handleTreeChange
       )
 

@@ -1,7 +1,7 @@
 HoverComponent = require './HoverComponent'
 H = React.DOM
 
-# Shows a tree that selects table + path of a scalar expression
+# Shows a tree that selects table + joins + expr of a scalar expression
 module.exports = class ScalarExprTreeComponent extends React.Component 
   @propTypes: 
     tree: React.PropTypes.array.isRequired    # Tree from ScalarExprTreeBuilder
