@@ -1,4 +1,4 @@
-# Builds a tree for selecting table + path of a scalar expression
+# Builds a tree for selecting table + joins + expr of a scalar expression
 # Organizes columns, and follows joins
 module.exports = class ScalarExprTreeBuilder
   constructor: (schema) ->
@@ -8,7 +8,7 @@ module.exports = class ScalarExprTreeBuilder
   # { 
   #   name: name of item, 
   #   desc: description of item, 
-  #   value: { table, path } - partial scalar expression, null if not selectable node
+  #   value: { table, joins, expr } - partial scalar expression, null if not selectable node
   #   children: function which returns children nodes
   #   initiallyOpen: true if children should display initially
   # }
