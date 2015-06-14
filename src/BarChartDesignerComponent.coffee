@@ -15,7 +15,7 @@ module.exports = class BarChartDesignerComponent extends React.Component
         editorTitle: "Bar size"
         schema: @props.schema
         onChange: @handleYAxisChange
-        value: null)
+        value: @props.value.yAxis)
       H.p className: "help-block", "Field to use for the size of the bars"
 
   renderXAxis: ->
@@ -31,7 +31,7 @@ module.exports = class BarChartDesignerComponent extends React.Component
         schema: @props.schema
         startTable: @props.value.yAxis.table
         onChange: @handleXAxisChange
-        value: null)
+        value: @props.value.xAxis)
       H.p className: "help-block", "Data to control the size of the bars"
 
   render: ->

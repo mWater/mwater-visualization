@@ -9,7 +9,7 @@ describe "ExpressionBuilder", ->
       .addTable({ id: "t1", name: "T1" })
       .addColumn("t1", { id: "c1", name: "C1", type: "text" })
       .addTable({ id: "t2", name: "T2" })
-      .addColumn("t2", { id: "c1", name: "C1", type: "text" })
+      .addColumn("t2", { id: "c1", name: "C1", type: "integer" })
 
     # Join columns
     join = { fromTable: "t1", fromCol: "c1", toTable: "t2", toCol: "c1", op: "=", multiple: true }
@@ -61,6 +61,55 @@ describe "ExpressionBuilder", ->
       assert.equal _.findWhere(aggrs, id: "sum").type, "integer"
       assert.equal _.findWhere(aggrs, id: "avg").type, "decimal"
       # TODO etc
+
+  describe "summarizeExpr", ->
+    it "summarizes null", ->
+      assert.equal @exprBuilder.summarizeExpr(null), "None"
+
+    it "summarizes field expr", ->
+      expr = { type: "field", table: "t1", column: "c1" }
+      assert.equal @exprBuilder.summarizeExpr(expr), "C1"
+
+    it "summarizes simple scalar expr", ->
+      fieldExpr = { type: "field", table: "t1", column: "c1" }
+      scalarExpr = { type: "scalar", table: "t1", joins: [], expr: fieldExpr }
+      assert.equal @exprBuilder.summarizeExpr(scalarExpr), "T1 > C1"
+
+    it "summarizes joined scalar expr", ->
+      fieldExpr = { type: "field", table: "t2", column: "c1" }
+      scalarExpr = { type: "scalar", table: "t1", joins: ['c2'], expr: fieldExpr }
+      assert.equal @exprBuilder.summarizeExpr(scalarExpr), "T1 > C2 > C1"
+
+    it "summarizes joined aggr scalar expr", ->
+      fieldExpr = { type: "field", table: "t2", column: "c1" }
+      scalarExpr = { type: "scalar", table: "t1", joins: ['c2'], expr: fieldExpr, aggr: "sum" }
+      assert.equal @exprBuilder.summarizeExpr(scalarExpr), "Sum of T1 > C2 > C1"
+
+  describe "getExprType", ->
+    it 'gets field type', ->
+      assert.equal @exprBuilder.getExprType({ type: "field", table: "t1", column: "c1" }), "text"
+
+    it 'gets scalar type', ->
+      expr = {
+        type: "scalar"
+        table: "t1"
+        expr: { type: "field", table: "t1", column: "c1" }
+        joins: []
+      }
+      assert.equal @exprBuilder.getExprType(expr), "text"
+
+    it 'gets scalar type with aggr', ->
+      expr = {
+        type: "scalar"
+        table: "t1"
+        expr: { type: "field", table: "t2", column: "c1" }
+        aggr: "avg"
+        joins: ["c2"]
+      }
+      assert.equal @exprBuilder.getExprType(expr), "decimal"
+
+    it "gets literal types", ->
+      assert.equal @exprBuilder.getExprType({ type: "literal", valueType: "boolean", value: true }), "boolean"
 
 #   describe "with sample schema", ->
 #     before ->
@@ -171,38 +220,6 @@ describe "ExpressionBuilder", ->
 #       it "false for non-oneToMany join", ->
 #         assert.isFalse @schema.isAggrNeeded(["ba"])
 
-#     describe "summarizeExpr", ->
-#       it "summarizes null", ->
-#         assert.equal @schema.summarizeExpr(null), "None"
-
-#       it "summarizes field expr", ->
-#         expr = { type: "field", tableId: "a", columnId: "y" }
-#         assert.equal @schema.summarizeExpr(expr), "Y"
-
-#       it "summarizes simple scalar expr", ->
-#         fieldExpr = { type: "field", tableId: "a", columnId: "y" }
-#         scalarExpr = { type: "scalar", expr: fieldExpr, joinIds: [] }
-#         assert.equal @schema.summarizeExpr(scalarExpr), "Y"
-
-#       it "summarizes simple scalar expr", ->
-#         fieldExpr = { type: "field", tableId: "a", columnId: "y" }
-#         scalarExpr = { type: "scalar", baseTableId: "a", expr: fieldExpr, joinIds: [] }
-#         assert.equal @schema.summarizeExpr(scalarExpr), "Y"
-
-#       it "summarizes joined scalar expr", ->
-#         fieldExpr = { type: "field", tableId: "a", columnId: "y" }
-#         scalarExpr = { type: "scalar", baseTableId: "b", expr: fieldExpr, joinIds: ['ba'] }
-#         assert.equal @schema.summarizeExpr(scalarExpr), "Y of BA"
-
-#       it "summarizes joined aggr scalar expr", ->
-#         fieldExpr = { type: "field", tableId: "b", columnId: "r" }
-#         scalarExpr = { type: "scalar", baseTableId: "a", expr: fieldExpr, joinIds: ['ab'], aggrId: "count" }
-#         assert.equal @schema.summarizeExpr(scalarExpr), "Number R of AB"
-
-#       it "summarizes joined number aggr scalar expr", ->
-#         fieldExpr = { type: "field", tableId: "b", columnId: "q" }
-#         scalarExpr = { type: "scalar", baseTableId: "a", expr: fieldExpr, joinIds: ['ab'], aggrId: "count" }
-#         assert.equal @schema.summarizeExpr(scalarExpr), "Number of AB"
 
 #   describe "getComparisonOps", ->
 #     it "includes is not null", ->

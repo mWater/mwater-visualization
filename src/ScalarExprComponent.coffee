@@ -2,13 +2,13 @@ H = React.DOM
 DesignValidator = require './DesignValidator'
 ActionCancelModalComponent = require './ActionCancelModalComponent'
 ScalarExprEditorComponent = require './ScalarExprEditorComponent'
+ExpressionBuilder = require './ExpressionBuilder'
 
 # Component which displays a scalar expression and allows editing/selecting it
 # by clicking.
 module.exports = class ScalarExprComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired
-    # expressionBuilder: React.PropTypes.object.isRequired
 
     startTable: React.PropTypes.string # Optional start table to restrict selections to
     editorTitle: React.PropTypes.string # Title of editor popup
@@ -18,23 +18,26 @@ module.exports = class ScalarExprComponent extends React.Component
 
   constructor: ->
     super
-    # Editing is set to the currently being edited value
-    @state = { editing: null }
+    # editorValue is set to the currently being edited value
+    # editorOpen is true if editing
+    @state = { editorValue: null, editorOpen: false }
 
-  handleEditorOpen: => @setState(editing: @props.value or {})
+  handleEditorOpen: => @setState(editorValue: @props.value, editorOpen: true)
 
-  handleEditorCancel: => @setState(editing: null)
+  handleEditorCancel: => @setState(editorValue: null, editorOpen: false)
 
-  handleEditorChange: (val) => @setState(editing: val)
+  handleEditorChange: (val) => @setState(editorValue: val)
 
   handleEditorSave: =>
     # TODO validate
-    @props.onChange(@state.editing)
-    @setState(editing: null)
+    @props.onChange(@state.editorValue)
+    @setState(editorOpen: false, editorValue: null)
 
   render: ->
+    exprBuilder = new ExpressionBuilder(@props.schema)
+
     # Display editor modal if editing
-    if @state.editing
+    if @state.editorOpen
       editor = React.createElement(ActionCancelModalComponent, { 
           title: @props.editorTitle
           onAction: @handleEditorSave
@@ -43,7 +46,7 @@ module.exports = class ScalarExprComponent extends React.Component
             React.createElement(ScalarExprEditorComponent, 
               schema: @props.schema, 
               startTable: @props.startTable, 
-              value: @state.editing
+              value: @state.editorValue
               onChange: @handleEditorChange)
         )
 
@@ -54,7 +57,7 @@ module.exports = class ScalarExprComponent extends React.Component
         className: "form-control input-sm",
         readOnly: true, 
         style: { backgroundColor: "white", cursor: "pointer" }
-        value: if @props.value then @props.expressionBuilder.summarizeExpr(@props.value) 
+        value: if @props.value then exprBuilder.summarizeExpr(@props.value)
         placeholder: "Click to select..."
         onClick: @handleEditorOpen
 

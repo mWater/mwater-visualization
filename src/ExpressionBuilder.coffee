@@ -81,33 +81,38 @@ module.exports = class ExpressionBuilder
   # isAggrNeeded: (joinIds) ->
   #   return _.any(joinIds, (j) => @getJoin(j).oneToMany)
 
-  # # Summarizes expression as text
-  # summarizeExpr: (expr) ->
-  #   if not expr
-  #     return "None"
-  #   switch expr.type
-  #     when "scalar"
-  #       return @summarizeScalarExpr(expr)
-  #     when "field"
-  #       return @schema.getColumn(expr.tableId, expr.columnId).name
-  #     else
-  #       throw new Error("Unsupported type #{expr.type}")
+  # Summarizes expression as text
+  summarizeExpr: (expr) ->
+    if not expr
+      return "None"
+    switch expr.type
+      when "scalar"
+        return @summarizeScalarExpr(expr)
+      when "field"
+        return @schema.getColumn(expr.table, expr.column).name
+      else
+        throw new Error("Unsupported type #{expr.type}")
 
-  # summarizeScalarExpr: (expr) ->
-  #   str = @summarizeExpr(expr.expr)
+  summarizeScalarExpr: (expr) ->
+    # Add aggr
+    if expr.aggr
+      str = _.findWhere(@getAggrs(expr.expr), { id: expr.aggr }).name + " of "
+    else
+      str = ""
 
-  #   # Handle case of primary key
-  #   if @getExprType(expr.expr) == "uuid"
-  #     str = "Number"
-  #   # Add aggr
-  #   else if expr.aggrId
-  #     str = _.findWhere(@getAggrs(expr.expr), { id: expr.aggrId }).name + " " + str
+    # Add table
+    str += @schema.getTable(expr.table).name + " > "
 
-  #   # Add ofs (reverse joins)
-  #   for joinId in expr.joinIds.slice().reverse()
-  #     str = str + " of " + @getJoin(joinId).name
+    # Add joins
+    t = expr.table
+    for join in expr.joins
+      joinCol = @schema.getColumn(t, join)
+      str += joinCol.name + " > "
+      t = joinCol.join.toTable
 
-  #   return str
+    str += @summarizeExpr(expr.expr)
+
+    return str
 
   # getComparisonOps: (lhsType) ->
   #   ops = []
