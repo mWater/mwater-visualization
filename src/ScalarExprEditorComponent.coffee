@@ -2,6 +2,7 @@ H = React.DOM
 ReactSelect = require 'react-select'
 ScalarExprTreeBuilder = require './ScalarExprTreeBuilder'
 ScalarExprTreeComponent = require './ScalarExprTreeComponent'
+ExpressionBuilder = require './ExpressionBuilder'
 
 # Component which appears in popup to allow editing scalar expression
 module.exports = class ScalarExprEditorComponent extends React.Component
@@ -12,10 +13,19 @@ module.exports = class ScalarExprEditorComponent extends React.Component
 
   handleTreeChange: (val) =>
     # Set table and joins and expr
-    newVal = _.extend({}, @props.value or { type: "scalar" }, val,)
+    newVal = _.extend({}, @props.value or { type: "scalar" }, val)
 
     # Clean 
-    console.log "TODO!"
+    newVal = new ExpressionBuilder(@props.schema).cleanScalarExpr(newVal)
+
+    @props.onChange(newVal)
+
+  handleAggrChange: (aggr) =>
+    # Set table and joins and expr
+    newVal = _.extend({}, @props.value, { aggr: aggr })
+
+    # Clean 
+    newVal = new ExpressionBuilder(@props.schema).cleanScalarExpr(newVal)
 
     @props.onChange(newVal)
 
@@ -23,7 +33,6 @@ module.exports = class ScalarExprEditorComponent extends React.Component
     # Create tree 
     treeBuilder = new ScalarExprTreeBuilder(@props.schema)
     tree = treeBuilder.getTree(startTable: @props.startTable)
-    console.log tree[0].children()
 
     # Create tree component with value of table and path
     return React.createElement(ScalarExprTreeComponent, 
@@ -33,10 +42,23 @@ module.exports = class ScalarExprEditorComponent extends React.Component
       )
 
   render: ->
+    exprBuilder = new ExpressionBuilder(@props.schema)
+
     H.div null, 
       H.label null, "Select Field"
       H.div style: { overflowY: "scroll", height: 350, border: "solid 1px #CCC" },
         @renderTree()
+
+      if @props.value and @props.value.aggr
+        options = _.map(exprBuilder.getAggrs(@props.value.expr), (aggr) -> { value: aggr.id, label: aggr.name })
+        aggrs = H.div null,
+          H.br()
+          H.label null, "Aggregate by"
+          React.createElement(ReactSelect, { 
+            value: @props.value.aggr, 
+            options: options 
+            onChange: @handleAggrChange
+          })
 
 
 #   handleJoinExprSelect: (joinExpr) ->

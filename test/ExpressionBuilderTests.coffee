@@ -111,6 +111,34 @@ describe "ExpressionBuilder", ->
     it "gets literal types", ->
       assert.equal @exprBuilder.getExprType({ type: "literal", valueType: "boolean", value: true }), "boolean"
 
+  describe "cleanScalarExpr", ->
+    it "leaves valid one alone", ->
+      fieldExpr = { type: "field", table: "t2", column: "c1" }
+      scalarExpr = { type: "scalar", table: "t1", joins: ['c2'], expr: fieldExpr, aggr: "sum" }
+
+      assert.equal scalarExpr, @exprBuilder.cleanScalarExpr(scalarExpr)
+
+    it "strips aggr if not needed", ->
+      fieldExpr = { type: "field", table: "t2", column: "c1" }
+      scalarExpr = { type: "scalar", table: "t1", joins: [], expr: fieldExpr, aggr: "sum" }
+      scalarExpr = @exprBuilder.cleanScalarExpr(scalarExpr)
+      assert not scalarExpr.aggr
+
+    it "defaults aggr if needed and wrong", ->
+      fieldExpr = { type: "field", table: "t2", column: "c1" }
+      scalarExpr = { type: "scalar", table: "t1", joins: ['c2'], expr: fieldExpr, aggr: "latest" }
+      scalarExpr = @exprBuilder.cleanScalarExpr(scalarExpr)
+      assert.equal scalarExpr.aggr, "sum"
+
+    it "strips where if wrong table", ->
+      fieldExpr = { type: "field", table: "t2", column: "c1" }
+      whereExpr = { type: "logical", table: "t1" }
+      scalarExpr = { type: "scalar", table: "t1", joins: ['c2'], expr: fieldExpr, aggr: "sum" }
+      scalarExpr = @exprBuilder.cleanScalarExpr(scalarExpr)
+      assert.equal scalarExpr.aggr, "sum"
+      assert not scalarExpr.where
+
+
 #   describe "with sample schema", ->
 #     before ->
 #       # Create simple schema with subtree

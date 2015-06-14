@@ -68,19 +68,6 @@ module.exports = class ExpressionBuilder
       else
         throw new Error("Not implemented for #{expr.type}")
 
-  # # Gets the table of an expression (null if none)
-  # getExprTable: (expr) ->
-  #   switch expr.type
-  #     when "field"
-  #       return @schema.getTable(expr.tableId)
-  #     else
-  #       throw new Error("Not implemented")
-
-
-  # # Determines if aggregation is needed for joins
-  # isAggrNeeded: (joinIds) ->
-  #   return _.any(joinIds, (j) => @getJoin(j).oneToMany)
-
   # Summarizes expression as text
   summarizeExpr: (expr) ->
     if not expr
@@ -114,6 +101,15 @@ module.exports = class ExpressionBuilder
 
     return str
 
+  # Strips/defaults invalid aggr and where of a scalar expression
+  cleanScalarExpr: (expr) ->
+    if expr.aggr and not @isMultipleJoins(expr.table, expr.joins)
+      expr = _.omit(expr, "aggr")
+
+    if @isMultipleJoins(expr.table, expr.joins) and expr.aggr not in _.pluck(@getAggrs(expr.expr), "id")
+      expr = _.extend({}, expr, { aggr: @getAggrs(expr.expr)[0].id })
+
+    return expr
   # getComparisonOps: (lhsType) ->
   #   ops = []
   #   switch lhsType

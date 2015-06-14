@@ -66,10 +66,8 @@ module.exports = class ScalarExprTreeBuilder
           fieldExpr = { type: "field", table: options.table, column: column.id }
           if options.limitTypes 
             exprBuilder = new ExpressionBuilder(@schema)
-            console.log options
             # If aggregated
             if exprBuilder.isMultipleJoins(options.startTable, options.joins)
-              console.log "multiple"
               # Get types that this can become through aggregation
               types = exprBuilder.getAggrTypes(fieldExpr)
               # Skip if wrong type
