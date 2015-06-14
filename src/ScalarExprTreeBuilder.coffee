@@ -1,3 +1,5 @@
+ExpressionBuilder = require './ExpressionBuilder'
+
 # Builds a tree for selecting table + joins + expr of a scalar expression
 # Organizes columns, and follows joins
 module.exports = class ScalarExprTreeBuilder
@@ -14,7 +16,7 @@ module.exports = class ScalarExprTreeBuilder
   # }
   # options are:
   #  startTable: to limit starting table to a specific table
-  #  onlyTypes: types to limit to 
+  #  limitTypes: types to limit to 
   getTree: (options = {}) ->
     nodes = []
     # For each table
@@ -32,7 +34,7 @@ module.exports = class ScalarExprTreeBuilder
 
         # Create nodes for each column of a table
         node.children = =>
-          @createChildNodes(startTable: table.id, table: table.id, joins: [])
+          @createChildNodes(startTable: table.id, table: table.id, joins: [], limitTypes: options.limitTypes)
         nodes.push(node)
 
     return nodes
@@ -41,6 +43,7 @@ module.exports = class ScalarExprTreeBuilder
   # startTable: table id that started from
   # table: table id to get nodes for
   # joins: joins for child nodes
+  # limitTypes: types to limit to 
   createChildNodes: (options) ->
     nodes = []
 
@@ -58,9 +61,26 @@ module.exports = class ScalarExprTreeBuilder
             # Add column to joins
             joins = options.joins.slice()
             joins.push(column.id)
-            return @createChildNodes(startTable: options.startTable, table: column.join.toTable, joins: joins)
+            return @createChildNodes(startTable: options.startTable, table: column.join.toTable, joins: joins, limitTypes: options.limitTypes)
         else
-          node.value = { table: options.startTable, joins: options.joins, expr: { type: "field", table: options.table, column: column.id } } 
+          fieldExpr = { type: "field", table: options.table, column: column.id }
+          if options.limitTypes 
+            exprBuilder = new ExpressionBuilder(@schema)
+            console.log options
+            # If aggregated
+            if exprBuilder.isMultipleJoins(options.startTable, options.joins)
+              console.log "multiple"
+              # Get types that this can become through aggregation
+              types = exprBuilder.getAggrTypes(fieldExpr)
+              # Skip if wrong type
+              if _.intersection(types, options.limitTypes).length == 0
+                return
+            else
+              # Skip if wrong type
+              if column.type not in options.limitTypes
+                return 
+
+          node.value = { table: options.startTable, joins: options.joins, expr: fieldExpr } 
         nodes.push(node)
 
     return nodes

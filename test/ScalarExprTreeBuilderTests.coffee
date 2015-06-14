@@ -36,4 +36,26 @@ describe "ScalarExprTreeBuilder", ->
     nodes = new ScalarExprTreeBuilder(@schema).getTree({ startTable: "t1" })
     assert.deepEqual _.pluck(nodes, "name"), ["T1"]
 
-  # it "limits type"
+  describe "limits type", ->
+    it "includes direct types", ->
+      @schema.addColumn("t1", { id: "c2", name: "C2", type: "integer" })
+
+      # Get nodes of first table
+      nodes = new ScalarExprTreeBuilder(@schema).getTree({ limitTypes: ["integer"] })[0].children()
+      assert.equal nodes.length, 1
+
+      # Get nodes of first table
+      nodes = new ScalarExprTreeBuilder(@schema).getTree({ limitTypes: ["decimal"] })[0].children()
+      assert.equal nodes.length, 0, "Decimal not included"
+
+    it "includes types formed by aggregation", ->
+      # Join column
+      join = { fromTable: "t1", fromCol: "c1", toTable: "t2", toCol: "c1", op: "=", multiple: true }
+      @schema.addColumn("t1", { id: "c2", name: "C2", type: "join", join: join })
+
+      # Go to first table, 2nd child, children
+      nodes = new ScalarExprTreeBuilder(@schema).getTree({ limitTypes: ["integer"] })[0].children()[0].children()
+      
+      # Should include text field, because can be aggregated to integer via count
+      assert.equal nodes.length, 1, "Should include text"
+      assert.equal nodes[0].value.expr.column, "c1"

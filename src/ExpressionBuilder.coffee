@@ -4,40 +4,33 @@ module.exports = class ExpressionBuilder
   constructor: (schema) ->
     @schema = schema
 
-  # Gets the type of an expression
-  getExprType: (expr) ->
-    if not expr?
-      return null
+  # Determines if an set of joins contains a multiple
+  isMultipleJoins: (table, joins) ->
+    t = table
+    for j in joins
+      joinCol = @schema.getColumn(t, j)
+      if joinCol.join.multiple
+        return true
 
-    switch expr.type
-      when "field"
-        column = @schema.getColumn(expr.tableId, expr.columnId)
-        return column.type
-      when "scalar"
-        if expr.aggrId == "count"
-          return "integer"
-        return @getExprType(expr.expr)
-      when "text", "integer", "boolean", "decimal", "enum", "date"
-        return expr.type
-      else
-        throw new Error("Not implemented")
+      t = joinCol.join.toTable
 
-  # Gets the table of an expression (null if none)
-  getExprTable: (expr) ->
-    switch expr.type
-      when "field"
-        return @schema.getTable(expr.tableId)
-      else
-        throw new Error("Not implemented")
+    return false
 
-  # Gets available aggregations [{id, name}]
+  getAggrTypes: (expr) ->
+    # Get available aggregations
+    aggrs = @getAggrs(expr)
+
+    # Keep unique types
+    return _.uniq(_.pluck(aggrs, "type"))
+
+  # Gets available aggregations [{id, name, type}]
   getAggrs: (expr) ->
     aggrs = []
 
     type = @getExprType(expr)
     
-    table = @getExprTable(expr)
-    if table and table.ordering and type != "uuid"
+    table = @schema.getTable(expr.table)
+    if table.ordering and type != "id"
       aggrs.push({ id: "last", name: "Latest", type: type })
 
     switch type
@@ -56,72 +49,100 @@ module.exports = class ExpressionBuilder
 
     return aggrs
 
-  # Determines if aggregation is needed for joins
-  isAggrNeeded: (joinIds) ->
-    return _.any(joinIds, (j) => @getJoin(j).oneToMany)
-
-  # Summarizes expression as text
-  summarizeExpr: (expr) ->
-    if not expr
-      return "None"
-    switch expr.type
-      when "scalar"
-        return @summarizeScalarExpr(expr)
-      when "field"
-        return @schema.getColumn(expr.tableId, expr.columnId).name
-      else
-        throw new Error("Unsupported type #{expr.type}")
-
-  summarizeScalarExpr: (expr) ->
-    str = @summarizeExpr(expr.expr)
-
-    # Handle case of primary key
-    if @getExprType(expr.expr) == "uuid"
-      str = "Number"
-    # Add aggr
-    else if expr.aggrId
-      str = _.findWhere(@getAggrs(expr.expr), { id: expr.aggrId }).name + " " + str
-
-    # Add ofs (reverse joins)
-    for joinId in expr.joinIds.slice().reverse()
-      str = str + " of " + @getJoin(joinId).name
-
-    return str
-
-  getComparisonOps: (lhsType) ->
-    ops = []
-    switch lhsType
-      when "integer", "decimal"
-        ops.push({ id: "=", name: "=" })
-        ops.push({ id: ">", name: ">" })
-        ops.push({ id: ">=", name: ">=" })
-        ops.push({ id: "<", name: "<" })
-        ops.push({ id: "<=", name: "<=" })
-      when "text"
-        ops.push({ id: "~*", name: "matches" })
-      when "date"
-        ops.push({ id: ">", name: "after" })
-        ops.push({ id: "<", name: "before" })
-      when "enum"
-        ops.push({ id: "=", name: "is" })
-      when "boolean"
-        ops.push({ id: "= true", name: "is true"})
-        ops.push({ id: "= false", name: "is false"})
-
-    ops.push({ id: "is null", name: "has no value"})
-    ops.push({ id: "is not null", name: "has a value"})
-
-    return ops
-
-  getComparisonRhsType: (lhsType, op) ->
-    if op in ['= true', '= false', 'is null', 'is not null']
+  # Gets the type of an expression
+  getExprType: (expr) ->
+    if not expr?
       return null
 
-    return lhsType
+    switch expr.type
+      when "field"
+        column = @schema.getColumn(expr.table, expr.column)
+        return column.type
+      when "scalar"
+        if expr.aggr
+          aggr = _.findWhere(@getAggrs(expr.expr), id: expr.aggr)
+          return aggr.type
+        return @getExprType(expr.expr)
+      when "literal"
+        return expr.valueType
+      else
+        throw new Error("Not implemented for #{expr.type}")
 
-  getExprValues: (expr) ->
-    if expr.type == "field"
-      column = @schema.getColumn(expr.tableId, expr.columnId)
-      return column.values
-    if expr.type == "scalar"
-      return @getExprValues(expr.expr)  
+  # # Gets the table of an expression (null if none)
+  # getExprTable: (expr) ->
+  #   switch expr.type
+  #     when "field"
+  #       return @schema.getTable(expr.tableId)
+  #     else
+  #       throw new Error("Not implemented")
+
+
+  # # Determines if aggregation is needed for joins
+  # isAggrNeeded: (joinIds) ->
+  #   return _.any(joinIds, (j) => @getJoin(j).oneToMany)
+
+  # # Summarizes expression as text
+  # summarizeExpr: (expr) ->
+  #   if not expr
+  #     return "None"
+  #   switch expr.type
+  #     when "scalar"
+  #       return @summarizeScalarExpr(expr)
+  #     when "field"
+  #       return @schema.getColumn(expr.tableId, expr.columnId).name
+  #     else
+  #       throw new Error("Unsupported type #{expr.type}")
+
+  # summarizeScalarExpr: (expr) ->
+  #   str = @summarizeExpr(expr.expr)
+
+  #   # Handle case of primary key
+  #   if @getExprType(expr.expr) == "uuid"
+  #     str = "Number"
+  #   # Add aggr
+  #   else if expr.aggrId
+  #     str = _.findWhere(@getAggrs(expr.expr), { id: expr.aggrId }).name + " " + str
+
+  #   # Add ofs (reverse joins)
+  #   for joinId in expr.joinIds.slice().reverse()
+  #     str = str + " of " + @getJoin(joinId).name
+
+  #   return str
+
+  # getComparisonOps: (lhsType) ->
+  #   ops = []
+  #   switch lhsType
+  #     when "integer", "decimal"
+  #       ops.push({ id: "=", name: "=" })
+  #       ops.push({ id: ">", name: ">" })
+  #       ops.push({ id: ">=", name: ">=" })
+  #       ops.push({ id: "<", name: "<" })
+  #       ops.push({ id: "<=", name: "<=" })
+  #     when "text"
+  #       ops.push({ id: "~*", name: "matches" })
+  #     when "date"
+  #       ops.push({ id: ">", name: "after" })
+  #       ops.push({ id: "<", name: "before" })
+  #     when "enum"
+  #       ops.push({ id: "=", name: "is" })
+  #     when "boolean"
+  #       ops.push({ id: "= true", name: "is true"})
+  #       ops.push({ id: "= false", name: "is false"})
+
+  #   ops.push({ id: "is null", name: "has no value"})
+  #   ops.push({ id: "is not null", name: "has a value"})
+
+  #   return ops
+
+  # getComparisonRhsType: (lhsType, op) ->
+  #   if op in ['= true', '= false', 'is null', 'is not null']
+  #     return null
+
+  #   return lhsType
+
+  # getExprValues: (expr) ->
+  #   if expr.type == "field"
+  #     column = @schema.getColumn(expr.tableId, expr.columnId)
+  #     return column.values
+  #   if expr.type == "scalar"
+  #     return @getExprValues(expr.expr)  

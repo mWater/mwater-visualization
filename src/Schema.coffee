@@ -22,9 +22,13 @@ module.exports = class Schema
 
   getColumns: (tableId) ->
     table = @getTable(tableId)
+    if not table
+      throw new Error("Unknown table #{tableId}")
     return table.columns
 
   getColumn: (tableId, columnId) ->
     table = @getTable(tableId)
+    if not table
+      throw new Error("Unknown table #{tableId}")
     return _.findWhere(table.columns, { id: columnId })
 

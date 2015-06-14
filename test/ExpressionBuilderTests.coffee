@@ -1,10 +1,66 @@
-# assert = require('chai').assert
-# _ = require 'lodash'
-# Schema = require '../src/Schema'
+assert = require('chai').assert
+_ = require 'lodash'
+Schema = require '../src/Schema'
+ExpressionBuilder = require '../src/ExpressionBuilder'
 
-# describe "ExpressionBuilder", ->
+describe "ExpressionBuilder", ->
+  beforeEach ->
+    @schema = new Schema()
+      .addTable({ id: "t1", name: "T1" })
+      .addColumn("t1", { id: "c1", name: "C1", type: "text" })
+      .addTable({ id: "t2", name: "T2" })
+      .addColumn("t2", { id: "c1", name: "C1", type: "text" })
+
+    # Join columns
+    join = { fromTable: "t1", fromCol: "c1", toTable: "t2", toCol: "c1", op: "=", multiple: true }
+    @schema.addColumn("t1", { id: "c2", name: "C2", type: "join", join: join })
+
+    # Join columns
+    join = { fromTable: "t2", fromCol: "c1", toTable: "t1", toCol: "c1", op: "=", multiple: false }
+    @schema.addColumn("t2", { id: "c2", name: "C2", type: "join", join: join })
+
+    @exprBuilder = new ExpressionBuilder(@schema)
+
+  it "determines if multiple joins", ->
+    assert.isTrue @exprBuilder.isMultipleJoins("t1", ["c2"])
+    assert.isFalse @exprBuilder.isMultipleJoins("t2", ["c2"])
   
-  
+  describe "getAggrs", ->
+    beforeEach ->
+      @schema = new Schema()
+        .addTable({ id: "a", name: "A", ordering: "z" })
+        .addColumn("a", { id: "x", name: "X", type: "id" })
+        .addColumn("a", { id: "y", name: "Y", type: "text" })
+        .addColumn("a", { id: "z", name: "Z", type: "integer" })
+      @exprBuilder = new ExpressionBuilder(@schema)
+
+    it "includes last if has natural ordering and is not id", ->
+      field = { type: "field", table: "a", column: "y" }
+      assert.equal _.findWhere(@exprBuilder.getAggrs(field), id: "last").type, "text"
+
+      field = { type: "field", table: "a", column: "x" }
+      assert not _.findWhere(@exprBuilder.getAggrs(field), id: "last")
+
+    it "doesn't include most recent normally", ->
+      @schema.addTable({ id: "b" }).addColumn("b", { id: "x", name: "X", type: "text" })
+      field = { type: "field", table: "b", column: "x" }
+      assert.isUndefined _.findWhere(@exprBuilder.getAggrs(field), id: "last")
+
+    it "includes count for text", ->
+      field = { type: "field", table: "a", column: "y" }
+      aggrs = @exprBuilder.getAggrs(field)
+
+      assert.equal _.findWhere(aggrs, id: "count").type, "integer"
+      assert.isUndefined _.findWhere(aggrs, id: "sum")
+      assert.isUndefined _.findWhere(aggrs, id: "avg")
+
+    it "includes sum, avg, etc for integer, decimal", ->
+      field = { type: "field", table: "a", column: "z" }
+      aggrs = @exprBuilder.getAggrs(field)
+
+      assert.equal _.findWhere(aggrs, id: "sum").type, "integer"
+      assert.equal _.findWhere(aggrs, id: "avg").type, "decimal"
+      # TODO etc
 
 #   describe "with sample schema", ->
 #     before ->
@@ -104,40 +160,6 @@
 #         assert.equal @schema.getExprType({ type: "decimal", value: 2.23 }), "decimal"
 #         assert.equal @schema.getExprType({ type: "integer", value: 34 }), "integer"
 #         assert.equal @schema.getExprType({ type: "date", value: "2010-07-28" }), "date"
-
-#     describe "getAggrs", ->
-#       it "includes last if has natural ordering and is not primary", ->
-#         schema = new Schema()
-#         schema.addTable({ id: "a", name: "A", ordering: "z" })
-#         schema.addColumn("a", { id: "x", name: "X", type: "uuid", primary: true })
-#         schema.addColumn("a", { id: "y", name: "Y", type: "text" })
-#         schema.addColumn("a", { id: "z", name: "Z", type: "integer" })
-
-#         field = { type: "field", tableId: "a", columnId: "y" }
-#         assert.equal _.findWhere(schema.getAggrs(field), id: "last").type, "text"
-
-#         field = { type: "field", tableId: "a", columnId: "x" }
-#         assert not _.findWhere(schema.getAggrs(field), id: "last")
-
-#       it "doesn't include most recent normally", ->
-#         field = { type: "field", tableId: "a", columnId: "z" }
-#         assert.isUndefined _.findWhere(@schema.getAggrs(field), id: "last")
-
-#       it "includes count for text", ->
-#         field = { type: "field", tableId: "a", columnId: "y" }
-#         aggrs = @schema.getAggrs(field)
-
-#         assert.equal _.findWhere(aggrs, id: "count").type, "integer"
-#         assert.isUndefined _.findWhere(aggrs, id: "sum")
-#         assert.isUndefined _.findWhere(aggrs, id: "avg")
-
-#       it "includes sum, avg, etc for integer, decimal", ->
-#         field = { type: "field", tableId: "a", columnId: "z" }
-#         aggrs = @schema.getAggrs(field)
-
-#         assert.equal _.findWhere(aggrs, id: "sum").type, "integer"
-#         assert.equal _.findWhere(aggrs, id: "avg").type, "decimal"
-#         # TODO etc
 
 #     describe "isAggrNeeded", ->
 #       it "false for no joins", ->
