@@ -1,17 +1,34 @@
 H = React.DOM
 ScalarExprComponent = require './ScalarExprComponent'
 LogicalExprComponent = require './LogicalExprComponent'
-
+ExpressionBuilder = require './ExpressionBuilder'
 
 module.exports = class BarChartDesignerComponent extends React.Component
+  cleanDesign: (design) ->
+    exprBuilder = new ExpressionBuilder(@props.schema)
+
+    design.yAxis = exprBuilder.cleanExpr(design.yAxis)
+    
+    if design.yAxis
+      design.xAxis = exprBuilder.cleanExpr(design.xAxis, design.yAxis.table)
+    else
+      design.xAxis = null
+
+    if design.yAxis
+      design.where = exprBuilder.cleanExpr(design.where, design.yAxis.table)
+    else
+      design.where = null
+
+    @props.onChange(design)
+
   handleYAxisChange: (val) =>
-    @props.onChange(_.extend({}, @props.value, { yAxis: val }))
+    @cleanDesign(_.extend({}, @props.value, { yAxis: val }))
 
   handleXAxisChange: (val) =>
-    @props.onChange(_.extend({}, @props.value, { xAxis: val }))
+    @cleanDesign(_.extend({}, @props.value, { xAxis: val }))
 
   handleWhereChange: (val) =>
-    @props.onChange(_.extend({}, @props.value, { where: val }))
+    @cleanDesign(_.extend({}, @props.value, { where: val }))
 
   renderYAxis: ->
     H.div className: "form-group",

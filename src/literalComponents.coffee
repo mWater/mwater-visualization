@@ -7,7 +7,7 @@ exports.TextComponent = React.createClass {
   }
 
   handleChange: (ev) ->
-    @props.onChange({ type: "text", value: ev.target.value })
+    @props.onChange({ type: "literal", valueType: "text", value: ev.target.value })
 
   render: ->
     H.input 
@@ -38,7 +38,7 @@ exports.DecimalComponent = React.createClass {
       return @setState(invalid: true, invalidText: ev.target.value)
 
     @setState(invalid: false, invalidText: null)
-    @props.onChange({ type: "decimal", value: val })
+    @props.onChange({ type: "literal", valueType: "decimal", value: val })
     
   render: ->
     H.div 
@@ -72,7 +72,7 @@ exports.IntegerComponent = React.createClass {
       return @setState(invalid: true, invalidText: ev.target.value)
 
     @setState(invalid: false, invalidText: null)
-    @props.onChange({ type: "integer", value: val })
+    @props.onChange({ type: "literal", valueType: "integer", value: val })
     
   render: ->
     H.div 
@@ -93,7 +93,10 @@ exports.EnumComponent = React.createClass {
   }
 
   handleChange: (ev) ->
-    @props.onChange({ type: "enum", value: ev.target.value })
+    if ev.target.value
+      @props.onChange({ type: "literal", valueType: "enum", value: ev.target.value })
+    else
+      @props.onChange(null)
 
   render: ->
     H.select 
@@ -101,6 +104,7 @@ exports.EnumComponent = React.createClass {
       style: { width: "auto", display: "inline-block" }
       value: if @props.expr then @props.expr.value
       onChange: @handleChange,
+        H.option(key: "null", value: "", "")
         _.map(@props.enumValues, (val) -> H.option(key: val.id, value: val.id, val.name))
 }
 
@@ -123,7 +127,7 @@ exports.DateComponent = React.createClass {
       return @setState(invalid: true, invalidText: ev.target.value)
 
     @setState(invalid: false, invalidText: null)
-    @props.onChange({ type: "date", value: ev.target.value })
+    @props.onChange({ type: "literal", valueType: "date", value: ev.target.value })
     
   render: ->
     H.div 
