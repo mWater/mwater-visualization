@@ -2,6 +2,7 @@ assert = require('chai').assert
 _ = require 'lodash'
 Schema = require '../src/Schema'
 ExpressionBuilder = require '../src/ExpressionBuilder'
+fixtures = require './fixtures'
 
 describe "ExpressionBuilder", ->
   beforeEach ->
@@ -137,6 +138,44 @@ describe "ExpressionBuilder", ->
       scalarExpr = @exprBuilder.cleanScalarExpr(scalarExpr)
       assert.equal scalarExpr.aggr, "sum"
       assert not scalarExpr.where
+
+  describe "cleanComparisonExpr", ->
+    beforeEach ->
+      @schema = fixtures.simpleSchema()
+      @exprBuilder = new ExpressionBuilder(@schema)
+
+    it "removes op if no lhs", ->
+      expr = { type: "comparison", op: "=" }
+      expr = @exprBuilder.cleanComparisonExpr(expr)
+      assert not expr.op
+
+    it "removes rhs if no op", ->
+      expr = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "text" }, rhs: { type: "literal", valueType: "text", value: "x" } }
+      expr = @exprBuilder.cleanComparisonExpr(expr)
+      assert not expr.rhs
+
+    it "removes rhs if wrong type", ->
+      expr = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "text" }, op: "~*", rhs: { type: "literal", valueType: "text", value: "x" } }
+      expr = @exprBuilder.cleanComparisonExpr(expr)
+      assert expr.rhs, "should keep"
+
+      expr = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "text" }, op: "~*", rhs: { type: "literal", valueType: "integer", value: 3 } }
+      expr = @exprBuilder.cleanComparisonExpr(expr)
+      assert not expr.rhs, "should remove"
+
+    it "removes rhs if invalid enum", ->
+      expr = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "enum" }, op: "=", rhs: { type: "literal", valueType: "enum", value: "a" } }
+      expr = @exprBuilder.cleanComparisonExpr(expr)
+      assert expr.rhs, "should keep"
+
+      expr = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "enum" }, op: "=", rhs: { type: "literal", valueType: "enum", value: "x" } }
+      expr = @exprBuilder.cleanComparisonExpr(expr)
+      assert not expr.rhs
+
+    it "defaults op", ->
+      expr = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "text" } }
+      expr = @exprBuilder.cleanComparisonExpr(expr)
+      assert.equal expr.op, "~*"
 
 
 #   describe "with sample schema", ->

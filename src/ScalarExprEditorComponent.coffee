@@ -9,7 +9,7 @@ module.exports = class ScalarExprEditorComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired
     value: React.PropTypes.object.isRequired
-    startTable: React.PropTypes.string # Optional start table to restrict selections to
+    table: React.PropTypes.string # Optional table to restrict selections to (can still follow joins to other tables)
 
   handleTreeChange: (val) =>
     # Set table and joins and expr
@@ -32,7 +32,7 @@ module.exports = class ScalarExprEditorComponent extends React.Component
   renderTree: ->
     # Create tree 
     treeBuilder = new ScalarExprTreeBuilder(@props.schema)
-    tree = treeBuilder.getTree(startTable: @props.startTable)
+    tree = treeBuilder.getTree(table: @props.table)
 
     # Create tree component with value of table and path
     return React.createElement(ScalarExprTreeComponent, 

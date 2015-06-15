@@ -1,26 +1,25 @@
 H = React.DOM
 ComparisonExprComponent = require './ComparisonExprComponent'
 
-module.exports = LogicalExprComponent = React.createClass {
-  propTypes: {
+module.exports = class LogicalExprComponent extends React.Component
+  @propTypes: 
     expr: React.PropTypes.object
     onChange: React.PropTypes.func.isRequired 
     schema: React.PropTypes.object.isRequired
-    baseTableId: React.PropTypes.string.isRequired 
-  }
+    table: React.PropTypes.string.isRequired 
 
-  handleExprChange: (i, expr) ->
+  handleExprChange: (i, expr) =>
     # Replace exprs
     exprs = @props.expr.exprs.slice()
     exprs[i] = expr
     @props.onChange(_.extend({}, @props.expr, exprs: exprs))
 
-  handleAdd: ->
-    expr = @props.expr or { type: "logical", op: "and", exprs: [] }
-    exprs = expr.exprs.concat([{ type: "comparison" }])
+  handleAdd: =>
+    expr = @props.expr or { type: "logical", table: @props.table, op: "and", exprs: [] }
+    exprs = expr.exprs.concat([{ type: "comparison", table: @props.table }])
     @props.onChange(_.extend({}, expr, exprs: exprs))
 
-  handleRemove: (i) ->
+  handleRemove: (i) =>
     exprs = @props.expr.exprs.slice()
     exprs.splice(i, 1)
     @props.onChange(_.extend({}, @props.expr, exprs: exprs))    
@@ -32,7 +31,7 @@ module.exports = LogicalExprComponent = React.createClass {
           React.createElement(ComparisonExprComponent, 
             expr: e, 
             schema: @props.schema, 
-            baseTableId: @props.baseTableId, 
+            table: @props.table, 
             onChange: @handleExprChange.bind(null, i))
           H.button 
             type: "button", 
@@ -46,5 +45,4 @@ module.exports = LogicalExprComponent = React.createClass {
       H.button className: "btn btn-sm btn-link", type: "button", onClick: @handleAdd,
         H.span className: "glyphicon glyphicon-plus"
         " Add Filter"
-}
 

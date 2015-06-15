@@ -61,6 +61,8 @@ module.exports = class ExpressionBuilder
       when "scalar"
         if expr.aggr
           aggr = _.findWhere(@getAggrs(expr.expr), id: expr.aggr)
+          if not aggr
+            throw new Error("Aggregation #{expr.aggr} not found for scalar")
           return aggr.type
         return @getExprType(expr.expr)
       when "literal"
@@ -101,6 +103,28 @@ module.exports = class ExpressionBuilder
 
     return str
 
+  # Clean an expression, returning null if completely invalid, otherwise removing
+  # invalid parts
+  cleanExpr: (expr, table) ->
+    if not expr
+      return null
+
+    # Strip if wrong table
+    if table and expr.type != "literal" and expr.table != table
+      return null
+
+    switch expr.type
+      when "field"
+        return expr
+      when "scalar"
+        return @cleanScalarExpr(expr)
+      when "comparison"
+        return @cleanComparisonExpr(expr)
+      when "logical"
+        return @cleanLogicalExpr(expr)
+      else
+        throw new Error("Unknown expression type #{expr.type}")
+
   # Strips/defaults invalid aggr and where of a scalar expression
   cleanScalarExpr: (expr) ->
     if expr.aggr and not @isMultipleJoins(expr.table, expr.joins)
@@ -110,40 +134,75 @@ module.exports = class ExpressionBuilder
       expr = _.extend({}, expr, { aggr: @getAggrs(expr.expr)[0].id })
 
     return expr
-  # getComparisonOps: (lhsType) ->
-  #   ops = []
-  #   switch lhsType
-  #     when "integer", "decimal"
-  #       ops.push({ id: "=", name: "=" })
-  #       ops.push({ id: ">", name: ">" })
-  #       ops.push({ id: ">=", name: ">=" })
-  #       ops.push({ id: "<", name: "<" })
-  #       ops.push({ id: "<=", name: "<=" })
-  #     when "text"
-  #       ops.push({ id: "~*", name: "matches" })
-  #     when "date"
-  #       ops.push({ id: ">", name: "after" })
-  #       ops.push({ id: "<", name: "before" })
-  #     when "enum"
-  #       ops.push({ id: "=", name: "is" })
-  #     when "boolean"
-  #       ops.push({ id: "= true", name: "is true"})
-  #       ops.push({ id: "= false", name: "is false"})
 
-  #   ops.push({ id: "is null", name: "has no value"})
-  #   ops.push({ id: "is not null", name: "has a value"})
+  # Removes parts that are invalid, leaving table alone
+  cleanComparisonExpr: (expr) =>
+    # TODO always creates new
+    expr = _.extend({}, expr, lhs: @cleanExpr(expr.lhs, expr.table))
 
-  #   return ops
+    # Remove op, rhs if no lhs
+    if not expr.lhs 
+      expr = { type: "comparison", table: expr.table }
 
-  # getComparisonRhsType: (lhsType, op) ->
-  #   if op in ['= true', '= false', 'is null', 'is not null']
-  #     return null
+    # Remove rhs if no op
+    if not expr.op and expr.rhs
+      expr = _.omit(expr, "rhs")
 
-  #   return lhsType
+    if expr.op and expr.rhs and expr.lhs
+      # Remove rhs if wrong type
+      if @getComparisonRhsType(@getExprType(expr.lhs), expr.op) != @getExprType(expr.rhs)
+        expr = _.omit(expr, "rhs")        
+      # Remove rhs if wrong enum
+      else if @getComparisonRhsType(@getExprType(expr.lhs), expr.op) == "enum" 
+        if expr.rhs.type == "literal" and expr.rhs.valueType == "enum" and expr.rhs.value not in _.pluck(@getExprValues(expr.lhs), "id")
+          expr = _.omit(expr, "rhs")
 
-  # getExprValues: (expr) ->
-  #   if expr.type == "field"
-  #     column = @schema.getColumn(expr.tableId, expr.columnId)
-  #     return column.values
-  #   if expr.type == "scalar"
-  #     return @getExprValues(expr.expr)  
+    # Default op
+    if expr.lhs and not expr.op
+      expr = _.extend({}, expr, op: @getComparisonOps(@getExprType(expr.lhs))[0].id)
+
+    return expr
+
+  cleanLogicalExpr: (expr) =>
+    # TODO always makes new
+    expr = _.extend({}, expr, exprs: _.map(expr.exprs, (e) => @cleanComparisonExpr(e)))
+
+  # Get all comparison ops (id and name) for a given left hand side type
+  getComparisonOps: (lhsType) ->
+    ops = []
+    switch lhsType
+      when "integer", "decimal"
+        ops.push({ id: "=", name: "=" })
+        ops.push({ id: ">", name: ">" })
+        ops.push({ id: ">=", name: ">=" })
+        ops.push({ id: "<", name: "<" })
+        ops.push({ id: "<=", name: "<=" })
+      when "text"
+        ops.push({ id: "~*", name: "matches" })
+      when "date"
+        ops.push({ id: ">", name: "after" })
+        ops.push({ id: "<", name: "before" })
+      when "enum"
+        ops.push({ id: "=", name: "is" })
+      when "boolean"
+        ops.push({ id: "= true", name: "is true"})
+        ops.push({ id: "= false", name: "is false"})
+
+    ops.push({ id: "is null", name: "has no value"})
+    ops.push({ id: "is not null", name: "has a value"})
+
+    return ops
+
+  # Get the right hand side type for a comparison
+  getComparisonRhsType: (lhsType, op) ->
+    if op in ['= true', '= false', 'is null', 'is not null']
+      return null
+
+    return lhsType
+
+  getExprValues: (expr) ->
+    if expr.type == "field"
+      column = @schema.getColumn(expr.table, expr.column)
+      return column.values
+    if expr.type == "scalar"
+      return @getExprValues(expr.expr)  

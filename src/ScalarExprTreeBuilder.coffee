@@ -15,13 +15,13 @@ module.exports = class ScalarExprTreeBuilder
   #   initiallyOpen: true if children should display initially
   # }
   # options are:
-  #  startTable: to limit starting table to a specific table
+  #  table: to limit starting table to a specific table
   #  limitTypes: types to limit to 
   getTree: (options = {}) ->
     nodes = []
     # For each table
     for table in @schema.getTables()
-      if options.startTable and table.id != options.startTable
+      if options.table and table.id != options.table
         continue
 
       do (table) =>
@@ -29,7 +29,7 @@ module.exports = class ScalarExprTreeBuilder
           name: table.name
           desc: table.desc
           # Initially open if only one table
-          initiallyOpen: options.startTable?
+          initiallyOpen: options.table?
         }
 
         # Create nodes for each column of a table
