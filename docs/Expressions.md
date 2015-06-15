@@ -15,6 +15,10 @@ Gets a single value given a row of a table.
 `aggr`: Aggregation function to use if any join is multiple, null/undefined if not needed
 `where`: optional logical expression to filter aggregation
 
+### Aggr values
+
+aggr: "last", "sum", "count", "max", "min", "stdev", "stdevp"
+
 ## Field expressions 
 
 Column of the database

@@ -88,7 +88,7 @@ module.exports = class BarChartDesignerComponent extends React.Component
 
     H.div null,
       if error 
-        H.div className: "alert alert-warning", 
+        H.div className: "text-warning", 
           H.span className: "glyphicon glyphicon-info-sign"
           " "
           error
