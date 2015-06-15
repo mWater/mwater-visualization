@@ -38,6 +38,10 @@ module.exports = class ScalarExprEditorComponent extends React.Component
   renderAggr: ->
     exprBuilder = new ExpressionBuilder(@props.schema)
     if @props.value and @props.value.aggr
+      # Do not render if only possible aggregation is count
+      if exprBuilder.getExprType(@props.value.expr) == "id"
+        return 
+        
       options = _.map(exprBuilder.getAggrs(@props.value.expr), (aggr) -> { value: aggr.id, label: aggr.name })
       return H.div null,
         H.br()
