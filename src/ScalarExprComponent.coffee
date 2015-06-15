@@ -1,5 +1,4 @@
 H = React.DOM
-DesignValidator = require './DesignValidator'
 ActionCancelModalComponent = require './ActionCancelModalComponent'
 ScalarExprEditorComponent = require './ScalarExprEditorComponent'
 ExpressionBuilder = require './ExpressionBuilder'

@@ -21,6 +21,16 @@ module.exports = class BarChartDesignerComponent extends React.Component
 
     @props.onChange(design)
 
+  validateDesign: (design) ->
+    if not design.yAxis 
+      return "Missing Y Axis"
+
+    if not design.xAxis
+      return "Missing X axis"
+
+    exprBuilder = new ExpressionBuilder(@props.schema)
+    return exprBuilder.validateExpr(design.yAxis) or exprBuilder.validateExpr(design.xAxis) or exprBuilder.validateExpr(design.where)
+
   handleYAxisChange: (val) =>
     @cleanDesign(_.extend({}, @props.value, { yAxis: val }))
 
@@ -74,7 +84,14 @@ module.exports = class BarChartDesignerComponent extends React.Component
   render: ->
     expr = null
 
+    error = @validateDesign(@props.value)
+
     H.div null,
+      if error 
+        H.div className: "alert alert-warning", 
+          H.span className: "glyphicon glyphicon-info-sign"
+          " "
+          error
       @renderYAxis()
       @renderXAxis()
       @renderFilter()

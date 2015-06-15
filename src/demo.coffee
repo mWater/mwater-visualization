@@ -2,7 +2,6 @@ ListComponent = require './ListComponent'
 React = require 'react'
 HoverMixin = require './HoverMixin'
 H = React.DOM
-DesignValidator = require './DesignValidator'
 
 Schema = require './Schema'
 
@@ -38,7 +37,6 @@ createSchema = ->
 $ ->
   # Create simple schema
   schema = createSchema()
-  designValidator = new DesignValidator(schema)
 
   expr = null
 
