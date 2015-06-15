@@ -172,6 +172,15 @@ describe "ExpressionBuilder", ->
       expr = @exprBuilder.cleanComparisonExpr(expr)
       assert not expr.rhs
 
+    it "removes rhs if empty enum[]", ->
+      expr = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "enum" }, op: "= any", rhs: { type: "literal", valueType: "enum[]", value: ['a'] } }
+      expr = @exprBuilder.cleanComparisonExpr(expr)
+      assert expr.rhs, "should keep"
+
+      expr = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "enum" }, op: "= any", rhs: { type: "literal", valueType: "enum[]", value: [] } }
+      expr = @exprBuilder.cleanComparisonExpr(expr)
+      assert not expr.rhs
+
     it "defaults op", ->
       expr = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "text" } }
       expr = @exprBuilder.cleanComparisonExpr(expr)

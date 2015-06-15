@@ -158,8 +158,17 @@ module.exports = class ExpressionBuilder
         expr = _.omit(expr, "rhs")        
       # Remove rhs if wrong enum
       else if @getComparisonRhsType(@getExprType(expr.lhs), expr.op) == "enum" 
-        if expr.rhs.type == "literal" and expr.rhs.valueType == "enum" and expr.rhs.value not in _.pluck(@getExprValues(expr.lhs), "id")
+        if expr.rhs.type == "literal" and expr.rhs.value not in _.pluck(@getExprValues(expr.lhs), "id")
           expr = _.omit(expr, "rhs")
+      # Remove rhs if empty enum list
+      else if @getComparisonRhsType(@getExprType(expr.lhs), expr.op) == "enum[]" 
+        if expr.rhs.type == "literal"
+          # Filter invalid values
+          expr.rhs.value = _.intersection(_.pluck(@getExprValues(expr.lhs), "id"), expr.rhs.value)
+
+          # Remove if empty
+          if expr.rhs.value.length == 0
+            expr = _.omit(expr, "rhs")
 
     # Default op
     if expr.lhs and not expr.op
