@@ -1,4 +1,5 @@
 H = React.DOM
+ReactSelect = require 'react-select'
 
 exports.TextComponent = React.createClass {
   propTypes: {
@@ -107,6 +108,32 @@ exports.EnumComponent = React.createClass {
         H.option(key: "null", value: "", "")
         _.map(@props.enumValues, (val) -> H.option(key: val.id, value: val.id, val.name))
 }
+
+# Component which displays an array of enums
+exports.EnumArrComponent = class EnumArrComponent extends React.Component
+  @propTypes: 
+    value: React.PropTypes.object
+    onChange: React.PropTypes.func.isRequired 
+    enumValues: React.PropTypes.array.isRequired # Array of id and name
+
+  handleChange: (val) =>
+    value = if val then val.split("\n") else []
+    @props.onChange({ type: "literal", valueType: "enum[]", value: value })
+
+  render: ->
+    value = null
+    if @props.value and @props.value.value.length > 0 
+      value = @props.value.value.join("\n")
+    console.log value
+
+    options = _.map(@props.enumValues, (val) -> { value: val.id, label: val.name })
+    React.createElement(ReactSelect, { 
+      value: value
+      multi: true
+      delimiter: "\n"
+      options: options 
+      onChange: @handleChange
+    })
 
 exports.DateComponent = React.createClass {
   propTypes: {

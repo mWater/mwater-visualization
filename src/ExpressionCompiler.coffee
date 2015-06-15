@@ -3,7 +3,6 @@
 module.exports = class ExpressionCompiler 
   constructor: (schema) ->
     @schema = schema
-    # @expressionBuilder = 
 
   # Compile an expression. Pass expr and tableAlias
   compileExpr: (options) =>
@@ -153,16 +152,19 @@ module.exports = class ExpressionCompiler
       exprs.push(@compileExpr(expr: expr.rhs, tableAlias: options.tableAlias))
 
     # Handle special cases 
-    if expr.op == '= true'
-      return { type: "op", op: "=", exprs: [exprs[0], { type: "literal", value: true }]}
-    else if expr.op == '= false'
-      return { type: "op", op: "=", exprs: [exprs[0], { type: "literal", value: false }]}
-
-    return { 
-      type: "op"
-      op: expr.op
-      exprs: exprs
-    }
+    switch expr.op
+      when '= true'
+        return { type: "op", op: "=", exprs: [exprs[0], { type: "literal", value: true }]}
+      when '= false'
+        return { type: "op", op: "=", exprs: [exprs[0], { type: "literal", value: false }]}
+      when '= any'
+        return { type: "op", op: "=", modifier: "any", exprs: exprs }
+      else
+        return { 
+          type: "op"
+          op: expr.op
+          exprs: exprs
+        }
 
   compileLogicalExpr: (options) ->
     expr = options.expr

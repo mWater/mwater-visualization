@@ -187,6 +187,7 @@ module.exports = class ExpressionBuilder
         ops.push({ id: ">", name: "after" })
         ops.push({ id: "<", name: "before" })
       when "enum"
+        ops.push({ id: "= any", name: "is one of" })
         ops.push({ id: "=", name: "is" })
       when "boolean"
         ops.push({ id: "= true", name: "is true"})
@@ -201,6 +202,9 @@ module.exports = class ExpressionBuilder
   getComparisonRhsType: (lhsType, op) ->
     if op in ['= true', '= false', 'is null', 'is not null']
       return null
+
+    if op in ['= any']
+      return 'enum[]'
 
     return lhsType
 

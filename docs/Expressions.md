@@ -39,11 +39,11 @@ Column of the database
 `type`: "logical"
 `table`: Table id of start table ??
 `lhs`: left hand side expression. `scalar` usually.
-`op`: "=", ">", ">=", "<", "<=", "~*", ">", "<", "= true", "= false", "is null", "is not null"
+`op`: "=", ">", ">=", "<", "<=", "~*", ">", "<", "= true", "= false", "is null", "is not null", '= any'
 `rhs`: right hand side expressions. `literal` usually.
 
 ## Literal expressions
 
 `type`: "literal"
-`valueType`: "text", "integer", "decimal", "boolean", "enum", "date"
+`valueType`: "text", "integer", "decimal", "boolean", "enum", "date", "enum[]"
 `value`: value of literal. date is ISO 8601

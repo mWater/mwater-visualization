@@ -46,17 +46,23 @@ module.exports = class ComparisonExprComponent extends React.Component
       rhsType = exprBuilder.getComparisonRhsType(lhsType, @props.value.op)
       switch rhsType
         when "text"
-          rhsControl = React.createElement(literalComponents.TextComponent, key: "rhs", expr: @props.value.rhs, onChange: @handleRhsChange)
+          rhsControl = React.createElement(literalComponents.TextComponent, key: "rhs", value: @props.value.rhs, onChange: @handleRhsChange)
         when "integer"
-          rhsControl = React.createElement(literalComponents.IntegerComponent, key: "rhs", expr: @props.value.rhs, onChange: @handleRhsChange)
+          rhsControl = React.createElement(literalComponents.IntegerComponent, key: "rhs", value: @props.value.rhs, onChange: @handleRhsChange)
         when "decimal"
-          rhsControl = React.createElement(literalComponents.DecimalComponent, key: "rhs", expr: @props.value.rhs, onChange: @handleRhsChange)
+          rhsControl = React.createElement(literalComponents.DecimalComponent, key: "rhs", value: @props.value.rhs, onChange: @handleRhsChange)
         when "date"
-          rhsControl = React.createElement(literalComponents.DateComponent, key: "rhs", expr: @props.value.rhs, onChange: @handleRhsChange)
+          rhsControl = React.createElement(literalComponents.DateComponent, key: "rhs", value: @props.value.rhs, onChange: @handleRhsChange)
         when "enum"
           rhsControl = React.createElement(literalComponents.EnumComponent, 
             key: "rhs", 
-            expr: @props.value.rhs, 
+            value: @props.value.rhs, 
+            enumValues: exprBuilder.getExprValues(@props.value.lhs)
+            onChange: @handleRhsChange)
+        when "enum[]"
+          rhsControl = React.createElement(literalComponents.EnumArrComponent, 
+            key: "rhs", 
+            value: @props.value.rhs, 
             enumValues: exprBuilder.getExprValues(@props.value.lhs)
             onChange: @handleRhsChange)
 

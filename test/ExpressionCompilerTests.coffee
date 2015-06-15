@@ -175,6 +175,26 @@ describe "ExpressionCompiler", ->
           { type: "literal", value: 3 }
         ]
         }), JSON.stringify(jql, null, 2)
+
+    it "compiles = any", ->
+      expr = { 
+        type: "comparison", op: "= any", 
+        lhs: { type: "field", table: "t1", column: "enum" } 
+        rhs: { type: "literal", valueType: "enum[]", value: ["a", "b"] }
+      }
+
+      jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
+
+      assert _.isEqual(jql, {
+        type: "op"
+        op: "="
+        modifier: "any"
+        exprs: [
+          { type: "field", tableAlias: "T1", column: "enum" }
+          { type: "literal", value: ["a", "b"] }
+        ]
+        }), JSON.stringify(jql, null, 2)
+
     
     it "compiles = true", ->
       expr = { type: "comparison", op: "= true", lhs: { type: "field", table: "t1", column: "integer" } }
