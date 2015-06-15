@@ -48,15 +48,15 @@ module.exports = class BarChartDesignerComponent extends React.Component
 
     # Expression is limited to same table as y-axis
     return H.div className: "form-group",
-      H.label null, "Bar size"
+      H.label null, "Group By"
       H.div null, 
         React.createElement(ScalarExprComponent, 
-          editorTitle: "Bar size"
+          editorTitle: "Group By"
           schema: @props.schema
           table: @props.value.yAxis.table
           onChange: @handleXAxisChange
           value: @props.value.xAxis)
-      H.p className: "help-block", "Data to control the size of the bars"
+      H.p className: "help-block", "Field to group by"
 
   renderFilter: ->
     # If no y axis, hide
@@ -69,7 +69,7 @@ module.exports = class BarChartDesignerComponent extends React.Component
         schema: @props.schema
         onChange: @handleWhereChange
         table: @props.value.yAxis.table
-        expr: @props.value.where)
+        value: @props.value.where)
 
   render: ->
     expr = null

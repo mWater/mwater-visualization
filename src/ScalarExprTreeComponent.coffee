@@ -15,12 +15,12 @@ module.exports = class ScalarExprTreeComponent extends React.Component
     for item in @props.tree
       if item.children
         elems.push(
-          React.createElement(HoverComponent, null,
-            React.createElement(ScalarExprTreeNodeComponent, key: item.name, item: item, onChange: @props.onChange, value: @props.value)))
+          React.createElement(HoverComponent, key: item.name,
+            React.createElement(ScalarExprTreeNodeComponent, item: item, onChange: @props.onChange, value: @props.value)))
       else 
         elems.push(
-          React.createElement(HoverComponent, null,
-            React.createElement(ScalarExprTreeLeafComponent, key: item.name, item: item, onChange: @props.onChange, value: @props.value)))
+          React.createElement(HoverComponent, key: item.name,
+            React.createElement(ScalarExprTreeLeafComponent, item: item, onChange: @props.onChange, value: @props.value)))
 
     H.div null, 
       elems
@@ -68,11 +68,11 @@ class ScalarExprTreeNodeComponent extends React.Component
       arrow = H.span className: "glyphicon glyphicon-triangle-bottom"
 
     if @state.collapse == "open"
-      children = H.div style: { paddingLeft: 25 },
+      children = H.div style: { paddingLeft: 25 }, key: "tree",
         React.createElement(ScalarExprTreeComponent, tree: @props.item.children(), onChange: @props.onChange, value: @props.value)
 
     H.div null,
-      H.div onClick: @handleArrowClick, style: { cursor: "pointer", padding: 4 },
+      H.div onClick: @handleArrowClick, style: { cursor: "pointer", padding: 4 }, key: "arrow",
         H.span style: { color: "#AAA", cursor: "pointer", paddingRight: 3 }, arrow
         @props.item.name
       children

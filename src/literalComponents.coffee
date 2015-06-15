@@ -2,7 +2,7 @@ H = React.DOM
 
 exports.TextComponent = React.createClass {
   propTypes: {
-    expr: React.PropTypes.object
+    value: React.PropTypes.object
     onChange: React.PropTypes.func.isRequired 
   }
 
@@ -15,12 +15,12 @@ exports.TextComponent = React.createClass {
       style: { width: "20em", display: "inline-block" },
       type: "text", 
       onChange: @handleChange
-      value: if @props.expr then @props.expr.value
+      value: if @props.value then @props.value.value
 }
 
 exports.DecimalComponent = React.createClass {
   propTypes: {
-    expr: React.PropTypes.object
+    value: React.PropTypes.object
     onChange: React.PropTypes.func.isRequired 
   }
 
@@ -49,12 +49,12 @@ exports.DecimalComponent = React.createClass {
           type: "text", 
           style: { width: "6em", display: "inline-block" },
           onChange: @handleChange,
-          value: (if @state.invalid then @state.invalidText) or (if @props.expr then @props.expr.value)
+          value: (if @state.invalid then @state.invalidText) or (if @props.value then @props.value.value)
 }
 
 exports.IntegerComponent = React.createClass {
   propTypes: {
-    expr: React.PropTypes.object
+    value: React.PropTypes.object
     onChange: React.PropTypes.func.isRequired 
   }
 
@@ -82,12 +82,12 @@ exports.IntegerComponent = React.createClass {
           className: "form-control input-sm",
           type: "text", 
           onChange: @handleChange,
-          value: (if @state.invalid then @state.invalidText) or (if @props.expr then @props.expr.value)
+          value: (if @state.invalid then @state.invalidText) or (if @props.value then @props.value.value)
 }
 
 exports.EnumComponent = React.createClass {
   propTypes: {
-    expr: React.PropTypes.object
+    value: React.PropTypes.object
     onChange: React.PropTypes.func.isRequired 
     enumValues: React.PropTypes.array.isRequired
   }
@@ -102,7 +102,7 @@ exports.EnumComponent = React.createClass {
     H.select 
       className: "form-control input-sm",
       style: { width: "auto", display: "inline-block" }
-      value: if @props.expr then @props.expr.value
+      value: if @props.value then @props.value.value
       onChange: @handleChange,
         H.option(key: "null", value: "", "")
         _.map(@props.enumValues, (val) -> H.option(key: val.id, value: val.id, val.name))
@@ -110,7 +110,7 @@ exports.EnumComponent = React.createClass {
 
 exports.DateComponent = React.createClass {
   propTypes: {
-    expr: React.PropTypes.object
+    value: React.PropTypes.object
     onChange: React.PropTypes.func.isRequired 
   }
 
@@ -138,5 +138,5 @@ exports.DateComponent = React.createClass {
           placeholder: "YYYY-MM-DD",
           type: "text", 
           onChange: @handleChange,
-          value: (if @state.invalid then @state.invalidText) or (if @props.expr then @props.expr.value)
+          value: (if @state.invalid then @state.invalidText) or (if @props.value then @props.value.value)
 }

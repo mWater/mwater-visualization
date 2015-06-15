@@ -3,33 +3,33 @@ ComparisonExprComponent = require './ComparisonExprComponent'
 
 module.exports = class LogicalExprComponent extends React.Component
   @propTypes: 
-    expr: React.PropTypes.object
+    value: React.PropTypes.object
     onChange: React.PropTypes.func.isRequired 
     schema: React.PropTypes.object.isRequired
     table: React.PropTypes.string.isRequired 
 
   handleExprChange: (i, expr) =>
     # Replace exprs
-    exprs = @props.expr.exprs.slice()
+    exprs = @props.value.exprs.slice()
     exprs[i] = expr
-    @props.onChange(_.extend({}, @props.expr, exprs: exprs))
+    @props.onChange(_.extend({}, @props.value, exprs: exprs))
 
   handleAdd: =>
-    expr = @props.expr or { type: "logical", table: @props.table, op: "and", exprs: [] }
+    expr = @props.value or { type: "logical", table: @props.table, op: "and", exprs: [] }
     exprs = expr.exprs.concat([{ type: "comparison", table: @props.table }])
     @props.onChange(_.extend({}, expr, exprs: exprs))
 
   handleRemove: (i) =>
-    exprs = @props.expr.exprs.slice()
+    exprs = @props.value.exprs.slice()
     exprs.splice(i, 1)
-    @props.onChange(_.extend({}, @props.expr, exprs: exprs))    
+    @props.onChange(_.extend({}, @props.value, exprs: exprs))    
 
   render: ->
-    if @props.expr
-      childElems = _.map @props.expr.exprs, (e, i) =>
-        H.div null,
+    if @props.value
+      childElems = _.map @props.value.exprs, (e, i) =>
+        H.div key: "#{i}",
           React.createElement(ComparisonExprComponent, 
-            expr: e, 
+            value: e, 
             schema: @props.schema, 
             table: @props.table, 
             onChange: @handleExprChange.bind(null, i))

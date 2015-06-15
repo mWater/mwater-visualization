@@ -8,7 +8,7 @@ ExpressionBuilder = require './ExpressionBuilder'
 module.exports = class ScalarExprEditorComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired
-    value: React.PropTypes.object.isRequired
+    value: React.PropTypes.object
     table: React.PropTypes.string # Optional table to restrict selections to (can still follow joins to other tables)
 
   handleTreeChange: (val) =>
