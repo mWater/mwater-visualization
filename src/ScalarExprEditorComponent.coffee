@@ -13,21 +13,15 @@ module.exports = class ScalarExprEditorComponent extends React.Component
 
   handleTreeChange: (val) =>
     # Set table and joins and expr
-    newVal = _.extend({}, @props.value or { type: "scalar" }, val)
-
-    # Clean 
-    newVal = new ExpressionBuilder(@props.schema).cleanScalarExpr(newVal)
-
-    @props.onChange(newVal)
+    @props.onChange(_.extend({}, @props.value or { type: "scalar" }, val))
 
   handleAggrChange: (aggr) =>
     # Set table and joins and expr
-    newVal = _.extend({}, @props.value, { aggr: aggr })
+    @props.onChange(_.extend({}, @props.value, { aggr: aggr }))
 
-    # Clean 
-    newVal = new ExpressionBuilder(@props.schema).cleanScalarExpr(newVal)
-
-    @props.onChange(newVal)
+  handleWhereChange: (where) =>
+    # Set table and joins and expr
+    @props.onChange(_.extend({}, @props.value, { where: where }))
 
   renderTree: ->
     # Create tree 
@@ -41,6 +35,36 @@ module.exports = class ScalarExprEditorComponent extends React.Component
       onChange: @handleTreeChange
       )
 
+  renderAggr: ->
+    exprBuilder = new ExpressionBuilder(@props.schema)
+    if @props.value and @props.value.aggr
+      options = _.map(exprBuilder.getAggrs(@props.value.expr), (aggr) -> { value: aggr.id, label: aggr.name })
+      return H.div null,
+        H.br()
+        H.label null, "Aggregate by"
+        React.createElement(ReactSelect, { 
+          value: @props.value.aggr, 
+          options: options 
+          onChange: @handleAggrChange
+        })
+
+  renderWhere: ->
+    exprBuilder = new ExpressionBuilder(@props.schema)
+
+    if @props.value and @props.value.aggr
+      # Prevent circularity problems in browserify
+      LogicalExprComponent = require './LogicalExprComponent'
+
+      return H.div null,
+        H.br()
+        H.label null, "Filter Aggregation"
+        React.createElement(LogicalExprComponent, 
+          schema: @props.schema, 
+          table: @props.value.expr.table,
+          value: @props.value.where
+          onChange: @handleWhereChange
+          )
+
   render: ->
     exprBuilder = new ExpressionBuilder(@props.schema)
 
@@ -48,17 +72,8 @@ module.exports = class ScalarExprEditorComponent extends React.Component
       H.label null, "Select Field"
       H.div style: { overflowY: "scroll", height: 350, border: "solid 1px #CCC" },
         @renderTree()
-
-      if @props.value and @props.value.aggr
-        options = _.map(exprBuilder.getAggrs(@props.value.expr), (aggr) -> { value: aggr.id, label: aggr.name })
-        aggrs = H.div null,
-          H.br()
-          H.label null, "Aggregate by"
-          React.createElement(ReactSelect, { 
-            value: @props.value.aggr, 
-            options: options 
-            onChange: @handleAggrChange
-          })
+      @renderAggr()
+      @renderWhere()
 
 
 #   handleJoinExprSelect: (joinExpr) ->

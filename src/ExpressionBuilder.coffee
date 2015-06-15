@@ -133,6 +133,10 @@ module.exports = class ExpressionBuilder
     if @isMultipleJoins(expr.table, expr.joins) and expr.aggr not in _.pluck(@getAggrs(expr.expr), "id")
       expr = _.extend({}, expr, { aggr: @getAggrs(expr.expr)[0].id })
 
+    # Clean where
+    if expr.where
+      expr.where = @cleanExpr(expr.where)
+
     return expr
 
   # Removes parts that are invalid, leaving table alone
@@ -206,3 +210,40 @@ module.exports = class ExpressionBuilder
       return column.values
     if expr.type == "scalar"
       return @getExprValues(expr.expr)  
+
+  # Returns null if ok, error message if invalid
+  validateExpr: (expr) ->
+    # Empty is ok
+    if not expr
+      return null
+
+    switch expr.type
+      when "scalar"
+        return @validateScalarExpr(expr)
+      when "comparison"
+        return @validateComparisonExpr(expr)
+      when "logical"
+        return @validateLogicalExpr(expr)
+    return null
+
+  validateComparisonExpr: (expr) ->
+    if not expr.lhs then return "Missing left-hand side"
+    if not expr.op then return "Missing operation"
+    if @getComparisonRhsType(@getExprType(expr.lhs), expr.op) and not expr.rhs then return "Missing right-hand side"
+
+    return @validateExpr(expr.lhs) or @validateExpr(expr.rhs)
+
+  validateLogicalExpr: (expr) ->
+    error = null
+    for subexpr in expr.exprs
+      error = error or @validateExpr(subexpr)
+    return error
+
+  validateScalarExpr: (expr) ->
+    # Check that has expr
+    if not expr.expr
+      return "Missing expression"
+
+    error = @validateExpr(expr.expr) or @validateExpr(expr.where)
+
+    return error

@@ -177,6 +177,44 @@ describe "ExpressionBuilder", ->
       expr = @exprBuilder.cleanComparisonExpr(expr)
       assert.equal expr.op, "~*"
 
+  describe "validateComparisonExpr", ->
+    it "null for valid", ->
+      expr = { type: "comparison", lhs: { type: "field", table: "t1", column: "c1" }, op: "~*", rhs: { type: "text", value: "x" } }
+      assert.isNull @exprBuilder.validateComparisonExpr(expr)
+
+    it "requires lhs", ->
+      expr = { type: "comparison", op: "~*", rhs: { type: "text", value: "x" } }
+      assert.isNotNull @exprBuilder.validateComparisonExpr(expr)
+
+    it "requires op", ->
+      expr = { type: "comparison", lhs: { type: "field", table: "t1", column: "c1" }, rhs: { type: "literal", valueType: "text", value: "x" } }
+      assert.isNotNull @exprBuilder.validateComparisonExpr(expr)
+
+    it "requires rhs if has type"
+    it "requires rhs type to match"
+
+  describe "validateLogicalExpr", ->
+    it "checks all exprs"
+
+  describe "validateScalarExpr", ->
+    it "null for valid", ->
+      fieldExpr = { type: "field", table: "t1", column: "c1" }
+      scalarExpr = { type: "scalar", table: "t1", joins: [], expr: fieldExpr }
+      assert.isNull @exprBuilder.validateScalarExpr(scalarExpr)
+
+    it "validates expr", ->
+      fieldExpr = { type: "field", table: "t1", column: "c1" }
+      scalarExpr = { type: "scalar", table: "t1", joins: [], expr: null }
+      assert.isNotNull @exprBuilder.validateScalarExpr(scalarExpr)
+
+    it "checks aggr" # No need, as will be cleaned and autofilled by cleaning
+    it "validates where", ->
+      fieldExpr = { type: "field", table: "t1", column: "c1" }
+      whereExpr = { type: "logical", table: "t1", exprs: [
+        { type: "comparison", table: "t1" }
+        ]}
+      scalarExpr = { type: "scalar", table: "t1", joins: [], expr: fieldExpr, where: whereExpr }
+      assert.isNotNull @exprBuilder.validateScalarExpr(scalarExpr)
 
 #   describe "with sample schema", ->
 #     before ->

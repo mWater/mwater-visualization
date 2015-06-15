@@ -26,7 +26,9 @@ module.exports = class ScalarExprComponent extends React.Component
 
   handleEditorCancel: => @setState(editorValue: null, editorOpen: false)
 
-  handleEditorChange: (val) => @setState(editorValue: val)
+  handleEditorChange: (val) => 
+    newVal = new ExpressionBuilder(@props.schema).cleanScalarExpr(val)
+    @setState(editorValue: newVal)
 
   handleEditorSave: =>
     # TODO validate
