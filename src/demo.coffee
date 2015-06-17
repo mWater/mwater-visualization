@@ -59,8 +59,9 @@ $ ->
   #       H.pre null, JSON.stringify(@state.expr, null, 2)
   # }
 
+  chart = new (require('./BarChart'))(schema)
   sample = H.div className: "container",
-    React.createElement(require("./ChartTestComponent"), schema: createSchema())
+    React.createElement(require("./ChartTestComponent"), chart: chart)
   React.render(sample, document.getElementById('root'))
 
 # Child = React.createClass {

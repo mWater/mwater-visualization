@@ -1,8 +1,14 @@
 _ = require 'lodash'
 ExpressionBuilder = require './ExpressionBuilder'
+BarChartDesignerComponent = require './BarChartDesignerComponent'
+BarChartViewComponent = require './BarChartViewComponent'
+React = require 'react'
+H = React.DOM
 
 ###
 Design is:
+
+table: base table of design
 
 aesthetics:
   x:
@@ -14,6 +20,8 @@ aesthetics:
   color:
     expr: expression
     scale: scale
+
+filter: expression that filters table
 
 stacked: true/false
 
@@ -29,7 +37,7 @@ module.exports = class BarChart
 
     # Clean aesthetic expressions. First table locks table for all others 
     # since all must use same table
-    table = null
+    design.table = null
     for aes in ['y', 'x', 'color']
       value = design.aesthetics[aes]
 
@@ -38,37 +46,55 @@ module.exports = class BarChart
         continue
 
       # Clean expression
-      value.expr = @exprBuilder.cleanExpr(value.expr, table)
+      value.expr = @exprBuilder.cleanExpr(value.expr, design.table)
 
       # Save table
       if value.expr
-        table = value.expr.table
+        design.table = value.expr.table
+
+    if design.filter
+      design.filter = @exprBuilder.cleanExpr(design.filter, design.table)
 
     return design
 
   validateDesign: (design) ->
     # Check that has x and y
     if not design.aesthetics.x 
-      return "Missing X Value"
+      return "Missing X Axis"
     if not design.aesthetics.y
-      return "Missing Y Value"
+      return "Missing Y Axis"
 
     error = null
-    error = error or @exprBuilder.validateExpr(design.aesthetics.x)
-    error = error or @exprBuilder.validateExpr(design.aesthetics.y)
+    error = error or @exprBuilder.validateExpr(design.aesthetics.x.expr)
+    error = error or @exprBuilder.validateExpr(design.aesthetics.y.expr)
+    error = error or @exprBuilder.validateExpr(design.filter)
     return error
 
+  # Creates a design element with specified options
+  # options include design: design and onChange: function
+  createDesignerElement: (options) ->
+    props = {
+      schema: @schema
+      design: options.design
+      onChange: options.onChange
+    }
+    return React.createElement(BarChartDesignerComponent, props)
 
-  #   design.yAxis = exprBuilder.cleanExpr(design.yAxis)
-    
-  #   if design.yAxis
-  #     design.xAxis = exprBuilder.cleanExpr(design.xAxis, design.yAxis.table)
-  #   else
-  #     design.xAxis = null
+  # Options include 
+  # design: design of the component
+  # width, height
+  createViewElement: (options) ->
+    # Validate design
+    error = @validateDesign(@cleanDesign(options.design))
+    if error
+      return H.div className: "alert alert-warning", error
 
-  #   if design.yAxis
-  #     design.where = exprBuilder.cleanExpr(design.where, design.yAxis.table)
-  #   else
-  #     design.where = null
+    props = {
+      schema: @schema
+      design: options.design
+      onChange: options.onChange
+      width: options.width
+      height: options.height
+    }
 
-  #   @props.onChange(design)
+    return React.createElement(BarChartViewComponent, props)

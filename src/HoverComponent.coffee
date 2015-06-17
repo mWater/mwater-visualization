@@ -1,3 +1,5 @@
+React = require 'react'
+
 module.exports = class HoverComponent extends React.Component
   constructor: ->
     super

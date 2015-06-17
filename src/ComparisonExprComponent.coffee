@@ -1,3 +1,4 @@
+React = require 'react'
 H = React.DOM
 ScalarExprComponent = require './ScalarExprComponent'
 literalComponents = require './literalComponents'

@@ -1,3 +1,4 @@
+React = require 'react'
 H = React.DOM
 
 # Child must be react element with value and onChange props

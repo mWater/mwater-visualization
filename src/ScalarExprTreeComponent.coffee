@@ -1,4 +1,5 @@
 HoverComponent = require './HoverComponent'
+React = require 'react'
 H = React.DOM
 
 # Shows a tree that selects table + joins + expr of a scalar expression

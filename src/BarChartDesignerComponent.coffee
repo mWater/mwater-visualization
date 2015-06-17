@@ -1,97 +1,97 @@
+React = require 'react'
 H = React.DOM
 ScalarExprComponent = require './ScalarExprComponent'
 LogicalExprComponent = require './LogicalExprComponent'
 ExpressionBuilder = require './ExpressionBuilder'
 
 module.exports = class BarChartDesignerComponent extends React.Component
-  cleanDesign: (design) ->
-    exprBuilder = new ExpressionBuilder(@props.schema)
+  handleAestheticChange: (aes, val) =>
+    aesthetics = _.clone(@props.design.aesthetics)
+    aesthetics[aes] = val
+    @props.onChange(_.extend({}, @props.design, { aesthetics: aesthetics }))
 
-    design.yAxis = exprBuilder.cleanExpr(design.yAxis)
-    
-    if design.yAxis
-      design.xAxis = exprBuilder.cleanExpr(design.xAxis, design.yAxis.table)
-    else
-      design.xAxis = null
+  handleFilterChange: (val) =>
+    @props.onChange(_.extend({}, @props.design, { filter: val }))
 
-    if design.yAxis
-      design.where = exprBuilder.cleanExpr(design.where, design.yAxis.table)
-    else
-      design.where = null
+  # renderYAxis: ->
+  #   H.div className: "form-group",
+  #     H.label null, "Bar size"
+  #     H.div null, 
+  #       React.createElement(ScalarExprComponent, 
+  #         editorTitle: "Bar size"
+  #         schema: @props.schema
+  #         onChange: @handleYAxisChange
+  #         value: @props.value.yAxis)
+  #     H.p className: "help-block", "Field to use for the size of the bars"
 
-    @props.onChange(design)
+  # renderXAxis: ->
+  #   # If no y axis, hide
+  #   if not @props.value.yAxis
+  #     return null
 
-  validateDesign: (design) ->
-    if not design.yAxis 
-      return "Missing Y Axis"
+  #   # Expression is limited to same table as y-axis
+  #   return H.div className: "form-group",
+  #     H.label null, "Group By"
+  #     H.div null, 
+  #       React.createElement(ScalarExprComponent, 
+  #         editorTitle: "Group By"
+  #         schema: @props.schema
+  #         table: @props.value.yAxis.table
+  #         onChange: @handleXAxisChange
+  #         value: @props.value.xAxis)
+  #     H.p className: "help-block", "Field to group by"
 
-    if not design.xAxis
-      return "Missing X axis"
+  renderYAesthetic: ->
+    React.createElement(AestheticComponent, 
+      title: "Value (Y) Axis"
+      schema: @props.schema, 
+      table: @props.design.table
+      value: @props.design.aesthetics.y, 
+      onChange: @handleAestheticChange.bind(this, "y"))
 
-    exprBuilder = new ExpressionBuilder(@props.schema)
-    return exprBuilder.validateExpr(design.yAxis) or exprBuilder.validateExpr(design.xAxis) or exprBuilder.validateExpr(design.where)
-
-  handleYAxisChange: (val) =>
-    @cleanDesign(_.extend({}, @props.value, { yAxis: val }))
-
-  handleXAxisChange: (val) =>
-    @cleanDesign(_.extend({}, @props.value, { xAxis: val }))
-
-  handleWhereChange: (val) =>
-    @cleanDesign(_.extend({}, @props.value, { where: val }))
-
-  renderYAxis: ->
-    H.div className: "form-group",
-      H.label null, "Bar size"
-      H.div null, 
-        React.createElement(ScalarExprComponent, 
-          editorTitle: "Bar size"
-          schema: @props.schema
-          onChange: @handleYAxisChange
-          value: @props.value.yAxis)
-      H.p className: "help-block", "Field to use for the size of the bars"
-
-  renderXAxis: ->
-    # If no y axis, hide
-    if not @props.value.yAxis
-      return null
-
-    # Expression is limited to same table as y-axis
-    return H.div className: "form-group",
-      H.label null, "Group By"
-      H.div null, 
-        React.createElement(ScalarExprComponent, 
-          editorTitle: "Group By"
-          schema: @props.schema
-          table: @props.value.yAxis.table
-          onChange: @handleXAxisChange
-          value: @props.value.xAxis)
-      H.p className: "help-block", "Field to group by"
+  renderXAesthetic: ->
+    React.createElement(AestheticComponent, 
+      title: "Category (X) Axis"
+      schema: @props.schema, 
+      table: @props.design.table
+      value: @props.design.aesthetics.x, 
+      onChange: @handleAestheticChange.bind(this, "x"))
 
   renderFilter: ->
-    # If no y axis, hide
-    if not @props.value.yAxis
+    # If no table, hide
+    if not @props.design.table
       return null
 
     return H.div className: "form-group",
       H.label null, "Filter"
       React.createElement(LogicalExprComponent, 
         schema: @props.schema
-        onChange: @handleWhereChange
-        table: @props.value.yAxis.table
-        value: @props.value.where)
+        onChange: @handleFilterChange
+        table: @props.design.table
+        value: @props.design.filter)
 
   render: ->
-    expr = null
-
-    error = @validateDesign(@props.value)
-
     H.div null,
-      if error 
-        H.div className: "text-warning", 
-          H.span className: "glyphicon glyphicon-info-sign"
-          " "
-          error
-      @renderYAxis()
-      @renderXAxis()
+      # if error 
+      #   H.div className: "text-warning", 
+      #     H.span className: "glyphicon glyphicon-info-sign"
+      #     " "
+      #     error
+      @renderYAesthetic()
+      @renderXAesthetic()
       @renderFilter()
+
+class AestheticComponent extends React.Component
+  handleExprChange: (expr) =>
+    @props.onChange(_.extend({}, @props.value, { expr: expr }))
+
+  render: ->
+    return H.div className: "form-group",
+      H.label null, @props.title
+      H.div null, 
+        React.createElement(ScalarExprComponent, 
+          editorTitle: @props.title
+          schema: @props.schema
+          table: @props.table
+          onChange: @handleExprChange
+          value: if @props.value then @props.value.expr)

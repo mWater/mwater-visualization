@@ -1,3 +1,4 @@
+React = require 'react'
 H = React.DOM
 ActionCancelModalComponent = require './ActionCancelModalComponent'
 ScalarExprEditorComponent = require './ScalarExprEditorComponent'
