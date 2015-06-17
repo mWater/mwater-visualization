@@ -1,5 +1,6 @@
 _ = require 'lodash'
 ExpressionBuilder = require './ExpressionBuilder'
+ExpressionCompiler = require './ExpressionCompiler'
 BarChartDesignerComponent = require './BarChartDesignerComponent'
 BarChartViewComponent = require './BarChartViewComponent'
 React = require 'react'
@@ -80,8 +81,25 @@ module.exports = class BarChart
     }
     return React.createElement(BarChartDesignerComponent, props)
 
+  createQueries: (design) ->
+    exprCompiler = new ExpressionCompiler(@schema)
+
+    # Create main query
+    query = {
+      type: "query"
+      selects: []
+      from: { type: "table", table: design.table, alias: "main" }
+      groupBy: [1] # X-axis
+    }
+
+    query.selects.push({ type: "select", expr: exprCompiler.compileExpr(expr: design.aesthetics.x.expr, tableAlias: "main"), alias: "x" })
+    query.selects.push({ type: "select", expr: exprCompiler.compileExpr(expr: design.aesthetics.y.expr, tableAlias: "main"), alias: "y" })
+
+    return { main: query }
+
   # Options include 
   # design: design of the component
+  # data: results from queries
   # width, height
   createViewElement: (options) ->
     # # Validate design
@@ -89,12 +107,16 @@ module.exports = class BarChart
     # if error
     #   return H.div className: "alert alert-warning", error
 
+    # Create datum from query re    
     props = {
       schema: @schema
       design: options.design
       onChange: options.onChange
       width: options.width
       height: options.height
+      datum: [
+        { key: "main", values: options.data.main }
+      ]
     }
 
     return React.createElement(BarChartViewComponent, props)

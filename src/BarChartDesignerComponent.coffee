@@ -46,7 +46,8 @@ module.exports = class BarChartDesignerComponent extends React.Component
       title: "Value (Y) Axis"
       schema: @props.schema, 
       table: @props.design.table
-      value: @props.design.aesthetics.y, 
+      types: ["decimal", "integer"]
+      value: @props.design.aesthetics.y
       onChange: @handleAestheticChange.bind(this, "y"))
 
   renderXAesthetic: ->
@@ -54,6 +55,7 @@ module.exports = class BarChartDesignerComponent extends React.Component
       title: "Category (X) Axis"
       schema: @props.schema, 
       table: @props.design.table
+      types: ["enum", "text"]
       value: @props.design.aesthetics.x, 
       onChange: @handleAestheticChange.bind(this, "x"))
 
@@ -93,5 +95,6 @@ class AestheticComponent extends React.Component
           editorTitle: @props.title
           schema: @props.schema
           table: @props.table
+          types: @props.types # TODO
           onChange: @handleExprChange
           value: if @props.value then @props.value.expr)

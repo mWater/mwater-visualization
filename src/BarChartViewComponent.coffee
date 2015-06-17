@@ -16,39 +16,45 @@ module.exports = class BarChartViewComponent extends React.Component
     #       # .height(200)
     #       # .width(300)
     nv.addGraph =>
-      chart = nv.models.multiBarChart()
+      @chart = nv.models.multiBarChart()
           # .x((d) -> d.label)
           # .y((d) -> d.value)
           # .staggerLabels(true)
           #.staggerLabels(historicalBarChart[0].values.length > 8)
           # .showValues(true)
+          .showLegend(false)
           .stacked(true)
           .showControls(false)
           .duration(250)
           # .height(200)
           # .width(300)
 
-          
-      d3.select(el)
-          .datum(data)
-          .call(chart)
+      @updateChart(@props)
+      return @chart
       # nv.utils.windowResize(chart.update)
       # return ChartTestComponent
+
+  componentWillReceiveProps: (props) ->
+    @updateChart(props)
+
+  updateChart: (props) =>
+    el = React.findDOMNode(@refs.chart)
+    d3.select(el).datum(props.datum).call(@chart)
 
   render: ->
     H.div style: { width: @props.width, height: @props.height }, 
       H.svg ref: "chart"
 
-data = [
-  { key: "Asadfsdfa", values: [
-    { x: 2, y: 10 }
-    { x: 1, y: 20 }
-    ]}
+# data = [
+#   { key: "Asadfsdfa", values: [
+#     { x: 2, y: 10 }
+#     { x: 1, y: 20 }
+#     ]}
   # { key: "sdfsdf", values: [
   #   { x: "apple", y: 14 }
   #   { x: "banana", y: 25 }
   #   ]}
-]
+# ]
 
 # data = [
 #   { key: "Asadfsdfa", values: [
