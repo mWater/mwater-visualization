@@ -11,6 +11,7 @@ module.exports = class ScalarExprComponent extends React.Component
     schema: React.PropTypes.object.isRequired
 
     table: React.PropTypes.string # Optional table to restrict selections to (can still follow joins to other tables)
+    types: React.PropTypes.array # Optional types to limit to
     editorTitle: React.PropTypes.string # Title of editor popup
     
     value: React.PropTypes.object # Current value of expression
@@ -46,8 +47,9 @@ module.exports = class ScalarExprComponent extends React.Component
           onCancel: @handleEditorCancel
           },
             React.createElement(ScalarExprEditorComponent, 
-              schema: @props.schema, 
-              table: @props.table, 
+              schema: @props.schema
+              table: @props.table 
+              types: @props.types
               value: @state.editorValue
               onChange: @handleEditorChange)
         )

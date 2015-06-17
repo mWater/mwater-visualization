@@ -41,11 +41,11 @@ describe "ScalarExprTreeBuilder", ->
       @schema.addColumn("t1", { id: "c2", name: "C2", type: "integer" })
 
       # Get nodes of first table
-      nodes = new ScalarExprTreeBuilder(@schema).getTree({ limitTypes: ["integer"] })[0].children()
+      nodes = new ScalarExprTreeBuilder(@schema).getTree({ types: ["integer"] })[0].children()
       assert.equal nodes.length, 1
 
       # Get nodes of first table
-      nodes = new ScalarExprTreeBuilder(@schema).getTree({ limitTypes: ["decimal"] })[0].children()
+      nodes = new ScalarExprTreeBuilder(@schema).getTree({ types: ["decimal"] })[0].children()
       assert.equal nodes.length, 0, "Decimal not included"
 
     it "includes types formed by aggregation", ->
@@ -54,7 +54,7 @@ describe "ScalarExprTreeBuilder", ->
       @schema.addColumn("t1", { id: "c2", name: "C2", type: "join", join: join })
 
       # Go to first table, 2nd child, children
-      nodes = new ScalarExprTreeBuilder(@schema).getTree({ limitTypes: ["integer"] })[0].children()[0].children()
+      nodes = new ScalarExprTreeBuilder(@schema).getTree({ types: ["integer"] })[0].children()[0].children()
       
       # Should include text field, because can be aggregated to integer via count
       assert.equal nodes.length, 1, "Should include text"

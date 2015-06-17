@@ -11,6 +11,8 @@ module.exports = class ScalarExprEditorComponent extends React.Component
     schema: React.PropTypes.object.isRequired
     value: React.PropTypes.object
     table: React.PropTypes.string # Optional table to restrict selections to (can still follow joins to other tables)
+    types: React.PropTypes.array # Optional types to limit to
+
 
   handleTreeChange: (val) =>
     # Set table and joins and expr
@@ -27,7 +29,7 @@ module.exports = class ScalarExprEditorComponent extends React.Component
   renderTree: ->
     # Create tree 
     treeBuilder = new ScalarExprTreeBuilder(@props.schema)
-    tree = treeBuilder.getTree(table: @props.table)
+    tree = treeBuilder.getTree(table: @props.table, types: @props.types)
 
     # Create tree component with value of table and path
     return React.createElement(ScalarExprTreeComponent, 

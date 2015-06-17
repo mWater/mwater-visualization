@@ -41,11 +41,22 @@ module.exports = class BarChartViewComponent extends React.Component
 
 data = [
   { key: "Asadfsdfa", values: [
-    { x: "apple", y: 10 }
-    { x: "banana", y: 20 }
+    { x: 2, y: 10 }
+    { x: 1, y: 20 }
     ]}
-  { key: "sdfsdf", values: [
-    { x: "apple", y: 14 }
-    { x: "banana", y: 25 }
-    ]}
+  # { key: "sdfsdf", values: [
+  #   { x: "apple", y: 14 }
+  #   { x: "banana", y: 25 }
+  #   ]}
 ]
+
+# data = [
+#   { key: "Asadfsdfa", values: [
+#     { x: "apple", y: 10 }
+#     { x: "banana", y: 20 }
+#     ]}
+#   # { key: "sdfsdf", values: [
+#   #   { x: "apple", y: 14 }
+#   #   { x: "banana", y: 25 }
+#   #   ]}
+# ]

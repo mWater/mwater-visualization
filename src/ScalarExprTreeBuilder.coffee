@@ -16,7 +16,7 @@ module.exports = class ScalarExprTreeBuilder
   # }
   # options are:
   #  table: to limit starting table to a specific table
-  #  limitTypes: types to limit to 
+  #  types: types to limit to 
   getTree: (options = {}) ->
     nodes = []
     # For each table
@@ -34,7 +34,7 @@ module.exports = class ScalarExprTreeBuilder
 
         # Create nodes for each column of a table
         node.children = =>
-          @createChildNodes(startTable: table.id, table: table.id, joins: [], limitTypes: options.limitTypes)
+          @createChildNodes(startTable: table.id, table: table.id, joins: [], types: options.types)
         nodes.push(node)
 
     return nodes
@@ -43,7 +43,7 @@ module.exports = class ScalarExprTreeBuilder
   # startTable: table id that started from
   # table: table id to get nodes for
   # joins: joins for child nodes
-  # limitTypes: types to limit to 
+  # types: types to limit to 
   createChildNodes: (options) ->
     nodes = []
 
@@ -61,21 +61,21 @@ module.exports = class ScalarExprTreeBuilder
             # Add column to joins
             joins = options.joins.slice()
             joins.push(column.id)
-            return @createChildNodes(startTable: options.startTable, table: column.join.toTable, joins: joins, limitTypes: options.limitTypes)
+            return @createChildNodes(startTable: options.startTable, table: column.join.toTable, joins: joins, types: options.types)
         else
           fieldExpr = { type: "field", table: options.table, column: column.id }
-          if options.limitTypes 
+          if options.types 
             exprBuilder = new ExpressionBuilder(@schema)
             # If aggregated
             if exprBuilder.isMultipleJoins(options.startTable, options.joins)
               # Get types that this can become through aggregation
               types = exprBuilder.getAggrTypes(fieldExpr)
               # Skip if wrong type
-              if _.intersection(types, options.limitTypes).length == 0
+              if _.intersection(types, options.types).length == 0
                 return
             else
               # Skip if wrong type
-              if column.type not in options.limitTypes
+              if column.type not in options.types
                 return 
 
           node.value = { table: options.startTable, joins: options.joins, expr: fieldExpr } 

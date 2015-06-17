@@ -84,10 +84,10 @@ module.exports = class BarChart
   # design: design of the component
   # width, height
   createViewElement: (options) ->
-    # Validate design
-    error = @validateDesign(@cleanDesign(options.design))
-    if error
-      return H.div className: "alert alert-warning", error
+    # # Validate design
+    # error = @validateDesign(@cleanDesign(options.design))
+    # if error
+    #   return H.div className: "alert alert-warning", error
 
     props = {
       schema: @schema
