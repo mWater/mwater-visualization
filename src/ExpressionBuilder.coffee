@@ -115,6 +115,8 @@ module.exports = class ExpressionBuilder
 
     switch expr.type
       when "field"
+        if not expr.column or not expr.table
+          return null
         return expr
       when "scalar"
         return @cleanScalarExpr(expr)

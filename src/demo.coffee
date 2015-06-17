@@ -1,6 +1,5 @@
 ListComponent = require './ListComponent'
 React = require 'react'
-HoverMixin = require './HoverMixin'
 H = React.DOM
 
 Schema = require './Schema'

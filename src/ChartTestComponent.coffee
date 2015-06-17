@@ -8,9 +8,9 @@ module.exports = class ChartTestComponent extends React.Component
 
   render: ->
     H.div className: "row",
-      H.div className: "col-xs-8",
+      H.div className: "col-xs-6",
         React.createElement(BarChartComponent, width: "100%", height: 500)
-      H.div className: "col-xs-4",
+      H.div className: "col-xs-6",
         React.createElement(BarChartDesignerComponent, 
           schema: @props.schema, 
           value: @state.design
