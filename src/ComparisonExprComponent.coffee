@@ -3,6 +3,7 @@ H = React.DOM
 ScalarExprComponent = require './ScalarExprComponent'
 literalComponents = require './literalComponents'
 ExpressionBuilder = require './ExpressionBuilder'
+EditableLinkComponent = require './EditableLinkComponent'
 
 module.exports = class ComparisonExprComponent extends React.Component
   @propTypes: 
@@ -14,8 +15,8 @@ module.exports = class ComparisonExprComponent extends React.Component
   handleLhsChange: (lhs) =>
     @props.onChange(_.extend({}, @props.value or { type: "comparison", table: @props.table }, lhs: lhs))
 
-  handleOpChange: (ev) =>
-    @props.onChange(_.extend({}, @props.value, op: ev.target.value))
+  handleOpChange: (op) =>
+    @props.onChange(_.extend({}, @props.value, op: op))
 
   handleRhsChange: (rhs) =>
     @props.onChange(_.extend({}, @props.value, rhs: rhs))
@@ -37,17 +38,11 @@ module.exports = class ComparisonExprComponent extends React.Component
       ops = exprBuilder.getComparisonOps(lhsType)
       currentOp = _.findWhere(ops, id: @props.value.op)
 
-      opControl = H.div className: "dropdown", style: { display: "inline-block" },
-        H.span
-          key: "op"
-          "data-toggle": "dropdown"
-          className: "editable-link",
-            if currentOp then currentOp.name
-        H.ul className: "dropdown-menu",
-          _.map(ops, (op) -> 
-            H.li(null, H.a(key: op.id, op.name)))
-
-        # onChange: @handleOpChange,
+      opControl = React.createElement(EditableLinkComponent, 
+        dropdownItems: ops
+        onDropdownItemClicked: @handleOpChange
+        if currentOp then currentOp.name
+        )
 
     if lhsType and @props.value.op
       rhsType = exprBuilder.getComparisonRhsType(lhsType, @props.value.op)
@@ -74,8 +69,10 @@ module.exports = class ComparisonExprComponent extends React.Component
             onChange: @handleRhsChange)
 
     return H.div style: { display: "inline-block" },
-      lhsControl,
-      opControl,
+      lhsControl
+      " "
+      opControl
+      " "
       rhsControl
 
 

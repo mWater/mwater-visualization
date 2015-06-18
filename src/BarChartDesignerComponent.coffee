@@ -3,6 +3,7 @@ H = React.DOM
 ScalarExprComponent = require './ScalarExprComponent'
 LogicalExprComponent = require './LogicalExprComponent'
 ExpressionBuilder = require './ExpressionBuilder'
+EditableLinkComponent = require './EditableLinkComponent'
 
 module.exports = class BarChartDesignerComponent extends React.Component
   handleAestheticChange: (aes, val) =>
@@ -100,8 +101,8 @@ class AestheticComponent extends React.Component
   handleExprChange: (expr) =>
     @props.onChange(_.extend({}, @props.value, { expr: expr }))
 
-  handleAggrChange: (ev) =>
-    @props.onChange(_.extend({}, @props.value, { aggr: ev.target.value }))
+  handleAggrChange: (aggr) =>
+    @props.onChange(_.extend({}, @props.value, { aggr: aggr }))
 
   renderAggr: ->
     if @props.value and @props.aggrRequired and @props.value.expr
@@ -112,23 +113,15 @@ class AestheticComponent extends React.Component
       aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
       currentAggr = _.findWhere(aggrs, id: @props.value.aggr)
 
-      return H.div style: { display: "inline-block" },
-        H.div className: "dropdown", style: { display: "inline-block" },
-          H.span
-            "data-toggle": "dropdown"
-            className: "editable-link",
-              if currentAggr then currentAggr.name
-          H.ul className: "dropdown-menu",
-            _.map(aggrs, (aggr) -> 
-              H.li(null, H.a(key: aggr.id, aggr.name)))
-        H.span className: "text-muted", "\u00A0of\u00A0"
+      # Do not display number of for id column
+      if exprBuilder.getExprType(@props.value.expr) == "id"
+        return
 
-      # return H.select(
-      #   style: { width: "auto", display: "inline-block" }
-      #   className: "form-control input-sm"
-      #   value: @props.value.aggr 
-      #   onChange: @handleAggrChange,
-      #     _.map(aggrs, (aggr) => H.option(value: aggr.id, aggr.name)))
+      return React.createElement(EditableLinkComponent, 
+        dropdownItems: aggrs
+        onDropdownItemClicked: @handleAggrChange
+        if currentAggr then currentAggr.name + " of\u00A0"
+        )
 
   render: ->
     return H.div className: "form-group",

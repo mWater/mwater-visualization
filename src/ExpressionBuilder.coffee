@@ -187,11 +187,11 @@ module.exports = class ExpressionBuilder
     ops = []
     switch lhsType
       when "integer", "decimal"
-        ops.push({ id: "=", name: "=" })
-        ops.push({ id: ">", name: ">" })
-        ops.push({ id: ">=", name: ">=" })
-        ops.push({ id: "<", name: "<" })
-        ops.push({ id: "<=", name: "<=" })
+        ops.push({ id: "=", name: "equals" })
+        ops.push({ id: ">", name: "is greater than" })
+        ops.push({ id: ">=", name: "is greater or equal to" })
+        ops.push({ id: "<", name: "is less than" })
+        ops.push({ id: "<=", name: "is less than or equal to" })
       when "text"
         ops.push({ id: "~*", name: "matches" })
       when "date"
