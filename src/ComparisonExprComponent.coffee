@@ -35,13 +35,19 @@ module.exports = class ComparisonExprComponent extends React.Component
     lhsType = exprBuilder.getExprType(@props.value.lhs)
     if lhsType
       ops = exprBuilder.getComparisonOps(lhsType)
-      opControl = H.select 
-        key: "op",
-        className: "form-control input-sm",
-        style: { width: "auto", display: "inline-block", marginRight: 3 }
-        value: @props.value.op
-        onChange: @handleOpChange,
-          _.map(ops, (op) -> H.option(key: op.id, value: op.id, op.name))
+      currentOp = _.findWhere(ops, id: @props.value.op)
+
+      opControl = H.div className: "dropdown", style: { display: "inline-block" },
+        H.span
+          key: "op"
+          "data-toggle": "dropdown"
+          className: "editable-link",
+            if currentOp then currentOp.name
+        H.ul className: "dropdown-menu",
+          _.map(ops, (op) -> 
+            H.li(null, H.a(key: op.id, op.name)))
+
+        # onChange: @handleOpChange,
 
     if lhsType and @props.value.op
       rhsType = exprBuilder.getComparisonRhsType(lhsType, @props.value.op)

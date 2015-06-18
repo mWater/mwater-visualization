@@ -15,3 +15,23 @@
 .items-leave.items-leave-active {
  	opacity: 0.01;
 }
+
+.editable-link {
+	color: #478;
+	cursor: pointer;
+	display: inline-block;
+}
+
+.editable-link:hover {
+	text-decoration: underline;
+}
+
+.editable-link .editable-link-remove {
+	visibility: hidden;
+	font-size: 80%;
+	padding-left: 2px;
+}
+
+.editable-link:hover .editable-link-remove {
+	visibility: visible;
+}

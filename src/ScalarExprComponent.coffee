@@ -57,21 +57,12 @@ module.exports = class ScalarExprComponent extends React.Component
               onChange: @handleEditorChange)
         )
 
-    H.div style: { display: "inline-block" }, 
+    H.div style: { display: "inline-block" },
       editor
-      H.input 
-        type: "text", 
-        className: "form-control input-sm"
-        readOnly: true, 
-        style: { backgroundColor: "white", cursor: "pointer", display: "inline-block", width: "auto" }
-        value: if @props.value then exprBuilder.summarizeExpr(@props.value)
-        placeholder: "Click to select..."
-        onClick: @handleEditorOpen
-      if @props.value
-        H.button 
-          type: "button", 
-          className: "btn btn-sm btn-link", 
-          onClick: @handleRemove,
+      H.div className: "editable-link", 
+        H.span onClick: @handleEditorOpen, if @props.value then exprBuilder.summarizeExpr(@props.value) else "Select..."
+        if @props.value
+          H.span className: "editable-link-remove", onClick: @handleRemove,
             H.span(className: "glyphicon glyphicon-remove")
 
 

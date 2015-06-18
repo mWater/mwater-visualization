@@ -110,13 +110,25 @@ class AestheticComponent extends React.Component
 
       # Remove latest, as it is tricky to group by. TODO
       aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
+      currentAggr = _.findWhere(aggrs, id: @props.value.aggr)
 
-      return H.select(
-        style: { width: "auto", display: "inline-block" }
-        className: "form-control input-sm"
-        value: @props.value.aggr 
-        onChange: @handleAggrChange,
-          _.map(aggrs, (aggr) => H.option(value: aggr.id, aggr.name)))
+      return H.div style: { display: "inline-block" },
+        H.div className: "dropdown", style: { display: "inline-block" },
+          H.span
+            "data-toggle": "dropdown"
+            className: "editable-link",
+              if currentAggr then currentAggr.name
+          H.ul className: "dropdown-menu",
+            _.map(aggrs, (aggr) -> 
+              H.li(null, H.a(key: aggr.id, aggr.name)))
+        H.span className: "text-muted", "\u00A0of\u00A0"
+
+      # return H.select(
+      #   style: { width: "auto", display: "inline-block" }
+      #   className: "form-control input-sm"
+      #   value: @props.value.aggr 
+      #   onChange: @handleAggrChange,
+      #     _.map(aggrs, (aggr) => H.option(value: aggr.id, aggr.name)))
 
   render: ->
     return H.div className: "form-group",
