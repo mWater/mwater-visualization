@@ -3,6 +3,7 @@ H = React.DOM
 ActionCancelModalComponent = require './ActionCancelModalComponent'
 ScalarExprEditorComponent = require './ScalarExprEditorComponent'
 ExpressionBuilder = require './ExpressionBuilder'
+EditableLinkComponent = require './EditableLinkComponent'
 
 # Component which displays a scalar expression and allows editing/selecting it
 # by clicking.
@@ -57,21 +58,11 @@ module.exports = class ScalarExprComponent extends React.Component
               onChange: @handleEditorChange)
         )
 
-    H.div style: { display: "inline-block" }, 
+    H.div style: { display: "inline-block" },
       editor
-      H.input 
-        type: "text", 
-        className: "form-control input-sm"
-        readOnly: true, 
-        style: { backgroundColor: "white", cursor: "pointer", display: "inline-block", width: "auto" }
-        value: if @props.value then exprBuilder.summarizeExpr(@props.value)
-        placeholder: "Click to select..."
+      React.createElement(EditableLinkComponent, 
         onClick: @handleEditorOpen
-      if @props.value
-        H.button 
-          type: "button", 
-          className: "btn btn-sm btn-link", 
-          onClick: @handleRemove,
-            H.span(className: "glyphicon glyphicon-remove")
-
+        onRemove: if @props.value then @handleRemove,
+        if @props.value then exprBuilder.summarizeExpr(@props.value) else H.i(null, "Select...")
+        )
 

@@ -3,6 +3,7 @@ H = React.DOM
 ScalarExprComponent = require './ScalarExprComponent'
 literalComponents = require './literalComponents'
 ExpressionBuilder = require './ExpressionBuilder'
+EditableLinkComponent = require './EditableLinkComponent'
 
 module.exports = class ComparisonExprComponent extends React.Component
   @propTypes: 
@@ -14,8 +15,8 @@ module.exports = class ComparisonExprComponent extends React.Component
   handleLhsChange: (lhs) =>
     @props.onChange(_.extend({}, @props.value or { type: "comparison", table: @props.table }, lhs: lhs))
 
-  handleOpChange: (ev) =>
-    @props.onChange(_.extend({}, @props.value, op: ev.target.value))
+  handleOpChange: (op) =>
+    @props.onChange(_.extend({}, @props.value, op: op))
 
   handleRhsChange: (rhs) =>
     @props.onChange(_.extend({}, @props.value, rhs: rhs))
@@ -35,13 +36,13 @@ module.exports = class ComparisonExprComponent extends React.Component
     lhsType = exprBuilder.getExprType(@props.value.lhs)
     if lhsType
       ops = exprBuilder.getComparisonOps(lhsType)
-      opControl = H.select 
-        key: "op",
-        className: "form-control input-sm",
-        style: { width: "auto", display: "inline-block", marginRight: 3 }
-        value: @props.value.op
-        onChange: @handleOpChange,
-          _.map(ops, (op) -> H.option(key: op.id, value: op.id, op.name))
+      currentOp = _.findWhere(ops, id: @props.value.op)
+
+      opControl = React.createElement(EditableLinkComponent, 
+        dropdownItems: ops
+        onDropdownItemClicked: @handleOpChange
+        if currentOp then currentOp.name
+        )
 
     if lhsType and @props.value.op
       rhsType = exprBuilder.getComparisonRhsType(lhsType, @props.value.op)
@@ -68,8 +69,10 @@ module.exports = class ComparisonExprComponent extends React.Component
             onChange: @handleRhsChange)
 
     return H.div style: { display: "inline-block" },
-      lhsControl,
-      opControl,
+      lhsControl
+      " "
+      opControl
+      " "
       rhsControl
 
 

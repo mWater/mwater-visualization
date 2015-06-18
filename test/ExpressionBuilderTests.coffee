@@ -86,6 +86,12 @@ describe "ExpressionBuilder", ->
       scalarExpr = { type: "scalar", table: "t1", joins: ['c2'], expr: fieldExpr, aggr: "sum" }
       assert.equal @exprBuilder.summarizeExpr(scalarExpr), "Sum of T1 > C2 > C1"
 
+    it "omits number of when aggr of id", ->
+      @schema.addColumn("t2", { id: "primary", type: "id", name: "Number of T2" })
+      fieldExpr = { type: "field", table: "t2", column: "primary" }
+      scalarExpr = { type: "scalar", table: "t1", joins: ['c2'], expr: fieldExpr, aggr: "count" }
+      assert.equal @exprBuilder.summarizeExpr(scalarExpr), "T1 > C2 > Number of T2"
+
   describe "getExprType", ->
     it 'gets field type', ->
       assert.equal @exprBuilder.getExprType({ type: "field", table: "t1", column: "c1" }), "text"

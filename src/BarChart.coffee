@@ -58,6 +58,14 @@ module.exports = class BarChart
       if value.expr
         design.table = value.expr.table
 
+    # Default y expr
+    if not design.aesthetics.y or not design.aesthetics.y.expr
+      if design.table 
+        # Get id column
+        idCol = _.findWhere(@schema.getColumns(design.table), type: "id")
+        if idCol
+          design.aesthetics.y = { expr: { type: "field", table: design.table, column: idCol.id }, aggr: "count" }
+
     # Default y aggr
     if design.aesthetics.y and design.aesthetics.y.expr and not design.aesthetics.y.aggr
       # Remove latest, as it is tricky to group by. TODO
@@ -73,10 +81,10 @@ module.exports = class BarChart
 
   validateDesign: (design) ->
     # Check that has x and y
-    if not design.aesthetics.y or not design.aesthetics.y.expr
-      return "Missing Y Axis"
     if not design.aesthetics.x or not design.aesthetics.x.expr
       return "Missing X Axis"
+    if not design.aesthetics.y or not design.aesthetics.y.expr
+      return "Missing Y Axis"
 
     error = null
     if not design.aesthetics.y.aggr

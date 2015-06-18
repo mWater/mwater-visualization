@@ -42,13 +42,13 @@ describe "BarChart", ->
     it "removes aesthetic if invalid expr", ->
       design = {
         aesthetics: {
-          x: { expr: { type: "field", table: "t1", column: "decimal" } }
-          y: { expr: { type: "field", table: "t1" } }
+          x: { expr: { type: "field", table: "t1" } }
+          y: { expr: { type: "field", table: "t1", column: "decimal" } }
         }
       }
       d = @barChart.cleanDesign(design)
 
-      assert not d.aesthetics.y.expr
+      assert not d.aesthetics.x.expr
 
     it "removes filter if invalid expr", ->
       design = {
@@ -59,10 +59,19 @@ describe "BarChart", ->
       }
 
       d = @barChart.cleanDesign(design)
-
       assert not d.aesthetics.filter
 
-    # it "defaults aggr of y", ->
+    it "defaults y if can count", ->
+      design = {
+        aesthetics: {
+          x: { expr: { type: "field", table: "t1", column: "decimal" } }
+        }
+      }
+      d = @barChart.cleanDesign(design)
+      assert.deepEqual d.aesthetics.y, {
+        aggr: "count"
+        expr: { type: "field", table: "t1", column: "primary" }
+      }
 
   describe "validateDesign", ->
     it "validates valid design", ->

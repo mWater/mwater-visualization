@@ -15,3 +15,34 @@
 .items-leave.items-leave-active {
  	opacity: 0.01;
 }
+
+.editable-link {
+	color: #478;
+	cursor: pointer;
+	display: inline-block;
+	position: relative;
+	padding: 2px;
+	border-radius: 5px;
+}
+
+.editable-link:hover {
+	background-color: #e7f0f3;
+}
+
+.editable-link .editable-link-remove {
+	position: absolute;
+	top: -6px;
+	right: -6px;
+	visibility: hidden;
+	font-size: 80%;
+	border-radius: 10;
+}
+
+.editable-link:hover .editable-link-remove {
+	visibility: visible;
+}
+
+.editable-link-remove:hover {
+	visibility: visible !important;
+	color: #639db0;
+}

@@ -83,9 +83,12 @@ module.exports = class ExpressionBuilder
         throw new Error("Unsupported type #{expr.type}")
 
   summarizeScalarExpr: (expr) ->
-    # Add aggr
+    # Add aggr if not count of id
     if expr.aggr
-      str = _.findWhere(@getAggrs(expr.expr), { id: expr.aggr }).name + " of "
+      if expr.aggr == "count" and @getExprType(expr.expr) == "id"
+        str = ""
+      else
+        str = _.findWhere(@getAggrs(expr.expr), { id: expr.aggr }).name + " of "
     else
       str = ""
 
@@ -187,11 +190,11 @@ module.exports = class ExpressionBuilder
     ops = []
     switch lhsType
       when "integer", "decimal"
-        ops.push({ id: "=", name: "=" })
-        ops.push({ id: ">", name: ">" })
-        ops.push({ id: ">=", name: ">=" })
-        ops.push({ id: "<", name: "<" })
-        ops.push({ id: "<=", name: "<=" })
+        ops.push({ id: "=", name: "equals" })
+        ops.push({ id: ">", name: "is greater than" })
+        ops.push({ id: ">=", name: "is greater or equal to" })
+        ops.push({ id: "<", name: "is less than" })
+        ops.push({ id: "<=", name: "is less than or equal to" })
       when "text"
         ops.push({ id: "~*", name: "matches" })
       when "date"
