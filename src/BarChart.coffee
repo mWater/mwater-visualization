@@ -122,6 +122,10 @@ module.exports = class BarChart
     expr = exprCompiler.compileExpr(expr: design.aesthetics.y.expr, tableAlias: "main")
     query.selects.push({ type: "select", expr: { type: "op", op: design.aesthetics.y.aggr, exprs: [expr] }, alias: "y" })
 
+    # Add where
+    if design.filter
+      query.where = exprCompiler.compileExpr(expr: design.filter, tableAlias: "main")
+
     return { main: query }
 
   # Options include 
@@ -133,6 +137,10 @@ module.exports = class BarChart
     # error = @validateDesign(@cleanDesign(options.design))
     # if error
     #   return H.div className: "alert alert-warning", error
+    rows = options.data.main
+    for row in rows
+      if not row.x
+        row.x = "None"
 
     # Create datum from query re    
     props = {
@@ -142,7 +150,7 @@ module.exports = class BarChart
       width: options.width
       height: options.height
       datum: [
-        { key: "main", values: options.data.main }
+        { key: "main", values: rows }
       ]
     }
 
