@@ -41,15 +41,6 @@ module.exports = class BarChartDesignerComponent extends React.Component
   #         value: @props.value.xAxis)
   #     H.p className: "help-block", "Field to group by"
 
-  renderYAesthetic: ->
-    React.createElement(AestheticComponent, 
-      title: "Value (Y) Axis"
-      schema: @props.schema, 
-      table: @props.design.table
-      types: ["decimal", "integer"]
-      value: @props.design.aesthetics.y
-      onChange: @handleAestheticChange.bind(this, "y"))
-
   renderXAesthetic: ->
     React.createElement(AestheticComponent, 
       title: "Category (X) Axis"
@@ -58,6 +49,17 @@ module.exports = class BarChartDesignerComponent extends React.Component
       types: ["enum", "text"]
       value: @props.design.aesthetics.x, 
       onChange: @handleAestheticChange.bind(this, "x"))
+
+  renderYAesthetic: ->
+    React.createElement(AestheticComponent, 
+      title: "Value (Y) Axis"
+      schema: @props.schema, 
+      table: @props.design.table
+      # types: ["decimal", "integer"]
+      # TODO should limit aggregated value to numeric
+      aggrRequired: true
+      value: @props.design.aesthetics.y
+      onChange: @handleAestheticChange.bind(this, "y"))
 
   renderFilter: ->
     # If no table, hide
@@ -79,18 +81,48 @@ module.exports = class BarChartDesignerComponent extends React.Component
       #     H.span className: "glyphicon glyphicon-info-sign"
       #     " "
       #     error
-      @renderYAesthetic()
       @renderXAesthetic()
+      @renderYAesthetic()
       @renderFilter()
 
 class AestheticComponent extends React.Component
+  @propTypes:
+    title: React.PropTypes.string.isRequired # Title for display and popups
+    schema: React.PropTypes.object.isRequired # schema to use
+
+    table: React.PropTypes.string # Limits table to this table
+    types: React.PropTypes.array # Optional types to limit to
+
+    value: React.PropTypes.object # Current value of expression
+    onChange: React.PropTypes.func.isRequired # Called when changes
+    aggrRequired: React.PropTypes.bool # True to require aggregation
+
   handleExprChange: (expr) =>
     @props.onChange(_.extend({}, @props.value, { expr: expr }))
+
+  handleAggrChange: (ev) =>
+    @props.onChange(_.extend({}, @props.value, { aggr: ev.target.value }))
+
+  renderAggr: ->
+    if @props.value and @props.aggrRequired and @props.value.expr
+      exprBuilder = new ExpressionBuilder(@props.schema)
+      aggrs = exprBuilder.getAggrs(@props.value.expr)
+
+      # Remove latest, as it is tricky to group by. TODO
+      aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
+
+      return H.select(
+        style: { width: "auto", display: "inline-block" }
+        className: "form-control input-sm"
+        value: @props.value.aggr 
+        onChange: @handleAggrChange,
+          _.map(aggrs, (aggr) => H.option(value: aggr.id, aggr.name)))
 
   render: ->
     return H.div className: "form-group",
       H.label null, @props.title
       H.div null, 
+        @renderAggr()
         React.createElement(ScalarExprComponent, 
           editorTitle: @props.title
           schema: @props.schema

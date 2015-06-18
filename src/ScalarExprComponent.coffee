@@ -36,6 +36,9 @@ module.exports = class ScalarExprComponent extends React.Component
     @props.onChange(@state.editorValue)
     @setState(editorOpen: false, editorValue: null)
 
+  handleRemove: =>
+    @props.onChange(null)
+
   render: ->
     exprBuilder = new ExpressionBuilder(@props.schema)
 
@@ -58,11 +61,17 @@ module.exports = class ScalarExprComponent extends React.Component
       editor
       H.input 
         type: "text", 
-        className: "form-control input-sm",
+        className: "form-control input-sm"
         readOnly: true, 
-        style: { backgroundColor: "white", cursor: "pointer" }
+        style: { backgroundColor: "white", cursor: "pointer", display: "inline-block", width: "auto" }
         value: if @props.value then exprBuilder.summarizeExpr(@props.value)
         placeholder: "Click to select..."
         onClick: @handleEditorOpen
+      if @props.value
+        H.button 
+          type: "button", 
+          className: "btn btn-sm btn-link", 
+          onClick: @handleRemove,
+            H.span(className: "glyphicon glyphicon-remove")
 
 

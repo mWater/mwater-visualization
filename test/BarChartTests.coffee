@@ -31,7 +31,7 @@ describe "BarChart", ->
         table: "t2"
         aesthetics: {
           x: { expr: { type: "field", table: "t1", column: "decimal" } }
-          y: { expr: { type: "field", table: "t2", column: "decimal" } }
+          y: { expr: { type: "field", table: "t2", column: "decimal" }, aggr: "sum" }
         }
       }
       d = @barChart.cleanDesign(design)
@@ -62,12 +62,14 @@ describe "BarChart", ->
 
       assert not d.aesthetics.filter
 
+    # it "defaults aggr of y", ->
+
   describe "validateDesign", ->
     it "validates valid design", ->
       design = {
         aesthetics: {
           x: { expr: { type: "field", table: "t1", column: "enum" } }
-          y: { expr: { type: "field", table: "t1", column: "decimal" } }
+          y: { expr: { type: "field", table: "t1", column: "decimal" }, aggr: "sum" }
         }
       }
       assert not @barChart.validateDesign(design)
@@ -88,12 +90,21 @@ describe "BarChart", ->
       }
       assert @barChart.validateDesign(design)
 
+    it "requires y aggr", ->
+      design = {
+        aesthetics: {
+          x: { expr: { type: "field", table: "t2", column: "enum" } }
+          y: { expr: { type: "field", table: "t2", column: "decimal" } }
+        }
+      }
+      assert @barChart.validateDesign(design)
+
   describe "createQueries", ->
     it "creates simple query, grouping by x aesthetic expr", ->
       design = {
         aesthetics: {
           x: { expr: { type: "field", table: "t1", column: "enum" } }
-          y: { expr: { type: "field", table: "t1", column: "decimal" } }
+          y: { expr: { type: "field", table: "t1", column: "decimal" }, aggr: "sum" }
         }
         table: "t1"
       }
@@ -104,10 +115,11 @@ describe "BarChart", ->
         type: "query"
         selects: [
           { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "x" }
-          { type: "select", expr: { type: "field", tableAlias: "main", column: "decimal" }, alias: "y" }
+          { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "decimal" }] }, alias: "y" }
         ]
         from: { type: "table", table: "t1", alias: "main" }
         groupBy: [1]
+        limit: 1000
       }
 
       assert _.isEqual(queries.main, expectedQuery), JSON.stringify(queries.main, null, 2)

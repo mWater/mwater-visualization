@@ -18,6 +18,7 @@ aesthetics:
   y: 
     expr: expression
     scale: scale
+    aggr: aggregation function to apply
   color:
     expr: expression
     scale: scale
@@ -33,6 +34,10 @@ module.exports = class BarChart
     @exprBuilder = new ExpressionBuilder(@schema)
 
   cleanDesign: (design) ->
+    # Fill in defaults
+    if not design.aesthetics
+      design.aesthetics = {}
+
     # Clone deep for now # TODO
     design = _.cloneDeep(design)
 
@@ -53,6 +58,14 @@ module.exports = class BarChart
       if value.expr
         design.table = value.expr.table
 
+    # Default y aggr
+    if design.aesthetics.y and design.aesthetics.y.expr and not design.aesthetics.y.aggr
+      # Remove latest, as it is tricky to group by. TODO
+      aggrs = @exprBuilder.getAggrs(design.aesthetics.y.expr)
+      aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
+
+      design.aesthetics.y.aggr = aggrs[0].id
+
     if design.filter
       design.filter = @exprBuilder.cleanExpr(design.filter, design.table)
 
@@ -60,12 +73,14 @@ module.exports = class BarChart
 
   validateDesign: (design) ->
     # Check that has x and y
-    if not design.aesthetics.x 
-      return "Missing X Axis"
-    if not design.aesthetics.y
+    if not design.aesthetics.y or not design.aesthetics.y.expr
       return "Missing Y Axis"
+    if not design.aesthetics.x or not design.aesthetics.x.expr
+      return "Missing X Axis"
 
     error = null
+    if not design.aesthetics.y.aggr
+      error = "Missing Y aggregation"
     error = error or @exprBuilder.validateExpr(design.aesthetics.x.expr)
     error = error or @exprBuilder.validateExpr(design.aesthetics.y.expr)
     error = error or @exprBuilder.validateExpr(design.filter)
@@ -90,10 +105,14 @@ module.exports = class BarChart
       selects: []
       from: { type: "table", table: design.table, alias: "main" }
       groupBy: [1] # X-axis
+      limit: 1000
     }
 
     query.selects.push({ type: "select", expr: exprCompiler.compileExpr(expr: design.aesthetics.x.expr, tableAlias: "main"), alias: "x" })
-    query.selects.push({ type: "select", expr: exprCompiler.compileExpr(expr: design.aesthetics.y.expr, tableAlias: "main"), alias: "y" })
+
+    # Y is aggregated
+    expr = exprCompiler.compileExpr(expr: design.aesthetics.y.expr, tableAlias: "main")
+    query.selects.push({ type: "select", expr: { type: "op", op: design.aesthetics.y.aggr, exprs: [expr] }, alias: "y" })
 
     return { main: query }
 
