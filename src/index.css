@@ -21,10 +21,12 @@
 	cursor: pointer;
 	display: inline-block;
 	position: relative;
+	padding: 2px;
+	border-radius: 5px;
 }
 
 .editable-link:hover {
-	text-decoration: underline;
+	background-color: #e7f0f3;
 }
 
 .editable-link .editable-link-remove {
@@ -33,7 +35,6 @@
 	right: -6px;
 	visibility: hidden;
 	font-size: 80%;
-	background-color: #EEE;
 	border-radius: 10;
 }
 
@@ -43,4 +44,5 @@
 
 .editable-link-remove:hover {
 	visibility: visible !important;
+	color: #639db0;
 }

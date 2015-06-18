@@ -83,9 +83,12 @@ module.exports = class ExpressionBuilder
         throw new Error("Unsupported type #{expr.type}")
 
   summarizeScalarExpr: (expr) ->
-    # Add aggr
+    # Add aggr if not count of id
     if expr.aggr
-      str = _.findWhere(@getAggrs(expr.expr), { id: expr.aggr }).name + " of "
+      if expr.aggr == "count" and @getExprType(expr.expr) == "id"
+        str = ""
+      else
+        str = _.findWhere(@getAggrs(expr.expr), { id: expr.aggr }).name + " of "
     else
       str = ""
 
