@@ -34,7 +34,7 @@ gulp.task "libs_css", ->
   return gulp.src([
     "./bower_components/bootstrap/dist/css/bootstrap.css"
     "./bower_components/bootstrap/dist/css/bootstrap-theme.css"
-    "./bower_components/nvd3/build/nv.d3.css"
+    "./bower_components/c3/c3.css"
   ]).pipe(concat("libs.css"))
     .pipe(gulp.dest("./dist/css/"))
 
@@ -46,7 +46,7 @@ gulp.task "libs_js", ->
     "./bower_components/backbone/backbone.js"
     "./bower_components/react/react-with-addons.js"
     "./bower_components/d3/d3.js"
-    "./bower_components/nvd3/build/nv.d3.js"
+    "./bower_components/c3/c3.js"
   ]).pipe(concat("libs.js"))
     .pipe(gulp.dest("./dist/js/"))
 

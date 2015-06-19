@@ -5,45 +5,36 @@ module.exports = class BarChartViewComponent extends React.Component
   componentDidMount: ->
     el = React.findDOMNode(@refs.chart)
 
-    # nv.addGraph =>
-    #   chart = nv.models.discreteBarChart()
-    #       .x((d) -> d.label)
-    #       .y((d) -> d.value)
-    #       .staggerLabels(true)
-    #       #.staggerLabels(historicalBarChart[0].values.length > 8)
-    #       .showValues(true)
-    #       .duration(250)
-    #       # .height(200)
-    #       # .width(300)
-    nv.addGraph =>
-      @chart = nv.models.multiBarChart()
-          # .x((d) -> d.label)
-          # .y((d) -> d.value)
-          # .staggerLabels(true)
-          #.staggerLabels(historicalBarChart[0].values.length > 8)
-          # .showValues(true)
-          .showLegend(false)
-          .stacked(true)
-          .showControls(false)
-          .duration(250)
-          # .height(200)
-          # .width(300)
+    # Create chart
+    @chart = c3.generate({
+        bindto: el
+        # data: {
+        #   columns: [
+        #     ["data1", 30, 200, 100, 400, 150, 250],
+        #   ]
+        #   type: "bar"
+        # }
+        legend: { hide: true }
+        axis: {
+          x: {
+            type: 'category'
+            categories: ['a', 'b', 'c', 'd']
+          }
+        }
+        size: { width: @props.width, height: @props.height }
+    })
 
-      @updateChart(@props)
-      return @chart
-      # nv.utils.windowResize(chart.update)
-      # return ChartTestComponent
+    # @chart.unfocus(['data1'], [1,3,5])
+    #d3.select(".c3-bars-data1").selectAll(".c3-bar").style("opacity", function(d,i) { return (i==3)?1:0.4 })
 
   componentWillReceiveProps: (props) ->
     @updateChart(props)
 
   updateChart: (props) =>
     el = React.findDOMNode(@refs.chart)
-    d3.select(el).datum(props.datum).call(@chart)
 
   render: ->
-    H.div style: { width: @props.width, height: @props.height }, 
-      H.svg ref: "chart"
+    H.div style: { width: @props.width, height: @props.height }, ref: "chart"
 
 # data = [
 #   { key: "Asadfsdfa", values: [

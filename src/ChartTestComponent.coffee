@@ -23,11 +23,12 @@ module.exports = class ChartTestComponent extends React.Component
 
     H.div className: "row",
       H.div className: "col-xs-6",
-        @props.chart.createViewElement(design: @state.design, data: data, width: "100%", height: 500)
+        @props.chart.createViewElement(design: @state.design, data: data, width: 500, height: 500)
       H.div className: "col-xs-6",
         @props.chart.createDesignerElement(design: @state.design, onChange: @handleDesignChange)
     
 data = {"main":[{"x":"broken","y":"48520"},{"x":null,"y":"2976"},{"x":"ok","y":"173396"},{"x":"maint","y":"12103"},{"x":"missing","y":"3364"}]}    
+
 design = {
   "aesthetics": {
     "x": {
