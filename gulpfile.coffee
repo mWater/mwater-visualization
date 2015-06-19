@@ -22,7 +22,7 @@ gulp.task 'copy', ->
     .pipe(gulp.dest('./lib/'))
 
 gulp.task "browserify", ->
-  shim(browserify("./demo.coffee",
+  shim(browserify("./drag.coffee",
     extensions: [".coffee"]
     basedir: "./src/"
   )).bundle()
@@ -76,9 +76,6 @@ gulp.task 'prepare_tests', ->
     .on('error', -> throw "Failed")
     .pipe(source('browserified.js'))
     .pipe(gulp.dest('./test'))
-
-gulp.task "watch", ->
-  return gulp.watch("./src/**", ["build"])
 
 gulp.task "build", gulp.parallel([
   "browserify"
