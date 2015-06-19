@@ -167,38 +167,45 @@ class Container extends React.Component
 
   renderBlocks: ->
     elems = []
-    for block in @props.blocks
-      # Don't render if moving
-      if @state.moveHover and @state.moveHover.dragInfo.id == block.id
-        continue
 
-      # Don't render if resizing
-      if @state.resizeHover and @state.resizeHover.dragInfo.id == block.id
-        continue
-
-      elems.push(@renderBlock(block))
-
-    # Add placeholder if moving
+    # Get hovered block if present
+    hoveredBlockId = null
+    hoveredBlockRect = null  # Non-snapped version of hover rectangle
     if @state.moveHover
-      { layouts, rectLayout } = @props.layoutEngine.insertRect(_.pluck(@props.blocks, "layout"), {
+      hoveredBlockId = @state.moveHover.dragInfo.id
+      hoveredBlockRect = {
         x: @state.moveHover.x
         y: @state.moveHover.y
         width: @state.moveHover.dragInfo.bounds.width
         height: @state.moveHover.dragInfo.bounds.height
-        })
+      }
 
-      # Show placeholder
-      elems.push(@renderPlaceholder(@props.layoutEngine.getLayoutBounds(rectLayout)))
-
-    # Add placeholder if resizing
     if @state.resizeHover
-      { layouts, rectLayout } = @props.layoutEngine.insertRect(_.pluck(@props.blocks, "layout"), {
+      hoveredBlockId = @state.resizeHover.dragInfo.id
+      hoveredBlockRect = {
         x: @state.resizeHover.dragInfo.bounds.x
         y: @state.resizeHover.dragInfo.bounds.y
         width: @state.resizeHover.width
         height: @state.resizeHover.height
-        })
+      }
 
+    # Skip blocks that are hovering
+    renderableBlocks = _.reject(@props.blocks, (block) => block.id == hoveredBlockId)
+    
+    # If hovering, displace other blocks
+    if hoveredBlockId
+      { layouts, rectLayout } = @props.layoutEngine.insertRect(_.pluck(renderableBlocks, "layout"), hoveredBlockRect)
+    else
+      # Unchanged if not hovering
+      layouts = _.pluck(renderableBlocks, "layout")
+      rectLayout = null
+
+    # Render renderable blocks
+    for block in renderableBlocks
+      elems.push(@renderBlock(block))
+
+    # Add placeholder if hovering
+    if rectLayout
       # Show placeholder
       elems.push(@renderPlaceholder(@props.layoutEngine.getLayoutBounds(rectLayout)))
 
