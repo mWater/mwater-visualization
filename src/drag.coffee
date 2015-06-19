@@ -73,6 +73,9 @@ class Widget extends React.Component
 # Render a child element as draggable, resizable block, injecting handle connectors
 # to child element
 class Block extends React.Component
+  @propTypes:
+    dragInfo: React.PropTypes.object.isRequired  # Opaque information to be used when a block is dragged
+
   render: ->
     React.cloneElement(React.Children.only(@props.children), {
       connectMoveHandle: @props.connectMoveHandle
@@ -81,15 +84,7 @@ class Block extends React.Component
 
 moveSpec = {
   beginDrag: (props, monitor, component) -> 
-    # props.onBeginMove()
-
-    return { 
-      block: props.block
-      width: props.width
-      height: props.height
-    }
-  endDrag: (props, monitor, component) ->
-    # props.onEndMove(monitor.didDrop())
+    return props.dragInfo
 }
 
 moveCollect = (connect, monitor) ->
@@ -99,15 +94,7 @@ MoveBlock = DragSource("block-move", moveSpec, moveCollect)(Block)
 
 resizeSpec = {
   beginDrag: (props, monitor, component) ->
-    return { 
-      block: props.block
-      width: props.width
-      height: props.height
-    }
-    # # props.onBeginResize()
-    # return { type: "resize" } # TODO
-  endDrag: (props, monitor, component) ->
-    # props.onEndResize(monitor.didDrop())
+    return props.dragInfo
 }
 
 resizeCollect = (connect, monitor) ->
@@ -128,7 +115,33 @@ class Container extends React.Component
     super
     @state = {}
 
-  renderElem: (layoutElem) =>
+  setMoveHover: (hoverInfo) ->
+    @setState(moveHover: hoverInfo)
+
+  componentWillReceiveProps: (nextProps) ->
+    # Reset hover blocks if not over
+    if not nextProps.isOver
+      # Defer to prevent "Cannot dispatch in the middle of a dispatch." error
+      _.defer () =>
+        @setState(moveHover: null, resizeHover: null)
+
+  renderPlaceholder: (bounds) ->
+    H.div style: { 
+      position: "absolute", 
+      left: bounds.x
+      top: bounds.y
+      width: bounds.width
+      height: bounds.height
+      border: "dashed 3px #DDD"
+      borderRadius: 5
+      padding: 5
+      position: "absolute"
+    }
+
+  renderElem: (index) =>
+    console.log index
+    layoutElem = @props.layoutElems[index]
+
     # Calculate bounds
     bounds = @props.layoutEngine.getLayoutBounds(layoutElem.layout)
 
@@ -139,13 +152,38 @@ class Container extends React.Component
       left: bounds.y
     }
 
+    # Create dragInfo which is all the info needed to drop the block
+    dragInfo = {
+      index: index
+      width: bounds.width
+      height: bounds.height
+    }
+
     # Clone element, injecting width, height and enclosing in a dnd block
     return H.div style: style,
-      React.createElement(MoveResizeBlock, {}, 
+      React.createElement(MoveResizeBlock, { dragInfo: dragInfo }, 
         React.cloneElement(layoutElem.elem, width: bounds.width, height: bounds.height))
 
   renderElems: ->
-    return _.map @props.layoutElems, @renderElem
+    elems = []
+    for index in [0...@props.layoutElems.length]
+      if @state.moveHover and @state.moveHover.dragInfo.index == index
+        continue
+      elems.push(@renderElem(index))
+
+    # Drag placeholder if dragging
+    if @state.moveHover
+      { layouts, rectLayout } = @props.layoutEngine.insertRect(_.pluck(@props.layoutElems, "layout"), {
+        x: @state.moveHover.x
+        y: @state.moveHover.y
+        width: @state.moveHover.dragInfo.width
+        height: @state.moveHover.dragInfo.height
+        })
+
+      # Drag placeholder
+      elems.push(@renderPlaceholder(@props.layoutEngine.getLayoutBounds(rectLayout)))
+
+    return elems
 
   render: ->
     style = {
@@ -205,18 +243,6 @@ class Container extends React.Component
   #       block: block
   #       )
 
-  # renderPlaceholder: (x, y, width, height) ->
-  #   H.div style: { 
-  #     position: "absolute", 
-  #     left: @props.width/@props.blocksAcross*x
-  #     top: @props.height/@props.blocksAcross*y
-  #     width: @props.width/@props.blocksAcross*width
-  #     height: @props.height/@props.blocksAcross*height
-  #     border: "dashed 3px #DDD"
-  #     borderRadius: 5
-  #     padding: 5
-  #     position: "absolute"
-  #   }
 
   # # Move block to new x, y
   # setMoveBlock: (block, x, y) ->
@@ -229,49 +255,37 @@ class Container extends React.Component
   #     if @state.resizeHover
   #       @setState(resizeHover: null)
 
-  # setMoveHover: (dragInfo) ->
-  #   @setState(moveHover: dragInfo)
-
-  # setResizeHover: (dragInfo) ->
-  #   @setState(resizeHover: dragInfo)
-
-  # dropMoveBlock: (dragInfo) ->
-  #   # TODO
-  #   console.log dragInfo
-
-  # dropResizeBlock: (dragInfo) ->
-  #   # TODO
-  #   console.log dragInfo
-
+  setResizeHover: (data) -> console.log data
+  dropMoveBlock: (data) -> 
+    @setState(draggingIndex: null)
+    console.log "DROP"
+    console.log data
+  dropResizeBlock: (data) -> console.log data
 
 targetSpec = {
   drop: (props, monitor, component) ->
     if monitor.getItemType() == "block-move"
       component.dropMoveBlock(
+        dragInfo: monitor.getItem()
         x: monitor.getClientOffset().x - (monitor.getInitialClientOffset().x - monitor.getInitialSourceClientOffset().x)
         y: monitor.getClientOffset().y - (monitor.getInitialClientOffset().y - monitor.getInitialSourceClientOffset().y)
-        width: monitor.getItem().width
-        height: monitor.getItem().height
-        block: monitor.getItem().block
         )
     if monitor.getItemType() == "block-resize"
       component.dropResizeBlock({
-        block: monitor.getItem().block
+        dragInfo: monitor.getItem()
         width: monitor.getItem().width + monitor.getDifferenceFromInitialOffset().x
         height: monitor.getItem().width + monitor.getDifferenceFromInitialOffset().y
         })
   hover: (props, monitor, component) ->
     if monitor.getItemType() == "block-move"
       component.setMoveHover(
-        block: monitor.getItem().block
+        dragInfo: monitor.getItem()
         x: monitor.getClientOffset().x - (monitor.getInitialClientOffset().x - monitor.getInitialSourceClientOffset().x)
         y: monitor.getClientOffset().y - (monitor.getInitialClientOffset().y - monitor.getInitialSourceClientOffset().y)
-        width: monitor.getItem().width
-        height: monitor.getItem().height
         )
     if monitor.getItemType() == "block-resize"
       component.setResizeHover({
-        block: monitor.getItem().block
+        dragInfo: monitor.getItem()
         width: monitor.getItem().width + monitor.getDifferenceFromInitialOffset().x
         height: monitor.getItem().width + monitor.getDifferenceFromInitialOffset().y
         })
@@ -289,20 +303,9 @@ DropContainer = DropTarget(["block-move", "block-resize"], targetSpec, targetCol
 
 class Root extends React.Component
   render: ->
-    blocks = [
-      { x: 1, y: 2, width: 3, height: 2, widget: { text: "A" }}
-    ]
-
-    widgetFactory = (options) =>
-      return React.createElement(Widget, 
-        text: options.widget.text, 
-        width: options.width, 
-        height: options.height
-        connectMoveHandle: options.connectMoveHandle
-        connectResizeHandle: options.connectResizeHandle)
-
     layoutElems = [
       { elem: React.createElement(Widget, text: "hi"), layout: { x: 1, y: 2, w: 3, h: 2 } }
+      { elem: React.createElement(Widget, text: "tim"), layout: { x: 5, y: 4, w: 3, h: 1 } }
     ]
 
     layoutEngine = new LayoutEngine(600, 12)
