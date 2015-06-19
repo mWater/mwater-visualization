@@ -102,21 +102,25 @@ resizeCollect = (connect, monitor) ->
 
 MoveResizeBlock = DragSource("block-resize", resizeSpec, resizeCollect)(MoveBlock)
 
-# Container contains layout elements
+# Container contains blocks to layout
 class Container extends React.Component
   @propTypes:
     layoutEngine: React.PropTypes.object.isRequired
-    layoutElems: React.PropTypes.array.isRequired # Array of { elem, layout }
+    blocks: React.PropTypes.array.isRequired # Array of { id, contents, elem, layout }
     width: React.PropTypes.number.isRequired # width in pixels
     height: React.PropTypes.number.isRequired # height in pixels
     connectDropTarget: React.PropTypes.func.isRequired # Injected by react-dnd wrapper
 
   constructor: (props) ->
     super
-    @state = {}
+    @state = { moveHover: null, resizeHover: null }
 
   setMoveHover: (hoverInfo) ->
     @setState(moveHover: hoverInfo)
+
+  setResizeHover: (hoverInfo) -> 
+    console.log hoverInfo
+    @setState(resizeHover: hoverInfo)
 
   componentWillReceiveProps: (nextProps) ->
     # Reset hover blocks if not over
@@ -138,49 +142,64 @@ class Container extends React.Component
       position: "absolute"
     }
 
-  renderElem: (index) =>
-    console.log index
-    layoutElem = @props.layoutElems[index]
-
+  renderBlock: (block) =>
     # Calculate bounds
-    bounds = @props.layoutEngine.getLayoutBounds(layoutElem.layout)
+    bounds = @props.layoutEngine.getLayoutBounds(block.layout)
 
     # Position absolutely
     style = { 
       position: "absolute"
-      top: bounds.x
-      left: bounds.y
+      left: bounds.x
+      top: bounds.y
     }
 
     # Create dragInfo which is all the info needed to drop the block
     dragInfo = {
-      index: index
-      width: bounds.width
-      height: bounds.height
+      id: block.id
+      contents: block.contents
+      bounds: bounds
     }
 
     # Clone element, injecting width, height and enclosing in a dnd block
     return H.div style: style,
       React.createElement(MoveResizeBlock, { dragInfo: dragInfo }, 
-        React.cloneElement(layoutElem.elem, width: bounds.width, height: bounds.height))
+        React.cloneElement(block.elem, width: bounds.width, height: bounds.height))
 
-  renderElems: ->
+  renderBlocks: ->
     elems = []
-    for index in [0...@props.layoutElems.length]
-      if @state.moveHover and @state.moveHover.dragInfo.index == index
+    for block in @props.blocks
+      # Don't render if moving
+      if @state.moveHover and @state.moveHover.dragInfo.id == block.id
         continue
-      elems.push(@renderElem(index))
 
-    # Drag placeholder if dragging
+      # Don't render if resizing
+      if @state.resizeHover and @state.resizeHover.dragInfo.id == block.id
+        continue
+
+      elems.push(@renderBlock(block))
+
+    # Add placeholder if moving
     if @state.moveHover
-      { layouts, rectLayout } = @props.layoutEngine.insertRect(_.pluck(@props.layoutElems, "layout"), {
+      { layouts, rectLayout } = @props.layoutEngine.insertRect(_.pluck(@props.blocks, "layout"), {
         x: @state.moveHover.x
         y: @state.moveHover.y
-        width: @state.moveHover.dragInfo.width
-        height: @state.moveHover.dragInfo.height
+        width: @state.moveHover.dragInfo.bounds.width
+        height: @state.moveHover.dragInfo.bounds.height
         })
 
-      # Drag placeholder
+      # Show placeholder
+      elems.push(@renderPlaceholder(@props.layoutEngine.getLayoutBounds(rectLayout)))
+
+    # Add placeholder if resizing
+    if @state.resizeHover
+      { layouts, rectLayout } = @props.layoutEngine.insertRect(_.pluck(@props.blocks, "layout"), {
+        x: @state.resizeHover.dragInfo.bounds.x
+        y: @state.resizeHover.dragInfo.bounds.y
+        width: @state.resizeHover.width
+        height: @state.resizeHover.height
+        })
+
+      # Show placeholder
       elems.push(@renderPlaceholder(@props.layoutEngine.getLayoutBounds(rectLayout)))
 
     return elems
@@ -195,7 +214,7 @@ class Container extends React.Component
     # Connect as a drop target
     @props.connectDropTarget(
       H.div style: style, 
-        @renderElems()
+        @renderBlocks()
     )
 
         # if blockElems.length > 0 then blockElems
@@ -255,7 +274,6 @@ class Container extends React.Component
   #     if @state.resizeHover
   #       @setState(resizeHover: null)
 
-  setResizeHover: (data) -> console.log data
   dropMoveBlock: (data) -> 
     @setState(draggingIndex: null)
     console.log "DROP"
@@ -286,8 +304,8 @@ targetSpec = {
     if monitor.getItemType() == "block-resize"
       component.setResizeHover({
         dragInfo: monitor.getItem()
-        width: monitor.getItem().width + monitor.getDifferenceFromInitialOffset().x
-        height: monitor.getItem().width + monitor.getDifferenceFromInitialOffset().y
+        width: monitor.getItem().bounds.width + monitor.getDifferenceFromInitialOffset().x
+        height: monitor.getItem().bounds.height + monitor.getDifferenceFromInitialOffset().y
         })
 }
 
@@ -303,16 +321,16 @@ DropContainer = DropTarget(["block-move", "block-resize"], targetSpec, targetCol
 
 class Root extends React.Component
   render: ->
-    layoutElems = [
-      { elem: React.createElement(Widget, text: "hi"), layout: { x: 1, y: 2, w: 3, h: 2 } }
-      { elem: React.createElement(Widget, text: "tim"), layout: { x: 5, y: 4, w: 3, h: 1 } }
+    blocks = [
+      { id: 1, contents: "hi", elem: React.createElement(Widget, text: "hi"), layout: { x: 1, y: 2, w: 3, h: 2 } }
+      { id: 2, contents: "there", elem: React.createElement(Widget, text: "tim"), layout: { x: 5, y: 4, w: 3, h: 1 } }
     ]
 
     layoutEngine = new LayoutEngine(600, 12)
     H.div null, 
       React.createElement(DropContainer, 
         layoutEngine: layoutEngine,
-        layoutElems: layoutElems
+        blocks: blocks
         width: 600, 
         height: 400)
 
