@@ -7,15 +7,20 @@ module.exports = class BarChartViewComponent extends React.Component
     @state = { selected: null }
 
   componentDidMount: ->
+    @createChart(@props)
+
+  createChart: (props) ->
+    if @chart
+      @chart.destroy()
+
     el = React.findDOMNode(@refs.chart)
 
     # Create chart
-    console.log @props.data
     @chart = c3.generate({
         bindto: el
         data: {
           type: "bar"
-          json: @props.data
+          json: props.data
           keys: { x: "x", value: ["y"] }
           names: { y: 'Value' } # Name the data
           onclick: @handleDataClick
@@ -28,19 +33,25 @@ module.exports = class BarChartViewComponent extends React.Component
           }
           # rotated: true
         }
-        size: { width: @props.width, height: @props.height }
+        size: { width: props.width, height: props.height }
     })
 
     @updateSelected()
 
-  componentWillReceiveProps: (props) ->
-    # Reload data
-    @chart.load({ 
-      json: props.data
-      keys: { x: "x", value: ["y"] }
-      names: { y: 'Value' } # Name the data
-    })
-    @setState(selected: null)
+  componentWillReceiveProps: (nextProps) ->
+    # Check if size changed
+    if @props.height != nextProps.height or @props.width != nextProps.width
+      @createChart(nextProps)
+      return
+
+    if not _.isEqual(@props.data, nextProps.data)
+      # Reload data
+      @chart.load({ 
+        json: props.data
+        keys: { x: "x", value: ["y"] }
+        names: { y: 'Value' } # Name the data
+      })
+      @setState(selected: null)
 
   # Update selected value
   updateSelected: =>
