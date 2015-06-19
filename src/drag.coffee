@@ -154,30 +154,35 @@ class Container extends React.Component
     blocks.push({ contents: dropInfo.dragInfo.contents, layout: rectLayout })
     @props.onLayoutUpdate(blocks)
   
-  # dropResizeBlock: (dropInfo) ->
-  #   # Stop hover
-  #   @setState(resizeHover: null)
+  dropResizeBlock: (dropInfo) ->
+    # Stop hover
+    @setState(resizeHover: null)
 
-  #   # TODO very duplicate code
-  #   # Remove existing block if matches
-  #   existingBlocks = _.without(@props.blocks, dropInfo.dragInfo.block)
+    blocks = @props.blocks.slice()
 
-  #   hoveredBlockRect = {
-  #     x: dropInfo.dragInfo.bounds.x
-  #     y: dropInfo.dragInfo.bounds.y
-  #     width: dropInfo.width
-  #     height: dropInfo.height
-  #   }
+    # TODO very duplicate code
+    # Remove existing block if dropped from same container
+    if dropInfo.dragInfo.container == this
+      # Remove block and element
+      blocks.splice(dropInfo.dragInfo.index, 1)
 
-  #   # Insert new block using layout
-  #   { layouts, rectLayout } = @props.layoutEngine.insertRect(_.pluck(existingBlocks, "layout"), hoveredBlockRect)
+    hoveredBlockRect = {
+      x: dropInfo.dragInfo.bounds.x
+      y: dropInfo.dragInfo.bounds.y
+      width: dropInfo.width
+      height: dropInfo.height
+    }
 
-  #   # Update existing blocks layouts
-  #   blocks = _.map(existingBlocks, (eb, i) => { contents: eb.contents, layout: layouts[i] })
+    # Insert new block using layout
+    layouts = _.pluck(blocks, "layout")
+    { layouts, rectLayout } = @props.layoutEngine.insertRect(layouts, hoveredBlockRect)
 
-  #   # Add new block
-  #   blocks.push({ contents: dropInfo.dragInfo.block.contents, layout: rectLayout })
-  #   @props.onLayoutUpdate(blocks)
+    # Update existing blocks layouts
+    blocks = _.map(blocks, (eb, i) => { contents: eb.contents, layout: layouts[i] })
+
+    # Add new block
+    blocks.push({ contents: dropInfo.dragInfo.contents, layout: rectLayout })
+    @props.onLayoutUpdate(blocks)
 
   componentWillReceiveProps: (nextProps) ->
     # Reset hover blocks if not over
