@@ -140,7 +140,7 @@ module.exports = class BarChart
     rows = options.data.main
     for row in rows
       if not row.x
-        row.x = "None"
+        row.x = "(None)"
 
     # Create datum from query re    
     props = {
@@ -149,9 +149,7 @@ module.exports = class BarChart
       onChange: options.onChange
       width: options.width
       height: options.height
-      datum: [
-        { key: "main", values: rows }
-      ]
+      data: rows
     }
 
     return React.createElement(BarChartViewComponent, props)
