@@ -110,6 +110,9 @@ class Container extends React.Component
     width: React.PropTypes.number.isRequired # width in pixels
     height: React.PropTypes.number.isRequired # height in pixels
     connectDropTarget: React.PropTypes.func.isRequired # Injected by react-dnd wrapper
+    onAddBlock: React.PropTypes.func.isRequired # Called with { content, layout } to add a block
+    onUpdateBlocks: React.PropTypes.func.isRequired # Called with array of { id, layout } to update layouts
+    onRemoveBlock: React.PropTypes.func.isRequired # Called with id of block to remove
 
   constructor: (props) ->
     super
@@ -121,6 +124,62 @@ class Container extends React.Component
   setResizeHover: (hoverInfo) -> 
     console.log hoverInfo
     @setState(resizeHover: hoverInfo)
+
+  # Called when a block is dropped
+  dropMoveBlock: (dropInfo) -> 
+    # Stop hover
+    @setState(moveHover: null)
+
+    # Remove existing block if matches
+    if _.findWhere(@props.blocks, { id: dropInfo.dragInfo.id })
+      @props.onRemoveBlock(dropInfo.dragInfo.id)
+
+    # Get remaining blocks
+    existingBlocks = _.reject(@props.blocks, (block) => block.id == dropInfo.dragInfo.id)
+
+    hoveredBlockRect = {
+      x: dropInfo.x
+      y: dropInfo.y
+      width: dropInfo.dragInfo.bounds.width
+      height: dropInfo.dragInfo.bounds.height
+    }
+
+    # Insert new block using layout
+    { layouts, rectLayout } = @props.layoutEngine.insertRect(_.pluck(existingBlocks, "layout"), hoveredBlockRect)
+
+    # Update existing blocks layouts
+    @props.onUpdateBlocks(_.map(_.range(0, layouts.length), (index) => { id: existingBlocks[index].id, layout: layouts[index] }))
+
+    # Add new block
+    @props.onAddBlock({ contents: dropInfo.dragInfo.contents, layout: rectLayout })
+  
+  dropResizeBlock: (dropInfo) ->
+    # Stop hover
+    @setState(resizeHover: null)
+
+    # TODO very duplicate code
+    # Remove existing block if matches
+    if _.findWhere(@props.blocks, { id: dropInfo.dragInfo.id })
+      @props.onRemoveBlock(dropInfo.dragInfo.id)
+
+    # Get remaining blocks
+    existingBlocks = _.reject(@props.blocks, (block) => block.id == dropInfo.dragInfo.id)
+
+    hoveredBlockRect = {
+      x: dropInfo.dragInfo.bounds.x
+      y: dropInfo.dragInfo.bounds.y
+      width: dropInfo.width
+      height: dropInfo.height
+    }
+
+    # Insert new block using layout
+    { layouts, rectLayout } = @props.layoutEngine.insertRect(_.pluck(existingBlocks, "layout"), hoveredBlockRect)
+
+    # Update existing blocks layouts
+    @props.onUpdateBlocks(_.map(_.range(0, layouts.length), (index) => { id: existingBlocks[index].id, layout: layouts[index] }))
+
+    # Add new block
+    @props.onAddBlock({ contents: dropInfo.dragInfo.contents, layout: rectLayout })
 
   componentWillReceiveProps: (nextProps) ->
     # Reset hover blocks if not over
@@ -224,69 +283,6 @@ class Container extends React.Component
         @renderBlocks()
     )
 
-        # if blockElems.length > 0 then blockElems
-        # placeholder
-    # if @state.moveHover
-    #   snappedX = Math.round(@state.moveHover.x/@props.width*12)
-    #   snappedY = Math.round(@state.moveHover.y/@props.height*12)
-    #   if snappedX < 0 then snappedX = 0
-    #   if snappedY < 0 then snappedY = 0
-
-    #   placeholder = @renderPlaceholder(snappedX, snappedY, 3, 2)
-
-    # # if @state.resize
-    # #   snappedX = Math.round(@state.resize.x/@props.width*12)
-    # #   snappedY = Math.round(@state.resize.y/@props.height*12)
-
-    # #   snapped = @renderPlaceholder(2, 2, snappedX + 3, snappedY + 2)
-
-    # # Skip rendering moving blocks
-    # blocks = @props.blocks
-
-    # blockElems = _.map blocks, (block) =>
-    #   if @state.moveHover
-    #     hoverBlock = @state.moveHover.block
-    #   if @state.resizeHover
-    #     hoverBlock = @state.resizeHover.block
-    #   @renderBlock(block, block == hoverBlock)
-
-
-  # renderElem: (block, hidden) ->
-  #   H.div style: { 
-  #     position: "absolute", 
-  #     display: if hidden then "none" else "block"
-  #     top: @props.height / @props.blocksAcross * block.y
-  #     left: @props.width / @props.blocksAcross * block.x },
-  #     React.createElement(MoveResizeBlock, 
-  #       # onBeginMove: @handleBeginMoveBlock.bind(this, block)
-  #       # onEndMove: @handleEndMoveBlock
-  #       # onBeginResize: -> console.log "BEGIN"
-  #       # onEndResize: (success) -> console.log "END #{success}"
-  #       width: @props.width / @props.blocksAcross * block.width, 
-  #       height: @props.height / @props.blocksAcross * block.height
-  #       widgetFactory: @props.widgetFactory
-  #       widget: block.widget
-  #       block: block
-  #       )
-
-
-  # # Move block to new x, y
-  # setMoveBlock: (block, x, y) ->
-  #   return
-  # componentWillReceiveProps: (nextProps) ->
-  #   # Reset hover blocks if not over
-  #   if not nextProps.isOver
-  #     if @state.moveHover
-  #       @setState(moveHover: null)
-  #     if @state.resizeHover
-  #       @setState(resizeHover: null)
-
-  dropMoveBlock: (data) -> 
-    @setState(draggingIndex: null)
-    console.log "DROP"
-    console.log data
-  dropResizeBlock: (data) -> console.log data
-
 targetSpec = {
   drop: (props, monitor, component) ->
     if monitor.getItemType() == "block-move"
@@ -298,8 +294,8 @@ targetSpec = {
     if monitor.getItemType() == "block-resize"
       component.dropResizeBlock({
         dragInfo: monitor.getItem()
-        width: monitor.getItem().width + monitor.getDifferenceFromInitialOffset().x
-        height: monitor.getItem().width + monitor.getDifferenceFromInitialOffset().y
+        width: monitor.getItem().bounds.width + monitor.getDifferenceFromInitialOffset().x
+        height: monitor.getItem().bounds.height + monitor.getDifferenceFromInitialOffset().y
         })
   hover: (props, monitor, component) ->
     if monitor.getItemType() == "block-move"
@@ -325,19 +321,50 @@ targetCollect = (connect, monitor) ->
 
 DropContainer = DropTarget(["block-move", "block-resize"], targetSpec, targetCollect)(Container)
 
-
 class Root extends React.Component
-  render: ->
-    blocks = [
-      { id: 1, contents: "hi", elem: React.createElement(Widget, text: "hi"), layout: { x: 1, y: 2, w: 3, h: 2 } }
-      { id: 2, contents: "there", elem: React.createElement(Widget, text: "tim"), layout: { x: 5, y: 4, w: 3, h: 1 } }
-    ]
+  constructor: ->
+    super
+    @nextBlockId = 2
 
+    @state = {
+      blocks: [
+        { id: 0, contents: "hi", elem: React.createElement(Widget, text: "hi"), layout: { x: 1, y: 2, w: 3, h: 2 } }
+        { id: 1, contents: "there", elem: React.createElement(Widget, text: "tim"), layout: { x: 5, y: 4, w: 3, h: 1 } }
+      ] 
+    }
+
+  handleAddBlock: (add) =>
+    blocks = @state.blocks.slice()
+    blocks.push({
+      id: @nextBlockId
+      contents: add.contents
+      elem: React.createElement(Widget, text: add.contents)
+      layout: add.layout
+      })
+    @nextBlockId += 1
+    @setState(blocks: blocks)
+
+  handleUpdateBlocks: (updates) =>
+    blocks = @state.blocks.slice()
+    for update in updates
+      index = _.findIndex(blocks, (block) => block.id == update.id)
+      # Copy over layout
+      if index >= 0
+        blocks[index] = _.extend({}, blocks[index], { layout: update.layout })
+    @setState(blocks: blocks)
+
+  handleRemoveBlock: (id) =>
+    @setState(blocks: _.reject(@state.blocks, (block) => block.id == id))
+
+  render: ->
     layoutEngine = new LayoutEngine(600, 12)
     H.div null, 
       React.createElement(DropContainer, 
         layoutEngine: layoutEngine,
-        blocks: blocks
+        blocks: @state.blocks
+        onAddBlock: @handleAddBlock
+        onUpdateBlocks: @handleUpdateBlocks
+        onRemoveBlock: @handleRemoveBlock
         width: 600, 
         height: 400)
 
