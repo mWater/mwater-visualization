@@ -1,98 +1,68 @@
+React = require 'react'
 H = React.DOM
-JoinExprTreeComponent = require './JoinExprTreeComponent' 
-ReactSelect = require 'react-select'
-DesignValidator = require './DesignValidator'
-SaveCancelModalComponent = require './SaveCancelModalComponent'
-HoverEditComponent = require './HoverEditComponent'
+ActionCancelModalComponent = require './ActionCancelModalComponent'
+ScalarExprEditorComponent = require './ScalarExprEditorComponent'
+ExpressionBuilder = require './ExpressionBuilder'
+EditableLinkComponent = require './EditableLinkComponent'
 
-module.exports = ScalarExprComponent = React.createClass {
-  render: ->
-    editor = React.createElement(SaveCancelModalComponent, { 
-        title: "Select Expression"
-        initialValue: @props.expr
-        onChange: @props.onChange
-        # onValidate: (data) =>
-        #   designValidator.validateExpr(data)
-        },
-          React.createElement(ScalarExprEditorComponent, schema: @props.schema, baseTableId: @props.baseTableId)
-      )
+# Component which displays a scalar expression and allows editing/selecting it
+# by clicking.
+module.exports = class ScalarExprComponent extends React.Component
+  @propTypes:
+    schema: React.PropTypes.object.isRequired
 
-    React.createElement HoverEditComponent, 
-      editor: editor,
-        H.input 
-          className: "form-control input-sm",
-          readOnly: true, 
-          type: "text", 
-          style: { backgroundColor: "white", cursor: "pointer" }
-          value: if @props.expr then @props.schema.summarizeExpr(@props.expr) else "Select..."
-}
-
-ScalarExprEditorComponent = React.createClass {
-  handleJoinExprSelect: (joinExpr) ->
-    # Create new expr
-    scalar = _.extend({}, @props.value, { type: "scalar", baseTableId: @props.baseTableId, expr: joinExpr.expr, joinIds: joinExpr.joinIds })
-
-    # Clean
-    scalar = new DesignValidator(@props.schema).cleanScalarExpr(scalar)
-
-    @props.onChange(scalar)
-
-  handleAggrChange: (aggrId) ->
-    # Create new expr
-    scalar = _.extend({}, @props.value, { aggrId: aggrId })
-
-    # Clean
-    scalar = new DesignValidator(@props.schema).cleanScalarExpr(scalar)
+    table: React.PropTypes.string # Optional table to restrict selections to (can still follow joins to other tables)
+    types: React.PropTypes.array # Optional types to limit to
+    editorTitle: React.PropTypes.string # Title of editor popup
     
-    @props.onChange(scalar)
+    value: React.PropTypes.object # Current value of expression
+    onChange: React.PropTypes.func.isRequired # Called when changes
 
-  handleWhereChange: (where) ->
-    # Create new expr
-    scalar = _.extend({}, @props.value, { where: where })
+  constructor: ->
+    super
+    # editorValue is set to the currently being edited value
+    # editorOpen is true if editing
+    @state = { editorValue: null, editorOpen: false }
 
-    # Clean
-    scalar = new DesignValidator(@props.schema).cleanScalarExpr(scalar)
-    
-    @props.onChange(scalar)
+  handleEditorOpen: => @setState(editorValue: @props.value, editorOpen: true)
+
+  handleEditorCancel: => @setState(editorValue: null, editorOpen: false)
+
+  handleEditorChange: (val) => 
+    newVal = new ExpressionBuilder(@props.schema).cleanScalarExpr(val)
+    @setState(editorValue: newVal)
+
+  handleEditorSave: =>
+    # TODO validate
+    @props.onChange(@state.editorValue)
+    @setState(editorOpen: false, editorValue: null)
+
+  handleRemove: =>
+    @props.onChange(null)
 
   render: ->
-    # Create tree 
-    tree = @props.schema.getJoinExprTree({ baseTableId: @props.baseTableId })
+    exprBuilder = new ExpressionBuilder(@props.schema)
 
-    # Create list of aggregates
-    # Hide if uuid expression as can only be counted (TODO: use primary key instead?)
-    if @props.value and @props.schema.isAggrNeeded(@props.value.joinIds) and @props.schema.getExprType(@props.value.expr) != "uuid"
-      options = _.map(@props.schema.getAggrs(@props.value.expr), (aggr) -> { value: aggr.id, label: aggr.name })
-      aggrs = H.div null,
-        H.br()
-        H.label null, "Aggregate by"
-        React.createElement(ReactSelect, { 
-          value: @props.value.aggrId, 
-          options: options 
-          onChange: @handleAggrChange
-        })
+    # Display editor modal if editing
+    if @state.editorOpen
+      editor = React.createElement(ActionCancelModalComponent, { 
+          title: @props.editorTitle
+          onAction: @handleEditorSave
+          onCancel: @handleEditorCancel
+          },
+            React.createElement(ScalarExprEditorComponent, 
+              schema: @props.schema
+              table: @props.table 
+              types: @props.types
+              value: @state.editorValue
+              onChange: @handleEditorChange)
+        )
 
-    # TODO remove as well as hide this
-    if @props.value and @props.schema.isAggrNeeded(@props.value.joinIds)
-      LogicalExprComponent = require './LogicalExprComponent'
-      whereElem = H.div null,
-        H.br()
-        H.label null, "Filter Aggregation"
-        React.createElement(LogicalExprComponent, 
-          schema: @props.schema, 
-          baseTableId: @props.schema.getExprTable(@props.value.expr).id,
-          expr: @props.value.where
-          onChange: @handleWhereChange
-          )
+    H.div style: { display: "inline-block" },
+      editor
+      React.createElement(EditableLinkComponent, 
+        onClick: @handleEditorOpen
+        onRemove: if @props.value then @handleRemove,
+        if @props.value then exprBuilder.summarizeExpr(@props.value) else H.i(null, "Select...")
+        )
 
-    H.div null, 
-      H.label null, "Expression"
-      H.div style: { overflowY: "scroll", height: 350, border: "solid 1px #CCC" },
-        React.createElement(JoinExprTreeComponent, 
-          tree: tree, 
-          onSelect: @handleJoinExprSelect, 
-          selectedValue: (if @props.value then { expr: @props.value.expr, joinIds: @props.value.joinIds }))
-      H.div style: { width: "20em" }, aggrs
-      H.br()
-      whereElem
-}

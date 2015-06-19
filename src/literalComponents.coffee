@@ -1,13 +1,15 @@
+React = require 'react'
 H = React.DOM
+ReactSelect = require 'react-select'
 
 exports.TextComponent = React.createClass {
   propTypes: {
-    expr: React.PropTypes.object
+    value: React.PropTypes.object
     onChange: React.PropTypes.func.isRequired 
   }
 
   handleChange: (ev) ->
-    @props.onChange({ type: "text", value: ev.target.value })
+    @props.onChange({ type: "literal", valueType: "text", value: ev.target.value })
 
   render: ->
     H.input 
@@ -15,12 +17,12 @@ exports.TextComponent = React.createClass {
       style: { width: "20em", display: "inline-block" },
       type: "text", 
       onChange: @handleChange
-      value: if @props.expr then @props.expr.value
+      value: if @props.value then @props.value.value
 }
 
 exports.DecimalComponent = React.createClass {
   propTypes: {
-    expr: React.PropTypes.object
+    value: React.PropTypes.object
     onChange: React.PropTypes.func.isRequired 
   }
 
@@ -38,7 +40,7 @@ exports.DecimalComponent = React.createClass {
       return @setState(invalid: true, invalidText: ev.target.value)
 
     @setState(invalid: false, invalidText: null)
-    @props.onChange({ type: "decimal", value: val })
+    @props.onChange({ type: "literal", valueType: "decimal", value: val })
     
   render: ->
     H.div 
@@ -49,12 +51,12 @@ exports.DecimalComponent = React.createClass {
           type: "text", 
           style: { width: "6em", display: "inline-block" },
           onChange: @handleChange,
-          value: (if @state.invalid then @state.invalidText) or (if @props.expr then @props.expr.value)
+          value: (if @state.invalid then @state.invalidText) or (if @props.value then @props.value.value)
 }
 
 exports.IntegerComponent = React.createClass {
   propTypes: {
-    expr: React.PropTypes.object
+    value: React.PropTypes.object
     onChange: React.PropTypes.func.isRequired 
   }
 
@@ -72,7 +74,7 @@ exports.IntegerComponent = React.createClass {
       return @setState(invalid: true, invalidText: ev.target.value)
 
     @setState(invalid: false, invalidText: null)
-    @props.onChange({ type: "integer", value: val })
+    @props.onChange({ type: "literal", valueType: "integer", value: val })
     
   render: ->
     H.div 
@@ -82,31 +84,61 @@ exports.IntegerComponent = React.createClass {
           className: "form-control input-sm",
           type: "text", 
           onChange: @handleChange,
-          value: (if @state.invalid then @state.invalidText) or (if @props.expr then @props.expr.value)
+          value: (if @state.invalid then @state.invalidText) or (if @props.value then @props.value.value)
 }
 
 exports.EnumComponent = React.createClass {
   propTypes: {
-    expr: React.PropTypes.object
+    value: React.PropTypes.object
     onChange: React.PropTypes.func.isRequired 
     enumValues: React.PropTypes.array.isRequired
   }
 
   handleChange: (ev) ->
-    @props.onChange({ type: "enum", value: ev.target.value })
+    if ev.target.value
+      @props.onChange({ type: "literal", valueType: "enum", value: ev.target.value })
+    else
+      @props.onChange(null)
 
   render: ->
     H.select 
       className: "form-control input-sm",
       style: { width: "auto", display: "inline-block" }
-      value: if @props.expr then @props.expr.value
+      value: if @props.value then @props.value.value
       onChange: @handleChange,
+        H.option(key: "null", value: "", "")
         _.map(@props.enumValues, (val) -> H.option(key: val.id, value: val.id, val.name))
 }
 
+# Component which displays an array of enums
+exports.EnumArrComponent = class EnumArrComponent extends React.Component
+  @propTypes: 
+    value: React.PropTypes.object
+    onChange: React.PropTypes.func.isRequired 
+    enumValues: React.PropTypes.array.isRequired # Array of id and name
+
+  handleChange: (val) =>
+    value = if val then val.split("\n") else []
+    @props.onChange({ type: "literal", valueType: "enum[]", value: value })
+
+  render: ->
+    value = null
+    if @props.value and @props.value.value.length > 0 
+      value = @props.value.value.join("\n")
+    console.log value
+
+    options = _.map(@props.enumValues, (val) -> { value: val.id, label: val.name })
+    React.createElement(ReactSelect, { 
+      value: value
+      multi: true
+      delimiter: "\n"
+      options: options 
+      onChange: @handleChange
+    })
+
 exports.DateComponent = React.createClass {
   propTypes: {
-    expr: React.PropTypes.object
+    value: React.PropTypes.object
     onChange: React.PropTypes.func.isRequired 
   }
 
@@ -123,7 +155,7 @@ exports.DateComponent = React.createClass {
       return @setState(invalid: true, invalidText: ev.target.value)
 
     @setState(invalid: false, invalidText: null)
-    @props.onChange({ type: "date", value: ev.target.value })
+    @props.onChange({ type: "literal", valueType: "date", value: ev.target.value })
     
   render: ->
     H.div 
@@ -134,5 +166,5 @@ exports.DateComponent = React.createClass {
           placeholder: "YYYY-MM-DD",
           type: "text", 
           onChange: @handleChange,
-          value: (if @state.invalid then @state.invalidText) or (if @props.expr then @props.expr.value)
+          value: (if @state.invalid then @state.invalidText) or (if @props.value then @props.value.value)
 }

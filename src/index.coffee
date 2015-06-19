@@ -1,5 +1,7 @@
 
 exports.Schema = require './Schema'
 exports.LogicalExprComponent = require './LogicalExprComponent'
-exports.DesignValidator = require './DesignValidator'
-exports.DesignCompiler = require './DesignCompiler'
+exports.ExpressionBuilder = require './ExpressionBuilder'
+exports.ExpressionCompiler = require './ExpressionCompiler'
+exports.ScalarExprComponent = require './ScalarExprComponent'
+exports.BarChart = require './BarChart'

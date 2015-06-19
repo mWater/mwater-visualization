@@ -1,3 +1,4 @@
+React = require 'react'
 H = React.DOM
 
 module.exports = ListControl = React.createClass {

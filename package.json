@@ -1,6 +1,6 @@
 {
   "name": "mwater-visualization",
-  "version": "0.1.0",
+  "version": "0.2.4",
   "description": "Visualization library",
   "repository": "git@github.com:mWater/mwater-visualization.git",
   "main": "lib/index.js",
@@ -17,7 +17,6 @@
   "license": "",
   "dependencies": {
     "backbone": "~1.1.2",
-    "freezer-js": "^0.5.1",
     "lodash": "~2.4.1",
     "react": "^0.13.2",
     "react-dnd": "^1.1.1",

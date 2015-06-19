@@ -1,33 +1,29 @@
 assert = require('chai').assert
 fixtures = require './fixtures'
 
-DesignCompiler = require '../src/DesignCompiler'
+ExpressionCompiler = require '../src/ExpressionCompiler'
 
-describe "DesignCompiler", ->
+describe "ExpressionCompiler", ->
   before ->
-    @dc = new DesignCompiler(fixtures.simpleSchema())
+    @ec = new ExpressionCompiler(fixtures.simpleSchema())
 
   it "compiles field", ->
-    jql = @dc.compileExpr(expr: { type: "field", tableId: "t1", columnId: "integer" }, baseTableId: "t1", baseTableAlias: "T1")
+    jql = @ec.compileExpr(expr: { type: "field", table: "t1", column: "integer" }, tableAlias: "T1")
     assert _.isEqual jql, {
       type: "field"
       tableAlias: "T1"
       column: "integer"
     }
 
-  it "checks baseTable of field", ->
-    assert.throws () =>
-      @dc.compileExpr(expr: { type: "field", tableId: "t1", columnId: "integer" }, baseTableId: "t2", baseTableAlias: "T2")
-
   it "compiles scalar with no joins, simplifying", ->
-    expr = { type: "scalar", expr: { type: "field", tableId: "t1", columnId: "integer" }, joinIds: [] }
-    jql = @dc.compileExpr(expr: expr, baseTableId: "t1", baseTableAlias: "T1")
+    expr = { type: "scalar", table: "t1", expr: { type: "field", table: "t1", column: "integer" }, joins: [] }
+    jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
 
     assert _.isEqual(jql, { type: "field", tableAlias: "T1", column: "integer" }), JSON.stringify(jql, null, 2)
 
   it "compiles scalar with one join", ->
-    expr = { type: "scalar", expr: { type: "field", tableId: "t2", columnId: "integer" }, joinIds: ["1-2"] }
-    jql = @dc.compileExpr(expr: expr, baseTableId: "t1", baseTableAlias: "T1")
+    expr = { type: "scalar", table: "t1", expr: { type: "field", table: "t2", column: "integer" }, joins: ["1-2"] }
+    jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
 
     assert _.isEqual(jql, {
       type: "scalar"
@@ -40,8 +36,8 @@ describe "DesignCompiler", ->
     }), JSON.stringify(jql, null, 2)
 
   it "compiles scalar with one join and sql aggr", ->
-    expr = { type: "scalar", expr: { type: "field", tableId: "t2", columnId: "integer" }, joinIds: ["1-2"], aggrId: "count" }
-    jql = @dc.compileExpr(expr: expr, baseTableId: "t1", baseTableAlias: "T1")
+    expr = { type: "scalar", table: "t1", expr: { type: "field", table: "t2", column: "integer" }, joins: ["1-2"], aggr: "count" }
+    jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
 
     assert _.isEqual(jql, {
       type: "scalar"
@@ -54,8 +50,8 @@ describe "DesignCompiler", ->
     }), JSON.stringify(jql, null, 2)
 
   it "compiles scalar with one join and last aggr", ->
-    expr = { type: "scalar", expr: { type: "field", tableId: "t2", columnId: "integer" }, joinIds: ["1-2"], aggrId: "last" }
-    jql = @dc.compileExpr(expr: expr, baseTableId: "t1", baseTableAlias: "T1")
+    expr = { type: "scalar", table: "t1", expr: { type: "field", table: "t2", column: "integer" }, joins: ["1-2"], aggr: "last" }
+    jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
 
     refJql = {
       type: "scalar"
@@ -72,8 +68,8 @@ describe "DesignCompiler", ->
     assert _.isEqual(jql, refJql), "\n" + JSON.stringify(jql) + "\n" + JSON.stringify(refJql)
 
   it "compiles scalar with two joins", -> 
-    expr = { type: "scalar", expr: { type: "field", tableId: "t1", columnId: "integer" }, joinIds: ["1-2", "2-1"], aggrId: "count" }
-    jql = @dc.compileExpr(expr: expr, baseTableId: "t1", baseTableAlias: "T1")
+    expr = { type: "scalar", table: "t1", expr: { type: "field", table: "t1", column: "integer" }, joins: ["1-2", "2-1"], aggr: "count" }
+    jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
 
     assert _.isEqual(jql, {
       type: "scalar"
@@ -106,14 +102,15 @@ describe "DesignCompiler", ->
             "baseTableId": "t2",
             "expr": {
               "type": "field",
-              "tableId": "t2",
-              "columnId": "decimal"
+              "table": "t2",
+              "column": "decimal"
             },
-            "joinIds": []
+            "joins": []
           },
           "op": "=",
           "rhs": {
-            "type": "decimal",
+            "type": "literal",
+            "valueType": "decimal",
             "value": 3
           }
         }
@@ -122,11 +119,12 @@ describe "DesignCompiler", ->
 
     expr = { 
       type: "scalar", 
-      expr: { type: "field", tableId: "t2", columnId: "integer" }, 
-      joinIds: ["1-2"], 
+      table: "t1",      
+      expr: { type: "field", table: "t2", column: "integer" }, 
+      joins: ["1-2"], 
       where: where
     }
-    jql = @dc.compileExpr(expr: expr, baseTableId: "t1", baseTableAlias: "T1")
+    jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
 
     assert _.isEqual(jql, {
       type: "scalar"
@@ -152,22 +150,22 @@ describe "DesignCompiler", ->
     }), JSON.stringify(jql, null, 2)
 
   it "compiles literals", ->
-    assert.deepEqual @dc.compileExpr(expr: { type: "text", value: "abc" }), { type: "literal", value: "abc" }
-    assert.deepEqual @dc.compileExpr(expr: { type: "integer", value: 123 }), { type: "literal", value: 123 }
-    assert.deepEqual @dc.compileExpr(expr: { type: "decimal", value: 123.4 }), { type: "literal", value: 123.4 }
-    assert.deepEqual @dc.compileExpr(expr: { type: "enum", value: "id1" }), { type: "literal", value: "id1" }
-    assert.deepEqual @dc.compileExpr(expr: { type: "boolean", value: true }), { type: "literal", value: true }
+    assert.deepEqual @ec.compileExpr(expr: { type: "literal", valueType: "text", value: "abc" }), { type: "literal", value: "abc" }
+    assert.deepEqual @ec.compileExpr(expr: { type: "literal", valueType: "integer", value: 123 }), { type: "literal", value: 123 }
+    assert.deepEqual @ec.compileExpr(expr: { type: "literal", valueType: "decimal", value: 123.4 }), { type: "literal", value: 123.4 }
+    assert.deepEqual @ec.compileExpr(expr: { type: "literal", valueType: "enum", value: "id1" }), { type: "literal", value: "id1" }
+    assert.deepEqual @ec.compileExpr(expr: { type: "literal", valueType: "boolean", value: true }), { type: "literal", value: true }
 
   describe "comparisons", ->
     it "compiles =", ->
       expr = { 
         type: "comparison"
         op: "="
-        lhs: { type: "field", tableId: "t1", columnId: "integer" }
-        rhs: { type: "integer", value: 3 }
+        lhs: { type: "field", table: "t1", column: "integer" }
+        rhs: { type: "literal", valueType: "integer", value: 3 }
       }
 
-      jql = @dc.compileExpr(expr: expr, baseTableId: "t1", baseTableAlias: "T1")
+      jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
 
       assert _.isEqual(jql, {
         type: "op"
@@ -177,11 +175,31 @@ describe "DesignCompiler", ->
           { type: "literal", value: 3 }
         ]
         }), JSON.stringify(jql, null, 2)
+
+    it "compiles = any", ->
+      expr = { 
+        type: "comparison", op: "= any", 
+        lhs: { type: "field", table: "t1", column: "enum" } 
+        rhs: { type: "literal", valueType: "enum[]", value: ["a", "b"] }
+      }
+
+      jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
+
+      assert _.isEqual(jql, {
+        type: "op"
+        op: "="
+        modifier: "any"
+        exprs: [
+          { type: "field", tableAlias: "T1", column: "enum" }
+          { type: "literal", value: ["a", "b"] }
+        ]
+        }), JSON.stringify(jql, null, 2)
+
     
     it "compiles = true", ->
-      expr = { type: "comparison", op: "= true", lhs: { type: "field", tableId: "t1", columnId: "integer" } }
+      expr = { type: "comparison", op: "= true", lhs: { type: "field", table: "t1", column: "integer" } }
 
-      jql = @dc.compileExpr(expr: expr, baseTableId: "t1", baseTableAlias: "T1")
+      jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
 
       assert _.isEqual(jql, {
         type: "op"
@@ -194,11 +212,11 @@ describe "DesignCompiler", ->
 
   describe "logicals", ->
     it "simplifies logical", ->
-      expr1 = { type: "comparison", op: "= true", lhs: { type: "field", tableId: "t1", columnId: "integer" } }
+      expr1 = { type: "comparison", op: "= true", lhs: { type: "field", table: "t1", column: "integer" } }
 
       expr = { type: "logical", op: "and", exprs: [expr1] }
 
-      jql = @dc.compileExpr(expr: expr, baseTableId: "t1", baseTableAlias: "T1")
+      jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
 
       assert _.isEqual(jql, 
         {
@@ -212,12 +230,12 @@ describe "DesignCompiler", ->
       ), JSON.stringify(jql, null, 2)
 
     it "compiles logical", ->
-      expr1 = { type: "comparison", op: "= true", lhs: { type: "field", tableId: "t1", columnId: "integer" } }
+      expr1 = { type: "comparison", op: "= true", lhs: { type: "field", table: "t1", column: "integer" } }
 
-      expr2 = { type: "comparison", op: "= false", lhs: { type: "field", tableId: "t1", columnId: "decimal" } }
+      expr2 = { type: "comparison", op: "= false", lhs: { type: "field", table: "t1", column: "decimal" } }
 
       expr = { type: "logical", op: "and", exprs: [expr1, expr2] }
-      jql = @dc.compileExpr(expr: expr, baseTableId: "t1", baseTableAlias: "T1")
+      jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
 
       assert _.isEqual(jql, 
         { type: "op", op: "and", exprs: [
