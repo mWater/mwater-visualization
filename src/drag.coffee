@@ -27,9 +27,11 @@ class Widget extends React.Component
       height: 20
     }
 
+    myData = _.cloneDeep(data)
+    myData[0].y = @props.data
     return @props.connectMoveHandle(
       H.div style: style,
-        React.createElement(BarChartViewComponent, width: @props.width - 10, height: @props.height - 10, data: data)
+        React.createElement(BarChartViewComponent, width: @props.width - 10, height: @props.height - 10, data: myData)
         # "#{@props.text}"
         @props.connectResizeHandle(
           H.div style: resizeHandleStyle
@@ -41,9 +43,9 @@ class Root extends React.Component
     super
     @state = {
       blocks: [
-        { contents: "Widget 1", layout: { x: 0, y: 0, w: 4, h: 3 } }
-        { contents: "Widget 2", layout: { x: 4, y: 0, w: 4, h: 3 } }
-        { contents: "Widget 3", layout: { x: 8, y: 0, w: 4, h: 3 } }
+        { contents: 40000, layout: { x: 0, y: 0, w: 4, h: 3 } }
+        { contents: 80000, layout: { x: 4, y: 0, w: 4, h: 3 } }
+        { contents: 120000, layout: { x: 8, y: 0, w: 4, h: 3 } }
       ] 
     }
 
@@ -54,7 +56,7 @@ class Root extends React.Component
     layoutEngine = new LegoLayoutEngine(800, 12)
 
     # Create elems
-    elems = _.map(@state.blocks, (block) => React.createElement(Widget, text: block.contents))
+    elems = _.map(@state.blocks, (block) => React.createElement(Widget, data: block.contents))
 
     H.div style: { backgroundColor: "#CCC", width: 800 }, 
       React.createElement(DragDropContainer, 
