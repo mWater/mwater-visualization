@@ -47,7 +47,7 @@ module.exports = class BarChartViewComponent extends React.Component
     if not _.isEqual(@props.data, nextProps.data)
       # Reload data
       @chart.load({ 
-        json: props.data
+        json: nextProps.data
         keys: { x: "x", value: ["y"] }
         names: { y: 'Value' } # Name the data
       })
