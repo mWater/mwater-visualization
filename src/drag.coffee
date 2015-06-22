@@ -22,9 +22,12 @@ class Widget extends React.Component
       position: "absolute"
       right: 0
       bottom: 0
-      backgroundColor: "green"
-      width: 20
-      height: 20
+      #backgroundColor: "green"
+      # backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYWDTIvm/cDwgAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAA/SURBVCjPpc8xCgAwDAJA6cv9uZ06NNAaiZuQwAmYkBRJnb7QjCQhOY4eInN7QyV8SdU82+DMzw3OfHVnHm3YUYtls6TxmNQAAAAASUVORK5CYII=')"
+      backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAB3RJTUUH2AkPCjIF90dj7QAAAAlwSFlzAAAPYQAAD2EBqD+naQAAAARnQU1BAACxjwv8YQUAAABISURBVHjaY2QgABwcHMSBlAETEYpagPgIIxGKCg4cOPCVkZAiIObBajUWRZhW41CEajUuRShWE1AEsZoIRWCrQSbawDh42AwAdwQtJBOblO0AAAAASUVORK5CYII=')"
+      width: 10
+      height: 10
+      cursor: "nwse-resize"
     }
 
     myData = _.cloneDeep(data)
@@ -43,9 +46,9 @@ class Root extends React.Component
     super
     @state = {
       blocks: [
-        { contents: 40000, layout: { x: 0, y: 0, w: 4, h: 3 } }
-        { contents: 80000, layout: { x: 4, y: 0, w: 4, h: 3 } }
-        { contents: 120000, layout: { x: 8, y: 0, w: 4, h: 3 } }
+        { id: "a", contents: 40000, layout: { x: 0, y: 0, w: 4, h: 3 } }
+        { id: "b", contents: 80000, layout: { x: 4, y: 0, w: 4, h: 3 } }
+        { id: "c", contents: 120000, layout: { x: 8, y: 0, w: 4, h: 3 } }
       ] 
     }
 
@@ -56,7 +59,9 @@ class Root extends React.Component
     layoutEngine = new LegoLayoutEngine(800, 12)
 
     # Create elems
-    elems = _.map(@state.blocks, (block) => React.createElement(Widget, data: block.contents))
+    elems = {}
+    for block in @state.blocks
+      elems[block.id] = React.createElement(Widget, data: block.contents)
 
     H.div style: { backgroundColor: "#CCC", width: 800 }, 
       React.createElement(DragDropContainer, 
@@ -70,3 +75,4 @@ class Root extends React.Component
 $ ->
   sample = React.createElement(Root)
   React.render(sample, document.getElementById('root'))
+  # React.render(sample, document.getElementById('root2'))

@@ -50,11 +50,6 @@ module.exports = class LegoLayoutEngine
       placedLayouts.push(layouts[priority])
       results[priority] = layouts[priority]
 
-    # if priority
-    #   toProcess = _.values(_.omit(layouts, priority))
-    # else
-    #   toProcess = _.values(layouts)
-
     # Order all by reading order (l->r, top->bottom)
     toProcess = _.sortBy(_.keys(layouts), (id) => 
       l = layouts[id]
