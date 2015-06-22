@@ -15,9 +15,8 @@ module.exports = class LegoLayoutEngine
       height: @scale * layout.h
     }
 
-  # Inserts a rectangle (x, y, width, height)
-  # Returns { layouts (modified to make room) and rectLayout (layout of new rectangle) }
-  insertRect: (layouts, rect) ->
+  # Converts a rectangle to a layout
+  rectToLayout: (rect) ->
     # Get snapped approximate location
     x = Math.round(rect.x / @scale)
     y = Math.round(rect.y / @scale)
@@ -34,23 +33,50 @@ module.exports = class LegoLayoutEngine
 
     if h < 1 then h = 1
 
-    # Create list of placed layouts to avoid as placing new ones
+    return { x: x, y: y, w: w, h: h }
+
+  # Arranges a layout, making all blocks fit. Optionally prioritizes
+  # a particular item.
+  # layouts is lookup of id -> layout
+  # priority is optional id to layout first
+  # Returns layout lookup of id -> layout
+  performLayout: (layouts, priority) ->
+    # Create list of placed layouts to avoid as placing new ones 
     placedLayouts = []
+    results = {}
 
-    # Add inserted first to displace others
-    placedLayouts.push({ x: x, y: y, w: w, h: h })
+    # Add priority first to displace others
+    if priority
+      placedLayouts.push(layouts[priority])
+      results[priority] = layouts[priority]
 
-    # Order existing by reading order (l->r, top->bottom)
-    toProcess = _.sortBy(layouts, (l) => l.x + l.y * @blocksAcross)
+    # if priority
+    #   toProcess = _.values(_.omit(layouts, priority))
+    # else
+    #   toProcess = _.values(layouts)
+
+    # Order all by reading order (l->r, top->bottom)
+    toProcess = _.sortBy(_.keys(layouts), (id) => 
+      l = layouts[id]
+      return l.x + l.y * @blocksAcross
+    )
 
     # Process each layout, avoiding all previous
-    for layout in toProcess
-      # Check if overlaps
-      while _.any(placedLayouts, (pl) => @overlaps(pl, layout))
-        layout = @shiftLayout(layout)
-      placedLayouts.push(layout)
+    for id in toProcess
+      # Skip priority one
+      if id == priority
+        continue
 
-    return { layouts: placedLayouts.slice(1), rectLayout: { x: x, y: y, w: w, h: h }}
+      # Check if overlaps
+      layout = layouts[id]
+      while _.any(placedLayouts, (pl) => @overlaps(pl, layout))
+        # Move around until fits
+        layout = @shiftLayout(layout)
+
+      placedLayouts.push(layout)
+      results[id] = layout
+
+    return results
 
   # Check if layouts overlap
   overlaps: (a, b) ->

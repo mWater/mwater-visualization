@@ -8,21 +8,35 @@ describe "LegoLayoutEngine", ->
     @le = new LegoLayoutEngine(60, 6)
 
   it "snaps to grid", ->
-    { layouts, rectLayout } = @le.insertRect([], { x: 11, y: 19, width: 32, height: 42 })
-    assert.deepEqual layouts, []
+    rectLayout = @le.rectToLayout({ x: 11, y: 19, width: 32, height: 42 })
     assert.deepEqual rectLayout, { x: 1, y: 2, w: 3, h: 4 }
 
   it "shifts existing to right if room", ->
     existing = { x: 1, y: 2, w: 1, h: 1 }
+    newOne = { x: 1, y: 2, w: 3, h: 4 }
 
-    { layouts, rectLayout } = @le.insertRect([existing], { x: 11, y: 19, width: 32, height: 42 })
-    assert.deepEqual layouts, [{ x: 4, y: 2, w: 1, h: 1 }]
-    assert.deepEqual rectLayout, { x: 1, y: 2, w: 3, h: 4 }
+    layouts = {
+      existing: existing
+      newOne: newOne
+    }
+
+    layouts = @le.performLayout(layouts, "newOne")
+    assert.deepEqual layouts, {
+      existing: { x: 4, y: 2, w: 1, h: 1 }
+      newOne: { x: 1, y: 2, w: 3, h: 4 }
+    }
 
   it "shifts existing to down if no room", ->
     existing = { x: 1, y: 2, w: 5, h: 1 }
+    newOne = { x: 1, y: 2, w: 3, h: 4 }
 
-    { layouts, rectLayout } = @le.insertRect([existing], { x: 11, y: 19, width: 32, height: 42 })
-    # Moves to left
-    assert.deepEqual layouts, [{ x: 0, y: 6, w: 5, h: 1 }]
-    assert.deepEqual rectLayout, { x: 1, y: 2, w: 3, h: 4 }
+    layouts = {
+      existing: existing
+      newOne: newOne
+    }
+
+    layouts = @le.performLayout(layouts, "newOne")
+    assert.deepEqual layouts, {
+      existing: { x: 0, y: 6, w: 5, h: 1 }  # Moves to left
+      newOne: { x: 1, y: 2, w: 3, h: 4 }
+    }
