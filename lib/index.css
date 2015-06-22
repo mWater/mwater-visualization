@@ -1,6 +1,6 @@
 @import "react-select/dist/default.css";
 
-.items-enter {
+/*.items-enter {
 	opacity: 0.1;
   	transition: opacity .2s ease-in;
 }
@@ -15,6 +15,7 @@
 .items-leave.items-leave-active {
  	opacity: 0.01;
 }
+*/
 
 .editable-link {
 	color: #478;
@@ -45,4 +46,21 @@
 .editable-link-remove:hover {
 	visibility: visible !important;
 	color: #639db0;
+}
+
+.widget {
+	border: solid 2px transparent;
+}
+
+.widget:hover {
+	border: solid 2px #EEE;
+	border-radius: 3px;
+}
+
+.widget .widget-resize-handle {
+	display: none;
+}
+
+.widget:hover .widget-resize-handle {
+	display: block;
 }

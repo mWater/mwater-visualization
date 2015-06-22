@@ -125,7 +125,6 @@ exports.EnumArrComponent = class EnumArrComponent extends React.Component
     value = null
     if @props.value and @props.value.value.length > 0 
       value = @props.value.value.join("\n")
-    console.log value
 
     options = _.map(@props.enumValues, (val) -> { value: val.id, label: val.name })
     React.createElement(ReactSelect, { 

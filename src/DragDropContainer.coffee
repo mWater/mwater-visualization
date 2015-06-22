@@ -56,7 +56,6 @@ class Container extends React.Component
     @setState(moveHover: hoverInfo)
 
   setResizeHover: (hoverInfo) -> 
-    console.log hoverInfo
     @setState(resizeHover: hoverInfo)
 
   dropBlock: (block, droppedBlockRect) ->
@@ -120,7 +119,7 @@ class Container extends React.Component
       top: bounds.y
       width: bounds.width
       height: bounds.height
-      border: "dashed 3px #DDD"
+      border: "dashed 3px #AAA"
       borderRadius: 5
       padding: 5
       position: "absolute"

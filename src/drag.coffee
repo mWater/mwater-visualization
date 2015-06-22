@@ -11,9 +11,8 @@ class Widget extends React.Component
     style = {
       width: @props.width
       height: @props.height
-      border: "solid 2px #35A"
-      backgroundColor: "white"
-      borderRadius: 3
+      # border: "solid 2px #35A"
+      # borderRadius: 3
       padding: 5
       position: "absolute"
     }
@@ -33,11 +32,10 @@ class Widget extends React.Component
     myData = _.cloneDeep(data)
     myData[0].y = @props.data
     return @props.connectMoveHandle(
-      H.div style: style,
+      H.div style: style, className: "widget",
         React.createElement(BarChartViewComponent, width: @props.width - 10, height: @props.height - 10, data: myData)
-        # "#{@props.text}"
         @props.connectResizeHandle(
-          H.div style: resizeHandleStyle
+          H.div style: resizeHandleStyle, className: "widget-resize-handle"
           )
       )
 
@@ -49,6 +47,9 @@ class Root extends React.Component
         { id: "a", contents: 40000, layout: { x: 0, y: 0, w: 4, h: 3 } }
         { id: "b", contents: 80000, layout: { x: 4, y: 0, w: 4, h: 3 } }
         { id: "c", contents: 120000, layout: { x: 8, y: 0, w: 4, h: 3 } }
+        { id: "d", contents: 40000, layout: { x: 0, y: 1, w: 4, h: 3 } }
+        { id: "e", contents: 80000, layout: { x: 4, y: 1, w: 4, h: 3 } }
+        { id: "f", contents: 120000, layout: { x: 8, y: 1, w: 4, h: 3 } }
       ] 
     }
 
@@ -63,7 +64,7 @@ class Root extends React.Component
     for block in @state.blocks
       elems[block.id] = React.createElement(Widget, data: block.contents)
 
-    H.div style: { backgroundColor: "#CCC", width: 800 }, 
+    H.div style: { border: "solid 1px #CCC", width: 800 }, 
       React.createElement(DragDropContainer, 
         layoutEngine: layoutEngine
         blocks: @state.blocks
