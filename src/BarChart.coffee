@@ -41,22 +41,16 @@ module.exports = class BarChart
     # Clone deep for now # TODO
     design = _.cloneDeep(design)
 
-    # Clean aesthetic expressions. First table locks table for all others 
-    # since all must use same table
-    design.table = null
+    # Clean aesthetic expressions.
     for aes in ['y', 'x', 'color']
       value = design.aesthetics[aes]
 
-      # Aesthetic or expression can be blank
+      # Aesthetic or its expression can be blank
       if not value or not value.expr
         continue
 
       # Clean expression
       value.expr = @exprBuilder.cleanExpr(value.expr, design.table)
-
-      # Save table
-      if value.expr
-        design.table = value.expr.table
 
     # Default y expr
     if not design.aesthetics.y or not design.aesthetics.y.expr
@@ -80,6 +74,10 @@ module.exports = class BarChart
     return design
 
   validateDesign: (design) ->
+    # Check that has table
+    if not design.table
+      return "Missing Table"
+
     # Check that has x and y
     if not design.aesthetics.x or not design.aesthetics.x.expr
       return "Missing X Axis"

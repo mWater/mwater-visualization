@@ -92,9 +92,6 @@ module.exports = class ExpressionBuilder
     else
       str = ""
 
-    # Add table
-    str += @schema.getTable(expr.table).name + " > "
-
     # Add joins
     t = expr.table
     for join in expr.joins

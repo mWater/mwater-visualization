@@ -1,11 +1,15 @@
 React = require 'react'
 H = React.DOM
+ReactSelect = require 'react-select'
 ScalarExprComponent = require './ScalarExprComponent'
 LogicalExprComponent = require './LogicalExprComponent'
 ExpressionBuilder = require './ExpressionBuilder'
 EditableLinkComponent = require './EditableLinkComponent'
 
 module.exports = class BarChartDesignerComponent extends React.Component
+  handleTableChange: (table) =>
+    @props.onChange(_.extend({}, @props.design, { table: table }))
+
   handleAestheticChange: (aes, val) =>
     aesthetics = _.clone(@props.design.aesthetics)
     aesthetics[aes] = val
@@ -41,6 +45,23 @@ module.exports = class BarChartDesignerComponent extends React.Component
   #         onChange: @handleXAxisChange
   #         value: @props.value.xAxis)
   #     H.p className: "help-block", "Field to group by"
+
+  renderTable: ->
+    return H.div className: "form-group",
+      H.label null, "Table"
+      H.div null, 
+       React.createElement(EditableLinkComponent, 
+          dropdownItems: @props.schema.getTables()
+          onDropdownItemClicked: @handleTableChange
+          onRemove: @handleTableChange.bind(this, null)
+          if @props.design.table then @props.schema.getTable(@props.design.table).name else H.i(null, "Select...")
+          )
+        # React.createElement(ReactSelect, { 
+        #   value: @props.design.table, 
+        #   options: _.map(@props.schema.getTables(), (t) => { value: t.id, label: t.name }) 
+        #   onChange: @handleTableChange
+        # })
+
 
   renderXAesthetic: ->
     React.createElement(AestheticComponent, 
@@ -82,9 +103,13 @@ module.exports = class BarChartDesignerComponent extends React.Component
       #     H.span className: "glyphicon glyphicon-info-sign"
       #     " "
       #     error
-      @renderXAesthetic()
-      @renderYAesthetic()
-      @renderFilter()
+      @renderTable()
+      if @props.design.table
+        [
+          @renderXAesthetic()
+          @renderYAesthetic()
+          @renderFilter()
+        ]
 
 class AestheticComponent extends React.Component
   @propTypes:

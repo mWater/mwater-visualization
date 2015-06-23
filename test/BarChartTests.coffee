@@ -8,23 +8,23 @@ describe "BarChart", ->
     @barChart = new BarChart(fixtures.simpleSchema())
 
   describe "cleanDesign", ->
-    it "sets table from aesthetics", ->
+    it "does not set table from aesthetics", ->
       design = {
         aesthetics: {
           x: { expr: { type: "field", table: "t1", column: "decimal" } }
         }
       }
       d = @barChart.cleanDesign(design)
-      assert.equal d.table, "t1"
+      assert not d.table
 
-    it "removes table if no aesthetics", ->
+    it "does not remove table if no aesthetics", ->
       design = {
         aesthetics: {
         }
         table: "t1"
       }
       d = @barChart.cleanDesign(design)
-      assert not d.table
+      assert d.table
 
     it "removes aesthetic if wrong table", ->
       design = {
@@ -66,6 +66,7 @@ describe "BarChart", ->
         aesthetics: {
           x: { expr: { type: "field", table: "t1", column: "decimal" } }
         }
+        table: "t1"
       }
       d = @barChart.cleanDesign(design)
       assert.deepEqual d.aesthetics.y, {
@@ -80,8 +81,18 @@ describe "BarChart", ->
           x: { expr: { type: "field", table: "t1", column: "enum" } }
           y: { expr: { type: "field", table: "t1", column: "decimal" }, aggr: "sum" }
         }
+        table: "t1"
       }
       assert not @barChart.validateDesign(design)
+
+    it "requires table", ->
+      design = {
+        aesthetics: {
+          x: { expr: { type: "field", table: "t1", column: "enum" } }
+          y: { expr: { type: "field", table: "t1", column: "decimal" }, aggr: "sum" }
+        }
+      }
+      assert @barChart.validateDesign(design)
 
     it "requires x aesthetic", ->
       design = {
