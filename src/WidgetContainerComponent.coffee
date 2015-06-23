@@ -7,7 +7,7 @@ HTML5Backend = require('react-dnd/modules/backends/HTML5')
 
 # Render a child element as draggable, resizable block, injecting handle connectors
 # to child element
-class Block extends React.Component
+class LayoutComponent extends React.Component
   @propTypes:
     dragInfo: React.PropTypes.object.isRequired  # Opaque information to be used when a block is dragged
 
@@ -25,7 +25,7 @@ moveSpec = {
 moveCollect = (connect, monitor) ->
   return { connectMoveHandle: connect.dragSource() }
 
-MoveBlock = DragSource("block-move", moveSpec, moveCollect)(Block)
+MoveLayoutComponent = DragSource("block-move", moveSpec, moveCollect)(LayoutComponent)
 
 resizeSpec = {
   beginDrag: (props, monitor, component) ->
@@ -35,18 +35,18 @@ resizeSpec = {
 resizeCollect = (connect, monitor) ->
   return { connectResizeHandle: connect.dragSource() }
 
-MoveResizeBlock = DragSource("block-resize", resizeSpec, resizeCollect)(MoveBlock)
+MoveResizeLayoutComponent = DragSource("block-resize", resizeSpec, resizeCollect)(MoveLayoutComponent)
 
-# Container contains blocks to layout
+# Container contains layouts to layout
 class Container extends React.Component
   @propTypes:
     layoutEngine: React.PropTypes.object.isRequired
-    blocks: React.PropTypes.array.isRequired # Array of { id, contents, layout }
+    layouts: React.PropTypes.object.isRequired # Lookup of id -> layout
     elems: React.PropTypes.object.isRequired # Lookup of id -> elem
     width: React.PropTypes.number.isRequired # width in pixels
     height: React.PropTypes.number.isRequired # height in pixels
     connectDropTarget: React.PropTypes.func.isRequired # Injected by react-dnd wrapper
-    onLayoutUpdate: React.PropTypes.func.isRequired # Called with array of { id, content, layout } 
+    onLayoutUpdate: React.PropTypes.func.isRequired # Called with array of { id, widget, layout }
 
   constructor: (props) ->
     super
@@ -58,55 +58,47 @@ class Container extends React.Component
   setResizeHover: (hoverInfo) -> 
     @setState(resizeHover: hoverInfo)
 
-  dropBlock: (block, droppedBlockRect) ->
+  dropLayout: (id, droppedRect) ->
     # Stop hover
     @setState(moveHover: null, resizeHover: null)
 
-    # Get blocks by id
-    blockLookup = _.indexBy(@props.blocks, "id")
-
     # Convert rect to layout
-    droppedBlockLayout = @props.layoutEngine.rectToLayout(droppedBlockRect)
+    droppedLayout = @props.layoutEngine.rectToLayout(droppedRect)
 
-    # Insert dropped block
-    blockLookup[block.id] = _.extend({}, block, layout: droppedBlockLayout)
+    # Insert dropped layout
+    layouts = _.clone(@props.layouts)
+    layouts[id] = droppedLayout
 
-    # Perform layout, first extracting layouts
-    layouts = _.mapValues(blockLookup, (b) -> b.layout)
-    layouts = @props.layoutEngine.performLayout(layouts, block.id)
+    # Perform layout
+    layouts = @props.layoutEngine.performLayout(layouts, id)
 
-    # Update blocks layouts
-    blocks = []
-    for key, value of layouts
-      blocks.push(_.extend({}, blockLookup[key], layout: value))
-
-    @props.onLayoutUpdate(blocks)
+    @props.onLayoutUpdate(layouts)
   
   # Called when a block is dropped
-  dropMoveBlock: (dropInfo) -> 
+  dropMoveLayout: (dropInfo) -> 
     # Get rectangle of dropped block
-    droppedBlockRect = {
+    droppedRect = {
       x: dropInfo.x
       y: dropInfo.y
       width: dropInfo.dragInfo.bounds.width   # width and height are from drop info
       height: dropInfo.dragInfo.bounds.height
     }
 
-    @dropBlock(dropInfo.dragInfo.block, droppedBlockRect)
+    @dropLayout(dropInfo.dragInfo.id, droppedRect)
   
-  dropResizeBlock: (dropInfo) ->
+  dropResizeLayout: (dropInfo) ->
     # Get rectangle of hovered block
-    droppedBlockRect = {
+    droppedRect = {
       x: dropInfo.dragInfo.bounds.x
       y: dropInfo.dragInfo.bounds.y
       width: dropInfo.width
       height: dropInfo.height
     }
 
-    @dropBlock(dropInfo.dragInfo.block, droppedBlockRect)
+    @dropLayout(dropInfo.dragInfo.id, droppedRect)
 
   componentWillReceiveProps: (nextProps) ->
-    # Reset hover blocks if not over
+    # Reset hover if not over
     if not nextProps.isOver
       # Defer to prevent "Cannot dispatch in the middle of a dispatch." error
       _.defer () =>
@@ -125,9 +117,9 @@ class Container extends React.Component
       position: "absolute"
     }
 
-  renderBlock: (block) =>
+  renderLayout: (id, layout) =>
     # Calculate bounds
-    bounds = @props.layoutEngine.getLayoutBounds(block.layout)
+    bounds = @props.layoutEngine.getLayoutBounds(layout)
 
     # Position absolutely
     style = { 
@@ -136,64 +128,58 @@ class Container extends React.Component
       top: bounds.y
     }
 
-    # Create dragInfo which is all the info needed to drop the block
+    # Create dragInfo which is all the info needed to drop the layout
     dragInfo = {
-      block: block
+      id: id
       bounds: bounds
     }
 
     # Clone element, injecting width, height and enclosing in a dnd block
-    return H.div style: style, key: block.id,
-      React.createElement(MoveResizeBlock, { dragInfo: dragInfo }, 
-        React.cloneElement(@props.elems[block.id], width: bounds.width, height: bounds.height))
+    return H.div style: style, key: id,
+      React.createElement(MoveResizeLayoutComponent, { dragInfo: dragInfo }, 
+        React.cloneElement(@props.elems[id], width: bounds.width, height: bounds.height))
 
-  renderBlocks: ->
+  renderLayouts: ->
     renderElems = []
 
     # Get hovered block if present
     hoveredDragInfo = null
-    hoveredBlockLayout = null  # Layout of hovered block
+    hoveredLayout = null  # Layout of hovered block
     if @state.moveHover
       hoveredDragInfo = @state.moveHover.dragInfo
-      hoveredBlockRect = {
+      hoveredRect = {
         x: @state.moveHover.x
         y: @state.moveHover.y
         width: @state.moveHover.dragInfo.bounds.width
         height: @state.moveHover.dragInfo.bounds.height
       }
-      hoveredBlockLayout = @props.layoutEngine.rectToLayout(hoveredBlockRect)
+      hoveredLayout = @props.layoutEngine.rectToLayout(hoveredRect)
 
     if @state.resizeHover
       hoveredDragInfo = @state.resizeHover.dragInfo
-      hoveredBlockRect = {
+      hoveredRect = {
         x: @state.resizeHover.dragInfo.bounds.x
         y: @state.resizeHover.dragInfo.bounds.y
         width: @state.resizeHover.width
         height: @state.resizeHover.height
       }
-      hoveredBlockLayout = @props.layoutEngine.rectToLayout(hoveredBlockRect)
+      hoveredLayout = @props.layoutEngine.rectToLayout(hoveredRect)
 
-    blockLookup = _.indexBy(@props.blocks, "id")
+    layouts = _.clone(@props.layouts)
 
-    # Add hovered block to blocks
+    # Add hovered layout
     if hoveredDragInfo
-      blockLookup[hoveredDragInfo.block.id] = _.extend({}, hoveredDragInfo.block, layout: hoveredBlockLayout)
+      layouts[hoveredDragInfo.id] = hoveredLayout
 
-    # Perform layout, first extracting layouts
-    layouts = _.mapValues(blockLookup, (b) -> b.layout)
-    layouts = @props.layoutEngine.performLayout(layouts, if hoveredDragInfo then hoveredDragInfo.block.id)
-
-    # Update blocks layouts
-    blocks = []
-    for key, value of layouts
-      blocks.push(_.extend({}, blockLookup[key], layout: value))
+    # Perform layout
+    layouts = @props.layoutEngine.performLayout(layouts, if hoveredDragInfo then hoveredDragInfo.id)
 
     # Render blocks in their adjusted position
-    for block in blocks
-      if not hoveredBlockLayout or block.id != hoveredDragInfo.block.id
-        renderElems.push(@renderBlock(block))
+    for id, layout of layouts
+      if not hoveredLayout or id != hoveredDragInfo.id
+        renderElems.push(@renderLayout(id, layout))
       else
-        renderElems.push(@renderPlaceholder(@props.layoutEngine.getLayoutBounds(hoveredBlockLayout)))
+        renderElems.push(@renderPlaceholder(@props.layoutEngine.getLayoutBounds(hoveredLayout)))
 
     return renderElems
 
@@ -207,19 +193,19 @@ class Container extends React.Component
     # Connect as a drop target
     @props.connectDropTarget(
       H.div style: style, 
-        @renderBlocks()
+        @renderLayouts()
     )
 
 targetSpec = {
   drop: (props, monitor, component) ->
     if monitor.getItemType() == "block-move"
-      component.dropMoveBlock(
+      component.dropMoveLayout(
         dragInfo: monitor.getItem()
         x: monitor.getClientOffset().x - (monitor.getInitialClientOffset().x - monitor.getInitialSourceClientOffset().x)
         y: monitor.getClientOffset().y - (monitor.getInitialClientOffset().y - monitor.getInitialSourceClientOffset().y)
         )
     if monitor.getItemType() == "block-resize"
-      component.dropResizeBlock({
+      component.dropResizeLayout({
         dragInfo: monitor.getItem()
         width: monitor.getItem().bounds.width + monitor.getDifferenceFromInitialOffset().x
         height: monitor.getItem().bounds.height + monitor.getDifferenceFromInitialOffset().y

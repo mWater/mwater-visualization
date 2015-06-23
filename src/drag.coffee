@@ -1,7 +1,7 @@
 React = require 'react'
 H = React.DOM
 LegoLayoutEngine = require './LegoLayoutEngine'
-DragDropContainer = require './DragDropContainer'
+WidgetContainerComponent = require './WidgetContainerComponent'
 BarChartViewComponent = require './BarChartViewComponent'
 
 data = [{"x":"broken","y":"48520"},{"x":null,"y":"2976"},{"x":"ok","y":"173396"},{"x":"maint","y":"12103"},{"x":"missing","y":"3364"}]
@@ -43,7 +43,7 @@ class Root extends React.Component
   constructor: ->
     super
     @state = {
-      blocks: [
+      widgets: [
         { id: "a", contents: 40000, layout: { x: 0, y: 0, w: 4, h: 3 } }
         { id: "b", contents: 80000, layout: { x: 4, y: 0, w: 4, h: 3 } }
         { id: "c", contents: 120000, layout: { x: 8, y: 0, w: 4, h: 3 } }
@@ -53,21 +53,28 @@ class Root extends React.Component
       ] 
     }
 
-  handleLayoutUpdate: (blocks) =>
-    @setState(blocks: blocks)
+  handleLayoutUpdate: (layouts) =>
+    # Update widget layouts
+    widgets = _.map(@state.widgets, (widget) =>
+      return _.extend({}, widget, layout: layouts[widget.id])
+      )
+    @setState(widgets: widgets)
 
   render: ->
     layoutEngine = new LegoLayoutEngine(800, 12)
 
     # Create elems
     elems = {}
-    for block in @state.blocks
-      elems[block.id] = React.createElement(Widget, data: block.contents)
+    for widget in @state.widgets
+      elems[widget.id] = React.createElement(Widget, data: widget.contents)
+
+    # Create layouts
+    layouts = _.object(_.pluck(@state.widgets, "id"), _.pluck(@state.widgets, "layout"))
 
     H.div style: { border: "solid 1px #CCC", width: 800 }, 
-      React.createElement(DragDropContainer, 
+      React.createElement(WidgetContainerComponent, 
         layoutEngine: layoutEngine
-        blocks: @state.blocks
+        layouts: layouts
         elems: elems
         onLayoutUpdate: @handleLayoutUpdate
         width: 800, 
