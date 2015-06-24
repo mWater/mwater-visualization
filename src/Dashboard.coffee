@@ -1,37 +1,91 @@
-LegoLayoutEngine = require './LegoLayoutEngine'
+React = require 'react'
 
-class Dashboard
+# Top-level class which holds design of dashboard as state, the undo/redo stack and the DOM elements
+# to render the view and optionally the designer
+module.exports = class Dashboard
   # Pass in
   # design: Dashboard design
   # viewNode: DOM node to show dashboard view in
-  # designing: initial designing state. True to show designer
+  # isDesigning: initial designing state. True to show designer
   # onShowDesigner: called to show the designer pane, returns DOM node
   # onHideDesigner: called to hide the designer pane
-  # onDesignChanged: called when design is changed (optional). Should save dashboard if desired
+  # onDesignChange: called when design is changed (optional). Should save dashboard if desired
+  # width: width of dashboard in pixels # TODO how updated?
+  # height: height of dashboard in pixels # TODO how updated?
+  # widgetFactory: WidgetFactory to use
   constructor: (options) ->
     @design = options.design
     @viewNode = options.viewNode
-    @designing = options.designing
+    @isDesigning = options.isDesigning
     @onShowDesigner = options.onShowDesigner
     @onHideDesigner = options.onHideDesigner
+    @onDesignChange = options.onDesignChange
+    @width = options.width
+    @height = options.height
+    @widgetFactory = options.widgetFactory
 
-    # Show designer if editing
-    if @editing
+    # Currently selected widget starts as none
+    @selectedWidgetId = null
+
+    # Show designer if designing
+    if @isDesigning
       @designerNode = @onShowDesigner()
 
-    # Create lego layout engine
-    @layoutEngine = new LegoLayoutEngine()
+  handleSelectedWidgetIdChange: (id) =>
+    @selectedWidgetId = id
+    @render()
 
+  handleDesignChange: (design) =>
+    @design = design
+    if @onDesignChange
+      @onDesignChange(design)
+    @render()
+
+  handleIsDesigningChange: (isDesigning) =>
+    @isDesigning = isDesigning
+    
+    # Remove designer if now false
+    if not @isDesigning and @designerNode
+      React.unmountComponentAtNode(@designerNode)
+      @designerNode = null
+      @onHideDesigner()
+
+    # Show designer if needed
+    if @isDesigning and not @designerNode
+      @designerNode = @onShowDesigner()      
+
+    @render()
 
   # Renders components
   render: ->
     # Create elements
-    viewElem = React.createElement(WidgetContainerComponent, )
+    viewElem = React.createElement(DashboardViewComponent, {
+      design: @design
+      onDesignChange: @handleDesignChange
+      selectedWidgetId: @selectedWidgetId
+      onSelectedWidgetIdChange: @handleSelectedWidgetIdChange
+      isDesigning: @isDesigning
+      onIsDesigningChange: @handleIsDesigningChange
+      width: @width
+      height: @height
+      })
 
-        layoutEngine: React.PropTypes.object.isRequired
-    blocks: React.PropTypes.array.isRequired # Array of { id, widget, layout }
-    elems: React.PropTypes.object.isRequired # Lookup of id -> elem
-    width: React.PropTypes.number.isRequired # width in pixels
-    height: React.PropTypes.number.isRequired # height in pixels
-    connectDropTarget: React.PropTypes.func.isRequired # Injected by react-dnd wrapper
-    onLayoutUpdate: React.PropTypes.func.isRequired # Called with array of { id, widget, layout }
+    React.render(viewElem, @viewNode)
+
+    if @isDesigning
+      designerElem = React.createElement(DashboardDesignerComponent, {
+        design: @design
+        onDesignChange: @handleDesignChange
+        selectedWidgetId: @selectedWidgetId
+        onSelectedWidgetIdChange: @handleSelectedWidgetIdChange
+        isDesigning: @isDesigning
+        onIsDesigningChange: @handleIsDesigningChange
+        })
+      React.render(designerElem, @designerNode)
+
+  destroy: ->
+    if @viewNode
+      React.unmountComponentAtNode(@viewNode)
+
+    if @designerNode
+      React.unmountComponentAtNode(@designerNode)

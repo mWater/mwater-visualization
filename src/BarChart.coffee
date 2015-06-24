@@ -1,10 +1,12 @@
 _ = require 'lodash'
+React = require 'react'
+H = React.DOM
+
+Chart = require './Chart'
 ExpressionBuilder = require './ExpressionBuilder'
 ExpressionCompiler = require './ExpressionCompiler'
 BarChartDesignerComponent = require './BarChartDesignerComponent'
 BarChartViewComponent = require './BarChartViewComponent'
-React = require 'react'
-H = React.DOM
 
 ###
 Design is:
@@ -28,7 +30,7 @@ filter: expression that filters table
 stacked: true/false
 
 ###
-module.exports = class BarChart
+module.exports = class BarChart extends Chart
   constructor: (schema) ->
     @schema = schema
     @exprBuilder = new ExpressionBuilder(@schema)

@@ -32,6 +32,20 @@ createSchema = ->
 
   return schema
 
+WidgetFactory = require './WidgetFactory'
+
+class SimpleWidgetFactory extends WidgetFactory
+  constructor: (schema, dataSource) ->
+    @schema = schema
+    @dataSource = dataSource
+
+  createWidget: (type, version, design) ->
+    if type != "BarChart"
+      throw new Error("Unknown widget type #{type}")
+
+    # Create chart object
+    chart = new BarChart(schema)  
+    return new ChartWidget(chart, design, dataSource)
 
 $ ->
   # Create simple schema

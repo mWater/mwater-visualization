@@ -32,7 +32,7 @@ class Widget extends React.Component
     myData = _.cloneDeep(data)
     myData[0].y = @props.data
     return @props.connectMoveHandle(
-      H.div style: style, className: "widget",
+      H.div style: style, className: "widget", onClick: (=> console.log("clicked")),
         React.createElement(BarChartViewComponent, width: @props.width - 10, height: @props.height - 10, data: myData)
         @props.connectResizeHandle(
           H.div style: resizeHandleStyle, className: "widget-resize-handle"
