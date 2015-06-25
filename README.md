@@ -1,5 +1,9 @@
 # mwater-visualization
 
+## Expressions
+
+[Expressions](docs/Expressions.md)
+
 ## Principles
 
 * In design, things must be valid or null. Design can be incomplete but not invalid
@@ -29,3 +33,7 @@ Each understands enough of the dashboard design to create widgets, which are sto
 `design`: design of the widget as a JSON object
 
 The actual `Widget` is created by the `WidgetFactory`
+
+### Widget scoping
+
+Each widget may have a scope (private data indicating which part is highlighted) and apply filters as a result to other widgets
