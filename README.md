@@ -18,13 +18,17 @@ It creates a view `DashboardViewComponent` and sometimes a designer `DashboardVi
 
 ### Dashboard design
 
-Each understands enough of the dashboard design to create widgets, which are stored with the following properties:
+Each understands enough of the dashboard design to create widgets.
 
-`id`: unique id of item uuid v4
+*Widget* refers to the widget itself, where *item* refers also to the layout and id that it has in the dashboard.
+
+Dashboard design is:
+
+`items`: dashboard items, indexed by id. Each item contains:
+
 `layout`: layout-engine specific data for layout of item
 `widget`: details of the widget (see below)
 
-*Widget* refers to the widget itself, where *item* refers also to the layout and id that it has in the dashboard.
 
 ### Widget data
 

@@ -1,5 +1,8 @@
 React = require 'react'
 
+DashboardViewComponent = require './DashboardViewComponent'
+DashboardDesignerComponent = require './DashboardDesignerComponent'
+
 # Top-level class which holds design of dashboard as state, the undo/redo stack and the DOM elements
 # to render the view and optionally the designer
 module.exports = class Dashboard
@@ -68,6 +71,7 @@ module.exports = class Dashboard
       onIsDesigningChange: @handleIsDesigningChange
       width: @width
       height: @height
+      widgetFactory: @widgetFactory
       })
 
     React.render(viewElem, @viewNode)
@@ -89,3 +93,4 @@ module.exports = class Dashboard
 
     if @designerNode
       React.unmountComponentAtNode(@designerNode)
+

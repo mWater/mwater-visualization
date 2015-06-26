@@ -53,9 +53,11 @@ $ ->
 
   expr = null
 
-  chart = new (require('./BarChart'))(schema)
-  sample = H.div className: "container",
-    React.createElement(require("./ChartTestComponent"), chart: chart)
+  # chart = new (require('./BarChart'))(schema)
+  # sample = H.div className: "container",
+  #   React.createElement(require("./ChartTestComponent"), chart: chart)
+  sample = H.div className: "container-fluid",
+    React.createElement(require("./DashboardTestComponent"))
   React.render(sample, document.getElementById('root'))
 
 

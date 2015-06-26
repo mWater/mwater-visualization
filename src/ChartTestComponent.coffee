@@ -14,13 +14,6 @@ module.exports = class ChartTestComponent extends React.Component
     console.log JSON.stringify(design, null, 2)
 
   render: ->
-    # data = {
-    #   main: [
-    #     { x: "apple", y: 4 }
-    #     { x: "banana", y: 20 }
-    #   ]
-    # }
-
     H.div className: "row",
       H.div className: "col-xs-6",
         @props.chart.createViewElement(design: @state.design, data: data, width: 500, height: 500)

@@ -78,11 +78,13 @@ class ChartWidgetComponent extends React.Component
     results = @props.chart.validateDesign(@props.design)
     if results
       return H.div style: { width: @props.width, height: @props.height },
+        "Invalid design: "
         results
 
     # If data error, display
     if @state.dataError
       return H.div style: { width: @props.width, height: @props.height },
+        "Error loading data: "
         @state.dataError.toString()
 
     # If no data, loading

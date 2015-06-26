@@ -3,17 +3,17 @@ H = React.DOM
 Dashboard = require './Dashboard'
 
 # Playground for a dashboard
-module.exports = class DashboardTestComponent extends React.DashbaordTestComponent
+module.exports = class DashboardTestComponent extends React.Component
   constructor: ->
     super
 
   componentDidMount: ->
     schema = createSchema()
-    dataSource = {}
+    dataSource = new SimpleDataSource()
 
     # Create dashboard
     @dashboard = new Dashboard({
-      design: {}
+      design: dashboardDesign
       viewNode: React.findDOMNode(@refs.view)
       isDesigning: true
       onShowDesigner: => React.findDOMNode(@refs.designer)
@@ -23,12 +23,96 @@ module.exports = class DashboardTestComponent extends React.DashbaordTestCompone
       widgetFactory: new SimpleWidgetFactory(schema, dataSource)
     })
 
+    @dashboard.render()
+
   render: ->
     H.div className: "row",
       H.div className: "col-xs-6", ref: "view"
       H.div className: "col-xs-6", ref: "designer"
 
+data = {"main":[{"x":"broken","y":"48520"},{"x":null,"y":"2976"},{"x":"ok","y":"173396"},{"x":"maint","y":"12103"},{"x":"missing","y":"3364"}]}    
+
+chartDesign = {
+  "aesthetics": {
+    "x": {
+      "expr": {
+        "type": "scalar",
+        "table": "a",
+        "joins": [],
+        "expr": {
+          "type": "field",
+          "table": "a",
+          "column": "enum"
+        }
+      }
+    },
+    "y": {
+      "expr": {
+        "type": "scalar",
+        "table": "a",
+        "joins": [],
+        "expr": {
+          "type": "field",
+          "table": "a",
+          "column": "decimal"
+        }
+      },
+      "aggr": "sum"
+    }
+  },
+  "table": "a",
+  "filter": {
+    "type": "logical",
+    "table": "a",
+    "op": "and",
+    "exprs": [
+      {
+        "type": "comparison",
+        "table": "a",
+        "lhs": {
+          "type": "scalar",
+          "table": "a",
+          "joins": [],
+          "expr": {
+            "type": "field",
+            "table": "a",
+            "column": "integer"
+          }
+        },
+        "op": "=",
+        "rhs": {
+          "type": "literal",
+          "valueType": "integer",
+          "value": 5
+        }
+      }
+    ]
+  }
+}
+
+
+dashboardDesign = {
+  items: {
+    "1": {
+      layout: { x: 4, y: 0, w: 4, h: 3 }
+      widget: {
+        type: "BarChart"
+        version: "0.0.0"
+        design: chartDesign
+      }
+    }
+  }
+}
+
+DataSource = require './DataSource'
+
+class SimpleDataSource extends DataSource 
+  fetchData: (queries, cb) ->
+    cb(null, data)
+
 WidgetFactory = require './WidgetFactory'
+BarChart = require './BarChart'
+ChartWidget = require './ChartWidget'
 
 class SimpleWidgetFactory extends WidgetFactory
   constructor: (schema, dataSource) ->
@@ -40,8 +124,8 @@ class SimpleWidgetFactory extends WidgetFactory
       throw new Error("Unknown widget type #{type}")
 
     # Create chart object
-    chart = new BarChart(schema)  
-    return new ChartWidget(chart, design, dataSource)
+    chart = new BarChart(@schema)  
+    return new ChartWidget(chart, design, @dataSource)
 
 
 Schema = require './Schema'

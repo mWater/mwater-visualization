@@ -1,5 +1,6 @@
 LegoLayoutEngine = require './LegoLayoutEngine'
 WidgetScoper = require './WidgetScoper'
+WidgetContainerComponent = require './WidgetContainerComponent'
 
 # Displays a dashboard, handling removing and passing up selection events
 module.exports = class DashboardViewComponent extends React.Component
@@ -11,7 +12,7 @@ module.exports = class DashboardViewComponent extends React.Component
     onSelectedWidgetIdChange: React.PropTypes.func.isRequired
 
     isDesigning: React.PropTypes.bool.isRequired
-    onIsDesigningChange React.PropTypes.func
+    onIsDesigningChange: React.PropTypes.func
 
     width: React.PropTypes.number.isRequired
     height: React.PropTypes.number.isRequired
@@ -34,7 +35,7 @@ module.exports = class DashboardViewComponent extends React.Component
 
   handleScopeChange: (scope, filter) => 
     @setState(widgetScoper: @state.widgetScoper.applyScope(id, scope, filter))
-    
+
   render: ->
     # Create layout engine
     # TODO create from design
@@ -49,7 +50,7 @@ module.exports = class DashboardViewComponent extends React.Component
       )
 
     # Create widget elems
-    elems = _.mapValues(widgets, (widget, id) =>
+    elems = _.mapValues widgets, (widget, id) =>
       widget.createViewElement({
         # width and height will be injected by widget container component
         selected: id == @props.selectedWidgetId

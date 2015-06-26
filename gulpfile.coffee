@@ -22,7 +22,7 @@ gulp.task 'copy', ->
     .pipe(gulp.dest('./lib/'))
 
 gulp.task "browserify", ->
-  shim(browserify("./drag.coffee",
+  shim(browserify("./demo.coffee",
     extensions: [".coffee"]
     basedir: "./src/"
   )).bundle()
