@@ -73,7 +73,7 @@ class ChartWidgetComponent extends React.Component
 
     # Call data source
     @setState(data: null, dataQueries: null, dataError: null)
-    props.dataSource.fetchData(queries, (err, data) =>
+    props.dataSource.performQueries(queries, (err, data) =>
       if err
         @setState(data: null, dataQueries: null, dataError: err)
       else

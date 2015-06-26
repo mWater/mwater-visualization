@@ -23,7 +23,7 @@ describe "ChartWidget", ->
 
   it "displays loading when getting data", ->
     dataSourceCb = null
-    @dataSource.fetchData = (queries, cb) -> dataSourceCb = cb
+    @dataSource.performQuery = (queries, cb) -> dataSourceCb = cb
 
     cw = new ChartWidget(@chart, @design, @dataSource)
     comp = React.addons.TestUtils.renderIntoDocument(cw.createViewElement(width: 100, height: 100))
@@ -31,7 +31,7 @@ describe "ChartWidget", ->
 
   it "displays error if getting data fails", ->
     dataSourceCb = null
-    @dataSource.fetchData = (queries, cb) -> cb(new Error("some error"))
+    @dataSource.performQuery = (queries, cb) -> cb(new Error("some error"))
 
     cw = new ChartWidget(@chart, @design, @dataSource)
     comp = React.addons.TestUtils.renderIntoDocument(cw.createViewElement(width: 100, height: 100))
@@ -49,7 +49,7 @@ describe "ChartWidget", ->
       }))
     assert.match($(React.findDOMNode(comp)).text(), /QUERYA/)
 
-    @dataSource.fetchData = -> throw new Error("should not call")
+    @dataSource.performQuery = -> throw new Error("should not call")
     comp.setChildren(cw.createViewElement(width: 100, height: 100))
 
   it "does requery if queries different", ->
@@ -63,10 +63,10 @@ describe "ChartWidget", ->
     comp.setChildren(cw.createViewElement(width: 100, height: 100))
     assert.match($(React.findDOMNode(comp)).text(), /QUERYC/)
 
-class MockDataSource
-  fetchData: (queries, cb) ->
-    # Capitalize queries
-    cb(null, _.mapValues(queries, (q) -> q.toUpperCase()))
+class MockDataSource extends DataSource
+  performQuery: (query, cb) ->
+    # Capitalize query
+    cb(null, query.toUpperCase())
 
 class MockChart
   cleanDesign: (design) -> design

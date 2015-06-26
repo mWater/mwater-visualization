@@ -108,7 +108,7 @@ dashboardDesign = {
 DataSource = require './DataSource'
 
 class SimpleDataSource extends DataSource 
-  fetchData: (queries, cb) ->
+  performQueries: (queries, cb) ->
     cb(null, data)
 
 WidgetFactory = require './WidgetFactory'
