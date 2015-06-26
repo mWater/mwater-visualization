@@ -100,7 +100,10 @@ module.exports = class BarChart extends Chart
     props = {
       schema: @schema
       design: options.design
-      onChange: options.onDesignChange
+      onDesignChange: (design) =>
+        # Clean design
+        design = @cleanDesign(design)
+        options.onDesignChange(design)
     }
     return React.createElement(BarChartDesignerComponent, props)
 

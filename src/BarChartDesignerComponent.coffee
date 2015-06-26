@@ -5,18 +5,28 @@ ScalarExprComponent = require './ScalarExprComponent'
 LogicalExprComponent = require './LogicalExprComponent'
 ExpressionBuilder = require './ExpressionBuilder'
 EditableLinkComponent = require './EditableLinkComponent'
+BarChart = require './BarChart'
 
 module.exports = class BarChartDesignerComponent extends React.Component
+  @propTypes: 
+    design: React.PropTypes.object.isRequired
+    schema: React.PropTypes.object.isRequired
+
   handleTableChange: (table) =>
-    @props.onChange(_.extend({}, @props.design, { table: table }))
+    @updateDesign(table: table)
 
   handleAestheticChange: (aes, val) =>
     aesthetics = _.clone(@props.design.aesthetics)
     aesthetics[aes] = val
-    @props.onChange(_.extend({}, @props.design, { aesthetics: aesthetics }))
+    @updateDesign(aesthetics: aesthetics)
 
   handleFilterChange: (val) =>
-    @props.onChange(_.extend({}, @props.design, { filter: val }))
+    @updateDesign(filter: val)
+
+  # Updates design with the specified changes
+  updateDesign: (changes) ->
+    design = _.extend({}, @props.design, changes)
+    @props.onDesignChange(design)
 
   # renderYAxis: ->
   #   H.div className: "form-group",

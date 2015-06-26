@@ -136,9 +136,9 @@ class ChartWidgetComponent extends React.Component
     }
 
     if @props.selected
-      style.border = "solid 2px #EEE"
+      style.border = "dashed 2px #CCC"
     else
-      style.border = "solid 2px transparent"
+      style.border = "dashed 2px transparent"
 
     elem = H.div style: style, onClick: @handleClick,
       contents

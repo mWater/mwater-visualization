@@ -12,10 +12,17 @@ module.exports = class DashboardDesignerComponent extends React.Component
     widgetFactory: React.PropTypes.object.isRequired # Factory of type WidgetFactory to make widgets
 
   handleDesignChange: (widgetDesign) =>
-    items = _.clone(@props.design.items)
-    items[@props.selectedWidgetId] = _.extend({}, items[@props.selectedWidgetId], design: widgetDesign)
-    @props.onDesignChange(_.extend({}, @props.design, items: items))
+    widget = @props.design.items[@props.selectedWidgetId].widget
+    widget = _.extend({}, widget, design: widgetDesign)
 
+    item = @props.design.items[@props.selectedWidgetId]
+    item = _.extend({}, item, widget: widget)
+
+    items = _.clone(@props.design.items)
+    items[@props.selectedWidgetId] = item
+
+    design = _.extend({}, @props.design, items: items)
+    @props.onDesignChange(design)
 
   render: ->
     if not @props.selectedWidgetId

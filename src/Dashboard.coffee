@@ -42,7 +42,6 @@ module.exports = class Dashboard
     @design = design
     if @onDesignChange
       @onDesignChange(design)
-    console.log design
     @render()
 
   handleIsDesigningChange: (isDesigning) =>

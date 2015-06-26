@@ -23,6 +23,7 @@ module.exports = class DashboardTestComponent extends React.Component
       widgetFactory: new SimpleWidgetFactory(schema, dataSource)
     })
 
+    console.log "Rendering dashboard"
     @dashboard.render()
 
   render: ->
@@ -93,7 +94,7 @@ chartDesign = {
 
 dashboardDesign = {
   items: {
-    "1": {
+    a: {
       layout: { x: 4, y: 0, w: 6, h: 6 }
       widget: {
         type: "BarChart"
