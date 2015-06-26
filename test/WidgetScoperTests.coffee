@@ -15,7 +15,7 @@ describe "WidgetScoper", ->
     assert.deepEqual scoper.getFilters("a"), []
     assert.deepEqual scoper.getFilters("b"), ["filter1"]
 
-  it "clears scope and filter", 
+  it "clears scope and filter", ->
     scoper = new WidgetScoper({})
     scoper = scoper.applyScope("a", "scope1", "filter1")
     scoper = scoper.reset()

@@ -50,3 +50,12 @@ describe "LegoLayoutEngine", ->
 
     height = @le.calculateHeight(layouts)
     assert.equal height, 40
+
+  it "appends layout", ->
+    existing = { x: 1, y: 2, w: 5, h: 1 }
+
+    layouts = { existing: existing }
+
+    newOne = @le.appendLayout(layouts, 4, 3)
+    assert.deepEqual newOne, { x: 0, y: 3, w: 4, h: 3 }
+

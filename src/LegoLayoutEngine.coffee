@@ -78,6 +78,15 @@ module.exports = class LegoLayoutEngine
 
     return results
 
+  # Adds a layout with the w and h (width and height in blocks)
+  appendLayout: (layouts, w, h) ->
+    # Check if overlaps
+    layout = { x: 0, y: 0, w: w, h: h }
+    while _.any(_.values(layouts), (pl) => @overlaps(pl, layout))
+      # Move around until fits
+      layout = @shiftLayout(layout)
+    return layout
+
   # Check if layouts overlap
   overlaps: (a, b) ->
     if a.x + a.w <= b.x

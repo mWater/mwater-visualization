@@ -69,10 +69,10 @@ describe "BarChart", ->
         table: "t1"
       }
       d = @barChart.cleanDesign(design)
-      assert.deepEqual d.aesthetics.y, {
+      assert _.isEqual(d.aesthetics.y, {
         aggr: "count"
-        expr: { type: "field", table: "t1", column: "primary" }
-      }
+        expr: { type: "scalar", table: "t1", joins: [], expr: { type: "field", table: "t1", column: "primary" } }
+      }), JSON.stringify(d.aesthetics.y)
 
   describe "validateDesign", ->
     it "validates valid design", ->
