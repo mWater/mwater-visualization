@@ -19,7 +19,6 @@ module.exports = class DashboardTestComponent extends React.Component
       onShowDesigner: => React.findDOMNode(@refs.designer)
       onHideDesigner: => alert("Designer hidden")
       width: 800
-      height: 600
       widgetFactory: new SimpleWidgetFactory(schema, dataSource)
     })
 
@@ -95,7 +94,15 @@ chartDesign = {
 dashboardDesign = {
   items: {
     a: {
-      layout: { x: 4, y: 0, w: 6, h: 6 }
+      layout: { x: 0, y: 0, w: 6, h: 6 }
+      widget: {
+        type: "BarChart"
+        version: "0.0.0"
+        design: chartDesign
+      }
+    }
+    b: {
+      layout: { x: 6, y: 0, w: 6, h: 6 }
       widget: {
         type: "BarChart"
         version: "0.0.0"

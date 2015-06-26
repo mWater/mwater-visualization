@@ -44,7 +44,6 @@ class Container extends React.Component
     layouts: React.PropTypes.object.isRequired # Lookup of id -> layout
     elems: React.PropTypes.object.isRequired # Lookup of id -> elem
     width: React.PropTypes.number.isRequired # width in pixels
-    height: React.PropTypes.number.isRequired # height in pixels
     connectDropTarget: React.PropTypes.func.isRequired # Injected by react-dnd wrapper
     onLayoutUpdate: React.PropTypes.func.isRequired # Called with array of { id, widget, layout }
 
@@ -139,9 +138,8 @@ class Container extends React.Component
       React.createElement(MoveResizeLayoutComponent, { dragInfo: dragInfo }, 
         React.cloneElement(@props.elems[id], width: bounds.width, height: bounds.height))
 
-  renderLayouts: ->
-    renderElems = []
-
+  # Calculate a lookup of layouts incorporating hover info
+  calculateLayouts: ->
     # Get hovered block if present
     hoveredDragInfo = null
     hoveredLayout = null  # Layout of hovered block
@@ -173,27 +171,36 @@ class Container extends React.Component
 
     # Perform layout
     layouts = @props.layoutEngine.performLayout(layouts, if hoveredDragInfo then hoveredDragInfo.id)
+    return layouts
+
+  renderLayouts: (layouts) ->
+    renderElems = []
+    hover = @state.moveHover or @state.resizeHover
 
     # Render blocks in their adjusted position
     for id, layout of layouts
-      if not hoveredLayout or id != hoveredDragInfo.id
+      if not hover or id != hover.dragInfo.id
         renderElems.push(@renderLayout(id, layout))
       else
-        renderElems.push(@renderPlaceholder(@props.layoutEngine.getLayoutBounds(hoveredLayout)))
+        renderElems.push(@renderPlaceholder(@props.layoutEngine.getLayoutBounds(layout)))
 
     return renderElems
 
   render: ->
+    layouts = @calculateLayouts()
+
+    # Determine height using layout engine
     style = {
       width: @props.width
-      height: @props.height
+      height: @props.layoutEngine.calculateHeight(layouts)
       position: "relative"
+      border: "solid 1px red"
     }
 
     # Connect as a drop target
     @props.connectDropTarget(
       H.div style: style, 
-        @renderLayouts()
+        @renderLayouts(layouts)
     )
 
 targetSpec = {

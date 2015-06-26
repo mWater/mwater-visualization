@@ -16,7 +16,7 @@ module.exports = class ChartTestComponent extends React.Component
   render: ->
     H.div className: "row",
       H.div className: "col-xs-6",
-        @props.chart.createViewElement(design: @state.design, data: data, width: 500, height: 500)
+        @props.chart.createViewElement(design: @state.design, data: data, width: 300, height: 300)
       H.div className: "col-xs-6",
         @props.chart.createDesignerElement(design: @state.design, onChange: @handleDesignChange)
     

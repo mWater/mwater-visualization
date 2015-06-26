@@ -1,7 +1,13 @@
 React = require 'react'
 H = React.DOM
 
+# Displays a bar chart
 module.exports = class BarChartViewComponent extends React.Component
+  @propTypes: 
+    data: React.PropTypes.object.isRequired
+    width: React.PropTypes.number.isRequired
+    height: React.PropTypes.number.isRequired
+
   constructor: ->
     super
     @state = { selected: null }

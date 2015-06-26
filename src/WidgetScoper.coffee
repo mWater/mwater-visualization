@@ -27,4 +27,4 @@ module.exports = class WidgetScoper
     return filters
 
   reset: ->
-    return new WidgetScoper()
+    return new this()

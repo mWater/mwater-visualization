@@ -18,7 +18,6 @@ module.exports = class DashboardViewComponent extends React.Component
     onIsDesigningChange: React.PropTypes.func
 
     width: React.PropTypes.number.isRequired
-    height: React.PropTypes.number.isRequired
 
     widgetFactory: React.PropTypes.object.isRequired # Factory of type WidgetFactory to make widgets
 
@@ -70,13 +69,16 @@ module.exports = class DashboardViewComponent extends React.Component
         onScopeChange: @handleScopeChange
       })  
 
+    style = {
+    }
+
     # Render widget container
-    return H.div onClick: @handleClick,
+    return H.div style: style, onClick: @handleClick,
       React.createElement(WidgetContainerComponent, 
         layoutEngine: layoutEngine
         layouts: layouts
         elems: elems
         onLayoutUpdate: @handleLayoutUpdate
         width: @props.width 
-        height: @props.height)
+      )
 

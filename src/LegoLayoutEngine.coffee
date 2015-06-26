@@ -6,6 +6,13 @@ module.exports = class LegoLayoutEngine
     @blocksAcross = blocksAcross
     @scale = @width / @blocksAcross
 
+  # Calculate the total height needed to fit all layouts
+  calculateHeight: (layouts) ->
+    bottom = _.max(_.map(_.values(layouts), (l) => @getLayoutBounds(l).y + @getLayoutBounds(l).height))
+
+    # Minimum height
+    return Math.max(bottom, @scale)
+
   # Get the bounds of a layout (x, y, width, height)
   getLayoutBounds: (layout) ->
     return {

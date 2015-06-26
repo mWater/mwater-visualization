@@ -40,3 +40,13 @@ describe "LegoLayoutEngine", ->
       existing: { x: 0, y: 6, w: 5, h: 1 }  # Moves to left
       newOne: { x: 1, y: 2, w: 3, h: 4 }
     }
+
+  it "calculates height", ->
+    existing = { x: 1, y: 2, w: 5, h: 1 }
+
+    layouts = {
+      existing: existing
+    }
+
+    height = @le.calculateHeight(layouts)
+    assert.equal height, 30
