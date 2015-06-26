@@ -23,10 +23,15 @@ module.exports = class ChartWidget extends Widget
       design: @design
       width: options.width
       height: options.height
+      selected: options.selected
+      onSelect: options.onSelect
     })
 
+  # Creates a React element that is a designer for the widget
+  # options:
+  #  onDesignChange: called with new design if changed
   createDesignerElement: (options) ->
-    throw new Error("Not implemented")
+    return @chart.createDesignerElement(design: @design, onDesignChange: options.onDesignChange)
 
 class ChartWidgetComponent extends React.Component
   @propTypes:
@@ -35,6 +40,8 @@ class ChartWidgetComponent extends React.Component
     design: React.PropTypes.object.isRequired # Design of chart
     width: React.PropTypes.number.isRequired
     height: React.PropTypes.number.isRequired
+    connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
+    connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
 
   constructor: (props) ->
     super
@@ -73,31 +80,72 @@ class ChartWidgetComponent extends React.Component
         @setState(data: data, dataQueries: queries, dataError: null)
       )
 
+  handleClick: (ev) =>
+    ev.stopPropagation()
+    @props.onSelect()
+
+  renderResizeHandle: ->
+    resizeHandleStyle = {
+      position: "absolute"
+      right: 0
+      bottom: 0
+      backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAB3RJTUUH2AkPCjIF90dj7QAAAAlwSFlzAAAPYQAAD2EBqD+naQAAAARnQU1BAACxjwv8YQUAAABISURBVHjaY2QgABwcHMSBlAETEYpagPgIIxGKCg4cOPCVkZAiIObBajUWRZhW41CEajUuRShWE1AEsZoIRWCrQSbawDh42AwAdwQtJBOblO0AAAAASUVORK5CYII=')"
+      width: 10
+      height: 10
+      cursor: "nwse-resize"
+    }
+
+    if @props.connectResizeHandle
+      return @props.connectResizeHandle(
+        H.div style: resizeHandleStyle, className: "widget-resize-handle"
+        )
+
+  renderChart: (width, height) ->
+    return @props.chart.createViewElement({
+        design: @props.design
+        data: @state.data
+        width: width
+        height: height
+      })
+
   render: ->
     # Check if design is invalid
     results = @props.chart.validateDesign(@props.design)
     if results
-      return H.div style: { width: @props.width, height: @props.height },
+      contents = H.div null, 
         "Invalid design: "
         results
-
     # If data error, display
-    if @state.dataError
-      return H.div style: { width: @props.width, height: @props.height },
+    else if @state.dataError
+      contents = H.div null,
         "Error loading data: "
         @state.dataError.toString()
 
     # If no data, loading
-    if not @state.data
-      return H.div style: { width: @props.width, height: @props.height },
+    else if not @state.data
+      contents = H.div null,
         "Loading..."
+    else 
+      contents = H.div style: { position: "absolute", left: 2, top: 2 }, 
+        @renderChart(@props.width - 8, @props.height - 8)
 
-    chartElem = @props.chart.createViewElement({
-      design: @props.design
-      data: @state.data
+    style = { 
       width: @props.width
-      height: @props.height
-    })
+      height: @props.height 
+      borderRadius: 5
+    }
 
-    H.div style: { width: @props.width, height: @props.height },
-      chartElem
+    if @props.selected
+      style.border = "solid 2px #EEE"
+    else
+      style.border = "solid 2px transparent"
+
+    elem = H.div style: style, onClick: @handleClick,
+      contents
+      @renderResizeHandle()
+
+    if @props.connectMoveHandle
+      elem = @props.connectMoveHandle(elem)
+
+    return elem
+

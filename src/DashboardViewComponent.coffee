@@ -1,3 +1,6 @@
+React = require 'react'
+H = React.DOM
+
 LegoLayoutEngine = require './LegoLayoutEngine'
 WidgetScoper = require './WidgetScoper'
 WidgetContainerComponent = require './WidgetContainerComponent'
@@ -27,14 +30,19 @@ module.exports = class DashboardViewComponent extends React.Component
 
   handleLayoutUpdate: (layouts) =>
     # Update item layouts
-    items = _.mapValues(@props.design.items, (item) =>
-      return _.extend({}, item, layout: layouts[widget.id])
+    items = _.mapValues(@props.design.items, (item, id) =>
+      return _.extend({}, item, layout: layouts[id])
       )
     design = _.extend({}, @props.design, items: items)
-    @onDesignChange(design: design)
+    @props.onDesignChange(design)
 
   handleScopeChange: (scope, filter) => 
     @setState(widgetScoper: @state.widgetScoper.applyScope(id, scope, filter))
+
+  handleClick: (ev) =>
+    # Deselect
+    ev.stopPropagation()
+    @props.onSelectedWidgetIdChange(null)
 
   render: ->
     # Create layout engine
@@ -53,6 +61,8 @@ module.exports = class DashboardViewComponent extends React.Component
     elems = _.mapValues widgets, (widget, id) =>
       widget.createViewElement({
         # width and height will be injected by widget container component
+        width: 0
+        height: 0
         selected: id == @props.selectedWidgetId
         onSelect: @props.onSelectedWidgetIdChange.bind(null, id)
         scope: @state.widgetScoper.getScope(id)
@@ -61,11 +71,12 @@ module.exports = class DashboardViewComponent extends React.Component
       })  
 
     # Render widget container
-    return React.createElement(WidgetContainerComponent, 
-      layoutEngine: layoutEngine
-      layouts: layouts
-      elems: elems
-      onLayoutUpdate: @handleLayoutUpdate
-      width: @props.width 
-      height: @props.height)
+    return H.div onClick: @handleClick,
+      React.createElement(WidgetContainerComponent, 
+        layoutEngine: layoutEngine
+        layouts: layouts
+        elems: elems
+        onLayoutUpdate: @handleLayoutUpdate
+        width: @props.width 
+        height: @props.height)
 

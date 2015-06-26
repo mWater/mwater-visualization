@@ -42,6 +42,7 @@ module.exports = class Dashboard
     @design = design
     if @onDesignChange
       @onDesignChange(design)
+    console.log design
     @render()
 
   handleIsDesigningChange: (isDesigning) =>
@@ -84,6 +85,7 @@ module.exports = class Dashboard
         onSelectedWidgetIdChange: @handleSelectedWidgetIdChange
         isDesigning: @isDesigning
         onIsDesigningChange: @handleIsDesigningChange
+        widgetFactory: @widgetFactory
         })
       React.render(designerElem, @designerNode)
 

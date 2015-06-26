@@ -210,6 +210,7 @@ targetSpec = {
         width: monitor.getItem().bounds.width + monitor.getDifferenceFromInitialOffset().x
         height: monitor.getItem().bounds.height + monitor.getDifferenceFromInitialOffset().y
         })
+    return
   hover: (props, monitor, component) ->
     if monitor.getItemType() == "block-move"
       component.setMoveHover(
@@ -223,6 +224,7 @@ targetSpec = {
         width: monitor.getItem().bounds.width + monitor.getDifferenceFromInitialOffset().x
         height: monitor.getItem().bounds.height + monitor.getDifferenceFromInitialOffset().y
         })
+    return
 }
 
 targetCollect = (connect, monitor) ->

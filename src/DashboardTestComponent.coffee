@@ -94,7 +94,7 @@ chartDesign = {
 dashboardDesign = {
   items: {
     "1": {
-      layout: { x: 4, y: 0, w: 4, h: 3 }
+      layout: { x: 4, y: 0, w: 6, h: 6 }
       widget: {
         type: "BarChart"
         version: "0.0.0"

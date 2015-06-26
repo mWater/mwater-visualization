@@ -8,7 +8,7 @@ module.exports = class Chart
     throw new Error("Not implemented")
 
   # Creates a design element with specified options
-  # options include design: design and onChange: function
+  # options include design: design and onDesignChange: function
   createDesignerElement: (options) ->
     throw new Error("Not implemented")
 

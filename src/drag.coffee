@@ -21,8 +21,6 @@ class Widget extends React.Component
       position: "absolute"
       right: 0
       bottom: 0
-      #backgroundColor: "green"
-      # backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wYWDTIvm/cDwgAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAA/SURBVCjPpc8xCgAwDAJA6cv9uZ06NNAaiZuQwAmYkBRJnb7QjCQhOY4eInN7QyV8SdU82+DMzw3OfHVnHm3YUYtls6TxmNQAAAAASUVORK5CYII=')"
       backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAB3RJTUUH2AkPCjIF90dj7QAAAAlwSFlzAAAPYQAAD2EBqD+naQAAAARnQU1BAACxjwv8YQUAAABISURBVHjaY2QgABwcHMSBlAETEYpagPgIIxGKCg4cOPCVkZAiIObBajUWRZhW41CEajUuRShWE1AEsZoIRWCrQSbawDh42AwAdwQtJBOblO0AAAAASUVORK5CYII=')"
       width: 10
       height: 10
