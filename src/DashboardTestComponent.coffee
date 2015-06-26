@@ -26,7 +26,7 @@ module.exports = class DashboardTestComponent extends React.Component
     @dashboard.render()
 
   render: ->
-    H.div className: "row",
+    H.div className: "row", style: { },
       H.div className: "col-xs-6", ref: "view"
       H.div className: "col-xs-6", ref: "designer"
 

@@ -206,10 +206,11 @@ class Container extends React.Component
 targetSpec = {
   drop: (props, monitor, component) ->
     if monitor.getItemType() == "block-move"
+      rect = React.findDOMNode(component).getBoundingClientRect()
       component.dropMoveLayout(
         dragInfo: monitor.getItem()
-        x: monitor.getClientOffset().x - (monitor.getInitialClientOffset().x - monitor.getInitialSourceClientOffset().x)
-        y: monitor.getClientOffset().y - (monitor.getInitialClientOffset().y - monitor.getInitialSourceClientOffset().y)
+        x: monitor.getClientOffset().x - (monitor.getInitialClientOffset().x - monitor.getInitialSourceClientOffset().x) - rect.left
+        y: monitor.getClientOffset().y - (monitor.getInitialClientOffset().y - monitor.getInitialSourceClientOffset().y) - rect.top
         )
     if monitor.getItemType() == "block-resize"
       component.dropResizeLayout({
@@ -220,10 +221,11 @@ targetSpec = {
     return
   hover: (props, monitor, component) ->
     if monitor.getItemType() == "block-move"
+      rect = React.findDOMNode(component).getBoundingClientRect()
       component.setMoveHover(
         dragInfo: monitor.getItem()
-        x: monitor.getClientOffset().x - (monitor.getInitialClientOffset().x - monitor.getInitialSourceClientOffset().x)
-        y: monitor.getClientOffset().y - (monitor.getInitialClientOffset().y - monitor.getInitialSourceClientOffset().y)
+        x: monitor.getClientOffset().x - (monitor.getInitialClientOffset().x - monitor.getInitialSourceClientOffset().x) - rect.left
+        y: monitor.getClientOffset().y - (monitor.getInitialClientOffset().y - monitor.getInitialSourceClientOffset().y) - rect.top
         )
     if monitor.getItemType() == "block-resize"
       component.setResizeHover({
