@@ -49,4 +49,4 @@ describe "LegoLayoutEngine", ->
     }
 
     height = @le.calculateHeight(layouts)
-    assert.equal height, 30
+    assert.equal height, 40

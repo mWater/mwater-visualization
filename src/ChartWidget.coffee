@@ -97,20 +97,23 @@ class ChartWidgetComponent extends React.Component
 
     if @props.connectResizeHandle
       return @props.connectResizeHandle(
-        H.div style: resizeHandleStyle, className: "widget-resize-handle"
+        H.div style: resizeHandleStyle, className: "mwater-chart-widget-resize-handle"
         )
 
-  renderChart: (width, height) ->
+  renderChart: (design, width, height) ->
     return @props.chart.createViewElement({
-        design: @props.design
-        data: @state.data
-        width: width
-        height: height
+      design: design
+      data: @state.data
+      width: width
+      height: height
       })
 
   render: ->
+    # Clean design first (needed to validate properly)
+    design = @props.chart.cleanDesign(@props.design)
+
     # Check if design is invalid
-    results = @props.chart.validateDesign(@props.design)
+    results = @props.chart.validateDesign(design)
     if results
       contents = H.div null, 
         "Invalid design: "
@@ -127,20 +130,17 @@ class ChartWidgetComponent extends React.Component
         "Loading..."
     else 
       contents = H.div style: { position: "absolute", left: 2, top: 2 }, 
-        @renderChart(@props.width - 8, @props.height - 8)
+        @renderChart(design, @props.width - 8, @props.height - 8)
 
     style = { 
       width: @props.width
       height: @props.height 
-      borderRadius: 5
     }
 
     if @props.selected
-      style.border = "dashed 2px #CCC"
-    else
-      style.border = "dashed 2px transparent"
+      style.border = "dashed 2px #AAA"
 
-    elem = H.div style: style, onClick: @handleClick,
+    elem = H.div className: "mwater-chart-widget", style: style, onClick: @handleClick,
       contents
       @renderResizeHandle()
 

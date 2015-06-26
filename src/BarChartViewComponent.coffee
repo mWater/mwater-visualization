@@ -4,7 +4,7 @@ H = React.DOM
 # Displays a bar chart
 module.exports = class BarChartViewComponent extends React.Component
   @propTypes: 
-    data: React.PropTypes.object.isRequired
+    data: React.PropTypes.array.isRequired
     width: React.PropTypes.number.isRequired
     height: React.PropTypes.number.isRequired
 

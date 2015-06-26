@@ -48,19 +48,19 @@
 	color: #639db0;
 }
 
-.widget {
+.mwater-chart-widget {
 	border: solid 2px transparent;
+	border-radius: 8px;
 }
 
-.widget:hover {
+.mwater-chart-widget:hover {
 	border: solid 2px #EEE;
-	border-radius: 3px;
 }
 
-.widget .widget-resize-handle {
+.mwater-chart-widget .mwater-chart-widget-resize-handle {
 	display: none;
 }
 
-.widget:hover .widget-resize-handle {
+.mwater-chart-widget:hover .mwater-chart-widget-resize-handle {
 	display: block;
 }

@@ -60,7 +60,7 @@ module.exports = class BarChart extends Chart
         # Get id column
         idCol = _.findWhere(@schema.getColumns(design.table), type: "id")
         if idCol
-          design.aesthetics.y = { expr: { type: "field", table: design.table, column: idCol.id }, aggr: "count" }
+          design.aesthetics.y = { expr: { type: "scalar", table: design.table, joins: [], expr: { type: "field", table: design.table, column: idCol.id } }, aggr: "count" }
 
     # Default y aggr
     if design.aesthetics.y and design.aesthetics.y.expr and not design.aesthetics.y.aggr
@@ -99,7 +99,7 @@ module.exports = class BarChart extends Chart
   createDesignerElement: (options) ->
     props = {
       schema: @schema
-      design: options.design
+      design: @cleanDesign(options.design)
       onDesignChange: (design) =>
         # Clean design
         design = @cleanDesign(design)
@@ -136,10 +136,6 @@ module.exports = class BarChart extends Chart
   # data: results from queries
   # width, height
   createViewElement: (options) ->
-    # # Validate design
-    # error = @validateDesign(@cleanDesign(options.design))
-    # if error
-    #   return H.div className: "alert alert-warning", error
     rows = options.data.main
     for row in rows
       if not row.x
@@ -148,7 +144,7 @@ module.exports = class BarChart extends Chart
     # Create datum from query re    
     props = {
       schema: @schema
-      design: options.design
+      design: @cleanDesign(options.design)
       onChange: options.onChange
       width: options.width
       height: options.height

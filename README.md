@@ -7,7 +7,8 @@
 ## Principles
 
 * In design, things must be valid or null. Design can be incomplete but not invalid
-* After any change design is cleaned
+* After any change design is cleaned before being stored
+* Stored design is always cleaned before being edited or displayed
 
 ## Layout
 
@@ -43,3 +44,8 @@ The actual `Widget` is created by the `WidgetFactory`
 ### Widget scoping
 
 Each widget may have a scope (private data indicating which part is highlighted) and apply filters as a result to other widgets
+
+
+## TODO
+
+Decide on responsibility for cleaning designs. A non-clean design cannot be validated, but also should not be stored. Both in and out?

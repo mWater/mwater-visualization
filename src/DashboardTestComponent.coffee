@@ -106,7 +106,7 @@ dashboardDesign = {
       widget: {
         type: "BarChart"
         version: "0.0.0"
-        design: chartDesign
+        design: { table: "a" }
       }
     }
   }

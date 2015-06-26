@@ -194,7 +194,6 @@ class Container extends React.Component
       width: @props.width
       height: @props.layoutEngine.calculateHeight(layouts)
       position: "relative"
-      border: "solid 1px red"
     }
 
     # Connect as a drop target
