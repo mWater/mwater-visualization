@@ -25,3 +25,6 @@ module.exports = class WidgetScoper
         filters.push(value.filter)
 
     return filters
+
+  reset: ->
+    return new WidgetScoper()
