@@ -70,7 +70,6 @@ module.exports = class Dashboard
       isDesigning: @isDesigning
       onIsDesigningChange: @handleIsDesigningChange
       width: @width
-      height: @height
       widgetFactory: @widgetFactory
       })
 
@@ -84,6 +83,7 @@ module.exports = class Dashboard
         onSelectedWidgetIdChange: @handleSelectedWidgetIdChange
         isDesigning: @isDesigning
         onIsDesigningChange: @handleIsDesigningChange
+        width: @width
         widgetFactory: @widgetFactory
         })
       React.render(designerElem, @designerNode)

@@ -109,6 +109,15 @@ class ChartWidgetComponent extends React.Component
       })
 
   render: ->
+    style = { 
+      width: @props.width
+      height: @props.height 
+      margin: 10
+    }
+    
+    if @props.selected
+      style.border = "dashed 2px #AAA"
+
     # Clean design first (needed to validate properly)
     design = @props.chart.cleanDesign(@props.design)
 
@@ -118,11 +127,13 @@ class ChartWidgetComponent extends React.Component
       contents = H.div null, 
         "Invalid design: "
         results
+      style.backgroundColor = "#DDD"
     # If data error, display
     else if @state.dataError
       contents = H.div null,
         "Error loading data: "
         @state.dataError.toString()
+      style.backgroundColor = "#DDD"
 
     # If no data, loading
     else if not @state.data
@@ -131,14 +142,6 @@ class ChartWidgetComponent extends React.Component
     else 
       contents = H.div style: { position: "absolute", left: 2, top: 2 }, 
         @renderChart(design, @props.width - 8, @props.height - 8)
-
-    style = { 
-      width: @props.width
-      height: @props.height 
-    }
-
-    if @props.selected
-      style.border = "dashed 2px #AAA"
 
     elem = H.div className: "mwater-chart-widget", style: style, onClick: @handleClick,
       contents
