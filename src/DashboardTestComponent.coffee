@@ -1,6 +1,7 @@
 React = require 'react'
 H = React.DOM
 Dashboard = require './Dashboard'
+WidgetFactory = require './WidgetFactory'
 
 # Playground for a dashboard
 module.exports = class DashboardTestComponent extends React.Component
@@ -19,7 +20,7 @@ module.exports = class DashboardTestComponent extends React.Component
       onShowDesigner: => React.findDOMNode(@refs.designer)
       onHideDesigner: => alert("Designer hidden")
       width: 800
-      widgetFactory: new SimpleWidgetFactory(schema, dataSource)
+      widgetFactory: new WidgetFactory(schema, dataSource)
     })
 
     console.log "Rendering dashboard"
@@ -117,24 +118,6 @@ DataSource = require './DataSource'
 class SimpleDataSource extends DataSource 
   performQueries: (queries, cb) ->
     cb(null, data)
-
-WidgetFactory = require './WidgetFactory'
-BarChart = require './BarChart'
-ChartWidget = require './ChartWidget'
-
-class SimpleWidgetFactory extends WidgetFactory
-  constructor: (schema, dataSource) ->
-    @schema = schema
-    @dataSource = dataSource
-
-  createWidget: (type, version, design) ->
-    if type != "BarChart"
-      throw new Error("Unknown widget type #{type}")
-
-    # Create chart object
-    chart = new BarChart(@schema)  
-    return new ChartWidget(chart, design, @dataSource)
-
 
 Schema = require './Schema'
 

@@ -2,6 +2,7 @@ React = require 'react'
 
 DashboardViewComponent = require './DashboardViewComponent'
 DashboardDesignerComponent = require './DashboardDesignerComponent'
+AutoWidthComponent = require './AutoWidthComponent'
 
 # Top-level class which holds design of dashboard as state, the undo/redo stack and the DOM elements
 # to render the view and optionally the designer
@@ -13,8 +14,6 @@ module.exports = class Dashboard
   # onShowDesigner: called to show the designer pane, returns DOM node
   # onHideDesigner: called to hide the designer pane
   # onDesignChange: called when design is changed (optional). Should save dashboard if desired
-  # width: width of dashboard in pixels # TODO how updated?
-  # height: height of dashboard in pixels # TODO how updated?
   # widgetFactory: WidgetFactory to use
   constructor: (options) ->
     @design = options.design
@@ -23,8 +22,6 @@ module.exports = class Dashboard
     @onShowDesigner = options.onShowDesigner
     @onHideDesigner = options.onHideDesigner
     @onDesignChange = options.onDesignChange
-    @width = options.width
-    @height = options.height
     @widgetFactory = options.widgetFactory
 
     # Currently selected widget starts as none
@@ -69,7 +66,6 @@ module.exports = class Dashboard
       onSelectedWidgetIdChange: @handleSelectedWidgetIdChange
       isDesigning: @isDesigning
       onIsDesigningChange: @handleIsDesigningChange
-      width: @width
       widgetFactory: @widgetFactory
       })
 
