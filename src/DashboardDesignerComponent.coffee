@@ -11,7 +11,6 @@ module.exports = class DashboardDesignerComponent extends React.Component
     onSelectedWidgetIdChange: React.PropTypes.func.isRequired # Call when change of widget (not used)
     isDesigning: React.PropTypes.bool.isRequired # Not used (since always designing)
     onIsDesigningChange: React.PropTypes.func
-    width: React.PropTypes.number.isRequired # Width of dashboard
     widgetFactory: React.PropTypes.object.isRequired # Factory of type WidgetFactory to make widgets
 
   handleDesignChange: (widgetDesign) =>
@@ -30,7 +29,8 @@ module.exports = class DashboardDesignerComponent extends React.Component
   handleAddBarChart: =>
     # Create layout engine
     # TODO create from design
-    layoutEngine = new LegoLayoutEngine(@props.width, 12)
+    # TODO uses fake width
+    layoutEngine = new LegoLayoutEngine(100, 12)
 
     # Get existing layouts
     layouts = _.pluck(_.values(@props.design.items), "layout")
@@ -55,15 +55,22 @@ module.exports = class DashboardDesignerComponent extends React.Component
 
     design = _.extend({}, @props.design, items: items)
     @props.onDesignChange(design)
+    @props.onSelectedWidgetIdChange(id)
 
   # Designer when no widgets displayed
   renderGeneralDesigner: ->
     return H.div null, 
-      H.div null, "Click on widgets to edit them"
-      H.a className: "btn btn-link", onClick: @handleAddBarChart,
-        H.span className: "glyphicon glyphicon-plus"
-        " "
-        "Add Bar Chart"
+      H.div className: "well well-sm", 
+        "Click on widgets to edit them"
+
+      H.div className: "btn-group",
+        H.button type: "button", "data-toggle": "dropdown", className: "btn btn-default dropdown-toggle",
+          H.span className: "glyphicon glyphicon-plus"
+          " Add Widget "
+          H.span className: "caret"
+        H.ul className: "dropdown-menu",
+          H.li null,
+            H.a onClick: @handleAddBarChart, "Bar Chart"
 
   render: ->
     if not @props.selectedWidgetId
