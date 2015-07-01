@@ -15,6 +15,7 @@ module.exports = class ChartWidget extends Widget
   #  height: height in pixels
   #  selected: true if selected
   #  onSelect: called when selected
+  #  onRemove: called when removed
   createViewElement: (options) ->
     # Wrap in a chart widget
     return React.createElement(ChartWidgetComponent, {
@@ -25,6 +26,7 @@ module.exports = class ChartWidget extends Widget
       height: options.height
       selected: options.selected
       onSelect: options.onSelect
+      onRemove: options.onRemove
     })
 
   # Creates a React element that is a designer for the widget
@@ -42,6 +44,7 @@ class ChartWidgetComponent extends React.Component
     height: React.PropTypes.number.isRequired
     connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
     connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
+    onRemove: React.PropTypes.func
 
   constructor: (props) ->
     super
@@ -100,6 +103,18 @@ class ChartWidgetComponent extends React.Component
         H.div style: resizeHandleStyle, className: "mwater-chart-widget-resize-handle"
         )
 
+  renderRemoveButton: ->
+    removeButtonStyle = {
+      position: "absolute"
+      right: 5
+      top: 5
+      cursor: "pointer"
+    }
+
+    if @props.onRemove
+      H.div style: removeButtonStyle, className: "mwater-chart-widget-remove-button", onClick: @props.onRemove,
+        H.span className: "glyphicon glyphicon-remove"
+
   renderChart: (design, width, height) ->
     return @props.chart.createViewElement({
       design: design
@@ -146,6 +161,7 @@ class ChartWidgetComponent extends React.Component
     elem = H.div className: "mwater-chart-widget", style: style, onClick: @handleClick,
       contents
       @renderResizeHandle()
+      @renderRemoveButton()
 
     if @props.connectMoveHandle
       elem = @props.connectMoveHandle(elem)

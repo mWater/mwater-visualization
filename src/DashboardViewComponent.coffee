@@ -62,6 +62,12 @@ class InnerDashboardViewComponent extends React.Component
     ev.stopPropagation()
     @props.onSelectedWidgetIdChange(null)
 
+  handleRemove: (id) =>
+    # Update item layouts
+    items = _.omit(@props.design.items, id)
+    design = _.extend({}, @props.design, items: items)
+    @props.onDesignChange(design)
+
   render: ->
     # Create layout engine
     # TODO create from design
@@ -86,6 +92,7 @@ class InnerDashboardViewComponent extends React.Component
         scope: @state.widgetScoper.getScope(id)
         filters: @state.widgetScoper.getFilters(id)
         onScopeChange: @handleScopeChange
+        onRemove: @handleRemove.bind(null, id)
       })  
 
     style = {

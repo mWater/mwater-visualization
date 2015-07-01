@@ -64,3 +64,12 @@
 .mwater-chart-widget:hover .mwater-chart-widget-resize-handle {
 	display: block;
 }
+
+.mwater-chart-widget .mwater-chart-widget-remove-button {
+	display: none;
+	color: #AAA;
+}
+
+.mwater-chart-widget:hover .mwater-chart-widget-remove-button {
+	display: block;
+}
