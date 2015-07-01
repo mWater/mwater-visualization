@@ -28,44 +28,20 @@ module.exports = class BarChartDesignerComponent extends React.Component
     design = _.extend({}, @props.design, changes)
     @props.onDesignChange(design)
 
-  # renderYAxis: ->
-  #   H.div className: "form-group",
-  #     H.label null, "Bar size"
-  #     H.div null, 
-  #       React.createElement(ScalarExprComponent, 
-  #         editorTitle: "Bar size"
-  #         schema: @props.schema
-  #         onChange: @handleYAxisChange
-  #         value: @props.value.yAxis)
-  #     H.p className: "help-block", "Field to use for the size of the bars"
-
-  # renderXAxis: ->
-  #   # If no y axis, hide
-  #   if not @props.value.yAxis
-  #     return null
-
-  #   # Expression is limited to same table as y-axis
-  #   return H.div className: "form-group",
-  #     H.label null, "Group By"
-  #     H.div null, 
-  #       React.createElement(ScalarExprComponent, 
-  #         editorTitle: "Group By"
-  #         schema: @props.schema
-  #         table: @props.value.yAxis.table
-  #         onChange: @handleXAxisChange
-  #         value: @props.value.xAxis)
-  #     H.p className: "help-block", "Field to group by"
-
   renderTable: ->
+    if not @props.design.table
+      popover = "Start by selecting a data source"
+
     return H.div className: "form-group",
       H.label null, "Table"
       H.div null, 
-       React.createElement(EditableLinkComponent, 
-          dropdownItems: @props.schema.getTables()
-          onDropdownItemClicked: @handleTableChange
-          onRemove: @handleTableChange.bind(this, null)
-          if @props.design.table then @props.schema.getTable(@props.design.table).name else H.i(null, "Select...")
-          )
+        React.createElement PopoverComponent, html: popover, 
+          React.createElement(EditableLinkComponent, 
+            dropdownItems: @props.schema.getTables()
+            onDropdownItemClicked: @handleTableChange
+            onRemove: @handleTableChange.bind(this, null)
+            if @props.design.table then @props.schema.getTable(@props.design.table).name else H.i(null, "Select...")
+            )
         # React.createElement(ReactSelect, { 
         #   value: @props.design.table, 
         #   options: _.map(@props.schema.getTables(), (t) => { value: t.id, label: t.name }) 
@@ -120,6 +96,38 @@ module.exports = class BarChartDesignerComponent extends React.Component
           @renderYAesthetic()
           @renderFilter()
         ]
+
+# Wraps a child with an optional popover
+class PopoverComponent extends React.Component
+  @propTypes: 
+    html: React.PropTypes.string # html to display
+    placement: React.PropTypes.string # See http://getbootstrap.com/javascript/#popovers
+
+  componentDidMount: ->
+    @updatePopover(@props, null)
+
+  componentWillUnmount: ->
+    @updatePopover(null, @props)
+
+  componentDidUpdate: (prevProps) ->
+    @updatePopover(@props, prevProps)
+
+  updatePopover: (props, oldProps) ->
+    # Destroy old popover
+    if oldProps and oldProps.html
+      $(React.findDOMNode(@refs.child)).popover("destroy")      
+      
+    if props and props.html
+      $(React.findDOMNode(@refs.child)).popover({
+        content: props.html
+        html: true
+        trigger: "manual"
+        placement: @props.placement
+        })
+      $(React.findDOMNode(@refs.child)).popover("show")
+
+  render: ->
+    React.cloneElement(React.Children.only(@props.children), ref: "child")
 
 class AestheticComponent extends React.Component
   @propTypes:

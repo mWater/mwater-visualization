@@ -112,7 +112,7 @@ class ChartWidgetComponent extends React.Component
     style = { 
       width: @props.width
       height: @props.height 
-      margin: 10
+      padding: 10
     }
     
     if @props.selected
@@ -140,8 +140,8 @@ class ChartWidgetComponent extends React.Component
       contents = H.div null,
         "Loading..."
     else 
-      contents = H.div style: { position: "absolute", left: 2, top: 2 }, 
-        @renderChart(design, @props.width - 8, @props.height - 8)
+      contents = H.div style: { position: "absolute", left: 10, top: 10 }, 
+        @renderChart(design, @props.width - 20, @props.height - 20)
 
     elem = H.div className: "mwater-chart-widget", style: style, onClick: @handleClick,
       contents
