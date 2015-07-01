@@ -63,9 +63,13 @@ class InnerDashboardViewComponent extends React.Component
     @props.onSelectedWidgetIdChange(null)
 
   handleRemove: (id) =>
+    # First unselect widgets
+    @props.onSelectedWidgetIdChange(null)
+    
     # Update item layouts
     items = _.omit(@props.design.items, id)
     design = _.extend({}, @props.design, items: items)
+
     @props.onDesignChange(design)
 
   render: ->
