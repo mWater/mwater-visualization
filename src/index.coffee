@@ -4,4 +4,9 @@ exports.LogicalExprComponent = require './LogicalExprComponent'
 exports.ExpressionBuilder = require './ExpressionBuilder'
 exports.ExpressionCompiler = require './ExpressionCompiler'
 exports.ScalarExprComponent = require './ScalarExprComponent'
-exports.BarChart = require './BarChart'
+
+exports.DataSource = require './DataSource'
+exports.WidgetFactory = require './WidgetFactory'
+
+exports.DashboardViewComponent = require './DashboardViewComponent'
+exports.DashboardDesignerComponent = require './DashboardDesignerComponent'
