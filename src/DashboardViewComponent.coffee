@@ -26,19 +26,19 @@ module.exports = class DashboardViewComponent extends React.Component
 
 # Dashboard component that requires width. Wrapped to inject width automatically
 class InnerDashboardViewComponent extends React.Component
-  # @propTypes: 
-  #   design: React.PropTypes.object.isRequired
-  #   onDesignChange: React.PropTypes.func.isRequired
+  @propTypes: 
+    design: React.PropTypes.object.isRequired
+    onDesignChange: React.PropTypes.func.isRequired
 
-  #   selectedWidgetId: React.PropTypes.string
-  #   onSelectedWidgetIdChange: React.PropTypes.func.isRequired
+    selectedWidgetId: React.PropTypes.string
+    onSelectedWidgetIdChange: React.PropTypes.func.isRequired
 
-  #   isDesigning: React.PropTypes.bool.isRequired
-  #   onIsDesigningChange: React.PropTypes.func
+    isDesigning: React.PropTypes.bool.isRequired
+    onIsDesigningChange: React.PropTypes.func
 
-  #   width: React.PropTypes.number.isRequired
+    width: React.PropTypes.number.isRequired
 
-  #   widgetFactory: React.PropTypes.object.isRequired # Factory of type WidgetFactory to make widgets
+    widgetFactory: React.PropTypes.object.isRequired # Factory of type WidgetFactory to make widgets
 
   constructor: (props) ->
     super

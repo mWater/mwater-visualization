@@ -8,16 +8,20 @@ module.exports = class Chart
     throw new Error("Not implemented")
 
   # Creates a design element with specified options
-  # options include design: design and onDesignChange: function
+  # options include:
+  # design: design of chart 
+  # onDesignChange: function called when design changes
   createDesignerElement: (options) ->
     throw new Error("Not implemented")
 
-  createQueries: (design) ->
+  createQueries: (design, filters) ->
     throw new Error("Not implemented")
 
   # Options include 
-  # design: design of the component
+  # design: design of the chart
   # data: results from queries
   # width, height: size of the chart view
+  # scope: current scope of the view element
+  # onScopeChange: called when scope changes with new scope
   createViewElement: (options) ->
     throw new Error("Not implemented")

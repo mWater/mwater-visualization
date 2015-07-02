@@ -107,7 +107,7 @@ module.exports = class BarChart extends Chart
     }
     return React.createElement(BarChartDesignerComponent, props)
 
-  createQueries: (design) ->
+  createQueries: (design, filters) ->
     exprCompiler = new ExpressionCompiler(@schema)
 
     # Create main query
@@ -129,26 +129,49 @@ module.exports = class BarChart extends Chart
     if design.filter
       query.where = exprCompiler.compileExpr(expr: design.filter, tableAlias: "main")
 
+    # Add filters
+    if filters and filters.length > 0
+      # Get relevant filters
+      relevantFilters = _.where(filters, table: design.table)
+
+      # If any, create and
+      if relevantFilters.length > 0
+        whereClauses = []
+
+        # Keep existing where
+        if query.where
+          whereClauses.push(query.where)
+
+        # Add others
+        for filter in relevantFilters
+          whereClauses.push(exprCompiler.compileExpr(expr: filter, tableAlias: "main"))
+
+        # Wrap if multiple
+        if whereClauses.length > 1
+          query.where = { type: "op", op: "and", exprs: whereClauses }
+        else
+          query.where = whereClauses[0]
+
     return { main: query }
 
   # Options include 
-  # design: design of the component
+  # design: design of the chart
   # data: results from queries
-  # width, height
+  # width, height: size of the chart view
+  # scope: current scope of the view element
+  # onScopeChange: called when scope changes with new scope
   createViewElement: (options) ->
-    rows = options.data.main
-    for row in rows
-      if not row.x
-        row.x = "(None)"
-
-    # Create datum from query re    
+    # Create chart
     props = {
       schema: @schema
       design: @cleanDesign(options.design)
-      onChange: options.onChange
+      data: options.data
+
       width: options.width
       height: options.height
-      data: rows
+
+      scope: options.scope
+      onScopeChange: options.onScopeChange
     }
 
     return React.createElement(BarChartViewComponent, props)

@@ -2,8 +2,9 @@
     "framework": "mocha",
     "serve_files": [ 
         "bower_components/jquery/dist/jquery.js",
-        "bower_components/underscore/underscore.js",
+        "bower_components/lodash/dist/lodash.min.js",
         "bower_components/backbone/backbone.js",
+        "bower_components/react/react-with-addons.js",
         "test/browserified.js"
      ],
     "src_files": [

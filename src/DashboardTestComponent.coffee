@@ -107,7 +107,7 @@ dashboardDesign = {
       widget: {
         type: "BarChart"
         version: "0.0.0"
-        design: { table: "a" }
+        design: _.cloneDeep(chartDesign)
       }
     }
   }

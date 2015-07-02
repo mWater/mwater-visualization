@@ -12,10 +12,6 @@ module.exports = class BarChartViewComponent extends React.Component
     width: React.PropTypes.number.isRequired
     height: React.PropTypes.number.isRequired
 
-  constructor: ->
-    super
-    @state = { selected: null }
-
   componentDidMount: ->
     @createChart(@props)
 
@@ -30,7 +26,7 @@ module.exports = class BarChartViewComponent extends React.Component
         bindto: el
         data: {
           type: "bar"
-          json: props.data
+          json: props.data.main
           keys: { x: "x", value: ["y"] }
           names: { y: 'Value' } # Name the data
           onclick: @handleDataClick
@@ -57,7 +53,7 @@ module.exports = class BarChartViewComponent extends React.Component
     if not _.isEqual(@props.data, nextProps.data)
       # Reload data
       @chart.load({ 
-        json: nextProps.data
+        json: nextProps.data.main
         keys: { x: "x", value: ["y"] }
         names: { y: 'Value' } # Name the data
       })
@@ -65,6 +61,7 @@ module.exports = class BarChartViewComponent extends React.Component
 
   # Update selected value
   updateSelected: =>
+    return
     d3.select(React.findDOMNode(@refs.chart))
       .select(".c3-bars-y") # Get bars
       .selectAll(".c3-bar")
@@ -72,6 +69,12 @@ module.exports = class BarChartViewComponent extends React.Component
       .style("opacity", (d,i) => if not @state.selected? or i == @state.selected then 1 else 0.3)    
 
   handleDataClick: (d) =>
+    # Scope is index
+    scope = d.index
+
+    # Filter is 
+    console.log d
+    console.log @props.data.main
     selected = if @state.selected == d.index then null else d.index
     @setState(selected: selected)
 

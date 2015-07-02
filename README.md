@@ -45,6 +45,19 @@ The actual `Widget` is created by the `WidgetFactory`
 
 Each widget may have a scope (private data indicating which part is highlighted) and apply filters as a result to other widgets
 
+## Component Layout
+
+`Dashboard` is a convenience class which holds a `DashboardViewComponent` and a `DashboardDesignerComponent` (if designing). It holds the state of the design.
+
+`DashboardViewComponent` holds the scoping (clicking on a chart's element filters all others. The element clicked on is the scope and the filters are applied to all other widgets)
+It is also responsible for removing widgets and it holds the drag and drop `WidgetContainerComponent`.
+
+The dashboard works with abstract `Widget`s. Widgets have methods to create a viewer and a designer element
+
+For charts, a `ChartWidget` is created which makes a `ChartWidgetComponent` that holds the current query results as state. It also renders the trimmings such as resize handle, remove button and border.
+
+`ChartWidgetComponent` calls its `Chart` class to create the queries and create the display element
+
 
 ## TODO
 

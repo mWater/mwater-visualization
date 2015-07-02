@@ -1,3 +1,4 @@
+_ = require 'lodash'
 gulp = require 'gulp'
 gutil = require 'gulp-util'
 glob = require 'glob'
@@ -70,7 +71,11 @@ gulp.task 'copy_assets', ->
 
 gulp.task 'prepare_tests', ->
   files = glob.sync("./test/**/*Tests.coffee")
-  bundler = browserify({ entries: files, extensions: [".js", ".coffee"], debug: true })
+  files = _.map(files, (f) -> "." + f)
+  bundler = shim(browserify({ 
+    entries: files, 
+    basedir: "./src/"
+    extensions: [".js", ".coffee"] }))
   return bundler.bundle()
     .on('error', gutil.log)
     .on('error', -> throw "Failed")

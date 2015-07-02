@@ -15,7 +15,10 @@ module.exports = class ChartWidget extends Widget
   #  height: height in pixels
   #  selected: true if selected
   #  onSelect: called when selected
-  #  onRemove: called when removed
+  #  onRemove: called when widget is removed
+  #  scope: scope of the widget (when the widget self-selects a particular scope)
+  #  filters: array of filters to apply (array of expressions)
+  #  onScopeChange: called with (scope, filter) as a scope to apply to self and filter to apply to other widgets
   createViewElement: (options) ->
     # Wrap in a chart widget
     return React.createElement(ChartWidgetComponent, {
@@ -27,6 +30,9 @@ module.exports = class ChartWidget extends Widget
       selected: options.selected
       onSelect: options.onSelect
       onRemove: options.onRemove
+      scope: options.scope
+      filters: options.filters
+      onScopeChange: options.onScopeChange
     })
 
   # Creates a React element that is a designer for the widget
@@ -40,11 +46,20 @@ class ChartWidgetComponent extends React.Component
     chart: React.PropTypes.object.isRequired # Chart object to use
     dataSource: React.PropTypes.object.isRequired # Data source to use for chart
     design: React.PropTypes.object.isRequired # Design of chart
+
     width: React.PropTypes.number.isRequired
     height: React.PropTypes.number.isRequired
+
+    selected: React.PropTypes.bool # true if selected
+    onSelect: React.PropTypes.func # called when selected
+    onRemove: React.PropTypes.func # called when widget is removed
+    
+    scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
+    filters: React.PropTypes.array  # array of filters to apply (array of expressions)
+    onScopeChange: React.PropTypes.func # called with (scope, filter) as a scope to apply to self and filter to apply to other widgets
+
     connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
     connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
-    onRemove: React.PropTypes.func
 
   constructor: (props) ->
     super
@@ -68,7 +83,7 @@ class ChartWidgetComponent extends React.Component
       return
 
     # Get queries
-    queries = props.chart.createQueries(props.design)
+    queries = props.chart.createQueries(props.design, props.filters)
 
     # Skip if same
     if _.isEqual(queries, @state.dataQueries)
@@ -125,6 +140,8 @@ class ChartWidgetComponent extends React.Component
       data: @state.data
       width: width
       height: height
+      scope: @props.scope
+      onScopeChange: @props.onScopeChange
       })
 
   render: ->
@@ -146,13 +163,13 @@ class ChartWidgetComponent extends React.Component
       contents = H.div null, 
         "Invalid design: "
         results
-      style.backgroundColor = "#DDD"
+      style.backgroundColor = "#EEE"
     # If data error, display
     else if @state.dataError
       contents = H.div null,
         "Error loading data: "
         @state.dataError.toString()
-      style.backgroundColor = "#DDD"
+      style.backgroundColor = "#EEE"
 
     # If no data, loading
     else if not @state.data

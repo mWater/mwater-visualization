@@ -120,15 +120,16 @@ describe "BarChart", ->
       assert @barChart.validateDesign(design)
 
   describe "createQueries", ->
-    it "creates simple query, grouping by x aesthetic expr", ->
-      design = {
-        aesthetics: {
-          x: { expr: { type: "field", table: "t1", column: "enum" } }
-          y: { expr: { type: "field", table: "t1", column: "decimal" }, aggr: "sum" }
-        }
-        table: "t1"
+    simpleDesign = {
+      aesthetics: {
+        x: { expr: { type: "field", table: "t1", column: "enum" } }
+        y: { expr: { type: "field", table: "t1", column: "decimal" }, aggr: "sum" }
       }
+      table: "t1"
+    }
 
+    it "creates simple query, grouping by x aesthetic expr", ->
+      design = simpleDesign
       queries = @barChart.createQueries(design)
 
       expectedQuery = {
@@ -138,6 +139,37 @@ describe "BarChart", ->
           { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "decimal" }] }, alias: "y" }
         ]
         from: { type: "table", table: "t1", alias: "main" }
+        groupBy: [1]
+        limit: 1000
+      }
+
+      assert _.isEqual(queries.main, expectedQuery), JSON.stringify(queries.main, null, 2)
+
+    it "filters if by relevant filter", ->
+      relevantFilter = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "integer" }, op: ">", rhs: { type: "literal", valueType: "integer", value: 4 } }
+
+      # Wrong table
+      otherFilter = { type: "comparison", table: "t2", lhs: { type: "field", table: "t2", column: "integer" }, op: ">", rhs: { type: "literal", valueType: "integer", value: 5 } }
+
+      filters = [
+        relevantFilter
+        otherFilter
+      ]
+
+      design = simpleDesign
+      queries = @barChart.createQueries(design, filters)
+
+      expectedQuery = {
+        type: "query"
+        selects: [
+          { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "x" }
+          { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "decimal" }] }, alias: "y" }
+        ]
+        from: { type: "table", table: "t1", alias: "main" }
+        where: { type: "op", op: ">", exprs: [
+          { type: "field", tableAlias: "main", column: "integer" }
+          { type: "literal", value: 4 }
+        ]}
         groupBy: [1]
         limit: 1000
       }
