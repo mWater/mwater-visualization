@@ -117,8 +117,10 @@ class ChartWidgetComponent extends React.Component
       right: 0
       bottom: 0
       backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAB3RJTUUH2AkPCjIF90dj7QAAAAlwSFlzAAAPYQAAD2EBqD+naQAAAARnQU1BAACxjwv8YQUAAABISURBVHjaY2QgABwcHMSBlAETEYpagPgIIxGKCg4cOPCVkZAiIObBajUWRZhW41CEajUuRShWE1AEsZoIRWCrQSbawDh42AwAdwQtJBOblO0AAAAASUVORK5CYII=')"
-      width: 10
-      height: 10
+      backgroundRepeat: "no-repeat"
+      backgroundPosition: "right bottom"
+      width: 20
+      height: 20
       cursor: "nwse-resize"
     }
 
@@ -146,7 +148,7 @@ class ChartWidgetComponent extends React.Component
     style = {
       position: "absolute"
       right: 10
-      top: 25
+      top: 30
       cursor: "pointer"
       borderRadius: 100
       border: "solid 1px #DDD"

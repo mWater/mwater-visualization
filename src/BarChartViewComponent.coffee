@@ -21,6 +21,7 @@ module.exports = class BarChartViewComponent extends React.Component
 
   componentDidMount: ->
     @createChart(@props)
+    @updateScope()
 
   # Makes nulls into (none) and localizes enums
   prepareData: (data) ->
@@ -61,8 +62,6 @@ module.exports = class BarChartViewComponent extends React.Component
         size: { width: props.width, height: props.height - titleHeight }
     })
 
-    @updateSelected()
-
   componentWillReceiveProps: (nextProps) ->
     # Check if size changed
     if @props.height != nextProps.height or @props.width != nextProps.width
@@ -74,17 +73,16 @@ module.exports = class BarChartViewComponent extends React.Component
       if @props.data.main.length != nextProps.data.main.length
         @createChart(nextProps)
         return
-        
+
       # Reload data
       @chart.load({ 
         json: @prepareData(nextProps.data).main
         keys: { x: "x", value: ["y"] }
         names: { y: 'Value' } # Name the data
       })
-      @setState(selected: null)
 
-  # Update selected value
-  updateSelected: =>
+  # Update scoped value
+  updateScope: =>
     d3.select(React.findDOMNode(@refs.chart))
       .select(".c3-bars-y") # Get bars
       .selectAll(".c3-bar")
@@ -124,7 +122,7 @@ module.exports = class BarChartViewComponent extends React.Component
     @props.onScopeChange(scope, filter)
 
   componentDidUpdate: ->
-    @updateSelected()
+    @updateScope()
 
   componentWillUnmount: ->
     @chart.destroy()
