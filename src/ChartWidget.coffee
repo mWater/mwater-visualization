@@ -87,6 +87,10 @@ class ChartWidgetComponent extends React.Component
     ev.stopPropagation()
     @props.onSelect()
 
+  handleRemove: (ev) =>
+    ev.stopPropagation()
+    @props.onRemove()
+
   renderResizeHandle: ->
     resizeHandleStyle = {
       position: "absolute"
@@ -112,7 +116,7 @@ class ChartWidgetComponent extends React.Component
     }
 
     if @props.onRemove
-      H.div style: removeButtonStyle, className: "mwater-chart-widget-remove-button", onClick: @props.onRemove,
+      H.div style: removeButtonStyle, className: "mwater-chart-widget-remove-button", onClick: @handleRemove,
         H.span className: "glyphicon glyphicon-remove"
 
   renderChart: (design, width, height) ->
