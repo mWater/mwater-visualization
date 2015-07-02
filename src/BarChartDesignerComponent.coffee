@@ -23,6 +23,11 @@ module.exports = class BarChartDesignerComponent extends React.Component
   handleFilterChange: (val) =>
     @updateDesign(filter: val)
 
+  handleTitleChange: (ev) =>
+    annotations = _.clone(@props.design.annotations)
+    annotations.title = ev.target.value
+    @updateDesign(annotations: annotations)
+
   # Updates design with the specified changes
   updateDesign: (changes) ->
     design = _.extend({}, @props.design, changes)
@@ -82,6 +87,11 @@ module.exports = class BarChartDesignerComponent extends React.Component
         table: @props.design.table
         value: @props.design.filter)
 
+  renderTitle: ->
+    H.div className: "form-group",
+      H.label null, "Title"
+      H.input type: "text", className: "form-control", value: @props.design.annotations.title, onChange: @handleTitleChange, placeholder: "Untitled"
+
   render: ->
     H.div null,
       # if error 
@@ -96,6 +106,7 @@ module.exports = class BarChartDesignerComponent extends React.Component
           @renderYAesthetic()
           @renderFilter()
         ]
+      @renderTitle()
 
 # Wraps a child with an optional popover
 class PopoverComponent extends React.Component

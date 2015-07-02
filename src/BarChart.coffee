@@ -37,8 +37,8 @@ module.exports = class BarChart extends Chart
 
   cleanDesign: (design) ->
     # Fill in defaults
-    if not design.aesthetics
-      design.aesthetics = {}
+    design.aesthetics = design.aesthetics or {}
+    design.annotations = design.annotations or {}
 
     # Clone deep for now # TODO
     design = _.cloneDeep(design)

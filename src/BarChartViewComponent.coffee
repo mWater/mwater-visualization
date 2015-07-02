@@ -1,10 +1,14 @@
 React = require 'react'
 H = React.DOM
 
+titleFontSize = 14
+titleHeight = 20
+
 # Displays a bar chart
 module.exports = class BarChartViewComponent extends React.Component
   @propTypes: 
     data: React.PropTypes.array.isRequired
+    design: React.PropTypes.object.isRequired
     width: React.PropTypes.number.isRequired
     height: React.PropTypes.number.isRequired
 
@@ -39,7 +43,7 @@ module.exports = class BarChartViewComponent extends React.Component
           }
           # rotated: true
         }
-        size: { width: props.width, height: props.height }
+        size: { width: props.width, height: props.height - titleHeight }
     })
 
     @updateSelected()
@@ -78,4 +82,14 @@ module.exports = class BarChartViewComponent extends React.Component
     @chart.destroy()
 
   render: ->
-    H.div style: { width: @props.width, height: @props.height }, ref: "chart"
+    titleStyle = {
+      position: "absolute"
+      top: 0
+      width: @props.width
+      textAlign: "center"
+      fontWeight: "bold"
+    }
+
+    H.div null,
+      H.div style: titleStyle, @props.design.annotations.title
+      H.div style: { marginTop: titleHeight }, ref: "chart"
