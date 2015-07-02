@@ -21,7 +21,7 @@ module.exports = class WidgetScoper
   getFilters: (widget) ->
     filters = []
     for key, value of @scopeData
-      if key != widget
+      if key != widget and value.filter
         filters.push(value.filter)
 
     return filters
