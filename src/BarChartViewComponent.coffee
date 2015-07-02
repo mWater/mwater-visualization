@@ -22,6 +22,18 @@ module.exports = class BarChartViewComponent extends React.Component
   componentDidMount: ->
     @createChart(@props)
 
+  # Makes nulls into (none) and localizes enums
+  prepareData: (data) ->
+    return { main: _.map(data.main, (row) =>
+      copy = {}
+      for key, value of row
+        if not value?
+          copy[key] = "(none)"
+        else
+          copy[key] = value
+      return copy
+      )}
+
   createChart: (props) ->
     if @chart
       @chart.destroy()
@@ -33,7 +45,7 @@ module.exports = class BarChartViewComponent extends React.Component
         bindto: el
         data: {
           type: "bar"
-          json: props.data.main
+          json: @prepareData(props.data).main
           keys: { x: "x", value: ["y"] }
           names: { y: 'Value' } # Name the data
           onclick: @handleDataClick
@@ -58,9 +70,14 @@ module.exports = class BarChartViewComponent extends React.Component
       return
 
     if not _.isEqual(@props.data, nextProps.data)
+      # If length of data is different, re-create chart
+      if @props.data.main.length != nextProps.data.main.length
+        @createChart(nextProps)
+        return
+        
       # Reload data
       @chart.load({ 
-        json: nextProps.data.main
+        json: @prepareData(nextProps.data).main
         keys: { x: "x", value: ["y"] }
         names: { y: 'Value' } # Name the data
       })

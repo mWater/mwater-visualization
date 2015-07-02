@@ -69,6 +69,7 @@ class ChartWidgetComponent extends React.Component
       data: null          # Data returned from data source
       dataQueries: null   # Queries that produced data
       dataError: null     # True if an error returned from data source
+      loading: false      # true if loading
     }
 
   componentDidMount: ->
@@ -90,12 +91,12 @@ class ChartWidgetComponent extends React.Component
       return
 
     # Call data source
-    @setState(data: null, dataQueries: null, dataError: null)
+    @setState(loading: true, dataQueries: queries, dataError: null)
     props.dataSource.performQueries(queries, (err, data) =>
       if err
-        @setState(data: null, dataQueries: null, dataError: err)
+        @setState(data: null, dataQueries: null, dataError: err, loading: false)
       else
-        @setState(data: data, dataQueries: queries, dataError: null)
+        @setState(data: data, dataQueries: queries, dataError: null, loading: false)
       )
 
   handleClick: (ev) =>
@@ -105,6 +106,10 @@ class ChartWidgetComponent extends React.Component
   handleRemove: (ev) =>
     ev.stopPropagation()
     @props.onRemove()
+
+  handleRemoveScope: (ev) =>
+    ev.stopPropagation()
+    @props.onScopeChange(null, null)
 
   renderResizeHandle: ->
     resizeHandleStyle = {
@@ -133,6 +138,26 @@ class ChartWidgetComponent extends React.Component
     if @props.onRemove
       H.div style: removeButtonStyle, className: "mwater-chart-widget-remove-button", onClick: @handleRemove,
         H.span className: "glyphicon glyphicon-remove"
+
+  renderScoping: ->
+    if not @props.scope
+      return
+    
+    style = {
+      position: "absolute"
+      right: 10
+      top: 25
+      cursor: "pointer"
+      borderRadius: 100
+      border: "solid 1px #DDD"
+      padding: "1px 10px 1px 10px"
+      color: "#666"
+      backgroundColor: "#EEE"
+    }
+
+    return H.div style: style, onClick: @handleRemoveScope,
+      H.span className: "glyphicon glyphicon-filter"
+      " Filtering"
 
   renderChart: (design, width, height) ->
     return @props.chart.createViewElement({
@@ -163,26 +188,29 @@ class ChartWidgetComponent extends React.Component
       contents = H.div null, 
         "Invalid design: "
         results
-      style.backgroundColor = "#EEE"
     # If data error, display
     else if @state.dataError
       contents = H.div null,
         "Error loading data: "
         @state.dataError.toString()
-      style.backgroundColor = "#EEE"
 
     # If no data, loading
     else if not @state.data
-      contents = H.div null,
+      contents = H.div style: { textAlign: "center" },
         "Loading..."
     else 
       contents = H.div style: { position: "absolute", left: 10, top: 10 }, 
         @renderChart(design, @props.width - 20, @props.height - 20)
 
+    if @state.loading
+      style.opacity = 0.5
+      style.backgroundColor = "#E8E8E8"
+
     elem = H.div className: "mwater-chart-widget", style: style, onClick: @handleClick,
       contents
       @renderResizeHandle()
       @renderRemoveButton()
+      @renderScoping()
 
     if @props.connectMoveHandle
       elem = @props.connectMoveHandle(elem)

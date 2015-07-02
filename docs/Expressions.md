@@ -30,14 +30,14 @@ Column of the database
 ## Logical expression
 
 `type`: "logical"
-`table`: Table id of start table ??
+`table`: Table id of table
 `op`: `and` or `or`
 `exprs`: expressions to combine. Either `logical` for nested conditions or `comparison`
 
 ## Comparison expressions
 
-`type`: "logical"
-`table`: Table id of start table ??
+`type`: "comparison"
+`table`: Table id of table 
 `lhs`: left hand side expression. `scalar` usually.
 `op`: "=", ">", ">=", "<", "<=", "~*", ">", "<", "= true", "= false", "is null", "is not null", '= any'
 `rhs`: right hand side expressions. `literal` usually.
