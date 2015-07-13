@@ -33,8 +33,9 @@ describe "ScalarExprTreeBuilder", ->
     assert _.isEqual(subnode.children()[0].value, { table: "t1", joins: ["c2"], expr: { type: "field", table: "t2", column: "c1"}}), JSON.stringify(subnode)
 
   it "limits to one table", ->
+    # Should not add root node
     nodes = new ScalarExprTreeBuilder(@schema).getTree({ table: "t1" })
-    assert.deepEqual _.pluck(nodes, "name"), ["T1"]
+    assert.deepEqual _.pluck(nodes, "name"), ["C1"]
 
   describe "limits type", ->
     it "includes direct types", ->

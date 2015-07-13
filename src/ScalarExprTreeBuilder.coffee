@@ -19,23 +19,23 @@ module.exports = class ScalarExprTreeBuilder
   #  types: types to limit to 
   getTree: (options = {}) ->
     nodes = []
-    # For each table
-    for table in @schema.getTables()
-      if options.table and table.id != options.table
-        continue
+    # For each table if not specified
+    if not options.table
+      for table in @schema.getTables()
+        do (table) =>
+          node = {
+            name: table.name
+            desc: table.desc
+            # Initially open if only one table
+            initiallyOpen: options.table?
+          }
 
-      do (table) =>
-        node = {
-          name: table.name
-          desc: table.desc
-          # Initially open if only one table
-          initiallyOpen: options.table?
-        }
-
-        # Create nodes for each column of a table
-        node.children = =>
-          @createChildNodes(startTable: table.id, table: table.id, joins: [], types: options.types)
-        nodes.push(node)
+          # Create nodes for each column of a table
+          node.children = =>
+            @createChildNodes(startTable: table.id, table: table.id, joins: [], types: options.types)
+          nodes.push(node)
+    else
+      nodes = @createChildNodes(startTable: options.table, table: options.table, joins: [], types: options.types)
 
     return nodes
 
