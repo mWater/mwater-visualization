@@ -38,25 +38,22 @@ module.exports = class BarChartDesignerComponent extends React.Component
       popover = "Start by selecting a data source"
 
     return H.div className: "form-group",
-      H.label null, "Table"
-      H.div null, 
-        React.createElement PopoverComponent, html: popover, 
-          React.createElement(EditableLinkComponent, 
-            dropdownItems: @props.schema.getTables()
-            onDropdownItemClicked: @handleTableChange
-            onRemove: @handleTableChange.bind(this, null)
-            if @props.design.table then @props.schema.getTable(@props.design.table).name else H.i(null, "Select...")
-            )
-        # React.createElement(ReactSelect, { 
-        #   value: @props.design.table, 
-        #   options: _.map(@props.schema.getTables(), (t) => { value: t.id, label: t.name }) 
-        #   onChange: @handleTableChange
-        # })
-
+      H.label className: "text-muted", 
+        H.span(className: "glyphicon glyphicon-file")
+        " "
+        "Data Source"
+      ": "
+      React.createElement PopoverComponent, html: popover, 
+        React.createElement(EditableLinkComponent, 
+          dropdownItems: @props.schema.getTables()
+          onDropdownItemClicked: @handleTableChange
+          onRemove: @handleTableChange.bind(this, null)
+          if @props.design.table then @props.schema.getTable(@props.design.table).name else H.i(null, "Select...")
+          )
 
   renderXAesthetic: ->
     React.createElement(AestheticComponent, 
-      title: "Category (X) Axis"
+      title: [H.span(className: "glyphicon glyphicon-resize-horizontal"), " Horizontal Axis"]
       schema: @props.schema, 
       table: @props.design.table
       types: ["enum", "text"]
@@ -65,7 +62,7 @@ module.exports = class BarChartDesignerComponent extends React.Component
 
   renderYAesthetic: ->
     React.createElement(AestheticComponent, 
-      title: "Value (Y) Axis"
+      title: [H.span(className: "glyphicon glyphicon-resize-vertical"), " Vertical Axis"]
       schema: @props.schema, 
       table: @props.design.table
       # types: ["decimal", "integer"]
@@ -80,16 +77,20 @@ module.exports = class BarChartDesignerComponent extends React.Component
       return null
 
     return H.div className: "form-group",
-      H.label null, "Filter"
-      React.createElement(LogicalExprComponent, 
-        schema: @props.schema
-        onChange: @handleFilterChange
-        table: @props.design.table
-        value: @props.design.filter)
+      H.label className: "text-muted", 
+        H.span(className: "glyphicon glyphicon-filter")
+        " "
+        "Filters"
+      H.div style: { marginLeft: 8 }, 
+        React.createElement(LogicalExprComponent, 
+          schema: @props.schema
+          onChange: @handleFilterChange
+          table: @props.design.table
+          value: @props.design.filter)
 
   renderTitle: ->
     H.div className: "form-group",
-      H.label null, "Title"
+      H.label className: "text-muted", "Title"
       H.input type: "text", className: "form-control", value: @props.design.annotations.title, onChange: @handleTitleChange, placeholder: "Untitled"
 
   render: ->
@@ -106,6 +107,7 @@ module.exports = class BarChartDesignerComponent extends React.Component
           @renderYAesthetic()
           @renderFilter()
         ]
+      H.hr()
       @renderTitle()
 
 # Wraps a child with an optional popover
@@ -179,8 +181,8 @@ class AestheticComponent extends React.Component
 
   render: ->
     return H.div className: "form-group",
-      H.label null, @props.title
-      H.div null, 
+      H.label className: "text-muted", @props.title
+      H.div style: { marginLeft: 8 }, 
         @renderAggr()
         React.createElement(ScalarExprComponent, 
           editorTitle: @props.title

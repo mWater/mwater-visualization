@@ -28,8 +28,8 @@ module.exports = class DashboardTestComponent extends React.Component
 
   render: ->
     H.div className: "row", style: { },
-      H.div className: "col-xs-6", ref: "view"
-      H.div className: "col-xs-6", ref: "designer"
+      H.div className: "col-xs-8", ref: "view"
+      H.div className: "col-xs-4", ref: "designer"
 
 data = {"main":[{"x":"broken","y":"48520"},{"x":null,"y":"2976"},{"x":"ok","y":"173396"},{"x":"maint","y":"12103"},{"x":"missing","y":"3364"}]}    
 
@@ -95,7 +95,7 @@ chartDesign = {
 dashboardDesign = {
   items: {
     a: {
-      layout: { x: 0, y: 0, w: 6, h: 6 }
+      layout: { x: 0, y: 0, w: 12, h: 12 }
       widget: {
         type: "BarChart"
         version: "0.0.0"
@@ -103,7 +103,7 @@ dashboardDesign = {
       }
     }
     b: {
-      layout: { x: 6, y: 0, w: 6, h: 6 }
+      layout: { x: 12, y: 0, w: 12, h: 12 }
       widget: {
         type: "BarChart"
         version: "0.0.0"
