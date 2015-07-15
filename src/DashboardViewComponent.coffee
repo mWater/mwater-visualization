@@ -75,7 +75,7 @@ class InnerDashboardViewComponent extends React.Component
   render: ->
     # Create layout engine
     # TODO create from design
-    layoutEngine = new LegoLayoutEngine(@props.width, 12)
+    layoutEngine = new LegoLayoutEngine(@props.width, 24)
 
     # Get layouts indexed by id
     layouts = _.mapValues(@props.design.items, "layout")

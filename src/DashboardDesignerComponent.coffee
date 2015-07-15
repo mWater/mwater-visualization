@@ -30,7 +30,7 @@ module.exports = class DashboardDesignerComponent extends React.Component
     # Create layout engine
     # TODO create from design
     # TODO uses fake width
-    layoutEngine = new LegoLayoutEngine(100, 12)
+    layoutEngine = new LegoLayoutEngine(100, 24)
 
     # Get existing layouts
     layouts = _.pluck(_.values(@props.design.items), "layout")

@@ -1,9 +1,5 @@
 # Expressions
 
-## Questions
-
-`startTable` or `baseTable`? Not used here, but in general... Or just `table`?
-
 ## Scalar expressions
 
 Gets a single value given a row of a table.
