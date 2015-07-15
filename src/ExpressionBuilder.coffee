@@ -219,6 +219,7 @@ module.exports = class ExpressionBuilder
 
     return lhsType
 
+  # Return array of { id: <enum value>, name: <localized label of enum value> }
   getExprValues: (expr) ->
     if expr.type == "field"
       column = @schema.getColumn(expr.table, expr.column)

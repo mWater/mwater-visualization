@@ -15,6 +15,26 @@ Joins are included as a column type as they have a natural order within the othe
 
 `ordering`: column with natural ordering (optional)
 
+`columns`: array of columns of the table
+
+`sql`: sql expression that gets the table. Usually just name of the table. *Note*: this is only for when sharing a schema file with [LookupSchemaMap](https://github.com/mWater/jsonql/blob/master/src/LookupSchemaMap.coffee)
+
+## Column properties
+
+`id`: table-unique id of column
+
+`name`: localized name of column
+
+`desc`: localized description of column
+
+`type`: See below
+
+`values`: Values for enum. Array of { id, name } 
+
+`join`: Details of the join. See below
+
+`sql`: sql expression that gets the column value. Uses `{alias}` which will be substituted with the table alias. Usually just `{alias}.some_column_name`. *Note*: this is only for when sharing a schema file with [LookupSchemaMap](https://github.com/mWater/jsonql/blob/master/src/LookupSchemaMap.coffee)
+
 
 ## Column types
 
@@ -35,19 +55,9 @@ Joins are included as a column type as they have a natural order within the othe
 `join`: Reference to another table, either one to many or many to one ?? join or ref?
 
 
-## Column properties
+## Values
 
-`id`: table-unique id of column
-
-`name`: localized name of column
-
-`desc`: localized description of column
-
-`type`: See above
-
-`values`: Values for enum. Array of { id, name } ?? id or value?
-
-`join`: Details of the join. See below
+Enum values are represented by an array of objects e.g. `{ id: some id, name: some name }`. `id` can be any literal type. `name` is a string label of the enum value
 
 
 ## Joins
