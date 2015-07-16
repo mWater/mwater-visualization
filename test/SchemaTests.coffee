@@ -28,6 +28,11 @@ describe "Schema", ->
         id: "a"
         name: "A"
         columns: [
+          { # Ignored
+            id: "id"
+            name: "ID"
+            type: "id"
+          },
           {
             id: "x"
             name: "X"

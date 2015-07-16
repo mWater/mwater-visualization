@@ -37,4 +37,8 @@ module.exports = class Schema
     for table in json.tables
       @addTable(table)
       for column in table.columns
+        # Ignore id columns. They are only there for sharing schema maps with server
+        if column.type == "id"
+          continue
+
         @addColumn(table.id, column)

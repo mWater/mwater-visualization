@@ -38,6 +38,8 @@ Joins are included as a column type as they have a natural order within the othe
 
 ## Column types
 
+`id`: id column. Ignored. *Note*: this is only for when sharing a schema file with [LookupSchemaMap](https://github.com/mWater/jsonql/blob/master/src/LookupSchemaMap.coffee)
+
 `text`: text string
 
 `decimal`: Floating point

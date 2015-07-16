@@ -16,7 +16,7 @@ createSchema = ->
   # Create simple schema with subtree
   schema = new Schema()
   schema.addTable({ id: "a", name: "A" })
-  schema.addColumn("a", { id: "x", name: "X", type: "uuid", primary: true })
+  schema.addColumn("a", { id: "x", name: "X", type: "uuid" })
   schema.addColumn("a", { id: "y", name: "Y", type: "text" })
   schema.addColumn("a", { id: "integer", name: "Integer", type: "integer" })
   schema.addColumn("a", { id: "decimal", name: "Decimal", type: "decimal" })
