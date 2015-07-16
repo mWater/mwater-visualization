@@ -2,6 +2,7 @@ React = require 'react'
 H = React.DOM
 ReactSelect = require 'react-select'
 ScalarExprComponent = require './ScalarExprComponent'
+AggrScalarExprComponent = require './AggrScalarExprComponent'
 LogicalExprComponent = require './LogicalExprComponent'
 ExpressionBuilder = require './ExpressionBuilder'
 EditableLinkComponent = require './EditableLinkComponent'
@@ -157,37 +158,29 @@ class AestheticComponent extends React.Component
   handleExprChange: (expr) =>
     @props.onChange(_.extend({}, @props.value, { expr: expr }))
 
-  handleAggrChange: (aggr) =>
-    @props.onChange(_.extend({}, @props.value, { aggr: aggr }))
+  handleExprAggrChange: (exprAggr) =>
+    @props.onChange(_.extend({}, @props.value, exprAggr))
 
-  renderAggr: ->
-    if @props.value and @props.aggrRequired and @props.value.expr
-      exprBuilder = new ExpressionBuilder(@props.schema)
-      aggrs = exprBuilder.getAggrs(@props.value.expr)
-
-      # Remove latest, as it is tricky to group by. TODO
-      aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
-      currentAggr = _.findWhere(aggrs, id: @props.value.aggr)
-
-      # Do not display number of for id column
-      if exprBuilder.getExprType(@props.value.expr) == "id"
-        return
-
-      return React.createElement(EditableLinkComponent, 
-        dropdownItems: aggrs
-        onDropdownItemClicked: @handleAggrChange
-        if currentAggr then currentAggr.name + " of\u00A0"
-        )
+  renderComponent: ->
+    if @props.aggrRequired
+      return React.createElement(AggrScalarExprComponent,
+        editorTitle: @props.title
+        schema: @props.schema
+        table: @props.table
+        types: @props.types 
+        onChange: @handleExprAggrChange
+        value: if @props.value then @props.value)
+    else
+      return React.createElement(ScalarExprComponent, 
+        editorTitle: @props.title
+        schema: @props.schema
+        table: @props.table
+        types: @props.types 
+        onChange: @handleExprChange
+        value: if @props.value then @props.value.expr)    
 
   render: ->
     return H.div className: "form-group",
       H.label className: "text-muted", @props.title
-      H.div style: { marginLeft: 8 }, 
-        @renderAggr()
-        React.createElement(ScalarExprComponent, 
-          editorTitle: @props.title
-          schema: @props.schema
-          table: @props.table
-          types: @props.types # TODO
-          onChange: @handleExprChange
-          value: if @props.value then @props.value.expr)
+      H.div null, 
+        @renderComponent()

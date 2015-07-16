@@ -12,7 +12,7 @@ module.exports = class ScalarExprEditorComponent extends React.Component
     value: React.PropTypes.object
     table: React.PropTypes.string # Optional table to restrict selections to (can still follow joins to other tables)
     types: React.PropTypes.array # Optional types to limit to
-
+    includeCount: React.PropTypes.boolean # Optionally include count at root level of a table
 
   handleTreeChange: (val) =>
     # Set table and joins and expr
@@ -29,7 +29,7 @@ module.exports = class ScalarExprEditorComponent extends React.Component
   renderTree: ->
     # Create tree 
     treeBuilder = new ScalarExprTreeBuilder(@props.schema)
-    tree = treeBuilder.getTree(table: @props.table, types: @props.types)
+    tree = treeBuilder.getTree(table: @props.table, types: @props.types, includeCount: @props.includeCount)
 
     # Create tree component with value of table and path
     return React.createElement(ScalarExprTreeComponent, 
@@ -41,11 +41,12 @@ module.exports = class ScalarExprEditorComponent extends React.Component
   renderAggr: ->
     exprBuilder = new ExpressionBuilder(@props.schema)
     if @props.value and @props.value.aggr
+      options = _.map(exprBuilder.getAggrs(@props.value.expr), (aggr) -> { value: aggr.id, label: aggr.name })
+
       # Do not render if only possible aggregation is count
-      if exprBuilder.getExprType(@props.value.expr) == "id"
+      if options.length == 1 and options[0].value == "count"
         return 
         
-      options = _.map(exprBuilder.getAggrs(@props.value.expr), (aggr) -> { value: aggr.id, label: aggr.name })
       return H.div null,
         H.br()
         H.label null, "Aggregate by"
@@ -62,12 +63,15 @@ module.exports = class ScalarExprEditorComponent extends React.Component
       # Prevent circularity problems in browserify
       LogicalExprComponent = require './LogicalExprComponent'
 
+      # Determine table to be filtered (follow joins)
+      whereTable = exprBuilder.followJoins(@props.value.table, @props.value.joins)
+
       return H.div null,
         H.br()
         H.label null, "Filter Aggregation"
         React.createElement(LogicalExprComponent, 
           schema: @props.schema, 
-          table: @props.value.expr.table,
+          table: whereTable,
           value: @props.value.where
           onChange: @handleWhereChange
           )

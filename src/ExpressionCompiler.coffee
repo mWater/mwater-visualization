@@ -8,6 +8,10 @@ module.exports = class ExpressionCompiler
   compileExpr: (options) =>
     expr = options.expr
 
+    # Handle null
+    if not expr
+      return null
+
     switch expr.type 
       when "field"
         return @compileFieldExpr(options)
@@ -115,7 +119,11 @@ module.exports = class ExpressionCompiler
           # order descending
           orderBy = [{ expr: { type: "field", tableAlias: tableAlias, column: ordering }, direction: "desc" }]
         when "sum", "count", "avg", "max", "min", "stdev", "stdevp"
-          scalarExpr = { type: "op", op: expr.aggr, exprs: [scalarExpr] }
+          # Don't include scalarExpr if null
+          if not scalarExpr
+            scalarExpr = { type: "op", op: expr.aggr, exprs: [] }
+          else
+            scalarExpr = { type: "op", op: expr.aggr, exprs: [scalarExpr] }
         else
           throw new Error("Unknown aggregation #{expr.aggr}")
 

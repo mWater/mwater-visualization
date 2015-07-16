@@ -21,6 +21,12 @@ describe "ScalarExprTreeBuilder", ->
     assert.deepEqual _.pluck(subnodes, "name"), ["C1"]
     assert _.isEqual(subnodes[0].value, { table: "t1", joins: [], expr: { type: "field", table: "t1", column: "c1"}}), JSON.stringify(subnodes[0].value)
 
+  it "returns null expr as first if includeCount is true", ->
+    # Should not add root node
+    nodes = new ScalarExprTreeBuilder(@schema).getTree({ table: "t1", includeCount: true })
+    assert.deepEqual _.pluck(nodes, "name"), ["Number of T1", "C1"]
+    assert.isNull nodes[0].value.expr
+
   it "follows joins", ->
     # Join column
     join = { fromTable: "t1", fromCol: "c1", toTable: "t2", toCol: "c1", op: "=", multiple: false }
@@ -57,6 +63,11 @@ describe "ScalarExprTreeBuilder", ->
       # Go to first table, 2nd child, children
       nodes = new ScalarExprTreeBuilder(@schema).getTree({ types: ["integer"] })[0].children()[0].children()
       
-      # Should include text field, because can be aggregated to integer via count
-      assert.equal nodes.length, 1, "Should include text"
-      assert.equal nodes[0].value.expr.column, "c1"
+      # Should include count and text field, because can be aggregated to integer via count
+      assert.equal nodes.length, 2, "Should include count and text"
+
+      assert.equal nodes[0].name, "Number of T2"
+      assert.isNull nodes[0].value.expr
+
+      assert.equal nodes[1].name, "C1"
+      assert.equal nodes[1].value.expr.column, "c1"

@@ -16,6 +16,15 @@ module.exports = class ExpressionBuilder
 
     return false
 
+  # Follows a list of joins to determine final table
+  followJoins: (startTable, joins) ->
+    t = startTable
+    for j in joins
+      joinCol = @schema.getColumn(t, j)
+      t = joinCol.join.toTable
+
+    return t
+
   getAggrTypes: (expr) ->
     # Get available aggregations
     aggrs = @getAggrs(expr)
@@ -28,9 +37,13 @@ module.exports = class ExpressionBuilder
     aggrs = []
 
     type = @getExprType(expr)
+
+    # If null type, only return count
+    if not type
+      return [{ id: "count", name: "Number", type: "integer" }]
     
     table = @schema.getTable(expr.table)
-    if table.ordering and type != "id"
+    if table.ordering
       aggrs.push({ id: "last", name: "Latest", type: type })
 
     switch type
@@ -83,12 +96,9 @@ module.exports = class ExpressionBuilder
         throw new Error("Unsupported type #{expr.type}")
 
   summarizeScalarExpr: (expr) ->
-    # Add aggr if not count of id
+    # Add aggr
     if expr.aggr
-      if expr.aggr == "count" and @getExprType(expr.expr) == "id"
-        str = ""
-      else
-        str = _.findWhere(@getAggrs(expr.expr), { id: expr.aggr }).name + " of "
+      str = _.findWhere(@getAggrs(expr.expr), { id: expr.aggr }).name + " of "
     else
       str = ""
 
@@ -99,7 +109,11 @@ module.exports = class ExpressionBuilder
       str += joinCol.name + " > "
       t = joinCol.join.toTable
 
-    str += @summarizeExpr(expr.expr)
+    # Special case for aggr (count) of null to be rendered Number of {last join name}
+    if expr.aggr and not expr.expr
+      str = str.substring(0, str.length - 3)
+    else
+      str += @summarizeExpr(expr.expr)
 
     return str
 
@@ -256,8 +270,8 @@ module.exports = class ExpressionBuilder
     return error
 
   validateScalarExpr: (expr) ->
-    # Check that has expr
-    if not expr.expr
+    # Check that has table
+    if not expr.table
       return "Missing expression"
 
     error = @validateExpr(expr.expr) or @validateExpr(expr.where)

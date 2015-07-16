@@ -49,6 +49,21 @@ describe "ExpressionCompiler", ->
         ]}
     }), JSON.stringify(jql, null, 2)
 
+  it "compiles scalar with one join and count(*) aggr", ->
+    expr = { type: "scalar", table: "t1", expr: null, joins: ["1-2"], aggr: "count" }
+    jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
+
+    assert _.isEqual(jql, {
+      type: "scalar"
+      expr: { type: "op", op: "count", exprs: [] }
+      from: { type: "table", table: "t2", alias: "j1" }
+      where: { type: "op", op: "=", exprs: [
+        { type: "field", tableAlias: "j1", column: "t1" }
+        { type: "field", tableAlias: "T1", column: "primary" }
+        ]}
+    }), JSON.stringify(jql, null, 2)
+
+
   it "compiles scalar with one join and last aggr", ->
     expr = { type: "scalar", table: "t1", expr: { type: "field", table: "t2", column: "integer" }, joins: ["1-2"], aggr: "last" }
     jql = @ec.compileExpr(expr: expr, tableAlias: "T1")

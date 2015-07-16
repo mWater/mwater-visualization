@@ -38,8 +38,6 @@ Joins are included as a column type as they have a natural order within the othe
 
 ## Column types
 
-`id`: Primary key. Opaque and used for counting number of rows. 
-
 `text`: text string
 
 `decimal`: Floating point

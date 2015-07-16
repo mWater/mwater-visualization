@@ -25,22 +25,22 @@ describe "ExpressionBuilder", ->
   it "determines if multiple joins", ->
     assert.isTrue @exprBuilder.isMultipleJoins("t1", ["c2"])
     assert.isFalse @exprBuilder.isMultipleJoins("t2", ["c2"])
+
+  it "follows joins", ->
+    assert.equal @exprBuilder.followJoins("t1", []), "t1"
+    assert.equal @exprBuilder.followJoins("t1", ["c2"]), "t2"
   
   describe "getAggrs", ->
     beforeEach ->
       @schema = new Schema()
         .addTable({ id: "a", name: "A", ordering: "z" })
-        .addColumn("a", { id: "x", name: "X", type: "id" })
         .addColumn("a", { id: "y", name: "Y", type: "text" })
         .addColumn("a", { id: "z", name: "Z", type: "integer" })
       @exprBuilder = new ExpressionBuilder(@schema)
 
-    it "includes last if has natural ordering and is not id", ->
+    it "includes last if has natural ordering", ->
       field = { type: "field", table: "a", column: "y" }
       assert.equal _.findWhere(@exprBuilder.getAggrs(field), id: "last").type, "text"
-
-      field = { type: "field", table: "a", column: "x" }
-      assert not _.findWhere(@exprBuilder.getAggrs(field), id: "last")
 
     it "doesn't include most recent normally", ->
       @schema.addTable({ id: "b" }).addColumn("b", { id: "x", name: "X", type: "text" })
@@ -62,6 +62,11 @@ describe "ExpressionBuilder", ->
       assert.equal _.findWhere(aggrs, id: "sum").type, "integer"
       assert.equal _.findWhere(aggrs, id: "avg").type, "decimal"
       # TODO etc
+
+    it "includes count for null", ->
+      aggrs = @exprBuilder.getAggrs(null)
+      assert.equal aggrs[0].type, "integer"
+      assert.equal aggrs[0].id, "count"
 
   describe "summarizeExpr", ->
     it "summarizes null", ->
@@ -86,11 +91,9 @@ describe "ExpressionBuilder", ->
       scalarExpr = { type: "scalar", table: "t1", joins: ['c2'], expr: fieldExpr, aggr: "sum" }
       assert.equal @exprBuilder.summarizeExpr(scalarExpr), "Sum of C2 > C1"
 
-    it "omits number of when aggr of id", ->
-      @schema.addColumn("t2", { id: "primary", type: "id", name: "Number of T2" })
-      fieldExpr = { type: "field", table: "t2", column: "primary" }
-      scalarExpr = { type: "scalar", table: "t1", joins: ['c2'], expr: fieldExpr, aggr: "count" }
-      assert.equal @exprBuilder.summarizeExpr(scalarExpr), "C2 > Number of T2"
+    it "simplifies when simple count", ->
+      scalarExpr = { type: "scalar", table: "t1", joins: ['c2'], expr: null, aggr: "count" }
+      assert.equal @exprBuilder.summarizeExpr(scalarExpr), "Number of C2"
 
   describe "getExprType", ->
     it 'gets field type', ->
@@ -220,6 +223,9 @@ describe "ExpressionBuilder", ->
     it "validates expr", ->
       fieldExpr = { type: "field", table: "t1", column: "c1" }
       scalarExpr = { type: "scalar", table: "t1", joins: [], expr: null }
+      assert.isNull @exprBuilder.validateScalarExpr(scalarExpr)
+
+      scalarExpr = { type: "scalar", table: null, joins: [], expr: null }
       assert.isNotNull @exprBuilder.validateScalarExpr(scalarExpr)
 
     it "checks aggr" # No need, as will be cleaned and autofilled by cleaning
@@ -231,132 +237,3 @@ describe "ExpressionBuilder", ->
       scalarExpr = { type: "scalar", table: "t1", joins: [], expr: fieldExpr, where: whereExpr }
       assert.isNotNull @exprBuilder.validateScalarExpr(scalarExpr)
 
-#   describe "with sample schema", ->
-#     before ->
-#       # Create simple schema with subtree
-#       @schema = new Schema()
-#       @schema.addTable({ id: "a", name: "A" })
-#       @schema.addColumn("a", { id: "x", name: "X", type: "key" })
-#       @schema.addColumn("a", { id: "y", name: "Y", type: "text" })
-#       @schema.addColumn("a", { id: "z", name: "Z", type: "integer" })
-#       @schema.addColumn("a", { id: "s", name: "S", type: "join", 
-#         join: { fromTable: "b", fromColumn: "s", toTable: "a", toColumn: "x", op: "=", multiple: false
-#        }) # a many to one join
-
-#       @schema.addTable({ id: "b", name: "B" })
-#       @schema.addColumn("b", { id: "q", name: "Q", type: "key" })
-#       @schema.addColumn("b", { id: "r", name: "R", type: "text" })
-#       @schema.addColumn("b", { id: "s", name: "S", type: "join", 
-#         join: { fromTable: "b", fromColumn: "s", toTable: "a", toColumn: "x", op: "=", multiple: false
-#        }) # a many to one join
-#       @schema.addColumn("b", { id: "t", name: "T", type: "enum", values: [{ id: "a1", name: "A1"}, { id: "a2", name: "A2"}] })
-
-#       @schema.addJoin({ id: "ab", name: "AB", fromTableId: "a", fromColumnId: "x", toTableId: "b", toColumnId: "s", op: "=", oneToMany: true })
-#       @schema.addJoin({ id: "ba", name: "BA", fromTableId: "b", fromColumnId: "s", toTableId: "a", toColumnId: "x", op: "=", oneToMany: false })
-
-#       @atree = @schema.getJoinExprTree({ baseTableId: "a" })
-#       @btree = @schema.getJoinExprTree({ baseTableId: "b" })
-    
-#     describe "getExprValues", ->
-#       it "gets for field", ->
-#         expr = { type: "field", tableId: "b", columnId: "t" }
-#         assert.deepEqual _.pluck(@schema.getExprValues(expr), "id"), ["a1", "a2"]
-
-#       it "gets for scalar", ->
-#         expr = { type: "field", tableId: "b", columnId: "t" }
-#         expr = { type: "scalar", expr: expr, joinIds: []}
-#         assert.deepEqual _.pluck(@schema.getExprValues(expr), "id"), ["a1", "a2"]
-    
-#     describe "getJoinExprTree", ->
-#       it "doesn't include primary keys at root", ->
-#         assert.equal @atree[0].name, "Y"
-
-#       it "skips uuids", ->
-#         assert.isUndefined _.findWhere(@btree, name: "S")
-
-#       it "includes primary key as count", ->
-#         joinItem = _.last(@atree)
-#         subtree = joinItem.getChildren()
-#         assert.equal subtree[0].name, "Number of B"
-
-#       it "has joins list", ->
-#         assert.deepEqual @atree[0].value.joinIds, []
-
-#       it "has field expressions for leaf nodes", ->
-#         assert.deepEqual @atree[0].value.expr, { type: "field", tableId: "a", columnId: "y" }
-
-#       it "joins are inserted at end", ->
-#         assert.equal _.last(@btree).name, "BA"
-
-#       it "gets children for joins", ->
-#         joinItem = _.last(@atree)
-#         assert joinItem.getChildren().length > 0
-#         assert.deepEqual joinItem.getChildren()[0].value.joinIds, ["ab"]
-
-#       it "has no field expressions for joins", ->
-#         joinItem = _.last(@atree)
-#         assert not joinItem.expr
-
-#       it "filters by types", ->
-#         atree = @schema.getJoinExprTree({ baseTableId: "a", types: ["integer"] })
-#         assert.isUndefined _.findWhere(atree, name: "Y")
-#         assert.isDefined _.findWhere(atree, name: "Z")
-
-#     describe "getExprType", ->
-#       it 'gets field type', ->
-#         assert.equal @schema.getExprType({ type: "field", tableId: "a", columnId: "z" }), "integer"
-
-#       it 'gets scalar type', ->
-#         expr = {
-#           type: "scalar"
-#           expr: { type: "field", tableId: "a", columnId: "z" }
-#           joinIds: []
-#         }
-#         assert.equal @schema.getExprType(expr), "integer"
-
-#       it 'gets scalar type with aggr', ->
-#         expr = {
-#           type: "scalar"
-#           expr: { type: "field", tableId: "a", columnId: "x" }
-#           aggrId: "count"
-#           joinIds: []
-#         }
-#         assert.equal @schema.getExprType(expr), "integer"
-
-#       it "gets literal types", ->
-#         assert.equal @schema.getExprType({ type: "text", value: "x" }), "text"
-#         assert.equal @schema.getExprType({ type: "boolean", value: true }), "boolean"
-#         assert.equal @schema.getExprType({ type: "decimal", value: 2.23 }), "decimal"
-#         assert.equal @schema.getExprType({ type: "integer", value: 34 }), "integer"
-#         assert.equal @schema.getExprType({ type: "date", value: "2010-07-28" }), "date"
-
-#     describe "isAggrNeeded", ->
-#       it "false for no joins", ->
-#         assert.isFalse @schema.isAggrNeeded([])
-
-#       it "true for oneToMany join", ->
-#         assert.isTrue @schema.isAggrNeeded(["ab"])
-
-#       it "false for non-oneToMany join", ->
-#         assert.isFalse @schema.isAggrNeeded(["ba"])
-
-
-#   describe "getComparisonOps", ->
-#     it "includes is not null", ->
-#       schema = new Schema()
-#       assert.include _.pluck(schema.getComparisonOps("text"), "id"), "is not null" 
-
-#     it "includes > for date", ->
-#       schema = new Schema()
-#       assert.include _.pluck(schema.getComparisonOps("date"), "id"), ">" 
-
-#   describe "getComparisonRhsType", ->
-#     before ->
-#       @schema = new Schema()
-    
-#     it "null for unary", ->
-#       assert.isNull @schema.getComparisonRhsType("text", "is not null")
-
-#     it "same for binary", ->
-#       assert.equal @schema.getComparisonRhsType("decimal", "="), "decimal"
-#   

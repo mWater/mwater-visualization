@@ -11,7 +11,7 @@ module.exports = class ScalarExprTreeComponent extends React.Component
 
   render: ->
     elems = []
-
+    console.log @props.value
     # Get tree
     for item in @props.tree
       if item.children

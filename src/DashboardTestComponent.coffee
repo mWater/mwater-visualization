@@ -125,7 +125,6 @@ createSchema = ->
   # Create simple schema with subtree
   schema = new Schema()
   schema.addTable({ id: "a", name: "A" })
-  schema.addColumn("a", { id: "x", name: "X", type: "id" })
   schema.addColumn("a", { id: "y", name: "Y", type: "text" })
   schema.addColumn("a", { id: "integer", name: "Integer", type: "integer" })
   schema.addColumn("a", { id: "decimal", name: "Decimal", type: "decimal" })
@@ -138,7 +137,6 @@ createSchema = ->
       fromTable: "a", fromColumn: "x", toTable: "b", toColumn: "q", op: "=", multiple: true }})
 
   schema.addTable({ id: "b", name: "B" })
-  schema.addColumn("b", { id: "q", name: "Q", type: "id" }) 
   schema.addColumn("b", { id: "r", name: "R", type: "integer" })
   schema.addColumn("b", { id: "s", name: "S", type: "text" })
   return schema

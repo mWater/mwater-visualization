@@ -57,18 +57,19 @@ module.exports = class BarChart extends Chart
     # Default y expr
     if not design.aesthetics.y or not design.aesthetics.y.expr
       if design.table 
-        # Get id column
-        idCol = _.findWhere(@schema.getColumns(design.table), type: "id")
-        if idCol
-          design.aesthetics.y = { expr: { type: "scalar", table: design.table, joins: [], expr: { type: "field", table: design.table, column: idCol.id } }, aggr: "count" }
+        design.aesthetics.y = { expr: { type: "scalar", table: design.table, joins: [], expr: null }, aggr: "count" }
 
-    # Default y aggr
-    if design.aesthetics.y and design.aesthetics.y.expr and not design.aesthetics.y.aggr
+    # Clean and default y aggr
+    if design.aesthetics.y and design.aesthetics.y.expr
       # Remove latest, as it is tricky to group by. TODO
       aggrs = @exprBuilder.getAggrs(design.aesthetics.y.expr)
       aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
 
-      design.aesthetics.y.aggr = aggrs[0].id
+      if design.aesthetics.y.aggr and design.aesthetics.y.aggr not in _.pluck(aggrs, "id")
+        delete design.aesthetics.y.aggr
+
+      if not design.aesthetics.y.aggr
+        design.aesthetics.y.aggr = aggrs[0].id
 
     if design.filter
       design.filter = @exprBuilder.cleanExpr(design.filter, design.table)
@@ -123,7 +124,8 @@ module.exports = class BarChart extends Chart
 
     # Y is aggregated
     expr = exprCompiler.compileExpr(expr: design.aesthetics.y.expr, tableAlias: "main")
-    query.selects.push({ type: "select", expr: { type: "op", op: design.aesthetics.y.aggr, exprs: [expr] }, alias: "y" })
+    exprs = if expr then [expr] else []
+    query.selects.push({ type: "select", expr: { type: "op", op: design.aesthetics.y.aggr, exprs: exprs }, alias: "y" })
 
     # Add where
     if design.filter

@@ -13,6 +13,12 @@ module.exports = class ScalarExprComponent extends React.Component
 
     table: React.PropTypes.string # Optional table to restrict selections to (can still follow joins to other tables)
     types: React.PropTypes.array # Optional types to limit to
+
+    # Includes count at root level of a table. Means that an extra entry will be present
+    # that is "Number of {table name}" that will have no aggregate or expression. 
+    # Also causes this to be rendered as "Number of {table name}" in the summary
+    includeCount: React.PropTypes.boolean 
+
     editorTitle: React.PropTypes.string # Title of editor popup
     
     value: React.PropTypes.object # Current value of expression
@@ -54,15 +60,23 @@ module.exports = class ScalarExprComponent extends React.Component
               schema: @props.schema
               table: @props.table 
               types: @props.types
+              includeCount: @props.includeCount
               value: @state.editorValue
               onChange: @handleEditorChange)
         )
+
+    if @props.value
+      # Summarize null is "Number of {table name}" to handle count(*) case if includeCount is true
+      if @props.includeCount and not exprBuilder.getExprType(@props.value)
+        summary = "Number of #{@props.schema.getTable(@props.value.table).name}"
+      else
+        summary = exprBuilder.summarizeExpr(@props.value)
 
     H.div style: { display: "inline-block" },
       editor
       React.createElement(EditableLinkComponent, 
         onClick: @handleEditorOpen
         onRemove: if @props.value then @handleRemove,
-        if @props.value then exprBuilder.summarizeExpr(@props.value) else H.i(null, "Select...")
+        if summary then summary else H.i(null, "Select...")
         )
 

@@ -17,6 +17,7 @@ module.exports = class ScalarExprTreeBuilder
   # options are:
   #  table: to limit starting table to a specific table
   #  types: types to limit to 
+  #  includeCount: to include an count (null) option that has null expr and name that is "Number of ..." at first table level
   getTree: (options = {}) ->
     nodes = []
     # For each table if not specified
@@ -35,7 +36,7 @@ module.exports = class ScalarExprTreeBuilder
             @createChildNodes(startTable: table.id, table: table.id, joins: [], types: options.types)
           nodes.push(node)
     else
-      nodes = @createChildNodes(startTable: options.table, table: options.table, joins: [], types: options.types)
+      nodes = @createChildNodes(startTable: options.table, table: options.table, joins: [], types: options.types, includeCount: options.includeCount)
 
     return nodes
 
@@ -44,8 +45,17 @@ module.exports = class ScalarExprTreeBuilder
   # table: table id to get nodes for
   # joins: joins for child nodes
   # types: types to limit to 
+  # includeCount: to include an count (null) option that has null expr and name that is "Number of ..."
   createChildNodes: (options) ->
     nodes = []
+    exprBuilder = new ExpressionBuilder(@schema)
+
+    # Create count node if any joins
+    if options.includeCount
+      nodes.push({
+        name: "Number of #{@schema.getTable(options.table).name}"
+        value: { table: options.startTable, joins: options.joins, expr: null }
+      })
 
     # Create node for each column
     for column in @schema.getColumns(options.table)
@@ -61,11 +71,14 @@ module.exports = class ScalarExprTreeBuilder
             # Add column to joins
             joins = options.joins.slice()
             joins.push(column.id)
-            return @createChildNodes(startTable: options.startTable, table: column.join.toTable, joins: joins, types: options.types)
+
+            # Determine if to include count. True if aggregated
+            includeCount = exprBuilder.isMultipleJoins(options.startTable, joins)
+
+            return @createChildNodes(startTable: options.startTable, table: column.join.toTable, joins: joins, types: options.types, includeCount: includeCount)
         else
           fieldExpr = { type: "field", table: options.table, column: column.id }
           if options.types 
-            exprBuilder = new ExpressionBuilder(@schema)
             # If aggregated
             if exprBuilder.isMultipleJoins(options.startTable, options.joins)
               # Get types that this can become through aggregation
