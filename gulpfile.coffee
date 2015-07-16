@@ -31,6 +31,15 @@ gulp.task "browserify", ->
   .pipe(source("index.js"))
   .pipe(gulp.dest("./dist/js/"))
 
+gulp.task "dist", ->
+  shim(browserify({ extensions: [".coffee"], basedir: "./src/" }))
+  .require('./index.coffee', {expose: 'mwater-visualization'})
+  .bundle()
+  .on("error", gutil.log)
+  .pipe(source("mwater-visualization.js"))
+  .pipe(gulp.dest("./dist/"))
+
+
 gulp.task "libs_css", ->
   return gulp.src([
     "./bower_components/bootstrap/dist/css/bootstrap.css"
