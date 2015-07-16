@@ -29,7 +29,7 @@ gulp.task "browserify", ->
   )).bundle()
   .on("error", gutil.log)
   .pipe(source("index.js"))
-  .pipe gulp.dest("./dist/js/")
+  .pipe(gulp.dest("./dist/js/"))
 
 gulp.task "libs_css", ->
   return gulp.src([

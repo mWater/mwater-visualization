@@ -21,3 +21,22 @@ describe "Schema", ->
     assert.equal schema.getColumns("a")[0].type, "enum"
     assert.deepEqual schema.getColumns("a")[0].values, [{ id: "q", name: "Q" }]
 
+  it "loads from JSON object", ->
+    schema = new Schema()
+    schema.loadFromJSON({
+      tables: [{
+        id: "a"
+        name: "A"
+        columns: [
+          {
+            id: "x"
+            name: "X"
+            type: "text"
+          }
+        ]
+      }]
+      })
+
+    assert.equal schema.getColumns("a")[0].id, "x"
+    assert.equal schema.getColumns("a")[0].name, "X"
+

@@ -32,3 +32,9 @@ module.exports = class Schema
       throw new Error("Unknown table #{tableId}")
     return _.findWhere(table.columns, { id: columnId })
 
+  # Loads from a json schema in format { tables: [...] }
+  loadFromJSON: (json) ->
+    for table in json.tables
+      @addTable(table)
+      for column in table.columns
+        @addColumn(table.id, column)
