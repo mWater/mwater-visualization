@@ -182,5 +182,5 @@ class AestheticComponent extends React.Component
   render: ->
     return H.div className: "form-group",
       H.label className: "text-muted", @props.title
-      H.div null, 
+      H.div style: { marginLeft: 10 }, 
         @renderComponent()

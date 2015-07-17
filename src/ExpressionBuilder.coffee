@@ -58,7 +58,7 @@ module.exports = class ExpressionBuilder
         aggrs.push({ id: "min", name: "Minimum", type: type })
 
     # Count is always last option
-    aggrs.push({ id: "count", name: "Number", type: "integer" })
+    aggrs.push({ id: "count", name: "Number of", type: "integer" })
 
     return aggrs
 
