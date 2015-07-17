@@ -60,8 +60,11 @@ module.exports = class DashboardDesignerComponent extends React.Component
   # Designer when no widgets displayed
   renderGeneralDesigner: ->
     return H.div null, 
-      H.div className: "well well-sm", 
-        "Click on widgets to edit them"
+      H.div null,
+        H.i null, 
+          H.span className:"glyphicon glyphicon-arrow-left"
+          " Click on widgets to edit them"
+      H.br()
 
       H.div className: "btn-group",
         H.button type: "button", "data-toggle": "dropdown", className: "btn btn-default dropdown-toggle",
