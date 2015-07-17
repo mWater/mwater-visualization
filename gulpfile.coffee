@@ -28,7 +28,7 @@ gulp.task "browserify", ->
     basedir: "./src/"
   )).bundle()
   .on("error", gutil.log)
-  .pipe(source("index.js"))
+  .pipe(source("demo.js"))
   .pipe(gulp.dest("./dist/js/"))
 
 gulp.task "dist", ->
@@ -37,7 +37,7 @@ gulp.task "dist", ->
   .bundle()
   .on("error", gutil.log)
   .pipe(source("mwater-visualization.js"))
-  .pipe(gulp.dest("./dist/"))
+  .pipe(gulp.dest("./dist/js/"))
 
 
 gulp.task "libs_css", ->

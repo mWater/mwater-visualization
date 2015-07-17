@@ -12,7 +12,7 @@ module.exports = class ScalarExprEditorComponent extends React.Component
     value: React.PropTypes.object
     table: React.PropTypes.string # Optional table to restrict selections to (can still follow joins to other tables)
     types: React.PropTypes.array # Optional types to limit to
-    includeCount: React.PropTypes.boolean # Optionally include count at root level of a table
+    includeCount: React.PropTypes.bool # Optionally include count at root level of a table
 
   handleTreeChange: (val) =>
     # Set table and joins and expr

@@ -7,7 +7,7 @@ EditableLinkComponent = require './EditableLinkComponent'
 # Aggregated scalar component. Displays a single component that gets 
 module.exports = class AggrScalarExprComponent extends React.Component
   @propTypes:
-    title: React.PropTypes.string.isRequired # Title for display and popups
+    editorTitle: React.PropTypes.any.isRequired # Title for display and popups
     schema: React.PropTypes.object.isRequired # schema to use
 
     table: React.PropTypes.string # Limits table to this table
@@ -44,7 +44,7 @@ module.exports = class AggrScalarExprComponent extends React.Component
     H.div style: { display: "inline-block" }, 
       @renderAggr()
       React.createElement(ScalarExprComponent, 
-        editorTitle: @props.title
+        editorTitle: @props.editorTitle
         schema: @props.schema
         table: @props.table
         types: @props.types # TODO take into account aggregation

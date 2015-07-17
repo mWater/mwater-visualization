@@ -145,7 +145,7 @@ class PopoverComponent extends React.Component
 
 class AestheticComponent extends React.Component
   @propTypes:
-    title: React.PropTypes.string.isRequired # Title for display and popups
+    title: React.PropTypes.any.isRequired # Title for display and popups. Any element
     schema: React.PropTypes.object.isRequired # schema to use
 
     table: React.PropTypes.string # Limits table to this table

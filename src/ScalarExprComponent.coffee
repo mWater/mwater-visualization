@@ -17,9 +17,9 @@ module.exports = class ScalarExprComponent extends React.Component
     # Includes count at root level of a table. Means that an extra entry will be present
     # that is "Number of {table name}" that will have no aggregate or expression. 
     # Also causes this to be rendered as "Number of {table name}" in the summary
-    includeCount: React.PropTypes.boolean 
+    includeCount: React.PropTypes.bool
 
-    editorTitle: React.PropTypes.string # Title of editor popup
+    editorTitle: React.PropTypes.any # Title of editor popup. Any element
     
     value: React.PropTypes.object # Current value of expression
     onChange: React.PropTypes.func.isRequired # Called when changes

@@ -4,7 +4,7 @@ H = React.DOM
 # Child must be react element with value and onChange props
 module.exports = React.createClass {
   propTypes: {
-    title: React.PropTypes.string # Title of modal
+    title: React.PropTypes.any # Title of modal. Any react element
     actionLabel: React.PropTypes.string # Action button. Defaults to "Save"
     onAction: React.PropTypes.func # Called when action button is clicked
     onCancel: React.PropTypes.func # Called when cancel is clicked
