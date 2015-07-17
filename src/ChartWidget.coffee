@@ -159,7 +159,8 @@ class ChartWidgetComponent extends React.Component
 
     return H.div style: style, onClick: @handleRemoveScope,
       H.span className: "glyphicon glyphicon-filter"
-      " Filtering"
+      " Filtering "
+      H.span className: "glyphicon glyphicon-remove"
 
   renderChart: (design, width, height) ->
     return @props.chart.createViewElement({
