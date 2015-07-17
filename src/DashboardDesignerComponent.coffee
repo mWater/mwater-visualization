@@ -36,7 +36,7 @@ module.exports = class DashboardDesignerComponent extends React.Component
     layouts = _.pluck(_.values(@props.design.items), "layout")
 
     # Find place for new item
-    layout = layoutEngine.appendLayout(layouts, 4, 4)
+    layout = layoutEngine.appendLayout(layouts, 12, 12)
 
     # Create item
     item = {
