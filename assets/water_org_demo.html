@@ -1,0 +1,156 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Water.org Visualization Demo</title>
+        <link rel="stylesheet" type="text/css" href="css/libs.css">
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+        <style>
+            html, body { height: 100%;}
+        </style>
+    </head>
+    <body>
+        <script src="js/libs.js" type="text/javascript"></script>
+        <script src="js/mwater-visualization.js" type="text/javascript"></script>
+
+        <div class="row" style="height: 100%">
+          <div id="dashboard_view" class="col-xs-8" style="padding-top: 10px"></div>
+          <div id="dashboard_designer" class="col-xs-4" style="border-left: solid 3px #AAA; height: 100%; padding-top: 10px"></div>
+        </div>
+
+        <script type="text/javascript">
+
+var design = {
+  "items": {
+    "6ecb5f90-93c7-443d-8cfe-10e38063d901": {
+      "layout": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 9
+      },
+      "widget": {
+        "type": "BarChart",
+        "version": "0.0.0",
+        "design": {
+          "aesthetics": {
+            "y": {
+              "expr": {
+                "type": "scalar",
+                "table": "wco_loans",
+                "joins": [],
+                "expr": null
+              },
+              "aggr": "count"
+            },
+            "x": {
+              "expr": {
+                "type": "scalar",
+                "table": "wco_loans",
+                "joins": [],
+                "expr": {
+                  "type": "field",
+                  "table": "wco_loans",
+                  "column": "ruralurban"
+                }
+              }
+            }
+          },
+          "annotations": {
+            "title": "Loans by Rural/Urban"
+          },
+          "table": "wco_loans",
+          "filter": {
+            "type": "logical",
+            "table": "wco_loans",
+            "op": "and",
+            "exprs": []
+          }
+        }
+      }
+    },
+    "87520c5a-1f3d-40fa-85b0-c5bbc73e90d1": {
+      "layout": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 9
+      },
+      "widget": {
+        "type": "BarChart",
+        "version": "0.0.0",
+        "design": {
+          "aesthetics": {
+            "y": {
+              "expr": {
+                "type": "scalar",
+                "table": "wco_loans",
+                "joins": [],
+                "expr": null
+              },
+              "aggr": "count"
+            },
+            "x": {
+              "expr": {
+                "type": "scalar",
+                "table": "wco_loans",
+                "joins": [
+                  "programid",
+                  "countryid"
+                ],
+                "expr": {
+                  "type": "field",
+                  "table": "countries",
+                  "column": "name"
+                }
+              }
+            }
+          },
+          "annotations": {
+            "title": "Loans by Country"
+          },
+          "table": "wco_loans"
+        }
+      }
+    }
+  }
+};
+
+/* First get the schema */
+$.getJSON("water_org_schema.json", function(schemaJson) {
+    var Dashboard = require('mwater-visualization').Dashboard;
+    var WidgetFactory = require('mwater-visualization').WidgetFactory;
+    var Schema = require('mwater-visualization').Schema;
+    var schema = new Schema();
+    schema.loadFromJSON(schemaJson);
+
+    var CachingDataSource = require('mwater-visualization').CachingDataSource;
+
+    var dataSource = new CachingDataSource({
+        perform: function(query, cb) {
+            console.log(JSON.stringify(query));
+            $.getJSON("http://dev-portal.water.org/index.php/visualization?query=" + encodeURIComponent(JSON.stringify(query)), function(rows) {
+                cb(null, rows);
+            }).fail(function(xhr) {
+                console.error(xhr.responseText);
+                cb(new Error(xhr.responseText));
+            });
+        }
+    });
+    var widgetFactory = new WidgetFactory(schema, dataSource);
+
+    var dashboard = new Dashboard({
+      design: design,
+      viewNode: document.getElementById("dashboard_view"),
+      isDesigning: true,
+      onShowDesigner: function() { return document.getElementById("dashboard_designer") },
+      widgetFactory: widgetFactory,
+      onDesignChange: function(design) { console.log(JSON.stringify(design, null, 2)); }
+    }).render();
+});
+
+
+
+        </script>
+    </body>
+</html>

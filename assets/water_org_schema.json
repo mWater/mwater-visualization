@@ -1,0 +1,94 @@
+{ 
+  "tables": [
+    {
+      "id": "countries",
+      "name": "Countries",
+      "sql": "countries",
+      "columns": [
+        {
+          "id": "gid",
+          "name": "",
+          "type": "id",
+          "sql": "{alias}.gid"
+        },
+        {
+          "id": "name",
+          "name": "Name",
+          "type": "text",
+          "sql": "{alias}.name"
+        }
+      ]
+    },
+    {
+      "id": "wo_programs",
+      "name": "Programs",
+      "sql": "wo_programs",
+      "columns": [
+        {
+          "id": "programid",
+          "name": "",
+          "type": "id",
+          "sql": "{alias}.programid"
+        },
+        {
+          "id": "name",
+          "name": "Name",
+          "type": "text",
+          "sql": "{alias}.name"
+        },
+        {
+          "id": "countryid",
+          "name": "Country",
+          "type": "join",
+          "sql": "{alias}.countryid",
+          "join": {
+            "fromTable": "wo_programs",
+            "fromColumn": "countryid",
+            "toTable": "countries",
+            "toColumn": "gid",
+            "op": "=",
+            "multiple": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "wco_loans",
+      "name": "Loans",
+      "sql": "(select wl.*, latest_report.programid from wco_loans wl inner join (select max(wu.control_id) as control_id, wu.programid from wop_upload_control wu where wu.status='Approved' group by wu.programid order by 1) as latest_report on latest_report.control_id = wl.control_id)",
+      "columns": [
+        {
+          "id": "loans_seq_id",
+          "name": "",
+          "type": "id",
+          "sql": "{alias}.loans_seq_id"
+        },
+        {
+          "id": "ruralurban",
+          "name": "Rural/Urban",
+          "type": "enum",
+          "values": [
+            { "id": "Rural", "name": "Rural" },
+            { "id": "Peri Urban", "name": "Peri-urban" },
+            { "id": "Urban", "name": "Urban" }
+          ],
+          "sql": "{alias}.ruralurban"
+        },
+        {
+          "id": "programid",
+          "name": "Program",
+          "type": "join",
+          "sql": "{alias}.programid",
+          "join": {
+            "fromTable": "wco_loans",
+            "fromColumn": "programid",
+            "toTable": "wo_programs",
+            "toColumn": "programid",
+            "op": "=",
+            "multiple": false
+          }
+        }
+      ]
+    }
+  ]
+}
