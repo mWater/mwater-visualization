@@ -35,10 +35,10 @@ module.exports = class AggrScalarExprComponent extends React.Component
       currentAggr = _.findWhere(aggrs, id: @props.value.aggr)
 
       return React.createElement(EditableLinkComponent, 
-        dropdownItems: aggrs
-        onDropdownItemClicked: @handleAggrChange
-        if currentAggr then currentAggr.name + " of\u00A0"
-        )
+          dropdownItems: aggrs
+          onDropdownItemClicked: @handleAggrChange
+          if currentAggr then currentAggr.name
+          )
 
   render: ->
     H.div style: { display: "inline-block" }, 

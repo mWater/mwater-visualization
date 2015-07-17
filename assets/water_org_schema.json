@@ -55,7 +55,7 @@
     {
       "id": "wco_loans",
       "name": "Loans",
-      "sql": "(select wl.*, latest_report.programid from wco_loans wl inner join (select max(wu.control_id) as control_id, wu.programid from wop_upload_control wu where wu.status='Approved' group by wu.programid order by 1) as latest_report on latest_report.control_id = wl.control_id)",
+      "sql": "wco_loans_active",
       "columns": [
         {
           "id": "loans_seq_id",
@@ -73,6 +73,30 @@
             { "id": "Urban", "name": "Urban" }
           ],
           "sql": "{alias}.ruralurban"
+        },
+        {
+          "id": "numwomen",
+          "name": "Number of Women",
+          "type": "integer",
+          "sql": "{alias}.numwomen"
+        },
+        {
+          "id": "nummen",
+          "name": "Number of Men",
+          "type": "integer",
+          "sql": "{alias}.nummen"
+        },
+        {
+          "id": "amtprincipal",
+          "name": "Principle Amount",
+          "type": "decimal",
+          "sql": "{alias}.amtprincipal"
+        },
+        {
+          "id": "numborrow",
+          "name": "Number of Borrowers",
+          "type": "integer",
+          "sql": "{alias}.numborrow"
         },
         {
           "id": "programid",

@@ -93,6 +93,7 @@ gulp.task 'prepare_tests', ->
 
 gulp.task "build", gulp.parallel([
   "browserify"
+  "dist"
   "libs_js"
   "libs_css"
   "copy_images"

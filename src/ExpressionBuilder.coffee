@@ -52,7 +52,7 @@ module.exports = class ExpressionBuilder
         aggrs.push({ id: "min", name: "Minimum", type: type })
 
       when "integer", "decimal"
-        aggrs.push({ id: "sum", name: "Sum", type: type })
+        aggrs.push({ id: "sum", name: "Total", type: type })
         aggrs.push({ id: "avg", name: "Average", type: "decimal" })
         aggrs.push({ id: "max", name: "Maximum", type: type })
         aggrs.push({ id: "min", name: "Minimum", type: type })
