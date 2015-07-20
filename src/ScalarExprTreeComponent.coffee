@@ -27,8 +27,7 @@ module.exports = class ScalarExprTreeComponent extends React.Component
       @loadChildren(item, 10)
       if item.children
         elems.push(
-          React.createElement(HoverComponent, key: item.name,
-            React.createElement(ScalarExprTreeNodeComponent, item: item, onChange: @props.onChange, value: @props.value)))
+          React.createElement(ScalarExprTreeNodeComponent, item: item, onChange: @props.onChange, value: @props.value))
       else 
         elems.push(
           React.createElement(HoverComponent, key: item.name,
