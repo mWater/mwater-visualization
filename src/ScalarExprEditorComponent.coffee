@@ -81,7 +81,6 @@ module.exports = class ScalarExprEditorComponent extends React.Component
 
     H.div null, 
       H.label null, "Select Field"
-      H.div style: { overflowY: "scroll", height: 350, border: "solid 1px #CCC" },
-        @renderTree()
+      @renderTree()
       @renderAggr()
       @renderWhere()
