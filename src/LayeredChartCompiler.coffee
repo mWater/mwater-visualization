@@ -198,7 +198,7 @@ module.exports = class LayeredChartCompiler
         for colorVal in colorValues
           names["layer#{layerId}:#{colorVal}:y"] = @mapValue(layer.colorExpr, colorVal)
       else
-        names["layer#{layerId}:y"] = layer.name or "Layer #{layerId+1}"
+        names["layer#{layerId}:y"] = layer.name or "Series #{layerId+1}"
 
     return names
 

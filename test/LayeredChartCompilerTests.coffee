@@ -362,7 +362,7 @@ describe "LayeredChartCompiler", ->
       names = @compiler.getNames(design, data)
 
       expectedNames = {
-        "layer0:y": "Layer 1" # Defaults names
+        "layer0:y": "Series 1" # Defaults names
         "layer1:y": "second layer"
       }
 

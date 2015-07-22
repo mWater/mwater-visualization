@@ -6,11 +6,13 @@ AggrScalarExprComponent = require './AggrScalarExprComponent'
 LogicalExprComponent = require './LogicalExprComponent'
 ExpressionBuilder = require './ExpressionBuilder'
 EditableLinkComponent = require './EditableLinkComponent'
+PopoverComponent = require './PopoverComponent'
 
 module.exports = class LayeredDesignerComponent extends React.Component
   @propTypes: 
     design: React.PropTypes.object.isRequired
     schema: React.PropTypes.object.isRequired
+    onDesignChange: React.PropTypes.func.isRequired
 
   # Updates design with the specified changes
   updateDesign: (changes) ->
@@ -20,14 +22,113 @@ module.exports = class LayeredDesignerComponent extends React.Component
   handleTitleChange: (ev) =>
     @updateDesign(titleText: ev.target.value)
 
+  handleLayerChange: (index, layer) =>
+    layers = @props.design.layers.slice()
+    layers[index] = layer
+    @updateDesign(layers: layers)
+
+  handleRemoveLayer: (index) =>
+    layers = @props.design.layers.slice().splice(index, 1)
+    @updateDesign(layers: layers)
+
+  handleAddSeries: =>
+    layers = @props.design.layers.slice()
+    layers.push({})
+    @updateDesign(layers: layers)
+
   renderTitle: ->
     H.div className: "form-group",
       H.label className: "text-muted", "Title"
       H.input type: "text", className: "form-control", value: @props.design.titleText, onChange: @handleTitleChange, placeholder: "Untitled"
 
+  renderLayer: (index) =>
+    style = {
+      borderTop: "solid 1px #AAA"
+      borderBottom: "solid 1px #AAA"
+    }
+    H.div style: style, 
+      React.createElement(LayerDesignerComponent, {
+        design: @props.design
+        schema: @props.schema
+        index: index
+        onChange: @handleLayerChange.bind(null, index)
+        onRemove: @handleRemoveLayer.bind(null, index)
+        })
+
+  renderLayers: ->
+    H.div null, 
+      _.map(@props.design.layers, (layer, i) => @renderLayer(i))
+      H.button className: "btn btn-link btn-sm", type: "button", onClick: @handleAddSeries,
+        H.span className: "glyphicon glyphicon-plus"
+        " Add Series"
+
   render: ->
     H.div null, 
       @renderTitle()
+      @renderLayers()
+
+
+class LayerDesignerComponent extends React.Component
+  @propTypes: 
+    design: React.PropTypes.object.isRequired
+    schema: React.PropTypes.object.isRequired
+    index: React.PropTypes.number.isRequired
+    onChange: React.PropTypes.func.isRequired
+    onRemove: React.PropTypes.func.isRequired
+
+  # Updates layer with the specified changes
+  updateLayer: (changes) ->
+    layer = _.extend({}, @props.design.layers[@props.index], changes)
+    @props.onChange(layer)
+
+  handleNameChange: (ev) =>
+    @updateLayer(name: ev.target.value)
+
+  handleTableChange: (table) =>
+    @updateLayer(table: table)
+
+  renderName: ->
+    # Only if multiple
+    if @props.design.layers.length <= 1
+      return
+
+    layer = @props.design.layers[@props.index]
+
+    # H.div className: "form-group",
+    #   H.label className: "text-muted", "Series Name"
+    H.input type: "text", className: "form-control input-sm", value: layer.name, onChange: @handleNameChange, placeholder: "Series #{@props.index+1}"
+
+  renderRemove: ->
+    if @props.design.layers.length > 1
+      H.button className: "btn btn-xs btn-link pull-right", type: "button", onClick: @props.onRemove,
+        H.span className: "glyphicon glyphicon-remove"
+
+  renderTable: ->
+    layer = @props.design.layers[@props.index]
+
+    if not layer.table
+      popover = "Start by selecting a data source"
+
+    return H.div className: "form-group",
+      H.label className: "text-muted", 
+        H.span(className: "glyphicon glyphicon-file")
+        " "
+        "Data Source"
+      ": "
+      React.createElement PopoverComponent, html: popover, 
+        React.createElement(EditableLinkComponent, 
+          dropdownItems: @props.schema.getTables()
+          onDropdownItemClicked: @handleTableChange
+          onRemove: if layer.table then @handleTableChange.bind(this, null)
+          if layer.table then @props.schema.getTable(layer.table).name else H.i(null, "Select...")
+          )
+
+
+  render: ->
+    H.div null, 
+      @renderRemove()
+      @renderName()
+      @renderTable()
 
 #   handleTableChange: (table) =>
 #     @updateDesign(table: table)

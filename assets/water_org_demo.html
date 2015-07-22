@@ -117,104 +117,134 @@
 //   }
 // };
 
+// var design = {
+//   "items": {
+//     "6ecb5f90-93c7-443d-8cfe-10e38063d901": {
+//       "layout": {
+//         "x": 0,
+//         "y": 0,
+//         "w": 12,
+//         "h": 9
+//       },
+//       "widget": {
+//         "type": "BarChart",
+//         "version": "0.0.0",
+//         "design": {
+//           "aesthetics": {
+//             "y": {
+//               "expr": {
+//                 "type": "scalar",
+//                 "table": "wco_loans",
+//                 "joins": [],
+//                 "expr": {
+//                   "type": "field",
+//                   "table": "wco_loans",
+//                   "column": "numborrow"
+//                 }
+//               },
+//               "aggr": "sum"
+//             },
+//             "x": {
+//               "expr": {
+//                 "type": "scalar",
+//                 "table": "wco_loans",
+//                 "joins": [],
+//                 "expr": {
+//                   "type": "field",
+//                   "table": "wco_loans",
+//                   "column": "ruralurban"
+//                 }
+//               }
+//             }
+//           },
+//           "annotations": {
+//             "title": "Borrowers by Rural vs. Urban"
+//           },
+//           "table": "wco_loans",
+//           "filter": {
+//             "type": "logical",
+//             "table": "wco_loans",
+//             "op": "and",
+//             "exprs": []
+//           }
+//         }
+//       }
+//     },
+//     "87520c5a-1f3d-40fa-85b0-c5bbc73e90d1": {
+//       "layout": {
+//         "x": 12,
+//         "y": 0,
+//         "w": 12,
+//         "h": 9
+//       },
+//       "widget": {
+//         "type": "BarChart",
+//         "version": "0.0.0",
+//         "design": {
+//           "aesthetics": {
+//             "y": {
+//               "expr": {
+//                 "type": "scalar",
+//                 "table": "wco_loans",
+//                 "joins": [],
+//                 "expr": {
+//                   "type": "field",
+//                   "table": "wco_loans",
+//                   "column": "numborrow"
+//                 }
+//               },
+//               "aggr": "sum"
+//             },
+//             "x": {
+//               "expr": {
+//                 "type": "scalar",
+//                 "table": "wco_loans",
+//                 "joins": [
+//                   "programid",
+//                   "countryid"
+//                 ],
+//                 "expr": {
+//                   "type": "field",
+//                   "table": "countries",
+//                   "column": "name"
+//                 }
+//               }
+//             }
+//           },
+//           "annotations": {
+//             "title": "Borrowers by Country"
+//           },
+//           "table": "wco_loans"
+//         }
+//       }
+//     }
+//   }
+// };
+
 var design = {
   "items": {
-    "6ecb5f90-93c7-443d-8cfe-10e38063d901": {
+    "b5f726be-75b4-4759-b85f-f2ca4428aa78": {
       "layout": {
         "x": 0,
         "y": 0,
         "w": 12,
-        "h": 9
+        "h": 12
       },
       "widget": {
-        "type": "BarChart",
+        "type": "LayeredChart",
         "version": "0.0.0",
         "design": {
-          "aesthetics": {
-            "y": {
-              "expr": {
-                "type": "scalar",
-                "table": "wco_loans",
-                "joins": [],
-                "expr": {
-                  "type": "field",
-                  "table": "wco_loans",
-                  "column": "numborrow"
-                }
-              },
-              "aggr": "sum"
-            },
-            "x": {
-              "expr": {
-                "type": "scalar",
-                "table": "wco_loans",
-                "joins": [],
-                "expr": {
-                  "type": "field",
-                  "table": "wco_loans",
-                  "column": "ruralurban"
-                }
-              }
+          "type": "line",
+          "layers": [
+            {
+              "xExpr": null,
+              "yExpr": null,
+              "colorExpr": null,
+              "yAggr": "count",
+              "filter": null
             }
-          },
-          "annotations": {
-            "title": "Borrowers by Rural vs. Urban"
-          },
-          "table": "wco_loans",
-          "filter": {
-            "type": "logical",
-            "table": "wco_loans",
-            "op": "and",
-            "exprs": []
-          }
-        }
-      }
-    },
-    "87520c5a-1f3d-40fa-85b0-c5bbc73e90d1": {
-      "layout": {
-        "x": 12,
-        "y": 0,
-        "w": 12,
-        "h": 9
-      },
-      "widget": {
-        "type": "BarChart",
-        "version": "0.0.0",
-        "design": {
-          "aesthetics": {
-            "y": {
-              "expr": {
-                "type": "scalar",
-                "table": "wco_loans",
-                "joins": [],
-                "expr": {
-                  "type": "field",
-                  "table": "wco_loans",
-                  "column": "numborrow"
-                }
-              },
-              "aggr": "sum"
-            },
-            "x": {
-              "expr": {
-                "type": "scalar",
-                "table": "wco_loans",
-                "joins": [
-                  "programid",
-                  "countryid"
-                ],
-                "expr": {
-                  "type": "field",
-                  "table": "countries",
-                  "column": "name"
-                }
-              }
-            }
-          },
-          "annotations": {
-            "title": "Borrowers by Country"
-          },
-          "table": "wco_loans"
+          ],
+          "titleText": "test"
         }
       }
     }
