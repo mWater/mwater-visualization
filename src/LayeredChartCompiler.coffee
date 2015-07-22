@@ -175,5 +175,35 @@ module.exports = class LayeredChartCompiler
 
     return names
 
+  # Gets the type of each y column
+  getTypes: (design, columns) ->
+    types = {}
+    for column in columns
+      if column[0].match(/:y$/)
+        layerId = parseInt(column[0].match(/^layer(\d+)/)[1])
+        types[column[0]] = design.layers[layerId].type or design.type
 
+    return types
+
+  getGroups: (design, columns) ->
+    groups = []
+    # For each layer
+    for layerId in [0...design.layers.length]
+      layer = design.layers[layerId]
+
+      if layer.stacked
+        group = []
+        for column in columns
+          if column[0].match("^layer#{layerId}:.*:y$")
+            group.push(column[0])
+        groups.push(group)
+
+    return groups
+
+
+  getXAxisType: (design) ->
+    switch @exprBuilder.getExprType(design.layers[0].xExpr)
+      when "text", "enum", "boolean" then "category"
+      when "date" then "timeseries"
+      else "indexed"
 

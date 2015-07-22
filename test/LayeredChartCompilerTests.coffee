@@ -14,6 +14,7 @@ describe "LayeredChartCompiler", ->
     @exprDecimal = { type: "field", table: "t1", column: "decimal" }
     @exprInteger = { type: "field", table: "t1", column: "integer" }
     @exprText = { type: "field", table: "t1", column: "text" }
+    @exprDate = { type: "field", table: "t1", column: "date" }
     @exprEnum = { type: "field", table: "t1", column: "enum" }
 
   describe "getQueries", ->
@@ -323,13 +324,104 @@ describe "LayeredChartCompiler", ->
       compare(names, expectedNames)
 
   describe "getGroups", ->
-    it "groups if layer is stacked"
-    it "doesn't group normally"
+    it "doesn't group normally", ->
+      design = {
+        type: "bar"
+        layers: [
+          { xExpr: @exprText, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+        ]
+      }
+
+      columns = [
+        [ "layer0:a:x", "1", "2" ]
+        [ "layer0:a:y", 10, 30 ]
+        [ "layer0:b:x", "1", "2" ]
+        [ "layer0:b:y", 20, null ]
+      ]
+
+      expectedGroups = []
+
+      types = @compiler.getGroups(design, columns)
+      compare(types, expectedGroups)
+
+    it "groups if layer is stacked", ->
+      design = {
+        type: "bar"
+        layers: [
+          { xExpr: @exprText, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1", stacked: true }
+        ]
+      }
+
+      columns = [
+        [ "layer0:a:x", "1", "2" ]
+        [ "layer0:a:y", 10, 30 ]
+        [ "layer0:b:x", "1", "2" ]
+        [ "layer0:b:y", 20, null ]
+      ]
+
+      expectedGroups = [
+        ['layer0:a:y', 'layer0:b:y']
+      ]
+
+      types = @compiler.getGroups(design, columns)
+      compare(types, expectedGroups)
+
 
   describe "getTypes", ->
-    it "defaults to overall type"
+    it "defaults to overall type", ->
+      design = {
+        type: "bar"
+        layers: [
+          { xExpr: @exprText, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+          { xExpr: @exprText, yExpr: @exprInteger, yAggr: "sum", table: "t1", type: "line" }
+        ]
+      }
+
+      columns = [
+        [ "layer0:x", "a", "b", "c" ]
+        [ "layer0:y", 10, 20, null ]
+        [ "layer1:x", "a", "b", "c" ]
+        [ "layer1:y", 11, null, 21 ]
+      ]
+
+      expectedTypes = {
+        "layer0:y": "bar"
+        "layer1:y": "line"
+      }
+
+      types = @compiler.getTypes(design, columns)
+      compare(types, expectedTypes)
 
   describe "getXAxisType", ->
-    it "uses category for text and enum"
-    it "uses timeseries for date"
-    it "uses indexed by default"
+    it "uses category for text and enum", ->
+      design = {
+        type: "bar"
+        layers: [
+          { xExpr: @exprText, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+        ]
+      }
+
+      xAxisType = @compiler.getXAxisType(design)
+      assert.equal xAxisType, "category"
+
+    it "uses timeseries for date", ->
+      design = {
+        type: "bar"
+        layers: [
+          { xExpr: @exprDate, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+        ]
+      }
+
+      xAxisType = @compiler.getXAxisType(design)
+      assert.equal xAxisType, "timeseries"
+
+    it "uses indexed by default", ->
+      design = {
+        type: "line"
+        layers: [
+          { xExpr: @exprDecimal, yExpr: @exprInteger, table: "t1" }
+        ]
+      }
+
+      xAxisType = @compiler.getXAxisType(design)
+      assert.equal xAxisType, "indexed"
