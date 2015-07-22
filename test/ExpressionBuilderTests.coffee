@@ -89,7 +89,7 @@ describe "ExpressionBuilder", ->
     it "summarizes joined aggr scalar expr", ->
       fieldExpr = { type: "field", table: "t2", column: "c1" }
       scalarExpr = { type: "scalar", table: "t1", joins: ['c2'], expr: fieldExpr, aggr: "sum" }
-      assert.equal @exprBuilder.summarizeExpr(scalarExpr), "Sum of C2 > C1"
+      assert.equal @exprBuilder.summarizeExpr(scalarExpr), "Total of C2 > C1"
 
     it "simplifies when simple count", ->
       scalarExpr = { type: "scalar", table: "t1", joins: ['c2'], expr: null, aggr: "count" }
