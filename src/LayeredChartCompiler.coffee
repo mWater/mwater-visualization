@@ -24,7 +24,7 @@ module.exports = class LayeredChartCompiler
     exprCompiler = new ExpressionCompiler(@schema)
     return exprCompiler.compileExpr(expr: expr, tableAlias: "main")
 
-  getQueries: (design) ->
+  getQueries: (design, extraFilters) ->
     queries = {}
 
     # For each layer
@@ -54,6 +54,33 @@ module.exports = class LayeredChartCompiler
         query.selects.push({ type: "select", expr: { type: "op", op: layer.yAggr, exprs: [@compileExpr(layer.yExpr)] }, alias: "y" })
       else
         query.selects.push({ type: "select", expr: @compileExpr(layer.yExpr), alias: "y" })
+
+      # Add where
+      if layer.filter
+        query.where = @compileExpr(layer.filter)
+
+      # Add filters
+      if extraFilters and extraFilters.length > 0
+        # Get relevant filters
+        relevantFilters = _.where(extraFilters, table: layer.table)
+
+        # If any, create and
+        if relevantFilters.length > 0
+          whereClauses = []
+
+          # Keep existing where
+          if query.where
+            whereClauses.push(query.where)
+
+          # Add others
+          for filter in relevantFilters
+            whereClauses.push(@compileExpr(filter))
+
+          # Wrap if multiple
+          if whereClauses.length > 1
+            query.where = { type: "op", op: "and", exprs: whereClauses }
+          else
+            query.where = whereClauses[0]
 
       queries["layer#{layerId}"] = query
 

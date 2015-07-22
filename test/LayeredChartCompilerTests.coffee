@@ -43,6 +43,76 @@ describe "LayeredChartCompiler", ->
 
       compare(queries, expectedQueries)
 
+    it "filters query", ->
+      filter = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "integer" }, op: ">", rhs: { type: "literal", valueType: "integer", value: 4 } }
+
+      design = {
+        type: "bar"
+        layers: [
+          { xExpr: @exprText, yExpr: @exprInteger, yAggr: "sum", table: "t1", filter: filter }
+        ]
+      }
+
+      queries = @compiler.getQueries(design)
+
+      expectedQueries = {
+        layer0: {
+          type: "query"
+          selects: [
+            { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "x" }
+            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "integer" }] }, alias: "y" }
+          ]
+          from: { type: "table", table: "t1", alias: "main" }
+          where: { type: "op", op: ">", exprs: [
+            { type: "field", tableAlias: "main", column: "integer" }
+            { type: "literal", value: 4 }
+          ]}
+          groupBy: [1]
+          limit: 1000
+        }
+      }
+
+      compare(queries, expectedQueries)
+
+    it "filters if by relevant extra filters", ->
+      relevantFilter = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "integer" }, op: ">", rhs: { type: "literal", valueType: "integer", value: 4 } }
+
+      # Wrong table
+      otherFilter = { type: "comparison", table: "t2", lhs: { type: "field", table: "t2", column: "integer" }, op: ">", rhs: { type: "literal", valueType: "integer", value: 5 } }
+
+      filters = [
+        relevantFilter
+        otherFilter
+      ]
+
+      design = {
+        type: "bar"
+        layers: [
+          { xExpr: @exprText, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+        ]
+      }
+
+      queries = @compiler.getQueries(design, filters)
+
+      expectedQueries = {
+        layer0: {
+          type: "query"
+          selects: [
+            { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "x" }
+            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "integer" }] }, alias: "y" }
+          ]
+          from: { type: "table", table: "t1", alias: "main" }
+          where: { type: "op", op: ">", exprs: [
+            { type: "field", tableAlias: "main", column: "integer" }
+            { type: "literal", value: 4 }
+          ]}
+          groupBy: [1]
+          limit: 1000
+        }
+      }
+
+      compare(queries, expectedQueries)
+
     it "creates single ungrouped query", ->
       design = {
         type: "scatter"
