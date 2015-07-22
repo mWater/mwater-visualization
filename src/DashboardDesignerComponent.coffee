@@ -26,7 +26,7 @@ module.exports = class DashboardDesignerComponent extends React.Component
     design = _.extend({}, @props.design, items: items)
     @props.onDesignChange(design)
 
-  handleAddBarChart: =>
+  handleAddChart: =>
     # Create layout engine
     # TODO create from design
     # TODO uses fake width
@@ -42,7 +42,7 @@ module.exports = class DashboardDesignerComponent extends React.Component
     item = {
       layout: layout
       widget: {
-        type: "BarChart"
+        type: "LayeredChart"
         version: "0.0.0"
         design: {}
       }
@@ -73,7 +73,7 @@ module.exports = class DashboardDesignerComponent extends React.Component
           H.span className: "caret"
         H.ul className: "dropdown-menu",
           H.li null,
-            H.a onClick: @handleAddBarChart, "Bar Chart"
+            H.a onClick: @handleAddChart, "Chart"
 
   render: ->
     if not @props.selectedWidgetId

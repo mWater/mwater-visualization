@@ -80,7 +80,7 @@ class ChartWidgetComponent extends React.Component
 
   updateData: (props) ->
     # Skip if invalid
-    if props.chart.validateDesign(props.design)
+    if props.chart.validateDesign(props.chart.cleanDesign(props.design))
       return
 
     # Get queries

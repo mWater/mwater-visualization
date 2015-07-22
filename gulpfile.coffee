@@ -105,7 +105,7 @@ gulp.task "build", gulp.parallel([
 gulp.task 'watch', gulp.series([
   'build'
   gulp.parallel([
-    -> browserSync({ server: "./dist" })
+    -> browserSync({ server: "./dist", startPath: "water_org_demo.html" })
     -> gulp.watch("./src/**", gulp.series(['build', -> reload()]))
   ])
 ])

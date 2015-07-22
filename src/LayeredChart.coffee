@@ -2,10 +2,10 @@ _ = require 'lodash'
 React = require 'react'
 
 Chart = require './Chart'
+LayeredChartCompiler = require './LayeredChartCompiler'
 ExpressionBuilder = require './ExpressionBuilder'
-ExpressionCompiler = require './ExpressionCompiler'
-BarChartDesignerComponent = require './BarChartDesignerComponent'
-BarChartViewComponent = require './BarChartViewComponent'
+LayeredChartDesignerComponent = require './LayeredChartDesignerComponent'
+LayeredChartViewComponent = require './LayeredChartViewComponent'
 
 ###
 Design is:
@@ -13,6 +13,7 @@ Design is:
   type: bar/line/spline/scatter/area
   layers: array of layers
   titleText: title text
+  transpose: true to flip axes
 
 layer:
   name: label for layer (optional)
@@ -30,65 +31,63 @@ module.exports = class LayeredChart extends Chart
     @exprBuilder = new ExpressionBuilder(@schema)
 
   cleanDesign: (design) ->
-    # TODO
-    # Fill in defaults
-    design.aesthetics = design.aesthetics or {}
-    design.annotations = design.annotations or {}
+    compiler = new LayeredChartCompiler(schema: @schema)
 
     # Clone deep for now # TODO
     design = _.cloneDeep(design)
 
-    # Clean aesthetic expressions.
-    for aes in ['y', 'x', 'color']
-      value = design.aesthetics[aes]
+    # Fill in defaults
+    design.type = design.type or "line"
+    design.layers = design.layers or [{}]
 
-      # Aesthetic or its expression can be blank
-      if not value or not value.expr
-        continue
+    # Clean each layer
+    for layerId in [0...design.layers.length]
+      layer = design.layers[layerId]
 
-      # Clean expression
-      value.expr = @exprBuilder.cleanExpr(value.expr, design.table)
+      layer.xExpr = @exprBuilder.cleanExpr(layer.xExpr, layer.table)
+      layer.yExpr = @exprBuilder.cleanExpr(layer.yExpr, layer.table)
+      layer.colorExpr = @exprBuilder.cleanExpr(layer.colorExpr, layer.table)
 
-    # Default y expr
-    if not design.aesthetics.y or not design.aesthetics.y.expr
-      if design.table 
-        design.aesthetics.y = { expr: { type: "scalar", table: design.table, joins: [], expr: null }, aggr: "count" }
+      # Default y aggr
+      if compiler.doesLayerNeedGrouping(design, layerId)
+        # Remove latest, as it is tricky to group by. TODO
+        aggrs = @exprBuilder.getAggrs(layer.yExpr)
+        aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
 
-    # Clean and default y aggr
-    if design.aesthetics.y and design.aesthetics.y.expr
-      # Remove latest, as it is tricky to group by. TODO
-      aggrs = @exprBuilder.getAggrs(design.aesthetics.y.expr)
-      aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
+        if layer.yAggr and layer.yAggr not in _.pluck(aggrs, "id")
+          delete layer.yAggr
 
-      if design.aesthetics.y.aggr and design.aesthetics.y.aggr not in _.pluck(aggrs, "id")
-        delete design.aesthetics.y.aggr
+        if not layer.yAggr
+          layer.yAggr = aggrs[0].id
 
-      if not design.aesthetics.y.aggr
-        design.aesthetics.y.aggr = aggrs[0].id
-
-    if design.filter
-      design.filter = @exprBuilder.cleanExpr(design.filter, design.table)
+        layer.filter = @exprBuilder.cleanExpr(layer.filter, layer.table)
 
     return design
 
   validateDesign: (design) ->
-    # Check that has table
-    if not design.table
-      return "Missing Table"
+    # Check that all have same xExpr type
+    xExprTypes = _.uniq(_.map(design.layers, (l) => @exprBuilder.getExprType(l.xExpr)))
 
-    # Check that has x and y
-    if not design.aesthetics.x or not design.aesthetics.x.expr
-      return "Missing X Axis"
-    if not design.aesthetics.y or not design.aesthetics.y.expr
-      return "Missing Y Axis"
+    if xExprTypes.length > 1
+      return "All x axes must be of same type"
 
-    error = null
-    if not design.aesthetics.y.aggr
-      error = "Missing Y aggregation"
-    error = error or @exprBuilder.validateExpr(design.aesthetics.x.expr)
-    error = error or @exprBuilder.validateExpr(design.aesthetics.y.expr)
-    error = error or @exprBuilder.validateExpr(design.filter)
-    return error
+    for layer in design.layers
+      # Check that has table
+      if not layer.table
+        return "Missing data source"
+
+      # Check that has x and y
+      if not layer.xExpr
+        return "Missing X Axis"
+      if not layer.yExpr
+        return "Missing Y Axis"
+
+      error = null
+      error = error or @exprBuilder.validateExpr(layer.xExpr)
+      error = error or @exprBuilder.validateExpr(layer.yExpr)
+      error = error or @exprBuilder.validateExpr(layer.colorExpr)
+      error = error or @exprBuilder.validateExpr(layer.filter)
+      return error
 
   # Creates a design element with specified options
   # options include design: design and onChange: function
@@ -101,55 +100,11 @@ module.exports = class LayeredChart extends Chart
         design = @cleanDesign(design)
         options.onDesignChange(design)
     }
-    return React.createElement(BarChartDesignerComponent, props)
+    return React.createElement(LayeredChartDesignerComponent, props)
 
   createQueries: (design, filters) ->
-    exprCompiler = new ExpressionCompiler(@schema)
-
-    # Create main query
-    query = {
-      type: "query"
-      selects: []
-      from: { type: "table", table: design.table, alias: "main" }
-      groupBy: [1] # X-axis
-      limit: 1000
-    }
-
-    query.selects.push({ type: "select", expr: exprCompiler.compileExpr(expr: design.aesthetics.x.expr, tableAlias: "main"), alias: "x" })
-
-    # Y is aggregated
-    expr = exprCompiler.compileExpr(expr: design.aesthetics.y.expr, tableAlias: "main")
-    exprs = if expr then [expr] else []
-    query.selects.push({ type: "select", expr: { type: "op", op: design.aesthetics.y.aggr, exprs: exprs }, alias: "y" })
-
-    # Add where
-    if design.filter
-      query.where = exprCompiler.compileExpr(expr: design.filter, tableAlias: "main")
-
-    # Add filters
-    if filters and filters.length > 0
-      # Get relevant filters
-      relevantFilters = _.where(filters, table: design.table)
-
-      # If any, create and
-      if relevantFilters.length > 0
-        whereClauses = []
-
-        # Keep existing where
-        if query.where
-          whereClauses.push(query.where)
-
-        # Add others
-        for filter in relevantFilters
-          whereClauses.push(exprCompiler.compileExpr(expr: filter, tableAlias: "main"))
-
-        # Wrap if multiple
-        if whereClauses.length > 1
-          query.where = { type: "op", op: "and", exprs: whereClauses }
-        else
-          query.where = whereClauses[0]
-
-    return { main: query }
+    compiler = new LayeredChartCompiler(schema: @schema)
+    return compiler.getQueries(design, filters)
 
   # Options include 
   # design: design of the chart
@@ -171,4 +126,4 @@ module.exports = class LayeredChart extends Chart
       onScopeChange: options.onScopeChange
     }
 
-    return React.createElement(BarChartViewComponent, props)
+    return React.createElement(LayeredChartViewComponent, props)
