@@ -49,7 +49,7 @@ module.exports = class LayeredChart extends Chart
       layer.colorExpr = @exprBuilder.cleanExpr(layer.colorExpr, layer.table)
 
       # Default y aggr
-      if compiler.doesLayerNeedGrouping(design, layerId)
+      if compiler.doesLayerNeedGrouping(design, layerId) and layer.yExpr
         # Remove latest, as it is tricky to group by. TODO
         aggrs = @exprBuilder.getAggrs(layer.yExpr)
         aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
@@ -59,8 +59,10 @@ module.exports = class LayeredChart extends Chart
 
         if not layer.yAggr
           layer.yAggr = aggrs[0].id
+      else
+        delete layer.yAggr
 
-        layer.filter = @exprBuilder.cleanExpr(layer.filter, layer.table)
+      layer.filter = @exprBuilder.cleanExpr(layer.filter, layer.table)
 
     return design
 

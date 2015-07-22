@@ -8,7 +8,7 @@ ExpressionBuilder = require './ExpressionBuilder'
 EditableLinkComponent = require './EditableLinkComponent'
 PopoverComponent = require './PopoverComponent'
 
-module.exports = class LayeredDesignerComponent extends React.Component
+module.exports = class LayeredChartDesignerComponent extends React.Component
   @propTypes: 
     design: React.PropTypes.object.isRequired
     schema: React.PropTypes.object.isRequired
@@ -28,7 +28,8 @@ module.exports = class LayeredDesignerComponent extends React.Component
     @updateDesign(layers: layers)
 
   handleRemoveLayer: (index) =>
-    layers = @props.design.layers.slice().splice(index, 1)
+    layers = @props.design.layers.slice()
+    layers.splice(index, 1)
     @updateDesign(layers: layers)
 
   handleAddSeries: =>
@@ -67,7 +68,6 @@ module.exports = class LayeredDesignerComponent extends React.Component
       @renderTitle()
       @renderLayers()
 
-
 class LayerDesignerComponent extends React.Component
   @propTypes: 
     design: React.PropTypes.object.isRequired
@@ -86,6 +86,15 @@ class LayerDesignerComponent extends React.Component
 
   handleTableChange: (table) =>
     @updateLayer(table: table)
+
+  handleXExprChange: (expr) =>
+    @updateLayer(xExpr: expr)
+
+  handleYExprChange: (expr) =>
+    @updateLayer(yExpr: expr)
+
+  handleYAggrExprChange: (val) =>
+    @updateLayer(yExpr: val.expr, yAggr: val.aggr)
 
   renderName: ->
     # Only if multiple
@@ -123,12 +132,50 @@ class LayerDesignerComponent extends React.Component
           if layer.table then @props.schema.getTable(layer.table).name else H.i(null, "Select...")
           )
 
+  renderXAxis: ->
+    layer = @props.design.layers[@props.index]
+    if not layer.table
+      return
+
+    title = [H.span(className: "glyphicon glyphicon-resize-horizontal"), " Horizontal Axis"]
+
+    H.div className: "form-group",
+      H.label className: "text-muted", title
+      H.div style: { marginLeft: 10 }, 
+        React.createElement(ScalarExprComponent, 
+          editorTitle: title
+          schema: @props.schema, 
+          table: layer.table
+          # types: ["enum", "text"]
+          value: layer.xExpr, 
+          onChange: @handleXExprChange)
+
+  renderYAxis: ->
+    layer = @props.design.layers[@props.index]
+    if not layer.table
+      return
+
+    title = [H.span(className: "glyphicon glyphicon-resize-vertical"), " Vertical Axis"]
+
+    H.div className: "form-group",
+      H.label className: "text-muted", title
+      H.div style: { marginLeft: 10 }, 
+        # TODO aggr and non-aggr
+        React.createElement(AggrScalarExprComponent, 
+          editorTitle: title
+          schema: @props.schema, 
+          table: layer.table
+          types: ["integer", "decimal"]
+          value: { expr: layer.yExpr, aggr: layer.yAggr }
+          onChange: @handleYAggrExprChange)
 
   render: ->
     H.div null, 
       @renderRemove()
       @renderName()
       @renderTable()
+      @renderXAxis()
+      @renderYAxis()
 
 #   handleTableChange: (table) =>
 #     @updateDesign(table: table)
