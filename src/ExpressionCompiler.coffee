@@ -1,4 +1,3 @@
-
 # Compiles expressions to JsonQL
 module.exports = class ExpressionCompiler 
   constructor: (schema) ->
