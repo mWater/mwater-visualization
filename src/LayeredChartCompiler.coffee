@@ -59,6 +59,15 @@ module.exports = class LayeredChartCompiler
 
     return queries
 
+  # Translates enums to label, leaves all else alone
+  mapValue: (expr, value) ->
+    if value and @exprBuilder.getExprType(expr) == "enum"
+      items = @exprBuilder.getExprValues(expr)
+      item = _.findWhere(items, { id: value })
+      if item
+        return item.name
+    return value
+
   getColumns: (design, data) ->
     columns = []
 
@@ -77,7 +86,39 @@ module.exports = class LayeredChartCompiler
 
       # If color expr
       if layer.colorExpr
-        throw new Error("Not implemented")
+        # Determine all color values
+        colorValues = _.uniq(_.pluck(data["layer#{layerId}"], "color"))
+
+        if xCategorical
+          # Create a series for each color value
+          for colorVal in colorValues
+            # Use x axis for each and lookup y
+            xcolumn = ["layer#{layerId}:#{colorVal}:x"]
+            ycolumn = ["layer#{layerId}:#{colorVal}:y"]
+
+            for val in xValues
+              xcolumn.push(@mapValue(layer.xExpr, val))
+              row = _.findWhere(data["layer#{layerId}"], { x: val, color: colorVal })
+              if row
+                ycolumn.push(row.y)
+              else
+                ycolumn.push(null)
+            columns.push(xcolumn)
+            columns.push(ycolumn)
+        else
+          # Create a series for each color value
+          for colorVal in colorValues
+            # Use x axis for each and lookup y
+            xcolumn = ["layer#{layerId}:#{colorVal}:x"]
+            ycolumn = ["layer#{layerId}:#{colorVal}:y"]
+
+            for row in data["layer#{layerId}"]
+              if row.color == colorVal
+                xcolumn.push(@mapValue(layer.xExpr, row.x))
+                ycolumn.push(row.y)
+
+            columns.push(xcolumn)
+            columns.push(ycolumn)
       else
         if xCategorical
           # Use x axis for each and lookup y
@@ -85,7 +126,7 @@ module.exports = class LayeredChartCompiler
           ycolumn = ["layer#{layerId}:y"]
 
           for val in xValues
-            xcolumn.push(val)
+            xcolumn.push(@mapValue(layer.xExpr, val))
             row = _.findWhere(data["layer#{layerId}"], { x: val })
             if row
               ycolumn.push(row.y)
@@ -100,13 +141,39 @@ module.exports = class LayeredChartCompiler
           ycolumn = ["layer#{layerId}:y"]
 
           for row in data["layer#{layerId}"]
-            xcolumn.push(row.x)
+            xcolumn.push(@mapValue(layer.xExpr, row.x))
             ycolumn.push(row.y)
 
           columns.push(xcolumn)
           columns.push(ycolumn)
 
-
-
     return columns
+
+  getXs: (columns) ->
+    xs = {}
+    for col in columns
+      if col[0].match(/:y$/)
+        xs[col[0]] = col[0].replace(/:y$/, ":x")
+
+    return xs
+
+  getNames: (design, data) ->
+    names = {}
+    # For each layer
+    for layerId in [0...design.layers.length]
+      layer = design.layers[layerId]
+
+      # If color expr
+      if layer.colorExpr
+        # Determine all color values
+        colorValues = _.uniq(_.pluck(data["layer#{layerId}"], "color"))
+
+        for colorVal in colorValues
+          names["layer#{layerId}:#{colorVal}:y"] = @mapValue(layer.colorExpr, colorVal)
+      else
+        names["layer#{layerId}:y"] = layer.name or "Layer #{layerId+1}"
+
+    return names
+
+
 

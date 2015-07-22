@@ -157,16 +157,170 @@ describe "LayeredChartCompiler", ->
 
       compare(columns, expectedColumns)
 
-    it "splits if color expr"
-    it "maps enums to labels"
+    it "splits if color expr with categorical x", ->
+      design = {
+        type: "bar"
+        layers: [
+          { xExpr: @exprText, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+        ]
+      }
+
+      data = {
+        layer0: [
+          { x: "1", color: "a", y: 10 }
+          { x: "1", color: "b", y: 20 }
+          { x: "2", color: "a", y: 30 }
+        ]
+      }
+
+      columns = @compiler.getColumns(design, data)
+
+      expectedColumns = [
+        [ "layer0:a:x", "1", "2" ]
+        [ "layer0:a:y", 10, 30 ]
+        [ "layer0:b:x", "1", "2" ]
+        [ "layer0:b:y", 20, null ]
+      ]
+
+      compare(columns, expectedColumns)
+
+    it "splits if color expr with non-categorical x", ->
+      design = {
+        type: "bar"
+        layers: [
+          { xExpr: @exprDecimal, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+        ]
+      }
+
+      data = {
+        layer0: [
+          { x: 1, color: "a", y: 10 }
+          { x: 1, color: "b", y: 20 }
+          { x: 2, color: "a", y: 30 }
+        ]
+      }
+
+      columns = @compiler.getColumns(design, data)
+
+      expectedColumns = [
+        [ "layer0:a:x", 1, 2 ]
+        [ "layer0:a:y", 10, 30 ]
+        [ "layer0:b:x", 1 ]
+        [ "layer0:b:y", 20 ]
+      ]
+
+      compare(columns, expectedColumns)
+
+    it "maps enums to labels", ->
+      # Category type x-axis must share one common x axis
+      design = {
+        type: "bar"
+        layers: [
+          { xExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+        ]
+      }
+
+      data = {
+        layer0: [
+          { x: "a", y: 10 }
+          { x: "b", y: 20 }
+        ]
+      }
+
+      columns = @compiler.getColumns(design, data)
+
+      expectedColumns = [
+        [ "layer0:x", "A", "B" ]
+        [ "layer0:y", 10, 20 ]
+      ]
+
+      compare(columns, expectedColumns)
 
   describe "getXs", ->
-    it "matches xs for simple query"
-    it "matches xs for color expr"
+    it "matches xs for simple query", ->
+      columns = [
+        [ "layer0:x", 1, 2 ]
+        [ "layer0:y", 10, 20 ]
+        [ "layer1:x", 11, 12 ]
+        [ "layer1:y", 11, 21 ]
+      ]
+
+      xs = @compiler.getXs(columns)
+      expectedXs = {
+        "layer0:y": "layer0:x"
+        "layer1:y": "layer1:x"
+      }
+      compare(xs, expectedXs)
+
+    it "matches xs for color expr", ->
+      columns = [
+        [ "layer0:a:x", "1", "2" ]
+        [ "layer0:a:y", 10, 30 ]
+        [ "layer0:b:x", "1", "2" ]
+        [ "layer0:b:y", 20, null ]
+      ]
+
+      xs = @compiler.getXs(columns)
+      expectedXs = {
+        "layer0:a:y": "layer0:a:x"
+        "layer0:b:y": "layer0:b:x"
+      }
+      compare(xs, expectedXs)
 
   describe "getNames", ->
-    it "uses names of each layer"
-    it "defaults names of layers with no name"
+    it "uses names of each simple layer", ->
+      design = {
+        type: "line"
+        layers: [
+          { xExpr: @exprDecimal, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+          { xExpr: @exprDecimal, yExpr: @exprInteger, yAggr: "sum", table: "t1", name: "second layer" }
+        ]
+      }
+
+      data = {
+        layer0: [
+          { x: 1, y: 10 }
+          { x: 2, y: 20 }
+        ]
+        layer1: [
+          { x: 11, y: 11 }
+          { x: 12, y: 21 }
+        ]
+      }
+
+      names = @compiler.getNames(design, data)
+
+      expectedNames = {
+        "layer0:y": "Layer 1" # Defaults names
+        "layer1:y": "second layer"
+      }
+
+      compare(names, expectedNames)
+
+    it "uses mapped color expr for names of color-split layers", ->
+      design = {
+        type: "bar"
+        layers: [
+          { xExpr: @exprText, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+        ]
+      }
+
+      data = {
+        layer0: [
+          { x: "1", color: "a", y: 10 }
+          { x: "1", color: "b", y: 20 }
+          { x: "2", color: "a", y: 30 }
+        ]
+      }
+
+      names = @compiler.getNames(design, data)
+
+      expectedNames = {
+        "layer0:a:y": "A"
+        "layer0:b:y": "B"
+      }
+
+      compare(names, expectedNames)
 
   describe "getGroups", ->
     it "groups if layer is stacked"
@@ -178,3 +332,4 @@ describe "LayeredChartCompiler", ->
   describe "getXAxisType", ->
     it "uses category for text and enum"
     it "uses timeseries for date"
+    it "uses indexed by default"
