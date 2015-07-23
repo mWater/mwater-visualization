@@ -41,31 +41,35 @@ module.exports = class LayeredChartCompiler
         orderBy: []
       }
 
-      query.selects.push({ type: "select", expr: @compileExpr(layer.xExpr), alias: "x" })
-      if layer.colorExpr
-        query.selects.push({ type: "select", expr: @compileExpr(layer.colorExpr), alias: "color" })
+      xExpr = @compileExpr(layer.xExpr)
+      colorExpr = @compileExpr(layer.colorExpr)
+      yExpr = @compileExpr(layer.yExpr)
 
-      # Sort by x
-      query.orderBy.push({ ordinal: 1 })
+      if xExpr
+        query.selects.push({ type: "select", expr: xExpr, alias: "x" })
+      if colorExpr
+        query.selects.push({ type: "select", expr: colorExpr, alias: "color" })
 
-      # Then sort by color
-      if layer.colorExpr
+      # Sort by x and color
+      if xExpr or colorExpr
+        query.orderBy.push({ ordinal: 1 })
+      if xExpr and colorExpr
         query.orderBy.push({ ordinal: 2 })
 
       # If grouping type
       if @doesLayerNeedGrouping(design, layerId)
-        query.groupBy.push(1)
+        if xExpr or colorExpr
+          query.groupBy.push(1)
 
-        if layer.colorExpr
+        if xExpr and colorExpr
           query.groupBy.push(2)
 
-        yExpr = @compileExpr(layer.yExpr)
         if yExpr
           query.selects.push({ type: "select", expr: { type: "op", op: layer.yAggr, exprs: [yExpr] }, alias: "y" })
         else
           query.selects.push({ type: "select", expr: { type: "op", op: layer.yAggr, exprs: [] }, alias: "y" })
       else
-        query.selects.push({ type: "select", expr: @compileExpr(layer.yExpr), alias: "y" })
+        query.selects.push({ type: "select", expr: yExpr, alias: "y" })
 
       # Add where
       if layer.filter
@@ -112,8 +116,9 @@ module.exports = class LayeredChartCompiler
 
     # Determine if x is categorical
     xCategorical = @isExprCategorical(design.layers[0].xExpr)
+    xPresent = design.layers[0].xExpr?
 
-    # If categorical, get all values
+    # Get all values
     xValues = []
     for layerId in [0...design.layers.length]
       layer = design.layers[layerId]
@@ -148,15 +153,18 @@ module.exports = class LayeredChartCompiler
           # Create a series for each color value
           for colorVal in colorValues
             # Use x axis for each and lookup y
-            xcolumn = ["layer#{layerId}:#{colorVal}:x"]
+            if xPresent
+              xcolumn = ["layer#{layerId}:#{colorVal}:x"]
             ycolumn = ["layer#{layerId}:#{colorVal}:y"]
 
             for row in data["layer#{layerId}"]
               if row.color == colorVal
-                xcolumn.push(@mapValue(layer.xExpr, row.x))
+                if xPresent
+                  xcolumn.push(@mapValue(layer.xExpr, row.x))
                 ycolumn.push(row.y)
 
-            columns.push(xcolumn)
+            if xPresent
+              columns.push(xcolumn)
             columns.push(ycolumn)
       else
         if xCategorical
@@ -176,14 +184,17 @@ module.exports = class LayeredChartCompiler
           columns.push(ycolumn)
         else
           # Simple expression
-          xcolumn = ["layer#{layerId}:x"]
+          if xPresent
+            xcolumn = ["layer#{layerId}:x"]
           ycolumn = ["layer#{layerId}:y"]
 
           for row in data["layer#{layerId}"]
-            xcolumn.push(@mapValue(layer.xExpr, row.x))
+            if xPresent
+              xcolumn.push(@mapValue(layer.xExpr, row.x))
             ycolumn.push(row.y)
 
-          columns.push(xcolumn)
+          if xPresent
+            columns.push(xcolumn)
           columns.push(ycolumn)
 
     return columns
@@ -192,7 +203,9 @@ module.exports = class LayeredChartCompiler
     xs = {}
     for col in columns
       if col[0].match(/:y$/)
-        xs[col[0]] = col[0].replace(/:y$/, ":x")
+        xcol = col[0].replace(/:y$/, ":x")
+        if _.any(columns, (c) -> c[0] == xcol)
+          xs[col[0]] = xcol
 
     return xs
 

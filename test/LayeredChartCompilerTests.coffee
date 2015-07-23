@@ -44,6 +44,32 @@ describe "LayeredChartCompiler", ->
 
       compare(queries, expectedQueries)
 
+    it "creates single grouped query without x", ->
+      design = {
+        type: "pie"
+        layers: [
+          { xExpr: null, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+        ]
+      }
+
+      queries = @compiler.getQueries(design)
+
+      expectedQueries = {
+        layer0: {
+          type: "query"
+          selects: [
+            { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "color" }
+            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "integer" }] }, alias: "y" }
+          ]
+          from: { type: "table", table: "t1", alias: "main" }
+          groupBy: [1]
+          orderBy: [{ ordinal: 1 }]
+          limit: 1000
+        }
+      }
+
+      compare(queries, expectedQueries)
+
     it "filters query", ->
       filter = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "integer" }, op: ">", rhs: { type: "literal", valueType: "integer", value: 4 } }
 
@@ -233,6 +259,30 @@ describe "LayeredChartCompiler", ->
 
       compare(columns, expectedColumns)
 
+    it "ignores x if no x axis", ->
+      design = {
+        type: "pie"
+        layers: [
+          { xExpr: null, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+        ]
+      }
+
+      data = {
+        layer0: [
+          { color: "a", y: 10 }
+          { color: "b", y: 20 }
+        ]
+      }
+
+      columns = @compiler.getColumns(design, data)
+
+      expectedColumns = [
+        [ "layer0:a:y", 10 ]
+        [ "layer0:b:y", 20 ]
+      ]
+
+      compare(columns, expectedColumns)
+
     it "splits if color expr with categorical x", ->
       design = {
         type: "bar"
@@ -341,6 +391,16 @@ describe "LayeredChartCompiler", ->
         "layer0:a:y": "layer0:a:x"
         "layer0:b:y": "layer0:b:x"
       }
+      compare(xs, expectedXs)
+
+    it "no xs if no x expr", ->
+      columns = [
+        [ "layer0:a:y", 10, 30 ]
+        [ "layer0:b:y", 20, null ]
+      ]
+
+      xs = @compiler.getXs(columns)
+      expectedXs = { }
       compare(xs, expectedXs)
 
   describe "getNames", ->

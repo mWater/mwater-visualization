@@ -80,7 +80,7 @@ module.exports = class LayeredChart extends Chart
 
       # Check that has y
       if not layer.yExpr
-        return "Missing Y Axis"
+        return "Missing Axis"
 
       error = null
       error = error or @exprBuilder.validateExpr(layer.xExpr)
