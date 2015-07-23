@@ -59,7 +59,11 @@ module.exports = class LayeredChartCompiler
         if layer.colorExpr
           query.groupBy.push(2)
 
-        query.selects.push({ type: "select", expr: { type: "op", op: layer.yAggr, exprs: [@compileExpr(layer.yExpr)] }, alias: "y" })
+        yExpr = @compileExpr(layer.yExpr)
+        if yExpr
+          query.selects.push({ type: "select", expr: { type: "op", op: layer.yAggr, exprs: [yExpr] }, alias: "y" })
+        else
+          query.selects.push({ type: "select", expr: { type: "op", op: layer.yAggr, exprs: [] }, alias: "y" })
       else
         query.selects.push({ type: "select", expr: @compileExpr(layer.yExpr), alias: "y" })
 
