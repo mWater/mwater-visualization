@@ -71,12 +71,13 @@ module.exports = class ScalarExprTreeBuilder
           joins = options.joins.slice()
           joins.push(column.id)
           initVal = options.initialValue
+          
           node.children = =>
-
             # Determine if to include count. True if aggregated
             includeCount = exprBuilder.isMultipleJoins(options.startTable, joins)
-
             return @createChildNodes(startTable: options.startTable, table: column.join.toTable, joins: joins, types: options.types, includeCount: includeCount, initialValue: initVal)
+            
+          # Load children (recursively) if selected node is in this tree
           if initVal and initVal.joins and _.isEqual(initVal.joins.slice(0, joins.length), joins)
             node.initiallyOpen = true
             node.loadedChildren = node.children()
