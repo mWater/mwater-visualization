@@ -46,11 +46,11 @@ module.exports = class LayeredChartCompiler
         query.selects.push({ type: "select", expr: @compileExpr(layer.colorExpr), alias: "color" })
 
       # Sort by x
-      query.orderBy.push(1)
+      query.orderBy.push({ ordinal: 1 })
 
       # Then sort by color
       if layer.colorExpr
-        query.orderBy.push(2)
+        query.orderBy.push({ ordinal: 2 })
 
       # If grouping type
       if @doesLayerNeedGrouping(design, layerId)

@@ -37,7 +37,7 @@ describe "LayeredChartCompiler", ->
           ]
           from: { type: "table", table: "t1", alias: "main" }
           groupBy: [1]
-          orderBy: [1]
+          orderBy: [{ ordinal: 1 }]
           limit: 1000
         }
       }
@@ -69,7 +69,7 @@ describe "LayeredChartCompiler", ->
             { type: "literal", value: 4 }
           ]}
           groupBy: [1]
-          orderBy: [1]
+          orderBy: [{ ordinal: 1 }]
           limit: 1000
         }
       }
@@ -109,7 +109,7 @@ describe "LayeredChartCompiler", ->
             { type: "literal", value: 4 }
           ]}
           groupBy: [1]
-          orderBy: [1]
+          orderBy: [{ ordinal: 1 }]
           limit: 1000
         }
       }
@@ -135,7 +135,7 @@ describe "LayeredChartCompiler", ->
           ]
           from: { type: "table", table: "t1", alias: "main" }
           groupBy: []
-          orderBy: [1]
+          orderBy: [{ ordinal: 1 }]
           limit: 1000
         }
       }
@@ -162,7 +162,7 @@ describe "LayeredChartCompiler", ->
           ]
           from: { type: "table", table: "t1", alias: "main" }
           groupBy: [1, 2]
-          orderBy: [1, 2]
+          orderBy: [{ ordinal: 1 }, { ordinal: 2 }]
           limit: 1000
         }
       }
