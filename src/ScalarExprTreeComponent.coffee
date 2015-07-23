@@ -8,22 +8,6 @@ module.exports = class ScalarExprTreeComponent extends React.Component
     tree: React.PropTypes.array.isRequired    # Tree from ScalarExprTreeBuilder
     value: React.PropTypes.object             # Currently selected value
     onChange: React.PropTypes.func.isRequired # Called with newly selected value
-    
-  constructor: (props) ->
-    super
-    for item in @props.tree
-      @loadChildren(item, 10)
-
-  # Loads the children for an item and sets `initiallyOpen` for all nodes in the path leading to the selected node
-  loadChildren: (item, levels) ->
-    if levels == 0 then return
-    if item.children
-      children = item.children()
-      for child in children
-        @loadChildren(child, levels-1)
-      item.loadedChildren = children
-      item.initiallyOpen = _.some(children, 'initiallyOpen')
-    else item.initiallyOpen = _.isEqual(@props.value, item.value)
 
   render: ->
     H.div style: { overflowY: "scroll", height: 350, border: "solid 1px #CCC" },

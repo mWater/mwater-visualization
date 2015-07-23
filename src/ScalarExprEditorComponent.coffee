@@ -29,7 +29,7 @@ module.exports = class ScalarExprEditorComponent extends React.Component
   renderTree: ->
     # Create tree 
     treeBuilder = new ScalarExprTreeBuilder(@props.schema)
-    tree = treeBuilder.getTree(table: @props.table, types: @props.types, includeCount: @props.includeCount)
+    tree = treeBuilder.getTree(table: @props.table, types: @props.types, includeCount: @props.includeCount, initialValue: @props.value)
 
     # Create tree component with value of table and path
     return React.createElement(ScalarExprTreeComponent, 
