@@ -77,6 +77,6 @@ module.exports = class ScalarExprComponent extends React.Component
       React.createElement(EditableLinkComponent, 
         onClick: @handleEditorOpen
         onRemove: if @props.value then @handleRemove,
-        if summary then summary else H.i(null, "Select...")
+        if summary then summary else H.i(null, "None")
         )
 

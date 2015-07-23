@@ -85,8 +85,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
 
   renderLayer: (index) =>
     style = {
-      borderTop: "solid 1px #CCC"
-      borderBottom: "solid 1px #CCC"
+      borderTop: "solid 1px #EEE"
       paddingTop: 10
       paddingBottom: 10
     }
@@ -102,7 +101,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
   renderLayers: ->
     H.div null, 
       _.map(@props.design.layers, (layer, i) => @renderLayer(i))
-      H.button className: "btn btn-link btn-sm", type: "button", onClick: @handleAddSeries,
+      H.button className: "btn btn-link", type: "button", onClick: @handleAddSeries,
         H.span className: "glyphicon glyphicon-plus"
         " Add Series"
 
@@ -111,6 +110,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
       @renderType()
       @renderTranspose()
       @renderLayers()
+      H.hr()
       @renderTitle()
 
 class LayerDesignerComponent extends React.Component
@@ -135,11 +135,17 @@ class LayerDesignerComponent extends React.Component
   handleXExprChange: (expr) =>
     @updateLayer(xExpr: expr)
 
+  handleColorExprChange: (expr) =>
+    @updateLayer(colorExpr: expr)
+
   handleYExprChange: (expr) =>
     @updateLayer(yExpr: expr)
 
   handleYAggrExprChange: (val) =>
     @updateLayer(yExpr: val.expr, yAggr: val.aggr)
+
+  handleStackedChange: (ev) =>
+    @updateLayer(stacked: ev.target.checked)
 
   renderName: ->
     # Only if multiple
@@ -195,6 +201,24 @@ class LayerDesignerComponent extends React.Component
           value: layer.xExpr, 
           onChange: @handleXExprChange)
 
+  renderColorAxis: ->
+    layer = @props.design.layers[@props.index]
+    if not layer.table
+      return
+
+    title = [H.span(className: "glyphicon glyphicon-equalizer"), " Split Axis"]
+
+    H.div className: "form-group",
+      H.label className: "text-muted", title
+      H.div style: { marginLeft: 10 }, 
+        React.createElement(ScalarExprComponent, 
+          editorTitle: title
+          schema: @props.schema, 
+          table: layer.table
+          types: ["enum", "text"]
+          value: layer.colorExpr, 
+          onChange: @handleColorExprChange)
+
   renderYAxis: ->
     layer = @props.design.layers[@props.index]
     if not layer.table
@@ -214,12 +238,26 @@ class LayerDesignerComponent extends React.Component
           value: { expr: layer.yExpr, aggr: layer.yAggr }
           onChange: @handleYAggrExprChange)
 
+  renderStacked: ->
+    layer = @props.design.layers[@props.index]
+
+    # Can only stack if coloring
+    if not layer.colorExpr
+      return
+
+    H.div className: "checkbox",
+      H.label null,
+        H.input type: "checkbox", value: layer.stacked, onChange: @handleStackedChange,
+          "Stacked"
+
   render: ->
     H.div null, 
       @renderRemove()
       @renderTable()
       @renderXAxis()
       @renderYAxis()
+      @renderColorAxis()
+      @renderStacked()
       @renderName()
 
 #   handleTableChange: (table) =>
