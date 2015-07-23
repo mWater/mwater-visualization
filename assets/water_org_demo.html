@@ -227,7 +227,7 @@ var design = {
       "layout": {
         "x": 0,
         "y": 0,
-        "w": 12,
+        "w": 24,
         "h": 12
       },
       "widget": {
@@ -237,11 +237,30 @@ var design = {
           "type": "line",
           "layers": [
             {
-              "xExpr": null,
-              "yExpr": null,
+              "xExpr": {
+                "type": "scalar",
+                "table": "wco_loans",
+                "joins": [],
+                "expr": {
+                  "type": "field",
+                  "table": "wco_loans",
+                  "column": "ruralurban"
+                }
+              },
+              "yExpr": {
+                "type": "scalar",
+                "table": "wco_loans",
+                "joins": [],
+                "expr": {
+                  "type": "field",
+                  "table": "wco_loans",
+                  "column": "numborrow"
+                }
+              },
               "colorExpr": null,
-              "yAggr": "count",
-              "filter": null
+              "filter": null,
+              "table": "wco_loans",
+              "yAggr": "sum"
             }
           ],
           "titleText": "test"

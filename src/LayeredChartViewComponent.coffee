@@ -2,6 +2,7 @@ React = require 'react'
 H = React.DOM
 
 ExpressionBuilder = require './ExpressionBuilder'
+LayeredChartCompiler = require './LayeredChartCompiler'
 
 titleFontSize = 14
 titleHeight = 20
@@ -19,9 +20,9 @@ module.exports = class LayeredChartViewComponent extends React.Component
     scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     onScopeChange: React.PropTypes.func # called with (scope, filter) as a scope to apply to self and filter to apply to other widgets
 
-  # componentDidMount: ->
-  #   @createChart(@props)
-  #   @updateScope()
+  componentDidMount: ->
+    @createChart(@props)
+    # @updateScope()
 
   # # Makes nulls into (none) and localizes enums
   # prepareData: (data) ->
@@ -35,51 +36,73 @@ module.exports = class LayeredChartViewComponent extends React.Component
   #     return copy
   #     )}
 
-  # createChart: (props) ->
-  #   if @chart
-  #     @chart.destroy()
+  createChartOptions: (props) ->
+    compiler = new LayeredChartCompiler(schema: props.schema)
+    columns = compiler.getColumns(props.design, props.data)
 
-  #   el = React.findDOMNode(@refs.chart)
+    # Create chart
+    chartDesign = {
+      data: {
+        types: compiler.getTypes(props.design, columns)
+        columns: columns
+        names: compiler.getNames(props.design, props.data)
+        types: compiler.getTypes(props.design, columns)
+        groups: compiler.getGroups(props.design, columns)
+        xs: compiler.getXs(columns)
+        # onclick: @handleDataClick
+      }
+      # legend: { hide: true } # No need for simple bar chart
+      grid: { focus: { show: false } }  # Don't display hover grid
+      axis: {
+        x: {
+          type: compiler.getXAxisType(props.design)
+        }
+        rotated: props.design.transpose
+      }
+      size: { width: props.width, height: props.height - titleHeight }
+    }
 
-  #   # Create chart
-  #   @chart = c3.generate({
-  #       bindto: el
-  #       data: {
-  #         type: "bar"
-  #         json: @prepareData(props.data).main
-  #         keys: { x: "x", value: ["y"] }
-  #         names: { y: 'Value' } # Name the data
-  #         onclick: @handleDataClick
-  #       }
-  #       legend: { hide: true } # No need for simple bar chart
-  #       grid: { focus: { show: false } }  # Don't display hover grid
-  #       axis: {
-  #         x: {
-  #           type: 'category'
-  #         }
-  #         # rotated: true
-  #       }
-  #       size: { width: props.width, height: props.height - titleHeight }
-  #   })
+    console.log chartDesign
+    return chartDesign
 
-  # componentWillReceiveProps: (nextProps) ->
-  #   # Check if size changed
-  #   if @props.height != nextProps.height or @props.width != nextProps.width
-  #     @createChart(nextProps)
-  #     return
+  createChart: (props) ->
+    if @chart
+      @chart.destroy()
 
-  #   if not _.isEqual(@props.data, nextProps.data)
-  #     # If length of data is different, re-create chart
-  #     if @props.data.main.length != nextProps.data.main.length
-  #       @createChart(nextProps)
-  #       return
+    el = React.findDOMNode(@refs.chart)
+    chartOptions = @createChartOptions(props)
+    
+    chartOptions.bindto = el
 
-  #     # Reload data
-  #     @chart.load({ 
-  #       json: @prepareData(nextProps.data).main
-  #       keys: { x: "x", value: ["y"] }
-  #       names: { y: 'Value' } # Name the data
-  #     })
+    @chart = c3.generate(chartOptions)
+
+  componentWillReceiveProps: (nextProps) ->
+    # Check if size changed
+    if @props.height != nextProps.height or @props.width != nextProps.width
+      @createChart(nextProps)
+      return
+
+    # Check if options changed
+    # TODO exclude columns
+    oldChartOptions = @createChartOptions(@props)
+    newChartOptions = @createChartOptions(nextProps)
+    if not _.isEqual(oldChartOptions, newChartOptions)
+      @createChart(nextProps)
+      return
+
+
+    # if not _.isEqual(@props.data, nextProps.data)
+    #   # # If length of data is different, re-create chart
+    #   # if @props.data.main.length != nextProps.data.main.length
+    #   @createChart(nextProps)
+    #   return
+
+      # # Reload data
+      # @chart.load({ 
+      #   json: @prepareData(nextProps.data).main
+      #   keys: { x: "x", value: ["y"] }
+      #   names: { y: 'Value' } # Name the data
+      # })
 
   # # Update scoped value
   # updateScope: =>
@@ -124,8 +147,8 @@ module.exports = class LayeredChartViewComponent extends React.Component
   # componentDidUpdate: ->
   #   @updateScope()
 
-  # componentWillUnmount: ->
-  #   @chart.destroy()
+  componentWillUnmount: ->
+    @chart.destroy()
 
   render: ->
     titleStyle = {

@@ -89,7 +89,8 @@ module.exports = class LayeredChart extends Chart
       error = error or @exprBuilder.validateExpr(layer.yExpr)
       error = error or @exprBuilder.validateExpr(layer.colorExpr)
       error = error or @exprBuilder.validateExpr(layer.filter)
-      return error
+
+    return error
 
   # Creates a design element with specified options
   # options include design: design and onChange: function

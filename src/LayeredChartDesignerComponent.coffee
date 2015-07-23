@@ -22,6 +22,9 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
   handleTitleChange: (ev) =>
     @updateDesign(titleText: ev.target.value)
 
+  handleTypeChange: (type) =>
+    @updateDesign(type: type)
+
   handleLayerChange: (index, layer) =>
     layers = @props.design.layers.slice()
     layers[index] = layer
@@ -42,10 +45,33 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
       H.label className: "text-muted", "Title"
       H.input type: "text", className: "form-control", value: @props.design.titleText, onChange: @handleTitleChange, placeholder: "Untitled"
 
+  renderType: ->
+    chartTypes =  [
+      { id: "bar", name: "Bar Chart" }
+      { id: "line", name: "Line Chart" }
+      { id: "spline", name: "Smoothed Line Chart" }
+      { id: "scatter", name: "Scatter Chart" }
+      { id: "area", name: "Area Chart" }
+    ]
+
+    return H.div className: "form-group",
+      H.label className: "text-muted", 
+        H.span(className: "glyphicon glyphicon-th")
+        " "
+        "Type"
+      ": "
+      React.createElement(EditableLinkComponent, 
+        dropdownItems: chartTypes
+        onDropdownItemClicked: @handleTypeChange
+        _.findWhere(chartTypes, { id: @props.design.type }).name
+        )
+
   renderLayer: (index) =>
     style = {
-      borderTop: "solid 1px #AAA"
-      borderBottom: "solid 1px #AAA"
+      borderTop: "solid 1px #CCC"
+      borderBottom: "solid 1px #CCC"
+      paddingTop: 10
+      paddingBottom: 10
     }
     H.div style: style, 
       React.createElement(LayerDesignerComponent, {
@@ -65,8 +91,9 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
 
   render: ->
     H.div null, 
-      @renderTitle()
+      @renderType()
       @renderLayers()
+      @renderTitle()
 
 class LayerDesignerComponent extends React.Component
   @propTypes: 
@@ -172,10 +199,10 @@ class LayerDesignerComponent extends React.Component
   render: ->
     H.div null, 
       @renderRemove()
-      @renderName()
       @renderTable()
       @renderXAxis()
       @renderYAxis()
+      @renderName()
 
 #   handleTableChange: (table) =>
 #     @updateDesign(table: table)
