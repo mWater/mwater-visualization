@@ -25,6 +25,9 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
   handleTypeChange: (type) =>
     @updateDesign(type: type)
 
+  handleTransposeChange: (val) =>
+    @updateDesign(transpose: val)
+
   handleLayerChange: (index, layer) =>
     layers = @props.design.layers.slice()
     layers[index] = layer
@@ -66,6 +69,20 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
         _.findWhere(chartTypes, { id: @props.design.type }).name
         )
 
+  renderTranspose: ->
+    return H.div className: "form-group",
+      H.label className: "text-muted", 
+        H.span(className: "glyphicon glyphicon-retweet")
+        " "
+        "Orientation"
+      ": "
+      H.label className: "radio-inline",
+        H.input type: "radio", checked: !@props.design.transpose, onChange: @handleTransposeChange.bind(null, false),
+          "Vertical"
+      H.label className: "radio-inline",
+        H.input type: "radio", checked: @props.design.transpose, onChange: @handleTransposeChange.bind(null, true),
+          "Horizontal"
+
   renderLayer: (index) =>
     style = {
       borderTop: "solid 1px #CCC"
@@ -92,6 +109,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
   render: ->
     H.div null, 
       @renderType()
+      @renderTranspose()
       @renderLayers()
       @renderTitle()
 
