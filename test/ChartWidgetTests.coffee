@@ -1,12 +1,12 @@
 assert = require('chai').assert
 _ = require 'lodash'
-React = require 'react'
-H = React.DOM
 
 ChartWidget = require '../src/ChartWidget'
 Chart = require '../src/Chart'
 DataSource = require '../src/DataSource'
 React = require('react/addons')
+H = React.DOM
+TestComponent = require './TestComponent'
 
 describe "ChartWidget", ->
   beforeEach ->
@@ -44,24 +44,20 @@ describe "ChartWidget", ->
 
   it "does not requery if queries same", ->
     cw = new ChartWidget(@chart, @design, @dataSource)
-    comp = React.addons.TestUtils.renderIntoDocument(React.createElement(ComponentWrapper, {
-      children: cw.createViewElement(width: 100, height: 100)
-      }))
-    assert.match($(React.findDOMNode(comp)).text(), /QUERYA/)
+    comp = new TestComponent(cw.createViewElement(width: 100, height: 100))
+    assert.match($(comp.getDOMNode()).text(), /QUERYA/)
 
     @dataSource.performQuery = -> throw new Error("should not call")
-    comp.setChildren(cw.createViewElement(width: 100, height: 100))
+    comp.setElement(cw.createViewElement(width: 100, height: 100))
 
   it "does requery if queries different", ->
     cw = new ChartWidget(@chart, @design, @dataSource)
-    comp = React.addons.TestUtils.renderIntoDocument(React.createElement(ComponentWrapper, {
-      children: cw.createViewElement(width: 100, height: 100)
-      }))
-    assert.match($(React.findDOMNode(comp)).text(), /QUERYA/)
+    comp = new TestComponent(cw.createViewElement(width: 100, height: 100))
+    assert.match($(comp.getDOMNode()).text(), /QUERYA/)
 
     @chart.createQueries = -> { c: "queryc" }
-    comp.setChildren(cw.createViewElement(width: 100, height: 100))
-    assert.match($(React.findDOMNode(comp)).text(), /QUERYC/)
+    comp.setElement(cw.createViewElement(width: 100, height: 100))
+    assert.match($(comp.getDOMNode()).text(), /QUERYC/)
 
 class MockDataSource extends DataSource
   performQuery: (query, cb) ->
@@ -86,15 +82,3 @@ class MockChart
   createViewElement: (options) ->
     return H.div null, JSON.stringify(options.data)
 
-# Wraps a react component, re-render
-class ComponentWrapper extends React.Component
-  constructor: (props) ->
-    super
-    @state = { children: @props.children }
-
-  setChildren: (children) =>
-    @setState(children: children)
-
-  render: ->
-    H.div null,
-      @state.children
