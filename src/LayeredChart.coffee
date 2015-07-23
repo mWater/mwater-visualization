@@ -78,9 +78,7 @@ module.exports = class LayeredChart extends Chart
       if not layer.table
         return "Missing data source"
 
-      # Check that has x and y
-      if not layer.xExpr
-        return "Missing X Axis"
+      # Check that has y
       if not layer.yExpr
         return "Missing Y Axis"
 

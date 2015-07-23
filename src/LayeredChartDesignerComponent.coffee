@@ -52,6 +52,8 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     chartTypes =  [
       { id: "bar", name: "Bar Chart" }
       { id: "line", name: "Line Chart" }
+      { id: "pie", name: "Pie Chart" }
+      { id: "donut", name: "Donut Chart" }
       { id: "spline", name: "Smoothed Line Chart" }
       { id: "scatter", name: "Scatter Chart" }
       { id: "area", name: "Area Chart" }
@@ -70,6 +72,10 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
         )
 
   renderTranspose: ->
+    # Don't include if polar
+    if @props.design.type in ['pie', 'donut']
+      return
+
     return H.div className: "form-group",
       H.label className: "text-muted", 
         H.span(className: "glyphicon glyphicon-retweet")
@@ -120,6 +126,36 @@ class LayerDesignerComponent extends React.Component
     index: React.PropTypes.number.isRequired
     onChange: React.PropTypes.func.isRequired
     onRemove: React.PropTypes.func.isRequired
+
+  isLayerPolar: (layer) ->
+    return (layer.type or @props.design.type) in ['pie', 'donut']
+
+  # Determine if x-axis required
+  isXAxisRequired: (layer) ->
+    return not @isLayerPolar(layer)
+
+  # Determine icon/label for color axis
+  getXAxisLabel: (layer) ->
+    if @props.design.transpose
+      [H.span(className: "glyphicon glyphicon-resize-vertical"), " Vertical Axis"]
+    else
+      [H.span(className: "glyphicon glyphicon-resize-horizontal"), " Horizontal Axis"]
+
+  # Determine icon/label for color axis
+  getYAxisLabel: (layer) ->
+    if @isLayerPolar(layer)
+      return [H.span(className: "glyphicon glyphicon-repeat"), " Angle Axis"]
+    else if @props.design.transpose
+      return [H.span(className: "glyphicon glyphicon-resize-horizontal"), " Horizontal Axis"]
+    else
+      return [H.span(className: "glyphicon glyphicon-resize-vertical"), " Vertical Axis"]
+
+  # Determine icon/label for color axis
+  getColorAxisLabel: (layer) ->
+    if @isLayerPolar(layer)
+      return [H.span(className: "glyphicon glyphicon-text-color"), " Label Axis"]
+    else
+      return [H.span(className: "glyphicon glyphicon-equalizer"), " Split Axis"]
 
   # Updates layer with the specified changes
   updateLayer: (changes) ->
@@ -188,7 +224,10 @@ class LayerDesignerComponent extends React.Component
     if not layer.table
       return
 
-    title = [H.span(className: "glyphicon glyphicon-resize-horizontal"), " Horizontal Axis"]
+    if not @isXAxisRequired(layer)
+      return
+
+    title = @getXAxisLabel(layer)
 
     H.div className: "form-group",
       H.label className: "text-muted", title
@@ -206,7 +245,7 @@ class LayerDesignerComponent extends React.Component
     if not layer.table
       return
 
-    title = [H.span(className: "glyphicon glyphicon-equalizer"), " Split Axis"]
+    title = @getColorAxisLabel(layer)
 
     H.div className: "form-group",
       H.label className: "text-muted", title
@@ -224,7 +263,7 @@ class LayerDesignerComponent extends React.Component
     if not layer.table
       return
 
-    title = [H.span(className: "glyphicon glyphicon-resize-vertical"), " Vertical Axis"]
+    title = @getYAxisLabel(layer)
 
     H.div className: "form-group",
       H.label className: "text-muted", title
@@ -241,8 +280,8 @@ class LayerDesignerComponent extends React.Component
   renderStacked: ->
     layer = @props.design.layers[@props.index]
 
-    # Can only stack if coloring
-    if not layer.colorExpr
+    # Can only stack if coloring and not polar
+    if not layer.colorExpr or @isLayerPolar(layer)
       return
 
     H.div className: "checkbox",
