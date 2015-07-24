@@ -132,8 +132,13 @@ module.exports = class LayeredChartViewComponent extends React.Component
     dataMap = {}
     compiler.getColumns(@props.design, @props.data, dataMap)
 
-    # Lookup layer and row
-    dp = dataMap["#{d.id}-#{d.index}"]
+    # Lookup layer and row. If pie/donut, index is always zero
+    isPolarChart = @props.design.type in ['pie', 'donut']
+    if isPolarChart
+      dp = dataMap["#{d.id}-0"]
+    else
+      dp = dataMap["#{d.id}-#{d.index}"]
+      
     if not dp
       return
 
