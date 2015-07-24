@@ -18,6 +18,7 @@ module.exports = class ScalarExprTreeBuilder
   #  table: to limit starting table to a specific table
   #  types: types to limit to 
   #  includeCount: to include an count (null) option that has null expr and name that is "Number of ..." at first table level
+  #  initialValue: initial value to flesh out
   getTree: (options = {}) ->
     nodes = []
     # For each table if not specified
@@ -33,11 +34,10 @@ module.exports = class ScalarExprTreeBuilder
 
           # Create nodes for each column of a table
           node.children = =>
-            @createChildNodes(startTable: table.id, table: table.id, joins: [], types: options.types)
+            @createChildNodes(startTable: table.id, table: table.id, joins: [], types: options.types, initialValue: options.initialValue)
           nodes.push(node)
     else
-      nodes = @createChildNodes(startTable: options.table, table: options.table, joins: [], types: options.types, includeCount: options.includeCount)
-
+      nodes = @createChildNodes(startTable: options.table, table: options.table, joins: [], types: options.types, includeCount: options.includeCount, initialValue: options.initialValue)
     return nodes
 
   # Options:
@@ -46,10 +46,10 @@ module.exports = class ScalarExprTreeBuilder
   # joins: joins for child nodes
   # types: types to limit to 
   # includeCount: to include an count (null) option that has null expr and name that is "Number of ..."
+  # initialValue: initial value to flesh out
   createChildNodes: (options) ->
     nodes = []
     exprBuilder = new ExpressionBuilder(@schema)
-
     # Create count node if any joins
     if options.includeCount
       nodes.push({
@@ -67,15 +67,19 @@ module.exports = class ScalarExprTreeBuilder
 
         # If join, add children
         if column.type == "join"
+          # Add column to joins
+          joins = options.joins.slice()
+          joins.push(column.id)
+          initVal = options.initialValue
+          
           node.children = =>
-            # Add column to joins
-            joins = options.joins.slice()
-            joins.push(column.id)
-
             # Determine if to include count. True if aggregated
             includeCount = exprBuilder.isMultipleJoins(options.startTable, joins)
-
-            return @createChildNodes(startTable: options.startTable, table: column.join.toTable, joins: joins, types: options.types, includeCount: includeCount)
+            return @createChildNodes(startTable: options.startTable, table: column.join.toTable, joins: joins, types: options.types, includeCount: includeCount, initialValue: initVal)
+            
+          # Load children (recursively) if selected node is in this tree
+          if initVal and initVal.joins and _.isEqual(initVal.joins.slice(0, joins.length), joins)
+            node.initiallyOpen = true
         else
           fieldExpr = { type: "field", table: options.table, column: column.id }
           if options.types 
@@ -91,7 +95,7 @@ module.exports = class ScalarExprTreeBuilder
               if column.type not in options.types
                 return 
 
-          node.value = { table: options.startTable, joins: options.joins, expr: fieldExpr } 
+          node.value = { table: options.startTable, joins: options.joins, expr: fieldExpr }
         nodes.push(node)
 
     return nodes

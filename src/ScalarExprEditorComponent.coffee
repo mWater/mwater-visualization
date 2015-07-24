@@ -29,13 +29,14 @@ module.exports = class ScalarExprEditorComponent extends React.Component
   renderTree: ->
     # Create tree 
     treeBuilder = new ScalarExprTreeBuilder(@props.schema)
-    tree = treeBuilder.getTree(table: @props.table, types: @props.types, includeCount: @props.includeCount)
+    tree = treeBuilder.getTree(table: @props.table, types: @props.types, includeCount: @props.includeCount, initialValue: @props.value)
 
     # Create tree component with value of table and path
     return React.createElement(ScalarExprTreeComponent, 
       tree: tree,
       value: _.pick(@props.value, "table", "joins", "expr")
       onChange: @handleTreeChange
+      height: 350
       )
 
   renderAggr: ->
@@ -81,7 +82,6 @@ module.exports = class ScalarExprEditorComponent extends React.Component
 
     H.div null, 
       H.label null, "Select Field"
-      H.div style: { overflowY: "scroll", height: 350, border: "solid 1px #CCC" },
-        @renderTree()
+      @renderTree()
       @renderAggr()
       @renderWhere()
