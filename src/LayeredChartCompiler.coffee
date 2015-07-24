@@ -9,12 +9,12 @@ module.exports = class LayeredChartCompiler
     @exprBuilder = new ExpressionBuilder(@schema)
 
   # Get layer type, defaulting to overall type
-  getLayerType: (design, layerId) ->
-    return design.layers[layerId].type or design.type
+  getLayerType: (design, layerIndex) ->
+    return design.layers[layerIndex].type or design.type
 
   # Determine if layer required grouping by x (and color)
-  doesLayerNeedGrouping: (design, layerId) ->
-    return @getLayerType(design, layerId) != "scatter"
+  doesLayerNeedGrouping: (design, layerIndex) ->
+    return @getLayerType(design, layerIndex) != "scatter"
 
   # Determines if expr is categorical
   isExprCategorical: (expr) ->
@@ -28,8 +28,8 @@ module.exports = class LayeredChartCompiler
     queries = {}
 
     # For each layer
-    for layerId in [0...design.layers.length]
-      layer = design.layers[layerId]
+    for layerIndex in [0...design.layers.length]
+      layer = design.layers[layerIndex]
 
       # Create shell of query
       query = {
@@ -57,7 +57,7 @@ module.exports = class LayeredChartCompiler
         query.orderBy.push({ ordinal: 2 })
 
       # If grouping type
-      if @doesLayerNeedGrouping(design, layerId)
+      if @doesLayerNeedGrouping(design, layerIndex)
         if xExpr or colorExpr
           query.groupBy.push(1)
 
@@ -98,7 +98,7 @@ module.exports = class LayeredChartCompiler
           else
             query.where = whereClauses[0]
 
-      queries["layer#{layerId}"] = query
+      queries["layer#{layerIndex}"] = query
 
     return queries
 
@@ -111,7 +111,10 @@ module.exports = class LayeredChartCompiler
         return item.name
     return value
 
-  getColumns: (design, data) ->
+  # Gets the columns for C3. Also updates dataMap to be a mapping
+  # of "series-" + index to { layerIndex:, row: }
+  # for lookup purposes
+  getColumns: (design, data, dataMap={}) ->
     columns = []
 
     # Determine if x is categorical
@@ -120,31 +123,32 @@ module.exports = class LayeredChartCompiler
 
     # Get all values
     xValues = []
-    for layerId in [0...design.layers.length]
-      layer = design.layers[layerId]
-      xValues = _.union(xValues, _.pluck(data["layer#{layerId}"], "x"))
+    for layerIndex in [0...design.layers.length]
+      layer = design.layers[layerIndex]
+      xValues = _.union(xValues, _.pluck(data["layer#{layerIndex}"], "x"))
 
     # For each layer
-    for layerId in [0...design.layers.length]
-      layer = design.layers[layerId]
+    for layerIndex in [0...design.layers.length]
+      layer = design.layers[layerIndex]
 
       # If color expr
       if layer.colorExpr
         # Determine all color values
-        colorValues = _.uniq(_.pluck(data["layer#{layerId}"], "color"))
+        colorValues = _.uniq(_.pluck(data["layer#{layerIndex}"], "color"))
 
         if xCategorical
           # Create a series for each color value
           for colorVal in colorValues
             # Use x axis for each and lookup y
-            xcolumn = ["layer#{layerId}:#{colorVal}:x"]
-            ycolumn = ["layer#{layerId}:#{colorVal}:y"]
+            xcolumn = ["layer#{layerIndex}:#{colorVal}:x"]
+            ycolumn = ["layer#{layerIndex}:#{colorVal}:y"]
 
             for val in xValues
               xcolumn.push(@mapValue(layer.xExpr, val))
-              row = _.findWhere(data["layer#{layerId}"], { x: val, color: colorVal })
+              row = _.findWhere(data["layer#{layerIndex}"], { x: val, color: colorVal })
               if row
                 ycolumn.push(row.y)
+                dataMap["#{ycolumn[0]}-#{ycolumn.length-2}"] = { layerIndex: layerIndex, row: row }
               else
                 ycolumn.push(null)
             columns.push(xcolumn)
@@ -154,14 +158,15 @@ module.exports = class LayeredChartCompiler
           for colorVal in colorValues
             # Use x axis for each and lookup y
             if xPresent
-              xcolumn = ["layer#{layerId}:#{colorVal}:x"]
-            ycolumn = ["layer#{layerId}:#{colorVal}:y"]
+              xcolumn = ["layer#{layerIndex}:#{colorVal}:x"]
+            ycolumn = ["layer#{layerIndex}:#{colorVal}:y"]
 
-            for row in data["layer#{layerId}"]
+            for row in data["layer#{layerIndex}"]
               if row.color == colorVal
                 if xPresent
                   xcolumn.push(@mapValue(layer.xExpr, row.x))
                 ycolumn.push(row.y)
+                dataMap["#{ycolumn[0]}-#{ycolumn.length-2}"] = { layerIndex: layerIndex, row: row }
 
             if xPresent
               columns.push(xcolumn)
@@ -169,14 +174,15 @@ module.exports = class LayeredChartCompiler
       else
         if xCategorical
           # Use x axis for each and lookup y
-          xcolumn = ["layer#{layerId}:x"]
-          ycolumn = ["layer#{layerId}:y"]
+          xcolumn = ["layer#{layerIndex}:x"]
+          ycolumn = ["layer#{layerIndex}:y"]
 
           for val in xValues
             xcolumn.push(@mapValue(layer.xExpr, val))
-            row = _.findWhere(data["layer#{layerId}"], { x: val })
+            row = _.findWhere(data["layer#{layerIndex}"], { x: val })
             if row
               ycolumn.push(row.y)
+              dataMap["#{ycolumn[0]}-#{ycolumn.length-2}"] = { layerIndex: layerIndex, row: row }
             else
               ycolumn.push(null)
 
@@ -185,13 +191,14 @@ module.exports = class LayeredChartCompiler
         else
           # Simple expression
           if xPresent
-            xcolumn = ["layer#{layerId}:x"]
-          ycolumn = ["layer#{layerId}:y"]
+            xcolumn = ["layer#{layerIndex}:x"]
+          ycolumn = ["layer#{layerIndex}:y"]
 
-          for row in data["layer#{layerId}"]
+          for row in data["layer#{layerIndex}"]
             if xPresent
               xcolumn.push(@mapValue(layer.xExpr, row.x))
             ycolumn.push(row.y)
+            dataMap["#{ycolumn[0]}-#{ycolumn.length-2}"] = { layerIndex: layerIndex, row: row }
 
           if xPresent
             columns.push(xcolumn)
@@ -212,18 +219,18 @@ module.exports = class LayeredChartCompiler
   getNames: (design, data) ->
     names = {}
     # For each layer
-    for layerId in [0...design.layers.length]
-      layer = design.layers[layerId]
+    for layerIndex in [0...design.layers.length]
+      layer = design.layers[layerIndex]
 
       # If color expr
       if layer.colorExpr
         # Determine all color values
-        colorValues = _.uniq(_.pluck(data["layer#{layerId}"], "color"))
+        colorValues = _.uniq(_.pluck(data["layer#{layerIndex}"], "color"))
 
         for colorVal in colorValues
-          names["layer#{layerId}:#{colorVal}:y"] = @mapValue(layer.colorExpr, colorVal)
+          names["layer#{layerIndex}:#{colorVal}:y"] = @mapValue(layer.colorExpr, colorVal)
       else
-        names["layer#{layerId}:y"] = layer.name or "Series #{layerId+1}"
+        names["layer#{layerIndex}:y"] = layer.name or "Series #{layerIndex+1}"
 
     return names
 
@@ -232,26 +239,25 @@ module.exports = class LayeredChartCompiler
     types = {}
     for column in columns
       if column[0].match(/:y$/)
-        layerId = parseInt(column[0].match(/^layer(\d+)/)[1])
-        types[column[0]] = design.layers[layerId].type or design.type
+        layerIndex = parseInt(column[0].match(/^layer(\d+)/)[1])
+        types[column[0]] = design.layers[layerIndex].type or design.type
 
     return types
 
   getGroups: (design, columns) ->
     groups = []
     # For each layer
-    for layerId in [0...design.layers.length]
-      layer = design.layers[layerId]
+    for layerIndex in [0...design.layers.length]
+      layer = design.layers[layerIndex]
 
       if layer.stacked
         group = []
         for column in columns
-          if column[0].match("^layer#{layerId}:.*:y$")
+          if column[0].match("^layer#{layerIndex}:.*:y$")
             group.push(column[0])
         groups.push(group)
 
     return groups
-
 
   getXAxisType: (design) ->
     switch @exprBuilder.getExprType(design.layers[0].xExpr)
@@ -259,3 +265,81 @@ module.exports = class LayeredChartCompiler
       when "date" then "timeseries"
       else "indexed"
 
+  # Given series id and index, find layerIndex and dataIndex
+  lookupDataPoint: (data, columns, seriesId, index) ->
+    # Get layer # from series. 
+    # Then search in columns to get x value (if there is one) and y value
+    # If extra colon, get color string
+    # Get data to search for index of row by x and color
+
+    layerIndex = parseInt(seriesId.match(/^layer(\d+)/)[1])
+
+    # Find x value
+    xColumnId = seriesId.replace(/:y$/, ":x")
+    xColumn = _.find(columns, (c) -> c[0] == xColumnId)
+    if xColumn
+      # Find x value
+      x = xColumn[index + 1]
+
+    # Find y value
+    y = _.find(columns, (c) -> c[0] == seriesId)[index + 1]
+
+    # Find color string
+    match = seriesId.match(/^layer\d+:(.*):y$/)
+    if match
+      colorStr = match[1]
+
+    # Find data point index
+    dataIndex = _.findIndex(data["layer#{layerIndex}"], (row) =>
+      if xColumn and row.x != x
+        return false
+      if colorStr? and "#{row.color}" != colorStr
+        return false
+      if row.y != y
+        return false
+
+      return true
+      )
+
+    if dataIndex >= 0
+      return { layerIndex: layerIndex, dataIndex: dataIndex }
+
+    return null
+
+  # Create a filter expression based on a row of a layer
+  createScopeFilter: (design, layerIndex, row) ->
+    expressionBuilder = new ExpressionBuilder(@schema)
+
+    # Get layer
+    layer = design.layers[layerIndex]
+
+    filters = []
+    
+    # If x
+    if layer.xExpr
+      filters.push({ 
+        type: "comparison"
+        table: layer.table
+        lhs: layer.xExpr
+        op: "="
+        rhs: { type: "literal", valueType: expressionBuilder.getExprType(layer.xExpr), value: row.x } 
+      })
+
+    if layer.colorExpr
+      filters.push({ 
+        type: "comparison"
+        table: layer.table
+        lhs: layer.colorExpr
+        op: "="
+        rhs: { type: "literal", valueType: expressionBuilder.getExprType(layer.colorExpr), value: row.color } 
+      })
+
+    if filters.length > 1
+      return {
+        type: "logical"
+        table: layer.table
+        op: "and"
+        exprs: filters
+      }
+    else
+      return filters[0]

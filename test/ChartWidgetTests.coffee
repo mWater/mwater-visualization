@@ -14,50 +14,50 @@ describe "ChartWidget", ->
     @dataSource = new MockDataSource()
     @design = "some design"
 
-  it "displays validation error if design invalid", ->
-    @chart.validateDesign = -> "validation error"
+  # it "displays validation error if design invalid", ->
+  #   @chart.validateDesign = -> "validation error"
 
-    cw = new ChartWidget(@chart, @design, @dataSource)
-    comp = React.addons.TestUtils.renderIntoDocument(cw.createViewElement(width: 100, height: 100))
-    assert.match($(React.findDOMNode(comp)).text(), /validation error/)
+  #   cw = new ChartWidget(@chart, @design, @dataSource)
+  #   comp = React.addons.TestUtils.renderIntoDocument(cw.createViewElement(width: 100, height: 100))
+  #   assert.match($(React.findDOMNode(comp)).text(), /validation error/)
 
-  it "displays loading when getting data", ->
-    dataSourceCb = null
-    @dataSource.performQuery = (queries, cb) -> dataSourceCb = cb
+  # it "displays loading when getting data", ->
+  #   dataSourceCb = null
+  #   @dataSource.performQuery = (queries, cb) -> dataSourceCb = cb
 
-    cw = new ChartWidget(@chart, @design, @dataSource)
-    comp = React.addons.TestUtils.renderIntoDocument(cw.createViewElement(width: 100, height: 100))
-    assert.match($(React.findDOMNode(comp)).text(), /loading/i)
+  #   cw = new ChartWidget(@chart, @design, @dataSource)
+  #   comp = React.addons.TestUtils.renderIntoDocument(cw.createViewElement(width: 100, height: 100))
+  #   assert.match($(React.findDOMNode(comp)).text(), /loading/i)
 
-  it "displays error if getting data fails", ->
-    dataSourceCb = null
-    @dataSource.performQuery = (queries, cb) -> cb(new Error("some error"))
+  # it "displays error if getting data fails", ->
+  #   dataSourceCb = null
+  #   @dataSource.performQuery = (queries, cb) -> cb(new Error("some error"))
 
-    cw = new ChartWidget(@chart, @design, @dataSource)
-    comp = React.addons.TestUtils.renderIntoDocument(cw.createViewElement(width: 100, height: 100))
-    assert.match($(React.findDOMNode(comp)).text(), /some error/)
+  #   cw = new ChartWidget(@chart, @design, @dataSource)
+  #   comp = React.addons.TestUtils.renderIntoDocument(cw.createViewElement(width: 100, height: 100))
+  #   assert.match($(React.findDOMNode(comp)).text(), /some error/)
 
-  it "displays data contents after loading", ->
-    cw = new ChartWidget(@chart, @design, @dataSource)
-    comp = React.addons.TestUtils.renderIntoDocument(cw.createViewElement(width: 100, height: 100))
-    assert.match($(React.findDOMNode(comp)).text(), /QUERYA/)
+  # it "displays data contents after loading", ->
+  #   cw = new ChartWidget(@chart, @design, @dataSource)
+  #   comp = React.addons.TestUtils.renderIntoDocument(cw.createViewElement(width: 100, height: 100))
+  #   assert.match($(React.findDOMNode(comp)).text(), /QUERYA/)
 
-  it "does not requery if queries same", ->
-    cw = new ChartWidget(@chart, @design, @dataSource)
-    comp = new TestComponent(cw.createViewElement(width: 100, height: 100))
-    assert.match($(comp.getDOMNode()).text(), /QUERYA/)
+  # it "does not requery if queries same", ->
+  #   cw = new ChartWidget(@chart, @design, @dataSource)
+  #   comp = new TestComponent(cw.createViewElement(width: 100, height: 100))
+  #   assert.match($(comp.getDOMNode()).text(), /QUERYA/)
 
-    @dataSource.performQuery = -> throw new Error("should not call")
-    comp.setElement(cw.createViewElement(width: 100, height: 100))
+  #   @dataSource.performQuery = -> throw new Error("should not call")
+  #   comp.setElement(cw.createViewElement(width: 100, height: 100))
 
-  it "does requery if queries different", ->
-    cw = new ChartWidget(@chart, @design, @dataSource)
-    comp = new TestComponent(cw.createViewElement(width: 100, height: 100))
-    assert.match($(comp.getDOMNode()).text(), /QUERYA/)
+  # it "does requery if queries different", ->
+  #   cw = new ChartWidget(@chart, @design, @dataSource)
+  #   comp = new TestComponent(cw.createViewElement(width: 100, height: 100))
+  #   assert.match($(comp.getDOMNode()).text(), /QUERYA/)
 
-    @chart.createQueries = -> { c: "queryc" }
-    comp.setElement(cw.createViewElement(width: 100, height: 100))
-    assert.match($(comp.getDOMNode()).text(), /QUERYC/)
+  #   @chart.createQueries = -> { c: "queryc" }
+  #   comp.setElement(cw.createViewElement(width: 100, height: 100))
+  #   assert.match($(comp.getDOMNode()).text(), /QUERYC/)
 
 class MockDataSource extends DataSource
   performQuery: (query, cb) ->

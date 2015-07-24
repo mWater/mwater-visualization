@@ -170,7 +170,7 @@ class ChartWidgetComponent extends React.Component
       style.border = "dashed 2px #AAA"
 
     contents = H.div style: { position: "absolute", left: 10, top: 10 }, 
-      @renderChart(design, @props.width - 20, @props.height - 20)
+      @renderChart(@props.design, @props.width - 20, @props.height - 20)
 
     elem = H.div className: "mwater-chart-widget", style: style, onClick: @handleClick,
       contents

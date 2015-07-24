@@ -216,7 +216,8 @@ describe "LayeredChartCompiler", ->
         ]
       }
 
-      columns = @compiler.getColumns(design, data)
+      dataMap = {}
+      columns = @compiler.getColumns(design, data, dataMap)
 
       expectedColumns = [
         [ "layer0:x", 1, 2 ]
@@ -226,6 +227,15 @@ describe "LayeredChartCompiler", ->
       ]
 
       compare(columns, expectedColumns)
+
+      expectedDataMap = {
+        "layer0:y-0": { layerIndex: 0, row: data.layer0[0] }
+        "layer0:y-1": { layerIndex: 0, row: data.layer0[1] }
+        "layer1:y-0": { layerIndex: 1, row: data.layer1[0] }
+        "layer1:y-1": { layerIndex: 1, row: data.layer1[1] }
+      }
+
+      compare(dataMap, expectedDataMap)
 
     it "combines category into one x axis", ->
       # Category type x-axis must share one common x axis
@@ -248,7 +258,8 @@ describe "LayeredChartCompiler", ->
         ]
       }
 
-      columns = @compiler.getColumns(design, data)
+      dataMap = {}
+      columns = @compiler.getColumns(design, data, dataMap)
 
       expectedColumns = [
         [ "layer0:x", "a", "b", "c" ]
@@ -258,6 +269,15 @@ describe "LayeredChartCompiler", ->
       ]
 
       compare(columns, expectedColumns)
+
+      expectedDataMap = {
+        "layer0:y-0": { layerIndex: 0, row: data.layer0[0] }
+        "layer0:y-1": { layerIndex: 0, row: data.layer0[1] }
+        "layer1:y-0": { layerIndex: 1, row: data.layer1[0] }
+        "layer1:y-2": { layerIndex: 1, row: data.layer1[1] }
+      }
+
+      compare(dataMap, expectedDataMap)
 
     it "ignores x if no x axis", ->
       design = {
@@ -299,7 +319,8 @@ describe "LayeredChartCompiler", ->
         ]
       }
 
-      columns = @compiler.getColumns(design, data)
+      dataMap = {}
+      columns = @compiler.getColumns(design, data, dataMap)
 
       expectedColumns = [
         [ "layer0:a:x", "1", "2" ]
@@ -309,6 +330,14 @@ describe "LayeredChartCompiler", ->
       ]
 
       compare(columns, expectedColumns)
+
+      expectedDataMap = {
+        "layer0:a:y-0": { layerIndex: 0, row: data.layer0[0] }
+        "layer0:a:y-1": { layerIndex: 0, row: data.layer0[2] }
+        "layer0:b:y-0": { layerIndex: 0, row: data.layer0[1] }
+      }
+
+      compare(dataMap, expectedDataMap)
 
     it "splits if color expr with non-categorical x", ->
       design = {
@@ -560,3 +589,153 @@ describe "LayeredChartCompiler", ->
 
       xAxisType = @compiler.getXAxisType(design)
       assert.equal xAxisType, "indexed"
+
+  describe "lookupDataPoint", ->
+    it "finds in simple x-y", ->
+      data = {
+        layer0: [
+          { x: 1, y: 10 }
+          { x: 2, y: 20 }
+        ]
+        layer1: [
+          { x: 11, y: 11 }
+          { x: 12, y: 21 }
+        ]
+      }
+
+      columns = [
+        [ "layer0:x", 1, 2 ]
+        [ "layer0:y", 10, 20 ]
+        [ "layer1:x", 11, 12 ]
+        [ "layer1:y", 11, 21 ]
+      ]
+
+      dp = @compiler.lookupDataPoint(data, columns, "layer1:y", 0)
+      assert.equal dp.layerIndex, 1
+      assert.equal dp.dataIndex, 0
+
+      dp = @compiler.lookupDataPoint(data, columns, "layer0:y", 1)
+      assert.equal dp.layerIndex, 0
+      assert.equal dp.dataIndex, 1
+
+    it "finds in x-color-y", ->
+      data = {
+        layer0: [
+          { x: "1", color: "a", y: 10 }
+          { x: "1", color: "b", y: 20 }
+          { x: "2", color: "a", y: 30 }
+        ]
+      }
+
+      columns = [
+        [ "layer0:a:x", "1", "2" ]
+        [ "layer0:a:y", 10, 30 ]
+        [ "layer0:b:x", "1", "2" ]
+        [ "layer0:b:y", 20, null ]
+      ]
+
+      dp = @compiler.lookupDataPoint(data, columns, "layer0:b:y", 0)
+      assert.equal dp.layerIndex, 0
+      assert.equal dp.dataIndex, 1
+
+      dp = @compiler.lookupDataPoint(data, columns, "layer0:a:y", 1)
+      assert.equal dp.layerIndex, 0
+      assert.equal dp.dataIndex, 2
+
+    it "finds in color-y", ->
+      data = {
+        layer0: [
+          { color: "a", y: 10 }
+          { color: "b", y: 20 }
+        ]
+      }
+
+      columns = [
+        [ "layer0:a:y", 10 ]
+        [ "layer0:b:y", 20 ]
+      ]
+
+      dp = @compiler.lookupDataPoint(data, columns, "layer0:b:y", 0)
+      assert.equal dp.layerIndex, 0
+      assert.equal dp.dataIndex, 1
+
+  describe "createScopeFilter", ->
+    it "creates x filter", ->
+      design = {
+        type: "line"
+        layers: [
+          { xExpr: @exprDecimal, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+          { xExpr: @exprDecimal, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+        ]
+      }
+
+      row = { x: 1, y: 10 }
+      filter = @compiler.createScopeFilter(design, 0, row)
+
+      expectedFilter = {
+        type: "comparison"
+        table: "t1"
+        lhs: @exprDecimal
+        op: "="
+        rhs: { type: "literal", valueType: "decimal", value: 1 } 
+      }
+
+      compare(filter, expectedFilter)
+
+    it "creates x-color filter", ->
+      design = {
+        type: "bar"
+        layers: [
+          { xExpr: @exprText, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+        ]
+      }
+
+      row = { x: "1", color: "b", y: 20 }
+      filter = @compiler.createScopeFilter(design, 0, row)
+
+      expectedFilter = {
+        type: "logical"
+        table: "t1"
+        op: "and"
+        exprs: [
+          {
+            type: "comparison"
+            table: "t1"
+            lhs: @exprText
+            op: "="
+            rhs: { type: "literal", valueType: "text", value: "1" } 
+          }
+          {
+            type: "comparison"
+            table: "t1"
+            lhs: @exprEnum
+            op: "="
+            rhs: { type: "literal", valueType: "enum", value: "b" } 
+          }
+        ]
+      }
+
+      compare(filter, expectedFilter)
+
+    it "creates color filter", ->
+      design = {
+        type: "pie"
+        layers: [
+          { xExpr: null, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+        ]
+      }
+
+      row = { color: "b", y: 20 }
+      filter = @compiler.createScopeFilter(design, 0, row)
+
+      expectedFilter =  {
+        type: "comparison"
+        table: "t1"
+        lhs: @exprEnum
+        op: "="
+        rhs: { type: "literal", valueType: "enum", value: "b" } 
+      }
+
+      compare(filter, expectedFilter)
+
+    

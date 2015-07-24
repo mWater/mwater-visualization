@@ -48,6 +48,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
         rotated: props.design.transpose
       }
       size: { width: props.width, height: props.height - titleHeight }
+      pie: {  expand: false } # Don't expand/contract
     }
 
     console.log chartDesign
@@ -93,14 +94,15 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
   # Update scoped value
   updateScope: =>
+    # Handle line and bar charts
     d3.select(React.findDOMNode(@refs.chart))
-      .select(".c3-bars-y") # Get bars
-      .selectAll(".c3-bar")
+      # .select(".c3-bars-y") # Get bars
+      .selectAll(".c3-chart-bar .c3-bar, .c3-chart-line .c3-circle")
       # Highlight only scoped
       .style("opacity", (d,i) =>
         # Determine if scoped
         if @props.scope 
-          if @props.data.main[d.index].x == @props.scope
+          if @props.scope.index == d.index and @props.scope.id == d.id
             return 1
           else
             return 0.3
@@ -109,28 +111,45 @@ module.exports = class LayeredChartViewComponent extends React.Component
           return 1
       )
 
+    # Handle pie charts
+    d3.select(React.findDOMNode(@refs.chart))
+      # .select(".c3-bars-y") # Get bars
+      .selectAll(".c3-chart-arcs .c3-chart-arc")
+      .style("opacity", (d, i) =>
+        # Determine if scoped
+        if @props.scope 
+          if @props.scope.id == d.data.id
+            return 1
+          else
+            return 0.3
+        else
+          # Not scoped
+          return 1
+        )
+
   handleDataClick: (d) =>
-    alert("TODO: Implement filtering")
-    return
-    # Scope x value
-    scope = @props.data.main[d.index].x
+    # Get data map
+    compiler = new LayeredChartCompiler(schema: @props.schema)
+    dataMap = {}
+    compiler.getColumns(@props.design, @props.data, dataMap)
+
+    # Lookup layer and row
+    dp = dataMap["#{d.id}-#{d.index}"]
+    if not dp
+      return
+
+    # Set scope to { id, index }
+    scope = { id: d.id, index: d.index }
 
     # If same scope, remove scope
-    if scope == @props.scope
+    if _.isEqual(scope, @props.scope)
       @props.onScopeChange(null, null)
       return
 
     expressionBuilder = new ExpressionBuilder(@props.schema)
 
-    xExpr = @props.design.aesthetics.x.expr
-    filter = { 
-      type: "comparison"
-      table: @props.design.table
-      lhs: xExpr
-      op: "="
-      rhs: { type: "literal", valueType: expressionBuilder.getExprType(xExpr), value: scope } 
-    }
-
+    # Get filter
+    filter = compiler.createScopeFilter(@props.design, dp.layerIndex, dp.row)
     @props.onScopeChange(scope, filter)
 
   componentDidUpdate: ->
