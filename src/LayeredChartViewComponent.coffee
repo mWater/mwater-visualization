@@ -39,7 +39,8 @@ module.exports = class LayeredChartViewComponent extends React.Component
         xs: compiler.getXs(columns)
         onclick: @handleDataClick
       }
-      legend: { hide: (props.design.layers.length == 1) } # Hide if one layer
+      # Hide if one layer with no colorExpr      
+      legend: { hide: (props.design.layers.length == 1 and not props.design.layers[0].colorExpr) } 
       grid: { focus: { show: false } }  # Don't display hover grid
       axis: {
         x: {
