@@ -39,7 +39,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
         xs: compiler.getXs(columns)
         onclick: @handleDataClick
       }
-      # legend: { hide: true } # No need for simple bar chart
+      legend: { hide: (props.design.layers.length == 1) } # Hide if one layer
       grid: { focus: { show: false } }  # Don't display hover grid
       axis: {
         x: {
@@ -96,7 +96,6 @@ module.exports = class LayeredChartViewComponent extends React.Component
   updateScope: =>
     # Handle line and bar charts
     d3.select(React.findDOMNode(@refs.chart))
-      # .select(".c3-bars-y") # Get bars
       .selectAll(".c3-chart-bar .c3-bar, .c3-chart-line .c3-circle")
       # Highlight only scoped
       .style("opacity", (d,i) =>
@@ -113,7 +112,6 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
     # Handle pie charts
     d3.select(React.findDOMNode(@refs.chart))
-      # .select(".c3-bars-y") # Get bars
       .selectAll(".c3-chart-arcs .c3-chart-arc")
       .style("opacity", (d, i) =>
         # Determine if scoped
