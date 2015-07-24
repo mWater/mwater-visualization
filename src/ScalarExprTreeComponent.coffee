@@ -8,9 +8,10 @@ module.exports = class ScalarExprTreeComponent extends React.Component
     tree: React.PropTypes.array.isRequired    # Tree from ScalarExprTreeBuilder
     value: React.PropTypes.object             # Currently selected value
     onChange: React.PropTypes.func.isRequired # Called with newly selected value
+    height: React.PropTypes.number.isRequired # Render height of the component
 
   render: ->
-    H.div style: { overflowY: "scroll", height: 350, border: "solid 1px #CCC" },
+    H.div style: { overflowY: "scroll", height: @props.height, border: "solid 1px #CCC" },
       React.createElement(ScalarExprTreeTreeComponent,
         tree: @props.tree,
         value: @props.value,
@@ -23,7 +24,7 @@ class ScalarExprTreeTreeComponent extends React.Component
     tree: React.PropTypes.array.isRequired    # Tree from ScalarExprTreeBuilder
     value: React.PropTypes.object             # Currently selected value
     onChange: React.PropTypes.func.isRequired # Called with newly selected value
-    frame: React.PropTypes.element
+    frame: React.PropTypes.element            # Scroll frame to fit the tree inside
 
   render: ->
     elems = []
@@ -48,7 +49,7 @@ class ScalarExprTreeLeafComponent extends React.Component
     @props.value and _.isEqual(@props.value, @props.item.value)
 
   componentDidMount: ->
-    if @isSelected()
+    if @props.frame and @isSelected()
       leaf = React.findDOMNode(this)
       frame = React.findDOMNode(@props.frame)
       window.requestAnimationFrame(->
@@ -61,9 +62,7 @@ class ScalarExprTreeLeafComponent extends React.Component
       cursor: "pointer"
     }
 
-    selected = @isSelected()
-
-    if selected
+    if @isSelected()
       style.color = "#EEE"
       style.backgroundColor = if @props.hovered then "#286090" else "#337AB7"
     else if @props.hovered
@@ -94,7 +93,7 @@ class ScalarExprTreeNodeComponent extends React.Component
 
     if @state.collapse == "open"
       children = H.div style: { paddingLeft: 25 }, key: "tree",
-        React.createElement(ScalarExprTreeTreeComponent, tree: @props.item.loadedChildren or @props.item.children(), onChange: @props.onChange, value: @props.value, frame: @props.frame)
+        React.createElement(ScalarExprTreeTreeComponent, tree: @props.item.children(), onChange: @props.onChange, value: @props.value, frame: @props.frame)
 
     H.div null,
       H.div onClick: @handleArrowClick, style: { cursor: "pointer", padding: 4 }, key: "arrow",

@@ -36,6 +36,7 @@ module.exports = class ScalarExprEditorComponent extends React.Component
       tree: tree,
       value: _.pick(@props.value, "table", "joins", "expr")
       onChange: @handleTreeChange
+      height: 350
       )
 
   renderAggr: ->
