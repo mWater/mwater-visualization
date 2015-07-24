@@ -162,26 +162,21 @@ class LayerDesignerComponent extends React.Component
     layer = _.extend({}, @props.design.layers[@props.index], changes)
     @props.onChange(layer)
 
-  handleNameChange: (ev) =>
-    @updateLayer(name: ev.target.value)
+  handleNameChange: (ev) =>  @updateLayer(name: ev.target.value)
 
-  handleTableChange: (table) =>
-    @updateLayer(table: table)
+  handleTableChange: (table) => @updateLayer(table: table)
 
-  handleXExprChange: (expr) =>
-    @updateLayer(xExpr: expr)
+  handleXExprChange: (expr) => @updateLayer(xExpr: expr)
 
-  handleColorExprChange: (expr) =>
-    @updateLayer(colorExpr: expr)
+  handleColorExprChange: (expr) => @updateLayer(colorExpr: expr)
 
-  handleYExprChange: (expr) =>
-    @updateLayer(yExpr: expr)
+  handleYExprChange: (expr) => @updateLayer(yExpr: expr)
 
-  handleYAggrExprChange: (val) =>
-    @updateLayer(yExpr: val.expr, yAggr: val.aggr)
+  handleYAggrExprChange: (val) => @updateLayer(yExpr: val.expr, yAggr: val.aggr)
 
-  handleStackedChange: (ev) =>
-    @updateLayer(stacked: ev.target.checked)
+  handleStackedChange: (ev) => @updateLayer(stacked: ev.target.checked)
+
+  handleFilterChange: (filter) => @updateLayer(filter: filter)
 
   renderName: ->
     # Only if multiple
@@ -289,6 +284,25 @@ class LayerDesignerComponent extends React.Component
         H.input type: "checkbox", value: layer.stacked, onChange: @handleStackedChange,
           "Stacked"
 
+  renderFilter: ->
+    layer = @props.design.layers[@props.index]
+
+    # If no table, hide
+    if not layer.table
+      return null
+
+    return H.div className: "form-group",
+      H.label className: "text-muted", 
+        H.span(className: "glyphicon glyphicon-filter")
+        " "
+        "Filters"
+      H.div style: { marginLeft: 8 }, 
+        React.createElement(LogicalExprComponent, 
+          schema: @props.schema
+          onChange: @handleFilterChange
+          table: layer.table
+          value: layer.filter)
+
   render: ->
     H.div null, 
       @renderRemove()
@@ -297,6 +311,7 @@ class LayerDesignerComponent extends React.Component
       @renderYAxis()
       @renderColorAxis()
       @renderStacked()
+      @renderFilter()
       @renderName()
 
 #   handleTableChange: (table) =>

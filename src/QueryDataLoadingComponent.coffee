@@ -53,6 +53,10 @@ module.exports = class QueryDataLoadingComponent extends React.Component
 
     if @state.loadingQueries
       style.opacity = 0.5
+
+    if not @props.elemFactory or not @props.queries
+      # Invalid. Show faded with background
       style.backgroundColor = "#E8E8E8"
+      style.opacity = 0.35
 
     return H.div style: style, @state.currentElem
