@@ -1,6 +1,7 @@
 React = require 'react'
 H = React.DOM
 Widget = require './Widget'
+QueryDataLoadingComponent = require './QueryDataLoadingComponent'
 
 # A widget which is a chart
 module.exports = class ChartWidget extends Widget
@@ -60,44 +61,6 @@ class ChartWidgetComponent extends React.Component
 
     connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
     connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
-
-  constructor: (props) ->
-    super
-
-    # State is initially with no data
-    @state = {
-      data: null          # Data returned from data source
-      dataQueries: null   # Queries that produced data
-      dataError: null     # True if an error returned from data source
-      loading: false      # true if loading
-    }
-
-  componentDidMount: ->
-    @updateData(@props)
-
-  componentWillReceiveProps: (nextProps) ->
-    @updateData(nextProps)
-
-  updateData: (props) ->
-    # Skip if invalid
-    if props.chart.validateDesign(props.chart.cleanDesign(props.design))
-      return
-
-    # Get queries
-    queries = props.chart.createQueries(props.design, props.filters)
-
-    # Skip if same
-    if _.isEqual(queries, @state.dataQueries)
-      return
-
-    # Call data source
-    @setState(loading: true, dataQueries: queries, dataError: null)
-    props.dataSource.performQueries(queries, (err, data) =>
-      if err
-        @setState(data: null, dataQueries: null, dataError: err, loading: false)
-      else
-        @setState(data: data, dataQueries: queries, dataError: null, loading: false)
-      )
 
   handleClick: (ev) =>
     ev.stopPropagation()
@@ -163,13 +126,37 @@ class ChartWidgetComponent extends React.Component
       H.span className: "glyphicon glyphicon-remove"
 
   renderChart: (design, width, height) ->
-    return @props.chart.createViewElement({
-      design: design
-      data: @state.data
-      width: width
-      height: height
-      scope: @props.scope
-      onScopeChange: @props.onScopeChange
+    # Clean design first (needed to validate properly)
+    design = @props.chart.cleanDesign(@props.design)
+
+    # Check if design is invalid
+    results = @props.chart.validateDesign(design)
+
+    if not results
+      elemFactory = (data) =>
+        @props.chart.createViewElement({
+          design: design
+          data: data
+          width: width
+          height: height
+          scope: @props.scope
+          onScopeChange: @props.onScopeChange
+          })
+
+      # Get queries
+      queries = @props.chart.createQueries(@props.design, @props.filters)
+
+    else
+      # Can't create with invalid design
+      elemFactory = null
+
+    dataSource = (queries, cb) =>
+      @props.dataSource.performQueries(queries, cb)
+
+    return React.createElement(QueryDataLoadingComponent, {
+      elemFactory: elemFactory
+      dataSource: dataSource
+      queries: queries
       })
 
   render: ->
@@ -182,32 +169,8 @@ class ChartWidgetComponent extends React.Component
     if @props.selected
       style.border = "dashed 2px #AAA"
 
-    # Clean design first (needed to validate properly)
-    design = @props.chart.cleanDesign(@props.design)
-
-    # Check if design is invalid
-    results = @props.chart.validateDesign(design)
-    if results
-      contents = H.div null, 
-        "Invalid design: "
-        results
-    # If data error, display
-    else if @state.dataError
-      contents = H.div null,
-        "Error loading data: "
-        @state.dataError.toString()
-
-    # If no data, loading
-    else if not @state.data
-      contents = H.div style: { textAlign: "center" },
-        "Loading..."
-    else 
-      contents = H.div style: { position: "absolute", left: 10, top: 10 }, 
-        @renderChart(design, @props.width - 20, @props.height - 20)
-
-    if @state.loading
-      style.opacity = 0.5
-      style.backgroundColor = "#E8E8E8"
+    contents = H.div style: { position: "absolute", left: 10, top: 10 }, 
+      @renderChart(design, @props.width - 20, @props.height - 20)
 
     elem = H.div className: "mwater-chart-widget", style: style, onClick: @handleClick,
       contents

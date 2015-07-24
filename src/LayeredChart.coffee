@@ -10,7 +10,7 @@ LayeredChartViewComponent = require './LayeredChartViewComponent'
 ###
 Design is:
   
-  type: bar/line/spline/scatter/area
+  type: bar/line/spline/scatter/area/pie/donut
   layers: array of layers
   titleText: title text
   transpose: true to flip axes
@@ -22,7 +22,7 @@ layer:
   yExpr: y-axis expression
   yAggr: aggregation function if needed for y
   stacked: true to stack
-  type: bar/line/spline/scatter/area (overrides main one)
+  type: bar/line/spline/scatter/area/pie/donut (overrides main one)
 
 ###
 module.exports = class LayeredChart extends Chart

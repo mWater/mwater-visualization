@@ -22,19 +22,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
   componentDidMount: ->
     @createChart(@props)
-    # @updateScope()
-
-  # # Makes nulls into (none) and localizes enums
-  # prepareData: (data) ->
-  #   return { main: _.map(data.main, (row) =>
-  #     copy = {}
-  #     for key, value of row
-  #       if not value?
-  #         copy[key] = "(none)"
-  #       else
-  #         copy[key] = value
-  #     return copy
-  #     )}
+    @updateScope()
 
   createChartOptions: (props) ->
     compiler = new LayeredChartCompiler(schema: props.schema)
@@ -49,7 +37,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
         types: compiler.getTypes(props.design, columns)
         groups: compiler.getGroups(props.design, columns)
         xs: compiler.getXs(columns)
-        # onclick: @handleDataClick
+        onclick: @handleDataClick
       }
       # legend: { hide: true } # No need for simple bar chart
       grid: { focus: { show: false } }  # Don't display hover grid
@@ -90,7 +78,6 @@ module.exports = class LayeredChartViewComponent extends React.Component
       @createChart(nextProps)
       return
 
-
     # if not _.isEqual(@props.data, nextProps.data)
     #   # # If length of data is different, re-create chart
     #   # if @props.data.main.length != nextProps.data.main.length
@@ -104,48 +91,50 @@ module.exports = class LayeredChartViewComponent extends React.Component
       #   names: { y: 'Value' } # Name the data
       # })
 
-  # # Update scoped value
-  # updateScope: =>
-  #   d3.select(React.findDOMNode(@refs.chart))
-  #     .select(".c3-bars-y") # Get bars
-  #     .selectAll(".c3-bar")
-  #     # Highlight only scoped
-  #     .style("opacity", (d,i) =>
-  #       # Determine if scoped
-  #       if @props.scope 
-  #         if @props.data.main[d.index].x == @props.scope
-  #           return 1
-  #         else
-  #           return 0.3
-  #       else
-  #         # Not scoped
-  #         return 1
-  #     )
+  # Update scoped value
+  updateScope: =>
+    d3.select(React.findDOMNode(@refs.chart))
+      .select(".c3-bars-y") # Get bars
+      .selectAll(".c3-bar")
+      # Highlight only scoped
+      .style("opacity", (d,i) =>
+        # Determine if scoped
+        if @props.scope 
+          if @props.data.main[d.index].x == @props.scope
+            return 1
+          else
+            return 0.3
+        else
+          # Not scoped
+          return 1
+      )
 
-  # handleDataClick: (d) =>
-  #   # Scope x value
-  #   scope = @props.data.main[d.index].x
+  handleDataClick: (d) =>
+    alert("TODO: Implement filtering")
+    return
+    # Scope x value
+    scope = @props.data.main[d.index].x
 
-  #   # If same scope, remove scope
-  #   if scope == @props.scope
-  #     @props.onScopeChange(null, null)
-  #     return
+    # If same scope, remove scope
+    if scope == @props.scope
+      @props.onScopeChange(null, null)
+      return
 
-  #   expressionBuilder = new ExpressionBuilder(@props.schema)
+    expressionBuilder = new ExpressionBuilder(@props.schema)
 
-  #   xExpr = @props.design.aesthetics.x.expr
-  #   filter = { 
-  #     type: "comparison"
-  #     table: @props.design.table
-  #     lhs: xExpr
-  #     op: "="
-  #     rhs: { type: "literal", valueType: expressionBuilder.getExprType(xExpr), value: scope } 
-  #   }
+    xExpr = @props.design.aesthetics.x.expr
+    filter = { 
+      type: "comparison"
+      table: @props.design.table
+      lhs: xExpr
+      op: "="
+      rhs: { type: "literal", valueType: expressionBuilder.getExprType(xExpr), value: scope } 
+    }
 
-  #   @props.onScopeChange(scope, filter)
+    @props.onScopeChange(scope, filter)
 
-  # componentDidUpdate: ->
-  #   @updateScope()
+  componentDidUpdate: ->
+    @updateScope()
 
   componentWillUnmount: ->
     @chart.destroy()
