@@ -270,6 +270,64 @@ var design = {
   }
 };
 
+var design = {
+  "items": {
+    "b5f726be-75b4-4759-b85f-f2ca4428aa78": {
+      "layout": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 12
+      },
+      "widget": {
+        "type": "LayeredChart",
+        "version": "0.0.0",
+        "design": {
+          "type": "pie",
+          "layers": [
+            {
+              "xExpr": {
+                "type": "scalar",
+                "table": "wco_loans",
+                "joins": [],
+                "expr": {
+                  "type": "field",
+                  "table": "wco_loans",
+                  "column": "ruralurban"
+                }
+              },
+              "yExpr": {
+                "type": "scalar",
+                "table": "wco_loans",
+                "joins": [],
+                "expr": {
+                  "type": "field",
+                  "table": "wco_loans",
+                  "column": "numborrow"
+                }
+              },
+              "colorExpr": {
+                "type": "scalar",
+                "table": "wco_loans",
+                "joins": [],
+                "expr": {
+                  "type": "field",
+                  "table": "wco_loans",
+                  "column": "ruralurban"
+                }
+              },
+              "filter": null,
+              "table": "wco_loans",
+              "yAggr": "sum"
+            }
+          ],
+          "titleText": "test"
+        }
+      }
+    }
+  }
+};
+
 /* First get the schema */
 $.getJSON("water_org_schema.json", function(schemaJson) {
     var Dashboard = require('mwater-visualization').Dashboard;
