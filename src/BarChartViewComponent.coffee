@@ -129,11 +129,13 @@ module.exports = class BarChartViewComponent extends React.Component
 
   render: ->
     titleStyle = {
+      position: "absolute"
+      top: 0
+      width: @props.width
+      textAlign: "center"
       fontWeight: "bold"
     }
 
     H.div null,
-      H.div 
-        H.svg width: @props.width, height: titleHeight,
-          H.text style: titleStyle, fill: "red", x: @props.width/2, y: titleHeight/2, textAnchor: "middle", @props.design.annotations.title
+      H.div style: titleStyle, @props.design.annotations.title
       H.div style: { marginTop: titleHeight }, ref: "chart"
