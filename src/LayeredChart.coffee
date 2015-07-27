@@ -48,6 +48,10 @@ module.exports = class LayeredChart extends Chart
       layer.yExpr = @exprBuilder.cleanExpr(layer.yExpr, layer.table)
       layer.colorExpr = @exprBuilder.cleanExpr(layer.colorExpr, layer.table)
 
+      # Remove x axis if not required
+      if not compiler.canLayerUseXExpr(design, layerId) and layer.xExpr
+        delete layer.xExpr
+
       # Default y aggr
       if compiler.doesLayerNeedGrouping(design, layerId) and layer.yExpr
         # Remove latest, as it is tricky to group by. TODO

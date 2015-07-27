@@ -20,6 +20,10 @@ module.exports = class LayeredChartCompiler
   isExprCategorical: (expr) ->
     return @exprBuilder.getExprType(expr) in ['text', 'enum', 'boolean']
 
+  # Determine if layer can use x axis
+  canLayerUseXExpr: (design, layerIndex) ->
+    return @getLayerType(design, layerIndex) not in ['pie', 'donut']
+    
   compileExpr: (expr) ->
     exprCompiler = new ExpressionCompiler(@schema)
     return exprCompiler.compileExpr(expr: expr, tableAlias: "main")
@@ -119,6 +123,7 @@ module.exports = class LayeredChartCompiler
 
     # Determine if x is categorical
     xCategorical = @isExprCategorical(design.layers[0].xExpr)
+    # x is present if 
     xPresent = design.layers[0].xExpr?
 
     # Get all values
