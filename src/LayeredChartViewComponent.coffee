@@ -50,7 +50,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
       }
       size: { width: props.width, height: props.height }
       pie: {  expand: false } # Don't expand/contract
-      title: { text: @props.design.titleText, padding: titlePadding }
+      title: { text: props.design.titleText, padding: titlePadding }
     }
 
     console.log chartDesign
