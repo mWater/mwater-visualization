@@ -73,3 +73,8 @@
 .mwater-chart-widget:hover .mwater-chart-widget-remove-button {
 	display: block;
 }
+
+.c3-title {
+  font: 14px sans-serif;
+  font-weight: bold;
+}
