@@ -5,7 +5,7 @@ ExpressionBuilder = require './ExpressionBuilder'
 LayeredChartCompiler = require './LayeredChartCompiler'
 
 titleFontSize = 14
-titleHeight = 20
+titlePadding = { top: 0, right: 0, bottom: 15, left: 0 }
 
 # Displays a layered chart
 module.exports = class LayeredChartViewComponent extends React.Component
@@ -48,8 +48,9 @@ module.exports = class LayeredChartViewComponent extends React.Component
         }
         rotated: props.design.transpose
       }
-      size: { width: props.width, height: props.height - titleHeight }
+      size: { width: props.width, height: props.height }
       pie: {  expand: false } # Don't expand/contract
+      title: { text: @props.design.titleText, padding: titlePadding }
     }
 
     console.log chartDesign
@@ -163,14 +164,5 @@ module.exports = class LayeredChartViewComponent extends React.Component
     @chart.destroy()
 
   render: ->
-    titleStyle = {
-      position: "absolute"
-      top: 0
-      width: @props.width
-      textAlign: "center"
-      fontWeight: "bold"
-    }
-
     H.div null,
-      H.div style: titleStyle, @props.design.titleText
-      H.div style: { marginTop: titleHeight }, ref: "chart"
+      H.div ref: "chart"
