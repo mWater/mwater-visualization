@@ -241,6 +241,20 @@ module.exports = class ExpressionBuilder
     if expr.type == "scalar"
       return @getExprValues(expr.expr)  
 
+  # Converts all literals to string, using name of enums
+  localizeExprLiteral: (expr, literal) ->
+    if not literal?
+      return "null"
+
+    values = @getExprValues(expr)
+    if values
+      item = _.findWhere(values, id: literal)
+      if item
+        return item.name
+      return "???"
+
+    return "#{literal}"
+
   # Returns null if ok, error message if invalid
   validateExpr: (expr) ->
     # Empty is ok

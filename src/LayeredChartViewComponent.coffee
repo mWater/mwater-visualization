@@ -18,7 +18,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
     height: React.PropTypes.number.isRequired
 
     scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
-    onScopeChange: React.PropTypes.func # called with (scope, filter) as a scope to apply to self and filter to apply to other widgets
+    onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
   componentDidMount: ->
     @createChart(@props)
@@ -97,14 +97,18 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
   # Update scoped value
   updateScope: =>
+    dataMap = @getDataMap()
+
     # Handle line and bar charts
     d3.select(React.findDOMNode(@refs.chart))
       .selectAll(".c3-chart-bar .c3-bar, .c3-chart-line .c3-circle")
       # Highlight only scoped
       .style("opacity", (d,i) =>
+        dataPoint = @lookupDataPoint(dataMap, d)
+
         # Determine if scoped
         if @props.scope 
-          if @props.scope.index == d.index and @props.scope.id == d.id
+          if _.isEqual(@props.scope.data, dataPoint)
             return 1
           else
             return 0.3
@@ -117,9 +121,11 @@ module.exports = class LayeredChartViewComponent extends React.Component
     d3.select(React.findDOMNode(@refs.chart))
       .selectAll(".c3-chart-arcs .c3-chart-arc")
       .style("opacity", (d, i) =>
+        dataPoint = @lookupDataPoint(dataMap, d)
+
         # Determine if scoped
         if @props.scope 
-          if @props.scope.id == d.data.id
+          if _.isEqual(@props.scope.data, dataPoint)
             return 1
           else
             return 0.3
@@ -128,35 +134,47 @@ module.exports = class LayeredChartViewComponent extends React.Component
           return 1
         )
 
-  handleDataClick: (d) =>
+  # Gets a data point { layerIndex, row } from a d3 object (d)
+  lookupDataPoint: (dataMap, d) ->
+    if d.data 
+      d = d.data
+      
+    # Lookup layer and row. If pie/donut, index is always zero
+    isPolarChart = @props.design.type in ['pie', 'donut']
+    if isPolarChart
+      dataPoint = dataMap["#{d.id}-0"]
+    else
+      dataPoint = dataMap["#{d.id}-#{d.index}"]
+
+    return dataPoint
+
+  getDataMap: ->
     # Get data map
     compiler = new LayeredChartCompiler(schema: @props.schema)
     dataMap = {}
     compiler.getColumns(@props.design, @props.data, dataMap)
 
-    # Lookup layer and row. If pie/donut, index is always zero
-    isPolarChart = @props.design.type in ['pie', 'donut']
-    if isPolarChart
-      dp = dataMap["#{d.id}-0"]
-    else
-      dp = dataMap["#{d.id}-#{d.index}"]
-      
-    if not dp
+    return dataMap
+
+  handleDataClick: (d) =>
+    # Get data map
+    dataMap = @getDataMap()
+
+    # Look up data point
+    dataPoint = @lookupDataPoint(dataMap, d)
+    if not dataPoint
       return
 
-    # Set scope to { id, index }
-    scope = { id: d.id, index: d.index }
+    # Create scope
+    compiler = new LayeredChartCompiler(schema: @props.schema)
+    scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
 
-    # If same scope, remove scope
-    if _.isEqual(scope, @props.scope)
-      @props.onScopeChange(null, null)
+    # If same scope data, remove scope
+    if @props.scope and _.isEqual(scope.data, @props.scope.data)
+      @props.onScopeChange(null)
       return
 
-    expressionBuilder = new ExpressionBuilder(@props.schema)
-
-    # Get filter
-    filter = compiler.createScopeFilter(@props.design, dp.layerIndex, dp.row)
-    @props.onScopeChange(scope, filter)
+    @props.onScopeChange(scope)
 
   componentDidUpdate: ->
     @updateScope()

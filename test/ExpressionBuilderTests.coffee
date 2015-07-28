@@ -237,3 +237,28 @@ describe "ExpressionBuilder", ->
       scalarExpr = { type: "scalar", table: "t1", joins: [], expr: fieldExpr, where: whereExpr }
       assert.isNotNull @exprBuilder.validateScalarExpr(scalarExpr)
 
+  describe "localizeExprLiteral", ->
+    it "stringifies decimal", ->
+      @schema.addColumn("t1", { id: "decimal", name: "Decimal", type: "decimal" })
+      str = @exprBuilder.localizeExprLiteral({ type: "field", table: "t1", column: "decimal" }, 2.34)
+      assert.equal str, "2.34"
+
+    it "stringifies null", ->
+      @schema.addColumn("t1", { id: "decimal", name: "Decimal", type: "decimal" })
+      str = @exprBuilder.localizeExprLiteral({ type: "field", table: "t1", column: "decimal" }, null)
+      assert.equal str, "null"
+
+    it "looks up enum", ->
+      @schema.addColumn("t1", { id: "enum", name: "Enum", type: "enum", values: [{ id: "a", name: "A" }] })
+      str = @exprBuilder.localizeExprLiteral({ type: "field", table: "t1", column: "enum" }, "a")
+      assert.equal str, "A"
+
+    it "handles null enum", ->
+      @schema.addColumn("t1", { id: "enum", name: "Enum", type: "enum", values: [{ id: "a", name: "A" }] })
+      str = @exprBuilder.localizeExprLiteral({ type: "field", table: "t1", column: "enum" }, null)
+      assert.equal str, "null"
+
+    it "handles invalid enum", ->
+      @schema.addColumn("t1", { id: "enum", name: "Enum", type: "enum", values: [{ id: "a", name: "A" }] })
+      str = @exprBuilder.localizeExprLiteral({ type: "field", table: "t1", column: "enum" }, "xyz")
+      assert.equal str, "???"

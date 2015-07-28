@@ -659,7 +659,7 @@ describe "LayeredChartCompiler", ->
       assert.equal dp.layerIndex, 0
       assert.equal dp.dataIndex, 1
 
-  describe "createScopeFilter", ->
+  describe "createScope", ->
     it "creates x filter", ->
       design = {
         type: "line"
@@ -670,7 +670,7 @@ describe "LayeredChartCompiler", ->
       }
 
       row = { x: 1, y: 10 }
-      filter = @compiler.createScopeFilter(design, 0, row)
+      scope = @compiler.createScope(design, 0, row)
 
       expectedFilter = {
         type: "comparison"
@@ -680,7 +680,9 @@ describe "LayeredChartCompiler", ->
         rhs: { type: "literal", valueType: "decimal", value: 1 } 
       }
 
-      compare(filter, expectedFilter)
+      compare(scope.filter, expectedFilter)
+      compare(scope.data, { layerIndex: 0, row: row })
+      compare(scope.name, "Decimal = 1")
 
     it "creates x-color filter", ->
       design = {
@@ -691,7 +693,7 @@ describe "LayeredChartCompiler", ->
       }
 
       row = { x: "1", color: "b", y: 20 }
-      filter = @compiler.createScopeFilter(design, 0, row)
+      scope = @compiler.createScope(design, 0, row)
 
       expectedFilter = {
         type: "logical"
@@ -715,7 +717,9 @@ describe "LayeredChartCompiler", ->
         ]
       }
 
-      compare(filter, expectedFilter)
+      compare(scope.filter, expectedFilter)
+      compare(scope.data, { layerIndex: 0, row: row })
+      compare(scope.name, "Text = 1 and Enum = B")
 
     it "creates color filter", ->
       design = {
@@ -726,7 +730,7 @@ describe "LayeredChartCompiler", ->
       }
 
       row = { color: "b", y: 20 }
-      filter = @compiler.createScopeFilter(design, 0, row)
+      scope = @compiler.createScope(design, 0, row)
 
       expectedFilter =  {
         type: "comparison"
@@ -736,6 +740,7 @@ describe "LayeredChartCompiler", ->
         rhs: { type: "literal", valueType: "enum", value: "b" } 
       }
 
-      compare(filter, expectedFilter)
+      compare(scope.filter, expectedFilter)
+      compare(scope.data, { layerIndex: 0, row: row })
+      compare(scope.name, "Enum = B")
 
-    

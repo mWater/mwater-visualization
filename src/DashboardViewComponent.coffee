@@ -54,8 +54,8 @@ class InnerDashboardViewComponent extends React.Component
     design = _.extend({}, @props.design, items: items)
     @props.onDesignChange(design)
 
-  handleScopeChange: (id, scope, filter) => 
-    @setState(widgetScoper: @state.widgetScoper.applyScope(id, scope, filter))
+  handleScopeChange: (id, scope) => 
+    @setState(widgetScoper: @state.widgetScoper.applyScope(id, scope))
 
   handleClick: (ev) =>
     # Deselect

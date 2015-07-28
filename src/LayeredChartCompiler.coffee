@@ -23,7 +23,7 @@ module.exports = class LayeredChartCompiler
   # Determine if layer can use x axis
   canLayerUseXExpr: (design, layerIndex) ->
     return @getLayerType(design, layerIndex) not in ['pie', 'donut']
-    
+
   compileExpr: (expr) ->
     exprCompiler = new ExpressionCompiler(@schema)
     return exprCompiler.compileExpr(expr: expr, tableAlias: "main")
@@ -311,14 +311,15 @@ module.exports = class LayeredChartCompiler
 
     return null
 
-  # Create a filter expression based on a row of a layer
-  createScopeFilter: (design, layerIndex, row) ->
+  # Create a expression based on a row of a layer
+  createScope: (design, layerIndex, row) ->
     expressionBuilder = new ExpressionBuilder(@schema)
 
     # Get layer
     layer = design.layers[layerIndex]
 
     filters = []
+    names = []
     
     # If x
     if layer.xExpr
@@ -329,6 +330,9 @@ module.exports = class LayeredChartCompiler
         op: "="
         rhs: { type: "literal", valueType: expressionBuilder.getExprType(layer.xExpr), value: row.x } 
       })
+      valueStr = row.x
+
+      names.push(expressionBuilder.summarizeExpr(layer.xExpr) + " = " + expressionBuilder.localizeExprLiteral(layer.xExpr, row.x))
 
     if layer.colorExpr
       filters.push({ 
@@ -338,13 +342,22 @@ module.exports = class LayeredChartCompiler
         op: "="
         rhs: { type: "literal", valueType: expressionBuilder.getExprType(layer.colorExpr), value: row.color } 
       })
+      names.push(expressionBuilder.summarizeExpr(layer.colorExpr) + " = " + expressionBuilder.localizeExprLiteral(layer.colorExpr, row.color))
 
     if filters.length > 1
-      return {
+      filter = {
         type: "logical"
         table: layer.table
         op: "and"
         exprs: filters
       }
     else
-      return filters[0]
+      filter = filters[0]
+
+    scope = {
+      name: names.join(" and ")
+      filter: filter
+      data: { layerIndex: layerIndex, row: row }
+    }
+
+    return scope

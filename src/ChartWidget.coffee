@@ -19,7 +19,7 @@ module.exports = class ChartWidget extends Widget
   #  onRemove: called when widget is removed
   #  scope: scope of the widget (when the widget self-selects a particular scope)
   #  filters: array of filters to apply (array of expressions)
-  #  onScopeChange: called with (scope, filter) as a scope to apply to self and filter to apply to other widgets
+  #  onScopeChange: called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
   createViewElement: (options) ->
     # Wrap in a chart widget
     return React.createElement(ChartWidgetComponent, {
@@ -57,7 +57,7 @@ class ChartWidgetComponent extends React.Component
     
     scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     filters: React.PropTypes.array  # array of filters to apply (array of expressions)
-    onScopeChange: React.PropTypes.func # called with (scope, filter) as a scope to apply to self and filter to apply to other widgets
+    onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
     connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
     connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
@@ -72,7 +72,7 @@ class ChartWidgetComponent extends React.Component
 
   handleRemoveScope: (ev) =>
     ev.stopPropagation()
-    @props.onScopeChange(null, null)
+    @props.onScopeChange(null)
 
   renderResizeHandle: ->
     resizeHandleStyle = {
@@ -122,7 +122,9 @@ class ChartWidgetComponent extends React.Component
 
     return H.div style: style, onClick: @handleRemoveScope,
       H.span className: "glyphicon glyphicon-filter"
-      " Filtering "
+      " Filter: "
+      @props.scope.name
+      " "
       H.span className: "glyphicon glyphicon-remove"
 
   renderChart: (design, width, height) ->
