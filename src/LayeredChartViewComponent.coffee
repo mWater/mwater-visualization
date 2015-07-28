@@ -54,7 +54,6 @@ module.exports = class LayeredChartViewComponent extends React.Component
       subchart: { axis: { x: { show: false } } }
     }
 
-    console.log chartDesign
     return chartDesign
 
   createChart: (props) ->
@@ -79,6 +78,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
     oldChartOptions = @createChartOptions(@props)
     newChartOptions = @createChartOptions(nextProps)
     if not _.isEqual(oldChartOptions, newChartOptions)
+      console.log newChartOptions
       @createChart(nextProps)
       return
 

@@ -100,6 +100,7 @@ class InnerDashboardViewComponent extends React.Component
       })  
 
     style = {
+      height: "100%"
     }
 
     # Render widget container
