@@ -104,29 +104,6 @@ class ChartWidgetComponent extends React.Component
       H.div style: removeButtonStyle, className: "mwater-chart-widget-remove-button", onClick: @handleRemove,
         H.span className: "glyphicon glyphicon-remove"
 
-  renderScoping: ->
-    if not @props.scope
-      return
-    
-    style = {
-      position: "absolute"
-      right: 10
-      top: 30
-      cursor: "pointer"
-      borderRadius: 100
-      border: "solid 1px #DDD"
-      padding: "1px 10px 1px 10px"
-      color: "#666"
-      backgroundColor: "#EEE"
-    }
-
-    return H.div style: style, onClick: @handleRemoveScope,
-      H.span className: "glyphicon glyphicon-filter"
-      " Filter: "
-      @props.scope.name
-      " "
-      H.span className: "glyphicon glyphicon-remove"
-
   renderChart: (design, width, height) ->
     # Clean design first (needed to validate properly)
     design = @props.chart.cleanDesign(@props.design)
@@ -178,7 +155,6 @@ class ChartWidgetComponent extends React.Component
       contents
       @renderResizeHandle()
       @renderRemoveButton()
-      @renderScoping()
 
     if @props.connectMoveHandle
       elem = @props.connectMoveHandle(elem)

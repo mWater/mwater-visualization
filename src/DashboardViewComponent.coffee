@@ -72,6 +72,39 @@ class InnerDashboardViewComponent extends React.Component
 
     @props.onDesignChange(design)
 
+  handleRemoveScope: (id) =>
+    @setState(widgetScoper: @state.widgetScoper.applyScope(id, null))    
+
+  renderScope: (id) =>
+    style = {
+      cursor: "pointer"
+      borderRadius: 100
+      border: "solid 1px #DDD"
+      padding: "1px 5px 1px 5px"
+      color: "#666"
+      backgroundColor: "#EEE"
+      display: "inline-block"
+      marginLeft: 4
+      marginRight: 4
+    }
+
+    scope = @state.widgetScoper.getScope(id) 
+
+    return H.div style: style, onClick: @handleRemoveScope.bind(null, id),
+      scope.name
+      " "
+      H.span className: "glyphicon glyphicon-remove"
+
+  renderScopes: ->
+    scopes = @state.widgetScoper.getScopes()
+    if _.compact(_.values(scopes)).length == 0
+      return null
+
+    return H.div className: "alert alert-info", 
+      H.span(className: "glyphicon glyphicon-filter")
+      " Filters: "
+      _.map(_.keys(scopes), @renderScope)
+
   render: ->
     # Create layout engine
     # TODO create from design
@@ -105,6 +138,7 @@ class InnerDashboardViewComponent extends React.Component
 
     # Render widget container
     return H.div style: style, onClick: @handleClick,
+      @renderScopes()
       React.createElement(WidgetContainerComponent, 
         layoutEngine: layoutEngine
         layouts: layouts
