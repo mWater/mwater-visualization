@@ -69,17 +69,19 @@ module.exports = class LayeredChartViewComponent extends React.Component
     @updateScope()
 
   componentWillReceiveProps: (nextProps) ->
-    # Check if size changed
-    if @props.height != nextProps.height or @props.width != nextProps.width
-      @createChart(nextProps)
-      return
-
     # Check if options changed
-    # TODO exclude columns
     oldChartOptions = @createChartOptions(@props)
     newChartOptions = @createChartOptions(nextProps)
+
+    # TODO check if only data changed
+
+    # Check if size alone changed
+    if _.isEqual(_.omit(oldChartOptions, "size"), _.omit(newChartOptions, "size"))
+      @chart.resize(width: nextProps.width, height: nextProps.height)
+      return
+
+    # Check if anything else changed
     if not _.isEqual(oldChartOptions, newChartOptions)
-      console.log newChartOptions
       @createChart(nextProps)
       return
 

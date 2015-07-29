@@ -340,7 +340,7 @@ $.getJSON("water_org_schema.json", function(schemaJson) {
 
     var dataSource = new CachingDataSource({
         perform: function(query, cb) {
-            console.log(JSON.stringify(query));
+            // console.log(JSON.stringify(query));
             $.getJSON("http://dev-portal.water.org/index.php/visualization?query=" + encodeURIComponent(JSON.stringify(query)), function(rows) {
                 cb(null, rows);
             }).fail(function(xhr) {

@@ -98,7 +98,7 @@ class Container extends React.Component
 
   componentWillReceiveProps: (nextProps) ->
     # Reset hover if not over
-    if not nextProps.isOver
+    if not nextProps.isOver and (@state.moveHover or @state.resizeHover)
       # Defer to prevent "Cannot dispatch in the middle of a dispatch." error
       _.defer () =>
         @setState(moveHover: null, resizeHover: null)
