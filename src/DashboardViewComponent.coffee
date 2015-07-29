@@ -78,8 +78,8 @@ class InnerDashboardViewComponent extends React.Component
   renderScope: (id) =>
     style = {
       cursor: "pointer"
-      borderRadius: 100
-      border: "solid 1px #DDD"
+      borderRadius: 4
+      border: "solid 1px #BBB"
       padding: "1px 5px 1px 5px"
       color: "#666"
       backgroundColor: "#EEE"

@@ -82,8 +82,8 @@ class ChartWidgetComponent extends React.Component
       backgroundImage: "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAB3RJTUUH2AkPCjIF90dj7QAAAAlwSFlzAAAPYQAAD2EBqD+naQAAAARnQU1BAACxjwv8YQUAAABISURBVHjaY2QgABwcHMSBlAETEYpagPgIIxGKCg4cOPCVkZAiIObBajUWRZhW41CEajUuRShWE1AEsZoIRWCrQSbawDh42AwAdwQtJBOblO0AAAAASUVORK5CYII=')"
       backgroundRepeat: "no-repeat"
       backgroundPosition: "right bottom"
-      width: 20
-      height: 20
+      width: 30
+      height: 30
       cursor: "nwse-resize"
     }
 

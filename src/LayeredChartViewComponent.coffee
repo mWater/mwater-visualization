@@ -66,6 +66,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
     chartOptions.bindto = el
 
     @chart = c3.generate(chartOptions)
+    @updateScope()
 
   componentWillReceiveProps: (nextProps) ->
     # Check if size changed
@@ -81,6 +82,8 @@ module.exports = class LayeredChartViewComponent extends React.Component
       console.log newChartOptions
       @createChart(nextProps)
       return
+
+    @updateScope()
 
     # if not _.isEqual(@props.data, nextProps.data)
     #   # # If length of data is different, re-create chart
@@ -175,9 +178,6 @@ module.exports = class LayeredChartViewComponent extends React.Component
       return
 
     @props.onScopeChange(scope)
-
-  componentDidUpdate: ->
-    @updateScope()
 
   componentWillUnmount: ->
     @chart.destroy()
