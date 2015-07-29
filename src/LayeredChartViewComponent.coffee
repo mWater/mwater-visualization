@@ -52,6 +52,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
       pie: {  expand: false } # Don't expand/contract
       title: { text: props.design.titleText, padding: titlePadding }
       subchart: { axis: { x: { show: false } } }
+      transition: { duration: 0 } # Transitions interfere with scoping
     }
 
     return chartDesign
@@ -64,28 +65,31 @@ module.exports = class LayeredChartViewComponent extends React.Component
     chartOptions = @createChartOptions(props)
     
     chartOptions.bindto = el
+    # Update scope after rendering. Needs a delay to make it happen
+    chartOptions.onrendered = => _.defer(@updateScope)
 
     @chart = c3.generate(chartOptions)
-    @updateScope()
 
-  componentWillReceiveProps: (nextProps) ->
+  componentDidUpdate: (prevProps) ->
     # Check if options changed
-    oldChartOptions = @createChartOptions(@props)
-    newChartOptions = @createChartOptions(nextProps)
+    oldChartOptions = @createChartOptions(prevProps)
+    newChartOptions = @createChartOptions(@props)
 
-    # TODO check if only data changed
-
-    # Check if size alone changed
-    if _.isEqual(_.omit(oldChartOptions, "size"), _.omit(newChartOptions, "size"))
-      @chart.resize(width: nextProps.width, height: nextProps.height)
-      return
-
-    # Check if anything else changed
+    # If chart changed
     if not _.isEqual(oldChartOptions, newChartOptions)
-      @createChart(nextProps)
-      return
 
-    @updateScope()
+      # Check if size alone changed
+      if _.isEqual(_.omit(oldChartOptions, "size"), _.omit(newChartOptions, "size"))
+        @chart.resize(width: @props.width, height: @props.height)
+        @updateScope()
+        return
+
+      # TODO check if only data changed
+      @createChart(@props)
+    else
+      # Check scope
+      if not _.isEqual(@props.scope, prevProps.scope)
+        @updateScope()
 
     # if not _.isEqual(@props.data, nextProps.data)
     #   # # If length of data is different, re-create chart
