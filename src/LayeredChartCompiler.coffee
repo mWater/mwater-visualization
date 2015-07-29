@@ -270,47 +270,6 @@ module.exports = class LayeredChartCompiler
       when "date" then "timeseries"
       else "indexed"
 
-  # Given series id and index, find layerIndex and dataIndex
-  lookupDataPoint: (data, columns, seriesId, index) ->
-    # Get layer # from series. 
-    # Then search in columns to get x value (if there is one) and y value
-    # If extra colon, get color string
-    # Get data to search for index of row by x and color
-
-    layerIndex = parseInt(seriesId.match(/^layer(\d+)/)[1])
-
-    # Find x value
-    xColumnId = seriesId.replace(/:y$/, ":x")
-    xColumn = _.find(columns, (c) -> c[0] == xColumnId)
-    if xColumn
-      # Find x value
-      x = xColumn[index + 1]
-
-    # Find y value
-    y = _.find(columns, (c) -> c[0] == seriesId)[index + 1]
-
-    # Find color string
-    match = seriesId.match(/^layer\d+:(.*):y$/)
-    if match
-      colorStr = match[1]
-
-    # Find data point index
-    dataIndex = _.findIndex(data["layer#{layerIndex}"], (row) =>
-      if xColumn and row.x != x
-        return false
-      if colorStr? and "#{row.color}" != colorStr
-        return false
-      if row.y != y
-        return false
-
-      return true
-      )
-
-    if dataIndex >= 0
-      return { layerIndex: layerIndex, dataIndex: dataIndex }
-
-    return null
-
   # Create a expression based on a row of a layer
   createScope: (design, layerIndex, row) ->
     expressionBuilder = new ExpressionBuilder(@schema)

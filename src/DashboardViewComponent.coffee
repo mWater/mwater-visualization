@@ -89,6 +89,8 @@ class InnerDashboardViewComponent extends React.Component
     }
 
     scope = @state.widgetScoper.getScope(id) 
+    if not scope
+      return null
 
     return H.div style: style, onClick: @handleRemoveScope.bind(null, id),
       scope.name
