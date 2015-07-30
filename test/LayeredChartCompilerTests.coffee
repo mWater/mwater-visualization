@@ -612,7 +612,7 @@ describe "LayeredChartCompiler", ->
       }
 
       compare(scope.filter, expectedFilter)
-      compare(scope.data, { layerIndex: 0, row: row })
+      compare(scope.data, { layerIndex: 0, x: 1 })
       compare(scope.name, "Decimal = 1")
 
     it "creates x-color filter", ->
@@ -649,7 +649,7 @@ describe "LayeredChartCompiler", ->
       }
 
       compare(scope.filter, expectedFilter)
-      compare(scope.data, { layerIndex: 0, row: row })
+      compare(scope.data, { layerIndex: 0, x: "1", color: "b" })
       compare(scope.name, "Text = 1 and Enum = B")
 
     it "creates color filter", ->
@@ -672,6 +672,6 @@ describe "LayeredChartCompiler", ->
       }
 
       compare(scope.filter, expectedFilter)
-      compare(scope.data, { layerIndex: 0, row: row })
+      compare(scope.data, { layerIndex: 0, color: "b" })
       compare(scope.name, "Enum = B")
 

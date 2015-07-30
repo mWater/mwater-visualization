@@ -107,6 +107,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
   # Update scoped value
   updateScope: =>
     dataMap = @getDataMap()
+    compiler = new LayeredChartCompiler(schema: @props.schema)
 
     # Handle line and bar charts
     d3.select(React.findDOMNode(@refs.chart))
@@ -114,10 +115,11 @@ module.exports = class LayeredChartViewComponent extends React.Component
       # Highlight only scoped
       .style("opacity", (d,i) =>
         dataPoint = @lookupDataPoint(dataMap, d)
+        scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
 
         # Determine if scoped
         if @props.scope 
-          if _.isEqual(@props.scope.data, dataPoint)
+          if _.isEqual(@props.scope.data, scope.data)
             return 1
           else
             return 0.3
@@ -131,10 +133,11 @@ module.exports = class LayeredChartViewComponent extends React.Component
       .selectAll(".c3-chart-arcs .c3-chart-arc")
       .style("opacity", (d, i) =>
         dataPoint = @lookupDataPoint(dataMap, d)
+        scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
 
         # Determine if scoped
         if @props.scope 
-          if _.isEqual(@props.scope.data, dataPoint)
+          if _.isEqual(@props.scope.data, scope.data)
             return 1
           else
             return 0.3

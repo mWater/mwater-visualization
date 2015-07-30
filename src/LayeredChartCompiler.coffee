@@ -270,7 +270,9 @@ module.exports = class LayeredChartCompiler
       when "date" then "timeseries"
       else "indexed"
 
-  # Create a expression based on a row of a layer
+  # Create a scope based on a row of a layer
+  # Scope data is relevant data from row that uniquely identifies scope
+  # plus a layer index
   createScope: (design, layerIndex, row) ->
     expressionBuilder = new ExpressionBuilder(@schema)
 
@@ -279,6 +281,7 @@ module.exports = class LayeredChartCompiler
 
     filters = []
     names = []
+    data = { layerIndex: layerIndex }
     
     # If x
     if layer.xExpr
@@ -289,9 +292,8 @@ module.exports = class LayeredChartCompiler
         op: "="
         rhs: { type: "literal", valueType: expressionBuilder.getExprType(layer.xExpr), value: row.x } 
       })
-      valueStr = row.x
-
       names.push(expressionBuilder.summarizeExpr(layer.xExpr) + " = " + expressionBuilder.localizeExprLiteral(layer.xExpr, row.x))
+      data.x = row.x
 
     if layer.colorExpr
       filters.push({ 
@@ -302,6 +304,7 @@ module.exports = class LayeredChartCompiler
         rhs: { type: "literal", valueType: expressionBuilder.getExprType(layer.colorExpr), value: row.color } 
       })
       names.push(expressionBuilder.summarizeExpr(layer.colorExpr) + " = " + expressionBuilder.localizeExprLiteral(layer.colorExpr, row.color))
+      data.color = row.color
 
     if filters.length > 1
       filter = {
@@ -316,7 +319,7 @@ module.exports = class LayeredChartCompiler
     scope = {
       name: names.join(" and ")
       filter: filter
-      data: { layerIndex: layerIndex, row: row }
+      data: data
     }
 
     return scope
