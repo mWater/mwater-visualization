@@ -14,13 +14,14 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     schema: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func.isRequired
 
+  # Determine if axes labels needed
+  areAxesLabelsNeeded: (layer) ->
+    return @props.design.type not in ['pie', 'donut']
+
   # Updates design with the specified changes
   updateDesign: (changes) ->
     design = _.extend({}, @props.design, changes)
     @props.onDesignChange(design)
-
-  handleTitleChange: (ev) =>
-    @updateDesign(titleText: ev.target.value)
 
   handleTypeChange: (type) =>
     @updateDesign(type: type)
@@ -43,10 +44,24 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     layers.push({})
     @updateDesign(layers: layers)
 
-  renderTitle: ->
-    H.div className: "form-group",
-      H.label className: "text-muted", "Title"
-      H.input type: "text", className: "form-control", value: @props.design.titleText, onChange: @handleTitleChange, placeholder: "Untitled"
+  handleTitleTextChange: (ev) =>  @updateDesign(titleText: ev.target.value)
+  handleXAxisLabelTextChange: (ev) =>  @updateDesign(xAxisLabelText: ev.target.value)
+  handleYAxisLabelTextChange: (ev) =>  @updateDesign(yAxisLabelText: ev.target.value)
+
+  renderLabels: ->
+    H.div null,
+      H.div className: "form-group",
+        H.label className: "text-muted", "Title"
+        H.input type: "text", className: "form-control input-sm", value: @props.design.titleText, onChange: @handleTitleTextChange, placeholder: "Untitled"
+      if @areAxesLabelsNeeded()
+        H.div className: "form-group",
+          H.label className: "text-muted", if @props.design.transpose then "Vertical Axis Label" else "Horizontal Axis Label"
+          H.input type: "text", className: "form-control input-sm", value: @props.design.xAxisLabelText, onChange: @handleXAxisLabelTextChange, placeholder: "None"
+      if @areAxesLabelsNeeded()
+        H.div null,
+          H.div className: "form-group",
+            H.label className: "text-muted", if not @props.design.transpose then "Vertical Axis Label" else "Horizontal Axis Label"
+            H.input type: "text", className: "form-control input-sm", value: @props.design.yAxisLabelText, onChange: @handleYAxisLabelTextChange, placeholder: "None"
 
   renderType: ->
     chartTypes =  [
@@ -117,7 +132,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
       @renderTranspose()
       @renderLayers()
       H.hr()
-      @renderTitle()
+      @renderLabels()
 
 class LayerDesignerComponent extends React.Component
   @propTypes: 

@@ -45,6 +45,10 @@ module.exports = class LayeredChartViewComponent extends React.Component
       axis: {
         x: {
           type: compiler.getXAxisType(props.design)
+          label: { text: props.design.xAxisLabelText, position: 'outer-center' }
+        }
+        y: {
+          label: { text: props.design.yAxisLabelText, position: 'outer-center' }
         }
         rotated: props.design.transpose
       }
