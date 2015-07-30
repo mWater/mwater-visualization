@@ -75,6 +75,46 @@ class InnerDashboardViewComponent extends React.Component
   handleRemoveScope: (id) =>
     @setState(widgetScoper: @state.widgetScoper.applyScope(id, null))    
 
+  handlePrint: =>
+
+    $("body").append('''
+      <style>
+@media print {
+   body {
+     visibility: hidden;
+   }
+
+   #print_xyz {
+     display: block !important;
+     visibility: visible;
+/*     background-color: #EEE;*/
+     border: solid 4px blue;
+   }
+ }
+ #print_xyz {
+  display: none;
+ }
+    </style>
+  ''')
+
+    # Add to body
+    $("body").append('''
+      <div id="print_xyz">
+      </div>
+      ''')
+
+    elem = H.div null, 
+      React.createElement(InnerDashboardViewComponent, @props)
+    # window.print()
+
+    React.render(elem, $("#print_xyz").get(0), =>
+      _.delay () =>
+        window.print()
+        React.unmountComponentAtNode($("#print_xyz").get(0))
+        $("#print_xyz").remove()
+      , 1000
+      )
+
   renderScope: (id) =>
     style = {
       cursor: "pointer"
@@ -138,8 +178,32 @@ class InnerDashboardViewComponent extends React.Component
       height: "100%"
     }
 
+#     embeddedCss = '''
+# @media print {
+#   body {
+#     visibility: hidden;
+#   }
+#   .mwater-visualization-dashboard {
+#     visibility: visible;
+#     background-color: #EEE;
+#     border: solid 4px green;
+# /*    position: fixed;
+#     left: 0;
+#     right: 0;
+#     top: 0;
+#     width: 100%;*/
+#   }
+# /*  .mwater-visualization-dashboard {
+#   #   position: absolute;
+#   #   left: 0;
+#   #   top: 0;
+#   # }*/
+# }
+#     '''
+
     # Render widget container
-    return H.div style: style, onClick: @handleClick,
+    return H.div style: style, className: "mwater-visualization-dashboard", onClick: @handleClick,
+      H.button type: "button", onClick: @handlePrint, "Print"
       @renderScopes()
       React.createElement(WidgetContainerComponent, 
         layoutEngine: layoutEngine
