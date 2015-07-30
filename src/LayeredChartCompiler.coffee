@@ -292,7 +292,7 @@ module.exports = class LayeredChartCompiler
         op: "="
         rhs: { type: "literal", valueType: expressionBuilder.getExprType(layer.xExpr), value: row.x } 
       })
-      names.push(expressionBuilder.summarizeExpr(layer.xExpr) + " = " + expressionBuilder.localizeExprLiteral(layer.xExpr, row.x))
+      names.push(expressionBuilder.summarizeExpr(layer.xExpr) + " is " + expressionBuilder.localizeExprLiteral(layer.xExpr, row.x))
       data.x = row.x
 
     if layer.colorExpr
@@ -303,7 +303,7 @@ module.exports = class LayeredChartCompiler
         op: "="
         rhs: { type: "literal", valueType: expressionBuilder.getExprType(layer.colorExpr), value: row.color } 
       })
-      names.push(expressionBuilder.summarizeExpr(layer.colorExpr) + " = " + expressionBuilder.localizeExprLiteral(layer.colorExpr, row.color))
+      names.push(expressionBuilder.summarizeExpr(layer.colorExpr) + " is " + expressionBuilder.localizeExprLiteral(layer.colorExpr, row.color))
       data.color = row.color
 
     if filters.length > 1
@@ -317,7 +317,7 @@ module.exports = class LayeredChartCompiler
       filter = filters[0]
 
     scope = {
-      name: names.join(" and ")
+      name: @schema.getTable(layer.table).name + " " + names.join(" and ")
       filter: filter
       data: data
     }
