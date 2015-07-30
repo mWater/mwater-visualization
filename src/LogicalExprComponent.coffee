@@ -2,6 +2,9 @@ React = require 'react'
 H = React.DOM
 ComparisonExprComponent = require './ComparisonExprComponent'
 
+# Displays a logical expression, which is a series of comparison 
+# expressions anded or ored together. Shows a simple "+ Add Filter" button
+# if no expressions
 module.exports = class LogicalExprComponent extends React.Component
   @propTypes: 
     value: React.PropTypes.object

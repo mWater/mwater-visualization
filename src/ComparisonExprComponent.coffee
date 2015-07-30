@@ -26,11 +26,14 @@ module.exports = class ComparisonExprComponent extends React.Component
 
     # Create LHS
     lhsControl = React.createElement(ScalarExprComponent, 
-      key: "lhs",
-      schema: @props.schema, 
-      table: @props.table, 
-      value: @props.value.lhs,
-      onChange: @handleLhsChange)
+      key: "lhs"
+      schema: @props.schema
+      table: @props.table
+      value: @props.value.lhs
+      onChange: @handleLhsChange
+      editorTitle: "Filter By"
+      editorInitiallyOpen: not @props.value.lhs  # Open editor if no value
+      )
 
     # Create op if LHS present
     lhsType = exprBuilder.getExprType(@props.value.lhs)

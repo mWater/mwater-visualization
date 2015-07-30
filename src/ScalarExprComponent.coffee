@@ -24,11 +24,17 @@ module.exports = class ScalarExprComponent extends React.Component
     value: React.PropTypes.object # Current value of expression
     onChange: React.PropTypes.func.isRequired # Called when changes
 
-  constructor: ->
-    super
+    editorInitiallyOpen: React.PropTypes.bool # True to open editor as soon as created
+
+  constructor: (props) ->
+    super(props)
+
     # editorValue is set to the currently being edited value
     # editorOpen is true if editing
-    @state = { editorValue: null, editorOpen: false }
+    if props.editorInitiallyOpen
+      @state = { editorValue: props.value, editorOpen: true }
+    else
+      @state = { editorValue: null, editorOpen: false }
 
   handleEditorOpen: => @setState(editorValue: @props.value, editorOpen: true)
 
