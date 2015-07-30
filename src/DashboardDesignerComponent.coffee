@@ -2,6 +2,7 @@ React = require 'react'
 H = React.DOM
 uuid = require 'node-uuid'
 LegoLayoutEngine = require './LegoLayoutEngine'
+UndoStack = require './UndoStack'
 
 module.exports = class DashboardDesignerComponent extends React.Component
   @propTypes:
@@ -12,6 +13,14 @@ module.exports = class DashboardDesignerComponent extends React.Component
     isDesigning: React.PropTypes.bool.isRequired # Not used (since always designing)
     onIsDesigningChange: React.PropTypes.func
     widgetFactory: React.PropTypes.object.isRequired # Factory of type WidgetFactory to make widgets
+
+  constructor: (props) ->
+    super
+    @state = { undoStack: new UndoStack().push(props.design) }
+
+  componentWillReceiveProps: (nextProps) ->
+    # Save on stack
+    @setState(undoStack: @state.undoStack.push(nextProps.design))
 
   handleDesignChange: (widgetDesign) =>
     widget = @props.design.items[@props.selectedWidgetId].widget
@@ -57,6 +66,26 @@ module.exports = class DashboardDesignerComponent extends React.Component
     @props.onDesignChange(design)
     @props.onSelectedWidgetIdChange(id)
 
+  handleUndo: => 
+    undoStack = @state.undoStack.undo()
+    # We need to use callback as state is applied later
+    @setState(undoStack: undoStack, => @props.onDesignChange(undoStack.getValue()))
+
+  handleRedo: =>
+    undoStack = @state.undoStack.redo()
+    # We need to use callback as state is applied later
+    @setState(undoStack: undoStack, => @props.onDesignChange(undoStack.getValue()))
+
+  renderUndoRedo: ->
+    H.div key: "undoredo",
+      H.button key: "undo", type: "button", className: "btn btn-default btn-xs", onClick: @handleUndo, disabled: not @state.undoStack.canUndo(),
+        H.span className: "glyphicon glyphicon-triangle-left"
+        " Undo"
+      " "
+      H.button key: "redo", type: "button", className: "btn btn-default btn-xs", onClick: @handleRedo, disabled: not @state.undoStack.canRedo(),
+        H.span className: "glyphicon glyphicon-triangle-right"
+        " Redo"
+
   # Designer when no widgets displayed
   renderGeneralDesigner: ->
     return H.div null, 
@@ -75,14 +104,21 @@ module.exports = class DashboardDesignerComponent extends React.Component
           H.li null,
             H.a onClick: @handleAddChart, "Chart"
 
-  render: ->
-    if not @props.selectedWidgetId
-      return @renderGeneralDesigner()
-
+  renderWidgetDesigner: ->
     # Get selected widget
     widgetDef = @props.design.items[@props.selectedWidgetId].widget
     widget = @props.widgetFactory.createWidget(widgetDef.type, widgetDef.version, widgetDef.design)
 
     # Create design element
     return widget.createDesignerElement(onDesignChange: @handleDesignChange)
+
+  render: ->
+    H.div null, 
+      @renderUndoRedo()
+      H.br()
+
+      if not @props.selectedWidgetId
+        @renderGeneralDesigner()
+      else
+        @renderWidgetDesigner()
 
