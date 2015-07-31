@@ -82,18 +82,33 @@ class InnerDashboardViewComponent extends React.Component
 @media print {
    body {
      visibility: hidden;
+    /* width: 612px;*/
+    margin: 0;
+    padding: 0;
+   }
+
+   body > * {
+    display: none;
    }
 
    #print_xyz {
      display: block !important;
      visibility: visible;
 /*     background-color: #EEE;*/
-     border: solid 4px blue;
+     /*border: solid 4px blue;*/
    }
+
  }
  #print_xyz {
   display: none;
  }
+
+@page  {
+size: 8.5in 11in; 
+margin: 0.5in 0.5in 0.5in 0.5in; 
+}
+
+
     </style>
   ''')
 
@@ -104,7 +119,9 @@ class InnerDashboardViewComponent extends React.Component
       ''')
 
     elem = H.div null, 
-      React.createElement(InnerDashboardViewComponent, @props)
+      H.div style: { }
+      React.createElement(InnerDashboardViewComponent, 
+        _.extend(@props, width: 7.5*96))
     # window.print()
 
     React.render(elem, $("#print_xyz").get(0), =>
@@ -176,40 +193,28 @@ class InnerDashboardViewComponent extends React.Component
 
     style = {
       height: "100%"
+      position: "relative"
     }
 
-#     embeddedCss = '''
-# @media print {
-#   body {
-#     visibility: hidden;
-#   }
-#   .mwater-visualization-dashboard {
-#     visibility: visible;
-#     background-color: #EEE;
-#     border: solid 4px green;
-# /*    position: fixed;
-#     left: 0;
-#     right: 0;
-#     top: 0;
-#     width: 100%;*/
-#   }
-# /*  .mwater-visualization-dashboard {
-#   #   position: absolute;
-#   #   left: 0;
-#   #   top: 0;
-#   # }*/
-# }
-#     '''
+      # H.div style: { position: "absolute", top: 960, left: 1, width: 718, height: 0, border: "dashed 1px red" }
+      # H.div style: { position: "absolute", top: 961, left: 1, width: 718, height: 0, border: "dashed 1px green" }
+      # H.div style: { position: "absolute", top: 1, left: 1, width: 718, height: 958, border: "solid 1px green" }
+      # H.div style: { position: "absolute", top: 960, left: 1, width: 718, height: 958, border: "solid 1px green" }
+      # H.div style: { position: "absolute", top: 2000 }, "PAGE BREAK"
 
     # Render widget container
     return H.div style: style, className: "mwater-visualization-dashboard", onClick: @handleClick,
-      H.button type: "button", onClick: @handlePrint, "Print"
-      @renderScopes()
-      React.createElement(WidgetContainerComponent, 
-        layoutEngine: layoutEngine
-        layouts: layouts
-        elems: elems
-        onLayoutUpdate: @handleLayoutUpdate
-        width: @props.width 
-      )
-
+      H.button type: "button", onClick: @handlePrint, style: { position: "absolute", right: 0, top: 0, zIndex: 10000 }, "Print"
+      H.div className: "mwater-visualization-page-break", style: { height: @props.width / 7.5 * 10 - 1 }
+      # _.map(_.range(0, 1500, 96), (i)=>
+      #   H.div style: { position: "absolute", top: i, left: 1, width: 718, height: 0, borderTop: "solid 1px green" }
+      #   )
+      H.div style: { position: "absolute", top: 0 },
+        @renderScopes()
+        React.createElement(WidgetContainerComponent, 
+          layoutEngine: layoutEngine
+          layouts: layouts
+          elems: elems
+          onLayoutUpdate: @handleLayoutUpdate
+          width: @props.width 
+        )
