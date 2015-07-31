@@ -31,7 +31,7 @@ module.exports = class EditableLinkComponent extends React.Component
     if @props.dropdownItems
       return H.div className: "dropdown", style: { display: "inline-block" },
         elem
-        H.ul className: "dropdown-menu",
+        H.ul className: "dropdown-menu", style: { cursor: "pointer" },
           _.map @props.dropdownItems, @renderDropdownItem
     else
       return elem
