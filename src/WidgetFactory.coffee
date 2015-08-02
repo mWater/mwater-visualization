@@ -18,3 +18,11 @@ module.exports = class WidgetFactory
         return new MarkdownWidget(design)
       else    
         throw new Error("Unknown widget type #{type}")
+
+
+  # Gets list of new widget types. Each contains name, type, version and design
+  getNewWidgetsTypes: ->
+    return [
+      { name: "Chart", type: "LayeredChart", version: "0.1.0", design: {} }
+      { name: "Text", type: "Markdown", version: "0.1.0", design: {} }
+    ]

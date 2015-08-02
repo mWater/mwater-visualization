@@ -71,11 +71,8 @@ module.exports = class DashboardDesignerComponent extends React.Component
     @props.onDesignChange(design)
     @props.onSelectedWidgetIdChange(id)
 
-  handleAddChart: =>
-    @addWidget("LayeredChart", "0.1.0", {}, 12, 12)
-
-  handleAddHTML: =>
-    @addWidget("Markdown", "0.1.0", { }, 12, 12)
+  handleAddWidget: (wt) =>
+    @addWidget(wt.type, wt.version, wt.design, 12, 12)
 
   handleUndo: => 
     undoStack = @state.undoStack.undo()
@@ -112,10 +109,10 @@ module.exports = class DashboardDesignerComponent extends React.Component
           " Add Widget "
           H.span className: "caret"
         H.ul className: "dropdown-menu",
-          H.li null,
-            H.a onClick: @handleAddChart, "Chart"
-          H.li null,
-            H.a onClick: @handleAddHTML, "Text"
+          _.map(@props.widgetFactory.getNewWidgetsTypes(), (wt) =>
+            H.li null,
+              H.a onClick: @handleAddWidget.bind(null, wt), wt.name
+            )
 
   renderWidgetDesigner: ->
     # Get selected widget
