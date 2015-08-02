@@ -1,5 +1,6 @@
 ChartWidget = require './ChartWidget'
 LayeredChart = require './LayeredChart'
+HTMLWidget = require './HTMLWidget'
 
 # Creates widgets based on type, version and design 
 module.exports = class WidgetFactory
@@ -13,6 +14,7 @@ module.exports = class WidgetFactory
         # Create chart object
         chart = new LayeredChart(@schema)  
         return new ChartWidget(chart, design, @dataSource)
+      when "HTML"
+        return new HTMLWidget(design)
       else    
         throw new Error("Unknown widget type #{type}")
-

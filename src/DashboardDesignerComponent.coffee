@@ -35,7 +35,8 @@ module.exports = class DashboardDesignerComponent extends React.Component
     design = _.extend({}, @props.design, items: items)
     @props.onDesignChange(design)
 
-  handleAddChart: =>
+  # Find a layout that the new widget fits in. width and height are in 24ths
+  findOpenLayout: (width, height) ->
     # Create layout engine
     # TODO create from design
     # TODO uses fake width
@@ -45,15 +46,19 @@ module.exports = class DashboardDesignerComponent extends React.Component
     layouts = _.pluck(_.values(@props.design.items), "layout")
 
     # Find place for new item
-    layout = layoutEngine.appendLayout(layouts, 12, 12)
+    return layoutEngine.appendLayout(layouts, width, height)
+
+  addWidget: (type, version, design, width, height) ->
+    # Find place for new item
+    layout = @findOpenLayout(12, 12)
 
     # Create item
     item = {
       layout: layout
       widget: {
-        type: "LayeredChart"
-        version: "0.0.0"
-        design: {}
+        type: type
+        version: version
+        design: design
       }
     }
 
@@ -65,6 +70,12 @@ module.exports = class DashboardDesignerComponent extends React.Component
     design = _.extend({}, @props.design, items: items)
     @props.onDesignChange(design)
     @props.onSelectedWidgetIdChange(id)
+
+  handleAddChart: =>
+    @addWidget("LayeredChart", "0.1.0", {}, 12, 12)
+
+  handleAddHTML: =>
+    @addWidget("HTML", "0.1.0", { }, 12, 12)
 
   handleUndo: => 
     undoStack = @state.undoStack.undo()
@@ -103,6 +114,8 @@ module.exports = class DashboardDesignerComponent extends React.Component
         H.ul className: "dropdown-menu",
           H.li null,
             H.a onClick: @handleAddChart, "Chart"
+          H.li null,
+            H.a onClick: @handleAddHTML, "Text"
 
   renderWidgetDesigner: ->
     # Get selected widget
