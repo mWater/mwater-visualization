@@ -75,7 +75,7 @@ module.exports = class DashboardDesignerComponent extends React.Component
     @addWidget("LayeredChart", "0.1.0", {}, 12, 12)
 
   handleAddHTML: =>
-    @addWidget("HTML", "0.1.0", { }, 12, 12)
+    @addWidget("Markdown", "0.1.0", { }, 12, 12)
 
   handleUndo: => 
     undoStack = @state.undoStack.undo()

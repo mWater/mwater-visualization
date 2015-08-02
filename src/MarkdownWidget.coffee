@@ -5,7 +5,7 @@ Widget = require './Widget'
 SimpleWidgetComponent = require './SimpleWidgetComponent'
 markdown = require("markdown").markdown
 
-module.exports = class HTMLWidget extends Widget
+module.exports = class MarkdownWidget extends Widget
   constructor: (design) ->
     @design = design
 
@@ -27,7 +27,7 @@ module.exports = class HTMLWidget extends Widget
       selected: options.selected
       onSelect: options.onSelect
       onRemove: options.onRemove,
-        React.createElement(HTMLWidgetViewComponent, {
+        React.createElement(MarkdownWidgetViewComponent, {
           design: @design
         })
       )
@@ -36,9 +36,9 @@ module.exports = class HTMLWidget extends Widget
   # options:
   #  onDesignChange: called with new design if changed
   createDesignerElement: (options) ->
-    return React.createElement(HTMLWidgetDesignerComponent, design: @design, onDesignChange: options.onDesignChange)
+    return React.createElement(MarkdownWidgetDesignerComponent, design: @design, onDesignChange: options.onDesignChange)
 
-class HTMLWidgetViewComponent extends React.Component
+class MarkdownWidgetViewComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired # Design of chart
     width: React.PropTypes.number.isRequired
@@ -47,7 +47,7 @@ class HTMLWidgetViewComponent extends React.Component
   render: ->
     H.div dangerouslySetInnerHTML: { __html: markdown.toHTML(@props.design.markdown or "") }
 
-class HTMLWidgetDesignerComponent extends React.Component 
+class MarkdownWidgetDesignerComponent extends React.Component 
   @propTypes: 
     design: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func.isRequired
