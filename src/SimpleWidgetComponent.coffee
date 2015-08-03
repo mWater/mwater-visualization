@@ -14,6 +14,7 @@ module.exports = class SimpleWidgetComponent extends React.Component
     
     connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
     connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
+    dropdownItems: React.PropTypes.arrayOf(React.PropTypes.shape({name: React.PropTypes.string.isRequired, onClick: React.PropTypes.func.isRequired})).isRequired # A list of {name, onClick} actions for the dropdown
 
   handleClick: (ev) =>
     ev.stopPropagation()
@@ -41,17 +42,28 @@ module.exports = class SimpleWidgetComponent extends React.Component
         H.div style: resizeHandleStyle, className: "mwater-visualization-simple-widget-resize-handle"
         )
 
-  renderRemoveButton: ->
-    removeButtonStyle = {
+  renderDropdownItem: (item) =>
+    return H.li null,
+      H.a onClick: item.onClick, item.name
+
+  renderDropdown: ->
+    dropdownStyle = {
       position: "absolute"
       right: 5
       top: 5
       cursor: "pointer"
     }
 
-    if @props.onRemove
-      H.div style: removeButtonStyle, className: "mwater-visualization-simple-widget-remove-button", onClick: @handleRemove,
-        H.span className: "glyphicon glyphicon-remove"
+    elem = H.div style: dropdownStyle, "data-toggle": "dropdown",
+      H.div {},
+        H.div className: "mwater-visualization-simple-widget-gear-button", onClick: @handleGear,
+          H.span className: "glyphicon glyphicon-cog"
+
+    return H.div style: dropdownStyle,
+      elem
+      H.ul className: "dropdown-menu dropdown-menu-right", style: { top: 25 },
+        _.map(@props.dropdownItems, @renderDropdownItem)        
+        @renderDropdownItem({ name: "Remove", onClick: @handleRemove })
 
   render: ->
     style = { 
@@ -70,7 +82,7 @@ module.exports = class SimpleWidgetComponent extends React.Component
     elem = H.div className: "mwater-visualization-simple-widget", style: style, onClick: @handleClick,
       contents
       @renderResizeHandle()
-      @renderRemoveButton()
+      @renderDropdown()
 
     if @props.connectMoveHandle
       elem = @props.connectMoveHandle(elem)

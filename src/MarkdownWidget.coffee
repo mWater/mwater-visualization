@@ -26,7 +26,8 @@ module.exports = class MarkdownWidget extends Widget
       height: options.height
       selected: options.selected
       onSelect: options.onSelect
-      onRemove: options.onRemove,
+      onRemove: options.onRemove
+      dropdownItems: [],
         React.createElement(MarkdownWidgetViewComponent, {
           design: @design
         })
