@@ -43,13 +43,13 @@ module.exports = class LayeredChartSvgFileSaver
 
   # design: design of the chart
   # dataSource: data source to use for chart
-  # filters: array of filters to apply (array of expressions)
-  # chart: the chart element
-  constructor: (design, dataSource, filters, chart) ->
+  # queries: array of queries to run
+  # schema: the chart's schema
+  constructor: (design, dataSource, queries, schema) ->
     @design = design
     @dataSource = dataSource
-    @filters = filters
-    @chart = chart
+    @queries = queries
+    @schema = schema
 
   # Handle the data: create the chart, have c3 generate it, and call the function to save it to file
   onQueryDone: (err, data) ->
@@ -57,12 +57,12 @@ module.exports = class LayeredChartSvgFileSaver
       alert(err)# TODO
     else
       props = {
-        design: @chart.cleanDesign(@design)
+        design: @design
         data: data
         width: 800
         height: 800
       }
-      compiler = new LayeredChartCompiler(schema: @chart.schema)
+      compiler = new LayeredChartCompiler(schema: @schema)
       chartOptions = compiler.createChartOptions(props)
       containerDiv = document.createElement("div")
       chartOptions.bindto = containerDiv
@@ -72,6 +72,5 @@ module.exports = class LayeredChartSvgFileSaver
 
   # Get the data and save it to file when finished
   save: ->
-    queries = @chart.createQueries(@design, @filters)
     self = this
-    @dataSource.performQueries(queries, (err, data) -> self.onQueryDone(err, data))
+    @dataSource.performQueries(@queries, (err, data) -> self.onQueryDone(err, data))

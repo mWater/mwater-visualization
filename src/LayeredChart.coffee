@@ -139,5 +139,7 @@ module.exports = class LayeredChart extends Chart
     return React.createElement(LayeredChartViewComponent, props)
 
   createDropdownItems: (design, dataSource, filters) ->
-    saver = new LayeredChartSvgFileSaver(design, dataSource, filters, this)
+    design = @cleanDesign(design)
+    queries = @createQueries(design, filters)
+    saver = new LayeredChartSvgFileSaver(design, dataSource, queries, @schema)
     return [{ node: [H.span(className: "glyphicon glyphicon-save"), " Save"], onClick: -> saver.save() }]
