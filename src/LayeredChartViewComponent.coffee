@@ -4,6 +4,16 @@ H = React.DOM
 ExpressionBuilder = require './ExpressionBuilder'
 LayeredChartCompiler = require './LayeredChartCompiler'
 
+# Get all css tags starting with C3
+getC3Css = () =>
+  css = []
+  for sheet in document.styleSheets
+    rules = sheet.cssRules or sheet.rules
+    for rule in rules
+      if rule.cssText and rule.cssText.startsWith(".c3")
+        css.push(rule.cssText)
+  return css.join('\n')
+
 titleFontSize = 14
 titlePadding = { top: 0, right: 0, bottom: 15, left: 0 }
 
@@ -112,9 +122,10 @@ module.exports = class LayeredChartViewComponent extends React.Component
   updateScope: =>
     dataMap = @getDataMap()
     compiler = new LayeredChartCompiler(schema: @props.schema)
+    el = React.findDOMNode(@refs.chart)
 
     # Handle line and bar charts
-    d3.select(React.findDOMNode(@refs.chart))
+    d3.select(el)
       .selectAll(".c3-chart-bar .c3-bar, .c3-chart-line .c3-circle")
       # Highlight only scoped
       .style("opacity", (d,i) =>
@@ -133,7 +144,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
       )
 
     # Handle pie charts
-    d3.select(React.findDOMNode(@refs.chart))
+    d3.select(el)
       .selectAll(".c3-chart-arcs .c3-chart-arc")
       .style("opacity", (d, i) =>
         dataPoint = @lookupDataPoint(dataMap, d)
@@ -149,6 +160,25 @@ module.exports = class LayeredChartViewComponent extends React.Component
           # Not scoped
           return 1
         )
+
+    # Log SVG with stylesheet info
+    # First get the svg DOM node and make a copy as an XML doc
+    svgStr = el.firstChild.outerHTML
+    xml = $.parseXML(svgStr)
+    svgNode = xml.documentElement
+    # Denote it as svg
+    svgNode.setAttribute("xmlns", "http://www.w3.org/2000/svg")
+    svgNode.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink")
+    # Add a style element with the .c3 css rules for this page
+    styleNode = xml.createElement("style")
+    styleNode.setAttribute("type", "text/css")
+    css = getC3Css()
+    cdata = xml.createCDATASection(css)
+    styleNode.appendChild(cdata)
+    svgNode.insertBefore(styleNode, svgNode.firstChild)
+    # Serialize
+    svgFinalStr = new XMLSerializer().serializeToString(xml)
+    #console.log (svgFinalStr)
 
   # Gets a data point { layerIndex, row } from a d3 object (d)
   lookupDataPoint: (dataMap, d) ->

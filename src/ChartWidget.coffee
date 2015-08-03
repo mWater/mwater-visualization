@@ -3,6 +3,7 @@ H = React.DOM
 Widget = require './Widget'
 QueryDataLoadingComponent = require './QueryDataLoadingComponent'
 SimpleWidgetComponent = require './SimpleWidgetComponent'
+saveAs = require 'filesaver.js'
 
 # A widget which is a chart
 module.exports = class ChartWidget extends Widget
@@ -22,13 +23,27 @@ module.exports = class ChartWidget extends Widget
   #  filters: array of filters to apply (array of expressions)
   #  onScopeChange: called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
   createViewElement: (options) ->
+
+    # create menu actions
+    save = =>
+      alert("Not implemented")
+      return
+      # console.log @chart
+      # blob = new Blob([@chart], {type: "text/plain;charset=utf-8"})
+      # saveAs(blob, "chart.svg")
+    dropdownItems = [
+      { name: [H.span(className: "glyphicon glyphicon-save"), " Save"], onClick: save }
+      { name: [H.span(className: "glyphicon glyphicon-remove"), " Remove"], onClick: options.onRemove }
+    ]
+
     # Wrap in a simple widget
     return React.createElement(SimpleWidgetComponent, 
       width: options.width
       height: options.height
       selected: options.selected
       onSelect: options.onSelect
-      onRemove: options.onRemove,
+      onRemove: options.onRemove
+      dropdownItems: dropdownItems,
         React.createElement(ChartWidgetComponent, {
           chart: @chart
           dataSource: @dataSource
