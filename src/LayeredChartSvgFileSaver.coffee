@@ -1,6 +1,7 @@
 LayeredChartCompiler = require './LayeredChartCompiler'
 saveAs = require 'filesaver.js'
 
+# Get the css rules corresponding to .c3 directly out of the document object
 getC3Css = () =>
   css = []
   for sheet in document.styleSheets
@@ -10,6 +11,7 @@ getC3Css = () =>
         css.push(rule.cssText)
   return css.join('\n')
 
+# Get the svg XML text straight from the DOM node, adding the css styling to it as a <style> element
 getC3String = (c3Node) =>
   # Log SVG with stylesheet info
   # First get the svg DOM node and make a copy as an XML doc
@@ -30,22 +32,29 @@ getC3String = (c3Node) =>
   svgFinalStr = new XMLSerializer().serializeToString(xml)
   return svgFinalStr
 
+# Creates the svg string and saves that to file
 saveSvgToFile = (c3Node, title) ->
   svgFinalStr = getC3String(c3Node)
   blob = new Blob([svgFinalStr], {type: "image/svg+xml"})
   saveAs(blob, title + ".svg")
 
+# Saves svg files from layered charts
 module.exports = class LayeredChartSvgFileSaver
+
+  # design: design of the chart
+  # dataSource: data source to use for chart
+  # filters: array of filters to apply (array of expressions)
+  # chart: the chart element
   constructor: (design, dataSource, filters, chart) ->
     @design = design
     @dataSource = dataSource
     @filters = filters
     @chart = chart
 
+  # Handle the data: create the chart, have c3 generate it, and call the function to save it to file
   onQueryDone: (err, data) ->
-    console.log this
     if err
-      # TODO
+      alert(err)# TODO
     else
       props = {
         design: @chart.cleanDesign(@design)
@@ -61,6 +70,7 @@ module.exports = class LayeredChartSvgFileSaver
       chartOptions.onrendered = => _.defer(-> saveSvgToFile(containerDiv.firstChild, title))
       c3.generate(chartOptions)
 
+  # Get the data and save it to file when finished
   save: ->
     queries = @chart.createQueries(@design, @filters)
     self = this
