@@ -428,6 +428,137 @@ var design = {
   }
 };
 
+var design = {
+  "items": {
+    "b5f726be-75b4-4759-b85f-f2ca4428aa78": {
+      "layout": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 12
+      },
+      "widget": {
+        "type": "LayeredChart",
+        "version": "0.0.0",
+        "design": {
+          "type": "pie",
+          "layers": [
+            {
+              "xExpr": {
+                "type": "scalar",
+                "table": "wco_loans",
+                "joins": [],
+                "expr": {
+                  "type": "field",
+                  "table": "wco_loans",
+                  "column": "ruralurban"
+                }
+              },
+              "yExpr": {
+                "type": "scalar",
+                "table": "wco_loans",
+                "joins": [],
+                "expr": {
+                  "type": "field",
+                  "table": "wco_loans",
+                  "column": "numborrow"
+                }
+              },
+              "colorExpr": {
+                "type": "scalar",
+                "table": "wco_loans",
+                "joins": [],
+                "expr": {
+                  "type": "field",
+                  "table": "wco_loans",
+                  "column": "ruralurban"
+                }
+              },
+              "filter": null,
+              "table": "wco_loans",
+              "yAggr": "sum"
+            }
+          ],
+          "titleText": "test"
+        }
+      }
+    },
+    "3b0e218b-4f67-45ec-aed7-6cee6476563b": {
+      "layout": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 12
+      },
+      "widget": {
+        "type": "LayeredChart",
+        "version": "0.0.0",
+        "design": {
+          "type": "pie",
+          "layers": [
+            {
+              "xExpr": null,
+              "yExpr": {
+                "type": "scalar",
+                "table": "wco_loans",
+                "joins": [],
+                "expr": null
+              },
+              "colorExpr": {
+                "type": "scalar",
+                "table": "wco_loans",
+                "joins": [
+                  "programid",
+                  "countryid"
+                ],
+                "expr": {
+                  "type": "field",
+                  "table": "countries",
+                  "column": "name"
+                }
+              },
+              "filter": null,
+              "table": "wco_loans",
+              "yAggr": "count"
+            }
+          ]
+        }
+      }
+    },
+    "8ece6cee-b8ae-4318-bc9d-6237ebeeec9e": {
+      "layout": {
+        "x": 0,
+        "y": 12,
+        "w": 12,
+        "h": 12
+      },
+      "widget": {
+        "type": "TableChart",
+        "version": "0.1.0",
+        "design": {
+          "columns": [
+            {
+              "expr": {
+                "type": "scalar",
+                "table": "countries",
+                "joins": [],
+                "expr": {
+                  "type": "field",
+                  "table": "countries",
+                  "column": "name"
+                }
+              },
+              "headerText": "Country Name"
+            }
+          ],
+          "table": "countries",
+          "titleText": "Countries"
+        }
+      }
+    }
+  }
+};
+
 
 /* First get the schema */
 $.getJSON("water_org_schema.json", function(schemaJson) {
