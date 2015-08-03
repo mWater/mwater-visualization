@@ -4,7 +4,7 @@ fixtures = require './fixtures'
 TableChart = require '../src/TableChart'
 
 compare = (actual, expected) ->
-  assert _.isEqual(actual, expected), JSON.stringify(actual, null, 2)
+  assert _.isEqual(actual, expected) or JSON.stringify(actual) == JSON.stringify(expected), "\n" + JSON.stringify(actual) + "\n" + JSON.stringify(expected)
 
 describe "TableChart", ->
   before ->
@@ -61,8 +61,7 @@ describe "TableChart", ->
           type: "query"
           selects: [
             { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
-            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "decimal" }] }, alias: "c1" }
-          ]
+            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "decimal" }] }, alias: "c1" }          ]
           from: { type: "table", table: "t1", alias: "main" }
           groupBy: [1]
           orderBy: []

@@ -3,6 +3,7 @@ React = require 'react'
 
 Chart = require './Chart'
 ExpressionBuilder = require './ExpressionBuilder'
+ExpressionCompiler = require './ExpressionCompiler'
 
 ###
 Design is:
@@ -10,6 +11,7 @@ Design is:
   table: table to use for data source
   titleText: title text
   columns: array of layers
+  filter: optional logical expression to filter by
 
 column:
   headerText: heaer text
@@ -98,8 +100,55 @@ module.exports = class TableChart extends Chart
     # return React.createElement(LayeredChartDesignerComponent, props)
 
   createQueries: (design, filters) ->
-    # compiler = new LayeredChartCompiler(schema: @schema)
-    # return compiler.getQueries(design, filters)
+    # Determine if any aggregation
+    hasAggr = _.any(design.columns, (c) -> c.aggr)
+
+    # Create shell of query
+    query = {
+      type: "query"
+      selects: []
+      from: { type: "table", table: design.table, alias: "main" }
+      groupBy: []
+      orderBy: []
+      limit: 1000
+    }
+
+    # For each column
+    for colNum in [0...design.columns.length]
+      column = design.columns[colNum]
+
+      if column.aggr
+        query.selects.push({ 
+          type: "select"
+          expr: { type: "op", op: column.aggr, exprs: [@compileExpr(column.expr)] }
+          alias: "c#{colNum}" 
+        })
+      else
+        query.selects.push({ 
+          type: "select"
+          expr: @compileExpr(column.expr)
+          alias: "c#{colNum}"
+        })
+
+      # Add group by
+      if not column.aggr and hasAggr
+        query.groupBy.push(colNum + 1)
+
+    # Get relevant filters
+    filters = _.where(filters or [], table: design.table)
+    if design.filter
+      filters.push(design.filter)
+
+    # Compile all filters
+    filters = _.map(filters, @compileExpr)      
+
+    # Wrap if multiple
+    if filters.length > 1
+      query.where = { type: "op", op: "and", exprs: filters }
+    else
+      query.where = filters[0]
+
+    return { main: query }
 
   # Options include 
   # design: design of the chart
@@ -122,3 +171,7 @@ module.exports = class TableChart extends Chart
     # }
 
     # return React.createElement(LayeredChartViewComponent, props)
+
+  compileExpr: (expr) =>
+    exprCompiler = new ExpressionCompiler(@schema)
+    return exprCompiler.compileExpr(expr: expr, tableAlias: "main")

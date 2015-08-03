@@ -25,6 +25,7 @@ layer:
   yAggr: aggregation function if needed for y
   stacked: true to stack
   type: bar/line/spline/scatter/area/pie/donut (overrides main one)
+  filter: optional logical expression to filter by
 
 ###
 module.exports = class LayeredChart extends Chart
