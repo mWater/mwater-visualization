@@ -88,9 +88,6 @@ module.exports = class TableChart extends Chart
     return React.createElement(TableChartDesignerComponent, props)
 
   createQueries: (design, filters) ->
-    # Determine if any aggregation
-    hasAggr = _.any(design.columns, (c) -> c.aggr)
-
     # Create shell of query
     query = {
       type: "query"
@@ -119,7 +116,7 @@ module.exports = class TableChart extends Chart
         })
 
       # Add group by
-      if not column.aggr and hasAggr
+      if not column.aggr
         query.groupBy.push(colNum + 1)
 
     # Get relevant filters

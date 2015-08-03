@@ -20,7 +20,7 @@ describe "TableChart", ->
   describe "createQueries", ->
     # it "includes _id if no grouping", ->
 
-    it "does not group if no aggr", ->
+    it "does group all if no aggr", ->
       design = {
         table: "t1"
         columns: [
@@ -38,7 +38,7 @@ describe "TableChart", ->
             { type: "select", expr: { type: "field", tableAlias: "main", column: "decimal" }, alias: "c1" }
           ]
           from: { type: "table", table: "t1", alias: "main" }
-          groupBy: []
+          groupBy: [1, 2]
           orderBy: []
           limit: 1000
         }
