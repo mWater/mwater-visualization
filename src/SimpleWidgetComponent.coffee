@@ -65,6 +65,9 @@ module.exports = class SimpleWidgetComponent extends React.Component
         _.map(@props.dropdownItems, @renderDropdownItem)        
         @renderDropdownItem({ name: "Remove", onClick: @handleRemove })
 
+  closeMenu: ->
+    $('[data-toggle="dropdown"]').parent().removeClass('open')
+
   render: ->
     style = { 
       width: @props.width
@@ -79,7 +82,7 @@ module.exports = class SimpleWidgetComponent extends React.Component
       React.cloneElement(React.Children.only(@props.children), 
         width: @props.width - 20, height: @props.height - 20)
 
-    elem = H.div className: "mwater-visualization-simple-widget", style: style, onClick: @handleClick,
+    elem = H.div className: "mwater-visualization-simple-widget", style: style, onClick: @handleClick, onMouseLeave: @closeMenu,
       contents
       @renderResizeHandle()
       @renderDropdown()
