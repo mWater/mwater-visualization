@@ -1,4 +1,5 @@
 LayeredChartCompiler = require './LayeredChartCompiler'
+saveAs = require 'filesaver.js'
 
 getC3Css = () =>
   css = []
@@ -29,9 +30,10 @@ getC3String = (c3Node) =>
   svgFinalStr = new XMLSerializer().serializeToString(xml)
   return svgFinalStr
 
-saveSvgToFile = (c3Node) ->
+saveSvgToFile = (c3Node, title) ->
   svgFinalStr = getC3String(c3Node)
-  console.log svgFinalStr
+  blob = new Blob([svgFinalStr], {type: "image/svg+xml"})
+  saveAs(blob, title + ".svg")
 
 module.exports = class LayeredChartSvgFileSaver
   constructor: (design, dataSource, filters, chart) ->
@@ -55,7 +57,8 @@ module.exports = class LayeredChartSvgFileSaver
       chartOptions = compiler.createChartOptions(props)
       containerDiv = document.createElement("div")
       chartOptions.bindto = containerDiv
-      chartOptions.onrendered = => _.defer(-> saveSvgToFile(containerDiv.firstChild))
+      title = @design.titleText
+      chartOptions.onrendered = => _.defer(-> saveSvgToFile(containerDiv.firstChild, title))
       c3.generate(chartOptions)
 
   save: ->

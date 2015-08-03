@@ -3,7 +3,6 @@ H = React.DOM
 Widget = require './Widget'
 QueryDataLoadingComponent = require './QueryDataLoadingComponent'
 SimpleWidgetComponent = require './SimpleWidgetComponent'
-saveAs = require 'filesaver.js'
 
 # A widget which is a chart
 module.exports = class ChartWidget extends Widget
