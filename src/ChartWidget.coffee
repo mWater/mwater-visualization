@@ -26,9 +26,11 @@ module.exports = class ChartWidget extends Widget
 
     # create menu actions
     save = =>
-      console.log @chart
-      blob = new Blob([@chart], {type: "text/plain;charset=utf-8"})
-      saveAs(blob, "chart.svg")
+      alert("Not implemented")
+      return
+      # console.log @chart
+      # blob = new Blob([@chart], {type: "text/plain;charset=utf-8"})
+      # saveAs(blob, "chart.svg")
     dropdownItems = [{name: "Save", onClick: save}]
 
     # Wrap in a simple widget
