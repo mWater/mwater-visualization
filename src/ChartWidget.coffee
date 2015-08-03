@@ -21,32 +21,24 @@ module.exports = class ChartWidget extends Widget
   #  filters: array of filters to apply (array of expressions)
   #  onScopeChange: called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
   createViewElement: (options) ->
-    # create menu actions
-    save = =>
-      alert("Not implemented")
-      return
-      # console.log @chart
-      # blob = new Blob([@chart], {type: "text/plain;charset=utf-8"})
-      # saveAs(blob, "chart.svg")
-    dropdownItems = [
-      { name: [H.span(className: "glyphicon glyphicon-save"), " Save"], onClick: save }
-      { name: [H.span(className: "glyphicon glyphicon-remove"), " Remove"], onClick: options.onRemove }
-    ]
+    dropdownItems = @chart.createDropdownItems(@design, @dataSource, options.filters)
+    dropdownItems.push({ node: [H.span(className: "glyphicon glyphicon-remove"), " Remove"], onClick: options.onRemove })
+
     # Wrap in a simple widget
     return React.createElement(SimpleWidgetComponent,
       selected: options.selected
       onSelect: options.onSelect
       onRemove: options.onRemove
       dropdownItems: dropdownItems,
-        React.createElement(ChartWidgetComponent, {
-          chart: @chart
-          dataSource: @dataSource
-          design: @design
-          scope: options.scope
-          filters: options.filters
-          onScopeChange: options.onScopeChange
-        })
-      )
+      React.createElement(ChartWidgetComponent, {
+        chart: @chart
+        dataSource: @dataSource
+        design: @design
+        scope: options.scope
+        filters: options.filters
+        onScopeChange: options.onScopeChange
+      })
+    )
 
   # Creates a React element that is a designer for the widget
   # options:

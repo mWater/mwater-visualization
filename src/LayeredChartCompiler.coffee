@@ -1,6 +1,8 @@
 ExpressionCompiler = require './ExpressionCompiler'
 ExpressionBuilder = require './ExpressionBuilder'
 
+titlePadding = { top: 0, right: 0, bottom: 15, left: 0 } # TODO move to CSS or make it configurable
+
 # Compiles various parts of a layered chart (line, bar, scatter, spline, area) to C3.js format
 module.exports = class LayeredChartCompiler
   # Pass in schema
@@ -269,6 +271,47 @@ module.exports = class LayeredChartCompiler
       when "text", "enum", "boolean" then "category"
       when "date" then "timeseries"
       else "indexed"
+
+  # Create the chartOptions to pass to c3.generate
+  # props is
+  #   design: chart design element
+  #   data: chart data
+  #   width: chart width
+  #   height: chart height
+  createChartOptions: (props) ->
+    columns = @getColumns(props.design, props.data)
+
+    # Create chart
+    chartDesign = {
+      data: {
+        types: @getTypes(props.design, columns)
+        columns: columns
+        names: @getNames(props.design, props.data)
+        types: @getTypes(props.design, columns)
+        groups: @getGroups(props.design, columns)
+        xs: @getXs(columns)
+      }
+      # Hide if one layer with no colorExpr
+      legend: { hide: (props.design.layers.length == 1 and not props.design.layers[0].colorExpr) }
+      grid: { focus: { show: false } }  # Don't display hover grid
+      axis: {
+        x: {
+          type: @getXAxisType(props.design)
+          label: { text: props.design.xAxisLabelText, position: 'outer-center' }
+        }
+        y: {
+          label: { text: props.design.yAxisLabelText, position: 'outer-center' }
+        }
+        rotated: props.design.transpose
+      }
+      size: { width: props.width, height: props.height }
+      pie: {  expand: false } # Don't expand/contract
+      title: { text: props.design.titleText, padding: titlePadding }
+      subchart: { axis: { x: { show: false } } }
+      transition: { duration: 0 } # Transitions interfere with scoping
+    }
+
+    return chartDesign
 
   # Create a scope based on a row of a layer
   # Scope data is relevant data from row that uniquely identifies scope

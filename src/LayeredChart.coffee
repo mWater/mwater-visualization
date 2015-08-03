@@ -1,5 +1,6 @@
 _ = require 'lodash'
 React = require 'react'
+H = React.DOM
 
 Chart = require './Chart'
 LayeredChartCompiler = require './LayeredChartCompiler'
@@ -135,3 +136,62 @@ module.exports = class LayeredChart extends Chart
     }
 
     return React.createElement(LayeredChartViewComponent, props)
+
+  saveSvgToFile: (design, dataSource, filters, chart) ->
+    console.log "saving"
+    console.log this
+    queries = chart.createQueries(design, filters)
+    onQueryDone = (err, data) =>
+      console.log err
+      console.log data
+      if err
+        # TODO
+      else
+        props = {
+          design: chart.cleanDesign(design)
+          data: data
+          width: 800
+          height: 800
+        }
+        console.log props
+        compiler = new LayeredChartCompiler(schema: chart.schema)
+        el = document.createElement("div")
+        chartOptions = compiler.createChartOptions(props)
+        chartOptions.bindto = el
+        chartOptions.onrendered = => _.defer(->
+          getC3Css = () =>
+            css = []
+            for sheet in document.styleSheets
+              rules = sheet.cssRules or sheet.rules
+              for rule in rules
+                if rule.cssText and rule.cssText.startsWith(".c3")
+                  css.push(rule.cssText)
+            return css.join('\n')
+          # Log SVG with stylesheet info
+          # First get the svg DOM node and make a copy as an XML doc
+          svgStr = el.firstChild.outerHTML
+          xml = $.parseXML(svgStr)
+          svgNode = xml.documentElement
+          # Denote it as svg
+          svgNode.setAttribute("xmlns", "http://www.w3.org/2000/svg")
+          svgNode.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink")
+          # Add a style element with the .c3 css rules for this page
+          styleNode = xml.createElement("style")
+          styleNode.setAttribute("type", "text/css")
+          css = getC3Css()
+          cdata = xml.createCDATASection(css)
+          styleNode.appendChild(cdata)
+          svgNode.insertBefore(styleNode, svgNode.firstChild)
+          # Serialize
+          svgFinalStr = new XMLSerializer().serializeToString(xml)
+          console.log (svgFinalStr)
+        )
+        c3.generate(chartOptions)
+    dataSource.performQueries(queries, onQueryDone)
+
+  createDropdownItems: (design, dataSource, filters) ->
+    saveSvgToFile = @saveSvgToFile
+    chart = this
+    save = () ->
+      saveSvgToFile(design, dataSource, filters, chart)
+    return [{ node: [H.span(className: "glyphicon glyphicon-save"), " Save"], onClick: save }]
