@@ -9,7 +9,7 @@ module.exports = class TableChartViewComponent extends React.Component
     exprBuilder = new ExpressionBuilder(@props.schema)
     column = @props.design.columns[index]
 
-    text = column.headerText or exprBuilder.summarizeExpr(column.expr)
+    text = column.headerText or exprBuilder.summarizeAggrExpr(column.expr, column.aggr)
     H.th null,
       text
 

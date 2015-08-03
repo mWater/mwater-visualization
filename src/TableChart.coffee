@@ -51,6 +51,9 @@ module.exports = class TableChart extends Chart
         if column.aggr and column.aggr not in _.pluck(aggrs, "id")
           delete column.aggr
 
+        # Set count aggr if null expression type
+        if not column.aggr and not @exprBuilder.getExprType(column.expr)
+          column.aggr = "count"
 
     if design.filter
       design.filter = @exprBuilder.cleanExpr(design.filter, design.table)
@@ -103,9 +106,10 @@ module.exports = class TableChart extends Chart
       column = design.columns[colNum]
 
       if column.aggr
+        expr = @compileExpr(column.expr)
         query.selects.push({ 
           type: "select"
-          expr: { type: "op", op: column.aggr, exprs: [@compileExpr(column.expr)] }
+          expr: { type: "op", op: column.aggr, exprs: if expr then [expr] else [] }
           alias: "c#{colNum}" 
         })
       else

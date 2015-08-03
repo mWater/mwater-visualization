@@ -110,6 +110,25 @@ describe "TableChart", ->
 
       compare(design, expectedDesign)
 
+    it "defaults aggr to count if no expression type", ->
+      design = {
+        table: "t1"
+        columns: [
+          { expr: { type: "scalar", table: "t1", expr: null, joins: [] }, aggr: "sum" }
+        ]
+      }
+
+      design = @chart.cleanDesign(design)
+
+      expectedDesign = {
+        table: "t1"
+        columns: [
+          { expr: { type: "scalar", table: "t1", expr: null, joins: [] }, aggr: "count" }
+        ]
+      }        
+
+      compare(design, expectedDesign)
+
     it "cleans filter"
 
   describe "validateDesign", ->

@@ -95,6 +95,18 @@ describe "ExpressionBuilder", ->
       scalarExpr = { type: "scalar", table: "t1", joins: ['c2'], expr: null, aggr: "count" }
       assert.equal @exprBuilder.summarizeExpr(scalarExpr), "Number of C2"
 
+  describe "summarizeAggrExpr", ->
+    it "summarizes null", ->
+      assert.equal @exprBuilder.summarizeAggrExpr(null), "None"
+
+    it "summarizes field expr", ->
+      expr = { type: "field", table: "t1", column: "c1" }
+      assert.equal @exprBuilder.summarizeAggrExpr(expr), "C1"
+
+    it "summarizes field expr", ->
+      expr = { type: "field", table: "t2", column: "c1" }
+      assert.equal @exprBuilder.summarizeAggrExpr(expr, "sum"), "Total C1"
+
   describe "getExprType", ->
     it 'gets field type', ->
       assert.equal @exprBuilder.getExprType({ type: "field", table: "t1", column: "c1" }), "text"

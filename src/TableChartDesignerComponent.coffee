@@ -114,7 +114,7 @@ class TableChartColumnDesignerComponent extends React.Component
 
     title = "Value"
 
-    H.div className: "form-group",
+    H.div null,
       H.label className: "text-muted", title
       ": "
       React.createElement(ScalarExprComponent, 
@@ -122,15 +122,16 @@ class TableChartColumnDesignerComponent extends React.Component
         schema: @props.schema 
         table: @props.design.table
         value: column.expr
+        includeCount: true # Can include simple counts
         onChange: @handleExprChange)
 
   renderHeader: ->
     column = @props.design.columns[@props.index]
 
     exprBuilder = new ExpressionBuilder(@props.schema)
-    placeholder = exprBuilder.summarizeExpr(column.expr)
+    placeholder = exprBuilder.summarizeAggrExpr(column.expr, column.aggr)
 
-    H.div className: "form-group",
+    H.div null,
       H.label className: "text-muted", "Header"
       ": "
       H.input 
@@ -145,7 +146,8 @@ class TableChartColumnDesignerComponent extends React.Component
     column = @props.design.columns[@props.index]
     exprBuilder = new ExpressionBuilder(@props.schema)
 
-    if not column.expr
+    # Don't show if no column expression or if has no type (count)
+    if not column.expr or not exprBuilder.getExprType(column.expr)
       return
 
     # Get aggregations
@@ -156,7 +158,7 @@ class TableChartColumnDesignerComponent extends React.Component
     aggrs = [{ id: null, name: "None" }].concat(aggrs)
     currentAggr = _.findWhere(aggrs, id: column.aggr)
 
-    return H.div className: "form-group",
+    return H.div null,
       H.label className: "text-muted", "Summarize"
       ": "
       React.createElement(EditableLinkComponent, 
