@@ -43,7 +43,7 @@ module.exports = class SimpleWidgetComponent extends React.Component
         )
 
   renderDropdownItem: (item) =>
-    return H.li null,
+    return H.li key: item.name,
       H.a onClick: item.onClick, item.name
 
   renderDropdown: ->
