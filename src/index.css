@@ -65,12 +65,12 @@
 	display: block;
 }
 
-.mwater-visualization-simple-widget .mwater-visualization-simple-widget-remove-button {
+.mwater-visualization-simple-widget .mwater-visualization-simple-widget-gear-button {
 	display: none;
 	color: #AAA;
 }
 
-.mwater-visualization-simple-widget:hover .mwater-visualization-simple-widget-remove-button {
+.mwater-visualization-simple-widget:hover .mwater-visualization-simple-widget-gear-button {
 	display: block;
 }
 
