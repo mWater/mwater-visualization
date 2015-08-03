@@ -72,10 +72,67 @@ describe "TableChart", ->
       compare(queries, expectedQueries)
 
   describe "cleanDesign", ->
-    it "cleans column expressions"
-    it "removes invalid aggrs"
+    it "cleans column expressions", ->
+      design = {
+        table: "t1"
+        columns: [
+          { expr: { type: "field", table: "t2", column: "text "} } # Wrong table
+        ]
+      }
+
+      design = @chart.cleanDesign(design)
+
+      expectedDesign = {
+        table: "t1"
+        columns: [
+          { expr: null }
+        ]
+      }        
+
+      compare(design, expectedDesign)
+
+    it "removes invalid aggrs", ->
+      design = {
+        table: "t1"
+        columns: [
+          { expr: @exprText, aggr: "sum" }
+        ]
+      }
+
+      design = @chart.cleanDesign(design)
+
+      expectedDesign = {
+        table: "t1"
+        columns: [
+          { expr: @exprText }
+        ]
+      }        
+
+      compare(design, expectedDesign)
+
+    it "cleans filter"
 
   describe "validateDesign", ->
-    it "allows valid design"
-    it "validates column expressions"
+    it "allows valid design", ->
+      design = {
+        table: "t1"
+        columns: [
+          { expr: @exprText }
+        ]
+      }
+
+      assert not @chart.validateDesign(design)
+
+    it "validates column expressions", ->
+      design = {
+        table: "t1"
+        columns: [
+          { expr: null }
+        ]
+      }
+
+      assert @chart.validateDesign(design)
+
+    it "validates filter"
+
 

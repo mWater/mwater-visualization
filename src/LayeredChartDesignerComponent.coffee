@@ -39,7 +39,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     layers.splice(index, 1)
     @updateDesign(layers: layers)
 
-  handleAddSeries: =>
+  handleAddLayer: =>
     layers = @props.design.layers.slice()
     layers.push({})
     @updateDesign(layers: layers)
@@ -122,7 +122,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
   renderLayers: ->
     H.div null, 
       _.map(@props.design.layers, (layer, i) => @renderLayer(i))
-      H.button className: "btn btn-link", type: "button", onClick: @handleAddSeries,
+      H.button className: "btn btn-default btn-xs", type: "button", onClick: @handleAddLayer,
         H.span className: "glyphicon glyphicon-plus"
         " Add Series"
 

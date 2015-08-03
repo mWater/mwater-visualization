@@ -29,8 +29,8 @@ layer:
 
 ###
 module.exports = class LayeredChart extends Chart
-  constructor: (schema) ->
-    @schema = schema
+  constructor: (options) ->
+    @schema = options.schema
     @exprBuilder = new ExpressionBuilder(@schema)
 
   cleanDesign: (design) ->
