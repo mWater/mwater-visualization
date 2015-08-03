@@ -31,7 +31,10 @@ module.exports = class ChartWidget extends Widget
       # console.log @chart
       # blob = new Blob([@chart], {type: "text/plain;charset=utf-8"})
       # saveAs(blob, "chart.svg")
-    dropdownItems = [{name: "Save", onClick: save}]
+    dropdownItems = [
+      { name: [H.span(className: "glyphicon glyphicon-save"), " Save"], onClick: save }
+      { name: [H.span(className: "glyphicon glyphicon-remove"), " Remove"], onClick: options.onRemove }
+    ]
 
     # Wrap in a simple widget
     return React.createElement(SimpleWidgetComponent, 

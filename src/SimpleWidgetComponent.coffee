@@ -14,7 +14,8 @@ module.exports = class SimpleWidgetComponent extends React.Component
     
     connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
     connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
-    dropdownItems: React.PropTypes.arrayOf(React.PropTypes.shape({name: React.PropTypes.string.isRequired, onClick: React.PropTypes.func.isRequired})).isRequired # A list of {name, onClick} actions for the dropdown
+
+    dropdownItems: React.PropTypes.arrayOf(React.PropTypes.shape({name: React.PropTypes.node.isRequired, onClick: React.PropTypes.func.isRequired})).isRequired # A list of {name, onClick} actions for the dropdown
 
   handleClick: (ev) =>
     ev.stopPropagation()
@@ -63,7 +64,6 @@ module.exports = class SimpleWidgetComponent extends React.Component
       elem
       H.ul className: "dropdown-menu dropdown-menu-right", style: { top: 25 },
         _.map(@props.dropdownItems, @renderDropdownItem)        
-        @renderDropdownItem({ name: "Remove", onClick: @handleRemove })
 
   closeMenu: ->
     $('[data-toggle="dropdown"]').parent().removeClass('open')
