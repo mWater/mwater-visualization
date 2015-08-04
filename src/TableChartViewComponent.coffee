@@ -38,6 +38,9 @@ module.exports = class TableChartViewComponent extends React.Component
     H.tbody null,
       _.map(@props.data.main, (row, i) => @renderRow(i))
 
+  shouldComponentUpdate: (prevProps) ->
+    not _.isEqual(prevProps, @props)
+
   render: ->
     style = {
       height: @props.height
