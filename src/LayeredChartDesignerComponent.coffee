@@ -149,28 +149,33 @@ class LayerDesignerComponent extends React.Component
   isXAxisRequired: (layer) ->
     return not @isLayerPolar(layer)
 
+  getAxisLabel: (icon, label) ->
+    H.span null,
+      H.span className: ("glyphicon glyphicon-" + icon)
+      " " + label
+
   # Determine icon/label for color axis
   getXAxisLabel: (layer) ->
     if @props.design.transpose
-      H.span className: "glyphicon glyphicon-resize-vertical", " Vertical Axis"
+      @getAxisLabel("resize-vertical", "Vertical Axis")
     else
-      H.span className: "glyphicon glyphicon-resize-horizontal", " Horizontal Axis"
+      @getAxisLabel("resize-horizontal", "Horizontal Axis")
 
   # Determine icon/label for color axis
   getYAxisLabel: (layer) ->
     if @isLayerPolar(layer)
-      H.span className: "glyphicon glyphicon-repeat", " Angle Axis"
+      @getAxisLabel("repeat", "Angle Axis")
     else if @props.design.transpose
-      H.span className: "glyphicon glyphicon-resize-horizontal", " Horizontal Axis"
+      @getAxisLabel("resize-horizontal", "Horizontal Axis")
     else
-      H.span className: "glyphicon glyphicon-resize-vertical", " Vertical Axis"
+      @getAxisLabel("resize-vertical", "Vertical Axis")
 
   # Determine icon/label for color axis
   getColorAxisLabel: (layer) ->
     if @isLayerPolar(layer)
-      H.span className: "glyphicon glyphicon-text-color", " Label Axis"
+      @getAxisLabel("text-color", "Label Axis")
     else
-      H.span className: "glyphicon glyphicon-equalizer", " Split Axis"
+      @getAxisLabel("equalizer", "Split Axis")
 
   # Updates layer with the specified changes
   updateLayer: (changes) ->
