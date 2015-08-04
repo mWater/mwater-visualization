@@ -17,7 +17,7 @@ module.exports = class DashboardViewComponent extends React.Component
     isDesigning: React.PropTypes.bool.isRequired
     onIsDesigningChange: React.PropTypes.func
 
-    width: React.PropTypes.number.isRequired
+    width: React.PropTypes.number
 
     widgetFactory: React.PropTypes.object.isRequired # Factory of type WidgetFactory to make widgets
 
@@ -104,9 +104,6 @@ module.exports = class DashboardViewComponent extends React.Component
     # Create widget elems
     elems = _.mapValues widgets, (widget, id) =>
       widget.createViewElement({
-        # width and height will be injected by widget container component
-        width: 0
-        height: 0
         selected: id == @props.selectedWidgetId
         onSelect: @props.onSelectedWidgetIdChange.bind(null, id)
         scope: @state.widgetScoper.getScope(id)

@@ -11,8 +11,6 @@ module.exports = class MarkdownWidget extends Widget
 
   # Creates a view of the widget
   # options:
-  #  width: width in pixels
-  #  height: height in pixels
   #  selected: true if selected
   #  onSelect: called when selected
   #  onRemove: called when widget is removed
@@ -22,8 +20,6 @@ module.exports = class MarkdownWidget extends Widget
   createViewElement: (options) ->
     # Wrap in a simple widget
     return React.createElement(SimpleWidgetComponent, 
-      width: options.width
-      height: options.height
       selected: options.selected
       onSelect: options.onSelect
       onRemove: options.onRemove
@@ -42,8 +38,8 @@ module.exports = class MarkdownWidget extends Widget
 class MarkdownWidgetViewComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired # Design of chart
-    width: React.PropTypes.number.isRequired
-    height: React.PropTypes.number.isRequired
+    width: React.PropTypes.number
+    height: React.PropTypes.number
 
   render: ->
     H.div dangerouslySetInnerHTML: { __html: markdown.toHTML(@props.design.markdown or "") }

@@ -11,7 +11,6 @@ module.exports = class ChartTestComponent extends React.Component
     design = @props.chart.cleanDesign(design)
 
     @setState(design: design)
-    console.log JSON.stringify(design, null, 2)
 
   render: ->
     H.div className: "row",

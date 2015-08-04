@@ -5,8 +5,8 @@ H = React.DOM
 # Injects inner width and height to child element
 module.exports = class SimpleWidgetComponent extends React.Component
   @propTypes:
-    width: React.PropTypes.number.isRequired
-    height: React.PropTypes.number.isRequired
+    width: React.PropTypes.number
+    height: React.PropTypes.number
 
     selected: React.PropTypes.bool # true if selected
     onSelect: React.PropTypes.func # called when selected
