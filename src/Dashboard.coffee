@@ -1,4 +1,5 @@
 React = require 'react'
+H = React.DOM
 
 DashboardViewComponent = require './DashboardViewComponent'
 DashboardDesignerComponent = require './DashboardDesignerComponent'
@@ -59,16 +60,18 @@ module.exports = class Dashboard
   # Renders components
   render: ->
     # Create elements
-    viewElem = React.createElement(AutoWidthComponent, {}, 
-      React.createElement(DashboardViewComponent, {
-      design: @design
-      onDesignChange: @handleDesignChange
-      selectedWidgetId: @selectedWidgetId
-      onSelectedWidgetIdChange: @handleSelectedWidgetIdChange
-      isDesigning: @isDesigning
-      onIsDesigningChange: @handleIsDesigningChange
-      widgetFactory: @widgetFactory
-      })
+    viewElem = React.createElement(PrintableDashboard, {},
+      React.createElement(AutoWidthComponent, {}, 
+        React.createElement(DashboardViewComponent, {
+          design: @design
+          onDesignChange: @handleDesignChange
+          selectedWidgetId: @selectedWidgetId
+          onSelectedWidgetIdChange: @handleSelectedWidgetIdChange
+          isDesigning: @isDesigning
+          onIsDesigningChange: @handleIsDesigningChange
+          widgetFactory: @widgetFactory
+        })
+      )
     )
 
     React.render(viewElem, @viewNode)
@@ -91,4 +94,13 @@ module.exports = class Dashboard
 
     if @designerNode
       React.unmountComponentAtNode(@designerNode)
+
+# TODO REMOVE
+class PrintableDashboard extends React.Component 
+  render: ->
+    # TODO REMOVE
+    return H.div null,
+      H.button type: "button", className: "btn btn-link", onClick: (=> @refs.view.callChild("print")),
+        "Print"
+      React.cloneElement(React.Children.only(@props.children), ref: "view")
 

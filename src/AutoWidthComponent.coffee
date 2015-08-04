@@ -20,8 +20,12 @@ module.exports = class AutoWidthComponent extends React.Component
     # Get width of self
     @setState(width: $(React.findDOMNode(this)).innerWidth())
 
+  # Call child component with parameter
+  callChild: (method, params...) =>
+    @refs.child[method].apply(@refs.child, params)
+
   render: ->
     if not @state.width
       return H.div null
     else
-      return React.cloneElement(React.Children.only(@props.children), width: @state.width)
+      return React.cloneElement(React.Children.only(@props.children), width: @state.width, ref: "child")
