@@ -675,3 +675,24 @@ describe "LayeredChartCompiler", ->
       compare(scope.data, { layerIndex: 0, color: "b" })
       compare(scope.name, "T1 Enum is B")
 
+    it "creates null color filter", ->
+      design = {
+        type: "pie"
+        layers: [
+          { xExpr: null, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+        ]
+      }
+
+      row = { color: null, y: 20 }
+      scope = @compiler.createScope(design, 0, row)
+
+      expectedFilter =  {
+        type: "comparison"
+        table: "t1"
+        lhs: @exprEnum
+        op: "is null"
+      }
+
+      compare(scope.filter, expectedFilter)
+      compare(scope.data, { layerIndex: 0, color: null })
+      compare(scope.name, "T1 Enum is None")

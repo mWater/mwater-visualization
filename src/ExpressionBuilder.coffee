@@ -256,7 +256,7 @@ module.exports = class ExpressionBuilder
   # Converts all literals to string, using name of enums
   stringifyExprLiteral: (expr, literal) ->
     if not literal?
-      return "null"
+      return "None"
 
     values = @getExprValues(expr)
     if values

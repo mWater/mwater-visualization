@@ -113,7 +113,7 @@ module.exports = class LayeredChartCompiler
       item = _.findWhere(items, { id: value })
       if item
         return item.name
-    return value
+    return value or "None"
 
   # Gets the columns for C3. Also updates dataMap to be a mapping
   # of "series-" + index to { layerIndex:, row: }
@@ -285,24 +285,42 @@ module.exports = class LayeredChartCompiler
     
     # If x
     if layer.xExpr
-      filters.push({ 
-        type: "comparison"
-        table: layer.table
-        lhs: layer.xExpr
-        op: "="
-        rhs: { type: "literal", valueType: expressionBuilder.getExprType(layer.xExpr), value: row.x } 
-      })
+      if row.x?
+        filters.push({ 
+          type: "comparison"
+          table: layer.table
+          lhs: layer.xExpr
+          op: "="
+          rhs: { type: "literal", valueType: expressionBuilder.getExprType(layer.xExpr), value: row.x } 
+        })
+      else
+        filters.push({ 
+          type: "comparison"
+          table: layer.table
+          lhs: layer.xExpr
+          op: "is null"
+        })
+
       names.push(expressionBuilder.summarizeExpr(layer.xExpr) + " is " + expressionBuilder.stringifyExprLiteral(layer.xExpr, row.x))
       data.x = row.x
 
     if layer.colorExpr
-      filters.push({ 
-        type: "comparison"
-        table: layer.table
-        lhs: layer.colorExpr
-        op: "="
-        rhs: { type: "literal", valueType: expressionBuilder.getExprType(layer.colorExpr), value: row.color } 
-      })
+      if row.color?
+        filters.push({ 
+          type: "comparison"
+          table: layer.table
+          lhs: layer.colorExpr
+          op: "="
+          rhs: { type: "literal", valueType: expressionBuilder.getExprType(layer.colorExpr), value: row.color } 
+        })
+      else
+        filters.push({ 
+          type: "comparison"
+          table: layer.table
+          lhs: layer.colorExpr
+          op: "is null"
+        })
+
       names.push(expressionBuilder.summarizeExpr(layer.colorExpr) + " is " + expressionBuilder.stringifyExprLiteral(layer.colorExpr, row.color))
       data.color = row.color
 

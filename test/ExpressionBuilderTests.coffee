@@ -258,7 +258,7 @@ describe "ExpressionBuilder", ->
     it "stringifies null", ->
       @schema.addColumn("t1", { id: "decimal", name: "Decimal", type: "decimal" })
       str = @exprBuilder.stringifyExprLiteral({ type: "field", table: "t1", column: "decimal" }, null)
-      assert.equal str, "null"
+      assert.equal str, "None"
 
     it "looks up enum", ->
       @schema.addColumn("t1", { id: "enum", name: "Enum", type: "enum", values: [{ id: "a", name: "A" }] })
@@ -268,7 +268,7 @@ describe "ExpressionBuilder", ->
     it "handles null enum", ->
       @schema.addColumn("t1", { id: "enum", name: "Enum", type: "enum", values: [{ id: "a", name: "A" }] })
       str = @exprBuilder.stringifyExprLiteral({ type: "field", table: "t1", column: "enum" }, null)
-      assert.equal str, "null"
+      assert.equal str, "None"
 
     it "handles invalid enum", ->
       @schema.addColumn("t1", { id: "enum", name: "Enum", type: "enum", values: [{ id: "a", name: "A" }] })
