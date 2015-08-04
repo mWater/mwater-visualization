@@ -17,8 +17,7 @@ module.exports = class EditableLinkComponent extends React.Component
   renderDropdownItem: (item) =>
     id = item.id or item.value
     name = item.name or item.label
-
-    return H.li key: id,
+    return H.li key: (id or "null"),
       H.a(key: id, onClick: @props.onDropdownItemClicked.bind(null, id), name)
 
   render: ->
@@ -31,7 +30,7 @@ module.exports = class EditableLinkComponent extends React.Component
     if @props.dropdownItems
       return H.div className: "dropdown", style: { display: "inline-block" },
         elem
-        H.ul className: "dropdown-menu",
+        H.ul className: "dropdown-menu", style: { cursor: "pointer" },
           _.map @props.dropdownItems, @renderDropdownItem
     else
       return elem

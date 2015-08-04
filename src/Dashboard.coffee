@@ -59,7 +59,8 @@ module.exports = class Dashboard
   # Renders components
   render: ->
     # Create elements
-    viewElem = React.createElement(DashboardViewComponent, {
+    viewElem = React.createElement(AutoWidthComponent, {}, 
+      React.createElement(DashboardViewComponent, {
       design: @design
       onDesignChange: @handleDesignChange
       selectedWidgetId: @selectedWidgetId
@@ -68,6 +69,7 @@ module.exports = class Dashboard
       onIsDesigningChange: @handleIsDesigningChange
       widgetFactory: @widgetFactory
       })
+    )
 
     React.render(viewElem, @viewNode)
 
@@ -79,7 +81,6 @@ module.exports = class Dashboard
         onSelectedWidgetIdChange: @handleSelectedWidgetIdChange
         isDesigning: @isDesigning
         onIsDesigningChange: @handleIsDesigningChange
-        width: @width
         widgetFactory: @widgetFactory
         })
       React.render(designerElem, @designerNode)

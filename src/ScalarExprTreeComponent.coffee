@@ -24,7 +24,7 @@ class ScalarExprTreeTreeComponent extends React.Component
     tree: React.PropTypes.array.isRequired    # Tree from ScalarExprTreeBuilder
     value: React.PropTypes.object             # Currently selected value
     onChange: React.PropTypes.func.isRequired # Called with newly selected value
-    frame: React.PropTypes.element            # Scroll frame to fit the tree inside
+    frame: React.PropTypes.instanceOf(ScalarExprTreeComponent) # Scroll frame to fit the tree inside
 
   render: ->
     elems = []
@@ -32,7 +32,7 @@ class ScalarExprTreeTreeComponent extends React.Component
     for item in @props.tree
       if item.children
         elems.push(
-          React.createElement(ScalarExprTreeNodeComponent, item: item, onChange: @props.onChange, value: @props.value, frame: @props.frame))
+          React.createElement(ScalarExprTreeNodeComponent, key: item.name, item: item, onChange: @props.onChange, value: @props.value, frame: @props.frame))
       else 
         elems.push(
           React.createElement(HoverComponent, key: item.name,

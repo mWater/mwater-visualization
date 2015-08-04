@@ -39,7 +39,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     layers.splice(index, 1)
     @updateDesign(layers: layers)
 
-  handleAddSeries: =>
+  handleAddLayer: =>
     layers = @props.design.layers.slice()
     layers.push({})
     @updateDesign(layers: layers)
@@ -110,7 +110,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
       paddingTop: 10
       paddingBottom: 10
     }
-    H.div style: style, 
+    H.div style: style, key: index,
       React.createElement(LayerDesignerComponent, {
         design: @props.design
         schema: @props.schema
@@ -122,7 +122,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
   renderLayers: ->
     H.div null, 
       _.map(@props.design.layers, (layer, i) => @renderLayer(i))
-      H.button className: "btn btn-link", type: "button", onClick: @handleAddSeries,
+      H.button className: "btn btn-default btn-xs", type: "button", onClick: @handleAddLayer,
         H.span className: "glyphicon glyphicon-plus"
         " Add Series"
 
@@ -149,28 +149,33 @@ class LayerDesignerComponent extends React.Component
   isXAxisRequired: (layer) ->
     return not @isLayerPolar(layer)
 
+  getAxisLabel: (icon, label) ->
+    H.span null,
+      H.span className: ("glyphicon glyphicon-" + icon)
+      " " + label
+
   # Determine icon/label for color axis
   getXAxisLabel: (layer) ->
     if @props.design.transpose
-      [H.span(className: "glyphicon glyphicon-resize-vertical"), " Vertical Axis"]
+      @getAxisLabel("resize-vertical", "Vertical Axis")
     else
-      [H.span(className: "glyphicon glyphicon-resize-horizontal"), " Horizontal Axis"]
+      @getAxisLabel("resize-horizontal", "Horizontal Axis")
 
   # Determine icon/label for color axis
   getYAxisLabel: (layer) ->
     if @isLayerPolar(layer)
-      return [H.span(className: "glyphicon glyphicon-repeat"), " Angle Axis"]
+      @getAxisLabel("repeat", "Angle Axis")
     else if @props.design.transpose
-      return [H.span(className: "glyphicon glyphicon-resize-horizontal"), " Horizontal Axis"]
+      @getAxisLabel("resize-horizontal", "Horizontal Axis")
     else
-      return [H.span(className: "glyphicon glyphicon-resize-vertical"), " Vertical Axis"]
+      @getAxisLabel("resize-vertical", "Vertical Axis")
 
   # Determine icon/label for color axis
   getColorAxisLabel: (layer) ->
     if @isLayerPolar(layer)
-      return [H.span(className: "glyphicon glyphicon-text-color"), " Label Axis"]
+      @getAxisLabel("text-color", "Label Axis")
     else
-      return [H.span(className: "glyphicon glyphicon-equalizer"), " Split Axis"]
+      @getAxisLabel("equalizer", "Split Axis")
 
   # Updates layer with the specified changes
   updateLayer: (changes) ->

@@ -48,29 +48,29 @@
 	color: #639db0;
 }
 
-.mwater-chart-widget {
+.mwater-visualization-simple-widget {
 	border: solid 2px transparent;
 	border-radius: 8px;
 }
 
-.mwater-chart-widget:hover {
+.mwater-visualization-simple-widget:hover {
 	border: solid 2px #EEE;
 }
 
-.mwater-chart-widget .mwater-chart-widget-resize-handle {
+.mwater-visualization-simple-widget .mwater-visualization-simple-widget-resize-handle {
 	display: none;
 }
 
-.mwater-chart-widget:hover .mwater-chart-widget-resize-handle {
+.mwater-visualization-simple-widget:hover .mwater-visualization-simple-widget-resize-handle {
 	display: block;
 }
 
-.mwater-chart-widget .mwater-chart-widget-remove-button {
+.mwater-visualization-simple-widget .mwater-visualization-simple-widget-gear-button {
 	display: none;
 	color: #AAA;
 }
 
-.mwater-chart-widget:hover .mwater-chart-widget-remove-button {
+.mwater-visualization-simple-widget:hover .mwater-visualization-simple-widget-gear-button {
 	display: block;
 }
 

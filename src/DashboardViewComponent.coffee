@@ -4,7 +4,6 @@ H = React.DOM
 LegoLayoutEngine = require './LegoLayoutEngine'
 WidgetScoper = require './WidgetScoper'
 WidgetContainerComponent = require './WidgetContainerComponent'
-AutoWidthComponent = require './AutoWidthComponent'
 
 # Displays a dashboard, handling removing and passing up selection events
 module.exports = class DashboardViewComponent extends React.Component
@@ -18,25 +17,7 @@ module.exports = class DashboardViewComponent extends React.Component
     isDesigning: React.PropTypes.bool.isRequired
     onIsDesigningChange: React.PropTypes.func
 
-    widgetFactory: React.PropTypes.object.isRequired # Factory of type WidgetFactory to make widgets
-
-  render: ->
-    React.createElement(AutoWidthComponent, null, 
-      React.createElement(InnerDashboardViewComponent, @props))
-
-# Dashboard component that requires width. Wrapped to inject width automatically
-class InnerDashboardViewComponent extends React.Component
-  @propTypes: 
-    design: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func.isRequired
-
-    selectedWidgetId: React.PropTypes.string
-    onSelectedWidgetIdChange: React.PropTypes.func.isRequired
-
-    isDesigning: React.PropTypes.bool.isRequired
-    onIsDesigningChange: React.PropTypes.func
-
-    width: React.PropTypes.number.isRequired
+    width: React.PropTypes.number
 
     widgetFactory: React.PropTypes.object.isRequired # Factory of type WidgetFactory to make widgets
 
@@ -149,7 +130,7 @@ margin: 0.5in 0.5in 0.5in 0.5in;
     if not scope
       return null
 
-    return H.div style: style, onClick: @handleRemoveScope.bind(null, id),
+    return H.div key: id, style: style, onClick: @handleRemoveScope.bind(null, id),
       scope.name
       " "
       H.span className: "glyphicon glyphicon-remove"
@@ -180,9 +161,6 @@ margin: 0.5in 0.5in 0.5in 0.5in;
     # Create widget elems
     elems = _.mapValues widgets, (widget, id) =>
       widget.createViewElement({
-        # width and height will be injected by widget container component
-        width: 0
-        height: 0
         selected: id == @props.selectedWidgetId
         onSelect: @props.onSelectedWidgetIdChange.bind(null, id)
         scope: @state.widgetScoper.getScope(id)

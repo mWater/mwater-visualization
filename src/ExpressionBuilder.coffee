@@ -117,6 +117,17 @@ module.exports = class ExpressionBuilder
 
     return str
 
+  # Summarize an expression with optional aggregation
+  summarizeAggrExpr: (expr, aggr) ->
+    # Summarize null with count as "Number of {table name}" to handle count(*) case 
+    if expr and not @getExprType(expr) and aggr == "count"
+      summary = "Number of #{@schema.getTable(expr.table).name}"
+    else if not aggr
+      summary = @summarizeExpr(expr)
+    else
+      aggrName = _.findWhere(@getAggrs(expr), { id: aggr }).name
+      return aggrName + " " + @summarizeExpr(expr)
+
   # Clean an expression, returning null if completely invalid, otherwise removing
   # invalid parts
   cleanExpr: (expr, table) ->
@@ -239,12 +250,13 @@ module.exports = class ExpressionBuilder
       column = @schema.getColumn(expr.table, expr.column)
       return column.values
     if expr.type == "scalar"
-      return @getExprValues(expr.expr)  
+      if expr.expr
+        return @getExprValues(expr.expr)  
 
   # Converts all literals to string, using name of enums
-  localizeExprLiteral: (expr, literal) ->
+  stringifyExprLiteral: (expr, literal) ->
     if not literal?
-      return "null"
+      return "None"
 
     values = @getExprValues(expr)
     if values

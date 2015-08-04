@@ -4,9 +4,6 @@ H = React.DOM
 ExpressionBuilder = require './ExpressionBuilder'
 LayeredChartCompiler = require './LayeredChartCompiler'
 
-titleFontSize = 14
-titlePadding = { top: 0, right: 0, bottom: 15, left: 0 }
-
 # Displays a layered chart
 module.exports = class LayeredChartViewComponent extends React.Component
   @propTypes: 
@@ -24,51 +21,16 @@ module.exports = class LayeredChartViewComponent extends React.Component
     @createChart(@props)
     @updateScope()
 
-  createChartOptions: (props) ->
-    compiler = new LayeredChartCompiler(schema: props.schema)
-    columns = compiler.getColumns(props.design, props.data)
-
-    # Create chart
-    chartDesign = {
-      data: {
-        types: compiler.getTypes(props.design, columns)
-        columns: columns
-        names: compiler.getNames(props.design, props.data)
-        types: compiler.getTypes(props.design, columns)
-        groups: compiler.getGroups(props.design, columns)
-        xs: compiler.getXs(columns)
-        onclick: @handleDataClick
-      }
-      # Hide if one layer with no colorExpr      
-      legend: { hide: (props.design.layers.length == 1 and not props.design.layers[0].colorExpr) } 
-      grid: { focus: { show: false } }  # Don't display hover grid
-      axis: {
-        x: {
-          type: compiler.getXAxisType(props.design)
-          label: { text: props.design.xAxisLabelText, position: 'outer-center' }
-        }
-        y: {
-          label: { text: props.design.yAxisLabelText, position: 'outer-center' }
-        }
-        rotated: props.design.transpose
-      }
-      size: { width: props.width, height: props.height }
-      pie: {  expand: false } # Don't expand/contract
-      title: { text: props.design.titleText, padding: titlePadding }
-      subchart: { axis: { x: { show: false } } }
-      transition: { duration: 0 } # Transitions interfere with scoping
-    }
-
-    return chartDesign
-
   createChart: (props) ->
     if @chart
       @chart.destroy()
 
+    compiler = new LayeredChartCompiler(schema: props.schema)
     el = React.findDOMNode(@refs.chart)
-    chartOptions = @createChartOptions(props)
+    chartOptions = compiler.createChartOptions(@props)
     
     chartOptions.bindto = el
+    chartOptions.data.onclick = @handleDataClick
     # Update scope after rendering. Needs a delay to make it happen
     chartOptions.onrendered = => _.defer(@updateScope)
 
@@ -76,8 +38,10 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
   componentDidUpdate: (prevProps) ->
     # Check if options changed
-    oldChartOptions = @createChartOptions(prevProps)
-    newChartOptions = @createChartOptions(@props)
+    oldCompiler = new LayeredChartCompiler(schema: prevProps.schema) # TODO can we consolidate these?
+    oldChartOptions = oldCompiler.createChartOptions(prevProps)
+    newCompiler = new LayeredChartCompiler(schema: @props.schema)
+    newChartOptions = newCompiler.createChartOptions(@props)
 
     # If chart changed
     if not _.isEqual(oldChartOptions, newChartOptions)
@@ -112,9 +76,10 @@ module.exports = class LayeredChartViewComponent extends React.Component
   updateScope: =>
     dataMap = @getDataMap()
     compiler = new LayeredChartCompiler(schema: @props.schema)
+    el = React.findDOMNode(@refs.chart)
 
     # Handle line and bar charts
-    d3.select(React.findDOMNode(@refs.chart))
+    d3.select(el)
       .selectAll(".c3-chart-bar .c3-bar, .c3-chart-line .c3-circle")
       # Highlight only scoped
       .style("opacity", (d,i) =>
@@ -133,7 +98,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
       )
 
     # Handle pie charts
-    d3.select(React.findDOMNode(@refs.chart))
+    d3.select(el)
       .selectAll(".c3-chart-arcs .c3-chart-arc")
       .style("opacity", (d, i) =>
         dataPoint = @lookupDataPoint(dataMap, d)

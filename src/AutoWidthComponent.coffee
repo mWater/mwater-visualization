@@ -18,7 +18,7 @@ module.exports = class AutoWidthComponent extends React.Component
 
   updateWidth: =>
     # Get width of self
-    @setState(width: $(React.findDOMNode(this)).width())
+    @setState(width: $(React.findDOMNode(this)).innerWidth())
 
   render: ->
     if not @state.width
