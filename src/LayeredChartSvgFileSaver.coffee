@@ -47,9 +47,10 @@ module.exports = save: (design, data, schema) ->
   props =
     design: design
     data: data
-    width: 800
-    height: 800
+    width: 400
+    height: 400
   chartOptions = compiler.createChartOptions(props)
+  _.merge(chartOptions, title: padding: top: 30)
   containerDiv = document.createElement("div")
   chartOptions.bindto = containerDiv
   title = design.titleText
