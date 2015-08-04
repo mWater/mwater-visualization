@@ -14,8 +14,6 @@ module.exports = class ChartWidget extends Widget
 
   # Creates a view of the widget
   # options:
-  #  width: width in pixels
-  #  height: height in pixels
   #  selected: true if selected
   #  onSelect: called when selected
   #  onRemove: called when widget is removed
@@ -23,7 +21,6 @@ module.exports = class ChartWidget extends Widget
   #  filters: array of filters to apply (array of expressions)
   #  onScopeChange: called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
   createViewElement: (options) ->
-
     # create menu actions
     save = =>
       alert("Not implemented")
@@ -35,11 +32,8 @@ module.exports = class ChartWidget extends Widget
       { name: [H.span(className: "glyphicon glyphicon-save"), " Save"], onClick: save }
       { name: [H.span(className: "glyphicon glyphicon-remove"), " Remove"], onClick: options.onRemove }
     ]
-
     # Wrap in a simple widget
-    return React.createElement(SimpleWidgetComponent, 
-      width: options.width
-      height: options.height
+    return React.createElement(SimpleWidgetComponent,
       selected: options.selected
       onSelect: options.onSelect
       onRemove: options.onRemove
@@ -66,8 +60,8 @@ class ChartWidgetComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired # Data source to use for chart
     design: React.PropTypes.object.isRequired # Design of chart
 
-    width: React.PropTypes.number.isRequired
-    height: React.PropTypes.number.isRequired
+    width: React.PropTypes.number
+    height: React.PropTypes.number
 
     scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     filters: React.PropTypes.array  # array of filters to apply (array of expressions)

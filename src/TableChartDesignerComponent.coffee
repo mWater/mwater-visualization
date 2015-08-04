@@ -61,7 +61,7 @@ module.exports = class TableChartDesignerComponent extends React.Component
       paddingBottom: 10
     }
 
-    H.div style: style, 
+    H.div key: index, style: style,
       React.createElement(TableChartColumnDesignerComponent, {
         design: @props.design
         schema: @props.schema

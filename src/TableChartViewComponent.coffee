@@ -10,7 +10,7 @@ module.exports = class TableChartViewComponent extends React.Component
     column = @props.design.columns[index]
 
     text = column.headerText or exprBuilder.summarizeAggrExpr(column.expr, column.aggr)
-    H.th null,
+    H.th key: index,
       text
 
   renderHeader: ->
@@ -28,10 +28,10 @@ module.exports = class TableChartViewComponent extends React.Component
     # Convert to string
     exprBuilder = new ExpressionBuilder(@props.schema)
     str = exprBuilder.stringifyExprLiteral(column.expr, value)
-    return H.td(null, str)
+    return H.td(key: rowIndex, str)
 
   renderRow: (index) ->
-    H.tr null,
+    H.tr key: index,
       _.map(@props.design.columns, (column, i) => @renderCell(index, i))
 
   renderBody: ->
