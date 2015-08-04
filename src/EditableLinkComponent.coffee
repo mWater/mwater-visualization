@@ -17,8 +17,7 @@ module.exports = class EditableLinkComponent extends React.Component
   renderDropdownItem: (item) =>
     id = item.id or item.value
     name = item.name or item.label
-
-    return H.li key: id,
+    return H.li key: name,
       H.a(key: id, onClick: @props.onDropdownItemClicked.bind(null, id), name)
 
   render: ->

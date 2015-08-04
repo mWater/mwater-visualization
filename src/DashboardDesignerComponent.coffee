@@ -110,7 +110,7 @@ module.exports = class DashboardDesignerComponent extends React.Component
           H.span className: "caret"
         H.ul className: "dropdown-menu",
           _.map(@props.widgetFactory.getNewWidgetsTypes(), (wt) =>
-            H.li null,
+            H.li key: wt.name,
               H.a onClick: @handleAddWidget.bind(null, wt), wt.name
             )
 

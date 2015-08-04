@@ -110,7 +110,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
       paddingTop: 10
       paddingBottom: 10
     }
-    H.div style: style, 
+    H.div style: style, key: index,
       React.createElement(LayerDesignerComponent, {
         design: @props.design
         schema: @props.schema
@@ -152,25 +152,25 @@ class LayerDesignerComponent extends React.Component
   # Determine icon/label for color axis
   getXAxisLabel: (layer) ->
     if @props.design.transpose
-      [H.span(className: "glyphicon glyphicon-resize-vertical"), " Vertical Axis"]
+      H.span className: "glyphicon glyphicon-resize-vertical", " Vertical Axis"
     else
-      [H.span(className: "glyphicon glyphicon-resize-horizontal"), " Horizontal Axis"]
+      H.span className: "glyphicon glyphicon-resize-horizontal", " Horizontal Axis"
 
   # Determine icon/label for color axis
   getYAxisLabel: (layer) ->
     if @isLayerPolar(layer)
-      return [H.span(className: "glyphicon glyphicon-repeat"), " Angle Axis"]
+      H.span className: "glyphicon glyphicon-repeat", " Angle Axis"
     else if @props.design.transpose
-      return [H.span(className: "glyphicon glyphicon-resize-horizontal"), " Horizontal Axis"]
+      H.span className: "glyphicon glyphicon-resize-horizontal", " Horizontal Axis"
     else
-      return [H.span(className: "glyphicon glyphicon-resize-vertical"), " Vertical Axis"]
+      H.span className: "glyphicon glyphicon-resize-vertical", " Vertical Axis"
 
   # Determine icon/label for color axis
   getColorAxisLabel: (layer) ->
     if @isLayerPolar(layer)
-      return [H.span(className: "glyphicon glyphicon-text-color"), " Label Axis"]
+      H.span className: "glyphicon glyphicon-text-color", " Label Axis"
     else
-      return [H.span(className: "glyphicon glyphicon-equalizer"), " Split Axis"]
+      H.span className: "glyphicon glyphicon-equalizer", " Split Axis"
 
   # Updates layer with the specified changes
   updateLayer: (changes) ->

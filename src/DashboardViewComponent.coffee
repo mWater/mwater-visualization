@@ -73,7 +73,7 @@ module.exports = class DashboardViewComponent extends React.Component
     if not scope
       return null
 
-    return H.div style: style, onClick: @handleRemoveScope.bind(null, id),
+    return H.div key: id, style: style, onClick: @handleRemoveScope.bind(null, id),
       scope.name
       " "
       H.span className: "glyphicon glyphicon-remove"
