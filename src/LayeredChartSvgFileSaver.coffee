@@ -36,41 +36,22 @@ getC3String = (c3Node) =>
 saveSvgToFile = (c3Node, title) ->
   svgFinalStr = getC3String(c3Node)
   blob = new Blob([svgFinalStr], {type: "image/svg+xml"})
-  saveAs(blob, title + ".svg")
+  saveAs(blob, (title or "unnamed-chart") + ".svg")
 
 # Saves svg files from layered charts
-module.exports = class LayeredChartSvgFileSaver
-
-  # design: design of the chart
-  # dataSource: data source to use for chart
-  # queries: array of queries to run
-  # schema: the chart's schema
-  constructor: (design, dataSource, queries, schema) ->
-    @design = design
-    @dataSource = dataSource
-    @queries = queries
-    @schema = schema
-
-  # Handle the data: create the chart, have c3 generate it, and call the function to save it to file
-  onQueryDone: (err, data) ->
-    if err
-      alert(err)# TODO
-    else
-      props = {
-        design: @design
-        data: data
-        width: 800
-        height: 800
-      }
-      compiler = new LayeredChartCompiler(schema: @schema)
-      chartOptions = compiler.createChartOptions(props)
-      containerDiv = document.createElement("div")
-      chartOptions.bindto = containerDiv
-      title = @design.titleText
-      chartOptions.onrendered = => _.defer(-> saveSvgToFile(containerDiv.firstChild, title))
-      c3.generate(chartOptions)
-
-  # Get the data and save it to file when finished
-  save: ->
-    self = this
-    @dataSource.performQueries(@queries, (err, data) -> self.onQueryDone(err, data))
+# design: design of the chart
+# data: results from queries
+# schema: the chart's schema
+module.exports = save: (design, data, schema) ->
+  compiler = new LayeredChartCompiler(schema: schema)
+  props =
+    design: design
+    data: data
+    width: 800
+    height: 800
+  chartOptions = compiler.createChartOptions(props)
+  containerDiv = document.createElement("div")
+  chartOptions.bindto = containerDiv
+  title = design.titleText
+  chartOptions.onrendered = => _.defer(-> saveSvgToFile(containerDiv.firstChild, title))
+  c3.generate(chartOptions)
