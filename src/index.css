@@ -90,3 +90,13 @@
 		page-break-after: always;
 	}
 }
+
+.overflow-auto-except-print {
+	overflow: auto;
+}
+
+@media print {
+	.overflow-auto-except-print {
+		overflow: hidden;
+	}
+}

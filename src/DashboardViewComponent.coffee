@@ -4,6 +4,7 @@ H = React.DOM
 LegoLayoutEngine = require './LegoLayoutEngine'
 WidgetScoper = require './WidgetScoper'
 WidgetContainerComponent = require './WidgetContainerComponent'
+ReactElementPrinter = require './ReactElementPrinter'
 
 # Displays a dashboard, handling removing and passing up selection events
 module.exports = class DashboardViewComponent extends React.Component
@@ -56,62 +57,13 @@ module.exports = class DashboardViewComponent extends React.Component
   handleRemoveScope: (id) =>
     @setState(widgetScoper: @state.widgetScoper.applyScope(id, null))    
 
-  handlePrint: =>
-
-    $("body").append('''
-      <style>
-@media print {
-   body {
-     visibility: hidden;
-    /* width: 612px;*/
-    margin: 0;
-    padding: 0;
-   }
-
-   body > * {
-    display: none;
-   }
-
-   #print_xyz {
-     display: block !important;
-     visibility: visible;
-/*     background-color: #EEE;*/
-     /*border: solid 4px blue;*/
-   }
-
- }
- #print_xyz {
-  display: none;
- }
-
-@page  {
-size: 8.5in 11in; 
-margin: 0.5in 0.5in 0.5in 0.5in; 
-}
-
-
-    </style>
-  ''')
-
-    # Add to body
-    $("body").append('''
-      <div id="print_xyz">
-      </div>
-      ''')
-
-    elem = H.div null, 
-      H.div style: { }
-      React.createElement(InnerDashboardViewComponent, 
-        _.extend(@props, width: 7.5*96))
-    # window.print()
-
-    React.render(elem, $("#print_xyz").get(0), =>
-      _.delay () =>
-        window.print()
-        React.unmountComponentAtNode($("#print_xyz").get(0))
-        $("#print_xyz").remove()
-      , 1000
-      )
+  # Call to print the dashboard
+  print: =>
+    # Create element at 96 dpi (usual for browsers) and 7.5" across (letter - 0.5" each side)
+    elem = React.createElement(DashboardViewComponent, _.extend(@props, width: 7.5*96))
+    
+    printer = new ReactElementPrinter()
+    printer.print(elem)
 
   renderScope: (id) =>
     style = {
@@ -174,19 +126,8 @@ margin: 0.5in 0.5in 0.5in 0.5in;
       position: "relative"
     }
 
-      # H.div style: { position: "absolute", top: 960, left: 1, width: 718, height: 0, border: "dashed 1px red" }
-      # H.div style: { position: "absolute", top: 961, left: 1, width: 718, height: 0, border: "dashed 1px green" }
-      # H.div style: { position: "absolute", top: 1, left: 1, width: 718, height: 958, border: "solid 1px green" }
-      # H.div style: { position: "absolute", top: 960, left: 1, width: 718, height: 958, border: "solid 1px green" }
-      # H.div style: { position: "absolute", top: 2000 }, "PAGE BREAK"
-
     # Render widget container
     return H.div style: style, className: "mwater-visualization-dashboard", onClick: @handleClick,
-      H.button type: "button", onClick: @handlePrint, style: { position: "absolute", right: 0, top: 0, zIndex: 10000 }, "Print"
-      H.div className: "mwater-visualization-page-break", style: { height: @props.width / 7.5 * 10 - 1 }
-      # _.map(_.range(0, 1500, 96), (i)=>
-      #   H.div style: { position: "absolute", top: i, left: 1, width: 718, height: 0, borderTop: "solid 1px green" }
-      #   )
       H.div style: { position: "absolute", top: 0 },
         @renderScopes()
         React.createElement(WidgetContainerComponent, 

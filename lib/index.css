@@ -78,3 +78,25 @@
   font: 14px sans-serif;
   font-weight: bold;
 }
+
+.mwater-visualization-page-break {
+	width: 100%;
+	border-bottom: dashed 1px #AAA;
+}
+
+@media print {
+	.mwater-visualization-page-break {
+		border-bottom: none;
+		page-break-after: always;
+	}
+}
+
+.overflow-auto-except-print {
+	overflow: auto;
+}
+
+@media print {
+	.overflow-auto-except-print {
+		overflow: hidden;
+	}
+}

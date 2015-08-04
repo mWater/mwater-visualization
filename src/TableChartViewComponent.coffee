@@ -44,10 +44,9 @@ module.exports = class TableChartViewComponent extends React.Component
   render: ->
     style = {
       height: @props.height
-      overflow: "auto"
       width: @props.width
     }
-    return H.div style: style, 
+    return H.div style: style, className: "overflow-auto-except-print",
       H.div style: { fontWeight: "bold", textAlign: "center" }, @props.design.titleText
       H.table className: "table table-condensed table-hover", style: { fontSize: "10pt" }, 
         @renderHeader()
