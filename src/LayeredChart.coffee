@@ -1,11 +1,13 @@
 _ = require 'lodash'
 React = require 'react'
+H = React.DOM
 
 Chart = require './Chart'
 LayeredChartCompiler = require './LayeredChartCompiler'
 ExpressionBuilder = require './ExpressionBuilder'
 LayeredChartDesignerComponent = require './LayeredChartDesignerComponent'
 LayeredChartViewComponent = require './LayeredChartViewComponent'
+LayeredChartSvgFileSaver = require './LayeredChartSvgFileSaver'
 
 ###
 Design is:
@@ -135,3 +137,14 @@ module.exports = class LayeredChart extends Chart
     }
 
     return React.createElement(LayeredChartViewComponent, props)
+
+  createDropdownItems: (design, dataSource, filters) ->
+    save = =>
+      design = @cleanDesign(design)
+      queries = @createQueries(design, filters)
+      dataSource.performQueries(queries, (err, data) =>
+        if err
+          alert(err)# TODO
+        else
+          LayeredChartSvgFileSaver.save(design, data, @schema))
+    return [{ node: [H.span(className: "glyphicon glyphicon-save"), " Save"], onClick: save }]

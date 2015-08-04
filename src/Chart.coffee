@@ -25,3 +25,11 @@ module.exports = class Chart
   # onScopeChange: called when scope changes with new scope
   createViewElement: (options) ->
     throw new Error("Not implemented")
+
+  # Creates the dropdown menu items of shape {node, action}
+  # design: design of the chart
+  # dataSource: Data source to use for chart
+  # filters: array of filters to apply (array of expressions)
+  # Returns an empty list by default
+  createDropdownItems: (design, dataSource, filters) ->
+    return []
