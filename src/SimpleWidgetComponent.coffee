@@ -65,8 +65,8 @@ module.exports = class SimpleWidgetComponent extends React.Component
       H.ul className: "dropdown-menu dropdown-menu-right", style: { top: 25 },
         _.map(@props.dropdownItems, @renderDropdownItem)        
 
-  closeMenu: ->
-    $('[data-toggle="dropdown"]').parent().removeClass('open')
+  closeMenu: =>
+    $(React.findDOMNode(this)).find('[data-toggle="dropdown"]').parent().removeClass('open')
 
   render: ->
     style = { 
