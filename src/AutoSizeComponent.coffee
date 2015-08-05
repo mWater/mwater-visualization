@@ -14,7 +14,7 @@ module.exports = class AutoSizeComponent extends React.Component
   componentDidMount: ->
     # Listen for changes
     $(window).on('resize', @updateSize)
-    @updateWidth()
+    @updateSize()
 
   componentWillUnmount: ->
     # Stop listening to resize events
@@ -30,7 +30,7 @@ module.exports = class AutoSizeComponent extends React.Component
     @refs.child[method].apply(@refs.child, params)
 
   render: ->
-    if not @state.width or not @state.height
+    if not @state.width? or not @state.height?
       return H.div null
     else
       overrides = { ref: "child" }
