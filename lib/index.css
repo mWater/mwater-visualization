@@ -1,4 +1,5 @@
 @import "react-select/dist/default.css";
+@import "leaflet/dist/leaflet.css";
 
 /*.items-enter {
 	opacity: 0.1;
