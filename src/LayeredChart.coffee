@@ -7,7 +7,7 @@ LayeredChartCompiler = require './LayeredChartCompiler'
 ExpressionBuilder = require './ExpressionBuilder'
 LayeredChartDesignerComponent = require './LayeredChartDesignerComponent'
 LayeredChartViewComponent = require './LayeredChartViewComponent'
-LayeredChartSvgFileSaver = require './LayeredChartSvgFileSaver'
+DataFileSaver = require './DataFileSaver'
 
 ###
 Design is:
@@ -146,5 +146,5 @@ module.exports = class LayeredChart extends Chart
         if err
           alert(err)# TODO
         else
-          LayeredChartSvgFileSaver.save(design, data, @schema))
+          DataFileSaver.saveDataAsSvg(design, data, @schema))
     return [{ node: [H.span(className: "glyphicon glyphicon-save"), " Save"], onClick: save }]
