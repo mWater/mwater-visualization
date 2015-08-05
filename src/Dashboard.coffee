@@ -3,7 +3,7 @@ H = React.DOM
 
 DashboardViewComponent = require './DashboardViewComponent'
 DashboardDesignerComponent = require './DashboardDesignerComponent'
-AutoWidthComponent = require './AutoWidthComponent'
+AutoSizeComponent = require './AutoSizeComponent'
 
 # Top-level class which holds design of dashboard as state, the undo/redo stack and the DOM elements
 # to render the view and optionally the designer
@@ -61,7 +61,7 @@ module.exports = class Dashboard
   render: ->
     # Create elements
     viewElem = React.createElement(PrintableDashboard, {},
-      React.createElement(AutoWidthComponent, {}, 
+      React.createElement(AutoSizeComponent, { injectWidth: true }, 
         React.createElement(DashboardViewComponent, {
           design: @design
           onDesignChange: @handleDesignChange
