@@ -44,12 +44,13 @@ class MapWidgetViewComponent extends React.Component
     height: React.PropTypes.number
 
   render: ->
-    H.div style: { height: @props.height, width: @props.width },
-      React.createElement(LeafletMapComponent, {
-        baseLayerId: "bing_road"
-        initialCenter: [0, 0]
-        initialZoom: 5
-      })
+    React.createElement(LeafletMapComponent, {
+      baseLayerId: "bing_road"
+      initialCenter: { lat: 0, lng: 10 }
+      initialZoom: 5
+      width: @props.width
+      height: @props.height
+    })
 
 class MapWidgetDesignerComponent extends React.Component 
   @propTypes: 

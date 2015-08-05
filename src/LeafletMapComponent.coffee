@@ -8,6 +8,9 @@ module.exports = class LeafletMapComponent extends React.Component
     baseLayerId: React.PropTypes.string.isRequired # "bing_road", "bing_aerial"
     initialCenter: React.PropTypes.object.isRequired # Leaflet-style { lat:, lng: }
     initialZoom: React.PropTypes.number.isRequired # Zoom level
+
+    width: React.PropTypes.number # Required width
+    height: React.PropTypes.number # Required height
     
     tileLayerUrl: React.PropTypes.string # URL of tile layer
     utfGridLayerUrl: React.PropTypes.string # URL of UTFGrid interactivity layer
@@ -53,6 +56,10 @@ module.exports = class LeafletMapComponent extends React.Component
     )
 
   updateLayers: (prevProps) ->
+    # Update size
+    if prevProps and (prevProps.width != @props.width or prevProps.height != @props.height)
+      @map.invalidateSize()
+
     if not prevProps or @props.baseLayerId != prevProps.baseLayerId
       if @baseLayer
         @map.removeLayer(@baseLayer)
@@ -98,5 +105,4 @@ module.exports = class LeafletMapComponent extends React.Component
       React.unmountComponentAtNode(@legendDiv)
     
   render: -> 
-    H.div(ref: "map", style: { height: "100%" })
-
+    H.div(ref: "map", style: { width: @props.width, height: @props.height })
