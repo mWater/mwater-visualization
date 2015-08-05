@@ -2,6 +2,7 @@ ChartWidget = require './ChartWidget'
 LayeredChart = require './LayeredChart'
 TableChart = require './TableChart'
 MarkdownWidget = require './MarkdownWidget'
+MapWidget = require './MapWidget'
 
 # Creates widgets based on type, version and design 
 module.exports = class WidgetFactory
@@ -21,6 +22,8 @@ module.exports = class WidgetFactory
         return new ChartWidget(chart, design, @dataSource)
       when "Markdown"
         return new MarkdownWidget(design)
+      when "Map"
+        return new MapWidget(design)
       else    
         throw new Error("Unknown widget type #{type}")
 
@@ -31,4 +34,5 @@ module.exports = class WidgetFactory
       { name: "Chart", type: "LayeredChart", version: "0.1.0", design: {} }
       { name: "Table", type: "TableChart", version: "0.1.0", design: {} }
       { name: "Text", type: "Markdown", version: "0.1.0", design: {} }
+      { name: "Map", type: "Map", version: "0.1.0", design: {} }
     ]

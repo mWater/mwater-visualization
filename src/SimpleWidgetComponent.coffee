@@ -10,7 +10,6 @@ module.exports = class SimpleWidgetComponent extends React.Component
 
     selected: React.PropTypes.bool # true if selected
     onSelect: React.PropTypes.func # called when selected
-    onRemove: React.PropTypes.func # called when widget is removed
     
     connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
     connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)

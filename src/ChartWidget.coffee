@@ -27,7 +27,6 @@ module.exports = class ChartWidget extends Widget
     return React.createElement(SimpleWidgetComponent,
       selected: options.selected
       onSelect: options.onSelect
-      onRemove: options.onRemove
       dropdownItems: dropdownItems,
       React.createElement(ChartWidgetComponent, {
         chart: @chart
