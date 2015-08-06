@@ -53,5 +53,9 @@ module.exports = save: (design, data, schema) ->
   containerDiv = document.createElement("div")
   chartOptions.bindto = containerDiv
   title = design.titleText
-  chartOptions.onrendered = => _.defer(-> saveSvgToFile(containerDiv, title))
-  c3.generate(chartOptions)
+  chart = null
+  chartOptions.onrendered = => _.defer(->
+    if chart
+      saveSvgToFile(containerDiv, title)
+      chart = chart.destroy())
+  chart = c3.generate(chartOptions)
