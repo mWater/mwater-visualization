@@ -3,6 +3,8 @@ H = React.DOM
 Widget = require './Widget'
 QueryDataLoadingComponent = require './QueryDataLoadingComponent'
 SimpleWidgetComponent = require './SimpleWidgetComponent'
+CsvBuilder = require './CsvBuilder'
+filesaver = require 'filesaver.js'
 
 # A widget which is a chart
 module.exports = class ChartWidget extends Widget
@@ -10,6 +12,27 @@ module.exports = class ChartWidget extends Widget
     @chart = chart
     @design = design
     @dataSource = dataSource
+
+  # Saves a csv file to disk
+  saveCsvFile: (filters) ->
+    # Get the queries
+    queries = @chart.createQueries(@design, filters)
+
+    # Execute queries
+    @dataSource.performQueries(queries, (err, data) =>
+      if err  
+        return alert("Failed to get data")
+
+      # Create data table
+      table = @chart.createDataTable(@design, data)
+
+      # Convert to csv
+      csv = new CsvBuilder().build(table)
+
+      # Make a blob and save
+      blob = new Blob([csv], {type: "text/csv"})
+      filesaver(blob, "Exported Data.csv")
+    )
 
   # Creates a view of the widget
   # options:
@@ -21,7 +44,8 @@ module.exports = class ChartWidget extends Widget
   #  onScopeChange: called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
   createViewElement: (options) ->
     dropdownItems = @chart.createDropdownItems(@design, @dataSource, options.filters)
-    dropdownItems.push({ label: [H.span(className: "glyphicon glyphicon-remove"), " Remove"], onClick: options.onRemove })
+    dropdownItems.push({ label: "Export Data", icon: "save-file", onClick: => @saveCsvFile() })
+    dropdownItems.push({ label: "Remove", icon: "remove", onClick: options.onRemove })
 
     # Wrap in a simple widget
     return React.createElement(SimpleWidgetComponent,

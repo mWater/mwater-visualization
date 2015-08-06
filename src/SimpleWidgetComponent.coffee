@@ -14,7 +14,11 @@ module.exports = class SimpleWidgetComponent extends React.Component
     connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
     connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
 
-    dropdownItems: React.PropTypes.arrayOf(React.PropTypes.shape({label: React.PropTypes.node.isRequired, onClick: React.PropTypes.func.isRequired})).isRequired # A list of {label, onClick} actions for the dropdown
+    dropdownItems: React.PropTypes.arrayOf(React.PropTypes.shape({
+      label: React.PropTypes.node.isRequired
+      icon: React.PropTypes.string # Glyphicon string. e.g. "remove"
+      onClick: React.PropTypes.func.isRequired
+      })).isRequired # A list of {label, icon, onClick} actions for the dropdown
 
   handleClick: (ev) =>
     ev.stopPropagation()
@@ -44,7 +48,10 @@ module.exports = class SimpleWidgetComponent extends React.Component
 
   renderDropdownItem: (item, i) =>
     return H.li key: "#{i}",
-      H.a onClick: item.onClick, item.label
+      H.a onClick: item.onClick, 
+        if item.icon then H.span(className: "glyphicon glyphicon-#{item.icon} text-muted")
+        if item.icon then " "
+        item.label
 
   renderDropdown: ->
     dropdownStyle = {

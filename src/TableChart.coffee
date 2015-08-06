@@ -7,7 +7,6 @@ ExpressionBuilder = require './ExpressionBuilder'
 ExpressionCompiler = require './ExpressionCompiler'
 TableChartDesignerComponent = require './TableChartDesignerComponent'
 TableChartViewComponent = require './TableChartViewComponent'
-CsvFileSaver = require './CsvFileSaver'
 
 ###
 Design is:
@@ -166,14 +165,19 @@ module.exports = class TableChart extends Chart
     exprCompiler = new ExpressionCompiler(@schema)
     return exprCompiler.compileExpr(expr: expr, tableAlias: "main")
 
-  createDropdownItems: (design, dataSource, filters) ->
-    saveCsv = =>
-      design = @cleanDesign(design)
-      queries = @createQueries(design, filters)
-      dataSource.performQueries(queries, (err, data) =>
-        if err
-          alert(err)# TODO
-        else
-          table = CsvFileSaver.tableFromTableChart(data.main, design.columns, @schema)
-          CsvFileSaver.saveTable(table, design.titleText))
-    return [{ label: [H.span(className: "glyphicon glyphicon-save"), " Save"], onClick: saveCsv }]
+  createDataTable: (design, data) ->
+    renderHeaderCell = (column) =>
+      column.headerText or @exprBuilder.summarizeAggrExpr(column.expr, column.aggr)
+
+    header = _.map(design.columns, renderHeaderCell)
+    table = [header]
+    renderRow = (record) =>
+      renderCell = (column, columnIndex) =>
+        value = record["c#{columnIndex}"]
+        return @exprBuilder.stringifyExprLiteral(column.expr, value)
+
+      return _.map(design.columns, renderCell)
+
+    table = table.concat(_.map(data.main, renderRow))
+    return table
+

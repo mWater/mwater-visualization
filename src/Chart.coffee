@@ -1,4 +1,3 @@
-
 # Common interface for all charts
 module.exports = class Chart
   cleanDesign: (design) ->
@@ -33,3 +32,8 @@ module.exports = class Chart
   # Returns an empty list by default
   createDropdownItems: (design, dataSource, filters) ->
     return []
+
+  # Creates a table form of the chart data. Array of arrays
+  createDataTable: (design, data) ->
+    throw new Error("Not implemented")
+

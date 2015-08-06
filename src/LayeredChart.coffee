@@ -8,7 +8,6 @@ ExpressionBuilder = require './ExpressionBuilder'
 LayeredChartDesignerComponent = require './LayeredChartDesignerComponent'
 LayeredChartViewComponent = require './LayeredChartViewComponent'
 LayeredChartSvgFileSaver = require './LayeredChartSvgFileSaver'
-CsvFileSaver = require './CsvFileSaver'
 
 ###
 Design is:
@@ -140,22 +139,25 @@ module.exports = class LayeredChart extends Chart
     return React.createElement(LayeredChartViewComponent, props)
 
   createDropdownItems: (design, dataSource, filters) ->
+    # TODO validate design before allowing save
     save = =>
       design = @cleanDesign(design)
       queries = @createQueries(design, filters)
       dataSource.performQueries(queries, (err, data) =>
         if err
-          alert(err)# TODO
+          alert("Unable to load data")
         else
           LayeredChartSvgFileSaver.save(design, data, @schema))
-    saveAsCsv = =>
-      design = @cleanDesign(design)
-      queries = @createQueries(design, filters)
-      dataSource.performQueries(queries, (err, data) =>
-        if err
-          alert(err)# TODO
-        else
-          table = CsvFileSaver.tableFromLayeredChart(data.layer0)          
-          CsvFileSaver.saveTable(table, design.titleText))
-    return [{ label: [H.span(className: "glyphicon glyphicon-camera"), " Save Image"], onClick: save }
-            { label: [H.span(className: "glyphicon glyphicon-floppy-save"), " Save Data"], onClick: saveAsCsv }]
+
+    return [{ label: "Save Image", icon: "camera", onClick: save }]
+
+  createDataTable: (design, data) ->
+    return [["x"], [4]]
+  #   if data.length > 0
+  #   fields = Object.getOwnPropertyNames(data[0])
+  #   table = [fields] # header
+  #   renderRow = (record) ->
+  #      _.map(fields, (field) -> record[field])
+  #   table.concat(_.map(data, renderRow))
+  # else []
+
