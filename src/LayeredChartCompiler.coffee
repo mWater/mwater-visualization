@@ -307,7 +307,6 @@ module.exports = class LayeredChartCompiler
       size: { width: props.width, height: props.height }
       pie: {  expand: false } # Don't expand/contract
       title: { text: props.design.titleText, padding: titlePadding }
-      subchart: { axis: { x: { show: false } } }
       transition: { duration: 0 } # Transitions interfere with scoping
     }
 

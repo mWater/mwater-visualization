@@ -35,7 +35,6 @@ getC3String = (c3Node) =>
 # Creates the svg string and saves that to file
 saveSvgToFile = (containerDiv, title) ->
   svgFinalStr = getC3String(containerDiv.firstChild)
-  document.body.removeChild(containerDiv)
   blob = new Blob([svgFinalStr], {type: "image/svg+xml"})
   saveAs(blob, (title or "unnamed-chart") + ".svg")
 
@@ -52,7 +51,6 @@ module.exports = save: (design, data, schema) ->
     height: 600
   chartOptions = compiler.createChartOptions(props)
   containerDiv = document.createElement("div")
-  document.body.appendChild(containerDiv) # Otherwise d3 getBBox doesn't work, odd title placement
   chartOptions.bindto = containerDiv
   title = design.titleText
   chartOptions.onrendered = => _.defer(-> saveSvgToFile(containerDiv, title))
