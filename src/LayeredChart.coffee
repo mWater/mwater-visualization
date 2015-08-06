@@ -157,5 +157,5 @@ module.exports = class LayeredChart extends Chart
         else
           table = CsvFileSaver.tableFromLayeredChart(data.layer0)          
           CsvFileSaver.saveTable(table, design.titleText))
-    return [{ node: [H.span(className: "glyphicon glyphicon-camera"), " Save Image"], onClick: save }
-            { node: [H.span(className: "glyphicon glyphicon-floppy-save"), " Save Data"], onClick: saveAsCsv }]
+    return [{ label: [H.span(className: "glyphicon glyphicon-camera"), " Save Image"], onClick: save }
+            { label: [H.span(className: "glyphicon glyphicon-floppy-save"), " Save Data"], onClick: saveAsCsv }]

@@ -26,7 +26,7 @@ module.exports = class Chart
   createViewElement: (options) ->
     throw new Error("Not implemented")
 
-  # Creates the dropdown menu items of shape {node, action}
+  # Creates the dropdown menu items of shape {label, action}
   # design: design of the chart
   # dataSource: Data source to use for chart
   # filters: array of filters to apply (array of expressions)

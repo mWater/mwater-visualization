@@ -21,7 +21,7 @@ module.exports = class ChartWidget extends Widget
   #  onScopeChange: called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
   createViewElement: (options) ->
     dropdownItems = @chart.createDropdownItems(@design, @dataSource, options.filters)
-    dropdownItems.push({ node: [H.span(className: "glyphicon glyphicon-remove"), " Remove"], onClick: options.onRemove })
+    dropdownItems.push({ label: [H.span(className: "glyphicon glyphicon-remove"), " Remove"], onClick: options.onRemove })
 
     # Wrap in a simple widget
     return React.createElement(SimpleWidgetComponent,

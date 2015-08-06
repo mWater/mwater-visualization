@@ -14,7 +14,7 @@ module.exports = class SimpleWidgetComponent extends React.Component
     connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
     connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
 
-    dropdownItems: React.PropTypes.arrayOf(React.PropTypes.shape({node: React.PropTypes.node.isRequired, onClick: React.PropTypes.func.isRequired})).isRequired # A list of {node, onClick} actions for the dropdown
+    dropdownItems: React.PropTypes.arrayOf(React.PropTypes.shape({label: React.PropTypes.node.isRequired, onClick: React.PropTypes.func.isRequired})).isRequired # A list of {label, onClick} actions for the dropdown
 
   handleClick: (ev) =>
     ev.stopPropagation()
@@ -42,9 +42,9 @@ module.exports = class SimpleWidgetComponent extends React.Component
         H.div style: resizeHandleStyle, className: "mwater-visualization-simple-widget-resize-handle"
         )
 
-  renderDropdownItem: (item) =>
-    return H.li key: item.node,
-      H.a onClick: item.onClick, item.node
+  renderDropdownItem: (item, i) =>
+    return H.li key: "#{i}",
+      H.a onClick: item.onClick, item.label
 
   renderDropdown: ->
     dropdownStyle = {

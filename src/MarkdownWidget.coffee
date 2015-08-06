@@ -18,7 +18,7 @@ module.exports = class MarkdownWidget extends Widget
   #  filters: array of filters to apply (array of expressions)
   #  onScopeChange: called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
   createViewElement: (options) ->
-    dropdownItems = [{ node: [H.span(className: "glyphicon glyphicon-remove"), " Remove"], onClick: options.onRemove }]
+    dropdownItems = [{ label: [H.span(className: "glyphicon glyphicon-remove"), " Remove"], onClick: options.onRemove }]
     
     # Wrap in a simple widget
     return React.createElement(SimpleWidgetComponent, 

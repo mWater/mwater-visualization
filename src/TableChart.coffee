@@ -176,4 +176,4 @@ module.exports = class TableChart extends Chart
         else
           table = CsvFileSaver.tableFromTableChart(data.main, design.columns, @schema)
           CsvFileSaver.saveTable(table, design.titleText))
-    return [{ node: [H.span(className: "glyphicon glyphicon-save"), " Save"], onClick: saveCsv }]
+    return [{ label: [H.span(className: "glyphicon glyphicon-save"), " Save"], onClick: saveCsv }]
