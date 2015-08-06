@@ -55,5 +55,9 @@ module.exports = save: (design, data, schema) ->
   document.body.appendChild(containerDiv) # Otherwise d3 getBBox doesn't work, odd title placement
   chartOptions.bindto = containerDiv
   title = design.titleText
-  chartOptions.onrendered = => _.defer(-> saveSvgToFile(containerDiv, title))
-  c3.generate(chartOptions)
+  chart = null
+  chartOptions.onrendered = => _.defer(->
+    if chart
+      saveSvgToFile(containerDiv, title)
+      chart = chart.destroy())
+  chart = c3.generate(chartOptions)
