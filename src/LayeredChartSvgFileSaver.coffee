@@ -48,8 +48,8 @@ module.exports = save: (design, data, schema) ->
   props =
     design: design
     data: data
-    width: 400
-    height: 400
+    width: 600
+    height: 600
   chartOptions = compiler.createChartOptions(props)
   containerDiv = document.createElement("div")
   document.body.appendChild(containerDiv) # Otherwise d3 getBBox doesn't work, odd title placement

@@ -114,21 +114,25 @@ module.exports = class DashboardDesignerComponent extends React.Component
               H.a onClick: @handleAddWidget.bind(null, wt), wt.name
             )
 
-  renderWidgetDesigner: ->
+  renderWidgetDesigner: (item) ->
     # Get selected widget
-    widgetDef = @props.design.items[@props.selectedWidgetId].widget
+    widgetDef = item.widget
     widget = @props.widgetFactory.createWidget(widgetDef.type, widgetDef.version, widgetDef.design)
 
     # Create design element
     return widget.createDesignerElement(onDesignChange: @handleDesignChange)
 
   render: ->
+    # Get selected item
+    if @props.selectedWidgetId
+      item = @props.design.items[@props.selectedWidgetId]
+
     H.div null, 
       @renderUndoRedo()
       H.br()
 
-      if not @props.selectedWidgetId
-        @renderGeneralDesigner()
+      if item
+        @renderWidgetDesigner(item)
       else
-        @renderWidgetDesigner()
+        @renderGeneralDesigner()
 
