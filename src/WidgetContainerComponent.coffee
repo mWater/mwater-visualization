@@ -1,4 +1,5 @@
 React = require 'react'
+_ = require 'lodash'
 H = React.DOM
 DragSource = require('react-dnd').DragSource
 DropTarget = require('react-dnd').DropTarget
@@ -144,38 +145,38 @@ class Container extends React.Component
         React.cloneElement(@props.elems[id], width: bounds.width, height: bounds.height))
 
   # Calculate a lookup of layouts incorporating hover info
-  calculateLayouts: ->
+  calculateLayouts: (props, state) ->
     # Get hovered block if present
     hoveredDragInfo = null
     hoveredLayout = null  # Layout of hovered block
-    if @state.moveHover
-      hoveredDragInfo = @state.moveHover.dragInfo
+    if state.moveHover
+      hoveredDragInfo = state.moveHover.dragInfo
       hoveredRect = {
-        x: @state.moveHover.x
-        y: @state.moveHover.y
-        width: @state.moveHover.dragInfo.bounds.width
-        height: @state.moveHover.dragInfo.bounds.height
+        x: state.moveHover.x
+        y: state.moveHover.y
+        width: state.moveHover.dragInfo.bounds.width
+        height: state.moveHover.dragInfo.bounds.height
       }
-      hoveredLayout = @props.layoutEngine.rectToLayout(hoveredRect)
+      hoveredLayout = props.layoutEngine.rectToLayout(hoveredRect)
 
-    if @state.resizeHover
-      hoveredDragInfo = @state.resizeHover.dragInfo
+    if state.resizeHover
+      hoveredDragInfo = state.resizeHover.dragInfo
       hoveredRect = {
-        x: @state.resizeHover.dragInfo.bounds.x
-        y: @state.resizeHover.dragInfo.bounds.y
-        width: @state.resizeHover.width
-        height: @state.resizeHover.height
+        x: state.resizeHover.dragInfo.bounds.x
+        y: state.resizeHover.dragInfo.bounds.y
+        width: state.resizeHover.width
+        height: state.resizeHover.height
       }
-      hoveredLayout = @props.layoutEngine.rectToLayout(hoveredRect)
+      hoveredLayout = props.layoutEngine.rectToLayout(hoveredRect)
 
-    layouts = _.clone(@props.layouts)
+    layouts = _.clone(props.layouts)
 
     # Add hovered layout
     if hoveredDragInfo
       layouts[hoveredDragInfo.id] = hoveredLayout
 
     # Perform layout
-    layouts = @props.layoutEngine.performLayout(layouts, if hoveredDragInfo then hoveredDragInfo.id)
+    layouts = props.layoutEngine.performLayout(layouts, if hoveredDragInfo then hoveredDragInfo.id)
     return layouts
 
   renderLayouts: (layouts) ->
@@ -193,8 +194,27 @@ class Container extends React.Component
 
     return renderElems
 
+  # This gets called 100s of times when dragging
+  shouldComponentUpdate: (nextProps, nextState) ->
+    if @props.width != nextProps.width
+      return true
+
+    if @props.layoutEngine != nextProps.layoutEngine
+      return true
+
+    layouts = @calculateLayouts(@props, @state)
+    nextLayouts = @calculateLayouts(nextProps, nextState)
+
+    if not _.isEqual(layouts, nextLayouts)
+      return true
+
+    if not _.isEqual(@props.elems, nextProps.elems)
+      return true
+
+    return false
+
   render: ->
-    layouts = @calculateLayouts()
+    layouts = @calculateLayouts(@props, @state)
 
     # Determine height using layout engine
     style = {
