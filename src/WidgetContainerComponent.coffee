@@ -116,7 +116,9 @@ class Container extends React.Component
       position: "absolute"
     }
 
-  renderLayout: (id, layout) =>
+  # Render a particular layout. Allow visible to be false so that 
+  # dragged elements can retain state
+  renderLayout: (id, layout, visible=true) =>
     # Calculate bounds
     bounds = @props.layoutEngine.getLayoutBounds(layout)
 
@@ -126,6 +128,9 @@ class Container extends React.Component
       left: bounds.x
       top: bounds.y
     }
+
+    if not visible
+      style.display = "none"
 
     # Create dragInfo which is all the info needed to drop the layout
     dragInfo = {
@@ -182,6 +187,8 @@ class Container extends React.Component
       if not hover or id != hover.dragInfo.id
         renderElems.push(@renderLayout(id, layout))
       else
+        # Render it anyway so that its state is retained
+        renderElems.push(@renderLayout(id, layout, false))
         renderElems.push(@renderPlaceholder(@props.layoutEngine.getLayoutBounds(layout)))
 
     return renderElems
