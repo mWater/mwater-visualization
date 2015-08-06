@@ -13,3 +13,6 @@ exports.Dashboard = require './Dashboard'
 exports.DashboardViewComponent = require './DashboardViewComponent'
 exports.DashboardDesignerComponent = require './DashboardDesignerComponent'
 exports.AutoSizeComponent = require './AutoSizeComponent'
+
+exports.BingLayer = require './BingLayer'
+exports.UtfGridLayer = require './UtfGridLayer'
