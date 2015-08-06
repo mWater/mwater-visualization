@@ -152,7 +152,27 @@ module.exports = class LayeredChart extends Chart
     return [{ label: "Save Image", icon: "camera", onClick: save }]
 
   createDataTable: (design, data) ->
-    return [["x"], [4]]
+    # Export only first layer
+    headers = []
+    if design.layers[0].xExpr
+      headers.push(@exprBuilder.summarizeExpr(design.layers[0].xExpr))
+    if design.layers[0].colorExpr
+      headers.push(@exprBuilder.summarizeExpr(design.layers[0].colorExpr))
+    if design.layers[0].yExpr
+      headers.push(@exprBuilder.summarizeAggrExpr(design.layers[0].yExpr, design.layers[0].yAggr))
+    table = [headers]
+
+    for row in data.layer0
+      r = []
+      if design.layers[0].xExpr
+        r.push(@exprBuilder.stringifyExprLiteral(design.layers[0].xExpr, row.x))
+      if design.layers[0].colorExpr
+        r.push(@exprBuilder.stringifyExprLiteral(design.layers[0].colorExpr, row.color))
+      if design.layers[0].yExpr
+        r.push(@exprBuilder.stringifyExprLiteral(design.layers[0].yExpr, row.y))
+      table.push(r)
+
+    return table
   #   if data.length > 0
   #   fields = Object.getOwnPropertyNames(data[0])
   #   table = [fields] # header

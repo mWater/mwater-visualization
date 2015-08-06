@@ -265,6 +265,11 @@ module.exports = class ExpressionBuilder
         return item.name
       return "???"
 
+    if literal == true
+      return "True"
+    if literal == false
+      return "False"
+
     return "#{literal}"
 
   # Returns null if ok, error message if invalid
