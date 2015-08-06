@@ -8,6 +8,7 @@ ExpressionBuilder = require './ExpressionBuilder'
 LayeredChartDesignerComponent = require './LayeredChartDesignerComponent'
 LayeredChartViewComponent = require './LayeredChartViewComponent'
 LayeredChartSvgFileSaver = require './LayeredChartSvgFileSaver'
+CsvFileSaver = require './CsvFileSaver'
 
 ###
 Design is:
@@ -147,4 +148,14 @@ module.exports = class LayeredChart extends Chart
           alert(err)# TODO
         else
           LayeredChartSvgFileSaver.save(design, data, @schema))
-    return [{ node: [H.span(className: "glyphicon glyphicon-save"), " Save"], onClick: save }]
+    saveAsCsv = =>
+      design = @cleanDesign(design)
+      queries = @createQueries(design, filters)
+      dataSource.performQueries(queries, (err, data) =>
+        if err
+          alert(err)# TODO
+        else
+          table = CsvFileSaver.tableFromLayeredChart(data.layer0)          
+          CsvFileSaver.saveTable(table, design.titleText))
+    return [{ node: [H.span(className: "glyphicon glyphicon-camera"), " Save Image"], onClick: save }
+            { node: [H.span(className: "glyphicon glyphicon-floppy-save"), " Save Data"], onClick: saveAsCsv }]

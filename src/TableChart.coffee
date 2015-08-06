@@ -7,6 +7,7 @@ ExpressionBuilder = require './ExpressionBuilder'
 ExpressionCompiler = require './ExpressionCompiler'
 TableChartDesignerComponent = require './TableChartDesignerComponent'
 TableChartViewComponent = require './TableChartViewComponent'
+CsvFileSaver = require './CsvFileSaver'
 
 ###
 Design is:
@@ -164,3 +165,15 @@ module.exports = class TableChart extends Chart
   compileExpr: (expr) =>
     exprCompiler = new ExpressionCompiler(@schema)
     return exprCompiler.compileExpr(expr: expr, tableAlias: "main")
+
+  createDropdownItems: (design, dataSource, filters) ->
+    saveCsv = =>
+      design = @cleanDesign(design)
+      queries = @createQueries(design, filters)
+      dataSource.performQueries(queries, (err, data) =>
+        if err
+          alert(err)# TODO
+        else
+          table = CsvFileSaver.tableFromTableChart(data.main, design.columns, @schema)
+          CsvFileSaver.saveTable(table, design.titleText))
+    return [{ node: [H.span(className: "glyphicon glyphicon-save"), " Save"], onClick: saveCsv }]
