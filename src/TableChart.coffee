@@ -174,6 +174,6 @@ module.exports = class TableChart extends Chart
         if err
           alert(err)# TODO
         else
-          table = CsvFileSaver.tableFromTableChart(data.main, design.columns, new ExpressionBuilder(@schema))
+          table = CsvFileSaver.tableFromTableChart(data.main, design.columns, @schema)
           CsvFileSaver.saveTable(table, design.titleText))
     return [{ node: [H.span(className: "glyphicon glyphicon-save"), " Save"], onClick: saveCsv }]

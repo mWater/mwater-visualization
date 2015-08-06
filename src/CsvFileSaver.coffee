@@ -49,6 +49,7 @@ exportCsv = (rows) ->
   csvString = stringifyCsv(rows, csvifyValue)
 # Third-party code END
 
+module.exports.exportCsv = exportCsv # export this for testing (3rd-party code of unknown origin)
 
 # Saves a table (data[][]) to CSV
 module.exports.saveTable = (table, title) ->
@@ -57,7 +58,11 @@ module.exports.saveTable = (table, title) ->
   saveAs(blob, (title or "unnamed-chart") + ".csv")
 
 # Creates a table (data[][]) from a TableChart, to save as csv
-module.exports.tableFromTableChart = (data, columns, exprBuilder) ->
+module.exports.tableFromTableChart = (data, columns, schema) ->
+  console.log data
+  console.log columns
+  console.log schema
+  exprBuilder = new ExpressionBuilder(schema)
   renderHeaderCell = (column) ->
     column.headerText or exprBuilder.summarizeAggrExpr(column.expr, column.aggr)
   header = _.map(columns, renderHeaderCell)
@@ -71,10 +76,9 @@ module.exports.tableFromTableChart = (data, columns, exprBuilder) ->
 
 # Creates a table (data[][]) from a LayeredChart, using the first layer only, to save as csv
 module.exports.tableFromLayeredChart = (data) ->
-  table = []
   if data.length > 0
     fields = Object.getOwnPropertyNames(data[0])
-    table = [fields]
+    table = [fields] # header
     renderRow = (record) ->
        _.map(fields, (field) -> record[field])
     table.concat(_.map(data, renderRow))
