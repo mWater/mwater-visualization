@@ -12,6 +12,6 @@ describe "CsvBuilder", ->
       ["a", 1, 4.5]
       [3.2, 4, "b", "x"]
     ]
-    csv = new CsvBuilder.build(table)
+    csv = new CsvBuilder().build(table)
     expectedCsv = "a,1,4.5\r\n3.2,4,b,x"
     assert.equal csv, expectedCsv
