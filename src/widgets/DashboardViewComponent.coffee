@@ -4,7 +4,7 @@ H = React.DOM
 LegoLayoutEngine = require './LegoLayoutEngine'
 WidgetScoper = require './WidgetScoper'
 WidgetContainerComponent = require './WidgetContainerComponent'
-ReactElementPrinter = require './ReactElementPrinter'
+ReactElementPrinter = require './../ReactElementPrinter'
 
 # Displays a dashboard, handling removing and passing up selection events
 module.exports = class DashboardViewComponent extends React.Component

@@ -1,18 +1,18 @@
 
 exports.Schema = require './Schema'
-exports.LogicalExprComponent = require './LogicalExprComponent'
-exports.ExpressionBuilder = require './ExpressionBuilder'
-exports.ExpressionCompiler = require './ExpressionCompiler'
-exports.ScalarExprComponent = require './ScalarExprComponent'
+exports.LogicalExprComponent = require './expressions/LogicalExprComponent'
+exports.ExpressionBuilder = require './expressions/ExpressionBuilder'
+exports.ExpressionCompiler = require './expressions/ExpressionCompiler'
+exports.ScalarExprComponent = require './expressions/ScalarExprComponent'
 
 exports.DataSource = require './DataSource'
 exports.CachingDataSource = require './CachingDataSource'
-exports.WidgetFactory = require './WidgetFactory'
+exports.WidgetFactory = require './widgets/WidgetFactory'
 
-exports.Dashboard = require './Dashboard'
-exports.DashboardViewComponent = require './DashboardViewComponent'
-exports.DashboardDesignerComponent = require './DashboardDesignerComponent'
+exports.Dashboard = require './widgets/Dashboard'
+exports.DashboardViewComponent = require './widgets/DashboardViewComponent'
+exports.DashboardDesignerComponent = require './widgets/DashboardDesignerComponent'
 exports.AutoSizeComponent = require './AutoSizeComponent'
 
-exports.BingLayer = require './BingLayer'
-exports.UtfGridLayer = require './UtfGridLayer'
+exports.BingLayer = require './maps/BingLayer'
+exports.UtfGridLayer = require './maps/UtfGridLayer'

@@ -2,7 +2,7 @@ React = require 'react'
 H = React.DOM
 ScalarExprComponent = require './ScalarExprComponent'
 ExpressionBuilder = require './ExpressionBuilder'
-EditableLinkComponent = require './EditableLinkComponent'
+EditableLinkComponent = require './../EditableLinkComponent'
 
 # Aggregated scalar component. Displays a single component that gets 
 module.exports = class AggrScalarExprComponent extends React.Component

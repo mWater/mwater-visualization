@@ -1,8 +1,8 @@
 assert = require('chai').assert
 _ = require 'lodash'
 
-ChartWidget = require '../src/ChartWidget'
-Chart = require '../src/Chart'
+ChartWidget = require '../src/widgets/charts/ChartWidget'
+Chart = require '../src/widgets/charts/Chart'
 DataSource = require '../src/DataSource'
 React = require('react/addons')
 H = React.DOM

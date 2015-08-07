@@ -2,10 +2,10 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 
-ExpressionBuilder = require './ExpressionBuilder'
-EditableLinkComponent = require './EditableLinkComponent'
-PopoverComponent = require './PopoverComponent'
-ScalarExprComponent = require './ScalarExprComponent'
+ExpressionBuilder = require './../../expressions/ExpressionBuilder'
+EditableLinkComponent = require './../../EditableLinkComponent'
+PopoverComponent = require './../../PopoverComponent'
+ScalarExprComponent = require './../../expressions/ScalarExprComponent'
 
 module.exports = class TableChartDesignerComponent extends React.Component
   # Updates design with the specified changes

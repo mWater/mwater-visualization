@@ -3,7 +3,7 @@ H = React.DOM
 ScalarExprComponent = require './ScalarExprComponent'
 literalComponents = require './literalComponents'
 ExpressionBuilder = require './ExpressionBuilder'
-EditableLinkComponent = require './EditableLinkComponent'
+EditableLinkComponent = require './../EditableLinkComponent'
 
 module.exports = class ComparisonExprComponent extends React.Component
   @propTypes: 

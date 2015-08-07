@@ -2,7 +2,7 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 
-ExpressionBuilder = require './ExpressionBuilder'
+ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 
 module.exports = class TableChartViewComponent extends React.Component
   renderHeaderCell: (index) ->

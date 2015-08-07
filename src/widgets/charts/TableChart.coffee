@@ -3,8 +3,8 @@ React = require 'react'
 H = React.DOM
 
 Chart = require './Chart'
-ExpressionBuilder = require './ExpressionBuilder'
-ExpressionCompiler = require './ExpressionCompiler'
+ExpressionBuilder = require './../../expressions/ExpressionBuilder'
+ExpressionCompiler = require './../../expressions/ExpressionCompiler'
 TableChartDesignerComponent = require './TableChartDesignerComponent'
 TableChartViewComponent = require './TableChartViewComponent'
 

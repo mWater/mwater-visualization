@@ -1,12 +1,12 @@
 React = require 'react'
 H = React.DOM
 ReactSelect = require 'react-select'
-ScalarExprComponent = require './ScalarExprComponent'
-AggrScalarExprComponent = require './AggrScalarExprComponent'
-LogicalExprComponent = require './LogicalExprComponent'
-ExpressionBuilder = require './ExpressionBuilder'
-EditableLinkComponent = require './EditableLinkComponent'
-PopoverComponent = require './PopoverComponent'
+ScalarExprComponent = require './../../expressions/ScalarExprComponent'
+AggrScalarExprComponent = require './../../expressions/AggrScalarExprComponent'
+LogicalExprComponent = require './../../expressions/LogicalExprComponent'
+ExpressionBuilder = require './../../expressions/ExpressionBuilder'
+EditableLinkComponent = require './../../EditableLinkComponent'
+PopoverComponent = require './../../PopoverComponent'
 
 module.exports = class LayeredChartDesignerComponent extends React.Component
   @propTypes: 

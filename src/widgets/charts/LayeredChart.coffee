@@ -4,7 +4,7 @@ H = React.DOM
 
 Chart = require './Chart'
 LayeredChartCompiler = require './LayeredChartCompiler'
-ExpressionBuilder = require './ExpressionBuilder'
+ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 LayeredChartDesignerComponent = require './LayeredChartDesignerComponent'
 LayeredChartViewComponent = require './LayeredChartViewComponent'
 LayeredChartSvgFileSaver = require './LayeredChartSvgFileSaver'

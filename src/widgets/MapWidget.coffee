@@ -4,7 +4,7 @@ _ = require 'lodash'
 
 Widget = require './Widget'
 SimpleWidgetComponent = require './SimpleWidgetComponent'
-LeafletMapComponent = require './LeafletMapComponent'
+LeafletMapComponent = require './../maps/LeafletMapComponent'
 
 module.exports = class MapWidget extends Widget
   constructor: (design) ->

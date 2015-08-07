@@ -1,5 +1,5 @@
-ExpressionCompiler = require './ExpressionCompiler'
-ExpressionBuilder = require './ExpressionBuilder'
+ExpressionCompiler = require './../../expressions/ExpressionCompiler'
+ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 
 titlePadding = { top: 0, right: 0, bottom: 15, left: 0 } # TODO move to CSS or make it configurable
 

@@ -1,7 +1,7 @@
 _ = require 'lodash'
 assert = require('chai').assert
 fixtures = require './fixtures'
-LayeredChartCompiler = require '../src/LayeredChartCompiler'
+LayeredChartCompiler = require '../src/widgets/charts/LayeredChartCompiler'
 
 compare = (actual, expected) ->
   assert _.isEqual(actual, expected), JSON.stringify(actual, null, 2)

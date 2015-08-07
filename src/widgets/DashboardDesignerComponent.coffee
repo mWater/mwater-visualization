@@ -2,7 +2,7 @@ React = require 'react'
 H = React.DOM
 uuid = require 'node-uuid'
 LegoLayoutEngine = require './LegoLayoutEngine'
-UndoStack = require './UndoStack'
+UndoStack = require './../UndoStack'
 
 module.exports = class DashboardDesignerComponent extends React.Component
   @propTypes:

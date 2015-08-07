@@ -1,9 +1,9 @@
 React = require 'react'
 H = React.DOM
-Widget = require './Widget'
-QueryDataLoadingComponent = require './QueryDataLoadingComponent'
-SimpleWidgetComponent = require './SimpleWidgetComponent'
-CsvBuilder = require './CsvBuilder'
+Widget = require './../Widget'
+QueryDataLoadingComponent = require './../QueryDataLoadingComponent'
+SimpleWidgetComponent = require './../SimpleWidgetComponent'
+CsvBuilder = require './../../CsvBuilder'
 filesaver = require 'filesaver.js'
 
 # A widget which is a chart

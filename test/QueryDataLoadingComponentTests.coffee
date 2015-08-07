@@ -1,6 +1,6 @@
 assert = require('chai').assert
 _ = require 'lodash'
-QueryDataLoadingComponent = require '../src/QueryDataLoadingComponent'
+QueryDataLoadingComponent = require '../src/widgets/QueryDataLoadingComponent'
 TestComponent = require './TestComponent'
 
 describe "QueryDataLoadingComponent", ->

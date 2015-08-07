@@ -1,4 +1,4 @@
-HoverComponent = require './HoverComponent'
+HoverComponent = require './../HoverComponent'
 React = require 'react'
 H = React.DOM
 

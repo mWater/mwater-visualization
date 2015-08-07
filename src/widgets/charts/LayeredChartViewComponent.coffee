@@ -1,7 +1,7 @@
 React = require 'react'
 H = React.DOM
 
-ExpressionBuilder = require './ExpressionBuilder'
+ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 LayeredChartCompiler = require './LayeredChartCompiler'
 
 # Displays a layered chart

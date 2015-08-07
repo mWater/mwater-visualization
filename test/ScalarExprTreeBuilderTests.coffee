@@ -1,6 +1,6 @@
 assert = require('chai').assert
 _ = require 'lodash'
-ScalarExprTreeBuilder = require '../src/ScalarExprTreeBuilder'
+ScalarExprTreeBuilder = require '../src/expressions/ScalarExprTreeBuilder'
 Schema = require '../src/Schema'
 
 describe "ScalarExprTreeBuilder", ->

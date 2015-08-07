@@ -4,10 +4,10 @@ H = React.DOM
 
 Schema = require './Schema'
 
-ScalarExprComponent = require './ScalarExprComponent'
-literalComponents = require './literalComponents'
-ComparisonExprComponent = require './ComparisonExprComponent'
-LogicalExprComponent = require './LogicalExprComponent'
+ScalarExprComponent = require './expressions/ScalarExprComponent'
+literalComponents = require './expressions/literalComponents'
+ComparisonExprComponent = require './expressions/ComparisonExprComponent'
+LogicalExprComponent = require './expressions/LogicalExprComponent'
 
 createSchema = ->
   # Create simple schema with subtree
@@ -30,7 +30,7 @@ createSchema = ->
 
   return schema
 
-WidgetFactory = require './WidgetFactory'
+WidgetFactory = require './widgets/WidgetFactory'
 
 class SimpleWidgetFactory extends WidgetFactory
   constructor: (schema, dataSource) ->
@@ -55,7 +55,7 @@ $ ->
   # sample = H.div className: "container",
   #   React.createElement(require("./ChartTestComponent"), chart: chart)
   sample = H.div className: "container-fluid",
-    React.createElement(require("./DashboardTestComponent"))
+    React.createElement(require("./widgets/DashboardTestComponent"))
   React.render(sample, document.getElementById('root'))
 
 

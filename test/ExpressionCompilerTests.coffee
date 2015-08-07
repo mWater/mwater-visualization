@@ -1,7 +1,7 @@
 assert = require('chai').assert
 fixtures = require './fixtures'
 
-ExpressionCompiler = require '../src/ExpressionCompiler'
+ExpressionCompiler = require '../src/expressions/ExpressionCompiler'
 
 describe "ExpressionCompiler", ->
   before ->

@@ -3,7 +3,7 @@ H = React.DOM
 
 DashboardViewComponent = require './DashboardViewComponent'
 DashboardDesignerComponent = require './DashboardDesignerComponent'
-AutoSizeComponent = require './AutoSizeComponent'
+AutoSizeComponent = require './../AutoSizeComponent'
 
 # Top-level class which holds design of dashboard as state, the undo/redo stack and the DOM elements
 # to render the view and optionally the designer

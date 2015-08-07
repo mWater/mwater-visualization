@@ -113,13 +113,13 @@ dashboardDesign = {
   }
 }
 
-DataSource = require './DataSource'
+DataSource = require './../DataSource'
 
 class SimpleDataSource extends DataSource 
   performQueries: (queries, cb) ->
     cb(null, data)
 
-Schema = require './Schema'
+Schema = require './../Schema'
 
 createSchema = ->
   # Create simple schema with subtree

@@ -1,6 +1,6 @@
 assert = require('chai').assert
 
-WidgetScoper = require '../src/WidgetScoper'
+WidgetScoper = require '../src/widgets/WidgetScoper'
 
 describe "WidgetScoper", ->
   it "applies scope to scoped widget", ->

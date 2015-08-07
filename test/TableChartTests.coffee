@@ -1,7 +1,7 @@
 _ = require 'lodash'
 assert = require('chai').assert
 fixtures = require './fixtures'
-TableChart = require '../src/TableChart'
+TableChart = require '../src/widgets/charts/TableChart'
 
 compare = (actual, expected) ->
   assert _.isEqual(actual, expected) or JSON.stringify(actual) == JSON.stringify(expected), "\n" + JSON.stringify(actual) + "\n" + JSON.stringify(expected)

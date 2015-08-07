@@ -1,6 +1,6 @@
-ChartWidget = require './ChartWidget'
-LayeredChart = require './LayeredChart'
-TableChart = require './TableChart'
+ChartWidget = require './charts/ChartWidget'
+LayeredChart = require './charts/LayeredChart'
+TableChart = require './charts/TableChart'
 MarkdownWidget = require './MarkdownWidget'
 MapWidget = require './MapWidget'
 

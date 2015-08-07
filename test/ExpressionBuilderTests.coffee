@@ -1,7 +1,7 @@
 assert = require('chai').assert
 _ = require 'lodash'
 Schema = require '../src/Schema'
-ExpressionBuilder = require '../src/ExpressionBuilder'
+ExpressionBuilder = require '../src/expressions/ExpressionBuilder'
 fixtures = require './fixtures'
 
 describe "ExpressionBuilder", ->

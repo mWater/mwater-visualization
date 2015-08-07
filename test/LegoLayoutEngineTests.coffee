@@ -1,6 +1,6 @@
 assert = require('chai').assert
 _ = require 'lodash'
-LegoLayoutEngine = require '../src/LegoLayoutEngine'
+LegoLayoutEngine = require '../src/widgets/LegoLayoutEngine'
 
 describe "LegoLayoutEngine", ->
   before ->
