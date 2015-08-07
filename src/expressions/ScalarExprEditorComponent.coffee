@@ -1,9 +1,9 @@
 React = require 'react'
 H = React.DOM
-ReactSelect = require 'react-select'
 ScalarExprTreeBuilder = require './ScalarExprTreeBuilder'
 ScalarExprTreeComponent = require './ScalarExprTreeComponent'
 ExpressionBuilder = require './ExpressionBuilder'
+EditableLinkComponent = require '../EditableLinkComponent'
 
 # Component which appears in popup to allow editing scalar expression
 module.exports = class ScalarExprEditorComponent extends React.Component
@@ -42,20 +42,25 @@ module.exports = class ScalarExprEditorComponent extends React.Component
   renderAggr: ->
     exprBuilder = new ExpressionBuilder(@props.schema)
     if @props.value and @props.value.aggr
-      options = _.map(exprBuilder.getAggrs(@props.value.expr), (aggr) -> { value: aggr.id, label: aggr.name })
+      # Use lower case to fit in sentense
+      options = _.map(exprBuilder.getAggrs(@props.value.expr), (aggr) -> { id: aggr.id, name: aggr.name.toLowerCase() })
 
       # Do not render if only possible aggregation is count
       if options.length == 1 and options[0].value == "count"
         return 
+
+      currentOption = _.findWhere(options, id: @props.value.aggr)
         
       return H.div null,
         H.br()
-        H.label null, "Aggregate by"
-        React.createElement(ReactSelect, { 
-          value: @props.value.aggr, 
-          options: options 
-          onChange: @handleAggrChange
-        })
+        H.div null, 
+          H.label null, "Aggregation"
+        "When there are multiple values, use the "
+        React.createElement(EditableLinkComponent, 
+          dropdownItems: options
+          onDropdownItemClicked: @handleAggrChange
+          if currentOption then currentOption.name
+          )
 
   renderWhere: ->
     exprBuilder = new ExpressionBuilder(@props.schema)

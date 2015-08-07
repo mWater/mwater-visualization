@@ -1,6 +1,8 @@
 # Expressions
 
-## Scalar expressions
+## Expression types
+
+### Scalar expressions
 
 Gets a single value given a row of a table.
 
@@ -11,11 +13,11 @@ Gets a single value given a row of a table.
 `aggr`: Aggregation function to use if any join is multiple, null/undefined if not needed
 `where`: optional logical expression to filter aggregation
 
-### Aggr values
+#### Aggr values
 
 aggr: "last", "sum", "count", "max", "min", "stdev", "stdevp"
 
-## Field expressions 
+### Field expressions 
 
 Column of the database
 
@@ -23,14 +25,14 @@ Column of the database
 `table`: Table id of table
 `column`: Column id of column
 
-## Logical expression
+### Logical expression
 
 `type`: "logical"
 `table`: Table id of table
 `op`: `and` or `or`
 `exprs`: expressions to combine. Either `logical` for nested conditions or `comparison`
 
-## Comparison expressions
+### Comparison expressions
 
 `type`: "comparison"
 `table`: Table id of table 
@@ -38,8 +40,14 @@ Column of the database
 `op`: "=", ">", ">=", "<", "<=", "~*", ">", "<", "= true", "= false", "is null", "is not null", '= any'
 `rhs`: right hand side expressions. `literal` usually.
 
-## Literal expressions
+### Literal expressions
 
 `type`: "literal"
 `valueType`: "text", "integer", "decimal", "boolean", "enum", "date", "enum[]"
 `value`: value of literal. date is ISO 8601
+
+## Notes on `count(*)`
+
+A scalar expression can have an `expr` of `null` and no joins in which case it acts as a null expression.
+
+This is to allow the scalar popup editor to allow selection of the "Number of" something, effectively returning null for `*`
