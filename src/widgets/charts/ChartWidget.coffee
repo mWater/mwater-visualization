@@ -44,7 +44,7 @@ module.exports = class ChartWidget extends Widget
   #  onScopeChange: called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
   createViewElement: (options) ->
     dropdownItems = @chart.createDropdownItems(@design, @dataSource, options.filters)
-    dropdownItems.push({ label: "Export Data", icon: "save-file", onClick: => @saveCsvFile() })
+    dropdownItems.push({ label: "Export Data", icon: "save-file", onClick: => @saveCsvFile(options.filters) })
     dropdownItems.push({ label: "Remove", icon: "remove", onClick: options.onRemove })
 
     # Wrap in a simple widget
