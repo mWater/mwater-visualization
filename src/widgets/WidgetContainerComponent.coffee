@@ -184,7 +184,11 @@ class Container extends React.Component
     hover = @state.moveHover or @state.resizeHover
 
     # Render blocks in their adjusted position
-    for id, layout of layouts
+    ids = []
+    for id of layouts
+      ids.push id
+    for id in _.sortBy(ids)
+      layout = layouts[id]
       if not hover or id != hover.dragInfo.id
         renderElems.push(@renderLayout(id, layout))
       else
