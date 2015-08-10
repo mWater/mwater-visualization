@@ -95,18 +95,24 @@ module.exports = class LeafletMapComponent extends React.Component
 
       if @props.layers
         @tileLayers = []
-        for layer in @layers
+        for layer in @props.layers
+          if not layer.visible
+            continue
+
           tileLayer = L.tileLayer(layer.tileUrl)
           @tileLayers.push(tileLayer)
 
           # TODO Hack for animated zooming
           @map._zoomAnimated = false
-          @map.addLayer(@tileLayer)
+          @map.addLayer(tileLayer)
           @map._zoomAnimated = true
-          leafletDataLayer._container.className += ' leaflet-zoom-hide'
+          tileLayer._container.className += ' leaflet-zoom-hide'
 
         @utfGridLayers = []
-        for layer in @layers
+        for layer in @props.layers
+          if not layer.visible
+            continue
+            
           if layer.utfGridUrl
             utfGridLayer = new L.UtfGrid(layer.utfGridUrl, { useJsonP: false })
             
