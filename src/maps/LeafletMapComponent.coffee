@@ -7,11 +7,17 @@ UtfGridLayer = require './UtfGridLayer'
 module.exports = class LeafletMapComponent extends React.Component
   @propTypes:
     baseLayerId: React.PropTypes.string.isRequired # "bing_road", "bing_aerial"
-    initialCenter: React.PropTypes.object.isRequired # Leaflet-style { lat:, lng: }
-    initialZoom: React.PropTypes.number.isRequired # Zoom level
+    initialBounds: React.PropTypes.shape({
+      w: React.PropTypes.number.isRequired
+      n: React.PropTypes.number.isRequired
+      e: React.PropTypes.number.isRequired
+      s: React.PropTypes.number.isRequired
+      }).isRequired
 
     width: React.PropTypes.number # Required width
     height: React.PropTypes.number # Required height
+
+    onBoundsChange: React.PropTypes.func # Called with bounds in w, n, s, e format
     
     layers: React.PropTypes.arrayOf(React.PropTypes.shape({
       tileUrl: React.PropTypes.string.isRequired # Url in leaflet format
@@ -25,7 +31,20 @@ module.exports = class LeafletMapComponent extends React.Component
   componentDidMount: ->
     # Create map
     mapElem = React.findDOMNode(@refs.map)
-    @map = L.map(mapElem).setView(@props.initialCenter, @props.initialZoom)
+    @map = L.map(mapElem)
+
+    # Fire onBoundsChange
+    @map.on "moveend", => 
+      if @props.onBoundsChange
+        bounds = @map.getBounds()
+        @props.onBoundsChange({ 
+          w: bounds.getWest() 
+          n: bounds.getNorth() 
+          e: bounds.getEast() 
+          s: bounds.getSouth() 
+        })
+
+    @map.fitBounds(new L.LatLngBounds([[@props.initialBounds.n, @props.initialBounds.w], [@props.initialBounds.s, @props.initialBounds.e]]))
 
     # Add legend
     @legendControl = L.control({position: 'bottomright'})

@@ -65,6 +65,7 @@ $ ->
     baseLayer: "bing_road"
     layerViews: layerViews
     filters: {}
+    bounds: { w: 0, n: 0, e: 40, s: -25 }
   }
 
   sample = React.createElement(MapDemoComponent, initialDesign: design, schema: schema)

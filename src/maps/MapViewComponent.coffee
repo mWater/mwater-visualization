@@ -9,13 +9,23 @@ module.exports = class MapViewComponent extends React.Component
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
 
+  handleBoundsChange: (bounds) =>
+    design = _.extend({}, @props.design, bounds: bounds)
+    @props.onDesignChange(design)
+
+  shouldComponentUpdate: (prevProps) ->
+    # Don't update if only initial bounds changed
+    if _.isEqual(_.omit(@props.design, "bounds"), _.omit(prevProps.design, "bounds"))
+      return false
+
+    return true
+
   render: ->
     exprBuilder = new ExpressionBuilder(@props.schema)
 
     # Use only valid ones
     filters = _.values(@props.design.filters)
     filters = _.filter(filters, (expr) => not exprBuilder.validateExpr(expr))
-
 
     # Create layers
     layers = _.map(@props.design.layerViews, (layerView) =>
@@ -28,9 +38,9 @@ module.exports = class MapViewComponent extends React.Component
         })
 
     React.createElement(LeafletMapComponent,
-      initialCenter: [0,20], 
-      initialZoom: 5, 
+      initialBounds: @props.design.bounds
       baseLayerId: @props.design.baseLayer
       layers: layers
       width: @props.width
-      height: @props.height)
+      height: @props.height
+      onBoundsChange: @handleBoundsChange)
