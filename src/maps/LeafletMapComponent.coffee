@@ -12,8 +12,12 @@ module.exports = class LeafletMapComponent extends React.Component
     width: React.PropTypes.number # Required width
     height: React.PropTypes.number # Required height
     
-    tileLayerUrl: React.PropTypes.string # URL of tile layer
-    utfGridLayerUrl: React.PropTypes.string # URL of UTFGrid interactivity layer
+    layers: React.PropTypes.arrayOf(React.PropTypes.shape({
+      tileUrl: React.PropTypes.string.isRequired # Url in leaflet format
+      utfGridUrl:  React.PropTypes.string # Url of interactivity grid
+      visible: React.PropTypes.bool # Visibility
+      opacity: React.PropTypes.number # 0-1
+      })).isRequired # List of layers
 
     legend: React.PropTypes.node # Legend element
 
@@ -29,11 +33,11 @@ module.exports = class LeafletMapComponent extends React.Component
       return @legendDiv
     @legendControl.addTo(@map)
 
-    # Update layers with no previous properties
-    @updateLayers()
+    # Update map with no previous properties
+    @updateMap()
 
   componentDidUpdate: (prevProps) ->
-    @updateLayers(prevProps)
+    @updateMap(prevProps)
 
   componentWillUnmount: ->
     if @legendDiv
@@ -55,11 +59,12 @@ module.exports = class LeafletMapComponent extends React.Component
         .openOn(@map)
     )
 
-  updateLayers: (prevProps) ->
+  updateMap: (prevProps) ->
     # Update size
     if prevProps and (prevProps.width != @props.width or prevProps.height != @props.height)
       @map.invalidateSize()
 
+    # Update base layer
     if not prevProps or @props.baseLayerId != prevProps.baseLayerId
       if @baseLayer
         @map.removeLayer(@baseLayer)
@@ -75,28 +80,38 @@ module.exports = class LeafletMapComponent extends React.Component
       # Base layers are always at back
       @baseLayer.bringToBack()
 
-    if not prevProps or @props.tileLayerUrl != prevProps.tileLayerUrl
-      if @tileLayer
-        @map.removeLayer(@tileLayer)
+    # Update layers
+    if not prevProps or not _.isEqual(@props.layers != prevProps.layers)
+      # TODO This is naive. Could be more surgical about updates
+      if @tileLayers
+        for tileLayer in @tileLayers        
+          @map.removeLayer(tileLayer)
         @tileLayer = null
 
-      if @props.tileLayerUrl
-        @tileLayer = L.tileLayer(layer.tile)
+      if @utfGridLayers
+        for utfGridLayer in @utfGridLayers
+          @map.removeLayer(utfGridLayer)
+        @utfGridLayers = null
 
-        # TODO Hack for animated zooming
-        @map._zoomAnimated = false
-        @map.addLayer(@tileLayer)
-        @map._zoomAnimated = true
-        leafletDataLayer._container.className += ' leaflet-zoom-hide'
+      if @props.layers
+        @tileLayers = []
+        for layer in @layers
+          tileLayer = L.tileLayer(layer.tileUrl)
+          @tileLayers.push(tileLayer)
 
-    if not prevProps or @props.utfGridLayerUrl != prevProps.utfGridLayerUrl
-      if @utfGridLayer
-        @map.removeLayer(@utfGridLayer)
-        @utfGridLayer = null
+          # TODO Hack for animated zooming
+          @map._zoomAnimated = false
+          @map.addLayer(@tileLayer)
+          @map._zoomAnimated = true
+          leafletDataLayer._container.className += ' leaflet-zoom-hide'
 
-      if @props.utfGridLayerUrl
-        @utfGridLayer = new L.UtfGrid(@props.utfGridLayerUrl, { useJsonP: false })
-        @map.addLayer(@utfGridLayer)
+        @utfGridLayers = []
+        for layer in @layers
+          if layer.utfGridUrl
+            utfGridLayer = new L.UtfGrid(layer.utfGridUrl, { useJsonP: false })
+            
+            @map.addLayer(utfGridLayer)
+            @utfGridLayers.push(utfGridLayer)
 
     # Render legend
     if @props.legend

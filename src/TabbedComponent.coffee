@@ -15,7 +15,7 @@ module.exports = class TabbedComponent extends React.Component
     @setState(tabId: tabId)
 
   renderTab: (tab) =>
-    H.li className: (if @state.tabId == tab.id then "active"),
+    H.li key: tab.id, className: (if @state.tabId == tab.id then "active"),
       H.a onClick: @handleClick.bind(null, tab.id),
         tab.label
 
