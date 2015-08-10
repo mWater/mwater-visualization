@@ -23,7 +23,7 @@ gulp.task 'copy', ->
     .pipe(gulp.dest('./lib/'))
 
 gulp.task "browserify", ->
-  shim(browserify("./demo.coffee",
+  shim(browserify("./mapdemo.coffee",
     extensions: [".coffee"]
     basedir: "./src/"
   )).bundle()
@@ -38,7 +38,6 @@ gulp.task "dist", ->
   .on("error", gutil.log)
   .pipe(source("mwater-visualization.js"))
   .pipe(gulp.dest("./dist/js/"))
-
 
 gulp.task "libs_css", ->
   return gulp.src([
@@ -105,7 +104,7 @@ gulp.task "build", gulp.parallel([
 gulp.task 'watch', gulp.series([
   'build'
   gulp.parallel([
-    -> browserSync({ server: "./dist", startPath: "water_org_demo.html" })
+    -> browserSync({ server: "./dist", startPath: "demo.html" })
     -> gulp.watch("./src/**", gulp.series(['build', -> reload()]))
   ])
 ])
