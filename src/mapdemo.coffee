@@ -3,7 +3,7 @@ H = React.DOM
 AutoSizeComponent = require './AutoSizeComponent'
 MapViewComponent = require './maps/MapViewComponent'
 MapDesignerComponent = require './maps/MapDesignerComponent'
-TileSourceFactory = require './maps/TileSourceFactory'
+LayerFactory = require './maps/LayerFactory'
 
 Schema = require './Schema'
 
@@ -40,14 +40,14 @@ $ ->
         # @renderLayer("Safe Water Access", "Within 1000 meters of safe, functional water", true)
         # @renderLayer("Arsenic", "Arsenic levels, WHO standard")
 
-  layers = []
-  addLegacyLayer = (id, name, visible) ->
-    layers.push { 
+  layerViews = []
+  addLegacyLayerView = (id, name, visible) ->
+    layerViews.push { 
       id: id
       name: name
       visible: visible == true
       opacity: 1
-      tileSource: {
+      layer: {
         type: "Legacy"
         design: {
           type: id
@@ -55,15 +55,15 @@ $ ->
       }
     }
 
-  addLegacyLayer("water_points_by_type", "Water Point Type", true)
-  addLegacyLayer("functional_status", "Functionality")
-  addLegacyLayer("ecoli_status", "E.Coli Level")
-  addLegacyLayer("water_access", "Functional Water Access")
-  addLegacyLayer("safe_water_access", "Safe Water Access")
+  addLegacyLayerView("water_points_by_type", "Water Point Type", true)
+  addLegacyLayerView("functional_status", "Functionality")
+  addLegacyLayerView("ecoli_status", "E.Coli Level")
+  addLegacyLayerView("water_access", "Functional Water Access")
+  addLegacyLayerView("safe_water_access", "Safe Water Access")
 
   design = {
     baseLayer: "bing_road"
-    layers: layers
+    layerViews: layerViews
     filters: {}
   }
 
@@ -80,7 +80,7 @@ class MapDemoComponent extends React.Component
     @setState(design: design)
 
   render: ->
-    tileSourceFactory = new TileSourceFactory(schema: @props.schema)
+    layerFactory = new LayerFactory(schema: @props.schema)
 
     H.div style: { height: "100%", width: "100%" },
       H.style null, ''' html, body { height: 100% }'''
@@ -89,11 +89,11 @@ class MapDemoComponent extends React.Component
           React.createElement(MapViewComponent, 
             design: @state.design
             onDesignChange: @handleDesignChange
-            tileSourceFactory: tileSourceFactory)
+            layerFactory: layerFactory)
         )
       H.div style: { position: "absolute", left: "70%", width: "30%" }, 
         React.createElement(MapDesignerComponent, 
           schema: @props.schema, 
           design: @state.design, 
           onDesignChange: @handleDesignChange
-          tileSourceFactory: tileSourceFactory)
+          layerFactory: layerFactory)

@@ -5,32 +5,34 @@ Maps are stored as a base layer, a series of layers and filters.
 ```
 {
 	baseLayer: "bing_road"/"bing_aerial"
-	layers: [ see layer below ]
+	layerViews: [ see layer view below ]
 	filters: filter expression indexed by table. e.g. { sometable: logical expression, etc. }
 }
 ```
 
-## Layer
+## LayerView
+
+Is a view of a layer including whether visible, opacity. 
 
 ```
 {
 	id: unique id
 	name: string name
 	desc: string description
-	tileSource: where to get tiles from. see below.
+	layer: layer contents. see below.
 	visible: true/false
 	opacity: 0.0-1.0
 }
 ```
 
-## Tile Source
+## Layer
 
-Where to get tiles from for a layer.
+Information about a layer
 
 ```
 {
-	type: type of the tile source. Pass this to tile source factory with design
-	design: design of the tile source. Tile-source specific
+	type: type of the layer. Pass this to layer factory with design
+	design: design of the layer. Layer-type specific
 }
 ```
 

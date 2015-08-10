@@ -12,32 +12,32 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     design = _.extend({}, @props.design, changes)
     @props.onDesignChange(design)
 
-  updateLayer: (index, changes) =>
-    # Make new layer
-    layer = @props.design.layers[index]
-    layer = _.extend({}, layer, changes)
+  updateLayerView: (index, changes) =>
+    # Make new layer view
+    layerView = @props.design.layerViews[index]
+    layerView = _.extend({}, layerView, changes)
     
-    layers = @props.design.layers.slice()
-    layers[index] = layer
-    @updateDesign(layers: layers)
+    layerViews = @props.design.layerViews.slice()
+    layerViews[index] = layerView
+    @updateDesign(layerViews: layerViews)
 
   handleBaseLayerChange: (baseLayer) =>
     @updateDesign(baseLayer: baseLayer)
 
-  handleRemoveLayer: (index) =>
-    layers = @props.design.layers.slice()
-    layers.splice(index, 1)
-    @updateDesign(layers: layers)
+  handleRemoveLayerView: (index) =>
+    layerViews = @props.design.layerViews.slice()
+    layerViews.splice(index, 1)
+    @updateDesign(layerViews: layerViews)
 
-  handleAddLayer: =>
+  handleAddLayerView: =>
     alert("TO DO")
-    # layers = @props.design.layers.slice()
+    # layers = @props.design.layerViews.slice()
     # layers.push({})
     # @updateDesign(layers: layers)
 
   handleVisibleClick: (index) =>
-    layer = @props.design.layers[index]
-    @updateLayer(index, visible: not layer.visible)
+    layerView = @props.design.layerViews[index]
+    @updateLayerView(index, visible: not layerView.visible)
 
   renderLayerGearMenu: (layer, index) =>
     H.div className: "btn-group", style: { float: "right" },
@@ -46,9 +46,9 @@ module.exports = class MapLayersDesignerComponent extends React.Component
       H.ul className: "dropdown-menu dropdown-menu-right",
         H.li(null, H.a(null, "Edit Layer"))
         H.li(null, H.a(null, "Set Opacity"))
-        H.li(null, H.a(onClick: @handleRemoveLayer.bind(null, index), "Remove Layer"))
+        H.li(null, H.a(onClick: @handleRemoveLayerView.bind(null, index), "Remove Layer"))
 
-  renderLayer: (layer, index) =>
+  renderLayerView: (layer, index) =>
     # Class of checkbox
     visibleClass = if layer.visible then "mwater-visualization-layer checked" else "mwater-visualization-layer"
 
@@ -79,9 +79,9 @@ module.exports = class MapLayersDesignerComponent extends React.Component
       @renderBaseLayer()
 
       H.ul className: "list-group", 
-        _.map(@props.design.layers, @renderLayer)
+        _.map(@props.design.layerViews, @renderLayerView)
 
       H.div style: { margin: 5 }, 
-        H.button type: "button", className: "btn btn-default", onClick: @handleAddLayer,
+        H.button type: "button", className: "btn btn-default", onClick: @handleAddLayerView,
           H.span className: "glyphicon glyphicon-plus"
           " Add Layer"

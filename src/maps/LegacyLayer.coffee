@@ -1,7 +1,7 @@
-TileSource = require './TileSource'
+Layer = require './Layer'
 
 # Legacy server map
-module.exports = class LegacyTileSource extends TileSource
+module.exports = class LegacyLayer extends Layer
   constructor: (design, schema, client) ->
     @design = design
     @schema = schema

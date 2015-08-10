@@ -1,7 +1,6 @@
 
-# Defines a source for tiles. Each layer on the map has a tile source
-# which has all the logic for rendering the specific data to be viewed
-module.exports = class TileSource
+# Defines a layer for a map which has all the logic for rendering the specific data to be viewed
+module.exports = class Layer
   # Get the url for the tiles with the specified filters applied
   # filters is an array of expressions.
   getTileUrl: (filters) ->

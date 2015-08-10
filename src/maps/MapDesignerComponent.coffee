@@ -7,7 +7,7 @@ MapFiltersDesignerComponent = require './MapFiltersDesignerComponent'
 module.exports = class MapDesignerComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
-    tileSourceFactory: React.PropTypes.object.isRequired # tile source factory to use
+    layerFactory: React.PropTypes.object.isRequired # Layer factory to use
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
 
@@ -19,7 +19,7 @@ module.exports = class MapDesignerComponent extends React.Component
         elem: React.createElement(MapLayersDesignerComponent, 
           schema: @props.schema,
           design: @props.design, 
-          tileSourceFactory: @props.tileSourceFactory,
+          layerFactory: @props.layerFactory,
           onDesignChange: @props.onDesignChange) 
       }
       { 
@@ -28,7 +28,7 @@ module.exports = class MapDesignerComponent extends React.Component
         elem: React.createElement(MapFiltersDesignerComponent, 
           schema: @props.schema,
           design: @props.design, 
-          tileSourceFactory: @props.tileSourceFactory,
+          layerFactory: @props.layerFactory,
           onDesignChange: @props.onDesignChange) 
       }
       { 

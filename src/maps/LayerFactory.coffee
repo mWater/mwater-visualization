@@ -1,14 +1,14 @@
-LegacyTileSource = require './LegacyTileSource'
+LegacyLayer = require './LegacyLayer'
 
-module.exports = class TileSourceFactory
+module.exports = class LayerFactory
   # Pass in:
   #  schema: schema to use
   constructor: (options) ->
     @schema = options.schema
 
-  createTileSource: (type, design) ->
+  createLayer: (type, design) ->
     switch type
       when "Legacy"
-        return new LegacyTileSource(design)
+        return new LegacyLayer(design)
 
     throw new Error("Unknown type #{type}")
