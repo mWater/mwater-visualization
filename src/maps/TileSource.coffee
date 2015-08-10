@@ -17,3 +17,6 @@ module.exports = class TileSource
   getLegend: ->
     return null
 
+  # Get a list of table ids that can be filtered on
+  getFilterableTables: ->
+    return []

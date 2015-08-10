@@ -1,6 +1,7 @@
 H = React.DOM
 L = require 'leaflet'
 BingLayer = require './BingLayer'
+UtfGridLayer = require './UtfGridLayer'
 
 # Leaflet map component that displays a base layer, a tile layer and an optional interactivity layer
 module.exports = class LeafletMapComponent extends React.Component
@@ -114,7 +115,7 @@ module.exports = class LeafletMapComponent extends React.Component
             continue
             
           if layer.utfGridUrl
-            utfGridLayer = new L.UtfGrid(layer.utfGridUrl, { useJsonP: false })
+            utfGridLayer = new UtfGridLayer(layer.utfGridUrl, { useJsonP: false })
             
             @map.addLayer(utfGridLayer)
             @utfGridLayers.push(utfGridLayer)

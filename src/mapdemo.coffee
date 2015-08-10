@@ -26,6 +26,10 @@ createSchema = ->
   schema.addColumn("b", { id: "r", name: "R", type: "integer" })
   schema.addColumn("b", { id: "s", name: "S", type: "text" })
 
+  schema.addTable({ id: "entities.water_point", name: "Water Points" })
+  schema.addColumn("entities.water_point", { id: "name", name: "Name", type: "text" })
+  schema.addColumn("entities.water_point", { id: "desc", name: "Description", type: "text" })
+
   return schema
 
 
@@ -37,29 +41,30 @@ $ ->
         # @renderLayer("Arsenic", "Arsenic levels, WHO standard")
 
   layers = []
-  addSimpleLayer = (id, name, visible) ->
+  addLegacyLayer = (id, name, visible) ->
     layers.push { 
       id: id
       name: name
       visible: visible == true
       opacity: 1
       tileSource: {
-        type: "Simple"
+        type: "Legacy"
         design: {
-          tileUrl: "https://api.mwater.co/v3/maps/tiles/{z}/{x}/{y}.png?type=#{id}&radius=1000"
+          type: id
         }
       }
     }
 
-  addSimpleLayer("water_points_by_type", "Water Point Type", true)
-  addSimpleLayer("functional_status", "Functionality")
-  addSimpleLayer("ecoli_status", "E.Coli Level")
-  addSimpleLayer("water_access", "Functional Water Access")
-  addSimpleLayer("safe_water_access", "Safe Water Access")
+  addLegacyLayer("water_points_by_type", "Water Point Type", true)
+  addLegacyLayer("functional_status", "Functionality")
+  addLegacyLayer("ecoli_status", "E.Coli Level")
+  addLegacyLayer("water_access", "Functional Water Access")
+  addLegacyLayer("safe_water_access", "Safe Water Access")
 
   design = {
     baseLayer: "bing_road"
     layers: layers
+    filters: {}
   }
 
   sample = React.createElement(MapDemoComponent, initialDesign: design, schema: schema)
@@ -75,7 +80,7 @@ class MapDemoComponent extends React.Component
     @setState(design: design)
 
   render: ->
-    tileSourceFactory = new TileSourceFactory()
+    tileSourceFactory = new TileSourceFactory(schema: @props.schema)
 
     H.div style: { height: "100%", width: "100%" },
       H.style null, ''' html, body { height: 100% }'''
@@ -90,4 +95,5 @@ class MapDemoComponent extends React.Component
         React.createElement(MapDesignerComponent, 
           schema: @props.schema, 
           design: @state.design, 
-          onDesignChange: @handleDesignChange)
+          onDesignChange: @handleDesignChange
+          tileSourceFactory: tileSourceFactory)
