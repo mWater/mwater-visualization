@@ -19,6 +19,9 @@ module.exports = class LegacyLayer extends Layer
     # TODO client
     url = "https://api.mwater.co/v3/maps/tiles/{z}/{x}/{y}.#{extension}?type=#{@design.type}&radius=1000"
 
+    if @client
+      url += "&client=#{@client}"
+      
     # Add where for any relevant filters
     relevantFilters = _.where(filters, table: "entities.water_point")
 
