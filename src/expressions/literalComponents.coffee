@@ -103,7 +103,6 @@ exports.EnumComponent = React.createClass {
   render: ->
     H.select 
       className: "form-control input-sm",
-      style: { width: "auto", display: "inline-block" }
       value: if @props.value then @props.value.value
       onChange: @handleChange,
         H.option(key: "null", value: "", "")
@@ -127,13 +126,14 @@ exports.EnumArrComponent = class EnumArrComponent extends React.Component
       value = @props.value.value.join("\n")
 
     options = _.map(@props.enumValues, (val) -> { value: val.id, label: val.name })
-    React.createElement(ReactSelect, { 
-      value: value
-      multi: true
-      delimiter: "\n"
-      options: options 
-      onChange: @handleChange
-    })
+    H.div style: { width: "100%" },
+      React.createElement(ReactSelect, { 
+        value: value
+        multi: true
+        delimiter: "\n"
+        options: options 
+        onChange: @handleChange
+      })
 
 exports.DateComponent = React.createClass {
   propTypes: {

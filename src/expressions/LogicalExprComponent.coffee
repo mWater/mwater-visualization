@@ -32,16 +32,17 @@ module.exports = class LogicalExprComponent extends React.Component
     if @props.value
       childElems = _.map @props.value.exprs, (e, i) =>
         H.div key: "#{i}",
+          H.button 
+            type: "button", 
+            className: "btn btn-sm btn-link", 
+            style: { float: "right" },
+            onClick: @handleRemove.bind(null, i),
+              H.span(className: "glyphicon glyphicon-remove")
           React.createElement(ComparisonExprComponent, 
             value: e, 
             schema: @props.schema, 
             table: @props.table, 
             onChange: @handleExprChange.bind(null, i))
-          H.button 
-            type: "button", 
-            className: "btn btn-sm btn-link", 
-            onClick: @handleRemove.bind(null, i),
-              H.span(className: "glyphicon glyphicon-remove")
  
     # Render all expressions (comparisons for now)
     H.div null,

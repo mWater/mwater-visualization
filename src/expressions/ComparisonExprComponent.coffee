@@ -71,7 +71,7 @@ module.exports = class ComparisonExprComponent extends React.Component
             enumValues: exprBuilder.getExprValues(@props.value.lhs)
             onChange: @handleRhsChange)
 
-    return H.div style: { display: "inline-block" },
+    return H.div null,
       lhsControl
       " "
       opControl

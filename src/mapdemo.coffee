@@ -27,6 +27,7 @@ createSchema = ->
   schema.addColumn("b", { id: "s", name: "S", type: "text" })
 
   schema.addTable({ id: "entities.water_point", name: "Water Points" })
+  schema.addColumn("entities.water_point", { id: "type", name: "Type", type: "enum", values: [{ id: "Protected dug well", name:  "Protected dug well" }] })
   schema.addColumn("entities.water_point", { id: "name", name: "Name", type: "text" })
   schema.addColumn("entities.water_point", { id: "desc", name: "Description", type: "text" })
 
