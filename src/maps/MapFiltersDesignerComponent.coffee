@@ -36,7 +36,7 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
   render: ->
     # Get filterable tables
     filterableTables = []
-    for layer in @props.design.layerViews
+    for layerView in @props.design.layerViews
       # Create layer
       layer = @props.layerFactory.createLayer(layerView.layer.type, layerView.layer.design)
 

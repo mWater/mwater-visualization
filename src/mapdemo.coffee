@@ -87,6 +87,7 @@ class MapDemoComponent extends React.Component
       H.div style: { position: "absolute", width: "70%", height: "100%" }, 
         React.createElement(AutoSizeComponent, injectWidth: true, injectHeight: true, 
           React.createElement(MapViewComponent, 
+            schema: @props.schema, 
             design: @state.design
             onDesignChange: @handleDesignChange
             layerFactory: layerFactory)
