@@ -46,7 +46,7 @@ module.exports = class LogicalExprComponent extends React.Component
     # Render all expressions (comparisons for now)
     H.div null,
       childElems
-      H.button className: "btn btn-sm btn-link", type: "button", onClick: @handleAdd,
+      H.button className: "btn btn-link", type: "button", onClick: @handleAdd,
         H.span className: "glyphicon glyphicon-plus"
         " Add Filter"
 
