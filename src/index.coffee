@@ -16,3 +16,4 @@ exports.AutoSizeComponent = require './AutoSizeComponent'
 
 exports.BingLayer = require './maps/BingLayer'
 exports.UtfGridLayer = require './maps/UtfGridLayer'
+exports.LeafletMapComponent = require './maps/LeafletMapComponent'

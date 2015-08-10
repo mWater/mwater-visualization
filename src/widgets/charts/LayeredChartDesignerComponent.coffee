@@ -1,6 +1,5 @@
 React = require 'react'
 H = React.DOM
-ReactSelect = require 'react-select'
 ScalarExprComponent = require './../../expressions/ScalarExprComponent'
 AggrScalarExprComponent = require './../../expressions/AggrScalarExprComponent'
 LogicalExprComponent = require './../../expressions/LogicalExprComponent'

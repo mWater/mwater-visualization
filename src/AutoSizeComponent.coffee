@@ -31,7 +31,13 @@ module.exports = class AutoSizeComponent extends React.Component
 
   render: ->
     if not @state.width? or not @state.height?
-      return H.div null
+      style = {}
+      if @props.injectWidth
+        style.width = "100%"
+      if @props.injectHeight
+        style.height = "100%"
+
+      return H.div(style: style)
     else
       overrides = { ref: "child" }
       if @props.injectWidth
