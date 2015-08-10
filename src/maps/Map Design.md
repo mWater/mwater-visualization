@@ -7,6 +7,7 @@ Maps are stored as a base layer, a series of layers and filters.
 	baseLayer: "bing_road"/"bing_aerial"
 	layerViews: [ see layer view below ]
 	filters: filter expression indexed by table. e.g. { sometable: logical expression, etc. }
+	bounds: bounds as { w:, n:, e:, s: }
 }
 ```
 
