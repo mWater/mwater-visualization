@@ -55,3 +55,6 @@ module.exports = class Schema
           continue
 
         @addColumn(table.id, column)
+
+      for namedExpr in table.namedExprs
+        @addColumn(table.id, namedExpr)
