@@ -23,7 +23,8 @@ module.exports = class TabbedComponent extends React.Component
     currentTab = _.findWhere(@props.tabs, id: @state.tabId)
 
     H.div null,
-      H.ul className: "nav nav-tabs", 
+      H.ul key: "tabs", className: "nav nav-tabs", 
         _.map(@props.tabs, @renderTab)
-      if currentTab
-        currentTab.elem
+      H.div key: "currentTab",
+        if currentTab
+          currentTab.elem

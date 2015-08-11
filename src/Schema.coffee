@@ -56,5 +56,6 @@ module.exports = class Schema
 
         @addColumn(table.id, column)
 
-      for namedExpr in table.namedExprs
-        @addColumn(table.id, namedExpr)
+      if table.namedExprs
+        for namedExpr in table.namedExprs
+          @addColumn(table.id, namedExpr)
