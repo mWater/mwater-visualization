@@ -107,6 +107,58 @@ describe "ExpressionBuilder", ->
       expr = { type: "field", table: "t2", column: "c1" }
       assert.equal @exprBuilder.summarizeAggrExpr(expr, "sum"), "Total C1"
 
+  describe "simplifyExpr", ->
+    it "simplifies simple scalar to field", ->
+      expr = {
+        type: "scalar"
+        table: "t1"
+        expr: { type: "field", table: "t1", column: "c1" }
+        joins: []
+      }
+
+      assert _.isEqual(@exprBuilder.simplifyExpr(expr), { type: "field", table: "t1", column: "c1" })
+
+    it "leaves scalar with joins alone", ->
+      expr = {
+        type: "scalar"
+        table: "t1"
+        expr: { type: "field", table: "t1", column: "c1" }
+        joins: ["c2"]
+      }      
+      assert _.isEqual(@exprBuilder.simplifyExpr(expr), expr)
+
+    it "leaves scalar with where alone", ->
+      expr = {
+        type: "scalar"
+        table: "t1"
+        expr: { type: "field", table: "t1", column: "c1" }
+        joins: []
+        where: { type: "logical", exprs: [] }
+      }      
+      assert _.isEqual(@exprBuilder.simplifyExpr(expr), expr)
+
+    it "makes null scalar expressions null", ->
+      expr = {
+        type: "scalar"
+        table: "t1"
+        expr: null
+        joins: []
+      }
+      assert _.isEqual(@exprBuilder.simplifyExpr(expr), null)
+
+  describe "areExprsEqual", ->
+    it "simplifies simple scalar to field", ->
+      expr = {
+        type: "scalar"
+        table: "t1"
+        expr: { type: "field", table: "t1", column: "c1" }
+        joins: []
+      }
+
+      assert @exprBuilder.areExprsEqual(expr, { type: "field", table: "t1", column: "c1" })
+      assert not @exprBuilder.areExprsEqual(expr, { type: "field", table: "t1", column: "c2" })
+
+
   describe "getExprType", ->
     it 'gets field type', ->
       assert.equal @exprBuilder.getExprType({ type: "field", table: "t1", column: "c1" }), "text"

@@ -207,6 +207,21 @@ module.exports = class ExpressionBuilder
     # TODO always makes new
     expr = _.extend({}, expr, exprs: _.map(expr.exprs, (e) => @cleanComparisonExpr(e)))
 
+  # Reduce scalar to field expressions or null when possible
+  simplifyExpr: (expr) ->
+    if not expr
+      return null
+
+    if expr.type == "scalar"
+      if expr.joins.length == 0 and not expr.where
+        return @simplifyExpr(expr.expr)
+
+    return expr
+
+  # Check if two expressions are functionally identical
+  areExprsEqual: (expr1, expr2) ->
+    return _.isEqual(@simplifyExpr(expr1), @simplifyExpr(expr2))
+
   # Get all comparison ops (id and name) for a given left hand side type
   getComparisonOps: (lhsType) ->
     ops = []
