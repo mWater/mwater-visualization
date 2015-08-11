@@ -18,15 +18,44 @@ module.exports = class LogicalExprComponent extends React.Component
     exprs[i] = expr
     @props.onChange(_.extend({}, @props.value, exprs: exprs))
 
-  handleAdd: =>
+  handleAdd: (newExpr) =>
     expr = @props.value or { type: "logical", table: @props.table, op: "and", exprs: [] }
-    exprs = expr.exprs.concat([{ type: "comparison", table: @props.table }])
+
+    # Convert field expression to scalar to be consistent and since scalar expression editor
+    # expects scalar expressions in the comparison expr.
+    if newExpr and newExpr.type == "field"
+      newExpr = { type: "scalar", table: newExpr.table, expr: newExpr, joins: [] }
+
+    exprs = expr.exprs.concat([{ type: "comparison", table: @props.table, lhs: newExpr }])
     @props.onChange(_.extend({}, expr, exprs: exprs))
 
   handleRemove: (i) =>
     exprs = @props.value.exprs.slice()
     exprs.splice(i, 1)
     @props.onChange(_.extend({}, @props.value, exprs: exprs))    
+
+  renderAdd: ->
+    # Get named expressions
+    namedExprs = @props.schema.getNamedExprs(@props.table)
+
+    # Simple button if no named expressions
+    if namedExprs.length == 0
+      return H.button type: "button", className: "btn btn-default", onClick: @handleAdd.bind(null, null),
+        H.span className: "glyphicon glyphicon-plus"
+        " Add Filter"
+
+    return H.div className: "btn-group",
+      H.button type: "button", "data-toggle": "dropdown", className: "btn btn-default dropdown-toggle",
+        H.span className: "glyphicon glyphicon-plus"
+        " Add Filter"
+      H.ul className: "dropdown-menu",
+        _.map(namedExprs, (ne) =>
+          H.li key: ne.id,
+            H.a onClick: @handleAdd.bind(null, ne.expr), ne.name
+          )
+        H.li key: "_divider", className: "divider"
+        H.li key: "_advanced",
+          H.a onClick: @handleAdd.bind(null, null), "Advanced..."
 
   render: ->
     if @props.value
@@ -47,7 +76,6 @@ module.exports = class LogicalExprComponent extends React.Component
     # Render all expressions (comparisons for now)
     H.div null,
       childElems
-      H.button className: "btn btn-link", type: "button", onClick: @handleAdd,
-        H.span className: "glyphicon glyphicon-plus"
-        " Add Filter"
+      H.div style: { marginTop: 5 },
+        @renderAdd()
 

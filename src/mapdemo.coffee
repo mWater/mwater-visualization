@@ -31,6 +31,8 @@ createSchema = ->
   schema.addColumn("entities.water_point", { id: "name", name: "Name", type: "text" })
   schema.addColumn("entities.water_point", { id: "desc", name: "Description", type: "text" })
 
+  schema.addNamedExpr("entities.water_point", { id: "type", name: "Water Point Type", expr: { type: "field", table: "entities.water_point", column: "type" }})
+
   return schema
 
 
