@@ -2,11 +2,12 @@ React = require 'react'
 H = React.DOM
 
 # Component that is blue to show that it is a link and responds to clicks
+# Also has a dropdown component if dropdown items are specified
 module.exports = class EditableLinkComponent extends React.Component
   @propTypes:
     onClick: React.PropTypes.func # Called on click
     onRemove: React.PropTypes.func # Adds an x if specified 
-    dropdownItems: React.PropTypes.array # Array of id, name or value, label to display as dropdown
+    dropdownItems: React.PropTypes.array # Array of { id, name } or { value, label } to display as dropdown. Null name/label is a separator
     onDropdownItemClicked: React.PropTypes.func # Called with id/value of dropdown item
 
   renderRemove: ->
@@ -17,7 +18,17 @@ module.exports = class EditableLinkComponent extends React.Component
   renderDropdownItem: (item) =>
     id = item.id or item.value
     name = item.name or item.label
-    return H.li key: (id or "null"),
+    
+    # Handle divider
+    if not name?
+      return H.li className: "divider"
+
+    # Get a string key
+    key = id
+    if not _.isString(key)
+      key = JSON.stringify(key)
+
+    return H.li key: key,
       H.a(key: id, onClick: @props.onDropdownItemClicked.bind(null, id), name)
 
   render: ->

@@ -52,9 +52,46 @@ module.exports = class ScalarExprComponent extends React.Component
   handleRemove: =>
     @props.onChange(null)
 
-  render: ->
+  handleDropdownItemClicked: (expr) =>
+    # Handle advanced
+    if not expr
+      @handleEditorOpen()
+    else
+      @props.onChange(expr)
+
+  renderEditableLink: ->
     exprBuilder = new ExpressionBuilder(@props.schema)
 
+    if @props.value
+      # Summarize null is "Number of {table name}" to handle count(*) case if includeCount is true
+      if @props.includeCount and not exprBuilder.getExprType(@props.value)
+        summary = "Number of #{@props.schema.getTable(@props.value.table).name}"
+      else
+        summary = exprBuilder.summarizeExpr(@props.value)
+
+    # Get named expressions
+    namedExprs = @props.schema.getNamedExprs(@props.table)
+
+    # Simple click if no named expressions
+    linkProps = {
+      onRemove: if @props.value then @handleRemove
+    }
+
+    if namedExprs.length == 0
+      linkProps.onClick = @handleEditorOpen
+    else
+      linkProps.dropdownItems = _.map(namedExprs, (ne) => { id: ne.expr, name: ne.name })
+
+      # Add advanced
+      linkProps.dropdownItems.push({ id: null, name: null }) # Divider has null name
+      linkProps.dropdownItems.push({ id: null, name: "Advanced..." })
+      linkProps.onDropdownItemClicked = @handleDropdownItemClicked
+
+    return React.createElement(EditableLinkComponent, linkProps, 
+        if summary then summary else H.i(null, "None")
+      )
+
+  render: ->
     # Display editor modal if editing
     if @state.editorOpen
       editor = React.createElement(ActionCancelModalComponent, { 
@@ -71,18 +108,7 @@ module.exports = class ScalarExprComponent extends React.Component
               onChange: @handleEditorChange)
         )
 
-    if @props.value
-      # Summarize null is "Number of {table name}" to handle count(*) case if includeCount is true
-      if @props.includeCount and not exprBuilder.getExprType(@props.value)
-        summary = "Number of #{@props.schema.getTable(@props.value.table).name}"
-      else
-        summary = exprBuilder.summarizeExpr(@props.value)
-
     H.div style: { display: "inline-block" },
       editor
-      React.createElement(EditableLinkComponent, 
-        onClick: @handleEditorOpen
-        onRemove: if @props.value then @handleRemove,
-        if summary then summary else H.i(null, "None")
-        )
+      @renderEditableLink()
 
