@@ -190,9 +190,13 @@ module.exports = class ExpressionBuilder
     if not expr.lhs 
       expr = { type: "comparison", table: expr.table }
 
-    # Remove rhs if no op
-    if not expr.op and expr.rhs
-      expr = _.omit(expr, "rhs")
+    # Remove op if wrong type
+    if expr.op and expr.op not in _.pluck(@getComparisonOps(@getExprType(expr.lhs)), "id")
+      expr = _.omit(expr, "op")
+
+    # Default op
+    if expr.lhs and not expr.op
+      expr = _.extend({}, expr, op: @getComparisonOps(@getExprType(expr.lhs))[0].id)
 
     if expr.op and expr.rhs and expr.lhs
       # Remove rhs if wrong type
@@ -211,10 +215,6 @@ module.exports = class ExpressionBuilder
           # Remove if empty
           if expr.rhs.value.length == 0
             expr = _.omit(expr, "rhs")
-
-    # Default op
-    if expr.lhs and not expr.op
-      expr = _.extend({}, expr, op: @getComparisonOps(@getExprType(expr.lhs))[0].id)
 
     return expr
 

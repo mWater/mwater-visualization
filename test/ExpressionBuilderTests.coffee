@@ -238,11 +238,6 @@ describe "ExpressionBuilder", ->
       expr = @exprBuilder.cleanComparisonExpr(expr)
       assert not expr.op
 
-    it "removes rhs if no op", ->
-      expr = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "text" }, rhs: { type: "literal", valueType: "text", value: "x" } }
-      expr = @exprBuilder.cleanComparisonExpr(expr)
-      assert not expr.rhs
-
     it "removes rhs if wrong type", ->
       expr = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "text" }, op: "~*", rhs: { type: "literal", valueType: "text", value: "x" } }
       expr = @exprBuilder.cleanComparisonExpr(expr)
@@ -272,6 +267,11 @@ describe "ExpressionBuilder", ->
 
     it "defaults op", ->
       expr = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "text" } }
+      expr = @exprBuilder.cleanComparisonExpr(expr)
+      assert.equal expr.op, "~*"
+
+    it "removes invalid op", ->
+      expr = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "text" }, op: ">" }
       expr = @exprBuilder.cleanComparisonExpr(expr)
       assert.equal expr.op, "~*"
 
