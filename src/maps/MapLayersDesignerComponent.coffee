@@ -59,24 +59,26 @@ module.exports = class MapLayersDesignerComponent extends React.Component
         # H.br()
         # H.small null, desc
 
-  renderBaseLayer: ->
+  renderBaseLayer: (id, name) ->
+    className = "mwater-visualization-layer"
+    if id == @props.design.baseLayer
+      className += " checked"
+    
+    H.div 
+      key: id
+      className: className
+      style: { display: "inline-block" },
+      onClick: @handleBaseLayerChange.bind(null, id),
+        name
+
+  renderBaseLayers: ->
     H.div style: { margin: 5, marginBottom: 10 },
-      H.label className: "radio-inline",
-        H.input 
-          type: "radio"
-          checked: (@props.design.baseLayer == "bing_road")
-          onClick: @handleBaseLayerChange.bind(null, "bing_road"),
-            "Roads"
-      H.label className: "radio-inline",
-        H.input 
-          type: "radio"
-          checked: (@props.design.baseLayer == "bing_aerial")
-          onClick: @handleBaseLayerChange.bind(null, "bing_aerial"),
-            "Satellite"
+      @renderBaseLayer("bing_road", "Roads")
+      @renderBaseLayer("bing_aerial", "Satellite")
 
   render: ->
     H.div style: { padding: 5 }, 
-      @renderBaseLayer()
+      @renderBaseLayers()
 
       H.ul className: "list-group", 
         _.map(@props.design.layerViews, @renderLayerView)
