@@ -8,12 +8,19 @@ module.exports = class Schema
   addTable: (options) ->
     table = _.pick(options, "id", "name", "desc", "ordering")
     table.columns = []
+    table.namedExprs = []
     @tables.push(table)
     return this
 
   addColumn: (tableId, options) ->
     table = @getTable(tableId)
-    table.columns.push(_.defaults(_.pick(options, "id", "name", "desc", "type", "values", "join")))
+    table.columns.push(_.pick(options, "id", "name", "desc", "type", "values", "join"))
+    return this
+
+  # Add a named expression to a table with id, name, expr which is a valid scalar or field expression
+  addNamedExpr: (tableId, options) ->
+    table = @getTable(tableId)
+    table.namedExprs.push(_.pick(options, "id", "name", "expr"))
     return this
 
   getTables: -> @tables
@@ -31,6 +38,12 @@ module.exports = class Schema
     if not table
       throw new Error("Unknown table #{tableId}")
     return _.findWhere(table.columns, { id: columnId })
+
+  getNamedExprs: (tableId) ->
+    table = @getTable(tableId)
+    if not table
+      throw new Error("Unknown table #{tableId}")
+    return table.namedExprs
 
   # Loads from a json schema in format { tables: [...] }
   loadFromJSON: (json) ->

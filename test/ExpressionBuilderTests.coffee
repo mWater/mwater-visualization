@@ -95,6 +95,19 @@ describe "ExpressionBuilder", ->
       scalarExpr = { type: "scalar", table: "t1", joins: ['c2'], expr: null, aggr: "count" }
       assert.equal @exprBuilder.summarizeExpr(scalarExpr), "Number of C2"
 
+    it "uses named expression when matching one present", ->
+      # Add named expression
+      @schema.addNamedExpr("t1", { id: "c1", name: "NE Column 1", expr: { type: "field", table: "t1", column: "c1" }})
+
+      # Test with scalar that can simplify
+      expr = {
+        type: "scalar"
+        table: "t1"
+        expr: { type: "field", table: "t1", column: "c1" }
+        joins: []
+      }
+      assert.equal @exprBuilder.summarizeExpr(expr), "NE Column 1"
+
   describe "summarizeAggrExpr", ->
     it "summarizes null", ->
       assert.equal @exprBuilder.summarizeAggrExpr(null), "None"
@@ -158,6 +171,9 @@ describe "ExpressionBuilder", ->
       assert @exprBuilder.areExprsEqual(expr, { type: "field", table: "t1", column: "c1" })
       assert not @exprBuilder.areExprsEqual(expr, { type: "field", table: "t1", column: "c2" })
 
+  describe "getExprTable", ->
+    it "gets table", ->
+      assert.equal @exprBuilder.getExprTable({ type: "field", table: "t1", column: "c1" }), "t1"
 
   describe "getExprType", ->
     it 'gets field type', ->

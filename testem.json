@@ -8,7 +8,7 @@
         "test/browserified.js"
      ],
     "src_files": [
-        "src/*.coffee",
+        "src/**/*.coffee",
         "test/*Tests.coffee"
     ],
     "launchers": {

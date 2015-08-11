@@ -62,6 +62,11 @@ module.exports = class ExpressionBuilder
 
     return aggrs
 
+  # Gets the table of an expression
+  getExprTable: (expr) ->
+    if expr and expr.table
+      return expr.table
+
   # Gets the type of an expression
   getExprType: (expr) ->
     if not expr?
@@ -87,6 +92,16 @@ module.exports = class ExpressionBuilder
   summarizeExpr: (expr) ->
     if not expr
       return "None"
+
+    # Check named expresions
+    table = @getExprTable(expr)
+    namedExpr = _.find(@schema.getNamedExprs(table), (ne) =>
+      return @areExprsEqual(@simplifyExpr(ne.expr), @simplifyExpr(expr))
+    )
+
+    if namedExpr
+      return namedExpr.name
+
     switch expr.type
       when "scalar"
         return @summarizeScalarExpr(expr)
