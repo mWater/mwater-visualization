@@ -46,7 +46,7 @@ module.exports = class ScalarExprEditorComponent extends React.Component
       options = _.map(exprBuilder.getAggrs(@props.value.expr), (aggr) -> { id: aggr.id, name: aggr.name.toLowerCase() })
 
       # Do not render if only possible aggregation is count
-      if options.length == 1 and options[0].value == "count"
+      if options.length == 1 and options[0].id == "count"
         return 
 
       currentOption = _.findWhere(options, id: @props.value.aggr)
