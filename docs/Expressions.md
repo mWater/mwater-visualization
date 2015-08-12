@@ -44,10 +44,11 @@ Column of the database
 
 `type`: "literal"
 `valueType`: "text", "integer", "decimal", "boolean", "enum", "date", "enum[]"
-`value`: value of literal. date is ISO 8601
+`value`: value of literal. date is ISO 8601 YYYY-MM-DD
 
-## Notes on `count(*)`
+## Count expressions
 
-A scalar expression can have an `expr` of `null` and no joins in which case it acts as a null expression.
+This represents a `count(sometable.*)` expression. It should be displayed as Number of tablename
 
-This is to allow the scalar popup editor to allow selection of the "Number of" something, effectively returning null for `*`
+`type`: "count"
+`table`: Table id of table

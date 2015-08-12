@@ -26,9 +26,9 @@ module.exports = class LayeredChartCompiler
   canLayerUseXExpr: (design, layerIndex) ->
     return @getLayerType(design, layerIndex) not in ['pie', 'donut']
 
-  compileExpr: (expr) ->
+  compileExpr: (expr, aggr) ->
     exprCompiler = new ExpressionCompiler(@schema)
-    return exprCompiler.compileExpr(expr: expr, tableAlias: "main")
+    return exprCompiler.compileExpr(expr: expr, tableAlias: "main", aggr: aggr)
 
   getQueries: (design, extraFilters) ->
     queries = {}
@@ -49,7 +49,7 @@ module.exports = class LayeredChartCompiler
 
       xExpr = @compileExpr(layer.xExpr)
       colorExpr = @compileExpr(layer.colorExpr)
-      yExpr = @compileExpr(layer.yExpr)
+      yExpr = @compileExpr(layer.yExpr, layer.yAggr)
 
       if xExpr
         query.selects.push({ type: "select", expr: xExpr, alias: "x" })
@@ -70,12 +70,7 @@ module.exports = class LayeredChartCompiler
         if xExpr and colorExpr
           query.groupBy.push(2)
 
-        if yExpr
-          query.selects.push({ type: "select", expr: { type: "op", op: layer.yAggr, exprs: [yExpr] }, alias: "y" })
-        else
-          query.selects.push({ type: "select", expr: { type: "op", op: layer.yAggr, exprs: [] }, alias: "y" })
-      else
-        query.selects.push({ type: "select", expr: yExpr, alias: "y" })
+      query.selects.push({ type: "select", expr: yExpr, alias: "y" })
 
       # Add where
       if layer.filter

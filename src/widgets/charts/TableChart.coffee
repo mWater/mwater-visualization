@@ -105,19 +105,13 @@ module.exports = class TableChart extends Chart
     for colNum in [0...design.columns.length]
       column = design.columns[colNum]
 
-      if column.aggr
-        expr = @compileExpr(column.expr)
-        query.selects.push({ 
-          type: "select"
-          expr: { type: "op", op: column.aggr, exprs: if expr then [expr] else [] }
-          alias: "c#{colNum}" 
-        })
-      else
-        query.selects.push({ 
-          type: "select"
-          expr: @compileExpr(column.expr)
-          alias: "c#{colNum}"
-        })
+      expr = @compileExpr(column.expr, column.aggr)
+
+      query.selects.push({ 
+        type: "select"
+        expr: expr
+        alias: "c#{colNum}" 
+      })
 
       # Add group by
       if not column.aggr
@@ -161,9 +155,9 @@ module.exports = class TableChart extends Chart
 
     return React.createElement(TableChartViewComponent, props)
 
-  compileExpr: (expr) =>
+  compileExpr: (expr, aggr) =>
     exprCompiler = new ExpressionCompiler(@schema)
-    return exprCompiler.compileExpr(expr: expr, tableAlias: "main")
+    return exprCompiler.compileExpr(expr: expr, tableAlias: "main", aggr: aggr)
 
   createDataTable: (design, data) ->
     renderHeaderCell = (column) =>

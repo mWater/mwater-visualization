@@ -25,8 +25,8 @@ module.exports = class AggrScalarExprComponent extends React.Component
   renderAggr: ->
     exprBuilder = new ExpressionBuilder(@props.schema)
 
-    # Only render if has a real expr with a type (not a count(*))
-    if @props.value and @props.value.expr and exprBuilder.getExprType(@props.value.expr)
+    # Only render if has a real expr with a type that is not count
+    if @props.value and @props.value.expr and exprBuilder.getExprType(@props.value.expr) != "count"
       exprBuilder = new ExpressionBuilder(@props.schema)
       aggrs = exprBuilder.getAggrs(@props.value.expr)
 

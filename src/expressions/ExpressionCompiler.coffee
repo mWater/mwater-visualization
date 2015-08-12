@@ -3,7 +3,8 @@ module.exports = class ExpressionCompiler
   constructor: (schema) ->
     @schema = schema
 
-  # Compile an expression. Pass expr and tableAlias
+  # Compile an expression. Pass expr and tableAlias.
+  # Pass aggr to aggregate the expression
   compileExpr: (options) =>
     expr = options.expr
 
@@ -13,17 +14,29 @@ module.exports = class ExpressionCompiler
 
     switch expr.type 
       when "field"
-        return @compileFieldExpr(options)
+        compiledExpr =  @compileFieldExpr(options)
       when "scalar"
-        return @compileScalarExpr(options)
+        compiledExpr =  @compileScalarExpr(options)
       when "comparison"
-        return @compileComparisonExpr(options)
+        compiledExpr =  @compileComparisonExpr(options)
       when "logical"
-        return @compileLogicalExpr(options)
+        compiledExpr =  @compileLogicalExpr(options)
       when "literal"
-        return { type: "literal", value: expr.value }
+        compiledExpr =  { type: "literal", value: expr.value }
+      when "count"
+        compiledExpr = null
       else
         throw new Error("Expr type #{expr.type} not supported")
+
+    # Aggregate
+    if options.aggr
+      compiledExpr = {
+        type: "op"
+        op: options.aggr
+        exprs: _.compact([compiledExpr])
+      }
+
+    return compiledExpr
 
   compileFieldExpr: (options) ->
     expr = options.expr

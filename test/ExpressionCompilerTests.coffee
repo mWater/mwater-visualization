@@ -15,6 +15,20 @@ describe "ExpressionCompiler", ->
       column: "integer"
     }
 
+  it "compiles aggregated field", ->
+    jql = @ec.compileExpr(expr: { type: "field", table: "t1", column: "integer" }, tableAlias: "T1", aggr: "sum")
+    assert _.isEqual jql, {
+      type: "op"
+      op: "sum"
+      exprs: [
+        {
+          type: "field"
+          tableAlias: "T1"
+          column: "integer"
+        }
+      ]
+    }
+
   it "compiles scalar with no joins, simplifying", ->
     expr = { type: "scalar", table: "t1", expr: { type: "field", table: "t1", column: "integer" }, joins: [] }
     jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
@@ -50,7 +64,7 @@ describe "ExpressionCompiler", ->
     }), JSON.stringify(jql, null, 2)
 
   it "compiles scalar with one join and count(*) aggr", ->
-    expr = { type: "scalar", table: "t1", expr: null, joins: ["1-2"], aggr: "count" }
+    expr = { type: "scalar", table: "t1", expr: { type: "count", table: "t2" }, joins: ["1-2"], aggr: "count" }
     jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
 
     assert _.isEqual(jql, {

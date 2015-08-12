@@ -121,7 +121,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
   renderLayers: ->
     H.div null, 
       _.map(@props.design.layers, (layer, i) => @renderLayer(i))
-      H.button className: "btn btn-default btn-xs", type: "button", onClick: @handleAddLayer,
+      H.button className: "btn btn-default", type: "button", onClick: @handleAddLayer,
         H.span className: "glyphicon glyphicon-plus"
         " Add Series"
 

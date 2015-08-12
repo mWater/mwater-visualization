@@ -54,7 +54,7 @@ module.exports = class ScalarExprTreeBuilder
     if options.includeCount
       nodes.push({
         name: "Number of #{@schema.getTable(options.table).name}"
-        value: { table: options.startTable, joins: options.joins, expr: null }
+        value: { table: options.startTable, joins: options.joins, expr: { type: "count", table: options.table } }
       })
 
     # Create node for each column

@@ -4,7 +4,7 @@ fixtures = require './fixtures'
 LayeredChartCompiler = require '../src/widgets/charts/LayeredChartCompiler'
 
 compare = (actual, expected) ->
-  assert _.isEqual(actual, expected), JSON.stringify(actual, null, 2)
+  assert _.isEqual(actual, expected), "\n" + JSON.stringify(actual) + "\n" + JSON.stringify(expected)
 
 describe "LayeredChartCompiler", ->
   before ->
@@ -146,7 +146,7 @@ describe "LayeredChartCompiler", ->
       design = {
         type: "scatter"
         layers: [
-          { xExpr: @exprText, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+          { xExpr: @exprText, yExpr: @exprInteger, table: "t1" }
         ]
       }
 

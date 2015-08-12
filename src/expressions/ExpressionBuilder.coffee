@@ -38,12 +38,12 @@ module.exports = class ExpressionBuilder
 
     type = @getExprType(expr)
 
-    # If null type, only return count
+    # If null type, retun none
     if not type
-      return [{ id: "count", name: "Number", type: "integer" }]
+      return []
     
     table = @schema.getTable(expr.table)
-    if table.ordering
+    if table.ordering and type != "count"
       aggrs.push({ id: "last", name: "Latest", type: type })
 
     switch type
@@ -85,6 +85,8 @@ module.exports = class ExpressionBuilder
         return @getExprType(expr.expr)
       when "literal"
         return expr.valueType
+      when "count"
+        return "count"
       else
         throw new Error("Not implemented for #{expr.type}")
 
@@ -107,13 +109,17 @@ module.exports = class ExpressionBuilder
         return @summarizeScalarExpr(expr)
       when "field"
         return @schema.getColumn(expr.table, expr.column).name
+      when "count"
+        return "Number of " + @schema.getTable(expr.table).name
       else
         throw new Error("Unsupported type #{expr.type}")
 
   summarizeScalarExpr: (expr) ->
+    exprType = @getExprType(expr.expr)
+
     # Add aggr
-    if expr.aggr
-      str = _.findWhere(@getAggrs(expr.expr), { id: expr.aggr }).name + " of "
+    if expr.aggr 
+      str = _.findWhere(@getAggrs(expr.expr), { id: expr.aggr }).name + " "
     else
       str = ""
 
@@ -124,8 +130,8 @@ module.exports = class ExpressionBuilder
       str += joinCol.name + " > "
       t = joinCol.join.toTable
 
-    # Special case for aggr (count) of null to be rendered Number of {last join name}
-    if expr.aggr and not expr.expr
+    # Special case for count of count type to be rendered Number of {last join name}
+    if expr.aggr and exprType == "count"
       str = str.substring(0, str.length - 3)
     else
       str += @summarizeExpr(expr.expr)
@@ -134,14 +140,14 @@ module.exports = class ExpressionBuilder
 
   # Summarize an expression with optional aggregation
   summarizeAggrExpr: (expr, aggr) ->
-    # Summarize null with count as "Number of {table name}" to handle count(*) case 
-    if expr and not @getExprType(expr) and aggr == "count"
-      summary = "Number of #{@schema.getTable(expr.table).name}"
-    else if not aggr
-      summary = @summarizeExpr(expr)
-    else
+    exprType = @getExprType(expr)
+
+    # Add aggr if not a count type
+    if aggr and exprType != "count"
       aggrName = _.findWhere(@getAggrs(expr), { id: aggr }).name
       return aggrName + " " + @summarizeExpr(expr)
+    else
+      return @summarizeExpr(expr)
 
   # Clean an expression, returning null if completely invalid, otherwise removing
   # invalid parts
@@ -164,6 +170,9 @@ module.exports = class ExpressionBuilder
         return @cleanComparisonExpr(expr)
       when "logical"
         return @cleanLogicalExpr(expr)
+      when "count"
+        # TODO null if table does not exist
+        return expr
       else
         throw new Error("Unknown expression type #{expr.type}")
 

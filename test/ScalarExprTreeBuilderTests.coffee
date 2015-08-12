@@ -21,11 +21,11 @@ describe "ScalarExprTreeBuilder", ->
     assert.deepEqual _.pluck(subnodes, "name"), ["C1"]
     assert _.isEqual(subnodes[0].value, { table: "t1", joins: [], expr: { type: "field", table: "t1", column: "c1"}}), JSON.stringify(subnodes[0].value)
 
-  it "returns null expr as first if includeCount is true", ->
+  it "returns count expr as first if includeCount is true", ->
     # Should not add root node
     nodes = new ScalarExprTreeBuilder(@schema).getTree({ table: "t1", includeCount: true })
     assert.deepEqual _.pluck(nodes, "name"), ["Number of T1", "C1"]
-    assert.isNull nodes[0].value.expr
+    assert.deepEqual nodes[0].value.expr, { type: "count", table: "t1" }, JSON.stringify(nodes[0].value)
 
   it "follows joins", ->
     # Join column
@@ -67,7 +67,7 @@ describe "ScalarExprTreeBuilder", ->
       assert.equal nodes.length, 2, "Should include count and text"
 
       assert.equal nodes[0].name, "Number of T2"
-      assert.isNull nodes[0].value.expr
+      assert.deepEqual nodes[0].value.expr, { type: "count", table: "t2" }
 
       assert.equal nodes[1].name, "C1"
       assert.equal nodes[1].value.expr.column, "c1"

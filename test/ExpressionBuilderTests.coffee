@@ -63,10 +63,16 @@ describe "ExpressionBuilder", ->
       assert.equal _.findWhere(aggrs, id: "avg").type, "decimal"
       # TODO etc
 
-    it "includes count for null", ->
+    it "includes nothing for null", ->
       aggrs = @exprBuilder.getAggrs(null)
-      assert.equal aggrs[0].type, "integer"
-      assert.equal aggrs[0].id, "count"
+      assert.equal aggrs.length, 0
+
+    it "includes only count for count type", ->
+      count = { type: "count", table: "a" }
+      aggrs = @exprBuilder.getAggrs(count)
+
+      assert.equal _.findWhere(aggrs, id: "count").type, "integer"
+      assert.equal aggrs.length, 1
 
   describe "summarizeExpr", ->
     it "summarizes null", ->
@@ -89,10 +95,10 @@ describe "ExpressionBuilder", ->
     it "summarizes joined aggr scalar expr", ->
       fieldExpr = { type: "field", table: "t2", column: "c1" }
       scalarExpr = { type: "scalar", table: "t1", joins: ['c2'], expr: fieldExpr, aggr: "sum" }
-      assert.equal @exprBuilder.summarizeExpr(scalarExpr), "Total of C2 > C1"
+      assert.equal @exprBuilder.summarizeExpr(scalarExpr), "Total C2 > C1"
 
-    it "simplifies when simple count", ->
-      scalarExpr = { type: "scalar", table: "t1", joins: ['c2'], expr: null, aggr: "count" }
+    it "simplifies when count", ->
+      scalarExpr = { type: "scalar", table: "t1", joins: ['c2'], expr: { type: "count", table: "t2" }, aggr: "count" }
       assert.equal @exprBuilder.summarizeExpr(scalarExpr), "Number of C2"
 
     it "uses named expression when matching one present", ->
@@ -119,6 +125,10 @@ describe "ExpressionBuilder", ->
     it "summarizes field expr", ->
       expr = { type: "field", table: "t2", column: "c1" }
       assert.equal @exprBuilder.summarizeAggrExpr(expr, "sum"), "Total C1"
+
+    it "simplifies when count", ->
+      scalarExpr = { type: "scalar", table: "t1", joins: [], expr: { type: "count", table: "t1" } }
+      assert.equal @exprBuilder.summarizeAggrExpr(scalarExpr, "count"), "Number of T1"
 
   describe "simplifyExpr", ->
     it "simplifies simple scalar to field", ->
@@ -197,6 +207,16 @@ describe "ExpressionBuilder", ->
         joins: ["c2"]
       }
       assert.equal @exprBuilder.getExprType(expr), "decimal"
+
+    it 'gets scalar type with count', ->
+      expr = {
+        type: "scalar"
+        table: "t1"
+        expr: { type: "count", table: "t2" }
+        aggr: "count"
+        joins: ["c2"]
+      }
+      assert.equal @exprBuilder.getExprType(expr), "integer"
 
     it "gets literal types", ->
       assert.equal @exprBuilder.getExprType({ type: "literal", valueType: "boolean", value: true }), "boolean"

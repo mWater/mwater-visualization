@@ -72,7 +72,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
         name
 
   renderBaseLayers: ->
-    H.div style: { margin: 5, marginBottom: 10 }, key: "baseLayers"
+    H.div style: { margin: 5, marginBottom: 10 }, key: "baseLayers",
       @renderBaseLayer("bing_road", "Roads")
       @renderBaseLayer("bing_aerial", "Satellite")
 

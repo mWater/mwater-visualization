@@ -15,8 +15,7 @@ module.exports = class ScalarExprComponent extends React.Component
     types: React.PropTypes.array # Optional types to limit to
 
     # Includes count at root level of a table. Means that an extra entry will be present
-    # that is "Number of {table name}" that will have no aggregate or expression. 
-    # Also causes this to be rendered as "Number of {table name}" in the summary
+    # that is "Number of {table name}" that will have no aggregate and a count expression. 
     includeCount: React.PropTypes.bool
 
     editorTitle: React.PropTypes.any # Title of editor popup. Any element
@@ -63,11 +62,7 @@ module.exports = class ScalarExprComponent extends React.Component
     exprBuilder = new ExpressionBuilder(@props.schema)
 
     if @props.value
-      # Summarize null is "Number of {table name}" to handle count(*) case if includeCount is true
-      if @props.includeCount and not exprBuilder.getExprType(@props.value)
-        summary = "Number of #{@props.schema.getTable(@props.value.table).name}"
-      else
-        summary = exprBuilder.summarizeExpr(@props.value)
+      summary = exprBuilder.summarizeExpr(@props.value)
 
     # Get named expressions
     namedExprs = @props.schema.getNamedExprs(@props.table)
