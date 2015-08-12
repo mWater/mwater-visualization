@@ -40,21 +40,21 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     @updateLayerView(index, visible: not layerView.visible)
 
   renderLayerGearMenu: (layer, index) =>
-    H.div className: "btn-group", style: { float: "right" },
+    H.div className: "btn-group", style: { float: "right" }, key: "gear",
       H.button type: "button", className: "btn btn-link dropdown-toggle", "data-toggle": "dropdown",
         H.span className: "glyphicon glyphicon-cog"
       H.ul className: "dropdown-menu dropdown-menu-right",
-        H.li(null, H.a(null, "Edit Layer"))
-        H.li(null, H.a(null, "Set Opacity"))
-        H.li(null, H.a(onClick: @handleRemoveLayerView.bind(null, index), "Remove Layer"))
+        H.li(key: "edit", H.a(null, "Edit Layer"))
+        H.li(key: "opacity", H.a(null, "Set Opacity"))
+        H.li(key: "remove", H.a(onClick: @handleRemoveLayerView.bind(null, index), "Remove Layer"))
 
   renderLayerView: (layer, index) =>
     # Class of checkbox
     visibleClass = if layer.visible then "mwater-visualization-layer checked" else "mwater-visualization-layer"
 
-    H.li className: "list-group-item",
+    H.li className: "list-group-item", key: layer.id,
       @renderLayerGearMenu(layer, index)
-      H.div className: visibleClass, onClick: @handleVisibleClick.bind(null, index), 
+      H.div className: visibleClass, onClick: @handleVisibleClick.bind(null, index), key: "layer",
         layer.name
         # H.br()
         # H.small null, desc
@@ -72,7 +72,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
         name
 
   renderBaseLayers: ->
-    H.div style: { margin: 5, marginBottom: 10 },
+    H.div style: { margin: 5, marginBottom: 10 }, key: "baseLayers"
       @renderBaseLayer("bing_road", "Roads")
       @renderBaseLayer("bing_aerial", "Satellite")
 
@@ -83,7 +83,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
       H.ul className: "list-group", 
         _.map(@props.design.layerViews, @renderLayerView)
 
-      H.div style: { margin: 5 }, 
+      H.div style: { margin: 5 }, key: "addLayer",
         H.button type: "button", className: "btn btn-default", onClick: @handleAddLayerView,
           H.span className: "glyphicon glyphicon-plus"
           " Add Layer"
