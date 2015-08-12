@@ -8,7 +8,7 @@ MWaterDataSource = require './MWaterDataSource'
 exports.createDataSource = (apiUrl, client) ->
   return new MWaterDataSource(apiUrl, client)
 
-exports.createSchema = (apiUrl, client, cb) ->
+exports.createSchema = (apiUrl, client, user, groups, cb) ->
   if client
     clientUrl = "?client=#{client}"
   else
@@ -21,7 +21,7 @@ exports.createSchema = (apiUrl, client, cb) ->
         # Create schema
         schema = new Schema()
         schemaBuilder = new SchemaBuilder()
-        schemaBuilder.addEntities(schema, entity_types, properties, units)
+        schemaBuilder.addEntities(schema, entity_types, properties, units, user, groups)
         schemaBuilder.addLegacyTables(schema)
 
         cb(null, schema)

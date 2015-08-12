@@ -2,7 +2,7 @@ Schema = require '../../Schema'
 
 # Builds a schema from properties and entity types
 module.exports = class SchemaBuilder 
-  addEntities: (schema, entityTypes, properties, units) ->
+  addEntities: (schema, entityTypes, properties, units, user, groups) ->
     # Keep list of reverse join columns (one to many) to add later. table and column
     reverseJoins = []
 
@@ -23,6 +23,18 @@ module.exports = class SchemaBuilder
 
       # Add properties
       for prop in properties
+        # Filter out invisible ones
+        if not _.any(prop._roles, (r) ->
+          if r.to == "all"
+            return true
+          if r.to == "user:#{user}"
+            return true
+          if r.to in _.map(groups or [], (g) -> "group:#{g}")
+            return true
+          return false
+          )
+          continue
+
         # Filter for this entity only
         if prop.entity_type != entityType.code
           continue
