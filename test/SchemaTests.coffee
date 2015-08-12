@@ -45,3 +45,32 @@ describe "Schema", ->
     assert.equal schema.getColumns("a")[0].id, "x"
     assert.equal schema.getColumns("a")[0].name, "X"
 
+  describe "parseStructureFromText", ->
+    it "parse flat structure", ->
+      structure = Schema.parseStructureFromText('''
+a
+b
+c  
+        ''')
+      assert.deepEqual structure, [
+        { type: "column", column: "a" }
+        { type: "column", column: "b" }
+        { type: "column", column: "c" }
+      ]
+
+    it "loads sections", ->
+      structure = Schema.parseStructureFromText('''
+a
++b
+  c some comment
+  d
+e
+        ''')
+      assert _.isEqual(structure, [
+        { type: "column", column: "a" }
+        { type: "section", name: "b", contents: [
+          { type: "column", column: "c" }
+          { type: "column", column: "d" }
+          ]}
+        { type: "column", column: "e" }
+      ]), JSON.stringify(structure, null, 2)
