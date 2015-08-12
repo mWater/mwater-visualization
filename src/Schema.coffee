@@ -9,7 +9,6 @@ module.exports = class Schema
     table = _.pick(options, "id", "name", "desc", "ordering")
     table.columns = []
     table.namedExprs = []
-    table.structure = []  # Order of columns and arrangement into sections
     @tables.push(table)
     return this
 
