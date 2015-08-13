@@ -32,11 +32,11 @@ module.exports = class DashboardComponent extends React.Component
 
   renderActionLinks: ->
     H.div style: { textAlign: "right", position: "absolute", top: 0, right: 0 },
-      H.a className: "btn btn-link btn-sm", onClick: @handlePrint,
-        H.span(className: "glyphicon glyphicon-print")
       H.a className: "btn btn-link btn-sm", onClick: @handleToggleDesigning,
         H.span(className: "glyphicon glyphicon-pencil")
-        " Edit"
+        if @state.isDesigning then " Close Editor" else " Edit"
+      H.a className: "btn btn-link btn-sm", onClick: @handlePrint,
+        H.span(className: "glyphicon glyphicon-print")
     # H.nav className: "navbar navbar-default",
     #   H.div className: "container-fluid",
     #     H.div className: "navbar-header", 
