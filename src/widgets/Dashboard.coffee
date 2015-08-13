@@ -100,7 +100,7 @@ class PrintableDashboard extends React.Component
   render: ->
     # TODO REMOVE
     return H.div null,
-      H.button type: "button", className: "btn btn-link", onClick: (=> @refs.view.callChild("print")),
+      H.button type: "button", className: "btn btn-link", onClick: (=> @refs.view.getChild().print()),
         "Print"
       React.cloneElement(React.Children.only(@props.children), ref: "view")
 

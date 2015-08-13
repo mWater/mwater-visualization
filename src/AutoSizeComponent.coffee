@@ -25,9 +25,9 @@ module.exports = class AutoSizeComponent extends React.Component
     node = React.findDOMNode(this)
     @setState(width: node.clientWidth, height: node.clientHeight)
 
-  # Call child component with parameter
-  callChild: (method, params...) =>
-    @refs.child[method].apply(@refs.child, params)
+  # Get child component
+  getChild: ->
+    return @refs.child
 
   render: ->
     if not @state.width? or not @state.height?
