@@ -40,7 +40,7 @@ module.exports = class LogicalExprComponent extends React.Component
 
     # Simple button if no named expressions
     if namedExprs.length == 0
-      return H.button type: "button", className: "btn btn-default", onClick: @handleAdd.bind(null, null),
+      return H.button type: "button", className: "btn btn-sm btn-default", onClick: @handleAdd.bind(null, null),
         H.span className: "glyphicon glyphicon-plus"
         " Add Filter"
 

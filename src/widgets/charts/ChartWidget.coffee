@@ -5,6 +5,7 @@ QueryDataLoadingComponent = require './../QueryDataLoadingComponent'
 SimpleWidgetComponent = require './../SimpleWidgetComponent'
 CsvBuilder = require './../../CsvBuilder'
 filesaver = require 'filesaver.js'
+ActionCancelModalComponent = require '../../ActionCancelModalComponent'
 
 # A widget which is a chart
 module.exports = class ChartWidget extends Widget
@@ -34,7 +35,6 @@ module.exports = class ChartWidget extends Widget
       onSelect: options.onSelect # TODO REMOVE
     )
 
-
   # Creates a React element that is a designer for the widget
   # options:
   #  onDesignChange: called with new design if changed
@@ -42,6 +42,7 @@ module.exports = class ChartWidget extends Widget
     # TODO REMOVE?
     return @chart.createDesignerElement(design: @design, onDesignChange: options.onDesignChange)
 
+# Complete chart widget. Stores state of editing and renders editor if open
 class ChartWidgetComponent extends React.Component
   @propTypes:
     chart: React.PropTypes.object.isRequired # Chart object to use
@@ -59,6 +60,11 @@ class ChartWidgetComponent extends React.Component
 
     connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
     connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
+
+  constructor: ->
+    super
+    # editingDesign is not null if editing
+    @state = { editingDesign: null }
 
   # Saves a csv file to disk
   handleSaveCsvFile: ->
@@ -81,29 +87,58 @@ class ChartWidgetComponent extends React.Component
       filesaver(blob, "Exported Data.csv")
     )
 
+  handleSaveEditing: =>
+    @props.onDesignChange(@state.editingDesign)
+    @setState(editingDesign: null)
+
+  handleCancelEditing: =>
+    @setState(editingDesign: null)
+
+  handleStartEditing: =>
+    @setState(editingDesign: @props.design)
+
+  handleEditingChange: (design) =>
+    @setState(editingDesign: design)
+
+  renderEditor: ->
+    if not @state.editingDesign?
+      return
+
+    return React.createElement(ActionCancelModalComponent,
+      title: "Edit Chart"
+      onAction: @handleSaveEditing
+      onCancel: @handleCancelEditing,
+        @props.chart.createDesignerElement(
+          design: @state.editingDesign
+          onDesignChange: @handleEditingChange)
+    )
+
   render: ->
     # Create dropdown items
     dropdownItems = @props.chart.createDropdownItems(@props.design, @props.dataSource, @props.filters)
     dropdownItems.push({ label: "Export Data", icon: "save-file", onClick: => @handleSaveCsvFile(@props.filters) })
     dropdownItems.push({ label: "Remove", icon: "remove", onClick: @props.onRemove })
+    dropdownItems.unshift({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
 
     # Wrap in a simple widget
-    return React.createElement(SimpleWidgetComponent,
-      selected: @props.selected
-      onSelect: @props.onSelect
-      width: @props.width
-      height: @props.height
-      dropdownItems: dropdownItems,
-      connectMoveHandle: @props.connectMoveHandle
-      connectResizeHandle: @props.connectResizeHandle,
-        React.createElement(ChartWidgetViewComponent, 
-          chart: @props.chart
-          design: @props.design
-          dataSource: @props.dataSource
-          scope: @props.scope
-          filters: @props.filters
-          onScopeChange: @props.onScopeChange)
-    )
+    return H.div null, 
+      @renderEditor()
+      React.createElement(SimpleWidgetComponent,
+        selected: @props.selected
+        onSelect: @props.onSelect
+        width: @props.width
+        height: @props.height
+        dropdownItems: dropdownItems,
+        connectMoveHandle: @props.connectMoveHandle
+        connectResizeHandle: @props.connectResizeHandle,
+          React.createElement(ChartWidgetViewComponent, 
+            chart: @props.chart
+            design: @props.design
+            dataSource: @props.dataSource
+            scope: @props.scope
+            filters: @props.filters
+            onScopeChange: @props.onScopeChange)
+      )
 
 # View part of the chart widget. Uses a query data loading component
 # to handle loading and continues to display old data if design becomes
