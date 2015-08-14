@@ -9,10 +9,7 @@ exports.DataSource = require './DataSource'
 exports.CachingDataSource = require './CachingDataSource'
 exports.WidgetFactory = require './widgets/WidgetFactory'
 
-exports.Dashboard = require './widgets/Dashboard'
 exports.DashboardComponent = require './widgets/DashboardComponent'
-exports.DashboardViewComponent = require './widgets/DashboardViewComponent'
-exports.DashboardDesignerComponent = require './widgets/DashboardDesignerComponent'
 exports.AutoSizeComponent = require './AutoSizeComponent'
 
 exports.BingLayer = require './maps/BingLayer'

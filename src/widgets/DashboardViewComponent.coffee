@@ -6,20 +6,13 @@ WidgetScoper = require './WidgetScoper'
 WidgetContainerComponent = require './WidgetContainerComponent'
 ReactElementPrinter = require './../ReactElementPrinter'
 
-# Displays a dashboard, handling removing and passing up selection events
+# Displays a dashboard, handling removing of widgets. No title bar or other decorations.
 module.exports = class DashboardViewComponent extends React.Component
   @propTypes: 
     design: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func.isRequired
 
-    selectedWidgetId: React.PropTypes.string
-    onSelectedWidgetIdChange: React.PropTypes.func.isRequired
-
-    isDesigning: React.PropTypes.bool.isRequired
-    onIsDesigningChange: React.PropTypes.func
-
     width: React.PropTypes.number
-
     widgetFactory: React.PropTypes.object.isRequired # Factory of type WidgetFactory to make widgets
 
   constructor: (props) ->
@@ -39,15 +32,7 @@ module.exports = class DashboardViewComponent extends React.Component
   handleScopeChange: (id, scope) => 
     @setState(widgetScoper: @state.widgetScoper.applyScope(id, scope))
 
-  handleClick: (ev) =>
-    # Deselect
-    ev.stopPropagation()
-    @props.onSelectedWidgetIdChange(null)
-
   handleRemove: (id) =>
-    # First unselect widgets
-    @props.onSelectedWidgetIdChange(null)
-    
     # Update item layouts
     items = _.omit(@props.design.items, id)
     design = _.extend({}, @props.design, items: items)
@@ -57,12 +42,24 @@ module.exports = class DashboardViewComponent extends React.Component
   handleRemoveScope: (id) =>
     @setState(widgetScoper: @state.widgetScoper.applyScope(id, null))    
 
+  handleDesignChange: (id, widgetDesign) =>
+    widget = @props.design.items[id].widget
+    widget = _.extend({}, widget, design: widgetDesign)
+
+    item = @props.design.items[id]
+    item = _.extend({}, item, widget: widget)
+
+    items = _.clone(@props.design.items)
+    items[id] = item
+
+    design = _.extend({}, @props.design, items: items)
+    @props.onDesignChange(design)
+
   # Call to print the dashboard
   print: =>
     # Create element at 96 dpi (usual for browsers) and 7.5" across (letter - 0.5" each side)
-    # Don't show selected widget
     elem = React.createElement(DashboardViewComponent, 
-      _.extend(@props, { width: 7.5*96, selectedWidgetId: null }))
+      _.extend(@props, { width: 7.5*96 }))
     
     printer = new ReactElementPrinter()
     printer.print(elem)
@@ -115,12 +112,11 @@ module.exports = class DashboardViewComponent extends React.Component
     # Create widget elems
     elems = _.mapValues widgets, (widget, id) =>
       widget.createViewElement({
-        selected: id == @props.selectedWidgetId
-        onSelect: @props.onSelectedWidgetIdChange.bind(null, id)
         scope: @state.widgetScoper.getScope(id)
         filters: @state.widgetScoper.getFilters(id)
         onScopeChange: @handleScopeChange.bind(null, id)
         onRemove: @handleRemove.bind(null, id)
+        onDesignChange: @handleDesignChange.bind(null, id)
       })  
 
     style = {

@@ -4,12 +4,11 @@
 module.exports = class Widget
   # Creates a React element that is a view of the widget 
   # options:
-  #  selected: true if selected
-  #  onSelect: called when selected
   #  onRemove: called when widget is removed
   #  scope: scope of the widget (when the widget self-selects a particular scope)
   #  filters: array of filters to apply (array of expressions)
-  #  onScopeChange: called with (scope, filter) as a scope to apply to self and filter to apply to other widgets
+  #  onScopeChange: called with scope of widget
+  #  onDesignChange: called with new design
   # Element will have the following props injected:
   #  width: width in pixels
   #  height: height in pixels

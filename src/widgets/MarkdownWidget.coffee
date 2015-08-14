@@ -11,8 +11,6 @@ module.exports = class MarkdownWidget extends Widget
 
   # Creates a view of the widget
   # options:
-  #  selected: true if selected
-  #  onSelect: called when selected
   #  onRemove: called when widget is removed
   #  scope: scope of the widget (when the widget self-selects a particular scope)
   #  filters: array of filters to apply (array of expressions)
@@ -22,8 +20,6 @@ module.exports = class MarkdownWidget extends Widget
     
     # Wrap in a simple widget
     return React.createElement(SimpleWidgetComponent, 
-      selected: options.selected
-      onSelect: options.onSelect
       dropdownItems: dropdownItems,
         React.createElement(MarkdownWidgetViewComponent, {
           design: @design

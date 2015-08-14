@@ -32,7 +32,6 @@ class DashboardPane extends React.Component
         design: @state.design
         widgetFactory: @state.widgetFactory
         onDesignChange: @handleDesignChange
-        initialIsDesigning: true
         })
 
 dashboardDesign = {"items":{"fc8d82bc-c485-4bc7-bc6d-b6c351f33813":{"layout":{"x":0,"y":0,"w":12,"h":12},"widget":{"type":"LayeredChart","version":"0.0.0","design":{"type":"pie","layers":[{"xExpr":null,"yExpr":{"type":"scalar","table":"entities.water_point","joins":[],"expr":{"type":"count","table":"entities.water_point"}},"colorExpr":{"type":"scalar","table":"entities.water_point","joins":[],"expr":{"type":"field","table":"entities.water_point","column":"type"}},"filter":null,"table":"entities.water_point","yAggr":"count"}],"titleText":"Water Points by Type"}}},"34e1f95a-30f5-4d63-b90f-bd3d310db850":{"layout":{"x":12,"y":0,"w":12,"h":12},"widget":{"type":"LayeredChart","version":"0.0.0","design":{"type":"bar","layers":[{"xExpr":{"type":"scalar","table":"entities.water_point","joins":["source_notes"],"expr":{"type":"field","table":"source_notes","column":"status"},"aggr":"last"},"yExpr":{"type":"scalar","table":"entities.water_point","joins":[],"expr":{"type":"count","table":"entities.water_point"}},"colorExpr":null,"filter":null,"table":"entities.water_point","yAggr":"count"}],"titleText":"Water Points by Status","transpose":false}}}}}

@@ -1,15 +1,14 @@
 React = require 'react'
 H = React.DOM
 
-# Simple widget that can be selected, dragged and resized
+# Simple widget that can be dragged and resized
 # Injects inner width and height to child element
 module.exports = class SimpleWidgetComponent extends React.Component
   @propTypes:
     width: React.PropTypes.number
     height: React.PropTypes.number
 
-    selected: React.PropTypes.bool # true if selected
-    onSelect: React.PropTypes.func # called when selected
+    highlighted: React.PropTypes.bool # true if highlighted
     
     connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
     connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
@@ -19,10 +18,6 @@ module.exports = class SimpleWidgetComponent extends React.Component
       icon: React.PropTypes.string # Glyphicon string. e.g. "remove"
       onClick: React.PropTypes.func.isRequired
       })).isRequired # A list of {label, icon, onClick} actions for the dropdown
-
-  handleClick: (ev) =>
-    ev.stopPropagation()
-    @props.onSelect()
 
   handleRemove: (ev) =>
     ev.stopPropagation()
@@ -81,8 +76,8 @@ module.exports = class SimpleWidgetComponent extends React.Component
       padding: 10
     }
     
-    if @props.selected
-      style.border = "dashed 2px #AAA"
+    if @props.highlighted
+      style.border = "dashed 2px blue"
 
     contents = H.div style: { position: "absolute", left: 10, top: 10, right: 10, bottom: 10 }, 
       React.cloneElement(React.Children.only(@props.children), 

@@ -16,12 +16,11 @@ module.exports = class ChartWidget extends Widget
 
   # Creates a view of the widget. width and height will be injected
   # options:
-  #  selected: true if selected
-  #  onSelect: called when selected
   #  onRemove: called when widget is removed
   #  scope: scope of the widget (when the widget self-selects a particular scope)
   #  filters: array of filters to apply (array of expressions)
   #  onScopeChange: called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+  #  onDesignChange: called with new design
   createViewElement: (options) ->
     return React.createElement(ChartWidgetComponent,
       chart: @chart
@@ -31,16 +30,15 @@ module.exports = class ChartWidget extends Widget
       scope: options.scope
       filters: options.filters
       onScopeChange: options.onScopeChange
-      selected: options.selected # TODO REMOVE
-      onSelect: options.onSelect # TODO REMOVE
+      onDesignChange: options.onDesignChange
     )
 
   # Creates a React element that is a designer for the widget
   # options:
   #  onDesignChange: called with new design if changed
   createDesignerElement: (options) ->
-    # TODO REMOVE?
-    return @chart.createDesignerElement(design: @design, onDesignChange: options.onDesignChange)
+    # TODO REMOVE
+    return null
 
 # Complete chart widget. Stores state of editing and renders editor if open
 class ChartWidgetComponent extends React.Component
@@ -124,8 +122,7 @@ class ChartWidgetComponent extends React.Component
     return H.div null, 
       @renderEditor()
       React.createElement(SimpleWidgetComponent,
-        selected: @props.selected
-        onSelect: @props.onSelect
+        highlighted: @state.editingDesign?
         width: @props.width
         height: @props.height
         dropdownItems: dropdownItems,
