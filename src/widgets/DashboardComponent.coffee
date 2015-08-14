@@ -31,23 +31,16 @@ module.exports = class DashboardComponent extends React.Component
     @setState(isDesigning: not @state.isDesigning)    
 
   renderActionLinks: ->
-    H.div style: { textAlign: "right", position: "absolute", top: 0, right: 0 },
+    H.div style: { textAlign: "right", position: "absolute", top: 0, right: 20 },
       H.a className: "btn btn-link btn-sm", onClick: @handleToggleDesigning,
         H.span(className: "glyphicon glyphicon-pencil")
         if @state.isDesigning then " Close Editor" else " Edit"
       H.a className: "btn btn-link btn-sm", onClick: @handlePrint,
         H.span(className: "glyphicon glyphicon-print")
-    # H.nav className: "navbar navbar-default",
-    #   H.div className: "container-fluid",
-    #     H.div className: "navbar-header", 
-    #       H.p className: "navbar-text", style: { marginLeft: 0 }, "Untitled Dashboard"
-    #     H.ul className: "nav navbar-nav navbar-right",
-    #       H.li null,
-    #         H.a onClick: @handlePrint,
-    #           H.span(className: "glyphicon glyphicon-print")
+        " Print"
 
   renderView: ->
-    H.div key: "view", style: { height: "100%", overflowY: "auto", paddingTop: 30, paddingRight: 20, position: "relative" },
+    H.div key: "view", style: { height: "100%", overflowY: "auto", paddingTop: 30, paddingRight: 20, paddingLeft: 5, position: "relative" },
       @renderActionLinks()
       # Dashboard view requires width, so use auto size component to inject it
       React.createElement(AutoSizeComponent, { injectWidth: true, ref: "dashboardViewContainer" }, 
