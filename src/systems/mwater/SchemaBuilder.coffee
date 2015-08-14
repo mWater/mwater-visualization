@@ -1,5 +1,6 @@
 Schema = require '../../Schema'
 fs = require 'fs'
+formUtils = require 'mwater-forms/lib/formUtils'
 
 # Builds a schema from properties and entity types
 module.exports = class SchemaBuilder 
@@ -229,6 +230,220 @@ module.exports = class SchemaBuilder
     # })
 
   addForm: (form) ->
-    return
+    # Create table
+    @schema.addTable({
+      id: "form:#{form._id}"
+      name: formUtils.localizeString(form.design.name)
+      # TODO ordering: 
+      })
 
+    structure = []
+    @addFormItem(form, form.design, structure)
+    # TODO structure
 
+  addFormItem: (form, item, structure) ->
+    # Add sub-items
+    if item.contents
+      # TODO For section structure
+      for subitem in item.contents
+        @addFormItem(form, subitem, structure)
+
+    else if formUtils.isQuestion(item)
+      # Get type of answer
+      answerType = formUtils.getAnswerType(item)
+      switch answerType
+        when "text"
+          # Get a simple text column
+          column = {
+            id: "data:#{item._id}:value"
+            type: "text"
+            name: formUtils.localizeString(item.text)
+            jsonql: {
+              type: "op"
+              op: "#>>"
+              exprs: [
+                { type: "field", tableAlias: "{alias}", column: "data" }
+                "{#{item._id},value}"
+              ]
+            }
+          }
+          @schema.addColumn("form:#{form._id}", column)
+
+        when "number"
+          # Get a decimal or integer column
+          if item.decimal
+            column = {
+              id: "data:#{item._id}:value"
+              type: "decimal"
+              name: formUtils.localizeString(item.text)
+              jsonql: {
+                type: "op"
+                op: "::decimal"
+                exprs: [
+                  {
+                    type: "op"
+                    op: "#>>"
+                    exprs: [
+                      { type: "field", tableAlias: "{alias}", column: "data" }
+                      "{#{item._id},value}"
+                    ]
+                  }
+                ]
+              }
+            }
+          else
+            column = {
+              id: "data:#{item._id}:value"
+              type: "integer"
+              name: formUtils.localizeString(item.text)
+              jsonql: {
+                type: "op"
+                op: "::integer"
+                exprs: [
+                  {
+                    type: "op"
+                    op: "#>>"
+                    exprs: [
+                      { type: "field", tableAlias: "{alias}", column: "data" }
+                      "{#{item._id},value}"
+                    ]
+                  }
+                ]
+              }
+            }
+          @schema.addColumn("form:#{form._id}", column)
+
+        when "choice"
+          # Get a simple text column
+          column = {
+            id: "data:#{item._id}:value"
+            type: "enum"
+            name: formUtils.localizeString(item.text)
+            jsonql: {
+              type: "op"
+              op: "#>>"
+              exprs: [
+                { type: "field", tableAlias: "{alias}", column: "data" }
+                "{#{item._id},value}"
+              ]
+            }
+            values: _.map(item.choices, (c) -> { id: c.id, name: formUtils.localizeString(c.label) })
+          }
+          @schema.addColumn("form:#{form._id}", column)
+
+        when "choices"
+          for choice in item.choices
+            column = {
+              id: "data:#{item._id}:value:#{choice.id}"
+              type: "boolean"
+              name: formUtils.localizeString(item.text) + ": " + formUtils.localizeString(choice.label)
+              jsonql: {
+                type: "op"
+                op: "like"
+                exprs: [
+                  {
+                    type: "op"
+                    op: "#>>"
+                    exprs: [
+                      { type: "field", tableAlias: "{alias}", column: "data" }
+                      "{#{item._id},value}"
+                    ]
+                  }
+                  "%\"#{choice.id}\"%"
+                ]
+              }
+            }
+            @schema.addColumn("form:#{form._id}", column)
+
+        when "date"
+          # Fill in month and year and remove timestamp
+          column = {
+            id: "data:#{item._id}:value"
+            type: "date"
+            name: formUtils.localizeString(item.text)
+            jsonql: {
+              type: "op"
+              op: "substr"
+              exprs: [
+                {
+                  type: "op"
+                  op: "rpad"
+                  exprs:[
+                    {
+                      type: "op"
+                      op: "#>>"
+                      exprs: [
+                        { type: "field", tableAlias: "{alias}", column: "data" }
+                        "{#{item._id},value}"
+                      ]
+                    }
+                    10
+                    '-01-01'
+                  ]
+                }
+                1
+                10
+              ]
+            }
+          }
+          @schema.addColumn("form:#{form._id}", column)
+
+        when "boolean"
+          column = {
+            id: "data:#{item._id}:value"
+            type: "boolean"
+            name: formUtils.localizeString(item.text)
+            jsonql: {
+              type: "op"
+              op: "::boolean"
+              exprs: [
+                {
+                  type: "op"
+                  op: "#>>"
+                  exprs: [
+                    { type: "field", tableAlias: "{alias}", column: "data" }
+                    "{#{item._id},value}"
+                  ]
+                }
+              ]
+            }
+          }
+
+          @schema.addColumn("form:#{form._id}", column)
+
+        when "location"
+          column = {
+            id: "data:#{item._id}:value"
+            type: "geometry"
+            name: formUtils.localizeString(item.text)
+            # ST_SetSRID(ST_MakePoint(data#>>'{questionid,value,latitude}'::decimal, data#>>'{questionid,value,longitude}'::decimal),4326)
+            jsonql: {
+              type: "op"
+              op: "ST_SetSRID"
+              exprs: [
+                {
+                  type: "op"
+                  op: "ST_MakePoint"
+                  exprs: [
+                    {
+                      type: "op"
+                      op: "::decimal"
+                      exprs: [
+                        { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{#{item._id},value,latitude}"] }
+                      ]
+                    }
+                    {
+                      type: "op"
+                      op: "::decimal"
+                      exprs: [
+                        { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{#{item._id},value,longitude}"] }
+                      ]
+                    }
+                  ]
+                }
+                4326
+              ]
+            }
+          }
+          
+          @schema.addColumn("form:#{form._id}", column)
