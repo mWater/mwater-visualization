@@ -31,11 +31,6 @@ module.exports = class MapDesignerComponent extends React.Component
           layerFactory: @props.layerFactory,
           onDesignChange: @props.onDesignChange) 
       }
-      { 
-        id: "save"
-        label: [H.span(className: "glyphicon glyphicon-saved"), " Saved"]
-        elem: "LOAD/SAVE"
-      }
     ]
 
     React.createElement(TabbedComponent, 
