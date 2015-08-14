@@ -7,6 +7,7 @@ WidgetContainerComponent = require './WidgetContainerComponent'
 ReactElementPrinter = require './../ReactElementPrinter'
 
 # Displays a dashboard, handling removing of widgets. No title bar or other decorations.
+# Handles scoping
 module.exports = class DashboardViewComponent extends React.Component
   @propTypes: 
     design: React.PropTypes.object.isRequired

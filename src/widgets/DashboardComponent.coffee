@@ -3,8 +3,8 @@ H = React.DOM
 
 UndoStack = require './../UndoStack'
 DashboardViewComponent = require './DashboardViewComponent'
-DashboardDesignerComponent = require './DashboardDesignerComponent'
 AutoSizeComponent = require './../AutoSizeComponent'
+filesaver = require 'filesaver.js'
 
 # Dashboard component that includes an action bar at the top
 # Manages undo stack
@@ -36,6 +36,12 @@ module.exports = class DashboardComponent extends React.Component
 
     # We need to use callback as state is applied later
     @setState(undoStack: undoStack, => @props.onDesignChange(undoStack.getValue()))
+
+  # Saves a json file to disk
+  handleSaveDesignFile: =>
+    # Make a blob and save
+    blob = new Blob([JSON.stringify(@props.design, null, 2)], {type: "text/json"})
+    filesaver(blob, "Dashboard.json")
 
   # Find a layout that the new widget fits in. width and height are in 24ths
   findOpenLayout: (width, height) ->
@@ -89,9 +95,6 @@ module.exports = class DashboardComponent extends React.Component
 
   renderActionLinks: ->
     H.div style: { textAlign: "right", position: "absolute", top: 0, right: 20 },
-      H.a key: "print", className: "btn btn-link btn-sm", onClick: @handlePrint,
-        H.span(className: "glyphicon glyphicon-print")
-        " Print"
       H.a key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
         H.span className: "glyphicon glyphicon-triangle-left"
         " Undo"
@@ -99,6 +102,12 @@ module.exports = class DashboardComponent extends React.Component
       H.a key: "redo", className: "btn btn-link btn-sm #{if not @state.undoStack.canRedo() then "disabled" else ""}", onClick: @handleRedo, 
         H.span className: "glyphicon glyphicon-triangle-right"
         " Redo"
+      H.a key: "print", className: "btn btn-link btn-sm", onClick: @handlePrint,
+        H.span(className: "glyphicon glyphicon-print")
+        " Print"
+      H.a key: "export", className: "btn btn-link btn-sm", onClick: @handleSaveDesignFile,
+        H.span(className: "glyphicon glyphicon-download-alt")
+        " Export"
 
   render: ->
     H.div key: "view", style: { height: "100%", overflowY: "auto", paddingTop: 30, paddingRight: 20, paddingLeft: 5, position: "relative" },
