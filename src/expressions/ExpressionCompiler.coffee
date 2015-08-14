@@ -41,6 +41,32 @@ module.exports = class ExpressionCompiler
   compileFieldExpr: (options) ->
     expr = options.expr
 
+    # Check if column has custom jsonql
+    column = @schema.getColumn(expr.table, expr.column)
+    if not column
+      throw new Error("Column #{expr.table}.#{expr.column} not found")
+
+    if column.jsonql
+      # Recursively substitute table alias
+      substituteTableAlias = (jsonql, tableAlias) ->
+        # Handle arrays
+        if _.isArray(jsonql)
+          return _.map(jsonql, (item) -> substituteTableAlias(item, tableAlias))
+
+        # Handle non-objects by leaving alone
+        if not _.isObject(jsonql)
+          return jsonql
+
+        # Handle field
+        if jsonql.type == "field" and jsonql.tableAlias == "{alias}"
+          return _.extend(jsonql, tableAlias: tableAlias)
+
+        # Recurse object keys
+        return _.mapValues(jsonql, (value) -> substituteTableAlias(value, tableAlias))
+
+      # Substitute tableAlias is fields
+      return substituteTableAlias(column.jsonql, options.tableAlias)
+
     return {
       type: "field"
       tableAlias: options.tableAlias

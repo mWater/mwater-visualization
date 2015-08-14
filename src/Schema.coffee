@@ -12,9 +12,12 @@ module.exports = class Schema
     @tables.push(table)
     return this
 
+  # Add a column. The column must contain id, name, type
+  # For enums, must contain values (array of id, name.)
+  # See Schema.md for complete details
   addColumn: (tableId, options) ->
     table = @getTable(tableId)
-    table.columns.push(_.pick(options, "id", "name", "desc", "type", "values", "join"))
+    table.columns.push(_.pick(options, "id", "name", "desc", "type", "values", "join", "jsonql"))
     return this
 
   # Add a named expression to a table with id, name, expr which is a valid scalar or field expression

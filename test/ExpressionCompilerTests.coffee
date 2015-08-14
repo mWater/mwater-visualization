@@ -287,3 +287,35 @@ describe "ExpressionCompiler", ->
         ]}
       ), JSON.stringify(jql, null, 2)
 
+  describe "custom jsonql", ->
+    it "substitutes {alias}", ->
+      schema = fixtures.simpleSchema()
+      columnJsonql = {
+        type: "op"
+        op: "sum"
+        exprs: [
+          {
+            type: "field"
+            tableAlias: "{alias}"  # Should be replaced!
+            column: "integer"
+          }
+        ]
+      }
+
+      schema.addColumn("t1", { id: "custom", name: "Custom", type: "text", jsonql: columnJsonql })
+      
+      ec = new ExpressionCompiler(schema)
+
+      jql = ec.compileExpr(expr: { type: "field", table: "t1", column: "custom" }, tableAlias: "T1")
+
+      assert _.isEqual jql, {
+        type: "op"
+        op: "sum"
+        exprs: [
+          {
+            type: "field"
+            tableAlias: "T1" # Replaced with table alias
+            column: "integer"
+          }
+        ]
+      }
