@@ -32,8 +32,10 @@ module.exports = class TableChartDesignerComponent extends React.Component
     @updateDesign(columns: columns)
 
   renderTable: ->
-    if not @props.design.table
-      popover = "Start by selecting a data source"
+    # Popover removed due to problems positioning in modal window
+    popover = null
+    # if not @props.design.table
+    #   popover = "Start by selecting a data source"
 
     return H.div className: "form-group",
       H.label className: "text-muted", 

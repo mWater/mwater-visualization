@@ -216,8 +216,10 @@ class LayerDesignerComponent extends React.Component
   renderTable: ->
     layer = @props.design.layers[@props.index]
 
-    if not layer.table
-      popover = "Start by selecting a data source"
+    # Popover removed due to problems positioning in modal window
+    popover = null
+    # if not layer.table
+    #   popover = "Start by selecting a data source"
 
     return H.div className: "form-group",
       H.label className: "text-muted", 

@@ -1,0 +1,60 @@
+type Type
+mwa_scheme_type MWA scheme type
+
++Name and location data
+  name Name
+  desc Description
+  location Location
+  location_accuracy Location Accuracy
+  location_altitude Location Altitude
+  admin_02_country Country
+  admin_08_ethiopia_woreda Woreda
+  admin_10_ethiopia_kebele Kebele
+  photos Photos
+
++Technical attributes
+  installation_date Date of installation
+  supply Supply
+  supply_other Supply (other)
+  treatment_works Treatment works
+  drilling_method Drilling method
+  drilling_method_other Drilling method (other)
+  pump_lifting_device Pump/lifting device
+  pump_lifting_device_other Pump lifting device (Other)
+  rehab Rehabilitated water point
+
++Identification codes
+  code mWater Code
+  the_water_trust_uganda_id The Water Trust Uganda Id
+  oxfam_south_sudan_id Oxfam South Sudan Id
+  charity_water_id charity: water Id
+  tz_wpms_id Tz-WPMS Id
+
++Program and funding data
+  wo_initiative Water.org Initiative
+  wo_partner_name Water.org Partner Name
+  wo_program_number Water.org Program Number
+  wo_program_type Water.org Program Type
+  twp_partner TWP Partner
+  twp_project_id TWP Project ID
+  twp_project_location TWP Project Location
+  twp_project_type TWP Project Type
+  twp_url TWP Project Link
+
++Other
+  legacy_attrs Attributes
+  legacy_custom Custom Fields
+  legacy_tags Tags
+
++Water Point Data Exchange (WPDX)
+  wpdx_converted_fields WPDX Converted fields
+  wpdx_country WPDX Country (ISO 2-letter code)
+  wpdx_data_source WPDX Data source
+  wpdx_id WPDX Water point ID
+  wpdx_installer WPDX Installer
+  wpdx_management_structure WPDX Management structure
+  wpdx_primary_admin_div WPDX Primary administrative division
+  wpdx_raw_data_source_url WPDX Raw data source URL
+  wpdx_secondary_admin_div WPDX Secondary administrative division
+  wpdx_water_point_technology WPDX Water point technology
+  wpdx_water_source WPDX Water Source

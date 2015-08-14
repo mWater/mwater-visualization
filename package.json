@@ -9,7 +9,8 @@
   },
   "browserify": {
     "transform": [
-      "coffeeify"
+      "coffeeify",
+      "brfs"
     ]
   },
   "style": "src/index.css",
@@ -29,6 +30,7 @@
     "react-select": "^0.4.8"
   },
   "devDependencies": {
+    "brfs": "^1.4.1",
     "browser-sync": "^2.5.0",
     "browserify": "^8.1.3",
     "chai": "~2.0.0",

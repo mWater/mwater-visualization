@@ -1,10 +1,12 @@
 React = require 'react'
 H = React.DOM
+uuid = require 'node-uuid'
 
 UndoStack = require './../UndoStack'
 DashboardViewComponent = require './DashboardViewComponent'
 AutoSizeComponent = require './../AutoSizeComponent'
 filesaver = require 'filesaver.js'
+LegoLayoutEngine = require './LegoLayoutEngine'
 
 # Dashboard component that includes an action bar at the top
 # Manages undo stack
@@ -82,7 +84,7 @@ module.exports = class DashboardComponent extends React.Component
     @addWidget(wt.type, wt.version, wt.design, 12, 12)
 
   renderAddWidget: ->
-    H.div className: "btn-group btn-sm",
+    H.div key: "add", className: "btn-group btn-xs",
       H.button type: "button", "data-toggle": "dropdown", className: "btn btn-link dropdown-toggle",
         H.span className: "glyphicon glyphicon-plus"
         " Add Widget "
@@ -95,6 +97,7 @@ module.exports = class DashboardComponent extends React.Component
 
   renderActionLinks: ->
     H.div style: { textAlign: "right", position: "absolute", top: 0, right: 20 },
+      @renderAddWidget()
       H.a key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
         H.span className: "glyphicon glyphicon-triangle-left"
         " Undo"
