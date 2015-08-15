@@ -19,7 +19,7 @@ gulp.task 'coffee', ->
 
 # Copy non-coffeescript files
 gulp.task 'copy', ->
-  gulp.src(['./src/**/*.js', './src/**/*.css'])
+  gulp.src(['./src/**/*.js', './src/**/*.css', './src/**/*.txt'])
     .pipe(gulp.dest('./lib/'))
 
 gulp.task "browserify", ->
