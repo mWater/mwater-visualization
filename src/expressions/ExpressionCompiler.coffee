@@ -46,32 +46,8 @@ module.exports = class ExpressionCompiler
     if not column
       throw new Error("Column #{expr.table}.#{expr.column} not found")
 
-    if column.jsonql
-      # Recursively substitute table alias
-      substituteTableAlias = (jsonql, tableAlias) ->
-        # Handle arrays
-        if _.isArray(jsonql)
-          return _.map(jsonql, (item) -> substituteTableAlias(item, tableAlias))
-
-        # Handle non-objects by leaving alone
-        if not _.isObject(jsonql)
-          return jsonql
-
-        # Handle field
-        if jsonql.type == "field" and jsonql.tableAlias == "{alias}"
-          return _.extend(jsonql, tableAlias: tableAlias)
-
-        # Recurse object keys
-        return _.mapValues(jsonql, (value) -> substituteTableAlias(value, tableAlias))
-
-      # Substitute tableAlias is fields
-      return substituteTableAlias(column.jsonql, options.tableAlias)
-
-    return {
-      type: "field"
-      tableAlias: options.tableAlias
-      column: expr.column
-    }
+    # If column has custom jsonql, use that instead of id
+    return @compileColumnRef(column.jsonql or column.id, options.tableAlias)
 
   compileScalarExpr: (options) ->
     expr = options.expr
@@ -92,8 +68,8 @@ module.exports = class ExpressionCompiler
       where = { 
         type: "op", op: join.op
         exprs: [
-          { type: "field", tableAlias: "j1", column: join.toColumn }
-          { type: "field", tableAlias: tableAlias, column: join.fromColumn }
+          @compileColumnRef(join.toColumn, "j1")
+          @compileColumnRef(join.fromColumn, tableAlias)
         ]
        }
 
@@ -120,8 +96,8 @@ module.exports = class ExpressionCompiler
             type: "op"
             op: join.op
             exprs: [
-              { type: "field", tableAlias: "j#{i}", column: join.fromColumn }
-              { type: "field", tableAlias: "j#{i+1}", column: join.toColumn }
+              @compileColumnRef(join.fromColumn, "j#{i}")
+              @compileColumnRef(join.toColumn, "j#{i+1}")
             ]
           }
         }
@@ -155,7 +131,7 @@ module.exports = class ExpressionCompiler
           limit = 1
 
           # order descending
-          orderBy = [{ expr: { type: "field", tableAlias: tableAlias, column: ordering }, direction: "desc" }]
+          orderBy = [{ expr: @compileColumnRef(ordering, tableAlias),  direction: "desc" }]
         when "sum", "count", "avg", "max", "min", "stdev", "stdevp"
           # Don't include scalarExpr if null
           if not scalarExpr
@@ -227,4 +203,30 @@ module.exports = class ExpressionCompiler
       op: expr.op
       exprs: _.map(expr.exprs, (e) => @compileExpr(expr: e, tableAlias: options.tableAlias))
     }
+
+  # Compiles a reference to a column or a JsonQL expression
+  # If parameter is a string, create a simple field expression
+  # If parameter is an object, substitute tableAlias for `{alias}`
+  compileColumnRef: (column, tableAlias) ->
+    if _.isString(column)
+      return { type: "field", tableAlias: tableAlias, column: column }
+
+    return @substituteTableAlias(column, tableAlias)
+
+  # Recursively substitute table alias tableAlias for `{alias}` 
+  substituteTableAlias: (jsonql, tableAlias) ->
+    # Handle arrays
+    if _.isArray(jsonql)
+      return _.map(jsonql, (item) => @substituteTableAlias(item, tableAlias))
+
+    # Handle non-objects by leaving alone
+    if not _.isObject(jsonql)
+      return jsonql
+
+    # Handle field
+    if jsonql.type == "field" and jsonql.tableAlias == "{alias}"
+      return _.extend(jsonql, tableAlias: tableAlias)
+
+    # Recurse object keys
+    return _.mapValues(jsonql, (value) => @substituteTableAlias(value, tableAlias))
 

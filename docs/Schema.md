@@ -13,7 +13,7 @@ Joins are included as a column type as they have a natural order within the othe
 
 `desc`: localized description of table (optional)
 
-`ordering`: column with natural ordering (optional)
+`ordering`: column with natural ordering (optional). Can be JsonQL expression with `{alias}` for table alias
 
 `columns`: array of columns of the table
 
@@ -66,11 +66,11 @@ Enum values are represented by an array of objects e.g. `{ id: some id, name: so
 
 `fromTable`: table to start join from
 
-`fromColumn`: table column to start join from
+`fromColumn`: table column to start join from. Can also be JsonQL expression with `{alias}` for tableAlias
 
 `toTable`: table to end join at
 
-`toColumn`: table to start join at
+`toColumn`: table column to end join at. Can also be JsonQL expression with `{alias}` for tableAlias
 
 `op`: Op to join with. Usually `=`
 
