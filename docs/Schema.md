@@ -75,3 +75,47 @@ Enum values are represented by an array of objects e.g. `{ id: some id, name: so
 `op`: Op to join with. Usually `=`
 
 `multiple`: true if one to many or many to many
+
+## JSON/YAML format
+
+This map is an JSON object which has a property `tables` which is an array of tables as defined in the schema. It includes the structure of the tables.
+
+Written in yaml:
+
+```
+tables:
+  - id: tablexyz
+    name: Table XYZ
+    primaryKey: id  # column name of primary key
+    sql: "(select * from tablexyz)" # Optional override on sql to get the column value. Most cases not needed
+    contents:
+      - type: section
+        name: Section X
+        contents: 
+          - type: text
+            id: program_name
+            name: Program Name
+          - type: integer
+            id: num_enrolled
+            name: Number of people enrolled in program  # Comments go here after hash
+            sql: "{alias}.number_enrolled" # Optional override on sql to get the column value
+          - type: enum
+            id: program_country
+            name: Country of Program
+            values:
+              - { id: "india", name: "India" }
+              - { id: "canada", name: "Canada" }
+      - type: section
+        name: Section Y
+        contents: 
+          - type: text
+            id: program_desc
+            name: Program Desciption
+          # And so on...
+
+  - id: tableabc
+    name: Table ABC
+    primaryKey: id  # column name of primary key
+    # And so on...
+
+```

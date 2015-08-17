@@ -2,6 +2,9 @@ assert = require('chai').assert
 _ = require 'lodash'
 Schema = require '../src/Schema'
 
+compare = (actual, expected) ->
+  assert _.isEqual(actual, expected) or JSON.stringify(actual) == JSON.stringify(expected), "\n" + JSON.stringify(actual) + "\n" + JSON.stringify(expected)
+
 describe "Schema", ->
   it "adds and gets tables", ->
     schema = new Schema()
@@ -27,7 +30,7 @@ describe "Schema", ->
       tables: [{
         id: "a"
         name: "A"
-        columns: [
+        contents: [
           { # Ignored
             id: "id"
             name: "ID"
@@ -45,6 +48,46 @@ describe "Schema", ->
     assert.equal schema.getColumns("a")[0].id, "x"
     assert.equal schema.getColumns("a")[0].name, "X"
 
+  it "loads from JSON object with structure", ->
+    schema = new Schema()
+    schema.loadFromJSON({
+      tables: [{
+        id: "a"
+        name: "A"
+        contents: [
+          { 
+            type: "section"
+            name: "S1"
+            contents: [
+              {
+                id: "x"
+                name: "X"
+                type: "text"
+              }
+            ]
+          }
+        ]
+      }]
+    })
+
+    compare(schema.getColumns("a"), [
+        {
+          id: "x"
+          name: "X"
+          type: "text"
+        }
+    ])
+
+    compare(schema.getTable("a").structure, [
+      { 
+        type: "section" 
+        name: "S1"
+        contents: [
+          { type: "column", column: "x" }
+        ]
+      }
+    ])
+    
   describe "parseStructureFromText", ->
     it "parse flat structure", ->
       structure = Schema.parseStructureFromText('''

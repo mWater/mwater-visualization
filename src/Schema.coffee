@@ -56,20 +56,40 @@ module.exports = class Schema
       throw new Error("Unknown table #{tableId}")
     return table.namedExprs
 
-  # Loads from a json schema in format { tables: [...] }
+  # Loads from a json schema in format described in Schema.md
   loadFromJSON: (json) ->
-    for table in json.tables
-      @addTable(table)
-      for column in table.columns
-        # Ignore id columns. They are only there for sharing schema maps with server
-        if column.type == "id"
+    loadContents = (table, contents, structure) =>
+      for item in contents
+        # Ignore id type. They are only there for sharing schema maps with server TODO remove
+        if item.type == "id"
           continue
 
-        @addColumn(table.id, column)
+        # If section, create structure and recurse
+        if item.type == "section"
+          structureItem = {
+            type: "section"
+            name: item.name
+            contents: []
+          }
+          structure.push(structureItem)
+          loadContents(table, item.contents, structureItem.contents)
+          continue
+        
+        # Add column to schema
+        @addColumn(table.id, item)
 
-      if table.namedExprs
-        for namedExpr in table.namedExprs
-          @addColumn(table.id, namedExpr)
+        # Add to structure
+        structure.push({ type: "column", column: item.id })
+
+    for table in json.tables
+      @addTable(table)
+      structure = []
+      loadContents(table, table.contents, structure)
+      @setTableStructure(table.id, structure)
+      # TODO namedExprs
+      # if table.namedExprs
+      #   for namedExpr in table.namedExprs
+      #     @addColumn(table.id, namedExpr)
 
   # Parses structure from a text definition in the format
   # column1
