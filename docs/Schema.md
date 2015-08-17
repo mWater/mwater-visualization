@@ -46,7 +46,7 @@ Joins are included as a column type as they have a natural order within the othe
 
 `integer`: Integer
 
-`date`: Date in ISO 6801 format
+`date`: Date in ISO 8601 format
 
 `boolean`: true/false
 
