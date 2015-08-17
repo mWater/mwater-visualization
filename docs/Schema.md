@@ -105,6 +105,17 @@ tables:
             values:
               - { id: "india", name: "India" }
               - { id: "canada", name: "Canada" }
+          - type: join
+            id: division
+            name: Division of Program
+            join:
+              fromTable: tablexyz
+              fromColumn: division_id # This is the column in this table that it refers to
+              toTable: divisions
+              toColumn: id  # Refered to field
+              op: "="
+              multiple: false
+              
       - type: section
         name: Section Y
         contents: 
