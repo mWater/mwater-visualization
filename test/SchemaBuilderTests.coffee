@@ -13,6 +13,7 @@ describe "SchemaBuilder", ->
       form = {
         _id: "formid"
         design: {
+          _type: "Form"
           name: { en: "Form" }
           contents: []
         }
@@ -23,30 +24,66 @@ describe "SchemaBuilder", ->
       schemaBuilder = new SchemaBuilder(schema)
       schemaBuilder.addForm(form)
 
-      compare(schema.getTable("form:formid"), {
-        id: "form:formid"
-        name: "Form"
-        namedExprs: []
-        columns: []
-        structure: []
-        jsonql: { 
-          type: "query" 
-          selects: [
-            { type: "select", expr: { type: "field", tableAlias: "responses", column: "data" }}
-            { type: "select", expr: { type: "field", tableAlias: "responses", column: "deployment" }}
-            { type: "select", expr: { type: "field", tableAlias: "responses", column: "submittedOn" }}
+      table = schema.getTable("form:formid")
+
+      compare(table.id, "form:formid")
+      compare(table.name, "Form")
+      compare(table.jsonql, { 
+        type: "query" 
+        selects: [
+          { type: "select", expr: { type: "field", tableAlias: "responses", column: "data" }, alias: "data" }
+          { type: "select", expr: { type: "field", tableAlias: "responses", column: "deployment" }, alias: "deployment" }
+          { type: "select", expr: { type: "field", tableAlias: "responses", column: "submittedOn" }, alias: "submittedOn" }
+        ]
+        from: { type: "table", table: "responses", alias: "responses" }
+        where: { 
+          type: "op", 
+          op: "=",
+          exprs: [
+            { type: "field", tableAlias: "responses", column: "form" }
+            "formid"
           ]
-          from: { type: "table", table: "responses", alias: "responses" }
-          where: { 
-            type: "op", 
-            op: "=",
-            exprs: [
-              { type: "field", tableAlias: "responses", column: "form" }
-              "formid"
-            ]
-          }
         }
       })
+
+    it "adds structure", ->
+      # Create form
+      form = {
+        _id: "formid"
+        design: {
+          _type: "Form"
+          name: { en: "Form" }
+          contents: [
+            {
+              _type: "Section"
+              name: { en: "Section X" }
+              contents: [
+                {
+                  _id: "questionid"
+                  _type: "TextQuestion"
+                  text: { _base: "en", en: "Question" } 
+                  conditions: []
+                }              
+              ]
+            }
+          ]
+        }
+      }
+
+      # Add to blank schema
+      schema = new Schema()
+      schemaBuilder = new SchemaBuilder(schema)
+      schemaBuilder.addForm(form)
+
+      compare(schema.getTable("form:formid").structure, [
+        { 
+          type: "section", 
+          name: "Section X"
+          contents: [
+            { type: "column", column: "data:questionid:value" }
+          ]
+        }
+      ])
 
     describe "Answer types", ->
       before ->
@@ -63,6 +100,7 @@ describe "SchemaBuilder", ->
           form = {
             _id: "formid"
             design: {
+              _type: "Form"
               name: { en: "Form" }
               contents: [question]
             }

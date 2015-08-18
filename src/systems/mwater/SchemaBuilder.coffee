@@ -256,14 +256,25 @@ module.exports = class SchemaBuilder
 
     structure = []
     @addFormItem(form, form.design, structure)
-    # @schema.setTableStructure("form:#{form._id}", structure)
+    @schema.setTableStructure("form:#{form._id}", structure)
 
   addFormItem: (form, item, structure) ->
+    addColumn = (column) =>
+      @schema.addColumn("form:#{form._id}", column)
+      structure.push({ type: "column", column: column.id })
+
     # Add sub-items
     if item.contents
-      # TODO For section structure
-      for subitem in item.contents
-        @addFormItem(form, subitem, structure)
+      if item._type == "Form"
+        for subitem in item.contents
+          @addFormItem(form, subitem, structure)
+
+      else if item._type == "Section"        
+        # Create section structure
+        sectionStructure = []
+        for subitem in item.contents
+          @addFormItem(form, subitem, sectionStructure)
+        structure.push({ type: "section", name: formUtils.localizeString(item.name), contents: sectionStructure })
 
     else if formUtils.isQuestion(item)
       # Get type of answer
@@ -284,7 +295,7 @@ module.exports = class SchemaBuilder
               ]
             }
           }
-          @schema.addColumn("form:#{form._id}", column)
+          addColumn(column)
 
         when "number"
           # Get a decimal or integer column
@@ -328,7 +339,7 @@ module.exports = class SchemaBuilder
                 ]
               }
             }
-          @schema.addColumn("form:#{form._id}", column)
+          addColumn(column)
 
         when "choice"
           # Get a simple text column
@@ -346,7 +357,7 @@ module.exports = class SchemaBuilder
             }
             values: _.map(item.choices, (c) -> { id: c.id, name: formUtils.localizeString(c.label) })
           }
-          @schema.addColumn("form:#{form._id}", column)
+          addColumn(column)
 
         when "choices"
           for choice in item.choices
@@ -370,7 +381,7 @@ module.exports = class SchemaBuilder
                 ]
               }
             }
-            @schema.addColumn("form:#{form._id}", column)
+            addColumn(column)
 
         when "date"
           # Fill in month and year and remove timestamp
@@ -403,7 +414,7 @@ module.exports = class SchemaBuilder
               ]
             }
           }
-          @schema.addColumn("form:#{form._id}", column)
+          addColumn(column)
 
         when "boolean"
           column = {
@@ -426,7 +437,7 @@ module.exports = class SchemaBuilder
             }
           }
 
-          @schema.addColumn("form:#{form._id}", column)
+          addColumn(column)
 
         when "units"
           # Get a decimal or integer column
@@ -476,7 +487,7 @@ module.exports = class SchemaBuilder
                 ]
               }
             }
-          @schema.addColumn("form:#{form._id}", column)
+          addColumn(column)
 
           # If multiple units, add units column
           if item.units.length > 1
@@ -494,7 +505,7 @@ module.exports = class SchemaBuilder
               }
               values: _.map(item.units, (c) -> { id: c.id, name: formUtils.localizeString(c.label) })
             }
-            @schema.addColumn("form:#{form._id}", column)
+            addColumn(column)
 
         when "location"
           column = {
@@ -531,7 +542,7 @@ module.exports = class SchemaBuilder
             }
           }
           
-          @schema.addColumn("form:#{form._id}", column)
+          addColumn(column)
 
         when "site"
           column = {
@@ -555,7 +566,7 @@ module.exports = class SchemaBuilder
             }
           }
 
-          @schema.addColumn("form:#{form._id}", column)
+          addColumn(column)
 
         when "entity"
           column = {
@@ -579,5 +590,5 @@ module.exports = class SchemaBuilder
             }
           }
 
-          @schema.addColumn("form:#{form._id}", column)
+          addColumn(column)
 

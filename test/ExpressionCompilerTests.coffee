@@ -332,7 +332,7 @@ describe "ExpressionCompiler", ->
 
         assert _.isEqual(jql.from, from), JSON.stringify(jql, null, 2)
 
-    describe "join"
+    # describe "join"
     describe "column", ->
       it "substitutes {alias}", ->
         schema = fixtures.simpleSchema()
