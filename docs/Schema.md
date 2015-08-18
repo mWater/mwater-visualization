@@ -13,6 +13,8 @@ Joins are included as a column type as they have a natural order within the othe
 
 `desc`: localized description of table (optional)
 
+`primaryKey`: column with primary key (optional). Can be JsonQL expression with `{alias}` for table alias
+
 `ordering`: column with natural ordering (optional). Can be JsonQL expression with `{alias}` for table alias
 
 `columns`: array of columns of the table
@@ -115,7 +117,7 @@ tables:
               toColumn: id  # Refered to field
               op: "="
               multiple: false
-              
+
       - type: section
         name: Section Y
         contents: 

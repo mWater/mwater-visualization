@@ -4,9 +4,9 @@ module.exports = class Schema
   constructor: ->
     @tables = []
 
-  # Add table with id, name, desc, ordering (column with natural order)
+  # Add table with id, name, desc, primaryKey, ordering (column with natural order)
   addTable: (options) ->
-    table = _.pick(options, "id", "name", "desc", "ordering")
+    table = _.pick(options, "id", "name", "desc", "primaryKey", "ordering")
     table.columns = []
     table.namedExprs = []
     @tables.push(table)
