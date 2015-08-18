@@ -113,7 +113,7 @@ module.exports = class DashboardComponent extends React.Component
         " Export"
 
   render: ->
-    H.div key: "view", style: { height: "100%", overflowY: "auto", paddingTop: 30, paddingRight: 20, paddingLeft: 5, position: "relative" },
+    H.div key: "view", style: { height: "100%", paddingTop: 30, paddingRight: 20, paddingLeft: 5, position: "relative" },
       @renderActionLinks()
       # Dashboard view requires width, so use auto size component to inject it
       React.createElement(AutoSizeComponent, { injectWidth: true, ref: "dashboardViewContainer" }, 

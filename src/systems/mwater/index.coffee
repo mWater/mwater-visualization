@@ -10,20 +10,25 @@ exports.SchemaBuilder = SchemaBuilder
 exports.createDataSource = (apiUrl, client) ->
   return new MWaterDataSource(apiUrl, client)
 
-exports.createSchema = (apiUrl, client, user, groups, cb) ->
-  if client
-    clientUrl = "?client=#{client}"
+# Options are:
+# apiUrl, client, user, groups
+# form is optional complete form
+exports.createSchema = (options, cb) ->
+  if options.client
+    clientUrl = "?client=#{options.client}"
   else
     clientUrl = ""
 
   # Get properties and entity types
-  $.getJSON apiUrl + "entity_types#{clientUrl}", (entity_types) => 
-    $.getJSON apiUrl + "properties#{clientUrl}", (properties) => 
-      $.getJSON apiUrl + "units#{clientUrl}", (units) => 
+  $.getJSON options.apiUrl + "entity_types#{clientUrl}", (entity_types) => 
+    $.getJSON options.apiUrl + "properties#{clientUrl}", (properties) => 
+      $.getJSON options.apiUrl + "units#{clientUrl}", (units) => 
         # Create schema
         schema = new Schema()
         schemaBuilder = new SchemaBuilder(schema)
-        schemaBuilder.addEntities(entity_types, properties, units, user, groups)
+        if options.form
+          schemaBuilder.addForm(options.form)
+        schemaBuilder.addEntities(entity_types, properties, units, options.user, options.groups)
         schemaBuilder.addLegacyTables()
 
         cb(null, schema)
