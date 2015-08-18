@@ -235,11 +235,28 @@ module.exports = class SchemaBuilder
       id: "form:#{form._id}"
       name: formUtils.localizeString(form.design.name)
       # TODO ordering: 
-      })
+      jsonql: { 
+        type: "query" 
+        selects: [
+          { type: "select", expr: { type: "field", tableAlias: "responses", column: "data" }}
+          { type: "select", expr: { type: "field", tableAlias: "responses", column: "deployment" }}
+          { type: "select", expr: { type: "field", tableAlias: "responses", column: "submittedOn" }}
+        ]
+        from: { type: "table", table: "responses", alias: "responses" }
+        where: { 
+          type: "op", 
+          op: "=",
+          exprs: [
+            { type: "field", tableAlias: "responses", column: "form" }
+            "formid"
+          ]
+        }
+      }
+    })
 
     structure = []
     @addFormItem(form, form.design, structure)
-    # TODO structure
+    @schema.setTableStructure("form:#{form._id}", structure)
 
   addFormItem: (form, item, structure) ->
     # Add sub-items
@@ -410,6 +427,76 @@ module.exports = class SchemaBuilder
           }
 
           @schema.addColumn("form:#{form._id}", column)
+
+        when "units"
+          # Get a decimal or integer column
+          name = formUtils.localizeString(item.text)
+          if item.units.length > 1
+            name += " (magnitude)"
+          else
+            name += " (#{formUtils.localizeString(item.units[0].label)})"
+
+          if item.decimal
+            column = {
+              id: "data:#{item._id}:value:quantity"
+              type: "decimal"
+              name: name
+              jsonql: {
+                type: "op"
+                op: "::decimal"
+                exprs: [
+                  {
+                    type: "op"
+                    op: "#>>"
+                    exprs: [
+                      { type: "field", tableAlias: "{alias}", column: "data" }
+                      "{#{item._id},value,quantity}"
+                    ]
+                  }
+                ]
+              }
+            }
+          else
+            column = {
+              id: "data:#{item._id}:value:quantity"
+              type: "integer"
+              name: name
+              jsonql: {
+                type: "op"
+                op: "::integer"
+                exprs: [
+                  {
+                    type: "op"
+                    op: "#>>"
+                    exprs: [
+                      { type: "field", tableAlias: "{alias}", column: "data" }
+                      "{#{item._id},value,quantity}"
+                    ]
+                  }
+                ]
+              }
+            }
+          @schema.addColumn("form:#{form._id}", column)
+
+          # If multiple units, add units column
+          if item.units.length > 1
+            column = {
+              id: "data:#{item._id}:value:units"
+              type: "enum"
+              name: formUtils.localizeString(item.text) + " (units)"
+              jsonql: {
+                type: "op"
+                op: "#>>"
+                exprs: [
+                  { type: "field", tableAlias: "{alias}", column: "data" }
+                  "{#{item._id},value,units}"
+                ]
+              }
+              values: _.map(item.units, (c) -> { id: c.id, name: formUtils.localizeString(c.label) })
+            }
+            @schema.addColumn("form:#{form._id}", column)
+
+
 
         when "location"
           column = {

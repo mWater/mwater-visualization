@@ -8,13 +8,53 @@ compare = (actual, expected) ->
 
 describe "SchemaBuilder", ->
   describe "addForm", ->
+    it "adds form as table", ->
+      # Create form
+      form = {
+        _id: "formid"
+        design: {
+          name: { en: "Form" }
+          contents: []
+        }
+      }
+
+      # Add to blank schema
+      schema = new Schema()
+      schemaBuilder = new SchemaBuilder(schema)
+      schemaBuilder.addForm(form)
+
+      compare(schema.getTable("form:formid"), {
+        id: "form:formid"
+        name: "Form"
+        namedExprs: []
+        columns: []
+        structure: []
+        jsonql: { 
+          type: "query" 
+          selects: [
+            { type: "select", expr: { type: "field", tableAlias: "responses", column: "data" }}
+            { type: "select", expr: { type: "field", tableAlias: "responses", column: "deployment" }}
+            { type: "select", expr: { type: "field", tableAlias: "responses", column: "submittedOn" }}
+          ]
+          from: { type: "table", table: "responses", alias: "responses" }
+          where: { 
+            type: "op", 
+            op: "=",
+            exprs: [
+              { type: "field", tableAlias: "responses", column: "form" }
+              "formid"
+            ]
+          }
+        }
+      })
+
     describe "Answer types", ->
       before ->
         @testQuestion = (questionOptions, expectedColumns) ->
           # Create question
           question = {
             _id: "questionid"
-            text: { _base: "en", en: "Title" } 
+            text: { _base: "en", en: "Question" } 
             conditions: []
           }
           _.extend(question, questionOptions)
@@ -113,6 +153,7 @@ describe "SchemaBuilder", ->
           { 
             id: "data:questionid:value:yes"
             type: "boolean"
+            name: "Question: Yes"
             # data#>>'{questionid,value}' link '%"id here"%'
             jsonql: {
               type: "op"
@@ -126,6 +167,7 @@ describe "SchemaBuilder", ->
           { 
             id: "data:questionid:value:no"
             type: "boolean"
+            name: "Question: No"
             # data#>>'{questionid,value}' like '%"id here"%'
             jsonql: {
               type: "op"
@@ -170,7 +212,64 @@ describe "SchemaBuilder", ->
 
       it "datetime"
         
-      it "units"
+      it "units integer with multiple", ->
+        @testQuestion({ 
+          _type: "UnitsQuestion",  
+          decimal: false
+          units: [
+            { id: "m", label: { _base:"en", en: "M"}}
+            { id: "ft", label: { _base:"en", en: "Ft"}}
+          ]
+         }, [
+          { 
+            id: "data:questionid:value:quantity"
+            type: "integer"
+            name: "Question (magnitude)"
+            # data#>>'{questionid,value,quantity}::integer
+            jsonql: {
+              type: "op"
+              op: "::integer"
+              exprs: [
+                { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{questionid,value,quantity}"] }
+              ]
+            }
+          }
+          { 
+            id: "data:questionid:value:units"
+            type: "enum"
+            name: "Question (units)"
+            # data#>>'{questionid,value,units}'
+            jsonql: { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{questionid,value,units}"] }
+            values: [
+              { id: "m", name: "M" }
+              { id: "ft", name: "Ft" }
+            ]
+          }
+        ])
+
+      it "units decimal with single", ->
+        @testQuestion({ 
+          _type: "UnitsQuestion",  
+          decimal: true
+          units: [
+            { id: "m", label: { _base:"en", en: "M"}}
+          ]
+         }, [
+          { 
+            id: "data:questionid:value:quantity"
+            type: "decimal"
+            name: "Question (M)"
+            # data#>>'{questionid,value,quantity}::decimal
+            jsonql: {
+              type: "op"
+              op: "::decimal"
+              exprs: [
+                { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{questionid,value,quantity}"] }
+              ]
+            }
+          }
+        ])
+
       it "boolean", ->
         @testQuestion({ _type: "CheckQuestion" }, [
           { 
@@ -224,20 +323,29 @@ describe "SchemaBuilder", ->
         ])
 
       it "entity"
-        # @testQuestion({ _type: "EntityQuestion" }, [
-        #   { 
-        #     id: "data:questionid:value" 
-        #     type: "join"
-        #     # data#>>'{questionid,value}'
-        #     jsonql: {
-        #       type: "op"
-        #       op: "::boolean"
-        #       exprs: [
-        #         { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{questionid,value}"] }
-        #       ]
-        #     }
-        #   }
-        # ])
+#         @testQuestion({ _type: "EntityQuestion" }, [
+#           { 
+#             id: "data:questionid:value" 
+#             type: "join"
+#             # data#>>'{questionid,value}'
+#             jsonql: { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{questionid,value}"] }
+#             join: {
+#               fromTable: ""
+#             }
+
+# `fromTable`: table to start join from
+
+# `fromColumn`: table column to start join from. Can also be JsonQL expression with `{alias}` for tableAlias
+
+# `toTable`: table to end join at
+
+# `toColumn`: table column to end join at. Can also be JsonQL expression with `{alias}` for tableAlias
+
+# `op`: Op to join with. Usually `=`
+
+# `multiple`: true if one to many or many to many            
+#           }
+#         ])
 
       # it "site", ->
       # it "image", ->

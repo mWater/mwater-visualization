@@ -19,7 +19,10 @@ Joins are included as a column type as they have a natural order within the othe
 
 `columns`: array of columns of the table
 
+`jsonql`: Optional custom JsonQL expression. This allows a simple table to be translated to an arbitrarily complex JsonQL expression before being sent to the server. 
+
 `sql`: sql expression that gets the table. Usually just name of the table. *Note*: this is only for when sharing a schema file with [LookupSchemaMap](https://github.com/mWater/jsonql/blob/master/src/LookupSchemaMap.coffee)
+
 
 ## Column properties
 
