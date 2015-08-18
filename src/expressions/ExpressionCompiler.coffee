@@ -73,11 +73,7 @@ module.exports = class ExpressionCompiler
         ]
        }
 
-      from = {
-        type: "table"
-        table: join.toTable
-        alias: "j1"
-      }
+      from = @compileTable(join.toTable, "j1")
 
       # We are now at j1, which is the to of the first join
       table = join.toTable
@@ -90,7 +86,7 @@ module.exports = class ExpressionCompiler
         from = {
           type: "join"
           left: from
-          right: { type: "table", table: join.toTable, alias: "j#{i+1}" }
+          right: @compileTable(join.toTable, "j#{i+1}")
           kind: "left"
           on: { 
             type: "op"
@@ -230,3 +226,10 @@ module.exports = class ExpressionCompiler
     # Recurse object keys
     return _.mapValues(jsonql, (value) => @substituteTableAlias(value, tableAlias))
 
+  # Compiles a table, substituting with custom jsonql if required
+  compileTable: (tableId, alias) ->
+    table = @schema.getTable(tableId)
+    if not table.jsonql
+      return { type: "table", table: tableId, alias: alias }
+    else
+      return { type: "subquery", query: table.jsonql, alias: alias }

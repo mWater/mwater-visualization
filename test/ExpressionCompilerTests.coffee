@@ -288,34 +288,80 @@ describe "ExpressionCompiler", ->
       ), JSON.stringify(jql, null, 2)
 
   describe "custom jsonql", ->
-    it "substitutes {alias}", ->
-      schema = fixtures.simpleSchema()
-      columnJsonql = {
-        type: "op"
-        op: "sum"
-        exprs: [
-          {
-            type: "field"
-            tableAlias: "{alias}"  # Should be replaced!
-            column: "integer"
-          }
-        ]
-      }
+    describe "table", ->
+      it "substitutes table", ->
+        schema = fixtures.simpleSchema()
+        tableJsonql = {
+          type: "query"
+          selects: [
+            {
+              type: "field"
+              tableAlias: "abc"
+              column: "integer"
+            }
+          ]
+          from: { type: "table", table: "t2", alias: "abc" }
+        }
 
-      schema.addColumn("t1", { id: "custom", name: "Custom", type: "text", jsonql: columnJsonql })
-      
-      ec = new ExpressionCompiler(schema)
+        # Customize t2
+        schema.getTable("t2").jsonql = tableJsonql
+        
+        ec = new ExpressionCompiler(schema)
 
-      jql = ec.compileExpr(expr: { type: "field", table: "t1", column: "custom" }, tableAlias: "T1")
+        jql = ec.compileExpr(expr: { type: "scalar", table: "t1", joins: ["1-2"], expr: { type: "field", table: "t2", column: "integer" } }, tableAlias: "T1")
 
-      assert _.isEqual jql, {
-        type: "op"
-        op: "sum"
-        exprs: [
-          {
-            type: "field"
-            tableAlias: "T1" # Replaced with table alias
-            column: "integer"
-          }
-        ]
-      }
+        from = {
+          type: "subquery",
+          query: {
+            type: "query",
+            selects: [
+              {
+                type: "field",
+                tableAlias: "abc",
+                column: "integer"
+              }
+            ],
+            from: {
+              type: "table",
+              table: "t2",
+              alias: "abc"
+            }
+          },
+          alias: "j1"
+        }
+
+        assert _.isEqual(jql.from, from), JSON.stringify(jql, null, 2)
+
+    describe "join"
+    describe "column", ->
+      it "substitutes {alias}", ->
+        schema = fixtures.simpleSchema()
+        columnJsonql = {
+          type: "op"
+          op: "sum"
+          exprs: [
+            {
+              type: "field"
+              tableAlias: "{alias}"  # Should be replaced!
+              column: "integer"
+            }
+          ]
+        }
+
+        schema.addColumn("t1", { id: "custom", name: "Custom", type: "text", jsonql: columnJsonql })
+        
+        ec = new ExpressionCompiler(schema)
+
+        jql = ec.compileExpr(expr: { type: "field", table: "t1", column: "custom" }, tableAlias: "T1")
+
+        assert _.isEqual jql, {
+          type: "op"
+          op: "sum"
+          exprs: [
+            {
+              type: "field"
+              tableAlias: "T1" # Replaced with table alias
+              column: "integer"
+            }
+          ]
+        }

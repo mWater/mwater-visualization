@@ -91,11 +91,13 @@ module.exports = class TableChart extends Chart
     return React.createElement(TableChartDesignerComponent, props)
 
   createQueries: (design, filters) ->
+    exprCompiler = new ExpressionCompiler(@schema)
+
     # Create shell of query
     query = {
       type: "query"
       selects: []
-      from: { type: "table", table: design.table, alias: "main" }
+      from: exprCompiler.compileTable(design.table, "main")
       groupBy: []
       orderBy: []
       limit: 1000

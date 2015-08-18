@@ -31,6 +31,8 @@ module.exports = class LayeredChartCompiler
     return exprCompiler.compileExpr(expr: expr, tableAlias: "main", aggr: aggr)
 
   getQueries: (design, extraFilters) ->
+    exprCompiler = new ExpressionCompiler(@schema)
+
     queries = {}
 
     # For each layer
@@ -41,7 +43,7 @@ module.exports = class LayeredChartCompiler
       query = {
         type: "query"
         selects: []
-        from: { type: "table", table: layer.table, alias: "main" }
+        from: exprCompiler.compileTable(layer.table, "main")
         limit: 1000
         groupBy: []
         orderBy: []

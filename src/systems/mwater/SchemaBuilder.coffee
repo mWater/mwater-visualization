@@ -238,9 +238,9 @@ module.exports = class SchemaBuilder
       jsonql: { 
         type: "query" 
         selects: [
-          { type: "select", expr: { type: "field", tableAlias: "responses", column: "data" }}
-          { type: "select", expr: { type: "field", tableAlias: "responses", column: "deployment" }}
-          { type: "select", expr: { type: "field", tableAlias: "responses", column: "submittedOn" }}
+          { type: "select", expr: { type: "field", tableAlias: "responses", column: "data" }, alias: "data" }
+          { type: "select", expr: { type: "field", tableAlias: "responses", column: "deployment" }, alias: "deployment" }
+          { type: "select", expr: { type: "field", tableAlias: "responses", column: "submittedOn" }, alias: "submittedOn" }
         ]
         from: { type: "table", table: "responses", alias: "responses" }
         where: { 
@@ -248,7 +248,7 @@ module.exports = class SchemaBuilder
           op: "=",
           exprs: [
             { type: "field", tableAlias: "responses", column: "form" }
-            "formid"
+            form._id
           ]
         }
       }
@@ -256,7 +256,7 @@ module.exports = class SchemaBuilder
 
     structure = []
     @addFormItem(form, form.design, structure)
-    @schema.setTableStructure("form:#{form._id}", structure)
+    # @schema.setTableStructure("form:#{form._id}", structure)
 
   addFormItem: (form, item, structure) ->
     # Add sub-items
@@ -496,8 +496,6 @@ module.exports = class SchemaBuilder
             }
             @schema.addColumn("form:#{form._id}", column)
 
-
-
         when "location"
           column = {
             id: "data:#{item._id}:value"
@@ -534,3 +532,52 @@ module.exports = class SchemaBuilder
           }
           
           @schema.addColumn("form:#{form._id}", column)
+
+        when "site"
+          column = {
+            id: "data:#{item._id}:value"
+            type: "join"
+            name: formUtils.localizeString(item.text)
+            join: {
+              fromTable: "responses"
+              fromColumn: {
+                type: "op"
+                op: "#>>"
+                exprs: [
+                  { type: "field", tableAlias: "{alias}", column: "data" }
+                  "{#{item._id},value,code}"
+                ]
+              }
+              toTable: if item.siteTypes then "entities." + _.first(item.siteTypes).toLowerCase().replace(" ", "_") else "entities.water_point"
+              toColumn: "code"
+              op: "="
+              multiple: true
+            }
+          }
+
+          @schema.addColumn("form:#{form._id}", column)
+
+        when "entity"
+          column = {
+            id: "data:#{item._id}:value"
+            type: "join"
+            name: formUtils.localizeString(item.text)
+            join: {
+              fromTable: "responses"
+              fromColumn: {
+                type: "op"
+                op: "#>>"
+                exprs: [
+                  { type: "field", tableAlias: "{alias}", column: "data" }
+                  "{#{item._id},value}"
+                ]
+              }
+              toTable: "entities.#{item.entityType}"
+              toColumn: "_id"
+              op: "="
+              multiple: true
+            }
+          }
+
+          @schema.addColumn("form:#{form._id}", column)
+

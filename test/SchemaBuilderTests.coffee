@@ -322,32 +322,47 @@ describe "SchemaBuilder", ->
           }
         ])
 
-      it "entity"
-#         @testQuestion({ _type: "EntityQuestion" }, [
-#           { 
-#             id: "data:questionid:value" 
-#             type: "join"
-#             # data#>>'{questionid,value}'
-#             jsonql: { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{questionid,value}"] }
-#             join: {
-#               fromTable: ""
-#             }
+      it "entity", ->
+        @testQuestion({ 
+          _type: "EntityQuestion" 
+          entityType: "water_point"
+        }, [
+          { 
+            id: "data:questionid:value" 
+            type: "join"
+            # data#>>'{questionid,value}'
+            join: {
+              fromTable: "responses"
+              fromColumn: { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{questionid,value}"] }
+              toTable: "entities.water_point"
+              toColumn: "_id"
+              op: "="
+              multiple: true
+            }
+          }
+        ])
 
-# `fromTable`: table to start join from
+      it "site", ->
+        @testQuestion({ 
+          _type: "SiteQuestion" 
+          # Only takes first
+          siteTypes: ["Water point", "Sanitation facility"]
+        }, [
+          { 
+            id: "data:questionid:value" 
+            type: "join"
+            # data#>>'{questionid,value,code}'
+            join: {
+              fromTable: "responses"
+              fromColumn: { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{questionid,value,code}"] }
+              toTable: "entities.water_point"
+              toColumn: "code"
+              op: "="
+              multiple: true
+            }
+          }
+        ])
 
-# `fromColumn`: table column to start join from. Can also be JsonQL expression with `{alias}` for tableAlias
-
-# `toTable`: table to end join at
-
-# `toColumn`: table column to end join at. Can also be JsonQL expression with `{alias}` for tableAlias
-
-# `op`: Op to join with. Usually `=`
-
-# `multiple`: true if one to many or many to many            
-#           }
-#         ])
-
-      # it "site", ->
       # it "image", ->
       # it "images", ->
       # it "texts", ->

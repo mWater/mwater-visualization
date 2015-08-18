@@ -4,6 +4,8 @@ MWaterDataSource = require './MWaterDataSource'
 
 # Note: Requires jQuery!!
 
+exports.SchemaBuilder = SchemaBuilder
+
 # Create a data source for mWater API
 exports.createDataSource = (apiUrl, client) ->
   return new MWaterDataSource(apiUrl, client)
