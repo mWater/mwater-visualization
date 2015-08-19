@@ -20,15 +20,21 @@ Design is:
   transpose: true to flip axes
 
 layer:
-  name: label for layer (optional)
-  xExpr: x-axis expression
-  colorExpr: expression to split into series, each with a color
-  yExpr: y-axis expression
-  yAggr: aggregation function if needed for y
-  stacked: true to stack
   type: bar/line/spline/scatter/area/pie/donut (overrides main one)
+  name: label for layer (optional)
+  axes: axes (see below)
+  stacked: true to stack
   filter: optional logical expression to filter by
 
+axes:
+  x: x axis
+  y: y axis
+  color: color axis (to split into series based on a color)
+
+axis: 
+  expr: expression of axis
+  aggr: aggregation for axis
+  
 ###
 module.exports = class LayeredChart extends Chart
   constructor: (options) ->

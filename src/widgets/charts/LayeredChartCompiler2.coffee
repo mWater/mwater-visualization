@@ -26,18 +26,19 @@ module.exports = class LayeredChartCompiler2
     types = {}
     names = {}
     mapping = {}
+    colors = {}
 
     # For each layer
     _.each design.layers, (layer, layerIndex) =>
       # If has color axis
-      if layer.color
+      if layer.axes.color
         # Create a series for each row
         _.each data["layer#{layerIndex}"], (row, rowIndex) =>
           series = "#{layerIndex}:#{rowIndex}"
           # Pie series contain a single value
           columns.push([series, row.y])
           types[series] = @getLayerType(design, layerIndex)
-          names[series] = @formatAxisValue(layer.color, row.color)
+          names[series] = @formatAxisValue(layer.axes.color, row.color)
           mapping[series] = { layerIndex: layerIndex, row: row }
       else
         # Create a single series
@@ -46,14 +47,21 @@ module.exports = class LayeredChartCompiler2
           series = "#{layerIndex}"
           columns.push([series, row.y])
           types[series] = @getLayerType(design, layerIndex)
+
+          # Name is name of entire layer
           names[series] = layer.name or "Untitled"
           mapping[series] = { layerIndex: layerIndex, row: row }
+
+          # Set color if present
+          if layer.color
+            colors[series] = layer.color
 
     return {
       columns: columns
       types: types
       names: names
       mapping: mapping
+      colors: colors
     }
 
   # Translates enums to label, leaves all else alone

@@ -28,7 +28,7 @@ describe "LayeredChartCompiler2", ->
         @design = {
           type: "pie"
           layers: [
-            { table: "t1", color: @axisEnum, y: @axisContinuous }
+            { table: "t1", axes: { color: @axisEnum, y: @axisContinuous } }
           ]
         }
 
@@ -62,13 +62,15 @@ describe "LayeredChartCompiler2", ->
           "0:1": "B"
           })
 
+      it "colors based on color map"
+
     describe "multiple layer", ->
       before ->
         @design = {
           type: "pie"
           layers: [
-            { table: "t1", y: @axisContinuous, name: "X" }
-            { table: "t1", y: @axisContinuous, name: "Y" }
+            { table: "t1", axes: { y: @axisContinuous }, name: "X" }
+            { table: "t1", axes: { y: @axisContinuous }, name: "Y", color: "red" }
           ]
         }
 
@@ -94,6 +96,11 @@ describe "LayeredChartCompiler2", ->
         compare(@res.mapping, {
           "0": { layerIndex: 0, row: @data.layer0[0] }
           "1": { layerIndex: 1, row: @data.layer1[0] }
+          })
+
+      it "uses series color", ->
+        compare(@res.colors, {
+          "1": "red"
           })
 
       it "names", ->
