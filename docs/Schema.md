@@ -55,6 +55,8 @@ Joins are included as a column type as they have a natural order within the othe
 
 `date`: Date in ISO 8601 format
 
+`datetime`: Date-time in ISO 8601 format (complete timestamp)
+
 `boolean`: true/false
 
 `enum`: fixed values. See values definition

@@ -22,6 +22,7 @@ describe "LayeredChartCompiler", ->
     @axisInteger = { expr: @exprInteger }
     @axisEnum = { expr: @exprEnum } 
     @axisText = { expr: @exprText } 
+    @axisDate = { expr: @exprDate } 
 
   describe "createQueries", ->
     it "creates single grouped query", ->
@@ -410,6 +411,24 @@ describe "LayeredChartCompiler", ->
 
         it "sets x axis type to indexed", ->
           assert.equal @res.xAxisType, "indexed"
+
+      describe "date x", ->
+        before ->
+          @design = {
+            type: "line"
+            layers: [
+              { table: "t1", axes: { x: @axisDate, y: @axisDecimal } }
+            ]
+          }
+
+          @data = { 
+            layer0: [{ x: "2015-01-02", y: 1 }, { x: "2015-03-04", y: 4 }]
+          }
+
+          @res = @compiler.compileData(@design, @data)
+
+        it "sets x axis type to timeseries", ->
+          assert.equal @res.xAxisType, "timeseries"
 
     describe "bar (or category)", ->
       it "groups for stacked"

@@ -208,6 +208,8 @@ module.exports = class LayeredChartCompiler
     colors = {}
     xs = {}
 
+    xType = @axisBuilder.getAxisType(design.layers[0].axes.x)
+
     # For each layer
     _.each design.layers, (layer, layerIndex) =>
       # Get data of layer
@@ -259,7 +261,7 @@ module.exports = class LayeredChartCompiler
       dataMap: dataMap
       colors: colors
       xs: xs
-      xAxisType: "indexed" 
+      xAxisType: if (xType in ["date"]) then "timeseries" else "indexed" 
     }
 
   compileDataCategorical: (design, data) ->

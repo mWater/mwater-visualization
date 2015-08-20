@@ -167,3 +167,36 @@ exports.DateComponent = React.createClass {
           onChange: @handleChange,
           value: (if @state.invalid then @state.invalidText) or (if @props.value then @props.value.value)
 }
+
+exports.DatetimeComponent = React.createClass {
+  propTypes: {
+    value: React.PropTypes.object
+    onChange: React.PropTypes.func.isRequired 
+  }
+
+  getInitialState: -> { invalid: false, invalidText: null }
+
+  handleChange: (ev) ->
+    # If blank, null
+    if not ev.target.value
+      @setState(invalid: false, invalidText: null)
+      return @props.onChange(null)
+
+    # Check if valid date
+    if not ev.target.value.match(/^\d\d\d\d(-\d\d(-\d\d)?)?$/)
+      return @setState(invalid: true, invalidText: ev.target.value)
+
+    @setState(invalid: false, invalidText: null)
+    @props.onChange({ type: "literal", valueType: "datetime", value: ev.target.value })
+    
+  render: ->
+    H.div 
+      className: (if @state.invalid then "has-error")
+      style: { width: "9em", display: "inline-block" },
+        H.input 
+          className: "form-control input-sm",
+          placeholder: "YYYY-MM-DD",
+          type: "text", 
+          onChange: @handleChange,
+          value: (if @state.invalid then @state.invalidText) or (if @props.value then @props.value.value)
+}

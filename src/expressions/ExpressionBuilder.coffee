@@ -47,7 +47,7 @@ module.exports = class ExpressionBuilder
       aggrs.push({ id: "last", name: "Latest", type: type })
 
     switch type
-      when "date"
+      when "date", "datetime"
         aggrs.push({ id: "max", name: "Maximum", type: type })
         aggrs.push({ id: "min", name: "Minimum", type: type })
 
@@ -259,7 +259,7 @@ module.exports = class ExpressionBuilder
         ops.push({ id: "<=", name: "is less than or equal to" })
       when "text"
         ops.push({ id: "~*", name: "matches" })
-      when "date"
+      when "date", "datetime"
         ops.push({ id: ">", name: "after" })
         ops.push({ id: "<", name: "before" })
       when "enum"
