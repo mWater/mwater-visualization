@@ -9,7 +9,7 @@ module.exports = class LayeredChartCompiler2
     @schema = options.schema
     @exprBuilder = new ExpressionBuilder(@schema)
 
-  compileQueries: (design, extraFilters) ->
+  createQueries: (design, extraFilters) ->
     exprCompiler = new ExpressionCompiler(@schema)
 
     queries = {}
@@ -29,13 +29,13 @@ module.exports = class LayeredChartCompiler2
       }
 
       # Create axis builder
-      axisBuilder = new AxisBuilder(schema: @schema, table: layer.table, tableAlias: "main")
+      axisBuilder = new AxisBuilder(schema: @schema, table: layer.table)
       if layer.axes.x
-        query.selects.push({ type: "select", expr: axisBuilder.compile(layer.axes.x), alias: "x" })
+        query.selects.push({ type: "select", expr: axisBuilder.compile(layer.axes.x, "main"), alias: "x" })
       if layer.axes.color
-        query.selects.push({ type: "select", expr: axisBuilder.compile(layer.axes.color), alias: "color" })
+        query.selects.push({ type: "select", expr: axisBuilder.compile(layer.axes.color, "main"), alias: "color" })
       if layer.axes.y
-        query.selects.push({ type: "select", expr: axisBuilder.compile(layer.axes.y), alias: "y" })
+        query.selects.push({ type: "select", expr: axisBuilder.compile(layer.axes.y, "main"), alias: "y" })
 
       # Sort by x and color
       if layer.axes.x or layer.axes.color
@@ -80,7 +80,55 @@ module.exports = class LayeredChartCompiler2
 
       queries["layer#{layerIndex}"] = query
 
+    # TODO remove
+    console.log queries
+
     return queries
+
+  # Create the chartOptions to pass to c3.generate
+  # options is
+  #   design: chart design element
+  #   data: chart data
+  #   width: chart width
+  #   height: chart height
+  createChartOptions: (options) ->
+    titlePadding = { top: 0, right: 0, bottom: 15, left: 0 } # TODO move to CSS or make it configurable
+
+    c3Data = @compileData(options.design, options.data)
+
+    # Create chart
+    chartDesign = {
+      data: {
+        types: c3Data.types
+        columns: c3Data.columns
+        names: c3Data.names
+        types: c3Data.types
+        groups: c3Data.groups
+        xs: c3Data.xs
+      }
+      # Hide if one layer with no color axis
+      legend: { hide: (options.design.layers.length == 1 and not options.design.layers[0].axes.color) }
+      grid: { focus: { show: false } }  # Don't display hover grid
+      axis: {
+        x: {
+          type: c3Data.xAxisType
+          label: { text: options.design.xAxisLabelText, position: 'outer-center' }
+        }
+        y: {
+          label: { text: options.design.yAxisLabelText, position: 'outer-center' }
+        }
+        rotated: options.design.transpose
+      }
+      size: { width: options.width, height: options.height }
+      pie: {  expand: false } # Don't expand/contract
+      title: { text: options.design.titleText, padding: titlePadding }
+      transition: { duration: 0 } # Transitions interfere with scoping
+    }
+
+    # TODO remove
+    console.log chartDesign
+
+    return chartDesign
 
 
   # Compiles data part of C3 chart, including mapping back to original data
@@ -156,3 +204,8 @@ module.exports = class LayeredChartCompiler2
   # Determine if layer required grouping by x (and color)
   doesLayerNeedGrouping: (design, layerIndex) ->
     return @getLayerType(design, layerIndex) != "scatter"
+
+  # Determine if layer can use x axis
+  canLayerUseXExpr: (design, layerIndex) ->
+    return @getLayerType(design, layerIndex) not in ['pie', 'donut']
+

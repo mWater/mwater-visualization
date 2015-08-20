@@ -23,7 +23,7 @@ describe "LayeredChartCompiler2", ->
     @axisEnum = { expr: @exprEnum } 
     @axisText = { expr: @exprText } 
 
-  describe "compileQueries", ->
+  describe "createQueries", ->
     it "creates single grouped query", ->
       design = {
         type: "bar"
@@ -32,7 +32,7 @@ describe "LayeredChartCompiler2", ->
         ]
       }
 
-      queries = @compiler.compileQueries(design)
+      queries = @compiler.createQueries(design)
 
       expectedQueries = {
         layer0: {
@@ -58,7 +58,7 @@ describe "LayeredChartCompiler2", ->
         ]
       }
 
-      queries = @compiler.compileQueries(design)
+      queries = @compiler.createQueries(design)
 
       expectedQueries = {
         layer0: {
@@ -86,7 +86,7 @@ describe "LayeredChartCompiler2", ->
         ]
       }
 
-      queries = @compiler.compileQueries(design)
+      queries = @compiler.createQueries(design)
 
       expectedQueries = {
         layer0: {
@@ -126,7 +126,7 @@ describe "LayeredChartCompiler2", ->
         ]
       }
 
-      queries = @compiler.compileQueries(design, filters)
+      queries = @compiler.createQueries(design, filters)
 
       expectedQueries = {
         layer0: {
@@ -156,7 +156,7 @@ describe "LayeredChartCompiler2", ->
         ]
       }
 
-      queries = @compiler.compileQueries(design)
+      queries = @compiler.createQueries(design)
 
       expectedQueries = {
         layer0: {
@@ -182,7 +182,7 @@ describe "LayeredChartCompiler2", ->
         ]
       }
 
-      queries = @compiler.compileQueries(design)
+      queries = @compiler.createQueries(design)
 
       expectedQueries = {
         layer0: {
@@ -242,6 +242,9 @@ describe "LayeredChartCompiler2", ->
           })
 
       it "colors based on color map"
+
+      it "sets x axis type to category", ->
+        assert.isEqual @res.xAxisType, "category"
 
     describe "multiple layer", ->
       before ->

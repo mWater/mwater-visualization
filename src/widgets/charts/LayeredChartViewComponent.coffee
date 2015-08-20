@@ -2,7 +2,7 @@ React = require 'react'
 H = React.DOM
 
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
-LayeredChartCompiler = require './LayeredChartCompiler'
+LayeredChartCompiler2 = require './LayeredChartCompiler2'
 
 # Displays a layered chart
 module.exports = class LayeredChartViewComponent extends React.Component
@@ -25,7 +25,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
     if @chart
       @chart.destroy()
 
-    compiler = new LayeredChartCompiler(schema: props.schema)
+    compiler = new LayeredChartCompiler2(schema: props.schema)
     el = React.findDOMNode(@refs.chart)
     chartOptions = compiler.createChartOptions(@props)
     
@@ -38,9 +38,9 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
   componentDidUpdate: (prevProps) ->
     # Check if options changed
-    oldCompiler = new LayeredChartCompiler(schema: prevProps.schema) # TODO can we consolidate these?
+    oldCompiler = new LayeredChartCompiler2(schema: prevProps.schema) # TODO can we consolidate these?
     oldChartOptions = oldCompiler.createChartOptions(prevProps)
-    newCompiler = new LayeredChartCompiler(schema: @props.schema)
+    newCompiler = new LayeredChartCompiler2(schema: @props.schema)
     newChartOptions = newCompiler.createChartOptions(@props)
 
     # If chart changed
@@ -74,46 +74,47 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
   # Update scoped value
   updateScope: =>
-    dataMap = @getDataMap()
-    compiler = new LayeredChartCompiler(schema: @props.schema)
-    el = React.findDOMNode(@refs.chart)
+    return 
+    # dataMap = @getDataMap()
+    # compiler = new LayeredChartCompiler(schema: @props.schema)
+    # el = React.findDOMNode(@refs.chart)
 
-    # Handle line and bar charts
-    d3.select(el)
-      .selectAll(".c3-chart-bar .c3-bar, .c3-chart-line .c3-circle")
-      # Highlight only scoped
-      .style("opacity", (d,i) =>
-        dataPoint = @lookupDataPoint(dataMap, d)
-        scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
+    # # Handle line and bar charts
+    # d3.select(el)
+    #   .selectAll(".c3-chart-bar .c3-bar, .c3-chart-line .c3-circle")
+    #   # Highlight only scoped
+    #   .style("opacity", (d,i) =>
+    #     dataPoint = @lookupDataPoint(dataMap, d)
+    #     scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
 
-        # Determine if scoped
-        if @props.scope 
-          if _.isEqual(@props.scope.data, scope.data)
-            return 1
-          else
-            return 0.3
-        else
-          # Not scoped
-          return 1
-      )
+    #     # Determine if scoped
+    #     if @props.scope 
+    #       if _.isEqual(@props.scope.data, scope.data)
+    #         return 1
+    #       else
+    #         return 0.3
+    #     else
+    #       # Not scoped
+    #       return 1
+    #   )
 
-    # Handle pie charts
-    d3.select(el)
-      .selectAll(".c3-chart-arcs .c3-chart-arc")
-      .style("opacity", (d, i) =>
-        dataPoint = @lookupDataPoint(dataMap, d)
-        scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
+    # # Handle pie charts
+    # d3.select(el)
+    #   .selectAll(".c3-chart-arcs .c3-chart-arc")
+    #   .style("opacity", (d, i) =>
+    #     dataPoint = @lookupDataPoint(dataMap, d)
+    #     scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
 
-        # Determine if scoped
-        if @props.scope 
-          if _.isEqual(@props.scope.data, scope.data)
-            return 1
-          else
-            return 0.3
-        else
-          # Not scoped
-          return 1
-        )
+    #     # Determine if scoped
+    #     if @props.scope 
+    #       if _.isEqual(@props.scope.data, scope.data)
+    #         return 1
+    #       else
+    #         return 0.3
+    #     else
+    #       # Not scoped
+    #       return 1
+    #     )
 
   # Gets a data point { layerIndex, row } from a d3 object (d)
   lookupDataPoint: (dataMap, d) ->
@@ -129,13 +130,13 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
     return dataPoint
 
-  getDataMap: ->
-    # Get data map
-    compiler = new LayeredChartCompiler(schema: @props.schema)
-    dataMap = {}
-    compiler.getColumns(@props.design, @props.data, dataMap)
+  # getDataMap: ->
+  #   # Get data map
+  #   compiler = new LayeredChartCompiler2(schema: @props.schema)
+  #   dataMap = {}
+  #   compiler.getColumns(@props.design, @props.data, dataMap)
 
-    return dataMap
+  #   return dataMap
 
   handleDataClick: (d) =>
     # Get data map
@@ -147,7 +148,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
       return
 
     # Create scope
-    compiler = new LayeredChartCompiler(schema: @props.schema)
+    compiler = new LayeredChartCompiler2(schema: @props.schema)
     scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
 
     # If same scope data, remove scope

@@ -38,7 +38,7 @@ module.exports = class ChartWidgetViewComponent extends React.Component
           })
 
       # Get queries
-      queries = @props.chart.createQueries(@props.design, @props.filters)
+      queries = @props.chart.createQueries(design, @props.filters)
 
     else
       # Can't create with invalid design

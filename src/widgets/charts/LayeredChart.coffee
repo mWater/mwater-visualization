@@ -3,8 +3,9 @@ React = require 'react'
 H = React.DOM
 
 Chart = require './Chart'
-LayeredChartCompiler = require './LayeredChartCompiler'
+LayeredChartCompiler2 = require './LayeredChartCompiler2'
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
+AxisBuilder = require './../../expressions/axes/AxisBuilder'
 LayeredChartDesignerComponent = require './LayeredChartDesignerComponent'
 LayeredChartViewComponent = require './LayeredChartViewComponent'
 LayeredChartSvgFileSaver = require './LayeredChartSvgFileSaver'
@@ -43,7 +44,7 @@ module.exports = class LayeredChart extends Chart
     @exprBuilder = new ExpressionBuilder(@schema)
 
   cleanDesign: (design) ->
-    compiler = new LayeredChartCompiler(schema: @schema)
+    compiler = new LayeredChartCompiler2(schema: @schema)
 
     # Clone deep for now # TODO
     design = _.cloneDeep(design)
@@ -56,52 +57,73 @@ module.exports = class LayeredChart extends Chart
     for layerId in [0...design.layers.length]
       layer = design.layers[layerId]
 
-      layer.xExpr = @exprBuilder.cleanExpr(layer.xExpr, layer.table)
-      layer.yExpr = @exprBuilder.cleanExpr(layer.yExpr, layer.table)
-      layer.colorExpr = @exprBuilder.cleanExpr(layer.colorExpr, layer.table)
+      layer.axes = layer.axes or {}
+
+      for axisKey, axis of layer.axes
+        layer.axes[axisKey] = @cleanAxis(
+          design, layer, axis, 
+          axisKey == "y" and compiler.doesLayerNeedGrouping(design, layerId))
 
       # Remove x axis if not required
-      if not compiler.canLayerUseXExpr(design, layerId) and layer.xExpr
-        delete layer.xExpr
-
-      # Default y aggr
-      if compiler.doesLayerNeedGrouping(design, layerId) and layer.yExpr
-        # Remove latest, as it is tricky to group by. TODO
-        aggrs = @exprBuilder.getAggrs(layer.yExpr)
-        aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
-
-        if layer.yAggr and layer.yAggr not in _.pluck(aggrs, "id")
-          delete layer.yAggr
-
-        if not layer.yAggr
-          layer.yAggr = aggrs[0].id
-      else
-        delete layer.yAggr
+      if not compiler.canLayerUseXExpr(design, layerId) and layer.axes.x
+        delete layer.axes.x
 
       layer.filter = @exprBuilder.cleanExpr(layer.filter, layer.table)
 
     return design
 
-  validateDesign: (design) ->
-    # Check that all have same xExpr type
-    xExprTypes = _.uniq(_.map(design.layers, (l) => @exprBuilder.getExprType(l.xExpr)))
+  # TODO move to AxisBuilder
+  cleanAxis: (design, layer, axis, shouldAggr) ->
+    if not axis
+      return
 
-    if xExprTypes.length > 1
+    # TODO does in place
+    axis.expr = @exprBuilder.cleanExpr(axis.expr, layer.table)
+
+    # Default aggr if grouping
+    if shouldAggr and axis
+      # Remove latest, as it is tricky to group by. TODO
+      aggrs = @exprBuilder.getAggrs(axis.expr)
+      aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
+
+      # Remove existing
+      if axis.aggr and axis.aggr not in _.pluck(aggrs, "id")
+        delete axis.aggr
+
+      if not axis.aggr
+        axis.aggr = aggrs[0].id
+    else
+      delete axis.aggr
+
+    return axis
+
+  validateDesign: (design) ->
+    # Check that layers have same x axis type
+    xAxisTypes = _.uniq(_.map(design.layers, (l) => 
+      axisBuilder = new AxisBuilder(schema: @schema, table: l.table)
+      return axisBuilder.getAxisType(l.axes.x)))
+
+    if xAxisTypes.length > 1
       return "All x axes must be of same type"
 
     for layer in design.layers
+      axisBuilder = new AxisBuilder(schema: @schema, table: layer.table)
+
       # Check that has table
       if not layer.table
         return "Missing data source"
 
-      # Check that has y
-      if not layer.yExpr
+      # Check that has y axis
+      if not layer.axes.y
         return "Missing Axis"
 
       error = null
-      error = error or @exprBuilder.validateExpr(layer.xExpr)
-      error = error or @exprBuilder.validateExpr(layer.yExpr)
-      error = error or @exprBuilder.validateExpr(layer.colorExpr)
+
+      # Validate axes
+      error = error or axisBuilder.validateAxis(layer.axes.x)
+      error = error or axisBuilder.validateAxis(layer.axes.y)
+      error = error or axisBuilder.validateAxis(layer.axes.color)
+
       error = error or @exprBuilder.validateExpr(layer.filter)
 
     return error
@@ -120,8 +142,8 @@ module.exports = class LayeredChart extends Chart
     return React.createElement(LayeredChartDesignerComponent, props)
 
   createQueries: (design, filters) ->
-    compiler = new LayeredChartCompiler(schema: @schema)
-    return compiler.getQueries(design, filters)
+    compiler = new LayeredChartCompiler2(schema: @schema)
+    return compiler.createQueries(design, filters)
 
   # Options include 
   # design: design of the chart
