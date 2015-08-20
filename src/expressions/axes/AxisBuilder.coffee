@@ -35,6 +35,31 @@ module.exports = class AxisBuilder
     # TODO 
     return null
 
+  # Get all categories for a given axis type given the known values
+  # Returns array of { value, label }
+  getCategories: (axis, values) ->
+    exprBuilder = new ExpressionBuilder(@schema)
+
+    switch @getAxisType(axis)
+      when "enum"
+        # If enum, return enum values
+        return _.map(exprBuilder.getExprValues(axis.expr), (ev) -> { value: ev.id, label: ev.name })
+      when "integer"
+        # Handle none
+        if values.length == 0
+          return []
+
+        # Integers are sometimes strings from database, so always parseInt (bigint in node-postgres)
+        min = _.min(_.map(values, (v) -> parseInt(v)))
+        max = _.max(_.map(values, (v) -> parseInt(v)))
+
+        return _.map(_.range(min, max + 1), (v) -> { value: v, label: "#{v}"})
+      when "text"
+        # Return unique values
+        return _.map(_.uniq(values), (v) -> { value: v, label: v })
+
+    throw new Error("Unsupported categories axis type")
+
   getAxisType: (axis) ->
     if not axis
       return null

@@ -85,7 +85,8 @@ module.exports = class LayeredChartViewComponent extends React.Component
       # Highlight only scoped
       .style("opacity", (d,i) =>
         dataPoint = @lookupDataPoint(dataMap, d)
-        scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
+        if dataPoint
+          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
 
         # Determine if scoped
         if @props.scope 
@@ -103,7 +104,8 @@ module.exports = class LayeredChartViewComponent extends React.Component
       .selectAll(".c3-chart-arcs .c3-chart-arc")
       .style("opacity", (d, i) =>
         dataPoint = @lookupDataPoint(dataMap, d)
-        scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
+        if dataPoint
+          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
 
         # Determine if scoped
         if @props.scope 

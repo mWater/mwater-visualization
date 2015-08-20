@@ -40,7 +40,7 @@ class DashboardPane extends React.Component
 $ ->
   sample = H.div className: "container-fluid", style: { height: "100%" },
     H.style null, '''html, body { height: 100% }'''
-    React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
+    React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
   React.render(sample, document.body)
 
 dashboardDesign = {
@@ -56,7 +56,7 @@ dashboardDesign = {
         "type": "LayeredChart",
         "version": "0.1.0",
         "design": {
-          "type": "line",
+          "type": "bar",
           "layers": [
             {
               "axes": {

@@ -4,7 +4,7 @@ fixtures = require './fixtures'
 LayeredChartCompiler = require '../src/widgets/charts/LayeredChartCompiler'
 
 compare = (actual, expected) ->
-  assert _.isEqual(actual, expected), "\n" + JSON.stringify(actual) + "\n" + JSON.stringify(expected)
+  assert _.isEqual(actual, expected) or JSON.stringify(actual) == JSON.stringify(expected), "\n" + JSON.stringify(actual) + "\n" + JSON.stringify(expected)
 
 describe "LayeredChartCompiler", ->
   before ->
@@ -413,6 +413,63 @@ describe "LayeredChartCompiler", ->
 
     describe "bar (or category)", ->
       it "groups for stacked"
+      describe "x axis range", ->
+        describe "integer", ->
+          before ->
+            @design = {
+              type: "bar"
+              layers: [
+                { table: "t1", axes: { x: @axisInteger, y: @axisIntegerSum }, color: "red" }
+                { table: "t1", axes: { x: @axisInteger, y: @axisIntegerSum }, name: "#2" }
+              ]
+            }
+
+            @data = { 
+              layer0: [{ x: 1, y: 11 }]
+              layer1: [{ x: 3, y: 13 }, { x: 4, y: 14 }]
+            }
+
+            @res = @compiler.compileData(@design, @data)
+
+          it "sets types to bar", -> 
+            compare(@res.types, {
+              "0": "bar"
+              "1": "bar"})
+
+          it "makes columns with y values with common x axis", ->
+            compare(@res.columns, [
+              ["x", "1", "2", "3", "4"]
+              ["0", 11, null, null, null]
+              ["1", null, null, 13, 14]
+              ])
+
+          it "maps back to rows", ->
+            compare(@res.dataMap, {
+              "0:0": { layerIndex: 0, row: @data.layer0[0] }
+              "1:2": { layerIndex: 1, row: @data.layer1[0] }
+              "1:3": { layerIndex: 1, row: @data.layer1[1] }
+              })
+
+          it "uses series color", ->
+            compare(@res.colors, { "0": "red" })
+
+          it "sets xs to common axis", ->
+            compare(@res.xs, {
+              "0": "x"
+              "1": "x"
+              })
+
+          it "names", ->
+            compare(@res.names, {
+              "0": "Series 1"
+              "1": "#2"
+              })
+
+          it "colors based on color map"
+
+          it "sets x axis type to category", ->
+            assert.equal @res.xAxisType, "category"
+
       it "fills out range types" # year, date, month, yearmonth, integer
       it "supports enum types" # enum, boolean, bins ??
       it "supports text type" # text

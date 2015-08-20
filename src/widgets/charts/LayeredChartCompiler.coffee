@@ -9,6 +9,7 @@ module.exports = class LayeredChartCompiler
   constructor: (options) ->
     @schema = options.schema
     @exprBuilder = new ExpressionBuilder(@schema)
+    @axisBuilder = new AxisBuilder(schema: @schema)
 
   # Create the queries needed for the chart.
   # extraFilters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. 
@@ -31,14 +32,12 @@ module.exports = class LayeredChartCompiler
         orderBy: []
       }
 
-      # Create axis builder
-      axisBuilder = new AxisBuilder(schema: @schema)
       if layer.axes.x
-        query.selects.push({ type: "select", expr: axisBuilder.compileAxis(axis: layer.axes.x, tableAlias: "main"), alias: "x" })
+        query.selects.push({ type: "select", expr: @axisBuilder.compileAxis(axis: layer.axes.x, tableAlias: "main"), alias: "x" })
       if layer.axes.color
-        query.selects.push({ type: "select", expr: axisBuilder.compileAxis(axis: layer.axes.color, tableAlias: "main"), alias: "color" })
+        query.selects.push({ type: "select", expr: @axisBuilder.compileAxis(axis: layer.axes.color, tableAlias: "main"), alias: "color" })
       if layer.axes.y
-        query.selects.push({ type: "select", expr: axisBuilder.compileAxis(axis: layer.axes.y, tableAlias: "main"), alias: "y" })
+        query.selects.push({ type: "select", expr: @axisBuilder.compileAxis(axis: layer.axes.y, tableAlias: "main"), alias: "y" })
 
       # Sort by x and color
       if layer.axes.x or layer.axes.color
@@ -148,15 +147,14 @@ module.exports = class LayeredChartCompiler
     isCategoricalX = design.type == "bar" or _.any(design.layers, (l) -> l.type == "bar")
 
     # Check if x axis is categorical type
-    axisBuilder = new AxisBuilder(schema: @schema)
-    xType = axisBuilder.getAxisType(design.layers[0].axes.x)
+    xType = @axisBuilder.getAxisType(design.layers[0].axes.x)
     if xType in ["enum", "text", "boolean"]
       isCategoricalX = true
 
     if isCategoricalX
-      throw new Error("TODO")
-
-    return @compileDataNonCategorical(design, data)
+      return @compileDataCategorical(design, data)
+    else
+      return @compileDataNonCategorical(design, data)
 
   compileDataPolar: (design, data) ->
     columns = []
@@ -234,7 +232,7 @@ module.exports = class LayeredChartCompiler
           types[seriesY] = @getLayerType(design, layerIndex)
           names[seriesY] = @formatAxisValue(layer.axes.color, colorValue)
           xs[seriesY] = seriesX
-          
+
           _.each rows, (row, rowIndex) =>
             dataMap["#{seriesY}:#{rowIndex}"] = { layerIndex: layerIndex, row: row }
       else
@@ -262,6 +260,97 @@ module.exports = class LayeredChartCompiler
       colors: colors
       xs: xs
       xAxisType: "indexed" 
+    }
+
+  compileDataCategorical: (design, data) ->
+    columns = []
+    types = {}
+    names = {}
+    dataMap = {}
+    colors = {}
+    xs = {}
+
+    # Get all values of the x-axis, taking into account values that might be missing
+    xAxis = design.layers[0].axes.x
+
+    # Get all known values from all layers
+    xValues = []
+    _.each design.layers, (layer, layerIndex) =>
+      # Get data of layer
+      layerData = data["layer#{layerIndex}"]
+      xValues = _.union(xValues, _.uniq(_.pluck(layerData, "x")))
+
+    # Categories will be in form [{ value, label }]
+    categories = @axisBuilder.getCategories(xAxis, xValues)
+
+    # Create map of category value to index
+    categoryMap = _.object(_.map(categories, (c, i) -> [c.value, i]))
+
+    # Create common x series
+    columns.push(["x"].concat(_.pluck(categories, "label")))
+
+    # For each layer
+    _.each design.layers, (layer, layerIndex) =>
+      # Get data of layer
+      layerData = data["layer#{layerIndex}"]
+
+      # If has color axis
+      if layer.axes.color
+        # Create a series for each color value
+        colorValues = _.uniq(_.pluck(layerData, "color"))
+
+        _.each colorValues, (colorValue) =>
+          # One series for y values
+          series = "#{layerIndex}:#{colorValue}"
+
+          # Get rows for this series
+          rows = _.where(layerData, color: colorValue)
+
+          # Create empty series
+          column = _.map(categories, (c) -> null)
+
+          # Set rows
+          _.each rows, (row) =>
+            # Get index
+            index = categoryMap[row.x]
+            column[index] = row.y
+            dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
+
+          columns.push([series].concat(column))
+
+          types[series] = @getLayerType(design, layerIndex)
+          names[series] = @formatAxisValue(layer.axes.color, colorValue)
+          xs[series] = "x"
+
+      else
+        # One series for y
+        series = "#{layerIndex}"
+
+        # Create empty series
+        column = _.map(categories, (c) -> null)
+
+        # Set rows
+        _.each layerData, (row) =>
+          # Get index
+          index = categoryMap[row.x]
+          column[index] = row.y
+          dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
+
+        columns.push([series].concat(column))
+
+        types[series] = @getLayerType(design, layerIndex)
+        names[series] = layer.name or "Series #{layerIndex+1}"
+        xs[series] = "x"
+        colors[series] = layer.color
+
+    return {
+      columns: columns
+      types: types
+      names: names
+      dataMap: dataMap
+      colors: colors
+      xs: xs
+      xAxisType: "category" 
     }
 
   # Translates enums to label, leaves all else alone
@@ -295,7 +384,6 @@ module.exports = class LayeredChartCompiler
   # plus a layer index
   createScope: (design, layerIndex, row) ->
     expressionBuilder = new ExpressionBuilder(@schema)
-    axisBuilder = new AxisBuilder(schema: @schema)
 
     # Get layer
     layer = design.layers[layerIndex]
@@ -306,13 +394,13 @@ module.exports = class LayeredChartCompiler
     
     # If x
     if layer.axes.x
-      filters.push(axisBuilder.createValueFilter(layer.axes.x, row.x))
-      names.push(axisBuilder.summarizeAxis(layer.axes.x) + " is " + axisBuilder.stringifyLiteral(layer.axes.x, row.x))
+      filters.push(@axisBuilder.createValueFilter(layer.axes.x, row.x))
+      names.push(@axisBuilder.summarizeAxis(layer.axes.x) + " is " + @axisBuilder.stringifyLiteral(layer.axes.x, row.x))
       data.x = row.x
 
     if layer.axes.color
-      filters.push(axisBuilder.createValueFilter(layer.axes.color, row.color))
-      names.push(axisBuilder.summarizeAxis(layer.axes.color) + " is " + axisBuilder.stringifyLiteral(layer.axes.color, row.color))
+      filters.push(@axisBuilder.createValueFilter(layer.axes.color, row.color))
+      names.push(@axisBuilder.summarizeAxis(layer.axes.color) + " is " + @axisBuilder.stringifyLiteral(layer.axes.color, row.color))
       data.color = row.color
 
     if filters.length > 1
