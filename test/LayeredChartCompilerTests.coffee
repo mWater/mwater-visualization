@@ -231,7 +231,7 @@ describe "LayeredChartCompiler", ->
             ])
 
         it "maps back to rows", ->
-          compare(@res.mapping, {
+          compare(@res.dataMap, {
             "0:0": { layerIndex: 0, row: @data.layer0[0] }
             "0:1": { layerIndex: 0, row: @data.layer0[1] }
             })
@@ -276,7 +276,7 @@ describe "LayeredChartCompiler", ->
             ])
 
         it "maps back to rows", ->
-          compare(@res.mapping, {
+          compare(@res.dataMap, {
             "0": { layerIndex: 0, row: @data.layer0[0] }
             "1": { layerIndex: 1, row: @data.layer1[0] }
             })

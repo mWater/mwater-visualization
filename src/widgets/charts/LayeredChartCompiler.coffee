@@ -88,6 +88,10 @@ module.exports = class LayeredChartCompiler
 
     return queries
 
+  # Create data map of "{layer name}" or "{layer name}:{index}" to { layerIndex, row }
+  createDataMap: (design, data) ->
+    return @compileData(design, data).dataMap
+
   # Create the chartOptions to pass to c3.generate
   # options is
   #   design: chart design element
@@ -133,8 +137,8 @@ module.exports = class LayeredChartCompiler
 
     return chartDesign
 
-  # Compiles data part of C3 chart, including mapping back to original data
-  # Outputs: columns, types, names, colors. Also mapping which is a map of "layername:index" to { layerIndex, row }
+  # Compiles data part of C3 chart, including data map back to original data
+  # Outputs: columns, types, names, colors. Also dataMap which is a map of "layername:index" to { layerIndex, row }
   compileData: (design, data) ->
     # If polar chart (no x axis)
     if design.type in ['pie', 'donut'] or _.any(design.layers, (l) -> l.type in ['pie', 'donut'])
@@ -146,7 +150,7 @@ module.exports = class LayeredChartCompiler
     columns = []
     types = {}
     names = {}
-    mapping = {}
+    dataMap = {}
     colors = {}
 
     # For each layer
@@ -160,7 +164,7 @@ module.exports = class LayeredChartCompiler
           columns.push([series, row.y])
           types[series] = @getLayerType(design, layerIndex)
           names[series] = @formatAxisValue(layer.axes.color, row.color)
-          mapping[series] = { layerIndex: layerIndex, row: row }
+          dataMap[series] = { layerIndex: layerIndex, row: row }
       else
         # Create a single series
         row = data["layer#{layerIndex}"][0]
@@ -171,7 +175,7 @@ module.exports = class LayeredChartCompiler
 
           # Name is name of entire layer
           names[series] = layer.name or "Untitled"
-          mapping[series] = { layerIndex: layerIndex, row: row }
+          dataMap[series] = { layerIndex: layerIndex, row: row }
 
           # Set color if present
           if layer.color
@@ -181,7 +185,7 @@ module.exports = class LayeredChartCompiler
       columns: columns
       types: types
       names: names
-      mapping: mapping
+      dataMap: dataMap
       colors: colors
       xAxisType: "category" # Polar charts are always category x-axis
     }
