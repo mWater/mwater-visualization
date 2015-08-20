@@ -56,17 +56,17 @@ dashboardDesign = {
         "type": "LayeredChart",
         "version": "0.1.0",
         "design": {
-          "type": "pie",
+          "type": "line",
           "layers": [
             {
               "axes": {
-                "color": {
-                  "expr": {
-                    "type": "field",
-                    "table": "entities.water_point",
-                    "column": "type"
-                  }
-                },
+                # "color": {
+                #   "expr": {
+                #     "type": "field",
+                #     "table": "entities.water_point",
+                #     "column": "type"
+                #   }
+                # },
                 "y": {
                   "expr": {
                     "type": "scalar",
@@ -76,6 +76,21 @@ dashboardDesign = {
                       "type": "count",
                       "table": "entities.water_point"
                     }
+                  },
+                  "aggr": "count"
+                },
+                "x": {
+                  "expr": {
+                    "type": "scalar",
+                    "table": "entities.water_point",
+                    "joins": [
+                      "source_notes"
+                    ],
+                    "expr": {
+                      "type": "count",
+                      "table": "source_notes"
+                    },
+                    "aggr": "count"
                   }
                 }
               },
@@ -88,3 +103,50 @@ dashboardDesign = {
     }
   }
 }
+
+# PIE CHART
+# dashboardDesign = {
+#   "items": {
+#     "b854aa65-7644-4b67-b0a4-d2344e7eb43a": {
+#       "layout": {
+#         "x": 0,
+#         "y": 0,
+#         "w": 12,
+#         "h": 12
+#       },
+#       "widget": {
+#         "type": "LayeredChart",
+#         "version": "0.1.0",
+#         "design": {
+#           "type": "pie",
+#           "layers": [
+#             {
+#               "axes": {
+#                 "color": {
+#                   "expr": {
+#                     "type": "field",
+#                     "table": "entities.water_point",
+#                     "column": "type"
+#                   }
+#                 },
+#                 "y": {
+#                   "expr": {
+#                     "type": "scalar",
+#                     "table": "entities.water_point",
+#                     "joins": [],
+#                     "expr": {
+#                       "type": "count",
+#                       "table": "entities.water_point"
+#                     }
+#                   }
+#                 }
+#               },
+#               "filter": null,
+#               "table": "entities.water_point"
+#             }
+#           ]
+#         }
+#       }
+#     }
+#   }
+# }

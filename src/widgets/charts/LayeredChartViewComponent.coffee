@@ -126,7 +126,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
     if isPolarChart
       dataPoint = dataMap["#{d.id}"]
     else
-      dataPoint = dataMap["#{d.id}-#{d.index}"]
+      dataPoint = dataMap["#{d.id}:#{d.index}"]
 
     return dataPoint
 

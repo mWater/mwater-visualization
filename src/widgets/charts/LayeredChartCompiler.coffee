@@ -144,7 +144,19 @@ module.exports = class LayeredChartCompiler
     if design.type in ['pie', 'donut'] or _.any(design.layers, (l) -> l.type in ['pie', 'donut'])
       return @compileDataPolar(design, data)
 
-    throw new Error("TODO")
+    # Check if categorical x axis (bar charts always are)
+    isCategoricalX = design.type == "bar" or _.any(design.layers, (l) -> l.type == "bar")
+
+    # Check if x axis is categorical type
+    axisBuilder = new AxisBuilder(schema: @schema)
+    xType = axisBuilder.getAxisType(design.layers[0].axes.x)
+    if xType in ["enum", "text", "boolean"]
+      isCategoricalX = true
+
+    if isCategoricalX
+      throw new Error("TODO")
+
+    return @compileDataNonCategorical(design, data)
 
   compileDataPolar: (design, data) ->
     columns = []
@@ -174,7 +186,7 @@ module.exports = class LayeredChartCompiler
           types[series] = @getLayerType(design, layerIndex)
 
           # Name is name of entire layer
-          names[series] = layer.name or "Untitled"
+          names[series] = layer.name or "Series #{layerIndex+1}"
           dataMap[series] = { layerIndex: layerIndex, row: row }
 
           # Set color if present
@@ -188,6 +200,68 @@ module.exports = class LayeredChartCompiler
       dataMap: dataMap
       colors: colors
       xAxisType: "category" # Polar charts are always category x-axis
+    }
+
+  compileDataNonCategorical: (design, data) ->
+    columns = []
+    types = {}
+    names = {}
+    dataMap = {}
+    colors = {}
+    xs = {}
+
+    # For each layer
+    _.each design.layers, (layer, layerIndex) =>
+      # Get data of layer
+      layerData = data["layer#{layerIndex}"]
+
+      # If has color axis
+      if layer.axes.color
+        # Create a series for each color value
+        colorValues = _.uniq(_.pluck(layerData, "color"))
+
+        _.each colorValues, (colorValue) =>
+          # One series for x values, one for y
+          seriesX = "#{layerIndex}:#{colorValue}:x"
+          seriesY = "#{layerIndex}:#{colorValue}:y"
+
+          # Get rows for this series
+          rows = _.where(layerData, color: colorValue)
+
+          columns.push([seriesY].concat(_.pluck(rows, "y")))
+          columns.push([seriesX].concat(_.pluck(rows, "x")))
+
+          types[seriesY] = @getLayerType(design, layerIndex)
+          names[seriesY] = @formatAxisValue(layer.axes.color, colorValue)
+          xs[seriesY] = seriesX
+          
+          _.each rows, (row, rowIndex) =>
+            dataMap["#{seriesY}:#{rowIndex}"] = { layerIndex: layerIndex, row: row }
+      else
+        # One series for x values, one for y
+        seriesX = "#{layerIndex}:x"
+        seriesY = "#{layerIndex}:y"
+
+        columns.push([seriesY].concat(_.pluck(layerData, "y")))
+        columns.push([seriesX].concat(_.pluck(layerData, "x")))
+
+        types[seriesY] = @getLayerType(design, layerIndex)
+        names[seriesY] = layer.name or "Series #{layerIndex+1}"
+        xs[seriesY] = seriesX
+        colors[seriesY] = layer.color
+
+        # Add data map for each row
+        _.each layerData, (row, rowIndex) =>
+          dataMap["#{seriesY}:#{rowIndex}"] = { layerIndex: layerIndex, row: row }
+
+    return {
+      columns: columns
+      types: types
+      names: names
+      dataMap: dataMap
+      colors: colors
+      xs: xs
+      xAxisType: "indexed" 
     }
 
   # Translates enums to label, leaves all else alone

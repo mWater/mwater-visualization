@@ -58,3 +58,7 @@ mwa_scheme_type MWA scheme type
   wpdx_secondary_admin_div WPDX Secondary administrative division
   wpdx_water_point_technology WPDX Water point technology
   wpdx_water_source WPDX Water Source
+
+source_notes
+_created_by
+_created_for

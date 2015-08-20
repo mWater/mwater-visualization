@@ -252,7 +252,7 @@ describe "LayeredChartCompiler", ->
           @design = {
             type: "pie"
             layers: [
-              { table: "t1", axes: { y: @axisDecimal }, name: "X" }
+              { table: "t1", axes: { y: @axisDecimal } }
               { table: "t1", axes: { y: @axisDecimal }, name: "Y", color: "red" }
             ]
           }
@@ -288,11 +288,136 @@ describe "LayeredChartCompiler", ->
 
         it "names", ->
           compare(@res.names, {
-            "0": "X"
+            "0": "Series 1"
             "1": "Y"
             })
 
-    # describe "scatter"
+        it "colors based on color map"
+
+        it "sets x axis type to category", ->
+          assert.equal @res.xAxisType, "category"
+
+    describe "scatter/line (continuous)", ->
+      # TODO Support these?
+      # describe "timeseries x"
+      # describe "enum x"
+      # describe "text x"
+      # describe "boolean x"
+      describe "decimal x, no color axis", ->
+        before ->
+          @design = {
+            type: "line"
+            layers: [
+              { table: "t1", axes: { x: @axisDecimal, y: @axisDecimal }, name: "X", color: "red" }
+            ]
+          }
+
+          @data = { 
+            layer0: [{ x: 1, y: 1 }, { x: 2, y: 4 }]
+          }
+
+          @res = @compiler.compileData(@design, @data)
+
+        it "sets types to line", -> 
+          compare(@res.types, {
+            "0:y": "line"
+          })
+
+        it "makes columns with y values and x values", ->
+          compare(@res.columns, [
+            ["0:y", 1, 4]
+            ["0:x", 1, 2]
+            ])
+
+        it "makes xs", ->
+          compare(@res.xs, {
+            "0:y": "0:x"
+            })
+
+        it "maps back to rows", ->
+          compare(@res.dataMap, {
+            "0:y:0": { layerIndex: 0, row: @data.layer0[0] }
+            "0:y:1": { layerIndex: 0, row: @data.layer0[1] }
+            })
+
+        it "names", ->
+          compare(@res.names, {
+            "0:y": "X"
+            })
+
+        it "uses series color", ->
+          compare(@res.colors, {
+            "0:y": "red"
+            })
+
+        it "sets x axis type to indexed", ->
+          assert.equal @res.xAxisType, "indexed"
+
+      describe "decimal x, enum color axis", ->
+        before ->
+          @design = {
+            type: "line"
+            layers: [
+              { table: "t1", axes: { x: @axisDecimal, color: @axisEnum, y: @axisDecimal }, name: "X" }
+            ]
+          }
+
+          @data = { 
+            layer0: [
+              { x: 1, color: "a", y: 1 }
+              { x: 2, color: "a", y: 4 }
+              { x: 1, color: "b", y: 2 }
+              { x: 2, color: "b", y: 5 }            ]
+          }
+
+          @res = @compiler.compileData(@design, @data)
+
+        it "sets types to line", -> 
+          compare(@res.types, {
+            "0:a:y": "line"
+            "0:b:y": "line"
+          })
+
+        it "makes columns with y values and x values", ->
+          compare(@res.columns, [
+            ["0:a:y", 1, 4]
+            ["0:a:x", 1, 2]
+            ["0:b:y", 2, 5]
+            ["0:b:x", 1, 2]
+            ])
+
+        it "makes xs", ->
+          compare(@res.xs, {
+            "0:a:y": "0:a:x"
+            "0:b:y": "0:b:x"
+            })
+
+        it "maps back to rows", ->
+          compare(@res.dataMap, {
+            "0:a:y:0": { layerIndex: 0, row: @data.layer0[0] }
+            "0:a:y:1": { layerIndex: 0, row: @data.layer0[1] }
+            "0:b:y:0": { layerIndex: 0, row: @data.layer0[2] }
+            "0:b:y:1": { layerIndex: 0, row: @data.layer0[3] }
+            })
+
+        it "names", ->
+          compare(@res.names, {
+            "0:a:y": "A"
+            "0:b:y": "B"
+            })
+
+        it "uses color maps"
+
+        it "sets x axis type to indexed", ->
+          assert.equal @res.xAxisType, "indexed"
+
+    describe "bar (or category)", ->
+      it "groups for stacked"
+      it "fills out range types" # year, date, month, yearmonth, integer
+      it "supports enum types" # enum, boolean, bins ??
+      it "supports text type" # text
+      # describe "enum x axis" 
+      # describe "text x axis"
 
   describe "createScope", ->
     it "creates x filter", ->
