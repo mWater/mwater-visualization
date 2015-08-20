@@ -100,14 +100,14 @@ module.exports = class LayeredChart extends Chart
   validateDesign: (design) ->
     # Check that layers have same x axis type
     xAxisTypes = _.uniq(_.map(design.layers, (l) => 
-      axisBuilder = new AxisBuilder(schema: @schema, table: l.table)
+      axisBuilder = new AxisBuilder(schema: @schema)
       return axisBuilder.getAxisType(l.axes.x)))
 
     if xAxisTypes.length > 1
       return "All x axes must be of same type"
 
     for layer in design.layers
-      axisBuilder = new AxisBuilder(schema: @schema, table: layer.table)
+      axisBuilder = new AxisBuilder(schema: @schema)
 
       # Check that has table
       if not layer.table

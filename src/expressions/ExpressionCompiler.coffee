@@ -4,8 +4,6 @@ module.exports = class ExpressionCompiler
     @schema = schema
 
   # Compile an expression. Pass expr and tableAlias.
-  # Pass aggr to aggregate the expression
-  # TODO remove aggr and leave only in AxisBuilder
   compileExpr: (options) =>
     expr = options.expr
 
@@ -28,14 +26,6 @@ module.exports = class ExpressionCompiler
         compiledExpr = null
       else
         throw new Error("Expr type #{expr.type} not supported")
-
-    # Aggregate
-    if options.aggr
-      compiledExpr = {
-        type: "op"
-        op: options.aggr
-        exprs: _.compact([compiledExpr])
-      }
 
     return compiledExpr
 

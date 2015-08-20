@@ -9,14 +9,27 @@ ExpressionBuilder = require '../ExpressionBuilder'
 #  xform: TBD
 #  colorMap: TBD
 module.exports = class AxisBuilder
-  # Options are: schema, table
-  constructor: (options) ->
-    @schema = options.schema
-    @table = options.table
+  # Options are: schema
+  constructor: (axis) ->
+    @schema = axis.schema
 
-  compile: (axis, tableAlias) ->
+  # Pass axis, tableAlias
+  compile: (options) ->
+    if not options.axis
+      return null
+
     exprCompiler = new ExpressionCompiler(@schema)
-    return exprCompiler.compileExpr(expr: axis.expr, tableAlias: tableAlias, aggr: axis.aggr)
+    compiledExpr = exprCompiler.compileExpr(expr: options.axis.expr, tableAlias: options.tableAlias, aggr: options.axis.aggr)
+
+    # Aggregate
+    if options.axis.aggr
+      compiledExpr = {
+        type: "op"
+        op: options.axis.aggr
+        exprs: _.compact([compiledExpr])
+      }
+
+    return compiledExpr
 
   validateAxis: (axis) ->
     # TODO
@@ -25,7 +38,7 @@ module.exports = class AxisBuilder
   getAxisType: (axis) ->
     if not axis
       return null
-      
+
     # TODO add aggr support
     # TODO add xform support
     exprBuilder = new ExpressionBuilder(@schema)

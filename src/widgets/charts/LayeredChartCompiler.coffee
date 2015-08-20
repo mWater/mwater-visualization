@@ -31,11 +31,11 @@ module.exports = class LayeredChartCompiler
       # Create axis builder
       axisBuilder = new AxisBuilder(schema: @schema, table: layer.table)
       if layer.axes.x
-        query.selects.push({ type: "select", expr: axisBuilder.compile(layer.axes.x, "main"), alias: "x" })
+        query.selects.push({ type: "select", expr: axisBuilder.compile(axis: layer.axes.x, tableAlias: "main"), alias: "x" })
       if layer.axes.color
-        query.selects.push({ type: "select", expr: axisBuilder.compile(layer.axes.color, "main"), alias: "color" })
+        query.selects.push({ type: "select", expr: axisBuilder.compile(axis: layer.axes.color, tableAlias: "main"), alias: "color" })
       if layer.axes.y
-        query.selects.push({ type: "select", expr: axisBuilder.compile(layer.axes.y, "main"), alias: "y" })
+        query.selects.push({ type: "select", expr: axisBuilder.compile(axis: layer.axes.y, tableAlias: "main"), alias: "y" })
 
       # Sort by x and color
       if layer.axes.x or layer.axes.color
@@ -130,7 +130,6 @@ module.exports = class LayeredChartCompiler
 
     return chartDesign
 
-
   # Compiles data part of C3 chart, including mapping back to original data
   # Outputs: columns, types, names, colors. Also mapping which is a map of "layername:index" to { layerIndex, row }
   compileData: (design, data) ->
@@ -181,6 +180,7 @@ module.exports = class LayeredChartCompiler
       names: names
       mapping: mapping
       colors: colors
+      xAxisType: "category" # Polar charts are always category x-axis
     }
 
   # Translates enums to label, leaves all else alone

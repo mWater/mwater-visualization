@@ -244,7 +244,7 @@ describe "LayeredChartCompiler", ->
       it "colors based on color map"
 
       it "sets x axis type to category", ->
-        assert.isEqual @res.xAxisType, "category"
+        assert.equal @res.xAxisType, "category"
 
     describe "multiple layer", ->
       before ->
