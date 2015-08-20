@@ -14,7 +14,7 @@ module.exports = class AxisBuilder
     @schema = axis.schema
 
   # Pass axis, tableAlias
-  compile: (options) ->
+  compileAxis: (options) ->
     if not options.axis
       return null
 
@@ -32,7 +32,7 @@ module.exports = class AxisBuilder
     return compiledExpr
 
   validateAxis: (axis) ->
-    # TODO
+    # TODO 
     return null
 
   getAxisType: (axis) ->
@@ -44,5 +44,36 @@ module.exports = class AxisBuilder
     exprBuilder = new ExpressionBuilder(@schema)
     return exprBuilder.getExprType(axis.expr)
 
+  # Summarize axis as a string
+  summarizeAxis: (axis) ->
+    # TODO add aggr support
+    # TODO add xform support
+    exprBuilder = new ExpressionBuilder(@schema)
+    return exprBuilder.summarizeExpr(axis.expr)
 
+  # Get a string representation of an axis value
+  stringifyLiteral: (axis, value) ->
+    # TODO add aggr support, xform support
+    exprBuilder = new ExpressionBuilder(@schema)
+    return exprBuilder.stringifyExprLiteral(axis.expr, value)
 
+  # Creates a filter (jsonql with {alias} for table name) based on a specific value
+  # of the axis. Used to filter by a specific point.
+  createValueFilter: (axis, value) ->
+    if value?
+      return {
+        type: "op"
+        op: "="
+        exprs: [
+          @compileAxis(axis: axis, tableAlias: "{alias}")
+          { type: "literal", value: value }
+        ]
+      }
+    else
+      return {
+        type: "op"
+        op: "is null"
+        exprs: [
+          @compileAxis(axis: axis, tableAlias: "{alias}")
+        ]
+      }

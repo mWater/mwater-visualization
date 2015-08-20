@@ -307,11 +307,15 @@ describe "LayeredChartCompiler", ->
       scope = @compiler.createScope(design, 0, row)
 
       expectedFilter = {
-        type: "comparison"
         table: "t1"
-        lhs: @exprDecimal
-        op: "="
-        rhs: { type: "literal", valueType: "decimal", value: 1 } 
+        jsonql: {
+          type: "op"
+          op: "="
+          exprs: [
+            { type: "field", tableAlias: "{alias}", column: "decimal" }
+            { type: "literal", value: 1 }
+          ]
+        }
       }
 
       compare(scope.filter, expectedFilter)
@@ -330,25 +334,29 @@ describe "LayeredChartCompiler", ->
       scope = @compiler.createScope(design, 0, row)
 
       expectedFilter = {
-        type: "logical"
         table: "t1"
-        op: "and"
-        exprs: [
-          {
-            type: "comparison"
-            table: "t1"
-            lhs: @exprText
-            op: "="
-            rhs: { type: "literal", valueType: "text", value: "1" } 
-          }
-          {
-            type: "comparison"
-            table: "t1"
-            lhs: @exprEnum
-            op: "="
-            rhs: { type: "literal", valueType: "enum", value: "b" } 
-          }
-        ]
+        jsonql: {
+          type: "op"
+          op: "and"
+          exprs: [
+            {
+              type: "op"
+              op: "="
+              exprs: [
+                { type: "field", tableAlias: "{alias}", column: "text" }
+                { type: "literal", value: "1" }
+              ]
+            }
+            {
+              type: "op"
+              op: "="
+              exprs: [
+                { type: "field", tableAlias: "{alias}", column: "enum" }
+                { type: "literal", value: "b" }
+              ]
+            }
+          ]
+        }
       }
 
       compare(scope.filter, expectedFilter)
@@ -366,12 +374,16 @@ describe "LayeredChartCompiler", ->
       row = { color: "b", y: 20 }
       scope = @compiler.createScope(design, 0, row)
 
-      expectedFilter =  {
-        type: "comparison"
+      expectedFilter = {
         table: "t1"
-        lhs: @exprEnum
-        op: "="
-        rhs: { type: "literal", valueType: "enum", value: "b" } 
+        jsonql: {
+          type: "op"
+          op: "="
+          exprs: [
+            { type: "field", tableAlias: "{alias}", column: "enum" }
+            { type: "literal", value: "b" }
+          ]
+        }
       }
 
       compare(scope.filter, expectedFilter)
@@ -390,10 +402,14 @@ describe "LayeredChartCompiler", ->
       scope = @compiler.createScope(design, 0, row)
 
       expectedFilter =  {
-        type: "comparison"
         table: "t1"
-        lhs: @exprEnum
-        op: "is null"
+        jsonql: {
+          type: "op"
+          op: "is null"
+          exprs: [
+            { type: "field", tableAlias: "{alias}", column: "enum" }
+          ]
+        }
       }
 
       compare(scope.filter, expectedFilter)

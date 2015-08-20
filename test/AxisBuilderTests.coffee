@@ -13,7 +13,7 @@ describe "AxisBuilder", ->
       expr: { type: "field", table: "t1", column: "integer" }
     }
 
-    jql = @ab.compile(axis: axis, tableAlias: "T1")
+    jql = @ab.compileAxis(axis: axis, tableAlias: "T1")
     assert _.isEqual jql, {
       type: "field"
       tableAlias: "T1"
@@ -26,7 +26,7 @@ describe "AxisBuilder", ->
       aggr: "sum"
     }
 
-    jql = @ab.compile(axis: axis, tableAlias: "T1")
+    jql = @ab.compileAxis(axis: axis, tableAlias: "T1")
     assert _.isEqual jql, {
       type: "op"
       op: "sum"

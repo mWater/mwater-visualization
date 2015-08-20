@@ -32,13 +32,13 @@ module.exports = class LayeredChartCompiler
       }
 
       # Create axis builder
-      axisBuilder = new AxisBuilder(schema: @schema, table: layer.table)
+      axisBuilder = new AxisBuilder(schema: @schema)
       if layer.axes.x
-        query.selects.push({ type: "select", expr: axisBuilder.compile(axis: layer.axes.x, tableAlias: "main"), alias: "x" })
+        query.selects.push({ type: "select", expr: axisBuilder.compileAxis(axis: layer.axes.x, tableAlias: "main"), alias: "x" })
       if layer.axes.color
-        query.selects.push({ type: "select", expr: axisBuilder.compile(axis: layer.axes.color, tableAlias: "main"), alias: "color" })
+        query.selects.push({ type: "select", expr: axisBuilder.compileAxis(axis: layer.axes.color, tableAlias: "main"), alias: "color" })
       if layer.axes.y
-        query.selects.push({ type: "select", expr: axisBuilder.compile(axis: layer.axes.y, tableAlias: "main"), alias: "y" })
+        query.selects.push({ type: "select", expr: axisBuilder.compileAxis(axis: layer.axes.y, tableAlias: "main"), alias: "y" })
 
       # Sort by x and color
       if layer.axes.x or layer.axes.color
@@ -217,6 +217,7 @@ module.exports = class LayeredChartCompiler
   # plus a layer index
   createScope: (design, layerIndex, row) ->
     expressionBuilder = new ExpressionBuilder(@schema)
+    axisBuilder = new AxisBuilder(schema: @schema)
 
     # Get layer
     layer = design.layers[layerIndex]
@@ -226,56 +227,30 @@ module.exports = class LayeredChartCompiler
     data = { layerIndex: layerIndex }
     
     # If x
-    # TODO switch to JsonQL expressions
     if layer.axes.x
-      if row.x?
-        filters.push({ 
-          type: "comparison"
-          table: layer.table
-          lhs: layer.xExpr
-          op: "="
-          rhs: { type: "literal", valueType: expressionBuilder.getExprType(layer.xExpr), value: row.x } 
-        })
-      else
-        filters.push({ 
-          type: "comparison"
-          table: layer.table
-          lhs: layer.xExpr
-          op: "is null"
-        })
-
-      names.push(expressionBuilder.summarizeExpr(layer.xExpr) + " is " + expressionBuilder.stringifyExprLiteral(layer.xExpr, row.x))
+      filters.push(axisBuilder.createValueFilter(layer.axes.x, row.x))
+      names.push(axisBuilder.summarizeAxis(layer.axes.x) + " is " + axisBuilder.stringifyLiteral(layer.axes.x, row.x))
       data.x = row.x
 
-    if layer.colorExpr
-      if row.color?
-        filters.push({ 
-          type: "comparison"
-          table: layer.table
-          lhs: layer.colorExpr
-          op: "="
-          rhs: { type: "literal", valueType: expressionBuilder.getExprType(layer.colorExpr), value: row.color } 
-        })
-      else
-        filters.push({ 
-          type: "comparison"
-          table: layer.table
-          lhs: layer.colorExpr
-          op: "is null"
-        })
-
-      names.push(expressionBuilder.summarizeExpr(layer.colorExpr) + " is " + expressionBuilder.stringifyExprLiteral(layer.colorExpr, row.color))
+    if layer.axes.color
+      filters.push(axisBuilder.createValueFilter(layer.axes.color, row.color))
+      names.push(axisBuilder.summarizeAxis(layer.axes.color) + " is " + axisBuilder.stringifyLiteral(layer.axes.color, row.color))
       data.color = row.color
 
     if filters.length > 1
       filter = {
-        type: "logical"
         table: layer.table
-        op: "and"
-        exprs: filters
+        jsonql: {
+          type: "op"
+          op: "and"
+          exprs: filters
+        }
       }
     else
-      filter = filters[0]
+      filter = {
+        table: layer.table
+        jsonql: filters[0]
+      }
 
     scope = {
       name: @schema.getTable(layer.table).name + " " + names.join(" and ")

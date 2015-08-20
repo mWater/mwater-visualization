@@ -139,6 +139,7 @@ module.exports = class ExpressionBuilder
     return str
 
   # Summarize an expression with optional aggregation
+  # TODO Remove to AxisBuilder
   summarizeAggrExpr: (expr, aggr) ->
     exprType = @getExprType(expr)
 
