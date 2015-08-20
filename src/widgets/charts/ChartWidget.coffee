@@ -18,7 +18,7 @@ module.exports = class ChartWidget extends Widget
   # options:
   #  onRemove: called when widget is removed
   #  scope: scope of the widget (when the widget self-selects a particular scope)
-  #  filters: array of filters to apply (array of expressions)
+  #  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   #  onScopeChange: called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
   #  onDesignChange: called with new design
   createViewElement: (options) ->
@@ -53,7 +53,7 @@ class ChartWidgetComponent extends React.Component
     handleight: React.PropTypes.number
 
     scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
-    filters: React.PropTypes.array  # array of filters to apply (array of expressions)
+    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
     connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)

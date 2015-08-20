@@ -1,5 +1,6 @@
 Layer = require './Layer'
 ExpressionCompiler = require '../expressions/ExpressionCompiler'
+injectTableAlias = require '../injectTableAlias'
 
 # Legacy server map
 module.exports = class LegacyLayer extends Layer
@@ -25,9 +26,8 @@ module.exports = class LegacyLayer extends Layer
     # Add where for any relevant filters
     relevantFilters = _.where(filters, table: "entities.water_point")
 
-    # TODO Duplicate code from LayeredChart
     # If any, create and
-    whereClauses = _.map(relevantFilters, @compileExpr)
+    whereClauses = _.map(relevantFilters, (f) => injectTableAlias(f.jsonql, "entities.water_point"))
 
     # Wrap if multiple
     if whereClauses.length > 1

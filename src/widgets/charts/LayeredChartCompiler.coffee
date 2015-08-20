@@ -1,6 +1,7 @@
 ExpressionCompiler = require './../../expressions/ExpressionCompiler'
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 AxisBuilder = require '../../expressions/axes/AxisBuilder'
+injectTableAlias = require '../../injectTableAlias'
 
 # Compiles various parts of a layered chart (line, bar, scatter, spline, area) to C3.js format
 module.exports = class LayeredChartCompiler
@@ -9,6 +10,8 @@ module.exports = class LayeredChartCompiler
     @schema = options.schema
     @exprBuilder = new ExpressionBuilder(@schema)
 
+  # Create the queries needed for the chart.
+  # extraFilters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. 
   createQueries: (design, extraFilters) ->
     exprCompiler = new ExpressionCompiler(@schema)
 
@@ -70,7 +73,7 @@ module.exports = class LayeredChartCompiler
 
           # Add others
           for filter in relevantFilters
-            whereClauses.push(@compileExpr(filter))
+            whereClauses.push(injectTableAlias(filter.jsonql, "main"))
 
           # Wrap if multiple
           if whereClauses.length > 1
@@ -209,3 +212,75 @@ module.exports = class LayeredChartCompiler
   canLayerUseXExpr: (design, layerIndex) ->
     return @getLayerType(design, layerIndex) not in ['pie', 'donut']
 
+  # Create a scope based on a row of a layer
+  # Scope data is relevant data from row that uniquely identifies scope
+  # plus a layer index
+  createScope: (design, layerIndex, row) ->
+    expressionBuilder = new ExpressionBuilder(@schema)
+
+    # Get layer
+    layer = design.layers[layerIndex]
+
+    filters = []
+    names = []
+    data = { layerIndex: layerIndex }
+    
+    # If x
+    # TODO switch to JsonQL expressions
+    if layer.axes.x
+      if row.x?
+        filters.push({ 
+          type: "comparison"
+          table: layer.table
+          lhs: layer.xExpr
+          op: "="
+          rhs: { type: "literal", valueType: expressionBuilder.getExprType(layer.xExpr), value: row.x } 
+        })
+      else
+        filters.push({ 
+          type: "comparison"
+          table: layer.table
+          lhs: layer.xExpr
+          op: "is null"
+        })
+
+      names.push(expressionBuilder.summarizeExpr(layer.xExpr) + " is " + expressionBuilder.stringifyExprLiteral(layer.xExpr, row.x))
+      data.x = row.x
+
+    if layer.colorExpr
+      if row.color?
+        filters.push({ 
+          type: "comparison"
+          table: layer.table
+          lhs: layer.colorExpr
+          op: "="
+          rhs: { type: "literal", valueType: expressionBuilder.getExprType(layer.colorExpr), value: row.color } 
+        })
+      else
+        filters.push({ 
+          type: "comparison"
+          table: layer.table
+          lhs: layer.colorExpr
+          op: "is null"
+        })
+
+      names.push(expressionBuilder.summarizeExpr(layer.colorExpr) + " is " + expressionBuilder.stringifyExprLiteral(layer.colorExpr, row.color))
+      data.color = row.color
+
+    if filters.length > 1
+      filter = {
+        type: "logical"
+        table: layer.table
+        op: "and"
+        exprs: filters
+      }
+    else
+      filter = filters[0]
+
+    scope = {
+      name: @schema.getTable(layer.table).name + " " + names.join(" and ")
+      filter: filter
+      data: data
+    }
+
+    return scope

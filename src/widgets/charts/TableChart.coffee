@@ -2,6 +2,7 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 
+injectTableAlias = require '../../injectTableAlias'
 Chart = require './Chart'
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 ExpressionCompiler = require './../../expressions/ExpressionCompiler'
@@ -125,7 +126,7 @@ module.exports = class TableChart extends Chart
       filters.push(design.filter)
 
     # Compile all filters
-    filters = _.map(filters, @compileExpr)      
+    filters = _.map(filters, (f) -> injectTableAlias(f.jsonql, "main")) 
 
     # Wrap if multiple
     if filters.length > 1

@@ -109,10 +109,10 @@ describe "LayeredChartCompiler", ->
       compare(queries, expectedQueries)
 
     it "filters if by relevant extra filters", ->
-      relevantFilter = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "integer" }, op: ">", rhs: { type: "literal", valueType: "integer", value: 4 } }
+      relevantFilter = { table: "t1", jsonql: { type: "op", op: ">", exprs: [{ type: "field", tableAlias: "{alias}", column: "integer" }, { type: "literal", value: 4 }] } }
 
       # Wrong table
-      otherFilter = { type: "comparison", table: "t2", lhs: { type: "field", table: "t2", column: "integer" }, op: ">", rhs: { type: "literal", valueType: "integer", value: 5 } }
+      otherFilter = { table: "t2", jsonql: { type: "op", op: ">", exprs: [{ type: "field", tableAlias: "{alias}", column: "integer" }, { type: "literal", value: 5 }] } }
 
       filters = [
         relevantFilter
@@ -201,94 +201,201 @@ describe "LayeredChartCompiler", ->
 
       compare(queries, expectedQueries)
 
-  describe "pie/donut", ->
-    describe "single layer", ->
-      before ->
-        @design = {
-          type: "pie"
-          layers: [
-            { table: "t1", axes: { color: @axisEnum, y: @axisDecimal } }
-          ]
-        }
+  describe "compileData", ->
+    describe "pie/donut", ->
+      describe "single layer", ->
+        before ->
+          @design = {
+            type: "pie"
+            layers: [
+              { table: "t1", axes: { color: @axisEnum, y: @axisDecimal } }
+            ]
+          }
 
-        @data = { layer0: [
-          { color: "a", y: 1 }
-          { color: "b", y: 2 }
-        ]}
+          @data = { layer0: [
+            { color: "a", y: 1 }
+            { color: "b", y: 2 }
+          ]}
 
-        @res = @compiler.compileData(@design, @data)
+          @res = @compiler.compileData(@design, @data)
 
-      it "sets types to pie", -> 
-        compare(@res.types, {
-          "0:0": "pie"
-          "0:1": "pie"})
+        it "sets types to pie", -> 
+          compare(@res.types, {
+            "0:0": "pie"
+            "0:1": "pie"})
 
-      it "makes columns with y value", ->
-        compare(@res.columns, [
-          ["0:0", 1]
-          ["0:1", 2]
-          ])
+        it "makes columns with y value", ->
+          compare(@res.columns, [
+            ["0:0", 1]
+            ["0:1", 2]
+            ])
 
-      it "maps back to rows", ->
-        compare(@res.mapping, {
-          "0:0": { layerIndex: 0, row: @data.layer0[0] }
-          "0:1": { layerIndex: 0, row: @data.layer0[1] }
-          })
+        it "maps back to rows", ->
+          compare(@res.mapping, {
+            "0:0": { layerIndex: 0, row: @data.layer0[0] }
+            "0:1": { layerIndex: 0, row: @data.layer0[1] }
+            })
 
-      it "names", ->
-        compare(@res.names, {
-          "0:0": "A"
-          "0:1": "B"
-          })
+        it "names", ->
+          compare(@res.names, {
+            "0:0": "A"
+            "0:1": "B"
+            })
 
-      it "colors based on color map"
+        it "colors based on color map"
 
-      it "sets x axis type to category", ->
-        assert.equal @res.xAxisType, "category"
+        it "sets x axis type to category", ->
+          assert.equal @res.xAxisType, "category"
 
-    describe "multiple layer", ->
-      before ->
-        @design = {
-          type: "pie"
-          layers: [
-            { table: "t1", axes: { y: @axisDecimal }, name: "X" }
-            { table: "t1", axes: { y: @axisDecimal }, name: "Y", color: "red" }
-          ]
-        }
+      describe "multiple layer", ->
+        before ->
+          @design = {
+            type: "pie"
+            layers: [
+              { table: "t1", axes: { y: @axisDecimal }, name: "X" }
+              { table: "t1", axes: { y: @axisDecimal }, name: "Y", color: "red" }
+            ]
+          }
 
-        @data = { 
-          layer0: [{ y: 1 }]
-          layer1: [{ y: 2 }]
-        }
+          @data = { 
+            layer0: [{ y: 1 }]
+            layer1: [{ y: 2 }]
+          }
 
-        @res = @compiler.compileData(@design, @data)
+          @res = @compiler.compileData(@design, @data)
 
-      it "sets types to pie", -> 
-        compare(@res.types, {
-          "0": "pie"
-          "1": "pie"})
+        it "sets types to pie", -> 
+          compare(@res.types, {
+            "0": "pie"
+            "1": "pie"})
 
-      it "makes columns with y value", ->
-        compare(@res.columns, [
-          ["0", 1]
-          ["1", 2]
-          ])
+        it "makes columns with y value", ->
+          compare(@res.columns, [
+            ["0", 1]
+            ["1", 2]
+            ])
 
-      it "maps back to rows", ->
-        compare(@res.mapping, {
-          "0": { layerIndex: 0, row: @data.layer0[0] }
-          "1": { layerIndex: 1, row: @data.layer1[0] }
-          })
+        it "maps back to rows", ->
+          compare(@res.mapping, {
+            "0": { layerIndex: 0, row: @data.layer0[0] }
+            "1": { layerIndex: 1, row: @data.layer1[0] }
+            })
 
-      it "uses series color", ->
-        compare(@res.colors, {
-          "1": "red"
-          })
+        it "uses series color", ->
+          compare(@res.colors, {
+            "1": "red"
+            })
 
-      it "names", ->
-        compare(@res.names, {
-          "0": "X"
-          "1": "Y"
-          })
+        it "names", ->
+          compare(@res.names, {
+            "0": "X"
+            "1": "Y"
+            })
 
-  describe "scatter"
+    # describe "scatter"
+
+  describe "createScope", ->
+    it "creates x filter", ->
+      design = {
+        type: "line"
+        layers: [
+          { axes: { x: @axisDecimal, y: @axisIntegerSum }, table: "t1" }
+        ]
+      }
+
+      row = { x: 1, y: 10 }
+      scope = @compiler.createScope(design, 0, row)
+
+      expectedFilter = {
+        type: "comparison"
+        table: "t1"
+        lhs: @exprDecimal
+        op: "="
+        rhs: { type: "literal", valueType: "decimal", value: 1 } 
+      }
+
+      compare(scope.filter, expectedFilter)
+      compare(scope.data, { layerIndex: 0, x: 1 })
+      compare(scope.name, "T1 Decimal is 1")
+
+    it "creates x-color filter", ->
+      design = {
+        type: "bar"
+        layers: [
+          { axes: { x: @axisText, color: @axisEnum, y: @axisIntegerSum }, table: "t1" }
+        ]
+      }
+
+      row = { x: "1", color: "b", y: 20 }
+      scope = @compiler.createScope(design, 0, row)
+
+      expectedFilter = {
+        type: "logical"
+        table: "t1"
+        op: "and"
+        exprs: [
+          {
+            type: "comparison"
+            table: "t1"
+            lhs: @exprText
+            op: "="
+            rhs: { type: "literal", valueType: "text", value: "1" } 
+          }
+          {
+            type: "comparison"
+            table: "t1"
+            lhs: @exprEnum
+            op: "="
+            rhs: { type: "literal", valueType: "enum", value: "b" } 
+          }
+        ]
+      }
+
+      compare(scope.filter, expectedFilter)
+      compare(scope.data, { layerIndex: 0, x: "1", color: "b" })
+      compare(scope.name, "T1 Text is 1 and Enum is B")
+
+    it "creates color filter", ->
+      design = {
+        type: "pie"
+        layers: [
+          { axes: { color: @axisEnum, y: @axisIntegerSum }, table: "t1" }
+        ]
+      }
+
+      row = { color: "b", y: 20 }
+      scope = @compiler.createScope(design, 0, row)
+
+      expectedFilter =  {
+        type: "comparison"
+        table: "t1"
+        lhs: @exprEnum
+        op: "="
+        rhs: { type: "literal", valueType: "enum", value: "b" } 
+      }
+
+      compare(scope.filter, expectedFilter)
+      compare(scope.data, { layerIndex: 0, color: "b" })
+      compare(scope.name, "T1 Enum is B")
+
+    it "creates null color filter", ->
+      design = {
+        type: "pie"
+        layers: [
+          { axes: { color: @axisEnum, y: @axisIntegerSum }, table: "t1" }
+        ]
+      }
+
+      row = { color: null, y: 20 }
+      scope = @compiler.createScope(design, 0, row)
+
+      expectedFilter =  {
+        type: "comparison"
+        table: "t1"
+        lhs: @exprEnum
+        op: "is null"
+      }
+
+      compare(scope.filter, expectedFilter)
+      compare(scope.data, { layerIndex: 0, color: null })
+      compare(scope.name, "T1 Enum is None")
