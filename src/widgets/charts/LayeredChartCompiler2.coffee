@@ -1,5 +1,6 @@
 ExpressionCompiler = require './../../expressions/ExpressionCompiler'
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
+AxisBuilder = require '../../expressions/axes/AxisBuilder'
 
 # Compiles various parts of a layered chart (line, bar, scatter, spline, area) to C3.js format
 module.exports = class LayeredChartCompiler2
@@ -8,12 +9,82 @@ module.exports = class LayeredChartCompiler2
     @schema = options.schema
     @exprBuilder = new ExpressionBuilder(@schema)
 
+  compileQueries: (design, extraFilters) ->
+    exprCompiler = new ExpressionCompiler(@schema)
 
-  # Get layer type, defaulting to overall type
-  getLayerType: (design, layerIndex) ->
-    return design.layers[layerIndex].type or design.type
+    queries = {}
 
-  # Compiles data part of C3 chart
+    # For each layer
+    for layerIndex in [0...design.layers.length]
+      layer = design.layers[layerIndex]
+
+      # Create shell of query
+      query = {
+        type: "query"
+        selects: []
+        from: exprCompiler.compileTable(layer.table, "main")
+        limit: 1000
+        groupBy: []
+        orderBy: []
+      }
+
+      # Create axis builder
+      axisBuilder = new AxisBuilder(schema: @schema, table: layer.table, tableAlias: "main")
+      if layer.axes.x
+        query.selects.push({ type: "select", expr: axisBuilder.compile(layer.axes.x), alias: "x" })
+      if layer.axes.color
+        query.selects.push({ type: "select", expr: axisBuilder.compile(layer.axes.color), alias: "color" })
+      if layer.axes.y
+        query.selects.push({ type: "select", expr: axisBuilder.compile(layer.axes.y), alias: "y" })
+
+      # Sort by x and color
+      if layer.axes.x or layer.axes.color
+        query.orderBy.push({ ordinal: 1 })
+      if layer.axes.x and layer.axes.color
+        query.orderBy.push({ ordinal: 2 })
+
+      # If grouping type
+      if @doesLayerNeedGrouping(design, layerIndex)
+        if layer.axes.x or layer.axes.color
+          query.groupBy.push(1)
+
+        if layer.axes.x and layer.axes.color
+          query.groupBy.push(2)
+
+      # Add where
+      if layer.filter
+        query.where = @compileExpr(layer.filter)
+
+      # Add filters
+      if extraFilters and extraFilters.length > 0
+        # Get relevant filters
+        relevantFilters = _.where(extraFilters, table: layer.table)
+
+        # If any, create and
+        if relevantFilters.length > 0
+          whereClauses = []
+
+          # Keep existing where
+          if query.where
+            whereClauses.push(query.where)
+
+          # Add others
+          for filter in relevantFilters
+            whereClauses.push(@compileExpr(filter))
+
+          # Wrap if multiple
+          if whereClauses.length > 1
+            query.where = { type: "op", op: "and", exprs: whereClauses }
+          else
+            query.where = whereClauses[0]
+
+      queries["layer#{layerIndex}"] = query
+
+    return queries
+
+
+  # Compiles data part of C3 chart, including mapping back to original data
+  # Outputs: columns, types, names, colors. Also mapping which is a map of "layername:index" to { layerIndex, row }
   compileData: (design, data) ->
     # If polar chart (no x axis)
     if design.type in ['pie', 'donut'] or _.any(design.layers, (l) -> l.type in ['pie', 'donut'])
@@ -73,3 +144,15 @@ module.exports = class LayeredChartCompiler2
         return item.name
     return value or "None"
 
+  # Compile an expression
+  compileExpr: (expr) ->
+    exprCompiler = new ExpressionCompiler(@schema)
+    return exprCompiler.compileExpr(expr: expr, tableAlias: "main")
+
+  # Get layer type, defaulting to overall type
+  getLayerType: (design, layerIndex) ->
+    return design.layers[layerIndex].type or design.type
+
+  # Determine if layer required grouping by x (and color)
+  doesLayerNeedGrouping: (design, layerIndex) ->
+    return @getLayerType(design, layerIndex) != "scatter"

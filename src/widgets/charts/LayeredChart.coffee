@@ -25,6 +25,7 @@ layer:
   axes: axes (see below)
   stacked: true to stack
   filter: optional logical expression to filter by
+  color: color of layer (e.g. #FF8800)
 
 axes:
   x: x axis
@@ -34,7 +35,7 @@ axes:
 axis: 
   expr: expression of axis
   aggr: aggregation for axis
-  
+
 ###
 module.exports = class LayeredChart extends Chart
   constructor: (options) ->

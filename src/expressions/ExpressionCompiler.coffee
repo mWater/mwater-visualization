@@ -5,6 +5,7 @@ module.exports = class ExpressionCompiler
 
   # Compile an expression. Pass expr and tableAlias.
   # Pass aggr to aggregate the expression
+  # TODO remove aggr and leave only in AxisBuilder
   compileExpr: (options) =>
     expr = options.expr
 
