@@ -2,7 +2,7 @@ React = require 'react'
 H = React.DOM
 
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
-LayeredChartCompiler2 = require './LayeredChartCompiler2'
+LayeredChartCompiler = require './LayeredChartCompiler'
 
 # Displays a layered chart
 module.exports = class LayeredChartViewComponent extends React.Component
@@ -25,7 +25,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
     if @chart
       @chart.destroy()
 
-    compiler = new LayeredChartCompiler2(schema: props.schema)
+    compiler = new LayeredChartCompiler(schema: props.schema)
     el = React.findDOMNode(@refs.chart)
     chartOptions = compiler.createChartOptions(@props)
     
@@ -38,9 +38,9 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
   componentDidUpdate: (prevProps) ->
     # Check if options changed
-    oldCompiler = new LayeredChartCompiler2(schema: prevProps.schema) # TODO can we consolidate these?
+    oldCompiler = new LayeredChartCompiler(schema: prevProps.schema) # TODO can we consolidate these?
     oldChartOptions = oldCompiler.createChartOptions(prevProps)
-    newCompiler = new LayeredChartCompiler2(schema: @props.schema)
+    newCompiler = new LayeredChartCompiler(schema: @props.schema)
     newChartOptions = newCompiler.createChartOptions(@props)
 
     # If chart changed
@@ -148,7 +148,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
       return
 
     # Create scope
-    compiler = new LayeredChartCompiler2(schema: @props.schema)
+    compiler = new LayeredChartCompiler(schema: @props.schema)
     scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
 
     # If same scope data, remove scope

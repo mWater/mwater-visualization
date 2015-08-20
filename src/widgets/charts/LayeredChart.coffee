@@ -3,7 +3,7 @@ React = require 'react'
 H = React.DOM
 
 Chart = require './Chart'
-LayeredChartCompiler2 = require './LayeredChartCompiler2'
+LayeredChartCompiler = require './LayeredChartCompiler'
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 AxisBuilder = require './../../expressions/axes/AxisBuilder'
 LayeredChartDesignerComponent = require './LayeredChartDesignerComponent'
@@ -44,7 +44,7 @@ module.exports = class LayeredChart extends Chart
     @exprBuilder = new ExpressionBuilder(@schema)
 
   cleanDesign: (design) ->
-    compiler = new LayeredChartCompiler2(schema: @schema)
+    compiler = new LayeredChartCompiler(schema: @schema)
 
     # Clone deep for now # TODO
     design = _.cloneDeep(design)
@@ -142,7 +142,7 @@ module.exports = class LayeredChart extends Chart
     return React.createElement(LayeredChartDesignerComponent, props)
 
   createQueries: (design, filters) ->
-    compiler = new LayeredChartCompiler2(schema: @schema)
+    compiler = new LayeredChartCompiler(schema: @schema)
     return compiler.createQueries(design, filters)
 
   # Options include 

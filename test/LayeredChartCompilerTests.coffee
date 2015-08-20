@@ -17,16 +17,22 @@ describe "LayeredChartCompiler", ->
     @exprDate = { type: "field", table: "t1", column: "date" }
     @exprEnum = { type: "field", table: "t1", column: "enum" }
 
-  describe "getQueries", ->
+    @axisDecimal = { expr: @exprDecimal }
+    @axisIntegerSum = { expr: @exprInteger, aggr: "sum" }
+    @axisInteger = { expr: @exprInteger }
+    @axisEnum = { expr: @exprEnum } 
+    @axisText = { expr: @exprText } 
+
+  describe "createQueries", ->
     it "creates single grouped query", ->
       design = {
         type: "bar"
         layers: [
-          { xExpr: @exprText, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+          { axes: { x: @axisText, y: @axisIntegerSum }, table: "t1" }
         ]
       }
 
-      queries = @compiler.getQueries(design)
+      queries = @compiler.createQueries(design)
 
       expectedQueries = {
         layer0: {
@@ -48,11 +54,11 @@ describe "LayeredChartCompiler", ->
       design = {
         type: "pie"
         layers: [
-          { xExpr: null, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+          { axes: { color: @axisEnum, y: @axisIntegerSum }, table: "t1" }
         ]
       }
 
-      queries = @compiler.getQueries(design)
+      queries = @compiler.createQueries(design)
 
       expectedQueries = {
         layer0: {
@@ -76,11 +82,11 @@ describe "LayeredChartCompiler", ->
       design = {
         type: "bar"
         layers: [
-          { xExpr: @exprText, yExpr: @exprInteger, yAggr: "sum", table: "t1", filter: filter }
+          { axes: { x: @axisText, y: @axisIntegerSum }, table: "t1", filter: filter }
         ]
       }
 
-      queries = @compiler.getQueries(design)
+      queries = @compiler.createQueries(design)
 
       expectedQueries = {
         layer0: {
@@ -116,11 +122,11 @@ describe "LayeredChartCompiler", ->
       design = {
         type: "bar"
         layers: [
-          { xExpr: @exprText, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+          { axes: { x: @axisText, y: @axisIntegerSum }, table: "t1" }
         ]
       }
 
-      queries = @compiler.getQueries(design, filters)
+      queries = @compiler.createQueries(design, filters)
 
       expectedQueries = {
         layer0: {
@@ -146,18 +152,18 @@ describe "LayeredChartCompiler", ->
       design = {
         type: "scatter"
         layers: [
-          { xExpr: @exprText, yExpr: @exprInteger, table: "t1" }
+          { axes: { x: @axisInteger, y: @axisDecimal }, table: "t1" }
         ]
       }
 
-      queries = @compiler.getQueries(design)
+      queries = @compiler.createQueries(design)
 
       expectedQueries = {
         layer0: {
           type: "query"
           selects: [
-            { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "x" }
-            { type: "select", expr: { type: "field", tableAlias: "main", column: "integer" }, alias: "y" }
+            { type: "select", expr: { type: "field", tableAlias: "main", column: "integer" }, alias: "x" }
+            { type: "select", expr: { type: "field", tableAlias: "main", column: "decimal" }, alias: "y" }
           ]
           from: { type: "table", table: "t1", alias: "main" }
           groupBy: []
@@ -172,11 +178,11 @@ describe "LayeredChartCompiler", ->
       design = {
         type: "bar"
         layers: [
-          { xExpr: @exprText, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
+          { axes: { x: @axisText, color: @axisEnum, y: @axisIntegerSum }, table: "t1" }
         ]
       }
 
-      queries = @compiler.getQueries(design)
+      queries = @compiler.createQueries(design)
 
       expectedQueries = {
         layer0: {
@@ -195,504 +201,94 @@ describe "LayeredChartCompiler", ->
 
       compare(queries, expectedQueries)
 
-  describe "getColumns", ->
-    it "creates x and y for each layer", ->
-      design = {
-        type: "line"
-        layers: [
-          { xExpr: @exprDecimal, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-          { xExpr: @exprDecimal, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-        ]
-      }
-
-      data = {
-        layer0: [
-          { x: 1, y: 10 }
-          { x: 2, y: 20 }
-        ]
-        layer1: [
-          { x: 11, y: 11 }
-          { x: 12, y: 21 }
-        ]
-      }
-
-      dataMap = {}
-      columns = @compiler.getColumns(design, data, dataMap)
-
-      expectedColumns = [
-        [ "layer0:x", 1, 2 ]
-        [ "layer0:y", 10, 20 ]
-        [ "layer1:x", 11, 12 ]
-        [ "layer1:y", 11, 21 ]
-      ]
-
-      compare(columns, expectedColumns)
-
-      expectedDataMap = {
-        "layer0:y-0": { layerIndex: 0, row: data.layer0[0] }
-        "layer0:y-1": { layerIndex: 0, row: data.layer0[1] }
-        "layer1:y-0": { layerIndex: 1, row: data.layer1[0] }
-        "layer1:y-1": { layerIndex: 1, row: data.layer1[1] }
-      }
-
-      compare(dataMap, expectedDataMap)
-
-    it "combines category into one x axis", ->
-      # Category type x-axis must share one common x axis
-      design = {
-        type: "bar"
-        layers: [
-          { xExpr: @exprText, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-          { xExpr: @exprText, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-        ]
-      }
-
-      data = {
-        layer0: [
-          { x: "a", y: 10 }
-          { x: "b", y: 20 }
-        ]
-        layer1: [
-          { x: "a", y: 11 }
-          { x: "c", y: 21 }
-        ]
-      }
-
-      dataMap = {}
-      columns = @compiler.getColumns(design, data, dataMap)
-
-      expectedColumns = [
-        [ "layer0:x", "a", "b", "c" ]
-        [ "layer0:y", 10, 20, null ]
-        [ "layer1:x", "a", "b", "c" ]
-        [ "layer1:y", 11, null, 21 ]
-      ]
-
-      compare(columns, expectedColumns)
-
-      expectedDataMap = {
-        "layer0:y-0": { layerIndex: 0, row: data.layer0[0] }
-        "layer0:y-1": { layerIndex: 0, row: data.layer0[1] }
-        "layer1:y-0": { layerIndex: 1, row: data.layer1[0] }
-        "layer1:y-2": { layerIndex: 1, row: data.layer1[1] }
-      }
-
-      compare(dataMap, expectedDataMap)
-
-    it "ignores x if no x axis", ->
-      design = {
-        type: "pie"
-        layers: [
-          { xExpr: null, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-        ]
-      }
-
-      data = {
-        layer0: [
-          { color: "a", y: 10 }
-          { color: "b", y: 20 }
-        ]
-      }
-
-      columns = @compiler.getColumns(design, data)
-
-      expectedColumns = [
-        [ "layer0:a:y", 10 ]
-        [ "layer0:b:y", 20 ]
-      ]
-
-      compare(columns, expectedColumns)
-
-    it "splits if color expr with categorical x", ->
-      design = {
-        type: "bar"
-        layers: [
-          { xExpr: @exprText, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-        ]
-      }
-
-      data = {
-        layer0: [
-          { x: "1", color: "a", y: 10 }
-          { x: "1", color: "b", y: 20 }
-          { x: "2", color: "a", y: 30 }
-        ]
-      }
-
-      dataMap = {}
-      columns = @compiler.getColumns(design, data, dataMap)
-
-      expectedColumns = [
-        [ "layer0:a:x", "1", "2" ]
-        [ "layer0:a:y", 10, 30 ]
-        [ "layer0:b:x", "1", "2" ]
-        [ "layer0:b:y", 20, null ]
-      ]
-
-      compare(columns, expectedColumns)
-
-      expectedDataMap = {
-        "layer0:a:y-0": { layerIndex: 0, row: data.layer0[0] }
-        "layer0:a:y-1": { layerIndex: 0, row: data.layer0[2] }
-        "layer0:b:y-0": { layerIndex: 0, row: data.layer0[1] }
-      }
-
-      compare(dataMap, expectedDataMap)
-
-    it "splits if color expr with non-categorical x", ->
-      design = {
-        type: "bar"
-        layers: [
-          { xExpr: @exprDecimal, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-        ]
-      }
-
-      data = {
-        layer0: [
-          { x: 1, color: "a", y: 10 }
-          { x: 1, color: "b", y: 20 }
-          { x: 2, color: "a", y: 30 }
-        ]
-      }
-
-      columns = @compiler.getColumns(design, data)
-
-      expectedColumns = [
-        [ "layer0:a:x", 1, 2 ]
-        [ "layer0:a:y", 10, 30 ]
-        [ "layer0:b:x", 1 ]
-        [ "layer0:b:y", 20 ]
-      ]
-
-      compare(columns, expectedColumns)
-
-    it "maps enums to labels", ->
-      # Category type x-axis must share one common x axis
-      design = {
-        type: "bar"
-        layers: [
-          { xExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-        ]
-      }
-
-      data = {
-        layer0: [
-          { x: "a", y: 10 }
-          { x: "b", y: 20 }
-        ]
-      }
-
-      columns = @compiler.getColumns(design, data)
-
-      expectedColumns = [
-        [ "layer0:x", "A", "B" ]
-        [ "layer0:y", 10, 20 ]
-      ]
-
-      compare(columns, expectedColumns)
-
-  describe "getXs", ->
-    it "matches xs for simple query", ->
-      columns = [
-        [ "layer0:x", 1, 2 ]
-        [ "layer0:y", 10, 20 ]
-        [ "layer1:x", 11, 12 ]
-        [ "layer1:y", 11, 21 ]
-      ]
-
-      xs = @compiler.getXs(columns)
-      expectedXs = {
-        "layer0:y": "layer0:x"
-        "layer1:y": "layer1:x"
-      }
-      compare(xs, expectedXs)
-
-    it "matches xs for color expr", ->
-      columns = [
-        [ "layer0:a:x", "1", "2" ]
-        [ "layer0:a:y", 10, 30 ]
-        [ "layer0:b:x", "1", "2" ]
-        [ "layer0:b:y", 20, null ]
-      ]
-
-      xs = @compiler.getXs(columns)
-      expectedXs = {
-        "layer0:a:y": "layer0:a:x"
-        "layer0:b:y": "layer0:b:x"
-      }
-      compare(xs, expectedXs)
-
-    it "no xs if no x expr", ->
-      columns = [
-        [ "layer0:a:y", 10, 30 ]
-        [ "layer0:b:y", 20, null ]
-      ]
-
-      xs = @compiler.getXs(columns)
-      expectedXs = { }
-      compare(xs, expectedXs)
-
-  describe "getNames", ->
-    it "uses names of each simple layer", ->
-      design = {
-        type: "line"
-        layers: [
-          { xExpr: @exprDecimal, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-          { xExpr: @exprDecimal, yExpr: @exprInteger, yAggr: "sum", table: "t1", name: "second layer" }
-        ]
-      }
-
-      data = {
-        layer0: [
-          { x: 1, y: 10 }
-          { x: 2, y: 20 }
-        ]
-        layer1: [
-          { x: 11, y: 11 }
-          { x: 12, y: 21 }
-        ]
-      }
-
-      names = @compiler.getNames(design, data)
-
-      expectedNames = {
-        "layer0:y": "Series 1" # Defaults names
-        "layer1:y": "second layer"
-      }
-
-      compare(names, expectedNames)
-
-    it "uses mapped color expr for names of color-split layers", ->
-      design = {
-        type: "bar"
-        layers: [
-          { xExpr: @exprText, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-        ]
-      }
-
-      data = {
-        layer0: [
-          { x: "1", color: "a", y: 10 }
-          { x: "1", color: "b", y: 20 }
-          { x: "2", color: "a", y: 30 }
-        ]
-      }
-
-      names = @compiler.getNames(design, data)
-
-      expectedNames = {
-        "layer0:a:y": "A"
-        "layer0:b:y": "B"
-      }
-
-      compare(names, expectedNames)
-
-  describe "getGroups", ->
-    it "doesn't group normally", ->
-      design = {
-        type: "bar"
-        layers: [
-          { xExpr: @exprText, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-        ]
-      }
-
-      columns = [
-        [ "layer0:a:x", "1", "2" ]
-        [ "layer0:a:y", 10, 30 ]
-        [ "layer0:b:x", "1", "2" ]
-        [ "layer0:b:y", 20, null ]
-      ]
-
-      expectedGroups = []
-
-      types = @compiler.getGroups(design, columns)
-      compare(types, expectedGroups)
-
-    it "groups if layer is stacked", ->
-      design = {
-        type: "bar"
-        layers: [
-          { xExpr: @exprText, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1", stacked: true }
-        ]
-      }
-
-      columns = [
-        [ "layer0:a:x", "1", "2" ]
-        [ "layer0:a:y", 10, 30 ]
-        [ "layer0:b:x", "1", "2" ]
-        [ "layer0:b:y", 20, null ]
-      ]
-
-      expectedGroups = [
-        ['layer0:a:y', 'layer0:b:y']
-      ]
-
-      types = @compiler.getGroups(design, columns)
-      compare(types, expectedGroups)
-
-
-  describe "getTypes", ->
-    it "defaults to overall type", ->
-      design = {
-        type: "bar"
-        layers: [
-          { xExpr: @exprText, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-          { xExpr: @exprText, yExpr: @exprInteger, yAggr: "sum", table: "t1", type: "line" }
-        ]
-      }
-
-      columns = [
-        [ "layer0:x", "a", "b", "c" ]
-        [ "layer0:y", 10, 20, null ]
-        [ "layer1:x", "a", "b", "c" ]
-        [ "layer1:y", 11, null, 21 ]
-      ]
-
-      expectedTypes = {
-        "layer0:y": "bar"
-        "layer1:y": "line"
-      }
-
-      types = @compiler.getTypes(design, columns)
-      compare(types, expectedTypes)
-
-  describe "getXAxisType", ->
-    it "uses category for text and enum", ->
-      design = {
-        type: "bar"
-        layers: [
-          { xExpr: @exprText, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-        ]
-      }
-
-      xAxisType = @compiler.getXAxisType(design)
-      assert.equal xAxisType, "category"
-
-    it "uses timeseries for date", ->
-      design = {
-        type: "bar"
-        layers: [
-          { xExpr: @exprDate, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-        ]
-      }
-
-      xAxisType = @compiler.getXAxisType(design)
-      assert.equal xAxisType, "timeseries"
-
-    it "uses indexed by default", ->
-      design = {
-        type: "line"
-        layers: [
-          { xExpr: @exprDecimal, yExpr: @exprInteger, table: "t1" }
-        ]
-      }
-
-      xAxisType = @compiler.getXAxisType(design)
-      assert.equal xAxisType, "indexed"
-
-  describe "createScope", ->
-    it "creates x filter", ->
-      design = {
-        type: "line"
-        layers: [
-          { xExpr: @exprDecimal, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-          { xExpr: @exprDecimal, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-        ]
-      }
-
-      row = { x: 1, y: 10 }
-      scope = @compiler.createScope(design, 0, row)
-
-      expectedFilter = {
-        type: "comparison"
-        table: "t1"
-        lhs: @exprDecimal
-        op: "="
-        rhs: { type: "literal", valueType: "decimal", value: 1 } 
-      }
-
-      compare(scope.filter, expectedFilter)
-      compare(scope.data, { layerIndex: 0, x: 1 })
-      compare(scope.name, "T1 Decimal is 1")
-
-    it "creates x-color filter", ->
-      design = {
-        type: "bar"
-        layers: [
-          { xExpr: @exprText, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-        ]
-      }
-
-      row = { x: "1", color: "b", y: 20 }
-      scope = @compiler.createScope(design, 0, row)
-
-      expectedFilter = {
-        type: "logical"
-        table: "t1"
-        op: "and"
-        exprs: [
-          {
-            type: "comparison"
-            table: "t1"
-            lhs: @exprText
-            op: "="
-            rhs: { type: "literal", valueType: "text", value: "1" } 
-          }
-          {
-            type: "comparison"
-            table: "t1"
-            lhs: @exprEnum
-            op: "="
-            rhs: { type: "literal", valueType: "enum", value: "b" } 
-          }
-        ]
-      }
-
-      compare(scope.filter, expectedFilter)
-      compare(scope.data, { layerIndex: 0, x: "1", color: "b" })
-      compare(scope.name, "T1 Text is 1 and Enum is B")
-
-    it "creates color filter", ->
-      design = {
-        type: "pie"
-        layers: [
-          { xExpr: null, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-        ]
-      }
-
-      row = { color: "b", y: 20 }
-      scope = @compiler.createScope(design, 0, row)
-
-      expectedFilter =  {
-        type: "comparison"
-        table: "t1"
-        lhs: @exprEnum
-        op: "="
-        rhs: { type: "literal", valueType: "enum", value: "b" } 
-      }
-
-      compare(scope.filter, expectedFilter)
-      compare(scope.data, { layerIndex: 0, color: "b" })
-      compare(scope.name, "T1 Enum is B")
-
-    it "creates null color filter", ->
-      design = {
-        type: "pie"
-        layers: [
-          { xExpr: null, colorExpr: @exprEnum, yExpr: @exprInteger, yAggr: "sum", table: "t1" }
-        ]
-      }
-
-      row = { color: null, y: 20 }
-      scope = @compiler.createScope(design, 0, row)
-
-      expectedFilter =  {
-        type: "comparison"
-        table: "t1"
-        lhs: @exprEnum
-        op: "is null"
-      }
-
-      compare(scope.filter, expectedFilter)
-      compare(scope.data, { layerIndex: 0, color: null })
-      compare(scope.name, "T1 Enum is None")
+  describe "pie/donut", ->
+    describe "single layer", ->
+      before ->
+        @design = {
+          type: "pie"
+          layers: [
+            { table: "t1", axes: { color: @axisEnum, y: @axisDecimal } }
+          ]
+        }
+
+        @data = { layer0: [
+          { color: "a", y: 1 }
+          { color: "b", y: 2 }
+        ]}
+
+        @res = @compiler.compileData(@design, @data)
+
+      it "sets types to pie", -> 
+        compare(@res.types, {
+          "0:0": "pie"
+          "0:1": "pie"})
+
+      it "makes columns with y value", ->
+        compare(@res.columns, [
+          ["0:0", 1]
+          ["0:1", 2]
+          ])
+
+      it "maps back to rows", ->
+        compare(@res.mapping, {
+          "0:0": { layerIndex: 0, row: @data.layer0[0] }
+          "0:1": { layerIndex: 0, row: @data.layer0[1] }
+          })
+
+      it "names", ->
+        compare(@res.names, {
+          "0:0": "A"
+          "0:1": "B"
+          })
+
+      it "colors based on color map"
+
+      it "sets x axis type to category", ->
+        assert.isEqual @res.xAxisType, "category"
+
+    describe "multiple layer", ->
+      before ->
+        @design = {
+          type: "pie"
+          layers: [
+            { table: "t1", axes: { y: @axisDecimal }, name: "X" }
+            { table: "t1", axes: { y: @axisDecimal }, name: "Y", color: "red" }
+          ]
+        }
+
+        @data = { 
+          layer0: [{ y: 1 }]
+          layer1: [{ y: 2 }]
+        }
+
+        @res = @compiler.compileData(@design, @data)
+
+      it "sets types to pie", -> 
+        compare(@res.types, {
+          "0": "pie"
+          "1": "pie"})
+
+      it "makes columns with y value", ->
+        compare(@res.columns, [
+          ["0", 1]
+          ["1", 2]
+          ])
+
+      it "maps back to rows", ->
+        compare(@res.mapping, {
+          "0": { layerIndex: 0, row: @data.layer0[0] }
+          "1": { layerIndex: 1, row: @data.layer1[0] }
+          })
+
+      it "uses series color", ->
+        compare(@res.colors, {
+          "1": "red"
+          })
+
+      it "names", ->
+        compare(@res.names, {
+          "0": "X"
+          "1": "Y"
+          })
+
+  describe "scatter"
