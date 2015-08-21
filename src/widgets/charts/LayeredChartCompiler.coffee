@@ -82,9 +82,6 @@ module.exports = class LayeredChartCompiler
 
       queries["layer#{layerIndex}"] = query
 
-    # TODO remove
-    console.log queries
-
     return queries
 
   # Create data map of "{layer name}" or "{layer name}:{index}" to { layerIndex, row }

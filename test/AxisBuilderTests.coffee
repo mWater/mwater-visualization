@@ -48,6 +48,14 @@ describe "AxisBuilder", ->
       ]
     }
 
+  describe "cleanAxis", ->
+    it "defaults aggr"
+    it "cleans expression"
+    it "removes bad aggr"
+    it "removes bad xform"
+    it "defaults xform"
+    it "defaults colorMap"
+    
   describe "getCategories", ->
     it "gets enum", ->
       categories = @ab.getCategories(@axisEnum, ["a"])

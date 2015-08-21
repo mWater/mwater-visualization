@@ -3,6 +3,7 @@ React = require 'react'
 H = React.DOM
 
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
+AxisBuilder = require './../../expressions/axes/AxisBuilder'
 EditableLinkComponent = require './../../EditableLinkComponent'
 PopoverComponent = require './../../PopoverComponent'
 ScalarExprComponent = require './../../expressions/ScalarExprComponent'
@@ -102,9 +103,13 @@ class TableChartColumnDesignerComponent extends React.Component
     column = _.extend({}, @props.design.columns[@props.index], changes)
     @props.onChange(column)
 
-  handleExprChange: (expr) => @updateColumn(expr: expr)
+  updateTextAxis: (changes) ->
+    textAxis = _.extend({}, @props.design.columns[@props.index].textAxis, changes)
+    @updateColumn(textAxis: textAxis)
+
+  handleExprChange: (expr) => @updateTextAxis(expr: expr)
   handleHeaderTextChange: (ev) => @updateColumn(headerText: ev.target.value)
-  handleAggrChange: (aggr) => @updateColumn(aggr: aggr)
+  handleAggrChange: (aggr) => @updateTextAxis(aggr: aggr)
 
   renderRemove: ->
     if @props.design.columns.length > 1
@@ -130,8 +135,8 @@ class TableChartColumnDesignerComponent extends React.Component
   renderHeader: ->
     column = @props.design.columns[@props.index]
 
-    exprBuilder = new ExpressionBuilder(@props.schema)
-    placeholder = exprBuilder.summarizeAggrExpr(column.expr, column.aggr)
+    axisBuilder = new AxisBuilder(schema: @props.schema)
+    placeholder = axisBuilder.summarizeAxis(column.textAxis)
 
     H.div null,
       H.label className: "text-muted", "Header"
@@ -148,17 +153,17 @@ class TableChartColumnDesignerComponent extends React.Component
     column = @props.design.columns[@props.index]
     exprBuilder = new ExpressionBuilder(@props.schema)
 
-    # Don't show if no column expression or if has no type (count)
-    if not column.expr or not exprBuilder.getExprType(column.expr)
+    # Don't show if no expression or if has no type (count)
+    if not column.textAxis.expr or not exprBuilder.getExprType(column.textAxis.expr)
       return
 
     # Get aggregations
-    aggrs = exprBuilder.getAggrs(column.expr)
+    aggrs = exprBuilder.getAggrs(column.textAxis.expr)
 
     # Remove latest, as it is tricky to group by. TODO
     aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
     aggrs = [{ id: null, name: "None" }].concat(aggrs)
-    currentAggr = _.findWhere(aggrs, id: column.aggr)
+    currentAggr = _.findWhere(aggrs, id: column.textAxis.aggr)
 
     return H.div null,
       H.label className: "text-muted", "Summarize"

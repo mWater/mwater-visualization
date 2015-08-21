@@ -42,6 +42,7 @@ module.exports = class LayeredChart extends Chart
   constructor: (options) ->
     @schema = options.schema
     @exprBuilder = new ExpressionBuilder(@schema)
+    @axisBuilder = new AxisBuilder(schema: @schema)
 
   cleanDesign: (design) ->
     compiler = new LayeredChartCompiler(schema: @schema)
@@ -60,9 +61,12 @@ module.exports = class LayeredChart extends Chart
       layer.axes = layer.axes or {}
 
       for axisKey, axis of layer.axes
-        layer.axes[axisKey] = @cleanAxis(
-          design, layer, axis, 
-          axisKey == "y" and compiler.doesLayerNeedGrouping(design, layerId))
+        # Determine what aggregation axis requires
+        if axisKey == "y" and compiler.doesLayerNeedGrouping(design, layerId)
+          aggrNeed = "required"
+        else
+          aggrNeed = "none"
+        layer.axes[axisKey] = @axisBuilder.cleanAxis(axis, layer.table, aggrNeed)
 
       # Remove x axis if not required
       if not compiler.canLayerUseXExpr(design, layerId) and layer.axes.x
@@ -72,42 +76,17 @@ module.exports = class LayeredChart extends Chart
 
     return design
 
-  # TODO move to AxisBuilder
-  cleanAxis: (design, layer, axis, shouldAggr) ->
-    if not axis
-      return
-
-    # TODO does in place
-    axis.expr = @exprBuilder.cleanExpr(axis.expr, layer.table)
-
-    # Default aggr if grouping
-    if shouldAggr and axis
-      # Remove latest, as it is tricky to group by. TODO
-      aggrs = @exprBuilder.getAggrs(axis.expr)
-      aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
-
-      # Remove existing
-      if axis.aggr and axis.aggr not in _.pluck(aggrs, "id")
-        delete axis.aggr
-
-      if not axis.aggr
-        axis.aggr = aggrs[0].id
-    else
-      delete axis.aggr
-
-    return axis
-
   validateDesign: (design) ->
     # Check that layers have same x axis type
     xAxisTypes = _.uniq(_.map(design.layers, (l) => 
-      axisBuilder = new AxisBuilder(schema: @schema)
-      return axisBuilder.getAxisType(l.axes.x)))
+      @axisBuilder = new AxisBuilder(schema: @schema)
+      return @axisBuilder.getAxisType(l.axes.x)))
 
     if xAxisTypes.length > 1
       return "All x axes must be of same type"
 
     for layer in design.layers
-      axisBuilder = new AxisBuilder(schema: @schema)
+      @axisBuilder = new AxisBuilder(schema: @schema)
 
       # Check that has table
       if not layer.table
@@ -120,9 +99,9 @@ module.exports = class LayeredChart extends Chart
       error = null
 
       # Validate axes
-      error = error or axisBuilder.validateAxis(layer.axes.x)
-      error = error or axisBuilder.validateAxis(layer.axes.y)
-      error = error or axisBuilder.validateAxis(layer.axes.color)
+      error = error or @axisBuilder.validateAxis(layer.axes.x)
+      error = error or @axisBuilder.validateAxis(layer.axes.y)
+      error = error or @axisBuilder.validateAxis(layer.axes.color)
 
       error = error or @exprBuilder.validateExpr(layer.filter)
 
@@ -183,22 +162,22 @@ module.exports = class LayeredChart extends Chart
   createDataTable: (design, data) ->
     # Export only first layer
     headers = []
-    if design.layers[0].xExpr
-      headers.push(@exprBuilder.summarizeExpr(design.layers[0].xExpr))
-    if design.layers[0].colorExpr
-      headers.push(@exprBuilder.summarizeExpr(design.layers[0].colorExpr))
-    if design.layers[0].yExpr
-      headers.push(@exprBuilder.summarizeAggrExpr(design.layers[0].yExpr, design.layers[0].yAggr))
+    if design.layers[0].axes.x
+      headers.push(@axisBuilder.summarizeAxis(design.layers[0].axes.x))
+    if design.layers[0].axes.color
+      headers.push(@axisBuilder.summarizeAxis(design.layers[0].axes.color))
+    if design.layers[0].axes.y
+      headers.push(@axisBuilder.summarizeAxis(design.layers[0].axes.y))
     table = [headers]
 
     for row in data.layer0
       r = []
-      if design.layers[0].xExpr
-        r.push(@exprBuilder.stringifyExprLiteral(design.layers[0].xExpr, row.x))
-      if design.layers[0].colorExpr
-        r.push(@exprBuilder.stringifyExprLiteral(design.layers[0].colorExpr, row.color))
-      if design.layers[0].yExpr
-        r.push(@exprBuilder.stringifyExprLiteral(design.layers[0].yExpr, row.y))
+      if design.layers[0].axes.x
+        r.push(@axisBuilder.stringifyLiteral(design.layers[0].axes.x, row.x))
+      if design.layers[0].axes.color
+        r.push(@axisBuilder.stringifyLiteral(design.layers[0].axes.color, row.color))
+      if design.layers[0].axes.y
+        r.push(@axisBuilder.stringifyLiteral(design.layers[0].axes.y, row.y))
       table.push(r)
 
     return table

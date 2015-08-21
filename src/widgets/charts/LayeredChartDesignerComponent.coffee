@@ -254,6 +254,7 @@ class LayerDesignerComponent extends React.Component
           schema: @props.schema, 
           table: layer.table
           # types: ["enum", "text"]
+          aggrNeed: "none"
           value: layer.axes.x, 
           onChange: @handleXAxisChange)
 
@@ -272,6 +273,7 @@ class LayerDesignerComponent extends React.Component
           schema: @props.schema, 
           table: layer.table
           types: ["enum", "text"]
+          aggrNeed: "none"
           value: layer.axes.color, 
           onChange: @handleColorAxisChange)
 
@@ -290,6 +292,7 @@ class LayerDesignerComponent extends React.Component
           schema: @props.schema, 
           table: layer.table
           types: ["integer", "decimal"]
+          aggrNeed: "required"
           value: layer.axes.y
           onChange: @handleYAxisChange)
 

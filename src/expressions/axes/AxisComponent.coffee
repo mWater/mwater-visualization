@@ -13,6 +13,8 @@ module.exports = class AxisComponent extends React.Component
     table: React.PropTypes.string # Limits table to this table
     types: React.PropTypes.array # Optional types to limit to
 
+    aggrNeed: React.PropTypes.oneOf(['none', 'optional', 'required']).isRequired
+
     value: React.PropTypes.object # { expr: scalar expression, aggr: aggregate }
     onChange: React.PropTypes.func.isRequired # Called when changes
 
@@ -23,6 +25,9 @@ module.exports = class AxisComponent extends React.Component
     @props.onChange(_.extend({}, @props.value, { aggr: aggr }))
 
   renderAggr: ->
+    if @props.aggrNeed == "none"
+      return
+      
     exprBuilder = new ExpressionBuilder(@props.schema)
 
     # Only render aggregate if has a real expr with a type that is not count

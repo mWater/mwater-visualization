@@ -12,6 +12,43 @@ module.exports = class AxisBuilder
   # Options are: schema
   constructor: (axis) ->
     @schema = axis.schema
+    @exprBuilder = new ExpressionBuilder(@schema)
+
+  # Clean an axis with respect to a specific table
+  # aggrNeed is "none", "optional" or "required"
+  cleanAxis: (axis, table, aggrNeed="optional") ->
+    if not axis
+      return
+
+    # TODO always clones
+    axis = _.clone(axis)
+
+    # Clean expression
+    axis.expr = @exprBuilder.cleanExpr(axis.expr, table)
+
+    # Clean aggr
+    aggrs = @exprBuilder.getAggrs(axis.expr)
+    # Remove latest, as it is tricky to group by. TODO
+    aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
+
+    # Remove existing if not in list
+    if axis.aggr and axis.aggr not in _.pluck(aggrs, "id")
+      delete axis.aggr
+
+    # Remove if need is none
+    if aggrNeed == "none"
+      delete axis.aggr
+
+    # Default aggr if required
+    if aggrNeed == "required" and aggrs[0] and not axis.aggr
+      axis.aggr = aggrs[0].id
+
+    # Set aggr to count if expr is type count and aggr possible
+    if aggrNeed != "none" and not axis.aggrs
+      if @exprBuilder.getExprType(axis.expr) == "count"
+        axis.aggr = "count"
+
+    return axis
 
   # Pass axis, tableAlias
   compileAxis: (options) ->
@@ -32,18 +69,20 @@ module.exports = class AxisBuilder
     return compiledExpr
 
   validateAxis: (axis) ->
-    # TODO 
-    return null
+    # Nothing is ok
+    if not axis
+      return
+
+    # TODO
+    return @exprBuilder.validateExpr(axis.expr)
 
   # Get all categories for a given axis type given the known values
   # Returns array of { value, label }
   getCategories: (axis, values) ->
-    exprBuilder = new ExpressionBuilder(@schema)
-
     switch @getAxisType(axis)
       when "enum"
         # If enum, return enum values
-        return _.map(exprBuilder.getExprValues(axis.expr), (ev) -> { value: ev.id, label: ev.name })
+        return _.map(@exprBuilder.getExprValues(axis.expr), (ev) -> { value: ev.id, label: ev.name })
       when "integer"
         # Handle none
         if values.length == 0
@@ -66,21 +105,24 @@ module.exports = class AxisBuilder
 
     # TODO add aggr support
     # TODO add xform support
-    exprBuilder = new ExpressionBuilder(@schema)
-    return exprBuilder.getExprType(axis.expr)
+    return @exprBuilder.getExprType(axis.expr)
 
   # Summarize axis as a string
   summarizeAxis: (axis) ->
-    # TODO add aggr support
+    exprType = @exprBuilder.getExprType(axis.expr)
+
+    # Add aggr if not a count type
+    if axis.aggr and exprType != "count"
+      aggrName = _.findWhere(@exprBuilder.getAggrs(axis.expr), { id: axis.aggr }).name
+      return aggrName + " " + @exprBuilder.summarizeExpr(axis.expr)
+    else
+      return @exprBuilder.summarizeExpr(axis.expr)
     # TODO add xform support
-    exprBuilder = new ExpressionBuilder(@schema)
-    return exprBuilder.summarizeExpr(axis.expr)
 
   # Get a string representation of an axis value
   stringifyLiteral: (axis, value) ->
     # TODO add aggr support, xform support
-    exprBuilder = new ExpressionBuilder(@schema)
-    return exprBuilder.stringifyExprLiteral(axis.expr, value)
+    return @exprBuilder.stringifyExprLiteral(axis.expr, value)
 
   # Creates a filter (jsonql with {alias} for table name) based on a specific value
   # of the axis. Used to filter by a specific point.
