@@ -4,6 +4,7 @@ H = React.DOM
 Layer = require './Layer'
 ExpressionCompiler = require '../expressions/ExpressionCompiler'
 injectTableAlias = require '../injectTableAlias'
+MarkersLayerDesignerComponent = require './MarkersLayerDesignerComponent'
 
 ###
 Layer that is composed of markers
@@ -11,18 +12,19 @@ Design is:
   table: table to get data from
   axes: axes (see below)
   filter: optional logical expression to filter by
-  color: color of layer (e.g. #FF8800)
+  color: color of layer (e.g. #FF8800). Color axis overrides
 
 axes:
   geometry: where to place markers
   color: color axis (to split into series based on a color)
 ###
 module.exports = class MarkersLayer extends Layer
-  # Pass design, client, apiUrl
+  # Pass design, client, apiUrl, schema
   constructor: (options) ->
     @design = options.design
     @client = options.client
     @apiUrl = options.apiUrl
+    @schema = options.schema
 
   getTileUrl: (filters) -> 
     @createUrl("png", filters)
@@ -64,12 +66,28 @@ module.exports = class MarkersLayer extends Layer
       return []
 
   getLegend: ->
-    return H.div null, "Legend here"
-    # # Create loading legend component
-    # React.createElement(LoadingLegend, 
-    #   url: "#{@apiUrl}maps/legend?type=#{@design.type}")
+    # return H.div null, "Legend here"
+    # # # Create loading legend component
+    # # React.createElement(LoadingLegend, 
+    # #   url: "#{@apiUrl}maps/legend?type=#{@design.type}")
   
   isEditable: -> true
 
+  # Returns a cleaned design
+  # TODO this is awkward since the design is part of the object too
+  cleanDesign: (design) ->
+    # TODO clones entirely
+    design = _.cloneDeep(design)
+    design.axes = design.axes or {}
+
+    # TODO table, filters, etc.
+    return design
+
+  # Pass in onDesignChange
   createDesignerElement: (options) ->
-    H.div null, "EDITOR"
+    # Clean on way in and out
+    React.createElement(MarkersLayerDesignerComponent,
+      schema: @schema
+      design: @cleanDesign(@design)
+      onDesignChange: (design) =>
+        options.onDesignChange(@cleanDesign(design)))

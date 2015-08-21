@@ -14,7 +14,7 @@ class MapDemoComponent extends React.Component
         
       dataSource = visualization_mwater.createDataSource(@props.apiUrl, @props.client)
       widgetFactory = new visualization.WidgetFactory(schema, dataSource)
-      layerFactory = new visualization.LayerFactory(schema: @props.schema, apiUrl: @props.apiUrl, client: @props.client, newLayers: newLayers)
+      layerFactory = new visualization.LayerFactory(schema: schema, apiUrl: @props.apiUrl, client: @props.client, newLayers: newLayers)
 
       @setState(schema: schema, widgetFactory: widgetFactory, dataSource: dataSource, layerFactory: layerFactory)
 
@@ -78,6 +78,28 @@ design = {
   layerViews: layerViews
   filters: {}
   bounds: { w: 0, n: 0, e: 40, s: -25 }
+}
+
+design = {
+  "baseLayer": "bing_road",
+  "layerViews": [
+    {
+      "id": "a434704e-2809-4f87-9a5f-86d3d4a6cdac",
+      "name": "Custom Layer",
+      "desc": "",
+      "type": "Markers",
+      "design": {},
+      "visible": true,
+      "opacity": 1
+    }
+  ],
+  "filters": {},
+  "bounds": {
+    "w": -1.0107421875,
+    "n": 2.064982495867104,
+    "e": 41.0009765625,
+    "s": -26.86328062676624
+  }
 }
 
 

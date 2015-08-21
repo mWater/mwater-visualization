@@ -54,6 +54,6 @@ module.exports = class AxisComponent extends React.Component
         table: @props.table
         types: @props.types # TODO take into account aggregation
         onChange: @handleExprChange
-        includeCount: true
+        includeCount: @props.aggrNeed != "none"
         value: if @props.value then @props.value.expr)  
 

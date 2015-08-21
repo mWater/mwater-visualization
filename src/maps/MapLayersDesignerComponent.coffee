@@ -16,11 +16,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     design = _.extend({}, @props.design, changes)
     @props.onDesignChange(design)
 
-  updateLayerView: (index, changes) =>
-    # Make new layer view
-    layerView = @props.design.layerViews[index]
-    layerView = _.extend({}, layerView, changes)
-    
+  updateLayerView: (index, layerView) =>
     layerViews = @props.design.layerViews.slice()
     layerViews[index] = layerView
     @updateDesign(layerViews: layerViews)
@@ -47,7 +43,6 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     layerViews = @props.design.layerViews.slice()
     layerViews.push(layerView)
     @updateDesign(layerViews: layerViews)
-
 
   renderBaseLayer: (id, name) ->
     className = "mwater-visualization-layer"
@@ -123,7 +118,7 @@ class MapLayerViewDesignerComponent extends React.Component
 
   handleCancelEditing: => @setState(editingDesign: null)
   handleStartEditing: => @setState(editingDesign: @props.layerView.design)
-  handleEditingChange: (design) =>  @setState(editingDesign: layerView.design)
+  handleEditingChange: (design) =>  @setState(editingDesign: design)
 
   renderEditor: ->
     if not @state.editingDesign?
