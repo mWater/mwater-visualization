@@ -19,3 +19,7 @@ module.exports = class Layer
   # Get a list of table ids that can be filtered on
   getFilterableTables: ->
     return []
+
+  # True if layer can be edited
+  isEditable: ->
+    return false

@@ -6,6 +6,8 @@ module.exports = class MapLayersDesignerComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
+    schema: React.PropTypes.object.isRequired # Schema to use
+    layerFactory: React.PropTypes.object.isRequired # Layer factory to use
 
   # Updates design with the specified changes
   updateDesign: (changes) ->
@@ -39,23 +41,24 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     layerView = @props.design.layerViews[index]
     @updateLayerView(index, visible: not layerView.visible)
 
-  renderLayerGearMenu: (layer, index) =>
+  renderLayerGearMenu: (layerView, index) =>
+    layer = @props.layerFactory.createLayer(layerView.layer.type, layerView.layer.type)
     H.div className: "btn-group", style: { float: "right" }, key: "gear",
       H.button type: "button", className: "btn btn-link dropdown-toggle", "data-toggle": "dropdown",
         H.span className: "glyphicon glyphicon-cog"
       H.ul className: "dropdown-menu dropdown-menu-right",
-        H.li(key: "edit", H.a(null, "Edit Layer"))
-        H.li(key: "opacity", H.a(null, "Set Opacity"))
+        if layer.isEditable() then H.li(key: "edit", H.a(null, "Edit Layer"))
+        # H.li(key: "opacity", H.a(null, "Set Opacity"))
         H.li(key: "remove", H.a(onClick: @handleRemoveLayerView.bind(null, index), "Remove Layer"))
 
-  renderLayerView: (layer, index) =>
+  renderLayerView: (layerView, index) =>
     # Class of checkbox
-    visibleClass = if layer.visible then "mwater-visualization-layer checked" else "mwater-visualization-layer"
+    visibleClass = if layerView.visible then "mwater-visualization-layer checked" else "mwater-visualization-layer"
 
-    H.li className: "list-group-item", key: layer.id,
-      @renderLayerGearMenu(layer, index)
-      H.div className: visibleClass, onClick: @handleVisibleClick.bind(null, index), key: "layer",
-        layer.name
+    H.li className: "list-group-item", key: layerView.id,
+      @renderLayerGearMenu(layerView, index)
+      H.div className: visibleClass, onClick: @handleVisibleClick.bind(null, index), key: "layerView",
+        layerView.name
         # H.br()
         # H.small null, desc
 
