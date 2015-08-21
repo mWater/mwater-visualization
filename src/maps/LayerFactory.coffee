@@ -1,4 +1,5 @@
 MWaterServerLayer = require './MWaterServerLayer'
+MarkersLayer = require './MarkersLayer'
 
 module.exports = class LayerFactory
   # Pass in:
@@ -16,6 +17,9 @@ module.exports = class LayerFactory
     switch type
       when "MWaterServer"
         return new MWaterServerLayer(design: design, client: @client, apiUrl: @apiUrl)
+
+      when "Markers"
+        return new MarkersLayer(design: design, client: @client, apiUrl: @apiUrl)
 
     throw new Error("Unknown type #{type}")
 

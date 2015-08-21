@@ -1,6 +1,7 @@
 React = require 'react'
 H = React.DOM
 uuid = require 'node-uuid'
+ActionCancelModalComponent = require '../ActionCancelModalComponent'
 
 # Designer for layer selection in the map
 module.exports = class MapLayersDesignerComponent extends React.Component
@@ -47,30 +48,6 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     layerViews.push(layerView)
     @updateDesign(layerViews: layerViews)
 
-  handleVisibleClick: (index) =>
-    layerView = @props.design.layerViews[index]
-    @updateLayerView(index, visible: not layerView.visible)
-
-  renderLayerGearMenu: (layerView, index) =>
-    layer = @props.layerFactory.createLayer(layerView.type, layerView.design)
-    H.div className: "btn-group", style: { float: "right" }, key: "gear",
-      H.button type: "button", className: "btn btn-link dropdown-toggle", "data-toggle": "dropdown",
-        H.span className: "glyphicon glyphicon-cog"
-      H.ul className: "dropdown-menu dropdown-menu-right",
-        if layer.isEditable() then H.li(key: "edit", H.a(null, "Edit Layer"))
-        # H.li(key: "opacity", H.a(null, "Set Opacity"))
-        H.li(key: "remove", H.a(onClick: @handleRemoveLayerView.bind(null, index), "Remove Layer"))
-
-  renderLayerView: (layerView, index) =>
-    # Class of checkbox
-    visibleClass = if layerView.visible then "mwater-visualization-layer checked" else "mwater-visualization-layer"
-
-    H.li className: "list-group-item", key: layerView.id,
-      @renderLayerGearMenu(layerView, index)
-      H.div className: visibleClass, onClick: @handleVisibleClick.bind(null, index), key: "layerView",
-        layerView.name
-        # H.br()
-        # H.small null, desc
 
   renderBaseLayer: (id, name) ->
     className = "mwater-visualization-layer"
@@ -101,7 +78,15 @@ module.exports = class MapLayersDesignerComponent extends React.Component
             H.a onClick: @handleAddLayerView.bind(null, layer), layer.name
           )
 
-
+  renderLayerView: (layerView, index) =>
+    H.li className: "list-group-item", key: layerView.id,
+      React.createElement(MapLayerViewDesignerComponent, 
+        layerView: layerView
+        onLayerViewChange: (lv) => @updateLayerView(index, lv)
+        onRemove: => @handleRemoveLayerView(index)
+        schema: @props.schema
+        layerFactory: @props.layerFactory
+      )
 
   render: ->
     H.div style: { padding: 5 }, 
@@ -111,3 +96,66 @@ module.exports = class MapLayersDesignerComponent extends React.Component
         _.map(@props.design.layerViews, @renderLayerView)
 
       @renderAddLayer()
+
+# A single row in the table of layer views. Handles the editor state
+class MapLayerViewDesignerComponent extends React.Component
+  @propTypes:
+    layerView: React.PropTypes.object.isRequired  # See Map Design.md
+    onLayerViewChange: React.PropTypes.func.isRequired # Called with new layer view
+    onRemove: React.PropTypes.func.isRequired # Called to remove
+    schema: React.PropTypes.object.isRequired # Schema to use
+    layerFactory: React.PropTypes.object.isRequired # Layer factory to use
+
+  constructor: ->
+    super
+    # editingDesign is not null if editing. If present, is the tentative design of the layer
+    @state = { editingDesign: null }
+
+  update: (updates) ->
+    @props.onLayerViewChange(_.extend({}, @props.layerView, updates))
+
+  handleVisibleClick: (index) =>
+    @update(visible: not layerView.visible)
+
+  handleSaveEditing: =>
+    @update(design: @state.editingDesign)
+    @setState(editingDesign: null)
+
+  handleCancelEditing: => @setState(editingDesign: null)
+  handleStartEditing: => @setState(editingDesign: @props.layerView.design)
+  handleEditingChange: (design) =>  @setState(editingDesign: layerView.design)
+
+  renderEditor: ->
+    if not @state.editingDesign?
+      return
+
+    layer = @props.layerFactory.createLayer(@props.layerView.type, @state.editingDesign)
+    return React.createElement(ActionCancelModalComponent,
+      title: "Edit Layer"
+      onAction: @handleSaveEditing
+      onCancel: @handleCancelEditing,
+        layer.createDesignerElement(onDesignChange: @handleEditingChange)
+    )
+
+  renderLayerGearMenu: ->
+    layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)
+
+    H.div className: "btn-group", style: { float: "right" }, key: "gear",
+      H.button type: "button", className: "btn btn-link dropdown-toggle", "data-toggle": "dropdown",
+        H.span className: "glyphicon glyphicon-cog"
+      H.ul className: "dropdown-menu dropdown-menu-right",
+        if layer.isEditable()
+          H.li(key: "edit", H.a(onClick: @handleStartEditing, "Edit Layer"))
+        # H.li(key: "opacity", H.a(null, "Set Opacity"))
+        H.li(key: "remove", H.a(onClick: @props.onRemove, "Remove Layer"))
+
+  render: ->
+    # Class of checkbox
+    visibleClass = if @props.layerView.visible then "mwater-visualization-layer checked" else "mwater-visualization-layer"
+    H.div null, 
+      @renderLayerGearMenu()
+      H.div className: visibleClass, onClick: @handleVisibleClick, key: "layerView",
+        @props.layerView.name
+        # H.br()
+        # H.small null, desc
+      @renderEditor()

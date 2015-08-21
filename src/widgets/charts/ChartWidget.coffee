@@ -89,14 +89,9 @@ class ChartWidgetComponent extends React.Component
     @props.onDesignChange(@state.editingDesign)
     @setState(editingDesign: null)
 
-  handleCancelEditing: =>
-    @setState(editingDesign: null)
-
-  handleStartEditing: =>
-    @setState(editingDesign: @props.design)
-
-  handleEditingChange: (design) =>
-    @setState(editingDesign: design)
+  handleCancelEditing: => @setState(editingDesign: null)
+  handleStartEditing: => @setState(editingDesign: @props.design)
+  handleEditingChange: (design) =>  @setState(editingDesign: design)
 
   renderEditor: ->
     if not @state.editingDesign?

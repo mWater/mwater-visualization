@@ -20,7 +20,7 @@ module.exports = class LeafletMapComponent extends React.Component
     onBoundsChange: React.PropTypes.func # Called with bounds in w, n, s, e format
     
     layers: React.PropTypes.arrayOf(React.PropTypes.shape({
-      tileUrl: React.PropTypes.string.isRequired # Url in leaflet format
+      tileUrl: React.PropTypes.string # Url in leaflet format
       utfGridUrl:  React.PropTypes.string # Url of interactivity grid
       visible: React.PropTypes.bool # Visibility
       opacity: React.PropTypes.number # 0-1
@@ -116,7 +116,8 @@ module.exports = class LeafletMapComponent extends React.Component
       if @props.layers
         @tileLayers = []
         for layer in @props.layers
-          if not layer.visible
+          # Do not display if not visible or no tile url
+          if not layer.visible or not layer.tileUrl
             continue
 
           tileLayer = L.tileLayer(layer.tileUrl)

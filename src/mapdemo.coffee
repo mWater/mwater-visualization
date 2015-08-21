@@ -65,6 +65,14 @@ addLegacyLayerView("ecoli_status", "E.Coli Level")
 addLegacyLayerView("water_access", "Functional Water Access")
 addLegacyLayerView("safe_water_access", "Safe Water Access")
 
+newLayers.push {
+  name: "Custom Layer"
+  type: "Markers"
+  design: {
+    
+  }
+}
+
 design = {
   baseLayer: "bing_road"
   layerViews: layerViews

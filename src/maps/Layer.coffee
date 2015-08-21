@@ -23,3 +23,10 @@ module.exports = class Layer
   # True if layer can be edited
   isEditable: ->
     return false
+
+  # Creates a design element with specified options
+  # options include:
+  #  onDesignChange: function called when design changes
+  createDesignerElement: (options) ->
+    throw new Error("Not implemented")
+
