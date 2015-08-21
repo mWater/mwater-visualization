@@ -14,7 +14,7 @@ class MapDemoComponent extends React.Component
         
       dataSource = visualization_mwater.createDataSource(@props.apiUrl, @props.client)
       widgetFactory = new visualization.WidgetFactory(schema, dataSource)
-      layerFactory = new visualization.LayerFactory(schema: @props.schema, apiUrl: @props.apiUrl, client: @props.client)
+      layerFactory = new visualization.LayerFactory(schema: @props.schema, apiUrl: @props.apiUrl, client: @props.client, newLayers: newLayers)
 
       @setState(schema: schema, widgetFactory: widgetFactory, dataSource: dataSource, layerFactory: layerFactory)
 
@@ -35,35 +35,44 @@ class MapDemoComponent extends React.Component
         onDesignChange: @handleDesignChange
         })
 
-$ ->
-  layerViews = []
-  addLegacyLayerView = (id, name, visible) ->
-    layerViews.push { 
-      id: id
-      name: name
-      visible: visible == true
-      opacity: 1
-      layer: {
-        type: "MWaterServer"
-        design: {
-          type: id
-          table: "entities.water_point"
-        }
-      }
+layerViews = []
+newLayers = []
+addLegacyLayerView = (id, name, visible) ->
+  newLayers.push {
+    name: name
+    type: "MWaterServer"
+    design: {
+      type: id
+      table: "entities.water_point"
     }
-
-  addLegacyLayerView("water_points_by_type", "Water Point Type", true)
-  addLegacyLayerView("functional_status", "Functionality")
-  addLegacyLayerView("ecoli_status", "E.Coli Level")
-  addLegacyLayerView("water_access", "Functional Water Access")
-  addLegacyLayerView("safe_water_access", "Safe Water Access")
-
-  design = {
-    baseLayer: "bing_road"
-    layerViews: layerViews
-    filters: {}
-    bounds: { w: 0, n: 0, e: 40, s: -25 }
+  }
+  
+  layerViews.push { 
+    id: id
+    name: name
+    visible: visible == true
+    opacity: 1
+    type: "MWaterServer"
+    design: {
+      type: id
+      table: "entities.water_point"
+    }
   }
 
+addLegacyLayerView("water_points_by_type", "Water Point Type", true)
+addLegacyLayerView("functional_status", "Functionality")
+addLegacyLayerView("ecoli_status", "E.Coli Level")
+addLegacyLayerView("water_access", "Functional Water Access")
+addLegacyLayerView("safe_water_access", "Safe Water Access")
+
+design = {
+  baseLayer: "bing_road"
+  layerViews: layerViews
+  filters: {}
+  bounds: { w: 0, n: 0, e: 40, s: -25 }
+}
+
+
+$ ->
   sample = React.createElement(MapDemoComponent, initialDesign: design, apiUrl: "http://localhost:1234/v3/")
   React.render(sample, document.body)

@@ -63,7 +63,7 @@ module.exports = class MapViewComponent extends React.Component
 
     # Create layers
     layers = _.map @props.design.layerViews, (layerView) =>
-      return @props.layerFactory.createLayer(layerView.layer.type, layerView.layer.design)
+      return @props.layerFactory.createLayer(layerView.type, layerView.design)
 
     # Convert to leaflet layers
     leafletLayers = _.map(layers, (layer, i) =>

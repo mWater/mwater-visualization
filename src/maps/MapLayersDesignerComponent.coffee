@@ -1,5 +1,6 @@
 React = require 'react'
 H = React.DOM
+uuid = require 'node-uuid'
 
 # Designer for layer selection in the map
 module.exports = class MapLayersDesignerComponent extends React.Component
@@ -31,18 +32,27 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     layerViews.splice(index, 1)
     @updateDesign(layerViews: layerViews)
 
-  handleAddLayerView: =>
-    alert("TO DO")
-    # layers = @props.design.layerViews.slice()
-    # layers.push({})
-    # @updateDesign(layers: layers)
+  handleAddLayerView: (layer) =>
+    layerView = {
+      id: uuid.v4()
+      name: layer.name
+      desc: ""
+      type: layer.type
+      design: layer.design
+      visible: true
+      opacity: 1
+    }
+
+    layerViews = @props.design.layerViews.slice()
+    layerViews.push(layerView)
+    @updateDesign(layerViews: layerViews)
 
   handleVisibleClick: (index) =>
     layerView = @props.design.layerViews[index]
     @updateLayerView(index, visible: not layerView.visible)
 
   renderLayerGearMenu: (layerView, index) =>
-    layer = @props.layerFactory.createLayer(layerView.layer.type, layerView.layer.type)
+    layer = @props.layerFactory.createLayer(layerView.type, layerView.design)
     H.div className: "btn-group", style: { float: "right" }, key: "gear",
       H.button type: "button", className: "btn btn-link dropdown-toggle", "data-toggle": "dropdown",
         H.span className: "glyphicon glyphicon-cog"
@@ -79,6 +89,20 @@ module.exports = class MapLayersDesignerComponent extends React.Component
       @renderBaseLayer("bing_road", "Roads")
       @renderBaseLayer("bing_aerial", "Satellite")
 
+  renderAddLayer: ->
+    H.div style: { margin: 5 }, key: "addLayer", className: "btn-group",
+      H.button type: "button", "data-toggle": "dropdown", className: "btn btn-default dropdown-toggle",
+        H.span className: "glyphicon glyphicon-plus"
+        " Add Layer "
+        H.span className: "caret"
+      H.ul className: "dropdown-menu",
+        _.map(@props.layerFactory.getNewLayers(), (layer, i) =>
+          H.li key: "" + i,
+            H.a onClick: @handleAddLayerView.bind(null, layer), layer.name
+          )
+
+
+
   render: ->
     H.div style: { padding: 5 }, 
       @renderBaseLayers()
@@ -86,7 +110,4 @@ module.exports = class MapLayersDesignerComponent extends React.Component
       H.ul className: "list-group", 
         _.map(@props.design.layerViews, @renderLayerView)
 
-      H.div style: { margin: 5 }, key: "addLayer",
-        H.button type: "button", className: "btn btn-default", onClick: @handleAddLayerView,
-          H.span className: "glyphicon glyphicon-plus"
-          " Add Layer"
+      @renderAddLayer()
