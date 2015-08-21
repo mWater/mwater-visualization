@@ -107,19 +107,19 @@ module.exports = class SchemaBuilder
       # Add extra columns
       @schema.addColumn(tableId, {
         id: "_created_by"
-        name: "Created by user"
+        name: "Added by user"
         type: "text"
       })
 
       @schema.addColumn(tableId, {
         id: "_created_for"
-        name: "Created by group"
+        name: "Added by group"
         type: "text"
       })
 
       @schema.addColumn(tableId, {
         id: "_created_on"
-        name: "Creation date"
+        name: "Date added"
         type: "datetime"
       })
 
