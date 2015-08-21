@@ -1,6 +1,9 @@
 @import "react-select/dist/default.css";
 @import "leaflet/dist/leaflet.css";
 
+/* http://stackoverflow.com/questions/19305821/multiple-modals-overlay */
+.modal { overflow-y: auto; }
+
 .editable-link {
 	color: #478;
 	cursor: pointer;
