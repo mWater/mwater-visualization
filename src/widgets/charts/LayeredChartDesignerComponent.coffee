@@ -1,7 +1,7 @@
 React = require 'react'
 H = React.DOM
 ScalarExprComponent = require './../../expressions/ScalarExprComponent'
-AggrScalarExprComponent = require './../../expressions/AggrScalarExprComponent'
+AxisComponent = require './../../expressions/axes/AxisComponent'
 LogicalExprComponent = require './../../expressions/LogicalExprComponent'
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 EditableLinkComponent = require './../../EditableLinkComponent'
@@ -181,17 +181,18 @@ class LayerDesignerComponent extends React.Component
     layer = _.extend({}, @props.design.layers[@props.index], changes)
     @props.onChange(layer)
 
+  # Update axes with specified changes
+  updateAxes: (changes) ->
+    axes = _.extend({}, @props.design.layers[@props.index].axes, changes)
+    @updateLayer(axes: axes)
+
   handleNameChange: (ev) =>  @updateLayer(name: ev.target.value)
 
   handleTableChange: (table) => @updateLayer(table: table)
 
-  handleXExprChange: (expr) => @updateLayer(xExpr: expr)
-
-  handleColorExprChange: (expr) => @updateLayer(colorExpr: expr)
-
-  handleYExprChange: (expr) => @updateLayer(yExpr: expr)
-
-  handleYAggrExprChange: (val) => @updateLayer(yExpr: val.expr, yAggr: val.aggr)
+  handleXAxisChange: (axis) => @updateAxes(x: axis)
+  handleColorAxisChange: (axis) => @updateAxes(color: axis)
+  handleYAxisChange: (axis) => @updateAxes(y: axis)
 
   handleStackedChange: (ev) => @updateLayer(stacked: ev.target.checked)
 
@@ -248,13 +249,14 @@ class LayerDesignerComponent extends React.Component
     H.div className: "form-group",
       H.label className: "text-muted", title
       H.div style: { marginLeft: 10 }, 
-        React.createElement(ScalarExprComponent, 
+        React.createElement(AxisComponent, 
           editorTitle: title
           schema: @props.schema, 
           table: layer.table
           # types: ["enum", "text"]
-          value: layer.xExpr, 
-          onChange: @handleXExprChange)
+          aggrNeed: "none"
+          value: layer.axes.x, 
+          onChange: @handleXAxisChange)
 
   renderColorAxis: ->
     layer = @props.design.layers[@props.index]
@@ -266,13 +268,14 @@ class LayerDesignerComponent extends React.Component
     H.div className: "form-group",
       H.label className: "text-muted", title
       H.div style: { marginLeft: 10 }, 
-        React.createElement(ScalarExprComponent, 
+        React.createElement(AxisComponent, 
           editorTitle: title
           schema: @props.schema, 
           table: layer.table
           types: ["enum", "text"]
-          value: layer.colorExpr, 
-          onChange: @handleColorExprChange)
+          aggrNeed: "none"
+          value: layer.axes.color, 
+          onChange: @handleColorAxisChange)
 
   renderYAxis: ->
     layer = @props.design.layers[@props.index]
@@ -284,14 +287,14 @@ class LayerDesignerComponent extends React.Component
     H.div className: "form-group",
       H.label className: "text-muted", title
       H.div style: { marginLeft: 10 }, 
-        # TODO aggr and non-aggr
-        React.createElement(AggrScalarExprComponent, 
+        React.createElement(AxisComponent, 
           editorTitle: title
           schema: @props.schema, 
           table: layer.table
           types: ["integer", "decimal"]
-          value: { expr: layer.yExpr, aggr: layer.yAggr }
-          onChange: @handleYAggrExprChange)
+          aggrNeed: "required"
+          value: layer.axes.y
+          onChange: @handleYAxisChange)
 
   renderStacked: ->
     layer = @props.design.layers[@props.index]

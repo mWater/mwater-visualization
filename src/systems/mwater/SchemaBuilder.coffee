@@ -117,6 +117,12 @@ module.exports = class SchemaBuilder
         type: "text"
       })
 
+      @schema.addColumn(tableId, {
+        id: "_created_on"
+        name: "Creation date"
+        type: "datetime"
+      })
+
       # Special columns
       if entityType.code == "water_point"
         @schema.addColumn(tableId, {

@@ -26,9 +26,9 @@ module.exports = class Chart
     throw new Error("Not implemented")
 
   # Creates the dropdown menu items of shape {label, action}
-  # design: design of the chart
-  # dataSource: Data source to use for chart
-  # filters: array of filters to apply (array of expressions)
+  #  design: design of the chart
+  #  dataSource: Data source to use for chart
+  #  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   # Returns an empty list by default
   createDropdownItems: (design, dataSource, filters) ->
     return []

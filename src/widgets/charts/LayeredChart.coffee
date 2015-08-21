@@ -5,6 +5,7 @@ H = React.DOM
 Chart = require './Chart'
 LayeredChartCompiler = require './LayeredChartCompiler'
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
+AxisBuilder = require './../../expressions/axes/AxisBuilder'
 LayeredChartDesignerComponent = require './LayeredChartDesignerComponent'
 LayeredChartViewComponent = require './LayeredChartViewComponent'
 LayeredChartSvgFileSaver = require './LayeredChartSvgFileSaver'
@@ -20,20 +21,28 @@ Design is:
   transpose: true to flip axes
 
 layer:
-  name: label for layer (optional)
-  xExpr: x-axis expression
-  colorExpr: expression to split into series, each with a color
-  yExpr: y-axis expression
-  yAggr: aggregation function if needed for y
-  stacked: true to stack
   type: bar/line/spline/scatter/area/pie/donut (overrides main one)
+  name: label for layer (optional)
+  axes: axes (see below)
+  stacked: true to stack
   filter: optional logical expression to filter by
+  color: color of layer (e.g. #FF8800)
+
+axes:
+  x: x axis
+  y: y axis
+  color: color axis (to split into series based on a color)
+
+axis: 
+  expr: expression of axis
+  aggr: aggregation for axis
 
 ###
 module.exports = class LayeredChart extends Chart
   constructor: (options) ->
     @schema = options.schema
     @exprBuilder = new ExpressionBuilder(@schema)
+    @axisBuilder = new AxisBuilder(schema: @schema)
 
   cleanDesign: (design) ->
     compiler = new LayeredChartCompiler(schema: @schema)
@@ -49,52 +58,51 @@ module.exports = class LayeredChart extends Chart
     for layerId in [0...design.layers.length]
       layer = design.layers[layerId]
 
-      layer.xExpr = @exprBuilder.cleanExpr(layer.xExpr, layer.table)
-      layer.yExpr = @exprBuilder.cleanExpr(layer.yExpr, layer.table)
-      layer.colorExpr = @exprBuilder.cleanExpr(layer.colorExpr, layer.table)
+      layer.axes = layer.axes or {}
+
+      for axisKey, axis of layer.axes
+        # Determine what aggregation axis requires
+        if axisKey == "y" and compiler.doesLayerNeedGrouping(design, layerId)
+          aggrNeed = "required"
+        else
+          aggrNeed = "none"
+        layer.axes[axisKey] = @axisBuilder.cleanAxis(axis, layer.table, aggrNeed)
 
       # Remove x axis if not required
-      if not compiler.canLayerUseXExpr(design, layerId) and layer.xExpr
-        delete layer.xExpr
-
-      # Default y aggr
-      if compiler.doesLayerNeedGrouping(design, layerId) and layer.yExpr
-        # Remove latest, as it is tricky to group by. TODO
-        aggrs = @exprBuilder.getAggrs(layer.yExpr)
-        aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
-
-        if layer.yAggr and layer.yAggr not in _.pluck(aggrs, "id")
-          delete layer.yAggr
-
-        if not layer.yAggr
-          layer.yAggr = aggrs[0].id
-      else
-        delete layer.yAggr
+      if not compiler.canLayerUseXExpr(design, layerId) and layer.axes.x
+        delete layer.axes.x
 
       layer.filter = @exprBuilder.cleanExpr(layer.filter, layer.table)
 
     return design
 
   validateDesign: (design) ->
-    # Check that all have same xExpr type
-    xExprTypes = _.uniq(_.map(design.layers, (l) => @exprBuilder.getExprType(l.xExpr)))
+    # Check that layers have same x axis type
+    xAxisTypes = _.uniq(_.map(design.layers, (l) => 
+      @axisBuilder = new AxisBuilder(schema: @schema)
+      return @axisBuilder.getAxisType(l.axes.x)))
 
-    if xExprTypes.length > 1
+    if xAxisTypes.length > 1
       return "All x axes must be of same type"
 
     for layer in design.layers
+      @axisBuilder = new AxisBuilder(schema: @schema)
+
       # Check that has table
       if not layer.table
         return "Missing data source"
 
-      # Check that has y
-      if not layer.yExpr
+      # Check that has y axis
+      if not layer.axes.y
         return "Missing Axis"
 
       error = null
-      error = error or @exprBuilder.validateExpr(layer.xExpr)
-      error = error or @exprBuilder.validateExpr(layer.yExpr)
-      error = error or @exprBuilder.validateExpr(layer.colorExpr)
+
+      # Validate axes
+      error = error or @axisBuilder.validateAxis(layer.axes.x)
+      error = error or @axisBuilder.validateAxis(layer.axes.y)
+      error = error or @axisBuilder.validateAxis(layer.axes.color)
+
       error = error or @exprBuilder.validateExpr(layer.filter)
 
     return error
@@ -114,7 +122,7 @@ module.exports = class LayeredChart extends Chart
 
   createQueries: (design, filters) ->
     compiler = new LayeredChartCompiler(schema: @schema)
-    return compiler.getQueries(design, filters)
+    return compiler.createQueries(design, filters)
 
   # Options include 
   # design: design of the chart
@@ -154,22 +162,22 @@ module.exports = class LayeredChart extends Chart
   createDataTable: (design, data) ->
     # Export only first layer
     headers = []
-    if design.layers[0].xExpr
-      headers.push(@exprBuilder.summarizeExpr(design.layers[0].xExpr))
-    if design.layers[0].colorExpr
-      headers.push(@exprBuilder.summarizeExpr(design.layers[0].colorExpr))
-    if design.layers[0].yExpr
-      headers.push(@exprBuilder.summarizeAggrExpr(design.layers[0].yExpr, design.layers[0].yAggr))
+    if design.layers[0].axes.x
+      headers.push(@axisBuilder.summarizeAxis(design.layers[0].axes.x))
+    if design.layers[0].axes.color
+      headers.push(@axisBuilder.summarizeAxis(design.layers[0].axes.color))
+    if design.layers[0].axes.y
+      headers.push(@axisBuilder.summarizeAxis(design.layers[0].axes.y))
     table = [headers]
 
     for row in data.layer0
       r = []
-      if design.layers[0].xExpr
-        r.push(@exprBuilder.stringifyExprLiteral(design.layers[0].xExpr, row.x))
-      if design.layers[0].colorExpr
-        r.push(@exprBuilder.stringifyExprLiteral(design.layers[0].colorExpr, row.color))
-      if design.layers[0].yExpr
-        r.push(@exprBuilder.stringifyExprLiteral(design.layers[0].yExpr, row.y))
+      if design.layers[0].axes.x
+        r.push(@axisBuilder.stringifyLiteral(design.layers[0].axes.x, row.x))
+      if design.layers[0].axes.color
+        r.push(@axisBuilder.stringifyLiteral(design.layers[0].axes.color, row.color))
+      if design.layers[0].axes.y
+        r.push(@axisBuilder.stringifyLiteral(design.layers[0].axes.y, row.y))
       table.push(r)
 
     return table

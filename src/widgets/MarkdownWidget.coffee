@@ -13,7 +13,7 @@ module.exports = class MarkdownWidget extends Widget
   # options:
   #  onRemove: called when widget is removed
   #  scope: scope of the widget (when the widget self-selects a particular scope)
-  #  filters: array of filters to apply (array of expressions)
+  #  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   #  onScopeChange: called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
   createViewElement: (options) ->
     dropdownItems = [{ label: [H.span(className: "glyphicon glyphicon-remove"), " Remove"], onClick: options.onRemove }]

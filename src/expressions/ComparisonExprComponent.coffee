@@ -58,6 +58,8 @@ module.exports = class ComparisonExprComponent extends React.Component
           rhsControl = React.createElement(literalComponents.DecimalComponent, key: "rhs", value: @props.value.rhs, onChange: @handleRhsChange)
         when "date"
           rhsControl = React.createElement(literalComponents.DateComponent, key: "rhs", value: @props.value.rhs, onChange: @handleRhsChange)
+        when "datetime"
+          rhsControl = React.createElement(literalComponents.DatetimeComponent, key: "rhs", value: @props.value.rhs, onChange: @handleRhsChange)
         when "enum"
           rhsControl = React.createElement(literalComponents.EnumComponent, 
             key: "rhs", 

@@ -1,10 +1,11 @@
+injectTableAlias = require '../injectTableAlias'
+
 # Compiles expressions to JsonQL
 module.exports = class ExpressionCompiler 
   constructor: (schema) ->
     @schema = schema
 
   # Compile an expression. Pass expr and tableAlias.
-  # Pass aggr to aggregate the expression
   compileExpr: (options) =>
     expr = options.expr
 
@@ -27,14 +28,6 @@ module.exports = class ExpressionCompiler
         compiledExpr = null
       else
         throw new Error("Expr type #{expr.type} not supported")
-
-    # Aggregate
-    if options.aggr
-      compiledExpr = {
-        type: "op"
-        op: options.aggr
-        exprs: _.compact([compiledExpr])
-      }
 
     return compiledExpr
 
@@ -202,29 +195,12 @@ module.exports = class ExpressionCompiler
 
   # Compiles a reference to a column or a JsonQL expression
   # If parameter is a string, create a simple field expression
-  # If parameter is an object, substitute tableAlias for `{alias}`
+  # If parameter is an object, inject tableAlias for `{alias}`
   compileColumnRef: (column, tableAlias) ->
     if _.isString(column)
       return { type: "field", tableAlias: tableAlias, column: column }
 
-    return @substituteTableAlias(column, tableAlias)
-
-  # Recursively substitute table alias tableAlias for `{alias}` 
-  substituteTableAlias: (jsonql, tableAlias) ->
-    # Handle arrays
-    if _.isArray(jsonql)
-      return _.map(jsonql, (item) => @substituteTableAlias(item, tableAlias))
-
-    # Handle non-objects by leaving alone
-    if not _.isObject(jsonql)
-      return jsonql
-
-    # Handle field
-    if jsonql.type == "field" and jsonql.tableAlias == "{alias}"
-      return _.extend(jsonql, tableAlias: tableAlias)
-
-    # Recurse object keys
-    return _.mapValues(jsonql, (value) => @substituteTableAlias(value, tableAlias))
+    return injectTableAlias(column, tableAlias)
 
   # Compiles a table, substituting with custom jsonql if required
   compileTable: (tableId, alias) ->

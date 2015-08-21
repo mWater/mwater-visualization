@@ -2,9 +2,11 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 
+injectTableAlias = require '../../injectTableAlias'
 Chart = require './Chart'
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 ExpressionCompiler = require './../../expressions/ExpressionCompiler'
+AxisBuilder = require './../../expressions/axes/AxisBuilder'
 TableChartDesignerComponent = require './TableChartDesignerComponent'
 TableChartViewComponent = require './TableChartViewComponent'
 
@@ -17,9 +19,8 @@ Design is:
   filter: optional logical expression to filter by
 
 column:
-  headerText: heaer text
-  expr: expression for column value
-  aggr: aggregation function if needed
+  headerText: header text
+  textAxis: axis that creates the text value of the column
 
 ###
 module.exports = class TableChart extends Chart
@@ -28,6 +29,7 @@ module.exports = class TableChart extends Chart
   constructor: (options) ->
     @schema = options.schema
     @exprBuilder = new ExpressionBuilder(@schema)
+    @axisBuilder = new AxisBuilder(schema: @schema)
 
   cleanDesign: (design) ->
     # Clone deep for now # TODO
@@ -42,18 +44,9 @@ module.exports = class TableChart extends Chart
     for columnId in [0...design.columns.length]
       column = design.columns[columnId]
 
-      # Clean expression
-      column.expr = @exprBuilder.cleanExpr(column.expr, design.table)
-
-      # Remove invalid aggr
-      if column.expr
-        aggrs = @exprBuilder.getAggrs(column.expr)
-        if column.aggr and column.aggr not in _.pluck(aggrs, "id")
-          delete column.aggr
-
-        # Set count aggr if null expression type
-        if not column.aggr and not @exprBuilder.getExprType(column.expr)
-          column.aggr = "count"
+      # Clean textAxis
+      column.textAxis = column.textAxis or {}
+      column.textAxis = @axisBuilder.cleanAxis(column.textAxis, design.table, "optional")
 
     if design.filter
       design.filter = @exprBuilder.cleanExpr(design.filter, design.table)
@@ -67,11 +60,11 @@ module.exports = class TableChart extends Chart
     error = null
 
     for column in design.columns
-      # Check that has expr
-      if not column.expr
-        error = error or "Missing expression"
+      # Check that has textAxis
+      if not column.textAxis
+        error = error or "Missing text"
 
-      error = error or @exprBuilder.validateExpr(column.xExpr)
+      error = error or @axisBuilder.validateAxis(column.textAxis)
 
     error = error or @exprBuilder.validateExpr(design.filter)
 
@@ -107,7 +100,7 @@ module.exports = class TableChart extends Chart
     for colNum in [0...design.columns.length]
       column = design.columns[colNum]
 
-      expr = @compileExpr(column.expr, column.aggr)
+      expr = @axisBuilder.compileAxis(axis: column.textAxis, tableAlias: "main")
 
       query.selects.push({ 
         type: "select"
@@ -116,7 +109,7 @@ module.exports = class TableChart extends Chart
       })
 
       # Add group by
-      if not column.aggr
+      if not column.textAxis.aggr
         query.groupBy.push(colNum + 1)
 
     # Get relevant filters
@@ -125,7 +118,7 @@ module.exports = class TableChart extends Chart
       filters.push(design.filter)
 
     # Compile all filters
-    filters = _.map(filters, @compileExpr)      
+    filters = _.map(filters, (f) -> injectTableAlias(f.jsonql, "main")) 
 
     # Wrap if multiple
     if filters.length > 1
@@ -157,20 +150,16 @@ module.exports = class TableChart extends Chart
 
     return React.createElement(TableChartViewComponent, props)
 
-  compileExpr: (expr, aggr) =>
-    exprCompiler = new ExpressionCompiler(@schema)
-    return exprCompiler.compileExpr(expr: expr, tableAlias: "main", aggr: aggr)
-
   createDataTable: (design, data) ->
     renderHeaderCell = (column) =>
-      column.headerText or @exprBuilder.summarizeAggrExpr(column.expr, column.aggr)
+      column.headerText or @axisBuilder.summarizeAxis(column.textAxis)
 
     header = _.map(design.columns, renderHeaderCell)
     table = [header]
     renderRow = (record) =>
       renderCell = (column, columnIndex) =>
         value = record["c#{columnIndex}"]
-        return @exprBuilder.stringifyExprLiteral(column.expr, value)
+        return @axisBuilder.stringifyLiteral(column.textAxis, value)
 
       return _.map(design.columns, renderCell)
 

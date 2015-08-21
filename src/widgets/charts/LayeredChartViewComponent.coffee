@@ -38,9 +38,10 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
   componentDidUpdate: (prevProps) ->
     # Check if options changed
-    oldCompiler = new LayeredChartCompiler(schema: prevProps.schema) # TODO can we consolidate these?
-    oldChartOptions = oldCompiler.createChartOptions(prevProps)
+    oldCompiler = new LayeredChartCompiler(schema: prevProps.schema) 
     newCompiler = new LayeredChartCompiler(schema: @props.schema)
+
+    oldChartOptions = oldCompiler.createChartOptions(prevProps)
     newChartOptions = newCompiler.createChartOptions(@props)
 
     # If chart changed
@@ -84,7 +85,8 @@ module.exports = class LayeredChartViewComponent extends React.Component
       # Highlight only scoped
       .style("opacity", (d,i) =>
         dataPoint = @lookupDataPoint(dataMap, d)
-        scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
+        if dataPoint
+          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
 
         # Determine if scoped
         if @props.scope 
@@ -102,7 +104,8 @@ module.exports = class LayeredChartViewComponent extends React.Component
       .selectAll(".c3-chart-arcs .c3-chart-arc")
       .style("opacity", (d, i) =>
         dataPoint = @lookupDataPoint(dataMap, d)
-        scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
+        if dataPoint
+          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
 
         # Determine if scoped
         if @props.scope 
@@ -123,19 +126,16 @@ module.exports = class LayeredChartViewComponent extends React.Component
     # Lookup layer and row. If pie/donut, index is always zero
     isPolarChart = @props.design.type in ['pie', 'donut']
     if isPolarChart
-      dataPoint = dataMap["#{d.id}-0"]
+      dataPoint = dataMap["#{d.id}"]
     else
-      dataPoint = dataMap["#{d.id}-#{d.index}"]
+      dataPoint = dataMap["#{d.id}:#{d.index}"]
 
     return dataPoint
 
   getDataMap: ->
     # Get data map
     compiler = new LayeredChartCompiler(schema: @props.schema)
-    dataMap = {}
-    compiler.getColumns(@props.design, @props.data, dataMap)
-
-    return dataMap
+    return compiler.createDataMap(@props.design, @props.data)
 
   handleDataClick: (d) =>
     # Get data map
