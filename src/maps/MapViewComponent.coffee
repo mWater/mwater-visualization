@@ -1,4 +1,5 @@
 React = require 'react'
+H = React.DOM
 LeafletMapComponent = require './LeafletMapComponent'
 ExpressionBuilder = require '../expressions/ExpressionBuilder'
 
@@ -20,6 +21,31 @@ module.exports = class MapViewComponent extends React.Component
 
     return true
 
+  renderLegend: (layers) ->
+    legends = _.compact(
+      _.map(layers, (layer, i) => 
+        layerView = @props.design.layerViews[i]
+        if layerView.visible
+          return layer.getLegend()
+        )
+      )
+
+    if legends.length == 0
+      return
+
+    style = {
+      padding: 7
+      background: "rgba(255,255,255,0.8)"
+      boxShadow: "0 0 15px rgba(0,0,0,0.2)"
+      borderRadius: 5
+    }
+
+    H.div style: style,
+      _.map legends, (legend, i) =>
+        H.div key: "#{i}", 
+          if i > 0 then H.br()
+          legend
+
   render: ->
     exprBuilder = new ExpressionBuilder(@props.schema)
 
@@ -28,19 +54,24 @@ module.exports = class MapViewComponent extends React.Component
     filters = _.filter(filters, (expr) => not exprBuilder.validateExpr(expr))
 
     # Create layers
-    layers = _.map(@props.design.layerViews, (layerView) =>
-      layer = @props.layerFactory.createLayer(layerView.layer.type, layerView.layer.design)
-      return {
+    layers = _.map @props.design.layerViews, (layerView) =>
+      return @props.layerFactory.createLayer(layerView.layer.type, layerView.layer.design)
+
+    # Convert to leaflet layers
+    leafletLayers = _.map(layers, (layer, i) =>
+      {
         tileUrl: layer.getTileUrl(filters)
         utfGridUrl: layer.getUtfGridUrl(filters)
-        visible: layerView.visible
-        opacity: layerView.opacity
-        })
+        visible: @props.design.layerViews[i].visible
+        opacity: @props.design.layerViews[i].opacity
+      }
+    )
 
     React.createElement(LeafletMapComponent,
       initialBounds: @props.design.bounds
       baseLayerId: @props.design.baseLayer
-      layers: layers
+      layers: leafletLayers
       width: @props.width
       height: @props.height
+      legend: @renderLegend(layers)
       onBoundsChange: @handleBoundsChange)

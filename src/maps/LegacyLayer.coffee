@@ -2,6 +2,9 @@ Layer = require './Layer'
 ExpressionCompiler = require '../expressions/ExpressionCompiler'
 injectTableAlias = require '../injectTableAlias'
 
+React = require 'react'
+H = React.DOM
+
 # Legacy server map
 module.exports = class LegacyLayer extends Layer
   constructor: (design, schema, client) ->
@@ -46,3 +49,25 @@ module.exports = class LegacyLayer extends Layer
   # getLegend: -> null
 
   getFilterableTables: -> ['entities.water_point']
+
+  getLegend: ->
+    # Create loading legend component
+    React.createElement(LoadingLegend, 
+      url: "http://localhost:1234/v3/maps/legend?type=#{@design.type}")
+
+class LoadingLegend extends React.Component
+  @propTypes:  
+    url: React.PropTypes.string
+
+  constructor: ->
+    super
+    @state = { html: "Loading..." }
+
+  componentDidMount: ->
+    $.get(@props.url).success (data) =>
+      @setState(html: data)
+
+  render: ->
+    H.div 
+      style: { font: "14px/16px Arial, Helvetica, sans-serif", color: "#555" }
+      dangerouslySetInnerHTML: { __html: @state.html }
