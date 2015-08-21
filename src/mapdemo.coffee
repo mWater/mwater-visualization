@@ -88,7 +88,24 @@ design = {
       "name": "Custom Layer",
       "desc": "",
       "type": "Markers",
-      "design": {},
+      "design": {
+        "axes": {
+          "geometry": {
+            "expr": {
+              "type": "scalar",
+              "table": "entities.water_point",
+              "joins": [],
+              "expr": {
+                "type": "field",
+                "table": "entities.water_point",
+                "column": "location"
+              }
+            }
+          }
+        },
+        "filter": null,
+        "table": "entities.water_point"
+      },
       "visible": true,
       "opacity": 1
     }

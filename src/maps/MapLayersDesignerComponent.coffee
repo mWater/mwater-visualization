@@ -110,7 +110,7 @@ class MapLayerViewDesignerComponent extends React.Component
     @props.onLayerViewChange(_.extend({}, @props.layerView, updates))
 
   handleVisibleClick: (index) =>
-    @update(visible: not layerView.visible)
+    @update(visible: not @props.layerView.visible)
 
   handleSaveEditing: =>
     @update(design: @state.editingDesign)
@@ -119,6 +119,10 @@ class MapLayerViewDesignerComponent extends React.Component
   handleCancelEditing: => @setState(editingDesign: null)
   handleStartEditing: => @setState(editingDesign: @props.layerView.design)
   handleEditingChange: (design) =>  @setState(editingDesign: design)
+  handleRename: =>
+    name = prompt("Enter new name", @props.layerView.name)
+    if name
+      @update(name: name)
 
   renderEditor: ->
     if not @state.editingDesign?
@@ -139,6 +143,7 @@ class MapLayerViewDesignerComponent extends React.Component
       H.button type: "button", className: "btn btn-link dropdown-toggle", "data-toggle": "dropdown",
         H.span className: "glyphicon glyphicon-cog"
       H.ul className: "dropdown-menu dropdown-menu-right",
+        H.li(key: "rename", H.a(onClick: @handleRename, "Rename Layer"))
         if layer.isEditable()
           H.li(key: "edit", H.a(onClick: @handleStartEditing, "Edit Layer"))
         # H.li(key: "opacity", H.a(null, "Set Opacity"))
