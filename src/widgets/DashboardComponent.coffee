@@ -58,7 +58,7 @@ module.exports = class DashboardComponent extends React.Component
     # Find place for new item
     return layoutEngine.appendLayout(layouts, width, height)
 
-  addWidget: (type, version, design, width, height) ->
+  addWidget: (type, design, width, height) ->
     # Find place for new item
     layout = @findOpenLayout(12, 12)
 
@@ -67,7 +67,6 @@ module.exports = class DashboardComponent extends React.Component
       layout: layout
       widget: {
         type: type
-        version: version
         design: design
       }
     }
@@ -81,7 +80,7 @@ module.exports = class DashboardComponent extends React.Component
     @props.onDesignChange(design)
 
   handleAddWidget: (wt) =>
-    @addWidget(wt.type, wt.version, wt.design, 12, 12)
+    @addWidget(wt.type, wt.design, 12, 12)
 
   renderAddWidget: ->
     H.div key: "add", className: "btn-group btn-xs",

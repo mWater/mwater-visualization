@@ -107,7 +107,7 @@ module.exports = class DashboardViewComponent extends React.Component
 
     # Create widgets indexed by id
     widgets = _.mapValues(@props.design.items, (item) =>
-      @props.widgetFactory.createWidget(item.widget.type, item.widget.version, item.widget.design)
+      @props.widgetFactory.createWidget(item.widget.type, item.widget.design)
       )
 
     # Create widget elems

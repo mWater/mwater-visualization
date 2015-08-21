@@ -35,6 +35,8 @@ module.exports = class TableChart extends Chart
     # Clone deep for now # TODO
     design = _.cloneDeep(design)
 
+    design.version = design.version or 1
+
     # Always have at least one column
     design.columns = design.columns or []
     if design.columns.length == 0

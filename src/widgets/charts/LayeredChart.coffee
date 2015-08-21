@@ -51,6 +51,7 @@ module.exports = class LayeredChart extends Chart
     design = _.cloneDeep(design)
 
     # Fill in defaults
+    design.version = design.version or 1
     design.type = design.type or "line"
     design.layers = design.layers or [{}]
 
