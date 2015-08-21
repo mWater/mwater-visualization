@@ -128,7 +128,7 @@ class TableChartColumnDesignerComponent extends React.Component
         editorTitle: title
         schema: @props.schema 
         table: @props.design.table
-        value: column.expr
+        value: column.textAxis.expr
         includeCount: true # Can include simple counts
         onChange: @handleExprChange)
 

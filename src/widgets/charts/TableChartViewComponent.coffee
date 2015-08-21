@@ -2,14 +2,14 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 
-ExpressionBuilder = require './../../expressions/ExpressionBuilder'
+AxisBuilder = require './../../expressions/axes/AxisBuilder'
 
 module.exports = class TableChartViewComponent extends React.Component
   renderHeaderCell: (index) ->
-    exprBuilder = new ExpressionBuilder(@props.schema)
+    axisBuilder = new AxisBuilder(schema: @props.schema)
     column = @props.design.columns[index]
 
-    text = column.headerText or exprBuilder.summarizeAggrExpr(column.expr, column.aggr)
+    text = column.headerText or axisBuilder.summarizeAxis(column.textAxis)
     H.th key: index,
       text
 
@@ -26,9 +26,9 @@ module.exports = class TableChartViewComponent extends React.Component
     value = row["c#{columnIndex}"]
 
     # Convert to string
-    exprBuilder = new ExpressionBuilder(@props.schema)
-    str = exprBuilder.stringifyExprLiteral(column.expr, value)
-    return H.td(key: rowIndex, str)
+    axisBuilder = new AxisBuilder(schema: @props.schema)
+    str = axisBuilder.stringifyLiteral(column.textAxis, value)
+    return H.td(key: columnIndex, str)
 
   renderRow: (index) ->
     H.tr key: index,

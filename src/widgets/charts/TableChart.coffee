@@ -46,7 +46,7 @@ module.exports = class TableChart extends Chart
 
       # Clean textAxis
       column.textAxis = column.textAxis or {}
-      column.textAxis = @axisBuilder.cleanExpr(column.textAxis, design.table, "optional")
+      column.textAxis = @axisBuilder.cleanAxis(column.textAxis, design.table, "optional")
 
     if design.filter
       design.filter = @exprBuilder.cleanExpr(design.filter, design.table)
@@ -150,20 +150,16 @@ module.exports = class TableChart extends Chart
 
     return React.createElement(TableChartViewComponent, props)
 
-  compileExpr: (expr, aggr) =>
-    exprCompiler = new ExpressionCompiler(@schema)
-    return exprCompiler.compileExpr(expr: expr, tableAlias: "main", aggr: aggr)
-
   createDataTable: (design, data) ->
     renderHeaderCell = (column) =>
-      column.headerText or @exprBuilder.summarizeAggrExpr(column.expr, column.aggr)
+      column.headerText or @axisBuilder.summarizeAxis(column.textAxis)
 
     header = _.map(design.columns, renderHeaderCell)
     table = [header]
     renderRow = (record) =>
       renderCell = (column, columnIndex) =>
         value = record["c#{columnIndex}"]
-        return @exprBuilder.stringifyExprLiteral(column.expr, value)
+        return @axisBuilder.stringifyLiteral(column.textAxis, value)
 
       return _.map(design.columns, renderCell)
 
