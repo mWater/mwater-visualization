@@ -2,6 +2,7 @@ React = require 'react'
 H = React.DOM
 LeafletMapComponent = require './LeafletMapComponent'
 ExpressionBuilder = require '../expressions/ExpressionBuilder'
+ExpressionCompiler = require '../expressions/ExpressionCompiler'
 
 module.exports = class MapViewComponent extends React.Component
   @propTypes:
@@ -53,6 +54,13 @@ module.exports = class MapViewComponent extends React.Component
     filters = _.values(@props.design.filters)
     filters = _.filter(filters, (expr) => not exprBuilder.validateExpr(expr))
 
+    # Compile filters to JsonQL expected by layers
+    exprCompiler = new ExpressionCompiler(@props.schema)
+    compiledFilters = _.map filters, (expr) =>
+      table = exprBuilder.getExprTable(expr)
+      jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
+      return { table: table, jsonql: jsonql }
+
     # Create layers
     layers = _.map @props.design.layerViews, (layerView) =>
       return @props.layerFactory.createLayer(layerView.layer.type, layerView.layer.design)
@@ -60,8 +68,8 @@ module.exports = class MapViewComponent extends React.Component
     # Convert to leaflet layers
     leafletLayers = _.map(layers, (layer, i) =>
       {
-        tileUrl: layer.getTileUrl(filters)
-        utfGridUrl: layer.getUtfGridUrl(filters)
+        tileUrl: layer.getTileUrl(compiledFilters)
+        utfGridUrl: layer.getUtfGridUrl(compiledFilters)
         visible: @props.design.layerViews[i].visible
         opacity: @props.design.layerViews[i].opacity
       }

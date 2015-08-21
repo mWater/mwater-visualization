@@ -21,7 +21,7 @@ module.exports = class LegacyLayer extends Layer
   # Create query string
   createUrl: (extension, filters) ->
     # TODO client
-    url = "https://api.mwater.co/v3/maps/tiles/{z}/{x}/{y}.#{extension}?type=#{@design.type}&radius=1000"
+    url = "http://localhost:1234/v3/maps/tiles/{z}/{x}/{y}.#{extension}?type=#{@design.type}&radius=1000"
 
     if @client
       url += "&client=#{@client}"
@@ -30,7 +30,7 @@ module.exports = class LegacyLayer extends Layer
     relevantFilters = _.where(filters, table: "entities.water_point")
 
     # If any, create and
-    whereClauses = _.map(relevantFilters, (f) => injectTableAlias(f.jsonql, "entities.water_point"))
+    whereClauses = _.map(relevantFilters, (f) => injectTableAlias(f.jsonql, "main"))
 
     # Wrap if multiple
     if whereClauses.length > 1
