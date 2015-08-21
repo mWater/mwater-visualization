@@ -23,15 +23,15 @@ module.exports = class MapViewComponent extends React.Component
     return true
 
   renderLegend: (layers) ->
-    legends = _.compact(
+    legendItems = _.compact(
       _.map(layers, (layer, i) => 
         layerView = @props.design.layerViews[i]
         if layerView.visible
-          return layer.getLegend()
+          return { key: layerView.id, legend: layer.getLegend() }
         )
       )
 
-    if legends.length == 0
+    if legendItems.length == 0
       return
 
     style = {
@@ -42,10 +42,10 @@ module.exports = class MapViewComponent extends React.Component
     }
 
     H.div style: style,
-      _.map legends, (legend, i) =>
-        H.div key: "#{i}", 
+      _.map legendItems, (item, i) =>
+        H.div key: item.key,
           if i > 0 then H.br()
-          legend
+          item.legend
 
   render: ->
     exprBuilder = new ExpressionBuilder(@props.schema)

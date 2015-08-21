@@ -5,12 +5,16 @@ injectTableAlias = require '../injectTableAlias'
 React = require 'react'
 H = React.DOM
 
-# Legacy server map
-module.exports = class LegacyLayer extends Layer
-  constructor: (design, schema, client) ->
-    @design = design
-    @schema = schema
-    @client = client
+# Layer defined on the mWater server
+# Design is:
+# type: type of layer on server
+# table: table to filter on (e.g. entities.water_point)
+module.exports = class MWaterServerLayer extends Layer
+  # Pass design, client, apiUrl
+  constructor: (options) ->
+    @design = options.design
+    @client = options.client
+    @apiUrl = options.apiUrl
 
   getTileUrl: (filters) -> 
     @createUrl("png", filters)
@@ -21,13 +25,13 @@ module.exports = class LegacyLayer extends Layer
   # Create query string
   createUrl: (extension, filters) ->
     # TODO client
-    url = "http://localhost:1234/v3/maps/tiles/{z}/{x}/{y}.#{extension}?type=#{@design.type}&radius=1000"
+    url = "#{@apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?type=#{@design.type}&radius=1000"
 
     if @client
       url += "&client=#{@client}"
       
     # Add where for any relevant filters
-    relevantFilters = _.where(filters, table: "entities.water_point")
+    relevantFilters = _.where(filters, table: @design.table)
 
     # If any, create and
     whereClauses = _.map(relevantFilters, (f) => injectTableAlias(f.jsonql, "main"))
@@ -43,18 +47,14 @@ module.exports = class LegacyLayer extends Layer
 
     return url
 
-  compileExpr: (expr) =>
-    return new ExpressionCompiler(@schema).compileExpr(expr: expr, tableAlias: "main")
-
-  # getLegend: -> null
-
-  getFilterableTables: -> ['entities.water_point']
+  getFilterableTables: -> [@design.table]
 
   getLegend: ->
     # Create loading legend component
     React.createElement(LoadingLegend, 
-      url: "http://localhost:1234/v3/maps/legend?type=#{@design.type}")
+      url: "#{@apiUrl}maps/legend?type=#{@design.type}")
 
+# Simple class to load legend from server
 class LoadingLegend extends React.Component
   @propTypes:  
     url: React.PropTypes.string
@@ -63,9 +63,14 @@ class LoadingLegend extends React.Component
     super
     @state = { html: "Loading..." }
 
-  componentDidMount: ->
+  componentDidMount: -> 
     $.get(@props.url).success (data) =>
       @setState(html: data)
+
+  componentWillReceiveProps: (nextProps) ->
+    if nextProps.url != @props.url
+      $.get(nextProps.url).success (data) =>
+        @setState(html: data)
 
   render: ->
     H.div 

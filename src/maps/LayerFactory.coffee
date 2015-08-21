@@ -1,16 +1,18 @@
-LegacyLayer = require './LegacyLayer'
+MWaterServerLayer = require './MWaterServerLayer'
 
 module.exports = class LayerFactory
   # Pass in:
   #  schema: schema to use
-  #  client: client id to use (to do remove and replace with data source)
+  #  client: client id to use for talking to mWater server
+  #  apiUrl: API url to use for talking to mWater server
   constructor: (options) ->
     @schema = options.schema
     @client = options.client
+    @apiUrl = options.apiUrl
 
   createLayer: (type, design) ->
     switch type
-      when "Legacy"
-        return new LegacyLayer(design, @schema, @client)
+      when "MWaterServer"
+        return new MWaterServerLayer(design: design, client: @client, apiUrl: @apiUrl)
 
     throw new Error("Unknown type #{type}")

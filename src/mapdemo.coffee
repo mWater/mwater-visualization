@@ -14,7 +14,7 @@ class MapDemoComponent extends React.Component
         
       dataSource = visualization_mwater.createDataSource(@props.apiUrl, @props.client)
       widgetFactory = new visualization.WidgetFactory(schema, dataSource)
-      layerFactory = new visualization.LayerFactory(schema: @props.schema)
+      layerFactory = new visualization.LayerFactory(schema: @props.schema, apiUrl: @props.apiUrl, client: @props.client)
 
       @setState(schema: schema, widgetFactory: widgetFactory, dataSource: dataSource, layerFactory: layerFactory)
 
@@ -44,9 +44,10 @@ $ ->
       visible: visible == true
       opacity: 1
       layer: {
-        type: "Legacy"
+        type: "MWaterServer"
         design: {
           type: id
+          table: "entities.water_point"
         }
       }
     }
