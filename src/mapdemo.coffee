@@ -14,7 +14,13 @@ class MapDemoComponent extends React.Component
         
       dataSource = visualization_mwater.createDataSource(@props.apiUrl, @props.client)
       widgetFactory = new visualization.WidgetFactory(schema, dataSource)
-      layerFactory = new visualization.LayerFactory(schema: schema, apiUrl: @props.apiUrl, client: @props.client, newLayers: newLayers)
+      layerFactory = new visualization.LayerFactory({
+        schema: schema
+        apiUrl: @props.apiUrl
+        client: @props.client
+        newLayers: newLayers
+        onMarkerClick: (table, id) => alert("#{table}:#{id}")
+      })
 
       @setState(schema: schema, widgetFactory: widgetFactory, dataSource: dataSource, layerFactory: layerFactory)
 

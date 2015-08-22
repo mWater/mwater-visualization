@@ -10,17 +10,24 @@ H = React.DOM
 # type: type of layer on server
 # table: table to filter on (e.g. entities.water_point)
 module.exports = class MWaterServerLayer extends Layer
-  # Pass design, client, apiUrl
+  # Pass design, client, apiUrl, onMarkerClick
+  # onMarkerClick takes (table, id) and is the table and id of the row that is represented by the click
   constructor: (options) ->
     @design = options.design
     @client = options.client
     @apiUrl = options.apiUrl
+    @onMarkerClick = options.onMarkerClick
 
   getTileUrl: (filters) -> 
     @createUrl("png", filters)
 
   getUtfGridUrl: (filters) -> 
     @createUrl("grid.json", filters)
+
+  # Called when the interactivity grid is clicked. Called with { data: interactivty data e.g. `{ id: 123 }` }
+  onGridClick: (ev) ->
+    if @onMarkerClick and ev.data and ev.data.id
+      @onMarkerClick(@design.table, ev.data.id)
 
   # Create query string
   createUrl: (extension, filters) ->

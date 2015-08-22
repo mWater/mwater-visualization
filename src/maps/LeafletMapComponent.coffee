@@ -24,6 +24,7 @@ module.exports = class LeafletMapComponent extends React.Component
       utfGridUrl:  React.PropTypes.string # Url of interactivity grid
       visible: React.PropTypes.bool # Visibility
       opacity: React.PropTypes.number # 0-1
+      onGridClick: React.PropTypes.func # Function that is called when grid layer is clicked. Passed { data }
       })).isRequired # List of layers
 
     legend: React.PropTypes.node # Legend element
@@ -139,6 +140,10 @@ module.exports = class LeafletMapComponent extends React.Component
             
             @map.addLayer(utfGridLayer)
             @utfGridLayers.push(utfGridLayer)
+
+            if layer.onGridClick
+              utfGridLayer.on 'click', (ev) =>
+                layer.onGridClick({ data: ev.data })
 
     # Render legend
     if @props.legend

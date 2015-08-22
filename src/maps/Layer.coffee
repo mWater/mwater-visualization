@@ -11,6 +11,10 @@ module.exports = class Layer
   getUtfGridUrl: (filters) ->
     return null
 
+  # Called when the interactivity grid is clicked. Called with { data: interactivty data e.g. `{ id: 123 }` }
+  onGridClick: (ev) ->
+    return
+
   # Get the legend to be optionally displayed on the map. Returns
   # a React element
   getLegend: ->

@@ -31,9 +31,6 @@ module.exports = class MapLayersDesignerComponent extends React.Component
 
     @updateDesign(layerViews: layerViews)
 
-  handleBaseLayerChange: (baseLayer) =>
-    @updateDesign(baseLayer: baseLayer)
-
   handleRemoveLayerView: (index) =>
     layerViews = @props.design.layerViews.slice()
     layerViews.splice(index, 1)
@@ -53,23 +50,6 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     layerViews = @props.design.layerViews.slice()
     layerViews.push(layerView)
     @updateDesign(layerViews: layerViews)
-
-  renderBaseLayer: (id, name) ->
-    className = "mwater-visualization-layer"
-    if id == @props.design.baseLayer
-      className += " checked"
-    
-    H.div 
-      key: id
-      className: className
-      style: { display: "inline-block" },
-      onClick: @handleBaseLayerChange.bind(null, id),
-        name
-
-  renderBaseLayers: ->
-    H.div style: { margin: 5, marginBottom: 10 }, key: "baseLayers",
-      @renderBaseLayer("bing_road", "Roads")
-      @renderBaseLayer("bing_aerial", "Satellite")
 
   renderAddLayer: ->
     H.div style: { margin: 5 }, key: "addLayer", className: "btn-group",
@@ -95,8 +75,6 @@ module.exports = class MapLayersDesignerComponent extends React.Component
 
   render: ->
     H.div style: { padding: 5 }, 
-      @renderBaseLayers()
-
       H.ul className: "list-group", 
         _.map(@props.design.layerViews, @renderLayerView)
 
