@@ -1,6 +1,7 @@
 H = React.DOM
 visualization_mwater = require './systems/mwater'
 visualization = require './index'
+uuid = require 'node-uuid'
 
 class MapDemoComponent extends React.Component
   constructor: (props) ->
@@ -43,34 +44,38 @@ class MapDemoComponent extends React.Component
 
 layerViews = []
 newLayers = []
-addLegacyLayerView = (id, name, group, visible) ->
+addServerLayerView = (options) ->
   newLayers.push {
-    name: name
+    name: options.name
     type: "MWaterServer"
     design: {
-      type: id
+      type: options.type
       table: "entities.water_point"
+      minZoom: options.minZoom
+      maxZoom: options.maxZoom
     }
   }
   
   layerViews.push { 
-    id: id
-    name: name
-    visible: visible == true
+    id: uuid.v4()
+    name: options.name
+    visible: options.visible == true
     opacity: 1
     type: "MWaterServer"
-    group: group
+    group: options.group
     design: {
-      type: id
+      type: options.type
       table: "entities.water_point"
+      minZoom: options.minZoom
+      maxZoom: options.maxZoom
     }
   }
 
-addLegacyLayerView("safe_water_access", "Safe Water Access", "access")
-addLegacyLayerView("water_access", "Functional Water Access", "access")
-addLegacyLayerView("water_points_by_type", "Water Point Type", "points", true)
-addLegacyLayerView("functional_status", "Functionality", "points")
-addLegacyLayerView("ecoli_status", "E.Coli Level", "points")
+addServerLayerView({ type: "safe_water_access", name: "Safe Water Access", group: "access", minZoom: 10 })
+addServerLayerView({ type: "water_access", name: "Functional Water Access", group: "access", minZoom: 10 })
+addServerLayerView({ type: "water_points_by_type", name: "Water Point Type", group: "points", visible: true })
+addServerLayerView({ type: "functional_status", name: "Functionality", group: "points" })
+addServerLayerView({ type: "ecoli_status", name: "E.Coli Level", group: "points" })
 
 newLayers.push {
   name: "Custom Layer"

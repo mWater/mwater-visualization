@@ -15,6 +15,10 @@ module.exports = class Layer
   onGridClick: (ev) ->
     return
 
+  # Get min and max zoom levels
+  getMinZoom: -> return
+  getMaxZoom: -> return 
+
   # Get the legend to be optionally displayed on the map. Returns
   # a React element
   getLegend: ->

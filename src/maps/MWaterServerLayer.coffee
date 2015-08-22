@@ -9,6 +9,8 @@ H = React.DOM
 # Design is:
 # type: type of layer on server
 # table: table to filter on (e.g. entities.water_point)
+# minZoom: optional minimum zoom
+# maxZoom: optional maximum zoom
 module.exports = class MWaterServerLayer extends Layer
   # Pass design, client, apiUrl, onMarkerClick
   # onMarkerClick takes (table, id) and is the table and id of the row that is represented by the click
@@ -23,6 +25,10 @@ module.exports = class MWaterServerLayer extends Layer
 
   getUtfGridUrl: (filters) -> 
     @createUrl("grid.json", filters)
+
+  # Get min and max zoom levels
+  getMinZoom: -> @design.minZoom
+  getMaxZoom: -> @design.maxZoom
 
   # Called when the interactivity grid is clicked. Called with { data: interactivty data e.g. `{ id: 123 }` }
   onGridClick: (ev) ->

@@ -72,6 +72,8 @@ module.exports = class MapViewComponent extends React.Component
         utfGridUrl: layer.getUtfGridUrl(compiledFilters)
         visible: @props.design.layerViews[i].visible
         opacity: @props.design.layerViews[i].opacity
+        minZoom: layer.getMinZoom()
+        maxZoom: layer.getMaxZoom()
         onGridClick: layer.onGridClick.bind(layer)
       }
     )

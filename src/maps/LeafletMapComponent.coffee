@@ -25,6 +25,8 @@ module.exports = class LeafletMapComponent extends React.Component
       visible: React.PropTypes.bool # Visibility
       opacity: React.PropTypes.number # 0-1
       onGridClick: React.PropTypes.func # Function that is called when grid layer is clicked. Passed { data }
+      minZoom: React.PropTypes.number # Minimum zoom level
+      mazZoom: React.PropTypes.number # Maximum zoom level
       })).isRequired # List of layers
 
     legend: React.PropTypes.node # Legend element
@@ -121,7 +123,10 @@ module.exports = class LeafletMapComponent extends React.Component
           if not layer.visible or not layer.tileUrl
             continue
 
-          tileLayer = L.tileLayer(layer.tileUrl)
+          tileLayer = L.tileLayer(layer.tileUrl, {
+            minZoom: layer.minZoom
+            maxZoom: layer.maxZoom
+          })
           @tileLayers.push(tileLayer)
 
           # TODO Hack for animated zooming
@@ -136,7 +141,11 @@ module.exports = class LeafletMapComponent extends React.Component
             continue
             
           if layer.utfGridUrl
-            utfGridLayer = new UtfGridLayer(layer.utfGridUrl, { useJsonP: false })
+            utfGridLayer = new UtfGridLayer(layer.utfGridUrl, { 
+              useJsonP: false 
+              minZoom: layer.minZoom
+              maxZoom: layer.maxZoom
+            })
             
             @map.addLayer(utfGridLayer)
             @utfGridLayers.push(utfGridLayer)
