@@ -16,9 +16,19 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     design = _.extend({}, @props.design, changes)
     @props.onDesignChange(design)
 
-  updateLayerView: (index, layerView) =>
+
+  handleLayerViewChange: (index, layerView) =>
     layerViews = @props.design.layerViews.slice()
+
+    # Update self
     layerViews[index] = layerView
+
+    # Unselect any in same group if selected
+    if layerView.group and layerView.visible
+      _.each @props.design.layerViews, (lv, i) =>
+        if lv.visible and i != index and lv.group == layerView.group
+          layerViews[i] = _.extend({}, lv, { visible: false })
+
     @updateDesign(layerViews: layerViews)
 
   handleBaseLayerChange: (baseLayer) =>
@@ -77,7 +87,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     H.li className: "list-group-item", key: layerView.id,
       React.createElement(MapLayerViewDesignerComponent, 
         layerView: layerView
-        onLayerViewChange: (lv) => @updateLayerView(index, lv)
+        onLayerViewChange: (lv) => @handleLayerViewChange(index, lv)
         onRemove: => @handleRemoveLayerView(index)
         schema: @props.schema
         layerFactory: @props.layerFactory

@@ -24,5 +24,6 @@ Is a view of a layer including whether visible, opacity.
 	design: design of the layer. Layer-type specific
 	visible: true/false
 	opacity: 0.0-1.0
+	group: optional group. layers in the same group act as radio buttons
 }
 ```

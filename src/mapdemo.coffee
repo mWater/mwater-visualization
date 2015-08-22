@@ -37,7 +37,7 @@ class MapDemoComponent extends React.Component
 
 layerViews = []
 newLayers = []
-addLegacyLayerView = (id, name, visible) ->
+addLegacyLayerView = (id, name, group, visible) ->
   newLayers.push {
     name: name
     type: "MWaterServer"
@@ -53,23 +53,23 @@ addLegacyLayerView = (id, name, visible) ->
     visible: visible == true
     opacity: 1
     type: "MWaterServer"
+    group: group
     design: {
       type: id
       table: "entities.water_point"
     }
   }
 
-addLegacyLayerView("water_points_by_type", "Water Point Type", true)
-addLegacyLayerView("functional_status", "Functionality")
-addLegacyLayerView("ecoli_status", "E.Coli Level")
-addLegacyLayerView("water_access", "Functional Water Access")
-addLegacyLayerView("safe_water_access", "Safe Water Access")
+addLegacyLayerView("safe_water_access", "Safe Water Access", "access")
+addLegacyLayerView("water_access", "Functional Water Access", "access")
+addLegacyLayerView("water_points_by_type", "Water Point Type", "points", true)
+addLegacyLayerView("functional_status", "Functionality", "points")
+addLegacyLayerView("ecoli_status", "E.Coli Level", "points")
 
 newLayers.push {
   name: "Custom Layer"
   type: "Markers"
-  design: {
-  }
+  design: { }
 }
 
 design = {
@@ -77,45 +77,6 @@ design = {
   layerViews: layerViews
   filters: {}
   bounds: { w: 0, n: 0, e: 40, s: -25 }
-}
-
-design = {
-  "baseLayer": "bing_road",
-  "layerViews": [
-    {
-      "id": "a434704e-2809-4f87-9a5f-86d3d4a6cdac",
-      "name": "Custom Layer",
-      "desc": "",
-      "type": "Markers",
-      "design": {
-        "axes": {
-          "geometry": {
-            "expr": {
-              "type": "scalar",
-              "table": "entities.water_point",
-              "joins": [],
-              "expr": {
-                "type": "field",
-                "table": "entities.water_point",
-                "column": "location"
-              }
-            }
-          }
-        },
-        "filter": null,
-        "table": "entities.water_point"
-      },
-      "visible": true,
-      "opacity": 1
-    }
-  ],
-  "filters": {},
-  "bounds": {
-    "w": -1.0107421875,
-    "n": 2.064982495867104,
-    "e": 41.0009765625,
-    "s": -26.86328062676624
-  }
 }
 
 

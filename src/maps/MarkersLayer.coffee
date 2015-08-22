@@ -31,17 +31,19 @@ module.exports = class MarkersLayer extends Layer
   getTileUrl: (filters) -> 
     # Check if valid
     # TODO clean/validate order??
-    if not @design.axes or not @design.axes.geometry
+    design = @cleanDesign(@design)
+    
+    if not design.axes or not design.axes.geometry
       return null
 
-    @createUrl("png", filters)
+    @createUrl("png", design, filters)
 
   getUtfGridUrl: (filters) -> 
     return null
     # @createUrl("grid.json", filters)
 
   # Create query string
-  createUrl: (extension, filters) ->
+  createUrl: (extension, design, filters) ->
     query = "type=jsonql"
     if @client
       query += "&client=" + @client
@@ -51,10 +53,10 @@ module.exports = class MarkersLayer extends Layer
       layers: [
         { 
           id: "layer0"
-          jsonql: @createJsonQL(filters)
+          jsonql: @createJsonQL(design, filters)
         }
       ]
-      css: @createCss()
+      css: @createCss(design)
       # interactivity: {
       #   layer: "layer0"
       #   fields: ["id"]
@@ -64,13 +66,13 @@ module.exports = class MarkersLayer extends Layer
 
     return "#{@apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?" + query
 
-  createJsonQL: (filters) ->
+  createJsonQL: (design, filters) ->
     axisBuilder = new AxisBuilder(schema: @schema)
     exprCompiler = new ExpressionCompiler(@schema)
     exprBuilder = new ExpressionBuilder(@schema)
 
     # Compile geometry axis
-    geometryExpr = axisBuilder.compileAxis(axis: @design.axes.geometry, tableAlias: "innerquery")
+    geometryExpr = axisBuilder.compileAxis(axis: design.axes.geometry, tableAlias: "innerquery")
 
     # row_number() over (partition by st_snaptogrid(location, !pixel_width!*5, !pixel_height!*5)) AS r
     cluster = { 
@@ -94,7 +96,7 @@ module.exports = class MarkersLayer extends Layer
         { type: "select", expr: geometryExpr, alias: "the_geom_webmercator" } # geometry as the_geom_webmercator
         cluster
       ]
-      from: exprCompiler.compileTable(@design.table, "innerquery")
+      from: exprCompiler.compileTable(design.table, "innerquery")
     }
 
     # Create filters. First limit to bounding box
@@ -110,12 +112,12 @@ module.exports = class MarkersLayer extends Layer
     ]
 
     # Then add filters baked into layer
-    if @design.filter
-      whereClauses.push(exprCompiler.compileExpr(expr: @design.filter, tableAlias: "innerquery"))
+    if design.filter
+      whereClauses.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "innerquery"))
 
     # Then add extra filters passed in, if relevant
     # Get relevant filters
-    relevantFilters = _.where(filters, table: @design.table)
+    relevantFilters = _.where(filters, table: design.table)
     for filter in relevantFilters
       whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
 
@@ -138,10 +140,10 @@ module.exports = class MarkersLayer extends Layer
 
     return outerquery
 
-  createCss: ->
+  createCss: (design) ->
     '''
     #layer0 {
-      marker-fill: #0088FF;
+      marker-fill: ''' + (design.color or "#666666") + ''';
       marker-width: 10;
       marker-line-color: white;
       marker-line-width: 1;
@@ -169,12 +171,13 @@ module.exports = class MarkersLayer extends Layer
   # Returns a cleaned design
   # TODO this is awkward since the design is part of the object too
   cleanDesign: (design) ->
+    exprBuilder = new ExpressionBuilder(@schema)
+    axisBuilder = new AxisBuilder(schema: @schema)
+
     # TODO clones entirely
     design = _.cloneDeep(design)
     design.axes = design.axes or {}
-
-    exprBuilder = new ExpressionBuilder(@schema)
-    axisBuilder = new AxisBuilder(schema: @schema)
+    design.color = design.color or "#0088FF"
 
     for axisKey, axis of design.axes
       design.axes[axisKey] = axisBuilder.cleanAxis(axis, design.table, "none")

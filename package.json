@@ -27,6 +27,7 @@
     "mwater-forms": "git+https://github.com/mWater/mwater-forms.git",
     "node-uuid": "^1.4.3",
     "react": "^0.13.2",
+    "react-color": "git+https://github.com/rickyvetter/react-color.git#directory-caps",
     "react-dnd": "^1.1.1",
     "react-select": "^0.4.8"
   },
