@@ -69,7 +69,6 @@ newLayers.push {
   name: "Custom Layer"
   type: "Markers"
   design: {
-    
   }
 }
 
