@@ -114,7 +114,7 @@ class ChartWidgetComponent extends React.Component
     dropdownItems.unshift({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
 
     # Wrap in a simple widget
-    return H.div null, 
+    return H.div onDoubleClick: @handleStartEditing, 
       @renderEditor()
       React.createElement(SimpleWidgetComponent,
         highlighted: @state.editingDesign?

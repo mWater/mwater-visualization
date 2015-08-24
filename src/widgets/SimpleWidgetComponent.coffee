@@ -57,9 +57,8 @@ module.exports = class SimpleWidgetComponent extends React.Component
     }
 
     elem = H.div style: dropdownStyle, "data-toggle": "dropdown",
-      H.div {},
-        H.div className: "mwater-visualization-simple-widget-gear-button", onClick: @handleGear,
-          H.span className: "glyphicon glyphicon-cog"
+      H.div className: "mwater-visualization-simple-widget-gear-button",
+        H.span className: "glyphicon glyphicon-cog"
 
     return H.div style: dropdownStyle,
       elem
