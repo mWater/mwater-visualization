@@ -53,7 +53,7 @@ module.exports = class TextArrayComponent extends React.Component
       else  
         cb(null, {
           options: _.map(rows, (r) -> { value: r.value, label: r.value })
-          complete: rows.length < 50 # Complete if didn't hit limit
+          complete: false # TODO rows.length < 50 # Complete if didn't hit limit
         })
 
   render: ->

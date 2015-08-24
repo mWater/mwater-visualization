@@ -44,11 +44,13 @@ module.exports = class ComparisonExprComponent extends React.Component
       ops = exprBuilder.getComparisonOps(lhsType)
       currentOp = _.findWhere(ops, id: @props.value.op)
 
-      opControl = React.createElement(EditableLinkComponent, 
-        dropdownItems: ops
-        onDropdownItemClicked: @handleOpChange
-        if currentOp then currentOp.name
-        )
+      # Hide if "is one of" # TODO
+      if not currentOp or currentOp.id != "= any"
+        opControl = React.createElement(EditableLinkComponent, 
+          dropdownItems: ops
+          onDropdownItemClicked: @handleOpChange
+          if currentOp then currentOp.name
+          )
 
     if lhsType and @props.value.op
       rhsType = exprBuilder.getComparisonRhsType(lhsType, @props.value.op)

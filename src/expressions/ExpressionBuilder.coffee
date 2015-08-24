@@ -225,6 +225,11 @@ module.exports = class ExpressionBuilder
           # Remove if empty
           if expr.rhs.value.length == 0
             expr = _.omit(expr, "rhs")
+      else if @getComparisonRhsType(@getExprType(expr.lhs), expr.op) == "text[]" 
+        if expr.rhs.type == "literal"
+          # Remove if empty
+          if expr.rhs.value.length == 0
+            expr = _.omit(expr, "rhs")
 
     return expr
 
