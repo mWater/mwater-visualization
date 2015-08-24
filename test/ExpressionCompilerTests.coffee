@@ -225,6 +225,17 @@ describe "ExpressionCompiler", ->
         ]
         }), JSON.stringify(jql, null, 2)
 
+    it "compiles no rhs as null", ->
+      expr = { 
+        type: "comparison"
+        op: "="
+        lhs: { type: "field", table: "t1", column: "integer" }
+      }
+
+      jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
+
+      assert not jql
+
   describe "logicals", ->
     it "simplifies logical", ->
       expr1 = { type: "comparison", op: "= true", lhs: { type: "field", table: "t1", column: "integer" } }
@@ -271,6 +282,25 @@ describe "ExpressionCompiler", ->
             ]
           }
         ]}
+      ), JSON.stringify(jql, null, 2)
+
+    it "excluded blank condition", ->
+      expr1 = { type: "comparison", op: "= true", lhs: { type: "field", table: "t1", column: "integer" } }
+
+      expr2 = { type: "comparison", op: "=", lhs: { type: "field", table: "t1", column: "decimal" } } # No RHS
+
+      expr = { type: "logical", op: "and", exprs: [expr1, expr2] }
+      jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
+
+      assert _.isEqual(jql, 
+        {
+          type: "op"
+          op: "="
+          exprs: [
+            { type: "field", tableAlias: "T1", column: "integer" }
+            { type: "literal", value: true }
+          ]
+        }
       ), JSON.stringify(jql, null, 2)
 
   describe "custom jsonql", ->

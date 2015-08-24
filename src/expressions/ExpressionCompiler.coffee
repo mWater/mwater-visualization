@@ -1,4 +1,5 @@
 injectTableAlias = require '../injectTableAlias'
+ExpressionBuilder = require './ExpressionBuilder'
 
 # Compiles expressions to JsonQL
 module.exports = class ExpressionCompiler 
@@ -158,6 +159,11 @@ module.exports = class ExpressionCompiler
   compileComparisonExpr: (options) ->
     expr = options.expr
 
+    # Missing right-hand side means null condition
+    exprBuilder = new ExpressionBuilder(@schema)
+    if exprBuilder.getComparisonRhsType(exprBuilder.getExprType(expr.lhs), expr.op) and not expr.rhs?
+      return null
+
     exprs = [@compileExpr(expr: expr.lhs, tableAlias: options.tableAlias)]
     if expr.rhs
       exprs.push(@compileExpr(expr: expr.rhs, tableAlias: options.tableAlias))
@@ -180,17 +186,22 @@ module.exports = class ExpressionCompiler
   compileLogicalExpr: (options) ->
     expr = options.expr
 
-    # Simplify
-    if expr.exprs.length == 1
-      return @compileExpr(expr: expr.exprs[0], tableAlias: options.tableAlias)
+    compiledExprs = _.map(expr.exprs, (e) => @compileExpr(expr: e, tableAlias: options.tableAlias))
 
-    if expr.exprs.length == 0
+    # Remove nulls
+    compiledExprs = _.compact(compiledExprs)
+
+    # Simplify
+    if compiledExprs.length == 1
+      return compiledExprs[0]
+
+    if compiledExprs.length == 0
       return null
 
     return { 
       type: "op"
       op: expr.op
-      exprs: _.map(expr.exprs, (e) => @compileExpr(expr: e, tableAlias: options.tableAlias))
+      exprs: compiledExprs
     }
 
   # Compiles a reference to a column or a JsonQL expression

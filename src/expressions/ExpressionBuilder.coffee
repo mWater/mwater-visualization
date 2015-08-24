@@ -330,7 +330,8 @@ module.exports = class ExpressionBuilder
   validateComparisonExpr: (expr) ->
     if not expr.lhs then return "Missing left-hand side"
     if not expr.op then return "Missing operation"
-    if @getComparisonRhsType(@getExprType(expr.lhs), expr.op) and not expr.rhs then return "Missing right-hand side"
+
+    # Allow no rhs = no filter specified
 
     return @validateExpr(expr.lhs) or @validateExpr(expr.rhs)
 

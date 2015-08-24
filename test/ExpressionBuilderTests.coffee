@@ -308,6 +308,10 @@ describe "ExpressionBuilder", ->
       expr = { type: "comparison", lhs: { type: "field", table: "t1", column: "c1" }, rhs: { type: "literal", valueType: "text", value: "x" } }
       assert.isNotNull @exprBuilder.validateComparisonExpr(expr)
 
+    it "does not require rhs (allows blank = no filter)", ->
+      expr = { type: "comparison", lhs: { type: "field", table: "t1", column: "c1" }, op: "~*" }
+      assert.isNull @exprBuilder.validateComparisonExpr(expr)
+
     it "requires rhs if has type"
     it "requires rhs type to match"
 
