@@ -76,7 +76,7 @@ module.exports = class SimpleWidgetComponent extends React.Component
     }
     
     if @props.highlighted
-      style.border = "dashed 2px blue"
+      style.border = "dashed 2px #337ab7"
 
     contents = H.div style: { position: "absolute", left: 10, top: 10, right: 10, bottom: 10 }, 
       React.cloneElement(React.Children.only(@props.children), 

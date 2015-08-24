@@ -6,6 +6,7 @@ CsvBuilder = require './../../CsvBuilder'
 filesaver = require 'filesaver.js'
 ActionCancelModalComponent = require '../../ActionCancelModalComponent'
 ChartWidgetViewComponent = require './ChartWidgetViewComponent'
+FloatingWindowComponent = require '../../FloatingWindowComponent'
 
 # A widget which is a chart
 module.exports = class ChartWidget extends Widget
@@ -97,8 +98,18 @@ class ChartWidgetComponent extends React.Component
     if not @state.editingDesign?
       return
 
-    return React.createElement(ActionCancelModalComponent,
+    # return React.createElement(ActionCancelModalComponent,
+    #   title: "Edit Chart"
+    #   onAction: @handleSaveEditing
+    #   onCancel: @handleCancelEditing,
+    #     @props.chart.createDesignerElement(
+    #       design: @state.editingDesign
+    #       onDesignChange: @handleEditingChange)
+    # )
+
+    return React.createElement(FloatingWindowComponent,
       title: "Edit Chart"
+      nextToElem: React.findDOMNode(this)
       onAction: @handleSaveEditing
       onCancel: @handleCancelEditing,
         @props.chart.createDesignerElement(
@@ -115,7 +126,6 @@ class ChartWidgetComponent extends React.Component
 
     # Wrap in a simple widget
     return H.div onDoubleClick: @handleStartEditing, 
-      @renderEditor()
       React.createElement(SimpleWidgetComponent,
         highlighted: @state.editingDesign?
         width: @props.width
@@ -131,4 +141,5 @@ class ChartWidgetComponent extends React.Component
             filters: @props.filters
             onScopeChange: @props.onScopeChange)
       )
+      @renderEditor()
 
