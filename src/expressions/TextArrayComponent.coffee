@@ -49,11 +49,13 @@ module.exports = class TextArrayComponent extends React.Component
         cb(err)
         return 
 
-      else  
-        cb(null, {
-          options: _.map(rows, (r) -> { value: r.value, label: r.value })
-          complete: false # TODO rows.length < 50 # Complete if didn't hit limit
-        })
+      # Filter null and blank
+      rows = _.filter(rows, (r) -> r.value)
+
+      cb(null, {
+        options: _.map(rows, (r) -> { value: r.value, label: r.value })
+        complete: false # TODO rows.length < 50 # Complete if didn't hit limit
+      })
 
   render: ->
     value = null
