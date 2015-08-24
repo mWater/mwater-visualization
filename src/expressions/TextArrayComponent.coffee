@@ -5,7 +5,6 @@ ExpressionCompiler = require './ExpressionCompiler'
 ExpressionBuilder = require './ExpressionBuilder'
 
 # Displays a combo box that allows selecting multiple text values from an expression
-# Component which displays an array of enums
 module.exports = class TextArrayComponent extends React.Component
   @propTypes: 
     value: React.PropTypes.object

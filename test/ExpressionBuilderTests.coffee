@@ -288,12 +288,12 @@ describe "ExpressionBuilder", ->
     it "defaults op", ->
       expr = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "text" } }
       expr = @exprBuilder.cleanComparisonExpr(expr)
-      assert.equal expr.op, "~*"
+      assert.equal expr.op, "= any"
 
     it "removes invalid op", ->
       expr = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "text" }, op: ">" }
       expr = @exprBuilder.cleanComparisonExpr(expr)
-      assert.equal expr.op, "~*"
+      assert.equal expr.op, "= any"
 
   describe "validateComparisonExpr", ->
     it "null for valid", ->

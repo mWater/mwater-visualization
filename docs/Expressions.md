@@ -37,14 +37,14 @@ Column of the database
 `type`: "comparison"
 `table`: Table id of table 
 `lhs`: left hand side expression. `scalar` usually.
-`op`: "=", ">", ">=", "<", "<=", "~*", ">", "<", "= true", "= false", "is null", "is not null", '= any'
+`op`: "=", ">", ">=", "<", "<=", "~*", ">", "<", "= true", "= false", "is null", "is not null", '= any', 'between'
 `rhs`: right hand side expressions. `literal` usually.
 
 ### Literal expressions
 
 `type`: "literal"
-`valueType`: "text", "integer", "decimal", "boolean", "enum", "date", "enum[]", "text[]"
-`value`: value of literal. date is ISO 8601 YYYY-MM-DD
+`valueType`: "text", "integer", "decimal", "boolean", "enum", "date", "enum[]", "text[]", "daterange", "datetimerange"
+`value`: value of literal. date is ISO 8601 YYYY-MM-DD. daterange is `[YYYY-MM-DD, YYYY-MM-DD]` (min, max). datetimerange is `[min iso datetime, max iso datetime]`
 
 ## Count expressions
 

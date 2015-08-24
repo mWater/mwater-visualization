@@ -155,7 +155,6 @@ module.exports = class ExpressionCompiler
 
     return scalar
 
-
   compileComparisonExpr: (options) ->
     expr = options.expr
 
@@ -164,18 +163,23 @@ module.exports = class ExpressionCompiler
     if exprBuilder.getComparisonRhsType(exprBuilder.getExprType(expr.lhs), expr.op) and not expr.rhs?
       return null
 
-    exprs = [@compileExpr(expr: expr.lhs, tableAlias: options.tableAlias)]
+    lhsExpr = @compileExpr(expr: expr.lhs, tableAlias: options.tableAlias) 
     if expr.rhs
-      exprs.push(@compileExpr(expr: expr.rhs, tableAlias: options.tableAlias))
+      rhsExpr = @compileExpr(expr: expr.rhs, tableAlias: options.tableAlias)
+      exprs = [lhsExpr, rhsExpr]
+    else
+      exprs = [lhsExpr]
 
     # Handle special cases 
     switch expr.op
       when '= true'
-        return { type: "op", op: "=", exprs: [exprs[0], { type: "literal", value: true }]}
+        return { type: "op", op: "=", exprs: [lhsExpr, { type: "literal", value: true }]}
       when '= false'
-        return { type: "op", op: "=", exprs: [exprs[0], { type: "literal", value: false }]}
+        return { type: "op", op: "=", exprs: [lhsExpr, { type: "literal", value: false }]}
       when '= any'
         return { type: "op", op: "=", modifier: "any", exprs: exprs }
+      when 'between'
+        return { type: "op", op: "between", exprs: [lhsExpr, { type: "literal", value: expr.rhs.value[0] }, { type: "literal", value: expr.rhs.value[1] }] }
       else
         return { 
           type: "op"

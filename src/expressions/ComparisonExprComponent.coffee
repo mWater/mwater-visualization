@@ -5,6 +5,7 @@ literalComponents = require './literalComponents'
 ExpressionBuilder = require './ExpressionBuilder'
 EditableLinkComponent = require './../EditableLinkComponent'
 TextArrayComponent = require './TextArrayComponent'
+DateRangeComponent = require './DateRangeComponent'
 
 module.exports = class ComparisonExprComponent extends React.Component
   @propTypes: 
@@ -34,6 +35,7 @@ module.exports = class ComparisonExprComponent extends React.Component
       table: @props.table
       value: @props.value.lhs
       onChange: @handleLhsChange
+      preventRemove: true
       editorTitle: "Filter By"
       editorInitiallyOpen: not @props.value.lhs  # Open editor if no value
       )
@@ -44,8 +46,16 @@ module.exports = class ComparisonExprComponent extends React.Component
       ops = exprBuilder.getComparisonOps(lhsType)
       currentOp = _.findWhere(ops, id: @props.value.op)
 
-      # Hide if "is one of" # TODO
-      if not currentOp or currentOp.id != "= any"
+      # Hide if "is one of" for enum and text
+      # Hide "between" for date and datetime
+      hideOp = false
+      if currentOp
+        if currentOp.id == "= any" and lhsType in ['enum', 'text']
+          hideOp = true
+        if currentOp.id == "between" and lhsType in ['date', 'datetime']
+          hideOp = true
+
+      if not hideOp
         opControl = React.createElement(EditableLinkComponent, 
           dropdownItems: ops
           onDropdownItemClicked: @handleOpChange
@@ -84,6 +94,18 @@ module.exports = class ComparisonExprComponent extends React.Component
             expr: @props.value.lhs
             schema: @props.schema
             dataSource: @props.dataSource
+            onChange: @handleRhsChange)
+        when "daterange"
+          rhsControl = React.createElement(DateRangeComponent, 
+            key: "rhs"
+            datetime: false
+            value: @props.value.rhs
+            onChange: @handleRhsChange)
+        when "datetimerange"
+          rhsControl = React.createElement(DateRangeComponent, 
+            key: "rhs"
+            datetime: true
+            value: @props.value.rhs
             onChange: @handleRhsChange)
 
     return H.div null,

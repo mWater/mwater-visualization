@@ -24,6 +24,8 @@ module.exports = class ScalarExprComponent extends React.Component
     value: React.PropTypes.object # Current value of expression
     onChange: React.PropTypes.func.isRequired # Called when changes
 
+    preventRemove: React.PropTypes.bool # True to prevent removal/clearing of value
+
     editorInitiallyOpen: React.PropTypes.bool # True to open editor as soon as created
 
   constructor: (props) ->
@@ -70,7 +72,7 @@ module.exports = class ScalarExprComponent extends React.Component
 
     # Simple click if no named expressions
     linkProps = {
-      onRemove: if @props.value then @handleRemove
+      onRemove: if @props.value and not @props.preventRemove then @handleRemove
     }
 
     if namedExprs.length == 0

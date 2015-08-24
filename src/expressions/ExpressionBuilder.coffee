@@ -267,6 +267,7 @@ module.exports = class ExpressionBuilder
         ops.push({ id: "=", name: "is" })
         ops.push({ id: "~*", name: "matches" })
       when "date", "datetime"
+        ops.push({ id: "between", name: "between" })
         ops.push({ id: ">", name: "after" })
         ops.push({ id: "<", name: "before" })
       when "enum"
@@ -293,6 +294,14 @@ module.exports = class ExpressionBuilder
         return "text[]"
       else
         throw new Error("Invalid lhs type for op = any")
+
+    if op == "between"
+      if lhsType == "date"
+        return 'daterange'
+      if lhsType == "datetime"
+        return 'datetimerange'
+      else
+        throw new Error("Invalid lhs type for op between")
 
     return lhsType
 

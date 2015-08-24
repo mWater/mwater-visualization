@@ -24,9 +24,11 @@
     "lodash": "^3.1.0",
     "lru-cache": "^2.6.5",
     "markdown": "^0.5.0",
+    "moment": "^2.10.6",
     "mwater-forms": "git+https://github.com/mWater/mwater-forms.git",
     "node-uuid": "^1.4.3",
     "react": "^0.13.2",
+    "react-bootstrap-daterangepicker": "^0.3.0",
     "react-color": "git+https://github.com/rickyvetter/react-color.git#directory-caps",
     "react-dnd": "^1.1.1",
     "react-select": "^0.4.8"

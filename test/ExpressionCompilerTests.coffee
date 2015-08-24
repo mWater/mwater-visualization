@@ -236,6 +236,27 @@ describe "ExpressionCompiler", ->
 
       assert not jql
 
+    it "compiles daterange", ->
+      expr = { 
+        type: "comparison"
+        op: "between"
+        lhs: { type: "field", table: "t1", column: "integer" }
+        rhs: { type: "literal", valueType: "daterange", value: ["2014-01-01", "2014-12-31"] }
+      }
+
+      jql = @ec.compileExpr(expr: expr, tableAlias: "T1")
+
+      assert _.isEqual(jql, {
+        type: "op"
+        op: "between"
+        exprs: [
+          { type: "field", tableAlias: "T1", column: "integer" }
+          { type: "literal", value: "2014-01-01" }
+          { type: "literal", value: "2014-12-31" }
+        ]
+        }), JSON.stringify(jql, null, 2)
+
+
   describe "logicals", ->
     it "simplifies logical", ->
       expr1 = { type: "comparison", op: "= true", lhs: { type: "field", table: "t1", column: "integer" } }

@@ -61,10 +61,10 @@ module.exports = class LogicalExprComponent extends React.Component
   render: ->
     if @props.value
       childElems = _.map @props.value.exprs, (e, i) =>
-        H.div key: "#{i}",
+        H.div key: "#{i}", className: "hover-display-parent",
           H.button 
             type: "button", 
-            className: "btn btn-sm btn-link", 
+            className: "btn btn-sm btn-link hover-display-child", 
             style: { float: "right" },
             onClick: @handleRemove.bind(null, i),
               H.span(className: "glyphicon glyphicon-remove")

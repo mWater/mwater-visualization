@@ -1,5 +1,6 @@
 @import "react-select/dist/default.css";
 @import "leaflet/dist/leaflet.css";
+@import "react-bootstrap-daterangepicker/css/daterangepicker.css";
 
 /* http://stackoverflow.com/questions/19305821/multiple-modals-overlay */
 .modal { overflow-y: auto; }
@@ -59,6 +60,15 @@
 
 .mwater-visualization-simple-widget:hover .mwater-visualization-simple-widget-gear-button {
 	display: block;
+}
+
+/* Use these to make a child that displays only when parent is hovered */
+.hover-display-parent > .hover-display-child {
+	visibility: hidden;
+}
+
+.hover-display-parent:hover > .hover-display-child {
+	visibility: visible;
 }
 
 .c3-title {
