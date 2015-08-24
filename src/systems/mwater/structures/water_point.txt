@@ -8,9 +8,13 @@ mwa_scheme_type MWA scheme type
   location_accuracy Location Accuracy
   location_altitude Location Altitude
   admin_02_country Country
+  admin_04
+  admin_05
   admin_08_ethiopia_woreda Woreda
   admin_10_ethiopia_kebele Kebele
   photos Photos
+
+!entities.water_test.water_point
 
 +Technical attributes
   installation_date Date of installation

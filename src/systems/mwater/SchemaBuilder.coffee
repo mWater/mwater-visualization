@@ -2,6 +2,14 @@ Schema = require '../../Schema'
 fs = require 'fs'
 formUtils = require 'mwater-forms/lib/formUtils'
 
+# Make a plural form
+pluralize = (str) ->
+  if str.match(/s$/)
+    return str + "es"
+  if str.match(/y$/)
+    return str.substr(0, str.length - 1) + "ies"
+  return str + "s"
+
 # Builds a schema from properties and entity types
 module.exports = class SchemaBuilder 
   constructor: (schema) ->
@@ -18,7 +26,7 @@ module.exports = class SchemaBuilder
       tableId = "entities.#{entityType.code}"
       @schema.addTable({ 
         id: tableId
-        name: entityType.name.en
+        name: pluralize(entityType.name.en)
         ordering: "_created_on"
       })
 
@@ -59,7 +67,7 @@ module.exports = class SchemaBuilder
           # Add two joins (to and from)
           @schema.addColumn(tableId, { 
             id: "#{tableId}.#{prop.code}"
-            name: prop.name.en
+            name: pluralize(prop.name.en)
             type: "join"
             join: {
               fromTable: tableId
@@ -75,7 +83,7 @@ module.exports = class SchemaBuilder
             table: "entities." + prop.ref_entity_type
             column: {
               id: "!#{tableId}.#{prop.code}"
-              name: entityType.name.en
+              name: pluralize(entityType.name.en)
               type: "join"
               join: {
                 fromTable: "entities." + prop.ref_entity_type
@@ -150,14 +158,14 @@ module.exports = class SchemaBuilder
 
     # Add named expressions
     @schema.addNamedExpr("entities.water_point", {
-      id: "Water Point Type"
-      name: "Water Point Type"
+      id: "Water point type"
+      name: "Water point type"
       expr: { type: "field", table: "entities.water_point", column: "type" }
       })
 
     @schema.addNamedExpr("entities.water_point", {
-      id: "Functional Status"
-      name: "Functional Status"
+      id: "Functional status"
+      name: "Functional status"
       expr: { 
         type: "scalar"
         table: "entities.water_point"
@@ -166,6 +174,38 @@ module.exports = class SchemaBuilder
         expr: { type: "field", table: "source_notes", column: "status" }
       }
     })
+
+    @schema.addNamedExpr("entities.water_point", {
+      id: "Date of last water test"
+      name: "Date of last water test"
+      expr: { 
+        "type": "scalar",
+        "table": "entities.water_point",
+        "joins": [
+          "!entities.water_test.water_point"
+        ],
+        "expr": {
+          "type": "field",
+          "table": "entities.water_test",
+          "column": "_created_on"
+        },
+        "aggr": "last"
+      }
+    })
+
+    # TODO name of these admin levels?
+    @schema.addNamedExpr("entities.water_point", {
+      id: "State"
+      name: "State"
+      expr: { type: "field", table: "entities.water_point", column: "admin_04" }
+      })
+
+    # TODO name of these admin levels?
+    @schema.addNamedExpr("entities.water_point", {
+      id: "District"
+      name: "District"
+      expr: { type: "field", table: "entities.water_point", column: "admin_05" }
+      })
 
     # Set table structure for water points
     @schema.setTableStructure("entities.water_point", 
