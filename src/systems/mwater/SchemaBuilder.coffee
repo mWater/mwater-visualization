@@ -72,7 +72,7 @@ module.exports = class SchemaBuilder
           })
 
           reverseJoins.push({
-            table: tableId
+            table: "entities." + prop.ref_entity_type
             column: {
               id: "!#{tableId}.#{prop.code}"
               name: entityType.name.en
