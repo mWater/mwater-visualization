@@ -7,6 +7,7 @@ MapFiltersDesignerComponent = require './MapFiltersDesignerComponent'
 module.exports = class MapDesignerComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
+    dataSource: React.PropTypes.object.isRequired # Data source to use
     layerFactory: React.PropTypes.object.isRequired # Layer factory to use
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
@@ -17,27 +18,28 @@ module.exports = class MapDesignerComponent extends React.Component
         id: "layers"
         label: [H.span(className: "glyphicon glyphicon-align-justify"), " Layers"]
         elem: React.createElement(MapLayersDesignerComponent, 
-          schema: @props.schema,
-          design: @props.design, 
-          layerFactory: @props.layerFactory,
+          schema: @props.schema
+          design: @props.design
+          layerFactory: @props.layerFactory
           onDesignChange: @props.onDesignChange) 
       }
       { 
         id: "filters"
         label: [H.span(className: "glyphicon glyphicon-filter"), " Filters"]
         elem: React.createElement(MapFiltersDesignerComponent, 
-          schema: @props.schema,
-          design: @props.design, 
-          layerFactory: @props.layerFactory,
+          schema: @props.schema
+          dataSource: @props.dataSource
+          design: @props.design
+          layerFactory: @props.layerFactory
           onDesignChange: @props.onDesignChange) 
       }
       { 
         id: "config"
         label: [H.span(className: "glyphicon glyphicon-cog"), " Config"]
         elem: React.createElement(MapConfigDesignerComponent, 
-          schema: @props.schema,
-          design: @props.design, 
-          layerFactory: @props.layerFactory,
+          schema: @props.schema
+          design: @props.design
+          layerFactory: @props.layerFactory
           onDesignChange: @props.onDesignChange) 
       }
     ]

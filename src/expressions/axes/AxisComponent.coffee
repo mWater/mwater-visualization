@@ -9,6 +9,7 @@ module.exports = class AxisComponent extends React.Component
   @propTypes:
     editorTitle: React.PropTypes.any.isRequired # Title for display and popups
     schema: React.PropTypes.object.isRequired # schema to use
+    dataSource: React.PropTypes.object.isRequired
 
     table: React.PropTypes.string # Limits table to this table
     types: React.PropTypes.array # Optional types to limit to
@@ -51,6 +52,7 @@ module.exports = class AxisComponent extends React.Component
       React.createElement(ScalarExprComponent, 
         editorTitle: @props.editorTitle
         schema: @props.schema
+        dataSource: @props.dataSource
         table: @props.table
         types: @props.types # TODO take into account aggregation
         onChange: @handleExprChange

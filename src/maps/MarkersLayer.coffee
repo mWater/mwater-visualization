@@ -21,12 +21,13 @@ axes:
   color: color axis (to split into series based on a color)
 ###
 module.exports = class MarkersLayer extends Layer
-  # Pass design, client, apiUrl, schema
+  # Pass design, client, apiUrl, schema, dataSource
   constructor: (options) ->
     @design = options.design
     @client = options.client
     @apiUrl = options.apiUrl
     @schema = options.schema
+    @dataSource = options.dataSource
 
   getTileUrl: (filters) -> 
     # Check if valid
@@ -191,6 +192,7 @@ module.exports = class MarkersLayer extends Layer
     # Clean on way in and out
     React.createElement(MarkersLayerDesignerComponent,
       schema: @schema
+      dataSource: @dataSource
       design: @cleanDesign(@design)
       onDesignChange: (design) =>
         options.onDesignChange(@cleanDesign(design)))

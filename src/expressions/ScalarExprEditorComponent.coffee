@@ -9,6 +9,7 @@ EditableLinkComponent = require '../EditableLinkComponent'
 module.exports = class ScalarExprEditorComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired
+    dataSource: React.PropTypes.object.isRequired
     value: React.PropTypes.object
     table: React.PropTypes.string # Optional table to restrict selections to (can still follow joins to other tables)
     types: React.PropTypes.array # Optional types to limit to
@@ -76,8 +77,9 @@ module.exports = class ScalarExprEditorComponent extends React.Component
         H.br()
         H.label null, "Filter Aggregation"
         React.createElement(LogicalExprComponent, 
-          schema: @props.schema, 
-          table: whereTable,
+          schema: @props.schema
+          dataSource: @props.dataSource
+          table: whereTable
           value: @props.value.where
           onChange: @handleWhereChange
           )

@@ -9,6 +9,12 @@ PopoverComponent = require './../../PopoverComponent'
 ScalarExprComponent = require './../../expressions/ScalarExprComponent'
 
 module.exports = class TableChartDesignerComponent extends React.Component
+  @propTypes:
+    design: React.PropTypes.object.isRequired
+    schema: React.PropTypes.object.isRequired
+    dataSource: React.PropTypes.object.isRequired
+    onDesignChange: React.PropTypes.func.isRequired
+
   # Updates design with the specified changes
   updateDesign: (changes) ->
     design = _.extend({}, @props.design, changes)
@@ -68,6 +74,7 @@ module.exports = class TableChartDesignerComponent extends React.Component
       React.createElement(TableChartColumnDesignerComponent, {
         design: @props.design
         schema: @props.schema
+        dataSource: @props.dataSource
         index: index
         onChange: @handleColumnChange.bind(null, index)
         onRemove: @handleRemoveColumn.bind(null, index)
@@ -94,6 +101,7 @@ class TableChartColumnDesignerComponent extends React.Component
   @propTypes: 
     design: React.PropTypes.object.isRequired
     schema: React.PropTypes.object.isRequired
+    dataSource: React.PropTypes.object.isRequired
     index: React.PropTypes.number.isRequired
     onChange: React.PropTypes.func.isRequired
     onRemove: React.PropTypes.func.isRequired
@@ -127,6 +135,7 @@ class TableChartColumnDesignerComponent extends React.Component
       React.createElement(ScalarExprComponent, 
         editorTitle: title
         schema: @props.schema 
+        dataSource: @props.dataSource
         table: @props.design.table
         value: column.textAxis.expr
         includeCount: true # Can include simple counts

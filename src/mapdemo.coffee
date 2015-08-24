@@ -17,6 +17,7 @@ class MapDemoComponent extends React.Component
       widgetFactory = new visualization.WidgetFactory(schema, dataSource)
       layerFactory = new visualization.LayerFactory({
         schema: schema
+        dataSource: dataSource
         apiUrl: @props.apiUrl
         client: @props.client
         newLayers: newLayers
@@ -38,6 +39,7 @@ class MapDemoComponent extends React.Component
       React.createElement(visualization.MapComponent, {
         layerFactory: @state.layerFactory
         schema: @state.schema
+        dataSource: @state.dataSource
         design: @state.design
         onDesignChange: @handleDesignChange
         })
@@ -92,5 +94,6 @@ design = {
 
 
 $ ->
-  sample = React.createElement(MapDemoComponent, initialDesign: design, apiUrl: "http://localhost:1234/v3/")
+  # sample = React.createElement(MapDemoComponent, initialDesign: design, apiUrl: "http://localhost:1234/v3/")
+  sample = React.createElement(MapDemoComponent, initialDesign: design, apiUrl: "https://api.mwater.co/v3/")
   React.render(sample, document.body)

@@ -43,7 +43,7 @@ Column of the database
 ### Literal expressions
 
 `type`: "literal"
-`valueType`: "text", "integer", "decimal", "boolean", "enum", "date", "enum[]"
+`valueType`: "text", "integer", "decimal", "boolean", "enum", "date", "enum[]", "text[]"
 `value`: value of literal. date is ISO 8601 YYYY-MM-DD
 
 ## Count expressions

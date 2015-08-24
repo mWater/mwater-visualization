@@ -14,11 +14,11 @@ module.exports = class WidgetFactory
     switch type
       when "LayeredChart"
         # Create chart object
-        chart = new LayeredChart(schema: @schema)  
+        chart = new LayeredChart(schema: @schema, dataSource: @dataSource)  
         return new ChartWidget(chart, design, @dataSource)
       when "TableChart"
         # Create chart object
-        chart = new TableChart(schema: @schema)  
+        chart = new TableChart(schema: @schema, dataSource: @dataSource)  
         return new ChartWidget(chart, design, @dataSource)
       when "Markdown"
         return new MarkdownWidget(design)

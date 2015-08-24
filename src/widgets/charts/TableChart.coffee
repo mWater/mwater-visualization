@@ -26,8 +26,10 @@ column:
 module.exports = class TableChart extends Chart
   # Options include
   #  schema: schema to use
+  #  dataSource: data source to use
   constructor: (options) ->
     @schema = options.schema
+    @dataSource = options.dataSource
     @exprBuilder = new ExpressionBuilder(@schema)
     @axisBuilder = new AxisBuilder(schema: @schema)
 

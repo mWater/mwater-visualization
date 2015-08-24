@@ -10,6 +10,7 @@ module.exports = class MapComponent extends React.Component
   @propTypes:
     layerFactory: React.PropTypes.object.isRequired
     schema: React.PropTypes.object.isRequired
+    dataSource: React.PropTypes.object.isRequired # Data source to use
 
     design: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func.isRequired
@@ -26,7 +27,8 @@ module.exports = class MapComponent extends React.Component
         )
       H.div style: { position: "absolute", left: "70%", width: "30%", height: "100%", borderLeft: "solid 3px #AAA" }, 
         React.createElement(MapDesignerComponent, 
-          schema: @props.schema, 
+          schema: @props.schema
+          dataSource: @props.dataSource
           design: @props.design, 
           onDesignChange: @props.onDesignChange
           layerFactory: @props.layerFactory)

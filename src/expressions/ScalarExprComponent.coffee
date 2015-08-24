@@ -10,6 +10,7 @@ EditableLinkComponent = require './../EditableLinkComponent'
 module.exports = class ScalarExprComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired
+    dataSource: React.PropTypes.object.isRequired
 
     table: React.PropTypes.string # Optional table to restrict selections to (can still follow joins to other tables)
     types: React.PropTypes.array # Optional types to limit to
@@ -96,6 +97,7 @@ module.exports = class ScalarExprComponent extends React.Component
           },
             React.createElement(ScalarExprEditorComponent, 
               schema: @props.schema
+              dataSource: @props.dataSource
               table: @props.table 
               types: @props.types
               includeCount: @props.includeCount

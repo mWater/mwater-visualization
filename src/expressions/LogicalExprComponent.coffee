@@ -10,6 +10,7 @@ module.exports = class LogicalExprComponent extends React.Component
     value: React.PropTypes.object
     onChange: React.PropTypes.func.isRequired 
     schema: React.PropTypes.object.isRequired
+    dataSource: React.PropTypes.object.isRequired
     table: React.PropTypes.string.isRequired 
 
   handleExprChange: (i, expr) =>
@@ -68,9 +69,10 @@ module.exports = class LogicalExprComponent extends React.Component
             onClick: @handleRemove.bind(null, i),
               H.span(className: "glyphicon glyphicon-remove")
           React.createElement(ComparisonExprComponent, 
-            value: e, 
-            schema: @props.schema, 
-            table: @props.table, 
+            value: e
+            schema: @props.schema
+            dataSource: @props.dataSource
+            table: @props.table
             onChange: @handleExprChange.bind(null, i))
  
     # Render all expressions (comparisons for now)

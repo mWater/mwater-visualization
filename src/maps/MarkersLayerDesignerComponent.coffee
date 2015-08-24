@@ -11,6 +11,7 @@ ColorPicker = require('react-color')
 module.exports = class MarkersLayerDesignerComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
+    dataSource: React.PropTypes.object.isRequired
     design: React.PropTypes.object.isRequired  # Design of the marker layer
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
 
@@ -56,6 +57,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
         React.createElement(AxisComponent, 
           editorTitle: title
           schema: @props.schema
+          dataSource: @props.dataSource
           table: @props.design.table
           types: ["geometry"]
           aggrNeed: "none"
@@ -81,6 +83,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
       H.div style: { marginLeft: 8 }, 
         React.createElement(LogicalExprComponent, 
           schema: @props.schema
+          dataSource: @props.dataSource
           onChange: @handleFilterChange
           table: @props.design.table
           value: @props.design.filter)

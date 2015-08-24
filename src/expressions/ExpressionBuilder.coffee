@@ -258,6 +258,8 @@ module.exports = class ExpressionBuilder
         ops.push({ id: "<", name: "is less than" })
         ops.push({ id: "<=", name: "is less than or equal to" })
       when "text"
+        ops.push({ id: "= any", name: "is one of" })
+        ops.push({ id: "=", name: "is" })
         ops.push({ id: "~*", name: "matches" })
       when "date", "datetime"
         ops.push({ id: ">", name: "after" })
@@ -280,7 +282,12 @@ module.exports = class ExpressionBuilder
       return null
 
     if op in ['= any']
-      return 'enum[]'
+      if lhsType == "enum"
+        return 'enum[]'
+      else if lhsType == "text"
+        return "text[]"
+      else
+        throw new Error("Invalid lhs type for op = any")
 
     return lhsType
 

@@ -7,6 +7,7 @@ ExpressionBuilder = require '../expressions/ExpressionBuilder'
 module.exports = class MapFiltersDesignerComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
+    dataSource: React.PropTypes.object.isRequired # Data source to use
     layerFactory: React.PropTypes.object.isRequired # layer factory to use
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
@@ -29,6 +30,7 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
       H.h4 null, name
       React.createElement(LogicalExprComponent, 
         schema: @props.schema
+        dataSource: @props.dataSource
         onChange: @handleFilterChange.bind(null, table)
         table: table
         value: @props.design.filters[table])
@@ -45,4 +47,3 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
 
     H.div style: { margin: 5 }, 
       _.map(filterableTables, @renderFilterableTable)
-

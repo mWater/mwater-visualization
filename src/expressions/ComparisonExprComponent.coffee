@@ -4,12 +4,14 @@ ScalarExprComponent = require './ScalarExprComponent'
 literalComponents = require './literalComponents'
 ExpressionBuilder = require './ExpressionBuilder'
 EditableLinkComponent = require './../EditableLinkComponent'
+TextArrayComponent = require './TextArrayComponent'
 
 module.exports = class ComparisonExprComponent extends React.Component
   @propTypes: 
     value: React.PropTypes.object.isRequired
     onChange: React.PropTypes.func.isRequired 
     schema: React.PropTypes.object.isRequired
+    dataSource: React.PropTypes.object.isRequired
     table: React.PropTypes.string.isRequired 
   
   handleLhsChange: (lhs) =>
@@ -28,6 +30,7 @@ module.exports = class ComparisonExprComponent extends React.Component
     lhsControl = React.createElement(ScalarExprComponent, 
       key: "lhs"
       schema: @props.schema
+      dataSource: @props.dataSource
       table: @props.table
       value: @props.value.lhs
       onChange: @handleLhsChange
@@ -71,6 +74,14 @@ module.exports = class ComparisonExprComponent extends React.Component
             key: "rhs", 
             value: @props.value.rhs, 
             enumValues: exprBuilder.getExprValues(@props.value.lhs)
+            onChange: @handleRhsChange)
+        when "text[]"
+          rhsControl = React.createElement(TextArrayComponent, 
+            key: "rhs"
+            value: @props.value.rhs
+            expr: @props.value.lhs
+            schema: @props.schema
+            dataSource: @props.dataSource
             onChange: @handleRhsChange)
 
     return H.div null,

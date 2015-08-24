@@ -39,8 +39,11 @@ axis:
 
 ###
 module.exports = class LayeredChart extends Chart
+  # Pass in schema and dataSource
   constructor: (options) ->
     @schema = options.schema
+    @dataSource = options.dataSource
+
     @exprBuilder = new ExpressionBuilder(@schema)
     @axisBuilder = new AxisBuilder(schema: @schema)
 
@@ -113,6 +116,7 @@ module.exports = class LayeredChart extends Chart
   createDesignerElement: (options) ->
     props = {
       schema: @schema
+      dataSource: @dataSource
       design: @cleanDesign(options.design)
       onDesignChange: (design) =>
         # Clean design
