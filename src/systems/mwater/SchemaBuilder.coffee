@@ -630,7 +630,7 @@ module.exports = class SchemaBuilder
                 ]
               }
               toTable: "entities.#{item.entityType}"
-              toColumn: "_id"
+              toColumn: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "{alias}", column: "_id" }] }
               op: "="
               multiple: true
             }

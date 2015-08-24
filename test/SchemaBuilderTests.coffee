@@ -368,12 +368,12 @@ describe "SchemaBuilder", ->
           { 
             id: "data:questionid:value" 
             type: "join"
-            # data#>>'{questionid,value}'
+            # data#>>'{questionid,value} = entities.water_point._id::text'
             join: {
               fromTable: "responses"
               fromColumn: { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{questionid,value}"] }
               toTable: "entities.water_point"
-              toColumn: "_id"
+              toColumn: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "{alias}", column: "_id" }] }
               op: "="
               multiple: true
             }
