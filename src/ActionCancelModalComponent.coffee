@@ -1,8 +1,9 @@
 React = require 'react'
 H = React.DOM
+_ = require 'lodash'
 
-# Child must be react element with value and onChange props
-module.exports = class ActionCancelModalComponent extends React.Component
+# Modal with action and cancel buttons
+module.exports = class ActionCancelModalComponent
   @propTypes: 
     title: React.PropTypes.node # Title of modal. Any react element
     actionLabel: React.PropTypes.string # Action button. Defaults to "Save"
@@ -11,14 +12,40 @@ module.exports = class ActionCancelModalComponent extends React.Component
     size: React.PropTypes.string # "large" for large
 
   componentDidMount: ->
-    $(React.findDOMNode(@refs.modal)).modal({ 
-      show: true, 
-      backdrop: "static", 
-      keyboard: false 
-      })
+    # Add special region to body
+    @modalNode = $('<div></div>').get(0)
+    $("body").append(@modalNode)
+
+    elem = React.createElement(ActionCancelModalComponentContent, @props)
+    React.render(elem, @modalNode)
+
+    _.defer () =>
+      $(@modalNode).children().modal({ 
+        show: true, 
+        backdrop: "static", 
+        keyboard: false 
+        })
+
+  componentDidUpdate: (prevProps) ->
+    elem = React.createElement(ActionCancelModalComponentContent, @props)
+    React.render(elem, @modalNode)
 
   componentWillUnmount: ->
-    $(React.findDOMNode(@refs.modal)).modal("hide")    
+    $(@modalNode).children().modal("hide")
+    React.unmountComponentAtNode(@modalNode)
+    $(@modalNode).remove()
+
+  render: ->
+    H.div null
+
+# Content must be rendered at body level to prevent weird behaviour, so this is the inner component
+class ActionCancelModalComponentContent extends React.Component
+  @propTypes: 
+    title: React.PropTypes.node # Title of modal. Any react element
+    actionLabel: React.PropTypes.string # Action button. Defaults to "Save"
+    onAction: React.PropTypes.func # Called when action button is clicked
+    onCancel: React.PropTypes.func # Called when cancel is clicked
+    size: React.PropTypes.string # "large" for large
 
   render: ->
     dialogExtraClass = ""
