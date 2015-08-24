@@ -58,16 +58,26 @@ module.exports = class LogicalExprComponent extends React.Component
         H.li key: "_advanced",
           H.a onClick: @handleAdd.bind(null, null), "Advanced..."
 
+  renderDropdownItem: (icon, label, onClick) ->
+    return H.li key: label,
+      H.a onClick: onClick, 
+        if icon then H.span(className: "glyphicon glyphicon-#{icon} text-muted")
+        if icon then " "
+        label
+
+  renderGearMenu: (i) ->
+    return H.div style: { float: "right", position: "relative" }, className: "hover-display-child",
+      H.div "data-toggle": "dropdown", 
+        H.div style: { color: "#337ab7" },
+          H.span className: "glyphicon glyphicon-cog"
+      H.ul className: "dropdown-menu dropdown-menu-right", 
+        @renderDropdownItem("remove", "Remove", @handleRemove.bind(null, i))
+
   render: ->
     if @props.value
       childElems = _.map @props.value.exprs, (e, i) =>
         H.div key: "#{i}", className: "hover-display-parent",
-          H.button 
-            type: "button", 
-            className: "btn btn-sm btn-link hover-display-child", 
-            style: { float: "right" },
-            onClick: @handleRemove.bind(null, i),
-              H.span(className: "glyphicon glyphicon-remove")
+          @renderGearMenu(i)
           React.createElement(ComparisonExprComponent, 
             value: e
             schema: @props.schema
