@@ -33,13 +33,6 @@ module.exports = class ChartWidget extends Widget
       onDesignChange: options.onDesignChange
     )
 
-  # Creates a React element that is a designer for the widget
-  # options:
-  #  onDesignChange: called with new design if changed
-  createDesignerElement: (options) ->
-    # TODO REMOVE
-    return null
-
 # Complete chart widget
 class ChartWidgetComponent extends React.Component
   @propTypes:
@@ -51,7 +44,7 @@ class ChartWidgetComponent extends React.Component
     onRemove: React.PropTypes.func
 
     width: React.PropTypes.number
-    handleight: React.PropTypes.number
+    height: React.PropTypes.number
 
     scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
@@ -87,7 +80,7 @@ class ChartWidgetComponent extends React.Component
   render: ->
     # Create dropdown items
     dropdownItems = @props.chart.createDropdownItems(@props.design, @props.dataSource, @props.filters)
-    dropdownItems.push({ label: "Export Data", icon: "save-file", @handleSaveCsvFile })
+    dropdownItems.push({ label: "Export Data", icon: "save-file", onClick: @handleSaveCsvFile })
     dropdownItems.push({ label: "Remove", icon: "remove", onClick: @props.onRemove })
     dropdownItems.unshift({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
 

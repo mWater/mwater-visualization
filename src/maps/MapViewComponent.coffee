@@ -10,17 +10,21 @@ module.exports = class MapViewComponent extends React.Component
     layerFactory: React.PropTypes.object.isRequired
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
+    extraFilters: React.PropTypes.arrayOf(React.PropTypes.shape({
+      table: React.PropTypes.string.isRequired
+      jsonql: React.PropTypes.object.isRequired
+      })) # Extra filters to apply to view
 
   handleBoundsChange: (bounds) =>
     design = _.extend({}, @props.design, bounds: bounds)
     @props.onDesignChange(design)
 
-  shouldComponentUpdate: (prevProps) ->
-    # Don't update if only initial bounds changed
-    if _.isEqual(_.omit(@props.design, "bounds"), _.omit(prevProps.design, "bounds"))
-      return false
+  # shouldComponentUpdate: (prevProps) ->
+  #   # Don't update if only initial bounds changed
+  #   if _.isEqual(_.omit(@props.design, "bounds"), _.omit(prevProps.design, "bounds"))
+  #     return false
 
-    return true
+  #   return true
 
   renderLegend: (layers) ->
     legendItems = _.compact(
@@ -60,6 +64,10 @@ module.exports = class MapViewComponent extends React.Component
       table = exprBuilder.getExprTable(expr)
       jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
       return { table: table, jsonql: jsonql }
+
+    # Add extra filters
+    if @props.extraFilters
+      compiledFilters = compiledFilters.concat(@props.extraFilters)
 
     # Create layers
     layers = _.map @props.design.layerViews, (layerView) =>

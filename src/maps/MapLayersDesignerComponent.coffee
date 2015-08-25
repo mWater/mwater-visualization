@@ -8,7 +8,6 @@ module.exports = class MapLayersDesignerComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
-    schema: React.PropTypes.object.isRequired # Schema to use
     layerFactory: React.PropTypes.object.isRequired # Layer factory to use
 
   # Updates design with the specified changes
@@ -69,7 +68,6 @@ module.exports = class MapLayersDesignerComponent extends React.Component
         layerView: layerView
         onLayerViewChange: (lv) => @handleLayerViewChange(index, lv)
         onRemove: => @handleRemoveLayerView(index)
-        schema: @props.schema
         layerFactory: @props.layerFactory
       )
 
@@ -86,7 +84,6 @@ class MapLayerViewDesignerComponent extends React.Component
     layerView: React.PropTypes.object.isRequired  # See Map Design.md
     onLayerViewChange: React.PropTypes.func.isRequired # Called with new layer view
     onRemove: React.PropTypes.func.isRequired # Called to remove
-    schema: React.PropTypes.object.isRequired # Schema to use
     layerFactory: React.PropTypes.object.isRequired # Layer factory to use
 
   constructor: ->

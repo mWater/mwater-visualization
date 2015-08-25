@@ -14,7 +14,7 @@ class MapDemoComponent extends React.Component
         throw err
         
       dataSource = visualization_mwater.createDataSource(@props.apiUrl, @props.client)
-      widgetFactory = new visualization.WidgetFactory(schema, dataSource)
+      widgetFactory = new visualization.WidgetFactory(schema: schema, dataSource: dataSource)
       layerFactory = new visualization.LayerFactory({
         schema: schema
         dataSource: dataSource

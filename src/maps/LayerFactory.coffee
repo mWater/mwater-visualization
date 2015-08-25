@@ -20,10 +20,10 @@ module.exports = class LayerFactory
   createLayer: (type, design) ->
     switch type
       when "MWaterServer"
-        return new MWaterServerLayer(design: design, client: @client, apiUrl: @apiUrl, onMarkerClick: @onMarkerClick)
+        return new MWaterServerLayer(design: design, dataSource: @dataSource, client: @client, apiUrl: @apiUrl, onMarkerClick: @onMarkerClick)
 
       when "Markers"
-        return new MarkersLayer(design: design, client: @client, apiUrl: @apiUrl, schema: @schema)
+        return new MarkersLayer(design: design, client: @client, apiUrl: @apiUrl, schema: @schema, dataSource: @dataSource)
 
     throw new Error("Unknown type #{type}")
 

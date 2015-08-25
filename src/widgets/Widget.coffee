@@ -16,9 +16,3 @@ module.exports = class Widget
   #  connectResizeHandle: Connects resize handle for dragging (see WidgetContainerComponent)
   createViewElement: (options) ->
     throw new Error("Not implemented")
-
-  # Creates a React element that is a designer for the widget
-  # options:
-  #  onDesignChange: called with new design if changed
-  createDesignerElement: (options) ->
-    throw new Error("Not implemented")

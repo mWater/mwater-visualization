@@ -70,6 +70,10 @@ module.exports = class ScalarExprComponent extends React.Component
     # Get named expressions
     namedExprs = @props.schema.getNamedExprs(@props.table)
 
+    # Filter by type
+    if @props.types
+      namedExprs = _.filter(namedExprs, (ne) => exprBuilder.getExprType(ne.expr) in @props.types)
+
     # Simple click if no named expressions
     linkProps = {
       onRemove: if @props.value and not @props.preventRemove then @handleRemove

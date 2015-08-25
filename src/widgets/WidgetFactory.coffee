@@ -6,9 +6,11 @@ MapWidget = require './MapWidget'
 
 # Creates widgets based on type and design 
 module.exports = class WidgetFactory
-  constructor: (schema, dataSource) ->
-    @schema = schema
-    @dataSource = dataSource
+  # Pass in schema, dataSource, and layerFactory
+  constructor: (options) ->
+    @schema = options.schema
+    @dataSource = options.dataSource
+    @layerFactory = options.layerFactory
 
   createWidget: (type, design) ->
     switch type
@@ -23,7 +25,7 @@ module.exports = class WidgetFactory
       when "Markdown"
         return new MarkdownWidget(design)
       when "Map"
-        return new MapWidget(design)
+        return new MapWidget(design: design, schema: @schema, dataSource: @dataSource, layerFactory: @layerFactory)
       else    
         throw new Error("Unknown widget type #{type}")
 
@@ -34,5 +36,5 @@ module.exports = class WidgetFactory
       { name: "Chart", type: "LayeredChart", design: {} }
       { name: "Table", type: "TableChart", design: {} }
       { name: "Text", type: "Markdown", design: {} }
-      # { name: "Map", type: "Map", design: {} }
+      { name: "Map", type: "Map", design: { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } } }
     ]

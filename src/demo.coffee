@@ -16,9 +16,20 @@ class DashboardPane extends React.Component
         throw err
         
       dataSource = visualization_mwater.createDataSource(@props.apiUrl, @props.client)
-      widgetFactory = new visualization.WidgetFactory(schema, dataSource)
+ 
 
-      @setState(widgetFactory: widgetFactory)
+      layerFactory = new visualization.LayerFactory({
+        schema: schema
+        dataSource: dataSource
+        apiUrl: @props.apiUrl
+        client: @props.client
+        newLayers: [{ name: "Custom Layer", type: "Markers", design: {} }]
+        onMarkerClick: (table, id) => alert("#{table}:#{id}")
+      })
+
+      widgetFactory = new visualization.WidgetFactory(schema: schema, dataSource: dataSource, layerFactory: layerFactory)
+ 
+      @setState(schema: schema, widgetFactory: widgetFactory, dataSource: dataSource, layerFactory: layerFactory)
 
   handleDesignChange: (design) =>
     @setState(design: design)
