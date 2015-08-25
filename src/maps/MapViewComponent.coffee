@@ -19,13 +19,6 @@ module.exports = class MapViewComponent extends React.Component
     design = _.extend({}, @props.design, bounds: bounds)
     @props.onDesignChange(design)
 
-  # shouldComponentUpdate: (prevProps) ->
-  #   # Don't update if only initial bounds changed
-  #   if _.isEqual(_.omit(@props.design, "bounds"), _.omit(prevProps.design, "bounds"))
-  #     return false
-
-  #   return true
-
   renderLegend: (layers) ->
     legendItems = _.compact(
       _.map(layers, (layer, i) => 
