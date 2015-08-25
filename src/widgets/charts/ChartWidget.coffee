@@ -46,6 +46,7 @@ class ChartWidgetComponent extends React.Component
   @propTypes:
     chart: React.PropTypes.object.isRequired # Chart object to use
     design: React.PropTypes.object.isRequired # Design of chart
+    onDesignChange: React.PropTypes.func.isRequired 
     dataSource: React.PropTypes.object.isRequired # Data source to use for chart
 
     onRemove: React.PropTypes.func
@@ -62,8 +63,8 @@ class ChartWidgetComponent extends React.Component
 
   constructor: ->
     super
-    # editingDesign is not null if editing
-    @state = { editingDesign: null }
+    # editorInitialBounds is not null if editing
+    @state = { editorInitialBounds: null }
 
   # Saves a csv file to disk
   handleSaveCsvFile: ->
@@ -86,35 +87,38 @@ class ChartWidgetComponent extends React.Component
       filesaver(blob, "Exported Data.csv")
     )
 
-  handleSaveEditing: =>
-    @props.onDesignChange(@state.editingDesign)
-    @setState(editingDesign: null)
+  handleCancelEditing: => @setState(editorInitialBounds: null)
+  handleStartEditing: => 
+    # Determine initial bounds 
+    myElem = React.findDOMNode(this)
 
-  handleCancelEditing: => @setState(editingDesign: null)
-  handleStartEditing: => @setState(editingDesign: @props.design)
+    # Get x and y of right of widget
+    width = 500
+    height = 600
+    editorInitialBounds = { x: myElem.offsetLeft + myElem.offsetWidth - 5, y: myElem.offsetTop + 5, width: width, height: height }
+
+    # Get space to right of widget
+    spaceRight = document.body.clientWidth - myElem.getBoundingClientRect().right
+
+    # Move back from edge
+    if spaceRight < width
+      editorInitialBounds.x -= width - spaceRight
+
+    @setState(editorInitialBounds: editorInitialBounds)
+
   handleEditingChange: (design) =>  @setState(editingDesign: design)
 
   renderEditor: ->
-    if not @state.editingDesign?
+    if not @state.editorInitialBounds?
       return
-
-    # return React.createElement(ActionCancelModalComponent,
-    #   title: "Edit Chart"
-    #   onAction: @handleSaveEditing
-    #   onCancel: @handleCancelEditing,
-    #     @props.chart.createDesignerElement(
-    #       design: @state.editingDesign
-    #       onDesignChange: @handleEditingChange)
-    # )
 
     return React.createElement(FloatingWindowComponent,
       title: "Edit Chart"
-      nextToElem: React.findDOMNode(this)
-      onAction: @handleSaveEditing
-      onCancel: @handleCancelEditing,
+      initialBounds: @state.editorInitialBounds
+      onClose: @handleCancelEditing,
         @props.chart.createDesignerElement(
-          design: @state.editingDesign
-          onDesignChange: @handleEditingChange)
+          design: @props.design
+          onDesignChange: @props.onDesignChange)
     )
 
   render: ->
@@ -127,7 +131,7 @@ class ChartWidgetComponent extends React.Component
     # Wrap in a simple widget
     return H.div onDoubleClick: @handleStartEditing, 
       React.createElement(SimpleWidgetComponent,
-        highlighted: @state.editingDesign?
+        highlighted: @state.editorInitialBounds?
         width: @props.width
         height: @props.height
         dropdownItems: dropdownItems,
