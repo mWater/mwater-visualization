@@ -33,7 +33,7 @@ module.exports = class FloatingWindowComponent extends React.Component
       color: "#888"
     }
 
-    H.div style: headerStyle,
+    H.div style: headerStyle, className: "floating-window-header",
       if @props.onClose
         H.div style: closeStyle, onClick: @props.onClose,
           H.span className: "glyphicon glyphicon-remove"
@@ -59,7 +59,7 @@ module.exports = class FloatingWindowComponent extends React.Component
       height: @props.initialBounds.height - 35
     }
 
-    React.createElement(Draggable, ref: "draggable",
+    React.createElement(Draggable, ref: "draggable", handle: ".floating-window-header",
       H.div style: windowStyle,
         @renderHeader()
         H.div style: contentsStyle,
