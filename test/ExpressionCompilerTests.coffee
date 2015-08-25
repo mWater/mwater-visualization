@@ -240,7 +240,7 @@ describe "ExpressionCompiler", ->
       expr = { 
         type: "comparison"
         op: "between"
-        lhs: { type: "field", table: "t1", column: "integer" }
+        lhs: { type: "field", table: "t1", column: "date" }
         rhs: { type: "literal", valueType: "daterange", value: ["2014-01-01", "2014-12-31"] }
       }
 
@@ -250,7 +250,7 @@ describe "ExpressionCompiler", ->
         type: "op"
         op: "between"
         exprs: [
-          { type: "field", tableAlias: "T1", column: "integer" }
+          { type: "field", tableAlias: "T1", column: "date" }
           { type: "literal", value: "2014-01-01" }
           { type: "literal", value: "2014-12-31" }
         ]

@@ -26,6 +26,10 @@ module.exports = class AxisBuilder
     # Clean expression
     axis.expr = @exprBuilder.cleanExpr(axis.expr, table)
 
+    # Remove if null or no type
+    if not @exprBuilder.getExprType(axis.expr)
+      return
+
     # Clean aggr
     aggrs = @exprBuilder.getAggrs(axis.expr)
     # Remove latest, as it is tricky to group by. TODO
@@ -97,7 +101,7 @@ module.exports = class AxisBuilder
         # Return unique values
         return _.map(_.uniq(values), (v) -> { value: v, label: v })
 
-    throw new Error("Unsupported categories axis type")
+    return []
 
   getAxisType: (axis) ->
     if not axis

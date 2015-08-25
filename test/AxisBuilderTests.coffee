@@ -51,6 +51,24 @@ describe "AxisBuilder", ->
   describe "cleanAxis", ->
     it "defaults aggr"
     it "cleans expression"
+    it "nulls if no expression", ->
+      axis = {
+        expr: null
+        aggr: "sum"
+      }
+
+      axis = @ab.cleanAxis(axis, "t1")
+      assert not axis
+
+    it "nulls if expression has no type", ->
+      axis = {
+        expr: { type: "scalar", expr: null, joins: [] }
+        aggr: "sum"
+      }
+
+      axis = @ab.cleanAxis(axis, "t1")
+      assert not axis
+
     it "removes bad aggr"
     it "removes bad xform"
     it "defaults xform"
@@ -81,3 +99,7 @@ describe "AxisBuilder", ->
         { value: "b", label: "b" }
         { value: "c", label: "c" }
         ])
+
+    it "gets empty list for decimal", ->
+      categories = @ab.getCategories(@axisDecimal, [1.2, 1.4])
+      compare(categories, [])
