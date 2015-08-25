@@ -76,7 +76,7 @@ module.exports = class LogicalExprComponent extends React.Component
   render: ->
     if @props.value
       childElems = _.map @props.value.exprs, (e, i) =>
-        H.div key: "#{i}", className: "hover-display-parent",
+        H.div key: "#{i}", className: "hover-display-parent", style: { marginBottom: 20 },
           @renderGearMenu(i)
           React.createElement(ComparisonExprComponent, 
             value: e
