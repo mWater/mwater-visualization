@@ -38,7 +38,7 @@ module.exports = class MarkersLayer extends Layer
     # TODO clean/validate order??
     design = @cleanDesign(@design)
     
-    if @validateDesign(@design)
+    if @validateDesign(design)
       return null
 
     @createUrl("png", design, filters)

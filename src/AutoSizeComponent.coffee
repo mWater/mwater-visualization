@@ -30,19 +30,20 @@ module.exports = class AutoSizeComponent extends React.Component
     return @refs.child
 
   render: ->
-    if not @state.width? or not @state.height?
-      style = {}
-      if @props.injectWidth
-        style.width = "100%"
-      if @props.injectHeight
-        style.height = "100%"
-
-      return H.div(style: style)
-    else
+    innerElem = null
+    if @state.width? and @state.height?
       overrides = { ref: "child" }
       if @props.injectWidth
         overrides.width = @state.width
       if @props.injectHeight
         overrides.height = @state.height
 
-      return React.cloneElement(React.Children.only(@props.children), overrides)
+      innerElem = React.cloneElement(React.Children.only(@props.children), overrides)
+
+    style = {}
+    if @props.injectWidth
+      style.width = "100%"
+    if @props.injectHeight
+      style.height = "100%"
+
+    return H.div(style: style, innerElem)
