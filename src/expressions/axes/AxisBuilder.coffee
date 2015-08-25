@@ -113,6 +113,9 @@ module.exports = class AxisBuilder
 
   # Summarize axis as a string
   summarizeAxis: (axis) ->
+    if not axis
+      return "None"
+
     exprType = @exprBuilder.getExprType(axis.expr)
 
     # Add aggr if not a count type

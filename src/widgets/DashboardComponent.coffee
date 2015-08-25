@@ -60,7 +60,7 @@ module.exports = class DashboardComponent extends React.Component
 
   addWidget: (type, design, width, height) ->
     # Find place for new item
-    layout = @findOpenLayout(12, 12)
+    layout = @findOpenLayout(width, height)
 
     # Create item
     item = {
@@ -80,7 +80,7 @@ module.exports = class DashboardComponent extends React.Component
     @props.onDesignChange(design)
 
   handleAddWidget: (wt) =>
-    @addWidget(wt.type, wt.design, 12, 12)
+    @addWidget(wt.type, wt.design, 8, 8)
 
   renderAddWidget: ->
     H.div key: "add", className: "btn-group btn-xs",

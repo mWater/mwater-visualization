@@ -137,7 +137,7 @@ class TableChartColumnDesignerComponent extends React.Component
         schema: @props.schema 
         dataSource: @props.dataSource
         table: @props.design.table
-        value: column.textAxis.expr
+        value: if column.textAxis then column.textAxis.expr
         includeCount: true # Can include simple counts
         onChange: @handleExprChange)
 
@@ -162,8 +162,8 @@ class TableChartColumnDesignerComponent extends React.Component
     column = @props.design.columns[@props.index]
     exprBuilder = new ExpressionBuilder(@props.schema)
 
-    # Don't show if no expression or if has no type (count)
-    if not column.textAxis.expr or not exprBuilder.getExprType(column.textAxis.expr)
+    # Only render aggregate if has a real expr with a type that is not count
+    if not column.textAxis or exprBuilder.getExprType(column.textAxis.expr) == "count"
       return
 
     # Get aggregations

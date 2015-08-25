@@ -49,11 +49,11 @@ module.exports = class TableChart extends Chart
       column = design.columns[columnId]
 
       # Clean textAxis
-      column.textAxis = column.textAxis or {}
       column.textAxis = @axisBuilder.cleanAxis(column.textAxis, design.table, "optional")
 
     if design.filter
       design.filter = @exprBuilder.cleanExpr(design.filter, design.table)
+
     return design
 
   validateDesign: (design) ->
@@ -80,6 +80,7 @@ module.exports = class TableChart extends Chart
     props = {
       schema: @schema
       design: @cleanDesign(options.design)
+      dataSource: @dataSource
       onDesignChange: (design) =>
         # Clean design
         design = @cleanDesign(design)

@@ -31,8 +31,8 @@ module.exports = class AxisComponent extends React.Component
       
     exprBuilder = new ExpressionBuilder(@props.schema)
 
-    # Only render aggregate if has a real expr with a type that is not count
-    if @props.value and @props.value.expr and exprBuilder.getExprType(@props.value.expr) != "count"
+    # Only render aggregate if has a expr with a type that is not count
+    if @props.value and exprBuilder.getExprType(@props.value.expr) != "count"
       exprBuilder = new ExpressionBuilder(@props.schema)
       aggrs = exprBuilder.getAggrs(@props.value.expr)
 
