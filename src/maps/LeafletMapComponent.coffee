@@ -104,7 +104,7 @@ module.exports = class LeafletMapComponent extends React.Component
       @baseLayer.bringToBack()
 
     # Update layers
-    if not prevProps or not _.isEqual(@props.layers != prevProps.layers)
+    if not prevProps or JSON.stringify(_.omit(@props.layers, "onGridClick")) != JSON.stringify(_.omit(prevProps.layers, "onGridClick")) # TODO naive
       # TODO This is naive. Could be more surgical about updates
       if @tileLayers
         for tileLayer in @tileLayers        

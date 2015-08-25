@@ -4,8 +4,7 @@ LogicalExprComponent = require '../expressions/LogicalExprComponent'
 ExpressionBuilder = require '../expressions/ExpressionBuilder'
 EditableLinkComponent = require '../EditableLinkComponent'
 AxisComponent = require './../expressions/axes/AxisComponent'
-
-ColorPicker = require('react-color')
+ColorComponent = require '../ColorComponent'
 
 # Designer for a markers layer
 module.exports = class MarkersLayerDesignerComponent extends React.Component
@@ -16,18 +15,79 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
 
   # Apply updates to design
-  update: (updates) ->
+  updateDesign: (updates) ->
     @props.onDesignChange(_.extend({}, @props.design, updates))
+
+  handleSublayerChange: (index, sublayer) =>
+    sublayers = @props.design.sublayers.slice()
+    sublayers[index] = sublayer
+    @updateDesign(sublayers: sublayers)
+
+  handleRemoveSublayer: (index) =>
+    sublayers = @props.design.sublayers.slice()
+    sublayers.splice(index, 1)
+    @updateDesign(sublayers: sublayers)
+
+  handleAddSublayer: =>
+    sublayers = @props.design.sublayers.slice()
+    sublayers.push({})
+    @updateDesign(sublayers: sublayers)
+
+  renderSublayer: (index) =>
+    style = {
+      borderTop: "solid 1px #EEE"
+      paddingTop: 10
+      paddingBottom: 10
+    }
+
+    H.div style: style, key: index,
+      React.createElement(MarkersLayerSublayerDesignerComponent, {
+        schema: @props.schema
+        dataSource: @props.dataSource
+        sublayer: @props.design.sublayers[index]
+        onChange: @handleSublayerChange.bind(null, index)
+        onRemove: if index > 0 then @handleRemoveSublayer.bind(null, index)
+        })
+
+  renderSublayers: ->
+    H.div null, 
+      _.map(@props.design.sublayers, (layer, i) => @renderSublayer(i))
+      H.button className: "btn btn-default", type: "button", onClick: @handleAddSublayer,
+        H.span className: "glyphicon glyphicon-plus"
+        " Add Series"
+
+  render: ->
+    H.div null, 
+      @renderSublayers()
+      H.hr()
+
+# Designer for a markers layer sublayer
+class MarkersLayerSublayerDesignerComponent extends React.Component
+  @propTypes:
+    schema: React.PropTypes.object.isRequired # Schema to use
+    dataSource: React.PropTypes.object.isRequired
+    sublayer: React.PropTypes.object.isRequired  # Design of the sublayer
+    onChange: React.PropTypes.func.isRequired # Called with new sublayer
+    onRemove: React.PropTypes.func
+
+  # Apply updates to sublayer
+  update: (updates) ->
+    @props.onChange(_.extend({}, @props.sublayer, updates))
 
   # Update axes with specified changes
   updateAxes: (changes) ->
-    axes = _.extend({}, @props.design.axes, changes)
+    axes = _.extend({}, @props.sublayer.axes, changes)
     @update(axes: axes)
 
   handleTableChange: (table) => @update(table: table)
   handleGeometryAxisChange: (axis) => @updateAxes(geometry: axis)
   handleFilterChange: (expr) => @update(filter: expr)
   handleColorChange: (color) => @update(color: color)
+
+  renderRemove: ->
+    if @props.onRemove
+      H.button className: "btn btn-xs btn-link pull-right", type: "button", onClick: @props.onRemove,
+        H.span className: "glyphicon glyphicon-remove"
 
   renderTable: ->
     return H.div className: "form-group",
@@ -39,12 +99,12 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
       React.createElement(EditableLinkComponent, 
         dropdownItems: @props.schema.getTables()
         onDropdownItemClicked: @handleTableChange
-        onRemove: if @props.design.table then @handleTableChange.bind(this, null)
-        if @props.design.table then @props.schema.getTable(@props.design.table).name else H.i(null, "Select...")
+        onRemove: if @props.sublayer.table then @handleTableChange.bind(this, null)
+        if @props.sublayer.table then @props.schema.getTable(@props.sublayer.table).name else H.i(null, "Select...")
         )
 
   renderGeometryAxis: ->
-    if not @props.design.table
+    if not @props.sublayer.table
       return
 
     title = H.span null,
@@ -58,10 +118,10 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
           editorTitle: title
           schema: @props.schema
           dataSource: @props.dataSource
-          table: @props.design.table
+          table: @props.sublayer.table
           types: ["geometry"]
           aggrNeed: "none"
-          value: @props.design.axes.geometry
+          value: @props.sublayer.axes.geometry
           onChange: @handleGeometryAxisChange)
 
   renderColor: ->
@@ -69,11 +129,11 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
       H.label className: "text-muted", 
         "Color"
       H.div style: { marginLeft: 8 }, 
-        React.createElement(ColorComponent, color: @props.design.color, onChange: @handleColorChange)
+        React.createElement(ColorComponent, color: @props.sublayer.color, onChange: @handleColorChange)
 
   renderFilter: ->
     # If no table, hide
-    if not @props.design.table
+    if not @props.sublayer.table
       return null
 
     return H.div className: "form-group",
@@ -85,49 +145,14 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
           schema: @props.schema
           dataSource: @props.dataSource
           onChange: @handleFilterChange
-          table: @props.design.table
-          value: @props.design.filter)
+          table: @props.sublayer.table
+          value: @props.sublayer.filter)
 
   render: ->
     H.div null,
+      @renderRemove()
       @renderTable()
       @renderGeometryAxis()
       @renderColor()
       @renderFilter()
-
-class ColorComponent extends React.Component
-  @propTypes: 
-    color: React.PropTypes.string
-    onChange: React.PropTypes.func
-
-  constructor: ->
-    super
-    @state = { open: false }
-
-  handleClick: =>
-    @setState(open: not @state.open)
-
-  handleClose: (color) =>
-    @setState(open: false)
-    @props.onChange("#" + color.hex)
-
-  render: ->
-    style = {
-      height: 30
-      width: 30
-      border: "solid 2px #888"
-      borderRadius: 4
-      backgroundColor: @props.color
-    }
-
-    popupPosition = {
-      position: 'absolute'
-      top: 0
-      left: 30
-    }
-
-    H.div style: { position: "relative" },
-      H.div(style: style, onClick: @handleClick)
-      React.createElement(ColorPicker, display: @state.open, positionCSS: popupPosition, onClose: @handleClose)
-
 

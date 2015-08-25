@@ -11,6 +11,9 @@ AxisBuilder = require '../expressions/axes/AxisBuilder'
 ###
 Layer that is composed of markers
 Design is:
+  sublayers: array of sublayers
+
+sublayer:
   table: table to get data from
   axes: axes (see below)
   filter: optional logical expression to filter by
@@ -19,6 +22,7 @@ Design is:
 axes:
   geometry: where to place markers
   color: color axis (to split into series based on a color)
+
 ###
 module.exports = class MarkersLayer extends Layer
   # Pass design, client, apiUrl, schema, dataSource
@@ -34,7 +38,7 @@ module.exports = class MarkersLayer extends Layer
     # TODO clean/validate order??
     design = @cleanDesign(@design)
     
-    if not design.axes or not design.axes.geometry
+    if @validateDesign(@design)
       return null
 
     @createUrl("png", design, filters)
@@ -51,13 +55,12 @@ module.exports = class MarkersLayer extends Layer
 
     # Create design
     mapDesign = {
-      layers: [
+      layers: _.map(design.sublayers, (sublayer, i) =>
         { 
-          id: "layer0"
-          jsonql: @createJsonQL(design, filters)
-        }
-      ]
-      css: @createCss(design)
+          id: "layer#{i}"
+          jsonql: @createJsonQL(sublayer, filters)
+        })
+      css: @createCss()
       # interactivity: {
       #   layer: "layer0"
       #   fields: ["id"]
@@ -67,13 +70,13 @@ module.exports = class MarkersLayer extends Layer
 
     return "#{@apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?" + query
 
-  createJsonQL: (design, filters) ->
+  createJsonQL: (sublayer, filters) ->
     axisBuilder = new AxisBuilder(schema: @schema)
     exprCompiler = new ExpressionCompiler(@schema)
     exprBuilder = new ExpressionBuilder(@schema)
 
     # Compile geometry axis
-    geometryExpr = axisBuilder.compileAxis(axis: design.axes.geometry, tableAlias: "innerquery")
+    geometryExpr = axisBuilder.compileAxis(axis: sublayer.axes.geometry, tableAlias: "innerquery")
 
     # row_number() over (partition by st_snaptogrid(location, !pixel_width!*5, !pixel_height!*5)) AS r
     cluster = { 
@@ -97,7 +100,7 @@ module.exports = class MarkersLayer extends Layer
         { type: "select", expr: geometryExpr, alias: "the_geom_webmercator" } # geometry as the_geom_webmercator
         cluster
       ]
-      from: exprCompiler.compileTable(design.table, "innerquery")
+      from: exprCompiler.compileTable(sublayer.table, "innerquery")
     }
 
     # Create filters. First limit to bounding box
@@ -113,12 +116,12 @@ module.exports = class MarkersLayer extends Layer
     ]
 
     # Then add filters baked into layer
-    if design.filter
-      whereClauses.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "innerquery"))
+    if sublayer.filter
+      whereClauses.push(exprCompiler.compileExpr(expr: sublayer.filter, tableAlias: "innerquery"))
 
     # Then add extra filters passed in, if relevant
     # Get relevant filters
-    relevantFilters = _.where(filters, table: design.table)
+    relevantFilters = _.where(filters, table: sublayer.table)
     for filter in relevantFilters
       whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
 
@@ -141,19 +144,23 @@ module.exports = class MarkersLayer extends Layer
 
     return outerquery
 
-  createCss: (design) ->
-    '''
-    #layer0 {
-      marker-fill: ''' + (design.color or "#666666") + ''';
-      marker-width: 10;
-      marker-line-color: white;
-      marker-line-width: 1;
-      marker-line-opacity: 0.6;
-      marker-placement: point;
-      marker-type: ellipse;
-      marker-allow-overlap: true;
-    }
-    '''
+  createCss: ->
+    css = ""
+    _.each @design.sublayers, (sublayer, index) =>
+      css += '''
+        #layer''' + index + ''' {
+          marker-fill: ''' + (sublayer.color or "#666666") + ''';
+          marker-width: 10;
+          marker-line-color: white;
+          marker-line-width: 1;
+          marker-line-opacity: 0.6;
+          marker-placement: point;
+          marker-type: ellipse;
+          marker-allow-overlap: true;
+        }
+
+      '''
+    return css
 
   getFilterableTables: -> 
     if @design.table
@@ -177,15 +184,33 @@ module.exports = class MarkersLayer extends Layer
 
     # TODO clones entirely
     design = _.cloneDeep(design)
-    design.axes = design.axes or {}
-    design.color = design.color or "#0088FF"
+    design.sublayers = design.sublayers or [{}]
 
-    for axisKey, axis of design.axes
-      design.axes[axisKey] = axisBuilder.cleanAxis(axis, design.table, "none")
+    for sublayer in design.sublayers
+      sublayer.axes = sublayer.axes or {}
+      sublayer.color = sublayer.color or "#0088FF"
 
-    design.filter = exprBuilder.cleanExpr(design.filter, design.table)
+      for axisKey, axis of sublayer.axes
+        sublayer.axes[axisKey] = axisBuilder.cleanAxis(axis, sublayer.table, "none")
+
+      sublayer.filter = exprBuilder.cleanExpr(sublayer.filter, sublayer.table)
 
     return design
+
+  validateDesign: (design) ->
+    axisBuilder = new AxisBuilder(schema: @schema)
+
+    if design.sublayers.length < 1
+      return "No sublayers"
+
+    for sublayer in design.sublayers
+      if not sublayer.axes or not sublayer.axes.geometry
+        return "Missing axes"
+
+      error = axisBuilder.validateAxis(sublayer.axes.geometry)
+      if error then return error
+
+    return null
 
   # Pass in onDesignChange
   createDesignerElement: (options) ->

@@ -75,7 +75,7 @@ addServerLayerView = (options) ->
 
 addServerLayerView({ type: "safe_water_access", name: "Safe Water Access", group: "access", minZoom: 10 })
 addServerLayerView({ type: "water_access", name: "Functional Water Access", group: "access", minZoom: 10 })
-addServerLayerView({ type: "water_points_by_type", name: "Water Point Type", group: "points", visible: true })
+addServerLayerView({ type: "water_points_by_type", name: "Water Point Type", group: "points", visible: false })
 addServerLayerView({ type: "functional_status", name: "Functionality", group: "points" })
 addServerLayerView({ type: "ecoli_status", name: "E.Coli Level", group: "points" })
 
@@ -84,6 +84,38 @@ newLayers.push {
   type: "Markers"
   design: { }
 }
+
+layerViews.push {
+  "id": "9ff7edcd-1955-4986-b082-c5af71e4a089",
+  "name": "Custom Layer",
+  "desc": "",
+  "type": "Markers",
+  "design": {
+    "sublayers": [
+      {
+        "axes": {
+          "geometry": {
+            "expr": {
+              "type": "scalar",
+              "table": "entities.water_point",
+              "joins": [],
+              "expr": {
+                "type": "field",
+                "table": "entities.water_point",
+                "column": "location"
+              }
+            }
+          }
+        },
+        "color": "#0088FF",
+        "filter": null,
+        "table": "entities.water_point"
+      }
+    ]
+  },
+  "visible": true,
+  "opacity": 1
+}  
 
 design = {
   baseLayer: "bing_road"
