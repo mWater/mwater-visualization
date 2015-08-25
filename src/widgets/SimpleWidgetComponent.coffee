@@ -1,8 +1,11 @@
 React = require 'react'
 H = React.DOM
+FloatingWindowComponent = require '../FloatingWindowComponent'
 
 # Simple widget that can be dragged and resized
 # Injects inner width and height to child element
+# Contains a dropdown menu and a popout editor that is also draggable
+# To display the editor, call displayEditor
 module.exports = class SimpleWidgetComponent extends React.Component
   @propTypes:
     width: React.PropTypes.number
@@ -13,15 +16,53 @@ module.exports = class SimpleWidgetComponent extends React.Component
     connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
     connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
 
+    editor: React.PropTypes.node # Editor in a floating window. Will only display when displayEditor is called
+
     dropdownItems: React.PropTypes.arrayOf(React.PropTypes.shape({
       label: React.PropTypes.node.isRequired
       icon: React.PropTypes.string # Glyphicon string. e.g. "remove"
       onClick: React.PropTypes.func.isRequired
       })).isRequired # A list of {label, icon, onClick} actions for the dropdown
 
+  constructor: ->
+    super
+    # editorInitialBounds is not null if editing
+    @state = { editorInitialBounds: null }
+
+  displayEditor: ->
+    # Determine initial bounds 
+    myElem = React.findDOMNode(this)
+
+    # Get x and y of right of widget
+    width = 500
+    height = 600
+    editorInitialBounds = { x: myElem.offsetLeft + myElem.offsetWidth - 5, y: myElem.offsetTop + 5, width: width, height: height }
+
+    # Get space to right of widget
+    spaceRight = document.body.clientWidth - myElem.getBoundingClientRect().right
+
+    # Move back from edge
+    if spaceRight < width
+      editorInitialBounds.x -= width - spaceRight
+
+    @setState(editorInitialBounds: editorInitialBounds)
+
+  handleCloseEditor: => 
+    @setState(editorInitialBounds: null)
+
   handleRemove: (ev) =>
     ev.stopPropagation()
     @props.onRemove()
+
+  renderEditor: ->
+    if not @state.editorInitialBounds?
+      return
+
+    return React.createElement(FloatingWindowComponent,
+      initialBounds: @state.editorInitialBounds
+      onClose: @handleCloseEditor,
+        @props.editor
+    )
 
   renderResizeHandle: ->
     resizeHandleStyle = {
@@ -86,6 +127,7 @@ module.exports = class SimpleWidgetComponent extends React.Component
       contents
       @renderResizeHandle()
       @renderDropdown()
+      @renderEditor()
 
     if @props.connectMoveHandle
       elem = @props.connectMoveHandle(elem)

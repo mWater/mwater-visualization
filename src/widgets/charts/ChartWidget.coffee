@@ -6,7 +6,6 @@ CsvBuilder = require './../../CsvBuilder'
 filesaver = require 'filesaver.js'
 ActionCancelModalComponent = require '../../ActionCancelModalComponent'
 ChartWidgetViewComponent = require './ChartWidgetViewComponent'
-FloatingWindowComponent = require '../../FloatingWindowComponent'
 
 # A widget which is a chart
 module.exports = class ChartWidget extends Widget
@@ -41,7 +40,7 @@ module.exports = class ChartWidget extends Widget
     # TODO REMOVE
     return null
 
-# Complete chart widget. Stores state of editing and renders editor if open
+# Complete chart widget
 class ChartWidgetComponent extends React.Component
   @propTypes:
     chart: React.PropTypes.object.isRequired # Chart object to use
@@ -61,13 +60,8 @@ class ChartWidgetComponent extends React.Component
     connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
     connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
 
-  constructor: ->
-    super
-    # editorInitialBounds is not null if editing
-    @state = { editorInitialBounds: null }
-
   # Saves a csv file to disk
-  handleSaveCsvFile: ->
+  handleSaveCsvFile: =>
     # Get the queries
     queries = @props.chart.createQueries(@props.design, @props.filters)
 
@@ -87,54 +81,27 @@ class ChartWidgetComponent extends React.Component
       filesaver(blob, "Exported Data.csv")
     )
 
-  handleCancelEditing: => @setState(editorInitialBounds: null)
-  handleStartEditing: => 
-    # Determine initial bounds 
-    myElem = React.findDOMNode(this)
-
-    # Get x and y of right of widget
-    width = 500
-    height = 600
-    editorInitialBounds = { x: myElem.offsetLeft + myElem.offsetWidth - 5, y: myElem.offsetTop + 5, width: width, height: height }
-
-    # Get space to right of widget
-    spaceRight = document.body.clientWidth - myElem.getBoundingClientRect().right
-
-    # Move back from edge
-    if spaceRight < width
-      editorInitialBounds.x -= width - spaceRight
-
-    @setState(editorInitialBounds: editorInitialBounds)
-
-  handleEditingChange: (design) =>  @setState(editingDesign: design)
-
-  renderEditor: ->
-    if not @state.editorInitialBounds?
-      return
-
-    return React.createElement(FloatingWindowComponent,
-      title: "Edit Chart"
-      initialBounds: @state.editorInitialBounds
-      onClose: @handleCancelEditing,
-        @props.chart.createDesignerElement(
-          design: @props.design
-          onDesignChange: @props.onDesignChange)
-    )
+  handleStartEditing: =>
+    @refs.simpleWidget.displayEditor()
 
   render: ->
     # Create dropdown items
     dropdownItems = @props.chart.createDropdownItems(@props.design, @props.dataSource, @props.filters)
-    dropdownItems.push({ label: "Export Data", icon: "save-file", onClick: => @handleSaveCsvFile(@props.filters) })
+    dropdownItems.push({ label: "Export Data", icon: "save-file", @handleSaveCsvFile })
     dropdownItems.push({ label: "Remove", icon: "remove", onClick: @props.onRemove })
     dropdownItems.unshift({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
 
+    # Create editor
+    editor = @props.chart.createDesignerElement(design: @props.design, onDesignChange: @props.onDesignChange)
+
     # Wrap in a simple widget
     return H.div onDoubleClick: @handleStartEditing, 
-      React.createElement(SimpleWidgetComponent,
-        highlighted: @state.editorInitialBounds?
+      React.createElement(SimpleWidgetComponent, 
+        ref: "simpleWidget",
         width: @props.width
         height: @props.height
         dropdownItems: dropdownItems,
+        editor: editor
         connectMoveHandle: @props.connectMoveHandle
         connectResizeHandle: @props.connectResizeHandle,
           React.createElement(ChartWidgetViewComponent, 
@@ -145,5 +112,4 @@ class ChartWidgetComponent extends React.Component
             filters: @props.filters
             onScopeChange: @props.onScopeChange)
       )
-      @renderEditor()
 
