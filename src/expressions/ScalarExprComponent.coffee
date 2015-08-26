@@ -55,6 +55,10 @@ module.exports = class ScalarExprComponent extends React.Component
     @props.onChange(null)
 
   handleDropdownItemClicked: (expr) =>
+    # Convert to scalar if not
+    if expr and expr.type == "field"
+      expr = { type: "scalar", expr: expr, table: expr.table, joins: [] }
+      
     # Handle advanced
     if not expr
       @handleEditorOpen()

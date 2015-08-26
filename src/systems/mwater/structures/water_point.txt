@@ -51,6 +51,7 @@ mwa_scheme_type MWA scheme type
   legacy_tags Tags
 
 +Water Point Data Exchange (WPDX)
+  wpdx.management
   wpdx_converted_fields WPDX Converted fields
   wpdx_country WPDX Country (ISO 2-letter code)
   wpdx_data_source WPDX Data source

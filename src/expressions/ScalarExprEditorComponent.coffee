@@ -17,7 +17,7 @@ module.exports = class ScalarExprEditorComponent extends React.Component
 
   handleTreeChange: (val) =>
     # Set table and joins and expr
-    @props.onChange(_.extend({}, @props.value or { type: "scalar" }, val))
+    @props.onChange(_.extend({}, @props.value, { type: "scalar" }, val))
 
   handleAggrChange: (aggr) =>
     # Set table and joins and expr

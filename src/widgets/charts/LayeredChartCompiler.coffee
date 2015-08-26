@@ -3,6 +3,14 @@ ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 AxisBuilder = require '../../expressions/axes/AxisBuilder'
 injectTableAlias = require '../../injectTableAlias'
 
+# TODO REMOVE
+colorHacks = {
+  "ok": "#00AA00"
+  "maint": "#AAAA00"
+  "broken": "#AA0000"
+  null: "#888888"
+}
+
 # Compiles various parts of a layered chart (line, bar, scatter, spline, area) to C3.js format
 module.exports = class LayeredChartCompiler
   # Pass in schema
@@ -108,6 +116,7 @@ module.exports = class LayeredChartCompiler
         types: c3Data.types
         groups: c3Data.groups
         xs: c3Data.xs
+        colors: c3Data.colors
       }
       # Hide if one layer with no color axis
       legend: { hide: (options.design.layers.length == 1 and not options.design.layers[0].axes.color) }
@@ -172,6 +181,10 @@ module.exports = class LayeredChartCompiler
           types[series] = @getLayerType(design, layerIndex)
           names[series] = @formatAxisValue(layer.axes.color, row.color)
           dataMap[series] = { layerIndex: layerIndex, row: row }
+
+          # TODO REMOVE
+          if colorHacks[row.color]
+            colors[series] = colorHacks[row.color]
       else
         # Create a single series
         row = data["layer#{layerIndex}"][0]
@@ -183,6 +196,10 @@ module.exports = class LayeredChartCompiler
           # Name is name of entire layer
           names[series] = layer.name or "Series #{layerIndex+1}"
           dataMap[series] = { layerIndex: layerIndex, row: row }
+
+          # TODO REMOVE
+          if colorHacks[row.color]
+            colors[series] = colorHacks[row.color]
 
           # Set color if present
           if layer.color

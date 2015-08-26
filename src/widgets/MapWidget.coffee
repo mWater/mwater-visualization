@@ -77,12 +77,39 @@ class MapWidgetComponent extends React.Component
       connectMoveHandle: @props.connectMoveHandle
       connectResizeHandle: @props.connectResizeHandle
       dropdownItems: dropdownItems,
-        React.createElement(MapViewComponent, {
+        React.createElement(InnerMapWidgetComponent, {
           schema: @props.schema
           layerFactory: @props.layerFactory
           design: @props.design
           onDesignChange: @props.onDesignChange
-          extraFilters: @props.filters
+          filters: @props.filters
         })
       )
 
+class InnerMapWidgetComponent extends React.Component
+  @propTypes:
+    schema: React.PropTypes.object.isRequired # Schema to use
+    dataSource: React.PropTypes.object.isRequired # Data source to use
+    layerFactory: React.PropTypes.object.isRequired # Layer factory to use
+
+    design: React.PropTypes.object.isRequired  # See Map Design.md
+    onDesignChange: React.PropTypes.func.isRequired # Called with new design
+
+    onRemove: React.PropTypes.func
+
+    width: React.PropTypes.number
+    height: React.PropTypes.number
+
+    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+
+  render: ->
+    H.div style: { width: @props.width, height: @props.height, padding: 10 },
+      React.createElement(MapViewComponent, {
+        schema: @props.schema
+        layerFactory: @props.layerFactory
+        design: @props.design
+        onDesignChange: @props.onDesignChange
+        extraFilters: @props.filters
+        width: @props.width - 20
+        height: @props.height - 20
+      })

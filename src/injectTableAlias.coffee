@@ -12,7 +12,7 @@ injectTableAlias = (jsonql, tableAlias) ->
 
   # Handle field
   if jsonql.type == "field" and jsonql.tableAlias == "{alias}"
-    return _.extend(jsonql, tableAlias: tableAlias)
+    return _.extend({}, jsonql, tableAlias: tableAlias)
 
   # Recurse object keys
   return _.mapValues(jsonql, (value) => injectTableAlias(value, tableAlias))
