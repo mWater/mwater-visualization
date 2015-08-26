@@ -1,0 +1,330 @@
+tables:
+  - id:         countries
+    name:       Countries
+    primaryKey: gid
+    sql:
+    contents:
+      - type: section
+        name: Country
+        contents: 
+          - id:   name
+            name: Country
+            type: text  
+          - id:   continent 
+            name: Region
+            type: text
+
+  - id:         wco_loans
+    name:       Operational Loan Data
+    primaryKey: loans_seq_id
+    sql:
+    contents:
+      - type: section
+        name: Loan
+        contents: 
+          - id:   amtprincipal
+            name: Principal Amount
+            type: decimal
+          - id:   amtinterest
+            name: Intrest Amount
+            type: decimal
+          - id:   amtfees
+            name: Fees Amount
+            type: decimal
+          - id:   amtdemand
+            name: Amount Due
+            type: decimal
+          - id:   amtcollect
+            name: Amount Collected
+            type: decimal
+          - id:   past3060
+            name: Past Due 30
+            type: decimal
+          - id:   past6090
+            name: Past Due 60
+            type: decimal
+          - id:   pastover90
+            name: Past Due 90
+            type: decimal
+          - id:   bstatus
+            name: Borrower Status
+            type: text
+          - id:   loanterm
+            name: Loan Term
+            type: text
+          - id:   repayfreq
+            name: Repayment Period
+            type: text
+          - id:   numactive
+            name: Number Active
+            type: integer
+          - id:   numcompleted
+            name: Number Completed
+            type: integer
+          - id:   numwrittenoff
+            name: Number Written Off
+            type: integer
+          - id:   qualified 
+            name: Loans Qualified 
+            type: enum
+            values:
+              - { id: "Y",   name: "Qualified" }
+              - { id: "N",   name: "Nonqualified" }
+          - id:   loantype 
+            name: Loan Type 
+            type: enum
+            values:
+              - { id: "Individual Upload",   name: "Individual Upload" }
+              - { id: "Group Upload",        name: "Group Upload" }
+          - id:   loanutilization 
+            name: Loan Utilization 
+            type: enum
+            values:
+              - { id: "Yes",   name: "Yes" }
+              - { id: "No",    name: "No" }
+              - { id: "Not Verified", name: "Not Verified" }
+          - type: section
+            name: Product
+            contents: 
+              - id:   nbr_prod_funct
+                name: Product Functions
+                type: integer
+              - id:   nbr_prod_not_funct
+                name: Product Does Not Function
+                type: integer
+              - id:   prodcmptedate
+                name: Product Complete Date
+                type: date
+                sql: "(to_char(prodcmptedate, 'YYYY-MM-DD'))" # Optional override on sql to get the column value. Most cases not needed
+              - id:   ptype
+                name: Product Type
+                type: text
+          - type: section
+            name: People Served
+            contents: 
+              - id:   beneficiarytype
+                name: People Reached Type
+                type: join
+                join: 
+                  fromTable: wco_loans
+                  fromColumn: prod_ben_type # This is the column in this table that it refers to
+                  toTable: wo_beneficiary_type
+                  toColumn: beneficiarytypeid  # Refered to field
+                  op: "="
+                  multiple: false
+              - id:   multiborrow
+                name: People Reached Removed Due To Duplicate Client IDs
+                type: integer
+          - type: section
+            name: Client
+            contents: 
+              - id:   mohhincome
+                name: Monthly Household Income
+                type: decimal
+              - id:   gender
+                name: Gender
+                type: text 
+              - id:   btype
+                name: Client Type
+                type: text
+              - id:   numborrow
+                name: Clients
+                type: integer
+              - id:   gender
+                name: Client Gender
+                type: enum
+                values:
+                  - { id: "Male",   name: "Male" }
+                  - { id: "Female", name: "Female" }
+                  - { id: "Both",   name: "Male and Female" }
+          - type: section
+            name: Geography
+            contents: 
+              - id:   countryname
+                name: Country
+                type: text  
+              - id:   ruralurban
+                name: Geography Type
+                type: text   
+              - id:   continent 
+                name: Region
+                type: join
+                join: 
+                  fromTable: wco_loans
+                  fromColumn: countryid # This is the column in this table that it refers to
+                  toTable: countries
+                  toColumn: gid  # Refered to field
+                  op: "="
+                  multiple: false
+          - type: section
+            name: Product
+            contents: 
+              - id:   nbr_prod_funct
+                name: Product Functions
+                type: integer
+              - id:   nbr_prod_not_funct
+                name: Product Does Not Function
+                type: integer
+              - id:   prodcmptedate
+                name: Product Complete Date
+                type: date
+              - id:   ptype
+                name: Product Type
+                type: text
+  - id:  wo_achibeneficiary
+    name: People Served
+    primaryKey: wo_achibeneficiary_pkey
+    sql:
+    contents:
+      - type: section
+        name: People Reached
+        contents: 
+          - id:   achieved
+            name: People Reached
+            type: join
+            join:
+              fromTable: wo_achibeneficiary
+              fromColumn: programid # This is the column in this table that it refers to
+              toTable: wo_programs
+              toColumn: programid  # Refered to field
+              op: "="
+              multiple: true 
+  - id:  wo_programs
+    name: Program
+    primaryKey: programid
+    sql:
+    contents:
+      - type: section
+        name: Program
+        contents: 
+          - id:   programid
+            name: Program ID
+            type: text
+          - id:   poname
+            name: Program Name
+            type: text
+          - id:   wc
+            name: Program Model
+            type: boolean
+            values:
+              - { id: "t",   name: "WaterCredit" }
+              - { id: "f",   name: "Direct Impact" }
+          - id:   status
+            name: Program Status
+            type: enum
+            values:
+              - { id: "Active",              name: "Active" }
+              - { id: "Proposed",            name: "Proposed" }
+              - { id: "Completed",           name: "Completed" }
+              - { id: "Early Termination",   name: "Early Termination" }
+          - id:   ontime
+            name: On Time
+            type: boolean
+            values:
+              - { id: "t",   name: "On Time" }
+              - { id: "f",   name: "Not On Time" }
+          - id:   onbudget
+            name: On Budget
+            type: boolean
+            values:
+              - { id: "t",   name: "On Budget" }
+              - { id: "f",   name: "Not On Budget" }
+          - id:   amtplandisb
+            name: Planned Disbursements
+            type: join
+            join:
+               fromTable: wo_programs
+               fromColumn: programid # This is the column in this table that it refers to
+               toTable: wo_plandisb
+               toColumn: programid  # Refered to field
+               op: "="
+               multiple: true
+          - id:   amtdisb
+            name: Actual Disbursements
+            type: join
+            join:
+              fromTable: wo_programs
+              fromColumn: programid # This is the column in this table that it refers to
+              toTable: wo_dynamicdisb
+              toColumn: programid  # Refered to field
+              op: "="
+              multiple: true
+      - type: section
+        name: Fund Description
+        contents: 
+        - id:   fundid
+          name: Fund Description
+          type: join
+          join:
+            fromTable: wo_programs
+            fromColumn: fundid # This is the column in this table that it refers to
+            toTable: wo_re_fund
+            toColumn: fundid  # Refered to field
+            op: "="
+            multiple: true
+      - type: section
+        name: Geography
+        contents: 
+          - id:   countryid
+            name: Country Name
+            type: join 
+            join:
+              fromTable: wo_programs
+              fromColumn: countryid # This is the column in this table that it refers to
+              toTable: countries
+              toColumn: gid  # Refered to field
+              op: "="
+              multiple: false
+          - id:   continent
+            name: Region
+            type: join 
+            join:
+              fromTable: wo_programs
+              fromColumn: countryid # This is the column in this table that it refers to
+              toTable: countries
+              toColumn: gid  # Refered to field
+              op: "="
+              multiple: false
+      - type: section
+        name: Currency Type
+        contents: 
+          - id:   ctypename
+            name: Currency Type
+            type: join
+            join:
+              fromTable: wo_programs
+              fromColumn: ctype # This is the column in this table that it refers to
+              toTable: wo_ctype
+              toColumn: ctype  # Refered to field
+              op: "="
+              multiple: false
+  - id:  wo_partnerorgs
+    name: Partner
+    primaryKey: gid
+    sql:
+    contents:
+      - type: section
+        name: Partner
+        contents: 
+          - id:   poname
+            name: Partner Name
+            type: text
+          - id:   status
+            name: Partner Status
+            type: boolean
+            values:
+              - { id: "t",   name: "Active" }
+              - { id: "f",   name: "Inactive" }
+      - type: section
+        name: Partner Programs
+        contents: 
+          - id:   poid
+            name: Partner Name
+            type: join
+            join:
+              fromTable: wo_partnerorgs
+              fromColumn: poid # This is the column in this table that it refers to
+              toTable: wo_programs
+              toColumn: poname  # Refered to field
+              op: "="
+              multiple: true

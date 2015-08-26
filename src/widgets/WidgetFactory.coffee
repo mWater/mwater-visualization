@@ -32,9 +32,13 @@ module.exports = class WidgetFactory
 
   # Gets list of new widget types. Each contains name, type and design
   getNewWidgetsTypes: ->
-    return [
+    widgetTypes = [
       { name: "Chart", type: "LayeredChart", design: {} }
       { name: "Table", type: "TableChart", design: {} }
       { name: "Text", type: "Markdown", design: {} }
-      { name: "Map", type: "Map", design: { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } } }
     ]
+
+    if @layerFactory
+      widgetTypes.push({ name: "Map", type: "Map", design: { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } } })
+    
+    return widgetTypes
