@@ -24,10 +24,16 @@ module.exports = class SimpleWidgetComponent extends React.Component
       onClick: React.PropTypes.func.isRequired
       })).isRequired # A list of {label, icon, onClick} actions for the dropdown
 
+    editorInitiallyDisplayed: React.PropTypes.bool  # True to open editor on load
+
   constructor: ->
     super
     # editorInitialBounds is not null if editing
     @state = { editorInitialBounds: null }
+
+  componentDidMount: ->
+    if @props.editorInitiallyDisplayed
+      @displayEditor()
 
   displayEditor: ->
     # Determine initial bounds 
@@ -60,6 +66,7 @@ module.exports = class SimpleWidgetComponent extends React.Component
 
     return React.createElement(FloatingWindowComponent,
       initialBounds: @state.editorInitialBounds
+      title: "Designer"
       onClose: @handleCloseEditor,
         @props.editor
     )

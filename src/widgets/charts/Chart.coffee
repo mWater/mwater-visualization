@@ -1,10 +1,16 @@
 # Common interface for all charts
 module.exports = class Chart
+  # Removes any invalid values from a design. Returns cleaned design
   cleanDesign: (design) ->
     throw new Error("Not implemented")
 
+  # Determines if design is valid. Null/undefined for yes, error string for no
   validateDesign: (design) ->
     throw new Error("Not implemented")
+
+  # True if a design is empty and so to display the editor immediately
+  isEmpty: (design) ->
+    return false
 
   # Creates a design element with specified options
   # options include:

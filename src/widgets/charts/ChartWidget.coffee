@@ -95,6 +95,7 @@ class ChartWidgetComponent extends React.Component
         height: @props.height
         dropdownItems: dropdownItems,
         editor: editor
+        editorInitiallyDisplayed: @props.chart.isEmpty(@props.design) # Display editor if empty design
         connectMoveHandle: @props.connectMoveHandle
         connectResizeHandle: @props.connectResizeHandle,
           React.createElement(ChartWidgetViewComponent, 

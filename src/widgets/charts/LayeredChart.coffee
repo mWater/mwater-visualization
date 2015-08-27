@@ -111,6 +111,9 @@ module.exports = class LayeredChart extends Chart
 
     return error
 
+  isEmpty: (design) ->
+    return not design.layers or not design.layers[0] or not design.layers[0].table
+
   # Creates a design element with specified options
   # options include design: design and onChange: function
   createDesignerElement: (options) ->

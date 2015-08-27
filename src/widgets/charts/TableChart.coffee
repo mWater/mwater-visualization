@@ -74,6 +74,9 @@ module.exports = class TableChart extends Chart
 
     return error
 
+  isEmpty: (design) ->
+    return not design.columns or not design.columns[0] or not design.columns[0].textAxis
+
   # Creates a design element with specified options
   # options include design: design and onChange: function
   createDesignerElement: (options) ->
