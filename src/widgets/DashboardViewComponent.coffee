@@ -59,8 +59,11 @@ module.exports = class DashboardViewComponent extends React.Component
   # Call to print the dashboard
   print: =>
     # Create element at 96 dpi (usual for browsers) and 7.5" across (letter - 0.5" each side)
-    elem = React.createElement(DashboardViewComponent, 
-      _.extend(@props, { width: 7.5*96*1.4 }))   # No idea why 2 ish
+    # We then double that and scale back down so that widgets have enough detail. Equivalent
+    # to dashboard 1440px wide
+    elem = H.div style: { transform: "scale(0.5)", transformOrigin: "top left" },
+        React.createElement(DashboardViewComponent, 
+          _.extend(@props, { width: 7.5*96*2 }))   
     
     printer = new ReactElementPrinter()
     printer.print(elem)
