@@ -127,7 +127,7 @@ module.exports = class DashboardViewComponent extends React.Component
 
     # Render widget container
     return H.div style: style, className: "mwater-visualization-dashboard", onClick: @handleClick,
-      H.div style: { position: "absolute", top: 0 },
+      H.div null,
         @renderScopes()
         React.createElement(WidgetContainerComponent, 
           layoutEngine: layoutEngine
