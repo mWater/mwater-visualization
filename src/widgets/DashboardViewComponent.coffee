@@ -100,6 +100,22 @@ module.exports = class DashboardViewComponent extends React.Component
       " Filters: "
       _.map(_.keys(scopes), @renderScope)
 
+  renderPageBreaks: (layoutEngine, layouts) ->
+    # Get height
+    height = layoutEngine.calculateHeight(layouts)
+
+    # Page breaks are 8.5x11 with 0.5" margin 
+    pageHeight = @props.width / 7.5 * 10
+
+    number = Math.floor(height/pageHeight)
+
+    elems = []
+    if number > 0
+      for i in [1..number]
+        elems.push(H.div(className: "mwater-visualization-page-break", style: { position: "absolute", top: i * pageHeight }))
+
+    return elems
+
   render: ->
     # Create layout engine
     # TODO create from design
@@ -139,3 +155,4 @@ module.exports = class DashboardViewComponent extends React.Component
           onLayoutUpdate: @handleLayoutUpdate
           width: @props.width 
         )
+        @renderPageBreaks(layoutEngine, layouts)

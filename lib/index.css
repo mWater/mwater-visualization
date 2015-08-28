@@ -79,12 +79,16 @@
 .mwater-visualization-page-break {
 	width: 100%;
 	border-bottom: dashed 1px #AAA;
+	height: 0px;
 }
 
 @media print {
 	.mwater-visualization-page-break {
 		border-bottom: none;
+		/*
+		Removed since needs to be normal display, not absolute to work 
 		page-break-after: always;
+		*/
 	}
 }
 
