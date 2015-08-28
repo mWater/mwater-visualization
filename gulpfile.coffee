@@ -23,7 +23,7 @@ gulp.task 'copy', ->
     .pipe(gulp.dest('./lib/'))
 
 gulp.task "browserify", ->
-  shim(browserify("./demo.coffee",
+  shim(browserify("./componenttest.coffee",
     extensions: [".coffee"]
     basedir: "./src/"
   )).bundle()
@@ -144,7 +144,7 @@ gulp.task 'watch', gulp.series([
   'build'
   gulp.parallel([
     -> browserSync({ server: "./dist", startPath: "demo.html" })
-    -> gulp.watch("./src/**", gulp.series(['build', -> reload()]))
+    -> gulp.watch("./src/**", gulp.series(['browserify', -> reload()]))
   ])
 ])
 
