@@ -3,7 +3,7 @@ H = React.DOM
 _ = require 'lodash'
 
 # Modal with action and cancel buttons
-module.exports = class ActionCancelModalComponent
+module.exports = class ActionCancelModalComponent extends React.Component
   @propTypes: 
     title: React.PropTypes.node # Title of modal. Any react element
     actionLabel: React.PropTypes.string # Action button. Defaults to "Save"

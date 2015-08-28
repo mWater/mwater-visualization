@@ -1,27 +1,36 @@
-React = require('react/addons')
+React = require('react')
 H = React.DOM
 
 module.exports = class TestComponent
   constructor: (elem) ->
     @comp = React.addons.TestUtils.renderIntoDocument(
-      React.createElement(ComponentWrapper, children: elem))
+      React.createElement(ComponentWrapper, elem: elem))
 
   setElement: (elem) ->
-    @comp.setChildren(elem)
+    @comp.setElement(elem)
 
-  getDOMNode: ->
-    return React.findDOMNode(@comp)
+  getComponent: ->
+    return @comp.getComponent()
+
+  getComponentNode: ->
+    return @comp.getComponentNode()
 
 # Wraps a react component, re-render
 class ComponentWrapper extends React.Component
   constructor: (props) ->
     super
-    @state = { children: @props.children }
+    @state = { elem: @props.elem }
 
-  setChildren: (children) =>
-    @setState(children: children)
+  setElement: (elem) =>
+    @setState(elem: elem)
+
+  getComponent: ->
+    return @refs.comp
+
+  getComponentNode: ->
+    return React.findDOMNode(@refs.comp)
 
   render: ->
     H.div null,
-      @state.children
+      React.cloneElement(@state.elem, ref: "comp")
 

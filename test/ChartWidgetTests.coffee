@@ -4,7 +4,7 @@ _ = require 'lodash'
 ChartWidget = require '../src/widgets/charts/ChartWidget'
 Chart = require '../src/widgets/charts/Chart'
 DataSource = require '../src/DataSource'
-React = require('react/addons')
+React = require('react')
 H = React.DOM
 TestComponent = require './TestComponent'
 
