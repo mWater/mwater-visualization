@@ -7,7 +7,7 @@ _ = require 'lodash'
 module.exports = class LargeListComponent extends React.Component
   @propTypes: 
     loadRows: React.PropTypes.func.isRequired     # Row source. Function with (offset, number, cb) called back with rows array
-    renderRow: React.PropTypes.func.isRequired    # Called with (row, index) to get React node
+    renderRow: React.PropTypes.func.isRequired    # Called with (row, index) to get React node. Row is null for placeholder while loading
     rowHeight: React.PropTypes.number.isRequired  # Height of rows in pixels
     pageSize: React.PropTypes.number.isRequired   # Number of rows per page
     height: React.PropTypes.number.isRequired     # Height of control in pixels
@@ -21,6 +21,9 @@ module.exports = class LargeListComponent extends React.Component
       loadingPages: [] # Array of page numbers that are loading
     }
 
+    # Throttle scrolling
+    @handleScroll = _.throttle(@handleScroll, 250)
+
   componentDidMount: ->
     # Load visible pages
     @loadVisiblePages()
@@ -31,7 +34,21 @@ module.exports = class LargeListComponent extends React.Component
     @loadVisiblePages()
 
   componentWillReceiveProps: (nextProps) ->
-    # TODO
+    # Reset everything if anything other than renderRow changed
+    reset = false
+    for key, value in nextProps
+      if @props[key] != value 
+        if key != "renderRow"
+          reset = true
+        else
+          refresh = true
+
+    if reset
+      @setState(loadedPages: [], loadingPages: [])
+
+  # Gets the size of a page (all same except last)
+  getPageRowCount: (page) ->
+    return Math.min(@props.pageSize, @props.rowCount - page * @props.pageSize)
 
   loadVisiblePages: ->
     # Determine which pages are visible
@@ -46,7 +63,7 @@ module.exports = class LargeListComponent extends React.Component
 
     for page in toLoadPages
       do (page) =>
-        @props.loadRows(page * @props.pageSize, Math.min(@props.pageSize, @props.rowCount - page * @props.pageSize), (err, rows) =>
+        @props.loadRows(page * @props.pageSize, @getPageRowCount(page), (err, rows) =>
           # Remove from loading pages
           loadingPages = _.without(@state.loadingPages, page)
           if not err
@@ -85,12 +102,20 @@ module.exports = class LargeListComponent extends React.Component
 
     return _.range(minPage, maxPage + 1)
 
-  renderPage: (loadedPage) =>
-    H.div style: { position: "absolute", top: loadedPage.page * @props.pageSize * @props.rowHeight, left: 0, right: 0 },
-      _.map loadedPage.rows, (row, i) => @props.renderRow(row, i)
+  renderLoadedPage: (loadedPage) =>
+    H.div style: { position: "absolute", top: loadedPage.page * @props.pageSize * @props.rowHeight, left: 0, right: 0 }, key: loadedPage.page,
+      _.map loadedPage.rows, (row, i) => @props.renderRow(row, i + loadedPage.page * @props.pageSize) 
+
+  renderLoadingPage: (loadingPage) =>
+    # Determine number of rows 
+    H.div style: { position: "absolute", top: loadingPage * @props.pageSize * @props.rowHeight, left: 0, right: 0 }, key: loadingPage,
+      _.map(_.range(0, @getPageRowCount(loadingPage)), (i) => @props.renderRow(null, i + loadingPage * @props.pageSize))
 
   renderPages: ->
-    _.map(@state.loadedPages, @renderPage)
+    [
+      _.map(@state.loadedPages, @renderLoadedPage)
+      _.map(@state.loadingPages, @renderLoadingPage)
+    ]
 
   render: ->
     # Outer scrollable container

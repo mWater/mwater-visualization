@@ -6,11 +6,13 @@ LargeListComponent = require './LargeListComponent'
 $ ->
   sample = React.createElement(LargeListComponent, {
     loadRows: (start, number, cb) => 
+      console.log start
+      console.log number
       setTimeout () =>
-        cb(null, _.range(start, start + number + 1))
-      , 400
+        cb(null, _.range(start, start + number))
+      , 200
 
-    renderRow: (row, index) -> H.div(style: {height: 25} , "" + row)
+    renderRow: (row, index) -> H.div(style: { height: 25 }, key: index, "" + row)
     rowHeight: 25
     pageSize: 50
     height: 500
