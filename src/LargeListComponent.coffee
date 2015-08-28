@@ -6,8 +6,8 @@ _ = require 'lodash'
 # List with an unlimited number of rows
 module.exports = class LargeListComponent extends React.Component
   @propTypes: 
-    rowSource: React.PropTypes.func.isRequired    # Row source. Function with (offset, number, cb) called back with rows array
-    rowRenderer: React.PropTypes.func.isRequired  # Called with (row, index) to get React node
+    loadRows: React.PropTypes.func.isRequired     # Row source. Function with (offset, number, cb) called back with rows array
+    renderRow: React.PropTypes.func.isRequired    # Called with (row, index) to get React node
     rowHeight: React.PropTypes.number.isRequired  # Height of rows in pixels
     pageSize: React.PropTypes.number.isRequired   # Number of rows per page
     height: React.PropTypes.number.isRequired     # Height of control in pixels
@@ -34,13 +34,31 @@ module.exports = class LargeListComponent extends React.Component
     # TODO
 
   loadVisiblePages: ->
-    @setState(loadingPages: @getVisiblePages())
     # Determine which pages are visible
-    # visiblePages = @getVisiblePages()
+    visiblePages = @getVisiblePages()
 
-    # Get visible rows
+    # Determine which ones to load
+    toLoadPages = _.difference(visiblePages, @state.loadingPages)
+    toLoadPages = _.difference(toLoadPages, _.pluck(@state.loadedPages, "page"))
 
-    # Load those pages
+    # Load those pages (but record that loading ones are still loading)
+    @setState(loadingPages: _.union(toLoadPages, @state.loadingPages))
+
+    for page in toLoadPages
+      do (page) =>
+        @props.loadRows(page * @props.pageSize, Math.min(@props.pageSize, @props.rowCount - page * @props.pageSize), (err, rows) =>
+          # Remove from loading pages
+          loadingPages = _.without(@state.loadingPages, page)
+          if not err
+            loadedPages = @state.loadedPages.slice()
+            loadedPages.push({ page: page, rows: rows })
+
+            # Clean invisible pages
+            visiblePages = @getVisiblePages()
+            loadedPages = _.filter(loadedPages, (p) => p.page in visiblePages)
+
+          @setState(loadingPages: loadingPages, loadedPages: loadedPages)
+        )
 
   getVisiblePages: ->
     # Get pixel range visible
@@ -67,15 +85,12 @@ module.exports = class LargeListComponent extends React.Component
 
     return _.range(minPage, maxPage + 1)
 
-  renderPage: (page) =>
-    H.div style: { position: "absolute", top: page * @props.pageSize * @props.rowHeight, left: 0, right: 0 },
-      _.map(_.range(0, @props.pageSize), (r) =>
-        H.div style: { height: @props.rowHeight, borderBottom: "solid 1px red" }, 
-          "#{r + @props.pageSize * page}"
-      )
+  renderPage: (loadedPage) =>
+    H.div style: { position: "absolute", top: loadedPage.page * @props.pageSize * @props.rowHeight, left: 0, right: 0 },
+      _.map loadedPage.rows, (row, i) => @props.renderRow(row, i)
 
   renderPages: ->
-    _.map(@state.loadingPages, @renderPage)
+    _.map(@state.loadedPages, @renderPage)
 
   render: ->
     # Outer scrollable container

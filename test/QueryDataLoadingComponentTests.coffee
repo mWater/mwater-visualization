@@ -16,7 +16,7 @@ describe "QueryDataLoadingComponent", ->
         queries: "abc"
       }))
     _.defer () =>
-      assert.match($(comp.getDOMNode()).text(), /ABC/)
+      assert.match($(comp.getComponentNode()).text(), /ABC/)
       done()
 
   it "displays updated element with data", (done) ->
@@ -32,7 +32,7 @@ describe "QueryDataLoadingComponent", ->
         queries: "def"
         }))
       _.defer () =>
-        assert.match($(comp.getDOMNode()).text(), /DEF/)
+        assert.match($(comp.getComponentNode()).text(), /DEF/)
         done()
 
   it "displays faded element with old data if no more factory", (done) ->
@@ -48,7 +48,7 @@ describe "QueryDataLoadingComponent", ->
         queries: null
         }))
       _.defer () =>
-        assert.match($(comp.getDOMNode()).text(), /ABC/)
+        assert.match($(comp.getComponentNode()).text(), /ABC/)
         # TODO check faded
         done()
 
@@ -66,7 +66,7 @@ describe "QueryDataLoadingComponent", ->
         queries: null
         }))
       _.defer () =>
-        assert.match($(comp.getDOMNode()).text(), /ABC/)
+        assert.match($(comp.getComponentNode()).text(), /ABC/)
         # TODO check faded
         done()
 
@@ -84,7 +84,7 @@ describe "QueryDataLoadingComponent", ->
         queries: "def"
         }))
       _.defer () =>
-        assert.match($(comp.getDOMNode()).text(), /error/i)
+        assert.match($(comp.getComponentNode()).text(), /error/i)
         done()
 
   it "waits until load complete before trying another", (done) ->
@@ -115,12 +115,12 @@ describe "QueryDataLoadingComponent", ->
         cbs[0](null, "ABC")
         _.defer () =>
           # Does not display since different queries now
-          assert.notMatch($(comp.getDOMNode()).text(), /ABC/)
+          assert.notMatch($(comp.getComponentNode()).text(), /ABC/)
 
           # Finish second request
           cbs[1](null, "DEF")
           _.defer () =>
-            assert.match($(comp.getDOMNode()).text(), /DEF/)
+            assert.match($(comp.getComponentNode()).text(), /DEF/)
             done()
 
 
