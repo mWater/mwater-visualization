@@ -13,6 +13,7 @@ module.exports = class LargeListComponent extends React.Component
     height: React.PropTypes.number.isRequired     # Height of control in pixels
     rowCount: React.PropTypes.number.isRequired   # number of rows
     bufferSize: React.PropTypes.number.isRequired # Number of extra rows to pull down on each size for nicer scrolling
+    useLoadingPlaceholder: React.PropTypes.bool   # true to use row placeholders when loading. calls renderRow with null row
 
   constructor: (props) ->
     super
@@ -133,7 +134,7 @@ module.exports = class LargeListComponent extends React.Component
       # Inner tall container
       H.div style: { height: @props.rowHeight * @props.rowCount }, # ref: "inner",
         _.map(@state.loadedPages, @renderLoadedPage)
-        _.map(@state.loadingPages, @renderLoadingPage)
+        if @props.useLoadingPlaceholder then _.map(@state.loadingPages, @renderLoadingPage)
 
 class LoadingPageComponent extends React.Component
   @propTypes:
@@ -154,8 +155,6 @@ class LoadingPageComponent extends React.Component
   render: (loadingPage) =>
     loadingPage = @props.loadingPage
 
-    console.log "LOADINGPAGE #{loadingPage}"
-
     H.div style: { position: "absolute", top: loadingPage * @props.pageSize * @props.rowHeight, left: 0, right: 0 }, 
       _.map(_.range(0, @getPageRowCount(loadingPage)), (i) => @props.renderRow(null, i + loadingPage * @props.pageSize))
 
@@ -172,8 +171,6 @@ class LoadedPageComponent extends React.Component
 
   render: ->
     loadedPage = @props.loadedPage
-
-    console.log "LOADEDPAGE #{loadedPage.page}"
 
     H.div style: { position: "absolute", top: loadedPage.page * @props.pageSize * @props.rowHeight, left: 0, right: 0 }, 
       _.map loadedPage.rows, (row, i) => @props.renderRow(row, i + loadedPage.page * @props.pageSize) 
