@@ -12,7 +12,7 @@ module.exports = class LeafletMapComponent extends React.Component
       n: React.PropTypes.number.isRequired
       e: React.PropTypes.number.isRequired
       s: React.PropTypes.number.isRequired
-      }).isRequired
+      }) # Initial bounds. Fit world if none
 
     width: React.PropTypes.number # Required width
     height: React.PropTypes.number # Required height
@@ -47,7 +47,10 @@ module.exports = class LeafletMapComponent extends React.Component
           s: bounds.getSouth() 
         })
 
-    @map.fitBounds(new L.LatLngBounds([[@props.initialBounds.n, @props.initialBounds.w], [@props.initialBounds.s, @props.initialBounds.e]]))
+    if @props.initialBounds
+      @map.fitBounds(new L.LatLngBounds([[@props.initialBounds.n, @props.initialBounds.w], [@props.initialBounds.s, @props.initialBounds.e]]))
+    else
+      @map.fitWorld()
 
     # Add legend
     @legendControl = L.control({position: 'bottomright'})
