@@ -1,7 +1,7 @@
 React = require 'react'
 H = React.DOM
 _ = require 'lodash'
-
+shallowequal = require('shallowequal')
 
 # List with an unlimited number of rows
 module.exports = class LargeListComponent extends React.Component
@@ -46,6 +46,10 @@ module.exports = class LargeListComponent extends React.Component
     if reset
       @setState(loadedPages: [], loadingPages: [])
 
+  # Optimize rendering
+  shouldComponentUpdate: (nextProps, nextState) ->
+    return not shallowequal(nextProps, @props) or not shallowequal(nextState, @state)
+
   # Gets the size of a page (all same except last)
   getPageRowCount: (page) ->
     return Math.min(@props.pageSize, @props.rowCount - page * @props.pageSize)
@@ -57,6 +61,9 @@ module.exports = class LargeListComponent extends React.Component
     # Determine which ones to load
     toLoadPages = _.difference(visiblePages, @state.loadingPages)
     toLoadPages = _.difference(toLoadPages, _.pluck(@state.loadedPages, "page"))
+
+    if toLoadPages.length == 0
+      return
 
     # Load those pages (but record that loading ones are still loading)
     @setState(loadingPages: _.union(toLoadPages, @state.loadingPages))
