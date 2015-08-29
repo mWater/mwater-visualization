@@ -62,6 +62,7 @@ module.exports = class LargeListComponent extends React.Component
     toLoadPages = _.difference(visiblePages, @state.loadingPages)
     toLoadPages = _.difference(toLoadPages, _.pluck(@state.loadedPages, "page"))
 
+    # Do nothing if nothing to load
     if toLoadPages.length == 0
       return
 
@@ -110,23 +111,69 @@ module.exports = class LargeListComponent extends React.Component
     return _.range(minPage, maxPage + 1)
 
   renderLoadedPage: (loadedPage) =>
-    H.div style: { position: "absolute", top: loadedPage.page * @props.pageSize * @props.rowHeight, left: 0, right: 0 }, key: loadedPage.page,
-      _.map loadedPage.rows, (row, i) => @props.renderRow(row, i + loadedPage.page * @props.pageSize) 
+    React.createElement(LoadedPageComponent, 
+      key: loadedPage.page
+      loadedPage: loadedPage
+      pageSize: @props.pageSize
+      rowHeight: @props.rowHeight
+      renderRow: @props.renderRow)
 
   renderLoadingPage: (loadingPage) =>
-    # Determine number of rows 
-    H.div style: { position: "absolute", top: loadingPage * @props.pageSize * @props.rowHeight, left: 0, right: 0 }, key: loadingPage,
-      _.map(_.range(0, @getPageRowCount(loadingPage)), (i) => @props.renderRow(null, i + loadingPage * @props.pageSize))
-
-  renderPages: ->
-    [
-      _.map(@state.loadedPages, @renderLoadedPage)
-      _.map(@state.loadingPages, @renderLoadingPage)
-    ]
+    React.createElement(LoadingPageComponent, 
+      key: loadingPage
+      loadingPage: loadingPage
+      pageSize: @props.pageSize
+      rowHeight: @props.rowHeight
+      renderRow: @props.renderRow
+      rowCount: @props.rowCount)
 
   render: ->
     # Outer scrollable container
     H.div style: { height: @props.height, overflowY: "scroll", position: "relative" }, # ref: "outer",
       # Inner tall container
       H.div style: { height: @props.rowHeight * @props.rowCount }, # ref: "inner",
-        @renderPages()
+        _.map(@state.loadedPages, @renderLoadedPage)
+        _.map(@state.loadingPages, @renderLoadingPage)
+
+class LoadingPageComponent extends React.Component
+  @propTypes:
+    loadingPage: React.PropTypes.number.isRequired # page number
+    renderRow: React.PropTypes.func.isRequired    # Called with (row, index) to get React node. Row is null for placeholder while loading
+    rowHeight: React.PropTypes.number.isRequired  # Height of rows in pixels
+    pageSize: React.PropTypes.number.isRequired   # Number of rows per page
+    rowCount: React.PropTypes.number.isRequired   # number of rows
+
+  # Optimize rendering
+  shouldComponentUpdate: (nextProps, nextState) ->
+    return not shallowequal(nextProps, @props)
+
+  # Gets the size of a page (all same except last)
+  getPageRowCount: (page) ->
+    return Math.min(@props.pageSize, @props.rowCount - page * @props.pageSize)
+
+  render: (loadingPage) =>
+    loadingPage = @props.loadingPage
+
+    console.log "LOADINGPAGE #{loadingPage}"
+
+    H.div style: { position: "absolute", top: loadingPage * @props.pageSize * @props.rowHeight, left: 0, right: 0 }, 
+      _.map(_.range(0, @getPageRowCount(loadingPage)), (i) => @props.renderRow(null, i + loadingPage * @props.pageSize))
+
+class LoadedPageComponent extends React.Component
+  @propTypes:
+    loadedPage: React.PropTypes.object.isRequired # { page: page number, rows: rows of page }
+    renderRow: React.PropTypes.func.isRequired    # Called with (row, index) to get React node. Row is null for placeholder while loading
+    rowHeight: React.PropTypes.number.isRequired  # Height of rows in pixels
+    pageSize: React.PropTypes.number.isRequired   # Number of rows per page
+
+  # Optimize rendering
+  shouldComponentUpdate: (nextProps, nextState) ->
+    return not shallowequal(nextProps, @props)
+
+  render: ->
+    loadedPage = @props.loadedPage
+
+    console.log "LOADEDPAGE #{loadedPage.page}"
+
+    H.div style: { position: "absolute", top: loadedPage.page * @props.pageSize * @props.rowHeight, left: 0, right: 0 }, 
+      _.map loadedPage.rows, (row, i) => @props.renderRow(row, i + loadedPage.page * @props.pageSize) 
