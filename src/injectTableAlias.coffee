@@ -2,6 +2,10 @@ _ = require 'lodash'
 
 # Recursively inject table alias tableAlias for `{alias}` 
 injectTableAlias = (jsonql, tableAlias) ->
+  # Handle empty
+  if not jsonql
+    return jsonql
+
   # Handle arrays
   if _.isArray(jsonql)
     return _.map(jsonql, (item) => injectTableAlias(item, tableAlias))
