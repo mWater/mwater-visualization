@@ -9,6 +9,8 @@ exports.DataSource = require './DataSource'
 exports.CachingDataSource = require './CachingDataSource'
 exports.WidgetFactory = require './widgets/WidgetFactory'
 
+exports.UndoStack = require './UndoStack'
+
 exports.DashboardComponent = require './widgets/DashboardComponent'
 exports.AutoSizeComponent = require './AutoSizeComponent'
 
@@ -25,6 +27,7 @@ exports.LargeListComponent = require './LargeListComponent'
 exports.VerticalLayoutComponent = require './VerticalLayoutComponent'
 exports.ModalComponent = require './ModalComponent'
 exports.ActionCancelModalComponent = require './ActionCancelModalComponent'
+exports.RadioButtonComponent = require './RadioButtonComponent'
 
 # http://stackoverflow.com/questions/19305821/multiple-modals-overlay
 $ = require 'jquery'
