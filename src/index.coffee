@@ -29,6 +29,10 @@ exports.ModalComponent = require './ModalComponent'
 exports.ActionCancelModalComponent = require './ActionCancelModalComponent'
 exports.RadioButtonComponent = require './RadioButtonComponent'
 
+exports.DateRangeComponent = require './DateRangeComponent'
+
+exports.injectTableAlias = require './injectTableAlias'
+
 # http://stackoverflow.com/questions/19305821/multiple-modals-overlay
 $ = require 'jquery'
 

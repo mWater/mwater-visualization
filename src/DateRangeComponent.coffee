@@ -1,16 +1,13 @@
 React = require 'react'
 H = React.DOM
 moment = require 'moment'
-
-ExpressionCompiler = require './ExpressionCompiler'
-ExpressionBuilder = require './ExpressionBuilder'
 DateRangePicker = require 'react-bootstrap-daterangepicker'
 
 # Displays a date range
 module.exports = class DateRangeComponent extends React.Component
   @propTypes: 
-    value: React.PropTypes.object
-    onChange: React.PropTypes.func.isRequired 
+    value: React.PropTypes.object             # Array of [start date, end date] in iso 8601 format
+    onChange: React.PropTypes.func.isRequired # Array of [start date, end date] in iso 8601 format
     datetime: React.PropTypes.bool.isRequired # true if for datetime, not date
 
   handleClear: (ev) =>
@@ -20,16 +17,16 @@ module.exports = class DateRangeComponent extends React.Component
   handleApply: (event, picker) =>
     if @props.datetime
       value = [picker.startDate.endOf('day').toISOString(), picker.endDate.endOf('day').toISOString()]
-      @props.onChange({ type: "literal", valueType: "datetimerange", value: value })
+      @props.onChange(value)
     else
       value = [picker.startDate.format("YYYY-MM-DD"), picker.endDate.format("YYYY-MM-DD")]
-      @props.onChange({ type: "literal", valueType: "daterange", value: value })
+      @props.onChange(value: value)
 
   render: ->
-    hasValue = @props.value and _.isArray(@props.value.value)
+    hasValue = _.isArray(@props.value)
     if hasValue
-      startDate = moment(@props.value.value[0], moment.ISO_8601)
-      endDate = moment(@props.value.value[1], moment.ISO_8601)
+      startDate = moment(@props.value[0], moment.ISO_8601)
+      endDate = moment(@props.value[1], moment.ISO_8601)
   
       startStr = startDate.format('ll')
       endStr = endDate.format('ll')

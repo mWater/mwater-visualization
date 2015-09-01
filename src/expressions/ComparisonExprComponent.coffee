@@ -5,7 +5,7 @@ literalComponents = require './literalComponents'
 ExpressionBuilder = require './ExpressionBuilder'
 EditableLinkComponent = require './../EditableLinkComponent'
 TextArrayComponent = require './TextArrayComponent'
-DateRangeComponent = require './DateRangeComponent'
+DateRangeLiteralComponent = require './DateRangeLiteralComponent'
 
 module.exports = class ComparisonExprComponent extends React.Component
   @propTypes: 
@@ -96,13 +96,13 @@ module.exports = class ComparisonExprComponent extends React.Component
             dataSource: @props.dataSource
             onChange: @handleRhsChange)
         when "daterange"
-          rhsControl = React.createElement(DateRangeComponent, 
+          rhsControl = React.createElement(DateRangeLiteralComponent, 
             key: "rhs"
             datetime: false
             value: @props.value.rhs
             onChange: @handleRhsChange)
         when "datetimerange"
-          rhsControl = React.createElement(DateRangeComponent, 
+          rhsControl = React.createElement(DateRangeLiteralComponent, 
             key: "rhs"
             datetime: true
             value: @props.value.rhs
