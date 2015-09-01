@@ -33,9 +33,8 @@ module.exports = class ModalComponent extends React.Component
     React.unmountComponentAtNode(@modalNode)
     $(@modalNode).remove()
 
-  render: ->
-    H.div null
-
+  render: -> null
+    
 # Content must be rendered at body level to prevent weird behaviour, so this is the inner component
 class ModalComponentContent extends React.Component
   @propTypes: 

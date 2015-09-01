@@ -23,6 +23,8 @@ exports.MapComponent = require './maps/MapComponent'
 
 exports.LargeListComponent = require './LargeListComponent'
 exports.VerticalLayoutComponent = require './VerticalLayoutComponent'
+exports.ModalComponent = require './ModalComponent'
+exports.ActionCancelModalComponent = require './ActionCancelModalComponent'
 
 # http://stackoverflow.com/questions/19305821/multiple-modals-overlay
 $ = require 'jquery'
