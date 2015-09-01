@@ -37,7 +37,6 @@ module.exports = class MWaterServerLayer extends Layer
 
   # Create query string
   createUrl: (extension, filters) ->
-    # TODO client
     url = "#{@apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?type=#{@design.type}&radius=1000"
 
     if @client

@@ -8,8 +8,13 @@ module.exports = class MapViewComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
     layerFactory: React.PropTypes.object.isRequired
+    
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
+
+    width: React.PropTypes.number        # Width in pixels
+    height: React.PropTypes.number       # Height in pixels
+
     extraFilters: React.PropTypes.arrayOf(React.PropTypes.shape({
       table: React.PropTypes.string.isRequired
       jsonql: React.PropTypes.object.isRequired

@@ -23,7 +23,7 @@ module.exports = class LayerFactory
         return new MWaterServerLayer(design: design, dataSource: @dataSource, client: @client, apiUrl: @apiUrl, onMarkerClick: @onMarkerClick)
 
       when "Markers"
-        return new MarkersLayer(design: design, client: @client, apiUrl: @apiUrl, schema: @schema, dataSource: @dataSource)
+        return new MarkersLayer(design: design, client: @client, apiUrl: @apiUrl, schema: @schema, dataSource: @dataSource, onMarkerClick: @onMarkerClick)
 
     throw new Error("Unknown type #{type}")
 

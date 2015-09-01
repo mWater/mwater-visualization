@@ -37,7 +37,7 @@ module.exports = class LargeListComponent extends React.Component
   componentWillReceiveProps: (nextProps) ->
     # Reset everything if anything other than renderRow changed
     reset = false
-    for key, value in nextProps
+    for key, value of nextProps
       if @props[key] != value 
         if key != "renderRow"
           reset = true
@@ -45,7 +45,7 @@ module.exports = class LargeListComponent extends React.Component
           refresh = true
 
     if reset
-      @setState(loadedPages: [], loadingPages: [])
+      @setState({ loadedPages: [], loadingPages: [] }, => @loadVisiblePages())
 
   # Optimize rendering
   shouldComponentUpdate: (nextProps, nextState) ->

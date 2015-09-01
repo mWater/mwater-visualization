@@ -28,6 +28,7 @@ module.exports = class SchemaBuilder
         id: tableId
         name: pluralize(entityType.name.en)
         ordering: "_created_on"
+        primaryKey: "_id"
       })
 
       # Add properties
@@ -280,6 +281,7 @@ module.exports = class SchemaBuilder
     @schema.addTable({
       id: "form:#{form._id}"
       name: formUtils.localizeString(form.design.name)
+      primaryKey: "_id"
       # TODO ordering: 
       jsonql: { 
         type: "query" 

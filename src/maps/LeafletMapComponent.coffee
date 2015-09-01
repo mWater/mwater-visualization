@@ -26,7 +26,7 @@ module.exports = class LeafletMapComponent extends React.Component
       opacity: React.PropTypes.number # 0-1
       onGridClick: React.PropTypes.func # Function that is called when grid layer is clicked. Passed { data }
       minZoom: React.PropTypes.number # Minimum zoom level
-      mazZoom: React.PropTypes.number # Maximum zoom level
+      maxZoom: React.PropTypes.number # Maximum zoom level
       })).isRequired # List of layers
 
     legend: React.PropTypes.node # Legend element
@@ -34,7 +34,7 @@ module.exports = class LeafletMapComponent extends React.Component
   componentDidMount: ->
     # Create map
     mapElem = React.findDOMNode(@refs.map)
-    @map = L.map(mapElem)
+    @map = L.map(mapElem, { fadeAnimation: false })
 
     # Fire onBoundsChange
     @map.on "moveend", => 
@@ -50,7 +50,8 @@ module.exports = class LeafletMapComponent extends React.Component
     if @props.initialBounds
       @map.fitBounds(new L.LatLngBounds([[@props.initialBounds.n, @props.initialBounds.w], [@props.initialBounds.s, @props.initialBounds.e]]))
     else
-      @map.fitWorld()
+      # Fit world doesn't work sometimes. Make sure that entire left-right is included
+      @map.fitBounds([[-1, -180], [1, 180]])
 
     # Add legend
     @legendControl = L.control({position: 'bottomright'})

@@ -26,12 +26,14 @@ axes:
 ###
 module.exports = class MarkersLayer extends Layer
   # Pass design, client, apiUrl, schema, dataSource
+  # onMarkerClick takes (table, id) and is the table and id of the row that is represented by the click
   constructor: (options) ->
     @design = options.design
     @client = options.client
     @apiUrl = options.apiUrl
     @schema = options.schema
     @dataSource = options.dataSource
+    @onMarkerClick = options.onMarkerClick
 
   getTileUrl: (filters) -> 
     # Check if valid
@@ -44,8 +46,19 @@ module.exports = class MarkersLayer extends Layer
     @createUrl("png", design, filters)
 
   getUtfGridUrl: (filters) -> 
-    return null
-    # @createUrl("grid.json", filters)
+    # Check if valid
+    # TODO clean/validate order??
+    design = @cleanDesign(@design)
+    
+    if @validateDesign(design)
+      return null
+
+    @createUrl("grid.json", design, filters)
+
+  # Called when the interactivity grid is clicked. Called with { data: interactivty data e.g. `{ id: 123 }` }
+  onGridClick: (ev) ->
+    if @onMarkerClick and ev.data and ev.data.id
+      @onMarkerClick(@design.table, ev.data.id)
 
   # Create query string
   createUrl: (extension, design, filters) ->
@@ -61,11 +74,12 @@ module.exports = class MarkersLayer extends Layer
           jsonql: @createJsonQL(sublayer, filters)
         })
       css: @createCss()
-      # interactivity: {
-      #   layer: "layer0"
-      #   fields: ["id"]
-      # }
+      interactivity: { # TODO Interactivity is only first sublayer!
+        layer: "layer0"
+        fields: ["id"]
+      }
     }
+
     query += "&design=" + encodeURIComponent(JSON.stringify(mapDesign))
 
     return "#{@apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?" + query
@@ -96,7 +110,7 @@ module.exports = class MarkersLayer extends Layer
     innerquery = { 
       type: "query"
       selects: [
-        # { type: "select", expr: { type: "field", tableAlias: "main", column: "_id" }, alias: "id" } # main._id as id
+        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: @schema.getTable(sublayer.table).primaryKey }, alias: "id" } # main primary key as id
         { type: "select", expr: geometryExpr, alias: "the_geom_webmercator" } # geometry as the_geom_webmercator
         cluster
       ]
@@ -135,7 +149,7 @@ module.exports = class MarkersLayer extends Layer
     outerquery = {
       type: "query"
       selects: [
-        # { type: "select", expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "innerquery", column: "id" }]}, alias: "id" } # innerquery._id::text as id
+        { type: "select", expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "innerquery", column: "id" }]}, alias: "id" } # innerquery._id::text as id
         { type: "select", expr: { type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }, alias: "the_geom_webmercator" } # innerquery.the_geom_webmercator as the_geom_webmercator
       ]
       from: { type: "subquery", query: innerquery, alias: "innerquery" }
