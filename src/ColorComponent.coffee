@@ -1,7 +1,7 @@
 React = require 'react'
 H = React.DOM
 
-ColorPicker = require('react-color')
+ColorPicker = require("react-color")
 
 # Simple color well with popup
 module.exports = class ColorComponent extends React.Component
