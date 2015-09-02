@@ -20,7 +20,7 @@ module.exports = class DateRangeComponent extends React.Component
       @props.onChange(value)
     else
       value = [picker.startDate.format("YYYY-MM-DD"), picker.endDate.format("YYYY-MM-DD")]
-      @props.onChange(value: value)
+      @props.onChange(value)
 
   render: ->
     hasValue = _.isArray(@props.value)

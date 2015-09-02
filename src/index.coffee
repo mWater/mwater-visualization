@@ -28,6 +28,7 @@ exports.VerticalLayoutComponent = require './VerticalLayoutComponent'
 exports.ModalComponent = require './ModalComponent'
 exports.ActionCancelModalComponent = require './ActionCancelModalComponent'
 exports.RadioButtonComponent = require './RadioButtonComponent'
+exports.CheckboxComponent = require './CheckboxComponent'
 
 exports.DateRangeComponent = require './DateRangeComponent'
 
