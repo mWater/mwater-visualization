@@ -14,7 +14,7 @@ module.exports = class ActionCancelModalComponent extends React.Component
 
   render: ->
     React.createElement(ModalComponent,
-      header: H.h4(className: "modal-title", @props.title)
+      header: if @props.title then H.h4(className: "modal-title", @props.title)
       footer: [
         H.button 
           key: "cancel"
@@ -22,11 +22,12 @@ module.exports = class ActionCancelModalComponent extends React.Component
           onClick: @props.onCancel
           className: "btn btn-default", 
             "Cancel"
-        H.button 
-          key: "action"
-          type: "button"
-          onClick: @props.onAction
-          className: "btn btn-primary",
-            @props.actionLabel or "Save"
+        if @props.onAction 
+          H.button 
+            key: "action"
+            type: "button"
+            onClick: @props.onAction
+            className: "btn btn-primary",
+              @props.actionLabel or "Save"
       ],
       @props.children)

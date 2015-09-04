@@ -8,6 +8,10 @@ module.exports = class MWaterDataSource extends DataSource
     @client = client
     @cache = LRU({ max: 50, maxAge: 1000 * 15 * 60 })
 
+  # Resets the cache
+  clearCache: -> 
+    @cache.reset()
+
   performQuery: (query, cb) ->
     cacheKey = JSON.stringify(query)
     cachedRows = @cache.get(cacheKey)

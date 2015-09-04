@@ -50,9 +50,11 @@ class ModalComponentContent extends React.Component
     H.div ref: "modal", className: "modal",
       H.div className: "modal-dialog#{dialogExtraClass}",
         H.div className: "modal-content",
-          H.div className: "modal-header",
-            @props.header
+          if @props.header
+            H.div className: "modal-header",
+              @props.header
           H.div className: "modal-body",
             @props.children
-          H.div className: "modal-footer",
-            @props.footer
+          if @props.footer
+            H.div className: "modal-footer",
+              @props.footer

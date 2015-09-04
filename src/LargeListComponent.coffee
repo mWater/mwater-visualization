@@ -3,7 +3,14 @@ H = React.DOM
 _ = require 'lodash'
 shallowequal = require('shallowequal')
 
-# List with an unlimited number of rows
+###
+List with an unlimited number of rows
+It shows a scrolling window with up to 1 million or more rows. It works by knowing the height of rows and 
+then only rendering a part of the list that is visible at any given moment.
+
+Internally, it divides the rows into pages, each with a fixed size. It calculates which pages are visible
+and then loads those pages, optionally putting a placeholder while the pages are being loaded.
+###
 module.exports = class LargeListComponent extends React.Component
   @propTypes: 
     loadRows: React.PropTypes.func.isRequired     # Row source. Function with (offset, number, cb) called back with rows array
@@ -31,21 +38,18 @@ module.exports = class LargeListComponent extends React.Component
 
     React.findDOMNode(this).addEventListener("scroll", @handleScroll)
     
-  handleScroll: (ev) =>
-    @loadVisiblePages()
-
   componentWillReceiveProps: (nextProps) ->
-    # Reset everything if anything other than renderRow changed
-    reset = false
+    # Reload everything if anything other than renderRow changed
+    reload = false
     for key, value of nextProps
       if @props[key] != value 
         if key != "renderRow"
-          reset = true
+          reload = true
         else
           refresh = true
 
-    if reset
-      @setState({ loadedPages: [], loadingPages: [] }, => @loadVisiblePages())
+    if reload
+      @reload()
 
   # Optimize rendering
   shouldComponentUpdate: (nextProps, nextState) ->
@@ -54,6 +58,13 @@ module.exports = class LargeListComponent extends React.Component
   # Gets the size of a page (all same except last)
   getPageRowCount: (page) ->
     return Math.min(@props.pageSize, @props.rowCount - page * @props.pageSize)
+
+  # Forces a reload of all data
+  reload: ->
+    @setState({ loadedPages: [], loadingPages: [] }, => @loadVisiblePages())    
+
+  handleScroll: (ev) =>
+    @loadVisiblePages()
 
   loadVisiblePages: ->
     # Determine which pages are visible
@@ -68,24 +79,28 @@ module.exports = class LargeListComponent extends React.Component
       return
 
     # Load those pages (but record that loading ones are still loading)
-    @setState(loadingPages: _.union(toLoadPages, @state.loadingPages))
+    @setState(loadingPages: _.union(toLoadPages, @state.loadingPages), =>
+      for page in toLoadPages
+        do (page) =>
+          @props.loadRows(page * @props.pageSize, @getPageRowCount(page), (err, rows) =>
+            # Remove from loading pages
+            loadingPages = _.without(@state.loadingPages, page)
+            if not err
+              loadedPages = @state.loadedPages.slice()
+              # Remove if already loaded
+              loadedPages = _.filter(loadedPages, (p) -> p.page != page)
+              loadedPages.push({ page: page, rows: rows })
 
-    for page in toLoadPages
-      do (page) =>
-        @props.loadRows(page * @props.pageSize, @getPageRowCount(page), (err, rows) =>
-          # Remove from loading pages
-          loadingPages = _.without(@state.loadingPages, page)
-          if not err
-            loadedPages = @state.loadedPages.slice()
-            loadedPages.push({ page: page, rows: rows })
+              # Clean invisible pages
+              visiblePages = @getVisiblePages()
+              loadedPages = _.filter(loadedPages, (p) => p.page in visiblePages)
 
-            # Clean invisible pages
-            visiblePages = @getVisiblePages()
-            loadedPages = _.filter(loadedPages, (p) => p.page in visiblePages)
+            @setState(loadingPages: loadingPages, loadedPages: loadedPages)
+          )
+      )
 
-          @setState(loadingPages: loadingPages, loadedPages: loadedPages)
-        )
 
+  # Get an array of visible page IDs
   getVisiblePages: ->
     # Get pixel range visible
     minPixels = React.findDOMNode(this).scrollTop
@@ -136,6 +151,7 @@ module.exports = class LargeListComponent extends React.Component
         _.map(@state.loadedPages, @renderLoadedPage)
         if @props.useLoadingPlaceholder then _.map(@state.loadingPages, @renderLoadingPage)
 
+# Displays a single page that is loading
 class LoadingPageComponent extends React.Component
   @propTypes:
     loadingPage: React.PropTypes.number.isRequired # page number
@@ -158,6 +174,7 @@ class LoadingPageComponent extends React.Component
     H.div style: { position: "absolute", top: loadingPage * @props.pageSize * @props.rowHeight, left: 0, right: 0 }, 
       _.map(_.range(0, @getPageRowCount(loadingPage)), (i) => @props.renderRow(null, i + loadingPage * @props.pageSize))
 
+# Displays a single page that has loaded
 class LoadedPageComponent extends React.Component
   @propTypes:
     loadedPage: React.PropTypes.object.isRequired # { page: page number, rows: rows of page }

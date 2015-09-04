@@ -33,6 +33,7 @@ exports.CheckboxComponent = require './CheckboxComponent'
 exports.DateRangeComponent = require './DateRangeComponent'
 
 exports.injectTableAlias = require './injectTableAlias'
+exports.TabbedComponent = require './TabbedComponent'
 
 # http://stackoverflow.com/questions/19305821/multiple-modals-overlay
 $ = require 'jquery'

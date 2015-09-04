@@ -1,6 +1,7 @@
 Schema = require '../../Schema'
 SchemaBuilder = require './SchemaBuilder'
 MWaterDataSource = require './MWaterDataSource'
+fs = require 'fs'
 
 # Note: Requires jQuery!!
 
@@ -39,4 +40,33 @@ exports.createSchema = (options, cb) ->
   .fail (xhr) =>
     cb(new Error(xhr.responseText))
 
+# Gets the structure of the properties of an entity type
+# { type: "property", property: the property }
+# and 
+# { type: "section", name: section name, contents: array of properties/sections etc. }
+# properties is properties of the entity type
+exports.getPropertiesStructure = (properties, entityType) ->
+  # TODO this is all a massive hack to be better organized when structure will be built into properties
+  # and schemas will have sections for tables directly
+  structure = null
+  switch entityType
+    when "water_point"
+      structure = Schema.parseStructureFromText(
+        fs.readFileSync(__dirname + '/structures/water_point.txt', 'utf-8'))
 
+  if not structure
+    return _.map(properties, (p) -> { type: "property", property: p })
+
+  mapStructure = (str) ->
+    return _.compact(
+      _.map(str, (item) ->
+        if item.type == "column"
+          prop = _.findWhere(properties, code: item.column)
+          if prop
+            return { type: "property", property: prop }
+        else if item.type == "section"
+          return { type: "section", name: item.name, contents: mapStructure(item.contents) }
+      )
+    )
+
+  return mapStructure(structure)
