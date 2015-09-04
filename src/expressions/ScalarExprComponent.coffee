@@ -19,7 +19,7 @@ module.exports = class ScalarExprComponent extends React.Component
     # that is "Number of {table name}" that will have no aggregate and a count expression. 
     includeCount: React.PropTypes.bool
 
-    editorTitle: React.PropTypes.any # Title of editor popup. Any element
+    editorTitle: React.PropTypes.node   # Title of editor popup. Any element
     
     value: React.PropTypes.object # Current value of expression
     onChange: React.PropTypes.func.isRequired # Called when changes
@@ -29,7 +29,7 @@ module.exports = class ScalarExprComponent extends React.Component
     editorInitiallyOpen: React.PropTypes.bool # True to open editor as soon as created
 
   constructor: (props) ->
-    super(props)
+    super
 
     # editorValue is set to the currently being edited value
     # editorOpen is true if editing

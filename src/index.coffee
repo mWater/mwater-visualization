@@ -4,6 +4,7 @@ exports.LogicalExprComponent = require './expressions/LogicalExprComponent'
 exports.ExpressionBuilder = require './expressions/ExpressionBuilder'
 exports.ExpressionCompiler = require './expressions/ExpressionCompiler'
 exports.ScalarExprComponent = require './expressions/ScalarExprComponent'
+exports.ScalarExprEditorComponent = require './expressions/ScalarExprEditorComponent'
 
 exports.DataSource = require './DataSource'
 exports.CachingDataSource = require './CachingDataSource'
