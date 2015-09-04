@@ -19,12 +19,13 @@ Design is:
   xAxisLabelText: text of x axis label
   yAxisLabelText: text of y axis label
   transpose: true to flip axes
+  stacked: true to stack all 
 
 layer:
   type: bar/line/spline/scatter/area/pie/donut (overrides main one)
   name: label for layer (optional)
   axes: axes (see below)
-  stacked: true to stack
+  stacked: true to stack (Note: not implemented yet)
   filter: optional logical expression to filter by
   color: color of layer (e.g. #FF8800)
 

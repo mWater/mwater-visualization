@@ -431,7 +431,25 @@ describe "LayeredChartCompiler", ->
           assert.equal @res.xAxisType, "timeseries"
 
     describe "bar (or category)", ->
-      it "groups for stacked"
+      it "groups for stacked layer", ->
+        design = {
+          type: "bar"
+          layers: [
+            { table: "t1", axes: { x: @axisInteger, y: @axisIntegerSum, color: @axisEnum } }
+          ]
+          stacked: true
+        }
+
+        data = { 
+          layer0: [{ x: 1, y: 11, color: "a" }, { x: 2, y: 12, color: "b" }]
+        }
+
+        res = @compiler.compileData(design, data)
+
+        compare(res.groups, [
+          ["0:a", "0:b"]
+          ])
+
       describe "x axis range", ->
         describe "integer", ->
           before ->

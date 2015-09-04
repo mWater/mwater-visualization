@@ -28,6 +28,8 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
   handleTransposeChange: (val) =>
     @updateDesign(transpose: val)
 
+  handleStackedChange: (ev) => @updateDesign(stacked: ev.target.checked)
+
   handleLayerChange: (index, layer) =>
     layers = @props.design.layers.slice()
     layers[index] = layer
@@ -126,10 +128,26 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
         H.span className: "glyphicon glyphicon-plus"
         " Add Series"
 
+  renderStacked: ->
+    design = @props.design
+
+    # Can only stack if multiple series or one with color  and not polar
+    if design.type in ['pie', 'donut']
+      return
+
+    if design.layers.length <= 1 and not design.layers[0].axes.color
+      return
+
+    H.div className: "checkbox",
+      H.label null,
+        H.input type: "checkbox", value: design.stacked, onChange: @handleStackedChange,
+          "Stacked"
+
   render: ->
     H.div null, 
       @renderType()
       @renderTranspose()
+      @renderStacked()
       @renderLayers()
       H.hr()
       @renderLabels()
@@ -195,8 +213,6 @@ class LayerDesignerComponent extends React.Component
   handleXAxisChange: (axis) => @updateAxes(x: axis)
   handleColorAxisChange: (axis) => @updateAxes(color: axis)
   handleYAxisChange: (axis) => @updateAxes(y: axis)
-
-  handleStackedChange: (ev) => @updateLayer(stacked: ev.target.checked)
 
   handleFilterChange: (filter) => @updateLayer(filter: filter)
 
@@ -301,18 +317,6 @@ class LayerDesignerComponent extends React.Component
           value: layer.axes.y
           onChange: @handleYAxisChange)
 
-  renderStacked: ->
-    layer = @props.design.layers[@props.index]
-
-    # Can only stack if coloring and not polar
-    if not layer.colorExpr or @isLayerPolar(layer)
-      return
-
-    H.div className: "checkbox",
-      H.label null,
-        H.input type: "checkbox", value: layer.stacked, onChange: @handleStackedChange,
-          "Stacked"
-
   renderFilter: ->
     layer = @props.design.layers[@props.index]
 
@@ -340,6 +344,5 @@ class LayerDesignerComponent extends React.Component
       @renderXAxis()
       @renderYAxis()
       @renderColorAxis()
-      @renderStacked()
       @renderFilter()
       @renderName()

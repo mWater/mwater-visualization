@@ -159,6 +159,7 @@ module.exports = class LayeredChartCompiler
     else
       return @compileDataNonCategorical(design, data)
 
+  # Compiles data for a polar chart (pie/donut) with no x axis
   compileDataPolar: (design, data) ->
     columns = []
     types = {}
@@ -211,6 +212,7 @@ module.exports = class LayeredChartCompiler
       xAxisType: "category" # Polar charts are always category x-axis
     }
 
+  # Compiles data for a chart like line or scatter that does not have a categorical x axis
   compileDataNonCategorical: (design, data) ->
     columns = []
     types = {}
@@ -282,6 +284,7 @@ module.exports = class LayeredChartCompiler
     dataMap = {}
     colors = {}
     xs = {}
+    groups = []
 
     # Get all values of the x-axis, taking into account values that might be missing
     xAxis = design.layers[0].axes.x
@@ -356,6 +359,9 @@ module.exports = class LayeredChartCompiler
         xs[series] = "x"
         colors[series] = layer.color
 
+    if design.stacked
+      groups = [_.keys(names)]
+      
     return {
       columns: columns
       types: types
@@ -363,6 +369,7 @@ module.exports = class LayeredChartCompiler
       dataMap: dataMap
       colors: colors
       xs: xs
+      groups: groups
       xAxisType: "category" 
     }
 
