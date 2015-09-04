@@ -49,10 +49,11 @@ module.exports = class VerticalLayoutComponent extends React.Component
           if @state.availableHeight
             height = @state.availableHeight * @props.relativeHeights[child.key]
             return H.div style: { height: height, position: "relative" },
-              H.div style: { height: height },
-                React.cloneElement(child, { height: height, ref: child.key })
+              H.div style: { height: height }, ref: child.key,
+                React.cloneElement(child, { height: height })
           # Otherwise don't show until available height is known
           return null
-        return React.cloneElement(child, { ref: child.key })
+        return H.div ref: child.key,
+          child
         )
 

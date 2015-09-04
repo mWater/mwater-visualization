@@ -25,14 +25,10 @@ module.exports = class AutoSizeComponent extends React.Component
     node = React.findDOMNode(this)
     @setState(width: node.clientWidth, height: node.clientHeight)
 
-  # Get child component
-  getChild: ->
-    return @refs.child
-
   render: ->
     innerElem = null
     if @state.width? and @state.height?
-      overrides = { ref: "child" }
+      overrides = {}
       if @props.injectWidth
         overrides.width = @state.width
       if @props.injectHeight

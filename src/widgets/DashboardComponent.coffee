@@ -25,7 +25,7 @@ module.exports = class DashboardComponent extends React.Component
     @setState(undoStack: @state.undoStack.push(nextProps.design))
 
   handlePrint: =>
-    @refs.dashboardViewContainer.getChild().print()
+    @refs.dashboardView.print()
 
   handleUndo: => 
     undoStack = @state.undoStack.undo()
@@ -115,8 +115,9 @@ module.exports = class DashboardComponent extends React.Component
     H.div key: "view", style: { height: "100%", paddingTop: 30, paddingRight: 20, paddingLeft: 5, position: "relative" },
       @renderActionLinks()
       # Dashboard view requires width, so use auto size component to inject it
-      React.createElement(AutoSizeComponent, { injectWidth: true, ref: "dashboardViewContainer" }, 
+      React.createElement(AutoSizeComponent, { injectWidth: true }, 
         React.createElement(DashboardViewComponent, {
+          ref: "dashboardView"
           design: @props.design
           onDesignChange: @props.onDesignChange
           widgetFactory: @props.widgetFactory
