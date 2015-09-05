@@ -7,9 +7,11 @@ ModalComponent = require('./ModalComponent')
 module.exports = class ActionCancelModalComponent extends React.Component
   @propTypes: 
     title: React.PropTypes.node # Title of modal. Any react element
-    actionLabel: React.PropTypes.string # Action button. Defaults to "Save"
+    actionLabel: React.PropTypes.node # Action button. Defaults to "Save"
     onAction: React.PropTypes.func # Called when action button is clicked
     onCancel: React.PropTypes.func # Called when cancel is clicked
+    onDelete: React.PropTypes.func # Big red destuctive action in footer. Not present if null
+    deleteLabel: React.PropTypes.node # Label of delete button. Default "Delete"
     size: React.PropTypes.string # "large" for large
 
   render: ->
@@ -29,5 +31,13 @@ module.exports = class ActionCancelModalComponent extends React.Component
             onClick: @props.onAction
             className: "btn btn-primary",
               @props.actionLabel or "Save"
+        if @props.onDelete 
+          H.button 
+            key: "delete"
+            type: "button"
+            style: { float: "left" }
+            onClick: @props.onDelete
+            className: "btn btn-danger",
+              @props.deleteLabel or "Delete"
       ],
       @props.children)

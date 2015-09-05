@@ -31,6 +31,12 @@ module.exports = class LeafletMapComponent extends React.Component
 
     legend: React.PropTypes.node # Legend element
 
+  # Reload all tiles
+  reload: ->
+    # TODO reload JSON tiles
+    for tileLayer in @tileLayers
+      tileLayer.redraw()
+
   componentDidMount: ->
     # Create map
     mapElem = React.findDOMNode(@refs.map)
