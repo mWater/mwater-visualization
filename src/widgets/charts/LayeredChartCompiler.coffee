@@ -128,6 +128,9 @@ module.exports = class LayeredChartCompiler
         }
         y: {
           label: { text: options.design.yAxisLabelText, position: 'outer-center' }
+          # Set max to 100 if proportional (with no padding)
+          max: if options.design.type == "bar" and options.design.proportional then 100
+          padding: if options.design.type == "bar" and options.design.proportional then { top: 0, bottom: 0 }
         }
         rotated: options.design.transpose
       }
@@ -329,7 +332,8 @@ module.exports = class LayeredChartCompiler
           _.each rows, (row) =>
             # Get index
             index = categoryMap[row.x]
-            column[index] = row.y
+            # Data arrives as string sometimes
+            column[index] = if row.y then parseFloat(row.y) else null
             dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
 
           columns.push([series].concat(column))
@@ -349,7 +353,8 @@ module.exports = class LayeredChartCompiler
         _.each layerData, (row) =>
           # Get index
           index = categoryMap[row.x]
-          column[index] = row.y
+          # Data arrives as string sometimes
+          column[index] = if row.y then parseFloat(row.y) else null
           dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
 
         columns.push([series].concat(column))
@@ -359,9 +364,33 @@ module.exports = class LayeredChartCompiler
         xs[series] = "x"
         colors[series] = layer.color
 
+
+    # Stack by putting into groups
     if design.stacked
       groups = [_.keys(names)]
-      
+
+    # If proportional
+    if design.proportional
+      # Calculate total for each x
+      xtotals = []
+      for column in columns
+        # Skip x column
+        if column[0] == 'x'
+          continue
+
+        for i in [1...column.length]
+          xtotals[i] = (xtotals[i] or 0) + (column[i] or 0)
+
+      # Now make percentage
+      for column in columns
+        # Skip x column
+        if column[0] == 'x'
+          continue
+
+        for i in [1...column.length]
+          if column[i] > 0
+            column[i] = 100 * column[i] / xtotals[i]
+
     return {
       columns: columns
       types: types

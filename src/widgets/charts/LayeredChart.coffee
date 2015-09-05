@@ -20,6 +20,7 @@ Design is:
   yAxisLabelText: text of y axis label
   transpose: true to flip axes
   stacked: true to stack all 
+  proportinal: true to stack proportionally (100 %). Only applicable if stacked
 
 layer:
   type: bar/line/spline/scatter/area/pie/donut (overrides main one)

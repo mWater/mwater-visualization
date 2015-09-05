@@ -29,6 +29,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     @updateDesign(transpose: val)
 
   handleStackedChange: (ev) => @updateDesign(stacked: ev.target.checked)
+  handleProportionalChange: (ev) => @updateDesign(proportional: ev.target.checked)
 
   handleLayerChange: (index, layer) =>
     layers = @props.design.layers.slice()
@@ -128,7 +129,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
         H.span className: "glyphicon glyphicon-plus"
         " Add Series"
 
-  renderStacked: ->
+  renderStackedProportional: ->
     design = @props.design
 
     # Can only stack if multiple series or one with color  and not polar
@@ -138,16 +139,21 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     if design.layers.length <= 1 and not design.layers[0].axes.color
       return
 
-    H.div className: "checkbox",
-      H.label null,
-        H.input type: "checkbox", value: design.stacked, onChange: @handleStackedChange,
+    H.div null,
+      H.div className: "checkbox-inline", key: "stacked",
+        H.label null,
+          H.input type: "checkbox", value: design.stacked, onChange: @handleStackedChange
           "Stacked"
+      H.div className: "checkbox-inline", key: "proportional",
+        H.label null,
+          H.input type: "checkbox", value: design.proportional, onChange: @handleProportionalChange,
+          "Proportional"
 
   render: ->
     H.div null, 
       @renderType()
       @renderTranspose()
-      @renderStacked()
+      @renderStackedProportional()
       @renderLayers()
       H.hr()
       @renderLabels()

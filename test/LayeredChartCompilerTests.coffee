@@ -431,7 +431,7 @@ describe "LayeredChartCompiler", ->
           assert.equal @res.xAxisType, "timeseries"
 
     describe "bar (or category)", ->
-      it "groups for stacked layer", ->
+      it "groups for stacked", ->
         design = {
           type: "bar"
           layers: [
@@ -448,6 +448,36 @@ describe "LayeredChartCompiler", ->
 
         compare(res.groups, [
           ["0:a", "0:b"]
+          ])
+
+      it "percentages for proportional", ->
+        design = {
+          type: "bar"
+          layers: [
+            { table: "t1", axes: { x: @axisInteger, y: @axisIntegerSum, color: @axisEnum } }
+          ]
+          stacked: true
+          proportional: true
+        }
+
+        data = { 
+          layer0: [
+            { x: 1, y: 10, color: "a" }
+            { x: 1, y: 30, color: "b" }
+            { x: 2, y: 20, color: "a" }
+          ]
+        }
+
+        res = @compiler.compileData(design, data)
+
+        compare(res.groups, [
+          ["0:a", "0:b"]
+          ])
+
+        compare(res.columns, [
+          ["x", "1", "2"]
+          ["0:a", 25, 100]
+          ["0:b", 75, null]
           ])
 
       describe "x axis range", ->
