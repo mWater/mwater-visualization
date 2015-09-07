@@ -15,6 +15,8 @@ module.exports = class DashboardComponent extends React.Component
     design: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func.isRequired
     widgetFactory: React.PropTypes.object.isRequired
+    titleElem: React.PropTypes.node                     # Extra element to include in title at left
+    extraTitleButtonsElem: React.PropTypes.node              # Extra elements to add to right
 
   constructor: (props) ->
     super
@@ -83,8 +85,8 @@ module.exports = class DashboardComponent extends React.Component
     @addWidget(wt.type, wt.design, 8, 8)
 
   renderAddWidget: ->
-    H.div key: "add", className: "btn-group btn-xs",
-      H.button type: "button", "data-toggle": "dropdown", className: "btn btn-link dropdown-toggle",
+    H.div key: "add", className: "btn-group",
+      H.button type: "button", "data-toggle": "dropdown", className: "btn btn-link btn-sm dropdown-toggle",
         H.span className: "glyphicon glyphicon-plus"
         " Add Widget "
         H.span className: "caret"
@@ -95,7 +97,7 @@ module.exports = class DashboardComponent extends React.Component
           )
 
   renderActionLinks: ->
-    H.div style: { textAlign: "right", position: "absolute", top: 0, right: 20 },
+    H.div null,
       @renderAddWidget()
       H.a key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
         H.span className: "glyphicon glyphicon-triangle-left"
@@ -110,10 +112,17 @@ module.exports = class DashboardComponent extends React.Component
       H.a key: "export", className: "btn btn-link btn-sm", onClick: @handleSaveDesignFile,
         H.span(className: "glyphicon glyphicon-download-alt")
         " Export"
+      @props.extraTitleButtonsElem
+
+  renderTitleBar: ->
+    H.div style: { position: "absolute", top: 0, left: 0, right: 0, height: 40, padding: 4 },
+      H.div style: { float: "right" },
+        @renderActionLinks()
+      @props.titleElem
 
   render: ->
-    H.div key: "view", style: { height: "100%", paddingTop: 30, paddingRight: 20, paddingLeft: 5, position: "relative" },
-      @renderActionLinks()
+    H.div key: "view", style: { height: "100%", paddingTop: 40, paddingRight: 20, paddingLeft: 5, position: "relative" },
+      @renderTitleBar()
       # Dashboard view requires width, so use auto size component to inject it
       React.createElement(AutoSizeComponent, { injectWidth: true }, 
         React.createElement(DashboardViewComponent, {

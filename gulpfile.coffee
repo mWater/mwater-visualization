@@ -23,7 +23,7 @@ gulp.task 'copy', ->
     .pipe(gulp.dest('./lib/'))
 
 gulp.task "browserify", ->
-  shim(browserify("./demo.coffee",
+  shim(browserify("./mapdemo.coffee",
     extensions: [".coffee"]
     basedir: "./src/"
   )).bundle()

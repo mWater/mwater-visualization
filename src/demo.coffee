@@ -47,6 +47,7 @@ class DashboardPane extends React.Component
         design: @state.design
         widgetFactory: @state.widgetFactory
         onDesignChange: @handleDesignChange
+        titleElem: "Hello!"
         })
 
 $ ->
