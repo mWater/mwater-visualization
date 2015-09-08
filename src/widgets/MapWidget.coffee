@@ -89,7 +89,6 @@ class MapWidgetComponent extends React.Component
 class InnerMapWidgetComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
-    dataSource: React.PropTypes.object.isRequired # Data source to use
     layerFactory: React.PropTypes.object.isRequired # Layer factory to use
 
     design: React.PropTypes.object.isRequired  # See Map Design.md
