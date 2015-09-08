@@ -11,28 +11,19 @@ class DashboardPane extends React.Component
     }
 
   componentDidMount: ->
-    visualization_mwater.createSchema { apiUrl: @props.apiUrl, client: @props.client }, (err, schema) =>
+    visualization_mwater.setup { 
+      apiUrl: @props.apiUrl
+      client: @props.client
+      onMarkerClick: (table, id) => alert("#{table}:#{id}")
+      newLayers: [
+        { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" } }
+        { name: "Custom Layer", type: "Markers", design: {} }
+      ]
+    }, (err, results) =>
       if err
         throw err
         
-      dataSource = visualization_mwater.createDataSource(@props.apiUrl, @props.client)
- 
-
-      layerFactory = new visualization.LayerFactory({
-        schema: schema
-        dataSource: dataSource
-        apiUrl: @props.apiUrl
-        client: @props.client
-        newLayers: [
-          { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" } }
-          { name: "Custom Layer", type: "Markers", design: {} }
-        ]
-        onMarkerClick: (table, id) => alert("#{table}:#{id}")
-      })
-
-      widgetFactory = new visualization.WidgetFactory(schema: schema, dataSource: dataSource, layerFactory: layerFactory)
- 
-      @setState(schema: schema, widgetFactory: widgetFactory, dataSource: dataSource, layerFactory: layerFactory)
+      @setState(schema: results.schema, widgetFactory: results.widgetFactory, dataSource: results.dataSource, layerFactory: results.layerFactory)
 
   handleDesignChange: (design) =>
     @setState(design: design)
@@ -110,52 +101,6 @@ dashboardDesign = {
           ],
           "version": 1,
           "titleText": "Functional Status of Water Points"
-        }
-      }
-    },
-    "50cb2e15-3aed-43af-ba5f-fda8dc4e03fb": {
-      "layout": {
-        "x": 16,
-        "y": 0,
-        "w": 8,
-        "h": 8
-      },
-      "widget": {
-        "type": "TableChart",
-        "design": {
-          "columns": [
-            {
-              "textAxis": {
-                "expr": {
-                  "type": "scalar",
-                  "expr": {
-                    "type": "field",
-                    "table": "entities.water_point",
-                    "column": "wpdx.management"
-                  },
-                  "table": "entities.water_point",
-                  "joins": []
-                }
-              },
-              "headerText": ""
-            },
-            {
-              "textAxis": {
-                "expr": {
-                  "type": "scalar",
-                  "table": "entities.water_point",
-                  "joins": [],
-                  "expr": {
-                    "type": "count",
-                    "table": "entities.water_point"
-                  }
-                },
-                "aggr": "count"
-              }
-            }
-          ],
-          "table": "entities.water_point",
-          "version": 1
         }
       }
     },

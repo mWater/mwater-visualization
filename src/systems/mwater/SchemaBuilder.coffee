@@ -15,12 +15,18 @@ module.exports = class SchemaBuilder
   constructor: (schema) ->
     @schema = schema
 
-  addEntities: (entityTypes, properties, units, user, groups) ->
+  # Pass in:
+  #   entityTypes: list of entity types objects
+  #   properties: list of all properties objects
+  #   units: list of all units objects
+  #   user: current username
+  #   groups: current groups
+  addEntities: (options) ->
     # Keep list of reverse join columns (one to many) to add later. table and column
     reverseJoins = []
 
     # For each entity type
-    for entityType in entityTypes
+    for entityType in options.entityTypes
       
       # Create table
       tableId = "entities.#{entityType.code}"
@@ -32,14 +38,14 @@ module.exports = class SchemaBuilder
       })
 
       # Add properties
-      for prop in properties
+      for prop in options.properties
         # Filter out invisible ones
         if not _.any(prop._roles, (r) ->
           if r.to == "all"
             return true
-          if r.to == "user:#{user}"
+          if r.to == "user:#{options.user}"
             return true
-          if r.to in _.map(groups or [], (g) -> "group:#{g}")
+          if r.to in _.map(options.groups or [], (g) -> "group:#{g}")
             return true
           return false
           )
@@ -61,7 +67,7 @@ module.exports = class SchemaBuilder
             id: prop.code + ".unit"
             name: prop.name.en + " (units)"
             type: "enum"
-            values: _.map(prop.units, (u) -> { id: u, name: _.findWhere(units, { code: u }).name.en })
+            values: _.map(prop.units, (u) -> { id: u, name: _.findWhere(options.units, { code: u }).name.en })
           })
 
         else if prop.type == "entity"
@@ -131,27 +137,6 @@ module.exports = class SchemaBuilder
         name: "Date added"
         type: "datetime"
       })
-
-      # # Special columns
-      # if entityType.code == "water_point"
-      #   @schema.addColumn(tableId, {
-      #     id: "wpdx.management"
-      #     name: "Management (WPDX)"
-      #     type: "enum"
-      #     values: [
-      #       { id: "Community Management", name: "Community Management" }
-      #       { id: "Private Operator/Delegated Management", name: "Private Operator/Delegated Management" }
-      #       { id: "Institutional Management", name: "Institutional Management" }
-      #       { id: "Other", name: "Other" }
-      #       { id: "Direct Government Operation", name: "Direct Government Operation" }
-      #     ]
-      #   })        
-
-      #   @schema.addColumn(tableId, {
-      #     id: "wpdx.install_year"
-      #     name: "Install Year (WPDX)"
-      #     type: "integer"
-      #   })        
 
     # Add reverse join columns
     for rj in reverseJoins
@@ -279,7 +264,7 @@ module.exports = class SchemaBuilder
   addForm: (form) ->
     # Create table
     @schema.addTable({
-      id: "form:#{form._id}"
+      id: "responses:#{form._id}"
       name: formUtils.localizeString(form.design.name)
       primaryKey: "_id"
       # TODO ordering: 

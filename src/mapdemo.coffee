@@ -9,22 +9,15 @@ class MapDemoComponent extends React.Component
     @state = { design: @props.initialDesign }
 
   componentDidMount: ->
-    visualization_mwater.createSchema { apiUrl: @props.apiUrl, client: @props.client }, (err, schema) =>
+    visualization_mwater.setup { 
+      apiUrl: @props.apiUrl
+      client: @props.client 
+      onMarkerClick: (table, id) => alert("#{table}:#{id}")
+    }, (err, results) =>
       if err
         throw err
-        
-      dataSource = visualization_mwater.createDataSource(@props.apiUrl, @props.client)
-      widgetFactory = new visualization.WidgetFactory(schema: schema, dataSource: dataSource)
-      layerFactory = new visualization.LayerFactory({
-        schema: schema
-        dataSource: dataSource
-        apiUrl: @props.apiUrl
-        client: @props.client
-        newLayers: newLayers
-        onMarkerClick: (table, id) => alert("#{table}:#{id}")
-      })
 
-      @setState(schema: schema, widgetFactory: widgetFactory, dataSource: dataSource, layerFactory: layerFactory)
+      @setState(schema: results.schema, widgetFactory: results.widgetFactory, dataSource: results.dataSource, layerFactory: results.layerFactory)
 
   handleDesignChange: (design) =>
     @setState(design: design)
