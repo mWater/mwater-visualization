@@ -132,26 +132,26 @@ module.exports = class SchemaBuilder
         type: "datetime"
       })
 
-      # Special columns
-      if entityType.code == "water_point"
-        @schema.addColumn(tableId, {
-          id: "wpdx.management"
-          name: "Management (WPDX)"
-          type: "enum"
-          values: [
-            { id: "Community Management", name: "Community Management" }
-            { id: "Private Operator/Delegated Management", name: "Private Operator/Delegated Management" }
-            { id: "Institutional Management", name: "Institutional Management" }
-            { id: "Other", name: "Other" }
-            { id: "Direct Government Operation", name: "Direct Government Operation" }
-          ]
-        })        
+      # # Special columns
+      # if entityType.code == "water_point"
+      #   @schema.addColumn(tableId, {
+      #     id: "wpdx.management"
+      #     name: "Management (WPDX)"
+      #     type: "enum"
+      #     values: [
+      #       { id: "Community Management", name: "Community Management" }
+      #       { id: "Private Operator/Delegated Management", name: "Private Operator/Delegated Management" }
+      #       { id: "Institutional Management", name: "Institutional Management" }
+      #       { id: "Other", name: "Other" }
+      #       { id: "Direct Government Operation", name: "Direct Government Operation" }
+      #     ]
+      #   })        
 
-        @schema.addColumn(tableId, {
-          id: "wpdx.install_year"
-          name: "Install Year (WPDX)"
-          type: "integer"
-        })        
+      #   @schema.addColumn(tableId, {
+      #     id: "wpdx.install_year"
+      #     name: "Install Year (WPDX)"
+      #     type: "integer"
+      #   })        
 
     # Add reverse join columns
     for rj in reverseJoins
@@ -194,19 +194,19 @@ module.exports = class SchemaBuilder
       }
     })
 
-    # TODO name of these admin levels?
-    @schema.addNamedExpr("entities.water_point", {
-      id: "State"
-      name: "State"
-      expr: { type: "field", table: "entities.water_point", column: "admin_04" }
-      })
+    # # TODO name of these admin levels?
+    # @schema.addNamedExpr("entities.water_point", {
+    #   id: "State"
+    #   name: "State"
+    #   expr: { type: "field", table: "entities.water_point", column: "admin_04" }
+    #   })
 
-    # TODO name of these admin levels?
-    @schema.addNamedExpr("entities.water_point", {
-      id: "District"
-      name: "District"
-      expr: { type: "field", table: "entities.water_point", column: "admin_05" }
-      })
+    # # TODO name of these admin levels?
+    # @schema.addNamedExpr("entities.water_point", {
+    #   id: "District"
+    #   name: "District"
+    #   expr: { type: "field", table: "entities.water_point", column: "admin_05" }
+    #   })
 
     # Set table structure for water points
     @schema.setTableStructure("entities.water_point", 
