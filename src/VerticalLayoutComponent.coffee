@@ -1,4 +1,5 @@
 H = React.DOM
+_ = require 'lodash'
 
 # Lays out divs vertically, allowing fractional allocation combined with auto-sized ones
 # Children must all have keys
@@ -13,7 +14,7 @@ module.exports = class VerticalLayoutComponent extends React.Component
     @state = { availableHeight: 0 }
 
   componentWillReceiveProps: (nextProps) -> 
-    if nextProps.height != @props.height
+    if nextProps.height != @props.height or not _.isEqual(nextProps.relativeHeights, @props.relativeHeights)
       @recalculateSize(nextProps)
 
   componentDidMount: -> 
