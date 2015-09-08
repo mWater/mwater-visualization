@@ -289,11 +289,11 @@ module.exports = class SchemaBuilder
 
     structure = []
     @addFormItem(form, form.design, structure)
-    @schema.setTableStructure("form:#{form._id}", structure)
+    @schema.setTableStructure("responses:#{form._id}", structure)
 
   addFormItem: (form, item, structure) ->
     addColumn = (column) =>
-      @schema.addColumn("form:#{form._id}", column)
+      @schema.addColumn("responses:#{form._id}", column)
       structure.push({ type: "column", column: column.id })
 
     # Add sub-items

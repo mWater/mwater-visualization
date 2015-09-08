@@ -55,7 +55,7 @@ exports.setup = (options, cb) ->
           $.getJSON url, (forms) => 
             if forms[0]
               form = forms[0]
-              schemaBuilder.addForm(options.form)
+              schemaBuilder.addForm(form)
 
             callback()
           .fail (xhr) =>
