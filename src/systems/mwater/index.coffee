@@ -17,14 +17,15 @@ exports.SchemaBuilder = SchemaBuilder
 # Options are:
 #   apiUrl: e.g. https://api.mwater.co/v3/
 #   client, user, groups: login information. groups is array, user is string, client is string token of login
-#   formIds: forms to include in schema
-#   onFormIdsChange: called with new form ids if a form is added
 #   newLayers: Array of new layers that can be created for a map. Defaults to custom markers layer e.g.
 #     { name: "Custom Layer", type: "Markers", design: {} }
 #   onMarkerClick: Called when a marker is clicked. Called with (table, id) where id is primary key
+#   onFormTableSelect: Called with the id of the form of the form table that is selected. Use this to keep track of which form tables are needed
 # 
 # cb is called with (err, results) and results contains:
-#   schema, dataSource, widgetFactory, layerFactory, entityTypes, properties, units,
+#   schema, dataSource, widgetFactory, layerFactory, entityTypes, properties, units, onFormTableSelect, loadFormTables
+#   loadFormTables(formIds, callback): loads the specified forms as tables. callback() when done
+#  
 exports.setup = (options, cb) ->
   # Add client url if specified
   if options.client
@@ -47,7 +48,7 @@ exports.setup = (options, cb) ->
         dataSource = new MWaterDataSource(options.apiUrl, options.client)
 
         # Loads the form into the schema
-        addFormToSchema = (formId, cb) ->
+        loadFormTable = (formId, cb) ->
           # Load form
           url = options.apiUrl
           url += "forms?selector=" + encodeURIComponent(JSON.stringify(_id:formId))
@@ -63,8 +64,9 @@ exports.setup = (options, cb) ->
           .fail (xhr) =>
             cb(new Error(xhr.responseText))
 
-        # Save form ids
-        formIds = options.formIds
+        loadFormTables = (formTables, callback) ->
+          # Add forms
+          async.eachSeries formTables or [], loadFormTable, callback
 
         # Create override for createTableSelectElement so that forms can be selected too
         createTableSelectElement = (table, onChange) ->
@@ -78,58 +80,49 @@ exports.setup = (options, cb) ->
               if not newTable
                 return onChange(newTable)
 
-              # If already loaded, just select it
-              if schema.getTable(newTable)
-                return onChange(newTable)
+              # Notify that selected if form table
+              if newTable.match(/^responses:/)
+                # Get id of form (is in format responses:<some form id>)
+                formId = newTable.split(":")[1]
 
-              # Get id of form (is in format responses:<some form id>)
-              formId = newTable.split(":")[1]
+                options.onFormTableSelect(formId)
 
-              # Load form
-              addFormToSchema(formId, (err) ->
-                if err
-                  throw err
+                # If already loaded, just select it
+                if schema.getTable(newTable)
+                  return onChange(newTable)
 
-                # Add to list of form ids
-                formIds = _.union(formIds, [formId])
+                # Load form
+                loadFormTable formId, (err) ->
+                  if err then throw err
 
-                # Fire change
-                options.onFormIdsChange(formIds)
-
-                # Accept change
-                return onChange(newTable)                
-              )
+                  # Accept change
+                  return onChange(newTable)                
 
         # Override table selection
         schema.setCreateTableSelectElement(createTableSelectElement)
 
-        # Add forms
-        async.eachSeries options.formIds or [], (formId, callback) =>
-          addFormToSchema(formId, callback)
-        , (err) =>
-          if err then return cb(err)
+        layerFactory = new LayerFactory({
+          schema: schema
+          dataSource: dataSource
+          apiUrl: options.apiUrl
+          client: options.client
+          newLayers: options.newLayers or [{ name: "Custom Layer", type: "Markers", design: {} }]
+          onMarkerClick: options.onMarkerClick
+        })
 
-          layerFactory = new LayerFactory({
-            schema: schema
-            dataSource: dataSource
-            apiUrl: options.apiUrl
-            client: options.client
-            newLayers: options.newLayers or [{ name: "Custom Layer", type: "Markers", design: {} }]
-            onMarkerClick: options.onMarkerClick
+        widgetFactory = new WidgetFactory(schema: schema, dataSource: dataSource, layerFactory: layerFactory)
+
+        # Call back with all data
+        cb(null, {
+          schema: schema
+          dataSource: dataSource
+          layerFactory: layerFactory
+          widgetFactory: widgetFactory
+          entityTypes: entityTypes
+          properties: properties
+          units: units
+          loadFormTables: loadFormTables
           })
-
-          widgetFactory = new WidgetFactory(schema: schema, dataSource: dataSource, layerFactory: layerFactory)
-
-          # Call back with all data
-          cb(null, {
-            schema: schema
-            dataSource: dataSource
-            layerFactory: layerFactory
-            widgetFactory: widgetFactory
-            entityTypes: entityTypes
-            properties: properties
-            units: units
-            })
 
       .fail (xhr) =>
         cb(new Error(xhr.responseText))

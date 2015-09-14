@@ -19,8 +19,7 @@ class DashboardPane extends React.Component
         { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" } }
         { name: "Custom Layer", type: "Markers", design: {} }
       ]
-      formIds: []
-      onFormIdsChange: (ids) -> alert(JSON.stringify(ids))
+      onFormTableSelect: (id) -> alert(id)
     }, (err, results) =>
       if err
         throw err
