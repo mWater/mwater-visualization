@@ -183,6 +183,8 @@ class MWaterTableSelectElement extends React.Component
     React.createElement(ReactSelect, 
       value: @props.table
       onChange: @props.onChange
+      # Set initial options
+      options: _.map(@props.schema.getTables(), (t) -> { value: t.id, label: t.name })
       asyncOptions: @getAsyncOptions)
 
 # Gets the structure of the properties of an entity type
