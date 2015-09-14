@@ -477,7 +477,7 @@ module.exports = class SchemaBuilder
           name = formUtils.localizeString(item.text)
           if item.units.length > 1
             name += " (magnitude)"
-          else
+          else if item.units.length == 1
             name += " (#{formUtils.localizeString(item.units[0].label)})"
 
           if item.decimal

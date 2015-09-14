@@ -96,13 +96,8 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
         " "
         "Data Source"
       ": "
-      React.createElement(EditableLinkComponent, 
-        dropdownItems: @props.schema.getTables()
-        onDropdownItemClicked: @handleTableChange
-        onRemove: if @props.sublayer.table then @handleTableChange.bind(this, null)
-        if @props.sublayer.table then @props.schema.getTable(@props.sublayer.table).name else H.i(null, "Select...")
-        )
-
+      @props.schema.createTableSelectElement(@props.sublayer.table, @handleTableChange)
+  
   renderGeometryAxis: ->
     if not @props.sublayer.table
       return

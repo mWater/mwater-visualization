@@ -39,24 +39,13 @@ module.exports = class TableChartDesignerComponent extends React.Component
     @updateDesign(columns: columns)
 
   renderTable: ->
-    # Popover removed due to problems positioning in modal window
-    popover = null
-    # if not @props.design.table
-    #   popover = "Start by selecting a data source"
-
     return H.div className: "form-group",
       H.label className: "text-muted", 
         H.span(className: "glyphicon glyphicon-file")
         " "
         "Data Source"
       ": "
-      React.createElement PopoverComponent, html: popover, 
-        React.createElement(EditableLinkComponent, 
-          dropdownItems: @props.schema.getTables()
-          onDropdownItemClicked: @handleTableChange
-          onRemove: if @props.design.table then @handleTableChange.bind(this, null)
-          if @props.design.table then @props.schema.getTable(@props.design.table).name else H.i(null, "Select...")
-          )
+      @props.schema.createTableSelectElement(@props.design.table, @handleTableChange)
 
   renderTitle: ->
     H.div className: "form-group",

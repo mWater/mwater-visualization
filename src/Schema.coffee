@@ -1,8 +1,26 @@
+React = require 'react'
+H = React.DOM
+EditableLinkComponent = require './EditableLinkComponent'
 
-# Schema for a database
+# Schema for a database. Stores tables with columns (possibly in nested sections).
+# Also creates a control for selecting a table
 module.exports = class Schema
-  constructor: ->
+  constructor: () ->
     @tables = []
+
+  # Create an element for selecting a table. Displays current table
+  createTableSelectElement: (table, onChange) ->
+    # Can be overridden
+    React.createElement(EditableLinkComponent, 
+      dropdownItems: @getTables()
+      onDropdownItemClicked: onChange
+      onRemove: (if table then @onChange.bind(this, null)),
+        if table then @getTable(table).name else H.i(null, "Select...")
+      )
+
+  # Call to override create table selection element function
+  setCreateTableSelectElement: (factory) ->
+    @createTableSelectElement = factory
 
   # Add table with id, name, desc, primaryKey, ordering (column with natural order)
   addTable: (options) ->

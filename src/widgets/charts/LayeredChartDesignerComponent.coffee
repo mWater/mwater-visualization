@@ -241,24 +241,13 @@ class LayerDesignerComponent extends React.Component
   renderTable: ->
     layer = @props.design.layers[@props.index]
 
-    # Popover removed due to problems positioning in modal window
-    popover = null
-    # if not layer.table
-    #   popover = "Start by selecting a data source"
-
     return H.div className: "form-group",
       H.label className: "text-muted", 
         H.span(className: "glyphicon glyphicon-file")
         " "
         "Data Source"
       ": "
-      React.createElement PopoverComponent, html: popover, 
-        React.createElement(EditableLinkComponent, 
-          dropdownItems: @props.schema.getTables()
-          onDropdownItemClicked: @handleTableChange
-          onRemove: if layer.table then @handleTableChange.bind(this, null)
-          if layer.table then @props.schema.getTable(layer.table).name else H.i(null, "Select...")
-          )
+      @props.schema.createTableSelectElement(layer.table, @handleTableChange)
 
   renderXAxis: ->
     layer = @props.design.layers[@props.index]
