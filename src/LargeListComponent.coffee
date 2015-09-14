@@ -55,6 +55,10 @@ module.exports = class LargeListComponent extends React.Component
   shouldComponentUpdate: (nextProps, nextState) ->
     return not shallowequal(nextProps, @props) or not shallowequal(nextState, @state)
 
+  componentWillUnmount: ->
+    # Record to prevent invalid updates
+    @unmounted = true
+
   # Gets the size of a page (all same except last)
   getPageRowCount: (page) ->
     return Math.min(@props.pageSize, @props.rowCount - page * @props.pageSize)
@@ -83,6 +87,9 @@ module.exports = class LargeListComponent extends React.Component
       for page in toLoadPages
         do (page) =>
           @props.loadRows(page * @props.pageSize, @getPageRowCount(page), (err, rows) =>
+            if @unmounted
+              return
+              
             # Remove from loading pages
             loadingPages = _.without(@state.loadingPages, page)
             if not err
