@@ -14,7 +14,7 @@ module.exports = class Schema
     React.createElement(EditableLinkComponent, 
       dropdownItems: @getTables()
       onDropdownItemClicked: onChange
-      onRemove: (if table then @onChange.bind(this, null)),
+      onRemove: (if table then onChange.bind(this, null)),
         if table then @getTable(table).name else H.i(null, "Select...")
       )
 
