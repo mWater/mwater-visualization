@@ -265,7 +265,7 @@ module.exports = class SchemaBuilder
     # Create table
     @schema.addTable({
       id: "responses:#{form._id}"
-      name: formUtils.localizeString(form.design.name)
+      name: "Form: " + formUtils.localizeString(form.design.name)
       primaryKey: "_id"
       # TODO ordering: 
       jsonql: { 
