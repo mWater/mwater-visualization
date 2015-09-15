@@ -4,10 +4,8 @@ LayerFactory = require '../../maps/LayerFactory'
 MWaterDataSource = require './MWaterDataSource'
 WidgetFactory = require '../../widgets/WidgetFactory'
 
-ReactSelect = require 'react-select'
 fs = require 'fs'
 async = require 'async'
-querystring = require 'querystring'
 
 exports.SchemaBuilder = SchemaBuilder
 
@@ -20,12 +18,10 @@ exports.SchemaBuilder = SchemaBuilder
 #   newLayers: Array of new layers that can be created for a map. Defaults to custom markers layer e.g.
 #     { name: "Custom Layer", type: "Markers", design: {} }
 #   onMarkerClick: Called when a marker is clicked. Called with (table, id) where id is primary key
-#   onFormTableSelect: Called with the id of the form of the form table that is selected. Use this to keep track of which form tables are needed
 # 
 # cb is called with (err, results) and results contains:
 #   schema, dataSource, widgetFactory, layerFactory, entityTypes, properties, units, onFormTableSelect, loadFormTables
-#   loadFormTables(formIds, callback): loads the specified forms as tables. callback() when done
-#  
+#   loadExtraTables(tableIds, callback): loads the specified extra tables (e.g. "responses:someformid"). Calls callback when done
 exports.setup = (options, cb) ->
   # Add client url if specified
   if options.client
@@ -47,8 +43,18 @@ exports.setup = (options, cb) ->
         # Create data source
         dataSource = new MWaterDataSource(options.apiUrl, options.client)
 
-        # Loads the form into the schema
-        loadFormTable = (formId, cb) ->
+        # Loads the extra table (usually a form)
+        loadExtraTable = (tableId, cb) ->
+          # If not known type, continue
+          if not tableId.match(/^responses:/)
+            return cb()
+
+          # If already loaded, continue
+          if schema.getTable(tableId)
+            return cb()
+
+          formId = tableId.split(":")[1]
+
           # Load form
           url = options.apiUrl
           url += "forms?selector=" + encodeURIComponent(JSON.stringify(_id:formId))
@@ -64,42 +70,9 @@ exports.setup = (options, cb) ->
           .fail (xhr) =>
             cb(new Error(xhr.responseText))
 
-        loadFormTables = (formTables, callback) ->
+        loadExtraTables = (tableIds, callback) ->
           # Add forms
-          async.eachSeries formTables or [], loadFormTable, callback
-
-        # Create override for createTableSelectElement so that forms can be selected too
-        createTableSelectElement = (table, onChange) ->
-          React.createElement MWaterTableSelectElement, 
-            apiUrl: options.apiUrl
-            client: options.client
-            schema: schema
-            table: table
-            onChange: (newTable) ->
-              # If nothing, do that
-              if not newTable
-                return onChange(newTable)
-
-              # Notify that selected if form table
-              if newTable.match(/^responses:/)
-                # Get id of form (is in format responses:<some form id>)
-                formId = newTable.split(":")[1]
-
-                options.onFormTableSelect(formId)
-
-                # If already loaded, just select it
-                if schema.getTable(newTable)
-                  return onChange(newTable)
-
-                # Load form
-                loadFormTable formId, (err) ->
-                  if err then throw err
-
-                  # Accept change
-                  return onChange(newTable)                
-
-        # Override table selection
-        schema.setCreateTableSelectElement(createTableSelectElement)
+          async.eachSeries tableIds or [], loadExtraTable, callback
 
         layerFactory = new LayerFactory({
           schema: schema
@@ -121,7 +94,7 @@ exports.setup = (options, cb) ->
           entityTypes: entityTypes
           properties: properties
           units: units
-          loadFormTables: loadFormTables
+          loadExtraTables: loadExtraTables
           })
 
       .fail (xhr) =>
@@ -130,55 +103,6 @@ exports.setup = (options, cb) ->
       cb(new Error(xhr.responseText))
   .fail (xhr) =>
     cb(new Error(xhr.responseText))
-
-# Allows selection of a table. Loads forms as well and calls event if modified
-class MWaterTableSelectElement extends React.Component
-  @propTypes:
-    apiUrl: React.PropTypes.string.isRequired # Url to hit api
-    client: React.PropTypes.string            # Optional client
-    schema: React.PropTypes.object.isRequired
-
-    table: React.PropTypes.string
-    onChange: React.PropTypes.func.isRequired # Called with table selected
-
-  # Call back with array of { label:, value: }
-  getFormOptions: (cb) =>
-    query = {}
-    if @props.client
-      query.client = @props.client
-
-    # Get names and basic of forms
-    query.fields = JSON.stringify({ "design.name": 1, roles: 1, created: 1, modified: 1, state: 1 })
-    query.selector = JSON.stringify({ design: { $exists: true }, state: { $ne: "deleted" } })
-
-    # Get list of all form names
-    $.getJSON @props.apiUrl + "forms?" + querystring.stringify(query), (forms) => 
-      # TODO use name instead of design.name
-      cb(null, _.map(forms, (form) -> { label: form.design.name.en, value: "responses:" + form._id }))
-    .fail (xhr) =>
-      cb(new Error(xhr.responseText))
-
-  # Get table options in react-select format
-  getAsyncOptions: (input, cb) =>
-    # Get loaded tables
-    options = _.map(@props.schema.getTables(), (t) -> { value: t.id, label: t.name })
-
-    # Get form options
-    @getFormOptions (err, formOptions) =>
-      # Add non-duplicates
-      for opt in formOptions
-        if not @props.schema.getTable(opt.value)
-          options.push(opt)
-
-      cb(null, { options: options, complete: true })
-
-  render: ->
-    React.createElement(ReactSelect, 
-      value: @props.table
-      onChange: @props.onChange
-      # Set initial options
-      options: _.map(@props.schema.getTables(), (t) -> { value: t.id, label: t.name })
-      asyncOptions: @getAsyncOptions)
 
 # Gets the structure of the properties of an entity type
 # { type: "property", property: the property }
