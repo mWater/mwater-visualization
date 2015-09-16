@@ -6,6 +6,8 @@ WidgetScoper = require './WidgetScoper'
 WidgetContainerComponent = require './WidgetContainerComponent'
 ReactElementPrinter = require './../ReactElementPrinter'
 
+uuid = require 'node-uuid'
+
 # Displays a dashboard, handling removing of widgets. No title bar or other decorations.
 # Handles scoping
 module.exports = class DashboardViewComponent extends React.Component
@@ -36,6 +38,19 @@ module.exports = class DashboardViewComponent extends React.Component
   handleRemove: (id) =>
     # Update item layouts
     items = _.omit(@props.design.items, id)
+    design = _.extend({}, @props.design, items: items)
+
+    @props.onDesignChange(design)
+
+  handleDuplicate: (id) =>
+    # Get item
+    item = @props.design.items[id]
+
+    # Make a copy (use same since immutable). It's in the same location, but 
+    # the dashboard will lay it out correctly
+    items = _.extend({}, @props.design.items)
+    items[uuid.v4()] = item
+    
     design = _.extend({}, @props.design, items: items)
 
     @props.onDesignChange(design)
@@ -136,6 +151,7 @@ module.exports = class DashboardViewComponent extends React.Component
         filters: @state.widgetScoper.getFilters(id)
         onScopeChange: @handleScopeChange.bind(null, id)
         onRemove: @handleRemove.bind(null, id)
+        onDuplicate: @handleDuplicate.bind(null, id)
         onDesignChange: @handleDesignChange.bind(null, id)
       })  
 

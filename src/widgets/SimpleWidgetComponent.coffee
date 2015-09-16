@@ -56,10 +56,6 @@ module.exports = class SimpleWidgetComponent extends React.Component
   handleCloseEditor: => 
     @setState(editorInitialBounds: null)
 
-  handleRemove: (ev) =>
-    ev.stopPropagation()
-    @props.onRemove()
-
   renderEditor: ->
     if not @state.editorInitialBounds?
       return

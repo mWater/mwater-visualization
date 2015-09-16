@@ -17,6 +17,7 @@ module.exports = class ChartWidget extends Widget
   # Creates a view of the widget. width and height will be injected
   # options:
   #  onRemove: called when widget is removed
+  #  onDuplicate: called when widget is duplicated
   #  scope: scope of the widget (when the widget self-selects a particular scope)
   #  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   #  onScopeChange: called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
@@ -27,6 +28,7 @@ module.exports = class ChartWidget extends Widget
       design: @design
       dataSource: @dataSource
       onRemove: options.onRemove
+      onDuplicate: options.onDuplicate
       scope: options.scope
       filters: options.filters
       onScopeChange: options.onScopeChange
@@ -42,6 +44,7 @@ class ChartWidgetComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired # Data source to use for chart
 
     onRemove: React.PropTypes.func
+    onDuplicate: React.PropTypes.func
 
     width: React.PropTypes.number
     height: React.PropTypes.number
@@ -85,7 +88,10 @@ class ChartWidgetComponent extends React.Component
     dropdownItems = @props.chart.createDropdownItems(@props.design, @props.dataSource, @props.filters)
     if validDesign
       dropdownItems.push({ label: "Export Data", icon: "save-file", onClick: @handleSaveCsvFile })
-    dropdownItems.push({ label: "Remove", icon: "remove", onClick: @props.onRemove })
+    if @props.onRemove
+      dropdownItems.push({ label: "Remove", icon: "remove", onClick: @props.onRemove })
+    if @props.onDuplicate
+      dropdownItems.push({ label: "Duplicate", icon: "duplicate", onClick: @props.onDuplicate })
     dropdownItems.unshift({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
 
     # Create editor
