@@ -171,6 +171,10 @@ module.exports = class LayeredChart extends Chart
         else
           LayeredChartSvgFileSaver.save(design, data, @schema))
 
+    # Don't save image of invalid design
+    if @validateDesign(@cleanDesign(design))
+      return []
+
     return [{ label: "Save Image", icon: "camera", onClick: save }]
 
   createDataTable: (design, data) ->

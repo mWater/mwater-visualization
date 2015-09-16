@@ -78,9 +78,13 @@ class ChartWidgetComponent extends React.Component
     @refs.simpleWidget.displayEditor()
 
   render: ->
+    # Determine if valid design
+    validDesign = not @props.chart.validateDesign(@props.chart.cleanDesign(@props.design))
+
     # Create dropdown items
     dropdownItems = @props.chart.createDropdownItems(@props.design, @props.dataSource, @props.filters)
-    dropdownItems.push({ label: "Export Data", icon: "save-file", onClick: @handleSaveCsvFile })
+    if validDesign
+      dropdownItems.push({ label: "Export Data", icon: "save-file", onClick: @handleSaveCsvFile })
     dropdownItems.push({ label: "Remove", icon: "remove", onClick: @props.onRemove })
     dropdownItems.unshift({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
 
