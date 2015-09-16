@@ -3,6 +3,7 @@ H = React.DOM
 _ = require 'lodash'
 Draggable = require 'react-draggable'
 
+# This is a floating window with a title bar that is draggable.
 module.exports = class FloatingWindowComponent extends React.Component
   @propTypes:
     initialBounds: React.PropTypes.object.isRequired  # x, y, width, height
@@ -35,7 +36,7 @@ module.exports = class FloatingWindowComponent extends React.Component
       cursor: "pointer"
     }
 
-    H.div style: headerStyle, className: "handle",
+    H.div style: headerStyle, 
       if @props.onClose
         H.div style: closeStyle, onClick: @props.onClose,
           H.span className: "glyphicon glyphicon-remove"
@@ -61,7 +62,7 @@ module.exports = class FloatingWindowComponent extends React.Component
       height: @props.initialBounds.height - 35
     }
 
-    React.createElement(Draggable, ref: "draggable", handle: ".handle, .handle > *", zIndex: 1001,
+    React.createElement(Draggable, ref: "draggable", zIndex: 1001,
       H.div style: windowStyle,
         @renderHeader()
         H.div style: contentsStyle,
