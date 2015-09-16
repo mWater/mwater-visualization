@@ -102,6 +102,10 @@ module.exports = class LayeredChart extends Chart
       if not layer.axes.y
         return "Missing Axis"
 
+      # Check that has either x or color axis
+      if not layer.axes.x and not layer.axes.color
+        return "Missing Axis"
+
       error = null
 
       # Validate axes
