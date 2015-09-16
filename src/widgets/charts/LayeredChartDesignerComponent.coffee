@@ -142,11 +142,11 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     H.div null,
       H.div className: "checkbox-inline", key: "stacked",
         H.label null,
-          H.input type: "checkbox", value: design.stacked, onChange: @handleStackedChange
+          H.input type: "checkbox", checked: design.stacked, onChange: @handleStackedChange
           "Stacked"
       H.div className: "checkbox-inline", key: "proportional",
         H.label null,
-          H.input type: "checkbox", value: design.proportional, onChange: @handleProportionalChange,
+          H.input type: "checkbox", checked: design.proportional, onChange: @handleProportionalChange,
           "Proportional"
 
   render: ->
