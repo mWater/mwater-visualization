@@ -5,6 +5,7 @@ LogicalExprComponent = require './../../expressions/LogicalExprComponent'
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 EditableLinkComponent = require './../../EditableLinkComponent'
 PopoverComponent = require './../../PopoverComponent'
+ColorComponent = require '../../ColorComponent'
 
 module.exports = class LayeredChartDesignerComponent extends React.Component
   @propTypes: 
@@ -222,6 +223,8 @@ class LayerDesignerComponent extends React.Component
 
   handleFilterChange: (filter) => @updateLayer(filter: filter)
 
+  handleColorChange: (color) => @updateLayer(color: color)
+
   renderName: ->
     # Only if multiple
     if @props.design.layers.length <= 1
@@ -312,6 +315,19 @@ class LayerDesignerComponent extends React.Component
           value: layer.axes.y
           onChange: @handleYAxisChange)
 
+  renderColor: ->
+    layer = @props.design.layers[@props.index]
+
+    # If color axis, do nothing
+    if layer.axes.color
+      return
+
+    return H.div className: "form-group",
+      H.label className: "text-muted", 
+        "Color"
+      H.div style: { marginLeft: 8 }, 
+        React.createElement(ColorComponent, color: layer.color, onChange: @handleColorChange)
+
   renderFilter: ->
     layer = @props.design.layers[@props.index]
 
@@ -339,5 +355,6 @@ class LayerDesignerComponent extends React.Component
       @renderXAxis()
       @renderYAxis()
       @renderColorAxis()
+      @renderColor()
       @renderFilter()
       @renderName()
