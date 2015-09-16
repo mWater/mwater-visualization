@@ -17,14 +17,23 @@ module.exports = class DashboardComponent extends React.Component
     widgetFactory: React.PropTypes.object.isRequired
     titleElem: React.PropTypes.node                     # Extra element to include in title at left
     extraTitleButtonsElem: React.PropTypes.node              # Extra elements to add to right
+    undoStackKey: React.PropTypes.any                   # Key that changes when the undo stack should be reset. Usually a document id or suchlike
 
   constructor: (props) ->
     super
     @state = { undoStack: new UndoStack().push(props.design) }
 
   componentWillReceiveProps: (nextProps) ->
+    undoStack = @state.undoStack
+
+    # Clear stack if key changed
+    if nextProps.undoStackKey != @props.undoStackKey
+      undoStack = new UndoStack()
+
     # Save on stack
-    @setState(undoStack: @state.undoStack.push(nextProps.design))
+    undoStack = undoStack.push(nextProps.design)
+
+    @setState(undoStack: undoStack)
 
   handlePrint: =>
     @refs.dashboardView.print()
