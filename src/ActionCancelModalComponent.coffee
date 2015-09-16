@@ -16,6 +16,7 @@ module.exports = class ActionCancelModalComponent extends React.Component
 
   render: ->
     React.createElement(ModalComponent,
+      size: @props.size
       header: if @props.title then H.h4(className: "modal-title", @props.title)
       footer: [
         H.button 
@@ -23,7 +24,7 @@ module.exports = class ActionCancelModalComponent extends React.Component
           type: "button"
           onClick: @props.onCancel
           className: "btn btn-default", 
-            "Cancel"
+            if @props.onAction then "Cancel" else "Close"
         if @props.onAction 
           H.button 
             key: "action"

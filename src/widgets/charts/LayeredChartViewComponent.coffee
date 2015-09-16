@@ -1,3 +1,4 @@
+_ = require 'lodash'
 React = require 'react'
 H = React.DOM
 
@@ -17,11 +18,17 @@ module.exports = class LayeredChartViewComponent extends React.Component
     scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
+  constructor: ->
+    super
+
+    # Create throttled createChart
+    @throttledCreateChart = _.throttle(@createChart, 1000)
+
   componentDidMount: ->
     @createChart(@props)
     @updateScope()
 
-  createChart: (props) ->
+  createChart: (props) =>
     if @chart
       @chart.destroy()
 
@@ -54,7 +61,8 @@ module.exports = class LayeredChartViewComponent extends React.Component
         return
 
       # TODO check if only data changed
-      @createChart(@props)
+      # Use throttled update to bypass https://github.com/mWater/mwater-visualization/issues/92
+      @throttledCreateChart(@props)
     else
       # Check scope
       if not _.isEqual(@props.scope, prevProps.scope)
