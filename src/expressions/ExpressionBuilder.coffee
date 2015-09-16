@@ -1,5 +1,5 @@
 
-# Understands expressions. Contains methods to build an expression of any type. 
+# Understands expressions. Contains methods to clean/validate etc. an expression of any type. 
 module.exports = class ExpressionBuilder
   constructor: (schema) ->
     @schema = schema
@@ -160,11 +160,13 @@ module.exports = class ExpressionBuilder
     if table and expr.type != "literal" and expr.table != table
       return null
 
+    # Strip if non-existent table
+    if expr.table and not @schema.getTable(expr.table)
+      return null
+
     switch expr.type
       when "field"
-        if not expr.column or not expr.table
-          return null
-        return expr
+        return @cleanFieldExpr(expr)
       when "scalar"
         return @cleanScalarExpr(expr)
       when "comparison"
@@ -176,6 +178,22 @@ module.exports = class ExpressionBuilder
         return expr
       else
         throw new Error("Unknown expression type #{expr.type}")
+
+  # Removes references to non-existent tables
+  cleanFieldExpr: (expr) ->
+    # Empty expression
+    if not expr.column or not expr.table
+      return null
+
+    # Missing table
+    if not @schema.getTable(expr.table)
+      return null
+
+    # Missing column
+    if not @schema.getColumn(expr.table, expr.column)
+      return null
+
+    return expr
 
   # Strips/defaults invalid aggr and where of a scalar expression
   cleanScalarExpr: (expr) ->

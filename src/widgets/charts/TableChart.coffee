@@ -122,12 +122,12 @@ module.exports = class TableChart extends Chart
 
     # Get relevant filters
     filters = _.where(filters or [], table: design.table)
-    if design.filter
-      filters.push(design.filter)
-
-    # Compile all filters
     filters = _.map(filters, (f) -> injectTableAlias(f.jsonql, "main")) 
 
+    # Compile filter
+    if design.filter
+      filters.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "main"))
+      
     # Wrap if multiple
     if filters.length > 1
       query.where = { type: "op", op: "and", exprs: filters }

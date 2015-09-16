@@ -1,13 +1,7 @@
 ExpressionCompiler = require '../ExpressionCompiler'
 ExpressionBuilder = require '../ExpressionBuilder'
 
-# An axis is an expression with optional aggregation, transform and color mapping
-# In ggplot2 parlance, an "aesthetic"
-# It contains:
-#  expr: expression
-#  aggr: optional aggregation (e.g. sum)
-#  xform: TBD
-#  colorMap: TBD
+# Understands axes. Contains methods to clean/validate etc. an axis of any type. 
 module.exports = class AxisBuilder
   # Options are: schema
   constructor: (axis) ->
