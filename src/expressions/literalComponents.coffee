@@ -96,17 +96,18 @@ exports.EnumComponent = React.createClass {
 
   handleChange: (ev) ->
     if ev.target.value
-      @props.onChange({ type: "literal", valueType: "enum", value: ev.target.value })
+      @props.onChange({ type: "literal", valueType: "enum", value: JSON.parse(ev.target.value) })
     else
       @props.onChange(null)
 
   render: ->
     H.select 
       className: "form-control input-sm",
-      value: if @props.value then @props.value.value
+      value: if @props.value and @props.value.value then JSON.stringify(@props.value.value)
       onChange: @handleChange,
         H.option(key: "null", value: "", "")
-        _.map(@props.enumValues, (val) -> H.option(key: val.id, value: val.id, val.name))
+        # Use JSON to allow non-strings as ids
+        _.map(@props.enumValues, (val) -> H.option(key: val.id, value: JSON.stringify(val.id), val.name))
 }
 
 # Component which displays an array of enums
@@ -118,14 +119,17 @@ exports.EnumArrComponent = class EnumArrComponent extends React.Component
 
   handleChange: (val) =>
     value = if val then val.split("\n") else []
+    value = _.map(value, JSON.parse)
+    console.log value
     @props.onChange({ type: "literal", valueType: "enum[]", value: value })
 
   render: ->
     value = null
     if @props.value and @props.value.value.length > 0 
-      value = @props.value.value.join("\n")
+      value = _.map(@props.value.value, JSON.stringify).join("\n")
 
-    options = _.map(@props.enumValues, (val) -> { value: val.id, label: val.name })
+    # Use JSON to allow non-strings as ids
+    options = _.map(@props.enumValues, (val) -> { value: JSON.stringify(val.id), label: val.name })
     H.div style: { width: "100%" },
       React.createElement(ReactSelect, { 
         value: value

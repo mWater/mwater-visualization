@@ -29,11 +29,15 @@ exports.loadDashboard = (options) ->
     # Create the widget factory
     widgetFactory = new visualization.WidgetFactory({ schema: schema, dataSource: dataSource })
 
+    # Get from local storage
     design = options.design
+    if window.localStorage["mwater-visualization-test-design"]
+      design = JSON.parse(window.localStorage["mwater-visualization-test-design"])
 
     # Called to update the design and re-render
     updateDesign = (newDesign) ->
       design = newDesign
+      window.localStorage["mwater-visualization-test-design"] = JSON.stringify(design)
       render()
 
     # Render the dashboard
