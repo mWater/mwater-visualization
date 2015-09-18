@@ -1,3 +1,4 @@
+_ = require 'lodash'
 injectTableAlias = require '../injectTableAlias'
 ExpressionBuilder = require './ExpressionBuilder'
 

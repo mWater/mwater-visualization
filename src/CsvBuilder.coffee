@@ -1,5 +1,6 @@
-# Builds a csv string from an array of arrays
+_ = require 'lodash'
 
+# Builds a csv string from an array of arrays
 module.exports = class CsvBuilder
   # Table is a 2d array [row][column]
   build: (table) ->

@@ -1,3 +1,4 @@
+_ = require 'lodash'
 ExpressionCompiler = require '../ExpressionCompiler'
 ExpressionBuilder = require '../ExpressionBuilder'
 

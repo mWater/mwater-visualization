@@ -1,3 +1,4 @@
+_ = require 'lodash'
 
 # Layout engine that places blocks like lego and displaces others out of the way
 module.exports = class LegoLayoutEngine 

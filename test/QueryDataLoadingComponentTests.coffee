@@ -1,5 +1,7 @@
 assert = require('chai').assert
 _ = require 'lodash'
+$ = require 'jquery'
+React = require 'react'
 QueryDataLoadingComponent = require '../src/widgets/QueryDataLoadingComponent'
 TestComponent = require './TestComponent'
 

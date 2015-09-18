@@ -1,3 +1,4 @@
+_ = require 'lodash'
 
 # Understands expressions. Contains methods to clean/validate etc. an expression of any type. 
 module.exports = class ExpressionBuilder

@@ -1,3 +1,4 @@
+_ = require 'lodash'
 ExpressionBuilder = require './ExpressionBuilder'
 
 # Builds a tree for selecting table + joins + expr of a scalar expression

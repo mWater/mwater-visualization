@@ -1,3 +1,4 @@
+_ = require 'lodash'
 Schema = require '../../Schema'
 fs = require 'fs'
 formUtils = require 'mwater-forms/lib/formUtils'

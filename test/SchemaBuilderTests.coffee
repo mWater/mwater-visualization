@@ -24,10 +24,10 @@ describe "SchemaBuilder", ->
       schemaBuilder = new SchemaBuilder(schema)
       schemaBuilder.addForm(form)
 
-      table = schema.getTable("form:formid")
+      table = schema.getTable("responses:formid")
 
-      compare(table.id, "form:formid")
-      compare(table.name, "Form")
+      compare(table.id, "responses:formid")
+      compare(table.name, "Form: Form")
       compare(table.jsonql, { 
         type: "query" 
         selects: [
@@ -75,7 +75,7 @@ describe "SchemaBuilder", ->
       schemaBuilder = new SchemaBuilder(schema)
       schemaBuilder.addForm(form)
 
-      compare(schema.getTable("form:formid").structure, [
+      compare(schema.getTable("responses:formid").structure, [
         { 
           type: "section", 
           name: "Section X"
@@ -113,7 +113,7 @@ describe "SchemaBuilder", ->
 
           # Get column
           for expectedColumn in expectedColumns
-            column = schema.getColumn("form:formid", expectedColumn.id)
+            column = schema.getColumn("responses:formid", expectedColumn.id)
   
             # Compare specified keys to expected
             for key, value of expectedColumn

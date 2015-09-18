@@ -1,5 +1,6 @@
 assert = require('chai').assert
 fixtures = require './fixtures'
+_ = require 'lodash'
 
 AxisBuilder = require '../src/expressions/axes/AxisBuilder'
 

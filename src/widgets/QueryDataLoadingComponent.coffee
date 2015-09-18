@@ -1,5 +1,6 @@
 React = require 'react'
 H = React.DOM
+_ = require 'lodash'
 
 # Loads data from queries, showing an faded version of the last valid
 # version until the data is loaded

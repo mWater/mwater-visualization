@@ -1,5 +1,6 @@
 assert = require('chai').assert
 fixtures = require './fixtures'
+_ = require 'lodash'
 
 ExpressionCompiler = require '../src/expressions/ExpressionCompiler'
 
