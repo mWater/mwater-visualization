@@ -34,6 +34,7 @@ describe "TableChart", ->
           { textAxis: @axisText }
           { textAxis: @axisDecimal }
         ]
+        orderings: []
       }
 
       queries = @chart.createQueries(design)
@@ -60,6 +61,7 @@ describe "TableChart", ->
           { textAxis: @axisText }
           { textAxis: @axisIntegerSum }
         ]
+        orderings: []
       }
 
       queries = @chart.createQueries(design)
@@ -78,6 +80,36 @@ describe "TableChart", ->
       }
 
       compare(queries, expectedQueries)
+
+    it "adds order with groupBy", ->
+      design = {
+        table: "t1"
+        columns: [
+          { textAxis: @axisText }
+          { textAxis: @axisIntegerSum }
+        ]
+        orderings: [
+          { axis: @axisDecimal, direction: "desc" }
+        ]
+      }
+
+      queries = @chart.createQueries(design)
+      expectedQueries = {
+        main: {
+          type: "query"
+          selects: [
+            { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
+            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "integer" }] }, alias: "c1" }
+          ]
+          from: { type: "table", table: "t1", alias: "main" }
+          groupBy: [1, { type: "field", tableAlias: "main", column: "decimal" }]
+          orderBy: [{ expr: { type: "field", tableAlias: "main", column: "decimal" }, direction: "desc" }]
+          limit: 1000
+        }
+      }
+
+      compare(queries, expectedQueries)
+
 
   # describe "cleanDesign", ->
   #   it "cleans column expressions", ->
@@ -146,6 +178,7 @@ describe "TableChart", ->
         columns: [
           { textAxis: @axisText }
         ]
+        orderings: []
       }
 
       assert not @chart.validateDesign(design)
@@ -156,6 +189,7 @@ describe "TableChart", ->
         columns: [
           { textAxis: null }
         ]
+        orderings: []
       }
 
       assert @chart.validateDesign(design)

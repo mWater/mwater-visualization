@@ -8,6 +8,7 @@ EditableLinkComponent = require './../../EditableLinkComponent'
 PopoverComponent = require './../../PopoverComponent'
 ScalarExprComponent = require './../../expressions/ScalarExprComponent'
 LogicalExprComponent = require './../../expressions/LogicalExprComponent'
+OrderingsComponent = require './OrderingsComponent'
 
 module.exports = class TableChartDesignerComponent extends React.Component
   @propTypes:
@@ -24,6 +25,7 @@ module.exports = class TableChartDesignerComponent extends React.Component
   handleTitleTextChange: (ev) =>  @updateDesign(titleText: ev.target.value)
   handleTableChange: (table) => @updateDesign(table: table)
   handleFilterChange: (filter) => @updateDesign(filter: filter)
+  handleOrderingsChange: (orderings) => @updateDesign(orderings: orderings)
 
   handleColumnChange: (index, column) =>
     columns = @props.design.columns.slice()
@@ -81,6 +83,24 @@ module.exports = class TableChartDesignerComponent extends React.Component
         H.span className: "glyphicon glyphicon-plus"
         " Add Column"
 
+  renderOrderings: ->
+    # If no table, hide
+    if not @props.design.table
+      return null
+
+    return H.div className: "form-group",
+      H.label className: "text-muted", 
+        H.span(className: "glyphicon glyphicon-sort-by-attributes")
+        " "
+        "Ordering"
+      H.div style: { marginLeft: 8 }, 
+        React.createElement(OrderingsComponent, 
+          schema: @props.schema
+          dataSource: @props.dataSource
+          orderings: @props.design.orderings
+          onOrderingsChange: @handleOrderingsChange
+          table: @props.design.table)
+
   renderFilter: ->
     # If no table, hide
     if not @props.design.table
@@ -104,6 +124,7 @@ module.exports = class TableChartDesignerComponent extends React.Component
       @renderTable()
       @renderColumns()
       if @props.design.table then H.hr()
+      @renderOrderings()
       @renderFilter()
       H.hr()
       @renderTitle()

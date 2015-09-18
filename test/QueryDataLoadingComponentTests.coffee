@@ -6,6 +6,7 @@ QueryDataLoadingComponent = require '../src/widgets/QueryDataLoadingComponent'
 TestComponent = require './TestComponent'
 
 describe "QueryDataLoadingComponent", ->
+  @timeout(10000)
   before ->
     # Create simple mock parts
     @dataSource = (queries, cb) -> cb(null, queries.toUpperCase())

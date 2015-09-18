@@ -17,10 +17,15 @@ Design is:
   titleText: title text
   columns: array of columns
   filter: optional logical expression to filter by
+  orderings: array of orderings
 
 column:
   headerText: header text
   textAxis: axis that creates the text value of the column
+
+ordering:
+  axis: axis that creates the order expression
+  direction: "asc"/"desc"
 
 ###
 module.exports = class TableChart extends Chart
@@ -44,12 +49,18 @@ module.exports = class TableChart extends Chart
     if design.columns.length == 0
       design.columns.push({})
 
+    design.orderings = design.orderings or []
+
     # Clean each column
     for columnId in [0...design.columns.length]
       column = design.columns[columnId]
 
       # Clean textAxis
       column.textAxis = @axisBuilder.cleanAxis(column.textAxis, design.table, "optional")
+
+    # Clean orderings
+    for ordering in design.orderings
+      ordering.axis = @axisBuilder.cleanAxis(ordering.axis, design.table, "optional")
 
     if design.filter
       design.filter = @exprBuilder.cleanExpr(design.filter, design.table)
@@ -69,6 +80,11 @@ module.exports = class TableChart extends Chart
         error = error or "Missing text"
 
       error = error or @axisBuilder.validateAxis(column.textAxis)
+
+    for ordering in design.orderings
+      if not ordering.axis
+        error = error or "Missing order expression"
+      error = error or @axisBuilder.validateAxis(ordering.axis)
 
     error = error or @exprBuilder.validateExpr(design.filter)
 
@@ -120,6 +136,13 @@ module.exports = class TableChart extends Chart
       if not column.textAxis.aggr
         query.groupBy.push(colNum + 1)
 
+    # Compile orderings
+    for ordering in design.orderings
+      query.orderBy.push({ expr: @axisBuilder.compileAxis(axis: ordering.axis, tableAlias: "main"), direction: ordering.direction })
+      # Add group by if non-aggregate
+      if not ordering.axis.aggr
+        query.groupBy.push(@axisBuilder.compileAxis(axis: ordering.axis, tableAlias: "main"))
+
     # Get relevant filters
     filters = _.where(filters or [], table: design.table)
     filters = _.map(filters, (f) -> injectTableAlias(f.jsonql, "main")) 
@@ -127,7 +150,7 @@ module.exports = class TableChart extends Chart
     # Compile filter
     if design.filter
       filters.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "main"))
-      
+
     # Wrap if multiple
     if filters.length > 1
       query.where = { type: "op", op: "and", exprs: filters }
