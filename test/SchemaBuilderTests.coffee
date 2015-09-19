@@ -31,6 +31,7 @@ describe "SchemaBuilder", ->
       compare(table.jsonql, { 
         type: "query" 
         selects: [
+          { type: "select", expr: { type: "field", tableAlias: "responses", column: "_id" }, alias: "_id" }
           { type: "select", expr: { type: "field", tableAlias: "responses", column: "data" }, alias: "data" }
           { type: "select", expr: { type: "field", tableAlias: "responses", column: "deployment" }, alias: "deployment" }
           { type: "select", expr: { type: "field", tableAlias: "responses", column: "submittedOn" }, alias: "submittedOn" }
