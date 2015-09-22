@@ -75,10 +75,10 @@ class MapWidgetComponent extends React.Component
     chart = @renderContent(@props.width, @props.height)
 
     content = H.div style: { height: "100%", width: "100%" },
-      H.div style: { position: "absolute", right: 20, top: 20, border: "solid 2px #EEE", borderRadius: 8, padding: 10 },
+      H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: @props.width + 20, height: @props.height + 20 },
         chart
-      H.div style: { width: "100%", height: "100%", paddingRight: @props.width + 70 },
-        H.div style: { width: "100%", height: "100%", overflowY: "auto", paddingRight: 20 },
+      H.div style: { width: "100%", height: "100%", paddingLeft: @props.width + 40 },
+        H.div style: { width: "100%", height: "100%", overflowY: "auto", paddingLeft: 20, borderLeft: "solid 3px #AAA" },
           editor
 
     React.createElement(ModalWindowComponent,
