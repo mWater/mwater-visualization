@@ -1,9 +1,10 @@
 assert = require('chai').assert
 _ = require 'lodash'
 Schema = require '../src/Schema'
+canonical = require 'canonical-json'
 
 compare = (actual, expected) ->
-  assert _.isEqual(actual, expected) or JSON.stringify(actual) == JSON.stringify(expected), "\n" + JSON.stringify(actual) + "\n" + JSON.stringify(expected)
+  assert.equal canonical(actual), canonical(expected)
 
 describe "Schema", ->
   it "adds and gets tables", ->

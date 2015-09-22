@@ -4,8 +4,10 @@ _ = require 'lodash'
 
 AxisBuilder = require '../src/expressions/axes/AxisBuilder'
 
+canonical = require 'canonical-json'
+
 compare = (actual, expected) ->
-  assert _.isEqual(actual, expected), "\n" + JSON.stringify(actual) + "\n" + JSON.stringify(expected)
+  assert.equal canonical(actual), canonical(expected)
 
 describe "AxisBuilder", ->
   before ->

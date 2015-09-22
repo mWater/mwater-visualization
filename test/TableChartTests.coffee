@@ -2,9 +2,10 @@ _ = require 'lodash'
 assert = require('chai').assert
 fixtures = require './fixtures'
 TableChart = require '../src/widgets/charts/TableChart'
+canonical = require 'canonical-json'
 
 compare = (actual, expected) ->
-  assert _.isEqual(actual, expected) or JSON.stringify(actual) == JSON.stringify(expected), "\n" + JSON.stringify(actual) + "\n" + JSON.stringify(expected)
+  assert.equal canonical(actual), canonical(expected)
 
 describe "TableChart", ->
   before ->
