@@ -6,6 +6,7 @@ Widget = require './Widget'
 SimpleWidgetComponent = require './SimpleWidgetComponent'
 MapDesignerComponent = require '../maps/MapDesignerComponent'
 MapViewComponent = require '../maps/MapViewComponent'
+ModalWindowComponent = require '../ModalWindowComponent'
 
 module.exports = class MapWidget extends Widget
   # design, schema, dataSource, layerFactory
@@ -50,15 +51,17 @@ class MapWidgetComponent extends React.Component
 
     filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
+  constructor: (props) ->
+    super
+    @state = { 
+      # True when editing map
+      editing: false
+    }  
+
   handleStartEditing: =>
-    @refs.simpleWidget.displayEditor()
+    @setState(editing: true)
 
-  render: ->
-    dropdownItems = [
-      { label: "Edit", icon: "pencil", onClick: @handleStartEditing }
-      { label: [H.span(className: "glyphicon glyphicon-remove"), " Remove"], onClick: @props.onRemove }
-    ]
-
+  renderEditor: ->
     # Create editor
     editor = React.createElement(MapDesignerComponent, 
       schema: @props.schema
@@ -68,22 +71,49 @@ class MapWidgetComponent extends React.Component
       onDesignChange: @props.onDesignChange
     )
 
+    # Create map (maxing out at half of width of screen)
+    width = Math.min(document.body.clientWidth/2, @props.width)
+    chart = @renderContent(width, @props.height)
+
+    content = H.div style: { height: "100%", width: "100%" },
+      H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: width + 20, height: @props.height + 20 },
+        chart
+      H.div style: { width: "100%", height: "100%", paddingLeft: width + 40 },
+        H.div style: { width: "100%", height: "100%", overflowY: "auto", paddingLeft: 20, borderLeft: "solid 3px #AAA" },
+          editor
+
+    React.createElement(ModalWindowComponent,
+      isOpen: @state.editing
+      onRequestClose: (=> @setState(editing: false)),
+        content)
+
+  renderContent: (width, height) ->
+    React.createElement(InnerMapWidgetComponent, {
+      schema: @props.schema
+      layerFactory: @props.layerFactory
+      design: @props.design
+      onDesignChange: @props.onDesignChange
+      filters: @props.filters
+      width: width
+      height: height
+    })
+
+  render: ->
+    dropdownItems = [
+      { label: "Edit", icon: "pencil", onClick: @handleStartEditing }
+      { label: [H.span(className: "glyphicon glyphicon-remove"), " Remove"], onClick: @props.onRemove }
+    ]
+
     # Wrap in a simple widget
-    return React.createElement(SimpleWidgetComponent, 
-      ref: "simpleWidget"
-      editor: editor
-      width: @props.width
-      height: @props.height
-      connectMoveHandle: @props.connectMoveHandle
-      connectResizeHandle: @props.connectResizeHandle
-      dropdownItems: dropdownItems,
-        React.createElement(InnerMapWidgetComponent, {
-          schema: @props.schema
-          layerFactory: @props.layerFactory
-          design: @props.design
-          onDesignChange: @props.onDesignChange
-          filters: @props.filters
-        })
+    return H.div null,
+      @renderEditor()
+      React.createElement(SimpleWidgetComponent, 
+        width: @props.width
+        height: @props.height
+        connectMoveHandle: @props.connectMoveHandle
+        connectResizeHandle: @props.connectResizeHandle
+        dropdownItems: dropdownItems,
+          @renderContent()
       )
 
 class InnerMapWidgetComponent extends React.Component

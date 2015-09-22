@@ -6,6 +6,7 @@ CsvBuilder = require './../../CsvBuilder'
 filesaver = require 'filesaver.js'
 ActionCancelModalComponent = require '../../ActionCancelModalComponent'
 ChartWidgetViewComponent = require './ChartWidgetViewComponent'
+ModalWindowComponent = require '../../ModalWindowComponent'
 
 # A widget which is a chart
 module.exports = class ChartWidget extends Widget
@@ -56,6 +57,13 @@ class ChartWidgetComponent extends React.Component
     connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
     connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
 
+  constructor: (props) ->
+    super
+    @state = { 
+      # True when editing chart
+      editing: props.chart.isEmpty(@props.design) # Display editor if empty design
+    }  
+
   # Saves a csv file to disk
   handleSaveCsvFile: =>
     # Get the queries
@@ -78,7 +86,38 @@ class ChartWidgetComponent extends React.Component
     )
 
   handleStartEditing: =>
-    @refs.simpleWidget.displayEditor()
+    @setState(editing: true)
+
+  renderChart: (width, height) ->
+    React.createElement(ChartWidgetViewComponent, 
+      chart: @props.chart
+      design: @props.design
+      dataSource: @props.dataSource
+      scope: @props.scope
+      filters: @props.filters
+      width: width
+      height: height
+      onScopeChange: @props.onScopeChange)
+
+  renderEditor: ->
+    # Create editor
+    editor = @props.chart.createDesignerElement(design: @props.design, onDesignChange: @props.onDesignChange)
+
+    # Create chart (maxing out at half of width of screen)
+    width = Math.min(document.body.clientWidth/2, @props.width)
+    chart = @renderChart(width, @props.height)
+
+    content = H.div style: { height: "100%", width: "100%" },
+      H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: width + 20, height: @props.height + 20 },
+        chart
+      H.div style: { width: "100%", height: "100%", paddingLeft: width + 40 },
+        H.div style: { width: "100%", height: "100%", overflowY: "auto", paddingLeft: 20, borderLeft: "solid 3px #AAA" },
+          editor
+
+    React.createElement(ModalWindowComponent,
+      isOpen: @state.editing
+      onRequestClose: (=> @setState(editing: false)),
+        content)
 
   render: ->
     # Determine if valid design
@@ -94,26 +133,16 @@ class ChartWidgetComponent extends React.Component
       dropdownItems.push({ label: "Duplicate", icon: "duplicate", onClick: @props.onDuplicate })
     dropdownItems.unshift({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
 
-    # Create editor
-    editor = @props.chart.createDesignerElement(design: @props.design, onDesignChange: @props.onDesignChange)
-
     # Wrap in a simple widget
     return H.div onDoubleClick: @handleStartEditing, 
+      @renderEditor()
       React.createElement(SimpleWidgetComponent, 
-        ref: "simpleWidget",
         width: @props.width
         height: @props.height
         dropdownItems: dropdownItems,
-        editor: editor
-        editorInitiallyDisplayed: @props.chart.isEmpty(@props.design) # Display editor if empty design
         connectMoveHandle: @props.connectMoveHandle
         connectResizeHandle: @props.connectResizeHandle,
-          React.createElement(ChartWidgetViewComponent, 
-            chart: @props.chart
-            design: @props.design
-            dataSource: @props.dataSource
-            scope: @props.scope
-            filters: @props.filters
-            onScopeChange: @props.onScopeChange)
+          # height and width will be injected
+          @renderChart()
       )
 
