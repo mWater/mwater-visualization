@@ -5,11 +5,11 @@ _ = require 'lodash'
 Widget = require './Widget'
 SimpleWidgetComponent = require './SimpleWidgetComponent'
 markdown = require("markdown").markdown
+ModalWindowComponent = require '../ModalWindowComponent'
 
 module.exports = class MarkdownWidget extends Widget
   constructor: (design) ->
     @design = design
-
 
   # Creates a view of the widget
   # options:
@@ -25,7 +25,6 @@ module.exports = class MarkdownWidget extends Widget
       onRemove: options.onRemove
     )
 
-
 class MarkdownWidgetComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired  # See Map Design.md
@@ -36,8 +35,44 @@ class MarkdownWidgetComponent extends React.Component
     width: React.PropTypes.number
     height: React.PropTypes.number
 
+  constructor: (props) ->
+    super
+    @state = { 
+      # True when editing map
+      editing: false
+    }  
+
   handleStartEditing: =>
-    @refs.simpleWidget.displayEditor()
+    @setState(editing: true)
+
+  renderEditor: ->
+    # Create editor
+    editor = React.createElement(MarkdownWidgetDesignerComponent, 
+      design: @props.design
+      onDesignChange: @props.onDesignChange
+    )
+
+    # Create map (maxing out at half of width of screen)
+    width = Math.min(document.body.clientWidth/2, @props.width)
+    chart = @renderContent()
+
+    content = H.div style: { height: "100%", width: "100%" },
+      H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: width + 20, height: @props.height + 20 },
+        chart
+      H.div style: { width: "100%", height: "100%", paddingLeft: width + 40 },
+        H.div style: { width: "100%", height: "100%", overflowY: "auto", paddingLeft: 20, borderLeft: "solid 3px #AAA" },
+          editor
+
+    React.createElement(ModalWindowComponent,
+      isOpen: @state.editing
+      onRequestClose: (=> @setState(editing: false)),
+        content)
+
+  renderContent: ->
+    React.createElement(MarkdownWidgetViewComponent, {
+      design: @props.design
+      onDesignChange: @props.onDesignChange
+    })
 
   render: ->
     dropdownItems = [
@@ -45,26 +80,16 @@ class MarkdownWidgetComponent extends React.Component
       { label: [H.span(className: "glyphicon glyphicon-remove"), " Remove"], onClick: @props.onRemove }
     ]
 
-    # Create editor
-    editor = React.createElement(MarkdownWidgetDesignerComponent, 
-      design: @props.design
-      onDesignChange: @props.onDesignChange
-    )
-
     # Wrap in a simple widget
     return H.div onDoubleClick: @handleStartEditing, 
+      @renderEditor()
       React.createElement(SimpleWidgetComponent, 
-        ref: "simpleWidget"
-        editor: editor
         width: @props.width
         height: @props.height
         connectMoveHandle: @props.connectMoveHandle
         connectResizeHandle: @props.connectResizeHandle
         dropdownItems: dropdownItems,
-          React.createElement(MarkdownWidgetViewComponent, {
-            design: @props.design
-            onDesignChange: @props.onDesignChange
-          })
+          @renderContent()
         )
 
 
@@ -87,6 +112,6 @@ class MarkdownWidgetDesignerComponent extends React.Component
     @props.onDesignChange(design)
 
   render: ->
-    H.textarea className: "form-control", rows: 10, value: @props.design.markdown, onChange: @handleMarkdownChange
+    H.textarea className: "form-control", style: { width: "100%", height: "100%" }, value: @props.design.markdown, onChange: @handleMarkdownChange
 
 

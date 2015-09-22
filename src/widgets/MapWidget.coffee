@@ -71,13 +71,14 @@ class MapWidgetComponent extends React.Component
       onDesignChange: @props.onDesignChange
     )
 
-    # Create map
-    chart = @renderContent(@props.width, @props.height)
+    # Create map (maxing out at half of width of screen)
+    width = Math.min(document.body.clientWidth/2, @props.width)
+    chart = @renderContent(width, @props.height)
 
     content = H.div style: { height: "100%", width: "100%" },
-      H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: @props.width + 20, height: @props.height + 20 },
+      H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: width + 20, height: @props.height + 20 },
         chart
-      H.div style: { width: "100%", height: "100%", paddingLeft: @props.width + 40 },
+      H.div style: { width: "100%", height: "100%", paddingLeft: width + 40 },
         H.div style: { width: "100%", height: "100%", overflowY: "auto", paddingLeft: 20, borderLeft: "solid 3px #AAA" },
           editor
 
