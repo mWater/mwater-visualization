@@ -1,7 +1,7 @@
 React = require 'react'
 H = React.DOM
 _ = require 'lodash'
-ModalComponent = require('./ModalComponent')
+ModalPopupComponent = require('./ModalPopupComponent')
 
 # Modal with action and cancel buttons
 module.exports = class ActionCancelModalComponent extends React.Component
@@ -15,7 +15,7 @@ module.exports = class ActionCancelModalComponent extends React.Component
     size: React.PropTypes.string # "large" for large
 
   render: ->
-    React.createElement(ModalComponent,
+    React.createElement(ModalPopupComponent,
       size: @props.size
       header: if @props.title then H.h4(className: "modal-title", @props.title)
       footer: [

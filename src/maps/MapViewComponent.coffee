@@ -4,6 +4,7 @@ LeafletMapComponent = require './LeafletMapComponent'
 ExpressionBuilder = require '../expressions/ExpressionBuilder'
 ExpressionCompiler = require '../expressions/ExpressionCompiler'
 
+# Component that displays just the map
 module.exports = class MapViewComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use

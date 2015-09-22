@@ -3,7 +3,7 @@ H = React.DOM
 _ = require 'lodash'
 
 # Modal popup
-module.exports = class ModalComponent extends React.Component
+module.exports = class ModalPopupComponent extends React.Component
   @propTypes: 
     header: React.PropTypes.node # Header of modal. Any react element
     footer: React.PropTypes.node # Footer of modal. Any react element
