@@ -63,8 +63,9 @@ module.exports = class LayeredChartCompiler
           query.groupBy.push(2)
 
       # Add where
+      whereClauses = []
       if layer.filter
-        query.where = @compileExpr(layer.filter)
+        whereClauses.push(@compileExpr(layer.filter))
 
       # Add filters
       if extraFilters and extraFilters.length > 0
@@ -73,21 +74,17 @@ module.exports = class LayeredChartCompiler
 
         # If any, create and
         if relevantFilters.length > 0
-          whereClauses = []
-
-          # Keep existing where
-          if query.where
-            whereClauses.push(query.where)
-
           # Add others
           for filter in relevantFilters
             whereClauses.push(injectTableAlias(filter.jsonql, "main"))
 
-          # Wrap if multiple
-          if whereClauses.length > 1
-            query.where = { type: "op", op: "and", exprs: whereClauses }
-          else
-            query.where = whereClauses[0]
+      # Wrap if multiple
+      whereClauses = _.compact(whereClauses)
+      
+      if whereClauses.length > 1
+        query.where = { type: "op", op: "and", exprs: whereClauses }
+      else
+        query.where = whereClauses[0]
 
       queries["layer#{layerIndex}"] = query
 

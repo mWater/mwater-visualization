@@ -196,8 +196,23 @@ module.exports = class ExpressionBuilder
 
     return expr
 
+  # Determines if an set of joins are valid
+  areJoinsValid: (table, joins) ->
+    t = table
+    for j in joins
+      joinCol = @schema.getColumn(t, j)
+      if not joinCol 
+        return false
+
+      t = joinCol.join.toTable
+
+    return true
+
   # Strips/defaults invalid aggr and where of a scalar expression
   cleanScalarExpr: (expr) ->
+    if not @areJoinsValid(expr.table, expr.joins)
+      return null
+
     if expr.aggr and not @isMultipleJoins(expr.table, expr.joins)
       expr = _.omit(expr, "aggr")
 

@@ -139,6 +139,8 @@ module.exports = class MarkersLayer extends Layer
     for filter in relevantFilters
       whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
 
+    whereClauses = _.compact(whereClauses)
+    
     # Wrap if multiple
     if whereClauses.length > 1
       innerquery.where = { type: "op", op: "and", exprs: whereClauses }

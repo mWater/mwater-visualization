@@ -248,6 +248,12 @@ describe "ExpressionBuilder", ->
       assert.equal scalarExpr.aggr, "sum"
       assert not scalarExpr.where
 
+    it "strips if invalid join", ->
+      fieldExpr = { type: "field", table: "t2", column: "c1" }
+      scalarExpr = { type: "scalar", table: "t1", joins: ['xyz'], expr: fieldExpr, aggr: "sum" }
+      scalarExpr = @exprBuilder.cleanScalarExpr(scalarExpr)
+      assert not scalarExpr
+
   describe "cleanComparisonExpr", ->
     beforeEach ->
       @schema = fixtures.simpleSchema()
