@@ -1,5 +1,9 @@
+_ = require 'lodash'
 visualization = require './index'
 jsyaml = require 'js-yaml'
+TabbedComponent = require './TabbedComponent'
+H = React.DOM
+R = React.createElement
 
 # Pass in:
 # schemaUrl (yaml schema url)
@@ -34,6 +38,14 @@ exports.loadDashboard = (options) ->
     if window.localStorage["mwater-visualization-test-design"]
       design = JSON.parse(window.localStorage["mwater-visualization-test-design"])
 
+    # Convert to tabs
+    if not design.tabs
+      design = {
+        tabs: [
+          { name: "Main", design: design }
+        ]
+      }
+
     # Called to update the design and re-render
     updateDesign = (newDesign) ->
       design = newDesign
@@ -42,13 +54,81 @@ exports.loadDashboard = (options) ->
 
     # Render the dashboard
     render = ->
-      dashboardElem = React.createElement(visualization.DashboardComponent, {
+      # dashboardElem = R(visualization.DashboardComponent, {
+      #   design: design,
+      #   widgetFactory: widgetFactory,
+      #   onDesignChange: updateDesign
+      # })
+      elem = R(TabbedDashboard,
         design: design,
         widgetFactory: widgetFactory,
         onDesignChange: updateDesign
-      })
+      )
 
-      React.render(dashboardElem, document.getElementById(options.elemId))
+      React.render(elem, document.getElementById(options.elemId))
 
     # Initial render
     render()
+
+class TabbedDashboard extends React.Component
+  @propTypes: 
+    design: React.PropTypes.object.isRequired
+    onDesignChange: React.PropTypes.func.isRequired
+    widgetFactory: React.PropTypes.object.isRequired
+
+  handleDesignChange: (index, design) =>
+    tabs = @props.design.tabs.slice()
+    tabs[index] = _.extend({}, tabs[index], design: design)
+    @props.onDesignChange(_.extend({}, @props.design, tabs: tabs))
+
+  handleAddTab: =>
+    tabs = @props.design.tabs.slice()
+    # Add new dashboard
+    tabs.push({ name: "Untitled", design: { items: {} } })
+    @props.onDesignChange(_.extend({}, @props.design, tabs: tabs))
+
+  handleRemoveTab: (index) =>
+    if not confirm("Permanently remove this tab? This cannot be undone!")
+      return
+      
+    tabs = @props.design.tabs.slice()
+    tabs.splice(index, 1)
+    @props.onDesignChange(_.extend({}, @props.design, tabs: tabs))
+
+  handleRenameTab: (index) =>
+    name = @props.design.tabs[index].name
+    name = prompt("Name of tab", name)
+    if name
+      tabs = @props.design.tabs.slice()
+      tabs[index] = _.extend({}, tabs[index], name: name)
+      @props.onDesignChange(_.extend({}, @props.design, tabs: tabs))
+
+  createTab: (tab, index) =>
+    return {
+      id: "#{index}"
+      label: tab.name
+      elem: R(visualization.DashboardComponent, {
+        design: tab.design,
+        widgetFactory: @props.widgetFactory,
+        onDesignChange: @handleDesignChange.bind(null, index)
+        extraTitleButtonsElem: [
+          H.a key: "renametab", className: "btn btn-link btn-sm", onClick: @handleRenameTab.bind(null, index),
+            H.span className: "glyphicon glyphicon-pencil"
+            " Rename Tab"
+          " "
+          H.a key: "removetab", className: "btn btn-link btn-sm", onClick: @handleRemoveTab.bind(null, index),
+            H.span className: "glyphicon glyphicon-remove"
+            " Remove Tab"
+        ]
+      })
+    }
+
+  createTabs: ->
+    return _.map(@props.design.tabs, @createTab)
+
+  render: ->
+    R(TabbedComponent,
+      tabs: @createTabs()
+      initialTabId: "0"
+      onAddTab: @handleAddTab
+      )

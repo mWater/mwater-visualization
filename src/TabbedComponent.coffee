@@ -6,6 +6,7 @@ module.exports = class TabbedComponent extends React.Component
   @propTypes:
     tabs: React.PropTypes.array.isRequired # Array of { id, label, elem }
     initialTabId: React.PropTypes.string # Initially selected id of tab
+    onAddTab: React.PropTypes.func    # Set to have a plus to add a tab
 
   constructor: ->
     super
@@ -25,6 +26,11 @@ module.exports = class TabbedComponent extends React.Component
     H.div null,
       H.ul key: "tabs", className: "nav nav-tabs", 
         _.map(@props.tabs, @renderTab)
+        if @props.onAddTab
+          H.li key: "_add", 
+            H.a onClick: @props.onAddTab,
+              H.span className: "glyphicon glyphicon-plus"
+
       H.div key: "currentTab",
         if currentTab
           currentTab.elem

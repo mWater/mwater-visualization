@@ -45,7 +45,7 @@ class InnerModalComponent extends React.Component
       top: 0
       bottom: 0
       zIndex: 1030 # Below bootstrap modals
-      backgroundColor: "rgba(64, 64, 64, 0.7)"
+      backgroundColor: "rgba(0, 0, 0, 0.7)"
     }
 
     windowStyle = {
