@@ -88,6 +88,13 @@ class ChartWidgetComponent extends React.Component
   handleStartEditing: =>
     @setState(editing: true)
 
+  handleEndEditing: =>
+    @setState(editing: false)
+
+    # Remove if blank
+    if @props.chart.isEmpty(@props.design)
+      @props.onRemove()
+
   renderChart: (width, height) ->
     React.createElement(ChartWidgetViewComponent, 
       chart: @props.chart
@@ -116,7 +123,7 @@ class ChartWidgetComponent extends React.Component
 
     React.createElement(ModalWindowComponent,
       isOpen: @state.editing
-      onRequestClose: (=> @setState(editing: false)),
+      onRequestClose: @handleEndEditing,
         content)
 
   render: ->
