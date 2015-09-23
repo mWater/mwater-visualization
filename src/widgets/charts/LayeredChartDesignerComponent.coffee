@@ -156,6 +156,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
       @renderTranspose()
       @renderStackedProportional()
       @renderLayers()
+      H.br()
       H.hr()
       @renderLabels()
 

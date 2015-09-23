@@ -75,7 +75,7 @@ class InnerModalComponent extends React.Component
       color: "#888"
     }
 
-    H.div null,
+    H.div className: "mwater-visualization-modal-window-component",
       H.style null, '''body { overflow-y: hidden }'''
       H.div style: overlayStyle, onClick: @props.onRequestClose
       H.div style: windowStyle,
