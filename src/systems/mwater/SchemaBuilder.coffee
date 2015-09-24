@@ -44,9 +44,9 @@ module.exports = class SchemaBuilder
         if not _.any(prop._roles, (r) ->
           if r.to == "all"
             return true
-          if r.to == "user:#{options.user}"
+          if options.user and r.to == "user:#{options.user}"
             return true
-          if r.to in _.map(options.groups or [], (g) -> "group:#{g}")
+          if options.groups and r.to in _.map(options.groups or [], (g) -> "group:#{g}")
             return true
           return false
           )
