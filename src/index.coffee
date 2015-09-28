@@ -12,7 +12,7 @@ exports.WidgetFactory = require './widgets/WidgetFactory'
 
 exports.UndoStack = require './UndoStack'
 
-# exports.PopoverComponent = require './PopoverComponent'
+exports.PopoverComponent = require './PopoverComponent'
 exports.DashboardComponent = require './widgets/DashboardComponent'
 exports.AutoSizeComponent = require './AutoSizeComponent'
 

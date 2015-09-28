@@ -3,8 +3,9 @@ React = require 'react'
 # Wraps a child with an optional popover
 module.exports = class PopoverComponent extends React.Component
   @propTypes: 
-    html: React.PropTypes.string # html to display
+    content: React.PropTypes.node.isRequired     # contents of popover
     placement: React.PropTypes.string # See http://getbootstrap.com/javascript/#popovers
+    visible: React.PropTypes.bool.isRequired
 
   componentDidMount: ->
     @updatePopover(@props, null)
@@ -13,24 +14,25 @@ module.exports = class PopoverComponent extends React.Component
     @updatePopover(null, @props)
 
   componentDidUpdate: (prevProps) ->
-    @updatePopover(@props, prevProps)
+    if not _.isEqual(prevProps.content, @props.content)
+      @updatePopover(@props, prevProps)
 
   updatePopover: (props, oldProps) ->
-    if props and oldProps and props.html == oldProps.html
-      return
-      
     # Destroy old popover
-    if oldProps and oldProps.html
-      $(React.findDOMNode(@refs.child)).popover("destroy")      
+    if oldProps and oldProps.visible
+      $(React.findDOMNode(this)).popover("destroy")      
       
-    if props and props.html
-      $(React.findDOMNode(@refs.child)).popover({
-        content: props.html
-        html: true
-        trigger: "manual"
-        placement: @props.placement
+    if props and props.visible
+      div = document.createElement("div")
+      React.render(@props.content, div, =>
+        $(React.findDOMNode(this)).popover({
+          content: -> $(div)
+          html: true
+          trigger: "manual"
+          placement: @props.placement
         })
-      $(React.findDOMNode(@refs.child)).popover("show")
-
+        $(React.findDOMNode(this)).popover("show")
+      )
+      
   render: ->
-    React.cloneElement(React.Children.only(@props.children), ref: "child")
+    React.Children.only(@props.children)
