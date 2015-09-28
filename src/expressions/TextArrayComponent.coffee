@@ -17,6 +17,9 @@ module.exports = class TextArrayComponent extends React.Component
     value = if val then val.split("\n") else []
     @props.onChange({ type: "literal", valueType: "text[]", value: value })
 
+  escapeRegex: (s) ->
+    return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+
   getOptions: (input, cb) =>
     # Create query to get matches ordered by most frequent to least
     exprBuilder = new ExpressionBuilder(@props.schema)
@@ -32,10 +35,10 @@ module.exports = class TextArrayComponent extends React.Component
       from: exprCompiler.compileTable(exprBuilder.getExprTable(@props.expr), "main") 
       where: {
         type: "op"
-        op: "like"
+        op: "~*"
         exprs: [
           exprCompiler.compileExpr(expr: @props.expr, tableAlias: "main")
-          input + "%"
+          "^" + @escapeRegex(input)
         ]
       }
       groupBy: [1]
@@ -58,7 +61,7 @@ module.exports = class TextArrayComponent extends React.Component
       })
 
   render: ->
-    value = null
+    value = ""
     if @props.value and @props.value.value.length > 0 
       value = @props.value.value.join("\n")
 
@@ -71,3 +74,4 @@ module.exports = class TextArrayComponent extends React.Component
         asyncOptions: @getOptions
         onChange: @handleChange
       })
+

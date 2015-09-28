@@ -5,7 +5,6 @@ H = React.DOM
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 AxisBuilder = require './../../expressions/axes/AxisBuilder'
 EditableLinkComponent = require './../../EditableLinkComponent'
-PopoverComponent = require './../../PopoverComponent'
 ScalarExprComponent = require './../../expressions/ScalarExprComponent'
 LogicalExprComponent = require './../../expressions/LogicalExprComponent'
 OrderingsComponent = require './OrderingsComponent'

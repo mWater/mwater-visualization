@@ -4,7 +4,6 @@ AxisComponent = require './../../expressions/axes/AxisComponent'
 LogicalExprComponent = require './../../expressions/LogicalExprComponent'
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 EditableLinkComponent = require './../../EditableLinkComponent'
-PopoverComponent = require './../../PopoverComponent'
 ColorComponent = require '../../ColorComponent'
 
 module.exports = class LayeredChartDesignerComponent extends React.Component

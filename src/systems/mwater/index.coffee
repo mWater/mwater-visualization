@@ -65,8 +65,9 @@ exports.setup = (options, cb) ->
             if forms[0]
               form = forms[0]
               schemaBuilder.addForm(form)
-
-            cb()
+              cb()
+            else
+              cb(new Error("Form #{formId} not found or access denied"))
           .fail (xhr) =>
             cb(new Error(xhr.responseText))
 
