@@ -35,7 +35,8 @@
     "react-draggable": "^0.8.1",
     "react-motion": "^0.2.7",
     "react-select": "^0.6.11",
-    "shallowequal": "^0.2.2"
+    "shallowequal": "^0.2.2",
+    "update-object": "^1.0.0"
   },
   "devDependencies": {
     "brfs": "^1.4.1",

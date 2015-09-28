@@ -25,7 +25,8 @@ module.exports = class AxisBuilder
     axis.expr = @exprBuilder.cleanExpr(axis.expr, options.table)
 
     # Remove if null or no type 
-    if not @exprBuilder.getExprType(axis.expr)
+    type = @exprBuilder.getExprType(axis.expr)
+    if not type
       return
 
     # Clean aggr
@@ -49,6 +50,10 @@ module.exports = class AxisBuilder
     if options.aggrNeed != "none" and not axis.aggrs
       if @exprBuilder.getExprType(axis.expr) == "count"
         axis.aggr = "count"
+
+    # Remove bin xform if not decimal/integer
+    if type not in ['decimal', "integer"] and axis.xform and axis.xform.type == "bin"
+      delete axis.xform
 
     return axis
 

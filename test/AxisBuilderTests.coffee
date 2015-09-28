@@ -60,7 +60,7 @@ describe "AxisBuilder", ->
         aggr: "sum"
       }
 
-      axis = @ab.cleanAxis(axis, "t1")
+      axis = @ab.cleanAxis(axis: axis, table: "t1")
       assert not axis
 
     it "nulls if expression has no type", ->
@@ -69,11 +69,19 @@ describe "AxisBuilder", ->
         aggr: "sum"
       }
 
-      axis = @ab.cleanAxis(axis, "t1")
+      axis = @ab.cleanAxis(axis: axis, table: "t1")
       assert not axis
 
+    it "removes bad xform", ->
+      axis = {
+        expr: @exprEnum
+        xform: { type: "bin", numBins: 10, min: 2, max: 8 }
+      }
+
+      axis = @ab.cleanAxis(axis: axis, table: "t1")
+      assert not axis.xform
+
     it "removes bad aggr"
-    it "removes bad xform"
     it "defaults xform"
     it "defaults colorMap"
     
