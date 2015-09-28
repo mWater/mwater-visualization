@@ -5,23 +5,26 @@ ExpressionBuilder = require '../ExpressionBuilder'
 # Understands axes. Contains methods to clean/validate etc. an axis of any type. 
 module.exports = class AxisBuilder
   # Options are: schema
-  constructor: (axis) ->
-    @schema = axis.schema
+  constructor: (options) ->
+    @schema = options.schema
     @exprBuilder = new ExpressionBuilder(@schema)
 
   # Clean an axis with respect to a specific table
-  # aggrNeed is "none", "optional" or "required"
-  cleanAxis: (axis, table, aggrNeed="optional") ->
-    if not axis
+  # Options:
+  #  axis: axis to clean
+  #  table: table that axis is to be for
+  #  aggrNeed is "none", "optional" or "required"
+  cleanAxis: (options) ->
+    if not options.axis
       return
 
     # TODO always clones
-    axis = _.clone(axis)
+    axis = _.clone(options.axis)
 
     # Clean expression
-    axis.expr = @exprBuilder.cleanExpr(axis.expr, table)
+    axis.expr = @exprBuilder.cleanExpr(axis.expr, options.table)
 
-    # Remove if null or no type
+    # Remove if null or no type 
     if not @exprBuilder.getExprType(axis.expr)
       return
 
@@ -35,15 +38,15 @@ module.exports = class AxisBuilder
       delete axis.aggr
 
     # Remove if need is none
-    if aggrNeed == "none"
+    if options.aggrNeed == "none"
       delete axis.aggr
 
     # Default aggr if required
-    if aggrNeed == "required" and aggrs[0] and not axis.aggr
+    if options.aggrNeed == "required" and aggrs[0] and not axis.aggr
       axis.aggr = aggrs[0].id
 
     # Set aggr to count if expr is type count and aggr possible
-    if aggrNeed != "none" and not axis.aggrs
+    if options.aggrNeed != "none" and not axis.aggrs
       if @exprBuilder.getExprType(axis.expr) == "count"
         axis.aggr = "count"
 

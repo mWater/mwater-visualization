@@ -56,11 +56,11 @@ module.exports = class TableChart extends Chart
       column = design.columns[columnId]
 
       # Clean textAxis
-      column.textAxis = @axisBuilder.cleanAxis(column.textAxis, design.table, "optional")
+      column.textAxis = @axisBuilder.cleanAxis(axis: column.textAxis, table: design.table, aggrNeed: "optional")
 
     # Clean orderings
     for ordering in design.orderings
-      ordering.axis = @axisBuilder.cleanAxis(ordering.axis, design.table, "optional")
+      ordering.axis = @axisBuilder.cleanAxis(axis: ordering.axis, table: design.table, aggrNeed: "optional")
 
     if design.filter
       design.filter = @exprBuilder.cleanExpr(design.filter, design.table)

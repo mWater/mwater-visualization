@@ -35,8 +35,8 @@ exports.loadDashboard = (options) ->
 
     # Get from local storage
     design = options.design
-    if window.localStorage["mwater-visualization-test-design"]
-      design = JSON.parse(window.localStorage["mwater-visualization-test-design"])
+    if window.localStorage["mwater-visualization-test-design2"]
+      design = JSON.parse(window.localStorage["mwater-visualization-test-design2"])
 
     # Convert to tabs
     if not design.tabs
@@ -49,7 +49,7 @@ exports.loadDashboard = (options) ->
     # Called to update the design and re-render
     updateDesign = (newDesign) ->
       design = newDesign
-      window.localStorage["mwater-visualization-test-design"] = JSON.stringify(design)
+      window.localStorage["mwater-visualization-test-design2"] = JSON.stringify(design)
       render()
 
     # Render the dashboard
@@ -90,7 +90,7 @@ class TabbedDashboard extends React.Component
   handleRemoveTab: (index) =>
     if not confirm("Permanently remove this tab? This cannot be undone!")
       return
-      
+
     tabs = @props.design.tabs.slice()
     tabs.splice(index, 1)
     @props.onDesignChange(_.extend({}, @props.design, tabs: tabs))

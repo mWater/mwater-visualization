@@ -43,7 +43,7 @@ module.exports = class LayeredChart extends Chart
           aggrNeed = "required"
         else
           aggrNeed = "none"
-        layer.axes[axisKey] = @axisBuilder.cleanAxis(axis, layer.table, aggrNeed)
+        layer.axes[axisKey] = @axisBuilder.cleanAxis(axis: axis, table: layer.table, aggrNeed: aggrNeed)
 
       # Remove x axis if not required
       if not compiler.canLayerUseXExpr(design, layerId) and layer.axes.x
