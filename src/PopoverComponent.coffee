@@ -14,7 +14,7 @@ module.exports = class PopoverComponent extends React.Component
     @updatePopover(null, @props)
 
   componentDidUpdate: (prevProps) ->
-    if not _.isEqual(prevProps.content, @props.content)
+    if not _.isEqual(prevProps.content, @props.content) or prevProps.visible != @props.visible or prevProps.placement != @props.placement
       @updatePopover(@props, prevProps)
 
   updatePopover: (props, oldProps) ->
