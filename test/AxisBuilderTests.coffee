@@ -20,6 +20,7 @@ describe "AxisBuilder", ->
 
     @axisDecimal = { expr: @exprDecimal }
     @axisIntegerSum = { expr: @exprInteger, aggr: "sum" }
+    @axisDecimalCount = { expr: @exprCount, aggr: "count" }
     @axisInteger = { expr: @exprInteger }
     @axisEnum = { expr: @exprEnum } 
     @axisText = { expr: @exprText } 
@@ -110,12 +111,30 @@ describe "AxisBuilder", ->
       axis = @ab.cleanAxis(axis: axis, table: "t1", types: ['enum'])
       assert.equal axis.xform.type, "bin"
 
+    it "remove if not possible to get type", ->
+      axis = { expr: @exprDecimal }
+      assert not @ab.cleanAxis(axis: axis, table: "t1", types: ['text'], aggrNeed: "none")
+      assert @ab.cleanAxis(axis: axis, table: "t1", types: ['enum'], aggrNeed: "none") # Can get enum via binning
+    
+      # Aggr can get to count
+      assert not @ab.cleanAxis(axis: axis, table: "t1", types: ['integer'], aggrNeed: "none")
+      assert @ab.cleanAxis(axis: axis, table: "t1", types: ['integer'], aggrNeed: "required")
+
     it "defaults colorMap"
 
-  describe "getType", ->
-    it "passes through if no aggr or xform"
-    it "converts count aggr to integer"
-    it "xforms before aggr"
+  describe "getAxisType", ->
+    it "passes through if no aggr or xform", ->
+      assert.equal @ab.getAxisType(@axisDecimal), "decimal"
+
+    it "converts count aggr to integer", ->
+      assert.equal @ab.getAxisType(@axisDecimalCount), "integer"
+
+    it "xforms", ->
+      axis = {
+        expr: @exprDecimal
+        xform: { type: "bin", numBins: 10, min: 2, max: 8 }
+      }
+      assert.equal @ab.getAxisType(axis), "enum"
     
   describe "getCategories", ->
     it "gets enum", ->

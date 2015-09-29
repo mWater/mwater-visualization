@@ -43,6 +43,16 @@ module.exports = class AxisBuilder
       # Min max will be calculated by axis component
       axis.xform = { type: "bin", numBins: 10 }
 
+    # Get xformed type
+    if axis.xform and axis.xform.type == "bin"
+      type = "enum"
+
+    # If not aggregating, can't get to integer (count)
+    if options.aggrNeed == "none" and options.types and type not in options.types
+      return null
+    if options.types and type not in options.types and "integer" not in options.types
+      return null
+
     # Only allow aggr if not xform
     if axis.xform
       delete axis.aggr
@@ -122,12 +132,17 @@ module.exports = class AxisBuilder
 
     return []
 
+  # Get type of axis output
   getAxisType: (axis) ->
     if not axis
       return null
 
-    # TODO add aggr support
-    # TODO add xform support
+    if axis.aggr == "count"
+      return "integer"
+
+    if axis.xform and axis.xform.type == "bin"
+      return "enum"
+
     return @exprBuilder.getExprType(axis.expr)
 
   # Summarize axis as a string

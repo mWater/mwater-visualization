@@ -55,6 +55,11 @@ module.exports = class AxisComponent extends React.Component
         )
 
   handleExprChange: (expr) =>
+    # If no expression, reset
+    if not expr
+      @props.onChange(null)
+      return
+      
     # Set expression and clear xform
     @props.onChange(update(@props.value, $merge: { expr: expr, xform: null, aggr: null }))
 
