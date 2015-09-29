@@ -168,7 +168,7 @@ module.exports = class AxisBuilder
 
       # Calculate precision
       precision = d3Format.precisionFixed((max - min) / numBins)
-      format = d3Format.format("." + precision + "f")
+      format = d3Format.format(",." + precision + "f")
 
       cats = []
       cats.push({ value: 0, label: "< #{format(min)}"})
