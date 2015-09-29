@@ -170,17 +170,15 @@ module.exports = class AxisBuilder
       precision = d3Format.precisionFixed((max - min) / numBins)
       format = d3Format.format(",." + precision + "f")
 
-      cats = []
-      cats.push({ value: 0, label: "< #{format(min)}"})
+      categories = []
+      categories.push({ value: 0, label: "< #{format(min)}"})
       for i in [1..numBins]
         start = (i-1) / numBins * (max - min) + min
         end = (i) / numBins * (max - min) + min
-        console.log start
-        console.log end
-        cats.push({ value: i, label: "#{format(start)} - #{format(end)}"})
-      cats.push({ value: axis.xform.numBins + 1, label: "> #{format(max)}"})
+        categories.push({ value: i, label: "#{format(start)} - #{format(end)}"})
+      categories.push({ value: axis.xform.numBins + 1, label: "> #{format(max)}"})
 
-      return cats
+      return categories
 
     switch @getAxisType(axis)
       when "enum"
@@ -231,9 +229,26 @@ module.exports = class AxisBuilder
     # TODO add xform support
 
   # Get a string representation of an axis value
-  stringifyLiteral: (axis, value) ->
-    # TODO add aggr support, xform support
-    return @exprBuilder.stringifyExprLiteral(axis.expr, value)
+  formatValue: (axis, value) ->
+    if not value?
+      return "None"
+
+    # If has categories, use those
+    categories = @getCategories(axis, [])
+    if categories.length > 0
+      category = _.findWhere(categories, value: value)
+      if category
+        return category.label
+      else
+        return "???"
+
+
+    # Format as string if number
+    if _.isNumber(value)
+      return d3Format.format(",")(value)
+
+    # TODO format dates
+    return "" + value
 
   # Creates a filter (jsonql with {alias} for table name) based on a specific value
   # of the axis. Used to filter by a specific point.

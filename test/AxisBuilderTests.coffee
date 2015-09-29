@@ -169,7 +169,7 @@ describe "AxisBuilder", ->
     it "adds integer, decimal if binnable", ->
       assert.include @ab.getExprTypes(["enum"], "optional"), "integer"
       assert.include @ab.getExprTypes(["enum"], "optional"), "decimal"
- 
+
 
   describe "getAxisType", ->
     it "passes through if no aggr or xform", ->
@@ -184,6 +184,17 @@ describe "AxisBuilder", ->
         xform: { type: "bin", numBins: 10, min: 2, max: 8 }
       }
       assert.equal @ab.getAxisType(axis), "enum"
+
+  describe "formatValue", ->
+    it "formats axes with categories", ->
+      axis = {
+        expr: @exprDecimal
+        xform: { type: "bin", numBins: 3, min: 1, max: 4 }
+      }
+      assert.equal @ab.formatValue(axis, 0), "< 1"
+
+    it "converts to string", ->
+      assert.equal @ab.formatValue(@axisDecimal, 2), "2"
     
   describe "getCategories", ->
     it "gets enum", ->

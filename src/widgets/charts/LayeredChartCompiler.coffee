@@ -181,7 +181,7 @@ module.exports = class LayeredChartCompiler
           # Pie series contain a single value
           columns.push([series, row.y])
           types[series] = @getLayerType(design, layerIndex)
-          names[series] = @formatAxisValue(layer.axes.color, row.color)
+          names[series] = @axisBuilder.formatValue(layer.axes.color, row.color)
           dataMap[series] = { layerIndex: layerIndex, row: row }
 
           # TODO REMOVE
@@ -249,7 +249,7 @@ module.exports = class LayeredChartCompiler
           columns.push([seriesX].concat(_.pluck(rows, "x")))
 
           types[seriesY] = @getLayerType(design, layerIndex)
-          names[seriesY] = @formatAxisValue(layer.axes.color, colorValue)
+          names[seriesY] = @axisBuilder.formatValue(layer.axes.color, colorValue)
           xs[seriesY] = seriesX
 
           _.each rows, (row, rowIndex) =>
@@ -340,7 +340,7 @@ module.exports = class LayeredChartCompiler
           columns.push([series].concat(column))
 
           types[series] = @getLayerType(design, layerIndex)
-          names[series] = @formatAxisValue(layer.axes.color, colorValue)
+          names[series] = @axisBuilder.formatValue(layer.axes.color, colorValue)
           xs[series] = "x"
 
       else
@@ -403,15 +403,6 @@ module.exports = class LayeredChartCompiler
       xAxisType: "category" 
     }
 
-  # Translates enums to label, leaves all else alone
-  formatAxisValue: (axis, value) ->
-    if value and @exprBuilder.getExprType(axis.expr) == "enum"
-      items = @exprBuilder.getExprValues(axis.expr)
-      item = _.findWhere(items, { id: value })
-      if item
-        return item.name
-    return value or "None"
-
   # Compile an expression
   compileExpr: (expr) ->
     exprCompiler = new ExpressionCompiler(@schema)
@@ -451,12 +442,12 @@ module.exports = class LayeredChartCompiler
     # If x
     if layer.axes.x
       filters.push(@axisBuilder.createValueFilter(layer.axes.x, row.x))
-      names.push(@axisBuilder.summarizeAxis(layer.axes.x) + " is " + @axisBuilder.stringifyLiteral(layer.axes.x, row.x))
+      names.push(@axisBuilder.summarizeAxis(layer.axes.x) + " is " + @axisBuilder.formatValue(layer.axes.x, row.x))
       data.x = row.x
 
     if layer.axes.color
       filters.push(@axisBuilder.createValueFilter(layer.axes.color, row.color))
-      names.push(@axisBuilder.summarizeAxis(layer.axes.color) + " is " + @axisBuilder.stringifyLiteral(layer.axes.color, row.color))
+      names.push(@axisBuilder.summarizeAxis(layer.axes.color) + " is " + @axisBuilder.formatValue(layer.axes.color, row.color))
       data.color = row.color
 
     if filters.length > 1

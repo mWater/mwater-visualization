@@ -192,7 +192,7 @@ module.exports = class TableChart extends Chart
     renderRow = (record) =>
       renderCell = (column, columnIndex) =>
         value = record["c#{columnIndex}"]
-        return @axisBuilder.stringifyLiteral(column.textAxis, value)
+        return @axisBuilder.formatValue(column.textAxis, value)
 
       return _.map(design.columns, renderCell)
 

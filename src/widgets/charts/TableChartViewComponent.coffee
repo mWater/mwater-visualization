@@ -27,7 +27,7 @@ module.exports = class TableChartViewComponent extends React.Component
 
     # Convert to string
     axisBuilder = new AxisBuilder(schema: @props.schema)
-    str = axisBuilder.stringifyLiteral(column.textAxis, value)
+    str = axisBuilder.formatValue(column.textAxis, value)
     return H.td(key: columnIndex, str)
 
   renderRow: (index) ->

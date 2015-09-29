@@ -166,11 +166,11 @@ module.exports = class LayeredChart extends Chart
     for row in data.layer0
       r = []
       if design.layers[0].axes.x
-        r.push(@axisBuilder.stringifyLiteral(design.layers[0].axes.x, row.x))
+        r.push(@axisBuilder.formatValue(design.layers[0].axes.x, row.x))
       if design.layers[0].axes.color
-        r.push(@axisBuilder.stringifyLiteral(design.layers[0].axes.color, row.color))
+        r.push(@axisBuilder.formatValue(design.layers[0].axes.color, row.color))
       if design.layers[0].axes.y
-        r.push(@axisBuilder.stringifyLiteral(design.layers[0].axes.y, row.y))
+        r.push(@axisBuilder.formatValue(design.layers[0].axes.y, row.y))
       table.push(r)
 
     return table
