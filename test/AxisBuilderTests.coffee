@@ -72,7 +72,7 @@ describe "AxisBuilder", ->
       axis = @ab.cleanAxis(axis: axis, table: "t1")
       assert not axis
 
-    it "removes bad xform", ->
+    it "removes bin xform if wrong input type", ->
       axis = {
         expr: @exprEnum
         xform: { type: "bin", numBins: 10, min: 2, max: 8 }
@@ -81,9 +81,41 @@ describe "AxisBuilder", ->
       axis = @ab.cleanAxis(axis: axis, table: "t1")
       assert not axis.xform
 
+    it "removes bin xform if wrong output type", ->
+      axis = {
+        expr: @exprDecimal
+        xform: { type: "bin", numBins: 10, min: 2, max: 8 }
+      }
+
+      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ["integer"])
+      assert not axis.xform
+
     it "removes bad aggr"
-    it "defaults xform"
+
+    it "removes aggr if xform", ->
+      axis = {
+        expr: @exprDecimal
+        xform: { type: "bin", numBins: 10, min: 2, max: 8 }
+        aggr: "sum"
+      }
+
+      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ["enum"])
+      assert not axis.aggr
+
+    it "defaults bin xform", ->
+      axis = {
+        expr: @exprDecimal
+      }
+
+      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ['enum'])
+      assert.equal axis.xform.type, "bin"
+
     it "defaults colorMap"
+
+  describe "getType", ->
+    it "passes through if no aggr or xform"
+    it "converts count aggr to integer"
+    it "xforms before aggr"
     
   describe "getCategories", ->
     it "gets enum", ->

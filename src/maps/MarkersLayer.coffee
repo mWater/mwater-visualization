@@ -223,7 +223,7 @@ module.exports = class MarkersLayer extends Layer
       if not sublayer.axes or not sublayer.axes.geometry
         return "Missing axes"
 
-      error = axisBuilder.validateAxis(sublayer.axes.geometry)
+      error = axisBuilder.validateAxis(axis: sublayer.axes.geometry)
       if error then return error
 
     return null

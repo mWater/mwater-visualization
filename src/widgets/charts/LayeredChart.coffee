@@ -80,9 +80,9 @@ module.exports = class LayeredChart extends Chart
       error = null
 
       # Validate axes
-      error = error or @axisBuilder.validateAxis(layer.axes.x)
-      error = error or @axisBuilder.validateAxis(layer.axes.y)
-      error = error or @axisBuilder.validateAxis(layer.axes.color)
+      error = error or @axisBuilder.validateAxis(axis: layer.axes.x)
+      error = error or @axisBuilder.validateAxis(axis: layer.axes.y)
+      error = error or @axisBuilder.validateAxis(axis: layer.axes.color)
 
       error = error or @exprBuilder.validateExpr(layer.filter)
 

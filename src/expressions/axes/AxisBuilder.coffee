@@ -14,6 +14,7 @@ module.exports = class AxisBuilder
   #  axis: axis to clean
   #  table: table that axis is to be for
   #  aggrNeed is "none", "optional" or "required"
+  #  types: optional list of types to require it to be one of
   cleanAxis: (options) ->
     if not options.axis
       return
@@ -29,33 +30,56 @@ module.exports = class AxisBuilder
     if not type
       return
 
-    # Clean aggr
-    aggrs = @exprBuilder.getAggrs(axis.expr)
-    # Remove latest, as it is tricky to group by. TODO
-    aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
-
-    # Remove existing if not in list
-    if axis.aggr and axis.aggr not in _.pluck(aggrs, "id")
-      delete axis.aggr
-
-    # Remove if need is none
-    if options.aggrNeed == "none"
-      delete axis.aggr
-
-    # Default aggr if required
-    if options.aggrNeed == "required" and aggrs[0] and not axis.aggr
-      axis.aggr = aggrs[0].id
-
-    # Set aggr to count if expr is type count and aggr possible
-    if options.aggrNeed != "none" and not axis.aggrs
-      if @exprBuilder.getExprType(axis.expr) == "count"
-        axis.aggr = "count"
-
-    # Remove bin xform if not decimal/integer
+    # Remove bin xform if not decimal/integer 
     if type not in ['decimal', "integer"] and axis.xform and axis.xform.type == "bin"
       delete axis.xform
 
+    # Remove bin xform if not allowed enum
+    if options.types and axis.xform and axis.xform.type == "bin" and "enum" not in options.types
+      delete axis.xform
+
+    # Force not allowed type and are allowed enum if decimal
+    if not axis.xform and options.types and type not in options.types and 'enum' in options.types
+      # Min max will be calculated by axis component
+      axis.xform = { type: "bin", numBins: 10 }
+
+    # Only allow aggr if not xform
+    if axis.xform
+      delete axis.aggr
+    else
+      # Clean aggr
+      aggrs = @exprBuilder.getAggrs(axis.expr)
+      # Remove latest, as it is tricky to group by. TODO
+      aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
+
+      # Remove existing if not in list
+      if axis.aggr and axis.aggr not in _.pluck(aggrs, "id")
+        delete axis.aggr
+
+      # Remove if need is none
+      if options.aggrNeed == "none"
+        delete axis.aggr
+
+      # Default aggr if required
+      if options.aggrNeed == "required" and aggrs[0] and not axis.aggr
+        axis.aggr = aggrs[0].id
+
+      # Set aggr to count if expr is type count and aggr possible
+      if options.aggrNeed != "none" and not axis.aggrs
+        if @exprBuilder.getExprType(axis.expr) == "count"
+          axis.aggr = "count"
+
     return axis
+
+  # Checks whether an axis is valid
+  #  axis: axis to validate
+  validateAxis: (options) ->
+    # Nothing is ok
+    if not options.axis
+      return
+
+    # TODO
+    return @exprBuilder.validateExpr(options.axis.expr)
 
   # Pass axis, tableAlias
   compileAxis: (options) ->
@@ -74,14 +98,6 @@ module.exports = class AxisBuilder
       }
 
     return compiledExpr
-
-  validateAxis: (axis) ->
-    # Nothing is ok
-    if not axis
-      return
-
-    # TODO
-    return @exprBuilder.validateExpr(axis.expr)
 
   # Get all categories for a given axis type given the known values
   # Returns array of { value, label }

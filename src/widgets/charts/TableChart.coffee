@@ -79,12 +79,12 @@ module.exports = class TableChart extends Chart
       if not column.textAxis
         error = error or "Missing text"
 
-      error = error or @axisBuilder.validateAxis(column.textAxis)
+      error = error or @axisBuilder.validateAxis(axis: column.textAxis)
 
     for ordering in design.orderings
       if not ordering.axis
         error = error or "Missing order expression"
-      error = error or @axisBuilder.validateAxis(ordering.axis)
+      error = error or @axisBuilder.validateAxis(axis: ordering.axis)
 
     error = error or @exprBuilder.validateExpr(design.filter)
 
