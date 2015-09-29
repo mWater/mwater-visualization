@@ -9,6 +9,7 @@ AxisBuilder = require './../../expressions/axes/AxisBuilder'
 LayeredChartDesignerComponent = require './LayeredChartDesignerComponent'
 LayeredChartViewComponent = require './LayeredChartViewComponent'
 LayeredChartSvgFileSaver = require './LayeredChartSvgFileSaver'
+LayeredChartUtils = require './LayeredChartUtils'
 
 # See LayeredChart Design.md for the design
 module.exports = class LayeredChart extends Chart
@@ -43,7 +44,7 @@ module.exports = class LayeredChart extends Chart
           aggrNeed = "required"
         else
           aggrNeed = "none"
-        layer.axes[axisKey] = @axisBuilder.cleanAxis(axis: axis, table: layer.table, aggrNeed: aggrNeed)
+        layer.axes[axisKey] = @axisBuilder.cleanAxis(axis: axis, table: layer.table, aggrNeed: aggrNeed, types: LayeredChartUtils.getAxisTypes(design, layer, axisKey))
 
       # Remove x axis if not required
       if not compiler.canLayerUseXExpr(design, layerId) and layer.axes.x

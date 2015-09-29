@@ -133,6 +133,25 @@ module.exports = class AxisBuilder
 
     return compiledExpr
 
+  # Get underlying expression types that will give specified output expression types
+  #  types: array of types
+  #  aggrNeed is "none", "optional" or "required"
+  getExprTypes: (types, aggrNeed) ->
+    if not types
+      return null
+      
+    # Allow any if count is an option
+    if aggrNeed != "none" and "integer" in types
+      return ["text", "decimal", "integer", "date", "datetime", "boolean", "enum"]
+
+    types = types.slice()
+
+    # Add decimal, integer if can bin
+    if "enum" in types
+      types = _.union(types, ["integer", "decimal"])
+
+    return types
+
   # Get all categories for a given axis type given the known values
   # Returns array of { value, label }
   getCategories: (axis, values) ->

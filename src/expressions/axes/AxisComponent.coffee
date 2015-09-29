@@ -4,6 +4,7 @@ ScalarExprComponent = require '../ScalarExprComponent'
 ExpressionBuilder = require '../ExpressionBuilder'
 ExpressionCompiler = require '../ExpressionCompiler'
 EditableLinkComponent = require '../../EditableLinkComponent'
+AxisBuilder = require './AxisBuilder'
 update = require 'update-object'
 
 # Axis component that allows designing of an axis
@@ -22,36 +23,36 @@ module.exports = class AxisComponent extends React.Component
     onChange: React.PropTypes.func.isRequired # Called when changes
 
   componentDidMount: ->
-    @checkMinMaxComputation()
+    @checkMinMaxComputation(@props)
 
-  componentWillReceiveProps: ->
-    @checkMinMaxComputation()
+  componentWillReceiveProps: (nextProps) ->
+    @checkMinMaxComputation(nextProps)
 
   # Compute min and max if xform of bin and not already present
-  checkMinMaxComputation: ->
-    exprCompiler = new ExpressionCompiler(@props.schema)
+  checkMinMaxComputation: (props) ->
+    exprCompiler = new ExpressionCompiler(props.schema)
 
-    value = @props.value
+    value = props.value
 
     if value and value.xform and value.xform.type == "bin" and (not value.xform.min? or not value.xform.max?)
       # Compile expression
-      expr = exprCompiler.compileExpr(value.expr)
+      expr = exprCompiler.compileExpr(expr: value.expr, tableAlias: "main")
 
       # Create query
       query = {
         type: "query"
         selects: [
-          { expr: { type: "op", op: "min", exprs: [expr]}, alias: "min" }
-          { expr: { type: "op", op: "max", exprs: [expr]}, alias: "max" }
+          { type: "select", expr: { type: "op", op: "min", exprs: [expr]}, alias: "min" }
+          { type: "select", expr: { type: "op", op: "max", exprs: [expr]}, alias: "max" }
         ]
-        from: @props.table
+        from: { type: "table", table: props.table, alias: "main" }
       }
 
-      @props.dataSource.performQuery(query, (error, rows) =>
+      props.dataSource.performQuery(query, (error, rows) =>
         if not error and rows.length > 0
           # Check that didn't change
-          if value == @props.value
-            @props.onChange(update(value, xform: { min: { $set: rows[0].min }, max: { $set: rows[0].max }}))
+          if value == props.value
+            props.onChange(update(value, xform: { min: { $set: rows[0].min }, max: { $set: rows[0].max }}))
         )
 
   handleExprChange: (expr) =>
@@ -61,7 +62,7 @@ module.exports = class AxisComponent extends React.Component
       return
       
     # Set expression and clear xform
-    @props.onChange(update(@props.value, $merge: { expr: expr, xform: null, aggr: null }))
+    @props.onChange({ expr: expr, xform: null, aggr: null })
 
   handleAggrChange: (aggr) =>
     @props.onChange(update(@props.value, $merge: { aggr: aggr }))
@@ -82,12 +83,14 @@ module.exports = class AxisComponent extends React.Component
       currentAggr = _.findWhere(aggrs, id: @props.value.aggr)
 
       return React.createElement(EditableLinkComponent, 
-          dropdownItems: aggrs
-          onDropdownItemClicked: @handleAggrChange
-          if currentAggr then currentAggr.name
-          )
+        dropdownItems: aggrs
+        onDropdownItemClicked: @handleAggrChange
+        if currentAggr then currentAggr.name
+        )
 
   render: ->
+    axisBuilder = new AxisBuilder(schema: @props.schema)
+
     H.div style: { display: "inline-block" }, 
       @renderAggr()
       React.createElement(ScalarExprComponent, 
@@ -95,8 +98,7 @@ module.exports = class AxisComponent extends React.Component
         schema: @props.schema
         dataSource: @props.dataSource
         table: @props.table
-        types: @props.types # TODO take into account aggregation
+        types: axisBuilder.getExprTypes(@props.types, @props.aggrNeed)
         onChange: @handleExprChange
         includeCount: @props.aggrNeed != "none"
         value: if @props.value then @props.value.expr)  
-

@@ -160,6 +160,17 @@ describe "AxisBuilder", ->
       }
       assert @ab.validateAxis(axis: axis)
 
+  describe "getExprTypes", ->
+    it "adds any if aggr allowed and integer out", ->
+      assert.include @ab.getExprTypes(["integer"], "optional"), "datetime"
+      assert.include @ab.getExprTypes(["integer"], "required"), "datetime"
+      assert.notInclude @ab.getExprTypes(["decimal"], "required"), "datetime"
+  
+    it "adds integer, decimal if binnable", ->
+      assert.include @ab.getExprTypes(["enum"], "optional"), "integer"
+      assert.include @ab.getExprTypes(["enum"], "optional"), "decimal"
+ 
+
   describe "getAxisType", ->
     it "passes through if no aggr or xform", ->
       assert.equal @ab.getAxisType(@axisDecimal), "decimal"

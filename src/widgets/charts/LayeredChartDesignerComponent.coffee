@@ -5,6 +5,7 @@ LogicalExprComponent = require './../../expressions/LogicalExprComponent'
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 EditableLinkComponent = require './../../EditableLinkComponent'
 ColorComponent = require '../../ColorComponent'
+LayeredChartUtils = require './LayeredChartUtils'
 
 module.exports = class LayeredChartDesignerComponent extends React.Component
   @propTypes: 
@@ -175,6 +176,9 @@ class LayerDesignerComponent extends React.Component
   isXAxisRequired: (layer) ->
     return not @isLayerPolar(layer)
 
+  getAxisTypes: (layer, axisKey) ->
+    return LayeredChartUtils.getAxisTypes(@props.design, layer, axisKey)
+
   getAxisLabel: (icon, label) ->
     H.span null,
       H.span className: ("glyphicon glyphicon-" + icon)
@@ -270,7 +274,7 @@ class LayerDesignerComponent extends React.Component
           schema: @props.schema
           dataSource: @props.dataSource
           table: layer.table
-          # types: ["enum", "text"]
+          types: @getAxisTypes(layer, "x")
           aggrNeed: "none"
           value: layer.axes.x, 
           onChange: @handleXAxisChange)
@@ -290,7 +294,7 @@ class LayerDesignerComponent extends React.Component
           schema: @props.schema, 
           dataSource: @props.dataSource
           table: layer.table
-          types: ["enum", "text"]
+          types: @getAxisTypes(layer, "color")
           aggrNeed: "none"
           value: layer.axes.color, 
           onChange: @handleColorAxisChange)
@@ -310,7 +314,7 @@ class LayerDesignerComponent extends React.Component
           schema: @props.schema, 
           dataSource: @props.dataSource
           table: layer.table
-          types: ["integer", "decimal"]
+          types: @getAxisTypes(layer, "y")
           aggrNeed: "required"
           value: layer.axes.y
           onChange: @handleYAxisChange)
