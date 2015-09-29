@@ -1,6 +1,7 @@
 _ = require 'lodash'
 ExpressionCompiler = require '../ExpressionCompiler'
 ExpressionBuilder = require '../ExpressionBuilder'
+d3Format = require 'd3-format'
 
 # Understands axes. Contains methods to clean/validate etc. an axis of any type. 
 module.exports = class AxisBuilder
@@ -41,7 +42,11 @@ module.exports = class AxisBuilder
     # Force not allowed type and are allowed enum if decimal
     if not axis.xform and options.types and type not in options.types and 'enum' in options.types
       # Min max will be calculated by axis component
-      axis.xform = { type: "bin", numBins: 10 }
+      axis.xform = { type: "bin" }
+
+    # Add number of bins
+    if axis.xform and axis.xform.type == "bin" and not axis.xform.numBins
+      axis.xform.numBins = 6
 
     # Get xformed type
     if axis.xform and axis.xform.type == "bin"
@@ -161,13 +166,19 @@ module.exports = class AxisBuilder
       max = axis.xform.max
       numBins = axis.xform.numBins
 
+      # Calculate precision
+      precision = d3Format.precisionFixed((max - min) / numBins)
+      format = d3Format.format("." + precision + "f")
+
       cats = []
-      cats.push({ value: 0, label: "< #{min}"})
+      cats.push({ value: 0, label: "< #{format(min)}"})
       for i in [1..numBins]
         start = (i-1) / numBins * (max - min) + min
         end = (i) / numBins * (max - min) + min
-        cats.push({ value: i, label: "#{start} - #{end}"})
-      cats.push({ value: axis.xform.numBins + 1, label: "> #{axis.xform.max}"})
+        console.log start
+        console.log end
+        cats.push({ value: i, label: "#{format(start)} - #{format(end)}"})
+      cats.push({ value: axis.xform.numBins + 1, label: "> #{format(max)}"})
 
       return cats
 
