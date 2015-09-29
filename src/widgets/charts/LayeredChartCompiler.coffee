@@ -129,6 +129,9 @@ module.exports = class LayeredChartCompiler
           # Set max to 100 if proportional (with no padding)
           max: if options.design.type == "bar" and options.design.proportional then 100
           padding: if options.design.type == "bar" and options.design.proportional then { top: 0, bottom: 0 }
+          tick: {
+            format: d3.format(",")
+          }
         }
         rotated: options.design.transpose
       }
