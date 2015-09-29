@@ -55,6 +55,8 @@ module.exports = class LayeredChart extends Chart
     return design
 
   validateDesign: (design) ->
+    compiler = new LayeredChartCompiler(schema: @schema)
+
     # Check that layers have same x axis type
     xAxisTypes = _.uniq(_.map(design.layers, (l) => 
       @axisBuilder = new AxisBuilder(schema: @schema)
@@ -63,8 +65,8 @@ module.exports = class LayeredChart extends Chart
     if xAxisTypes.length > 1
       return "All x axes must be of same type"
 
-    for layer in design.layers
-      @axisBuilder = new AxisBuilder(schema: @schema)
+    for layerId in [0...design.layers.length]
+      layer = design.layers[layerId]
 
       # Check that has table
       if not layer.table
@@ -72,11 +74,12 @@ module.exports = class LayeredChart extends Chart
 
       # Check that has y axis
       if not layer.axes.y
-        return "Missing Axis"
+        return "Missing Y Axis"
 
-      # Check that has either x or color axis
-      if not layer.axes.x and not layer.axes.color
-        return "Missing Axis"
+      if not layer.axes.x and compiler.isXAxisRequired(design, layerId)
+        return "Missing X Axis"
+      if not layer.axes.color and compiler.isColorAxisRequired(design, layerId)
+        return "Missing Color Axis"
 
       error = null
 

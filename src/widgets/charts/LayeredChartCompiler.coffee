@@ -429,6 +429,12 @@ module.exports = class LayeredChartCompiler
   canLayerUseXExpr: (design, layerIndex) ->
     return @getLayerType(design, layerIndex) not in ['pie', 'donut']
 
+  isXAxisRequired: (design, layerIndex) ->
+    return @getLayerType(design, layerIndex) not in ['pie', 'donut']
+
+  isColorAxisRequired: (design, layerIndex) ->
+    return @getLayerType(design, layerIndex) in ['pie', 'donut']
+
   # Create a scope based on a row of a layer
   # Scope data is relevant data from row that uniquely identifies scope
   # plus a layer index
