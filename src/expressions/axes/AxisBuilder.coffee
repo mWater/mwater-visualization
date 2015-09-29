@@ -88,6 +88,17 @@ module.exports = class AxisBuilder
     if not options.axis
       return
 
+    # xform validation
+    if options.axis.xform and options.axis.xform.type == "bin"
+      if not options.axis.xform.numBins
+        return "Missing numBins"
+
+      if not options.axis.xform.min?
+        return "Missing min"
+
+      if not options.axis.xform.max?
+        return "Missing max"
+
     # TODO
     return @exprBuilder.validateExpr(options.axis.expr)
 
@@ -98,6 +109,19 @@ module.exports = class AxisBuilder
 
     exprCompiler = new ExpressionCompiler(@schema)
     compiledExpr = exprCompiler.compileExpr(expr: options.axis.expr, tableAlias: options.tableAlias, aggr: options.axis.aggr)
+
+    # Bin
+    if options.axis.xform and options.axis.xform.type == "bin"
+      compiledExpr = {
+        type: "op"
+        op: "width_bucket"
+        exprs: [
+          compiledExpr
+          options.axis.xform.min
+          options.axis.xform.max
+          options.axis.xform.numBins
+        ]
+      }
 
     # Aggregate
     if options.axis.aggr
@@ -112,6 +136,22 @@ module.exports = class AxisBuilder
   # Get all categories for a given axis type given the known values
   # Returns array of { value, label }
   getCategories: (axis, values) ->
+    # Handle binning first
+    if axis.xform and axis.xform.type == "bin"
+      min = axis.xform.min
+      max = axis.xform.max
+      numBins = axis.xform.numBins
+
+      cats = []
+      cats.push({ value: 0, label: "< #{min}"})
+      for i in [1..numBins]
+        start = (i-1) / numBins * (max - min) + min
+        end = (i) / numBins * (max - min) + min
+        cats.push({ value: i, label: "#{start} - #{end}"})
+      cats.push({ value: axis.xform.numBins + 1, label: "> #{axis.xform.max}"})
+
+      return cats
+
     switch @getAxisType(axis)
       when "enum"
         # If enum, return enum values

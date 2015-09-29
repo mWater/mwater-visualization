@@ -25,32 +25,55 @@ describe "AxisBuilder", ->
     @axisEnum = { expr: @exprEnum } 
     @axisText = { expr: @exprText } 
 
-  it "compiles simple expr", ->
-    jql = @ab.compileAxis(axis: @axisInteger, tableAlias: "T1")
-    assert _.isEqual jql, {
-      type: "field"
-      tableAlias: "T1"
-      column: "integer"
-    }
+  describe "compileAxis", ->
+    it "compiles simple expr", ->
+      jql = @ab.compileAxis(axis: @axisInteger, tableAlias: "T1")
+      assert _.isEqual jql, {
+        type: "field"
+        tableAlias: "T1"
+        column: "integer"
+      }
 
-  it "compiles aggregated field", ->
-    axis = {
-      expr: @exprInteger
-      aggr: "sum"
-    }
+    it "compiles aggregated field", ->
+      axis = {
+        expr: @exprInteger
+        aggr: "sum"
+      }
 
-    jql = @ab.compileAxis(axis: @axisIntegerSum, tableAlias: "T1")
-    assert _.isEqual jql, {
-      type: "op"
-      op: "sum"
-      exprs: [
-        {
-          type: "field"
-          tableAlias: "T1"
-          column: "integer"
-        }
-      ]
-    }
+      jql = @ab.compileAxis(axis: @axisIntegerSum, tableAlias: "T1")
+      assert _.isEqual jql, {
+        type: "op"
+        op: "sum"
+        exprs: [
+          {
+            type: "field"
+            tableAlias: "T1"
+            column: "integer"
+          }
+        ]
+      }
+
+    it "compiles binned field", ->
+      axis = {
+        expr: @exprDecimal
+        xform: { type: "bin", numBins: 10, min: 2, max: 8 }
+      }
+
+      jql = @ab.compileAxis(axis: axis, tableAlias: "T1")
+      assert _.isEqual jql, {
+        type: "op"
+        op: "width_bucket"
+        exprs: [
+          {
+            type: "field"
+            tableAlias: "T1"
+            column: "decimal"
+          },
+          2,
+          8,
+          10
+        ]
+      }
 
   describe "cleanAxis", ->
     it "defaults aggr"
@@ -122,6 +145,21 @@ describe "AxisBuilder", ->
 
     it "defaults colorMap"
 
+  describe "validateAxis", ->
+    it "allows xform", ->
+      axis = {
+        expr: @exprDecimal
+        xform: { type: "bin", numBins: 10, min: 2, max: 8 }
+      }
+      assert not @ab.validateAxis(axis: axis)
+
+    it "requires min, max for bin", ->
+      axis = {
+        expr: @exprDecimal
+        xform: { type: "bin", numBins: 10, min: 2 }
+      }
+      assert @ab.validateAxis(axis: axis)
+
   describe "getAxisType", ->
     it "passes through if no aggr or xform", ->
       assert.equal @ab.getAxisType(@axisDecimal), "decimal"
@@ -165,3 +203,18 @@ describe "AxisBuilder", ->
     it "gets empty list for decimal", ->
       categories = @ab.getCategories(@axisDecimal, [1.2, 1.4])
       compare(categories, [])
+
+    it "gets bins by name", ->
+      axis = {
+        expr: @exprDecimal
+        xform: { type: "bin", numBins: 3, min: 1, max: 4 }
+      }
+
+      categories = @ab.getCategories(axis, [])
+      compare(categories, [
+        { value: 0, label: "< 1" }
+        { value: 1, label: "1 - 2" }
+        { value: 2, label: "2 - 3" }
+        { value: 3, label: "3 - 4" }
+        { value: 4, label: "> 4" }
+      ])
