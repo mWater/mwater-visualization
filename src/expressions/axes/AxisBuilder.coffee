@@ -2,6 +2,7 @@ _ = require 'lodash'
 ExpressionCompiler = require '../ExpressionCompiler'
 ExpressionBuilder = require '../ExpressionBuilder'
 d3Format = require 'd3-format'
+moment = require 'moment'
 
 xforms = [
   { type: "bin", input: "decimal", output: "enum" }
@@ -64,7 +65,7 @@ module.exports = class AxisBuilder
         delete axis.xform
 
     # If no xform and using an xform would allow satisfying output types, pick first
-    if options.types and type not in options.types
+    if not axis.xform and options.types and type not in options.types
       xform = _.find(xforms, (xf) -> xf.input == type and xf.output in options.types)
       if xform
         axis.xform = { type: xform.type }
@@ -268,13 +269,45 @@ module.exports = class AxisBuilder
         { value: "11", label: "November" }
         { value: "12", label: "December" }
       ]
+
+    if axis.xform and axis.xform.type == "year"
+      values = _.compact(values)
+      if values.length == 0 
+        return []
+
+      # Get min and max
+      min = _.min(_.map(values, (date) -> parseInt(date.substr(0, 4))))
+      max = _.max(_.map(values, (date) -> parseInt(date.substr(0, 4))))
+      categories = []
+      for year in [min..max]
+        categories.push({ value: "#{year}-01-01", label: "#{year}"})
+      return categories
+
+    if axis.xform and axis.xform.type == "yearmonth"
+      values = _.compact(values)
+      if values.length == 0 
+        return []
+
+      # Get min and max
+      min = values.sort()[0]
+      max = values.sort().slice(-1)[0]
+
+      # Use moment to get range
+      current = moment(min, "YYYY-MM-DD")
+      end = moment(max, "YYYY-MM-DD")
+      categories = []
+      while not current.isAfter(end)
+        categories.push({ value: current.format("YYYY-MM-DD"), label: current.format("MMM YYYY")})
+        current.add(1, "months")
+      return categories
+
     switch @getAxisType(axis)
       when "enum"
         # If enum, return enum values
         return _.map(@exprBuilder.getExprValues(axis.expr), (ev) -> { value: ev.id, label: ev.name })
       when "integer"
-        # Handle none
-        if values.length == 0
+        values = _.compact(values)
+        if values.length == 0 
           return []
 
         # Integers are sometimes strings from database, so always parseInt (bigint in node-postgres)
@@ -284,7 +317,24 @@ module.exports = class AxisBuilder
         return _.map(_.range(min, max + 1), (v) -> { value: v, label: "#{v}"})
       when "text"
         # Return unique values
-        return _.map(_.uniq(values), (v) -> { value: v, label: v })
+        return _.map(_.uniq(values), (v) -> { value: v, label: v or "None" })
+      when "date"
+        values = _.compact(values)
+        if values.length == 0 
+          return []
+
+        # Get min and max
+        min = values.sort()[0]
+        max = values.sort().slice(-1)[0]
+
+        # Use moment to get range
+        current = moment(min, "YYYY-MM-DD")
+        end = moment(max, "YYYY-MM-DD")
+        categories = []
+        while not current.isAfter(end)
+          categories.push({ value: current.format("YYYY-MM-DD"), label: current.format("ll")})
+          current.add(1, "days")
+        return categories
 
     return []
 
@@ -296,10 +346,13 @@ module.exports = class AxisBuilder
     if axis.aggr == "count"
       return "integer"
 
-    if axis.xform and axis.xform.type == "bin"
-      return "enum"
+    type = @exprBuilder.getExprType(axis.expr)
 
-    return @exprBuilder.getExprType(axis.expr)
+    if axis.xform 
+      xform = _.findWhere(xforms, { type: axis.xform.type, input: type })
+      return xform.output
+
+    return type
 
   # Summarize axis as a string
   summarizeAxis: (axis) ->

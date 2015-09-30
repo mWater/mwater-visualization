@@ -112,7 +112,10 @@ module.exports = class AxisComponent extends React.Component
     @props.onChange(update(@props.value, $merge: { aggr: aggr }))
 
   handleXformTypeChange: (type) =>
-    @props.onChange(update(@props.value, $merge: { xform: { type: type } }))
+    if type
+      @props.onChange(update(@props.value, $merge: { xform: { type: type } }))
+    else
+      @props.onChange(_.omit(@props.value, "xform"))
 
   renderAggr: ->
     if @props.aggrNeed == "none"
@@ -149,7 +152,7 @@ module.exports = class AxisComponent extends React.Component
           options: [
             { value: null, label: "Exact Date" }
             { value: "year", label: "Year" }
-            { value: "yearmonth", label: "Year and Month" }
+            { value: "yearmonth", label: "Year/Month" }
             { value: "month", label: "Month" }
           ]
           onChange: @handleXformTypeChange
@@ -157,9 +160,9 @@ module.exports = class AxisComponent extends React.Component
         R ButtonToggleComponent,
           value: if @props.value.xform then @props.value.xform.type
           options: [
-            { value: "date", label: "Exact Date" }
+            { value: "date", label: "Date" }
             { value: "year", label: "Year" }
-            { value: "yearmonth", label: "Year and Month" }
+            { value: "yearmonth", label: "Year/Month" }
             { value: "month", label: "Month" }
           ]
           onChange: @handleXformTypeChange
@@ -191,7 +194,7 @@ class ButtonToggleComponent extends React.Component
     onChange: React.PropTypes.func.isRequired # Called with value
 
   render: ->
-    H.div className: "btn-group btn-group-sm",
+    H.div className: "btn-group btn-group-xs",
       _.map @props.options, (option, i) =>
         H.button type: "button", className: (if option.value == @props.value then "btn btn-primary active" else "btn btn-default"), onClick: @props.onChange.bind(null, option.value),
           option.label

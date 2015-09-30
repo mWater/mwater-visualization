@@ -8,11 +8,11 @@ exports.getAxisTypes = (design, layer, axis) ->
   switch axis
     when "x"
       if layerType == 'bar'
-        return ['enum', 'text', 'integer']
+        return ['enum', 'text', 'integer', 'date']
 
       # All
       return null
     when "color"
-      return ['enum', 'text']
+      return ['enum', 'text', 'date']
     when "y"
       return ['integer', "decimal"]

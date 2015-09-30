@@ -278,7 +278,6 @@ describe "AxisBuilder", ->
       assert.include @ab.getExprTypes(["enum"], "optional"), "integer"
       assert.include @ab.getExprTypes(["enum"], "optional"), "decimal"
 
-
   describe "getAxisType", ->
     it "passes through if no aggr or xform", ->
       assert.equal @ab.getAxisType(@axisDecimal), "decimal"
@@ -286,12 +285,19 @@ describe "AxisBuilder", ->
     it "converts count aggr to integer", ->
       assert.equal @ab.getAxisType(@axisDecimalCount), "integer"
 
-    it "xforms", ->
+    it "xforms bin", ->
       axis = {
         expr: @exprDecimal
         xform: { type: "bin", numBins: 10, min: 2, max: 8 }
       }
       assert.equal @ab.getAxisType(axis), "enum"
+
+    it "xforms date", ->
+      axis = {
+        expr: @exprDatetime
+        xform: { type: "date" }
+      }
+      assert.equal @ab.getAxisType(axis), "date"
 
   describe "formatValue", ->
     it "formats axes with categories", ->
@@ -371,3 +377,42 @@ describe "AxisBuilder", ->
         { value: "12", label: "December" }
       ])
 
+    it "gets years", ->
+      axis = {
+        expr: @exprDate
+        xform: { type: "year" }
+      }
+
+      categories = @ab.getCategories(axis, ['2010-01-01', '2013-01-01', null])
+      compare(categories, [
+        { value: "2010-01-01", label: "2010" }
+        { value: "2011-01-01", label: "2011" }
+        { value: "2012-01-01", label: "2012" }
+        { value: "2013-01-01", label: "2013" }
+      ])
+
+    it "gets yearmonths", ->
+      axis = {
+        expr: @exprDate
+        xform: { type: "yearmonth" }
+      }
+
+      categories = @ab.getCategories(axis, ['2010-01-01', '2010-03-01', null])
+      compare(categories, [
+        { value: "2010-01-01", label: "Jan 2010" }
+        { value: "2010-02-01", label: "Feb 2010" }
+        { value: "2010-03-01", label: "Mar 2010" }
+      ])
+
+    it "gets days", ->
+      axis = {
+        expr: @exprDate
+      }
+
+      categories = @ab.getCategories(axis, ['2010-01-30', '2010-02-02', null])
+      compare(categories, [
+        { value: "2010-01-30", label: "Jan 30, 2010" }
+        { value: "2010-01-31", label: "Jan 31, 2010" }
+        { value: "2010-02-01", label: "Feb 1, 2010" }
+        { value: "2010-02-02", label: "Feb 2, 2010" }
+      ])

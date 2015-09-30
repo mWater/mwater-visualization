@@ -141,6 +141,8 @@ module.exports = class LayeredChartCompiler
       transition: { duration: 0 } # Transitions interfere with scoping
     }
 
+    console.log options.design
+    console.log chartDesign
     return chartDesign
 
   # Compiles data part of C3 chart, including data map back to original data
