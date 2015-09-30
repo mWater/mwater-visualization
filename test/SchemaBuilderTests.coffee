@@ -29,24 +29,6 @@ describe "SchemaBuilder", ->
 
       compare(table.id, "responses:formid")
       compare(table.name, "Form: Form")
-      compare(table.jsonql, { 
-        type: "query" 
-        selects: [
-          { type: "select", expr: { type: "field", tableAlias: "responses", column: "_id" }, alias: "_id" }
-          { type: "select", expr: { type: "field", tableAlias: "responses", column: "data" }, alias: "data" }
-          { type: "select", expr: { type: "field", tableAlias: "responses", column: "deployment" }, alias: "deployment" }
-          { type: "select", expr: { type: "field", tableAlias: "responses", column: "submittedOn" }, alias: "submittedOn" }
-        ]
-        from: { type: "table", table: "responses", alias: "responses" }
-        where: { 
-          type: "op", 
-          op: "=",
-          exprs: [
-            { type: "field", tableAlias: "responses", column: "form" }
-            "formid"
-          ]
-        }
-      })
 
     it "adds structure", ->
       # Create form
@@ -77,7 +59,7 @@ describe "SchemaBuilder", ->
       schemaBuilder = new SchemaBuilder(schema)
       schemaBuilder.addForm(form)
 
-      compare(schema.getTable("responses:formid").structure, [
+      compare(_.findWhere(schema.getTable("responses:formid").structure, type: "section"), 
         { 
           type: "section", 
           name: "Section X"
@@ -85,7 +67,7 @@ describe "SchemaBuilder", ->
             { type: "column", column: "data:questionid:value" }
           ]
         }
-      ])
+      )
 
     describe "Answer types", ->
       before ->

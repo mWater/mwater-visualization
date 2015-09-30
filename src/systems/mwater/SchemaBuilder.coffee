@@ -268,28 +268,32 @@ module.exports = class SchemaBuilder
       id: "responses:#{form._id}"
       name: "Form: " + formUtils.localizeString(form.design.name)
       primaryKey: "_id"
-      # TODO ordering: 
-      jsonql: { 
-        type: "query" 
-        selects: [
-          { type: "select", expr: { type: "field", tableAlias: "responses", column: "_id" }, alias: "_id" }
-          { type: "select", expr: { type: "field", tableAlias: "responses", column: "data" }, alias: "data" }
-          { type: "select", expr: { type: "field", tableAlias: "responses", column: "deployment" }, alias: "deployment" }
-          { type: "select", expr: { type: "field", tableAlias: "responses", column: "submittedOn" }, alias: "submittedOn" }
-        ]
-        from: { type: "table", table: "responses", alias: "responses" }
-        where: { 
-          type: "op", 
-          op: "=",
-          exprs: [
-            { type: "field", tableAlias: "responses", column: "form" }
-            form._id
-          ]
-        }
-      }
     })
 
     structure = []
+    
+    # Add user
+    @schema.addColumn("responses:#{form._id}", { id: "user", type: "text", name: "Enumerator" })
+    structure.push({ type: "column", column: "user" })
+
+    # Add submitted on
+    @schema.addColumn("responses:#{form._id}", { id: "submittedOn", type: "datetime", name: "Submitted On" })
+    structure.push({ type: "column", column: "submittedOn" })
+
+    # Get deployments
+    deploymentValues = _.map(form.deployments, (dep) -> { id: dep._id, name: dep.name })
+    @schema.addColumn("responses:#{form._id}", { id: "deployment", type: "enum", name: "Deployment", values: deploymentValues })
+    structure.push({ type: "column", column: "deployment" })
+
+    # Add status
+    @schema.addColumn("responses:#{form._id}", { id: "status", type: "enum", name: "Status", values: [
+      { id: "draft", name: "Draft" }
+      { id: "rejected", name: "Rejected" }
+      { id: "pending", name: "Pending" }
+      { id: "final", name: "Final" }
+    ]})
+    structure.push({ type: "column", column: "status" })
+
     @addFormItem(form, form.design, structure)
     @schema.setTableStructure("responses:#{form._id}", structure)
 
