@@ -3,6 +3,19 @@ ExpressionCompiler = require '../ExpressionCompiler'
 ExpressionBuilder = require '../ExpressionBuilder'
 d3Format = require 'd3-format'
 
+xforms = [
+  { type: "bin", input: "decimal", output: "enum" }
+  { type: "bin", input: "integer", output: "enum" }
+  { type: "date", input: "date", output: "date" }
+  { type: "date", input: "datetime", output: "date" }
+  { type: "year", input: "date", output: "date" }
+  { type: "year", input: "datetime", output: "date" }
+  { type: "yearmonth", input: "date", output: "date" }
+  { type: "yearmonth", input: "datetime", output: "date" }
+  { type: "month", input: "date", output: "enum" }
+  { type: "month", input: "datetime", output: "enum" }
+]
+
 # Understands axes. Contains methods to clean/validate etc. an axis of any type. 
 module.exports = class AxisBuilder
   # Options are: schema
@@ -31,14 +44,29 @@ module.exports = class AxisBuilder
     if not type
       return
 
-    # Remove bin xform if not decimal/integer 
-    if type not in ['decimal', "integer"] and axis.xform and axis.xform.type == "bin"
-      delete axis.xform
+    # Validate xform type
+    if axis.xform
+      # Find valid xform
+      xform = _.find(xforms, (xf) ->
+        # xform type must match
+        if xf.type != axis.xform.type
+          return false
 
-    # Remove bin xform if not allowed enum
-    if options.types and axis.xform and axis.xform.type == "bin" and "enum" not in options.types
-      delete axis.xform
+        # Input type must match
+        if xf.input != type
+          return false
 
+        # Output type must match
+        if options.types and xf.output not in options.types
+          return false
+        return true
+        )
+      if not xform
+        delete axis.xform
+
+    # If no xform and xform would allow satisfying output types, pick first
+    if options.types and type not in options.type
+      
     # Force not allowed type and are allowed enum if decimal
     if not axis.xform and options.types and type not in options.types and 'enum' in options.types
       # Min max will be calculated by axis component
