@@ -305,6 +305,8 @@ module.exports = class LayeredChartCompiler
     # Get all values of the x-axis, taking into account values that might be missing
     xAxis = design.layers[0].axes.x
 
+    xType = @axisBuilder.getAxisType(xAxis)
+
     # Get all known values from all layers
     xValues = []
     _.each design.layers, (layer, layerIndex) =>
@@ -419,7 +421,7 @@ module.exports = class LayeredChartCompiler
       xs: xs
       groups: groups
       xAxisType: "category" 
-      xAxisTickFit: true   # Put a tick for each point since categorical
+      xAxisTickFit: xAxisType != "date"   # Put a tick for each point since categorical unless date
     }
 
   # Compile an expression
