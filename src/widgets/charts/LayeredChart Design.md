@@ -16,6 +16,7 @@ layer:
   stacked: true to stack (Note: not implemented yet)
   filter: optional logical expression to filter by
   color: color of layer (e.g. #FF8800)
+  cumulative: true to use running total of values
 
 axes:
   x: x axis

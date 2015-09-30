@@ -229,6 +229,8 @@ class LayerDesignerComponent extends React.Component
 
   handleColorChange: (color) => @updateLayer(color: color)
 
+  handleCumulativeChange: (ev) => @updateLayer(cumulative: ev.target.checked)
+
   renderName: ->
     # Only if multiple
     if @props.design.layers.length <= 1
@@ -318,6 +320,19 @@ class LayerDesignerComponent extends React.Component
           aggrNeed: "required"
           value: layer.axes.y
           onChange: @handleYAxisChange)
+        @renderCumulative()
+
+  renderCumulative: ->
+    layer = @props.design.layers[@props.index]
+
+    # Can only cumulative if non-polar and y axis determined
+    if not @isXAxisRequired(layer) or not layer.axes.y
+      return
+
+    H.div key: "cumulative",
+      H.div className: "checkbox-inline", 
+        H.input type: "checkbox", checked: layer.cumulative, onChange: @handleCumulativeChange
+        "Cumulative"
 
   renderColor: ->
     layer = @props.design.layers[@props.index]

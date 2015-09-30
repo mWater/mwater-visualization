@@ -148,7 +148,7 @@ module.exports = class AxisComponent extends React.Component
     switch exprType
       when "date"
         R ButtonToggleComponent,
-          value: if @props.value.xform then @props.value.xform.type
+          value: if @props.value.xform then @props.value.xform.type else null
           options: [
             { value: null, label: "Exact Date" }
             { value: "year", label: "Year" }
@@ -158,7 +158,7 @@ module.exports = class AxisComponent extends React.Component
           onChange: @handleXformTypeChange
       when "datetime"
         R ButtonToggleComponent,
-          value: if @props.value.xform then @props.value.xform.type
+          value: if @props.value.xform then @props.value.xform.type else null
           options: [
             { value: "date", label: "Date" }
             { value: "year", label: "Year" }

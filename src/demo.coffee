@@ -53,8 +53,23 @@ $ ->
   React.render(sample, document.body)
 
 dashboardDesign = {
-  items: {}
+  "items": {
+    "b854aa65-7644-4b67-b0a4-d2344e7eb43a": {
+      "layout": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "widget": {
+        "type": "LayeredChart",
+        design: {"version":1,"type":"line","layers":[{"axes":{"x":{"expr":{"type":"scalar","table":"entities.water_point","joins":[],"expr":{"type":"field","table":"entities.water_point","column":"_created_on"}},"xform":{"type":"date"}},"y":{"expr":{"type":"scalar","table":"entities.water_point","joins":[],"expr":{"type":"count","table":"entities.water_point"}},"xform":null,"aggr":"count"}},"filter":null,"table":"entities.water_point","cumulative":true}]}
+      }
+    }
+  }
 }
+
+
 #   "items": {
 #     "b854aa65-7644-4b67-b0a4-d2344e7eb43a": {
 #       "layout": {

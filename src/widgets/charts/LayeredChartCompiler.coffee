@@ -123,6 +123,7 @@ module.exports = class LayeredChartCompiler
         x: {
           type: c3Data.xAxisType
           label: { text: options.design.xAxisLabelText, position: 'outer-center' }
+          tick: { fit: false }
         }
         y: {
           label: { text: options.design.yAxisLabelText, position: 'outer-center' }
@@ -247,7 +248,11 @@ module.exports = class LayeredChartCompiler
           # Get rows for this series
           rows = _.where(layerData, color: colorValue)
 
-          columns.push([seriesY].concat(_.pluck(rows, "y")))
+          yValues = _.map(_.pluck(rows, "y"), (v) -> parseFloat(v))
+          if layer.cumulative
+            @makeCumulative(yValues)
+
+          columns.push([seriesY].concat(yValues))
           columns.push([seriesX].concat(_.pluck(rows, "x")))
 
           types[seriesY] = @getLayerType(design, layerIndex)
@@ -261,7 +266,11 @@ module.exports = class LayeredChartCompiler
         seriesX = "#{layerIndex}:x"
         seriesY = "#{layerIndex}:y"
 
-        columns.push([seriesY].concat(_.pluck(layerData, "y")))
+        yValues = _.map(_.pluck(layerData, "y"), (v) -> parseFloat(v))
+        if layer.cumulative
+          @makeCumulative(yValues)
+
+        columns.push([seriesY].concat(yValues))
         columns.push([seriesX].concat(_.pluck(layerData, "x")))
 
         types[seriesY] = @getLayerType(design, layerIndex)
@@ -339,6 +348,9 @@ module.exports = class LayeredChartCompiler
             column[index] = if row.y then parseFloat(row.y) else null
             dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
 
+          if layer.cumulative
+            @makeCumulative(column)
+
           columns.push([series].concat(column))
 
           types[series] = @getLayerType(design, layerIndex)
@@ -359,6 +371,9 @@ module.exports = class LayeredChartCompiler
           # Data arrives as string sometimes
           column[index] = if row.y then parseFloat(row.y) else null
           dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
+
+        if layer.cumulative
+          @makeCumulative(column)
 
         columns.push([series].concat(column))
 
@@ -474,3 +489,10 @@ module.exports = class LayeredChartCompiler
     }
 
     return scope
+
+  # Converts an array [value, value...] to be cumulative
+  makeCumulative: (column) ->
+    total = 0
+    for i in [0...column.length]
+      total += column[i]
+      column[i] = total

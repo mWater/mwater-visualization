@@ -306,7 +306,7 @@ describe "LayeredChartCompiler", ->
       # describe "text x"
       # describe "boolean x"
       describe "decimal x, no color axis", ->
-        before ->
+        beforeEach ->
           @design = {
             type: "line"
             layers: [
@@ -329,6 +329,29 @@ describe "LayeredChartCompiler", ->
           compare(@res.columns, [
             ["0:y", 1, 4]
             ["0:x", 1, 2]
+            ])
+
+        it "parses string y values", ->
+          @data = { 
+            layer0: [{ x: 1, y: "1" }, { x: 2, y: "4" }]
+          }
+
+          @res = @compiler.compileData(@design, @data)
+
+          compare(@res.columns, [
+            ["0:y", 1, 4]
+            ["0:x", 1, 2]
+            ])
+
+        it "totals for cumulative", ->
+          @data = { 
+            layer0: [{ x: 1, y: 1 }, { x: 2, y: 4 }, { x: 3, y: 5 }]
+          }
+          @design.layers[0].cumulative = true
+          @res = @compiler.compileData(@design, @data)
+          compare(@res.columns, [
+            ["0:y", 1, 5, 10]
+            ["0:x", 1, 2, 3]
             ])
 
         it "makes xs", ->
