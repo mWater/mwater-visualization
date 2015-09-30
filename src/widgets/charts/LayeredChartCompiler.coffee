@@ -123,7 +123,7 @@ module.exports = class LayeredChartCompiler
         x: {
           type: c3Data.xAxisType
           label: { text: options.design.xAxisLabelText, position: 'outer-center' }
-          tick: { fit: false }
+          tick: { fit: c3Data.xAxisTickFit }
         }
         y: {
           label: { text: options.design.yAxisLabelText, position: 'outer-center' }
@@ -290,6 +290,7 @@ module.exports = class LayeredChartCompiler
       colors: colors
       xs: xs
       xAxisType: if (xType in ["date"]) then "timeseries" else "indexed" 
+      xAxisTickFit: false   # Don't put a tick for each point
     }
 
   compileDataCategorical: (design, data) ->
@@ -418,6 +419,7 @@ module.exports = class LayeredChartCompiler
       xs: xs
       groups: groups
       xAxisType: "category" 
+      xAxisTickFit: true   # Put a tick for each point since categorical
     }
 
   # Compile an expression
