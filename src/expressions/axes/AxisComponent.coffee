@@ -1,5 +1,6 @@
 React = require 'react'
 H = React.DOM
+R = React.createElement
 ScalarExprComponent = require '../ScalarExprComponent'
 ExpressionBuilder = require '../ExpressionBuilder'
 ExpressionCompiler = require '../ExpressionCompiler'
@@ -110,6 +111,9 @@ module.exports = class AxisComponent extends React.Component
   handleAggrChange: (aggr) =>
     @props.onChange(update(@props.value, $merge: { aggr: aggr }))
 
+  handleXformTypeChange: (type) =>
+    @props.onChange(update(@props.value, $merge: { xform: { type: type } }))
+
   renderAggr: ->
     if @props.aggrNeed == "none"
       return
@@ -131,17 +135,63 @@ module.exports = class AxisComponent extends React.Component
         if currentAggr then currentAggr.name
         )
 
+  renderXform: ->
+    if not @props.value
+      return
+
+    exprBuilder = new ExpressionBuilder(@props.schema)
+    exprType = exprBuilder.getExprType(@props.value.expr) 
+
+    switch exprType
+      when "date"
+        R ButtonToggleComponent,
+          value: if @props.value.xform then @props.value.xform.type
+          options: [
+            { value: null, label: "Exact Date" }
+            { value: "year", label: "Year" }
+            { value: "yearmonth", label: "Year and Month" }
+            { value: "month", label: "Month" }
+          ]
+          onChange: @handleXformTypeChange
+      when "datetime"
+        R ButtonToggleComponent,
+          value: if @props.value.xform then @props.value.xform.type
+          options: [
+            { value: "date", label: "Exact Date" }
+            { value: "year", label: "Year" }
+            { value: "yearmonth", label: "Year and Month" }
+            { value: "month", label: "Month" }
+          ]
+          onChange: @handleXformTypeChange
+
   render: ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
 
     H.div style: { display: "inline-block" }, 
-      @renderAggr()
-      React.createElement(ScalarExprComponent, 
-        editorTitle: @props.editorTitle
-        schema: @props.schema
-        dataSource: @props.dataSource
-        table: @props.table
-        types: axisBuilder.getExprTypes(@props.types, @props.aggrNeed)
-        onChange: @handleExprChange
-        includeCount: @props.aggrNeed != "none"
-        value: if @props.value then @props.value.expr)  
+      H.div null, 
+        @renderAggr()
+        React.createElement(ScalarExprComponent, 
+          editorTitle: @props.editorTitle
+          schema: @props.schema
+          dataSource: @props.dataSource
+          table: @props.table
+          types: axisBuilder.getExprTypes(@props.types, @props.aggrNeed)
+          onChange: @handleExprChange
+          includeCount: @props.aggrNeed != "none"
+          value: if @props.value then @props.value.expr)  
+      @renderXform()
+
+class ButtonToggleComponent extends React.Component
+  @propTypes:
+    value: React.PropTypes.any
+    options: React.PropTypes.arrayOf(React.PropTypes.shape({
+      label: React.PropTypes.node.isRequired
+      value: React.PropTypes.any
+      })).isRequired # List of layers
+    onChange: React.PropTypes.func.isRequired # Called with value
+
+  render: ->
+    H.div className: "btn-group btn-group-sm",
+      _.map @props.options, (option, i) =>
+        H.button type: "button", className: (if option.value == @props.value then "btn btn-primary active" else "btn btn-default"), onClick: @props.onChange.bind(null, option.value),
+          option.label

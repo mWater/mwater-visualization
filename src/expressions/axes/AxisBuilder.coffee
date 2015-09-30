@@ -223,9 +223,10 @@ module.exports = class AxisBuilder
 
     types = types.slice()
 
-    # Add decimal, integer if can bin
-    if "enum" in types
-      types = _.union(types, ["integer", "decimal"])
+    # Add xformed types
+    for xform in xforms
+      if xform.output in types
+        types = _.union(types, [xform.input])
 
     return types
 
@@ -252,6 +253,21 @@ module.exports = class AxisBuilder
 
       return categories
 
+    if axis.xform and axis.xform.type == "month"
+      return [
+        { value: "01", label: "January" }
+        { value: "02", label: "February" }
+        { value: "03", label: "March" }
+        { value: "04", label: "April" }
+        { value: "05", label: "May" }
+        { value: "06", label: "June" }
+        { value: "07", label: "July" }
+        { value: "08", label: "August" }
+        { value: "09", label: "September" }
+        { value: "10", label: "October" }
+        { value: "11", label: "November" }
+        { value: "12", label: "December" }
+      ]
     switch @getAxisType(axis)
       when "enum"
         # If enum, return enum values
