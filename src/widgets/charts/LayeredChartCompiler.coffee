@@ -421,7 +421,7 @@ module.exports = class LayeredChartCompiler
       xs: xs
       groups: groups
       xAxisType: "category" 
-      xAxisTickFit: xAxisType != "date"   # Put a tick for each point since categorical unless date
+      xAxisTickFit: xType != "date"   # Put a tick for each point since categorical unless date
     }
 
   # Compile an expression
