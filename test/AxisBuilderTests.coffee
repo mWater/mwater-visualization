@@ -53,7 +53,7 @@ describe "AxisBuilder", ->
         ]
       }
 
-    it "compiles binned field", ->
+    it "compiles bin xform", ->
       axis = {
         expr: @exprDecimal
         xform: { type: "bin", numBins: 10, min: 2, max: 8 }
@@ -72,6 +72,109 @@ describe "AxisBuilder", ->
           2,
           8,
           10
+        ]
+      }
+
+    it "compiles date xform", ->
+      axis = {
+        expr: @exprDate
+        xform: { type: "date" }
+      }
+
+      jql = @ab.compileAxis(axis: axis, tableAlias: "T1")
+      assert _.isEqual jql, {
+        type: "op"
+        op: "substr"
+        exprs: [
+          {
+            type: "field"
+            tableAlias: "T1"
+            column: "date"
+          },
+          1,
+          10
+        ]
+      }
+
+    it "compiles year xform", ->
+      # rpad(substr('2011-12-21T', 1, 4), 10, '-01-01')      
+      axis = {
+        expr: @exprDate
+        xform: { type: "year" }
+      }
+
+      jql = @ab.compileAxis(axis: axis, tableAlias: "T1")
+      assert _.isEqual jql, {
+        type: "op"
+        op: "rpad"
+        exprs: [
+          {
+            type: "op"
+            op: "substr"
+            exprs: [
+              {
+                type: "field"
+                tableAlias: "T1"
+                column: "date"
+              },
+              1,
+              4
+            ]
+          }
+          10
+          "-01-01"
+        ]
+      }
+
+    it "compiles yearmonth xform", ->
+      # rpad(substr('2011-12-21T', 1, 7), 10, '-01')
+      axis = {
+        expr: @exprDate
+        xform: { type: "yearmonth" }
+      }
+
+      jql = @ab.compileAxis(axis: axis, tableAlias: "T1")
+      assert _.isEqual jql, {
+        type: "op"
+        op: "rpad"
+        exprs: [
+          {
+            type: "op"
+            op: "substr"
+            exprs: [
+              {
+                type: "field"
+                tableAlias: "T1"
+                column: "date"
+              },
+              1,
+              7
+            ]
+          }
+          10
+          "-01"
+        ]
+      }
+
+    it "compiles month xform", ->
+      # substr('2011-12-21T', 6, 2)
+      axis = {
+        expr: @exprDate
+        xform: { type: "month" }
+      }
+
+      jql = @ab.compileAxis(axis: axis, tableAlias: "T1")
+      assert _.isEqual jql, {
+        type: "op"
+        op: "substr"
+        exprs: [
+          {
+            type: "field"
+            tableAlias: "T1"
+            column: "date"
+          }
+          6
+          2
         ]
       }
 

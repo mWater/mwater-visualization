@@ -143,17 +143,62 @@ module.exports = class AxisBuilder
     compiledExpr = exprCompiler.compileExpr(expr: options.axis.expr, tableAlias: options.tableAlias, aggr: options.axis.aggr)
 
     # Bin
-    if options.axis.xform and options.axis.xform.type == "bin"
-      compiledExpr = {
-        type: "op"
-        op: "width_bucket"
-        exprs: [
-          compiledExpr
-          options.axis.xform.min
-          options.axis.xform.max
-          options.axis.xform.numBins
-        ]
-      }
+    if options.axis.xform 
+      if options.axis.xform.type == "bin"
+        compiledExpr = {
+          type: "op"
+          op: "width_bucket"
+          exprs: [
+            compiledExpr
+            options.axis.xform.min
+            options.axis.xform.max
+            options.axis.xform.numBins
+          ]
+        }
+
+      if options.axis.xform.type == "date"
+        compiledExpr = {
+          type: "op"
+          op: "substr"
+          exprs: [
+            compiledExpr
+            1
+            10
+          ]
+        }
+
+      if options.axis.xform.type == "year"
+        compiledExpr = {
+          type: "op"
+          op: "rpad"
+          exprs: [
+            { type: "op", op: "substr", exprs: [compiledExpr, 1, 4] }
+            10
+            "-01-01"
+          ]
+        }
+
+      if options.axis.xform.type == "yearmonth"
+        compiledExpr = {
+          type: "op"
+          op: "rpad"
+          exprs: [
+            { type: "op", op: "substr", exprs: [compiledExpr, 1, 7] }
+            10
+            "-01"
+          ]
+        }
+
+      if options.axis.xform.type == "month"
+        compiledExpr = {
+          type: "op"
+          op: "substr"
+          exprs: [
+            compiledExpr
+            6
+            2
+          ]
+        }
 
     # Aggregate
     if options.axis.aggr
