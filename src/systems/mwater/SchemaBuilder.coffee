@@ -272,6 +272,11 @@ module.exports = class SchemaBuilder
 
     structure = []
     
+    # Get deployments
+    deploymentValues = _.map(form.deployments, (dep) -> { id: dep._id, name: dep.name })
+    @schema.addColumn("responses:#{form._id}", { id: "deployment", type: "enum", name: "Deployment", values: deploymentValues })
+    structure.push({ type: "column", column: "deployment" })
+
     # Add user
     @schema.addColumn("responses:#{form._id}", { id: "user", type: "text", name: "Enumerator" })
     structure.push({ type: "column", column: "user" })
@@ -280,19 +285,14 @@ module.exports = class SchemaBuilder
     @schema.addColumn("responses:#{form._id}", { id: "submittedOn", type: "datetime", name: "Submitted On" })
     structure.push({ type: "column", column: "submittedOn" })
 
-    # Get deployments
-    deploymentValues = _.map(form.deployments, (dep) -> { id: dep._id, name: dep.name })
-    @schema.addColumn("responses:#{form._id}", { id: "deployment", type: "enum", name: "Deployment", values: deploymentValues })
-    structure.push({ type: "column", column: "deployment" })
-
-    # Add status
-    @schema.addColumn("responses:#{form._id}", { id: "status", type: "enum", name: "Status", values: [
-      { id: "draft", name: "Draft" }
-      { id: "rejected", name: "Rejected" }
-      { id: "pending", name: "Pending" }
-      { id: "final", name: "Final" }
-    ]})
-    structure.push({ type: "column", column: "status" })
+    # # Add status ONLY FINAL FOR NOW
+    # @schema.addColumn("responses:#{form._id}", { id: "status", type: "enum", name: "Status", values: [
+    #   { id: "draft", name: "Draft" }
+    #   { id: "rejected", name: "Rejected" }
+    #   { id: "pending", name: "Pending" }
+    #   { id: "final", name: "Final" }
+    # ]})
+    # structure.push({ type: "column", column: "status" })
 
     @addFormItem(form, form.design, structure)
     @schema.setTableStructure("responses:#{form._id}", structure)
