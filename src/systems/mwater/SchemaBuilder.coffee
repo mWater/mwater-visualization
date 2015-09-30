@@ -145,12 +145,6 @@ module.exports = class SchemaBuilder
 
     # Add named expressions
     @schema.addNamedExpr("entities.water_point", {
-      id: "Number of Water Points"
-      name: "Number of Water Points"
-      expr: { type: "count", table: "entities.water_point" }
-      })
-
-    @schema.addNamedExpr("entities.water_point", {
       id: "Water point type"
       name: "Water point type"
       expr: { type: "field", table: "entities.water_point", column: "type" }
