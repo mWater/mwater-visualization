@@ -6,7 +6,6 @@ d3Format = require 'd3-format'
 xforms = [
   { type: "bin", input: "decimal", output: "enum" }
   { type: "bin", input: "integer", output: "enum" }
-  { type: "date", input: "date", output: "date" }
   { type: "date", input: "datetime", output: "date" }
   { type: "year", input: "date", output: "date" }
   { type: "year", input: "datetime", output: "date" }
@@ -77,6 +76,7 @@ module.exports = class AxisBuilder
         if "integer" not in options.types
           return null
 
+    # Always 
     # Add number of bins
     if axis.xform and axis.xform.type == "bin" and not axis.xform.numBins
       axis.xform.numBins = 6

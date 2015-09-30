@@ -16,6 +16,7 @@ describe "AxisBuilder", ->
     @exprInteger = { type: "field", table: "t1", column: "integer" }
     @exprText = { type: "field", table: "t1", column: "text" }
     @exprDate = { type: "field", table: "t1", column: "date" }
+    @exprDatetime = { type: "field", table: "t1", column: "datetime" }
     @exprEnum = { type: "field", table: "t1", column: "enum" }
 
     @axisDecimal = { expr: @exprDecimal }
