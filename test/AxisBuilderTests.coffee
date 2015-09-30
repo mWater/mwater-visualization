@@ -116,6 +116,10 @@ describe "AxisBuilder", ->
 
     it "removes bad aggr"
 
+    it "defaults count aggr if will satify output", ->
+      axis = @ab.cleanAxis(axis: @axisDecimal, table: "t1", types: ["integer"])
+      assert.equal axis.aggr, "count"
+
     it "removes aggr if xform", ->
       axis = {
         expr: @exprDecimal

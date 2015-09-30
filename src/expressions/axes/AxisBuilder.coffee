@@ -64,27 +64,22 @@ module.exports = class AxisBuilder
       if not xform
         delete axis.xform
 
-    # If no xform and xform would allow satisfying output types, pick first
-    if options.types and type not in options.type
-      
-    # Force not allowed type and are allowed enum if decimal
-    if not axis.xform and options.types and type not in options.types and 'enum' in options.types
-      # Min max will be calculated by axis component
-      axis.xform = { type: "bin" }
+    # If no xform and using an xform would allow satisfying output types, pick first
+    if options.types and type not in options.types
+      xform = _.find(xforms, (xf) -> xf.input == type and xf.output in options.types)
+      if xform
+        axis.xform = { type: xform.type }
+        type = xform.output
+      else
+        # Unredeemable if no xform possible and cannot use count to get integer
+        if options.aggrNeed == "none" 
+          return null
+        if "integer" not in options.types
+          return null
 
     # Add number of bins
     if axis.xform and axis.xform.type == "bin" and not axis.xform.numBins
       axis.xform.numBins = 6
-
-    # Get xformed type
-    if axis.xform and axis.xform.type == "bin"
-      type = "enum"
-
-    # If not aggregating, can't get to integer (count)
-    if options.aggrNeed == "none" and options.types and type not in options.types
-      return null
-    if options.types and type not in options.types and "integer" not in options.types
-      return null
 
     # Only allow aggr if not xform
     if axis.xform
@@ -111,6 +106,10 @@ module.exports = class AxisBuilder
       if options.aggrNeed != "none" and not axis.aggrs
         if @exprBuilder.getExprType(axis.expr) == "count"
           axis.aggr = "count"
+
+      # Set aggr to count if needed to satisfy types
+      if options.types and "integer" in options.types and type not in options.types
+        axis.aggr = "count"
 
     return axis
 
