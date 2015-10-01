@@ -126,7 +126,7 @@ module.exports = class LayeredChartCompiler
           tick: { fit: c3Data.xAxisTickFit }
         }
         y: {
-          label: { text: options.design.yAxisLabelText, position: 'outer-center' }
+          label: { text: options.design.yAxisLabelText, position: 'outer-middle' }
           # Set max to 100 if proportional (with no padding)
           max: if options.design.type == "bar" and options.design.proportional then 100
           padding: if options.design.type == "bar" and options.design.proportional then { top: 0, bottom: 0 }
