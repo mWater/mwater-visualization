@@ -122,11 +122,11 @@ module.exports = class LayeredChartCompiler
       axis: {
         x: {
           type: c3Data.xAxisType
-          label: { text: options.design.xAxisLabelText, position: 'outer-center' }
+          label: { text: options.design.xAxisLabelText, position: if options.design.transpose then 'outer-middle' else 'outer-center' }
           tick: { fit: c3Data.xAxisTickFit }
         }
         y: {
-          label: { text: options.design.yAxisLabelText, position: 'outer-middle' }
+          label: { text: options.design.yAxisLabelText, position: if options.design.transpose then 'outer-center' else 'outer-middle' }
           # Set max to 100 if proportional (with no padding)
           max: if options.design.type == "bar" and options.design.proportional then 100
           padding: if options.design.type == "bar" and options.design.proportional then { top: 0, bottom: 0 }
@@ -385,7 +385,6 @@ module.exports = class LayeredChartCompiler
         xs[series] = "x"
         colors[series] = layer.color
 
-
     # Stack by putting into groups
     if design.stacked
       groups = [_.keys(names)]
@@ -402,7 +401,7 @@ module.exports = class LayeredChartCompiler
         for i in [1...column.length]
           xtotals[i] = (xtotals[i] or 0) + (column[i] or 0)
 
-      # Now make percentage
+      # Now make percentage with one decimal
       for column in columns
         # Skip x column
         if column[0] == 'x'
@@ -410,7 +409,7 @@ module.exports = class LayeredChartCompiler
 
         for i in [1...column.length]
           if column[i] > 0
-            column[i] = 100 * column[i] / xtotals[i]
+            column[i] = Math.round(100 * column[i] / xtotals[i] * 10) / 10
 
     return {
       columns: columns
