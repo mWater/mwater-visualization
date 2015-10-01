@@ -133,11 +133,11 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
   renderStackedProportional: ->
     design = @props.design
 
-    # Can only stack if multiple series or one with color  and not polar
+    # Can only stack if multiple series or one with color and not polar
     if design.type in ['pie', 'donut']
       return
 
-    if design.layers.length <= 1 and not design.layers[0].axes.color
+    if design.layers.length <= 1 or not design.layers[0].axes.color
       return
 
     H.div null,
