@@ -29,7 +29,6 @@ module.exports = class LayeredChart extends Chart
 
     # Fill in defaults
     design.version = design.version or 1
-    design.type = design.type or "bar"
     design.layers = design.layers or [{}]
 
     # Clean each layer

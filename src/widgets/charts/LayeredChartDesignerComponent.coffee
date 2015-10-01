@@ -1,5 +1,6 @@
 React = require 'react'
 H = React.DOM
+R = React.createElement
 AxisComponent = require './../../expressions/axes/AxisComponent'
 LogicalExprComponent = require './../../expressions/LogicalExprComponent'
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
@@ -52,6 +53,9 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
   handleYAxisLabelTextChange: (ev) =>  @updateDesign(yAxisLabelText: ev.target.value)
 
   renderLabels: ->
+    if not @props.design.type
+      return 
+
     H.div null,
       H.div className: "form-group",
         H.label className: "text-muted", "Title"
@@ -68,28 +72,41 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
 
   renderType: ->
     chartTypes =  [
-      { id: "bar", name: "Bar Chart" }
-      { id: "line", name: "Line Chart" }
-      { id: "pie", name: "Pie Chart" }
-      { id: "donut", name: "Donut Chart" }
-      { id: "spline", name: "Smoothed Line Chart" }
-      { id: "scatter", name: "Scatter Chart" }
-      { id: "area", name: "Area Chart" }
+      { id: "bar", name: "Bar", desc: "Best for most charts" }
+      { id: "pie", name: "Pie", desc: "Compare ratios of one variable" }
+      { id: "donut", name: "Donut", desc: "Pie chart with center removed" }
+      { id: "line", name: "Line", desc: "Show how data changes smoothly over time" }
+      { id: "spline", name: "Smoothed Line", desc: "For noisy data over time" }
+      { id: "scatter", name: "Scatter", desc: "Show correlation between two number variables" }
+      { id: "area", name: "Area", desc: "For cumulative data over time" }
     ]
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.span(className: "glyphicon glyphicon-th")
-        " "
-        "Type"
-      ": "
-      React.createElement(EditableLinkComponent, 
-        dropdownItems: chartTypes
-        onDropdownItemClicked: @handleTypeChange
-        _.findWhere(chartTypes, { id: @props.design.type }).name
-        )
+    if @props.design.type
+      return H.div className: "form-group",
+        H.label className: "text-muted", 
+          H.span(className: "glyphicon glyphicon-th")
+          " Type: "
+          R(EditableLinkComponent, 
+            onClick: @handleTypeChange.bind(null, null)
+            _.findWhere(chartTypes, { id: @props.design.type }).name
+          )
+    else
+      return H.div className: "form-group",
+        H.label className: "text-muted", 
+          H.span(className: "glyphicon glyphicon-th")
+          " Select Chart Type"
+        R BigOptions, items: _.map(chartTypes, (ct) => { name: ct.name, desc: ct.desc, onClick: @handleTypeChange.bind(null, ct.id) })
+      # ": "
+      # R(EditableLinkComponent, 
+      #   dropdownItems: chartTypes
+      #   onDropdownItemClicked: @handleTypeChange
+      #   _.findWhere(chartTypes, { id: @props.design.type }).name
+      #   )
 
   renderTranspose: ->
+    if not @props.design.type
+      return 
+
     # Don't include if polar
     if @props.design.type in ['pie', 'donut']
       return
@@ -114,7 +131,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
       paddingBottom: 10
     }
     H.div style: style, key: index,
-      React.createElement(LayerDesignerComponent, {
+      R(LayerDesignerComponent, {
         design: @props.design
         schema: @props.schema
         dataSource: @props.dataSource
@@ -124,6 +141,9 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
         })
 
   renderLayers: ->
+    if not @props.design.type
+      return 
+
     H.div null, 
       _.map(@props.design.layers, (layer, i) => @renderLayer(i))
       H.button className: "btn btn-default", type: "button", onClick: @handleAddLayer,
@@ -271,7 +291,7 @@ class LayerDesignerComponent extends React.Component
     H.div className: "form-group",
       H.label className: "text-muted", title
       H.div style: { marginLeft: 10 }, 
-        React.createElement(AxisComponent, 
+        R(AxisComponent, 
           editorTitle: title
           schema: @props.schema
           dataSource: @props.dataSource
@@ -291,7 +311,7 @@ class LayerDesignerComponent extends React.Component
     H.div className: "form-group",
       H.label className: "text-muted", title
       H.div style: { marginLeft: 10 }, 
-        React.createElement(AxisComponent, 
+        R(AxisComponent, 
           editorTitle: title
           schema: @props.schema, 
           dataSource: @props.dataSource
@@ -311,7 +331,7 @@ class LayerDesignerComponent extends React.Component
     H.div className: "form-group",
       H.label className: "text-muted", title
       H.div style: { marginLeft: 10 }, 
-        React.createElement(AxisComponent, 
+        R(AxisComponent, 
           editorTitle: title
           schema: @props.schema, 
           dataSource: @props.dataSource
@@ -345,7 +365,7 @@ class LayerDesignerComponent extends React.Component
       H.label className: "text-muted", 
         "Color"
       H.div style: { marginLeft: 8 }, 
-        React.createElement(ColorComponent, color: layer.color, onChange: @handleColorChange)
+        R(ColorComponent, color: layer.color, onChange: @handleColorChange)
 
   renderFilter: ->
     layer = @props.design.layers[@props.index]
@@ -360,7 +380,7 @@ class LayerDesignerComponent extends React.Component
         " "
         "Filters"
       H.div style: { marginLeft: 8 }, 
-        React.createElement(LogicalExprComponent, 
+        R(LogicalExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           onChange: @handleFilterChange
@@ -377,3 +397,26 @@ class LayerDesignerComponent extends React.Component
       @renderColor()
       @renderFilter()
       @renderName()
+
+class BigOptions extends React.Component
+  @propTypes:
+    items: React.PropTypes.array.isRequired # name, desc, onClick
+
+  render: ->
+    H.div className: "mwater-visualization-big-options", 
+      _.map @props.items, (item) =>
+        R BigOption, name: item.name, desc: item.desc, onClick: item.onClick, key: item.name
+
+class BigOption extends React.Component
+  @propTypes:
+    name: React.PropTypes.string
+    desc: React.PropTypes.string
+    onClick: React.PropTypes.func.isRequired
+
+  render: ->
+    H.div className: "mwater-visualization-big-option", onClick: @props.onClick,
+      H.div style: { fontWeight: "bold" }, @props.name
+      H.div style: { color: "#888" }, @props.desc
+
+
+
