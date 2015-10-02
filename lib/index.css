@@ -6,69 +6,69 @@
 .modal { overflow-y: auto; }
 
 .editable-link {
-	color: #478;
-	cursor: pointer;
-	display: inline-block;
-	position: relative;
-	padding: 2px;
-	border-radius: 5px;
+  color: #478;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  padding: 2px;
+  border-radius: 5px;
 }
 
 .editable-link:hover {
-	background-color: #e7f0f3;
+  background-color: #e7f0f3;
 }
 
 .editable-link .editable-link-remove {
-	position: absolute;
-	top: -6px;
-	right: -6px;
-	visibility: hidden;
-	font-size: 80%;
-	border-radius: 10;
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  visibility: hidden;
+  font-size: 80%;
+  border-radius: 10;
 }
 
 .editable-link:hover .editable-link-remove {
-	visibility: visible;
+  visibility: visible;
 }
 
 .editable-link-remove:hover {
-	visibility: visible !important;
-	color: #639db0;
+  visibility: visible !important;
+  color: #639db0;
 }
 
 .mwater-visualization-simple-widget {
-	border: solid 2px transparent;
-	border-radius: 8px;
+  border: solid 2px transparent;
+  border-radius: 8px;
 }
 
 .mwater-visualization-simple-widget:hover {
-	border: solid 2px #EEE;
+  border: solid 2px #EEE;
 }
 
 .mwater-visualization-simple-widget .mwater-visualization-simple-widget-resize-handle {
-	display: none;
+  display: none;
 }
 
 .mwater-visualization-simple-widget:hover .mwater-visualization-simple-widget-resize-handle {
-	display: block;
+  display: block;
 }
 
 .mwater-visualization-simple-widget .mwater-visualization-simple-widget-gear-button {
-	display: none;
-	color: #337ab7;
+  display: none;
+  color: #337ab7;
 }
 
 .mwater-visualization-simple-widget:hover .mwater-visualization-simple-widget-gear-button {
-	display: block;
+  display: block;
 }
 
 /* Use these to make a child that displays only when parent is hovered */
 .hover-display-parent > .hover-display-child {
-	visibility: hidden;
+  visibility: hidden;
 }
 
 .hover-display-parent:hover > .hover-display-child {
-	visibility: visible;
+  visibility: visible;
 }
 
 .c3-title {
@@ -77,29 +77,29 @@
 }
 
 .mwater-visualization-page-break {
-	width: 100%;
-	border-bottom: dashed 1px #AAA;
-	height: 0px;
+  width: 100%;
+  border-bottom: dashed 1px #AAA;
+  height: 0px;
 }
 
 @media print {
-	.mwater-visualization-page-break {
-		border-bottom: none;
-		/*
-		Removed since needs to be normal display, not absolute to work 
-		page-break-after: always;
-		*/
-	}
+  .mwater-visualization-page-break {
+    border-bottom: none;
+    /*
+    Removed since needs to be normal display, not absolute to work 
+    page-break-after: always;
+    */
+  }
 }
 
 .overflow-auto-except-print {
-	overflow: auto;
+  overflow: auto;
 }
 
 @media print {
-	.overflow-auto-except-print {
-		overflow: hidden;
-	}
+  .overflow-auto-except-print {
+    overflow: hidden;
+  }
 }
 
 .mwater-visualization-layer {
@@ -151,4 +151,40 @@
 
 .mwater-visualization-radio.checked {
   background-position: 8px -112px;
+}
+
+.mwater-visualization-big-options {
+  border: solid 1px #DDD;
+  max-width: 400px;
+}
+ 
+.mwater-visualization-big-option {
+  border: solid 1px transparent;
+  border-bottom: solid 1px #AAA;
+  padding: 8px;
+  max-width: 400px;
+  margin-bottom: -1px;
+  cursor: pointer
+}
+
+.mwater-visualization-big-option:hover {
+  border: solid 1px #888;
+  background-color: #F0F0F0;
+}
+
+/* For react-popover */
+.Popover {
+  z-index: 1050; /* In front of bootstrap modals */
+}
+
+.Popover-body {
+  padding: 20px;
+  border: solid 1px #AAA;
+  border-radius: 5px;
+  background-color: white;
+  box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.10);
+}
+
+.Popover-tip {
+  fill: #DDD;
 }

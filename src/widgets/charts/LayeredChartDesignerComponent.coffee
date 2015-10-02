@@ -8,6 +8,8 @@ ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 EditableLinkComponent = require './../../EditableLinkComponent'
 ColorComponent = require '../../ColorComponent'
 LayeredChartUtils = require './LayeredChartUtils'
+Popover = require 'react-popover'
+TabbedComponent = require "../../TabbedComponent"
 
 module.exports = class LayeredChartDesignerComponent extends React.Component
   @propTypes: 
@@ -82,27 +84,24 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
       { id: "area", name: "Area", desc: "For cumulative data over time" }
     ]
 
-    if @props.design.type
-      return H.div className: "form-group",
-        H.label className: "text-muted", 
-          H.span(className: "glyphicon glyphicon-th")
-          " Type: "
-          R(EditableLinkComponent, 
-            onClick: @handleTypeChange.bind(null, null)
-            _.findWhere(chartTypes, { id: @props.design.type }).name
-          )
-    else
-      return H.div className: "form-group",
-        H.label className: "text-muted", 
-          H.span(className: "glyphicon glyphicon-th")
-          " Select Chart Type"
-        R BigOptions, items: _.map(chartTypes, (ct) => { name: ct.name, desc: ct.desc, onClick: @handleTypeChange.bind(null, ct.id) })
-      # ": "
-      # R(EditableLinkComponent, 
-      #   dropdownItems: chartTypes
-      #   onDropdownItemClicked: @handleTypeChange
-      #   _.findWhere(chartTypes, { id: @props.design.type }).name
-      #   )
+    current = _.findWhere(chartTypes, { id: @props.design.type })
+
+    H.label className: "text-muted", 
+      H.span(className: "glyphicon glyphicon-th")
+      " Chart Type: "
+      R PopoverEditComponent,
+        forceOpen: not @props.design.type
+        label: (if current then current.name else H.i(null, "Select...")),
+        editor: (onClose) =>
+          R(BigOptions, items: _.map(chartTypes, (ct) => { 
+            name: ct.name
+            desc: ct.desc
+            onClick: () =>
+              # Close popover first
+              onClose()
+
+              @handleTypeChange(ct.id)
+          }))
 
   renderTranspose: ->
     if not @props.design.type
@@ -112,12 +111,13 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     if @props.design.type in ['pie', 'donut']
       return
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.span(className: "glyphicon glyphicon-retweet")
-        " "
-        "Orientation"
-      ": "
+    # return H.div className: "form-group",
+    #   H.label className: "text-muted", 
+    #     H.span(className: "glyphicon glyphicon-retweet")
+    #     " "
+    #     "Orientation"
+    #   ": "
+    H.div className: "text-muted",
       H.label className: "radio-inline",
         H.input type: "radio", checked: !@props.design.transpose, onChange: @handleTransposeChange.bind(null, false),
           "Vertical"
@@ -172,14 +172,31 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
           "Proportional"
 
   render: ->
-    H.div null, 
-      @renderType()
-      @renderTranspose()
-      @renderStackedProportional()
-      @renderLayers()
-      H.br()
-      H.hr()
-      @renderLabels()
+    tabs = []
+
+    tabs.push {
+      id: "design"
+      label: "Design"
+      elem: H.div null, 
+        H.br()
+        @renderType()
+        @renderLayers()
+    }
+
+    if @props.design.type
+      tabs.push {
+        id: "appearance"
+        label: "Appearance"
+        elem: H.div null,
+          H.br()
+          @renderTranspose()
+          @renderStackedProportional()
+          @renderLabels()
+      }
+
+    R TabbedComponent,
+      initialTabId: "design"
+      tabs: tabs      
 
 class LayerDesignerComponent extends React.Component
   @propTypes: 
@@ -271,13 +288,33 @@ class LayerDesignerComponent extends React.Component
   renderTable: ->
     layer = @props.design.layers[@props.index]
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.span(className: "glyphicon glyphicon-file")
-        " "
-        "Data Source"
-      ": "
-      @props.schema.createTableSelectElement(layer.table, @handleTableChange)
+    # return H.div className: "form-group",
+    #   H.label className: "text-muted", 
+    #     H.span(className: "glyphicon glyphicon-file")
+    #     " "
+    #     "Data Source"
+    #   ": "
+
+
+    H.label className: "text-muted", 
+      H.span(className: "glyphicon glyphicon-file")
+      " Data Source: "
+      R PopoverEditComponent,
+        forceOpen: not layer.table
+        label: if layer.table then @props.schema.getTable(layer.table).name else H.i(null, "Select...")
+        editor: (onClose) =>
+          R(BigOptions, items: _.map(@props.schema.getTables(), (table) => { 
+            name: table.name
+            desc: table.desc
+            onClick: () =>
+              # Close popover first
+              onClose()
+
+              @handleTableChange(table.id)
+          }))
+
+    # TODO PUT BACK
+      # @props.schema.createTableSelectElement(layer.table, @handleTableChange)
 
   renderXAxis: ->
     layer = @props.design.layers[@props.index]
@@ -359,8 +396,8 @@ class LayerDesignerComponent extends React.Component
   renderColor: ->
     layer = @props.design.layers[@props.index]
 
-    # If color axis, do nothing
-    if layer.axes.color
+    # If not table or has color axis, do nothing
+    if not layer.table or layer.axes.color
       return
 
     return H.div className: "form-group",
@@ -390,12 +427,15 @@ class LayerDesignerComponent extends React.Component
           value: layer.filter)
 
   render: ->
+    layer = @props.design.layers[@props.index]
     H.div null, 
       @renderRemove()
       @renderTable()
+      # Color axis first for pie
+      if @isLayerPolar(layer) then @renderColorAxis()
       @renderXAxis()
-      @renderYAxis()
-      @renderColorAxis()
+      if layer.axes.x or layer.axes.color then @renderYAxis()
+      if layer.axes.x and layer.axes.y and not @isLayerPolar(layer) then @renderColorAxis()
       @renderColor()
       @renderFilter()
       @renderName()
@@ -419,6 +459,41 @@ class BigOption extends React.Component
     H.div className: "mwater-visualization-big-option", onClick: @props.onClick,
       H.div style: { fontWeight: "bold" }, @props.name
       H.div style: { color: "#888" }, @props.desc
+
+# Shows as editable link that can be clicked to open a popover
+# Editor can be node or can be function that takes onClose function as first parameter
+class PopoverEditComponent extends React.Component
+  @propTypes:
+    forceOpen: React.PropTypes.bool
+    label: React.PropTypes.node.isRequired
+    editor: React.PropTypes.any.isRequired
+
+  constructor: (props) ->
+    @state = { open: false }
+
+  handleOpen: => @setState(open: true)
+  handleClose: => @setState(open: false)
+  handleToggle: => @setState(open: not @state.open)
+
+  render: ->
+    editor = @props.editor
+
+    # # Add close icon
+    # if not @props.forceOpen
+    #   editor = H.div null,
+    #     H.div style: { position: "absolute", right: 4, top: 10, color: "#AAA" }, onClick: @handleClose,
+    #       H.div className: "glyphicon glyphicon-remove"
+    #     editor
+    if _.isFunction(editor)
+      editor = editor(@handleClose)
+
+    R Popover, 
+      isOpen: @state.open or @props.forceOpen
+      preferPlace: "below"
+      onOuterAction: => @setState(open: false)
+      body: editor,
+        R(EditableLinkComponent, onClick: @handleToggle, @props.label)
+
 
 
 

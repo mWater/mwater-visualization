@@ -171,3 +171,20 @@
   border: solid 1px #888;
   background-color: #F0F0F0;
 }
+
+/* For react-popover */
+.Popover {
+  z-index: 1050; /* In front of bootstrap modals */
+}
+
+.Popover-body {
+  padding: 20px;
+  border: solid 1px #AAA;
+  border-radius: 5px;
+  background-color: white;
+  box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.10);
+}
+
+.Popover-tip {
+  fill: #DDD;
+}

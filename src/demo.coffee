@@ -9,9 +9,7 @@ class TestPane extends React.Component
   constructor: (props) ->
     super
 
-    @state = {
-      design: { layers: [] }
-    }
+    @state = { }
 
   componentDidMount: ->
     visualization_mwater.setup { 
@@ -26,11 +24,15 @@ class TestPane extends React.Component
     }, (err, results) =>
       if err
         throw err
+  
+      chart = new LayeredChart(schema: results.schema, dataSource: results.dataSource)
+      design = chart.cleanDesign({})
         
-      @setState(schema: results.schema, widgetFactory: results.widgetFactory, dataSource: results.dataSource, layerFactory: results.layerFactory)
+      @setState(schema: results.schema, widgetFactory: results.widgetFactory, dataSource: results.dataSource, layerFactory: results.layerFactory, design: design)
 
   handleDesignChange: (design) =>
-    @setState(design: design)
+    chart = new LayeredChart(schema: @state.schema, dataSource: @state.dataSource)
+    @setState(design: chart.cleanDesign(design))
     # console.log JSON.stringify(design, null, 2)
     
   render: ->
