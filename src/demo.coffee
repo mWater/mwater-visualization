@@ -2,6 +2,48 @@ H = React.DOM
 visualization_mwater = require './systems/mwater'
 visualization = require './index'
 
+LayeredChart = require './widgets/charts/LayeredChart'
+LayeredChartDesignerComponent = require './widgets/charts/LayeredChartDesignerComponent'
+
+class TestPane extends React.Component
+  constructor: (props) ->
+    super
+
+    @state = {
+      design: { layers: [] }
+    }
+
+  componentDidMount: ->
+    visualization_mwater.setup { 
+      apiUrl: @props.apiUrl
+      client: @props.client
+      onMarkerClick: (table, id) => alert("#{table}:#{id}")
+      newLayers: [
+        { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" } }
+        { name: "Custom Layer", type: "Markers", design: {} }
+      ]
+      onFormTableSelect: (id) -> alert(id)
+    }, (err, results) =>
+      if err
+        throw err
+        
+      @setState(schema: results.schema, widgetFactory: results.widgetFactory, dataSource: results.dataSource, layerFactory: results.layerFactory)
+
+  handleDesignChange: (design) =>
+    @setState(design: design)
+    # console.log JSON.stringify(design, null, 2)
+    
+  render: ->
+    if not @state.widgetFactory
+      return H.div null, "Loading..."
+
+    React.createElement(LayeredChartDesignerComponent, 
+      design: @state.design
+      schema: @state.schema
+      dataSource: @state.dataSource
+      onDesignChange: @handleDesignChange
+    )
+
 class DashboardPane extends React.Component
   constructor: (props) ->
     super
@@ -39,7 +81,7 @@ class DashboardPane extends React.Component
         design: @state.design
         widgetFactory: @state.widgetFactory
         onDesignChange: @handleDesignChange
-        titleElem: "Hello!"
+        titleElem: "Sample"
         })
 
 $ ->
@@ -47,6 +89,7 @@ $ ->
 
   sample = H.div className: "container-fluid", style: { height: "100%" },
     H.style null, '''html, body { height: 100% }'''
+    # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")

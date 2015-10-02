@@ -8,6 +8,8 @@ R = React.createElement
 # Pass in:
 # schemaUrl (yaml schema url)
 # queryUrl (will replace {query} with query)
+# loadDesignUrl (gets the current design)
+# saveDesignUrl (sets the current design)
 # design (initial design)
 # elemId (id of to render into)
 exports.loadDashboard = (options) ->
@@ -33,42 +35,43 @@ exports.loadDashboard = (options) ->
     # Create the widget factory
     widgetFactory = new visualization.WidgetFactory({ schema: schema, dataSource: dataSource })
 
-    # Get from local storage
-    design = options.design
-    if window.localStorage["mwater-visualization-test-design2"]
-      design = JSON.parse(window.localStorage["mwater-visualization-test-design2"])
+    # Get the design
+    $.get options.loadDesignUrl, (designString) ->
+      if designString
+        design = JSON.parse(designString)
+      else
+        # Use default
+        design = options.design
 
-    # Convert to tabs
-    if not design.tabs
-      design = {
-        tabs: [
-          { name: "Main", design: design }
-        ]
-      }
+      # Convert to tabs if not already 
+      if not design.tabs
+        design = {
+          tabs: [
+            { name: "Main", design: design }
+          ]
+        }
 
-    # Called to update the design and re-render
-    updateDesign = (newDesign) ->
-      design = newDesign
-      window.localStorage["mwater-visualization-test-design2"] = JSON.stringify(design)
+      # Called to update the design and re-render
+      updateDesign = (newDesign) ->
+        design = newDesign
+
+        # Save to database
+        $.post(options.saveDesignUrl, { userdata: JSON.stringify(design) })
+
+        render()
+
+      # Render the dashboard
+      render = ->
+        elem = R(TabbedDashboard,
+          design: design,
+          widgetFactory: widgetFactory,
+          onDesignChange: updateDesign
+        )
+
+        React.render(elem, document.getElementById(options.elemId))
+
+      # Initial render
       render()
-
-    # Render the dashboard
-    render = ->
-      # dashboardElem = R(visualization.DashboardComponent, {
-      #   design: design,
-      #   widgetFactory: widgetFactory,
-      #   onDesignChange: updateDesign
-      # })
-      elem = R(TabbedDashboard,
-        design: design,
-        widgetFactory: widgetFactory,
-        onDesignChange: updateDesign
-      )
-
-      React.render(elem, document.getElementById(options.elemId))
-
-    # Initial render
-    render()
 
 class TabbedDashboard extends React.Component
   @propTypes: 

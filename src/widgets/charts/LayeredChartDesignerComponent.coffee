@@ -2,6 +2,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 AxisComponent = require './../../expressions/axes/AxisComponent'
+AxisBuilder = require '../../expressions/axes/AxisBuilder'
 LogicalExprComponent = require './../../expressions/LogicalExprComponent'
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 EditableLinkComponent = require './../../EditableLinkComponent'
@@ -154,10 +155,10 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     design = @props.design
 
     # Can only stack if multiple series or one with color and not polar
-    if design.type in ['pie', 'donut']
+    if design.type in ['pie', 'donut'] or design.layers.length == 0
       return
 
-    if design.layers.length <= 1 or not design.layers[0].axes.color
+    if design.layers.length == 1 and not design.layers[0].axes.color
       return
 
     H.div null,
@@ -345,12 +346,13 @@ class LayerDesignerComponent extends React.Component
   renderCumulative: ->
     layer = @props.design.layers[@props.index]
 
-    # Can only cumulative if non-polar and y axis determined
-    if not @isXAxisRequired(layer) or not layer.axes.y
-      return
+    # Can only cumulative if non-polar and y axis determined and x axis is date, decimal or integer
+    axisBuilder = new AxisBuilder(schema: @props.schema)
+    if not layer.axes.y or not layer.axes.x or axisBuilder.getAxisType(layer.axes.x) not in ['date', 'decimal', 'integer']
+      return 
 
     H.div key: "cumulative",
-      H.div className: "checkbox-inline", 
+      H.label className: "checkbox-inline", 
         H.input type: "checkbox", checked: layer.cumulative, onChange: @handleCumulativeChange
         "Cumulative"
 
