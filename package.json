@@ -34,7 +34,7 @@
     "react-color": "git+https://github.com/rickyvetter/react-color.git#directory-caps",
     "react-dnd": "^1.1.1",
     "react-draggable": "^0.8.1",
-    "react-motion": "^0.2.7",
+    "react-motion": "^0.3.0",
     "react-select": "^0.6.11",
     "shallowequal": "^0.2.2",
     "update-object": "^1.0.0"

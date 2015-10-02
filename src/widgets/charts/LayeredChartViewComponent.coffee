@@ -97,7 +97,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
           scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
 
         # Determine if scoped
-        if @props.scope 
+        if scope and @props.scope 
           if _.isEqual(@props.scope.data, scope.data)
             return 1
           else
