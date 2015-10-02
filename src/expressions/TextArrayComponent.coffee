@@ -42,7 +42,7 @@ module.exports = class TextArrayComponent extends React.Component
         ]
       }
       groupBy: [1]
-      orderBy: [{ ordinal: 2, direction: "desc" }]
+      orderBy: [{ ordinal: 2, direction: "desc" }, { ordinal: 1, direction: "asc" }]
       limit: 50
     }
 
