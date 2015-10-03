@@ -5,7 +5,6 @@ R = React.createElement
 EditableLinkComponent = require './EditableLinkComponent'
 
 # Miscellaneous ui components
-
 exports.SectionComponent = class SectionComponent extends React.Component
   @propTypes: 
     icon: React.PropTypes.string
@@ -48,11 +47,16 @@ exports.BigOption = class BigOption extends React.Component
 exports.ToggleEditComponent = class ToggleEditComponent extends React.Component
   @propTypes:
     forceOpen: React.PropTypes.bool
+    initiallyOpen: React.PropTypes.bool
     label: React.PropTypes.node.isRequired
     editor: React.PropTypes.any.isRequired
+    onRemove: React.PropTypes.func
 
   constructor: (props) ->
-    @state = { open: false }
+    @state = { open: props.initiallyOpen or false }
+
+  close: ->
+    @setState(open: false)
 
   handleOpen: => @setState(open: true)
   handleClose: => @setState(open: false)
@@ -73,7 +77,7 @@ exports.ToggleEditComponent = class ToggleEditComponent extends React.Component
     if @state.open or @props.forceOpen
       return editor
     else
-      R(EditableLinkComponent, onClick: @handleToggle, @props.label)
+      R(EditableLinkComponent, onClick: @handleToggle, onRemove: @props.onRemove, @props.label)
       # R Popover, 
       #   isOpen: @state.open or @props.forceOpen
       #   preferPlace: "below"

@@ -1,7 +1,7 @@
 React = require 'react'
 H = React.DOM
 R = React.createElement
-ScalarExprComponent = require '../ScalarExprComponent'
+ScalarExprComponent = require '../ScalarExprComponent2'
 ExpressionBuilder = require '../ExpressionBuilder'
 ExpressionCompiler = require '../ExpressionCompiler'
 EditableLinkComponent = require '../../EditableLinkComponent'
@@ -22,6 +22,8 @@ module.exports = class AxisComponent extends React.Component
 
     value: React.PropTypes.object # See Axis Design.md
     onChange: React.PropTypes.func.isRequired # Called when changes
+
+    required: React.PropTypes.bool  # Makes this a required value
 
   componentDidMount: ->
     @checkMinMaxComputation(@props)
@@ -170,7 +172,7 @@ module.exports = class AxisComponent extends React.Component
   render: ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
 
-    H.div style: { display: "inline-block" }, 
+    H.div null,
       H.div null, 
         @renderAggr()
         React.createElement(ScalarExprComponent, 
@@ -179,6 +181,7 @@ module.exports = class AxisComponent extends React.Component
           dataSource: @props.dataSource
           table: @props.table
           types: axisBuilder.getExprTypes(@props.types, @props.aggrNeed)
+          preventRemove: @props.required
           onChange: @handleExprChange
           includeCount: @props.aggrNeed != "none"
           value: if @props.value then @props.value.expr)  

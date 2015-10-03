@@ -328,6 +328,7 @@ class LayerDesignerComponent extends React.Component
         table: layer.table
         types: @getAxisTypes(layer, "x")
         aggrNeed: "none"
+        required: true
         value: layer.axes.x, 
         onChange: @handleXAxisChange)
 
