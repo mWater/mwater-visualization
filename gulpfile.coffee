@@ -143,7 +143,7 @@ gulp.task 'watch', gulp.series([
   'build'
   gulp.parallel([
     -> browserSync({ server: "./dist", startPath: "demo.html" })
-    -> gulp.watch("./src/**", gulp.series(['browserify', -> reload()]))
+    -> gulp.watch("./src/**", gulp.series(['browserify', 'index_css', -> reload()]))
   ])
 ])
 

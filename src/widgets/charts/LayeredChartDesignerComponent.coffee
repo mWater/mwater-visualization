@@ -8,8 +8,8 @@ ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 EditableLinkComponent = require './../../EditableLinkComponent'
 ColorComponent = require '../../ColorComponent'
 LayeredChartUtils = require './LayeredChartUtils'
-Popover = require 'react-popover'
 TabbedComponent = require "../../TabbedComponent"
+ui = require '../../UIComponents'
 
 module.exports = class LayeredChartDesignerComponent extends React.Component
   @propTypes: 
@@ -86,22 +86,20 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
 
     current = _.findWhere(chartTypes, { id: @props.design.type })
 
-    H.label className: "text-muted", 
-      H.span(className: "glyphicon glyphicon-th")
-      " Chart Type: "
-      R PopoverEditComponent,
+    R ui.SectionComponent, icon: "th", label: "Chart Type",
+      R ui.ToggleEditComponent,
         forceOpen: not @props.design.type
-        label: (if current then current.name else H.i(null, "Select...")),
+        label: if current then current.name
         editor: (onClose) =>
-          R(BigOptions, items: _.map(chartTypes, (ct) => { 
-            name: ct.name
-            desc: ct.desc
-            onClick: () =>
-              # Close popover first
-              onClose()
-
-              @handleTypeChange(ct.id)
-          }))
+          R ui.BigOptions, 
+            hint: "Select a Chart Type"
+            items: _.map(chartTypes, (ct) => { 
+              name: ct.name
+              desc: ct.desc
+              onClick: () =>
+                onClose() # Close editor first
+                @handleTypeChange(ct.id)
+            })
 
   renderTranspose: ->
     if not @props.design.type
@@ -127,7 +125,6 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
 
   renderLayer: (index) =>
     style = {
-      borderTop: "solid 1px #EEE"
       paddingTop: 10
       paddingBottom: 10
     }
@@ -147,9 +144,9 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
 
     H.div null, 
       _.map(@props.design.layers, (layer, i) => @renderLayer(i))
-      H.button className: "btn btn-default", type: "button", onClick: @handleAddLayer,
+      H.button className: "btn btn-link", type: "button", onClick: @handleAddLayer,
         H.span className: "glyphicon glyphicon-plus"
-        " Add Series"
+        " Add Another Series"
 
   renderStackedProportional: ->
     design = @props.design
@@ -295,23 +292,20 @@ class LayerDesignerComponent extends React.Component
     #     "Data Source"
     #   ": "
 
-
-    H.label className: "text-muted", 
-      H.span(className: "glyphicon glyphicon-file")
-      " Data Source: "
-      R PopoverEditComponent,
+    R ui.SectionComponent, icon: "file", label: "Data Source",
+      R ui.ToggleEditComponent,
         forceOpen: not layer.table
         label: if layer.table then @props.schema.getTable(layer.table).name else H.i(null, "Select...")
         editor: (onClose) =>
-          R(BigOptions, items: _.map(@props.schema.getTables(), (table) => { 
-            name: table.name
-            desc: table.desc
-            onClick: () =>
-              # Close popover first
-              onClose()
-
-              @handleTableChange(table.id)
-          }))
+          R(ui.BigOptions, 
+            hint: "Select source to get data from"
+            items: _.map(@props.schema.getTables(), (table) => { 
+              name: table.name
+              desc: table.desc
+              onClick: () =>
+                onClose() # Close popover first
+                @handleTableChange(table.id)
+            }))
 
     # TODO PUT BACK
       # @props.schema.createTableSelectElement(layer.table, @handleTableChange)
@@ -326,18 +320,16 @@ class LayerDesignerComponent extends React.Component
 
     title = @getXAxisLabel(layer)
 
-    H.div className: "form-group",
-      H.label className: "text-muted", title
-      H.div style: { marginLeft: 10 }, 
-        R(AxisComponent, 
-          editorTitle: title
-          schema: @props.schema
-          dataSource: @props.dataSource
-          table: layer.table
-          types: @getAxisTypes(layer, "x")
-          aggrNeed: "none"
-          value: layer.axes.x, 
-          onChange: @handleXAxisChange)
+    R ui.SectionComponent, label: title,
+      R(AxisComponent, 
+        editorTitle: title
+        schema: @props.schema
+        dataSource: @props.dataSource
+        table: layer.table
+        types: @getAxisTypes(layer, "x")
+        aggrNeed: "none"
+        value: layer.axes.x, 
+        onChange: @handleXAxisChange)
 
   renderColorAxis: ->
     layer = @props.design.layers[@props.index]
@@ -436,64 +428,7 @@ class LayerDesignerComponent extends React.Component
       @renderXAxis()
       if layer.axes.x or layer.axes.color then @renderYAxis()
       if layer.axes.x and layer.axes.y and not @isLayerPolar(layer) then @renderColorAxis()
-      @renderColor()
-      @renderFilter()
-      @renderName()
-
-class BigOptions extends React.Component
-  @propTypes:
-    items: React.PropTypes.array.isRequired # name, desc, onClick
-
-  render: ->
-    H.div className: "mwater-visualization-big-options", 
-      _.map @props.items, (item) =>
-        R BigOption, name: item.name, desc: item.desc, onClick: item.onClick, key: item.name
-
-class BigOption extends React.Component
-  @propTypes:
-    name: React.PropTypes.string
-    desc: React.PropTypes.string
-    onClick: React.PropTypes.func.isRequired
-
-  render: ->
-    H.div className: "mwater-visualization-big-option", onClick: @props.onClick,
-      H.div style: { fontWeight: "bold" }, @props.name
-      H.div style: { color: "#888" }, @props.desc
-
-# Shows as editable link that can be clicked to open a popover
-# Editor can be node or can be function that takes onClose function as first parameter
-class PopoverEditComponent extends React.Component
-  @propTypes:
-    forceOpen: React.PropTypes.bool
-    label: React.PropTypes.node.isRequired
-    editor: React.PropTypes.any.isRequired
-
-  constructor: (props) ->
-    @state = { open: false }
-
-  handleOpen: => @setState(open: true)
-  handleClose: => @setState(open: false)
-  handleToggle: => @setState(open: not @state.open)
-
-  render: ->
-    editor = @props.editor
-
-    # # Add close icon
-    # if not @props.forceOpen
-    #   editor = H.div null,
-    #     H.div style: { position: "absolute", right: 4, top: 10, color: "#AAA" }, onClick: @handleClose,
-    #       H.div className: "glyphicon glyphicon-remove"
-    #     editor
-    if _.isFunction(editor)
-      editor = editor(@handleClose)
-
-    R Popover, 
-      isOpen: @state.open or @props.forceOpen
-      preferPlace: "below"
-      onOuterAction: => @setState(open: false)
-      body: editor,
-        R(EditableLinkComponent, onClick: @handleToggle, @props.label)
-
-
-
+      if layer.axes.y then @renderColor()
+      if layer.axes.y then @renderFilter()
+      if layer.axes.y then @renderName()
 
