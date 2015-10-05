@@ -53,6 +53,12 @@ module.exports = class LayeredChart extends Chart
       if not layer.axes.x or @axisBuilder.getAxisType(layer.axes.x) not in ['date', 'decimal', 'integer']
         delete layer.cumulative
 
+      # Default y to count if x or color present
+      if not layer.axes.y and (layer.axes.x or layer.axes.color)
+        # Create scalar count expr
+        countExpr = { type: "scalar", table: layer.table, expr: { type: "count", table: layer.table }, joins: [] }
+        layer.axes.y = { expr: countExpr, aggr: "count", xform: null }
+
       layer.filter = @exprBuilder.cleanExpr(layer.filter, layer.table)
 
     return design

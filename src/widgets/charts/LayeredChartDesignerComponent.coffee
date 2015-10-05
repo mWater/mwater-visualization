@@ -167,8 +167,8 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
 
     if @props.design.type
       tabs.push {
-        id: "appearance"
-        label: "Appearance"
+        id: "labels"
+        label: "Labels"
         elem: H.div null,
           H.br()
           @renderLabels()
@@ -332,6 +332,7 @@ class LayerDesignerComponent extends React.Component
           types: @getAxisTypes(layer, "y")
           aggrNeed: "required"
           value: layer.axes.y
+          required: true
           onChange: @handleYAxisChange)
         @renderCumulative()
 
