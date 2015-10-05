@@ -39,7 +39,7 @@ exports.TabbedComponent = require './TabbedComponent'
 
 # exports.UIComponents = require './UIComponents'
 exports.ToggleEditComponent = ui.ToggleEditComponent
-
+exports.OptionListComponent = ui.OptionListComponent
 
 # http://stackoverflow.com/questions/19305821/multiple-modals-overlay
 $ = require 'jquery'

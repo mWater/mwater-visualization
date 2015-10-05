@@ -24,13 +24,13 @@ module.exports = class TabbedComponent extends React.Component
     currentTab = _.findWhere(@props.tabs, id: @state.tabId)
 
     H.div null,
-      H.ul key: "tabs", className: "nav nav-tabs", 
+      H.ul key: "tabs", className: "nav nav-tabs", style: { marginBottom: 10 },
         _.map(@props.tabs, @renderTab)
         if @props.onAddTab
           H.li key: "_add", 
             H.a onClick: @props.onAddTab,
               H.span className: "glyphicon glyphicon-plus"
 
-      H.div key: "currentTab",
+      H.div key: "currentTab", 
         if currentTab
           currentTab.elem

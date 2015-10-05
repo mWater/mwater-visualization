@@ -59,7 +59,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     H.div null,
       H.div className: "form-group",
         H.label className: "text-muted", "Title"
-        H.input type: "text", className: "form-control input-sm", value: @props.design.titleText, onChange: @handleTitleTextChange, placeholder: compiler.compileDefaultTitleText(@props.design)
+        H.input type: "text", className: "form-control input-sm", value: @props.design.titleText, onChange: @handleTitleTextChange, placeholder: "Untitled"
       if @areAxesLabelsNeeded()
         H.div className: "form-group",
           H.label className: "text-muted", if @props.design.transpose then "Vertical Axis Label" else "Horizontal Axis Label"
@@ -120,9 +120,11 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
 
     H.div null, 
       _.map(@props.design.layers, (layer, i) => @renderLayer(i))
-      H.button className: "btn btn-link", type: "button", onClick: @handleAddLayer,
-        H.span className: "glyphicon glyphicon-plus"
-        " Add Another Series"
+      # Only add if last has table
+      if @props.design.layers.length > 0 and _.last(@props.design.layers).table
+        H.button className: "btn btn-link", type: "button", onClick: @handleAddLayer,
+          H.span className: "glyphicon glyphicon-plus"
+          " Add Another Series"
 
   renderOptions: ->
     design = @props.design

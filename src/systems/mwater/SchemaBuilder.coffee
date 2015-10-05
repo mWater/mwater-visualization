@@ -5,6 +5,9 @@ formUtils = require 'mwater-forms/lib/formUtils'
 
 # Make a plural form
 pluralize = (str) ->
+  # Water doesn't pluralize
+  if str.match(/ater$/)
+    return str
   if str.match(/s$/)
     return str + "es"
   if str.match(/y$/)

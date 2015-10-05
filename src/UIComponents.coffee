@@ -104,7 +104,7 @@ exports.SwitchViewComponent = class SwitchViewComponent extends React.Component
 
           return H.div style: { position: "relative", height: height },
             _.map _.keys(@props.views), (v) =>
-              H.div style: { position: "absolute", top: 0, opacity: style[v] }, key: v,
+              H.div style: { position: "absolute", top: 0, left: 0, right: 0, opacity: style[v] }, key: v,
                 @props.views[v]
 
         # Just display (but wrapped to keep same component)

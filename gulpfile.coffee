@@ -92,11 +92,11 @@ gulp.task "libs_js", ->
 gulp.task "copy_fonts", ->
   return gulp.src(["./bower_components/bootstrap/dist/fonts/*"]).pipe(gulp.dest("./dist/fonts/"))
 
-gulp.task "copy_images", ->
-  gulp.src([
-    # "./bower_components/select2/*.png"
-    # "./bower_components/select2/*.gif"
-  ]).pipe(gulp.dest("./dist/css/"))
+# gulp.task "copy_images", ->
+#   gulp.src([
+#     # "./bower_components/select2/*.png"
+#     # "./bower_components/select2/*.gif"
+#   ]).pipe(gulp.dest("./dist/css/"))
 
 gulp.task "index_css", ->
   return gulp.src("./src/index.css")
@@ -133,7 +133,7 @@ gulp.task "build", gulp.parallel([
   "dist"
   "libs_js"
   "libs_css"
-  "copy_images"
+  # "copy_images"
   "copy_fonts"
   "copy_assets"
   "index_css"

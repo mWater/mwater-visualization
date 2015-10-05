@@ -155,14 +155,12 @@
 
 .mwater-visualization-big-options {
   border: solid 1px #DDD;
-  max-width: 400px;
 }
  
 .mwater-visualization-big-option {
   border: solid 1px transparent;
   border-bottom: solid 1px #DDD;
   padding: 8px;
-  max-width: 400px;
   margin-bottom: -1px;
   cursor: pointer
 }
