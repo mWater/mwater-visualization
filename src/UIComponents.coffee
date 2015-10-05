@@ -1,6 +1,7 @@
 React = require 'react'
 H = React.DOM
 R = React.createElement
+motion = require 'react-motion'
 
 EditableLinkComponent = require './EditableLinkComponent'
 
@@ -55,15 +56,62 @@ exports.ToggleEditComponent = class ToggleEditComponent extends React.Component
   constructor: (props) ->
     @state = { open: props.initiallyOpen or false }
 
-  close: ->
+  close: =>
+    # Save height of editor
+    if @editorComp
+      @editorHeight = React.findDOMNode(@editorComp).clientHeight
+
     @setState(open: false)
 
-  handleOpen: => @setState(open: true)
-  handleClose: => @setState(open: false)
-  handleToggle: => @setState(open: not @state.open)
+  open: =>
+    @setState(open: true)
+  
+  handleToggle: => 
+    @setState(open: not @state.open)
+
+  # Save editor comp
+  editorRef: (editorComp) => @editorComp = editorComp
 
   render: ->
     editor = @props.editor
+    if _.isFunction(editor)
+      editor = editor(@close)
+
+    link = R(EditableLinkComponent, onClick: @open, onRemove: @props.onRemove, @props.label)
+    
+    isOpen = @state.open or @props.forceOpen
+
+    return R motion.TransitionMotion,
+      defaultStyles: { editor: { opacity: 0, scaleY: 0 } }
+      styles: if isOpen then { editor: { opacity: motion.spring(1), scaleY: motion.spring(1) } } else { link: { opacity: motion.spring(1) } }
+      willLeave: (key, styles) => if key == "editor" then { opacity: motion.spring(0), scaleY: motion.spring(0) } else styles
+      willEnter: (key, styles) => if key == "editor" then { opacity: 0, scaleY: 0 } else styles
+      (styles) =>
+        H.div null,
+          if styles.link 
+            H.div style: styles.link, link
+          if styles.editor
+            H.div 
+              style: { 
+                opacity: styles.editor.opacity
+                height: if styles.editor.scaleY < 1 then @editorHeight* styles.editor.scaleY
+                overflowY: if styles.editor.scaleY < 1 then "hidden" # Hide overflow if closing
+              }
+              ref: @editorRef,
+                editor
+
+# , transform: "scale(1,#{styles.editor.scaleY})"
+    # return R motion.TransitionMotion,
+    #   # defaultStyles: { editor: { opacity: 0 } }
+    #   styles: if isOpen then { editor: { opacity: 1, height: 1 } } else { link: { opacity: motion.spring(1) } }
+    #   willLeave: (key, styles) => if key == "editor" then { opacity: motion.spring(0), height: motion.spring(0) } else styles
+    #   willEnter: (key, styles) => if key == "editor" then { opacity: 0 } else styles
+    #   (styles) =>
+    #     H.div null,
+    #       if styles.link
+    #         H.div style: styles.link, link
+    #       if styles.editor
+    #         H.div style: { opacity: styles.editor.opacity, height: (if styles.editor.height < 1 then styles.editor.height * @editorHeight) }, ref: @editorRef, editor
 
     # # Add close icon
     # if not @props.forceOpen
@@ -71,13 +119,11 @@ exports.ToggleEditComponent = class ToggleEditComponent extends React.Component
     #     H.div style: { position: "absolute", right: 4, top: 10, color: "#AAA" }, onClick: @handleClose,
     #       H.div className: "glyphicon glyphicon-remove"
     #     editor
-    if _.isFunction(editor)
-      editor = editor(@handleClose)
 
-    if @state.open or @props.forceOpen
-      return editor
-    else
-      R(EditableLinkComponent, onClick: @handleToggle, onRemove: @props.onRemove, @props.label)
+    # if @state.open or @props.forceOpen
+    #   return editor
+    # else
+    #   R(EditableLinkComponent, onClick: @handleToggle, onRemove: @props.onRemove, @props.label)
       # R Popover, 
       #   isOpen: @state.open or @props.forceOpen
       #   preferPlace: "below"
