@@ -88,7 +88,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
         forceOpen: not @props.design.type
         label: if current then current.name else ""
         editor: (onClose) =>
-          R ui.BigOptionsComponent, 
+          R ui.OptionListComponent, 
             hint: "Select a Chart Type"
             items: _.map(chartTypes, (ct) => { 
               name: ct.name

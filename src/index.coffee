@@ -1,3 +1,4 @@
+ui = require './UIComponents'
 
 exports.Schema = require './Schema'
 exports.LogicalExprComponent = require './expressions/LogicalExprComponent'
@@ -37,7 +38,8 @@ exports.injectTableAlias = require './injectTableAlias'
 exports.TabbedComponent = require './TabbedComponent'
 
 # exports.UIComponents = require './UIComponents'
-# exports
+exports.ToggleEditComponent = ui.ToggleEditComponent
+
 
 # http://stackoverflow.com/questions/19305821/multiple-modals-overlay
 $ = require 'jquery'

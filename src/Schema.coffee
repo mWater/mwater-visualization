@@ -17,7 +17,7 @@ module.exports = class Schema
       forceOpen: not table
       label: if table then @getTable(table).name else H.i(null, "Select...")
       editor: (onClose) =>
-        React.createElement(ui.BigOptionsComponent, 
+        React.createElement(ui.OptionListComponent, 
           hint: "Select source to get data from"
           items: _.map(@getTables(), (table) => { 
             name: table.name

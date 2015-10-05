@@ -23,7 +23,7 @@ exports.SectionComponent = class SectionComponent extends React.Component
         @props.children
 
 # List of options with a name and description each
-exports.BigOptionsComponent = class BigOptionsComponent extends React.Component
+exports.OptionListComponent = class OptionListComponent extends React.Component
   @propTypes:
     items: React.PropTypes.array.isRequired # name, desc, onClick
     hint: React.PropTypes.string
@@ -33,9 +33,10 @@ exports.BigOptionsComponent = class BigOptionsComponent extends React.Component
       H.div style: { color: "#AAA", fontStyle: "italic" }, key: "hint", @props.hint
       H.div className: "mwater-visualization-big-options", key: "options",
         _.map @props.items, (item) =>
-          R BigOptionComponent, name: item.name, desc: item.desc, onClick: item.onClick, key: item.name
+          R OptionComponent, name: item.name, desc: item.desc, onClick: item.onClick, key: item.name
 
-exports.BigOptionComponent = class BigOptionComponent extends React.Component
+# Single option
+class OptionComponent extends React.Component
   @propTypes:
     name: React.PropTypes.string
     desc: React.PropTypes.string
@@ -47,7 +48,7 @@ exports.BigOptionComponent = class BigOptionComponent extends React.Component
       H.div style: { color: "#888" }, @props.desc
 
 # Switches views smoothly
-exports.SmoothSwitchViewComponent = class SmoothSwitchViewComponent extends React.Component
+exports.SwitchViewComponent = class SwitchViewComponent extends React.Component
   @propTypes:
     views: React.PropTypes.object.isRequired  # Map of view id to view element
     viewId: React.PropTypes.string.isRequired   # Current view id to display
@@ -149,10 +150,9 @@ exports.ToggleEditComponent = class ToggleEditComponent extends React.Component
     
     isOpen = @state.open or @props.forceOpen
 
-    return R SmoothSwitchViewComponent,
+    return R SwitchViewComponent,
       views: { editor: editor, link: link },
       viewId: if isOpen then "editor" else "link"
-
 
 # Switch between several values as a series of radio buttons
 exports.ButtonToggleComponent = class ButtonToggleComponent extends React.Component
