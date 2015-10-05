@@ -6,13 +6,15 @@ motion = require 'react-motion'
 EditableLinkComponent = require './EditableLinkComponent'
 
 # Miscellaneous ui components
+
+# Section with a title and icon
 exports.SectionComponent = class SectionComponent extends React.Component
   @propTypes: 
     icon: React.PropTypes.string
     label: React.PropTypes.node
 
   render: ->
-    H.div style: { marginBottom: 10 }, 
+    H.div style: { marginBottom: 15 }, 
       H.label className: "text-muted", 
         H.span(className: "glyphicon glyphicon-#{@props.icon}")
         " "
@@ -20,7 +22,8 @@ exports.SectionComponent = class SectionComponent extends React.Component
       H.div style: { marginLeft: 10 },
         @props.children
 
-exports.BigOptions = class BigOptions extends React.Component
+# List of options with a name and description each
+exports.BigOptionsComponent = class BigOptionsComponent extends React.Component
   @propTypes:
     items: React.PropTypes.array.isRequired # name, desc, onClick
     hint: React.PropTypes.string
@@ -30,9 +33,9 @@ exports.BigOptions = class BigOptions extends React.Component
       H.div style: { color: "#AAA", fontStyle: "italic" }, key: "hint", @props.hint
       H.div className: "mwater-visualization-big-options", key: "options",
         _.map @props.items, (item) =>
-          R BigOption, name: item.name, desc: item.desc, onClick: item.onClick, key: item.name
+          R BigOptionComponent, name: item.name, desc: item.desc, onClick: item.onClick, key: item.name
 
-exports.BigOption = class BigOption extends React.Component
+exports.BigOptionComponent = class BigOptionComponent extends React.Component
   @propTypes:
     name: React.PropTypes.string
     desc: React.PropTypes.string
@@ -42,7 +45,6 @@ exports.BigOption = class BigOption extends React.Component
     H.div className: "mwater-visualization-big-option", onClick: @props.onClick,
       H.div style: { fontWeight: "bold" }, @props.name
       H.div style: { color: "#888" }, @props.desc
-
 
 # Switches views smoothly
 exports.SmoothSwitchViewComponent = class SmoothSwitchViewComponent extends React.Component

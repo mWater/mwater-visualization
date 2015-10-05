@@ -122,11 +122,11 @@ module.exports = class LayeredChartCompiler
       axis: {
         x: {
           type: c3Data.xAxisType
-          label: { text: options.design.xAxisLabelText, position: if options.design.transpose then 'outer-middle' else 'outer-center' }
+          label: { text: c3Data.xAxisLabelText, position: if options.design.transpose then 'outer-middle' else 'outer-center' }
           tick: { fit: c3Data.xAxisTickFit }
         }
         y: {
-          label: { text: options.design.yAxisLabelText, position: if options.design.transpose then 'outer-center' else 'outer-middle' }
+          label: { text: c3Data.yAxisLabelText, position: if options.design.transpose then 'outer-center' else 'outer-middle' }
           # Set max to 100 if proportional (with no padding)
           max: if options.design.type == "bar" and options.design.proportional then 100
           padding: if options.design.type == "bar" and options.design.proportional then { top: 0, bottom: 0 }
@@ -138,12 +138,10 @@ module.exports = class LayeredChartCompiler
       }
       size: { width: options.width, height: options.height }
       pie: {  expand: false } # Don't expand/contract
-      title: { text: options.design.titleText, padding: titlePadding }
+      title: { text: c3Data.titleText, padding: titlePadding }
       transition: { duration: 0 } # Transitions interfere with scoping
     }
 
-    console.log options.design
-    console.log chartDesign
     return chartDesign
 
   # Compiles data part of C3 chart, including data map back to original data
@@ -217,6 +215,7 @@ module.exports = class LayeredChartCompiler
       dataMap: dataMap
       colors: colors
       xAxisType: "category" # Polar charts are always category x-axis
+      titleText: @compileTitleText(design)
     }
 
   # Compiles data for a chart like line or scatter that does not have a categorical x axis
@@ -291,6 +290,9 @@ module.exports = class LayeredChartCompiler
       xs: xs
       xAxisType: if (xType in ["date"]) then "timeseries" else "indexed" 
       xAxisTickFit: false   # Don't put a tick for each point
+      xAxisLabelText: @compileXAxisLabelText(design)
+      yAxisLabelText: @compileYAxisLabelText(design)
+      titleText: @compileTitleText(design)
     }
 
   compileDataCategorical: (design, data) ->
@@ -421,6 +423,9 @@ module.exports = class LayeredChartCompiler
       groups: groups
       xAxisType: "category" 
       xAxisTickFit: xType != "date"   # Put a tick for each point since categorical unless date
+      xAxisLabelText: @compileXAxisLabelText(design)
+      yAxisLabelText: @compileYAxisLabelText(design)
+      titleText: @compileTitleText(design)
     }
 
   # Compile an expression
@@ -445,6 +450,27 @@ module.exports = class LayeredChartCompiler
 
   isColorAxisRequired: (design, layerIndex) ->
     return @getLayerType(design, layerIndex) in ['pie', 'donut']
+
+  compileDefaultTitleText: (design) ->
+    if design.layers[0].axes.x
+      return @compileYAxisLabelText(design) + " vs " + @compileXAxisLabelText(design)
+    else
+      return @compileYAxisLabelText(design) + " vs " + @axisBuilder.summarizeAxis(design.layers[0].axes.color)
+
+  compileDefaultYAxisLabelText: (design) ->
+    @axisBuilder.summarizeAxis(design.layers[0].axes.y)
+
+  compileDefaultXAxisLabelText: (design) ->
+    @axisBuilder.summarizeAxis(design.layers[0].axes.x)
+
+  compileTitleText: (design) ->
+    return design.titleText or @compileDefaultTitleText(design)
+
+  compileYAxisLabelText: (design) ->
+    return design.yAxisLabelText or @compileDefaultYAxisLabelText(design)
+
+  compileXAxisLabelText: (design) ->
+    return design.xAxisLabelText or @compileDefaultXAxisLabelText(design)
 
   # Create a scope based on a row of a layer
   # Scope data is relevant data from row that uniquely identifies scope
