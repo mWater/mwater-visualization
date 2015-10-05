@@ -452,10 +452,12 @@ module.exports = class LayeredChartCompiler
     return @getLayerType(design, layerIndex) in ['pie', 'donut']
 
   compileDefaultTitleText: (design) ->
-    if design.layers[0].axes.x
-      return @compileYAxisLabelText(design) + " vs " + @compileXAxisLabelText(design)
-    else
-      return @compileYAxisLabelText(design) + " vs " + @axisBuilder.summarizeAxis(design.layers[0].axes.color)
+    # Don't default this for now
+    return ""
+    # if design.layers[0].axes.x
+    #   return @compileYAxisLabelText(design) + " by " + @compileXAxisLabelText(design)
+    # else
+    #   return @compileYAxisLabelText(design) + " by " + @axisBuilder.summarizeAxis(design.layers[0].axes.color)
 
   compileDefaultYAxisLabelText: (design) ->
     @axisBuilder.summarizeAxis(design.layers[0].axes.y)
