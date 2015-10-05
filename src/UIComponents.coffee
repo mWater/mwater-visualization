@@ -43,6 +43,72 @@ exports.BigOption = class BigOption extends React.Component
       H.div style: { fontWeight: "bold" }, @props.name
       H.div style: { color: "#888" }, @props.desc
 
+
+# Switches views smoothly
+exports.SmoothSwitchViewComponent = class SmoothSwitchViewComponent extends React.Component
+  @propTypes:
+    views: React.PropTypes.object.isRequired  # Map of view id to view element
+    viewId: React.PropTypes.string.isRequired   # Current view id to display
+
+  constructor: (props) ->
+    @state = { 
+      measuring: false
+    }
+
+  componentWillReceiveProps: (nextProps) ->
+    # If view changes, measure all components
+    if nextProps.viewId != @props.viewId
+      @setState(measuring: true)
+
+  # Save components
+  refCallback: (id, comp) => 
+    @comps = @comps or {}
+    @comps[id] = comp
+
+  componentDidUpdate: (prevProps, prevState) ->
+    # If measuring, get the heights to interpolate
+    if @state.measuring
+      @heights = {}
+
+      # Get heights
+      for id in _.keys(@props.views)
+        @heights[id] = React.findDOMNode(@comps[id]).clientHeight
+
+      @setState(measuring: false)
+
+  render: ->
+    # Create the style object that has the opacity for each view
+    style = {}
+    for id, view of @props.views
+      style[id] = motion.spring(if id == @props.viewId then 1 else 0)
+
+    return R motion.Motion,
+      style: style
+      (style) =>
+        # If measuring, display all positioned at top
+        if @state.measuring
+          return H.div style: { position: "relative" },
+            _.map _.keys(@props.views), (v) =>
+              H.div style: { position: "absolute", top: 0, opacity: style[v] }, ref: @refCallback.bind(null, v), key: v,
+                @props.views[v]
+
+        # If transitioning
+        if style[@props.viewId] != 1
+          # Calculate interpolated height
+          height = 0
+          for id, val of style
+            height += val * @heights[id]
+
+          return H.div style: { position: "relative", height: height },
+            _.map _.keys(@props.views), (v) =>
+              H.div style: { position: "absolute", top: 0, opacity: style[v] }, key: v,
+                @props.views[v]
+
+        # Just display (but wrapped to keep same component)
+        return H.div null,
+          H.div key: @props.viewId,
+            @props.views[@props.viewId]
+
 # Shows as editable link that can be clicked to open 
 # Editor can be node or can be function that takes onClose function as first parameter
 exports.ToggleEditComponent = class ToggleEditComponent extends React.Component
@@ -81,55 +147,23 @@ exports.ToggleEditComponent = class ToggleEditComponent extends React.Component
     
     isOpen = @state.open or @props.forceOpen
 
-    return R motion.TransitionMotion,
-      defaultStyles: { editor: { opacity: 0, scaleY: 0 } }
-      styles: if isOpen then { editor: { opacity: motion.spring(1), scaleY: motion.spring(1) } } else { link: { opacity: motion.spring(1) } }
-      willLeave: (key, styles) => if key == "editor" then { opacity: motion.spring(0), scaleY: motion.spring(0) } else styles
-      willEnter: (key, styles) => if key == "editor" then { opacity: 0, scaleY: 0 } else styles
-      (styles) =>
-        H.div null,
-          if styles.link 
-            H.div style: styles.link, link
-          if styles.editor
-            H.div 
-              style: { 
-                opacity: styles.editor.opacity
-                height: if styles.editor.scaleY < 1 then @editorHeight* styles.editor.scaleY
-                overflowY: if styles.editor.scaleY < 1 then "hidden" # Hide overflow if closing
-              }
-              ref: @editorRef,
-                editor
-
-# , transform: "scale(1,#{styles.editor.scaleY})"
-    # return R motion.TransitionMotion,
-    #   # defaultStyles: { editor: { opacity: 0 } }
-    #   styles: if isOpen then { editor: { opacity: 1, height: 1 } } else { link: { opacity: motion.spring(1) } }
-    #   willLeave: (key, styles) => if key == "editor" then { opacity: motion.spring(0), height: motion.spring(0) } else styles
-    #   willEnter: (key, styles) => if key == "editor" then { opacity: 0 } else styles
-    #   (styles) =>
-    #     H.div null,
-    #       if styles.link
-    #         H.div style: styles.link, link
-    #       if styles.editor
-    #         H.div style: { opacity: styles.editor.opacity, height: (if styles.editor.height < 1 then styles.editor.height * @editorHeight) }, ref: @editorRef, editor
-
-    # # Add close icon
-    # if not @props.forceOpen
-    #   editor = H.div null,
-    #     H.div style: { position: "absolute", right: 4, top: 10, color: "#AAA" }, onClick: @handleClose,
-    #       H.div className: "glyphicon glyphicon-remove"
-    #     editor
-
-    # if @state.open or @props.forceOpen
-    #   return editor
-    # else
-    #   R(EditableLinkComponent, onClick: @handleToggle, onRemove: @props.onRemove, @props.label)
-      # R Popover, 
-      #   isOpen: @state.open or @props.forceOpen
-      #   preferPlace: "below"
-      #   onOuterAction: => @setState(open: false)
-      #   body: editor,
+    return R SmoothSwitchViewComponent,
+      views: { editor: editor, link: link },
+      viewId: if isOpen then "editor" else "link"
 
 
+# Switch between several values as a series of radio buttons
+exports.ButtonToggleComponent = class ButtonToggleComponent extends React.Component
+  @propTypes:
+    value: React.PropTypes.any
+    options: React.PropTypes.arrayOf(React.PropTypes.shape({
+      label: React.PropTypes.node.isRequired
+      value: React.PropTypes.any
+      })).isRequired # List of layers
+    onChange: React.PropTypes.func.isRequired # Called with value
 
-
+  render: ->
+    H.div className: "btn-group btn-group-xs",
+      _.map @props.options, (option, i) =>
+        H.button type: "button", className: (if option.value == @props.value then "btn btn-primary active" else "btn btn-default"), onClick: @props.onChange.bind(null, option.value),
+          option.label

@@ -1,12 +1,13 @@
 React = require 'react'
 H = React.DOM
 R = React.createElement
-ScalarExprComponent = require '../ScalarExprComponent2'
+ScalarExprComponent = require '../ScalarExprComponent'
 ExpressionBuilder = require '../ExpressionBuilder'
 ExpressionCompiler = require '../ExpressionCompiler'
 EditableLinkComponent = require '../../EditableLinkComponent'
 AxisBuilder = require './AxisBuilder'
 update = require 'update-object'
+ui = require '../../UIComponents'
 
 # Axis component that allows designing of an axis
 module.exports = class AxisComponent extends React.Component
@@ -149,7 +150,7 @@ module.exports = class AxisComponent extends React.Component
 
     switch exprType
       when "date"
-        R ButtonToggleComponent,
+        R ui.ButtonToggleComponent,
           value: if @props.value.xform then @props.value.xform.type else null
           options: [
             { value: null, label: "Exact Date" }
@@ -159,7 +160,7 @@ module.exports = class AxisComponent extends React.Component
           ]
           onChange: @handleXformTypeChange
       when "datetime"
-        R ButtonToggleComponent,
+        R ui.ButtonToggleComponent,
           value: if @props.value.xform then @props.value.xform.type else null
           options: [
             { value: "date", label: "Date" }
@@ -187,17 +188,3 @@ module.exports = class AxisComponent extends React.Component
           value: if @props.value then @props.value.expr)  
       @renderXform()
 
-class ButtonToggleComponent extends React.Component
-  @propTypes:
-    value: React.PropTypes.any
-    options: React.PropTypes.arrayOf(React.PropTypes.shape({
-      label: React.PropTypes.node.isRequired
-      value: React.PropTypes.any
-      })).isRequired # List of layers
-    onChange: React.PropTypes.func.isRequired # Called with value
-
-  render: ->
-    H.div className: "btn-group btn-group-xs",
-      _.map @props.options, (option, i) =>
-        H.button type: "button", className: (if option.value == @props.value then "btn btn-primary active" else "btn btn-default"), onClick: @props.onChange.bind(null, option.value),
-          option.label

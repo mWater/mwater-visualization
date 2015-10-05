@@ -94,7 +94,12 @@ module.exports = class ScalarExprComponent extends React.Component
       linkProps.onDropdownItemClicked = @handleDropdownItemClicked
 
     return React.createElement(EditableLinkComponent, linkProps, 
-        if summary then summary else H.i(null, "None")
+        if summary 
+          summary 
+        else if @props.preventRemove
+          H.i(null, "Select...")
+        else
+          H.i(null, "None")
       )
 
   render: ->

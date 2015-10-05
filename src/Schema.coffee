@@ -2,6 +2,7 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 EditableLinkComponent = require './EditableLinkComponent'
+ui = require './UIComponents'
 
 # Schema for a database. Stores tables with columns (possibly in nested sections).
 # Also creates a control for selecting a table
@@ -12,12 +13,19 @@ module.exports = class Schema
   # Create an element for selecting a table. Displays current table
   createTableSelectElement: (table, onChange) ->
     # Can be overridden
-    React.createElement(EditableLinkComponent, 
-      dropdownItems: @getTables()
-      onDropdownItemClicked: onChange
-      onRemove: (if table then onChange.bind(this, null)),
-        if table then @getTable(table).name else H.i(null, "Select...")
-      )
+    React.createElement ui.ToggleEditComponent,
+      forceOpen: not table
+      label: if table then @getTable(table).name else H.i(null, "Select...")
+      editor: (onClose) =>
+        React.createElement(ui.BigOptions, 
+          hint: "Select source to get data from"
+          items: _.map(@getTables(), (table) => { 
+            name: table.name
+            desc: table.desc
+            onClick: () =>
+              onClose() # Close popover first
+              onChange(table.id)
+          }))
 
   # Call to override create table selection element function
   setCreateTableSelectElement: (factory) ->

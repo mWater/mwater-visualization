@@ -30,8 +30,8 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
   handleTypeChange: (type) =>
     @updateDesign(type: type)
 
-  handleTransposeChange: (val) =>
-    @updateDesign(transpose: val)
+  handleTransposeChange: (ev) =>
+    @updateDesign(transpose: ev.target.checked)
 
   handleStackedChange: (ev) => @updateDesign(stacked: ev.target.checked)
   handleProportionalChange: (ev) => @updateDesign(proportional: ev.target.checked)
@@ -101,28 +101,6 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
                 @handleTypeChange(ct.id)
             })
 
-  renderTranspose: ->
-    if not @props.design.type
-      return 
-
-    # Don't include if polar
-    if @props.design.type in ['pie', 'donut']
-      return
-
-    # return H.div className: "form-group",
-    #   H.label className: "text-muted", 
-    #     H.span(className: "glyphicon glyphicon-retweet")
-    #     " "
-    #     "Orientation"
-    #   ": "
-    H.div className: "text-muted",
-      H.label className: "radio-inline",
-        H.input type: "radio", checked: !@props.design.transpose, onChange: @handleTransposeChange.bind(null, false),
-          "Vertical"
-      H.label className: "radio-inline",
-        H.input type: "radio", checked: @props.design.transpose, onChange: @handleTransposeChange.bind(null, true),
-          "Horizontal"
-
   renderLayer: (index) =>
     style = {
       paddingTop: 10
@@ -148,23 +126,29 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
         H.span className: "glyphicon glyphicon-plus"
         " Add Another Series"
 
-  renderStackedProportional: ->
+  renderOptions: ->
     design = @props.design
+    if not design.type
+      return 
 
     # Can only stack if multiple series or one with color and not polar
-    if design.type in ['pie', 'donut'] or design.layers.length == 0
-      return
-
+    canStack = design.type not in ['pie', 'donut'] and design.layers.length > 0
     if design.layers.length == 1 and not design.layers[0].axes.color
-      return
+      canStack = false
 
-    H.div null,
-      H.div className: "checkbox-inline", key: "stacked",
-        H.label null,
+    # Don't include if transpose
+    canTranspose = design.type not in ['pie', 'donut']
+
+    H.div style: { marginLeft: 10 }, className: "text-muted",
+      if canTranspose
+        H.label className: "checkbox-inline", 
+          H.input type:"checkbox", checked: design.transpose, onChange: @handleTransposeChange, key: "transpose",
+            "Horizontal"
+      if canStack
+        H.label className: "checkbox-inline", key: "stacked",
           H.input type: "checkbox", checked: design.stacked, onChange: @handleStackedChange
           "Stacked"
-      H.div className: "checkbox-inline", key: "proportional",
-        H.label null,
+        H.label className: "checkbox-inline", key: "proportional",
           H.input type: "checkbox", checked: design.proportional, onChange: @handleProportionalChange,
           "Proportional"
 
@@ -177,6 +161,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
       elem: H.div null, 
         H.br()
         @renderType()
+        @renderOptions()
         @renderLayers()
     }
 
@@ -186,8 +171,6 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
         label: "Appearance"
         elem: H.div null,
           H.br()
-          @renderTranspose()
-          @renderStackedProportional()
           @renderLabels()
       }
 
@@ -285,30 +268,8 @@ class LayerDesignerComponent extends React.Component
   renderTable: ->
     layer = @props.design.layers[@props.index]
 
-    # return H.div className: "form-group",
-    #   H.label className: "text-muted", 
-    #     H.span(className: "glyphicon glyphicon-file")
-    #     " "
-    #     "Data Source"
-    #   ": "
-
     R ui.SectionComponent, icon: "file", label: "Data Source",
-      R ui.ToggleEditComponent,
-        forceOpen: not layer.table
-        label: if layer.table then @props.schema.getTable(layer.table).name else H.i(null, "Select...")
-        editor: (onClose) =>
-          R(ui.BigOptions, 
-            hint: "Select source to get data from"
-            items: _.map(@props.schema.getTables(), (table) => { 
-              name: table.name
-              desc: table.desc
-              onClick: () =>
-                onClose() # Close popover first
-                @handleTableChange(table.id)
-            }))
-
-    # TODO PUT BACK
-      # @props.schema.createTableSelectElement(layer.table, @handleTableChange)
+      @props.schema.createTableSelectElement(layer.table, @handleTableChange)
 
   renderXAxis: ->
     layer = @props.design.layers[@props.index]
@@ -349,6 +310,7 @@ class LayerDesignerComponent extends React.Component
           table: layer.table
           types: @getAxisTypes(layer, "color")
           aggrNeed: "none"
+          required: @isLayerPolar(layer)
           value: layer.axes.color, 
           onChange: @handleColorAxisChange)
 
@@ -422,6 +384,8 @@ class LayerDesignerComponent extends React.Component
   render: ->
     layer = @props.design.layers[@props.index]
     H.div null, 
+      if @props.index > 0
+        H.hr()
       @renderRemove()
       @renderTable()
       # Color axis first for pie
