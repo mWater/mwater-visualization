@@ -33,7 +33,7 @@ module.exports = class EditableLinkComponent extends React.Component
 
   render: ->
     elem = H.div className: "editable-link", "data-toggle": "dropdown", 
-      H.div style: { display: "inline-block" }, onClick: @props.onClick,
+      H.div style: { display: "inline-block" }, onClick: @props.onClick, 
         @props.children
       @renderRemove()
 

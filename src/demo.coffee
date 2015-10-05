@@ -91,8 +91,8 @@ $ ->
 
   sample = H.div className: "container-fluid", style: { height: "100%" },
     H.style null, '''html, body { height: 100% }'''
-    React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
-    # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
+    # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
+    React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
   React.render(sample, document.body)

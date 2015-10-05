@@ -89,7 +89,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     R ui.SectionComponent, icon: "th", label: "Chart Type",
       R ui.ToggleEditComponent,
         forceOpen: not @props.design.type
-        label: if current then current.name
+        label: if current then current.name else ""
         editor: (onClose) =>
           R ui.BigOptions, 
             hint: "Select a Chart Type"
