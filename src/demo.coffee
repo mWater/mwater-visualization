@@ -87,8 +87,6 @@ class DashboardPane extends React.Component
         })
 
 $ ->
-  FloatingWindowComponent = require './FloatingWindowComponent'
-
   sample = H.div className: "container-fluid", style: { height: "100%" },
     H.style null, '''html, body { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")

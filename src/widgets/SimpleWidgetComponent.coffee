@@ -1,6 +1,5 @@
 React = require 'react'
 H = React.DOM
-FloatingWindowComponent = require '../FloatingWindowComponent'
 
 # Simple widget that can be dragged and resized
 # Injects inner width and height to child element
