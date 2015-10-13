@@ -235,35 +235,34 @@ module.exports = class SchemaBuilder
       }
     })
 
-    # # Add source notes
-    # @schema.addTable({ 
-    #   id: "ecoli_statuses"
-    #   name: "E.Coli Tests"
-    #   ordering: "date"
-    # })
+    # Add ecoli statuses pseudo-table
+    @schema.addTable({ 
+      id: "ecoli_statuses"
+      name: "E.Coli Tests"
+      ordering: "date"
+    })
 
-    # @schema.addColumn("ecoli_statuses", { id: "_id", name: "Number of Reports", type: "id" })
-    # @schema.addColumn("ecoli_statuses", { id: "source", name: "Water Point Code", type: "text" })
-    # @schema.addColumn("ecoli_statuses", { id: "date", name: "Test Date", type: "date" })
-    # @schema.addColumn("ecoli_statuses", { id: "status", name: "E.Coli Risk Level", type: "enum", values: [
-    #   { id: 'red', name: 'High (>=100 CFU/100mL)' }
-    #   { id: 'yellow', name: 'Medium (>=1 CFU/100mL)' }
-    #   { id: 'green', name: 'Low (<1 CFU/100mL)' }
-    #   ] })
+    @schema.addColumn("ecoli_statuses", { id: "source", name: "Water Point Code", type: "text" })
+    @schema.addColumn("ecoli_statuses", { id: "date", name: "Test Date", type: "date" })
+    @schema.addColumn("ecoli_statuses", { id: "status", name: "E.Coli Risk Level", type: "enum", values: [
+      { id: 'red', name: 'High (>=100 CFU/100mL)' }
+      { id: 'yellow', name: 'Medium (>=1 CFU/100mL)' }
+      { id: 'green', name: 'Low (<1 CFU/100mL)' }
+      ] })
 
-    # @schema.addColumn("entities.water_point", {
-    #   id: "entities.water_point.ecoli_statuses"
-    #   name: "E.Coli Tests"
-    #   type: "join"
-    #   join: {
-    #     fromTable: "entities.water_point"
-    #     fromColumn: "code"
-    #     toTable: "ecoli_statuses"
-    #     toColumn: "source"
-    #     op: "="
-    #     multiple: true
-    #   }
-    # })
+    @schema.addColumn("entities.water_point", {
+      id: "entities.water_point.ecoli_statuses"
+      name: "E.Coli Tests"
+      type: "join"
+      join: {
+        fromTable: "entities.water_point"
+        fromColumn: "code"
+        toTable: "ecoli_statuses"
+        toColumn: "source"
+        op: "="
+        multiple: true
+      }
+    })
 
   addForm: (form) ->
     # Create table
