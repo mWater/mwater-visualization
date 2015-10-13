@@ -9,6 +9,9 @@ colorHacks = {
   "ok": "#00AA00"
   "maint": "#AAAA00"
   "broken": "#AA0000"
+  "green": "#00AA00"
+  "yellow": "#AAAA00"
+  "red": "#AA0000"
   null: "#888888"
 }
 
@@ -338,6 +341,10 @@ module.exports = class LayeredChartCompiler
         _.each colorValues, (colorValue) =>
           # One series for y values
           series = "#{layerIndex}:#{colorValue}"
+
+          # TODO REMOVE
+          if colorHacks[colorValue]
+            colors[series] = colorHacks[colorValue]
 
           # Get rows for this series
           rows = _.where(layerData, color: colorValue)
