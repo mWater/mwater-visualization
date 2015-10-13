@@ -65,6 +65,7 @@ mwa_scheme_type MWA scheme type
   wpdx_water_source WPDX Water Source
 
 source_notes
+ecoli_statuses
 _created_by
 _created_for
 _created_on

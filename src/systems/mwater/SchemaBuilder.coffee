@@ -242,7 +242,6 @@ module.exports = class SchemaBuilder
       ordering: "date"
     })
 
-    @schema.addColumn("ecoli_statuses", { id: "source", name: "Water Point Code", type: "text" })
     @schema.addColumn("ecoli_statuses", { id: "date", name: "Test Date", type: "date" })
     @schema.addColumn("ecoli_statuses", { id: "status", name: "E.Coli Risk Level", type: "enum", values: [
       { id: 'red', name: 'High (>=100 CFU/100mL)' }
@@ -250,15 +249,29 @@ module.exports = class SchemaBuilder
       { id: 'green', name: 'Low (<1 CFU/100mL)' }
       ] })
 
+    @schema.addColumn("ecoli_statuses", {
+      id: "water_point"
+      name: "Water Point"
+      type: "join"
+      join: {
+        fromTable: "ecoli_statuses"
+        fromColumn: "water_point"
+        toTable: "entities.water_point"
+        toColumn: "_id"
+        op: "="
+        multiple: false
+      }
+    })
+
     @schema.addColumn("entities.water_point", {
-      id: "entities.water_point.ecoli_statuses"
+      id: "ecoli_statuses"
       name: "E.Coli Tests"
       type: "join"
       join: {
         fromTable: "entities.water_point"
-        fromColumn: "code"
+        fromColumn: "_id"
         toTable: "ecoli_statuses"
-        toColumn: "source"
+        toColumn: "water_point"
         op: "="
         multiple: true
       }
