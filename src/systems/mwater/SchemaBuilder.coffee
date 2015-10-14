@@ -78,7 +78,7 @@ module.exports = class SchemaBuilder
           # Add two joins (to and from)
           @schema.addColumn(tableId, { 
             id: "#{tableId}.#{prop.code}"
-            name: pluralize(prop.name.en)
+            name: prop.name.en
             type: "join"
             join: {
               fromTable: tableId
