@@ -1,4 +1,4 @@
-@import "react-select/dist/default.css";
+@import "react-select";
 @import "leaflet/dist/leaflet.css";
 @import "react-bootstrap-daterangepicker/css/daterangepicker.css";
 
