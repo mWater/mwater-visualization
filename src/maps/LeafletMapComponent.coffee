@@ -54,7 +54,17 @@ module.exports = class LeafletMapComponent extends React.Component
         })
 
     if @props.initialBounds
-      @map.fitBounds(new L.LatLngBounds([[@props.initialBounds.n, @props.initialBounds.w], [@props.initialBounds.s, @props.initialBounds.e]]))
+      # Check that bounds contain some actual area (hangs leaflet if not https://github.com/mWater/mwater-visualization/issues/127)
+      n = @props.initialBounds.n 
+      w = @props.initialBounds.w
+      s = @props.initialBounds.s
+      e = @props.initialBounds.e
+      if n == s
+        n += 0.001
+      if e == w
+        e += 0.001
+
+      @map.fitBounds(new L.LatLngBounds([[n, w], [s, e]]))
     else
       # Fit world doesn't work sometimes. Make sure that entire left-right is included
       @map.fitBounds([[-1, -180], [1, 180]])
