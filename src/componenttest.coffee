@@ -1,4 +1,5 @@
 React = require 'react'
+ReactDOM = require 'react-dom'
 H = React.DOM
 
 # LargeListComponent = require './LargeListComponent'
@@ -47,5 +48,5 @@ $ ->
   #   rowCount: 10000
   #   bufferSize: 100
   #   })
-  React.render(sample, document.body)
+  ReactDOM.render(sample, document.body)
 

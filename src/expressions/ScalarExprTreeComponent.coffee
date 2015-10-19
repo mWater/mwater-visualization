@@ -1,5 +1,6 @@
 HoverComponent = require './../HoverComponent'
 React = require 'react'
+ReactDOM = require 'react-dom'
 H = React.DOM
 
 # Shows a tree that selects table + joins + expr of a scalar expression
@@ -50,8 +51,8 @@ class ScalarExprTreeLeafComponent extends React.Component
 
   componentDidMount: ->
     if @props.frame and @isSelected()
-      leaf = React.findDOMNode(this)
-      frame = React.findDOMNode(@props.frame)
+      leaf = ReactDOM.findDOMNode(this)
+      frame = ReactDOM.findDOMNode(@props.frame)
       window.requestAnimationFrame(->
         frame.scrollTop = leaf.offsetTop - 60)
 

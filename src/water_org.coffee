@@ -2,6 +2,7 @@ _ = require 'lodash'
 visualization = require './index'
 jsyaml = require 'js-yaml'
 TabbedComponent = require './TabbedComponent'
+React = require 'react'
 H = React.DOM
 R = React.createElement
 
@@ -68,7 +69,7 @@ exports.loadDashboard = (options) ->
           onDesignChange: updateDesign
         )
 
-        React.render(elem, document.getElementById(options.elemId))
+        ReactDOM.render(elem, document.getElementById(options.elemId))
 
       # Initial render
       render()

@@ -1,4 +1,5 @@
 React = require 'react'
+ReactDOM = require 'react-dom'
 H = React.DOM
 
 # Simple widget that can be dragged and resized
@@ -63,7 +64,7 @@ module.exports = class SimpleWidgetComponent extends React.Component
         _.map(@props.dropdownItems, @renderDropdownItem)        
 
   closeMenu: =>
-    $(React.findDOMNode(this)).find('[data-toggle="dropdown"]').parent().removeClass('open')
+    $(ReactDOM.findDOMNode(this)).find('[data-toggle="dropdown"]').parent().removeClass('open')
 
   render: ->
     style = { 

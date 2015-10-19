@@ -1,3 +1,5 @@
+React = require 'react'
+ReactDOM = require 'react-dom'
 H = React.DOM
 visualization_mwater = require './systems/mwater'
 visualization = require './index'
@@ -121,4 +123,4 @@ design = {
 $ ->
   # sample = React.createElement(MapDemoComponent, initialDesign: design, apiUrl: "http://localhost:1234/v3/")
   sample = React.createElement(MapDemoComponent, initialDesign: design, apiUrl: "https://api.mwater.co/v3/")
-  React.render(sample, document.body)
+  ReactDOM.render(sample, document.body)

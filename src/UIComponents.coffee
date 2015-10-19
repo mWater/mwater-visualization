@@ -1,4 +1,5 @@
 React = require 'react'
+ReactDOM = require 'react-dom'
 H = React.DOM
 R = React.createElement
 motion = require 'react-motion'
@@ -75,7 +76,7 @@ exports.SwitchViewComponent = class SwitchViewComponent extends React.Component
 
       # Get heights
       for id in _.keys(@props.views)
-        @heights[id] = React.findDOMNode(@comps[id]).clientHeight
+        @heights[id] = ReactDOM.findDOMNode(@comps[id]).clientHeight
 
       @setState(measuring: false)
 
@@ -128,7 +129,7 @@ exports.ToggleEditComponent = class ToggleEditComponent extends React.Component
   close: =>
     # Save height of editor
     if @editorComp
-      @editorHeight = React.findDOMNode(@editorComp).clientHeight
+      @editorHeight = ReactDOM.findDOMNode(@editorComp).clientHeight
 
     @setState(open: false)
 

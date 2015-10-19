@@ -1,4 +1,5 @@
 React = require 'react'
+ReactDOM = require 'react-dom'
 H = React.DOM
 _ = require 'lodash'
 
@@ -15,7 +16,7 @@ module.exports = class ModalPopupComponent extends React.Component
     $("body").append(@modalNode)
 
     elem = React.createElement(ModalComponentContent, @props)
-    React.render(elem, @modalNode)
+    ReactDOM.render(elem, @modalNode)
 
     _.defer () =>
       $(@modalNode).children().modal({ 
@@ -26,11 +27,11 @@ module.exports = class ModalPopupComponent extends React.Component
 
   componentDidUpdate: (prevProps) ->
     elem = React.createElement(ModalComponentContent, @props)
-    React.render(elem, @modalNode)
+    ReactDOM.render(elem, @modalNode)
 
   componentWillUnmount: ->
     $(@modalNode).children().modal("hide")
-    React.unmountComponentAtNode(@modalNode)
+    ReactDOM.unmountComponentAtNode(@modalNode)
     $(@modalNode).remove()
 
   render: -> null

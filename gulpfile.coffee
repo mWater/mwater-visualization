@@ -51,7 +51,6 @@ gulp.task "water_org_libs_js", ->
   return gulp.src([
     "./bower_components/bootstrap/dist/js/bootstrap.js"
     "./bower_components/lodash/dist/lodash.min.js"
-    "./bower_components/react/react.min.js"
     "./bower_components/c3/c3.min.js"
   ]).pipe(concat("libs.js"))
     .pipe(gulp.dest("./dist/water_org/"))
@@ -83,7 +82,6 @@ gulp.task "libs_js", ->
     "./bower_components/bootstrap/dist/js/bootstrap.js"
     "./bower_components/lodash/dist/lodash.js"
     "./bower_components/backbone/backbone.js"
-    "./bower_components/react/react-with-addons.js"
     "./bower_components/d3/d3.js"
     "./bower_components/c3/c3.js"
   ]).pipe(concat("libs.js"))
@@ -156,7 +154,6 @@ shim = (instance) ->
     lodash: './lodash-shim'
     underscore: './lodash-shim'
     backbone: './backbone-shim' 
-    react: './react-shim'
   }
 
   # Add shims
