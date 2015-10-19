@@ -141,9 +141,9 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
 
     H.div className: "text-muted",
       if canTranspose
-        H.label className: "checkbox-inline", 
-          H.input type:"checkbox", checked: design.transpose, onChange: @handleTransposeChange, key: "transpose",
-            "Horizontal"
+        H.label className: "checkbox-inline", key: "transpose",
+          H.input type: "checkbox", checked: design.transpose, onChange: @handleTransposeChange
+          "Horizontal"
       if canStack
         H.label className: "checkbox-inline", key: "stacked",
           H.input type: "checkbox", checked: design.stacked, onChange: @handleStackedChange
