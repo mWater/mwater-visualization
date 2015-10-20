@@ -1,4 +1,5 @@
 React = require 'react'
+ReactDOM = require 'react-dom'
 
 # Wraps a child with an optional popover
 module.exports = class PopoverComponent extends React.Component
@@ -20,18 +21,18 @@ module.exports = class PopoverComponent extends React.Component
   updatePopover: (props, oldProps) ->
     # Destroy old popover
     if oldProps and oldProps.visible
-      $(React.findDOMNode(this)).popover("destroy")      
+      $(ReactDOM.findDOMNode(this)).popover("destroy")      
       
     if props and props.visible
       div = document.createElement("div")
-      React.render(@props.content, div, =>
-        $(React.findDOMNode(this)).popover({
+      ReactDOM.render(@props.content, div, =>
+        $(ReactDOM.findDOMNode(this)).popover({
           content: -> $(div)
           html: true
           trigger: "manual"
           placement: @props.placement
         })
-        $(React.findDOMNode(this)).popover("show")
+        $(ReactDOM.findDOMNode(this)).popover("show")
       )
       
   render: ->

@@ -1,5 +1,6 @@
 _ = require 'lodash'
 React = require 'react'
+ReactDOM = require 'react-dom'
 H = React.DOM
 
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
@@ -33,7 +34,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
       @chart.destroy()
 
     compiler = new LayeredChartCompiler(schema: props.schema)
-    el = React.findDOMNode(@refs.chart)
+    el = ReactDOM.findDOMNode(@refs.chart)
     chartOptions = compiler.createChartOptions(@props)
     
     chartOptions.bindto = el
@@ -85,7 +86,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
   updateScope: =>
     dataMap = @getDataMap()
     compiler = new LayeredChartCompiler(schema: @props.schema)
-    el = React.findDOMNode(@refs.chart)
+    el = ReactDOM.findDOMNode(@refs.chart)
 
     # Handle line and bar charts
     d3.select(el)

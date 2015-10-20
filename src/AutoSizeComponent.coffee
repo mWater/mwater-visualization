@@ -1,4 +1,5 @@
 React = require 'react'
+ReactDOM = require 'react-dom'
 H = React.DOM
 
 # Automatically injects the width of the DOM element into the
@@ -22,7 +23,7 @@ module.exports = class AutoSizeComponent extends React.Component
 
   updateSize: =>
     # Get width of self
-    node = React.findDOMNode(this)
+    node = ReactDOM.findDOMNode(this)
     @setState(width: node.clientWidth, height: node.clientHeight)
 
   render: ->

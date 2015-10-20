@@ -1,3 +1,5 @@
+React = require 'react'
+ReactDOM = require 'react-dom'
 H = React.DOM
 _ = require 'lodash'
 
@@ -28,7 +30,7 @@ module.exports = class VerticalLayoutComponent extends React.Component
       if not child then continue
       if props.relativeHeights[child.key] then continue
 
-      node = React.findDOMNode(@refs[child.key])
+      node = ReactDOM.findDOMNode(@refs[child.key])
       availableHeight -= $(node).outerHeight()
 
     @setState(availableHeight: availableHeight)

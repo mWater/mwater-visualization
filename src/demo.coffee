@@ -1,3 +1,5 @@
+React = require 'react'
+ReactDOM = require 'react-dom'
 H = React.DOM
 visualization_mwater = require './systems/mwater'
 visualization = require './index'
@@ -88,12 +90,12 @@ class DashboardPane extends React.Component
 
 $ ->
   sample = H.div className: "container-fluid", style: { height: "100%" },
-    H.style null, '''html, body { height: 100% }'''
+    H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
-  React.render(sample, document.body)
+  ReactDOM.render(sample, document.getElementById("main"))
 
 dashboardDesign = {
   "items": {

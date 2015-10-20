@@ -1,4 +1,5 @@
 React = require 'react'
+ReactDOM = require 'react-dom'
 
 module.exports = class HoverComponent extends React.Component
   constructor: ->
@@ -6,12 +7,12 @@ module.exports = class HoverComponent extends React.Component
     @state = { hovered: false }
 
   componentDidMount: ->
-    React.findDOMNode(@refs.main).addEventListener("mouseover", @onOver)
-    React.findDOMNode(@refs.main).addEventListener("mouseout", @onOut)
+    ReactDOM.findDOMNode(@refs.main).addEventListener("mouseover", @onOver)
+    ReactDOM.findDOMNode(@refs.main).addEventListener("mouseout", @onOut)
 
   componentWillUnmount: ->
-      React.findDOMNode(@refs.main).removeEventListener("mouseover", @onOver)
-      React.findDOMNode(@refs.main).removeEventListener("mouseout", @onOut)
+      ReactDOM.findDOMNode(@refs.main).removeEventListener("mouseover", @onOver)
+      ReactDOM.findDOMNode(@refs.main).removeEventListener("mouseout", @onOut)
 
   onOver: =>
     @setState(hovered: true)

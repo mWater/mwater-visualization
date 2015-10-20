@@ -1,4 +1,5 @@
 React = require 'react'
+ReactDOM = require 'react-dom'
 H = React.DOM
 _ = require 'lodash'
 
@@ -20,10 +21,10 @@ module.exports = class ModalWindowComponent extends React.Component
 
   update: (props) ->
     elem = React.createElement(InnerModalComponent, props)
-    React.render(elem, @modalNode)
+    ReactDOM.render(elem, @modalNode)
 
   componentWillUnmount: ->
-    React.unmountComponentAtNode(@modalNode)
+    ReactDOM.unmountComponentAtNode(@modalNode)
     $(@modalNode).remove()
 
   render: -> null

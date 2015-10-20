@@ -1,3 +1,5 @@
+React = require 'react'
+ReactDOM = require 'react-dom'
 H = React.DOM
 L = require 'leaflet'
 BingLayer = require './BingLayer'
@@ -39,7 +41,7 @@ module.exports = class LeafletMapComponent extends React.Component
 
   componentDidMount: ->
     # Create map
-    mapElem = React.findDOMNode(@refs.map)
+    mapElem = ReactDOM.findDOMNode(@refs.map)
     @map = L.map(mapElem, { fadeAnimation: false })
 
     # Fire onBoundsChange
@@ -84,7 +86,7 @@ module.exports = class LeafletMapComponent extends React.Component
 
   componentWillUnmount: ->
     if @legendDiv
-      React.unmountComponentAtNode(@legendDiv)
+      ReactDOM.unmountComponentAtNode(@legendDiv)
       
     @map.remove()
 
@@ -95,7 +97,7 @@ module.exports = class LeafletMapComponent extends React.Component
   #   offset: x and y of offset
   openPopup: (options) ->
     popupDiv = L.DomUtil.create('div', '')
-    React.render(options.contents, popupDiv, =>
+    ReactDOM.render(options.contents, popupDiv, =>
       popup = L.popup({ minWidth: 100, offset: options.offset, autoPan: true })
         .setLatLng(options.location)
         .setContent(popupDiv)
@@ -176,9 +178,9 @@ module.exports = class LeafletMapComponent extends React.Component
 
     # Render legend
     if @props.legend
-      React.render(@props.legend, @legendDiv)
+      ReactDOM.render(@props.legend, @legendDiv)
     else if @legendDiv
-      React.unmountComponentAtNode(@legendDiv)
+      ReactDOM.unmountComponentAtNode(@legendDiv)
     
   render: -> 
     H.div(ref: "map", style: { width: @props.width, height: @props.height })

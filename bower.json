@@ -1,11 +1,11 @@
 {
-  "name": "playground",
+  "name": "mwater-visualization",
   "version": "0.0.0",
   "authors": [
     "Clayton Grassick <clayton@claytronics.org>"
   ],
-  "description": "mWater playground",
-  "license": "GPLv3",
+  "description": "mWater Visualization",
+  "license": "",
   "private": true,
   "ignore": [
     "**/.*",
@@ -18,8 +18,7 @@
     "bootstrap": "^3.3.4",
     "backbone": "^1.1.1",
     "lodash": "^2.4.1",
-    "react": "~0.13.1",
-    "c3": "~0.4.11-rc.2",
+    "c3": "https://github.com/mWater/c3.git#master",
     "d3": "v3.5.0"
   }
 }

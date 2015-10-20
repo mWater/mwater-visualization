@@ -1,10 +1,11 @@
 React = require 'react'
+ReactDOM = require 'react-dom'
 _ = require 'lodash'
 H = React.DOM
 DragSource = require('react-dnd').DragSource
 DropTarget = require('react-dnd').DropTarget
 DragDropContext = require('react-dnd').DragDropContext
-HTML5Backend = require('react-dnd/modules/backends/HTML5')
+HTML5Backend = require('react-dnd-html5-backend')
 
 # Render a child element as draggable, resizable block, injecting handle connectors
 # to child element
@@ -236,7 +237,7 @@ class Container extends React.Component
 targetSpec = {
   drop: (props, monitor, component) ->
     if monitor.getItemType() == "block-move"
-      rect = React.findDOMNode(component).getBoundingClientRect()
+      rect = ReactDOM.findDOMNode(component).getBoundingClientRect()
       component.dropMoveLayout(
         dragInfo: monitor.getItem()
         x: monitor.getClientOffset().x - (monitor.getInitialClientOffset().x - monitor.getInitialSourceClientOffset().x) - rect.left
@@ -251,7 +252,7 @@ targetSpec = {
     return
   hover: (props, monitor, component) ->
     if monitor.getItemType() == "block-move"
-      rect = React.findDOMNode(component).getBoundingClientRect()
+      rect = ReactDOM.findDOMNode(component).getBoundingClientRect()
       component.setMoveHover(
         dragInfo: monitor.getItem()
         x: monitor.getClientOffset().x - (monitor.getInitialClientOffset().x - monitor.getInitialSourceClientOffset().x) - rect.left

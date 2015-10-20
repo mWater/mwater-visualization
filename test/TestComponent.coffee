@@ -1,9 +1,11 @@
-React = require('react/addons')
+React = require('react')
+ReactDOM = require('react-dom')
+TestUtils = require('react-addons-test-utils')
 H = React.DOM
 
 module.exports = class TestComponent
   constructor: (elem) ->
-    @comp = React.addons.TestUtils.renderIntoDocument(
+    @comp = TestUtils.renderIntoDocument(
       React.createElement(ComponentWrapper, elem: elem))
 
   setElement: (elem) ->
@@ -28,7 +30,7 @@ class ComponentWrapper extends React.Component
     return @refs.comp
 
   getComponentNode: ->
-    return React.findDOMNode(@refs.comp)
+    return ReactDOM.findDOMNode(@refs.comp)
 
   render: ->
     H.div null,
