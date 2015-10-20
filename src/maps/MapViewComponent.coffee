@@ -21,6 +21,10 @@ module.exports = class MapViewComponent extends React.Component
       jsonql: React.PropTypes.object.isRequired
       })) # Extra filters to apply to view
 
+    dragging:  React.PropTypes.bool         # Whether the map be draggable with mouse/touch or not. Default true
+    touchZoom: React.PropTypes.bool         # Whether the map can be zoomed by touch-dragging with two fingers. Default true
+    scrollWheelZoom: React.PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
+
   handleBoundsChange: (bounds) =>
     design = _.extend({}, @props.design, bounds: bounds)
     @props.onDesignChange(design)
@@ -92,4 +96,7 @@ module.exports = class MapViewComponent extends React.Component
       width: @props.width
       height: @props.height
       legend: @renderLegend(layers)
+      dragging: @props.dragging
+      touchZoom: @props.touchZoom
+      scrollWheelZoom: @props.scrollWheelZoom
       onBoundsChange: @handleBoundsChange)

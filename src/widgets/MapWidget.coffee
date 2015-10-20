@@ -141,4 +141,6 @@ class InnerMapWidgetComponent extends React.Component
         extraFilters: @props.filters
         width: @props.width - 20
         height: @props.height - 20
+        touchZoom: false    # Prevent accidental zooming
+        scrollWheelZoom: false # Prevent accidental zooming
       })

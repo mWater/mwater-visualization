@@ -33,6 +33,15 @@ module.exports = class LeafletMapComponent extends React.Component
 
     legend: React.PropTypes.node # Legend element
 
+    dragging:  React.PropTypes.bool         # Whether the map be draggable with mouse/touch or not. Default true
+    touchZoom: React.PropTypes.bool         # Whether the map can be zoomed by touch-dragging with two fingers. Default true
+    scrollWheelZoom: React.PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
+
+  @defaultProps: 
+    dragging: true
+    touchZoom: true
+    scrollWheelZoom: true
+
   # Reload all tiles
   reload: ->
     # TODO reload JSON tiles
@@ -42,7 +51,12 @@ module.exports = class LeafletMapComponent extends React.Component
   componentDidMount: ->
     # Create map
     mapElem = ReactDOM.findDOMNode(@refs.map)
-    @map = L.map(mapElem, { fadeAnimation: false })
+    @map = L.map(mapElem, {
+      fadeAnimation: false
+      dragging: @props.dragging
+      touchZoom: @props.touchZoom
+      scrollWheelZoom: @props.scrollWheelZoom
+    })
 
     # Fire onBoundsChange
     @map.on "moveend", => 
