@@ -80,12 +80,12 @@ module.exports = class SimpleWidgetComponent extends React.Component
       React.cloneElement(React.Children.only(@props.children), 
         width: @props.width - 20, height: @props.height - 20)
 
-    if @props.connectMoveHandle
-      contents = @props.connectMoveHandle(contents)
-
-    elem = H.div className: "mwater-visualization-simple-widget", style: style, onClick: @handleClick, onMouseLeave: @closeMenu,
+    elem = H.div className: "mwater-visualization-simple-widget", style: style, onMouseLeave: @closeMenu,
       contents
       @renderResizeHandle()
       @renderDropdown()
+
+    if @props.connectMoveHandle
+      elem = @props.connectMoveHandle(elem)
 
     return elem
