@@ -39,6 +39,11 @@ module.exports = class MWaterServerLayer extends Layer
   createUrl: (extension, filters) ->
     url = "#{@apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?type=#{@design.type}&radius=1000"
 
+    # Add subdomains: {s} will be substituted with "a", "b" or "c" in leaflet for api.mwater.co only.
+    # Used to speed queries
+    if url.match(/^https:\/\/api\.mwater\.co\//)
+      url = url.replace(/^https:\/\/api\.mwater\.co\//, "https://{s}-api.mwater.co/")
+
     if @client
       url += "&client=#{@client}"
       

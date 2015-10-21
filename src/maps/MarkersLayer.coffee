@@ -82,7 +82,14 @@ module.exports = class MarkersLayer extends Layer
 
     query += "&design=" + encodeURIComponent(JSON.stringify(mapDesign))
 
-    return "#{@apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?" + query
+    url = "#{@apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?" + query
+
+    # Add subdomains: {s} will be substituted with "a", "b" or "c" in leaflet for api.mwater.co only.
+    # Used to speed queries
+    if url.match(/^https:\/\/api\.mwater\.co\//)
+      url = url.replace(/^https:\/\/api\.mwater\.co\//, "https://{s}-api.mwater.co/")
+
+    return url
 
   createJsonQL: (sublayer, filters) ->
     axisBuilder = new AxisBuilder(schema: @schema)
