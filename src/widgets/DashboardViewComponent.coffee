@@ -144,6 +144,8 @@ module.exports = class DashboardViewComponent extends React.Component
       @props.widgetFactory.createWidget(item.widget.type, item.widget.design)
       )
 
+    scale = @props.width / 720
+
     # Create widget elems
     elems = _.mapValues widgets, (widget, id) =>
       widget.createViewElement({
@@ -153,6 +155,7 @@ module.exports = class DashboardViewComponent extends React.Component
         onRemove: @handleRemove.bind(null, id)
         onDuplicate: @handleDuplicate.bind(null, id)
         onDesignChange: @handleDesignChange.bind(null, id)
+        scale: scale
       })  
 
     style = {

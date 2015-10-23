@@ -18,11 +18,13 @@ module.exports = class MarkdownWidget extends Widget
   #  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   #  onScopeChange: called with scope of widget
   #  onDesignChange: called with new design
+  #  scale: called with scale factor of widget
   createViewElement: (options) ->
     return React.createElement(MarkdownWidgetComponent,
       design: @design
       onDesignChange: options.onDesignChange
       onRemove: options.onRemove
+      scale: options.scale
     )
 
 class MarkdownWidgetComponent extends React.Component
@@ -34,6 +36,7 @@ class MarkdownWidgetComponent extends React.Component
 
     width: React.PropTypes.number
     height: React.PropTypes.number
+    scale: React.PropTypes.number
 
   constructor: (props) ->
     super
@@ -70,6 +73,7 @@ class MarkdownWidgetComponent extends React.Component
 
   renderContent: ->
     React.createElement(MarkdownWidgetViewComponent, {
+      scale: @props.scale
       design: @props.design
       onDesignChange: @props.onDesignChange
     })
@@ -98,9 +102,12 @@ class MarkdownWidgetViewComponent extends React.Component
     design: React.PropTypes.object.isRequired # Design of chart
     width: React.PropTypes.number
     height: React.PropTypes.number
+    scale: React.PropTypes.number
 
   render: ->
-    H.div dangerouslySetInnerHTML: { __html: markdown.toHTML(@props.design.markdown or "") }
+    H.div 
+      style: { fontSize: "#{@props.scale*100}%" }
+      dangerouslySetInnerHTML: { __html: markdown.toHTML(@props.design.markdown or "") }
 
 class MarkdownWidgetDesignerComponent extends React.Component 
   @propTypes: 
