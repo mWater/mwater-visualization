@@ -1,6 +1,6 @@
 _ = require 'lodash'
-ExpressionCompiler = require '../ExpressionCompiler'
-ExpressionBuilder = require '../ExpressionBuilder'
+ExpressionCompiler = require '../expressions/ExpressionCompiler'
+ExpressionBuilder = require '../expressions/ExpressionBuilder'
 d3Format = require 'd3-format'
 moment = require 'moment'
 

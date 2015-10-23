@@ -6,7 +6,7 @@ ExpressionCompiler = require '../expressions/ExpressionCompiler'
 injectTableAlias = require '../injectTableAlias'
 MarkersLayerDesignerComponent = require './MarkersLayerDesignerComponent'
 ExpressionBuilder = require '../expressions/ExpressionBuilder'
-AxisBuilder = require '../expressions/axes/AxisBuilder'
+AxisBuilder = require '../axes/AxisBuilder'
 
 ###
 Layer that is composed of markers

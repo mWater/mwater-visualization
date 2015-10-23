@@ -3,7 +3,7 @@ H = React.DOM
 LogicalExprComponent = require '../expressions/LogicalExprComponent'
 ExpressionBuilder = require '../expressions/ExpressionBuilder'
 EditableLinkComponent = require '../EditableLinkComponent'
-AxisComponent = require './../expressions/axes/AxisComponent'
+AxisComponent = require './../axes/AxisComponent'
 ColorComponent = require '../ColorComponent'
 
 # Designer for a markers layer

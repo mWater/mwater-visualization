@@ -3,7 +3,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
-AxisComponent = require '../../expressions/axes/AxisComponent'
+AxisComponent = require '../../axes/AxisComponent'
 
 # Edits the orderings of a chart
 # Orderings are an array of { axis: axis to order by, direction: "asc"/"desc" }

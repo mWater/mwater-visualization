@@ -6,7 +6,7 @@ injectTableAlias = require '../../injectTableAlias'
 Chart = require './Chart'
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 ExpressionCompiler = require './../../expressions/ExpressionCompiler'
-AxisBuilder = require './../../expressions/axes/AxisBuilder'
+AxisBuilder = require './../../axes/AxisBuilder'
 TableChartDesignerComponent = require './TableChartDesignerComponent'
 TableChartViewComponent = require './TableChartViewComponent'
 

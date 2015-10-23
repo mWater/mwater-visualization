@@ -1,8 +1,8 @@
 React = require 'react'
 H = React.DOM
 R = React.createElement
-AxisComponent = require './../../expressions/axes/AxisComponent'
-AxisBuilder = require '../../expressions/axes/AxisBuilder'
+AxisComponent = require './../../axes/AxisComponent'
+AxisBuilder = require '../../axes/AxisBuilder'
 LogicalExprComponent = require './../../expressions/LogicalExprComponent'
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
 EditableLinkComponent = require './../../EditableLinkComponent'

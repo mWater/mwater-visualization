@@ -1,13 +1,13 @@
 React = require 'react'
 H = React.DOM
 R = React.createElement
-ScalarExprComponent = require '../ScalarExprComponent'
-ExpressionBuilder = require '../ExpressionBuilder'
-ExpressionCompiler = require '../ExpressionCompiler'
-EditableLinkComponent = require '../../EditableLinkComponent'
+ScalarExprComponent = require '../expressions/ScalarExprComponent'
+ExpressionBuilder = require '../expressions/ExpressionBuilder'
+ExpressionCompiler = require '../expressions/ExpressionCompiler'
+EditableLinkComponent = require '../EditableLinkComponent'
 AxisBuilder = require './AxisBuilder'
 update = require 'update-object'
-ui = require '../../UIComponents'
+ui = require '../UIComponents'
 
 # Axis component that allows designing of an axis
 module.exports = class AxisComponent extends React.Component
