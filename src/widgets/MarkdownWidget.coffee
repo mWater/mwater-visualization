@@ -112,6 +112,7 @@ class MarkdownWidgetViewComponent extends React.Component
         transform: "scale(#{@props.width/@props.standardWidth}, #{@props.width/@props.standardWidth})"
         transformOrigin: "0 0"
       }
+      className: "mwater-visualization-markdown"
       dangerouslySetInnerHTML: { __html: markdown.toHTML(@props.design.markdown or "") }
 
 class MarkdownWidgetDesignerComponent extends React.Component 

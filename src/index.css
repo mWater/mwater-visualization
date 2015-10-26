@@ -169,3 +169,7 @@
   border: solid 1px #888;
   background-color: #F0F0F0;
 }
+
+.mwater-visualization-markdown p {
+  font-size: 12pt;
+}
