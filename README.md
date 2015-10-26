@@ -16,6 +16,9 @@
 
 It creates a view `DashboardViewComponent` and sometimes a designer `DashboardViewDesigner`.
 
+## Standard widths
+
+The entire dashboard has a standard width of 1440px. All widgets receive both a width and a standardWidth so they can scale themselves to be size-invariant. Widgets should always look the same at any resolution. This is especially important for text widgets.
 
 ### Dashboard design
 

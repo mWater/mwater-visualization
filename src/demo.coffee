@@ -35,7 +35,7 @@ class TestPane extends React.Component
   handleDesignChange: (design) =>
     chart = new LayeredChart(schema: @state.schema, dataSource: @state.dataSource)
     @setState(design: chart.cleanDesign(design))
-    # console.log JSON.stringify(design, null, 2)
+    console.log JSON.stringify(design, null, 2)
     
   render: ->
     if not @state.widgetFactory
@@ -74,7 +74,7 @@ class DashboardPane extends React.Component
 
   handleDesignChange: (design) =>
     @setState(design: design)
-    # console.log JSON.stringify(design, null, 2)
+    console.log JSON.stringify(design, null, 2)
     
   render: ->
     if not @state.widgetFactory
@@ -99,7 +99,7 @@ $ ->
 
 dashboardDesign = {
   "items": {
-    "b854aa65-7644-4b67-b0a4-d2344e7eb43a": {
+    "e08ef8a3-34db-467d-ac78-f0f273d49f25": {
       "layout": {
         "x": 0,
         "y": 0,
@@ -107,12 +107,29 @@ dashboardDesign = {
         "h": 8
       },
       "widget": {
-        "type": "LayeredChart",
-        design: {"version":1,"type":"line","layers":[{"axes":{"x":{"expr":{"type":"scalar","table":"entities.water_point","joins":[],"expr":{"type":"field","table":"entities.water_point","column":"_created_on"}},"xform":{"type":"date"}},"y":{"expr":{"type":"scalar","table":"entities.water_point","joins":[],"expr":{"type":"count","table":"entities.water_point"}},"xform":null,"aggr":"count"}},"filter":null,"table":"entities.water_point","cumulative":true}]}
+        "type": "Markdown",
+        "design": {
+          "markdown": "# Header 1\n## Header 2\n### Header 3\nText Text Text More Text\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+        }
       }
     }
   }
-}
+}  
+#   "items": {
+#     "b854aa65-7644-4b67-b0a4-d2344e7eb43a": {
+#       "layout": {
+#         "x": 0,
+#         "y": 0,
+#         "w": 8,
+#         "h": 8
+#       },
+#       "widget": {
+#         "type": "LayeredChart",
+#         design: {"version":1,"type":"line","layers":[{"axes":{"x":{"expr":{"type":"scalar","table":"entities.water_point","joins":[],"expr":{"type":"field","table":"entities.water_point","column":"_created_on"}},"xform":{"type":"date"}},"y":{"expr":{"type":"scalar","table":"entities.water_point","joins":[],"expr":{"type":"count","table":"entities.water_point"}},"xform":null,"aggr":"count"}},"filter":null,"table":"entities.water_point","cumulative":true}]}
+#       }
+#     }
+#   }
+# }
 
 
 #   "items": {
