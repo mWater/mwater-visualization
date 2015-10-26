@@ -5,6 +5,18 @@ H = React.DOM
 AxisBuilder = require './../../axes/AxisBuilder'
 
 module.exports = class TableChartViewComponent extends React.Component
+  @propTypes:
+    chart: React.PropTypes.object.isRequired # Chart object to use
+    design: React.PropTypes.object.isRequired # Design of chart
+    data: React.PropTypes.object.isRequired # Data that the table has requested
+
+    width: React.PropTypes.number
+    height: React.PropTypes.number
+    standardWidth: React.PropTypes.number
+
+    scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
+    onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+
   renderHeaderCell: (index) ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
     column = @props.design.columns[index]
@@ -42,10 +54,14 @@ module.exports = class TableChartViewComponent extends React.Component
     not _.isEqual(prevProps, @props)
 
   render: ->
+    # Render in a standard width container and then scale up to ensure that widget always looks consistent
     style = {
-      height: @props.height
-      width: @props.width
+      width: @props.standardWidth
+      height: @props.height * (@props.standardWidth / @props.width)
+      transform: "scale(#{@props.width/@props.standardWidth}, #{@props.width/@props.standardWidth})"
+      transformOrigin: "0 0"
     }
+
     return H.div style: style, className: "overflow-auto-except-print",
       H.div style: { fontWeight: "bold", textAlign: "center" }, @props.design.titleText
       H.table className: "table table-condensed table-hover", style: { fontSize: "10pt" }, 

@@ -211,6 +211,53 @@ dashboardDesign = {
           "titleText": "Some Title"
         }
       }
+    },
+    "d41a2dd2-85bd-46d8-af9a-a650af4c0047": {
+      "layout": {
+        "x": 0,
+        "y": 16,
+        "w": 8,
+        "h": 8
+      },
+      "widget": {
+        "type": "TableChart",
+        "design": {
+          "version": 1,
+          "columns": [
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "scalar",
+                  "table": "entities.water_point",
+                  "joins": [],
+                  "expr": {
+                    "type": "field",
+                    "table": "entities.water_point",
+                    "column": "type"
+                  }
+                }
+              }
+            },
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "scalar",
+                  "table": "entities.water_point",
+                  "joins": [],
+                  "expr": {
+                    "type": "count",
+                    "table": "entities.water_point"
+                  }
+                },
+                "aggr": "count"
+              }
+            }
+          ],
+          "orderings": [],
+          "table": "entities.water_point",
+          "titleText": "TEST"
+        }
+      }
     }
   }
 }  
