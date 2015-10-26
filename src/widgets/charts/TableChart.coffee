@@ -164,7 +164,7 @@ module.exports = class TableChart extends Chart
   # Options include 
   # design: design of the chart
   # data: results from queries
-  # width, height: size of the chart view
+  # width, height, standardWidth: size of the chart view
   # scope: current scope of the view element
   # onScopeChange: called when scope changes with new scope
   createViewElement: (options) ->
@@ -176,6 +176,7 @@ module.exports = class TableChart extends Chart
 
       width: options.width
       height: options.height
+      standardWidth: options.standardWidth
 
       scope: options.scope
       onScopeChange: options.onScopeChange

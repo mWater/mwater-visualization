@@ -34,11 +34,12 @@ class MarkdownWidgetComponent extends React.Component
 
     width: React.PropTypes.number
     height: React.PropTypes.number
+    standardWidth: React.PropTypes.number
 
   constructor: (props) ->
     super
     @state = { 
-      # True when editing map
+      # True when editing
       editing: false
     }  
 
@@ -52,7 +53,7 @@ class MarkdownWidgetComponent extends React.Component
       onDesignChange: @props.onDesignChange
     )
 
-    # Create map (maxing out at half of width of screen)
+    # Create item (maxing out at half of width of screen)
     width = Math.min(document.body.clientWidth/2, @props.width)
     chart = @renderContent()
 
@@ -68,7 +69,7 @@ class MarkdownWidgetComponent extends React.Component
       onRequestClose: (=> @setState(editing: false)),
         content)
 
-  renderContent: ->
+  renderContent: (scale) ->
     React.createElement(MarkdownWidgetViewComponent, {
       design: @props.design
       onDesignChange: @props.onDesignChange
@@ -86,6 +87,7 @@ class MarkdownWidgetComponent extends React.Component
       React.createElement(SimpleWidgetComponent, 
         width: @props.width
         height: @props.height
+        standardWidth: @props.standardWidth
         connectMoveHandle: @props.connectMoveHandle
         connectResizeHandle: @props.connectResizeHandle
         dropdownItems: dropdownItems,
@@ -96,11 +98,21 @@ class MarkdownWidgetComponent extends React.Component
 class MarkdownWidgetViewComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired # Design of chart
+
     width: React.PropTypes.number
     height: React.PropTypes.number
+    standardWidth: React.PropTypes.number
 
   render: ->
-    H.div dangerouslySetInnerHTML: { __html: markdown.toHTML(@props.design.markdown or "") }
+    # Render in a standard width container and then scale up to ensure that widget always looks consistent
+    H.div 
+      style: { 
+        width: @props.standardWidth
+        height: @props.height * (@props.standardWidth / @props.width)
+        transform: "scale(#{@props.width/@props.standardWidth}, #{@props.width/@props.standardWidth})"
+        transformOrigin: "0 0"
+      }
+      dangerouslySetInnerHTML: { __html: markdown.toHTML(@props.design.markdown or "") }
 
 class MarkdownWidgetDesignerComponent extends React.Component 
   @propTypes: 

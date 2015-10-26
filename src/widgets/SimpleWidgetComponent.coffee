@@ -9,6 +9,7 @@ module.exports = class SimpleWidgetComponent extends React.Component
   @propTypes:
     width: React.PropTypes.number
     height: React.PropTypes.number
+    standardWidth: React.PropTypes.number # Standard width to use for scaling
 
     highlighted: React.PropTypes.bool # true if highlighted
     
@@ -76,9 +77,10 @@ module.exports = class SimpleWidgetComponent extends React.Component
     if @props.highlighted
       style.border = "dashed 2px #337ab7"
 
+    # Inject width, height and standardWidth into child element, leaving a 10px border
     contents = H.div style: { position: "absolute", left: 10, top: 10, right: 10, bottom: 10 }, 
       React.cloneElement(React.Children.only(@props.children), 
-        width: @props.width - 20, height: @props.height - 20)
+        width: @props.width - 20, height: @props.height - 20, standardWidth: @props.standardWidth - 20)
 
     elem = H.div className: "mwater-visualization-simple-widget", style: style, onMouseLeave: @closeMenu,
       contents

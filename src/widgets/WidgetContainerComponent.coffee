@@ -39,13 +39,14 @@ resizeCollect = (connect, monitor) ->
 
 MoveResizeLayoutComponent = DragSource("block-resize", resizeSpec, resizeCollect)(MoveLayoutComponent)
 
-# Container contains layouts to layout
+# Container contains layouts to layout. It clones elems, injecting width, height and standardWidth into them before rendering them at the correct location.
 class Container extends React.Component
   @propTypes:
     layoutEngine: React.PropTypes.object.isRequired
     layouts: React.PropTypes.object.isRequired # Lookup of id -> layout
     elems: React.PropTypes.object.isRequired # Lookup of id -> elem
     width: React.PropTypes.number.isRequired # width in pixels
+    standardWidth: React.PropTypes.number.isRequired # width in pixels of a standard container that all other widths should scale to look like. Usually 1440
     connectDropTarget: React.PropTypes.func.isRequired # Injected by react-dnd wrapper
     onLayoutUpdate: React.PropTypes.func.isRequired # Called with array of { id, widget, layout }
 
@@ -140,10 +141,10 @@ class Container extends React.Component
       bounds: bounds
     }
 
-    # Clone element, injecting width, height and enclosing in a dnd block
+    # Clone element, injecting width, height, standardWidth and enclosing in a dnd block
     return H.div style: style, key: id,
       React.createElement(MoveResizeLayoutComponent, { dragInfo: dragInfo }, 
-        React.cloneElement(@props.elems[id], width: bounds.width, height: bounds.height))
+        React.cloneElement(@props.elems[id], width: bounds.width, height: bounds.height, standardWidth: (bounds.width / @props.width) * @props.standardWidth))
 
   # Calculate a lookup of layouts incorporating hover info
   calculateLayouts: (props, state) ->

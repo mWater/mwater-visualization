@@ -11,8 +11,9 @@ module.exports = class Widget
   #  onScopeChange: called with scope of widget
   #  onDesignChange: called with new design
   # Element will have the following props injected:
-  #  width: width in pixels
-  #  height: height in pixels
+  #  width: width in pixels on screen
+  #  height: height in pixels on screen
+  #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
   #  connectMoveHandle:  Connects move handle for dragging (see WidgetContainerComponent)
   #  connectResizeHandle: Connects resize handle for dragging (see WidgetContainerComponent)
   createViewElement: (options) ->

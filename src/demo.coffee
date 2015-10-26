@@ -35,7 +35,7 @@ class TestPane extends React.Component
   handleDesignChange: (design) =>
     chart = new LayeredChart(schema: @state.schema, dataSource: @state.dataSource)
     @setState(design: chart.cleanDesign(design))
-    # console.log JSON.stringify(design, null, 2)
+    console.log JSON.stringify(design, null, 2)
     
   render: ->
     if not @state.widgetFactory
@@ -74,7 +74,7 @@ class DashboardPane extends React.Component
 
   handleDesignChange: (design) =>
     @setState(design: design)
-    # console.log JSON.stringify(design, null, 2)
+    console.log JSON.stringify(design, null, 2)
     
   render: ->
     if not @state.widgetFactory
@@ -99,7 +99,7 @@ $ ->
 
 dashboardDesign = {
   "items": {
-    "b854aa65-7644-4b67-b0a4-d2344e7eb43a": {
+    "e08ef8a3-34db-467d-ac78-f0f273d49f25": {
       "layout": {
         "x": 0,
         "y": 0,
@@ -107,12 +107,175 @@ dashboardDesign = {
         "h": 8
       },
       "widget": {
+        "type": "Markdown",
+        "design": {
+          "markdown": "# Header 1\n## Header 2\n### Header 3\nText Text Text More Text\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+        }
+      }
+    },
+    "9d8df869-8869-4191-aa18-b58142f9c961": {
+      "layout": {
+        "x": 8,
+        "y": 0,
+        "w": 10,
+        "h": 8
+      },
+      "widget": {
         "type": "LayeredChart",
-        design: {"version":1,"type":"line","layers":[{"axes":{"x":{"expr":{"type":"scalar","table":"entities.water_point","joins":[],"expr":{"type":"field","table":"entities.water_point","column":"_created_on"}},"xform":{"type":"date"}},"y":{"expr":{"type":"scalar","table":"entities.water_point","joins":[],"expr":{"type":"count","table":"entities.water_point"}},"xform":null,"aggr":"count"}},"filter":null,"table":"entities.water_point","cumulative":true}]}
+        "design": {
+          "version": 1,
+          "layers": [
+            {
+              "axes": {
+                "color": {
+                  "expr": {
+                    "type": "scalar",
+                    "table": "entities.water_point",
+                    "joins": [],
+                    "expr": {
+                      "type": "field",
+                      "table": "entities.water_point",
+                      "column": "type"
+                    }
+                  },
+                  "xform": null
+                },
+                "y": {
+                  "expr": {
+                    "type": "scalar",
+                    "table": "entities.water_point",
+                    "expr": {
+                      "type": "count",
+                      "table": "entities.water_point"
+                    },
+                    "joins": []
+                  },
+                  "aggr": "count",
+                  "xform": null
+                }
+              },
+              "filter": null,
+              "table": "entities.water_point"
+            }
+          ],
+          "type": "donut"
+        }
+      }
+    },
+    "409d7b5b-e1d9-4e18-bd45-afdead7fe18f": {
+      "layout": {
+        "x": 0,
+        "y": 8,
+        "w": 18,
+        "h": 8
+      },
+      "widget": {
+        "type": "LayeredChart",
+        "design": {
+          "version": 1,
+          "layers": [
+            {
+              "axes": {
+                "x": {
+                  "expr": {
+                    "type": "scalar",
+                    "table": "entities.news_item",
+                    "joins": [],
+                    "expr": {
+                      "type": "field",
+                      "table": "entities.news_item",
+                      "column": "post_country"
+                    }
+                  },
+                  "xform": null
+                },
+                "y": {
+                  "expr": {
+                    "type": "scalar",
+                    "table": "entities.news_item",
+                    "expr": {
+                      "type": "count",
+                      "table": "entities.news_item"
+                    },
+                    "joins": []
+                  },
+                  "aggr": "count",
+                  "xform": null
+                }
+              },
+              "filter": null,
+              "table": "entities.news_item"
+            }
+          ],
+          "type": "bar",
+          "titleText": "Some Title"
+        }
+      }
+    },
+    "d41a2dd2-85bd-46d8-af9a-a650af4c0047": {
+      "layout": {
+        "x": 0,
+        "y": 16,
+        "w": 8,
+        "h": 8
+      },
+      "widget": {
+        "type": "TableChart",
+        "design": {
+          "version": 1,
+          "columns": [
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "scalar",
+                  "table": "entities.water_point",
+                  "joins": [],
+                  "expr": {
+                    "type": "field",
+                    "table": "entities.water_point",
+                    "column": "type"
+                  }
+                }
+              }
+            },
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "scalar",
+                  "table": "entities.water_point",
+                  "joins": [],
+                  "expr": {
+                    "type": "count",
+                    "table": "entities.water_point"
+                  }
+                },
+                "aggr": "count"
+              }
+            }
+          ],
+          "orderings": [],
+          "table": "entities.water_point",
+          "titleText": "TEST"
+        }
       }
     }
   }
-}
+}  
+#   "items": {
+#     "b854aa65-7644-4b67-b0a4-d2344e7eb43a": {
+#       "layout": {
+#         "x": 0,
+#         "y": 0,
+#         "w": 8,
+#         "h": 8
+#       },
+#       "widget": {
+#         "type": "LayeredChart",
+#         design: {"version":1,"type":"line","layers":[{"axes":{"x":{"expr":{"type":"scalar","table":"entities.water_point","joins":[],"expr":{"type":"field","table":"entities.water_point","column":"_created_on"}},"xform":{"type":"date"}},"y":{"expr":{"type":"scalar","table":"entities.water_point","joins":[],"expr":{"type":"count","table":"entities.water_point"}},"xform":null,"aggr":"count"}},"filter":null,"table":"entities.water_point","cumulative":true}]}
+#       }
+#     }
+#   }
+# }
 
 
 #   "items": {

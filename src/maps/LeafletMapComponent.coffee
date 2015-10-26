@@ -19,7 +19,7 @@ module.exports = class LeafletMapComponent extends React.Component
     width: React.PropTypes.number # Required width
     height: React.PropTypes.number # Required height
 
-    onBoundsChange: React.PropTypes.func # Called with bounds in w, n, s, e format
+    onBoundsChange: React.PropTypes.func # Called with bounds in w, n, s, e format when bounds change
     
     layers: React.PropTypes.arrayOf(React.PropTypes.shape({
       tileUrl: React.PropTypes.string # Url in leaflet format
