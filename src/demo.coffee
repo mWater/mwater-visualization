@@ -112,6 +112,105 @@ dashboardDesign = {
           "markdown": "# Header 1\n## Header 2\n### Header 3\nText Text Text More Text\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
         }
       }
+    },
+    "9d8df869-8869-4191-aa18-b58142f9c961": {
+      "layout": {
+        "x": 8,
+        "y": 0,
+        "w": 10,
+        "h": 8
+      },
+      "widget": {
+        "type": "LayeredChart",
+        "design": {
+          "version": 1,
+          "layers": [
+            {
+              "axes": {
+                "color": {
+                  "expr": {
+                    "type": "scalar",
+                    "table": "entities.water_point",
+                    "joins": [],
+                    "expr": {
+                      "type": "field",
+                      "table": "entities.water_point",
+                      "column": "type"
+                    }
+                  },
+                  "xform": null
+                },
+                "y": {
+                  "expr": {
+                    "type": "scalar",
+                    "table": "entities.water_point",
+                    "expr": {
+                      "type": "count",
+                      "table": "entities.water_point"
+                    },
+                    "joins": []
+                  },
+                  "aggr": "count",
+                  "xform": null
+                }
+              },
+              "filter": null,
+              "table": "entities.water_point"
+            }
+          ],
+          "type": "donut"
+        }
+      }
+    },
+    "409d7b5b-e1d9-4e18-bd45-afdead7fe18f": {
+      "layout": {
+        "x": 0,
+        "y": 8,
+        "w": 18,
+        "h": 8
+      },
+      "widget": {
+        "type": "LayeredChart",
+        "design": {
+          "version": 1,
+          "layers": [
+            {
+              "axes": {
+                "x": {
+                  "expr": {
+                    "type": "scalar",
+                    "table": "entities.news_item",
+                    "joins": [],
+                    "expr": {
+                      "type": "field",
+                      "table": "entities.news_item",
+                      "column": "post_country"
+                    }
+                  },
+                  "xform": null
+                },
+                "y": {
+                  "expr": {
+                    "type": "scalar",
+                    "table": "entities.news_item",
+                    "expr": {
+                      "type": "count",
+                      "table": "entities.news_item"
+                    },
+                    "joins": []
+                  },
+                  "aggr": "count",
+                  "xform": null
+                }
+              },
+              "filter": null,
+              "table": "entities.news_item"
+            }
+          ],
+          "type": "bar",
+          "titleText": "Some Title"
+        }
+      }
     }
   }
 }  

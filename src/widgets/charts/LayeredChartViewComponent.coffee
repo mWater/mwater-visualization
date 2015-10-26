@@ -15,6 +15,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
     width: React.PropTypes.number.isRequired
     height: React.PropTypes.number.isRequired
+    standardWidth: React.PropTypes.number.isRequired
 
     scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
@@ -170,5 +171,13 @@ module.exports = class LayeredChartViewComponent extends React.Component
     @chart.destroy()
 
   render: ->
+    scale = @props.width / @props.standardWidth
+
+    css = ".c3 svg { font-size: #{scale * 10}px; }\n"
+    css += ".c3-legend-item { font-size: #{scale * 12}px; }\n"
+    css += ".c3-chart-arc text { font-size: #{scale * 13}px; }\n"
+    css += ".c3-title { font-size: #{scale * 14}px; }\n"
+
     H.div null,
+      H.style null, css
       H.div ref: "chart"

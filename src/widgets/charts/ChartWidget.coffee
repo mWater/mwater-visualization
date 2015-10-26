@@ -15,7 +15,7 @@ module.exports = class ChartWidget extends Widget
     @design = design
     @dataSource = dataSource
 
-  # Creates a view of the widget. width and height will be injected
+  # Creates a view of the widget. width, height and standardWidth will be injected
   # options:
   #  onRemove: called when widget is removed
   #  onDuplicate: called when widget is duplicated
@@ -49,6 +49,7 @@ class ChartWidgetComponent extends React.Component
 
     width: React.PropTypes.number
     height: React.PropTypes.number
+    standardWidth: React.PropTypes.number   # Standard width to allow widget to scale properly to retain same appearance
 
     scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
@@ -104,6 +105,7 @@ class ChartWidgetComponent extends React.Component
       filters: @props.filters
       width: width
       height: height
+      standardWidth: @props.standardWidth
       onScopeChange: @props.onScopeChange)
 
   renderEditor: ->
@@ -112,7 +114,7 @@ class ChartWidgetComponent extends React.Component
 
     # Create chart (maxing out at half of width of screen)
     width = Math.min(document.body.clientWidth/2, @props.width)
-    chart = @renderChart(width, @props.height)
+    chart = @renderChart(width, @props.height * (width / @props.width))
 
     content = H.div style: { height: "100%", width: "100%" },
       H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: width + 20, height: @props.height + 20 },
@@ -146,6 +148,7 @@ class ChartWidgetComponent extends React.Component
       React.createElement(SimpleWidgetComponent, 
         width: @props.width
         height: @props.height
+        standardWidth: @props.standardWidth
         dropdownItems: dropdownItems,
         connectMoveHandle: @props.connectMoveHandle
         connectResizeHandle: @props.connectResizeHandle,
