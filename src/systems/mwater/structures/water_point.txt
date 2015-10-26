@@ -68,4 +68,3 @@ mwa_scheme_type MWA scheme type
 ecoli_statuses
 _created_by
 _created_on
-source_notes

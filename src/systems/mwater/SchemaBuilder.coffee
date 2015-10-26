@@ -203,6 +203,7 @@ module.exports = class SchemaBuilder
         fs.readFileSync(__dirname + '/structures/water_point.txt', 'utf-8')))
 
   addLegacyTables: () ->
+    # TODO REMOVE STARTING HERE
     # Add source notes
     @schema.addTable({ 
       id: "source_notes"
@@ -234,6 +235,7 @@ module.exports = class SchemaBuilder
         multiple: true
       }
     })
+    # TODO REMOVE ENDING HERE
 
     # Add ecoli statuses pseudo-table
     @schema.addTable({ 
