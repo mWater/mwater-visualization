@@ -6,7 +6,6 @@ AxisBuilder = require './../../axes/AxisBuilder'
 
 module.exports = class TableChartViewComponent extends React.Component
   @propTypes:
-    chart: React.PropTypes.object.isRequired # Chart object to use
     design: React.PropTypes.object.isRequired # Design of chart
     data: React.PropTypes.object.isRequired # Data that the table has requested
 
