@@ -2,7 +2,7 @@ assert = require('chai').assert
 _ = require 'lodash'
 React = require 'react'
 R = React.createElement
-AxisComponent = require '../src/expressions/axes/AxisComponent'
+AxisComponent = require '../src/axes/AxisComponent'
 TestComponent = require './TestComponent'
 fixtures = require './fixtures'
 

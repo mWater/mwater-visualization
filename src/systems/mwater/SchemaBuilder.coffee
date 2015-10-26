@@ -146,42 +146,42 @@ module.exports = class SchemaBuilder
     for rj in reverseJoins
       @schema.addColumn(rj.table, rj.column)
 
-    # Add named expressions
-    @schema.addNamedExpr("entities.water_point", {
-      id: "Water point type"
-      name: "Water point type"
-      expr: { type: "field", table: "entities.water_point", column: "type" }
-      })
+    # # Add named expressions
+    # @schema.addNamedExpr("entities.water_point", {
+    #   id: "Water point type"
+    #   name: "Water point type"
+    #   expr: { type: "field", table: "entities.water_point", column: "type" }
+    #   })
 
-    @schema.addNamedExpr("entities.water_point", {
-      id: "Functional status"
-      name: "Functional status"
-      expr: { 
-        type: "scalar"
-        table: "entities.water_point"
-        joins: ["source_notes"]
-        aggr: "last"
-        expr: { type: "field", table: "source_notes", column: "status" }
-      }
-    })
+    # @schema.addNamedExpr("entities.water_point", {
+    #   id: "Functional status"
+    #   name: "Functional status"
+    #   expr: { 
+    #     type: "scalar"
+    #     table: "entities.water_point"
+    #     joins: ["source_notes"]
+    #     aggr: "last"
+    #     expr: { type: "field", table: "source_notes", column: "status" }
+    #   }
+    # })
 
-    @schema.addNamedExpr("entities.water_point", {
-      id: "Date of last water test"
-      name: "Date of last water test"
-      expr: { 
-        "type": "scalar",
-        "table": "entities.water_point",
-        "joins": [
-          "!entities.water_test.water_point"
-        ],
-        "expr": {
-          "type": "field",
-          "table": "entities.water_test",
-          "column": "_created_on"
-        },
-        "aggr": "last"
-      }
-    })
+    # @schema.addNamedExpr("entities.water_point", {
+    #   id: "Date of last water test"
+    #   name: "Date of last water test"
+    #   expr: { 
+    #     "type": "scalar",
+    #     "table": "entities.water_point",
+    #     "joins": [
+    #       "!entities.water_test.water_point"
+    #     ],
+    #     "expr": {
+    #       "type": "field",
+    #       "table": "entities.water_test",
+    #       "column": "_created_on"
+    #     },
+    #     "aggr": "last"
+    #   }
+    # })
 
     # # TODO name of these admin levels?
     # @schema.addNamedExpr("entities.water_point", {
@@ -203,10 +203,11 @@ module.exports = class SchemaBuilder
         fs.readFileSync(__dirname + '/structures/water_point.txt', 'utf-8')))
 
   addLegacyTables: () ->
+    # TODO REMOVE STARTING HERE
     # Add source notes
     @schema.addTable({ 
       id: "source_notes"
-      name: "Functionality Reports"
+      name: "Functionality Reports (legacy. do not use!)"
       ordering: "date"
     })
 
@@ -223,7 +224,7 @@ module.exports = class SchemaBuilder
 
     @schema.addColumn("entities.water_point", {
       id: "source_notes"
-      name: "Functional Reports"
+      name: "Functional Reports (legacy. do not use!)"
       type: "join"
       join: {
         fromTable: "entities.water_point"
@@ -234,11 +235,12 @@ module.exports = class SchemaBuilder
         multiple: true
       }
     })
+    # TODO REMOVE ENDING HERE
 
     # Add ecoli statuses pseudo-table
     @schema.addTable({ 
       id: "ecoli_statuses"
-      name: "E.Coli Tests"
+      name: "E.Coli Risk Level (experimental)"
       ordering: "date"
     })
 
@@ -265,7 +267,7 @@ module.exports = class SchemaBuilder
 
     @schema.addColumn("entities.water_point", {
       id: "ecoli_statuses"
-      name: "E.Coli Tests"
+      name: "E.Coli Risk Levels (experimental)"
       type: "join"
       join: {
         fromTable: "entities.water_point"

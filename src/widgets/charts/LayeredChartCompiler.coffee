@@ -1,7 +1,7 @@
 _ = require 'lodash'
 ExpressionCompiler = require './../../expressions/ExpressionCompiler'
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
-AxisBuilder = require '../../expressions/axes/AxisBuilder'
+AxisBuilder = require '../../axes/AxisBuilder'
 injectTableAlias = require '../../injectTableAlias'
 
 # TODO REMOVE

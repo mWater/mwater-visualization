@@ -3,7 +3,7 @@ React = require 'react'
 H = React.DOM
 
 ExpressionBuilder = require './../../expressions/ExpressionBuilder'
-AxisBuilder = require './../../expressions/axes/AxisBuilder'
+AxisBuilder = require './../../axes/AxisBuilder'
 EditableLinkComponent = require './../../EditableLinkComponent'
 ScalarExprComponent = require './../../expressions/ScalarExprComponent'
 LogicalExprComponent = require './../../expressions/LogicalExprComponent'

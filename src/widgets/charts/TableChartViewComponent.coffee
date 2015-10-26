@@ -2,7 +2,7 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 
-AxisBuilder = require './../../expressions/axes/AxisBuilder'
+AxisBuilder = require './../../axes/AxisBuilder'
 
 module.exports = class TableChartViewComponent extends React.Component
   renderHeaderCell: (index) ->
