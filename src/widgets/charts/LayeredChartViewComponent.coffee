@@ -172,6 +172,8 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
   render: ->
     scale = @props.width / @props.standardWidth
+    # Don't grow fonts as it causes overlap
+    scale = Math.min(scale, 1)
 
     css = ".c3 svg { font-size: #{scale * 10}px; }\n"
     css += ".c3-legend-item { font-size: #{scale * 12}px; }\n"
