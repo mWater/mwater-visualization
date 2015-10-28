@@ -18,6 +18,7 @@ exports.SchemaBuilder = SchemaBuilder
 #   newLayers: Array of new layers that can be created for a map. Defaults to custom markers layer e.g.
 #     { name: "Custom Layer", type: "Markers", design: {} }
 #   onMarkerClick: Called when a marker is clicked. Called with (table, id) where id is primary key
+#   caching: defaults to true. Set false to prevent getting cached data results
 # 
 # cb is called with (err, results) and results contains:
 #   schema, dataSource, widgetFactory, layerFactory, entityTypes, properties, units, onFormTableSelect, loadFormTables
@@ -41,7 +42,7 @@ exports.setup = (options, cb) ->
         schemaBuilder.addLegacyTables()
 
         # Create data source
-        dataSource = new MWaterDataSource(options.apiUrl, options.client)
+        dataSource = new MWaterDataSource(options.apiUrl, options.client, if options.caching? then options.caching else true)
 
         # Loads the extra table (usually a form)
         loadExtraTable = (tableId, cb) ->
