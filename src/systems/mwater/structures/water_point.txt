@@ -45,6 +45,29 @@ mwa_scheme_type MWA scheme type
   twp_project_type TWP Project Type
   twp_url TWP Project Link
 
++Custom
+  +MWA
+    mwa_id
+    mwa_co_comunidad
+    mwa_co_departamento
+    mwa_baseline_photo_link
+    mwa_baseline_submitter
+    mwa_co_municipalidad
+    mwa_condition_info
+    mwa_families_using
+    mwa_flow_response_id_code
+    mwa_fuente_de_agua
+    mwa_funder
+    mwa_geocode
+    mwa_gt_comunidad
+    mwa_gt_departamento
+    mwa_gt_municipio
+    mwa_installer
+    mwa_installer_other
+    mwa_number_of_people_using
+    mwa_scheme_type
+    mwa_type
+
 +Other
   legacy_attrs Attributes
   legacy_custom Custom Fields
