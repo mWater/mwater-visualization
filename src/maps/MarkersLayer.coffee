@@ -99,6 +99,9 @@ module.exports = class MarkersLayer extends Layer
     # Compile geometry axis
     geometryExpr = axisBuilder.compileAxis(axis: sublayer.axes.geometry, tableAlias: "innerquery")
 
+    # Convert to Web mercator (3857)
+    geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
+
     # row_number() over (partition by st_snaptogrid(location, !pixel_width!*5, !pixel_height!*5)) AS r
     cluster = { 
       type: "select" 
