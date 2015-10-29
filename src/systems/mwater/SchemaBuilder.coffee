@@ -618,7 +618,7 @@ module.exports = class SchemaBuilder
               toTable: if item.siteTypes then "entities." + _.first(item.siteTypes).toLowerCase().replace(" ", "_") else "entities.water_point"
               toColumn: "code"
               op: "="
-              multiple: true
+              multiple: false
             }
           }
 
@@ -642,7 +642,7 @@ module.exports = class SchemaBuilder
               toTable: "entities.#{item.entityType}"
               toColumn: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "{alias}", column: "_id" }] }
               op: "="
-              multiple: true
+              multiple: false
             }
           }
 
