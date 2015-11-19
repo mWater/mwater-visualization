@@ -1,5 +1,7 @@
 # mwater-visualization
 
+Requires C3, D3 and Bootstrap
+
 ## Expressions
 
 [Expressions](docs/Expressions.md)
