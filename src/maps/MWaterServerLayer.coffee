@@ -1,6 +1,6 @@
 Layer = require './Layer'
-ExpressionCompiler = require '../expressions/ExpressionCompiler'
-injectTableAlias = require '../injectTableAlias'
+ExprCompiler = require('mwater-expressions').ExprCompiler
+injectTableAlias = require('mwater-expressions').injectTableAlias
 
 React = require 'react'
 H = React.DOM

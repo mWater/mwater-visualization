@@ -2,10 +2,10 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 
-injectTableAlias = require '../../injectTableAlias'
+injectTableAlias = require('mwater-expressions').injectTableAlias
 Chart = require './Chart'
-ExpressionBuilder = require './../../expressions/ExpressionBuilder'
-ExpressionCompiler = require './../../expressions/ExpressionCompiler'
+ExprCleaner = require('mwater-expressions').ExprCleaner
+ExprCompiler = require('mwater-expressions').ExprCompiler
 AxisBuilder = require './../../axes/AxisBuilder'
 TableChartDesignerComponent = require './TableChartDesignerComponent'
 TableChartViewComponent = require './TableChartViewComponent'
@@ -35,7 +35,7 @@ module.exports = class TableChart extends Chart
   constructor: (options) ->
     @schema = options.schema
     @dataSource = options.dataSource
-    @exprBuilder = new ExpressionBuilder(@schema)
+    @exprCleaner = new ExprCleaner(@schema)
     @axisBuilder = new AxisBuilder(schema: @schema)
 
   cleanDesign: (design) ->
@@ -63,7 +63,7 @@ module.exports = class TableChart extends Chart
       ordering.axis = @axisBuilder.cleanAxis(axis: ordering.axis, table: design.table, aggrNeed: "optional")
 
     if design.filter
-      design.filter = @exprBuilder.cleanExpr(design.filter, design.table)
+      design.filter = @exprCleaner.cleanExpr(design.filter, { table: design.table })
 
     return design
 
@@ -86,8 +86,6 @@ module.exports = class TableChart extends Chart
         error = error or "Missing order expression"
       error = error or @axisBuilder.validateAxis(axis: ordering.axis)
 
-    error = error or @exprBuilder.validateExpr(design.filter)
-
     return error
 
   isEmpty: (design) ->
@@ -108,7 +106,7 @@ module.exports = class TableChart extends Chart
     return React.createElement(TableChartDesignerComponent, props)
 
   createQueries: (design, filters) ->
-    exprCompiler = new ExpressionCompiler(@schema)
+    exprCompiler = new ExprCompiler(@schema)
 
     # Create shell of query
     query = {

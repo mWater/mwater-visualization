@@ -4,7 +4,7 @@ H = React.DOM
 
 Chart = require './Chart'
 LayeredChartCompiler = require './LayeredChartCompiler'
-ExpressionBuilder = require './../../expressions/ExpressionBuilder'
+ExprCleaner = require('mwater-expressions').ExprCleaner
 AxisBuilder = require './../../axes/AxisBuilder'
 LayeredChartDesignerComponent = require './LayeredChartDesignerComponent'
 LayeredChartViewComponent = require './LayeredChartViewComponent'
@@ -18,7 +18,7 @@ module.exports = class LayeredChart extends Chart
     @schema = options.schema
     @dataSource = options.dataSource
 
-    @exprBuilder = new ExpressionBuilder(@schema)
+    @exprCleaner = new ExprCleaner(@schema)
     @axisBuilder = new AxisBuilder(schema: @schema)
 
   cleanDesign: (design) ->
@@ -59,7 +59,7 @@ module.exports = class LayeredChart extends Chart
         countExpr = { type: "scalar", table: layer.table, expr: { type: "count", table: layer.table }, joins: [] }
         layer.axes.y = { expr: countExpr, aggr: "count", xform: null }
 
-      layer.filter = @exprBuilder.cleanExpr(layer.filter, layer.table)
+      layer.filter = @exprCleaner.cleanExpr(layer.filter, { table: layer.table })
 
     return design
 
@@ -96,8 +96,6 @@ module.exports = class LayeredChart extends Chart
       error = error or @axisBuilder.validateAxis(axis: layer.axes.x)
       error = error or @axisBuilder.validateAxis(axis: layer.axes.y)
       error = error or @axisBuilder.validateAxis(axis: layer.axes.color)
-
-      error = error or @exprBuilder.validateExpr(layer.filter)
 
     return error
 

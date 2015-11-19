@@ -1,8 +1,8 @@
 _ = require 'lodash'
-ExpressionCompiler = require './../../expressions/ExpressionCompiler'
-ExpressionBuilder = require './../../expressions/ExpressionBuilder'
+ExprCompiler = require('mwater-expressions').ExprCompiler
+ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../../axes/AxisBuilder'
-injectTableAlias = require '../../injectTableAlias'
+injectTableAlias = require('mwater-expressions').injectTableAlias
 
 # TODO REMOVE
 colorHacks = {
@@ -20,13 +20,13 @@ module.exports = class LayeredChartCompiler
   # Pass in schema
   constructor: (options) ->
     @schema = options.schema
-    @exprBuilder = new ExpressionBuilder(@schema)
+    @exprUtils = new ExprUtils(@schema)
     @axisBuilder = new AxisBuilder(schema: @schema)
 
   # Create the queries needed for the chart.
   # extraFilters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. 
   createQueries: (design, extraFilters) ->
-    exprCompiler = new ExpressionCompiler(@schema)
+    exprCompiler = new ExprCompiler(@schema)
 
     queries = {}
 
@@ -437,7 +437,7 @@ module.exports = class LayeredChartCompiler
 
   # Compile an expression
   compileExpr: (expr) ->
-    exprCompiler = new ExpressionCompiler(@schema)
+    exprCompiler = new ExprCompiler(@schema)
     return exprCompiler.compileExpr(expr: expr, tableAlias: "main")
 
   # Get layer type, defaulting to overall type
@@ -485,7 +485,7 @@ module.exports = class LayeredChartCompiler
   # Scope data is relevant data from row that uniquely identifies scope
   # plus a layer index
   createScope: (design, layerIndex, row) ->
-    expressionBuilder = new ExpressionBuilder(@schema)
+    expressionBuilder = new ExprUtils(@schema)
 
     # Get layer
     layer = design.layers[layerIndex]

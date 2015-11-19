@@ -2,10 +2,10 @@ React = require 'react'
 H = React.DOM
 
 Layer = require './Layer'
-ExpressionCompiler = require '../expressions/ExpressionCompiler'
-injectTableAlias = require '../injectTableAlias'
+ExprCompiler = require('mwater-expressions').ExprCompiler
+injectTableAlias = require('mwater-expressions').injectTableAlias
 MarkersLayerDesignerComponent = require './MarkersLayerDesignerComponent'
-ExpressionBuilder = require '../expressions/ExpressionBuilder'
+ExprCleaner = require('mwater-expressions').ExprCleaner
 AxisBuilder = require '../axes/AxisBuilder'
 
 ###
@@ -93,8 +93,7 @@ module.exports = class MarkersLayer extends Layer
 
   createJsonQL: (sublayer, filters) ->
     axisBuilder = new AxisBuilder(schema: @schema)
-    exprCompiler = new ExpressionCompiler(@schema)
-    exprBuilder = new ExpressionBuilder(@schema)
+    exprCompiler = new ExprCompiler(@schema)
 
     # Compile geometry axis
     geometryExpr = axisBuilder.compileAxis(axis: sublayer.axes.geometry, tableAlias: "innerquery")
@@ -205,7 +204,7 @@ module.exports = class MarkersLayer extends Layer
   # Returns a cleaned design
   # TODO this is awkward since the design is part of the object too
   cleanDesign: (design) ->
-    exprBuilder = new ExpressionBuilder(@schema)
+    exprCleaner = new ExprCleaner(@schema)
     axisBuilder = new AxisBuilder(schema: @schema)
 
     # TODO clones entirely
@@ -219,7 +218,7 @@ module.exports = class MarkersLayer extends Layer
       for axisKey, axis of sublayer.axes
         sublayer.axes[axisKey] = axisBuilder.cleanAxis(axis: axis, table: sublayer.table, aggrNeed: "none")
 
-      sublayer.filter = exprBuilder.cleanExpr(sublayer.filter, sublayer.table)
+      sublayer.filter = exprCleaner.cleanExpr(sublayer.filter, { table: sublayer.table })
 
     return design
 

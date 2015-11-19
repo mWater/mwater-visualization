@@ -1,9 +1,9 @@
 React = require 'react'
 H = React.DOM
 R = React.createElement
-ScalarExprComponent = require '../expressions/ScalarExprComponent'
-ExpressionBuilder = require '../expressions/ExpressionBuilder'
-ExpressionCompiler = require '../expressions/ExpressionCompiler'
+ExprComponent = require("mwater-expressions-ui").ExprComponent
+ExprUtils = require('mwater-expressions').ExprUtils
+ExprCompiler = require('mwater-expressions').ExprCompiler
 EditableLinkComponent = require '../EditableLinkComponent'
 AxisBuilder = require './AxisBuilder'
 update = require 'update-object'
@@ -34,7 +34,7 @@ module.exports = class AxisComponent extends React.Component
 
   # Compute min and max if xform of bin and not already present
   checkMinMaxComputation: (props) ->
-    exprCompiler = new ExpressionCompiler(props.schema)
+    exprCompiler = new ExprCompiler(props.schema)
 
     value = props.value
 
@@ -124,12 +124,12 @@ module.exports = class AxisComponent extends React.Component
     if @props.aggrNeed == "none"
       return
       
-    exprBuilder = new ExpressionBuilder(@props.schema)
+    exprUtils = new ExprUtils(@props.schema)
 
     # Only render aggregate if has a expr with a type that is not count
-    if @props.value and exprBuilder.getExprType(@props.value.expr) != "count"
-      exprBuilder = new ExpressionBuilder(@props.schema)
-      aggrs = exprBuilder.getAggrs(@props.value.expr)
+    if @props.value and exprUtils.getExprType(@props.value.expr) != "count"
+      exprUtils = new ExprUtils(@props.schema)
+      aggrs = exprUtils.getAggrs(@props.value.expr)
 
       # Remove latest, as it is tricky to group by. TODO
       aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
@@ -145,8 +145,8 @@ module.exports = class AxisComponent extends React.Component
     if not @props.value
       return
 
-    exprBuilder = new ExpressionBuilder(@props.schema)
-    exprType = exprBuilder.getExprType(@props.value.expr) 
+    exprUtils = new ExprUtils(@props.schema)
+    exprType = exprUtils.getExprType(@props.value.expr) 
 
     switch exprType
       when "date"
@@ -177,12 +177,11 @@ module.exports = class AxisComponent extends React.Component
       H.div null, 
         @renderAggr()
         React.createElement(ScalarExprComponent, 
-          editorTitle: @props.editorTitle
           schema: @props.schema
           dataSource: @props.dataSource
           table: @props.table
-          types: axisBuilder.getExprTypes(@props.types, @props.aggrNeed)
-          preventRemove: @props.required
+          # types: axisBuilder.getExprTypes(@props.types, @props.aggrNeed) TODO types are not passed in as ExprComponent is single-type now
+          # preventRemove: @props.required
           onChange: @handleExprChange
           includeCount: @props.aggrNeed != "none"
           value: if @props.value then @props.value.expr)  

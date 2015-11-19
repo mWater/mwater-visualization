@@ -3,7 +3,7 @@ React = require 'react'
 ReactDOM = require 'react-dom'
 H = React.DOM
 
-ExpressionBuilder = require './../../expressions/ExpressionBuilder'
+ExprUtils = require('mwater-expressions').ExprUtils
 LayeredChartCompiler = require './LayeredChartCompiler'
 
 # Displays a layered chart

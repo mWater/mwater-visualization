@@ -2,11 +2,10 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 
-ExpressionBuilder = require './../../expressions/ExpressionBuilder'
+ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require './../../axes/AxisBuilder'
 EditableLinkComponent = require './../../EditableLinkComponent'
-ScalarExprComponent = require './../../expressions/ScalarExprComponent'
-LogicalExprComponent = require './../../expressions/LogicalExprComponent'
+ExprComponent = require("mwater-expressions-ui").ExprComponent
 OrderingsComponent = require './OrderingsComponent'
 
 module.exports = class TableChartDesignerComponent extends React.Component
@@ -111,10 +110,11 @@ module.exports = class TableChartDesignerComponent extends React.Component
         " "
         "Filters"
       H.div style: { marginLeft: 8 }, 
-        React.createElement(LogicalExprComponent, 
+        React.createElement(ExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           onChange: @handleFilterChange
+          type: "boolean"
           table: @props.design.table
           value: @props.design.filter)
 
@@ -163,8 +163,7 @@ class TableChartColumnDesignerComponent extends React.Component
     H.div null,
       H.label className: "text-muted", title
       ": "
-      React.createElement(ScalarExprComponent, 
-        editorTitle: title
+      React.createElement(ExprComponent, 
         schema: @props.schema 
         dataSource: @props.dataSource
         table: @props.design.table
@@ -191,14 +190,14 @@ class TableChartColumnDesignerComponent extends React.Component
 
   renderAggr: ->
     column = @props.design.columns[@props.index]
-    exprBuilder = new ExpressionBuilder(@props.schema)
+    exprUtils = new ExprUtils(@props.schema)
 
     # Only render aggregate if has a real expr with a type that is not count
-    if not column.textAxis or exprBuilder.getExprType(column.textAxis.expr) == "count"
+    if not column.textAxis or exprUtils.getExprType(column.textAxis.expr) == "count"
       return
 
     # Get aggregations
-    aggrs = exprBuilder.getAggrs(column.textAxis.expr)
+    aggrs = exprUtils.getAggrs(column.textAxis.expr)
 
     # Remove latest, as it is tricky to group by. TODO
     aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")

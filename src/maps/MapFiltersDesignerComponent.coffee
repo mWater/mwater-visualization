@@ -1,7 +1,7 @@
 React = require 'react'
 H = React.DOM
-LogicalExprComponent = require '../expressions/LogicalExprComponent'
-ExpressionBuilder = require '../expressions/ExpressionBuilder'
+ExprComponent = require("mwater-expressions-ui").ExprComponent
+ExprCleaner = require('mwater-expressions').ExprCleaner
 
 # Designer for filters for a map
 module.exports = class MapFiltersDesignerComponent extends React.Component
@@ -14,7 +14,7 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
 
   handleFilterChange: (table, expr) =>
     # Clean filter
-    expr = new ExpressionBuilder(@props.schema).cleanExpr(expr, table)
+    expr = new ExprCleaner(@props.schema).cleanExpr(expr, { table: table })
 
     update = {}
     update[table] = expr
@@ -28,10 +28,11 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
 
     H.div key: table, 
       H.h4 null, name
-      React.createElement(LogicalExprComponent, 
+      React.createElement(ExprComponent, 
         schema: @props.schema
         dataSource: @props.dataSource
         onChange: @handleFilterChange.bind(null, table)
+        type: "boolean"
         table: table
         value: @props.design.filters[table])
 

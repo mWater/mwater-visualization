@@ -1,76 +1,47 @@
 React = require 'react'
 ReactDOM = require 'react-dom'
 H = React.DOM
-visualization_mwater = require './systems/mwater'
-visualization = require './index'
 
+Schema = require('mwater-expressions').Schema
+DataSource = require('mwater-expressions').DataSource
+
+visualization = require './index'
 LayeredChart = require './widgets/charts/LayeredChart'
 LayeredChartDesignerComponent = require './widgets/charts/LayeredChartDesignerComponent'
 
-class TestPane extends React.Component
-  constructor: (props) ->
-    super
-
-    @state = { }
-
-  componentDidMount: ->
-    visualization_mwater.setup { 
-      apiUrl: @props.apiUrl
-      client: @props.client
-      onMarkerClick: (table, id) => alert("#{table}:#{id}")
-      newLayers: [
-        { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" } }
-        { name: "Custom Layer", type: "Markers", design: {} }
-      ]
-      onFormTableSelect: (id) -> alert(id)
-    }, (err, results) =>
-      if err
-        throw err
-  
-      chart = new LayeredChart(schema: results.schema, dataSource: results.dataSource)
-      design = chart.cleanDesign({})
-        
-      @setState(schema: results.schema, widgetFactory: results.widgetFactory, dataSource: results.dataSource, layerFactory: results.layerFactory, design: design)
-
-  handleDesignChange: (design) =>
-    chart = new LayeredChart(schema: @state.schema, dataSource: @state.dataSource)
-    @setState(design: chart.cleanDesign(design))
-    console.log JSON.stringify(design, null, 2)
-    
-  render: ->
-    if not @state.widgetFactory
-      return H.div null, "Loading..."
-
-    React.createElement(LayeredChartDesignerComponent, 
-      design: @state.design
-      schema: @state.schema
-      dataSource: @state.dataSource
-      onDesignChange: @handleDesignChange
-    )
+LayerFactory = require './maps/LayerFactory'
+WidgetFactory = require './widgets/WidgetFactory'
 
 class DashboardPane extends React.Component
   constructor: (props) ->
     super
 
     @state = {
+      schema: null
+      dataSource: null
       design: dashboardDesign
     }
 
   componentDidMount: ->
-    visualization_mwater.setup { 
-      apiUrl: @props.apiUrl
-      client: @props.client
-      onMarkerClick: (table, id) => alert("#{table}:#{id}")
-      newLayers: [
-        { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" } }
-        { name: "Custom Layer", type: "Markers", design: {} }
-      ]
-      onFormTableSelect: (id) -> alert(id)
-    }, (err, results) =>
-      if err
-        throw err
-        
-      @setState(schema: results.schema, widgetFactory: results.widgetFactory, dataSource: results.dataSource, layerFactory: results.layerFactory)
+    $.getJSON @props.apiUrl + "jsonql/schema", (schemaJson) =>
+      schema = new Schema(schemaJson)
+      dataSource = new MWaterDataSource(@props.apiUrl, @props.client, false)
+
+      layerFactory = new LayerFactory({
+        schema: schema
+        dataSource: dataSource
+        apiUrl: @props.apiUrl
+        client: @props.client
+        newLayers: [
+          { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" } }
+          { name: "Custom Layer", type: "Markers", design: {} }
+        ]
+        onMarkerClick: (table, id) => alert("#{table}:#{id}")
+      })
+
+      widgetFactory = new WidgetFactory(schema: schema, dataSource: dataSource, layerFactory: layerFactory)    
+
+      @setState(schema: schema, dataSource: dataSource, layerFactory: layerFactory, widgetFactory: widgetFactory)
 
   handleDesignChange: (design) =>
     @setState(design: design)
@@ -97,6 +68,32 @@ $ ->
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
   ReactDOM.render(sample, document.getElementById("main"))
+
+# Caching data source for mWater. Requires jQuery
+class MWaterDataSource extends DataSource
+  # Caching allows server to send cached results
+  constructor: (apiUrl, client, caching = true) ->
+    @apiUrl = apiUrl
+    @client = client
+    @caching = caching
+
+  performQuery: (query, cb) ->
+    url = @apiUrl + "jsonql?jsonql=" + encodeURIComponent(JSON.stringify(query))
+    if @client
+      url += "&client=#{@client}"
+
+    # Setup caching
+    headers = {}
+    if not @caching
+      headers['Cache-Control'] = "no-cache"
+
+    $.ajax({ dataType: "json", url: url, headers: headers })
+      .done (rows) =>
+        cb(null, rows)
+      .fail (xhr) =>
+        cb(new Error(xhr.responseText))
+
+
 
 dashboardDesign = {
   "items": {
@@ -412,4 +409,45 @@ dashboardDesign = {
 #       }
 #     }
 #   }
-# }
+# }# class TestPane extends React.Component
+#   constructor: (props) ->
+#     super
+
+#     @state = { }
+
+#   componentDidMount: ->
+#     $.getJSON @props.apiUrl + "jsonql/schema", (schemaJson) =>
+#       @setState()
+#     visualization_mwater.setup { 
+#       apiUrl: @props.apiUrl
+#       client: @props.client
+#       onMarkerClick: (table, id) => alert("#{table}:#{id}")
+#       newLayers: [
+#         { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" } }
+#         { name: "Custom Layer", type: "Markers", design: {} }
+#       ]
+#       onFormTableSelect: (id) -> alert(id)
+#     }, (err, results) =>
+#       if err
+#         throw err
+  
+#       chart = new LayeredChart(schema: results.schema, dataSource: results.dataSource)
+#       design = chart.cleanDesign({})
+        
+#       @setState(schema: results.schema, widgetFactory: results.widgetFactory, dataSource: results.dataSource, layerFactory: results.layerFactory, design: design)
+
+#   handleDesignChange: (design) =>
+#     chart = new LayeredChart(schema: @state.schema, dataSource: @state.dataSource)
+#     @setState(design: chart.cleanDesign(design))
+#     console.log JSON.stringify(design, null, 2)
+    
+#   render: ->
+#     if not @state.widgetFactory
+#       return H.div null, "Loading..."
+
+#     React.createElement(LayeredChartDesignerComponent, 
+#       design: @state.design
+#       schema: @state.schema
+#       dataSource: @state.dataSource
+#       onDesignChange: @handleDesignChange
+#     )

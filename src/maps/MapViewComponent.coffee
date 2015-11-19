@@ -1,8 +1,8 @@
 React = require 'react'
 H = React.DOM
 LeafletMapComponent = require './LeafletMapComponent'
-ExpressionBuilder = require '../expressions/ExpressionBuilder'
-ExpressionCompiler = require '../expressions/ExpressionCompiler'
+ExprUtils = require('mwater-expressions').ExprUtils
+ExprCompiler = require('mwater-expressions').ExprCompiler
 
 # Component that displays just the map
 module.exports = class MapViewComponent extends React.Component
@@ -55,16 +55,15 @@ module.exports = class MapViewComponent extends React.Component
           item.legend
 
   render: ->
-    exprBuilder = new ExpressionBuilder(@props.schema)
+    exprUtils = new ExprUtils(@props.schema)
 
     # Use only valid ones
     filters = _.values(@props.design.filters)
-    filters = _.filter(filters, (expr) => not exprBuilder.validateExpr(expr))
 
     # Compile filters to JsonQL expected by layers
-    exprCompiler = new ExpressionCompiler(@props.schema)
+    exprCompiler = new ExprCompiler(@props.schema)
     compiledFilters = _.map filters, (expr) =>
-      table = exprBuilder.getExprTable(expr)
+      table = exprUtils.getExprTable(expr)
       jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
       return { table: table, jsonql: jsonql }
 

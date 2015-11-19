@@ -1,6 +1,7 @@
 _ = require 'lodash'
-ExpressionCompiler = require '../expressions/ExpressionCompiler'
-ExpressionBuilder = require '../expressions/ExpressionBuilder'
+ExprCompiler = require('mwater-expressions').ExprCompiler
+ExprUtils = require('mwater-expressions').ExprUtils
+ExprCleaner = require('mwater-expressions').ExprCleaner
 d3Format = require 'd3-format'
 moment = require 'moment'
 
@@ -21,7 +22,8 @@ module.exports = class AxisBuilder
   # Options are: schema
   constructor: (options) ->
     @schema = options.schema
-    @exprBuilder = new ExpressionBuilder(@schema)
+    @exprUtils = new ExprUtils(@schema)
+    @exprCleaner = new ExprCleaner(@schema)
 
   # Clean an axis with respect to a specific table
   # Options:
@@ -37,10 +39,10 @@ module.exports = class AxisBuilder
     axis = _.clone(options.axis)
 
     # Clean expression
-    axis.expr = @exprBuilder.cleanExpr(axis.expr, options.table)
+    axis.expr = @exprCleaner.cleanExpr(axis.expr, { table: options.table })
 
     # Remove if null or no type 
-    type = @exprBuilder.getExprType(axis.expr)
+    type = @exprUtils.getExprType(axis.expr)
     if not type
       return
 
@@ -87,7 +89,7 @@ module.exports = class AxisBuilder
       delete axis.aggr
     else
       # Clean aggr
-      aggrs = @exprBuilder.getAggrs(axis.expr)
+      aggrs = @exprUtils.getAggrs(axis.expr)
       # Remove latest, as it is tricky to group by. TODO
       aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
 
@@ -105,7 +107,7 @@ module.exports = class AxisBuilder
 
       # Set aggr to count if expr is type count and aggr possible
       if options.aggrNeed != "none" and not axis.aggrs
-        if @exprBuilder.getExprType(axis.expr) == "count"
+        if @exprUtils.getExprType(axis.expr) == "count"
           axis.aggr = "count"
 
       # Set aggr to count if needed to satisfy types
@@ -132,15 +134,14 @@ module.exports = class AxisBuilder
       if not options.axis.xform.max?
         return "Missing max"
 
-    # TODO
-    return @exprBuilder.validateExpr(options.axis.expr)
+    return
 
   # Pass axis, tableAlias
   compileAxis: (options) ->
     if not options.axis
       return null
 
-    exprCompiler = new ExpressionCompiler(@schema)
+    exprCompiler = new ExprCompiler(@schema)
     compiledExpr = exprCompiler.compileExpr(expr: options.axis.expr, tableAlias: options.tableAlias, aggr: options.axis.aggr)
 
     # Bin
@@ -304,7 +305,7 @@ module.exports = class AxisBuilder
     switch @getAxisType(axis)
       when "enum"
         # If enum, return enum values
-        return _.map(@exprBuilder.getExprValues(axis.expr), (ev) -> { value: ev.id, label: ev.name })
+        return _.map(@exprUtils.getExprEnumValues(axis.expr), (ev) -> { value: ev.id, label: ev.name })
       when "integer"
         values = _.compact(values)
         if values.length == 0 
@@ -346,7 +347,7 @@ module.exports = class AxisBuilder
     if axis.aggr == "count"
       return "integer"
 
-    type = @exprBuilder.getExprType(axis.expr)
+    type = @exprUtils.getExprType(axis.expr)
 
     if axis.xform 
       xform = _.findWhere(xforms, { type: axis.xform.type, input: type })
@@ -359,14 +360,14 @@ module.exports = class AxisBuilder
     if not axis
       return "None"
 
-    exprType = @exprBuilder.getExprType(axis.expr)
+    exprType = @exprUtils.getExprType(axis.expr)
 
     # Add aggr if not a count type
     if axis.aggr and exprType != "count"
-      aggrName = _.findWhere(@exprBuilder.getAggrs(axis.expr), { id: axis.aggr }).name
-      return aggrName + " " + @exprBuilder.summarizeExpr(axis.expr)
+      aggrName = _.findWhere(@exprUtils.getAggrs(axis.expr), { id: axis.aggr }).name
+      return aggrName + " " + @exprUtils.summarizeExpr(axis.expr)
     else
-      return @exprBuilder.summarizeExpr(axis.expr)
+      return @exprUtils.summarizeExpr(axis.expr)
     # TODO add xform support
 
   # Get a string representation of an axis value

@@ -1,13 +1,5 @@
 ui = require './UIComponents'
 
-exports.Schema = require './Schema'
-exports.LogicalExprComponent = require './expressions/LogicalExprComponent'
-exports.ExpressionBuilder = require './expressions/ExpressionBuilder'
-exports.ExpressionCompiler = require './expressions/ExpressionCompiler'
-exports.ScalarExprComponent = require './expressions/ScalarExprComponent'
-exports.ScalarExprEditorComponent = require './expressions/ScalarExprEditorComponent'
-
-exports.DataSource = require './DataSource'
 exports.CachingDataSource = require './CachingDataSource'
 exports.WidgetFactory = require './widgets/WidgetFactory'
 
@@ -31,9 +23,9 @@ exports.ActionCancelModalComponent = require './ActionCancelModalComponent'
 exports.RadioButtonComponent = require './RadioButtonComponent'
 exports.CheckboxComponent = require './CheckboxComponent'
 
+# TODO REMOVE
 exports.DateRangeComponent = require './DateRangeComponent'
 
-exports.injectTableAlias = require './injectTableAlias'
 exports.TabbedComponent = require './TabbedComponent'
 
 # exports.UIComponents = require './UIComponents'
