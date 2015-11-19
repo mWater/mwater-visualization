@@ -176,7 +176,7 @@ module.exports = class AxisComponent extends React.Component
     H.div null,
       H.div null, 
         @renderAggr()
-        React.createElement(ScalarExprComponent, 
+        React.createElement(ExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           table: @props.table

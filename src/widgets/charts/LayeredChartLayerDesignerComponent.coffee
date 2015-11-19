@@ -9,6 +9,7 @@ EditableLinkComponent = require './../../EditableLinkComponent'
 ColorComponent = require '../../ColorComponent'
 LayeredChartUtils = require './LayeredChartUtils'
 ui = require '../../UIComponents'
+TableSelectComponent = require '../../TableSelectComponent'
 
 module.exports = class LayeredChartLayerDesignerComponent extends React.Component
   @propTypes: 
@@ -101,7 +102,7 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
     layer = @props.design.layers[@props.index]
 
     R ui.SectionComponent, icon: "file", label: "Data Source",
-      @props.schema.createTableSelectElement(layer.table, @handleTableChange)
+      React.createElement(TableSelectComponent, { schema: @props.schema, value: layer.table, onChange: @handleTableChange })
 
   renderXAxis: ->
     layer = @props.design.layers[@props.index]

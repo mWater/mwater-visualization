@@ -1,4 +1,4 @@
-DataSource = require './DataSource'
+DataSource = require('mwater-expressions').DataSource
 LRU = require("lru-cache")
 
 # Data source that caches requests. Designed to be simple for implementation

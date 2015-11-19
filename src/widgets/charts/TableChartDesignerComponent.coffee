@@ -7,6 +7,7 @@ AxisBuilder = require './../../axes/AxisBuilder'
 EditableLinkComponent = require './../../EditableLinkComponent'
 ExprComponent = require("mwater-expressions-ui").ExprComponent
 OrderingsComponent = require './OrderingsComponent'
+TableSelectComponent = require '../../TableSelectComponent'
 
 module.exports = class TableChartDesignerComponent extends React.Component
   @propTypes:
@@ -47,7 +48,7 @@ module.exports = class TableChartDesignerComponent extends React.Component
         " "
         "Data Source"
       ": "
-      @props.schema.createTableSelectElement(@props.design.table, @handleTableChange)
+      React.createElement(TableSelectComponent, { schema: @props.schema, value: @props.design.table, onChange: @handleTableChange })
 
   renderTitle: ->
     H.div className: "form-group",

@@ -5,6 +5,7 @@ ExprUtils = require('mwater-expressions').ExprUtils
 EditableLinkComponent = require '../EditableLinkComponent'
 AxisComponent = require './../axes/AxisComponent'
 ColorComponent = require '../ColorComponent'
+TableSelectComponent = require '../TableSelectComponent'
 
 # Designer for a markers layer
 module.exports = class MarkersLayerDesignerComponent extends React.Component
@@ -96,7 +97,7 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
         " "
         "Data Source"
       ": "
-      @props.schema.createTableSelectElement(@props.sublayer.table, @handleTableChange)
+      React.createElement(TableSelectComponent, { schema: @props.schema, value: @props.sublayer.table, onChange: @handleTableChange })
   
   renderGeometryAxis: ->
     if not @props.sublayer.table
