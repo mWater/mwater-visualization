@@ -11,6 +11,7 @@ LayeredChartDesignerComponent = require './widgets/charts/LayeredChartDesignerCo
 
 LayerFactory = require './maps/LayerFactory'
 WidgetFactory = require './widgets/WidgetFactory'
+CalendarChartViewComponent = require './widgets/charts/CalendarChartViewComponent'
 
 class DashboardPane extends React.Component
   constructor: (props) ->
@@ -59,11 +60,37 @@ class DashboardPane extends React.Component
         titleElem: "Sample"
         })
 
+class TestCalendarChart extends React.Component
+  render: ->
+    calendarData = { main: [
+      { date: "2010-03-09", value: 10 }  # Weird outlier that should be ignored in display (maybe display a tiny warning message ?)
+      { date: "2015-03-01", value: 1 }
+      { date: "2015-03-02", value: 2 }
+      { date: "2015-03-03", value: 4 }
+      { date: "2015-03-05", value: 5 }
+      { date: "2015-03-06", value: 10 }
+      { date: "2015-03-07", value: 5 }
+      { date: "2015-03-09", value: 1 }
+    ]}
+    React.createElement(CalendarChartViewComponent, {
+      design: {}
+      data: calendarData 
+
+      width: 600
+      height: 600
+      standardWidth: 800 # Ignore this
+
+      scope: null # Ignore this
+      onScopeChange: null # Ignore this
+    })
+
+
 $ ->
   sample = H.div className: "container-fluid", style: { height: "100%" },
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
-    React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
+    # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
+    React.createElement(TestCalendarChart)
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
