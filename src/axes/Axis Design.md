@@ -18,3 +18,8 @@ types:
 `year`: year only e.g. `2015-01-01`. type date
 `yearmonth`: year and month only e.g. `2015-02-01`. type date
 `month`: month only e.g. `02`. type enum
+
+
+### bin
+
+min and max are computed by the AxisComponent when it is loaded if the values are not already present.
