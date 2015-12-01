@@ -20,5 +20,6 @@ module.exports = class CalendarChartViewComponent extends React.Component
     not _.isEqual(prevProps, @props)
 
   render: ->
-    H.div null, "THIS SHOULD BE A CALENDAR HEATMAP"
+    H.div style: { width: @props.width, height: @props.height, border: "solid 1px #AAA" }, 
+      "THIS SHOULD BE A CALENDAR HEATMAP"
 
