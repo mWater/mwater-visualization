@@ -6,7 +6,7 @@ Widget = require './Widget'
 SimpleWidgetComponent = require './SimpleWidgetComponent'
 MapDesignerComponent = require '../maps/MapDesignerComponent'
 MapViewComponent = require '../maps/MapViewComponent'
-ModalWindowComponent = require '../ModalWindowComponent'
+ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
 
 module.exports = class MapWidget extends Widget
   # design, schema, dataSource, layerFactory

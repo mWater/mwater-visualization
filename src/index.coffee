@@ -19,7 +19,6 @@ exports.MapDesignerComponent = require './maps/MapDesignerComponent'
 exports.MapComponent = require './maps/MapComponent'
 
 exports.VerticalLayoutComponent = require './VerticalLayoutComponent'
-exports.ActionCancelModalComponent = require './ActionCancelModalComponent'
 exports.RadioButtonComponent = require './RadioButtonComponent'
 exports.CheckboxComponent = require './CheckboxComponent'
 

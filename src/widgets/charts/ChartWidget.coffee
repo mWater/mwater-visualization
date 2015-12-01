@@ -4,9 +4,9 @@ Widget = require './../Widget'
 SimpleWidgetComponent = require './../SimpleWidgetComponent'
 CsvBuilder = require './../../CsvBuilder'
 filesaver = require 'filesaver.js'
-ActionCancelModalComponent = require '../../ActionCancelModalComponent'
+ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
 ChartWidgetViewComponent = require './ChartWidgetViewComponent'
-ModalWindowComponent = require '../../ModalWindowComponent'
+ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
 
 # A widget which is a chart
 module.exports = class ChartWidget extends Widget

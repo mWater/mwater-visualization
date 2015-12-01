@@ -1,7 +1,7 @@
 React = require 'react'
 H = React.DOM
 uuid = require 'node-uuid'
-ActionCancelModalComponent = require '../ActionCancelModalComponent'
+ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
 
 # Designer for layer selection in the map
 module.exports = class MapLayersDesignerComponent extends React.Component

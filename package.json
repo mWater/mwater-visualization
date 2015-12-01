@@ -36,6 +36,7 @@
     "react-dnd": "^2.0.0",
     "react-dnd-html5-backend": "^2.0.0",
     "react-dom": "^0.14.0",
+    "react-library": "github:mwater/react-library",
     "react-motion": "^0.3.0",
     "react-select": "^0.8.0",
     "shallowequal": "^0.2.2",

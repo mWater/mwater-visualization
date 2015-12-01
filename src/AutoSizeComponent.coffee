@@ -2,7 +2,7 @@ React = require 'react'
 ReactDOM = require 'react-dom'
 H = React.DOM
 
-# Automatically injects the width of the DOM element into the
+# Automatically injects the width or height of the DOM element into the
 # child component, updating as window resizes
 module.exports = class AutoSizeComponent extends React.Component
   @propTypes:

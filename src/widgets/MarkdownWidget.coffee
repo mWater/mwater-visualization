@@ -5,7 +5,7 @@ _ = require 'lodash'
 Widget = require './Widget'
 SimpleWidgetComponent = require './SimpleWidgetComponent'
 markdown = require("markdown").markdown
-ModalWindowComponent = require '../ModalWindowComponent'
+ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
 
 module.exports = class MarkdownWidget extends Widget
   constructor: (design) ->
