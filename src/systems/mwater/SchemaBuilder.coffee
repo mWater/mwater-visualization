@@ -568,7 +568,7 @@ module.exports = class SchemaBuilder
             id: "data:#{item._id}:value"
             type: "geometry"
             name: formUtils.localizeString(item.text)
-            # ST_SetSRID(ST_MakePoint(data#>>'{questionid,value,latitude}'::decimal, data#>>'{questionid,value,longitude}'::decimal),4326)
+            # ST_SetSRID(ST_MakePoint(data#>>'{questionid,value,longitude}'::decimal, data#>>'{questionid,value,latitude}'::decimal),4326)
             jsonql: {
               type: "op"
               op: "ST_SetSRID"
@@ -581,14 +581,14 @@ module.exports = class SchemaBuilder
                       type: "op"
                       op: "::decimal"
                       exprs: [
-                        { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{#{item._id},value,latitude}"] }
+                        { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{#{item._id},value,longitude}"] }
                       ]
                     }
                     {
                       type: "op"
                       op: "::decimal"
                       exprs: [
-                        { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{#{item._id},value,longitude}"] }
+                        { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{#{item._id},value,latitude}"] }
                       ]
                     }
                   ]
