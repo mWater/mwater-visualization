@@ -359,7 +359,7 @@ describe "SchemaBuilder", ->
               toTable: "entities.water_point"
               toColumn: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "{alias}", column: "_id" }] }
               op: "="
-              multiple: true
+              multiple: false
             }
           }
         ])
@@ -380,7 +380,7 @@ describe "SchemaBuilder", ->
               toTable: "entities.water_point"
               toColumn: "code"
               op: "="
-              multiple: true
+              multiple: false
             }
           }
         ])
