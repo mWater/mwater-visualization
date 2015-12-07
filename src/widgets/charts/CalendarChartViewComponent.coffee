@@ -5,6 +5,9 @@ moment = require 'moment'
 
 AxisBuilder = require '../../axes/AxisBuilder'
 
+# Require d3-tip to use it
+require('d3-tip')(d3)
+
 # creates a d3 calendar visualization
 module.exports = class CalendarChartViewComponent extends React.Component
   @propTypes:
