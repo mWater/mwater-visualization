@@ -1,12 +1,11 @@
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
-D3 = require 'd3'
 ReactDOM = require 'react-dom'
 
 AxisBuilder = require '../../axes/AxisBuilder'
 
-# creates a D3 calendar visualization
+# creates a d3 calendar visualization
 module.exports = class CalendarChartViewComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired # Design of chart
@@ -25,12 +24,6 @@ module.exports = class CalendarChartViewComponent extends React.Component
     cellColor: React.PropTypes.string #the day cell color
     cellStrokeColor: React.PropTypes.string #the day cell stroke color
 
-  constructor: (props) ->
-    super props
-    @state = {
-      cellSize: Math.floor((props.width - props.monthsStrokeWidth * 2 - 20) / 53)
-    }
-
   @defaultProps:
     monthsStrokeColor: "#222"
     monthsStrokeWidth: 1
@@ -38,6 +31,9 @@ module.exports = class CalendarChartViewComponent extends React.Component
 
   shouldComponentUpdate: (prevProps) ->
     not _.isEqual(prevProps, @props)
+
+  getCellSize: ->
+    Math.floor((@props.width - @props.monthsStrokeWidth * 2 - 20) / 53)
 
   getYears: ->
     years = _.map @props.data.main, (entry) =>
@@ -47,27 +43,27 @@ module.exports = class CalendarChartViewComponent extends React.Component
 
   # @todo: detect outliers/ implement data points threshold
   componentDidMount: ->
-    container = ReactDOM.findDOMNode(@refs.chart_container)
-    cellSize = @state.cellSize
+    container = @refs.chart_container
+    cellSize = @getCellSize()
     height = cellSize * 7 + 10
-    format = D3.time.format("%Y-%m-%d")
-    percent = D3.format(".1%")
+    format = d3.time.format("%Y-%m-%d")
+    percent = d3.format(".1%")
     cellStroke = @props.cellStrokeColor || @props.cellColor
 
-    rgb = D3.rgb(@props.cellColor)
+    rgb = d3.rgb(@props.cellColor)
 
-    data = D3.nest()
+    data = d3.nest()
       .key( (d) -> d.date )
       .rollup( (d) -> d[0].value )
-      .map(@props.data.main, D3.map)
+      .map(@props.data.main, d3.map)
 
-    color = D3.scale.quantize()
-      .domain([1, D3.max(data.values())])
-      .range(D3.range(10).map( (d) ->
+    color = d3.scale.quantize()
+      .domain([1, d3.max(data.values())])
+      .range(d3.range(10).map( (d) ->
         rgb.darker( d * 0.1).toString()
       ))
 
-    svg = D3.select(container).selectAll("svg")
+    svg = d3.select(container).selectAll("svg")
       .data(@getYears())
       .enter().append("svg")
       .attr("width", @props.width)
@@ -82,7 +78,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
       .text( (d,i) -> d )
 
     rect = svg.selectAll(".calendar-chart-day")
-      .data( (d) -> D3.time.days(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
+      .data( (d) -> d3.time.days(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
       .enter().append("rect")
       .attr("class", "calendar-chart-day")
       .attr("fill", "#fff")
@@ -90,7 +86,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
       .attr("stroke-width", @props.monthsStrokeWidth)
       .attr("width", cellSize)
       .attr("height", cellSize)
-      .attr("x", (d) -> D3.time.weekOfYear(d) * cellSize )
+      .attr("x", (d) -> d3.time.weekOfYear(d) * cellSize )
       .attr("y", (d) -> d.getDay() * cellSize )
       .datum(format)
 
@@ -112,9 +108,9 @@ module.exports = class CalendarChartViewComponent extends React.Component
     monthPath = (t0) ->
       t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0)
       d0 = t0.getDay()
-      w0 = D3.time.weekOfYear(t0)
+      w0 = d3.time.weekOfYear(t0)
       d1 = t1.getDay()
-      w1 = D3.time.weekOfYear(t1)
+      w1 = d3.time.weekOfYear(t1)
 
       "M" + (w0 + 1) * cellSize + "," + d0 * cellSize +
         "H" + w0 * cellSize + "V" + 7 * cellSize +
@@ -123,7 +119,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
         "H" + (w0 + 1) * cellSize + "Z"
 
     svg.selectAll(".calendar-chart-month")
-      .data( (d) -> D3.time.months(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
+      .data( (d) -> d3.time.months(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
       .enter().append("path")
       .attr("fill", "none")
       .attr("class", "calendar-chart-month")
@@ -138,7 +134,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
       width: @props.width
       height: @props.height
       border: "solid 1px #AAA"
-      shapeRendering: "crispEdges";
+      shapeRendering: "crispEdges"
 
     H.div {style: style, ref: "chart_container"}
 

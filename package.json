@@ -19,7 +19,6 @@
   "dependencies": {
     "async": "^1.2.1",
     "backbone": "~1.1.2",
-    "d3": "^3.5.10",
     "d3-format": "^0.3.2",
     "filesaver.js": "^0.1.1",
     "js-yaml": "^3.4.0",
