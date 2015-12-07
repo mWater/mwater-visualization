@@ -83,6 +83,7 @@ gulp.task "libs_js", ->
     "./bower_components/lodash/dist/lodash.js"
     "./bower_components/d3/d3.js"
     "./bower_components/c3/c3.js"
+    # "./bower_components/d3-tip/index.js"
   ]).pipe(concat("libs.js"))
     .pipe(gulp.dest("./dist/js/"))
 
