@@ -1,7 +1,7 @@
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
-ReactDOM = require 'react-dom'
+moment = require 'moment'
 
 AxisBuilder = require '../../axes/AxisBuilder'
 
@@ -33,7 +33,13 @@ module.exports = class CalendarChartViewComponent extends React.Component
     not _.isEqual(prevProps, @props)
 
   getCellSize: ->
-    Math.floor((@props.width - @props.monthsStrokeWidth * 2 - 20) / 53)
+    # ((total width) - (total required month stroke) - (left and right padding) - (space for year text) ) / weeks in year
+    cellSizeForWidth = Math.floor((@props.width - @props.monthsStrokeWidth * 2 - 26 ) / 53)
+    years = @getYears()
+
+    # ((total height) - (total required month stroke) - ( total required padding)) / (total year * 7)
+    cellSizeForHeight = Math.floor((@props.height - @props.monthsStrokeWidth * 2 * years.length - (years.length + 1) * 5)  / (years.length * 7) )
+    Math.min(cellSizeForHeight, cellSizeForWidth)
 
   getYears: ->
     years = _.map @props.data.main, (entry) =>
@@ -51,11 +57,21 @@ module.exports = class CalendarChartViewComponent extends React.Component
     cellStroke = @props.cellStrokeColor || @props.cellColor
 
     rgb = d3.rgb(@props.cellColor)
+    years = @getYears()
 
     data = d3.nest()
       .key( (d) -> d.date )
       .rollup( (d) -> d[0].value )
       .map(@props.data.main, d3.map)
+
+    tip = d3.tip().attr('class', 'd3-tip').html( (d) ->
+      _date = moment(d)
+
+      title = '<p>' + _date.format('LL') + '</p>'
+      title += '<p>' + if data.has(d) then data.get(d) else 0 + '<p>'
+
+      title
+    )
 
     color = d3.scale.quantize()
       .domain([1, d3.max(data.values())])
@@ -63,14 +79,18 @@ module.exports = class CalendarChartViewComponent extends React.Component
         rgb.darker( d * 0.1).toString()
       ))
 
+    yearGroupTranslateX = (@props.width - cellSize * 53 - 16 ) / 2 + 16
+
     svg = d3.select(container).selectAll("svg")
-      .data(@getYears())
+      .data(years)
       .enter().append("svg")
       .attr("width", @props.width)
       .attr("height", height)
       .attr("class", "calendar-chart-year")
       .append("g")
-      .attr("transform", "translate(20,5)")
+      .attr("transform", "translate("+yearGroupTranslateX+",5)")
+
+    svg.call(tip)
 
     svg.append("text")
       .attr("transform", "translate(-6," + cellSize * 3.5 + ")rotate(-90)")
@@ -88,19 +108,12 @@ module.exports = class CalendarChartViewComponent extends React.Component
       .attr("height", cellSize)
       .attr("x", (d) -> d3.time.weekOfYear(d) * cellSize )
       .attr("y", (d) -> d.getDay() * cellSize )
+      .on("mouseenter", tip.show)
+      .on("mouseleave", tip.hide)
       .datum(format)
 
-    rect.append("title")
-      .text((d) -> d )
-
-#    rect.on 'mouseenter', (arg) ->
-#      D3.select(@).attr("stroke", "#222")
-#
-#    rect.on 'mouseleave', (arg) ->
-#      D3.select(@).attr("stroke", cellStroke)
-#
-#    rect.on 'click', (e) ->
-#      console.log @
+#    rect.append("title")
+#      .text((d) -> d )
 
     rect.filter( (d) -> data.has(d) )
       .attr( "fill", (d) -> color(data.get(d)))
@@ -131,6 +144,9 @@ module.exports = class CalendarChartViewComponent extends React.Component
 
   render: ->
     style =
+      display: "flex"
+      flexDirection: "column"
+      justifyContent: "center"
       width: @props.width
       height: @props.height
       border: "solid 1px #AAA"

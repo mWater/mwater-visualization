@@ -86,13 +86,35 @@ class TestCalendarChart extends React.Component
       { date: "2015-04-23", value: 8 }
       { date: "2015-04-29", value: 1 }
       { date: "2015-06-01", value: 20 }
+      { date: "2017-03-01", value: 1 }
+      { date: "2017-03-02", value: 2 }
+      { date: "2017-03-03", value: 4 }
+      { date: "2017-03-05", value: 5 }
+      { date: "2017-03-06", value: 10 }
+      { date: "2017-03-07", value: 5 }
+      { date: "2017-03-09", value: 1 }
+      { date: "2017-03-15", value: 19 }
+      { date: "2017-03-17", value: 9 }
+      { date: "2017-03-20", value: 1 }
+      { date: "2017-03-21", value: 21 }
+      { date: "2017-03-22", value: 1 }
+      { date: "2017-03-26", value: 8 }
+      { date: "2017-04-09", value: 43 }
+      { date: "2017-04-10", value: 1 }
+      { date: "2017-04-15", value: 6 }
+      { date: "2017-04-16", value: 1 }
+      { date: "2017-04-19", value: 21 }
+      { date: "2017-04-21", value: 4 }
+      { date: "2017-04-23", value: 8 }
+      { date: "2017-04-29", value: 1 }
+      { date: "2017-06-01", value: 20 }
     ]}
     React.createElement(CalendarChartViewComponent, {
       design: {}
       data: calendarData 
 
-      width: 600
-      height: 600
+      width: 500
+      height: 400
       standardWidth: 800 # Ignore this
 
       scope: null # Ignore this
