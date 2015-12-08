@@ -1,25 +1,36 @@
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
+
 Schema = require('mwater-expressions').Schema
+LayerFactory = require './maps/LayerFactory'
+WidgetFactory = require './widgets/WidgetFactory'
+MWaterDataSource = require './MWaterDataSource'
 MWaterTableSelectComponent = require './MWaterTableSelectComponent'
 querystring = require 'querystring'
 
-# Loads an mWater schema from the server and creates child with schema passed in.
+# Loads an mWater schema from the server and creates child with schema and related items passed in.
 # Also creates a tableSelectElementFactory context to allow selecting of a table in an mWater-friendly way
-module.exports = class MWaterSchemaLoaderComponent extends React.Component
+module.exports = class MWaterLoaderComponent extends React.Component
   @propTypes:
     apiUrl: React.PropTypes.string.isRequired
     client: React.PropTypes.string
     user: React.PropTypes.string                              # username of logged in user
+
     formIds: React.PropTypes.arrayOf(React.PropTypes.string)  # Forms to load in schema
     onFormIdsChange: React.PropTypes.func.isRequired          # Called when form ids are changed and schema should be reloaded
-    children: React.PropTypes.func.isRequired                 # Called with schema
+
+    onMarkerClick: React.PropTypes.func                       # Called with (table, id)
+
+    children: React.PropTypes.func.isRequired                 # Called with { schema:, dataSource:, widgetFactory:, layerFactory: }
 
   constructor: ->
     super
     @state = {
       schema: null
+      dataSource: null
+      widgetFactory: null
+      layerFactory: null
     }
 
     @mounted = false
@@ -56,7 +67,28 @@ module.exports = class MWaterSchemaLoaderComponent extends React.Component
       if not @mounted
         return
 
-      @setState(schema: new Schema(schemaJson))
+      schema = new Schema(schemaJson)
+      dataSource = new MWaterDataSource(@props.apiUrl, @props.client, false)
+
+      layerFactory = new LayerFactory({
+        schema: schema
+        dataSource: dataSource
+        apiUrl: @props.apiUrl
+        client: @props.client
+        newLayers: [
+          { name: "Custom Layer", type: "Markers", design: {} }
+        ]
+        onMarkerClick: @props.onMarkerClick
+      })
+
+      widgetFactory = new WidgetFactory(schema: schema, dataSource: dataSource, layerFactory: layerFactory) 
+
+      @setState({
+        schema: schema
+        dataSource: dataSource
+        layerFactory: layerFactory
+        widgetFactory: widgetFactory
+        })
     # TODO error handling
 
   @childContextTypes: 
@@ -65,16 +97,23 @@ module.exports = class MWaterSchemaLoaderComponent extends React.Component
   getChildContext: ->
     { 
       tableSelectElementFactory: (schema, value, onChange) =>
-        apiUrl: @props.apiUrl
-        client: @props.client
-        schema: schema
-        user: @props.user
-        table: value
-        onChange: onChange
+        return React.createElement(MWaterTableSelectComponent,
+          apiUrl: @props.apiUrl
+          client: @props.client
+          schema: schema
+          user: @props.user
+          table: value
+          onChange: onChange
+        )
     }
 
   render: ->
     if not @state.schema
       return H.div null, "Loading..."
 
-    return @props.children(@state.schema)
+    return @props.children({
+      schema: @state.schema
+      dataSource: @state.dataSource
+      layerFactory: @state.layerFactory
+      widgetFactory: @state.widgetFactory
+    })

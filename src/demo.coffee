@@ -12,6 +12,8 @@ LayeredChartDesignerComponent = require './widgets/charts/LayeredChartDesignerCo
 LayerFactory = require './maps/LayerFactory'
 WidgetFactory = require './widgets/WidgetFactory'
 
+MWaterLoaderComponent = require './MWaterLoaderComponent'
+
 class DashboardPane extends React.Component
   constructor: (props) ->
     super
@@ -59,11 +61,41 @@ class DashboardPane extends React.Component
         titleElem: "Sample"
         })
 
+class MWaterDashboardPane extends React.Component
+  constructor: (props) ->
+    super
+
+    @state = {
+      design: dashboardDesign
+      formIds: null
+    }
+
+  handleDesignChange: (design) =>
+    @setState(design: design)
+    console.log JSON.stringify(design, null, 2)
+    
+  render: ->
+    React.createElement(MWaterLoaderComponent, {
+      apiUrl: @props.apiUrl
+      client: @props.client
+      user: @props.user
+      onFormIdsChange: (formIds) => @setState(formIds: formIds)
+      formIds: @state.formIds
+    }, (options) =>
+      H.div style: { height: "100%" },
+        React.createElement(visualization.DashboardComponent, {
+          design: @state.design
+          widgetFactory: options.widgetFactory
+          onDesignChange: @handleDesignChange
+          titleElem: "Sample"
+        })
+    )
+
 $ ->
   sample = H.div className: "container-fluid", style: { height: "100%" },
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
-    React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
+    React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
