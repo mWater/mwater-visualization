@@ -3,7 +3,7 @@
 Schema = require '../../Schema'
 SchemaBuilder = require './SchemaBuilder'
 LayerFactory = require '../../maps/LayerFactory'
-MWaterDataSource = require './MWaterDataSource'
+MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 WidgetFactory = require '../../widgets/WidgetFactory'
 
 fs = require 'fs'

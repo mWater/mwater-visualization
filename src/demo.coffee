@@ -13,6 +13,7 @@ LayerFactory = require './maps/LayerFactory'
 WidgetFactory = require './widgets/WidgetFactory'
 
 MWaterLoaderComponent = require './MWaterLoaderComponent'
+MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 
 class DashboardPane extends React.Component
   constructor: (props) ->
