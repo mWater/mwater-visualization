@@ -149,10 +149,10 @@ module.exports = class LayeredChartCompiler
 
   # Compiles data part of C3 chart, including data map back to original data
   # Outputs: columns, types, names, colors. Also dataMap which is a map of "layername:index" to { layerIndex, row }
-  compileData: (design, data) ->
+  compileData: (design, data, locale) ->
     # If polar chart (no x axis)
     if design.type in ['pie', 'donut'] or _.any(design.layers, (l) -> l.type in ['pie', 'donut'])
-      return @compileDataPolar(design, data)
+      return @compileDataPolar(design, data, locale)
 
     # Check if categorical x axis (bar charts always are)
     isCategoricalX = design.type == "bar" or _.any(design.layers, (l) -> l.type == "bar")
@@ -163,12 +163,12 @@ module.exports = class LayeredChartCompiler
       isCategoricalX = true
 
     if isCategoricalX
-      return @compileDataCategorical(design, data)
+      return @compileDataCategorical(design, data, locale)
     else
-      return @compileDataNonCategorical(design, data)
+      return @compileDataNonCategorical(design, data, locale)
 
   # Compiles data for a polar chart (pie/donut) with no x axis
-  compileDataPolar: (design, data) ->
+  compileDataPolar: (design, data, locale) ->
     columns = []
     types = {}
     names = {}
@@ -185,7 +185,7 @@ module.exports = class LayeredChartCompiler
           # Pie series contain a single value
           columns.push([series, row.y])
           types[series] = @getLayerType(design, layerIndex)
-          names[series] = @axisBuilder.formatValue(layer.axes.color, row.color)
+          names[series] = @axisBuilder.formatValue(layer.axes.color, row.color, locale)
           dataMap[series] = { layerIndex: layerIndex, row: row }
 
           # TODO REMOVE
@@ -218,11 +218,11 @@ module.exports = class LayeredChartCompiler
       dataMap: dataMap
       colors: colors
       xAxisType: "category" # Polar charts are always category x-axis
-      titleText: @compileTitleText(design)
+      titleText: @compileTitleText(design, locale)
     }
 
   # Compiles data for a chart like line or scatter that does not have a categorical x axis
-  compileDataNonCategorical: (design, data) ->
+  compileDataNonCategorical: (design, data, locale) ->
     columns = []
     types = {}
     names = {}
@@ -258,7 +258,7 @@ module.exports = class LayeredChartCompiler
           columns.push([seriesX].concat(_.pluck(rows, "x")))
 
           types[seriesY] = @getLayerType(design, layerIndex)
-          names[seriesY] = @axisBuilder.formatValue(layer.axes.color, colorValue)
+          names[seriesY] = @axisBuilder.formatValue(layer.axes.color, colorValue, locale)
           xs[seriesY] = seriesX
 
           _.each rows, (row, rowIndex) =>
@@ -293,12 +293,12 @@ module.exports = class LayeredChartCompiler
       xs: xs
       xAxisType: if (xType in ["date"]) then "timeseries" else "indexed" 
       xAxisTickFit: false   # Don't put a tick for each point
-      xAxisLabelText: @compileXAxisLabelText(design)
-      yAxisLabelText: @compileYAxisLabelText(design)
-      titleText: @compileTitleText(design)
+      xAxisLabelText: @compileXAxisLabelText(design, locale)
+      yAxisLabelText: @compileYAxisLabelText(design, locale)
+      titleText: @compileTitleText(design, locale)
     }
 
-  compileDataCategorical: (design, data) ->
+  compileDataCategorical: (design, data, locale) ->
     columns = []
     types = {}
     names = {}
@@ -320,7 +320,7 @@ module.exports = class LayeredChartCompiler
       xValues = _.union(xValues, _.uniq(_.pluck(layerData, "x")))
 
     # Categories will be in form [{ value, label }]
-    categories = @axisBuilder.getCategories(xAxis, xValues)
+    categories = @axisBuilder.getCategories(xAxis, xValues, locale)
 
     # Create map of category value to index
     categoryMap = _.object(_.map(categories, (c, i) -> [c.value, i]))
@@ -366,7 +366,7 @@ module.exports = class LayeredChartCompiler
           columns.push([series].concat(column))
 
           types[series] = @getLayerType(design, layerIndex)
-          names[series] = @axisBuilder.formatValue(layer.axes.color, colorValue)
+          names[series] = @axisBuilder.formatValue(layer.axes.color, colorValue, locale)
           xs[series] = "x"
 
       else
@@ -430,9 +430,9 @@ module.exports = class LayeredChartCompiler
       groups: groups
       xAxisType: "category" 
       xAxisTickFit: xType != "date"   # Put a tick for each point since categorical unless date
-      xAxisLabelText: @compileXAxisLabelText(design)
-      yAxisLabelText: @compileYAxisLabelText(design)
-      titleText: @compileTitleText(design)
+      xAxisLabelText: @compileXAxisLabelText(design, locale)
+      yAxisLabelText: @compileYAxisLabelText(design, locale)
+      titleText: @compileTitleText(design, locale)
     }
 
   # Compile an expression
@@ -458,7 +458,7 @@ module.exports = class LayeredChartCompiler
   isColorAxisRequired: (design, layerIndex) ->
     return @getLayerType(design, layerIndex) in ['pie', 'donut']
 
-  compileDefaultTitleText: (design) ->
+  compileDefaultTitleText: (design, locale) ->
     # Don't default this for now
     return ""
     # if design.layers[0].axes.x
@@ -466,25 +466,25 @@ module.exports = class LayeredChartCompiler
     # else
     #   return @compileYAxisLabelText(design) + " by " + @axisBuilder.summarizeAxis(design.layers[0].axes.color)
 
-  compileDefaultYAxisLabelText: (design) ->
-    @axisBuilder.summarizeAxis(design.layers[0].axes.y)
+  compileDefaultYAxisLabelText: (design, locale) ->
+    @axisBuilder.summarizeAxis(design.layers[0].axes.y, locale)
 
-  compileDefaultXAxisLabelText: (design) ->
-    @axisBuilder.summarizeAxis(design.layers[0].axes.x)
+  compileDefaultXAxisLabelText: (design, locale) ->
+    @axisBuilder.summarizeAxis(design.layers[0].axes.x, locale)
 
-  compileTitleText: (design) ->
-    return design.titleText or @compileDefaultTitleText(design)
+  compileTitleText: (design, locale) ->
+    return design.titleText or @compileDefaultTitleText(design, locale)
 
-  compileYAxisLabelText: (design) ->
-    return design.yAxisLabelText or @compileDefaultYAxisLabelText(design)
+  compileYAxisLabelText: (design, locale) ->
+    return design.yAxisLabelText or @compileDefaultYAxisLabelText(design, locale)
 
-  compileXAxisLabelText: (design) ->
-    return design.xAxisLabelText or @compileDefaultXAxisLabelText(design)
+  compileXAxisLabelText: (design, locale) ->
+    return design.xAxisLabelText or @compileDefaultXAxisLabelText(design, locale)
 
   # Create a scope based on a row of a layer
   # Scope data is relevant data from row that uniquely identifies scope
   # plus a layer index
-  createScope: (design, layerIndex, row) ->
+  createScope: (design, layerIndex, row, locale) ->
     expressionBuilder = new ExprUtils(@schema)
 
     # Get layer
@@ -497,12 +497,12 @@ module.exports = class LayeredChartCompiler
     # If x
     if layer.axes.x
       filters.push(@axisBuilder.createValueFilter(layer.axes.x, row.x))
-      names.push(@axisBuilder.summarizeAxis(layer.axes.x) + " is " + @axisBuilder.formatValue(layer.axes.x, row.x))
+      names.push(@axisBuilder.summarizeAxis(layer.axes.x, locale) + " is " + @axisBuilder.formatValue(layer.axes.x, row.x, locale))
       data.x = row.x
 
     if layer.axes.color
       filters.push(@axisBuilder.createValueFilter(layer.axes.color, row.color))
-      names.push(@axisBuilder.summarizeAxis(layer.axes.color) + " is " + @axisBuilder.formatValue(layer.axes.color, row.color))
+      names.push(@axisBuilder.summarizeAxis(layer.axes.color, locale) + " is " + @axisBuilder.formatValue(layer.axes.color, row.color, locale))
       data.color = row.color
 
     if filters.length > 1
@@ -521,7 +521,7 @@ module.exports = class LayeredChartCompiler
       }
 
     scope = {
-      name: @schema.getTable(layer.table).name + " " + names.join(" and ")
+      name: ExprUtils.localizeString(@schema.getTable(layer.table).name, locale) + " " + names.join(" and ")
       filter: filter
       data: data
     }

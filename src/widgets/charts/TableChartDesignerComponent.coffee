@@ -138,6 +138,9 @@ class TableChartColumnDesignerComponent extends React.Component
     onChange: React.PropTypes.func.isRequired
     onRemove: React.PropTypes.func.isRequired
 
+  @contextTypes:
+    locale: React.PropTypes.string  # e.g. "en"
+
   # Updates column with the specified changes
   updateColumn: (changes) ->
     column = _.extend({}, @props.design.columns[@props.index], changes)
@@ -176,7 +179,7 @@ class TableChartColumnDesignerComponent extends React.Component
     column = @props.design.columns[@props.index]
 
     axisBuilder = new AxisBuilder(schema: @props.schema)
-    placeholder = axisBuilder.summarizeAxis(column.textAxis)
+    placeholder = axisBuilder.summarizeAxis(column.textAxis, @context.locale)
 
     H.div null,
       H.label className: "text-muted", "Header"

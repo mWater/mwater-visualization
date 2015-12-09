@@ -6,6 +6,7 @@ querystring = require 'querystring'
 TabbedComponent = require('mwater-visualization').TabbedComponent
 ToggleEditComponent = require('mwater-visualization').ToggleEditComponent
 OptionListComponent = require('mwater-visualization').OptionListComponent
+ExprUtils = require("mwater-expressions").ExprUtils
 
 siteTypes = ["entities.water_point", "entities.household", "entities.sanitation_facility", "entities.community", "entities.school", "entities.health_facility", "entities.surface_water"]
 
@@ -20,6 +21,9 @@ module.exports = class MWaterTableSelectComponent extends React.Component
     table: React.PropTypes.string
     onChange: React.PropTypes.func.isRequired # Called with table selected
 
+  @contextTypes:
+    locale: React.PropTypes.string  # e.g. "en"
+
   handleChange: (tableId) =>
     # Close toggle edit
     @refs.toggleEdit.close()
@@ -29,7 +33,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
     R OptionListComponent,
       items: _.map(siteTypes, (tableId) =>
         table = @props.schema.getTable(tableId)
-        return { name: table.name, desc: table.desc, onClick: @handleChange.bind(null, table.id) }
+        return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @handleChange.bind(null, table.id) }
       )
 
   renderForms: ->
@@ -45,7 +49,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
     otherTables = _.sortBy(otherTables, "name")
     R OptionListComponent,
       items: _.map(otherTables, (table) =>
-        return { name: table.name, desc: table.desc, onClick: @handleChange.bind(null, table.id) }
+        return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @handleChange.bind(null, table.id) }
       )
 
   render: ->
@@ -60,7 +64,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
     R ToggleEditComponent,
       ref: "toggleEdit"
       forceOpen: not @props.table # Must have table
-      label: if @props.table then @props.schema.getTable(@props.table).name
+      label: if @props.table then ExprUtils.localizeString(@props.schema.getTable(@props.table).name, @context.locale)
       editor: editor
 
 
@@ -71,6 +75,9 @@ class FormsListComponent extends React.Component
     schema: React.PropTypes.object.isRequired
     user: React.PropTypes.string
     onChange: React.PropTypes.func.isRequired # Called with table selected
+
+  @contextTypes:
+    locale: React.PropTypes.string  # e.g. "en"
 
   constructor: ->
     super
@@ -96,7 +103,7 @@ class FormsListComponent extends React.Component
         ], ['desc', 'desc'])
 
       # TODO use name instead of design.name
-      @setState(forms: _.map(forms, (form) -> { id: "responses:" + form._id, name: form.design.name[form.design.name._base or "en"] or "", desc: "Created by #{form.created.by}" }))
+      @setState(forms: _.map(forms, (form) => { id: "responses:" + form._id, name: ExprUtils.localizeString(form.design.name, @context.locale), desc: "Created by #{form.created.by}" }))
     .fail (xhr) =>
       @setState(error: xhr.responseText)
 

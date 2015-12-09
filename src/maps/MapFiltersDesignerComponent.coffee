@@ -2,6 +2,7 @@ React = require 'react'
 H = React.DOM
 ExprComponent = require("mwater-expressions-ui").ExprComponent
 ExprCleaner = require('mwater-expressions').ExprCleaner
+ExprUtils = require('mwater-expressions').ExprUtils
 
 # Designer for filters for a map
 module.exports = class MapFiltersDesignerComponent extends React.Component
@@ -11,6 +12,9 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
     layerFactory: React.PropTypes.object.isRequired # layer factory to use
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
+
+  @contextTypes:
+    locale: React.PropTypes.string  # e.g. "en"
 
   handleFilterChange: (table, expr) =>
     # Clean filter
@@ -24,7 +28,7 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
     @props.onDesignChange(design)
 
   renderFilterableTable: (table) =>
-    name = @props.schema.getTable(table).name
+    name = ExprUtils.localizeString(@props.schema.getTable(table).name, @context.locale)
 
     H.div key: table, 
       H.h4 null, name

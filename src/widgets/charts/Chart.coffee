@@ -40,6 +40,6 @@ module.exports = class Chart
     return []
 
   # Creates a table form of the chart data. Array of arrays
-  createDataTable: (design, data) ->
+  createDataTable: (design, data, locale) ->
     throw new Error("Not implemented")
 

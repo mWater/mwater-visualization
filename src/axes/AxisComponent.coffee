@@ -26,6 +26,9 @@ module.exports = class AxisComponent extends React.Component
 
     required: React.PropTypes.bool  # Makes this a required value
 
+  @contextTypes:
+    locale: React.PropTypes.string  # e.g. "en"
+
   componentDidMount: ->
     @checkMinMaxComputation(@props)
 

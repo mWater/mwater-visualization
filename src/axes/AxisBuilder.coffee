@@ -234,7 +234,7 @@ module.exports = class AxisBuilder
 
   # Get all categories for a given axis type given the known values
   # Returns array of { value, label }
-  getCategories: (axis, values) ->
+  getCategories: (axis, values, locale) ->
     # Handle binning first
     if axis.xform and axis.xform.type == "bin"
       min = axis.xform.min
@@ -305,7 +305,7 @@ module.exports = class AxisBuilder
     switch @getAxisType(axis)
       when "enum"
         # If enum, return enum values
-        return _.map(@exprUtils.getExprEnumValues(axis.expr), (ev) -> { value: ev.id, label: ev.name })
+        return _.map(@exprUtils.getExprEnumValues(axis.expr), (ev) -> { value: ev.id, label: ExprUtils.localizeString(ev.name, locale) })
       when "integer"
         values = _.compact(values)
         if values.length == 0 
@@ -356,7 +356,7 @@ module.exports = class AxisBuilder
     return type
 
   # Summarize axis as a string
-  summarizeAxis: (axis) ->
+  summarizeAxis: (axis, locale) ->
     if not axis
       return "None"
 
@@ -365,18 +365,18 @@ module.exports = class AxisBuilder
     # Add aggr if not a count type
     if axis.aggr and exprType != "count"
       aggrName = _.findWhere(@exprUtils.getAggrs(axis.expr), { id: axis.aggr }).name
-      return aggrName + " " + @exprUtils.summarizeExpr(axis.expr)
+      return aggrName + " " + @exprUtils.summarizeExpr(axis.expr, locale)
     else
-      return @exprUtils.summarizeExpr(axis.expr)
+      return @exprUtils.summarizeExpr(axis.expr, locale)
     # TODO add xform support
 
   # Get a string representation of an axis value
-  formatValue: (axis, value) ->
+  formatValue: (axis, value, locale) ->
     if not value?
       return "None"
 
     # If has categories, use those
-    categories = @getCategories(axis, [])
+    categories = @getCategories(axis, [], locale)
     if categories.length > 0
       category = _.findWhere(categories, value: value)
       if category

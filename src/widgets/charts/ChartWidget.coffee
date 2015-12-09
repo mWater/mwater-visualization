@@ -58,6 +58,9 @@ class ChartWidgetComponent extends React.Component
     connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
     connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
 
+  @contextTypes:
+    locale: React.PropTypes.string  # e.g. "en"
+
   constructor: (props) ->
     super
     @state = { 
@@ -76,7 +79,7 @@ class ChartWidgetComponent extends React.Component
         return alert("Failed to get data")
 
       # Create data table
-      table = @props.chart.createDataTable(@props.design, data)
+      table = @props.chart.createDataTable(@props.design, data, @context.locale)
 
       # Convert to csv
       csv = new CsvBuilder().build(table)

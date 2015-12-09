@@ -160,25 +160,25 @@ module.exports = class LayeredChart extends Chart
 
     return [{ label: "Save Image", icon: "camera", onClick: save }]
 
-  createDataTable: (design, data) ->
+  createDataTable: (design, data, locale) ->
     # Export only first layer
     headers = []
     if design.layers[0].axes.x
-      headers.push(@axisBuilder.summarizeAxis(design.layers[0].axes.x))
+      headers.push(@axisBuilder.summarizeAxis(design.layers[0].axes.x, locale))
     if design.layers[0].axes.color
-      headers.push(@axisBuilder.summarizeAxis(design.layers[0].axes.color))
+      headers.push(@axisBuilder.summarizeAxis(design.layers[0].axes.color, locale))
     if design.layers[0].axes.y
-      headers.push(@axisBuilder.summarizeAxis(design.layers[0].axes.y))
+      headers.push(@axisBuilder.summarizeAxis(design.layers[0].axes.y, locale))
     table = [headers]
 
     for row in data.layer0
       r = []
       if design.layers[0].axes.x
-        r.push(@axisBuilder.formatValue(design.layers[0].axes.x, row.x))
+        r.push(@axisBuilder.formatValue(design.layers[0].axes.x, row.x, locale))
       if design.layers[0].axes.color
-        r.push(@axisBuilder.formatValue(design.layers[0].axes.color, row.color))
+        r.push(@axisBuilder.formatValue(design.layers[0].axes.color, row.color, locale))
       if design.layers[0].axes.y
-        r.push(@axisBuilder.formatValue(design.layers[0].axes.y, row.y))
+        r.push(@axisBuilder.formatValue(design.layers[0].axes.y, row.y, locale))
       table.push(r)
 
     return table

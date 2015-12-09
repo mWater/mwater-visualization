@@ -20,6 +20,9 @@ module.exports = class LayeredChartViewComponent extends React.Component
     scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
+  @contextTypes:
+    locale: React.PropTypes.string  # e.g. "en"
+
   constructor: ->
     super
 
@@ -96,7 +99,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
       .style("opacity", (d,i) =>
         dataPoint = @lookupDataPoint(dataMap, d)
         if dataPoint
-          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
+          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @context.locale)
 
         # Determine if scoped
         if scope and @props.scope 
@@ -115,7 +118,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
       .style("opacity", (d, i) =>
         dataPoint = @lookupDataPoint(dataMap, d)
         if dataPoint
-          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
+          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @context.locale)
 
         # Determine if scoped
         if @props.scope 
@@ -158,7 +161,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
     # Create scope
     compiler = new LayeredChartCompiler(schema: @props.schema)
-    scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row)
+    scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @context.locale)
 
     # If same scope data, remove scope
     if @props.scope and _.isEqual(scope.data, @props.scope.data)

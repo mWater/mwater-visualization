@@ -16,11 +16,14 @@ module.exports = class TableChartViewComponent extends React.Component
     scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
+  @contextTypes:
+    locale: React.PropTypes.string  # e.g. "en"
+
   renderHeaderCell: (index) ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
     column = @props.design.columns[index]
 
-    text = column.headerText or axisBuilder.summarizeAxis(column.textAxis)
+    text = column.headerText or axisBuilder.summarizeAxis(column.textAxis, @context.locale)
     H.th key: index,
       text
 
@@ -38,7 +41,7 @@ module.exports = class TableChartViewComponent extends React.Component
 
     # Convert to string
     axisBuilder = new AxisBuilder(schema: @props.schema)
-    str = axisBuilder.formatValue(column.textAxis, value)
+    str = axisBuilder.formatValue(column.textAxis, value, @context.locale)
     return H.td(key: columnIndex, str)
 
   renderRow: (index) ->
