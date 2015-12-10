@@ -44,6 +44,14 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       user: @props.user
       onChange: @handleChange
 
+  renderIndicators: ->
+    tables = _.filter(@props.schema.getTables(), (table) => table.id.match(/^indicator_values:/))
+    tables = _.sortBy(tables, "name")
+    R OptionListComponent,
+      items: _.map(tables, (table) =>
+        return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @handleChange.bind(null, table.id) }
+      )
+
   renderOther: ->
     otherTables = _.filter(@props.schema.getTables(), (table) => table.id not in siteTypes and not table.id.match(/^responses:/))
     otherTables = _.sortBy(otherTables, "name")
@@ -57,6 +65,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       tabs: [
         { id: "sites", label: "Sites", elem: @renderSites() }
         { id: "forms", label: "Forms", elem: @renderForms() }
+        { id: "indicators", label: "Indicators", elem: @renderIndicators() }
         { id: "other", label: "Other", elem: @renderOther() }
       ]
       initialTabId: "sites"
@@ -66,7 +75,6 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       forceOpen: not @props.table # Must have table
       label: if @props.table then ExprUtils.localizeString(@props.schema.getTable(@props.table).name, @context.locale)
       editor: editor
-
 
 class FormsListComponent extends React.Component
   @propTypes:
