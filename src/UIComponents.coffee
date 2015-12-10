@@ -33,8 +33,8 @@ exports.OptionListComponent = class OptionListComponent extends React.Component
     H.div null,
       H.div style: { color: "#AAA", fontStyle: "italic" }, key: "hint", @props.hint
       H.div className: "mwater-visualization-big-options", key: "options",
-        _.map @props.items, (item) =>
-          R OptionComponent, name: item.name, desc: item.desc, onClick: item.onClick, key: item.name
+        _.map @props.items, (item, i) =>
+          R OptionComponent, name: item.name, desc: item.desc, onClick: item.onClick, key: i
 
 # Single option
 class OptionComponent extends React.Component

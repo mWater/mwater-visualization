@@ -5,7 +5,7 @@ QueryDataLoadingComponent = require './../QueryDataLoadingComponent'
 # Inner view part of the chart widget. Uses a query data loading component
 # to handle loading and continues to display old data if design becomes
 # invalid
-module.exports = class ChartWidgetViewComponent extends React.Component
+module.exports = class ChartViewComponent extends React.Component
   @propTypes:
     chart: React.PropTypes.object.isRequired # Chart object to use
     design: React.PropTypes.object.isRequired # Design of chart

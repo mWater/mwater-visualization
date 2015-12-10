@@ -18,7 +18,7 @@ module.exports = class MWaterLoaderComponent extends React.Component
     user: React.PropTypes.string                              # username of logged in user
 
     formIds: React.PropTypes.arrayOf(React.PropTypes.string)  # Forms to load in schema
-    onFormIdsChange: React.PropTypes.func.isRequired          # Called when form ids are changed and schema should be reloaded
+    onFormIdsChange: React.PropTypes.func                     # Called when form ids are changed and schema should be reloaded
 
     onMarkerClick: React.PropTypes.func                       # Called with (table, id)
 
@@ -53,13 +53,13 @@ module.exports = class MWaterLoaderComponent extends React.Component
       return
 
     # Load schema
-    url = @props.apiUrl + "jsonql/schema"
+    url = newProps.apiUrl + "jsonql/schema"
 
     query = {}
-    if @props.client
-      query.client = @props.client
-    if @props.formIds and @props.formIds.length > 0
-      query.formIds = @props.formIds.join(',')
+    if newProps.client
+      query.client = newProps.client
+    if newProps.formIds and newProps.formIds.length > 0
+      query.formIds = newProps.formIds.join(',')
 
     url += "?" + querystring.stringify(query)
 
@@ -68,17 +68,17 @@ module.exports = class MWaterLoaderComponent extends React.Component
         return
 
       schema = new Schema(schemaJson)
-      dataSource = new MWaterDataSource(@props.apiUrl, @props.client, false)
+      dataSource = new MWaterDataSource(newProps.apiUrl, newProps.client, false)
 
       layerFactory = new LayerFactory({
         schema: schema
         dataSource: dataSource
-        apiUrl: @props.apiUrl
-        client: @props.client
+        apiUrl: newProps.apiUrl
+        client: newProps.client
         newLayers: [
           { name: "Custom Layer", type: "Markers", design: {} }
         ]
-        onMarkerClick: @props.onMarkerClick
+        onMarkerClick: newProps.onMarkerClick
       })
 
       widgetFactory = new WidgetFactory(schema: schema, dataSource: dataSource, layerFactory: layerFactory) 
@@ -104,6 +104,8 @@ module.exports = class MWaterLoaderComponent extends React.Component
           user: @props.user
           table: value
           onChange: onChange
+          formIds: @props.formIds
+          onFormIdsChange: @props.onFormIdsChange
         )
     }
 

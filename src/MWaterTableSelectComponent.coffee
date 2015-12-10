@@ -21,13 +21,46 @@ module.exports = class MWaterTableSelectComponent extends React.Component
     table: React.PropTypes.string
     onChange: React.PropTypes.func.isRequired # Called with table selected
 
+    formIds: React.PropTypes.array.isRequired
+    onFormIdsChange: React.PropTypes.func.isRequired
+
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
+
+  constructor: ->
+    super
+
+    @state = {
+      pendingFormId: null   # Set when waiting for a form to load
+    }
+
+  componentWillReceiveProps: (nextProps) ->
+    # If received new schema with pending form, select it
+    if @state.pendingFormId
+      tableId = "responses:#{@state.pendingFormId}"
+      if nextProps.schema.getTable(tableId)
+        # No longer waiting
+        @setState(pendingFormId: null)
+
+        # Close toggle edit
+        @refs.toggleEdit.close()
+        
+        # Fire change
+        nextProps.onChange(tableId)
 
   handleChange: (tableId) =>
     # Close toggle edit
     @refs.toggleEdit.close()
     @props.onChange(tableId)
+
+  handleFormChange: (formId) =>
+    # If not part of formIds, add it and wait for new schema
+    if formId not in @props.formIds
+      @setState(pendingFormId: formId, =>
+        @props.onFormIdsChange([formId].concat(@props.formIds))
+      )
+    else
+      @handleChange("responses:#{formId}")
 
   renderSites: ->
     R OptionListComponent,
@@ -42,7 +75,8 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       client: @props.client
       apiUrl: @props.apiUrl
       user: @props.user
-      onChange: @handleChange
+      onChange: @handleFormChange
+      includedFormIds: @props.formIds
 
   renderIndicators: ->
     tables = _.filter(@props.schema.getTables(), (table) => table.id.match(/^indicator_values:/))
@@ -76,6 +110,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       label: if @props.table then ExprUtils.localizeString(@props.schema.getTable(@props.table).name, @context.locale)
       editor: editor
 
+# Searchable list of forms
 class FormsListComponent extends React.Component
   @propTypes:
     apiUrl: React.PropTypes.string.isRequired # Url to hit api
@@ -83,6 +118,7 @@ class FormsListComponent extends React.Component
     schema: React.PropTypes.object.isRequired
     user: React.PropTypes.string
     onChange: React.PropTypes.func.isRequired # Called with table selected
+    includedFormIds: React.PropTypes.array.isRequired
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
@@ -106,12 +142,13 @@ class FormsListComponent extends React.Component
       
       # Sort by modified.on desc but first by user
       forms = _.sortByOrder(forms, [
+        (form) => if form._id in @props.includedFormIds then 1 else 0
         (form) => if form.created.by == @props.user then 1 else 0
         (form) => form.modified.on
-        ], ['desc', 'desc'])
+        ], ['desc', 'desc', 'desc'])
 
       # TODO use name instead of design.name
-      @setState(forms: _.map(forms, (form) => { id: "responses:" + form._id, name: ExprUtils.localizeString(form.design.name, @context.locale), desc: "Created by #{form.created.by}" }))
+      @setState(forms: _.map(forms, (form) => { id: form._id, name: ExprUtils.localizeString(form.design.name, @context.locale), desc: "Created by #{form.created.by}" }))
     .fail (xhr) =>
       @setState(error: xhr.responseText)
 

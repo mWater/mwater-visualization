@@ -5,7 +5,7 @@ SimpleWidgetComponent = require './../SimpleWidgetComponent'
 CsvBuilder = require './../../CsvBuilder'
 filesaver = require 'filesaver.js'
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
-ChartWidgetViewComponent = require './ChartWidgetViewComponent'
+ChartViewComponent = require './ChartViewComponent'
 ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
 
 # A widget which is a chart
@@ -100,7 +100,7 @@ class ChartWidgetComponent extends React.Component
       @props.onRemove()
 
   renderChart: (width, height) ->
-    React.createElement(ChartWidgetViewComponent, 
+    React.createElement(ChartViewComponent, 
       chart: @props.chart
       design: @props.design
       dataSource: @props.dataSource

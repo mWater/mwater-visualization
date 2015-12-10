@@ -1,5 +1,6 @@
 ui = require './UIComponents'
 
+# TODO still needed?
 exports.CachingDataSource = require './CachingDataSource'
 exports.WidgetFactory = require './widgets/WidgetFactory'
 
@@ -30,6 +31,11 @@ exports.TabbedComponent = require './TabbedComponent'
 # exports.UIComponents = require './UIComponents'
 exports.ToggleEditComponent = ui.ToggleEditComponent
 exports.OptionListComponent = ui.OptionListComponent
+
+exports.MWaterLoaderComponent = require './MWaterLoaderComponent'
+
+exports.LayeredChart = require './widgets/charts/LayeredChart'
+exports.ChartViewComponent = require './widgets/charts/ChartViewComponent'
 
 # http://stackoverflow.com/questions/19305821/multiple-modals-overlay
 $ = require 'jquery'
