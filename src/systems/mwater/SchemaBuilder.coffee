@@ -633,14 +633,18 @@ module.exports = class SchemaBuilder
               fromTable: "responses"
               fromColumn: {
                 type: "op"
-                op: "#>>"
-                exprs: [
-                  { type: "field", tableAlias: "{alias}", column: "data" }
-                  "{#{item._id},value}"
-                ]
+                op: "::uuid"
+                exprs: [{
+                  type: "op"
+                  op: "#>>"
+                  exprs: [
+                    { type: "field", tableAlias: "{alias}", column: "data" }
+                    "{#{item._id},value}"
+                  ]
+                }]
               }
               toTable: "entities.#{item.entityType}"
-              toColumn: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "{alias}", column: "_id" }] }
+              toColumn: { type: "field", tableAlias: "{alias}", column: "_id" }
               op: "="
               multiple: false
             }

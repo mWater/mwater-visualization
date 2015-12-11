@@ -326,14 +326,14 @@ describe "SchemaBuilder", ->
                       type: "op"
                       op: "::decimal"
                       exprs: [
-                        { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{questionid,value,latitude}"] }
+                        { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{questionid,value,longitude}"] }
                       ]
                     }
                     {
                       type: "op"
                       op: "::decimal"
                       exprs: [
-                        { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{questionid,value,longitude}"] }
+                        { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{questionid,value,latitude}"] }
                       ]
                     }
                   ]
@@ -352,12 +352,12 @@ describe "SchemaBuilder", ->
           { 
             id: "data:questionid:value" 
             type: "join"
-            # data#>>'{questionid,value} = entities.water_point._id::text'
+            # data#>>'{questionid,value}::uuid = entities.water_point._id'
             join: {
               fromTable: "responses"
-              fromColumn: { type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{questionid,value}"] }
+              fromColumn: { type: "op", op: "::uuid", exprs: [{ type: "op", op: "#>>", exprs: [{ type: "field", tableAlias: "{alias}", column: "data" }, "{questionid,value}"] } ] }
               toTable: "entities.water_point"
-              toColumn: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "{alias}", column: "_id" }] }
+              toColumn: { type: "field", tableAlias: "{alias}", column: "_id" }
               op: "="
               multiple: false
             }
