@@ -50,7 +50,7 @@ gulp.task "water_org_libs_css", ->
 gulp.task "water_org_libs_js", ->
   return gulp.src([
     "./bower_components/bootstrap/dist/js/bootstrap.js"
-    "./bower_components/lodash/dist/lodash.min.js"
+    "./bower_components/lodash/lodash.min.js"
     "./bower_components/c3/c3.min.js"
   ]).pipe(concat("libs.js"))
     .pipe(gulp.dest("./dist/water_org/"))
@@ -80,7 +80,7 @@ gulp.task "libs_js", ->
   return gulp.src([
     "./bower_components/jquery/dist/jquery.js"
     "./bower_components/bootstrap/dist/js/bootstrap.js"
-    "./bower_components/lodash/dist/lodash.js"
+    "./bower_components/lodash/lodash.js"
     "./bower_components/d3/d3.js"
     "./bower_components/c3/c3.js"
   ]).pipe(concat("libs.js"))
