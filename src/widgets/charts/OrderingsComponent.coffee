@@ -70,7 +70,7 @@ class OrderingComponent extends React.Component
         schema: @props.schema
         dataSource: @props.dataSource
         table: @props.table
-        types: ['text', 'integer', 'decimal', 'boolean', 'date', 'datetime']
+        types: ['text', 'number', 'boolean', 'date', 'datetime']
         aggrNeed: 'optional'
         value: @props.ordering.axis
         onChange: @handleAxisChange

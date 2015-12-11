@@ -49,8 +49,8 @@ module.exports = class LayeredChart extends Chart
       if not compiler.canLayerUseXExpr(design, layerId) and layer.axes.x
         delete layer.axes.x
 
-      # Remove cumulative if x is not date, decimal or integer
-      if not layer.axes.x or @axisBuilder.getAxisType(layer.axes.x) not in ['date', 'decimal', 'integer']
+      # Remove cumulative if x is not date or number
+      if not layer.axes.x or @axisBuilder.getAxisType(layer.axes.x) not in ['date', 'number']
         delete layer.cumulative
 
       # Default y to count if x or color present

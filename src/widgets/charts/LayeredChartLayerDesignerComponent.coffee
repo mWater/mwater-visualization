@@ -172,9 +172,9 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
   renderCumulative: ->
     layer = @props.design.layers[@props.index]
 
-    # Can only cumulative if non-polar and y axis determined and x axis is date, decimal or integer
+    # Can only cumulative if non-polar and y axis determined and x axis is date or number
     axisBuilder = new AxisBuilder(schema: @props.schema)
-    if not layer.axes.y or not layer.axes.x or axisBuilder.getAxisType(layer.axes.x) not in ['date', 'decimal', 'integer']
+    if not layer.axes.y or not layer.axes.x or axisBuilder.getAxisType(layer.axes.x) not in ['date', 'number']
       return 
 
     H.div key: "cumulative",

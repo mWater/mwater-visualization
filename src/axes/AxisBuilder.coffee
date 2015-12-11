@@ -6,8 +6,7 @@ d3Format = require 'd3-format'
 moment = require 'moment'
 
 xforms = [
-  { type: "bin", input: "decimal", output: "enum" }
-  { type: "bin", input: "integer", output: "enum" }
+  { type: "bin", input: "number", output: "enum" }
   { type: "date", input: "datetime", output: "date" }
   { type: "year", input: "date", output: "date" }
   { type: "year", input: "datetime", output: "date" }
@@ -73,10 +72,10 @@ module.exports = class AxisBuilder
         axis.xform = { type: xform.type }
         type = xform.output
       else
-        # Unredeemable if no xform possible and cannot use count to get integer
+        # Unredeemable if no xform possible and cannot use count to get number
         if options.aggrNeed == "none" 
           return null
-        if "integer" not in options.types
+        if "number" not in options.types
           return null
 
     # Always 
@@ -105,13 +104,13 @@ module.exports = class AxisBuilder
       if options.aggrNeed == "required" and aggrs[0] and not axis.aggr
         axis.aggr = aggrs[0].id
 
-      # Set aggr to count if expr is type count and aggr possible
+      # Set aggr to count if expr is type id and aggr possible
       if options.aggrNeed != "none" and not axis.aggrs
-        if @exprUtils.getExprType(axis.expr) == "count"
+        if @exprUtils.getExprType(axis.expr) == "id"
           axis.aggr = "count"
 
       # Set aggr to count if needed to satisfy types
-      if options.types and "integer" in options.types and type not in options.types
+      if options.types and "number" in options.types and type not in options.types
         axis.aggr = "count"
 
     return axis
@@ -220,8 +219,8 @@ module.exports = class AxisBuilder
       return null
       
     # Allow any if count is an option
-    if aggrNeed != "none" and "integer" in types
-      return ["text", "decimal", "integer", "date", "datetime", "boolean", "enum"]
+    if aggrNeed != "none" and "number" in types
+      return ["text", "number", "date", "datetime", "boolean", "enum"]
 
     types = types.slice()
 
@@ -306,16 +305,17 @@ module.exports = class AxisBuilder
       when "enum"
         # If enum, return enum values
         return _.map(@exprUtils.getExprEnumValues(axis.expr), (ev) -> { value: ev.id, label: ExprUtils.localizeString(ev.name, locale) })
-      when "integer"
-        values = _.compact(values)
-        if values.length == 0 
-          return []
+      # Removed since integer is no longer a fundamental type. TODO REMOVE
+      # when "integer"
+      #   values = _.compact(values)
+      #   if values.length == 0 
+      #     return []
 
-        # Integers are sometimes strings from database, so always parseInt (bigint in node-postgres)
-        min = _.min(_.map(values, (v) -> parseInt(v)))
-        max = _.max(_.map(values, (v) -> parseInt(v)))
+      #   # Integers are sometimes strings from database, so always parseInt (bigint in node-postgres)
+      #   min = _.min(_.map(values, (v) -> parseInt(v)))
+      #   max = _.max(_.map(values, (v) -> parseInt(v)))
 
-        return _.map(_.range(min, max + 1), (v) -> { value: v, label: "#{v}"})
+      #   return _.map(_.range(min, max + 1), (v) -> { value: v, label: "#{v}"})
       when "text"
         # Return unique values
         return _.map(_.uniq(values), (v) -> { value: v, label: v or "None" })
@@ -345,7 +345,7 @@ module.exports = class AxisBuilder
       return null
 
     if axis.aggr == "count"
-      return "integer"
+      return "number"
 
     type = @exprUtils.getExprType(axis.expr)
 
@@ -363,7 +363,7 @@ module.exports = class AxisBuilder
     exprType = @exprUtils.getExprType(axis.expr)
 
     # Add aggr if not a count type
-    if axis.aggr and exprType != "count"
+    if axis.aggr and exprType != "id"
       aggrName = _.findWhere(@exprUtils.getAggrs(axis.expr), { id: axis.aggr }).name
       return aggrName + " " + @exprUtils.summarizeExpr(axis.expr, locale)
     else

@@ -68,7 +68,7 @@ class MWaterDashboardPane extends React.Component
 
     @state = {
       design: dashboardDesign
-      formIds: []
+      formIds: ["e24f0a0ec11643cab3c21c07de2f6889"]
     }
 
   handleDesignChange: (design) =>
@@ -127,9 +127,63 @@ class MWaterDataSource extends DataSource
         cb(new Error(xhr.responseText))
 
 dashboardDesign = {
-  "items": {}
+  "items": {
+    "6ae73377-694d-4567-aa6d-abbaecf52934": {
+      "layout": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "widget": {
+        "type": "TableChart",
+        "design": {
+          "version": 1,
+          "columns": [
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "field",
+                  "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
+                  "column": "data:d0dcfce3a697453ba16cc8baa8e384e7:value"
+                }
+              },
+              "headerText": " "
+            }
+          ],
+          "orderings": [],
+          "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
+          "titleText": "Some Title"
+        }
+      }
+    },
+    "bc27601c-8933-4356-b10e-30ce2d30df19": {
+      "layout": {
+        "x": 8,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "widget": {
+        "type": "LayeredChart",
+        "design": {
+          "version": 1,
+          "layers": [
+            {
+              "axes": {
+                "x": null
+              },
+              "filter": null,
+              "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
+            }
+          ],
+          "type": "bar",
+          "transpose": false
+        }
+      }
+    }
+  }
 }
-
 # dashboardDesign = {
 #   "items": {
 #     "e08ef8a3-34db-467d-ac78-f0f273d49f25": {
