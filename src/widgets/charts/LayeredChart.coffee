@@ -55,9 +55,8 @@ module.exports = class LayeredChart extends Chart
 
       # Default y to count if x or color present
       if not layer.axes.y and (layer.axes.x or layer.axes.color)
-        # Create scalar count expr
-        countExpr = { type: "scalar", table: layer.table, expr: { type: "count", table: layer.table }, joins: [] }
-        layer.axes.y = { expr: countExpr, aggr: "count", xform: null }
+        # Create count expr
+        layer.axes.y = { expr: { type: "id", table: layer.table }, aggr: "count", xform: null }
 
       layer.filter = @exprCleaner.cleanExpr(layer.filter, { table: layer.table })
 
