@@ -566,6 +566,51 @@ describe "LayeredChartCompiler", ->
       it "fills out range types" # year, date, month, yearmonth, number
       it "supports enum types" # enum, boolean, bins ??
       it "supports text type" # text
+
+      it.only "supports enumset x axis", ->
+        design = {
+          type: "bar"
+          layers: [
+            { table: "t1", axes: { x: @axisEnumset, y: @axisNumberSum } }
+          ]
+        }
+
+        data = { 
+          layer0: [
+            { x: ["a", "b"], y: 10 }
+            { x: ["b"], y: 8 }
+          ]
+        }
+
+        res = @compiler.compileData(design, data)
+
+        compare(res.columns, [
+          ["x", "A", "B"]
+          ["0", 10, 18] # Totals
+          ])
+
+      it.only "supports enumset x axis with JSON encoded x", ->
+        design = {
+          type: "bar"
+          layers: [
+            { table: "t1", axes: { x: @axisEnumset, y: @axisNumberSum } }
+          ]
+        }
+
+        data = { 
+          layer0: [
+            { x: JSON.stringify(["a", "b"]), y: 10 }
+            { x: JSON.stringify(["b"]), y: 8 }
+          ]
+        }
+
+        res = @compiler.compileData(design, data)
+
+        compare(res.columns, [
+          ["x", "A", "B"]
+          ["0", 10, 18] # Totals
+          ])
+
       # describe "enum x axis" 
       # describe "text x axis"
 

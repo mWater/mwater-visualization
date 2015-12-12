@@ -302,7 +302,7 @@ module.exports = class AxisBuilder
       return categories
 
     switch @getAxisType(axis)
-      when "enum"
+      when "enum", "enumset"
         # If enum, return enum values
         return _.map(@exprUtils.getExprEnumValues(axis.expr), (ev) -> { value: ev.id, label: ExprUtils.localizeString(ev.name, locale) })
       # Removed since integer is no longer a fundamental type. TODO REMOVE

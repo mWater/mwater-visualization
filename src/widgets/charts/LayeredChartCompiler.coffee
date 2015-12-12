@@ -298,6 +298,39 @@ module.exports = class LayeredChartCompiler
       titleText: @compileTitleText(design, locale)
     }
 
+
+  # Numbers sometimes arrive as strings from database. Fix by parsing
+  fixStringYValues: (rows) ->
+    for row in rows
+      if _.isString(row.y)
+        row.y = parseFloat(row.y)
+    return rows
+
+  # Flatten if x-type is enumset. e.g. if one row has x = ["a", "b"], make into two rows with x="a" and x="b", summing if already exists
+  flattenRowData: (rows) ->
+    flatRows = []
+    for row in rows
+      # Handle null
+      if not row.x 
+        flatRows.push(row)
+        continue
+
+      if _.isString(row.x)
+        xs = JSON.parse(row.x)
+      else
+        xs = row.x
+
+      for x in xs
+        # Find existing row
+        existingRow = _.find(flatRows, (r) -> r.x == x and r.color == row.color)
+        if existingRow
+          existingRow.y += row.y
+        else
+          flatRows.push(_.extend({}, row, x: x))
+
+    console.log flatRows
+    return flatRows
+
   compileDataCategorical: (design, data, locale) ->
     columns = []
     types = {}
@@ -332,6 +365,13 @@ module.exports = class LayeredChartCompiler
     _.each design.layers, (layer, layerIndex) =>
       # Get data of layer
       layerData = data["layer#{layerIndex}"]
+
+      # Fix string y values
+      layerData = @fixStringYValues(layerData)
+
+      # Flatten if x-type is enumset. e.g. if one row has x = ["a", "b"], make into two rows with x="a" and x="b", summing if already exists
+      if xType == "enumset"
+        layerData = @flattenRowData(layerData)
 
       # If has color axis
       if layer.axes.color

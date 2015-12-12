@@ -17,11 +17,13 @@ describe "AxisBuilder", ->
     @exprDate = { type: "field", table: "t1", column: "date" }
     @exprDatetime = { type: "field", table: "t1", column: "datetime" }
     @exprEnum = { type: "field", table: "t1", column: "enum" }
+    @exprEnumset = { type: "field", table: "t1", column: "enumset" }
 
     @axisNumber = { expr: @exprNumber }
     @axisNumberSum = { expr: @exprNumber, aggr: "sum" }
     @axisNumberCount = { expr: @exprCount, aggr: "count" }
     @axisEnum = { expr: @exprEnum } 
+    @axisEnumset = { expr: @exprEnumset } 
     @axisText = { expr: @exprText } 
 
   describe "compileAxis", ->
@@ -309,6 +311,13 @@ describe "AxisBuilder", ->
   describe "getCategories", ->
     it "gets enum", ->
       categories = @ab.getCategories(@axisEnum, ["a"])
+      compare(categories, [
+        { value: "a", label: "A" }
+        { value: "b", label: "B" }
+        ])
+
+    it.only "gets enumset", ->
+      categories = @ab.getCategories(@axisEnumset, ["a"])
       compare(categories, [
         { value: "a", label: "A" }
         { value: "b", label: "B" }
