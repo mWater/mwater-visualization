@@ -12,16 +12,15 @@ describe "LayeredChart", ->
     @schema = fixtures.simpleSchema()
     @chart = new LayeredChart(schema: @schema, dataSource: {})
 
-    @exprDecimal = { type: "field", table: "t1", column: "decimal" }
-    @exprInteger = { type: "field", table: "t1", column: "integer" }
+    @exprNumber = { type: "field", table: "t1", column: "number" }
     @exprText = { type: "field", table: "t1", column: "text" }
     @exprDate = { type: "field", table: "t1", column: "date" }
     @exprEnum = { type: "field", table: "t1", column: "enum" }
 
-    @axisDecimal = { expr: @exprDecimal }
-    @axisIntegerSum = { expr: @exprInteger, aggr: "sum" }
-    @axisInteger = { expr: @exprInteger }
+    @axisNumber = { expr: @exprNumber }
+    @axisNumberSum = { expr: @exprNumber, aggr: "sum" }
     @axisEnum = { expr: @exprEnum } 
+    @axisEnumset = { expr: @exprEnumset } 
     @axisText = { expr: @exprText } 
     @axisDate = { expr: @exprDate } 
 

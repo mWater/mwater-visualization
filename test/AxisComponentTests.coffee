@@ -21,7 +21,7 @@ describe "AxisComponent", ->
       dataSource: dataSource
       table: "t1"
       aggrNeed: 'none'
-      value: { expr: { type: "field", table: "t1", column: "decimal" }, xform: { type: "bin", numBins: 10 }}
+      value: { expr: { type: "field", table: "t1", column: "number" }, xform: { type: "bin", numBins: 10 }}
       onChange: (val) =>
         assert.equal val.xform.min, 2
         assert.equal val.xform.max, 8

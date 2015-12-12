@@ -12,16 +12,16 @@ describe "LayeredChartCompiler", ->
     @schema = fixtures.simpleSchema()
     @compiler = new LayeredChartCompiler(schema: @schema)
 
-    @exprDecimal = { type: "field", table: "t1", column: "decimal" }
-    @exprInteger = { type: "field", table: "t1", column: "integer" }
+    @exprNumber = { type: "field", table: "t1", column: "number" }
     @exprText = { type: "field", table: "t1", column: "text" }
     @exprDate = { type: "field", table: "t1", column: "date" }
     @exprEnum = { type: "field", table: "t1", column: "enum" }
+    @exprEnumset = { type: "field", table: "t1", column: "enumset" }
 
-    @axisDecimal = { expr: @exprDecimal }
-    @axisIntegerSum = { expr: @exprInteger, aggr: "sum" }
-    @axisInteger = { expr: @exprInteger }
+    @axisNumber = { expr: @exprNumber }
+    @axisNumberSum = { expr: @exprNumber, aggr: "sum" }
     @axisEnum = { expr: @exprEnum } 
+    @axisEnumset = { expr: @exprEnumset } 
     @axisText = { expr: @exprText } 
     @axisDate = { expr: @exprDate } 
 
@@ -30,7 +30,7 @@ describe "LayeredChartCompiler", ->
       design = {
         type: "bar"
         layers: [
-          { axes: { x: @axisText, y: @axisIntegerSum }, table: "t1" }
+          { axes: { x: @axisText, y: @axisNumberSum }, table: "t1" }
         ]
       }
 
@@ -41,7 +41,7 @@ describe "LayeredChartCompiler", ->
           type: "query"
           selects: [
             { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "x" }
-            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "integer" }] }, alias: "y" }
+            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "y" }
           ]
           from: { type: "table", table: "t1", alias: "main" }
           groupBy: [1]
@@ -56,7 +56,7 @@ describe "LayeredChartCompiler", ->
       design = {
         type: "pie"
         layers: [
-          { axes: { color: @axisEnum, y: @axisIntegerSum }, table: "t1" }
+          { axes: { color: @axisEnum, y: @axisNumberSum }, table: "t1" }
         ]
       }
 
@@ -67,7 +67,7 @@ describe "LayeredChartCompiler", ->
           type: "query"
           selects: [
             { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "color" }
-            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "integer" }] }, alias: "y" }
+            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "y" }
           ]
           from: { type: "table", table: "t1", alias: "main" }
           groupBy: [1]
@@ -79,12 +79,12 @@ describe "LayeredChartCompiler", ->
       compare(queries, expectedQueries)
 
     it "filters query", ->
-      filter = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "integer" }, op: ">", rhs: { type: "literal", valueType: "integer", value: 4 } }
+      filter = { type: "comparison", table: "t1", lhs: { type: "field", table: "t1", column: "number" }, op: ">", rhs: { type: "literal", valueType: "number", value: 4 } }
 
       design = {
         type: "bar"
         layers: [
-          { axes: { x: @axisText, y: @axisIntegerSum }, table: "t1", filter: filter }
+          { axes: { x: @axisText, y: @axisNumberSum }, table: "t1", filter: filter }
         ]
       }
 
@@ -95,11 +95,11 @@ describe "LayeredChartCompiler", ->
           type: "query"
           selects: [
             { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "x" }
-            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "integer" }] }, alias: "y" }
+            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "y" }
           ]
           from: { type: "table", table: "t1", alias: "main" }
           where: { type: "op", op: ">", exprs: [
-            { type: "field", tableAlias: "main", column: "integer" }
+            { type: "field", tableAlias: "main", column: "number" }
             { type: "literal", value: 4 }
           ]}
           groupBy: [1]
@@ -111,10 +111,10 @@ describe "LayeredChartCompiler", ->
       compare(queries, expectedQueries)
 
     it "filters if by relevant extra filters", ->
-      relevantFilter = { table: "t1", jsonql: { type: "op", op: ">", exprs: [{ type: "field", tableAlias: "{alias}", column: "integer" }, { type: "literal", value: 4 }] } }
+      relevantFilter = { table: "t1", jsonql: { type: "op", op: ">", exprs: [{ type: "field", tableAlias: "{alias}", column: "number" }, { type: "literal", value: 4 }] } }
 
       # Wrong table
-      otherFilter = { table: "t2", jsonql: { type: "op", op: ">", exprs: [{ type: "field", tableAlias: "{alias}", column: "integer" }, { type: "literal", value: 5 }] } }
+      otherFilter = { table: "t2", jsonql: { type: "op", op: ">", exprs: [{ type: "field", tableAlias: "{alias}", column: "number" }, { type: "literal", value: 5 }] } }
 
       filters = [
         relevantFilter
@@ -124,7 +124,7 @@ describe "LayeredChartCompiler", ->
       design = {
         type: "bar"
         layers: [
-          { axes: { x: @axisText, y: @axisIntegerSum }, table: "t1" }
+          { axes: { x: @axisText, y: @axisNumberSum }, table: "t1" }
         ]
       }
 
@@ -135,11 +135,11 @@ describe "LayeredChartCompiler", ->
           type: "query"
           selects: [
             { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "x" }
-            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "integer" }] }, alias: "y" }
+            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "y" }
           ]
           from: { type: "table", table: "t1", alias: "main" }
           where: { type: "op", op: ">", exprs: [
-            { type: "field", tableAlias: "main", column: "integer" }
+            { type: "field", tableAlias: "main", column: "number" }
             { type: "literal", value: 4 }
           ]}
           groupBy: [1]
@@ -154,7 +154,7 @@ describe "LayeredChartCompiler", ->
       design = {
         type: "scatter"
         layers: [
-          { axes: { x: @axisInteger, y: @axisDecimal }, table: "t1" }
+          { axes: { x: @axisNumber, y: @axisNumber }, table: "t1" }
         ]
       }
 
@@ -164,8 +164,8 @@ describe "LayeredChartCompiler", ->
         layer0: {
           type: "query"
           selects: [
-            { type: "select", expr: { type: "field", tableAlias: "main", column: "integer" }, alias: "x" }
-            { type: "select", expr: { type: "field", tableAlias: "main", column: "decimal" }, alias: "y" }
+            { type: "select", expr: { type: "field", tableAlias: "main", column: "number" }, alias: "x" }
+            { type: "select", expr: { type: "field", tableAlias: "main", column: "number" }, alias: "y" }
           ]
           from: { type: "table", table: "t1", alias: "main" }
           groupBy: []
@@ -180,7 +180,7 @@ describe "LayeredChartCompiler", ->
       design = {
         type: "bar"
         layers: [
-          { axes: { x: @axisText, color: @axisEnum, y: @axisIntegerSum }, table: "t1" }
+          { axes: { x: @axisText, color: @axisEnum, y: @axisNumberSum }, table: "t1" }
         ]
       }
 
@@ -192,7 +192,7 @@ describe "LayeredChartCompiler", ->
           selects: [
             { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "x" }
             { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "color" }
-            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "integer" }] }, alias: "y" }
+            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "y" }
           ]
           from: { type: "table", table: "t1", alias: "main" }
           groupBy: [1, 2]
@@ -210,7 +210,7 @@ describe "LayeredChartCompiler", ->
           @design = {
             type: "pie"
             layers: [
-              { table: "t1", axes: { color: @axisEnum, y: @axisDecimal } }
+              { table: "t1", axes: { color: @axisEnum, y: @axisNumber } }
             ]
           }
 
@@ -254,8 +254,8 @@ describe "LayeredChartCompiler", ->
           @design = {
             type: "pie"
             layers: [
-              { table: "t1", axes: { y: @axisDecimal } }
-              { table: "t1", axes: { y: @axisDecimal }, name: "Y", color: "red" }
+              { table: "t1", axes: { y: @axisNumber } }
+              { table: "t1", axes: { y: @axisNumber }, name: "Y", color: "red" }
             ]
           }
 
@@ -305,12 +305,12 @@ describe "LayeredChartCompiler", ->
       # describe "enum x"
       # describe "text x"
       # describe "boolean x"
-      describe "decimal x, no color axis", ->
+      describe "number x, no color axis", ->
         beforeEach ->
           @design = {
             type: "line"
             layers: [
-              { table: "t1", axes: { x: @axisDecimal, y: @axisDecimal }, name: "X", color: "red" }
+              { table: "t1", axes: { x: @axisNumber, y: @axisNumber }, name: "X", color: "red" }
             ]
           }
 
@@ -378,12 +378,12 @@ describe "LayeredChartCompiler", ->
         it "sets x axis type to indexed", ->
           assert.equal @res.xAxisType, "indexed"
 
-      describe "decimal x, enum color axis", ->
+      describe "number x, enum color axis", ->
         before ->
           @design = {
             type: "line"
             layers: [
-              { table: "t1", axes: { x: @axisDecimal, color: @axisEnum, y: @axisDecimal }, name: "X" }
+              { table: "t1", axes: { x: @axisNumber, color: @axisEnum, y: @axisNumber }, name: "X" }
             ]
           }
 
@@ -441,7 +441,7 @@ describe "LayeredChartCompiler", ->
           @design = {
             type: "line"
             layers: [
-              { table: "t1", axes: { x: @axisDate, y: @axisDecimal } }
+              { table: "t1", axes: { x: @axisDate, y: @axisNumber } }
             ]
           }
 
@@ -459,13 +459,13 @@ describe "LayeredChartCompiler", ->
         design = {
           type: "bar"
           layers: [
-            { table: "t1", axes: { x: @axisInteger, y: @axisIntegerSum, color: @axisEnum } }
+            { table: "t1", axes: { x: @axisText, y: @axisNumberSum, color: @axisEnum } }
           ]
           stacked: true
         }
 
         data = { 
-          layer0: [{ x: 1, y: 11, color: "a" }, { x: 2, y: 12, color: "b" }]
+          layer0: [{ x: "t1", y: 11, color: "a" }, { x: "t2", y: 12, color: "b" }]
         }
 
         res = @compiler.compileData(design, data)
@@ -478,7 +478,7 @@ describe "LayeredChartCompiler", ->
         design = {
           type: "bar"
           layers: [
-            { table: "t1", axes: { x: @axisInteger, y: @axisIntegerSum, color: @axisEnum } }
+            { table: "t1", axes: { x: @axisText, y: @axisNumberSum, color: @axisEnum } }
           ]
           stacked: true
           proportional: true
@@ -486,9 +486,9 @@ describe "LayeredChartCompiler", ->
 
         data = { 
           layer0: [
-            { x: 1, y: 10, color: "a" }
-            { x: 1, y: 30, color: "b" }
-            { x: 2, y: 20, color: "a" }
+            { x: "t1", y: 10, color: "a" }
+            { x: "t1", y: 30, color: "b" }
+            { x: "t2", y: 20, color: "a" }
           ]
         }
 
@@ -499,69 +499,71 @@ describe "LayeredChartCompiler", ->
           ])
 
         compare(res.columns, [
-          ["x", "1", "2"]
+          ["x", "t1", "t2"]
           ["0:a", 25, 100]
           ["0:b", 75, null]
           ])
 
-      describe "x axis range", ->
-        describe "integer", ->
-          before ->
-            @design = {
-              type: "bar"
-              layers: [
-                { table: "t1", axes: { x: @axisInteger, y: @axisIntegerSum }, color: "red" }
-                { table: "t1", axes: { x: @axisInteger, y: @axisIntegerSum }, name: "#2" }
-              ]
-            }
 
-            @data = { 
-              layer0: [{ x: 1, y: 11 }]
-              layer1: [{ x: 3, y: 13 }, { x: 4, y: 14 }]
-            }
+      # x axis as number (integer) no longer supported without binning
+      # describe "x axis range", ->
+      #   describe "number", ->
+      #     before ->
+      #       @design = {
+      #         type: "bar"
+      #         layers: [
+      #           { table: "t1", axes: { x: @axisNumber, y: @axisNumberSum }, color: "red" }
+      #           { table: "t1", axes: { x: @axisNumber, y: @axisNumberSum }, name: "#2" }
+      #         ]
+      #       }
 
-            @res = @compiler.compileData(@design, @data)
+      #       @data = { 
+      #         layer0: [{ x: 1, y: 11 }]
+      #         layer1: [{ x: 3, y: 13 }, { x: 4, y: 14 }]
+      #       }
 
-          it "sets types to bar", -> 
-            compare(@res.types, {
-              "0": "bar"
-              "1": "bar"})
+      #       @res = @compiler.compileData(@design, @data)
 
-          it "makes columns with y values with common x axis", ->
-            compare(@res.columns, [
-              ["x", "1", "2", "3", "4"]
-              ["0", 11, null, null, null]
-              ["1", null, null, 13, 14]
-              ])
+      #     it "sets types to bar", -> 
+      #       compare(@res.types, {
+      #         "0": "bar"
+      #         "1": "bar"})
 
-          it "maps back to rows", ->
-            compare(@res.dataMap, {
-              "0:0": { layerIndex: 0, row: @data.layer0[0] }
-              "1:2": { layerIndex: 1, row: @data.layer1[0] }
-              "1:3": { layerIndex: 1, row: @data.layer1[1] }
-              })
+      #     it "makes columns with y values with common x axis", ->
+      #       compare(@res.columns, [
+      #         ["x", "1", "2", "3", "4"]
+      #         ["0", 11, null, null, null]
+      #         ["1", null, null, 13, 14]
+      #         ])
 
-          it "uses series color", ->
-            compare(@res.colors, { "0": "red" })
+      #     it "maps back to rows", ->
+      #       compare(@res.dataMap, {
+      #         "0:0": { layerIndex: 0, row: @data.layer0[0] }
+      #         "1:2": { layerIndex: 1, row: @data.layer1[0] }
+      #         "1:3": { layerIndex: 1, row: @data.layer1[1] }
+      #         })
 
-          it "sets xs to common axis", ->
-            compare(@res.xs, {
-              "0": "x"
-              "1": "x"
-              })
+      #     it "uses series color", ->
+      #       compare(@res.colors, { "0": "red" })
 
-          it "names", ->
-            compare(@res.names, {
-              "0": "Series 1"
-              "1": "#2"
-              })
+      #     it "sets xs to common axis", ->
+      #       compare(@res.xs, {
+      #         "0": "x"
+      #         "1": "x"
+      #         })
 
-          it "colors based on color map"
+      #     it "names", ->
+      #       compare(@res.names, {
+      #         "0": "Series 1"
+      #         "1": "#2"
+      #         })
 
-          it "sets x axis type to category", ->
-            assert.equal @res.xAxisType, "category"
+      #     it "colors based on color map"
 
-      it "fills out range types" # year, date, month, yearmonth, integer
+      #     it "sets x axis type to category", ->
+      #       assert.equal @res.xAxisType, "category"
+
+      it "fills out range types" # year, date, month, yearmonth, number
       it "supports enum types" # enum, boolean, bins ??
       it "supports text type" # text
       # describe "enum x axis" 
@@ -572,7 +574,7 @@ describe "LayeredChartCompiler", ->
       design = {
         type: "line"
         layers: [
-          { axes: { x: @axisDecimal, y: @axisIntegerSum }, table: "t1" }
+          { axes: { x: @axisNumber, y: @axisNumberSum }, table: "t1" }
         ]
       }
 
@@ -585,7 +587,7 @@ describe "LayeredChartCompiler", ->
           type: "op"
           op: "="
           exprs: [
-            { type: "field", tableAlias: "{alias}", column: "decimal" }
+            { type: "field", tableAlias: "{alias}", column: "number" }
             { type: "literal", value: 1 }
           ]
         }
@@ -593,13 +595,13 @@ describe "LayeredChartCompiler", ->
 
       compare(scope.filter, expectedFilter)
       compare(scope.data, { layerIndex: 0, x: 1 })
-      compare(scope.name, "T1 Decimal is 1")
+      compare(scope.name, "T1 Number is 1")
 
     it "creates x-color filter", ->
       design = {
         type: "bar"
         layers: [
-          { axes: { x: @axisText, color: @axisEnum, y: @axisIntegerSum }, table: "t1" }
+          { axes: { x: @axisText, color: @axisEnum, y: @axisNumberSum }, table: "t1" }
         ]
       }
 
@@ -640,7 +642,7 @@ describe "LayeredChartCompiler", ->
       design = {
         type: "pie"
         layers: [
-          { axes: { color: @axisEnum, y: @axisIntegerSum }, table: "t1" }
+          { axes: { color: @axisEnum, y: @axisNumberSum }, table: "t1" }
         ]
       }
 
@@ -667,7 +669,7 @@ describe "LayeredChartCompiler", ->
       design = {
         type: "pie"
         layers: [
-          { axes: { color: @axisEnum, y: @axisIntegerSum }, table: "t1" }
+          { axes: { color: @axisEnum, y: @axisNumberSum }, table: "t1" }
         ]
       }
 

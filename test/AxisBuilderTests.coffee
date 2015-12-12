@@ -12,36 +12,34 @@ compare = (actual, expected) ->
 describe "AxisBuilder", ->
   before ->
     @ab = new AxisBuilder(schema: fixtures.simpleSchema())
-    @exprDecimal = { type: "field", table: "t1", column: "decimal" }
-    @exprInteger = { type: "field", table: "t1", column: "integer" }
+    @exprNumber = { type: "field", table: "t1", column: "number" }
     @exprText = { type: "field", table: "t1", column: "text" }
     @exprDate = { type: "field", table: "t1", column: "date" }
     @exprDatetime = { type: "field", table: "t1", column: "datetime" }
     @exprEnum = { type: "field", table: "t1", column: "enum" }
 
-    @axisDecimal = { expr: @exprDecimal }
-    @axisIntegerSum = { expr: @exprInteger, aggr: "sum" }
-    @axisDecimalCount = { expr: @exprCount, aggr: "count" }
-    @axisInteger = { expr: @exprInteger }
+    @axisNumber = { expr: @exprNumber }
+    @axisNumberSum = { expr: @exprNumber, aggr: "sum" }
+    @axisNumberCount = { expr: @exprCount, aggr: "count" }
     @axisEnum = { expr: @exprEnum } 
     @axisText = { expr: @exprText } 
 
   describe "compileAxis", ->
     it "compiles simple expr", ->
-      jql = @ab.compileAxis(axis: @axisInteger, tableAlias: "T1")
+      jql = @ab.compileAxis(axis: @axisNumber, tableAlias: "T1")
       assert _.isEqual jql, {
         type: "field"
         tableAlias: "T1"
-        column: "integer"
+        column: "number"
       }
 
     it "compiles aggregated field", ->
       axis = {
-        expr: @exprInteger
+        expr: @exprNumber
         aggr: "sum"
       }
 
-      jql = @ab.compileAxis(axis: @axisIntegerSum, tableAlias: "T1")
+      jql = @ab.compileAxis(axis: @axisNumberSum, tableAlias: "T1")
       assert _.isEqual jql, {
         type: "op"
         op: "sum"
@@ -49,14 +47,14 @@ describe "AxisBuilder", ->
           {
             type: "field"
             tableAlias: "T1"
-            column: "integer"
+            column: "number"
           }
         ]
       }
 
     it "compiles bin xform", ->
       axis = {
-        expr: @exprDecimal
+        expr: @exprNumber
         xform: { type: "bin", numBins: 10, min: 2, max: 8 }
       }
 
@@ -68,7 +66,7 @@ describe "AxisBuilder", ->
           {
             type: "field"
             tableAlias: "T1"
-            column: "decimal"
+            column: "number"
           },
           2,
           8,
@@ -211,22 +209,22 @@ describe "AxisBuilder", ->
 
     it "removes bin xform if wrong output type", ->
       axis = {
-        expr: @exprDecimal
+        expr: @exprNumber
         xform: { type: "bin", numBins: 10, min: 2, max: 8 }
       }
 
-      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ["integer"])
+      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ["number"])
       assert not axis.xform
 
     it "removes bad aggr"
 
     it "defaults count aggr if will satify output", ->
-      axis = @ab.cleanAxis(axis: @axisDecimal, table: "t1", types: ["integer"])
+      axis = @ab.cleanAxis(axis: @axisText, table: "t1", types: ["number"])
       assert.equal axis.aggr, "count"
 
     it "removes aggr if xform", ->
       axis = {
-        expr: @exprDecimal
+        expr: @exprNumber
         xform: { type: "bin", numBins: 10, min: 2, max: 8 }
         aggr: "sum"
       }
@@ -236,58 +234,56 @@ describe "AxisBuilder", ->
 
     it "defaults bin xform", ->
       axis = {
-        expr: @exprDecimal
+        expr: @exprNumber
       }
 
       axis = @ab.cleanAxis(axis: axis, table: "t1", types: ['enum'])
       assert.equal axis.xform.type, "bin"
 
     it "remove if not possible to get type", ->
-      axis = { expr: @exprDecimal }
-      assert not @ab.cleanAxis(axis: axis, table: "t1", types: ['text'], aggrNeed: "none")
-      assert @ab.cleanAxis(axis: axis, table: "t1", types: ['enum'], aggrNeed: "none") # Can get enum via binning
+      axis = { expr: @exprNumber }
+      assert not @ab.cleanAxis(axis: axis, table: "t1", types: ['text'], aggrNeed: "none"), "Should remove text"
+      assert @ab.cleanAxis(axis: axis, table: "t1", types: ['enum'], aggrNeed: "none"), "Number can be binned to enum" # Can get enum via binning
     
-      # Aggr can get to count
-      assert not @ab.cleanAxis(axis: axis, table: "t1", types: ['integer'], aggrNeed: "none")
-      assert @ab.cleanAxis(axis: axis, table: "t1", types: ['integer'], aggrNeed: "required")
+      # Aggr text can get to count
+      assert not @ab.cleanAxis(axis: { expr: @exprText }, table: "t1", types: ['number'], aggrNeed: "none"), "No aggr allowed"
+      assert @ab.cleanAxis(axis: { expr: @exprText }, table: "t1", types: ['number'], aggrNeed: "required")
 
     it "defaults colorMap"
 
   describe "validateAxis", ->
     it "allows xform", ->
       axis = {
-        expr: @exprDecimal
+        expr: @exprNumber
         xform: { type: "bin", numBins: 10, min: 2, max: 8 }
       }
       assert not @ab.validateAxis(axis: axis)
 
     it "requires min, max for bin", ->
       axis = {
-        expr: @exprDecimal
+        expr: @exprNumber
         xform: { type: "bin", numBins: 10, min: 2 }
       }
       assert @ab.validateAxis(axis: axis)
 
   describe "getExprTypes", ->
-    it "adds any if aggr allowed and integer out", ->
-      assert.include @ab.getExprTypes(["integer"], "optional"), "datetime"
-      assert.include @ab.getExprTypes(["integer"], "required"), "datetime"
-      assert.notInclude @ab.getExprTypes(["decimal"], "required"), "datetime"
+    it "adds any if aggr allowed and number out", ->
+      assert.include @ab.getExprTypes(["number"], "optional"), "datetime"
+      assert.include @ab.getExprTypes(["number"], "required"), "datetime"
   
-    it "adds integer, decimal if binnable", ->
-      assert.include @ab.getExprTypes(["enum"], "optional"), "integer"
-      assert.include @ab.getExprTypes(["enum"], "optional"), "decimal"
+    it "adds number if binnable", ->
+      assert.include @ab.getExprTypes(["enum"], "optional"), "number"
 
   describe "getAxisType", ->
     it "passes through if no aggr or xform", ->
-      assert.equal @ab.getAxisType(@axisDecimal), "decimal"
+      assert.equal @ab.getAxisType(@axisNumber), "number"
 
-    it "converts count aggr to integer", ->
-      assert.equal @ab.getAxisType(@axisDecimalCount), "integer"
+    it "converts count aggr to number", ->
+      assert.equal @ab.getAxisType(@axisNumberCount), "number"
 
     it "xforms bin", ->
       axis = {
-        expr: @exprDecimal
+        expr: @exprNumber
         xform: { type: "bin", numBins: 10, min: 2, max: 8 }
       }
       assert.equal @ab.getAxisType(axis), "enum"
@@ -302,13 +298,13 @@ describe "AxisBuilder", ->
   describe "formatValue", ->
     it "formats axes with categories", ->
       axis = {
-        expr: @exprDecimal
+        expr: @exprNumber
         xform: { type: "bin", numBins: 3, min: 1, max: 4 }
       }
       assert.equal @ab.formatValue(axis, 0), "< 1"
 
     it "converts to string", ->
-      assert.equal @ab.formatValue(@axisDecimal, 2), "2"
+      assert.equal @ab.formatValue(@axisNumber, 2), "2"
     
   describe "getCategories", ->
     it "gets enum", ->
@@ -318,15 +314,16 @@ describe "AxisBuilder", ->
         { value: "b", label: "B" }
         ])
 
-    it "gets integer range", ->
-      categories = @ab.getCategories(@axisInteger, [3, 4, 7])
-      compare(categories, [
-        { value: 3, label: "3" }
-        { value: 4, label: "4" }
-        { value: 5, label: "5" }
-        { value: 6, label: "6" }
-        { value: 7, label: "7" }
-        ])
+    # Integer ranges no longer supported since decimal and integer were merged as numbre
+    # it "gets number range", ->
+    #   categories = @ab.getCategories(@axisInteger, [3, 4, 7])
+    #   compare(categories, [
+    #     { value: 3, label: "3" }
+    #     { value: 4, label: "4" }
+    #     { value: 5, label: "5" }
+    #     { value: 6, label: "6" }
+    #     { value: 7, label: "7" }
+    #     ])
 
     it "gets text values", ->
       categories = @ab.getCategories(@axisText, ["a", "b", "a", "c"])
@@ -336,13 +333,13 @@ describe "AxisBuilder", ->
         { value: "c", label: "c" }
         ])
 
-    it "gets empty list for decimal", ->
-      categories = @ab.getCategories(@axisDecimal, [1.2, 1.4])
+    it "gets empty list for number", ->
+      categories = @ab.getCategories(@axisNumber, [1.2, 1.4])
       compare(categories, [])
 
     it "gets bins by name", ->
       axis = {
-        expr: @exprDecimal
+        expr: @exprNumber
         xform: { type: "bin", numBins: 3, min: 1, max: 4 }
       }
 

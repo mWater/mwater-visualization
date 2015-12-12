@@ -12,16 +12,16 @@ describe "TableChart", ->
     @schema = fixtures.simpleSchema()
     @chart = new TableChart(schema: @schema)
 
-    @exprDecimal = { type: "field", table: "t1", column: "decimal" }
-    @exprInteger = { type: "field", table: "t1", column: "integer" }
+    @exprNumber = { type: "field", table: "t1", column: "number" }
     @exprText = { type: "field", table: "t1", column: "text" }
     @exprDate = { type: "field", table: "t1", column: "date" }
     @exprEnum = { type: "field", table: "t1", column: "enum" }
+    @exprEnumset = { type: "field", table: "t1", column: "enumset" }
 
-    @axisDecimal = { expr: @exprDecimal }
-    @axisIntegerSum = { expr: @exprInteger, aggr: "sum" }
-    @axisInteger = { expr: @exprInteger }
+    @axisNumber = { expr: @exprNumber }
+    @axisNumberSum = { expr: @exprNumber, aggr: "sum" }
     @axisEnum = { expr: @exprEnum } 
+    @axisEnumset = { expr: @exprEnumset } 
     @axisText = { expr: @exprText } 
     @axisDate = { expr: @exprDate } 
 
@@ -33,7 +33,7 @@ describe "TableChart", ->
         table: "t1"
         columns: [
           { textAxis: @axisText }
-          { textAxis: @axisDecimal }
+          { textAxis: @axisNumber }
         ]
         orderings: []
       }
@@ -44,7 +44,7 @@ describe "TableChart", ->
           type: "query"
           selects: [
             { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
-            { type: "select", expr: { type: "field", tableAlias: "main", column: "decimal" }, alias: "c1" }
+            { type: "select", expr: { type: "field", tableAlias: "main", column: "number" }, alias: "c1" }
           ]
           from: { type: "table", table: "t1", alias: "main" }
           groupBy: [1, 2]
@@ -60,7 +60,7 @@ describe "TableChart", ->
         table: "t1"
         columns: [
           { textAxis: @axisText }
-          { textAxis: @axisIntegerSum }
+          { textAxis: @axisNumberSum }
         ]
         orderings: []
       }
@@ -71,7 +71,7 @@ describe "TableChart", ->
           type: "query"
           selects: [
             { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
-            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "integer" }] }, alias: "c1" }
+            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "c1" }
           ]
           from: { type: "table", table: "t1", alias: "main" }
           groupBy: [1]
@@ -87,10 +87,10 @@ describe "TableChart", ->
         table: "t1"
         columns: [
           { textAxis: @axisText }
-          { textAxis: @axisIntegerSum }
+          { textAxis: @axisNumberSum }
         ]
         orderings: [
-          { axis: @axisDecimal, direction: "desc" }
+          { axis: @axisNumber, direction: "desc" }
         ]
       }
 
@@ -100,11 +100,11 @@ describe "TableChart", ->
           type: "query"
           selects: [
             { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
-            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "integer" }] }, alias: "c1" }
+            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "c1" }
           ]
           from: { type: "table", table: "t1", alias: "main" }
-          groupBy: [1, { type: "field", tableAlias: "main", column: "decimal" }]
-          orderBy: [{ expr: { type: "field", tableAlias: "main", column: "decimal" }, direction: "desc" }]
+          groupBy: [1, { type: "field", tableAlias: "main", column: "number" }]
+          orderBy: [{ expr: { type: "field", tableAlias: "main", column: "number" }, direction: "desc" }]
           limit: 1000
         }
       }
