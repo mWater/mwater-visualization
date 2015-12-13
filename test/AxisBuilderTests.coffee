@@ -9,7 +9,7 @@ AxisBuilder = require '../src/axes/AxisBuilder'
 canonical = require 'canonical-json'
 
 compare = (actual, expected) ->
-  assert.equal canonical(actual), canonical(expected)
+  assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected)
 
 describe "AxisBuilder", ->
   before ->
@@ -326,7 +326,8 @@ describe "AxisBuilder", ->
       assert.equal @ab.formatValue(@axisNumber, "123456"), "123,456", "Should parse string"
 
     it "wraps text[]", ->
-      assert.deepEqual @ab.formatValue(@axisTextarr, ["a", "b"]), H.div(null, H.div(key: 0, "a"), H.div(key: 1, "b"))
+      compare(@ab.formatValue(@axisTextarr, ["a", "b"]), H.div(null, H.div(key: 0, "a"), H.div(key: 1, "b")))
+      compare(@ab.formatValue(@axisTextarr, JSON.stringify(["a", "b"])), H.div(null, H.div(key: 0, "a"), H.div(key: 1, "b")))
     
   describe "getCategories", ->
     it "gets enum", ->

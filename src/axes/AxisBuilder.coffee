@@ -383,6 +383,9 @@ module.exports = class AxisBuilder
     categories = @getCategories(axis, [], locale)
     if categories.length > 0
       if type == "enumset"
+        # Parse if string
+        if _.isString(value)
+          value = JSON.parse(value)
         return _.map(value, (v) ->
           category = _.findWhere(categories, value: v)
           if category
@@ -404,6 +407,9 @@ module.exports = class AxisBuilder
         num = parseFloat(value)
         return d3Format.format(",")(num)
       when "text[]"
+        # Parse if string
+        if _.isString(value)
+          value = JSON.parse(value)
         return H.div(null, _.map(value, (v, i) -> H.div(key: i, v)))
 
     # TODO format dates
