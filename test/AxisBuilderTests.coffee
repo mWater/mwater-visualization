@@ -1,6 +1,8 @@
 assert = require('chai').assert
 fixtures = require './fixtures'
 _ = require 'lodash'
+React = require 'react'
+H = React.DOM
 
 AxisBuilder = require '../src/axes/AxisBuilder'
 
@@ -18,6 +20,7 @@ describe "AxisBuilder", ->
     @exprDatetime = { type: "field", table: "t1", column: "datetime" }
     @exprEnum = { type: "field", table: "t1", column: "enum" }
     @exprEnumset = { type: "field", table: "t1", column: "enumset" }
+    @exprTextarr = { type: "field", table: "t1", column: "text[]" }
 
     @axisNumber = { expr: @exprNumber }
     @axisNumberSum = { expr: @exprNumber, aggr: "sum" }
@@ -25,6 +28,7 @@ describe "AxisBuilder", ->
     @axisEnum = { expr: @exprEnum } 
     @axisEnumset = { expr: @exprEnumset } 
     @axisText = { expr: @exprText } 
+    @axisTextarr = { expr: @exprTextarr } 
 
   describe "compileAxis", ->
     it "compiles simple expr", ->
@@ -298,6 +302,9 @@ describe "AxisBuilder", ->
       assert.equal @ab.getAxisType(axis), "date"
 
   describe "formatValue", ->
+    it "formats None", ->
+      assert.equal @ab.formatValue(@axisNumber, null), "None"
+
     it "formats axes with categories", ->
       axis = {
         expr: @exprNumber
@@ -305,8 +312,21 @@ describe "AxisBuilder", ->
       }
       assert.equal @ab.formatValue(axis, 0), "< 1"
 
+    it "formats enum", ->
+      assert.equal @ab.formatValue(@axisEnum, "a"), "A"
+
+    it "formats enumset", ->
+      assert.equal @ab.formatValue(@axisEnumset, ["a","b"]), "A, B"
+
     it "converts to string", ->
       assert.equal @ab.formatValue(@axisNumber, 2), "2"
+
+    it "adds decimal separator", ->
+      assert.equal @ab.formatValue(@axisNumber, 123456), "123,456"
+      assert.equal @ab.formatValue(@axisNumber, "123456"), "123,456", "Should parse string"
+
+    it "wraps text[]", ->
+      assert.deepEqual @ab.formatValue(@axisTextarr, ["a", "b"]), H.div(null, H.div(key: 0, "a"), H.div(key: 1, "b"))
     
   describe "getCategories", ->
     it "gets enum", ->
@@ -316,7 +336,7 @@ describe "AxisBuilder", ->
         { value: "b", label: "B" }
         ])
 
-    it.only "gets enumset", ->
+    it "gets enumset", ->
       categories = @ab.getCategories(@axisEnumset, ["a"])
       compare(categories, [
         { value: "a", label: "A" }

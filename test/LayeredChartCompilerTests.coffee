@@ -567,7 +567,7 @@ describe "LayeredChartCompiler", ->
       it "supports enum types" # enum, boolean, bins ??
       it "supports text type" # text
 
-      it.only "supports enumset x axis", ->
+      it "supports enumset x axis", ->
         design = {
           type: "bar"
           layers: [
@@ -589,7 +589,7 @@ describe "LayeredChartCompiler", ->
           ["0", 10, 18] # Totals
           ])
 
-      it.only "supports enumset x axis with JSON encoded x", ->
+      it "supports enumset x axis with JSON encoded x", ->
         design = {
           type: "bar"
           layers: [

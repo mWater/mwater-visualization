@@ -145,7 +145,7 @@ dashboardDesign = {
                 "expr": {
                   "type": "field",
                   "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
-                  "column": "data:d0dcfce3a697453ba16cc8baa8e384e7:value"
+                  "column": "data:f5cfe2ac564c46f9a42e91a327e9c836:value"
                 }
               },
               "headerText": " "
@@ -154,31 +154,6 @@ dashboardDesign = {
           "orderings": [],
           "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
           "titleText": "Some Title"
-        }
-      }
-    },
-    "bc27601c-8933-4356-b10e-30ce2d30df19": {
-      "layout": {
-        "x": 8,
-        "y": 0,
-        "w": 8,
-        "h": 8
-      },
-      "widget": {
-        "type": "LayeredChart",
-        "design": {
-          "version": 1,
-          "layers": [
-            {
-              "axes": {
-                "x": null
-              },
-              "filter": null,
-              "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
-            }
-          ],
-          "type": "bar",
-          "transpose": false
         }
       }
     }

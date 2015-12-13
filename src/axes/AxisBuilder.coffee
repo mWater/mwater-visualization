@@ -4,6 +4,8 @@ ExprUtils = require('mwater-expressions').ExprUtils
 ExprCleaner = require('mwater-expressions').ExprCleaner
 d3Format = require 'd3-format'
 moment = require 'moment'
+React = require 'react'
+H = React.DOM
 
 xforms = [
   { type: "bin", input: "number", output: "enum" }
@@ -370,24 +372,39 @@ module.exports = class AxisBuilder
       return @exprUtils.summarizeExpr(axis.expr, locale)
     # TODO add xform support
 
-  # Get a string representation of an axis value
+  # Get a string (or React DOM actually) representation of an axis value
   formatValue: (axis, value, locale) ->
     if not value?
       return "None"
 
+    type = @getAxisType(axis)
+
     # If has categories, use those
     categories = @getCategories(axis, [], locale)
     if categories.length > 0
-      category = _.findWhere(categories, value: value)
-      if category
-        return category.label
+      if type == "enumset"
+        return _.map(value, (v) ->
+          category = _.findWhere(categories, value: v)
+          if category
+            return category.label
+          else
+            return "???"
+        ).join(", ")
       else
-        return "???"
+        category = _.findWhere(categories, value: value)
+        if category
+          return category.label
+        else
+          return "???"
 
-
-    # Format as string if number
-    if _.isNumber(value)
-      return d3Format.format(",")(value)
+    switch type
+      when "text"
+        return value
+      when "number"
+        num = parseFloat(value)
+        return d3Format.format(",")(num)
+      when "text[]"
+        return H.div(null, _.map(value, (v, i) -> H.div(key: i, v)))
 
     # TODO format dates
     return "" + value

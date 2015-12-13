@@ -328,7 +328,6 @@ module.exports = class LayeredChartCompiler
         else
           flatRows.push(_.extend({}, row, x: x))
 
-    console.log flatRows
     return flatRows
 
   compileDataCategorical: (design, data, locale) ->

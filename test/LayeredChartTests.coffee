@@ -36,12 +36,7 @@ describe "LayeredChart", ->
       design = @chart.cleanDesign(design)
 
       expectedY = {
-        expr: {
-          type: "scalar"
-          table: "t1"
-          joins:[]
-          expr: { type: "count", table: "t1" }
-        }
+        expr: { type: "id", table: "t1" }
         xform: null
         aggr: "count"
       }
