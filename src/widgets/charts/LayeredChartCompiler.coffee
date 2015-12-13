@@ -535,9 +535,22 @@ module.exports = class LayeredChartCompiler
     
     # If x
     if layer.axes.x
-      filters.push(@axisBuilder.createValueFilter(layer.axes.x, row.x))
-      names.push(@axisBuilder.summarizeAxis(layer.axes.x, locale) + " is " + @axisBuilder.formatValue(layer.axes.x, row.x, locale))
-      data.x = row.x
+      # Handle special case of enumset which is flattened to enum type
+      if @axisBuilder.getAxisType(layer.axes.x) == "enumset"
+        filters.push({
+          type: "op"
+          op: "@>"
+          exprs: [
+            @axisBuilder.compileAxis(axis: layer.axes.x, tableAlias: "{alias}")
+            { type: "literal", value: row.x }
+          ]
+        })
+        names.push(@axisBuilder.summarizeAxis(layer.axes.x, locale) + " includes " + @exprUtils.stringifyExprLiteral(layer.axes.x.expr, row.x, locale))
+        data.x = row.x
+      else        
+        filters.push(@axisBuilder.createValueFilter(layer.axes.x, row.x))
+        names.push(@axisBuilder.summarizeAxis(layer.axes.x, locale) + " is " + @axisBuilder.formatValue(layer.axes.x, row.x, locale))
+        data.x = row.x
 
     if layer.axes.color
       filters.push(@axisBuilder.createValueFilter(layer.axes.color, row.color))

@@ -735,3 +735,30 @@ describe "LayeredChartCompiler", ->
       compare(scope.filter, expectedFilter)
       compare(scope.data, { layerIndex: 0, color: null })
       compare(scope.name, "T1 Enum is None")
+
+    it "creates x filter when enumset which is expanded to enum", ->
+      design = {
+        type: "bar"
+        layers: [
+          { axes: { x: @axisEnumset, y: @axisNumberSum }, table: "t1" }
+        ]
+      }
+
+      row = { x: "a", y: 10 }
+      scope = @compiler.createScope(design, 0, row)
+
+      expectedFilter = {
+        table: "t1"
+        jsonql: {
+          type: "op"
+          op: "@>"
+          exprs: [
+            { type: "field", tableAlias: "{alias}", column: "enumset" }
+            { type: "literal", value: "a" }
+          ]
+        }
+      }
+
+      compare(scope.filter, expectedFilter)
+      compare(scope.data, { layerIndex: 0, x: "a" })
+      compare(scope.name, "T1 Enumset includes A")
