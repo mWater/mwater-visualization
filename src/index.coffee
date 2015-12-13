@@ -37,6 +37,7 @@ exports.MWaterLoaderComponent = require './MWaterLoaderComponent'
 exports.LayeredChart = require './widgets/charts/LayeredChart'
 exports.TableChart = require './widgets/charts/TableChart'
 exports.ChartViewComponent = require './widgets/charts/ChartViewComponent'
+exports.MapViewComponent = require './maps/MapViewComponent'
 
 # http://stackoverflow.com/questions/19305821/multiple-modals-overlay
 $ = require 'jquery'
