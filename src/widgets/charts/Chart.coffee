@@ -19,14 +19,14 @@ module.exports = class Chart
   createDesignerElement: (options) ->
     throw new Error("Not implemented")
 
-  # Create queries for the chart
+  # Get data for the chart asynchronously 
   # filters is array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
-  createQueries: (design, filters) ->
+  getData: (design, filters, callback) ->
     throw new Error("Not implemented")
 
   # Options include 
   # design: design of the chart
-  # data: results from queries
+  # data: data from getData callback
   # width, height: size of the chart view
   # scope: current scope of the view element
   # onScopeChange: called when scope changes with new scope

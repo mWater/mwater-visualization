@@ -8,7 +8,7 @@ AxisBuilder = require '../../axes/AxisBuilder'
 module.exports = class ImageMosaicChartViewComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired # Design of chart
-    data: React.PropTypes.object.isRequired # Data that the chart has requested. In format { main: [image: {image data or imagelist data}] }
+    data: React.PropTypes.array.isRequired # Data that the chart has requested. In format  [image: {image data or imagelist data}]
     dataSource: React.PropTypes.object.isRequired # Data source to use
 
     width: React.PropTypes.number
@@ -30,7 +30,7 @@ module.exports = class ImageMosaicChartViewComponent extends React.Component
     imageElems = []
 
     # For each image
-    for row in @props.data.main
+    for row in @props.data
       imageObj = row.image
       if _.isString(imageObj)
         imageObj = JSON.parse(imageObj)

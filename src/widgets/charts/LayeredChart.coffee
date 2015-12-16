@@ -116,9 +116,10 @@ module.exports = class LayeredChart extends Chart
     return React.createElement(LayeredChartDesignerComponent, props)
 
   # filters is array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
-  createQueries: (design, filters) ->
+  getData: (design, filters, callback) ->
     compiler = new LayeredChartCompiler(schema: @schema)
-    return compiler.createQueries(design, filters)
+    queries = compiler.createQueries(design, filters)
+    @dataSource.performQueries(queries, callback)
 
   # Options include 
   # design: design of the chart
@@ -147,8 +148,7 @@ module.exports = class LayeredChart extends Chart
     # TODO validate design before allowing save
     save = =>
       design = @cleanDesign(design)
-      queries = @createQueries(design, filters)
-      dataSource.performQueries(queries, (err, data) =>
+      @getData(design, filters, (err, data) =>
         if err
           alert("Unable to load data")
         else

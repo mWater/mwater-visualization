@@ -161,9 +161,53 @@ dashboardDesign = {
           "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
         }
       }
+    },
+    "23bd0283-7508-4eb8-9077-8eac7c911e09": {
+      "layout": {
+        "x": 8,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "widget": {
+        "type": "LayeredChart",
+        "design": {
+          "version": 1,
+          "layers": [
+            {
+              "axes": {
+                "x": {
+                  "expr": {
+                    "type": "field",
+                    "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
+                    "column": "data:f1792fe879ce459bb97ec9d5ffff39e1:value:quantity"
+                  },
+                  "xform": {
+                    "type": "bin",
+                    "numBins": 6
+                  }
+                },
+                "y": {
+                  "expr": {
+                    "type": "id",
+                    "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
+                  },
+                  "aggr": "count",
+                  "xform": null
+                }
+              },
+              "filter": null,
+              "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
+            }
+          ],
+          "type": "bar"
+        }
+      }
     }
   }
 }
+
+
 # dashboardDesign = {
 #   "items": {
 #     "e08ef8a3-34db-467d-ac78-f0f273d49f25": {

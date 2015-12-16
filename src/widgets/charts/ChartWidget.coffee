@@ -70,11 +70,8 @@ class ChartWidgetComponent extends React.Component
 
   # Saves a csv file to disk
   handleSaveCsvFile: =>
-    # Get the queries
-    queries = @props.chart.createQueries(@props.design, @props.filters)
-
-    # Execute queries
-    @props.dataSource.performQueries(queries, (err, data) =>
+    # Get the data
+    @props.chart.getData(@props.design, @props.filters, (err, data) =>
       if err  
         return alert("Failed to get data")
 
