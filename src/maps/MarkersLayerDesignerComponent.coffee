@@ -111,7 +111,6 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
       H.label className: "text-muted", title
       H.div style: { marginLeft: 10 }, 
         React.createElement(AxisComponent, 
-          editorTitle: title
           schema: @props.schema
           dataSource: @props.dataSource
           table: @props.sublayer.table

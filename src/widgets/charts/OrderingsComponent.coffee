@@ -66,7 +66,6 @@ class OrderingComponent extends React.Component
         H.span className: "glyphicon glyphicon-remove"
 
       R AxisComponent,
-        editorTitle: "Order"
         schema: @props.schema
         dataSource: @props.dataSource
         table: @props.table

@@ -12,7 +12,6 @@ ui = require '../UIComponents'
 # Axis component that allows designing of an axis
 module.exports = class AxisComponent extends React.Component
   @propTypes:
-    editorTitle: React.PropTypes.any.isRequired # Title for display and popups
     schema: React.PropTypes.object.isRequired # schema to use
     dataSource: React.PropTypes.object.isRequired
 

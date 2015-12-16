@@ -116,7 +116,6 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
 
     R ui.SectionComponent, label: title,
       R(AxisComponent, 
-        editorTitle: title
         schema: @props.schema
         dataSource: @props.dataSource
         table: layer.table
@@ -137,7 +136,6 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
       H.label className: "text-muted", title
       H.div style: { marginLeft: 10 }, 
         R(AxisComponent, 
-          editorTitle: title
           schema: @props.schema, 
           dataSource: @props.dataSource
           table: layer.table
@@ -158,7 +156,6 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
       H.label className: "text-muted", title
       H.div style: { marginLeft: 10 }, 
         R(AxisComponent, 
-          editorTitle: title
           schema: @props.schema, 
           dataSource: @props.dataSource
           table: layer.table

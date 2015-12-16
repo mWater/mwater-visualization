@@ -1,6 +1,7 @@
 ChartWidget = require './charts/ChartWidget'
 LayeredChart = require './charts/LayeredChart'
 TableChart = require './charts/TableChart'
+CalendarChart = require './charts/CalendarChart'
 MarkdownWidget = require './MarkdownWidget'
 MapWidget = require './MapWidget'
 
@@ -22,6 +23,10 @@ module.exports = class WidgetFactory
         # Create chart object
         chart = new TableChart(schema: @schema, dataSource: @dataSource)  
         return new ChartWidget(chart, design, @dataSource)
+      when "CalendarChart"
+        # Create chart object
+        chart = new CalendarChart(schema: @schema, dataSource: @dataSource)  
+        return new ChartWidget(chart, design, @dataSource)
       when "Markdown"
         return new MarkdownWidget(design)
       when "Map"
@@ -35,6 +40,7 @@ module.exports = class WidgetFactory
     widgetTypes = [
       { name: "Chart", type: "LayeredChart", design: {} }
       { name: "Table", type: "TableChart", design: {} }
+      { name: "Calendar", type: "CalendarChart", design: {} }
       { name: "Text", type: "Markdown", design: {} }
     ]
 

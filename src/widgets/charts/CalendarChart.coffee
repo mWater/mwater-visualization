@@ -7,8 +7,8 @@ Chart = require './Chart'
 ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprCompiler = require('mwater-expressions').ExprCompiler
 AxisBuilder = require './../../axes/AxisBuilder'
-TableChartDesignerComponent = require './TableChartDesignerComponent'
-TableChartViewComponent = require './TableChartViewComponent'
+CalendarChartDesignerComponent = require './CalendarChartDesignerComponent'
+CalendarChartViewComponent = require './CalendarChartViewComponent'
 
 ###
 Design is:
@@ -41,6 +41,11 @@ module.exports = class CalendarChart extends Chart
     design.dateAxis = @axisBuilder.cleanAxis(axis: design.dateAxis, table: design.table, aggrNeed: "none", types: ["date", "datetime"])
     design.valueAxis = @axisBuilder.cleanAxis(axis: design.dateAxis, table: design.table, aggrNeed: "required", types: ["number"])
 
+    # Default value axis to count if date axis present
+    if not design.valueAxis and design.dateAxis
+      # Create count expr
+      design.valueAxis = { expr: { type: "id", table: design.table }, aggr: "count", xform: null }
+
     # Clean filter
     design.filter = @exprCleaner.cleanExpr(design.filter, { table: design.table, types: ["boolean"] })
 
@@ -70,18 +75,16 @@ module.exports = class CalendarChart extends Chart
   # Creates a design element with specified options
   # options include design: design and onChange: function
   createDesignerElement: (options) ->
-    # TODO
-    return null
-    # props = {
-    #   schema: @schema
-    #   design: @cleanDesign(options.design)
-    #   dataSource: @dataSource
-    #   onDesignChange: (design) =>
-    #     # Clean design
-    #     design = @cleanDesign(design)
-    #     options.onDesignChange(design)
-    # }
-    # return React.createElement(TableChartDesignerComponent, props)
+    props = {
+      schema: @schema
+      design: @cleanDesign(options.design)
+      dataSource: @dataSource
+      onDesignChange: (design) =>
+        # Clean design
+        design = @cleanDesign(design)
+        options.onDesignChange(design)
+    }
+    return React.createElement(CalendarChartDesignerComponent, props)
 
   createQueries: (design, filters) ->
     exprCompiler = new ExprCompiler(@schema)
@@ -92,26 +95,26 @@ module.exports = class CalendarChart extends Chart
       selects: []
       from: exprCompiler.compileTable(design.table, "main")
       groupBy: [1]
-      orderBy: [1]
+      orderBy: [{ ordinal: 1 }]
       limit: 5000
     }
 
     # Add date axis
-    expr = @axisBuilder.compileAxis(axis: column.dateAxis, tableAlias: "main")
+    dateExpr = @axisBuilder.compileAxis(axis: design.dateAxis, tableAlias: "main")
 
     # Make into date only, stripping time. TODO timezones?
-    expr = { type: "op", op: "left", exprs: [expr, 10] }
+    dateExpr = { type: "op", op: "left", exprs: [dateExpr, 10] }
 
     query.selects.push({ 
       type: "select"
-      expr: expr
+      expr: dateExpr
       alias: "date" 
     })
 
     # Add value axis
     query.selects.push({
       type: "select"      
-      expr: @axisBuilder.compileAxis(axis: column.valueAxis, tableAlias: "main")
+      expr: @axisBuilder.compileAxis(axis: design.valueAxis, tableAlias: "main")
       alias: "value"
     })
 
@@ -122,6 +125,9 @@ module.exports = class CalendarChart extends Chart
     # Compile filter
     if design.filter
       whereClauses.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "main"))
+
+    # Add null filter for date
+    whereClauses.push({ type: "op", op: "is not null", exprs: [dateExpr] })
 
     whereClauses = _.compact(whereClauses)
 
