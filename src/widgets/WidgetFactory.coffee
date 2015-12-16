@@ -2,6 +2,7 @@ ChartWidget = require './charts/ChartWidget'
 LayeredChart = require './charts/LayeredChart'
 TableChart = require './charts/TableChart'
 CalendarChart = require './charts/CalendarChart'
+ImageMosaicChart = require './charts/ImageMosaicChart'
 MarkdownWidget = require './MarkdownWidget'
 MapWidget = require './MapWidget'
 
@@ -27,6 +28,10 @@ module.exports = class WidgetFactory
         # Create chart object
         chart = new CalendarChart(schema: @schema, dataSource: @dataSource)  
         return new ChartWidget(chart, design, @dataSource)
+      when "ImageMosaicChart"
+        # Create chart object
+        chart = new ImageMosaicChart(schema: @schema, dataSource: @dataSource)  
+        return new ChartWidget(chart, design, @dataSource)
       when "Markdown"
         return new MarkdownWidget(design)
       when "Map"
@@ -41,6 +46,7 @@ module.exports = class WidgetFactory
       { name: "Chart", type: "LayeredChart", design: {} }
       { name: "Table", type: "TableChart", design: {} }
       { name: "Calendar", type: "CalendarChart", design: {} }
+      { name: "Image Mosaic", type: "ImageMosaicChart", design: {} }
       { name: "Text", type: "Markdown", design: {} }
     ]
 
