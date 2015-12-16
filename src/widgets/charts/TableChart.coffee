@@ -63,7 +63,7 @@ module.exports = class TableChart extends Chart
       ordering.axis = @axisBuilder.cleanAxis(axis: ordering.axis, table: design.table, aggrNeed: "optional")
 
     if design.filter
-      design.filter = @exprCleaner.cleanExpr(design.filter, { table: design.table })
+      design.filter = @exprCleaner.cleanExpr(design.filter, { table: design.table, types: ['boolean'] })
 
     return design
 

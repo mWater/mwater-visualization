@@ -31,32 +31,18 @@ module.exports = class CalendarChart extends Chart
     @axisBuilder = new AxisBuilder(schema: @schema)
 
   cleanDesign: (design) ->
-    # TODO
-    # # Clone deep for now # TODO
-    # design = _.cloneDeep(design)
+    # Clone deep for now # TODO
+    design = _.cloneDeep(design)
 
-    # design.version = design.version or 1
+    # Fill in defaults
+    design.version = design.version or 1
 
-    # # Always have at least one column
-    # design.columns = design.columns or []
-    # if design.columns.length == 0
-    #   design.columns.push({})
+    # Clean axes
+    design.dateAxis = @axisBuilder.cleanAxis(axis: design.dateAxis, table: design.table, aggrNeed: "none", types: ["date", "datetime"])
+    design.valueAxis = @axisBuilder.cleanAxis(axis: design.dateAxis, table: design.table, aggrNeed: "required", types: ["number"])
 
-    # design.orderings = design.orderings or []
-
-    # # Clean each column
-    # for columnId in [0...design.columns.length]
-    #   column = design.columns[columnId]
-
-    #   # Clean textAxis
-    #   column.textAxis = @axisBuilder.cleanAxis(axis: column.textAxis, table: design.table, aggrNeed: "optional")
-
-    # # Clean orderings
-    # for ordering in design.orderings
-    #   ordering.axis = @axisBuilder.cleanAxis(axis: ordering.axis, table: design.table, aggrNeed: "optional")
-
-    # if design.filter
-    #   design.filter = @exprCleaner.cleanExpr(design.filter, { table: design.table })
+    # Clean filter
+    design.filter = @exprCleaner.cleanExpr(design.filter, { table: design.table, types: ["boolean"] })
 
     return design
 
@@ -65,20 +51,16 @@ module.exports = class CalendarChart extends Chart
     if not design.table
       return "Missing data source"
 
+    # Check that has axes
     error = null
 
-    # TODO
-    # for column in design.columns
-    #   # Check that has textAxis
-    #   if not column.textAxis
-    #     error = error or "Missing text"
+    if not design.dateAxis
+      error = error or "Missing date"
+    if not design.valueAxis
+      error = error or "Missing value"
 
-    #   error = error or @axisBuilder.validateAxis(axis: column.textAxis)
-
-    # for ordering in design.orderings
-    #   if not ordering.axis
-    #     error = error or "Missing order expression"
-    #   error = error or @axisBuilder.validateAxis(axis: ordering.axis)
+    error = error or @axisBuilder.validateAxis(axis: design.dateAxis)
+    error = error or @axisBuilder.validateAxis(axis: design.valueAxis)
 
     return error
 
@@ -117,7 +99,7 @@ module.exports = class CalendarChart extends Chart
     # Add date axis
     expr = @axisBuilder.compileAxis(axis: column.dateAxis, tableAlias: "main")
 
-    # Make into date only TODO
+    # Make into date only, stripping time. TODO timezones?
     expr = { type: "op", op: "left", exprs: [expr, 10] }
 
     query.selects.push({ 
@@ -175,6 +157,7 @@ module.exports = class CalendarChart extends Chart
     return React.createElement(CalendarChartViewComponent, props)
 
   createDataTable: (design, data) ->
+    super
     # TODO
     # renderHeaderCell = (column) =>
     #   column.headerText or @axisBuilder.summarizeAxis(column.textAxis)
