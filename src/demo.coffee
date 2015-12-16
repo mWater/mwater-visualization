@@ -11,6 +11,7 @@ LayeredChartDesignerComponent = require './widgets/charts/LayeredChartDesignerCo
 
 LayerFactory = require './maps/LayerFactory'
 WidgetFactory = require './widgets/WidgetFactory'
+CalendarChartViewComponent = require './widgets/charts/CalendarChartViewComponent'
 
 MWaterLoaderComponent = require './MWaterLoaderComponent'
 MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
