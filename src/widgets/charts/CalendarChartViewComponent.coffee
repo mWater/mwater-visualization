@@ -156,7 +156,6 @@ module.exports = class CalendarChartViewComponent extends React.Component
       justifyContent: "center"
       width: @props.width
       height: @props.height
-      border: "solid 1px #AAA"
       shapeRendering: "crispEdges"
 
     title = @props.design.titleText
