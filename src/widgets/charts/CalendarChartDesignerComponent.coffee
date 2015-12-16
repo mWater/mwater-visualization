@@ -69,7 +69,7 @@ module.exports = class CalendarChartDesignerComponent extends React.Component
         schema: @props.schema
         dataSource: @props.dataSource
         table: @props.design.table
-        types: ["date", "datetime"]
+        types: ["date"]
         aggrNeed: "none"
         required: true
         value: @props.design.dateAxis 
@@ -95,7 +95,7 @@ module.exports = class CalendarChartDesignerComponent extends React.Component
     H.div null,
       @renderTable()
       @renderDateAxis()
-      @renderValueAxis
+      @renderValueAxis()
       @renderFilter()
       H.hr()
       @renderTitle()

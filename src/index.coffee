@@ -36,6 +36,7 @@ exports.MWaterLoaderComponent = require './MWaterLoaderComponent'
 
 exports.LayeredChart = require './widgets/charts/LayeredChart'
 exports.TableChart = require './widgets/charts/TableChart'
+exports.CalendarChart = require './widgets/charts/CalendarChart'
 exports.ChartViewComponent = require './widgets/charts/ChartViewComponent'
 exports.MapViewComponent = require './maps/MapViewComponent'
 exports.DashboardUtils = require './widgets/DashboardUtils'

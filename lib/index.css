@@ -173,3 +173,16 @@
 .mwater-visualization-markdown p {
   font-size: 12pt;
 }
+
+.d3-tip {
+  line-height: 1;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+.d3-tip p {
+  margin: 0;
+  padding: 0;
+}

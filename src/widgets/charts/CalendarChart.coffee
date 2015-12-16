@@ -38,7 +38,7 @@ module.exports = class CalendarChart extends Chart
     design.version = design.version or 1
 
     # Clean axes
-    design.dateAxis = @axisBuilder.cleanAxis(axis: design.dateAxis, table: design.table, aggrNeed: "none", types: ["date", "datetime"])
+    design.dateAxis = @axisBuilder.cleanAxis(axis: design.dateAxis, table: design.table, aggrNeed: "none", types: ["date"])
     design.valueAxis = @axisBuilder.cleanAxis(axis: design.dateAxis, table: design.table, aggrNeed: "required", types: ["number"])
 
     # Default value axis to count if date axis present
@@ -101,9 +101,6 @@ module.exports = class CalendarChart extends Chart
 
     # Add date axis
     dateExpr = @axisBuilder.compileAxis(axis: design.dateAxis, tableAlias: "main")
-
-    # Make into date only, stripping time. TODO timezones?
-    dateExpr = { type: "op", op: "left", exprs: [dateExpr, 10] }
 
     query.selects.push({ 
       type: "select"
