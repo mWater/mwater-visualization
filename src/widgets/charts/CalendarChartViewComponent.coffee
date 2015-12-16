@@ -146,14 +146,23 @@ module.exports = class CalendarChartViewComponent extends React.Component
     return
 
   render: ->
+    titleStyle =
+      textAlign: "center"
+      fontSize: "14px"
+      fontWeight: "bold"
     style =
-      display: "flex"
-      flexDirection: "column"
+#      display: "flex"
+#      flexDirection: "column"
       justifyContent: "center"
       width: @props.width
       height: @props.height
       border: "solid 1px #AAA"
       shapeRendering: "crispEdges"
 
-    H.div {style: style, ref: "chart_container"}
+    title = @props.design.titleText
+
+    H.div style: style,
+      if title
+        H.p style: titleStyle, title,
+      H.div { ref: "chart_container"}
 
