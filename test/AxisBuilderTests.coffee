@@ -224,9 +224,9 @@ describe "AxisBuilder", ->
 
     it "removes bad aggr"
 
-    it "defaults count aggr if will satify output", ->
+    it "does not default count aggr for text", ->
       axis = @ab.cleanAxis(axis: @axisText, table: "t1", types: ["number"])
-      assert.equal axis.aggr, "count"
+      assert not axis, JSON.stringify(axis)
 
     it "removes aggr if xform", ->
       axis = {
@@ -251,9 +251,9 @@ describe "AxisBuilder", ->
       assert not @ab.cleanAxis(axis: axis, table: "t1", types: ['text'], aggrNeed: "none"), "Should remove text"
       assert @ab.cleanAxis(axis: axis, table: "t1", types: ['enum'], aggrNeed: "none"), "Number can be binned to enum" # Can get enum via binning
     
-      # Aggr text can get to count
+      # Aggr text cannot get to count
       assert not @ab.cleanAxis(axis: { expr: @exprText }, table: "t1", types: ['number'], aggrNeed: "none"), "No aggr allowed"
-      assert @ab.cleanAxis(axis: { expr: @exprText }, table: "t1", types: ['number'], aggrNeed: "required")
+      assert not @ab.cleanAxis(axis: { expr: @exprText }, table: "t1", types: ['number'], aggrNeed: "required")
 
     it "defaults colorMap"
 
@@ -273,9 +273,9 @@ describe "AxisBuilder", ->
       assert @ab.validateAxis(axis: axis)
 
   describe "getExprTypes", ->
-    it "adds any if aggr allowed and number out", ->
-      assert.include @ab.getExprTypes(["number"], "optional"), "datetime"
-      assert.include @ab.getExprTypes(["number"], "required"), "datetime"
+    it "does not add any if aggr allowed and number out", ->
+      assert.notInclude @ab.getExprTypes(["number"], "optional"), "datetime"
+      assert.notInclude @ab.getExprTypes(["number"], "required"), "datetime"
   
     it "adds number if binnable", ->
       assert.include @ab.getExprTypes(["enum"], "optional"), "number"

@@ -77,7 +77,7 @@ module.exports = class AxisBuilder
         # Unredeemable if no xform possible and cannot use count to get number
         if options.aggrNeed == "none" 
           return null
-        if "number" not in options.types
+        if "number" not in options.types or type != "id"
           return null
 
     # Always 
@@ -110,10 +110,6 @@ module.exports = class AxisBuilder
       if options.aggrNeed != "none" and not axis.aggrs
         if @exprUtils.getExprType(axis.expr) == "id"
           axis.aggr = "count"
-
-      # Set aggr to count if needed to satisfy types
-      if options.types and "number" in options.types and type not in options.types
-        axis.aggr = "count"
 
     return axis
 
@@ -220,16 +216,16 @@ module.exports = class AxisBuilder
     if not types
       return null
       
-    # Allow any if count is an option
-    if aggrNeed != "none" and "number" in types
-      return ["text", "number", "date", "datetime", "boolean", "enum"]
-
     types = types.slice()
 
     # Add xformed types
     for xform in xforms
       if xform.output in types
         types = _.union(types, [xform.input])
+
+    # Allow id type if count is an option
+    if aggrNeed != "none" and "number" in types
+      types = _.union(["id"], types)
 
     return types
 
@@ -321,6 +317,9 @@ module.exports = class AxisBuilder
       when "text"
         # Return unique values
         return _.map(_.uniq(values), (v) -> { value: v, label: v or "None" })
+      when "boolean"
+        # Return unique values
+        return [{ value: true, label: "True" }, { value: false, label: "False" }]
       when "date"
         values = _.compact(values)
         if values.length == 0 
@@ -364,7 +363,7 @@ module.exports = class AxisBuilder
 
     exprType = @exprUtils.getExprType(axis.expr)
 
-    # Add aggr if not a count type
+    # Add aggr if not a id type
     if axis.aggr and exprType != "id"
       aggrName = _.findWhere(@exprUtils.getAggrs(axis.expr), { id: axis.aggr }).name
       return aggrName + " " + @exprUtils.summarizeExpr(axis.expr, locale)

@@ -84,7 +84,7 @@ exports.SwitchViewComponent = class SwitchViewComponent extends React.Component
     # Create the style object that has the opacity for each view
     style = {}
     for id, view of @props.views
-      style[id] = motion.spring(if id == @props.viewId then 1 else 0)
+      style[id] = motion.spring((if id == @props.viewId then 1 else 0), [332, 34]) # Stiff, quick spring
 
     return R motion.Motion,
       style: style

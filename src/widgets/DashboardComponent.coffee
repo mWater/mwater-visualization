@@ -1,12 +1,11 @@
 React = require 'react'
 H = React.DOM
-uuid = require 'node-uuid'
 
 UndoStack = require './../UndoStack'
 DashboardViewComponent = require './DashboardViewComponent'
 AutoSizeComponent = require './../AutoSizeComponent'
 filesaver = require 'filesaver.js'
-LegoLayoutEngine = require './LegoLayoutEngine'
+DashboardUtils = require './DashboardUtils'
 
 # Dashboard component that includes an action bar at the top
 # Manages undo stack
@@ -56,42 +55,9 @@ module.exports = class DashboardComponent extends React.Component
     blob = new Blob([JSON.stringify(@props.design, null, 2)], {type: "text/json"})
     filesaver(blob, "Dashboard.json")
 
-  # Find a layout that the new widget fits in. width and height are in 24ths
-  findOpenLayout: (width, height) ->
-    # Create layout engine
-    # TODO create from design
-    # TODO uses fake width
-    layoutEngine = new LegoLayoutEngine(100, 24)
-
-    # Get existing layouts
-    layouts = _.pluck(_.values(@props.design.items), "layout")
-
-    # Find place for new item
-    return layoutEngine.appendLayout(layouts, width, height)
-
-  addWidget: (type, design, width, height) ->
-    # Find place for new item
-    layout = @findOpenLayout(width, height)
-
-    # Create item
-    item = {
-      layout: layout
-      widget: {
-        type: type
-        design: design
-      }
-    }
-
-    id = uuid.v4()
-    # Add item
-    items = _.clone(@props.design.items)
-    items[id] = item
-
-    design = _.extend({}, @props.design, items: items)
-    @props.onDesignChange(design)
-
   handleAddWidget: (wt) =>
-    @addWidget(wt.type, wt.design, 8, 8)
+    design = DashboardUtils.addWidget(@props.design, wt.type, wt.design, 8, 8)
+    @props.onDesignChange(design)
 
   renderAddWidget: ->
     H.div key: "add", className: "btn-group",

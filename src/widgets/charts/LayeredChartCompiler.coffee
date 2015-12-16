@@ -24,7 +24,7 @@ module.exports = class LayeredChartCompiler
     @axisBuilder = new AxisBuilder(schema: @schema)
 
   # Create the queries needed for the chart.
-  # extraFilters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. 
+  # extraFilters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. }
   createQueries: (design, extraFilters) ->
     exprCompiler = new ExprCompiler(@schema)
 

@@ -1,6 +1,6 @@
 React = require 'react'
 H = React.DOM
-ExprComponent = require("mwater-expressions-ui").ExprComponent
+FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprUtils = require('mwater-expressions').ExprUtils
 
@@ -32,11 +32,10 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
 
     H.div key: table, 
       H.h4 null, name
-      React.createElement(ExprComponent, 
+      React.createElement(FilterExprComponent, 
         schema: @props.schema
         dataSource: @props.dataSource
         onChange: @handleFilterChange.bind(null, table)
-        type: "boolean"
         table: table
         value: @props.design.filters[table])
 

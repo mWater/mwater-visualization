@@ -6,6 +6,7 @@ ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require './../../axes/AxisBuilder'
 EditableLinkComponent = require './../../EditableLinkComponent'
 ExprComponent = require("mwater-expressions-ui").ExprComponent
+FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 OrderingsComponent = require './OrderingsComponent'
 TableSelectComponent = require '../../TableSelectComponent'
 
@@ -111,11 +112,10 @@ module.exports = class TableChartDesignerComponent extends React.Component
         " "
         "Filters"
       H.div style: { marginLeft: 8 }, 
-        React.createElement(ExprComponent, 
+        React.createElement(FilterExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           onChange: @handleFilterChange
-          type: "boolean"
           table: @props.design.table
           value: @props.design.filter)
 

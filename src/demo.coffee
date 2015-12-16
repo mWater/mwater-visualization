@@ -82,11 +82,11 @@ class MWaterDashboardPane extends React.Component
       user: @props.user
       onFormIdsChange: (formIds) => @setState(formIds: formIds)
       formIds: @state.formIds
-    }, (options) =>
+    }, (error, config) =>
       H.div style: { height: "100%" },
         React.createElement(visualization.DashboardComponent, {
           design: @state.design
-          widgetFactory: options.widgetFactory
+          widgetFactory: config.widgetFactory
           onDesignChange: @handleDesignChange
           titleElem: "Sample"
         })
@@ -96,7 +96,8 @@ $ ->
   sample = H.div className: "container-fluid", style: { height: "100%" },
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
-    React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
@@ -128,32 +129,42 @@ class MWaterDataSource extends DataSource
 
 dashboardDesign = {
   "items": {
-    "6ae73377-694d-4567-aa6d-abbaecf52934": {
+    "e845bb49-8c50-44e5-9b4c-7bf5a2765284": {
       "layout": {
-        "x": 0,
+        "x": 8,
         "y": 0,
         "w": 8,
         "h": 8
       },
       "widget": {
-        "type": "TableChart",
+        "type": "LayeredChart",
         "design": {
           "version": 1,
-          "columns": [
+          "layers": [
             {
-              "textAxis": {
-                "expr": {
-                  "type": "field",
-                  "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
-                  "column": "data:f5cfe2ac564c46f9a42e91a327e9c836:value"
+              "axes": {
+                "color": {
+                  "expr": {
+                    "type": "field",
+                    "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
+                    "column": "data:ef40dba8338d4ebdbbc5808e78969e95:value"
+                  },
+                  "xform": null
+                },
+                "y": {
+                  "expr": {
+                    "type": "id",
+                    "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
+                  },
+                  "aggr": "count",
+                  "xform": null
                 }
               },
-              "headerText": " "
+              "filter": null,
+              "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
             }
           ],
-          "orderings": [],
-          "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
-          "titleText": "Some Title"
+          "type": "donut"
         }
       }
     }

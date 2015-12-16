@@ -3,7 +3,7 @@ H = React.DOM
 R = React.createElement
 AxisComponent = require './../../axes/AxisComponent'
 AxisBuilder = require '../../axes/AxisBuilder'
-ExprComponent = require("mwater-expressions-ui").ExprComponent
+FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
 EditableLinkComponent = require './../../EditableLinkComponent'
 ColorComponent = require '../../ColorComponent'
@@ -208,11 +208,10 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
         " "
         "Filters"
       H.div style: { marginLeft: 8 }, 
-        R(ExprComponent, 
+        R(FilterExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           onChange: @handleFilterChange
-          type: "boolean"
           table: layer.table
           value: layer.filter)
 

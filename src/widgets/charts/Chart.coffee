@@ -19,6 +19,8 @@ module.exports = class Chart
   createDesignerElement: (options) ->
     throw new Error("Not implemented")
 
+  # Create queries for the chart
+  # filters is array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   createQueries: (design, filters) ->
     throw new Error("Not implemented")
 

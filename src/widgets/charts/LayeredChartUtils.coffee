@@ -13,6 +13,6 @@ exports.getAxisTypes = (design, layer, axis) ->
       # More broad
       return ['enum', 'text', 'number', 'boolean', 'date']
     when "color"
-      return ['enum', 'text', 'date']
+      return ['enum', 'text', 'date', 'boolean']
     when "y"
       return ['number']

@@ -115,6 +115,7 @@ module.exports = class LayeredChart extends Chart
     }
     return React.createElement(LayeredChartDesignerComponent, props)
 
+  # filters is array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   createQueries: (design, filters) ->
     compiler = new LayeredChartCompiler(schema: @schema)
     return compiler.createQueries(design, filters)

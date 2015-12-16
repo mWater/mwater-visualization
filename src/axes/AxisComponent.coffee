@@ -183,7 +183,7 @@ module.exports = class AxisComponent extends React.Component
           schema: @props.schema
           dataSource: @props.dataSource
           table: @props.table
-          # types: axisBuilder.getExprTypes(@props.types, @props.aggrNeed) TODO types are not passed in as ExprComponent is single-type now
+          types: axisBuilder.getExprTypes(@props.types, @props.aggrNeed)
           # preventRemove: @props.required
           onChange: @handleExprChange
           includeCount: @props.aggrNeed != "none"

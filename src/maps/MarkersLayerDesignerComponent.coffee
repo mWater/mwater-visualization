@@ -1,6 +1,6 @@
 React = require 'react'
 H = React.DOM
-ExprComponent = require("mwater-expressions-ui").ExprComponent
+FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
 EditableLinkComponent = require '../EditableLinkComponent'
 AxisComponent = require './../axes/AxisComponent'
@@ -137,11 +137,10 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
         H.span(className: "glyphicon glyphicon-filter")
         " Filters"
       H.div style: { marginLeft: 8 }, 
-        React.createElement(ExprComponent, 
+        React.createElement(FilterExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           onChange: @handleFilterChange
-          type: "boolean"
           table: @props.sublayer.table
           value: @props.sublayer.filter)
 

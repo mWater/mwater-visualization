@@ -41,17 +41,17 @@ gulp.task "dist", ->
 
 gulp.task "water_org_libs_css", ->
   return gulp.src([
-    "./bower_components/bootstrap/dist/css/bootstrap.min.css"
-    "./bower_components/bootstrap/dist/css/bootstrap-theme.min.css"
-    "./bower_components/c3/c3.min.css"
+    "bower_components/bootstrap/dist/css/bootstrap.min.css"
+    "bower_components/bootstrap/dist/css/bootstrap-theme.min.css"
+    "bower_components/c3/c3.min.css"
   ]).pipe(concat("libs.css"))
     .pipe(gulp.dest("./dist/water_org/"))
 
 gulp.task "water_org_libs_js", ->
   return gulp.src([
-    "./bower_components/bootstrap/dist/js/bootstrap.js"
-    "./bower_components/lodash/lodash.min.js"
-    "./bower_components/c3/c3.min.js"
+    "bower_components/bootstrap/dist/js/bootstrap.js"
+    "bower_components/lodash/lodash.min.js"
+    "bower_components/c3/c3.min.js"
   ]).pipe(concat("libs.js"))
     .pipe(gulp.dest("./dist/water_org/"))
 
@@ -70,24 +70,26 @@ gulp.task "water_org_index_css", ->
 
 gulp.task "libs_css", ->
   return gulp.src([
-    "./bower_components/bootstrap/dist/css/bootstrap.css"
-    "./bower_components/bootstrap/dist/css/bootstrap-theme.css"
-    "./bower_components/c3/c3.css"
+    "bower_components/bootstrap/dist/css/bootstrap.css"
+    "bower_components/bootstrap/dist/css/bootstrap-theme.css"
+    "bower_components/c3/c3.css"
   ]).pipe(concat("libs.css"))
     .pipe(gulp.dest("./dist/css/"))
 
 gulp.task "libs_js", ->
   return gulp.src([
-    "./bower_components/jquery/dist/jquery.js"
-    "./bower_components/bootstrap/dist/js/bootstrap.js"
-    "./bower_components/lodash/lodash.js"
-    "./bower_components/d3/d3.js"
-    "./bower_components/c3/c3.js"
+    "bower_components/jquery/dist/jquery.js"
+    "bower_components/bootstrap/dist/js/bootstrap.js"
+    "bower_components/lodash/lodash.js"
+    "bower_components/d3/d3.js"
+    "bower_components/c3/c3.js"
+    "vendor/react-0.14.3.js"
+    "vendor/react-dom-0.14.3.js"
   ]).pipe(concat("libs.js"))
     .pipe(gulp.dest("./dist/js/"))
 
 gulp.task "copy_fonts", ->
-  return gulp.src(["./bower_components/bootstrap/dist/fonts/*"]).pipe(gulp.dest("./dist/fonts/"))
+  return gulp.src(["bower_components/bootstrap/dist/fonts/*"]).pipe(gulp.dest("./dist/fonts/"))
 
 # gulp.task "copy_images", ->
 #   gulp.src([
@@ -152,6 +154,8 @@ shim = (instance) ->
     jquery: './jquery-shim'
     lodash: './lodash-shim'
     underscore: './lodash-shim'
+    react: './react-shim'
+    "react-dom": './react-dom-shim'
   }
 
   # Add shims

@@ -22,11 +22,12 @@ module.exports = class MWaterLoaderComponent extends React.Component
 
     onMarkerClick: React.PropTypes.func                       # Called with (table, id)
 
-    children: React.PropTypes.func.isRequired                 # Called with { schema:, dataSource:, widgetFactory:, layerFactory: }
+    children: React.PropTypes.func.isRequired                 # Called with (error, { schema:, dataSource:, widgetFactory:, layerFactory: })
 
   constructor: ->
     super
     @state = {
+      error: null
       schema: null
       dataSource: null
       widgetFactory: null
@@ -113,7 +114,7 @@ module.exports = class MWaterLoaderComponent extends React.Component
     if not @state.schema
       return H.div null, "Loading..."
 
-    return @props.children({
+    return @props.children(@state.error, {
       schema: @state.schema
       dataSource: @state.dataSource
       layerFactory: @state.layerFactory
