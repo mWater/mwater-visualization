@@ -130,38 +130,6 @@ class MWaterDataSource extends DataSource
 
 dashboardDesign = {
   "items": {
-    "11035ea3-6812-4dce-9002-bf4df3fefc50": {
-      "layout": {
-        "x": 0,
-        "y": 0,
-        "w": 8,
-        "h": 8
-      },
-      "widget": {
-        "type": "CalendarChart",
-        "design": {
-          "version": 1,
-          "dateAxis": {
-            "expr": {
-              "type": "field",
-              "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
-              "column": "data:f12aada1e2fd4ad8af06b3be00f23a93:value"
-            },
-            "xform": null
-          },
-          "valueAxis": {
-            "expr": {
-              "type": "id",
-              "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
-            },
-            "aggr": "count",
-            "xform": null
-          },
-          "filter": null,
-          "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
-        }
-      }
-    },
     "23bd0283-7508-4eb8-9077-8eac7c911e09": {
       "layout": {
         "x": 8,
@@ -184,7 +152,9 @@ dashboardDesign = {
                   },
                   "xform": {
                     "type": "bin",
-                    "numBins": 6
+                    "numBins": 6,
+                    "min": null,
+                    "max": null
                   }
                 },
                 "y": {
@@ -206,7 +176,6 @@ dashboardDesign = {
     }
   }
 }
-
 
 # dashboardDesign = {
 #   "items": {

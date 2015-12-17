@@ -1,6 +1,7 @@
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
+async = require 'async'
 
 Chart = require './Chart'
 LayeredChartCompiler = require './LayeredChartCompiler'
@@ -119,7 +120,17 @@ module.exports = class LayeredChart extends Chart
   getData: (design, filters, callback) ->
     compiler = new LayeredChartCompiler(schema: @schema)
     queries = compiler.createQueries(design, filters)
-    @dataSource.performQueries(queries, callback)
+
+    # Run queries in parallel
+    async.map _.pairs(queries), (item, cb) =>
+      @dataSource.performQuery(item[1], (err, rows) =>
+        cb(err, [item[0], rows])
+        )
+    , (err, items) =>
+      if err
+        return callback(err)
+      else
+        callback(null, _.object(items))
 
   # Options include 
   # design: design of the chart

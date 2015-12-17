@@ -9,6 +9,8 @@ It contains:
  xform: optional transformation to be applied. object with `type` field. See below
  colorMap: TBD
 
+aggregation and transforms are mutually exclusive.
+
 ## Xforms
 
 types: 
