@@ -32,6 +32,9 @@ module.exports = class CalendarChartViewComponent extends React.Component
     monthsStrokeWidth: 1
     cellColor: "#FDAE61"
 
+  @contextTypes:
+    locale: React.PropTypes.string  # e.g. "en"
+
   shouldComponentUpdate: (prevProps) ->
     not _.isEqual(prevProps, @props)
 
@@ -69,7 +72,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
 
     rgb = d3.rgb(@props.cellColor)
     years = @getYears()
-    
+
     # Don't draw if no years
     if years.length == 0
       return

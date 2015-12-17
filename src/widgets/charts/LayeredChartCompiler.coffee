@@ -316,7 +316,11 @@ module.exports = class LayeredChartCompiler
         continue
 
       if _.isString(row.x)
-        xs = JSON.parse(row.x)
+        # Handle failed parsings graciously in case question used to be a non-array
+        try
+          xs = JSON.parse(row.x)
+        catch
+          xs = row.x
       else
         xs = row.x
 

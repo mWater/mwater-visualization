@@ -21,8 +21,16 @@ module.exports = class MWaterLoaderComponent extends React.Component
     onFormIdsChange: React.PropTypes.func                     # Called when form ids are changed and schema should be reloaded
 
     onMarkerClick: React.PropTypes.func                       # Called with (table, id)
+    newLayers: React.PropTypes.arrayOf(React.PropTypes.shape({
+      name: React.PropTypes.string.isRequired
+      type: React.PropTypes.string.isRequired
+      design: React.PropTypes.object.isRequired
+    }))
 
     children: React.PropTypes.func.isRequired                 # Called with (error, { schema:, dataSource:, widgetFactory:, layerFactory: })
+
+  @defaultProps:
+    newLayers: [{ name: "Custom Layer", type: "Markers", design: {} }]
 
   constructor: ->
     super

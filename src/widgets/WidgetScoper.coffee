@@ -4,8 +4,8 @@ _ = require 'lodash'
 # widgets. Immutable.
 # Scope is a JSON object consisting of:
 #  name: human-readable name for the scope/filter
-#  filter: filter for other widgets. opaque
-#  data: internal, opaque data that the widget understands
+#  filter: filter for other widgets in format { table: tablename, jsonql: JsonQL with {alias} for the table name to filter by }
+#  data: internal, opaque data that the widget understands. opaque
 module.exports = class WidgetScoper
   constructor: (scopes) ->
     @scopes = scopes or {}

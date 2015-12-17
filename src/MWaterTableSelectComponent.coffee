@@ -148,7 +148,11 @@ class FormsListComponent extends React.Component
         ], ['desc', 'desc', 'desc'])
 
       # TODO use name instead of design.name
-      @setState(forms: _.map(forms, (form) => { id: form._id, name: ExprUtils.localizeString(form.design.name, @context.locale), desc: "Created by #{form.created.by}" }))
+      @setState(forms: _.map(forms, (form) => { 
+          id: form._id
+          name: ExprUtils.localizeString(form.design.name, @context.locale)
+          desc: "Created by #{form.created.by}" 
+      }))
     .fail (xhr) =>
       @setState(error: xhr.responseText)
 
