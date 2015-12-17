@@ -17,7 +17,7 @@ module.exports = class MWaterLoaderComponent extends React.Component
     client: React.PropTypes.string
     user: React.PropTypes.string                              # username of logged in user
 
-    formIds: React.PropTypes.arrayOf(React.PropTypes.string)  # Forms to load in schema
+    formIds: React.PropTypes.arrayOf(React.PropTypes.string)  # Forms to load in schema. Forms are not loaded by default as they are too many
     onFormIdsChange: React.PropTypes.func                     # Called when form ids are changed and schema should be reloaded
 
     onMarkerClick: React.PropTypes.func                       # Called with (table, id)
@@ -98,7 +98,8 @@ module.exports = class MWaterLoaderComponent extends React.Component
         layerFactory: layerFactory
         widgetFactory: widgetFactory
         })
-    # TODO error handling
+    .fail (xhr) =>
+      @setState(error: xhr.responseText)
 
   @childContextTypes: 
     tableSelectElementFactory: React.PropTypes.func
