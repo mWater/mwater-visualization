@@ -36,13 +36,13 @@ module.exports = class ChartViewComponent extends React.Component
 
   # Get options in react-select format
   componentDidMount: ->
-    @updateView(@props)
+    @updateData(@props)
 
   componentWillReceiveProps: (nextProps) ->
-    if not _.isEqual(nextProps.design, @props.design)
-      @updateView(nextProps)
+    if not _.isEqual(nextProps.design, @props.design) or not _.isEqual(nextProps.filters, @props.filters)
+      @updateData(nextProps)
 
-  updateView: (props) ->
+  updateData: (props) ->
     # Clean design first (needed to validate properly)
     design = props.chart.cleanDesign(props.design)
 

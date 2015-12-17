@@ -23,7 +23,7 @@ module.exports = class ImageMosaicChartViewComponent extends React.Component
 
   # Render a single image
   renderImage: (image) ->
-    H.img src: @props.dataSource.getImageUrl(image.id, 100), alt: image.caption, className: "img-thumbnail", style: { height: 100, minWidth: 50 }
+    H.img src: @props.dataSource.getImageUrl(image.id, 100), key: image.id, alt: image.caption, className: "img-thumbnail", style: { height: 100, minWidth: 50 }
 
   # Render images
   renderImages: ->

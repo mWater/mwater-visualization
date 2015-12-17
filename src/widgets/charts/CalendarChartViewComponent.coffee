@@ -69,6 +69,10 @@ module.exports = class CalendarChartViewComponent extends React.Component
 
     rgb = d3.rgb(@props.cellColor)
     years = @getYears()
+    
+    # Don't draw if no years
+    if years.length == 0
+      return
 
     data = d3.nest()
       .key( (d) -> d.date )

@@ -469,7 +469,7 @@ module.exports = class AxisBuilder
     type = @getAxisType(axis)
 
     # If has categories, use those
-    categories = @getCategories(axis, [], locale)
+    categories = @getCategories(axis, [value], locale)
     if categories.length > 0
       if type == "enumset"
         # Parse if string

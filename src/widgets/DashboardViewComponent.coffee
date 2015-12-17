@@ -6,6 +6,8 @@ WidgetScoper = require './WidgetScoper'
 WidgetContainerComponent = require './WidgetContainerComponent'
 ReactElementPrinter = require './../ReactElementPrinter'
 
+WidgetScopesViewComponent = require './WidgetScopesViewComponent'
+
 uuid = require 'node-uuid'
 
 # Displays a dashboard, handling removing of widgets. No title bar or other decorations.
@@ -81,37 +83,8 @@ module.exports = class DashboardViewComponent extends React.Component
     printer = new ReactElementPrinter()
     printer.print(elem)
 
-  renderScope: (id) =>
-    style = {
-      cursor: "pointer"
-      borderRadius: 4
-      border: "solid 1px #BBB"
-      padding: "1px 5px 1px 5px"
-      color: "#666"
-      backgroundColor: "#EEE"
-      display: "inline-block"
-      marginLeft: 4
-      marginRight: 4
-    }
-
-    scope = @state.widgetScoper.getScope(id) 
-    if not scope
-      return null
-
-    return H.div key: id, style: style, onClick: @handleRemoveScope.bind(null, id),
-      scope.name
-      " "
-      H.span className: "glyphicon glyphicon-remove"
-
   renderScopes: ->
-    scopes = @state.widgetScoper.getScopes()
-    if _.compact(_.values(scopes)).length == 0
-      return null
-
-    return H.div className: "alert alert-info", 
-      H.span(className: "glyphicon glyphicon-filter")
-      " Filters: "
-      _.map(_.keys(scopes), @renderScope)
+    React.createElement(WidgetScopesViewComponent, scopes: @state.widgetScoper.getScopes(), onRemoveScope: @handleRemoveScope)
 
   renderPageBreaks: (layoutEngine, layouts) ->
     # Get height

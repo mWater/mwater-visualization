@@ -42,6 +42,10 @@ exports.ChartViewComponent = require './widgets/charts/ChartViewComponent'
 exports.MapViewComponent = require './maps/MapViewComponent'
 exports.DashboardUtils = require './widgets/DashboardUtils'
 
+exports.WidgetScoper = require './widgets/WidgetScoper'
+exports.WidgetScopesViewComponent = require './widgets/WidgetScopesViewComponent'
+
+
 # http://stackoverflow.com/questions/19305821/multiple-modals-overlay
 $ = require 'jquery'
 
