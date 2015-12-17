@@ -173,10 +173,43 @@ dashboardDesign = {
           "type": "bar"
         }
       }
+    },
+    "089cfc26-057a-494e-8d5a-46b682cec1d3": {
+      "layout": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "widget": {
+        "type": "CalendarChart",
+        "design": {
+          "version": 1,
+          "dateAxis": {
+            "expr": {
+              "type": "field",
+              "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
+              "column": "submittedOn"
+            },
+            "xform": {
+              "type": "date"
+            }
+          },
+          "valueAxis": {
+            "expr": {
+              "type": "id",
+              "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
+            },
+            "aggr": "count",
+            "xform": null
+          },
+          "filter": null,
+          "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
+        }
+      }
     }
   }
 }
-
 # dashboardDesign = {
 #   "items": {
 #     "e08ef8a3-34db-467d-ac78-f0f273d49f25": {

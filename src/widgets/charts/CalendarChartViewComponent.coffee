@@ -52,7 +52,15 @@ module.exports = class CalendarChartViewComponent extends React.Component
 
   # @todo: detect outliers/ implement data points threshold
   componentDidMount: ->
+    @redraw()
+
+  componentDidUpdate: (prevProps) ->
+    @redraw()
+
+  # Redraw component
+  redraw: ->
     container = @refs.chart_container
+    container.innerHTML = ''
     cellSize = @getCellSize()
     height = cellSize * 7 + 10
     format = d3.time.format("%Y-%m-%d")

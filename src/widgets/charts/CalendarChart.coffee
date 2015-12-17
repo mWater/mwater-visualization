@@ -155,6 +155,7 @@ module.exports = class CalendarChart extends Chart
 
       scope: options.scope
       onScopeChange: options.onScopeChange
+      cellStrokeColor: "#DDD"
     }
 
     return React.createElement(CalendarChartViewComponent, props)
