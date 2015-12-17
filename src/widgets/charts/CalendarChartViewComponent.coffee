@@ -12,7 +12,7 @@ require('d3-tip')(d3)
 module.exports = class CalendarChartViewComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired # Design of chart
-    data: React.PropTypes.object.isRequired # Data that the chart has requested. In format { main: [{ date: <YYYY-MM-DD>, value: <number value> }, { date: ... }...] }
+    data: React.PropTypes.array.isRequired # Data that the chart has requested. In format [{ date: <YYYY-MM-DD>, value: <number value> }, { date: ... }...] 
 
     width: React.PropTypes.number
     height: React.PropTypes.number
@@ -45,7 +45,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
     Math.min(cellSizeForHeight, cellSizeForWidth)
 
   getYears: ->
-    years = _.map @props.data.main, (entry) =>
+    years = _.map @props.data, (entry) =>
       (new Date(entry.date)).getFullYear()
 
     _.uniq(years, true)
@@ -65,7 +65,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
     data = d3.nest()
       .key( (d) -> d.date )
       .rollup( (d) -> d[0].value )
-      .map(@props.data.main, d3.map)
+      .map(@props.data, d3.map)
 
     tip = d3.tip().attr('class', 'd3-tip').html( (d) ->
       _date = moment(d)

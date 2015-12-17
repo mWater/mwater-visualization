@@ -76,7 +76,7 @@ module.exports = class ImageMosaicChart extends Chart
     }
     return React.createElement(ImageMosaicChartDesignerComponent, props)
 
-  createQueries: (design, filters) ->
+  getData: (design, filters, callback) ->
     exprCompiler = new ExprCompiler(@schema)
 
     # Create shell of query
@@ -115,7 +115,7 @@ module.exports = class ImageMosaicChart extends Chart
     else
       query.where = whereClauses[0]
 
-    return { main: query }
+    @dataSource.performQuery(query, callback)
 
   # Options include 
   # design: design of the chart

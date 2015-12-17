@@ -105,7 +105,7 @@ module.exports = class TableChart extends Chart
     }
     return React.createElement(TableChartDesignerComponent, props)
 
-  createQueries: (design, filters) ->
+  getData: (design, filters, callback) ->
     exprCompiler = new ExprCompiler(@schema)
 
     # Create shell of query
@@ -157,7 +157,7 @@ module.exports = class TableChart extends Chart
     else
       query.where = whereClauses[0]
 
-    return { main: query }
+    @dataSource.performQuery(query, (error, data) => callback(error, { main: data }))
 
   # Options include 
   # design: design of the chart

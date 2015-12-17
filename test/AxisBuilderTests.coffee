@@ -67,18 +67,28 @@ describe "AxisBuilder", ->
       jql = @ab.compileAxis(axis: axis, tableAlias: "T1")
       assert _.isEqual jql, {
         type: "op"
-        op: "width_bucket"
+        op: "||"
         exprs: [
           {
-            type: "field"
-            tableAlias: "T1"
-            column: "number"
-          },
-          2,
-          8,
-          10
-        ]
-      }
+            type: "op"
+            op: "width_bucket"
+            exprs: [
+              {
+                type: "field"
+                tableAlias: "T1"
+                column: "number"
+              },
+              2,
+              8,
+              10
+            ]
+          }
+          ":"
+          2
+          ":"
+          8
+      ]
+    }
 
     it "compiles date xform", ->
       axis = {
@@ -265,13 +275,6 @@ describe "AxisBuilder", ->
       }
       assert not @ab.validateAxis(axis: axis)
 
-    it "requires min, max for bin", ->
-      axis = {
-        expr: @exprNumber
-        xform: { type: "bin", numBins: 10, min: 2 }
-      }
-      assert @ab.validateAxis(axis: axis)
-
   describe "getExprTypes", ->
     it "does not add any if aggr allowed and number out", ->
       assert.notInclude @ab.getExprTypes(["number"], "optional"), "datetime"
@@ -310,7 +313,7 @@ describe "AxisBuilder", ->
         expr: @exprNumber
         xform: { type: "bin", numBins: 3, min: 1, max: 4 }
       }
-      assert.equal @ab.formatValue(axis, 0), "< 1"
+      assert.equal @ab.formatValue(axis, "0:1:4"), "< 1"
 
     it "formats enum", ->
       assert.equal @ab.formatValue(@axisEnum, "a"), "A"
@@ -375,11 +378,11 @@ describe "AxisBuilder", ->
 
       categories = @ab.getCategories(axis, [])
       compare(categories, [
-        { value: 0, label: "< 1" }
-        { value: 1, label: "1 - 2" }
-        { value: 2, label: "2 - 3" }
-        { value: 3, label: "3 - 4" }
-        { value: 4, label: "> 4" }
+        { value: "0:1:4", label: "< 1" }
+        { value: "1:1:4", label: "1 - 2" }
+        { value: "2:1:4", label: "2 - 3" }
+        { value: "3:1:4", label: "3 - 4" }
+        { value: "4:1:4", label: "> 4" }
       ])
 
     it "gets months", ->

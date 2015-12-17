@@ -10,7 +10,12 @@ compare = (actual, expected) ->
 describe "TableChart", ->
   before ->
     @schema = fixtures.simpleSchema()
-    @chart = new TableChart(schema: @schema)
+    mockDataSource = {
+      performQuery: (query) =>
+        @query = query
+    }
+
+    @chart = new TableChart(schema: @schema, dataSource: mockDataSource)
 
     @exprNumber = { type: "field", table: "t1", column: "number" }
     @exprText = { type: "field", table: "t1", column: "text" }
@@ -38,22 +43,20 @@ describe "TableChart", ->
         orderings: []
       }
 
-      queries = @chart.createQueries(design)
-      expectedQueries = {
-        main: {
-          type: "query"
-          selects: [
-            { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
-            { type: "select", expr: { type: "field", tableAlias: "main", column: "number" }, alias: "c1" }
-          ]
-          from: { type: "table", table: "t1", alias: "main" }
-          groupBy: [1, 2]
-          orderBy: []
-          limit: 1000
-        }
+      @chart.getData(design)
+      expectedQuery = {
+        type: "query"
+        selects: [
+          { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
+          { type: "select", expr: { type: "field", tableAlias: "main", column: "number" }, alias: "c1" }
+        ]
+        from: { type: "table", table: "t1", alias: "main" }
+        groupBy: [1, 2]
+        orderBy: []
+        limit: 1000
       }
 
-      compare(queries, expectedQueries)
+      compare(@query, expectedQuery)
 
     it "groups all non-aggr", ->
       design = {
@@ -65,22 +68,20 @@ describe "TableChart", ->
         orderings: []
       }
 
-      queries = @chart.createQueries(design)
-      expectedQueries = {
-        main: {
-          type: "query"
-          selects: [
-            { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
-            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "c1" }
-          ]
-          from: { type: "table", table: "t1", alias: "main" }
-          groupBy: [1]
-          orderBy: []
-          limit: 1000
-        }
+      @chart.getData(design)
+      expectedQuery = {
+        type: "query"
+        selects: [
+          { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
+          { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "c1" }
+        ]
+        from: { type: "table", table: "t1", alias: "main" }
+        groupBy: [1]
+        orderBy: []
+        limit: 1000
       }
 
-      compare(queries, expectedQueries)
+      compare(@query, expectedQuery)
 
     it "adds order with groupBy", ->
       design = {
@@ -94,23 +95,20 @@ describe "TableChart", ->
         ]
       }
 
-      queries = @chart.createQueries(design)
-      expectedQueries = {
-        main: {
-          type: "query"
-          selects: [
-            { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
-            { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "c1" }
-          ]
-          from: { type: "table", table: "t1", alias: "main" }
-          groupBy: [1, { type: "field", tableAlias: "main", column: "number" }]
-          orderBy: [{ expr: { type: "field", tableAlias: "main", column: "number" }, direction: "desc" }]
-          limit: 1000
-        }
+      @chart.getData(design)
+      expectedQuery = {
+        type: "query"
+        selects: [
+          { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
+          { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "c1" }
+        ]
+        from: { type: "table", table: "t1", alias: "main" }
+        groupBy: [1, { type: "field", tableAlias: "main", column: "number" }]
+        orderBy: [{ expr: { type: "field", tableAlias: "main", column: "number" }, direction: "desc" }]
+        limit: 1000
       }
 
-      compare(queries, expectedQueries)
-
+      compare(@query, expectedQuery)
 
   # describe "cleanDesign", ->
   #   it "cleans column expressions", ->
