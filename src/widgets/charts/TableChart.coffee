@@ -135,7 +135,7 @@ module.exports = class TableChart extends Chart
         query.groupBy.push(colNum + 1)
 
     # Compile orderings
-    for ordering in design.orderings
+    for ordering in design.orderings or []
       query.orderBy.push({ expr: @axisBuilder.compileAxis(axis: ordering.axis, tableAlias: "main"), direction: ordering.direction })
       # Add group by if non-aggregate
       if not ordering.axis.aggr
