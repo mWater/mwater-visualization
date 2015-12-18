@@ -3,7 +3,7 @@ H = React.DOM
 R = React.createElement
 LayeredChartLayerDesignerComponent = require './LayeredChartLayerDesignerComponent'
 LayeredChartCompiler = require './LayeredChartCompiler'
-TabbedComponent = require "../../TabbedComponent"
+TabbedComponent = require('react-library/lib/TabbedComponent')
 ui = require '../../UIComponents'
 
 module.exports = class LayeredChartDesignerComponent extends React.Component

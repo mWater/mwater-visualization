@@ -1,6 +1,6 @@
 React = require 'react'
 H = React.DOM
-TabbedComponent = require '../TabbedComponent'
+TabbedComponent = require('react-library/lib/TabbedComponent')
 MapLayersDesignerComponent = require './MapLayersDesignerComponent'
 MapFiltersDesignerComponent = require './MapFiltersDesignerComponent'
 

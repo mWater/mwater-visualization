@@ -1,7 +1,7 @@
 _ = require 'lodash'
 visualization = require './index'
 jsyaml = require 'js-yaml'
-TabbedComponent = require './TabbedComponent'
+TabbedComponent = require('react-library/lib/TabbedComponent')
 React = require 'react'
 H = React.DOM
 R = React.createElement

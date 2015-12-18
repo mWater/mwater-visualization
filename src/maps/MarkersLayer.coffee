@@ -58,7 +58,7 @@ module.exports = class MarkersLayer extends Layer
   # Called when the interactivity grid is clicked. Called with { data: interactivty data e.g. `{ id: 123 }` }
   onGridClick: (ev) ->
     if @onMarkerClick and ev.data and ev.data.id
-      @onMarkerClick(@design.table, ev.data.id)
+      @onMarkerClick(@design.sublayers[0].table, ev.data.id)
 
   # Create query string
   createUrl: (extension, design, filters) ->

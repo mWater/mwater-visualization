@@ -26,8 +26,6 @@ exports.CheckboxComponent = require './CheckboxComponent'
 # TODO REMOVE
 exports.DateRangeComponent = require './DateRangeComponent'
 
-exports.TabbedComponent = require './TabbedComponent'
-
 # exports.UIComponents = require './UIComponents'
 exports.ToggleEditComponent = ui.ToggleEditComponent
 exports.OptionListComponent = ui.OptionListComponent
