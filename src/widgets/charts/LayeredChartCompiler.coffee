@@ -545,8 +545,8 @@ module.exports = class LayeredChartCompiler
           type: "op"
           op: "@>"
           exprs: [
-            @axisBuilder.compileAxis(axis: layer.axes.x, tableAlias: "{alias}")
-            { type: "literal", value: row.x }
+            { type: "op", op: "::jsonb", exprs: [@axisBuilder.compileAxis(axis: layer.axes.x, tableAlias: "{alias}")] }
+            { type: "op", op: "::jsonb", exprs: [JSON.stringify(row.x)] }
           ]
         })
         names.push(@axisBuilder.summarizeAxis(layer.axes.x, locale) + " includes " + @exprUtils.stringifyExprLiteral(layer.axes.x.expr, row.x, locale))
