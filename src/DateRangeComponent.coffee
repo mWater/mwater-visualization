@@ -6,7 +6,7 @@ DateRangePicker = require 'react-bootstrap-daterangepicker'
 # Displays a date range
 module.exports = class DateRangeComponent extends React.Component
   @propTypes: 
-    value: React.PropTypes.object             # Array of [start date, end date] in iso 8601 format
+    value: React.PropTypes.array              # Array of [start date, end date] in iso 8601 format
     onChange: React.PropTypes.func.isRequired # Array of [start date, end date] in iso 8601 format
     datetime: React.PropTypes.bool.isRequired # true if for datetime, not date
 
