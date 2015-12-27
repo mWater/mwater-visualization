@@ -79,6 +79,10 @@ module.exports = class ChartViewComponent extends React.Component
       style.backgroundColor = "#E0E0E0"
       style.opacity = 0.35
 
+    if @state.dataError
+      return H.div className: "alert alert-danger",
+       "Error loading data: #{@state.dataError.message or @state.dataError}" 
+
     return H.div style: style,
       if @state.validDesign
         @props.chart.createViewElement({
