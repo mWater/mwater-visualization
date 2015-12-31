@@ -40,11 +40,17 @@ module.exports = class CalendarChartViewComponent extends React.Component
 
   getCellSize: ->
     # ((total width) - (total required month stroke) - (left and right padding) - (space for year text) ) / weeks in year
-    cellSizeForWidth = Math.floor((@props.width - @props.monthsStrokeWidth * 2 - 26 ) / 53)
+    cellSizeForWidth = (@props.width - @props.monthsStrokeWidth * 2 - 26 ) / 53
     years = @getYears()
 
-    # ((total height) - (total required month stroke) - ( total required padding)) / (total year * 7)
-    cellSizeForHeight = Math.floor((@props.height - @props.monthsStrokeWidth * 2 * years.length - (years.length + 1) * 5)  / (years.length * 7) )
+    # ((total height) - (total cell stroke) - (total required month stroke) - ( total required padding)) / (total year * 7)
+    remainingSpace = (@props.height - years.length * 7 - @props.monthsStrokeWidth * 2 * years.length)
+
+    if @props.design.titleText
+      remainingSpace = remainingSpace - $(@refs.title).outerHeight()
+
+    cellSizeForHeight = remainingSpace / (years.length * 7)
+
     Math.min(cellSizeForHeight, cellSizeForWidth)
 
   getYears: ->
@@ -65,7 +71,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
     container = @refs.chart_container
     container.innerHTML = ''
     cellSize = @getCellSize()
-    height = cellSize * 7 + 10
+    height = cellSize * 7 + 7
     format = d3.time.format("%Y-%m-%d")
     percent = d3.format(".1%")
     cellStroke = @props.cellStrokeColor || @props.cellColor
@@ -101,19 +107,25 @@ module.exports = class CalendarChartViewComponent extends React.Component
 
     svg = d3.select(container).selectAll("svg")
       .data(years)
-      .enter().append("svg")
+      .enter()
+      .append("svg")
       .attr("width", @props.width)
       .attr("height", height)
       .attr("class", "calendar-chart-year")
       .append("g")
-      .attr("transform", "translate("+yearGroupTranslateX+",5)")
+      .attr("transform", "translate("+yearGroupTranslateX+",0)")
+
 
     svg.call(tip)
 
     svg.append("text")
-      .attr("transform", "translate(-6," + cellSize * 3.5 + ")rotate(-90)")
-      .style("text-anchor", "middle")
       .text( (d,i) -> d )
+      .attr("transform", "translate(-6," + cellSize * 3.5 + ")rotate(-90)")
+      .attr("font-size", (d) ->
+        Math.min( cellSize * 7, (cellSize * 7) / this.getComputedTextLength() * 14) + "px"
+      )
+      .style("text-anchor", "middle")
+
 
     rect = svg.selectAll(".calendar-chart-day")
       .data( (d) -> d3.time.days(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
@@ -165,18 +177,20 @@ module.exports = class CalendarChartViewComponent extends React.Component
       textAlign: "center"
       fontSize: "14px"
       fontWeight: "bold"
+      margin: 0
     style =
 #      display: "flex"
 #      flexDirection: "column"
-      justifyContent: "center"
+#      justifyContent: "center"
       width: @props.width
       height: @props.height
       shapeRendering: "crispEdges"
+      lineHeight: 1
 
     title = @props.design.titleText
 
     H.div style: style,
       if title
-        H.p style: titleStyle, title,
+        H.p {style: titleStyle, ref: "title"}, title,
       H.div { ref: "chart_container"}
 
