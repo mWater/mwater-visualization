@@ -1,18 +1,22 @@
 React = require 'react'
 H = React.DOM
+R = React.createElement
 
 UndoStack = require './../UndoStack'
 DashboardViewComponent = require './DashboardViewComponent'
 AutoSizeComponent = require './../AutoSizeComponent'
 filesaver = require 'filesaver.js'
 DashboardUtils = require './DashboardUtils'
+QuickfilterComponent = require '../quickfilter/QuickfilterComponent'
 
 # Dashboard component that includes an action bar at the top
-# Manages undo stack
+# Manages undo stack and quickfilter value
 module.exports = class DashboardComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func.isRequired
+    schema: React.PropTypes.object.isRequired
+    dataSource: React.PropTypes.object.isRequired
     widgetFactory: React.PropTypes.object.isRequired
     titleElem: React.PropTypes.node                     # Extra element to include in title at left
     extraTitleButtonsElem: React.PropTypes.node              # Extra elements to add to right
@@ -20,7 +24,10 @@ module.exports = class DashboardComponent extends React.Component
 
   constructor: (props) ->
     super
-    @state = { undoStack: new UndoStack().push(props.design) }
+    @state = { 
+      undoStack: new UndoStack().push(props.design) 
+      quickfilterValue: null
+    }
 
   componentWillReceiveProps: (nextProps) ->
     undoStack = @state.undoStack
@@ -95,15 +102,25 @@ module.exports = class DashboardComponent extends React.Component
         @renderActionLinks()
       @props.titleElem
 
+  renderQuickfilter: ->
+    R QuickfilterComponent, {
+      design: @props.design.quickfilter
+      schema: @props.schema
+      dataSource: @props.dataSource
+      value: @state.quickfilterValue
+      onValueChange: (value) => @setState(quickfilterValue: value)
+    }
+
   render: ->
     H.div key: "view", style: { height: "100%", paddingTop: 40, paddingRight: 20, paddingLeft: 5, position: "relative" },
       @renderTitleBar()
+      @renderQuickfilter()
       # Dashboard view requires width, so use auto size component to inject it
-      React.createElement(AutoSizeComponent, { injectWidth: true }, 
-        React.createElement(DashboardViewComponent, {
+      R AutoSizeComponent, { injectWidth: true }, 
+        R DashboardViewComponent, {
           ref: "dashboardView"
           design: @props.design
           onDesignChange: @props.onDesignChange
           widgetFactory: @props.widgetFactory
-        })
-      )
+        }
+      
