@@ -20,6 +20,12 @@ module.exports = class DashboardViewComponent extends React.Component
     width: React.PropTypes.number
     widgetFactory: React.PropTypes.object.isRequired # Factory of type WidgetFactory to make widgets
 
+    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
+      table: React.PropTypes.string.isRequired    # id table to filter
+      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    }))
+
+
   constructor: (props) ->
     super
     @state = {
@@ -117,9 +123,13 @@ module.exports = class DashboardViewComponent extends React.Component
 
     # Create widget elems
     elems = _.mapValues widgets, (widget, id) =>
+      # Get filters (passed in plus widget scoper filters)
+      filters = @props.filters or []
+      filters = filters.concat(@state.widgetScoper.getFilters(id))
+
       widget.createViewElement({
         scope: @state.widgetScoper.getScope(id)
-        filters: @state.widgetScoper.getFilters(id)
+        filters: filters
         onScopeChange: @handleScopeChange.bind(null, id)
         onRemove: @handleRemove.bind(null, id)
         onDuplicate: @handleDuplicate.bind(null, id)

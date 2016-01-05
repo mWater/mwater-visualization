@@ -8,6 +8,7 @@ AutoSizeComponent = require './../AutoSizeComponent'
 filesaver = require 'filesaver.js'
 DashboardUtils = require './DashboardUtils'
 QuickfiltersComponent = require '../quickfilter/QuickfiltersComponent'
+QuickfilterCompiler = require '../quickfilter/QuickfilterCompiler'
 
 # Dashboard component that includes an action bar at the top
 # Manages undo stack and quickfilter value
@@ -26,7 +27,7 @@ module.exports = class DashboardComponent extends React.Component
     super
     @state = { 
       undoStack: new UndoStack().push(props.design) 
-      quickfiltersValue: null
+      quickfiltersValues: null
     }
 
   componentWillReceiveProps: (nextProps) ->
@@ -107,14 +108,18 @@ module.exports = class DashboardComponent extends React.Component
       design: @props.design.quickfilters
       schema: @props.schema
       dataSource: @props.dataSource
-      value: @state.quickfiltersValue
-      onValueChange: (value) => @setState(quickfiltersValue: value)
+      values: @state.quickfiltersValues
+      onValuesChange: (values) => @setState(quickfiltersValues: values)
     }
 
   render: ->
+    # Compile quickfilters
+    filters = new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues)
+
     H.div key: "view", style: { height: "100%", paddingTop: 40, paddingRight: 20, paddingLeft: 5, position: "relative" },
       @renderTitleBar()
       @renderQuickfilter()
+
       # Dashboard view requires width, so use auto size component to inject it
       R AutoSizeComponent, { injectWidth: true }, 
         R DashboardViewComponent, {
@@ -122,5 +127,6 @@ module.exports = class DashboardComponent extends React.Component
           design: @props.design
           onDesignChange: @props.onDesignChange
           widgetFactory: @props.widgetFactory
+          filters: filters
         }
       

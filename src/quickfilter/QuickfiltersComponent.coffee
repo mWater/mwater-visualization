@@ -7,14 +7,14 @@ ExprUtils = require('mwater-expressions').ExprUtils
 module.exports = class QuickfiltersComponent extends React.Component
   @propTypes:
     design: React.PropTypes.array.isRequired  # Design of quickfilters. See README.md
-    value: React.PropTypes.array               # Current value of quickfilters (state of filters selected)
-    onValueChange: React.PropTypes.func.isRequired # Called when value changes
+    values: React.PropTypes.array             # Current values of quickfilters (state of filters selected)
+    onValuesChange: React.PropTypes.func.isRequired # Called when value changes
     
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
 
   renderQuickfilter: (item, index) ->
-    values = (@props.value or [])
+    values = (@props.values or [])
     itemValue = values[index]
 
     # Get type of expr
@@ -29,9 +29,9 @@ module.exports = class QuickfiltersComponent extends React.Component
         options: new ExprUtils(@props.schema).getExprEnumValues(item.expr)
         value: itemValue
         onValueChange: (v) =>
-          values = (@props.value or []).slice()
+          values = (@props.values or []).slice()
           values[index] = v
-          @props.onValueChange(values)
+          @props.onValuesChange(values)
 
   render: ->
     if not @props.design or @props.design.length == 0
@@ -53,6 +53,12 @@ class EnumQuickfilterComponent extends React.Component
     value: React.PropTypes.any              # Current value of quickfilter (state of filter selected)
     onValueChange: React.PropTypes.func.isRequired # Called when value changes
 
+  handleChange: (val) =>
+    if val
+      @props.onValueChange(val)
+    else
+      @props.onValueChange(null)
+
   render: ->
     H.div style: { display: "inline-block", paddingRight: 10 },
       if @props.label
@@ -63,6 +69,6 @@ class EnumQuickfilterComponent extends React.Component
           value: @props.value
           multi: false
           options: _.map(@props.options, (opt) -> { value: opt.id, label: opt.name.en }) # TODO localize
-          onChange: @props.onValueChange
+          onChange: @handleChange
         }
 

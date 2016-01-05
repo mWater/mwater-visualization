@@ -131,11 +131,58 @@ class MWaterDataSource extends DataSource
         cb(new Error(xhr.responseText))
 
 dashboardDesign = {
-  items: { }
-  quickfilters: [
-    { table: "entities.water_point", expr: { type: "field", table: "entities.water_point", column: "type" }, label: "Type" }
+  "items": {
+    "01952e51-ba0e-43e0-9ede-57eb4dcb3ddd": {
+      "layout": {
+        "x": 0,
+        "y": 0,
+        "w": 17,
+        "h": 12
+      },
+      "widget": {
+        "type": "LayeredChart",
+        "design": {
+          "version": 1,
+          "layers": [
+            {
+              "axes": {
+                "color": {
+                  "expr": {
+                    "type": "field",
+                    "table": "entities.water_point",
+                    "column": "type"
+                  },
+                  "xform": null
+                },
+                "y": {
+                  "expr": {
+                    "type": "id",
+                    "table": "entities.water_point"
+                  },
+                  "aggr": "count",
+                  "xform": null
+                }
+              },
+              "filter": null,
+              "table": "entities.water_point"
+            }
+          ],
+          "type": "pie"
+        }
+      }
+    }
+  },
+  "quickfilters": [
+    {
+      "table": "entities.water_point",
+      "expr": {
+        "type": "field",
+        "table": "entities.water_point",
+        "column": "type"
+      },
+      "label": "Type"
+    }
   ]
-
 }
 # dashboardDesign = {
 #   "items": {
