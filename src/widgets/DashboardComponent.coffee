@@ -7,7 +7,7 @@ DashboardViewComponent = require './DashboardViewComponent'
 AutoSizeComponent = require './../AutoSizeComponent'
 filesaver = require 'filesaver.js'
 DashboardUtils = require './DashboardUtils'
-QuickfilterComponent = require '../quickfilter/QuickfilterComponent'
+QuickfiltersComponent = require '../quickfilter/QuickfiltersComponent'
 
 # Dashboard component that includes an action bar at the top
 # Manages undo stack and quickfilter value
@@ -26,7 +26,7 @@ module.exports = class DashboardComponent extends React.Component
     super
     @state = { 
       undoStack: new UndoStack().push(props.design) 
-      quickfilterValue: null
+      quickfiltersValue: null
     }
 
   componentWillReceiveProps: (nextProps) ->
@@ -103,12 +103,12 @@ module.exports = class DashboardComponent extends React.Component
       @props.titleElem
 
   renderQuickfilter: ->
-    R QuickfilterComponent, {
-      design: @props.design.quickfilter
+    R QuickfiltersComponent, {
+      design: @props.design.quickfilters
       schema: @props.schema
       dataSource: @props.dataSource
-      value: @state.quickfilterValue
-      onValueChange: (value) => @setState(quickfilterValue: value)
+      value: @state.quickfiltersValue
+      onValueChange: (value) => @setState(quickfiltersValue: value)
     }
 
   render: ->

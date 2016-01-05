@@ -131,7 +131,11 @@ class MWaterDataSource extends DataSource
         cb(new Error(xhr.responseText))
 
 dashboardDesign = {
-  "items": { }
+  items: { }
+  quickfilters: [
+    { table: "entities.water_point", expr: { type: "field", table: "entities.water_point", column: "type" }, label: "Type" }
+  ]
+
 }
 # dashboardDesign = {
 #   "items": {
