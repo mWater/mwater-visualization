@@ -4,6 +4,7 @@ H = React.DOM
 moment = require 'moment'
 
 AxisBuilder = require '../../axes/AxisBuilder'
+ExprUtils = require('mwater-expressions').ExprUtils
 
 # Require d3-tip to use it
 require('d3-tip')(d3)
@@ -27,10 +28,22 @@ module.exports = class CalendarChartViewComponent extends React.Component
     cellColor: React.PropTypes.string #the day cell color
     cellStrokeColor: React.PropTypes.string #the day cell stroke color
 
+    highlightCellFillColor: React.PropTypes.string #the fill color for highlighted cell
+
+  constructor: (options) ->
+    @schema = options.schema
+    @axisBuilder = new AxisBuilder(schema: @schema)
+
+    @state = {
+      selectedCellOriginalFillColor: null,
+      selectedCell: null
+    }
+
   @defaultProps:
     monthsStrokeColor: "#222"
     monthsStrokeWidth: 1
     cellColor: "#FDAE61"
+    highlightCellFillColor: "#000000"
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
@@ -66,6 +79,29 @@ module.exports = class CalendarChartViewComponent extends React.Component
   componentDidUpdate: (prevProps) ->
     @redraw()
 
+  handleCellClick: (cell, data) ->
+    if @state.selectedCell
+      @state.selectedCell.attr("fill", @state.selectedCellOriginalFillColor )
+
+      if data == @state.selectedCell.datum()
+        @setState(selectedCellOriginalFillColor: null)
+        @setState(selectedCell: null)
+        @props.onScopeChange?(null)
+        return
+
+    @setState(selectedCellOriginalFillColor: cell.attr("fill"))
+    @setState(selectedCell: cell)
+    cell.attr("fill", @props.highlightCellFillColor)
+
+    scopeData =
+      name: ExprUtils.localizeString(@schema.getTable(@props.design.table).name, @context.locale) + " is " + data
+      filter:
+        jsonql: @axisBuilder.createValueFilter(@props.design.dateAxis, data)
+        table: @props.design.table
+      data: data
+
+    @props.onScopeChange?(scopeData)
+
   # Redraw component
   redraw: ->
     container = @refs.chart_container
@@ -75,6 +111,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
     format = d3.time.format("%Y-%m-%d")
     percent = d3.format(".1%")
     cellStroke = @props.cellStrokeColor || @props.cellColor
+    self = this
 
     rgb = d3.rgb(@props.cellColor)
     years = @getYears()
@@ -142,11 +179,22 @@ module.exports = class CalendarChartViewComponent extends React.Component
       .on("mouseleave", tip.hide)
       .datum(format)
 
-#    rect.append("title")
-#      .text((d) -> d )
+    rect.on "click", (e) ->
+      selectedRect = d3.select(this)
+      self.handleCellClick selectedRect, e
+
 
     rect.filter( (d) -> data.has(d) )
-      .attr( "fill", (d) -> color(data.get(d)))
+      .attr( "fill", (d) ->
+        _color = color(data.get(d))
+
+        if self.props.scope.data && self.props.scope.data == d
+          self.setState(selectedCellOriginalFillColor: _color)
+          self.setState(selectedCell: d3.select(this))
+          return self.props.highlightCellFillColor
+
+        _color
+      )
 
     monthPath = (t0) ->
       t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0)
@@ -179,9 +227,6 @@ module.exports = class CalendarChartViewComponent extends React.Component
       fontWeight: "bold"
       margin: 0
     style =
-#      display: "flex"
-#      flexDirection: "column"
-#      justifyContent: "center"
       width: @props.width
       height: @props.height
       shapeRendering: "crispEdges"
