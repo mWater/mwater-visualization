@@ -34,7 +34,6 @@ module.exports = class ChartViewComponent extends React.Component
 
     @state = {}
 
-  # Get options in react-select format
   componentDidMount: ->
     @updateData(@props)
 
