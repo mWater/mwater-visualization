@@ -69,7 +69,7 @@ class MWaterDashboardPane extends React.Component
 
     @state = {
       design: dashboardDesign
-      formIds: ["e24f0a0ec11643cab3c21c07de2f6889"]
+      formIds: [] # "e24f0a0ec11643cab3c21c07de2f6889"]
     }
 
   handleDesignChange: (design) =>
@@ -97,8 +97,8 @@ $ ->
   sample = H.div className: "container-fluid", style: { height: "100%" },
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
-    React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
@@ -130,51 +130,7 @@ class MWaterDataSource extends DataSource
 
 dashboardDesign = {
   "items": {
-    "23bd0283-7508-4eb8-9077-8eac7c911e09": {
-      "layout": {
-        "x": 8,
-        "y": 0,
-        "w": 8,
-        "h": 8
-      },
-      "widget": {
-        "type": "LayeredChart",
-        "design": {
-          "version": 1,
-          "layers": [
-            {
-              "axes": {
-                "x": {
-                  "expr": {
-                    "type": "field",
-                    "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
-                    "column": "data:f1792fe879ce459bb97ec9d5ffff39e1:value:quantity"
-                  },
-                  "xform": {
-                    "type": "bin",
-                    "numBins": 6,
-                    "min": null,
-                    "max": null
-                  }
-                },
-                "y": {
-                  "expr": {
-                    "type": "id",
-                    "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
-                  },
-                  "aggr": "count",
-                  "xform": null
-                }
-              },
-              "filter": null,
-              "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
-            }
-          ],
-          "type": "bar"
-        }
-      }
-    },
-    "089cfc26-057a-494e-8d5a-46b682cec1d3": {
+    "c78d1987-a14e-4cab-b772-4a56136e2641": {
       "layout": {
         "x": 0,
         "y": 0,
@@ -188,8 +144,8 @@ dashboardDesign = {
           "dateAxis": {
             "expr": {
               "type": "field",
-              "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
-              "column": "submittedOn"
+              "table": "entities.water_point",
+              "column": "_created_on"
             },
             "xform": {
               "type": "date"
@@ -198,18 +154,19 @@ dashboardDesign = {
           "valueAxis": {
             "expr": {
               "type": "id",
-              "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
+              "table": "entities.water_point"
             },
             "aggr": "count",
             "xform": null
           },
           "filter": null,
-          "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
+          "table": "entities.water_point"
         }
       }
     }
   }
 }
+
 # dashboardDesign = {
 #   "items": {
 #     "e08ef8a3-34db-467d-ac78-f0f273d49f25": {

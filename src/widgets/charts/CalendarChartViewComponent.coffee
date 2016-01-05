@@ -188,7 +188,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
       .attr( "fill", (d) ->
         _color = color(data.get(d))
 
-        if self.props.scope.data && self.props.scope.data == d
+        if self.props.scope and self.props.scope.data && self.props.scope.data == d
           self.setState(selectedCellOriginalFillColor: _color)
           self.setState(selectedCell: d3.select(this))
           return self.props.highlightCellFillColor
