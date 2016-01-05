@@ -122,7 +122,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
       .text( (d,i) -> d )
       .attr("transform", "translate(-6," + cellSize * 3.5 + ")rotate(-90)")
       .attr("font-size", (d) ->
-        Math.min( cellSize * 7, (cellSize * 7) / this.getComputedTextLength() * 14) + "px"
+        Math.min( 14, (cellSize * 7) / this.getComputedTextLength() * 14) + "px"
       )
       .style("text-anchor", "middle")
 
