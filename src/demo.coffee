@@ -178,9 +178,9 @@ dashboardDesign = {
       "expr": {
         "type": "field",
         "table": "entities.water_point",
-        "column": "type"
+        "column": "name"
       },
-      "label": "Type"
+      "label": "Name"
     }
   ]
 }
