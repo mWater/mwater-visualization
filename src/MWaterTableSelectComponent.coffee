@@ -1,7 +1,6 @@
 React = require 'react'
 H = React.DOM
 R = React.createElement
-ReactSelect = require 'react-select'
 querystring = require 'querystring'
 TabbedComponent = require('react-library/lib/TabbedComponent')
 ToggleEditComponent = require('mwater-visualization').ToggleEditComponent
