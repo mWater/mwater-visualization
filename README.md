@@ -32,9 +32,14 @@ Dashboard design is:
 
 `items`: dashboard items, indexed by id. Each item contains:
 
-`layout`: layout-engine specific data for layout of item
-`widget`: details of the widget (see below)
+ `layout`: layout-engine specific data for layout of item
+ `widget`: details of the widget (see below)
 
+`quickfilters`: array of quick filters (user-selectable filters). Each contains:
+ 
+ `table`: table of filter
+ `expr`: filter expression (left hand side only. Usually enum or text)
+ `label`: optional label
 
 ### Widget data
 

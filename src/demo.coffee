@@ -69,7 +69,7 @@ class MWaterDashboardPane extends React.Component
 
     @state = {
       design: dashboardDesign
-      formIds: ["e24f0a0ec11643cab3c21c07de2f6889"]
+      formIds: [] #"e24f0a0ec11643cab3c21c07de2f6889"]
     }
 
   handleDesignChange: (design) =>
@@ -86,6 +86,8 @@ class MWaterDashboardPane extends React.Component
     }, (error, config) =>
       H.div style: { height: "100%" },
         React.createElement(visualization.DashboardComponent, {
+          schema: config.schema
+          dataSource: config.dataSource
           design: @state.design
           widgetFactory: config.widgetFactory
           onDesignChange: @handleDesignChange
@@ -97,8 +99,8 @@ $ ->
   sample = H.div className: "container-fluid", style: { height: "100%" },
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
-    React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
@@ -130,12 +132,12 @@ class MWaterDataSource extends DataSource
 
 dashboardDesign = {
   "items": {
-    "23bd0283-7508-4eb8-9077-8eac7c911e09": {
+    "01952e51-ba0e-43e0-9ede-57eb4dcb3ddd": {
       "layout": {
-        "x": 8,
+        "x": 0,
         "y": 0,
-        "w": 8,
-        "h": 8
+        "w": 17,
+        "h": 12
       },
       "widget": {
         "type": "LayeredChart",
@@ -144,71 +146,43 @@ dashboardDesign = {
           "layers": [
             {
               "axes": {
-                "x": {
+                "color": {
                   "expr": {
                     "type": "field",
-                    "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
-                    "column": "data:f1792fe879ce459bb97ec9d5ffff39e1:value:quantity"
+                    "table": "entities.water_point",
+                    "column": "type"
                   },
-                  "xform": {
-                    "type": "bin",
-                    "numBins": 6,
-                    "min": null,
-                    "max": null
-                  }
+                  "xform": null
                 },
                 "y": {
                   "expr": {
                     "type": "id",
-                    "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
+                    "table": "entities.water_point"
                   },
                   "aggr": "count",
                   "xform": null
                 }
               },
               "filter": null,
-              "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
+              "table": "entities.water_point"
             }
           ],
-          "type": "bar"
-        }
-      }
-    },
-    "089cfc26-057a-494e-8d5a-46b682cec1d3": {
-      "layout": {
-        "x": 0,
-        "y": 0,
-        "w": 8,
-        "h": 8
-      },
-      "widget": {
-        "type": "CalendarChart",
-        "design": {
-          "version": 1,
-          "dateAxis": {
-            "expr": {
-              "type": "field",
-              "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
-              "column": "submittedOn"
-            },
-            "xform": {
-              "type": "date"
-            }
-          },
-          "valueAxis": {
-            "expr": {
-              "type": "id",
-              "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
-            },
-            "aggr": "count",
-            "xform": null
-          },
-          "filter": null,
-          "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
+          "type": "pie"
         }
       }
     }
-  }
+  },
+  "quickfilters": [
+    {
+      "table": "entities.water_point",
+      "expr": {
+        "type": "field",
+        "table": "entities.water_point",
+        "column": "name"
+      },
+      "label": "Name"
+    }
+  ]
 }
 # dashboardDesign = {
 #   "items": {
