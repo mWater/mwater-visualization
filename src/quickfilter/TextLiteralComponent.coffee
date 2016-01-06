@@ -57,6 +57,8 @@ module.exports = class TextLiteralComponent extends React.Component
         options: _.map(rows, (r) -> { value: r.value, label: r.value })
         complete: false # TODO rows.length < 50 # Complete if didn't hit limit
       })
+      
+    return
 
   render: ->
     value = @props.value or "" 
