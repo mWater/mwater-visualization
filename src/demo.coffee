@@ -69,7 +69,7 @@ class MWaterDashboardPane extends React.Component
 
     @state = {
       design: dashboardDesign
-      formIds: [] # "e24f0a0ec11643cab3c21c07de2f6889"]
+      formIds: [] #"e24f0a0ec11643cab3c21c07de2f6889"]
     }
 
   handleDesignChange: (design) =>
@@ -86,6 +86,8 @@ class MWaterDashboardPane extends React.Component
     }, (error, config) =>
       H.div style: { height: "100%" },
         React.createElement(visualization.DashboardComponent, {
+          schema: config.schema
+          dataSource: config.dataSource
           design: @state.design
           widgetFactory: config.widgetFactory
           onDesignChange: @handleDesignChange
@@ -164,7 +166,7 @@ dashboardDesign = {
         }
       }
     }
-  }
+  ]
 }
 
 # dashboardDesign = {

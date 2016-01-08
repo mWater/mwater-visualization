@@ -5,7 +5,7 @@ LayeredChartCompiler = require '../src/widgets/charts/LayeredChartCompiler'
 canonical = require 'canonical-json'
 
 compare = (actual, expected) ->
-  assert.equal canonical(actual), canonical(expected)
+  assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected)
 
 describe "LayeredChartCompiler", ->
   before ->
@@ -753,8 +753,8 @@ describe "LayeredChartCompiler", ->
           type: "op"
           op: "@>"
           exprs: [
-            { type: "field", tableAlias: "{alias}", column: "enumset" }
-            { type: "literal", value: "a" }
+            { type: "op", op: "::jsonb", exprs: [{ type: "field", tableAlias: "{alias}", column: "enumset" }] }
+            { type: "op", op: "::jsonb", exprs: ["\"a\""] }
           ]
         }
       }

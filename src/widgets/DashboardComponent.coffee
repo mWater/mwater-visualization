@@ -1,18 +1,25 @@
+_ = require 'lodash'
 React = require 'react'
 H = React.DOM
+R = React.createElement
 
 UndoStack = require './../UndoStack'
 DashboardViewComponent = require './DashboardViewComponent'
 AutoSizeComponent = require './../AutoSizeComponent'
 filesaver = require 'filesaver.js'
 DashboardUtils = require './DashboardUtils'
+QuickfiltersComponent = require '../quickfilter/QuickfiltersComponent'
+QuickfilterCompiler = require '../quickfilter/QuickfilterCompiler'
+SettingsModalComponent = require './SettingsModalComponent'
 
 # Dashboard component that includes an action bar at the top
-# Manages undo stack
+# Manages undo stack and quickfilter value
 module.exports = class DashboardComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func.isRequired
+    schema: React.PropTypes.object.isRequired
+    dataSource: React.PropTypes.object.isRequired
     widgetFactory: React.PropTypes.object.isRequired
     titleElem: React.PropTypes.node                     # Extra element to include in title at left
     extraTitleButtonsElem: React.PropTypes.node              # Extra elements to add to right
@@ -20,7 +27,10 @@ module.exports = class DashboardComponent extends React.Component
 
   constructor: (props) ->
     super
-    @state = { undoStack: new UndoStack().push(props.design) }
+    @state = { 
+      undoStack: new UndoStack().push(props.design) 
+      quickfiltersValues: null
+    }
 
   componentWillReceiveProps: (nextProps) ->
     undoStack = @state.undoStack
@@ -31,8 +41,11 @@ module.exports = class DashboardComponent extends React.Component
 
     # Save on stack
     undoStack = undoStack.push(nextProps.design)
-
     @setState(undoStack: undoStack)
+
+    # Clear quickfilters if definition changed
+    if not _.isEqual(@props.design.quickfilters, nextProps.design.quickfilters)
+      @setState(quickfiltersValues: null)
 
   handlePrint: =>
     @refs.dashboardView.print()
@@ -58,6 +71,9 @@ module.exports = class DashboardComponent extends React.Component
   handleAddWidget: (wt) =>
     design = DashboardUtils.addWidget(@props.design, wt.type, wt.design, 8, 8)
     @props.onDesignChange(design)
+
+  handleSettings: =>
+    @refs.settings.show(@props.design)
 
   renderAddWidget: ->
     H.div key: "add", className: "btn-group",
@@ -87,6 +103,9 @@ module.exports = class DashboardComponent extends React.Component
       H.a key: "export", className: "btn btn-link btn-sm", onClick: @handleSaveDesignFile,
         H.span(className: "glyphicon glyphicon-download-alt")
         " Export"
+      H.a key: "settings", className: "btn btn-link btn-sm", onClick: @handleSettings,
+        H.span(className: "glyphicon glyphicon-cog")
+        " Settings"
       @props.extraTitleButtonsElem
 
   renderTitleBar: ->
@@ -95,15 +114,31 @@ module.exports = class DashboardComponent extends React.Component
         @renderActionLinks()
       @props.titleElem
 
+  renderQuickfilter: ->
+    R QuickfiltersComponent, {
+      design: @props.design.quickfilters
+      schema: @props.schema
+      dataSource: @props.dataSource
+      values: @state.quickfiltersValues
+      onValuesChange: (values) => @setState(quickfiltersValues: values)
+    }
+
   render: ->
+    # Compile quickfilters
+    filters = new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues)
+
     H.div key: "view", style: { height: "100%", paddingTop: 40, paddingRight: 20, paddingLeft: 5, position: "relative" },
       @renderTitleBar()
+      @renderQuickfilter()
+      R SettingsModalComponent, { onDesignChange: @props.onDesignChange, schema: @props.schema, dataSource: @props.dataSource, ref: "settings" }
+
       # Dashboard view requires width, so use auto size component to inject it
-      React.createElement(AutoSizeComponent, { injectWidth: true }, 
-        React.createElement(DashboardViewComponent, {
+      R AutoSizeComponent, { injectWidth: true }, 
+        R DashboardViewComponent, {
           ref: "dashboardView"
           design: @props.design
           onDesignChange: @props.onDesignChange
           widgetFactory: @props.widgetFactory
-        })
-      )
+          filters: filters
+        }
+      
