@@ -166,7 +166,7 @@ dashboardDesign = {
         }
       }
     }
-  ]
+  }
 }
 
 # dashboardDesign = {
