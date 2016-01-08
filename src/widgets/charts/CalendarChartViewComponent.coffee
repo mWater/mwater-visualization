@@ -80,21 +80,12 @@ module.exports = class CalendarChartViewComponent extends React.Component
     @redraw()
 
   handleCellClick: (cell, data) ->
-    if @state.selectedCell
-      @state.selectedCell.attr("fill", @state.selectedCellOriginalFillColor )
-
-      if data == @state.selectedCell.datum()
-        @setState(selectedCellOriginalFillColor: null)
-        @setState(selectedCell: null)
-        @props.onScopeChange?(null)
-        return
-
-    @setState(selectedCellOriginalFillColor: cell.attr("fill"))
-    @setState(selectedCell: cell)
-    cell.attr("fill", @props.highlightCellFillColor)
+    if @props.scope?.data == data
+      @props.onScopeChange?(null)
+      return
 
     scopeData =
-      name: ExprUtils.localizeString(@schema.getTable(@props.design.table).name, @context.locale) + " is " + data
+      name: @axisBuilder.summarizeAxis(@props.design.dateAxis, @context.locale) + " is " + @axisBuilder.formatValue(@props.design.dateAxis, data, @context.locale)
       filter:
         jsonql: @axisBuilder.createValueFilter(@props.design.dateAxis, data)
         table: @props.design.table
@@ -180,18 +171,17 @@ module.exports = class CalendarChartViewComponent extends React.Component
       .datum(format)
 
     rect.on "click", (e) ->
+      tip.hide()
       selectedRect = d3.select(this)
       self.handleCellClick selectedRect, e
 
 
     rect.filter( (d) -> data.has(d) )
-      .attr( "fill", (d) ->
+      .attr( "fill", (d) =>
         _color = color(data.get(d))
 
-        if self.props.scope and self.props.scope.data && self.props.scope.data == d
-          self.setState(selectedCellOriginalFillColor: _color)
-          self.setState(selectedCell: d3.select(this))
-          return self.props.highlightCellFillColor
+        if @props.scope?.data == d
+          return @props.highlightCellFillColor
 
         _color
       )
