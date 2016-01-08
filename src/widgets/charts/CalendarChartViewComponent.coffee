@@ -34,11 +34,6 @@ module.exports = class CalendarChartViewComponent extends React.Component
     @schema = options.schema
     @axisBuilder = new AxisBuilder(schema: @schema)
 
-    @state = {
-      selectedCellOriginalFillColor: null,
-      selectedCell: null
-    }
-
   @defaultProps:
     monthsStrokeColor: "#222"
     monthsStrokeWidth: 1
