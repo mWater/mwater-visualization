@@ -132,58 +132,43 @@ class MWaterDataSource extends DataSource
 
 dashboardDesign = {
   "items": {
-    "01952e51-ba0e-43e0-9ede-57eb4dcb3ddd": {
+    "c78d1987-a14e-4cab-b772-4a56136e2641": {
       "layout": {
         "x": 0,
         "y": 0,
-        "w": 17,
-        "h": 12
+        "w": 8,
+        "h": 8
       },
       "widget": {
-        "type": "LayeredChart",
+        "type": "CalendarChart",
         "design": {
           "version": 1,
-          "layers": [
-            {
-              "axes": {
-                "color": {
-                  "expr": {
-                    "type": "field",
-                    "table": "entities.water_point",
-                    "column": "type"
-                  },
-                  "xform": null
-                },
-                "y": {
-                  "expr": {
-                    "type": "id",
-                    "table": "entities.water_point"
-                  },
-                  "aggr": "count",
-                  "xform": null
-                }
-              },
-              "filter": null,
-              "table": "entities.water_point"
+          "dateAxis": {
+            "expr": {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "_created_on"
+            },
+            "xform": {
+              "type": "date"
             }
-          ],
-          "type": "pie"
+          },
+          "valueAxis": {
+            "expr": {
+              "type": "id",
+              "table": "entities.water_point"
+            },
+            "aggr": "count",
+            "xform": null
+          },
+          "filter": null,
+          "table": "entities.water_point"
         }
       }
     }
-  },
-  "quickfilters": [
-    {
-      "table": "entities.water_point",
-      "expr": {
-        "type": "field",
-        "table": "entities.water_point",
-        "column": "name"
-      },
-      "label": "Name"
-    }
   ]
 }
+
 # dashboardDesign = {
 #   "items": {
 #     "e08ef8a3-34db-467d-ac78-f0f273d49f25": {
