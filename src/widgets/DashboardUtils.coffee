@@ -3,6 +3,9 @@ LegoLayoutEngine = require './LegoLayoutEngine'
 
 # Add a widget to a dashboard design, returning the new design
 exports.addWidget = (dashboardDesign, widgetType, widgetDesign, width, height) ->
+  # Create dashboard if doesn't exist
+  dashboardDesign = dashboardDesign or { items: {} }
+
   # Find place for new item
   layout = exports.findOpenLayout(dashboardDesign, width, height)
 
