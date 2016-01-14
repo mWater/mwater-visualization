@@ -7,7 +7,7 @@ TextLiteralComponent = require './TextLiteralComponent'
 # Displays quick filters and allows their value to be modified
 module.exports = class QuickfiltersComponent extends React.Component
   @propTypes:
-    design: React.PropTypes.array.isRequired  # Design of quickfilters. See README.md
+    design: React.PropTypes.array             # Design of quickfilters. See README.md
     values: React.PropTypes.array             # Current values of quickfilters (state of filters selected)
     onValuesChange: React.PropTypes.func.isRequired # Called when value changes
     
