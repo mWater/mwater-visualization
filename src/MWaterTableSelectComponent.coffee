@@ -80,6 +80,12 @@ module.exports = class MWaterTableSelectComponent extends React.Component
   renderIndicators: ->
     tables = _.filter(@props.schema.getTables(), (table) => table.id.match(/^indicator_values:/))
     tables = _.sortBy(tables, "name")
+
+    # Add all indicators to top
+    table = @props.schema.getTable("response_indicators")
+    if table
+      tables.unshift(table)
+
     R OptionListComponent,
       items: _.map(tables, (table) =>
         return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @handleChange.bind(null, table.id) }
