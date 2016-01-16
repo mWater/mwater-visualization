@@ -4,7 +4,7 @@ R = React.createElement
 ExprComponent = require("mwater-expressions-ui").ExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
 ExprCompiler = require('mwater-expressions').ExprCompiler
-EditableLinkComponent = require '../EditableLinkComponent'
+LinkComponent = require('mwater-expressions-ui').LinkComponent
 AxisBuilder = require './AxisBuilder'
 update = require 'update-object'
 ui = require '../UIComponents'
@@ -61,7 +61,7 @@ module.exports = class AxisComponent extends React.Component
       aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
       currentAggr = _.findWhere(aggrs, id: @props.value.aggr)
 
-      return React.createElement(EditableLinkComponent, 
+      return React.createElement(LinkComponent, 
         dropdownItems: aggrs
         onDropdownItemClicked: @handleAggrChange
         if currentAggr then currentAggr.name

@@ -2,7 +2,6 @@ React = require 'react'
 H = React.DOM
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
-EditableLinkComponent = require '../EditableLinkComponent'
 AxisComponent = require './../axes/AxisComponent'
 ColorComponent = require '../ColorComponent'
 TableSelectComponent = require '../TableSelectComponent'

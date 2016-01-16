@@ -4,7 +4,7 @@ H = React.DOM
 
 ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require './../../axes/AxisBuilder'
-EditableLinkComponent = require './../../EditableLinkComponent'
+LinkComponent = require('mwater-expressions-ui').LinkComponent
 ExprComponent = require("mwater-expressions-ui").ExprComponent
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 OrderingsComponent = require './OrderingsComponent'
@@ -211,7 +211,7 @@ class TableChartColumnDesignerComponent extends React.Component
     return H.div null,
       H.label className: "text-muted", "Summarize"
       ": "
-      React.createElement(EditableLinkComponent, 
+      React.createElement(LinkComponent, 
         dropdownItems: aggrs
         onDropdownItemClicked: @handleAggrChange
         if currentAggr then currentAggr.name else "None"

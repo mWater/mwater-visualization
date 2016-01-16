@@ -4,7 +4,7 @@ H = React.DOM
 R = React.createElement
 motion = require 'react-motion'
 
-EditableLinkComponent = require './EditableLinkComponent'
+LinkComponent = require('mwater-expressions-ui').LinkComponent
 
 # Miscellaneous ui components
 
@@ -147,7 +147,7 @@ exports.ToggleEditComponent = class ToggleEditComponent extends React.Component
     if _.isFunction(editor)
       editor = editor(@close)
 
-    link = R(EditableLinkComponent, onClick: @open, onRemove: @props.onRemove, @props.label)
+    link = R(LinkComponent, onClick: @open, onRemove: @props.onRemove, @props.label)
     
     isOpen = @state.open or @props.forceOpen
 

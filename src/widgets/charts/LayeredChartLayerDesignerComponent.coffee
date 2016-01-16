@@ -5,7 +5,6 @@ AxisComponent = require './../../axes/AxisComponent'
 AxisBuilder = require '../../axes/AxisBuilder'
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
-EditableLinkComponent = require './../../EditableLinkComponent'
 ColorComponent = require '../../ColorComponent'
 LayeredChartUtils = require './LayeredChartUtils'
 ui = require '../../UIComponents'
