@@ -1,6 +1,6 @@
 # mwater-visualization
 
-Requires C3, D3 and Bootstrap
+Requires C3, D3, Bootstrap and Font Awesome
 
 ## Expressions
 

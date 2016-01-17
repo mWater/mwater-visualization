@@ -18,6 +18,7 @@ sublayer:
   axes: axes (see below)
   filter: optional logical expression to filter by
   color: color of layer (e.g. #FF8800). Color axis overrides
+  symbol: symbol to use for layer. e.g. "font-awesome/bell". Will be converted on server to proper uri.
 
 axes:
   geometry: where to place markers
@@ -172,6 +173,11 @@ module.exports = class MarkersLayer extends Layer
   createCss: ->
     css = ""
     _.each @design.sublayers, (sublayer, index) =>
+      if sublayer.symbol
+        symbol = "marker-file: url(#{sublayer.symbol});"
+      else
+        symbol = "marker-type: ellipse;"
+
       css += '''
         #layer''' + index + ''' {
           marker-fill: ''' + (sublayer.color or "#666666") + ''';
@@ -180,7 +186,7 @@ module.exports = class MarkersLayer extends Layer
           marker-line-width: 1;
           marker-line-opacity: 0.6;
           marker-placement: point;
-          marker-type: ellipse;
+          ''' + symbol + '''
           marker-allow-overlap: true;
         }
 

@@ -22,6 +22,3 @@ types:
 `month`: month only e.g. `02`. type enum
 
 
-### bin
-
-min and max are computed by the AxisComponent when it is loaded if the values are not already present.

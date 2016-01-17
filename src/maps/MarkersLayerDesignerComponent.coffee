@@ -5,6 +5,7 @@ ExprUtils = require('mwater-expressions').ExprUtils
 AxisComponent = require './../axes/AxisComponent'
 ColorComponent = require '../ColorComponent'
 TableSelectComponent = require '../TableSelectComponent'
+ReactSelect = require 'react-select'
 
 # Designer for a markers layer
 module.exports = class MarkersLayerDesignerComponent extends React.Component
@@ -83,6 +84,7 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
   handleGeometryAxisChange: (axis) => @updateAxes(geometry: axis)
   handleFilterChange: (expr) => @update(filter: expr)
   handleColorChange: (color) => @update(color: color)
+  handleSymbolChange: (symbol) => @update(symbol: symbol)
 
   renderRemove: ->
     if @props.onRemove
@@ -125,6 +127,46 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
       H.div style: { marginLeft: 8 }, 
         React.createElement(ColorComponent, color: @props.sublayer.color, onChange: @handleColorChange)
 
+  renderSymbol: ->
+    # Create options
+    options = [
+      { value: "font-awesome/star", label: "Star" }
+      { value: "font-awesome/square", label: "Square" }
+      { value: "font-awesome/check", label: "Check" }
+      { value: "font-awesome/check-circle", label: "Check Circle" }
+      { value: "font-awesome/times", label: "Removed" }
+      { value: "font-awesome/ban", label: "Ban" }
+      { value: "font-awesome/crosshairs", label: "Crosshairs" }
+      { value: "font-awesome/flask", label: "Flask" }
+      { value: "font-awesome/info-circle", label: "Info Circle" }
+      { value: "font-awesome/male", label: "Male" }
+      { value: "font-awesome/female", label: "Female" }
+      { value: "font-awesome/user", label: "Person" }
+      { value: "font-awesome/users", label: "Group" }
+      { value: "font-awesome/home", label: "Home" }
+      { value: "font-awesome/wheelchair", label: "Wheelchair" }
+      { value: "font-awesome/h-square", label: "Hospital Symbol" }
+    ]
+
+    optionRenderer = (option) ->
+      return H.span null,
+        H.i className: "fa fa-#{option.value.substr(13)}" # Trim "font-awesome/"
+        " #{option.label}"
+
+    return H.div className: "form-group",
+      H.label className: "text-muted", 
+        H.span(className: "fa fa-star")
+        " "
+        "Symbol"
+      React.createElement ReactSelect, {
+        placeholder: "Circle"
+        value: @props.sublayer.symbol
+        options: options
+        optionRenderer: optionRenderer
+        valueRenderer: optionRenderer
+        onChange: @handleSymbolChange
+      }
+
   renderFilter: ->
     # If no table, hide
     if not @props.sublayer.table
@@ -148,5 +190,6 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
       @renderTable()
       @renderGeometryAxis()
       @renderColor()
+      @renderSymbol()
       @renderFilter()
 
