@@ -187,8 +187,9 @@ module.exports = class LeafletMapComponent extends React.Component
             @utfGridLayers.push(utfGridLayer)
 
             if layer.onGridClick
-              utfGridLayer.on 'click', (ev) =>
-                layer.onGridClick({ data: ev.data })
+              do (layer) =>
+                utfGridLayer.on 'click', (ev) =>
+                  layer.onGridClick({ data: ev.data })
 
     # Render legend
     if @props.legend
