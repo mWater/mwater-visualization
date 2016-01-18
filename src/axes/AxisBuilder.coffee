@@ -83,10 +83,10 @@ module.exports = class AxisBuilder
         if "number" not in options.types or type != "id"
           return null
 
-    # Always 
-    # Add number of bins
-    if axis.xform and axis.xform.type == "bin" and not axis.xform.numBins
-      axis.xform.numBins = 6
+    if axis.xform and axis.xform.type == "bin"
+      # Add number of bins
+      if not axis.xform.numBins
+        axis.xform.numBins = 6
 
     # Only allow aggr if not xform
     if axis.xform
@@ -127,6 +127,10 @@ module.exports = class AxisBuilder
     if options.axis.xform and options.axis.xform.type == "bin"
       if not options.axis.xform.numBins
         return "Missing numBins"
+      if not options.axis.xform.min?
+        return "Missing min"
+      if not options.axis.xform.max?
+        return "Missing max"
 
     return
 
@@ -239,9 +243,7 @@ module.exports = class AxisBuilder
 
     # Create expression that selects the min or max
     minExpr = { type: "op", op: "min", exprs: [{ type: "field", tableAlias: "inner", column: "val" }]}
-
-    # Add epsilon to prevent width_bucket from crashing if min = max
-    maxExpr = { type: "op", op: "+", exprs: [{ type: "op", op: "max", exprs: [{ type: "field", tableAlias: "inner", column: "val" }]}, epsilon] }
+    maxExpr = { type: "op", op: "max", exprs: [{ type: "field", tableAlias: "inner", column: "val" }]}
 
     # Only include not null values
     where = {

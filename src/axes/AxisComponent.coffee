@@ -80,7 +80,12 @@ module.exports = class AxisComponent extends React.Component
       return
 
     if @props.value.xform and @props.value.xform.type == "bin"
-      return R(BinsComponent, xform: @props.value.xform, onChange: @handleXformChange)
+      return R(BinsComponent, 
+        schema: @props.schema
+        dataSource: @props.dataSource
+        expr: @props.value.expr
+        xform: @props.value.xform
+        onChange: @handleXformChange)
 
     exprUtils = new ExprUtils(@props.schema)
     exprType = exprUtils.getExprType(@props.value.expr) 
@@ -127,8 +132,39 @@ module.exports = class AxisComponent extends React.Component
 # Allows setting of bins (min, max and number). Computes defaults if not present
 class BinsComponent extends React.Component
   @propTypes:
+    schema: React.PropTypes.object.isRequired 
+    dataSource: React.PropTypes.object.isRequired
+
+    expr: React.PropTypes.object.isRequired   # Expression for computing min/max
     xform: React.PropTypes.object.isRequired
     onChange: React.PropTypes.func.isRequired
+
+  componentDidMount: ->
+    # Check if computing is needed
+    if not @props.xform.min? or not @props.xform.max?
+      axisBuilder = new AxisBuilder(schema: @props.schema)
+
+      # Get min and max from a query
+      minMaxQuery = axisBuilder.compileBinMinMax(@props.expr, @props.expr.table, null, @props.xform.numBins)
+
+      @props.dataSource.performQuery(minMaxQuery, (error, rows) =>
+        if @unmounted
+          return
+
+        if error
+          return # Ignore
+
+        min = rows[0].min
+        max = rows[0].max
+        if min == max
+          # Add epsilon to prevent width_bucket from crashing if min = max
+          max += 0.000001
+
+        @props.onChange(update(@props.xform, { min: { $set: min }, max: { $set: max }}))
+      )
+
+  componentWillUnmount: ->
+    @unmounted = true
 
   render: ->
     H.div null,
@@ -166,6 +202,6 @@ class NumberComponent extends React.Component
         value: @props.value
         onChange: @handleChange
         className: "form-control input-sm"
-        style: { width: "5em", display: "inline-block", marginLeft: 5 }
+        style: { width: "8em", display: "inline-block", marginLeft: 5 }
 
 
