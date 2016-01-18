@@ -308,6 +308,13 @@ module.exports = class AxisBuilder
 
     return types
 
+  # Gets the color for a value (if in colorMap)
+  getValueColor: (axis, value) ->
+    item = _.find(axis.colorMap, (item) => item.value == value)
+    if item
+      return item.color
+    return null
+
   # Get all categories for a given axis type given the known values
   # Returns array of { value, label }
   getCategories: (axis, values, locale) ->

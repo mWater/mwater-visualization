@@ -20,7 +20,7 @@ describe "LayeredChartCompiler", ->
 
     @axisNumber = { expr: @exprNumber }
     @axisNumberSum = { expr: @exprNumber, aggr: "sum" }
-    @axisEnum = { expr: @exprEnum } 
+    @axisEnum = { expr: @exprEnum }  
     @axisEnumset = { expr: @exprEnumset } 
     @axisText = { expr: @exprText } 
     @axisDate = { expr: @exprDate } 
@@ -206,7 +206,7 @@ describe "LayeredChartCompiler", ->
   describe "compileData", ->
     describe "pie/donut", ->
       describe "single layer", ->
-        before ->
+        beforeEach ->
           @design = {
             type: "pie"
             layers: [
@@ -244,7 +244,38 @@ describe "LayeredChartCompiler", ->
             "0:1": "B"
             })
 
-        it "colors based on color map"
+        it "colors based on color map", ->
+          @design.layers[0].axes.color.colorMap = [
+            { value: "b", color: "green" }
+          ]
+          @res = @compiler.compileData(@design, @data)
+          
+          compare(@res.colors, {
+            "0:1": "green"
+            })          
+
+        it "colors based on color map with series default", ->
+          @design.layers[0].axes.color.colorMap = [
+            { value: "b", color: "green" }
+          ]
+          @res = @compiler.compileData(@design, @data)
+          
+          compare(@res.colors, {
+            "0:1": "green"
+            })          
+
+        it "colors based on color map defaulting to series", ->
+          @design.layers[0].color = "red"
+          @design.layers[0].axes.color.colorMap = [
+            { value: "b", color: "green" }
+          ]
+          @res = @compiler.compileData(@design, @data)
+          
+          compare(@res.colors, {
+            "0:0": "red"
+            "0:1": "green"
+            })          
+
 
         it "sets x axis type to category", ->
           assert.equal @res.xAxisType, "category"
@@ -431,7 +462,27 @@ describe "LayeredChartCompiler", ->
             "0:b:y": "B"
             })
 
-        it "uses color maps"
+        it "colors based on color map", ->
+          @design.layers[0].axes.color.colorMap = [
+            { value: "b", color: "green" }
+          ]
+          @res = @compiler.compileData(@design, @data)
+          
+          compare(@res.colors, {
+            "0:b:y": "green"
+            })          
+
+        it "colors based on color map defaulting to series", ->
+          @design.layers[0].color = "red"
+          @design.layers[0].axes.color.colorMap = [
+            { value: "b", color: "green" }
+          ]
+          @res = @compiler.compileData(@design, @data)
+          
+          compare(@res.colors, {
+            "0:a:y": "red"
+            "0:b:y": "green"
+            })          
 
         it "sets x axis type to indexed", ->
           assert.equal @res.xAxisType, "indexed"
@@ -504,6 +555,50 @@ describe "LayeredChartCompiler", ->
           ["0:b", 75, null]
           ])
 
+      it "colors based on color map", ->
+        design = {
+          type: "bar"
+          layers: [
+            { table: "t1", axes: { x: @axisText, y: @axisNumberSum, color: @axisEnum } }
+          ]
+        }
+
+        design.layers[0].axes.color.colorMap = [
+          { value: "b", color: "green" }
+        ]
+
+        data = { 
+          layer0: [{ x: "t1", y: 11, color: "a" }, { x: "t2", y: 12, color: "b" }]
+        }
+
+        res = @compiler.compileData(design, data)
+        compare(res.colors, {
+          "0:b": "green"
+          })          
+
+      it "colors based on color map defaulting to series", ->
+        design = {
+          type: "bar"
+          layers: [
+            { table: "t1", axes: { x: @axisText, y: @axisNumberSum, color: @axisEnum } }
+          ]
+        }
+
+        design.layers[0].color = "red"
+        design.layers[0].axes.color.colorMap = [
+          { value: "b", color: "green" }
+        ]
+
+        data = { 
+          layer0: [{ x: "t1", y: 11, color: "a" }, { x: "t2", y: 12, color: "b" }]
+        }
+
+        res = @compiler.compileData(design, data)
+        
+        compare(res.colors, {
+          "0:a": "red"
+          "0:b": "green"
+          })          
 
       # x axis as number (integer) no longer supported without binning
       # describe "x axis range", ->

@@ -188,8 +188,12 @@ module.exports = class LayeredChartCompiler
           names[series] = @axisBuilder.formatValue(layer.axes.color, row.color, locale)
           dataMap[series] = { layerIndex: layerIndex, row: row }
 
-          # TODO REMOVE
-          if colorHacks[row.color]
+          # Get specific color if present
+          color = @axisBuilder.getValueColor(layer.axes.color, row.color)
+          color = color or layer.color
+          if color
+            colors[series] = color
+          else if colorHacks[row.color] # TODO REMOVE
             colors[series] = colorHacks[row.color]
       else
         # Create a single series
@@ -203,13 +207,11 @@ module.exports = class LayeredChartCompiler
           names[series] = layer.name or "Series #{layerIndex+1}"
           dataMap[series] = { layerIndex: layerIndex, row: row }
 
-          # TODO REMOVE
-          if colorHacks[row.color]
-            colors[series] = colorHacks[row.color]
-
           # Set color if present
           if layer.color
             colors[series] = layer.color
+          else if colorHacks[row.color] # TODO REMOVE
+            colors[series] = colorHacks[row.color]
 
     return {
       columns: columns
@@ -246,6 +248,16 @@ module.exports = class LayeredChartCompiler
           # One series for x values, one for y
           seriesX = "#{layerIndex}:#{colorValue}:x"
           seriesY = "#{layerIndex}:#{colorValue}:y"
+
+          # Get specific color if present
+          color = @axisBuilder.getValueColor(layer.axes.color, colorValue)
+          color = color or layer.color
+          if color
+            colors[seriesY] = color
+          else
+            # TODO REMOVE
+            if colorHacks[colorValue]
+              colors[series] = colorHacks[colorValue]
 
           # Get rows for this series
           rows = _.where(layerData, color: colorValue)
@@ -385,9 +397,15 @@ module.exports = class LayeredChartCompiler
           # One series for y values
           series = "#{layerIndex}:#{colorValue}"
 
-          # TODO REMOVE
-          if colorHacks[colorValue]
-            colors[series] = colorHacks[colorValue]
+          # Get specific color if present
+          color = @axisBuilder.getValueColor(layer.axes.color, colorValue)
+          color = color or layer.color
+          if color
+            colors[series] = color
+          else
+            # TODO REMOVE
+            if colorHacks[colorValue]
+              colors[series] = colorHacks[colorValue]
 
           # Get rows for this series
           rows = _.where(layerData, color: colorValue)

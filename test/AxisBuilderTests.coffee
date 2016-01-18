@@ -328,6 +328,26 @@ describe "AxisBuilder", ->
     it "wraps text[]", ->
       compare(@ab.formatValue(@axisTextarr, ["a", "b"]), H.div(null, H.div(key: 0, "a"), H.div(key: 1, "b")))
       compare(@ab.formatValue(@axisTextarr, JSON.stringify(["a", "b"])), H.div(null, H.div(key: 0, "a"), H.div(key: 1, "b")))
+
+  describe "getValueColor", ->
+    it "gets if in color map", ->
+      axis = {
+        expr: @exprEnum
+        colorMap: [
+          { value: "a", color: "#FF0000" }
+          { value: "b", color: "#00FF00" }
+        ]
+      }
+      assert.equal @ab.getValueColor(axis, "b"), "#00FF00"
+
+    it "handles missing", ->
+      axis = {
+        expr: @exprEnum
+        colorMap: [
+          { value: "a", color: "#FF0000" }
+        ]
+      }
+      assert not @ab.getValueColor(axis, "b")
     
   describe "getCategories", ->
     it "gets enum", ->

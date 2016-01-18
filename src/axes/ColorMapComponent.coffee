@@ -89,7 +89,7 @@ module.exports = class ColorMapComponent extends React.Component
 
   render: ->
     H.div null,
-      H.table className: "table table-bordered", style: { width: "auto" },
+      H.table className: "table table-bordered  ", style: { width: "auto" },
         H.thead null,
           H.tr null, 
             H.th colSpan: 2, "Colors"

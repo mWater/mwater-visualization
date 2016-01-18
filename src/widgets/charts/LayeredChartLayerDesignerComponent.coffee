@@ -182,13 +182,13 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
   renderColor: ->
     layer = @props.design.layers[@props.index]
 
-    # If not table or has color axis, do nothing
-    if not layer.table or layer.axes.color
+    # If not table do nothing
+    if not layer.table 
       return
 
     return H.div className: "form-group",
       H.label className: "text-muted", 
-        "Color"
+        if layer.axes.color then "Default Color" else "Color"
       H.div style: { marginLeft: 8 }, 
         R(ColorComponent, color: layer.color, onChange: @handleColorChange)
 
