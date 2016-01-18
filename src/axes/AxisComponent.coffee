@@ -154,11 +154,9 @@ class BinsComponent extends React.Component
         if error
           return # Ignore
 
-        min = rows[0].min
-        max = rows[0].max
-        if min == max
-          # Add epsilon to prevent width_bucket from crashing if min = max
-          max += 0.000001
+        if rows[0].min?
+          min = parseFloat(rows[0].min)
+          max = parseFloat(rows[0].max)
 
         @props.onChange(update(@props.xform, { min: { $set: min }, max: { $set: max }}))
       )

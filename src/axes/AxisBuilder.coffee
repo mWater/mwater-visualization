@@ -131,6 +131,8 @@ module.exports = class AxisBuilder
         return "Missing min"
       if not options.axis.xform.max?
         return "Missing max"
+      if options.axis.xform.max < options.axis.xform.min
+        return "Max < min"
 
     return
 
@@ -145,31 +147,20 @@ module.exports = class AxisBuilder
     # Bin
     if options.axis.xform 
       if options.axis.xform.type == "bin"
-        # Sometimes bin min and max are specified, and if they are not, we need to compute them
-        # Since we need the computed values, we encode min and max into the resulting value as 
-        # binnumber:min:max
-        # e.g. for 3 bins, range 12-15, "0:12:15", "1:12:15", "2:12:15"
-        minExpr = options.axis.xform.min or @compileBinRange(options.axis.expr, options.axis.expr.table, options.axis.xform.numBins, "min")
-        maxExpr = options.axis.xform.max or @compileBinRange(options.axis.expr, options.axis.expr.table, options.axis.xform.numBins, "max")
+        min = options.axis.xform.min
+        max = options.axis.xform.max
+        # Add epsilon to prevent width_bucket from crashing
+        if max == min
+          max += epsilon
 
         compiledExpr = {
           type: "op"
-          op: "||"  # String concatenation
+          op: "width_bucket"
           exprs: [
-            {
-              type: "op"
-              op: "width_bucket"
-              exprs: [
-                compiledExpr
-                minExpr
-                maxExpr
-                options.axis.xform.numBins
-              ]
-            }
-            ":"
-            minExpr
-            ":"
-            maxExpr
+            compiledExpr
+            min
+            max
+            options.axis.xform.numBins
           ]
         }
 
@@ -297,65 +288,6 @@ module.exports = class AxisBuilder
     return query
 
 
-  # Create query to get percentiles
-  # To do so, split into numBins + 2 percentile sections and exclude first and last
-  # That will give a nice distribution when using width_bucket so that all are used
-  # select max(inner.val), min(inner.val) f
-  # from (select expression as val, ntile(numBins + 2) over (order by expression asc) as ntilenum
-  # from the_table where exprssion is not null)
-  # where inner.ntilenum > 1 and inner.ntilenum < numBins + 2
-  # Inspired by: http://dba.stackexchange.com/questions/17086/fast-general-method-to-calculate-percentiles
-  compileBinRange: (expr, table, numBins, minOrMax) ->
-    exprCompiler = new ExprCompiler(@schema)
-    compiledExpr = exprCompiler.compileExpr(expr: expr, tableAlias: "binrange")
-
-    # Create expression that selects the min or max
-    minMaxExpr = { type: "op", op: minOrMax, exprs: [{ type: "field", tableAlias: "inner", column: "val" }]}
-
-    # Add epsilon to prevent width_bucket from crashing if min = max
-    if minOrMax == "max"
-      minMaxExpr = { type: "op", op: "+", exprs: [minMaxExpr, epsilon] }
-
-    query = {
-      type: "scalar"
-      expr: minMaxExpr
-      from: {
-        type: "subquery"
-        query: {
-          type: "query"
-          selects: [
-            { type: "select", expr: compiledExpr, alias: "val" }
-            { 
-              type: "select"
-              expr: { 
-                type: "op"
-                op: "ntile"
-                exprs: [numBins + 2]
-              }
-              over: { 
-                orderBy: [{ expr: compiledExpr, direction: "asc" }]
-              } 
-              alias: "ntilenum" 
-            }
-          ]
-          from: { type: "table", table: table, alias: "binrange" }
-          where: {
-            type: "op"
-            op: "is not null"
-            exprs: [compiledExpr]
-          }
-        }
-        alias: "inner"
-      }
-      where: {
-        type: "op"
-        op: "between"
-        exprs: [{ type: "field", tableAlias: "inner", column: "ntilenum" }, 2, numBins + 1]
-      }
-    }
-    return query
-
-
   # Get underlying expression types that will give specified output expression types
   #  types: array of types
   #  aggrNeed is "none", "optional" or "required"
@@ -385,21 +317,12 @@ module.exports = class AxisBuilder
       max = axis.xform.max
       numBins = axis.xform.numBins
 
-      # Get min from values if not present
-      if not min? or not max?
-        value = _.find(values, (v) -> v?)
-        if not value
-          return []
-
-        min = min or parseFloat(value.split(":")[1])
-        max = max or parseFloat(value.split(":")[2])
-
       # Special case of single value (min and max within epsilon of each other)
       if (max - min) <= epsilon
         return [
-          { value: "0:#{min}:#{max}", label: "< #{min}"}
-          { value: "1:#{min}:#{max}", label: "= #{min}"}
-          { value: "#{axis.xform.numBins + 1}:#{min}:#{max}", label: "> #{min}"}
+          { value: 0, label: "< #{min}"}
+          { value: 1, label: "= #{min}"}
+          { value: axis.xform.numBins + 1, label: "> #{min}"}
         ]
 
       # Calculate precision
@@ -407,12 +330,12 @@ module.exports = class AxisBuilder
       format = d3Format.format(",." + precision + "f")
 
       categories = []
-      categories.push({ value: "0:#{min}:#{max}", label: "< #{format(min)}"})
+      categories.push({ value: 0, label: "< #{format(min)}"})
       for i in [1..numBins]
         start = (i-1) / numBins * (max - min) + min
         end = (i) / numBins * (max - min) + min
-        categories.push({ value: "#{i}:#{min}:#{max}", label: "#{format(start)} - #{format(end)}"})
-      categories.push({ value: "#{axis.xform.numBins + 1}:#{min}:#{max}", label: "> #{format(max)}"})
+        categories.push({ value: i, label: "#{format(start)} - #{format(end)}"})
+      categories.push({ value: axis.xform.numBins + 1, label: "> #{format(max)}"})
 
       return categories
 

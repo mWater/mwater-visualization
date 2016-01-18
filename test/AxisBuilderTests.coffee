@@ -275,6 +275,13 @@ describe "AxisBuilder", ->
       }
       assert not @ab.validateAxis(axis: axis)
 
+    it "requires valid min/max bin xform", ->
+      axis = {
+        expr: @exprNumber
+        xform: { type: "bin", numBins: 10, min: 2, max: 1 }
+      }
+      assert @ab.validateAxis(axis: axis)
+
   describe "getExprTypes", ->
     it "does not add any if aggr allowed and number out", ->
       assert.notInclude @ab.getExprTypes(["number"], "optional"), "datetime"
@@ -378,11 +385,11 @@ describe "AxisBuilder", ->
 
       categories = @ab.getCategories(axis, [])
       compare(categories, [
-        { value: "0:1:4", label: "< 1" }
-        { value: "1:1:4", label: "1 - 2" }
-        { value: "2:1:4", label: "2 - 3" }
-        { value: "3:1:4", label: "3 - 4" }
-        { value: "4:1:4", label: "> 4" }
+        { value: 0, label: "< 1" }
+        { value: 1, label: "1 - 2" }
+        { value: 2, label: "2 - 3" }
+        { value: 3, label: "3 - 4" }
+        { value: 4, label: "> 4" }
       ])
 
     it "gets months", ->
