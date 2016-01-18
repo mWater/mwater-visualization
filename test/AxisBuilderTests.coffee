@@ -67,28 +67,18 @@ describe "AxisBuilder", ->
       jql = @ab.compileAxis(axis: axis, tableAlias: "T1")
       assert _.isEqual jql, {
         type: "op"
-        op: "||"
+        op: "width_bucket"
         exprs: [
           {
-            type: "op"
-            op: "width_bucket"
-            exprs: [
-              {
-                type: "field"
-                tableAlias: "T1"
-                column: "number"
-              },
-              2,
-              8,
-              10
-            ]
-          }
-          ":"
-          2
-          ":"
-          8
-      ]
-    }
+            type: "field"
+            tableAlias: "T1"
+            column: "number"
+          },
+          2,
+          8,
+          10
+        ]
+      }
 
     it "compiles date xform", ->
       axis = {
@@ -320,7 +310,7 @@ describe "AxisBuilder", ->
         expr: @exprNumber
         xform: { type: "bin", numBins: 3, min: 1, max: 4 }
       }
-      assert.equal @ab.formatValue(axis, "0:1:4"), "< 1"
+      assert.equal @ab.formatValue(axis, 0), "< 1"
 
     it "formats enum", ->
       assert.equal @ab.formatValue(@axisEnum, "a"), "A"
