@@ -46,6 +46,9 @@ module.exports = class AxisComponent extends React.Component
     else
       @props.onChange(_.omit(@props.value, "xform"))
 
+  handleXformChange: (xform) =>
+    @props.onChange(update(@props.value, { xform: { $set: xform } }))
+
   renderAggr: ->
     if @props.aggrNeed == "none"
       return
@@ -67,9 +70,17 @@ module.exports = class AxisComponent extends React.Component
         if currentAggr then currentAggr.name
         )
 
+  renderBins: ->
+    R BinsComponent,
+      value: @props.value.xform
+      onChange: @handleXformChange
+
   renderXform: ->
     if not @props.value
       return
+
+    if @props.value.xform and @props.value.xform.type == "bin"
+      return R(BinsComponent, xform: @props.value.xform, onChange: @handleXformChange)
 
     exprUtils = new ExprUtils(@props.schema)
     exprType = exprUtils.getExprType(@props.value.expr) 
@@ -112,4 +123,49 @@ module.exports = class AxisComponent extends React.Component
           includeCount: @props.aggrNeed != "none"
           value: if @props.value then @props.value.expr)  
       @renderXform()
+
+# Allows setting of bins (min, max and number). Computes defaults if not present
+class BinsComponent extends React.Component
+  @propTypes:
+    xform: React.PropTypes.object.isRequired
+    onChange: React.PropTypes.func.isRequired
+
+  render: ->
+    H.div null,
+      R NumberComponent, key: "min", label: "Min:", value: @props.xform.min, onChange: (v) => @props.onChange(update(@props.xform, { min: { $set: v }}))
+      " "
+      R NumberComponent, key: "max", label: "Max:", value: @props.xform.max, onChange: (v) => @props.onChange(update(@props.xform, { max: { $set: v }}))
+      " "
+      R NumberComponent, key: "numBins", label: "Bins:", value: @props.xform.numBins, onChange: (v) => @props.onChange(update(@props.xform, { numBins: { $set: v }}))
+
+# Label and number
+class NumberComponent extends React.Component
+  @propTypes:
+    label: React.PropTypes.node
+    value: React.PropTypes.number
+    onChange: React.PropTypes.func.isRequired
+    integer: React.PropTypes.bool
+
+  handleChange: (ev) =>
+    if @props.integer
+      number = parseInt(ev.target.value)
+    else
+      number = parseFloat(ev.target.value)
+
+    if _.isNaN(number)
+      @props.onChange(null)
+    else
+      @props.onChange(number)
+
+  render: ->
+    H.div style: { display: "inline-block" },
+      H.label className: "text-muted", @props.label
+      H.input 
+        type: "number"
+        step: (if @props.integer then "1" else "any")
+        value: @props.value
+        onChange: @handleChange
+        className: "form-control input-sm"
+        style: { width: "5em", display: "inline-block", marginLeft: 5 }
+
 
