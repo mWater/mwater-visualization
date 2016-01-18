@@ -44,6 +44,7 @@ exports.WidgetScoper = require './widgets/WidgetScoper'
 exports.WidgetScopesViewComponent = require './widgets/WidgetScopesViewComponent'
 
 exports.TableSelectComponent = require './TableSelectComponent'
+exports.AxisBuilder = require './axes/AxisBuilder'
 
 # http://stackoverflow.com/questions/19305821/multiple-modals-overlay
 $ = require 'jquery'
