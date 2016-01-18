@@ -223,6 +223,78 @@ module.exports = class AxisBuilder
 
     return compiledExpr
 
+  # Create query to get min and max for a nice binning. Returns one row with "min" and "max" fields
+  # To do so, split into numBins + 2 percentile sections and exclude first and last
+  # That will give a nice distribution when using width_bucket so that all are used
+  # select max(inner.val), min(inner.val) f
+  # from (select expression as val, ntile(numBins + 2) over (order by expression asc) as ntilenum
+  # from the_table where exprssion is not null)
+  # where inner.ntilenum > 1 and inner.ntilenum < numBins + 2
+  # Inspired by: http://dba.stackexchange.com/questions/17086/fast-general-method-to-calculate-percentiles
+  # expr is mwater expression on table
+  # filterExpr is optional filter on values to include
+  compileBinMinMax: (expr, table, filterExpr, numBins) ->
+    exprCompiler = new ExprCompiler(@schema)
+    compiledExpr = exprCompiler.compileExpr(expr: expr, tableAlias: "binrange")
+
+    # Create expression that selects the min or max
+    minExpr = { type: "op", op: "min", exprs: [{ type: "field", tableAlias: "inner", column: "val" }]}
+
+    # Add epsilon to prevent width_bucket from crashing if min = max
+    maxExpr = { type: "op", op: "+", exprs: [{ type: "op", op: "max", exprs: [{ type: "field", tableAlias: "inner", column: "val" }]}, epsilon] }
+
+    # Only include not null values
+    where = {
+      type: "op"
+      op: "is not null"
+      exprs: [compiledExpr]
+    }
+
+    # If filtering, compile and add to inner where
+    if filterExpr
+      compiledFilterExpr = exprCompiler.compileExpr(expr: filterExpr, tableAlias: "binrange")
+      if compiledFilterExpr
+        where = { type: "op", op: "and", exprs: [where, compiledFilterExpr] }
+
+    query = {
+      type: "query"
+      selects: [
+        { type: "select", expr: minExpr, alias: "min" }
+        { type: "select", expr: maxExpr, alias: "max" }
+      ]
+      from: {
+        type: "subquery"
+        query: {
+          type: "query"
+          selects: [
+            { type: "select", expr: compiledExpr, alias: "val" }
+            { 
+              type: "select"
+              expr: { 
+                type: "op"
+                op: "ntile"
+                exprs: [numBins + 2]
+              }
+              over: { 
+                orderBy: [{ expr: compiledExpr, direction: "asc" }]
+              } 
+              alias: "ntilenum" 
+            }
+          ]
+          from: { type: "table", table: table, alias: "binrange" }
+          where: where
+        }
+        alias: "inner"
+      }
+      where: {
+        type: "op"
+        op: "between"
+        exprs: [{ type: "field", tableAlias: "inner", column: "ntilenum" }, 2, numBins + 1]
+      }
+    }
+    return query
+
+
   # Create query to get percentiles
   # To do so, split into numBins + 2 percentile sections and exclude first and last
   # That will give a nice distribution when using width_bucket so that all are used
@@ -393,17 +465,6 @@ module.exports = class AxisBuilder
       when "enum", "enumset"
         # If enum, return enum values
         return _.map(@exprUtils.getExprEnumValues(axis.expr), (ev) -> { value: ev.id, label: ExprUtils.localizeString(ev.name, locale) })
-      # Removed since integer is no longer a fundamental type. TODO REMOVE
-      # when "integer"
-      #   values = _.compact(values)
-      #   if values.length == 0 
-      #     return []
-
-      #   # Integers are sometimes strings from database, so always parseInt (bigint in node-postgres)
-      #   min = _.min(_.map(values, (v) -> parseInt(v)))
-      #   max = _.max(_.map(values, (v) -> parseInt(v)))
-
-      #   return _.map(_.range(min, max + 1), (v) -> { value: v, label: "#{v}"})
       when "text"
         # Return unique values
         return _.map(_.uniq(values), (v) -> { value: v, label: v or "None" })
