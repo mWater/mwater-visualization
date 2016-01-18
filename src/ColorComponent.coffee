@@ -22,11 +22,13 @@ module.exports = class ColorComponent extends React.Component
 
   render: ->
     style = {
-      height: 30
-      width: 30
+      height: 20
+      width: 20
       border: "solid 2px #888"
       borderRadius: 4
       backgroundColor: @props.color
+      cursor: "pointer"
+      display: "inline-block"
     }
 
     popupPosition = {
@@ -35,8 +37,10 @@ module.exports = class ColorComponent extends React.Component
       left: 30
     }
 
-    H.div style: { position: "relative" },
+    H.div style: { position: "relative", display: "inline-block" },
       H.div(style: style, onClick: @handleClick)
+      " "
+      H.a style: { cursor: "pointer" }, onClick: (=> @props.onChange(null)), "Clear"
       React.createElement(ColorPicker, display: @state.open, positionCSS: popupPosition, onClose: @handleClose)
 
 

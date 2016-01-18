@@ -8,6 +8,7 @@ LinkComponent = require('mwater-expressions-ui').LinkComponent
 AxisBuilder = require './AxisBuilder'
 update = require 'update-object'
 ui = require '../UIComponents'
+ColorMapComponent = require './ColorMapComponent'
 
 # Axis component that allows designing of an axis
 module.exports = class AxisComponent extends React.Component
@@ -24,6 +25,7 @@ module.exports = class AxisComponent extends React.Component
     onChange: React.PropTypes.func.isRequired # Called when changes
 
     required: React.PropTypes.bool  # Makes this a required value
+    showColorMap: React.PropTypes.bool # Shows the color map
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
@@ -112,6 +114,16 @@ module.exports = class AxisComponent extends React.Component
           ]
           onChange: @handleXformTypeChange
 
+  renderColorMap: ->
+    if not @props.showColorMap or not @props.value or not @props.value.expr
+      return null
+
+    return R ColorMapComponent,
+      schema: @props.schema
+      dataSource: @props.dataSource
+      axis: @props.value
+      onChange: @props.onChange
+
   render: ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
 
@@ -128,6 +140,7 @@ module.exports = class AxisComponent extends React.Component
           includeCount: @props.aggrNeed != "none"
           value: if @props.value then @props.value.expr)  
       @renderXform()
+      @renderColorMap()
 
 # Allows setting of bins (min, max and number). Computes defaults if not present
 class BinsComponent extends React.Component
