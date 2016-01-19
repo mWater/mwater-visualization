@@ -69,7 +69,7 @@ class MWaterDashboardPane extends React.Component
 
     @state = {
       design: dashboardDesign
-      formIds: [] #"e24f0a0ec11643cab3c21c07de2f6889"]
+      formIds: ["e24f0a0ec11643cab3c21c07de2f6889"]
     }
 
   handleDesignChange: (design) =>
@@ -132,7 +132,7 @@ class MWaterDataSource extends DataSource
 
 dashboardDesign = {
   "items": {
-    "0f55a8aa-afff-4511-870d-63dd604c1525": {
+    "d2ea9c20-bcd3-46f6-8f78-ccb795d1a91a": {
       "layout": {
         "x": 0,
         "y": 0,
@@ -145,7 +145,7 @@ dashboardDesign = {
           "baseLayer": "bing_road",
           "layerViews": [
             {
-              "id": "7002dace-6b00-44f6-98fb-d136817ac6c1",
+              "id": "827187bf-a5fd-4d07-b34b-1e213407f96d",
               "name": "Custom Layer",
               "desc": "",
               "type": "Markers",
@@ -156,16 +156,34 @@ dashboardDesign = {
                       "geometry": {
                         "expr": {
                           "type": "field",
-                          "table": "entities.community",
+                          "table": "entities.water_point",
                           "column": "location"
                         },
                         "xform": null
+                      },
+                      "color": {
+                        "expr": {
+                          "type": "field",
+                          "table": "entities.water_point",
+                          "column": "type"
+                        },
+                        "xform": null,
+                        "colorMap": [
+                          {
+                            "value": "Protected dug well",
+                            "color": "#d0021b"
+                          },
+                          {
+                            "value": "Piped into dwelling",
+                            "color": "#4a90e2"
+                          }
+                        ]
                       }
-                    },                    
+                    },
                     "color": "#0088FF",
                     "filter": null,
-                    "table": "entities.community",
-                    "symbol": "font-awesome/times"
+                    "table": "entities.water_point",
+                    "symbol": "font-awesome/star"
                   }
                 ]
               },
@@ -175,16 +193,118 @@ dashboardDesign = {
           ],
           "filters": {},
           "bounds": {
-            "w": -52.91015625,
-            "n": 46.6795944656402,
-            "e": 52.91015625,
-            "s": -46.679594465640186
+            "w": -104.69970703125,
+            "n": 24.046463999666567,
+            "e": -91.47216796875,
+            "s": 11.480024648555816
           }
         }
       }
     }
   }
 }
+
+#   {
+#   "items": {
+#     "df5aa9d4-20fb-4735-9178-ba7cc543fa27": {
+#       "layout": {
+#         "x": 0,
+#         "y": 0,
+#         "w": 8,
+#         "h": 8
+#       },
+#       "widget": {
+#         "type": "LayeredChart",
+#         "design": {
+#           "version": 1,
+#           "layers": [
+#             {
+#               "axes": {
+#                 "x": {
+#                   "expr": {
+#                     "type": "field",
+#                     "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
+#                     "column": "data:fd43a6faa6764490ab82eae19d71af71:value"
+#                   },
+#                   "xform": {
+#                     "type": "bin",
+#                     "numBins": 6
+#                   }
+#                 },
+#                 "y": {
+#                   "expr": {
+#                     "type": "id",
+#                     "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
+#                   },
+#                   "aggr": "count",
+#                   "xform": null
+#                 }
+#               },
+#               "filter": null,
+#               "table": "responses:e24f0a0ec11643cab3c21c07de2f6889"
+#             }
+#           ],
+#           "type": "bar"
+#         }
+#       }
+#     }
+#   }
+# }
+
+#   "items": {
+#     "0f55a8aa-afff-4511-870d-63dd604c1525": {
+#       "layout": {
+#         "x": 0,
+#         "y": 0,
+#         "w": 8,
+#         "h": 8
+#       },
+#       "widget": {
+#         "type": "Map",
+#         "design": {
+#           "baseLayer": "bing_road",
+#           "layerViews": [
+#             {
+#               "id": "7002dace-6b00-44f6-98fb-d136817ac6c1",
+#               "name": "Custom Layer",
+#               "desc": "",
+#               "type": "Markers",
+#               "design": {
+#                 "sublayers": [
+#                   {
+#                     "axes": {
+#                       "geometry": {
+#                         "expr": {
+#                           "type": "field",
+#                           "table": "entities.community",
+#                           "column": "location"
+#                         },
+#                         "xform": null
+#                       }
+#                     },                    
+#                     "color": "#0088FF",
+#                     "filter": null,
+#                     "table": "entities.community",
+#                     "symbol": "font-awesome/times"
+#                   }
+#                 ]
+#               },
+#               "visible": true,
+#               "opacity": 1
+#             }
+#           ],
+#           "filters": {},
+#           "bounds": {
+#             "w": -52.91015625,
+#             "n": 46.6795944656402,
+#             "e": 52.91015625,
+#             "s": -46.679594465640186
+#           }
+#         }
+#       }
+#     }
+#   }
+# }
 
 
 #   "items": {
