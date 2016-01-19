@@ -127,6 +127,11 @@ module.exports = class MarkersLayer extends Layer
       from: exprCompiler.compileTable(sublayer.table, "innerquery")
     }
 
+    # Add color select if color axis
+    if sublayer.axes.color
+      colorExpr = axisBuilder.compileAxis(axis: sublayer.axes.color, tableAlias: "innerquery")
+      innerquery.selects.push({ type: "select", expr: colorExpr, alias: "color" })
+
     # Create filters. First limit to bounding box
     whereClauses = [
       { 
@@ -168,6 +173,10 @@ module.exports = class MarkersLayer extends Layer
       where: { type: "op", op: "<=", exprs: [{ type: "field", tableAlias: "innerquery", column: "r" }, 3]}
     }
 
+    # Add color select if color axis
+    if sublayer.axes.color
+      outerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "innerquery", column: "color" }, alias: "color" }) # innerquery.color as color
+
     return outerquery
 
   createCss: ->
@@ -191,13 +200,16 @@ module.exports = class MarkersLayer extends Layer
         }
 
       '''
+
+      # If color axes, add color conditions
+      if sublayer.axes.color and sublayer.axes.color.colorMap
+        for item in sublayer.axes.color.colorMap
+          css += "#layer#{index} [color=#{JSON.stringify(item.value)}] { marker-fill: #{item.color} }\n"
+
     return css
 
   getFilterableTables: -> 
-    if @design.table
-      return [@design.table]
-    else
-      return []
+    return _.uniq(_.compact(_.pluck(@design.sublayers, "table")))
 
   getLegend: ->
     # return H.div null, "Legend here"

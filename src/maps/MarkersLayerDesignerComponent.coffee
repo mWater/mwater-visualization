@@ -82,6 +82,7 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
 
   handleTableChange: (table) => @update(table: table)
   handleGeometryAxisChange: (axis) => @updateAxes(geometry: axis)
+  handleColorAxisChange: (axis) => @updateAxes(color: axis)
   handleFilterChange: (expr) => @update(filter: expr)
   handleColorChange: (color) => @update(color: color)
   handleSymbolChange: (symbol) => @update(symbol: symbol)
@@ -105,7 +106,7 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
       return
 
     title = H.span null,
-      H.span className: ("glyphicon glyphicon-map-marker")
+      H.span className: "glyphicon glyphicon-map-marker"
       " Marker Position"
 
     H.div className: "form-group",
@@ -120,10 +121,31 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
           value: @props.sublayer.axes.geometry
           onChange: @handleGeometryAxisChange)
 
+  renderColorAxis: ->
+    if not @props.sublayer.table
+      return
+
+    title = H.span null,
+      H.span className: "glyphicon glyphicon glyphicon-tint"
+      " Color By"
+
+    H.div className: "form-group",
+      H.label className: "text-muted", title
+      H.div style: { marginLeft: 10 }, 
+        React.createElement(AxisComponent, 
+          schema: @props.schema
+          dataSource: @props.dataSource
+          table: @props.sublayer.table
+          types: ["text", "enum", "boolean"]
+          aggrNeed: "none"
+          value: @props.sublayer.axes.color
+          showColorMap: true
+          onChange: @handleColorAxisChange)
+
   renderColor: ->
     return H.div className: "form-group",
       H.label className: "text-muted", 
-        "Color"
+        if @props.sublayer.axes.color then "Default Color" else "Color"
       H.div style: { marginLeft: 8 }, 
         React.createElement(ColorComponent, color: @props.sublayer.color, onChange: @handleColorChange)
 
@@ -190,6 +212,7 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
       @renderTable()
       @renderGeometryAxis()
       @renderColor()
+      @renderColorAxis()
       @renderSymbol()
       @renderFilter()
 
