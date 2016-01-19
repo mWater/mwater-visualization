@@ -3,7 +3,7 @@ H = React.DOM
 
 MapViewComponent = require './MapViewComponent'
 MapDesignerComponent = require './MapDesignerComponent'
-AutoSizeComponent = require './../AutoSizeComponent'
+AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 UndoStack = require '../UndoStack'
 
 # Map with designer on right

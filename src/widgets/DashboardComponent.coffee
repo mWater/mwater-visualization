@@ -5,7 +5,7 @@ R = React.createElement
 
 UndoStack = require './../UndoStack'
 DashboardViewComponent = require './DashboardViewComponent'
-AutoSizeComponent = require './../AutoSizeComponent'
+AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 filesaver = require 'filesaver.js'
 DashboardUtils = require './DashboardUtils'
 QuickfiltersComponent = require '../quickfilter/QuickfiltersComponent'
@@ -22,8 +22,12 @@ module.exports = class DashboardComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired
     widgetFactory: React.PropTypes.object.isRequired
     titleElem: React.PropTypes.node                     # Extra element to include in title at left
-    extraTitleButtonsElem: React.PropTypes.node              # Extra elements to add to right
+    extraTitleButtonsElem: React.PropTypes.node         # Extra elements to add to right
     undoStackKey: React.PropTypes.any                   # Key that changes when the undo stack should be reset. Usually a document id or suchlike
+    printScaling: React.PropTypes.bool                  # True to scale for printing
+
+  @defaultProps:
+    printScaling: true
 
   constructor: (props) ->
     super
@@ -134,11 +138,14 @@ module.exports = class DashboardComponent extends React.Component
 
       # Dashboard view requires width, so use auto size component to inject it
       R AutoSizeComponent, { injectWidth: true }, 
-        R DashboardViewComponent, {
-          ref: "dashboardView"
-          design: @props.design
-          onDesignChange: @props.onDesignChange
-          widgetFactory: @props.widgetFactory
-          filters: filters
-        }
+        (size) =>
+          R DashboardViewComponent, {
+            ref: "dashboardView"
+            design: @props.design
+            onDesignChange: @props.onDesignChange
+            widgetFactory: @props.widgetFactory
+            filters: filters
+            width: size.width
+            standardWidth: if @props.printScaling then 1440 else size.width
+          }
       

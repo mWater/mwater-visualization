@@ -18,6 +18,7 @@ module.exports = class DashboardViewComponent extends React.Component
     onDesignChange: React.PropTypes.func.isRequired
 
     width: React.PropTypes.number
+    standardWidth: React.PropTypes.number   # Width for scaling
     widgetFactory: React.PropTypes.object.isRequired # Factory of type WidgetFactory to make widgets
 
     filters: React.PropTypes.arrayOf(React.PropTypes.shape({
@@ -25,6 +26,8 @@ module.exports = class DashboardViewComponent extends React.Component
       jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
     }))
 
+  @defaultProps:
+    standardWidth: 1440 # Standard width. Matches 8.5x11" paper with 0.5" margin at 192dpi
 
   constructor: (props) ->
     super
@@ -151,6 +154,6 @@ module.exports = class DashboardViewComponent extends React.Component
           elems: elems
           onLayoutUpdate: @handleLayoutUpdate
           width: @props.width 
-          standardWidth: 1440 # Standard width. Matches 8.5x11" paper with 0.5" margin at 192dpi
+          standardWidth: @props.standardWidth
         )
         @renderPageBreaks(layoutEngine, layouts)

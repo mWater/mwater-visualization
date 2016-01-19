@@ -61,6 +61,7 @@ class DashboardPane extends React.Component
         widgetFactory: @state.widgetFactory
         onDesignChange: @handleDesignChange
         titleElem: "Sample"
+        printScaling: false
         })
 
 class MWaterDashboardPane extends React.Component
@@ -193,11 +194,50 @@ dashboardDesign = {
           ],
           "filters": {},
           "bounds": {
-            "w": -104.69970703125,
-            "n": 24.046463999666567,
-            "e": -91.47216796875,
-            "s": 11.480024648555816
+            "w": -103.7548828125,
+            "n": 23.160563309048314,
+            "e": -92.4169921875,
+            "s": 12.382928338487408
           }
+        }
+      }
+    },
+    "9ef85e17-73aa-4b5f-8363-95f9a2e24193": {
+      "layout": {
+        "x": 8,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "widget": {
+        "type": "LayeredChart",
+        "design": {
+          "version": 1,
+          "layers": [
+            {
+              "axes": {
+                "x": {
+                  "expr": {
+                    "type": "field",
+                    "table": "entities.water_point",
+                    "column": "type"
+                  },
+                  "xform": null
+                },
+                "y": {
+                  "expr": {
+                    "type": "id",
+                    "table": "entities.water_point"
+                  },
+                  "aggr": "count",
+                  "xform": null
+                }
+              },
+              "filter": null,
+              "table": "entities.water_point"
+            }
+          ],
+          "type": "bar"
         }
       }
     }
