@@ -120,7 +120,7 @@ module.exports = class MWaterLoaderComponent extends React.Component
     }
 
   render: ->
-    if not @state.schema
+    if not @state.schema and not @state.error
       return H.div null, "Loading..."
 
     return @props.children(@state.error, {
