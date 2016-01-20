@@ -99,7 +99,8 @@ module.exports = class MWaterLoaderComponent extends React.Component
         widgetFactory: widgetFactory
         })
     .fail (xhr) =>
-      @setState(error: xhr.responseText)
+      console.log xhr.responseText
+      @setState(error: "Cannot load one of the forms that this depends on. Perhaps the administrator has not shared the form with you?")
 
   @childContextTypes: 
     tableSelectElementFactory: React.PropTypes.func
