@@ -334,6 +334,9 @@ module.exports = class AxisBuilder
 
       # Calculate precision
       precision = d3Format.precisionFixed((max - min) / numBins)
+      if _.isNaN(precision)
+        throw new Error("Min/max errors: #{min} #{max} #{numBins}")
+        
       format = d3Format.format(",." + precision + "f")
 
       categories = []
