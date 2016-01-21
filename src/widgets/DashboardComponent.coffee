@@ -52,7 +52,7 @@ module.exports = class DashboardComponent extends React.Component
       @setState(quickfiltersValues: null)
 
   handlePrint: =>
-    @refs.dashboardView.print()
+    @dashboardView.print()
 
   handleUndo: => 
     undoStack = @state.undoStack.undo()
@@ -127,6 +127,9 @@ module.exports = class DashboardComponent extends React.Component
       onValuesChange: (values) => @setState(quickfiltersValues: values)
     }
 
+  refDashboardView: (el) =>
+    @dashboardView = el
+
   render: ->
     # Compile quickfilters
     filters = new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues)
@@ -140,7 +143,7 @@ module.exports = class DashboardComponent extends React.Component
       R AutoSizeComponent, { injectWidth: true }, 
         (size) =>
           R DashboardViewComponent, {
-            ref: "dashboardView"
+            ref: @refDashboardView
             design: @props.design
             onDesignChange: @props.onDesignChange
             widgetFactory: @props.widgetFactory
