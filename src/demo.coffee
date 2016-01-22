@@ -70,7 +70,7 @@ class MWaterDashboardPane extends React.Component
 
     @state = {
       design: dashboardDesign
-      formIds: ["e24f0a0ec11643cab3c21c07de2f6889"]
+      formIds: []
     }
 
   handleDesignChange: (design) =>
@@ -133,6 +133,53 @@ class MWaterDataSource extends DataSource
 
 dashboardDesign = {
   "items": {
+    "d41a2dd2-85bd-46d8-af9a-a650af4c0047": {
+      "layout": {
+        "x": 16,
+        "y": 0,
+        "w": 8,
+        "h": 6
+      },
+      "widget": {
+        "type": "TableChart",
+        "design": {
+          "version": 1,
+          "columns": [
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "scalar",
+                  "table": "entities.water_point",
+                  "joins": [],
+                  "expr": {
+                    "type": "field",
+                    "table": "entities.water_point",
+                    "column": "type"
+                  }
+                }
+              }
+            },
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "scalar",
+                  "table": "entities.water_point",
+                  "joins": [],
+                  "expr": {
+                    "type": "count",
+                    "table": "entities.water_point"
+                  }
+                },
+                "aggr": "count"
+              }
+            }
+          ],
+          "orderings": [],
+          "table": "entities.water_point",
+          "titleText": "TEST"
+        }
+      }
+    },
     "d2ea9c20-bcd3-46f6-8f78-ccb795d1a91a": {
       "layout": {
         "x": 0,
@@ -548,7 +595,7 @@ dashboardDesign = {
 #       }
 #     }
 #   }
-# }  
+# }
 #   "items": {
 #     "b854aa65-7644-4b67-b0a4-d2344e7eb43a": {
 #       "layout": {

@@ -24,8 +24,19 @@ module.exports = class TableChartViewComponent extends React.Component
     column = @props.design.columns[index]
 
     text = column.headerText or axisBuilder.summarizeAxis(column.textAxis, @context.locale)
-    H.th key: index,
+    cellStyle=
+      color: 'transparent'
+      padding: 0
+      lineHeight: 0
+
+    placeholderDivStyle=
+      position: 'absolute'
+      color: '#333'
+      top: 0
+      lineHeight: 'normal'
+    H.th {key: index, style: cellStyle},
       text
+      H.div style:placeholderDivStyle, text
 
   renderHeader: ->
     H.thead null,
@@ -62,12 +73,17 @@ module.exports = class TableChartViewComponent extends React.Component
       height: @props.height * (@props.standardWidth / @props.width)
       transform: "scale(#{@props.width/@props.standardWidth}, #{@props.width/@props.standardWidth})"
       transformOrigin: "0 0"
+      overflow: 'hidden'
     }
 
+    height = @props.height * (@props.standardWidth / @props.width) - $(@refs.title).outerHeight() - 25
+
     return H.div style: style, className: "overflow-auto-except-print",
-      H.div style: { fontWeight: "bold", textAlign: "center" }, @props.design.titleText
-      H.table className: "table table-condensed table-hover", style: { fontSize: "10pt" }, 
-        @renderHeader()
-        @renderBody()
+      H.div {style: { fontWeight: "bold", textAlign: "center" }, ref: "title"}, @props.design.titleText
+      H.div style: {position: 'relative', paddingTop: 25},
+        H.div style: { overflowY: 'auto', height: height},
+          H.table className: "table table-condensed table-hover", style: { fontSize: "10pt" },
+            @renderHeader()
+            @renderBody()
 
 
