@@ -90,7 +90,7 @@ module.exports = class DashboardViewComponent extends React.Component
         React.createElement(DashboardViewComponent, _.extend({}, @props, { width: 1440 }))
     
     printer = new ReactElementPrinter()
-    printer.print(elem)
+    printer.print(elem, { delay: 5000 })
 
   renderScopes: ->
     React.createElement(WidgetScopesViewComponent, scopes: @state.widgetScoper.getScopes(), onRemoveScope: @handleRemoveScope)

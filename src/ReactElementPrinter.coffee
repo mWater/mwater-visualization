@@ -6,7 +6,7 @@ module.exports = class ReactElementPrinter
   # constructor: ->
 
   # Options include:
-  #  
+  # delay: ms to wait before printing to allow elements to render
   print: (element, options) ->
     # Add special CSS printing rules
     extraCss = $('''
@@ -17,6 +17,7 @@ module.exports = class ReactElementPrinter
       visibility: hidden;
       margin: 0;
       padding: 0;
+      opacity: 100%
     }
 
     /* Hide all children of body */
@@ -43,6 +44,27 @@ module.exports = class ReactElementPrinter
     size: 8.5in 11in; 
     margin: 0.5in 0.5in 0.5in 0.5in; 
   }
+
+  #react_element_printer_splash {
+    display: flex; 
+    align-items: center;
+    justify-content: center;    
+    position: fixed; 
+    left: 0;
+    top: 0;
+    z-index: 9999;
+    width: 100%;
+    height: 100%;
+    overflow: visible;    
+    background-color: rgba(255,255,255,0.7);
+  }
+
+  @media print {
+    #react_element_printer_splash {
+      display: none;
+    }
+  }
+
 </style>
       ''')
 
@@ -50,6 +72,16 @@ module.exports = class ReactElementPrinter
 
     # Add special region to body
     $("body").append('<div id="react_element_printer"></div>')
+
+    # Add warning that printing
+    $("body").append('''
+      <div id="react_element_printer_splash">
+        <div style="font-size: 30pt;">
+          <i class="fa fa-spinner fa-spin"></i>
+          Preparing to print...
+        </div>
+      </div>
+    ''')
 
     # Render element into special region
     ReactDOM.render(element, $("#react_element_printer").get(0), =>
@@ -64,5 +96,6 @@ module.exports = class ReactElementPrinter
         # Remove rest of nodes
         $("#react_element_printer").remove()
         $("#react_element_printer_css").remove()
-      , 1000
+        $("#react_element_printer_splash").remove()
+      , options.delay or 1000
       )

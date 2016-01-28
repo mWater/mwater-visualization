@@ -77,7 +77,7 @@ module.exports = class MWaterLoaderComponent extends React.Component
         return
 
       schema = new Schema(schemaJson)
-      dataSource = new MWaterDataSource(newProps.apiUrl, newProps.client, false)
+      dataSource = new MWaterDataSource(newProps.apiUrl, newProps.client, { serverCaching: false, localCaching: true })
 
       layerFactory = new LayerFactory({
         schema: schema

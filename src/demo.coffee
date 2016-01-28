@@ -29,7 +29,7 @@ class DashboardPane extends React.Component
   componentDidMount: ->
     $.getJSON @props.apiUrl + "jsonql/schema", (schemaJson) =>
       schema = new Schema(schemaJson)
-      dataSource = new MWaterDataSource(@props.apiUrl, @props.client, false)
+      dataSource = new MWaterDataSource(@props.apiUrl, @props.client, { serverCaching: false, localCaching: true })
 
       layerFactory = new LayerFactory({
         schema: schema
