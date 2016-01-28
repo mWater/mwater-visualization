@@ -537,10 +537,14 @@ module.exports = class LayeredChartCompiler
     return design.titleText or @compileDefaultTitleText(design, locale)
 
   compileYAxisLabelText: (design, locale) ->
-    return design.yAxisLabelText or @compileDefaultYAxisLabelText(design, locale)
+    if design.yAxisLabelText == ""
+      return @compileDefaultYAxisLabelText(design, locale)
+    return design.yAxisLabelText
 
   compileXAxisLabelText: (design, locale) ->
-    return design.xAxisLabelText or @compileDefaultXAxisLabelText(design, locale)
+    if design.xAxisLabelText == ""
+      return @compileDefaultXAxisLabelText(design, locale)
+    return design.xAxisLabelText
 
   # Create a scope based on a row of a layer
   # Scope data is relevant data from row that uniquely identifies scope

@@ -50,6 +50,12 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
   handleXAxisLabelTextChange: (ev) =>  @updateDesign(xAxisLabelText: ev.target.value)
   handleYAxisLabelTextChange: (ev) =>  @updateDesign(yAxisLabelText: ev.target.value)
 
+  handleToggleXAxisLabelClick: (ev) =>
+    @updateDesign(xAxisLabelText: if @props.design.xAxisLabelText? then null else "")
+
+  handleToggleYAxisLabelClick: (ev) =>
+    @updateDesign(yAxisLabelText: if @props.design.yAxisLabelText? then null else "")
+
   renderLabels: ->
     if not @props.design.type
       return 
@@ -62,12 +68,19 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
         H.input type: "text", className: "form-control input-sm", value: @props.design.titleText, onChange: @handleTitleTextChange, placeholder: "Untitled"
       if @areAxesLabelsNeeded()
         H.div className: "form-group",
-          H.label className: "text-muted", if @props.design.transpose then "Vertical Axis Label" else "Horizontal Axis Label"
-          H.input type: "text", className: "form-control input-sm", value: @props.design.xAxisLabelText, onChange: @handleXAxisLabelTextChange, placeholder: compiler.compileDefaultXAxisLabelText(@props.design)
+          H.span null,
+            H.label className: "text-muted", if @props.design.transpose then "Vertical Axis Label" else "Horizontal Axis Label"
+            " ",
+            H.button({className: "btn btn-default btn-xs", onClick: @handleToggleXAxisLabelClick}, if @props.design.xAxisLabelText? then "Hide" else "Show")
+          if @props.design.xAxisLabelText?
+            H.input type: "text", className: "form-control input-sm", value: @props.design.xAxisLabelText, onChange: @handleXAxisLabelTextChange, placeholder: compiler.compileDefaultXAxisLabelText(@props.design)
       if @areAxesLabelsNeeded()
-        H.div null,
-          H.div className: "form-group",
-            H.label className: "text-muted", if not @props.design.transpose then "Vertical Axis Label" else "Horizontal Axis Label"
+        H.div className: "form-group",
+          H.span null,
+            H.label({className: "text-muted"}, if not @props.design.transpose then "Vertical Axis Label" else "Horizontal Axis Label"),
+            " ",
+            H.button({className: "btn btn-default btn-xs", onClick: @handleToggleYAxisLabelClick}, if @props.design.yAxisLabelText? then "Hide" else "Show")
+          if @props.design.yAxisLabelText?
             H.input type: "text", className: "form-control input-sm", value: @props.design.yAxisLabelText, onChange: @handleYAxisLabelTextChange, placeholder: compiler.compileDefaultYAxisLabelText(@props.design)
 
   renderType: ->
