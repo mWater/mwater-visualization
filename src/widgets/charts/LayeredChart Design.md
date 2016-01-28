@@ -3,8 +3,8 @@
   type: bar/line/spline/scatter/area/pie/donut
   layers: array of layers
   titleText: title text
-  xAxisLabelText: text of x axis label
-  yAxisLabelText: text of y axis label
+  xAxisLabelText: text of x axis label, display default value if "", display nothing if null
+  yAxisLabelText: text of y axis label, display default value if "", display nothing if null
   transpose: true to flip axes
   stacked: true to stack all 
   proportinal: true to stack proportionally (100 %). Only applicable if stacked

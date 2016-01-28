@@ -43,7 +43,7 @@ module.exports = class WidgetFactory
   # Gets list of new widget types. Each contains name, type and design
   getNewWidgetsTypes: ->
     widgetTypes = [
-      { name: "Chart", type: "LayeredChart", design: {} }
+      { name: "Chart", type: "LayeredChart", design: {xAxisLabelText: "", yAxisLabelText: ""} }
       { name: "Table", type: "TableChart", design: {} }
       { name: "Calendar", type: "CalendarChart", design: {} }
       { name: "Image Mosaic", type: "ImageMosaicChart", design: {} }

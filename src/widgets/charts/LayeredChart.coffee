@@ -29,8 +29,16 @@ module.exports = class LayeredChart extends Chart
     design = _.cloneDeep(design)
 
     # Fill in defaults
-    design.version = design.version or 1
+    design.version = design.version or 2
     design.layers = design.layers or [{}]
+
+    # Default value is now ""
+    if design.version < 2
+      if not design.xAxisLabelText?
+        design.xAxisLabelText = ""
+      if not design.yAxisLabelText?
+        design.yAxisLabelText = ""
+      design.version = 2
 
     # Clean each layer
     for layerId in [0...design.layers.length]
