@@ -14,7 +14,7 @@ module.exports = class MapComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired # Data source to use
 
     design: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func.isRequired
+    onDesignChange: React.PropTypes.func  # Null/undefined for readonly
 
     titleElem: React.PropTypes.node                     # Extra element to include in title at left
     extraTitleButtonsElem: React.PropTypes.node              # Extra elements to add to right

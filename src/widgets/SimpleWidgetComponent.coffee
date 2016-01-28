@@ -13,8 +13,8 @@ module.exports = class SimpleWidgetComponent extends React.Component
 
     highlighted: React.PropTypes.bool # true if highlighted
     
-    connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
-    connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
+    connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent). Null to not render
+    connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent). Null to not render
 
     dropdownItems: React.PropTypes.arrayOf(React.PropTypes.shape({
       label: React.PropTypes.node.isRequired
@@ -35,10 +35,9 @@ module.exports = class SimpleWidgetComponent extends React.Component
       cursor: "nwse-resize"
     }
 
-    if @props.connectResizeHandle
-      return @props.connectResizeHandle(
-        H.div style: resizeHandleStyle, className: "mwater-visualization-simple-widget-resize-handle"
-        )
+    return @props.connectResizeHandle(
+      H.div style: resizeHandleStyle, className: "mwater-visualization-simple-widget-resize-handle"
+      )
 
   renderDropdownItem: (item, i) =>
     return H.li key: "#{i}",
@@ -48,6 +47,9 @@ module.exports = class SimpleWidgetComponent extends React.Component
         item.label
 
   renderDropdown: ->
+    if @props.dropdownItems.length == 0 
+      return null
+
     dropdownStyle = {
       position: "absolute"
       right: 5
@@ -84,7 +86,8 @@ module.exports = class SimpleWidgetComponent extends React.Component
 
     elem = H.div className: "mwater-visualization-simple-widget", style: style, onMouseLeave: @closeMenu,
       contents
-      @renderResizeHandle()
+      if @props.connectResizeHandle
+        @renderResizeHandle()
       @renderDropdown()
 
     if @props.connectMoveHandle

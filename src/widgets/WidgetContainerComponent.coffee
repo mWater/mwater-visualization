@@ -12,16 +12,22 @@ HTML5Backend = require('react-dnd-html5-backend')
 class LayoutComponent extends React.Component
   @propTypes:
     dragInfo: React.PropTypes.object.isRequired  # Opaque information to be used when a block is dragged
+    canDrag: React.PropTypes.bool.isRequired     # True if draggable
 
   render: ->
-    React.cloneElement(React.Children.only(@props.children), {
-      connectMoveHandle: @props.connectMoveHandle
-      connectResizeHandle: @props.connectResizeHandle      
-      })
+    if @props.canDrag
+      return React.cloneElement(React.Children.only(@props.children), {
+        connectMoveHandle: @props.connectMoveHandle
+        connectResizeHandle: @props.connectResizeHandle      
+        })
+    else
+      return @props.children
 
 moveSpec = {
   beginDrag: (props, monitor, component) -> 
     return props.dragInfo
+  canDrag: (props, monitor) ->
+    return props.canDrag
 }
 
 moveCollect = (connect, monitor) ->
@@ -32,6 +38,8 @@ MoveLayoutComponent = DragSource("block-move", moveSpec, moveCollect)(LayoutComp
 resizeSpec = {
   beginDrag: (props, monitor, component) ->
     return props.dragInfo
+  canDrag: (props, monitor) ->
+    return props.canDrag
 }
 
 resizeCollect = (connect, monitor) ->
@@ -48,7 +56,7 @@ class Container extends React.Component
     width: React.PropTypes.number.isRequired # width in pixels
     standardWidth: React.PropTypes.number.isRequired # width in pixels of a standard container that all other widths should scale to look like. Usually 1440
     connectDropTarget: React.PropTypes.func.isRequired # Injected by react-dnd wrapper
-    onLayoutUpdate: React.PropTypes.func.isRequired # Called with array of { id, widget, layout }
+    onLayoutUpdate: React.PropTypes.func # Called with array of { id, widget, layout }. Null/undefined for readonly
 
   constructor: (props) ->
     super
@@ -143,7 +151,7 @@ class Container extends React.Component
 
     # Clone element, injecting width, height, standardWidth and enclosing in a dnd block
     return H.div style: style, key: id,
-      React.createElement(MoveResizeLayoutComponent, { dragInfo: dragInfo }, 
+      React.createElement(MoveResizeLayoutComponent, { dragInfo: dragInfo, canDrag: @props.onLayoutUpdate? }, 
         React.cloneElement(@props.elems[id], width: bounds.width, height: bounds.height, standardWidth: (bounds.width / @props.width) * @props.standardWidth))
 
   # Calculate a lookup of layouts incorporating hover info

@@ -17,7 +17,7 @@ SettingsModalComponent = require './SettingsModalComponent'
 module.exports = class DashboardComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func.isRequired
+    onDesignChange: React.PropTypes.func               # If not set, readonly
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
     widgetFactory: React.PropTypes.object.isRequired
@@ -93,23 +93,28 @@ module.exports = class DashboardComponent extends React.Component
 
   renderActionLinks: ->
     H.div null,
-      @renderAddWidget()
-      H.a key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
-        H.span className: "glyphicon glyphicon-triangle-left"
-        " Undo"
-      " "
-      H.a key: "redo", className: "btn btn-link btn-sm #{if not @state.undoStack.canRedo() then "disabled" else ""}", onClick: @handleRedo, 
-        H.span className: "glyphicon glyphicon-triangle-right"
-        " Redo"
+      if @props.onDesignChange?
+        @renderAddWidget()
+      if @props.onDesignChange?
+        [
+          H.a key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
+            H.span className: "glyphicon glyphicon-triangle-left"
+            " Undo"
+          " "
+          H.a key: "redo", className: "btn btn-link btn-sm #{if not @state.undoStack.canRedo() then "disabled" else ""}", onClick: @handleRedo, 
+            H.span className: "glyphicon glyphicon-triangle-right"
+            " Redo"
+        ]
       H.a key: "print", className: "btn btn-link btn-sm", onClick: @handlePrint,
         H.span(className: "glyphicon glyphicon-print")
         " Print"
       H.a key: "export", className: "btn btn-link btn-sm", onClick: @handleSaveDesignFile,
         H.span(className: "glyphicon glyphicon-download-alt")
         " Export"
-      H.a key: "settings", className: "btn btn-link btn-sm", onClick: @handleSettings,
-        H.span(className: "glyphicon glyphicon-cog")
-        " Settings"
+      if @props.onDesignChange?
+        H.a key: "settings", className: "btn btn-link btn-sm", onClick: @handleSettings,
+          H.span(className: "glyphicon glyphicon-cog")
+          " Settings"
       @props.extraTitleButtonsElem
 
   renderTitleBar: ->
@@ -137,7 +142,8 @@ module.exports = class DashboardComponent extends React.Component
     H.div key: "view", style: { height: "100%", paddingTop: 40, paddingRight: 20, paddingLeft: 5, position: "relative" },
       @renderTitleBar()
       @renderQuickfilter()
-      R SettingsModalComponent, { onDesignChange: @props.onDesignChange, schema: @props.schema, dataSource: @props.dataSource, ref: "settings" }
+      if @props.onDesignChange?
+        R SettingsModalComponent, { onDesignChange: @props.onDesignChange, schema: @props.schema, dataSource: @props.dataSource, ref: "settings" }
 
       # Dashboard view requires width, so use auto size component to inject it
       R AutoSizeComponent, { injectWidth: true }, 

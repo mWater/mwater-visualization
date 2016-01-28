@@ -15,7 +15,7 @@ uuid = require 'node-uuid'
 module.exports = class DashboardViewComponent extends React.Component
   @propTypes: 
     design: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func.isRequired
+    onDesignChange: React.PropTypes.func      # Leave unset for readonly
 
     width: React.PropTypes.number
     standardWidth: React.PropTypes.number   # Width for scaling
@@ -134,9 +134,9 @@ module.exports = class DashboardViewComponent extends React.Component
         scope: @state.widgetScoper.getScope(id)
         filters: filters
         onScopeChange: @handleScopeChange.bind(null, id)
-        onRemove: @handleRemove.bind(null, id)
-        onDuplicate: @handleDuplicate.bind(null, id)
-        onDesignChange: @handleDesignChange.bind(null, id)
+        onRemove: if @props.onDesignChange? then @handleRemove.bind(null, id)
+        onDuplicate: if @props.onDesignChange? then @handleDuplicate.bind(null, id)
+        onDesignChange: if @props.onDesignChange? then @handleDesignChange.bind(null, id)
       })  
 
     style = {
@@ -152,7 +152,7 @@ module.exports = class DashboardViewComponent extends React.Component
           layoutEngine: layoutEngine
           layouts: layouts
           elems: elems
-          onLayoutUpdate: @handleLayoutUpdate
+          onLayoutUpdate: if @props.onDesignChange? then @handleLayoutUpdate
           width: @props.width 
           standardWidth: @props.standardWidth
         )

@@ -11,7 +11,7 @@ module.exports = class MapViewComponent extends React.Component
     layerFactory: React.PropTypes.object.isRequired
     
     design: React.PropTypes.object.isRequired  # See Map Design.md
-    onDesignChange: React.PropTypes.func.isRequired # Called with new design
+    onDesignChange: React.PropTypes.func   # Called with new design. null/undefined to ignore bounds changes
 
     width: React.PropTypes.number        # Width in pixels
     height: React.PropTypes.number       # Height in pixels
@@ -26,6 +26,10 @@ module.exports = class MapViewComponent extends React.Component
     scrollWheelZoom: React.PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
 
   handleBoundsChange: (bounds) =>
+    # Ignore if readonly
+    if not @props.onDesignChange?
+      return
+
     design = _.extend({}, @props.design, bounds: bounds)
     @props.onDesignChange(design)
 

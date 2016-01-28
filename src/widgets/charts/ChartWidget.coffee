@@ -22,7 +22,7 @@ module.exports = class ChartWidget extends Widget
   #  scope: scope of the widget (when the widget self-selects a particular scope)
   #  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   #  onScopeChange: called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
-  #  onDesignChange: called with new design
+  #  onDesignChange: called with new design. null/undefined for readonly
   createViewElement: (options) ->
     return React.createElement(ChartWidgetComponent,
       chart: @chart
@@ -41,7 +41,7 @@ class ChartWidgetComponent extends React.Component
   @propTypes:
     chart: React.PropTypes.object.isRequired # Chart object to use
     design: React.PropTypes.object.isRequired # Design of chart
-    onDesignChange: React.PropTypes.func.isRequired 
+    onDesignChange: React.PropTypes.func # null/undefined for readonly
     dataSource: React.PropTypes.object.isRequired # Data source to use for chart
 
     onRemove: React.PropTypes.func
@@ -138,13 +138,15 @@ class ChartWidgetComponent extends React.Component
       dropdownItems.push({ label: "Export Data", icon: "save-file", onClick: @handleSaveCsvFile })
     if @props.onRemove
       dropdownItems.push({ label: "Remove", icon: "remove", onClick: @props.onRemove })
-    if @props.onDuplicate
+    if @props.onDuplicate and @props.onDesignChange?
       dropdownItems.push({ label: "Duplicate", icon: "duplicate", onClick: @props.onDuplicate })
-    dropdownItems.unshift({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
+    if @props.onDesignChange?      
+      dropdownItems.unshift({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
 
     # Wrap in a simple widget
-    return H.div onDoubleClick: @handleStartEditing, 
-      @renderEditor()
+    return H.div onDoubleClick: (if @props.onDesignChange? then @handleStartEditing), 
+      if @props.onDesignChange?
+        @renderEditor()
       React.createElement(SimpleWidgetComponent, 
         width: @props.width
         height: @props.height
@@ -155,4 +157,3 @@ class ChartWidgetComponent extends React.Component
           # height and width will be injected
           @renderChart()
       )
-
