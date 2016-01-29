@@ -24,23 +24,12 @@ module.exports = class TableChartViewComponent extends React.Component
     column = @props.design.columns[index]
 
     text = column.headerText or axisBuilder.summarizeAxis(column.textAxis, @context.locale)
-    cellStyle=
-      color: 'transparent'
-      padding: 0
-      lineHeight: 0
-
-    placeholderDivStyle=
-      position: 'absolute'
-      color: '#333'
-      top: 0
-      lineHeight: 'normal'
-    H.th {key: index, style: cellStyle},
+    H.th {key: index},
       text
-      H.div style:placeholderDivStyle, text
 
   renderHeader: ->
     H.thead null,
-      H.tr null,
+      H.tr { style: {display: "block", position: "relative"}, ref: "tableHeader"},
         _.map(@props.design.columns, (column, i) => @renderHeaderCell(i))
 
   renderCell: (rowIndex, columnIndex) ->
@@ -59,8 +48,31 @@ module.exports = class TableChartViewComponent extends React.Component
     H.tr key: index,
       _.map(@props.design.columns, (column, i) => @renderCell(index, i))
 
+  componentDidUpdate: (prevProps, prevState) ->
+    @calculateHeadersWidth()
+
+  componentDidMount: ->
+    @calculateHeadersWidth()
+
+  calculateHeadersWidth: ->
+    tr = $(@refs.tableBody).find("tr").first()
+    headers = $(@refs.tableHeader).find("th")
+    body = $(@refs.tableBody)
+
+    tr.find("td").each (i, el) ->
+      headers.eq(i).width($(el).outerWidth())
+
+    height = @props.height * (@props.standardWidth / @props.width) - $(@refs.title).outerHeight() - $(@refs.tableHeader).outerHeight()
+    body.height(height)
+
   renderBody: ->
-    H.tbody null,
+    height = @props.height * (@props.standardWidth / @props.width) - $(@refs.title).outerHeight()
+    tbodyStyle =
+      display: "block"
+      overflow: "auto"
+      height: height
+
+    H.tbody { style: tbodyStyle , ref: "tableBody"},
       _.map(@props.data.main, (row, i) => @renderRow(i))
 
   shouldComponentUpdate: (prevProps) ->
@@ -80,10 +92,9 @@ module.exports = class TableChartViewComponent extends React.Component
 
     return H.div style: style, className: "overflow-auto-except-print",
       H.div {style: { fontWeight: "bold", textAlign: "center" }, ref: "title"}, @props.design.titleText
-      H.div style: {position: 'relative', paddingTop: 25},
-        H.div style: { overflowY: 'auto', height: height},
-          H.table className: "table table-condensed table-hover", style: { fontSize: "10pt" },
-            @renderHeader()
-            @renderBody()
+      H.table className: "table table-condensed table-hover", style: { fontSize: "10pt" },
+        @renderHeader()
+        @renderBody()
+
 
 
