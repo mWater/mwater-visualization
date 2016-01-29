@@ -224,7 +224,9 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
       @renderXAxis()
       if layer.axes.x or layer.axes.color then @renderYAxis()
       if layer.axes.x and layer.axes.y and not @isLayerPolar(layer) then @renderColorAxis()
-      if layer.axes.y then @renderColor()
+      # No default color for polar
+      if not @isLayerPolar(layer)
+        if layer.axes.y then @renderColor()
       if layer.axes.y then @renderFilter()
       if layer.axes.y then @renderName()
 
