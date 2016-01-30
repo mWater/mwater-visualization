@@ -45,6 +45,9 @@ exports.WidgetScopesViewComponent = require './widgets/WidgetScopesViewComponent
 exports.TableSelectComponent = require './TableSelectComponent'
 exports.AxisBuilder = require './axes/AxisBuilder'
 
+# Polyfill pathseg https://github.com/masayuki0812/c3/issues/1529
+require './pathseg-polyfill.js'
+
 # http://stackoverflow.com/questions/19305821/multiple-modals-overlay
 $ = require 'jquery'
 
