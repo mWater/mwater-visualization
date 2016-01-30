@@ -190,7 +190,7 @@ module.exports = class LayeredChartCompiler
 
           # Get specific color if present
           color = @axisBuilder.getValueColor(layer.axes.color, row.color)
-          color = color or layer.color
+          #color = color or layer.color
           if color
             colors[series] = color
           else if colorHacks[row.color] # TODO REMOVE
