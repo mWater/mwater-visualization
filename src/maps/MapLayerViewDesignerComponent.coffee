@@ -7,7 +7,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
   @propTypes:
     layerView: React.PropTypes.object.isRequired  # See Map Design.md
     onLayerViewChange: React.PropTypes.func.isRequired # Called with new layer view
-    onRemove: React.PropTypes.func.isRequired # Called to remove
+    onRemove: React.PropTypes.func.isRequired  # Called to remove
     layerFactory: React.PropTypes.object.isRequired # Layer factory to use
 
   constructor: ->
@@ -48,14 +48,14 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
 
   renderEditor: ->
     layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)
-    return H.div style: { paddingTop: 10 },
-      layer.createDesignerElement(onDesignChange: @handleSaveEditing)
+    return H.div null,
+      H.div style: { textAlign: "right" },
+        H.a className: "btn btn-link btn-xs", onClick: @props.onRemove, "Delete Layer"
+      if layer.isEditable()
+        layer.createDesignerElement(onDesignChange: @handleSaveEditing)
 
   renderLayerEditToggle: ->
     layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)
-
-    if not layer.isEditable()
-      return 
 
     H.div style: { float: "right" }, key: "gear", 
       H.a onClick: @handleToggleEditing,
@@ -84,8 +84,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
 
     H.div null, 
       H.div style: { fontSize: 16 }, key: "layerView",
-        if layer.isEditable()
-          @renderLayerEditToggle()
+        @renderLayerEditToggle()
         @renderVisible()
         @renderName()
       if @state.editing
