@@ -219,6 +219,10 @@ module.exports = class MarkersLayer extends Layer
   
   isEditable: -> true
 
+  # True if layer is incomplete (e.g. brand new) and should be editable immediately
+  isIncomplete: ->
+    return @validateDesign(@cleanDesign(@design))
+
   # Returns a cleaned design
   # TODO this is awkward since the design is part of the object too
   cleanDesign: (design) ->

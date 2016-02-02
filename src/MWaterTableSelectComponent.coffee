@@ -92,7 +92,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       )
 
   renderOther: ->
-    otherTables = _.filter(@props.schema.getTables(), (table) => table.id not in siteTypes and not table.id.match(/^responses:/))
+    otherTables = _.filter(@props.schema.getTables(), (table) => table.id not in siteTypes and not table.id.match(/^responses:/) and not table.id.match(/^indicator_values:/) and table.id != "response_indicators")
     otherTables = _.sortBy(otherTables, "name")
     R OptionListComponent,
       items: _.map(otherTables, (table) =>

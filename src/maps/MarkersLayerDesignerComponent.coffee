@@ -1,3 +1,4 @@
+_ = require 'lodash'
 React = require 'react'
 H = React.DOM
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
@@ -36,9 +37,10 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
 
   renderSublayer: (index) =>
     style = {
-      borderTop: "solid 1px #EEE"
+      borderBottom: "solid 1px #EEE"
       paddingTop: 10
       paddingBottom: 10
+      marginBottom: 10
     }
 
     H.div style: style, key: index,
@@ -53,14 +55,15 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
   renderSublayers: ->
     H.div null, 
       _.map(@props.design.sublayers, (layer, i) => @renderSublayer(i))
-      H.button className: "btn btn-default", type: "button", onClick: @handleAddSublayer,
-        H.span className: "glyphicon glyphicon-plus"
-        " Add Series"
+      # Add if previous has table
+      if _.last(@props.design.sublayers) and _.last(@props.design.sublayers).table
+        H.button className: "btn btn-default btn-sm", type: "button", onClick: @handleAddSublayer,
+          H.span className: "glyphicon glyphicon-plus"
+          " Add Series"
 
   render: ->
     H.div null, 
       @renderSublayers()
-      H.hr()
 
 # Designer for a markers layer sublayer
 class MarkersLayerSublayerDesignerComponent extends React.Component
@@ -122,7 +125,7 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
           onChange: @handleGeometryAxisChange)
 
   renderColorAxis: ->
-    if not @props.sublayer.table
+    if not @props.sublayer.axes.geometry
       return
 
     title = H.span null,
@@ -143,13 +146,20 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
           onChange: @handleColorAxisChange)
 
   renderColor: ->
+    if not @props.sublayer.axes.geometry
+      return
+
     return H.div className: "form-group",
       H.label className: "text-muted", 
-        if @props.sublayer.axes.color then "Default Color" else "Color"
+        H.span className: "glyphicon glyphicon glyphicon-tint"
+        if @props.sublayer.axes.color then " Default Color" else " Color"
       H.div style: { marginLeft: 8 }, 
         React.createElement(ColorComponent, color: @props.sublayer.color, onChange: @handleColorChange)
 
   renderSymbol: ->
+    if not @props.sublayer.axes.geometry
+      return
+
     # Create options
     options = [
       { value: "font-awesome/star", label: "Star" }
@@ -190,8 +200,8 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
       }
 
   renderFilter: ->
-    # If no table, hide
-    if not @props.sublayer.table
+    # If no data, hide
+    if not @props.sublayer.axes.geometry
       return null
 
     return H.div className: "form-group",

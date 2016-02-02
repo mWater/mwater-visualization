@@ -96,10 +96,10 @@ module.exports = class ColorMapComponent extends React.Component
         H.tbody null,
           _.map @state.categories, (category) =>
             H.tr null,
-              H.td null,
-                category.label
-              H.td null,
+              H.td key: "color",
                 R ColorComponent, 
                   color: @lookupColor(category.value)
                   onChange: (color) => @handleColorChange(category.value, color)
+              H.td key: "label",
+                category.label
 

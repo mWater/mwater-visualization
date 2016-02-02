@@ -30,7 +30,7 @@ module.exports = class MWaterLoaderComponent extends React.Component
     children: React.PropTypes.func.isRequired                 # Called with (error, { schema:, dataSource:, widgetFactory:, layerFactory: })
 
   @defaultProps:
-    newLayers: [{ name: "Custom Layer", type: "Markers", design: {} }]
+    newLayers: [{ label: "Custom Layer", name: "Untitled Layer", type: "Markers", design: { } }]
 
   constructor: ->
     super
@@ -84,9 +84,7 @@ module.exports = class MWaterLoaderComponent extends React.Component
         dataSource: dataSource
         apiUrl: newProps.apiUrl
         client: newProps.client
-        newLayers: [
-          { name: "Custom Layer", type: "Markers", design: {} }
-        ]
+        newLayers: newProps.newLayers
         onMarkerClick: newProps.onMarkerClick
       })
 

@@ -32,6 +32,10 @@ module.exports = class Layer
   isEditable: ->
     return false
 
+  # True if layer is incomplete (e.g. brand new) and should be editable immediately
+  isIncomplete: ->
+    return false
+
   # Creates a design element with specified options
   # options include:
   #  onDesignChange: function called when design changes

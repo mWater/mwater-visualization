@@ -42,7 +42,7 @@ module.exports = class ColorComponent extends React.Component
         H.div null,
           H.div(style: style, onClick: @handleClick)
           " ",
-          H.a style: { cursor: "pointer" }, onClick: (=> @props.onChange(null)), "Clear"
+          H.a style: { cursor: "pointer" }, onClick: (=> @props.onChange(null)), "Reset"
       else
         H.a style: { cursor: "pointer"}, onClick: @handleClick, "Customize"
       React.createElement(ColorPicker, display: @state.open, positionCSS: popupPosition, onClose: @handleClose)

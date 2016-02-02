@@ -7,7 +7,7 @@ module.exports = class LayerFactory
   #  dataSource: data source to use
   #  client: client id to use for talking to mWater server
   #  apiUrl: API url to use for talking to mWater server
-  #  newLayers: array of new layers that are addable. Contains { name, type, design }
+  #  newLayers: array of new layers that are addable. Contains { label, name, type, design }. label is label in dropdown to add. defaults to name
   #  onMarkerClick takes (table, id) and is the table and id of the row that is represented by the click
   constructor: (options) ->
     @schema = options.schema
