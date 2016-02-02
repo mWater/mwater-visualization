@@ -156,7 +156,8 @@ dashboardDesign = {
                     "table": "entities.water_point",
                     "column": "type"
                   }
-                }
+                },
+                "headerText": "This is a reallyyyyyyyyyy long title "
               }
             },
             {
@@ -170,8 +171,19 @@ dashboardDesign = {
                     "table": "entities.water_point"
                   }
                 },
-                "aggr": "count"
+                "aggr": "count",
+                "headerText": "This is a reallyyyyyyyyyy long title "
               }
+            },
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "field",
+                  "table": "entities.water_point",
+                  "column": "desc"
+                }
+              },
+              "headerText": "This is a reallyyyyyyyyyy long title "
             }
           ],
           "orderings": [],
