@@ -188,7 +188,24 @@ dashboardDesign = {
           ],
           "orderings": [],
           "table": "entities.water_point",
-          "titleText": "TEST"
+          "titleText": "TEST",
+          "filter": {
+            "type": "op",
+            "table": "entities.water_point",
+            "op": "=",
+            "exprs": [
+              {
+                "type": "field",
+                "table": "entities.water_point",
+                "column": "code"
+              },
+              {
+                "type": "literal",
+                "valueType": "text",
+                "value": "10007"
+              }
+            ]
+          }
         }
       }
     },
