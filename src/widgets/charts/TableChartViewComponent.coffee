@@ -29,7 +29,7 @@ module.exports = class TableChartViewComponent extends React.Component
 
   renderHeader: ->
     H.thead null,
-      H.tr { style: {display: "block", position: "relative"}, ref: "tableHeader"},
+      H.tr { style: { position: "relative"}, ref: "tableHeader"},
         _.map(@props.design.columns, (column, i) => @renderHeaderCell(i))
 
   renderCell: (rowIndex, columnIndex) ->
@@ -58,21 +58,20 @@ module.exports = class TableChartViewComponent extends React.Component
     tr = $(@refs.tableBody).find("tr").first()
     headers = $(@refs.tableHeader).find("th")
     body = $(@refs.tableBody)
+    bodyContainer = $(@refs.tableBodyContainer)
 
     tr.find("td").each (i, el) ->
       headers.eq(i).width($(el).outerWidth())
 
     height = @props.height * (@props.standardWidth / @props.width) - $(@refs.title).outerHeight() - $(@refs.tableHeader).outerHeight()
-    body.height(height)
+    bodyContainer.height(height)
 
   renderBody: ->
-    height = @props.height * (@props.standardWidth / @props.width) - $(@refs.title).outerHeight()
-    tbodyStyle =
-      display: "block"
-      overflow: "auto"
-      height: height
+#    height = @props.height * (@props.standardWidth / @props.width) - $(@refs.title).outerHeight()
+#    tbodyStyle =
 
-    H.tbody { style: tbodyStyle , ref: "tableBody"},
+
+    H.tbody { ref: "tableBody"},
       _.map(@props.data.main, (row, i) => @renderRow(i))
 
   shouldComponentUpdate: (prevProps) ->
@@ -88,13 +87,17 @@ module.exports = class TableChartViewComponent extends React.Component
       overflow: 'hidden'
     }
 
+    containerStyle =
+      overflow: "auto"
+      height: height
+
     height = @props.height * (@props.standardWidth / @props.width) - $(@refs.title).outerHeight() - 25
 
     return H.div style: style, className: "overflow-auto-except-print",
       H.div {style: { fontWeight: "bold", textAlign: "center" }, ref: "title"}, @props.design.titleText
-      H.table className: "table table-condensed table-hover", style: { fontSize: "10pt" },
+      H.table className: "table table-condensed table-hover", style: { fontSize: "10pt", marginBottom: 0 },
         @renderHeader()
-        @renderBody()
-
-
+      H.div {ref: "tableBodyContainer", style: containerStyle},
+        H.table className: "table table-condensed table-hover", style: { fontSize: "10pt" },
+          @renderBody()
 
