@@ -496,6 +496,11 @@ module.exports = class AxisBuilder
         if _.isString(value)
           value = JSON.parse(value)
         return H.div(null, _.map(value, (v, i) -> H.div(key: i, v)))
+      when "date"
+        return moment(value, moment.ISO_8601).format("ll")
+      when "datetime"
+        return moment(value, moment.ISO_8601).format("lll")
+
 
     # TODO format dates
     return "" + value
