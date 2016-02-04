@@ -70,7 +70,7 @@ class MWaterDashboardPane extends React.Component
 
     @state = {
       design: dashboardDesign
-      formIds: []
+      extraTables: []
     }
 
   handleDesignChange: (design) =>
@@ -82,8 +82,8 @@ class MWaterDashboardPane extends React.Component
       apiUrl: @props.apiUrl
       client: @props.client
       user: @props.user
-      onFormIdsChange: (formIds) => @setState(formIds: formIds)
-      formIds: @state.formIds
+      onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
+      extraTables: @state.extraTables
     }, (error, config) =>
       H.div style: { height: "100%" },
         React.createElement(visualization.DashboardComponent, {
@@ -102,7 +102,7 @@ class MWaterMapPane extends React.Component
 
     @state = {
       design: mapDesign
-      formIds: []
+      extraTables: []
     }
 
   handleDesignChange: (design) =>
@@ -114,8 +114,8 @@ class MWaterMapPane extends React.Component
       apiUrl: @props.apiUrl
       client: @props.client
       user: @props.user
-      onFormIdsChange: (formIds) => @setState(formIds: formIds)
-      formIds: @state.formIds
+      extraTables: @state.extraTables
+      onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
     }, (error, config) =>
       H.div style: { height: "100%" },
         React.createElement(visualization.MapComponent, {
@@ -128,49 +128,49 @@ class MWaterMapPane extends React.Component
         })
     )
 
-class MapPane extends React.Component
-  constructor: (props) ->
-    super
+# class MapPane extends React.Component
+#   constructor: (props) ->
+#     super
 
-    @state = {
-      schema: null
-      dataSource: null
-      design: mapDesign
-      layerFactory: null
-    }
+#     @state = {
+#       schema: null
+#       dataSource: null
+#       design: mapDesign
+#       layerFactory: null
+#     }
 
-  componentDidMount: ->
-    $.getJSON @props.apiUrl + "jsonql/schema", (schemaJson) =>
-      schema = new Schema(schemaJson)
-      dataSource = new MWaterDataSource(@props.apiUrl, @props.client, { serverCaching: false, localCaching: true })
+#   componentDidMount: ->
+#     $.getJSON @props.apiUrl + "jsonql/schema", (schemaJson) =>
+#       schema = new Schema(schemaJson)
+#       dataSource = new MWaterDataSource(@props.apiUrl, @props.client, { serverCaching: false, localCaching: true })
 
-      layerFactory = new LayerFactory({
-        schema: schema
-        dataSource: dataSource
-        apiUrl: @props.apiUrl
-        client: @props.client
-        newLayers: [
-          { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" } }
-          { name: "Custom Layer", type: "Markers", design: {} }
-        ]
-        onMarkerClick: (table, id) => alert("#{table}:#{id}")
-      })
+#       layerFactory = new LayerFactory({
+#         schema: schema
+#         dataSource: dataSource
+#         apiUrl: @props.apiUrl
+#         client: @props.client
+#         newLayers: [
+#           { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" } }
+#           { name: "Custom Layer", type: "Markers", design: {} }
+#         ]
+#         onMarkerClick: (table, id) => alert("#{table}:#{id}")
+#       })
 
-      @setState(schema: schema, dataSource: dataSource, layerFactory: layerFactory)
+#       @setState(schema: schema, dataSource: dataSource, layerFactory: layerFactory)
 
-  handleDesignChange: (design) =>
-    @setState(design: design)
-    console.log JSON.stringify(design, null, 2)
+#   handleDesignChange: (design) =>
+#     @setState(design: design)
+#     console.log JSON.stringify(design, null, 2)
 
-  render: ->
-    React.createElement(visualization.MapComponent, {
-      layerFactory: @
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired # Data source to use
+#   render: ->
+#     React.createElement(visualization.MapComponent, {
+#       layerFactory: @
+#     schema: React.PropTypes.object.isRequired
+#     dataSource: React.PropTypes.object.isRequired # Data source to use
 
-    design: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func  # Null/undefined for readonly
-    })
+#     design: React.PropTypes.object.isRequired
+#     onDesignChange: React.PropTypes.func  # Null/undefined for readonly
+#     })
 
 
 $ ->
@@ -178,8 +178,8 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")

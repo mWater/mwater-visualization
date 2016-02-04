@@ -20,8 +20,8 @@ module.exports = class MWaterTableSelectComponent extends React.Component
     table: React.PropTypes.string
     onChange: React.PropTypes.func.isRequired # Called with table selected
 
-    formIds: React.PropTypes.array.isRequired
-    onFormIdsChange: React.PropTypes.func.isRequired
+    extraTables: React.PropTypes.array.isRequired
+    onExtraTablesChange: React.PropTypes.func.isRequired
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
@@ -30,36 +30,36 @@ module.exports = class MWaterTableSelectComponent extends React.Component
     super
 
     @state = {
-      pendingFormId: null   # Set when waiting for a form to load
+      pendingExtraTable: null   # Set when waiting for a table to load
     }
 
   componentWillReceiveProps: (nextProps) ->
-    # If received new schema with pending form, select it
-    if @state.pendingFormId
-      tableId = "responses:#{@state.pendingFormId}"
-      if nextProps.schema.getTable(tableId)
+    # If received new schema with pending extra table, select it
+    if @state.pendingExtraTable
+      table = @state.pendingExtraTable
+      if nextProps.schema.getTable(table)
         # No longer waiting
-        @setState(pendingFormId: null)
+        @setState(pendingExtraTable: null)
 
         # Close toggle edit
         @refs.toggleEdit.close()
         
         # Fire change
-        nextProps.onChange(tableId)
+        nextProps.onChange(table)
 
   handleChange: (tableId) =>
     # Close toggle edit
     @refs.toggleEdit.close()
     @props.onChange(tableId)
 
-  handleFormChange: (formId) =>
+  handleTableChange: (tableId) =>
     # If not part of formIds, add it and wait for new schema
-    if formId not in @props.formIds
-      @setState(pendingFormId: formId, =>
-        @props.onFormIdsChange([formId].concat(@props.formIds))
+    if not @props.schema.getTable(tableId)
+      @setState(pendingExtraTable: tableId, =>
+        @props.onExtraTablesChange(_.union(@props.extraTables, [tableId]))
       )
     else
-      @handleChange("responses:#{formId}")
+      @handleChange(tableId)
 
   renderSites: ->
     R OptionListComponent,
@@ -74,8 +74,8 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       client: @props.client
       apiUrl: @props.apiUrl
       user: @props.user
-      onChange: @handleFormChange
-      includedFormIds: @props.formIds
+      onChange: @handleTableChange
+      extraTables: @props.extraTables
 
   renderIndicators: ->
     tables = _.filter(@props.schema.getTables(), (table) => table.id.match(/^indicator_values:/))
@@ -123,7 +123,7 @@ class FormsListComponent extends React.Component
     schema: React.PropTypes.object.isRequired
     user: React.PropTypes.string
     onChange: React.PropTypes.func.isRequired # Called with table selected
-    includedFormIds: React.PropTypes.array.isRequired
+    extraTables: React.PropTypes.array.isRequired
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
@@ -138,7 +138,7 @@ class FormsListComponent extends React.Component
   componentDidMount: ->
     # Get names and basic of forms
     query = {}
-    query.fields = JSON.stringify({ "design.name": 1, roles: 1, created: 1, modified: 1, state: 1 })
+    query.fields = JSON.stringify({ "design.name": 1, roles: 1, created: 1, modified: 1, state: 1, isMaster: 1 })
     query.selector = JSON.stringify({ design: { $exists: true }, state: { $ne: "deleted" } })
     query.client = @props.client
 
@@ -147,7 +147,7 @@ class FormsListComponent extends React.Component
       
       # Sort by modified.on desc but first by user
       forms = _.sortByOrder(forms, [
-        (form) => if form._id in @props.includedFormIds then 1 else 0
+        (form) => if "responses:" + form._id in @props.extraTables then 1 else 0
         (form) => if form.created.by == @props.user then 1 else 0
         (form) => form.modified.on
         ], ['desc', 'desc', 'desc'])
@@ -196,5 +196,5 @@ class FormsListComponent extends React.Component
         onChange: (ev) => @setState(search: ev.target.value)
 
       R OptionListComponent,
-        items: _.map(forms, (form) => { name: form.name, desc: form.desc, onClick: @props.onChange.bind(null, form.id) })
+        items: _.map(forms, (form) => { name: form.name, desc: form.desc, onClick: @props.onChange.bind(null, "responses:" + form.id) })
 

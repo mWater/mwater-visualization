@@ -8,17 +8,18 @@ WidgetFactory = require './widgets/WidgetFactory'
 MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 MWaterTableSelectComponent = require './MWaterTableSelectComponent'
 querystring = require 'querystring'
+AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
 
 # Loads an mWater schema from the server and creates child with schema and related items passed in.
 # Also creates a tableSelectElementFactory context to allow selecting of a table in an mWater-friendly way
-module.exports = class MWaterLoaderComponent extends React.Component
+module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
   @propTypes:
     apiUrl: React.PropTypes.string.isRequired
     client: React.PropTypes.string
     user: React.PropTypes.string                              # username of logged in user
 
-    formIds: React.PropTypes.arrayOf(React.PropTypes.string)  # Forms to load in schema. Forms are not loaded by default as they are too many
-    onFormIdsChange: React.PropTypes.func                     # Called when form ids are changed and schema should be reloaded
+    extraTables: React.PropTypes.arrayOf(React.PropTypes.string)  # Extra tables to load in schema. Forms are not loaded by default as they are too many
+    onExtraTablesChange: React.PropTypes.func                     # Called when extra tables are changed and schema should be reloaded
 
     onMarkerClick: React.PropTypes.func                       # Called with (table, id)
     newLayers: React.PropTypes.arrayOf(React.PropTypes.shape({
@@ -44,53 +45,39 @@ module.exports = class MWaterLoaderComponent extends React.Component
 
     @mounted = false
 
-  componentDidMount: ->
-    @mounted = true
-    
-    @updateSchema(@props, null)
+  # Override to determine if a load is needed. Not called on mounting
+  isLoadNeeded: (newProps, oldProps) -> 
+    return not _.isEqual(_.pick(newProps, "apiUrl", "client", "user", "extraTables"), _.pick(oldProps, "apiUrl", "client", "user", "extraTables"))
 
-  componentWillReceiveProps: (nextProps) ->
-    @updateSchema(nextProps, @props)
-
-  componentWillUnmount: ->
-    @mounted = false
-
-  # Load the schema if the formIds have changed
-  updateSchema: (newProps, oldProps) ->
-    # Do nothing if not changed
-    if oldProps and _.isEqual(newProps.formIds, oldProps.formIds)
-      return
-
+  # Call callback with state changes
+  load: (props, prevProps, callback) -> 
     # Load schema
-    url = newProps.apiUrl + "jsonql/schema"
+    url = props.apiUrl + "jsonql/schema"
 
     query = {}
-    if newProps.client
-      query.client = newProps.client
-    if newProps.formIds and newProps.formIds.length > 0
-      query.formIds = newProps.formIds.join(',')
+    if props.client
+      query.client = props.client
+    if props.extraTables and props.extraTables.length > 0
+      query.extraTables = props.extraTables.join(',')
 
     url += "?" + querystring.stringify(query)
 
     $.getJSON url, (schemaJson) =>
-      if not @mounted
-        return
-
       schema = new Schema(schemaJson)
-      dataSource = new MWaterDataSource(newProps.apiUrl, newProps.client, { serverCaching: false, localCaching: true })
+      dataSource = new MWaterDataSource(props.apiUrl, props.client, { serverCaching: false, localCaching: true })
 
       layerFactory = new LayerFactory({
         schema: schema
         dataSource: dataSource
-        apiUrl: newProps.apiUrl
-        client: newProps.client
-        newLayers: newProps.newLayers
-        onMarkerClick: newProps.onMarkerClick
+        apiUrl: props.apiUrl
+        client: props.client
+        newLayers: props.newLayers
+        onMarkerClick: props.onMarkerClick
       })
 
       widgetFactory = new WidgetFactory(schema: schema, dataSource: dataSource, layerFactory: layerFactory) 
 
-      @setState({
+      callback({
         schema: schema
         dataSource: dataSource
         layerFactory: layerFactory
@@ -98,7 +85,7 @@ module.exports = class MWaterLoaderComponent extends React.Component
         })
     .fail (xhr) =>
       console.log xhr.responseText
-      @setState(error: "Cannot load one of the forms that this depends on. Perhaps the administrator has not shared the form with you?")
+      callback(error: "Cannot load one of the forms that this depends on. Perhaps the administrator has not shared the form with you?")
 
   @childContextTypes: 
     tableSelectElementFactory: React.PropTypes.func
@@ -113,8 +100,8 @@ module.exports = class MWaterLoaderComponent extends React.Component
           user: @props.user
           table: value
           onChange: onChange
-          formIds: @props.formIds
-          onFormIdsChange: @props.onFormIdsChange
+          extraTables: @props.extraTables
+          onExtraTablesChange: @props.onExtraTablesChange
         )
     }
 
