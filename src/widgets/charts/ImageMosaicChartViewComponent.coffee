@@ -32,6 +32,11 @@ module.exports = class ImageMosaicChartViewComponent extends React.Component
     # For each image
     for row in @props.data
       imageObj = row.image
+
+      # Ignore nulls (https://github.com/mWater/mwater-server/issues/202)
+      if not imageObj
+        continue
+
       if _.isString(imageObj)
         imageObj = JSON.parse(imageObj)
 
