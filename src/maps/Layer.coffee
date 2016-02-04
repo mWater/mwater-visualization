@@ -42,3 +42,7 @@ module.exports = class Layer
   createDesignerElement: (options) ->
     throw new Error("Not implemented")
 
+  # Returns a cleaned design
+  # TODO this is awkward since the design is part of the object too
+  cleanDesign: (design) ->
+    return design
