@@ -63,10 +63,12 @@ module.exports = class MWaterTableSelectComponent extends React.Component
 
   renderSites: ->
     R OptionListComponent,
-      items: _.map(siteTypes, (tableId) =>
+      items: _.compact(_.map(siteTypes, (tableId) =>
         table = @props.schema.getTable(tableId)
+        if not table
+          return null
         return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @handleChange.bind(null, table.id) }
-      )
+      ))
 
   renderForms: ->
     R FormsListComponent,
