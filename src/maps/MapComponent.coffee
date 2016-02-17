@@ -68,7 +68,7 @@ module.exports = class MapComponent extends React.Component
               onDesignChange: @props.onDesignChange
               layerFactory: @props.layerFactory)
           )
-      H.div style: { position: "absolute", left: "70%", width: "30%", height: "100%", borderLeft: "solid 3px #AAA" }, 
+      H.div style: { position: "absolute", left: "70%", width: "30%", height: "100%", borderLeft: "solid 3px #AAA", scrollY: "auto" }, 
         React.createElement(MapDesignerComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
