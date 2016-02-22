@@ -122,8 +122,19 @@ class ColumnsDesignerComponent extends React.Component
     columns = _.map(elems, (e) -> e.props.column)
     @props.onColumnsChange(columns)
 
+  handleRemoveAllColumns: => 
+    @props.onColumnsChange([])
+
   render: ->
     H.div style: { height: 800, overflowY: "auto", overflowX: "hidden" }, 
+      H.button
+        key: "removeall"
+        type: "button"
+        className: "btn btn-link btn-xs"
+        onClick: @handleRemoveAllColumns,
+          H.span className: "glyphicon glyphicon-remove"
+          " Remove All Columns"
+
       R ReactReorderable, onDrop: @handleReorder, handle: ".drag-handle",
         _.map @props.columns, (column, columnIndex) =>
           R ColumnDesignerComponent, 
@@ -135,6 +146,7 @@ class ColumnsDesignerComponent extends React.Component
             onColumnChange: @handleColumnChange.bind(null, columnIndex)
 
       H.button
+        key: "add"
         type: "button"
         className: "btn btn-default"
         onClick: @handleAddColumn,
