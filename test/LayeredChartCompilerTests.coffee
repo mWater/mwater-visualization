@@ -264,17 +264,18 @@ describe "LayeredChartCompiler", ->
             "0:1": "green"
             })          
 
-        it "colors based on color map defaulting to series", ->
-          @design.layers[0].color = "red"
-          @design.layers[0].axes.color.colorMap = [
-            { value: "b", color: "green" }
-          ]
-          @res = @compiler.compileData(@design, @data)
+        # Removed since we don't allow pie slice coloring
+        # it "colors based on color map defaulting to series", ->
+        #   @design.layers[0].color = "red"
+        #   @design.layers[0].axes.color.colorMap = [
+        #     { value: "b", color: "green" }
+        #   ]
+        #   @res = @compiler.compileData(@design, @data)
           
-          compare(@res.colors, {
-            "0:0": "red"
-            "0:1": "green"
-            })          
+        #   compare(@res.colors, {
+        #     "0:0": "red"
+        #     "0:1": "green"
+        #     })          
 
 
         it "sets x axis type to category", ->

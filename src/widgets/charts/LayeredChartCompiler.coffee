@@ -571,7 +571,7 @@ module.exports = class LayeredChartCompiler
             { type: "op", op: "::jsonb", exprs: [JSON.stringify(row.x)] }
           ]
         })
-        names.push(@axisBuilder.summarizeAxis(layer.axes.x, locale) + " includes " + @exprUtils.stringifyExprLiteral(layer.axes.x.expr, row.x, locale))
+        names.push(@axisBuilder.summarizeAxis(layer.axes.x, locale) + " includes " + @exprUtils.stringifyExprLiteral(layer.axes.x.expr, [row.x], locale))
         data.x = row.x
       else        
         filters.push(@axisBuilder.createValueFilter(layer.axes.x, row.x))
