@@ -127,13 +127,13 @@ class ColumnsDesignerComponent extends React.Component
 
   render: ->
     H.div style: { height: 800, overflowY: "auto", overflowX: "hidden" }, 
-      H.button
-        key: "removeall"
-        type: "button"
-        className: "btn btn-link btn-xs"
-        onClick: @handleRemoveAllColumns,
-          H.span className: "glyphicon glyphicon-remove"
-          " Remove All Columns"
+      H.div style: { textAlign: "right" }, key: "removeall",
+        H.button
+          type: "button"
+          className: "btn btn-link btn-xs"
+          onClick: @handleRemoveAllColumns,
+            H.span className: "glyphicon glyphicon-remove"
+            " Remove All Columns"
 
       R ReactReorderable, onDrop: @handleReorder, handle: ".drag-handle",
         _.map @props.columns, (column, columnIndex) =>
