@@ -45,6 +45,9 @@ exports.WidgetScopesViewComponent = require './widgets/WidgetScopesViewComponent
 exports.TableSelectComponent = require './TableSelectComponent'
 exports.AxisBuilder = require './axes/AxisBuilder'
 
+exports.DatagridComponent = require './datagrids/DatagridComponent'
+exports.DatagridDesignerComponent = require './datagrids/DatagridDesignerComponent'
+
 # Polyfill pathseg https://github.com/masayuki0812/c3/issues/1529
 require './pathseg-polyfill.js'
 

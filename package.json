@@ -23,6 +23,7 @@
     "d3-format": "^0.3.2",
     "d3-tip": "^0.6.7",
     "filesaver.js": "^0.1.1",
+    "fixed-data-table": "^0.6.0",
     "js-yaml": "^3.4.0",
     "leaflet": "^0.7.3",
     "lodash": "^3.1.0",
@@ -40,6 +41,7 @@
     "react-dom": "^0.14.0",
     "react-library": "github:mwater/react-library",
     "react-motion": "^0.3.0",
+    "react-reorderable": "^0.2.3",
     "react-select": "^0.8.0",
     "shallowequal": "^0.2.2",
     "update-object": "^1.0.0"
