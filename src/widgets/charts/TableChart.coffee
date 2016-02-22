@@ -135,11 +135,18 @@ module.exports = class TableChart extends Chart
         query.groupBy.push(colNum + 1)
 
     # Compile orderings
-    for ordering in design.orderings or []
-      query.orderBy.push({ expr: @axisBuilder.compileAxis(axis: ordering.axis, tableAlias: "main"), direction: ordering.direction })
+    for ordering, i in design.orderings or []
+      # Add as select so we can use ordinals. Prevents https://github.com/mWater/mwater-visualization/issues/165
+      query.selects.push({
+        type: "select"
+        expr: @axisBuilder.compileAxis(axis: ordering.axis, tableAlias: "main")
+        alias: "o#{i}"
+      })
+      
+      query.orderBy.push({ ordinal: design.columns.length + i + 1, direction: ordering.direction })
       # Add group by if non-aggregate
       if not ordering.axis.aggr
-        query.groupBy.push(@axisBuilder.compileAxis(axis: ordering.axis, tableAlias: "main"))
+        query.groupBy.push(design.columns.length + i + 1)
 
     # Get relevant filters
     filters = _.where(filters or [], table: design.table)

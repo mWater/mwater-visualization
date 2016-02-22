@@ -101,10 +101,11 @@ describe "TableChart", ->
         selects: [
           { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
           { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "c1" }
+          { type: "select", expr: { type: "field", tableAlias: "main", column: "number" }, alias: "o0" }
         ]
         from: { type: "table", table: "t1", alias: "main" }
-        groupBy: [1, { type: "field", tableAlias: "main", column: "number" }]
-        orderBy: [{ expr: { type: "field", tableAlias: "main", column: "number" }, direction: "desc" }]
+        groupBy: [1, 3]
+        orderBy: [{ ordinal: 3, direction: "desc" }]
         limit: 1000
       }
 
