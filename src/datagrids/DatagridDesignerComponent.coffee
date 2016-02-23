@@ -35,7 +35,6 @@ module.exports = class DatagridDesignerComponent extends React.Component
          type: "expr"
          width: 150
          expr: { type: "field", table: table, column: col.id }
-         label: null
       })
 
     design = {
@@ -107,6 +106,9 @@ class ColumnsDesignerComponent extends React.Component
     # Handle remove
     if not column
       columns.splice(columnIndex, 1)
+    else if _.isArray(column)
+      # Handle array case
+      Array.prototype.splice.apply(columns, [columnIndex, 1].concat(column))
     else
       columns[columnIndex] = column
       
@@ -160,13 +162,76 @@ class ColumnDesignerComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired # dataSource to use
     table: React.PropTypes.string.isRequired
     column: React.PropTypes.object.isRequired     # Column See README.md of this folder
-    onColumnChange: React.PropTypes.func.isRequired # Called when column changes. Null to remove
+    onColumnChange: React.PropTypes.func.isRequired # Called when column changes. Null to remove. Array to replace with multiple entries
 
   handleExprChange: (expr) =>
     @props.onColumnChange(update(@props.column, expr: { $set: expr }))
 
   handleLabelChange: (label) =>
     @props.onColumnChange(update(@props.column, label: { $set: label }))
+
+  handleSplitEnumset: =>
+    exprUtils = new ExprUtils(@props.schema)
+
+    @props.onColumnChange(_.map(exprUtils.getExprEnumValues(@props.column.expr), (enumVal) =>
+      {
+        id: uuid.v4()
+        type: "expr"
+        width: 150
+        expr: {
+          type: "op"
+          op: "contains"
+          table: @props.table
+          exprs: [
+            @props.column.expr
+            { type: "literal", valueType: "enumset", value: [enumVal.id] }
+          ]
+        }
+      }
+    ))
+
+  handleSplitGeometry: =>
+    @props.onColumnChange([
+      {
+        id: uuid.v4()
+        type: "expr"
+        width: 150
+        expr: {
+          type: "op"
+          op: "latitude"
+          table: @props.table
+          exprs: [@props.column.expr]
+        }
+      }      
+      {
+        id: uuid.v4()
+        type: "expr"
+        width: 150
+        expr: {
+          type: "op"
+          op: "longitude"
+          table: @props.table
+          exprs: [@props.column.expr]
+        }
+      }      
+    ])
+
+  # Render options to split a column, such as an enumset to booleans or geometry to lat/lng
+  renderSplit: ->
+    exprUtils = new ExprUtils(@props.schema)
+    exprType = exprUtils.getExprType(@props.column.expr)
+
+    switch exprType
+      when "enumset"
+        return H.a className: "btn btn-xs btn-link", onClick: @handleSplitEnumset,
+          H.i className: "fa fa-chain-broken"
+          " Split by options"
+      when "geometry"
+        return H.a className: "btn btn-xs btn-link", onClick: @handleSplitGeometry,
+          H.i className: "fa fa-chain-broken"
+          " Split by lat/lng"
+
+    return null
 
   render: =>
     exprUtils = new ExprUtils(@props.schema)
@@ -182,6 +247,7 @@ class ColumnDesignerComponent extends React.Component
           table: @props.table
           value: @props.column.expr
           onChange: @handleExprChange
+        @renderSplit()
 
       H.div className: "col-xs-5",
         H.input

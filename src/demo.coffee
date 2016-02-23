@@ -128,6 +128,37 @@ class MWaterMapPane extends React.Component
         })
     )
 
+class MWaterDatagridDesignerPane extends React.Component
+  constructor: (props) ->
+    super
+
+    @state = {
+      design: {}
+      extraTables: []
+    }
+
+  handleDesignChange: (design) =>
+    @setState(design: design)
+    console.log JSON.stringify(design, null, 2)
+    
+  render: ->
+    React.createElement(MWaterLoaderComponent, {
+      apiUrl: @props.apiUrl
+      client: @props.client
+      user: @props.user
+      onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
+      extraTables: @state.extraTables
+    }, (error, config) =>
+      H.div style: { height: "100%" },
+        React.createElement(visualization.DatagridDesignerComponent, {
+          schema: config.schema
+          dataSource: config.dataSource
+          design: @state.design
+          onDesignChange: @handleDesignChange
+        })
+    )
+
+
 # class MapPane extends React.Component
 #   constructor: (props) ->
 #     super
@@ -178,7 +209,8 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
