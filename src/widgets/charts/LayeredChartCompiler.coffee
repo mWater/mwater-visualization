@@ -257,7 +257,7 @@ module.exports = class LayeredChartCompiler
           else
             # TODO REMOVE
             if colorHacks[colorValue]
-              colors[series] = colorHacks[colorValue]
+              colors[seriesY] = colorHacks[colorValue]
 
           # Get rows for this series
           rows = _.where(layerData, color: colorValue)
