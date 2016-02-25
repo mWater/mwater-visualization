@@ -5,7 +5,7 @@ LayeredChart = require '../src/widgets/charts/LayeredChart'
 canonical = require 'canonical-json'
 
 compare = (actual, expected) ->
-  assert.equal canonical(actual), canonical(expected)
+  assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected)
 
 describe "LayeredChart", ->
   before ->
@@ -43,3 +43,28 @@ describe "LayeredChart", ->
 
       compare(design.layers[0].axes.y, expectedY)
 
+    it "does not default y axis if scatter", ->
+      design = {
+        type: "scatter"
+        layers: [
+          { axes: { x: @axisEnum, y: null }, table: "t1" }
+        ]
+      }
+
+      design = @chart.cleanDesign(design)
+
+      assert not design.layers[0].axes.y
+
+    it "removes aggr from y if scatter", ->
+      design = {
+        type: "scatter"
+        layers: [
+          { axes: { x: @axisEnum, y: { expr: { type: "id", table: "t1" }, xform: null, aggr: "count" } }, table: "t1" }
+        ]
+      }
+
+      design = @chart.cleanDesign(design)
+
+      expectedY = @axisNumber
+
+      assert not design.layers[0].axes.y
