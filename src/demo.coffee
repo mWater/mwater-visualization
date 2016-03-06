@@ -246,7 +246,7 @@ mapDesign = {
   "baseLayer": "bing_road",
   "layerViews": [
      # { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
-     { name: "Choropleth", type: "AdminIndicatorChoropleth", design: { }, visible: true }
+     { name: "Choropleth", type: "AdminIndicatorChoropleth", design: { table: "entities.water_point" }, visible: true }
   ]
   filters: {}
   bounds: { 

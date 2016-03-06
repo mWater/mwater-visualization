@@ -88,11 +88,11 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
     exprCompiler = new ExprCompiler(@schema)
 
 
-    # select _id, shape, 
-    # (select sum(case when valuequery.type = 'Protected dug well' then 1 else 0 end)::decimal/sum(1)
-    # from entities.water_point as valuequery where valuequery.admin_region in (select subtree._id from admin_regions as subtree where subtree.path @> json_build_array(admin_regions._id)::jsonb)
+    # select _id, /*shape, */
+    # (select sum(case when wp.type = 'Protected dug well' then 1.0 else 0.0 end)::decimal/sum(1.0)
+    # from entities.water_point as wp inner join admin_region_subtrees on wp.admin_region = admin_region_subtrees.descendant where admin_region_subtrees.ancestor = admin_regions._id)
     # from admin_regions 
-    # where shape && !bbox! and path ->> 0 = 'abed5734-4598-45ac-8d7b-def868c2cb7c' and level = 1  
+    # where shape && !bbox! and path ->> 0 = '39dc194a-ffed-4a9c-95bf-1761a8d0b794' and level = 1  
 
     valueQuery = {
       type: "scalar"
@@ -110,7 +110,7 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
                 exprs: [
                   { 
                     type: "case"
-                    cases: [{ when: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "valuequery", column: "type" }, "Protected dug well"]}, then: 1 }]
+                    cases: [{ when: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "innerquery", column: "type" }, "Protected dug well"]}, then: 1 }]
                     else: 0
                   }
                 ]
@@ -124,29 +124,69 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
           }
         ]
       }
-      from: { type: "table", table: "entities.water_point", alias: "valuequery" }
+      from: {
+        type: "join"
+        left: { type: "table", table: "entities.water_point", alias: "innerquery" }
+        right: { type: "table", table: "admin_region_subtrees", alias: "admin_region_subtrees" }
+        kind: "inner"
+        on: {
+          type: "op"
+          op: "="
+          exprs: [
+            { type: "field", tableAlias: "innerquery", column: "admin_region" }
+            { type: "field", tableAlias: "admin_region_subtrees", column: "descendant" }
+          ]
+        }
+      }
       where: {
         type: "op"
-        op: "in"
+        op: "="
         exprs: [
-          { type: "field", tableAlias: "valuequery", column: "admin_region" }
-          { 
-            type: "scalar"
-            expr: { type: "field", tableAlias: "subtree", column: "_id" }
-            from: { type: "table", table: "admin_regions", alias: "subtree" }
-            where: { 
-              type: "op"
-              op: "@>"
-              exprs: [
-                { type: "field", tableAlias: "subtree", column: "path" }
-                { type: "op", op: "::jsonb", exprs: [{ type: "op", op: "json_build_array", exprs: [{ type: "field", tableAlias: "admin_regions", column: "_id" }] }] }                
-              ]
-            }
-          }
+          { type: "field", tableAlias: "admin_region_subtrees", column: "ancestor" }
+          { type: "field", tableAlias: "admin_regions", column: "_id" }
         ]
       }
     }
 
+    # Then add extra filters passed in, if relevant
+    relevantFilters = _.where(filters, table: design.table)
+    extraWhereClauses = []
+    for filter in relevantFilters
+      extraWhereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
+    extraWhereClauses = _.compact(extraWhereClauses)
+
+    if extraWhereClauses.length > 0
+      valueQuery.where = { type: "op", op: "and", exprs: [valueQuery.where].concat(extraWhereClauses) }
+
+    wheres = [
+      # Bounding box
+      { 
+        type: "op"
+        op: "&&"
+        exprs: [
+          { type: "field", tableAlias: "admin_regions", column: "shape" }
+          { type: "token", token: "!bbox!" }
+        ]
+      }
+      # Outer administative region
+      {
+        type: "op"
+        op: "="
+        exprs: [
+          { type: "op", op: "->>", exprs: [{ type: "field", tableAlias: "admin_regions", column: "path" }, 0] }
+          "39dc194a-ffed-4a9c-95bf-1761a8d0b794"
+        ]
+      }
+      # Level to display
+      {
+        type: "op"
+        op: "="
+        exprs: [
+          { type: "field", tableAlias: "admin_regions", column: "level" }
+          1
+        ]
+      }
+    ]
 
     query = {
       type: "query"
@@ -159,63 +199,9 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
       where: {
         type: "op"
         op: "and"
-        exprs: [
-          { 
-            type: "op"
-            op: "&&"
-            exprs: [
-              { type: "field", tableAlias: "admin_regions", column: "shape" }
-              { type: "token", token: "!bbox!" }
-            ]
-          }
-          {
-            type: "op"
-            op: "="
-            exprs: [
-              { type: "op", op: "->>", exprs: [{ type: "field", tableAlias: "admin_regions", column: "path" }, 0] }
-              "39dc194a-ffed-4a9c-95bf-1761a8d0b794"
-            ]
-          }
-          {
-            type: "op"
-            op: "="
-            exprs: [
-              { type: "field", tableAlias: "admin_regions", column: "level" }
-              1
-            ]
-          }
-        ]
+        exprs: wheres
       }
     }
-
-    # # Then add extra filters passed in, if relevant
-    # # Get relevant filters
-    # relevantFilters = _.where(filters, table: sublayer.table)
-    # for filter in relevantFilters
-    #   whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
-
-    # whereClauses = _.compact(whereClauses)
-    
-    # # Wrap if multiple
-    # if whereClauses.length > 1
-    #   innerquery.where = { type: "op", op: "and", exprs: whereClauses }
-    # else
-    #   innerquery.where = whereClauses[0]
-
-    # Create outer query which takes where r <= 3 to limit # of points in a cluster
-    # outerquery = {
-    #   type: "query"
-    #   selects: [
-    #     { type: "select", expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "innerquery", column: "id" }]}, alias: "id" } # innerquery._id::text as id
-    #     { type: "select", expr: { type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }, alias: "the_geom_webmercator" } # innerquery.the_geom_webmercator as the_geom_webmercator
-    #   ]
-    #   from: { type: "subquery", query: innerquery, alias: "innerquery" }
-    #   where: { type: "op", op: "<=", exprs: [{ type: "field", tableAlias: "innerquery", column: "r" }, 3]}
-    # }
-
-    # # Add color select if color axis
-    # if sublayer.axes.color
-    #   outerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "innerquery", column: "color" }, alias: "color" }) # innerquery.color as color
 
     return query
 
@@ -247,8 +233,8 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
 
     return css
 
-  # getFilterableTables: -> 
-  #   return _.uniq(_.compact(_.pluck(@design.sublayers, "table")))
+  getFilterableTables: -> 
+    return [@design.table]
 
   # getLegend: ->
   #   # return H.div null, "Legend here"
