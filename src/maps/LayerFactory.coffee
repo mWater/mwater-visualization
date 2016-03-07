@@ -1,5 +1,6 @@
 MWaterServerLayer = require './MWaterServerLayer'
 MarkersLayer = require './MarkersLayer'
+AdminIndicatorChoroplethLayer = require './AdminIndicatorChoroplethLayer'
 
 module.exports = class LayerFactory
   # Pass in:
@@ -24,6 +25,9 @@ module.exports = class LayerFactory
 
       when "Markers"
         return new MarkersLayer(design: design, client: @client, apiUrl: @apiUrl, schema: @schema, dataSource: @dataSource, onMarkerClick: @onMarkerClick)
+
+      when "AdminIndicatorChoropleth"
+        return new AdminIndicatorChoroplethLayer(design: design, client: @client, apiUrl: @apiUrl, schema: @schema, dataSource: @dataSource, onMarkerClick: @onMarkerClick)
 
     throw new Error("Unknown type #{type}")
 

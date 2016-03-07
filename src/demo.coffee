@@ -209,9 +209,10 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
@@ -244,20 +245,46 @@ class MWaterDataSource extends DataSource
 mapDesign = {
   "baseLayer": "bing_road",
   "layerViews": [
-     { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
+     # { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
+     { 
+      name: "Choropleth"
+      type: "AdminIndicatorChoropleth"
+      design: { 
+        scope: '39dc194a-ffed-4a9c-95bf-1761a8d0b794'
+        table: "entities.water_point" 
+        adminRegionExpr: { type: "scalar", table: "entities.water_point", joins: ['admin_region'], expr: { type: "id", table: "admin_regions" } }
+        detailLevel: 1
+        condition: { 
+          type: "op"
+          op: "="
+          table: "entities.water_point"
+          exprs: [
+            { type: "field", table: "entities.water_point", column: "type" }
+            { type: "literal", valueType: "enum", value: "Protected dug well" }
+          ] 
+        }
+      }
+      visible: true 
+    }
   ]
   filters: {}
-  bounds: { w: -40, n: 25, e: 40, s: -25 } 
+  bounds: { 
+    "w": 23.1591796875,
+    "n": 4.214943141390651,
+    "e": 44.2529296875,
+    "s": -18.583775688370928
+  }
 }
+# bounds: { w: -40, n: 25, e: 40, s: -25 }
 
 dashboardDesign = {
   "items": {
-    "d41a2dd2-85bd-46d8-af9a-a650af4c0047": {
+    "942e0cee-fd4f-4ff6-b394-c1091180ecdb": {
       "layout": {
-        "x": 16,
+        "x": 0,
         "y": 0,
         "w": 8,
-        "h": 6
+        "h": 8
       },
       "widget": {
         "type": "TableChart",
@@ -267,175 +294,227 @@ dashboardDesign = {
             {
               "textAxis": {
                 "expr": {
-                  "type": "scalar",
-                  "table": "entities.water_point",
-                  "joins": [],
-                  "expr": {
-                    "type": "field",
-                    "table": "entities.water_point",
-                    "column": "type"
-                  }
-                },
-                "headerText": "This is a reallyyyyyyyyyy long title "
-              }
-            },
-            {
-              "textAxis": {
-                "expr": {
-                  "type": "scalar",
-                  "table": "entities.water_point",
-                  "joins": [],
-                  "expr": {
-                    "type": "count",
-                    "table": "entities.water_point"
-                  }
-                },
-                "aggr": "count",
-                "headerText": "This is a reallyyyyyyyyyy long title "
-              }
-            },
-            {
-              "textAxis": {
-                "expr": {
                   "type": "field",
                   "table": "entities.water_point",
-                  "column": "desc"
+                  "column": "name"
                 }
-              },
-              "headerText": "This is a reallyyyyyyyyyy long title "
+              }
             }
           ],
           "orderings": [],
           "table": "entities.water_point",
-          "titleText": "TEST",
           "filter": {
             "type": "op",
             "table": "entities.water_point",
-            "op": "=",
+            "op": "within",
             "exprs": [
               {
-                "type": "field",
+                "type": "scalar",
                 "table": "entities.water_point",
-                "column": "code"
+                "joins": [
+                  "admin_region"
+                ],
+                "expr": {
+                  "type": "id",
+                  "table": "admin_regions"
+                }
               },
               {
                 "type": "literal",
-                "valueType": "text",
-                "value": "10007"
+                "valueType": "id",
+                "idTable": "admin_regions",
+                "value": "abed5734-4598-45ac-8d7b-def868c2cb7c"
               }
             ]
           }
         }
       }
-    },
-    "d2ea9c20-bcd3-46f6-8f78-ccb795d1a91a": {
-      "layout": {
-        "x": 0,
-        "y": 0,
-        "w": 8,
-        "h": 8
-      },
-      "widget": {
-        "type": "Map",
-        "design": {
-          "baseLayer": "bing_road",
-          "layerViews": [
-            {
-              "id": "827187bf-a5fd-4d07-b34b-1e213407f96d",
-              "name": "Custom Layer",
-              "desc": "",
-              "type": "Markers",
-              "design": {
-                "sublayers": [
-                  {
-                    "axes": {
-                      "geometry": {
-                        "expr": {
-                          "type": "field",
-                          "table": "entities.water_point",
-                          "column": "location"
-                        },
-                        "xform": null
-                      },
-                      "color": {
-                        "expr": {
-                          "type": "field",
-                          "table": "entities.water_point",
-                          "column": "type"
-                        },
-                        "xform": null,
-                        "colorMap": [
-                          {
-                            "value": "Protected dug well",
-                            "color": "#d0021b"
-                          },
-                          {
-                            "value": "Piped into dwelling",
-                            "color": "#4a90e2"
-                          }
-                        ]
-                      }
-                    },
-                    "color": "#0088FF",
-                    "filter": null,
-                    "table": "entities.water_point",
-                    "symbol": "font-awesome/star"
-                  }
-                ]
-              },
-              "visible": true,
-              "opacity": 1
-            }
-          ],
-          "filters": {},
-          "bounds": {
-            "w": -103.7548828125,
-            "n": 23.160563309048314,
-            "e": -92.4169921875,
-            "s": 12.382928338487408
-          }
-        }
-      }
-    },
-    "9ef85e17-73aa-4b5f-8363-95f9a2e24193": {
-      "layout": {
-        "x": 8,
-        "y": 0,
-        "w": 8,
-        "h": 8
-      },
-      "widget": {
-        "type": "LayeredChart",
-        "design": {
-          "version": 1,
-          "layers": [
-            {
-              "axes": {
-                "x": {
-                  "expr": {
-                    "type": "field",
-                    "table": "entities.water_point",
-                    "column": "type"
-                  },
-                  "xform": null
-                },
-                "y": {
-                  "expr": {
-                    "type": "id",
-                    "table": "entities.water_point"
-                  },
-                  "aggr": "count",
-                  "xform": null
-                }
-              },
-              "filter": null,
-              "table": "entities.water_point"
-            }
-          ],
-          "type": "bar"
-        }
-      }
     }
+     
+    # "d41a2dd2-85bd-46d8-af9a-a650af4c0047": {
+    #   "layout": {
+    #     "x": 16,
+    #     "y": 0,
+    #     "w": 8,
+    #     "h": 6
+    #   },
+    #   "widget": {
+    #     "type": "TableChart",
+    #     "design": {
+    #       "version": 1,
+    #       "columns": [
+    #         {
+    #           "textAxis": {
+    #             "expr": {
+    #               "type": "scalar",
+    #               "table": "entities.water_point",
+    #               "joins": [],
+    #               "expr": {
+    #                 "type": "field",
+    #                 "table": "entities.water_point",
+    #                 "column": "type"
+    #               }
+    #             },
+    #             "headerText": "This is a reallyyyyyyyyyy long title "
+    #           }
+    #         },
+    #         {
+    #           "textAxis": {
+    #             "expr": {
+    #               "type": "scalar",
+    #               "table": "entities.water_point",
+    #               "joins": [],
+    #               "expr": {
+    #                 "type": "count",
+    #                 "table": "entities.water_point"
+    #               }
+    #             },
+    #             "aggr": "count",
+    #             "headerText": "This is a reallyyyyyyyyyy long title "
+    #           }
+    #         },
+    #         {
+    #           "textAxis": {
+    #             "expr": {
+    #               "type": "field",
+    #               "table": "entities.water_point",
+    #               "column": "desc"
+    #             }
+    #           },
+    #           "headerText": "This is a reallyyyyyyyyyy long title "
+    #         }
+    #       ],
+    #       "orderings": [],
+    #       "table": "entities.water_point",
+    #       "titleText": "TEST",
+    #       "filter": {
+    #         "type": "op",
+    #         "table": "entities.water_point",
+    #         "op": "=",
+    #         "exprs": [
+    #           {
+    #             "type": "field",
+    #             "table": "entities.water_point",
+    #             "column": "code"
+    #           },
+    #           {
+    #             "type": "literal",
+    #             "valueType": "text",
+    #             "value": "10007"
+    #           }
+    #         ]
+    #       }
+    #     }
+    #   }
+    # },
+    # "d2ea9c20-bcd3-46f6-8f78-ccb795d1a91a": {
+    #   "layout": {
+    #     "x": 0,
+    #     "y": 0,
+    #     "w": 8,
+    #     "h": 8
+    #   },
+    #   "widget": {
+    #     "type": "Map",
+    #     "design": {
+    #       "baseLayer": "bing_road",
+    #       "layerViews": [
+    #         {
+    #           "id": "827187bf-a5fd-4d07-b34b-1e213407f96d",
+    #           "name": "Custom Layer",
+    #           "desc": "",
+    #           "type": "Markers",
+    #           "design": {
+    #             "sublayers": [
+    #               {
+    #                 "axes": {
+    #                   "geometry": {
+    #                     "expr": {
+    #                       "type": "field",
+    #                       "table": "entities.water_point",
+    #                       "column": "location"
+    #                     },
+    #                     "xform": null
+    #                   },
+    #                   "color": {
+    #                     "expr": {
+    #                       "type": "field",
+    #                       "table": "entities.water_point",
+    #                       "column": "type"
+    #                     },
+    #                     "xform": null,
+    #                     "colorMap": [
+    #                       {
+    #                         "value": "Protected dug well",
+    #                         "color": "#d0021b"
+    #                       },
+    #                       {
+    #                         "value": "Piped into dwelling",
+    #                         "color": "#4a90e2"
+    #                       }
+    #                     ]
+    #                   }
+    #                 },
+    #                 "color": "#0088FF",
+    #                 "filter": null,
+    #                 "table": "entities.water_point",
+    #                 "symbol": "font-awesome/star"
+    #               }
+    #             ]
+    #           },
+    #           "visible": true,
+    #           "opacity": 1
+    #         }
+    #       ],
+    #       "filters": {},
+    #       "bounds": {
+    #         "w": -103.7548828125,
+    #         "n": 23.160563309048314,
+    #         "e": -92.4169921875,
+    #         "s": 12.382928338487408
+    #       }
+    #     }
+    #   }
+    # },
+    # "9ef85e17-73aa-4b5f-8363-95f9a2e24193": {
+    #   "layout": {
+    #     "x": 8,
+    #     "y": 0,
+    #     "w": 8,
+    #     "h": 8
+    #   },
+    #   "widget": {
+    #     "type": "LayeredChart",
+    #     "design": {
+    #       "version": 1,
+    #       "layers": [
+    #         {
+    #           "axes": {
+    #             "x": {
+    #               "expr": {
+    #                 "type": "field",
+    #                 "table": "entities.water_point",
+    #                 "column": "type"
+    #               },
+    #               "xform": null
+    #             },
+    #             "y": {
+    #               "expr": {
+    #                 "type": "id",
+    #                 "table": "entities.water_point"
+    #               },
+    #               "aggr": "count",
+    #               "xform": null
+    #             }
+    #           },
+    #           "filter": null,
+    #           "table": "entities.water_point"
+    #         }
+    #       ],
+    #       "type": "bar"
+    #     }
+    #   }
+    # }
   }
 }
 

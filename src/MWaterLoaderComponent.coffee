@@ -31,7 +31,7 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
     children: React.PropTypes.func.isRequired                 # Called with (error, { schema:, dataSource:, widgetFactory:, layerFactory: })
 
   @defaultProps:
-    newLayers: [{ label: "Custom Layer", name: "Untitled Layer", type: "Markers", design: { } }]
+    newLayers: [{ label: "Custom Marker Layer", name: "Untitled Layer", type: "Markers", design: { } }]
 
   constructor: ->
     super
