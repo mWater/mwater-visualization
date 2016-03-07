@@ -6,6 +6,7 @@ ExprCompiler = require('mwater-expressions').ExprCompiler
 injectTableAlias = require('mwater-expressions').injectTableAlias
 ExprCleaner = require('mwater-expressions').ExprCleaner
 AxisBuilder = require '../axes/AxisBuilder'
+AdminIndicatorChoroplethLayerDesigner = require './AdminIndicatorChoroplethLayerDesigner'
 
 ###
 Layer that is composed of administrative regions colored by an indicator
@@ -89,7 +90,6 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
   createJsonQL: (design, filters) ->
     axisBuilder = new AxisBuilder(schema: @schema)
     exprCompiler = new ExprCompiler(@schema)
-
 
     # select _id, /*shape, */
     # (select sum(case when wp.type = 'Protected dug well' then 1.0 else 0.0 end)::decimal/sum(1.0)
@@ -265,7 +265,7 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
   #   # # React.createElement(LoadingLegend, 
   #   # #   url: "#{@apiUrl}maps/legend?type=#{@design.type}")
   
-  # isEditable: -> true
+  isEditable: -> true
 
   # True if layer is incomplete (e.g. brand new) and should be editable immediately
   isIncomplete: ->
@@ -298,12 +298,14 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
   
     return null
 
-  # # Pass in onDesignChange
-  # createDesignerElement: (options) ->
-  #   # Clean on way in and out
-  #   React.createElement(MarkersLayerDesignerComponent,
-  #     schema: @schema
-  #     dataSource: @dataSource
-  #     design: @cleanDesign(@design)
-  #     onDesignChange: (design) =>
-  #       options.onDesignChange(@cleanDesign(design)))
+  # Pass in onDesignChange
+  createDesignerElement: (options) ->
+    # Clean on way in and out
+    React.createElement(AdminIndicatorChoroplethLayerDesigner,
+      schema: @schema
+      dataSource: @dataSource
+      design: @cleanDesign(@design)
+      onDesignChange: (design) =>
+        options.onDesignChange(@cleanDesign(design)))
+
+
