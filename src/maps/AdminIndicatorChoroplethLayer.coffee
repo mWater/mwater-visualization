@@ -10,8 +10,11 @@ AxisBuilder = require '../axes/AxisBuilder'
 ###
 Layer that is composed of administrative regions colored by an indicator
 Design is:
+  region: _id of overall admin region. Null for whole world.
+  detailLevel: admin level to disaggregate to 
+
   table: table to get data from
-  adminRegionExpr: expression to get admin region id
+  adminRegionExpr: expression to get admin region id for calculations
 
   condition: filter for numerator
   basis: optional filter for numerator and denominator
@@ -94,6 +97,15 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
     # from admin_regions 
     # where shape && !bbox! and path ->> 0 = '39dc194a-ffed-4a9c-95bf-1761a8d0b794' and level = 1  
 
+    # Compile adminRegionExpr
+    compiledAdminRegionExpr = exprCompiler.compileExpr(expr: design.adminRegionExpr, tableAlias: "innerquery")
+
+    # Compile condition expression
+    compiledCondition = exprCompiler.compileExpr(expr: design.condition, tableAlias: "innerquery")
+
+    # Compile basis expression
+    compiledBasis = exprCompiler.compileExpr(expr: design.basis, tableAlias: "innerquery")
+
     valueQuery = {
       type: "scalar"
       expr: {
@@ -110,7 +122,10 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
                 exprs: [
                   { 
                     type: "case"
-                    cases: [{ when: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "innerquery", column: "type" }, "Protected dug well"]}, then: 1 }]
+                    cases: [{ 
+                      when: compiledCondition
+                      then: 1 
+                    }]
                     else: 0
                   }
                 ]
@@ -126,38 +141,44 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
       }
       from: {
         type: "join"
-        left: { type: "table", table: "entities.water_point", alias: "innerquery" }
+        left: exprCompiler.compileTable(design.table, "innerquery")
         right: { type: "table", table: "admin_region_subtrees", alias: "admin_region_subtrees" }
         kind: "inner"
         on: {
           type: "op"
           op: "="
           exprs: [
-            { type: "field", tableAlias: "innerquery", column: "admin_region" }
+            { type: "field", tableAlias: "innerquery", column: "admin_region" }#compiledAdminRegionExpr
             { type: "field", tableAlias: "admin_region_subtrees", column: "descendant" }
           ]
         }
       }
-      where: {
+    }
+
+    whereClauses = [
+      {
         type: "op"
         op: "="
         exprs: [
           { type: "field", tableAlias: "admin_region_subtrees", column: "ancestor" }
           { type: "field", tableAlias: "admin_regions", column: "_id" }
         ]
-      }
-    }
+      }      
+    ]
+
+    # Add basis
+    if compiledBasis
+      whereClauses.push(compiledBasis)
 
     # Then add extra filters passed in, if relevant
     relevantFilters = _.where(filters, table: design.table)
-    extraWhereClauses = []
     for filter in relevantFilters
-      extraWhereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
-    extraWhereClauses = _.compact(extraWhereClauses)
+      whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
+    whereClauses = _.compact(whereClauses)
 
-    if extraWhereClauses.length > 0
-      valueQuery.where = { type: "op", op: "and", exprs: [valueQuery.where].concat(extraWhereClauses) }
+    valueQuery.where = { type: "op", op: "and", exprs: whereClauses }
 
+    # Now create outer query
     wheres = [
       # Bounding box
       { 
@@ -168,31 +189,33 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
           { type: "token", token: "!bbox!" }
         ]
       }
-      # Outer administative region
-      {
+    ]
+
+    if design.region
+      wheres.push({
         type: "op"
         op: "="
         exprs: [
           { type: "op", op: "->>", exprs: [{ type: "field", tableAlias: "admin_regions", column: "path" }, 0] }
-          "39dc194a-ffed-4a9c-95bf-1761a8d0b794"
+          design.region
         ]
-      }
-      # Level to display
-      {
-        type: "op"
-        op: "="
-        exprs: [
-          { type: "field", tableAlias: "admin_regions", column: "level" }
-          1
-        ]
-      }
-    ]
+      })
+
+    # Level to display
+    wheres.push({
+      type: "op"
+      op: "="
+      exprs: [
+        { type: "field", tableAlias: "admin_regions", column: "level" }
+        design.detailLevel
+      ]
+    })
 
     query = {
       type: "query"
       selects: [
         { type: "select", expr: { type: "field", tableAlias: "admin_regions", column: "_id" }, alias: "id" }
-        { type: "select", expr: { type: "field", tableAlias: "admin_regions", column: "shape" }, alias: "the_geom_webmercator" }
+        { type: "select", expr: { type: "field", tableAlias: "admin_regions", column: "shape_simplified" }, alias: "the_geom_webmercator" }
         { type: "select", expr: valueQuery, alias: "value" } 
       ]
       from: { type: "table", table: "admin_regions", alias: "admin_regions" }
@@ -244,46 +267,36 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
   
   # isEditable: -> true
 
-  # # True if layer is incomplete (e.g. brand new) and should be editable immediately
-  # isIncomplete: ->
-  #   return @validateDesign(@cleanDesign(@design))
+  # True if layer is incomplete (e.g. brand new) and should be editable immediately
+  isIncomplete: ->
+    return @validateDesign(@cleanDesign(@design))
 
-  # # Returns a cleaned design
-  # # TODO this is awkward since the design is part of the object too
-  # cleanDesign: (design) ->
-  #   exprCleaner = new ExprCleaner(@schema)
-  #   axisBuilder = new AxisBuilder(schema: @schema)
+  # Returns a cleaned design
+  # TODO this is awkward since the design is part of the object too
+  cleanDesign: (design) ->
+    exprCleaner = new ExprCleaner(@schema)
 
-  #   # TODO clones entirely
-  #   design = _.cloneDeep(design)
-  #   design.sublayers = design.sublayers or [{}]
+    # TODO clones entirely
+    design = _.cloneDeep(design)
 
-  #   for sublayer in design.sublayers
-  #     sublayer.axes = sublayer.axes or {}
-  #     sublayer.color = sublayer.color or "#0088FF"
+    design.condition = exprCleaner.cleanExpr(design.condition, { table: design.table, types: ['boolean'] })
+    design.basis = exprCleaner.cleanExpr(design.basis, { table: design.table, types: ['boolean'] })
+    design.adminRegionExpr = exprCleaner.cleanExpr(design.adminRegionExpr, { table: design.table, types: ["id"], idTable: "admin_regions" })
+    design.factor = exprCleaner.cleanExpr(design.factor, { table: design.table, types: ["number"] })
 
-  #     for axisKey, axis of sublayer.axes
-  #       sublayer.axes[axisKey] = axisBuilder.cleanAxis(axis: axis, table: sublayer.table, aggrNeed: "none")
-
-  #     sublayer.filter = exprCleaner.cleanExpr(sublayer.filter, { table: sublayer.table })
-
-  #   return design
+    return design
 
   validateDesign: (design) ->
+    if not design.table
+      return "Missing table"
+
+    if not design.adminRegionExpr
+      return "Missing admin region expr"
+
+    if not design.condition
+      return "Missing condition"
+  
     return null
-  #   axisBuilder = new AxisBuilder(schema: @schema)
-
-  #   if design.sublayers.length < 1
-  #     return "No sublayers"
-
-  #   for sublayer in design.sublayers
-  #     if not sublayer.axes or not sublayer.axes.geometry
-  #       return "Missing axes"
-
-  #     error = axisBuilder.validateAxis(axis: sublayer.axes.geometry)
-  #     if error then return error
-
-  #   return null
 
   # # Pass in onDesignChange
   # createDesignerElement: (options) ->
