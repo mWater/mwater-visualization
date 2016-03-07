@@ -250,7 +250,7 @@ mapDesign = {
       name: "Choropleth"
       type: "AdminIndicatorChoropleth"
       design: { 
-        region: '39dc194a-ffed-4a9c-95bf-1761a8d0b794'
+        scope: '39dc194a-ffed-4a9c-95bf-1761a8d0b794'
         table: "entities.water_point" 
         adminRegionExpr: { type: "scalar", table: "entities.water_point", joins: ['admin_region'], expr: { type: "id", table: "admin_regions" } }
         detailLevel: 1

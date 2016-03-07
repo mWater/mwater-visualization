@@ -21,6 +21,7 @@ module.exports = class AdminIndicatorChoroplethLayerDesigner extends React.Compo
   update: (updates) ->
     @props.onDesignChange(_.extend({}, @props.design, updates))
 
+  handleScopeAndDetailLevelChange: (scope, detailLevel) => @update(scope: scope, detailLevel: detailLevel)
   handleTableChange: (table) => @update(table: table)
   handleAdminRegionExprChange: (expr) => @update(adminRegionExpr: expr)
   handleConditionChange: (expr) => @update(condition: expr)
@@ -62,7 +63,7 @@ module.exports = class AdminIndicatorChoroplethLayerDesigner extends React.Compo
     return H.div className: "form-group",
       H.label className: "text-muted", 
         H.span(className: "glyphicon glyphicon-scale")
-        " Condition (numerator"
+        " Condition (numerator)"
       H.div style: { marginLeft: 8 }, 
         React.createElement(FilterExprComponent, 
           schema: @props.schema
@@ -88,8 +89,46 @@ module.exports = class AdminIndicatorChoroplethLayerDesigner extends React.Compo
           table: @props.design.table
           value: @props.design.basis)
 
+  renderRegionAndDetailLevel: ->
+    getOptions = (input, cb) =>
+      query = {
+        type: "query"
+        selects: [
+          { type: "select", expr: { type: "field", tableAlias: "main", column: "country_id" }, alias: "country_id" }
+          { type: "select", expr: { type: "field", tableAlias: "main", column: "country" }, alias: "country" }
+          { type: "select", expr: { type: "field", tableAlias: "main", column: "level" }, alias: "level" }
+          { type: "select", expr: { type: "field", tableAlias: "main", column: "name" }, alias: "name" }
+        ]
+        from: { type: "table", table: "admin_region_levels", alias: "main" }
+      }
+
+      # Execute query
+      @props.dataSource.performQuery query, (err, rows) =>
+        if err
+          cb(err)
+          return 
+
+        cb(null, {
+          options: _.map(rows, (r) -> { value: r.country_id + ":" + r.level, label: "#{r.name} (#{r.country})" })
+          complete: true
+        })
+
+      return
+
+    return H.div className: "form-group",
+      H.label className: "text-muted", 
+        "Detail Level"
+      React.createElement ReactSelect, {
+        placeholder: "Select..."
+        value: @props.design.scope + ":" + @props.design.detailLevel
+        asyncOptions: getOptions
+        clearable: false
+        onChange: (value) => @handleScopeAndDetailLevelChange(value.split(":")[0], parseInt(value.split(":")[1]))
+      }
+
   render: ->
     H.div null,
+      @renderRegionAndDetailLevel()
       @renderTable()
       @renderAdminRegionExpr()
       @renderCondition()

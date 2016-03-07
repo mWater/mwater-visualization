@@ -11,7 +11,7 @@ AdminIndicatorChoroplethLayerDesigner = require './AdminIndicatorChoroplethLayer
 ###
 Layer that is composed of administrative regions colored by an indicator
 Design is:
-  region: _id of overall admin region. Null for whole world.
+  scope: _id of overall admin region. Null for whole world.
   detailLevel: admin level to disaggregate to 
 
   table: table to get data from
@@ -191,13 +191,13 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
       }
     ]
 
-    if design.region
+    if design.scope
       wheres.push({
         type: "op"
         op: "="
         exprs: [
           { type: "op", op: "->>", exprs: [{ type: "field", tableAlias: "admin_regions", column: "path" }, 0] }
-          design.region
+          design.scope
         ]
       })
 
@@ -289,6 +289,9 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
   validateDesign: (design) ->
     if not design.table
       return "Missing table"
+
+    if not design.detailLevel?
+      return "Missing detail level"
 
     if not design.adminRegionExpr
       return "Missing admin region expr"
