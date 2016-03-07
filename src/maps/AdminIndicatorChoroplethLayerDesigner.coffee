@@ -109,7 +109,7 @@ module.exports = class AdminIndicatorChoroplethLayerDesigner extends React.Compo
           return 
 
         cb(null, {
-          options: _.map(rows, (r) -> { value: r.country_id + ":" + r.level, label: "#{r.name} (#{r.country})" })
+          options: [{ value: ":0", label: "Countries" }].concat(_.map(rows, (r) -> { value: r.country_id + ":" + r.level, label: "#{r.name} (#{r.country})" }))
           complete: true
         })
 
@@ -120,10 +120,10 @@ module.exports = class AdminIndicatorChoroplethLayerDesigner extends React.Compo
         "Detail Level"
       React.createElement ReactSelect, {
         placeholder: "Select..."
-        value: @props.design.scope + ":" + @props.design.detailLevel
+        value: if @props.design.detailLevel? then (@props.design.scope or "") + ":" + @props.design.detailLevel else ""
         asyncOptions: getOptions
         clearable: false
-        onChange: (value) => @handleScopeAndDetailLevelChange(value.split(":")[0], parseInt(value.split(":")[1]))
+        onChange: (value) => @handleScopeAndDetailLevelChange(value.split(":")[0] or null, parseInt(value.split(":")[1]))
       }
 
   render: ->
