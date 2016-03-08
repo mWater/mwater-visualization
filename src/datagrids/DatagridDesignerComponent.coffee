@@ -119,6 +119,11 @@ class ColumnsDesignerComponent extends React.Component
     columns.push({ id: uuid.v4(), type: "expr", width: 150 })
     @props.onColumnsChange(columns)
 
+  handleAddIdColumn: =>
+    columns = @props.columns.slice()
+    columns.push({ id: uuid.v4(), type: "expr", width: 150, expr: { type: "id", table: @props.table }, label: "Unique Id" })
+    @props.onColumnsChange(columns)
+
   handleReorder: (elems) =>
     # Extract columns
     columns = _.map(elems, (e) -> e.props.column)
@@ -150,10 +155,18 @@ class ColumnsDesignerComponent extends React.Component
       H.button
         key: "add"
         type: "button"
-        className: "btn btn-default"
+        className: "btn btn-link"
         onClick: @handleAddColumn,
           H.span className: "glyphicon glyphicon-plus"
           " Add Column"
+
+      H.button
+        key: "add-id"
+        type: "button"
+        className: "btn btn-link"
+        onClick: @handleAddIdColumn,
+          H.span className: "glyphicon glyphicon-plus"
+          " Add Unique Id (advanced)"
 
 # Column item
 class ColumnDesignerComponent extends React.Component
