@@ -152,6 +152,8 @@ module.exports = class AxisBuilder
         # Add epsilon to prevent width_bucket from crashing
         if max == min
           max += epsilon
+        if max == min # If was too big to add epsilon
+          max = min * 1.00001
 
         compiledExpr = {
           type: "op"
@@ -324,8 +326,8 @@ module.exports = class AxisBuilder
       max = axis.xform.max
       numBins = axis.xform.numBins
 
-      # Special case of single value (min and max within epsilon of each other)
-      if (max - min) <= epsilon
+      # Special case of single value (min and max within epsilon or 0.01% of each other since epsilon might be too small to add to a big number)
+      if (max - min) <= epsilon or Math.abs((max - min)/(max + min)) < 0.0001
         return [
           { value: 0, label: "< #{min}"}
           { value: 1, label: "= #{min}"}
