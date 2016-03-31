@@ -148,7 +148,7 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
           type: "op"
           op: "="
           exprs: [
-            { type: "field", tableAlias: "innerquery", column: "admin_region" }#compiledAdminRegionExpr
+            compiledAdminRegionExpr
             { type: "field", tableAlias: "admin_region_subtrees", column: "descendant" }
           ]
         }

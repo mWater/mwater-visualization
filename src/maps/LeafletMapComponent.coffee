@@ -37,6 +37,8 @@ module.exports = class LeafletMapComponent extends React.Component
     touchZoom: React.PropTypes.bool         # Whether the map can be zoomed by touch-dragging with two fingers. Default true
     scrollWheelZoom: React.PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
 
+    maxZoom: React.PropTypes.number         # Maximum zoom level
+
   @defaultProps: 
     dragging: true
     touchZoom: true
@@ -56,6 +58,7 @@ module.exports = class LeafletMapComponent extends React.Component
       dragging: @props.dragging
       touchZoom: @props.touchZoom
       scrollWheelZoom: @props.scrollWheelZoom
+      maxZoom: @props.maxZoom
     })
 
     # Fire onBoundsChange
@@ -80,7 +83,7 @@ module.exports = class LeafletMapComponent extends React.Component
       if e == w
         e += 0.001
 
-      @map.fitBounds(new L.LatLngBounds([[n, w], [s, e]]))
+      @map.fitBounds(new L.LatLngBounds([[s, w], [n, e]]))
     else
       # Fit world doesn't work sometimes. Make sure that entire left-right is included
       @map.fitBounds([[-1, -180], [1, 180]])
