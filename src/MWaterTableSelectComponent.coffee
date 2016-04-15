@@ -172,9 +172,6 @@ class FormsListComponent extends React.Component
     if @state.error
       return H.div className: "alert alert-danger", @state.error
 
-    if not @state.forms
-      return H.div className: "alert alert-info", "Loading..."
-
     # Filter forms
     if @state.search
       escapeRegExp = (s) ->
@@ -195,16 +192,23 @@ class FormsListComponent extends React.Component
           return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @props.onChange.bind(null, table.id) }
         )
 
-      H.input 
-        type: "text"
-        className: "form-control input-sm"
-        placeholder: "Search..."
-        key: "search"
-        ref: @searchRef
-        style: { maxWidth: "20em", marginBottom: 10 }
-        value: @state.search
-        onChange: (ev) => @setState(search: ev.target.value)
+      H.br()
 
-      R OptionListComponent,
-        items: _.map(forms, (form) => { name: form.name, desc: form.desc, onClick: @props.onChange.bind(null, "responses:" + form.id) })
+      if not @state.forms
+        H.div className: "alert alert-info", "Loading..."
+      else
+        [
+          H.input 
+            type: "text"
+            className: "form-control input-sm"
+            placeholder: "Search..."
+            key: "search"
+            ref: @searchRef
+            style: { maxWidth: "20em", marginBottom: 10 }
+            value: @state.search
+            onChange: (ev) => @setState(search: ev.target.value)
+
+          R OptionListComponent,
+            items: _.map(forms, (form) => { name: form.name, desc: form.desc, onClick: @props.onChange.bind(null, "responses:" + form.id) })
+        ]
 
