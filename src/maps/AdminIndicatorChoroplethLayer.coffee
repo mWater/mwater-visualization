@@ -216,6 +216,7 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
       selects: [
         { type: "select", expr: { type: "field", tableAlias: "admin_regions", column: "_id" }, alias: "id" }
         { type: "select", expr: { type: "field", tableAlias: "admin_regions", column: "shape_simplified" }, alias: "the_geom_webmercator" }
+        { type: "select", expr: { type: "field", tableAlias: "admin_regions", column: "name" }, alias: "name" }
         { type: "select", expr: valueQuery, alias: "value" } 
       ]
       from: { type: "table", table: "admin_regions", alias: "admin_regions" }
@@ -236,6 +237,10 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
         line-opacity: 0.5;
         polygon-opacity: 0.7;
         polygon-fill: #ffffff;
+        text-name: [name];
+        text-face-name: 'Times New Roman'; 
+        /* text-halo-radius: 1;
+        text-halo-fill: #DDD;        */
       }
     '''
 

@@ -4,7 +4,7 @@ H = React.DOM
 LegoLayoutEngine = require './LegoLayoutEngine'
 WidgetScoper = require './WidgetScoper'
 WidgetContainerComponent = require './WidgetContainerComponent'
-ReactElementPrinter = require './../ReactElementPrinter'
+ReactElementPrinter = require 'react-library/lib/ReactElementPrinter'
 
 WidgetScopesViewComponent = require './WidgetScopesViewComponent'
 

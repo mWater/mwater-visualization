@@ -81,7 +81,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
 
   renderIndicators: ->
     tables = _.filter(@props.schema.getTables(), (table) => table.id.match(/^indicator_values:/))
-    tables = _.sortBy(tables, "name")
+    tables = _.sortBy(tables, (t) -> t.name.en)
 
     # Add all indicators to top
     table = @props.schema.getTable("response_indicators")
@@ -186,7 +186,15 @@ class FormsListComponent extends React.Component
     else
       forms = @state.forms
 
+    tables = _.filter(@props.schema.getTables(), (table) => table.id.match(/^responses:/) or table.id.match(/^master_responses:/))
+    tables = _.sortBy(tables, (t) -> t.name.en)
+
     H.div null,
+      R OptionListComponent,
+        items: _.map(tables, (table) =>
+          return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @props.onChange.bind(null, table.id) }
+        )
+
       H.input 
         type: "text"
         className: "form-control input-sm"
