@@ -59,6 +59,7 @@ module.exports = class LeafletMapComponent extends React.Component
       touchZoom: @props.touchZoom
       scrollWheelZoom: @props.scrollWheelZoom
       maxZoom: @props.maxZoom
+      minZoom: 1  # Bing doesn't allow going to zero
     })
 
     # Fire onBoundsChange

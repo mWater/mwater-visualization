@@ -95,7 +95,7 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
     # (select sum(case when wp.type = 'Protected dug well' then 1.0 else 0.0 end)::decimal/sum(1.0)
     # from entities.water_point as wp inner join admin_region_subtrees on wp.admin_region = admin_region_subtrees.descendant where admin_region_subtrees.ancestor = admin_regions._id)
     # from admin_regions 
-    # where shape && !bbox! and path ->> 0 = '39dc194a-ffed-4a9c-95bf-1761a8d0b794' and level = 1  
+    # where shape && !bbox! and path ->> 0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb' and level = 1  
 
     # Compile adminRegionExpr
     compiledAdminRegionExpr = exprCompiler.compileExpr(expr: design.adminRegionExpr, tableAlias: "innerquery")
