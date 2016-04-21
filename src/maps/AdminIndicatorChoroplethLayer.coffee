@@ -64,11 +64,11 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
     if @client
       query += "&client=" + @client
 
+    jsonql = @createJsonQL(design, filters)
+
     # Create design
     mapDesign = {
-      layers: [{ id: "layer0", jsonql: @createJsonQL(design, filters)
-        }
-      ]
+      layers: [{ id: "layer0", jsonql: jsonql }]
       css: @createCss()
       # interactivity: { 
       #   layer: "layer0"
@@ -298,7 +298,7 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
     if not design.detailLevel?
       return "Missing detail level"
 
-    if not design.adminRegionExpr
+    if not design.adminRegionExpr or 
       return "Missing admin region expr"
 
     if not design.condition
