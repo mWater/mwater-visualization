@@ -28,6 +28,7 @@ module.exports = class DatagridComponent extends React.Component
 
   componentWillReceiveProps: (nextProps) ->
     # If design changed, delete all rows
+    # TODO won't this reload on column resize?
     if not _.isEqual(nextProps.design, @props.design)
       @setState(rows: [], entirelyLoaded: false)
 
