@@ -3,6 +3,7 @@ H = React.DOM
 
 Layer = require './Layer'
 ExprCompiler = require('mwater-expressions').ExprCompiler
+ExprUtils = require('mwater-expressions').ExprUtils
 injectTableAlias = require('mwater-expressions').injectTableAlias
 ExprCleaner = require('mwater-expressions').ExprCleaner
 AxisBuilder = require '../axes/AxisBuilder'
@@ -292,13 +293,15 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
     return design
 
   validateDesign: (design) ->
+    exprUtils = new ExprUtils(@schema)
+
     if not design.table
       return "Missing table"
 
     if not design.detailLevel?
       return "Missing detail level"
 
-    if not design.adminRegionExpr or 
+    if not design.adminRegionExpr or exprUtils.getExprType(design.adminRegionExpr) != "id"
       return "Missing admin region expr"
 
     if not design.condition
