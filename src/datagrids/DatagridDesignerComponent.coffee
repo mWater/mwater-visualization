@@ -23,19 +23,7 @@ module.exports = class DatagridDesignerComponent extends React.Component
 
   handleTableChange: (table) =>
     # Create default columns
-    columns = []
-
-    for col in @props.schema.getColumns(table)
-      # Skip joins
-      if col.type == "join"
-        continue 
-
-      columns.push({ 
-         id: uuid.v4()
-         type: "expr"
-         width: 150
-         expr: { type: "field", table: table, column: col.id }
-      })
+    columns = new DefaultColumnsBuilder(@props.schema).buildColumns(table)
 
     design = {
       table: table
@@ -99,6 +87,7 @@ class ColumnsDesignerComponent extends React.Component
     table: React.PropTypes.string.isRequired
     columns: React.PropTypes.array.isRequired     # Columns list See README.md of this folder
     onColumnsChange: React.PropTypes.func.isRequired # Called when columns changes
+    onAddAllColumns: React.PropTypes.func.isRequired  # Called to add all columns
 
   handleColumnChange: (columnIndex, column) =>
     columns = @props.columns.slice()
@@ -129,13 +118,25 @@ class ColumnsDesignerComponent extends React.Component
     columns = _.map(elems, (e) -> e.props.column)
     @props.onColumnsChange(columns)
 
+  handleAddDefaultColumns: =>
+    columns = @props.columns.concat(new DefaultColumnsBuilder(@props.schema).buildColumns(@props.table))
+    @props.onColumnsChange(columns)
+
   handleRemoveAllColumns: => 
     @props.onColumnsChange([])
 
   render: ->
     H.div style: { height: 800, overflowY: "auto", overflowX: "hidden" }, 
-      H.div style: { textAlign: "right" }, key: "removeall",
+      H.div style: { textAlign: "right" }, key: "options",
         H.button
+          key: "addAll"
+          type: "button"
+          className: "btn btn-link btn-xs"
+          onClick: @handleAddDefaultColumns,
+            H.span className: "glyphicon glyphicon-plus"
+            " Add Default Columns"
+        H.button
+          key: "removeAll"
           type: "button"
           className: "btn btn-link btn-xs"
           onClick: @handleRemoveAllColumns,
@@ -275,4 +276,25 @@ class ColumnDesignerComponent extends React.Component
           H.span className: "glyphicon glyphicon-remove"
 
 
+# Builds default columns
+class DefaultColumnsBuilder
+  constructor: (schema) ->
+    @schema = schema
 
+  buildColumns: (table) ->
+    # Create default columns
+    columns = []
+
+    for col in @schema.getColumns(table)
+      # Skip joins
+      if col.type == "join"
+        continue 
+
+      columns.push({ 
+         id: uuid.v4()
+         type: "expr"
+         width: 150
+         expr: { type: "field", table: table, column: col.id }
+      })
+
+    return columns
