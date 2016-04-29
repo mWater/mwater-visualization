@@ -210,8 +210,8 @@ $ ->
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
@@ -279,7 +279,7 @@ mapDesign = {
 
 dashboardDesign = {
   "items": {
-    "942e0cee-fd4f-4ff6-b394-c1091180ecdb": {
+    "4ed3415c-30c1-45fe-8984-dbffb9dd42d1": {
       "layout": {
         "x": 0,
         "y": 0,
@@ -287,50 +287,75 @@ dashboardDesign = {
         "h": 8
       },
       "widget": {
-        "type": "TableChart",
+        "type": "LayeredChart",
         "design": {
-          "version": 1,
-          "columns": [
+          "xAxisLabelText": "",
+          "yAxisLabelText": "",
+          "version": 2,
+          "layers": [
             {
-              "textAxis": {
-                "expr": {
-                  "type": "field",
-                  "table": "entities.water_point",
-                  "column": "name"
-                }
-              }
-            }
-          ],
-          "orderings": [],
-          "table": "entities.water_point",
-          "filter": {
-            "type": "op",
-            "table": "entities.water_point",
-            "op": "within",
-            "exprs": [
-              {
-                "type": "scalar",
-                "table": "entities.water_point",
-                "joins": [
-                  "admin_region"
-                ],
-                "expr": {
-                  "type": "id",
-                  "table": "admin_regions"
+              "axes": {
+                "color": {
+                  "expr": {
+                    "type": "scalar",
+                    "table": "entities.water_point",
+                    "joins": [
+                      "!indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9.Water point"
+                    ],
+                    "expr": {
+                      "type": "field",
+                      "table": "indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9",
+                      "column": "Functionality"
+                    },
+                    "aggr": "last"
+                  },
+                  "xform": null
+                },
+                "y": {
+                  "expr": {
+                    "type": "id",
+                    "table": "entities.water_point"
+                  },
+                  "aggr": "count",
+                  "xform": null
                 }
               },
-              {
-                "type": "literal",
-                "valueType": "id",
-                "idTable": "admin_regions",
-                "value": "abed5734-4598-45ac-8d7b-def868c2cb7c"
-              }
-            ]
-          }
+              "filter": {
+                "type": "op",
+                "table": "entities.water_point",
+                "op": "= any",
+                "exprs": [
+                  {
+                    "type": "scalar",
+                    "table": "entities.water_point",
+                    "joins": [
+                      "!indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9.Water point"
+                    ],
+                    "expr": {
+                      "type": "field",
+                      "table": "indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9",
+                      "column": "Functionality"
+                    },
+                    "aggr": "last"
+                  },
+                  {
+                    "type": "literal",
+                    "valueType": "enumset",
+                    "value": [
+                      "Functional"
+                    ]
+                  }
+                ]
+              },
+              "table": "entities.water_point"
+            }
+          ],
+          "type": "donut"
         }
       }
     }
-     
+  }
+}
     # "d41a2dd2-85bd-46d8-af9a-a650af4c0047": {
     #   "layout": {
     #     "x": 16,
@@ -515,8 +540,8 @@ dashboardDesign = {
     #     }
     #   }
     # }
-  }
-}
+#   }
+# }
 
 #   {
 #   "items": {

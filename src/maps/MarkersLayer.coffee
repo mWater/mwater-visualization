@@ -237,8 +237,8 @@ module.exports = class MarkersLayer extends Layer
       sublayer.axes = sublayer.axes or {}
       sublayer.color = sublayer.color or "#0088FF"
 
-      for axisKey, axis of sublayer.axes
-        sublayer.axes[axisKey] = axisBuilder.cleanAxis(axis: axis, table: sublayer.table, aggrNeed: "none")
+      sublayer.axes.geometry = axisBuilder.cleanAxis(axis: sublayer.axes.geometry, table: sublayer.table, types: ['geometry'], aggrNeed: "none")
+      sublayer.axes.color = axisBuilder.cleanAxis(axis: sublayer.axes.color, table: sublayer.table, types: ['enum', 'text', 'boolean'], aggrNeed: "none")
 
       sublayer.filter = exprCleaner.cleanExpr(sublayer.filter, { table: sublayer.table })
 
