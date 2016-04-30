@@ -105,7 +105,7 @@ module.exports = class MarkersLayer extends Layer
     # row_number() over (partition by st_snaptogrid(location, !pixel_width!*5, !pixel_height!*5)) AS r
     cluster = { 
       type: "select" 
-      expr: { type: "op", op: "row_number" }
+      expr: { type: "op", op: "row_number", exprs: [] }
       over: { partitionBy: [
         { type: "op", op: "ST_SnapToGrid", exprs: [
           geometryExpr
