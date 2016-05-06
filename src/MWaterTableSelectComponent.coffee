@@ -15,7 +15,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
     apiUrl: React.PropTypes.string.isRequired # Url to hit api
     client: React.PropTypes.string            # Optional client
     schema: React.PropTypes.object.isRequired
-    user: React.PropTypes.string
+    user: React.PropTypes.string              # User id
 
     table: React.PropTypes.string
     onChange: React.PropTypes.func.isRequired # Called with table selected
@@ -123,7 +123,7 @@ class FormsListComponent extends React.Component
     apiUrl: React.PropTypes.string.isRequired # Url to hit api
     client: React.PropTypes.string            # Optional client
     schema: React.PropTypes.object.isRequired
-    user: React.PropTypes.string
+    user: React.PropTypes.string              # User id
     onChange: React.PropTypes.func.isRequired # Called with table selected
     extraTables: React.PropTypes.array.isRequired
 

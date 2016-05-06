@@ -16,7 +16,7 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
   @propTypes:
     apiUrl: React.PropTypes.string.isRequired
     client: React.PropTypes.string
-    user: React.PropTypes.string                              # username of logged in user
+    user: React.PropTypes.string                              # user id of logged in user
 
     extraTables: React.PropTypes.arrayOf(React.PropTypes.string)  # Extra tables to load in schema. Forms are not loaded by default as they are too many
     onExtraTablesChange: React.PropTypes.func                     # Called when extra tables are changed and schema should be reloaded
