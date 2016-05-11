@@ -77,6 +77,8 @@ class ChartWidgetComponent extends React.Component
 
       # Create data table
       table = @props.chart.createDataTable(@props.design, data, @context.locale)
+      if not table
+        return
 
       # Convert to csv
       csv = new CsvBuilder().build(table)

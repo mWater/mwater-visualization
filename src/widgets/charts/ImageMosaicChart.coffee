@@ -142,7 +142,8 @@ module.exports = class ImageMosaicChart extends Chart
     return React.createElement(ImageMosaicChartViewComponent, props)
 
   createDataTable: (design, data) ->
-    super
+    alert("Not available for Image Mosaics")
+    return null
     # TODO
     # renderHeaderCell = (column) =>
     #   column.headerText or @axisBuilder.summarizeAxis(column.textAxis)
