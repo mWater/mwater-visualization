@@ -6,6 +6,7 @@ moment = require 'moment'
 
 ExprCompiler = require("mwater-expressions").ExprCompiler
 ExprUtils = require("mwater-expressions").ExprUtils
+ExprCellComponent = require './ExprCellComponent'
 
 {Table, Column, Cell} = require('fixed-data-table')
 
@@ -129,10 +130,6 @@ module.exports = class DatagridComponent extends React.Component
 
     @props.onDesignChange(_.extend({}, @props.design, { columns: columns }))
 
-  renderImage: (id) ->
-    url = @props.dataSource.getImageUrl(id)
-    return H.a(href: url, key: id, target: "_blank", style: { paddingLeft: 5, paddingRight: 5 }, "Image")
-
   renderCell: (column, columnIndex, exprType, cellProps) =>
     # If rendering placeholder row
     if cellProps.rowIndex >= @state.rows.length
@@ -143,36 +140,15 @@ module.exports = class DatagridComponent extends React.Component
     # Get value (columns are c0, c1, c2, etc.)
     value = @state.rows[cellProps.rowIndex]["c#{columnIndex}"]
 
-    exprUtils = new ExprUtils(@props.schema)
-
-    if not value?
-      node = null
-    else
-      # Parse if should be JSON
-      if exprType in ['image', 'imagelist', 'geometry', 'text[]'] and _.isString(value)
-        value = JSON.parse(value)
-
-      # Convert to node based on type
-      switch exprType
-        when "text", "number"
-          node = value
-        when "boolean", "enum", "enumset", "text[]"
-          node = exprUtils.stringifyExprLiteral(column.expr, value)
-        when "date"
-          node = moment(value, "YYYY-MM-DD").format("ll")
-        when "datetime"
-          node = moment(value, moment.ISO_8601).format("lll")
-        when "image"
-          node = @renderImage(value.id)
-        when "imagelist"
-          node = _.map(value, (v) => @renderImage(v.id))
-        when "geometry"
-          node = "#{value.coordinates[1].toFixed(6)} #{value.coordinates[0].toFixed(6)}" 
-        else
-          node = "" + value
-
-    return R Cell, { width: cellProps.width, height: cellProps.height, style: { whiteSpace: "nowrap" } }, 
-      node
+    if column.type == "expr"
+      return R ExprCellComponent, 
+        schema: @props.schema
+        dataSource: @props.dataSource
+        width: cellProps.width
+        height: cellProps.height
+        value: value
+        expr: column.expr
+        exprType: exprType
 
   # Render a single column
   renderColumn: (column, columnIndex) ->
