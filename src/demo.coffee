@@ -16,6 +16,8 @@ CalendarChartViewComponent = require './widgets/charts/CalendarChartViewComponen
 MWaterLoaderComponent = require './MWaterLoaderComponent'
 MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 
+AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
+
 # class DashboardPane extends React.Component
 #   constructor: (props) ->
 #     super
@@ -158,6 +160,41 @@ class MWaterDatagridDesignerPane extends React.Component
         })
     )
 
+class MWaterDatagridPane extends React.Component
+  constructor: (props) ->
+    super
+
+    @state = {
+      design: datagridDesign
+      extraTables: []
+    }
+
+  handleDesignChange: (design) =>
+    @setState(design: design)
+    console.log JSON.stringify(design, null, 2)
+    
+  render: ->
+    React.createElement(MWaterLoaderComponent, {
+      apiUrl: @props.apiUrl
+      client: @props.client
+      user: @props.user
+      onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
+      extraTables: @state.extraTables
+    }, (error, config) =>
+      H.div style: { height: "100%" },
+        React.createElement(AutoSizeComponent, injectWidth: true, injectHeight: true, 
+          (size) =>
+            React.createElement(visualization.DatagridComponent, {
+              width: size.width
+              height: size.height
+              schema: config.schema
+              dataSource: config.dataSource
+              design: @state.design
+              onDesignChange: @handleDesignChange
+            })
+        )
+    )
+
 
 # class MapPane extends React.Component
 #   constructor: (props) ->
@@ -211,12 +248,109 @@ $ ->
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
   ReactDOM.render(sample, document.getElementById("main"))
+
+datagridDesign = {
+  "table": "entities.community",
+  "columns": [
+    {
+      "id": "5859b3fc-64f0-42c1-a035-9dffbfd13132",
+      "type": "expr",
+      "width": 150,
+      "expr": {
+        "type": "field",
+        "table": "entities.community",
+        "column": "code"
+      }
+    },
+    {
+      "id": "a2c21f4f-2f15-4d11-b2cc-eba8c85e0bbb",
+      "type": "expr",
+      "width": 150,
+      "expr": {
+        "type": "field",
+        "table": "entities.community",
+        "column": "desc"
+      }
+    },
+    {
+      "id": "4162d2d4-c8d0-4e13-8075-7e42f44e57c2",
+      "type": "expr",
+      "width": 150,
+      "expr": {
+        "type": "field",
+        "table": "entities.community",
+        "column": "location"
+      }
+    },
+    {
+      "id": "d5bb43c5-5666-43d9-aef5-3b20fe0d8eee",
+      "type": "expr",
+      "width": 150,
+      "expr": {
+        "type": "field",
+        "table": "entities.community",
+        "column": "location_accuracy"
+      }
+    },
+    {
+      "id": "220f48a7-565f-4374-b42d-eed32a799421",
+      "type": "expr",
+      "width": 150,
+      "expr": {
+        "type": "field",
+        "table": "entities.community",
+        "column": "location_altitude"
+      }
+    },
+    {
+      "id": "dcab1083-a60f-4def-bd7d-de4c9dff4945",
+      "type": "expr",
+      "width": 150,
+      "expr": {
+        "type": "field",
+        "table": "entities.community",
+        "column": "name"
+      }
+    },
+    {
+      "id": "3e53e5f9-149d-4a69-8e90-a18a19efc843",
+      "type": "expr",
+      "width": 150,
+      "expr": {
+        "type": "field",
+        "table": "entities.community",
+        "column": "photos"
+      }
+    },
+    {
+      "id": "aea0a8fd-1470-46ea-93e8-939b0797b0f6",
+      "type": "expr",
+      "width": 150,
+      "expr": {
+        "type": "field",
+        "table": "entities.community",
+        "column": "_created_by"
+      }
+    },
+    {
+      "id": "918804c5-769e-4e4a-aacf-762d4474eb61",
+      "type": "expr",
+      "width": 150,
+      "expr": {
+        "type": "field",
+        "table": "entities.community",
+        "column": "_created_on"
+      }
+    }
+  ]
+}
 
 # Caching data source for mWater. Requires jQuery
 class MWaterDataSource extends DataSource

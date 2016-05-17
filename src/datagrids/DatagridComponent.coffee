@@ -9,6 +9,8 @@ ExprUtils = require("mwater-expressions").ExprUtils
 
 {Table, Column, Cell} = require('fixed-data-table')
 
+# Datagrid table itself without decorations such as edit button etc.
+# See README.md for description of datagrid format
 module.exports = class DatagridComponent extends React.Component
   @propTypes:
     width: React.PropTypes.number.isRequired      # Width of control
@@ -18,6 +20,9 @@ module.exports = class DatagridComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired # dataSource to use
     design: React.PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
     onDesignChange: React.PropTypes.func.isRequired # Called when design changes
+
+  @defaultProps:
+    pageSize: 100
 
   constructor: (props) ->
     super

@@ -2,6 +2,7 @@
 @import "leaflet/dist/leaflet.css";
 @import "react-bootstrap-daterangepicker/css/daterangepicker.css";
 @import "mwater-expressions-ui";
+@import "fixed-data-table/dist/fixed-data-table.min.css";
 
 /* http://stackoverflow.com/questions/19305821/multiple-modals-overlay */
 .modal { overflow-y: auto; }
