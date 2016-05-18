@@ -83,8 +83,8 @@ gulp.task "libs_js", ->
     "bower_components/lodash/lodash.js"
     "bower_components/d3/d3.js"
     "bower_components/c3/c3.js"
-    "vendor/react-0.14.3.js"
-    "vendor/react-dom-0.14.3.js"
+    "vendor/react-15.0.2.js"
+    "vendor/react-dom-15.0.2.js"
   ]).pipe(concat("libs.js"))
     .pipe(gulp.dest("./dist/js/"))
 
