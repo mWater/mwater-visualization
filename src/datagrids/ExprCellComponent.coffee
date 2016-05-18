@@ -65,5 +65,8 @@ module.exports = class ExprCellComponent extends React.Component
       width: @props.width
       height: @props.height
       onClick: @props.onClick
-      style: { whiteSpace: "nowrap" }, 
+      style: { 
+        whiteSpace: "nowrap" 
+        textAlign: if @props.exprType in ['number'] then "right" else "left"
+      }, 
         node

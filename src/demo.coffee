@@ -191,6 +191,12 @@ class MWaterDatagridPane extends React.Component
               dataSource: config.dataSource
               design: @state.design
               onDesignChange: @handleDesignChange
+              # Called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
+              canEditCell: (tableId, rowId, expr, callback) => callback(null, true)
+              updateCell: (tableId, rowId, expr, value, callback) => 
+                setTimeout () =>
+                  callback(null)
+              , 1000
             })
         )
     )
@@ -257,7 +263,7 @@ $ ->
   ReactDOM.render(sample, document.getElementById("main"))
 
 datagridDesign = {
-  "table": "entities.community",
+  "table": "entities.water_point",
   "columns": [
     {
       "id": "5859b3fc-64f0-42c1-a035-9dffbfd13132",
@@ -265,7 +271,7 @@ datagridDesign = {
       "width": 150,
       "expr": {
         "type": "field",
-        "table": "entities.community",
+        "table": "entities.water_point",
         "column": "code"
       }
     },
@@ -275,7 +281,7 @@ datagridDesign = {
       "width": 150,
       "expr": {
         "type": "field",
-        "table": "entities.community",
+        "table": "entities.water_point",
         "column": "desc"
       }
     },
@@ -285,7 +291,7 @@ datagridDesign = {
       "width": 150,
       "expr": {
         "type": "field",
-        "table": "entities.community",
+        "table": "entities.water_point",
         "column": "location"
       }
     },
@@ -295,7 +301,7 @@ datagridDesign = {
       "width": 150,
       "expr": {
         "type": "field",
-        "table": "entities.community",
+        "table": "entities.water_point",
         "column": "location_accuracy"
       }
     },
@@ -305,7 +311,7 @@ datagridDesign = {
       "width": 150,
       "expr": {
         "type": "field",
-        "table": "entities.community",
+        "table": "entities.water_point",
         "column": "location_altitude"
       }
     },
@@ -315,8 +321,18 @@ datagridDesign = {
       "width": 150,
       "expr": {
         "type": "field",
-        "table": "entities.community",
+        "table": "entities.water_point",
         "column": "name"
+      }
+    },
+    {
+      "id": "34671083-a60f-4def-bd7d-de4c9dff4945",
+      "type": "expr",
+      "width": 150,
+      "expr": {
+        "type": "field",
+        "table": "entities.water_point",
+        "column": "type"
       }
     },
     {
@@ -325,7 +341,7 @@ datagridDesign = {
       "width": 150,
       "expr": {
         "type": "field",
-        "table": "entities.community",
+        "table": "entities.water_point",
         "column": "photos"
       }
     },
@@ -335,7 +351,7 @@ datagridDesign = {
       "width": 150,
       "expr": {
         "type": "field",
-        "table": "entities.community",
+        "table": "entities.water_point",
         "column": "_created_by"
       }
     },
@@ -345,7 +361,7 @@ datagridDesign = {
       "width": 150,
       "expr": {
         "type": "field",
-        "table": "entities.community",
+        "table": "entities.water_point",
         "column": "_created_on"
       }
     }
