@@ -90,6 +90,12 @@ class NumberEditComponent extends React.Component
     # Focus when created
     @refs.input?.focus()
 
+  handleChange: (ev) =>
+    if ev.target.value
+      @props.onChange(parseFloat(ev.target.value))
+    else
+      @props.onChange(null)
+
   render: ->
     H.div style: { paddingTop: 3 },
       H.input 
@@ -98,7 +104,7 @@ class NumberEditComponent extends React.Component
         step: "any"
         className: "form-control"
         value: if @props.value? then @props.value else ""
-        onChange: (ev) => @props.onChange(ev.target.value or null)
+        onChange: @handleChange
         onKeyUp: (ev) =>
           if ev.keyCode == 27
             @props.onCancel()

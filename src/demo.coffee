@@ -194,9 +194,10 @@ class MWaterDatagridPane extends React.Component
               # Called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
               canEditCell: (tableId, rowId, expr, callback) => callback(null, true)
               updateCell: (tableId, rowId, expr, value, callback) => 
+                console.log value
                 setTimeout () =>
                   callback(null)
-              , 1000
+              , 500
             })
         )
     )
