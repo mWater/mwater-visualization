@@ -207,7 +207,9 @@ class FormsListComponent extends React.Component
 
       H.label null, "All Forms:"
       if not @state.forms
-        H.div className: "alert alert-info", "Loading..."
+        H.div className: "alert alert-info", 
+          H.i className: "fa fa-spinner fa-spin"
+            "\u00A0Loading..."
       else
         [
           H.input 
