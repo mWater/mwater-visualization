@@ -22,12 +22,13 @@ module.exports = class DatagridDesignerComponent extends React.Component
     onDesignChange: React.PropTypes.func.isRequired # Called when design changes
 
   handleTableChange: (table) =>
-    # Create default columns
-    columns = new DefaultColumnsBuilder(@props.schema).buildColumns(table)
+    # No longer add default columns
+    # # Create default columns
+    # columns = new DefaultColumnsBuilder(@props.schema).buildColumns(table)
 
     design = {
       table: table
-      columns: columns
+      columns: []
     }
 
     @props.onDesignChange(design)

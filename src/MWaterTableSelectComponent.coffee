@@ -102,14 +102,21 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       )
 
   render: ->
-    editor = R TabbedComponent,
-      tabs: [
-        { id: "sites", label: "Sites", elem: @renderSites() }
-        { id: "forms", label: "Forms", elem: @renderForms() }
-        { id: "indicators", label: "Indicators", elem: @renderIndicators() }
-        { id: "other", label: "Other", elem: @renderOther() }
-      ]
-      initialTabId: "sites"
+    editor = H.div null,
+      # Show message if loading
+      if @state.pendingExtraTable
+        H.div className: "alert alert-info", key: "pendingExtraTable",
+          H.i className: "fa fa-spinner fa-spin"
+          "\u00a0Please wait..."
+
+      R TabbedComponent,
+        tabs: [
+          { id: "sites", label: "Sites", elem: @renderSites() }
+          { id: "forms", label: "Forms", elem: @renderForms() }
+          { id: "indicators", label: "Indicators", elem: @renderIndicators() }
+          { id: "other", label: "Other", elem: @renderOther() }
+        ]
+        initialTabId: "sites"
 
     R ToggleEditComponent,
       ref: "toggleEdit"
@@ -156,9 +163,9 @@ class FormsListComponent extends React.Component
 
       # TODO use name instead of design.name
       @setState(forms: _.map(forms, (form) => { 
-          id: form._id
-          name: ExprUtils.localizeString(form.design.name, @context.locale)
-          desc: "Created by #{form.created.by}" 
+        id: form._id
+        name: ExprUtils.localizeString(form.design.name, @context.locale)
+        desc: "Created by #{form.created.by}" 
       }))
     .fail (xhr) =>
       @setState(error: xhr.responseText)
@@ -187,13 +194,18 @@ class FormsListComponent extends React.Component
     tables = _.sortBy(tables, (t) -> t.name.en)
 
     H.div null,
-      R OptionListComponent,
-        items: _.map(tables, (table) =>
-          return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @props.onChange.bind(null, table.id) }
-        )
+      H.label null, "Included Forms:"
+      if tables.length > 0
+        R OptionListComponent,
+          items: _.map(tables, (table) =>
+            return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @props.onChange.bind(null, table.id) }
+          )
+      else
+        H.div null, "None"
 
       H.br()
 
+      H.label null, "All Forms:"
       if not @state.forms
         H.div className: "alert alert-info", "Loading..."
       else
