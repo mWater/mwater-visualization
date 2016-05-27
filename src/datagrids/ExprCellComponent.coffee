@@ -14,6 +14,8 @@ module.exports = class ExprCellComponent extends React.Component
     schema: React.PropTypes.object.isRequired     # schema to use
     dataSource: React.PropTypes.object.isRequired # dataSource to use
 
+    locale: React.PropTypes.string      # Locale to use
+
     exprType: React.PropTypes.string.isRequired
 
     width: React.PropTypes.number.isRequired
@@ -47,7 +49,7 @@ module.exports = class ExprCellComponent extends React.Component
         when "text", "number"
           node = value
         when "boolean", "enum", "enumset", "text[]"
-          node = exprUtils.stringifyExprLiteral(@props.expr, value)
+          node = exprUtils.stringifyExprLiteral(@props.expr, value, @props.locale)
         when "date"
           node = moment(value, "YYYY-MM-DD").format("ll")
         when "datetime"

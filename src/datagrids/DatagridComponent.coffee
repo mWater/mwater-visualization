@@ -218,6 +218,7 @@ module.exports = class DatagridComponent extends React.Component
         ref: @refEditCell
         schema: @props.schema
         dataSource: @props.dataSource
+        locale: @props.design.locale
         width: cellProps.width
         height: cellProps.height
         value: value
@@ -229,6 +230,7 @@ module.exports = class DatagridComponent extends React.Component
       return R ExprCellComponent, 
         schema: @props.schema
         dataSource: @props.dataSource
+        locale: @props.design.locale
         width: cellProps.width
         height: cellProps.height
         value: value
@@ -245,7 +247,7 @@ module.exports = class DatagridComponent extends React.Component
 
     R Column,
       key: column.id
-      header: R Cell, style: { whiteSpace: "nowrap" }, column.label or exprUtils.summarizeExpr(column.expr)
+      header: R Cell, style: { whiteSpace: "nowrap" }, column.label or exprUtils.summarizeExpr(column.expr, @props.design.locale)
       width: column.width
       allowCellsRecycling: true
       cell: @renderCell.bind(null, column, columnIndex, exprType)

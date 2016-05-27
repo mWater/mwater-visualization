@@ -15,6 +15,8 @@ module.exports = class EditExprCellComponent extends React.Component
     schema: React.PropTypes.object.isRequired     # schema to use
     dataSource: React.PropTypes.object.isRequired # dataSource to use
 
+    locale: React.PropTypes.string      # Locale to use
+
     width: React.PropTypes.number.isRequired
     height: React.PropTypes.number.isRequired
 
@@ -48,7 +50,7 @@ module.exports = class EditExprCellComponent extends React.Component
       when "number"
         return R NumberEditComponent, value: @state.value, onChange: @handleChange, onSave: @props.onSave, onCancel: @props.onCancel
       when "enum"
-        return R EnumEditComponent, value: @state.value, onChange: @handleChange, enumValues: exprUtils.getExprEnumValues(@props.expr), onSave: @props.onSave, onCancel: @props.onCancel
+        return R EnumEditComponent, value: @state.value, onChange: @handleChange, enumValues: exprUtils.getExprEnumValues(@props.expr), onSave: @props.onSave, onCancel: @props.onCancel, locale: @props.locale
 
     throw new Error("Unsupported type #{exprType} for editing")
 
@@ -116,6 +118,7 @@ class EnumEditComponent extends React.Component
   @propTypes:
     value: React.PropTypes.any
     enumValues: React.PropTypes.array.isRequired
+    locale: React.PropTypes.string      # Locale to use
     onChange: React.PropTypes.func.isRequired     # Called with new value
     onSave: React.PropTypes.func.isRequired       # Called when enter is pressed
     onCancel: React.PropTypes.func.isRequired     # Called when cancelled
@@ -128,4 +131,4 @@ class EnumEditComponent extends React.Component
         className: "form-control",
           H.option key: "", value: "", ""
           _.map @props.enumValues, (ev) =>
-            H.option key: ev.id, value: ev.id, ExprUtils.localizeString(ev.name)
+            H.option key: ev.id, value: ev.id, ExprUtils.localizeString(ev.name, @props.locale)

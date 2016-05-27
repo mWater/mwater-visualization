@@ -5,7 +5,7 @@
 `table`: table id of main table
 `columns`: array of columns
 `filter`: mwater-expression
-
+`locale`: locale to display localizable strings in. optional
 
 ### Column
 
