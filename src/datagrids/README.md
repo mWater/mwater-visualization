@@ -18,4 +18,5 @@ type: type of the column. see below
 `expr`: expression column
   label: label used for header
   expr: mwater-expression
+  preferEnumCodes: true to preferentially display enum codes over name TODO implement
 

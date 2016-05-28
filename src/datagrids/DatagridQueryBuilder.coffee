@@ -1,7 +1,9 @@
+_ = require 'lodash'
 ExprCompiler = require("mwater-expressions").ExprCompiler
 ExprUtils = require("mwater-expressions").ExprUtils
 
-# Builds a datagrid query
+# Builds a datagrid query. 
+# Warning: mwater-server requires this directly!
 module.exports = class DatagridQueryBuilder 
   constructor: (schema) ->
     @schema = schema
