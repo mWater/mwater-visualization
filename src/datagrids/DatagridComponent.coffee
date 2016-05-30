@@ -227,6 +227,9 @@ module.exports = class DatagridComponent extends React.Component
         onCancel: @handleCancelEdit
 
     if column.type == "expr"
+      # Muted if from main and are displaying subtable
+      muted = not column.subtable and @state.rows[cellProps.rowIndex].subtable >= 0
+
       return R ExprCellComponent, 
         schema: @props.schema
         dataSource: @props.dataSource
@@ -236,6 +239,7 @@ module.exports = class DatagridComponent extends React.Component
         value: value
         expr: column.expr
         exprType: exprType
+        muted: muted
         onClick: @handleCellClick.bind(null, cellProps.rowIndex, columnIndex)
 
   # Render a single column

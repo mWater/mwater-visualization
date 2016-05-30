@@ -24,6 +24,8 @@ module.exports = class ExprCellComponent extends React.Component
     value: React.PropTypes.any
     expr: React.PropTypes.object.isRequired
 
+    muted: React.PropTypes.bool       # True to show muted
+
     onClick: React.PropTypes.func
 
   handleClick: =>
@@ -70,5 +72,6 @@ module.exports = class ExprCellComponent extends React.Component
       style: { 
         whiteSpace: "nowrap" 
         textAlign: if @props.exprType in ['number'] then "right" else "left"
+        opacity: if @props.muted then 0.4 
       }, 
         node

@@ -165,8 +165,8 @@ class MWaterDatagridPane extends React.Component
     super
 
     @state = {
-      design: datagridDesign
-      extraTables: []
+      design: rosterDatagridDesign
+      extraTables: ["responses:3aee880e079a417ea51d388d95217edf"]
     }
 
   handleDesignChange: (design) =>
@@ -254,8 +254,9 @@ $ ->
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
@@ -1191,3 +1192,94 @@ dashboardDesign = {
 #       dataSource: @state.dataSource
 #       onDesignChange: @handleDesignChange
 #     )
+
+
+rosterDatagridDesign = {
+  "table": "responses:3aee880e079a417ea51d388d95217edf",
+  subtables: [
+    { id: "r1", joins: ["data:cb4661bb948c4c188f6b94bc7bb3ce1f"] }
+  ]
+  "columns": [
+    {
+      "id": "5fa704cf-f08b-4ff0-9b33-3814238a021a",
+      "type": "expr",
+      "width": 150,
+      "expr": {
+        "type": "field",
+        "table": "responses:3aee880e079a417ea51d388d95217edf",
+        "column": "deployment"
+      }
+    },
+    {
+      "id": "7e90248c-aa7e-4c90-b08a-7be61ac849d1",
+      "type": "expr",
+      "width": 150,
+      "expr": {
+        "type": "field",
+        "table": "responses:3aee880e079a417ea51d388d95217edf",
+        "column": "user"
+      }
+    },
+    {
+      "id": "5882d5b6-ee8c-44a0-abc2-a1782d9d1593",
+      "type": "expr",
+      "width": 150,
+      "expr": {
+        "type": "field",
+        "table": "responses:3aee880e079a417ea51d388d95217edf",
+        "column": "status"
+      }
+    },
+    {
+      "id": "1efa41fa-f173-467b-92ab-144d0899cf1b",
+      "type": "expr",
+      "width": 150,
+      "expr": {
+        "type": "field",
+        "table": "responses:3aee880e079a417ea51d388d95217edf",
+        "column": "code"
+      }
+    },
+    {
+      "id": "39cadddf-0ec7-401f-ade0-39bc726dbc5b",
+      "type": "expr",
+      "width": 150,
+      "expr": {
+        "type": "field",
+        "table": "responses:3aee880e079a417ea51d388d95217edf",
+        "column": "submittedOn"
+      }
+    },
+    {
+      "id": "efc513f6-94b2-4399-a98f-3fbec3a0d502",
+      "type": "expr",
+      "width": 150,
+      "expr": {
+        "type": "field",
+        "table": "responses:3aee880e079a417ea51d388d95217edf",
+        "column": "data:ec3613ba32184bf6bd69911055efad71:value"
+      }
+    },
+    {
+      "id": "79520f3e-71fd-4907-8dc6-6b25741a7277",
+      "type": "expr",
+      "width": 150,
+      "expr": {
+        "type": "field",
+        "table": "responses:3aee880e079a417ea51d388d95217edf",
+        "column": "data:4a276bc577254a63943cf77f86f86382:value"
+      }
+    }
+    {
+      "id": "roster1",
+      "type": "expr",
+      width: 200
+      subtable: "r1"
+      expr: {
+        type: "field"
+        table: "responses:3aee880e079a417ea51d388d95217edf:roster:cb4661bb948c4c188f6b94bc7bb3ce1f"
+        column: "data:37c99596f2e14feaa313431a91e3e620:value"
+      }
+    }
+  ]
+}
