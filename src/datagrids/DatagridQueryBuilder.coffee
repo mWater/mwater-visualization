@@ -15,7 +15,6 @@ module.exports = class DatagridQueryBuilder
   createQuery: (design, offset, limit) ->
     # Create query to get the page of rows at the specific offset
     design = design
-    exprCompiler = new ExprCompiler(@schema)
 
     # Handle simple case
     if not design.subtables or design.subtables.length == 0
@@ -25,6 +24,8 @@ module.exports = class DatagridQueryBuilder
 
   # Simple query with no subtables
   createSimpleQuery: (design, offset, limit) ->
+    exprCompiler = new ExprCompiler(@schema)
+
     query = {
       type: "query"
       selects: @createLoadSelects(design)
