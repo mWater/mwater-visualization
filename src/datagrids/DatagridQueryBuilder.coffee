@@ -48,8 +48,6 @@ module.exports = class DatagridQueryBuilder
 
   # Simple query with no subtables
   createComplexQuery: (design, offset, limit) ->
-    exprCompiler = new ExprCompiler(@schema)
-
     # Queries to union
     unionQueries = []
 
@@ -98,6 +96,8 @@ module.exports = class DatagridQueryBuilder
 
   # Create the main query (not joined to subtables) part of the overall complex query. See tests for more details
   createComplexMainQuery: (design) ->
+    exprCompiler = new ExprCompiler(@schema)
+
     # Create selects
     selects = [
       # Primary key
