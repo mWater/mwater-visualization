@@ -14,8 +14,6 @@ module.exports = class DatagridQueryBuilder
   # Create the query, starting at row offset for limit rows
   createQuery: (design, offset, limit) ->
     # Create query to get the page of rows at the specific offset
-    design = design
-
     # Handle simple case
     if not design.subtables or design.subtables.length == 0
       return @createSimpleQuery(design, offset, limit)
@@ -50,6 +48,8 @@ module.exports = class DatagridQueryBuilder
 
   # Simple query with no subtables
   createComplexQuery: (design, offset, limit) ->
+    exprCompiler = new ExprCompiler(@schema)
+
     # Queries to union
     unionQueries = []
 
