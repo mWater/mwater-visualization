@@ -48,6 +48,8 @@ module.exports = class DatagridQueryBuilder
       if extraFilter.table == design.table
         wheres.push(injectTableAlias(extraFilter.jsonql, "main"))
 
+    wheres = _.compact(wheres)
+
     if wheres.length == 1
       query.where = wheres[0]
     else if wheres.length > 1
@@ -149,6 +151,8 @@ module.exports = class DatagridQueryBuilder
       if extraFilter.table == design.table
         wheres.push(injectTableAlias(extraFilter.jsonql, "main"))
 
+    wheres = _.compact(wheres)
+
     if wheres.length == 1
       query.where = wheres[0]
     else if wheres.length > 1
@@ -210,6 +214,8 @@ module.exports = class DatagridQueryBuilder
         wheres.push(injectTableAlias(extraFilter.jsonql, "main"))
       if extraFilter.table == subtableTable
         wheres.push(injectTableAlias(extraFilter.jsonql, "st"))
+
+    wheres = _.compact(wheres)
 
     if wheres.length == 1
       query.where = wheres[0]
