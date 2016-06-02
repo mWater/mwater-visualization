@@ -52,7 +52,7 @@ module.exports = class DatagridComponent extends React.Component
   # Load more rows starting at a particular offset and with a specific design. Call callback with new rows
   performLoad: (loadState, callback) =>
     # Create query to get the page of rows at the specific offset
-    query = new DatagridQueryBuilder(@props.schema).createQuery(loadState.design, loadState.offset, loadState.pageSize)
+    query = new DatagridQueryBuilder(@props.schema).createQuery(loadState.design, { offset: loadState.offset, limit: loadState.pageSize })
 
     @props.dataSource.performQuery(query, (error, rows) =>
       if error
@@ -93,7 +93,7 @@ module.exports = class DatagridComponent extends React.Component
   # Reload a single row
   reloadRow: (rowIndex, callback) ->
     # Create query to get a single row
-    query = new DatagridQueryBuilder(@props.schema).createQuery(@props.design, rowIndex, 1)
+    query = new DatagridQueryBuilder(@props.schema).createQuery(@props.design, { offset: rowIndex, limit: 1 })
 
     @props.dataSource.performQuery(query, (error, rows) =>
       if error
