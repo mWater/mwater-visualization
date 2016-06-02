@@ -1,6 +1,7 @@
 _ = require 'lodash'
 ExprCompiler = require("mwater-expressions").ExprCompiler
 ExprUtils = require("mwater-expressions").ExprUtils
+injectTableAlias = require('mwater-expressions').injectTableAlias
 
 # Builds a datagrid query. 
 # columns are named c0, c1, c2...
@@ -11,17 +12,21 @@ module.exports = class DatagridQueryBuilder
   constructor: (schema) ->
     @schema = schema
 
-  # Create the query, starting at row offset for limit rows
-  createQuery: (design, offset, limit) ->
+  # Create the query for the design
+  # options:
+  #  offset: start at row offset
+  #  limit: limit rows
+  #  extraFilters: array of additional filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. }
+  createQuery: (design, options = {}) ->
     # Create query to get the page of rows at the specific offset
     # Handle simple case
     if not design.subtables or design.subtables.length == 0
-      return @createSimpleQuery(design, offset, limit)
+      return @createSimpleQuery(design, options)
     else
-      return @createComplexQuery(design, offset, limit)
+      return @createComplexQuery(design, options)
 
   # Simple query with no subtables
-  createSimpleQuery: (design, offset, limit) ->
+  createSimpleQuery: (design, options) ->
     exprCompiler = new ExprCompiler(@schema)
 
     query = {
@@ -29,13 +34,24 @@ module.exports = class DatagridQueryBuilder
       selects: @createLoadSelects(design)
       from: { type: "table", table: design.table, alias: "main" }
       orderBy: []
-      offset: offset
-      limit: limit
+      offset: options.offset
+      limit: options.limit
     }
 
     # Filter by filter
+    wheres = []
     if design.filter
-      query.where = exprCompiler.compileExpr(expr: design.filter, tableAlias: "main")
+      wheres.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "main"))
+
+    # Add extra filters
+    for extraFilter in (options.extraFilters or [])
+      if extraFilter.table == design.table
+        wheres.push(injectTableAlias(extraFilter.jsonql, "main"))
+
+    if wheres.length == 1
+      query.where = wheres[0]
+    else if wheres.length > 1
+      query.where = { type: "op", op: "and", exprs: wheres }
 
     # Add sorts of main
     for expr, i in @getMainSortExprs(design)
@@ -47,15 +63,15 @@ module.exports = class DatagridQueryBuilder
     return query
 
   # Simple query with no subtables
-  createComplexQuery: (design, offset, limit) ->
+  createComplexQuery: (design, options) ->
     # Queries to union
     unionQueries = []
 
     # Create main query
-    unionQueries.push(@createComplexMainQuery(design))
+    unionQueries.push(@createComplexMainQuery(design, options, ))
 
     for subtable, index in design.subtables
-      unionQueries.push(@createComplexSubtableQuery(design, subtable, index))
+      unionQueries.push(@createComplexSubtableQuery(design, options, subtable, index))
 
     # Union together
     unionQuery = {
@@ -72,8 +88,8 @@ module.exports = class DatagridQueryBuilder
       ]
       from: { type: "subquery", query: unionQuery, alias: "unioned" }
       orderBy: []
-      offset: offset
-      limit: limit
+      offset: options.offset
+      limit: options.limit
     }
 
     # Add column references
@@ -95,7 +111,7 @@ module.exports = class DatagridQueryBuilder
     return query
 
   # Create the main query (not joined to subtables) part of the overall complex query. See tests for more details
-  createComplexMainQuery: (design) ->
+  createComplexMainQuery: (design, options) ->
     exprCompiler = new ExprCompiler(@schema)
 
     # Create selects
@@ -124,13 +140,24 @@ module.exports = class DatagridQueryBuilder
     }
 
     # Filter by filter
+    wheres = []
     if design.filter
-      query.where = exprCompiler.compileExpr(expr: design.filter, tableAlias: "main")
+      wheres.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "main"))
+
+    # Add extra filters
+    for extraFilter in (options.extraFilters or [])
+      if extraFilter.table == design.table
+        wheres.push(injectTableAlias(extraFilter.jsonql, "main"))
+
+    if wheres.length == 1
+      query.where = wheres[0]
+    else if wheres.length > 1
+      query.where = { type: "op", op: "and", exprs: wheres }
 
     return query
 
   # Create one subtable query part of the overall complex query. See tests for more details
-  createComplexSubtableQuery: (design, subtable, subtableIndex) ->
+  createComplexSubtableQuery: (design, options, subtable, subtableIndex) ->
     exprUtils = new ExprUtils(@schema)
     exprCompiler = new ExprCompiler(@schema)
 
@@ -173,8 +200,21 @@ module.exports = class DatagridQueryBuilder
     }
 
     # Filter by filter
+    wheres = []
     if design.filter
-      query.where = exprCompiler.compileExpr(expr: design.filter, tableAlias: "main")
+      wheres.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "main"))
+
+    # Add extra filters
+    for extraFilter in (options.extraFilters or [])
+      if extraFilter.table == design.table
+        wheres.push(injectTableAlias(extraFilter.jsonql, "main"))
+      if extraFilter.table == subtableTable
+        wheres.push(injectTableAlias(extraFilter.jsonql, "st"))
+
+    if wheres.length == 1
+      query.where = wheres[0]
+    else if wheres.length > 1
+      query.where = { type: "op", op: "and", exprs: wheres }
 
     return query
 

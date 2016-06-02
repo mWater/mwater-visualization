@@ -29,7 +29,7 @@ describe "DatagridQueryBuilder", ->
       }]
     }
 
-    jsonql = @qb.createQuery(design, null, null)
+    jsonql = @qb.createQuery(design, { limit: null, offset: null })
     compare jsonql, {
       type: "query"
       selects: [
@@ -41,6 +41,90 @@ describe "DatagridQueryBuilder", ->
         { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
       ]
       from: { type: "table", table: "t1", alias: "main" }
+      orderBy: [
+        # Orders by primary key for consistency
+        { expr: { type: "field", tableAlias: "main", column: "primary" }, direction: "asc" }
+      ]
+      limit: null
+      offset: null
+    }
+
+  it "creates filtered simple query", ->
+    design = {
+      table: "t1"
+      columns: [{
+        id: "cid1"
+        type: "expr"
+        expr: @exprText
+      }]
+      filter: {
+        type: "op"
+        op: "="
+        exprs: [
+          { type: "field", table: "t1", column: "number" }
+          { type: "literal", valueType: "number", value: 1 }
+        ]
+      }
+    }
+
+    jsonql = @qb.createQuery(design, { limit: null, offset: null })
+    compare jsonql, {
+      type: "query"
+      selects: [
+        # Includes id
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "id" }
+        # Includes -1 subtable
+        { type: "select", expr: -1, alias: "subtable" }
+        # Includes column
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
+      ]
+      from: { type: "table", table: "t1", alias: "main" }
+      where: {
+        type: "op"
+        op: "="
+        exprs: [
+          { type: "field", tableAlias: "main", column: "number" }
+          { type: "literal", value: 1 }
+        ]
+      }
+      orderBy: [
+        # Orders by primary key for consistency
+        { expr: { type: "field", tableAlias: "main", column: "primary" }, direction: "asc" }
+      ]
+      limit: null
+      offset: null
+    }
+
+  it "creates adds extra filter query", ->
+    design = {
+      table: "t1"
+      columns: [{
+        id: "cid1"
+        type: "expr"
+        expr: @exprText
+      }]
+    }
+
+    extraFilters = [
+      { 
+        table: "t1"
+        jsonql: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "text" }, "hello" ]}
+      }
+    ]
+
+    jsonql = @qb.createQuery(design, { limit: null, offset: null, extraFilters: extraFilters })
+    compare jsonql, {
+      type: "query"
+      selects: [
+        # Includes id
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "id" }
+        # Includes -1 subtable
+        { type: "select", expr: -1, alias: "subtable" }
+        # Includes column
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
+      ]
+      from: { type: "table", table: "t1", alias: "main" }
+      where: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "main", column: "text" }, "hello" ]}
       orderBy: [
         # Orders by primary key for consistency
         { expr: { type: "field", tableAlias: "main", column: "primary" }, direction: "asc" }
@@ -70,7 +154,7 @@ describe "DatagridQueryBuilder", ->
       ]
     }
 
-    jsonql = @qb.createQuery(design, null, null)
+    jsonql = @qb.createQuery(design, { limit: null, offset: null })
 
     # Should union all main query and then inner join query. Sorts by main sorts, then subtable id, then subtable sorts
     ###
