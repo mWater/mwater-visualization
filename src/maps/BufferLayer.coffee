@@ -179,7 +179,7 @@ module.exports = class BufferLayer extends Layer
     # If color axes, add color conditions
     if design.axes.color and design.axes.color.colorMap
       for item, i in design.axes.color.colorMap
-        css += "#layer::#{i} [color=#{JSON.stringify(item.value)}] { polygon-fill: #{item.color} }\n"
+        css += "#layer0::#{i} [color=#{JSON.stringify(item.value)}] { polygon-fill: #{item.color}; opacity: #{design.opacity}; }\n"
 
     return css
 

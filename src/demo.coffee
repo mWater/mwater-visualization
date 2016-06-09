@@ -456,8 +456,30 @@ mapDesign = {
             },
             "xform": null
           }
+          "color": {
+            "expr": {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "type"
+            },
+            "xform": null,
+            "colorMap": [
+              {
+                "value": "Protected dug well",
+                "color": "#d0021b"
+              },
+              {
+                "value": "Piped into dwelling",
+                "color": "#7ed321"
+              },
+              {
+                "value": "Borehole or tubewell",
+                "color": "#f8e71c"
+              }
+            ]
+          }
         },
-        color: "#0088FF"
+        color: "#9b9b9b"
         filter: null
       }
       visible: true 
