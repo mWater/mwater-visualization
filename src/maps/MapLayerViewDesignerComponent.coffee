@@ -18,7 +18,6 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
 
     @state = { 
       editing: layer.isIncomplete() # Editing initially if incomplete
-      hover: false # Is the layer is being hovered?
     }
 
   update: (updates) ->
@@ -26,12 +25,6 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
 
   handleVisibleClick: (index) =>
     @update(visible: not @props.layerView.visible)
-
-  mouseOver: =>
-    @setState({hover: true})
-
-  mouseOut: =>
-    @setState({hover: false})
 
   handleToggleEditing: => @setState(editing: not @state.editing)
   handleSaveEditing: (design) => @update(design: design)
@@ -96,12 +89,9 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
       opacity: 0.6
 
     H.div onMouseOver:@mouseOver, onMouseOut: @mouseOut,
-      H.div style: { fontSize: 16 }, key: "layerView",
-        if @state.hover and not @state.editing
-          @props.connectDragSource(H.i className: "glyphicon glyphicon-menu-hamburger", style: style)
-        else
-          H.i null,
-            " "
+      H.div style: { fontSize: 16 }, key: "layerView", className: "hover-display-parent",
+        if not @state.editing
+          @props.connectDragSource(H.i className: "glyphicon glyphicon-menu-hamburger hover-display-child", style: style)
         @renderLayerEditToggle()
         @renderVisible()
         @renderName()
