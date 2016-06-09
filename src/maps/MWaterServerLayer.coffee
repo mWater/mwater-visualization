@@ -5,6 +5,8 @@ injectTableAlias = require('mwater-expressions').injectTableAlias
 React = require 'react'
 H = React.DOM
 
+# TODO ALL WRONG
+
 # Layer defined on the mWater server
 # Design is:
 # type: type of layer on server

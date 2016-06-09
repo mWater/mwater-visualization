@@ -23,74 +23,32 @@ Design is:
   factor: optional value to use for calculating
 ###
 module.exports = class AdminIndicatorChoroplethLayer extends Layer
-  # Pass design, client, apiUrl, schema, dataSource
-  # onMarkerClick takes (table, id) and is the table and id of the row that is represented by the click
-  constructor: (options) ->
-    @design = options.design
-    @client = options.client
-    @apiUrl = options.apiUrl
-    @schema = options.schema
-    @dataSource = options.dataSource
-    @onMarkerClick = options.onMarkerClick
-
-  getTileUrl: (filters) -> 
-    # Check if valid
-    # TODO clean/validate order??
-    design = @cleanDesign(@design)
-    
-    if @validateDesign(design)
-      return null
-
-    @createUrl("png", design, filters)
-
-  getUtfGridUrl: (filters) -> 
-    # Check if valid
-    # TODO clean/validate order??
-    design = @cleanDesign(@design)
-    
-    if @validateDesign(design)
-      return null
-
-    @createUrl("grid.json", design, filters)
-
-  # Called when the interactivity grid is clicked. Called with { data: interactivty data e.g. `{ id: 123 }` }
-  onGridClick: (ev) ->
-    return
-    # if @onMarkerClick and ev.data and ev.data.id
-    #   @onMarkerClick(@design.sublayers[0].table, ev.data.id)
-
-  # Create query string
-  createUrl: (extension, design, filters) ->
-    query = "type=jsonql"
-    if @client
-      query += "&client=" + @client
-
-    jsonql = @createJsonQL(design, filters)
-
+  # Gets the layer definition as JsonQL + CSS in format:
+  #   {
+  #     layers: array of { id: layer id, jsonql: jsonql that includes "the_webmercator_geom" as a column }
+  #     css: carto css
+  #     interactivity: (optional) { layer: id of layer, fields: array of field names }
+  #   }
+  # arguments:
+  #   design: design of layer
+  #   schema: schema to use
+  #   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
+  getJsonQLCss: (design, schema, filters) ->
     # Create design
-    mapDesign = {
-      layers: [{ id: "layer0", jsonql: jsonql }]
-      css: @createCss()
+    layerDef = {
+      layers: [{ id: "layer0", jsonql: @createJsonQL(design, schema, filters) }]
+      css: @createCss(design, schema, filters)
       # interactivity: { 
       #   layer: "layer0"
       #   fields: ["id"]
       # }
     }
+    
+    return layerDef
 
-    query += "&design=" + encodeURIComponent(JSON.stringify(mapDesign))
-
-    url = "#{@apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?" + query
-
-    # Add subdomains: {s} will be substituted with "a", "b" or "c" in leaflet for api.mwater.co only.
-    # Used to speed queries
-    if url.match(/^https:\/\/api\.mwater\.co\//)
-      url = url.replace(/^https:\/\/api\.mwater\.co\//, "https://{s}-api.mwater.co/")
-
-    return url
-
-  createJsonQL: (design, filters) ->
-    axisBuilder = new AxisBuilder(schema: @schema)
-    exprCompiler = new ExprCompiler(@schema)
+  createJsonQL: (design, schema, filters) ->
+    axisBuilder = new AxisBuilder(schema: schema)
+    exprCompiler = new ExprCompiler(schema)
 
     # select _id, /*shape, */
     # (select sum(case when wp.type = 'Protected dug well' then 1.0 else 0.0 end)::decimal/sum(1.0)
@@ -230,7 +188,7 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
 
     return query
 
-  createCss: ->
+  createCss: (design, schema, filters) ->
     css = '''
       #layer0 {
         line-color: #000;
@@ -262,25 +220,44 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
 
     return css
 
-  getFilterableTables: -> 
-    return [@design.table]
+  # Called when the interactivity grid is clicked. 
+  # arguments:
+  #   ev: { data: interactivty data e.g. `{ id: 123 }` }
+  #   options: 
+  #     design: design of layer
+  #     schema: schema to use
+  #     dataSource: data source to use
+  # 
+  # Returns:
+  #   null/undefined to do nothing
+  #   [table id, primary key] to open a default system popup if one is present
+  #   React element to put into a popup
+  onGridClick: (ev, options) ->
+    # if ev.data and ev.data.id
+    #   return [options.design.table, ev.data.id]
+    return null
 
-  # getLegend: ->
-  #   # return H.div null, "Legend here"
-  #   # # # Create loading legend component
-  #   # # React.createElement(LoadingLegend, 
-  #   # #   url: "#{@apiUrl}maps/legend?type=#{@design.type}")
-  
-  isEditable: -> true
+  # Get min and max zoom levels
+  getMinZoom: (design) -> return null
+  getMaxZoom: (design) -> return null
 
-  # True if layer is incomplete (e.g. brand new) and should be editable immediately
-  isIncomplete: ->
-    return @validateDesign(@cleanDesign(@design))
+  # Get the legend to be optionally displayed on the map. Returns
+  # a React element
+  getLegend: (design, schema) ->
+    # TODO
+    return null
+
+  # Get a list of table ids that can be filtered on
+  getFilterableTables: (design, schema) ->
+    return [design.table]
+
+  # True if layer can be edited
+  isEditable: (design, schema) ->
+    return true
 
   # Returns a cleaned design
-  # TODO this is awkward since the design is part of the object too
-  cleanDesign: (design) ->
-    exprCleaner = new ExprCleaner(@schema)
+  cleanDesign: (design, schema) ->
+    exprCleaner = new ExprCleaner(schema)
 
     # TODO clones entirely
     design = _.cloneDeep(design)
@@ -292,8 +269,9 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
 
     return design
 
-  validateDesign: (design) ->
-    exprUtils = new ExprUtils(@schema)
+  # Validates design. Null if ok, message otherwise
+  validateDesign: (design, schema) ->
+    exprUtils = new ExprUtils(schema)
 
     if not design.table
       return "Missing table"
@@ -309,14 +287,17 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
   
     return null
 
-  # Pass in onDesignChange
+  # Creates a design element with specified options
+  # options:
+  #   design: design of layer
+  #   schema: schema to use
+  #   dataSource: data source to use
+  #   onDesignChange: function called when design changes
   createDesignerElement: (options) ->
     # Clean on way in and out
     React.createElement(AdminIndicatorChoroplethLayerDesigner,
-      schema: @schema
-      dataSource: @dataSource
-      design: @cleanDesign(@design)
+      schema: options.schema
+      dataSource: options.dataSource
+      design: @cleanDesign(options.design, options.schema)
       onDesignChange: (design) =>
-        options.onDesignChange(@cleanDesign(design)))
-
-
+        options.onDesignChange(@cleanDesign(design, options.schema)))

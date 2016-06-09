@@ -5,18 +5,20 @@ ActionCancelModalComponent = require('react-library/lib/ActionCancelModalCompone
 # A single row in the table of layer views. Handles the editor state
 module.exports = class MapLayerViewDesignerComponent extends React.Component
   @propTypes:
+    schema: React.PropTypes.object.isRequired # Schema to use
+    dataSource: React.PropTypes.object.isRequired
     layerView: React.PropTypes.object.isRequired  # See Map Design.md
     onLayerViewChange: React.PropTypes.func.isRequired # Called with new layer view
     onRemove: React.PropTypes.func.isRequired  # Called to remove
     layerFactory: React.PropTypes.object.isRequired # Layer factory to use
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)
 
     @state = { 
-      editing: layer.isIncomplete() # Editing initially if incomplete
+      editing: layer.isIncomplete(@props.layerView.design, @props.schema) # Editing initially if incomplete
     }
 
   update: (updates) ->
@@ -51,8 +53,13 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
     return H.div null,
       H.div style: { textAlign: "right" },
         H.a className: "btn btn-link btn-xs", onClick: @props.onRemove, "Delete Layer"
-      if layer.isEditable()
-        layer.createDesignerElement(onDesignChange: @handleSaveEditing)
+      if layer.isEditable(@props.layerView.design)
+        layer.createDesignerElement({
+          design: @props.layerView.design
+          schema: @props.schema
+          dataSource: @props.dataSource
+          onDesignChange: @handleSaveEditing
+        })
 
   renderLayerEditToggle: ->
     layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)

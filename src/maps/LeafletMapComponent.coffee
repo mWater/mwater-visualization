@@ -148,6 +148,7 @@ module.exports = class LeafletMapComponent extends React.Component
       # TODO This is naive. Could be more surgical about updates
       if @tileLayers
         for tileLayer in @tileLayers        
+          console.log "### REMOVING LAYER"
           @map.removeLayer(tileLayer)
         @tileLayer = null
 
@@ -163,10 +164,14 @@ module.exports = class LeafletMapComponent extends React.Component
           if not layer.visible or not layer.tileUrl
             continue
 
-          tileLayer = L.tileLayer(layer.tileUrl, {
-            minZoom: layer.minZoom
-            maxZoom: layer.maxZoom
-          })
+          options = {}
+          # Putting null seems to make layer vanish
+          if layer.minZoom
+            options.minZoom = layer.minZoom
+          if layer.maxZoom
+            options.maxZoom = layer.maxZoom
+
+          tileLayer = L.tileLayer(layer.tileUrl, options)
           @tileLayers.push(tileLayer)
 
           # TODO Hack for animated zooming
@@ -174,6 +179,7 @@ module.exports = class LeafletMapComponent extends React.Component
           @map.addLayer(tileLayer)
           @map._zoomAnimated = true
           tileLayer._container.className += ' leaflet-zoom-hide'
+          console.log "### ADDING LAYER #{layer.tileUrl}"
 
         @utfGridLayers = []
         for layer in @props.layers

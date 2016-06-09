@@ -18,6 +18,8 @@ MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
+LegacyMapUrlSource = require './maps/LegacyMapUrlSource'
+
 # class DashboardPane extends React.Component
 #   constructor: (props) ->
 #     super
@@ -119,11 +121,15 @@ class MWaterMapPane extends React.Component
       extraTables: @state.extraTables
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
     }, (error, config) =>
+      # Create map url source
+      mapUrlSource = new LegacyMapUrlSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design, layerFactory: config.layerFactory })
+
       H.div style: { height: "100%" },
         React.createElement(visualization.MapComponent, {
           schema: config.schema
           dataSource: config.dataSource
           design: @state.design
+          mapUrlSource: mapUrlSource
           layerFactory: config.layerFactory
           onDesignChange: @handleDesignChange
           titleElem: "Sample"
@@ -253,12 +259,12 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
@@ -399,6 +405,7 @@ mapDesign = {
   "layerViews": [
      # { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
      { 
+      id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
       name: "Choropleth"
       type: "AdminIndicatorChoropleth"
       design: { 
