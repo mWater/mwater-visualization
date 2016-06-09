@@ -5,7 +5,7 @@ H = React.DOM
 Layer = require './Layer'
 ExprCompiler = require('mwater-expressions').ExprCompiler
 injectTableAlias = require('mwater-expressions').injectTableAlias
-# MarkersLayerDesignerComponent = require './MarkersLayerDesignerComponent'
+BufferLayerDesignerComponent = require './BufferLayerDesignerComponent'
 ExprCleaner = require('mwater-expressions').ExprCleaner
 AxisBuilder = require '../axes/AxisBuilder'
 
@@ -203,7 +203,7 @@ module.exports = class BufferLayer extends Layer
     # TODO hide when zoomed out too far
     return null
 
-  getMaxZoom: (design) -> return null
+  getMaxZoom: (design) -> null
 
   # Get the legend to be optionally displayed on the map. Returns
   # a React element
@@ -212,12 +212,10 @@ module.exports = class BufferLayer extends Layer
     return null
 
   # Get a list of table ids that can be filtered on
-  getFilterableTables: (design, schema) ->
-    return [design.table]
+  getFilterableTables: (design, schema) -> [design.table]
 
   # True if layer can be edited
-  isEditable: (design, schema) ->
-    return false # TODO
+  isEditable: (design, schema) -> true
 
   # True if layer is incomplete (e.g. brand new) and should be editable immediately
   isIncomplete: (design, schema) ->
@@ -230,7 +228,13 @@ module.exports = class BufferLayer extends Layer
   #   dataSource: data source to use
   #   onDesignChange: function called when design changes
   createDesignerElement: (options) ->
-    throw new Error("Not implemented")
+    # Clean on way in and out
+    React.createElement(BufferLayerDesignerComponent,
+      schema: options.schema
+      dataSource: options.dataSource
+      design: @cleanDesign(options.design, options.schema)
+      onDesignChange: (design) =>
+        options.onDesignChange(@cleanDesign(design, options.schema)))
 
   # Returns a cleaned design
   cleanDesign: (design, schema) ->
@@ -242,6 +246,7 @@ module.exports = class BufferLayer extends Layer
 
     design.axes = design.axes or {}
     design.color = design.color or "#0088FF"
+    design.radius = design.radius or 1000
 
     design.axes.geometry = axisBuilder.cleanAxis(axis: design.axes.geometry, table: design.table, types: ['geometry'], aggrNeed: "none")
     design.axes.color = axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean'], aggrNeed: "none")
