@@ -88,7 +88,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
       marginRight: 8
       opacity: 0.6
 
-    H.div onMouseOver:@mouseOver, onMouseOut: @mouseOut,
+    H.div null,
       H.div style: { fontSize: 16 }, key: "layerView", className: "hover-display-parent",
         if not @state.editing
           @props.connectDragSource(H.i className: "glyphicon glyphicon-menu-hamburger hover-display-child", style: style)
