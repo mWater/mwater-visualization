@@ -1,6 +1,7 @@
 React = require 'react'
 H = React.DOM
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
+Rcslider = require 'rc-slider'
 
 # A single row in the table of layer views. Handles the editor state
 module.exports = class MapLayerViewDesignerComponent extends React.Component
@@ -52,6 +53,8 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
     return H.div null,
       H.div style: { textAlign: "right" },
         H.a className: "btn btn-link btn-xs", onClick: @props.onRemove, "Delete Layer"
+
+      @renderOpacityControl()
       if layer.isEditable()
         layer.createDesignerElement(onDesignChange: @handleSaveEditing)
 
@@ -80,6 +83,16 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
   #       # H.li(key: "opacity", H.a(null, "Set Opacity"))
   #       H.li(key: "remove", H.a(onClick: @props.onRemove, "Remove Layer"))
 
+  renderOpacityControl: ->
+    H.div className: 'form-group',
+      H.label className: 'text-muted',
+        "Opacity:"
+      H.div style: {padding: '10px'},
+        React.createElement(Rcslider,
+          min: 0
+          max: 1
+          step: 0.1
+        )
 
   render: ->
     layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)
