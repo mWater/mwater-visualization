@@ -1,5 +1,6 @@
 MWaterServerLayer = require './MWaterServerLayer'
 MarkersLayer = require './MarkersLayer'
+BufferLayer = require './BufferLayer'
 AdminIndicatorChoroplethLayer = require './AdminIndicatorChoroplethLayer'
 
 module.exports = class LayerFactory
@@ -15,6 +16,9 @@ module.exports = class LayerFactory
 
       when "Markers"
         return new MarkersLayer()
+
+      when "Buffer"
+        return new BufferLayer()
 
       when "AdminIndicatorChoropleth"
         return new AdminIndicatorChoroplethLayer()

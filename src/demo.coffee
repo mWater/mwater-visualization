@@ -434,7 +434,43 @@ mapDesign = {
     "s": -18.583775688370928
   }
 }
+
 # bounds: { w: -40, n: 25, e: 40, s: -25 }
+mapDesign = {
+  "baseLayer": "bing_road",
+  "layerViews": [
+     { 
+      id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
+      name: "Buffer"
+      type: "Buffer"
+      design: { 
+        table: "entities.water_point" 
+        opacity: 0.5
+        radius: 1000
+        "axes": {
+          "geometry": {
+            "expr": {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "location"
+            },
+            "xform": null
+          }
+        },
+        color: "#0088FF"
+        filter: null
+      }
+      visible: true 
+    }
+  ]
+  filters: {}
+  bounds: {
+    "w": 32.75848388671875,
+    "n": -2.217997457638444,
+    "e": 33.4808349609375,
+    "s": -2.9375549775994263
+  }
+}
 
 dashboardDesign = {
   "items": {

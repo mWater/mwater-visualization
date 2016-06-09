@@ -74,9 +74,7 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
       schema = new Schema(schemaJson)
       dataSource = new MWaterDataSource(props.apiUrl, props.client, { serverCaching: false, localCaching: true })
 
-      layerFactory = new LayerFactory({
-        newLayers: props.newLayers
-      })
+      layerFactory = new LayerFactory(props.newLayers)
 
       widgetFactory = new WidgetFactory(schema: schema, dataSource: dataSource, layerFactory: layerFactory) 
 
