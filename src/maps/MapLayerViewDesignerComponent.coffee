@@ -9,6 +9,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
     onLayerViewChange: React.PropTypes.func.isRequired # Called with new layer view
     onRemove: React.PropTypes.func.isRequired  # Called to remove
     layerFactory: React.PropTypes.object.isRequired # Layer factory to use
+    connectDragSource: React.PropTypes.func.isRequired # connector for reorderable
 
   constructor: ->
     super
@@ -17,6 +18,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
 
     @state = { 
       editing: layer.isIncomplete() # Editing initially if incomplete
+      hover: false # Is the layer is being hovered?
     }
 
   update: (updates) ->
@@ -24,6 +26,12 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
 
   handleVisibleClick: (index) =>
     @update(visible: not @props.layerView.visible)
+
+  mouseOver: =>
+    @setState({hover: true})
+
+  mouseOut: =>
+    @setState({hover: false})
 
   handleToggleEditing: => @setState(editing: not @state.editing)
   handleSaveEditing: (design) => @update(design: design)
@@ -57,7 +65,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
   renderLayerEditToggle: ->
     layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)
 
-    H.div style: { float: "right" }, key: "gear", 
+    H.div style: { float: "right" }, key: "gear",
       H.a onClick: @handleToggleEditing,
         if @state.editing
           H.i className: "fa fa-caret-square-o-up"
@@ -79,11 +87,21 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
   #       # H.li(key: "opacity", H.a(null, "Set Opacity"))
   #       H.li(key: "remove", H.a(onClick: @props.onRemove, "Remove Layer"))
 
+
   render: ->
     layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)
+    style =
+      cursor: "move"
+      marginRight: 8
+      opacity: 0.6
 
-    H.div null, 
+    H.div onMouseOver:@mouseOver, onMouseOut: @mouseOut,
       H.div style: { fontSize: 16 }, key: "layerView",
+        if @state.hover and not @state.editing
+          @props.connectDragSource(H.i className: "glyphicon glyphicon-menu-hamburger", style: style)
+        else
+          H.i null,
+            " "
         @renderLayerEditToggle()
         @renderVisible()
         @renderName()
