@@ -3,6 +3,7 @@ H = React.DOM
 uuid = require 'node-uuid'
 
 MapLayerViewDesignerComponent = require './MapLayerViewDesignerComponent'
+ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
 
 # Designer for layer selection in the map
 module.exports = class MapLayersDesignerComponent extends React.Component
@@ -56,6 +57,9 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     layerViews.push(layerView)
     @updateDesign(layerViews: layerViews)
 
+  handleReorder: (layerList) =>
+    @updateDesign(layerViews: layerList)
+
   renderAddLayer: ->
     H.div style: { margin: 5 }, key: "addLayer", className: "btn-group",
       H.button type: "button", "data-toggle": "dropdown", className: "btn btn-default dropdown-toggle",
@@ -68,8 +72,13 @@ module.exports = class MapLayersDesignerComponent extends React.Component
             H.a onClick: @handleAddLayerView.bind(null, layer), layer.label or layer.name
           )
 
-  renderLayerView: (layerView, index) =>
-    H.li className: "list-group-item", key: layerView.id,
+  renderLayerView: (layerView, index, connectDragSource) =>
+    style =
+      padding: "10px 15px"
+      border: "1px solid #ddd"
+      marginBottom: -1
+      backgroundColor: "#fff"
+    H.div style: style,
       React.createElement(MapLayerViewDesignerComponent, 
         schema: @props.schema
         dataSource: @props.dataSource
@@ -77,12 +86,18 @@ module.exports = class MapLayersDesignerComponent extends React.Component
         onLayerViewChange: (lv) => @handleLayerViewChange(index, lv)
         onRemove: => @handleRemoveLayerView(index)
         layerFactory: @props.layerFactory
+        connectDragSource: connectDragSource
       )
 
   render: ->
     H.div style: { padding: 5 }, 
-      H.ul className: "list-group", 
-        _.map(@props.design.layerViews, @renderLayerView)
+      H.div className: "list-group",
+        React.createElement(ReorderableListComponent,
+          items: @props.design.layerViews
+          onReorder: @handleReorder
+          renderItem: @renderLayerView
+          getItemId: (layerView) => layerView.id
+        )
 
       @renderAddLayer()
 
