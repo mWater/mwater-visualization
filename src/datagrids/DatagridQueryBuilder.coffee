@@ -358,4 +358,4 @@ module.exports = class DatagridQueryBuilder
       when "enumset", "text[]", "image", "imagelist"
         return { type: "op", op: "::jsonb", exprs: [null] } 
       else
-        return "#{exprType}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx"
+        return null
