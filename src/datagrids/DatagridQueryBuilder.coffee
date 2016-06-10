@@ -70,7 +70,7 @@ module.exports = class DatagridQueryBuilder
     unionQueries = []
 
     # Create main query
-    unionQueries.push(@createComplexMainQuery(design, options, ))
+    unionQueries.push(@createComplexMainQuery(design, options))
 
     for subtable, index in design.subtables
       unionQueries.push(@createComplexSubtableQuery(design, options, subtable, index))
@@ -177,9 +177,13 @@ module.exports = class DatagridQueryBuilder
       selects.push({ type: "select", expr: expr, alias: "s#{i}" })
 
     # Add sorts of subtables
-    for subtable, stindex in design.subtables
-      for expr, i in @getSubtableSortExprs(design, subtable)
-        selects.push({ type: "select", expr: expr, alias: "st#{stindex}s#{i}" })
+    for st, stindex in design.subtables
+      for expr, i in @getSubtableSortExprs(design, st)
+        if stindex == subtableIndex
+          selects.push({ type: "select", expr: expr, alias: "st#{stindex}s#{i}" })
+        else
+          # Null placeholder
+          selects.push({ type: "select", expr: null, alias: "st#{stindex}s#{i}" })
 
     # Add columns
     selects = selects.concat(_.map(design.columns, (column, columnIndex) => @createColumnSelect(column, columnIndex, subtable)))
