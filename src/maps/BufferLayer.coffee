@@ -169,12 +169,15 @@ module.exports = class BufferLayer extends Layer
     return query
 
   createCss: (design, schema) ->
-    css = '''
-      #layer0 {
-        opacity: ''' + design.opacity + ''';
-        polygon-fill: ''' + design.color + ''';
-      }
-    '''
+    css = ""
+    
+    if design.color
+      css += '''
+        #layer0 {
+          opacity: ''' + design.opacity + ''';
+          polygon-fill: ''' + design.color + ''';
+        }
+      '''
 
     # If color axes, add color conditions
     if design.axes.color and design.axes.color.colorMap
@@ -245,7 +248,6 @@ module.exports = class BufferLayer extends Layer
     design = _.cloneDeep(design)
 
     design.axes = design.axes or {}
-    design.color = design.color or "#0088FF"
     design.radius = design.radius or 1000
 
     design.axes.geometry = axisBuilder.cleanAxis(axis: design.axes.geometry, table: design.table, types: ['geometry'], aggrNeed: "none")
