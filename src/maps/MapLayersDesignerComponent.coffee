@@ -78,7 +78,8 @@ module.exports = class MapLayersDesignerComponent extends React.Component
       border: "1px solid #ddd"
       marginBottom: -1
       backgroundColor: "#fff"
-    H.div style: style,
+
+    H.div style: style, 
       React.createElement(MapLayerViewDesignerComponent, 
         schema: @props.schema
         dataSource: @props.dataSource
@@ -91,7 +92,8 @@ module.exports = class MapLayersDesignerComponent extends React.Component
 
   render: ->
     H.div style: { padding: 5 }, 
-      H.div className: "list-group",
+      H.div className: "list-group", key: "layers",
+        # _.map(@props.design.layerViews, @renderLayerView)
         React.createElement(ReorderableListComponent,
           items: @props.design.layerViews
           onReorder: @handleReorder

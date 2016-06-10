@@ -94,11 +94,12 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
       cursor: "move"
       marginRight: 8
       opacity: 0.6
+      # float: "right"
 
     H.div null,
       H.div style: { fontSize: 16 }, key: "layerView", className: "hover-display-parent",
-        if not @state.editing
-          @props.connectDragSource(H.i className: "glyphicon glyphicon-menu-hamburger hover-display-child", style: style)
+        if @props.connectDragSource
+          @props.connectDragSource(H.i(className: "fa fa-bars hover-display-child", style: style))
         @renderLayerEditToggle()
         @renderVisible()
         @renderName()

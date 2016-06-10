@@ -148,7 +148,6 @@ module.exports = class LeafletMapComponent extends React.Component
       # TODO This is naive. Could be more surgical about updates
       if @tileLayers
         for tileLayer in @tileLayers        
-          console.log "### REMOVING LAYER"
           @map.removeLayer(tileLayer)
         @tileLayer = null
 
@@ -179,7 +178,6 @@ module.exports = class LeafletMapComponent extends React.Component
           @map.addLayer(tileLayer)
           @map._zoomAnimated = true
           tileLayer._container.className += ' leaflet-zoom-hide'
-          console.log "### ADDING LAYER #{layer.tileUrl}"
 
         @utfGridLayers = []
         for layer in @props.layers
