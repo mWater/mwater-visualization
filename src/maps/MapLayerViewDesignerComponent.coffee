@@ -9,7 +9,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
     onLayerViewChange: React.PropTypes.func.isRequired # Called with new layer view
     onRemove: React.PropTypes.func.isRequired  # Called to remove
     layerFactory: React.PropTypes.object.isRequired # Layer factory to use
-    connectDragSource: React.PropTypes.func.isRequired # connector for reorderable
+    connectDragSource: React.PropTypes.func    # connector for reorderable
 
   constructor: ->
     super
@@ -90,8 +90,8 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
 
     H.div null,
       H.div style: { fontSize: 16 }, key: "layerView", className: "hover-display-parent",
-        if not @state.editing
-          @props.connectDragSource(H.i className: "glyphicon glyphicon-menu-hamburger hover-display-child", style: style)
+        if @props.connectDragSource
+          @props.connectDragSource(H.i(className: "fa fa-bars hover-display-child", style: style))
         @renderLayerEditToggle()
         @renderVisible()
         @renderName()
