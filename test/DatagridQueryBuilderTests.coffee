@@ -162,8 +162,8 @@ describe "DatagridQueryBuilder", ->
     from
     (
       (
-        select main.primary as id, -1 as subtable, main.primary as s0, null as st0s0, null as st0s1,
-          main.text as c0, null as c1
+        select main.primary as id, -1 as subtable, main.primary as s0, null::decimal as st0s0, null::text as st0s1,
+          main.text as c0, null::decimal as c1
         from t1 as main
       )
       union all
@@ -185,12 +185,12 @@ describe "DatagridQueryBuilder", ->
         { type: "select", expr: -1, alias: "subtable" }
         # Includes sorts
         { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "s0" }
-        { type: "select", expr: null, alias: "st0s0" }
-        { type: "select", expr: null, alias: "st0s1" }
+        { type: "select", expr: { type: "op", op: "::decimal", exprs: [null] }, alias: "st0s0" }
+        { type: "select", expr: { type: "op", op: "::text", exprs: [null] }, alias: "st0s1" }
         # Includes column
         { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
         # Includes subtable column
-        { type: "select", expr: null, alias: "c1" }
+        { type: "select", expr: { type: "op", op: "::decimal", exprs: [null] }, alias: "c1" }
       ]
       from: { type: "table", table: "t1", alias: "main" }
     }

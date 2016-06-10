@@ -129,8 +129,8 @@ module.exports = class DatagridQueryBuilder
 
     # Add sorts of subtables
     for subtable, stindex in design.subtables
-      for expr, i in @getSubtableSortExprs(design, subtable)
-        selects.push({ type: "select", expr: null, alias: "st#{stindex}s#{i}" })
+      for type, i in @getSubtableSortExprTypes(design, subtable)
+        selects.push({ type: "select", expr: @createNullExpr(type), alias: "st#{stindex}s#{i}" })
 
     # Add columns
     selects = selects.concat(_.map(design.columns, (column, columnIndex) => @createColumnSelect(column, columnIndex)))
@@ -183,7 +183,8 @@ module.exports = class DatagridQueryBuilder
           selects.push({ type: "select", expr: expr, alias: "st#{stindex}s#{i}" })
         else
           # Null placeholder
-          selects.push({ type: "select", expr: null, alias: "st#{stindex}s#{i}" })
+          types = @getSubtableSortExprTypes(design, st)
+          selects.push({ type: "select", expr: @createNullExpr(types[i]), alias: "st#{stindex}s#{i}" })
 
     # Add columns
     selects = selects.concat(_.map(design.columns, (column, columnIndex) => @createColumnSelect(column, columnIndex, subtable)))
@@ -290,20 +291,40 @@ module.exports = class DatagridQueryBuilder
     directions.push("asc")
     return directions
 
+  # Get types of expressions to sort subtable query by. Tricky since ordering is a column, not an expression
+  getSubtableSortExprTypes: (design, subtable) ->
+    exprUtils = new ExprUtils(@schema)
+
+    # Get subtable actual table
+    subtableTable = exprUtils.followJoins(design.table, subtable.joins)
+
+    types = []
+  
+    # Natural order if present
+    ordering = @schema.getTable(subtableTable).ordering
+    if ordering
+      types.push(@schema.getColumn(subtableTable, ordering).type)
+
+    # Always primary key. Assume text
+    types.push("text")
+
+    return types
+
   # Create the select for a column in JsonQL format
   createColumnSelect: (column, columnIndex, subtable) ->
+    exprUtils = new ExprUtils(@schema)
+    
+    # Get expression type
+    exprType = exprUtils.getExprType(column.expr)
+
     # Null if wrong subtable
     if column.subtable and not subtable
-      return { type: "select", expr: null, alias: "c#{columnIndex}" }
+      return { type: "select", expr: @createNullExpr(exprType), alias: "c#{columnIndex}" }
 
     if column.subtable and subtable    
       if subtable.id != column.subtable
-        return { type: "select", expr: null, alias: "c#{columnIndex}" }
+        return { type: "select", expr: @createNullExpr(exprType), alias: "c#{columnIndex}" }
 
-    # Get expression type
-    exprUtils = new ExprUtils(@schema)
-    exprType = exprUtils.getExprType(column.expr)
-    
     # Compile expression
     exprCompiler = new ExprCompiler(@schema)
     compiledExpr = exprCompiler.compileExpr(expr: column.expr, tableAlias: if column.subtable then "st" else "main")
@@ -323,3 +344,18 @@ module.exports = class DatagridQueryBuilder
       { type: "select", expr: -1, alias: "subtable" }
     ]
     selects = selects.concat(_.map(design.columns, (column, columnIndex) => @createColumnSelect(column, columnIndex)))
+
+  # Create a null expression, but cast to correct type. See https://github.com/mWater/mwater-visualization/issues/183
+  createNullExpr: (exprType) ->
+    switch exprType
+      # Geometry is as textual geojson
+      when "text", "enum", "geometry", "id", "date", "datetime"
+        return { type: "op", op: "::text", exprs: [null] } 
+      when "boolean"
+        return { type: "op", op: "::boolean", exprs: [null] } 
+      when "number"
+        return { type: "op", op: "::decimal", exprs: [null] } 
+      when "enumset", "text[]", "image", "imagelist"
+        return { type: "op", op: "::jsonb", exprs: [null] } 
+      else
+        return "#{exprType}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx"
