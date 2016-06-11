@@ -1,3 +1,4 @@
+_ = require 'lodash'
 LayerFactory = require './LayerFactory'
 
 module.exports = class LegacyMapUrlSource
@@ -27,6 +28,10 @@ module.exports = class LegacyMapUrlSource
     # Get JsonQLCss
     jsonqlCss = layer.getJsonQLCss(layerView.design, @schema, filters)
 
+    # HACK FOR LEGACY MWATER SERVER LAYERS
+    if _.isString(jsonqlCss)
+      return @createLegacyUrl(layerView.design, "png", filters)
+
     return @createUrl("png", jsonqlCss, filters) 
 
   # Get the url for the interactivity tiles with the specified filters applied
@@ -43,7 +48,11 @@ module.exports = class LegacyMapUrlSource
     # Get JsonQLCss
     jsonqlCss = layer.getJsonQLCss(layerView.design, @schema, filters)
 
-    return @createUrl("png", jsonqlCss, filters) 
+    # HACK FOR LEGACY MWATER SERVER LAYERS
+    if _.isString(jsonqlCss)
+      return @createLegacyUrl(layerView.design, "grid.json", filters)
+
+    return @createUrl("grid.json", jsonqlCss, filters) 
 
   # Create query string
   createUrl: (extension, jsonqlCss, filters) ->
@@ -62,3 +71,31 @@ module.exports = class LegacyMapUrlSource
 
     return url
 
+  # Create query string
+  createLegacyUrl: (design, extension, filters) ->
+    url = "#{@apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?type=#{design.type}&radius=1000"
+
+    # Add subdomains: {s} will be substituted with "a", "b" or "c" in leaflet for api.mwater.co only.
+    # Used to speed queries
+    if url.match(/^https:\/\/api\.mwater\.co\//)
+      url = url.replace(/^https:\/\/api\.mwater\.co\//, "https://{s}-api.mwater.co/")
+
+    if @client
+      url += "&client=#{@client}"
+      
+    # Add where for any relevant filters
+    relevantFilters = _.where(filters, table: design.table)
+
+    # If any, create and
+    whereClauses = _.map(relevantFilters, (f) => injectTableAlias(f.jsonql, "main"))
+
+    # Wrap if multiple
+    if whereClauses.length > 1
+      where = { type: "op", op: "and", exprs: whereClauses }
+    else
+      where = whereClauses[0]
+
+    if where 
+      url += "&where=" + encodeURIComponent(JSON.stringify(where))
+
+    return url

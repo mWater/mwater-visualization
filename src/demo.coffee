@@ -353,7 +353,7 @@ class MWaterDataSource extends DataSource
 mapDesign = {
   "baseLayer": "bing_road",
   "layerViews": [
-     # { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
+     { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
      { 
       id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
       name: "Choropleth"
@@ -434,6 +434,7 @@ mapDesign = {
       }
       visible: true 
     }
+     { id: "old_func_status", name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
   ]
   filters: {}
   bounds: {

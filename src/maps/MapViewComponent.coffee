@@ -58,7 +58,7 @@ module.exports = class MapViewComponent extends React.Component
           return null
 
         if layerView.visible
-          return { key: layerView.id, legend: layer.getLegend() }
+          return { key: layerView.id, legend: layer.getLegend(layerView.design, @props.schema) }
       )
     )
 
@@ -108,7 +108,7 @@ module.exports = class MapViewComponent extends React.Component
       # Create leafletLayer
       leafletLayer = {
         tileUrl: @props.mapUrlSource.getTileUrl(layerView.id, compiledFilters)
-        utfGridUrl: @props.mapUrlSource.getTileUrl(layerView.id, compiledFilters)
+        utfGridUrl: @props.mapUrlSource.getUtfGridUrl(layerView.id, compiledFilters)
         visible: layerView.visible
         opacity: layerView.opacity
         minZoom: layer.getMinZoom(layerView.design)
