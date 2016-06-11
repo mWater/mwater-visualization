@@ -87,14 +87,14 @@ module.exports = class DashboardComponent extends React.Component
       { name: "Text", type: "Markdown", design: {} }
       { name: "Map", type: "Map", design: { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } } }
     ]
-    newWidgetsTypes = 
+
     H.div key: "add", className: "btn-group",
       H.button type: "button", "data-toggle": "dropdown", className: "btn btn-link btn-sm dropdown-toggle",
         H.span className: "glyphicon glyphicon-plus"
         " Add Widget "
         H.span className: "caret"
       H.ul className: "dropdown-menu",
-        _.map(newWidgetsTypes, (wt) =>
+        _.map(newWidgetTypes, (wt) =>
           H.li key: wt.name,
             H.a onClick: @handleAddWidget.bind(null, wt), wt.name
           )
