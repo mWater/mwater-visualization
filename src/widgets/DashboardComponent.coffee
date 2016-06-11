@@ -79,6 +79,14 @@ module.exports = class DashboardComponent extends React.Component
     @refs.settings.show(@props.design)
 
   renderAddWidget: ->
+    newWidgetTypes = [
+      { name: "Chart", type: "LayeredChart", design: {xAxisLabelText: "", yAxisLabelText: ""} }
+      { name: "Table", type: "TableChart", design: {} }
+      { name: "Calendar", type: "CalendarChart", design: {} }
+      { name: "Image Mosaic", type: "ImageMosaicChart", design: {} }
+      { name: "Text", type: "Markdown", design: {} }
+      { name: "Map", type: "Map", design: { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } } }
+    ]
     newWidgetsTypes = 
     H.div key: "add", className: "btn-group",
       H.button type: "button", "data-toggle": "dropdown", className: "btn btn-link btn-sm dropdown-toggle",
@@ -86,15 +94,6 @@ module.exports = class DashboardComponent extends React.Component
         " Add Widget "
         H.span className: "caret"
       H.ul className: "dropdown-menu",
-        newWidgetTypes = [
-          { name: "Chart", type: "LayeredChart", design: {xAxisLabelText: "", yAxisLabelText: ""} }
-          { name: "Table", type: "TableChart", design: {} }
-          { name: "Calendar", type: "CalendarChart", design: {} }
-          { name: "Image Mosaic", type: "ImageMosaicChart", design: {} }
-          { name: "Text", type: "Markdown", design: {} }
-          { name: "Map", type: "Map", design: { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } } }
-        ]
-      
         _.map(newWidgetsTypes, (wt) =>
           H.li key: wt.name,
             H.a onClick: @handleAddWidget.bind(null, wt), wt.name
@@ -158,6 +157,9 @@ module.exports = class DashboardComponent extends React.Component
       R AutoSizeComponent, { injectWidth: true }, 
         (size) =>
           R DashboardViewComponent, {
+            schema: @props.schema
+            dataSource: @props.dataSource
+
             ref: @refDashboardView
             design: @props.design
             onDesignChange: @props.onDesignChange

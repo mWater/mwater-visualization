@@ -44,10 +44,10 @@ module.exports = class ChartViewComponent extends React.Component
 
   updateData: (props) ->
     # Clean design first (needed to validate properly)
-    design = props.chart.cleanDesign(props.design)
+    design = props.chart.cleanDesign(props.design, props.schema)
 
     # If design is not valid, do nothing as can't query invalid design
-    errors = props.chart.validateDesign(design)
+    errors = props.chart.validateDesign(design, props.schema)
     if errors
       return
 
@@ -70,7 +70,7 @@ module.exports = class ChartViewComponent extends React.Component
       style.opacity = 0.5
 
     # Faded if design is different than valid design (clean first to ensure that consistent)
-    if not _.isEqual(@props.chart.cleanDesign(@props.design), @state.validDesign)
+    if not _.isEqual(@props.chart.cleanDesign(@props.design, @props.schema), @state.validDesign)
       style.opacity = 0.5
 
     # If nothing to show, show grey

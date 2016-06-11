@@ -29,7 +29,7 @@ module.exports = class ChartWidget extends Widget
       chart: @chart
       design: options.design
       schema: options.schema
-      dataSource: @dataSource
+      dataSource: options.dataSource
       onRemove: options.onRemove
       onDuplicate: options.onDuplicate
       scope: options.scope
@@ -139,7 +139,7 @@ class ChartWidgetComponent extends React.Component
 
   render: ->
     # Determine if valid design
-    validDesign = not @props.chart.validateDesign(@props.chart.cleanDesign(@props.design))
+    validDesign = not @props.chart.validateDesign(@props.chart.cleanDesign(@props.design, @props.schema))
 
     # Create dropdown items
     dropdownItems = @props.chart.createDropdownItems(@props.design, @props.schema, @props.dataSource, @props.filters)

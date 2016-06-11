@@ -173,7 +173,7 @@ module.exports = class LayeredChart extends Chart
   createDropdownItems: (design, schema, dataSource, filters) ->
     # TODO validate design before allowing save
     save = =>
-      design = @cleanDesign(design)
+      design = @cleanDesign(design, schema)
       @getData(design, schema, dataSource, filters, (err, data) =>
         if err
           alert("Unable to load data")
@@ -181,7 +181,7 @@ module.exports = class LayeredChart extends Chart
           LayeredChartSvgFileSaver.save(design, data, @schema))
 
     # Don't save image of invalid design
-    if @validateDesign(@cleanDesign(design))
+    if @validateDesign(@cleanDesign(design, schema), schema)
       return []
 
     return [{ label: "Save Image", icon: "camera", onClick: save }]

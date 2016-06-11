@@ -130,7 +130,7 @@ module.exports = class DashboardViewComponent extends React.Component
       filters = @props.filters or []
       filters = filters.concat(@state.widgetScoper.getFilters(id))
 
-      widget.createViewElement({
+      return widget.createViewElement({
         schema: @props.schema
         dataSource: @props.dataSource
         design: item.widget.design
