@@ -10,13 +10,14 @@ ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
 
 # A widget which is a chart
 module.exports = class ChartWidget extends Widget
-  constructor: (chart, design, dataSource) ->
+  constructor: (chart) ->
     @chart = chart
-    @design = design
-    @dataSource = dataSource
 
   # Creates a view of the widget. width, height and standardWidth will be injected
   # options:
+  #  schema: schema to use
+  #  dataSource: data source to use
+  #  design: widget design
   #  onRemove: called when widget is removed
   #  onDuplicate: called when widget is duplicated
   #  scope: scope of the widget (when the widget self-selects a particular scope)
@@ -26,7 +27,8 @@ module.exports = class ChartWidget extends Widget
   createViewElement: (options) ->
     return React.createElement(ChartWidgetComponent,
       chart: @chart
-      design: @design
+      design: options.design
+      schema: options.schema
       dataSource: @dataSource
       onRemove: options.onRemove
       onDuplicate: options.onDuplicate
@@ -39,7 +41,11 @@ module.exports = class ChartWidget extends Widget
 # Complete chart widget
 class ChartWidgetComponent extends React.Component
   @propTypes:
+    schema: React.PropTypes.object.isRequired # schema to use
+    dataSource: React.PropTypes.object.isRequired # data source to use
+
     chart: React.PropTypes.object.isRequired # Chart object to use
+
     design: React.PropTypes.object.isRequired # Design of chart
     onDesignChange: React.PropTypes.func # null/undefined for readonly
     dataSource: React.PropTypes.object.isRequired # Data source to use for chart
@@ -71,7 +77,7 @@ class ChartWidgetComponent extends React.Component
   # Saves a csv file to disk
   handleSaveCsvFile: =>
     # Get the data
-    @props.chart.getData(@props.design, @props.filters, (err, data) =>
+    @props.chart.getData(@props.design, @props.schema, @props.dataSource, @props.filters, (err, data) =>
       if err  
         return alert("Failed to get data")
 
@@ -102,6 +108,7 @@ class ChartWidgetComponent extends React.Component
     React.createElement(ChartViewComponent, 
       chart: @props.chart
       design: @props.design
+      schema: @props.schema
       dataSource: @props.dataSource
       scope: @props.scope
       filters: @props.filters
@@ -112,7 +119,7 @@ class ChartWidgetComponent extends React.Component
 
   renderEditor: ->
     # Create editor
-    editor = @props.chart.createDesignerElement(design: @props.design, onDesignChange: @props.onDesignChange)
+    editor = @props.chart.createDesignerElement(schema: @props.schema, dataSource: @props.dataSource, design: @props.design, onDesignChange: @props.onDesignChange)
 
     # Create chart (maxing out at half of width of screen)
     width = Math.min(document.body.clientWidth/2, @props.width)
@@ -135,7 +142,7 @@ class ChartWidgetComponent extends React.Component
     validDesign = not @props.chart.validateDesign(@props.chart.cleanDesign(@props.design))
 
     # Create dropdown items
-    dropdownItems = @props.chart.createDropdownItems(@props.design, @props.dataSource, @props.filters)
+    dropdownItems = @props.chart.createDropdownItems(@props.design, @props.schema, @props.dataSource, @props.filters)
     if validDesign
       dropdownItems.push({ label: "Export Data", icon: "save-file", onClick: @handleSaveCsvFile })
     if @props.onRemove

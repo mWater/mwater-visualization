@@ -9,7 +9,6 @@ visualization = require './index'
 LayeredChart = require './widgets/charts/LayeredChart'
 LayeredChartDesignerComponent = require './widgets/charts/LayeredChartDesignerComponent'
 
-WidgetFactory = require './widgets/WidgetFactory'
 CalendarChartViewComponent = require './widgets/charts/CalendarChartViewComponent'
 
 MWaterLoaderComponent = require './MWaterLoaderComponent'
@@ -45,7 +44,6 @@ class MWaterDashboardPane extends React.Component
           schema: config.schema
           dataSource: config.dataSource
           design: @state.design
-          widgetFactory: config.widgetFactory
           onDesignChange: @handleDesignChange
           titleElem: "Sample"
         })

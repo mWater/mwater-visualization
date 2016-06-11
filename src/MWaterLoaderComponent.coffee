@@ -4,7 +4,6 @@ H = React.DOM
 
 Schema = require('mwater-expressions').Schema
 LayerFactory = require './maps/LayerFactory'
-WidgetFactory = require './widgets/WidgetFactory'
 MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 MWaterTableSelectComponent = require './MWaterTableSelectComponent'
 querystring = require 'querystring'
@@ -23,7 +22,7 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
 
     onMarkerClick: React.PropTypes.func                       # Called with (table, id)
 
-    children: React.PropTypes.func.isRequired                 # Called with (error, { schema:, dataSource:, widgetFactory: })
+    children: React.PropTypes.func.isRequired                 # Called with (error, { schema:, dataSource: })
 
   constructor: ->
     super
@@ -31,7 +30,6 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
       error: null
       schema: null
       dataSource: null
-      widgetFactory: null
     }
 
     @mounted = false
@@ -57,12 +55,9 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
       schema = new Schema(schemaJson)
       dataSource = new MWaterDataSource(props.apiUrl, props.client, { serverCaching: false, localCaching: true })
 
-      widgetFactory = new WidgetFactory(schema: schema, dataSource: dataSource) 
-
       callback({
         schema: schema
         dataSource: dataSource
-        widgetFactory: widgetFactory
         })
     .fail (xhr) =>
       console.log xhr.responseText
@@ -93,5 +88,4 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
     return @props.children(@state.error, {
       schema: @state.schema
       dataSource: @state.dataSource
-      widgetFactory: @state.widgetFactory
     })

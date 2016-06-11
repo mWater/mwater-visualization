@@ -6,48 +6,21 @@ ImageMosaicChart = require './charts/ImageMosaicChart'
 MarkdownWidget = require './MarkdownWidget'
 MapWidget = require './MapWidget'
 
-# Creates widgets based on type and design 
+# Creates widgets based on type 
 module.exports = class WidgetFactory
-  # Pass in schema, dataSource
-  constructor: (options) ->
-    @schema = options.schema
-    @dataSource = options.dataSource
-
-  createWidget: (type, design) ->
+  @createWidget: (type) ->
     switch type
       when "LayeredChart"
-        # Create chart object
-        chart = new LayeredChart(schema: @schema, dataSource: @dataSource)  
-        return new ChartWidget(chart, design, @dataSource)
+        return new ChartWidget(new LayeredChart())
       when "TableChart"
-        # Create chart object
-        chart = new TableChart(schema: @schema, dataSource: @dataSource)  
-        return new ChartWidget(chart, design, @dataSource)
+        return new ChartWidget(new TableChart())
       when "CalendarChart"
-        # Create chart object
-        chart = new CalendarChart(schema: @schema, dataSource: @dataSource)  
-        return new ChartWidget(chart, design, @dataSource)
+        return new ChartWidget(new CalendarChart())
       when "ImageMosaicChart"
-        # Create chart object
-        chart = new ImageMosaicChart(schema: @schema, dataSource: @dataSource)  
-        return new ChartWidget(chart, design, @dataSource)
+        return new ChartWidget(new ImageMosaicChart())
       when "Markdown"
-        return new MarkdownWidget(design)
+        return new MarkdownWidget()
       when "Map"
-        return new MapWidget(design: design, schema: @schema, dataSource: @dataSource)
+        return new MapWidget()
       else    
         throw new Error("Unknown widget type #{type}")
-
-
-  # Gets list of new widget types. Each contains name, type and design
-  getNewWidgetsTypes: ->
-    widgetTypes = [
-      { name: "Chart", type: "LayeredChart", design: {xAxisLabelText: "", yAxisLabelText: ""} }
-      { name: "Table", type: "TableChart", design: {} }
-      { name: "Calendar", type: "CalendarChart", design: {} }
-      { name: "Image Mosaic", type: "ImageMosaicChart", design: {} }
-      { name: "Text", type: "Markdown", design: {} }
-      { name: "Map", type: "Map", design: { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } } }
-    ]
-    
-    return widgetTypes

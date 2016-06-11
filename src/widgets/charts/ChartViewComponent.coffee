@@ -9,6 +9,7 @@ module.exports = class ChartViewComponent extends React.Component
   @propTypes:
     chart: React.PropTypes.object.isRequired # Chart object to use
     design: React.PropTypes.object.isRequired # Design of chart
+    schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired # Data source to use for chart
 
     width: React.PropTypes.number
@@ -59,7 +60,7 @@ module.exports = class ChartViewComponent extends React.Component
 
   loadData: (props, callback) ->
     # Get data from chart
-    props.chart.getData(props.design, props.filters, callback)
+    props.chart.getData(props.design, props.schema, props.dataSource, props.filters, callback)
 
   render: ->
     style = { width: @props.width, height: @props.height }
@@ -85,6 +86,8 @@ module.exports = class ChartViewComponent extends React.Component
     return H.div style: style,
       if @state.validDesign
         @props.chart.createViewElement({
+          schema: @props.schema
+          dataSource: @props.dataSource
           design: @state.validDesign
           data: @state.data
           scope: @props.scope

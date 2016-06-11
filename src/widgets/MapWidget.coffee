@@ -17,6 +17,8 @@ module.exports = class MapWidget extends Widget
 
   # Creates a view of the widget
   # options:
+  #  schema: schema to use
+  #  dataSource: data source to use
   #  onRemove: called when widget is removed
   #  scope: scope of the widget (when the widget self-selects a particular scope)
   #  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
@@ -24,8 +26,8 @@ module.exports = class MapWidget extends Widget
   #  onDesignChange: called with new design. null/undefined for readonly
   createViewElement: (options) ->
     return React.createElement(MapWidgetComponent,
-      schema: @schema
-      dataSource: @dataSource
+      schema: options.schema
+      dataSource: options.dataSource
 
       design: @design
       onDesignChange: options.onDesignChange

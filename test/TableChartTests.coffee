@@ -10,12 +10,12 @@ compare = (actual, expected) ->
 describe "TableChart", ->
   before ->
     @schema = fixtures.simpleSchema()
-    mockDataSource = {
+    @dataSource = {
       performQuery: (query) =>
         @query = query
     }
 
-    @chart = new TableChart(schema: @schema, dataSource: mockDataSource)
+    @chart = new TableChart()
 
     @exprNumber = { type: "field", table: "t1", column: "number" }
     @exprText = { type: "field", table: "t1", column: "text" }
@@ -43,7 +43,7 @@ describe "TableChart", ->
         orderings: []
       }
 
-      @chart.getData(design)
+      @chart.getData(design, @schema, @dataSource, [])
       expectedQuery = {
         type: "query"
         selects: [
@@ -68,7 +68,7 @@ describe "TableChart", ->
         orderings: []
       }
 
-      @chart.getData(design)
+      @chart.getData(design, @schema, @dataSource, [])
       expectedQuery = {
         type: "query"
         selects: [
@@ -95,7 +95,7 @@ describe "TableChart", ->
         ]
       }
 
-      @chart.getData(design)
+      @chart.getData(design, @schema, @dataSource, [])
       expectedQuery = {
         type: "query"
         selects: [
@@ -181,7 +181,7 @@ describe "TableChart", ->
         orderings: []
       }
 
-      assert not @chart.validateDesign(design)
+      assert not @chart.validateDesign(design, @schema)
 
     it "validates column expressions", ->
       design = {
@@ -192,7 +192,7 @@ describe "TableChart", ->
         orderings: []
       }
 
-      assert @chart.validateDesign(design)
+      assert @chart.validateDesign(design, @schema)
 
     it "validates filter"
 

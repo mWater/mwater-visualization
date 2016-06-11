@@ -14,16 +14,10 @@ LayeredChartUtils = require './LayeredChartUtils'
 
 # See LayeredChart Design.md for the design
 module.exports = class LayeredChart extends Chart
-  # Pass in schema and dataSource
-  constructor: (options) ->
-    @schema = options.schema
-    @dataSource = options.dataSource
-
-    @exprCleaner = new ExprCleaner(@schema)
-    @axisBuilder = new AxisBuilder(schema: @schema)
-
-  cleanDesign: (design) ->
-    compiler = new LayeredChartCompiler(schema: @schema)
+  cleanDesign: (design, schema) ->
+    exprCleaner = new ExprCleaner(schema)
+    axisBuilder = new AxisBuilder(schema: schema)
+    compiler = new LayeredChartCompiler(schema: schema)
 
     # Clone deep for now # TODO
     design = _.cloneDeep(design)
@@ -52,14 +46,14 @@ module.exports = class LayeredChart extends Chart
           aggrNeed = "required"
         else
           aggrNeed = "none"
-        layer.axes[axisKey] = @axisBuilder.cleanAxis(axis: axis, table: layer.table, aggrNeed: aggrNeed, types: LayeredChartUtils.getAxisTypes(design, layer, axisKey))
+        layer.axes[axisKey] = axisBuilder.cleanAxis(axis: axis, table: layer.table, aggrNeed: aggrNeed, types: LayeredChartUtils.getAxisTypes(design, layer, axisKey))
 
       # Remove x axis if not required
       if not compiler.canLayerUseXExpr(design, layerId) and layer.axes.x
         delete layer.axes.x
 
       # Remove cumulative if x is not date or number
-      if not layer.axes.x or @axisBuilder.getAxisType(layer.axes.x) not in ['date', 'number']
+      if not layer.axes.x or axisBuilder.getAxisType(layer.axes.x) not in ['date', 'number']
         delete layer.cumulative
 
       # Default y to count if x or color present and not scatter
@@ -67,17 +61,18 @@ module.exports = class LayeredChart extends Chart
         # Create count expr
         layer.axes.y = { expr: { type: "id", table: layer.table }, aggr: "count", xform: null }
 
-      layer.filter = @exprCleaner.cleanExpr(layer.filter, { table: layer.table, types: ['boolean'] })
+      layer.filter = exprCleaner.cleanExpr(layer.filter, { table: layer.table, types: ['boolean'] })
 
     return design
 
-  validateDesign: (design) ->
-    compiler = new LayeredChartCompiler(schema: @schema)
+  validateDesign: (design, schema) ->
+    axisBuilder = new AxisBuilder(schema: schema)
+    compiler = new LayeredChartCompiler(schema: schema)
 
     # Check that layers have same x axis type
     xAxisTypes = _.uniq(_.map(design.layers, (l) => 
-      @axisBuilder = new AxisBuilder(schema: @schema)
-      return @axisBuilder.getAxisType(l.axes.x)))
+      axisBuilder = new AxisBuilder(schema: schema)
+      return axisBuilder.getAxisType(l.axes.x)))
 
     if xAxisTypes.length > 1
       return "All x axes must be of same type"
@@ -101,9 +96,9 @@ module.exports = class LayeredChart extends Chart
       error = null
 
       # Validate axes
-      error = error or @axisBuilder.validateAxis(axis: layer.axes.x)
-      error = error or @axisBuilder.validateAxis(axis: layer.axes.y)
-      error = error or @axisBuilder.validateAxis(axis: layer.axes.color)
+      error = error or axisBuilder.validateAxis(axis: layer.axes.x)
+      error = error or axisBuilder.validateAxis(axis: layer.axes.y)
+      error = error or axisBuilder.validateAxis(axis: layer.axes.color)
 
     return error
 
@@ -111,27 +106,36 @@ module.exports = class LayeredChart extends Chart
     return not design.layers or not design.layers[0] or not design.layers[0].table
 
   # Creates a design element with specified options
-  # options include design: design and onChange: function
+  # options include:
+  #   schema: schema to use
+  #   dataSource: dataSource to use
+  #   design: design 
+  #   onDesignChange: function
   createDesignerElement: (options) ->
     props = {
-      schema: @schema
-      dataSource: @dataSource
-      design: @cleanDesign(options.design)
+      schema: options.schema
+      dataSource: options.dataSource
+      design: @cleanDesign(options.design, options.schema)
       onDesignChange: (design) =>
         # Clean design
-        design = @cleanDesign(design)
+        design = @cleanDesign(design, options.schema)
         options.onDesignChange(design)
     }
     return React.createElement(LayeredChartDesignerComponent, props)
 
-  # filters is array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
-  getData: (design, filters, callback) ->
-    compiler = new LayeredChartCompiler(schema: @schema)
+  # Get data for the chart asynchronously 
+  # design: design of the chart
+  # schema: schema to use
+  # dataSource: data source to get data from
+  # filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
+  # callback: (error, data)
+  getData: (design, schema, dataSource, filters, callback) ->
+    compiler = new LayeredChartCompiler(schema: schema)
     queries = compiler.createQueries(design, filters)
 
     # Run queries in parallel
     async.map _.pairs(queries), (item, cb) =>
-      @dataSource.performQuery(item[1], (err, rows) =>
+      dataSource.performQuery(item[1], (err, rows) =>
         cb(err, [item[0], rows])
         )
     , (err, items) =>
@@ -140,17 +144,20 @@ module.exports = class LayeredChart extends Chart
       else
         callback(null, _.object(items))
 
-  # Options include 
-  # design: design of the chart
-  # data: results from queries
-  # width, height, standardWidth: size of the chart view
-  # scope: current scope of the view element
-  # onScopeChange: called when scope changes with new scope
+  # Create a view element for the chart
+  # Options include:
+  #   schema: schema to use
+  #   dataSource: dataSource to use
+  #   design: design of the chart
+  #   data: results from queries
+  #   width, height, standardWidth: size of the chart view
+  #   scope: current scope of the view element
+  #   onScopeChange: called when scope changes with new scope
   createViewElement: (options) ->
     # Create chart
     props = {
-      schema: @schema
-      design: @cleanDesign(options.design)
+      schema: options.schema
+      design: @cleanDesign(options.design, options.schema)
       data: options.data
 
       width: options.width
@@ -163,11 +170,11 @@ module.exports = class LayeredChart extends Chart
 
     return React.createElement(LayeredChartViewComponent, props)
 
-  createDropdownItems: (design, dataSource, filters) ->
+  createDropdownItems: (design, schema, dataSource, filters) ->
     # TODO validate design before allowing save
     save = =>
       design = @cleanDesign(design)
-      @getData(design, filters, (err, data) =>
+      @getData(design, schema, dataSource, filters, (err, data) =>
         if err
           alert("Unable to load data")
         else

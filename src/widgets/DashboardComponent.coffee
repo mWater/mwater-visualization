@@ -20,7 +20,6 @@ module.exports = class DashboardComponent extends React.Component
     onDesignChange: React.PropTypes.func               # If not set, readonly
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
-    widgetFactory: React.PropTypes.object.isRequired
     titleElem: React.PropTypes.node                     # Extra element to include in title at left
     extraTitleButtonsElem: React.PropTypes.node         # Extra elements to add to right
     undoStackKey: React.PropTypes.any                   # Key that changes when the undo stack should be reset. Usually a document id or suchlike
@@ -80,13 +79,23 @@ module.exports = class DashboardComponent extends React.Component
     @refs.settings.show(@props.design)
 
   renderAddWidget: ->
+    newWidgetsTypes = 
     H.div key: "add", className: "btn-group",
       H.button type: "button", "data-toggle": "dropdown", className: "btn btn-link btn-sm dropdown-toggle",
         H.span className: "glyphicon glyphicon-plus"
         " Add Widget "
         H.span className: "caret"
       H.ul className: "dropdown-menu",
-        _.map(@props.widgetFactory.getNewWidgetsTypes(), (wt) =>
+        newWidgetTypes = [
+          { name: "Chart", type: "LayeredChart", design: {xAxisLabelText: "", yAxisLabelText: ""} }
+          { name: "Table", type: "TableChart", design: {} }
+          { name: "Calendar", type: "CalendarChart", design: {} }
+          { name: "Image Mosaic", type: "ImageMosaicChart", design: {} }
+          { name: "Text", type: "Markdown", design: {} }
+          { name: "Map", type: "Map", design: { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } } }
+        ]
+      
+        _.map(newWidgetsTypes, (wt) =>
           H.li key: wt.name,
             H.a onClick: @handleAddWidget.bind(null, wt), wt.name
           )
@@ -152,7 +161,6 @@ module.exports = class DashboardComponent extends React.Component
             ref: @refDashboardView
             design: @props.design
             onDesignChange: @props.onDesignChange
-            widgetFactory: @props.widgetFactory
             filters: filters
             width: size.width
             standardWidth: if @props.printScaling then 1440 else size.width
