@@ -400,7 +400,7 @@
   position: absolute;
   left: -9999px;
   top: -9999px;
-  z-index: 4;
+  z-index: 4000;
   visibility: visible;
   box-sizing: border-box;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
