@@ -133,6 +133,7 @@ class InnerMapWidgetComponent extends React.Component
 
   render: ->
     H.div style: { width: @props.width, height: @props.height, padding: 10 },
+      # TODO mapUrlSource missing!!
       React.createElement(MapViewComponent, {
         schema: @props.schema
         layerFactory: @props.layerFactory

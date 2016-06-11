@@ -19,6 +19,7 @@ module.exports = class MapDesignerComponent extends React.Component
         label: [H.span(className: "glyphicon glyphicon-align-justify"), " Layers"]
         elem: React.createElement(MapLayersDesignerComponent, 
           schema: @props.schema
+          dataSource: @props.dataSource
           design: @props.design
           layerFactory: @props.layerFactory
           onDesignChange: @props.onDesignChange) 

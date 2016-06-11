@@ -163,10 +163,14 @@ module.exports = class LeafletMapComponent extends React.Component
           if not layer.visible or not layer.tileUrl
             continue
 
-          tileLayer = L.tileLayer(layer.tileUrl, {
-            minZoom: layer.minZoom
-            maxZoom: layer.maxZoom
-          })
+          options = {}
+          # Putting null seems to make layer vanish
+          if layer.minZoom
+            options.minZoom = layer.minZoom
+          if layer.maxZoom
+            options.maxZoom = layer.maxZoom
+
+          tileLayer = L.tileLayer(layer.tileUrl, options)
           @tileLayers.push(tileLayer)
 
           # TODO Hack for animated zooming

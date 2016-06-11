@@ -8,6 +8,8 @@ ReorderableListComponent = require("react-library/lib/reorderable/ReorderableLis
 # Designer for layer selection in the map
 module.exports = class MapLayersDesignerComponent extends React.Component
   @propTypes:
+    schema: React.PropTypes.object.isRequired # Schema to use
+    dataSource: React.PropTypes.object.isRequired
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
     layerFactory: React.PropTypes.object.isRequired # Layer factory to use
@@ -48,7 +50,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
 
     # Clean design to make valid
     layer = @props.layerFactory.createLayer(newLayer.type, newLayer.design)
-    layerView.design = layer.cleanDesign(newLayer.design)
+    layerView.design = layer.cleanDesign(newLayer.design, @props.schema)
 
     # Add to list
     layerViews = @props.design.layerViews.slice()
@@ -76,8 +78,11 @@ module.exports = class MapLayersDesignerComponent extends React.Component
       border: "1px solid #ddd"
       marginBottom: -1
       backgroundColor: "#fff"
-    H.div style: style,
+
+    H.div style: style, 
       React.createElement(MapLayerViewDesignerComponent, 
+        schema: @props.schema
+        dataSource: @props.dataSource
         layerView: layerView
         onLayerViewChange: (lv) => @handleLayerViewChange(index, lv)
         onRemove: => @handleRemoveLayerView(index)
@@ -87,7 +92,8 @@ module.exports = class MapLayersDesignerComponent extends React.Component
 
   render: ->
     H.div style: { padding: 5 }, 
-      H.div className: "list-group",
+      H.div className: "list-group", key: "layers",
+        # _.map(@props.design.layerViews, @renderLayerView)
         React.createElement(ReorderableListComponent,
           items: @props.design.layerViews
           onReorder: @handleReorder

@@ -18,6 +18,8 @@ MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
+LegacyMapUrlSource = require './maps/LegacyMapUrlSource'
+
 # class DashboardPane extends React.Component
 #   constructor: (props) ->
 #     super
@@ -119,11 +121,15 @@ class MWaterMapPane extends React.Component
       extraTables: @state.extraTables
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
     }, (error, config) =>
+      # Create map url source
+      mapUrlSource = new LegacyMapUrlSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design, layerFactory: config.layerFactory })
+
       H.div style: { height: "100%" },
         React.createElement(visualization.MapComponent, {
           schema: config.schema
           dataSource: config.dataSource
           design: @state.design
+          mapUrlSource: mapUrlSource
           layerFactory: config.layerFactory
           onDesignChange: @handleDesignChange
           titleElem: "Sample"
@@ -253,12 +259,12 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+     React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+#    React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
@@ -399,6 +405,7 @@ mapDesign = {
   "layerViews": [
      # { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
      { 
+      id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
       name: "Choropleth"
       type: "AdminIndicatorChoropleth"
       design: { 
@@ -427,7 +434,65 @@ mapDesign = {
     "s": -18.583775688370928
   }
 }
+
 # bounds: { w: -40, n: 25, e: 40, s: -25 }
+mapDesign = {
+  "baseLayer": "bing_road",
+  "layerViews": [
+     { 
+      id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
+      name: "Buffer"
+      type: "Buffer"
+      design: { 
+        table: "entities.water_point" 
+        opacity: 0.5
+        radius: 1000
+        "axes": {
+          "geometry": {
+            "expr": {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "location"
+            },
+            "xform": null
+          }
+          "color": {
+            "expr": {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "type"
+            },
+            "xform": null,
+            "colorMap": [
+              {
+                "value": "Protected dug well",
+                "color": "#d0021b"
+              },
+              {
+                "value": "Piped into dwelling",
+                "color": "#7ed321"
+              },
+              {
+                "value": "Borehole or tubewell",
+                "color": "#f8e71c"
+              }
+            ]
+          }
+        },
+        color: "#9b9b9b"
+        filter: null
+      }
+      visible: true 
+    }
+  ]
+  filters: {}
+  bounds: {
+    "w": 32.75848388671875,
+    "n": -2.217997457638444,
+    "e": 33.4808349609375,
+    "s": -2.9375549775994263
+  }
+}
 
 dashboardDesign = {
   "items": {
