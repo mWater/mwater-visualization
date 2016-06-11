@@ -4,7 +4,7 @@ BufferLayer = require './BufferLayer'
 AdminIndicatorChoroplethLayer = require './AdminIndicatorChoroplethLayer'
 
 module.exports = class LayerFactory
-  @createLayer: (type, design) ->
+  @createLayer: (type) ->
     switch type
       when "MWaterServer"
         return new MWaterServerLayer()

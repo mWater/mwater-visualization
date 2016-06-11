@@ -16,7 +16,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
   constructor: (props) ->
     super(props)
 
-    layer = LayerFactory.createLayer(@props.layerView.type, @props.layerView.design)
+    layer = LayerFactory.createLayer(@props.layerView.type)
 
     @state = { 
       editing: layer.isIncomplete(@props.layerView.design, @props.schema) # Editing initially if incomplete
@@ -50,7 +50,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
       H.a className: "hover-display-child glyphicon glyphicon-pencil", onClick: @handleRename
 
   renderEditor: ->
-    layer = LayerFactory.createLayer(@props.layerView.type, @props.layerView.design)
+    layer = LayerFactory.createLayer(@props.layerView.type)
     return H.div null,
       H.div style: { textAlign: "right" },
         H.a className: "btn btn-link btn-xs", onClick: @props.onRemove, "Delete Layer"
@@ -63,7 +63,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
         })
 
   renderLayerEditToggle: ->
-    layer = LayerFactory.createLayer(@props.layerView.type, @props.layerView.design)
+    layer = LayerFactory.createLayer(@props.layerView.type)
 
     H.div style: { float: "right" }, key: "gear",
       H.a onClick: @handleToggleEditing,
@@ -73,7 +73,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
           H.i className: "fa fa-caret-square-o-down"
 
   # renderLayerGearMenu: ->
-  #   layer = LayerFactory.createLayer(@props.layerView.type, @props.layerView.design)
+  #   layer = LayerFactory.createLayer(@props.layerView.type)
   #   if not layer.isEditable()
   #     return 
 
@@ -89,7 +89,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
 
 
   render: ->
-    layer = LayerFactory.createLayer(@props.layerView.type, @props.layerView.design)
+    layer = LayerFactory.createLayer(@props.layerView.type)
     style =
       cursor: "move"
       marginRight: 8

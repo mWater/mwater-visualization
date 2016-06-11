@@ -49,7 +49,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     }
 
     # Clean design to make valid
-    layer = LayerFactory.createLayer(newLayer.type, newLayer.design)
+    layer = LayerFactory.createLayer(newLayer.type)
     layerView.design = layer.cleanDesign(newLayer.design, @props.schema)
 
     # Add to list

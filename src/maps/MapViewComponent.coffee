@@ -51,7 +51,7 @@ module.exports = class MapViewComponent extends React.Component
     legendItems = _.compact(
       _.map(@props.design.layerViews, (layerView) => 
         # Create layer
-        layer = LayerFactory.createLayer(layerView.type, layerView.design)
+        layer = LayerFactory.createLayer(layerView.type)
 
         # Ignore if invalid
         if layer.validateDesign(layerView.design, @props.schema)
@@ -99,7 +99,7 @@ module.exports = class MapViewComponent extends React.Component
     leafletLayers = []
     for layerView, index in @props.design.layerViews
       # Create layer
-      layer = LayerFactory.createLayer(layerView.type, layerView.design)
+      layer = LayerFactory.createLayer(layerView.type)
 
       # Ignore if invalid
       if layer.validateDesign(layerView.design, @props.schema)

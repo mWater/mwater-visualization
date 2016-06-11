@@ -23,7 +23,7 @@ module.exports = class LegacyMapUrlSource
       return null
 
     # Create layer
-    layer = LayerFactory.createLayer(layerView.type, layerView.design)
+    layer = LayerFactory.createLayer(layerView.type)
 
     # Get JsonQLCss
     jsonqlCss = layer.getJsonQLCss(layerView.design, @schema, filters)
@@ -43,7 +43,7 @@ module.exports = class LegacyMapUrlSource
       return null
 
     # Create layer
-    layer = LayerFactory.createLayer(layerView.type, layerView.design)
+    layer = LayerFactory.createLayer(layerView.type)
 
     # Get JsonQLCss
     jsonqlCss = layer.getJsonQLCss(layerView.design, @schema, filters)
