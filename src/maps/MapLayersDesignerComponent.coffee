@@ -2,6 +2,7 @@ React = require 'react'
 H = React.DOM
 uuid = require 'node-uuid'
 
+LayerFactory = require './LayerFactory'
 MapLayerViewDesignerComponent = require './MapLayerViewDesignerComponent'
 ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
 
@@ -12,7 +13,6 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
-    layerFactory: React.PropTypes.object.isRequired # Layer factory to use
 
   # Updates design with the specified changes
   updateDesign: (changes) ->
@@ -49,7 +49,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     }
 
     # Clean design to make valid
-    layer = @props.layerFactory.createLayer(newLayer.type, newLayer.design)
+    layer = LayerFactory.createLayer(newLayer.type, newLayer.design)
     layerView.design = layer.cleanDesign(newLayer.design, @props.schema)
 
     # Add to list
@@ -61,13 +61,34 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     @updateDesign(layerViews: layerList)
 
   renderAddLayer: ->
+    newLayers = [
+      {
+        label: "Marker Layer"
+        name: "Untitled Layer"
+        type: "Markers"
+        design: { }
+      }
+      {
+        label: "Radius (circles) Layer"
+        name: "Untitled Layer"
+        type: "Buffer"
+        design: { }
+      }
+      {
+        label: "Choropleth Indicator Layer (experimental)"
+        name: "Untitled Layer"
+        type: "AdminIndicatorChoropleth"
+        design: { }
+      }
+    ]
+
     H.div style: { margin: 5 }, key: "addLayer", className: "btn-group",
       H.button type: "button", "data-toggle": "dropdown", className: "btn btn-default dropdown-toggle",
         H.span className: "glyphicon glyphicon-plus"
         " Add Layer "
         H.span className: "caret"
       H.ul className: "dropdown-menu",
-        _.map(@props.layerFactory.getNewLayers(), (layer, i) =>
+        _.map(newLayers, (layer, i) =>
           H.li key: "" + i,
             H.a onClick: @handleAddLayerView.bind(null, layer), layer.label or layer.name
           )
@@ -86,7 +107,6 @@ module.exports = class MapLayersDesignerComponent extends React.Component
         layerView: layerView
         onLayerViewChange: (lv) => @handleLayerViewChange(index, lv)
         onRemove: => @handleRemoveLayerView(index)
-        layerFactory: @props.layerFactory
         connectDragSource: connectDragSource
       )
 

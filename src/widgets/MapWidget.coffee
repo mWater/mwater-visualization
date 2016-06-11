@@ -9,12 +9,11 @@ MapViewComponent = require '../maps/MapViewComponent'
 ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
 
 module.exports = class MapWidget extends Widget
-  # design, schema, dataSource, layerFactory
+  # design, schema, dataSource
   constructor: (options) ->
     @schema = options.schema
     @design = options.design
     @dataSource = options.dataSource
-    @layerFactory = options.layerFactory
 
   # Creates a view of the widget
   # options:
@@ -27,7 +26,6 @@ module.exports = class MapWidget extends Widget
     return React.createElement(MapWidgetComponent,
       schema: @schema
       dataSource: @dataSource
-      layerFactory: @layerFactory
 
       design: @design
       onDesignChange: options.onDesignChange
@@ -39,7 +37,6 @@ class MapWidgetComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
     dataSource: React.PropTypes.object.isRequired # Data source to use
-    layerFactory: React.PropTypes.object.isRequired # Layer factory to use
 
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func # Called with new design.  null/undefined for readonly
@@ -66,7 +63,6 @@ class MapWidgetComponent extends React.Component
     editor = React.createElement(MapDesignerComponent, 
       schema: @props.schema
       dataSource: @props.dataSource
-      layerFactory: @props.layerFactory
       design: @props.design
       onDesignChange: @props.onDesignChange
     )
@@ -90,7 +86,6 @@ class MapWidgetComponent extends React.Component
   renderContent: (width, height) ->
     React.createElement(InnerMapWidgetComponent, {
       schema: @props.schema
-      layerFactory: @props.layerFactory
       design: @props.design
       onDesignChange: @props.onDesignChange
       filters: @props.filters
@@ -121,7 +116,6 @@ class MapWidgetComponent extends React.Component
 class InnerMapWidgetComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
-    layerFactory: React.PropTypes.object.isRequired # Layer factory to use
 
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func  # Called with new design. null/undefined for readonly
@@ -136,7 +130,6 @@ class InnerMapWidgetComponent extends React.Component
       # TODO mapUrlSource missing!!
       React.createElement(MapViewComponent, {
         schema: @props.schema
-        layerFactory: @props.layerFactory
         design: @props.design
         onDesignChange: @props.onDesignChange
         extraFilters: @props.filters

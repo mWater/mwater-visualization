@@ -1,3 +1,5 @@
+LayerFactory = require './LayerFactory'
+
 module.exports = class LegacyMapUrlSource
   # Create map url source that uses legacy jsonql maps
   # options:
@@ -5,13 +7,11 @@ module.exports = class LegacyMapUrlSource
   #   mapDesign: design of entire map
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
-  #   layerFactory: layer factory to use
   constructor: (options) ->
     @apiUrl = options.apiUrl
     @client = options.client
     @mapDesign = options.mapDesign
     @schema = options.schema
-    @layerFactory = options.layerFactory
 
   # Get the url for the image tiles with the specified filters applied
   # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
@@ -22,7 +22,7 @@ module.exports = class LegacyMapUrlSource
       return null
 
     # Create layer
-    layer = @layerFactory.createLayer(layerView.type, layerView.design)
+    layer = LayerFactory.createLayer(layerView.type, layerView.design)
 
     # Get JsonQLCss
     jsonqlCss = layer.getJsonQLCss(layerView.design, @schema, filters)
@@ -38,8 +38,7 @@ module.exports = class LegacyMapUrlSource
       return null
 
     # Create layer
-    layerFactory = new LayerFactory()
-    layer = layerFactory.createLayer(layerView.type, layerView.design)
+    layer = LayerFactory.createLayer(layerView.type, layerView.design)
 
     # Get JsonQLCss
     jsonqlCss = layer.getJsonQLCss(layerView.design, @schema, filters)

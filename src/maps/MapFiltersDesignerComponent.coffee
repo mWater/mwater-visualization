@@ -4,12 +4,13 @@ FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprUtils = require('mwater-expressions').ExprUtils
 
+LayerFactory = require './LayerFactory'
+
 # Designer for filters for a map
 module.exports = class MapFiltersDesignerComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
     dataSource: React.PropTypes.object.isRequired # Data source to use
-    layerFactory: React.PropTypes.object.isRequired # layer factory to use
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
 
@@ -44,7 +45,7 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
     filterableTables = []
     for layerView in @props.design.layerViews
       # Create layer
-      layer = @props.layerFactory.createLayer(layerView.type, layerView.design)
+      layer = LayerFactory.createLayer(layerView.type, layerView.design)
 
       # Get filterable tables
       filterableTables = _.uniq(filterableTables.concat(layer.getFilterableTables(layerView.design, @props.schema)))
