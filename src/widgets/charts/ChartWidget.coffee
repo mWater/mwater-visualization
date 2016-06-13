@@ -152,7 +152,7 @@ class ChartWidgetComponent extends React.Component
 
   render: ->
     # Determine if valid design
-    validDesign = not @props.chart.validateDesign(@props.chart.cleanDesign(@props.design, @props.schema))
+    validDesign = not @props.chart.validateDesign(@props.chart.cleanDesign(@props.design, @props.schema), @props.schema)
 
     # Create dropdown items
     dropdownItems = @props.chart.createDropdownItems(@props.design, @props.schema, @props.widgetDataSource, @props.filters)
