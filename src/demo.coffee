@@ -210,12 +210,12 @@ $ ->
   sample = H.div className: "container-fluid", style: { height: "100%", paddingLeft: 0, paddingRight: 0 },
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
-    React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
@@ -355,7 +355,7 @@ class MWaterDataSource extends DataSource
 mapDesign = {
   "baseLayer": "bing_road",
   "layerViews": [
-     { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
+     # { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
      { 
       id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
       name: "Choropleth"
@@ -388,64 +388,64 @@ mapDesign = {
 }
 
 # bounds: { w: -40, n: 25, e: 40, s: -25 }
-mapDesign = {
-  "baseLayer": "bing_road",
-  "layerViews": [
-     { 
-      id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
-      name: "Buffer"
-      type: "Buffer"
-      design: { 
-        table: "entities.water_point" 
-        opacity: 0.5
-        radius: 1000
-        "axes": {
-          "geometry": {
-            "expr": {
-              "type": "field",
-              "table": "entities.water_point",
-              "column": "location"
-            },
-            "xform": null
-          }
-          "color": {
-            "expr": {
-              "type": "field",
-              "table": "entities.water_point",
-              "column": "type"
-            },
-            "xform": null,
-            "colorMap": [
-              {
-                "value": "Protected dug well",
-                "color": "#d0021b"
-              },
-              {
-                "value": "Piped into dwelling",
-                "color": "#7ed321"
-              },
-              {
-                "value": "Borehole or tubewell",
-                "color": "#f8e71c"
-              }
-            ]
-          }
-        },
-        color: "#9b9b9b"
-        filter: null
-      }
-      visible: true 
-    }
-     { id: "old_func_status", name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
-  ]
-  filters: {}
-  bounds: {
-    "w": 32.75848388671875,
-    "n": -2.217997457638444,
-    "e": 33.4808349609375,
-    "s": -2.9375549775994263
-  }
-}
+# mapDesign = {
+#   "baseLayer": "bing_road",
+#   "layerViews": [
+#      { 
+#       id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
+#       name: "Buffer"
+#       type: "Buffer"
+#       design: { 
+#         table: "entities.water_point" 
+#         opacity: 0.5
+#         radius: 1000
+#         "axes": {
+#           "geometry": {
+#             "expr": {
+#               "type": "field",
+#               "table": "entities.water_point",
+#               "column": "location"
+#             },
+#             "xform": null
+#           }
+#           "color": {
+#             "expr": {
+#               "type": "field",
+#               "table": "entities.water_point",
+#               "column": "type"
+#             },
+#             "xform": null,
+#             "colorMap": [
+#               {
+#                 "value": "Protected dug well",
+#                 "color": "#d0021b"
+#               },
+#               {
+#                 "value": "Piped into dwelling",
+#                 "color": "#7ed321"
+#               },
+#               {
+#                 "value": "Borehole or tubewell",
+#                 "color": "#f8e71c"
+#               }
+#             ]
+#           }
+#         },
+#         color: "#9b9b9b"
+#         filter: null
+#       }
+#       visible: true 
+#     }
+#      { id: "old_func_status", name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
+#   ]
+#   filters: {}
+#   bounds: {
+#     "w": 32.75848388671875,
+#     "n": -2.217997457638444,
+#     "e": 33.4808349609375,
+#     "s": -2.9375549775994263
+#   }
+# }
 
 dashboardDesign = {
   "items": {
