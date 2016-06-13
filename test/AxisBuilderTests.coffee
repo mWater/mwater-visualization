@@ -183,6 +183,37 @@ describe "AxisBuilder", ->
         ]
       }
 
+    it "compiles ranges xform", ->
+      axis = {
+        expr: @exprNumber
+        xform: { type: "ranges", ranges: [
+          { id: "a", minValue: 0, maxValue: 50, minOpen: false, maxOpen: true } # >=0 and < 50
+          { id: "b", minValue: 50, minOpen: false, label: "High" } # >= 50 
+          ]}
+      }
+
+      jql = @ab.compileAxis(axis: axis, tableAlias: "T1")
+      assert _.isEqual jql, {
+        type: "case"
+        cases: [
+          {
+            when: {
+              type: "op"
+              op: "and"
+              exprs: [
+                { type: "op", op: ">=", exprs: [{ type: "field", tableAlias: "T1", column: "number" }, 0] }
+                { type: "op", op: "<", exprs: [{ type: "field", tableAlias: "T1", column: "number" }, 50] }
+              ]
+            }
+            then: "a"
+          }
+          {
+            when: { type: "op", op: ">=", exprs: [{ type: "field", tableAlias: "T1", column: "number" }, 50] }
+            then: "b"
+          }
+        ]
+      }
+
   describe "cleanAxis", ->
     it "defaults aggr"
     it "cleans expression"

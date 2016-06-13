@@ -210,6 +210,46 @@ module.exports = class AxisBuilder
           ]
         }
 
+      # Ranges
+      if options.axis.xform.type == "ranges"
+        cases = []
+        for range in options.axis.xform.ranges
+          whens = []
+          if range.minValue?
+            if range.minOpen
+              whens.push({ type: "op", op: ">", exprs: [compiledExpr, range.minValue] })
+            else
+              whens.push({ type: "op", op: ">=", exprs: [compiledExpr, range.minValue] })
+
+          if range.maxValue?
+            if range.maxOpen
+              whens.push({ type: "op", op: "<", exprs: [compiledExpr, range.maxValue] })
+            else
+              whens.push({ type: "op", op: "<=", exprs: [compiledExpr, range.maxValue] })
+
+          if whens.length > 1
+            cases.push({
+              when: {
+                type: "op"
+                op: "and"
+                exprs: whens
+              }
+              then: range.id
+            })
+          else if whens.length == 1
+            cases.push({
+              when: whens[0]
+              then: range.id
+            })
+
+        if cases.length > 0 
+          compiledExpr = {
+            type: "case"
+            cases: cases
+          }
+        else
+          compiledExpr = null
+
     # Aggregate
     if options.axis.aggr
       compiledExpr = {
