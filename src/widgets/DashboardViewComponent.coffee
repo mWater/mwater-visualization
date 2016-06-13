@@ -16,7 +16,8 @@ uuid = require 'node-uuid'
 module.exports = class DashboardViewComponent extends React.Component
   @propTypes: 
     schema: React.PropTypes.object.isRequired # schema to use
-    dataSource: React.PropTypes.object.isRequired # data source to use
+    dataSource: React.PropTypes.object.isRequired # data source to use. Only used when designing, for display uses dashboardDataSource
+    dashboardDataSource: React.PropTypes.object.isRequired # dashboard data source
 
     design: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func      # Leave unset for readonly
@@ -133,6 +134,7 @@ module.exports = class DashboardViewComponent extends React.Component
       return widget.createViewElement({
         schema: @props.schema
         dataSource: @props.dataSource
+        widgetDataSource: @props.dashboardDataSource.getWidgetDataSource(id)
         design: item.widget.design
         scope: @state.widgetScoper.getScope(id)
         filters: filters

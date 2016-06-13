@@ -5,7 +5,7 @@ module.exports = class Widget
   # Creates a React element that is a view of the widget 
   # options:
   #  schema: schema to use
-  #  dataSource: data source to use
+  #  dataSource: data source to use. Only used when designing, for display uses widgetDataSource
   #  widgetDataSource: Gives data to the widget in a way that allows client-server separation and secure sharing. See definition in WidgetDataSource.
   #  design: widget design
   #  onRemove: called when widget is removed

@@ -16,6 +16,7 @@ MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
+LegacyDashboardDataSource = require './widgets/LegacyDashboardDataSource'
 LegacyMapUrlSource = require './maps/LegacyMapUrlSource'
 
 class MWaterDashboardPane extends React.Component
@@ -39,10 +40,13 @@ class MWaterDashboardPane extends React.Component
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
       extraTables: @state.extraTables
     }, (error, config) =>
+      dashboardDataSource = new LegacyDashboardDataSource(@props.apiUrl, @props.client, @state.design, config.schema, config.dataSource)
+
       H.div style: { height: "100%" },
         React.createElement(visualization.DashboardComponent, {
           schema: config.schema
           dataSource: config.dataSource
+          dashboardDataSource: dashboardDataSource
           design: @state.design
           onDesignChange: @handleDesignChange
           titleElem: "Sample"

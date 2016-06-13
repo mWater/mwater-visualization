@@ -20,6 +20,8 @@ module.exports = class DashboardComponent extends React.Component
     onDesignChange: React.PropTypes.func               # If not set, readonly
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
+    dashboardDataSource: React.PropTypes.object.isRequired # dashboard data source
+
     titleElem: React.PropTypes.node                     # Extra element to include in title at left
     extraTitleButtonsElem: React.PropTypes.node         # Extra elements to add to right
     undoStackKey: React.PropTypes.any                   # Key that changes when the undo stack should be reset. Usually a document id or suchlike
@@ -159,6 +161,7 @@ module.exports = class DashboardComponent extends React.Component
           R DashboardViewComponent, {
             schema: @props.schema
             dataSource: @props.dataSource
+            dashboardDataSource: @props.dashboardDataSource
 
             ref: @refDashboardView
             design: @props.design

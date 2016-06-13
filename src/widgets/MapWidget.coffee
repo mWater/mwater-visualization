@@ -33,6 +33,7 @@ module.exports = class MapWidget extends Widget
     return React.createElement(MapWidgetComponent,
       schema: options.schema
       dataSource: options.dataSource
+      widgetDataSource: options.widgetDataSource
 
       design: options.design
       onDesignChange: options.onDesignChange
@@ -44,6 +45,7 @@ class MapWidgetComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
     dataSource: React.PropTypes.object.isRequired # Data source to use
+    widgetDataSource: React.PropTypes.object.isRequired
 
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func # Called with new design.  null/undefined for readonly
@@ -93,6 +95,7 @@ class MapWidgetComponent extends React.Component
   renderContent: (width, height) ->
     React.createElement(InnerMapWidgetComponent, {
       schema: @props.schema
+      widgetDataSource: @props.widgetDataSource
       design: @props.design
       onDesignChange: @props.onDesignChange
       filters: @props.filters
@@ -123,6 +126,7 @@ class MapWidgetComponent extends React.Component
 class InnerMapWidgetComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
+    widgetDataSource: React.PropTypes.object.isRequired
 
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func  # Called with new design. null/undefined for readonly
@@ -134,13 +138,18 @@ class InnerMapWidgetComponent extends React.Component
 
   render: ->
     # Create mapUrlSource
-    
+    mapUrlSource = {
+      getTileUrl: (layerId, filters) =>
+        return @props.widgetDataSource.getTileUrl(layerId, filters)
+      getUtfGridUrl: (layerId, filters) =>
+        return @props.widgetDataSource.getUtfGridUrl(layerId, filters)
+    }
 
     H.div style: { width: @props.width, height: @props.height, padding: 10 },
-      # TODO mapUrlSource missing!!
       React.createElement(MapViewComponent, {
         schema: @props.schema
         design: @props.design
+        mapUrlSource: mapUrlSource
         onDesignChange: @props.onDesignChange
         extraFilters: @props.filters
         width: @props.width - 20
