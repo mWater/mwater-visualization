@@ -1,7 +1,7 @@
 React = require 'react'
 H = React.DOM
 
-ColorPicker = require("react-color")
+SketchPicker = require("react-color").SketchPicker
 
 # Simple color well with popup
 module.exports = class ColorComponent extends React.Component
@@ -18,7 +18,7 @@ module.exports = class ColorComponent extends React.Component
 
   handleClose: (color) =>
     @setState(open: false)
-    @props.onChange("#" + color.hex)
+    @props.onChange(color.hex)
 
   render: ->
     style = {
@@ -45,6 +45,8 @@ module.exports = class ColorComponent extends React.Component
           H.a style: { cursor: "pointer" }, onClick: (=> @props.onChange(null)), "Reset"
       else
         H.a style: { cursor: "pointer"}, onClick: @handleClick, "Customize"
-      React.createElement(ColorPicker, display: @state.open, positionCSS: popupPosition, onClose: @handleClose)
+      if @state.open
+        H.div style: popupPosition,
+          React.createElement(SketchPicker, type: "sketch", color: @props.color or undefined, onChangeComplete: @handleClose)
 
 
