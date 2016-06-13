@@ -253,6 +253,30 @@ describe "AxisBuilder", ->
       axis = @ab.cleanAxis(axis: axis, table: "t1", types: ["number"])
       assert not axis.xform
 
+    it "removes ranges xform if wrong input type", ->
+      axis = {
+        expr: @exprEnum
+        xform: { type: "ranges", ranges: [
+          { id: "a", minValue: 0, maxValue: 50, minOpen: false, maxOpen: true } # >=0 and < 50
+          { id: "b", minValue: 50, minOpen: false, label: "High" } # >= 50 
+          ]}
+      }
+
+      axis = @ab.cleanAxis(axis: axis, table: "t1")
+      assert not axis.xform
+
+    it "removes ranges xform if wrong output type", ->
+      axis = {
+        expr: @exprNumber
+        xform: { type: "ranges", ranges: [
+          { id: "a", minValue: 0, maxValue: 50, minOpen: false, maxOpen: true } # >=0 and < 50
+          { id: "b", minValue: 50, minOpen: false, label: "High" } # >= 50 
+          ]}
+      }
+
+      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ["number"])
+      assert not axis.xform
+
     it "removes bad aggr"
 
     it "does not default count aggr for text", ->
@@ -322,6 +346,16 @@ describe "AxisBuilder", ->
       axis = {
         expr: @exprNumber
         xform: { type: "bin", numBins: 10, min: 2, max: 8 }
+      }
+      assert.equal @ab.getAxisType(axis), "enum"
+
+    it "xforms ranges", ->
+      axis = {
+        expr: @exprNumber
+        xform: { type: "ranges", ranges: [
+          { id: "a", minValue: 0, maxValue: 50, minOpen: false, maxOpen: true } # >=0 and < 50
+          { id: "b", minValue: 50, minOpen: false, label: "High" } # >= 50 
+          ]}
       }
       assert.equal @ab.getAxisType(axis), "enum"
 
@@ -432,6 +466,21 @@ describe "AxisBuilder", ->
         { value: 3, label: "3 - 4" }
         { value: 4, label: "> 4" }
       ])
+
+    it "gets ranges by name, overriding with label", ->
+      axis = {
+        expr: @exprNumber
+        xform: { type: "ranges", ranges: [
+          { id: "a", minValue: 0, maxValue: 50, minOpen: false, maxOpen: true } # >=0 and < 50
+          { id: "b", minValue: 50, minOpen: false, label: "High" } # >= 50 
+          ]}
+      }
+
+      categories = @ab.getCategories(axis, [])
+      compare(categories, [
+        { value: "a", label: ">= 0 and < 50" }
+        { value: "b", label: "High" }
+     ])
 
     it "gets months", ->
       axis = {

@@ -9,6 +9,7 @@ H = React.DOM
 
 xforms = [
   { type: "bin", input: "number", output: "enum" }
+  { type: "ranges", input: "number", output: "enum" }
   { type: "date", input: "datetime", output: "date" }
   { type: "year", input: "date", output: "date" }
   { type: "year", input: "datetime", output: "date" }
@@ -88,6 +89,11 @@ module.exports = class AxisBuilder
       if not axis.xform.numBins
         axis.xform.numBins = 6
 
+    if axis.xform and axis.xform.type == "ranges"
+      # Add ranges
+      if not axis.xform.ranges
+        axis.xform.ranges = []
+
     # Only allow aggr if not xform
     if axis.xform
       delete axis.aggr
@@ -133,6 +139,14 @@ module.exports = class AxisBuilder
         return "Missing max"
       if options.axis.xform.max < options.axis.xform.min
         return "Max < min"
+
+    # xform validation
+    if options.axis.xform and options.axis.xform.type == "ranges"
+      if not options.axis.xform.ranges or not _.isArray(options.axis.xform.ranges)
+        return "Missing ranges"
+      for range in options.axis.xform.ranges
+        if range.minValue? and range.maxValue? and range.minValue > range.maxValue
+          return "Max < min"
 
     return
 
@@ -360,7 +374,32 @@ module.exports = class AxisBuilder
   # Get all categories for a given axis type given the known values
   # Returns array of { value, label }
   getCategories: (axis, values, locale) ->
-    # Handle binning first
+    # Handle ranges
+    if axis.xform and axis.xform.type == "ranges"
+      return _.map(axis.xform.ranges, (range) =>
+        label = range.label or ""
+        if not label
+          if range.minValue?
+            if range.minOpen
+              label = "> #{range.minValue}"
+            else
+              label = ">= #{range.minValue}"
+
+          if range.maxValue?
+            if label
+              label += " and "
+            if range.maxOpen
+              label += "< #{range.maxValue}"
+            else
+              label += "<= #{range.maxValue}"
+
+        return {
+          value: range.id
+          label: label
+        }
+      )
+
+    # Handle binning 
     if axis.xform and axis.xform.type == "bin"
       min = axis.xform.min
       max = axis.xform.max
