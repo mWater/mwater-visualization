@@ -21,12 +21,13 @@ module.exports = class Chart
   createDesignerElement: (options) ->
     throw new Error("Not implemented")
 
-  # Get data for the chart asynchronously 
-  # design: design of the chart
-  # schema: schema to use
-  # dataSource: data source to get data from
-  # filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
-  # callback: (error, data)
+  # Get data for the chart asynchronously. Charts should not call this directly!
+  # Instead they should use the widgetDataSource provided to the chart view.
+  #   design: design of the chart
+  #   schema: schema to use
+  #   dataSource: data source to get data from
+  #   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
+  #   callback: (error, data)
   getData: (design, schema, dataSource, filters, callback) ->
     throw new Error("Not implemented")
 
@@ -45,10 +46,10 @@ module.exports = class Chart
   # Creates the dropdown menu items of shape {label, action}
   #   design: design of the chart
   #   schema: schema to use
-  #   dataSource: Data source to use for chart
+  #   widgetDataSource: widget data source to use 
   #   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   # Returns an empty list by default
-  createDropdownItems: (design, schema, dataSource, filters) ->
+  createDropdownItems: (design, schema, widgetDataSource, filters) ->
     return []
 
   # Creates a table form of the chart data. Array of arrays

@@ -17,6 +17,7 @@ module.exports = class ChartWidget extends Widget
   # options:
   #  schema: schema to use
   #  dataSource: data source to use
+  #  widgetDataSource: Gives data to the widget in a way that allows client-server separation and secure sharing. See definition in WidgetDataSource.
   #  design: widget design
   #  onRemove: called when widget is removed
   #  onDuplicate: called when widget is duplicated
@@ -29,6 +30,7 @@ module.exports = class ChartWidget extends Widget
       chart: @chart
       design: options.design
       schema: options.schema
+      widgetDataSource: options.widgetDataSource
       dataSource: options.dataSource
       onRemove: options.onRemove
       onDuplicate: options.onDuplicate
@@ -38,11 +40,21 @@ module.exports = class ChartWidget extends Widget
       onDesignChange: options.onDesignChange
     )
 
+  # Get the data that the widget needs. This will be called on the server, typically.
+  #   design: design of the chart
+  #   schema: schema to use
+  #   dataSource: data source to get data from
+  #   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
+  #   callback: (error, data)
+  getData: (design, schema, dataSource, filters, callback) ->
+    @chart.getData(design, schema, dataSource, filters, callback)
+
 # Complete chart widget
 class ChartWidgetComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # schema to use
     dataSource: React.PropTypes.object.isRequired # data source to use
+    widgetDataSource: React.PropTypes.object.isRequired
 
     chart: React.PropTypes.object.isRequired # Chart object to use
 
@@ -77,7 +89,7 @@ class ChartWidgetComponent extends React.Component
   # Saves a csv file to disk
   handleSaveCsvFile: =>
     # Get the data
-    @props.chart.getData(@props.design, @props.schema, @props.dataSource, @props.filters, (err, data) =>
+    @props.widgetDataSource.getData(@props.filters, (err, data) =>
       if err  
         return alert("Failed to get data")
 
@@ -110,6 +122,7 @@ class ChartWidgetComponent extends React.Component
       design: @props.design
       schema: @props.schema
       dataSource: @props.dataSource
+      widgetDataSource: @props.widgetDataSource
       scope: @props.scope
       filters: @props.filters
       width: width
@@ -142,7 +155,7 @@ class ChartWidgetComponent extends React.Component
     validDesign = not @props.chart.validateDesign(@props.chart.cleanDesign(@props.design, @props.schema))
 
     # Create dropdown items
-    dropdownItems = @props.chart.createDropdownItems(@props.design, @props.schema, @props.dataSource, @props.filters)
+    dropdownItems = @props.chart.createDropdownItems(@props.design, @props.schema, @props.widgetDataSource, @props.filters)
     if validDesign
       dropdownItems.push({ label: "Export Data", icon: "save-file", onClick: @handleSaveCsvFile })
     if @props.onRemove

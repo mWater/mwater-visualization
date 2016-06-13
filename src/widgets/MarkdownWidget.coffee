@@ -12,6 +12,7 @@ module.exports = class MarkdownWidget extends Widget
   # options:
   #  schema: schema to use
   #  dataSource: data source to use
+  #  widgetDataSource: Gives data to the widget in a way that allows client-server separation and secure sharing. See definition in WidgetDataSource.
   #  design: widget design
   #  onRemove: called when widget is removed
   #  onDuplicate: called when widget is duplicated

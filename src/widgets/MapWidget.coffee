@@ -14,6 +14,7 @@ module.exports = class MapWidget extends Widget
   # options:
   #  schema: schema to use
   #  dataSource: data source to use
+  #  widgetDataSource: Gives data to the widget in a way that allows client-server separation and secure sharing. See definition in WidgetDataSource.
   #  design: widget design
   #  onRemove: called when widget is removed
   #  onDuplicate: called when widget is duplicated
@@ -132,6 +133,9 @@ class InnerMapWidgetComponent extends React.Component
     filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   render: ->
+    # Create mapUrlSource
+    
+
     H.div style: { width: @props.width, height: @props.height, padding: 10 },
       # TODO mapUrlSource missing!!
       React.createElement(MapViewComponent, {

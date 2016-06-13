@@ -170,15 +170,15 @@ module.exports = class LayeredChart extends Chart
 
     return React.createElement(LayeredChartViewComponent, props)
 
-  createDropdownItems: (design, schema, dataSource, filters) ->
+  createDropdownItems: (design, schema, widgetDataSource, filters) ->
     # TODO validate design before allowing save
     save = =>
       design = @cleanDesign(design, schema)
-      @getData(design, schema, dataSource, filters, (err, data) =>
+      widgetDataSource.getData filters, (err, data) =>
         if err
           alert("Unable to load data")
         else
-          LayeredChartSvgFileSaver.save(design, data, @schema))
+          LayeredChartSvgFileSaver.save(design, data, @schema)
 
     # Don't save image of invalid design
     if @validateDesign(@cleanDesign(design, schema), schema)
