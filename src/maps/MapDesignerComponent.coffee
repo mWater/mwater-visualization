@@ -78,3 +78,4 @@ class MapConfigDesignerComponent extends React.Component
       H.div style: { marginLeft: 10 }, 
         @renderBaseLayer("bing_road", "Roads")
         @renderBaseLayer("bing_aerial", "Satellite")
+        @renderBaseLayer("cartodb_positron", "Monochrome Light")
