@@ -3,12 +3,12 @@ H = React.DOM
 LeafletMapComponent = require './LeafletMapComponent'
 ExprUtils = require('mwater-expressions').ExprUtils
 ExprCompiler = require('mwater-expressions').ExprCompiler
+LayerFactory = require './LayerFactory'
 
 # Component that displays just the map
 module.exports = class MapViewComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
-    layerFactory: React.PropTypes.object.isRequired
 
     # Url source for the map
     mapUrlSource: React.PropTypes.shape({
@@ -51,14 +51,14 @@ module.exports = class MapViewComponent extends React.Component
     legendItems = _.compact(
       _.map(@props.design.layerViews, (layerView) => 
         # Create layer
-        layer = @props.layerFactory.createLayer(layerView.type, layerView.design)
+        layer = LayerFactory.createLayer(layerView.type)
 
         # Ignore if invalid
         if layer.validateDesign(layerView.design, @props.schema)
           return null
 
         if layerView.visible
-          return { key: layerView.id, legend: layer.getLegend() }
+          return { key: layerView.id, legend: layer.getLegend(layerView.design, @props.schema) }
       )
     )
 
@@ -99,7 +99,7 @@ module.exports = class MapViewComponent extends React.Component
     leafletLayers = []
     for layerView, index in @props.design.layerViews
       # Create layer
-      layer = @props.layerFactory.createLayer(layerView.type, layerView.design)
+      layer = LayerFactory.createLayer(layerView.type)
 
       # Ignore if invalid
       if layer.validateDesign(layerView.design, @props.schema)
@@ -108,7 +108,7 @@ module.exports = class MapViewComponent extends React.Component
       # Create leafletLayer
       leafletLayer = {
         tileUrl: @props.mapUrlSource.getTileUrl(layerView.id, compiledFilters)
-        utfGridUrl: @props.mapUrlSource.getTileUrl(layerView.id, compiledFilters)
+        utfGridUrl: @props.mapUrlSource.getUtfGridUrl(layerView.id, compiledFilters)
         visible: layerView.visible
         opacity: layerView.opacity
         minZoom: layer.getMinZoom(layerView.design)

@@ -197,9 +197,10 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
         polygon-opacity: 0.7;
         polygon-fill: #ffffff;
         text-name: [name];
-        text-face-name: 'Times New Roman'; 
-        /* text-halo-radius: 1;
-        text-halo-fill: #DDD;        */
+        text-face-name: 'Arial Regular'; 
+        text-halo-radius: 2;
+        text-halo-opacity: 0.5;
+        text-halo-fill: #FFF;
       }
     '''
 

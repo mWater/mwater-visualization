@@ -9,7 +9,6 @@ UndoStack = require '../UndoStack'
 # Map with designer on right
 module.exports = class MapComponent extends React.Component
   @propTypes:
-    layerFactory: React.PropTypes.object.isRequired
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired # Data source to use
 
@@ -78,7 +77,7 @@ module.exports = class MapComponent extends React.Component
               schema: @props.schema, 
               design: @props.design
               onDesignChange: @props.onDesignChange
-              layerFactory: @props.layerFactory)
+            )
           )
       H.div style: { position: "absolute", left: "70%", width: "30%", height: "100%", borderLeft: "solid 3px #AAA", overflowY: "auto" }, 
         React.createElement(MapDesignerComponent, 
@@ -86,4 +85,4 @@ module.exports = class MapComponent extends React.Component
           dataSource: @props.dataSource
           design: @props.design, 
           onDesignChange: @props.onDesignChange
-          layerFactory: @props.layerFactory)
+        )

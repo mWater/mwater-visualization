@@ -1,6 +1,7 @@
 React = require 'react'
 H = React.DOM
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
+LayerFactory = require './LayerFactory'
 
 # A single row in the table of layer views. Handles the editor state
 module.exports = class MapLayerViewDesignerComponent extends React.Component
@@ -11,12 +12,12 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
     onLayerViewChange: React.PropTypes.func.isRequired # Called with new layer view
     onRemove: React.PropTypes.func.isRequired  # Called to remove
     layerFactory: React.PropTypes.object.isRequired # Layer factory to use
-    connectDragSource: React.PropTypes.func.isRequired # connector for reorderable
+    connectDragSource: React.PropTypes.func    # connector for reorderable
 
   constructor: (props) ->
     super(props)
 
-    layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)
+    layer = LayerFactory.createLayer(@props.layerView.type)
 
     @state = { 
       editing: layer.isIncomplete(@props.layerView.design, @props.schema) # Editing initially if incomplete
@@ -50,7 +51,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
       H.a className: "hover-display-child glyphicon glyphicon-pencil", onClick: @handleRename
 
   renderEditor: ->
-    layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)
+    layer = LayerFactory.createLayer(@props.layerView.type)
     return H.div null,
       H.div style: { textAlign: "right" },
         H.a className: "btn btn-link btn-xs", onClick: @props.onRemove, "Delete Layer"
@@ -63,7 +64,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
         })
 
   renderLayerEditToggle: ->
-    layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)
+    layer = LayerFactory.createLayer(@props.layerView.type)
 
     H.div style: { float: "right" }, key: "gear",
       H.a onClick: @handleToggleEditing,
@@ -73,7 +74,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
           H.i className: "fa fa-caret-square-o-down"
 
   # renderLayerGearMenu: ->
-  #   layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)
+  #   layer = LayerFactory.createLayer(@props.layerView.type)
   #   if not layer.isEditable()
   #     return 
 
@@ -89,7 +90,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
 
 
   render: ->
-    layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)
+    layer = LayerFactory.createLayer(@props.layerView.type)
     style =
       cursor: "move"
       marginRight: 8

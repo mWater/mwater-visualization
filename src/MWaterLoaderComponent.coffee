@@ -4,7 +4,6 @@ H = React.DOM
 
 Schema = require('mwater-expressions').Schema
 LayerFactory = require './maps/LayerFactory'
-WidgetFactory = require './widgets/WidgetFactory'
 MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 MWaterTableSelectComponent = require './MWaterTableSelectComponent'
 querystring = require 'querystring'
@@ -22,24 +21,8 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
     onExtraTablesChange: React.PropTypes.func                     # Called when extra tables are changed and schema should be reloaded
 
     onMarkerClick: React.PropTypes.func                       # Called with (table, id)
-    newLayers: React.PropTypes.arrayOf(React.PropTypes.shape({
-      name: React.PropTypes.string.isRequired
-      type: React.PropTypes.string.isRequired
-      design: React.PropTypes.object.isRequired
-    }))
 
-    children: React.PropTypes.func.isRequired                 # Called with (error, { schema:, dataSource:, widgetFactory:, layerFactory: })
-
-  @defaultProps:
-    newLayers: [
-      { label: "Custom Marker Layer", name: "Untitled Layer", type: "Markers", design: { } }
-      {
-        label: "Choropleth Indicator Layer (experimental)"
-        name: "Untitled Layer"
-        type: "AdminIndicatorChoropleth"
-        design: { }
-      }
-    ]
+    children: React.PropTypes.func.isRequired                 # Called with (error, { schema:, dataSource: })
 
   constructor: ->
     super
@@ -47,8 +30,6 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
       error: null
       schema: null
       dataSource: null
-      widgetFactory: null
-      layerFactory: null
     }
 
     @mounted = false
@@ -74,15 +55,9 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
       schema = new Schema(schemaJson)
       dataSource = new MWaterDataSource(props.apiUrl, props.client, { serverCaching: false, localCaching: true })
 
-      layerFactory = new LayerFactory(props.newLayers)
-
-      widgetFactory = new WidgetFactory(schema: schema, dataSource: dataSource, layerFactory: layerFactory) 
-
       callback({
         schema: schema
         dataSource: dataSource
-        layerFactory: layerFactory
-        widgetFactory: widgetFactory
         })
     .fail (xhr) =>
       console.log xhr.responseText
@@ -113,6 +88,4 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
     return @props.children(@state.error, {
       schema: @state.schema
       dataSource: @state.dataSource
-      layerFactory: @state.layerFactory
-      widgetFactory: @state.widgetFactory
     })

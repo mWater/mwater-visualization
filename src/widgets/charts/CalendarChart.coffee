@@ -21,16 +21,10 @@ Design is:
 
 ###
 module.exports = class CalendarChart extends Chart
-  # Options include
-  #  schema: schema to use
-  #  dataSource: data source to use
-  constructor: (options) ->
-    @schema = options.schema
-    @dataSource = options.dataSource
-    @exprCleaner = new ExprCleaner(@schema)
-    @axisBuilder = new AxisBuilder(schema: @schema)
+  cleanDesign: (design, schema) ->
+    exprCleaner = new ExprCleaner(schema)
+    axisBuilder = new AxisBuilder(schema: schema)
 
-  cleanDesign: (design) ->
     # Clone deep for now # TODO
     design = _.cloneDeep(design)
 
@@ -38,8 +32,8 @@ module.exports = class CalendarChart extends Chart
     design.version = design.version or 1
 
     # Clean axes
-    design.dateAxis = @axisBuilder.cleanAxis(axis: design.dateAxis, table: design.table, aggrNeed: "none", types: ["date"])
-    design.valueAxis = @axisBuilder.cleanAxis(axis: design.dateAxis, table: design.table, aggrNeed: "required", types: ["number"])
+    design.dateAxis = axisBuilder.cleanAxis(axis: design.dateAxis, table: design.table, aggrNeed: "none", types: ["date"])
+    design.valueAxis = axisBuilder.cleanAxis(axis: design.dateAxis, table: design.table, aggrNeed: "required", types: ["number"])
 
     # Default value axis to count if date axis present
     if not design.valueAxis and design.dateAxis
@@ -47,11 +41,13 @@ module.exports = class CalendarChart extends Chart
       design.valueAxis = { expr: { type: "id", table: design.table }, aggr: "count", xform: null }
 
     # Clean filter
-    design.filter = @exprCleaner.cleanExpr(design.filter, { table: design.table, types: ["boolean"] })
+    design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ["boolean"] })
 
     return design
 
-  validateDesign: (design) ->
+  validateDesign: (design, schema) ->
+    axisBuilder = new AxisBuilder(schema: schema)
+
     # Check that has table
     if not design.table
       return "Missing data source"
@@ -64,8 +60,8 @@ module.exports = class CalendarChart extends Chart
     if not design.valueAxis
       error = error or "Missing value"
 
-    error = error or @axisBuilder.validateAxis(axis: design.dateAxis)
-    error = error or @axisBuilder.validateAxis(axis: design.valueAxis)
+    error = error or axisBuilder.validateAxis(axis: design.dateAxis)
+    error = error or axisBuilder.validateAxis(axis: design.valueAxis)
 
     return error
 
@@ -73,21 +69,32 @@ module.exports = class CalendarChart extends Chart
     return not design.dateAxis or not design.valueAxis
 
   # Creates a design element with specified options
-  # options include design: design and onChange: function
+  # options include:
+  #   schema: schema to use
+  #   dataSource: dataSource to use
+  #   design: design 
+  #   onDesignChange: function
   createDesignerElement: (options) ->
     props = {
-      schema: @schema
-      design: @cleanDesign(options.design)
-      dataSource: @dataSource
+      schema: options.schema
+      design: @cleanDesign(options.design, options.schema)
+      dataSource: options.dataSource
       onDesignChange: (design) =>
         # Clean design
-        design = @cleanDesign(design)
+        design = @cleanDesign(design, options.schema)
         options.onDesignChange(design)
     }
     return React.createElement(CalendarChartDesignerComponent, props)
 
-  getData: (design, filters, callback) ->
-    exprCompiler = new ExprCompiler(@schema)
+  # Get data for the chart asynchronously 
+  # design: design of the chart
+  # schema: schema to use
+  # dataSource: data source to get data from
+  # filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
+  # callback: (error, data)
+  getData: (design, schema, dataSource, filters, callback) ->
+    exprCompiler = new ExprCompiler(schema)
+    axisBuilder = new AxisBuilder(schema: schema)
 
     # Create shell of query
     query = {
@@ -100,7 +107,7 @@ module.exports = class CalendarChart extends Chart
     }
 
     # Add date axis
-    dateExpr = @axisBuilder.compileAxis(axis: design.dateAxis, tableAlias: "main")
+    dateExpr = axisBuilder.compileAxis(axis: design.dateAxis, tableAlias: "main")
 
     query.selects.push({ 
       type: "select"
@@ -111,7 +118,7 @@ module.exports = class CalendarChart extends Chart
     # Add value axis
     query.selects.push({
       type: "select"      
-      expr: @axisBuilder.compileAxis(axis: design.valueAxis, tableAlias: "main")
+      expr: axisBuilder.compileAxis(axis: design.valueAxis, tableAlias: "main")
       alias: "value"
     })
 
@@ -134,19 +141,22 @@ module.exports = class CalendarChart extends Chart
     else
       query.where = whereClauses[0]
 
-    @dataSource.performQuery(query, callback)
+    dataSource.performQuery(query, callback)
 
-  # Options include 
-  # design: design of the chart
-  # data: results from queries
-  # width, height, standardWidth: size of the chart view
-  # scope: current scope of the view element
-  # onScopeChange: called when scope changes with new scope
+  # Create a view element for the chart
+  # Options include:
+  #   schema: schema to use
+  #   dataSource: dataSource to use
+  #   design: design of the chart
+  #   data: results from queries
+  #   width, height, standardWidth: size of the chart view
+  #   scope: current scope of the view element
+  #   onScopeChange: called when scope changes with new scope
   createViewElement: (options) ->
     # Create chart
     props = {
-      schema: @schema
-      design: @cleanDesign(options.design)
+      schema: options.schema
+      design: @cleanDesign(options.design, options.schema)
       data: options.data
 
       width: options.width
