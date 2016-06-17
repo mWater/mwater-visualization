@@ -91,20 +91,20 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
   #       H.li(key: "remove", H.a(onClick: @props.onRemove, "Remove Layer"))
 
   handleOpacityChange: (newValue) =>
-    @update(opacity: newValue)
+    @update(opacity: newValue/100)
 
   renderOpacityControl: ->
     H.div className: 'form-group',
       H.label className: 'text-muted',
         H.span null,
-          "Opacity: #{@props.layerView.opacity}"
+          "Opacity: #{@props.layerView.opacity * 100}"
       H.div style: {padding: '10px'},
         React.createElement(Rcslider,
           min: 0
-          max: 1
-          step: 0.1
+          max: 100
+          step: 1
           tipTransitionName: "rc-slider-tooltip-zoom-down",
-          value: @props.layerView.opacity,
+          value: @props.layerView.opacity * 100,
           onChange: @handleOpacityChange
         )
 
