@@ -9,6 +9,7 @@ NumberInputComponent = require('react-library/lib/NumberInputComponent')
 AxisComponent = require './../axes/AxisComponent'
 ColorComponent = require '../ColorComponent'
 TableSelectComponent = require '../TableSelectComponent'
+Rcslider = require 'rc-slider'
 
 module.exports = class BufferLayerDesignerComponent extends React.Component
   @propTypes:
@@ -107,7 +108,14 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
       H.label className: "text-muted", 
         "Opacity (%)"
       ": "
-      React.createElement(NumberInputComponent, value: @props.design.opacity * 100, onChange: @handleOpacityChange)
+      React.createElement(Rcslider,
+        min: 0
+        max: 100
+        step: 1
+        tipTransitionName: "rc-slider-tooltip-zoom-down",
+        value: @props.design.opacity * 100,
+        onChange: @handleOpacityChange
+      )
 
   renderFilter: ->
     # If no data, hide
