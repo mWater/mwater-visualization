@@ -16,6 +16,13 @@ module.exports = class BinsComponent extends React.Component
     xform: React.PropTypes.object.isRequired
     onChange: React.PropTypes.func.isRequired
 
+  constructor: (props) ->
+    super
+
+    @state = {
+      guessing: false   # True when guessing ranges
+    }
+
   componentDidMount: ->
     # Check if computing is needed
     if not @props.xform.min? or not @props.xform.max?
@@ -24,9 +31,12 @@ module.exports = class BinsComponent extends React.Component
       # Get min and max from a query
       minMaxQuery = axisBuilder.compileBinMinMax(@props.expr, @props.expr.table, null, @props.xform.numBins)
 
+      @setState(guessing: true)
       @props.dataSource.performQuery(minMaxQuery, (error, rows) =>
         if @unmounted
           return
+    
+        @setState(guessing: false)
 
         if error
           return # Ignore
@@ -51,6 +61,8 @@ module.exports = class BinsComponent extends React.Component
       " "
       R LabeledInlineComponent, key: "numBins", label: "# of Bins:",
         R NumberInputComponent, value: @props.xform.numBins, decimal: false, onChange: (v) => @props.onChange(update(@props.xform, { numBins: { $set: v }}))
+      if @state.guessing
+        H.i className: "fa fa-spinner fa-spin"
 
 LabeledInlineComponent = (props) ->
   H.div style: { display: "inline-block" },
