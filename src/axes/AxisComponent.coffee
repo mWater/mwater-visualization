@@ -40,10 +40,7 @@ module.exports = class AxisComponent extends React.Component
       return
       
     # Set expression and clear xform
-    @props.onChange({ expr: expr, xform: null, aggr: null })
-
-  handleAggrChange: (aggr) =>
-    @props.onChange(update(@props.value, $merge: { aggr: aggr }))
+    @props.onChange(@cleanAxis({ expr: expr, xform: null }))
 
   handleXformTypeChange: (type) =>
     # Remove
@@ -75,28 +72,11 @@ module.exports = class AxisComponent extends React.Component
     @props.onChange(update(@props.value, { xform: { $set: xform }}))
 
   handleXformChange: (xform) =>
-    @props.onChange(update(@props.value, { xform: { $set: xform } }))
+    @props.onChange(@cleanAxis(update(@props.value, { xform: { $set: xform } })))
 
-  renderAggr: ->
-    if @props.aggrNeed == "none"
-      return
-      
-    exprUtils = new ExprUtils(@props.schema)
-
-    # Only render aggregate if has a expr with a type that is not count
-    if @props.value and exprUtils.getExprType(@props.value.expr) != "count"
-      exprUtils = new ExprUtils(@props.schema)
-      aggrs = exprUtils.getAggrs(@props.value.expr)
-
-      # Remove latest, as it is tricky to group by. TODO
-      aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
-      currentAggr = _.findWhere(aggrs, id: @props.value.aggr)
-
-      return React.createElement(LinkComponent, 
-        dropdownItems: aggrs
-        onDropdownItemClicked: @handleAggrChange
-        if currentAggr then currentAggr.name
-        )
+  cleanAxis: (axis) ->
+    axisBuilder = new AxisBuilder(schema: @props.schema)
+    return axisBuilder.cleanAxis(axis: axis, table: @props.table, aggrNeed: @props.aggrNeed, types: @props.types)
 
   renderXform: ->
     if not @props.value
@@ -166,18 +146,28 @@ module.exports = class AxisComponent extends React.Component
   render: ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
 
+    # Determine aggrStatuses that are possible
+    switch @props.aggrNeed
+      when "none"
+        aggrStatuses = ["literal", "individual"]
+      when "optional"
+        aggrStatuses = ["literal", "individual", "aggregate"]
+      when "required"
+        aggrStatuses = ["literal", "aggregate"]
+   
     H.div null,
       H.div null, 
-        @renderAggr()
         React.createElement(ExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           table: @props.table
-          types: axisBuilder.getExprTypes(@props.types, @props.aggrNeed)
+          types: axisBuilder.getExprTypes(@props.types)
           # preventRemove: @props.required
           onChange: @handleExprChange
           includeCount: @props.aggrNeed != "none"
-          value: if @props.value then @props.value.expr)  
+          value: if @props.value then axisBuilder.cleanAxis() @props.value.expr
+          aggrStatuses: aggrStatuses
+          )  
       @renderXform()
       @renderColorMap()
 

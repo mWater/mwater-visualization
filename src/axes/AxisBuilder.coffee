@@ -44,8 +44,22 @@ module.exports = class AxisBuilder
     # TODO always clones
     axis = _.clone(options.axis)
 
+    # Move aggr inside since aggr is deprecated at axis level
+    if axis.aggr and axis.expr
+      axis.expr = { type: "op", op: axis.aggr, table: axis.expr.table, exprs: [axis.expr] }
+      delete axis.aggr
+
+    # Determine aggrStatuses that are possible
+    switch options.aggrNeed
+      when "none"
+        aggrStatuses = ["literal", "individual"]
+      when "optional"
+        aggrStatuses = ["literal", "individual", "aggregate"]
+      when "required"
+        aggrStatuses = ["literal", "aggregate"]
+
     # Clean expression
-    axis.expr = @exprCleaner.cleanExpr(axis.expr, { table: options.table })
+    axis.expr = @exprCleaner.cleanExpr(axis.expr, { table: options.table, aggrStatuses: aggrStatuses })
 
     # Remove if null or no type 
     type = @exprUtils.getExprType(axis.expr)
@@ -95,32 +109,6 @@ module.exports = class AxisBuilder
       if not axis.xform.ranges
         axis.xform.ranges = [{ id: uuid.v4(), minOpen: false, maxOpen: true }]
 
-    # Only allow aggr if not xform
-    if axis.xform
-      delete axis.aggr
-    else
-      # Clean aggr
-      aggrs = @exprUtils.getAggrs(axis.expr)
-      # Remove latest, as it is tricky to group by. TODO
-      aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
-
-      # Remove existing if not in list
-      if axis.aggr and axis.aggr not in _.pluck(aggrs, "id")
-        delete axis.aggr
-
-      # Remove if need is none
-      if options.aggrNeed == "none"
-        delete axis.aggr
-
-      # Default aggr if required
-      if options.aggrNeed == "required" and aggrs[0] and not axis.aggr
-        axis.aggr = aggrs[0].id
-
-      # Set aggr to count if expr is type id and aggr possible
-      if options.aggrNeed != "none" and not axis.aggrs
-        if @exprUtils.getExprType(axis.expr) == "id"
-          axis.aggr = "count"
-
     return axis
 
   # Checks whether an axis is valid
@@ -156,8 +144,13 @@ module.exports = class AxisBuilder
     if not options.axis
       return null
 
+    # Legacy support of aggr
+    expr = options.axis.expr
+    if options.axis.aggr
+      expr = { type: "op", op: options.axis.aggr, exprs: [expr] }
+
     exprCompiler = new ExprCompiler(@schema)
-    compiledExpr = exprCompiler.compileExpr(expr: options.axis.expr, tableAlias: options.tableAlias, aggr: options.axis.aggr)
+    compiledExpr = exprCompiler.compileExpr(expr: expr, tableAlias: options.tableAlias)
 
     # Bin
     if options.axis.xform 
@@ -265,14 +258,6 @@ module.exports = class AxisBuilder
         else
           compiledExpr = null
 
-    # Aggregate
-    if options.axis.aggr
-      compiledExpr = {
-        type: "op"
-        op: options.axis.aggr
-        exprs: _.compact([compiledExpr])
-      }
-
     return compiledExpr
 
   # Create query to get min and max for a nice binning. Returns one row with "min" and "max" fields
@@ -344,11 +329,9 @@ module.exports = class AxisBuilder
     }
     return query
 
-
   # Get underlying expression types that will give specified output expression types
   #  types: array of types
-  #  aggrNeed is "none", "optional" or "required"
-  getExprTypes: (types, aggrNeed) ->
+  getExprTypes: (types) ->
     if not types
       return null
       
@@ -358,10 +341,6 @@ module.exports = class AxisBuilder
     for xform in xforms
       if xform.output in types
         types = _.union(types, [xform.input])
-
-    # Allow id type if count is an option
-    if aggrNeed != "none" and "number" in types
-      types = _.union(["id"], types)
 
     return types
 
@@ -513,6 +492,7 @@ module.exports = class AxisBuilder
     if not axis
       return null
 
+    # DEPRECATED
     if axis.aggr == "count"
       return "number"
 
@@ -531,7 +511,7 @@ module.exports = class AxisBuilder
 
     exprType = @exprUtils.getExprType(axis.expr)
 
-    # Add aggr if not a id type
+    # DEPRECATED Add aggr if not a id type
     if axis.aggr and exprType != "id"
       aggrName = _.findWhere(@exprUtils.getAggrs(axis.expr), { id: axis.aggr }).name
       return aggrName + " " + @exprUtils.summarizeExpr(axis.expr, locale)

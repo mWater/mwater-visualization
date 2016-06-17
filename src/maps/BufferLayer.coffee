@@ -22,7 +22,7 @@ Design is:
 
 axes:
   geometry: where to draw buffers around
-  color: color axis (to split into series based on a color)
+  color: color axis 
 
 ###
 module.exports = class BufferLayer extends Layer
