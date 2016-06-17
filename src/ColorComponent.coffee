@@ -35,6 +35,7 @@ module.exports = class ColorComponent extends React.Component
       position: 'absolute'
       top: 0
       left: 30
+      zIndex: 1000
     }
 
     H.div style: { position: "relative", display: "inline-block" },
