@@ -60,11 +60,20 @@ module.exports = class TableChartViewComponent extends React.Component
     body = $(@refs.tableBody)
     bodyContainer = $(@refs.tableBodyContainer)
 
-    tr.find("td").each (i, el) ->
-      headers.eq(i).width($(el).outerWidth())
+    tr.find("td").each (i, el) =>
+      cellWIdth = $(el).width()
+      headers.eq(i).width(cellWIdth)
+
+      if headers.eq(i).width() != cellWIdth
+        @setColumnWidth(i, headers.eq(i).width())
 
     height = @props.height * (@props.standardWidth / @props.width) - $(@refs.title).outerHeight() - $(@refs.tableHeader).outerHeight()
     bodyContainer.height(height)
+
+  setColumnWidth: (column,width) ->
+    body = $(@refs.tableBody)
+    body.find('tr').each (i, el) ->
+      $(el).find('td').eq(column).width(width)
 
   renderBody: ->
 #    height = @props.height * (@props.standardWidth / @props.width) - $(@refs.title).outerHeight()

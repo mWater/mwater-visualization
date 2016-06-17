@@ -17,8 +17,16 @@ exports.SectionComponent = class SectionComponent extends React.Component
   render: ->
     H.div style: { marginBottom: 15 }, 
       H.label className: "text-muted", 
-        H.span(className: "glyphicon glyphicon-#{@props.icon}")
-        " "
+        if @props.icon and @props.icon.match(/^fa-/)
+          [
+            H.i(className: "fa #{@props.icon}")
+            " "
+          ]
+        if @props.icon and @props.icon.match(/^glyphicon-/)
+          [
+            H.span(className: "glyphicon #{@props.icon}")
+            " "
+          ]
         @props.label
       H.div style: { marginLeft: 10 },
         @props.children

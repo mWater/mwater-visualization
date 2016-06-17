@@ -3,12 +3,23 @@ H = React.DOM
 LeafletMapComponent = require './LeafletMapComponent'
 ExprUtils = require('mwater-expressions').ExprUtils
 ExprCompiler = require('mwater-expressions').ExprCompiler
+LayerFactory = require './LayerFactory'
 
 # Component that displays just the map
 module.exports = class MapViewComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
-    layerFactory: React.PropTypes.object.isRequired
+
+    # Url source for the map
+    mapUrlSource: React.PropTypes.shape({
+        # Get the url for the image tiles with the specified filters applied
+        # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
+        getTileUrl: React.PropTypes.func.isRequired
+
+        # Get the url for the interactivity tiles with the specified filters applied
+        # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
+        getUtfGridUrl: React.PropTypes.func.isRequired
+      }).isRequired
     
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func   # Called with new design. null/undefined to ignore bounds changes
@@ -33,14 +44,23 @@ module.exports = class MapViewComponent extends React.Component
     design = _.extend({}, @props.design, bounds: bounds)
     @props.onDesignChange(design)
 
-  renderLegend: (layers) ->
+  handleGridClick: (layer, design, ev) =>
+    # TODO
+
+  renderLegend:  ->
     legendItems = _.compact(
-      _.map(layers, (layer, i) => 
-        layerView = @props.design.layerViews[i]
+      _.map(@props.design.layerViews, (layerView) => 
+        # Create layer
+        layer = LayerFactory.createLayer(layerView.type)
+
+        # Ignore if invalid
+        if layer.validateDesign(layerView.design, @props.schema)
+          return null
+
         if layerView.visible
-          return { key: layerView.id, legend: layer.getLegend() }
-        )
+          return { key: layerView.id, legend: layer.getLegend(layerView.design, @props.schema) }
       )
+    )
 
     if legendItems.length == 0
       return
@@ -75,22 +95,28 @@ module.exports = class MapViewComponent extends React.Component
     if @props.extraFilters
       compiledFilters = compiledFilters.concat(@props.extraFilters)
 
-    # Create layers
-    layers = _.map @props.design.layerViews, (layerView) =>
-      return @props.layerFactory.createLayer(layerView.type, layerView.design)
+    # Convert to leaflet layers, if layers are valid
+    leafletLayers = []
+    for layerView, index in @props.design.layerViews
+      # Create layer
+      layer = LayerFactory.createLayer(layerView.type)
 
-    # Convert to leaflet layers
-    leafletLayers = _.map(layers, (layer, i) =>
-      {
-        tileUrl: layer.getTileUrl(compiledFilters)
-        utfGridUrl: layer.getUtfGridUrl(compiledFilters)
-        visible: @props.design.layerViews[i].visible
-        opacity: @props.design.layerViews[i].opacity
-        minZoom: layer.getMinZoom()
-        maxZoom: layer.getMaxZoom()
-        onGridClick: layer.onGridClick.bind(layer)
+      # Ignore if invalid
+      if layer.validateDesign(layerView.design, @props.schema)
+        continue
+
+      # Create leafletLayer
+      leafletLayer = {
+        tileUrl: @props.mapUrlSource.getTileUrl(layerView.id, compiledFilters)
+        utfGridUrl: @props.mapUrlSource.getUtfGridUrl(layerView.id, compiledFilters)
+        visible: layerView.visible
+        opacity: layerView.opacity
+        minZoom: layer.getMinZoom(layerView.design)
+        maxZoom: layer.getMaxZoom(layerView.design)
+        onGridClick: @handleGridClick.bind(null, layer, layerView.design)
       }
-    )
+
+      leafletLayers.push(leafletLayer)
 
     React.createElement(LeafletMapComponent,
       initialBounds: @props.design.bounds
@@ -98,7 +124,7 @@ module.exports = class MapViewComponent extends React.Component
       layers: leafletLayers
       width: @props.width
       height: @props.height
-      legend: @renderLegend(layers)
+      legend: @renderLegend()
       dragging: @props.dragging
       touchZoom: @props.touchZoom
       scrollWheelZoom: @props.scrollWheelZoom

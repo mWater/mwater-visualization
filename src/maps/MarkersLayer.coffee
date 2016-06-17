@@ -26,75 +26,36 @@ axes:
 
 ###
 module.exports = class MarkersLayer extends Layer
-  # Pass design, client, apiUrl, schema, dataSource
-  # onMarkerClick takes (table, id) and is the table and id of the row that is represented by the click
-  constructor: (options) ->
-    @design = options.design
-    @client = options.client
-    @apiUrl = options.apiUrl
-    @schema = options.schema
-    @dataSource = options.dataSource
-    @onMarkerClick = options.onMarkerClick
-
-  getTileUrl: (filters) -> 
-    # Check if valid
-    # TODO clean/validate order??
-    design = @cleanDesign(@design)
-    
-    if @validateDesign(design)
-      return null
-
-    @createUrl("png", design, filters)
-
-  getUtfGridUrl: (filters) -> 
-    # Check if valid
-    # TODO clean/validate order??
-    design = @cleanDesign(@design)
-    
-    if @validateDesign(design)
-      return null
-
-    @createUrl("grid.json", design, filters)
-
-  # Called when the interactivity grid is clicked. Called with { data: interactivty data e.g. `{ id: 123 }` }
-  onGridClick: (ev) ->
-    if @onMarkerClick and ev.data and ev.data.id
-      @onMarkerClick(@design.sublayers[0].table, ev.data.id)
-
-  # Create query string
-  createUrl: (extension, design, filters) ->
-    query = "type=jsonql"
-    if @client
-      query += "&client=" + @client
-
+  # Gets the layer definition as JsonQL + CSS in format:
+  #   {
+  #     layers: array of { id: layer id, jsonql: jsonql that includes "the_webmercator_geom" as a column }
+  #     css: carto css
+  #     interactivity: (optional) { layer: id of layer, fields: array of field names }
+  #   }
+  # arguments:
+  #   design: design of layer
+  #   schema: schema to use
+  #   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
+  getJsonQLCss: (design, schema, filters) ->
     # Create design
-    mapDesign = {
+    layerDef = {
       layers: _.map(design.sublayers, (sublayer, i) =>
         { 
           id: "layer#{i}"
-          jsonql: @createJsonQL(sublayer, filters)
+          jsonql: @createJsonQL(sublayer, schema, filters)
         })
-      css: @createCss()
+      css: @createCss(design, schema)
       interactivity: { # TODO Interactivity is only first sublayer!
         layer: "layer0"
         fields: ["id"]
       }
     }
 
-    query += "&design=" + encodeURIComponent(JSON.stringify(mapDesign))
+    return layerDef
 
-    url = "#{@apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?" + query
-
-    # Add subdomains: {s} will be substituted with "a", "b" or "c" in leaflet for api.mwater.co only.
-    # Used to speed queries
-    if url.match(/^https:\/\/api\.mwater\.co\//)
-      url = url.replace(/^https:\/\/api\.mwater\.co\//, "https://{s}-api.mwater.co/")
-
-    return url
-
-  createJsonQL: (sublayer, filters) ->
-    axisBuilder = new AxisBuilder(schema: @schema)
-    exprCompiler = new ExprCompiler(@schema)
+  createJsonQL: (sublayer, schema, filters) ->
+    axisBuilder = new AxisBuilder(schema: schema)
+    exprCompiler = new ExprCompiler(schema)
 
     # Compile geometry axis
     geometryExpr = axisBuilder.compileAxis(axis: sublayer.axes.geometry, tableAlias: "innerquery")
@@ -120,7 +81,7 @@ module.exports = class MarkersLayer extends Layer
     innerquery = { 
       type: "query"
       selects: [
-        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: @schema.getTable(sublayer.table).primaryKey }, alias: "id" } # main primary key as id
+        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(sublayer.table).primaryKey }, alias: "id" } # main primary key as id
         { type: "select", expr: geometryExpr, alias: "the_geom_webmercator" } # geometry as the_geom_webmercator
         cluster
       ]
@@ -179,9 +140,10 @@ module.exports = class MarkersLayer extends Layer
 
     return outerquery
 
-  createCss: ->
+  # Creates CartoCSS
+  createCss: (design, schema) ->
     css = ""
-    _.each @design.sublayers, (sublayer, index) =>
+    _.each design.sublayers, (sublayer, index) =>
       if sublayer.symbol
         symbol = "marker-file: url(#{sublayer.symbol});"
       else
@@ -208,26 +170,60 @@ module.exports = class MarkersLayer extends Layer
 
     return css
 
-  getFilterableTables: -> 
-    return _.uniq(_.compact(_.pluck(@design.sublayers, "table")))
+  # Called when the interactivity grid is clicked. 
+  # arguments:
+  #   ev: { data: interactivty data e.g. `{ id: 123 }` }
+  #   options: 
+  #     design: design of layer
+  #     schema: schema to use
+  #     dataSource: data source to use
+  # 
+  # Returns:
+  #   null/undefined to do nothing
+  #   [table id, primary key] to open a default system popup if one is present
+  #   React element to put into a popup
+  onGridClick: (ev, options) ->
+    if ev.data and ev.data.id
+      return [options.design.sublayers[0].table, ev.data.id]
+    return null
 
-  getLegend: ->
-    # return H.div null, "Legend here"
-    # # # Create loading legend component
-    # # React.createElement(LoadingLegend, 
-    # #   url: "#{@apiUrl}maps/legend?type=#{@design.type}")
-  
-  isEditable: -> true
+  # Get min and max zoom levels
+  getMinZoom: (design) -> return null
+  getMaxZoom: (design) -> return null
 
-  # True if layer is incomplete (e.g. brand new) and should be editable immediately
-  isIncomplete: ->
-    return @validateDesign(@cleanDesign(@design))
+  # Get the legend to be optionally displayed on the map. Returns
+  # a React element
+  getLegend: (design, schema) ->
+    # TODO
+    return null
+
+  # Get a list of table ids that can be filtered on
+  getFilterableTables: (design, schema) ->
+    return []
+
+  # True if layer can be edited
+  isEditable: (design, schema) ->
+    return true
+
+  # Creates a design element with specified options
+  # options:
+  #   design: design of layer
+  #   schema: schema to use
+  #   dataSource: data source to use
+  #   onDesignChange: function called when design changes
+  createDesignerElement: (options) ->
+    # Clean on way in and out
+    React.createElement(MarkersLayerDesignerComponent,
+      schema: options.schema
+      dataSource: options.dataSource
+      design: @cleanDesign(options.design, options.schema)
+      onDesignChange: (design) =>
+        options.onDesignChange(@cleanDesign(design, options.schema)))
 
   # Returns a cleaned design
-  # TODO this is awkward since the design is part of the object too
-  cleanDesign: (design) ->
-    exprCleaner = new ExprCleaner(@schema)
-    axisBuilder = new AxisBuilder(schema: @schema)
+  cleanDesign: (design, schema) ->
+    exprCleaner = new ExprCleaner(schema)
+    axisBuilder = new AxisBuilder(schema: schema)
 
     # TODO clones entirely
     design = _.cloneDeep(design)
@@ -244,8 +240,9 @@ module.exports = class MarkersLayer extends Layer
 
     return design
 
-  validateDesign: (design) ->
-    axisBuilder = new AxisBuilder(schema: @schema)
+  # Validates design. Null if ok, message otherwise
+  validateDesign: (design, schema) ->
+    axisBuilder = new AxisBuilder(schema: schema)
 
     if design.sublayers.length < 1
       return "No sublayers"
@@ -258,13 +255,3 @@ module.exports = class MarkersLayer extends Layer
       if error then return error
 
     return null
-
-  # Pass in onDesignChange
-  createDesignerElement: (options) ->
-    # Clean on way in and out
-    React.createElement(MarkersLayerDesignerComponent,
-      schema: @schema
-      dataSource: @dataSource
-      design: @cleanDesign(@design)
-      onDesignChange: (design) =>
-        options.onDesignChange(@cleanDesign(design)))

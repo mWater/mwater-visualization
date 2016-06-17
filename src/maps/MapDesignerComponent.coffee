@@ -8,7 +8,6 @@ module.exports = class MapDesignerComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
     dataSource: React.PropTypes.object.isRequired # Data source to use
-    layerFactory: React.PropTypes.object.isRequired # Layer factory to use
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
 
@@ -19,8 +18,8 @@ module.exports = class MapDesignerComponent extends React.Component
         label: [H.span(className: "glyphicon glyphicon-align-justify"), " Layers"]
         elem: React.createElement(MapLayersDesignerComponent, 
           schema: @props.schema
+          dataSource: @props.dataSource
           design: @props.design
-          layerFactory: @props.layerFactory
           onDesignChange: @props.onDesignChange) 
       }
       { 
@@ -30,7 +29,6 @@ module.exports = class MapDesignerComponent extends React.Component
           schema: @props.schema
           dataSource: @props.dataSource
           design: @props.design
-          layerFactory: @props.layerFactory
           onDesignChange: @props.onDesignChange) 
       }
       { 
@@ -39,7 +37,6 @@ module.exports = class MapDesignerComponent extends React.Component
         elem: React.createElement(MapConfigDesignerComponent, 
           schema: @props.schema
           design: @props.design
-          layerFactory: @props.layerFactory
           onDesignChange: @props.onDesignChange) 
       }
     ]
@@ -81,3 +78,5 @@ class MapConfigDesignerComponent extends React.Component
       H.div style: { marginLeft: 10 }, 
         @renderBaseLayer("bing_road", "Roads")
         @renderBaseLayer("bing_aerial", "Satellite")
+        @renderBaseLayer("cartodb_positron", "Light")
+        @renderBaseLayer("cartodb_dark_matter", "Dark")

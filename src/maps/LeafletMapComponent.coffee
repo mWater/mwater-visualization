@@ -16,8 +16,8 @@ module.exports = class LeafletMapComponent extends React.Component
       s: React.PropTypes.number.isRequired
       }) # Initial bounds. Fit world if none
 
-    width: React.PropTypes.number # Required width
-    height: React.PropTypes.number # Required height
+    width: React.PropTypes.any # Required width
+    height: React.PropTypes.any # Required height
 
     onBoundsChange: React.PropTypes.func # Called with bounds in w, n, s, e format when bounds change
     
@@ -138,6 +138,15 @@ module.exports = class LeafletMapComponent extends React.Component
           @baseLayer = new BingLayer("Ao26dWY2IC8PjorsJKFaoR85EPXCnCohrJdisCWXIULAXFo0JAXquGauppTMQbyU", { type: "Road"})
         when "bing_aerial"
           @baseLayer = new BingLayer("Ao26dWY2IC8PjorsJKFaoR85EPXCnCohrJdisCWXIULAXFo0JAXquGauppTMQbyU", { type: "AerialWithLabels"})
+        when "cartodb_positron"
+          @baseLayer = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>'
+          })
+        when "cartodb_dark_matter"
+          @baseLayer = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',{
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>'
+          })
+
       @map.addLayer(@baseLayer)
 
       # Base layers are always at back
@@ -163,10 +172,14 @@ module.exports = class LeafletMapComponent extends React.Component
           if not layer.visible or not layer.tileUrl
             continue
 
-          tileLayer = L.tileLayer(layer.tileUrl, {
-            minZoom: layer.minZoom
-            maxZoom: layer.maxZoom
-          })
+          options = {}
+          # Putting null seems to make layer vanish
+          if layer.minZoom
+            options.minZoom = layer.minZoom
+          if layer.maxZoom
+            options.maxZoom = layer.maxZoom
+
+          tileLayer = L.tileLayer(layer.tileUrl, options)
           @tileLayers.push(tileLayer)
 
           # TODO Hack for animated zooming

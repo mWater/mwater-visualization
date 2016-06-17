@@ -31,7 +31,7 @@ module.exports = class CalendarChartDesignerComponent extends React.Component
   renderTable: ->
     return H.div className: "form-group",
       H.label className: "text-muted", 
-        H.span(className: "glyphicon glyphicon-file")
+        H.i(className: "fa fa-database")
         " "
         "Data Source"
       ": "

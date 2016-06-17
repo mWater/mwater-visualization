@@ -1,6 +1,6 @@
 {
   "name": "mwater-visualization",
-  "version": "2.14.2",
+  "version": "2.15.2",
   "description": "Visualization library",
   "repository": "git@github.com:mWater/mwater-visualization.git",
   "main": "lib/index.js",
@@ -36,7 +36,7 @@
     "rc-slider": "^3.7.0",
     "react": "^0.14.0",
     "react-bootstrap-daterangepicker": "^0.3.0",
-    "react-color": "1.2.0",
+    "react-color": "^2.2.0",
     "react-dnd": "^2.1.4",
     "react-dnd-html5-backend": "^2.1.2",
     "react-dom": "^0.14.0",

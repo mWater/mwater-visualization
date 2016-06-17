@@ -9,8 +9,6 @@ visualization = require './index'
 LayeredChart = require './widgets/charts/LayeredChart'
 LayeredChartDesignerComponent = require './widgets/charts/LayeredChartDesignerComponent'
 
-LayerFactory = require './maps/LayerFactory'
-WidgetFactory = require './widgets/WidgetFactory'
 CalendarChartViewComponent = require './widgets/charts/CalendarChartViewComponent'
 
 MWaterLoaderComponent = require './MWaterLoaderComponent'
@@ -18,53 +16,8 @@ MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
-# class DashboardPane extends React.Component
-#   constructor: (props) ->
-#     super
-
-#     @state = {
-#       schema: null
-#       dataSource: null
-#       design: dashboardDesign
-#     }
-
-#   componentDidMount: ->
-#     $.getJSON @props.apiUrl + "jsonql/schema", (schemaJson) =>
-#       schema = new Schema(schemaJson)
-#       dataSource = new MWaterDataSource(@props.apiUrl, @props.client, { serverCaching: false, localCaching: true })
-
-#       layerFactory = new LayerFactory({
-#         schema: schema
-#         dataSource: dataSource
-#         apiUrl: @props.apiUrl
-#         client: @props.client
-#         newLayers: [
-#           { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" } }
-#           { name: "Custom Layer", type: "Markers", design: {} }
-#         ]
-#         onMarkerClick: (table, id) => alert("#{table}:#{id}")
-#       })
-
-#       widgetFactory = new WidgetFactory(schema: schema, dataSource: dataSource, layerFactory: layerFactory)    
-
-#       @setState(schema: schema, dataSource: dataSource, layerFactory: layerFactory, widgetFactory: widgetFactory)
-
-#   handleDesignChange: (design) =>
-#     @setState(design: design)
-#     console.log JSON.stringify(design, null, 2)
-    
-#   render: ->
-#     if not @state.widgetFactory
-#       return H.div null, "Loading..."
-
-#     return H.div style: { height: "100%" },
-#       React.createElement(visualization.DashboardComponent, {
-#         design: @state.design
-#         widgetFactory: @state.widgetFactory
-#         onDesignChange: @handleDesignChange
-#         titleElem: "Sample"
-#         printScaling: false
-#         })
+LegacyDashboardDataSource = require './widgets/LegacyDashboardDataSource'
+LegacyMapUrlSource = require './maps/LegacyMapUrlSource'
 
 class MWaterDashboardPane extends React.Component
   constructor: (props) ->
@@ -87,12 +40,14 @@ class MWaterDashboardPane extends React.Component
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
       extraTables: @state.extraTables
     }, (error, config) =>
+      dashboardDataSource = new LegacyDashboardDataSource(@props.apiUrl, @props.client, @state.design, config.schema, config.dataSource)
+
       H.div style: { height: "100%" },
         React.createElement(visualization.DashboardComponent, {
           schema: config.schema
           dataSource: config.dataSource
+          dashboardDataSource: dashboardDataSource
           design: @state.design
-          widgetFactory: config.widgetFactory
           onDesignChange: @handleDesignChange
           titleElem: "Sample"
         })
@@ -119,12 +74,15 @@ class MWaterMapPane extends React.Component
       extraTables: @state.extraTables
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
     }, (error, config) =>
+      # Create map url source
+      mapUrlSource = new LegacyMapUrlSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
+
       H.div style: { height: "100%" },
         React.createElement(visualization.MapComponent, {
           schema: config.schema
           dataSource: config.dataSource
           design: @state.design
-          layerFactory: config.layerFactory
+          mapUrlSource: mapUrlSource
           onDesignChange: @handleDesignChange
           titleElem: "Sample"
         })
@@ -399,6 +357,7 @@ mapDesign = {
   "layerViews": [
      # { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
      { 
+      id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
       name: "Choropleth"
       type: "AdminIndicatorChoropleth"
       design: { 
@@ -427,7 +386,66 @@ mapDesign = {
     "s": -18.583775688370928
   }
 }
+
 # bounds: { w: -40, n: 25, e: 40, s: -25 }
+# mapDesign = {
+#   "baseLayer": "bing_road",
+#   "layerViews": [
+#      { 
+#       id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
+#       name: "Buffer"
+#       type: "Buffer"
+#       design: { 
+#         table: "entities.water_point" 
+#         opacity: 0.5
+#         radius: 1000
+#         "axes": {
+#           "geometry": {
+#             "expr": {
+#               "type": "field",
+#               "table": "entities.water_point",
+#               "column": "location"
+#             },
+#             "xform": null
+#           }
+#           "color": {
+#             "expr": {
+#               "type": "field",
+#               "table": "entities.water_point",
+#               "column": "type"
+#             },
+#             "xform": null,
+#             "colorMap": [
+#               {
+#                 "value": "Protected dug well",
+#                 "color": "#d0021b"
+#               },
+#               {
+#                 "value": "Piped into dwelling",
+#                 "color": "#7ed321"
+#               },
+#               {
+#                 "value": "Borehole or tubewell",
+#                 "color": "#f8e71c"
+#               }
+#             ]
+#           }
+#         },
+#         color: "#9b9b9b"
+#         filter: null
+#       }
+#       visible: true 
+#     }
+#      { id: "old_func_status", name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
+#   ]
+#   filters: {}
+#   bounds: {
+#     "w": 32.75848388671875,
+#     "n": -2.217997457638444,
+#     "e": 33.4808349609375,
+#     "s": -2.9375549775994263
+#   }
+# }
 
 dashboardDesign = {
   "items": {
@@ -505,8 +523,144 @@ dashboardDesign = {
         }
       }
     }
+    "a6570651-fd84-4d24-a416-92479d592409": {
+      "layout": {
+        "x": 8,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "widget": {
+        "type": "LayeredChart",
+        "design": {
+          "xAxisLabelText": "",
+          "yAxisLabelText": "",
+          "version": 2,
+          "layers": [
+            {
+              "axes": {
+                "x": {
+                  "expr": {
+                    "type": "scalar",
+                    "table": "entities.surface_water",
+                    "joins": [
+                      "!entities.wwmc_visit.site"
+                    ],
+                    "expr": {
+                      "type": "field",
+                      "table": "entities.wwmc_visit",
+                      "column": "ph"
+                    },
+                    "aggr": "last"
+                  },
+                  "xform": {
+                    "type": "bin",
+                    "numBins": 6,
+                    "min": 6.59,
+                    "max": 9
+                  }
+                },
+                "y": {
+                  "expr": {
+                    "type": "id",
+                    "table": "entities.surface_water"
+                  },
+                  "aggr": "count",
+                  "xform": null
+                }
+              },
+              "filter": null,
+              "table": "entities.surface_water"
+            }
+          ],
+          "type": "bar"
+        }
+      }
+    },
+    "8e54a8ac-4b76-4743-ab94-9cbd842501eb": {
+      "layout": {
+        "x": 9,
+        "y": 0,
+        "w": 15,
+        "h": 8
+      },
+      "widget": {
+        "type": "TableChart",
+        "design": {
+          "version": 1,
+          "columns": [
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "field",
+                  "table": "entities.water_point",
+                  "column": "admin_02_country"
+                }
+              }
+            },
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "field",
+                  "table": "entities.water_point",
+                  "column": "admin_04"
+                }
+              }
+            },
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "field",
+                  "table": "entities.water_point",
+                  "column": "admin_05"
+                }
+              }
+            },
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "field",
+                  "table": "entities.water_point",
+                  "column": "admin_10_ethiopia_kebele"
+                }
+              }
+            },
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "field",
+                  "table": "entities.water_point",
+                  "column": "alt_id"
+                }
+              }
+            },
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "field",
+                  "table": "entities.water_point",
+                  "column": "attributes_selected"
+                }
+              }
+            },
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "field",
+                  "table": "entities.water_point",
+                  "column": "cw_piped_system_type"
+                }
+              }
+            }
+          ],
+          "orderings": [],
+          "table": "entities.water_point"
+        }
+      }
+    }
   }
 }
+
     # "d41a2dd2-85bd-46d8-af9a-a650af4c0047": {
     #   "layout": {
     #     "x": 16,
@@ -1282,3 +1436,53 @@ rosterDatagridDesign = {
     }
   ]
 }
+
+
+# class DashboardPane extends React.Component
+#   constructor: (props) ->
+#     super
+
+#     @state = {
+#       schema: null
+#       dataSource: null
+#       design: dashboardDesign
+#     }
+
+#   componentDidMount: ->
+#     $.getJSON @props.apiUrl + "jsonql/schema", (schemaJson) =>
+#       schema = new Schema(schemaJson)
+#       dataSource = new MWaterDataSource(@props.apiUrl, @props.client, { serverCaching: false, localCaching: true })
+
+#       layerFactory = new LayerFactory({
+#         schema: schema
+#         dataSource: dataSource
+#         apiUrl: @props.apiUrl
+#         client: @props.client
+#         newLayers: [
+#           { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" } }
+#           { name: "Custom Layer", type: "Markers", design: {} }
+#         ]
+#         onMarkerClick: (table, id) => alert("#{table}:#{id}")
+#       })
+
+#       widgetFactory = new WidgetFactory(schema: schema, dataSource: dataSource, layerFactory: layerFactory)    
+
+#       @setState(schema: schema, dataSource: dataSource, layerFactory: layerFactory, widgetFactory: widgetFactory)
+
+#   handleDesignChange: (design) =>
+#     @setState(design: design)
+#     console.log JSON.stringify(design, null, 2)
+    
+#   render: ->
+#     if not @state.widgetFactory
+#       return H.div null, "Loading..."
+
+#     return H.div style: { height: "100%" },
+#       React.createElement(visualization.DashboardComponent, {
+#         design: @state.design
+#         widgetFactory: @state.widgetFactory
+#         onDesignChange: @handleDesignChange
+#         titleElem: "Sample"
+#         printScaling: false
+#         })
+
