@@ -326,6 +326,10 @@ module.exports = class AxisBuilder
       max = axis.xform.max
       numBins = axis.xform.numBins
 
+      # If not ready, no categories
+      if not min? or not max? or not numBins
+        return []
+
       # Special case of single value (min and max within epsilon or 0.01% of each other since epsilon might be too small to add to a big number)
       if (max - min) <= epsilon or Math.abs((max - min)/(max + min)) < 0.0001
         return [
