@@ -91,7 +91,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
   #       H.li(key: "remove", H.a(onClick: @props.onRemove, "Remove Layer"))
 
   handleOpacityChange: (newValue) =>
-    @update( opacity: newValue )
+    @update(opacity: newValue)
 
   renderOpacityControl: ->
     H.div className: 'form-group',
