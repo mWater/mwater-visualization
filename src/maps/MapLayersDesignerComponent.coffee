@@ -75,9 +75,9 @@ module.exports = class MapLayersDesignerComponent extends React.Component
         design: { }
       }
       {
-        label: "Choropleth Indicator Layer (experimental)"
+        label: "Choropleth Layer"
         name: "Untitled Layer"
-        type: "AdminIndicatorChoropleth"
+        type: "AdminChoropleth"
         design: { }
       }
     ]

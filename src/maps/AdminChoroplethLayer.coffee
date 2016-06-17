@@ -24,11 +24,11 @@ Design is:
   color: default color (e.g. #FF8800). Color axis overrides
   opacity: 0-1
 
-  regionLabels: true to display name labels on admin regions
+  nameLabels: true to display name labels on admin regions
 
 axes:
   color: color axis 
-  label: overrides the regionLabels to display text on each region
+  label: overrides the nameLabels to display text on each region
 
 ###
 module.exports = class AdminChoroplethLayer extends Layer
@@ -265,6 +265,7 @@ module.exports = class AdminChoroplethLayer extends Layer
 
     design.axes = design.axes or {}
     design.opacity = if design.opacity? then design.opacity else 0.5
+    design.nameLabels = if design.nameLabels? then design.nameLabels else true
 
     design.axes.color = axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean'], aggrNeed: "required")
     design.axes.label = axisBuilder.cleanAxis(axis: design.axes.label, table: design.table, types: ['text', 'number'], aggrNeed: "required")
@@ -276,6 +277,7 @@ module.exports = class AdminChoroplethLayer extends Layer
   # Validates design. Null if ok, message otherwise
   validateDesign: (design, schema) ->
     exprUtils = new ExprUtils(schema)
+    axisBuilder = new AxisBuilder(schema: schema)
 
     if not design.table
       return "Missing table"

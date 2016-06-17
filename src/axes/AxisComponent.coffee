@@ -164,8 +164,7 @@ module.exports = class AxisComponent extends React.Component
           types: axisBuilder.getExprTypes(@props.types)
           # preventRemove: @props.required
           onChange: @handleExprChange
-          includeCount: @props.aggrNeed != "none"
-          value: if @props.value then axisBuilder.cleanAxis() @props.value.expr
+          value: if @props.value then axisBuilder.cleanAxis(@props.value.expr)
           aggrStatuses: aggrStatuses
           )  
       @renderXform()

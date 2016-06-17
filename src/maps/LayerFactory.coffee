@@ -2,6 +2,7 @@ MWaterServerLayer = require './MWaterServerLayer'
 MarkersLayer = require './MarkersLayer'
 BufferLayer = require './BufferLayer'
 AdminIndicatorChoroplethLayer = require './AdminIndicatorChoroplethLayer'
+AdminChoroplethLayer = require './AdminChoroplethLayer'
 
 module.exports = class LayerFactory
   @createLayer: (type) ->
@@ -17,5 +18,8 @@ module.exports = class LayerFactory
 
       when "AdminIndicatorChoropleth"
         return new AdminIndicatorChoroplethLayer()
+
+      when "AdminChoropleth"
+        return new AdminChoroplethLayer()
 
     throw new Error("Unknown type #{type}")

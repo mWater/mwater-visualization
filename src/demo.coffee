@@ -356,26 +356,54 @@ mapDesign = {
   "baseLayer": "bing_road",
   "layerViews": [
      # { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
-     { 
-      id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
-      name: "Choropleth"
-      type: "AdminIndicatorChoropleth"
-      design: { 
-        scope: 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
-        table: "entities.water_point" 
-        adminRegionExpr: { type: "scalar", table: "entities.water_point", joins: ['admin_region'], expr: { type: "id", table: "admin_regions" } }
-        detailLevel: 1
-        condition: { 
-          type: "op"
-          op: "="
-          table: "entities.water_point"
-          exprs: [
-            { type: "field", table: "entities.water_point", column: "type" }
-            { type: "literal", valueType: "enum", value: "Protected dug well" }
-          ] 
-        }
+    #  { 
+    #   id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
+    #   name: "Choropleth"
+    #   type: "AdminIndicatorChoropleth"
+    #   design: { 
+    #     scope: 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
+    #     table: "entities.water_point" 
+    #     adminRegionExpr: { type: "scalar", table: "entities.water_point", joins: ['admin_region'], expr: { type: "id", table: "admin_regions" } }
+    #     detailLevel: 1
+    #     condition: { 
+    #       type: "op"
+    #       op: "="
+    #       table: "entities.water_point"
+    #       exprs: [
+    #         { type: "field", table: "entities.water_point", column: "type" }
+    #         { type: "literal", valueType: "enum", value: "Protected dug well" }
+    #       ] 
+    #     }
+    #   }
+    #   visible: true 
+    # }
+    {
+      "id": "afbf76a3-29b8-4a11-882c-42aa21a3ca7a",
+      "name": "Untitled Layer",
+      "desc": "",
+      "type": "AdminChoropleth",
+      "visible": true,
+      "opacity": 1,
+      "design": {
+        "adminRegionExpr": {
+          "type": "scalar",
+          "table": "entities.water_point",
+          "joins": [
+            "admin_region"
+          ],
+          "expr": {
+            "type": "id",
+            "table": "admin_regions"
+          }
+        },
+        "axes": {},
+        "opacity": 0.5,
+        "nameLabels": true,
+        "filter": null,
+        "scope": "eb3e12a2-de1e-49a9-8afd-966eb55d47eb",
+        "detailLevel": 1,
+        "table": "entities.water_point"
       }
-      visible: true 
     }
   ]
   filters: {}
