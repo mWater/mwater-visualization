@@ -1,4 +1,5 @@
 _ = require 'lodash'
+uuid = require 'node-uuid'
 ExprCompiler = require('mwater-expressions').ExprCompiler
 ExprUtils = require('mwater-expressions').ExprUtils
 ExprCleaner = require('mwater-expressions').ExprCleaner
@@ -9,6 +10,7 @@ H = React.DOM
 
 xforms = [
   { type: "bin", input: "number", output: "enum" }
+  { type: "ranges", input: "number", output: "enum" }
   { type: "date", input: "datetime", output: "date" }
   { type: "year", input: "date", output: "date" }
   { type: "year", input: "datetime", output: "date" }
@@ -88,6 +90,11 @@ module.exports = class AxisBuilder
       if not axis.xform.numBins
         axis.xform.numBins = 6
 
+    if axis.xform and axis.xform.type == "ranges"
+      # Add ranges
+      if not axis.xform.ranges
+        axis.xform.ranges = [{ id: uuid.v4(), minOpen: false, maxOpen: true }]
+
     # Only allow aggr if not xform
     if axis.xform
       delete axis.aggr
@@ -133,6 +140,14 @@ module.exports = class AxisBuilder
         return "Missing max"
       if options.axis.xform.max < options.axis.xform.min
         return "Max < min"
+
+    # xform validation
+    if options.axis.xform and options.axis.xform.type == "ranges"
+      if not options.axis.xform.ranges or not _.isArray(options.axis.xform.ranges)
+        return "Missing ranges"
+      for range in options.axis.xform.ranges
+        if range.minValue? and range.maxValue? and range.minValue > range.maxValue
+          return "Max < min"
 
     return
 
@@ -209,6 +224,46 @@ module.exports = class AxisBuilder
             2
           ]
         }
+
+      # Ranges
+      if options.axis.xform.type == "ranges"
+        cases = []
+        for range in options.axis.xform.ranges
+          whens = []
+          if range.minValue?
+            if range.minOpen
+              whens.push({ type: "op", op: ">", exprs: [compiledExpr, range.minValue] })
+            else
+              whens.push({ type: "op", op: ">=", exprs: [compiledExpr, range.minValue] })
+
+          if range.maxValue?
+            if range.maxOpen
+              whens.push({ type: "op", op: "<", exprs: [compiledExpr, range.maxValue] })
+            else
+              whens.push({ type: "op", op: "<=", exprs: [compiledExpr, range.maxValue] })
+
+          if whens.length > 1
+            cases.push({
+              when: {
+                type: "op"
+                op: "and"
+                exprs: whens
+              }
+              then: range.id
+            })
+          else if whens.length == 1
+            cases.push({
+              when: whens[0]
+              then: range.id
+            })
+
+        if cases.length > 0 
+          compiledExpr = {
+            type: "case"
+            cases: cases
+          }
+        else
+          compiledExpr = null
 
     # Aggregate
     if options.axis.aggr
@@ -320,7 +375,32 @@ module.exports = class AxisBuilder
   # Get all categories for a given axis type given the known values
   # Returns array of { value, label }
   getCategories: (axis, values, locale) ->
-    # Handle binning first
+    # Handle ranges
+    if axis.xform and axis.xform.type == "ranges"
+      return _.map(axis.xform.ranges, (range) =>
+        label = range.label or ""
+        if not label
+          if range.minValue?
+            if range.minOpen
+              label = "> #{range.minValue}"
+            else
+              label = ">= #{range.minValue}"
+
+          if range.maxValue?
+            if label
+              label += " and "
+            if range.maxOpen
+              label += "< #{range.maxValue}"
+            else
+              label += "<= #{range.maxValue}"
+
+        return {
+          value: range.id
+          label: label
+        }
+      )
+
+    # Handle binning 
     if axis.xform and axis.xform.type == "bin"
       min = axis.xform.min
       max = axis.xform.max

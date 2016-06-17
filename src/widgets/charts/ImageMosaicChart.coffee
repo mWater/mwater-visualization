@@ -20,16 +20,10 @@ Design is:
 
 ###
 module.exports = class ImageMosaicChart extends Chart
-  # Options include
-  #  schema: schema to use
-  #  dataSource: data source to use
-  constructor: (options) ->
-    @schema = options.schema
-    @dataSource = options.dataSource
-    @exprCleaner = new ExprCleaner(@schema)
-    @axisBuilder = new AxisBuilder(schema: @schema)
+  cleanDesign: (design, schema) ->
+    exprCleaner = new ExprCleaner(schema)
+    axisBuilder = new AxisBuilder(schema: schema)
 
-  cleanDesign: (design) ->
     # Clone deep for now # TODO
     design = _.cloneDeep(design)
 
@@ -37,14 +31,16 @@ module.exports = class ImageMosaicChart extends Chart
     design.version = design.version or 1
 
     # Clean axis
-    design.imageAxis = @axisBuilder.cleanAxis(axis: design.imageAxis, table: design.table, aggrNeed: "none", types: ["image", "imagelist"])
+    design.imageAxis = axisBuilder.cleanAxis(axis: design.imageAxis, table: design.table, aggrNeed: "none", types: ["image", "imagelist"])
 
     # Clean filter
-    design.filter = @exprCleaner.cleanExpr(design.filter, { table: design.table, types: ["boolean"] })
+    design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ["boolean"] })
 
     return design
 
-  validateDesign: (design) ->
+  validateDesign: (design, schema) ->
+    axisBuilder = new AxisBuilder(schema: schema)
+
     # Check that has table
     if not design.table
       return "Missing data source"
@@ -55,7 +51,7 @@ module.exports = class ImageMosaicChart extends Chart
     if not design.imageAxis
       error = error or "Missing image"
 
-    error = error or @axisBuilder.validateAxis(axis: design.imageAxis)
+    error = error or axisBuilder.validateAxis(axis: design.imageAxis)
 
     return error
 
@@ -63,21 +59,32 @@ module.exports = class ImageMosaicChart extends Chart
     return not design.imageAxis
 
   # Creates a design element with specified options
-  # options include design: design and onChange: function
+  # options include:
+  #   schema: schema to use
+  #   dataSource: dataSource to use
+  #   design: design 
+  #   onDesignChange: function
   createDesignerElement: (options) ->
     props = {
-      schema: @schema
-      design: @cleanDesign(options.design)
-      dataSource: @dataSource
+      schema: options.schema
+      design: @cleanDesign(options.design, options.schema)
+      dataSource: options.dataSource
       onDesignChange: (design) =>
         # Clean design
-        design = @cleanDesign(design)
+        design = @cleanDesign(design, options.schema)
         options.onDesignChange(design)
     }
     return React.createElement(ImageMosaicChartDesignerComponent, props)
 
-  getData: (design, filters, callback) ->
-    exprCompiler = new ExprCompiler(@schema)
+  # Get data for the chart asynchronously 
+  # design: design of the chart
+  # schema: schema to use
+  # dataSource: data source to get data from
+  # filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
+  # callback: (error, data)
+  getData: (design, schema, dataSource, filters, callback) ->
+    exprCompiler = new ExprCompiler(schema)
+    axisBuilder = new AxisBuilder(schema: schema)
 
     # Create shell of query
     query = {
@@ -88,7 +95,7 @@ module.exports = class ImageMosaicChart extends Chart
     }
 
     # Add image axis
-    imageExpr = @axisBuilder.compileAxis(axis: design.imageAxis, tableAlias: "main")
+    imageExpr = axisBuilder.compileAxis(axis: design.imageAxis, tableAlias: "main")
 
     query.selects.push({ 
       type: "select"
@@ -115,21 +122,24 @@ module.exports = class ImageMosaicChart extends Chart
     else
       query.where = whereClauses[0]
 
-    @dataSource.performQuery(query, callback)
+    dataSource.performQuery(query, callback)
 
-  # Options include 
-  # design: design of the chart
-  # data: results from queries
-  # width, height, standardWidth: size of the chart view
-  # scope: current scope of the view element
-  # onScopeChange: called when scope changes with new scope
+  # Create a view element for the chart
+  # Options include:
+  #   schema: schema to use
+  #   dataSource: dataSource to use
+  #   design: design of the chart
+  #   data: results from queries
+  #   width, height, standardWidth: size of the chart view
+  #   scope: current scope of the view element
+  #   onScopeChange: called when scope changes with new scope
   createViewElement: (options) ->
     # Create chart
     props = {
-      schema: @schema
-      design: @cleanDesign(options.design)
+      schema: options.schema
+      design: @cleanDesign(options.design, options.schema)
       data: options.data
-      dataSource: @dataSource
+      dataSource: options.dataSource
 
       width: options.width
       height: options.height

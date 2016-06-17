@@ -1,23 +1,27 @@
 React = require 'react'
 H = React.DOM
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
+Rcslider = require 'rc-slider'
+LayerFactory = require './LayerFactory'
 
 # A single row in the table of layer views. Handles the editor state
 module.exports = class MapLayerViewDesignerComponent extends React.Component
   @propTypes:
+    schema: React.PropTypes.object.isRequired # Schema to use
+    dataSource: React.PropTypes.object.isRequired
     layerView: React.PropTypes.object.isRequired  # See Map Design.md
     onLayerViewChange: React.PropTypes.func.isRequired # Called with new layer view
     onRemove: React.PropTypes.func.isRequired  # Called to remove
     layerFactory: React.PropTypes.object.isRequired # Layer factory to use
     connectDragSource: React.PropTypes.func    # connector for reorderable
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
-    layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)
+    layer = LayerFactory.createLayer(@props.layerView.type)
 
     @state = { 
-      editing: layer.isIncomplete() # Editing initially if incomplete
+      editing: layer.isIncomplete(@props.layerView.design, @props.schema) # Editing initially if incomplete
     }
 
   update: (updates) ->
@@ -48,15 +52,21 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
       H.a className: "hover-display-child glyphicon glyphicon-pencil", onClick: @handleRename
 
   renderEditor: ->
-    layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)
+    layer = LayerFactory.createLayer(@props.layerView.type)
     return H.div null,
       H.div style: { textAlign: "right" },
         H.a className: "btn btn-link btn-xs", onClick: @props.onRemove, "Delete Layer"
-      if layer.isEditable()
-        layer.createDesignerElement(onDesignChange: @handleSaveEditing)
+      @renderOpacityControl()
+      if layer.isEditable(@props.layerView.design)
+        layer.createDesignerElement({
+          design: @props.layerView.design
+          schema: @props.schema
+          dataSource: @props.dataSource
+          onDesignChange: @handleSaveEditing
+        })
 
   renderLayerEditToggle: ->
-    layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)
+    layer = LayerFactory.createLayer(@props.layerView.type)
 
     H.div style: { float: "right" }, key: "gear",
       H.a onClick: @handleToggleEditing,
@@ -66,7 +76,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
           H.i className: "fa fa-caret-square-o-down"
 
   # renderLayerGearMenu: ->
-  #   layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)
+  #   layer = LayerFactory.createLayer(@props.layerView.type)
   #   if not layer.isEditable()
   #     return 
 
@@ -80,13 +90,31 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
   #       # H.li(key: "opacity", H.a(null, "Set Opacity"))
   #       H.li(key: "remove", H.a(onClick: @props.onRemove, "Remove Layer"))
 
+  handleOpacityChange: (newValue) =>
+    @update(opacity: newValue)
+
+  renderOpacityControl: ->
+    H.div className: 'form-group',
+      H.label className: 'text-muted',
+        H.span null,
+          "Opacity: #{@props.layerView.opacity}"
+      H.div style: {padding: '10px'},
+        React.createElement(Rcslider,
+          min: 0
+          max: 1
+          step: 0.1
+          tipTransitionName: "rc-slider-tooltip-zoom-down",
+          value: @props.layerView.opacity,
+          onChange: @handleOpacityChange
+        )
 
   render: ->
-    layer = @props.layerFactory.createLayer(@props.layerView.type, @props.layerView.design)
+    layer = LayerFactory.createLayer(@props.layerView.type)
     style =
       cursor: "move"
       marginRight: 8
       opacity: 0.6
+      # float: "right"
 
     H.div null,
       H.div style: { fontSize: 16 }, key: "layerView", className: "hover-display-parent",

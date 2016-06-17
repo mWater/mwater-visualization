@@ -10,7 +10,7 @@ compare = (actual, expected) ->
 describe "LayeredChart", ->
   before ->
     @schema = fixtures.simpleSchema()
-    @chart = new LayeredChart(schema: @schema, dataSource: {})
+    @chart = new LayeredChart()
 
     @exprNumber = { type: "field", table: "t1", column: "number" }
     @exprText = { type: "field", table: "t1", column: "text" }
@@ -33,7 +33,7 @@ describe "LayeredChart", ->
         ]
       }
 
-      design = @chart.cleanDesign(design)
+      design = @chart.cleanDesign(design, @schema)
 
       expectedY = {
         expr: { type: "id", table: "t1" }
@@ -51,7 +51,7 @@ describe "LayeredChart", ->
         ]
       }
 
-      design = @chart.cleanDesign(design)
+      design = @chart.cleanDesign(design, @schema)
 
       assert not design.layers[0].axes.y
 
@@ -63,7 +63,7 @@ describe "LayeredChart", ->
         ]
       }
 
-      design = @chart.cleanDesign(design)
+      design = @chart.cleanDesign(design, @schema)
 
       expectedY = @axisNumber
 

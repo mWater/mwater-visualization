@@ -2,6 +2,7 @@ React = require 'react'
 H = React.DOM
 
 LegoLayoutEngine = require './LegoLayoutEngine'
+WidgetFactory = require './WidgetFactory'
 WidgetScoper = require './WidgetScoper'
 WidgetContainerComponent = require './WidgetContainerComponent'
 ReactElementPrinter = require 'react-library/lib/ReactElementPrinter'
@@ -14,12 +15,15 @@ uuid = require 'node-uuid'
 # Handles scoping
 module.exports = class DashboardViewComponent extends React.Component
   @propTypes: 
+    schema: React.PropTypes.object.isRequired # schema to use
+    dataSource: React.PropTypes.object.isRequired # data source to use. Only used when designing, for display uses dashboardDataSource
+    dashboardDataSource: React.PropTypes.object.isRequired # dashboard data source
+
     design: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func      # Leave unset for readonly
 
     width: React.PropTypes.number
     standardWidth: React.PropTypes.number   # Width for scaling
-    widgetFactory: React.PropTypes.object.isRequired # Factory of type WidgetFactory to make widgets
 
     filters: React.PropTypes.arrayOf(React.PropTypes.shape({
       table: React.PropTypes.string.isRequired    # id table to filter
@@ -119,18 +123,19 @@ module.exports = class DashboardViewComponent extends React.Component
     # Get layouts indexed by id
     layouts = _.mapValues(@props.design.items, "layout")
 
-    # Create widgets indexed by id
-    widgets = _.mapValues(@props.design.items, (item) =>
-      @props.widgetFactory.createWidget(item.widget.type, item.widget.design)
-      )
-
     # Create widget elems
-    elems = _.mapValues widgets, (widget, id) =>
+    elems = _.mapValues @props.design.items, (item, id) =>
+      widget = WidgetFactory.createWidget(item.widget.type)
+
       # Get filters (passed in plus widget scoper filters)
       filters = @props.filters or []
       filters = filters.concat(@state.widgetScoper.getFilters(id))
 
-      widget.createViewElement({
+      return widget.createViewElement({
+        schema: @props.schema
+        dataSource: @props.dataSource
+        widgetDataSource: @props.dashboardDataSource.getWidgetDataSource(id)
+        design: item.widget.design
         scope: @state.widgetScoper.getScope(id)
         filters: filters
         onScopeChange: @handleScopeChange.bind(null, id)

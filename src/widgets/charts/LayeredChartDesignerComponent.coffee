@@ -96,7 +96,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
 
     current = _.findWhere(chartTypes, { id: @props.design.type })
 
-    R ui.SectionComponent, icon: "th", label: "Chart Type",
+    R ui.SectionComponent, icon: "glyphicon-th", label: "Chart Type",
       R ui.ToggleEditComponent,
         forceOpen: not @props.design.type
         label: if current then current.name else ""
