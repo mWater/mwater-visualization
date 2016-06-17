@@ -249,7 +249,7 @@ module.exports = class BufferLayer extends Layer
 
     design.axes = design.axes or {}
     design.radius = design.radius or 1000
-    design.opacity = if design.opacity? then design.opacity or 0.5
+    design.opacity = if design.opacity? then design.opacity else 0.5
 
     design.axes.geometry = axisBuilder.cleanAxis(axis: design.axes.geometry, table: design.table, types: ['geometry'], aggrNeed: "none")
     design.axes.color = axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean'], aggrNeed: "none")
