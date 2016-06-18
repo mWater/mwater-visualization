@@ -8,6 +8,7 @@ update = require 'update-object'
 LinkComponent = require('mwater-expressions-ui').LinkComponent
 AxisBuilder = require './AxisBuilder'
 NumberInputComponent = require('react-library/lib/NumberInputComponent')
+ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
 
 # Allows setting of ranges 
 module.exports = class RangesComponent extends React.Component
@@ -34,12 +35,19 @@ module.exports = class RangesComponent extends React.Component
     ranges.splice(index, 1)
     @props.onChange(update(@props.xform, { ranges: { $set: ranges }}))
 
+  renderRange: (range, index, connectDragSource) =>
+    R RangeComponent, key: range.id, range: range, onChange: @handleRangeChange.bind(null, index), onRemove: @handleRemoveRange.bind(null, index), connectDragSource: connectDragSource
+
+  handleReorder: =>
+
+
   render: ->
     H.div null,
       H.table null,
         if @props.xform.ranges.length > 0
           H.thead null,
             H.tr null,
+              H.th null, " "
               H.th key: "min", colSpan: 2, style: { textAlign: "center" }, "From"
               H.th key: "and", ""
               H.th key: "max", colSpan: 2, style: { textAlign: "center" }, "To"
@@ -47,8 +55,14 @@ module.exports = class RangesComponent extends React.Component
               H.th key: "remove"
 
         H.tbody null,
-          _.map @props.xform.ranges, (range, i) =>
-            R RangeComponent, key: range.id, range: range, onChange: @handleRangeChange.bind(null, i), onRemove: @handleRemoveRange.bind(null, i)
+          React.createElement(ReorderableListComponent,
+            items: @props.xform.ranges
+            onReorder: @handleReorder
+            renderItem: @renderRange
+            getItemId: (range) => range.id
+          )
+#          _.map @props.xform.ranges, (range, i) =>
+#            R RangeComponent, key: range.id, range: range, onChange: @handleRangeChange.bind(null, i), onRemove: @handleRemoveRange.bind(null, i)
 
       H.button className: "btn btn-link btn-sm", type: "button", onClick: @handleAddRange,
         H.span className: "glyphicon glyphicon-plus"
@@ -84,6 +98,8 @@ class RangeComponent extends React.Component
         placeholder += "<= #{@props.range.maxValue}"
 
     H.tr null,
+      H.td null,
+        @props.connectDragSource(H.span className: "glyphicon glyphicon-move")
       H.td key: "minOpen",
         R LinkComponent, 
           dropdownItems: [{ id: true, name: "greater than"}, { id: false, name: "greater than or equal to"}]
