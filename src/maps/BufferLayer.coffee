@@ -17,7 +17,7 @@ Design is:
   axes: axes (see below)
   filter: optional logical expression to filter by
   color: color of layer (e.g. #FF8800). Color axis overrides
-  opacity: 0-1
+  fillOpacity: Opacity to fill the circles (0-1)
   radius: radius to draw in meters
 
 axes:
@@ -174,7 +174,7 @@ module.exports = class BufferLayer extends Layer
     if design.color
       css += '''
         #layer0 {
-          opacity: ''' + design.opacity + ''';
+          opacity: ''' + design.fillOpacity + ''';
           polygon-fill: ''' + design.color + ''';
         }
       '''
@@ -182,7 +182,7 @@ module.exports = class BufferLayer extends Layer
     # If color axes, add color conditions
     if design.axes.color and design.axes.color.colorMap
       for item, i in design.axes.color.colorMap
-        css += "#layer0::#{i} [color=#{JSON.stringify(item.value)}] { polygon-fill: #{item.color}; opacity: #{design.opacity}; }\n"
+        css += "#layer0::#{i} [color=#{JSON.stringify(item.value)}] { polygon-fill: #{item.color}; opacity: #{design.fillOpacity}; }\n"
 
     return css
 
@@ -249,7 +249,7 @@ module.exports = class BufferLayer extends Layer
 
     design.axes = design.axes or {}
     design.radius = design.radius or 1000
-    design.opacity = if design.opacity? then design.opacity else 0.5
+    design.fillOpacity = if design.fillOpacity? then design.fillOpacity else 0.5
 
     design.axes.geometry = axisBuilder.cleanAxis(axis: design.axes.geometry, table: design.table, types: ['geometry'], aggrNeed: "none")
     design.axes.color = axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean'], aggrNeed: "none")

@@ -78,29 +78,29 @@ module.exports = class AxisComponent extends React.Component
     axisBuilder = new AxisBuilder(schema: @props.schema)
     return axisBuilder.cleanAxis(axis: axis, table: @props.table, aggrNeed: @props.aggrNeed, types: @props.types)
 
-  renderXform: ->
-    if not @props.value
+  renderXform: (axis) ->
+    if not axis
       return
 
-    if @props.value.xform and @props.value.xform.type in ["bin", "ranges"]
-      if @props.value.xform.type == "ranges"
+    if axis.xform and axis.xform.type in ["bin", "ranges"]
+      if axis.xform.type == "ranges"
         comp = R(RangesComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
-          expr: @props.value.expr
-          xform: @props.value.xform
+          expr: axis.expr
+          xform: axis.xform
           onChange: @handleXformChange)
       else
         comp = R(BinsComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
-          expr: @props.value.expr
-          xform: @props.value.xform
+          expr: axis.expr
+          xform: axis.xform
           onChange: @handleXformChange)
 
       return H.div null,
         R ui.ButtonToggleComponent,
-          value: if @props.value.xform then @props.value.xform.type else null
+          value: if axis.xform then axis.xform.type else null
           options: [
             { value: "bin", label: "Equal Bins" }
             { value: "ranges", label: "Custom Ranges" }
@@ -109,12 +109,12 @@ module.exports = class AxisComponent extends React.Component
         comp
 
     exprUtils = new ExprUtils(@props.schema)
-    exprType = exprUtils.getExprType(@props.value.expr) 
+    exprType = exprUtils.getExprType(axis.expr) 
 
     switch exprType
       when "date"
         R ui.ButtonToggleComponent,
-          value: if @props.value.xform then @props.value.xform.type else null
+          value: if axis.xform then axis.xform.type else null
           options: [
             { value: null, label: "Exact Date" }
             { value: "year", label: "Year" }
@@ -124,7 +124,7 @@ module.exports = class AxisComponent extends React.Component
           onChange: @handleXformTypeChange
       when "datetime"
         R ui.ButtonToggleComponent,
-          value: if @props.value.xform then @props.value.xform.type else null
+          value: if axis.xform then axis.xform.type else null
           options: [
             { value: "date", label: "Date" }
             { value: "year", label: "Year" }
@@ -133,18 +133,21 @@ module.exports = class AxisComponent extends React.Component
           ]
           onChange: @handleXformTypeChange
 
-  renderColorMap: ->
-    if not @props.showColorMap or not @props.value or not @props.value.expr
+  renderColorMap: (axis) ->
+    if not @props.showColorMap or not axis or not axis.expr
       return null
 
     return R ColorMapComponent,
       schema: @props.schema
       dataSource: @props.dataSource
-      axis: @props.value
+      axis: axis
       onChange: @props.onChange
 
   render: ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
+
+    # Clean before render
+    axis = @cleanAxis(@props.value)
 
     # Determine aggrStatuses that are possible
     switch @props.aggrNeed
@@ -164,9 +167,9 @@ module.exports = class AxisComponent extends React.Component
           types: axisBuilder.getExprTypes(@props.types)
           # preventRemove: @props.required
           onChange: @handleExprChange
-          value: if @props.value then axisBuilder.cleanAxis(@props.value.expr)
+          value: if @props.value then @props.value.expr
           aggrStatuses: aggrStatuses
           )  
-      @renderXform()
-      @renderColorMap()
+      @renderXform(axis)
+      @renderColorMap(axis)
 

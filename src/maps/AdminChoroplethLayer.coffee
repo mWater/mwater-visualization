@@ -22,7 +22,7 @@ Design is:
 
   filter: optional logical expression to filter by
   color: default color (e.g. #FF8800). Color axis overrides
-  opacity: 0-1
+  fillOpacity: opacity of fill of regions (0-1)
 
   nameLabels: true to display name labels on admin regions
 
@@ -126,12 +126,12 @@ module.exports = class AdminChoroplethLayer extends Layer
 
     # Add color select if color axis
     if design.axes.color
-      colorExpr = axisBuilder.compileAxis(axis: design.axes.color, tableAlias: "main")
+      colorExpr = axisBuilder.compileAxis(axis: design.axes.color, tableAlias: "innerquery")
       selects.push({ type: "select", expr: createScalar(colorExpr), alias: "color" })
 
     # Add label select if color axis
     if design.axes.label
-      labelExpr = axisBuilder.compileAxis(axis: design.axes.label, tableAlias: "main")
+      labelExpr = axisBuilder.compileAxis(axis: design.axes.label, tableAlias: "innerquery")
       selects.push({ type: "select", expr: createScalar(labelExpr), alias: "label" })
 
     # Now create outer query
@@ -185,9 +185,12 @@ module.exports = class AdminChoroplethLayer extends Layer
       #layer0 {
         line-color: #000;
         line-width: 1.5;
-        line-opacity: 0.5;
-        polygon-opacity: ''' + design.opacity + ''';
+        line-opacity: 0.6;
+        polygon-opacity: ''' + design.fillOpacity + ''';
         polygon-fill: ''' + (design.color or "transparent") + ''';
+      }
+
+      #layer0::labels {
         text-name: [name];
         text-face-name: 'Arial Regular'; 
         text-halo-radius: 2;
@@ -199,7 +202,7 @@ module.exports = class AdminChoroplethLayer extends Layer
     # If color axes, add color conditions
     if design.axes.color and design.axes.color.colorMap
       for item in design.axes.color.colorMap
-        css += "#layer0 [color=#{JSON.stringify(item.value)}] { polygon-fill: #{item.color}; opacity: #{design.opacity}; }\n"
+        css += "#layer0 [color=#{JSON.stringify(item.value)}] { polygon-fill: #{item.color}; opacity: #{design.fillOpacity}; }\n"
 
     # colors = [
     #   "#f7fbff"
@@ -264,7 +267,7 @@ module.exports = class AdminChoroplethLayer extends Layer
     design.adminRegionExpr = exprCleaner.cleanExpr(design.adminRegionExpr, { table: design.table, types: ["id"], idTable: "admin_regions" })
 
     design.axes = design.axes or {}
-    design.opacity = if design.opacity? then design.opacity else 0.5
+    design.fillOpacity = if design.fillOpacity? then design.fillOpacity else 0.5
     design.nameLabels = if design.nameLabels? then design.nameLabels else true
 
     design.axes.color = axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean'], aggrNeed: "required")

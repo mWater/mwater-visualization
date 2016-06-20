@@ -36,7 +36,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
   handleLabelAxisChange: (axis) => @updateAxes(label: axis)
   handleFilterChange: (expr) => @update(filter: expr)
   handleColorChange: (color) => @update(color: color)
-  handleOpacityChange: (opacity) => @update(opacity: opacity/100)
+  handleFillOpacityChange: (fillOpacity) => @update(fillOpacity: fillOpacity/100)
 
   renderTable: ->
     return H.div className: "form-group",
@@ -156,18 +156,18 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
   #         showColorMap: true
   #         onChange: @handleColorAxisChange)
 
-  renderOpacity: ->
+  renderFillOpacity: ->
     return H.div className: "form-group",
       H.label className: "text-muted", 
-        "Opacity (%)"
+        "Fill Opacity (%)"
       ": "
       React.createElement(Rcslider,
         min: 0
         max: 100
         step: 1
         tipTransitionName: "rc-slider-tooltip-zoom-down",
-        value: @props.design.opacity * 100,
-        onChange: @handleOpacityChange
+        value: @props.design.fillOpacity * 100,
+        onChange: @handleFillOpacityChange
       )
 
   renderFilter: ->
@@ -194,7 +194,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
       @renderAdminRegionExpr()
       @renderColor()
       @renderColorAxis()
-      @renderOpacity()
+      @renderFillOpacity()
       @renderFilter()
 
 

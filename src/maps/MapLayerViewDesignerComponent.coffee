@@ -12,7 +12,6 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
     layerView: React.PropTypes.object.isRequired  # See Map Design.md
     onLayerViewChange: React.PropTypes.func.isRequired # Called with new layer view
     onRemove: React.PropTypes.func.isRequired  # Called to remove
-    layerFactory: React.PropTypes.object.isRequired # Layer factory to use
     connectDragSource: React.PropTypes.func    # connector for reorderable
 
   constructor: (props) ->

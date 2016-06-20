@@ -513,14 +513,7 @@ module.exports = class AxisBuilder
     if not axis
       return "None"
 
-    exprType = @exprUtils.getExprType(axis.expr)
-
-    # DEPRECATED Add aggr if not a id type
-    if axis.aggr and exprType != "id"
-      aggrName = _.findWhere(@exprUtils.getAggrs(axis.expr), { id: axis.aggr }).name
-      return aggrName + " " + @exprUtils.summarizeExpr(axis.expr, locale)
-    else
-      return @exprUtils.summarizeExpr(axis.expr, locale)
+    return @exprUtils.summarizeExpr(axis.expr, locale)
     # TODO add xform support
 
   # Get a string (or React DOM actually) representation of an axis value

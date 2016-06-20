@@ -33,7 +33,7 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
   handleColorAxisChange: (axis) => @updateAxes(color: axis)
   handleFilterChange: (expr) => @update(filter: expr)
   handleColorChange: (color) => @update(color: color)
-  handleOpacityChange: (opacity) => @update(opacity: opacity/100)
+  handleFillOpacityChange: (fillOpacity) => @update(fillOpacity: fillOpacity/100)
 
   renderTable: ->
     return H.div className: "form-group",
@@ -103,18 +103,18 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
       H.div style: { marginLeft: 8 }, 
         React.createElement(ColorComponent, color: @props.design.color, onChange: @handleColorChange)
 
-  renderOpacity: ->
+  renderFillOpacity: ->
     return H.div className: "form-group",
       H.label className: "text-muted", 
-        "Opacity (%)"
+        "Circle Opacity (%)"
       ": "
       React.createElement(Rcslider,
         min: 0
         max: 100
         step: 1
         tipTransitionName: "rc-slider-tooltip-zoom-down",
-        value: @props.design.opacity * 100,
-        onChange: @handleOpacityChange
+        value: @props.design.fillOpacity * 100,
+        onChange: @handleFillOpacityChange
       )
 
   renderFilter: ->
@@ -141,6 +141,6 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
       @renderRadius()
       @renderColor()
       @renderColorAxis()
-      @renderOpacity()
+      @renderFillOpacity()
       @renderFilter()
 
