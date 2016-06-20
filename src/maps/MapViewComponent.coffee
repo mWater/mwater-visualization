@@ -101,8 +101,11 @@ module.exports = class MapViewComponent extends React.Component
       # Create layer
       layer = LayerFactory.createLayer(layerView.type)
 
+      # Clean design (prevent ever displaying invalid/legacy designs)
+      design = layer.cleanDesign(layerView.design, @props.schema)
+
       # Ignore if invalid
-      if layer.validateDesign(layerView.design, @props.schema)
+      if layer.validateDesign(design, @props.schema)
         continue
 
       # Create leafletLayer
@@ -111,9 +114,9 @@ module.exports = class MapViewComponent extends React.Component
         utfGridUrl: @props.mapUrlSource.getUtfGridUrl(layerView.id, compiledFilters)
         visible: layerView.visible
         opacity: layerView.opacity
-        minZoom: layer.getMinZoom(layerView.design)
-        maxZoom: layer.getMaxZoom(layerView.design)
-        onGridClick: @handleGridClick.bind(null, layer, layerView.design)
+        minZoom: layer.getMinZoom(design)
+        maxZoom: layer.getMaxZoom(design)
+        onGridClick: @handleGridClick.bind(null, layer, design)
       }
 
       leafletLayers.push(leafletLayer)
