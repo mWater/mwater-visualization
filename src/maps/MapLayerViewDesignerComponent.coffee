@@ -13,6 +13,8 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
     onLayerViewChange: React.PropTypes.func.isRequired # Called with new layer view
     onRemove: React.PropTypes.func.isRequired  # Called to remove
     connectDragSource: React.PropTypes.func    # connector for reorderable
+    connectDragPreview: React.PropTypes.func  #connector for reorderable
+    connectDropTarget: React.PropTypes.func # connector for reorderable
 
   constructor: (props) ->
     super(props)
@@ -115,7 +117,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
       opacity: 0.6
       # float: "right"
 
-    H.div null,
+    @props.connectDragPreview(@props.connectDropTarget(H.div null,
       H.div style: { fontSize: 16 }, key: "layerView", className: "hover-display-parent",
         if @props.connectDragSource
           @props.connectDragSource(H.i(className: "fa fa-bars hover-display-child", style: style))
@@ -124,4 +126,5 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
         @renderName()
       if @state.editing
         @renderEditor()
+    ))
 
