@@ -25,12 +25,19 @@ module.exports = class LegacyMapUrlSource
     # Create layer
     layer = LayerFactory.createLayer(layerView.type)
 
+    # Clean design (prevent ever displaying invalid/legacy designs)
+    design = layer.cleanDesign(layerView.design, @schema)
+
+    # Ignore if invalid
+    if layer.validateDesign(design, @schema)
+      return null
+
     # Get JsonQLCss
-    jsonqlCss = layer.getJsonQLCss(layerView.design, @schema, filters)
+    jsonqlCss = layer.getJsonQLCss(design, @schema, filters)
 
     # HACK FOR LEGACY MWATER SERVER LAYERS
     if _.isString(jsonqlCss)
-      return @createLegacyUrl(layerView.design, "png", filters)
+      return @createLegacyUrl(design, "png", filters)
 
     return @createUrl("png", jsonqlCss, filters) 
 
@@ -45,12 +52,19 @@ module.exports = class LegacyMapUrlSource
     # Create layer
     layer = LayerFactory.createLayer(layerView.type)
 
+    # Clean design (prevent ever displaying invalid/legacy designs)
+    design = layer.cleanDesign(layerView.design, @schema)
+
+    # Ignore if invalid
+    if layer.validateDesign(design, @schema)
+      return null
+
     # Get JsonQLCss
-    jsonqlCss = layer.getJsonQLCss(layerView.design, @schema, filters)
+    jsonqlCss = layer.getJsonQLCss(design, @schema, filters)
 
     # HACK FOR LEGACY MWATER SERVER LAYERS
     if _.isString(jsonqlCss)
-      return @createLegacyUrl(layerView.design, "grid.json", filters)
+      return @createLegacyUrl(design, "grid.json", filters)
 
     return @createUrl("grid.json", jsonqlCss, filters) 
 

@@ -172,12 +172,14 @@ module.exports = class LeafletMapComponent extends React.Component
           if not layer.visible or not layer.tileUrl
             continue
 
-          options = {}
+          options = { opacity: layer.opacity }
+          
           # Putting null seems to make layer vanish
           if layer.minZoom
             options.minZoom = layer.minZoom
           if layer.maxZoom
             options.maxZoom = layer.maxZoom
+
 
           tileLayer = L.tileLayer(layer.tileUrl, options)
           @tileLayers.push(tileLayer)

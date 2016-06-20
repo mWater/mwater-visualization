@@ -5,7 +5,7 @@ In ggplot2 parlance, an "aesthetic"
 
 It contains:
  expr: expression
- aggr: optional aggregation (e.g. sum)
+ aggr: DEPRECATED: optional aggregation (e.g. sum)
  xform: optional transformation to be applied. object with `type` field. See below
  colorMap: optional array of { value: value of expression, post-transform, color: html color }
 

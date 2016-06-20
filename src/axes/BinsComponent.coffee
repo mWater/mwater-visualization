@@ -3,6 +3,7 @@ H = React.DOM
 R = React.createElement
 update = require 'update-object'
 
+ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require './AxisBuilder'
 NumberInputComponent = require('react-library/lib/NumberInputComponent')
 
@@ -26,6 +27,11 @@ module.exports = class BinsComponent extends React.Component
   componentDidMount: ->
     # Check if computing is needed
     if not @props.xform.min? or not @props.xform.max?
+      # Only do for individual (not aggregate) expressions
+      exprUtils = new ExprUtils(@props.schema)
+      if exprUtils.getExprAggrStatus(@props.expr) != "individual"
+        return
+
       axisBuilder = new AxisBuilder(schema: @props.schema)
 
       # Get min and max from a query
