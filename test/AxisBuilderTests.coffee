@@ -215,15 +215,34 @@ describe "AxisBuilder", ->
       }
 
   describe "cleanAxis", ->
-    it "defaults aggr"
-    it "cleans expression"
+    it "moves legacy aggr into expr", ->
+      axis = {
+        expr: { type: "field", table: "t1", column: "number" }
+        aggr: "sum"
+      }
+
+      axis = @ab.cleanAxis(axis: axis, table: "t1", aggrNeed: "optional")
+      compare(axis, {
+        expr: { type: "op", op: "sum", table: "t1", exprs: [{ type: "field", table: "t1", column: "number" }] }
+      })
+
+    it "cleans expression", ->
+      axis = {
+        expr: { type: "op", op: "+", table: "t1", exprs: [{ type: "field", table: "t1", column: "number" }, { type: "field", table: "t1", column: "text" }] }
+      }
+
+      axis = @ab.cleanAxis(axis: axis, table: "t1", aggrNeed: "optional")
+      compare(axis, {
+        expr: { type: "op", op: "+", table: "t1", exprs: [{ type: "field", table: "t1", column: "number" }, null] }
+      })
+
     it "nulls if no expression", ->
       axis = {
         expr: null
         aggr: "sum"
       }
 
-      axis = @ab.cleanAxis(axis: axis, table: "t1")
+      axis = @ab.cleanAxis(axis: axis, table: "t1", aggrNeed: "optional")
       assert not axis
 
     it "nulls if expression has no type", ->
@@ -232,7 +251,7 @@ describe "AxisBuilder", ->
         aggr: "sum"
       }
 
-      axis = @ab.cleanAxis(axis: axis, table: "t1")
+      axis = @ab.cleanAxis(axis: axis, table: "t1", aggrNeed: "optional")
       assert not axis
 
     it "removes bin xform if wrong input type", ->
@@ -241,7 +260,7 @@ describe "AxisBuilder", ->
         xform: { type: "bin", numBins: 10, min: 2, max: 8 }
       }
 
-      axis = @ab.cleanAxis(axis: axis, table: "t1")
+      axis = @ab.cleanAxis(axis: axis, table: "t1", aggrNeed: "optional")
       assert not axis.xform
 
     it "removes bin xform if wrong output type", ->
@@ -250,7 +269,7 @@ describe "AxisBuilder", ->
         xform: { type: "bin", numBins: 10, min: 2, max: 8 }
       }
 
-      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ["number"])
+      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ["number"], aggrNeed: "optional")
       assert not axis.xform
 
     it "removes ranges xform if wrong input type", ->
@@ -262,7 +281,7 @@ describe "AxisBuilder", ->
           ]}
       }
 
-      axis = @ab.cleanAxis(axis: axis, table: "t1")
+      axis = @ab.cleanAxis(axis: axis, table: "t1", aggrNeed: "optional")
       assert not axis.xform
 
     it "removes ranges xform if wrong output type", ->
@@ -274,31 +293,15 @@ describe "AxisBuilder", ->
           ]}
       }
 
-      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ["number"])
+      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ["number"], aggrNeed: "optional")
       assert not axis.xform
-
-    it "removes bad aggr"
-
-    it "does not default count aggr for text", ->
-      axis = @ab.cleanAxis(axis: @axisText, table: "t1", types: ["number"])
-      assert not axis, JSON.stringify(axis)
-
-    it "removes aggr if xform", ->
-      axis = {
-        expr: @exprNumber
-        xform: { type: "bin", numBins: 10, min: 2, max: 8 }
-        aggr: "sum"
-      }
-
-      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ["enum"])
-      assert not axis.aggr
 
     it "defaults bin xform", ->
       axis = {
         expr: @exprNumber
       }
 
-      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ['enum'])
+      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ['enum'], aggrNeed: "optional")
       assert.equal axis.xform.type, "bin"
 
     it "remove if not possible to get type", ->

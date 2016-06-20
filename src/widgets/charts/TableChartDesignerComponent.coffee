@@ -172,8 +172,9 @@ class TableChartColumnDesignerComponent extends React.Component
         dataSource: @props.dataSource
         table: @props.design.table
         value: if column.textAxis then column.textAxis.expr
-        includeCount: true # Can include simple counts
-        onChange: @handleExprChange)
+        onChange: @handleExprChange
+        aggrStatuses: ["literal", "individual", "aggregate"]
+      )
 
   renderHeader: ->
     column = @props.design.columns[@props.index]
