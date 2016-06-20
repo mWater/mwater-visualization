@@ -40,7 +40,7 @@ module.exports = class AxisComponent extends React.Component
       return
       
     # Set expression and clear xform
-    @props.onChange(@cleanAxis({ expr: expr, xform: null }))
+    @props.onChange(@cleanAxis(_.extend({}, @props.value, { expr: expr })))
 
   handleXformTypeChange: (type) =>
     # Remove
@@ -171,5 +171,6 @@ module.exports = class AxisComponent extends React.Component
           aggrStatuses: aggrStatuses
           )  
       @renderXform(axis)
+      H.br()
       @renderColorMap(axis)
 

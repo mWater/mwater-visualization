@@ -271,7 +271,7 @@ module.exports = class AdminChoroplethLayer extends Layer
     design.adminRegionExpr = exprCleaner.cleanExpr(design.adminRegionExpr, { table: design.table, types: ["id"], idTable: "admin_regions" })
 
     design.axes = design.axes or {}
-    design.fillOpacity = if design.fillOpacity? then design.fillOpacity else 0.5
+    design.fillOpacity = if design.fillOpacity? then design.fillOpacity else 0.75
     design.displayNames = if design.displayNames? then design.displayNames else true
 
     design.axes.color = axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean'], aggrNeed: "required")

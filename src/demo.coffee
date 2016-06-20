@@ -400,7 +400,7 @@ mapDesign = {
           "color": {
             "expr": {
               "type": "op",
-              "op": "count",
+              "op": "percent where",
               "table": "entities.water_point",
               "exprs": []
             },
@@ -408,7 +408,7 @@ mapDesign = {
               "type": "bin",
               "numBins": 6,
               "min": 0,
-              "max": 1999
+              "max": 100
             },
             "colorMap": [
               {

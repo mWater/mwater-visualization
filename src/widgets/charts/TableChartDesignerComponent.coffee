@@ -202,6 +202,7 @@ class TableChartColumnDesignerComponent extends React.Component
       return
 
     # Get aggregations
+    # TODO REMOVED!!!
     aggrs = exprUtils.getAggrs(column.textAxis.expr)
 
     # Remove latest, as it is tricky to group by. TODO

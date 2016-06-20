@@ -31,23 +31,28 @@ module.exports = class ColorComponent extends React.Component
       display: "inline-block"
     }
 
+    if not @props.color
+      # http://lea.verou.me/css3patterns/#diagonal-stripes
+      style.backgroundColor = "#AAA"
+      style.backgroundImage = "repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,.7) 2px, rgba(255,255,255,.7) 4px)"
+
     popupPosition = {
       position: 'absolute'
       top: 0
       left: 30
       zIndex: 1000
+      backgroundColor: "white"
+      border: "solid 1px #DDD"
+      borderRadius: 3
     }
 
     H.div style: { position: "relative", display: "inline-block" },
-      if @props.color? 
-        H.div null,
-          H.div(style: style, onClick: @handleClick)
-          " ",
-          H.a style: { cursor: "pointer" }, onClick: (=> @props.onChange(null)), "Reset"
-      else
-        H.a style: { cursor: "pointer"}, onClick: @handleClick, "Customize"
+      H.div(style: style, onClick: @handleClick)
       if @state.open
         H.div style: popupPosition,
+          H.button type: "button", className: "btn btn-link btn-sm", onClick: (=> @props.onChange(null)),
+            H.span className: "glyphicon glyphicon-remove"
+            " Reset Color"
           React.createElement(SketchPicker, type: "sketch", color: @props.color or undefined, onChangeComplete: @handleClose)
 
 
