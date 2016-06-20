@@ -211,12 +211,12 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
@@ -640,87 +640,6 @@ dashboardDesign = {
             }
           ],
           "type": "bar"
-        }
-      }
-    },
-    "8e54a8ac-4b76-4743-ab94-9cbd842501eb": {
-      "layout": {
-        "x": 9,
-        "y": 0,
-        "w": 15,
-        "h": 8
-      },
-      "widget": {
-        "type": "TableChart",
-        "design": {
-          "version": 1,
-          "columns": [
-            {
-              "textAxis": {
-                "expr": {
-                  "type": "field",
-                  "table": "entities.water_point",
-                  "column": "admin_02_country"
-                }
-              }
-            },
-            {
-              "textAxis": {
-                "expr": {
-                  "type": "field",
-                  "table": "entities.water_point",
-                  "column": "admin_04"
-                }
-              }
-            },
-            {
-              "textAxis": {
-                "expr": {
-                  "type": "field",
-                  "table": "entities.water_point",
-                  "column": "admin_05"
-                }
-              }
-            },
-            {
-              "textAxis": {
-                "expr": {
-                  "type": "field",
-                  "table": "entities.water_point",
-                  "column": "admin_10_ethiopia_kebele"
-                }
-              }
-            },
-            {
-              "textAxis": {
-                "expr": {
-                  "type": "field",
-                  "table": "entities.water_point",
-                  "column": "alt_id"
-                }
-              }
-            },
-            {
-              "textAxis": {
-                "expr": {
-                  "type": "field",
-                  "table": "entities.water_point",
-                  "column": "attributes_selected"
-                }
-              }
-            },
-            {
-              "textAxis": {
-                "expr": {
-                  "type": "field",
-                  "table": "entities.water_point",
-                  "column": "cw_piped_system_type"
-                }
-              }
-            }
-          ],
-          "orderings": [],
-          "table": "entities.water_point"
         }
       }
     }
