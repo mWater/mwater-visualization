@@ -34,6 +34,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
   handleAdminRegionExprChange: (expr) => @update(adminRegionExpr: expr)
   handleColorAxisChange: (axis) => @updateAxes(color: axis)
   handleLabelAxisChange: (axis) => @updateAxes(label: axis)
+  handleDisplayNamesChange: (displayNames) => @update(displayNames: displayNames)
   handleFilterChange: (expr) => @update(filter: expr)
   handleColorChange: (color) => @update(color: color)
   handleFillOpacityChange: (fillOpacity) => @update(fillOpacity: fillOpacity/100)
@@ -102,6 +103,13 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
         clearable: false
         onChange: (value) => @handleScopeAndDetailLevelChange(value.split(":")[0] or null, parseInt(value.split(":")[1]))
       }
+
+  renderDisplayNames: ->
+    H.div className: "form-group",
+      H.div className: "checkbox",
+        H.label null,
+          H.input type: "checkbox", checked: @props.design.displayNames, onChange: (ev) => @handleDisplayNamesChange(ev.target.checked)
+          "Display Region Names"
 
   renderColor: ->
     if not @props.design.table
@@ -192,6 +200,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
       @renderRegionAndDetailLevel()
       @renderTable()
       @renderAdminRegionExpr()
+      @renderDisplayNames()
       @renderColor()
       @renderColorAxis()
       @renderFillOpacity()

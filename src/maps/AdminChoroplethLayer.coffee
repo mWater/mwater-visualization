@@ -24,7 +24,7 @@ Design is:
   color: default color (e.g. #FF8800). Color axis overrides
   fillOpacity: opacity of fill of regions (0-1)
 
-  nameLabels: true to display name labels on admin regions
+  displayNames: true to display name labels on admin regions
 
 axes:
   color: color axis 
@@ -190,6 +190,10 @@ module.exports = class AdminChoroplethLayer extends Layer
         polygon-fill: ''' + (design.color or "transparent") + ''';
       }
 
+    '''
+
+    if design.displayNames
+      css += '''
       #layer0::labels {
         text-name: [name];
         text-face-name: 'Arial Regular'; 
@@ -268,7 +272,7 @@ module.exports = class AdminChoroplethLayer extends Layer
 
     design.axes = design.axes or {}
     design.fillOpacity = if design.fillOpacity? then design.fillOpacity else 0.5
-    design.nameLabels = if design.nameLabels? then design.nameLabels else true
+    design.displayNames = if design.displayNames? then design.displayNames else true
 
     design.axes.color = axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean'], aggrNeed: "required")
     design.axes.label = axisBuilder.cleanAxis(axis: design.axes.label, table: design.table, types: ['text', 'number'], aggrNeed: "required")
