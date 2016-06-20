@@ -35,11 +35,18 @@ module.exports = class RangesComponent extends React.Component
     ranges.splice(index, 1)
     @props.onChange(update(@props.xform, { ranges: { $set: ranges }}))
 
-  renderRange: (range, index, connectDragSource) =>
-    R RangeComponent, key: range.id, range: range, onChange: @handleRangeChange.bind(null, index), onRemove: @handleRemoveRange.bind(null, index), connectDragSource: connectDragSource
+  renderRange: (range, index, connectDragSource, connectDragPreview, connectDropTarget) =>
+    R RangeComponent,
+      key: range.id
+      range: range
+      onChange: @handleRangeChange.bind(null, index)
+      onRemove: @handleRemoveRange.bind(null, index)
+      connectDragSource: connectDragSource
+      connectDragPreview: connectDragPreview
+      connectDropTarget: connectDropTarget
 
-  handleReorder: =>
-
+  handleReorder: (ranges) =>
+    @props.onChange(update(@props.xform, { ranges: { $set: ranges }}))
 
   render: ->
     H.div null,
@@ -54,13 +61,13 @@ module.exports = class RangesComponent extends React.Component
               H.th key: "label", colSpan: 1, style: { textAlign: "center" }, "Label"
               H.th key: "remove"
 
-        H.tbody null,
-          React.createElement(ReorderableListComponent,
-            items: @props.xform.ranges
-            onReorder: @handleReorder
-            renderItem: @renderRange
-            getItemId: (range) => range.id
-          )
+        React.createElement(ReorderableListComponent,
+          items: @props.xform.ranges
+          onReorder: @handleReorder
+          renderItem: @renderRange
+          getItemId: (range) => range.id
+          element: H.tbody null
+        )
 #          _.map @props.xform.ranges, (range, i) =>
 #            R RangeComponent, key: range.id, range: range, onChange: @handleRangeChange.bind(null, i), onRemove: @handleRemoveRange.bind(null, i)
 
@@ -74,6 +81,9 @@ class RangeComponent extends React.Component
     range: React.PropTypes.object.isRequired   # Range to edit
     onChange: React.PropTypes.func.isRequired
     onRemove: React.PropTypes.func.isRequired
+    connectDragSource: React.PropTypes.func.isRequired #reorderable connector
+    connectDragPreview: React.PropTypes.func.isRequired #reorderable connector
+    connectDropTarget: React.PropTypes.func.isRequired #reorderable connector
 
   handleMinOpenChange: (minOpen) =>
     @props.onChange(update(@props.range, { minOpen: { $set: minOpen }}))
@@ -97,9 +107,9 @@ class RangeComponent extends React.Component
       else
         placeholder += "<= #{@props.range.maxValue}"
 
-    H.tr null,
+    @props.connectDragPreview(@props.connectDropTarget(H.tr null,
       H.td null,
-        @props.connectDragSource(H.span className: "glyphicon glyphicon-move")
+        @props.connectDragSource(H.span className: "fa fa-bars")
       H.td key: "minOpen",
         R LinkComponent, 
           dropdownItems: [{ id: true, name: "greater than"}, { id: false, name: "greater than or equal to"}]
@@ -126,5 +136,6 @@ class RangeComponent extends React.Component
       H.td key: "remove",
         H.button className: "btn btn-xs btn-link", type: "button", onClick: @props.onRemove,
           H.span className: "glyphicon glyphicon-remove"
+    ))
 
 
