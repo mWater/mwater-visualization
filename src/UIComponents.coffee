@@ -176,5 +176,5 @@ exports.ButtonToggleComponent = class ButtonToggleComponent extends React.Compon
   render: ->
     H.div className: "btn-group btn-group-xs",
       _.map @props.options, (option, i) =>
-        H.button type: "button", className: (if option.value == @props.value then "btn btn-primary active" else "btn btn-default"), onClick: @props.onChange.bind(null, option.value),
+        H.button type: "button", className: (if option.value == @props.value then "btn btn-default active" else "btn btn-default"), onClick: @props.onChange.bind(null, option.value),
           option.label

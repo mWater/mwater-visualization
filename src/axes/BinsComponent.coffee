@@ -30,6 +30,10 @@ module.exports = class BinsComponent extends React.Component
       # Only do for individual (not aggregate) expressions
       exprUtils = new ExprUtils(@props.schema)
       if exprUtils.getExprAggrStatus(@props.expr) != "individual"
+        # Percent is a special case where 0-100
+        if @props.expr?.op == "percent where"
+          @props.onChange(update(@props.xform, { min: { $set: 0 }, max: { $set: 100 }}))
+
         return
 
       axisBuilder = new AxisBuilder(schema: @props.schema)
@@ -60,13 +64,13 @@ module.exports = class BinsComponent extends React.Component
   render: ->
     H.div null,
       R LabeledInlineComponent, key: "min", label: "Min:",
-        R NumberInputComponent, value: @props.xform.min, onChange: (v) => @props.onChange(update(@props.xform, { min: { $set: v }}))
+        R NumberInputComponent, small: true, value: @props.xform.min, onChange: (v) => @props.onChange(update(@props.xform, { min: { $set: v }}))
       " "
       R LabeledInlineComponent, key: "max", label: "Max:",
-        R NumberInputComponent, value: @props.xform.max, onChange: (v) => @props.onChange(update(@props.xform, { max: { $set: v }}))
+        R NumberInputComponent, small: true, value: @props.xform.max, onChange: (v) => @props.onChange(update(@props.xform, { max: { $set: v }}))
       " "
       R LabeledInlineComponent, key: "numBins", label: "# of Bins:",
-        R NumberInputComponent, value: @props.xform.numBins, decimal: false, onChange: (v) => @props.onChange(update(@props.xform, { numBins: { $set: v }}))
+        R NumberInputComponent, small: true, value: @props.xform.numBins, decimal: false, onChange: (v) => @props.onChange(update(@props.xform, { numBins: { $set: v }}))
       if @state.guessing
         H.i className: "fa fa-spinner fa-spin"
 

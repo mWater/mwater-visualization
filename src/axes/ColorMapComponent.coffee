@@ -90,10 +90,7 @@ module.exports = class ColorMapComponent extends React.Component
 
   render: ->
     H.div null,
-      H.table className: "table table-bordered  ", style: { width: "auto" },
-        H.thead null,
-          H.tr null, 
-            H.th colSpan: 2, "Colors"
+      H.table style: { width: "auto" },
         H.tbody null,
           _.map @state.categories, (category) =>
             H.tr null,
@@ -101,6 +98,6 @@ module.exports = class ColorMapComponent extends React.Component
                 R ColorComponent, 
                   color: @lookupColor(category.value)
                   onChange: (color) => @handleColorChange(category.value, color)
-              H.td key: "label",
+              H.td key: "label", style: { paddingLeft: 8 },
                 category.label
 

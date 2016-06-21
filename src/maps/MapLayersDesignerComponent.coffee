@@ -93,7 +93,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
             H.a onClick: @handleAddLayerView.bind(null, layer), layer.label or layer.name
           )
 
-  renderLayerView: (layerView, index, connectDragSource) =>
+  renderLayerView: (layerView, index, connectDragSource, connectDragPreview, connectDropTarget) =>
     style =
       padding: "10px 15px"
       border: "1px solid #ddd"
@@ -108,6 +108,8 @@ module.exports = class MapLayersDesignerComponent extends React.Component
         onLayerViewChange: (lv) => @handleLayerViewChange(index, lv)
         onRemove: => @handleRemoveLayerView(index)
         connectDragSource: connectDragSource
+        connectDragPreview: connectDragPreview
+        connectDropTarget: connectDropTarget
       )
 
   render: ->
