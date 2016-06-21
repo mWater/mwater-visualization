@@ -80,7 +80,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       extraTables: @props.extraTables
 
   renderIndicators: ->
-    tables = _.filter(@props.schema.getTables(), (table) => table.id.match(/^indicator_values:/))
+    tables = _.filter(@props.schema.getTables(), (table) => table.id.match(/^indicator_values:/) and not table.deprecated)
     tables = _.sortBy(tables, (t) -> t.name.en)
 
     # Add all indicators to top
@@ -94,7 +94,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       )
 
   renderOther: ->
-    otherTables = _.filter(@props.schema.getTables(), (table) => table.id not in siteTypes and not table.id.match(/^responses:/) and not table.id.match(/^indicator_values:/) and table.id != "response_indicators")
+    otherTables = _.filter(@props.schema.getTables(), (table) => (table.id not in siteTypes and not table.id.match(/^responses:/) and not table.id.match(/^indicator_values:/) and table.id != "response_indicators") and not table.deprecated)
     otherTables = _.sortBy(otherTables, "name")
     R OptionListComponent,
       items: _.map(otherTables, (table) =>
@@ -190,7 +190,7 @@ class FormsListComponent extends React.Component
     else
       forms = @state.forms
 
-    tables = _.filter(@props.schema.getTables(), (table) => table.id.match(/^responses:/) or table.id.match(/^master_responses:/))
+    tables = _.filter(@props.schema.getTables(), (table) => (table.id.match(/^responses:/) or table.id.match(/^master_responses:/)) and not table.deprecated)
     tables = _.sortBy(tables, (t) -> t.name.en)
 
     H.div null,
