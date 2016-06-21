@@ -22,7 +22,7 @@ module.exports = class TableSelectComponent extends React.Component
       editor: (onClose) =>
         React.createElement(ui.OptionListComponent, 
           hint: "Select source to get data from"
-          items: _.map(@props.schema.getTables(), (table) => { 
+          items: _.map(_.filter(@props.schema.getTables(), (table) -> not table.deprecated), (table) => { 
             name: ExprUtils.localizeString(table.name, @context.locale)
             desc: ExprUtils.localizeString(table.desc, @context.locale)
             onClick: () =>
