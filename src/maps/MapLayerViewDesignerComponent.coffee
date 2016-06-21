@@ -96,7 +96,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
     H.div className: 'form-group',
       H.label className: 'text-muted',
         H.span null,
-          "Opacity: #{@props.layerView.opacity * 100}"
+          "Opacity: #{Math.round(@props.layerView.opacity * 100) }%"
       H.div style: {padding: '10px'},
         React.createElement(Rcslider,
           min: 0
