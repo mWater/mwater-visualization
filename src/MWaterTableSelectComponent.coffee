@@ -3,8 +3,7 @@ H = React.DOM
 R = React.createElement
 querystring = require 'querystring'
 TabbedComponent = require('react-library/lib/TabbedComponent')
-ToggleEditComponent = require('mwater-visualization').ToggleEditComponent
-OptionListComponent = require('mwater-visualization').OptionListComponent
+ui = require './UIComponents'
 ExprUtils = require("mwater-expressions").ExprUtils
 
 siteTypes = ["entities.water_point", "entities.household", "entities.sanitation_facility", "entities.community", "entities.school", "entities.health_facility", "entities.surface_water"]
@@ -61,8 +60,15 @@ module.exports = class MWaterTableSelectComponent extends React.Component
     else
       @handleChange(tableId)
 
+  handleExtraTableRemove: (tableId) =>
+    # Set to null if current table
+    if @props.table == tableId
+      @props.onChange(null)
+
+    @props.onExtraTablesChange(_.without(@props.extraTables, tableId))
+
   renderSites: ->
-    R OptionListComponent,
+    R ui.OptionListComponent,
       items: _.compact(_.map(siteTypes, (tableId) =>
         table = @props.schema.getTable(tableId)
         if not table
@@ -78,6 +84,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       user: @props.user
       onChange: @handleTableChange
       extraTables: @props.extraTables
+      onExtraTableRemove: @handleExtraTableRemove
 
   renderIndicators: ->
     tables = _.filter(@props.schema.getTables(), (table) => table.id.match(/^indicator_values:/) and not table.deprecated)
@@ -88,7 +95,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
     if table
       tables.unshift(table)
 
-    R OptionListComponent,
+    R ui.OptionListComponent,
       items: _.map(tables, (table) =>
         return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @handleChange.bind(null, table.id) }
       )
@@ -96,7 +103,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
   renderOther: ->
     otherTables = _.filter(@props.schema.getTables(), (table) => (table.id not in siteTypes and not table.id.match(/^responses:/) and not table.id.match(/^indicator_values:/) and table.id != "response_indicators") and not table.deprecated)
     otherTables = _.sortBy(otherTables, "name")
-    R OptionListComponent,
+    R ui.OptionListComponent,
       items: _.map(otherTables, (table) =>
         return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @handleChange.bind(null, table.id) }
       )
@@ -118,10 +125,10 @@ module.exports = class MWaterTableSelectComponent extends React.Component
         ]
         initialTabId: "sites"
 
-    R ToggleEditComponent,
+    R ui.ToggleEditComponent,
       ref: "toggleEdit"
       forceOpen: not @props.table # Must have table
-      label: if @props.table then ExprUtils.localizeString(@props.schema.getTable(@props.table).name, @context.locale)
+      label: if @props.table then ExprUtils.localizeString(@props.schema.getTable(@props.table)?.name, @context.locale) else ""
       editor: editor
 
 # Searchable list of forms
@@ -133,6 +140,7 @@ class FormsListComponent extends React.Component
     user: React.PropTypes.string              # User id
     onChange: React.PropTypes.func.isRequired # Called with table selected
     extraTables: React.PropTypes.array.isRequired
+    onExtraTableRemove: React.PropTypes.func.isRequired
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
@@ -170,6 +178,10 @@ class FormsListComponent extends React.Component
     .fail (xhr) =>
       @setState(error: xhr.responseText)
 
+  handleTableRemove: (table) =>
+    if confirm("Remove #{ExprUtils.localizeString(table.name, @context.locale)}? Any widgets that depend on it will no longer work properly.")
+      @props.onExtraTableRemove(table.id)
+
   searchRef: (comp) =>
     # Focus
     if comp
@@ -196,9 +208,14 @@ class FormsListComponent extends React.Component
     H.div null,
       H.label null, "Included Forms:"
       if tables.length > 0
-        R OptionListComponent,
+        R ui.OptionListComponent,
           items: _.map(tables, (table) =>
-            return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @props.onChange.bind(null, table.id) }
+            return { 
+              name: ExprUtils.localizeString(table.name, @context.locale)
+              desc: ExprUtils.localizeString(table.desc, @context.locale)
+              onClick: @props.onChange.bind(null, table.id) 
+              onRemove: @handleTableRemove.bind(null, table)
+            }
           )
       else
         H.div null, "None"
@@ -222,7 +239,7 @@ class FormsListComponent extends React.Component
             value: @state.search
             onChange: (ev) => @setState(search: ev.target.value)
 
-          R OptionListComponent,
+          R ui.OptionListComponent,
             items: _.map(forms, (form) => { name: form.name, desc: form.desc, onClick: @props.onChange.bind(null, "responses:" + form.id) })
         ]
 
