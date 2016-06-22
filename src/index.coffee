@@ -1,5 +1,3 @@
-ui = require './UIComponents'
-
 # TODO still needed?
 exports.CachingDataSource = require './CachingDataSource'
 exports.WidgetFactory = require './widgets/WidgetFactory'
@@ -24,10 +22,6 @@ exports.CheckboxComponent = require './CheckboxComponent'
 
 # TODO REMOVE
 exports.DateRangeComponent = require './DateRangeComponent'
-
-# exports.UIComponents = require './UIComponents'
-exports.ToggleEditComponent = ui.ToggleEditComponent
-exports.OptionListComponent = ui.OptionListComponent
 
 exports.MWaterLoaderComponent = require './MWaterLoaderComponent'
 
