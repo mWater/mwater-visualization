@@ -26,7 +26,7 @@ exports.SectionComponent = class SectionComponent extends React.Component
 # List of options with a name and description each
 exports.OptionListComponent = class OptionListComponent extends React.Component
   @propTypes:
-    items: React.PropTypes.array.isRequired # name, desc, onClick
+    items: React.PropTypes.array.isRequired # name, desc, onClick, onRemove (optional)
     hint: React.PropTypes.string
 
   render: ->
@@ -34,7 +34,7 @@ exports.OptionListComponent = class OptionListComponent extends React.Component
       H.div style: { color: "#AAA", fontStyle: "italic" }, key: "hint", @props.hint
       H.div className: "mwater-visualization-big-options", key: "options",
         _.map @props.items, (item, i) =>
-          R OptionComponent, name: item.name, desc: item.desc, onClick: item.onClick, key: i
+          R OptionComponent, name: item.name, desc: item.desc, onClick: item.onClick, onRemove: item.onRemove, key: i
 
 # Single option
 class OptionComponent extends React.Component
@@ -42,9 +42,17 @@ class OptionComponent extends React.Component
     name: React.PropTypes.string
     desc: React.PropTypes.string
     onClick: React.PropTypes.func.isRequired
+    onRemove: React.PropTypes.func          # Displays X to right if present
+
+  handleClick: (ev) =>
+    ev.stopPropagation()
+    @props.onRemove()
 
   render: ->
     H.div className: "mwater-visualization-big-option", onClick: @props.onClick,
+      if @props.onRemove
+        H.button type: "button", className: "btn btn-link btn-xs pull-right", onClick: @handleClick, 
+          H.span className: "glyphicon glyphicon-remove"
       H.div style: { fontWeight: "bold" }, @props.name
       H.div style: { color: "#888" }, @props.desc
 
