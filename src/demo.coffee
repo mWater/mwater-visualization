@@ -211,11 +211,11 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
@@ -577,8 +577,7 @@ dashboardDesign = {
                   {
                     "type": "literal",
                     "valueType": "enumset",
-                    "value": [
-                    ]
+                    "value": []
                   }
                 ]
               },
@@ -586,60 +585,6 @@ dashboardDesign = {
             }
           ],
           "type": "donut"
-        }
-      }
-    }
-    "a6570651-fd84-4d24-a416-92479d592409": {
-      "layout": {
-        "x": 8,
-        "y": 0,
-        "w": 8,
-        "h": 8
-      },
-      "widget": {
-        "type": "LayeredChart",
-        "design": {
-          "xAxisLabelText": "",
-          "yAxisLabelText": "",
-          "version": 2,
-          "layers": [
-            {
-              "axes": {
-                "x": {
-                  "expr": {
-                    "type": "scalar",
-                    "table": "entities.surface_water",
-                    "joins": [
-                      "!entities.wwmc_visit.site"
-                    ],
-                    "expr": {
-                      "type": "field",
-                      "table": "entities.wwmc_visit",
-                      "column": "ph"
-                    },
-                    "aggr": "last"
-                  },
-                  "xform": {
-                    "type": "bin",
-                    "numBins": 6,
-                    "min": 6.59,
-                    "max": 9
-                  }
-                },
-                "y": {
-                  "expr": {
-                    "type": "id",
-                    "table": "entities.surface_water"
-                  },
-                  "aggr": "count",
-                  "xform": null
-                }
-              },
-              "filter": null,
-              "table": "entities.surface_water"
-            }
-          ],
-          "type": "bar"
         }
       }
     }

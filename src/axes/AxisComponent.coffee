@@ -12,6 +12,7 @@ ui = require '../UIComponents'
 ColorMapComponent = require './ColorMapComponent'
 BinsComponent = require './BinsComponent'
 RangesComponent = require './RangesComponent'
+AxisColorEditorComponent = require './AxisColorEditorComponent'
 
 # Axis component that allows designing of an axis
 module.exports = class AxisComponent extends React.Component
@@ -137,7 +138,7 @@ module.exports = class AxisComponent extends React.Component
     if not @props.showColorMap or not axis or not axis.expr
       return null
 
-    return R ColorMapComponent,
+    return R AxisColorEditorComponent,
       schema: @props.schema
       dataSource: @props.dataSource
       axis: axis
