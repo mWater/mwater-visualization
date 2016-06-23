@@ -508,6 +508,11 @@ module.exports = class AxisBuilder
 
     return type
 
+  # Determines if axis is aggregate
+  isAxisAggr: (axis) ->
+    # Legacy support of axis.aggr
+    return axis.aggr or @exprUtils.getExprAggrStatus(axis.expr) == "aggregate"
+
   # Summarize axis as a string
   summarizeAxis: (axis, locale) ->
     if not axis
@@ -560,8 +565,6 @@ module.exports = class AxisBuilder
       when "datetime"
         return moment(value, moment.ISO_8601).format("lll")
 
-
-    # TODO format dates
     return "" + value
 
   # Creates a filter (jsonql with {alias} for table name) based on a specific value

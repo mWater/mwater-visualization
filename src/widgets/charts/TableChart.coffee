@@ -4,6 +4,7 @@ H = React.DOM
 
 injectTableAlias = require('mwater-expressions').injectTableAlias
 Chart = require './Chart'
+ExprUtils = require('mwater-expressions').ExprUtils
 ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprCompiler = require('mwater-expressions').ExprCompiler
 AxisBuilder = require './../../axes/AxisBuilder'
@@ -111,6 +112,7 @@ module.exports = class TableChart extends Chart
   # filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   # callback: (error, data)
   getData: (design, schema, dataSource, filters, callback) ->
+    exprUtils = new ExprUtils(schema)
     exprCompiler = new ExprCompiler(schema)
     axisBuilder = new AxisBuilder(schema: schema)
 
@@ -136,8 +138,8 @@ module.exports = class TableChart extends Chart
         alias: "c#{colNum}" 
       })
 
-      # Add group by
-      if not column.textAxis.aggr
+      # Add group by if not aggregate
+      if not axisBuilder.isAxisAggr(column.textAxis)
         query.groupBy.push(colNum + 1)
 
     # Compile orderings
@@ -151,7 +153,7 @@ module.exports = class TableChart extends Chart
       
       query.orderBy.push({ ordinal: design.columns.length + i + 1, direction: ordering.direction })
       # Add group by if non-aggregate
-      if not ordering.axis.aggr
+      if not axisBuilder.isAxisAggr(ordering.axis)
         query.groupBy.push(design.columns.length + i + 1)
 
     # Get relevant filters

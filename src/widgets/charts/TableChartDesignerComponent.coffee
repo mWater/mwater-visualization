@@ -193,32 +193,6 @@ class TableChartColumnDesignerComponent extends React.Component
         onChange: @handleHeaderTextChange
         placeholder: placeholder
 
-  renderAggr: ->
-    column = @props.design.columns[@props.index]
-    exprUtils = new ExprUtils(@props.schema)
-
-    # Only render aggregate if has a real expr with a type that is not count
-    if not column.textAxis or exprUtils.getExprType(column.textAxis.expr) == "count"
-      return
-
-    # Get aggregations
-    # TODO REMOVED!!!
-    aggrs = exprUtils.getAggrs(column.textAxis.expr)
-
-    # Remove latest, as it is tricky to group by. TODO
-    aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
-    aggrs = [{ id: null, name: "None" }].concat(aggrs)
-    currentAggr = _.findWhere(aggrs, id: column.textAxis.aggr)
-
-    return H.div null,
-      H.label className: "text-muted", "Summarize"
-      ": "
-      React.createElement(LinkComponent, 
-        dropdownItems: aggrs
-        onDropdownItemClicked: @handleAggrChange
-        if currentAggr then currentAggr.name else "None"
-      )
-
   render: ->
     H.div null, 
       @renderRemove()
@@ -226,4 +200,3 @@ class TableChartColumnDesignerComponent extends React.Component
       H.div style: { marginLeft: 5 }, 
         @renderExpr()
         @renderHeader()
-        @renderAggr()
