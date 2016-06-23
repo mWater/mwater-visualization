@@ -2,6 +2,7 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 
+updt = require '../updt'
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprComponent = require("mwater-expressions-ui").ExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
@@ -20,25 +21,9 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
     design: React.PropTypes.object.isRequired  # Design of the marker layer
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
 
-  # Apply updates to design
-  update: (updates) ->
-    @props.onDesignChange(_.extend({}, @props.design, updates))
-
-  # Update axes with specified changes
-  updateAxes: (changes) ->
-    axes = _.extend({}, @props.design.axes, changes)
-    @update(axes: axes)
-
-  handleScopeAndDetailLevelChange: (scope, detailLevel) => @update(scope: scope, detailLevel: detailLevel)
-  handleTableChange: (table) => @update(table: table)
-  handleAdminRegionExprChange: (expr) => @update(adminRegionExpr: expr)
-  handleColorAxisChange: (axis) => @updateAxes(color: axis)
-  handleLabelAxisChange: (axis) => @updateAxes(label: axis)
-  handleDisplayNamesChange: (displayNames) => @update(displayNames: displayNames)
-  handleFilterChange: (expr) => @update(filter: expr)
-  handleColorChange: (color) => @update(color: color)
-  handleFillOpacityChange: (fillOpacity) => @update(fillOpacity: fillOpacity/100)
-
+  handleScopeAndDetailLevelChange: (scope, detailLevel) => 
+    @props.onDesignChange(_.extend({}, @props.design, { scope: scope, detailLevel: detailLevel })
+  
   renderTable: ->
     return H.div className: "form-group",
       H.label className: "text-muted", 
@@ -46,7 +31,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
         " "
         "Data Source"
       ": "
-      React.createElement(TableSelectComponent, { schema: @props.schema, value: @props.design.table, onChange: @handleTableChange })
+      React.createElement(TableSelectComponent, { schema: @props.schema, value: @props.design.table, onChange: updt(@props.onDesignChange, @props.design, "table") })
   
   renderAdminRegionExpr: ->
     # If no data, hide
@@ -61,7 +46,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
         React.createElement(ExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
-          onChange: @handleAdminRegionExprChange
+          onChange: updt(@props.onDesignChange, @props.design, "adminRegionExpr")
           table: @props.design.table
           types: ["id"]
           idTable: "admin_regions"
@@ -108,7 +93,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
     H.div className: "form-group",
       H.div className: "checkbox",
         H.label null,
-          H.input type: "checkbox", checked: @props.design.displayNames, onChange: (ev) => @handleDisplayNamesChange(ev.target.checked)
+          H.input type: "checkbox", checked: @props.design.displayNames, onChange: (ev) => updt(@props.onDesignChange, @props.design, "displayNames", ev.target.checked)
           "Display Region Names"
 
   renderColor: ->
@@ -120,7 +105,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
         H.span className: "glyphicon glyphicon glyphicon-tint"
         if @props.design.axes.color then " Default Color" else " Color"
       H.div style: { marginLeft: 8 }, 
-        React.createElement(ColorComponent, color: @props.design.color, onChange: @handleColorChange)
+        React.createElement(ColorComponent, color: @props.design.color, onChange: updt(@props.onDesignChange, @props.design, "color"))
 
   renderColorAxis: ->
     if not @props.design.table
@@ -141,7 +126,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
           aggrNeed: "required"
           value: @props.design.axes.color
           showColorMap: true
-          onChange: @handleColorAxisChange)
+          onChange: updt(@props.onDesignChange, @props.design, ["axes", "color"]))
 
   # renderLabelAxis: ->
   #   if not @props.design.table
@@ -175,7 +160,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
         step: 1
         tipTransitionName: "rc-slider-tooltip-zoom-down",
         value: @props.design.fillOpacity * 100,
-        onChange: @handleFillOpacityChange
+        onChange: (val) => updt(@props.onDesignChange, @props.design, "fillOpacity", val/100)
       )
 
   renderFilter: ->
@@ -191,7 +176,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
         React.createElement(FilterExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
-          onChange: @handleFilterChange
+          onChange: updt(@props.onDesignChange, @props.design, "filter")
           table: @props.design.table
           value: @props.design.filter)
 

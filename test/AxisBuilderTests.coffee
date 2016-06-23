@@ -309,9 +309,9 @@ describe "AxisBuilder", ->
       assert not @ab.cleanAxis(axis: axis, table: "t1", types: ['text'], aggrNeed: "none"), "Should remove text"
       assert @ab.cleanAxis(axis: axis, table: "t1", types: ['enum'], aggrNeed: "none"), "Number can be binned to enum" # Can get enum via binning
     
-      # Aggr text cannot get to count
       assert not @ab.cleanAxis(axis: { expr: @exprText }, table: "t1", types: ['number'], aggrNeed: "none"), "No aggr allowed"
-      assert not @ab.cleanAxis(axis: { expr: @exprText }, table: "t1", types: ['number'], aggrNeed: "required")
+      # Aggr text cannot get to count (actually it can with percent where)
+      # assert not @ab.cleanAxis(axis: { expr: @exprText }, table: "t1", types: ['number'], aggrNeed: "required")
 
     it "defaults colorMap"
 
