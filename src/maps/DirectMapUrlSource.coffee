@@ -1,7 +1,7 @@
 _ = require 'lodash'
 LayerFactory = require './LayerFactory'
 
-module.exports = class LegacyMapUrlSource
+module.exports = class DirectMapUrlSource
   # Create map url source that uses legacy jsonql maps
   # options:
   #   schema: schema to use

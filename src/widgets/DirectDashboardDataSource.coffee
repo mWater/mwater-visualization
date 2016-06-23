@@ -1,8 +1,8 @@
 WidgetFactory = require './WidgetFactory'
-LegacyMapUrlSource = require '../maps/LegacyMapUrlSource'
+DirectMapUrlSource = require '../maps/DirectMapUrlSource'
 
 # Uses direct DataSource queries
-module.exports = class LegacyDashboardDataSource
+module.exports = class DirectDashboardDataSource
   constructor: (apiUrl, client, design, schema, dataSource) ->
     @apiUrl = apiUrl
     @client = client
@@ -34,10 +34,10 @@ class LegacyWidgetDataSource
   # Get the url for the image tiles with the specified filters applied
   # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
   getTileUrl: (layerId, filters) ->
-    new LegacyMapUrlSource({ apiUrl: @apiUrl, client: @client, mapDesign: @design, schema: @schema }).getTileUrl(layerId, filters)
+    new DirectMapUrlSource({ apiUrl: @apiUrl, client: @client, mapDesign: @design, schema: @schema }).getTileUrl(layerId, filters)
 
   # Get the url for the interactivity tiles with the specified filters applied
   # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
   getUtfGridUrl: (layerId, filters) ->
-    new LegacyMapUrlSource({ apiUrl: @apiUrl, client: @client, mapDesign: @design, schema: @schema }).getUtfGridUrl(layerId, filters)
+    new DirectMapUrlSource({ apiUrl: @apiUrl, client: @client, mapDesign: @design, schema: @schema }).getUtfGridUrl(layerId, filters)
 

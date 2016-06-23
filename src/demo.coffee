@@ -16,8 +16,8 @@ MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
-LegacyDashboardDataSource = require './widgets/LegacyDashboardDataSource'
-LegacyMapUrlSource = require './maps/LegacyMapUrlSource'
+DirectDashboardDataSource = require './widgets/DirectDashboardDataSource'
+DirectMapUrlSource = require './maps/DirectMapUrlSource'
 
 class MWaterDashboardPane extends React.Component
   constructor: (props) ->
@@ -40,7 +40,7 @@ class MWaterDashboardPane extends React.Component
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
       extraTables: @state.extraTables
     }, (error, config) =>
-      dashboardDataSource = new LegacyDashboardDataSource(@props.apiUrl, @props.client, @state.design, config.schema, config.dataSource)
+      dashboardDataSource = new DirectDashboardDataSource(@props.apiUrl, @props.client, @state.design, config.schema, config.dataSource)
 
       H.div style: { height: "100%" },
         React.createElement(visualization.DashboardComponent, {
@@ -75,7 +75,7 @@ class MWaterMapPane extends React.Component
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
     }, (error, config) =>
       # Create map url source
-      mapUrlSource = new LegacyMapUrlSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
+      mapUrlSource = new DirectMapUrlSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
 
       H.div style: { height: "100%" },
         React.createElement(visualization.MapComponent, {
