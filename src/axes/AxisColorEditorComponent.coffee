@@ -59,6 +59,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
           onPaletteSelected: @onPaletteChange
           axis: @props.axis
           categories: @state.categories
+          onCancel: @handleCancelCustomize
         }
       if @state.mode == "customize"
         [
@@ -91,6 +92,7 @@ class ColorPaletteCollectionComponent extends React.Component
     onPaletteSelected: React.PropTypes.func.isRequired
     axis: React.PropTypes.object.isRequired
     categories: React.PropTypes.array
+    onCancel: React.PropTypes.func.isRequired
 
   @defaultProps:
     collection: [
@@ -109,6 +111,10 @@ class ColorPaletteCollectionComponent extends React.Component
       }
     @props.onPaletteSelected(colormap)
 
+  renderCancel: =>
+    if @props.axis.colorMap
+      H.a onClick: @props.onCancel, key: "calcel-customize", "Close"
+
   render: ->
     H.div null,
       _.map @props.collection, (collection, index) =>
@@ -117,6 +123,7 @@ class ColorPaletteCollectionComponent extends React.Component
           index: index
           colorSet: collection
           onPaletteSelected: @onPaletteSelected
+      @renderCancel
 
 class ColorPaletteComponent extends React.Component
   @propTypes:

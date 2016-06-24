@@ -587,10 +587,99 @@ dashboardDesign = {
           "type": "donut"
         }
       }
+    },
+    "c84506e8-727d-4515-9579-fd66220ebdea": {
+      "layout": {
+        "x": 8,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "widget": {
+        "type": "TableChart",
+        "design": {
+          "version": 1,
+          "columns": [
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "op",
+                  "op": "count",
+                  "table": "entities.water_point",
+                  "exprs": []
+                }
+              },
+              "headerText": "# Water points"
+            },
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "op",
+                  "table": "entities.water_point",
+                  "op": "percent where",
+                  "exprs": [
+                    {
+                      "type": "op",
+                      "table": "entities.water_point",
+                      "op": "= any",
+                      "exprs": [
+                        {
+                          "type": "field",
+                          "table": "entities.water_point",
+                          "column": "type"
+                        },
+                        {
+                          "type": "literal",
+                          "valueType": "enumset",
+                          "value": [
+                            "Protected dug well",
+                            "Unprotected dug well"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "headerText": "% Dug Wells"
+            },
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "scalar",
+                  "table": "entities.water_point",
+                  "joins": [
+                    "admin_region"
+                  ],
+                  "expr": {
+                    "type": "field",
+                    "table": "admin_regions",
+                    "column": "country"
+                  }
+                }
+              },
+              "headerText": "Country"
+            }
+          ],
+          "orderings": [
+            {
+              "axis": {
+                "expr": {
+                  "type": "op",
+                  "op": "count",
+                  "table": "entities.water_point",
+                  "exprs": []
+                }
+              },
+              "direction": "desc"
+            }
+          ],
+          "table": "entities.water_point"
+        }
+      }
     }
   }
 }
-
     # "d41a2dd2-85bd-46d8-af9a-a650af4c0047": {
     #   "layout": {
     #     "x": 16,
