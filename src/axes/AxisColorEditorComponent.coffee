@@ -18,8 +18,8 @@ module.exports = class AxisColorEditorComponent extends React.Component
   constructor: ->
     super
     @state = {
-      mode: if @props.axis.colorMap then "normal" else "palette"
-      categories: null
+      mode: if @props.axis.colorMap and @props.axis.colorMap.length > 0 then "normal" else "palette"
+      categories: []
     }
 
   componentDidMount: ->
@@ -28,6 +28,9 @@ module.exports = class AxisColorEditorComponent extends React.Component
   componentWillReceiveProps: (nextProps) ->
     if not _.isEqual(nextProps.axis, @props.axis)
       @loadCategories(nextProps)
+
+  componentWillUnmount: ->
+    @unmounted = true
 
   loadCategories: (props) ->
     axisBuilder = new AxisBuilder(schema: props.schema)
@@ -70,11 +73,9 @@ module.exports = class AxisColorEditorComponent extends React.Component
     )
 
   handleCustomizePalette: =>
-    console.log "Customize palette"
     @setState(mode: "customize")
 
   handleSelectPalette: =>
-    console.log "Select a palette"
     @setState(mode: "palette")
 
   onPaletteChange: (palette) =>
@@ -169,20 +170,25 @@ class ColorPaletteCollectionComponent extends React.Component
           index: index
           colorSet: collection
           onPaletteSelected: @onPaletteSelected
+          number: @props.categories.length
       @renderCancel()
 
 class ColorPaletteComponent extends React.Component
   @propTypes:
     index: React.PropTypes.number.isRequired
-    onPaletteSelected: React.PropTypes.func.isRequired
     colorSet: React.PropTypes.array.isRequired
+    onPaletteSelected: React.PropTypes.func.isRequired
+    number: React.PropTypes.number
 
-  handlePaletteSelect: =>
+  @defaultProps:
+    number: 6
+
+  handleSelect: =>
     @props.onPaletteSelected(@props.index)
 
   render: ->
-    H.div onClick: @handlePaletteSelect, className: "axis-palette",
-      _.map @props.colorSet.slice(0,6), (color, i) =>
+    H.div onClick: @handleSelect ,className: "axis-palette",
+      _.map @props.colorSet.slice(0,Math.min(@props.number, 6)), (color, i) =>
         cellStyle =
           display: 'inline-block'
           height: 20
