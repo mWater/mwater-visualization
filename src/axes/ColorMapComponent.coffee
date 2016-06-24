@@ -14,6 +14,7 @@ module.exports = class ColorMapComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired
     axis: React.PropTypes.object.isRequired   
     onChange: React.PropTypes.func.isRequired
+    categories: React.PropTypes.array
 
   constructor: ->
     super
@@ -21,12 +22,12 @@ module.exports = class ColorMapComponent extends React.Component
       categories: null
     }
 
-  componentDidMount: ->
-    @loadCategories(@props)
-  
-  componentWillReceiveProps: (nextProps) ->
-    if not _.isEqual(nextProps.axis, @props.axis)
-      @loadCategories(nextProps)
+#  componentDidMount: ->
+#    @loadCategories(@props)
+#
+#  componentWillReceiveProps: (nextProps) ->
+#    if not _.isEqual(nextProps.axis, @props.axis)
+#      @loadCategories(nextProps)
 
   loadCategories: (props) ->
     axisBuilder = new AxisBuilder(schema: props.schema)
@@ -92,7 +93,7 @@ module.exports = class ColorMapComponent extends React.Component
     H.div null,
       H.table style: { width: "auto" },
         H.tbody null,
-          _.map @state.categories, (category) =>
+          _.map @props.categories, (category) =>
             H.tr null,
               H.td key: "color",
                 R ColorComponent, 

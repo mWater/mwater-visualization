@@ -22,7 +22,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
 
   handleScopeAndDetailLevelChange: (scope, detailLevel) => 
-    @props.onDesignChange(_.extend({}, @props.design, { scope: scope, detailLevel: detailLevel })
+    @props.onDesignChange(_.extend({}, @props.design, { scope: scope, detailLevel: detailLevel }))
   
   renderTable: ->
     return H.div className: "form-group",
