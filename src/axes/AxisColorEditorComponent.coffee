@@ -107,7 +107,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
             onChange: @props.onChange
             categories: @state.categories
             key: "colormap"
-          H.a onClick: @handleCancelCustomize, key: "cancel-customize", "Close"
+          H.a style: { cursor: "pointer" }, onClick: @handleCancelCustomize, key: "cancel-customize", "Close"
         ]
       if @state.mode == "normal"
         [
@@ -122,9 +122,9 @@ module.exports = class AxisColorEditorComponent extends React.Component
                     width: 20
                     backgroundColor: map.color
                   H.div style: cellStyle, key: i, " "
-              H.a onClick: @handleCustomizePalette, key: "customize-palette", style: {marginRight: 10}, "Customize color scheme"
+              H.a style: { cursor: "pointer" }, onClick: @handleCustomizePalette, key: "customize-palette", style: {marginRight: 10}, "Customize color scheme"
             ]
-          H.a onClick: @handleSelectPalette, key: "select-palette", "Select color scheme"
+          H.a style: { cursor: "pointer" }, onClick: @handleSelectPalette, key: "select-palette", "Select color scheme"
         ]
 
 
@@ -170,11 +170,11 @@ class ColorPaletteCollectionComponent extends React.Component
   renderCancel: =>
     if @props.axis.colorMap
       H.div null,
-        H.a onClick: @props.onCancel, key: "cancel-customize", "Cancel"
+        H.a style: { cursor: "pointer" }, onClick: @props.onCancel, key: "cancel-customize", "Cancel"
 
   render: ->
     H.div null,
-      H.p null, "Please select a color palette"
+      H.p null, "Please select a color scheme"
       _.map @props.collection, (collection, index) =>
         R ColorPaletteComponent,
           key: index
