@@ -15,6 +15,7 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
   @propTypes:
     apiUrl: React.PropTypes.string.isRequired
     client: React.PropTypes.string
+    share: React.PropTypes.string
     user: React.PropTypes.string                              # user id of logged in user
 
     extraTables: React.PropTypes.arrayOf(React.PropTypes.string)  # Extra tables to load in schema. Forms are not loaded by default as they are too many
@@ -36,7 +37,7 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
 
   # Override to determine if a load is needed. Not called on mounting
   isLoadNeeded: (newProps, oldProps) -> 
-    return not _.isEqual(_.pick(newProps, "apiUrl", "client", "user", "extraTables"), _.pick(oldProps, "apiUrl", "client", "user", "extraTables"))
+    return not _.isEqual(_.pick(newProps, "apiUrl", "client", "user", "share", "extraTables"), _.pick(oldProps, "apiUrl", "client", "user", "share", "extraTables"))
 
   # Call callback with state changes
   load: (props, prevProps, callback) -> 
@@ -46,6 +47,8 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
     query = {}
     if props.client
       query.client = props.client
+    if props.share
+      query.share = props.share
     if props.extraTables and props.extraTables.length > 0
       query.extraTables = props.extraTables.join(',')
 

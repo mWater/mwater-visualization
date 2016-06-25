@@ -1,3 +1,4 @@
+_ = require 'lodash'
 React = require 'react'
 H = React.DOM
 
@@ -213,7 +214,7 @@ module.exports = class MarkersLayer extends Layer
   createDesignerElement: (options) ->
     # Require here to prevent server require problems
     MarkersLayerDesignerComponent = require './MarkersLayerDesignerComponent'
-    
+
     # Clean on way in and out
     React.createElement(MarkersLayerDesignerComponent,
       schema: options.schema
