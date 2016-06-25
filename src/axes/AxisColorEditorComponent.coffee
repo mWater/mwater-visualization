@@ -14,11 +14,15 @@ module.exports = class AxisColorEditorComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired
     axis: React.PropTypes.object.isRequired
     onChange: React.PropTypes.func.isRequired
+    colorMapOptional: React.PropTypes.bool
+
+  @defaultProps:
+    colorMapOptional: false
 
   constructor: ->
     super
     @state = {
-      mode: if @props.axis.colorMap and @props.axis.colorMap.length > 0 then "normal" else "palette"
+      mode: if @props.axis.colorMap or @props.colorMapOptional then "normal" else "palette"
       categories: []
     }
 
@@ -107,17 +111,20 @@ module.exports = class AxisColorEditorComponent extends React.Component
         ]
       if @state.mode == "normal"
         [
-          H.div key: "selected-palette",
-            H.div className: "axis-palette",
-            _.map @props.axis.colorMap.slice(0,6), (map, i) =>
-              cellStyle =
-                display: 'inline-block'
-                height: 20
-                width: 20
-                backgroundColor: map.color
-              H.div style: cellStyle, key: i, " "
-          H.a onClick: @handleCustomizePalette, key: "customize-palette", style: {marginRight: 10}, "Customize palette"
-          H.a onClick: @handleSelectPalette, key: "select-palette", "Select palette"
+          if @props.axis.colorMap
+            [
+              H.div key: "selected-palette",
+                H.div className: "axis-palette",
+                _.map @props.axis.colorMap.slice(0,6), (map, i) =>
+                  cellStyle =
+                    display: 'inline-block'
+                    height: 20
+                    width: 20
+                    backgroundColor: map.color
+                  H.div style: cellStyle, key: i, " "
+              H.a onClick: @handleCustomizePalette, key: "customize-palette", style: {marginRight: 10}, "Customize color scheme"
+            ]
+          H.a onClick: @handleSelectPalette, key: "select-palette", "Select color scheme"
         ]
 
 
@@ -128,9 +135,9 @@ class ColorPaletteCollectionComponent extends React.Component
     categories: React.PropTypes.array
     onCancel: React.PropTypes.func.isRequired
 
-  @generateColorFadeScheme: (baseColor) ->
+  @generateColorFadeScheme: (baseColor, number) ->
     base = new c_c.Color(baseColor)
-    _.map  base.darken_set(6), (subcolor, i) ->
+    _.map  base.darken_set(number), (subcolor, i) ->
       subcolor.hex()
 
   @defaultProps:
@@ -138,17 +145,21 @@ class ColorPaletteCollectionComponent extends React.Component
       ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
       ["#1f77b4", "#aec7e8", "#ff7f0e", "#ffbb78", "#2ca02c", "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5", "#8c564b", "#c49c94", "#e377c2", "#f7b6d2", "#7f7f7f", "#c7c7c7", "#bcbd22", "#dbdb8d", "#17becf", "#9edae5"]
       ["#9c9ede", "#7375b5", "#4a5584", "#cedb9c", "#b5cf6b", "#8ca252", "#637939", "#e7cb94", "#e7ba52", "#bd9e39", "#8c6d31", "#e7969c", "#d6616b", "#ad494a", "#843c39", "#de9ed6", "#ce6dbd", "#a55194", "#7b4173"]
-      @generateColorFadeScheme({hex:'#D49097'}) #red
-      @generateColorFadeScheme({hex:'#C1CCE6'})
-      @generateColorFadeScheme({hex:'#C8E6C1'})
-      @generateColorFadeScheme({hex:'#E6D6C1'})
-      @generateColorFadeScheme({hex:'#C1E6E6'})
-      @generateColorFadeScheme({hex:'#DFC1E6'})
+      @generateColorFadeScheme({hex:'#D49097'}, 6) #red
+      @generateColorFadeScheme({hex:'#C1CCE6'}, 6)
+      @generateColorFadeScheme({hex:'#C8E6C1'}, 6)
+      @generateColorFadeScheme({hex:'#E6D6C1'}, 6)
+      @generateColorFadeScheme({hex:'#C1E6E6'}, 6)
+      @generateColorFadeScheme({hex:'#DFC1E6'}, 6)
     ]
 
   onPaletteSelected: (index) =>
     #generate color map
     scheme = @props.collection[index]
+
+    if index > 2
+      scheme = ColorPaletteCollectionComponent.generateColorFadeScheme({ hex: scheme[0]}, @props.categories.length)
+
     colormap = _.map @props.categories, (category, i) ->
       {
         value: category.value

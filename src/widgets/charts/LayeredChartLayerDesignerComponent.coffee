@@ -143,6 +143,7 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
           required: @isLayerPolar(layer)
           showColorMap: true
           value: layer.axes.color
+          colorMapOptional: true
           onChange: @handleColorAxisChange)
 
   renderYAxis: ->
