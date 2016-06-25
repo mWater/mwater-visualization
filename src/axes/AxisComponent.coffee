@@ -12,6 +12,7 @@ ui = require '../UIComponents'
 ColorMapComponent = require './ColorMapComponent'
 BinsComponent = require './BinsComponent'
 RangesComponent = require './RangesComponent'
+AxisColorEditorComponent = require './AxisColorEditorComponent'
 
 # Axis component that allows designing of an axis
 module.exports = class AxisComponent extends React.Component
@@ -29,6 +30,10 @@ module.exports = class AxisComponent extends React.Component
 
     required: React.PropTypes.bool  # Makes this a required value
     showColorMap: React.PropTypes.bool # Shows the color map
+    colorMapOptional: React.PropTypes.bool # Is the color map optional
+
+  @defaultProps:
+    colorMapOptional: false
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
@@ -137,11 +142,12 @@ module.exports = class AxisComponent extends React.Component
     if not @props.showColorMap or not axis or not axis.expr
       return null
 
-    return R ColorMapComponent,
+    return R AxisColorEditorComponent,
       schema: @props.schema
       dataSource: @props.dataSource
       axis: axis
       onChange: @props.onChange
+      colorMapOptional: @props.colorMapOptional
 
   render: ->
     axisBuilder = new AxisBuilder(schema: @props.schema)

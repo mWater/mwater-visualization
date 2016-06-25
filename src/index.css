@@ -162,3 +162,15 @@
 .rc-tooltip {
   z-index: 4000;
 }
+
+.axis-palette{
+  display: inline-block;
+  margin-right: 10px;
+  padding: 2px;
+  border: 1px solid transparent;
+  line-height: 0;
+}
+
+.axis-palette:hover{
+  border-color: #1f77b4;
+}
