@@ -7,7 +7,6 @@ ExprUtils = require('mwater-expressions').ExprUtils
 injectTableAlias = require('mwater-expressions').injectTableAlias
 ExprCleaner = require('mwater-expressions').ExprCleaner
 AxisBuilder = require '../axes/AxisBuilder'
-AdminIndicatorChoroplethLayerDesigner = require './AdminIndicatorChoroplethLayerDesigner'
 
 ###
 Layer that is composed of administrative regions colored by an indicator
@@ -295,6 +294,9 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
   #   dataSource: data source to use
   #   onDesignChange: function called when design changes
   createDesignerElement: (options) ->
+    # Require here to prevent server require problems
+    AdminIndicatorChoroplethLayerDesigner = require './AdminIndicatorChoroplethLayerDesigner'
+
     # Clean on way in and out
     React.createElement(AdminIndicatorChoroplethLayerDesigner,
       schema: options.schema

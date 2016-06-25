@@ -4,8 +4,6 @@ _ = require 'lodash'
 
 Widget = require './Widget'
 SimpleWidgetComponent = require './SimpleWidgetComponent'
-MapDesignerComponent = require '../maps/MapDesignerComponent'
-MapViewComponent = require '../maps/MapViewComponent'
 ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
 
 # Design is the map design specified in maps/Map Design.md
@@ -68,6 +66,9 @@ class MapWidgetComponent extends React.Component
     @setState(editing: true)
 
   renderEditor: ->
+    # Require here to prevent server require problems
+    MapDesignerComponent = require '../maps/MapDesignerComponent'
+
     # Create editor
     editor = React.createElement(MapDesignerComponent, 
       schema: @props.schema
@@ -137,6 +138,9 @@ class InnerMapWidgetComponent extends React.Component
     filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   render: ->
+    # Require here to prevent server require problems
+    MapViewComponent = require '../maps/MapViewComponent'
+
     # Create mapUrlSource
     mapUrlSource = {
       getTileUrl: (layerId, filters) =>

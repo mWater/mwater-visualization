@@ -14,9 +14,9 @@ module.exports = class DirectDashboardDataSource
   getWidgetDataSource: (widgetId) ->
     widget = WidgetFactory.createWidget(@design.items[widgetId].widget.type)
     widgetDesign = @design.items[widgetId].widget.design
-    return new LegacyWidgetDataSource(@apiUrl, @client, widget, widgetDesign, @schema, @dataSource)
+    return new DirectWidgetDataSource(@apiUrl, @client, widget, widgetDesign, @schema, @dataSource)
 
-class LegacyWidgetDataSource
+class DirectWidgetDataSource
   constructor: (apiUrl, client, widget, design, schema, dataSource) ->
     @apiUrl = apiUrl
     @widget = widget

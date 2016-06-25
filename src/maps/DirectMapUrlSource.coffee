@@ -39,7 +39,7 @@ module.exports = class DirectMapUrlSource
     if _.isString(jsonqlCss)
       return @createLegacyUrl(design, "png", filters)
 
-    return @createUrl("png", jsonqlCss, filters) 
+    return @createUrl("png", jsonqlCss) 
 
   # Get the url for the interactivity tiles with the specified filters applied
   # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
@@ -66,10 +66,10 @@ module.exports = class DirectMapUrlSource
     if _.isString(jsonqlCss)
       return @createLegacyUrl(design, "grid.json", filters)
 
-    return @createUrl("grid.json", jsonqlCss, filters) 
+    return @createUrl("grid.json", jsonqlCss) 
 
   # Create query string
-  createUrl: (extension, jsonqlCss, filters) ->
+  createUrl: (extension, jsonqlCss) ->
     query = "type=jsonql"
     if @client
       query += "&client=" + @client

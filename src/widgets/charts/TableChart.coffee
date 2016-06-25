@@ -8,7 +8,6 @@ ExprUtils = require('mwater-expressions').ExprUtils
 ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprCompiler = require('mwater-expressions').ExprCompiler
 AxisBuilder = require './../../axes/AxisBuilder'
-TableChartDesignerComponent = require './TableChartDesignerComponent'
 TableChartViewComponent = require './TableChartViewComponent'
 
 ###
@@ -94,6 +93,9 @@ module.exports = class TableChart extends Chart
   #   design: design 
   #   onDesignChange: function
   createDesignerElement: (options) ->
+    # Require here to prevent server require problems
+    TableChartDesignerComponent = require './TableChartDesignerComponent'
+    
     props = {
       schema: options.schema
       design: @cleanDesign(options.design, options.schema)

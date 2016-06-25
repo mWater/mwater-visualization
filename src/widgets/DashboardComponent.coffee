@@ -6,7 +6,6 @@ R = React.createElement
 UndoStack = require './../UndoStack'
 DashboardViewComponent = require './DashboardViewComponent'
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
-filesaver = require 'filesaver.js'
 DashboardUtils = require './DashboardUtils'
 QuickfiltersComponent = require '../quickfilter/QuickfiltersComponent'
 QuickfilterCompiler = require '../quickfilter/QuickfilterCompiler'
@@ -71,6 +70,8 @@ module.exports = class DashboardComponent extends React.Component
   handleSaveDesignFile: =>
     # Make a blob and save
     blob = new Blob([JSON.stringify(@props.design, null, 2)], {type: "text/json"})
+    # Require at use as causes server problems
+    filesaver = require 'filesaver.js'
     filesaver(blob, "Dashboard.json")
 
   handleAddWidget: (wt) =>
