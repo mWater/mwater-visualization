@@ -9,17 +9,18 @@ LayerFactory = require './LayerFactory'
 module.exports = class MapViewComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
+    dataSource: React.PropTypes.object.isRequired # data source to use
 
     # Url source for the map
     mapUrlSource: React.PropTypes.shape({
-        # Get the url for the image tiles with the specified filters applied
-        # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-        getTileUrl: React.PropTypes.func.isRequired
+      # Get the url for the image tiles with the specified filters applied
+      # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
+      getTileUrl: React.PropTypes.func.isRequired
 
-        # Get the url for the interactivity tiles with the specified filters applied
-        # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-        getUtfGridUrl: React.PropTypes.func.isRequired
-      }).isRequired
+      # Get the url for the interactivity tiles with the specified filters applied
+      # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
+      getUtfGridUrl: React.PropTypes.func.isRequired
+    }).isRequired
     
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func   # Called with new design. null/undefined to ignore bounds changes
@@ -27,10 +28,12 @@ module.exports = class MapViewComponent extends React.Component
     width: React.PropTypes.number        # Width in pixels
     height: React.PropTypes.number       # Height in pixels
 
+    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+
     extraFilters: React.PropTypes.arrayOf(React.PropTypes.shape({
       table: React.PropTypes.string.isRequired
       jsonql: React.PropTypes.object.isRequired
-      })) # Extra filters to apply to view
+    })) # Extra filters to apply to view
 
     dragging:  React.PropTypes.bool         # Whether the map be draggable with mouse/touch or not. Default true
     touchZoom: React.PropTypes.bool         # Whether the map can be zoomed by touch-dragging with two fingers. Default true
@@ -45,7 +48,12 @@ module.exports = class MapViewComponent extends React.Component
     @props.onDesignChange(design)
 
   handleGridClick: (layer, design, ev) =>
-    # TODO
+    # Handle click of layer
+    results = layer.onGridClick(ev, { design: design, schema: @props.schema, dataSource: @props.dataSource })
+
+    # TODO handle popup case
+    if _.isArray(results)
+      @props.onRowClick?(results[0], results[1])
 
   renderLegend:  ->
     legendItems = _.compact(
@@ -54,7 +62,7 @@ module.exports = class MapViewComponent extends React.Component
         layer = LayerFactory.createLayer(layerView.type)
 
         # Ignore if invalid
-        if layer.validateDesign(layerView.design, @props.schema)
+        if layer.validateDesign(layer.cleanDesign(layerView.design, @props.schema), @props.schema)
           return null
 
         if layerView.visible

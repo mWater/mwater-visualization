@@ -3,18 +3,23 @@ WidgetFactory = require './WidgetFactory'
 DirectMapUrlSource = require '../maps/DirectMapUrlSource'
 
 # Uses mWater server to get widget data to allow sharing with unprivileged users
-module.exports = class MWaterDashboardDataSource
-  constructor: (apiUrl, client, share, dashboardId) ->
-    @apiUrl = apiUrl
-    @client = client
-    @share = share
-    @dashboardId = dashboardId
+module.exports = class ServerDashboardDataSource
+  # options:
+  #   apiUrl: API url to use for talking to mWater server
+  #   client: client id to use for talking to mWater server
+  #   share: share id to use for talking to mWater server
+  #   dashboardId: dashboard id to use on server
+  constructor: (options) ->
+    @apiUrl = options.apiUrl
+    @client = options.client
+    @share = options.share
+    @dashboardId = options.dashboardId
 
   # Gets the widget data source for a specific widget
   getWidgetDataSource: (widgetId) ->
-    return new MWaterWidgetDataSource(@apiUrl, @client, @share, @dashboardId, widgetId)
+    return new ServerWidgetDataSource(@apiUrl, @client, @share, @dashboardId, widgetId)
 
-class MWaterWidgetDataSource
+class ServerWidgetDataSource
   constructor: (apiUrl, client, share, dashboardId, widgetId) ->
     @apiUrl = apiUrl
     @client = client
