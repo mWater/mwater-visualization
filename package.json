@@ -20,6 +20,7 @@
     "async": "^1.2.1",
     "async-latest": "^1.0.0",
     "backbone": "~1.1.2",
+    "color-mixer": "^1.0.0",
     "d3-format": "^0.3.2",
     "d3-tip": "^0.6.7",
     "filesaver.js": "^0.1.1",
