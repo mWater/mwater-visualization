@@ -588,6 +588,31 @@ dashboardDesign = {
         }
       }
     },
+    "1219bae7-b616-4c53-8423-a6495ecf26f9": {
+      "layout": {
+        "x": 0,
+        "y": 15,
+        "w": 8,
+        "h": 8
+      },
+      "widget": {
+        "type": "ImageMosaicChart",
+        "design": {
+          "version": 1,
+          "imageAxis": {
+            "expr": {
+              "type": "field",
+              "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
+              "column": "data:c3f07eeec3ab4324a2f2d69949384c8c:value"
+            },
+            "xform": null
+          },
+          "filter": null,
+          "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
+          "titleText": "gfhfdg hdfgh dfh"
+        }
+      }
+    },
     "c84506e8-727d-4515-9579-fd66220ebdea": {
       "layout": {
         "x": 8,
