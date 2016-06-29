@@ -41,6 +41,7 @@ exports.AxisBuilder = require './axes/AxisBuilder'
 
 exports.DatagridComponent = require './datagrids/DatagridComponent'
 exports.DatagridDesignerComponent = require './datagrids/DatagridDesignerComponent'
+exports.DatagridUtils = require './datagrids/DatagridUtils'
 
 exports.ServerDashboardDataSource = require './widgets/ServerDashboardDataSource'
 exports.DirectDashboardDataSource = require './widgets/DirectDashboardDataSource'
