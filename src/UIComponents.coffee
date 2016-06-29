@@ -17,8 +17,16 @@ exports.SectionComponent = class SectionComponent extends React.Component
   render: ->
     H.div style: { marginBottom: 15 }, 
       H.label className: "text-muted", 
-        H.span(className: "glyphicon glyphicon-#{@props.icon}")
-        " "
+        if @props.icon and @props.icon.match(/^fa-/)
+          [
+            H.i(className: "fa #{@props.icon}")
+            " "
+          ]
+        if @props.icon and @props.icon.match(/^glyphicon-/)
+          [
+            H.span(className: "glyphicon #{@props.icon}")
+            " "
+          ]
         @props.label
       H.div style: { marginLeft: 10 },
         @props.children
@@ -176,5 +184,5 @@ exports.ButtonToggleComponent = class ButtonToggleComponent extends React.Compon
   render: ->
     H.div className: "btn-group btn-group-xs",
       _.map @props.options, (option, i) =>
-        H.button type: "button", className: (if option.value == @props.value then "btn btn-primary active" else "btn btn-default"), onClick: @props.onChange.bind(null, option.value),
+        H.button type: "button", className: (if option.value == @props.value then "btn btn-default active" else "btn btn-default"), onClick: @props.onChange.bind(null, option.value),
           option.label

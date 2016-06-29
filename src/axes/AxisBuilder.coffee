@@ -1,4 +1,5 @@
 _ = require 'lodash'
+uuid = require 'node-uuid'
 ExprCompiler = require('mwater-expressions').ExprCompiler
 ExprUtils = require('mwater-expressions').ExprUtils
 ExprCleaner = require('mwater-expressions').ExprCleaner
@@ -9,6 +10,7 @@ H = React.DOM
 
 xforms = [
   { type: "bin", input: "number", output: "enum" }
+  { type: "ranges", input: "number", output: "enum" }
   { type: "date", input: "datetime", output: "date" }
   { type: "year", input: "date", output: "date" }
   { type: "year", input: "datetime", output: "date" }
@@ -42,8 +44,22 @@ module.exports = class AxisBuilder
     # TODO always clones
     axis = _.clone(options.axis)
 
+    # Move aggr inside since aggr is deprecated at axis level
+    if axis.aggr and axis.expr
+      axis.expr = { type: "op", op: axis.aggr, table: axis.expr.table, exprs: [axis.expr] }
+      delete axis.aggr
+
+    # Determine aggrStatuses that are possible
+    switch options.aggrNeed
+      when "none"
+        aggrStatuses = ["literal", "individual"]
+      when "optional"
+        aggrStatuses = ["literal", "individual", "aggregate"]
+      when "required"
+        aggrStatuses = ["literal", "aggregate"]
+
     # Clean expression
-    axis.expr = @exprCleaner.cleanExpr(axis.expr, { table: options.table })
+    axis.expr = @exprCleaner.cleanExpr(axis.expr, { table: options.table, aggrStatuses: aggrStatuses })
 
     # Remove if null or no type 
     type = @exprUtils.getExprType(axis.expr)
@@ -88,31 +104,10 @@ module.exports = class AxisBuilder
       if not axis.xform.numBins
         axis.xform.numBins = 6
 
-    # Only allow aggr if not xform
-    if axis.xform
-      delete axis.aggr
-    else
-      # Clean aggr
-      aggrs = @exprUtils.getAggrs(axis.expr)
-      # Remove latest, as it is tricky to group by. TODO
-      aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
-
-      # Remove existing if not in list
-      if axis.aggr and axis.aggr not in _.pluck(aggrs, "id")
-        delete axis.aggr
-
-      # Remove if need is none
-      if options.aggrNeed == "none"
-        delete axis.aggr
-
-      # Default aggr if required
-      if options.aggrNeed == "required" and aggrs[0] and not axis.aggr
-        axis.aggr = aggrs[0].id
-
-      # Set aggr to count if expr is type id and aggr possible
-      if options.aggrNeed != "none" and not axis.aggrs
-        if @exprUtils.getExprType(axis.expr) == "id"
-          axis.aggr = "count"
+    if axis.xform and axis.xform.type == "ranges"
+      # Add ranges
+      if not axis.xform.ranges
+        axis.xform.ranges = [{ id: uuid.v4(), minOpen: false, maxOpen: true }]
 
     return axis
 
@@ -134,6 +129,14 @@ module.exports = class AxisBuilder
       if options.axis.xform.max < options.axis.xform.min
         return "Max < min"
 
+    # xform validation
+    if options.axis.xform and options.axis.xform.type == "ranges"
+      if not options.axis.xform.ranges or not _.isArray(options.axis.xform.ranges)
+        return "Missing ranges"
+      for range in options.axis.xform.ranges
+        if range.minValue? and range.maxValue? and range.minValue > range.maxValue
+          return "Max < min"
+
     return
 
   # Pass axis, tableAlias
@@ -141,8 +144,13 @@ module.exports = class AxisBuilder
     if not options.axis
       return null
 
+    # Legacy support of aggr
+    expr = options.axis.expr
+    if options.axis.aggr
+      expr = { type: "op", op: options.axis.aggr, exprs: [expr] }
+
     exprCompiler = new ExprCompiler(@schema)
-    compiledExpr = exprCompiler.compileExpr(expr: options.axis.expr, tableAlias: options.tableAlias, aggr: options.axis.aggr)
+    compiledExpr = exprCompiler.compileExpr(expr: expr, tableAlias: options.tableAlias)
 
     # Bin
     if options.axis.xform 
@@ -210,13 +218,45 @@ module.exports = class AxisBuilder
           ]
         }
 
-    # Aggregate
-    if options.axis.aggr
-      compiledExpr = {
-        type: "op"
-        op: options.axis.aggr
-        exprs: _.compact([compiledExpr])
-      }
+      # Ranges
+      if options.axis.xform.type == "ranges"
+        cases = []
+        for range in options.axis.xform.ranges
+          whens = []
+          if range.minValue?
+            if range.minOpen
+              whens.push({ type: "op", op: ">", exprs: [compiledExpr, range.minValue] })
+            else
+              whens.push({ type: "op", op: ">=", exprs: [compiledExpr, range.minValue] })
+
+          if range.maxValue?
+            if range.maxOpen
+              whens.push({ type: "op", op: "<", exprs: [compiledExpr, range.maxValue] })
+            else
+              whens.push({ type: "op", op: "<=", exprs: [compiledExpr, range.maxValue] })
+
+          if whens.length > 1
+            cases.push({
+              when: {
+                type: "op"
+                op: "and"
+                exprs: whens
+              }
+              then: range.id
+            })
+          else if whens.length == 1
+            cases.push({
+              when: whens[0]
+              then: range.id
+            })
+
+        if cases.length > 0 
+          compiledExpr = {
+            type: "case"
+            cases: cases
+          }
+        else
+          compiledExpr = null
 
     return compiledExpr
 
@@ -289,11 +329,9 @@ module.exports = class AxisBuilder
     }
     return query
 
-
   # Get underlying expression types that will give specified output expression types
   #  types: array of types
-  #  aggrNeed is "none", "optional" or "required"
-  getExprTypes: (types, aggrNeed) ->
+  getExprTypes: (types) ->
     if not types
       return null
       
@@ -303,10 +341,6 @@ module.exports = class AxisBuilder
     for xform in xforms
       if xform.output in types
         types = _.union(types, [xform.input])
-
-    # Allow id type if count is an option
-    if aggrNeed != "none" and "number" in types
-      types = _.union(["id"], types)
 
     return types
 
@@ -320,7 +354,32 @@ module.exports = class AxisBuilder
   # Get all categories for a given axis type given the known values
   # Returns array of { value, label }
   getCategories: (axis, values, locale) ->
-    # Handle binning first
+    # Handle ranges
+    if axis.xform and axis.xform.type == "ranges"
+      return _.map(axis.xform.ranges, (range) =>
+        label = range.label or ""
+        if not label
+          if range.minValue?
+            if range.minOpen
+              label = "> #{range.minValue}"
+            else
+              label = ">= #{range.minValue}"
+
+          if range.maxValue?
+            if label
+              label += " and "
+            if range.maxOpen
+              label += "< #{range.maxValue}"
+            else
+              label += "<= #{range.maxValue}"
+
+        return {
+          value: range.id
+          label: label
+        }
+      )
+
+    # Handle binning 
     if axis.xform and axis.xform.type == "bin"
       min = axis.xform.min
       max = axis.xform.max
@@ -437,6 +496,7 @@ module.exports = class AxisBuilder
     if not axis
       return null
 
+    # DEPRECATED
     if axis.aggr == "count"
       return "number"
 
@@ -448,19 +508,17 @@ module.exports = class AxisBuilder
 
     return type
 
+  # Determines if axis is aggregate
+  isAxisAggr: (axis) ->
+    # Legacy support of axis.aggr
+    return axis.aggr or @exprUtils.getExprAggrStatus(axis.expr) == "aggregate"
+
   # Summarize axis as a string
   summarizeAxis: (axis, locale) ->
     if not axis
       return "None"
 
-    exprType = @exprUtils.getExprType(axis.expr)
-
-    # Add aggr if not a id type
-    if axis.aggr and exprType != "id"
-      aggrName = _.findWhere(@exprUtils.getAggrs(axis.expr), { id: axis.aggr }).name
-      return aggrName + " " + @exprUtils.summarizeExpr(axis.expr, locale)
-    else
-      return @exprUtils.summarizeExpr(axis.expr, locale)
+    return @exprUtils.summarizeExpr(axis.expr, locale)
     # TODO add xform support
 
   # Get a string (or React DOM actually) representation of an axis value
@@ -507,8 +565,6 @@ module.exports = class AxisBuilder
       when "datetime"
         return moment(value, moment.ISO_8601).format("lll")
 
-
-    # TODO format dates
     return "" + value
 
   # Creates a filter (jsonql with {alias} for table name) based on a specific value

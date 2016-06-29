@@ -9,8 +9,6 @@ visualization = require './index'
 LayeredChart = require './widgets/charts/LayeredChart'
 LayeredChartDesignerComponent = require './widgets/charts/LayeredChartDesignerComponent'
 
-LayerFactory = require './maps/LayerFactory'
-WidgetFactory = require './widgets/WidgetFactory'
 CalendarChartViewComponent = require './widgets/charts/CalendarChartViewComponent'
 
 MWaterLoaderComponent = require './MWaterLoaderComponent'
@@ -18,53 +16,8 @@ MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
-# class DashboardPane extends React.Component
-#   constructor: (props) ->
-#     super
-
-#     @state = {
-#       schema: null
-#       dataSource: null
-#       design: dashboardDesign
-#     }
-
-#   componentDidMount: ->
-#     $.getJSON @props.apiUrl + "jsonql/schema", (schemaJson) =>
-#       schema = new Schema(schemaJson)
-#       dataSource = new MWaterDataSource(@props.apiUrl, @props.client, { serverCaching: false, localCaching: true })
-
-#       layerFactory = new LayerFactory({
-#         schema: schema
-#         dataSource: dataSource
-#         apiUrl: @props.apiUrl
-#         client: @props.client
-#         newLayers: [
-#           { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" } }
-#           { name: "Custom Layer", type: "Markers", design: {} }
-#         ]
-#         onMarkerClick: (table, id) => alert("#{table}:#{id}")
-#       })
-
-#       widgetFactory = new WidgetFactory(schema: schema, dataSource: dataSource, layerFactory: layerFactory)    
-
-#       @setState(schema: schema, dataSource: dataSource, layerFactory: layerFactory, widgetFactory: widgetFactory)
-
-#   handleDesignChange: (design) =>
-#     @setState(design: design)
-#     console.log JSON.stringify(design, null, 2)
-    
-#   render: ->
-#     if not @state.widgetFactory
-#       return H.div null, "Loading..."
-
-#     return H.div style: { height: "100%" },
-#       React.createElement(visualization.DashboardComponent, {
-#         design: @state.design
-#         widgetFactory: @state.widgetFactory
-#         onDesignChange: @handleDesignChange
-#         titleElem: "Sample"
-#         printScaling: false
-#         })
+DirectDashboardDataSource = require './widgets/DirectDashboardDataSource'
+DirectMapUrlSource = require './maps/DirectMapUrlSource'
 
 class MWaterDashboardPane extends React.Component
   constructor: (props) ->
@@ -87,12 +40,14 @@ class MWaterDashboardPane extends React.Component
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
       extraTables: @state.extraTables
     }, (error, config) =>
+      dashboardDataSource = new DirectDashboardDataSource(@props.apiUrl, @props.client, @state.design, config.schema, config.dataSource)
+
       H.div style: { height: "100%" },
         React.createElement(visualization.DashboardComponent, {
           schema: config.schema
           dataSource: config.dataSource
+          dashboardDataSource: dashboardDataSource
           design: @state.design
-          widgetFactory: config.widgetFactory
           onDesignChange: @handleDesignChange
           titleElem: "Sample"
         })
@@ -119,12 +74,15 @@ class MWaterMapPane extends React.Component
       extraTables: @state.extraTables
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
     }, (error, config) =>
+      # Create map url source
+      mapUrlSource = new DirectMapUrlSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
+
       H.div style: { height: "100%" },
         React.createElement(visualization.MapComponent, {
           schema: config.schema
           dataSource: config.dataSource
           design: @state.design
-          layerFactory: config.layerFactory
+          mapUrlSource: mapUrlSource
           onDesignChange: @handleDesignChange
           titleElem: "Sample"
         })
@@ -398,25 +356,92 @@ mapDesign = {
   "baseLayer": "bing_road",
   "layerViews": [
      # { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
-     { 
-      name: "Choropleth"
-      type: "AdminIndicatorChoropleth"
-      design: { 
-        scope: 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
-        table: "entities.water_point" 
-        adminRegionExpr: { type: "scalar", table: "entities.water_point", joins: ['admin_region'], expr: { type: "id", table: "admin_regions" } }
-        detailLevel: 1
-        condition: { 
-          type: "op"
-          op: "="
-          table: "entities.water_point"
-          exprs: [
-            { type: "field", table: "entities.water_point", column: "type" }
-            { type: "literal", valueType: "enum", value: "Protected dug well" }
-          ] 
-        }
+    #  { 
+    #   id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
+    #   name: "Choropleth"
+    #   type: "AdminIndicatorChoropleth"
+    #   design: { 
+    #     scope: 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
+    #     table: "entities.water_point" 
+    #     adminRegionExpr: { type: "scalar", table: "entities.water_point", joins: ['admin_region'], expr: { type: "id", table: "admin_regions" } }
+    #     detailLevel: 1
+    #     condition: { 
+    #       type: "op"
+    #       op: "="
+    #       table: "entities.water_point"
+    #       exprs: [
+    #         { type: "field", table: "entities.water_point", column: "type" }
+    #         { type: "literal", valueType: "enum", value: "Protected dug well" }
+    #       ] 
+    #     }
+    #   }
+    #   visible: true 
+    # }
+    {
+      "id": "afbf76a3-29b8-4a11-882c-42aa21a3ca7a",
+      "name": "Untitled Layer",
+      "desc": "",
+      "type": "AdminChoropleth",
+      "visible": true,
+      "opacity": 1,
+      "design": {
+        "adminRegionExpr": {
+          "type": "scalar",
+          "table": "entities.water_point",
+          "joins": [
+            "admin_region"
+          ],
+          "expr": {
+            "type": "id",
+            "table": "admin_regions"
+          }
+        },
+        "axes": {
+          "color": {
+            "expr": {
+              "type": "op",
+              "op": "percent where",
+              "table": "entities.water_point",
+              "exprs": []
+            },
+            "xform": {
+              "type": "bin",
+              "numBins": 6,
+              "min": 0,
+              "max": 100
+            },
+            "colorMap": [
+              {
+                "value": 1,
+                "color": "#f8e71c"
+              },
+              {
+                "value": 2,
+                "color": "#7ed321"
+              },
+              {
+                "value": 3,
+                "color": "#f5a623"
+              },
+              {
+                "value": 4,
+                "color": "#d0021b"
+              },
+              {
+                "value": 5,
+                "color": "#4725f0"
+              }
+            ]
+          }
+        },
+        "opacity": 1,
+        "nameLabels": true,
+        "filter": null,
+        "scope": "eb3e12a2-de1e-49a9-8afd-966eb55d47eb",
+        "detailLevel": 1,
+        "table": "entities.water_point",
+        "color": "#9b9b9b"
       }
-      visible: true 
     }
   ]
   filters: {}
@@ -427,7 +452,66 @@ mapDesign = {
     "s": -18.583775688370928
   }
 }
+
 # bounds: { w: -40, n: 25, e: 40, s: -25 }
+# mapDesign = {
+#   "baseLayer": "bing_road",
+#   "layerViews": [
+#      { 
+#       id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
+#       name: "Buffer"
+#       type: "Buffer"
+#       design: { 
+#         table: "entities.water_point" 
+#         opacity: 0.5
+#         radius: 1000
+#         "axes": {
+#           "geometry": {
+#             "expr": {
+#               "type": "field",
+#               "table": "entities.water_point",
+#               "column": "location"
+#             },
+#             "xform": null
+#           }
+#           "color": {
+#             "expr": {
+#               "type": "field",
+#               "table": "entities.water_point",
+#               "column": "type"
+#             },
+#             "xform": null,
+#             "colorMap": [
+#               {
+#                 "value": "Protected dug well",
+#                 "color": "#d0021b"
+#               },
+#               {
+#                 "value": "Piped into dwelling",
+#                 "color": "#7ed321"
+#               },
+#               {
+#                 "value": "Borehole or tubewell",
+#                 "color": "#f8e71c"
+#               }
+#             ]
+#           }
+#         },
+#         color: "#9b9b9b"
+#         filter: null
+#       }
+#       visible: true 
+#     }
+#      { id: "old_func_status", name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
+#   ]
+#   filters: {}
+#   bounds: {
+#     "w": 32.75848388671875,
+#     "n": -2.217997457638444,
+#     "e": 33.4808349609375,
+#     "s": -2.9375549775994263
+#   }
+# }
 
 dashboardDesign = {
   "items": {
@@ -493,8 +577,7 @@ dashboardDesign = {
                   {
                     "type": "literal",
                     "valueType": "enumset",
-                    "value": [
-                    ]
+                    "value": []
                   }
                 ]
               },
@@ -502,6 +585,121 @@ dashboardDesign = {
             }
           ],
           "type": "donut"
+        }
+      }
+    },
+    "1219bae7-b616-4c53-8423-a6495ecf26f9": {
+      "layout": {
+        "x": 0,
+        "y": 15,
+        "w": 8,
+        "h": 8
+      },
+      "widget": {
+        "type": "ImageMosaicChart",
+        "design": {
+          "version": 1,
+          "imageAxis": {
+            "expr": {
+              "type": "field",
+              "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
+              "column": "data:c3f07eeec3ab4324a2f2d69949384c8c:value"
+            },
+            "xform": null
+          },
+          "filter": null,
+          "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
+          "titleText": "gfhfdg hdfgh dfh"
+        }
+      }
+    },
+    "c84506e8-727d-4515-9579-fd66220ebdea": {
+      "layout": {
+        "x": 8,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "widget": {
+        "type": "TableChart",
+        "design": {
+          "version": 1,
+          "columns": [
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "op",
+                  "op": "count",
+                  "table": "entities.water_point",
+                  "exprs": []
+                }
+              },
+              "headerText": "# Water points"
+            },
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "op",
+                  "table": "entities.water_point",
+                  "op": "percent where",
+                  "exprs": [
+                    {
+                      "type": "op",
+                      "table": "entities.water_point",
+                      "op": "= any",
+                      "exprs": [
+                        {
+                          "type": "field",
+                          "table": "entities.water_point",
+                          "column": "type"
+                        },
+                        {
+                          "type": "literal",
+                          "valueType": "enumset",
+                          "value": [
+                            "Protected dug well",
+                            "Unprotected dug well"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "headerText": "% Dug Wells"
+            },
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "scalar",
+                  "table": "entities.water_point",
+                  "joins": [
+                    "admin_region"
+                  ],
+                  "expr": {
+                    "type": "field",
+                    "table": "admin_regions",
+                    "column": "country"
+                  }
+                }
+              },
+              "headerText": "Country"
+            }
+          ],
+          "orderings": [
+            {
+              "axis": {
+                "expr": {
+                  "type": "op",
+                  "op": "count",
+                  "table": "entities.water_point",
+                  "exprs": []
+                }
+              },
+              "direction": "desc"
+            }
+          ],
+          "table": "entities.water_point"
         }
       }
     }
@@ -1282,3 +1480,53 @@ rosterDatagridDesign = {
     }
   ]
 }
+
+
+# class DashboardPane extends React.Component
+#   constructor: (props) ->
+#     super
+
+#     @state = {
+#       schema: null
+#       dataSource: null
+#       design: dashboardDesign
+#     }
+
+#   componentDidMount: ->
+#     $.getJSON @props.apiUrl + "jsonql/schema", (schemaJson) =>
+#       schema = new Schema(schemaJson)
+#       dataSource = new MWaterDataSource(@props.apiUrl, @props.client, { serverCaching: false, localCaching: true })
+
+#       layerFactory = new LayerFactory({
+#         schema: schema
+#         dataSource: dataSource
+#         apiUrl: @props.apiUrl
+#         client: @props.client
+#         newLayers: [
+#           { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" } }
+#           { name: "Custom Layer", type: "Markers", design: {} }
+#         ]
+#         onMarkerClick: (table, id) => alert("#{table}:#{id}")
+#       })
+
+#       widgetFactory = new WidgetFactory(schema: schema, dataSource: dataSource, layerFactory: layerFactory)    
+
+#       @setState(schema: schema, dataSource: dataSource, layerFactory: layerFactory, widgetFactory: widgetFactory)
+
+#   handleDesignChange: (design) =>
+#     @setState(design: design)
+#     console.log JSON.stringify(design, null, 2)
+    
+#   render: ->
+#     if not @state.widgetFactory
+#       return H.div null, "Loading..."
+
+#     return H.div style: { height: "100%" },
+#       React.createElement(visualization.DashboardComponent, {
+#         design: @state.design
+#         widgetFactory: @state.widgetFactory
+#         onDesignChange: @handleDesignChange
+#         titleElem: "Sample"
+#         printScaling: false
+#         })
+

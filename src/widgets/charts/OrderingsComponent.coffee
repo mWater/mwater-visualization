@@ -62,9 +62,9 @@ class OrderingComponent extends React.Component
 
   render: ->
     H.div style: { marginLeft: 5 },
-      H.button className: "btn btn-xs btn-link pull-right", type: "button", onClick: @props.onOrderingRemove,
-        H.span className: "glyphicon glyphicon-remove"
-
+      H.div style: { textAlign: "right" },
+        H.button className: "btn btn-xs btn-link", type: "button", onClick: @props.onOrderingRemove,
+          H.span className: "glyphicon glyphicon-remove"
       R AxisComponent,
         schema: @props.schema
         dataSource: @props.dataSource
@@ -73,7 +73,8 @@ class OrderingComponent extends React.Component
         aggrNeed: 'optional'
         value: @props.ordering.axis
         onChange: @handleAxisChange
-      H.div className: "checkbox",
-        H.label null,
-          H.input type: "checkbox", checked: @props.ordering.direction == "desc", onChange: @handleDirectionChange
-          "Reverse"
+      H.div null, 
+        H.div className: "checkbox-inline",
+          H.label null,
+            H.input type: "checkbox", checked: @props.ordering.direction == "desc", onChange: @handleDirectionChange
+            "Reverse"

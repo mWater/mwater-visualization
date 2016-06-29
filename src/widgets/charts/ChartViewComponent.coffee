@@ -9,7 +9,10 @@ module.exports = class ChartViewComponent extends React.Component
   @propTypes:
     chart: React.PropTypes.object.isRequired # Chart object to use
     design: React.PropTypes.object.isRequired # Design of chart
+
+    schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired # Data source to use for chart
+    widgetDataSource: React.PropTypes.object.isRequired
 
     width: React.PropTypes.number
     height: React.PropTypes.number
@@ -43,10 +46,10 @@ module.exports = class ChartViewComponent extends React.Component
 
   updateData: (props) ->
     # Clean design first (needed to validate properly)
-    design = props.chart.cleanDesign(props.design)
+    design = props.chart.cleanDesign(props.design, props.schema)
 
     # If design is not valid, do nothing as can't query invalid design
-    errors = props.chart.validateDesign(design)
+    errors = props.chart.validateDesign(design, props.schema)
     if errors
       return
 
@@ -58,8 +61,8 @@ module.exports = class ChartViewComponent extends React.Component
     )
 
   loadData: (props, callback) ->
-    # Get data from chart
-    props.chart.getData(props.design, props.filters, callback)
+    # Get data from widget data source
+    props.widgetDataSource.getData(props.filters, callback)
 
   render: ->
     style = { width: @props.width, height: @props.height }
@@ -69,7 +72,7 @@ module.exports = class ChartViewComponent extends React.Component
       style.opacity = 0.5
 
     # Faded if design is different than valid design (clean first to ensure that consistent)
-    if not _.isEqual(@props.chart.cleanDesign(@props.design), @state.validDesign)
+    if not _.isEqual(@props.chart.cleanDesign(@props.design, @props.schema), @state.validDesign)
       style.opacity = 0.5
 
     # If nothing to show, show grey
@@ -85,6 +88,8 @@ module.exports = class ChartViewComponent extends React.Component
     return H.div style: style,
       if @state.validDesign
         @props.chart.createViewElement({
+          schema: @props.schema
+          dataSource: @props.dataSource
           design: @state.validDesign
           data: @state.data
           scope: @props.scope

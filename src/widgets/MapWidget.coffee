@@ -8,28 +8,34 @@ MapDesignerComponent = require '../maps/MapDesignerComponent'
 MapViewComponent = require '../maps/MapViewComponent'
 ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
 
+# Design is the map design specified in maps/Map Design.md
 module.exports = class MapWidget extends Widget
-  # design, schema, dataSource, layerFactory
-  constructor: (options) ->
-    @schema = options.schema
-    @design = options.design
-    @dataSource = options.dataSource
-    @layerFactory = options.layerFactory
-
-  # Creates a view of the widget
+  # Creates a React element that is a view of the widget 
   # options:
+  #  schema: schema to use
+  #  dataSource: data source to use
+  #  widgetDataSource: Gives data to the widget in a way that allows client-server separation and secure sharing. See definition in WidgetDataSource.
+  #  design: widget design
   #  onRemove: called when widget is removed
+  #  onDuplicate: called when widget is duplicated
   #  scope: scope of the widget (when the widget self-selects a particular scope)
   #  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   #  onScopeChange: called with scope of widget
   #  onDesignChange: called with new design. null/undefined for readonly
+  #
+  # Element will have the following props injected:
+  #  width: width in pixels on screen
+  #  height: height in pixels on screen
+  #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
+  #  connectMoveHandle:  Connects move handle for dragging (see WidgetContainerComponent)
+  #  connectResizeHandle: Connects resize handle for dragging (see WidgetContainerComponent)
   createViewElement: (options) ->
     return React.createElement(MapWidgetComponent,
-      schema: @schema
-      dataSource: @dataSource
-      layerFactory: @layerFactory
+      schema: options.schema
+      dataSource: options.dataSource
+      widgetDataSource: options.widgetDataSource
 
-      design: @design
+      design: options.design
       onDesignChange: options.onDesignChange
       onRemove: options.onRemove
       filters: options.filters
@@ -39,7 +45,7 @@ class MapWidgetComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
     dataSource: React.PropTypes.object.isRequired # Data source to use
-    layerFactory: React.PropTypes.object.isRequired # Layer factory to use
+    widgetDataSource: React.PropTypes.object.isRequired
 
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func # Called with new design.  null/undefined for readonly
@@ -66,7 +72,6 @@ class MapWidgetComponent extends React.Component
     editor = React.createElement(MapDesignerComponent, 
       schema: @props.schema
       dataSource: @props.dataSource
-      layerFactory: @props.layerFactory
       design: @props.design
       onDesignChange: @props.onDesignChange
     )
@@ -90,7 +95,7 @@ class MapWidgetComponent extends React.Component
   renderContent: (width, height) ->
     React.createElement(InnerMapWidgetComponent, {
       schema: @props.schema
-      layerFactory: @props.layerFactory
+      widgetDataSource: @props.widgetDataSource
       design: @props.design
       onDesignChange: @props.onDesignChange
       filters: @props.filters
@@ -121,7 +126,7 @@ class MapWidgetComponent extends React.Component
 class InnerMapWidgetComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
-    layerFactory: React.PropTypes.object.isRequired # Layer factory to use
+    widgetDataSource: React.PropTypes.object.isRequired
 
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func  # Called with new design. null/undefined for readonly
@@ -132,11 +137,19 @@ class InnerMapWidgetComponent extends React.Component
     filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   render: ->
+    # Create mapUrlSource
+    mapUrlSource = {
+      getTileUrl: (layerId, filters) =>
+        return @props.widgetDataSource.getTileUrl(layerId, filters)
+      getUtfGridUrl: (layerId, filters) =>
+        return @props.widgetDataSource.getUtfGridUrl(layerId, filters)
+    }
+
     H.div style: { width: @props.width, height: @props.height, padding: 10 },
       React.createElement(MapViewComponent, {
         schema: @props.schema
-        layerFactory: @props.layerFactory
         design: @props.design
+        mapUrlSource: mapUrlSource
         onDesignChange: @props.onDesignChange
         extraFilters: @props.filters
         width: @props.width - 20

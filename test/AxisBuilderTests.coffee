@@ -183,16 +183,66 @@ describe "AxisBuilder", ->
         ]
       }
 
+    it "compiles ranges xform", ->
+      axis = {
+        expr: @exprNumber
+        xform: { type: "ranges", ranges: [
+          { id: "a", minValue: 0, maxValue: 50, minOpen: false, maxOpen: true } # >=0 and < 50
+          { id: "b", minValue: 50, minOpen: false, label: "High" } # >= 50 
+          ]}
+      }
+
+      jql = @ab.compileAxis(axis: axis, tableAlias: "T1")
+      assert _.isEqual jql, {
+        type: "case"
+        cases: [
+          {
+            when: {
+              type: "op"
+              op: "and"
+              exprs: [
+                { type: "op", op: ">=", exprs: [{ type: "field", tableAlias: "T1", column: "number" }, 0] }
+                { type: "op", op: "<", exprs: [{ type: "field", tableAlias: "T1", column: "number" }, 50] }
+              ]
+            }
+            then: "a"
+          }
+          {
+            when: { type: "op", op: ">=", exprs: [{ type: "field", tableAlias: "T1", column: "number" }, 50] }
+            then: "b"
+          }
+        ]
+      }
+
   describe "cleanAxis", ->
-    it "defaults aggr"
-    it "cleans expression"
+    it "moves legacy aggr into expr", ->
+      axis = {
+        expr: { type: "field", table: "t1", column: "number" }
+        aggr: "sum"
+      }
+
+      axis = @ab.cleanAxis(axis: axis, table: "t1", aggrNeed: "optional")
+      compare(axis, {
+        expr: { type: "op", op: "sum", table: "t1", exprs: [{ type: "field", table: "t1", column: "number" }] }
+      })
+
+    it "cleans expression", ->
+      axis = {
+        expr: { type: "op", op: "+", table: "t1", exprs: [{ type: "field", table: "t1", column: "number" }, { type: "field", table: "t1", column: "text" }] }
+      }
+
+      axis = @ab.cleanAxis(axis: axis, table: "t1", aggrNeed: "optional")
+      compare(axis, {
+        expr: { type: "op", op: "+", table: "t1", exprs: [{ type: "field", table: "t1", column: "number" }, null] }
+      })
+
     it "nulls if no expression", ->
       axis = {
         expr: null
         aggr: "sum"
       }
 
-      axis = @ab.cleanAxis(axis: axis, table: "t1")
+      axis = @ab.cleanAxis(axis: axis, table: "t1", aggrNeed: "optional")
       assert not axis
 
     it "nulls if expression has no type", ->
@@ -201,7 +251,7 @@ describe "AxisBuilder", ->
         aggr: "sum"
       }
 
-      axis = @ab.cleanAxis(axis: axis, table: "t1")
+      axis = @ab.cleanAxis(axis: axis, table: "t1", aggrNeed: "optional")
       assert not axis
 
     it "removes bin xform if wrong input type", ->
@@ -210,7 +260,7 @@ describe "AxisBuilder", ->
         xform: { type: "bin", numBins: 10, min: 2, max: 8 }
       }
 
-      axis = @ab.cleanAxis(axis: axis, table: "t1")
+      axis = @ab.cleanAxis(axis: axis, table: "t1", aggrNeed: "optional")
       assert not axis.xform
 
     it "removes bin xform if wrong output type", ->
@@ -219,31 +269,39 @@ describe "AxisBuilder", ->
         xform: { type: "bin", numBins: 10, min: 2, max: 8 }
       }
 
-      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ["number"])
+      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ["number"], aggrNeed: "optional")
       assert not axis.xform
 
-    it "removes bad aggr"
-
-    it "does not default count aggr for text", ->
-      axis = @ab.cleanAxis(axis: @axisText, table: "t1", types: ["number"])
-      assert not axis, JSON.stringify(axis)
-
-    it "removes aggr if xform", ->
+    it "removes ranges xform if wrong input type", ->
       axis = {
-        expr: @exprNumber
-        xform: { type: "bin", numBins: 10, min: 2, max: 8 }
-        aggr: "sum"
+        expr: @exprEnum
+        xform: { type: "ranges", ranges: [
+          { id: "a", minValue: 0, maxValue: 50, minOpen: false, maxOpen: true } # >=0 and < 50
+          { id: "b", minValue: 50, minOpen: false, label: "High" } # >= 50 
+          ]}
       }
 
-      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ["enum"])
-      assert not axis.aggr
+      axis = @ab.cleanAxis(axis: axis, table: "t1", aggrNeed: "optional")
+      assert not axis.xform
+
+    it "removes ranges xform if wrong output type", ->
+      axis = {
+        expr: @exprNumber
+        xform: { type: "ranges", ranges: [
+          { id: "a", minValue: 0, maxValue: 50, minOpen: false, maxOpen: true } # >=0 and < 50
+          { id: "b", minValue: 50, minOpen: false, label: "High" } # >= 50 
+          ]}
+      }
+
+      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ["number"], aggrNeed: "optional")
+      assert not axis.xform
 
     it "defaults bin xform", ->
       axis = {
         expr: @exprNumber
       }
 
-      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ['enum'])
+      axis = @ab.cleanAxis(axis: axis, table: "t1", types: ['enum'], aggrNeed: "optional")
       assert.equal axis.xform.type, "bin"
 
     it "remove if not possible to get type", ->
@@ -251,9 +309,9 @@ describe "AxisBuilder", ->
       assert not @ab.cleanAxis(axis: axis, table: "t1", types: ['text'], aggrNeed: "none"), "Should remove text"
       assert @ab.cleanAxis(axis: axis, table: "t1", types: ['enum'], aggrNeed: "none"), "Number can be binned to enum" # Can get enum via binning
     
-      # Aggr text cannot get to count
       assert not @ab.cleanAxis(axis: { expr: @exprText }, table: "t1", types: ['number'], aggrNeed: "none"), "No aggr allowed"
-      assert not @ab.cleanAxis(axis: { expr: @exprText }, table: "t1", types: ['number'], aggrNeed: "required")
+      # Aggr text cannot get to count (actually it can with percent where)
+      # assert not @ab.cleanAxis(axis: { expr: @exprText }, table: "t1", types: ['number'], aggrNeed: "required")
 
     it "defaults colorMap"
 
@@ -291,6 +349,16 @@ describe "AxisBuilder", ->
       axis = {
         expr: @exprNumber
         xform: { type: "bin", numBins: 10, min: 2, max: 8 }
+      }
+      assert.equal @ab.getAxisType(axis), "enum"
+
+    it "xforms ranges", ->
+      axis = {
+        expr: @exprNumber
+        xform: { type: "ranges", ranges: [
+          { id: "a", minValue: 0, maxValue: 50, minOpen: false, maxOpen: true } # >=0 and < 50
+          { id: "b", minValue: 50, minOpen: false, label: "High" } # >= 50 
+          ]}
       }
       assert.equal @ab.getAxisType(axis), "enum"
 
@@ -401,6 +469,21 @@ describe "AxisBuilder", ->
         { value: 3, label: "3 - 4" }
         { value: 4, label: "> 4" }
       ])
+
+    it "gets ranges by name, overriding with label", ->
+      axis = {
+        expr: @exprNumber
+        xform: { type: "ranges", ranges: [
+          { id: "a", minValue: 0, maxValue: 50, minOpen: false, maxOpen: true } # >=0 and < 50
+          { id: "b", minValue: 50, minOpen: false, label: "High" } # >= 50 
+          ]}
+      }
+
+      categories = @ab.getCategories(axis, [])
+      compare(categories, [
+        { value: "a", label: ">= 0 and < 50" }
+        { value: "b", label: "High" }
+     ])
 
     it "gets months", ->
       axis = {

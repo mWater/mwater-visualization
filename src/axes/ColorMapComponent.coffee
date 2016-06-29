@@ -14,61 +14,7 @@ module.exports = class ColorMapComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired
     axis: React.PropTypes.object.isRequired   
     onChange: React.PropTypes.func.isRequired
-
-  constructor: ->
-    super
-    @state = {
-      categories: null
-    }
-
-  componentDidMount: ->
-    @loadCategories(@props)
-  
-  componentWillReceiveProps: (nextProps) ->
-    if not _.isEqual(nextProps.axis, @props.axis)
-      @loadCategories(nextProps)
-
-  loadCategories: (props) ->
-    axisBuilder = new AxisBuilder(schema: props.schema)
-
-    # Get categories (value + label)
-    categories = axisBuilder.getCategories(props.axis)
-    if categories.length > 0
-      @setState(categories: categories)
-      return
-
-    axis = axisBuilder.cleanAxis(axis: props.axis)
-    # Ignore if error
-    if axisBuilder.validateAxis(axis: axis)
-      return
-
-    axisCompiledExpr = axisBuilder.compileAxis(axis: axis, tableAlias: "main")
-
-    # If no categories, we need values as input
-    valuesQuery = {
-      type: "query"
-      selects: [
-        { type: "select", expr: axisCompiledExpr, alias: "val" }
-      ]
-      from: { type: "table", table: axis.expr.table, alias: "main" }
-      groupBy: [1]
-      limit: 50
-    }
-
-    props.dataSource.performQuery(valuesQuery, (error, rows) =>
-      if @unmounted
-        return
-
-      if error
-        return # Ignore
-
-      # Get categories (value + label)
-      categories = axisBuilder.getCategories(props.axis, _.pluck(rows, "val"))
-      @setState(categories: categories)
-    )
-
-  componentWillUnmount: ->
-    @unmounted = true
+    categories: React.PropTypes.array
 
   handleColorChange: (value, color) =>
     # Delete if present for value
@@ -89,17 +35,14 @@ module.exports = class ColorMapComponent extends React.Component
 
   render: ->
     H.div null,
-      H.table className: "table table-bordered  ", style: { width: "auto" },
-        H.thead null,
-          H.tr null, 
-            H.th colSpan: 2, "Colors"
+      H.table style: { width: "auto" },
         H.tbody null,
-          _.map @state.categories, (category) =>
+          _.map @props.categories, (category) =>
             H.tr null,
               H.td key: "color",
                 R ColorComponent, 
                   color: @lookupColor(category.value)
                   onChange: (color) => @handleColorChange(category.value, color)
-              H.td key: "label",
+              H.td key: "label", style: { paddingLeft: 8 },
                 category.label
 

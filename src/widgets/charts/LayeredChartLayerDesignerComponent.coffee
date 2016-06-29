@@ -100,7 +100,7 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
   renderTable: ->
     layer = @props.design.layers[@props.index]
 
-    R ui.SectionComponent, icon: "file", label: "Data Source",
+    R ui.SectionComponent, icon: "fa-database", label: "Data Source",
       React.createElement(TableSelectComponent, { schema: @props.schema, value: layer.table, onChange: @handleTableChange })
 
   renderXAxis: ->
@@ -143,6 +143,7 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
           required: @isLayerPolar(layer)
           showColorMap: true
           value: layer.axes.color
+          colorMapOptional: true
           onChange: @handleColorAxisChange)
 
   renderYAxis: ->

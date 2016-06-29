@@ -1,6 +1,7 @@
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
+lazyLoadImages = require 'lazy-load-images'
 
 AxisBuilder = require '../../axes/AxisBuilder'
 
@@ -18,12 +19,15 @@ module.exports = class ImageMosaicChartViewComponent extends React.Component
     scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
+  componentDidMount: ->
+    lazyLoadImages.init()
+
   shouldComponentUpdate: (prevProps) ->
     not _.isEqual(prevProps, @props)
 
   # Render a single image
   renderImage: (image) ->
-    H.img src: @props.dataSource.getImageUrl(image.id, 100), key: image.id, alt: image.caption, className: "img-thumbnail", style: { height: 100, minWidth: 50 }
+    H.img 'data-lazy-load-src': @props.dataSource.getImageUrl(image.id, 100), key: image.id, alt: image.caption, className: "img-thumbnail", style: { height: 100, minWidth: 50 }
 
   # Render images
   renderImages: ->

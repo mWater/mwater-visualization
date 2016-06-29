@@ -1,6 +1,7 @@
 React = require 'react'
 H = React.DOM
 R = React.createElement
+uuid = require 'node-uuid'
 ExprComponent = require("mwater-expressions-ui").ExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
 ExprCompiler = require('mwater-expressions').ExprCompiler
@@ -9,6 +10,9 @@ AxisBuilder = require './AxisBuilder'
 update = require 'update-object'
 ui = require '../UIComponents'
 ColorMapComponent = require './ColorMapComponent'
+BinsComponent = require './BinsComponent'
+RangesComponent = require './RangesComponent'
+AxisColorEditorComponent = require './AxisColorEditorComponent'
 
 # Axis component that allows designing of an axis
 module.exports = class AxisComponent extends React.Component
@@ -26,6 +30,10 @@ module.exports = class AxisComponent extends React.Component
 
     required: React.PropTypes.bool  # Makes this a required value
     showColorMap: React.PropTypes.bool # Shows the color map
+    colorMapOptional: React.PropTypes.bool # Is the color map optional
+
+  @defaultProps:
+    colorMapOptional: false
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
@@ -37,65 +45,81 @@ module.exports = class AxisComponent extends React.Component
       return
       
     # Set expression and clear xform
-    @props.onChange({ expr: expr, xform: null, aggr: null })
-
-  handleAggrChange: (aggr) =>
-    @props.onChange(update(@props.value, $merge: { aggr: aggr }))
+    @props.onChange(@cleanAxis(_.extend({}, @props.value, { expr: expr })))
 
   handleXformTypeChange: (type) =>
-    if type
-      @props.onChange(update(@props.value, $merge: { xform: { type: type } }))
-    else
+    # Remove
+    if not type
       @props.onChange(_.omit(@props.value, "xform"))
 
+    # Save bins if going from bins to custom ranges and has ranges
+    if type == "ranges" and @props.value.xform?.type == "bin" and @props.value.xform.min? and @props.value.xform.max? and @props.value.xform.min != @props.value.xform.max and @props.value.xform.numBins
+      min = @props.value.xform.min
+      max = @props.value.xform.max
+      numBins = @props.value.xform.numBins
+
+      ranges = [{ id: uuid.v4(), maxValue: min, minOpen: false, maxOpen: true }]
+      for i in [1..numBins]
+        start = (i-1) / numBins * (max - min) + min
+        end = (i) / numBins * (max - min) + min
+        ranges.push({ id: uuid.v4(), minValue: start, minOpen: false, maxValue: end, maxOpen: true })
+      ranges.push({ id: uuid.v4(), minValue: max, minOpen: true, maxOpen: true })
+
+      xform = {
+        type: "ranges"
+        ranges: ranges
+      }
+    else
+      xform = {
+        type: type
+      }
+
+    @props.onChange(update(@props.value, { xform: { $set: xform }}))
+
   handleXformChange: (xform) =>
-    @props.onChange(update(@props.value, { xform: { $set: xform } }))
+    @props.onChange(@cleanAxis(update(@props.value, { xform: { $set: xform } })))
 
-  renderAggr: ->
-    if @props.aggrNeed == "none"
-      return
-      
-    exprUtils = new ExprUtils(@props.schema)
+  cleanAxis: (axis) ->
+    axisBuilder = new AxisBuilder(schema: @props.schema)
+    return axisBuilder.cleanAxis(axis: axis, table: @props.table, aggrNeed: @props.aggrNeed, types: @props.types)
 
-    # Only render aggregate if has a expr with a type that is not count
-    if @props.value and exprUtils.getExprType(@props.value.expr) != "count"
-      exprUtils = new ExprUtils(@props.schema)
-      aggrs = exprUtils.getAggrs(@props.value.expr)
-
-      # Remove latest, as it is tricky to group by. TODO
-      aggrs = _.filter(aggrs, (aggr) -> aggr.id != "last")
-      currentAggr = _.findWhere(aggrs, id: @props.value.aggr)
-
-      return React.createElement(LinkComponent, 
-        dropdownItems: aggrs
-        onDropdownItemClicked: @handleAggrChange
-        if currentAggr then currentAggr.name
-        )
-
-  renderBins: ->
-    R BinsComponent,
-      value: @props.value.xform
-      onChange: @handleXformChange
-
-  renderXform: ->
-    if not @props.value
+  renderXform: (axis) ->
+    if not axis
       return
 
-    if @props.value.xform and @props.value.xform.type == "bin"
-      return R(BinsComponent, 
-        schema: @props.schema
-        dataSource: @props.dataSource
-        expr: @props.value.expr
-        xform: @props.value.xform
-        onChange: @handleXformChange)
+    if axis.xform and axis.xform.type in ["bin", "ranges"]
+      if axis.xform.type == "ranges"
+        comp = R(RangesComponent, 
+          schema: @props.schema
+          dataSource: @props.dataSource
+          expr: axis.expr
+          xform: axis.xform
+          onChange: @handleXformChange)
+      else
+        comp = R(BinsComponent, 
+          schema: @props.schema
+          dataSource: @props.dataSource
+          expr: axis.expr
+          xform: axis.xform
+          onChange: @handleXformChange)
+
+      return H.div null,
+        R ui.ButtonToggleComponent,
+          value: if axis.xform then axis.xform.type else null
+          options: [
+            { value: "bin", label: "Equal Bins" }
+            { value: "ranges", label: "Custom Ranges" }
+          ]
+          onChange: @handleXformTypeChange
+        comp
 
     exprUtils = new ExprUtils(@props.schema)
-    exprType = exprUtils.getExprType(@props.value.expr) 
+    exprType = exprUtils.getExprType(axis.expr) 
 
     switch exprType
       when "date"
         R ui.ButtonToggleComponent,
-          value: if @props.value.xform then @props.value.xform.type else null
+          value: if axis.xform then axis.xform.type else null
           options: [
             { value: null, label: "Exact Date" }
             { value: "year", label: "Year" }
@@ -105,7 +129,7 @@ module.exports = class AxisComponent extends React.Component
           onChange: @handleXformTypeChange
       when "datetime"
         R ui.ButtonToggleComponent,
-          value: if @props.value.xform then @props.value.xform.type else null
+          value: if axis.xform then axis.xform.type else null
           options: [
             { value: "date", label: "Date" }
             { value: "year", label: "Year" }
@@ -114,105 +138,45 @@ module.exports = class AxisComponent extends React.Component
           ]
           onChange: @handleXformTypeChange
 
-  renderColorMap: ->
-    if not @props.showColorMap or not @props.value or not @props.value.expr
+  renderColorMap: (axis) ->
+    if not @props.showColorMap or not axis or not axis.expr
       return null
 
-    return R ColorMapComponent,
+    return R AxisColorEditorComponent,
       schema: @props.schema
       dataSource: @props.dataSource
-      axis: @props.value
+      axis: axis
       onChange: @props.onChange
+      colorMapOptional: @props.colorMapOptional
 
   render: ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
 
+    # Clean before render
+    axis = @cleanAxis(@props.value)
+
+    # Determine aggrStatuses that are possible
+    switch @props.aggrNeed
+      when "none"
+        aggrStatuses = ["literal", "individual"]
+      when "optional"
+        aggrStatuses = ["literal", "individual", "aggregate"]
+      when "required"
+        aggrStatuses = ["literal", "aggregate"]
+   
     H.div null,
       H.div null, 
-        @renderAggr()
         React.createElement(ExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           table: @props.table
-          types: axisBuilder.getExprTypes(@props.types, @props.aggrNeed)
+          types: axisBuilder.getExprTypes(@props.types)
           # preventRemove: @props.required
           onChange: @handleExprChange
-          includeCount: @props.aggrNeed != "none"
-          value: if @props.value then @props.value.expr)  
-      @renderXform()
-      @renderColorMap()
-
-# Allows setting of bins (min, max and number). Computes defaults if not present
-class BinsComponent extends React.Component
-  @propTypes:
-    schema: React.PropTypes.object.isRequired 
-    dataSource: React.PropTypes.object.isRequired
-
-    expr: React.PropTypes.object.isRequired   # Expression for computing min/max
-    xform: React.PropTypes.object.isRequired
-    onChange: React.PropTypes.func.isRequired
-
-  componentDidMount: ->
-    # Check if computing is needed
-    if not @props.xform.min? or not @props.xform.max?
-      axisBuilder = new AxisBuilder(schema: @props.schema)
-
-      # Get min and max from a query
-      minMaxQuery = axisBuilder.compileBinMinMax(@props.expr, @props.expr.table, null, @props.xform.numBins)
-
-      @props.dataSource.performQuery(minMaxQuery, (error, rows) =>
-        if @unmounted
-          return
-
-        if error
-          return # Ignore
-
-        if rows[0].min?
-          min = parseFloat(rows[0].min)
-          max = parseFloat(rows[0].max)
-
-        @props.onChange(update(@props.xform, { min: { $set: min }, max: { $set: max }}))
-      )
-
-  componentWillUnmount: ->
-    @unmounted = true
-
-  render: ->
-    H.div null,
-      R NumberComponent, key: "min", label: "Min:", value: @props.xform.min, onChange: (v) => @props.onChange(update(@props.xform, { min: { $set: v }}))
-      " "
-      R NumberComponent, key: "max", label: "Max:", value: @props.xform.max, onChange: (v) => @props.onChange(update(@props.xform, { max: { $set: v }}))
-      " "
-      R NumberComponent, key: "numBins", label: "Bins:", value: @props.xform.numBins, onChange: (v) => @props.onChange(update(@props.xform, { numBins: { $set: v }}))
-
-# Label and number
-class NumberComponent extends React.Component
-  @propTypes:
-    label: React.PropTypes.node
-    value: React.PropTypes.number
-    onChange: React.PropTypes.func.isRequired
-    integer: React.PropTypes.bool
-
-  handleChange: (ev) =>
-    if @props.integer
-      number = parseInt(ev.target.value)
-    else
-      number = parseFloat(ev.target.value)
-
-    if _.isNaN(number)
-      @props.onChange(null)
-    else
-      @props.onChange(number)
-
-  render: ->
-    H.div style: { display: "inline-block" },
-      H.label className: "text-muted", @props.label
-      H.input 
-        type: "number"
-        step: (if @props.integer then "1" else "any")
-        value: @props.value
-        onChange: @handleChange
-        className: "form-control input-sm"
-        style: { width: "8em", display: "inline-block", marginLeft: 5 }
-
+          value: if @props.value then @props.value.expr
+          aggrStatuses: aggrStatuses
+          )  
+      @renderXform(axis)
+      H.br()
+      @renderColorMap(axis)
 
