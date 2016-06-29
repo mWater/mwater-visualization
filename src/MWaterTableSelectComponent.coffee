@@ -211,7 +211,7 @@ class FormsListComponent extends React.Component
       forms = @state.forms
 
     # Remove if already included
-    forms = _.filter(forms, (f) => "responses:#{f._id}" not in @props.extraTables)
+    forms = _.filter(forms, (f) => "responses:#{f.id}" not in @props.extraTables)
 
     tables = _.filter(@props.schema.getTables(), (table) => (table.id.match(/^responses:/) or table.id.match(/^master_responses:/)) and not table.deprecated)
     tables = _.sortBy(tables, (t) -> t.name.en)
@@ -234,7 +234,7 @@ class FormsListComponent extends React.Component
       H.br()
 
       H.label null, "All Forms:"
-      if not @state.forms
+      if not @state.forms or @state.forms.length == 0
         H.div className: "alert alert-info", 
           H.i className: "fa fa-spinner fa-spin"
           "\u00A0Loading..."
