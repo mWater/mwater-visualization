@@ -49,7 +49,10 @@ module.exports = class MWaterTableSelectComponent extends React.Component
   handleChange: (tableId) =>
     # Close toggle edit
     @refs.toggleEdit.close()
-    @props.onChange(tableId)
+
+    # Call onChange if different
+    if tableId != @props.table
+      @props.onChange(tableId)
 
   handleTableChange: (tableId) =>
     # If not part of formIds, add it and wait for new schema
