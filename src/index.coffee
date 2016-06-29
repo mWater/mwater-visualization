@@ -45,6 +45,7 @@ exports.DatagridUtils = require './datagrids/DatagridUtils'
 
 exports.ServerDashboardDataSource = require './widgets/ServerDashboardDataSource'
 exports.DirectDashboardDataSource = require './widgets/DirectDashboardDataSource'
+exports.DirectWidgetDataSource = require './widgets/DirectWidgetDataSource'
 
 exports.ServerMapUrlSource = require './maps/ServerMapUrlSource'
 exports.DirectMapUrlSource = require './maps/DirectMapUrlSource'
