@@ -1,10 +1,8 @@
-# TODO still needed?
 exports.CachingDataSource = require './CachingDataSource'
 exports.WidgetFactory = require './widgets/WidgetFactory'
 
 exports.UndoStack = require './UndoStack'
 
-exports.PopoverComponent = require './PopoverComponent'
 exports.DashboardComponent = require './widgets/DashboardComponent'
 
 exports.BingLayer = require './maps/BingLayer'
@@ -19,9 +17,6 @@ exports.MapComponent = require './maps/MapComponent'
 exports.VerticalLayoutComponent = require './VerticalLayoutComponent'
 exports.RadioButtonComponent = require './RadioButtonComponent'
 exports.CheckboxComponent = require './CheckboxComponent'
-
-# TODO REMOVE
-exports.DateRangeComponent = require './DateRangeComponent'
 
 exports.MWaterLoaderComponent = require './MWaterLoaderComponent'
 

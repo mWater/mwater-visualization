@@ -25,7 +25,7 @@ module.exports = class DirectDashboardDataSource
       apiUrl: @apiUrl
       client: @client
       widget: widget
-      widgetDesign: widgetDesign
+      design: widgetDesign
       schema: @schema
       dataSource: @dataSource
     })
