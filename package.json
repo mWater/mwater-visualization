@@ -42,6 +42,7 @@
     "react-dnd": "^2.1.4",
     "react-dnd-html5-backend": "^2.1.2",
     "react-dom": "^0.14.0",
+    "react-lazy-load": "^3.0.10",
     "react-library": "github:mwater/react-library",
     "react-motion": "^0.3.0",
     "react-reorderable": "^0.2.3",
