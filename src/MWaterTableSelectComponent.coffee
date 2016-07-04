@@ -49,7 +49,10 @@ module.exports = class MWaterTableSelectComponent extends React.Component
   handleChange: (tableId) =>
     # Close toggle edit
     @refs.toggleEdit.close()
-    @props.onChange(tableId)
+
+    # Call onChange if different
+    if tableId != @props.table
+      @props.onChange(tableId)
 
   handleTableChange: (tableId) =>
     # If not part of formIds, add it and wait for new schema
@@ -59,6 +62,9 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       )
     else
       @handleChange(tableId)
+
+  handleExtraTableAdd: (tableId) =>
+    @props.onExtraTablesChange(_.union(@props.extraTables, [tableId]))
 
   handleExtraTableRemove: (tableId) =>
     # Set to null if current table
@@ -84,6 +90,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       user: @props.user
       onChange: @handleTableChange
       extraTables: @props.extraTables
+      onExtraTableAdd: @handleExtraTableAdd
       onExtraTableRemove: @handleExtraTableRemove
 
   renderIndicators: ->
@@ -140,6 +147,7 @@ class FormsListComponent extends React.Component
     user: React.PropTypes.string              # User id
     onChange: React.PropTypes.func.isRequired # Called with table selected
     extraTables: React.PropTypes.array.isRequired
+    onExtraTableAdd: React.PropTypes.func.isRequired
     onExtraTableRemove: React.PropTypes.func.isRequired
 
   @contextTypes:
@@ -178,6 +186,9 @@ class FormsListComponent extends React.Component
     .fail (xhr) =>
       @setState(error: xhr.responseText)
 
+  handleTableAdd: (tableId) =>
+    @props.onExtraTableAdd(tableId)
+
   handleTableRemove: (table) =>
     if confirm("Remove #{ExprUtils.localizeString(table.name, @context.locale)}? Any widgets that depend on it will no longer work properly.")
       @props.onExtraTableRemove(table.id)
@@ -202,6 +213,9 @@ class FormsListComponent extends React.Component
     else
       forms = @state.forms
 
+    # Remove if already included
+    forms = _.filter(forms, (f) => "responses:#{f.id}" not in @props.extraTables)
+
     tables = _.filter(@props.schema.getTables(), (table) => (table.id.match(/^responses:/) or table.id.match(/^master_responses:/)) and not table.deprecated)
     tables = _.sortBy(tables, (t) -> t.name.en)
 
@@ -223,7 +237,7 @@ class FormsListComponent extends React.Component
       H.br()
 
       H.label null, "All Forms:"
-      if not @state.forms
+      if not @state.forms or @state.forms.length == 0
         H.div className: "alert alert-info", 
           H.i className: "fa fa-spinner fa-spin"
           "\u00A0Loading..."
@@ -240,6 +254,13 @@ class FormsListComponent extends React.Component
             onChange: (ev) => @setState(search: ev.target.value)
 
           R ui.OptionListComponent,
-            items: _.map(forms, (form) => { name: form.name, desc: form.desc, onClick: @props.onChange.bind(null, "responses:" + form.id) })
+            items: _.map(forms, (form) => { 
+              name: [
+                H.span(className: "glyphicon glyphicon-plus")
+                " " + form.name
+              ]
+              desc: form.desc
+              onClick: @handleTableAdd.bind(null, "responses:" + form.id) 
+            })
         ]
 
