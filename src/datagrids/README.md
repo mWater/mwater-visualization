@@ -7,6 +7,7 @@
 `filter`: mwater-expression
 `locale`: locale to display localizable strings in. optional
 `subtables`: array of subtables (1-n joins)
+`orderBys`: array of { expr: expression to order on, direction: "asc"/"desc" }
 
 ### Column
 
@@ -24,5 +25,5 @@
 
 `id`: unique id of the subtable (not the id of the table, just a unique id)
 `joins`: array of join columns to get to subtable from the table
-`filter`: TODO
-`order`: TODO
+`filter`: mwater-expression
+`orderBys`: array of { expr: expression to order on, direction: "asc"/"desc" }

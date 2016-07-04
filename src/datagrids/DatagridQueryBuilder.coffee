@@ -27,11 +27,14 @@ module.exports = class DatagridQueryBuilder
 
   # Simple query with no subtables
   createSimpleQuery: (design, options) ->
+    exprUtils = new ExprUtils(@schema)
     exprCompiler = new ExprCompiler(@schema)
+
+    isAggr = @isMainAggr(design)
 
     query = {
       type: "query"
-      selects: @createLoadSelects(design)
+      selects: @createSimpleSelects(design, isAggr)
       from: { type: "table", table: design.table, alias: "main" }
       orderBy: []
       offset: options.offset
@@ -55,16 +58,26 @@ module.exports = class DatagridQueryBuilder
     else if wheres.length > 1
       query.where = { type: "op", op: "and", exprs: wheres }
 
-    # Add sorts of main
-    for expr, i in @getMainSortExprs(design)
-      query.orderBy.push({ expr: expr })
+    # Add order of main
+    for direction, i in @getMainOrderByDirections(design, isAggr)
+      # Leave room for primary key and columns
+      query.orderBy.push({ ordinal: i + 2 + design.columns.length, direction: direction })
 
-    for direction, i in @getMainSortDirections(design)
-      query.orderBy[i].direction = direction
+    # Add group bys if any expressions are individual and overall is aggregate
+    if isAggr
+      query.groupBy = []
+
+      for column, i in design.columns
+        if exprUtils.getExprAggrStatus(column.expr) == "individual"
+          query.groupBy.push(i + 1)
+
+      for orderBy, i in design.orderBys or []
+        if exprUtils.getExprAggrStatus(orderBy.expr) == "individual"
+          query.groupBy.push(i + 1 + design.columns.length)
 
     return query
 
-  # Simple query with no subtables
+  # Query with subtables
   createComplexQuery: (design, options) ->
     # Queries to union
     unionQueries = []
@@ -81,7 +94,7 @@ module.exports = class DatagridQueryBuilder
       queries: unionQueries
     }
 
-    # Create wrapper query that sorts
+    # Create wrapper query that orders
     query = {
       type: "query"
       selects: [
@@ -98,16 +111,16 @@ module.exports = class DatagridQueryBuilder
     for column, index in design.columns
       query.selects.push({ type: "select", expr: { type: "field", tableAlias: "unioned", column: "c#{index}" }, alias: "c#{index}" })
 
-    # Add sorts of main
-    for direction, i in @getMainSortDirections(design)
+    # Add order of main
+    for direction, i in @getMainOrderByDirections(design)
       query.orderBy.push({ expr: { type: "field", tableAlias: "unioned", column: "s#{i}" }, direction: direction })
 
-    # Add subtable sort
+    # Add subtable order
     query.orderBy.push({ expr: { type: "field", tableAlias: "unioned", column: "subtable" }, direction: "asc" })
 
-    # Add sorts of subtables
+    # Add orders of subtables
     for subtable, stindex in design.subtables
-      for direction, i in @getSubtableSortDirections(design, subtable)
+      for direction, i in @getSubtableOrderByDirections(design, subtable)
         query.orderBy.push({ expr: { type: "field", tableAlias: "unioned", column: "st#{stindex}s#{i}" }, direction: direction })
 
     return query
@@ -123,13 +136,13 @@ module.exports = class DatagridQueryBuilder
       { type: "select", expr: -1, alias: "subtable" }
     ]
 
-    # Add sorts of main
-    for expr, i in @getMainSortExprs(design)
+    # Add order bys of main
+    for expr, i in @getMainOrderByExprs(design)
       selects.push({ type: "select", expr: expr, alias: "s#{i}" })
 
-    # Add sorts of subtables
+    # Add order bys of subtables
     for subtable, stindex in design.subtables
-      for type, i in @getSubtableSortExprTypes(design, subtable)
+      for type, i in @getSubtableOrderByExprTypes(design, subtable)
         selects.push({ type: "select", expr: @createNullExpr(type), alias: "st#{stindex}s#{i}" })
 
     # Add columns
@@ -172,18 +185,18 @@ module.exports = class DatagridQueryBuilder
       { type: "select", expr: subtableIndex, alias: "subtable" }
     ]
 
-    # Add sorts of main
-    for expr, i in @getMainSortExprs(design)
+    # Add order bys of main
+    for expr, i in @getMainOrderByExprs(design)
       selects.push({ type: "select", expr: expr, alias: "s#{i}" })
 
-    # Add sorts of subtables
+    # Add order bys of subtables
     for st, stindex in design.subtables
-      for expr, i in @getSubtableSortExprs(design, st)
+      for expr, i in @getSubtableOrderByExprs(design, st)
         if stindex == subtableIndex
           selects.push({ type: "select", expr: expr, alias: "st#{stindex}s#{i}" })
         else
           # Null placeholder
-          types = @getSubtableSortExprTypes(design, st)
+          types = @getSubtableOrderByExprTypes(design, st)
           selects.push({ type: "select", expr: @createNullExpr(types[i]), alias: "st#{stindex}s#{i}" })
 
     # Add columns
@@ -229,40 +242,63 @@ module.exports = class DatagridQueryBuilder
 
     return query
 
-  # Get expressions to sort main query by
-  getMainSortExprs: (design) ->
+  # Get expressions to order main query by
+  # isAggr is true if any column or ordering is aggregate. 
+  # If so, only use explicit ordering
+  getMainOrderByExprs: (design, isAggr = false) ->
+    exprCompiler = new ExprCompiler(@schema)
+
     exprs = []
   
-    # Natural order if present
-    ordering = @schema.getTable(design.table).ordering
-    if ordering
-      exprs.push({ type: "field", tableAlias: "main", column: ordering })
+    # First explicit order bys
+    for orderBy in design.orderBys or []
+      exprs.push(exprCompiler.compileExpr(expr: orderBy.expr, tableAlias: "main"))
 
-    # Always primary key
-    exprs.push({ type: "field", tableAlias: "main", column: @schema.getTable(design.table).primaryKey })
+    if not isAggr
+      # Natural order if present
+      ordering = @schema.getTable(design.table).ordering
+      if ordering
+        exprs.push({ type: "field", tableAlias: "main", column: ordering })
+
+      # Always primary key
+      exprs.push({ type: "field", tableAlias: "main", column: @schema.getTable(design.table).primaryKey })
+
     return exprs
 
-  # Get directions to sort main query by (asc/desc)
-  getMainSortDirections: (design) ->
+  # Get directions to order main query by (asc/desc)
+  # isAggr is true if any column or ordering is aggregate. 
+  # If so, only use explicit ordering
+  getMainOrderByDirections: (design, isAggr = false) ->
     directions = []
-  
-    # Natural order if present
-    ordering = @schema.getTable(design.table).ordering
-    if ordering
+
+    # First explicit order bys
+    for orderBy in design.orderBys or []
+      directions.push(orderBy.direction)
+
+    if not isAggr
+      # Natural order if present
+      ordering = @schema.getTable(design.table).ordering
+      if ordering
+        directions.push("asc")
+
+      # Always primary key
       directions.push("asc")
 
-    # Always primary key
-    directions.push("asc")
     return directions
 
-  # Get expressions to sort subtable query by
-  getSubtableSortExprs: (design, subtable) ->
+  # Get expressions to order subtable query by
+  getSubtableOrderByExprs: (design, subtable) ->
     exprUtils = new ExprUtils(@schema)
+    exprCompiler = new ExprCompiler(@schema)
 
     # Get subtable actual table
     subtableTable = exprUtils.followJoins(design.table, subtable.joins)
 
     exprs = []
+
+    # First explicit order bys
+    for orderBy in subtable.orderBys or []
+      exprs.push(exprCompiler.compileExpr(expr: orderBy.expr, tableAlias: "st"))
   
     # Natural order if present
     ordering = @schema.getTable(subtableTable).ordering
@@ -273,14 +309,18 @@ module.exports = class DatagridQueryBuilder
     exprs.push({ type: "field", tableAlias: "st", column: @schema.getTable(subtableTable).primaryKey })
     return exprs
 
-  # Get directions to sort subtable query by (asc/desc)
-  getSubtableSortDirections: (design, subtable) ->
+  # Get directions to order subtable query by (asc/desc)
+  getSubtableOrderByDirections: (design, subtable) ->
     exprUtils = new ExprUtils(@schema)
 
     # Get subtable actual table
     subtableTable = exprUtils.followJoins(design.table, subtable.joins)
 
     directions = []
+
+    # First explicit order bys
+    for orderBy in subtable.orderBys or []
+      directions.push(orderBy.direction)
   
     # Natural order if present
     ordering = @schema.getTable(subtableTable).ordering
@@ -291,14 +331,18 @@ module.exports = class DatagridQueryBuilder
     directions.push("asc")
     return directions
 
-  # Get types of expressions to sort subtable query by. Tricky since ordering is a column, not an expression
-  getSubtableSortExprTypes: (design, subtable) ->
+  # Get types of expressions to order subtable query by. Tricky since ordering is a column, not an expression
+  getSubtableOrderByExprTypes: (design, subtable) ->
     exprUtils = new ExprUtils(@schema)
 
     # Get subtable actual table
     subtableTable = exprUtils.followJoins(design.table, subtable.joins)
 
     types = []
+
+    # First explicit order bys
+    for orderBy in subtable.orderBys or []
+      types.push(exprUtils.getExprType(orderBy.expr))
   
     # Natural order if present
     ordering = @schema.getTable(subtableTable).ordering
@@ -337,13 +381,20 @@ module.exports = class DatagridQueryBuilder
     return { type: "select", expr: compiledExpr, alias: "c#{columnIndex}" }
 
   # Create selects to load given a design
-  createLoadSelects: (design) ->
-    selects = [
-      # Primary key
-      { type: "select", expr: { type: "field", tableAlias: "main", column: @schema.getTable(design.table).primaryKey }, alias: "id" }
-      { type: "select", expr: -1, alias: "subtable" }
-    ]
+  createSimpleSelects: (design, isAggr) ->
+    selects = []
+
+    # Primary key if not aggr
+    if not isAggr
+      selects.push({ type: "select", expr: { type: "field", tableAlias: "main", column: @schema.getTable(design.table).primaryKey }, alias: "id" })
+    
     selects = selects.concat(_.map(design.columns, (column, columnIndex) => @createColumnSelect(column, columnIndex)))
+
+    # Add sorting
+    for expr, i in @getMainOrderByExprs(design, isAggr)
+      selects.push({ type: "select", expr: expr, alias: "s#{i}" })
+
+    return selects
 
   # Create a null expression, but cast to correct type. See https://github.com/mWater/mwater-visualization/issues/183
   createNullExpr: (exprType) ->
@@ -359,3 +410,17 @@ module.exports = class DatagridQueryBuilder
         return { type: "op", op: "::jsonb", exprs: [null] } 
       else
         return null
+
+  # Determine if main is aggregate
+  isMainAggr: (design) ->
+    exprUtils = new ExprUtils(@schema)
+
+    for column in design.columns
+      if exprUtils.getExprAggrStatus(column.expr) == "aggregate"
+        return true
+
+    for orderBy in design.orderBys or []
+      if exprUtils.getExprAggrStatus(orderBy.expr) == "aggregate"
+        return true
+
+    return false
