@@ -55,11 +55,11 @@ module.exports = class DatagridQueryBuilder
     else if wheres.length > 1
       query.where = { type: "op", op: "and", exprs: wheres }
 
-    # Add sorts of main
-    for expr, i in @getMainSortExprs(design)
+    # Add order of main
+    for expr, i in @getMainOrderByExprs(design)
       query.orderBy.push({ expr: expr })
 
-    for direction, i in @getMainSortDirections(design)
+    for direction, i in @getMainOrderByDirections(design)
       query.orderBy[i].direction = direction
 
     return query
@@ -81,7 +81,7 @@ module.exports = class DatagridQueryBuilder
       queries: unionQueries
     }
 
-    # Create wrapper query that sorts
+    # Create wrapper query that orders
     query = {
       type: "query"
       selects: [
@@ -98,16 +98,16 @@ module.exports = class DatagridQueryBuilder
     for column, index in design.columns
       query.selects.push({ type: "select", expr: { type: "field", tableAlias: "unioned", column: "c#{index}" }, alias: "c#{index}" })
 
-    # Add sorts of main
-    for direction, i in @getMainSortDirections(design)
+    # Add order of main
+    for direction, i in @getMainOrderByDirections(design)
       query.orderBy.push({ expr: { type: "field", tableAlias: "unioned", column: "s#{i}" }, direction: direction })
 
-    # Add subtable sort
+    # Add subtable order
     query.orderBy.push({ expr: { type: "field", tableAlias: "unioned", column: "subtable" }, direction: "asc" })
 
-    # Add sorts of subtables
+    # Add orders of subtables
     for subtable, stindex in design.subtables
-      for direction, i in @getSubtableSortDirections(design, subtable)
+      for direction, i in @getSubtableOrderByDirections(design, subtable)
         query.orderBy.push({ expr: { type: "field", tableAlias: "unioned", column: "st#{stindex}s#{i}" }, direction: direction })
 
     return query
@@ -123,13 +123,13 @@ module.exports = class DatagridQueryBuilder
       { type: "select", expr: -1, alias: "subtable" }
     ]
 
-    # Add sorts of main
-    for expr, i in @getMainSortExprs(design)
+    # Add order bys of main
+    for expr, i in @getMainOrderByExprs(design)
       selects.push({ type: "select", expr: expr, alias: "s#{i}" })
 
-    # Add sorts of subtables
+    # Add order bys of subtables
     for subtable, stindex in design.subtables
-      for type, i in @getSubtableSortExprTypes(design, subtable)
+      for type, i in @getSubtableOrderByExprTypes(design, subtable)
         selects.push({ type: "select", expr: @createNullExpr(type), alias: "st#{stindex}s#{i}" })
 
     # Add columns
@@ -172,18 +172,18 @@ module.exports = class DatagridQueryBuilder
       { type: "select", expr: subtableIndex, alias: "subtable" }
     ]
 
-    # Add sorts of main
-    for expr, i in @getMainSortExprs(design)
+    # Add order bys of main
+    for expr, i in @getMainOrderByExprs(design)
       selects.push({ type: "select", expr: expr, alias: "s#{i}" })
 
-    # Add sorts of subtables
+    # Add order bys of subtables
     for st, stindex in design.subtables
-      for expr, i in @getSubtableSortExprs(design, st)
+      for expr, i in @getSubtableOrderByExprs(design, st)
         if stindex == subtableIndex
           selects.push({ type: "select", expr: expr, alias: "st#{stindex}s#{i}" })
         else
           # Null placeholder
-          types = @getSubtableSortExprTypes(design, st)
+          types = @getSubtableOrderByExprTypes(design, st)
           selects.push({ type: "select", expr: @createNullExpr(types[i]), alias: "st#{stindex}s#{i}" })
 
     # Add columns
@@ -229,10 +229,16 @@ module.exports = class DatagridQueryBuilder
 
     return query
 
-  # Get expressions to sort main query by
-  getMainSortExprs: (design) ->
+  # Get expressions to order main query by
+  getMainOrderByExprs: (design) ->
+    exprCompiler = new ExprCompiler(@schema)
+
     exprs = []
   
+    # First explicit order bys
+    for orderBy in design.orderBys or []
+      exprs.push(exprCompiler.compileExpr(expr: orderBy.expr, tableAlias: "main"))
+
     # Natural order if present
     ordering = @schema.getTable(design.table).ordering
     if ordering
@@ -242,9 +248,13 @@ module.exports = class DatagridQueryBuilder
     exprs.push({ type: "field", tableAlias: "main", column: @schema.getTable(design.table).primaryKey })
     return exprs
 
-  # Get directions to sort main query by (asc/desc)
-  getMainSortDirections: (design) ->
+  # Get directions to order main query by (asc/desc)
+  getMainOrderByDirections: (design) ->
     directions = []
+
+    # First explicit order bys
+    for orderBy in design.orderBys or []
+      directions.push(orderBy.direction)
   
     # Natural order if present
     ordering = @schema.getTable(design.table).ordering
@@ -255,14 +265,19 @@ module.exports = class DatagridQueryBuilder
     directions.push("asc")
     return directions
 
-  # Get expressions to sort subtable query by
-  getSubtableSortExprs: (design, subtable) ->
+  # Get expressions to order subtable query by
+  getSubtableOrderByExprs: (design, subtable) ->
     exprUtils = new ExprUtils(@schema)
+    exprCompiler = new ExprCompiler(@schema)
 
     # Get subtable actual table
     subtableTable = exprUtils.followJoins(design.table, subtable.joins)
 
     exprs = []
+
+    # First explicit order bys
+    for orderBy in subtable.orderBys or []
+      exprs.push(exprCompiler.compileExpr(expr: orderBy.expr, tableAlias: "st"))
   
     # Natural order if present
     ordering = @schema.getTable(subtableTable).ordering
@@ -273,14 +288,18 @@ module.exports = class DatagridQueryBuilder
     exprs.push({ type: "field", tableAlias: "st", column: @schema.getTable(subtableTable).primaryKey })
     return exprs
 
-  # Get directions to sort subtable query by (asc/desc)
-  getSubtableSortDirections: (design, subtable) ->
+  # Get directions to order subtable query by (asc/desc)
+  getSubtableOrderByDirections: (design, subtable) ->
     exprUtils = new ExprUtils(@schema)
 
     # Get subtable actual table
     subtableTable = exprUtils.followJoins(design.table, subtable.joins)
 
     directions = []
+
+    # First explicit order bys
+    for orderBy in subtable.orderBys or []
+      directions.push(orderBy.direction)
   
     # Natural order if present
     ordering = @schema.getTable(subtableTable).ordering
@@ -291,14 +310,18 @@ module.exports = class DatagridQueryBuilder
     directions.push("asc")
     return directions
 
-  # Get types of expressions to sort subtable query by. Tricky since ordering is a column, not an expression
-  getSubtableSortExprTypes: (design, subtable) ->
+  # Get types of expressions to order subtable query by. Tricky since ordering is a column, not an expression
+  getSubtableOrderByExprTypes: (design, subtable) ->
     exprUtils = new ExprUtils(@schema)
 
     # Get subtable actual table
     subtableTable = exprUtils.followJoins(design.table, subtable.joins)
 
     types = []
+
+    # First explicit order bys
+    for orderBy in subtable.orderBys or []
+      types.push(exprUtils.getExprType(orderBy.expr))
   
     # Natural order if present
     ordering = @schema.getTable(subtableTable).ordering

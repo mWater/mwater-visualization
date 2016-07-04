@@ -12,8 +12,8 @@ describe "DatagridQueryBuilder", ->
     @schema = fixtures.simpleSchema()
     @qb = new DatagridQueryBuilder(@schema)
 
-    # @exprNumber = { type: "field", table: "t1", column: "number" }
     @exprText = { type: "field", table: "t1", column: "text" }
+    @exprNumber = { type: "field", table: "t1", column: "number" }
     # @exprDate = { type: "field", table: "t1", column: "date" }
     # @exprEnum = { type: "field", table: "t1", column: "enum" }
     # @exprInvalid = { type: "field", table: "t1", column: "NONSUCH" }
@@ -94,6 +94,42 @@ describe "DatagridQueryBuilder", ->
       limit: null
       offset: null
     }
+
+  it "creates ordered query", ->
+    design = {
+      table: "t1"
+      columns: [{
+        id: "cid1"
+        type: "expr"
+        expr: @exprText
+      }]
+      orderBys: [
+        { expr: @exprNumber, direction: "desc" }
+      ]
+    }
+
+    jsonql = @qb.createQuery(design, { limit: null, offset: null })
+    compare jsonql, {
+      type: "query"
+      selects: [
+        # Includes id
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "id" }
+        # Includes -1 subtable
+        { type: "select", expr: -1, alias: "subtable" }
+        # Includes column
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
+      ]
+      from: { type: "table", table: "t1", alias: "main" }
+      orderBy: [
+        # Orders by ordering first
+        { expr: { type: "field", tableAlias: "main", column: "number" }, direction: "desc" }
+        # Orders by primary key for consistency
+        { expr: { type: "field", tableAlias: "main", column: "primary" }, direction: "asc" }
+      ]
+      limit: null
+      offset: null
+    }
+
 
   it "creates adds extra filter query", ->
     design = {
