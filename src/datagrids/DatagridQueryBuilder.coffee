@@ -27,11 +27,12 @@ module.exports = class DatagridQueryBuilder
 
   # Simple query with no subtables
   createSimpleQuery: (design, options) ->
+    exprUtils = new ExprUtils(@schema)
     exprCompiler = new ExprCompiler(@schema)
 
     query = {
       type: "query"
-      selects: @createLoadSelects(design)
+      selects: @createSelects(design)
       from: { type: "table", table: design.table, alias: "main" }
       orderBy: []
       offset: options.offset
@@ -56,15 +57,13 @@ module.exports = class DatagridQueryBuilder
       query.where = { type: "op", op: "and", exprs: wheres }
 
     # Add order of main
-    for expr, i in @getMainOrderByExprs(design)
-      query.orderBy.push({ expr: expr })
-
     for direction, i in @getMainOrderByDirections(design)
-      query.orderBy[i].direction = direction
+      # Leave room for primary key and columns
+      query.orderBy.push({ ordinal: i + 2 + design.columns.length, direction: direction })
 
     return query
 
-  # Simple query with no subtables
+  # Query with subtables
   createComplexQuery: (design, options) ->
     # Queries to union
     unionQueries = []
@@ -360,13 +359,18 @@ module.exports = class DatagridQueryBuilder
     return { type: "select", expr: compiledExpr, alias: "c#{columnIndex}" }
 
   # Create selects to load given a design
-  createLoadSelects: (design) ->
+  createSelects: (design) ->
     selects = [
       # Primary key
       { type: "select", expr: { type: "field", tableAlias: "main", column: @schema.getTable(design.table).primaryKey }, alias: "id" }
-      { type: "select", expr: -1, alias: "subtable" }
     ]
     selects = selects.concat(_.map(design.columns, (column, columnIndex) => @createColumnSelect(column, columnIndex)))
+
+    # Add sorting
+    for expr, i in @getMainOrderByExprs(design)
+      selects.push({ type: "select", expr: expr, alias: "s#{i}" })
+
+    return selects
 
   # Create a null expression, but cast to correct type. See https://github.com/mWater/mwater-visualization/issues/183
   createNullExpr: (exprType) ->
