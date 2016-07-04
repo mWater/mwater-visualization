@@ -1,8 +1,10 @@
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
+R = React.createElement
 
 AxisBuilder = require '../../axes/AxisBuilder'
+LazyLoad = require 'react-lazy-load'
 
 # creates a d3 calendar visualization
 module.exports = class ImageMosaicChartViewComponent extends React.Component
@@ -23,7 +25,8 @@ module.exports = class ImageMosaicChartViewComponent extends React.Component
 
   # Render a single image
   renderImage: (image) ->
-    H.img src: @props.dataSource.getImageUrl(image.id, 100), key: image.id, alt: image.caption, className: "img-thumbnail", style: { height: 100, minWidth: 50 }
+    R LazyLoad, key: image.id, height: 100,
+      H.img src: @props.dataSource.getImageUrl(image.id, 100), alt: image.caption, className: "img-thumbnail", style: { height: 100, minWidth: 50 }
 
   # Render images
   renderImages: ->
@@ -59,7 +62,7 @@ module.exports = class ImageMosaicChartViewComponent extends React.Component
 
     title = @props.design.titleText
 
-    H.div style: style,
+    H.div style: style, className: 'image-mosaic',
       if title
         H.p style: titleStyle, title
       H.div null,

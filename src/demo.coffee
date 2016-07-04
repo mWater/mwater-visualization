@@ -77,7 +77,7 @@ class MWaterDirectDashboardPane extends React.Component
 
     @state = {
       design: dashboardDesign
-      extraTables: []
+      extraTables: ['responses:e24f0a0ec11643cab3c21c07de2f6889']
     }
 
   handleDesignChange: (design) =>
@@ -688,6 +688,30 @@ dashboardDesign = {
             }
           ],
           "type": "donut"
+        }
+      }
+    },
+    "1219bae7-b616-4c53-8423-a6495ecf26f9": {
+      "layout": {
+        "x": 16,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "widget": {
+        "type": "ImageMosaicChart",
+        "design": {
+          "version": 1,
+          "imageAxis": {
+            "expr": {
+              "type": "field",
+              "table": "entities.community",
+              "column": "photos"
+            }
+          },
+          "filter": null,
+          "table": "entities.community",
+          "titleText": "gfhfdg hdfgh dfh"
         }
       }
     },
