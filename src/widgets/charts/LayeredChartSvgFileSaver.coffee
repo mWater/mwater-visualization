@@ -1,5 +1,4 @@
 LayeredChartCompiler = require './LayeredChartCompiler'
-saveAs = require 'filesaver.js'
 
 # Get the css rules corresponding to .c3 directly out of the document object
 getC3Css = () =>
@@ -36,7 +35,9 @@ getC3String = (c3Node) =>
 saveSvgToFile = (containerDiv, title) ->
   svgFinalStr = getC3String(containerDiv.firstChild)
   blob = new Blob([svgFinalStr], {type: "image/svg+xml"})
-  saveAs(blob, (title or "unnamed-chart") + ".svg")
+  # Require at use as causes server problems
+  filesaver = require 'filesaver.js'
+  filesaver(blob, (title or "unnamed-chart") + ".svg")
 
 # Saves svg files from layered charts
 # design: design of the chart

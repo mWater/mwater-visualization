@@ -1,6 +1,7 @@
 React = require 'react'
 ReactDOM = require 'react-dom'
 H = React.DOM
+querystring = require 'querystring'
 
 Schema = require('mwater-expressions').Schema
 DataSource = require('mwater-expressions').DataSource
@@ -19,7 +20,58 @@ AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 DirectDashboardDataSource = require './widgets/DirectDashboardDataSource'
 DirectMapUrlSource = require './maps/DirectMapUrlSource'
 
+ServerMapUrlSource = require './maps/ServerMapUrlSource'
+ServerDashboardDataSource = require './widgets/ServerDashboardDataSource'
+
+dashboardId = "366702069dba44249d14bfccaa2d333e"
+
 class MWaterDashboardPane extends React.Component
+  constructor: (props) ->
+    super
+
+    @state = {
+      design: null
+      extraTables: []
+    }
+
+  componentWillMount: ->
+    # Load dashboard
+    url = @props.apiUrl + "dashboards/#{dashboardId}?" + querystring.stringify({ client: @props.client, share: @props.share })
+    $.getJSON url, (dashboard) => 
+      @setState(design: dashboard.design, extraTables: dashboard.extra_tables)
+
+  handleDesignChange: (design) =>
+    # @setState(design: design, extraTables: )
+    console.log JSON.stringify(design, null, 2)
+    
+  render: ->
+    if not @state.design
+      return H.div null, "Loading..."
+
+    return React.createElement(MWaterLoaderComponent, {
+      apiUrl: @props.apiUrl
+      client: @props.client
+      user: @props.user
+      onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
+      extraTables: @state.extraTables
+    }, (error, config) =>
+      dashboardDataSource = new ServerDashboardDataSource({
+        apiUrl: @props.apiUrl, client: @props.client, share: share, dashboardId: dashboardId
+        })
+      # dashboardDataSource = new DirectDashboardDataSource(@props.apiUrl, @props.client, @state.design, config.schema, config.dataSource)
+
+      H.div style: { height: "100%" },
+        React.createElement(visualization.DashboardComponent, {
+          schema: config.schema
+          dataSource: config.dataSource
+          dashboardDataSource: dashboardDataSource
+          design: @state.design
+          onDesignChange: @handleDesignChange
+          titleElem: "Sample"
+        })
+    )
+
+class MWaterDirectDashboardPane extends React.Component
   constructor: (props) ->
     super
 
@@ -53,7 +105,58 @@ class MWaterDashboardPane extends React.Component
         })
     )
 
+
+mapId = "ed291fa35f994c0094aba62b57ac004c"
+share = "testshareid"
+
 class MWaterMapPane extends React.Component
+  constructor: (props) ->
+    super
+
+    @state = {
+      design: null
+      extraTables: []
+    }
+
+  componentWillMount: ->
+    # Load map
+    url = @props.apiUrl + "maps/#{mapId}?" + querystring.stringify({ client: @props.client, share: share })
+    $.getJSON url, (map) => 
+      @setState(design: map.design, extraTables: map.extra_tables)
+
+  handleDesignChange: (design) =>
+    @setState(design: design)
+    console.log JSON.stringify(design, null, 2)
+    
+  render: ->
+    if not @state.design
+      return H.div null, "Loading..."
+
+    React.createElement(MWaterLoaderComponent, {
+      apiUrl: @props.apiUrl
+      client: @props.client
+      share: share
+      user: @props.user
+      extraTables: @state.extraTables
+      onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
+    }, (error, config) =>
+      # Create map url source
+      # mapUrlSource = new DirectMapUrlSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
+      mapUrlSource = new ServerMapUrlSource({ apiUrl: @props.apiUrl, client: @props.client, share: share, mapId: mapId })
+
+      H.div style: { height: "100%" },
+        React.createElement(visualization.MapComponent, {
+          schema: config.schema
+          dataSource: config.dataSource
+          design: @state.design
+          mapUrlSource: mapUrlSource
+          onDesignChange: @handleDesignChange
+          onRowClick: (tableId, rowId) => alert("#{tableId}:#{rowId}")
+          titleElem: "Sample"
+        })
+    )
+
+class MWaterDirectMapPane extends React.Component
   constructor: (props) ->
     super
 
@@ -211,12 +314,12 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")

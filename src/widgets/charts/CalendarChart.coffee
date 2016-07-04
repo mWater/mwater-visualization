@@ -7,8 +7,6 @@ Chart = require './Chart'
 ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprCompiler = require('mwater-expressions').ExprCompiler
 AxisBuilder = require './../../axes/AxisBuilder'
-CalendarChartDesignerComponent = require './CalendarChartDesignerComponent'
-CalendarChartViewComponent = require './CalendarChartViewComponent'
 
 ###
 Design is:
@@ -75,6 +73,9 @@ module.exports = class CalendarChart extends Chart
   #   design: design 
   #   onDesignChange: function
   createDesignerElement: (options) ->
+    # Require here to prevent server require problems
+    CalendarChartDesignerComponent = require './CalendarChartDesignerComponent'
+
     props = {
       schema: options.schema
       design: @cleanDesign(options.design, options.schema)
@@ -153,6 +154,9 @@ module.exports = class CalendarChart extends Chart
   #   scope: current scope of the view element
   #   onScopeChange: called when scope changes with new scope
   createViewElement: (options) ->
+    # Require here to prevent server require problems
+    CalendarChartViewComponent = require './CalendarChartViewComponent'
+    
     # Create chart
     props = {
       schema: options.schema

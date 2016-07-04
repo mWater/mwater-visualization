@@ -5,7 +5,6 @@ H = React.DOM
 Layer = require './Layer'
 ExprCompiler = require('mwater-expressions').ExprCompiler
 injectTableAlias = require('mwater-expressions').injectTableAlias
-BufferLayerDesignerComponent = require './BufferLayerDesignerComponent'
 ExprCleaner = require('mwater-expressions').ExprCleaner
 AxisBuilder = require '../axes/AxisBuilder'
 
@@ -231,6 +230,9 @@ module.exports = class BufferLayer extends Layer
   #   dataSource: data source to use
   #   onDesignChange: function called when design changes
   createDesignerElement: (options) ->
+    # Require here to prevent server require problems
+    BufferLayerDesignerComponent = require './BufferLayerDesignerComponent'
+
     # Clean on way in and out
     React.createElement(BufferLayerDesignerComponent,
       schema: options.schema

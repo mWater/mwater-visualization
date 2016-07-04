@@ -1,10 +1,10 @@
+_ = require 'lodash'
 React = require 'react'
 H = React.DOM
 
 Layer = require './Layer'
 ExprCompiler = require('mwater-expressions').ExprCompiler
 injectTableAlias = require('mwater-expressions').injectTableAlias
-MarkersLayerDesignerComponent = require './MarkersLayerDesignerComponent'
 ExprCleaner = require('mwater-expressions').ExprCleaner
 AxisBuilder = require '../axes/AxisBuilder'
 
@@ -212,6 +212,9 @@ module.exports = class MarkersLayer extends Layer
   #   dataSource: data source to use
   #   onDesignChange: function called when design changes
   createDesignerElement: (options) ->
+    # Require here to prevent server require problems
+    MarkersLayerDesignerComponent = require './MarkersLayerDesignerComponent'
+
     # Clean on way in and out
     React.createElement(MarkersLayerDesignerComponent,
       schema: options.schema

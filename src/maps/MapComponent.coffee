@@ -14,17 +14,19 @@ module.exports = class MapComponent extends React.Component
 
     # Url source for the map
     mapUrlSource: React.PropTypes.shape({
-        # Get the url for the image tiles with the specified filters applied
-        # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-        getTileUrl: React.PropTypes.func.isRequired
+      # Get the url for the image tiles with the specified filters applied
+      # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
+      getTileUrl: React.PropTypes.func.isRequired
 
-        # Get the url for the interactivity tiles with the specified filters applied
-        # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-        getUtfGridUrl: React.PropTypes.func.isRequired
-      }).isRequired
+      # Get the url for the interactivity tiles with the specified filters applied
+      # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
+      getUtfGridUrl: React.PropTypes.func.isRequired
+    }).isRequired
 
     design: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func  # Null/undefined for readonly
+
+    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
 
     titleElem: React.PropTypes.node                     # Extra element to include in title at left
     extraTitleButtonsElem: React.PropTypes.node              # Extra elements to add to right
@@ -66,23 +68,38 @@ module.exports = class MapComponent extends React.Component
         @renderActionLinks()
       @props.titleElem
 
+  renderView: ->
+    React.createElement(AutoSizeComponent, injectWidth: true, injectHeight: true, 
+      React.createElement(MapViewComponent, 
+        mapUrlSource: @props.mapUrlSource
+        schema: @props.schema, 
+        dataSource: @props.dataSource
+        design: @props.design
+        onDesignChange: @props.onDesignChange
+        onRowClick: @props.onRowClick
+      )
+    )
+
+  renderDesigner: ->
+    React.createElement(MapDesignerComponent, 
+      schema: @props.schema
+      dataSource: @props.dataSource
+      design: @props.design, 
+      onDesignChange: @props.onDesignChange
+    )
+
   render: ->
-    H.div style: { width: "100%", height: "100%", position: "relative" },
-      H.div style: { position: "absolute", width: "70%", height: "100%", paddingTop: 40 }, 
-        @renderHeader()
-        H.div style: { width: "100%", height: "100%" }, 
-          React.createElement(AutoSizeComponent, injectWidth: true, injectHeight: true, 
-            React.createElement(MapViewComponent, 
-              mapUrlSource: @props.mapUrlSource
-              schema: @props.schema, 
-              design: @props.design
-              onDesignChange: @props.onDesignChange
-            )
-          )
-      H.div style: { position: "absolute", left: "70%", width: "30%", height: "100%", borderLeft: "solid 3px #AAA", overflowY: "auto" }, 
-        React.createElement(MapDesignerComponent, 
-          schema: @props.schema
-          dataSource: @props.dataSource
-          design: @props.design, 
-          onDesignChange: @props.onDesignChange
-        )
+    if @props.onDesignChange
+      return H.div style: { width: "100%", height: "100%", position: "relative" },
+        H.div style: { position: "absolute", width: "70%", height: "100%", paddingTop: 40 }, 
+          @renderHeader()
+          H.div style: { width: "100%", height: "100%" }, 
+            @renderView()
+        H.div style: { position: "absolute", left: "70%", width: "30%", height: "100%", borderLeft: "solid 3px #AAA", overflowY: "auto" }, 
+          @renderDesigner()
+    else
+      return H.div style: { width: "100%", height: "100%", position: "relative" },
+        H.div style: { position: "absolute", width: "100%", height: "100%", paddingTop: 40 }, 
+          @renderHeader()
+          H.div style: { width: "100%", height: "100%" }, 
+            @renderView()

@@ -7,7 +7,6 @@ Chart = require './Chart'
 LayeredChartCompiler = require './LayeredChartCompiler'
 ExprCleaner = require('mwater-expressions').ExprCleaner
 AxisBuilder = require './../../axes/AxisBuilder'
-LayeredChartDesignerComponent = require './LayeredChartDesignerComponent'
 LayeredChartViewComponent = require './LayeredChartViewComponent'
 LayeredChartSvgFileSaver = require './LayeredChartSvgFileSaver'
 LayeredChartUtils = require './LayeredChartUtils'
@@ -112,6 +111,9 @@ module.exports = class LayeredChart extends Chart
   #   design: design 
   #   onDesignChange: function
   createDesignerElement: (options) ->
+    # Require here to prevent server require problems
+    LayeredChartDesignerComponent = require './LayeredChartDesignerComponent'
+
     props = {
       schema: options.schema
       dataSource: options.dataSource

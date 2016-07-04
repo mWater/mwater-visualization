@@ -1,10 +1,8 @@
-# TODO still needed?
 exports.CachingDataSource = require './CachingDataSource'
 exports.WidgetFactory = require './widgets/WidgetFactory'
 
 exports.UndoStack = require './UndoStack'
 
-exports.PopoverComponent = require './PopoverComponent'
 exports.DashboardComponent = require './widgets/DashboardComponent'
 
 exports.BingLayer = require './maps/BingLayer'
@@ -19,9 +17,6 @@ exports.MapComponent = require './maps/MapComponent'
 exports.VerticalLayoutComponent = require './VerticalLayoutComponent'
 exports.RadioButtonComponent = require './RadioButtonComponent'
 exports.CheckboxComponent = require './CheckboxComponent'
-
-# TODO REMOVE
-exports.DateRangeComponent = require './DateRangeComponent'
 
 exports.MWaterLoaderComponent = require './MWaterLoaderComponent'
 
@@ -42,6 +37,13 @@ exports.AxisBuilder = require './axes/AxisBuilder'
 exports.DatagridComponent = require './datagrids/DatagridComponent'
 exports.DatagridDesignerComponent = require './datagrids/DatagridDesignerComponent'
 exports.DatagridUtils = require './datagrids/DatagridUtils'
+
+exports.ServerDashboardDataSource = require './widgets/ServerDashboardDataSource'
+exports.DirectDashboardDataSource = require './widgets/DirectDashboardDataSource'
+exports.DirectWidgetDataSource = require './widgets/DirectWidgetDataSource'
+
+exports.ServerMapUrlSource = require './maps/ServerMapUrlSource'
+exports.DirectMapUrlSource = require './maps/DirectMapUrlSource'
 
 # Polyfill pathseg https://github.com/masayuki0812/c3/issues/1529
 require './pathseg-polyfill.js'
