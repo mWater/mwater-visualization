@@ -173,3 +173,8 @@
 .axis-palette:hover{
   border-color: #1f77b4;
 }
+
+.image-mosaic .LazyLoad{
+  display: inline-block;
+  min-width: 50px;
+}

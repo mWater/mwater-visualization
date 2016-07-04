@@ -147,6 +147,7 @@ describe "DatagridQueryBuilder", ->
       ]
       from: { type: "table", table: "t1", alias: "main" }
       orderBy: []
+      groupBy: []
       limit: null
       offset: null
     }
@@ -206,7 +207,7 @@ describe "DatagridQueryBuilder", ->
         # Includes columns
         { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "c0" }
         # Includes order
-        { type: "select", expr: { type: "field", tableAlias: "main", column: "textr" }, alias: "s0" }
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "s0" }
       ]
       from: { type: "table", table: "t1", alias: "main" }
       orderBy: [{ ordinal: 3, direction: "desc" }]
