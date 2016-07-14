@@ -268,7 +268,7 @@ module.exports = class AdminChoroplethLayer extends Layer
     design = _.cloneDeep(design)
 
     # Default color
-    design.color = sublayer.color or "#000000"
+    design.color = design.color or "#000000"
 
     design.adminRegionExpr = exprCleaner.cleanExpr(design.adminRegionExpr, { table: design.table, types: ["id"], idTable: "admin_regions" })
 
