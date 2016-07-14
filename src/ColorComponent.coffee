@@ -20,6 +20,10 @@ module.exports = class ColorComponent extends React.Component
     @setState(open: false)
     @props.onChange(color.hex)
 
+  handleReset: =>
+    @setState(open: false)
+    @props.onChange(null)
+
   render: ->
     style = {
       height: 20
@@ -50,8 +54,8 @@ module.exports = class ColorComponent extends React.Component
       H.div(style: style, onClick: @handleClick)
       if @state.open
         H.div style: popupPosition,
-          H.button type: "button", className: "btn btn-link btn-sm", onClick: (=> @props.onChange(null)),
-            H.span className: "glyphicon glyphicon-remove"
+          H.button type: "button", className: "btn btn-link btn-sm", onClick: @handleReset,
+            H.i className: "fa fa-undo"
             " Reset Color"
           React.createElement(SketchPicker, type: "sketch", color: @props.color or undefined, onChangeComplete: @handleClose)
 
