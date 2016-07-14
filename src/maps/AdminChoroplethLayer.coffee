@@ -7,7 +7,6 @@ ExprUtils = require('mwater-expressions').ExprUtils
 injectTableAlias = require('mwater-expressions').injectTableAlias
 ExprCleaner = require('mwater-expressions').ExprCleaner
 AxisBuilder = require '../axes/AxisBuilder'
-AdminChoroplethLayerDesigner = require './AdminChoroplethLayerDesigner'
 
 ###
 Layer that is composed of administrative regions colored
@@ -269,7 +268,7 @@ module.exports = class AdminChoroplethLayer extends Layer
     design = _.cloneDeep(design)
 
     # Default color
-    design.color = sublayer.color or "#000000"
+    design.color = design.color or "#FFFFFF"
 
     design.adminRegionExpr = exprCleaner.cleanExpr(design.adminRegionExpr, { table: design.table, types: ["id"], idTable: "admin_regions" })
 
@@ -315,6 +314,9 @@ module.exports = class AdminChoroplethLayer extends Layer
   #   dataSource: data source to use
   #   onDesignChange: function called when design changes
   createDesignerElement: (options) ->
+    # Require here to prevent server require problems
+    AdminChoroplethLayerDesigner = require './AdminChoroplethLayerDesigner'
+
     # Clean on way in and out
     React.createElement(AdminChoroplethLayerDesigner,
       schema: options.schema

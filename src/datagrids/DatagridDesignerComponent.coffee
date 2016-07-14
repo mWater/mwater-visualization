@@ -8,12 +8,13 @@ TableSelectComponent = require('mwater-visualization').TableSelectComponent
 TabbedComponent = require 'react-library/lib/TabbedComponent'
 ExprComponent = require('mwater-expressions-ui').ExprComponent
 FilterExprComponent = require('mwater-expressions-ui').FilterExprComponent
+OrderBysDesignerComponent = require './OrderBysDesignerComponent'
 ReactReorderable = require 'react-reorderable'
 
 uuid = require 'node-uuid'
 update = require 'update-object'
 
-
+# Designer for the datagrid. Currenly allows only single-table designs (no subtable rows)
 module.exports = class DatagridDesignerComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired     # schema to use
@@ -22,10 +23,6 @@ module.exports = class DatagridDesignerComponent extends React.Component
     onDesignChange: React.PropTypes.func.isRequired # Called when design changes
 
   handleTableChange: (table) =>
-    # No longer add default columns
-    # # Create default columns
-    # columns = new DefaultColumnsBuilder(@props.schema).buildColumns(table)
-
     design = {
       table: table
       columns: []
@@ -38,6 +35,9 @@ module.exports = class DatagridDesignerComponent extends React.Component
 
   handleFilterChange: (filter) => 
     @props.onDesignChange(update(@props.design, filter: { $set: filter }))
+
+  handleOrderBysChange: (orderBys) => 
+    @props.onDesignChange(update(@props.design, orderBys: { $set: orderBys }))
 
   # Render the tabs of the designer
   renderTabs: ->
@@ -64,6 +64,17 @@ module.exports = class DatagridDesignerComponent extends React.Component
             table: @props.design.table
             value: @props.design.filter
             onChange: @handleFilterChange
+          }) 
+        }
+        { 
+          id: "order"
+          label: "Sorting"
+          elem: R(OrderBysDesignerComponent, {
+            schema: @props.schema
+            dataSource: @props.dataSource
+            table: @props.design.table
+            orderBys: @props.design.orderBys
+            onChange: @handleOrderBysChange
           }) 
         }
       ]
@@ -299,3 +310,4 @@ class DefaultColumnsBuilder
       })
 
     return columns
+

@@ -12,8 +12,8 @@ describe "DatagridQueryBuilder", ->
     @schema = fixtures.simpleSchema()
     @qb = new DatagridQueryBuilder(@schema)
 
-    # @exprNumber = { type: "field", table: "t1", column: "number" }
     @exprText = { type: "field", table: "t1", column: "text" }
+    @exprNumber = { type: "field", table: "t1", column: "number" }
     # @exprDate = { type: "field", table: "t1", column: "date" }
     # @exprEnum = { type: "field", table: "t1", column: "enum" }
     # @exprInvalid = { type: "field", table: "t1", column: "NONSUCH" }
@@ -35,15 +35,14 @@ describe "DatagridQueryBuilder", ->
       selects: [
         # Includes id
         { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "id" }
-        # Includes -1 subtable
-        { type: "select", expr: -1, alias: "subtable" }
         # Includes column
         { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
+        # Orders by primary key for consistency
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "s0" }
       ]
       from: { type: "table", table: "t1", alias: "main" }
       orderBy: [
-        # Orders by primary key for consistency
-        { expr: { type: "field", tableAlias: "main", column: "primary" }, direction: "asc" }
+        { ordinal: 3, direction: "asc" }
       ]
       limit: null
       offset: null
@@ -73,10 +72,10 @@ describe "DatagridQueryBuilder", ->
       selects: [
         # Includes id
         { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "id" }
-        # Includes -1 subtable
-        { type: "select", expr: -1, alias: "subtable" }
         # Includes column
         { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
+        # Orders by primary key for consistency
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "s0" }
       ]
       from: { type: "table", table: "t1", alias: "main" }
       where: {
@@ -88,12 +87,135 @@ describe "DatagridQueryBuilder", ->
         ]
       }
       orderBy: [
-        # Orders by primary key for consistency
-        { expr: { type: "field", tableAlias: "main", column: "primary" }, direction: "asc" }
+        { ordinal: 3, direction: "asc" }
       ]
       limit: null
       offset: null
     }
+
+  it "creates ordered query", ->
+    design = {
+      table: "t1"
+      columns: [{
+        id: "cid1"
+        type: "expr"
+        expr: @exprText
+      }]
+      orderBys: [
+        { expr: @exprNumber, direction: "desc" }
+      ]
+    }
+
+    jsonql = @qb.createQuery(design, { limit: null, offset: null })
+    compare jsonql, {
+      type: "query"
+      selects: [
+        # Includes id
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "id" }
+        # Includes column
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
+        # Include order by as column
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "number" }, alias: "s0" }
+        # Orders by primary key for consistency
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "s1" }
+      ]
+      from: { type: "table", table: "t1", alias: "main" }
+      orderBy: [
+        { ordinal: 3, direction: "desc" }
+        { ordinal: 4, direction: "asc" }
+      ]
+      limit: null
+      offset: null
+    }
+
+  it "allows aggregate select", ->
+    design = {
+      table: "t1"
+      columns: [{
+        id: "cid1"
+        type: "expr"
+        expr: { type: "op", op: "sum", exprs: [@exprNumber] }
+      }]
+    }
+
+    jsonql = @qb.createQuery(design, { limit: null, offset: null })
+    compare jsonql, {
+      type: "query"
+      selects: [
+        # Includes column
+        { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "c0" }
+      ]
+      from: { type: "table", table: "t1", alias: "main" }
+      orderBy: []
+      groupBy: []
+      limit: null
+      offset: null
+    }
+
+  it "allows aggregate select with group by", ->
+    design = {
+      table: "t1"
+      columns: [
+        {
+          id: "cid1"
+          type: "expr"
+          expr: { type: "op", op: "sum", exprs: [@exprNumber] }
+        }
+        {
+          id: "cid2"
+          type: "expr"
+          expr: @exprText
+        }
+      ]
+    }
+
+    jsonql = @qb.createQuery(design, { limit: null, offset: null })
+    compare jsonql, {
+      type: "query"
+      selects: [
+        # Includes columns
+        { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "c0" }
+        # Includes columns
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c1" }
+      ]
+      from: { type: "table", table: "t1", alias: "main" }
+      orderBy: []
+      groupBy: [2]
+      limit: null
+      offset: null
+    }
+
+  it "allows aggregate select with order by grouped", ->
+    design = {
+      table: "t1"
+      columns: [
+        {
+          id: "cid1"
+          type: "expr"
+          expr: { type: "op", op: "sum", exprs: [@exprNumber] }
+        }
+      ]
+      orderBys: [
+        { expr: @exprText, direction: "desc" }
+      ]
+    }
+
+    jsonql = @qb.createQuery(design, { limit: null, offset: null })
+    compare jsonql, {
+      type: "query"
+      selects: [
+        # Includes columns
+        { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "c0" }
+        # Includes order
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "s0" }
+      ]
+      from: { type: "table", table: "t1", alias: "main" }
+      orderBy: [{ ordinal: 3, direction: "desc" }]
+      groupBy: [2]
+      limit: null
+      offset: null
+    }
+
 
   it "creates adds extra filter query", ->
     design = {
@@ -118,16 +240,15 @@ describe "DatagridQueryBuilder", ->
       selects: [
         # Includes id
         { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "id" }
-        # Includes -1 subtable
-        { type: "select", expr: -1, alias: "subtable" }
         # Includes column
         { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
+        # Orders by primary key for consistency
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "s0" }
       ]
       from: { type: "table", table: "t1", alias: "main" }
       where: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "main", column: "text" }, "hello" ]}
       orderBy: [
-        # Orders by primary key for consistency
-        { expr: { type: "field", tableAlias: "main", column: "primary" }, direction: "asc" }
+        { ordinal: 3, direction: "asc" }
       ]
       limit: null
       offset: null

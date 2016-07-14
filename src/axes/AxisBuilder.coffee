@@ -46,7 +46,7 @@ module.exports = class AxisBuilder
 
     # Move aggr inside since aggr is deprecated at axis level
     if axis.aggr and axis.expr
-      axis.expr = { type: "op", op: axis.aggr, table: axis.expr.table, exprs: [axis.expr] }
+      axis.expr = { type: "op", op: axis.aggr, table: axis.expr.table, exprs: (if axis.aggr != "count" then [axis.expr] else []) }
       delete axis.aggr
 
     # Determine aggrStatuses that are possible
@@ -147,7 +147,7 @@ module.exports = class AxisBuilder
     # Legacy support of aggr
     expr = options.axis.expr
     if options.axis.aggr
-      expr = { type: "op", op: options.axis.aggr, exprs: [expr] }
+      expr = { type: "op", op: options.axis.aggr, table: expr.table, exprs: (if options.axis.aggr != "count" then [expr] else []) }
 
     exprCompiler = new ExprCompiler(@schema)
     compiledExpr = exprCompiler.compileExpr(expr: expr, tableAlias: options.tableAlias)

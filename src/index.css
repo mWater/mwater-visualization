@@ -1,6 +1,5 @@
 @import "react-select";
 @import "leaflet/dist/leaflet.css";
-@import "react-bootstrap-daterangepicker/css/daterangepicker.css";
 @import "mwater-expressions-ui";
 @import "fixed-data-table/dist/fixed-data-table.min.css";
 @import "rc-slider/assets/index.css";

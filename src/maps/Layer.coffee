@@ -48,7 +48,7 @@ module.exports = class Layer
 
   # True if layer is incomplete (e.g. brand new) and should be editable immediately
   isIncomplete: (design, schema) ->
-    return @validateDesign(design, schema)?
+    return @validateDesign(@cleanDesign(design, schema), schema)?
 
   # Creates a design element with specified options
   # options:
