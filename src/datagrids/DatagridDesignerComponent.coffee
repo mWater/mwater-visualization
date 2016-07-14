@@ -272,6 +272,7 @@ class ColumnDesignerComponent extends React.Component
           dataSource: @props.dataSource
           table: @props.table
           value: @props.column.expr
+          aggrStatuses: ['literal', 'individual', 'aggregate']
           onChange: @handleExprChange
         @renderSplit()
 

@@ -42,7 +42,7 @@ module.exports = class MWaterServerLayer extends Layer
   #   React element to put into a popup
   onGridClick: (ev, options) ->
     if ev.data and ev.data.id
-      return [@design.table, ev.data.id]
+      return [options.design.table, ev.data.id]
 
   # Get min and max zoom levels
   getMinZoom: (design) -> return design.minZoom

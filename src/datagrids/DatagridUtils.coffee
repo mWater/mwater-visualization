@@ -19,7 +19,7 @@ module.exports = class DatagridUtils
     design = _.cloneDeep(design)
     for column in design.columns
       if column.type == "expr"
-        column.expr = exprCleaner.cleanExpr(column.expr, { table: design.table })
+        column.expr = exprCleaner.cleanExpr(column.expr, { table: design.table, aggrStatuses: ["individual", "literal", "aggregate"] })
 
     return design
   

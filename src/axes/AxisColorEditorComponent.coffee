@@ -45,10 +45,10 @@ module.exports = class AxisColorEditorComponent extends React.Component
       @setState(categories: categories)
       return
 
-    # TODO reenable. Check for axis
+    # Check for axis
     axis = axisBuilder.cleanAxis(axis: props.axis)
     # Ignore if error
-    if axisBuilder.validateAxis(axis: axis)
+    if not axis or axisBuilder.validateAxis(axis: axis)
      return
 
     axisCompiledExpr = axisBuilder.compileAxis(axis: axis, tableAlias: "main")
