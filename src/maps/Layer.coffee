@@ -66,3 +66,10 @@ module.exports = class Layer
   # Validates design. Null if ok, message otherwise
   validateDesign: (design, schema) ->
     return null
+
+  # arguments:
+  #   design: design of layer
+  #   schema: schema to use
+  #   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
+  getKMLExportJsonQL: (design, schema, filters) ->
+    throw new Error("Not implemented")

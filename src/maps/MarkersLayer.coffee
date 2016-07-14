@@ -255,3 +255,83 @@ module.exports = class MarkersLayer extends Layer
       if error then return error
 
     return null
+
+  getKMLExportJsonQL: (design, schema, filters) ->
+    axisBuilder = new AxisBuilder(schema: schema)
+    exprCompiler = new ExprCompiler(schema)
+
+    # Compile geometry axis
+    geometryExpr = axisBuilder.compileAxis(axis: sublayer.axes.geometry, tableAlias: "innerquery")
+
+    # Convert to Web mercator (3857)
+    geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
+
+    # row_number() over (partition by st_snaptogrid(location, !pixel_width!*5, !pixel_height!*5)) AS r
+    cluster = {
+      type: "select"
+      expr: { type: "op", op: "row_number", exprs: [] }
+      over: { partitionBy: [geometryExpr]}
+      alias: "r"
+    }
+
+    # Select _id, location and clustered row number
+    innerquery = {
+      type: "query"
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(sublayer.table).primaryKey }, alias: "id" } # main primary key as id
+        { type: "select", expr: geometryExpr, alias: "the_geom_webmercator" } # geometry as the_geom_webmercator
+        cluster
+      ]
+      from: exprCompiler.compileTable(sublayer.table, "innerquery")
+    }
+
+    # Add color select if color axis
+    if sublayer.axes.color
+      colorExpr = axisBuilder.compileAxis(axis: sublayer.axes.color, tableAlias: "innerquery")
+      innerquery.selects.push({ type: "select", expr: colorExpr, alias: "color" })
+
+    # Create filters. First limit to bounding box
+    whereClauses = [
+      {
+        type: "op"
+        op: "&&"
+        exprs: [
+          geometryExpr
+        ]
+      }
+    ]
+
+    # Then add filters baked into layer
+    if sublayer.filter
+      whereClauses.push(exprCompiler.compileExpr(expr: sublayer.filter, tableAlias: "innerquery"))
+
+    # Then add extra filters passed in, if relevant
+    # Get relevant filters
+    relevantFilters = _.where(filters, table: sublayer.table)
+    for filter in relevantFilters
+      whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
+
+    whereClauses = _.compact(whereClauses)
+
+    # Wrap if multiple
+    if whereClauses.length > 1
+      innerquery.where = { type: "op", op: "and", exprs: whereClauses }
+    else
+      innerquery.where = whereClauses[0]
+
+    # Create outer query which takes where r <= 3 to limit # of points in a cluster
+    outerquery = {
+      type: "query"
+      selects: [
+        { type: "select", expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "innerquery", column: "id" }]}, alias: "id" } # innerquery._id::text as id
+        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }, alias: "the_geom_webmercator" } # innerquery.the_geom_webmercator as the_geom_webmercator
+      ]
+      from: { type: "subquery", query: innerquery, alias: "innerquery" }
+      where: { type: "op", op: "<=", exprs: [{ type: "field", tableAlias: "innerquery", column: "r" }, 3]}
+    }
+
+    # Add color select if color axis
+    if sublayer.axes.color
+      outerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "innerquery", column: "color" }, alias: "color" }) # innerquery.color as color
+
+    return outerquery
