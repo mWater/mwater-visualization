@@ -17,6 +17,9 @@ gulp.task 'coffee', ->
     .pipe(coffee({ bare: true }))
     .pipe(gulp.dest('./lib/'))
 
+gulp.task 'coffee:watch', ->
+  gulp.watch('./src/**/*.coffee', gulp.series('coffee'))
+
 # Copy non-coffeescript files
 gulp.task 'copy', ->
   gulp.src(['./src/**/*.js', './src/**/*.css', './src/**/*.txt'])

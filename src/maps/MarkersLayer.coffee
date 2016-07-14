@@ -259,7 +259,7 @@ module.exports = class MarkersLayer extends Layer
 
     return null
 
-  getKMLExportJsonQL: (design, schema, filters) ->
+  createKMLExportJsonQL: (sublayer, schema, filters) ->
     axisBuilder = new AxisBuilder(schema: schema)
     exprCompiler = new ExprCompiler(schema)
 
@@ -267,7 +267,7 @@ module.exports = class MarkersLayer extends Layer
     geometryExpr = axisBuilder.compileAxis(axis: sublayer.axes.geometry, tableAlias: "innerquery")
 
     # Convert to Web mercator (3857)
-    geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
+    geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326] }
 
     # row_number() over (partition by st_snaptogrid(location, !pixel_width!*5, !pixel_height!*5)) AS r
     cluster = {
@@ -294,15 +294,7 @@ module.exports = class MarkersLayer extends Layer
       innerquery.selects.push({ type: "select", expr: colorExpr, alias: "color" })
 
     # Create filters. First limit to bounding box
-    whereClauses = [
-      {
-        type: "op"
-        op: "&&"
-        exprs: [
-          geometryExpr
-        ]
-      }
-    ]
+    whereClauses = []
 
     # Then add filters baked into layer
     if sublayer.filter
@@ -327,7 +319,8 @@ module.exports = class MarkersLayer extends Layer
       type: "query"
       selects: [
         { type: "select", expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "innerquery", column: "id" }]}, alias: "id" } # innerquery._id::text as id
-        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }, alias: "the_geom_webmercator" } # innerquery.the_geom_webmercator as the_geom_webmercator
+        { type: "select", expr: { type: "op", op: "ST_X", exprs: [{ type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }]}, alias: "longitude" } # innerquery.the_geom_webmercator as the_geom_webmercator
+        { type: "select", expr: { type: "op", op: "ST_Y", exprs: [{ type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }]}, alias: "latitude" } # innerquery.the_geom_webmercator as the_geom_webmercator
       ]
       from: { type: "subquery", query: innerquery, alias: "innerquery" }
       where: { type: "op", op: "<=", exprs: [{ type: "field", tableAlias: "innerquery", column: "r" }, 3]}
@@ -338,3 +331,14 @@ module.exports = class MarkersLayer extends Layer
       outerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "innerquery", column: "color" }, alias: "color" }) # innerquery.color as color
 
     return outerquery
+
+  getKMLExportJsonQL: (design, schema, filters) ->
+    layerDef = {
+      layers: _.map(design.sublayers, (sublayer, i) =>
+        {
+          id: "layer#{i}"
+          jsonql: @createKMLExportJsonQL(sublayer, schema, filters)
+        })
+    }
+
+    return layerDef
