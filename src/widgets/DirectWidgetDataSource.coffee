@@ -8,6 +8,7 @@ module.exports = class DirectWidgetDataSource
     @design = options.design
     @schema = options.schema
     @dataSource = options.dataSource
+    @client = options.client
 
   # Get the data that the widget needs. The widget should implement getData method (see above) to get the actual data on the server
   #  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
