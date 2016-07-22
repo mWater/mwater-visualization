@@ -37,6 +37,9 @@ module.exports = class MapDesignerComponent extends React.Component
         H.label className: "text-muted", 
           "Filters"
 
+        H.p className: "help-block",
+          "Optionally filter all data on the map"
+
         R MapFiltersDesignerComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
