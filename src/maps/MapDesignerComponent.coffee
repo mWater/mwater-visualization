@@ -1,5 +1,6 @@
 React = require 'react'
 H = React.DOM
+R = React.createElement
 TabbedComponent = require('react-library/lib/TabbedComponent')
 MapLayersDesignerComponent = require './MapLayersDesignerComponent'
 MapFiltersDesignerComponent = require './MapFiltersDesignerComponent'
@@ -12,42 +13,38 @@ module.exports = class MapDesignerComponent extends React.Component
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
 
   render: ->
-    tabs = [
-      { 
-        id: "layers"
-        label: [H.span(className: "glyphicon glyphicon-align-justify"), " Layers"]
-        elem: React.createElement(MapLayersDesignerComponent, 
+    H.div style: { padding: 5 },
+      H.div className: "form-group",
+        H.label className: "text-muted", 
+          "Map Style"
+  
+        R BaseLayerDesignerComponent,
+          schema: @props.schema
+          design: @props.design
+          onDesignChange: @props.onDesignChange
+
+      H.div className: "form-group",
+        H.label className: "text-muted", 
+          "Layers"
+
+        R MapLayersDesignerComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           design: @props.design
-          onDesignChange: @props.onDesignChange) 
-      }
-      { 
-        id: "filters"
-        label: [H.span(className: "glyphicon glyphicon-filter"), " Filters"]
-        elem: React.createElement(MapFiltersDesignerComponent, 
+          onDesignChange: @props.onDesignChange
+
+      H.div className: "form-group",
+        H.label className: "text-muted", 
+          "Filters"
+
+        R MapFiltersDesignerComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           design: @props.design
-          onDesignChange: @props.onDesignChange) 
-      }
-      { 
-        id: "config"
-        label: [H.span(className: "glyphicon glyphicon-cog"), " Config"]
-        elem: React.createElement(MapConfigDesignerComponent, 
-          schema: @props.schema
-          design: @props.design
-          onDesignChange: @props.onDesignChange) 
-      }
-    ]
-
-    React.createElement(TabbedComponent, 
-      tabs: tabs
-      initialTabId: "layers")
-
+          onDesignChange: @props.onDesignChange
 
 # Designer for config
-class MapConfigDesignerComponent extends React.Component
+class BaseLayerDesignerComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
@@ -73,10 +70,8 @@ class MapConfigDesignerComponent extends React.Component
         name
 
   render: ->
-    H.div className: "form-group", style: { margin: 5 },
-      H.label className: "text-muted", "Base Layer"
-      H.div style: { marginLeft: 10 }, 
-        @renderBaseLayer("bing_road", "Roads")
-        @renderBaseLayer("bing_aerial", "Satellite")
-        @renderBaseLayer("cartodb_positron", "Light")
-        @renderBaseLayer("cartodb_dark_matter", "Dark")
+    H.div style: { marginLeft: 10 }, 
+      @renderBaseLayer("bing_road", "Roads")
+      @renderBaseLayer("bing_aerial", "Satellite")
+      @renderBaseLayer("cartodb_positron", "Light")
+      @renderBaseLayer("cartodb_dark_matter", "Dark")

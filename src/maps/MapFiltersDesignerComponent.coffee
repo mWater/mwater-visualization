@@ -32,7 +32,7 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
     name = ExprUtils.localizeString(@props.schema.getTable(table).name, @context.locale)
 
     H.div key: table, 
-      H.h4 null, name
+      H.label null, name
       React.createElement(FilterExprComponent, 
         schema: @props.schema
         dataSource: @props.dataSource

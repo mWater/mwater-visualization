@@ -72,7 +72,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
           return 
 
         cb(null, {
-          options: [{ value: ":0", label: "Countries" }].concat(_.map(rows, (r) -> { value: r.country_id + ":" + r.level, label: "#{r.name} (#{r.country})" }))
+          options: [{ value: ":0", label: "Countries" }].concat(_.map(rows, (r) -> { value: r.country_id + ":" + r.level, label: "#{r.country} (#{r.name})" }))
           complete: true
         })
 
