@@ -170,11 +170,72 @@
   line-height: 0;
 }
 
-.axis-palette:hover{
+.axis-palette:hover {
   border-color: #1f77b4;
 }
 
-.image-mosaic .LazyLoad{
+.image-mosaic .LazyLoad {
   display: inline-block;
   min-width: 50px;
+}
+
+.mwater-visualization-block-inner {
+  padding: 5px;
+  margin: 5px;
+  border: solid 1px transparent;
+  border-radius: 5px;
+}
+
+.mwater-visualization-block-outer {
+  position: relative;
+}
+
+.mwater-visualization-block-outer:hover > .mwater-visualization-block-inner {
+  border: solid 1px #88ceff;
+}
+
+.mwater-visualization-block-move {
+  display: none;
+}
+
+.mwater-visualization-block-remove {
+  display: none;
+}
+
+.mwater-visualization-block-outer:hover > .mwater-visualization-block-move {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: -10px;
+    border: solid 1px #88ceff;
+    color: #88ceff;
+    background-color: white;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 5px;
+    border-radius: 5px;
+    padding-right: 5px;
+    cursor: move;
+}  
+
+.mwater-visualization-block-move:hover {
+  background-color: #88ceff !important;
+  color: white !important;
+}
+ 
+.mwater-visualization-block-outer:hover > .mwater-visualization-block-remove {
+    display: block;
+    position: absolute;
+    right: -5px;
+    top: -10px;
+    border: solid 1px #88ceff;
+    background-color: white;
+    color: #88ceff;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.mwater-visualization-block-remove:hover {
+  background-color: red !important;
+  color: white !important;
 }
