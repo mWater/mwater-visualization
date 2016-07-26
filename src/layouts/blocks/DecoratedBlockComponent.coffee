@@ -11,7 +11,7 @@ module.exports = class DecoratedBlockComponent extends React.Component
     connectDragPreview: React.PropTypes.func.isRequired # the drag preview connector, supplied by React DND
 
   render: ->
-    elem = H.div className: "mwater-visualization-block",
+    elem = @props.connectDragPreview(H.div className: "mwater-visualization-block",
       if not @props.isDragging
         @props.connectDragSource(H.div key: "move", className: "mwater-visualization-block-move",
           H.i className: "fa fa-ellipsis-h")
@@ -20,6 +20,7 @@ module.exports = class DecoratedBlockComponent extends React.Component
         H.div key: "remove", className: "mwater-visualization-block-remove", onClick: @props.onBlockRemove,
           H.i className: "fa fa-times"
 
-      @props.connectDragPreview(React.Children.only(@props.children))
+      @props.children
+    )
 
     return elem

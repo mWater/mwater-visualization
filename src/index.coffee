@@ -3,7 +3,7 @@ exports.WidgetFactory = require './widgets/WidgetFactory'
 
 exports.UndoStack = require './UndoStack'
 
-exports.DashboardComponent = require './widgets/DashboardComponent'
+exports.DashboardComponent = require './dashboards/DashboardComponent'
 
 exports.BingLayer = require './maps/BingLayer'
 exports.UtfGridLayer = require './maps/UtfGridLayer'
@@ -26,7 +26,7 @@ exports.CalendarChart = require './widgets/charts/CalendarChart'
 exports.ImageMosaicChart = require './widgets/charts/ImageMosaicChart'
 exports.ChartViewComponent = require './widgets/charts/ChartViewComponent'
 exports.MapViewComponent = require './maps/MapViewComponent'
-exports.DashboardUtils = require './widgets/DashboardUtils'
+exports.DashboardUtils = require './dashboards/DashboardUtils'
 
 exports.WidgetScoper = require './widgets/WidgetScoper'
 exports.WidgetScopesViewComponent = require './widgets/WidgetScopesViewComponent'
@@ -38,8 +38,8 @@ exports.DatagridComponent = require './datagrids/DatagridComponent'
 exports.DatagridDesignerComponent = require './datagrids/DatagridDesignerComponent'
 exports.DatagridUtils = require './datagrids/DatagridUtils'
 
-exports.ServerDashboardDataSource = require './widgets/ServerDashboardDataSource'
-exports.DirectDashboardDataSource = require './widgets/DirectDashboardDataSource'
+exports.ServerDashboardDataSource = require './dashboards/ServerDashboardDataSource'
+exports.DirectDashboardDataSource = require './dashboards/DirectDashboardDataSource'
 exports.DirectWidgetDataSource = require './widgets/DirectWidgetDataSource'
 
 exports.ServerMapUrlSource = require './maps/ServerMapUrlSource'
