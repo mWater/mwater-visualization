@@ -100,6 +100,7 @@ class DraggableBlockComponent extends React.Component
 
     onBlockDrop: React.PropTypes.func.isRequired # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
     onBlockRemove: React.PropTypes.func.isRequired # Called with (block) when block is removed
+    style: React.PropTypes.object # Merge in style
 
     canMove: React.PropTypes.bool.isRequired  # True to allow block to be moved
     canRemove: React.PropTypes.bool.isRequired # True to allow block to be removed
@@ -173,7 +174,7 @@ class DraggableBlockComponent extends React.Component
           @renderHover()
           @props.children
     else
-      elem = H.div style: { position: "relative" },
+      elem = H.div style: _.extend({}, @props.style, { position: "relative" }),
         @renderHover()
         @props.children
 
