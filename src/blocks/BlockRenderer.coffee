@@ -112,7 +112,7 @@ class TextBlockComponent extends React.Component
       block: @props.block
       onBlockDrop: @props.onBlockDrop,
         R DecoratedBlockComponent, 
-          onBlockRemove: @props.onBlockDrop,
+          onBlockRemove: @props.onBlockRemove.bind(null, @props.block),
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
 class ImageBlockComponent extends React.Component
@@ -127,5 +127,5 @@ class ImageBlockComponent extends React.Component
       onBlockDrop: @props.onBlockDrop,
         R DecoratedBlockComponent, 
           style: { textAlign: "center" }
-          onBlockRemove: @props.onBlockDrop,
+          onBlockRemove: @props.onBlockRemove.bind(null, @props.block),
           H.img src: "https://realfood.tesco.com/media/images/Orange-and-almond-srping-cake-hero-58d07750-0952-47eb-bc41-a1ef9b81c01a-0-472x310.jpg", style: { height: 150 }

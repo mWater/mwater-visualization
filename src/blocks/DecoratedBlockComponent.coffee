@@ -5,7 +5,7 @@ R = React.createElement
 # Block decorated with drag/close hover controls
 module.exports = class DecoratedBlockComponent extends React.Component
   @propTypes:
-    onBlockRemove: React.PropTypes.func.isRequired # Called with (block) when block is removed
+    onBlockRemove: React.PropTypes.func.isRequired # Called when block is removed
 
     connectDragSource: React.PropTypes.func.isRequired # the drag source connector, supplied by React DND
     connectDropTarget: React.PropTypes.func.isRequired # the drop target connector, supplied by React DND
@@ -18,7 +18,7 @@ module.exports = class DecoratedBlockComponent extends React.Component
           H.i className: "fa fa-ellipsis-h")
 
       if not @props.isDragging
-        H.div key: "remove", className: "mwater-visualization-block-remove", onClick: @props.onBlockRemove.bind(null, @props.block),
+        H.div key: "remove", className: "mwater-visualization-block-remove", onClick: @props.onBlockRemove,
           H.i className: "fa fa-times"
 
       @props.connectDragPreview(H.div className: "mwater-visualization-block-inner",
