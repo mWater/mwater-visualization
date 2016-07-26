@@ -3,6 +3,7 @@ H = React.DOM
 R = React.createElement
 
 DraggableBlockComponent = require "./DraggableBlockComponent"
+DecoratedBlockComponent = require './DecoratedBlockComponent'
 
 module.exports = class BlockRenderer
   # renders a block. Passed (options)
@@ -40,18 +41,16 @@ class RootBlockComponent extends React.Component
       onBlockDrop: @props.onBlockDrop
       onBlockRemove: @props.onBlockDrop
       style: { height: "100%" }
-      canMove: false
-      canRemove: false
       onlyBottom: true,
-      H.div style: { padding: 10 },
-        _.map @props.block.design.blocks, (block) =>
-          @props.renderBlock({
-            block: block
-            orientation: "vertical"
-            renderBlock: @props.renderBlock
-            onBlockDrop: @props.onBlockDrop
-            onBlockRemove: @props.onBlockRemove
-          })
+        H.div style: { padding: 10 },
+          _.map @props.block.design.blocks, (block) =>
+            @props.renderBlock({
+              block: block
+              orientation: "vertical"
+              renderBlock: @props.renderBlock
+              onBlockDrop: @props.onBlockDrop
+              onBlockRemove: @props.onBlockRemove
+            })
 
 
 class VerticalBlockComponent extends React.Component
@@ -65,17 +64,16 @@ class VerticalBlockComponent extends React.Component
     R DraggableBlockComponent, 
       block: @props.block
       onBlockDrop: @props.onBlockDrop
-      onBlockRemove: @props.onBlockDrop
-      canMove: false
-      canRemove: false,
-      _.map @props.block.design.blocks, (block) =>
-        @props.renderBlock({
-          block: block
-          orientation: "vertical"
-          renderBlock: @props.renderBlock
-          onBlockDrop: @props.onBlockDrop
-          onBlockRemove: @props.onBlockRemove
-        })
+      onBlockRemove: @props.onBlockDrop,
+        H.div null,
+        _.map @props.block.design.blocks, (block) =>
+          @props.renderBlock({
+            block: block
+            orientation: "vertical"
+            renderBlock: @props.renderBlock
+            onBlockDrop: @props.onBlockDrop
+            onBlockRemove: @props.onBlockRemove
+          })
 
 
 class HorizontalBlockComponent extends React.Component
@@ -89,21 +87,19 @@ class HorizontalBlockComponent extends React.Component
     R DraggableBlockComponent, 
       block: @props.block
       onBlockDrop: @props.onBlockDrop
-      onBlockRemove: @props.onBlockDrop
-      canMove: false
-      canRemove: false,
-      H.table style: { width: "100%" },
-        H.tbody null,
-          H.tr null,
-            _.map @props.block.design.blocks, (block) =>
-              H.td style: { width: "#{100/@props.block.design.blocks.length}%", verticalAlign: "top" }, key: block.id,
-                @props.renderBlock({
-                  block: block
-                  orientation: "horizontal"
-                  renderBlock: @props.renderBlock
-                  onBlockDrop: @props.onBlockDrop
-                  onBlockRemove: @props.onBlockRemove
-                })
+      onBlockRemove: @props.onBlockDrop,
+        H.table style: { width: "100%" },
+          H.tbody null,
+            H.tr null,
+              _.map @props.block.design.blocks, (block) =>
+                H.td style: { width: "#{100/@props.block.design.blocks.length}%", verticalAlign: "top" }, key: block.id,
+                  @props.renderBlock({
+                    block: block
+                    orientation: "horizontal"
+                    renderBlock: @props.renderBlock
+                    onBlockDrop: @props.onBlockDrop
+                    onBlockRemove: @props.onBlockRemove
+                  })
 
 class TextBlockComponent extends React.Component
   @propTypes:
@@ -114,13 +110,10 @@ class TextBlockComponent extends React.Component
   render: ->
     R DraggableBlockComponent, 
       block: @props.block
-      onBlockDrop: @props.onBlockDrop
-      onBlockRemove: @props.onBlockDrop
-      canMove: true
-      canRemove: true,
-        H.div style: {},
+      onBlockDrop: @props.onBlockDrop,
+        R DecoratedBlockComponent, 
+          onBlockRemove: @props.onBlockDrop,
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-          # JSON.stringify(@props.block)
 
 class ImageBlockComponent extends React.Component
   @propTypes:
@@ -131,9 +124,8 @@ class ImageBlockComponent extends React.Component
   render: ->
     R DraggableBlockComponent, 
       block: @props.block
-      onBlockDrop: @props.onBlockDrop
-      onBlockRemove: @props.onBlockDrop
-      canMove: true
-      canRemove: true,
-        H.div style: { textAlign: "center" },
+      onBlockDrop: @props.onBlockDrop,
+        R DecoratedBlockComponent, 
+          style: { textAlign: "center" }
+          onBlockRemove: @props.onBlockDrop,
           H.img src: "https://realfood.tesco.com/media/images/Orange-and-almond-srping-cake-hero-58d07750-0952-47eb-bc41-a1ef9b81c01a-0-472x310.jpg", style: { height: 150 }

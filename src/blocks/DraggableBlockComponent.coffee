@@ -99,11 +99,8 @@ class DraggableBlockComponent extends React.Component
     block: React.PropTypes.object.isRequired # Block to display
 
     onBlockDrop: React.PropTypes.func.isRequired # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
-    onBlockRemove: React.PropTypes.func.isRequired # Called with (block) when block is removed
     style: React.PropTypes.object # Merge in style
 
-    canMove: React.PropTypes.bool.isRequired  # True to allow block to be moved
-    canRemove: React.PropTypes.bool.isRequired # True to allow block to be removed
     onlyBottom: React.PropTypes.bool # True to only allow dropping at bottom (root block)
 
     # Injected by React-dnd
@@ -160,26 +157,13 @@ class DraggableBlockComponent extends React.Component
     if @props.isDragging
       style.visibility = "hidden"
 
-    if @props.canMove or @props.canRemove
-      elem = H.div className: "mwater-visualization-block-outer",
-        if @props.canMove and not @props.isDragging
-          @props.connectDragSource(H.div key: "move", className: "mwater-visualization-block-move",
-            H.i className: "fa fa-ellipsis-h")
-
-        if @props.canRemove and not @props.isDragging
-          H.div key: "remove", className: "mwater-visualization-block-remove", onClick: @props.onBlockRemove.bind(null, @props.block),
-            H.i className: "fa fa-times"
-
-        H.div style: style, className: "mwater-visualization-block-inner",
-          @renderHover()
-          @props.children
-    else
-      elem = H.div style: _.extend({}, @props.style, { position: "relative" }),
-        @renderHover()
-        @props.children
-
-    return @props.connectDragPreview(@props.connectDropTarget(elem))
-
+    return H.div style: _.extend({}, @props.style, { position: "relative" }),
+      @renderHover()
+      React.cloneElement(React.Children.only(@props.children), {
+        connectDragSource: @props.connectDragSource
+        connectDropTarget: @props.connectDropTarget
+        connectDragPreview: @props.connectDragPreview
+        })
 
 module.exports = _.flow(DragSource("block", blockSourceSpec, collectSource), DropTarget("block", blockTargetSpec, collectTarget))(DraggableBlockComponent)
 
