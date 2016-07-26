@@ -21,7 +21,7 @@ collectSource = (connect, monitor) ->
   }
 
 
-class BlockCreatorComponent extends React.Component
+class BlockPaletteComponent extends React.Component
   @propTypes:
     block: React.PropTypes.object.isRequired # Block to display
 
@@ -33,4 +33,4 @@ class BlockCreatorComponent extends React.Component
     return @props.connectDragPreview(@props.connectDragSource(@props.children))
 
 
-module.exports = _.flow(DragSource("block", blockSourceSpec, collectSource))(BlockCreatorComponent)
+module.exports = _.flow(DragSource("block", blockSourceSpec, collectSource))(BlockPaletteComponent)

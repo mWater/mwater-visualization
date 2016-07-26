@@ -1,5 +1,5 @@
-WidgetFactory = require './WidgetFactory'
-DirectWidgetDataSource = require './DirectWidgetDataSource'
+WidgetFactory = require '../widgets/WidgetFactory'
+DirectWidgetDataSource = require '../widgets/DirectWidgetDataSource'
 
 # Uses direct DataSource queries
 module.exports = class DirectDashboardDataSource

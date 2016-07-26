@@ -2,7 +2,7 @@ _ = require 'lodash'
 assert = require('chai').assert
 canonical = require 'canonical-json'
 
-blockUtils = require '../src/blocks/blockUtils'
+blockUtils = require '../src/layouts/blocks/blockUtils'
 
 compare = (actual, expected) ->
   assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n"

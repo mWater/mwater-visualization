@@ -3,8 +3,8 @@ ReactDOM = require 'react-dom'
 H = React.DOM
 R = React.createElement
 
-BlocksDesignerComponent = require './blocks/BlocksDesignerComponent'
-BlockRenderer = require './blocks/BlockRenderer'
+BlocksDesignerComponent = require './layouts/blocks/BlocksDesignerComponent'
+BlockRenderer = require './layouts/blocks/BlockRenderer'
 
 class DemoComponent extends React.Component
   constructor: ->

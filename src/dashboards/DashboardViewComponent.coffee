@@ -2,12 +2,12 @@ React = require 'react'
 H = React.DOM
 
 LegoLayoutEngine = require './LegoLayoutEngine'
-WidgetFactory = require './WidgetFactory'
-WidgetScoper = require './WidgetScoper'
-WidgetContainerComponent = require './WidgetContainerComponent'
+WidgetFactory = require '../widgets/WidgetFactory'
+WidgetScoper = require '../widgets/WidgetScoper'
+WidgetContainerComponent = require '../widgets/WidgetContainerComponent'
 ReactElementPrinter = require 'react-library/lib/ReactElementPrinter'
 
-WidgetScopesViewComponent = require './WidgetScopesViewComponent'
+WidgetScopesViewComponent = require '../widgets/WidgetScopesViewComponent'
 
 uuid = require 'node-uuid'
 

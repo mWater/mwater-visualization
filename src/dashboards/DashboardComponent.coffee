@@ -3,7 +3,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
-UndoStack = require './../UndoStack'
+UndoStack = require '../UndoStack'
 DashboardViewComponent = require './DashboardViewComponent'
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 DashboardUtils = require './DashboardUtils'

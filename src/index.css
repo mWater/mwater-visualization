@@ -179,17 +179,15 @@
   min-width: 50px;
 }
 
-.mwater-visualization-block-inner {
+.mwater-visualization-block {
+  margin: 1px;
   padding: 5px;
-  border: solid 1px transparent;
-  border-radius: 3px;
-}
-
-.mwater-visualization-block-outer {
+  border-radius: 4px;
   position: relative;
 }
 
-.mwater-visualization-block-outer:hover > .mwater-visualization-block-inner {
+.mwater-visualization-block:hover {
+  margin: 0px;
   border: solid 1px #88ceff;
 }
 
@@ -201,10 +199,10 @@
   display: none;
 }
 
-.mwater-visualization-block-outer:hover > .mwater-visualization-block-move {
+.mwater-visualization-block:hover > .mwater-visualization-block-move {
     display: block;
     position: absolute;
-    left: 50%;
+    right: 50%;
     top: -10px;
     border: solid 1px #88ceff;
     color: #88ceff;
@@ -222,7 +220,7 @@
   color: white !important;
 }
   
-.mwater-visualization-block-outer:hover > .mwater-visualization-block-remove {
+.mwater-visualization-block:hover > .mwater-visualization-block-remove {
     display: block;
     position: absolute;
     right: -5px;
