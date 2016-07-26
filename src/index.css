@@ -181,9 +181,8 @@
 
 .mwater-visualization-block-inner {
   padding: 5px;
-  margin: 5px;
   border: solid 1px transparent;
-  border-radius: 5px;
+  border-radius: 3px;
 }
 
 .mwater-visualization-block-outer {
@@ -222,7 +221,7 @@
   background-color: #88ceff !important;
   color: white !important;
 }
- 
+  
 .mwater-visualization-block-outer:hover > .mwater-visualization-block-remove {
     display: block;
     position: absolute;
@@ -236,6 +235,40 @@
 }
 
 .mwater-visualization-block-remove:hover {
-  background-color: red !important;
+  background-color: #88ceff !important;
   color: white !important;
+  /*background-color: red !important;*/
+  /*color: white !important;*/
+}
+
+.mwater-visualization-block-palette {
+  background-color: #363b3e;
+  padding: 5px;
+}
+
+.mwater-visualization-block-palette-item {
+  cursor: move;
+  background-color: #4B5155;
+  margin: 10px;
+  border-radius: 5px;
+  color: white;
+  width: 72px;
+  text-align: center;
+}
+
+.mwater-visualization-block-palette-item > .icon {
+  color: white;
+  text-align: center;
+  font-size: 20pt;
+}
+
+.mwater-visualization-block-palette-item > .title {
+  color: #DDD;
+  text-align: center;
+  padding-bottom: 5px;
+}
+
+.mwater-visualization-block-palette-item:hover {
+  cursor: move;
+  background-color: #2485dd;
 }

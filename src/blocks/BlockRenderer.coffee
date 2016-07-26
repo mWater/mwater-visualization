@@ -4,7 +4,6 @@ R = React.createElement
 
 DraggableBlockComponent = require "./DraggableBlockComponent"
 
-
 module.exports = class BlockRenderer
   # renders a block. Passed (options)
   #  block: block to render
@@ -22,8 +21,10 @@ module.exports = class BlockRenderer
         return R VerticalBlockComponent, block: block, renderBlock: @renderBlock, onBlockDrop: options.onBlockDrop, onBlockRemove: options.onBlockRemove
       when "horizontal"
         return R HorizontalBlockComponent, block: block, renderBlock: @renderBlock, onBlockDrop: options.onBlockDrop, onBlockRemove: options.onBlockRemove
-      else
-        return R OtherBlockComponent, block: block, onBlockDrop: options.onBlockDrop, onBlockRemove: options.onBlockRemove
+      when "text"
+        return R TextBlockComponent, block: block, onBlockDrop: options.onBlockDrop, onBlockRemove: options.onBlockRemove
+      when "image"
+        return R ImageBlockComponent, block: block, onBlockDrop: options.onBlockDrop, onBlockRemove: options.onBlockRemove
 
 
 class RootBlockComponent extends React.Component
@@ -38,6 +39,7 @@ class RootBlockComponent extends React.Component
       block: @props.block
       onBlockDrop: @props.onBlockDrop
       onBlockRemove: @props.onBlockDrop
+      style: { height: "100%" }
       canMove: false
       canRemove: false
       onlyBottom: true,
@@ -103,7 +105,7 @@ class HorizontalBlockComponent extends React.Component
                   onBlockRemove: @props.onBlockRemove
                 })
 
-class OtherBlockComponent extends React.Component
+class TextBlockComponent extends React.Component
   @propTypes:
     block: React.PropTypes.object.isRequired
     onBlockDrop: React.PropTypes.func.isRequired # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
@@ -116,5 +118,22 @@ class OtherBlockComponent extends React.Component
       onBlockRemove: @props.onBlockDrop
       canMove: true
       canRemove: true,
-        H.div style: { height: 50, backgroundColor: "#EEE" },
-          JSON.stringify(@props.block)
+        H.div style: {},
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+          # JSON.stringify(@props.block)
+
+class ImageBlockComponent extends React.Component
+  @propTypes:
+    block: React.PropTypes.object.isRequired
+    onBlockDrop: React.PropTypes.func.isRequired # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
+    onBlockRemove: React.PropTypes.func.isRequired # Called with (block) when block is removed
+
+  render: ->
+    R DraggableBlockComponent, 
+      block: @props.block
+      onBlockDrop: @props.onBlockDrop
+      onBlockRemove: @props.onBlockDrop
+      canMove: true
+      canRemove: true,
+        H.div style: { textAlign: "center" },
+          H.img src: "https://realfood.tesco.com/media/images/Orange-and-almond-srping-cake-hero-58d07750-0952-47eb-bc41-a1ef9b81c01a-0-472x310.jpg", style: { height: 150 }

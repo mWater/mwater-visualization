@@ -33,10 +33,10 @@ design = {
   design: {
     blocks: [
       { id: "1", type: "horizontal", design: { blocks: [
-        { id: "2", type: "xyzzy" }
-        { id: "3", type: "apple" }
+        { id: "2", type: "text" }
+        { id: "3", type: "image" }
         ]}}
-      { id: "4", type: "other" }
+      { id: "4", type: "text" }
     ]
   }    
 }

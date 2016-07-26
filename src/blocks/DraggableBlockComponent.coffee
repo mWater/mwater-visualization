@@ -4,8 +4,6 @@ R = React.createElement
 
 DragSource = require('react-dnd').DragSource
 DropTarget = require('react-dnd').DropTarget
-DragDropContext = require('react-dnd').DragDropContext
-
 
 # Gets the drop side (top, left, right, bottom)
 getDropSide = (monitor, component) ->
@@ -122,22 +120,39 @@ class DraggableBlockComponent extends React.Component
       hoverSide: null
     }
 
-  render: ->
-    outerStyle = { }
+  renderHover: ->
+    lineStyle = { position: "absolute" }
 
     # Show
     if @props.isOver
       # style.backgroundColor = "#DDF"
       switch @state.hoverSide
         when "left"
-          outerStyle.borderLeft = "solid 3px #38D"
+          lineStyle.borderLeft = "solid 3px #38D"
+          lineStyle.top = 0
+          lineStyle.bottom = 0
+          lineStyle.left = 0
         when "right"
-          outerStyle.borderRight = "solid 3px #38D"
+          lineStyle.borderRight = "solid 3px #38D"
+          lineStyle.top = 0
+          lineStyle.right = 0
+          lineStyle.bottom = 0
         when "top"
-          outerStyle.borderTop = "solid 3px #38D"
+          lineStyle.borderTop = "solid 3px #38D"
+          lineStyle.top = 0
+          lineStyle.left = 0
+          lineStyle.right = 0
         when "bottom"
-          outerStyle.borderBottom = "solid 3px #38D"
+          lineStyle.borderBottom = "solid 3px #38D"
+          lineStyle.bottom = 0
+          lineStyle.left = 0
+          lineStyle.right = 0
 
+      return H.div style: lineStyle
+    else
+      return null
+
+  render: ->
     style = { } 
 
     # Hide if dragging
@@ -145,7 +160,7 @@ class DraggableBlockComponent extends React.Component
       style.visibility = "hidden"
 
     if @props.canMove or @props.canRemove
-      elem = H.div style: outerStyle, className: "mwater-visualization-block-outer",
+      elem = H.div className: "mwater-visualization-block-outer",
         if @props.canMove and not @props.isDragging
           @props.connectDragSource(H.div key: "move", className: "mwater-visualization-block-move",
             H.i className: "fa fa-ellipsis-h")
@@ -155,9 +170,12 @@ class DraggableBlockComponent extends React.Component
             H.i className: "fa fa-times"
 
         H.div style: style, className: "mwater-visualization-block-inner",
+          @renderHover()
           @props.children
     else
-      elem = H.div style: outerStyle, @props.children
+      elem = H.div style: { position: "relative" },
+        @renderHover()
+        @props.children
 
     return @props.connectDragPreview(@props.connectDropTarget(elem))
 
