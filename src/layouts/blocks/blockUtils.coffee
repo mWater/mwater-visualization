@@ -71,6 +71,23 @@ exports.dropBlock = (rootBlock, sourceBlock, targetBlock, side) ->
   return rootBlock
 
 
+# Updates a block
+# returns new root block
+exports.updateBlock = (rootBlock, block) ->
+  # If vertical or horizontal
+  if rootBlock.type in ['vertical', 'horizontal', 'root']
+    blocks = rootBlock.blocks
+
+    # Update block
+    blocks = _.map(blocks, (b) -> if b.id == block.id then block else b)
+
+    # Recurse
+    blocks = _.map(blocks, (b) -> exports.updateBlock(b, block))
+
+    return _.extend({}, rootBlock, blocks: blocks)
+  
+  return rootBlock
+
 # When block is removed
 # returns new root block
 exports.removeBlock = (rootBlock, block) ->

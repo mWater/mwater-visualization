@@ -8,6 +8,28 @@ compare = (actual, expected) ->
   assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n"
 
 describe "blockUtils", ->
+  it "updates nested block", ->
+    design = {
+      id: "root"
+      type: "root"
+      blocks: [
+        { id: "a", type: "a" }
+        { id: "b", type: "b" }
+        { id: "c", type: "horizontal", blocks: [{ id: "d", type: "d" }, { id: "e", type: "e" }] }
+      ]
+    }
+
+    newDesign = blockUtils.updateBlock(design, { id: "d", type: "xyz" })
+    compare(newDesign, {
+      id: "root"
+      type: "root"
+      blocks: [
+        { id: "a", type: "a" }
+        { id: "b", type: "b" }
+        { id: "c", type: "horizontal", blocks: [{ id: "d", type: "xyz" }, { id: "e", type: "e" }] }
+      ]
+    })
+
   it "removes nested block", ->
     design = {
       id: "root"

@@ -33,6 +33,7 @@ class DemoComponent extends React.Component
         # Passed
         #  type: type of the widget
         #  design: design of the widget
+        #  onDesignChange: TODO
         #  width: width to render. null for auto
         #  height: height to render. null for auto
         widget = WidgetFactory.createWidget(options.type)
@@ -51,12 +52,10 @@ class DemoComponent extends React.Component
           dataSource: config.dataSource
           widgetDataSource: widgetDataSource
           design: options.design
-          onRemove: => alert("TODO remove")
-          onDuplicate: => alert("TODO remove")
+          onDesignChange: options.onDesignChange
           scope: null
           filters: []
           onScopeChange: => alert("TODO")
-          onDesignChange: => alert("TODO") 
         }), {
           width: options.width
           height: options.height
@@ -75,12 +74,40 @@ $ ->
 
   ReactDOM.render(sample, document.getElementById("main"))
 
+widgetDesign = {
+  "version": 1,
+  "layers": [
+    {
+      "axes": {
+        "x": {
+          "expr": {
+            "type": "field",
+            "table": "entities.water_point",
+            "column": "type"
+          },
+          "xform": null
+        },
+        "y": {
+          "expr": {
+            "type": "id",
+            "table": "entities.water_point"
+          },
+          "aggr": "count",
+          "xform": null
+        }
+      },
+      "filter": null,
+      "table": "entities.water_point"
+    }
+  ],
+  "type": "bar"
+}
+
 design = {
   id: "root"
   type: "root"
-  design: {
-    blocks: [
-      { id: "1234", type: "widget", widgetType: "LayeredChart", design: {xAxisLabelText: "", yAxisLabelText: ""} }
-    ]
-  }    
+  blocks: [
+    { id: "1234", type: "widget", widgetType: "LayeredChart", design: widgetDesign }
+  ]
 }
+
