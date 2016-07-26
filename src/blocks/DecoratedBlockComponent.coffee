@@ -8,7 +8,6 @@ module.exports = class DecoratedBlockComponent extends React.Component
     onBlockRemove: React.PropTypes.func.isRequired # Called when block is removed
 
     connectDragSource: React.PropTypes.func.isRequired # the drag source connector, supplied by React DND
-    connectDropTarget: React.PropTypes.func.isRequired # the drop target connector, supplied by React DND
     connectDragPreview: React.PropTypes.func.isRequired # the drag preview connector, supplied by React DND
 
   render: ->
@@ -25,4 +24,4 @@ module.exports = class DecoratedBlockComponent extends React.Component
         @props.children
       )
 
-    return @props.connectDropTarget(elem)
+    return elem

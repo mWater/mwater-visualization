@@ -39,10 +39,9 @@ class RootBlockComponent extends React.Component
     R DraggableBlockComponent, 
       block: @props.block
       onBlockDrop: @props.onBlockDrop
-      onBlockRemove: @props.onBlockDrop
       style: { height: "100%" }
       onlyBottom: true,
-        H.div style: { padding: 10 },
+        H.div style: { padding: 10, height: "100%" },
           _.map @props.block.design.blocks, (block) =>
             @props.renderBlock({
               block: block
@@ -61,19 +60,15 @@ class VerticalBlockComponent extends React.Component
     onBlockRemove: React.PropTypes.func.isRequired # Called with (block) when block is removed
 
   render: ->
-    R DraggableBlockComponent, 
-      block: @props.block
-      onBlockDrop: @props.onBlockDrop
-      onBlockRemove: @props.onBlockDrop,
-        H.div null,
-        _.map @props.block.design.blocks, (block) =>
-          @props.renderBlock({
-            block: block
-            orientation: "vertical"
-            renderBlock: @props.renderBlock
-            onBlockDrop: @props.onBlockDrop
-            onBlockRemove: @props.onBlockRemove
-          })
+    H.div null,
+      _.map @props.block.design.blocks, (block) =>
+        @props.renderBlock({
+          block: block
+          orientation: "vertical"
+          renderBlock: @props.renderBlock
+          onBlockDrop: @props.onBlockDrop
+          onBlockRemove: @props.onBlockRemove
+        })
 
 
 class HorizontalBlockComponent extends React.Component
@@ -84,22 +79,18 @@ class HorizontalBlockComponent extends React.Component
     onBlockRemove: React.PropTypes.func.isRequired # Called with (block) when block is removed
 
   render: ->
-    R DraggableBlockComponent, 
-      block: @props.block
-      onBlockDrop: @props.onBlockDrop
-      onBlockRemove: @props.onBlockDrop,
-        H.table style: { width: "100%" },
-          H.tbody null,
-            H.tr null,
-              _.map @props.block.design.blocks, (block) =>
-                H.td style: { width: "#{100/@props.block.design.blocks.length}%", verticalAlign: "top" }, key: block.id,
-                  @props.renderBlock({
-                    block: block
-                    orientation: "horizontal"
-                    renderBlock: @props.renderBlock
-                    onBlockDrop: @props.onBlockDrop
-                    onBlockRemove: @props.onBlockRemove
-                  })
+    H.table style: { width: "100%" },
+      H.tbody null,
+        H.tr null,
+          _.map @props.block.design.blocks, (block) =>
+            H.td style: { width: "#{100/@props.block.design.blocks.length}%", verticalAlign: "top" }, key: block.id,
+              @props.renderBlock({
+                block: block
+                orientation: "horizontal"
+                renderBlock: @props.renderBlock
+                onBlockDrop: @props.onBlockDrop
+                onBlockRemove: @props.onBlockRemove
+              })
 
 class TextBlockComponent extends React.Component
   @propTypes:

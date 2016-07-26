@@ -157,13 +157,13 @@ class DraggableBlockComponent extends React.Component
     if @props.isDragging
       style.visibility = "hidden"
 
-    return H.div style: _.extend({}, @props.style, { position: "relative" }),
+    return @props.connectDropTarget(H.div style: _.extend({}, @props.style, { position: "relative" }),
       @renderHover()
       React.cloneElement(React.Children.only(@props.children), {
         connectDragSource: @props.connectDragSource
-        connectDropTarget: @props.connectDropTarget
         connectDragPreview: @props.connectDragPreview
         })
+    )
 
 module.exports = _.flow(DragSource("block", blockSourceSpec, collectSource), DropTarget("block", blockTargetSpec, collectTarget))(DraggableBlockComponent)
 

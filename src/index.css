@@ -259,7 +259,8 @@
 .mwater-visualization-block-palette-item > .icon {
   color: white;
   text-align: center;
-  font-size: 20pt;
+  font-size: 18pt;
+  padding-top: 5px;
 }
 
 .mwater-visualization-block-palette-item > .title {
