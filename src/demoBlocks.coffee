@@ -58,7 +58,7 @@ class DemoComponent extends React.Component
           onScopeChange: => alert("TODO")
         }), {
           width: options.width
-          height: options.height
+          height: if widget.isAutoHeight() then null else options.height
           standardWidth: options.width
         })
 
@@ -107,7 +107,8 @@ design = {
   id: "root"
   type: "root"
   blocks: [
-    { id: "1234", type: "widget", aspectRatio: 1.4, widgetType: "LayeredChart", design: widgetDesign }
+    # { id: "1234", type: "widget", aspectRatio: 1.4, widgetType: "LayeredChart", design: widgetDesign }
+    { id: "1234", type: "widget", widgetType: "Text", design: { items: ["hello world!!!"] } }
   ]
 }
 

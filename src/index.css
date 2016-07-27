@@ -277,6 +277,26 @@
   text-align: center;
 }
 
+.mwater-visualization-text-palette {
+  position: absolute;
+  top: -27px;
+  left: 0px;
+  background-color: #4B5155;
+  border-radius: 3px;
+}
+
+.mwater-visualization-text-palette-item {
+  display: inline-block;
+  color: white;
+  padding: 3px 10px 3px 10px;
+  min-width: 2em;
+  text-align: center;
+}
+
+.mwater-visualization-text-palette-item:hover {
+  background-color: #2485dd;
+}
+
 .mwater-visualization-palette-item > .title {
   color: white;
   text-align: center;

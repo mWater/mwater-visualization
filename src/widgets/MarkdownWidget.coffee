@@ -56,7 +56,8 @@ class MarkdownWidgetComponent extends React.Component
     }  
 
   handleStartEditing: =>
-    @setState(editing: true)
+    if @props.onDesignChange?
+      @setState(editing: true)
 
   renderEditor: ->
     # Create editor

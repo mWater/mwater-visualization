@@ -81,7 +81,7 @@ class BlocksDesignerComponent extends React.Component
           onBlockDrop: @handleBlockDrop,
             R DecoratedBlockComponent, 
               aspectRatio: block.aspectRatio
-              onAspectRatioChange: (aspectRatio) => @props.onDesignChange(blockUtils.updateBlock(@props.design, _.extend({}, block, aspectRatio: aspectRatio)))
+              onAspectRatioChange: if block.aspectRatio? then (aspectRatio) => @props.onDesignChange(blockUtils.updateBlock(@props.design, _.extend({}, block, aspectRatio: aspectRatio)))
               onBlockRemove: @handleBlockDrop.bind(null, block),
                 R AutoSizeComponent, { injectWidth: true }, 
                   (size) =>
@@ -152,7 +152,7 @@ class RootBlockComponent extends React.Component
       onBlockDrop: @props.onBlockDrop
       style: { height: "100%" }
       onlyBottom: true,
-        H.div style: { padding: 20, height: "100%" },
+        H.div style: { padding: 30, height: "100%" },
           _.map @props.block.blocks, (block) =>
             @props.renderBlock(block)
 
