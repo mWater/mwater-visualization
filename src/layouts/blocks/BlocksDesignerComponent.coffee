@@ -70,13 +70,14 @@ class BlocksDesignerComponent extends React.Component
   renderBlock: (block) =>
     switch block.type
       when "root"
-        return R RootBlockComponent, block: block, renderBlock: @renderBlock, onBlockDrop: @handleBlockDrop, onBlockRemove: @handleBlockRemove
+        return R RootBlockComponent, key: block.id, block: block, renderBlock: @renderBlock, onBlockDrop: @handleBlockDrop, onBlockRemove: @handleBlockRemove
       when "vertical"
-        return R VerticalBlockComponent, block: block, renderBlock: @renderBlock, onBlockDrop: @handleBlockDrop, onBlockRemove: @handleBlockRemove
+        return R VerticalBlockComponent, key: block.id, block: block, renderBlock: @renderBlock, onBlockDrop: @handleBlockDrop, onBlockRemove: @handleBlockRemove
       when "horizontal"
-        return R HorizontalBlockComponent, block: block, renderBlock: @renderBlock, onBlockDrop: @handleBlockDrop, onBlockRemove: @handleBlockRemove
+        return R HorizontalBlockComponent, key: block.id, block: block, renderBlock: @renderBlock, onBlockDrop: @handleBlockDrop, onBlockRemove: @handleBlockRemove
       when "widget"
         return R DraggableBlockComponent, 
+          key: block.id
           block: block
           onBlockDrop: @handleBlockDrop,
             R DecoratedBlockComponent, 
