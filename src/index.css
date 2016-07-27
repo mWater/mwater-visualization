@@ -279,7 +279,7 @@
 
 .mwater-visualization-text-palette {
   position: absolute;
-  top: -27px;
+  top: -30px;
   left: 0px;
   background-color: #4B5155;
   border-radius: 3px;
@@ -313,4 +313,12 @@
 .mwater-visualization-palette-item:hover {
   cursor: move;
   background-color: #2485dd;
+}
+
+.mwater-visualization-text-widget-default {
+  font-size: 15px;
+}
+
+.mwater-visualization-text-widget-title {
+  font-size: 25px;
 }

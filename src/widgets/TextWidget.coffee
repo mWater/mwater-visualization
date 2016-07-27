@@ -56,10 +56,16 @@ class TextWidgetComponent extends React.Component
     if @props.onDesignChange? and not @state.editing
       @setState(editing: true)
 
+  refEditor: (elem) ->
+    if elem
+      elem.focus()
+
   renderEditor: ->
     R TextWidgetDesignerComponent,
+      ref: @refEditor
       design: @props.design
       onDesignChange: @props.onDesignChange
+      onDoneEditing: => @setState(editing: false)
 
   renderView: (scale) ->
     R TextWidgetViewComponent, 
@@ -80,6 +86,84 @@ class TextWidgetComponent extends React.Component
         @renderView()
 
 
+class TextWidgetViewComponent extends React.Component
+  createHtml: ->
+    new TextDesignHtmlConverter().designToHtml(@props.design)
+
+  render: ->
+    if @props.design.items?[0]?
+      H.div className: "mwater-visualization-text-widget-#{@props.design.className or "default"}", dangerouslySetInnerHTML: { __html: @createHtml() }
+    else
+      H.div className: "mwater-visualization-text-widget-#{@props.design.className or "default"} text-muted", 
+        "Click to Edit"
+
+class TextWidgetDesignerComponent extends React.Component
+  @propTypes: 
+    onDoneEditing: React.PropTypes.func
+
+  focus: ->
+    @refs.contentEditable.focus()
+
+  createHtml: ->
+    new TextDesignHtmlConverter().designToHtml(@props.design)
+
+  handleChange: (elem) =>
+    @props.onDesignChange(_.extend({}, @props.design, items: new TextDesignHtmlConverter().elemToDesign(elem)))
+
+  handleCommand: (command, ev) =>
+    # Don't lose focus
+    ev.preventDefault()
+    document.execCommand(command)
+
+  renderMenu: ->
+    H.div className: "mwater-visualization-text-palette",
+      H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "bold"),
+        H.b null, "B"
+      H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "italic"),
+        H.i null, "I"
+      H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "underline"),
+        H.span style: { textDecoration: "underline" }, "U"
+      H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyLeft"),
+        H.i className: "fa fa-align-left"
+      H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyCenter"),
+        H.i className: "fa fa-align-center"
+      H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyRight"),
+        H.i className: "fa fa-align-right"
+      H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyFull"),
+        H.i className: "fa fa-align-justify"
+      if @props.onDoneEditing
+        H.div className: "mwater-visualization-text-palette-item", onClick: @props.onDoneEditing,
+          H.i className: "fa fa-check"
+          " Done"
+  
+  render: ->
+    H.div style: { position: "relative" },
+      H.div className: "mwater-visualization-text-widget-#{@props.design.className or "default"}", 
+        R ContentEditableComponent, 
+          ref: "contentEditable"
+          style: { outline: "none" }
+          html: @createHtml()
+          onChange: @handleChange
+      @renderMenu()
+
+
+# getHTMLOfSelection = ->
+#   if document.selection && document.selection.createRange
+#     range = document.selection.createRange()
+#     return range.htmlText
+#   else if window.getSelection
+#     selection = window.getSelection()
+#     if selection.rangeCount > 0
+#       range = selection.getRangeAt(0)
+#       clonedSelection = range.cloneContents()
+#       div = document.createElement('div')
+#       div.appendChild(clonedSelection)
+#       return div.innerHTML
+#     else 
+#       return ''
+#   else 
+#     return ''
+
 class TextDesignHtmlConverter 
   designToHtml: (design) ->
     html = ""
@@ -92,11 +176,24 @@ class TextDesignHtmlConverter
         if not item.tag.match(/^[a-z]+$/) or item.tag == "script"
           throw new Error("Invalid tag #{item.tag}")
 
+        attrs = ""
+        # Add style
+        if item.style
+          attrs += " style=\""
+          first = true
+          for key, value of item.style
+            if not first
+              attrs += " "
+            attrs += _.escape(key) + ": " + _.escape(value) + ";"
+            first = false
+
+          attrs += "\""
+
         # Special case for self-closing tags
         if item.tag in ['br']
-          html += "<#{item.tag}>"
+          html += "<#{item.tag}#{attrs}>"
         else
-          html += "<#{item.tag}>" + @designToHtml(item) + "</#{item.tag}>"
+          html += "<#{item.tag}#{attrs}>" + @designToHtml(item) + "</#{item.tag}>"
 
     # If empty, put placeholder
     if html.length == 0
@@ -106,14 +203,22 @@ class TextDesignHtmlConverter
     return html
 
   elemToDesign: (elem) ->
+    console.log elem.outerHTML
+    
     # Walk DOM tree, adding strings and expressions
     items = []
 
     for node in elem.childNodes
-      console.log node.nodeType
 
       if node.nodeType == 1 # Element
         item = { type: "element", tag: node.tagName.toLowerCase(), items: @elemToDesign(node) }
+
+        # Add style
+        if node.style?
+          for style in node.style
+            item.style = item.style or {}
+            item.style[style] = node.style[style]
+
         items.push(item)
         # # If expression, handle specially
         # if node.className and node.className.match(/inline-expr-block/)
@@ -136,60 +241,7 @@ class TextDesignHtmlConverter
 
         # Strip word joiner used to allow editing at end of string
         items.push(text.replace(/\u2060/g, ''))
+
+    console.log JSON.stringify(items, null, 2)
    
     return items
-
-
-class TextWidgetViewComponent extends React.Component
-  createHtml: ->
-    new TextDesignHtmlConverter().designToHtml(@props.design)
-
-  render: ->
-    H.div dangerouslySetInnerHTML: { __html: @createHtml() }
-
-class TextWidgetDesignerComponent extends React.Component
-  createHtml: ->
-    new TextDesignHtmlConverter().designToHtml(@props.design)
-
-  handleChange: (elem) =>
-    @props.onDesignChange(items: new TextDesignHtmlConverter().elemToDesign(elem))
-
-  handleCommand: (command) =>
-    document.execCommand(command)
-    @refs.contentEditable.focus()
-
-  renderMenu: ->
-    H.div className: "mwater-visualization-text-palette",
-      H.button type: "button", className: "btn btn-xs", onClick: @handleCommand.bind(null, "bold"),
-        H.b null, "B"
-      H.button type: "button", className: "btn btn-xs", onClick: @handleCommand.bind(null, "italic"),
-        H.i null, "I"
-      H.button type: "button", className: "btn btn-xs", onClick: @handleCommand.bind(null, "underline"),
-        H.span style: { textDecoration: "underline" }, "U"
-  
-  render: ->
-    H.div style: { position: "relative" },
-      R ContentEditableComponent, 
-        ref: "contentEditable"
-        style: { outline: "none" }
-        html: @createHtml()
-        onChange: @handleChange
-      @renderMenu()
-
-
-# getHTMLOfSelection = ->
-#   if document.selection && document.selection.createRange
-#     range = document.selection.createRange()
-#     return range.htmlText
-#   else if window.getSelection
-#     selection = window.getSelection()
-#     if selection.rangeCount > 0
-#       range = selection.getRangeAt(0)
-#       clonedSelection = range.cloneContents()
-#       div = document.createElement('div')
-#       div.appendChild(clonedSelection)
-#       return div.innerHTML
-#     else 
-#       return ''
-#   else 
-#     return ''
