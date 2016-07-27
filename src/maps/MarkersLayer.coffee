@@ -327,10 +327,28 @@ module.exports = class MarkersLayer extends Layer
     }
 
     # Add color select if color axis
+
     if sublayer.axes.color
       outerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "innerquery", column: "color" }, alias: "color" }) # innerquery.color as color
 
     return outerquery
+
+
+  createKMLExportStyleInfo: (sublayer, schema, filters) ->
+    if sublayer.symbol
+      symbol = sublayer.symbol
+    else
+      symbol = "font-awesome/circle"
+
+    style = {
+      color: sublayer.color
+      symbol: symbol
+    }
+
+    if sublayer.axes.color and sublayer.axes.color.colorMap
+      style.colorMap = sublayer.axes.color.colorMap
+      
+    return style
 
   getKMLExportJsonQL: (design, schema, filters) ->
     layerDef = {
@@ -338,7 +356,12 @@ module.exports = class MarkersLayer extends Layer
         {
           id: "layer#{i}"
           jsonql: @createKMLExportJsonQL(sublayer, schema, filters)
+          style: @createKMLExportStyleInfo(sublayer, schema, filters)
         })
     }
 
     return layerDef
+
+  acceptKmlVisitorForRow: (visitor, row) ->
+    visitor.addPoint(row.latitude, row.longitude, null, null, row.color)
+

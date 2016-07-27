@@ -1,3 +1,4 @@
+_ = require 'lodash'
 React = require 'react'
 H = React.DOM
 
@@ -324,3 +325,169 @@ module.exports = class AdminChoroplethLayer extends Layer
       design: @cleanDesign(options.design, options.schema)
       onDesignChange: (design) =>
         options.onDesignChange(@cleanDesign(design, options.schema)))
+
+  createKMLExportJsonQL: (design, schema, filters) ->
+    axisBuilder = new AxisBuilder(schema: schema)
+    exprCompiler = new ExprCompiler(schema)
+
+    ###
+    E.g.:
+    select admin_regions._id, shape_simplified, 
+      (select count(wp.*) as cnt from 
+      admin_region_subtrees 
+      inner join entities.water_point as wp on wp.admin_region = admin_region_subtrees.descendant
+      where admin_region_subtrees.ancestor = admin_regions._id) as color
+
+    from admin_regions 
+    where shape && !bbox! and  path ->> 0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb' and level = 1  
+    ###
+
+    # Compile adminRegionExpr
+    compiledAdminRegionExpr = exprCompiler.compileExpr(expr: design.adminRegionExpr, tableAlias: "innerquery")
+
+    adminGeometry = {
+      type: "op", op: "ST_AsGeoJson", exprs: [
+        {
+          type: "op", op: "ST_Transform", exprs: [
+            {type: "field", tableAlias: "admin_regions", column: "shape_simplified"},
+            4326
+          ]
+        }
+      ]
+    }
+
+    selects = [
+      { type: "select", expr: { type: "field", tableAlias: "admin_regions", column: "_id" }, alias: "id" }
+      { type: "select", expr: adminGeometry, alias: "the_geom_webmercator" }
+      { type: "select", expr: { type: "field", tableAlias: "admin_regions", column: "name" }, alias: "name" }
+    ]
+
+    # Makes the scalar subquery needed to get a value
+    createScalar = (expr) =>
+      whereClauses = [
+        {
+          type: "op"
+          op: "="
+          exprs: [
+            { type: "field", tableAlias: "admin_region_subtrees", column: "ancestor" }
+            { type: "field", tableAlias: "admin_regions", column: "_id" }
+          ]
+        }      
+      ]
+
+      # Then add filters baked into layer
+      if design.filter
+        whereClauses.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "innerquery"))
+
+      # Then add extra filters passed in, if relevant
+      relevantFilters = _.where(filters, table: design.table)
+      for filter in relevantFilters
+        whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
+  
+      whereClauses = _.compact(whereClauses)
+      
+      return {
+        type: "scalar"
+        expr: colorExpr
+        from: {
+          type: "join"
+          left: exprCompiler.compileTable(design.table, "innerquery")
+          right: { type: "table", table: "admin_region_subtrees", alias: "admin_region_subtrees" }
+          kind: "inner"
+          on: {
+            type: "op"
+            op: "="
+            exprs: [
+              compiledAdminRegionExpr
+              { type: "field", tableAlias: "admin_region_subtrees", column: "descendant" }
+            ]
+          }
+        }
+        where: { type: "op", op: "and", exprs: whereClauses }
+      }
+
+    # Add color select if color axis
+    if design.axes.color
+      colorExpr = axisBuilder.compileAxis(axis: design.axes.color, tableAlias: "innerquery")
+      selects.push({ type: "select", expr: createScalar(colorExpr), alias: "color" })
+
+    # Add label select if color axis
+    if design.axes.label
+      labelExpr = axisBuilder.compileAxis(axis: design.axes.label, tableAlias: "innerquery")
+      selects.push({ type: "select", expr: createScalar(labelExpr), alias: "label" })
+
+    # Now create outer query
+    wheres = []
+
+    if design.scope
+      wheres.push({
+        type: "op"
+        op: "="
+        exprs: [
+          { type: "op", op: "->>", exprs: [{ type: "field", tableAlias: "admin_regions", column: "path" }, 0] }
+          design.scope
+        ]
+      })
+
+    # Level to display
+    wheres.push({
+      type: "op"
+      op: "="
+      exprs: [
+        { type: "field", tableAlias: "admin_regions", column: "level" }
+        design.detailLevel
+      ]
+    })
+
+    query = {
+      type: "query"
+      selects: selects
+      from: { type: "table", table: "admin_regions", alias: "admin_regions" }
+      where: {
+        type: "op"
+        op: "and"
+        exprs: wheres
+      }
+    }
+
+    return query
+
+  getKMLExportJsonQL: (design, schema, filters) ->
+    style = {
+      color: design.color
+      opacity: design.fillOpacity
+    }
+
+    if design.axes.color and design.axes.color.colorMap
+      style.colorMap = design.axes.color.colorMap
+      
+    layerDef = {
+      layers: [{ id: "layer0", jsonql: @createKMLExportJsonQL(design, schema, filters) , style: style}]
+    }
+    
+    return layerDef
+
+  acceptKmlVisitorForRow: (visitor, row) ->
+    if not row.the_geom_webmercator
+      return
+
+    if row.the_geom_webmercator.length == 0
+      return
+
+    data = JSON.parse(row.the_geom_webmercator)
+
+    if data.coordinates.length == 0
+      return
+
+    if data.type == "MultiPolygon"
+      outer = data.coordinates[0][0]  
+    else
+      outer = data.coordinates[0]
+
+
+    list = _.map(outer, (coordinates) ->
+      coordinates.join(",")
+    )
+
+    visitor.addPolygon(list.join(" "), row.color, data.type == "MultiPolygon")
+    

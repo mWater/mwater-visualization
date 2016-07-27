@@ -23,7 +23,7 @@ DirectMapUrlSource = require './maps/DirectMapUrlSource'
 ServerMapUrlSource = require './maps/ServerMapUrlSource'
 ServerDashboardDataSource = require './widgets/ServerDashboardDataSource'
 
-dashboardId = "366702069dba44249d14bfccaa2d333e"
+dashboardId = "e6f5442a14e147edad28ba91aed3dac0"
 
 class MWaterDashboardPane extends React.Component
   constructor: (props) ->

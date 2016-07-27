@@ -280,3 +280,114 @@ module.exports = class BufferLayer extends Layer
     if error then return error
   
     return null
+
+  createKMLExportJsonQL: (design, schema, filters) ->
+    axisBuilder = new AxisBuilder(schema: schema)
+    exprCompiler = new ExprCompiler(schema)
+    # Compile geometry axis
+    geometryExpr = axisBuilder.compileAxis(axis: design.axes.geometry, tableAlias: "main")
+
+    # st_transform(st_buffer(st_transform(<geometry axis>, 4326)::geography, <radius>)::geometry, 3857) as the_geom_webmercator
+    bufferedGeometry = {
+      type: "op", op: "ST_AsGeoJson", exprs: [
+        { type: "op", op: "::geometry", exprs: [
+          { type: "op", op: "ST_Buffer", exprs: [
+            { type: "op", op: "::geography", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326] }] }
+            design.radius
+            ]}
+          ]}
+      ]
+    }
+
+    # bufferedGeometry = {
+    #   type: "op", op: "ST_Transform", exprs: [
+    #     { type: "op", op: "::geometry", exprs: [
+    #       { type: "op", op: "ST_Buffer", exprs: [
+    #         { type: "op", op: "::geography", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326] }] }
+    #         design.radius
+    #         ]}
+    #       ]}
+    #     3857
+    #   ]
+    # }
+    # geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
+
+    selects = [
+      { type: "select", expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table).primaryKey }, alias: "id" } # main primary key as id
+      { type: "select", expr: bufferedGeometry, alias: "the_geom_webmercator" } 
+    ]
+
+    # Add color select if color axis
+    if design.axes.color
+      colorExpr = axisBuilder.compileAxis(axis: design.axes.color, tableAlias: "main")
+      selects.push({ type: "select", expr: colorExpr, alias: "color" })
+    
+    # Select _id, location and clustered row number
+    query = { 
+      type: "query"
+      selects: selects
+      from: exprCompiler.compileTable(design.table, "main")
+    }
+
+    # ST_Transform(ST_Expand(
+    #     # Prevent 3857 overflow (i.e. > 85 degrees lat) 
+    #     ST_Intersection(
+    #       ST_Transform(!bbox!, 4326),
+    #       ST_Expand(ST_MakeEnvelope(-180, -85, 180, 85, 4326), -<radius in degrees>))
+    #     , <radius in degrees>})
+    #   , 3857)
+    # TODO document how we compute this
+    radiusDeg = design.radius / 100000
+
+    # Create filters. First ensure geometry and limit to bounding box
+    whereClauses = [
+      { type: "op", op: "is not null", exprs: [geometryExpr] }
+    ]
+
+    # Then add filters baked into layer
+    if design.filter
+      whereClauses.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "main"))
+
+    # Then add extra filters passed in, if relevant
+    # Get relevant filters
+    relevantFilters = _.where(filters, table: design.table)
+    for filter in relevantFilters
+      whereClauses.push(injectTableAlias(filter.jsonql, "main"))
+
+    whereClauses = _.compact(whereClauses)
+    
+    # Wrap if multiple
+    if whereClauses.length > 1
+      query.where = { type: "op", op: "and", exprs: whereClauses }
+    else
+      query.where = whereClauses[0]
+
+    return query
+
+  getKMLExportJsonQL: (design, schema, filters) ->
+    style = {
+      color: design.color
+      opacity: design.fillOpacity
+    }
+
+    if design.axes.color and design.axes.color.colorMap
+      style.colorMap = design.axes.color.colorMap
+      
+    layerDef = {
+      layers: [{ id: "layer0", jsonql: @createKMLExportJsonQL(design, schema, filters) , style: style}]
+    }
+    
+    return layerDef
+
+  acceptKmlVisitorForRow: (visitor, row) ->
+    data = JSON.parse(row.the_geom_webmercator)
+
+    outer = data.coordinates[0]
+    inner = data.coordinates.slice(1)
+
+    list = _.map(outer, (coordinates) ->
+      coordinates.join(",")
+    )
+
+    visitor.addPolygon(list.join(" "), row.color)
+
