@@ -72,8 +72,8 @@ class ChartWidgetComponent extends React.Component
     filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
-    connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
-    connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
+    connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent) TODO REMOVE
+    connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent) TODO REMOVE
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
@@ -82,7 +82,7 @@ class ChartWidgetComponent extends React.Component
     super
     @state = { 
       # True when editing chart
-      editing: props.chart.isEmpty(@props.design) # Display editor if empty design
+      editing: false
     }  
 
   # Saves a csv file to disk
@@ -113,10 +113,6 @@ class ChartWidgetComponent extends React.Component
 
   handleEndEditing: =>
     @setState(editing: false)
-
-    # Remove if blank
-    if @props.chart.isEmpty(@props.design)
-      @props.onRemove()
 
   renderChart: (width, height) ->
     React.createElement(ChartViewComponent, 
@@ -152,9 +148,17 @@ class ChartWidgetComponent extends React.Component
       onRequestClose: @handleEndEditing,
         content)
 
+  # Render a link to start editing
+  renderEditLink: ->
+    H.div style: { position: "absolute", bottom: @props.height / 2, left: 0, right: 0, textAlign: "center" },
+      H.a className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Edit"
+
   render: ->
     # Determine if valid design
     validDesign = not @props.chart.validateDesign(@props.chart.cleanDesign(@props.design, @props.schema), @props.schema)
+
+    # Determine if empty
+    emptyDesign = @props.chart.isEmpty(@props.design)
 
     # Create dropdown items
     dropdownItems = @props.chart.createDropdownItems(@props.design, @props.schema, @props.widgetDataSource, @props.filters)
@@ -168,7 +172,7 @@ class ChartWidgetComponent extends React.Component
       dropdownItems.unshift({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
 
     # Wrap in a simple widget
-    return H.div onDoubleClick: (if @props.onDesignChange? then @handleStartEditing), 
+    return H.div onDoubleClick: (if @props.onDesignChange? then @handleStartEditing), style: { position: "relative" },
       if @props.onDesignChange?
         @renderEditor()
       React.createElement(SimpleWidgetComponent, 
@@ -181,3 +185,5 @@ class ChartWidgetComponent extends React.Component
           # height and width will be injected
           @renderChart()
       )
+      if emptyDesign or not validDesign
+        @renderEditLink()

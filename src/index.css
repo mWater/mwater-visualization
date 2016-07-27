@@ -7,14 +7,6 @@
 /* http://stackoverflow.com/questions/19305821/multiple-modals-overlay */
 .modal { overflow-y: auto; }
 
-.mwater-visualization-simple-widget {
-  border: solid 2px transparent;
-  border-radius: 8px;
-}
-
-.mwater-visualization-simple-widget:hover {
-  border: solid 2px #EEE;
-}
 
 .mwater-visualization-simple-widget .mwater-visualization-simple-widget-resize-handle {
   display: none;
@@ -26,7 +18,12 @@
 
 .mwater-visualization-simple-widget .mwater-visualization-simple-widget-gear-button {
   display: none;
-  color: #337ab7;
+  color: #88ceff;
+  border: solid 1px #88ceff;
+  background-color: rgba(255, 255, 255, 0.7);
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-top: 2px;
 }
 
 .mwater-visualization-simple-widget:hover .mwater-visualization-simple-widget-gear-button {
@@ -199,11 +196,15 @@
   display: none;
 }
 
+.mwater-visualization-block-aspect {
+  display: none;
+}
+
 .mwater-visualization-block:hover > .mwater-visualization-block-move {
     display: block;
     position: absolute;
     right: 50%;
-    top: -10px;
+    top: -11px;
     border: solid 1px #88ceff;
     color: #88ceff;
     background-color: white;
@@ -239,12 +240,34 @@
   /*color: white !important;*/
 }
 
-.mwater-visualization-block-palette {
+.mwater-visualization-block:hover > .mwater-visualization-block-aspect {
+    display: block;
+    position: absolute;
+    right: 50%;
+    bottom: -12px;
+    border: solid 1px #88ceff;
+    color: #88ceff;
+    background-color: white;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 5px;
+    border-radius: 5px;
+    padding-right: 5px;
+    cursor: move;
+}  
+
+.mwater-visualization-block-aspect:hover {
+  background-color: #88ceff !important;
+  color: white !important;
+}
+
+
+.mwater-visualization-palette {
   background-color: #363b3e;
   padding: 5px;
 }
 
-.mwater-visualization-block-palette-item {
+.mwater-visualization-palette-item {
   cursor: move;
   background-color: #4B5155;
   margin: 10px;
@@ -254,20 +277,20 @@
   text-align: center;
 }
 
-.mwater-visualization-block-palette-item > .icon {
+.mwater-visualization-palette-item > .title {
   color: white;
   text-align: center;
   font-size: 18pt;
   padding-top: 5px;
 }
 
-.mwater-visualization-block-palette-item > .title {
+.mwater-visualization-palette-item > .subtitle {
   color: #DDD;
   text-align: center;
   padding-bottom: 5px;
 }
 
-.mwater-visualization-block-palette-item:hover {
+.mwater-visualization-palette-item:hover {
   cursor: move;
   background-color: #2485dd;
 }

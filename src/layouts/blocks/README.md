@@ -5,5 +5,6 @@ Contents:
 id: id of block
 type: "root"/"vertical"/"horizontal"/"widget"
 widgetType: if a widget
+aspectRatio: w/h if not autoHeight
 design: widget design
 blocks: other blocks if not a widget

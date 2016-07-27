@@ -34,6 +34,9 @@ module.exports = class MarkdownWidget extends Widget
       onRemove: options.onRemove
     )
 
+  # Determine if widget is auto-height, which means that a vertical height is not required.
+  isAutoHeight: -> true
+
 class MarkdownWidgetComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired  # See Map Design.md

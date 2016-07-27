@@ -33,3 +33,5 @@ module.exports = class Widget
   getData: (design, schema, dataSource, filters, callback) ->
     throw new Error("Not implemented")
 
+  # Determine if widget is auto-height, which means that a vertical height is not required.
+  isAutoHeight: -> false

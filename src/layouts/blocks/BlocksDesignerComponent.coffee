@@ -1,6 +1,7 @@
 React = require 'react'
 H = React.DOM
 R = React.createElement
+uuid = require 'node-uuid'
 
 HTML5Backend = require('react-dnd-html5-backend')
 NestableDragDropContext = require  "react-library/lib/NestableDragDropContext"
@@ -8,7 +9,7 @@ NestableDragDropContext = require  "react-library/lib/NestableDragDropContext"
 DraggableBlockComponent = require "./DraggableBlockComponent"
 DecoratedBlockComponent = require './DecoratedBlockComponent'
 
-BlockPaletteComponent = require './BlockPaletteComponent'
+PaletteItemComponent = require '../PaletteItemComponent'
 blockUtils = require './blockUtils'
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
@@ -79,6 +80,8 @@ class BlocksDesignerComponent extends React.Component
           block: block
           onBlockDrop: @handleBlockDrop,
             R DecoratedBlockComponent, 
+              aspectRatio: block.aspectRatio
+              onAspectRatioChange: (aspectRatio) => @props.onDesignChange(blockUtils.updateBlock(@props.design, _.extend({}, block, aspectRatio: aspectRatio)))
               onBlockRemove: @handleBlockDrop.bind(null, block),
                 R AutoSizeComponent, { injectWidth: true }, 
                   (size) =>
@@ -87,54 +90,44 @@ class BlocksDesignerComponent extends React.Component
                       design: block.design
                       onDesignChange: (design) => @props.onDesignChange(blockUtils.updateBlock(@props.design, _.extend({}, block, design: design)))
                       width: size.width
-                      height: size.width * 0.8
+                      height: size.width / block.aspectRatio
                     })
+
+  createBlockItem: (block) ->
+    # Add unique id
+    return () -> { block: _.extend({}, block, id: uuid.v4()) }
 
   renderPalette: ->
     H.td key: "palette", style: { width: "1%", verticalAlign: "top", height: "100%" }, 
-      H.div className: "mwater-visualization-block-palette", style: { height: "100%" },
-        R BlockPaletteComponent, block: { type: "widget", widgetType: "Markdown", design: {} },
-          H.div className: "mwater-visualization-block-palette-item",
-            H.div className: "icon",
-              H.i className: "fa fa-font"
-            H.div className: "title",
-              "Text"
-        R BlockPaletteComponent, block: { type: "image" },
-          H.div className: "mwater-visualization-block-palette-item",
-            H.div className: "icon",
-              H.i className: "fa fa-picture-o"
-            H.div className: "title",
-              "Image"
-        R BlockPaletteComponent, block: { type: "widget", widgetType: "LayeredChart", design: widgetDesign },
-          H.div className: "mwater-visualization-block-palette-item",
-            H.div className: "icon",
-              H.i className: "fa fa-bar-chart"
-            H.div className: "title",
-              "Chart"
-        R BlockPaletteComponent, block: { type: "widget", widgetType: "Map", design: { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } } },
-          H.div className: "mwater-visualization-block-palette-item",
-            H.div className: "icon",
-              H.i className: "fa fa-map-o"
-            H.div className: "title",
-              "Map"
-        R BlockPaletteComponent, block: { type: "widget", widgetType: "TableChart", design: {} },
-          H.div className: "mwater-visualization-block-palette-item",
-            H.div className: "icon",
-              H.i className: "fa fa-table"
-            H.div className: "title",
-              "Table"
-        R BlockPaletteComponent, block: { type: "widget", widgetType: "CalendarChart", design: {} },
-          H.div className: "mwater-visualization-block-palette-item",
-            H.div className: "icon",
-              H.i className: "fa fa-calendar"
-            H.div className: "title",
-              "Calendar"
-        R BlockPaletteComponent, block: { type: "widget", widgetType: "ImageMosaicChart", design: {} },
-          H.div className: "mwater-visualization-block-palette-item",
-            H.div className: "icon",
-              H.i className: "fa fa-th"
-            H.div className: "title",
-              "Image Mosaic"
+      H.div className: "mwater-visualization-palette", style: { height: "100%" },
+        R PaletteItemComponent, 
+          createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "Text", design: {} })
+          title: H.i className: "fa fa-font"
+          subtitle: "Text"
+        # R PaletteItemComponent,
+        #   createItem: @createBlockItem({ type: "image" })
+        #   title: H.i className: "fa fa-picture-o"
+        #   subtitle: "Image"
+        R PaletteItemComponent,
+          createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "LayeredChart", design: {} })
+          title: H.i className: "fa fa-bar-chart"
+          subtitle: "Chart"
+        R PaletteItemComponent,
+          createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "Map", design: { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } } })
+          title: H.i className: "fa fa-map-o"
+          subtitle: "Map"
+        R PaletteItemComponent,
+          createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "TableChart", design: {} })
+          title: H.i className: "fa fa-table"
+          subtitle: "Table"
+        R PaletteItemComponent,
+          createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "CalendarChart", design: {} })
+          title: H.i className: "fa fa-calendar"
+          subtitle: "Calendar"
+        R PaletteItemComponent,
+          createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "ImageMosaicChart", design: {} })
+          title: H.i className: "fa fa-th"
+          subtitle: "Image Mosaic"
 
   render: ->
     H.table style: { width: "100%", height: "100%" },
