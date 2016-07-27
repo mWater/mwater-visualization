@@ -114,13 +114,13 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
     style =
       cursor: "move"
       marginRight: 8
-      opacity: 0.6
+      opacity: 0.5
       # float: "right"
 
     @props.connectDragPreview(@props.connectDropTarget(H.div null,
-      H.div style: { fontSize: 16 }, key: "layerView", className: "hover-display-parent",
+      H.div style: { fontSize: 16 }, key: "layerView",
         if @props.connectDragSource
-          @props.connectDragSource(H.i(className: "fa fa-bars hover-display-child", style: style))
+          @props.connectDragSource(H.i(className: "fa fa-bars", style: style))
         @renderLayerEditToggle()
         @renderVisible()
         @renderName()

@@ -6,7 +6,17 @@ TabbedComponent = require('react-library/lib/TabbedComponent')
 ui = require './UIComponents'
 ExprUtils = require("mwater-expressions").ExprUtils
 
-siteTypes = ["entities.water_point", "entities.household", "entities.sanitation_facility", "entities.community", "entities.school", "entities.health_facility", "entities.surface_water"]
+siteTypes = [
+  "entities.water_point"
+  "entities.household"
+  "entities.sanitation_facility"
+  "entities.community"
+  "entities.school"
+  "entities.health_facility"
+  "entities.surface_water"
+  "entities.place_of_worship"
+  "entities.water_system"
+]
 
 # Allows selection of a mwater-visualization table. Loads forms as well and calls event if modified
 module.exports = class MWaterTableSelectComponent extends React.Component

@@ -30,6 +30,7 @@ ordering:
 ###
 module.exports = class TableChart extends Chart
   cleanDesign: (design, schema) ->
+    exprCleaner = new ExprCleaner(schema)
     axisBuilder = new AxisBuilder(schema: schema)
 
     # Clone deep for now # TODO
