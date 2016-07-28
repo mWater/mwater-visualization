@@ -183,5 +183,5 @@ class ChartWidgetComponent extends React.Component
         dropdownItems: dropdownItems,
           @renderChart()
       )
-      if emptyDesign or not validDesign
+      if (emptyDesign or not validDesign) and @props.onDesignChange?
         @renderEditLink()

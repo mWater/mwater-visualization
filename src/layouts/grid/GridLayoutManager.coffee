@@ -1,3 +1,4 @@
+_ = require 'lodash'
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -20,6 +21,10 @@ module.exports = class GridLayoutManager
       items: options.items
       onItemsChange: options.onItemsChange
       renderWidget: options.renderWidget
+
+  # Tests if dashboard has any items
+  isEmpty: (items) ->
+    return _.isEmpty(items)
 
 
 class GridLayoutComponent extends React.Component

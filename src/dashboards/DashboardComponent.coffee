@@ -10,6 +10,7 @@ DashboardUtils = require './DashboardUtils'
 QuickfiltersComponent = require '../quickfilter/QuickfiltersComponent'
 QuickfilterCompiler = require '../quickfilter/QuickfilterCompiler'
 SettingsModalComponent = require './SettingsModalComponent'
+GridLayoutManager = require '../layouts/grid/GridLayoutManager'
 
 # Dashboard component that includes an action bar at the top
 # Manages undo stack and quickfilter value
@@ -34,6 +35,7 @@ module.exports = class DashboardComponent extends React.Component
     @state = { 
       undoStack: new UndoStack().push(props.design) 
       quickfiltersValues: null
+      editing: new GridLayoutManager().isEmpty(props.design.items) # TODO
     }
 
   componentWillReceiveProps: (nextProps) ->
@@ -50,6 +52,9 @@ module.exports = class DashboardComponent extends React.Component
     # Clear quickfilters if definition changed
     if not _.isEqual(@props.design.quickfilters, nextProps.design.quickfilters)
       @setState(quickfiltersValues: null)
+
+    if not nextProps.onDesignChange?
+      @setState(editing: false)
 
   handlePrint: =>
     @dashboardView.print()
@@ -81,6 +86,9 @@ module.exports = class DashboardComponent extends React.Component
   handleSettings: =>
     @refs.settings.show(@props.design)
 
+  handleToggleEditing: =>
+    @setState(editing: not @state.editing)
+
   renderAddWidget: ->
     newWidgetTypes = [
       { name: "Chart", type: "LayeredChart", design: {xAxisLabelText: "", yAxisLabelText: ""} }
@@ -102,11 +110,21 @@ module.exports = class DashboardComponent extends React.Component
             H.a onClick: @handleAddWidget.bind(null, wt), wt.name
           )
 
+  renderEditingSwitch: ->
+    H.a key: "edit", className: "btn btn-link btn-sm", onClick: @handleToggleEditing,
+      if @state.editing
+        H.i className: "fa fa-fw fa-check-square"
+      else
+        H.i className: "fa fa-fw fa-square-o"
+      if @state.editing then " Editing" else " Edit Dashboard"
+
   renderActionLinks: ->
     H.div null,
       if @props.onDesignChange?
+        @renderEditingSwitch()
+      if @state.editing
         @renderAddWidget()
-      if @props.onDesignChange?
+      if @state.editing
         [
           H.a key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
             H.span className: "glyphicon glyphicon-triangle-left"
@@ -122,7 +140,7 @@ module.exports = class DashboardComponent extends React.Component
       H.a key: "export", className: "btn btn-link btn-sm", onClick: @handleSaveDesignFile,
         H.span(className: "glyphicon glyphicon-download-alt")
         " Export"
-      if @props.onDesignChange?
+      if @state.editing
         H.a key: "settings", className: "btn btn-link btn-sm", onClick: @handleSettings,
           H.span(className: "glyphicon glyphicon-cog")
           " Settings"
@@ -166,7 +184,7 @@ module.exports = class DashboardComponent extends React.Component
 
             ref: @refDashboardView
             design: @props.design
-            onDesignChange: @props.onDesignChange
+            onDesignChange: if @state.editing then @props.onDesignChange
             filters: filters
             width: size.width
             standardWidth: if @props.printScaling then 1440 else size.width
