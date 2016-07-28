@@ -2,7 +2,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
-# Block decorated with drag/close hover controls
+# Block decorated with drag/remove hover controls
 module.exports = class DecoratedBlockComponent extends React.Component
   @propTypes:
     onBlockRemove: React.PropTypes.func.isRequired # Called when block is removed

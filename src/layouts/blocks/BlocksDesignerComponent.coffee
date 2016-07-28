@@ -7,7 +7,7 @@ HTML5Backend = require('react-dnd-html5-backend')
 NestableDragDropContext = require  "react-library/lib/NestableDragDropContext"
 
 DraggableBlockComponent = require "./DraggableBlockComponent"
-DecoratedBlockComponent = require './DecoratedBlockComponent'
+DecoratedBlockComponent = require '../DecoratedBlockComponent'
 
 PaletteItemComponent = require '../PaletteItemComponent'
 blockUtils = require './blockUtils'
