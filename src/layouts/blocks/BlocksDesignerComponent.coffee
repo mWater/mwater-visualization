@@ -132,7 +132,7 @@ class BlocksDesignerComponent extends React.Component
         R PaletteItemComponent,
           createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "ImageMosaicChart", design: {} })
           title: H.i className: "fa fa-th"
-          subtitle: "Image Mosaic"
+          subtitle: "Mosaic"
 
   render: ->
     H.table style: { width: "100%", height: "100%" },
@@ -155,9 +155,9 @@ class RootBlockComponent extends React.Component
     R DraggableBlockComponent, 
       block: @props.block
       onBlockDrop: @props.onBlockDrop
-      style: { height: "100%" }
+      style: { height: "100%", padding: 30 }
       onlyBottom: true,
-        H.div style: { padding: 30, height: "100%" },
+        H.div null,
           _.map @props.block.blocks, (block) =>
             @props.renderBlock(block)
 

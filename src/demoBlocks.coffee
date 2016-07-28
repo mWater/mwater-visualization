@@ -108,7 +108,7 @@ design = {
   type: "root"
   blocks: [
     # { id: "1234", type: "widget", aspectRatio: 1.4, widgetType: "LayeredChart", design: widgetDesign }
-    { id: "1234", type: "widget", widgetType: "Text", design: { items: ["hello world!!!"] } }
+    # { id: "1234", type: "widget", widgetType: "Text", design: { items: ["hello world!!!"] } }
   ]
 }
 
