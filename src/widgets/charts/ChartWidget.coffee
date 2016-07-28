@@ -12,18 +12,20 @@ module.exports = class ChartWidget extends Widget
   constructor: (chart) ->
     @chart = chart
 
-  # Creates a view of the widget. width, height and standardWidth will be injected
+  # Creates a view of the widget.
   # options:
   #  schema: schema to use
   #  dataSource: data source to use
   #  widgetDataSource: Gives data to the widget in a way that allows client-server separation and secure sharing. See definition in WidgetDataSource.
   #  design: widget design
   #  onRemove: called when widget is removed
-  #  onDuplicate: called when widget is duplicated
   #  scope: scope of the widget (when the widget self-selects a particular scope)
   #  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   #  onScopeChange: called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
   #  onDesignChange: called with new design. null/undefined for readonly
+  #  width: width in pixels on screen
+  #  height: height in pixels on screen
+  #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
   createViewElement: (options) ->
     return React.createElement(ChartWidgetComponent,
       chart: @chart
@@ -32,11 +34,13 @@ module.exports = class ChartWidget extends Widget
       widgetDataSource: options.widgetDataSource
       dataSource: options.dataSource
       onRemove: options.onRemove
-      onDuplicate: options.onDuplicate
       scope: options.scope
       filters: options.filters
       onScopeChange: options.onScopeChange
       onDesignChange: options.onDesignChange
+      width: options.width
+      height: options.height
+      standardWidth: options.standardWidth
     )
 
   # Get the data that the widget needs. This will be called on the server, typically.
@@ -62,7 +66,6 @@ class ChartWidgetComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired # Data source to use for chart
 
     onRemove: React.PropTypes.func
-    onDuplicate: React.PropTypes.func
 
     width: React.PropTypes.number
     height: React.PropTypes.number
@@ -166,8 +169,6 @@ class ChartWidgetComponent extends React.Component
       dropdownItems.push({ label: "Export Data", icon: "save-file", onClick: @handleSaveCsvFile })
     if @props.onRemove
       dropdownItems.push({ label: "Remove", icon: "remove", onClick: @props.onRemove })
-    if @props.onDuplicate and @props.onDesignChange?
-      dropdownItems.push({ label: "Duplicate", icon: "duplicate", onClick: @props.onDuplicate })
     if @props.onDesignChange?      
       dropdownItems.unshift({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
 
@@ -180,9 +181,6 @@ class ChartWidgetComponent extends React.Component
         height: @props.height
         standardWidth: @props.standardWidth
         dropdownItems: dropdownItems,
-        connectMoveHandle: @props.connectMoveHandle
-        connectResizeHandle: @props.connectResizeHandle,
-          # height and width will be injected
           @renderChart()
       )
       if emptyDesign or not validDesign

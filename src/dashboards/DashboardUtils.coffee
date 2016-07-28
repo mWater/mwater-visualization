@@ -1,5 +1,5 @@
 uuid = require 'node-uuid'
-LegoLayoutEngine = require './LegoLayoutEngine'
+LegoLayoutEngine = require '../layouts/grid/LegoLayoutEngine'
 
 # Add a widget to a dashboard design, returning the new design
 exports.addWidget = (dashboardDesign, widgetType, widgetDesign, width, height) ->

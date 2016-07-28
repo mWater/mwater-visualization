@@ -7,8 +7,9 @@ module.exports = class DecoratedBlockComponent extends React.Component
   @propTypes:
     onBlockRemove: React.PropTypes.func.isRequired # Called when block is removed
 
-    connectDragSource: React.PropTypes.func.isRequired # the drag source connector, supplied by React DND
-    connectDragPreview: React.PropTypes.func.isRequired # the drag preview connector, supplied by React DND
+    connectMoveHandle: React.PropTypes.func.isRequired # the move handle connector
+    connectDragPreview: React.PropTypes.func   # the drag preview connector
+    connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging. Null to not render
 
     # Set to allow changing aspect ratio
     aspectRatio: React.PropTypes.number
@@ -66,9 +67,13 @@ module.exports = class DecoratedBlockComponent extends React.Component
       return null
   
   render: ->
-    elem = @props.connectDragPreview(H.div className: "mwater-visualization-block",
-      if not @props.isDragging and @props.connectDragSource?
-        @props.connectDragSource(H.div key: "move", className: "mwater-visualization-block-move",
+    elem = H.div className: "mwater-visualization-block",
+      @props.children
+    
+      @renderAspectDrag()
+
+      if not @props.isDragging and @props.connectMoveHandle?
+        @props.connectMoveHandle(H.div key: "move", className: "mwater-visualization-block-move",
           H.i className: "fa fa-arrows")
 
       if not @props.isDragging and @props.onBlockRemove?
@@ -80,9 +85,11 @@ module.exports = class DecoratedBlockComponent extends React.Component
         H.div key: "aspect", className: "mwater-visualization-block-aspect", onMouseDown: @handleAspectMouseDown,
           H.i className: "fa fa-arrows-v"
 
-      @renderAspectDrag()
+      if not @props.isDragging and @props.connectResizeHandle?
+        @props.connectResizeHandle(H.div key: "resize", className: "mwater-visualization-block-resize",
+          H.i className: "fa fa-expand fa-rotate-90")
 
-      @props.children
-    )
+    if @props.connectDragPreview
+      elem = @props.connectDragPreview(elem)
 
     return elem

@@ -73,7 +73,7 @@ class DraggableBlockComponent extends React.Component
       H.div style: { position: "relative" },
         @renderHover()
         React.cloneElement(React.Children.only(@props.children), {
-          connectDragSource: @props.connectDragSource
+          connectMoveHandle: @props.connectDragSource
           connectDragPreview: @props.connectDragPreview
         })
     )

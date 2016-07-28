@@ -1,15 +1,15 @@
 React = require 'react'
 H = React.DOM
-
-LegoLayoutEngine = require './LegoLayoutEngine'
-WidgetFactory = require '../widgets/WidgetFactory'
-WidgetScoper = require '../widgets/WidgetScoper'
-WidgetContainerComponent = require '../layouts/grid/WidgetContainerComponent'
-ReactElementPrinter = require 'react-library/lib/ReactElementPrinter'
-
-WidgetScopesViewComponent = require '../widgets/WidgetScopesViewComponent'
+R = React.createElement
 
 uuid = require 'node-uuid'
+
+WidgetFactory = require '../widgets/WidgetFactory'
+WidgetScoper = require '../widgets/WidgetScoper'
+ReactElementPrinter = require 'react-library/lib/ReactElementPrinter'
+GridLayoutManager = require '../layouts/grid/GridLayoutManager'
+WidgetScopesViewComponent = require '../widgets/WidgetScopesViewComponent'
+
 
 # Displays a dashboard, handling removing of widgets. No title bar or other decorations.
 # Handles scoping
@@ -39,50 +39,13 @@ module.exports = class DashboardViewComponent extends React.Component
       widgetScoper: new WidgetScoper() # Empty scoping
     }
 
-  handleLayoutUpdate: (layouts) =>
-    # Update item layouts
-    items = _.mapValues(@props.design.items, (item, id) =>
-      return _.extend({}, item, layout: layouts[id])
-      )
-    design = _.extend({}, @props.design, items: items)
-    @props.onDesignChange(design)
-
   handleScopeChange: (id, scope) => 
     @setState(widgetScoper: @state.widgetScoper.applyScope(id, scope))
-
-  handleRemove: (id) =>
-    # Update item layouts
-    items = _.omit(@props.design.items, id)
-    design = _.extend({}, @props.design, items: items)
-
-    @props.onDesignChange(design)
-
-  handleDuplicate: (id) =>
-    # Get item
-    item = @props.design.items[id]
-
-    # Make a copy (use same since immutable). It's in the same location, but 
-    # the dashboard will lay it out correctly
-    items = _.extend({}, @props.design.items)
-    items[uuid.v4()] = item
-    
-    design = _.extend({}, @props.design, items: items)
-
-    @props.onDesignChange(design)
 
   handleRemoveScope: (id) =>
     @setState(widgetScoper: @state.widgetScoper.applyScope(id, null))    
 
-  handleDesignChange: (id, widgetDesign) =>
-    widget = @props.design.items[id].widget
-    widget = _.extend({}, widget, design: widgetDesign)
-
-    item = @props.design.items[id]
-    item = _.extend({}, item, widget: widget)
-
-    items = _.clone(@props.design.items)
-    items[id] = item
-
+  handleItemsChange: (items) =>
     design = _.extend({}, @props.design, items: items)
     @props.onDesignChange(design)
 
@@ -91,57 +54,36 @@ module.exports = class DashboardViewComponent extends React.Component
     # Create element at 96 dpi (usual for browsers) and 7.5" across (letter - 0.5" each side). 1440 is double, so scale down
     # props are immutable in React 0.14+
     elem = H.div style: { transform: "scale(0.5)", transformOrigin: "top left" },
-        React.createElement(DashboardViewComponent, _.extend({}, @props, { width: 1440 }))
+        R(DashboardViewComponent, _.extend({}, @props, { width: 1440 }))
     
     printer = new ReactElementPrinter()
     printer.print(elem, { delay: 5000 })
 
   renderScopes: ->
-    React.createElement(WidgetScopesViewComponent, scopes: @state.widgetScoper.getScopes(), onRemoveScope: @handleRemoveScope)
-
-  renderPageBreaks: (layoutEngine, layouts) ->
-    # Get height
-    height = layoutEngine.calculateHeight(layouts)
-
-    # Page breaks are 8.5x11 with 0.5" margin 
-    pageHeight = @props.width / 7.5 * 10
-
-    number = Math.floor(height/pageHeight)
-
-    elems = []
-    if number > 0
-      for i in [1..number]
-        elems.push(H.div(className: "mwater-visualization-page-break", style: { position: "absolute", top: i * pageHeight }))
-
-    return elems
+    R(WidgetScopesViewComponent, scopes: @state.widgetScoper.getScopes(), onRemoveScope: @handleRemoveScope)
 
   render: ->
-    # Create layout engine
-    # TODO create from design
-    layoutEngine = new LegoLayoutEngine(@props.width, 24)
+    layoutManager = new GridLayoutManager()
 
-    # Get layouts indexed by id
-    layouts = _.mapValues(@props.design.items, "layout")
-
-    # Create widget elems
-    elems = _.mapValues @props.design.items, (item, id) =>
-      widget = WidgetFactory.createWidget(item.widget.type)
+    renderWidget = (options) =>
+      widget = WidgetFactory.createWidget(options.type)
 
       # Get filters (passed in plus widget scoper filters)
       filters = @props.filters or []
-      filters = filters.concat(@state.widgetScoper.getFilters(id))
+      filters = filters.concat(@state.widgetScoper.getFilters(options.id))
 
       return widget.createViewElement({
         schema: @props.schema
         dataSource: @props.dataSource
-        widgetDataSource: @props.dashboardDataSource.getWidgetDataSource(id)
-        design: item.widget.design
-        scope: @state.widgetScoper.getScope(id)
+        widgetDataSource: @props.dashboardDataSource.getWidgetDataSource(options.id)
+        design: options.design
+        scope: @state.widgetScoper.getScope(options.id)
         filters: filters
-        onScopeChange: @handleScopeChange.bind(null, id)
-        onRemove: if @props.onDesignChange? then @handleRemove.bind(null, id)
-        onDuplicate: if @props.onDesignChange? then @handleDuplicate.bind(null, id)
-        onDesignChange: if @props.onDesignChange? then @handleDesignChange.bind(null, id)
+        onScopeChange: @handleScopeChange.bind(null, options.id)
+        onDesignChange: options.onDesignChange
+        width: options.width
+        height: options.height
+        standardWidth: options.standardWidth # TODO doc
       })  
 
     style = {
@@ -150,15 +92,15 @@ module.exports = class DashboardViewComponent extends React.Component
     }
 
     # Render widget container
-    return H.div style: style, className: "mwater-visualization-dashboard", onClick: @handleClick,
+    return H.div style: style, 
       H.div null,
         @renderScopes()
-        React.createElement(WidgetContainerComponent, 
-          layoutEngine: layoutEngine
-          layouts: layouts
-          elems: elems
-          onLayoutUpdate: if @props.onDesignChange? then @handleLayoutUpdate
+
+        layoutManager.renderLayout({
           width: @props.width 
           standardWidth: @props.standardWidth
-        )
-        @renderPageBreaks(layoutEngine, layouts)
+          items: @props.design.items
+          onItemsChange: @handleItemsChange
+          renderWidget: renderWidget
+        })
+        
