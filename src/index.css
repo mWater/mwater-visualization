@@ -176,6 +176,12 @@
   min-width: 50px;
 }
 
+.mwater-visualization-block-view {
+  margin: 1px;
+  padding: 5px;
+  position: relative;
+}
+
 .mwater-visualization-block {
   margin: 1px;
   padding: 5px;

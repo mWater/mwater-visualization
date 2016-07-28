@@ -106,16 +106,28 @@ class GridLayoutComponent extends React.Component
 
 class WidgetComponent extends React.Component
   render: ->
-    # TODO injects width, height too late
-    R DecoratedBlockComponent,
-      connectMoveHandle: @props.connectMoveHandle
-      connectResizeHandle: @props.connectResizeHandle
-      onBlockRemove: @props.onBlockRemove,
+    # Render decorated if editable
+    if @props.onDesignChange
+      return R DecoratedBlockComponent,
+        connectMoveHandle: @props.connectMoveHandle
+        connectResizeHandle: @props.connectResizeHandle
+        onBlockRemove: @props.onBlockRemove,
+          @props.renderWidget({
+            id: @props.id
+            type: @props.type
+            design: @props.design
+            onDesignChange: @props.onDesignChange
+            width: @props.width - 10 # for padding
+            height: @props.height - 10 # for padding
+          })
+    else
+      return H.div className: "mwater-visualization-block-view", 
         @props.renderWidget({
           id: @props.id
           type: @props.type
           design: @props.design
           onDesignChange: @props.onDesignChange
-          width: @props.width
-          height: @props.height
+          width: @props.width - 10
+          height: @props.height - 10
         })
+
