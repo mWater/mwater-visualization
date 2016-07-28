@@ -3,6 +3,7 @@ H = React.DOM
 R = React.createElement
 _ = require 'lodash'
 
+ClickOutHandler = require('react-onclickout')
 Widget = require './Widget'
 SimpleWidgetComponent = require './SimpleWidgetComponent'
 ContentEditableComponent = require('mwater-expressions-ui').ContentEditableComponent
@@ -54,6 +55,9 @@ class TextWidgetComponent extends React.Component
     if @props.onDesignChange? and not @state.editing
       @setState(editing: true)
 
+  handleStopEditing: => 
+    @setState(editing: false)
+
   refEditor: (elem) ->
     if elem
       elem.focus()
@@ -63,7 +67,6 @@ class TextWidgetComponent extends React.Component
       ref: @refEditor
       design: @props.design
       onDesignChange: @props.onDesignChange
-      onDoneEditing: => @setState(editing: false)
 
   renderView: (scale) ->
     R TextWidgetViewComponent, 
@@ -79,7 +82,8 @@ class TextWidgetComponent extends React.Component
     # Wrap in a simple widget
     return H.div onClick: @handleStartEditing, 
       if @state.editing
-        @renderEditor()
+        R ClickOutHandler, onClickOut: @handleStopEditing,
+          @renderEditor()
       else
         @renderView()
 
@@ -97,7 +101,8 @@ class TextWidgetViewComponent extends React.Component
 
 class TextWidgetDesignerComponent extends React.Component
   @propTypes: 
-    onDoneEditing: React.PropTypes.func
+    design: React.PropTypes.object.isRequired
+    onDesignChange: React.PropTypes.func # Called with new design. null/undefined for readonly
 
   focus: ->
     @refs.contentEditable.focus()
@@ -137,10 +142,6 @@ class TextWidgetDesignerComponent extends React.Component
         H.i className: "fa fa-undo"
       H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "redo"),
         H.i className: "fa fa-repeat"
-      if @props.onDoneEditing
-        H.div className: "mwater-visualization-text-palette-item", onClick: @props.onDoneEditing,
-          H.i className: "fa fa-check"
-          " Done Editing"
   
   render: ->
     H.div style: { position: "relative" },

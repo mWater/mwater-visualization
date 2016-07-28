@@ -35,6 +35,7 @@
     "mwater-expressions": "git+ssh://git@github.com/mWater/mwater-expressions.git#sprint3",
     "mwater-expressions-ui": "git+ssh://git@github.com/mWater/mwater-expressions-ui.git#sprint3",
     "node-uuid": "^1.4.3",
+    "react-onclickout": "^2.0.4",
     "rc-slider": "^3.7.0",
     "react": "^0.14.0",
     "react-color": "^2.2.0",
