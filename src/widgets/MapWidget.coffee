@@ -14,7 +14,6 @@ module.exports = class MapWidget extends Widget
   #  dataSource: data source to use
   #  widgetDataSource: Gives data to the widget in a way that allows client-server separation and secure sharing. See definition in WidgetDataSource.
   #  design: widget design
-  #  onRemove: called when widget is removed
   #  scope: scope of the widget (when the widget self-selects a particular scope)
   #  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   #  onScopeChange: called with scope of widget
@@ -30,7 +29,6 @@ module.exports = class MapWidget extends Widget
 
       design: options.design
       onDesignChange: options.onDesignChange
-      onRemove: options.onRemove
       filters: options.filters
       width: options.width
       height: options.height
@@ -45,8 +43,6 @@ class MapWidgetComponent extends React.Component
 
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func # Called with new design.  null/undefined for readonly
-
-    onRemove: React.PropTypes.func
 
     width: React.PropTypes.number
     height: React.PropTypes.number
@@ -106,8 +102,6 @@ class MapWidgetComponent extends React.Component
     dropdownItems = []
     if @props.onDesignChange?
       dropdownItems.push({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
-    if @props.onRemove?
-      dropdownItems.push({ label: [H.span(className: "glyphicon glyphicon-remove"), " Remove"], onClick: @props.onRemove })
 
     # Wrap in a simple widget
     return H.div null,

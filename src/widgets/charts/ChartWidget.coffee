@@ -18,7 +18,6 @@ module.exports = class ChartWidget extends Widget
   #  dataSource: data source to use
   #  widgetDataSource: Gives data to the widget in a way that allows client-server separation and secure sharing. See definition in WidgetDataSource.
   #  design: widget design
-  #  onRemove: called when widget is removed
   #  scope: scope of the widget (when the widget self-selects a particular scope)
   #  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   #  onScopeChange: called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
@@ -33,7 +32,6 @@ module.exports = class ChartWidget extends Widget
       schema: options.schema
       widgetDataSource: options.widgetDataSource
       dataSource: options.dataSource
-      onRemove: options.onRemove
       scope: options.scope
       filters: options.filters
       onScopeChange: options.onScopeChange
@@ -64,8 +62,6 @@ class ChartWidgetComponent extends React.Component
     design: React.PropTypes.object.isRequired # Design of chart
     onDesignChange: React.PropTypes.func # null/undefined for readonly
     dataSource: React.PropTypes.object.isRequired # Data source to use for chart
-
-    onRemove: React.PropTypes.func
 
     width: React.PropTypes.number
     height: React.PropTypes.number
@@ -167,8 +163,6 @@ class ChartWidgetComponent extends React.Component
     dropdownItems = @props.chart.createDropdownItems(@props.design, @props.schema, @props.widgetDataSource, @props.filters)
     if validDesign
       dropdownItems.push({ label: "Export Data", icon: "save-file", onClick: @handleSaveCsvFile })
-    if @props.onRemove
-      dropdownItems.push({ label: "Remove", icon: "remove", onClick: @props.onRemove })
     if @props.onDesignChange?      
       dropdownItems.unshift({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
 

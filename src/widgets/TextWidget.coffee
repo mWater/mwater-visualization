@@ -15,7 +15,6 @@ module.exports = class MarkdownWidget extends Widget
   #  dataSource: data source to use
   #  widgetDataSource: Gives data to the widget in a way that allows client-server separation and secure sharing. See definition in WidgetDataSource.
   #  design: widget design
-  #  onRemove: called when widget is removed
   #  scope: scope of the widget (when the widget self-selects a particular scope)
   #  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   #  onScopeChange: called with scope of widget
@@ -27,7 +26,6 @@ module.exports = class MarkdownWidget extends Widget
     return R TextWidgetComponent,
       design: options.design
       onDesignChange: options.onDesignChange
-      onRemove: options.onRemove # TODO Remove, ironically
       width: options.width
       height: options.height
       standardWidth: options.standardWidth
@@ -76,8 +74,6 @@ class TextWidgetComponent extends React.Component
     dropdownItems = []
     if @props.onDesignChange?
       dropdownItems.push({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
-    if @props.onRemove? # TODO remove
-      dropdownItems.push({ label: [H.span(className: "glyphicon glyphicon-remove"), " Remove"], onClick: @props.onRemove })
 
     # Wrap in a simple widget
     return H.div onClick: @handleStartEditing, style: { width: @props.width, height: @props.height },
