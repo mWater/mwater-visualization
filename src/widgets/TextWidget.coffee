@@ -80,7 +80,7 @@ class TextWidgetComponent extends React.Component
       dropdownItems.push({ label: [H.span(className: "glyphicon glyphicon-remove"), " Remove"], onClick: @props.onRemove })
 
     # Wrap in a simple widget
-    return H.div onClick: @handleStartEditing, 
+    return H.div onClick: @handleStartEditing, style: { width: @props.width, height: @props.height },
       if @state.editing
         R ClickOutHandler, onClickOut: @handleStopEditing,
           @renderEditor()
