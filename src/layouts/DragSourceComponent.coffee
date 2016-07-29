@@ -28,4 +28,4 @@ class DragSourceComponent extends React.Component
   render: ->
     @props.connectDragPreview(@props.connectDragSource(@props.children))
 
-module.exports = _.flow(DragSource("block", sourceSpec, collectSource))(DragSourceComponent)
+module.exports = (type) -> DragSource(type, sourceSpec, collectSource)(DragSourceComponent)

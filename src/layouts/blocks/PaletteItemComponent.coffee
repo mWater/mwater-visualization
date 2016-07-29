@@ -2,7 +2,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
-DragSourceComponent = require './DragSourceComponent'
+DragSourceComponent = require('../DragSourceComponent')("block")
 
 # Item in a palette that can be dragged to add a widget or other item
 module.exports = class PaletteItemComponent extends React.Component

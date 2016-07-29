@@ -6,6 +6,7 @@ DragSource = require('react-dnd').DragSource
 DropTarget = require('react-dnd').DropTarget
 DragDropContext = require('react-dnd').DragDropContext
 HTML5Backend = require('react-dnd-html5-backend')
+DecoratedBlockComponent = require '../DecoratedBlockComponent'
 
 # Render a child element as draggable, resizable block, injecting handle connectors
 # to child element
@@ -51,12 +52,12 @@ MoveResizeLayoutComponent = DragSource("block-resize", resizeSpec, resizeCollect
 class Container extends React.Component
   @propTypes:
     layoutEngine: React.PropTypes.object.isRequired
-    layouts: React.PropTypes.object.isRequired # Lookup of id -> layout
-    elems: React.PropTypes.object.isRequired # Lookup of id -> elem
+    items: React.PropTypes.object.isRequired # Lookup of id -> { widget:, layout: }
+    onItemsChange: React.PropTypes.func # Called with lookup of id -> { widget:, layout: }
+    renderWidget: React.PropTypes.func.isRequired # Renders a widget
     width: React.PropTypes.number.isRequired # width in pixels
     standardWidth: React.PropTypes.number.isRequired # width in pixels of a standard container that all other widths should scale to look like. Usually 1440
     connectDropTarget: React.PropTypes.func.isRequired # Injected by react-dnd wrapper
-    onLayoutUpdate: React.PropTypes.func # Called with array of { id, widget, layout }. Null/undefined for readonly
 
   constructor: (props) ->
     super
@@ -68,7 +69,7 @@ class Container extends React.Component
   setResizeHover: (hoverInfo) -> 
     @setState(resizeHover: hoverInfo)
 
-  dropLayout: (id, droppedRect) ->
+  dropLayout: (id, droppedRect, widget) ->
     # Stop hover
     @setState(moveHover: null, resizeHover: null)
 
@@ -76,13 +77,22 @@ class Container extends React.Component
     droppedLayout = @props.layoutEngine.rectToLayout(droppedRect)
 
     # Insert dropped layout
-    layouts = _.clone(@props.layouts)
-    layouts[id] = droppedLayout
+    items = _.clone(@props.items)
+    items[id] = { layout: droppedLayout, widget: widget }
+
+    layouts = {}
+    for id, item of items
+      layouts[id] = item.layout
 
     # Perform layout
     layouts = @props.layoutEngine.performLayout(layouts, id)
 
-    @props.onLayoutUpdate(layouts)
+    # Update item layouts
+    items = _.mapValues(items, (item, id) =>
+      return _.extend({}, item, layout: layouts[id])
+      )
+
+    @props.onItemsChange(items)
   
   # Called when a block is dropped
   dropMoveLayout: (dropInfo) -> 
@@ -94,7 +104,7 @@ class Container extends React.Component
       height: dropInfo.dragInfo.bounds.height
     }
 
-    @dropLayout(dropInfo.dragInfo.id, droppedRect)
+    @dropLayout(dropInfo.dragInfo.id, droppedRect, dropInfo.dragInfo.widget)
   
   dropResizeLayout: (dropInfo) ->
     # Get rectangle of hovered block
@@ -105,7 +115,7 @@ class Container extends React.Component
       height: dropInfo.height
     }
 
-    @dropLayout(dropInfo.dragInfo.id, droppedRect)
+    @dropLayout(dropInfo.dragInfo.id, droppedRect, dropInfo.dragInfo.widget)
 
   componentWillReceiveProps: (nextProps) ->
     # Reset hover if not over
@@ -113,6 +123,23 @@ class Container extends React.Component
       # Defer to prevent "Cannot dispatch in the middle of a dispatch." error
       _.defer () =>
         @setState(moveHover: null, resizeHover: null)
+
+  handleRemove: (id) =>
+    # Update item layouts
+    items = _.omit(@props.items, id)
+    @props.onItemsChange(items)
+
+  handleWidgetDesignChange: (id, widgetDesign) =>
+    widget = @props.items[id].widget
+    widget = _.extend({}, widget, design: widgetDesign)
+
+    item = @props.items[id]
+    item = _.extend({}, item, widget: widget)
+
+    items = _.clone(@props.items)
+    items[id] = item
+
+    @props.onItemsChange(items)
 
   renderPlaceholder: (bounds) ->
     H.div key: "placeholder", style: { 
@@ -129,7 +156,7 @@ class Container extends React.Component
 
   # Render a particular layout. Allow visible to be false so that 
   # dragged elements can retain state
-  renderLayout: (id, layout, visible=true) =>
+  renderItem: (id, item, layout, visible=true) =>
     # Calculate bounds
     bounds = @props.layoutEngine.getLayoutBounds(layout)
 
@@ -147,12 +174,34 @@ class Container extends React.Component
     dragInfo = {
       id: id
       bounds: bounds
+      widget: item.widget
     }
+
+    elem = @props.renderWidget({ 
+      id: id
+      type: item.widget.type
+      design: item.widget.design
+      onDesignChange: @handleWidgetDesignChange.bind(null, id)
+      width: bounds.width - 10
+      height: bounds.height - 10 
+      standardWidth: ((bounds.width - 10) / @props.width) * @props.standardWidth 
+    })
+
+    # Render decorated if editable
+    if @props.onItemsChange
+      elem = React.createElement DecoratedBlockComponent,
+        # style: { width: bounds.width, height: bounds.height }
+        onBlockRemove: @handleRemove.bind(null, id),
+          elem
+    else
+      elem = H.div className: "mwater-visualization-block-view",
+        # style: { width: bounds.width, height: bounds.height },
+        elem
 
     # Clone element, injecting width, height, standardWidth and enclosing in a dnd block
     return H.div style: style, key: id,
-      React.createElement(MoveResizeLayoutComponent, { dragInfo: dragInfo, canDrag: @props.onLayoutUpdate? }, 
-        React.cloneElement(@props.elems[id], width: bounds.width, height: bounds.height, standardWidth: (bounds.width / @props.width) * @props.standardWidth))
+      React.createElement(MoveResizeLayoutComponent, { dragInfo: dragInfo, canDrag: @props.onItemsChange? }, 
+        elem)
 
   # Calculate a lookup of layouts incorporating hover info
   calculateLayouts: (props, state) ->
@@ -179,7 +228,9 @@ class Container extends React.Component
       }
       hoveredLayout = props.layoutEngine.rectToLayout(hoveredRect)
 
-    layouts = _.clone(props.layouts)
+    layouts = {}
+    for id, item of props.items
+      layouts[id] = item.layout
 
     # Add hovered layout
     if hoveredDragInfo
@@ -189,22 +240,28 @@ class Container extends React.Component
     layouts = props.layoutEngine.performLayout(layouts, if hoveredDragInfo then hoveredDragInfo.id)
     return layouts
 
-  renderLayouts: (layouts) ->
+  renderItems: (items) ->
+    layouts = @calculateLayouts(@props, @state)
+
     renderElems = []
     hover = @state.moveHover or @state.resizeHover
 
     # Render blocks in their adjusted position
     ids = []
-    for id of layouts
+    for id of items
       ids.push id
+    if hover and hover.dragInfo.id not in ids
+      ids.push hover.dragInfo.id
+
     for id in _.sortBy(ids)
-      layout = layouts[id]
+      item = items[id]
       if not hover or id != hover.dragInfo.id
-        renderElems.push(@renderLayout(id, layout))
+        renderElems.push(@renderItem(id, item, layouts[id]))
       else
         # Render it anyway so that its state is retained
-        renderElems.push(@renderLayout(id, layout, false))
-        renderElems.push(@renderPlaceholder(@props.layoutEngine.getLayoutBounds(layout)))
+        if item
+          renderElems.push(@renderItem(id, item, layouts[id], false))
+        renderElems.push(@renderPlaceholder(@props.layoutEngine.getLayoutBounds(layouts[id])))
 
     return renderElems
 
@@ -228,19 +285,17 @@ class Container extends React.Component
     return false
 
   render: ->
-    layouts = @calculateLayouts(@props, @state)
-
     # Determine height using layout engine
     style = {
       width: @props.width
-      height: @props.layoutEngine.calculateHeight(layouts)
+      height: "100%" # @props.layoutEngine.calculateHeight(layouts)
       position: "relative"
     }
 
     # Connect as a drop target
     @props.connectDropTarget(
       H.div style: style, 
-        @renderLayouts(layouts)
+        @renderItems(@props.items)
     )
 
 targetSpec = {
@@ -283,4 +338,4 @@ targetCollect = (connect, monitor) ->
     clientOffset: monitor.getClientOffset()
   }
 
-module.exports = DragDropContainer = DragDropContext(HTML5Backend)(DropTarget(["block-move", "block-resize"], targetSpec, targetCollect)(Container))
+module.exports = DropTarget(["block-move", "block-resize"], targetSpec, targetCollect)(Container)

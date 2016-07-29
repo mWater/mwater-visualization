@@ -138,10 +138,10 @@ class TextWidgetDesignerComponent extends React.Component
         H.i className: "fa fa-list-ul"
       H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertOrderedList"),
         H.i className: "fa fa-list-ol"
-      H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "undo"),
-        H.i className: "fa fa-undo"
-      H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "redo"),
-        H.i className: "fa fa-repeat"
+      # H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "undo"),
+      #   H.i className: "fa fa-undo"
+      # H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "redo"),
+      #   H.i className: "fa fa-repeat"
   
   render: ->
     H.div style: { position: "relative" },

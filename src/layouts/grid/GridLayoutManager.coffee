@@ -3,11 +3,52 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
+uuid = require 'node-uuid'
+
 LegoLayoutEngine = require './LegoLayoutEngine'
 WidgetContainerComponent = require './WidgetContainerComponent'
-DecoratedBlockComponent = require '../DecoratedBlockComponent'
+PaletteItemComponent = require './PaletteItemComponent'
 
 module.exports = class GridLayoutManager
+  renderPalette: (width) ->
+    createWidgetItem = (type, design) ->
+      # Add unique id
+      return () -> { id: uuid.v4(), widget: { type: type, design: design }, bounds: { x: 0, y: 0, width: width/3, height: width/4 } } 
+
+    H.div className: "mwater-visualization-palette", style: { position: "absolute", top: 0, left: 0, bottom: 0 },
+      R PaletteItemComponent, 
+        createItem: createWidgetItem("Text", { className: "title" })
+        title: H.i className: "fa fa-font"
+        subtitle: "Title"
+      R PaletteItemComponent, 
+        createItem: createWidgetItem("Text", {})
+        title: H.i className: "fa fa-align-left"
+        subtitle: "Text"
+      # R PaletteItemComponent,
+      #   createItem: @createBlockItem({ type: "image" })
+      #   title: H.i className: "fa fa-picture-o"
+      #   subtitle: "Image"
+      R PaletteItemComponent,
+        createItem: createWidgetItem("LayeredChart", {})
+        title: H.i className: "fa fa-bar-chart"
+        subtitle: "Chart"
+      R PaletteItemComponent,
+        createItem: createWidgetItem("Map", { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } })
+        title: H.i className: "fa fa-map-o"
+        subtitle: "Map"
+      R PaletteItemComponent,
+        createItem: createWidgetItem("TableChart", {})
+        title: H.i className: "fa fa-table"
+        subtitle: "Table"
+      R PaletteItemComponent,
+        createItem: createWidgetItem("CalendarChart", {})
+        title: H.i className: "fa fa-calendar"
+        subtitle: "Calendar"
+      R PaletteItemComponent,
+        createItem: createWidgetItem("ImageMosaicChart", {})
+        title: H.i className: "fa fa-th"
+        subtitle: "Mosaic"
+
   # Renders the layout as a react element
   # options:
   #  width: width of layout
@@ -15,17 +56,19 @@ module.exports = class GridLayoutManager
   #  onItemsChange: Called when items changes
   #  renderWidget: called with ({ id:, type:, design:, onDesignChange:, width:, height:  })
   renderLayout: (options) ->
-    return R GridLayoutComponent, 
-      width: options.width # TODO needed?
-      standardWidth: options.standardWidth # TODO doc. needed?
-      items: options.items
-      onItemsChange: options.onItemsChange
-      renderWidget: options.renderWidget
+    return H.div style: { position: "relative", height: "100%" }, 
+      @renderPalette(options.width)
+      H.div style: { position: "absolute", left: 102, top: 0, right: 0, bottom: 0 },
+        R GridLayoutComponent, 
+          width: options.width - 102 # TODO if not editable
+          standardWidth: options.standardWidth - 102 # TODO doc. needed?
+          items: options.items
+          onItemsChange: options.onItemsChange
+          renderWidget: options.renderWidget
 
   # Tests if dashboard has any items
   isEmpty: (items) ->
     return _.isEmpty(items)
-
 
 class GridLayoutComponent extends React.Component
   @propTypes:
@@ -34,30 +77,6 @@ class GridLayoutComponent extends React.Component
     items: React.PropTypes.any
     onItemsChange: React.PropTypes.func
     renderWidget: React.PropTypes.func.isRequired
-
-  handleRemove: (id) =>
-    # Update item layouts
-    items = _.omit(@props.items, id)
-    @props.onItemsChange(items)
-
-  handleWidgetDesignChange: (id, widgetDesign) =>
-    widget = @props.items[id].widget
-    widget = _.extend({}, widget, design: widgetDesign)
-
-    item = @props.items[id]
-    item = _.extend({}, item, widget: widget)
-
-    items = _.clone(@props.items)
-    items[id] = item
-
-    @props.onItemsChange(items)
-
-  handleLayoutUpdate: (layouts) =>
-    # Update item layouts
-    items = _.mapValues(@props.items, (item, id) =>
-      return _.extend({}, item, layout: layouts[id])
-      )
-    @props.onItemsChange(items)
 
   renderPageBreaks: (layoutEngine, layouts) ->
     # Get height
@@ -82,28 +101,18 @@ class GridLayoutComponent extends React.Component
     # Get layouts indexed by id
     layouts = _.mapValues(@props.items, "layout")
 
-    # Create widget elems
-    elems = _.mapValues @props.items, (item, id) =>
-      R WidgetComponent,
-        id: id
-        type: item.widget.type
-        design: item.widget.design
-        onDesignChange: if @props.onItemsChange? then @handleWidgetDesignChange.bind(null, id)
-        onBlockRemove: @handleRemove.bind(null, id)
-        renderWidget: @props.renderWidget
-
     style = {
       height: "100%"
       position: "relative"
     }
 
     # Render widget container
-    return H.div null,
+    return H.div style: style,
       R WidgetContainerComponent, 
         layoutEngine: layoutEngine
-        layouts: layouts
-        elems: elems
-        onLayoutUpdate: if @props.onItemsChange? then @handleLayoutUpdate
+        items: @props.items
+        onItemsChange: @props.onItemsChange
+        renderWidget: @props.renderWidget
         width: @props.width 
         standardWidth: @props.standardWidth
       @renderPageBreaks(layoutEngine, layouts)

@@ -9,7 +9,7 @@ NestableDragDropContext = require  "react-library/lib/NestableDragDropContext"
 DraggableBlockComponent = require "./DraggableBlockComponent"
 DecoratedBlockComponent = require '../DecoratedBlockComponent'
 
-PaletteItemComponent = require '../PaletteItemComponent'
+PaletteItemComponent = require './PaletteItemComponent'
 blockUtils = require './blockUtils'
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')

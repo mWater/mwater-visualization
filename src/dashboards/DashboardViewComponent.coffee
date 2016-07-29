@@ -4,6 +4,9 @@ R = React.createElement
 
 uuid = require 'node-uuid'
 
+HTML5Backend = require('react-dnd-html5-backend')
+NestableDragDropContext = require  "react-library/lib/NestableDragDropContext"
+
 WidgetFactory = require '../widgets/WidgetFactory'
 WidgetScoper = require '../widgets/WidgetScoper'
 ReactElementPrinter = require 'react-library/lib/ReactElementPrinter'
@@ -93,14 +96,14 @@ module.exports = class DashboardViewComponent extends React.Component
 
     # Render widget container
     return H.div style: style, 
-      H.div null,
-        @renderScopes()
+      @renderScopes()
 
-        layoutManager.renderLayout({
-          width: @props.width 
-          standardWidth: @props.standardWidth
-          items: @props.design.items
-          onItemsChange: if @props.onDesignChange? then @handleItemsChange
-          renderWidget: renderWidget
-        })
+      layoutManager.renderLayout({
+        width: @props.width 
+        standardWidth: @props.standardWidth
+        items: @props.design.items
+        onItemsChange: if @props.onDesignChange? then @handleItemsChange
+        renderWidget: renderWidget
+      })
         
+module.exports = NestableDragDropContext(HTML5Backend)(DashboardViewComponent)

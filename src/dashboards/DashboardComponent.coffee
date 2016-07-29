@@ -175,7 +175,7 @@ module.exports = class DashboardComponent extends React.Component
         R SettingsModalComponent, { onDesignChange: @props.onDesignChange, schema: @props.schema, dataSource: @props.dataSource, ref: "settings" }
 
       # Dashboard view requires width, so use auto size component to inject it
-      R AutoSizeComponent, { injectWidth: true }, 
+      R AutoSizeComponent, { injectWidth: true, injectHeight: true }, 
         (size) =>
           R DashboardViewComponent, {
             schema: @props.schema

@@ -5,6 +5,7 @@ R = React.createElement
 # Block decorated with drag/remove hover controls
 module.exports = class DecoratedBlockComponent extends React.Component
   @propTypes:
+    style: React.PropTypes.object   # Style to add to outer div
     onBlockRemove: React.PropTypes.func.isRequired # Called when block is removed
 
     connectMoveHandle: React.PropTypes.func.isRequired # the move handle connector
@@ -67,7 +68,7 @@ module.exports = class DecoratedBlockComponent extends React.Component
       return null
   
   render: ->
-    elem = H.div className: "mwater-visualization-block",
+    elem = H.div className: "mwater-visualization-block", style: @props.style,
       @props.children
     
       @renderAspectDrag()
