@@ -94,9 +94,9 @@ class TextWidgetViewComponent extends React.Component
 
   render: ->
     if @props.design.items?[0]?
-      H.div className: "mwater-visualization-text-widget-#{@props.design.className or "default"}", dangerouslySetInnerHTML: { __html: @createHtml() }
+      H.div className: "mwater-visualization-text-widget-#{@props.design.style or "default"}", dangerouslySetInnerHTML: { __html: @createHtml() }
     else
-      H.div className: "mwater-visualization-text-widget-#{@props.design.className or "default"} text-muted", 
+      H.div className: "mwater-visualization-text-widget-#{@props.design.style or "default"} text-muted", 
         "Click to Edit"
 
 class TextWidgetDesignerComponent extends React.Component
@@ -145,7 +145,7 @@ class TextWidgetDesignerComponent extends React.Component
   
   render: ->
     H.div style: { position: "relative" },
-      H.div className: "mwater-visualization-text-widget-#{@props.design.className or "default"}", 
+      H.div className: "mwater-visualization-text-widget-#{@props.design.style or "default"}", 
         R ContentEditableComponent, 
           ref: "contentEditable"
           style: { outline: "none" }

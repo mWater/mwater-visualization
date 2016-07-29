@@ -17,7 +17,7 @@ module.exports = class GridLayoutManager
 
     H.div className: "mwater-visualization-palette", style: { position: "absolute", top: 0, left: 0, bottom: 0 },
       R PaletteItemComponent, 
-        createItem: createWidgetItem("Text", { className: "title" })
+        createItem: createWidgetItem("Text", { style: "title" })
         title: H.i className: "fa fa-font"
         subtitle: "Title"
       R PaletteItemComponent, 
@@ -56,12 +56,21 @@ module.exports = class GridLayoutManager
   #  onItemsChange: Called when items changes
   #  renderWidget: called with ({ id:, type:, design:, onDesignChange:, width:, height:  })
   renderLayout: (options) ->
-    return H.div style: { position: "relative", height: "100%" }, 
-      @renderPalette(options.width)
-      H.div style: { position: "absolute", left: 102, top: 0, right: 0, bottom: 0 },
+    if options.onItemsChange?
+      return H.div style: { position: "relative", height: "100%" }, 
+        @renderPalette(options.width)
+        H.div style: { position: "absolute", left: 102, top: 0, right: 0, bottom: 0 },
+          R GridLayoutComponent, 
+            width: options.width - 102 
+            standardWidth: options.standardWidth - 102 # TODO 102? doc. needed?
+            items: options.items
+            onItemsChange: options.onItemsChange
+            renderWidget: options.renderWidget
+    else
+      return H.div style: { position: "relative", height: "100%" }, 
         R GridLayoutComponent, 
-          width: options.width - 102 # TODO if not editable
-          standardWidth: options.standardWidth - 102 # TODO doc. needed?
+          width: options.width
+          standardWidth: options.standardWidth
           items: options.items
           onItemsChange: options.onItemsChange
           renderWidget: options.renderWidget

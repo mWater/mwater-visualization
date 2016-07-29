@@ -102,7 +102,7 @@ class BlocksDesignerComponent extends React.Component
     H.td key: "palette", style: { width: "1%", verticalAlign: "top", height: "100%" }, 
       H.div className: "mwater-visualization-palette", style: { height: "100%" },
         R PaletteItemComponent, 
-          createItem: @createBlockItem({ type: "widget", widgetType: "Text", design: { className: "title" } })
+          createItem: @createBlockItem({ type: "widget", widgetType: "Text", design: { style: "title" } })
           title: H.i className: "fa fa-font"
           subtitle: "Title"
         R PaletteItemComponent, 
