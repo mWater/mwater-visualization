@@ -59,10 +59,10 @@ module.exports = class GridLayoutManager
     if options.onItemsChange?
       return H.div style: { position: "relative", height: "100%" }, 
         @renderPalette(options.width)
-        H.div style: { position: "absolute", left: 102, top: 0, right: 0, bottom: 0 },
+        H.div style: { position: "absolute", left: 108, top: 0, right: 0, bottom: 0 },
           R GridLayoutComponent, 
-            width: options.width - 102 
-            standardWidth: options.standardWidth - 102 # TODO 102? doc. needed?
+            width: options.width - 108
+            standardWidth: options.standardWidth - 108 # TODO 102? doc. needed?
             items: options.items
             onItemsChange: options.onItemsChange
             renderWidget: options.renderWidget

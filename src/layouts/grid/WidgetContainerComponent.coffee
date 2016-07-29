@@ -48,7 +48,7 @@ resizeCollect = (connect, monitor) ->
 
 MoveResizeLayoutComponent = DragSource("block-resize", resizeSpec, resizeCollect)(MoveLayoutComponent)
 
-# Container contains layouts to layout. It clones elems, injecting width, height and standardWidth into them before rendering them at the correct location.
+# Container contains layouts to layout. It renders widgets at the correct location.
 class Container extends React.Component
   @propTypes:
     layoutEngine: React.PropTypes.object.isRequired

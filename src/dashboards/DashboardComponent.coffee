@@ -168,7 +168,7 @@ module.exports = class DashboardComponent extends React.Component
     # Compile quickfilters
     filters = new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues)
 
-    H.div key: "view", style: { height: "100%", paddingTop: 40, paddingRight: 20, paddingLeft: 5, position: "relative" },
+    H.div key: "view", style: { height: "100%", paddingTop: 40, paddingRight: 20, position: "relative" },
       @renderTitleBar()
       @renderQuickfilter()
       if @props.onDesignChange?
