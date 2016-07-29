@@ -6,7 +6,9 @@ Layer = require './Layer'
 ExprCompiler = require('mwater-expressions').ExprCompiler
 injectTableAlias = require('mwater-expressions').injectTableAlias
 ExprCleaner = require('mwater-expressions').ExprCleaner
+ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../axes/AxisBuilder'
+LegendGroup = require './LegendGroup'
 
 ###
 Layer that is composed of markers
@@ -194,8 +196,26 @@ module.exports = class MarkersLayer extends Layer
   # Get the legend to be optionally displayed on the map. Returns
   # a React element
   getLegend: (design, schema) ->
-    # TODO
-    return null
+    exprUtils = new ExprUtils(schema)
+    console.log schema
+    items = _.map design.sublayers, (sublayer, i) =>
+      title = schema.getTable(sublayer.axes.geometry.expr.table).name.en
+
+      if sublayer.axes.color and sublayer.axes.color.colorMap
+#        title += ' by ' + schema.getColumn(sublayer.axes.color.expr.table, sublayer.axes.color.expr.column).name.en
+        enums = exprUtils.getExprEnumValues(sublayer.axes.color.expr)
+
+        colors = _.map sublayer.axes.color.colorMap, (colorItem) =>
+          {color: colorItem.color, name: _.find(enums, {id: colorItem.value}).name.en }
+        colors.push({ color: sublayer.color, name: "None"})
+      else
+        colors = [{ color: sublayer.color, name: "None"}]
+
+      React.createElement(LegendGroup, {items: colors, key: sublayer.axes.geometry.expr.table, name: title})
+
+    H.div null,
+      items
+#    return null
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->

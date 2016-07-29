@@ -70,6 +70,8 @@ module.exports = class MapViewComponent extends React.Component
       )
     )
 
+    console.log legendItems
+
     if legendItems.length == 0
       return
 
