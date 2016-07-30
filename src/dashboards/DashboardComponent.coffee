@@ -89,27 +89,6 @@ module.exports = class DashboardComponent extends React.Component
   handleToggleEditing: =>
     @setState(editing: not @state.editing)
 
-  renderAddWidget: ->
-    newWidgetTypes = [
-      { name: "Chart", type: "LayeredChart", design: {xAxisLabelText: "", yAxisLabelText: ""} }
-      { name: "Table", type: "TableChart", design: {} }
-      { name: "Calendar", type: "CalendarChart", design: {} }
-      { name: "Image Mosaic", type: "ImageMosaicChart", design: {} }
-      { name: "Text", type: "Markdown", design: {} }
-      { name: "Map", type: "Map", design: { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } } }
-    ]
-
-    H.div key: "add", className: "btn-group",
-      H.button type: "button", "data-toggle": "dropdown", className: "btn btn-link btn-sm dropdown-toggle",
-        H.span className: "glyphicon glyphicon-plus"
-        " Add Widget "
-        H.span className: "caret"
-      H.ul className: "dropdown-menu",
-        _.map(newWidgetTypes, (wt) =>
-          H.li key: wt.name,
-            H.a onClick: @handleAddWidget.bind(null, wt), wt.name
-          )
-
   renderEditingSwitch: ->
     H.a key: "edit", className: "btn btn-link btn-sm", onClick: @handleToggleEditing,
       if @state.editing
@@ -122,8 +101,6 @@ module.exports = class DashboardComponent extends React.Component
     H.div null,
       if @props.onDesignChange?
         @renderEditingSwitch()
-      if @state.editing
-        @renderAddWidget()
       if @state.editing
         [
           H.a key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
