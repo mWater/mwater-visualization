@@ -10,7 +10,7 @@ NestableDragDropContext = require  "react-library/lib/NestableDragDropContext"
 WidgetFactory = require '../widgets/WidgetFactory'
 WidgetScoper = require '../widgets/WidgetScoper'
 ReactElementPrinter = require 'react-library/lib/ReactElementPrinter'
-GridLayoutManager = require '../layouts/grid/GridLayoutManager'
+LayoutManager = require '../layouts/LayoutManager'
 WidgetScopesViewComponent = require '../widgets/WidgetScopesViewComponent'
 
 
@@ -49,6 +49,7 @@ module.exports = class DashboardViewComponent extends React.Component
     @setState(widgetScoper: @state.widgetScoper.applyScope(id, null))    
 
   handleItemsChange: (items) =>
+    console.log JSON.stringify(items, null, 2)
     design = _.extend({}, @props.design, items: items)
     @props.onDesignChange(design)
 
@@ -66,7 +67,7 @@ module.exports = class DashboardViewComponent extends React.Component
     R(WidgetScopesViewComponent, scopes: @state.widgetScoper.getScopes(), onRemoveScope: @handleRemoveScope)
 
   render: ->
-    layoutManager = new GridLayoutManager()
+    layoutManager = LayoutManager.createLayoutManager(@props.design.layout)
 
     renderWidget = (options) =>
       widget = WidgetFactory.createWidget(options.type)

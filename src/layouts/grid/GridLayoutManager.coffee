@@ -4,12 +4,13 @@ H = React.DOM
 R = React.createElement
 
 uuid = require 'node-uuid'
+LayoutManager = require '../LayoutManager'
 
 LegoLayoutEngine = require './LegoLayoutEngine'
 WidgetContainerComponent = require './WidgetContainerComponent'
 PaletteItemComponent = require './PaletteItemComponent'
 
-module.exports = class GridLayoutManager
+module.exports = class GridLayoutManager extends LayoutManager
   renderPalette: (width) ->
     createWidgetItem = (type, design) ->
       # Add unique id
@@ -78,6 +79,10 @@ module.exports = class GridLayoutManager
   # Tests if dashboard has any items
   isEmpty: (items) ->
     return _.isEmpty(items)
+
+  # Gets { type, design } of a widget
+  getWidgetTypeAndDesign: (items, widgetId) -> 
+    return items[widgetId]?.widget
 
 class GridLayoutComponent extends React.Component
   @propTypes:

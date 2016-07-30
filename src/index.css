@@ -201,7 +201,7 @@
 .mwater-visualization-block:hover > .mwater-visualization-block-move {
     display: block;
     position: absolute;
-    right: 50%;
+    left: -14px;
     top: -11px;
     border: solid 1px #88ceff;
     color: #88ceff;
@@ -296,8 +296,8 @@
 
 .mwater-visualization-text-palette {
   position: absolute;
-  top: -30px;
-  left: 0px;
+  top: -32px;
+  left: 7px;
   background-color: #4B5155;
   border-radius: 3px;
 }

@@ -10,7 +10,7 @@ DashboardUtils = require './DashboardUtils'
 QuickfiltersComponent = require '../quickfilter/QuickfiltersComponent'
 QuickfilterCompiler = require '../quickfilter/QuickfilterCompiler'
 SettingsModalComponent = require './SettingsModalComponent'
-GridLayoutManager = require '../layouts/grid/GridLayoutManager'
+LayoutManager = require '../layouts/LayoutManager'
 
 # Dashboard component that includes an action bar at the top
 # Manages undo stack and quickfilter value
@@ -35,7 +35,7 @@ module.exports = class DashboardComponent extends React.Component
     @state = { 
       undoStack: new UndoStack().push(props.design) 
       quickfiltersValues: null
-      editing: new GridLayoutManager().isEmpty(props.design.items) # TODO
+      editing: LayoutManager.createLayoutManager(props.design.layout).isEmpty(props.design.items) 
     }
 
   componentWillReceiveProps: (nextProps) ->
