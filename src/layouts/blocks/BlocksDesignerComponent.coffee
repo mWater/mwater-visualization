@@ -60,7 +60,6 @@ class BlocksDesignerComponent extends React.Component
               onBlockRemove: (if @props.onItemsChange then @handleBlockDrop.bind(null, block)),
                 R AutoSizeComponent, { injectWidth: true }, 
                   (size) =>
-                    console.log _.isEqual(window.design1, window.design2)
                     @props.renderWidget({
                       id: block.id
                       type: block.widgetType
