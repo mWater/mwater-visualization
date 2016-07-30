@@ -8,7 +8,7 @@ Widget = require './Widget'
 SimpleWidgetComponent = require './SimpleWidgetComponent'
 ContentEditableComponent = require('mwater-expressions-ui').ContentEditableComponent
 
-module.exports = class MarkdownWidget extends Widget
+module.exports = class TextWidget extends Widget
   # Creates a React element that is a view of the widget 
   # options:
   #  schema: schema to use
@@ -66,7 +66,7 @@ class TextWidgetComponent extends React.Component
       design: @props.design
       onDesignChange: @props.onDesignChange
 
-  renderView: (scale) ->
+  renderView: ->
     R TextWidgetViewComponent, 
       design: @props.design
 
