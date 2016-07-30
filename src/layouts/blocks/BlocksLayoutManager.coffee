@@ -29,9 +29,10 @@ module.exports = class BlocksLayoutManager extends LayoutManager
     if items.type == "widget" and items.id == widgetId
       return { type: items.widgetType, design: items.design }
 
-    for block in items.blocks
-      value = @getWidgetTypeAndDesign(block, widgetId)
-      if value
-        return value
+    if items.blocks
+      for block in items.blocks
+        value = @getWidgetTypeAndDesign(block, widgetId)
+        if value
+          return value
         
     return null
