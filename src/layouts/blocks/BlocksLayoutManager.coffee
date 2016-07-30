@@ -26,7 +26,7 @@ module.exports = class BlocksLayoutManager extends LayoutManager
 
   # Gets { type, design } of a widget
   getWidgetTypeAndDesign: (items, widgetId) -> 
-    if items.type == "widget" and items.id = widgetId
+    if items.type == "widget" and items.id == widgetId
       return { type: items.widgetType, design: items.design }
 
     for block in items.blocks
