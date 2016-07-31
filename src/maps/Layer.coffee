@@ -35,7 +35,7 @@ module.exports = class Layer
 
   # Get the legend to be optionally displayed on the map. Returns
   # a React element
-  getLegend: (design, schema) ->
+  getLegend: (design, schema, name) ->
     return null
 
   # Get a list of table ids that can be filtered on

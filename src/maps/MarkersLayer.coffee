@@ -195,25 +195,35 @@ module.exports = class MarkersLayer extends Layer
 
   # Get the legend to be optionally displayed on the map. Returns
   # a React element
-  getLegend: (design, schema) ->
+  getLegend: (design, schema, name) ->
     exprUtils = new ExprUtils(schema)
     console.log schema
     items = _.map design.sublayers, (sublayer, i) =>
-      title = schema.getTable(sublayer.axes.geometry.expr.table).name.en
+      title = ExprUtils.localizeString(schema.getTable(sublayer.axes.geometry.expr.table).name)
 
       if sublayer.axes.color and sublayer.axes.color.colorMap
 #        title += ' by ' + schema.getColumn(sublayer.axes.color.expr.table, sublayer.axes.color.expr.column).name.en
         enums = exprUtils.getExprEnumValues(sublayer.axes.color.expr)
 
         colors = _.map sublayer.axes.color.colorMap, (colorItem) =>
-          {color: colorItem.color, name: _.find(enums, {id: colorItem.value}).name.en }
+          {color: colorItem.color, name: ExprUtils.localizeString(_.find(enums, {id: colorItem.value}).name) }
         colors.push({ color: sublayer.color, name: "None"})
       else
         colors = [{ color: sublayer.color, name: "None"}]
+      titleStyle =
+        margin: 2
+        fontWeight: 'bold'
+      H.div null,
+        H.p key: 'legend-group-title', style: titleStyle, title
+        React.createElement(LegendGroup, {items: colors, key: sublayer.axes.geometry.expr.table})
 
-      React.createElement(LegendGroup, {items: colors, key: sublayer.axes.geometry.expr.table, name: title})
+    layerTitleStyle =
+      margin: 2
+      fontWeight: 'bold'
+      borderBottom: '1px solid #cecece'
 
     H.div null,
+      H.p style: layerTitleStyle, name
       items
 #    return null
 

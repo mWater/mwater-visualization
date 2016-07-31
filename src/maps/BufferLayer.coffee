@@ -6,7 +6,9 @@ Layer = require './Layer'
 ExprCompiler = require('mwater-expressions').ExprCompiler
 injectTableAlias = require('mwater-expressions').injectTableAlias
 ExprCleaner = require('mwater-expressions').ExprCleaner
+ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../axes/AxisBuilder'
+LegendGroup = require './LegendGroup'
 
 ###
 Layer which draws a buffer around geometries (i.e. a radius circle around points)
@@ -209,9 +211,24 @@ module.exports = class BufferLayer extends Layer
 
   # Get the legend to be optionally displayed on the map. Returns
   # a React element
-  getLegend: (design, schema) ->
-    # TODO
-    return null
+  getLegend: (design, schema, name) ->
+    exprUtils = new ExprUtils(schema)
+    if design.axes.color and design.axes.color.colorMap
+      enums = exprUtils.getExprEnumValues(design.axes.color.expr)
+
+      colors = _.map design.axes.color.colorMap, (colorItem) =>
+        {color: colorItem.color, name: ExprUtils.localizeString(_.find(enums, {id: colorItem.value}).name) }
+      colors.push({ color: design.color, name: "None"})
+    else
+      colors = [{ color: design.color, name: "None"}]
+
+    layerTitleStyle =
+      margin: 2
+      fontWeight: 'bold'
+      borderBottom: '1px solid #cecece'
+    H.div null,
+      H.p style: layerTitleStyle, name
+      React.createElement(LegendGroup, {items: colors, key: design.axes.geometry.expr.table})
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) -> [design.table]

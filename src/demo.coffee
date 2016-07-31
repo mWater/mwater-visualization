@@ -632,7 +632,7 @@ dashboardDesign = {
           "layerViews": [
             {
               "id": "53c9d731-dbe6-4987-b0ef-434a944b26a5",
-              "name": "Untitled Layer",
+              "name": "Markers",
               "desc": "",
               "type": "Markers",
               "visible": true,
@@ -690,6 +690,59 @@ dashboardDesign = {
                     "symbol": "font-awesome/h-square"
                   }
                 ]
+              }
+            },
+            {
+              "id": "656b346f-c4ee-41e7-b6bc-2c7361403d62",
+              "name": "Affected Area",
+              "desc": "",
+              "type": "Buffer",
+              "visible": true,
+              "opacity": 1,
+              "design": {
+                "axes": {
+                  "geometry": {
+                    "expr": {
+                      "type": "field",
+                      "table": "entities.water_system",
+                      "column": "location"
+                    }
+                  }
+                },
+                "radius": 150000,
+                "fillOpacity": 0.5,
+                "filter": null,
+                "table": "entities.water_system",
+                "color": "#f5f323"
+              }
+            },
+            {
+              "id": "1ae794c7-77e5-41c5-beba-54734221a7ba",
+              "name": "Water surfaces",
+              "desc": "",
+              "type": "AdminChoropleth",
+              "visible": true,
+              "opacity": 1,
+              "design": {
+                "color": "#8f5c5c",
+                "adminRegionExpr": {
+                  "type": "scalar",
+                  "table": "entities.surface_water",
+                  "joins": [
+                    "admin_region"
+                  ],
+                  "expr": {
+                    "type": "id",
+                    "table": "admin_regions"
+                  }
+                },
+                "axes": {},
+                "fillOpacity": 0.75,
+                "displayNames": true,
+                "filter": null,
+                "scope": null,
+                "detailLevel": 0,
+                "table": "entities.surface_water"
               }
             }
           ],
