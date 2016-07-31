@@ -670,6 +670,7 @@ dashboardDesign = {
                         ]
                       }
                     },
+                    "name": "Water points",
                     "color": "#0088FF",
                     "filter": null,
                     "table": "entities.water_point"
@@ -684,6 +685,7 @@ dashboardDesign = {
                         }
                       }
                     },
+                    "name": "",
                     "color": "#5e354c",
                     "filter": null,
                     "table": "entities.school",

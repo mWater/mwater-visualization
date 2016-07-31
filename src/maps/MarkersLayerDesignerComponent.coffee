@@ -89,6 +89,7 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
   handleFilterChange: (expr) => @update(filter: expr)
   handleColorChange: (color) => @update(color: color)
   handleSymbolChange: (symbol) => @update(symbol: symbol)
+  handleNameChange: (e) => @update(name: e.target.value)
 
   renderRemove: ->
     if @props.onRemove
@@ -216,9 +217,19 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
           table: @props.sublayer.table
           value: @props.sublayer.filter)
 
+  renderName: ->
+    return H.div className: "form-group",
+      H.label className: "text-muted",
+        H.span(className: "fa fa-tag")
+        " "
+        "Name"
+      H.div style: { marginLeft: 8 },
+        H.input {type: 'text', value: @props.sublayer.name, onChange: @handleNameChange, className: 'form-control'}
+
   render: ->
     H.div null,
       @renderRemove()
+      @renderName()
       @renderTable()
       @renderGeometryAxis()
       @renderColor()

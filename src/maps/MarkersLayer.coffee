@@ -197,9 +197,9 @@ module.exports = class MarkersLayer extends Layer
   # a React element
   getLegend: (design, schema, name) ->
     exprUtils = new ExprUtils(schema)
-    console.log schema
+
     items = _.map design.sublayers, (sublayer, i) =>
-      title = ExprUtils.localizeString(schema.getTable(sublayer.axes.geometry.expr.table).name)
+      title = if sublayer.name then sublayer.name else ExprUtils.localizeString(schema.getTable(sublayer.axes.geometry.expr.table).name)
 
       if sublayer.axes.color and sublayer.axes.color.colorMap
 #        title += ' by ' + schema.getColumn(sublayer.axes.color.expr.table, sublayer.axes.color.expr.column).name.en
