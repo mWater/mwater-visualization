@@ -30,6 +30,9 @@ module.exports = class TextWidgetDesignerComponent extends React.Component
     design = _.extend({}, @props.design, items: new ItemsHtmlConverter(@props.schema, true).elemToItems(elem))
     if not _.isEqual(design, @props.design)
       @props.onDesignChange(design)
+    else
+      # Re-render as HTML may have been mangled and needs a round-trip
+      @forceUpdate()
 
   handleCommand: (command, ev) =>
     # Don't lose focus

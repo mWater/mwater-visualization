@@ -49,7 +49,9 @@ module.exports = class ItemsHtmlConverter
           if label.length > 15
             label = label.substr(0, 15) + "..."
 
-          html += '''&#x2060;<div contentEditable="false" data-embed="''' + _.escape(JSON.stringify(item)) + '''" class="mwater-visualization-text-widget-expr">''' + label + '''</div>&#x2060;'''
+          # html += '''&#x2060;<div contentEditable="false" data-embed="''' + _.escape(JSON.stringify(item)) + '''" class="mwater-visualization-text-widget-expr">''' + label + '''</div>&#x2060;'''
+          # Don't use a contentEditable false, as it allows for 
+          html += '''&#x2060;<span data-embed="''' + _.escape(JSON.stringify(item)) + '''" class="mwater-visualization-text-widget-expr">''' + label + '''</span>&#x2060;'''
         else
           # View mode
           # If has data
@@ -94,7 +96,9 @@ module.exports = class ItemsHtmlConverter
         text = node.nodeValue
 
         # Strip word joiner used to allow editing at end of string
-        items.push(text.replace(/\u2060/g, ''))
+        text = text.replace(/\u2060/g, '')
+        if text.length > 0
+          items.push(text)
 
     # console.log JSON.stringify(items, null, 2)
    

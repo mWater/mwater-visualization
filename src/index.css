@@ -341,7 +341,7 @@
 
 /* For InlineExprEditorComponent */
 .mwater-visualization-text-widget-expr {
-  display: inline-block;
+  cursor: pointer;
   border-radius: 2px;
   padding-left: 2px;
   padding-right: 2px;
