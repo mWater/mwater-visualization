@@ -3,10 +3,14 @@ H = React.DOM
 R = React.createElement
 _ = require 'lodash'
 
+uuid = require 'node-uuid'
+
 ClickOutHandler = require('react-onclickout')
-Widget = require './Widget'
-SimpleWidgetComponent = require './SimpleWidgetComponent'
+Widget = require '../Widget'
 ContentEditableComponent = require('mwater-expressions-ui').ContentEditableComponent
+
+ExprInsertModalComponent = require './ExprInsertModalComponent'
+ItemsHtmlConverter = require './ItemsHtmlConverter'
 
 module.exports = class TextWidget extends Widget
   # Creates a React element that is a view of the widget 
@@ -24,6 +28,9 @@ module.exports = class TextWidget extends Widget
   #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
   createViewElement: (options) ->
     return R TextWidgetComponent,
+      schema: options.schema
+      dataSource: options.dataSource
+      widgetDataSource: options.widgetDataSource
       design: options.design
       onDesignChange: options.onDesignChange
       width: options.width
@@ -37,6 +44,10 @@ class TextWidgetComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func # Called with new design. null/undefined for readonly
+
+    schema: React.PropTypes.object.isRequired
+    dataSource: React.PropTypes.object.isRequired # Data source to use for chart
+    widgetDataSource: React.PropTypes.object.isRequired
 
     width: React.PropTypes.number
     height: React.PropTypes.number
@@ -65,10 +76,16 @@ class TextWidgetComponent extends React.Component
       ref: @refEditor
       design: @props.design
       onDesignChange: @props.onDesignChange
+      schema: @props.schema
+      dataSource: @props.dataSource
+      onStopEditing: @handleStopEditing
 
   renderView: ->
     R TextWidgetViewComponent, 
       design: @props.design
+      schema: @props.schema
+      dataSource: @props.dataSource
+      # TODO schema, etc.
 
   render: ->
     dropdownItems = []
@@ -78,41 +95,54 @@ class TextWidgetComponent extends React.Component
     # Wrap in a simple widget
     return H.div onClick: @handleStartEditing, style: { width: @props.width, height: @props.height },
       if @state.editing
-        R ClickOutHandler, onClickOut: @handleStopEditing,
-          @renderEditor()
+        # R ClickOutHandler, onClickOut: @handleStopEditing,
+        @renderEditor()
       else
         @renderView()
 
 
 class TextWidgetViewComponent extends React.Component
   createHtml: ->
-    new TextDesignHtmlConverter().designToHtml(@props.design)
+    new ItemsHtmlConverter(@props.schema).itemsToHtml(@props.design.items)
 
   render: ->
     if @props.design.items?[0]?
-      H.div className: "mwater-visualization-text-widget-#{@props.design.style or "default"}", dangerouslySetInnerHTML: { __html: @createHtml() }
+      H.div className: "mwater-visualization-text-widget-style-#{@props.design.style or "default"}", dangerouslySetInnerHTML: { __html: @createHtml() }
     else
-      H.div className: "mwater-visualization-text-widget-#{@props.design.style or "default"} text-muted", 
+      H.div className: "mwater-visualization-text-widget-style-#{@props.design.style or "default"} text-muted", 
         "Click to Edit"
 
 class TextWidgetDesignerComponent extends React.Component
   @propTypes: 
     design: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func # Called with new design. null/undefined for readonly
+    onStopEditing: React.PropTypes.func
+    
+    schema: React.PropTypes.object.isRequired
+    dataSource: React.PropTypes.object.isRequired # Data source to use for chart
 
   focus: ->
     @refs.contentEditable.focus()
 
   createHtml: ->
-    new TextDesignHtmlConverter().designToHtml(@props.design)
+    new ItemsHtmlConverter(@props.schema).itemsToHtml(@props.design.items)
 
   handleChange: (elem) =>
-    @props.onDesignChange(_.extend({}, @props.design, items: new TextDesignHtmlConverter().elemToDesign(elem)))
+    @props.onDesignChange(_.extend({}, @props.design, items: new ItemsHtmlConverter(@props.schema).elemToItems(elem)))
 
   handleCommand: (command, ev) =>
     # Don't lose focus
     ev.preventDefault()
     document.execCommand(command)
+
+  handleInsertExpr: (expr) =>
+    @handleInsertEmbed({ type: "expr", id: uuid.v4(), expr: expr })
+
+  # Put in an embedded item
+  handleInsertEmbed: (item) =>
+    @refs.contentEditable.pasteHTML('''
+      <div data-embed="''' + _.escape(JSON.stringify(item)) + '''"></div>
+    ''')
 
   renderMenu: ->
     H.div className: "mwater-visualization-text-palette",
@@ -134,14 +164,26 @@ class TextWidgetDesignerComponent extends React.Component
         H.i className: "fa fa-list-ul"
       H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertOrderedList"),
         H.i className: "fa fa-list-ol"
+      H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertOrderedList"),
+        H.i className: "fa fa-list-ol"
+      H.div className: "mwater-visualization-text-palette-item", onClick: (ev) =>
+        @refs.exprModal.open()
+      , "fx"
       # H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "undo"),
       #   H.i className: "fa fa-undo"
       # H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "redo"),
       #   H.i className: "fa fa-repeat"
+      if @props.onStopEditing
+        H.div className: "mwater-visualization-text-palette-item", onClick: @props.onStopEditing,
+          "Close"
+
+  renderExprInsertModal: ->
+    R ExprInsertModalComponent, key: "exprModal", ref: "exprModal", schema: @props.schema, dataSource: @props.dataSource, onInsert: @handleInsertExpr
   
   render: ->
     H.div style: { position: "relative" },
-      H.div className: "mwater-visualization-text-widget-#{@props.design.style or "default"}", 
+      @renderExprInsertModal()
+      H.div className: "mwater-visualization-text-widget-style-#{@props.design.style or "default"}", 
         R ContentEditableComponent, 
           ref: "contentEditable"
           style: { outline: "none" }
@@ -167,84 +209,3 @@ class TextWidgetDesignerComponent extends React.Component
 #   else 
 #     return ''
 
-class TextDesignHtmlConverter 
-  designToHtml: (design) ->
-    html = ""
-
-    for item in (design.items or [])
-      if _.isString(item)
-        # Escape HTML
-        html += _.escape(item)
-      else if item.type == "element"
-        if not item.tag.match(/^[a-z]+$/) or item.tag == "script"
-          throw new Error("Invalid tag #{item.tag}")
-
-        attrs = ""
-        # Add style
-        if item.style
-          attrs += " style=\""
-          first = true
-          for key, value of item.style
-            if not first
-              attrs += " "
-            attrs += _.escape(key) + ": " + _.escape(value) + ";"
-            first = false
-
-          attrs += "\""
-
-        # Special case for self-closing tags
-        if item.tag in ['br']
-          html += "<#{item.tag}#{attrs}>"
-        else
-          html += "<#{item.tag}#{attrs}>" + @designToHtml(item) + "</#{item.tag}>"
-
-    # If empty, put placeholder
-    if html.length == 0
-      html = '&#x2060;'
-
-    console.log "createHtml: #{html}"
-    return html
-
-  elemToDesign: (elem) ->
-    console.log elem.outerHTML
-    
-    # Walk DOM tree, adding strings and expressions
-    items = []
-
-    for node in elem.childNodes
-
-      if node.nodeType == 1 # Element
-        item = { type: "element", tag: node.tagName.toLowerCase(), items: @elemToDesign(node) }
-
-        # Add style
-        if node.style?
-          for style in node.style
-            item.style = item.style or {}
-            item.style[style] = node.style[style]
-
-        items.push(item)
-        # # If expression, handle specially
-        # if node.className and node.className.match(/inline-expr-block/)
-        #   # Get expression decoded from comment which is first child
-        #   commentNode = _.find(node.childNodes, (subnode) -> subnode.nodeType == 8)
-        #   if commentNode
-        #     text += "{" + index + "}" 
-        #     exprs.push(JSON.parse(decodeURIComponent(commentNode.nodeValue)))
-        #     index += 1
-        #   return
-
-        # # If div, add enter if not initial div
-        # if not isFirst and not wasBr and node.tagName in ['div', 'DIV']
-        #   text += "\n"
-
-        # wasBr = false
-
-      else if node.nodeType == 3
-        text = node.nodeValue
-
-        # Strip word joiner used to allow editing at end of string
-        items.push(text.replace(/\u2060/g, ''))
-
-    console.log JSON.stringify(items, null, 2)
-   
-    return items

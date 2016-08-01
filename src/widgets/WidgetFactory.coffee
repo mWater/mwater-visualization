@@ -4,7 +4,7 @@ TableChart = require './charts/TableChart'
 CalendarChart = require './charts/CalendarChart'
 ImageMosaicChart = require './charts/ImageMosaicChart'
 MarkdownWidget = require './MarkdownWidget'
-TextWidget = require './TextWidget'
+TextWidget = require './text/TextWidget'
 MapWidget = require './MapWidget'
 
 # Creates widgets based on type 

@@ -332,10 +332,23 @@
   background-color: #2485dd;
 }
 
-.mwater-visualization-text-widget-default {
+.mwater-visualization-text-widget-style-default {
   font-size: 15px;
 }
 
-.mwater-visualization-text-widget-title {
+.mwater-visualization-text-widget-style-title {
   font-size: 25px;
+}
+
+/* For InlineExprEditorComponent */
+.mwater-visualization-text-widget-expr {
+  display: inline-block;
+  border-radius: 2px;
+  padding-left: 2px;
+  padding-right: 2px;
+  margin-left: 1px;
+  margin-right: 1px;
+  background-color: rgba(0, 126, 255, 0.08);
+  border: solid 1px rgba(0, 126, 255, 0.24);
+  color: rgba(0,126,255, 0.8)
 }
