@@ -71,12 +71,137 @@ class MWaterDashboardPane extends React.Component
         })
     )
 
+design = {
+  "items": {
+    "id": "root",
+    "type": "root",
+    "blocks": [
+      {
+        "type": "widget",
+        "widgetType": "Text",
+        "design": {
+          "style": "title",
+          "items": [
+            "The Water Situation"
+          ]
+        },
+        "id": "2fb6f7f9-212f-4488-abb6-9662eacc879f"
+      },
+      {
+        "type": "widget",
+        "widgetType": "Text",
+        "design": {
+          "items": [
+            "We have ",
+            {
+              "type": "expr",
+              "id": "b0e56d85-7999-4dfa-84ac-a4f6b4878f53",
+              "expr": {
+                "type": "op",
+                "op": "count",
+                "table": "entities.water_point",
+                "exprs": []
+              }
+            },
+            " water points in mWater. Of these, ",
+            {
+              "type": "expr",
+              "id": "9accfd63-7ae9-4e8e-a784-dfc259977d4c",
+              "expr": {
+                "type": "op",
+                "table": "entities.water_point",
+                "op": "count where",
+                "exprs": [
+                  {
+                    "type": "op",
+                    "table": "entities.water_point",
+                    "op": "= any",
+                    "exprs": [
+                      {
+                        "type": "field",
+                        "table": "entities.water_point",
+                        "column": "type"
+                      },
+                      {
+                        "type": "literal",
+                        "valueType": "enumset",
+                        "value": [
+                          "Protected dug well",
+                          "Unprotected dug well"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            " are dug wells!"
+          ]
+        },
+        "id": "09c8981b-3869-410d-bd90-4a5a012314a8"
+      },
+      {
+        "type": "widget",
+        "aspectRatio": 1.4,
+        "widgetType": "LayeredChart",
+        "design": {
+          "version": 2,
+          "layers": [
+            {
+              "axes": {
+                "x": {
+                  "expr": {
+                    "type": "field",
+                    "table": "entities.water_point",
+                    "column": "_created_on"
+                  },
+                  "xform": {
+                    "type": "yearmonth"
+                  }
+                },
+                "y": {
+                  "expr": {
+                    "type": "op",
+                    "op": "count",
+                    "table": "entities.water_point",
+                    "exprs": []
+                  },
+                  "xform": null
+                }
+              },
+              "filter": {
+                "type": "op",
+                "table": "entities.water_point",
+                "op": "thisyear",
+                "exprs": [
+                  {
+                    "type": "field",
+                    "table": "entities.water_point",
+                    "column": "_created_on"
+                  }
+                ]
+              },
+              "table": "entities.water_point",
+              "cumulative": false
+            }
+          ],
+          "type": "bar",
+          "titleText": "Water points added by month 2016"
+        },
+        "id": "906863e8-3b03-4b6c-b70f-f4cd4adc002b"
+      }
+    ]
+  },
+  "layout": "blocks"
+}
+
 class MWaterDirectDashboardPane extends React.Component
   constructor: (props) ->
     super
 
     @state = {
-      design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" } # dashboardDesign
+      # design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" } # dashboardDesign
+      design: design
       extraTables: [] #['responses:e24f0a0ec11643cab3c21c07de2f6889']
     }
 

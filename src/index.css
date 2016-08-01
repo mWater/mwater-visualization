@@ -183,14 +183,13 @@
 }
 
 .mwater-visualization-block {
-  margin: 1px;
+  border: solid 1px transparent;
   padding: 5px;
   border-radius: 4px;
   position: relative;
 }
 
 .mwater-visualization-block:hover {
-  margin: 0px;
   border: solid 1px #88ceff;
 }
 

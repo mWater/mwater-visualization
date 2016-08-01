@@ -39,7 +39,6 @@ class BlocksDesignerComponent extends React.Component
     @props.onItemsChange(items)
 
   renderBlock: (block) =>
-    console.log "renderBlock: #{JSON.stringify(block, null, 2)}"
     switch block.type
       when "root"
         return R RootBlockComponent, key: block.id, block: block, renderBlock: @renderBlock, onBlockDrop: @handleBlockDrop, onBlockRemove: @handleBlockRemove
@@ -48,26 +47,29 @@ class BlocksDesignerComponent extends React.Component
       when "horizontal"
         return R HorizontalBlockComponent, key: block.id, block: block, renderBlock: @renderBlock, onBlockDrop: @handleBlockDrop, onBlockRemove: @handleBlockRemove
       when "widget"
-        console.log _.isEqual(window.design1, window.design2)
+        elem = R AutoSizeComponent, { injectWidth: true }, 
+          (size) =>
+            @props.renderWidget({
+              id: block.id
+              type: block.widgetType
+              design: block.design
+              onDesignChange: if @props.onItemsChange then (design) => @props.onItemsChange(blockUtils.updateBlock(@props.items, _.extend({}, block, design: design)))
+              width: size.width
+              height: size.width / block.aspectRatio
+            })
 
-        return R DraggableBlockComponent, 
-          key: block.id
-          block: block
-          onBlockDrop: @handleBlockDrop,
-            R DecoratedBlockComponent, 
-              aspectRatio: block.aspectRatio
-              onAspectRatioChange: if block.aspectRatio? then (aspectRatio) => @props.onItemsChange(blockUtils.updateBlock(@props.items, _.extend({}, block, aspectRatio: aspectRatio)))
-              onBlockRemove: (if @props.onItemsChange then @handleBlockDrop.bind(null, block)),
-                R AutoSizeComponent, { injectWidth: true }, 
-                  (size) =>
-                    @props.renderWidget({
-                      id: block.id
-                      type: block.widgetType
-                      design: block.design
-                      onDesignChange: if @props.onItemsChange then (design) => @props.onItemsChange(blockUtils.updateBlock(@props.items, _.extend({}, block, design: design)))
-                      width: size.width
-                      height: size.width / block.aspectRatio
-                    })
+        if @props.onItemsChange
+          return R DraggableBlockComponent, 
+            key: block.id
+            block: block
+            onBlockDrop: @handleBlockDrop,
+              R DecoratedBlockComponent, 
+                aspectRatio: block.aspectRatio
+                onAspectRatioChange: if block.aspectRatio? then (aspectRatio) => @props.onItemsChange(blockUtils.updateBlock(@props.items, _.extend({}, block, aspectRatio: aspectRatio)))
+                onBlockRemove: (if @props.onItemsChange then @handleBlockDrop.bind(null, block)),
+                  elem
+        else
+          return elem
       else
         throw new Error("Unknown block type #{block.type}")
 
@@ -112,7 +114,6 @@ class BlocksDesignerComponent extends React.Component
           subtitle: "Mosaic"
 
   render: ->
-    console.log _.isEqual(window.design1, window.design2)
     return H.table style: { width: "100%", height: "100%" },
       H.tbody null,
         H.tr null,

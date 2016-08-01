@@ -7,8 +7,12 @@ ExprUtils = require('mwater-expressions').ExprUtils
 #  { type: "element", tag: "h1", items: [nested items] }
 #  { type: "expr", id: unique id, expr: expression } 
 module.exports = class ItemsHtmlConverter 
-  constructor: (schema) ->
+  # designMode is true to display in design mode (exprs as blocks)
+  # exprValues is map of expr id to value
+  constructor: (schema, designMode, exprValues) ->
     @schema = schema
+    @designMode = designMode
+    @exprValues = exprValues
 
   itemsToHtml: (items) ->
     html = ""
@@ -38,23 +42,32 @@ module.exports = class ItemsHtmlConverter
         if item.tag in ['br']
           html += "<#{item.tag}#{attrs}>"
         else
-          html += "<#{item.tag}#{attrs}>" + @itemsToHtml(item) + "</#{item.tag}>"
+          html += "<#{item.tag}#{attrs}>" + @itemsToHtml(item.items) + "</#{item.tag}>"
       else if item.type == "expr"
-        label = new ExprUtils(@schema).summarizeExpr(item.expr)
-        if label.length > 15
-          label = label.substr(0, 15) + "..."
+        if @designMode
+          label = new ExprUtils(@schema).summarizeExpr(item.expr)
+          if label.length > 15
+            label = label.substr(0, 15) + "..."
 
-        html += '''&#x2060;<div contentEditable="false" data-embed="''' + _.escape(JSON.stringify(item)) + '''" class="mwater-visualization-text-widget-expr">''' + label + '''</div>&#x2060;'''
+          html += '''&#x2060;<div contentEditable="false" data-embed="''' + _.escape(JSON.stringify(item)) + '''" class="mwater-visualization-text-widget-expr">''' + label + '''</div>&#x2060;'''
+        else
+          # View mode
+          # If has data
+          if _.has(@exprValues, item.id)
+            html += _.escape(@exprValues[item.id] + "")
+          else
+            # Placeholder
+            html += '''<span class="text-muted">&#x25a0;&#x25a0;&#x25a0;</span>'''
 
     # If empty, put placeholder
     if html.length == 0
       html = '&#x2060;'
 
-    console.log "createHtml: #{html}"
+    # console.log "createHtml: #{html}"
     return html
 
   elemToItems: (elem) ->
-    console.log elem.outerHTML
+    # console.log elem.outerHTML
     
     # Walk DOM tree, adding strings and expressions
     items = []
@@ -83,6 +96,6 @@ module.exports = class ItemsHtmlConverter
         # Strip word joiner used to allow editing at end of string
         items.push(text.replace(/\u2060/g, ''))
 
-    console.log JSON.stringify(items, null, 2)
+    # console.log JSON.stringify(items, null, 2)
    
     return items

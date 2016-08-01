@@ -90,17 +90,18 @@ module.exports = class DashboardComponent extends React.Component
     @setState(editing: not @state.editing)
 
   renderEditingSwitch: ->
-    H.a key: "edit", className: "btn btn-link btn-sm", onClick: @handleToggleEditing,
-      if @state.editing
-        H.i className: "fa fa-fw fa-check-square"
-      else
-        H.i className: "fa fa-fw fa-square-o"
-      if @state.editing then " Editing" else " Edit Dashboard"
+    # H.a key: "edit", className: "btn btn-link btn-sm", onClick: @handleToggleEditing,
+    #   if @state.editing
+    #     H.i className: "fa fa-fw fa-check-square"
+    #   else
+    #     H.i className: "fa fa-fw fa-square-o"
+    #   if @state.editing then " Editing" else " Edit Dashboard"
+    H.a key: "edit", className: "btn btn-primary btn-sm #{if @state.editing then "active" else ""}", onClick: @handleToggleEditing,
+      H.span(className: "glyphicon glyphicon-pencil")
+      if @state.editing then " Editing" else " Edit"
 
   renderActionLinks: ->
     H.div null,
-      if @props.onDesignChange?
-        @renderEditingSwitch()
       if @state.editing
         [
           H.a key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
@@ -122,6 +123,8 @@ module.exports = class DashboardComponent extends React.Component
           H.span(className: "glyphicon glyphicon-cog")
           " Settings"
       @props.extraTitleButtonsElem
+      if @props.onDesignChange?
+        @renderEditingSwitch()
 
   renderTitleBar: ->
     H.div style: { position: "absolute", top: 0, left: 0, right: 0, height: 40, padding: 4 },
