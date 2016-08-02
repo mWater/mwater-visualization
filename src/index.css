@@ -7,6 +7,9 @@
 /* http://stackoverflow.com/questions/19305821/multiple-modals-overlay */
 .modal { overflow-y: auto; }
 
+.mwater-visualization-simple-widget {
+  position: relative;
+}
 
 .mwater-visualization-simple-widget .mwater-visualization-simple-widget-resize-handle {
   display: none;
