@@ -1,5 +1,5 @@
 querystring = require 'querystring'
-WidgetFactory = require './WidgetFactory'
+WidgetFactory = require '../widgets/WidgetFactory'
 DirectMapUrlSource = require '../maps/DirectMapUrlSource'
 
 # Uses mWater server to get widget data to allow sharing with unprivileged users

@@ -3,13 +3,14 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
-UndoStack = require './../UndoStack'
+UndoStack = require '../UndoStack'
 DashboardViewComponent = require './DashboardViewComponent'
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 DashboardUtils = require './DashboardUtils'
 QuickfiltersComponent = require '../quickfilter/QuickfiltersComponent'
 QuickfilterCompiler = require '../quickfilter/QuickfilterCompiler'
 SettingsModalComponent = require './SettingsModalComponent'
+LayoutManager = require '../layouts/LayoutManager'
 
 # Dashboard component that includes an action bar at the top
 # Manages undo stack and quickfilter value
@@ -34,6 +35,7 @@ module.exports = class DashboardComponent extends React.Component
     @state = { 
       undoStack: new UndoStack().push(props.design) 
       quickfiltersValues: null
+      editing: LayoutManager.createLayoutManager(props.design.layout).isEmpty(props.design.items) 
     }
 
   componentWillReceiveProps: (nextProps) ->
@@ -50,6 +52,9 @@ module.exports = class DashboardComponent extends React.Component
     # Clear quickfilters if definition changed
     if not _.isEqual(@props.design.quickfilters, nextProps.design.quickfilters)
       @setState(quickfiltersValues: null)
+
+    if not nextProps.onDesignChange?
+      @setState(editing: false)
 
   handlePrint: =>
     @dashboardView.print()
@@ -81,32 +86,23 @@ module.exports = class DashboardComponent extends React.Component
   handleSettings: =>
     @refs.settings.show(@props.design)
 
-  renderAddWidget: ->
-    newWidgetTypes = [
-      { name: "Chart", type: "LayeredChart", design: {xAxisLabelText: "", yAxisLabelText: ""} }
-      { name: "Table", type: "TableChart", design: {} }
-      { name: "Calendar", type: "CalendarChart", design: {} }
-      { name: "Image Mosaic", type: "ImageMosaicChart", design: {} }
-      { name: "Text", type: "Markdown", design: {} }
-      { name: "Map", type: "Map", design: { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } } }
-    ]
+  handleToggleEditing: =>
+    @setState(editing: not @state.editing)
 
-    H.div key: "add", className: "btn-group",
-      H.button type: "button", "data-toggle": "dropdown", className: "btn btn-link btn-sm dropdown-toggle",
-        H.span className: "glyphicon glyphicon-plus"
-        " Add Widget "
-        H.span className: "caret"
-      H.ul className: "dropdown-menu",
-        _.map(newWidgetTypes, (wt) =>
-          H.li key: wt.name,
-            H.a onClick: @handleAddWidget.bind(null, wt), wt.name
-          )
+  renderEditingSwitch: ->
+    # H.a key: "edit", className: "btn btn-link btn-sm", onClick: @handleToggleEditing,
+    #   if @state.editing
+    #     H.i className: "fa fa-fw fa-check-square"
+    #   else
+    #     H.i className: "fa fa-fw fa-square-o"
+    #   if @state.editing then " Editing" else " Edit Dashboard"
+    H.a key: "edit", className: "btn btn-primary btn-sm #{if @state.editing then "active" else ""}", onClick: @handleToggleEditing,
+      H.span(className: "glyphicon glyphicon-pencil")
+      if @state.editing then " Editing" else " Edit"
 
   renderActionLinks: ->
     H.div null,
-      if @props.onDesignChange?
-        @renderAddWidget()
-      if @props.onDesignChange?
+      if @state.editing
         [
           H.a key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
             H.span className: "glyphicon glyphicon-triangle-left"
@@ -122,11 +118,13 @@ module.exports = class DashboardComponent extends React.Component
       H.a key: "export", className: "btn btn-link btn-sm", onClick: @handleSaveDesignFile,
         H.span(className: "glyphicon glyphicon-download-alt")
         " Export"
-      if @props.onDesignChange?
+      if @state.editing
         H.a key: "settings", className: "btn btn-link btn-sm", onClick: @handleSettings,
           H.span(className: "glyphicon glyphicon-cog")
           " Settings"
       @props.extraTitleButtonsElem
+      if @props.onDesignChange?
+        @renderEditingSwitch()
 
   renderTitleBar: ->
     H.div style: { position: "absolute", top: 0, left: 0, right: 0, height: 40, padding: 4 },
@@ -150,14 +148,14 @@ module.exports = class DashboardComponent extends React.Component
     # Compile quickfilters
     filters = new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues)
 
-    H.div key: "view", style: { height: "100%", paddingTop: 40, paddingRight: 20, paddingLeft: 5, position: "relative" },
+    H.div key: "view", style: { height: "100%", paddingTop: 40, paddingRight: 20, position: "relative" },
       @renderTitleBar()
       @renderQuickfilter()
       if @props.onDesignChange?
         R SettingsModalComponent, { onDesignChange: @props.onDesignChange, schema: @props.schema, dataSource: @props.dataSource, ref: "settings" }
 
       # Dashboard view requires width, so use auto size component to inject it
-      R AutoSizeComponent, { injectWidth: true }, 
+      R AutoSizeComponent, { injectWidth: true, injectHeight: true }, 
         (size) =>
           R DashboardViewComponent, {
             schema: @props.schema
@@ -166,7 +164,7 @@ module.exports = class DashboardComponent extends React.Component
 
             ref: @refDashboardView
             design: @props.design
-            onDesignChange: @props.onDesignChange
+            onDesignChange: if @state.editing then @props.onDesignChange
             filters: filters
             width: size.width
             standardWidth: if @props.printScaling then 1440 else size.width

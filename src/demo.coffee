@@ -17,11 +17,11 @@ MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
-DirectDashboardDataSource = require './widgets/DirectDashboardDataSource'
+DirectDashboardDataSource = require './dashboards/DirectDashboardDataSource'
 DirectMapUrlSource = require './maps/DirectMapUrlSource'
 
 ServerMapUrlSource = require './maps/ServerMapUrlSource'
-ServerDashboardDataSource = require './widgets/ServerDashboardDataSource'
+ServerDashboardDataSource = require './dashboards/ServerDashboardDataSource'
 
 dashboardId = "366702069dba44249d14bfccaa2d333e"
 
@@ -71,13 +71,138 @@ class MWaterDashboardPane extends React.Component
         })
     )
 
+design = {
+  "items": {
+    "id": "root",
+    "type": "root",
+    "blocks": [
+      {
+        "type": "widget",
+        "widgetType": "Text",
+        "design": {
+          "style": "title",
+          "items": [
+            "The Water Situation"
+          ]
+        },
+        "id": "2fb6f7f9-212f-4488-abb6-9662eacc879f"
+      },
+      {
+        "type": "widget",
+        "widgetType": "Text",
+        "design": {
+          "items": [
+            "We have ",
+            {
+              "type": "expr",
+              "id": "b0e56d85-7999-4dfa-84ac-a4f6b4878f53",
+              "expr": {
+                "type": "op",
+                "op": "count",
+                "table": "entities.water_point",
+                "exprs": []
+              }
+            },
+            " water points in mWater. Of these, ",
+            {
+              "type": "expr",
+              "id": "9accfd63-7ae9-4e8e-a784-dfc259977d4c",
+              "expr": {
+                "type": "op",
+                "table": "entities.water_point",
+                "op": "count where",
+                "exprs": [
+                  {
+                    "type": "op",
+                    "table": "entities.water_point",
+                    "op": "= any",
+                    "exprs": [
+                      {
+                        "type": "field",
+                        "table": "entities.water_point",
+                        "column": "type"
+                      },
+                      {
+                        "type": "literal",
+                        "valueType": "enumset",
+                        "value": [
+                          "Protected dug well",
+                          "Unprotected dug well"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            " are dug wells!"
+          ]
+        },
+        "id": "09c8981b-3869-410d-bd90-4a5a012314a8"
+      },
+      {
+        "type": "widget",
+        "aspectRatio": 1.4,
+        "widgetType": "LayeredChart",
+        "design": {
+          "version": 2,
+          "layers": [
+            {
+              "axes": {
+                "x": {
+                  "expr": {
+                    "type": "field",
+                    "table": "entities.water_point",
+                    "column": "_created_on"
+                  },
+                  "xform": {
+                    "type": "yearmonth"
+                  }
+                },
+                "y": {
+                  "expr": {
+                    "type": "op",
+                    "op": "count",
+                    "table": "entities.water_point",
+                    "exprs": []
+                  },
+                  "xform": null
+                }
+              },
+              "filter": {
+                "type": "op",
+                "table": "entities.water_point",
+                "op": "thisyear",
+                "exprs": [
+                  {
+                    "type": "field",
+                    "table": "entities.water_point",
+                    "column": "_created_on"
+                  }
+                ]
+              },
+              "table": "entities.water_point",
+              "cumulative": false
+            }
+          ],
+          "type": "bar",
+          "titleText": "Water points added by month 2016"
+        },
+        "id": "906863e8-3b03-4b6c-b70f-f4cd4adc002b"
+      }
+    ]
+  },
+  "layout": "blocks"
+}
+
 class MWaterDirectDashboardPane extends React.Component
   constructor: (props) ->
     super
 
     @state = {
-      design: dashboardDesign
-      extraTables: ['responses:e24f0a0ec11643cab3c21c07de2f6889']
+      # design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" } # dashboardDesign
+      design: design
+      extraTables: [] #['responses:e24f0a0ec11643cab3c21c07de2f6889']
     }
 
   handleDesignChange: (design) =>
@@ -92,7 +217,17 @@ class MWaterDirectDashboardPane extends React.Component
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
       extraTables: @state.extraTables
     }, (error, config) =>
-      dashboardDataSource = new DirectDashboardDataSource(@props.apiUrl, @props.client, @state.design, config.schema, config.dataSource)
+      if error
+        alert("Error: " + error.message)
+        return null
+
+      dashboardDataSource = new DirectDashboardDataSource({
+        apiUrl: @props.apiUrl
+        client: @props.client
+        design: @state.design
+        schema: config.schema
+        dataSource: config.dataSource
+      })
 
       H.div style: { height: "100%" },
         React.createElement(visualization.DashboardComponent, {
@@ -314,11 +449,12 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(BlocksDesignerComponent, renderBlock: [])
     # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })

@@ -1,5 +1,6 @@
-WidgetFactory = require './WidgetFactory'
-DirectWidgetDataSource = require './DirectWidgetDataSource'
+WidgetFactory = require '../widgets/WidgetFactory'
+DirectWidgetDataSource = require '../widgets/DirectWidgetDataSource'
+LayoutManager = require '../layouts/LayoutManager'
 
 # Uses direct DataSource queries
 module.exports = class DirectDashboardDataSource
@@ -19,13 +20,15 @@ module.exports = class DirectDashboardDataSource
 
   # Gets the widget data source for a specific widget
   getWidgetDataSource: (widgetId) ->
-    widget = WidgetFactory.createWidget(@design.items[widgetId].widget.type)
-    widgetDesign = @design.items[widgetId].widget.design
+    # Get widget type and design from layout manager
+    { type, design } = LayoutManager.createLayoutManager(@design.layout).getWidgetTypeAndDesign(@design.items, widgetId)
+
+    widget = WidgetFactory.createWidget(type)
     return new DirectWidgetDataSource({
       apiUrl: @apiUrl
       client: @client
       widget: widget
-      design: widgetDesign
+      design: design
       schema: @schema
       dataSource: @dataSource
     })

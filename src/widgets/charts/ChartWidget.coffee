@@ -12,18 +12,19 @@ module.exports = class ChartWidget extends Widget
   constructor: (chart) ->
     @chart = chart
 
-  # Creates a view of the widget. width, height and standardWidth will be injected
+  # Creates a view of the widget.
   # options:
   #  schema: schema to use
   #  dataSource: data source to use
   #  widgetDataSource: Gives data to the widget in a way that allows client-server separation and secure sharing. See definition in WidgetDataSource.
   #  design: widget design
-  #  onRemove: called when widget is removed
-  #  onDuplicate: called when widget is duplicated
   #  scope: scope of the widget (when the widget self-selects a particular scope)
   #  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   #  onScopeChange: called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
   #  onDesignChange: called with new design. null/undefined for readonly
+  #  width: width in pixels on screen
+  #  height: height in pixels on screen
+  #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
   createViewElement: (options) ->
     return React.createElement(ChartWidgetComponent,
       chart: @chart
@@ -31,12 +32,13 @@ module.exports = class ChartWidget extends Widget
       schema: options.schema
       widgetDataSource: options.widgetDataSource
       dataSource: options.dataSource
-      onRemove: options.onRemove
-      onDuplicate: options.onDuplicate
       scope: options.scope
       filters: options.filters
       onScopeChange: options.onScopeChange
       onDesignChange: options.onDesignChange
+      width: options.width
+      height: options.height
+      standardWidth: options.standardWidth
     )
 
   # Get the data that the widget needs. This will be called on the server, typically.
@@ -61,9 +63,6 @@ class ChartWidgetComponent extends React.Component
     onDesignChange: React.PropTypes.func # null/undefined for readonly
     dataSource: React.PropTypes.object.isRequired # Data source to use for chart
 
-    onRemove: React.PropTypes.func
-    onDuplicate: React.PropTypes.func
-
     width: React.PropTypes.number
     height: React.PropTypes.number
     standardWidth: React.PropTypes.number   # Standard width to allow widget to scale properly to retain same appearance
@@ -72,8 +71,8 @@ class ChartWidgetComponent extends React.Component
     filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
-    connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent)
-    connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent)
+    connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent) TODO REMOVE
+    connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent) TODO REMOVE
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
@@ -82,7 +81,7 @@ class ChartWidgetComponent extends React.Component
     super
     @state = { 
       # True when editing chart
-      editing: props.chart.isEmpty(@props.design) # Display editor if empty design
+      editing: false
     }  
 
   # Saves a csv file to disk
@@ -113,10 +112,6 @@ class ChartWidgetComponent extends React.Component
 
   handleEndEditing: =>
     @setState(editing: false)
-
-    # Remove if blank
-    if @props.chart.isEmpty(@props.design)
-      @props.onRemove()
 
   renderChart: (width, height) ->
     React.createElement(ChartViewComponent, 
@@ -152,23 +147,27 @@ class ChartWidgetComponent extends React.Component
       onRequestClose: @handleEndEditing,
         content)
 
+  # Render a link to start editing
+  renderEditLink: ->
+    H.div style: { position: "absolute", bottom: @props.height / 2, left: 0, right: 0, textAlign: "center" },
+      H.a className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Edit"
+
   render: ->
     # Determine if valid design
     validDesign = not @props.chart.validateDesign(@props.chart.cleanDesign(@props.design, @props.schema), @props.schema)
+
+    # Determine if empty
+    emptyDesign = @props.chart.isEmpty(@props.design)
 
     # Create dropdown items
     dropdownItems = @props.chart.createDropdownItems(@props.design, @props.schema, @props.widgetDataSource, @props.filters)
     if validDesign
       dropdownItems.push({ label: "Export Data", icon: "save-file", onClick: @handleSaveCsvFile })
-    if @props.onRemove
-      dropdownItems.push({ label: "Remove", icon: "remove", onClick: @props.onRemove })
-    if @props.onDuplicate and @props.onDesignChange?
-      dropdownItems.push({ label: "Duplicate", icon: "duplicate", onClick: @props.onDuplicate })
     if @props.onDesignChange?      
       dropdownItems.unshift({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
 
     # Wrap in a simple widget
-    return H.div onDoubleClick: (if @props.onDesignChange? then @handleStartEditing), 
+    return H.div onDoubleClick: (if @props.onDesignChange? then @handleStartEditing), style: { position: "relative", width: @props.width },
       if @props.onDesignChange?
         @renderEditor()
       React.createElement(SimpleWidgetComponent, 
@@ -176,8 +175,7 @@ class ChartWidgetComponent extends React.Component
         height: @props.height
         standardWidth: @props.standardWidth
         dropdownItems: dropdownItems,
-        connectMoveHandle: @props.connectMoveHandle
-        connectResizeHandle: @props.connectResizeHandle,
-          # height and width will be injected
           @renderChart()
       )
+      if (emptyDesign or not validDesign) and @props.onDesignChange?
+        @renderEditLink()

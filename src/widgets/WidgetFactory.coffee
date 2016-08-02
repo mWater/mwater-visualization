@@ -4,6 +4,7 @@ TableChart = require './charts/TableChart'
 CalendarChart = require './charts/CalendarChart'
 ImageMosaicChart = require './charts/ImageMosaicChart'
 MarkdownWidget = require './MarkdownWidget'
+TextWidget = require './text/TextWidget'
 MapWidget = require './MapWidget'
 
 # Creates widgets based on type 
@@ -22,5 +23,7 @@ module.exports = class WidgetFactory
         return new MarkdownWidget()
       when "Map"
         return new MapWidget()
+      when "Text"
+        return new TextWidget()
       else    
         throw new Error("Unknown widget type #{type}")
