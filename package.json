@@ -80,6 +80,7 @@
     "rework-npm": "~1.0.0",
     "uglify-js": "~2.4.13",
     "vinyl-source-stream": "^1.0.0",
+    "watchify": "^3.7.0",
     "xml2js": "^0.4.5"
   }
 }
