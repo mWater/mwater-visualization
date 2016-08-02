@@ -1,4 +1,4 @@
-DirectMapUrlSource = require '../maps/DirectMapUrlSource'
+DirectMapDataSource = require '../maps/DirectMapDataSource'
 
 # Get widget data directly from the dataSource
 module.exports = class DirectWidgetDataSource
@@ -20,10 +20,10 @@ module.exports = class DirectWidgetDataSource
   # Get the url for the image tiles with the specified filters applied
   # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
   getTileUrl: (layerId, filters) ->
-    new DirectMapUrlSource({ apiUrl: @apiUrl, client: @client, mapDesign: @design, schema: @schema }).getTileUrl(layerId, filters)
+    new DirectMapDataSource({ apiUrl: @apiUrl, client: @client, mapDesign: @design, schema: @schema }).getTileUrl(layerId, filters)
 
   # Get the url for the interactivity tiles with the specified filters applied
   # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
   getUtfGridUrl: (layerId, filters) ->
-    new DirectMapUrlSource({ apiUrl: @apiUrl, client: @client, mapDesign: @design, schema: @schema }).getUtfGridUrl(layerId, filters)
+    new DirectMapDataSource({ apiUrl: @apiUrl, client: @client, mapDesign: @design, schema: @schema }).getUtfGridUrl(layerId, filters)
 

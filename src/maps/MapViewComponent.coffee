@@ -12,7 +12,7 @@ module.exports = class MapViewComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired # data source to use
 
     # Url source for the map
-    mapUrlSource: React.PropTypes.shape({
+    mapDataSource: React.PropTypes.shape({
       # Get the url for the image tiles with the specified filters applied
       # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
       getTileUrl: React.PropTypes.func.isRequired
@@ -118,8 +118,8 @@ module.exports = class MapViewComponent extends React.Component
 
       # Create leafletLayer
       leafletLayer = {
-        tileUrl: @props.mapUrlSource.getTileUrl(layerView.id, compiledFilters)
-        utfGridUrl: @props.mapUrlSource.getUtfGridUrl(layerView.id, compiledFilters)
+        tileUrl: @props.mapDataSource.getTileUrl(layerView.id, compiledFilters)
+        utfGridUrl: @props.mapDataSource.getUtfGridUrl(layerView.id, compiledFilters)
         visible: layerView.visible
         opacity: layerView.opacity
         minZoom: layer.getMinZoom(design)
