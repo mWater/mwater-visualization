@@ -14,7 +14,7 @@ blockUtils = require './blockUtils'
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
-class BlocksDesignerComponent extends React.Component
+class BlocksDisplayComponent extends React.Component
   @propTypes:
     items: React.PropTypes.object.isRequired
     onItemsChange: React.PropTypes.func
@@ -122,7 +122,7 @@ class BlocksDesignerComponent extends React.Component
           H.td key: "design", style: { verticalAlign: "top", height: "100%" },
             @renderBlock(@props.items)
 
-module.exports = NestableDragDropContext(HTML5Backend)(BlocksDesignerComponent)
+module.exports = NestableDragDropContext(HTML5Backend)(BlocksDisplayComponent)
 
 class RootBlockComponent extends React.Component
   @propTypes:
