@@ -36,6 +36,9 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
     @updateDesign(sublayers: sublayers)
 
   renderSublayer: (index) =>
+    if not @props.design.sublayers?[index]
+      return null
+
     style = {
       borderBottom: "solid 1px #EEE"
       paddingTop: 10
@@ -52,18 +55,9 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
         onRemove: if index > 0 then @handleRemoveSublayer.bind(null, index)
         })
 
-  renderSublayers: ->
-    H.div null, 
-      _.map(@props.design.sublayers, (layer, i) => @renderSublayer(i))
-      # Add if previous has table
-      if _.last(@props.design.sublayers) and _.last(@props.design.sublayers).table
-        H.button className: "btn btn-default btn-sm", type: "button", onClick: @handleAddSublayer,
-          H.span className: "glyphicon glyphicon-plus"
-          " Add Series"
-
   render: ->
     H.div null, 
-      @renderSublayers()
+      @renderSublayer(0)
 
 # Designer for a markers layer sublayer
 class MarkersLayerSublayerDesignerComponent extends React.Component
