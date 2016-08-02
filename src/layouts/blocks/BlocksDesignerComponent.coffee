@@ -78,7 +78,7 @@ class BlocksDesignerComponent extends React.Component
     return () -> { block: _.extend({}, block, id: uuid.v4()) }
 
   renderPalette: ->
-    H.td key: "palette", style: { width: "1%", verticalAlign: "top", height: "100%" }, 
+    H.td key: "palette", style: { width: 102, verticalAlign: "top", height: "100%" }, 
       H.div className: "mwater-visualization-palette", style: { height: "100%" },
         R PaletteItemComponent, 
           createItem: @createBlockItem({ type: "widget", widgetType: "Text", design: { style: "title" } })
@@ -114,7 +114,7 @@ class BlocksDesignerComponent extends React.Component
           subtitle: "Mosaic"
 
   render: ->
-    return H.table style: { width: "100%", height: "100%" },
+    return H.table style: { width: "100%", height: "100%", tableLayout: "fixed" },
       H.tbody null,
         H.tr null,
           if @props.onItemsChange
@@ -163,7 +163,7 @@ class HorizontalBlockComponent extends React.Component
     onBlockRemove: React.PropTypes.func.isRequired # Called with (block) when block is removed
 
   render: ->
-    H.table style: { width: "100%" },
+    H.table style: { width: "100%", tableLayout: "fixed" },
       H.tbody null,
         H.tr null,
           _.map @props.block.blocks, (block) =>
