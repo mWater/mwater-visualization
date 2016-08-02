@@ -673,7 +673,8 @@ dashboardDesign = {
                     "name": "Water points",
                     "color": "#0088FF",
                     "filter": null,
-                    "table": "entities.water_point"
+                    "table": "entities.water_point",
+                    "symbol": "font-awesome/star"
                   },
                   {
                     "axes": {
@@ -715,7 +716,7 @@ dashboardDesign = {
                 "fillOpacity": 0.5,
                 "filter": null,
                 "table": "entities.water_system",
-                "color": "#f5f323"
+                "color": "#25250e"
               }
             },
             {

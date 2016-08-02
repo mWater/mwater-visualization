@@ -9,7 +9,7 @@ injectTableAlias = require('mwater-expressions').injectTableAlias
 ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../axes/AxisBuilder'
-LegendGroup = require './LegendGroup'
+LegendGroup = require('./LegendGroup').LegendGroup
 
 ###
 Layer that is composed of administrative regions colored
@@ -260,15 +260,21 @@ module.exports = class AdminChoroplethLayer extends Layer
         {color: colorItem.color, name: ExprUtils.localizeString(_.find(enums, {id: colorItem.value}).name) }
       colors.push({ color: design.color, name: "None"})
     else
-      colors = [{ color: design.color, name: "None"}]
+      colors = []
+
+    legendGroupProps =
+      items: colors
+      key: design.adminRegionExpr.expr.table
+      defaultColor: design.color
+      name: name
 
     layerTitleStyle =
       margin: 2
       fontWeight: 'bold'
       borderBottom: '1px solid #cecece'
     H.div null,
-      H.p style: layerTitleStyle, name
-      React.createElement(LegendGroup, {items: colors, key: design.adminRegionExpr.expr.table})
+#      H.p style: layerTitleStyle, name
+      React.createElement(LegendGroup, legendGroupProps)
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->

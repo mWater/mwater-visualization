@@ -8,7 +8,8 @@ injectTableAlias = require('mwater-expressions').injectTableAlias
 ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../axes/AxisBuilder'
-LegendGroup = require './LegendGroup'
+LegendGroup = require('./LegendGroup').LegendGroup
+LegendItem = require('./LegendGroup').LegendItem
 
 ###
 Layer that is composed of markers
@@ -202,20 +203,24 @@ module.exports = class MarkersLayer extends Layer
       title = if sublayer.name then sublayer.name else ExprUtils.localizeString(schema.getTable(sublayer.axes.geometry.expr.table).name)
 
       if sublayer.axes.color and sublayer.axes.color.colorMap
-#        title += ' by ' + schema.getColumn(sublayer.axes.color.expr.table, sublayer.axes.color.expr.column).name.en
         enums = exprUtils.getExprEnumValues(sublayer.axes.color.expr)
 
         colors = _.map sublayer.axes.color.colorMap, (colorItem) =>
           {color: colorItem.color, name: ExprUtils.localizeString(_.find(enums, {id: colorItem.value}).name) }
-        colors.push({ color: sublayer.color, name: "None"})
       else
-        colors = [{ color: sublayer.color, name: "None"}]
-      titleStyle =
-        margin: 2
-        fontWeight: 'bold'
+        colors = []
+
+      symbol = if sublayer.symbol then sublayer.symbol else 'font-awesome/circle'
+
+      legendGroupProps =
+        symbol: symbol
+        items: colors
+        key: sublayer.axes.geometry.expr.table
+        defaultColor: sublayer.color
+        name: title
+
       H.div null,
-        H.p key: 'legend-group-title', style: titleStyle, title
-        React.createElement(LegendGroup, {items: colors, key: sublayer.axes.geometry.expr.table})
+        React.createElement(LegendGroup, legendGroupProps)
 
     layerTitleStyle =
       margin: 2
@@ -223,9 +228,7 @@ module.exports = class MarkersLayer extends Layer
       borderBottom: '1px solid #cecece'
 
     H.div null,
-      H.p style: layerTitleStyle, name
       items
-#    return null
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->
