@@ -19,6 +19,7 @@ sublayer:
   filter: optional logical expression to filter by
   color: color of layer (e.g. #FF8800). Color axis overrides
   symbol: symbol to use for layer. e.g. "font-awesome/bell". Will be converted on server to proper uri.
+  popup: contains items: which is BlocksLayoutManager items. Will be displayed when the marker is clicked
 
 axes:
   geometry: where to place markers
@@ -182,9 +183,54 @@ module.exports = class MarkersLayer extends Layer
   #   null/undefined to do nothing
   #   [table id, primary key] to open a default system popup if one is present
   #   React element to put into a popup
-  onGridClick: (ev, options) ->
+  onGridClick: (ev, clickOptions) ->
     if ev.data and ev.data.id
-      return [options.design.sublayers[0].table, ev.data.id]
+      # TODO handle sublayers
+      if clickOptions.design.sublayers[0].popup
+        BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
+        WidgetFactory = require '../widgets/WidgetFactory'
+        DirectWidgetDataSource = require '../widgets/DirectWidgetDataSource'
+
+        return new BlocksLayoutManager().renderLayout({
+          items: clickOptions.design.sublayers[0].popup.items
+          renderWidget: (options) =>
+            # TODO abstract to popup renderer in map data source
+            widget = WidgetFactory.createWidget(options.type)
+
+            table = clickOptions.design.sublayers[0].table
+
+            # Create filters for single row
+            filters = [{ 
+              table: table
+              jsonql: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table).primaryKey }, ev.data.id] } 
+            }]
+
+            widgetDataSource = new DirectWidgetDataSource({
+              apiUrl: "https://api.mwater.co/v3/" # TODO
+              widget: widget
+              design: options.design
+              schema: clickOptions.schema
+              dataSource: clickOptions.dataSource
+              client: null # TODO
+            })
+
+            return widget.createViewElement({
+              schema: clickOptions.schema
+              dataSource: clickOptions.dataSource
+              # TODO get widget data source for map
+              widgetDataSource: widgetDataSource
+              design: options.design
+              scope: null
+              filters: filters
+              onScopeChange: null
+              onDesignChange: null
+              width: options.width
+              height: options.height
+              standardWidth: null
+            })  
+          })
+
+      return [clickOptions.design.sublayers[0].table, ev.data.id]
     return null
 
   # Get min and max zoom levels

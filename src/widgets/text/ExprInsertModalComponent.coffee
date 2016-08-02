@@ -48,7 +48,7 @@ module.exports = class ExprInsertModalComponent extends React.Component
             table: @state.table
             types: ['text', 'number', 'enum', 'date', 'datetime', 'boolean']
             value: @state.expr
-            aggrStatuses: ["literal", "aggregate"]
+            aggrStatuses: ["individual", "literal", "aggregate"]
             onChange: (expr) => @setState(expr: expr)
 
 
@@ -57,7 +57,6 @@ module.exports = class ExprInsertModalComponent extends React.Component
       return null
 
     R ActionCancelModalComponent, 
-      size: "large"
       actionLabel: "Insert"
       onAction: => 
         # Close first to avoid strange effects when mixed with pojoviews

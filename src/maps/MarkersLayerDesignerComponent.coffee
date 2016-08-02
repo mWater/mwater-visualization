@@ -1,6 +1,7 @@
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
+R = React.createElement
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
 AxisComponent = require './../axes/AxisComponent'
@@ -44,7 +45,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
     }
 
     H.div style: style, key: index,
-      React.createElement(MarkersLayerSublayerDesignerComponent, {
+      R(MarkersLayerSublayerDesignerComponent, {
         schema: @props.schema
         dataSource: @props.dataSource
         sublayer: @props.design.sublayers[index]
@@ -102,7 +103,7 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
         " "
         "Data Source"
       ": "
-      React.createElement(TableSelectComponent, { schema: @props.schema, value: @props.sublayer.table, onChange: @handleTableChange })
+      R(TableSelectComponent, { schema: @props.schema, value: @props.sublayer.table, onChange: @handleTableChange })
   
   renderGeometryAxis: ->
     if not @props.sublayer.table
@@ -115,7 +116,7 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
     H.div className: "form-group",
       H.label className: "text-muted", title
       H.div style: { marginLeft: 10 }, 
-        React.createElement(AxisComponent, 
+        R(AxisComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           table: @props.sublayer.table
@@ -135,7 +136,7 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
     H.div className: "form-group",
       H.label className: "text-muted", title
       H.div style: { marginLeft: 10 }, 
-        React.createElement(AxisComponent, 
+        R(AxisComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           table: @props.sublayer.table
@@ -154,7 +155,7 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
         H.span className: "glyphicon glyphicon glyphicon-tint"
         if @props.sublayer.axes.color then " Default Color" else " Color"
       H.div style: { marginLeft: 8 }, 
-        React.createElement(ColorComponent, color: @props.sublayer.color, onChange: @handleColorChange)
+        R(ColorComponent, color: @props.sublayer.color, onChange: @handleColorChange)
 
   renderSymbol: ->
     if not @props.sublayer.axes.geometry
@@ -190,7 +191,7 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
         H.span(className: "fa fa-star")
         " "
         "Symbol"
-      React.createElement ReactSelect, {
+      R ReactSelect, {
         placeholder: "Circle"
         value: @props.sublayer.symbol
         options: options
@@ -209,7 +210,7 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
         H.span(className: "glyphicon glyphicon-filter")
         " Filters"
       H.div style: { marginLeft: 8 }, 
-        React.createElement(FilterExprComponent, 
+        R(FilterExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           onChange: @handleFilterChange
@@ -225,4 +226,61 @@ class MarkersLayerSublayerDesignerComponent extends React.Component
       @renderColorAxis()
       @renderSymbol()
       @renderFilter()
+      R EditPopupComponent, sublayer: @props.sublayer, onSublayerChange: @props.onChange, schema: @props.schema, dataSource: @props.dataSource
+
+
+# Modal for editing design of popup
+ModalWindowComponent = require 'react-library/lib/ModalWindowComponent'
+BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
+WidgetFactory = require '../widgets/WidgetFactory'
+DirectWidgetDataSource = require '../widgets/DirectWidgetDataSource'
+
+class EditPopupComponent extends React.Component
+  constructor: ->
+    super
+    @state = { editing: false }
+
+  handleItemsChange: (items) =>
+    popup = @props.sublayer.popup or {}
+    popup = _.extend({}, popup, items: items)
+    sublayer = _.extend({}, @props.sublayer, popup: popup)
+    @props.onSublayerChange(sublayer)
+
+  render: ->
+    H.div null, 
+      H.a className: "btn btn-link", onClick: (=> @setState(editing: true)),
+        "Customize Popup"
+      if @state.editing
+        R ModalWindowComponent, isOpen: true, onRequestClose: (=> @setState(editing: false)),
+          new BlocksLayoutManager().renderLayout({
+            items: @props.sublayer.popup?.items
+            onItemsChange: @handleItemsChange
+            renderWidget: (options) =>
+              # TODO abstract to popup renderer in map data source
+              widget = WidgetFactory.createWidget(options.type)
+
+              widgetDataSource = new DirectWidgetDataSource({
+                apiUrl: "https://api.mwater.co/v3/" # TODO
+                widget: widget
+                design: options.design
+                schema: @props.schema
+                dataSource: @props.dataSource
+                client: null # TODO
+              })
+
+              return widget.createViewElement({
+                schema: @props.schema
+                dataSource: @props.dataSource
+                # TODO get widget data source for map
+                widgetDataSource: widgetDataSource
+                design: options.design
+                scope: null
+                filters: []
+                onScopeChange: null
+                onDesignChange: options.onDesignChange
+                width: null
+                height: null
+                standardWidth: null
+              })  
+            })
 

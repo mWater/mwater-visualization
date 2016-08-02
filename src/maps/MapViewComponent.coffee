@@ -1,9 +1,11 @@
 React = require 'react'
 H = React.DOM
+R = React.createElement
 LeafletMapComponent = require './LeafletMapComponent'
 ExprUtils = require('mwater-expressions').ExprUtils
 ExprCompiler = require('mwater-expressions').ExprCompiler
 LayerFactory = require './LayerFactory'
+ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
 
 # Component that displays just the map
 module.exports = class MapViewComponent extends React.Component
@@ -39,6 +41,13 @@ module.exports = class MapViewComponent extends React.Component
     touchZoom: React.PropTypes.bool         # Whether the map can be zoomed by touch-dragging with two fingers. Default true
     scrollWheelZoom: React.PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
 
+  constructor: (props) ->
+    super
+
+    @state = {
+      popupContents: null   # Element in the popup
+    }
+
   handleBoundsChange: (bounds) =>
     # Ignore if readonly
     if not @props.onDesignChange?
@@ -47,13 +56,24 @@ module.exports = class MapViewComponent extends React.Component
     design = _.extend({}, @props.design, bounds: bounds)
     @props.onDesignChange(design)
 
-  handleGridClick: (layer, design, ev) =>
-    # Handle click of layer
+  handleGridClick: (layerViewId, ev) =>
+    layerView = _.findWhere(@props.design.layerViews, id: layerViewId)
+
+    # Create layer
+    layer = LayerFactory.createLayer(layerView.type)
+
+    # Clean design (prevent ever displaying invalid/legacy designs)
+    design = layer.cleanDesign(layerView.design, @props.schema)
+
+    # Handle click of layerS
     results = layer.onGridClick(ev, { design: design, schema: @props.schema, dataSource: @props.dataSource })
 
-    # TODO handle popup case
+    # Handle standard case
     if _.isArray(results)
       @props.onRowClick?(results[0], results[1])
+    else if results
+      # Handle popup
+      @setState(popupContents: results)
 
   renderLegend:  ->
     legendItems = _.compact(
@@ -85,6 +105,18 @@ module.exports = class MapViewComponent extends React.Component
         H.div key: item.key,
           if i > 0 then H.br()
           item.legend
+
+  renderPopup: ->
+    if not @state.popupContents
+      return null
+
+    return R ModalPopupComponent, 
+      onClose: => @setState(popupContents: null)
+      size: "large",
+        @state.popupContents
+        H.div style: { textAlign: "right", marginTop: 10 },
+          H.button className: "btn btn-default", onClick: (=> @setState(popupContents: null)),
+            "Close"
 
   render: ->
     exprUtils = new ExprUtils(@props.schema)
@@ -124,19 +156,21 @@ module.exports = class MapViewComponent extends React.Component
         opacity: layerView.opacity
         minZoom: layer.getMinZoom(design)
         maxZoom: layer.getMaxZoom(design)
-        onGridClick: @handleGridClick.bind(null, layer, design)
+        onGridClick: @handleGridClick.bind(null, layerView.id)
       }
 
       leafletLayers.push(leafletLayer)
 
-    React.createElement(LeafletMapComponent,
-      initialBounds: @props.design.bounds
-      baseLayerId: @props.design.baseLayer
-      layers: leafletLayers
-      width: @props.width
-      height: @props.height
-      legend: @renderLegend()
-      dragging: @props.dragging
-      touchZoom: @props.touchZoom
-      scrollWheelZoom: @props.scrollWheelZoom
-      onBoundsChange: @handleBoundsChange)
+    H.div style: { width: @props.width, height: @props.height },
+      @renderPopup()
+      R LeafletMapComponent,
+        initialBounds: @props.design.bounds
+        baseLayerId: @props.design.baseLayer
+        layers: leafletLayers
+        width: @props.width
+        height: @props.height
+        legend: @renderLegend()
+        dragging: @props.dragging
+        touchZoom: @props.touchZoom
+        scrollWheelZoom: @props.scrollWheelZoom
+        onBoundsChange: @handleBoundsChange
