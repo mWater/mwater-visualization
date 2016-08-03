@@ -47,7 +47,7 @@ class BlocksDisplayComponent extends React.Component
       when "horizontal"
         return R HorizontalBlockComponent, key: block.id, block: block, renderBlock: @renderBlock, onBlockDrop: @handleBlockDrop, onBlockRemove: @handleBlockRemove
       when "widget"
-        elem = R AutoSizeComponent, { injectWidth: true }, 
+        elem = R AutoSizeComponent, { injectWidth: true, key: block.id }, 
           (size) =>
             @props.renderWidget({
               id: block.id
@@ -64,6 +64,7 @@ class BlocksDisplayComponent extends React.Component
             block: block
             onBlockDrop: @handleBlockDrop,
               R DecoratedBlockComponent, 
+                key: block.id
                 aspectRatio: block.aspectRatio
                 onAspectRatioChange: if block.aspectRatio? then (aspectRatio) => @props.onItemsChange(blockUtils.updateBlock(@props.items, _.extend({}, block, aspectRatio: aspectRatio)))
                 onBlockRemove: (if @props.onItemsChange then @handleBlockDrop.bind(null, block)),
@@ -137,7 +138,7 @@ class RootBlockComponent extends React.Component
       onBlockDrop: @props.onBlockDrop
       style: { height: "100%", padding: 30 }
       onlyBottom: true,
-        H.div null,
+        H.div key: "root",
           _.map @props.block.blocks, (block) =>
             @props.renderBlock(block)
 

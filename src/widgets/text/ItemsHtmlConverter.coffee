@@ -44,22 +44,25 @@ module.exports = class ItemsHtmlConverter
         else
           html += "<#{item.tag}#{attrs}>" + @itemsToHtml(item.items) + "</#{item.tag}>"
       else if item.type == "expr"
+        # If has data
+        if _.has(@exprValues, item.id)
+          exprHtml = _.escape(@exprValues[item.id] + "")
+        else
+          # Placeholder
+          exprHtml = '''<span class="text-muted">&#x25a0;&#x25a0;&#x25a0;</span>'''
+
         if @designMode
-          label = new ExprUtils(@schema).summarizeExpr(item.expr)
-          if label.length > 15
-            label = label.substr(0, 15) + "..."
+          # Show actual value
+          # label = new ExprUtils(@schema).summarizeExpr(item.expr)
+          # if label.length > 15
+          #   label = label.substr(0, 15) + "..."
 
           # html += '''&#x2060;<div contentEditable="false" data-embed="''' + _.escape(JSON.stringify(item)) + '''" class="mwater-visualization-text-widget-expr">''' + label + '''</div>&#x2060;'''
           # Don't use a contentEditable false, as it allows for 
-          html += '''&#x2060;<span data-embed="''' + _.escape(JSON.stringify(item)) + '''" class="mwater-visualization-text-widget-expr">''' + label + '''</span>&#x2060;'''
+          html += '''&#x2060;<span data-embed="''' + _.escape(JSON.stringify(item)) + '''" class="mwater-visualization-text-widget-expr">''' + (exprHtml or "&nbsp;") + '''</span>&#x2060;'''
         else
           # View mode
-          # If has data
-          if _.has(@exprValues, item.id)
-            html += _.escape(@exprValues[item.id] + "")
-          else
-            # Placeholder
-            html += '''<span class="text-muted">&#x25a0;&#x25a0;&#x25a0;</span>'''
+          html += exprHtml
 
     # If empty, put placeholder
     if html.length == 0
