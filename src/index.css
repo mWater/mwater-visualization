@@ -339,6 +339,47 @@
   font-size: 15px;
 }
 
+/* Reset styles */
+.mwater-visualization-text-widget-style-default h1 {
+  font-size: initial;
+  margin: 0px;
+  font-family: inherit;
+  font-weight: normal;
+  line-height: 1;
+  color: inherit;
+}
+
+.mwater-visualization-text-widget-style-default h2 {
+  font-size: initial;
+  margin: 0px;
+  font-family: inherit;
+  font-weight: normal;
+  line-height: 1;
+  color: inherit;
+}
+
+.mwater-visualization-text-widget-style-default h3 {
+  font-size: initial;
+  margin: 0px;
+  font-family: inherit;
+  font-weight: normal;
+  line-height: 1;
+  color: inherit;
+}
+
+.mwater-visualization-text-widget-style-default h1 {
+  font-size: 19px;
+}
+
+.mwater-visualization-text-widget-style-default h2 {
+  font-size: 17px;
+}
+
+.mwater-visualization-text-widget-style-default h3 {
+  font-size: 15px;
+  font-weight: bold;
+}
+
 .mwater-visualization-text-widget-style-title {
   font-size: 25px;
 }

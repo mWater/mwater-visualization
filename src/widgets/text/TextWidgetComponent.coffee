@@ -144,14 +144,17 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
         H.i className: "fa fa-list-ul"
       H.div key: "insertOrderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertOrderedList"),
         H.i className: "fa fa-list-ol"
-      H.div key: "h1", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H1>"),
-        "h1"
-      H.div key: "h2", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H2>"),
-        "h2"
-      H.div key: "h3", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H3>"),
-        "h3"
-      H.div key: "p", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<div>"),
-        "\u00b6"
+      if @props.design.style != "title"
+        [
+          H.div key: "h1", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H1>"),
+            "h1"
+          H.div key: "h2", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H2>"),
+            "h2"
+          H.div key: "h3", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H3>"),
+            "h3"
+          H.div key: "p", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<div>"),
+            "\u00b6"
+        ]
       H.div key: "expr", className: "mwater-visualization-text-palette-item", onClick: (ev) =>
         @refs.exprInsertModal.open()
       , 
