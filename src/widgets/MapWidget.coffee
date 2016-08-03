@@ -133,8 +133,8 @@ class InnerMapWidgetComponent extends React.Component
     # Require here to prevent server require problems
     MapViewComponent = require '../maps/MapViewComponent'
 
-    # Create mapUrlSource
-    mapUrlSource = {
+    # Create mapDataSource
+    mapDataSource = {
       getTileUrl: (layerId, filters) =>
         return @props.widgetDataSource.getTileUrl(layerId, filters)
       getUtfGridUrl: (layerId, filters) =>
@@ -145,7 +145,7 @@ class InnerMapWidgetComponent extends React.Component
       React.createElement(MapViewComponent, {
         schema: @props.schema
         design: @props.design
-        mapUrlSource: mapUrlSource
+        mapDataSource: mapDataSource
         onDesignChange: @props.onDesignChange
         extraFilters: @props.filters
         width: @props.width - 20

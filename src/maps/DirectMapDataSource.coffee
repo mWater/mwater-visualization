@@ -1,8 +1,9 @@
 _ = require 'lodash'
 LayerFactory = require './LayerFactory'
 injectTableAlias = require('mwater-expressions').injectTableAlias
+MapDataSource = require './MapDataSource'
 
-module.exports = class DirectMapUrlSource
+module.exports = class DirectMapDataSource extends MapDataSource
   # Create map url source that uses direct jsonql maps
   # options:
   #   schema: schema to use

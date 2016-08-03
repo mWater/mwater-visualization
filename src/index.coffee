@@ -42,8 +42,8 @@ exports.ServerDashboardDataSource = require './dashboards/ServerDashboardDataSou
 exports.DirectDashboardDataSource = require './dashboards/DirectDashboardDataSource'
 exports.DirectWidgetDataSource = require './widgets/DirectWidgetDataSource'
 
-exports.ServerMapUrlSource = require './maps/ServerMapUrlSource'
-exports.DirectMapUrlSource = require './maps/DirectMapUrlSource'
+exports.ServerMapDataSource = require './maps/ServerMapDataSource'
+exports.DirectMapDataSource = require './maps/DirectMapDataSource'
 
 # Polyfill pathseg https://github.com/masayuki0812/c3/issues/1529
 require './pathseg-polyfill.js'

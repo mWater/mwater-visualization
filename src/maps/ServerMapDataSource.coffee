@@ -1,8 +1,9 @@
 _ = require 'lodash'
 querystring = require 'querystring'
+MapDataSource = require './MapDataSource'
 
 # Get map urls for map stored on server
-module.exports = class ServerMapUrlSource
+module.exports = class ServerMapDataSource extends MapDataSource
   # Create map url source that uses map design stored on server
   # options:
   #   apiUrl: API url to use for talking to mWater server

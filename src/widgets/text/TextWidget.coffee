@@ -8,10 +8,8 @@ async = require 'async'
 ExprCompiler = require('mwater-expressions').ExprCompiler
 injectTableAlias = require('mwater-expressions').injectTableAlias
 
-ClickOutHandler = require('react-onclickout')
 Widget = require '../Widget'
-TextWidgetViewComponent = require './TextWidgetViewComponent'
-TextWidgetDesignerComponent = require './TextWidgetDesignerComponent'
+TextWidgetComponent = require './TextWidgetComponent'
 
 module.exports = class TextWidget extends Widget
   # Creates a React element that is a view of the widget 
@@ -37,7 +35,7 @@ module.exports = class TextWidget extends Widget
       onDesignChange: options.onDesignChange
       width: options.width
       height: options.height
-      standardWidth: options.standardWidth
+      standardWidth: options.standardWidth  # TODO do something with this
 
   # Get the data that the widget needs. This will be called on the server, typically.
   #   design: design of the chart
@@ -109,63 +107,3 @@ module.exports = class TextWidget extends Widget
 
   # Determine if widget is auto-height, which means that a vertical height is not required.
   isAutoHeight: -> true
-
-class TextWidgetComponent extends React.Component
-  @propTypes:
-    design: React.PropTypes.object.isRequired  # See Map Design.md
-    onDesignChange: React.PropTypes.func # Called with new design. null/undefined for readonly
-
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired # Data source to use for chart
-    widgetDataSource: React.PropTypes.object.isRequired
-
-    filters: React.PropTypes.array
-
-    width: React.PropTypes.number
-    height: React.PropTypes.number
-    standardWidth: React.PropTypes.number
-
-  constructor: (props) ->
-    super
-    @state = { 
-      # True when editing
-      editing: false
-    }  
-
-  handleStartEditing: =>
-    if @props.onDesignChange? and not @state.editing
-      @setState(editing: true)
-
-  handleStopEditing: => 
-    @setState(editing: false)
-
-  refEditor: (elem) ->
-    if elem
-      elem.focus()
-
-  renderEditor: ->
-    R TextWidgetDesignerComponent,
-      ref: @refEditor
-      design: @props.design
-      onDesignChange: @props.onDesignChange
-      schema: @props.schema
-      dataSource: @props.dataSource
-      onStopEditing: @handleStopEditing
-
-  renderView: ->
-    R TextWidgetViewComponent, 
-      design: @props.design
-      schema: @props.schema
-      filters: @props.filters
-      widgetDataSource: @props.widgetDataSource
-
-  render: ->
-    return H.div onClick: @handleStartEditing, style: { width: @props.width, height: @props.height },
-      if @state.editing
-        # R ClickOutHandler, onClickOut: @handleStopEditing, # Removed as triggers on modal
-        @renderEditor()
-      else
-        @renderView()
-
-
-

@@ -18,9 +18,9 @@ MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
 DirectDashboardDataSource = require './dashboards/DirectDashboardDataSource'
-DirectMapUrlSource = require './maps/DirectMapUrlSource'
+DirectMapDataSource = require './maps/DirectMapDataSource'
 
-ServerMapUrlSource = require './maps/ServerMapUrlSource'
+ServerMapDataSource = require './maps/ServerMapDataSource'
 ServerDashboardDataSource = require './dashboards/ServerDashboardDataSource'
 
 dashboardId = "366702069dba44249d14bfccaa2d333e"
@@ -42,7 +42,7 @@ class MWaterDashboardPane extends React.Component
 
   handleDesignChange: (design) =>
     # @setState(design: design, extraTables: )
-    console.log JSON.stringify(design, null, 2)
+    # console.log JSON.stringify(design, null, 2)
     
   render: ->
     if not @state.design
@@ -276,15 +276,15 @@ class MWaterMapPane extends React.Component
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
     }, (error, config) =>
       # Create map url source
-      # mapUrlSource = new DirectMapUrlSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
-      mapUrlSource = new ServerMapUrlSource({ apiUrl: @props.apiUrl, client: @props.client, share: share, mapId: mapId })
+      # mapDataSource = new DirectMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
+      mapDataSource = new ServerMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, share: share, mapId: mapId })
 
       H.div style: { height: "100%" },
         React.createElement(visualization.MapComponent, {
           schema: config.schema
           dataSource: config.dataSource
           design: @state.design
-          mapUrlSource: mapUrlSource
+          mapDataSource: mapDataSource
           onDesignChange: @handleDesignChange
           onRowClick: (tableId, rowId) => alert("#{tableId}:#{rowId}")
           titleElem: "Sample"
@@ -313,14 +313,14 @@ class MWaterDirectMapPane extends React.Component
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
     }, (error, config) =>
       # Create map url source
-      mapUrlSource = new DirectMapUrlSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
+      mapDataSource = new DirectMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
 
       H.div style: { height: "100%" },
         React.createElement(visualization.MapComponent, {
           schema: config.schema
           dataSource: config.dataSource
           design: @state.design
-          mapUrlSource: mapUrlSource
+          mapDataSource: mapDataSource
           onDesignChange: @handleDesignChange
           titleElem: "Sample"
         })

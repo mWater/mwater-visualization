@@ -13,7 +13,7 @@ module.exports = class MapComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired # Data source to use
 
     # Url source for the map
-    mapUrlSource: React.PropTypes.shape({
+    mapDataSource: React.PropTypes.shape({
       # Get the url for the image tiles with the specified filters applied
       # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
       getTileUrl: React.PropTypes.func.isRequired
@@ -71,7 +71,7 @@ module.exports = class MapComponent extends React.Component
   renderView: ->
     React.createElement(AutoSizeComponent, injectWidth: true, injectHeight: true, 
       React.createElement(MapViewComponent, 
-        mapUrlSource: @props.mapUrlSource
+        mapDataSource: @props.mapDataSource
         schema: @props.schema, 
         dataSource: @props.dataSource
         design: @props.design
