@@ -46,8 +46,30 @@ class BlocksDisplayComponent extends React.Component
         return R VerticalBlockComponent, key: block.id, block: block, renderBlock: @renderBlock, onBlockDrop: @handleBlockDrop, onBlockRemove: @handleBlockRemove
       when "horizontal"
         return R HorizontalBlockComponent, key: block.id, block: block, renderBlock: @renderBlock, onBlockDrop: @handleBlockDrop, onBlockRemove: @handleBlockRemove
+      when "spacer"
+        elem = R AutoSizeComponent, { injectWidth: true, key: block.id }, 
+          (size) =>
+            H.div id: block.id, style: {
+              width: size.width
+              height: if block.aspectRatio? then size.width / block.aspectRatio
+            }
+
+        if @props.onItemsChange
+          return R DraggableBlockComponent, 
+            key: block.id
+            block: block
+            onBlockDrop: @handleBlockDrop,
+              R DecoratedBlockComponent, 
+                key: block.id
+                aspectRatio: block.aspectRatio
+                onAspectRatioChange: if block.aspectRatio? then (aspectRatio) => @props.onItemsChange(blockUtils.updateBlock(@props.items, _.extend({}, block, aspectRatio: aspectRatio)))
+                onBlockRemove: (if @props.onItemsChange then @handleBlockDrop.bind(null, block)),
+                  elem
+        else
+          return elem
+
       when "widget"
-        elem = R AutoSizeComponent, { injectWidth: true }, 
+        elem = R AutoSizeComponent, { injectWidth: true, key: block.id }, 
           (size) =>
             @props.renderWidget({
               id: block.id
@@ -64,6 +86,7 @@ class BlocksDisplayComponent extends React.Component
             block: block
             onBlockDrop: @handleBlockDrop,
               R DecoratedBlockComponent, 
+                key: block.id
                 aspectRatio: block.aspectRatio
                 onAspectRatioChange: if block.aspectRatio? then (aspectRatio) => @props.onItemsChange(blockUtils.updateBlock(@props.items, _.extend({}, block, aspectRatio: aspectRatio)))
                 onBlockRemove: (if @props.onItemsChange then @handleBlockDrop.bind(null, block)),
@@ -112,6 +135,10 @@ class BlocksDisplayComponent extends React.Component
           createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "ImageMosaicChart", design: {} })
           title: H.i className: "fa fa-th"
           subtitle: "Mosaic"
+        R PaletteItemComponent,
+          createItem: @createBlockItem({ type: "spacer", aspectRatio: 1.4 })
+          title: H.i className: "fa fa-square-o"
+          subtitle: "Spacer"
 
   render: ->
     return H.table style: { width: "100%", height: "100%", tableLayout: "fixed" },
@@ -137,7 +164,7 @@ class RootBlockComponent extends React.Component
       onBlockDrop: @props.onBlockDrop
       style: { height: "100%", padding: 30 }
       onlyBottom: true,
-        H.div null,
+        H.div key: "root",
           _.map @props.block.blocks, (block) =>
             @props.renderBlock(block)
 

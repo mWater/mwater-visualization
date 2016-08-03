@@ -8,7 +8,7 @@ module.exports = class DecoratedBlockComponent extends React.Component
     style: React.PropTypes.object   # Style to add to outer div
     onBlockRemove: React.PropTypes.func.isRequired # Called when block is removed
 
-    connectMoveHandle: React.PropTypes.func.isRequired # the move handle connector
+    connectMoveHandle: React.PropTypes.func   # the move handle connector
     connectDragPreview: React.PropTypes.func   # the drag preview connector
     connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging. Null to not render
 

@@ -41,9 +41,9 @@ class MWaterDashboardPane extends React.Component
 #      @setState(design: dashboard.design, extraTables: dashboard.extra_tables)
 
   handleDesignChange: (design) =>
-    @setState(design: design, extraTables: [])
-    console.log JSON.stringify(design, null, 2)
-
+    # @setState(design: design, extraTables: )
+    # console.log JSON.stringify(design, null, 2)
+    
   render: ->
     if not @state.design
       return H.div null, "Loading..."
@@ -206,6 +206,7 @@ class MWaterDirectDashboardPane extends React.Component
 
     @state = {
       # design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" } # dashboardDesign
+      # design: design
       design: dashboardDesign
       extraTables: [] #['responses:e24f0a0ec11643cab3c21c07de2f6889']
     }
@@ -402,6 +403,7 @@ class MWaterDatagridPane extends React.Component
             })
         )
     )
+
 
 
 # class MapPane extends React.Component

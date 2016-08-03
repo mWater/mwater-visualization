@@ -12,7 +12,7 @@ module.exports = class ExprInsertModalComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired   # Schema to use
     dataSource: React.PropTypes.object.isRequired # Data source to use to get values
-    onInsert: React.PropTypes.func.isRequired   # Called with expr to insert
+    onInsert: React.PropTypes.func.isRequired   # Called with expr to insert and label if including label
 
   constructor: ->
     super
@@ -21,12 +21,24 @@ module.exports = class ExprInsertModalComponent extends React.Component
       open: false
       expr: null
       table: null
+      includeLabel: true
     }
 
   open: ->
     @setState(open: true, expr: null)
 
   handleTableChange: (table) => @setState(table: table)
+
+  handleInsert: (ev) =>
+    if not @state.expr
+      return
+
+    # Close first to avoid strange effects when mixed with pojoviews
+    @setState(open: false, =>
+      label = new ExprUtils(@props.schema).summarizeExpr(@state.expr)
+
+      @props.onInsert(@state.expr, if @state.includeLabel then label)
+    )
 
   renderContents: ->
     H.div className: "form-group",
@@ -51,6 +63,11 @@ module.exports = class ExprInsertModalComponent extends React.Component
             aggrStatuses: ["literal", "aggregate"]
             onChange: (expr) => @setState(expr: expr)
 
+      if @state.table
+        H.label key: "includeLabel",
+          H.input type: "checkbox", checked: @state.includeLabel, onChange: (ev) => @setState(includeLabel: ev.target.checked)
+          " Include Label"
+
 
   render: ->
     if not @state.open
@@ -59,11 +76,7 @@ module.exports = class ExprInsertModalComponent extends React.Component
     R ActionCancelModalComponent, 
       size: "large"
       actionLabel: "Insert"
-      onAction: => 
-        # Close first to avoid strange effects when mixed with pojoviews
-        @setState(open: false, =>
-          @props.onInsert(@state.expr)
-        )
+      onAction: @handleInsert 
       onCancel: => @setState(open: false)
       title: "Insert Field",
         @renderContents()

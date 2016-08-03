@@ -3,7 +3,7 @@ Layout that does blocks that are stacked vertically or horizontally alternately.
 Contents:
 
 id: id of block
-type: "root"/"vertical"/"horizontal"/"widget"
+type: "root"/"vertical"/"horizontal"/"widget"/"spacer"
 widgetType: if a widget
 aspectRatio: w/h if not autoHeight
 design: widget design
