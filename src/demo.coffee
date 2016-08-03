@@ -775,6 +775,7 @@ dashboardDesign = {
           "layerViews": [
             {
               "id": "53c9d731-dbe6-4987-b0ef-434a944b26b5",
+              "name": "Water points",
               "desc": "",
               "type": "Markers",
               "visible": true,
@@ -810,7 +811,6 @@ dashboardDesign = {
                     ]
                   }
                 },
-                "name": "Water points",
                 "color": "#0088FF",
                 "filter": null,
                 "table": "entities.water_point",

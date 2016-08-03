@@ -8,7 +8,7 @@ injectTableAlias = require('mwater-expressions').injectTableAlias
 ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../axes/AxisBuilder'
-LegendGroup = require('./LegendGroup').LegendGroup
+LegendGroup = require('./LegendGroup')
 
 ###
 Layer which draws a buffer around geometries (i.e. a radius circle around points)

@@ -8,8 +8,7 @@ injectTableAlias = require('mwater-expressions').injectTableAlias
 ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../axes/AxisBuilder'
-LegendGroup = require('./LegendGroup').LegendGroup
-LegendItem = require('./LegendGroup').LegendItem
+LegendGroup = require('./LegendGroup')
 
 ###
 Layer that is composed of markers
@@ -199,9 +198,6 @@ module.exports = class MarkersLayer extends Layer
   getLegend: (design, schema, name) ->
     exprUtils = new ExprUtils(schema)
 
-#    items = _.map design.sublayers, (sublayer, i) =>
-#      title = if sublayer.name then sublayer.name else ExprUtils.localizeString(schema.getTable(sublayer.axes.geometry.expr.table).name)
-
     if design.axes.color and design.axes.color.colorMap
       enums = exprUtils.getExprEnumValues(design.axes.color.expr)
 
@@ -221,9 +217,6 @@ module.exports = class MarkersLayer extends Layer
 
     H.div null,
       React.createElement(LegendGroup, legendGroupProps)
-
-#    H.div null,
-#      items
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->

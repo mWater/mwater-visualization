@@ -9,7 +9,7 @@ injectTableAlias = require('mwater-expressions').injectTableAlias
 ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../axes/AxisBuilder'
-LegendGroup = require('./LegendGroup').LegendGroup
+LegendGroup = require('./LegendGroup')
 
 ###
 Layer that is composed of administrative regions colored

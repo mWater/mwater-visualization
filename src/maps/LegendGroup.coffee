@@ -2,7 +2,7 @@ React = require 'react'
 H = React.DOM
 _ = require 'lodash'
 
-class LegendGroup extends React.Component
+module.exports = class LegendGroup extends React.Component
   @propTypes:
     items: React.PropTypes.array
     radiusLayer: React.PropTypes.bool
@@ -77,8 +77,3 @@ class LegendItem extends React.Component
     H.div style: containerStyle,
       @renderIndicator()
       H.span {style: titleStyle}, @props.name
-
-module.exports = {
-  LegendItem: LegendItem
-  LegendGroup: LegendGroup
-}
