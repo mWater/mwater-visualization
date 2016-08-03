@@ -180,7 +180,6 @@ module.exports = class LeafletMapComponent extends React.Component
           if layer.maxZoom
             options.maxZoom = layer.maxZoom
 
-
           tileLayer = L.tileLayer(layer.tileUrl, options)
           @tileLayers.push(tileLayer)
 
@@ -198,8 +197,8 @@ module.exports = class LeafletMapComponent extends React.Component
           if layer.utfGridUrl
             utfGridLayer = new UtfGridLayer(layer.utfGridUrl, { 
               useJsonP: false 
-              minZoom: layer.minZoom
-              maxZoom: layer.maxZoom
+              minZoom: layer.minZoom or undefined
+              maxZoom: layer.maxZoom or undefined
             })
             
             @map.addLayer(utfGridLayer)

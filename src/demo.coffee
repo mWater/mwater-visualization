@@ -17,11 +17,11 @@ MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
-DirectDashboardDataSource = require './widgets/DirectDashboardDataSource'
-DirectMapUrlSource = require './maps/DirectMapUrlSource'
+DirectDashboardDataSource = require './dashboards/DirectDashboardDataSource'
+DirectMapDataSource = require './maps/DirectMapDataSource'
 
-ServerMapUrlSource = require './maps/ServerMapUrlSource'
-ServerDashboardDataSource = require './widgets/ServerDashboardDataSource'
+ServerMapDataSource = require './maps/ServerMapDataSource'
+ServerDashboardDataSource = require './dashboards/ServerDashboardDataSource'
 
 dashboardId = "f1532f47b96c4211afbb15bd754068bf"
 
@@ -58,8 +58,13 @@ class MWaterDashboardPane extends React.Component
 #      dashboardDataSource = new ServerDashboardDataSource({
 #        apiUrl: @props.apiUrl, client: @props.client, share: share, dashboardId: dashboardId
 #      })
-      dashboardDataSource = new DirectDashboardDataSource(@props.apiUrl, @props.client, @state.design, config.schema, config.dataSource)
-
+      dashboardDataSource = new DirectDashboardDataSource({
+        apiUrl: @props.apiUrl
+        client: @props.client
+        design: @state.design
+        schema: config.schema
+        dataSource: config.dataSource
+      })
       H.div style: { height: "100%" },
         React.createElement(visualization.DashboardComponent, {
           schema: config.schema
@@ -71,13 +76,138 @@ class MWaterDashboardPane extends React.Component
         })
     )
 
+design = {
+  "items": {
+    "id": "root",
+    "type": "root",
+    "blocks": [
+      {
+        "type": "widget",
+        "widgetType": "Text",
+        "design": {
+          "style": "title",
+          "items": [
+            "The Water Situation"
+          ]
+        },
+        "id": "2fb6f7f9-212f-4488-abb6-9662eacc879f"
+      },
+      {
+        "type": "widget",
+        "widgetType": "Text",
+        "design": {
+          "items": [
+            "We have ",
+            {
+              "type": "expr",
+              "id": "b0e56d85-7999-4dfa-84ac-a4f6b4878f53",
+              "expr": {
+                "type": "op",
+                "op": "count",
+                "table": "entities.water_point",
+                "exprs": []
+              }
+            },
+            " water points in mWater. Of these, ",
+            {
+              "type": "expr",
+              "id": "9accfd63-7ae9-4e8e-a784-dfc259977d4c",
+              "expr": {
+                "type": "op",
+                "table": "entities.water_point",
+                "op": "count where",
+                "exprs": [
+                  {
+                    "type": "op",
+                    "table": "entities.water_point",
+                    "op": "= any",
+                    "exprs": [
+                      {
+                        "type": "field",
+                        "table": "entities.water_point",
+                        "column": "type"
+                      },
+                      {
+                        "type": "literal",
+                        "valueType": "enumset",
+                        "value": [
+                          "Protected dug well",
+                          "Unprotected dug well"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            " are dug wells!"
+          ]
+        },
+        "id": "09c8981b-3869-410d-bd90-4a5a012314a8"
+      },
+      {
+        "type": "widget",
+        "aspectRatio": 1.4,
+        "widgetType": "LayeredChart",
+        "design": {
+          "version": 2,
+          "layers": [
+            {
+              "axes": {
+                "x": {
+                  "expr": {
+                    "type": "field",
+                    "table": "entities.water_point",
+                    "column": "_created_on"
+                  },
+                  "xform": {
+                    "type": "yearmonth"
+                  }
+                },
+                "y": {
+                  "expr": {
+                    "type": "op",
+                    "op": "count",
+                    "table": "entities.water_point",
+                    "exprs": []
+                  },
+                  "xform": null
+                }
+              },
+              "filter": {
+                "type": "op",
+                "table": "entities.water_point",
+                "op": "thisyear",
+                "exprs": [
+                  {
+                    "type": "field",
+                    "table": "entities.water_point",
+                    "column": "_created_on"
+                  }
+                ]
+              },
+              "table": "entities.water_point",
+              "cumulative": false
+            }
+          ],
+          "type": "bar",
+          "titleText": "Water points added by month 2016"
+        },
+        "id": "906863e8-3b03-4b6c-b70f-f4cd4adc002b"
+      }
+    ]
+  },
+  "layout": "blocks"
+}
+
 class MWaterDirectDashboardPane extends React.Component
   constructor: (props) ->
     super
 
     @state = {
+      # design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" } # dashboardDesign
       design: dashboardDesign
-      extraTables: ['responses:e24f0a0ec11643cab3c21c07de2f6889']
+      extraTables: [] #['responses:e24f0a0ec11643cab3c21c07de2f6889']
     }
 
   handleDesignChange: (design) =>
@@ -92,7 +222,17 @@ class MWaterDirectDashboardPane extends React.Component
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
       extraTables: @state.extraTables
     }, (error, config) =>
-      dashboardDataSource = new DirectDashboardDataSource({apiUrl:@props.apiUrl, client:@props.client, design:@state.design, schema:config.schema, dataSource:config.dataSource})
+      if error
+        alert("Error: " + error.message)
+        return null
+
+      dashboardDataSource = new DirectDashboardDataSource({
+        apiUrl: @props.apiUrl
+        client: @props.client
+        design: @state.design
+        schema: config.schema
+        dataSource: config.dataSource
+      })
 
       H.div style: { height: "100%" },
         React.createElement(visualization.DashboardComponent, {
@@ -140,16 +280,16 @@ class MWaterMapPane extends React.Component
       extraTables: @state.extraTables
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
     }, (error, config) =>
-# Create map url source
-# mapUrlSource = new DirectMapUrlSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
-      mapUrlSource = new ServerMapUrlSource({ apiUrl: @props.apiUrl, client: @props.client, share: share, mapId: mapId })
+      # Create map url source
+      # mapDataSource = new DirectMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
+      mapDataSource = new ServerMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, share: share, mapId: mapId })
 
       H.div style: { height: "100%" },
         React.createElement(visualization.MapComponent, {
           schema: config.schema
           dataSource: config.dataSource
           design: @state.design
-          mapUrlSource: mapUrlSource
+          mapDataSource: mapDataSource
           onDesignChange: @handleDesignChange
           onRowClick: (tableId, rowId) => alert("#{tableId}:#{rowId}")
           titleElem: "Sample"
@@ -177,15 +317,15 @@ class MWaterDirectMapPane extends React.Component
       extraTables: @state.extraTables
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
     }, (error, config) =>
-# Create map url source
-      mapUrlSource = new DirectMapUrlSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
+      # Create map url source
+      mapDataSource = new DirectMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
 
       H.div style: { height: "100%" },
         React.createElement(visualization.MapComponent, {
           schema: config.schema
           dataSource: config.dataSource
           design: @state.design
-          mapUrlSource: mapUrlSource
+          mapDataSource: mapDataSource
           onDesignChange: @handleDesignChange
           titleElem: "Sample"
         })
@@ -318,7 +458,8 @@ $ ->
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(BlocksDesignerComponent, renderBlock: [])
     # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
@@ -631,68 +772,70 @@ dashboardDesign = {
           "baseLayer": "bing_road",
           "layerViews": [
             {
-              "id": "53c9d731-dbe6-4987-b0ef-434a944b26a5",
-              "name": "Markers",
+              "id": "53c9d731-dbe6-4987-b0ef-434a944b26b5",
               "desc": "",
               "type": "Markers",
               "visible": true,
               "opacity": 1,
               "design": {
-                "sublayers": [
-                  {
-                    "axes": {
-                      "geometry": {
-                        "expr": {
-                          "type": "field",
-                          "table": "entities.water_point",
-                          "column": "location"
-                        }
-                      },
-                      "color": {
-                        "expr": {
-                          "type": "field",
-                          "table": "entities.water_point",
-                          "column": "drilling_method"
-                        },
-                        "colorMap": [
-                          {
-                            "value": "manual",
-                            "color": "#d49097"
-                          },
-                          {
-                            "value": "mechanical",
-                            "color": "#a9424c"
-                          },
-                          {
-                            "value": "other",
-                            "color": "#542126"
-                          }
-                        ]
-                      }
-                    },
-                    "name": "Water points",
-                    "color": "#0088FF",
-                    "filter": null,
-                    "table": "entities.water_point",
-                    "symbol": "font-awesome/star"
+                "axes": {
+                  "geometry": {
+                    "expr": {
+                      "type": "field",
+                      "table": "entities.water_point",
+                      "column": "location"
+                    }
                   },
-                  {
-                    "axes": {
-                      "geometry": {
-                        "expr": {
-                          "type": "field",
-                          "table": "entities.school",
-                          "column": "location"
-                        }
-                      }
+                  "color": {
+                    "expr": {
+                      "type": "field",
+                      "table": "entities.water_point",
+                      "column": "drilling_method"
                     },
-                    "name": "",
-                    "color": "#5e354c",
-                    "filter": null,
-                    "table": "entities.school",
-                    "symbol": "font-awesome/h-square"
+                    "colorMap": [
+                      {
+                        "value": "manual",
+                        "color": "#d49097"
+                      },
+                      {
+                        "value": "mechanical",
+                        "color": "#a9424c"
+                      },
+                      {
+                        "value": "other",
+                        "color": "#542126"
+                      }
+                    ]
                   }
-                ]
+                },
+                "name": "Water points",
+                "color": "#0088FF",
+                "filter": null,
+                "table": "entities.water_point",
+                "symbol": "font-awesome/star"
+              }
+            },
+            {
+              "id": "53c9d731-dbe6-4987-b0ef-434a944b26a5",
+              "name": "Schools",
+              "desc": "",
+              "type": "Markers",
+              "visible": true,
+              "opacity": 1,
+              "design": {
+                "axes": {
+                  "geometry": {
+                    "expr": {
+                      "type": "field",
+                      "table": "entities.school",
+                      "column": "location"
+                    }
+                  }
+                },
+                "color": "#5e354c",
+                "filter": null,
+                "table": "entities.school",
+                "symbol": "font-awesome/h-square"
               }
             },
             {

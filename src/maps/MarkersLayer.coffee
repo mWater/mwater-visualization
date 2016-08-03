@@ -14,14 +14,13 @@ LegendItem = require('./LegendGroup').LegendItem
 ###
 Layer that is composed of markers
 Design is:
-  sublayers: array of sublayers
-
-sublayer:
   table: table to get data from
   axes: axes (see below)
   filter: optional logical expression to filter by
   color: color of layer (e.g. #FF8800). Color axis overrides
   symbol: symbol to use for layer. e.g. "font-awesome/bell". Will be converted on server to proper uri.
+
+LEGACY: sublayers array that contains above design
 
 axes:
   geometry: where to place markers
@@ -42,13 +41,14 @@ module.exports = class MarkersLayer extends Layer
   getJsonQLCss: (design, schema, filters) ->
     # Create design
     layerDef = {
-      layers: _.map(design.sublayers, (sublayer, i) =>
-        { 
-          id: "layer#{i}"
-          jsonql: @createJsonQL(sublayer, schema, filters)
-        })
+      layers: [
+        {
+          id: "layer0"
+          jsonql: @createJsonQL(design, schema, filters)
+        }
+      ]
       css: @createCss(design, schema)
-      interactivity: { # TODO Interactivity is only first sublayer!
+      interactivity: { 
         layer: "layer0"
         fields: ["id"]
       }
@@ -56,12 +56,12 @@ module.exports = class MarkersLayer extends Layer
 
     return layerDef
 
-  createJsonQL: (sublayer, schema, filters) ->
+  createJsonQL: (design, schema, filters) ->
     axisBuilder = new AxisBuilder(schema: schema)
     exprCompiler = new ExprCompiler(schema)
 
     # Compile geometry axis
-    geometryExpr = axisBuilder.compileAxis(axis: sublayer.axes.geometry, tableAlias: "innerquery")
+    geometryExpr = axisBuilder.compileAxis(axis: design.axes.geometry, tableAlias: "innerquery")
 
     # Convert to Web mercator (3857)
     geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
@@ -84,16 +84,16 @@ module.exports = class MarkersLayer extends Layer
     innerquery = { 
       type: "query"
       selects: [
-        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(sublayer.table).primaryKey }, alias: "id" } # main primary key as id
+        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(design.table).primaryKey }, alias: "id" } # main primary key as id
         { type: "select", expr: geometryExpr, alias: "the_geom_webmercator" } # geometry as the_geom_webmercator
         cluster
       ]
-      from: exprCompiler.compileTable(sublayer.table, "innerquery")
+      from: exprCompiler.compileTable(design.table, "innerquery")
     }
 
     # Add color select if color axis
-    if sublayer.axes.color
-      colorExpr = axisBuilder.compileAxis(axis: sublayer.axes.color, tableAlias: "innerquery")
+    if design.axes.color
+      colorExpr = axisBuilder.compileAxis(axis: design.axes.color, tableAlias: "innerquery")
       innerquery.selects.push({ type: "select", expr: colorExpr, alias: "color" })
 
     # Create filters. First limit to bounding box
@@ -109,12 +109,12 @@ module.exports = class MarkersLayer extends Layer
     ]
 
     # Then add filters baked into layer
-    if sublayer.filter
-      whereClauses.push(exprCompiler.compileExpr(expr: sublayer.filter, tableAlias: "innerquery"))
+    if design.filter
+      whereClauses.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "innerquery"))
 
     # Then add extra filters passed in, if relevant
     # Get relevant filters
-    relevantFilters = _.where(filters, table: sublayer.table)
+    relevantFilters = _.where(filters, table: design.table)
     for filter in relevantFilters
       whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
 
@@ -138,7 +138,7 @@ module.exports = class MarkersLayer extends Layer
     }
 
     # Add color select if color axis
-    if sublayer.axes.color
+    if design.axes.color
       outerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "innerquery", column: "color" }, alias: "color" }) # innerquery.color as color
 
     return outerquery
@@ -146,30 +146,30 @@ module.exports = class MarkersLayer extends Layer
   # Creates CartoCSS
   createCss: (design, schema) ->
     css = ""
-    _.each design.sublayers, (sublayer, index) =>
-      if sublayer.symbol
-        symbol = "marker-file: url(#{sublayer.symbol});"
-      else
-        symbol = "marker-type: ellipse;"
 
-      css += '''
-        #layer''' + index + ''' {
-          marker-fill: ''' + (sublayer.color or "#666666") + ''';
-          marker-width: 10;
-          marker-line-color: white;
-          marker-line-width: 1;
-          marker-line-opacity: 0.6;
-          marker-placement: point;
-          ''' + symbol + '''
-          marker-allow-overlap: true;
-        }
+    if design.symbol
+      symbol = "marker-file: url(#{design.symbol});"
+    else
+      symbol = "marker-type: ellipse;"
 
-      '''
+    css += '''
+      #layer0 {
+        marker-fill: ''' + (design.color or "#666666") + ''';
+        marker-width: 10;
+        marker-line-color: white;
+        marker-line-width: 1;
+        marker-line-opacity: 0.6;
+        marker-placement: point;
+        ''' + symbol + '''
+        marker-allow-overlap: true;
+      }
 
-      # If color axes, add color conditions
-      if sublayer.axes.color and sublayer.axes.color.colorMap
-        for item in sublayer.axes.color.colorMap
-          css += "#layer#{index} [color=#{JSON.stringify(item.value)}] { marker-fill: #{item.color} }\n"
+    '''
+
+    # If color axes, add color conditions
+    if design.axes.color and design.axes.color.colorMap
+      for item in design.axes.color.colorMap
+        css += "#layer0 [color=#{JSON.stringify(item.value)}] { marker-fill: #{item.color} }\n"
 
     return css
 
@@ -187,7 +187,7 @@ module.exports = class MarkersLayer extends Layer
   #   React element to put into a popup
   onGridClick: (ev, options) ->
     if ev.data and ev.data.id
-      return [options.design.sublayers[0].table, ev.data.id]
+      return [options.design.table, ev.data.id]
     return null
 
   # Get min and max zoom levels
@@ -263,16 +263,19 @@ module.exports = class MarkersLayer extends Layer
 
     # TODO clones entirely
     design = _.cloneDeep(design)
-    design.sublayers = design.sublayers or [{}]
 
-    for sublayer in design.sublayers
-      sublayer.axes = sublayer.axes or {}
-      sublayer.color = sublayer.color or "#0088FF"
+    # Migrate legacy sublayers
+    if design.sublayers?[0]
+      design = _.extend({}, design, design.sublayers[0])
+    delete design.sublayers
 
-      sublayer.axes.geometry = axisBuilder.cleanAxis(axis: sublayer.axes.geometry, table: sublayer.table, types: ['geometry'], aggrNeed: "none")
-      sublayer.axes.color = axisBuilder.cleanAxis(axis: sublayer.axes.color, table: sublayer.table, types: ['enum', 'text', 'boolean'], aggrNeed: "none")
+    design.axes = design.axes or {}
+    design.color = design.color or "#0088FF"
 
-      sublayer.filter = exprCleaner.cleanExpr(sublayer.filter, { table: sublayer.table })
+    design.axes.geometry = axisBuilder.cleanAxis(axis: design.axes.geometry, table: design.table, types: ['geometry'], aggrNeed: "none")
+    design.axes.color = axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean'], aggrNeed: "none")
+
+    design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table })
 
     return design
 
@@ -280,15 +283,14 @@ module.exports = class MarkersLayer extends Layer
   validateDesign: (design, schema) ->
     axisBuilder = new AxisBuilder(schema: schema)
 
-    if design.sublayers.length < 1
-      return "No sublayers"
+    if not design.table
+      return "Missing table"
 
-    for sublayer in design.sublayers
-      if not sublayer.axes or not sublayer.axes.geometry
-        return "Missing axes"
+    if not design.axes or not design.axes.geometry
+      return "Missing axes"
 
-      error = axisBuilder.validateAxis(axis: sublayer.axes.geometry)
-      if error then return error
+    error = axisBuilder.validateAxis(axis: design.axes.geometry)
+    if error then return error
 
     return null
 

@@ -1,6 +1,6 @@
 querystring = require 'querystring'
-WidgetFactory = require './WidgetFactory'
-DirectMapUrlSource = require '../maps/DirectMapUrlSource'
+WidgetFactory = require '../widgets/WidgetFactory'
+DirectMapDataSource = require '../maps/DirectMapDataSource'
 
 # Uses mWater server to get widget data to allow sharing with unprivileged users
 module.exports = class ServerDashboardDataSource

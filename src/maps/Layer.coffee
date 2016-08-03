@@ -50,7 +50,8 @@ module.exports = class Layer
   isIncomplete: (design, schema) ->
     return @validateDesign(@cleanDesign(design, schema), schema)?
 
-  # Creates a design element with specified options
+  # Creates a design element with specified options.
+  # Design should be cleaned on the way in and on way out.
   # options:
   #   design: design of layer
   #   schema: schema to use

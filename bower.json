@@ -16,8 +16,11 @@
   ],
   "dependencies": {
     "bootstrap": "^3.3.4",
-    "c3": "https://github.com/mWater/c3.git#master",
+    "c3": "~0.4.11",
     "d3": "v3.5.0",
     "lodash": "~3.10.1"
+  },
+  "resolutions": {
+    "c3": "~0.4.11"
   }
 }
