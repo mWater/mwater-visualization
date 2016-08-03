@@ -42,7 +42,7 @@ class MWaterDashboardPane extends React.Component
 
   handleDesignChange: (design) =>
     # @setState(design: design, extraTables: )
-    console.log JSON.stringify(design, null, 2)
+    # console.log JSON.stringify(design, null, 2)
     
   render: ->
     if not @state.design

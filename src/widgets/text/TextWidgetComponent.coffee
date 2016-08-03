@@ -69,14 +69,16 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
     ev.preventDefault()
     document.execCommand(command)
 
-  handleInsertExpr: (expr) =>
-    @handleInsertEmbed({ type: "expr", id: uuid.v4(), expr: expr })
+  handleInsertExpr: (expr, label) =>
+    item = { type: "expr", id: uuid.v4(), expr: expr }
 
-  # Put in an embedded item
-  handleInsertEmbed: (item) =>
-    @refs.contentEditable.pasteHTML('''
-      <div data-embed="''' + _.escape(JSON.stringify(item)) + '''"></div>
-    ''')
+    html = '''<div data-embed="''' + _.escape(JSON.stringify(item)) + '''"></div>'''
+
+    # Add label
+    if label
+      html = _.escape("#{label}: ") + html
+
+    @refs.contentEditable.pasteHTML(html)
 
   replaceItem: (item) ->
     replaceItemInItems = (items, item) ->
@@ -93,6 +95,10 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
     @props.onDesignChange(_.extend({}, @props.design, items: items))
 
   handleClick: (ev) =>
+    # Be sure focused
+    if not @state.focused
+      @setState(focused: true)
+
     if ev.target.dataset?.embed
       item = JSON.parse(ev.target.dataset?.embed)
       @refs.exprUpdateModal.open(item.expr, (expr) =>

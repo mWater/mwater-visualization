@@ -49,7 +49,7 @@ module.exports = class ItemsHtmlConverter
           exprHtml = _.escape(@exprValues[item.id] + "")
         else
           # Placeholder
-          exprHtml = '''<span class="text-muted">&#x25a0;&#x25a0;&#x25a0;</span>'''
+          exprHtml = '<span class="text-muted">\u25a0\u25a0\u25a0</span>'
 
         if @designMode
           # Show actual value
@@ -59,14 +59,14 @@ module.exports = class ItemsHtmlConverter
 
           # html += '''&#x2060;<div contentEditable="false" data-embed="''' + _.escape(JSON.stringify(item)) + '''" class="mwater-visualization-text-widget-expr">''' + label + '''</div>&#x2060;'''
           # Don't use a contentEditable false, as it allows for 
-          html += '''&#x2060;<span data-embed="''' + _.escape(JSON.stringify(item)) + '''" class="mwater-visualization-text-widget-expr">''' + (exprHtml or "&nbsp;") + '''</span>&#x2060;'''
+          html += '\u2060<span data-embed="' + _.escape(JSON.stringify(item)) + '" class="mwater-visualization-text-widget-expr">' + (exprHtml or "\u00A0") + '</span>\u2060'
         else
           # View mode
           html += exprHtml
 
     # If empty, put placeholder
     if html.length == 0
-      html = '&#x2060;'
+      html = '\u2060'
 
     # console.log "createHtml: #{html}"
     return html
