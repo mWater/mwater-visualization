@@ -6,7 +6,9 @@ Layer = require './Layer'
 ExprCompiler = require('mwater-expressions').ExprCompiler
 injectTableAlias = require('mwater-expressions').injectTableAlias
 ExprCleaner = require('mwater-expressions').ExprCleaner
+ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../axes/AxisBuilder'
+LegendGroup = require('./LegendGroup')
 
 ###
 Layer that is composed of markers
@@ -193,9 +195,28 @@ module.exports = class MarkersLayer extends Layer
 
   # Get the legend to be optionally displayed on the map. Returns
   # a React element
-  getLegend: (design, schema) ->
-    # TODO
-    return null
+  getLegend: (design, schema, name) ->
+    exprUtils = new ExprUtils(schema)
+
+    if design.axes.color and design.axes.color.colorMap
+      enums = exprUtils.getExprEnumValues(design.axes.color.expr)
+
+      colors = _.map design.axes.color.colorMap, (colorItem) =>
+        {color: colorItem.color, name: ExprUtils.localizeString(_.find(enums, {id: colorItem.value}).name) }
+    else
+      colors = []
+
+    symbol = if design.symbol then design.symbol else 'font-awesome/circle'
+
+    legendGroupProps =
+      symbol: symbol
+      items: colors
+      key: design.axes.geometry.expr.table
+      defaultColor: design.color
+      name: name
+
+    H.div null,
+      React.createElement(LegendGroup, legendGroupProps)
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->
@@ -260,3 +281,110 @@ module.exports = class MarkersLayer extends Layer
     if error then return error
 
     return null
+
+  createKMLExportJsonQL: (sublayer, schema, filters) ->
+    axisBuilder = new AxisBuilder(schema: schema)
+    exprCompiler = new ExprCompiler(schema)
+
+    # Compile geometry axis
+    geometryExpr = axisBuilder.compileAxis(axis: sublayer.axes.geometry, tableAlias: "innerquery")
+
+    # Convert to Web mercator (3857)
+    geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326] }
+
+    # row_number() over (partition by st_snaptogrid(location, !pixel_width!*5, !pixel_height!*5)) AS r
+    cluster = {
+      type: "select"
+      expr: { type: "op", op: "row_number", exprs: [] }
+      over: { partitionBy: [geometryExpr]}
+      alias: "r"
+    }
+
+    # Select _id, location and clustered row number
+    innerquery = {
+      type: "query"
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(sublayer.table).primaryKey }, alias: "id" } # main primary key as id
+        { type: "select", expr: geometryExpr, alias: "the_geom_webmercator" } # geometry as the_geom_webmercator
+        cluster
+      ]
+      from: exprCompiler.compileTable(sublayer.table, "innerquery")
+    }
+
+    # Add color select if color axis
+    if sublayer.axes.color
+      colorExpr = axisBuilder.compileAxis(axis: sublayer.axes.color, tableAlias: "innerquery")
+      innerquery.selects.push({ type: "select", expr: colorExpr, alias: "color" })
+
+    # Create filters. First limit to bounding box
+    whereClauses = []
+
+    # Then add filters baked into layer
+    if sublayer.filter
+      whereClauses.push(exprCompiler.compileExpr(expr: sublayer.filter, tableAlias: "innerquery"))
+
+    # Then add extra filters passed in, if relevant
+    # Get relevant filters
+    relevantFilters = _.where(filters, table: sublayer.table)
+    for filter in relevantFilters
+      whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
+
+    whereClauses = _.compact(whereClauses)
+
+    # Wrap if multiple
+    if whereClauses.length > 1
+      innerquery.where = { type: "op", op: "and", exprs: whereClauses }
+    else
+      innerquery.where = whereClauses[0]
+
+    # Create outer query which takes where r <= 3 to limit # of points in a cluster
+    outerquery = {
+      type: "query"
+      selects: [
+        { type: "select", expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "innerquery", column: "id" }]}, alias: "id" } # innerquery._id::text as id
+        { type: "select", expr: { type: "op", op: "ST_X", exprs: [{ type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }]}, alias: "longitude" } # innerquery.the_geom_webmercator as the_geom_webmercator
+        { type: "select", expr: { type: "op", op: "ST_Y", exprs: [{ type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }]}, alias: "latitude" } # innerquery.the_geom_webmercator as the_geom_webmercator
+      ]
+      from: { type: "subquery", query: innerquery, alias: "innerquery" }
+      where: { type: "op", op: "<=", exprs: [{ type: "field", tableAlias: "innerquery", column: "r" }, 3]}
+    }
+
+    # Add color select if color axis
+
+    if sublayer.axes.color
+      outerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "innerquery", column: "color" }, alias: "color" }) # innerquery.color as color
+
+    return outerquery
+
+
+  createKMLExportStyleInfo: (sublayer, schema, filters) ->
+    if sublayer.symbol
+      symbol = sublayer.symbol
+    else
+      symbol = "font-awesome/circle"
+
+    style = {
+      color: sublayer.color
+      symbol: symbol
+    }
+
+    if sublayer.axes.color and sublayer.axes.color.colorMap
+      style.colorMap = sublayer.axes.color.colorMap
+      
+    return style
+
+  getKMLExportJsonQL: (design, schema, filters) ->
+    layerDef = {
+      layers: _.map(design.sublayers, (sublayer, i) =>
+        {
+          id: "layer#{i}"
+          jsonql: @createKMLExportJsonQL(sublayer, schema, filters)
+          style: @createKMLExportStyleInfo(sublayer, schema, filters)
+        })
+    }
+
+    return layerDef
+
+  acceptKmlVisitorForRow: (visitor, row) ->
+    visitor.addPoint(row.latitude, row.longitude, null, null, row.color)
+
