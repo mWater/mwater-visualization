@@ -90,6 +90,7 @@ class MapWidgetComponent extends React.Component
   renderContent: (width, height) ->
     React.createElement(InnerMapWidgetComponent, {
       schema: @props.schema
+      dataSource: @props.dataSource
       widgetDataSource: @props.widgetDataSource
       design: @props.design
       onDesignChange: @props.onDesignChange
@@ -119,6 +120,7 @@ class MapWidgetComponent extends React.Component
 class InnerMapWidgetComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
+    dataSource: React.PropTypes.object.isRequired
     widgetDataSource: React.PropTypes.object.isRequired
 
     design: React.PropTypes.object.isRequired  # See Map Design.md
@@ -145,6 +147,7 @@ class InnerMapWidgetComponent extends React.Component
       React.createElement(MapViewComponent, {
         schema: @props.schema
         design: @props.design
+        dataSource: @props.dataSource
         mapDataSource: mapDataSource
         onDesignChange: @props.onDesignChange
         extraFilters: @props.filters
