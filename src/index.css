@@ -305,6 +305,7 @@
 }
 
 .mwater-visualization-text-palette-item {
+  cursor: pointer;
   display: inline-block;
   color: white;
   padding: 3px 10px 3px 10px;
