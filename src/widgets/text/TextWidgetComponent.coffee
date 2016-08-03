@@ -38,7 +38,18 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
 
   # Override to determine if a load is needed. Not called on mounting
   isLoadNeeded: (newProps, oldProps) -> 
-    return not _.isEqual(_.pick(newProps, "filters", "design"), _.pick(oldProps, "filters", "design"))
+    # Get expression items recursively
+    getExprItems = (items) ->
+      exprItems = []
+      for item in (items or [])
+        if item.type == "expr"
+          exprItems.push(item)
+        if item.items
+          exprItems = exprItems.concat(getExprItems(item.items))
+      return exprItems    
+
+    # Reload if filters or expressions have changed
+    return not _.isEqual(newProps.filters, oldProps.filters) or not _.isEqual(getExprItems(newProps.design.items), getExprItems(oldProps.design.items))
 
   # Call callback with state changes
   load: (props, prevProps, callback) -> 
