@@ -6,7 +6,6 @@ R = React.createElement
 UndoStack = require '../UndoStack'
 DashboardViewComponent = require './DashboardViewComponent'
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
-DashboardUtils = require './DashboardUtils'
 QuickfiltersComponent = require '../quickfilter/QuickfiltersComponent'
 QuickfilterCompiler = require '../quickfilter/QuickfilterCompiler'
 SettingsModalComponent = require './SettingsModalComponent'
@@ -78,10 +77,6 @@ module.exports = class DashboardComponent extends React.Component
     # Require at use as causes server problems
     filesaver = require 'filesaver.js'
     filesaver(blob, "Dashboard.json")
-
-  handleAddWidget: (wt) =>
-    design = DashboardUtils.addWidget(@props.design, wt.type, wt.design, 8, 8)
-    @props.onDesignChange(design)
 
   handleSettings: =>
     @refs.settings.show(@props.design)
