@@ -9,7 +9,6 @@ ExprCompiler = require('mwater-expressions').ExprCompiler
 injectTableAlias = require('mwater-expressions').injectTableAlias
 
 Widget = require '../Widget'
-TextWidgetComponent = require './TextWidgetComponent'
 
 module.exports = class TextWidget extends Widget
   # Creates a React element that is a view of the widget 
@@ -26,6 +25,9 @@ module.exports = class TextWidget extends Widget
   #  height: height in pixels on screen
   #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
   createViewElement: (options) ->
+    # Put here so TextWidget can be created on server
+    TextWidgetComponent = require './TextWidgetComponent'
+    
     return R TextWidgetComponent,
       schema: options.schema
       dataSource: options.dataSource
