@@ -7,6 +7,8 @@ uuid = require 'node-uuid'
 
 AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
 
+DropdownWidgetComponent = require './DropdownWidgetComponent'
+
 module.exports = class ImageWidgetComponent extends AsyncLoadComponent
   @propTypes: 
     design: React.PropTypes.object.isRequired
@@ -44,6 +46,9 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
     props.widgetDataSource.getData(props.filters, (error, data) =>
       callback(error: error, data: data )
     )
+
+  handleStartEditing: =>
+    alert("TODO")
   
   # TODO add editor 
   # TODO display "Click to edit" if image not specified: e.g.
@@ -53,5 +58,13 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
   #     H.a className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Edit"
 
   render: ->
-    H.div style: { position: "relative", width: @props.width, height: @props.height, textAlign: "center" },
-      H.img style: { maxWidth: "100%", maxHeight: "100%"}, src: "https://realfood.tesco.com/media/images/Orange-and-almond-srping-cake-hero-58d07750-0952-47eb-bc41-a1ef9b81c01a-0-472x310.jpg"
+    dropdownItems = []
+    if @props.onDesignChange?
+      dropdownItems.push({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
+
+    R DropdownWidgetComponent, 
+      width: @props.width
+      height: @props.height
+      dropdownItems: dropdownItems,
+        H.div style: { position: "relative", width: @props.width, height: @props.height, textAlign: "center" },
+          H.img style: { maxWidth: "100%", maxHeight: "100%"}, src: "https://realfood.tesco.com/media/images/Orange-and-almond-srping-cake-hero-58d07750-0952-47eb-bc41-a1ef9b81c01a-0-472x310.jpg"

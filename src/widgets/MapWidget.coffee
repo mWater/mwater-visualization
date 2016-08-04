@@ -3,7 +3,7 @@ H = React.DOM
 _ = require 'lodash'
 
 Widget = require './Widget'
-SimpleWidgetComponent = require './SimpleWidgetComponent'
+DropdownWidgetComponent = require './DropdownWidgetComponent'
 ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
 
 # Design is the map design specified in maps/Map Design.md
@@ -87,51 +87,7 @@ class MapWidgetComponent extends React.Component
       onRequestClose: (=> @setState(editing: false)),
         content)
 
-  renderContent: (width, height) ->
-    React.createElement(InnerMapWidgetComponent, {
-      schema: @props.schema
-      dataSource: @props.dataSource
-      widgetDataSource: @props.widgetDataSource
-      design: @props.design
-      onDesignChange: @props.onDesignChange
-      filters: @props.filters
-      width: width
-      height: height
-    })
-
-  render: ->
-    dropdownItems = []
-    if @props.onDesignChange?
-      dropdownItems.push({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
-
-    # Wrap in a simple widget
-    return H.div null,
-      if @props.onDesignChange?
-        @renderEditor()
-      React.createElement(SimpleWidgetComponent, 
-        width: @props.width
-        height: @props.height
-        connectMoveHandle: @props.connectMoveHandle
-        connectResizeHandle: @props.connectResizeHandle
-        dropdownItems: dropdownItems,
-          @renderContent()
-      )
-
-class InnerMapWidgetComponent extends React.Component
-  @propTypes:
-    schema: React.PropTypes.object.isRequired # Schema to use
-    dataSource: React.PropTypes.object.isRequired
-    widgetDataSource: React.PropTypes.object.isRequired
-
-    design: React.PropTypes.object.isRequired  # See Map Design.md
-    onDesignChange: React.PropTypes.func  # Called with new design. null/undefined for readonly
-
-    width: React.PropTypes.number
-    height: React.PropTypes.number
-
-    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
-
-  render: ->
+  renderContent: ->
     # Require here to prevent server require problems
     MapViewComponent = require '../maps/MapViewComponent'
 
@@ -156,3 +112,19 @@ class InnerMapWidgetComponent extends React.Component
         touchZoom: false    # Prevent accidental zooming
         scrollWheelZoom: false # Prevent accidental zooming
       })
+
+  render: ->
+    dropdownItems = []
+    if @props.onDesignChange?
+      dropdownItems.push({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
+
+    # Wrap in a simple widget
+    return H.div null,
+      if @props.onDesignChange?
+        @renderEditor()
+      React.createElement(DropdownWidgetComponent, 
+        width: @props.width
+        height: @props.height
+        dropdownItems: dropdownItems,
+          @renderContent()
+      )

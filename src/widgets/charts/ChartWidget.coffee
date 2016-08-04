@@ -1,7 +1,7 @@
 React = require 'react'
 H = React.DOM
 Widget = require './../Widget'
-SimpleWidgetComponent = require './../SimpleWidgetComponent'
+DropdownWidgetComponent = require './../DropdownWidgetComponent'
 CsvBuilder = require './../../CsvBuilder'
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
 ChartViewComponent = require './ChartViewComponent'
@@ -113,7 +113,7 @@ class ChartWidgetComponent extends React.Component
   handleEndEditing: =>
     @setState(editing: false)
 
-  renderChart: (width, height) ->
+  renderChart: ->
     React.createElement(ChartViewComponent, 
       chart: @props.chart
       design: @props.design
@@ -122,8 +122,8 @@ class ChartWidgetComponent extends React.Component
       widgetDataSource: @props.widgetDataSource
       scope: @props.scope
       filters: @props.filters
-      width: width
-      height: height
+      width: @props.width
+      height: @props.height
       standardWidth: @props.standardWidth
       onScopeChange: @props.onScopeChange)
 
@@ -170,10 +170,9 @@ class ChartWidgetComponent extends React.Component
     return H.div onDoubleClick: (if @props.onDesignChange? then @handleStartEditing), style: { position: "relative", width: @props.width },
       if @props.onDesignChange?
         @renderEditor()
-      React.createElement(SimpleWidgetComponent, 
+      React.createElement(DropdownWidgetComponent, 
         width: @props.width
         height: @props.height
-        standardWidth: @props.standardWidth
         dropdownItems: dropdownItems,
           @renderChart()
       )
