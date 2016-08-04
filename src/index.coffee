@@ -26,7 +26,6 @@ exports.CalendarChart = require './widgets/charts/CalendarChart'
 exports.ImageMosaicChart = require './widgets/charts/ImageMosaicChart'
 exports.ChartViewComponent = require './widgets/charts/ChartViewComponent'
 exports.MapViewComponent = require './maps/MapViewComponent'
-exports.DashboardUtils = require './dashboards/DashboardUtils'
 
 exports.WidgetScoper = require './widgets/WidgetScoper'
 exports.WidgetScopesViewComponent = require './widgets/WidgetScopesViewComponent'

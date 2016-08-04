@@ -81,12 +81,13 @@ module.exports = class MapViewComponent extends React.Component
         # Create layer
         layer = LayerFactory.createLayer(layerView.type)
 
+        design = layer.cleanDesign(layerView.design, @props.schema)
         # Ignore if invalid
-        if layer.validateDesign(layer.cleanDesign(layerView.design, @props.schema), @props.schema)
+        if layer.validateDesign(design, @props.schema)
           return null
 
         if layerView.visible
-          return { key: layerView.id, legend: layer.getLegend(layerView.design, @props.schema) }
+          return { key: layerView.id, legend: layer.getLegend(design, @props.schema, layerView.name) }
       )
     )
 
@@ -103,7 +104,7 @@ module.exports = class MapViewComponent extends React.Component
     H.div style: style,
       _.map legendItems, (item, i) =>
         H.div key: item.key,
-          if i > 0 then H.br()
+#          if i > 0 then H.br()
           item.legend
 
   renderPopup: ->

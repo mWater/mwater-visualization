@@ -3,7 +3,7 @@ H = React.DOM
 _ = require 'lodash'
 
 Widget = require './Widget'
-SimpleWidgetComponent = require './SimpleWidgetComponent'
+DropdownWidgetComponent = require './DropdownWidgetComponent'
 markdown = require("markdown").markdown
 ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
 
@@ -91,15 +91,12 @@ class MarkdownWidgetComponent extends React.Component
     return H.div onDoubleClick: @handleStartEditing, 
       if @props.onDesignChange?
         @renderEditor()
-      React.createElement(SimpleWidgetComponent, 
+      React.createElement(DropdownWidgetComponent, 
         width: @props.width
         height: @props.height
-        standardWidth: @props.standardWidth
-        connectMoveHandle: @props.connectMoveHandle
-        connectResizeHandle: @props.connectResizeHandle
         dropdownItems: dropdownItems,
           @renderContent()
-        )
+      )
 
 
 class MarkdownWidgetViewComponent extends React.Component

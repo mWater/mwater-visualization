@@ -35,7 +35,7 @@ module.exports = class Layer
 
   # Get the legend to be optionally displayed on the map. Returns
   # a React element
-  getLegend: (design, schema) ->
+  getLegend: (design, schema, name) ->
     return null
 
   # Get a list of table ids that can be filtered on
@@ -67,3 +67,10 @@ module.exports = class Layer
   # Validates design. Null if ok, message otherwise
   validateDesign: (design, schema) ->
     return null
+
+  # arguments:
+  #   design: design of layer
+  #   schema: schema to use
+  #   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
+  getKMLExportJsonQL: (design, schema, filters) ->
+    throw new Error("Not implemented")

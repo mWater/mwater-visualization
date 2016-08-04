@@ -3,12 +3,10 @@ H = React.DOM
 R = React.createElement
 _ = require 'lodash'
 
-async = require 'async'
-
 ExprCompiler = require('mwater-expressions').ExprCompiler
 injectTableAlias = require('mwater-expressions').injectTableAlias
 
-Widget = require '../Widget'
+Widget = require './Widget'
 
 module.exports = class TextWidget extends Widget
   # Creates a React element that is a view of the widget 
@@ -25,10 +23,10 @@ module.exports = class TextWidget extends Widget
   #  height: height in pixels on screen
   #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
   createViewElement: (options) ->
-    # Put here so TextWidget can be created on server
-    TextWidgetComponent = require './TextWidgetComponent'
+    # Put here so ImageWidget can be created on server
+    ImageWidgetComponent = require './ImageWidgetComponent'
     
-    return R TextWidgetComponent,
+    return R ImageWidgetComponent,
       schema: options.schema
       dataSource: options.dataSource
       widgetDataSource: options.widgetDataSource
@@ -46,66 +44,39 @@ module.exports = class TextWidget extends Widget
   #   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   #   callback: (error, data)
   getData: (design, schema, dataSource, filters, callback) ->
-    # Get expression items recursively
-    getExprItems = (items) ->
-      exprItems = []
-      for item in (items or [])
-        if item.type == "expr"
-          exprItems.push(item)
-        if item.items
-          exprItems = exprItems.concat(getExprItems(item.items))
-      return exprItems
+    # TODO! Should get expression value if using expression
 
-    # Evaluates a single exprItem
-    evalExprItem = (exprItem, cb) =>
-      table = exprItem.expr.table
+    table = design.expr.table
 
-      exprCompiler = new ExprCompiler(schema)
+    exprCompiler = new ExprCompiler(schema)
 
-      query = {
-        selects: [
-          { type: "select", expr: exprCompiler.compileExpr(expr: exprItem.expr, tableAlias: "main"), alias: "value" }
-        ]
-        from: { type: "table", table: table, alias: "main" }
-        limit: 1
-      }
+    query = {
+      selects: [
+        { type: "select", expr: exprCompiler.compileExpr(expr: design.expr, tableAlias: "main"), alias: "value" }
+      ]
+      from: { type: "table", table: table, alias: "main" }
+      limit: 1
+    }
 
-      # Get relevant filters
-      filters = _.where(filters or [], table: table)
-      whereClauses = _.map(filters, (f) -> injectTableAlias(f.jsonql, "main")) 
+    # Get relevant filters
+    filters = _.where(filters or [], table: table)
+    whereClauses = _.map(filters, (f) -> injectTableAlias(f.jsonql, "main")) 
 
-      whereClauses = _.compact(whereClauses)
+    whereClauses = _.compact(whereClauses)
 
-      # Wrap if multiple
-      if whereClauses.length > 1
-        query.where = { type: "op", op: "and", exprs: whereClauses }
-      else
-        query.where = whereClauses[0]
+    # Wrap if multiple
+    if whereClauses.length > 1
+      query.where = { type: "op", op: "and", exprs: whereClauses }
+    else
+      query.where = whereClauses[0]
 
-      # Execute query
-      dataSource.performQuery(query, (error, rows) =>
-        if error
-          cb(error)
-        else
-          cb(null, rows[0]?.value)
-      )
-
-    # Map of value by id
-    exprValues = {}
-
-    async.each getExprItems(design.items), (exprItem, cb) =>
-      evalExprItem(exprItem, (error, value) =>
-        if error
-          cb(error)
-        else
-          exprValues[exprItem.id] = value
-          cb(null)
-        )
-    , (error) =>
+    # Execute query
+    dataSource.performQuery(query, (error, rows) =>
       if error
         callback(error)
       else
-        callback(null, exprValues)
+        callback(null, rows[0]?.value)
+    )
 
   # Determine if widget is auto-height, which means that a vertical height is not required.
-  isAutoHeight: -> true
+  isAutoHeight: -> false

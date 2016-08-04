@@ -181,7 +181,7 @@ class Container extends React.Component
       id: id
       type: item.widget.type
       design: item.widget.design
-      onDesignChange: @handleWidgetDesignChange.bind(null, id)
+      onDesignChange: if @props.onItemsChange? then @handleWidgetDesignChange.bind(null, id)
       width: bounds.width - 10
       height: bounds.height - 10 
       standardWidth: ((bounds.width - 10) / @props.width) * @props.standardWidth 

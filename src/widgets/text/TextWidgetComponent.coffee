@@ -38,7 +38,18 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
 
   # Override to determine if a load is needed. Not called on mounting
   isLoadNeeded: (newProps, oldProps) -> 
-    return not _.isEqual(_.pick(newProps, "filters", "design"), _.pick(oldProps, "filters", "design"))
+    # Get expression items recursively
+    getExprItems = (items) ->
+      exprItems = []
+      for item in (items or [])
+        if item.type == "expr"
+          exprItems.push(item)
+        if item.items
+          exprItems = exprItems.concat(getExprItems(item.items))
+      return exprItems    
+
+    # Reload if filters or expressions have changed
+    return not _.isEqual(newProps.filters, oldProps.filters) or not _.isEqual(getExprItems(newProps.design.items), getExprItems(oldProps.design.items))
 
   # Call callback with state changes
   load: (props, prevProps, callback) -> 
@@ -133,14 +144,17 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
         H.i className: "fa fa-list-ul"
       H.div key: "insertOrderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertOrderedList"),
         H.i className: "fa fa-list-ol"
-      H.div key: "h1", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H1>"),
-        "h1"
-      H.div key: "h2", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H2>"),
-        "h2"
-      H.div key: "h3", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H3>"),
-        "h3"
-      H.div key: "p", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<div>"),
-        "\u00b6"
+      if @props.design.style != "title"
+        [
+          H.div key: "h1", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H1>"),
+            "h1"
+          H.div key: "h2", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H2>"),
+            "h2"
+          H.div key: "h3", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H3>"),
+            "h3"
+          H.div key: "p", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<div>"),
+            "\u00b6"
+        ]
       H.div key: "expr", className: "mwater-visualization-text-palette-item", onClick: (ev) =>
         @refs.exprInsertModal.open()
       , 
@@ -171,7 +185,7 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
           onClick: @handleClick
           onFocus: @handleFocus
         if not @props.design.items?[0]?
-          H.div key: "placeholder", style: { color: "#DDD", position: "absolute", top: 0, left: 0 }, "Click to Edit"
+          H.div key: "placeholder", style: { color: "#DDD", position: "absolute", top: 0, left: 0, pointerEvents: "none" }, "Click to Edit"
 
     else
       return H.div key: "contents", className: "mwater-visualization-text-widget-style-#{@props.design.style or "default"}", dangerouslySetInnerHTML: { __html: @createHtml() }

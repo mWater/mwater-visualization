@@ -22,7 +22,7 @@ module.exports = class ItemsHtmlConverter
         # Escape HTML
         html += _.escape(item)
       else if item.type == "element"
-        if not item.tag.match(/^[a-z]+$/) or item.tag == "script"
+        if not item.tag.match(/^[a-z][a-z0-9]*$/) or item.tag == "script"
           throw new Error("Invalid tag #{item.tag}")
 
         attrs = ""

@@ -32,6 +32,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
   handleFilterChange: (expr) => @update(filter: expr)
   handleColorChange: (color) => @update(color: color)
   handleSymbolChange: (symbol) => @update(symbol: symbol)
+  handleNameChange: (e) => @update(name: e.target.value)
 
   renderTable: ->
     return H.div className: "form-group",
@@ -154,8 +155,18 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
           table: @props.design.table
           value: @props.design.filter)
 
+  renderName: ->
+    return H.div className: "form-group",
+      H.label className: "text-muted",
+        H.span(className: "fa fa-tag")
+        " "
+        "Name"
+      H.div style: { marginLeft: 8 },
+        H.input {type: 'text', value: @props.sublayer.name, onChange: @handleNameChange, className: 'form-control'}
+
   render: ->
     H.div null,
+#      @renderName()
       @renderTable()
       @renderGeometryAxis()
       @renderColor()

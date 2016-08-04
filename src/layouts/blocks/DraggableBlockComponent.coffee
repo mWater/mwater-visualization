@@ -140,6 +140,7 @@ blockTargetSpec =
 
     side = component.getDecoratedComponentInstance().state.hoverSide
     props.onBlockDrop(monitor.getItem().block, props.block, side)
+    return
 
 blockSourceSpec = {
   beginDrag: (props, monitor, component) ->
