@@ -256,9 +256,13 @@ module.exports = class AdminChoroplethLayer extends Layer
     if design.axes.color and design.axes.color.colorMap
       enums = exprUtils.getExprEnumValues(design.axes.color.expr)
 
-      colors = _.map design.axes.color.colorMap, (colorItem) =>
-        {color: colorItem.color, name: ExprUtils.localizeString(_.find(enums, {id: colorItem.value}).name) }
-      colors.push({ color: design.color, name: "None"})
+      # HACK FOR #218!
+      if not enums
+        colors = []
+      else
+        colors = _.map design.axes.color.colorMap, (colorItem) =>
+          {color: colorItem.color, name: ExprUtils.localizeString(_.find(enums, {id: colorItem.value}).name) }
+        colors.push({ color: design.color, name: "None"})
     else
       colors = []
 
