@@ -2,7 +2,7 @@ React = require 'react'
 ReactDOM = require 'react-dom'
 H = React.DOM
 
-# Simple widget that can be dragged and resized
+# Simple widget with a 
 # Injects inner width and height to child element
 # Contains a dropdown menu 
 module.exports = class SimpleWidgetComponent extends React.Component
