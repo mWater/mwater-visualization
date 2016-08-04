@@ -61,12 +61,13 @@ module.exports = class MapViewComponent extends React.Component
         # Create layer
         layer = LayerFactory.createLayer(layerView.type)
 
+        design = layer.cleanDesign(layerView.design, @props.schema)
         # Ignore if invalid
-        if layer.validateDesign(layer.cleanDesign(layerView.design, @props.schema), @props.schema)
+        if layer.validateDesign(design, @props.schema)
           return null
 
         if layerView.visible
-          return { key: layerView.id, legend: layer.getLegend(layerView.design, @props.schema, layerView.name) }
+          return { key: layerView.id, legend: layer.getLegend(design, @props.schema, layerView.name) }
       )
     )
 
