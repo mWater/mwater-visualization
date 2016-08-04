@@ -185,7 +185,7 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
           onClick: @handleClick
           onFocus: @handleFocus
         if not @props.design.items?[0]?
-          H.div key: "placeholder", style: { color: "#DDD", position: "absolute", top: 0, left: 0 }, "Click to Edit"
+          H.div key: "placeholder", style: { color: "#DDD", position: "absolute", top: 0, left: 0, pointerEvents: "none" }, "Click to Edit"
 
     else
       return H.div key: "contents", className: "mwater-visualization-text-widget-style-#{@props.design.style or "default"}", dangerouslySetInnerHTML: { __html: @createHtml() }
