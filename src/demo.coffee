@@ -23,22 +23,22 @@ DirectMapDataSource = require './maps/DirectMapDataSource'
 ServerMapDataSource = require './maps/ServerMapDataSource'
 ServerDashboardDataSource = require './dashboards/ServerDashboardDataSource'
 
-dashboardId = "f1532f47b96c4211afbb15bd754068bf"
+dashboardId = "366702069dba44249d14bfccaa2d333e"
 
 class MWaterDashboardPane extends React.Component
   constructor: (props) ->
     super
 
     @state = {
-      design: dashboardDesign
-      extraTables: ['entities.school']
+      design: null
+      extraTables: []
     }
 
   componentWillMount: ->
-# Load dashboard
-#    url = @props.apiUrl + "dashboards/#{dashboardId}?" + querystring.stringify({ client: @props.client, share: @props.share })
-#    $.getJSON url, (dashboard) =>
-#      @setState(design: dashboard.design, extraTables: dashboard.extra_tables)
+    # Load dashboard
+    url = @props.apiUrl + "dashboards/#{dashboardId}?" + querystring.stringify({ client: @props.client, share: @props.share })
+    $.getJSON url, (dashboard) => 
+      @setState(design: dashboard.design, extraTables: dashboard.extra_tables)
 
   handleDesignChange: (design) =>
     # @setState(design: design, extraTables: )
@@ -55,16 +55,11 @@ class MWaterDashboardPane extends React.Component
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
       extraTables: @state.extraTables
     }, (error, config) =>
-#      dashboardDataSource = new ServerDashboardDataSource({
-#        apiUrl: @props.apiUrl, client: @props.client, share: share, dashboardId: dashboardId
-#      })
-      dashboardDataSource = new DirectDashboardDataSource({
-        apiUrl: @props.apiUrl
-        client: @props.client
-        design: @state.design
-        schema: config.schema
-        dataSource: config.dataSource
-      })
+      dashboardDataSource = new ServerDashboardDataSource({
+        apiUrl: @props.apiUrl, client: @props.client, share: share, dashboardId: dashboardId
+        })
+      # dashboardDataSource = new DirectDashboardDataSource(@props.apiUrl, @props.client, @state.design, config.schema, config.dataSource)
+
       H.div style: { height: "100%" },
         React.createElement(visualization.DashboardComponent, {
           schema: config.schema
@@ -456,11 +451,11 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(BlocksDesignerComponent, renderBlock: [])
     # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
@@ -598,31 +593,110 @@ class MWaterDataSource extends DataSource
     .fail (xhr) =>
       cb(new Error(xhr.responseText))
 
+# mapDesign = {
+#   "baseLayer": "bing_road",
+#   "layerViews": [
+#      # { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
+#     #  { 
+#     #   id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
+#     #   name: "Choropleth"
+#     #   type: "AdminIndicatorChoropleth"
+#     #   design: { 
+#     #     scope: 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
+#     #     table: "entities.water_point" 
+#     #     adminRegionExpr: { type: "scalar", table: "entities.water_point", joins: ['admin_region'], expr: { type: "id", table: "admin_regions" } }
+#     #     detailLevel: 1
+#     #     condition: { 
+#     #       type: "op"
+#     #       op: "="
+#     #       table: "entities.water_point"
+#     #       exprs: [
+#     #         { type: "field", table: "entities.water_point", column: "type" }
+#     #         { type: "literal", valueType: "enum", value: "Protected dug well" }
+#     #       ] 
+#     #     }
+#     #   }
+#     #   visible: true 
+#     # }
+#     # {
+#     #   "id": "afbf76a3-29b8-4a11-882c-42aa21a3ca7a",
+#     #   "name": "Untitled Layer",
+#     #   "desc": "",
+#     #   "type": "AdminChoropleth",
+#     #   "visible": true,
+#     #   "opacity": 1,
+#     #   "design": {
+#     #     "adminRegionExpr": {
+#     #       "type": "scalar",
+#     #       "table": "entities.water_point",
+#     #       "joins": [
+#     #         "admin_region"
+#     #       ],
+#     #       "expr": {
+#     #         "type": "id",
+#     #         "table": "admin_regions"
+#     #       }
+#     #     },
+#     #     "axes": {
+#     #       "color": {
+#     #         "expr": {
+#     #           "type": "op",
+#     #           "op": "percent where",
+#     #           "table": "entities.water_point",
+#     #           "exprs": []
+#     #         },
+#     #         "xform": {
+#     #           "type": "bin",
+#     #           "numBins": 6,
+#     #           "min": 0,
+#     #           "max": 100
+#     #         },
+#     #         "colorMap": [
+#     #           {
+#     #             "value": 1,
+#     #             "color": "#f8e71c"
+#     #           },
+#     #           {
+#     #             "value": 2,
+#     #             "color": "#7ed321"
+#     #           },
+#     #           {
+#     #             "value": 3,
+#     #             "color": "#f5a623"
+#     #           },
+#     #           {
+#     #             "value": 4,
+#     #             "color": "#d0021b"
+#     #           },
+#     #           {
+#     #             "value": 5,
+#     #             "color": "#4725f0"
+#     #           }
+#     #         ]
+#     #       }
+#     #     },
+#     #     "opacity": 1,
+#     #     "nameLabels": true,
+#     #     "filter": null,
+#     #     "scope": "eb3e12a2-de1e-49a9-8afd-966eb55d47eb",
+#     #     "detailLevel": 1,
+#     #     "table": "entities.water_point",
+#     #     "color": "#9b9b9b"
+#     #   }
+#     # }
+#   ]
+#   filters: {}
+#   bounds: { 
+#     "w": 23.1591796875,
+#     "n": 4.214943141390651,
+#     "e": 44.2529296875,
+#     "s": -18.583775688370928
+#   }
+# }
+
 mapDesign = {
   "baseLayer": "bing_road",
   "layerViews": [
-# { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
-#  {
-#   id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
-#   name: "Choropleth"
-#   type: "AdminIndicatorChoropleth"
-#   design: {
-#     scope: 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
-#     table: "entities.water_point"
-#     adminRegionExpr: { type: "scalar", table: "entities.water_point", joins: ['admin_region'], expr: { type: "id", table: "admin_regions" } }
-#     detailLevel: 1
-#     condition: {
-#       type: "op"
-#       op: "="
-#       table: "entities.water_point"
-#       exprs: [
-#         { type: "field", table: "entities.water_point", column: "type" }
-#         { type: "literal", valueType: "enum", value: "Protected dug well" }
-#       ]
-#     }
-#   }
-#   visible: true
-# }
     {
       "id": "afbf76a3-29b8-4a11-882c-42aa21a3ca7a",
       "name": "Untitled Layer",
@@ -648,7 +722,27 @@ mapDesign = {
               "type": "op",
               "op": "percent where",
               "table": "entities.water_point",
-              "exprs": []
+              "exprs": [
+                {
+                  "type": "op",
+                  "table": "entities.water_point",
+                  "op": "= any",
+                  "exprs": [
+                    {
+                      "type": "field",
+                      "table": "entities.water_point",
+                      "column": "type"
+                    },
+                    {
+                      "type": "literal",
+                      "valueType": "enumset",
+                      "value": [
+                        "Protected dug well"
+                      ]
+                    }
+                  ]
+                }
+              ]
             },
             "xform": {
               "type": "bin",
@@ -658,24 +752,36 @@ mapDesign = {
             },
             "colorMap": [
               {
+                "value": 0,
+                "color": "#c1cce6"
+              },
+              {
                 "value": 1,
-                "color": "#f8e71c"
+                "color": "#99abd6"
               },
               {
                 "value": 2,
-                "color": "#7ed321"
+                "color": "#748dc8"
               },
               {
                 "value": 3,
-                "color": "#f5a623"
+                "color": "#4c6db8"
               },
               {
                 "value": 4,
-                "color": "#d0021b"
+                "color": "#3c5796"
               },
               {
                 "value": 5,
-                "color": "#4725f0"
+                "color": "#2d4171"
+              },
+              {
+                "value": 6,
+                "color": "#1d2a49"
+              },
+              {
+                "value": 7,
+                "color": "#0f1524"
               }
             ]
           }
@@ -686,16 +792,125 @@ mapDesign = {
         "scope": "eb3e12a2-de1e-49a9-8afd-966eb55d47eb",
         "detailLevel": 1,
         "table": "entities.water_point",
-        "color": "#9b9b9b"
+        "color": "#9b9b9b",
+        "fillOpacity": 0.75,
+        "displayNames": true
+      }
+    },
+    {
+      "id": "0c6525a2-1300-48db-b793-ba7806827f3c",
+      "name": "Untitled Layer",
+      "desc": "",
+      "type": "Markers",
+      "visible": true,
+      "opacity": 1,
+      "design": {
+        "axes": {
+          "geometry": {
+            "expr": {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "location"
+            }
+          }
+        },
+        "color": "#0088FF",
+        "filter": null,
+        "table": "entities.water_point",
+        "popup": {
+          "items": {
+            "id": "root",
+            "type": "root",
+            "blocks": [
+              {
+                "id": "f5dcf519-0287-4f65-ab44-abdd609b704b",
+                "type": "horizontal",
+                "blocks": [
+                  {
+                    "id": "e50f7026-44f2-44fd-9c19-a2c412d6cf10",
+                    "type": "vertical",
+                    "blocks": [
+                      {
+                        "type": "widget",
+                        "widgetType": "Text",
+                        "design": {
+                          "style": "title",
+                          "items": [
+                            {
+                              "type": "expr",
+                              "id": "1af0f88c-db39-46bb-ad5a-4777a7d0357d",
+                              "expr": {
+                                "type": "field",
+                                "table": "entities.water_point",
+                                "column": "name"
+                              }
+                            }
+                          ]
+                        },
+                        "id": "b2becac4-db3c-48b8-92db-9f1d2da0df97"
+                      },
+                      {
+                        "type": "widget",
+                        "widgetType": "Text",
+                        "design": {
+                          "items": [
+                            "Description: ",
+                            {
+                              "type": "expr",
+                              "id": "d3813f6f-a8c6-4783-80ca-70a18e8fa630",
+                              "expr": {
+                                "type": "field",
+                                "table": "entities.water_point",
+                                "column": "desc"
+                              }
+                            },
+                            {
+                              "type": "element",
+                              "tag": "div",
+                              "items": [
+                                "Type: ",
+                                {
+                                  "type": "expr",
+                                  "id": "7c74bf50-d649-4e25-a80b-27504d029f4c",
+                                  "expr": {
+                                    "type": "field",
+                                    "table": "entities.water_point",
+                                    "column": "type"
+                                  }
+                                },
+                                {
+                                  "type": "element",
+                                  "tag": "br",
+                                  "items": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "id": "47e4be90-cfad-4145-8afd-3adfb2ac2882"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "widget",
+                    "widgetType": "Image",
+                    "design": {},
+                    "id": "858fb20f-5f5f-48cf-8fe3-a4f3639b7684"
+                  }
+                ]
+              }
+            ]
+          }
+        }
       }
     }
-  ]
-  filters: {}
-  bounds: {
-    "w": 23.1591796875,
-    "n": 4.214943141390651,
-    "e": 44.2529296875,
-    "s": -18.583775688370928
+  ],
+  "filters": {},
+  "bounds": {
+    "w": 10.590820312499998,
+    "n": 15.241789855961722,
+    "e": 41.4404296875,
+    "s": -27.33273513685913
   }
 }
 

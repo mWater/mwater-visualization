@@ -60,7 +60,8 @@ module.exports = class ExprInsertModalComponent extends React.Component
             table: @state.table
             types: ['text', 'number', 'enum', 'date', 'datetime', 'boolean']
             value: @state.expr
-            aggrStatuses: ["literal", "aggregate"]
+            # TODO only individual if singleRowTable 
+            aggrStatuses: ["individual", "literal", "aggregate"]
             onChange: (expr) => @setState(expr: expr)
 
       if @state.table
@@ -74,7 +75,6 @@ module.exports = class ExprInsertModalComponent extends React.Component
       return null
 
     R ActionCancelModalComponent, 
-      size: "large"
       actionLabel: "Insert"
       onAction: @handleInsert 
       onCancel: => @setState(open: false)

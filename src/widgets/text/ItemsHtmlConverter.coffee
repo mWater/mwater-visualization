@@ -46,7 +46,10 @@ module.exports = class ItemsHtmlConverter
       else if item.type == "expr"
         # If has data
         if _.has(@exprValues, item.id)
-          exprHtml = _.escape(@exprValues[item.id] + "")
+          exprUtils = new ExprUtils(@schema)
+
+          text = exprUtils.stringifyExprLiteral(item.expr, @exprValues[item.id]) # TODO locale
+          exprHtml = _.escape(text)
         else
           # Placeholder
           exprHtml = '<span class="text-muted">\u25a0\u25a0\u25a0</span>'

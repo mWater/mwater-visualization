@@ -1,12 +1,14 @@
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
+R = React.createElement
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
 AxisComponent = require './../axes/AxisComponent'
 ColorComponent = require '../ColorComponent'
 TableSelectComponent = require '../TableSelectComponent'
 ReactSelect = require 'react-select'
+EditPopupComponent = require './EditPopupComponent'
 
 # Designer for a markers layer
 module.exports = class MarkersLayerDesignerComponent extends React.Component
@@ -40,7 +42,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
         " "
         "Data Source"
       ": "
-      React.createElement(TableSelectComponent, { schema: @props.schema, value: @props.design.table, onChange: @handleTableChange })
+      R(TableSelectComponent, { schema: @props.schema, value: @props.design.table, onChange: @handleTableChange })
   
   renderGeometryAxis: ->
     if not @props.design.table
@@ -53,7 +55,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
     H.div className: "form-group",
       H.label className: "text-muted", title
       H.div style: { marginLeft: 10 }, 
-        React.createElement(AxisComponent, 
+        R(AxisComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           table: @props.design.table
@@ -73,7 +75,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
     H.div className: "form-group",
       H.label className: "text-muted", title
       H.div style: { marginLeft: 10 }, 
-        React.createElement(AxisComponent, 
+        R(AxisComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           table: @props.design.table
@@ -92,7 +94,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
         H.span className: "glyphicon glyphicon glyphicon-tint"
         if @props.design.axes.color then " Default Color" else " Color"
       H.div style: { marginLeft: 8 }, 
-        React.createElement(ColorComponent, color: @props.design.color, onChange: @handleColorChange)
+        R(ColorComponent, color: @props.design.color, onChange: @handleColorChange)
 
   renderSymbol: ->
     if not @props.design.axes.geometry
@@ -128,7 +130,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
         H.span(className: "fa fa-star")
         " "
         "Symbol"
-      React.createElement ReactSelect, {
+      R ReactSelect, {
         placeholder: "Circle"
         value: @props.design.symbol
         options: options
@@ -147,29 +149,22 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
         H.span(className: "glyphicon glyphicon-filter")
         " Filters"
       H.div style: { marginLeft: 8 }, 
-        React.createElement(FilterExprComponent, 
+        R(FilterExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           onChange: @handleFilterChange
           table: @props.design.table
           value: @props.design.filter)
 
-  renderName: ->
-    return H.div className: "form-group",
-      H.label className: "text-muted",
-        H.span(className: "fa fa-tag")
-        " "
-        "Name"
-      H.div style: { marginLeft: 8 },
-        H.input {type: 'text', value: @props.sublayer.name, onChange: @handleNameChange, className: 'form-control'}
-
   render: ->
     H.div null,
-#      @renderName()
       @renderTable()
       @renderGeometryAxis()
       @renderColor()
       @renderColorAxis()
       @renderSymbol()
       @renderFilter()
+      if @props.design.table
+        R EditPopupComponent, design: @props.design, onDesignChange: @props.onDesignChange, schema: @props.schema, dataSource: @props.dataSource
+
 
