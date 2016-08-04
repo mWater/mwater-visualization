@@ -187,8 +187,7 @@ module.exports = class MarkersLayer extends Layer
   #   React element to put into a popup
   onGridClick: (ev, clickOptions) ->
     if ev.data and ev.data.id
-      # TODO handle sublayers
-      if clickOptions.design.sublayers[0].popup
+      if clickOptions.design.popup
         BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
         WidgetFactory = require '../widgets/WidgetFactory'
         DirectWidgetDataSource = require '../widgets/DirectWidgetDataSource'

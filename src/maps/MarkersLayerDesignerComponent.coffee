@@ -8,6 +8,7 @@ AxisComponent = require './../axes/AxisComponent'
 ColorComponent = require '../ColorComponent'
 TableSelectComponent = require '../TableSelectComponent'
 ReactSelect = require 'react-select'
+EditPopupComponent = require './EditPopupComponent'
 
 # Designer for a markers layer
 module.exports = class MarkersLayerDesignerComponent extends React.Component
@@ -155,79 +156,15 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
           table: @props.design.table
           value: @props.design.filter)
 
-  renderName: ->
-    return H.div className: "form-group",
-      H.label className: "text-muted",
-        H.span(className: "fa fa-tag")
-        " "
-        "Name"
-      H.div style: { marginLeft: 8 },
-        H.input {type: 'text', value: @props.sublayer.name, onChange: @handleNameChange, className: 'form-control'}
-
   render: ->
     H.div null,
-#      @renderName()
       @renderTable()
       @renderGeometryAxis()
       @renderColor()
       @renderColorAxis()
       @renderSymbol()
       @renderFilter()
-      R EditPopupComponent, design: @props.design, onChange: @props.onChange, schema: @props.schema, dataSource: @props.dataSource
+      if @props.design.table
+        R EditPopupComponent, design: @props.design, onDesignChange: @props.onDesignChange, schema: @props.schema, dataSource: @props.dataSource
 
-
-# Modal for editing design of popup
-ModalWindowComponent = require 'react-library/lib/ModalWindowComponent'
-BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
-WidgetFactory = require '../widgets/WidgetFactory'
-DirectWidgetDataSource = require '../widgets/DirectWidgetDataSource'
-
-class EditPopupComponent extends React.Component
-  constructor: ->
-    super
-    @state = { editing: false }
-
-  handleItemsChange: (items) =>
-    popup = @props.design.popup or {}
-    popup = _.extend({}, popup, items: items)
-    design = _.extend({}, @props.design, popup: popup)
-    @props.onChange(design)
-
-  render: ->
-    H.div null, 
-      H.a className: "btn btn-link", onClick: (=> @setState(editing: true)),
-        "Customize Popup"
-      if @state.editing
-        R ModalWindowComponent, isOpen: true, onRequestClose: (=> @setState(editing: false)),
-          new BlocksLayoutManager().renderLayout({
-            items: @props.design.popup?.items
-            onItemsChange: @handleItemsChange
-            renderWidget: (options) =>
-              # TODO abstract to popup renderer in map data source
-              widget = WidgetFactory.createWidget(options.type)
-
-              widgetDataSource = new DirectWidgetDataSource({
-                apiUrl: "https://api.mwater.co/v3/" # TODO
-                widget: widget
-                design: options.design
-                schema: @props.schema
-                dataSource: @props.dataSource
-                client: null # TODO
-              })
-
-              return widget.createViewElement({
-                schema: @props.schema
-                dataSource: @props.dataSource
-                # TODO get widget data source for map
-                widgetDataSource: widgetDataSource
-                design: options.design
-                scope: null
-                filters: []
-                onScopeChange: null
-                onDesignChange: options.onDesignChange
-                width: null
-                height: null
-                standardWidth: null
-              })  
-            })
 

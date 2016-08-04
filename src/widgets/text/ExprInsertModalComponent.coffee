@@ -60,6 +60,7 @@ module.exports = class ExprInsertModalComponent extends React.Component
             table: @state.table
             types: ['text', 'number', 'enum', 'date', 'datetime', 'boolean']
             value: @state.expr
+            # TODO only individual if singleRowTable 
             aggrStatuses: ["individual", "literal", "aggregate"]
             onChange: (expr) => @setState(expr: expr)
 
