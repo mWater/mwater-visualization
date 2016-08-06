@@ -251,18 +251,15 @@ module.exports = class AdminChoroplethLayer extends Layer
   # Get the legend to be optionally displayed on the map. Returns
   # a React element
   getLegend: (design, schema, name) ->
+    axisBuilder = new AxisBuilder(schema: schema)
     exprUtils = new ExprUtils(schema)
     
     if design.axes.color and design.axes.color.colorMap
-      enums = exprUtils.getExprEnumValues(design.axes.color.expr)
+      categories = axisBuilder.getCategories(design.axes.color)
 
-      # HACK FOR #218!
-      if not enums
-        colors = []
-      else
-        colors = _.map design.axes.color.colorMap, (colorItem) =>
-          {color: colorItem.color, name: ExprUtils.localizeString(_.find(enums, {id: colorItem.value}).name) }
-        colors.push({ color: design.color, name: "None"})
+      colors = _.map design.axes.color.colorMap, (colorItem) =>
+        {color: colorItem.color, name: ExprUtils.localizeString(_.find(categories, {value: colorItem.value}).label) }
+      colors.push({ color: design.color, name: "None"})
     else
       colors = []
 
