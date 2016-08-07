@@ -420,7 +420,7 @@ module.exports = class MarkersLayer extends Layer
 
   getKMLExportJsonQL: (design, schema, filters) ->
     layerDef = {
-      layyers: [
+      layers: [
         {
           id: "layer0"
           jsonql: @createKMLExportJsonQL(design, schema, filters)
