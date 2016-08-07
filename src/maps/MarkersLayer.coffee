@@ -327,12 +327,12 @@ module.exports = class MarkersLayer extends Layer
 
     return null
 
-  createKMLExportJsonQL: (sublayer, schema, filters) ->
+  createKMLExportJsonQL: (design, schema, filters) ->
     axisBuilder = new AxisBuilder(schema: schema)
     exprCompiler = new ExprCompiler(schema)
 
     # Compile geometry axis
-    geometryExpr = axisBuilder.compileAxis(axis: sublayer.axes.geometry, tableAlias: "innerquery")
+    geometryExpr = axisBuilder.compileAxis(axis: design.axes.geometry, tableAlias: "innerquery")
 
     # Convert to Web mercator (3857)
     geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326] }
@@ -349,28 +349,28 @@ module.exports = class MarkersLayer extends Layer
     innerquery = {
       type: "query"
       selects: [
-        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(sublayer.table).primaryKey }, alias: "id" } # main primary key as id
+        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(design.table).primaryKey }, alias: "id" } # main primary key as id
         { type: "select", expr: geometryExpr, alias: "the_geom_webmercator" } # geometry as the_geom_webmercator
         cluster
       ]
-      from: exprCompiler.compileTable(sublayer.table, "innerquery")
+      from: exprCompiler.compileTable(design.table, "innerquery")
     }
 
     # Add color select if color axis
-    if sublayer.axes.color
-      colorExpr = axisBuilder.compileAxis(axis: sublayer.axes.color, tableAlias: "innerquery")
+    if design.axes.color
+      colorExpr = axisBuilder.compileAxis(axis: design.axes.color, tableAlias: "innerquery")
       innerquery.selects.push({ type: "select", expr: colorExpr, alias: "color" })
 
     # Create filters. First limit to bounding box
     whereClauses = []
 
     # Then add filters baked into layer
-    if sublayer.filter
-      whereClauses.push(exprCompiler.compileExpr(expr: sublayer.filter, tableAlias: "innerquery"))
+    if design.filter
+      whereClauses.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "innerquery"))
 
     # Then add extra filters passed in, if relevant
     # Get relevant filters
-    relevantFilters = _.where(filters, table: sublayer.table)
+    relevantFilters = _.where(filters, table: design.table)
     for filter in relevantFilters
       whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
 
@@ -396,36 +396,37 @@ module.exports = class MarkersLayer extends Layer
 
     # Add color select if color axis
 
-    if sublayer.axes.color
+    if design.axes.color
       outerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "innerquery", column: "color" }, alias: "color" }) # innerquery.color as color
 
     return outerquery
 
 
-  createKMLExportStyleInfo: (sublayer, schema, filters) ->
-    if sublayer.symbol
-      symbol = sublayer.symbol
+  createKMLExportStyleInfo: (design, schema, filters) ->
+    if design.symbol
+      symbol = design.symbol
     else
       symbol = "font-awesome/circle"
 
     style = {
-      color: sublayer.color
+      color: design.color
       symbol: symbol
     }
 
-    if sublayer.axes.color and sublayer.axes.color.colorMap
-      style.colorMap = sublayer.axes.color.colorMap
+    if design.axes.color and design.axes.color.colorMap
+      style.colorMap = design.axes.color.colorMap
       
     return style
 
   getKMLExportJsonQL: (design, schema, filters) ->
     layerDef = {
-      layers: _.map(design.sublayers, (sublayer, i) =>
+      layyers: [
         {
-          id: "layer#{i}"
-          jsonql: @createKMLExportJsonQL(sublayer, schema, filters)
-          style: @createKMLExportStyleInfo(sublayer, schema, filters)
-        })
+          id: "layer0"
+          jsonql: @createKMLExportJsonQL(design, schema, filters)
+          style: @createKMLExportStyleInfo(design, schema, filters)
+        }
+      ]
     }
 
     return layerDef
