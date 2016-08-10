@@ -14,20 +14,6 @@ H = React.DOM
 # minZoom: optional minimum zoom
 # maxZoom: optional maximum zoom
 module.exports = class MWaterServerLayer extends Layer
-  # Gets the layer definition as JsonQL + CSS in format:
-  #   {
-  #     layers: array of { id: layer id, jsonql: jsonql that includes "the_webmercator_geom" as a column }
-  #     css: carto css
-  #     interactivity: (optional) { layer: id of layer, fields: array of field names }
-  #   }
-  # arguments:
-  #   design: design of layer
-  #   schema: schema to use
-  #   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
-  getJsonQLCss: (design, schema, filters) ->
-    # TODO Get rid of this. It's obviously a hack
-    return design.type
-
   # Called when the interactivity grid is clicked. 
   # arguments:
   #   ev: { data: interactivty data e.g. `{ id: 123 }` }

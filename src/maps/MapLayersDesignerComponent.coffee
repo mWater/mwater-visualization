@@ -80,6 +80,12 @@ module.exports = class MapLayersDesignerComponent extends React.Component
         type: "AdminChoropleth"
         design: { }
       }
+      {
+        label: "Custom Tile Url (advanced)"
+        name: "Untitled Layer"
+        type: "TileUrl"
+        design: { }
+      }
     ]
 
     H.div style: { margin: 5 }, key: "addLayer", className: "btn-group",

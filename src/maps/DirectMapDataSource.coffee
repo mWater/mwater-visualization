@@ -34,12 +34,14 @@ module.exports = class DirectMapDataSource extends MapDataSource
     if layer.validateDesign(design, @schema)
       return null
 
+    # Handle special cases
+    if layerView.type == "MWaterServer"
+      return @createLegacyUrl(design, "png", filters)
+    if layerView.type == "TileUrl"
+      return design.tileUrl
+
     # Get JsonQLCss
     jsonqlCss = layer.getJsonQLCss(design, @schema, filters)
-
-    # HACK FOR LEGACY MWATER SERVER LAYERS
-    if _.isString(jsonqlCss)
-      return @createLegacyUrl(design, "png", filters)
 
     return @createUrl("png", jsonqlCss) 
 
@@ -61,12 +63,14 @@ module.exports = class DirectMapDataSource extends MapDataSource
     if layer.validateDesign(design, @schema)
       return null
 
+    # Handle special cases
+    if layerView.type == "MWaterServer"
+      return @createLegacyUrl(design, "grid.json", filters)
+    if layerView.type == "TileUrl"
+      return null
+
     # Get JsonQLCss
     jsonqlCss = layer.getJsonQLCss(design, @schema, filters)
-
-    # HACK FOR LEGACY MWATER SERVER LAYERS
-    if _.isString(jsonqlCss)
-      return @createLegacyUrl(design, "grid.json", filters)
 
     return @createUrl("grid.json", jsonqlCss) 
 
