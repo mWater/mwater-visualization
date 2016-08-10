@@ -37,7 +37,7 @@ module.exports = class TextWidget extends Widget
       onDesignChange: options.onDesignChange
       width: options.width
       height: options.height
-      standardWidth: options.standardWidth  # TODO do something with this
+      standardWidth: options.standardWidth
 
   # Get the data that the widget needs. This will be called on the server, typically.
   #   design: design of the chart

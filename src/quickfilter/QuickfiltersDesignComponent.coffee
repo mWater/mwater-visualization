@@ -91,12 +91,12 @@ class QuickfilterDesignComponent extends React.Component
                   table: @props.design.table
                   value: @props.design.expr
                   onChange: @handleExprChange
-                  types: ['enum', 'text'] # TODO add more possibilities
+                  types: ['enum', 'text', 'date', 'datetime']
 
           if @props.design.expr
             H.div className: "form-group", key: "label",
               H.label className: "text-muted", "Label"
-              H.input type: "text", className: "form-control input-sm", value: @props.design.label, onChange: @handleLabelChange, placeholder: "Optional Label"
+              H.input type: "text", className: "form-control input-sm", value: @props.design.label or "", onChange: @handleLabelChange, placeholder: "Optional Label"
 
 
 # Floats an x to the right on hover

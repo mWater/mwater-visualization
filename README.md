@@ -67,8 +67,3 @@ The dashboard works with abstract `Widget`s. Widgets have methods to create a vi
 For charts, a `ChartWidget` is created which makes a `ChartWidgetComponent` that holds the current query results as state. It also renders the trimmings such as resize handle, remove button and border.
 
 `ChartWidgetComponent` calls its `Chart` class to create the queries and create the display element
-
-
-## TODO
-
-Decide on responsibility for cleaning designs. A non-clean design cannot be validated, but also should not be stored. Both in and out?
