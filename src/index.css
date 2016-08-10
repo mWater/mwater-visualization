@@ -302,6 +302,7 @@
   left: 7px;
   background-color: #4B5155;
   border-radius: 3px;
+  white-space: nowrap;
 }
 
 .mwater-visualization-text-palette-item {

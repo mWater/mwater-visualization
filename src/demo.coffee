@@ -451,11 +451,11 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(BlocksDesignerComponent, renderBlock: [])
     # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
@@ -1070,9 +1070,64 @@ dashboardDesign = {
                       "table": "entities.water_system",
                       "column": "location"
                     }
+                  },
+                  "color": {
+                    "expr": {
+                      "type": "scalar",
+                      "table": "entities.water_system",
+                      "joins": [
+                        "!entities.water_point.water_system"
+                      ],
+                      "expr": {
+                        "type": "op",
+                        "op": "count",
+                        "table": "entities.water_point",
+                        "exprs": []
+                      }
+                    },
+                    "xform": {
+                      "type": "bin",
+                      "numBins": 6,
+                      "min": 1,
+                      "max": 3000
+                    },
+                    "colorMap": [
+                      {
+                        "value": 0,
+                        "color": "#9c9ede"
+                      },
+                      {
+                        "value": 1,
+                        "color": "#7375b5"
+                      },
+                      {
+                        "value": 2,
+                        "color": "#4a5584"
+                      },
+                      {
+                        "value": 3,
+                        "color": "#cedb9c"
+                      },
+                      {
+                        "value": 4,
+                        "color": "#b5cf6b"
+                      },
+                      {
+                        "value": 5,
+                        "color": "#8ca252"
+                      },
+                      {
+                        "value": 6,
+                        "color": "#637939"
+                      },
+                      {
+                        "value": 7,
+                        "color": "#e7cb94"
+                      }
+                    ]
                   }
                 },
-                "radius": 150000,
+                "radius": 500000,
                 "fillOpacity": 0.5,
                 "filter": null,
                 "table": "entities.water_system",
@@ -1099,7 +1154,56 @@ dashboardDesign = {
                     "table": "admin_regions"
                   }
                 },
-                "axes": {},
+                "axes": {
+                  "color": {
+                    "expr": {
+                      "type": "op",
+                      "op": "count",
+                      "table": "entities.surface_water",
+                      "exprs": []
+                    },
+                    "xform": {
+                      "type": "bin",
+                      "numBins": 6,
+                      "min": 0,
+                      "max": 1000
+                    },
+                    "colorMap": [
+                      {
+                        "value": 0,
+                        "color": "#c1e6e6"
+                      },
+                      {
+                        "value": 1,
+                        "color": "#99d6d6"
+                      },
+                      {
+                        "value": 2,
+                        "color": "#74c8c8"
+                      },
+                      {
+                        "value": 3,
+                        "color": "#4cb8b8"
+                      },
+                      {
+                        "value": 4,
+                        "color": "#3c9696"
+                      },
+                      {
+                        "value": 5,
+                        "color": "#2d7171"
+                      },
+                      {
+                        "value": 6,
+                        "color": "#1d4949"
+                      },
+                      {
+                        "value": 7,
+                        "color": "#0f2424"
+                      }
+                    ]
+                  }
+                },
                 "fillOpacity": 0.75,
                 "displayNames": true,
                 "filter": null,
