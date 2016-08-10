@@ -25,6 +25,7 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
 
     width: React.PropTypes.number
     height: React.PropTypes.number
+    standardWidth: React.PropTypes.number
 
   constructor: (props) ->
     super(props)
@@ -191,8 +192,22 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
       return H.div key: "contents", className: "mwater-visualization-text-widget-style-#{@props.design.style or "default"}", dangerouslySetInnerHTML: { __html: @createHtml() }
 
   render: ->
+    style = { 
+      position: "relative"
+    }
+
+    # Handle scaled case
+    if @props.standardWidth and @props.standardWidth != @props.width
+      style.width = @props.standardWidth
+      style.height = @props.height * (@props.standardWidth / @props.width)
+      style.transform = "scale(#{@props.width/@props.standardWidth}, #{@props.width/@props.standardWidth})"
+      style.transformOrigin = "0 0"
+    else
+      style.width = @props.width
+      style.height = @props.height
+
     R ClickOutHandler, onClickOut: @handleClickOut,
-      H.div style: { position: "relative", width: @props.width, height: @props.height },
+      H.div style: style,
         @renderModals()
         @renderHtml()
         if @state.focused
