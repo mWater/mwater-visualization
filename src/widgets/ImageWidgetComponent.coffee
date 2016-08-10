@@ -22,6 +22,8 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
     width: React.PropTypes.number
     height: React.PropTypes.number
 
+    singleRowTable: React.PropTypes.string  # Table that is filtered to have one row
+
   constructor: (props) ->
     super(props)
 

@@ -10,6 +10,7 @@ TableSelectComponent = require '../TableSelectComponent'
 ReactSelect = require 'react-select'
 
 # Designer for a markers layer
+# DEPRECATED!!!!!!!!!!!!!!!!!!!!!!
 module.exports = class AdminIndicatorChoroplethLayerDesigner extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use

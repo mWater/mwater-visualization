@@ -12,6 +12,7 @@ module.exports = class ExprUpdateModalComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired   # Schema to use
     dataSource: React.PropTypes.object.isRequired # Data source to use to get values
+    singleRowTable: React.PropTypes.string  # Table that is filtered to have one row
 
   constructor: ->
     super
@@ -48,8 +49,8 @@ module.exports = class ExprUpdateModalComponent extends React.Component
             table: @state.table
             types: ['text', 'number', 'enum', 'date', 'datetime', 'boolean']
             value: @state.expr
-            # TODO only individual if singleRowTable 
-            aggrStatuses: ["individual", "literal", "aggregate"]
+            # Only individual if singleRowTable 
+            aggrStatuses: if @state.table == @props.singleRowTable then ["individual", "literal"] else ['literal', "aggregate"]
             onChange: (expr) => @setState(expr: expr)
 
 

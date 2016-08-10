@@ -15,6 +15,7 @@ module.exports = class Widget
   #  width: width in pixels on screen
   #  height: height in pixels on screen
   #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
+  #  singleRowTable: optional table name of table that will be filtered to have a single row present. Widget designer should optionally account for this
   createViewElement: (options) ->
     throw new Error("Not implemented")
 

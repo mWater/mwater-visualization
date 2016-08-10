@@ -13,6 +13,7 @@ module.exports = class ExprInsertModalComponent extends React.Component
     schema: React.PropTypes.object.isRequired   # Schema to use
     dataSource: React.PropTypes.object.isRequired # Data source to use to get values
     onInsert: React.PropTypes.func.isRequired   # Called with expr to insert and label if including label
+    singleRowTable: React.PropTypes.string  # Table that is filtered to have one row
 
   constructor: ->
     super
@@ -25,7 +26,7 @@ module.exports = class ExprInsertModalComponent extends React.Component
     }
 
   open: ->
-    @setState(open: true, expr: null)
+    @setState(open: true, expr: null, table: @props.singleRowTable)
 
   handleTableChange: (table) => @setState(table: table)
 
@@ -60,8 +61,8 @@ module.exports = class ExprInsertModalComponent extends React.Component
             table: @state.table
             types: ['text', 'number', 'enum', 'date', 'datetime', 'boolean']
             value: @state.expr
-            # TODO only individual if singleRowTable 
-            aggrStatuses: ["individual", "literal", "aggregate"]
+            # Only individual if singleRowTable 
+            aggrStatuses: if @state.table == @props.singleRowTable then ["individual", "literal"] else ['literal', "aggregate"]
             onChange: (expr) => @setState(expr: expr)
 
       if @state.table

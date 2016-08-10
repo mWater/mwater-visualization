@@ -27,6 +27,8 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
     height: React.PropTypes.number
     standardWidth: React.PropTypes.number
 
+    singleRowTable: React.PropTypes.string  # Table that is filtered to have one row
+
   constructor: (props) ->
     super(props)
 
@@ -59,14 +61,21 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
       callback(error: error, exprValues: data or {})
     )
 
+  createItemsHtmlConverter: ->
+    # If loading, don't display old values
+    exprValues = if not @state.loading then @state.exprValues else {}
+
+    # Display summaries if in design more and singleRowTable is set
+    return new ItemsHtmlConverter(@props.schema, @props.onDesignChange?, exprValues, @props.onDesignChange? and @props.singleRowTable?)
+
   createHtml: ->
     # If loading, don't display old values
     exprValues = if not @state.loading then @state.exprValues else {}
 
-    new ItemsHtmlConverter(@props.schema, @props.onDesignChange?, exprValues).itemsToHtml(@props.design.items)
+    return @createItemsHtmlConverter().itemsToHtml(@props.design.items)
 
   handleChange: (elem) =>
-    design = _.extend({}, @props.design, items: new ItemsHtmlConverter(@props.schema, @props.onDesignChange?, (if not @state.loading then @state.exprValues else {})).elemToItems(elem))
+    design = _.extend({}, @props.design, items: @createItemsHtmlConverter().elemToItems(elem))
     if not _.isEqual(design, @props.design)
       @props.onDesignChange(design)
     else
@@ -159,7 +168,7 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
       H.div key: "expr", className: "mwater-visualization-text-palette-item", onClick: (ev) =>
         @refs.exprInsertModal.open()
       , 
-        H.i className: "fa fa-caret-up"
+        H.i className: "fa fa-plus"
         " Field"
       # H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "undo"),
       #   H.i className: "fa fa-undo"
@@ -171,8 +180,8 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
 
   renderModals: ->
     [
-      R ExprInsertModalComponent, key: "exprInsertModal", ref: "exprInsertModal", schema: @props.schema, dataSource: @props.dataSource, onInsert: @handleInsertExpr
-      R ExprUpdateModalComponent, key: "exprUpdateModal", ref: "exprUpdateModal", schema: @props.schema, dataSource: @props.dataSource
+      R ExprInsertModalComponent, key: "exprInsertModal", ref: "exprInsertModal", schema: @props.schema, dataSource: @props.dataSource, onInsert: @handleInsertExpr, singleRowTable: @props.singleRowTable
+      R ExprUpdateModalComponent, key: "exprUpdateModal", ref: "exprUpdateModal", schema: @props.schema, dataSource: @props.dataSource, singleRowTable: @props.singleRowTable
     ]
   
   renderHtml: ->

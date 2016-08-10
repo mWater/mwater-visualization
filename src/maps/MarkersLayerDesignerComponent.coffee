@@ -156,6 +156,17 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
           table: @props.design.table
           value: @props.design.filter)
 
+  renderPopup: ->
+    if not @props.design.table
+      return null
+
+    return R EditPopupComponent, 
+      design: @props.design
+      onDesignChange: @props.onDesignChange
+      schema: @props.schema
+      dataSource: @props.dataSource
+      table: @props.design.table
+
   render: ->
     H.div null,
       @renderTable()
@@ -164,7 +175,6 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
       @renderColorAxis()
       @renderSymbol()
       @renderFilter()
-      if @props.design.table
-        R EditPopupComponent, design: @props.design, onDesignChange: @props.onDesignChange, schema: @props.schema, dataSource: @props.dataSource
+      @renderPopup()
 
 

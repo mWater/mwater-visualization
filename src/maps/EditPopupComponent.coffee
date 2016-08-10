@@ -15,6 +15,7 @@ module.exports = class EditPopupComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired
     design: React.PropTypes.object.isRequired  # Design of the marker layer
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
+    table: React.PropTypes.string.isRequired
     
   constructor: ->
     super
@@ -72,6 +73,7 @@ module.exports = class EditPopupComponent extends React.Component
                 width: null
                 height: null
                 standardWidth: null
+                singleRowTable: @props.table
               })  
             })
 
