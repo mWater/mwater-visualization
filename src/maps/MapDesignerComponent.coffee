@@ -4,6 +4,7 @@ R = React.createElement
 TabbedComponent = require('react-library/lib/TabbedComponent')
 MapLayersDesignerComponent = require './MapLayersDesignerComponent'
 MapFiltersDesignerComponent = require './MapFiltersDesignerComponent'
+ClickOutHandler = require('react-onclickout')
 
 module.exports = class MapDesignerComponent extends React.Component
   @propTypes:
@@ -11,6 +12,10 @@ module.exports = class MapDesignerComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired # Data source to use
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
+
+  handleAttributionChange: (text) =>
+    design = _.extend({}, @props.design, {attribution: text})
+    @props.onDesignChange(design)
 
   render: ->
     H.div style: { padding: 5 },
@@ -46,6 +51,15 @@ module.exports = class MapDesignerComponent extends React.Component
           design: @props.design
           onDesignChange: @props.onDesignChange
 
+      H.div className: "form-group",
+        H.label className: "text-muted",
+          "Attribution"
+
+        H.p null,
+          R AttributionComponent,
+            text: @props.design.attribution
+            onTextChange: @handleAttributionChange
+
 # Designer for config
 class BaseLayerDesignerComponent extends React.Component
   @propTypes:
@@ -78,3 +92,40 @@ class BaseLayerDesignerComponent extends React.Component
       @renderBaseLayer("bing_aerial", "Satellite")
       @renderBaseLayer("cartodb_positron", "Light")
       @renderBaseLayer("cartodb_dark_matter", "Dark")
+
+# Attribution inline editing
+class AttributionComponent extends React.Component
+  @propTypes:
+    text: React.PropTypes.string
+    onTextChange: React.PropTypes.func.required
+
+  @defaultProps:
+    text: null
+
+  constructor: ->
+    @state =
+      editing: false
+
+  handleTextChange: (e) =>
+    @props.onTextChange(e.target.value)
+
+  handleClickOut: () =>
+    @setState(editing: false)
+
+  renderEditor: ->
+    R ClickOutHandler, onClickOut: @handleClickOut,
+      H.input { ref: "attributionInput", onChange:@handleTextChange, value: @props.text, className: 'form-control'}
+
+  onTextClick: =>
+    @setState(editing: true)
+
+  render: ->
+    if @state.editing
+      @renderEditor()
+    else
+      if @props.text?
+        H.a onClick: @onTextClick,
+          @props.text
+      else
+        H.a onClick: @onTextClick,
+          "+ Add attribution"
