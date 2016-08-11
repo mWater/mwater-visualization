@@ -83,6 +83,7 @@ module.exports = class AxisBuilder
           return false
         return true
         )
+
       if not xform
         delete axis.xform
 
