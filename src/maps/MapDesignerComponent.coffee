@@ -21,15 +21,6 @@ module.exports = class MapDesignerComponent extends React.Component
     H.div style: { padding: 5 },
       H.div className: "form-group",
         H.label className: "text-muted", 
-          "Map Style"
-  
-        R BaseLayerDesignerComponent,
-          schema: @props.schema
-          design: @props.design
-          onDesignChange: @props.onDesignChange
-
-      H.div className: "form-group",
-        H.label className: "text-muted", 
           "Layers"
 
         R MapLayersDesignerComponent, 
@@ -38,16 +29,29 @@ module.exports = class MapDesignerComponent extends React.Component
           design: @props.design
           onDesignChange: @props.onDesignChange
 
+      H.br()
+
       H.div className: "form-group",
         H.label className: "text-muted", 
           "Filters"
 
-        H.p className: "help-block",
-          "Optionally filter all data on the map"
+        # H.p className: "help-block",
+        #   "Optionally filter all data on the map"
 
         R MapFiltersDesignerComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
+          design: @props.design
+          onDesignChange: @props.onDesignChange
+
+      H.br()
+
+      H.div className: "form-group",
+        H.label className: "text-muted", 
+          "Map Style"
+  
+        R BaseLayerDesignerComponent,
+          schema: @props.schema
           design: @props.design
           onDesignChange: @props.onDesignChange
 
@@ -59,6 +63,8 @@ module.exports = class MapDesignerComponent extends React.Component
           R AttributionComponent,
             text: @props.design.attribution
             onTextChange: @handleAttributionChange
+
+
 
 # Designer for config
 class BaseLayerDesignerComponent extends React.Component
