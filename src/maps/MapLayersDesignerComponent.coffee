@@ -89,7 +89,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     ]
 
     H.div style: { margin: 5 }, key: "addLayer", className: "btn-group",
-      H.button type: "button", "data-toggle": "dropdown", className: "btn btn-default dropdown-toggle",
+      H.button type: "button", "data-toggle": "dropdown", className: "btn btn-primary dropdown-toggle",
         H.span className: "glyphicon glyphicon-plus"
         " Add Layer "
         H.span className: "caret"
