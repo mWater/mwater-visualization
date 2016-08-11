@@ -72,9 +72,9 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
     H.div style: { float: "right" }, key: "gear",
       H.a onClick: @handleToggleEditing,
         if @state.editing
-          H.i className: "fa fa-caret-square-o-up"
+          H.i className: "fa fa-caret-up"
         else
-          H.i className: "fa fa-caret-square-o-down"
+          H.i className: "fa fa-caret-down"
 
   # renderLayerGearMenu: ->
   #   layer = LayerFactory.createLayer(@props.layerView.type)
