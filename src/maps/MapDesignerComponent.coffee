@@ -55,14 +55,9 @@ module.exports = class MapDesignerComponent extends React.Component
           design: @props.design
           onDesignChange: @props.onDesignChange
 
-      H.div className: "form-group",
-        H.label className: "text-muted",
-          "Attribution"
-
-        H.p null,
-          R AttributionComponent,
-            text: @props.design.attribution
-            onTextChange: @handleAttributionChange
+      R AttributionComponent,
+        text: @props.design.attribution
+        onTextChange: @handleAttributionChange
 
 
 
@@ -109,8 +104,11 @@ class AttributionComponent extends React.Component
     text: null
 
   constructor: ->
-    @state =
+    super
+
+    @state = {
       editing: false
+    }
 
   handleTextChange: (e) =>
     @props.onTextChange(e.target.value)
@@ -122,16 +120,25 @@ class AttributionComponent extends React.Component
     R ClickOutHandler, onClickOut: @handleClickOut,
       H.input { ref: "attributionInput", onChange:@handleTextChange, value: @props.text, className: 'form-control'}
 
-  onTextClick: =>
+  handleTextClick: =>
     @setState(editing: true)
 
   render: ->
-    if @state.editing
-      @renderEditor()
-    else
-      if @props.text?
-        H.a onClick: @onTextClick,
-          @props.text
+    elem = H.div null, 
+      if @state.editing
+        @renderEditor()
       else
-        H.a onClick: @onTextClick,
-          "+ Add attribution"
+        if @props.text
+          H.span onClick: @handleTextClick, style: { cursor: "pointer" },
+            @props.text
+        else
+          H.a onClick: @handleTextClick, className: "btn btn-link btn-sm",
+            "+ Add attribution"
+
+    if @props.text or @state.editing
+      elem = H.div className: "form-group",
+        H.label className: "text-muted",
+          "Attribution"
+        elem
+
+    return elem
