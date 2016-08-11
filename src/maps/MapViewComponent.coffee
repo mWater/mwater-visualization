@@ -175,3 +175,4 @@ module.exports = class MapViewComponent extends React.Component
         touchZoom: @props.touchZoom
         scrollWheelZoom: @props.scrollWheelZoom
         onBoundsChange: @handleBoundsChange
+        extraAttribution: @props.design.attribution

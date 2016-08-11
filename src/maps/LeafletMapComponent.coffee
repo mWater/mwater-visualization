@@ -38,6 +38,7 @@ module.exports = class LeafletMapComponent extends React.Component
     scrollWheelZoom: React.PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
 
     maxZoom: React.PropTypes.number         # Maximum zoom level
+    extraAttribution: React.PropTypes.string # User defined attributions
 
   @defaultProps: 
     dragging: true
@@ -127,6 +128,12 @@ module.exports = class LeafletMapComponent extends React.Component
     if prevProps and (prevProps.width != @props.width or prevProps.height != @props.height)
       @map.invalidateSize()
 
+    #update attribution
+    if not prevProps or @props.extraAttribution != prevProps.extraAttribution
+      if @baseLayer
+        @baseLayer._map.attributionControl.removeAttribution(prevProps.extraAttribution)
+        @baseLayer._map.attributionControl.addAttribution(@props.extraAttribution)
+
     # Update base layer
     if not prevProps or @props.baseLayerId != prevProps.baseLayerId
       if @baseLayer
@@ -135,9 +142,9 @@ module.exports = class LeafletMapComponent extends React.Component
 
       switch @props.baseLayerId
         when "bing_road"
-          @baseLayer = new BingLayer("Ao26dWY2IC8PjorsJKFaoR85EPXCnCohrJdisCWXIULAXFo0JAXquGauppTMQbyU", { type: "Road"})
+          @baseLayer = new BingLayer("Ao26dWY2IC8PjorsJKFaoR85EPXCnCohrJdisCWXIULAXFo0JAXquGauppTMQbyU", {type: "Road"})
         when "bing_aerial"
-          @baseLayer = new BingLayer("Ao26dWY2IC8PjorsJKFaoR85EPXCnCohrJdisCWXIULAXFo0JAXquGauppTMQbyU", { type: "AerialWithLabels"})
+          @baseLayer = new BingLayer("Ao26dWY2IC8PjorsJKFaoR85EPXCnCohrJdisCWXIULAXFo0JAXquGauppTMQbyU", {type: "AerialWithLabels"})
         when "cartodb_positron"
           @baseLayer = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>'
@@ -148,6 +155,9 @@ module.exports = class LeafletMapComponent extends React.Component
           })
 
       @map.addLayer(@baseLayer)
+
+      if @props.extraAttribution
+        @baseLayer._map.attributionControl.addAttribution(@props.extraAttribution)
 
       # Base layers are always at back
       @baseLayer.bringToBack()
