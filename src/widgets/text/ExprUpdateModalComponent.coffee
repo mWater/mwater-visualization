@@ -19,13 +19,15 @@ module.exports = class ExprUpdateModalComponent extends React.Component
 
     @state = {
       open: false
+      id: null
       expr: null
       table: null
-      onUpdate: null
+      includeLabel: false
+      labelText: null
     }
 
-  open: (expr, onUpdate) ->
-    @setState(open: true, table: expr.table, expr: expr, onUpdate: onUpdate)
+  open: (item, onUpdate) ->
+    @setState(open: true, id: item.id, expr: item.expr, table: item.expr.table, includeLabel: item.includeLabel, labelText: item.labelText, onUpdate: onUpdate)
 
   handleTableChange: (table) => @setState(table: table)
 
@@ -37,6 +39,7 @@ module.exports = class ExprUpdateModalComponent extends React.Component
         "Data Source"
       ": "
       R(TableSelectComponent, { schema: @props.schema, value: @state.table, onChange: @handleTableChange })
+      H.br()
 
       if @state.table
         H.div className: "form-group",
@@ -53,6 +56,19 @@ module.exports = class ExprUpdateModalComponent extends React.Component
             aggrStatuses: if @state.table == @props.singleRowTable then ["individual", "literal"] else ['literal', "aggregate"]
             onChange: (expr) => @setState(expr: expr)
 
+      if @state.table and @state.expr
+        H.label key: "includeLabel",
+          H.input type: "checkbox", checked: @state.includeLabel, onChange: (ev) => @setState(includeLabel: ev.target.checked)
+          " Include Label"
+
+      if @state.table and @state.expr and @state.includeLabel
+        H.input 
+          key: "labelText"
+          className: "form-control"
+          type: "text"
+          value: @state.labelText or ""
+          onChange: (ev) => @setState(labelText: ev.target.value or null)
+          placeholder: new ExprUtils(@props.schema).summarizeExpr(@state.expr)
 
   render: ->
     if not @state.open
@@ -63,7 +79,7 @@ module.exports = class ExprUpdateModalComponent extends React.Component
       onAction: => 
         # Close first to avoid strange effects when mixed with pojoviews
         @setState(open: false, =>
-          @state.onUpdate(@state.expr)
+          @state.onUpdate({ type: "expr", id: @state.id, expr: @state.expr, includeLabel: @state.includeLabel, labelText: @state.labelText })
         )
       onCancel: => @setState(open: false)
       title: "Update Field",

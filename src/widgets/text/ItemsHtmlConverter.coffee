@@ -5,7 +5,7 @@ ExprUtils = require('mwater-expressions').ExprUtils
 # Text widgets are an array of items: each one of:
 #  string (html text) 
 #  { type: "element", tag: "h1", items: [nested items] }
-#  { type: "expr", id: unique id, expr: expression } 
+#  { type: "expr", id: unique id, expr: expression, includeLabel: true to include label, labelText: override label text } 
 module.exports = class ItemsHtmlConverter 
   # designMode is true to display in design mode (exprs as blocks)
   # exprValues is map of expr id to value
@@ -67,6 +67,11 @@ module.exports = class ItemsHtmlConverter
 
         else # Placeholder
           exprHtml = '<span class="text-muted">\u25a0\u25a0\u25a0</span>'
+
+        # Add label
+        if item.includeLabel
+          label = item.labelText or new ExprUtils(@schema).summarizeExpr(item.expr)
+          exprHtml = '<span class="text-muted">' + _.escape(label) + ":\u00A0</span>" + exprHtml
 
         if @designMode 
           html += '\u2060<span data-embed="' + _.escape(JSON.stringify(item)) + '" class="mwater-visualization-text-widget-expr">' + (exprHtml or "\u00A0") + '</span>\u2060'

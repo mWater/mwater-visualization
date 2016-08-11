@@ -2,6 +2,8 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
+uuid = require 'node-uuid'
+
 ExprUtils = require("mwater-expressions").ExprUtils
 ExprComponent = require("mwater-expressions-ui").ExprComponent
 ActionCancelModalComponent = require("react-library/lib/ActionCancelModalComponent")
@@ -12,7 +14,7 @@ module.exports = class ExprInsertModalComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired   # Schema to use
     dataSource: React.PropTypes.object.isRequired # Data source to use to get values
-    onInsert: React.PropTypes.func.isRequired   # Called with expr to insert and label if including label
+    onInsert: React.PropTypes.func.isRequired   # Called with expr item to insert
     singleRowTable: React.PropTypes.string  # Table that is filtered to have one row
 
   constructor: ->
@@ -22,7 +24,8 @@ module.exports = class ExprInsertModalComponent extends React.Component
       open: false
       expr: null
       table: null
-      includeLabel: true
+      includeLabel: false
+      labelText: null
     }
 
   open: ->
@@ -36,9 +39,9 @@ module.exports = class ExprInsertModalComponent extends React.Component
 
     # Close first to avoid strange effects when mixed with pojoviews
     @setState(open: false, =>
-      label = new ExprUtils(@props.schema).summarizeExpr(@state.expr)
+      item = { type: "expr", id: uuid.v4(), expr: @state.expr, includeLabel: @state.includeLabel, labelText: (if @state.includeLabel then @state.labelText) }
 
-      @props.onInsert(@state.expr, if @state.includeLabel then label)
+      @props.onInsert(item)
     )
 
   renderContents: ->
@@ -49,6 +52,7 @@ module.exports = class ExprInsertModalComponent extends React.Component
         "Data Source"
       ": "
       R(TableSelectComponent, { schema: @props.schema, value: @state.table, onChange: @handleTableChange })
+      H.br()
 
       if @state.table
         H.div className: "form-group",
@@ -65,10 +69,19 @@ module.exports = class ExprInsertModalComponent extends React.Component
             aggrStatuses: if @state.table == @props.singleRowTable then ["individual", "literal"] else ['literal', "aggregate"]
             onChange: (expr) => @setState(expr: expr)
 
-      if @state.table
+      if @state.table and @state.expr
         H.label key: "includeLabel",
           H.input type: "checkbox", checked: @state.includeLabel, onChange: (ev) => @setState(includeLabel: ev.target.checked)
           " Include Label"
+
+      if @state.table and @state.expr and @state.includeLabel
+        H.input 
+          key: "labelText"
+          className: "form-control"
+          type: "text"
+          value: @state.labelText or ""
+          onChange: (ev) => @setState(labelText: ev.target.value or null)
+          placeholder: new ExprUtils(@props.schema).summarizeExpr(@state.expr)
 
 
   render: ->

@@ -3,8 +3,6 @@ H = React.DOM
 R = React.createElement
 _ = require 'lodash'
 
-uuid = require 'node-uuid'
-
 ContentEditableComponent = require('mwater-expressions-ui').ContentEditableComponent
 ExprInsertModalComponent = require './ExprInsertModalComponent'
 ExprUpdateModalComponent = require './ExprUpdateModalComponent'
@@ -95,14 +93,8 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
     ev.preventDefault()
     document.execCommand(command, false, param)
 
-  handleInsertExpr: (expr, label) =>
-    item = { type: "expr", id: uuid.v4(), expr: expr }
-
+  handleInsertExpr: (item) =>
     html = '''<div data-embed="''' + _.escape(JSON.stringify(item)) + '''"></div>'''
-
-    # Add label
-    if label
-      html = _.escape("#{label}: ") + html
 
     @refs.contentEditable.pasteHTML(html)
 
@@ -125,11 +117,9 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
     if not @state.focused
       @setState(focused: true)
 
-    if ev.target.dataset?.embed
-      item = JSON.parse(ev.target.dataset?.embed)
-      @refs.exprUpdateModal.open(item.expr, (expr) =>
-        item.expr = expr
-
+    if ev.target.dataset?.embed or ev.target.parentElement?.dataset?.embed
+      item = JSON.parse(ev.target.dataset?.embed or ev.target.parentElement?.dataset?.embed)
+      @refs.exprUpdateModal.open(item, (item) =>
         # Replace in items
         @replaceItem(item)
       )
