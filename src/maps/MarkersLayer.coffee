@@ -265,7 +265,7 @@ module.exports = class MarkersLayer extends Layer
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->
-    return []
+    return [design.table]
 
   # True if layer can be edited
   isEditable: (design, schema) ->
