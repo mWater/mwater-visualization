@@ -8,6 +8,7 @@ Maps are stored as a base layer, a series of layers and filters.
 	layerViews: [ see layer view below ]
 	filters: filter expression indexed by table. e.g. { sometable: logical expression, etc. }
 	bounds: bounds as { w:, n:, e:, s: }
+	attribution: string User defined attribution string, added with other required attributions to the map
 }
 ```
 
