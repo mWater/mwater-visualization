@@ -25,35 +25,44 @@ describe "LayeredChart", ->
     @axisDate = { expr: @exprDate } 
 
   describe "cleanDesign", ->
-    it "defaults y axis to count", ->
-      design = {
-        type: "bar"
-        layers: [
-          { axes: { x: @axisEnum, y: null }, table: "t1" }
-        ]
-      }
+    # Removed as was making impossible to choose other than count
+    # it "defaults y axis to count", ->
+    #   design = {
+    #     type: "bar"
+    #     layers: [
+    #       { axes: { x: @axisEnum, y: null }, table: "t1" }
+    #     ]
+    #   }
+    # 
+    #   design = @chart.cleanDesign(design, @schema)
+    # 
+    #   expectedY = {
+    #     expr: { type: "id", table: "t1" }
+    #     xform: null
+    #     aggr: "count"
+    #   }
+    # 
+    #   compare(design.layers[0].axes.y, expectedY)
 
-      design = @chart.cleanDesign(design, @schema)
+    # it "does not default y axis if scatter", ->
+    #   design = {
+    #     type: "scatter"
+    #     layers: [
+    #       { axes: { x: @axisEnum, y: null }, table: "t1" }
+    #     ]
+    #   }
 
-      expectedY = {
-        expr: { type: "id", table: "t1" }
-        xform: null
-        aggr: "count"
-      }
+    # it "does not default y axis if scatter", ->
+    #   design = {
+    #     type: "scatter"
+    #     layers: [
+    #       { axes: { x: @axisEnum, y: null }, table: "t1" }
+    #     ]
+    #   }
 
-      compare(design.layers[0].axes.y, expectedY)
+    #   design = @chart.cleanDesign(design, @schema)
 
-    it "does not default y axis if scatter", ->
-      design = {
-        type: "scatter"
-        layers: [
-          { axes: { x: @axisEnum, y: null }, table: "t1" }
-        ]
-      }
-
-      design = @chart.cleanDesign(design, @schema)
-
-      assert not design.layers[0].axes.y
+    #   assert not design.layers[0].axes.y
 
     it "removes aggr from y if scatter", ->
       design = {
