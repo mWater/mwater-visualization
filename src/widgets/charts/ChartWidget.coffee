@@ -3,7 +3,6 @@ H = React.DOM
 Widget = require './../Widget'
 SimpleWidgetComponent = require './../SimpleWidgetComponent'
 CsvBuilder = require './../../CsvBuilder'
-filesaver = require 'filesaver.js'
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
 ChartViewComponent = require './ChartViewComponent'
 ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
@@ -85,6 +84,9 @@ class ChartWidgetComponent extends React.Component
 
       # Make a blob and save
       blob = new Blob([csv], {type: "text/csv"})
+      
+      # Require here to allow server use
+      filesaver = require 'filesaver.js'
       filesaver(blob, "Exported Data.csv")
     )
 
