@@ -16,8 +16,8 @@ module.exports = class LeafletMapComponent extends React.Component
       s: React.PropTypes.number.isRequired
       }) # Initial bounds. Fit world if none
 
-    width: React.PropTypes.number # Required width
-    height: React.PropTypes.number # Required height
+    width: React.PropTypes.any # Required width
+    height: React.PropTypes.any # Required height
 
     onBoundsChange: React.PropTypes.func # Called with bounds in w, n, s, e format when bounds change
     
