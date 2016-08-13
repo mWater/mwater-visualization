@@ -107,6 +107,10 @@ module.exports = class MWaterAddLayerComponent extends React.Component
                 " Create"
             R ExpandingComponent, label: "GeMap 3"
           R ExpandingComponent, initiallyOpen: false, label: "Public Surveys",
+        R ExpandingComponent, label: "Advanced", 
+          R LinkComponent, onClick: @handleAddLayer, "Markers"
+          R LinkComponent, onClick: @handleAddLayer, "Circles (radius map)"
+          R LinkComponent, onClick: @handleAddLayer, "Choropleth (color regions)"
 
       if @props.firstLayer
         H.div style: { marginTop: 40 }, 
