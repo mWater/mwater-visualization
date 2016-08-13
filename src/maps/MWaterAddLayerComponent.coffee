@@ -91,11 +91,20 @@ module.exports = class MWaterAddLayerComponent extends React.Component
         R ExpandingComponent, label: "Surveys",
           R ExpandingComponent, initiallyOpen: true, label: "My Surveys",
             R ExpandingComponent, label: "UWP Pre-Site Assessment",
-              R LinkComponent, null, "All Responses"
-              H.label style: { paddingTop: 3 }, "Map specific answer:"
-              R LinkComponent, null, "Which site is this for?"
-              R LinkComponent, null, "How is the site built?"
-              R LinkComponent, null, "Is it stable?"
+              H.div className: "form-group",
+                H.div null, "Location to map"
+                H.select className: "form-control input-sm",
+                  H.option value: "a", "Which water point is this associated with?"
+                  H.option value: "b", "Enter Pre-Site location"
+              H.div className: "form-group",
+                H.div null, "Answer to visualize"
+                H.select className: "form-control input-sm",
+                  H.option value: "a", "None"
+                  H.option value: "b", "What type of facility is this"
+                  H.option value: "c", "Is it stable?"
+              H.button className: "btn btn-sm btn-primary", type: "button",
+                H.i className: "fa fa-plus"
+                " Create"
             R ExpandingComponent, label: "GeMap 3"
           R ExpandingComponent, initiallyOpen: false, label: "Public Surveys",
 
