@@ -63,17 +63,24 @@ module.exports = class MapLayersDesignerComponent extends React.Component
       )
 
   render: ->
-    H.div style: { padding: 5 }, 
-      H.div className: "list-group", key: "layers",
-        # _.map(@props.design.layerViews, @renderLayerView)
-        React.createElement(ReorderableListComponent,
-          items: @props.design.layerViews
-          onReorder: @handleReorder
-          renderItem: @renderLayerView
-          getItemId: (layerView) => layerView.id
-        )
+    H.div className: "form-group",
+      if @props.design.layerViews.length > 0
+        H.label className: "text-muted", 
+          "Layers"
+
+      if @props.design.layerViews.length > 0
+        H.div style: { padding: 5 }, 
+          H.div className: "list-group", key: "layers",
+            # _.map(@props.design.layerViews, @renderLayerView)
+            React.createElement(ReorderableListComponent,
+              items: @props.design.layerViews
+              onReorder: @handleReorder
+              renderItem: @renderLayerView
+              getItemId: (layerView) => layerView.id
+            )
 
       R AddLayerComponent, 
+        firstLayer: @props.design.layerViews.length == 0
         schema: @props.schema
         dataSource: @props.dataSource
         design: @props.design

@@ -2,8 +2,8 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 R = React.createElement
-uuid = require 'node-uuid'
 
+uuid = require 'node-uuid'
 LayerFactory = require './LayerFactory'
 
 # Dropdown to add a new layer. Can be overridden by context of addLayerElementFactory which is called with { schema, dataSource } # TODO
@@ -41,6 +41,10 @@ module.exports = class AddLayerComponent extends React.Component
     @props.onDesignChange(design)
 
   render: ->
+    # TODO REMOVE
+    MWaterAddLayerComponent = require './MWaterAddLayerComponent'
+    return R MWaterAddLayerComponent, @props
+
     newLayers = [
       {
         label: "Marker Layer"

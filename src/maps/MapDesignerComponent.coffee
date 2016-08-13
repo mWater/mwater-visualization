@@ -19,15 +19,11 @@ module.exports = class MapDesignerComponent extends React.Component
 
   render: ->
     H.div style: { padding: 5 },
-      H.div className: "form-group",
-        H.label className: "text-muted", 
-          "Layers"
-
-        R MapLayersDesignerComponent, 
-          schema: @props.schema
-          dataSource: @props.dataSource
-          design: @props.design
-          onDesignChange: @props.onDesignChange
+      R MapLayersDesignerComponent, 
+        schema: @props.schema
+        dataSource: @props.dataSource
+        design: @props.design
+        onDesignChange: @props.onDesignChange
 
       H.br()
 
@@ -80,10 +76,25 @@ class BaseLayerDesignerComponent extends React.Component
 
   render: ->
     H.div style: { marginLeft: 10 }, 
-      @renderBaseLayer("bing_road", "Roads")
-      @renderBaseLayer("bing_aerial", "Satellite")
       @renderBaseLayer("cartodb_positron", "Light")
       @renderBaseLayer("cartodb_dark_matter", "Dark")
+      @renderBaseLayer("bing_road", "Roads")
+      @renderBaseLayer("bing_aerial", "Satellite")
+
+  # handleBaseLayerChange: (ev) =>
+  #   @updateDesign(baseLayer: ev.target.value)
+
+  # render: ->
+  #   H.select className: "form-control", value: @props.design.baseLayer, onChange: @handleBaseLayerChange,
+  #     H.option key: "bing_road", value: "bing_road",
+  #       "Roads"
+  #     H.option key: "bing_aerial", value: "bing_aerial",
+  #       "Satellite"
+  #     H.option key: "cartodb_positron", value: "cartodb_positron",
+  #       "Light"
+  #     H.option key: "cartodb_dark_matter", value: "cartodb_dark_matter",
+  #       "Dark"
+
 
 # Attribution inline editing
 class AttributionComponent extends React.Component
