@@ -102,6 +102,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
 
     # Create options
     options = [
+      { value: "font-awesome/dot-circle-o", label: "Bullseye" }
       { value: "font-awesome/star", label: "Star" }
       { value: "font-awesome/square", label: "Square" }
       { value: "font-awesome/check", label: "Check" }
