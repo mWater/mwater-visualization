@@ -50,7 +50,7 @@ module.exports = class GridLayoutManager extends LayoutManager
         title: H.i className: "fa fa-th"
         subtitle: "Mosaic"
       R PaletteItemComponent,
-        createItem: createWidgetItem("IFrame", {}})
+        createItem: createWidgetItem("IFrame", {})
         title: H.i className: "fa fa-youtube-play"
         subtitle: "Video"
 
