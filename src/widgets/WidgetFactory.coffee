@@ -7,6 +7,7 @@ MarkdownWidget = require './MarkdownWidget'
 TextWidget = require './text/TextWidget'
 ImageWidget = require './ImageWidget'
 MapWidget = require './MapWidget'
+IFrameWidget = require './IFrameWidget'
 
 # Creates widgets based on type 
 module.exports = class WidgetFactory
@@ -28,5 +29,7 @@ module.exports = class WidgetFactory
         return new TextWidget()
       when "Image"
         return new ImageWidget()
+      when "IFrame"
+        return new IFrameWidget()
       else    
         throw new Error("Unknown widget type #{type}")

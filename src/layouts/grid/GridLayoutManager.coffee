@@ -49,6 +49,10 @@ module.exports = class GridLayoutManager extends LayoutManager
         createItem: createWidgetItem("ImageMosaicChart", {})
         title: H.i className: "fa fa-th"
         subtitle: "Mosaic"
+      R PaletteItemComponent,
+        createItem: createWidgetItem("IFrame", {}})
+        title: H.i className: "fa fa-youtube-play"
+        subtitle: "Video"
 
   # Renders the layout as a react element
   # options:

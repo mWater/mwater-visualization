@@ -139,6 +139,10 @@ class BlocksDisplayComponent extends React.Component
           createItem: @createBlockItem({ type: "spacer", aspectRatio: 1.4 })
           title: H.i className: "fa fa-square-o"
           subtitle: "Spacer"
+        R PaletteItemComponent,
+          createItem: @createBlockItem({ type: "widget", aspectRatio: 16.0/9.0, widgetType: "IFrame", design: {} })
+          title: H.i className: "fa fa-youtube-play"
+          subtitle: "Video"
 
   render: ->
     return H.table style: { width: "100%", height: "100%", tableLayout: "fixed" },

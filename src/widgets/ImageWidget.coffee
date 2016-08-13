@@ -8,7 +8,7 @@ injectTableAlias = require('mwater-expressions').injectTableAlias
 
 Widget = require './Widget'
 
-module.exports = class TextWidget extends Widget
+module.exports = class ImageWidget extends Widget
   # Creates a React element that is a view of the widget 
   # options:
   #  schema: schema to use
