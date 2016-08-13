@@ -98,6 +98,15 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
 
     @refs.contentEditable.pasteHTML(html)
 
+  handleCreateLink: (ev) =>
+    # Don't lose focus
+    ev.preventDefault()
+
+    # Ask for url
+    url = window.prompt("Enter URL to link to")
+    if url
+      document.execCommand("createLink", false, url)
+
   replaceItem: (item) ->
     replaceItemInItems = (items, item) ->
       return _.map(items, (i) ->
@@ -132,6 +141,8 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
         H.i null, "I"
       H.div key: "underline", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "underline"),
         H.span style: { textDecoration: "underline" }, "U"
+      H.div key: "link", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCreateLink,
+        H.i className: "fa fa-link"
       H.div key: "justifyLeft", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyLeft"),
         H.i className: "fa fa-align-left"
       H.div key: "justifyCenter", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyCenter"),
