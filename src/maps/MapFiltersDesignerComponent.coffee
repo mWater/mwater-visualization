@@ -50,5 +50,12 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
       # Get filterable tables
       filterableTables = _.uniq(filterableTables.concat(layer.getFilterableTables(layerView.design, @props.schema)))
 
-    H.div style: { margin: 5 }, 
-      _.map(filterableTables, @renderFilterableTable)
+    if filterableTables.length == 0
+      return null
+
+    return H.div className: "form-group",
+      H.label className: "text-muted", 
+        "Filters"
+
+      H.div style: { margin: 5 }, 
+        _.map(filterableTables, @renderFilterableTable)

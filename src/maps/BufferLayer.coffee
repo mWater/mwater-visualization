@@ -236,7 +236,8 @@ module.exports = class BufferLayer extends Layer
       React.createElement(LegendGroup, legendGroupProps)
 
   # Get a list of table ids that can be filtered on
-  getFilterableTables: (design, schema) -> [design.table]
+  getFilterableTables: (design, schema) -> 
+    return if design.table then [design.table] else []
 
   # True if layer can be edited
   isEditable: (design, schema) -> true

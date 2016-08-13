@@ -8,7 +8,7 @@ UtfGridLayer = require './UtfGridLayer'
 # Leaflet map component that displays a base layer, a tile layer and an optional interactivity layer
 module.exports = class LeafletMapComponent extends React.Component
   @propTypes:
-    baseLayerId: React.PropTypes.string.isRequired # "bing_road", "bing_aerial"
+    baseLayerId: React.PropTypes.string.isRequired # "bing_road", "bing_aerial", "cartodb_positron", "cartodb_dark_matter"
     initialBounds: React.PropTypes.shape({
       w: React.PropTypes.number.isRequired
       n: React.PropTypes.number.isRequired

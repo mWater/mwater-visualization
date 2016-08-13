@@ -250,7 +250,7 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->
-    return [design.table]
+    return if design.table then [design.table] else []
 
   # True if layer can be edited
   isEditable: (design, schema) ->

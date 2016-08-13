@@ -85,7 +85,9 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
 
   render: ->
     if not @state.schema and not @state.error
-      return H.div null, "Loading..."
+      return H.div style: { fontSize: "150%" },
+          H.i(className: "fa fa-spinner fa-spin", style: { color: '#0c7cba' })
+          ' Loading...'
 
     return @props.children(@state.error, {
       schema: @state.schema

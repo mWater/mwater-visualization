@@ -1,8 +1,10 @@
+_ = require 'lodash'
 React = require 'react'
 H = React.DOM
-uuid = require 'node-uuid'
+R = React.createElement
 
 LayerFactory = require './LayerFactory'
+AddLayerComponent = require './AddLayerComponent'
 MapLayerViewDesignerComponent = require './MapLayerViewDesignerComponent'
 ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
 
@@ -38,66 +40,8 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     layerViews.splice(index, 1)
     @updateDesign(layerViews: layerViews)
 
-  handleAddLayerView: (newLayer) =>
-    layerView = {
-      id: uuid.v4()
-      name: newLayer.name
-      desc: ""
-      type: newLayer.type
-      visible: true
-      opacity: 1
-    }
-
-    # Clean design to make valid
-    layer = LayerFactory.createLayer(newLayer.type)
-    layerView.design = layer.cleanDesign(newLayer.design, @props.schema)
-
-    # Add to list
-    layerViews = @props.design.layerViews.slice()
-    layerViews.push(layerView)
-    @updateDesign(layerViews: layerViews)
-
   handleReorder: (layerList) =>
     @updateDesign(layerViews: layerList)
-
-  renderAddLayer: ->
-    newLayers = [
-      {
-        label: "Marker Layer"
-        name: "Untitled Layer"
-        type: "Markers"
-        design: { }
-      }
-      {
-        label: "Radius (circles) Layer"
-        name: "Untitled Layer"
-        type: "Buffer"
-        design: { }
-      }
-      {
-        label: "Choropleth Layer"
-        name: "Untitled Layer"
-        type: "AdminChoropleth"
-        design: { }
-      }
-      {
-        label: "Custom Tile Url (advanced)"
-        name: "Untitled Layer"
-        type: "TileUrl"
-        design: { }
-      }
-    ]
-
-    H.div style: { margin: 5 }, key: "addLayer", className: "btn-group",
-      H.button type: "button", "data-toggle": "dropdown", className: "btn btn-primary dropdown-toggle",
-        H.span className: "glyphicon glyphicon-plus"
-        " Add Layer "
-        H.span className: "caret"
-      H.ul className: "dropdown-menu",
-        _.map(newLayers, (layer, i) =>
-          H.li key: "" + i,
-            H.a onClick: @handleAddLayerView.bind(null, layer), layer.label or layer.name
-          )
 
   renderLayerView: (layerView, index, connectDragSource, connectDragPreview, connectDropTarget) =>
     style =
@@ -129,5 +73,10 @@ module.exports = class MapLayersDesignerComponent extends React.Component
           getItemId: (layerView) => layerView.id
         )
 
-      @renderAddLayer()
+      R AddLayerComponent, 
+        schema: @props.schema
+        dataSource: @props.dataSource
+        design: @props.design
+        onDesignChange: @props.onDesignChange
+
 

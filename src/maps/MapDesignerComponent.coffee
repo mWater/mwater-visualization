@@ -31,18 +31,11 @@ module.exports = class MapDesignerComponent extends React.Component
 
       H.br()
 
-      H.div className: "form-group",
-        H.label className: "text-muted", 
-          "Filters"
-
-        # H.p className: "help-block",
-        #   "Optionally filter all data on the map"
-
-        R MapFiltersDesignerComponent, 
-          schema: @props.schema
-          dataSource: @props.dataSource
-          design: @props.design
-          onDesignChange: @props.onDesignChange
+      R MapFiltersDesignerComponent, 
+        schema: @props.schema
+        dataSource: @props.dataSource
+        design: @props.design
+        onDesignChange: @props.onDesignChange
 
       H.br()
 
@@ -58,8 +51,6 @@ module.exports = class MapDesignerComponent extends React.Component
       R AttributionComponent,
         text: @props.design.attribution
         onTextChange: @handleAttributionChange
-
-
 
 # Designer for config
 class BaseLayerDesignerComponent extends React.Component
@@ -98,7 +89,7 @@ class BaseLayerDesignerComponent extends React.Component
 class AttributionComponent extends React.Component
   @propTypes:
     text: React.PropTypes.string
-    onTextChange: React.PropTypes.func.required
+    onTextChange: React.PropTypes.func.isRequired
 
   @defaultProps:
     text: null
