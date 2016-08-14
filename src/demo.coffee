@@ -771,56 +771,6 @@ mapDesign = {
                 "value": "12",
                 "color": "#0b1609"
               }
-            ],
-            "drawOrder": [
-              {
-                "value": "12",
-                "color": "#0b1609"
-              },
-              {
-                "value": "02",
-                "color": "#b1dca7"
-              },
-              {
-                "value": "03",
-                "color": "#9ad28e"
-              },
-              {
-                "value": "04",
-                "color": "#84c874"
-              },
-              {
-                "value": "05",
-                "color": "#6dbe5b"
-              },
-              {
-                "value": "06",
-                "color": "#59af46"
-              },
-              {
-                "value": "07",
-                "color": "#4c963c"
-              },
-              {
-                "value": "08",
-                "color": "#3f7c31"
-              },
-              {
-                "value": "09",
-                "color": "#326227"
-              },
-              {
-                "value": "10",
-                "color": "#25491d"
-              },
-              {
-                "value": "11",
-                "color": "#182f13"
-              },
-              {
-                "value": "01",
-                "color": "#c8e6c1"
-              }
             ]
           }
         },

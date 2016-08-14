@@ -86,7 +86,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
     @setState(mode: "palette")
 
   onPaletteChange: (palette) =>
-    @props.onChange(update(@props.axis, { colorMap: { $set: palette }, drawOrder: { $set: order }}))
+    @props.onChange(update(@props.axis, { colorMap: { $set: palette }, drawOrder: { $set: _.pluck(palette, "value") }}))
     @setState(mode: "normal")
 
   handleDrawOrderChange: (order) =>
@@ -96,7 +96,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
     @setState(mode: "normal")
 
   render: ->
-    drawOrder = if @props.axis.drawOrder then @props.axis.drawOrder else @props.axis.colorMap
+    drawOrder = @props.axis.drawOrder or _.pluck(@props.axis.colorMap, "value")
 
     H.div null,
       if @state.mode == "palette"
@@ -135,7 +135,8 @@ module.exports = class AxisColorEditorComponent extends React.Component
             H.a style: { cursor: "pointer" }, onClick: @handleSelectPalette, key: "select-palette", "Select color scheme"
           if drawOrder and @props.colormapReorderable
             R ColorMapOrderEditorComponent,
-              colorMap: drawOrder
+              colorMap: @props.axis.colorMap
+              order: drawOrder
               categories: @state.categories
               onChange: @handleDrawOrderChange
 
