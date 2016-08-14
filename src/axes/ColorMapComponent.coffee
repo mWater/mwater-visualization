@@ -40,7 +40,7 @@ module.exports = class ColorMapComponent extends React.Component
           _.map @props.categories, (category) =>
             H.tr null,
               H.td key: "color",
-                R ColorComponent, 
+                  R ColorComponent, 
                   color: @lookupColor(category.value)
                   onChange: (color) => @handleColorChange(category.value, color)
               H.td key: "label", style: { paddingLeft: 8 },
