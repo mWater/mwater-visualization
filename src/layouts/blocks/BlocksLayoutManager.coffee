@@ -5,7 +5,6 @@ R = React.createElement
 uuid = require 'node-uuid'
 
 LayoutManager = require '../LayoutManager'
-BlocksDisplayComponent = require './BlocksDisplayComponent'
 
 module.exports = class BlocksLayoutManager extends LayoutManager
   # Renders the layout as a react element
@@ -15,6 +14,7 @@ module.exports = class BlocksLayoutManager extends LayoutManager
   #  onItemsChange: Called when items changes
   #  renderWidget: called with ({ id:, type:, design:, onDesignChange:, width:, height:  })
   renderLayout: (options) ->
+    BlocksDisplayComponent = require './BlocksDisplayComponent'
     return R BlocksDisplayComponent,
       items: options.items or { id: "root", type: "root", blocks: [] }
       onItemsChange: options.onItemsChange
