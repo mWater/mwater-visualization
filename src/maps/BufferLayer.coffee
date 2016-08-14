@@ -184,7 +184,16 @@ module.exports = class BufferLayer extends Layer
 
     # If color axes, add color conditions
     if design.axes.color and design.axes.color.colorMap
-      for item, i in design.axes.color.colorMap
+      iteratee = design.axes.color.colorMap
+      order = design.axes.color.drawOrder or _.pluck(design.axes.color.colorMap, "value")
+
+      # color on top gets rendered last
+      actualOrder = _(order).reverse().value()
+      iteratee = _.sortBy(design.axes.color.colorMap, (item) =>
+        _.indexOf(actualOrder, item.value)
+      )
+
+      for item, i in iteratee
         css += "#layer0::#{i} [color=#{JSON.stringify(item.value)}] { polygon-fill: #{item.color}; opacity: #{design.fillOpacity}; }\n"
 
     return css

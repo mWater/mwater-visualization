@@ -31,9 +31,11 @@ module.exports = class AxisComponent extends React.Component
     required: React.PropTypes.bool  # Makes this a required value
     showColorMap: React.PropTypes.bool # Shows the color map
     colorMapOptional: React.PropTypes.bool # Is the color map optional
+    colormapReorderable: React.PropTypes.bool # Is the color map reorderable
 
   @defaultProps:
     colorMapOptional: false
+    colormapReorderable: false
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
@@ -148,6 +150,7 @@ module.exports = class AxisComponent extends React.Component
       axis: axis
       onChange: @props.onChange
       colorMapOptional: @props.colorMapOptional
+      colormapReorderable: @props.colormapReorderable
 
   render: ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
