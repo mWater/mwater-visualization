@@ -206,8 +206,12 @@ module.exports = class BufferLayer extends Layer
 
   # Get min and max zoom levels
   getMinZoom: (design) -> 
-    # TODO hide when zoomed out too far
-    return null
+    # Earth is 40000km around, is 256 pixels. So zoom z radius map of r takes up 2*r*256*2^z/40000000 meters.
+    # So zoom with 5 pixels across = log2(4000000*5/(2*r*256))
+    if design.radius
+      return Math.ceil(Math.log(40000000*5/(2*design.radius*256))/Math.log(2))
+    else
+      return null
 
   getMaxZoom: (design) -> null
 
