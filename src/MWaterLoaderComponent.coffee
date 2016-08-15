@@ -22,6 +22,8 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
     extraTables: React.PropTypes.arrayOf(React.PropTypes.string)  # Extra tables to load in schema. Forms are not loaded by default as they are too many
     onExtraTablesChange: React.PropTypes.func                     # Called when extra tables are changed and schema should be reloaded
 
+    addLayerElementFactory: React.PropTypes.func       # Override default add layer component. See AddLayerComponent for details
+
     children: React.PropTypes.func.isRequired                 # Called with (error, { schema:, dataSource: })
 
   constructor: ->
@@ -67,6 +69,7 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
 
   @childContextTypes: 
     tableSelectElementFactory: React.PropTypes.func
+    addLayerElementFactory: React.PropTypes.func
   
   getChildContext: ->
     { 
@@ -81,6 +84,7 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
           extraTables: @props.extraTables
           onExtraTablesChange: @props.onExtraTablesChange
         )
+      addLayerElementFactory: @props.addLayerElementFactory
     }
 
   render: ->

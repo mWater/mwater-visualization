@@ -16,6 +16,9 @@ module.exports = class AddLayerComponent extends React.Component
     schema: React.PropTypes.object.isRequired # Schema to use
     dataSource: React.PropTypes.object.isRequired
 
+  @contextTypes:
+    addLayerElementFactory: React.PropTypes.func  # Can be overridden by setting addLayerElementFactory in context that takes ({schema: , dataSource, design, onDesignChange, firstLayer})
+
   handleAddLayer: (newLayer) =>
     layerView = {
       id: uuid.v4()
@@ -41,9 +44,8 @@ module.exports = class AddLayerComponent extends React.Component
     @props.onDesignChange(design)
 
   render: ->
-    # TODO REMOVE
-    MWaterAddLayerComponent = require './MWaterAddLayerComponent'
-    return R MWaterAddLayerComponent, @props
+    if @context.addLayerElementFactory
+      return @context.addLayerElementFactory(@props)    
 
     newLayers = [
       {
