@@ -6,7 +6,8 @@ R = React.createElement
 uuid = require 'node-uuid'
 LayerFactory = require './LayerFactory'
 
-# Dropdown to add a new layer. Can be overridden by context of addLayerElementFactory which is called with { schema, dataSource } # TODO
+# Dropdown to add a new layer. 
+# Can be overridden by context of addLayerElementFactory which is called with all props
 module.exports = class AddLayerComponent extends React.Component
   @propTypes:
     firstLayer: React.PropTypes.bool  # True if for first layer
