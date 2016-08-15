@@ -40,6 +40,14 @@ module.exports = class ItemsHtmlConverter
 
           attrs += "\""
 
+        # Add href
+        if item.href
+          attrs += " href=\"" + _.escape(item.href) + '"'
+
+        # Add target
+        if item.target
+          attrs += " target=\"" + _.escape(item.target) + '"'
+
         # Special case for self-closing tags
         if item.tag in ['br']
           html += "<#{item.tag}#{attrs}>"
@@ -107,6 +115,12 @@ module.exports = class ItemsHtmlConverter
           for style in node.style
             item.style = item.style or {}
             item.style[style] = node.style[style]
+
+        # Add href and target
+        if node.href
+          item.href = node.href
+        if node.target
+          item.target = node.target
 
         items.push(item)
 

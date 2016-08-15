@@ -6,6 +6,7 @@ ColorMapComponent = require './ColorMapComponent'
 update = require 'update-object'
 AxisBuilder = require './AxisBuilder'
 c_c = require 'color-mixer'
+ColorMapOrderEditorComponent = require './ColorMapOrderEditorComponent'
 
 # color editor for axis
 module.exports = class AxisColorEditorComponent extends React.Component
@@ -14,10 +15,12 @@ module.exports = class AxisColorEditorComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired
     axis: React.PropTypes.object.isRequired
     onChange: React.PropTypes.func.isRequired
-    colorMapOptional: React.PropTypes.bool
+    colorMapOptional: React.PropTypes.bool # is colormap optional
+    colormapReorderable: React.PropTypes.bool # is the color map reorderable
 
   @defaultProps:
     colorMapOptional: false
+    colormapReorderable: false
 
   constructor: ->
     super
@@ -83,13 +86,18 @@ module.exports = class AxisColorEditorComponent extends React.Component
     @setState(mode: "palette")
 
   onPaletteChange: (palette) =>
-    @props.onChange(update(@props.axis, { colorMap: { $set: palette }}))
+    @props.onChange(update(@props.axis, { colorMap: { $set: palette }, drawOrder: { $set: _.pluck(palette, "value") }}))
     @setState(mode: "normal")
+
+  handleDrawOrderChange: (order) =>
+    @props.onChange(update(@props.axis, { drawOrder: { $set: order }}))
 
   handleCancelCustomize: =>
     @setState(mode: "normal")
 
   render: ->
+    drawOrder = @props.axis.drawOrder or _.pluck(@props.axis.colorMap, "value")
+
     H.div null,
       if @state.mode == "palette"
         R ColorPaletteCollectionComponent, {
@@ -110,22 +118,27 @@ module.exports = class AxisColorEditorComponent extends React.Component
           H.a style: { cursor: "pointer" }, onClick: @handleCancelCustomize, key: "cancel-customize", "Close"
         ]
       if @state.mode == "normal"
-        [
+        H.div null,
           if @props.axis.colorMap
-            [
-              H.div key: "selected-palette",
-                H.div className: "axis-palette",
-                _.map @props.axis.colorMap.slice(0,6), (map, i) =>
-                  cellStyle =
-                    display: 'inline-block'
-                    height: 20
-                    width: 20
-                    backgroundColor: map.color
-                  H.div style: cellStyle, key: i, " "
-              H.a style: { cursor: "pointer" }, onClick: @handleCustomizePalette, key: "customize-palette", style: {marginRight: 10}, "Customize color scheme"
-            ]
-          H.a style: { cursor: "pointer" }, onClick: @handleSelectPalette, key: "select-palette", "Select color scheme"
-        ]
+            H.div key: "selected-palette",
+              H.div className: "axis-palette",
+              _.map @props.axis.colorMap.slice(0,6), (map, i) =>
+                cellStyle =
+                  display: 'inline-block'
+                  height: 20
+                  width: 20
+                  backgroundColor: map.color
+                H.div style: cellStyle, key: i, " "
+              H.p null,
+                H.a style: { cursor: "pointer" }, onClick: @handleCustomizePalette, key: "customize-palette", style: {marginRight: 10}, "Customize color scheme"
+          H.p null,
+            H.a style: { cursor: "pointer" }, onClick: @handleSelectPalette, key: "select-palette", "Select color scheme"
+          if drawOrder and @props.colormapReorderable
+            R ColorMapOrderEditorComponent,
+              colorMap: @props.axis.colorMap
+              order: drawOrder
+              categories: @state.categories
+              onChange: @handleDrawOrderChange
 
 
 class ColorPaletteCollectionComponent extends React.Component

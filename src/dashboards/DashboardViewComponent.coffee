@@ -13,7 +13,6 @@ ReactElementPrinter = require 'react-library/lib/ReactElementPrinter'
 LayoutManager = require '../layouts/LayoutManager'
 WidgetScopesViewComponent = require '../widgets/WidgetScopesViewComponent'
 
-
 # Displays a dashboard, handling removing of widgets. No title bar or other decorations.
 # Handles scoping
 module.exports = class DashboardViewComponent extends React.Component
@@ -96,7 +95,7 @@ module.exports = class DashboardViewComponent extends React.Component
     }
 
     # Render widget container
-    return H.div style: style, 
+    return R DragDropContextComponent, style: style, 
       @renderScopes()
 
       layoutManager.renderLayout({
@@ -106,5 +105,10 @@ module.exports = class DashboardViewComponent extends React.Component
         onItemsChange: if @props.onDesignChange? then @handleItemsChange
         renderWidget: renderWidget
       })
+
+# Wrapper that has a nestable drag drop context
+class DragDropContextComponent extends React.Component
+  render: ->
+    return H.div @props
         
-module.exports = NestableDragDropContext(HTML5Backend)(DashboardViewComponent)
+DragDropContextComponent = NestableDragDropContext(HTML5Backend)(DragDropContextComponent)
