@@ -15,12 +15,12 @@ module.exports = class AxisColorEditorComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired
     axis: React.PropTypes.object.isRequired
     onChange: React.PropTypes.func.isRequired
-    colorMapOptional: React.PropTypes.bool # is colormap optional
-    colormapReorderable: React.PropTypes.bool # is the color map reorderable
+    colorMapOptional: React.PropTypes.bool # is colorMap optional
+    colorMapReorderable: React.PropTypes.bool # is the color map reorderable
 
   @defaultProps:
     colorMapOptional: false
-    colormapReorderable: false
+    colorMapReorderable: false
 
   constructor: ->
     super
@@ -114,7 +114,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
             axis: @props.axis
             onChange: @props.onChange
             categories: @state.categories
-            key: "colormap"
+            key: "colorMap"
           H.a style: { cursor: "pointer" }, onClick: @handleCancelCustomize, key: "cancel-customize", "Close"
         ]
       if @state.mode == "normal"
@@ -133,7 +133,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
                 H.a style: { cursor: "pointer" }, onClick: @handleCustomizePalette, key: "customize-palette", style: {marginRight: 10}, "Customize color scheme"
           H.p null,
             H.a style: { cursor: "pointer" }, onClick: @handleSelectPalette, key: "select-palette", "Select color scheme"
-          if drawOrder and @props.colormapReorderable
+          if drawOrder and @props.colorMapReorderable
             R ColorMapOrderEditorComponent,
               colorMap: @props.axis.colorMap
               order: drawOrder
@@ -173,12 +173,12 @@ class ColorPaletteCollectionComponent extends React.Component
     if index > 2
       scheme = ColorPaletteCollectionComponent.generateColorFadeScheme({ hex: scheme[0]}, @props.categories.length)
 
-    colormap = _.map @props.categories, (category, i) ->
+    colorMap = _.map @props.categories, (category, i) ->
       {
         value: category.value
         color: scheme[i % scheme.length]
       }
-    @props.onPaletteSelected(colormap)
+    @props.onPaletteSelected(colorMap)
 
   renderCancel: =>
     if @props.axis.colorMap

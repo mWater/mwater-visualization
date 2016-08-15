@@ -90,7 +90,7 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
           aggrNeed: "none"
           value: @props.design.axes.color
           showColorMap: true
-          colormapReorderable: true
+          colorMapReorderable: true
           onChange: @handleColorAxisChange)
 
   renderColor: ->
