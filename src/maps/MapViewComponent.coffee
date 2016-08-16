@@ -99,6 +99,14 @@ module.exports = class MapViewComponent extends React.Component
       background: "rgba(255,255,255,0.8)"
       boxShadow: "0 0 15px rgba(0,0,0,0.2)"
       borderRadius: 5
+      position: 'absolute'
+      right: 10
+      bottom: 35
+#      top: 10
+      maxHeight: '85%'
+      overflowY: 'auto'
+      zIndex: 9
+      fontSize: 12
     }
 
     H.div style: style,
@@ -162,7 +170,7 @@ module.exports = class MapViewComponent extends React.Component
 
       leafletLayers.push(leafletLayer)
 
-    H.div style: { width: @props.width, height: @props.height },
+    H.div style: { width: @props.width, height: @props.height, position: 'relative' },
       @renderPopup()
       R LeafletMapComponent,
         initialBounds: @props.design.bounds
