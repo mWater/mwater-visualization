@@ -61,10 +61,8 @@ module.exports = class AxisBuilder
     # Clean expression
     axis.expr = @exprCleaner.cleanExpr(axis.expr, { table: options.table, aggrStatuses: aggrStatuses })
 
-    # Remove if null or no type 
+    # Allow no type here, as if/then has no type temporarily
     type = @exprUtils.getExprType(axis.expr)
-    if not type
-      return
 
     # Validate xform type
     if axis.xform
@@ -88,7 +86,7 @@ module.exports = class AxisBuilder
         delete axis.xform
 
     # If no xform and using an xform would allow satisfying output types, pick first
-    if not axis.xform and options.types and type not in options.types
+    if not axis.xform and options.types and type and type not in options.types
       xform = _.find(xforms, (xf) -> xf.input == type and xf.output in options.types)
       if xform
         axis.xform = { type: xform.type }
