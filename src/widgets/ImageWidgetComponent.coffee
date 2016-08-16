@@ -41,7 +41,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
       data: {}
       error: null
       editing: false
-      imageURL: null
+      imageUrl: null
       expr: null
       table: null
       uid: null
@@ -76,7 +76,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
   handleStartEditing: =>
     @setCurrentTab()
-    @setState(editing: true, imageURL: @props.design.imageURL, uid: @props.design.uid, expr: @props.design.expr)
+    @setState(editing: true, imageUrl: @props.design.imageUrl, uid: @props.design.uid, expr: @props.design.expr)
 
   handleTableChange: (table) => @setState(table: table)
 
@@ -88,15 +88,16 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
   onSave: () =>
     @setState(editing: false)
     updates =
-      imageURL: @state.imageURL
+      imageUrl: @state.imageUrl
       uid: @state.uid
       expr: @state.expr
+
     @props.onDesignChange(_.extend({}, @props.design, updates))
     return
 
   onCancel: () =>
     @setCurrentTab()
-    @setState(editing: false, imageURL: null, uid: null, expr: null)
+    @setState(editing: false, imageUrl: null, uid: null, expr: null)
 
   renderEditor: ->
     if not @state.editing
@@ -124,12 +125,12 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
   renderUrlEditor: ->
     H.div className: "form-group",
       H.label null, "URL to image"
-      H.input type: "text", className: "form-control", value: @state.imageURL or "", onChange: @onUrlChange
+      H.input type: "text", className: "form-control", value: @state.imageUrl or "", onChange: @onUrlChange
       H.p className: "help-block",
-        'e.g. http://lorempixel.com/sports/1'
+        'e.g. http://somesite.com/image.jpg'
 
   onUrlChange: (e) =>
-    @setState( imageURL: e.target.value, uid: null, expr: null)
+    @setState(imageUrl: e.target.value, uid: null, expr: null)
 
   renderUploadEditor: ->
     R ImageUploaderComponent,
@@ -139,7 +140,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
       uid: @props.design.uid
 
   onFileUpload: (uid) =>
-    @setState( imageURL: null, uid: uid, expr: null)
+    @setState(imageUrl: null, uid: uid, expr: null)
 
   renderExpressionEditor: ->
     H.div className: "form-group",
@@ -162,12 +163,10 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
             table: @state.table
             types: ['image', 'imagelist']
             value: @state.expr
-            # Only individual if singleRowTable
-            aggrStatuses: if @state.table == @props.singleRowTable then ["individual", "literal"] else ['literal', "aggregate"]
+            aggrStatuses: ["individual", "literal"]
             onChange: @handleExpressionChange
 
   handleExpressionChange: (expr) =>
-    console.log expr
     @setState(expr: expr)
 
   renderContent: ->
@@ -190,7 +189,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
       height: @props.height
       dropdownItems: dropdownItems,
         @renderEditor()
-        if not @props.design.imageURL and not @props.design.expr and not @props.design.uid
+        if not @props.design.imageUrl and not @props.design.expr and not @props.design.uid
           @renderEditLink()
         else
           H.div style: { position: "relative", width: @props.width, height: @props.height, textAlign: "center" },

@@ -3,8 +3,9 @@ H = React.DOM
 R = React.createElement
 Dropzone = require 'react-dropzone'
 
-module.exports = class ImageUploaderComponent extends React.Component
+uuid = require 'node-uuid'
 
+module.exports = class ImageUploaderComponent extends React.Component
   @propTypes:
     apiUrl: React.PropTypes.string.isRequired # The base url for api
     client: React.PropTypes.string.isRequired # The client ID required for authentication
@@ -49,12 +50,7 @@ module.exports = class ImageUploaderComponent extends React.Component
     else
       alert "Upload failed: #{e.target.responseText}",
 
-  createId: ->
-    'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, (c) ->
-      r = Math.random()*16|0
-      v = if c == 'x' then r else (r&0x3|0x8)
-      return v.toString(16)
-    )
+  createId: -> uuid.v4().replace(/-/g, "")
   
   renderUploader: ->
     H.div null,

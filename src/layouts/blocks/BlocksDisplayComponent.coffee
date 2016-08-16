@@ -113,7 +113,7 @@ class BlocksDisplayComponent extends React.Component
           title: H.i className: "fa fa-align-left"
           subtitle: "Text"
         R PaletteItemComponent,
-          createItem: @createBlockItem({ type: "widget", widgetType: "Image", design: {} })
+          createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "Image", design: {} })
           title: H.i className: "fa fa-picture-o"
           subtitle: "Image"
         R PaletteItemComponent,
