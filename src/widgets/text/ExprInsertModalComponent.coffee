@@ -29,7 +29,7 @@ module.exports = class ExprInsertModalComponent extends React.Component
     }
 
   open: ->
-    @setState(open: true, expr: null, table: @props.singleRowTable)
+    @setState(open: true, expr: null, table: @props.singleRowTable, labelText: null)
 
   handleTableChange: (table) => @setState(table: table)
 
