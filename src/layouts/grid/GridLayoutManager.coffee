@@ -51,6 +51,10 @@ module.exports = class GridLayoutManager extends LayoutManager
         createItem: createWidgetItem("IFrame", {})
         title: H.i className: "fa fa-youtube-play"
         subtitle: "Video"
+      R PaletteItemComponent,
+        createItem: createWidgetItem("Image", {})
+        title: H.i className: "fa fa-image"
+        subtitle: "Image"
 
   # Renders the layout as a react element
   # options:

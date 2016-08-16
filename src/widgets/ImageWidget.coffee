@@ -38,6 +38,8 @@ module.exports = class ImageWidget extends Widget
       height: options.height
       standardWidth: options.standardWidth 
       singleRowTable: options.singleRowTable
+      apiUrl: options.widgetDataSource.apiUrl
+      client: options.widgetDataSource.client
 
   # Get the data that the widget needs. This will be called on the server, typically.
   #   design: design of the chart
