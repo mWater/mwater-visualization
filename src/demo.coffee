@@ -201,9 +201,9 @@ class MWaterDirectDashboardPane extends React.Component
 
     @state = {
       # design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" } # dashboardDesign
-      # design: design
-      design: imageWidgetDashboardDesign
-#      design: dashboardDesign
+      design: design
+      # design: imageWidgetDashboardDesign
+      # design: dashboardDesign
       extraTables: [] #['responses:e24f0a0ec11643cab3c21c07de2f6889']
     }
 
@@ -991,7 +991,7 @@ imageWidgetDashboardDesign = {
         "type": "Image",
         "design": {
           "uid": "cfce4760503a422d88da67ef55b1e82b",
-          "imageURL": null,
+          "imageUrl": null,
           "expr": null
 #          "imageURL": "https://img0.etsystatic.com/108/0/6281042/il_570xN.916411774_dslp.jpg"
         }
