@@ -91,11 +91,11 @@ module.exports = class LeafletMapComponent extends React.Component
       @map.fitBounds([[-1, -180], [1, 180]])
 
     # Add legend
-    @legendControl = L.control({position: 'bottomright'})
-    @legendControl.onAdd = (map) =>
-      @legendDiv = L.DomUtil.create('div', '')
-      return @legendDiv
-    @legendControl.addTo(@map)
+#    @legendControl = L.control({position: 'bottomright'})
+#    @legendControl.onAdd = (map) =>
+#      @legendDiv = L.DomUtil.create('div', '')
+#      return @legendDiv
+#    @legendControl.addTo(@map)
 
     # Update map with no previous properties
     @updateMap()
@@ -104,9 +104,9 @@ module.exports = class LeafletMapComponent extends React.Component
     @updateMap(prevProps)
 
   componentWillUnmount: ->
-    if @legendDiv
-      ReactDOM.unmountComponentAtNode(@legendDiv)
-      
+#    if @legendDiv
+#      ReactDOM.unmountComponentAtNode(@legendDiv)
+#
     @map.remove()
 
   # Open a popup.
@@ -220,10 +220,13 @@ module.exports = class LeafletMapComponent extends React.Component
                   layer.onGridClick({ data: ev.data })
 
     # Render legend
-    if @props.legend
-      ReactDOM.render(@props.legend, @legendDiv)
-    else if @legendDiv
-      ReactDOM.unmountComponentAtNode(@legendDiv)
+#    if @props.legend
+#      ReactDOM.render(@props.legend, @legendDiv)
+#    else if @legendDiv
+#      ReactDOM.unmountComponentAtNode(@legendDiv)
     
-  render: -> 
-    H.div(ref: "map", style: { width: @props.width, height: @props.height })
+  render: ->
+    H.div null,
+      if @props.legend
+        @props.legend
+      H.div(ref: "map", style: { width: @props.width, height: @props.height })
