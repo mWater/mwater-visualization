@@ -445,7 +445,6 @@ class MWaterDatagridPane extends React.Component
 #     onDesignChange: React.PropTypes.func  # Null/undefined for readonly
 #     })
 
-
 $ ->
   sample = H.div className: "container-fluid", style: { height: "100%", paddingLeft: 0, paddingRight: 0 },
     H.style null, '''html, body, #main { height: 100% }'''

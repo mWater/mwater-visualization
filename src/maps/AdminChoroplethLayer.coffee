@@ -260,7 +260,9 @@ module.exports = class AdminChoroplethLayer extends Layer
       categories = axisBuilder.getCategories(design.axes.color)
 
       colors = _.map design.axes.color.colorMap, (colorItem) =>
-        {color: colorItem.color, name: ExprUtils.localizeString(_.find(categories, {value: colorItem.value})?.label) }
+        category = _.find(categories, {value: colorItem.value})
+        _name = if category then ExprUtils.localizeString(category.label) else colorItem.value
+        {color: colorItem.color, name: _name }
       colors.push({ color: design.color, name: "None"})
     else
       colors = []
