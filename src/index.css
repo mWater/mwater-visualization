@@ -393,3 +393,12 @@
   padding-right: 2px;
   background-color: rgba(212, 235, 255, 0.8);
 }
+
+.dropzone{
+    width: 100%;
+    padding: 80px 40px;
+    border: 2px dashed rgb(102, 102, 102);
+    border-radius: 5px;
+    text-align: center;
+    vertical-align: middle;
+}
