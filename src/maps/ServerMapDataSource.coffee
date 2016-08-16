@@ -1,6 +1,8 @@
 _ = require 'lodash'
 querystring = require 'querystring'
 MapDataSource = require './MapDataSource'
+LayerFactory = require './LayerFactory'
+injectTableAlias = require('mwater-expressions').injectTableAlias
 
 # Get map urls for map stored on server
 module.exports = class ServerMapDataSource extends MapDataSource
@@ -9,12 +11,14 @@ module.exports = class ServerMapDataSource extends MapDataSource
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   #   mapDesign: design of entire map
+  #   schema: schema to use
   #   share: share id to use for talking to mWater server
   #   mapId: map id to use on server
   constructor: (options) ->
     @apiUrl = options.apiUrl
     @client = options.client
     @mapDesign = options.mapDesign
+    @schema = options.schema
     @share = options.share
     @mapId = options.mapId
 
