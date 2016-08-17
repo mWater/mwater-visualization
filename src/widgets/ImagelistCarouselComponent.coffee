@@ -55,10 +55,9 @@ module.exports = class ImagelistCarouselComponent extends React.Component
         _.map @props.imagelist, (img, i) =>
           H.li className: if i == @state.activeImage then "active"
 
-# Wrapper for slides
+      # Wrapper for slides
       H.div className: "carousel-inner",
         @renderImages()
-#        _.map @props.imagelist, (img, i) => @renderImage(img, i)
 
       H.a className: "left carousel-control",
         H.span className: "glyphicon glyphicon-chevron-left", onClick: @handleLeft
