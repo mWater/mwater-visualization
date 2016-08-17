@@ -64,7 +64,6 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
     # Get data
     props.widgetDataSource.getData(props.filters, (error, data) =>
       callback(error: error, data: data )
-      console.log data
     )
     
   setCurrentTab: ->
@@ -175,7 +174,6 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
             onChange: @handleExpressionChange
 
   handleExpressionChange: (expr) =>
-    console.log expr
     @setState(imageUrl: null, uid: null, expr: expr)
 
   renderContent: ->

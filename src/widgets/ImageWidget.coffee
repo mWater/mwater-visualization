@@ -52,6 +52,8 @@ module.exports = class ImageWidget extends Widget
   #   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   #   callback: (error, data)
   getData: (design, schema, dataSource, filters, callback) ->
+    if not design.expr
+      return callback(null)
     # TODO! Should get expression value if using expression
 
     table = design.expr.table
