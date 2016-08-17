@@ -40,6 +40,7 @@ module.exports = class BufferLayer extends Layer
   #   schema: schema to use
   #   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
   getJsonQLCss: (design, schema, filters) ->
+    console.log JSON.stringify(@createKMLExportJsonQL(design, schema, filters))
     # Create design
     layerDef = {
       layers: [{ id: "layer0", jsonql: @createJsonQL(design, schema, filters) }]
@@ -337,19 +338,6 @@ module.exports = class BufferLayer extends Layer
       ]
     }
 
-    # bufferedGeometry = {
-    #   type: "op", op: "ST_Transform", exprs: [
-    #     { type: "op", op: "::geometry", exprs: [
-    #       { type: "op", op: "ST_Buffer", exprs: [
-    #         { type: "op", op: "::geography", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326] }] }
-    #         design.radius
-    #         ]}
-    #       ]}
-    #     3857
-    #   ]
-    # }
-    # geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
-
     selects = [
       { type: "select", expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table).primaryKey }, alias: "id" } # main primary key as id
       { type: "select", expr: bufferedGeometry, alias: "the_geom_webmercator" } 
@@ -399,6 +387,50 @@ module.exports = class BufferLayer extends Layer
       query.where = { type: "op", op: "and", exprs: whereClauses }
     else
       query.where = whereClauses[0]
+
+    # if draworder is
+    if design.axes.color and design.axes.color.colorMap
+      order = design.axes.color.drawOrder or _.pluck(design.axes.color.colorMap, "value")
+
+      # color on top gets rendered last
+      actualOrder = _(order).reverse().value()
+      outerQuery = {
+        type: "query"
+        selects: [
+          { type: "select", expr: { type: "field", tableAlias: "outer", column: "id" }, alias: "id" }
+          { type: "select", expr: { type: "field", tableAlias: "outer", column: "the_geom_webmercator" }, alias: "the_geom_webmercator" }
+          { type: "select", expr: { type: "field", tableAlias: "outer", column: "color" }, alias: "color" }
+        ]
+        from: {
+          type: "subquery"
+          query: query,
+          alias: "outer"
+        }
+        join: {
+          type: "join"
+          left: "outer"
+          right: {
+            type: "literal"
+            value: "( VALUES (7,1),(2,2),(5,3),(6,4),(1,5),(0,6),(3,7),(4,8) )"
+            alias: "ordering(id, _order)"
+          }
+          on: {
+            type: "op"
+            op: "="
+            exprs: [
+              { type: "field", tableAlias: "ordering", column: "_order" }
+              { type: "field", tableAlias: "outer", column: "color" }
+            ]
+          }
+        }
+        orderBy: [
+          {
+            expr: { type: "field", tableAlias: "ordering", column: "_order" }
+          }
+        ]
+      }
+
+      return outerQuery
 
     return query
 
