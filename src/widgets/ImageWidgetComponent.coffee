@@ -121,8 +121,8 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
     footer =
       H.div null,
-        H.button(type: "button", className: "btn btn-default", onClick: @onSave, "Save")
-        H.button(type: "button", className: "btn btn-danger", onClick: @onCancel, "Cancel")
+        H.button(key: "save", type: "button", className: "btn btn-primary", onClick: @onSave, "Save")
+        H.button(key: "cancel", type: "button", className: "btn btn-default", onClick: @onCancel, "Cancel")
 
     return R ModalPopupComponent,
       header: "Configure"
