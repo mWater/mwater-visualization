@@ -40,6 +40,8 @@ class BlocksDisplayComponent extends React.Component
     @props.onItemsChange(items)
 
   renderBlock: (block) =>
+    elem = null
+
     switch block.type
       when "root"
         return R RootBlockComponent, key: block.id, block: block, renderBlock: @renderBlock, onBlockDrop: @handleBlockDrop, onBlockRemove: @handleBlockRemove
@@ -56,7 +58,7 @@ class BlocksDisplayComponent extends React.Component
             }
 
         if @props.onItemsChange
-          return R DraggableBlockComponent, 
+          elem = R DraggableBlockComponent, 
             key: block.id
             block: block
             onBlockDrop: @handleBlockDrop,
@@ -66,9 +68,7 @@ class BlocksDisplayComponent extends React.Component
                 onAspectRatioChange: if block.aspectRatio? then (aspectRatio) => @props.onItemsChange(blockUtils.updateBlock(@props.items, _.extend({}, block, aspectRatio: aspectRatio)))
                 onBlockRemove: (if @props.onItemsChange then @handleBlockDrop.bind(null, block)),
                   elem
-        else
-          return elem
-
+    
       when "widget"
         elem = R AutoSizeComponent, { injectWidth: true, key: block.id }, 
           (size) =>
@@ -82,7 +82,7 @@ class BlocksDisplayComponent extends React.Component
             })
 
         if @props.onItemsChange
-          return R DraggableBlockComponent, 
+          elem = R DraggableBlockComponent, 
             key: block.id
             block: block
             onBlockDrop: @handleBlockDrop,
@@ -92,10 +92,12 @@ class BlocksDisplayComponent extends React.Component
                 onAspectRatioChange: if block.aspectRatio? then (aspectRatio) => @props.onItemsChange(blockUtils.updateBlock(@props.items, _.extend({}, block, aspectRatio: aspectRatio)))
                 onBlockRemove: (if @props.onItemsChange then @handleBlockDrop.bind(null, block)),
                   elem
-        else
-          return elem
       else
         throw new Error("Unknown block type #{block.type}")
+
+    # Wrap block in padding
+    return H.div style: { paddingLeft: 15, paddingRight: 15, paddingBottom: 15 },
+      elem
 
   createBlockItem: (block) ->
     # Add unique id
