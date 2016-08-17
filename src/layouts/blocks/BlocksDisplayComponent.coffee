@@ -35,10 +35,12 @@ class BlocksDisplayComponent extends React.Component
     # Remove source
     items = blockUtils.removeBlock(@props.items, sourceBlock)
     items = blockUtils.dropBlock(items, sourceBlock, targetBlock, side)
+    items = blockUtils.cleanBlock(items)
     @props.onItemsChange(items)
 
   handleBlockRemove: (block) =>
     items = blockUtils.removeBlock(@props.items, block)
+    items = blockUtils.cleanBlock(items)
     @props.onItemsChange(items)
 
   renderBlock: (block) =>
@@ -171,7 +173,7 @@ class RootBlockComponent extends React.Component
     R DraggableBlockComponent, 
       block: @props.block
       onBlockDrop: @props.onBlockDrop
-      style: { height: "100%", padding: 30 }
+      style: { height: "100%" },
       onlyBottom: true,
         H.div key: "root",
           _.map @props.block.blocks, (block) =>

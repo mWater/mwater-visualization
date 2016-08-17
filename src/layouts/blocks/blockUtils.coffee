@@ -108,3 +108,20 @@ exports.removeBlock = (rootBlock, block) ->
     return _.extend({}, rootBlock, blocks: blocks)
   
   return rootBlock
+
+# Clean blocks, simplifying as needed
+exports.cleanBlock = (rootBlock) ->
+  # If vertical or horizontal
+  if rootBlock.type in ['vertical', 'horizontal', 'root']
+    blocks = rootBlock.blocks
+
+    # Simplify
+    if blocks.length == 1 and rootBlock.type != "root"
+      return blocks[0]
+
+    # Recurse
+    blocks = _.map(blocks, (b) -> exports.cleanBlock(b))
+
+    return _.extend({}, rootBlock, blocks: blocks)
+  
+  return rootBlock

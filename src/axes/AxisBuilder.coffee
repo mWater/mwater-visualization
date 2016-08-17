@@ -62,6 +62,9 @@ module.exports = class AxisBuilder
     axis.expr = @exprCleaner.cleanExpr(axis.expr, { table: options.table, aggrStatuses: aggrStatuses })
 
     # Allow no type here, as if/then has no type temporarily
+    if not axis.expr
+      return null
+      
     type = @exprUtils.getExprType(axis.expr)
 
     # Validate xform type
