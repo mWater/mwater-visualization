@@ -41,6 +41,9 @@ Dashboard design is:
  `expr`: filter expression (left hand side only. Usually enum or text)
  `label`: optional label
 
+`layout`: layout engine to use (`blocks` is new default) 
+`style`: optional stylesheet to use
+
 ### Widget data
 
 `widget` contains:

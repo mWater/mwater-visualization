@@ -3,6 +3,7 @@ H = React.DOM
 R = React.createElement
 
 # Block decorated with drag/remove hover controls
+# TODO make zero border
 module.exports = class DecoratedBlockComponent extends React.Component
   @propTypes:
     style: React.PropTypes.object   # Style to add to outer div
@@ -68,26 +69,26 @@ module.exports = class DecoratedBlockComponent extends React.Component
       return null
   
   render: ->
-    elem = H.div className: "mwater-visualization-block", style: @props.style,
+    elem = H.div className: "mwater-visualization-decorated-block", style: @props.style,
       @props.children
     
       @renderAspectDrag()
 
       if not @props.isDragging and @props.connectMoveHandle?
-        @props.connectMoveHandle(H.div key: "move", className: "mwater-visualization-block-move",
+        @props.connectMoveHandle(H.div key: "move", className: "mwater-visualization-decorated-block-move",
           H.i className: "fa fa-arrows")
 
       if not @props.isDragging and @props.onBlockRemove?
-        H.div key: "remove", className: "mwater-visualization-block-remove", onClick: @props.onBlockRemove,
+        H.div key: "remove", className: "mwater-visualization-decorated-block-remove", onClick: @props.onBlockRemove,
           H.i className: "fa fa-times"
 
       if not @props.isDragging and @props.onAspectRatioChange?
         # TODO sometimes drags (onDragStart) and so doesn't work. Disable dragging?
-        H.div key: "aspect", className: "mwater-visualization-block-aspect", onMouseDown: @handleAspectMouseDown,
+        H.div key: "aspect", className: "mwater-visualization-decorated-block-aspect", onMouseDown: @handleAspectMouseDown,
           H.i className: "fa fa-arrows-v"
 
       if not @props.isDragging and @props.connectResizeHandle?
-        @props.connectResizeHandle(H.div key: "resize", className: "mwater-visualization-block-resize",
+        @props.connectResizeHandle(H.div key: "resize", className: "mwater-visualization-decorated-block-resize",
           H.i className: "fa fa-expand fa-rotate-90")
 
     if @props.connectDragPreview

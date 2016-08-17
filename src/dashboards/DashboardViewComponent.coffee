@@ -103,6 +103,7 @@ module.exports = class DashboardViewComponent extends React.Component
         standardWidth: @props.standardWidth
         items: @props.design.items
         onItemsChange: if @props.onDesignChange? then @handleItemsChange
+        style: @props.design.style
         renderWidget: renderWidget
       })
 

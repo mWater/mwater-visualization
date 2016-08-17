@@ -20,6 +20,8 @@ class BlocksDisplayComponent extends React.Component
     items: React.PropTypes.object.isRequired
     onItemsChange: React.PropTypes.func
 
+    style: React.PropTypes.string   # Stylesheet to use. null for default
+
     # Renders a widget. Passed (options)
     #  id: id of widget
     #  type: type of the widget
@@ -96,7 +98,7 @@ class BlocksDisplayComponent extends React.Component
         throw new Error("Unknown block type #{block.type}")
 
     # Wrap block in padding
-    return H.div style: { paddingLeft: 15, paddingRight: 15, paddingBottom: 15 },
+    return H.div className: "mwater-visualization-block-#{@props.style or "default"}",
       elem
 
   createBlockItem: (block) ->
@@ -153,7 +155,7 @@ class BlocksDisplayComponent extends React.Component
         H.tr null,
           if @props.onItemsChange
             @renderPalette()
-          H.td key: "design", style: { verticalAlign: "top", height: "100%" },
+          H.td key: "design", className: "mwater-visualization-block-parent-#{@props.style or "default"}", style: { verticalAlign: "top", height: "100%" },
             @renderBlock(@props.items)
 
 module.exports = NestableDragDropContext(HTML5Backend)(BlocksDisplayComponent)
