@@ -78,6 +78,21 @@ design = {
     "blocks": [
       {
         "type": "widget",
+        "aspectRatio": 1.4,
+        "widgetType": "Image",
+        "design": {
+          "imageUrl": null,
+          "uid": null,
+          "expr": {
+            "type": "field",
+            "table": "responses:e24f0a0ec11643cab3c21c07de2f6889",
+            "column": "data:c3f07eeec3ab4324a2f2d69949384c8c:value"
+          }
+        },
+        "id": "5b26dacb-afdc-4105-92a0-105e86d47d90"
+      },
+      {
+        "type": "widget",
         "widgetType": "Text",
         "design": {
           "style": "title",
@@ -204,7 +219,7 @@ class MWaterDirectDashboardPane extends React.Component
       design: design
       # design: imageWidgetDashboardDesign
       # design: dashboardDesign
-      extraTables: [] #['responses:e24f0a0ec11643cab3c21c07de2f6889']
+      extraTables: ['responses:e24f0a0ec11643cab3c21c07de2f6889'] #['responses:e24f0a0ec11643cab3c21c07de2f6889']
     }
 
   handleDesignChange: (design) =>

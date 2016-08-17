@@ -14,6 +14,7 @@ TabbedComponent = require('react-library/lib/TabbedComponent')
 ExprComponent = require("mwater-expressions-ui").ExprComponent
 TableSelectComponent = require '../TableSelectComponent'
 ImageUploaderComponent = require './ImageUploaderComponent'
+ImagelistCarouselComponent = require './ImagelistCarouselComponent'
 
 module.exports = class ImageWidgetComponent extends AsyncLoadComponent
   @propTypes: 
@@ -38,7 +39,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
     @state = {
       # Widget data
-      data: {}
+      data: []
       error: null
       editing: false
       imageUrl: null
@@ -51,19 +52,19 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
     }
 
   # Override to determine if a load is needed. Not called on mounting
-  isLoadNeeded: (newProps, oldProps) -> 
-    # TODO load the expression value from the widget data source if needed
-    return false
+  isLoadNeeded: (newProps, oldProps) ->
+    return newProps.design.expr and not _.isEqual(newProps.design.expr, oldProps.design.expr)
 
   # Call callback with state changes
   load: (props, prevProps, callback) -> 
     # TODO load the expression value from the widget data source only if needed
-    callback(null)
-    return
+#    callback(null)
+#    return
 
     # Get data
     props.widgetDataSource.getData(props.filters, (error, data) =>
       callback(error: error, data: data )
+      console.log data
     )
     
   setCurrentTab: ->
@@ -76,7 +77,14 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
   handleStartEditing: =>
     @setCurrentTab()
-    @setState(editing: true, imageUrl: @props.design.imageUrl, uid: @props.design.uid, expr: @props.design.expr)
+    state =
+      editing: true
+      imageUrl: @props.design.imageUrl
+      uid: @props.design.uid
+      expr: @props.design.expr
+      table: @props.design.expr?.table
+
+    @setState(state)
 
   handleTableChange: (table) => @setState(table: table)
 
@@ -97,7 +105,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
   onCancel: () =>
     @setCurrentTab()
-    @setState(editing: false, imageUrl: null, uid: null, expr: null)
+    @setState(editing: false, imageUrl: null, uid: null, expr: null, table: null, files: null, uploading: false)
 
   renderEditor: ->
     if not @state.editing
@@ -167,7 +175,8 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
             onChange: @handleExpressionChange
 
   handleExpressionChange: (expr) =>
-    @setState(expr: expr)
+    console.log expr
+    @setState(imageUrl: null, uid: null, expr: expr)
 
   renderContent: ->
     if @props.design.imageUrl or @props.design.uid
@@ -177,7 +186,10 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
       @renderExpression()
 
   renderExpression: ->
-    H.img style: { maxWidth: "100%", maxHeight: "100%"}, src: "https://img0.etsystatic.com/119/0/6281042/il_570xN.1025495956_8oux.jpg"
+    R ImagelistCarouselComponent,
+      apiUrl: @props.apiUrl
+      imagelist: @state.data
+#    H.img style: { maxWidth: "100%", maxHeight: "100%"}, src: "https://img0.etsystatic.com/119/0/6281042/il_570xN.1025495956_8oux.jpg"
 
   render: ->
     dropdownItems = []
