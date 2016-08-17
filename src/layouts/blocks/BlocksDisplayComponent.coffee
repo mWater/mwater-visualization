@@ -108,7 +108,7 @@ class BlocksDisplayComponent extends React.Component
     return () -> { block: _.extend({}, block, id: uuid.v4()) }
 
   renderPalette: ->
-    H.td key: "palette", style: { width: 102, verticalAlign: "top", height: "100%" }, 
+    H.div key: "palette", style: { width: 102, height: "100%", position: "absolute", top: 0, left: 0 }, 
       H.div className: "mwater-visualization-palette", style: { height: "100%" },
         R PaletteItemComponent, 
           createItem: @createBlockItem({ type: "widget", widgetType: "Text", design: { style: "title" } })
@@ -152,13 +152,11 @@ class BlocksDisplayComponent extends React.Component
           subtitle: "Video"
 
   render: ->
-    return H.table style: { width: "100%", height: "100%", tableLayout: "fixed" },
-      H.tbody null,
-        H.tr null,
-          if @props.onItemsChange
-            @renderPalette()
-          H.td key: "design", className: "mwater-visualization-block-parent-#{@props.style or "default"}", style: { verticalAlign: "top", height: "100%" },
-            @renderBlock(@props.items)
+    H.div style: { width: "100%", height: "100%", overflow: "hidden", position: "relative" },
+      if @props.onItemsChange
+        @renderPalette()
+      H.div key: "design", className: "mwater-visualization-block-parent-#{@props.style or "default"}", style: { height: "100%", overflow: "auto", marginLeft: (if @props.onItemsChange then 102) },
+        @renderBlock(@props.items)
 
 module.exports = NestableDragDropContext(HTML5Backend)(BlocksDisplayComponent)
 

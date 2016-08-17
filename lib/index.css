@@ -179,9 +179,13 @@
   min-width: 50px;
 }
 
+.mwater-visualization-block-parent-default {
+  padding: 15px;
+}
+
 .mwater-visualization-block-parent-greybg {
   background-color: #DDD;
-  padding: 0.1px; /* To prevent collapse */
+  padding: 10px;
 }
 
 .mwater-visualization-block-default {
