@@ -40,7 +40,6 @@ module.exports = class BufferLayer extends Layer
   #   schema: schema to use
   #   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
   getJsonQLCss: (design, schema, filters) ->
-    console.log JSON.stringify(@createKMLExportJsonQL(design, schema, filters))
     # Create design
     layerDef = {
       layers: [{ id: "layer0", jsonql: @createJsonQL(design, schema, filters) }]
