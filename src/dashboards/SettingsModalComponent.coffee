@@ -49,6 +49,7 @@ module.exports = class SettingsModalComponent extends React.Component
           schema: @props.schema
           dataSource: @props.dataSource
         }
+        H.br()
         H.div className: "form-group",
           H.label null, "Style"
           H.select className: "form-control", value: @state.design.style or "", onChange: @handleStyleChange,
