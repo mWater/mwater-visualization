@@ -184,9 +184,13 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
       @renderExpression()
 
   renderExpression: ->
-    R ImagelistCarouselComponent,
-      apiUrl: @props.apiUrl
-      imagelist: @state.data
+    if @state.loading
+      H.span null, "Loading"
+    else
+      R ImagelistCarouselComponent,
+        apiUrl: @props.apiUrl
+        imagelist: @state.data
+        height: @props.height
 #    H.img style: { maxWidth: "100%", maxHeight: "100%"}, src: "https://img0.etsystatic.com/119/0/6281042/il_570xN.1025495956_8oux.jpg"
 
   render: ->

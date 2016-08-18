@@ -8,6 +8,7 @@ module.exports = class ImagelistCarouselComponent extends React.Component
   @propTypes:
     imagelist: React.PropTypes.array  # Array of { id, cover: true/false }
     apiUrl: React.PropTypes.string.isRequired # The base api url
+    height: React.PropTypes.number
 
   constructor: ->
     super
@@ -28,8 +29,8 @@ module.exports = class ImagelistCarouselComponent extends React.Component
       @setState(activeImage: activeImage)
 
   renderImage: (img, i) ->
-    H.div className: "item #{if i == @state.activeImage then "active" else ""}",
-      H.img style: { maxWidth: "100%", maxHeight: "100%"}, src: @props.apiUrl + 'images/' + img.id+ "?h=400"
+    H.div className: "item #{if i == @state.activeImage then "active" else ""}", style: {height: @props.height},
+      H.img style: { margin: '0 auto', height: @props.height}, src: @props.apiUrl + 'images/' + img.id+ "?h=640"
 
   renderImages: ->
     counter = 0
@@ -50,10 +51,11 @@ module.exports = class ImagelistCarouselComponent extends React.Component
         @renderImage(imageObj, counter++)
 
   render: ->
-    H.div className: "carousel slide",
-      H.ol className: "carousel-indicators",
-        _.map @props.imagelist, (img, i) =>
-          H.li className: if i == @state.activeImage then "active"
+    H.div className: "image-carousel-component carousel slide", style: {height: @props.height, overflow: 'hidden'},
+      if @props.imagelist.length < 10
+        H.ol className: "carousel-indicators",
+          _.map @props.imagelist, (img, i) =>
+            H.li className: if i == @state.activeImage then "active"
 
       # Wrapper for slides
       H.div className: "carousel-inner",

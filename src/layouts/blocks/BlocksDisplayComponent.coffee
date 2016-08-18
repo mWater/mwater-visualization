@@ -152,11 +152,15 @@ class BlocksDisplayComponent extends React.Component
           subtitle: "Video"
 
   render: ->
-    H.div style: { width: "100%", height: "100%", overflow: "hidden", position: "relative" },
-      if @props.onItemsChange
+    if @props.onItemsChange
+      return H.div style: { width: "100%", height: "100%", overflow: "hidden", position: "relative" },
         @renderPalette()
-      H.div key: "design", className: "mwater-visualization-block-parent-#{@props.style or "default"}", style: { height: "100%", overflow: "scroll", marginLeft: (if @props.onItemsChange then 102) },
-        @renderBlock(@props.items)
+        H.div key: "design", className: "mwater-visualization-block-parent-#{@props.style or "default"}", style: { height: "100%", overflow: "scroll", marginLeft: 102 },
+          @renderBlock(@props.items)
+    else
+      return H.div style: { width: "100%", height: "100%" },
+        H.div key: "design", className: "mwater-visualization-block-parent-#{@props.style or "default"}", style: { height: "100%" },
+          @renderBlock(@props.items)
 
 module.exports = NestableDragDropContext(HTML5Backend)(BlocksDisplayComponent)
 

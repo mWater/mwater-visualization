@@ -76,21 +76,6 @@ design = {
     "id": "root",
     "type": "root",
     "blocks": [
-      # {
-      #   "type": "widget",
-      #   "aspectRatio": 1.4,
-      #   "widgetType": "Image",
-      #   "design": {
-      #     "imageUrl": null,
-      #     "uid": null,
-      #     "expr": {
-      #       "type": "field",
-      #       "table": "entities.water_point",
-      #       "column": "photos"
-      #     }
-      #   },
-      #   "id": "5b26dacb-afdc-4105-92a0-105e86d47d90"
-      # },
       {
         "type": "widget",
         "widgetType": "Text",
@@ -156,54 +141,75 @@ design = {
         "id": "09c8981b-3869-410d-bd90-4a5a012314a8"
       },
       {
-        "type": "widget",
-        "aspectRatio": 1.4,
-        "widgetType": "LayeredChart",
-        "design": {
-          "version": 2,
-          "layers": [
-            {
-              "axes": {
-                "x": {
-                  "expr": {
-                    "type": "field",
-                    "table": "entities.water_point",
-                    "column": "_created_on"
+        "id": "bc90d763-5429-40bc-b76b-b0d3868d7cfc",
+        "type": "horizontal",
+        "blocks": [
+          {
+            "type": "widget",
+            "aspectRatio": 1.4,
+            "widgetType": "Image",
+            "design": {
+              "imageUrl": null,
+              "uid": null,
+              "expr": {
+                "type": "field",
+                "table": "entities.community",
+                "column": "photos"
+              }
+            },
+            "id": "e5360947-b1f6-4d85-8b07-8e15f3ef6d33"
+          },
+          {
+            "type": "widget",
+            "aspectRatio": 1.4,
+            "widgetType": "LayeredChart",
+            "design": {
+              "version": 2,
+              "layers": [
+                {
+                  "axes": {
+                    "x": {
+                      "expr": {
+                        "type": "field",
+                        "table": "entities.water_point",
+                        "column": "_created_on"
+                      },
+                      "xform": {
+                        "type": "yearmonth"
+                      }
+                    },
+                    "y": {
+                      "expr": {
+                        "type": "op",
+                        "op": "count",
+                        "table": "entities.water_point",
+                        "exprs": []
+                      },
+                      "xform": null
+                    }
                   },
-                  "xform": {
-                    "type": "yearmonth"
-                  }
-                },
-                "y": {
-                  "expr": {
+                  "filter": {
                     "type": "op",
-                    "op": "count",
                     "table": "entities.water_point",
-                    "exprs": []
+                    "op": "thisyear",
+                    "exprs": [
+                      {
+                        "type": "field",
+                        "table": "entities.water_point",
+                        "column": "_created_on"
+                      }
+                    ]
                   },
-                  "xform": null
+                  "table": "entities.water_point",
+                  "cumulative": false
                 }
-              },
-              "filter": {
-                "type": "op",
-                "table": "entities.water_point",
-                "op": "thisyear",
-                "exprs": [
-                  {
-                    "type": "field",
-                    "table": "entities.water_point",
-                    "column": "_created_on"
-                  }
-                ]
-              },
-              "table": "entities.water_point",
-              "cumulative": false
-            }
-          ],
-          "type": "bar",
-          "titleText": "Water points added by month 2016"
-        },
-        "id": "906863e8-3b03-4b6c-b70f-f4cd4adc002b"
+              ],
+              "type": "bar",
+              "titleText": "Water points added by month 2016"
+            },
+            "id": "906863e8-3b03-4b6c-b70f-f4cd4adc002b"
+          }
+        ]
       }
     ]
   },
@@ -1166,6 +1172,16 @@ dashboardDesign = {
                         "value": 7,
                         "color": "#e7cb94"
                       }
+                    ],
+                    "drawOrder": [
+                      7,
+                      2,
+                      5,
+                      6,
+                      1,
+                      0,
+                      3,
+                      4
                     ]
                   }
                 },
