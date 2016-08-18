@@ -269,7 +269,7 @@ module.exports = class AdminChoroplethLayer extends Layer
 
     legendGroupProps =
       items: colors
-      key: design.adminRegionExpr.expr.table
+      key: design.adminRegionExpr.table
       defaultColor: design.color
       name: name
 
