@@ -337,19 +337,6 @@ module.exports = class BufferLayer extends Layer
       ]
     }
 
-    # bufferedGeometry = {
-    #   type: "op", op: "ST_Transform", exprs: [
-    #     { type: "op", op: "::geometry", exprs: [
-    #       { type: "op", op: "ST_Buffer", exprs: [
-    #         { type: "op", op: "::geography", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326] }] }
-    #         design.radius
-    #         ]}
-    #       ]}
-    #     3857
-    #   ]
-    # }
-    # geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
-
     selects = [
       { type: "select", expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table).primaryKey }, alias: "id" } # main primary key as id
       { type: "select", expr: bufferedGeometry, alias: "the_geom_webmercator" } 
@@ -399,6 +386,41 @@ module.exports = class BufferLayer extends Layer
       query.where = { type: "op", op: "and", exprs: whereClauses }
     else
       query.where = whereClauses[0]
+
+    # if draworder is
+    if design.axes.color and design.axes.color.colorMap
+      order = design.axes.color.drawOrder or _.pluck(design.axes.color.colorMap, "value")
+
+      # color on top gets rendered last
+      actualOrder = _(order).reverse().value()
+
+      cases = _.map actualOrder, (value, i) =>
+        { when: value, then: i}
+
+      outerQuery = {
+        type: "query"
+        selects: [
+          { type: "select", expr: { type: "field", tableAlias: "outer", column: "id" }, alias: "id" }
+          { type: "select", expr: { type: "field", tableAlias: "outer", column: "the_geom_webmercator" }, alias: "the_geom_webmercator" }
+          { type: "select", expr: { type: "field", tableAlias: "outer", column: "color" }, alias: "color" }
+        ]
+        from: {
+          type: "subquery"
+          query: query,
+          alias: "outer"
+        }
+        orderBy: [
+          {
+            expr: {
+              type: "case",
+              input: {type: "field", tableAlias: "outer", column: "color"}
+              cases: cases
+            }
+          }
+        ]
+      }
+
+      return outerQuery
 
     return query
 
