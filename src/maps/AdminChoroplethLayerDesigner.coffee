@@ -1,6 +1,7 @@
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
+R = React.createElement
 
 updt = require '../updt'
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
@@ -31,7 +32,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
         " "
         "Data Source"
       ": "
-      React.createElement(TableSelectComponent, { schema: @props.schema, value: @props.design.table, onChange: updt(@props.onDesignChange, @props.design, "table") })
+      R(TableSelectComponent, { schema: @props.schema, value: @props.design.table, onChange: updt(@props.onDesignChange, @props.design, "table") })
   
   renderAdminRegionExpr: ->
     # If no data, hide
@@ -43,7 +44,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
         H.span(className: "glyphicon glyphicon-map-marker")
         " Location"
       H.div style: { marginLeft: 8 }, 
-        React.createElement(ExprComponent, 
+        R(ExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           onChange: updt(@props.onDesignChange, @props.design, "adminRegionExpr")
@@ -53,41 +54,11 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
           value: @props.design.adminRegionExpr)
 
   renderRegionAndDetailLevel: ->
-    getOptions = (input, cb) =>
-      query = {
-        type: "query"
-        selects: [
-          { type: "select", expr: { type: "field", tableAlias: "main", column: "country_id" }, alias: "country_id" }
-          { type: "select", expr: { type: "field", tableAlias: "main", column: "country" }, alias: "country" }
-          { type: "select", expr: { type: "field", tableAlias: "main", column: "level" }, alias: "level" }
-          { type: "select", expr: { type: "field", tableAlias: "main", column: "name" }, alias: "name" }
-        ]
-        from: { type: "table", table: "admin_region_levels", alias: "main" }
-      }
-
-      # Execute query
-      @props.dataSource.performQuery query, (err, rows) =>
-        if err
-          cb(err)
-          return 
-
-        cb(null, {
-          options: [{ value: ":0", label: "Countries" }].concat(_.map(rows, (r) -> { value: r.country_id + ":" + r.level, label: "#{r.country} (#{r.name})" }))
-          complete: true
-        })
-
-      return
-
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        "Detail Level"
-      React.createElement ReactSelect, {
-        placeholder: "Select..."
-        value: if @props.design.detailLevel? then (@props.design.scope or "") + ":" + @props.design.detailLevel else ""
-        asyncOptions: getOptions
-        clearable: false
-        onChange: (value) => @handleScopeAndDetailLevelChange(value.split(":")[0] or null, parseInt(value.split(":")[1]))
-      }
+    R RegionAndDetailLevelComponent,
+      dataSource: @props.dataSource
+      scope: @props.design.scope
+      detailLevel: @props.design.detailLevel
+      onScopeAndDetailLevelChange: @handleScopeAndDetailLevelChange
 
   renderDisplayNames: ->
     H.div className: "form-group",
@@ -105,7 +76,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
         H.span className: "glyphicon glyphicon glyphicon-tint"
         if @props.design.axes.color then " Default Color" else " Color"
       H.div style: { marginLeft: 8 }, 
-        React.createElement(ColorComponent, color: @props.design.color, onChange: updt(@props.onDesignChange, @props.design, "color"))
+        R(ColorComponent, color: @props.design.color, onChange: updt(@props.onDesignChange, @props.design, "color"))
 
   renderColorAxis: ->
     if not @props.design.table
@@ -118,7 +89,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
     H.div className: "form-group",
       H.label className: "text-muted", title
       H.div style: { marginLeft: 10 }, 
-        React.createElement(AxisComponent, 
+        R(AxisComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           table: @props.design.table
@@ -139,7 +110,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
   #   H.div className: "form-group",
   #     H.label className: "text-muted", title
   #     H.div style: { marginLeft: 10 }, 
-  #       React.createElement(AxisComponent, 
+  #       R(AxisComponent, 
   #         schema: @props.schema
   #         dataSource: @props.dataSource
   #         table: @props.design.table
@@ -154,7 +125,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
       H.label className: "text-muted", 
         "Fill Opacity (%)"
       ": "
-      React.createElement(Rcslider,
+      R(Rcslider,
         min: 0
         max: 100
         step: 1
@@ -173,7 +144,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
         H.span(className: "glyphicon glyphicon-filter")
         " Filters"
       H.div style: { marginLeft: 8 }, 
-        React.createElement(FilterExprComponent, 
+        R(FilterExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           onChange: updt(@props.onDesignChange, @props.design, "filter")
@@ -192,3 +163,50 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
       @renderFilter()
 
 
+class RegionAndDetailLevelComponent extends React.Component
+  @propTypes:
+    dataSource: React.PropTypes.object.isRequired
+    scope: React.PropTypes.string     # admin region
+    detailLevel: React.PropTypes.number # Detail level within
+    onScopeAndDetailLevelChange: React.PropTypes.func.isRequired # Called with (scope, detailLevel)
+
+  constructor: ->
+    super
+    @state = { options: null }
+    
+  componentWillMount: ->
+    query = {
+      type: "query"
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "country_id" }, alias: "country_id" }
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "country" }, alias: "country" }
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "level" }, alias: "level" }
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "name" }, alias: "name" }
+      ]
+      from: { type: "table", table: "admin_region_levels", alias: "main" }
+    }
+
+    # Execute query
+    @props.dataSource.performQuery query, (err, rows) =>
+      if err
+        cb(err)
+        return 
+
+      @setState(options: [{ value: ":0", label: "Countries" }].concat(_.map(rows, (r) -> { value: r.country_id + ":" + r.level, label: "#{r.country} (#{r.name})" })))
+
+  render: ->
+    return H.div className: "form-group",
+      H.label className: "text-muted", 
+        "Detail Level"
+      if @state.options
+        R ReactSelect, {
+          placeholder: "Select..."
+          value: if @props.detailLevel? then (@props.scope or "") + ":" + @props.detailLevel else ""
+          options: @state.options
+          clearable: false
+          onChange: (value) => @props.onScopeAndDetailLevelChange(value.split(":")[0] or null, parseInt(value.split(":")[1]))
+        }
+      else
+        H.div className: "text-muted",
+          H.i className: "fa fa-spinner fa-spin"
+          " Loading..."
