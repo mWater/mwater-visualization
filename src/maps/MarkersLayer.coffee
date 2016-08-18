@@ -149,15 +149,17 @@ module.exports = class MarkersLayer extends Layer
 
     if design.symbol
       symbol = "marker-file: url(#{design.symbol});"
+      stroke = "marker-line-width: 60;"
     else
       symbol = "marker-type: ellipse;"
+      stroke = "marker-line-width: 1;"
 
     css += '''
       #layer0 {
         marker-fill: ''' + (design.color or "#666666") + ''';
         marker-width: 10;
         marker-line-color: white;
-        marker-line-width: 60;
+        ''' + stroke +'''
         marker-line-opacity: 0.6;
         marker-placement: point;
         ''' + symbol + '''
