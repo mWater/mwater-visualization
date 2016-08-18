@@ -68,7 +68,7 @@ module.exports = class ExprUpdateModalComponent extends React.Component
           type: "text"
           value: @state.labelText or ""
           onChange: (ev) => @setState(labelText: ev.target.value or null)
-          placeholder: new ExprUtils(@props.schema).summarizeExpr(@state.expr)
+          placeholder: new ExprUtils(@props.schema).summarizeExpr(@state.expr) + ": "
 
   render: ->
     if not @state.open

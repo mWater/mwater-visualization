@@ -78,8 +78,8 @@ module.exports = class ItemsHtmlConverter
 
         # Add label
         if item.includeLabel
-          label = item.labelText or new ExprUtils(@schema).summarizeExpr(item.expr)
-          exprHtml = '<span class="text-muted">' + _.escape(label) + ":\u00A0</span>" + exprHtml
+          label = item.labelText or (new ExprUtils(@schema).summarizeExpr(item.expr) + ":\u00A0")
+          exprHtml = '<span class="text-muted">' + _.escape(label) + "</span>" + exprHtml
 
         if @designMode 
           html += '\u2060<span data-embed="' + _.escape(JSON.stringify(item)) + '" class="mwater-visualization-text-widget-expr">' + (exprHtml or "\u00A0") + '</span>\u2060'
