@@ -3,11 +3,13 @@ LayeredChartCompiler = require './LayeredChartCompiler'
 # Get the css rules corresponding to .c3 directly out of the document object
 getC3Css = () =>
   css = []
-  for sheet in document.styleSheets
-    rules = sheet.cssRules or sheet.rules
-    for rule in rules
-      if rule.cssText and rule.cssText.startsWith(".c3")
-        css.push(rule.cssText)
+  if document.styleSheets
+    for sheet in document.styleSheets
+      rules = sheet?.cssRules or sheet.rules
+      if rules
+        for rule in rules
+          if rule.cssText and rule.cssText.startsWith(".c3")
+            css.push(rule.cssText)
   return css.join('\n')
 
 # Get the svg XML text straight from the DOM node, adding the css styling to it as a <style> element
