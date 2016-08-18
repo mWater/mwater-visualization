@@ -159,7 +159,7 @@ module.exports = class MarkersLayer extends Layer
         marker-fill: ''' + (design.color or "#666666") + ''';
         marker-width: 10;
         marker-line-color: white;
-        ''' + stroke +'''
+        ''' + stroke + '''
         marker-line-opacity: 0.6;
         marker-placement: point;
         ''' + symbol + '''
