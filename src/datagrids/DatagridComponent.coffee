@@ -257,7 +257,7 @@ module.exports = class DatagridComponent extends React.Component
       allowCellsRecycling: true
       cell: @renderCell.bind(null, column, columnIndex, exprType)
       columnKey: column.id
-      isResizable: true
+      isResizable: @props.onDesignChange?
 
   # Render all columns
   renderColumns: ->
