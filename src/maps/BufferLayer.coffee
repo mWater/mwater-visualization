@@ -394,6 +394,10 @@ module.exports = class BufferLayer extends Layer
 
       # color on top gets rendered last
       actualOrder = _(order).reverse().value()
+
+      cases = _.map actualOrder, (value, i) =>
+        { when: value, then: i}
+
       outerQuery = {
         type: "query"
         selects: [
@@ -406,26 +410,13 @@ module.exports = class BufferLayer extends Layer
           query: query,
           alias: "outer"
         }
-        join: {
-          type: "join"
-          left: "outer"
-          right: {
-            type: "literal"
-            value: "( VALUES (7,1),(2,2),(5,3),(6,4),(1,5),(0,6),(3,7),(4,8) )"
-            alias: "ordering(id, _order)"
-          }
-          on: {
-            type: "op"
-            op: "="
-            exprs: [
-              { type: "field", tableAlias: "ordering", column: "_order" }
-              { type: "field", tableAlias: "outer", column: "color" }
-            ]
-          }
-        }
         orderBy: [
           {
-            expr: { type: "field", tableAlias: "ordering", column: "_order" }
+            expr: {
+              type: "case",
+              input: {type: "field", tableAlias: "outer", column: "color"}
+              cases: cases
+            }
           }
         ]
       }
