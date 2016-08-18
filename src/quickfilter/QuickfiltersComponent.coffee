@@ -65,7 +65,7 @@ module.exports = class QuickfiltersComponent extends React.Component
     if not @props.design or @props.design.length == 0
       return null
 
-    H.div style: { borderTop: "solid 1px #E8E8E8", borderBottom: "solid 1px #E8E8E8", paddingTop: 5, paddingBottom: 5 },
+    H.div style: { borderTop: "solid 1px #E8E8E8", borderBottom: "solid 1px #E8E8E8", padding: 5 },
       _.map @props.design, (item, i) => @renderQuickfilter(item, i)
 
 # Quickfilter for an enum

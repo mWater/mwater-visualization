@@ -20,6 +20,8 @@ class BlocksDisplayComponent extends React.Component
     items: React.PropTypes.object.isRequired
     onItemsChange: React.PropTypes.func
 
+    style: React.PropTypes.string   # Stylesheet to use. null for default
+
     # Renders a widget. Passed (options)
     #  id: id of widget
     #  type: type of the widget
@@ -33,13 +35,17 @@ class BlocksDisplayComponent extends React.Component
     # Remove source
     items = blockUtils.removeBlock(@props.items, sourceBlock)
     items = blockUtils.dropBlock(items, sourceBlock, targetBlock, side)
+    items = blockUtils.cleanBlock(items)
     @props.onItemsChange(items)
 
   handleBlockRemove: (block) =>
     items = blockUtils.removeBlock(@props.items, block)
+    items = blockUtils.cleanBlock(items)
     @props.onItemsChange(items)
 
   renderBlock: (block) =>
+    elem = null
+
     switch block.type
       when "root"
         return R RootBlockComponent, key: block.id, block: block, renderBlock: @renderBlock, onBlockDrop: @handleBlockDrop, onBlockRemove: @handleBlockRemove
@@ -56,7 +62,7 @@ class BlocksDisplayComponent extends React.Component
             }
 
         if @props.onItemsChange
-          return R DraggableBlockComponent, 
+          elem = R DraggableBlockComponent, 
             key: block.id
             block: block
             onBlockDrop: @handleBlockDrop,
@@ -66,9 +72,7 @@ class BlocksDisplayComponent extends React.Component
                 onAspectRatioChange: if block.aspectRatio? then (aspectRatio) => @props.onItemsChange(blockUtils.updateBlock(@props.items, _.extend({}, block, aspectRatio: aspectRatio)))
                 onBlockRemove: (if @props.onItemsChange then @handleBlockDrop.bind(null, block)),
                   elem
-        else
-          return elem
-
+    
       when "widget"
         elem = R AutoSizeComponent, { injectWidth: true, key: block.id }, 
           (size) =>
@@ -82,7 +86,7 @@ class BlocksDisplayComponent extends React.Component
             })
 
         if @props.onItemsChange
-          return R DraggableBlockComponent, 
+          elem = R DraggableBlockComponent, 
             key: block.id
             block: block
             onBlockDrop: @handleBlockDrop,
@@ -92,17 +96,19 @@ class BlocksDisplayComponent extends React.Component
                 onAspectRatioChange: if block.aspectRatio? then (aspectRatio) => @props.onItemsChange(blockUtils.updateBlock(@props.items, _.extend({}, block, aspectRatio: aspectRatio)))
                 onBlockRemove: (if @props.onItemsChange then @handleBlockDrop.bind(null, block)),
                   elem
-        else
-          return elem
       else
         throw new Error("Unknown block type #{block.type}")
+
+    # Wrap block in padding
+    return H.div className: "mwater-visualization-block-#{@props.style or "default"}",
+      elem
 
   createBlockItem: (block) ->
     # Add unique id
     return () -> { block: _.extend({}, block, id: uuid.v4()) }
 
   renderPalette: ->
-    H.td key: "palette", style: { width: 102, verticalAlign: "top", height: "100%" }, 
+    H.div key: "palette", style: { width: 102, height: "100%", position: "absolute", top: 0, left: 0 }, 
       H.div className: "mwater-visualization-palette", style: { height: "100%" },
         R PaletteItemComponent, 
           createItem: @createBlockItem({ type: "widget", widgetType: "Text", design: { style: "title" } })
@@ -146,13 +152,11 @@ class BlocksDisplayComponent extends React.Component
           subtitle: "Video"
 
   render: ->
-    return H.table style: { width: "100%", height: "100%", tableLayout: "fixed" },
-      H.tbody null,
-        H.tr null,
-          if @props.onItemsChange
-            @renderPalette()
-          H.td key: "design", style: { verticalAlign: "top", height: "100%" },
-            @renderBlock(@props.items)
+    H.div style: { width: "100%", height: "100%", overflow: "hidden", position: "relative" },
+      if @props.onItemsChange
+        @renderPalette()
+      H.div key: "design", className: "mwater-visualization-block-parent-#{@props.style or "default"}", style: { height: "100%", overflow: "scroll", marginLeft: (if @props.onItemsChange then 102) },
+        @renderBlock(@props.items)
 
 module.exports = NestableDragDropContext(HTML5Backend)(BlocksDisplayComponent)
 
@@ -167,7 +171,7 @@ class RootBlockComponent extends React.Component
     R DraggableBlockComponent, 
       block: @props.block
       onBlockDrop: @props.onBlockDrop
-      style: { height: "100%", padding: 30 }
+      style: { height: "100%" },
       onlyBottom: true,
         H.div key: "root",
           _.map @props.block.blocks, (block) =>

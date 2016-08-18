@@ -13,11 +13,13 @@ module.exports = class BlocksLayoutManager extends LayoutManager
   #  items: opaque items object that layout manager understands
   #  onItemsChange: Called when items changes
   #  renderWidget: called with ({ id:, type:, design:, onDesignChange:, width:, height:  })
+  #  style: style to use for layout. null for default
   renderLayout: (options) ->
     BlocksDisplayComponent = require './BlocksDisplayComponent'
     return R BlocksDisplayComponent,
       items: options.items or { id: "root", type: "root", blocks: [] }
       onItemsChange: options.onItemsChange
+      style: options.style
       renderWidget: options.renderWidget
 
   # Tests if dashboard has any items

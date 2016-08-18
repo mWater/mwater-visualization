@@ -23,14 +23,14 @@ module.exports = class GridLayoutManager extends LayoutManager
         createItem: createWidgetItem("Text", {})
         title: H.i className: "fa fa-align-left"
         subtitle: "Text"
-      # R PaletteItemComponent,
-      #   createItem: @createBlockItem({ type: "image" })
-      #   title: H.i className: "fa fa-picture-o"
-      #   subtitle: "Image"
       R PaletteItemComponent,
         createItem: createWidgetItem("LayeredChart", {})
         title: H.i className: "fa fa-bar-chart"
         subtitle: "Chart"
+      R PaletteItemComponent,
+        createItem: createWidgetItem("Image", {})
+        title: H.i className: "fa fa-image"
+        subtitle: "Image"
       R PaletteItemComponent,
         createItem: createWidgetItem("Map", { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } })
         title: H.i className: "fa fa-map-o"
@@ -51,10 +51,6 @@ module.exports = class GridLayoutManager extends LayoutManager
         createItem: createWidgetItem("IFrame", {})
         title: H.i className: "fa fa-youtube-play"
         subtitle: "Video"
-      R PaletteItemComponent,
-        createItem: createWidgetItem("Image", {})
-        title: H.i className: "fa fa-image"
-        subtitle: "Image"
 
   # Renders the layout as a react element
   # options:

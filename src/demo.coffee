@@ -76,6 +76,21 @@ design = {
     "id": "root",
     "type": "root",
     "blocks": [
+      # {
+      #   "type": "widget",
+      #   "aspectRatio": 1.4,
+      #   "widgetType": "Image",
+      #   "design": {
+      #     "imageUrl": null,
+      #     "uid": null,
+      #     "expr": {
+      #       "type": "field",
+      #       "table": "entities.water_point",
+      #       "column": "photos"
+      #     }
+      #   },
+      #   "id": "5b26dacb-afdc-4105-92a0-105e86d47d90"
+      # },
       {
         "type": "widget",
         "widgetType": "Text",
@@ -193,6 +208,7 @@ design = {
     ]
   },
   "layout": "blocks"
+  style: "greybg"
 }
 
 class MWaterDirectDashboardPane extends React.Component

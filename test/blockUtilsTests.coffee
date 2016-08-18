@@ -76,6 +76,51 @@ describe "blockUtils", ->
 
   it "removes empty vertical"
 
+  it "simplifies horizontal with one child", ->
+    design = {
+      id: "root"
+      type: "root"
+      blocks: [
+        { id: "a", type: "a" }
+        { id: "b", type: "b" }
+        { id: "c", type: "horizontal", blocks: [{ id: "d", type: "d" }] }
+      ]
+    }
+
+    newDesign = blockUtils.cleanBlock(design)
+    compare(newDesign, {
+      id: "root"
+      type: "root"
+      blocks: [
+        { id: "a", type: "a" }
+        { id: "b", type: "b" }
+        { id: "d", type: "d" }
+      ]
+    })
+
+  it "simplifies vertical with one child", ->
+    design = {
+      id: "root"
+      type: "root"
+      blocks: [
+        { id: "a", type: "a" }
+        { id: "b", type: "b" }
+        { id: "c", type: "vertical", blocks: [{ id: "d", type: "d" }] }
+      ]
+    }
+
+    newDesign = blockUtils.cleanBlock(design)
+    compare(newDesign, {
+      id: "root"
+      type: "root"
+      blocks: [
+        { id: "a", type: "a" }
+        { id: "b", type: "b" }
+        { id: "d", type: "d" }
+      ]
+    })
+
+
   describe "in vertical", ->
     before ->
       @design = {

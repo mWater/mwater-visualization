@@ -24,6 +24,10 @@ module.exports = class ColorComponent extends React.Component
     @setState(open: false)
     @props.onChange(null)
 
+  handleTransparent: =>
+    @setState(open: false)
+    @props.onChange("transparent")
+
   render: ->
     style = {
       height: 20
@@ -57,6 +61,9 @@ module.exports = class ColorComponent extends React.Component
           H.button type: "button", className: "btn btn-link btn-sm", onClick: @handleReset,
             H.i className: "fa fa-undo"
             " Reset Color"
+          H.button type: "button", className: "btn btn-link btn-sm", onClick: @handleTransparent,
+            H.i className: "fa fa-ban"
+            " Transparent"
           React.createElement(SketchPicker, type: "sketch", color: @props.color or undefined, onChangeComplete: @handleClose)
 
 

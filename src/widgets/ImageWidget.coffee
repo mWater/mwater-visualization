@@ -52,24 +52,29 @@ module.exports = class ImageWidget extends Widget
   #   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   #   callback: (error, data)
   getData: (design, schema, dataSource, filters, callback) ->
+    if not design.expr
+      return callback(null)
     # TODO! Should get expression value if using expression
 
     table = design.expr.table
 
     exprCompiler = new ExprCompiler(schema)
 
+    imageExpr = exprCompiler.compileExpr(expr: design.expr, tableAlias: "main")
+
     query = {
       selects: [
-        { type: "select", expr: exprCompiler.compileExpr(expr: design.expr, tableAlias: "main"), alias: "value" }
+        { type: "select", expr: imageExpr, alias: "value" }
       ]
       from: { type: "table", table: table, alias: "main" }
-      limit: 1
+      limit: 100
     }
 
     # Get relevant filters
     filters = _.where(filters or [], table: table)
-    whereClauses = _.map(filters, (f) -> injectTableAlias(f.jsonql, "main")) 
+    whereClauses = _.map(filters, (f) -> injectTableAlias(f.jsonql, "main"))
 
+    whereClauses.push({ type: "op", op: "is not null", exprs: [imageExpr] })
     whereClauses = _.compact(whereClauses)
 
     # Wrap if multiple
@@ -83,7 +88,7 @@ module.exports = class ImageWidget extends Widget
       if error
         callback(error)
       else
-        callback(null, rows[0]?.value)
+        callback(null, rows)
     )
 
   # Determine if widget is auto-height, which means that a vertical height is not required.
