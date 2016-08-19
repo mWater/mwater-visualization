@@ -104,7 +104,7 @@ class BlocksDisplayComponent extends React.Component
         throw new Error("Unknown block type #{block.type}")
 
     # Wrap block in padding
-    return H.div className: "mwater-visualization-block-#{@props.style or "default"}",
+    return H.div key: block.id, className: "mwater-visualization-block-#{@props.style or "default"}",
       elem
 
   createBlockItem: (block) ->

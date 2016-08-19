@@ -58,7 +58,7 @@ class ServerLayerDataSource
     if layerView.type == "TileUrl"
       return design.tileUrl
 
-    return @createUrl(layerId, filters, "png") 
+    return @createUrl(@options.layerId, filters, "png") 
 
   # Get the url for the interactivity tiles with the specified filters applied
   # Called with (filters) where filters are filters to apply. Returns URL
@@ -84,7 +84,7 @@ class ServerLayerDataSource
     if layerView.type == "TileUrl"
       return null
 
-    return @createUrl(layerId, filters, "grid.json") 
+    return @createUrl(@options.layerId, filters, "grid.json") 
 
   # Gets widget data source for a popup widget
   getPopupWidgetDataSource: (widgetId) -> 
@@ -169,7 +169,7 @@ class ServerMapLayerPopupWidgetDataSource
       filters: JSON.stringify(filters)
     }
 
-    url = @options.apiUrl + "maps/#{@options.mapId}/layer/#{@options.layerId}/widgets/#{@options.popupWidgetId}/data?" + querystring.stringify(query)
+    url = @options.apiUrl + "maps/#{@options.mapId}/layers/#{@options.layerId}/widgets/#{@options.popupWidgetId}/data?" + querystring.stringify(query)
 
     $.getJSON url, (data) =>
       callback(null, data)
