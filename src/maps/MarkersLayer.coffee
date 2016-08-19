@@ -182,22 +182,22 @@ module.exports = class MarkersLayer extends Layer
   #     design: design of layer
   #     schema: schema to use
   #     dataSource: data source to use
+  #     layerDataSource: layer data source
   # 
   # Returns:
   #   null/undefined to do nothing
   #   [table id, primary key] to open a default system popup if one is present
   #   React element to put into a popup
   onGridClick: (ev, clickOptions) ->
+    # TODO abstract most to base class
     if ev.data and ev.data.id
       if clickOptions.design.popup
         BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
         WidgetFactory = require '../widgets/WidgetFactory'
-        DirectWidgetDataSource = require '../widgets/DirectWidgetDataSource'
 
         return new BlocksLayoutManager().renderLayout({
           items: clickOptions.design.popup.items
           renderWidget: (options) =>
-            # TODO abstract to popup renderer in map data source
             widget = WidgetFactory.createWidget(options.type)
 
             table = clickOptions.design.table
@@ -208,19 +208,12 @@ module.exports = class MarkersLayer extends Layer
               jsonql: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table).primaryKey }, ev.data.id] } 
             }]
 
-            widgetDataSource = new DirectWidgetDataSource({
-              apiUrl: "https://api.mwater.co/v3/" # TODO
-              widget: widget
-              design: options.design
-              schema: clickOptions.schema
-              dataSource: clickOptions.dataSource
-              client: null # TODO
-            })
+            # Get data source for widget
+            widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(options.id)
 
             return widget.createViewElement({
               schema: clickOptions.schema
               dataSource: clickOptions.dataSource
-              # TODO get widget data source for map
               widgetDataSource: widgetDataSource
               design: options.design
               scope: null

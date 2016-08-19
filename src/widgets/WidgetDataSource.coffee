@@ -8,14 +8,11 @@ module.exports = class WidgetDataSource
   getData: (filters, callback) ->
     throw new Error("Not implemented")
 
-  # For map widgets, the following are required:
-
-  # Get the url for the image tiles with the specified filters applied
-  # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-  getTileUrl: (layerId, filters) ->
+  # For map widgets, the following is required
+  getMapDataSource: ->
     throw new Error("Not implemented")
 
-  # Get the url for the interactivity tiles with the specified filters applied
-  # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-  getUtfGridUrl: (layerId, filters) ->
+  # Get the url to download an image (by id from an image or imagelist column)
+  # Height, if specified, is minimum height needed. May return larger image
+  getImageUrl: (imageId, height) ->
     throw new Error("Not implemented")

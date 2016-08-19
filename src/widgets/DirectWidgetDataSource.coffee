@@ -2,28 +2,27 @@ DirectMapDataSource = require '../maps/DirectMapDataSource'
 
 # Get widget data directly from the dataSource
 module.exports = class DirectWidgetDataSource
+  # options:
+  #   widget: widget object
+  #   design: design of widget
+  #   schema: schema to use
+  #   dataSource: general data source
+  #   apiUrl: API url to use for talking to mWater server. Not needed if no map widgets
+  #   client: client id to use for talking to mWater server. Not needed if no map widgets
   constructor: (options) ->
-    @apiUrl = options.apiUrl
-    @widget = options.widget
-    @design = options.design
-    @schema = options.schema
-    @dataSource = options.dataSource
-    @client = options.client
+    @options = options
 
   # Get the data that the widget needs. The widget should implement getData method (see above) to get the actual data on the server
   #  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+  #  callback: (error, data)
   getData: (filters, callback) ->
-    @widget.getData(@design, @schema, @dataSource, filters, callback)
+    @options.widget.getData(@options.design, @options.schema, @options.dataSource, filters, callback)
 
-  # For map widgets, the following are required:
+  # For map widgets, the following is required
+  getMapDataSource: ->
+    return new DirectMapDataSource({ apiUrl: @options.apiUrl, client: @options.client, design: @options.design, schema: @options.schema })
 
-  # Get the url for the image tiles with the specified filters applied
-  # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-  getTileUrl: (layerId, filters) ->
-    new DirectMapDataSource({ apiUrl: @apiUrl, client: @client, mapDesign: @design, schema: @schema }).getTileUrl(layerId, filters)
-
-  # Get the url for the interactivity tiles with the specified filters applied
-  # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-  getUtfGridUrl: (layerId, filters) ->
-    new DirectMapDataSource({ apiUrl: @apiUrl, client: @client, mapDesign: @design, schema: @schema }).getUtfGridUrl(layerId, filters)
-
+  # Get the url to download an image (by id from an image or imagelist column)
+  # Height, if specified, is minimum height needed. May return larger image
+  getImageUrl: (imageId, height) ->
+    return @options.dataSource.getImageUrl(imageId, height)

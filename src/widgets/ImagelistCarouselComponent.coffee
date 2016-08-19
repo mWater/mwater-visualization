@@ -7,7 +7,7 @@ R = React.createElement
 module.exports = class ImagelistCarouselComponent extends React.Component
   @propTypes:
     imagelist: React.PropTypes.array  # Array of { id, cover: true/false }
-    apiUrl: React.PropTypes.string.isRequired # The base api url
+    widgetDataSource: React.PropTypes.object.isRequired
     height: React.PropTypes.number
 
   constructor: ->
@@ -30,7 +30,7 @@ module.exports = class ImagelistCarouselComponent extends React.Component
 
   renderImage: (img, i) ->
     H.div className: "item #{if i == @state.activeImage then "active" else ""}", style: {height: @props.height},
-      H.img style: { margin: '0 auto', height: @props.height}, src: @props.apiUrl + 'images/' + img.id+ "?h=640"
+      H.img style: { margin: '0 auto', height: @props.height }, src: @props.widgetDataSource.getImageUrl(img.id, 640)
 
   renderImages: ->
     counter = 0

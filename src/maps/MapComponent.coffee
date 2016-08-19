@@ -12,15 +12,10 @@ module.exports = class MapComponent extends React.Component
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired # Data source to use
 
-    # Url source for the map
+    # Data source for the map
     mapDataSource: React.PropTypes.shape({
-      # Get the url for the image tiles with the specified filters applied
-      # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-      getTileUrl: React.PropTypes.func.isRequired
-
-      # Get the url for the interactivity tiles with the specified filters applied
-      # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-      getUtfGridUrl: React.PropTypes.func.isRequired
+      # Gets the data source for a layer
+      getLayerDataSource: React.PropTypes.func.isRequired
     }).isRequired
 
     design: React.PropTypes.object.isRequired

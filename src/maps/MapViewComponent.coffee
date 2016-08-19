@@ -15,13 +15,8 @@ module.exports = class MapViewComponent extends React.Component
 
     # Url source for the map
     mapDataSource: React.PropTypes.shape({
-      # Get the url for the image tiles with the specified filters applied
-      # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-      getTileUrl: React.PropTypes.func.isRequired
-
-      # Get the url for the interactivity tiles with the specified filters applied
-      # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-      getUtfGridUrl: React.PropTypes.func.isRequired
+      # Gets the data source for a layer
+      getLayerDataSource: React.PropTypes.func.isRequired
     }).isRequired
     
     design: React.PropTypes.object.isRequired  # See Map Design.md
@@ -65,8 +60,8 @@ module.exports = class MapViewComponent extends React.Component
     # Clean design (prevent ever displaying invalid/legacy designs)
     design = layer.cleanDesign(layerView.design, @props.schema)
 
-    # Handle click of layerS
-    results = layer.onGridClick(ev, { design: design, schema: @props.schema, dataSource: @props.dataSource })
+    # Handle click of layer
+    results = layer.onGridClick(ev, { design: design, schema: @props.schema, dataSource: @props.dataSource, layerDataSource: @props.mapDataSource.getLayerDataSource(layerViewId) })
 
     # Handle standard case
     if _.isArray(results)
@@ -82,6 +77,7 @@ module.exports = class MapViewComponent extends React.Component
         layer = LayerFactory.createLayer(layerView.type)
 
         design = layer.cleanDesign(layerView.design, @props.schema)
+
         # Ignore if invalid
         if layer.validateDesign(design, @props.schema)
           return null
@@ -102,7 +98,6 @@ module.exports = class MapViewComponent extends React.Component
       position: 'absolute'
       right: 10
       bottom: 35
-#      top: 10
       maxHeight: '85%'
       overflowY: 'auto'
       zIndex: 9
@@ -157,10 +152,13 @@ module.exports = class MapViewComponent extends React.Component
       if layer.validateDesign(design, @props.schema)
         continue
 
+      # Get layer data source
+      layerDataSource = @props.mapDataSource.getLayerDataSource(layerView.id)
+
       # Create leafletLayer
       leafletLayer = {
-        tileUrl: @props.mapDataSource.getTileUrl(layerView.id, compiledFilters)
-        utfGridUrl: @props.mapDataSource.getUtfGridUrl(layerView.id, compiledFilters)
+        tileUrl: layerDataSource.getTileUrl(compiledFilters)
+        utfGridUrl: layerDataSource.getUtfGridUrl(compiledFilters)
         visible: layerView.visible
         opacity: layerView.opacity
         minZoom: layer.getMinZoom(design)

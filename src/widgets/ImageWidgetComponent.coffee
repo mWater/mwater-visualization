@@ -23,11 +23,8 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
     filters: React.PropTypes.array
     
     schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired # Data source to use for chart
+    dataSource: React.PropTypes.object.isRequired # Data source to use for widget
     widgetDataSource: React.PropTypes.object.isRequired
-
-    apiUrl: React.PropTypes.string.isRequired
-    client: React.PropTypes.string.isRequired
 
     width: React.PropTypes.number
     height: React.PropTypes.number
@@ -57,10 +54,6 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
   # Call callback with state changes
   load: (props, prevProps, callback) -> 
-    # TODO load the expression value from the widget data source only if needed
-#    callback(null)
-#    return
-
     # Get data
     props.widgetDataSource.getData(props.filters, (error, data) =>
       callback(error: error, data: data )
@@ -141,8 +134,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
   renderUploadEditor: ->
     R ImageUploaderComponent,
-      apiUrl: @props.apiUrl
-      client: @props.client
+      dataSource: @props.dataSource
       onUpload: @onFileUpload
       uid: @props.design.uid
 
@@ -178,7 +170,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
   renderContent: ->
     if @props.design.imageUrl or @props.design.uid
-      source = @props.design.imageUrl or @props.apiUrl + "images/"+@props.design.uid
+      source = @props.design.imageUrl or @props.widgetDataSource.getImageUrl(@props.design.uid, 1024)
       H.img style: { maxWidth: "100%", maxHeight: "100%"}, src: source
     else
       @renderExpression()
@@ -188,10 +180,9 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
       H.span null, "Loading"
     else
       R ImagelistCarouselComponent,
-        apiUrl: @props.apiUrl
+        widgetDataSource: @props.widgetDataSource
         imagelist: @state.data
         height: @props.height
-#    H.img style: { maxWidth: "100%", maxHeight: "100%"}, src: "https://img0.etsystatic.com/119/0/6281042/il_570xN.1025495956_8oux.jpg"
 
   render: ->
     dropdownItems = []

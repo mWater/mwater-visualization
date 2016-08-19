@@ -7,8 +7,7 @@ uuid = require 'node-uuid'
 
 module.exports = class ImageUploaderComponent extends React.Component
   @propTypes:
-    apiUrl: React.PropTypes.string.isRequired # The base url for api
-    client: React.PropTypes.string.isRequired # The client ID required for authentication
+    dataSource: React.PropTypes.object.isRequired # Data source to use for chart
     onUpload: React.PropTypes.func.isRequired # callback for when upload is successful
     uid: React.PropTypes.string # existing UID of the image if available
 
@@ -32,7 +31,7 @@ module.exports = class ImageUploaderComponent extends React.Component
     @xhr.addEventListener "load", @uploadComplete, false
 
     id = @createId()
-    @xhr.open "POST", @props.apiUrl + "images/#{id}?client=" + @props.client
+    @xhr.open "POST", @props.dataSource.getImageUrl(id)
     @xhr.send fd
     @setState(uid: id)
 

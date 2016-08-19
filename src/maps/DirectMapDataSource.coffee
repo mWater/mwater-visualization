@@ -2,25 +2,42 @@ _ = require 'lodash'
 LayerFactory = require './LayerFactory'
 injectTableAlias = require('mwater-expressions').injectTableAlias
 MapDataSource = require './MapDataSource'
+DirectWidgetDataSource = require '../widgets/DirectWidgetDataSource'
+BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
+WidgetFactory = require '../widgets/WidgetFactory'
 
 module.exports = class DirectMapDataSource extends MapDataSource
   # Create map url source that uses direct jsonql maps
   # options:
   #   schema: schema to use
-  #   mapDesign: design of entire map
+  #   dataSource: general data source
+  #   design: design of entire map
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   constructor: (options) ->
-    @apiUrl = options.apiUrl
-    @client = options.client
-    @mapDesign = options.mapDesign
-    @schema = options.schema
+    @options = options
+
+  # Gets the data source for a layer
+  getLayerDataSource: (layerId) ->
+    new DirectLayerDataSource(_.extend({}, @options, layerId: layerId))
+
+class DirectLayerDataSource
+  # Create map url source that uses direct jsonql maps
+  # options:
+  #   schema: schema to use
+  #   dataSource: general data source
+  #   design: design of entire map
+  #   layerId: id of layer
+  #   apiUrl: API url to use for talking to mWater server
+  #   client: client id to use for talking to mWater server
+  constructor: (options) ->
+    @options = options
 
   # Get the url for the image tiles with the specified filters applied
-  # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-  getTileUrl: (layerId, filters) ->
+  # Called with (filters) where filters are filters to apply. Returns URL
+  getTileUrl: (filters) -> 
     # Get layerView
-    layerView = _.findWhere(@mapDesign.layerViews, { id: layerId })
+    layerView = _.findWhere(@options.design.layerViews, { id: @options.layerId })
     if not layerView
       return null
 
@@ -28,10 +45,10 @@ module.exports = class DirectMapDataSource extends MapDataSource
     layer = LayerFactory.createLayer(layerView.type)
 
     # Clean design (prevent ever displaying invalid/legacy designs)
-    design = layer.cleanDesign(layerView.design, @schema)
+    design = layer.cleanDesign(layerView.design, @options.schema)
 
     # Ignore if invalid
-    if layer.validateDesign(design, @schema)
+    if layer.validateDesign(design, @options.schema)
       return null
 
     # Handle special cases
@@ -41,15 +58,15 @@ module.exports = class DirectMapDataSource extends MapDataSource
       return design.tileUrl
 
     # Get JsonQLCss
-    jsonqlCss = layer.getJsonQLCss(design, @schema, filters)
+    jsonqlCss = layer.getJsonQLCss(design, @options.schema, filters)
 
     return @createUrl("png", jsonqlCss) 
 
   # Get the url for the interactivity tiles with the specified filters applied
-  # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-  getUtfGridUrl: (layerId, filters) ->
+  # Called with (filters) where filters are filters to apply. Returns URL
+  getUtfGridUrl: (filters) -> 
     # Get layerView
-    layerView = _.findWhere(@mapDesign.layerViews, { id: layerId })
+    layerView = _.findWhere(@options.design.layerViews, { id: @options.layerId })
     if not layerView
       return null
 
@@ -57,10 +74,10 @@ module.exports = class DirectMapDataSource extends MapDataSource
     layer = LayerFactory.createLayer(layerView.type)
 
     # Clean design (prevent ever displaying invalid/legacy designs)
-    design = layer.cleanDesign(layerView.design, @schema)
+    design = layer.cleanDesign(layerView.design, @options.schema)
 
     # Ignore if invalid
-    if layer.validateDesign(design, @schema)
+    if layer.validateDesign(design, @options.schema)
       return null
 
     # Handle special cases
@@ -70,19 +87,36 @@ module.exports = class DirectMapDataSource extends MapDataSource
       return null
 
     # Get JsonQLCss
-    jsonqlCss = layer.getJsonQLCss(design, @schema, filters)
+    jsonqlCss = layer.getJsonQLCss(design, @options.schema, filters)
 
     return @createUrl("grid.json", jsonqlCss) 
+
+  # Gets widget data source for a popup widget
+  getPopupWidgetDataSource: (widgetId) -> 
+    # Get widget
+    { type, design } = new BlocksLayoutManager().getWidgetTypeAndDesign(@options.design.popup.items, widgetId)
+
+    # Create widget
+    widget = WidgetFactory.createWidget(type)
+
+    return new DirectWidgetDataSource({
+      widget: widget
+      design: design
+      schema: options.schema
+      dataSource: options.dataSource
+      apiUrl: options.apiUrl
+      client: options.client
+    })
 
   # Create query string
   createUrl: (extension, jsonqlCss) ->
     query = "type=jsonql"
-    if @client
-      query += "&client=" + @client
+    if @options.client
+      query += "&client=" + @options.client
 
     query += "&design=" + encodeURIComponent(JSON.stringify(jsonqlCss))
 
-    url = "#{@apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?" + query
+    url = "#{@options.apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?" + query
 
     # Add subdomains: {s} will be substituted with "a", "b" or "c" in leaflet for api.mwater.co only.
     # Used to speed queries
@@ -93,7 +127,7 @@ module.exports = class DirectMapDataSource extends MapDataSource
 
   # Create query string
   createLegacyUrl: (design, extension, filters) ->
-    url = "#{@apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?type=#{design.type}&radius=1000"
+    url = "#{@options.apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?type=#{design.type}&radius=1000"
 
     # Add subdomains: {s} will be substituted with "a", "b" or "c" in leaflet for api.mwater.co only.
     # Used to speed queries
@@ -101,7 +135,7 @@ module.exports = class DirectMapDataSource extends MapDataSource
       url = url.replace(/^https:\/\/api\.mwater\.co\//, "https://{s}-api.mwater.co/")
 
     if @client
-      url += "&client=#{@client}"
+      url += "&client=#{@options.client}"
       
     # Add where for any relevant filters
     relevantFilters = _.where(filters, table: design.table)

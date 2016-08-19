@@ -21,6 +21,7 @@ module.exports = class Layer
   #     design: design of layer
   #     schema: schema to use
   #     dataSource: data source to use
+  #     layerDataSource: layer data source
   # 
   # Returns:
   #   null/undefined to do nothing
