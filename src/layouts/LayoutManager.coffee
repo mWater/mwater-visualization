@@ -30,3 +30,5 @@ module.exports = class LayoutManager
       else
         throw new Error("Unknown layout manager type #{type}")
 	
+    addWidget: (items, widgetType, widgetDesign) ->
+      throw new Error("Not implemented")

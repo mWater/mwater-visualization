@@ -5,6 +5,7 @@ R = React.createElement
 
 uuid = require 'node-uuid'
 LayoutManager = require '../LayoutManager'
+LegoLayoutEngine = require './LegoLayoutEngine'
 
 module.exports = class GridLayoutManager extends LayoutManager
   renderPalette: (width) ->
@@ -89,3 +90,37 @@ module.exports = class GridLayoutManager extends LayoutManager
   getWidgetTypeAndDesign: (items, widgetId) -> 
     return items[widgetId]?.widget
 
+  # Add a widget to the items
+  addWidget: (items, widgetType, widgetDesign) ->
+    # Find place for new item
+    layout = @findOpenLayout(items, width, height)
+
+    # Create item
+    item = {
+      layout: layout
+      widget: {
+        type: widgetType
+        design: widgetDesign
+      }
+    }
+
+    id = uuid.v4()
+
+    # Add item
+    items = _.clone(items)
+    items[id] = item
+
+    return items
+
+  # Find a layout that the new widget fits in. width and height are in 24ths
+  findOpenLayout: (items, width, height) ->
+    # Create layout engine
+    # TODO create from design
+    # TODO uses fake width
+    layoutEngine = new LegoLayoutEngine(100, 24)
+
+    # Get existing layouts
+    layouts = _.pluck(_.values(items), "layout")
+
+    # Find place for new item
+    return layoutEngine.appendLayout(layouts, width, height)
