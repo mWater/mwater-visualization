@@ -13,6 +13,7 @@ module.exports = class EditPopupComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
     dataSource: React.PropTypes.object.isRequired
+    apiUrl: React.PropTypes.string.isRequired
     design: React.PropTypes.object.isRequired  # Design of the marker layer
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
     table: React.PropTypes.string.isRequired
@@ -52,7 +53,7 @@ module.exports = class EditPopupComponent extends React.Component
               widget = WidgetFactory.createWidget(options.type)
 
               widgetDataSource = new DirectWidgetDataSource({
-                apiUrl: "https://api.mwater.co/v3/" # TODO
+                apiUrl: @props.apiUrl
                 widget: widget
                 design: options.design
                 schema: @props.schema
@@ -65,6 +66,7 @@ module.exports = class EditPopupComponent extends React.Component
                 dataSource: @props.dataSource
                 # TODO get widget data source for map
                 widgetDataSource: widgetDataSource
+                apiUrl: @props.apiUrl
                 design: options.design
                 scope: null
                 filters: []

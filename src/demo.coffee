@@ -473,11 +473,11 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(BlocksDesignerComponent, renderBlock: [])
     # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
@@ -819,113 +819,113 @@ mapDesign = {
     #     "displayNames": true
     #   }
     # },
-    # {
-    #   "id": "0c6525a2-1300-48db-b793-ba7806827f3c",
-    #   "name": "Untitled Layer",
-    #   "desc": "",
-    #   "type": "Markers",
-    #   "visible": true,
-    #   "opacity": 1,
-    #   "design": {
-    #     "axes": {
-    #       "geometry": {
-    #         "expr": {
-    #           "type": "field",
-    #           "table": "entities.water_point",
-    #           "column": "location"
-    #         }
-    #       }
-    #     },
-    #     "color": "#0088FF",
-    #     "filter": null,
-    #     "table": "entities.water_point",
-    #     "popup": {
-    #       "items": {
-    #         "id": "root",
-    #         "type": "root",
-    #         "blocks": [
-    #           {
-    #             "id": "f5dcf519-0287-4f65-ab44-abdd609b704b",
-    #             "type": "horizontal",
-    #             "blocks": [
-    #               {
-    #                 "id": "e50f7026-44f2-44fd-9c19-a2c412d6cf10",
-    #                 "type": "vertical",
-    #                 "blocks": [
-    #                   {
-    #                     "type": "widget",
-    #                     "widgetType": "Text",
-    #                     "design": {
-    #                       "style": "title",
-    #                       "items": [
-    #                         {
-    #                           "type": "expr",
-    #                           "id": "1af0f88c-db39-46bb-ad5a-4777a7d0357d",
-    #                           "expr": {
-    #                             "type": "field",
-    #                             "table": "entities.water_point",
-    #                             "column": "name"
-    #                           }
-    #                         }
-    #                       ]
-    #                     },
-    #                     "id": "b2becac4-db3c-48b8-92db-9f1d2da0df97"
-    #                   },
-    #                   {
-    #                     "type": "widget",
-    #                     "widgetType": "Text",
-    #                     "design": {
-    #                       "items": [
-    #                         "Description: ",
-    #                         {
-    #                           "type": "expr",
-    #                           "id": "d3813f6f-a8c6-4783-80ca-70a18e8fa630",
-    #                           "expr": {
-    #                             "type": "field",
-    #                             "table": "entities.water_point",
-    #                             "column": "desc"
-    #                           }
-    #                         },
-    #                         {
-    #                           "type": "element",
-    #                           "tag": "div",
-    #                           "items": [
-    #                             "Type: ",
-    #                             {
-    #                               "type": "expr",
-    #                               "id": "7c74bf50-d649-4e25-a80b-27504d029f4c",
-    #                               "expr": {
-    #                                 "type": "field",
-    #                                 "table": "entities.water_point",
-    #                                 "column": "type"
-    #                               }
-    #                             },
-    #                             {
-    #                               "type": "element",
-    #                               "tag": "br",
-    #                               "items": []
-    #                             }
-    #                           ]
-    #                         }
-    #                       ]
-    #                     },
-    #                     "id": "47e4be90-cfad-4145-8afd-3adfb2ac2882"
-    #                   }
-    #                 ]
-    #               },
-    #               {
-    #                 "type": "widget",
-    #                 "widgetType": "Image",
-    #                 "design": {},
-    #                 "id": "858fb20f-5f5f-48cf-8fe3-a4f3639b7684"
-    #               }
-    #             ]
-    #           }
-    #         ]
-    #       }
-    #     }
-    #   }
-    # }
+    {
+      "id": "0c6525a2-1300-48db-b793-ba7806827f3c",
+      "name": "Untitled Layer",
+      "desc": "",
+      "type": "Markers",
+      "visible": true,
+      "opacity": 1,
+      "design": {
+        "axes": {
+          "geometry": {
+            "expr": {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "location"
+            }
+          }
+        },
+        "color": "#0088FF",
+        "filter": null,
+        "table": "entities.water_point",
+        "popup": {
+          "items": {
+            "id": "root",
+            "type": "root",
+            "blocks": [
+              {
+                "id": "f5dcf519-0287-4f65-ab44-abdd609b704b",
+                "type": "horizontal",
+                "blocks": [
+                  {
+                    "id": "e50f7026-44f2-44fd-9c19-a2c412d6cf10",
+                    "type": "vertical",
+                    "blocks": [
+                      {
+                        "type": "widget",
+                        "widgetType": "Text",
+                        "design": {
+                          "style": "title",
+                          "items": [
+                            {
+                              "type": "expr",
+                              "id": "1af0f88c-db39-46bb-ad5a-4777a7d0357d",
+                              "expr": {
+                                "type": "field",
+                                "table": "entities.water_point",
+                                "column": "name"
+                              }
+                            }
+                          ]
+                        },
+                        "id": "b2becac4-db3c-48b8-92db-9f1d2da0df97"
+                      },
+                      {
+                        "type": "widget",
+                        "widgetType": "Text",
+                        "design": {
+                          "items": [
+                            "Description: ",
+                            {
+                              "type": "expr",
+                              "id": "d3813f6f-a8c6-4783-80ca-70a18e8fa630",
+                              "expr": {
+                                "type": "field",
+                                "table": "entities.water_point",
+                                "column": "desc"
+                              }
+                            },
+                            {
+                              "type": "element",
+                              "tag": "div",
+                              "items": [
+                                "Type: ",
+                                {
+                                  "type": "expr",
+                                  "id": "7c74bf50-d649-4e25-a80b-27504d029f4c",
+                                  "expr": {
+                                    "type": "field",
+                                    "table": "entities.water_point",
+                                    "column": "type"
+                                  }
+                                },
+                                {
+                                  "type": "element",
+                                  "tag": "br",
+                                  "items": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        "id": "47e4be90-cfad-4145-8afd-3adfb2ac2882"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "widget",
+                    "widgetType": "Image",
+                    "design": {},
+                    "id": "858fb20f-5f5f-48cf-8fe3-a4f3639b7684"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
   ],
   "filters": {},
   "bounds": {

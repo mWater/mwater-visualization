@@ -50,7 +50,7 @@ module.exports = class ExprUpdateModalComponent extends React.Component
             schema: @props.schema
             dataSource: @props.dataSource
             table: @state.table
-            types: ['text', 'number', 'enum', 'date', 'datetime', 'boolean']
+            types: ['text', 'number', 'enum', 'date', 'datetime', 'boolean', 'enumset']
             value: @state.expr
             # Only individual if singleRowTable 
             aggrStatuses: if @state.table == @props.singleRowTable then ["individual", "literal"] else ['literal', "aggregate"]

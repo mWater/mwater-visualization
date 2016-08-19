@@ -1,6 +1,7 @@
 React = require 'react'
 H = React.DOM
 
+ClickOutHandler = require('react-onclickout')
 SketchPicker = require("react-color").SketchPicker
 
 # Simple color well with popup
@@ -57,13 +58,14 @@ module.exports = class ColorComponent extends React.Component
     H.div style: { position: "relative", display: "inline-block" },
       H.div(style: style, onClick: @handleClick)
       if @state.open
-        H.div style: popupPosition,
-          H.button type: "button", className: "btn btn-link btn-sm", onClick: @handleReset,
-            H.i className: "fa fa-undo"
-            " Reset Color"
-          H.button type: "button", className: "btn btn-link btn-sm", onClick: @handleTransparent,
-            H.i className: "fa fa-ban"
-            " Transparent"
-          React.createElement(SketchPicker, type: "sketch", color: @props.color or undefined, onChangeComplete: @handleClose)
+        React.createElement ClickOutHandler, onClickOut: (=> @setState(open: false)),
+          H.div style: popupPosition,
+            H.button type: "button", className: "btn btn-link btn-sm", onClick: @handleReset,
+              H.i className: "fa fa-undo"
+              " Reset Color"
+            H.button type: "button", className: "btn btn-link btn-sm", onClick: @handleTransparent,
+              H.i className: "fa fa-ban"
+              " Transparent"
+            React.createElement(SketchPicker, type: "sketch", color: @props.color or undefined, onChangeComplete: @handleClose)
 
 
