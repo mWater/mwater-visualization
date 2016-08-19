@@ -47,6 +47,7 @@ module.exports = class EditPopupComponent extends React.Component
           new BlocksLayoutManager().renderLayout({
             items: @props.design.popup?.items
             onItemsChange: @handleItemsChange
+            disableMaps: true
             renderWidget: (options) =>
               widget = WidgetFactory.createWidget(options.type)
 

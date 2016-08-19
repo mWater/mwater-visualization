@@ -31,6 +31,9 @@ class BlocksDisplayComponent extends React.Component
     #  height: height to render. null for auto
     renderWidget: React.PropTypes.func.isRequired
 
+    # True to prevent maps
+    disableMaps: React.PropTypes.bool
+
   handleBlockDrop: (sourceBlock, targetBlock, side) =>
     # Remove source
     items = blockUtils.removeBlock(@props.items, sourceBlock)
@@ -82,6 +85,7 @@ class BlocksDisplayComponent extends React.Component
               design: block.design
               onDesignChange: if @props.onItemsChange then (design) => @props.onItemsChange(blockUtils.updateBlock(@props.items, _.extend({}, block, design: design)))
               width: size.width
+              standardWidth: size.width
               height: if block.aspectRatio? then size.width / block.aspectRatio
             })
 
@@ -126,10 +130,11 @@ class BlocksDisplayComponent extends React.Component
           createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "LayeredChart", design: {} })
           title: H.i className: "fa fa-bar-chart"
           subtitle: "Chart"
-        R PaletteItemComponent,
-          createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "Map", design: { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } } })
-          title: H.i className: "fa fa-map-o"
-          subtitle: "Map"
+        if not @props.disableMaps
+          R PaletteItemComponent,
+            createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "Map", design: { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } } })
+            title: H.i className: "fa fa-map-o"
+            subtitle: "Map"
         R PaletteItemComponent,
           createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "TableChart", design: {} })
           title: H.i className: "fa fa-table"

@@ -14,6 +14,7 @@ module.exports = class BlocksLayoutManager extends LayoutManager
   #  onItemsChange: Called when items changes
   #  renderWidget: called with ({ id:, type:, design:, onDesignChange:, width:, height:  })
   #  style: style to use for layout. null for default
+  #  disableMaps: true to disable maps
   renderLayout: (options) ->
     BlocksDisplayComponent = require './BlocksDisplayComponent'
     return R BlocksDisplayComponent,
@@ -21,6 +22,7 @@ module.exports = class BlocksLayoutManager extends LayoutManager
       onItemsChange: options.onItemsChange
       style: options.style
       renderWidget: options.renderWidget
+      disableMaps: options.disableMaps
 
   # Tests if dashboard has any items
   isEmpty: (items) ->

@@ -86,7 +86,7 @@ module.exports = class DashboardViewComponent extends React.Component
         onDesignChange: options.onDesignChange
         width: options.width
         height: options.height
-        standardWidth: options.standardWidth # TODO doc
+        standardWidth: options.standardWidth 
       })  
 
     style = {

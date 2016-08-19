@@ -1,5 +1,3 @@
-DirectMapDataSource = require '../maps/DirectMapDataSource'
-
 # Get widget data directly from the dataSource
 module.exports = class DirectWidgetDataSource
   # options:
@@ -20,7 +18,8 @@ module.exports = class DirectWidgetDataSource
 
   # For map widgets, the following is required
   getMapDataSource: ->
-    return new DirectMapDataSource({ apiUrl: @options.apiUrl, client: @options.client, design: @options.design, schema: @options.schema })
+    DirectMapDataSource = require '../maps/DirectMapDataSource'
+    return new DirectMapDataSource({ apiUrl: @options.apiUrl, client: @options.client, design: @options.design, schema: @options.schema, dataSource: @options.dataSource })
 
   # Get the url to download an image (by id from an image or imagelist column)
   # Height, if specified, is minimum height needed. May return larger image

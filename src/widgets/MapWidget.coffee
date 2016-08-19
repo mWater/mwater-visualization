@@ -91,20 +91,12 @@ class MapWidgetComponent extends React.Component
     # Require here to prevent server require problems
     MapViewComponent = require '../maps/MapViewComponent'
 
-    # Create mapDataSource
-    mapDataSource = {
-      getTileUrl: (layerId, filters) =>
-        return @props.widgetDataSource.getTileUrl(layerId, filters)
-      getUtfGridUrl: (layerId, filters) =>
-        return @props.widgetDataSource.getUtfGridUrl(layerId, filters)
-    }
-
     H.div style: { width: @props.width, height: @props.height, padding: 10 },
       React.createElement(MapViewComponent, {
         schema: @props.schema
         design: @props.design
         dataSource: @props.dataSource
-        mapDataSource: mapDataSource
+        mapDataSource: @props.widgetDataSource.getMapDataSource()
         onDesignChange: @props.onDesignChange
         extraFilters: @props.filters
         width: @props.width - 20

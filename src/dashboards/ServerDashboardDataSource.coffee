@@ -14,7 +14,7 @@ module.exports = class ServerDashboardDataSource
 
   # Gets the widget data source for a specific widget
   getWidgetDataSource: (widgetId) ->
-    return new ServerWidgetDataSource(_.extend({}, options, widgetId: widgetId))
+    return new ServerWidgetDataSource(_.extend({}, @options, widgetId: widgetId))
 
 class ServerWidgetDataSource
   # options:
@@ -45,7 +45,7 @@ class ServerWidgetDataSource
 
   # For map widgets, the following is required
   getMapDataSource: ->
-    return new ServerWidgetMapDataSource(options)
+    return new ServerWidgetMapDataSource(@options)
 
   # Get the url to download an image (by id from an image or imagelist column)
   # Height, if specified, is minimum height needed. May return larger image
@@ -68,7 +68,7 @@ class ServerWidgetMapDataSource
 
   # Gets the data source for a layer
   getLayerDataSource: (layerId) ->
-    return new ServerWidgetLayerDataSource(_.extend({}, options, layerId: layerId))
+    return new ServerWidgetLayerDataSource(_.extend({}, @options, layerId: layerId))
 
 class ServerWidgetLayerDataSource
   # options:
@@ -93,33 +93,21 @@ class ServerWidgetLayerDataSource
 
   # Gets widget data source for a popup widget
   getPopupWidgetDataSource: (widgetId) -> 
-    return new ServerWidgetLayerPopupWidgetDataSource(_.extend({}, options, popupWidgetId: widgetId))
-
-  # For map widgets, the following are required:
-
-  # Get the url for the image tiles with the specified filters applied
-  # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-  getTileUrl: (layerId, filters) ->
-    return @createUrl(layerId, filters, "png")
-
-  # Get the url for the interactivity tiles with the specified filters applied
-  # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-  getUtfGridUrl: (layerId, filters) ->
-    return @createUrl(layerId, filters, "grid.json")
+    return new ServerWidgetLayerPopupWidgetDataSource(_.extend({}, @options, popupWidgetId: widgetId))
 
   # Create url
   createUrl: (filters, extension) ->
     query = {
       type: "dashboard_widget"
-      client: @client
-      share: @share
-      dashboard: @dashboardId
-      widget: @widgetId
-      layer: @layerId
+      client: @options.client
+      share: @options.share
+      dashboard: @options.dashboardId
+      widget: @options.widgetId
+      layer: @options.layerId
       filters: JSON.stringify(filters or [])
     }
 
-    url = "#{@apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?" + querystring.stringify(query)
+    url = "#{@options.apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?" + querystring.stringify(query)
 
     # Add subdomains: {s} will be substituted with "a", "b" or "c" in leaflet for api.mwater.co only.
     # Used to speed queries

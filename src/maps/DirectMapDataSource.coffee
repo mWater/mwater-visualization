@@ -93,8 +93,19 @@ class DirectLayerDataSource
 
   # Gets widget data source for a popup widget
   getPopupWidgetDataSource: (widgetId) -> 
+    # Get layerView
+    layerView = _.findWhere(@options.design.layerViews, { id: @options.layerId })
+    if not layerView
+      return null
+
+    # Create layer
+    layer = LayerFactory.createLayer(layerView.type)
+
+    # Clean design (prevent ever displaying invalid/legacy designs)
+    design = layer.cleanDesign(layerView.design, @options.schema)
+
     # Get widget
-    { type, design } = new BlocksLayoutManager().getWidgetTypeAndDesign(@options.design.popup.items, widgetId)
+    { type, design } = new BlocksLayoutManager().getWidgetTypeAndDesign(design.popup.items, widgetId)
 
     # Create widget
     widget = WidgetFactory.createWidget(type)
@@ -102,10 +113,10 @@ class DirectLayerDataSource
     return new DirectWidgetDataSource({
       widget: widget
       design: design
-      schema: options.schema
-      dataSource: options.dataSource
-      apiUrl: options.apiUrl
-      client: options.client
+      schema: @options.schema
+      dataSource: @options.dataSource
+      apiUrl: @options.apiUrl
+      client: @options.client
     })
 
   # Create query string

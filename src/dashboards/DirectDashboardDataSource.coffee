@@ -12,24 +12,20 @@ module.exports = class DirectDashboardDataSource
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   constructor: (options) ->
-    @schema = options.schema
-    @dataSource = options.dataSource
-    @design = options.design
-    @apiUrl = options.apiUrl
-    @client = options.client
+    @options = options
 
   # Gets the widget data source for a specific widget
   getWidgetDataSource: (widgetId) ->
     # Get widget type and design from layout manager
-    { type, design } = LayoutManager.createLayoutManager(@design.layout).getWidgetTypeAndDesign(@design.items, widgetId)
+    { type, design } = LayoutManager.createLayoutManager(@options.design.layout).getWidgetTypeAndDesign(@options.design.items, widgetId)
 
     widget = WidgetFactory.createWidget(type)
     return new DirectWidgetDataSource({
-      apiUrl: @apiUrl
-      client: @client
+      apiUrl: @options.apiUrl
+      client: @options.client
       widget: widget
       design: design
-      schema: @schema
-      dataSource: @dataSource
+      schema: @options.schema
+      dataSource: @options.dataSource
     })
 

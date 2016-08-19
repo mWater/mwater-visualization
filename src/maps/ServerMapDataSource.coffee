@@ -38,7 +38,7 @@ class ServerLayerDataSource
   # Called with (filters) where filters are filters to apply. Returns URL
   getTileUrl: (filters) ->
     # Get layerView
-    layerView = _.findWhere(@options.design.layerViews, { id: layerId })
+    layerView = _.findWhere(@options.design.layerViews, { id: @options.layerId })
     if not layerView
       return null
 
@@ -64,7 +64,7 @@ class ServerLayerDataSource
   # Called with (filters) where filters are filters to apply. Returns URL
   getUtfGridUrl: (filters) -> 
     # Get layerView
-    layerView = _.findWhere(@options.design.layerViews, { id: layerId })
+    layerView = _.findWhere(@options.design.layerViews, { id: @options.layerId })
     if not layerView
       return null
 
