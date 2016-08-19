@@ -43,19 +43,8 @@ module.exports = class BlocksLayoutManager extends LayoutManager
 
   # Add a widget, returning new items
   addWidget: (items, widgetType, widgetDesign) ->
-    # Create item
-    item = {
-      layout: layout
-      widget: {
-        type: widgetType
-        design: widgetDesign
-      }
-    }
-
-    id = uuid.v4()
-
     # Add to root block
     items = items or { type: "root", id: "root", blocks: [] }
-    items.blocks.push({ type: "widget", id: id, widgetType: widgetType, design: widgetDesign, aspectRatio: 1.4 })
+    items.blocks.push({ type: "widget", id: uuid.v4(), widgetType: widgetType, design: widgetDesign, aspectRatio: 1.4 })
 
     return items

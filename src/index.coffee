@@ -44,6 +44,8 @@ exports.DirectWidgetDataSource = require './widgets/DirectWidgetDataSource'
 exports.ServerMapDataSource = require './maps/ServerMapDataSource'
 exports.DirectMapDataSource = require './maps/DirectMapDataSource'
 
+exports.LayoutManager = require './layouts/LayoutManager'
+
 # Polyfill pathseg https://github.com/masayuki0812/c3/issues/1529
 require './pathseg-polyfill.js'
 

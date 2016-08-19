@@ -93,7 +93,7 @@ module.exports = class GridLayoutManager extends LayoutManager
   # Add a widget to the items
   addWidget: (items, widgetType, widgetDesign) ->
     # Find place for new item
-    layout = @findOpenLayout(items, width, height)
+    layout = @findOpenLayout(items, 12, 12)
 
     # Create item
     item = {
