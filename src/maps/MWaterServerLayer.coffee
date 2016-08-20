@@ -48,7 +48,7 @@ module.exports = class MWaterServerLayer extends Layer
     return if design.table then [design.table] else []
 
   # True if layer can be edited
-  isEditable: (design, schema) ->
+  isEditable: () ->
     return false
 
   # Returns a cleaned design

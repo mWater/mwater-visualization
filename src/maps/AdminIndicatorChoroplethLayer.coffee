@@ -254,7 +254,7 @@ module.exports = class AdminIndicatorChoroplethLayer extends Layer
     return if design.table then [design.table] else []
 
   # True if layer can be edited
-  isEditable: (design, schema) ->
+  isEditable: () ->
     return true
 
   # Returns a cleaned design

@@ -266,7 +266,7 @@ module.exports = class MarkersLayer extends Layer
     return if design.table then [design.table] else []
 
   # True if layer can be edited
-  isEditable: (design, schema) ->
+  isEditable: () ->
     return true
 
   # Creates a design element with specified options

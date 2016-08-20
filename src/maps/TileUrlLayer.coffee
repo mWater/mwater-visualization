@@ -23,7 +23,7 @@ module.exports = class TileUrlLayer extends Layer
   getMaxZoom: (design) -> return null
 
   # True if layer can be edited
-  isEditable: (design, schema) ->
+  isEditable: () ->
     return true
 
   # True if layer is incomplete (e.g. brand new) and should be editable immediately

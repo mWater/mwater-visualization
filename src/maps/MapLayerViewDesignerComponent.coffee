@@ -57,10 +57,8 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
   renderEditor: ->
     layer = LayerFactory.createLayer(@props.layerView.type)
     return H.div null,
-      H.div style: { textAlign: "right" },
-        H.a className: "btn btn-link btn-xs", onClick: @props.onRemove, "Delete Layer"
       @renderOpacityControl()
-      if layer.isEditable(@props.layerView.design)
+      if layer.isEditable()
         layer.createDesignerElement({
           design: @props.layerView.design
           schema: @props.schema
@@ -69,14 +67,12 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
         })
 
   renderLayerEditToggle: ->
-    layer = LayerFactory.createLayer(@props.layerView.type)
-
-    H.div style: { float: "right" }, key: "gear",
+    return H.div style: { float: "right", cursor: "pointer", marginLeft: 10 }, key: "gear",
       H.a onClick: @handleToggleEditing,
         if @state.editing
           H.i className: "fa fa-caret-up"
         else
-          H.i className: "fa fa-caret-down"
+          H.i className: "fa fa-cog"
 
   # renderLayerGearMenu: ->
   #   layer = LayerFactory.createLayer(@props.layerView.type)
@@ -96,8 +92,12 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
   handleOpacityChange: (newValue) =>
     @update(opacity: newValue/100)
 
+  handleRemove: =>
+    if confirm("Delete layer?")
+      @props.onRemove()
+
   renderOpacityControl: ->
-    H.div className: 'form-group',
+    H.div className: 'form-group', style: { paddingTop: 10 },
       H.label className: 'text-muted',
         H.span null,
           "Opacity: #{Math.round(@props.layerView.opacity * 100) }%"
@@ -111,6 +111,11 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
           onChange: @handleOpacityChange
         )
 
+  renderDeleteLayer: ->
+    H.div style: { float: "right", cursor: "pointer", marginLeft: 10 }, key: "delete",
+      H.a onClick: @handleRemove,
+        H.i className: "fa fa-remove"
+
   render: ->
     layer = LayerFactory.createLayer(@props.layerView.type)
     style =
@@ -123,6 +128,8 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
       H.div style: { fontSize: 16 }, key: "layerView",
         if @props.connectDragSource
           @props.connectDragSource(H.i(className: "fa fa-bars", style: style))
+        if @props.allowEditingLayer
+          @renderDeleteLayer()
         if @props.allowEditingLayer
           @renderLayerEditToggle()
         @renderVisible()

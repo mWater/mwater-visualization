@@ -44,7 +44,7 @@ module.exports = class Layer
     return []
 
   # True if layer can be edited
-  isEditable: (design, schema) ->
+  isEditable: () ->
     return false
 
   # True if layer is incomplete (e.g. brand new) and should be editable immediately

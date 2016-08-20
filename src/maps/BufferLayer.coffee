@@ -255,7 +255,7 @@ module.exports = class BufferLayer extends Layer
     return if design.table then [design.table] else []
 
   # True if layer can be edited
-  isEditable: (design, schema) -> true
+  isEditable: () -> true
 
   # True if layer is incomplete (e.g. brand new) and should be editable immediately
   isIncomplete: (design, schema) ->
