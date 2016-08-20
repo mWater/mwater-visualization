@@ -1,10 +1,10 @@
 React = require 'react'
 H = React.DOM
 R = React.createElement
-TabbedComponent = require('react-library/lib/TabbedComponent')
+
 MapLayersDesignerComponent = require './MapLayersDesignerComponent'
 MapFiltersDesignerComponent = require './MapFiltersDesignerComponent'
-ClickOutHandler = require('react-onclickout')
+BaseLayerDesignerComponent = require './BaseLayerDesignerComponent'
 
 module.exports = class MapDesignerComponent extends React.Component
   @propTypes:
@@ -24,6 +24,7 @@ module.exports = class MapDesignerComponent extends React.Component
         dataSource: @props.dataSource
         design: @props.design
         onDesignChange: @props.onDesignChange
+        allowEditingLayers: true
 
       H.br()
 
@@ -40,60 +41,12 @@ module.exports = class MapDesignerComponent extends React.Component
           "Map Style"
   
         R BaseLayerDesignerComponent,
-          schema: @props.schema
           design: @props.design
           onDesignChange: @props.onDesignChange
 
       R AttributionComponent,
         text: @props.design.attribution
         onTextChange: @handleAttributionChange
-
-# Designer for config
-class BaseLayerDesignerComponent extends React.Component
-  @propTypes:
-    design: React.PropTypes.object.isRequired  # See Map Design.md
-    onDesignChange: React.PropTypes.func.isRequired # Called with new design
-
-  # Updates design with the specified changes
-  updateDesign: (changes) ->
-    design = _.extend({}, @props.design, changes)
-    @props.onDesignChange(design)
-
-  handleBaseLayerChange: (baseLayer) =>
-    @updateDesign(baseLayer: baseLayer)
-
-  renderBaseLayer: (id, name) ->
-    className = "mwater-visualization-layer"
-    if id == @props.design.baseLayer
-      className += " checked"
-    
-    H.div 
-      key: id
-      className: className
-      style: { display: "inline-block" },
-      onClick: @handleBaseLayerChange.bind(null, id),
-        name
-
-  render: ->
-    H.div style: { marginLeft: 10 }, 
-      @renderBaseLayer("cartodb_positron", "Light")
-      @renderBaseLayer("cartodb_dark_matter", "Dark")
-      @renderBaseLayer("bing_road", "Roads")
-      @renderBaseLayer("bing_aerial", "Satellite")
-
-  # handleBaseLayerChange: (ev) =>
-  #   @updateDesign(baseLayer: ev.target.value)
-
-  # render: ->
-  #   H.select className: "form-control", value: @props.design.baseLayer, onChange: @handleBaseLayerChange,
-  #     H.option key: "bing_road", value: "bing_road",
-  #       "Roads"
-  #     H.option key: "bing_aerial", value: "bing_aerial",
-  #       "Satellite"
-  #     H.option key: "cartodb_positron", value: "cartodb_positron",
-  #       "Light"
-  #     H.option key: "cartodb_dark_matter", value: "cartodb_dark_matter",
-  #       "Dark"
 
 
 # Attribution inline editing

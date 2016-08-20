@@ -134,13 +134,15 @@ module.exports = L.TileLayer.extend({
 	},
 
 	onRemove: function(map) {
-		for (var i = 0; i < this._providers.length; i++) {
-			var p = this._providers[i];
-			if (p.active && this._map.attributionControl) {
-				this._map.attributionControl.removeAttribution(p.attrib);
-				p.active = false;
+		if (this._providers) {
+			for (var i = 0; i < this._providers.length; i++) {
+				var p = this._providers[i];
+				if (p.active && this._map.attributionControl) {
+					this._map.attributionControl.removeAttribution(p.attrib);
+					p.active = false;
+				}
 			}
 		}
-        	L.TileLayer.prototype.onRemove.apply(this, [map]);
+    L.TileLayer.prototype.onRemove.apply(this, [map]);
 	}
 });

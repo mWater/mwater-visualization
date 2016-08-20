@@ -48,7 +48,6 @@ module.exports = class DashboardViewComponent extends React.Component
     @setState(widgetScoper: @state.widgetScoper.applyScope(id, null))    
 
   handleItemsChange: (items) =>
-    console.log JSON.stringify(items, null, 2)
     design = _.extend({}, @props.design, items: items)
     @props.onDesignChange(design)
 

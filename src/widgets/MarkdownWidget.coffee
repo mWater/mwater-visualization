@@ -76,10 +76,13 @@ class MarkdownWidgetComponent extends React.Component
       onRequestClose: (=> @setState(editing: false)),
         content)
 
-  renderContent: (scale) ->
+  renderContent: ->
     React.createElement(MarkdownWidgetViewComponent, {
       design: @props.design
       onDesignChange: @props.onDesignChange
+      width: @props.width
+      height: @props.height
+      standardWidth: @props.standardWidth
     })
 
   render: ->
@@ -103,9 +106,9 @@ class MarkdownWidgetViewComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired # Design of chart
 
-    width: React.PropTypes.number
-    height: React.PropTypes.number
-    standardWidth: React.PropTypes.number
+    width: React.PropTypes.number.isRequired
+    height: React.PropTypes.number.isRequired
+    standardWidth: React.PropTypes.number.isRequired
 
   render: ->
     # Render in a standard width container and then scale up to ensure that widget always looks consistent

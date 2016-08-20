@@ -15,6 +15,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
     connectDragSource: React.PropTypes.func    # connector for reorderable
     connectDragPreview: React.PropTypes.func  #connector for reorderable
     connectDropTarget: React.PropTypes.func # connector for reorderable
+    allowEditingLayer: React.PropTypes.bool.isRequired
 
   constructor: (props) ->
     super(props)
@@ -22,7 +23,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
     layer = LayerFactory.createLayer(@props.layerView.type)
 
     @state = { 
-      editing: layer.isIncomplete(@props.layerView.design, @props.schema) # Editing initially if incomplete
+      editing: props.allowEditingLayer and layer.isIncomplete(@props.layerView.design, @props.schema) # Editing initially if incomplete
     }
 
   update: (updates) ->
@@ -35,9 +36,10 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
   handleSaveEditing: (design) => @update(design: design)
 
   handleRename: =>
-    name = prompt("Enter new name", @props.layerView.name)
-    if name
-      @update(name: name)
+    if @props.allowEditingLayer
+      name = prompt("Enter new name", @props.layerView.name)
+      if name
+        @update(name: name)
 
   renderVisible: ->
     if @props.layerView.visible
@@ -121,7 +123,8 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
       H.div style: { fontSize: 16 }, key: "layerView",
         if @props.connectDragSource
           @props.connectDragSource(H.i(className: "fa fa-bars", style: style))
-        @renderLayerEditToggle()
+        if @props.allowEditingLayer
+          @renderLayerEditToggle()
         @renderVisible()
         @renderName()
       if @state.editing

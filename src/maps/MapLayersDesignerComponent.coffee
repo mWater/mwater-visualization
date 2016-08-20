@@ -15,6 +15,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
+    allowEditingLayers: React.PropTypes.bool.isRequired  # True to allow editing layers
 
   # Updates design with the specified changes
   updateDesign: (changes) ->
@@ -60,6 +61,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
         connectDragSource: connectDragSource
         connectDragPreview: connectDragPreview
         connectDropTarget: connectDropTarget
+        allowEditingLayer: @props.allowEditingLayers
       )
 
   render: ->
@@ -79,12 +81,13 @@ module.exports = class MapLayersDesignerComponent extends React.Component
               getItemId: (layerView) => layerView.id
             )
 
-      R AddLayerComponent, 
-        key: "addlayer"
-        firstLayer: @props.design.layerViews.length == 0
-        schema: @props.schema
-        dataSource: @props.dataSource
-        design: @props.design
-        onDesignChange: @props.onDesignChange
+      if @props.allowEditingLayers
+        R AddLayerComponent, 
+          key: "addlayer"
+          firstLayer: @props.design.layerViews.length == 0
+          schema: @props.schema
+          dataSource: @props.dataSource
+          design: @props.design
+          onDesignChange: @props.onDesignChange
 
 

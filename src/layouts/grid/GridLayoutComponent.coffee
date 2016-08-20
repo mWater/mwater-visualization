@@ -26,7 +26,7 @@ module.exports = class GridLayoutComponent extends React.Component
     elems = []
     if number > 0
       for i in [1..number]
-        elems.push(H.div(className: "mwater-visualization-page-break", style: { position: "absolute", top: i * pageHeight }))
+        elems.push(H.div(className: "mwater-visualization-page-break", key: "page#{i}", style: { position: "absolute", top: i * pageHeight }))
 
     return elems
 
