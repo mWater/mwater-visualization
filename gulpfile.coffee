@@ -172,7 +172,7 @@ gulp.task 'watch', gulp.series([
   ])
 
 
-gulp.task "default", gulp.series("copy", "coffee", "build")
+gulp.task "default", gulp.series("copy", "coffee")
 
 # Shim non-browserify friendly libraries to allow them to be 'require'd
 shim = (instance) ->
