@@ -108,7 +108,12 @@ module.exports = class ItemsHtmlConverter
           items.push(JSON.parse(node.dataset.embed))
           continue
 
-        item = { type: "element", tag: node.tagName.toLowerCase(), items: @elemToItems(node) }
+        tag = node.tagName.toLowerCase()
+        # Strip namespace
+        if tag.match(/:/)
+          tag = tag.split(":")[1]
+
+        item = { type: "element", tag: tag, items: @elemToItems(node) }
 
         # Add style
         if node.style?
