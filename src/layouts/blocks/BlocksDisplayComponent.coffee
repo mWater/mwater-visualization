@@ -15,6 +15,8 @@ blockUtils = require './blockUtils'
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
+HorizontalBlockComponent = require './HorizontalBlockComponent'
+
 class BlocksDisplayComponent extends React.Component
   @propTypes:
     items: React.PropTypes.object.isRequired
@@ -46,16 +48,39 @@ class BlocksDisplayComponent extends React.Component
     items = blockUtils.cleanBlock(items)
     @props.onItemsChange(items)
 
+  handleBlockUpdate: (block) =>
+    items = blockUtils.updateBlock(@props.items, block)
+    @props.onItemsChange(items)
+
   renderBlock: (block) =>
     elem = null
 
     switch block.type
       when "root"
-        return R RootBlockComponent, key: block.id, block: block, renderBlock: @renderBlock, onBlockDrop: @handleBlockDrop, onBlockRemove: @handleBlockRemove
+        return R RootBlockComponent, 
+          key: block.id 
+          block: block 
+          renderBlock: @renderBlock
+          onBlockDrop: if @props.onItemsChange? then @handleBlockDrop
+          onBlockRemove: if @props.onItemsChange? then @handleBlockRemove
+
       when "vertical"
-        return R VerticalBlockComponent, key: block.id, block: block, renderBlock: @renderBlock, onBlockDrop: @handleBlockDrop, onBlockRemove: @handleBlockRemove
+        return R VerticalBlockComponent, 
+          key: block.id 
+          block: block 
+          renderBlock: @renderBlock
+          onBlockDrop: if @props.onItemsChange? then @handleBlockDrop
+          onBlockRemove: if @props.onItemsChange? then @handleBlockRemove
+
       when "horizontal"
-        return R HorizontalBlockComponent, key: block.id, block: block, renderBlock: @renderBlock, onBlockDrop: @handleBlockDrop, onBlockRemove: @handleBlockRemove
+        return R HorizontalBlockComponent, 
+          key: block.id 
+          block: block 
+          renderBlock: @renderBlock
+          onBlockDrop: if @props.onItemsChange? then @handleBlockDrop
+          onBlockRemove: if @props.onItemsChange? then @handleBlockRemove
+          onBlockUpdate: if @props.onItemsChange? then @handleBlockUpdate
+
       when "spacer"
         elem = R AutoSizeComponent, { injectWidth: true, key: block.id }, 
           (size) =>
@@ -173,26 +198,31 @@ class RootBlockComponent extends React.Component
   @propTypes:
     block: React.PropTypes.object.isRequired
     renderBlock: React.PropTypes.func.isRequired
-    onBlockDrop: React.PropTypes.func.isRequired # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
-    onBlockRemove: React.PropTypes.func.isRequired # Called with (block) when block is removed
+    onBlockDrop: React.PropTypes.func # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
+    onBlockRemove: React.PropTypes.func # Called with (block) when block is removed
 
   render: ->
-    R DraggableBlockComponent, 
-      block: @props.block
-      onBlockDrop: @props.onBlockDrop
-      style: { height: "100%" },
-      onlyBottom: true,
-        H.div key: "root",
-          _.map @props.block.blocks, (block) =>
-            @props.renderBlock(block)
+    elem = H.div key: "root",
+      _.map @props.block.blocks, (block) =>
+        @props.renderBlock(block)
 
+    # If draggable
+    if @props.onBlockDrop?
+      return R DraggableBlockComponent, 
+        block: @props.block
+        onBlockDrop: @props.onBlockDrop
+        style: { height: "100%" },
+        onlyBottom: true,
+          elem
+    else
+      return elem
 
 class VerticalBlockComponent extends React.Component
   @propTypes:
     block: React.PropTypes.object.isRequired
     renderBlock: React.PropTypes.func.isRequired
-    onBlockDrop: React.PropTypes.func.isRequired # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
-    onBlockRemove: React.PropTypes.func.isRequired # Called with (block) when block is removed
+    onBlockDrop: React.PropTypes.func # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
+    onBlockRemove: React.PropTypes.func # Called with (block) when block is removed
 
   render: ->
     H.div null,
@@ -200,17 +230,3 @@ class VerticalBlockComponent extends React.Component
         @props.renderBlock(block)
 
 
-class HorizontalBlockComponent extends React.Component
-  @propTypes:
-    block: React.PropTypes.object.isRequired
-    renderBlock: React.PropTypes.func.isRequired
-    onBlockDrop: React.PropTypes.func.isRequired # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
-    onBlockRemove: React.PropTypes.func.isRequired # Called with (block) when block is removed
-
-  render: ->
-    H.table style: { width: "100%", tableLayout: "fixed" },
-      H.tbody null,
-        H.tr null,
-          _.map @props.block.blocks, (block) =>
-            H.td style: { width: "#{100/@props.block.blocks.length}%", verticalAlign: "top" }, key: block.id,
-              @props.renderBlock(block)

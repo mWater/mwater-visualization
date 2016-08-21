@@ -222,9 +222,9 @@ class MWaterDirectDashboardPane extends React.Component
     super
 
     @state = {
-      design: { items: {}, layout: "grid" } # dashboardDesign
+      # design: { items: {}, layout: "grid" } # dashboardDesign
       # design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" } # dashboardDesign
-      # design: design
+      design: design
       # design: imageWidgetDashboardDesign
       # design: dashboardDesign
       extraTables: [] #['responses:e24f0a0ec11643cab3c21c07de2f6889']
@@ -1023,7 +1023,7 @@ imageWidgetDashboardDesign = {
   }
 }
 
-dashboardDesign = {
+oldDashboardDesign = {
   "items": {
     "c83b1d83-bc2b-4c87-a7fc-2e4bcd7694d8": {
       "layout": {
