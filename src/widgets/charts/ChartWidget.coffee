@@ -113,7 +113,7 @@ class ChartWidgetComponent extends React.Component
   handleEndEditing: =>
     @setState(editing: false)
 
-  renderChart: ->
+  renderChart: (width, height, standardWidth) ->
     React.createElement(ChartViewComponent, 
       chart: @props.chart
       design: @props.design
@@ -122,9 +122,9 @@ class ChartWidgetComponent extends React.Component
       widgetDataSource: @props.widgetDataSource
       scope: @props.scope
       filters: @props.filters
-      width: @props.width
-      height: @props.height
-      standardWidth: @props.standardWidth
+      width: width
+      height: height
+      standardWidth: standardWidth
       onScopeChange: @props.onScopeChange)
 
   renderEditor: ->
@@ -133,7 +133,7 @@ class ChartWidgetComponent extends React.Component
 
     # Create chart (maxing out at half of width of screen)
     width = Math.min(document.body.clientWidth/2, @props.width)
-    chart = @renderChart(width, @props.height * (width / @props.width))
+    chart = @renderChart(width, @props.height * (width / @props.width), width)
 
     content = H.div style: { height: "100%", width: "100%" },
       H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: width + 20, height: @props.height + 20 },
@@ -174,7 +174,7 @@ class ChartWidgetComponent extends React.Component
         width: @props.width
         height: @props.height
         dropdownItems: dropdownItems,
-          @renderChart()
+          @renderChart(@props.width, @props.height, @props.standardWidth)
       )
       if (emptyDesign or not validDesign) and @props.onDesignChange?
         @renderEditLink()

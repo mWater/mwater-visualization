@@ -64,12 +64,14 @@ module.exports = class TextWidget extends Widget
 
       exprCompiler = new ExprCompiler(schema)
 
+      # Get two distinct examples to know if unique
       query = {
+        distinct: true
         selects: [
           { type: "select", expr: exprCompiler.compileExpr(expr: exprItem.expr, tableAlias: "main"), alias: "value" }
         ]
         from: { type: "table", table: table, alias: "main" }
-        limit: 1
+        limit: 2
       }
 
       # Get relevant filters
@@ -89,7 +91,11 @@ module.exports = class TextWidget extends Widget
         if error
           cb(error)
         else
-          cb(null, rows[0]?.value)
+          # If multiple, use null
+          if rows.length != 1
+            cb(null, null)
+          else 
+            cb(null, rows[0].value)
       )
 
     # Map of value by id
