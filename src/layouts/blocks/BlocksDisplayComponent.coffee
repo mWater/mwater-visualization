@@ -112,7 +112,7 @@ class BlocksDisplayComponent extends React.Component
     return () -> { block: _.extend({}, block, id: uuid.v4()) }
 
   renderPalette: ->
-    H.div key: "palette", style: { width: 102, height: "100%", position: "absolute", top: 0, left: 0 }, 
+    H.div key: "palette", style: { width: 185, height: "100%", position: "absolute", top: 0, left: 0 }, 
       H.div className: "mwater-visualization-palette", style: { height: "100%" },
         R PaletteItemComponent, 
           createItem: @createBlockItem({ type: "widget", widgetType: "Text", design: { style: "title" } })
@@ -160,7 +160,7 @@ class BlocksDisplayComponent extends React.Component
     if @props.onItemsChange
       return H.div style: { width: "100%", height: "100%", overflow: "hidden", position: "relative" },
         @renderPalette()
-        H.div key: "design", className: "mwater-visualization-block-parent-#{@props.style or "default"}", style: { height: "100%", overflow: "scroll", marginLeft: 102 },
+        H.div key: "design", className: "mwater-visualization-block-parent-#{@props.style or "default"}", style: { height: "100%", overflow: "scroll", marginLeft: 185 },
           @renderBlock(@props.items)
     else
       return H.div style: { width: "100%", height: "100%" },

@@ -15,7 +15,7 @@ module.exports = class GridLayoutManager extends LayoutManager
       # Add unique id
       return () -> { id: uuid.v4(), widget: { type: type, design: design }, bounds: { x: 0, y: 0, width: width/3, height: width/4 } } 
 
-    H.div className: "mwater-visualization-palette", style: { position: "absolute", top: 0, left: 0, bottom: 0 },
+    H.div className: "mwater-visualization-palette", style: { position: "absolute", top: 0, left: 0, bottom: 0, width: 185 },
       R PaletteItemComponent, 
         createItem: createWidgetItem("Text", { style: "title" })
         title: H.i className: "fa fa-font"
@@ -65,11 +65,11 @@ module.exports = class GridLayoutManager extends LayoutManager
     if options.onItemsChange?
       return H.div style: { position: "relative", height: "100%", overflow: "hidden" }, 
         @renderPalette(options.width)
-        H.div style: { position: "absolute", left: 102, top: 0, right: 0, bottom: 0, overflow: "scroll" },
+        H.div style: { position: "absolute", left: 185, top: 0, right: 0, bottom: 0, overflow: "scroll" },
           H.div style: { position: "absolute", left: 20, top: 20, right: 20, bottom: 20 },
             R GridLayoutComponent, 
-              width: options.width - 40 - 102
-              standardWidth: options.standardWidth - 40 - 102 # TODO 102? doc. needed?
+              width: options.width - 40 - 185
+              standardWidth: options.standardWidth - 40 - 185 # TODO 185? doc. needed?
               items: options.items
               onItemsChange: options.onItemsChange
               renderWidget: options.renderWidget
