@@ -279,34 +279,33 @@ design = {
                         },
                         "colorMap": [
                           {
-                            "value": null,
-                            "color": "#d49097"
+                            "value": "A pied",
+                            "color": "#1f77b4"
                           },
                           {
                             "value": "a pied",
-                            "color": "#ba4f5a"
+                            "color": "#aec7e8"
                           },
                           {
                             "value": "testing other",
-                            "color": "#81323a"
+                            "color": "#ff7f0e"
                           },
                           {
-                            "value": "A pied",
-                            "color": "#3e181c"
+                            "value": null,
+                            "color": "#ffbb78"
                           }
                         ],
                         "drawOrder": [
-                          null,
+                          "A pied",
                           "a pied",
                           "testing other",
-                          "A pied"
+                          null
                         ]
                       }
                     },
                     "color": "#0088FF",
                     "filter": null,
-                    "table": "entities.water_point",
-                    "symbol": "font-awesome/amazon"
+                    "table": "entities.water_point"
                   }
                 }
               ],

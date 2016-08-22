@@ -44,7 +44,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
 
     # Get categories (value + label)
     categories = axisBuilder.getCategories(props.axis)
-    if categories.length > 0
+    if categories.length > 1
       @setState(categories: categories)
       return
 

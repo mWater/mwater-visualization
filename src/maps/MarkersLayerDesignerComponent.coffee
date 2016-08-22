@@ -90,22 +90,23 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
     if not @props.design.axes.geometry
       return
 
-    colorAxisComponent = R ColorAxisComponent,
-      defaultColor: @props.design.color
-      schema: @props.schema
-      dataSource: @props.dataSource
-      axis: @props.design.axes.color
-      table: @props.design.table
-      handleColorChange: @handleColorChange
-      handleColorAxisChange: @handleColorAxisChange
-      table: @props.design.table
-
     return H.div className: "form-group",
       H.label className: "text-muted", 
         H.span className: "glyphicon glyphicon glyphicon-tint"
         "Color"
-      H.div null,
-        colorAxisComponent
+      H.div style: {marginLeft: 8},
+        R ColorAxisComponent,
+          defaultColor: @props.design.color
+          schema: @props.schema
+          dataSource: @props.dataSource
+          axis: @props.design.axes.color
+          table: @props.design.table
+          onColorChange: @handleColorChange
+          onColorAxisChange: @handleColorAxisChange
+          table: @props.design.table
+          showColorMap: true
+          types: ["text", "enum", "boolean"]
+          aggrNeed: "none"
 #        R(ColorComponent, color: @props.design.color, onChange: @handleColorChange)
 
   renderSymbol: ->

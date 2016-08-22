@@ -6,6 +6,7 @@ AxisBuilder = require '../axes/AxisBuilder'
 LegendGroup = require('./LegendGroup')
 ExprUtils = require('mwater-expressions').ExprUtils
 
+# wraps the legends for a layer
 module.exports = class LayerLegendComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired
@@ -37,20 +38,29 @@ module.exports = class LayerLegendComponent extends React.Component
   loadCategories: (props) ->
     axisBuilder = new AxisBuilder(schema: props.schema)
 
+    if not props.axis or not props.axis.colorMap
+      return
+
     # Get categories (value + label)
-    categories = axisBuilder.getCategories(props.axis, _.pluck(@props.axis.colorMap or [], "value"))
-    if categories.length > 0
+    categories = axisBuilder.getCategories(props.axis, _.pluck(props.axis.colorMap, "value"))
+    if categories.length > 1
       @setState(categories: categories)
       return
 
   render: ->
-    symbol = @props.symbol
+    if @props.axis and @props.axis.colorMap
+      colors = _.map @state.categories, (category) =>
+        color = _.find(@props.axis.colorMap, {value: category.value})
+        if color
+          {color: color.color, name: ExprUtils.localizeString(category.label) }
+        else # old color maps dont have null value
+          {color: @props.defaultColor, name: ExprUtils.localizeString(category.label) }
+    else
+      colors = []
 
     React.createElement LegendGroup,
-      symbol: symbol
-      items: _.map @state.categories, (category) =>
-        color = _.find(@props.axis.colorMap, {value: category.value})
-        {color: color.color, name: ExprUtils.localizeString(category.label) }
+      symbol: @props.symbol
+      items: colors
       defaultColor: @props.defaultColor
       name: @props.name
       radiusLayer: @props.radiusLayer

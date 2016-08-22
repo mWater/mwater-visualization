@@ -13,6 +13,7 @@ ReactSelect = require 'react-select'
 ColorComponent = require '../ColorComponent'
 Rcslider = require 'rc-slider'
 EditPopupComponent = require './EditPopupComponent'
+ColorAxisComponent = require '../axes/ColorAxisComponent'
 
 # Designer for a choropleth layer
 module.exports = class AdminChoroplethLayerDesigner extends React.Component
@@ -74,9 +75,21 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
     return H.div className: "form-group",
       H.label className: "text-muted", 
         H.span className: "glyphicon glyphicon glyphicon-tint"
-        if @props.design.axes.color then " Default Color" else " Color"
-      H.div style: { marginLeft: 8 }, 
-        R(ColorComponent, color: @props.design.color, onChange: updt(@props.onDesignChange, @props.design, "color"))
+        "Color"
+      H.div style: {marginLeft: 8},
+        R ColorAxisComponent,
+          defaultColor: @props.design.color
+          schema: @props.schema
+          dataSource: @props.dataSource
+          axis: @props.design.axes.color
+          table: @props.design.table
+          onColorChange: updt(@props.onDesignChange, @props.design, "color")
+          onColorAxisChange: updt(@props.onDesignChange, @props.design, ["axes", "color"])
+          table: @props.design.table
+          showColorMap: true
+          types: ["text", "enum", "boolean"]
+          aggrNeed: "required"
+#        R(ColorComponent, color: @props.design.color, onChange: updt(@props.onDesignChange, @props.design, "color"))
 
   renderColorAxis: ->
     if not @props.design.table
@@ -169,7 +182,6 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
       @renderAdminRegionExpr()
       @renderDisplayNames()
       @renderColor()
-      @renderColorAxis()
       @renderFillOpacity()
       @renderFilter()
       @renderPopup()

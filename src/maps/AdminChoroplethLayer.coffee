@@ -326,13 +326,13 @@ module.exports = class AdminChoroplethLayer extends Layer
   # Get the legend to be optionally displayed on the map. Returns
   # a React element
   getLegend: (design, schema, name, dataSource) ->
-    exprCleaner = new ExprCleaner(schema)
     axisBuilder = new AxisBuilder(schema: schema)
 
     React.createElement LayerLegendComponent,
       schema: schema
       name: name
       axis: axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean'], aggrNeed: "required")
+      defaultColor: design.color
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->

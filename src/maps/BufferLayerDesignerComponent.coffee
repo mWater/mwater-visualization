@@ -11,7 +11,7 @@ ColorComponent = require '../ColorComponent'
 TableSelectComponent = require '../TableSelectComponent'
 Rcslider = require 'rc-slider'
 EditPopupComponent = require './EditPopupComponent'
-
+ColorAxisComponent = require '../axes/ColorAxisComponent'
 
 module.exports = class BufferLayerDesignerComponent extends React.Component
   @propTypes:
@@ -102,9 +102,21 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
     return H.div className: "form-group",
       H.label className: "text-muted", 
         H.span className: "glyphicon glyphicon glyphicon-tint"
-        if @props.design.axes.color then " Default Color" else " Color"
-      H.div style: { marginLeft: 8 }, 
-        React.createElement(ColorComponent, color: @props.design.color, onChange: @handleColorChange)
+        "Color"
+      H.div style: {marginLeft: 8},
+        R ColorAxisComponent,
+          defaultColor: @props.design.color
+          schema: @props.schema
+          dataSource: @props.dataSource
+          axis: @props.design.axes.color
+          table: @props.design.table
+          onColorChange: @handleColorChange
+          onColorAxisChange: @handleColorAxisChange
+          table: @props.design.table
+          showColorMap: true
+          types: ["text", "enum", "boolean"]
+          aggrNeed: "none"
+#        React.createElement(ColorComponent, color: @props.design.color, onChange: @handleColorChange)
 
   renderFillOpacity: ->
     return H.div className: "form-group",
@@ -154,7 +166,6 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
       @renderGeometryAxis()
       @renderRadius()
       @renderColor()
-      @renderColorAxis()
       @renderFillOpacity()
       @renderFilter()
       @renderPopup()
