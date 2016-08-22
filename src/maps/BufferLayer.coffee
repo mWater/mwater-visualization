@@ -44,6 +44,10 @@ module.exports = class BufferLayer extends Layer
     layerDef = {
       layers: [{ id: "layer0", jsonql: @createJsonQL(design, schema, filters) }]
       css: @createCss(design, schema, filters)
+      interactivity: { 
+        layer: "layer0"
+        fields: ["id"]
+      }
     }
     
     return layerDef
@@ -205,13 +209,83 @@ module.exports = class BufferLayer extends Layer
   #     design: design of layer
   #     schema: schema to use
   #     dataSource: data source to use
+  #     layerDataSource: layer data source
+  #     scopeData: current scope data if layer is scoping
   # 
   # Returns:
-  #   null/undefined to do nothing
-  #   [table id, primary key] to open a default system popup if one is present
-  #   React element to put into a popup
-  onGridClick: (ev, options) ->
-    return null
+  #   null/undefined 
+  #   or
+  #   {
+  #     scope: scope to apply ({ name, filter, data })
+  #     row: { tableId:, primaryKey: }  # row that was selected
+  #     popup: React element to put into a popup
+  #   }
+  onGridClick: (ev, clickOptions) ->
+    # TODO abstract most to base class
+    if ev.data and ev.data.id
+      results = {
+        row: { tableId: clickOptions.design.table, primaryKey: ev.data.id }
+      }
+
+      # Create filter for single row
+      table = clickOptions.design.table
+
+      ids = clickOptions.scopeData or []
+
+      # Toggle marker
+      if ev.data.id in ids
+        ids = _.without(ids, ev.data.id)
+      else
+        ids = ids.concat([ev.data.id])
+
+      filter = { 
+        table: table
+        jsonql: { type: "op", op: "=", modifier: "any", exprs: [
+          { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table).primaryKey }
+          { type: "literal", value: ids }
+        ]} 
+      }
+
+      # Scope to marker
+      results.scope = {
+        name: "Selected Marker(s)"
+        filter: filter
+        data: ids
+      }
+
+      if clickOptions.design.popup
+        BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
+        WidgetFactory = require '../widgets/WidgetFactory'
+
+        results.popup = new BlocksLayoutManager().renderLayout({
+          items: clickOptions.design.popup.items
+          renderWidget: (options) =>
+            widget = WidgetFactory.createWidget(options.type)
+
+            # Create filters for single row
+            filters = [filter]
+
+            # Get data source for widget
+            widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(options.id)
+
+            return widget.createViewElement({
+              schema: clickOptions.schema
+              dataSource: clickOptions.dataSource
+              widgetDataSource: widgetDataSource
+              design: options.design
+              scope: null
+              filters: filters
+              onScopeChange: null
+              onDesignChange: null
+              width: options.width
+              height: options.height
+              standardWidth: null
+            })  
+          })
+
+      return results
+    else
+      return null
 
   # Get min and max zoom levels
   getMinZoom: (design) -> 

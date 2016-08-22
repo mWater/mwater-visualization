@@ -25,11 +25,11 @@ module.exports = class Layer
   #     scopeData: current scope data if layer is scoping
   # 
   # Returns:
-  #   null/undefined to do nothing
+  #   null/undefined 
   #   or
   #   {
   #     scope: scope to apply ({ name, filter, data })
-  #     row: { tableId:, primaryKey: }
+  #     row: { tableId:, primaryKey: }  # row that was selected
   #     popup: React element to put into a popup
   #   }
   onGridClick: (ev, options) ->

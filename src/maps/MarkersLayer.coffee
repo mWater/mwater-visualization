@@ -183,11 +183,16 @@ module.exports = class MarkersLayer extends Layer
   #     schema: schema to use
   #     dataSource: data source to use
   #     layerDataSource: layer data source
+  #     scopeData: current scope data if layer is scoping
   # 
   # Returns:
-  #   null/undefined to do nothing
-  #   [table id, primary key] to open a default system popup if one is present
-  #   React element to put into a popup TODO udpate docs here
+  #   null/undefined 
+  #   or
+  #   {
+  #     scope: scope to apply ({ name, filter, data })
+  #     row: { tableId:, primaryKey: }  # row that was selected
+  #     popup: React element to put into a popup
+  #   }
   onGridClick: (ev, clickOptions) ->
     # TODO abstract most to base class
     if ev.data and ev.data.id

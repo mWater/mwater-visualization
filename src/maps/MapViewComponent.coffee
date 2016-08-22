@@ -80,24 +80,25 @@ module.exports = class MapViewComponent extends React.Component
     if not results
       return
 
-    # Handle popup as first priority
+    # Handle popup 
     if results.popup
       @setState(popupContents: results.popup)
-      return
 
-    # Next try scoping
-    if @props.onScopeChange and results.scope
-      # Encode layer view id into scope
-      scope = {
-        name: results.scope.name
-        filter: results.scope.filter
-        data: { layerViewId: layerViewId, data: results.scope.data }
-      }
+    # Handle scoping
+    if @props.onScopeChange and _.has(results, "scope")
+      if results.scope
+        # Encode layer view id into scope
+        scope = {
+          name: results.scope.name
+          filter: results.scope.filter
+          data: { layerViewId: layerViewId, data: results.scope.data }
+        }
+      else
+        scope = null
 
       @props.onScopeChange(scope)
-      return
 
-    # Handle standard case
+    # Handle onRowClick case
     if results.row
       @props.onRowClick?(results.row.tableId, results.row.primaryKey)
 
@@ -210,7 +211,6 @@ module.exports = class MapViewComponent extends React.Component
 
       # Add scoped layer if scoping
       if isScoping
-        
         leafletLayer = {
           tileUrl: layerDataSource.getTileUrl(scopedCompiledFilters)
           utfGridUrl: layerDataSource.getUtfGridUrl(scopedCompiledFilters)

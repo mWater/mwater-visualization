@@ -200,7 +200,8 @@ module.exports = class LeafletMapComponent extends React.Component
           tileLayer._container.className += ' leaflet-zoom-hide'
 
         @utfGridLayers = []
-        for layer in @props.layers
+        # Add grid layers in reverse order
+        for layer in @props.layers.slice().reverse()
           if not layer.visible
             continue
             
