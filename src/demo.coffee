@@ -825,7 +825,7 @@ mapDesign = {
       "name": "Untitled Layer",
       "desc": "",
       "type": "Markers",
-      "visible": true,
+      "visible": false,
       "opacity": 1,
       "design": {
         "axes": {
@@ -835,6 +835,37 @@ mapDesign = {
               "table": "entities.water_point",
               "column": "location"
             }
+          },
+          "color": {
+            "expr": {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "drilling_method_other"
+            },
+            "colorMap": [
+              {
+                "value": null,
+                "color": "#d49097"
+              },
+              {
+                "value": "a pied",
+                "color": "#ba4f5a"
+              },
+              {
+                "value": "testing other",
+                "color": "#81323a"
+              },
+              {
+                "value": "A pied",
+                "color": "#3e181c"
+              }
+            ],
+            "drawOrder": [
+              null,
+              "a pied",
+              "testing other",
+              "A pied"
+            ]
           }
         },
         "color": "#0088FF",
@@ -925,6 +956,56 @@ mapDesign = {
             ]
           }
         }
+      }
+    },
+    {
+      "id": "cc3771af-ce10-48ee-b48a-e698513fa8bf",
+      "name": "Untitled Layer",
+      "desc": "",
+      "type": "Buffer",
+      "visible": false,
+      "opacity": 1,
+      "design": {
+        "axes": {
+          "geometry": {
+            "expr": {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "location"
+            }
+          },
+          "color": {
+            "expr": {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "drilling_method"
+            },
+            "colorMap": [
+              {
+                "value": "manual",
+                "color": "#d49097"
+              },
+              {
+                "value": "mechanical",
+                "color": "#a9424c"
+              },
+              {
+                "value": "other",
+                "color": "#542126"
+              }
+            ],
+            "drawOrder": [
+              "manual",
+              "mechanical",
+              "other"
+            ]
+          }
+        },
+        "radius": 100000,
+        "fillOpacity": 0.5,
+        "filter": null,
+        "table": "entities.water_point",
+        "color": "#6244f8",
       }
     }
   ],
@@ -1057,21 +1138,31 @@ dashboardDesign = {
                     "expr": {
                       "type": "field",
                       "table": "entities.water_point",
-                      "column": "drilling_method"
+                      "column": "drilling_method_other"
                     },
                     "colorMap": [
                       {
-                        "value": "manual",
+                        "value": null,
                         "color": "#d49097"
                       },
                       {
-                        "value": "mechanical",
-                        "color": "#a9424c"
+                        "value": "a pied",
+                        "color": "#ba4f5a"
                       },
                       {
-                        "value": "other",
-                        "color": "#542126"
+                        "value": "testing other",
+                        "color": "#81323a"
+                      },
+                      {
+                        "value": "A pied",
+                        "color": "#3e181c"
                       }
+                    ],
+                    "drawOrder": [
+                      null,
+                      "a pied",
+                      "testing other",
+                      "A pied"
                     ]
                   }
                 },

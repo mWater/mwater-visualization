@@ -9,6 +9,7 @@ ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../axes/AxisBuilder'
 LegendGroup = require('./LegendGroup')
+LayerLegendComponent = require './LayerLegendComponent'
 
 ###
 Layer that is composed of markers
@@ -235,31 +236,12 @@ module.exports = class MarkersLayer extends Layer
 
   # Get the legend to be optionally displayed on the map. Returns
   # a React element
-  getLegend: (design, schema, name) ->
-    axisBuilder = new AxisBuilder(schema: schema)
-    exprUtils = new ExprUtils(schema)
-
-    if design.axes.color and design.axes.color.colorMap
-      categories = axisBuilder.getCategories(design.axes.color)
-
-      colors = _.map design.axes.color.colorMap, (colorItem) =>
-        category = _.find(categories, {value: colorItem.value})
-        _name = if category then ExprUtils.localizeString(category.label) else colorItem.value
-        {color: colorItem.color, name: _name }
-    else
-      colors = []
-
-    symbol = if design.symbol then design.symbol else 'font-awesome/circle'
-
-    legendGroupProps =
-      symbol: symbol
-      items: colors
-      key: design.axes.geometry.expr.table
-      defaultColor: design.color
+  getLegend: (design, schema, name, dataSource) ->
+    React.createElement LayerLegendComponent,
+      design: design
+      schema: schema
+      dataSource: dataSource
       name: name
-
-    H.div null,
-      React.createElement(LegendGroup, legendGroupProps)
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->

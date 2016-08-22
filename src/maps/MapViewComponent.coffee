@@ -83,7 +83,7 @@ module.exports = class MapViewComponent extends React.Component
           return null
 
         if layerView.visible
-          return { key: layerView.id, legend: layer.getLegend(design, @props.schema, layerView.name) }
+          return { key: layerView.id, legend: layer.getLegend(design, @props.schema, layerView.name, @props.dataSource) }
       )
     )
 

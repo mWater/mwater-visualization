@@ -42,12 +42,6 @@ module.exports = class AxisColorEditorComponent extends React.Component
   loadCategories: (props) ->
     axisBuilder = new AxisBuilder(schema: props.schema)
 
-    # Get categories (value + label)
-    categories = axisBuilder.getCategories(props.axis)
-    if categories.length > 0
-      @setState(categories: categories)
-      return
-
     # Check for axis
     axis = axisBuilder.cleanAxis(axis: props.axis)
     # Ignore if error
@@ -58,13 +52,13 @@ module.exports = class AxisColorEditorComponent extends React.Component
 
     # If no categories, we need values as input
     valuesQuery = {
-     type: "query"
-     selects: [
-       { type: "select", expr: axisCompiledExpr, alias: "val" }
-     ]
-     from: { type: "table", table: axis.expr.table, alias: "main" }
-     groupBy: [1]
-     limit: 50
+      type: "query"
+      selects: [
+        { type: "select", expr: axisCompiledExpr, alias: "val" }
+      ]
+      from: { type: "table", table: axis.expr.table, alias: "main" }
+      groupBy: [1]
+      limit: 50
     }
 
     props.dataSource.performQuery(valuesQuery, (error, rows) =>
@@ -107,7 +101,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
           onCancel: @handleCancelCustomize
         }
       if @state.mode == "customize"
-        [
+        H.div null,
           R ColorMapComponent,
             schema: @props.schema
             dataSource: @props.dataSource
@@ -116,9 +110,11 @@ module.exports = class AxisColorEditorComponent extends React.Component
             categories: @state.categories
             key: "colorMap"
           H.a style: { cursor: "pointer" }, onClick: @handleCancelCustomize, key: "cancel-customize", "Close"
-        ]
+
       if @state.mode == "normal"
         H.div null,
+          H.p null,
+            H.a style: { cursor: "pointer" }, onClick: @handleSelectPalette, key: "select-palette", "Change color scheme"
           if @props.axis.colorMap
             H.div key: "selected-palette",
               H.div className: "axis-palette",
@@ -129,10 +125,9 @@ module.exports = class AxisColorEditorComponent extends React.Component
                   width: 20
                   backgroundColor: map.color
                 H.div style: cellStyle, key: i, " "
-              H.p null,
-                H.a style: { cursor: "pointer" }, onClick: @handleCustomizePalette, key: "customize-palette", style: {marginRight: 10}, "Customize color scheme"
-          H.p null,
-            H.a style: { cursor: "pointer" }, onClick: @handleSelectPalette, key: "select-palette", "Select color scheme"
+              H.p style: {fontSize: 12},
+                H.a style: { cursor: "pointer" }, onClick: @handleCustomizePalette, key: "customize-palette", style: {marginRight: 10}, "Choose colors manually"
+
           if drawOrder and @props.colorMapReorderable
             R ColorMapOrderEditorComponent,
               colorMap: @props.axis.colorMap
