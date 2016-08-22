@@ -247,7 +247,6 @@ module.exports = class AdminChoroplethLayer extends Layer
   #     row: { tableId:, primaryKey: }  # row that was selected
   #     popup: React element to put into a popup
   #   }
-
   onGridClick: (ev, clickOptions) ->
     # TODO abstract most to base class
     if ev.data and ev.data.id
