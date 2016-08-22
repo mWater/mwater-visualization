@@ -551,9 +551,9 @@ describe "LayeredChartCompiler", ->
           ])
 
         compare(res.columns, [
-          ["x", "t1", "t2"]
-          ["0:a", 25, 100]
-          ["0:b", 75, null]
+          ["x", "t1", "t2", "None"]
+          ["0:a", 25, 100, null]
+          ["0:b", 75, null, null]
           ])
 
       it "colors based on color map", ->
@@ -681,8 +681,8 @@ describe "LayeredChartCompiler", ->
         res = @compiler.compileData(design, data)
 
         compare(res.columns, [
-          ["x", "A", "B"]
-          ["0", 10, 18] # Totals
+          ["x", "A", "B", "None"]
+          ["0", 10, 18, null] # Totals
           ])
 
       it "supports enumset x axis with JSON encoded x", ->
@@ -703,8 +703,8 @@ describe "LayeredChartCompiler", ->
         res = @compiler.compileData(design, data)
 
         compare(res.columns, [
-          ["x", "A", "B"]
-          ["0", 10, 18] # Totals
+          ["x", "A", "B", "None"]
+          ["0", 10, 18, null] # Totals
           ])
 
       # describe "enum x axis" 
