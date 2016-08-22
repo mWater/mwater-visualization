@@ -310,7 +310,7 @@ module.exports = class AdminChoroplethLayer extends Layer
               onDesignChange: null
               width: options.width
               height: options.height
-              standardWidth: null
+              standardWidth: options.standardWidth
             })  
           })
 

@@ -282,7 +282,7 @@ module.exports = class BufferLayer extends Layer
               onDesignChange: null
               width: options.width
               height: options.height
-              standardWidth: null
+              standardWidth: options.standardWidth
             })  
           })
 
