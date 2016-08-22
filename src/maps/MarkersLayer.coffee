@@ -218,7 +218,7 @@ module.exports = class MarkersLayer extends Layer
       results.scope = {
         name: "Selected Marker(s)"
         filter: filter
-        data: ev.data.id
+        data: ids
       }
 
       if clickOptions.design.popup
