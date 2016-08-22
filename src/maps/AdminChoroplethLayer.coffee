@@ -51,10 +51,10 @@ module.exports = class AdminChoroplethLayer extends Layer
     layerDef = {
       layers: [{ id: "layer0", jsonql: @createJsonQL(design, schema, filters) }]
       css: @createCss(design, schema, filters)
-      # interactivity: { 
-      #   layer: "layer0"
-      #   fields: ["id"]
-      # }
+      interactivity: { 
+        layer: "layer0"
+        fields: ["id", "name"]
+      }
     }
     
     return layerDef
@@ -242,9 +242,42 @@ module.exports = class AdminChoroplethLayer extends Layer
   #   [table id, primary key] to open a default system popup if one is present
   #   React element to put into a popup
   onGridClick: (ev, options) ->
-    # if ev.data and ev.data.id
-    #   return [options.design.table, ev.data.id]
-    return null
+    # TODO abstract most to base class
+    if ev.data and ev.data.id
+      results = { }
+
+      # Create filter for single row
+      table = options.design.table
+      
+      # Compile adminRegionExpr
+      exprCompiler = new ExprCompiler(options.schema)
+      filterExpr = {
+        type: "op"
+        op: "within"
+        table: table
+        exprs: [
+          options.design.adminRegionExpr
+          { type: "literal", idTable: "admin_regions", valueType: "id", value: ev.data.id }
+        ]
+      }
+      compiledFilterExpr = exprCompiler.compileExpr(expr: filterExpr, tableAlias: "{alias}")
+
+      # Filter within
+      filter = { 
+        table: table
+        jsonql: compiledFilterExpr 
+      }
+
+      # Scope to marker
+      results.scope = {
+        name: ev.data.name
+        filter: filter
+        data: ev.data.id
+      }
+
+      return results
+    else
+      return null
 
   # Get min and max zoom levels
   getMinZoom: (design) -> return null

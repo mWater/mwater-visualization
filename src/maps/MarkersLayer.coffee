@@ -187,26 +187,51 @@ module.exports = class MarkersLayer extends Layer
   # Returns:
   #   null/undefined to do nothing
   #   [table id, primary key] to open a default system popup if one is present
-  #   React element to put into a popup
+  #   React element to put into a popup TODO udpate docs here
   onGridClick: (ev, clickOptions) ->
     # TODO abstract most to base class
     if ev.data and ev.data.id
+      results = {
+        row: { tableId: clickOptions.design.table, primaryKey: ev.data.id }
+      }
+
+      # Create filter for single row
+      table = clickOptions.design.table
+
+      ids = clickOptions.scopeData or []
+
+      # Toggle marker
+      if ev.data.id in ids
+        ids = _.without(ids, ev.data.id)
+      else
+        ids = ids.concat([ev.data.id])
+
+      filter = { 
+        table: table
+        jsonql: { type: "op", op: "=", modifier: "any", exprs: [
+          { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table).primaryKey }
+          { type: "literal", value: ids }
+        ]} 
+      }
+
+      # Scope to marker
+      results.scope = {
+        name: "Selected Marker(s)"
+        filter: filter
+        data: ev.data.id
+      }
+
       if clickOptions.design.popup
         BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
         WidgetFactory = require '../widgets/WidgetFactory'
 
-        return new BlocksLayoutManager().renderLayout({
+        results.popup = new BlocksLayoutManager().renderLayout({
           items: clickOptions.design.popup.items
           renderWidget: (options) =>
             widget = WidgetFactory.createWidget(options.type)
 
-            table = clickOptions.design.table
-
             # Create filters for single row
-            filters = [{ 
-              table: table
-              jsonql: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table).primaryKey }, ev.data.id] } 
-            }]
+            filters = [filter]
 
             # Get data source for widget
             widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(options.id)
@@ -226,8 +251,9 @@ module.exports = class MarkersLayer extends Layer
             })  
           })
 
-      return [clickOptions.design.table, ev.data.id]
-    return null
+      return results
+    else
+      return null
 
   # Get min and max zoom levels
   getMinZoom: (design) -> return null
