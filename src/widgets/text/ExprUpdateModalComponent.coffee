@@ -52,8 +52,7 @@ module.exports = class ExprUpdateModalComponent extends React.Component
             table: @state.table
             types: ['text', 'number', 'enum', 'date', 'datetime', 'boolean', 'enumset']
             value: @state.expr
-            # Only individual if singleRowTable 
-            aggrStatuses: if @state.table == @props.singleRowTable then ["individual", "literal"] else ['literal', "aggregate"]
+            aggrStatuses: ["individual", "literal", "aggregate"]
             onChange: (expr) => @setState(expr: expr)
 
       if @state.table and @state.expr

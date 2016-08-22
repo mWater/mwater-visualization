@@ -301,16 +301,18 @@
 .mwater-visualization-palette {
   background-color: #363b3e;
   padding: 5px;
+  padding-top: 10px;
 }
 
 .mwater-visualization-palette-item {
   cursor: move;
   background-color: #4B5155;
-  margin: 10px;
+  margin: 7px;
   border-radius: 5px;
   color: white;
   width: 72px;
   text-align: center;
+  display: inline-block;
 }
 
 .mwater-visualization-text-palette {

@@ -29,7 +29,9 @@ module.exports = class MapWidget extends Widget
 
       design: options.design
       onDesignChange: options.onDesignChange
+      scope: options.scope
       filters: options.filters
+      onScopeChange: options.onScopeChange
       width: options.width
       height: options.height
       standardWidth: options.standardWidth
@@ -47,7 +49,9 @@ class MapWidgetComponent extends React.Component
     width: React.PropTypes.number
     height: React.PropTypes.number
 
+    scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+    onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
   constructor: (props) ->
     super
@@ -98,6 +102,8 @@ class MapWidgetComponent extends React.Component
         dataSource: @props.dataSource
         mapDataSource: @props.widgetDataSource.getMapDataSource()
         onDesignChange: @props.onDesignChange
+        scope: @props.scope
+        onScopeChange: @props.onScopeChange
         extraFilters: @props.filters
         width: @props.width - 20
         height: @props.height - 20

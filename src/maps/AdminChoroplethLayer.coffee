@@ -52,10 +52,10 @@ module.exports = class AdminChoroplethLayer extends Layer
     layerDef = {
       layers: [{ id: "layer0", jsonql: @createJsonQL(design, schema, filters) }]
       css: @createCss(design, schema, filters)
-      # interactivity: { 
-      #   layer: "layer0"
-      #   fields: ["id"]
-      # }
+      interactivity: { 
+        layer: "layer0"
+        fields: ["id", "name"]
+      }
     }
     
     return layerDef
@@ -237,15 +237,87 @@ module.exports = class AdminChoroplethLayer extends Layer
   #     design: design of layer
   #     schema: schema to use
   #     dataSource: data source to use
+  #     layerDataSource: layer data source
+  #     scopeData: current scope data if layer is scoping
   # 
   # Returns:
-  #   null/undefined to do nothing
-  #   [table id, primary key] to open a default system popup if one is present
-  #   React element to put into a popup
-  onGridClick: (ev, options) ->
-    # if ev.data and ev.data.id
-    #   return [options.design.table, ev.data.id]
-    return null
+  #   null/undefined 
+  #   or
+  #   {
+  #     scope: scope to apply ({ name, filter, data })
+  #     row: { tableId:, primaryKey: }  # row that was selected
+  #     popup: React element to put into a popup
+  #   }
+  onGridClick: (ev, clickOptions) ->
+    # TODO abstract most to base class
+    if ev.data and ev.data.id
+      results = { }
+
+      # Create filter for single row
+      table = clickOptions.design.table
+      
+      # Compile adminRegionExpr
+      exprCompiler = new ExprCompiler(clickOptions.schema)
+      filterExpr = {
+        type: "op"
+        op: "within"
+        table: table
+        exprs: [
+          clickOptions.design.adminRegionExpr
+          { type: "literal", idTable: "admin_regions", valueType: "id", value: ev.data.id }
+        ]
+      }
+      compiledFilterExpr = exprCompiler.compileExpr(expr: filterExpr, tableAlias: "{alias}")
+
+      # Filter within
+      filter = { 
+        table: table
+        jsonql: compiledFilterExpr 
+      }
+
+      # Scope to region, unless already scoped
+      if clickOptions.scopeData == ev.data.id
+        results.scope = null
+      else
+        results.scope = {
+          name: ev.data.name
+          filter: filter
+          data: ev.data.id
+        }
+
+      if clickOptions.design.popup
+        BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
+        WidgetFactory = require '../widgets/WidgetFactory'
+
+        results.popup = new BlocksLayoutManager().renderLayout({
+          items: clickOptions.design.popup.items
+          renderWidget: (options) =>
+            widget = WidgetFactory.createWidget(options.type)
+
+            # Create filters for single row
+            filters = [filter]
+
+            # Get data source for widget
+            widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(options.id)
+
+            return widget.createViewElement({
+              schema: clickOptions.schema
+              dataSource: clickOptions.dataSource
+              widgetDataSource: widgetDataSource
+              design: options.design
+              scope: null
+              filters: filters
+              onScopeChange: null
+              onDesignChange: null
+              width: options.width
+              height: options.height
+              standardWidth: null
+            })  
+          })
+
+      return results
+    else
+      return null
 
   # Get min and max zoom levels
   getMinZoom: (design) -> return null

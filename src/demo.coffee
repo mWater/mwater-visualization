@@ -141,23 +141,152 @@ design = {
         "id": "09c8981b-3869-410d-bd90-4a5a012314a8"
       },
       {
-        "id": "bc90d763-5429-40bc-b76b-b0d3868d7cfc",
+        "id": "9bec34a2-f0e5-4a0b-88e8-3406521408bf",
         "type": "horizontal",
         "blocks": [
           {
             "type": "widget",
             "aspectRatio": 1.4,
-            "widgetType": "Image",
+            "widgetType": "Map",
             "design": {
-              "imageUrl": null,
-              "uid": null,
-              "expr": {
-                "type": "field",
-                "table": "entities.community",
-                "column": "photos"
+              "baseLayer": "cartodb_positron",
+              "layerViews": [
+                {
+                  "id": "471776be-5c67-4d0d-a0fd-d406cc60c44c",
+                  "name": "Untitled Layer",
+                  "desc": "",
+                  "type": "AdminChoropleth",
+                  "visible": true,
+                  "opacity": 1,
+                  "design": {
+                    "color": "#FFFFFF",
+                    "adminRegionExpr": {
+                      "type": "field",
+                      "table": "entities.water_point",
+                      "column": "admin_region"
+                    },
+                    "axes": {
+                      "color": {
+                        "expr": {
+                          "type": "op",
+                          "table": "entities.water_point",
+                          "op": "percent where",
+                          "exprs": [
+                            {
+                              "type": "op",
+                              "table": "entities.water_point",
+                              "op": "= any",
+                              "exprs": [
+                                {
+                                  "type": "field",
+                                  "table": "entities.water_point",
+                                  "column": "type"
+                                },
+                                {
+                                  "type": "literal",
+                                  "valueType": "enumset",
+                                  "value": [
+                                    "Protected dug well",
+                                    "Unprotected dug well"
+                                  ]
+                                }
+                              ]
+                            },
+                            null
+                          ]
+                        },
+                        "xform": {
+                          "type": "bin",
+                          "numBins": 6,
+                          "min": 0,
+                          "max": 100
+                        },
+                        "colorMap": [
+                          {
+                            "value": 0,
+                            "color": "#c1cce6"
+                          },
+                          {
+                            "value": 1,
+                            "color": "#99abd6"
+                          },
+                          {
+                            "value": 2,
+                            "color": "#748dc8"
+                          },
+                          {
+                            "value": 3,
+                            "color": "#4c6db8"
+                          },
+                          {
+                            "value": 4,
+                            "color": "#3c5796"
+                          },
+                          {
+                            "value": 5,
+                            "color": "#2d4171"
+                          },
+                          {
+                            "value": 6,
+                            "color": "#1d2a49"
+                          },
+                          {
+                            "value": 7,
+                            "color": "#0f1524"
+                          }
+                        ],
+                        "drawOrder": [
+                          0,
+                          1,
+                          2,
+                          3,
+                          4,
+                          5,
+                          6,
+                          7
+                        ]
+                      }
+                    },
+                    "fillOpacity": 0.75,
+                    "displayNames": true,
+                    "filter": null,
+                    "scope": "eb3e12a2-de1e-49a9-8afd-966eb55d47eb",
+                    "detailLevel": 1,
+                    "table": "entities.water_point"
+                  }
+                },
+                {
+                  "id": "fc9a4641-8319-471d-9e80-c2c3a6b11e34",
+                  "name": "Untitled Layer",
+                  "desc": "",
+                  "type": "Markers",
+                  "visible": true,
+                  "opacity": 1,
+                  "design": {
+                    "axes": {
+                      "geometry": {
+                        "expr": {
+                          "type": "field",
+                          "table": "entities.water_point",
+                          "column": "location"
+                        }
+                      }
+                    },
+                    "color": "#0088FF",
+                    "filter": null,
+                    "table": "entities.water_point"
+                  }
+                }
+              ],
+              "filters": {},
+              "bounds": {
+                "w": 28.63037109375,
+                "n": -1.625758360412755,
+                "e": 41.06689453125,
+                "s": -10.336536087082974
               }
             },
-            "id": "e5360947-b1f6-4d85-8b07-8e15f3ef6d33"
+            "id": "a4148cd8-457f-4424-b464-c427f1b630de"
           },
           {
             "type": "widget",
@@ -213,8 +342,8 @@ design = {
       }
     ]
   },
-  "layout": "blocks"
-  style: "greybg"
+  "layout": "blocks",
+  "style": "greybg"
 }
 
 class MWaterDirectDashboardPane extends React.Component
@@ -222,9 +351,9 @@ class MWaterDirectDashboardPane extends React.Component
     super
 
     @state = {
-      design: { items: {}, layout: "grid" } # dashboardDesign
+      # design: { items: {}, layout: "grid" } # dashboardDesign
       # design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" } # dashboardDesign
-      # design: design
+      design: design
       # design: imageWidgetDashboardDesign
       # design: dashboardDesign
       extraTables: [] #['responses:e24f0a0ec11643cab3c21c07de2f6889']
@@ -474,11 +603,11 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(BlocksDesignerComponent, renderBlock: [])
     # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
@@ -1104,7 +1233,7 @@ imageWidgetDashboardDesign = {
   }
 }
 
-dashboardDesign = {
+oldDashboardDesign = {
   "items": {
     "c83b1d83-bc2b-4c87-a7fc-2e4bcd7694d8": {
       "layout": {

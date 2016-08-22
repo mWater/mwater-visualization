@@ -1,6 +1,7 @@
 
 
 # All logic needed to display and design a particular widget
+# Scopes are a feature of widgets that allow a widget to apply filters to another widget. See WidgetScoper for more details
 module.exports = class Widget
   # Creates a React element that is a view of the widget 
   # options:

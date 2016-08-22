@@ -8,7 +8,7 @@ ExprUtils = require('mwater-expressions').ExprUtils
 #  { type: "expr", id: unique id, expr: expression, includeLabel: true to include label, labelText: override label text } 
 module.exports = class ItemsHtmlConverter 
   # designMode is true to display in design mode (exprs as blocks)
-  # exprValues is map of expr id to value
+  # exprValues is map of expr id to value 
   # summarizeExprs shows summaries of expressions, not values
   constructor: (schema, designMode, exprValues, summarizeExprs = false) ->
     @schema = schema
@@ -67,11 +67,7 @@ module.exports = class ItemsHtmlConverter
             text = exprUtils.stringifyExprLiteral(item.expr, @exprValues[item.id]) # TODO locale
             exprHtml = _.escape(text)
           else
-            exprHtml = ""  
-
-          # "None" looked ugly
-          # else
-          #   exprHtml = '<span class="text-muted">None</span>'
+            exprHtml = '<span style="color: #DDD">---</span>'
 
         else # Placeholder
           exprHtml = '<span class="text-muted">\u25a0\u25a0\u25a0</span>'
@@ -108,7 +104,12 @@ module.exports = class ItemsHtmlConverter
           items.push(JSON.parse(node.dataset.embed))
           continue
 
-        item = { type: "element", tag: node.tagName.toLowerCase(), items: @elemToItems(node) }
+        tag = node.tagName.toLowerCase()
+        # Strip namespace
+        if tag.match(/:/)
+          tag = tag.split(":")[1]
+
+        item = { type: "element", tag: tag, items: @elemToItems(node) }
 
         # Add style
         if node.style?

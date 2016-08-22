@@ -12,7 +12,7 @@ TableSelectComponent = require '../TableSelectComponent'
 ReactSelect = require 'react-select'
 ColorComponent = require '../ColorComponent'
 Rcslider = require 'rc-slider'
-
+EditPopupComponent = require './EditPopupComponent'
 
 # Designer for a choropleth layer
 module.exports = class AdminChoroplethLayerDesigner extends React.Component
@@ -151,6 +151,17 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
           table: @props.design.table
           value: @props.design.filter)
 
+  renderPopup: ->
+    if not @props.design.table
+      return null
+
+    return R EditPopupComponent, 
+      design: @props.design
+      onDesignChange: @props.onDesignChange
+      schema: @props.schema
+      dataSource: @props.dataSource
+      table: @props.design.table
+
   render: ->
     H.div null,
       @renderRegionAndDetailLevel()
@@ -161,6 +172,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
       @renderColorAxis()
       @renderFillOpacity()
       @renderFilter()
+      @renderPopup()
 
 
 class RegionAndDetailLevelComponent extends React.Component

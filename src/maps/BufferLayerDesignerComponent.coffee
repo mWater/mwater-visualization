@@ -10,6 +10,8 @@ AxisComponent = require './../axes/AxisComponent'
 ColorComponent = require '../ColorComponent'
 TableSelectComponent = require '../TableSelectComponent'
 Rcslider = require 'rc-slider'
+EditPopupComponent = require './EditPopupComponent'
+
 
 module.exports = class BufferLayerDesignerComponent extends React.Component
   @propTypes:
@@ -135,6 +137,17 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
           table: @props.design.table
           value: @props.design.filter)
 
+  renderPopup: ->
+    if not @props.design.table
+      return null
+
+    return R EditPopupComponent, 
+      design: @props.design
+      onDesignChange: @props.onDesignChange
+      schema: @props.schema
+      dataSource: @props.dataSource
+      table: @props.design.table
+
   render: ->
     H.div null,
       @renderTable()
@@ -144,4 +157,5 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
       @renderColorAxis()
       @renderFillOpacity()
       @renderFilter()
+      @renderPopup()
 

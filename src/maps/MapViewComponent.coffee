@@ -32,6 +32,14 @@ module.exports = class MapViewComponent extends React.Component
       jsonql: React.PropTypes.object.isRequired
     })) # Extra filters to apply to view
 
+    # scope of the map (when a layer self-selects a particular scope)
+    scope: React.PropTypes.shape({
+      name: React.PropTypes.string.isRequired
+      filter: React.PropTypes.shape({ table: React.PropTypes.string.isRequired, jsonql: React.PropTypes.object.isRequired })
+      data: React.PropTypes.shape({ layerViewId: React.PropTypes.string.isRequired, data: React.PropTypes.any }).isRequired  
+      })
+    onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+
     dragging:  React.PropTypes.bool         # Whether the map be draggable with mouse/touch or not. Default true
     touchZoom: React.PropTypes.bool         # Whether the map can be zoomed by touch-dragging with two fingers. Default true
     scrollWheelZoom: React.PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
@@ -61,14 +69,41 @@ module.exports = class MapViewComponent extends React.Component
     design = layer.cleanDesign(layerView.design, @props.schema)
 
     # Handle click of layer
-    results = layer.onGridClick(ev, { design: design, schema: @props.schema, dataSource: @props.dataSource, layerDataSource: @props.mapDataSource.getLayerDataSource(layerViewId) })
+    results = layer.onGridClick(ev, { 
+      design: design
+      schema: @props.schema
+      dataSource: @props.dataSource
+      layerDataSource: @props.mapDataSource.getLayerDataSource(layerViewId) 
+      scopeData: if @props.scope?.data?.layerViewId == layerViewId then @props.scope.data.data
+    })
 
-    # Handle standard case
-    if _.isArray(results)
-      @props.onRowClick?(results[0], results[1])
-    else if results
-      # Handle popup
-      @setState(popupContents: results)
+    if not results
+      return
+
+    # Handle popup first
+    if results.popup
+      @setState(popupContents: results.popup)
+      return
+
+    # Handle onRowClick case
+    if results.row and @props.onRowClick
+      @props.onRowClick(results.row.tableId, results.row.primaryKey)
+      return
+
+    # Handle scoping
+    if @props.onScopeChange and _.has(results, "scope")
+      if results.scope
+        # Encode layer view id into scope
+        scope = {
+          name: results.scope.name
+          filter: results.scope.filter
+          data: { layerViewId: layerViewId, data: results.scope.data }
+        }
+      else
+        scope = null
+
+      @props.onScopeChange(scope)
+
 
   renderLegend:  ->
     legendItems = _.compact(
@@ -139,6 +174,12 @@ module.exports = class MapViewComponent extends React.Component
     if @props.extraFilters
       compiledFilters = compiledFilters.concat(@props.extraFilters)
 
+    # Determine scoped filters
+    if @props.scope
+      scopedCompiledFilters = compiledFilters.concat([@props.scope.filter])
+    else
+      scopedCompiledFilters = compiledFilters
+
     # Convert to leaflet layers, if layers are valid
     leafletLayers = []
     for layerView, index in @props.design.layerViews
@@ -155,18 +196,35 @@ module.exports = class MapViewComponent extends React.Component
       # Get layer data source
       layerDataSource = @props.mapDataSource.getLayerDataSource(layerView.id)
 
+      # If layer is scoping, fade opacity and add extra filtered version
+      isScoping = @props.scope and @props.scope.data.layerViewId == layerView.id 
+
       # Create leafletLayer
       leafletLayer = {
-        tileUrl: layerDataSource.getTileUrl(compiledFilters)
-        utfGridUrl: layerDataSource.getUtfGridUrl(compiledFilters)
+        tileUrl: layerDataSource.getTileUrl(if isScoping then compiledFilters else scopedCompiledFilters)
+        utfGridUrl: layerDataSource.getUtfGridUrl(if isScoping then compiledFilters else scopedCompiledFilters)
         visible: layerView.visible
-        opacity: layerView.opacity
+        opacity: if isScoping then layerView.opacity * 0.5 else layerView.opacity
         minZoom: layer.getMinZoom(design)
         maxZoom: layer.getMaxZoom(design)
         onGridClick: @handleGridClick.bind(null, layerView.id)
       }
 
       leafletLayers.push(leafletLayer)
+
+      # Add scoped layer if scoping
+      if isScoping
+        leafletLayer = {
+          tileUrl: layerDataSource.getTileUrl(scopedCompiledFilters)
+          utfGridUrl: layerDataSource.getUtfGridUrl(scopedCompiledFilters)
+          visible: layerView.visible
+          opacity: layerView.opacity
+          minZoom: layer.getMinZoom(design)
+          maxZoom: layer.getMaxZoom(design)
+          onGridClick: @handleGridClick.bind(null, layerView.id)
+        }
+
+        leafletLayers.push(leafletLayer)
 
     H.div style: { width: @props.width, height: @props.height, position: 'relative' },
       @renderPopup()
