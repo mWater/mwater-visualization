@@ -103,7 +103,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
     return H.div className: "form-group",
       H.label className: "text-muted", 
         H.span className: "glyphicon glyphicon glyphicon-tint"
-        if @props.design.axes.color then " Default Color" else " Color"
+        "Color"
       H.div null,
         colorAxisComponent
 #        R(ColorComponent, color: @props.design.color, onChange: @handleColorChange)

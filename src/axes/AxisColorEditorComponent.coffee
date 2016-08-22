@@ -42,11 +42,17 @@ module.exports = class AxisColorEditorComponent extends React.Component
   loadCategories: (props) ->
     axisBuilder = new AxisBuilder(schema: props.schema)
 
+    # Get categories (value + label)
+    categories = axisBuilder.getCategories(props.axis)
+    if categories.length > 0
+      @setState(categories: categories)
+      return
+
     # Check for axis
     axis = axisBuilder.cleanAxis(axis: props.axis)
     # Ignore if error
     if not axis or axisBuilder.validateAxis(axis: axis)
-     return
+      return
 
     axisCompiledExpr = axisBuilder.compileAxis(axis: axis, tableAlias: "main")
 
@@ -62,15 +68,15 @@ module.exports = class AxisColorEditorComponent extends React.Component
     }
 
     props.dataSource.performQuery(valuesQuery, (error, rows) =>
-     if @unmounted
-       return
+      if @unmounted
+        return
 
-     if error
-       return # Ignore
+      if error
+        return # Ignore
 
-     # Get categories (value + label)
-     categories = axisBuilder.getCategories(props.axis, _.pluck(rows, "val"))
-     @setState(categories: categories)
+      # Get categories (value + label)
+      categories = axisBuilder.getCategories(props.axis, _.pluck(rows, "val"))
+      @setState(categories: categories)
     )
 
   handleCustomizePalette: =>

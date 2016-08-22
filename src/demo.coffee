@@ -270,11 +270,43 @@ design = {
                           "table": "entities.water_point",
                           "column": "location"
                         }
+                      },
+                      "color": {
+                        "expr": {
+                          "type": "field",
+                          "table": "entities.water_point",
+                          "column": "drilling_method_other"
+                        },
+                        "colorMap": [
+                          {
+                            "value": null,
+                            "color": "#d49097"
+                          },
+                          {
+                            "value": "a pied",
+                            "color": "#ba4f5a"
+                          },
+                          {
+                            "value": "testing other",
+                            "color": "#81323a"
+                          },
+                          {
+                            "value": "A pied",
+                            "color": "#3e181c"
+                          }
+                        ],
+                        "drawOrder": [
+                          null,
+                          "a pied",
+                          "testing other",
+                          "A pied"
+                        ]
                       }
                     },
                     "color": "#0088FF",
                     "filter": null,
-                    "table": "entities.water_point"
+                    "table": "entities.water_point",
+                    "symbol": "font-awesome/amazon"
                   }
                 }
               ],
@@ -603,7 +635,8 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDirectDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
