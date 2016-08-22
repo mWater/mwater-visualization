@@ -423,6 +423,7 @@ describe "AxisBuilder", ->
       compare(categories, [
         { value: "a", label: "A" }
         { value: "b", label: "B" }
+        { value: null, label: "None" }
         ])
 
     it "gets enumset", ->
@@ -430,6 +431,7 @@ describe "AxisBuilder", ->
       compare(categories, [
         { value: "a", label: "A" }
         { value: "b", label: "B" }
+        { value: null, label: "None" }
         ])
 
     # Integer ranges no longer supported since decimal and integer were merged as numbre
@@ -449,6 +451,7 @@ describe "AxisBuilder", ->
         { value: "a", label: "a" }
         { value: "b", label: "b" }
         { value: "c", label: "c" }
+        { value: null, label: "None" }
         ])
 
     it "gets empty list for number", ->
@@ -468,6 +471,7 @@ describe "AxisBuilder", ->
         { value: 2, label: "2 - 3" }
         { value: 3, label: "3 - 4" }
         { value: 4, label: "> 4" }
+        { value: null, label: "None" }
       ])
 
     it "gets ranges by name, overriding with label", ->
@@ -483,6 +487,7 @@ describe "AxisBuilder", ->
       compare(categories, [
         { value: "a", label: ">= 0 and < 50" }
         { value: "b", label: "High" }
+        { value: null, label: "None" }
      ])
 
     it "gets months", ->
@@ -505,6 +510,7 @@ describe "AxisBuilder", ->
         { value: "10", label: "October" }
         { value: "11", label: "November" }
         { value: "12", label: "December" }
+        { value: null, label: "None" }
       ])
 
     it "gets years", ->
@@ -519,6 +525,7 @@ describe "AxisBuilder", ->
         { value: "2011-01-01", label: "2011" }
         { value: "2012-01-01", label: "2012" }
         { value: "2013-01-01", label: "2013" }
+        { value: null, label: "None" }
       ])
 
     it "gets yearmonths", ->
@@ -532,6 +539,7 @@ describe "AxisBuilder", ->
         { value: "2010-01-01", label: "Jan 2010" }
         { value: "2010-02-01", label: "Feb 2010" }
         { value: "2010-03-01", label: "Mar 2010" }
+        { value: null, label: "None" }
       ])
 
     it "gets days", ->
@@ -545,4 +553,5 @@ describe "AxisBuilder", ->
         { value: "2010-01-31", label: "Jan 31, 2010" }
         { value: "2010-02-01", label: "Feb 1, 2010" }
         { value: "2010-02-02", label: "Feb 2, 2010" }
+        { value: null, label: "None" }
       ])

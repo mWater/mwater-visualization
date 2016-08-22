@@ -356,6 +356,8 @@ module.exports = class AxisBuilder
   # Get all categories for a given axis type given the known values
   # Returns array of { value, label }
   getCategories: (axis, values, locale) ->
+    noneCategory = { value: null, label: "None" }
+
     # Handle ranges
     if axis.xform and axis.xform.type == "ranges"
       return _.map(axis.xform.ranges, (range) =>
@@ -379,7 +381,7 @@ module.exports = class AxisBuilder
           value: range.id
           label: label
         }
-      )
+      ).concat([noneCategory])
 
     # Handle binning 
     if axis.xform and axis.xform.type == "bin"
@@ -397,6 +399,7 @@ module.exports = class AxisBuilder
           { value: 0, label: "< #{min}"}
           { value: 1, label: "= #{min}"}
           { value: axis.xform.numBins + 1, label: "> #{min}"}
+          noneCategory
         ]
 
       # Calculate precision
@@ -413,6 +416,7 @@ module.exports = class AxisBuilder
         end = (i) / numBins * (max - min) + min
         categories.push({ value: i, label: "#{format(start)} - #{format(end)}"})
       categories.push({ value: axis.xform.numBins + 1, label: "> #{format(max)}"})
+      categories.push(noneCategory)
 
       return categories
 
@@ -430,12 +434,13 @@ module.exports = class AxisBuilder
         { value: "10", label: "October" }
         { value: "11", label: "November" }
         { value: "12", label: "December" }
+        noneCategory
       ]
 
     if axis.xform and axis.xform.type == "year"
       values = _.compact(values)
       if values.length == 0 
-        return []
+        return [noneCategory]
 
       # Get min and max
       min = _.min(_.map(values, (date) -> parseInt(date.substr(0, 4))))
@@ -443,12 +448,14 @@ module.exports = class AxisBuilder
       categories = []
       for year in [min..max]
         categories.push({ value: "#{year}-01-01", label: "#{year}"})
+      categories.push(noneCategory)
+
       return categories
 
     if axis.xform and axis.xform.type == "yearmonth"
       values = _.compact(values)
       if values.length == 0 
-        return []
+        return [noneCategory]
 
       # Get min and max
       min = values.sort()[0]
@@ -461,22 +468,24 @@ module.exports = class AxisBuilder
       while not current.isAfter(end)
         categories.push({ value: current.format("YYYY-MM-DD"), label: current.format("MMM YYYY")})
         current.add(1, "months")
+      
+      categories.push(noneCategory)
       return categories
 
     switch @getAxisType(axis)
       when "enum", "enumset"
         # If enum, return enum values
-        return _.map(@exprUtils.getExprEnumValues(axis.expr), (ev) -> { value: ev.id, label: ExprUtils.localizeString(ev.name, locale) })
+        return _.map(@exprUtils.getExprEnumValues(axis.expr), (ev) -> { value: ev.id, label: ExprUtils.localizeString(ev.name, locale) }).concat([noneCategory])
       when "text"
         # Return unique values
-        return _.map(_.uniq(values), (v) -> { value: v, label: v or "None" })
+        return _.map(_.compact(_.uniq(values)).sort(), (v) -> { value: v, label: v or "None" }).concat([noneCategory])
       when "boolean"
         # Return unique values
-        return [{ value: true, label: "True" }, { value: false, label: "False" }]
+        return [{ value: true, label: "True" }, { value: false, label: "False" }, noneCategory]
       when "date"
         values = _.compact(values)
         if values.length == 0 
-          return []
+          return [noneCategory]
 
         # Get min and max
         min = values.sort()[0]
@@ -489,6 +498,7 @@ module.exports = class AxisBuilder
         while not current.isAfter(end)
           categories.push({ value: current.format("YYYY-MM-DD"), label: current.format("ll")})
           current.add(1, "days")
+        categories.push(noneCategory)
         return categories
 
     return []

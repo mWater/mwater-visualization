@@ -54,6 +54,10 @@ module.exports = class AxisColorEditorComponent extends React.Component
     if not axis or axisBuilder.validateAxis(axis: axis)
       return
 
+    # Can't get values of aggregate axis
+    if axisBuilder.isAxisAggr(axis)
+      return
+
     axisCompiledExpr = axisBuilder.compileAxis(axis: axis, tableAlias: "main")
 
     # If no categories, we need values as input
