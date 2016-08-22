@@ -80,9 +80,15 @@ module.exports = class MapViewComponent extends React.Component
     if not results
       return
 
-    # Handle popup 
+    # Handle popup first
     if results.popup
       @setState(popupContents: results.popup)
+      return
+
+    # Handle onRowClick case
+    if results.row and @props.onRowClick
+      @props.onRowClick(results.row.tableId, results.row.primaryKey)
+      return
 
     # Handle scoping
     if @props.onScopeChange and _.has(results, "scope")
@@ -98,9 +104,6 @@ module.exports = class MapViewComponent extends React.Component
 
       @props.onScopeChange(scope)
 
-    # Handle onRowClick case
-    if results.row
-      @props.onRowClick?(results.row.tableId, results.row.primaryKey)
 
   renderLegend:  ->
     legendItems = _.compact(

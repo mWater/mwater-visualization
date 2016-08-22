@@ -220,11 +220,14 @@ module.exports = class MarkersLayer extends Layer
       }
 
       # Scope to marker
-      results.scope = {
-        name: "Selected Marker(s)"
-        filter: filter
-        data: ids
-      }
+      if ids.length > 0
+        results.scope = {
+          name: "Selected Marker(s)"
+          filter: filter
+          data: ids
+        }
+      else
+        results.scope = null
 
       if clickOptions.design.popup
         BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'

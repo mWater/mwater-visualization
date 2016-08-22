@@ -275,12 +275,15 @@ module.exports = class AdminChoroplethLayer extends Layer
         jsonql: compiledFilterExpr 
       }
 
-      # Scope to marker
-      results.scope = {
-        name: ev.data.name
-        filter: filter
-        data: ev.data.id
-      }
+      # Scope to region, unless already scoped
+      if clickOptions.scopeData == ev.data.id
+        results.scope = null
+      else
+        results.scope = {
+          name: ev.data.name
+          filter: filter
+          data: ev.data.id
+        }
 
       if clickOptions.design.popup
         BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'

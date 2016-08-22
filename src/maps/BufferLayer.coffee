@@ -232,7 +232,7 @@ module.exports = class BufferLayer extends Layer
 
       ids = clickOptions.scopeData or []
 
-      # Toggle marker
+      # Toggle item
       if ev.data.id in ids
         ids = _.without(ids, ev.data.id)
       else
@@ -246,12 +246,15 @@ module.exports = class BufferLayer extends Layer
         ]} 
       }
 
-      # Scope to marker
-      results.scope = {
-        name: "Selected Marker(s)"
-        filter: filter
-        data: ids
-      }
+      # Scope to item
+      if ids.length > 0
+        results.scope = {
+          name: "Selected Circle(s)"
+          filter: filter
+          data: ids
+        }
+      else
+        results.scope = null
 
       if clickOptions.design.popup
         BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
