@@ -52,31 +52,35 @@ module.exports = class AxisColorEditorComponent extends React.Component
     axis = axisBuilder.cleanAxis(axis: props.axis)
     # Ignore if error
     if not axis or axisBuilder.validateAxis(axis: axis)
-     return
+      return
+
+    # Can't get values of aggregate axis
+    if axisBuilder.isAxisAggr(axis)
+      return
 
     axisCompiledExpr = axisBuilder.compileAxis(axis: axis, tableAlias: "main")
 
     # If no categories, we need values as input
     valuesQuery = {
-     type: "query"
-     selects: [
-       { type: "select", expr: axisCompiledExpr, alias: "val" }
-     ]
-     from: { type: "table", table: axis.expr.table, alias: "main" }
-     groupBy: [1]
-     limit: 50
+      type: "query"
+      selects: [
+        { type: "select", expr: axisCompiledExpr, alias: "val" }
+      ]
+      from: { type: "table", table: axis.expr.table, alias: "main" }
+      groupBy: [1]
+      limit: 50
     }
 
     props.dataSource.performQuery(valuesQuery, (error, rows) =>
-     if @unmounted
-       return
+      if @unmounted
+        return
 
-     if error
-       return # Ignore
+      if error
+        return # Ignore
 
-     # Get categories (value + label)
-     categories = axisBuilder.getCategories(props.axis, _.pluck(rows, "val"))
-     @setState(categories: categories)
+      # Get categories (value + label)
+      categories = axisBuilder.getCategories(props.axis, _.pluck(rows, "val"))
+      @setState(categories: categories)
     )
 
   handleCustomizePalette: =>
