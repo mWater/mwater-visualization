@@ -1,6 +1,7 @@
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
+moment = require 'moment'
 
 injectTableAlias = require('mwater-expressions').injectTableAlias
 Chart = require './Chart'
@@ -31,7 +32,7 @@ module.exports = class CalendarChart extends Chart
 
     # Clean axes
     design.dateAxis = axisBuilder.cleanAxis(axis: design.dateAxis, table: design.table, aggrNeed: "none", types: ["date"])
-    design.valueAxis = axisBuilder.cleanAxis(axis: design.dateAxis, table: design.table, aggrNeed: "required", types: ["number"])
+    design.valueAxis = axisBuilder.cleanAxis(axis: design.valueAxis, table: design.table, aggrNeed: "required", types: ["number"])
 
     # Default value axis to count if date axis present
     if not design.valueAxis and design.dateAxis
@@ -175,20 +176,6 @@ module.exports = class CalendarChart extends Chart
     return React.createElement(CalendarChartViewComponent, props)
 
   createDataTable: (design, data) ->
-    super
-    # TODO
-    # renderHeaderCell = (column) =>
-    #   column.headerText or @axisBuilder.summarizeAxis(column.textAxis)
-
-    # header = _.map(design.columns, renderHeaderCell)
-    # table = [header]
-    # renderRow = (record) =>
-    #   renderCell = (column, columnIndex) =>
-    #     value = record["c#{columnIndex}"]
-    #     return @axisBuilder.formatValue(column.textAxis, value)
-
-    #   return _.map(design.columns, renderCell)
-
-    # table = table.concat(_.map(data.main, renderRow))
-    # return table
-
+    header = ["Date", "Value"]
+    rows = _.map(data, (row) -> [moment(row.date).format("YYYY-MM-DD"), row.value])
+    return [header].concat(rows)
