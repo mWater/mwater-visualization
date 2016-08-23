@@ -31,11 +31,11 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDirectMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(BlocksDesignerComponent, renderBlock: [])
     # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
@@ -669,8 +669,8 @@ class MWaterDatagridPane extends React.Component
     super
 
     @state = {
-      design: rosterDatagridDesign
-      extraTables: ["responses:3aee880e079a417ea51d388d95217edf"]
+      design: datagridDesign
+      extraTables: [] # "responses:3aee880e079a417ea51d388d95217edf"]
     }
 
   handleDesignChange: (design) =>
@@ -695,7 +695,8 @@ class MWaterDatagridPane extends React.Component
               dataSource: config.dataSource
               design: @state.design
               onDesignChange: @handleDesignChange
-# Called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
+              onRowDoubleClick: => console.log(arguments)
+              # Called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
               canEditCell: (tableId, rowId, expr, callback) => callback(null, true)
               updateCell: (tableId, rowId, expr, value, callback) =>
                 console.log value
