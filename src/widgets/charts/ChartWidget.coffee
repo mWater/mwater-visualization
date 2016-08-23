@@ -92,7 +92,7 @@ class ChartWidgetComponent extends React.Component
         return alert("Failed to get data")
 
       # Create data table
-      table = @props.chart.createDataTable(@props.design, data, @context.locale)
+      table = @props.chart.createDataTable(@props.design, @props.schema, data, @context.locale)
       if not table
         return
 
