@@ -1,6 +1,7 @@
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
+R = React.createElement
 
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
