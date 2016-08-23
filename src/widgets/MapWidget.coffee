@@ -95,7 +95,7 @@ class MapWidgetComponent extends React.Component
     # Require here to prevent server require problems
     MapViewComponent = require '../maps/MapViewComponent'
 
-    H.div style: { width: @props.width, height: @props.height, padding: 10 },
+    H.div style: { width: width, height: height, padding: 10 },
       React.createElement(MapViewComponent, {
         schema: @props.schema
         design: @props.design
