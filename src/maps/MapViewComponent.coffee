@@ -240,3 +240,4 @@ module.exports = class MapViewComponent extends React.Component
         scrollWheelZoom: @props.scrollWheelZoom
         onBoundsChange: @handleBoundsChange
         extraAttribution: @props.design.attribution
+        loadingSpinner: true

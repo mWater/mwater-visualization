@@ -5,6 +5,10 @@ L = require 'leaflet'
 BingLayer = require './BingLayer'
 UtfGridLayer = require './UtfGridLayer'
 
+# Setup leaflet loading
+window.L = L
+require('leaflet-loading')
+
 # Leaflet map component that displays a base layer, a tile layer and an optional interactivity layer
 module.exports = class LeafletMapComponent extends React.Component
   @propTypes:
@@ -39,6 +43,8 @@ module.exports = class LeafletMapComponent extends React.Component
 
     maxZoom: React.PropTypes.number         # Maximum zoom level
     extraAttribution: React.PropTypes.string # User defined attributions
+
+    loadingSpinner: React.PropTypes.bool       # True to add loading spinner
 
   @defaultProps: 
     dragging: true
@@ -89,6 +95,13 @@ module.exports = class LeafletMapComponent extends React.Component
     else
       # Fit world doesn't work sometimes. Make sure that entire left-right is included
       @map.fitBounds([[-1, -180], [1, 180]])
+
+
+    if @props.loadingSpinner
+      loadingControl = L.Control.loading({
+        separate: true
+      })
+      @map.addControl(loadingControl)
 
     # Add legend
 #    @legendControl = L.control({position: 'bottomright'})
