@@ -28,7 +28,7 @@
     "immutable-setter": "^1.1.1",
     "js-yaml": "^3.4.0",
     "leaflet": "^0.7.3",
-    "leaflet-loading": "^0.1.22",
+    "leaflet-loading": "github:mwater/Leaflet.loading",
     "lodash": "^3.1.0",
     "lru-cache": "^2.6.5",
     "markdown": "^0.5.0",
