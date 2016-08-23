@@ -62,7 +62,8 @@ module.exports = class BufferLayer extends Layer
       select 
       <primary key> as id,
       [<color axis> as color,
-      st_transform(st_buffer(st_transform(<geometry axis>, 4326)::geography, <radius>)::geometry, 3857) as the_geom_webmercator
+      st_transform(<geometry axis>, 3857) as the_geom_webmercator,
+      radius * 2 / (!pixel_width! * cos(st_y(st_transform(geometryExpr, 4326)) * 0.017453293) as width
       from <table> as main
       where
         <geometry axis> is not null
@@ -81,23 +82,29 @@ module.exports = class BufferLayer extends Layer
     # Compile geometry axis
     geometryExpr = axisBuilder.compileAxis(axis: design.axes.geometry, tableAlias: "main")
 
-    # st_transform(st_buffer(st_transform(<geometry axis>, 4326)::geography, <radius>)::geometry, 3857) as the_geom_webmercator
-    bufferedGeometry = {
-      type: "op", op: "ST_Transform", exprs: [
-        { type: "op", op: "::geometry", exprs: [
-          { type: "op", op: "ST_Buffer", exprs: [
-            { type: "op", op: "::geography", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326] }] }
-            design.radius
-            ]}
+    # Convert to Web mercator (3857)
+    geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
+
+    # radius * 2 / (!pixel_width! * cos(st_y(st_transform(geometryExpr, 4326)) * 0.017453293)
+    widthExpr = {
+      type: "op"
+      op: "/"
+      exprs: [{ type: "op", op: "*", exprs: [design.radius, 2] }, { type: "op", op: "*", exprs: [
+        { type: "token", token: "!pixel_height!" }
+        { type: "op", op: "cos", exprs: [
+          { type: "op", op: "*", exprs: [
+            { type: "op", op: "ST_Y", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326]}] }
+            0.017453293
           ]}
-        3857
+        ]}
+       ]}
       ]
     }
-    # geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
 
     selects = [
       { type: "select", expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table).primaryKey }, alias: "id" } # main primary key as id
-      { type: "select", expr: bufferedGeometry, alias: "the_geom_webmercator" } 
+      { type: "select", expr: geometryExpr, alias: "the_geom_webmercator" } 
+      { type: "select", expr: widthExpr, alias: "width" } # Width of circles
     ]
 
     # Add color select if color axis
@@ -204,15 +211,33 @@ module.exports = class BufferLayer extends Layer
     if design.color
       css += '''
         #layer0 {
-          opacity: ''' + design.fillOpacity + ''';
-          polygon-fill: ''' + design.color + ''';
+          marker-fill-opacity: ''' + design.fillOpacity + ''';
+          marker-fill: ''' + design.color + ''';
+          marker-type: ellipse;
+          marker-width: [width];
+          marker-line-width: 0;
+          marker-allow-overlap: true;
+          marker-ignore-placement: true;
         }
       '''
+    # css += '''
+    #   #layer0 {
+    #     marker-fill: ''' + (design.color or "#666666") + ''';
+    #     marker-width: 10;
+    #     marker-line-color: white;
+    #     ''' + stroke + '''
+    #     marker-line-opacity: 0.6;
+    #     marker-placement: point;
+    #     ''' + symbol + '''
+    #     marker-allow-overlap: true;
+
+    #     }
+    #   '''
 
     # If color axes, add color conditions
     if design.axes.color?.colorMap
       for item in design.axes.color.colorMap
-        css += "#layer0 [color=#{JSON.stringify(item.value)}] { polygon-fill: #{item.color}; opacity: #{design.fillOpacity}; }\n"
+        css += "#layer0 [color=#{JSON.stringify(item.value)}] { marker-fill: #{item.color}; }\n"
 
     return css
 
