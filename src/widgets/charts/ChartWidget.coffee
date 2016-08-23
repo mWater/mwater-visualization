@@ -48,6 +48,9 @@ module.exports = class ChartWidget extends Widget
   #   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   #   callback: (error, data)
   getData: (design, schema, dataSource, filters, callback) ->
+    # Clean design first
+    design = @chart.cleanDesign(design, schema)
+    
     @chart.getData(design, schema, dataSource, filters, callback)
 
 # Complete chart widget
