@@ -256,7 +256,7 @@ module.exports = class MarkersLayer extends Layer
               onDesignChange: null
               width: options.width
               height: options.height
-              standardWidth: null
+              standardWidth: options.standardWidth
             })  
           })
 

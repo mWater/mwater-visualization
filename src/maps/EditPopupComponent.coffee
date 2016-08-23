@@ -67,9 +67,9 @@ module.exports = class EditPopupComponent extends React.Component
                 filters: []
                 onScopeChange: null
                 onDesignChange: options.onDesignChange
-                width: null
-                height: null
-                standardWidth: null
+                width: options.width
+                height: options.height
+                standardWidth: options.standardWidth
                 singleRowTable: @props.table
               })  
             })

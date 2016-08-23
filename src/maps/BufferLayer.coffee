@@ -174,6 +174,28 @@ module.exports = class BufferLayer extends Layer
     else
       query.where = whereClauses[0]
 
+    # Sort order
+    if design.axes.color and design.axes.color.colorMap
+      # TODO should use categories, not colormap order
+      order = design.axes.color.drawOrder or _.pluck(design.axes.color.colorMap, "value")
+
+      cases = _.map order, (value, i) =>
+        { 
+          when: if value? then { type: "op", op: "=", exprs: [colorExpr, value] } else { type: "op", op: "is null", exprs: [colorExpr] }
+          then: i 
+        }
+
+      query.orderBy = [
+        {
+          expr: {
+            type: "case"
+            cases: cases
+          }
+          direction: "desc" # Reverse color map order
+        }
+      ]
+    console.log query
+
     return query
 
   createCss: (design, schema) ->
@@ -188,18 +210,9 @@ module.exports = class BufferLayer extends Layer
       '''
 
     # If color axes, add color conditions
-    if design.axes.color and design.axes.color.colorMap
-      iteratee = design.axes.color.colorMap
-      order = design.axes.color.drawOrder or _.pluck(design.axes.color.colorMap, "value")
-
-      # color on top gets rendered last
-      actualOrder = _(order).reverse().value()
-      iteratee = _.sortBy(design.axes.color.colorMap, (item) =>
-        _.indexOf(actualOrder, item.value)
-      )
-
-      for item, i in iteratee
-        css += "#layer0::#{i} [color=#{JSON.stringify(item.value)}] { polygon-fill: #{item.color}; opacity: #{design.fillOpacity}; }\n"
+    if design.axes.color?.colorMap
+      for item in design.axes.color.colorMap
+        css += "#layer0 [color=#{JSON.stringify(item.value)}] { polygon-fill: #{item.color}; opacity: #{design.fillOpacity}; }\n"
 
     return css
 
@@ -283,7 +296,7 @@ module.exports = class BufferLayer extends Layer
               onDesignChange: null
               width: options.width
               height: options.height
-              standardWidth: null
+              standardWidth: options.standardWidth
             })  
           })
 

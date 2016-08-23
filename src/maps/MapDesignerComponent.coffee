@@ -2,6 +2,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
+ClickOutHandler = require('react-onclickout')
 MapLayersDesignerComponent = require './MapLayersDesignerComponent'
 MapFiltersDesignerComponent = require './MapFiltersDesignerComponent'
 BaseLayerDesignerComponent = require './BaseLayerDesignerComponent'

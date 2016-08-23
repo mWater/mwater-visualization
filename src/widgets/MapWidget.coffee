@@ -91,7 +91,7 @@ class MapWidgetComponent extends React.Component
       onRequestClose: (=> @setState(editing: false)),
         content)
 
-  renderContent: ->
+  renderContent: (width, height) ->
     # Require here to prevent server require problems
     MapViewComponent = require '../maps/MapViewComponent'
 
@@ -105,8 +105,8 @@ class MapWidgetComponent extends React.Component
         scope: @props.scope
         onScopeChange: @props.onScopeChange
         extraFilters: @props.filters
-        width: @props.width - 20
-        height: @props.height - 20
+        width: width - 20
+        height: height - 20
         touchZoom: false    # Prevent accidental zooming
         scrollWheelZoom: false # Prevent accidental zooming
       })
@@ -124,5 +124,5 @@ class MapWidgetComponent extends React.Component
         width: @props.width
         height: @props.height
         dropdownItems: dropdownItems,
-          @renderContent()
+          @renderContent(@props.width, @props.height)
       )
