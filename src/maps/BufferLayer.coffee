@@ -206,18 +206,21 @@ module.exports = class BufferLayer extends Layer
     return query
 
   createCss: (design, schema) ->
-    css = ""
+    css = '''
+      #layer0 {
+        marker-fill-opacity: ''' + design.fillOpacity + ''';
+        marker-type: ellipse;
+        marker-width: [width];
+        marker-line-width: 0;
+        marker-allow-overlap: true;
+        marker-ignore-placement: true;
+      }
+    '''
     
     if design.color
       css += '''
         #layer0 {
-          marker-fill-opacity: ''' + design.fillOpacity + ''';
           marker-fill: ''' + design.color + ''';
-          marker-type: ellipse;
-          marker-width: [width];
-          marker-line-width: 0;
-          marker-allow-overlap: true;
-          marker-ignore-placement: true;
         }
       '''
     # css += '''
