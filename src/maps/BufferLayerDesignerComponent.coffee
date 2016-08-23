@@ -117,6 +117,7 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
           showColorMap: true
           types: ["text", "enum", "boolean"]
           aggrNeed: "none"
+          colorMapReorderable: true
 #        React.createElement(ColorComponent, color: @props.design.color, onChange: @handleColorChange)
 
   renderFillOpacity: ->

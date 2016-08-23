@@ -156,7 +156,7 @@ design = {
                   "name": "Untitled Layer",
                   "desc": "",
                   "type": "AdminChoropleth",
-                  "visible": true,
+                  "visible": false,
                   "opacity": 1,
                   "design": {
                     "color": "#FFFFFF",
@@ -260,7 +260,7 @@ design = {
                   "name": "Untitled Layer",
                   "desc": "",
                   "type": "Markers",
-                  "visible": true,
+                  "visible": false,
                   "opacity": 1,
                   "design": {
                     "axes": {
@@ -304,6 +304,108 @@ design = {
                       }
                     },
                     "color": "#0088FF",
+                    "filter": null,
+                    "table": "entities.water_point"
+                  }
+                },
+                {
+                  "id": "c8fe521e-1577-4b4c-98a9-c2c5aba964e5",
+                  "name": "Untitled Layer",
+                  "desc": "",
+                  "type": "Buffer",
+                  "visible": true,
+                  "opacity": 1,
+                  "design": {
+                    "axes": {
+                      "geometry": {
+                        "expr": {
+                          "type": "field",
+                          "table": "entities.water_point",
+                          "column": "location"
+                        }
+                      },
+                      "color": {
+                        "expr": {
+                          "type": "field",
+                          "table": "entities.water_point",
+                          "column": "_created_on"
+                        },
+                        "xform": {
+                          "type": "month"
+                        },
+                        "colorMap": [
+                          {
+                            "value": "01",
+                            "color": "#1f77b4"
+                          },
+                          {
+                            "value": "02",
+                            "color": "#ff7f0e"
+                          },
+                          {
+                            "value": "03",
+                            "color": "#2ca02c"
+                          },
+                          {
+                            "value": "04",
+                            "color": "#d62728"
+                          },
+                          {
+                            "value": "05",
+                            "color": "#9467bd"
+                          },
+                          {
+                            "value": "06",
+                            "color": "#8c564b"
+                          },
+                          {
+                            "value": "07",
+                            "color": "#e377c2"
+                          },
+                          {
+                            "value": "08",
+                            "color": "#7f7f7f"
+                          },
+                          {
+                            "value": "09",
+                            "color": "#bcbd22"
+                          },
+                          {
+                            "value": "10",
+                            "color": "#17becf"
+                          },
+                          {
+                            "value": "11",
+                            "color": "#1f77b4"
+                          },
+                          {
+                            "value": "12",
+                            "color": "#ff7f0e"
+                          },
+                          {
+                            "value": null,
+                            "color": "#2ca02c"
+                          }
+                        ],
+                        "drawOrder": [
+                          null,
+                          "03",
+                          "01",
+                          "04",
+                          "12",
+                          "05",
+                          "06",
+                          "07",
+                          "08",
+                          "09",
+                          "10",
+                          "11",
+                          "02"
+                        ]
+                      }
+                    },
+                    "radius": 50000,
+                    "fillOpacity": 0.5,
                     "filter": null,
                     "table": "entities.water_point"
                   }
