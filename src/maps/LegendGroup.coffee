@@ -17,7 +17,7 @@ module.exports = class LegendGroup extends React.Component
 
   render: ->
     H.div style: { marginBottom: 5},
-      React.createElement(LegendItem, {symbol:@props.symbol,color: @props.defaultColor, name: @props.name, key: @props.name, radiusLayer: @props.radiusLayer})
+      React.createElement(LegendItem, {hasChildren: @props.items.length?,symbol:@props.symbol,color: @props.defaultColor, name: @props.name, key: @props.name, radiusLayer: @props.radiusLayer})
       _.map @props.items, (item) =>
         React.createElement(LegendItem, {isChild: true, symbol:@props.symbol,color: item.color, name: item.name, key: item.name, radiusLayer: @props.radiusLayer})
 
@@ -27,12 +27,12 @@ class LegendItem extends React.Component
     name: React.PropTypes.string
     radiusLayer: React.PropTypes.bool
     symbol: React.PropTypes.string
-    isHeader: React.PropTypes.bool
+    hasChildren: React.PropTypes.bool
     isChild: React.PropTypes.bool
 
   @defaultProps:
     radiusLayer: false
-    isHeader: true
+    hasChildren: false
     isChild: false
 
   renderSymbol: ->
@@ -75,5 +75,6 @@ class LegendItem extends React.Component
       paddingLeft: if @props.isChild then 5 else 0
 
     H.div style: containerStyle,
-      @renderIndicator()
+      if not @props.hasChildren
+        @renderIndicator()
       H.span {style: titleStyle}, @props.name

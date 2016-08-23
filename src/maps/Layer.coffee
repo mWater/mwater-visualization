@@ -1,4 +1,4 @@
-
+AxisBuilder = require '../axes/AxisBuilder'
 # Defines a layer for a map which has all the logic for rendering the specific data to be viewed
 module.exports = class Layer
   # Gets the layer definition as JsonQL + CSS in format:

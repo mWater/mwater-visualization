@@ -10,6 +10,7 @@ ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../axes/AxisBuilder'
 LegendGroup = require('./LegendGroup')
+LayerLegendComponent = require './LayerLegendComponent'
 
 ###
 Layer that is composed of administrative regions colored
@@ -357,34 +358,14 @@ module.exports = class AdminChoroplethLayer extends Layer
 
   # Get the legend to be optionally displayed on the map. Returns
   # a React element
-  getLegend: (design, schema, name) ->
+  getLegend: (design, schema, name, dataSource) ->
     axisBuilder = new AxisBuilder(schema: schema)
-    exprUtils = new ExprUtils(schema)
-    
-    if design.axes.color and design.axes.color.colorMap
-      categories = axisBuilder.getCategories(design.axes.color)
 
-      colors = _.map design.axes.color.colorMap, (colorItem) =>
-        category = _.find(categories, {value: colorItem.value})
-        _name = if category then ExprUtils.localizeString(category.label) else colorItem.value
-        {color: colorItem.color, name: _name }
-      colors.push({ color: design.color, name: "None"})
-    else
-      colors = []
-
-    legendGroupProps =
-      items: colors
-      key: design.adminRegionExpr.table
-      defaultColor: design.color
+    React.createElement LayerLegendComponent,
+      schema: schema
       name: name
-
-    layerTitleStyle =
-      margin: 2
-      fontWeight: 'bold'
-      borderBottom: '1px solid #cecece'
-    H.div null,
-#      H.p style: layerTitleStyle, name
-      React.createElement(LegendGroup, legendGroupProps)
+      axis: axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean'], aggrNeed: "required")
+      defaultColor: design.color
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->

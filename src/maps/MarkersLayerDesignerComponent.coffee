@@ -9,6 +9,7 @@ ColorComponent = require '../ColorComponent'
 TableSelectComponent = require '../TableSelectComponent'
 ReactSelect = require 'react-select'
 EditPopupComponent = require './EditPopupComponent'
+ColorAxisComponent = require '../axes/ColorAxisComponent'
 
 # Designer for a markers layer
 module.exports = class MarkersLayerDesignerComponent extends React.Component
@@ -92,9 +93,21 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
     return H.div className: "form-group",
       H.label className: "text-muted", 
         H.span className: "glyphicon glyphicon glyphicon-tint"
-        if @props.design.axes.color then " Default Color" else " Color"
-      H.div style: { marginLeft: 8 }, 
-        R(ColorComponent, color: @props.design.color, onChange: @handleColorChange)
+        "Color"
+      H.div style: {marginLeft: 8},
+        R ColorAxisComponent,
+          defaultColor: @props.design.color
+          schema: @props.schema
+          dataSource: @props.dataSource
+          axis: @props.design.axes.color
+          table: @props.design.table
+          onColorChange: @handleColorChange
+          onColorAxisChange: @handleColorAxisChange
+          table: @props.design.table
+          showColorMap: true
+          types: ["text", "enum", "boolean"]
+          aggrNeed: "none"
+#        R(ColorComponent, color: @props.design.color, onChange: @handleColorChange)
 
   renderSymbol: ->
     if not @props.design.axes.geometry
@@ -173,7 +186,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
       @renderTable()
       @renderGeometryAxis()
       @renderColor()
-      @renderColorAxis()
+#      @renderColorAxis()
       @renderSymbol()
       @renderFilter()
       @renderPopup()

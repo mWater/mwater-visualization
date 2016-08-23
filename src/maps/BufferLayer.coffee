@@ -9,6 +9,7 @@ ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../axes/AxisBuilder'
 LegendGroup = require('./LegendGroup')
+LayerLegendComponent = require './LayerLegendComponent'
 
 ###
 Layer which draws a buffer around geometries (i.e. a radius circle around points)
@@ -56,7 +57,7 @@ module.exports = class BufferLayer extends Layer
     axisBuilder = new AxisBuilder(schema: schema)
     exprCompiler = new ExprCompiler(schema)
 
-    ### 
+    ###
     Query:
       select 
       <primary key> as id,
@@ -177,11 +178,12 @@ module.exports = class BufferLayer extends Layer
     if design.axes.color and design.axes.color.colorMap
       # TODO should use categories, not colormap order
       order = design.axes.color.drawOrder or _.pluck(design.axes.color.colorMap, "value")
+      categories = axisBuilder.getCategories(design.axes.color, order)
 
-      cases = _.map order, (value, i) =>
-        { 
-          when: if value? then { type: "op", op: "=", exprs: [colorExpr, value] } else { type: "op", op: "is null", exprs: [colorExpr] }
-          then: i 
+      cases = _.map categories, (category, i) =>
+        {
+          when: if category.value? then { type: "op", op: "=", exprs: [colorExpr, category.value] } else { type: "op", op: "is null", exprs: [colorExpr] }
+          then: order.indexOf(category.value) or -1
         }
 
       query.orderBy = [
@@ -193,7 +195,6 @@ module.exports = class BufferLayer extends Layer
           direction: "desc" # Reverse color map order
         }
       ]
-    console.log query
 
     return query
 
@@ -318,27 +319,11 @@ module.exports = class BufferLayer extends Layer
   # a React element
   getLegend: (design, schema, name) ->
     axisBuilder = new AxisBuilder(schema: schema)
-    exprUtils = new ExprUtils(schema)
-    
-    if design.axes.color and design.axes.color.colorMap
-      categories = axisBuilder.getCategories(design.axes.color)
-
-      colors = _.map design.axes.color.colorMap, (colorItem) =>
-        category = _.find(categories, {value: colorItem.value})
-        _name = if category then ExprUtils.localizeString(category.label) else colorItem.value
-        {color: colorItem.color, name: _name }
-    else
-      colors = []
-
-    legendGroupProps =
-      items: colors
-      key: design.axes.geometry.expr.table
-      defaultColor: design.color
+    React.createElement LayerLegendComponent,
+      schema: schema
       name: name
+      axis: axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean'], aggrNeed: "none")
       radiusLayer: true
-
-    H.div null,
-      React.createElement(LegendGroup, legendGroupProps)
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) -> 
@@ -477,40 +462,25 @@ module.exports = class BufferLayer extends Layer
     else
       query.where = whereClauses[0]
 
-    # if draworder is
     if design.axes.color and design.axes.color.colorMap
       order = design.axes.color.drawOrder or _.pluck(design.axes.color.colorMap, "value")
+      categories = axisBuilder.getCategories(design.axes.color, _.pluck(design.axes.color.colorMap, "value"))
 
-      # color on top gets rendered last
-      actualOrder = _(order).reverse().value()
-
-      cases = _.map actualOrder, (value, i) =>
-        { when: value, then: i}
-
-      outerQuery = {
-        type: "query"
-        selects: [
-          { type: "select", expr: { type: "field", tableAlias: "outer", column: "id" }, alias: "id" }
-          { type: "select", expr: { type: "field", tableAlias: "outer", column: "the_geom_webmercator" }, alias: "the_geom_webmercator" }
-          { type: "select", expr: { type: "field", tableAlias: "outer", column: "color" }, alias: "color" }
-        ]
-        from: {
-          type: "subquery"
-          query: query,
-          alias: "outer"
+      cases = _.map categories, (category, i) =>
+        {
+          when: if category.value? then { type: "op", op: "=", exprs: [colorExpr, category.value] } else { type: "op", op: "is null", exprs: [colorExpr] }
+          then: order.indexOf(category.value) or -1
         }
-        orderBy: [
-          {
-            expr: {
-              type: "case",
-              input: {type: "field", tableAlias: "outer", column: "color"}
-              cases: cases
-            }
-          }
-        ]
-      }
 
-      return outerQuery
+      query.orderBy = [
+        {
+          expr: {
+            type: "case"
+            cases: cases
+          }
+          direction: "desc" # Reverse color map order
+        }
+      ]
 
     return query
 
