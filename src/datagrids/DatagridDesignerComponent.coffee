@@ -58,24 +58,27 @@ module.exports = class DatagridDesignerComponent extends React.Component
         { 
           id: "filter"
           label: "Filter"
-          elem: R(FilterExprComponent, {
-            schema: @props.schema
-            dataSource: @props.dataSource
-            table: @props.design.table
-            value: @props.design.filter
-            onChange: @handleFilterChange
-          }) 
+          # Here because of modal scroll issue
+          elem: H.div style: { marginBottom: 200 },
+            R(FilterExprComponent, {
+              schema: @props.schema
+              dataSource: @props.dataSource
+              table: @props.design.table
+              value: @props.design.filter
+              onChange: @handleFilterChange
+            }) 
         }
         { 
           id: "order"
           label: "Sorting"
-          elem: R(OrderBysDesignerComponent, {
-            schema: @props.schema
-            dataSource: @props.dataSource
-            table: @props.design.table
-            orderBys: @props.design.orderBys
-            onChange: @handleOrderBysChange
-          }) 
+          elem: H.div style: { marginBottom: 200 },
+            R(OrderBysDesignerComponent, {
+              schema: @props.schema
+              dataSource: @props.dataSource
+              table: @props.design.table
+              orderBys: @props.design.orderBys
+              onChange: @handleOrderBysChange
+            }) 
         }
       ]
 

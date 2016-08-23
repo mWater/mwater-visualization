@@ -32,6 +32,9 @@ module.exports = class DatagridComponent extends React.Component
     # Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
     updateCell:  React.PropTypes.func
 
+    # Called when row is double-clicked with (tableId, rowId)
+    onRowDoubleClick: React.PropTypes.func
+
   @defaultProps:
     pageSize: 100
 
@@ -197,6 +200,10 @@ module.exports = class DatagridComponent extends React.Component
   refEditCell: (comp) =>
     @editCellComp = comp
 
+  handleRowDoubleClick: (ev, rowIndex) =>
+    if @props.onRowDoubleClick? and @state.rows[rowIndex].id
+      @props.onRowDoubleClick(@props.design.table, @state.rows[rowIndex].id)
+
   # Render a single cell. exprType is passed in for performance purposes and is calculated once per column
   renderCell: (column, columnIndex, exprType, cellProps) =>
     # If rendering placeholder row
@@ -276,6 +283,7 @@ module.exports = class DatagridComponent extends React.Component
       headerHeight: 40
       width: @props.width
       height: @props.height
+      onRowDoubleClick: @handleRowDoubleClick
       isColumnResizing: false
       onColumnResizeEndCallback: @handleColumnResize,
         @renderColumns()
