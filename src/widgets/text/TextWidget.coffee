@@ -60,6 +60,9 @@ module.exports = class TextWidget extends Widget
 
     # Evaluates a single exprItem
     evalExprItem = (exprItem, cb) =>
+      if not exprItem.expr
+        return cb(null)
+
       table = exprItem.expr.table
 
       exprCompiler = new ExprCompiler(schema)

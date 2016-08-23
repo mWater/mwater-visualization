@@ -25,6 +25,27 @@ ServerDashboardDataSource = require './dashboards/ServerDashboardDataSource'
 
 dashboardId = "366702069dba44249d14bfccaa2d333e"
 
+
+$ ->
+  sample = H.div className: "container-fluid", style: { height: "100%", paddingLeft: 0, paddingRight: 0 },
+    H.style null, '''html, body, #main { height: 100% }'''
+    # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
+    # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDirectMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+    # React.createElement(BlocksDesignerComponent, renderBlock: [])
+    # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+    # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
+    # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
+    # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
+  ReactDOM.render(sample, document.getElementById("main"))
+
+
+
 class MWaterDashboardPane extends React.Component
   constructor: (props) ->
     super
@@ -583,7 +604,7 @@ class MWaterDirectMapPane extends React.Component
     super
 
     @state = {
-      design: mapDesign
+      design: adminRegionMap
       extraTables: []
     }
 
@@ -730,24 +751,6 @@ class MWaterDatagridPane extends React.Component
 #     design: React.PropTypes.object.isRequired
 #     onDesignChange: React.PropTypes.func  # Null/undefined for readonly
 #     })
-
-$ ->
-  sample = H.div className: "container-fluid", style: { height: "100%", paddingLeft: 0, paddingRight: 0 },
-    H.style null, '''html, body, #main { height: 100% }'''
-    # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
-    # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDirectDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(BlocksDesignerComponent, renderBlock: [])
-    # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
-    # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
-    # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
-  ReactDOM.render(sample, document.getElementById("main"))
 
 datagridDesign = {
   "table": "entities.water_point",
@@ -2649,3 +2652,213 @@ rosterDatagridDesign = {
 #         titleElem: "Sample"
 #         printScaling: false
 #         })
+
+
+bufferMap = {
+  "baseLayer": "cartodb_positron",
+  "layerViews": [
+    {
+      "id": "6991fe14-03eb-4cf1-a4f5-6e3ebe581482",
+      "name": "Untitled Layer",
+      "desc": "",
+      "type": "Buffer",
+      "visible": true,
+      "opacity": 1,
+      "design": {
+        "axes": {
+          "geometry": {
+            "expr": {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "location"
+            }
+          },
+          "color": {
+            "expr": {
+              "type": "scalar",
+              "table": "entities.water_point",
+              "joins": [
+                "!indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9.Water point"
+              ],
+              "expr": {
+                "type": "op",
+                "op": "last",
+                "table": "indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9",
+                "exprs": [
+                  {
+                    "type": "field",
+                    "table": "indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9",
+                    "column": "Functionality"
+                  }
+                ]
+              }
+            },
+            "colorMap": [
+              {
+                "value": "Partially functional",
+                "color": "#ff7f0e"
+              },
+              {
+                "value": "Functional",
+                "color": "#7ed321"
+              },
+              {
+                "value": "Not functional",
+                "color": "#d0021b"
+              },
+              {
+                "value": null,
+                "color": "#9b9b9b"
+              },
+              {
+                "value": "No longer exists",
+                "color": "#000000"
+              }
+            ],
+            "drawOrder": [
+              "Functional",
+              "Partially functional",
+              "Not functional",
+              "No longer exists",
+              null
+            ]
+          }
+        },
+        "radius": 1000,
+        "fillOpacity": 0.5,
+        "filter": null,
+        "table": "entities.water_point",
+        "color": "#9b9b9b"
+      }
+    }
+  ],
+  "filters": {},
+  "bounds": {
+    "w": 32.79075622558594,
+    "n": -2.3706535651058847,
+    "e": 33.02146911621094,
+    "s": -2.5452440019589724
+  }
+}
+
+adminRegionMap = {
+  "baseLayer": "cartodb_positron",
+  "layerViews": [
+    {
+      "id": "f17cae2c-6357-432f-aaff-c3f98cbc374e",
+      "name": "Untitled Layer",
+      "desc": "",
+      "type": "AdminChoropleth",
+      "visible": true,
+      "opacity": 1,
+      "design": {
+        "color": "#FFFFFF",
+        "adminRegionExpr": {
+          "type": "field",
+          "table": "entities.water_point",
+          "column": "admin_region"
+        },
+        "axes": {
+          "color": {
+            "expr": {
+              "type": "op",
+              "op": "percent where",
+              "table": "entities.water_point",
+              "exprs": [
+                {
+                  "type": "op",
+                  "table": "entities.water_point",
+                  "op": "= any",
+                  "exprs": [
+                    {
+                      "type": "field",
+                      "table": "entities.water_point",
+                      "column": "type"
+                    },
+                    {
+                      "type": "literal",
+                      "valueType": "enumset",
+                      "value": [
+                        "Protected dug well",
+                        "Unprotected dug well"
+                      ]
+                    }
+                  ]
+                },
+                null
+              ]
+            },
+            "xform": {
+              "type": "bin",
+              "numBins": 6,
+              "min": 0,
+              "max": 100
+            },
+            "colorMap": [
+              {
+                "value": 0,
+                "color": "#c1cce6"
+              },
+              {
+                "value": 1,
+                "color": "#9daed8"
+              },
+              {
+                "value": 2,
+                "color": "#7c93cb"
+              },
+              {
+                "value": 3,
+                "color": "#5b79be"
+              },
+              {
+                "value": 4,
+                "color": "#4361a8"
+              },
+              {
+                "value": 5,
+                "color": "#344c83"
+              },
+              {
+                "value": 6,
+                "color": "#273962"
+              },
+              {
+                "value": 7,
+                "color": "#1a2642"
+              },
+              {
+                "value": null,
+                "color": "#0d1321"
+              }
+            ],
+            "drawOrder": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              null
+            ]
+          }
+        },
+        "fillOpacity": 0.75,
+        "displayNames": true,
+        "filter": null,
+        "scope": "eb3e12a2-de1e-49a9-8afd-966eb55d47eb",
+        "detailLevel": 2,
+        "table": "entities.water_point"
+      }
+    }
+  ],
+  "filters": {},
+  "bounds": {
+    "w": 14.567871093749998,
+    "n": 5.550380568997962,
+    "e": 44.09912109375,
+    "s": -16.573022719182777
+  }
+}

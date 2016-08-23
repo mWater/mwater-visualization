@@ -181,7 +181,7 @@ module.exports = class LayeredChart extends Chart
         if err
           alert("Unable to load data")
         else
-          LayeredChartSvgFileSaver.save(design, data, @schema)
+          LayeredChartSvgFileSaver.save(design, data, schema)
 
     # Don't save image of invalid design
     if @validateDesign(@cleanDesign(design, schema), schema)
@@ -189,25 +189,27 @@ module.exports = class LayeredChart extends Chart
 
     return [{ label: "Save Image", icon: "camera", onClick: save }]
 
-  createDataTable: (design, data, locale) ->
+  createDataTable: (design, schema, data, locale) ->
+    axisBuilder = new AxisBuilder(schema: schema)
+
     # Export only first layer
     headers = []
     if design.layers[0].axes.x
-      headers.push(@axisBuilder.summarizeAxis(design.layers[0].axes.x, locale))
+      headers.push(axisBuilder.summarizeAxis(design.layers[0].axes.x, locale))
     if design.layers[0].axes.color
-      headers.push(@axisBuilder.summarizeAxis(design.layers[0].axes.color, locale))
+      headers.push(axisBuilder.summarizeAxis(design.layers[0].axes.color, locale))
     if design.layers[0].axes.y
-      headers.push(@axisBuilder.summarizeAxis(design.layers[0].axes.y, locale))
+      headers.push(axisBuilder.summarizeAxis(design.layers[0].axes.y, locale))
     table = [headers]
 
     for row in data.layer0
       r = []
       if design.layers[0].axes.x
-        r.push(@axisBuilder.formatValue(design.layers[0].axes.x, row.x, locale))
+        r.push(axisBuilder.formatValue(design.layers[0].axes.x, row.x, locale))
       if design.layers[0].axes.color
-        r.push(@axisBuilder.formatValue(design.layers[0].axes.color, row.color, locale))
+        r.push(axisBuilder.formatValue(design.layers[0].axes.color, row.color, locale))
       if design.layers[0].axes.y
-        r.push(@axisBuilder.formatValue(design.layers[0].axes.y, row.y, locale))
+        r.push(axisBuilder.formatValue(design.layers[0].axes.y, row.y, locale))
       table.push(r)
 
     return table

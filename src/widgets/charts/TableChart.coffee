@@ -5,7 +5,6 @@ H = React.DOM
 injectTableAlias = require('mwater-expressions').injectTableAlias
 Chart = require './Chart'
 ExprUtils = require('mwater-expressions').ExprUtils
-ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprCompiler = require('mwater-expressions').ExprCompiler
 AxisBuilder = require './../../axes/AxisBuilder'
 TableChartViewComponent = require './TableChartViewComponent'
@@ -30,6 +29,8 @@ ordering:
 ###
 module.exports = class TableChart extends Chart
   cleanDesign: (design, schema) ->
+    ExprCleaner = require('mwater-expressions').ExprCleaner
+    
     exprCleaner = new ExprCleaner(schema)
     axisBuilder = new AxisBuilder(schema: schema)
 
@@ -203,16 +204,18 @@ module.exports = class TableChart extends Chart
 
     return React.createElement(TableChartViewComponent, props)
 
-  createDataTable: (design, data, locale) ->
+  createDataTable: (design, schema, data, locale) ->
+    axisBuilder = new AxisBuilder(schema: schema)
+
     renderHeaderCell = (column) =>
-      column.headerText or @axisBuilder.summarizeAxis(column.textAxis, locale)
+      column.headerText or axisBuilder.summarizeAxis(column.textAxis, locale)
 
     header = _.map(design.columns, renderHeaderCell)
     table = [header]
     renderRow = (record) =>
       renderCell = (column, columnIndex) =>
         value = record["c#{columnIndex}"]
-        return @axisBuilder.formatValue(column.textAxis, value, locale)
+        return axisBuilder.formatValue(column.textAxis, value, locale)
 
       return _.map(design.columns, renderCell)
 
