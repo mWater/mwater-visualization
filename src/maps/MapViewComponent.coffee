@@ -1,3 +1,4 @@
+_ = require 'lodash'
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -50,6 +51,11 @@ module.exports = class MapViewComponent extends React.Component
     @state = {
       popupContents: null   # Element in the popup
     }
+
+  componentWillReceiveProps: (nextProps) ->
+    # Update bounds
+    if not _.isEqual(nextProps.design.bounds, @props.design.bounds)
+      @refs.leafletMap?.setBounds(nextProps.design.bounds)
 
   handleBoundsChange: (bounds) =>
     # Ignore if readonly
@@ -229,6 +235,7 @@ module.exports = class MapViewComponent extends React.Component
     H.div style: { width: @props.width, height: @props.height, position: 'relative' },
       @renderPopup()
       R LeafletMapComponent,
+        ref: "leafletMap"
         initialBounds: @props.design.bounds
         baseLayerId: @props.design.baseLayer
         layers: leafletLayers
