@@ -16,6 +16,7 @@ LayerLegendComponent = require './LayerLegendComponent'
 Layer that is composed of administrative regions colored
 Design is:
   scope: _id of overall admin region. Null for whole world.
+  scopeLevel: admin level of scope. Default is 0 (entire country) if scope is set
   detailLevel: admin level to disaggregate to 
 
   table: table to get data from
@@ -64,7 +65,6 @@ module.exports = class AdminChoroplethLayer extends Layer
     axisBuilder = new AxisBuilder(schema: schema)
     exprCompiler = new ExprCompiler(schema)
 
-    # TODO HARDCODED TO COUNTRY AS SCOPE. NEED TO POSSIBLY ADD EXTRA INFO TO MAKE queries easy as scope is tricky to query under
     ###
     E.g:
     select name, shape_simplified, regions.color from 
@@ -82,6 +82,10 @@ module.exports = class AdminChoroplethLayer extends Layer
     ) as regions on regions.id = admin_regions2._id 
     where admin_regions2.level = 2 and admin_regions2.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb' 
     ###
+
+    # Verify that scopeLevel is an integer to prevent injection
+    if design.scopeLevel? and design.scopeLevel not in [0, 1, 2, 3, 4, 5]
+      throw new Error("Invalid scope level")
 
     # Verify that detailLevel is an integer to prevent injection
     if design.detailLevel not in [0, 1, 2, 3, 4, 5]
@@ -140,7 +144,7 @@ module.exports = class AdminChoroplethLayer extends Layer
         type: "op"
         op: "="
         exprs: [
-          { type: "field", tableAlias: "admin_regions", column: "level0" }
+          { type: "field", tableAlias: "admin_regions", column: "level#{design.scopeLevel or 0}" }
           design.scope
         ]
       })
@@ -203,7 +207,7 @@ module.exports = class AdminChoroplethLayer extends Layer
         type: "op"
         op: "="
         exprs: [
-          { type: "field", tableAlias: "admin_regions2", column: "level0" }
+          { type: "field", tableAlias: "admin_regions2", column: "level#{design.scopeLevel or 0}" }
           design.scope
         ]
       })
