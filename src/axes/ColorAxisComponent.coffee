@@ -9,7 +9,7 @@ AxisComponent = require './AxisComponent'
 # binds together the default color control and color map control
 module.exports = class ColorAxisComponent extends React.Component
   @propTypes:
-    defaultColor: React.PropTypes.string.isRequired # the default color
+    defaultColor: React.PropTypes.string # the default color
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
     axis: React.PropTypes.object
@@ -32,7 +32,7 @@ module.exports = class ColorAxisComponent extends React.Component
     }
 
   componentWillReceiveProps: (nextProps) ->
-    if not _.isEqual(nextProps.axis, @props.axis) and @state.mode == "colorby"
+    if not _.isEqual(nextProps.axis, @props.axis)
       @setState(axis: nextProps.axis)
 
   onModeChange: (mode) =>
@@ -45,11 +45,11 @@ module.exports = class ColorAxisComponent extends React.Component
   render: ->
     H.div null,
       R ui.ButtonToggleComponent,
-        value: @state.mode
+        value: if @props.axis then 'colorby' else @state.mode
         options: [{label: 'Single color', value: 'single'},{label: 'Color by', value: 'colorby'}]
         onChange: @onModeChange
       H.div style: { marginTop: 8},
-        if @state.mode == 'single'
+        if not @props.axis and @state.mode == 'single'
           R ColorComponent,
             color: @props.defaultColor
             onChange: @props.onColorChange

@@ -214,7 +214,7 @@ module.exports = class BufferLayer extends Layer
         marker-line-width: 0;
         marker-allow-overlap: true;
         marker-ignore-placement: true;
-        marker-fill: transparent;
+        marker-fill: ''' + (design.color or "transparent") + ''';
       }
     '''
     
@@ -390,6 +390,8 @@ module.exports = class BufferLayer extends Layer
 
     # TODO clones entirely
     design = _.cloneDeep(design)
+    # Default color
+    design.color = design.color or "#0088FF"
 
     design.axes = design.axes or {}
     design.radius = design.radius or 1000
