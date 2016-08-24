@@ -56,14 +56,24 @@ class MapWidgetComponent extends React.Component
   constructor: (props) ->
     super
     @state = { 
-      # True when editing map
-      editing: false
+      # Design that is being edited. Change is propagated on closing window
+      editDesign: null
     }  
 
   handleStartEditing: =>
-    @setState(editing: true)
+    @setState(editDesign: @props.design)
+
+  handleEndEditing: =>
+    @props.onDesignChange(@state.editDesign)
+    @setState(editDesign: null)
+
+  handleEditDesignChange: (design) =>
+    @setState(editDesign: design)
 
   renderEditor: ->
+    if not @state.editDesign
+      return null
+
     # Require here to prevent server require problems
     MapDesignerComponent = require '../maps/MapDesignerComponent'
 
@@ -71,14 +81,14 @@ class MapWidgetComponent extends React.Component
     editor = React.createElement(MapDesignerComponent, 
       schema: @props.schema
       dataSource: @props.dataSource
-      design: @props.design
-      onDesignChange: @props.onDesignChange
+      design: @state.editDesign
+      onDesignChange: @handleEditDesignChange
     )
 
     # Create map (maxing out at half of width of screen)
     width = Math.min(document.body.clientWidth/2, @props.width)
     height = @props.height * width / @props.width
-    chart = @renderContent(width, height)
+    chart = @renderContent(@state.editDesign, @handleEditDesignChange, width, height)
 
     content = H.div style: { height: "100%", width: "100%" },
       H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: width + 20, height: height + 20 },
@@ -88,21 +98,21 @@ class MapWidgetComponent extends React.Component
           editor
 
     React.createElement(ModalWindowComponent,
-      isOpen: @state.editing
-      onRequestClose: (=> @setState(editing: false)),
+      isOpen: true
+      onRequestClose: @handleEndEditing,
         content)
 
-  renderContent: (width, height) ->
+  renderContent: (design, onDesignChange, width, height) ->
     # Require here to prevent server require problems
     MapViewComponent = require '../maps/MapViewComponent'
 
     H.div style: { width: width, height: height, padding: 10 },
       React.createElement(MapViewComponent, {
         schema: @props.schema
-        design: @props.design
+        design: design
         dataSource: @props.dataSource
         mapDataSource: @props.widgetDataSource.getMapDataSource()
-        onDesignChange: @props.onDesignChange
+        onDesignChange: onDesignChange
         scope: @props.scope
         onScopeChange: @props.onScopeChange
         extraFilters: @props.filters
@@ -125,5 +135,5 @@ class MapWidgetComponent extends React.Component
         width: @props.width
         height: @props.height
         dropdownItems: dropdownItems,
-          @renderContent(@props.width, @props.height)
+          @renderContent(@props.design, null, @props.width, @props.height)
       )
