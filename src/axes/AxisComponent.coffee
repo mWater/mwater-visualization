@@ -32,6 +32,7 @@ module.exports = class AxisComponent extends React.Component
     showColorMap: React.PropTypes.bool # Shows the color map
     colorMapOptional: React.PropTypes.bool # Is the color map optional
     colorMapReorderable: React.PropTypes.bool # Is the color map reorderable
+    defaultColor: React.PropTypes.string
 
   @defaultProps:
     colorMapOptional: false
@@ -47,12 +48,12 @@ module.exports = class AxisComponent extends React.Component
       return
       
     # Set expression and clear xform
-    @props.onChange(@cleanAxis(_.extend({}, @props.value, { expr: expr })))
+    @props.onChange(@cleanAxis(_.extend({}, _.omit(@props.value, ["colorMap", "drawOrder"]), { expr: expr })))
 
   handleXformTypeChange: (type) =>
     # Remove
     if not type
-      @props.onChange(_.omit(@props.value, "xform"))
+      @props.onChange(_.omit(@props.value, ["xform", "colorMap", "drawOrder"]))
 
     # Save bins if going from bins to custom ranges and has ranges
     if type == "ranges" and @props.value.xform?.type == "bin" and @props.value.xform.min? and @props.value.xform.max? and @props.value.xform.min != @props.value.xform.max and @props.value.xform.numBins
@@ -76,10 +77,10 @@ module.exports = class AxisComponent extends React.Component
         type: type
       }
 
-    @props.onChange(update(@props.value, { xform: { $set: xform }}))
+    @props.onChange(update(_.omit(@props.value, ["colorMap", "drawOrder"]), { xform: { $set: xform }}))
 
   handleXformChange: (xform) =>
-    @props.onChange(@cleanAxis(update(@props.value, { xform: { $set: xform } })))
+    @props.onChange(@cleanAxis(update(_.omit(@props.value, ["colorMap", "drawOrder"]), { xform: { $set: xform } })))
 
   cleanAxis: (axis) ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
@@ -151,6 +152,7 @@ module.exports = class AxisComponent extends React.Component
       onChange: @props.onChange
       colorMapOptional: @props.colorMapOptional
       colorMapReorderable: @props.colorMapReorderable
+      defaultColor: @props.defaultColor
 
   render: ->
     axisBuilder = new AxisBuilder(schema: @props.schema)

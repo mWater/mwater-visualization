@@ -38,9 +38,9 @@ module.exports = class ColorMapComponent extends React.Component
       H.table style: { width: "auto" },
         H.tbody null,
           _.map @props.categories, (category) =>
-            H.tr null,
+            H.tr key: category.value,
               H.td key: "color",
-                  R ColorComponent, 
+                  R ColorComponent,
                   color: @lookupColor(category.value)
                   onChange: (color) => @handleColorChange(category.value, color)
               H.td key: "label", style: { paddingLeft: 8 },

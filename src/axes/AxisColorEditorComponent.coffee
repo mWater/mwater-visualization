@@ -17,6 +17,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
     onChange: React.PropTypes.func.isRequired
     colorMapOptional: React.PropTypes.bool # is colorMap optional
     colorMapReorderable: React.PropTypes.bool # is the color map reorderable
+    defaultColor: React.PropTypes.string
 
   @defaultProps:
     colorMapOptional: false
@@ -35,6 +36,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
   componentWillReceiveProps: (nextProps) ->
     if not _.isEqual(nextProps.axis, @props.axis)
       @loadCategories(nextProps)
+      @setState(mode: if nextProps.axis.colorMap or nextProps.colorMapOptional then "normal" else "palette")
 
   componentWillUnmount: ->
     @unmounted = true
@@ -91,7 +93,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
 
   onPaletteChange: (palette) =>
     @props.onChange(update(@props.axis, { colorMap: { $set: palette }, drawOrder: { $set: _.pluck(palette, "value") }}))
-    @setState(mode: "normal")
+#    @setState(mode: "normal")
 
   handleDrawOrderChange: (order) =>
     @props.onChange(update(@props.axis, { drawOrder: { $set: order }}))
@@ -143,6 +145,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
               colorMap: @props.axis.colorMap
               order: drawOrder
               categories: @state.categories
+              defaultColor: @props.defaultColor
               onChange: @handleDrawOrderChange
 
 

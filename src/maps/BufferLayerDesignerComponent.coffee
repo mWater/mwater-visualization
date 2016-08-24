@@ -118,7 +118,7 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
           types: ["text", "enum", "boolean"]
           aggrNeed: "none"
           colorMapReorderable: true
-#        React.createElement(ColorComponent, color: @props.design.color, onChange: @handleColorChange)
+#        React.createElement(ColorComponent, color: @props.desidefaultColor: @props.design.colorgn.color, onChange: @handleColorChange)
 
   renderFillOpacity: ->
     return H.div className: "form-group",

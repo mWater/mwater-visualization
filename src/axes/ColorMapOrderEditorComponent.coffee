@@ -11,6 +11,7 @@ module.exports = class ColorMapOrderEditorComponent extends React.Component
     categories: React.PropTypes.array.isRequired # The categories for the given color map [{label: string, name: string},...]
     order: React.PropTypes.array.isRequired # The order of the colors, array of the values from color map in specified order
     onChange: React.PropTypes.func.isRequired # callback when the order is changed
+    defaultColor: React.PropTypes.string
 
   constructor: ->
     @state = {
@@ -58,9 +59,12 @@ module.exports = class ColorMapOrderEditorComponent extends React.Component
 
   render: ->
     if @state.editing
-      items = _.sortBy(@props.colorMap, (item) =>
+      ordered = _.sortBy(@props.categories, (item) =>
         _.indexOf(@props.order, item.value)
       )
+
+      items = _.map ordered, (category) =>
+        {value: category.value, color: _.find(@props.colorMap, {value: category.value})?.color or @props.defaultColor }
 
       H.div null,
         R ReorderableListComponent,
