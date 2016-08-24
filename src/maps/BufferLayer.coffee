@@ -307,6 +307,14 @@ module.exports = class BufferLayer extends Layer
             widget = WidgetFactory.createWidget(options.type)
 
             # Create filters for single row
+            filter = { 
+              table: table
+              jsonql: { type: "op", op: "=", exprs: [
+                { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table).primaryKey }
+                { type: "literal", value: ev.data.id }
+              ]} 
+            }
+
             filters = [filter]
 
             # Get data source for widget

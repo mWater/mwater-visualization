@@ -220,7 +220,7 @@ module.exports = class MarkersLayer extends Layer
         # Scope to item
         if ids.length > 0
           results.scope = {
-            name: "Selected #{ids.length} Marker(s)"
+            name: "Selected #{ids.length} Markers(s)"
             filter: filter
             data: ids
           }
@@ -238,6 +238,14 @@ module.exports = class MarkersLayer extends Layer
             widget = WidgetFactory.createWidget(options.type)
 
             # Create filters for single row
+            filter = { 
+              table: table
+              jsonql: { type: "op", op: "=", exprs: [
+                { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table).primaryKey }
+                { type: "literal", value: ev.data.id }
+              ]} 
+            }
+
             filters = [filter]
 
             # Get data source for widget
@@ -263,6 +271,7 @@ module.exports = class MarkersLayer extends Layer
       return results
     else
       return null
+
 
   # Get min and max zoom levels
   getMinZoom: (design) -> return null

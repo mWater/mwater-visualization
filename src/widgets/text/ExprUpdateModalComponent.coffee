@@ -32,14 +32,15 @@ module.exports = class ExprUpdateModalComponent extends React.Component
   handleTableChange: (table) => @setState(table: table)
 
   renderContents: ->
-    H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.i(className: "fa fa-database")
-        " "
-        "Data Source"
-      ": "
-      R(TableSelectComponent, { schema: @props.schema, value: @state.table, onChange: @handleTableChange })
-      H.br()
+    H.div style: { paddingBottom: 200 },
+      H.div className: "form-group",
+        H.label className: "text-muted", 
+          H.i(className: "fa fa-database")
+          " "
+          "Data Source"
+        ": "
+        R(TableSelectComponent, { schema: @props.schema, value: @state.table, onChange: @handleTableChange })
+        H.br()
 
       if @state.table
         H.div className: "form-group",
