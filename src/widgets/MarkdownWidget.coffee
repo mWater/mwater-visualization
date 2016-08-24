@@ -45,24 +45,33 @@ class MarkdownWidgetComponent extends React.Component
   constructor: (props) ->
     super
     @state = { 
-      # True when editing
-      editing: false
+      # Design that is being edited. Change is propagated on closing window
+      editDesign: null
     }  
 
   handleStartEditing: =>
-    if @props.onDesignChange?
-      @setState(editing: true)
+    @setState(editDesign: @props.design)
+
+  handleEndEditing: =>
+    @props.onDesignChange(@state.editDesign)
+    @setState(editDesign: null)
+
+  handleEditDesignChange: (design) =>
+    @setState(editDesign: design)
 
   renderEditor: ->
+    if not @state.editDesign
+      return null
+
     # Create editor
     editor = React.createElement(MarkdownWidgetDesignerComponent, 
-      design: @props.design
-      onDesignChange: @props.onDesignChange
+      design: @state.editDesign
+      onDesignChange: @handleEditDesignChange
     )
 
     # Create item (maxing out at half of width of screen)
     width = Math.min(document.body.clientWidth/2, @props.width)
-    chart = @renderContent()
+    chart = @renderContent(@state.editDesign)
 
     content = H.div style: { height: "100%", width: "100%" },
       H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: width + 20, height: @props.height + 20 },
@@ -76,10 +85,9 @@ class MarkdownWidgetComponent extends React.Component
       onRequestClose: (=> @setState(editing: false)),
         content)
 
-  renderContent: ->
+  renderContent: (design) ->
     React.createElement(MarkdownWidgetViewComponent, {
-      design: @props.design
-      onDesignChange: @props.onDesignChange
+      design: design
       width: @props.width
       height: @props.height
       standardWidth: @props.standardWidth
@@ -98,7 +106,7 @@ class MarkdownWidgetComponent extends React.Component
         width: @props.width
         height: @props.height
         dropdownItems: dropdownItems,
-          @renderContent()
+          @renderContent(@props.design)
       )
 
 

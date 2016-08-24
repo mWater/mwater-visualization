@@ -57,6 +57,32 @@ module.exports = class LeafletMapComponent extends React.Component
     for tileLayer in @tileLayers
       tileLayer.redraw()
 
+  # Set bounds. Bounds are in { w, n, s, e } format
+  setBounds: (bounds) ->
+    if bounds
+      # Ignore if same as current
+      if @hasBounds
+        curBounds = @map.getBounds()
+        if curBounds and curBounds.getWest() == bounds.w and curBounds.getEast() == bounds.e and curBounds.getNorth() == bounds.n and curBounds.getSouth() == bounds.s
+          return
+
+      # Check that bounds contain some actual area (hangs leaflet if not https://github.com/mWater/mwater-visualization/issues/127)
+      n = bounds.n 
+      w = bounds.w
+      s = bounds.s
+      e = bounds.e
+      if n == s
+        n += 0.001
+      if e == w
+        e += 0.001
+
+      @map.fitBounds(new L.LatLngBounds([[s, w], [n, e]]))
+    else
+      # Fit world doesn't work sometimes. Make sure that entire left-right is included
+      @map.fitBounds([[-1, -180], [1, 180]])
+
+    @hasBounds = true
+
   componentDidMount: ->
     # Create map
     mapElem = ReactDOM.findDOMNode(@refs.map)
@@ -80,35 +106,13 @@ module.exports = class LeafletMapComponent extends React.Component
           s: bounds.getSouth() 
         })
 
-    if @props.initialBounds
-      # Check that bounds contain some actual area (hangs leaflet if not https://github.com/mWater/mwater-visualization/issues/127)
-      n = @props.initialBounds.n 
-      w = @props.initialBounds.w
-      s = @props.initialBounds.s
-      e = @props.initialBounds.e
-      if n == s
-        n += 0.001
-      if e == w
-        e += 0.001
-
-      @map.fitBounds(new L.LatLngBounds([[s, w], [n, e]]))
-    else
-      # Fit world doesn't work sometimes. Make sure that entire left-right is included
-      @map.fitBounds([[-1, -180], [1, 180]])
-
+    @setBounds(@props.initialBounds)
 
     if @props.loadingSpinner
       loadingControl = L.Control.loading({
         separate: true
       })
       @map.addControl(loadingControl)
-
-    # Add legend
-#    @legendControl = L.control({position: 'bottomright'})
-#    @legendControl.onAdd = (map) =>
-#      @legendDiv = L.DomUtil.create('div', '')
-#      return @legendDiv
-#    @legendControl.addTo(@map)
 
     # Update map with no previous properties
     @updateMap()
@@ -117,9 +121,6 @@ module.exports = class LeafletMapComponent extends React.Component
     @updateMap(prevProps)
 
   componentWillUnmount: ->
-#    if @legendDiv
-#      ReactDOM.unmountComponentAtNode(@legendDiv)
-#
     @map.remove()
 
   # Open a popup.

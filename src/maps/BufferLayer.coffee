@@ -214,6 +214,7 @@ module.exports = class BufferLayer extends Layer
         marker-line-width: 0;
         marker-allow-overlap: true;
         marker-ignore-placement: true;
+        marker-fill: transparent;
       }
     '''
     
