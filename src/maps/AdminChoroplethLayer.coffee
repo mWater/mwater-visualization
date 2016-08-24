@@ -286,39 +286,40 @@ module.exports = class AdminChoroplethLayer extends Layer
     if ev.data and ev.data.id
       results = { }
 
-      # Create filter for single row
-      table = clickOptions.design.table
-      
-      # Compile adminRegionExpr
-      exprCompiler = new ExprCompiler(clickOptions.schema)
-      filterExpr = {
-        type: "op"
-        op: "within"
-        table: table
-        exprs: [
-          clickOptions.design.adminRegionExpr
-          { type: "literal", idTable: "admin_regions", valueType: "id", value: ev.data.id }
-        ]
-      }
-      compiledFilterExpr = exprCompiler.compileExpr(expr: filterExpr, tableAlias: "{alias}")
+      if ev.event.originalEvent.ctrlKey
+        # Create filter for single row
+        table = clickOptions.design.table
+        
+        # Compile adminRegionExpr
+        exprCompiler = new ExprCompiler(clickOptions.schema)
+        filterExpr = {
+          type: "op"
+          op: "within"
+          table: table
+          exprs: [
+            clickOptions.design.adminRegionExpr
+            { type: "literal", idTable: "admin_regions", valueType: "id", value: ev.data.id }
+          ]
+        }
+        compiledFilterExpr = exprCompiler.compileExpr(expr: filterExpr, tableAlias: "{alias}")
 
-      # Filter within
-      filter = { 
-        table: table
-        jsonql: compiledFilterExpr 
-      }
-
-      # Scope to region, unless already scoped
-      if clickOptions.scopeData == ev.data.id
-        results.scope = null
-      else
-        results.scope = {
-          name: ev.data.name
-          filter: filter
-          data: ev.data.id
+        # Filter within
+        filter = { 
+          table: table
+          jsonql: compiledFilterExpr 
         }
 
-      if clickOptions.design.popup
+        # Scope to region, unless already scoped
+        if clickOptions.scopeData == ev.data.id
+          results.scope = null
+        else
+          results.scope = {
+            name: ev.data.name
+            filter: filter
+            data: ev.data.id
+          }
+          
+      else if clickOptions.design.popup
         BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
         WidgetFactory = require '../widgets/WidgetFactory'
 

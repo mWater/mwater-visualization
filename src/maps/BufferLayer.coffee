@@ -266,40 +266,38 @@ module.exports = class BufferLayer extends Layer
   onGridClick: (ev, clickOptions) ->
     # TODO abstract most to base class
     if ev.data and ev.data.id
-      results = {
-        row: { tableId: clickOptions.design.table, primaryKey: ev.data.id }
-      }
-
-      # Create filter for single row
       table = clickOptions.design.table
+      results = {}
 
-      ids = clickOptions.scopeData or []
+      # Scope toggle item if ctrl-click
+      if ev.event.originalEvent.ctrlKey
+        ids = clickOptions.scopeData or []
+        if ev.data.id in ids
+          ids = _.without(ids, ev.data.id)
+        else
+          ids = ids.concat([ev.data.id])
 
-      # Toggle item
-      if ev.data.id in ids
-        ids = _.without(ids, ev.data.id)
-      else
-        ids = ids.concat([ev.data.id])
-
-      filter = { 
-        table: table
-        jsonql: { type: "op", op: "=", modifier: "any", exprs: [
-          { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table).primaryKey }
-          { type: "literal", value: ids }
-        ]} 
-      }
-
-      # Scope to item
-      if ids.length > 0
-        results.scope = {
-          name: "Selected Circle(s)"
-          filter: filter
-          data: ids
+        # Create filter for rows
+        filter = { 
+          table: table
+          jsonql: { type: "op", op: "=", modifier: "any", exprs: [
+            { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table).primaryKey }
+            { type: "literal", value: ids }
+          ]} 
         }
-      else
-        results.scope = null
 
-      if clickOptions.design.popup
+        # Scope to item
+        if ids.length > 0
+          results.scope = {
+            name: "Selected #{ids.length} Circle(s)"
+            filter: filter
+            data: ids
+          }
+        else
+          results.scope = null
+
+      # Popup
+      if clickOptions.design.popup and not ev.event.originalEvent.ctrlKey
         BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
         WidgetFactory = require '../widgets/WidgetFactory'
 
@@ -328,6 +326,8 @@ module.exports = class BufferLayer extends Layer
               standardWidth: options.standardWidth
             })  
           })
+      else if not ev.event.originalEvent.ctrlKey
+        results.row = { tableId: table, primaryKey: ev.data.id }
 
       return results
     else

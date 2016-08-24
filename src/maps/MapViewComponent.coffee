@@ -89,12 +89,10 @@ module.exports = class MapViewComponent extends React.Component
     # Handle popup first
     if results.popup
       @setState(popupContents: results.popup)
-      return
 
     # Handle onRowClick case
     if results.row and @props.onRowClick
       @props.onRowClick(results.row.tableId, results.row.primaryKey)
-      return
 
     # Handle scoping
     if @props.onScopeChange and _.has(results, "scope")
@@ -109,7 +107,6 @@ module.exports = class MapViewComponent extends React.Component
         scope = null
 
       @props.onScopeChange(scope)
-
 
   renderLegend:  ->
     legendItems = _.compact(
@@ -210,7 +207,7 @@ module.exports = class MapViewComponent extends React.Component
         tileUrl: layerDataSource.getTileUrl(if isScoping then compiledFilters else scopedCompiledFilters)
         utfGridUrl: layerDataSource.getUtfGridUrl(if isScoping then compiledFilters else scopedCompiledFilters)
         visible: layerView.visible
-        opacity: if isScoping then layerView.opacity * 0.5 else layerView.opacity
+        opacity: if isScoping then layerView.opacity * 0.3 else layerView.opacity
         minZoom: layer.getMinZoom(design)
         maxZoom: layer.getMaxZoom(design)
         onGridClick: @handleGridClick.bind(null, layerView.id)

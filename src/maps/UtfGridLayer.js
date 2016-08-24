@@ -162,7 +162,7 @@ module.exports = L.Class.extend({
 
 		var data = this._cache[map.getZoom() + '_' + x + '_' + y];
 		if (!data) {
-			return { latlng: e.latlng, data: null };
+			return { latlng: e.latlng, data: null, event: e };
 		}
 
 		var idx = this._utfDecode(data.grid[gridY].charCodeAt(gridX)),
@@ -173,7 +173,7 @@ module.exports = L.Class.extend({
 			result = null;
 		}
 
-		return { latlng: e.latlng, data: result};
+		return { latlng: e.latlng, data: result, event: e };
 	},
 
 	//Load up all required json grid files
