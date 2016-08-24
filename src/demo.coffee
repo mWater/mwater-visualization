@@ -2853,6 +2853,72 @@ adminRegionMap = {
         "detailLevel": 2,
         "table": "entities.water_point"
       }
+    },
+    {
+      "id": "838b2071-1f0d-49e0-9f8c-a9e7f8665516",
+      "name": "Untitled Layer",
+      "desc": "",
+      "type": "Buffer",
+      "visible": true,
+      "opacity": 1,
+      "design": {
+        "axes": {
+          "geometry": {
+            "expr": {
+              "type": "scalar",
+              "table": "indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9",
+              "joins": [
+                "Water point"
+              ],
+              "expr": {
+                "type": "field",
+                "table": "entities.water_point",
+                "column": "location"
+              }
+            }
+          },
+          "color": {
+            "expr": {
+              "type": "field",
+              "table": "indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9",
+              "column": "Functionality"
+            },
+            "colorMap": [
+              {
+                "value": "Functional",
+                "color": "#1f77b4"
+              },
+              {
+                "value": "Partially functional",
+                "color": "#ff7f0e"
+              },
+              {
+                "value": "Not functional",
+                "color": "#2ca02c"
+              },
+              {
+                "value": "No longer exists",
+                "color": "#d62728"
+              },
+              {
+                "value": null,
+                "color": "#9467bd"
+              }
+            ],
+            "drawOrder": [
+              "Functional",
+              "Partially functional",
+              "Not functional",
+              "No longer exists",
+              null
+            ]
+          }
+        },
+        "radius": 50000,
+        "fillOpacity": 0.5,
+        "filter": null,
+        "table": "indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9"
+      }
     }
   ],
   "filters": {},

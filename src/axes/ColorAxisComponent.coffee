@@ -61,6 +61,7 @@ module.exports = class ColorAxisComponent extends React.Component
             types: @props.types
             aggrNeed: @props.aggrNeed
             value: @state.axis
+            defaultColor: @props.defaultColor
             showColorMap: @props.showColorMap
             colorMapOptional: @props.colorMapOptional
             colorMapReorderable: @props.colorMapReorderable

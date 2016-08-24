@@ -17,6 +17,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
     onChange: React.PropTypes.func.isRequired
     colorMapOptional: React.PropTypes.bool # is colorMap optional
     colorMapReorderable: React.PropTypes.bool # is the color map reorderable
+    defaultColor: React.PropTypes.string
 
   @defaultProps:
     colorMapOptional: false
@@ -143,6 +144,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
               colorMap: @props.axis.colorMap
               order: drawOrder
               categories: @state.categories
+              defaultColor: @props.defaultColor
               onChange: @handleDrawOrderChange
 
 
