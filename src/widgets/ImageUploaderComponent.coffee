@@ -77,7 +77,7 @@ module.exports = class ImageUploaderComponent extends React.Component
       border: '1px solid #aeaeae'
       marginRight: 20
     H.div null,
-      H.img style: thumbnailStyle, src: @props.apiUrl + "images/#{@state.uid}"
+      H.img style: thumbnailStyle, src: @props.dataSource.getImageUrl(@state.uid)
       H.a className: 'btn btn-default', onClick: @handleChangeImage, "Change"
 
   handleChangeImage: () =>
