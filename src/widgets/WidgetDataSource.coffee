@@ -3,13 +3,14 @@
 # data source to get it, as the server will return the exact data he needs for the widget, since the server has a copy of the design of the widget.
 module.exports = class WidgetDataSource
   # Get the data that the widget needs. The widget should implement getData method (see above) to get the actual data on the server
+  #  design: design of the widget. Ignored in the case of server-side rendering
   #  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   #  callback: (error, data)
-  getData: (filters, callback) ->
+  getData: (design, filters, callback) ->
     throw new Error("Not implemented")
 
   # For map widgets, the following is required
-  getMapDataSource: ->
+  getMapDataSource: (design) ->
     throw new Error("Not implemented")
 
   # Get the url to download an image (by id from an image or imagelist column)

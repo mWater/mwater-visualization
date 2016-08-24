@@ -53,7 +53,6 @@ module.exports = class EditPopupComponent extends React.Component
 
               widgetDataSource = new DirectWidgetDataSource({
                 widget: widget
-                design: options.design
                 schema: @props.schema
                 dataSource: @props.dataSource
               })

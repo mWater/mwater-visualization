@@ -177,7 +177,7 @@ module.exports = class LayeredChart extends Chart
     # TODO validate design before allowing save
     save = =>
       design = @cleanDesign(design, schema)
-      widgetDataSource.getData filters, (err, data) =>
+      widgetDataSource.getData design, filters, (err, data) =>
         if err
           alert("Unable to load data")
         else

@@ -41,7 +41,6 @@ class DemoComponent extends React.Component
         widgetDataSource = new DirectWidgetDataSource({
           apiUrl: @props.apiUrl
           widget: widget
-          design: options.design
           schema: config.schema
           dataSource: config.dataSource
           client: @props.client

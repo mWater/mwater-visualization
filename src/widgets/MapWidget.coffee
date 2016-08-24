@@ -111,7 +111,7 @@ class MapWidgetComponent extends React.Component
         schema: @props.schema
         design: design
         dataSource: @props.dataSource
-        mapDataSource: @props.widgetDataSource.getMapDataSource()
+        mapDataSource: @props.widgetDataSource.getMapDataSource(design)
         onDesignChange: onDesignChange
         scope: @props.scope
         onScopeChange: @props.onScopeChange

@@ -62,7 +62,7 @@ module.exports = class ChartViewComponent extends React.Component
 
   loadData: (props, callback) ->
     # Get data from widget data source
-    props.widgetDataSource.getData(props.filters, callback)
+    props.widgetDataSource.getData(props.design, props.filters, callback)
 
   render: ->
     style = { width: @props.width, height: @props.height }

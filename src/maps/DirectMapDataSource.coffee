@@ -112,7 +112,6 @@ class DirectLayerDataSource
 
     return new DirectWidgetDataSource({
       widget: widget
-      design: design
       schema: @options.schema
       dataSource: @options.dataSource
       apiUrl: @options.apiUrl

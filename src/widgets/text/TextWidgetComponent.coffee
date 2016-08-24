@@ -55,7 +55,7 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
   # Call callback with state changes
   load: (props, prevProps, callback) -> 
     # Get data
-    props.widgetDataSource.getData(props.filters, (error, data) =>
+    props.widgetDataSource.getData(props.design, props.filters, (error, data) =>
       callback(error: error, exprValues: data or {})
     )
 

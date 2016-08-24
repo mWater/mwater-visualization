@@ -27,8 +27,9 @@ class ServerWidgetDataSource
     @options = options
 
   # Get the data that the widget needs. The widget should implement getData method (see above) to get the data from the server
+  #  design: design of the widget. Ignored in the case of server-side rendering
   #  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
-  getData: (filters, callback) ->
+  getData: (design, filters, callback) ->
     query = {
       client: @options.client
       share: @options.share
@@ -44,7 +45,7 @@ class ServerWidgetDataSource
       callback(new Error(xhr.responseText))
 
   # For map widgets, the following is required
-  getMapDataSource: ->
+  getMapDataSource: (design) ->
     return new ServerWidgetMapDataSource(@options)
 
   # Get the url to download an image (by id from an image or imagelist column)

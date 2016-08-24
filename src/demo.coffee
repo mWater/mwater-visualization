@@ -31,11 +31,11 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDirectMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(BlocksDesignerComponent, renderBlock: [])
     # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
@@ -165,6 +165,38 @@ design = {
         "id": "9bec34a2-f0e5-4a0b-88e8-3406521408bf",
         "type": "horizontal",
         "blocks": [
+          {
+            "type": "widget",
+            "aspectRatio": 1.4,
+            "widgetType": "TableChart",
+            "design": {
+              "version": 1,
+              "columns": [
+                {
+                  "textAxis": {
+                    "expr": {
+                      "type": "field",
+                      "table": "entities.water_point",
+                      "column": "name"
+                    }
+                  }
+                },
+                {
+                  "textAxis": {
+                    "expr": {
+                      "type": "field",
+                      "table": "entities.water_point",
+                      "column": "type"
+                    }
+                  }
+                }
+              ],
+              "orderings": [],
+              "table": "entities.water_point",
+              "titleText": "This is a really long title This is a really long title This is a really long title This is a really long title "
+            },
+            "id": "ca85906f-c6cd-4729-a52f-984c28d625a8"
+          },
           {
             "type": "widget",
             "aspectRatio": 1.4,
@@ -604,7 +636,7 @@ class MWaterDirectMapPane extends React.Component
     super
 
     @state = {
-      design: adminRegionMap
+      design: bufferMap
       extraTables: []
     }
 
@@ -2735,10 +2767,10 @@ bufferMap = {
   ],
   "filters": {},
   "bounds": {
-    "w": 32.79075622558594,
-    "n": -2.3706535651058847,
-    "e": 33.02146911621094,
-    "s": -2.5452440019589724
+    "w": 32.01690673828125,
+    "n": -1.9606767908079445,
+    "e": 33.86260986328125,
+    "s": -3.424320686307251
   }
 }
 
