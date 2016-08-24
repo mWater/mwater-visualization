@@ -50,7 +50,7 @@ module.exports = class ChartWidget extends Widget
   getData: (design, schema, dataSource, filters, callback) ->
     # Clean design first
     design = @chart.cleanDesign(design, schema)
-    
+
     @chart.getData(design, schema, dataSource, filters, callback)
 
 # Complete chart widget
@@ -83,8 +83,8 @@ class ChartWidgetComponent extends React.Component
   constructor: (props) ->
     super
     @state = { 
-      # True when editing chart
-      editing: false
+      # Design that is being edited. Change is propagated on closing window
+      editDesign: null
     }  
 
   # Saves a csv file to disk
@@ -111,15 +111,19 @@ class ChartWidgetComponent extends React.Component
     )
 
   handleStartEditing: =>
-    @setState(editing: true)
+    @setState(editDesign: @props.design)
 
   handleEndEditing: =>
-    @setState(editing: false)
+    @props.onDesignChange(@state.editDesign)
+    @setState(editDesign: null)
 
-  renderChart: (width, height, standardWidth) ->
+  handleEditDesignChange: (design) =>
+    @setState(editDesign: design)
+
+  renderChart: (design, width, height, standardWidth) ->
     React.createElement(ChartViewComponent, 
       chart: @props.chart
-      design: @props.design
+      design: design
       schema: @props.schema
       dataSource: @props.dataSource
       widgetDataSource: @props.widgetDataSource
@@ -131,12 +135,15 @@ class ChartWidgetComponent extends React.Component
       onScopeChange: @props.onScopeChange)
 
   renderEditor: ->
+    if not @state.editDesign
+      return null
+
     # Create editor
-    editor = @props.chart.createDesignerElement(schema: @props.schema, dataSource: @props.dataSource, design: @props.design, onDesignChange: @props.onDesignChange)
+    editor = @props.chart.createDesignerElement(schema: @props.schema, dataSource: @props.dataSource, design: @state.editDesign, onDesignChange: @handleEditDesignChange)
 
     # Create chart (maxing out at half of width of screen)
     width = Math.min(document.body.clientWidth/2, @props.width)
-    chart = @renderChart(width, @props.height * (width / @props.width), width)
+    chart = @renderChart(@state.editDesign, width, @props.height * (width / @props.width), width)
 
     content = H.div style: { height: "100%", width: "100%" },
       H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: width + 20, height: @props.height + 20 },
@@ -146,7 +153,7 @@ class ChartWidgetComponent extends React.Component
           editor
 
     React.createElement(ModalWindowComponent,
-      isOpen: @state.editing
+      isOpen: true
       onRequestClose: @handleEndEditing,
         content)
 
@@ -177,7 +184,7 @@ class ChartWidgetComponent extends React.Component
         width: @props.width
         height: @props.height
         dropdownItems: dropdownItems,
-          @renderChart(@props.width, @props.height, @props.standardWidth)
+          @renderChart(@props.design, @props.width, @props.height, @props.standardWidth)
       )
       if (emptyDesign or not validDesign) and @props.onDesignChange?
         @renderEditLink()
