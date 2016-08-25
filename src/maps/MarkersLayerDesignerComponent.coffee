@@ -105,7 +105,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
           onColorAxisChange: @handleColorAxisChange
           table: @props.design.table
           showColorMap: true
-          types: ["text", "enum", "boolean"]
+          types: ["text", "enum", "boolean",'date']
           aggrNeed: "none"
 #        R(ColorComponent, color: @props.design.color, onChange: @handleColorChange)
 

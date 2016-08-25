@@ -115,7 +115,7 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
           onColorAxisChange: @handleColorAxisChange
           table: @props.design.table
           showColorMap: true
-          types: ["text", "enum", "boolean"]
+          types: ["text", "enum", "boolean", "date"]
           aggrNeed: "none"
           colorMapReorderable: true
 #        React.createElement(ColorComponent, color: @props.desidefaultColor: @props.design.colorgn.color, onChange: @handleColorChange)

@@ -55,12 +55,6 @@ module.exports = class LayeredChart extends Chart
       if not layer.axes.x or axisBuilder.getAxisType(layer.axes.x) not in ['date', 'number']
         delete layer.cumulative
 
-      # Prevents selecting other than count(*) when enabled
-      # # Default y to count if x or color present and not scatter
-      # if not layer.axes.y and (layer.axes.x or layer.axes.color) and compiler.doesLayerNeedGrouping(design, layerId)
-      #   # Create count expr
-      #   layer.axes.y = { expr: { type: "id", table: layer.table }, aggr: "count", xform: null }
-
       layer.filter = exprCleaner.cleanExpr(layer.filter, { table: layer.table, types: ['boolean'] })
 
     return design

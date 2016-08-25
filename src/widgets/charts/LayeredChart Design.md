@@ -11,6 +11,7 @@
 
 layer:
   type: bar/line/spline/scatter/area/pie/donut (overrides main one)
+  table: table of layer
   name: label for layer (optional)
   axes: axes (see below)
   stacked: true to stack (Note: not implemented yet)

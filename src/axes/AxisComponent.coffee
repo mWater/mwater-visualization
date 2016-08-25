@@ -153,6 +153,9 @@ module.exports = class AxisComponent extends React.Component
       colorMapOptional: @props.colorMapOptional
       colorMapReorderable: @props.colorMapReorderable
       defaultColor: @props.defaultColor
+      table: @props.table
+      types: @props.types
+      aggrNeed: @props.aggrNeed
 
   render: ->
     axisBuilder = new AxisBuilder(schema: @props.schema)

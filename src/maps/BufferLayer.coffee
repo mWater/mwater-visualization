@@ -359,8 +359,9 @@ module.exports = class BufferLayer extends Layer
     React.createElement LayerLegendComponent,
       schema: schema
       name: name
-      axis: axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean'], aggrNeed: "none")
+      axis: axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none")
       radiusLayer: true
+      defaultColor: design.color
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) -> 
@@ -406,7 +407,7 @@ module.exports = class BufferLayer extends Layer
     design.fillOpacity = if design.fillOpacity? then design.fillOpacity else 0.5
 
     design.axes.geometry = axisBuilder.cleanAxis(axis: design.axes.geometry, table: design.table, types: ['geometry'], aggrNeed: "none")
-    design.axes.color = axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean'], aggrNeed: "none")
+    design.axes.color = axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none")
 
     design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table })
 

@@ -119,6 +119,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
     return R ModalPopupComponent,
       header: "Configure"
       onClose: @handleEndEditing
+      scrollDisabled: true
       footer: footer,
       content
 
@@ -199,3 +200,5 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
         else
           H.div style: { position: "relative", width: @props.width, height: @props.height, textAlign: "center" },
             @renderContent()
+
+          

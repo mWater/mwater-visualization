@@ -102,7 +102,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
           onColorAxisChange: updt(@props.onDesignChange, @props.design, ["axes", "color"])
           table: @props.design.table
           showColorMap: true
-          types: ["text", "enum", "boolean"]
+          types: ["text", "enum", "boolean",'date']
           aggrNeed: "required"
 #        R(ColorComponent, color: @props.design.color, onChange: updt(@props.onDesignChange, @props.design, "color"))
 
@@ -192,9 +192,9 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
 
   render: ->
     H.div null,
-      @renderScopeAndDetailLevel()
       @renderTable()
       @renderAdminRegionExpr()
+      @renderScopeAndDetailLevel()
       @renderDisplayNames()
       @renderColor()
       @renderFillOpacity()
