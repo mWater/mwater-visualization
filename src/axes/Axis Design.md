@@ -8,6 +8,8 @@ It contains:
  aggr: DEPRECATED: optional aggregation (e.g. sum)
  xform: optional transformation to be applied. object with `type` field. See below
  colorMap: optional array of { value: value of expression, post-transform, color: html color }
+ drawOrder: optional array of category values which define the order in which categories should be rendered
+ nullLabel: optional string for null category
 
 aggregation and transforms are mutually exclusive.
 
