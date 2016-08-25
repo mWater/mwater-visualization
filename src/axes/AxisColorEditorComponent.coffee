@@ -37,7 +37,8 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
 
   componentWillReceiveProps: (nextProps) ->
     super(nextProps)
-    @setState(mode: if nextProps.axis.colorMap or nextProps.colorMapOptional then "normal" else "palette")
+    if not @state.mode == "customize"
+      @setState(mode: if nextProps.axis.colorMap or nextProps.colorMapOptional then "normal" else "palette")
 
   isLoadNeeded: (newProps, oldProps) ->
     return not _.isEqual(_.omit(newProps.axis, ["colorMap", "drawOrder"]), _.omit(oldProps.axis, ["colorMap", "drawOrder"]))
