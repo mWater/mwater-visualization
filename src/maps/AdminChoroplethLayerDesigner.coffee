@@ -192,9 +192,9 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
 
   render: ->
     H.div null,
-      @renderScopeAndDetailLevel()
       @renderTable()
       @renderAdminRegionExpr()
+      @renderScopeAndDetailLevel()
       @renderDisplayNames()
       @renderColor()
       @renderFillOpacity()
