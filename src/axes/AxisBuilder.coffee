@@ -8,18 +8,6 @@ moment = require 'moment'
 React = require 'react'
 H = React.DOM
 
-#if xf.type != axis.xform.type
-#  return false
-#
-## Input type must match
-#if xf.input != type
-#  return false
-#
-## Output type must match
-#if options.types and xf.output not in options.types
-#  return false
-#return true
-
 xforms = [
   { type: "bin", input: "number", output: "enum" }
   { type: "ranges", input: "number", output: "enum" }

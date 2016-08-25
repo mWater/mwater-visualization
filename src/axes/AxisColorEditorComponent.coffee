@@ -144,14 +144,6 @@ module.exports = class AxisColorEditorComponent extends React.Component
           if @props.axis.colorMap
             H.div key: "selected-palette",
               @renderPreview()
-#              H.div className: "axis-palette",
-#              _.map @props.axis.colorMap.slice(0,6), (map, i) =>
-#                cellStyle =
-#                  display: 'inline-block'
-#                  height: 20
-#                  width: 20
-#                  backgroundColor: map.color
-#                H.div style: cellStyle, key: i, " "
               H.p style: {fontSize: 12},
                 H.a style: { cursor: "pointer" }, onClick: @handleCustomizePalette, key: "customize-palette", style: {marginRight: 10}, "Choose colors manually"
 

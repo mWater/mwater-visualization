@@ -119,7 +119,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
     return R ModalPopupComponent,
       header: "Configure"
       onClose: @handleEndEditing
-      scrollEnabled: false
+      scrollDisabled: true
       footer: footer,
       content
 
