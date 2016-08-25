@@ -286,7 +286,7 @@ module.exports = class MarkersLayer extends Layer
       defaultColor: design.color
       symbol: design.symbol or 'font-awesome/circle'
       name: name
-      axis: axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean'], aggrNeed: "none")
+      axis: axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none")
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->
@@ -331,7 +331,7 @@ module.exports = class MarkersLayer extends Layer
     design.color = design.color or "#0088FF"
 
     design.axes.geometry = axisBuilder.cleanAxis(axis: design.axes.geometry, table: design.table, types: ['geometry'], aggrNeed: "none")
-    design.axes.color = axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean'], aggrNeed: "none")
+    design.axes.color = axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none")
 
     design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table })
 

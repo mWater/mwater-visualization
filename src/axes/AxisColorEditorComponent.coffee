@@ -18,6 +18,9 @@ module.exports = class AxisColorEditorComponent extends React.Component
     colorMapOptional: React.PropTypes.bool # is colorMap optional
     colorMapReorderable: React.PropTypes.bool # is the color map reorderable
     defaultColor: React.PropTypes.string
+    table: React.PropTypes.string.isRequired # Table to use
+    types: React.PropTypes.array # Optional types to limit to
+    aggrNeed: React.PropTypes.oneOf(['none', 'optional', 'required']).isRequired
 
   @defaultProps:
     colorMapOptional: false
@@ -51,7 +54,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
       return
 
     # Check for axis
-    axis = axisBuilder.cleanAxis(axis: props.axis)
+    axis = axisBuilder.cleanAxis(axis: props.axis, table: @props.table, types: @props.types, aggrNeed: @props.aggrNeed)
     # Ignore if error
     if not axis or axisBuilder.validateAxis(axis: axis)
       return
@@ -101,6 +104,17 @@ module.exports = class AxisColorEditorComponent extends React.Component
   handleCancelCustomize: =>
     @setState(mode: "normal")
 
+  renderPreview: ->
+    H.div className: "axis-palette",
+      _.map @state.categories.slice(0,6), (category, i) =>
+        color = _.find(@props.axis.colorMap, {value: category.value})
+        cellStyle =
+          display: 'inline-block'
+          height: 20
+          width: 20
+          backgroundColor: if color then color.color else @props.defaultColor
+        H.div style: cellStyle, key: i, " "
+
   render: ->
     drawOrder = @props.axis.drawOrder or _.pluck(@props.axis.colorMap, "value")
 
@@ -129,14 +143,15 @@ module.exports = class AxisColorEditorComponent extends React.Component
             H.a style: { cursor: "pointer" }, onClick: @handleSelectPalette, key: "select-palette", "Change color scheme"
           if @props.axis.colorMap
             H.div key: "selected-palette",
-              H.div className: "axis-palette",
-              _.map @props.axis.colorMap.slice(0,6), (map, i) =>
-                cellStyle =
-                  display: 'inline-block'
-                  height: 20
-                  width: 20
-                  backgroundColor: map.color
-                H.div style: cellStyle, key: i, " "
+              @renderPreview()
+#              H.div className: "axis-palette",
+#              _.map @props.axis.colorMap.slice(0,6), (map, i) =>
+#                cellStyle =
+#                  display: 'inline-block'
+#                  height: 20
+#                  width: 20
+#                  backgroundColor: map.color
+#                H.div style: cellStyle, key: i, " "
               H.p style: {fontSize: 12},
                 H.a style: { cursor: "pointer" }, onClick: @handleCustomizePalette, key: "customize-palette", style: {marginRight: 10}, "Choose colors manually"
 

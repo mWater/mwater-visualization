@@ -17,7 +17,7 @@ module.exports = class LegendGroup extends React.Component
 
   render: ->
     H.div style: { marginBottom: 5},
-      React.createElement(LegendItem, {hasChildren: @props.items.length?,symbol:@props.symbol,color: @props.defaultColor, name: @props.name, key: @props.name, radiusLayer: @props.radiusLayer})
+      React.createElement(LegendItem, {hasChildren: @props.items.length > 0,symbol:@props.symbol,color: @props.defaultColor, name: @props.name, key: @props.name, radiusLayer: @props.radiusLayer})
       _.map @props.items, (item) =>
         React.createElement(LegendItem, {isChild: true, symbol:@props.symbol,color: item.color, name: item.name, key: item.name, radiusLayer: @props.radiusLayer})
 

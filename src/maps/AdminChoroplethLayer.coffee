@@ -365,7 +365,7 @@ module.exports = class AdminChoroplethLayer extends Layer
     React.createElement LayerLegendComponent,
       schema: schema
       name: name
-      axis: axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean'], aggrNeed: "required")
+      axis: axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required")
       defaultColor: design.color
 
   # Get a list of table ids that can be filtered on
@@ -393,7 +393,7 @@ module.exports = class AdminChoroplethLayer extends Layer
     design.fillOpacity = if design.fillOpacity? then design.fillOpacity else 0.75
     design.displayNames = if design.displayNames? then design.displayNames else true
 
-    design.axes.color = axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean'], aggrNeed: "required")
+    design.axes.color = axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required")
     design.axes.label = axisBuilder.cleanAxis(axis: design.axes.label, table: design.table, types: ['text', 'number'], aggrNeed: "required")
 
     design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table })
