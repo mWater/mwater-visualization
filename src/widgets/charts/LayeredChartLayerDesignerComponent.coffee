@@ -22,6 +22,9 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
   isLayerPolar: (layer) ->
     return (layer.type or @props.design.type) in ['pie', 'donut']
 
+  doesLayerNeedGrouping: (layer) ->
+    return (layer.type or @props.design.type) not in ['scatter']
+
   # Determine if x-axis required
   isXAxisRequired: (layer) ->
     return not @isLayerPolar(layer)
@@ -71,8 +74,26 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
 
   handleTableChange: (table) => @updateLayer(table: table)
 
-  handleXAxisChange: (axis) => @updateAxes(x: axis)
-  handleColorAxisChange: (axis) => @updateAxes(color: axis)
+  handleXAxisChange: (axis) => 
+    layer = @props.design.layers[@props.index]
+    axesChanges ={ x: axis }
+    
+    # Default y to count if x or color present and not scatter
+    if axis and @doesLayerNeedGrouping(layer) and not layer.axes?.y
+      axesChanges.y = { expr: { type: "op", op: "count", table: layer.table, exprs: [] } }
+
+    @updateAxes(axesChanges)
+
+  handleColorAxisChange: (axis) => 
+    layer = @props.design.layers[@props.index]
+    axesChanges ={ color: axis }
+    
+    # Default y to count if x or color present and not scatter
+    if axis and @doesLayerNeedGrouping(layer) and not layer.axes?.y
+      axesChanges.y = { expr: { type: "op", op: "count", table: layer.table, exprs: [] } }
+
+    @updateAxes(axesChanges)
+
   handleYAxisChange: (axis) => @updateAxes(y: axis)
 
   handleFilterChange: (filter) => @updateLayer(filter: filter)
