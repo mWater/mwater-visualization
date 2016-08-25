@@ -631,7 +631,7 @@ class MWaterDirectMapPane extends React.Component
     super
 
     @state = {
-      design: bufferMap
+      design: wholeWorldFuncMap
       extraTables: []
     }
 
@@ -2880,72 +2880,6 @@ adminRegionMap = {
         "detailLevel": 2,
         "table": "entities.water_point"
       }
-    },
-    {
-      "id": "838b2071-1f0d-49e0-9f8c-a9e7f8665516",
-      "name": "Untitled Layer",
-      "desc": "",
-      "type": "Buffer",
-      "visible": true,
-      "opacity": 1,
-      "design": {
-        "axes": {
-          "geometry": {
-            "expr": {
-              "type": "scalar",
-              "table": "indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9",
-              "joins": [
-                "Water point"
-              ],
-              "expr": {
-                "type": "field",
-                "table": "entities.water_point",
-                "column": "location"
-              }
-            }
-          },
-          "color": {
-            "expr": {
-              "type": "field",
-              "table": "indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9",
-              "column": "Functionality"
-            },
-            "colorMap": [
-              {
-                "value": "Functional",
-                "color": "#1f77b4"
-              },
-              {
-                "value": "Partially functional",
-                "color": "#ff7f0e"
-              },
-              {
-                "value": "Not functional",
-                "color": "#2ca02c"
-              },
-              {
-                "value": "No longer exists",
-                "color": "#d62728"
-              },
-              {
-                "value": null,
-                "color": "#9467bd"
-              }
-            ],
-            "drawOrder": [
-              "Functional",
-              "Partially functional",
-              "Not functional",
-              "No longer exists",
-              null
-            ]
-          }
-        },
-        "radius": 50000,
-        "fillOpacity": 0.5,
-        "filter": null,
-        "table": "indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9"
-      }
     }
   ],
   "filters": {},
@@ -2954,5 +2888,161 @@ adminRegionMap = {
     "n": 5.550380568997962,
     "e": 44.09912109375,
     "s": -16.573022719182777
+  }
+}
+
+wholeWorldFuncMap = {
+  "baseLayer": "cartodb_positron",
+  "layerViews": [
+    {
+      "id": "83530ec5-6c08-477c-8c1e-e5ee0077f14f",
+      "desc": "",
+      "name": "% Functional",
+      "type": "AdminChoropleth",
+      "design": {
+        "axes": {
+          "color": {
+            "expr": {
+              "op": "percent where",
+              "type": "op",
+              "exprs": [
+                {
+                  "op": "= any",
+                  "type": "op",
+                  "exprs": [
+                    {
+                      "expr": {
+                        "op": "last",
+                        "type": "op",
+                        "exprs": [
+                          {
+                            "type": "field",
+                            "table": "indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9",
+                            "column": "Functionality"
+                          }
+                        ],
+                        "table": "indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9"
+                      },
+                      "type": "scalar",
+                      "joins": [
+                        "!indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9.Water point"
+                      ],
+                      "table": "entities.water_point"
+                    },
+                    {
+                      "type": "literal",
+                      "value": [
+                        "Functional"
+                      ],
+                      "valueType": "enumset"
+                    }
+                  ],
+                  "table": "entities.water_point"
+                },
+                {
+                  "op": "is not null",
+                  "type": "op",
+                  "exprs": [
+                    {
+                      "expr": {
+                        "op": "last",
+                        "type": "op",
+                        "exprs": [
+                          {
+                            "type": "field",
+                            "table": "indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9",
+                            "column": "Functionality"
+                          }
+                        ],
+                        "table": "indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9"
+                      },
+                      "type": "scalar",
+                      "joins": [
+                        "!indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9.Water point"
+                      ],
+                      "table": "entities.water_point"
+                    }
+                  ],
+                  "table": "entities.water_point"
+                }
+              ],
+              "table": "entities.water_point"
+            },
+            "xform": {
+              "max": 100,
+              "min": 0,
+              "type": "bin",
+              "numBins": 6
+            },
+            "colorMap": [
+              {
+                "color": "#c8e6c1",
+                "value": 0
+              },
+              {
+                "color": "#a4d699",
+                "value": 1
+              },
+              {
+                "color": "#84c874",
+                "value": 2
+              },
+              {
+                "color": "#60b84c",
+                "value": 3
+              },
+              {
+                "color": "#4c963c",
+                "value": 4
+              },
+              {
+                "color": "#3a712d",
+                "value": 5
+              },
+              {
+                "color": "#25491d",
+                "value": 6
+              },
+              {
+                "color": "#13240f",
+                "value": 7
+              }
+            ],
+            "drawOrder": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ]
+          }
+        },
+        "color": "#FFFFFF",
+        "scope": null,
+        "table": "entities.water_point",
+        "filter": null,
+        "detailLevel": 0,
+        "fillOpacity": 0.75,
+        "displayNames": true,
+        "adminRegionExpr": {
+          "type": "field",
+          "table": "entities.water_point",
+          "column": "admin_region"
+        },
+        "scopeLevel": null
+      },
+      "opacity": 1,
+      "visible": true
+    }
+  ],
+  "filters": {},
+  "bounds": {
+    "w": -21.181640624999996,
+    "n": 35.60371874069731,
+    "e": 69.43359375,
+    "s": -33.7243396617476
   }
 }
