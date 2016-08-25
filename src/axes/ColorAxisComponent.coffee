@@ -27,7 +27,7 @@ module.exports = class ColorAxisComponent extends React.Component
   constructor: ->
     super
     @state = {
-      mode: if @props.axis then "colorby" else "single"
+      mode: if @props.axis then "multicolor" else "single"
       axis: @props.axis
     }
 
@@ -45,8 +45,8 @@ module.exports = class ColorAxisComponent extends React.Component
   render: ->
     H.div null,
       R ui.ButtonToggleComponent,
-        value: if @props.axis then 'colorby' else @state.mode
-        options: [{label: 'Single color', value: 'single'},{label: 'Color by', value: 'colorby'}]
+        value: if @props.axis then 'multicolor' else @state.mode
+        options: [{label: 'Single color', value: 'single'},{label: 'Multiple Colors', value: 'multicolor'}]
         onChange: @onModeChange
       H.div style: { marginTop: 8},
         if not @props.axis and @state.mode == 'single'
@@ -54,15 +54,18 @@ module.exports = class ColorAxisComponent extends React.Component
             color: @props.defaultColor
             onChange: @props.onColorChange
         else
-          R AxisComponent,
-            schema: @props.schema
-            dataSource: @props.dataSource
-            table: @props.table
-            types: @props.types
-            aggrNeed: @props.aggrNeed
-            value: @state.axis
-            defaultColor: @props.defaultColor
-            showColorMap: @props.showColorMap
-            colorMapOptional: @props.colorMapOptional
-            colorMapReorderable: @props.colorMapReorderable
-            onChange: @props.onColorAxisChange
+          H.div null,
+            H.label className: "text-muted", style: {fontSize: 12},
+              "Color by"
+            R AxisComponent,
+              schema: @props.schema
+              dataSource: @props.dataSource
+              table: @props.table
+              types: @props.types
+              aggrNeed: @props.aggrNeed
+              value: @state.axis
+              defaultColor: @props.defaultColor
+              showColorMap: @props.showColorMap
+              colorMapOptional: @props.colorMapOptional
+              colorMapReorderable: @props.colorMapReorderable
+              onChange: @props.onColorAxisChange

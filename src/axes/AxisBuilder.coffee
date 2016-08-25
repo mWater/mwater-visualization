@@ -599,3 +599,12 @@ module.exports = class AxisBuilder
           @compileAxis(axis: axis, tableAlias: "{alias}")
         ]
       }
+
+  isCategorical: (axis) ->
+    nonCategoricalTypes = ["bin","ranges", "date", "yearmonth"]
+    if axis.xform
+      type = axis.xform.type
+    else
+      type = @exprUtils.getExprType(axis.expr)
+
+    nonCategoricalTypes.indexOf(type) == -1
