@@ -434,14 +434,9 @@ design = {
                           {
                             "value": "12",
                             "color": "#ff7f0e"
-                          },
-                          {
-                            "value": null,
-                            "color": "#2ca02c"
                           }
                         ],
                         "drawOrder": [
-                          null,
                           "03",
                           "01",
                           "04",
