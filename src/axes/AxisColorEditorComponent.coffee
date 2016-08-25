@@ -187,11 +187,14 @@ class ColorPaletteCollectionComponent extends React.Component
       subcolor.hex()
 
   @getColorMapForCategories: (categories, isCategorical = true) ->
-    scheme = if isCategorical then @categoricalColorSet[0] else @colorFadesSet[0]
+    if isCategorical
+      scheme = @categoricalColorSet[0]
+    else
+      scheme = ColorPaletteCollectionComponent.generateColorFadeScheme({ hex: @colorFadesSet[0][0]}, categories.length)
     _.map categories, (category, i) ->
       {
         value: category.value
-        color: scheme[i % scheme.length]
+        color: if category.value == null then "#aaaaaa" else scheme[i % scheme.length]
       }
 
   @categoricalColorSet:
@@ -224,7 +227,7 @@ class ColorPaletteCollectionComponent extends React.Component
     colorMap = _.map @props.categories, (category, i) ->
       {
         value: category.value
-        color: scheme[i % scheme.length]
+        color: if category.value == null then "#aaaaaa" else scheme[i % scheme.length]
       }
     @props.onPaletteSelected(colorMap)
 
