@@ -48,11 +48,10 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
       H.i className: "fa fa-fw fa-square", style: { color: "#DDDDDD" }, onClick: @handleVisibleClick
 
   renderName: ->
-    H.span className: "hover-display-parent",
-      "\u00A0"
+    H.a className: "hover-display-parent", onClick: @handleRename, style: { cursor: "pointer" },
       @props.layerView.name
       " "
-      H.a className: "hover-display-child glyphicon glyphicon-pencil", onClick: @handleRename
+      H.span className: "hover-display-child glyphicon glyphicon-pencil text-muted"
 
   renderEditor: ->
     layer = LayerFactory.createLayer(@props.layerView.type)
@@ -133,6 +132,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
         if @props.allowEditingLayer
           @renderLayerEditToggle()
         @renderVisible()
+        "\u00A0"
         @renderName()
       if @state.editing
         @renderEditor()
