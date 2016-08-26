@@ -10,6 +10,7 @@ TableSelectComponent = require '../TableSelectComponent'
 ReactSelect = require 'react-select'
 EditPopupComponent = require './EditPopupComponent'
 ColorAxisComponent = require '../axes/ColorAxisComponent'
+ZoomLevelsComponent = require './ZoomLevelsComponent'
 
 # Designer for a markers layer
 module.exports = class MarkersLayerDesignerComponent extends React.Component
@@ -222,5 +223,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
       @renderSymbol()
       @renderFilter()
       @renderPopup()
+      if @props.design.table
+        R ZoomLevelsComponent, design: @props.design, onDesignChange: @props.onDesignChange
 
 

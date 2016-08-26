@@ -21,6 +21,8 @@ Design is:
   color: color of layer (e.g. #FF8800). Color axis overrides
   fillOpacity: Opacity to fill the circles (0-1)
   radius: radius to draw in meters
+  minZoom: minimum zoom level
+  maxZoom: maximum zoom level
 
   popup: contains items: which is BlocksLayoutManager items. Will be displayed when the circle is clicked
 
@@ -346,11 +348,14 @@ module.exports = class BufferLayer extends Layer
     # Earth is 40000km around, is 256 pixels. So zoom z radius map of r takes up 2*r*256*2^z/40000000 meters.
     # So zoom with 5 pixels across = log2(4000000*5/(2*r*256))
     if design.radius
-      return Math.ceil(Math.log(40000000*5/(2*design.radius*256))/Math.log(2))
+      zoom = Math.ceil(Math.log(40000000*5/(2*design.radius*256))/Math.log(2))
+      if design.minZoom?
+        return Math.max(zoom, design.minZoom)
+      return zoom
     else
-      return null
+      return design.minZoom
 
-  getMaxZoom: (design) -> null
+  getMaxZoom: (design) -> design.maxZoom
 
   # Get the legend to be optionally displayed on the map. Returns
   # a React element

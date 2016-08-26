@@ -31,6 +31,8 @@ Design is:
   displayNames: true to display name labels on admin regions
 
   popup: contains items: which is BlocksLayoutManager items. Will be displayed when the region is clicked
+  minZoom: minimum zoom level
+  maxZoom: maximum zoom level
 
 axes:
   color: color axis 
@@ -358,8 +360,8 @@ module.exports = class AdminChoroplethLayer extends Layer
       return null
 
   # Get min and max zoom levels
-  getMinZoom: (design) -> return null
-  getMaxZoom: (design) -> return null
+  getMinZoom: (design) -> return design.minZoom
+  getMaxZoom: (design) -> return design.maxZoom
 
   # Get the legend to be optionally displayed on the map. Returns
   # a React element

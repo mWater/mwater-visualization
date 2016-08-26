@@ -20,6 +20,8 @@ Design is:
   color: color of layer (e.g. #FF8800). Color axis overrides
   symbol: symbol to use for layer. e.g. "font-awesome/bell". Will be converted on server to proper uri.
   popup: contains items: which is BlocksLayoutManager items. Will be displayed when the marker is clicked
+  minZoom: minimum zoom level
+  maxZoom: maximum zoom level
 
 LEGACY: sublayers array that contains above design
 
@@ -274,8 +276,8 @@ module.exports = class MarkersLayer extends Layer
 
 
   # Get min and max zoom levels
-  getMinZoom: (design) -> return null
-  getMaxZoom: (design) -> return null
+  getMinZoom: (design) -> return design.minZoom
+  getMaxZoom: (design) -> return design.maxZoom
 
   # Get the legend to be optionally displayed on the map. Returns
   # a React element

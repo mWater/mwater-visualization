@@ -200,5 +200,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
       @renderFillOpacity()
       @renderFilter()
       @renderPopup()
+      if @props.design.table
+        R ZoomLevelsComponent, design: @props.design, onDesignChange: @props.onDesignChange
 
 

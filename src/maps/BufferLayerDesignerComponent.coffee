@@ -171,4 +171,6 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
       @renderFillOpacity()
       @renderFilter()
       @renderPopup()
+      if @props.design.table
+        R ZoomLevelsComponent, design: @props.design, onDesignChange: @props.onDesignChange
 
