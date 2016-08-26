@@ -6,6 +6,7 @@ ExprCompiler = require('mwater-expressions').ExprCompiler
 AxisBuilder = require './AxisBuilder'
 update = require 'update-object'
 ColorComponent = require '../ColorComponent'
+ExprUtils = require('mwater-expressions').ExprUtils
 
 # Color map for an axis
 module.exports = class ColorMapComponent extends React.Component
@@ -33,6 +34,21 @@ module.exports = class ColorMapComponent extends React.Component
       return item.color
     return null
 
+  handleNullLabelChange: (e) =>
+    name = prompt("Enter label for none value", @props.axis.nullLabel or ExprUtils.localizeString("None"))
+    if name
+      @props.onChange(update(@props.axis, { nullLabel: { $set: name }}))
+
+  renderLabel: (category) ->
+    label = ExprUtils.localizeString(category.label)
+
+    if category.value
+      label
+    else
+      H.a onClick: @handleNullLabelChange, style: {cursor: 'pointer'},
+        label
+        H.span style: {fontSize: 12, marginLeft: 4}, "(click to change label for none value)"
+
   render: ->
     H.div null,
       H.table style: { width: "auto" },
@@ -44,5 +60,5 @@ module.exports = class ColorMapComponent extends React.Component
                   color: @lookupColor(category.value)
                   onChange: (color) => @handleColorChange(category.value, color)
               H.td key: "label", style: { paddingLeft: 8 },
-                category.label
+                @renderLabel(category)
 
