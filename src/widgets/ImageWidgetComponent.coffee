@@ -50,7 +50,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
   # Override to determine if a load is needed. Not called on mounting
   isLoadNeeded: (newProps, oldProps) ->
-    return newProps.design.expr and not _.isEqual(newProps.design.expr, oldProps.design.expr)
+    return newProps.design.expr and (not _.isEqual(newProps.design.expr, oldProps.design.expr) or not _.isEqual(newProps.filters, oldProps.filters))
 
   # Call callback with state changes
   load: (props, prevProps, callback) -> 
