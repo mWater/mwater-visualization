@@ -201,7 +201,7 @@ module.exports = class MarkersLayer extends Layer
       results = {}
 
       # Scope toggle item if ctrl-click
-      if ev.event.originalEvent.ctrlKey
+      if ev.event.originalEvent.shiftKey
         ids = clickOptions.scopeData or []
         if ev.data.id in ids
           ids = _.without(ids, ev.data.id)
@@ -228,7 +228,7 @@ module.exports = class MarkersLayer extends Layer
           results.scope = null
 
       # Popup
-      if clickOptions.design.popup and not ev.event.originalEvent.ctrlKey
+      if clickOptions.design.popup and not ev.event.originalEvent.shiftKey
         BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
         WidgetFactory = require '../widgets/WidgetFactory'
 
@@ -265,7 +265,7 @@ module.exports = class MarkersLayer extends Layer
               standardWidth: options.standardWidth
             })  
           })
-      else if not ev.event.originalEvent.ctrlKey
+      else if not ev.event.originalEvent.shiftKey
         results.row = { tableId: table, primaryKey: ev.data.id }
 
       return results

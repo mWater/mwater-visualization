@@ -312,7 +312,7 @@ module.exports = class AdminChoroplethLayer extends Layer
         jsonql: compiledFilterExpr 
       }
 
-      if ev.event.originalEvent.ctrlKey
+      if ev.event.originalEvent.shiftKey
         # Scope to region, unless already scoped
         if clickOptions.scopeData == ev.data.id
           results.scope = null
