@@ -48,7 +48,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
       H.i className: "fa fa-fw fa-square", style: { color: "#DDDDDD" }, onClick: @handleVisibleClick
 
   renderName: ->
-    H.a className: "hover-display-parent", onClick: @handleRename, style: { cursor: "pointer" },
+    H.span className: "hover-display-parent", onClick: @handleRename, style: { cursor: "pointer" },
       @props.layerView.name
       " "
       H.span className: "hover-display-child glyphicon glyphicon-pencil text-muted"
@@ -56,7 +56,6 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
   renderEditor: ->
     layer = LayerFactory.createLayer(@props.layerView.type)
     return H.div null,
-      @renderOpacityControl()
       if layer.isEditable()
         layer.createDesignerElement({
           design: @props.layerView.design
@@ -64,14 +63,21 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
           dataSource: @props.dataSource
           onDesignChange: @handleSaveEditing
         })
+      @renderOpacityControl()
 
   renderLayerEditToggle: ->
-    return H.div style: { float: "right", cursor: "pointer", marginLeft: 10 }, key: "gear",
-      H.a onClick: @handleToggleEditing,
+    return H.div key: "edit", style: { marginBottom: (if @state.editing then 10) },
+      H.a onClick: @handleToggleEditing, style: { fontSize: 12, cursor: "pointer" },
         if @state.editing
-          H.i className: "fa fa-caret-up"
+          [
+            H.i className: "fa fa-caret-up"
+            " Close"
+          ]
         else
-          H.i className: "fa fa-cog"
+          [
+            H.i className: "fa fa-cog"
+            " Customize..."
+          ]
 
   # renderLayerGearMenu: ->
   #   layer = LayerFactory.createLayer(@props.layerView.type)
@@ -129,11 +135,11 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
           @props.connectDragSource(H.i(className: "fa fa-bars", style: style))
         if @props.allowEditingLayer
           @renderDeleteLayer()
-        if @props.allowEditingLayer
-          @renderLayerEditToggle()
         @renderVisible()
         "\u00A0"
         @renderName()
+      if @props.allowEditingLayer
+        @renderLayerEditToggle()
       if @state.editing
         @renderEditor()
     ))
