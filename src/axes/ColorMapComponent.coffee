@@ -35,7 +35,7 @@ module.exports = class ColorMapComponent extends React.Component
     return null
 
   handleNullLabelChange: (e) =>
-    name = prompt("Enter label for null value", @props.axis.nullLabel or ExprUtils.localizeString("None"))
+    name = prompt("Enter label for none value", @props.axis.nullLabel or ExprUtils.localizeString("None"))
     if name
       @props.onChange(update(@props.axis, { nullLabel: { $set: name }}))
 
@@ -47,7 +47,7 @@ module.exports = class ColorMapComponent extends React.Component
     else
       H.a onClick: @handleNullLabelChange, style: {cursor: 'pointer'},
         label
-        H.span style: {fontSize: 12, marginLeft: 4}, "(click to change label for null value)"
+        H.span style: {fontSize: 12, marginLeft: 4}, "(click to change label for none value)"
 
   render: ->
     H.div null,
