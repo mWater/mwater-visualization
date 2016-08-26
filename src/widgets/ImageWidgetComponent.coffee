@@ -60,9 +60,9 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
     )
     
   setCurrentTab: ->
-    tab = "url"
+    tab = "upload"
 
-    if @props.design.uid then tab = "upload"
+    if @props.design.url then tab = "url"
     if @props.design.expr then tab = "expression"
 
     @setState(currentTab: tab)
@@ -105,9 +105,9 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
     content = R TabbedComponent,
       tabs: [
-        { id: "url", label: "From URL", elem: @renderUrlEditor() }
         { id: "upload", label: "Upload", elem: @renderUploadEditor() }
-        { id: "expression", label: "From Expression", elem: @renderExpressionEditor() }
+        { id: "expression", label: "From Data", elem: @renderExpressionEditor() }
+        { id: "url", label: "From URL", elem: @renderUrlEditor() }
       ]
       initialTabId: @state.currentTab
 
@@ -117,7 +117,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
         H.button(key: "cancel", type: "button", className: "btn btn-default", onClick: @onCancel, "Cancel")
 
     return R ModalPopupComponent,
-      header: "Configure"
+      header: if @props.design.url or @props.design.expr or @props.design.uid then "Edit Image" else "Insert Image"
       onClose: @handleEndEditing
       scrollDisabled: true
       footer: footer,
@@ -125,7 +125,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
   renderUrlEditor: ->
     H.div className: "form-group",
-      H.label null, "URL to image"
+      H.label null, "URL of image"
       H.input type: "text", className: "form-control", value: @state.imageUrl or "", onChange: @onUrlChange
       H.p className: "help-block",
         'e.g. http://somesite.com/image.jpg'
