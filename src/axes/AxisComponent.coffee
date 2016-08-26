@@ -145,17 +145,20 @@ module.exports = class AxisComponent extends React.Component
     if not @props.showColorMap or not axis or not axis.expr
       return null
 
-    return R AxisColorEditorComponent,
-      schema: @props.schema
-      dataSource: @props.dataSource
-      axis: axis
-      onChange: @props.onChange
-      colorMapOptional: @props.colorMapOptional
-      colorMapReorderable: @props.colorMapReorderable
-      defaultColor: @props.defaultColor
-      table: @props.table
-      types: @props.types
-      aggrNeed: @props.aggrNeed
+    return [
+      H.br()
+      R AxisColorEditorComponent,
+        schema: @props.schema
+        dataSource: @props.dataSource
+        axis: axis
+        onChange: @props.onChange
+        colorMapOptional: @props.colorMapOptional
+        colorMapReorderable: @props.colorMapReorderable
+        defaultColor: @props.defaultColor
+        table: @props.table
+        types: @props.types
+        aggrNeed: @props.aggrNeed
+      ]
 
   render: ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
@@ -185,6 +188,5 @@ module.exports = class AxisComponent extends React.Component
           aggrStatuses: aggrStatuses
           )  
       @renderXform(axis)
-      H.br()
       @renderColorMap(axis)
 

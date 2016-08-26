@@ -42,8 +42,8 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
         H.i(className: "fa fa-database")
         " "
         "Data Source"
-      ": "
-      R(TableSelectComponent, { schema: @props.schema, value: @props.design.table, onChange: @handleTableChange })
+      H.div style: { marginLeft: 10 }, 
+        R(TableSelectComponent, { schema: @props.schema, value: @props.design.table, onChange: @handleTableChange })
   
   renderGeometryAxis: ->
     if not @props.design.table

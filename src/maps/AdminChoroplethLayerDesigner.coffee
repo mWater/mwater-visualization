@@ -45,8 +45,8 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
         H.i(className: "fa fa-database")
         " "
         "Data Source"
-      ": "
-      R(TableSelectComponent, { schema: @props.schema, value: @props.design.table, onChange: @handleTableChange })
+      H.div style: { marginLeft: 10 }, 
+        R(TableSelectComponent, { schema: @props.schema, value: @props.design.table, onChange: @handleTableChange })
   
   renderAdminRegionExpr: ->
     # If no data, hide
