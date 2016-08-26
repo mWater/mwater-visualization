@@ -13,6 +13,7 @@ ColorComponent = require '../ColorComponent'
 Rcslider = require 'rc-slider'
 EditPopupComponent = require './EditPopupComponent'
 ColorAxisComponent = require '../axes/ColorAxisComponent'
+ZoomLevelsComponent = require './ZoomLevelsComponent'
 
 AdminScopeAndDetailLevelComponent = require './AdminScopeAndDetailLevelComponent'
 
