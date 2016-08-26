@@ -40,7 +40,7 @@ module.exports = class ColorMapComponent extends React.Component
       @props.onChange(update(@props.axis, { nullLabel: { $set: name }}))
 
   renderLabel: (category) ->
-    label = if (category.value == null and @props.axis.nullLabel) then @props.axis.nullLabel else ExprUtils.localizeString(category.label)
+    label = ExprUtils.localizeString(category.label)
 
     if category.value
       label
@@ -54,7 +54,6 @@ module.exports = class ColorMapComponent extends React.Component
       H.table style: { width: "auto" },
         H.tbody null,
           _.map @props.categories, (category) =>
-            label = if (category.value == null and @props.axis.nullLabel) then @props.axis.nullLabel else ExprUtils.localizeString(category.label)
             H.tr key: category.value,
               H.td key: "color",
                   R ColorComponent,

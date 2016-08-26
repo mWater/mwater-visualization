@@ -50,7 +50,7 @@ module.exports = class LayerLegendComponent extends React.Component
   render: ->
     if @props.axis and @props.axis.colorMap
       colors = _.map @state.categories, (category) =>
-        label = if (category.value == null and @props.axis.nullLabel) then @props.axis.nullLabel else ExprUtils.localizeString(category.label)
+        label = ExprUtils.localizeString(category.label)
         color = _.find(@props.axis.colorMap, {value: category.value})
         if color
           {color: color.color, name: label }

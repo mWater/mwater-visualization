@@ -356,7 +356,7 @@ module.exports = class AxisBuilder
   # Get all categories for a given axis type given the known values
   # Returns array of { value, label }
   getCategories: (axis, values, locale) ->
-    noneCategory = { value: null, label: "None" }
+    noneCategory = { value: null, label: axis.nullLabel or "None" }
 
     # Handle ranges
     if axis.xform and axis.xform.type == "ranges"
