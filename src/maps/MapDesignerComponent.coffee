@@ -27,15 +27,11 @@ module.exports = class MapDesignerComponent extends React.Component
         onDesignChange: @props.onDesignChange
         allowEditingLayers: true
 
-      H.br()
-
       R MapFiltersDesignerComponent, 
         schema: @props.schema
         dataSource: @props.dataSource
         design: @props.design
         onDesignChange: @props.onDesignChange
-
-      H.br()
 
       H.div className: "form-group",
         H.label className: "text-muted", 
@@ -74,13 +70,13 @@ class AttributionComponent extends React.Component
 
   renderEditor: ->
     R ClickOutHandler, onClickOut: @handleClickOut,
-      H.input { ref: "attributionInput", onChange:@handleTextChange, value: @props.text, className: 'form-control'}
+      H.input { ref: "attributionInput", onChange: @handleTextChange, value: @props.text, className: 'form-control'}
 
   handleTextClick: =>
     @setState(editing: true)
 
   render: ->
-    elem = H.div null, 
+    elem = H.div style: { marginLeft: 5 }, 
       if @state.editing
         @renderEditor()
       else
@@ -88,7 +84,7 @@ class AttributionComponent extends React.Component
           H.span onClick: @handleTextClick, style: { cursor: "pointer" },
             @props.text
         else
-          H.a onClick: @handleTextClick, className: "btn btn-link btn-sm",
+          H.a onClick: @handleTextClick, style: { fontSize: 12 },
             "+ Add attribution"
 
     if @props.text or @state.editing

@@ -162,8 +162,11 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
           if @props.axis.colorMap
             H.div key: "selected-palette",
               @renderPreview()
-              H.p style: {fontSize: 12},
-                H.a style: { cursor: "pointer" }, onClick: @handleCustomizePalette, key: "customize-palette", style: {marginRight: 10}, "Choose colors manually"
+              H.a 
+                style: { fontSize: 12, cursor: "pointer", paddingTop: 5, display: "inline-block", verticalAlign: "top" }
+                onClick: @handleCustomizePalette
+                key: "customize-palette", 
+                  "Customize these colors"
 
           if drawOrder and @props.colorMapReorderable
             R ColorMapOrderEditorComponent,
