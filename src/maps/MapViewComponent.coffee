@@ -8,6 +8,8 @@ ExprCompiler = require('mwater-expressions').ExprCompiler
 LayerFactory = require './LayerFactory'
 ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
 
+LegendComponent = require './LegendComponent'
+
 # Component that displays just the map
 module.exports = class MapViewComponent extends React.Component
   @propTypes:
@@ -108,45 +110,10 @@ module.exports = class MapViewComponent extends React.Component
 
       @props.onScopeChange(scope)
 
-  renderLegend:  ->
-    legendItems = _.compact(
-      _.map(@props.design.layerViews, (layerView) => 
-        # Create layer
-        layer = LayerFactory.createLayer(layerView.type)
-
-        design = layer.cleanDesign(layerView.design, @props.schema)
-
-        # Ignore if invalid
-        if layer.validateDesign(design, @props.schema)
-          return null
-
-        if layerView.visible
-          return { key: layerView.id, legend: layer.getLegend(design, @props.schema, layerView.name) }
-      )
-    )
-
-    if legendItems.length == 0
-      return
-
-    style = {
-      padding: 7
-      background: "rgba(255,255,255,0.8)"
-      boxShadow: "0 0 15px rgba(0,0,0,0.2)"
-      borderRadius: 5
-      position: 'absolute'
-      right: 10
-      bottom: 35
-      maxHeight: '85%'
-      overflowY: 'auto'
-      zIndex: 9
-      fontSize: 12
-    }
-
-    H.div style: style,
-      _.map legendItems, (item, i) =>
-        H.div key: item.key,
-#          if i > 0 then H.br()
-          item.legend
+  renderLegend: ->
+    return R LegendComponent,
+      schema: @props.schema
+      layerViews: @props.design.layerViews
 
   renderPopup: ->
     if not @state.popupContents

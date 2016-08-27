@@ -35,6 +35,7 @@ module.exports = class LeafletMapComponent extends React.Component
       maxZoom: React.PropTypes.number # Maximum zoom level
       })).isRequired # List of layers
 
+    # Legend. Will have zoom injected
     legend: React.PropTypes.node # Legend element
 
     dragging:  React.PropTypes.bool         # Whether the map be draggable with mouse/touch or not. Default true
@@ -94,6 +95,14 @@ module.exports = class LeafletMapComponent extends React.Component
       maxZoom: @props.maxZoom
       minZoom: 1  # Bing doesn't allow going to zero
     })
+
+    # Update legend on zoom
+    @map.on "zoomend", => @forceUpdate()
+
+    # Update legend on first load
+    @map.on "load", => 
+      @loaded = true
+      @forceUpdate()
 
     # Fire onBoundsChange
     @map.on "moveend", => 
@@ -234,14 +243,9 @@ module.exports = class LeafletMapComponent extends React.Component
                 utfGridLayer.on 'click', (ev) =>
                   layer.onGridClick(ev)
 
-    # Render legend
-#    if @props.legend
-#      ReactDOM.render(@props.legend, @legendDiv)
-#    else if @legendDiv
-#      ReactDOM.unmountComponentAtNode(@legendDiv)
-    
   render: ->
     H.div null,
-      if @props.legend
-        @props.legend
+      if @props.legend and @loaded
+        # Inject zoom
+        React.cloneElement(@props.legend, zoom: @map.getZoom())
       H.div(ref: "map", style: { width: @props.width, height: @props.height })
