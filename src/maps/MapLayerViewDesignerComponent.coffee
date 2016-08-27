@@ -79,21 +79,6 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
             " Customize..."
           ]
 
-  # renderLayerGearMenu: ->
-  #   layer = LayerFactory.createLayer(@props.layerView.type)
-  #   if not layer.isEditable()
-  #     return 
-
-  #   H.div className: "btn-group", style: { float: "right" }, key: "gear",
-  #     H.button type: "button", className: "btn btn-link dropdown-toggle", "data-toggle": "dropdown",
-  #       H.span className: "glyphicon glyphicon-cog"
-  #     H.ul className: "dropdown-menu dropdown-menu-right",
-  #       H.li(key: "rename", H.a(onClick: @handleRename, "Rename Layer"))
-  #       if layer.isEditable()
-  #         H.li(key: "edit", H.a(onClick: @handleStartEditing, "Edit Layer"))
-  #       # H.li(key: "opacity", H.a(null, "Set Opacity"))
-  #       H.li(key: "remove", H.a(onClick: @props.onRemove, "Remove Layer"))
-
   handleOpacityChange: (newValue) =>
     @update(opacity: newValue/100)
 
