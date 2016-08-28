@@ -74,10 +74,10 @@ module.exports = class GridLayoutManager extends LayoutManager
               onItemsChange: options.onItemsChange
               renderWidget: options.renderWidget
     else
-      return H.div style: { position: "relative", height: "100%" }, 
+      return H.div style: { position: "relative", height: "100%", width: options.width, padding: 20 },
         R GridLayoutComponent, 
-          width: options.width
-          standardWidth: options.standardWidth
+          width: options.width - 40
+          standardWidth: options.standardWidth - 40
           items: options.items
           onItemsChange: options.onItemsChange
           renderWidget: options.renderWidget

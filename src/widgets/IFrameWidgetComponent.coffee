@@ -67,4 +67,5 @@ module.exports = class IFrameWidgetComponent extends React.Component
             frameborder: 0
             allowfullscreen: true
         else
-          @renderEditLink()
+          if @props.onDesignChange?
+            @renderEditLink()

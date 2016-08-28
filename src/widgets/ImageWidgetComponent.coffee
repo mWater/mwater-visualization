@@ -195,7 +195,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
       height: @props.height
       dropdownItems: dropdownItems,
         @renderEditor()
-        if not @props.design.imageUrl and not @props.design.expr and not @props.design.uid
+        if not @props.design.imageUrl and not @props.design.expr and not @props.design.uid and @props.onDesignChange
           @renderEditLink()
         else
           H.div style: { position: "relative", width: @props.width, height: @props.height, textAlign: "center" },
