@@ -179,7 +179,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
   renderExpression: ->
     if @state.loading
       H.span null, "Loading"
-    else
+    else if @state.data
       R ImagelistCarouselComponent,
         widgetDataSource: @props.widgetDataSource
         imagelist: @state.data
