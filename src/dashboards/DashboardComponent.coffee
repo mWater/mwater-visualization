@@ -110,9 +110,9 @@ module.exports = class DashboardComponent extends React.Component
       H.a key: "print", className: "btn btn-link btn-sm", onClick: @handlePrint,
         H.span(className: "glyphicon glyphicon-print")
         " Print"
-      H.a key: "export", className: "btn btn-link btn-sm", onClick: @handleSaveDesignFile,
-        H.span(className: "glyphicon glyphicon-download-alt")
-        " Export"
+      # H.a key: "export", className: "btn btn-link btn-sm", onClick: @handleSaveDesignFile,
+      #   H.span(className: "glyphicon glyphicon-download-alt")
+      #   " Export"
       if @state.editing
         H.a key: "settings", className: "btn btn-link btn-sm", onClick: @handleSettings,
           H.span(className: "glyphicon glyphicon-cog")

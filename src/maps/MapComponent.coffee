@@ -56,13 +56,16 @@ module.exports = class MapComponent extends React.Component
 
   renderActionLinks: ->
     H.div null,
-      H.a key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
-        H.span className: "glyphicon glyphicon-triangle-left"
-        " Undo"
-      " "
-      H.a key: "redo", className: "btn btn-link btn-sm #{if not @state.undoStack.canRedo() then "disabled" else ""}", onClick: @handleRedo, 
-        H.span className: "glyphicon glyphicon-triangle-right"
-        " Redo"
+      if @props.onDesignChange?
+        [
+          H.a key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
+            H.span className: "glyphicon glyphicon-triangle-left"
+            " Undo"
+          " "
+          H.a key: "redo", className: "btn btn-link btn-sm #{if not @state.undoStack.canRedo() then "disabled" else ""}", onClick: @handleRedo, 
+            H.span className: "glyphicon glyphicon-triangle-right"
+            " Redo"
+        ]
       @props.extraTitleButtonsElem
 
   renderHeader: ->

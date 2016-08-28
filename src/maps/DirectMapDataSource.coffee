@@ -19,15 +19,19 @@ module.exports = class DirectMapDataSource extends MapDataSource
 
   # Gets the data source for a layer
   getLayerDataSource: (layerId) ->
-    new DirectLayerDataSource(_.extend({}, @options, layerId: layerId))
+    # Get layerView
+    layerView = _.findWhere(@options.design.layerViews, { id: layerId })
+    if not layerView
+      return null
+
+    new DirectLayerDataSource(_.extend({}, @options, layerView: layerView))
 
 class DirectLayerDataSource
   # Create map url source that uses direct jsonql maps
   # options:
   #   schema: schema to use
   #   dataSource: general data source
-  #   design: design of entire map
-  #   layerId: id of layer
+  #   layerView: layerView to display
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   constructor: (options) ->
@@ -36,20 +40,9 @@ class DirectLayerDataSource
   # Get the url for the image tiles with the specified filters applied
   # Called with (filters) where filters are filters to apply. Returns URL
   getTileUrl: (filters) -> 
-    # Get layerView
-    layerView = _.findWhere(@options.design.layerViews, { id: @options.layerId })
-    if not layerView
-      return null
-
     # Create layer
-    layer = LayerFactory.createLayer(layerView.type)
-
-    # Clean design (prevent ever displaying invalid/legacy designs)
-    design = layer.cleanDesign(layerView.design, @options.schema)
-
-    # Ignore if invalid
-    if layer.validateDesign(design, @options.schema)
-      return null
+    layer = LayerFactory.createLayer(@options.layerView.type)
+    design = @options.layerView.design
 
     # Handle special cases
     if layerView.type == "MWaterServer"
@@ -65,20 +58,9 @@ class DirectLayerDataSource
   # Get the url for the interactivity tiles with the specified filters applied
   # Called with (filters) where filters are filters to apply. Returns URL
   getUtfGridUrl: (filters) -> 
-    # Get layerView
-    layerView = _.findWhere(@options.design.layerViews, { id: @options.layerId })
-    if not layerView
-      return null
-
     # Create layer
-    layer = LayerFactory.createLayer(layerView.type)
-
-    # Clean design (prevent ever displaying invalid/legacy designs)
-    design = layer.cleanDesign(layerView.design, @options.schema)
-
-    # Ignore if invalid
-    if layer.validateDesign(design, @options.schema)
-      return null
+    layer = LayerFactory.createLayer(@options.layerView.type)
+    design = @options.layerView.design
 
     # Handle special cases
     if layerView.type == "MWaterServer"
@@ -93,16 +75,9 @@ class DirectLayerDataSource
 
   # Gets widget data source for a popup widget
   getPopupWidgetDataSource: (widgetId) -> 
-    # Get layerView
-    layerView = _.findWhere(@options.design.layerViews, { id: @options.layerId })
-    if not layerView
-      return null
-
     # Create layer
-    layer = LayerFactory.createLayer(layerView.type)
-
-    # Clean design (prevent ever displaying invalid/legacy designs)
-    design = layer.cleanDesign(layerView.design, @options.schema)
+    layer = LayerFactory.createLayer(@options.layerView.type)
+    design = @options.layerView.design
 
     # Get widget
     { type, design } = new BlocksLayoutManager().getWidgetTypeAndDesign(design.popup.items, widgetId)

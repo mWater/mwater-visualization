@@ -8,18 +8,23 @@ injectTableAlias = require('mwater-expressions').injectTableAlias
 module.exports = class ServerMapDataSource extends MapDataSource
   # Create map url source that uses map design stored on server
   # options:
+  #   schema: schema to use
+  #   design: design of entire map
+  #   share: share id to use for talking to mWater server
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
-  #   design: design of entire map
-  #   schema: schema to use
-  #   share: share id to use for talking to mWater server
   #   mapId: map id to use on server
   constructor: (options) ->
     @options = options
 
   # Gets the data source for a layer
   getLayerDataSource: (layerId) ->
-    return new ServerLayerDataSource(_.extend({}, @options, layerId: layerId))
+    # Get layerView
+    layerView = _.findWhere(@options.design.layerViews, { id: layerId })
+    if not layerView
+      return null
+
+    return new ServerLayerDataSource(_.extend({}, @options, layerView: layerView))
 
 class ServerLayerDataSource
   # Create map url source that uses map design stored on server
@@ -30,61 +35,31 @@ class ServerLayerDataSource
   #   schema: schema to use
   #   share: share id to use for talking to mWater server
   #   mapId: map id to use on server
-  #   layerId: layer id to use on server
+  #   layerView: layer view
   constructor: (options) ->
     @options = options
 
   # Get the url for the image tiles with the specified filters applied
   # Called with (filters) where filters are filters to apply. Returns URL
   getTileUrl: (filters) ->
-    # Get layerView
-    layerView = _.findWhere(@options.design.layerViews, { id: @options.layerId })
-    if not layerView
-      return null
-
-    # Create layer
-    layer = LayerFactory.createLayer(layerView.type)
-
-    # Clean design (prevent ever displaying invalid/legacy designs)
-    design = layer.cleanDesign(layerView.design, @options.schema)
-
-    # Ignore if invalid
-    if layer.validateDesign(design, @options.schema)
-      return null
-
     # Handle special cases
-    if layerView.type == "MWaterServer"
-      return @createLegacyUrl(design, "png", filters)
-    if layerView.type == "TileUrl"
-      return design.tileUrl
+    if @options.layerView.type == "MWaterServer"
+      return @createLegacyUrl(@options.layerView.design, "png", filters)
+    if @options.layerView.type == "TileUrl"
+      return @options.layerView.design.tileUrl
 
-    return @createUrl(@options.layerId, filters, "png") 
+    return @createUrl(filters, "png") 
 
   # Get the url for the interactivity tiles with the specified filters applied
   # Called with (filters) where filters are filters to apply. Returns URL
   getUtfGridUrl: (filters) -> 
-    # Get layerView
-    layerView = _.findWhere(@options.design.layerViews, { id: @options.layerId })
-    if not layerView
-      return null
-
-    # Create layer
-    layer = LayerFactory.createLayer(layerView.type)
-
-    # Clean design (prevent ever displaying invalid/legacy designs)
-    design = layer.cleanDesign(layerView.design, @options.schema)
-
-    # Ignore if invalid
-    if layer.validateDesign(design, @options.schema)
-      return null
-
     # Handle special cases
-    if layerView.type == "MWaterServer"
-      return @createLegacyUrl(design, "grid.json", filters)
-    if layerView.type == "TileUrl"
+    if @options.layerView.type == "MWaterServer"
+      return @createLegacyUrl(@options.layerView.design, "grid.json", filters)
+    if @options.layerView.type == "TileUrl"
       return null
 
-    return @createUrl(@options.layerId, filters, "grid.json") 
+    return @createUrl(filters, "grid.json") 
 
   # Gets widget data source for a popup widget
   getPopupWidgetDataSource: (widgetId) -> 
@@ -93,17 +68,17 @@ class ServerLayerDataSource
       client: @options.client
       share: @options.share
       mapId: @options.mapId
-      layerId: @options.layerId
+      layerId: @options.layerView.id
       popupWidgetId: widgetId
     })
 
-  createUrl: (layerId, filters, extension) ->
+  createUrl: (filters, extension) ->
     query = {
       type: "maps"
       client: @options.client
       share: @options.share
       map: @options.mapId
-      layer: @options.layerId
+      layer: @options.layerView.id
       filters: JSON.stringify(filters or [])
     }
 

@@ -46,7 +46,7 @@ class ServerWidgetDataSource
 
   # For map widgets, the following is required
   getMapDataSource: (design) ->
-    return new ServerWidgetMapDataSource(@options)
+    return new ServerWidgetMapDataSource(_.extend({}, @options, design: design))
 
   # Get the url to download an image (by id from an image or imagelist column)
   # Height, if specified, is minimum height needed. May return larger image
@@ -60,6 +60,7 @@ class ServerWidgetDataSource
 class ServerWidgetMapDataSource 
   # options:
   #   apiUrl: API url to use for talking to mWater server
+  #   design: design of the map widget
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
   #   dashboardId: dashboard id to use on server
@@ -69,7 +70,12 @@ class ServerWidgetMapDataSource
 
   # Gets the data source for a layer
   getLayerDataSource: (layerId) ->
-    return new ServerWidgetLayerDataSource(_.extend({}, @options, layerId: layerId))
+    # Get layerView
+    layerView = _.findWhere(@options.design.layerViews, { id: layerId })
+    if not layerView
+      return null
+
+    return new ServerWidgetLayerDataSource(_.extend({}, @options, layerView: layerView))
 
 class ServerWidgetLayerDataSource
   # options:
@@ -78,13 +84,19 @@ class ServerWidgetLayerDataSource
   #   share: share id to use for talking to mWater server
   #   dashboardId: dashboard id to use on server
   #   widgetId: widget id to use
-  #   layerId: layer of map inside widget
+  #   layerView: layer view of map inside widget
   constructor: (options) ->
     @options = options
 
   # Get the url for the image tiles with the specified filters applied
   # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
   getTileUrl: (filters) -> 
+    # Handle special cases
+    if @options.layerView.type == "MWaterServer"
+      return @createLegacyUrl(design, "png", filters)
+    if @options.layerView.type == "TileUrl"
+      return @options.layerView.design.tileUrl
+
     return @createUrl(filters, "png")
 
   # Get the url for the interactivity tiles with the specified filters applied
@@ -104,7 +116,7 @@ class ServerWidgetLayerDataSource
       share: @options.share
       dashboard: @options.dashboardId
       widget: @options.widgetId
-      layer: @options.layerId
+      layer: @options.layerView.id
       filters: JSON.stringify(filters or [])
     }
 
@@ -124,7 +136,7 @@ class ServerWidgetLayerPopupWidgetDataSource
   #   share: share id to use for talking to mWater server
   #   dashboardId: dashboard id to use on server
   #   widgetId: widget id to use
-  #   layerId: layer of map inside widget
+  #   layerView: layer view of map inside widget
   #   popupWidgetId: id of popup widget
   constructor: (options) ->
     @options = options
@@ -139,7 +151,7 @@ class ServerWidgetLayerPopupWidgetDataSource
       filters: JSON.stringify(filters)
     }
 
-    url = @options.apiUrl + "dashboards/#{@options.dashboardId}/widgets/#{@options.widgetId}/layers/#{@options.layerId}/widgets/#{@options.popupWidgetId}/data?" + querystring.stringify(query)
+    url = @options.apiUrl + "dashboards/#{@options.dashboardId}/widgets/#{@options.widgetId}/layers/#{@options.layerView.id}/widgets/#{@options.popupWidgetId}/data?" + querystring.stringify(query)
 
     $.getJSON url, (data) =>
       callback(null, data)
