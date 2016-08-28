@@ -99,12 +99,6 @@ module.exports = L.Class.extend({
 
 		this._update();
 
-		var zoom = this._map.getZoom();
-
-		if (zoom > this.options.maxZoom || zoom < this.options.minZoom) {
-			return;
-		}
-
 		map.on('click', this._click, this);
 		map.on('mousemove', this._move, this);
 		map.on('moveend', this._update, this);
@@ -121,9 +115,21 @@ module.exports = L.Class.extend({
 	},
 
 	_click: function (e) {
+		var zoom = this._map.getZoom();
+
+		if (zoom > this.options.maxZoom || zoom < this.options.minZoom) {
+			return;
+		}
+
 		this.fire('click', this._objectForEvent(e));
 	},
 	_move: function (e) {
+		var zoom = this._map.getZoom();
+
+		if (zoom > this.options.maxZoom || zoom < this.options.minZoom) {
+			return;
+		}
+
 		var on = this._objectForEvent(e);
 
 		if (on.data !== this._mouseOn) {
