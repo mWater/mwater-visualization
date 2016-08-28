@@ -8,6 +8,7 @@ MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 MWaterTableSelectComponent = require './MWaterTableSelectComponent'
 querystring = require 'querystring'
 AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
+LoadingComponent = require 'react-library/lib/LoadingComponent'
 
 # Loads an mWater schema from the server and creates child with schema and dataSource
 # Also creates a tableSelectElementFactory context to allow selecting of a table in an mWater-friendly way
@@ -76,16 +77,16 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
     context = {}
 
     context.tableSelectElementFactory = (schema, value, onChange) =>
-        return React.createElement(MWaterTableSelectComponent,
-          apiUrl: @props.apiUrl
-          client: @props.client
-          schema: schema
-          user: @props.user
-          table: value
-          onChange: onChange
-          extraTables: @props.extraTables
-          onExtraTablesChange: @props.onExtraTablesChange
-        )
+      return React.createElement(MWaterTableSelectComponent,
+        apiUrl: @props.apiUrl
+        client: @props.client
+        schema: schema
+        user: @props.user
+        table: value
+        onChange: onChange
+        extraTables: @props.extraTables
+        onExtraTablesChange: @props.onExtraTablesChange
+      )
 
     if @props.addLayerElementFactory
       context.addLayerElementFactory = @props.addLayerElementFactory
@@ -94,9 +95,7 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
 
   render: ->
     if not @state.schema and not @state.error
-      return H.div style: { fontSize: "150%" },
-          H.i(className: "fa fa-spinner fa-spin", style: { color: '#0c7cba' })
-          ' Loading...'
+      return React.createElement(LoadingComponent)
 
     return @props.children(@state.error, {
       schema: @state.schema
