@@ -45,9 +45,9 @@ class DirectLayerDataSource
     design = @options.layerView.design
 
     # Handle special cases
-    if layerView.type == "MWaterServer"
+    if @options.layerView.type == "MWaterServer"
       return @createLegacyUrl(design, "png", filters)
-    if layerView.type == "TileUrl"
+    if @options.layerView.type == "TileUrl"
       return design.tileUrl
 
     # Get JsonQLCss
@@ -63,9 +63,9 @@ class DirectLayerDataSource
     design = @options.layerView.design
 
     # Handle special cases
-    if layerView.type == "MWaterServer"
+    if @options.layerView.type == "MWaterServer"
       return @createLegacyUrl(design, "grid.json", filters)
-    if layerView.type == "TileUrl"
+    if @options.layerView.type == "TileUrl"
       return null
 
     # Get JsonQLCss
