@@ -102,6 +102,12 @@ class ServerWidgetLayerDataSource
   # Get the url for the interactivity tiles with the specified filters applied
   # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
   getUtfGridUrl: (filters) ->
+    # Handle special cases
+    if @options.layerView.type == "MWaterServer"
+      return @createLegacyUrl(design, "grid.json", filters)
+    if @options.layerView.type == "TileUrl"
+      return null
+
     return @createUrl(filters, "grid.json")
 
   # Gets widget data source for a popup widget
