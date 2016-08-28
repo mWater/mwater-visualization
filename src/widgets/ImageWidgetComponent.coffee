@@ -171,7 +171,19 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
   renderContent: ->
     if @props.design.imageUrl or @props.design.uid
-      source = @props.design.imageUrl or @props.widgetDataSource.getImageUrl(@props.design.uid, 1024)
+      # Determine approximate height
+      imageHeight = null
+
+      if @props.height <= 160
+        imageHeight = 160
+      else if @props.height <= 320
+        imageHeight = 320
+      else if @props.height <= 640
+        imageHeight = 640
+      else if @props.height <= 1280
+        imageHeight = 1280
+
+      source = @props.design.imageUrl or @props.widgetDataSource.getImageUrl(@props.design.uid, imageHeight)
       H.img style: { maxWidth: "100%", maxHeight: "100%"}, src: source
     else
       @renderExpression()
