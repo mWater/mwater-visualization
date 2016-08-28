@@ -9,6 +9,7 @@ module.exports = class ServerDashboardDataSource
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
   #   dashboardId: dashboard id to use on server
+  #   rev: revision to use to allow caching
   constructor: (options) ->
     @options = options
 
@@ -22,6 +23,7 @@ class ServerWidgetDataSource
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
   #   dashboardId: dashboard id to use on server
+  #   rev: revision to use to allow caching
   #   widgetId: widget id to use
   constructor: (options) ->
     @options = options
@@ -34,6 +36,7 @@ class ServerWidgetDataSource
       client: @options.client
       share: @options.share
       filters: JSON.stringify(filters)
+      rev: @options.rev
     }
 
     url = @options.apiUrl + "dashboards/#{@options.dashboardId}/widgets/#{@options.widgetId}/data?" + querystring.stringify(query)
@@ -64,6 +67,7 @@ class ServerWidgetMapDataSource
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
   #   dashboardId: dashboard id to use on server
+  #   rev: revision to use to allow caching
   #   widgetId: widget id to use
   constructor: (options) ->
     @options = options
@@ -83,6 +87,7 @@ class ServerWidgetLayerDataSource
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
   #   dashboardId: dashboard id to use on server
+  #   rev: revision to use to allow caching
   #   widgetId: widget id to use
   #   layerView: layer view of map inside widget
   constructor: (options) ->
@@ -141,6 +146,7 @@ class ServerWidgetLayerPopupWidgetDataSource
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
   #   dashboardId: dashboard id to use on server
+  #   rev: revision to use to allow caching
   #   widgetId: widget id to use
   #   layerView: layer view of map inside widget
   #   popupWidgetId: id of popup widget
@@ -155,6 +161,7 @@ class ServerWidgetLayerPopupWidgetDataSource
       client: @options.client
       share: @options.share
       filters: JSON.stringify(filters)
+      rev: @options.rev
     }
 
     url = @options.apiUrl + "dashboards/#{@options.dashboardId}/widgets/#{@options.widgetId}/layers/#{@options.layerView.id}/widgets/#{@options.popupWidgetId}/data?" + querystring.stringify(query)

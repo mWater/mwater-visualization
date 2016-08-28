@@ -14,6 +14,7 @@ module.exports = class ServerMapDataSource extends MapDataSource
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   #   mapId: map id to use on server
+  #   rev: revision to use to allow caching
   constructor: (options) ->
     @options = options
 
@@ -35,6 +36,7 @@ class ServerLayerDataSource
   #   schema: schema to use
   #   share: share id to use for talking to mWater server
   #   mapId: map id to use on server
+  #   rev: revision to use to allow caching
   #   layerView: layer view
   constructor: (options) ->
     @options = options
@@ -68,6 +70,7 @@ class ServerLayerDataSource
       client: @options.client
       share: @options.share
       mapId: @options.mapId
+      rev: @options.rev
       layerId: @options.layerView.id
       popupWidgetId: widgetId
     })
@@ -80,6 +83,7 @@ class ServerLayerDataSource
       map: @options.mapId
       layer: @options.layerView.id
       filters: JSON.stringify(filters or [])
+      rev: @options.rev
     }
 
     url = "#{@options.apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?" + querystring.stringify(query)
@@ -129,6 +133,7 @@ class ServerMapLayerPopupWidgetDataSource
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
   #   mapId: map id to use on server
+  #   rev: revision to use to allow caching
   #   layerId: layer id to use
   #   popupWidgetId: id of popup widget
   constructor: (options) ->
@@ -142,6 +147,7 @@ class ServerMapLayerPopupWidgetDataSource
       client: @options.client
       share: @options.share
       filters: JSON.stringify(filters)
+      rev: @options.rev
     }
 
     url = @options.apiUrl + "maps/#{@options.mapId}/layers/#{@options.layerId}/widgets/#{@options.popupWidgetId}/data?" + querystring.stringify(query)
