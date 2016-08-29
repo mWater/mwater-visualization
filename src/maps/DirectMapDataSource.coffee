@@ -44,6 +44,9 @@ class DirectLayerDataSource
     layer = LayerFactory.createLayer(@options.layerView.type)
     design = @options.layerView.design
 
+    # TODO REMOVE
+    design = layer.cleanDesign(design, @options.schema)
+
     # Handle special cases
     if @options.layerView.type == "MWaterServer"
       return @createLegacyUrl(design, "png", filters)
@@ -61,6 +64,9 @@ class DirectLayerDataSource
     # Create layer
     layer = LayerFactory.createLayer(@options.layerView.type)
     design = @options.layerView.design
+
+    # TODO REMOVE
+    design = layer.cleanDesign(design, @options.schema)
 
     # Handle special cases
     if @options.layerView.type == "MWaterServer"
