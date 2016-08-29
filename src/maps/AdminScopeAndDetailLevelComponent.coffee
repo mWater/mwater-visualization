@@ -67,7 +67,7 @@ class RegionComponent extends React.Component
     # Execute query
     @props.dataSource.performQuery query, (err, rows) =>
       if err
-        cb(err)
+        console.log "Error getting regions: " + err?.message
         return 
 
       @props.onChange(id, rows[0].level)
