@@ -98,7 +98,7 @@ class ServerWidgetLayerDataSource
   getTileUrl: (filters) -> 
     # Handle special cases
     if @options.layerView.type == "MWaterServer"
-      return @createLegacyUrl(design, "png", filters)
+      return @createLegacyUrl(@options.layerView.design, "png", filters)
     if @options.layerView.type == "TileUrl"
       return @options.layerView.design.tileUrl
 
@@ -109,7 +109,7 @@ class ServerWidgetLayerDataSource
   getUtfGridUrl: (filters) ->
     # Handle special cases
     if @options.layerView.type == "MWaterServer"
-      return @createLegacyUrl(design, "grid.json", filters)
+      return @createLegacyUrl(@options.layerView.design, "grid.json", filters)
     if @options.layerView.type == "TileUrl"
       return null
 
