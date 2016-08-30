@@ -82,7 +82,7 @@ module.exports = class AdminChoroplethLayer extends Layer
       where admin_regions.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
       group by 1
     ) as regions on regions.id = admin_regions2._id 
-    where admin_regions2.shape && !bbox! admin_regions2.level = 2 and admin_regions2.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb' 
+    where admin_regions2.level = 2 and admin_regions2.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb' 
     ###
 
     # Verify that scopeLevel is an integer to prevent injection
@@ -181,15 +181,6 @@ module.exports = class AdminChoroplethLayer extends Layer
         type: "op"
         op: "and"
         exprs: [
-          # Bounding box
-          { 
-            type: "op"
-            op: "&&"
-            exprs: [
-              { type: "field", tableAlias: "admin_regions2", column: "shape" }
-              { type: "token", token: "!bbox!" }
-            ]
-          }
           # Level to display
           {
             type: "op"
