@@ -140,6 +140,39 @@ class ServerWidgetLayerDataSource
 
     return url
 
+  # Create query string
+  createLegacyUrl: (design, extension, filters) ->
+    url = "#{@options.apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?type=#{design.type}&radius=1000"
+
+    # Add subdomains: {s} will be substituted with "a", "b" or "c" in leaflet for api.mwater.co only.
+    # Used to speed queries
+    if url.match(/^https:\/\/api\.mwater\.co\//)
+      url = url.replace(/^https:\/\/api\.mwater\.co\//, "https://{s}-api.mwater.co/")
+
+    if @options.client
+      url += "&client=#{@options.client}"
+
+    if @options.share
+      url += "&share=#{@options.share}"
+      
+    # Add where for any relevant filters
+    relevantFilters = _.where(filters, table: design.table)
+
+    # If any, create and
+    whereClauses = _.map(relevantFilters, (f) => injectTableAlias(f.jsonql, "main"))
+
+    # Wrap if multiple
+    if whereClauses.length > 1
+      where = { type: "op", op: "and", exprs: whereClauses }
+    else
+      where = whereClauses[0]
+
+    if where 
+      url += "&where=" + encodeURIComponent(JSON.stringify(where))
+
+    return url
+
+
 class ServerWidgetLayerPopupWidgetDataSource
   # options:
   #   apiUrl: API url to use for talking to mWater server
