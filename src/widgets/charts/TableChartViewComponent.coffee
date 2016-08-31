@@ -37,13 +37,14 @@ module.exports = class TableChartViewComponent extends React.Component
 
     return H.div style: style, className: "overflow-auto-except-print",
       H.div {style: { fontWeight: "bold", textAlign: "center" }, ref: "title"}, @props.design.titleText
-      R TableContentsComponent, columns: @props.design.columns, data: @props.data, schema: @props.schema
+      R TableContentsComponent, columns: @props.design.columns, table: @props.design.table, data: @props.data, schema: @props.schema, onRowClick: @props.onRowClick
 
 class TableContentsComponent extends React.Component
   @propTypes:
     columns: React.PropTypes.array.isRequired # Columns of chart
     data: React.PropTypes.object.isRequired # Data that the table has requested
     schema: React.PropTypes.object.isRequired # Schema to use
+    table: React.PropTypes.string.isRequired
 
     onRowClick: React.PropTypes.func # Called with (tableId, rowId) when item is clicked
 
@@ -59,11 +60,12 @@ class TableContentsComponent extends React.Component
 
     return false
 
-  # NOTE: Not used. Not clear how to detect unique columns
-  handleRowClick: (rowIndex) ->
+  handleRowClick: (rowIndex) =>
     row = @props.data.main[rowIndex]  
-    if row and row.id and @props.onRowClick
-      @props.onRowClick(@props.design.table, row.id)
+
+    # If there is only one id (num_ids = 1)
+    if row and row.id and row.num_ids == 1 and @props.onRowClick
+      @props.onRowClick(@props.table, row.id)
 
   renderHeaderCell: (index) ->
     axisBuilder = new AxisBuilder(schema: @props.schema)

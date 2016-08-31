@@ -160,13 +160,18 @@ module.exports = class TableChart extends Chart
       if not axisBuilder.isAxisAggr(ordering.axis)
         query.groupBy.push(design.columns.length + i + 1)
 
-    # # Add id. Select as distinct array to determine if unique TODO. Also change in view component
-    # if query.groupBy.length == 0
-    #   query.selects.unshift({
-    #     type: "select"
-    #     expr:  { type: "id", idTable: design.table }
-    #     alias: "id" 
-    #   })
+    # Add id. Also add num_ids so we can tell if unique
+    query.selects.push({
+      type: "select"
+      expr: { type: "op", op: "min", exprs: [{ type: "field", tableAlias: "main", column: schema.getTable(design.table).primaryKey }] }
+      alias: "id" 
+    })
+
+    query.selects.push({
+      type: "select"
+      expr: { type: "op", op: "count", exprs: [] }
+      alias: "num_ids" 
+    })
 
     # Get relevant filters
     filters = _.where(filters or [], table: design.table)
