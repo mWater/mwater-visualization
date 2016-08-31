@@ -189,7 +189,7 @@ class BlocksDisplayComponent extends React.Component
           @renderBlock(@props.items)
     else
       return H.div style: { width: "100%", height: "100%" },
-        H.div key: "design", className: "mwater-visualization-block-parent-#{@props.style or "default"}", style: { height: "100%" },
+        H.div key: "design", className: "mwater-visualization-block-parent-#{@props.style or "default"}", style: { minHeight: "100%" },
           @renderBlock(@props.items)
 
 module.exports = NestableDragDropContext(HTML5Backend)(BlocksDisplayComponent)
