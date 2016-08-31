@@ -48,6 +48,9 @@ exports.dropBlock = (rootBlock, sourceBlock, targetBlock, side) ->
     if index >= 0
       blocks = blocks.slice()
 
+      # TODO splice into weights
+      # TODO weights as map?
+
       # Add 
       switch side
         when "left"
@@ -98,6 +101,8 @@ exports.removeBlock = (rootBlock, block) ->
     # Remove blocks
     blocks = _.filter(blocks, (b) -> b.id != block.id)
 
+    # TODO remove weight
+
     # Recurse
     blocks = _.compact(_.map(blocks, (b) -> exports.removeBlock(b, block)))
 
@@ -118,6 +123,13 @@ exports.cleanBlock = (rootBlock) ->
     # Simplify
     if blocks.length == 1 and rootBlock.type != "root"
       return blocks[0]
+
+    # TODO # Truncate weights
+    # weights = null
+    # if rootBlock.type == "horizontal" and rootBlock.weights
+    #   if rootBlock.weights.length > blocks.length
+    #     weights = _.take(rootBlock.w)
+
 
     # Recurse
     blocks = _.map(blocks, (b) -> exports.cleanBlock(b))

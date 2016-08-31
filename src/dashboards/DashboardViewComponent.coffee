@@ -27,6 +27,8 @@ module.exports = class DashboardViewComponent extends React.Component
     width: React.PropTypes.number
     standardWidth: React.PropTypes.number   # Width for scaling
 
+    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+
     filters: React.PropTypes.arrayOf(React.PropTypes.shape({
       table: React.PropTypes.string.isRequired    # id table to filter
       jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
@@ -86,6 +88,7 @@ module.exports = class DashboardViewComponent extends React.Component
         width: options.width
         height: options.height
         standardWidth: options.standardWidth 
+        onRowClick: @props.onRowClick
       })  
 
     style = {

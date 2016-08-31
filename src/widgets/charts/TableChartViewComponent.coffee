@@ -17,6 +17,8 @@ module.exports = class TableChartViewComponent extends React.Component
 
     scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+  
+    onRowClick: React.PropTypes.func # Called with (tableId, rowId) when item is clicked
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
@@ -43,6 +45,8 @@ class TableContentsComponent extends React.Component
     data: React.PropTypes.object.isRequired # Data that the table has requested
     schema: React.PropTypes.object.isRequired # Schema to use
 
+    onRowClick: React.PropTypes.func # Called with (tableId, rowId) when item is clicked
+
   shouldComponentUpdate: (prevProps) ->
     if prevProps.columns != @props.columns and not _.isEqual(prevProps.columns, @props.columns)
       return true
@@ -54,6 +58,12 @@ class TableContentsComponent extends React.Component
       return true
 
     return false
+
+  # NOTE: Not used. Not clear how to detect unique columns
+  handleRowClick: (rowIndex) ->
+    row = @props.data.main[rowIndex]  
+    if row and row.id and @props.onRowClick
+      @props.onRowClick(@props.design.table, row.id)
 
   renderHeaderCell: (index) ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
@@ -81,7 +91,7 @@ class TableContentsComponent extends React.Component
     return H.td(key: columnIndex, str)
 
   renderRow: (index) ->
-    H.tr key: index,
+    H.tr key: index, onClick: @handleRowClick.bind(null, index),
       _.map(@props.columns, (column, i) => @renderCell(index, i))
 
   renderBody: ->

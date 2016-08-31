@@ -26,6 +26,8 @@ module.exports = class DashboardComponent extends React.Component
     undoStackKey: React.PropTypes.any                   # Key that changes when the undo stack should be reset. Usually a document id or suchlike
     printScaling: React.PropTypes.bool                  # True to scale for printing
 
+    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+
   @defaultProps:
     printScaling: true
 
@@ -163,5 +165,6 @@ module.exports = class DashboardComponent extends React.Component
             filters: filters
             width: size.width
             standardWidth: if @props.printScaling then 1440 else size.width
+            onRowClick: @props.onRowClick
           }
       

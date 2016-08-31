@@ -21,6 +21,7 @@ module.exports = class MapWidget extends Widget
   #  width: width in pixels on screen
   #  height: height in pixels on screen
   #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
+  #  onRowClick: Called with (tableId, rowId) when item is clicked
   createViewElement: (options) ->
     return React.createElement(MapWidgetComponent,
       schema: options.schema
@@ -35,6 +36,7 @@ module.exports = class MapWidget extends Widget
       width: options.width
       height: options.height
       standardWidth: options.standardWidth
+      onRowClick: options.onRowClick
     )
 
 class MapWidgetComponent extends React.Component
@@ -52,6 +54,7 @@ class MapWidgetComponent extends React.Component
     scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
 
   constructor: (props) ->
     super
@@ -120,6 +123,7 @@ class MapWidgetComponent extends React.Component
         height: height - 20
         touchZoom: false    # Prevent accidental zooming
         scrollWheelZoom: false # Prevent accidental zooming
+        onRowClick: @props.onRowClick
       })
 
   render: ->

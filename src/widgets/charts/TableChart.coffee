@@ -160,6 +160,14 @@ module.exports = class TableChart extends Chart
       if not axisBuilder.isAxisAggr(ordering.axis)
         query.groupBy.push(design.columns.length + i + 1)
 
+    # # Add id. Select as distinct array to determine if unique TODO. Also change in view component
+    # if query.groupBy.length == 0
+    #   query.selects.unshift({
+    #     type: "select"
+    #     expr:  { type: "id", idTable: design.table }
+    #     alias: "id" 
+    #   })
+
     # Get relevant filters
     filters = _.where(filters or [], table: design.table)
     whereClauses = _.map(filters, (f) -> injectTableAlias(f.jsonql, "main")) 
@@ -187,6 +195,7 @@ module.exports = class TableChart extends Chart
   #   width, height, standardWidth: size of the chart view
   #   scope: current scope of the view element
   #   onScopeChange: called when scope changes with new scope
+  #   onRowClick: Called with (tableId, rowId) when item is clicked
   createViewElement: (options) ->
     # Create chart
     props = {
@@ -200,6 +209,8 @@ module.exports = class TableChart extends Chart
 
       scope: options.scope
       onScopeChange: options.onScopeChange
+
+      onRowClick: options.onRowClick
     }
 
     return React.createElement(TableChartViewComponent, props)

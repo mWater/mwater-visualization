@@ -40,6 +40,7 @@ module.exports = class Chart
   #   width, height, standardWidth: size of the chart view
   #   scope: current scope of the view element
   #   onScopeChange: called when scope changes with new scope
+  #   onRowClick: Called with (tableId, rowId) when item is clicked
   createViewElement: (options) ->
     throw new Error("Not implemented")
 
