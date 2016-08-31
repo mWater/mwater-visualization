@@ -180,30 +180,47 @@
   min-width: 50px;
 }
 
+/* DEFAULT */
 .mwater-visualization-block-parent-default {
   padding: 30px;
 }
 
-.mwater-visualization-block-parent-greybg {
-  background-color: #DDD;
-  padding: 15px;
-}
-
-.mwater-visualization-block-default {
+.mwater-visualization-block-parent-default .mwater-visualization-block {
   padding-left: 15px;
   padding-right: 15px;
   padding-bottom: 15px;
 }
 
-.mwater-visualization-block-greybg {
+
+/* GREYBG */
+.mwater-visualization-block-parent-greybg {
+  background-color: #DDD;
+  padding: 15px;
+}
+
+.mwater-visualization-block-parent-greybg .mwater-visualization-block {
   margin: 9px;
   padding: 8px;
   border-radius: 5px;
   background-color: white;
 }
 
-.mwater-visualization-block-greybg-spacer {
+.mwater-visualization-block-parent-greybg .mwater-visualization-block-spacer {
   background-color: #DDD;
+}
+
+/* MEDIUM */
+.mwater-visualization-block-parent-medium {
+  margin-left: auto;
+  margin-right: auto;
+  padding: 15px;
+  width: 1000px;
+}
+
+.mwater-visualization-block-parent-medium .mwater-visualization-block {
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 15px;
 }
 
 .mwater-visualization-decorated-block {
@@ -302,6 +319,19 @@
   color: white !important;
 }
 
+.mwater-visualization-horizontal-block-splitter {
+  height: 100%;
+  cursor: ew-resize;
+  width: 5px;
+}
+
+.mwater-visualization-horizontal-block-splitter:hover {
+  background-color: #38D;
+}
+
+.mwater-visualization-horizontal-block-splitter.active {
+  background-color: #38D;
+}
 
 .mwater-visualization-palette {
   background-color: #363b3e;
@@ -364,6 +394,20 @@
   font-size: 15px;
 }
 
+.mwater-visualization-block-parent-medium .mwater-visualization-text-widget-style-default {
+  color: rgba(0, 0, 0, 0.8);
+  font-family: medium-content-serif-font, Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: 21px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 33.18px;
+  margin-top: 38px;
+  /*width: 700px;*/
+  word-wrap: break-word;
+ -webkit-font-smoothing: antialiased;
+}
+
+
 /* Reset styles */
 .mwater-visualization-text-widget-style-default h1 {
   font-size: initial;
@@ -418,13 +462,13 @@
   background-color: rgba(212, 235, 255, 0.8);
 }
 
-.dropzone{
-    width: 100%;
-    padding: 80px 40px;
-    border: 2px dashed rgb(102, 102, 102);
-    border-radius: 5px;
-    text-align: center;
-    vertical-align: middle;
+.dropzone {
+  width: 100%;
+  padding: 80px 40px;
+  border: 2px dashed rgb(102, 102, 102);
+  border-radius: 5px;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .image-carousel-component .item{

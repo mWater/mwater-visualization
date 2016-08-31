@@ -129,7 +129,7 @@ class BlocksDisplayComponent extends React.Component
         throw new Error("Unknown block type #{block.type}")
 
     # Wrap block in padding
-    return H.div key: block.id, className: "mwater-visualization-block-#{@props.style or "default"} mwater-visualization-block-#{@props.style or "default"}-#{block.type}",
+    return H.div key: block.id, className: "mwater-visualization-block mwater-visualization-block-#{block.type}",
       elem
 
   createBlockItem: (block) ->
@@ -183,7 +183,7 @@ class BlocksDisplayComponent extends React.Component
 
   render: ->
     if @props.onItemsChange
-      return H.div style: { width: "100%", height: "100%", overflow: "hidden", position: "relative" },
+      return H.div style: { width: "100%", height: "100%", overflow: "hidden", position: "relative" }, 
         @renderPalette()
         H.div key: "design", className: "mwater-visualization-block-parent-#{@props.style or "default"}", style: { height: "100%", overflow: "scroll", marginLeft: 185 },
           @renderBlock(@props.items)
