@@ -13,7 +13,7 @@
       "brfs"
     ]
   },
-  "style": "src/index.css",
+  "style": "lib/index.css",
   "author": "mWater",
   "license": "",
   "dependencies": {
