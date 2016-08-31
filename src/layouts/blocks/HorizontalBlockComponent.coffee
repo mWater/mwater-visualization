@@ -85,36 +85,28 @@ module.exports = class HorizontalBlockComponent extends React.Component
       weight = (@props.block.weights or [])[index] or 1
       percentages[index] = (weight * 100) / totalWeight
 
-    H.table style: { width: "100%", tableLayout: "fixed", position: "relative" },
-      H.style null, '''
-        .mwater-visualization-horizontal-block-splitter {
-          height: 100%;
-          cursor: ew-resize;
-          width: 5px;
-        }
-
-        .mwater-visualization-horizontal-block-splitter:hover {
-          background-color: #38D;
-        }
-
-        .mwater-visualization-horizontal-block-splitter.active {
-          background-color: #38D;
-        }
-      '''
-      H.tbody null,
-        H.tr null,
-          _.map @props.block.blocks, (block, index) =>
-            [
-              if index > 0 and @props.onBlockUpdate?
-                H.td 
-                  style: { width: 5, position: "relative", left: @state.dragXOffset }
-                  key: "splitter#{index}"
-                  className: "mwater-visualization-horizontal-block-splitter #{if index - 1 == @state.dragIndex then "active" else ""}"
-                  onMouseDown: @handleMouseDown.bind(null, index - 1)
-              H.td style: { width: "#{percentages[index]}%", verticalAlign: "top" }, key: block.id, ref: "block#{index}",
-                @props.renderBlock(block)
-            ]              
-
+    if @props.onBlockUpdate?
+      H.table style: { width: "100%", tableLayout: "fixed", position: "relative" },
+        H.tbody null,
+          H.tr null,
+            _.map @props.block.blocks, (block, index) =>
+              [
+                if index > 0 and @props.onBlockUpdate?
+                  H.td 
+                    style: { width: 5, position: "relative", left: @state.dragXOffset }
+                    key: "splitter#{index}"
+                    className: "mwater-visualization-horizontal-block-splitter #{if index - 1 == @state.dragIndex then "active" else ""}"
+                    onMouseDown: @handleMouseDown.bind(null, index - 1)
+                H.td style: { width: "#{percentages[index]}%", verticalAlign: "top" }, key: block.id, ref: "block#{index}",
+                  @props.renderBlock(block)
+              ]              
+    else  # Simplify in this case for printing
+      H.div null,
+        _.map @props.block.blocks, (block, index) =>
+          [
+            H.div style: { width: "#{percentages[index]}%", verticalAlign: "top", display: "inline-block" }, key: block.id, ref: "block#{index}",
+              @props.renderBlock(block)
+          ]              
 
 
   # handleAspectMouseDown: (ev) =>

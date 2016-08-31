@@ -11,6 +11,7 @@ browserSync = require 'browser-sync'
 reload = browserSync.reload
 coffee = require 'gulp-coffee' 
 watchify = require 'watchify'
+sass = require 'gulp-sass'
 
 # Compile coffeescript to js in lib/
 gulp.task 'coffee', ->
@@ -108,8 +109,11 @@ gulp.task "copy_fonts", ->
 #   ]).pipe(gulp.dest("./dist/css/"))
 
 gulp.task "index_css", ->
-  return gulp.src("./src/index.css")
+  return gulp.src("./src/index.scss")
     .pipe(rework(reworkNpm("./src/")))
+    .pipe(sass({
+        onError: (error) -> console.log(error)
+      }))
     .pipe gulp.dest("./dist/css/")
 
 gulp.task 'copy_assets', ->

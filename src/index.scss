@@ -302,6 +302,19 @@
   color: white !important;
 }
 
+.mwater-visualization-horizontal-block-splitter {
+  height: 100%;
+  cursor: ew-resize;
+  width: 5px;
+}
+
+.mwater-visualization-horizontal-block-splitter:hover {
+  background-color: #38D;
+}
+
+.mwater-visualization-horizontal-block-splitter.active {
+  background-color: #38D;
+}
 
 .mwater-visualization-palette {
   background-color: #363b3e;

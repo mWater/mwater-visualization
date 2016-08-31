@@ -70,6 +70,7 @@
     "gulp-coffee": "^2.3.1",
     "gulp-concat": "^2.2.0",
     "gulp-rework": "^1.0.2",
+    "gulp-sass": "^2.3.2",
     "gulp-uglify": "^1.1.0",
     "gulp-util": "^3.0.3",
     "jquery": "^2.1.4",
