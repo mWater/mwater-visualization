@@ -329,7 +329,7 @@ module.exports = class AdminChoroplethLayer extends Layer
             filters = [filter]
 
             # Get data source for widget
-            widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(options.id)
+            widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(clickOptions.design, options.id)
 
             return widget.createViewElement({
               schema: clickOptions.schema

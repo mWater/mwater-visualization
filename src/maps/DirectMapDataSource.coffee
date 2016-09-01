@@ -38,14 +38,10 @@ class DirectLayerDataSource
     @options = options
 
   # Get the url for the image tiles with the specified filters applied
-  # Called with (filters) where filters are filters to apply. Returns URL
-  getTileUrl: (filters) -> 
+  # Called with (design, filters) where design is the design of the layer and filters are filters to apply. Returns URL
+  getTileUrl: (design, filters) -> 
     # Create layer
     layer = LayerFactory.createLayer(@options.layerView.type)
-    design = @options.layerView.design
-
-    # TODO REMOVE
-    design = layer.cleanDesign(design, @options.schema)
 
     # Handle special cases
     if @options.layerView.type == "MWaterServer"
@@ -59,14 +55,10 @@ class DirectLayerDataSource
     return @createUrl("png", jsonqlCss) 
 
   # Get the url for the interactivity tiles with the specified filters applied
-  # Called with (filters) where filters are filters to apply. Returns URL
-  getUtfGridUrl: (filters) -> 
+  # Called with (design, filters) where design is the design of the layer and filters are filters to apply. Returns URL
+  getUtfGridUrl: (design, filters) -> 
     # Create layer
     layer = LayerFactory.createLayer(@options.layerView.type)
-    design = @options.layerView.design
-
-    # TODO REMOVE
-    design = layer.cleanDesign(design, @options.schema)
 
     # Handle special cases
     if @options.layerView.type == "MWaterServer"
@@ -80,10 +72,9 @@ class DirectLayerDataSource
     return @createUrl("grid.json", jsonqlCss) 
 
   # Gets widget data source for a popup widget
-  getPopupWidgetDataSource: (widgetId) -> 
+  getPopupWidgetDataSource: (design, widgetId) -> 
     # Create layer
     layer = LayerFactory.createLayer(@options.layerView.type)
-    design = @options.layerView.design
 
     # Get widget
     { type, design } = new BlocksLayoutManager().getWidgetTypeAndDesign(design.popup.items, widgetId)

@@ -94,8 +94,8 @@ class ServerWidgetLayerDataSource
     @options = options
 
   # Get the url for the image tiles with the specified filters applied
-  # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-  getTileUrl: (filters) -> 
+  # Called with (design, filters) where design is the layer design and filters are filters to apply. Returns URL
+  getTileUrl: (design, filters) -> 
     # Handle special cases
     if @options.layerView.type == "MWaterServer"
       return @createLegacyUrl(@options.layerView.design, "png", filters)
@@ -105,8 +105,8 @@ class ServerWidgetLayerDataSource
     return @createUrl(filters, "png")
 
   # Get the url for the interactivity tiles with the specified filters applied
-  # Called with (layerId, filters) where layerId is the layer id and filters are filters to apply. Returns URL
-  getUtfGridUrl: (filters) ->
+  # Called with (design, filters) where design is the layer design and filters are filters to apply. Returns URL
+  getUtfGridUrl: (design, filters) ->
     # Handle special cases
     if @options.layerView.type == "MWaterServer"
       return @createLegacyUrl(@options.layerView.design, "grid.json", filters)
@@ -116,7 +116,7 @@ class ServerWidgetLayerDataSource
     return @createUrl(filters, "grid.json")
 
   # Gets widget data source for a popup widget
-  getPopupWidgetDataSource: (widgetId) -> 
+  getPopupWidgetDataSource: (design, widgetId) -> 
     return new ServerWidgetLayerPopupWidgetDataSource(_.extend({}, @options, popupWidgetId: widgetId))
 
   # Create url

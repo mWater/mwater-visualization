@@ -171,8 +171,8 @@ module.exports = class MapViewComponent extends React.Component
 
       # Create leafletLayer
       leafletLayer = {
-        tileUrl: layerDataSource.getTileUrl(if isScoping then compiledFilters else scopedCompiledFilters)
-        utfGridUrl: layerDataSource.getUtfGridUrl(if isScoping then compiledFilters else scopedCompiledFilters)
+        tileUrl: layerDataSource.getTileUrl(design, if isScoping then compiledFilters else scopedCompiledFilters)
+        utfGridUrl: layerDataSource.getUtfGridUrl(design, if isScoping then compiledFilters else scopedCompiledFilters)
         visible: layerView.visible
         opacity: if isScoping then layerView.opacity * 0.3 else layerView.opacity
         minZoom: layer.getMinZoom(design)
@@ -185,8 +185,8 @@ module.exports = class MapViewComponent extends React.Component
       # Add scoped layer if scoping
       if isScoping
         leafletLayer = {
-          tileUrl: layerDataSource.getTileUrl(scopedCompiledFilters)
-          utfGridUrl: layerDataSource.getUtfGridUrl(scopedCompiledFilters)
+          tileUrl: layerDataSource.getTileUrl(design, scopedCompiledFilters)
+          utfGridUrl: layerDataSource.getUtfGridUrl(design, scopedCompiledFilters)
           visible: layerView.visible
           opacity: layerView.opacity
           minZoom: layer.getMinZoom(design)
