@@ -24,8 +24,10 @@ module.exports = class ItemsHtmlConverter
         # Escape HTML
         html += _.escape(item)
       else if item.type == "element"
-        if not item.tag.match(/^[a-z][a-z0-9]*$/) or item.tag == "script"
-          throw new Error("Invalid tag #{item.tag}")
+        if not allowedTags[item.tag]
+          # Ignore and do contents
+          html += @itemsToHtml(item.items)
+          continue
 
         attrs = ""
         # Add style
@@ -33,6 +35,9 @@ module.exports = class ItemsHtmlConverter
           attrs += " style=\""
           first = true
           for key, value of item.style
+            if not allowedStyles[key]
+              continue
+
             if not first
               attrs += " "
             attrs += _.escape(key) + ": " + _.escape(value) + ";"
@@ -97,7 +102,6 @@ module.exports = class ItemsHtmlConverter
     items = []
 
     for node in elem.childNodes
-
       if node.nodeType == 1 # Element
         # Handle embeds
         if node.dataset.embed
@@ -109,13 +113,26 @@ module.exports = class ItemsHtmlConverter
         if tag.match(/:/)
           tag = tag.split(":")[1]
 
+        # Whitelist tags
+        if not allowedTags[tag]
+          # Just add contents
+          items = items.concat(@elemToItems(node))
+          continue
+
         item = { type: "element", tag: tag, items: @elemToItems(node) }
 
         # Add style
         if node.style?
           for style in node.style
+            if not allowedStyles[style]
+              continue
+
             item.style = item.style or {}
             item.style[style] = node.style[style]
+
+        # Convert align (Firefox)
+        if node.align
+          item.style['text-align'] = node.align
 
         # Add href and target
         if node.href
@@ -136,3 +153,7 @@ module.exports = class ItemsHtmlConverter
     # console.log JSON.stringify(items, null, 2)
    
     return items
+
+# Whitelist allowed tags and styles
+allowedTags = { div: 1, p: 1, ul: 1, ol: 1, li: 1, span: 1, b: 1, u: 1, em: 1, i: 1, br: 1, h1: 1, h2: 1, h3: 1, h4: 1, h5: 1, a: 1, strong: 1 }
+allowedStyles = { "text-align": 1, "font-weight": 1, "font-style": 1, "text-decoration": 1 }
