@@ -128,6 +128,7 @@ class ServerWidgetLayerDataSource
       dashboard: @options.dashboardId
       widget: @options.widgetId
       layer: @options.layerView.id
+      rev: @options.rev
       filters: JSON.stringify(filters or [])
     }
 
