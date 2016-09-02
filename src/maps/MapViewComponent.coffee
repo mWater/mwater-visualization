@@ -7,6 +7,7 @@ ExprUtils = require('mwater-expressions').ExprUtils
 ExprCompiler = require('mwater-expressions').ExprCompiler
 LayerFactory = require './LayerFactory'
 ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
+ReactElementPrinter = require 'react-library/lib/ReactElementPrinter'
 
 LegendComponent = require './LegendComponent'
 
@@ -53,6 +54,24 @@ module.exports = class MapViewComponent extends React.Component
     @state = {
       popupContents: null   # Element in the popup
     }
+
+  # Call to print the map
+  print: =>
+    # Create element at 96 dpi (usual for browsers) and 7.5" across (letter - 0.5" each side). 1440 is double, so scale down
+    # props are immutable in React 0.14+
+    elem = H.div style: { transform: "scale(0.5)", transformOrigin: "top left" },
+      # Hide zoom control and display background colors
+      H.style null, '''
+      .leaflet-control-zoom { display: none; }
+      @media print {
+        body { -webkit-print-color-adjust: exact; }
+        .mwater-visualization-legend { background: rgba(255,255,255,0.8) !important; }
+      }      
+      '''
+      R(MapViewComponent, _.extend({}, @props, { width: 1440, height: 1440 * @props.height / @props.width, onDesignChange: null }))
+    
+    printer = new ReactElementPrinter()
+    printer.print(elem, { delay: 5000 })
 
   componentWillReceiveProps: (nextProps) ->
     # Update bounds

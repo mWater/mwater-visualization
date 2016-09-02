@@ -58,7 +58,7 @@ module.exports = class LegendComponent extends React.Component
       fontSize: 12
     }
 
-    return H.div style: style,
+    return H.div style: style, className: "mwater-visualization-legend",
       _.map legendItems, (item, i) =>
         [
           H.div key: item.key,
