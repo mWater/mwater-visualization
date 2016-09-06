@@ -11,6 +11,7 @@ browserSync = require 'browser-sync'
 reload = browserSync.reload
 coffee = require 'gulp-coffee' 
 watchify = require 'watchify'
+replace = require 'gulp-replace'
 
 # Compile coffeescript to js in lib/
 gulp.task 'coffee', ->
@@ -84,6 +85,8 @@ gulp.task "libs_css", ->
     "bower_components/bootstrap/dist/css/bootstrap-theme.css"
     "bower_components/c3/c3.css"
   ]).pipe(concat("libs.css"))
+    # Remove print background color removal (https://github.com/h5bp/html5-boilerplate/issues/1643)
+    .pipe(replace('  *,\n  *:before,\n  *:after {\n    color: #000 !important;\n    text-shadow: none !important;\n    background: transparent !important;\n    -webkit-box-shadow: none !important;\n            box-shadow: none !important;\n  }', ''))
     .pipe(gulp.dest("./dist/css/"))
 
 gulp.task "libs_js", ->

@@ -58,6 +58,16 @@ module.exports = class LeafletMapComponent extends React.Component
     for tileLayer in @tileLayers
       tileLayer.redraw()
 
+  # Get bounds. Bounds are in { w, n, s, e } format
+  getBounds: ->
+    curBounds = @map.getBounds()
+    return {
+      n: curBounds.getNorth()
+      e: curBounds.getEast()
+      s: curBounds.getSouth()
+      w: curBounds.getWest()
+    }
+
   # Set bounds. Bounds are in { w, n, s, e } format
   setBounds: (bounds) ->
     if bounds

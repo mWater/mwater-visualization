@@ -631,7 +631,7 @@ class MWaterDirectMapPane extends React.Component
     super
 
     @state = {
-      design: wholeWorldFuncMap
+      design: adminRegionMap
       extraTables: []
     }
 
@@ -2884,10 +2884,10 @@ adminRegionMap = {
   ],
   "filters": {},
   "bounds": {
-    "w": 14.567871093749998,
-    "n": 5.550380568997962,
-    "e": 44.09912109375,
-    "s": -16.573022719182777
+    "w": 27.916259765625,
+    "n": -0.7470491450051796,
+    "e": 42.681884765625,
+    "s": -12.37219737335794
   }
 }
 
