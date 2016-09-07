@@ -55,3 +55,4 @@ module.exports = class SettingsModalComponent extends React.Component
           H.select className: "form-control", value: @state.design.style or "", onChange: @handleStyleChange,
             H.option key: "none", value: "", "Default"
             H.option key: "greybg", value: "greybg", "White on Grey"
+            H.option key: "medium", value: "medium", "Medium"

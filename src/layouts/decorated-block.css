@@ -1,0 +1,97 @@
+/* Styles for decorated blocks */
+
+.mwater-visualization-decorated-block {
+  border: solid 1px transparent;
+  padding: 5px;
+  margin: -5px;
+  border-radius: 4px;
+  position: relative;
+}
+
+.mwater-visualization-decorated-block:hover {
+  border: solid 1px #88ceff;
+}
+
+.mwater-visualization-decorated-block-move, .mwater-visualization-decorated-block-remove, .mwater-visualization-decorated-block-aspect, .mwater-visualization-decorated-block-resize {
+  display: none;
+}
+
+.mwater-visualization-decorated-block:hover > .mwater-visualization-decorated-block-move {
+    display: block;
+    position: absolute;
+    left: -14px;
+    top: -11px;
+    border: solid 1px #88ceff;
+    color: #88ceff;
+    background-color: white;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 5px;
+    border-radius: 5px;
+    padding-right: 5px;
+    cursor: move;
+}  
+
+.mwater-visualization-decorated-block-move:hover {
+  background-color: #88ceff !important;
+  color: white !important;
+}
+  
+.mwater-visualization-decorated-block:hover > .mwater-visualization-decorated-block-remove {
+    display: block;
+    position: absolute;
+    right: -5px;
+    top: -10px;
+    border: solid 1px #88ceff;
+    background-color: white;
+    color: #88ceff;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.mwater-visualization-decorated-block-remove:hover {
+  background-color: #88ceff !important;
+  color: white !important;
+  /*background-color: red !important;*/
+  /*color: white !important;*/
+}
+
+.mwater-visualization-decorated-block:hover > .mwater-visualization-decorated-block-aspect {
+    display: block;
+    position: absolute;
+    right: 50%;
+    bottom: -12px;
+    border: solid 1px #88ceff;
+    color: #88ceff;
+    background-color: white;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 5px;
+    border-radius: 5px;
+    padding-right: 5px;
+    cursor: move;
+}  
+
+.mwater-visualization-decorated-block-aspect:hover {
+  background-color: #88ceff !important;
+  color: white !important;
+}
+
+.mwater-visualization-decorated-block:hover > .mwater-visualization-decorated-block-resize {
+    display: block;
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    border: solid 1px #88ceff;
+    color: #88ceff;
+    background-color: white;
+    border-radius: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    cursor: move;
+}  
+
+.mwater-visualization-decorated-block-resize:hover {
+  background-color: #88ceff !important;
+  color: white !important;
+}
