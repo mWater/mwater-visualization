@@ -36,7 +36,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
     @state = {
       # Widget data
-      data: []
+      data: null
       error: null
       editing: false
       imageUrl: null
@@ -192,10 +192,17 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
     if @state.loading
       H.span null, "Loading"
     else if @state.data
-      R ImagelistCarouselComponent,
-        widgetDataSource: @props.widgetDataSource
-        imagelist: @state.data
-        height: @props.height
+      # Make into array if not
+      if not _.isArray(@state.data)
+        R ImagelistCarouselComponent,
+          widgetDataSource: @props.widgetDataSource
+          imagelist: [@state.data]
+          height: @props.height
+      else
+        R ImagelistCarouselComponent,
+          widgetDataSource: @props.widgetDataSource
+          imagelist: @state.data
+          height: @props.height
 
   render: ->
     dropdownItems = []

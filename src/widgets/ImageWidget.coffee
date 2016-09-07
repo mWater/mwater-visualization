@@ -59,12 +59,14 @@ module.exports = class ImageWidget extends Widget
 
     imageExpr = exprCompiler.compileExpr(expr: design.expr, tableAlias: "main")
 
+    # Get distinct to only show if single row match
     query = {
+      distinct: true
       selects: [
         { type: "select", expr: imageExpr, alias: "value" }
       ]
       from: { type: "table", table: table, alias: "main" }
-      limit: 100
+      limit: 2
     }
 
     # Get relevant filters
@@ -85,7 +87,11 @@ module.exports = class ImageWidget extends Widget
       if error
         callback(error)
       else
-        callback(null, rows)
+        # If multiple, use null
+        if rows.length != 1
+          callback(null, null)
+        else 
+          callback(null, rows[0].value)
     )
 
   # Determine if widget is auto-height, which means that a vertical height is not required.

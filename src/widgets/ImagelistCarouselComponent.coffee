@@ -33,24 +33,19 @@ module.exports = class ImagelistCarouselComponent extends React.Component
       H.img style: { margin: '0 auto', height: @props.height }, src: @props.widgetDataSource.getImageUrl(img.id, 640)
 
   renderImages: ->
-    counter = 0
-    for row, i in @props.imagelist
-      imageObj = row.value
-
-      # Ignore nulls (https://github.com/mWater/mwater-server/issues/202)
-      if not imageObj
-        continue
-
+    for imageObj, i in @props.imagelist
       if _.isString(imageObj)
         imageObj = JSON.parse(imageObj)
 
-      if _.isArray(imageObj)
-        for image in imageObj
-          @renderImage(image, counter++)
-      else
-        @renderImage(imageObj, counter++)
+      @renderImage(imageObj, i)
 
   render: ->
+    if @props.imagelist.length == 1
+      return @renderImage(@props.imagelist[0], 0)
+
+    if @props.imagelist.length == 0
+      return null
+
     H.div className: "image-carousel-component carousel slide", style: {height: @props.height, overflow: 'hidden'},
       if @props.imagelist.length < 10
         H.ol className: "carousel-indicators",
