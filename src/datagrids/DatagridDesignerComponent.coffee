@@ -4,12 +4,13 @@ H = React.DOM
 R = React.createElement
 
 ExprUtils = require("mwater-expressions").ExprUtils
-TableSelectComponent = require('mwater-visualization').TableSelectComponent
 TabbedComponent = require 'react-library/lib/TabbedComponent'
 ExprComponent = require('mwater-expressions-ui').ExprComponent
 FilterExprComponent = require('mwater-expressions-ui').FilterExprComponent
 OrderBysDesignerComponent = require './OrderBysDesignerComponent'
 ReactReorderable = require 'react-reorderable'
+
+TableSelectComponent = require('../TableSelectComponent')
 
 uuid = require 'node-uuid'
 update = require 'update-object'
