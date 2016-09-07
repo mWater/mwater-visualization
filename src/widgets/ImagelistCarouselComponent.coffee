@@ -34,9 +34,6 @@ module.exports = class ImagelistCarouselComponent extends React.Component
 
   renderImages: ->
     for imageObj, i in @props.imagelist
-      if _.isString(imageObj)
-        imageObj = JSON.parse(imageObj)
-
       @renderImage(imageObj, i)
 
   render: ->

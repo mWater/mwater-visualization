@@ -91,7 +91,12 @@ module.exports = class ImageWidget extends Widget
         if rows.length != 1
           callback(null, null)
         else 
-          callback(null, rows[0].value)
+          # Make sure is not string
+          value = rows[0].value
+          if _.isString(rows[0].value)
+            value = JSON.parse(rows[0].value)
+
+          callback(null, value)
     )
 
   # Determine if widget is auto-height, which means that a vertical height is not required.
