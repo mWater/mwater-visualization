@@ -55,26 +55,25 @@ module.exports = class MapViewComponent extends React.Component
       popupContents: null   # Element in the popup
     }
 
-  # Call to print the map. Prints landscape
-  print: =>
+  # Call to print the map. Prints landscape. Scale is the scaling factor to apply to increase resolution
+  print: (scale) =>
     # Create new design with current bounds
     design = _.extend({}, @props.design, { bounds: @refs.leafletMap.getBounds() })
 
     # Create element at 96 dpi (usual for browsers) and 7.5" across (letter - 0.5" each side). 1440 is double, so scale down
-    elem = H.div style: { width: 0, height: 0 },
-      H.div style: { transform: "rotate(90deg) translateX(-720px)" },
-        H.div style: { transform: "scale(0.5)", transformOrigin: "top left" },
-          # Hide zoom control and display background colors
-          H.style null, '''
-          .leaflet-control-zoom { display: none; }
-          @media print {
-            body { -webkit-print-color-adjust: exact; }
-          }      
-          '''
-          R(MapViewComponent, _.extend({}, @props, { width: 960 * 2, height: 720 * 2, design: design, onDesignChange: null }))
+    elem = H.div style: { transform: "rotate(90deg) translateY(-720px)", width: 0, height: 0 },
+      H.div style: { transform: "scale(#{1/scale})", transformOrigin: "top left" },
+        # Hide zoom control and display background colors
+        H.style null, '''
+        .leaflet-control-zoom { display: none; }
+        @media print {
+          body { -webkit-print-color-adjust: exact; }
+        }      
+        '''
+        R(MapViewComponent, _.extend({}, @props, { width: 960 * scale, height: 720 * scale, design: design, onDesignChange: null }))
     
     printer = new ReactElementPrinter()
-    printer.print(elem, { delay: 5000 })
+    printer.print(elem, { delay: 8000 })
 
   componentWillReceiveProps: (nextProps) ->
     # Update bounds

@@ -42,8 +42,8 @@ module.exports = class MapComponent extends React.Component
     if not _.isEqual(nextProps.design, @props.design)
       @setState(transientDesign: nextProps.design)
 
-  handlePrint: =>
-    @mapView.print()
+  handlePrint: (scale) =>
+    @mapView.print(scale)
 
   handleUndo: => 
     undoStack = @state.undoStack.undo()
@@ -57,6 +57,18 @@ module.exports = class MapComponent extends React.Component
     # We need to use callback as state is applied later
     @setState(undoStack: undoStack, => @props.onDesignChange(undoStack.getValue()))
 
+  renderPrint: ->
+    return H.div key: "print", className: "btn-group",
+      H.button type: "button", "data-toggle": "dropdown", className: "btn btn-link btn-sm dropdown-toggle",
+        H.span className: "glyphicon glyphicon-print"
+        " Print "
+        H.span className: "caret"
+      H.ul className: "dropdown-menu",
+        H.li key: "scale2",
+          H.a onClick: @handlePrint.bind(null, 2), "Normal"
+        H.li key: "scale3",
+          H.a onClick: @handlePrint.bind(null, 3), "High-Resolution"
+
   renderActionLinks: ->
     H.div null,
       if @props.onDesignChange?
@@ -69,9 +81,7 @@ module.exports = class MapComponent extends React.Component
             H.span className: "glyphicon glyphicon-triangle-right"
             " Redo"
         ]
-      H.a key: "print", className: "btn btn-link btn-sm", onClick: @handlePrint,
-        H.span(className: "glyphicon glyphicon-print")
-        " Print"
+      @renderPrint()
       @props.extraTitleButtonsElem
 
   renderHeader: ->
