@@ -104,7 +104,7 @@ module.exports = class HorizontalBlockComponent extends React.Component
       H.div null,
         _.map @props.block.blocks, (block, index) =>
           [
-            H.div style: { width: "#{percentages[index]}%", verticalAlign: "top", display: "inline-block" }, key: block.id, ref: "block#{index}",
+            H.div style: { width: "#{percentages[index]}%", verticalAlign: "top", display: "inline-block" }, key: block.id, ref: "block#{index}", className: "mwater-visualization-horizontal-block-item",
               @props.renderBlock(block)
           ]              
 
