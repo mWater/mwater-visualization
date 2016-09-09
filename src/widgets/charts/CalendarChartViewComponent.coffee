@@ -65,7 +65,15 @@ module.exports = class CalendarChartViewComponent extends React.Component
     years = _.map @props.data, (entry) =>
       (new Date(entry.date)).getFullYear()
 
-    _.uniq(years, true)
+    years = _.uniq(years, true)
+
+    # Filter extraneous dates
+    years = _.filter(years, (y) -> y > 1970 and y < 2050)
+
+    # Take only max of 10 years to display
+    years = _.take(years, 10) 
+
+    return years
 
   # @todo: detect outliers/ implement data points threshold
   componentDidMount: ->
