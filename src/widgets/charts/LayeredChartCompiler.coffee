@@ -137,6 +137,17 @@ module.exports = class LayeredChartCompiler
 
     return chartDesign
 
+  isCategoricalX: (design) ->
+    # Check if categorical x axis (bar charts always are)
+    categoricalX = design.type == "bar" or _.any(design.layers, (l) -> l.type == "bar")
+
+    # Check if x axis is categorical type
+    xType = @axisBuilder.getAxisType(design.layers[0].axes.x)
+    if xType in ["enum", "text", "boolean"]
+      categoricalX = true
+
+    return categoricalX
+
   # Compiles data part of C3 chart, including data map back to original data
   # Outputs: columns, types, names, colors. Also dataMap which is a map of "layername:index" to { layerIndex, row }
   compileData: (design, data, locale) ->
@@ -144,15 +155,7 @@ module.exports = class LayeredChartCompiler
     if design.type in ['pie', 'donut'] or _.any(design.layers, (l) -> l.type in ['pie', 'donut'])
       return @compileDataPolar(design, data, locale)
 
-    # Check if categorical x axis (bar charts always are)
-    isCategoricalX = design.type == "bar" or _.any(design.layers, (l) -> l.type == "bar")
-
-    # Check if x axis is categorical type
-    xType = @axisBuilder.getAxisType(design.layers[0].axes.x)
-    if xType in ["enum", "text", "boolean"]
-      isCategoricalX = true
-
-    if isCategoricalX
+    if @isCategoricalX(design)
       return @compileDataCategorical(design, data, locale)
     else
       return @compileDataNonCategorical(design, data, locale)
@@ -352,6 +355,10 @@ module.exports = class LayeredChartCompiler
     # Categories will be in form [{ value, label }]
     categories = @axisBuilder.getCategories(xAxis, xValues, locale)
 
+    # Limit categories to prevent crashes in C3 (https://github.com/mWater/mwater-visualization/issues/272)
+    categories = _.take(categories, 40)
+    categoryXs = _.indexBy(categories, "value")
+
     # Create map of category value to index
     categoryMap = _.object(_.map(categories, (c, i) -> [c.value, i]))
 
@@ -362,6 +369,9 @@ module.exports = class LayeredChartCompiler
     _.each design.layers, (layer, layerIndex) =>
       # Get data of layer
       layerData = data["layer#{layerIndex}"]
+
+      # Filter out categories that were removed
+      layerData = _.filter(layerData, (row) -> categoryXs[row.x]?)
 
       # Fix string y values
       layerData = @fixStringYValues(layerData)
