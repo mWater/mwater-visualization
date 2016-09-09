@@ -4,16 +4,6 @@ ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../../axes/AxisBuilder'
 injectTableAlias = require('mwater-expressions').injectTableAlias
 
-# TODO REMOVE
-colorHacks = {
-  "ok": "#00AA00"
-  "maint": "#AAAA00"
-  "broken": "#AA0000"
-  "green": "#00AA00"
-  "yellow": "#AAAA00"
-  "red": "#AA0000"
-  null: "#888888"
-}
 
 # Compiles various parts of a layered chart (line, bar, scatter, spline, area) to C3.js format
 module.exports = class LayeredChartCompiler
@@ -193,8 +183,6 @@ module.exports = class LayeredChartCompiler
           #color = color or layer.color
           if color
             colors[series] = color
-          else if colorHacks[row.color] # TODO REMOVE
-            colors[series] = colorHacks[row.color]
       else
         # Create a single series
         row = data["layer#{layerIndex}"][0]
@@ -210,8 +198,6 @@ module.exports = class LayeredChartCompiler
           # Set color if present
           if layer.color
             colors[series] = layer.color
-          else if colorHacks[row.color] # TODO REMOVE
-            colors[series] = colorHacks[row.color]
 
     return {
       columns: columns
@@ -254,10 +240,6 @@ module.exports = class LayeredChartCompiler
           color = color or layer.color
           if color
             colors[seriesY] = color
-          else
-            # TODO REMOVE
-            if colorHacks[colorValue]
-              colors[seriesY] = colorHacks[colorValue]
 
           # Get rows for this series
           rows = _.where(layerData, color: colorValue)
@@ -402,10 +384,6 @@ module.exports = class LayeredChartCompiler
           color = color or layer.color
           if color
             colors[series] = color
-          else
-            # TODO REMOVE
-            if colorHacks[colorValue]
-              colors[series] = colorHacks[colorValue]
 
           # Get rows for this series
           rows = _.where(layerData, color: colorValue)
