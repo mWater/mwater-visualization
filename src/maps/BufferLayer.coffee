@@ -350,6 +350,11 @@ module.exports = class BufferLayer extends Layer
     else
       return null
 
+  # Gets the bounds of the layer as GeoJSON
+  getBounds: (design, schema, dataSource, filters, callback) ->
+    # TODO technically should pad for the radius, but we always pad by 20% anyway so it should be fine
+    @getBoundsFromExpr(schema, dataSource, design.table, design.axes.geometry.expr, design.filter, filters, callback)
+
   getMinZoom: (design) -> design.minZoom
 
   # Removed as was making deceptively not present

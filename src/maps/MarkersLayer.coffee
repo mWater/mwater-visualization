@@ -274,6 +274,9 @@ module.exports = class MarkersLayer extends Layer
     else
       return null
 
+  # Gets the bounds of the layer as GeoJSON
+  getBounds: (design, schema, dataSource, filters, callback) ->
+    @getBoundsFromExpr(schema, dataSource, design.table, design.axes.geometry.expr, design.filter, filters, callback)
 
   # Get min and max zoom levels
   getMinZoom: (design) -> return design.minZoom
@@ -422,7 +425,6 @@ module.exports = class MarkersLayer extends Layer
     }
 
     # Add color select if color axis
-
     if design.axes.color
       outerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "innerquery", column: "color" }, alias: "color" }) # innerquery.color as color
 
