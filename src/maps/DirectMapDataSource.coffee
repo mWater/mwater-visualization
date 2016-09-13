@@ -1,5 +1,4 @@
 _ = require 'lodash'
-async = require 'async'
 LayerFactory = require './LayerFactory'
 injectTableAlias = require('mwater-expressions').injectTableAlias
 MapDataSource = require './MapDataSource'

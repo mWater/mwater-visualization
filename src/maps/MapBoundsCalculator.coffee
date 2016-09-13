@@ -1,3 +1,4 @@
+async = require 'async'
 LayerFactory = require './LayerFactory'
 
 # Calculates map bounds given layers by unioning together
