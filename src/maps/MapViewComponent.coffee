@@ -91,12 +91,12 @@ module.exports = class MapViewComponent extends React.Component
     else
       # Update bounds
       if not _.isEqual(@props.design.bounds, prevProps.design.bounds)
-        @refs.leafletMap?.setBounds(@props.design.bounds, 0.2)
+        @refs.leafletMap?.setBounds(@props.design.bounds)
 
   performAutoZoom: ->
     @props.mapDataSource.getBounds(@props.design, @getCompiledFilters(), (error, bounds) =>
       if bounds
-        @refs.leafletMap?.setBounds(bounds)
+        @refs.leafletMap?.setBounds(bounds, 0.2)
 
         # Also record if editable as part of bounds
         if not @props.onDesignChange?
