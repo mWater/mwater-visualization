@@ -81,23 +81,27 @@ module.exports = class MapViewComponent extends React.Component
   componentDidMount: ->
     # Autozoom
     if @props.design.autoBounds 
-      @props.mapDataSource.getBounds(@props.design, @getCompiledFilters(), (error, bounds) =>
-        if bounds
-          @refs.leafletMap?.setBounds(bounds, 0.2)
-        )
+      @performAutoZoom()
 
   componentDidUpdate: (prevProps) ->
     if @props.design.autoBounds
       # Autozoom
-      if not _.isEqual(@props.design, prevProps.design) or not _.isEqual(@props.extraFilters, prevProps.extraFilters)
-        @props.mapDataSource.getBounds(@props.design, @getCompiledFilters(), (error, bounds) =>
-          if bounds
-            @refs.leafletMap?.setBounds(bounds)
-          )
+      if not _.isEqual(_.omit(@props.design, "bounds"), _.omit(prevProps.design, "bounds")) or not _.isEqual(@props.extraFilters, prevProps.extraFilters)
+        @performAutoZoom()
     else
       # Update bounds
       if not _.isEqual(@props.design.bounds, prevProps.design.bounds)
         @refs.leafletMap?.setBounds(@props.design.bounds, 0.2)
+
+  performAutoZoom: ->
+    @props.mapDataSource.getBounds(@props.design, @getCompiledFilters(), (error, bounds) =>
+      if bounds
+        @refs.leafletMap?.setBounds(bounds)
+
+        # Also record if editable as part of bounds
+        if not @props.onDesignChange?
+          @props.onDesignChange(_.extend({}, @props.design, bounds: bounds))
+      )
 
   handleBoundsChange: (bounds) =>
     # Ignore if readonly
@@ -249,7 +253,7 @@ module.exports = class MapViewComponent extends React.Component
       @renderPopup()
       R LeafletMapComponent,
         ref: "leafletMap"
-        initialBounds: if not @props.design.autoBounds then @props.design.bounds
+        initialBounds: @props.design.bounds
         baseLayerId: @props.design.baseLayer
         layers: leafletLayers
         width: @props.width
