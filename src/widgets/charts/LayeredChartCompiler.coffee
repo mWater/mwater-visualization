@@ -356,7 +356,8 @@ module.exports = class LayeredChartCompiler
     categories = @axisBuilder.getCategories(xAxis, xValues, locale)
 
     # Limit categories to prevent crashes in C3 (https://github.com/mWater/mwater-visualization/issues/272)
-    categories = _.take(categories, 40)
+    # Take last ones to make dates prettier
+    categories = _.takeRight(categories, 40)
     categoryXs = _.indexBy(categories, "value")
 
     # Create map of category value to index
