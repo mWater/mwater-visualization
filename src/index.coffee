@@ -48,6 +48,7 @@ exports.DirectMapDataSource = require './maps/DirectMapDataSource'
 exports.LayoutManager = require './layouts/LayoutManager'
 exports.AdminScopeAndDetailLevelComponent = require './maps/AdminScopeAndDetailLevelComponent'
 exports.MarkerSymbolSelectComponent = require './maps/MarkerSymbolSelectComponent'
+exports.AxisColorEditorComponent = require './maps/AxisColorEditorComponent'
 
 # Polyfill pathseg https://github.com/masayuki0812/c3/issues/1529
 require './pathseg-polyfill.js'
