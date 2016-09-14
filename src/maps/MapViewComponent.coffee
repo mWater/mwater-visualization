@@ -85,8 +85,8 @@ module.exports = class MapViewComponent extends React.Component
 
   componentDidUpdate: (prevProps) ->
     if @props.design.autoBounds
-      # Autozoom
-      if not _.isEqual(_.omit(@props.design, "bounds"), _.omit(prevProps.design, "bounds")) or not _.isEqual(@props.extraFilters, prevProps.extraFilters)
+      # Autozoom if filters changed
+      if not _.isEqual(@props.design.filters, prevProps.design.filters) or not _.isEqual(@props.extraFilters, prevProps.extraFilters)
         @performAutoZoom()
     else
       # Update bounds
