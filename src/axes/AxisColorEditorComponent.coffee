@@ -10,7 +10,7 @@ ColorMapOrderEditorComponent = require './ColorMapOrderEditorComponent'
 AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
 d3 = require 'd3-scale'
 
-# color editor for axis
+# Color editor for axis
 module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
   @propTypes:
     schema: React.PropTypes.object.isRequired
