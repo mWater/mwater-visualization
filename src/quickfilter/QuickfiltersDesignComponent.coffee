@@ -14,6 +14,8 @@ module.exports = class QuickfiltersDesignComponent extends React.Component
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
 
+    table: React.PropTypes.string     # If present, forces table
+
   @defaultProps:
     design: []
 
@@ -23,6 +25,7 @@ module.exports = class QuickfiltersDesignComponent extends React.Component
       design: item
       schema: @props.schema
       dataSource: @props.dataSource
+      table: @props.table
       onChange: (newItem) => 
         design = @props.design.slice()
         design[index] = newItem
@@ -33,7 +36,7 @@ module.exports = class QuickfiltersDesignComponent extends React.Component
 
   handleAdd: =>
     # Add blank to end
-    design = @props.design.concat([{}])
+    design = @props.design.concat([{ table: @props.table }])
     @props.onDesignChange(design)
 
   handleRemove: (index) =>
@@ -62,6 +65,8 @@ class QuickfilterDesignComponent extends React.Component
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
 
+    table: React.PropTypes.string     # If present, forces table
+
   handleTableChange: (table) => 
     design = {
       table: table
@@ -77,9 +82,11 @@ class QuickfilterDesignComponent extends React.Component
     R RemovableComponent, onRemove: @props.onRemove, 
       H.div className: "panel panel-default",
         H.div className: "panel-body",
-          H.div className: "form-group", key: "table",
-            H.label className: "text-muted", "Data Source"
-            R TableSelectComponent, schema: @props.schema, value: @props.design.table, onChange: @handleTableChange
+          # If table not forced
+          if not @props.table
+            H.div className: "form-group", key: "table",
+              H.label className: "text-muted", "Data Source"
+              R TableSelectComponent, schema: @props.schema, value: @props.design.table, onChange: @handleTableChange
 
           if @props.design.table
             H.div className: "form-group", key: "expr",

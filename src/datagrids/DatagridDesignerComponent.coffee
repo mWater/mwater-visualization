@@ -81,6 +81,22 @@ module.exports = class DatagridDesignerComponent extends React.Component
               onChange: @handleOrderBysChange
             }) 
         }
+        { 
+          id: "quickfilters"
+          label: "Quickfilters"
+          elem: H.div style: { marginBottom: 200 },
+            R QuickfiltersDesignComponent, {
+              design: @state.design.quickfilters
+              onDesignChange: (design) => @handleDesignChange(update(@state.design, { quickfilters: { $set: design } }))
+              schema: @props.schema
+              dataSource: @props.dataSource
+            }
+            R(OrderBysDesignerComponent, {
+              table: @props.design.table
+              orderBys: @props.design.orderBys
+              onChange: @handleOrderBysChange
+            }) 
+        }
       ]
 
   render: ->
