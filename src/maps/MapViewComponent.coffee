@@ -160,16 +160,14 @@ module.exports = class MapViewComponent extends React.Component
 
   # Get filters from extraFilters combined with map filters
   getCompiledFilters: ->
-    exprUtils = new ExprUtils(@props.schema)
+    exprCompiler = new ExprCompiler(@props.schema)
 
-    filters = _.values(@props.design.filters)
+    compiledFilters = []
 
     # Compile filters to JsonQL expected by layers
-    exprCompiler = new ExprCompiler(@props.schema)
-    compiledFilters = _.map filters, (expr) =>
-      table = exprUtils.getExprTable(expr)
+    for table, expr of (@props.design.filters or {})
       jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
-      return { table: table, jsonql: jsonql }
+      compiledFilters.push({ table: table, jsonql: jsonql })
 
     # Add extra filters
     if @props.extraFilters
