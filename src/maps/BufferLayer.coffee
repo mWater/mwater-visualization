@@ -477,6 +477,14 @@ module.exports = class BufferLayer extends Layer
       { type: "select", expr: bufferedGeometry, alias: "the_geom_webmercator" } 
     ]
 
+    extraFields = ["code", "name", "desc", "type", "photos"]
+
+    for field in extraFields
+      column = schema.getColumn(design.table, field)
+
+      if column
+        selects.push({ type: "select", expr: { type: "field", tableAlias: "main", column: field }, alias: field })  
+
     # Add color select if color axis
     if design.axes.color
       colorExpr = axisBuilder.compileAxis(axis: design.axes.color, tableAlias: "main")
@@ -569,5 +577,5 @@ module.exports = class BufferLayer extends Layer
       coordinates.join(",")
     )
 
-    visitor.addPolygon(list.join(" "), row.color)
+    visitor.addPolygon(list.join(" "), row.color, false, row.name, visitor.buildDescription(row))
 

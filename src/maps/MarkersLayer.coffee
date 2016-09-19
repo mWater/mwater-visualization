@@ -386,6 +386,14 @@ module.exports = class MarkersLayer extends Layer
       from: exprCompiler.compileTable(design.table, "innerquery")
     }
 
+    extraFields = ["code", "name", "desc", "type", "photos"]
+
+    for field in extraFields
+      column = schema.getColumn(design.table, field)
+
+      if column
+        innerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "innerquery", column: field }, alias: field })  
+
     # Add color select if color axis
     if design.axes.color
       colorExpr = axisBuilder.compileAxis(axis: design.axes.color, tableAlias: "innerquery")
@@ -416,17 +424,25 @@ module.exports = class MarkersLayer extends Layer
     outerquery = {
       type: "query"
       selects: [
-        { type: "select", expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "innerquery", column: "id" }]}, alias: "id" } # innerquery._id::text as id
-        { type: "select", expr: { type: "op", op: "ST_X", exprs: [{ type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }]}, alias: "longitude" } # innerquery.the_geom_webmercator as the_geom_webmercator
-        { type: "select", expr: { type: "op", op: "ST_Y", exprs: [{ type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }]}, alias: "latitude" } # innerquery.the_geom_webmercator as the_geom_webmercator
+        { type: "select", expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "outerquery", column: "id" }]}, alias: "id" } # innerquery._id::text as id
+        { type: "select", expr: { type: "op", op: "ST_X", exprs: [{ type: "field", tableAlias: "outerquery", column: "the_geom_webmercator" }]}, alias: "longitude" } # innerquery.the_geom_webmercator as the_geom_webmercator
+        { type: "select", expr: { type: "op", op: "ST_Y", exprs: [{ type: "field", tableAlias: "outerquery", column: "the_geom_webmercator" }]}, alias: "latitude" } # innerquery.the_geom_webmercator as the_geom_webmercator
       ]
-      from: { type: "subquery", query: innerquery, alias: "innerquery" }
-      where: { type: "op", op: "<=", exprs: [{ type: "field", tableAlias: "innerquery", column: "r" }, 3]}
+      from: { type: "subquery", query: innerquery, alias: "outerquery" }
+      where: { type: "op", op: "<=", exprs: [{ type: "field", tableAlias: "outerquery", column: "r" }, 3]}
     }
+
+    extraFields = ["code", "name", "desc", "type", "photos"]
+
+    for field in extraFields
+      column = schema.getColumn(design.table, field)
+
+      if column
+        outerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "outerquery", column: field }, alias: field })  
 
     # Add color select if color axis
     if design.axes.color
-      outerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "innerquery", column: "color" }, alias: "color" }) # innerquery.color as color
+      outerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "outerquery", column: "color" }, alias: "color" }) # innerquery.color as color
 
     return outerquery
 
@@ -461,5 +477,5 @@ module.exports = class MarkersLayer extends Layer
     return layerDef
 
   acceptKmlVisitorForRow: (visitor, row) ->
-    visitor.addPoint(row.latitude, row.longitude, null, null, row.color)
+    visitor.addPoint(row.latitude, row.longitude, row.name, visitor.buildDescription(row), row.color)
 
