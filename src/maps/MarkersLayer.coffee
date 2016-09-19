@@ -367,21 +367,13 @@ module.exports = class MarkersLayer extends Layer
     # Convert to Web mercator (3857)
     geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326] }
 
-    # row_number() over (partition by st_snaptogrid(location, !pixel_width!*5, !pixel_height!*5)) AS r
-    cluster = {
-      type: "select"
-      expr: { type: "op", op: "row_number", exprs: [] }
-      over: { partitionBy: [geometryExpr]}
-      alias: "r"
-    }
-
     # Select _id, location and clustered row number
     innerquery = {
       type: "query"
       selects: [
         { type: "select", expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(design.table).primaryKey }, alias: "id" } # main primary key as id
-        { type: "select", expr: geometryExpr, alias: "the_geom_webmercator" } # geometry as the_geom_webmercator
-        cluster
+        { type: "select", expr: { type: "op", op: "ST_X", exprs: [geometryExpr]}, alias: "longitude" } # innerquery.the_geom_webmercator as the_geom_webmercator
+        { type: "select", expr: { type: "op", op: "ST_Y", exprs: [geometryExpr]}, alias: "latitude" } # innerquery.the_geom_webmercator as the_geom_webmercator
       ]
       from: exprCompiler.compileTable(design.table, "innerquery")
     }
@@ -420,31 +412,7 @@ module.exports = class MarkersLayer extends Layer
     else
       innerquery.where = whereClauses[0]
 
-    # Create outer query which takes where r <= 3 to limit # of points in a cluster
-    outerquery = {
-      type: "query"
-      selects: [
-        { type: "select", expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "outerquery", column: "id" }]}, alias: "id" } # innerquery._id::text as id
-        { type: "select", expr: { type: "op", op: "ST_X", exprs: [{ type: "field", tableAlias: "outerquery", column: "the_geom_webmercator" }]}, alias: "longitude" } # innerquery.the_geom_webmercator as the_geom_webmercator
-        { type: "select", expr: { type: "op", op: "ST_Y", exprs: [{ type: "field", tableAlias: "outerquery", column: "the_geom_webmercator" }]}, alias: "latitude" } # innerquery.the_geom_webmercator as the_geom_webmercator
-      ]
-      from: { type: "subquery", query: innerquery, alias: "outerquery" }
-      where: { type: "op", op: "<=", exprs: [{ type: "field", tableAlias: "outerquery", column: "r" }, 3]}
-    }
-
-    extraFields = ["code", "name", "desc", "type", "photos"]
-
-    for field in extraFields
-      column = schema.getColumn(design.table, field)
-
-      if column
-        outerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "outerquery", column: field }, alias: field })  
-
-    # Add color select if color axis
-    if design.axes.color
-      outerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "outerquery", column: "color" }, alias: "color" }) # innerquery.color as color
-
-    return outerquery
+    return innerquery
 
 
   createKMLExportStyleInfo: (design, schema, filters) ->

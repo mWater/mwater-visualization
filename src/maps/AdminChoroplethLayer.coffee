@@ -623,5 +623,5 @@ module.exports = class AdminChoroplethLayer extends Layer
       coordinates.join(",")
     )
 
-    visitor.addPolygon(list.join(" "), row.color, data.type == "MultiPolygon", row.name)
+    visitor.addPolygon(list.join(" "), row.color, data.type == "MultiPolygon", row.name, visitor.buildDescription(row))
     
