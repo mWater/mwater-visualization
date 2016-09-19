@@ -21,6 +21,9 @@ module.exports = class MapViewComponent extends React.Component
     mapDataSource: React.PropTypes.shape({
       # Gets the data source for a layer
       getLayerDataSource: React.PropTypes.func.isRequired
+      
+      # Gets the bounds for the map. Null for no opinion. Callback as { n:, s:, w:, e: }
+      getBounds: React.PropTypes.func.isRequired
     }).isRequired
     
     design: React.PropTypes.object.isRequired  # See Map Design.md
@@ -75,14 +78,38 @@ module.exports = class MapViewComponent extends React.Component
     printer = new ReactElementPrinter()
     printer.print(elem, { delay: 8000 })
 
-  componentWillReceiveProps: (nextProps) ->
-    # Update bounds
-    if not _.isEqual(nextProps.design.bounds, @props.design.bounds)
-      @refs.leafletMap?.setBounds(nextProps.design.bounds)
+  componentDidMount: ->
+    # Autozoom
+    if @props.design.autoBounds 
+      @performAutoZoom()
+
+  componentDidUpdate: (prevProps) ->
+    if @props.design.autoBounds
+      # Autozoom if filters or autozoom changed
+      if not _.isEqual(@props.design.filters, prevProps.design.filters) or not _.isEqual(@props.extraFilters, prevProps.extraFilters) or not prevProps.design.autoBounds 
+        @performAutoZoom()
+    else
+      # Update bounds
+      if not _.isEqual(@props.design.bounds, prevProps.design.bounds)
+        @refs.leafletMap?.setBounds(@props.design.bounds)
+
+  performAutoZoom: ->
+    @props.mapDataSource.getBounds(@props.design, @getCompiledFilters(), (error, bounds) =>
+      if bounds
+        @refs.leafletMap?.setBounds(bounds, 0.2)
+
+        # Also record if editable as part of bounds
+        if not @props.onDesignChange?
+          @props.onDesignChange(_.extend({}, @props.design, bounds: bounds))
+      )
 
   handleBoundsChange: (bounds) =>
     # Ignore if readonly
     if not @props.onDesignChange?
+      return
+
+    # Ignore if autoBounds
+    if @props.design.autoBounds
       return
 
     design = _.extend({}, @props.design, bounds: bounds)
@@ -131,6 +158,23 @@ module.exports = class MapViewComponent extends React.Component
 
       @props.onScopeChange(scope)
 
+  # Get filters from extraFilters combined with map filters
+  getCompiledFilters: ->
+    exprCompiler = new ExprCompiler(@props.schema)
+
+    compiledFilters = []
+
+    # Compile filters to JsonQL expected by layers
+    for table, expr of (@props.design.filters or {})
+      jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
+      compiledFilters.push({ table: table, jsonql: jsonql })
+
+    # Add extra filters
+    if @props.extraFilters
+      compiledFilters = compiledFilters.concat(@props.extraFilters)
+
+    return compiledFilters
+
   renderLegend: ->
     return R LegendComponent,
       schema: @props.schema
@@ -149,21 +193,7 @@ module.exports = class MapViewComponent extends React.Component
             "Close"
 
   render: ->
-    exprUtils = new ExprUtils(@props.schema)
-
-    # Use only valid ones
-    filters = _.values(@props.design.filters)
-
-    # Compile filters to JsonQL expected by layers
-    exprCompiler = new ExprCompiler(@props.schema)
-    compiledFilters = _.map filters, (expr) =>
-      table = exprUtils.getExprTable(expr)
-      jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
-      return { table: table, jsonql: jsonql }
-
-    # Add extra filters
-    if @props.extraFilters
-      compiledFilters = compiledFilters.concat(@props.extraFilters)
+    compiledFilters = @getCompiledFilters()
 
     # Determine scoped filters
     if @props.scope

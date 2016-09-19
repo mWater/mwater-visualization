@@ -27,6 +27,23 @@ module.exports = class ServerMapDataSource extends MapDataSource
 
     return new ServerLayerDataSource(_.extend({}, @options, layerView: layerView))
 
+  # Gets the bounds for the map. Null for no opinion. Callback as { n:, s:, w:, e: }
+  getBounds: (design, filters, callback) ->
+    query = {
+      client: @options.client
+      share: @options.share
+      filters: JSON.stringify(filters)
+      rev: @options.rev
+    }
+
+    url = @options.apiUrl + "maps/#{@options.mapId}/bounds?" + querystring.stringify(query)
+
+    $.getJSON url, (data) =>
+      callback(null, data)
+    .fail (xhr) =>
+      console.log xhr.responseText
+      callback(new Error(xhr.responseText))
+
 class ServerLayerDataSource
   # Create map url source that uses map design stored on server
   # options:

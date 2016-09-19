@@ -25,7 +25,7 @@ module.exports = class LayerLegendComponent extends React.Component
       categories: []
     }
 
-  componentDidMount: ->
+  componentWillMount: ->
     @loadCategories(@props)
 
   componentWillReceiveProps: (nextProps) ->

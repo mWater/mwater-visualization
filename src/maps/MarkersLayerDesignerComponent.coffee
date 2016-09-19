@@ -11,6 +11,7 @@ ReactSelect = require 'react-select'
 EditPopupComponent = require './EditPopupComponent'
 ColorAxisComponent = require '../axes/ColorAxisComponent'
 ZoomLevelsComponent = require './ZoomLevelsComponent'
+MarkerSymbolSelectComponent = require './MarkerSymbolSelectComponent'
 
 # Designer for a markers layer
 module.exports = class MarkersLayerDesignerComponent extends React.Component
@@ -114,6 +115,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
     if not @props.design.axes.geometry
       return
 
+<<<<<<< HEAD
     # Create options
     options = [
       { value: "font-awesome/dot-circle-o", label: "Dot circle" }
@@ -183,6 +185,9 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
         valueRenderer: optionRenderer
         onChange: @handleSymbolChange
       }
+=======
+    R MarkerSymbolSelectComponent, symbol: @props.design.symbol, onChange: @handleSymbolChange
+>>>>>>> master
 
   renderFilter: ->
     # If no data, hide

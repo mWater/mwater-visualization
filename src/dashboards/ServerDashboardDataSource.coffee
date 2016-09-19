@@ -81,6 +81,23 @@ class ServerWidgetMapDataSource
 
     return new ServerWidgetLayerDataSource(_.extend({}, @options, layerView: layerView))
 
+  # Gets the bounds for the map. Null for no opinion. Callback as { n:, s:, w:, e: }
+  getBounds: (design, filters, callback) ->
+    query = {
+      client: @options.client
+      share: @options.share
+      filters: JSON.stringify(filters)
+      rev: @options.rev
+    }
+
+    url = @options.apiUrl + "dashboards/#{@options.dashboardId}/widgets/#{@options.widgetId}/bounds?" + querystring.stringify(query)
+
+    $.getJSON url, (data) =>
+      callback(null, data)
+    .fail (xhr) =>
+      console.log xhr.responseText
+      callback(new Error(xhr.responseText))
+
 class ServerWidgetLayerDataSource
   # options:
   #   apiUrl: API url to use for talking to mWater server

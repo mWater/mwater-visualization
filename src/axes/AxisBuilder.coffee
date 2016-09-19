@@ -448,6 +448,8 @@ module.exports = class AxisBuilder
       categories = []
       for year in [min..max]
         categories.push({ value: "#{year}-01-01", label: "#{year}"})
+        if categories.length >= 1000
+          break
       categories.push(noneCategory)
 
       return categories
@@ -468,6 +470,8 @@ module.exports = class AxisBuilder
       while not current.isAfter(end)
         categories.push({ value: current.format("YYYY-MM-DD"), label: current.format("MMM YYYY")})
         current.add(1, "months")
+        if categories.length >= 1000
+          break
       
       categories.push(noneCategory)
       return categories
@@ -498,6 +502,8 @@ module.exports = class AxisBuilder
         while not current.isAfter(end)
           categories.push({ value: current.format("YYYY-MM-DD"), label: current.format("ll")})
           current.add(1, "days")
+          if categories.length >= 1000
+            break
         categories.push(noneCategory)
         return categories
 

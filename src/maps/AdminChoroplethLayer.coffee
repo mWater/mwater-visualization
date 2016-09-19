@@ -350,6 +350,27 @@ module.exports = class AdminChoroplethLayer extends Layer
     else
       return null
 
+  # Gets the bounds of the layer as GeoJSON
+  getBounds: (design, schema, dataSource, filters, callback) ->
+    # Whole world
+    if not design.scope
+      return callback(null)
+
+    # Get just scope. Ignore filters and get entire scope
+    filters = [{
+      table: "admin_regions"
+      jsonql: {
+        type: "op"
+        op: "="
+        exprs: [
+          { type: "field", tableAlias: "{alias}", column: "_id" }
+          design.scope
+        ]
+      }
+    }]
+
+    @getBoundsFromExpr(schema, dataSource, "admin_regions", { type: "field", table: "admin_regions", column: "shape" }, null, filters, callback)
+
   # Get min and max zoom levels
   getMinZoom: (design) -> return design.minZoom
   getMaxZoom: (design) -> return design.maxZoom
@@ -602,5 +623,5 @@ module.exports = class AdminChoroplethLayer extends Layer
       coordinates.join(",")
     )
 
-    visitor.addPolygon(list.join(" "), row.color, data.type == "MultiPolygon")
+    visitor.addPolygon(list.join(" "), row.color, data.type == "MultiPolygon", row.name, visitor.buildDescription(row))
     

@@ -84,7 +84,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
       if @props.allowEditingLayers
         R AddLayerComponent, 
           key: "addlayer"
-          firstLayer: @props.design.layerViews.length == 0
+          layerNumber: @props.design.layerViews.length
           schema: @props.schema
           dataSource: @props.dataSource
           design: @props.design

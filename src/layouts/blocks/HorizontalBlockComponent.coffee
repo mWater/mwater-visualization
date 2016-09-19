@@ -3,6 +3,8 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
+DraggableBlockComponent = require "./DraggableBlockComponent"
+
 module.exports = class HorizontalBlockComponent extends React.Component
   @propTypes:
     block: React.PropTypes.object.isRequired
@@ -86,7 +88,7 @@ module.exports = class HorizontalBlockComponent extends React.Component
       percentages[index] = (weight * 100) / totalWeight
 
     if @props.onBlockUpdate?
-      H.table style: { width: "100%", tableLayout: "fixed", position: "relative" },
+      elem = H.table style: { width: "100%", tableLayout: "fixed", position: "relative", paddingTop: 5 },  # Add padding to allow dropping
         H.tbody null,
           H.tr null,
             _.map @props.block.blocks, (block, index) =>
@@ -100,8 +102,17 @@ module.exports = class HorizontalBlockComponent extends React.Component
                 H.td style: { width: "#{percentages[index]}%", verticalAlign: "top" }, key: block.id, ref: "block#{index}",
                   @props.renderBlock(block)
               ]              
+
+      # Allow dropping
+      elem = R DraggableBlockComponent, 
+        block: @props.block
+        onBlockDrop: @props.onBlockDrop,
+          elem
+
+      return elem
+
     else  # Simplify in this case for printing
-      H.div null,
+      return H.div null,
         _.map @props.block.blocks, (block, index) =>
           [
             H.div style: { width: "#{percentages[index]}%", verticalAlign: "top", display: "inline-block" }, key: block.id, ref: "block#{index}", className: "mwater-visualization-horizontal-block-item",

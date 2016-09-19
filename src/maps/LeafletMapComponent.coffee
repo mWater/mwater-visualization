@@ -68,8 +68,8 @@ module.exports = class LeafletMapComponent extends React.Component
       w: curBounds.getWest()
     }
 
-  # Set bounds. Bounds are in { w, n, s, e } format
-  setBounds: (bounds) ->
+  # Set bounds. Bounds are in { w, n, s, e } format. Padding is optional
+  setBounds: (bounds, pad) ->
     if bounds
       # Ignore if same as current
       if @hasBounds
@@ -87,7 +87,11 @@ module.exports = class LeafletMapComponent extends React.Component
       if e == w
         e += 0.001
 
-      @map.fitBounds(new L.LatLngBounds([[s, w], [n, e]]))
+      lBounds = new L.LatLngBounds([[s, w], [n, e]])
+      if pad
+        lBounds = lBounds.pad(pad)
+
+      @map.fitBounds(lBounds, { animate: true })
     else
       # Fit world doesn't work sometimes. Make sure that entire left-right is included
       @map.fitBounds([[-1, -180], [1, 180]])
