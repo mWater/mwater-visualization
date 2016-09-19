@@ -141,7 +141,7 @@ class MWaterDirectDashboardPane extends React.Component
     )
 
 
-mapId = "674bbaa39fab493bab1f42abbe477047"
+mapId = "fb92ca9ca9a04bfd8dc156b5ac71380d"
 share = "testshareid"
 
 class MWaterMapPane extends React.Component
@@ -175,6 +175,7 @@ class MWaterMapPane extends React.Component
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
     }, (error, config) =>
       # Create map url source
+      console.log config.schema
       # mapDataSource = new DirectMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
       mapDataSource = new ServerMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, mapId: mapId, design: @state.design })
 
