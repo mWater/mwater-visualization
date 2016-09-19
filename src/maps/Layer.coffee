@@ -1,4 +1,8 @@
 AxisBuilder = require '../axes/AxisBuilder'
+ExprCompiler = require('mwater-expressions').ExprCompiler
+injectTableAlias = require('mwater-expressions').injectTableAlias
+
+
 # Defines a layer for a map which has all the logic for rendering the specific data to be viewed
 module.exports = class Layer
   # Gets the layer definition as JsonQL + CSS in format:
@@ -34,6 +38,10 @@ module.exports = class Layer
   #   }
   onGridClick: (ev, options) ->
     return null
+
+  # Gets the bounds of the layer as GeoJSON
+  getBounds: (design, schema, dataSource, filters, callback) ->
+    callback(null)
 
   # Get min and max zoom levels
   getMinZoom: (design) -> return null
@@ -80,3 +88,57 @@ module.exports = class Layer
   #   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
   getKMLExportJsonQL: (design, schema, filters) ->
     throw new Error("Not implemented")
+
+  # Convenience function to get the bounds of a geometry expression with filters
+  getBoundsFromExpr: (schema, dataSource, table, geometryExpr, filterExpr, filters, callback) ->
+    exprCompiler = new ExprCompiler(schema)
+    compiledGeometryExpr = exprCompiler.compileExpr(expr: geometryExpr, tableAlias: "main")
+
+    # Create where clause from filters
+    where = {
+      type: "op"
+      op: "and"
+      exprs: _.pluck(_.where(filters, table: table), "jsonql")
+    }
+
+    if filterExpr
+      where.exprs.push(exprCompiler.compileExpr(expr: filterExpr, tableAlias: "main"))
+
+    # Compact and inject alias
+    where.exprs = _.compact(where.exprs)
+    where = injectTableAlias(where, "main")
+
+    # Get bounds
+    boundsQuery = {
+      type: "query"
+      selects: [{ type: "select", expr: { type: "op", op: "::json", exprs: [{ type: "op", op: "ST_AsGeoJSON", exprs: [
+        { type: "op", op: "ST_SetSRID", exprs: [{ type: "op", op: "ST_Extent", exprs: [{ type: "op", op: "ST_Transform", exprs: [compiledGeometryExpr, 4326] }] }, 4326 ]}
+        ] } ] }, alias: "bounds" }]
+      from: { type: "table", table: table, alias: "main" }
+      where: where
+    }
+
+    dataSource.performQuery boundsQuery, (err, results) =>
+      if err
+        callback(err)
+      else
+        if results[0].bounds
+          if results[0].bounds.type == "Point"
+            bounds = {
+              w: results[0].bounds.coordinates[0] - 0.1 # Single point; zoom to 10km bounds
+              s: results[0].bounds.coordinates[1] - 0.1
+              e: results[0].bounds.coordinates[0] + 0.1
+              n: results[0].bounds.coordinates[1] + 0.1
+            }            
+          else
+            bounds = {
+              w: results[0].bounds.coordinates[0][0][0] - 0.001 # Add 10 meters to prevent too small box
+              s: results[0].bounds.coordinates[0][0][1] - 0.001
+              e: results[0].bounds.coordinates[0][2][0] + 0.001
+              n: results[0].bounds.coordinates[0][2][1] + 0.001
+            }
+        else
+          # Default bounds
+          bounds = { w: -165.9375, n: 76.9206135182968, e: 38.67187499999999, s: -62.431074232920906 }
+
+        callback(null, bounds)

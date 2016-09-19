@@ -5,6 +5,7 @@ MapDataSource = require './MapDataSource'
 DirectWidgetDataSource = require '../widgets/DirectWidgetDataSource'
 BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
 WidgetFactory = require '../widgets/WidgetFactory'
+MapBoundsCalculator = require './MapBoundsCalculator'
 
 module.exports = class DirectMapDataSource extends MapDataSource
   # Create map url source that uses direct jsonql maps
@@ -25,6 +26,10 @@ module.exports = class DirectMapDataSource extends MapDataSource
       return null
 
     new DirectLayerDataSource(_.extend({}, @options, layerView: layerView))
+
+  # Gets the bounds for the map. Null for whole world. Callback as { n:, s:, w:, e: }
+  getBounds: (design, filters, callback) ->
+    new MapBoundsCalculator(@options.schema, @options.dataSource).getBounds(design, filters, callback)
 
 class DirectLayerDataSource
   # Create map url source that uses direct jsonql maps

@@ -87,19 +87,26 @@ module.exports = class BufferLayer extends Layer
     # Convert to Web mercator (3857)
     geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
 
-    # radius * 2 / (!pixel_width! * cos(st_y(st_transform(geometryExpr, 4326)) * 0.017453293)
+    # radius * 2 / (!pixel_width! * cos(st_y(st_transform(geometryExpr, 4326)) * 0.017453293) + 1 # add one to make always visible
     widthExpr = {
       type: "op"
-      op: "/"
-      exprs: [{ type: "op", op: "*", exprs: [design.radius, 2] }, { type: "op", op: "*", exprs: [
-        { type: "token", token: "!pixel_height!" }
-        { type: "op", op: "cos", exprs: [
-          { type: "op", op: "*", exprs: [
-            { type: "op", op: "ST_Y", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326]}] }
-            0.017453293
-          ]}
-        ]}
-       ]}
+      op: "+"
+      exprs: [      
+        {
+          type: "op"
+          op: "/"
+          exprs: [{ type: "op", op: "*", exprs: [design.radius, 2] }, { type: "op", op: "*", exprs: [
+            { type: "token", token: "!pixel_height!" }
+            { type: "op", op: "cos", exprs: [
+              { type: "op", op: "*", exprs: [
+                { type: "op", op: "ST_Y", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326]}] }
+                0.017453293
+              ]}
+            ]}
+           ]}
+          ]
+        }
+        2
       ]
     }
 
@@ -343,17 +350,25 @@ module.exports = class BufferLayer extends Layer
     else
       return null
 
-  # Get min and max zoom levels
-  getMinZoom: (design) -> 
-    # Earth is 40000km around, is 256 pixels. So zoom z radius map of r takes up 2*r*256*2^z/40000000 meters.
-    # So zoom with 5 pixels across = log2(4000000*5/(2*r*256))
-    if design.radius
-      zoom = Math.ceil(Math.log(40000000*5/(2*design.radius*256))/Math.log(2))
-      if design.minZoom?
-        return Math.max(zoom, design.minZoom)
-      return zoom
-    else
-      return design.minZoom
+  # Gets the bounds of the layer as GeoJSON
+  getBounds: (design, schema, dataSource, filters, callback) ->
+    # TODO technically should pad for the radius, but we always pad by 20% anyway so it should be fine
+    @getBoundsFromExpr(schema, dataSource, design.table, design.axes.geometry.expr, design.filter, filters, callback)
+
+  getMinZoom: (design) -> design.minZoom
+
+  # Removed as was making deceptively not present
+  # # Get min and max zoom levels
+  # getMinZoom: (design) -> 
+  #   # Earth is 40000km around, is 256 pixels. So zoom z radius map of r takes up 2*r*256*2^z/40000000 meters.
+  #   # So zoom with 5 pixels across = log2(4000000*5/(2*r*256))
+  #   if design.radius
+  #     zoom = Math.ceil(Math.log(40000000*5/(2*design.radius*256))/Math.log(2))
+  #     if design.minZoom?
+  #       return Math.max(zoom, design.minZoom)
+  #     return zoom
+  #   else
+  #     return design.minZoom
 
   getMaxZoom: (design) -> design.maxZoom
 

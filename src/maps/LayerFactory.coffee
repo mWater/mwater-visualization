@@ -1,7 +1,6 @@
 MWaterServerLayer = require './MWaterServerLayer'
 MarkersLayer = require './MarkersLayer'
 BufferLayer = require './BufferLayer'
-AdminIndicatorChoroplethLayer = require './AdminIndicatorChoroplethLayer'
 AdminChoroplethLayer = require './AdminChoroplethLayer'
 TileUrlLayer = require './TileUrlLayer'
 
@@ -16,10 +15,6 @@ module.exports = class LayerFactory
 
       when "Buffer"
         return new BufferLayer()
-
-      # DEPRECATED
-      when "AdminIndicatorChoropleth"
-        return new AdminIndicatorChoroplethLayer()
 
       when "AdminChoropleth"
         return new AdminChoroplethLayer()

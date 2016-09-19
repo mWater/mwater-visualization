@@ -2,6 +2,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
+CheckboxComponent = require '../CheckboxComponent'
 ClickOutHandler = require('react-onclickout')
 MapLayersDesignerComponent = require './MapLayersDesignerComponent'
 MapFiltersDesignerComponent = require './MapFiltersDesignerComponent'
@@ -16,6 +17,10 @@ module.exports = class MapDesignerComponent extends React.Component
 
   handleAttributionChange: (text) =>
     design = _.extend({}, @props.design, {attribution: text})
+    @props.onDesignChange(design)
+
+  handleAutoBoundsChange: (value) =>
+    design = _.extend({}, @props.design, {autoBounds: value})
     @props.onDesignChange(design)
 
   render: ->
@@ -40,6 +45,11 @@ module.exports = class MapDesignerComponent extends React.Component
         R BaseLayerDesignerComponent,
           design: @props.design
           onDesignChange: @props.onDesignChange
+
+      R CheckboxComponent, 
+        checked: @props.design.autoBounds
+        onChange: @handleAutoBoundsChange,
+          H.span className: "text-muted", "Automatic zoom"
 
       R AttributionComponent,
         text: @props.design.attribution
