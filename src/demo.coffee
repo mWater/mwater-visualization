@@ -35,11 +35,11 @@ $ ->
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDirectMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+#    React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+#     React.createElement(MWaterDirectMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(BlocksDesignerComponent, renderBlock: [])
-    # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
+     React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+#     React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
   ReactDOM.render(sample, document.getElementById("main"))
@@ -576,7 +576,7 @@ class MWaterDirectDashboardPane extends React.Component
     )
 
 
-mapId = "ed291fa35f994c0094aba62b57ac004c"
+mapId = "674bbaa39fab493bab1f42abbe477047"
 share = "testshareid"
 
 class MWaterMapPane extends React.Component
@@ -590,7 +590,7 @@ class MWaterMapPane extends React.Component
 
   componentWillMount: ->
 # Load map
-    url = @props.apiUrl + "maps/#{mapId}?" + querystring.stringify({ client: @props.client, share: share })
+    url = @props.apiUrl + "maps/#{mapId}?" + querystring.stringify({ client: @props.client })
     $.getJSON url, (map) =>
       @setState(design: map.design, extraTables: map.extra_tables)
 
@@ -605,14 +605,13 @@ class MWaterMapPane extends React.Component
     React.createElement(MWaterLoaderComponent, {
       apiUrl: @props.apiUrl
       client: @props.client
-      share: share
       user: @props.user
       extraTables: @state.extraTables
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
     }, (error, config) =>
       # Create map url source
       # mapDataSource = new DirectMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
-      mapDataSource = new ServerMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, share: share, mapId: mapId })
+      mapDataSource = new ServerMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, mapId: mapId, design: @state.design })
 
       H.div style: { height: "100%" },
         React.createElement(visualization.MapComponent, {
