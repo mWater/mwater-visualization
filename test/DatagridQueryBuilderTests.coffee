@@ -210,7 +210,7 @@ describe "DatagridQueryBuilder", ->
         { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "s0" }
       ]
       from: { type: "table", table: "t1", alias: "main" }
-      orderBy: [{ ordinal: 3, direction: "desc" }]
+      orderBy: [{ ordinal: 2, direction: "desc" }]
       groupBy: [2]
       limit: null
       offset: null

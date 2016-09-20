@@ -60,8 +60,8 @@ module.exports = class DatagridQueryBuilder
 
     # Add order of main
     for direction, i in @getMainOrderByDirections(design, isAggr)
-      # Leave room for primary key and columns
-      query.orderBy.push({ ordinal: i + 2 + design.columns.length, direction: direction })
+      # Leave room for primary key (if not aggr) and columns
+      query.orderBy.push({ ordinal: i + (if isAggr then 1 else 2) + design.columns.length, direction: direction })
 
     # Add group bys if any expressions are individual and overall is aggregate
     if isAggr
