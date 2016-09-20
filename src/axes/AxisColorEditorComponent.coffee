@@ -7,7 +7,6 @@ ColorPaletteCollectionComponent = require './ColorPaletteCollectionComponent'
 update = require 'update-object'
 AxisBuilder = require './AxisBuilder'
 AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
-d3 = require 'd3-scale'
 
 # Color editor for axis
 module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
