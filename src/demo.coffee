@@ -175,8 +175,8 @@ class MWaterMapPane extends React.Component
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
     }, (error, config) =>
       # Create map url source
-      console.log config.schema
-      # mapDataSource = new DirectMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
+
+#      mapDataSource = new DirectMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
       mapDataSource = new ServerMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, mapId: mapId, design: @state.design })
 
       H.div style: { height: "100%" },

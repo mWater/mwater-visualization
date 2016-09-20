@@ -4,6 +4,7 @@ exports.WidgetFactory = require './widgets/WidgetFactory'
 exports.UndoStack = require './UndoStack'
 
 exports.DashboardComponent = require './dashboards/DashboardComponent'
+exports.DashboardViewComponent = require './dashboards/DashboardViewComponent'
 
 exports.BingLayer = require './maps/BingLayer'
 exports.UtfGridLayer = require './maps/UtfGridLayer'
@@ -25,7 +26,6 @@ exports.TableChart = require './widgets/charts/TableChart'
 exports.CalendarChart = require './widgets/charts/CalendarChart'
 exports.ImageMosaicChart = require './widgets/charts/ImageMosaicChart'
 exports.ChartViewComponent = require './widgets/charts/ChartViewComponent'
-exports.MapViewComponent = require './maps/MapViewComponent'
 
 exports.WidgetScoper = require './widgets/WidgetScoper'
 exports.WidgetScopesViewComponent = require './widgets/WidgetScopesViewComponent'
