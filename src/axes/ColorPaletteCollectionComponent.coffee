@@ -1,4 +1,11 @@
-class ColorPaletteCollectionComponent extends React.Component
+React = require 'react'
+H = React.DOM
+R = React.createElement
+
+c_c = require 'color-mixer'
+d3 = require 'd3-scale'
+
+module.exports = class ColorPaletteCollectionComponent extends React.Component
   @propTypes:
     onPaletteSelected: React.PropTypes.func.isRequired
     axis: React.PropTypes.object.isRequired
