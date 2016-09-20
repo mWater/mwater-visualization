@@ -7,6 +7,7 @@ AxisBuilder = require './AxisBuilder'
 update = require 'update-object'
 ColorComponent = require '../ColorComponent'
 ExprUtils = require('mwater-expressions').ExprUtils
+ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
 
 # Color map for an axis
 module.exports = class ColorMapComponent extends React.Component
@@ -16,6 +17,12 @@ module.exports = class ColorMapComponent extends React.Component
     axis: React.PropTypes.object.isRequired   
     onChange: React.PropTypes.func.isRequired
     categories: React.PropTypes.array
+    reorderable: React.PropTypes.bool
+    onOrderChange: React.PropTypes.func
+    order: React.PropTypes.array
+
+  handleReorder: (map) =>
+    @props.onOrderChange(_.pluck(map, "value"))
 
   handleColorChange: (value, color) =>
     # Delete if present for value
@@ -49,16 +56,63 @@ module.exports = class ColorMapComponent extends React.Component
         label
         H.span style: {fontSize: 12, marginLeft: 4}, "(click to change label for none value)"
 
-  render: ->
+  renderItem: (item, index, connectDragSource, connectDragPreview, connectDropTarget) =>
+    labelStyle =
+      verticalAlign: 'middle'
+      marginLeft: 8
+
+    iconStyle =
+      cursor: "move"
+      marginRight: 8
+      opacity: 0.5
+      fontSize: 12
+      height: 20
+
+    colorPickerStyle =
+      verticalAlign: 'middle'
+      lineHeight: 1
+      display: 'inline'
+
+    connectDragPreview(connectDropTarget(H.div null,
+      connectDragSource(H.i(className: "fa fa-bars", style: iconStyle))
+      H.div style: colorPickerStyle,
+        R ColorComponent,
+          key: 'color'
+          color: @lookupColor(item.value)
+          onChange: (color) => @handleColorChange(item.value, color)
+      H.span style: labelStyle ,
+        @renderLabel(item)
+    ))
+
+  renderReorderable: ->
+    ordered = _.sortBy(@props.categories, (item) =>
+      _.indexOf(@props.order, item.value)
+    )
+
+    items = _.map ordered, (category) =>
+      {value: category.value, color: @lookupColor(category.value), label: category.label }
+
     H.div null,
-      H.table style: { width: "auto" },
-        H.tbody null,
-          _.map @props.categories, (category) =>
-            H.tr key: category.value,
-              H.td key: "color",
+      R ReorderableListComponent,
+        items: items
+        onReorder: @handleReorder
+        renderItem: @renderItem
+        getItemId: (item) => item.value
+
+  render: ->
+    if @props.reorderable
+      @renderReorderable()
+    else
+      H.div null,
+        H.table style: { width: "auto" },
+          H.tbody null,
+            _.map @props.categories, (category) =>
+              H.tr key: category.value,
+                H.td key: "color",
                   R ColorComponent,
-                  color: @lookupColor(category.value)
-                  onChange: (color) => @handleColorChange(category.value, color)
-              H.td key: "label", style: { paddingLeft: 8 },
-                @renderLabel(category)
+                    color: @lookupColor(category.value)
+                    onChange: (color) => @handleColorChange(category.value, color)
+                H.td key: "label", style: { paddingLeft: 8 },
+                  @renderLabel(category)
+
 

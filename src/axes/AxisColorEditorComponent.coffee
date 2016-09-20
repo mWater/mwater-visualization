@@ -6,7 +6,6 @@ ColorMapComponent = require './ColorMapComponent'
 ColorPaletteCollectionComponent = require './ColorPaletteCollectionComponent'
 update = require 'update-object'
 AxisBuilder = require './AxisBuilder'
-ColorMapOrderEditorComponent = require './ColorMapOrderEditorComponent'
 AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
 d3 = require 'd3-scale'
 
@@ -38,8 +37,7 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
 
   componentWillReceiveProps: (nextProps) ->
     super(nextProps)
-    if not @state.mode == "customize"
-      @setState(mode: if nextProps.axis.colorMap or nextProps.colorMapOptional then "normal" else "palette")
+    @setState(mode: if nextProps.axis.colorMap or nextProps.colorMapOptional then "normal" else "palette")
 
   isLoadNeeded: (newProps, oldProps) ->
     return not _.isEqual(_.omit(newProps.axis, ["colorMap", "drawOrder"]), _.omit(oldProps.axis, ["colorMap", "drawOrder"]))
@@ -105,9 +103,6 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
   componentWillUnmount: ->
     @unmounted = true
 
-  handleCustomizePalette: =>
-    @setState(mode: "customize")
-
   handleSelectPalette: =>
     @setState(mode: "palette")
 
@@ -146,34 +141,20 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
             categories: @state.categories
             onCancel: @handleCancelCustomize
           }
-      if @state.mode == "customize"
-        H.div null,
-          R ColorMapComponent,
-            schema: @props.schema
-            dataSource: @props.dataSource
-            axis: @props.axis
-            onChange: @props.onChange
-            categories: @state.categories
-            key: "colorMap"
-          H.a style: { cursor: "pointer" }, onClick: @handleCancelCustomize, key: "cancel-customize", "Close"
-
       if @state.mode == "normal"
         H.div null,
           H.p null,
             H.a style: { cursor: "pointer" }, onClick: @handleSelectPalette, key: "select-palette", "Change color scheme"
           if @props.axis.colorMap
             H.div key: "selected-palette",
-              @renderPreview()
-              H.a 
-                style: { fontSize: 12, cursor: "pointer", paddingTop: 5, display: "inline-block", verticalAlign: "top" }
-                onClick: @handleCustomizePalette
-                key: "customize-palette", 
-                  "Customize these colors"
-
-          if drawOrder and @props.colorMapReorderable
-            R ColorMapOrderEditorComponent,
-              colorMap: @props.axis.colorMap
-              order: drawOrder
-              categories: @state.categories
-              defaultColor: @props.defaultColor
-              onChange: @handleDrawOrderChange
+              H.div null,
+                R ColorMapComponent,
+                  schema: @props.schema
+                  dataSource: @props.dataSource
+                  axis: @props.axis
+                  onChange: @props.onChange
+                  categories: @state.categories
+                  key: "colorMap"
+                  reorderable: drawOrder and @props.colorMapReorderable
+                  order: drawOrder
+                  onOrderChange: @handleDrawOrderChange
