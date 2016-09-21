@@ -12,6 +12,7 @@ Widget = require './Widget'
 # imageUrl: arbitrary url of image if using url
 # uid: uid of image if on server
 # expr: image or imagelist expression if using expression
+# caption: string caption
 module.exports = class ImageWidget extends Widget
   # Creates a React element that is a view of the widget 
   # options:

@@ -31,6 +31,93 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
     singleRowTable: React.PropTypes.string  # Table that is filtered to have one row
 
+  # Override to determine if a load is needed. Not called on mounting
+  isLoadNeeded: (newProps, oldProps) ->
+    return newProps.design.expr and (not _.isEqual(newProps.design.expr, oldProps.design.expr) or not _.isEqual(newProps.filters, oldProps.filters))
+
+  # Call callback with state changes
+  load: (props, prevProps, callback) -> 
+    # Get data
+    props.widgetDataSource.getData(props.design, props.filters, (error, data) =>
+      callback(error: error, data: data )
+    )
+    
+  handleStartEditing: =>
+    @refs.editor.edit()
+
+  # Render a link to start editing
+  renderEditLink: ->
+    H.div style: { position: "absolute", bottom: @props.height / 2, left: 0, right: 0, textAlign: "center" },
+      H.a className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Edit"
+
+  renderEditor: ->
+    R ImageWidgetDesignComponent,
+      ref: "editor"
+      key: "editor"
+      design: @props.design
+      onDesignChange: @props.onDesignChange
+      schema: @props.schema
+      dataSource: @props.dataSource
+
+  renderExpression: ->
+    if @state.loading
+      H.span null, "Loading"
+    else if @state.data
+      # Make into array if not
+      if not _.isArray(@state.data)
+        R ImagelistCarouselComponent,
+          widgetDataSource: @props.widgetDataSource
+          imagelist: [@state.data]
+          height: @props.height
+      else
+        R ImagelistCarouselComponent,
+          widgetDataSource: @props.widgetDataSource
+          imagelist: @state.data
+          height: @props.height
+
+  renderContent: ->
+    if @props.design.imageUrl or @props.design.uid
+      # Determine approximate height
+      imageHeight = null
+
+      if @props.height <= 160
+        imageHeight = 160
+      else if @props.height <= 320
+        imageHeight = 320
+      else if @props.height <= 640
+        imageHeight = 640
+      else if @props.height <= 1280
+        imageHeight = 1280
+
+      source = @props.design.imageUrl or @props.widgetDataSource.getImageUrl(@props.design.uid, imageHeight)
+      H.img style: { maxWidth: "100%", maxHeight: "100%"}, src: source
+    else
+      @renderExpression()
+
+  render: ->
+    dropdownItems = []
+    if @props.onDesignChange?
+      dropdownItems.push({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
+
+    R DropdownWidgetComponent, 
+      width: @props.width
+      height: @props.height
+      dropdownItems: dropdownItems,
+        @renderEditor()
+        if not @props.design.imageUrl and not @props.design.expr and not @props.design.uid and @props.onDesignChange
+          @renderEditLink()
+        else
+          H.div style: { position: "relative", width: @props.width, height: @props.height, textAlign: "center" },
+            @renderContent()
+
+  
+class ImageWidgetDesignComponent extends React.Component
+  @propTypes: 
+    design: React.PropTypes.object.isRequired
+    onDesignChange: React.PropTypes.func # Called with new design. null/undefined for readonly
+    schema: React.PropTypes.object.isRequired
+    dataSource: React.PropTypes.object.isRequired # Data source to use for widget
+
   constructor: (props) ->
     super(props)
 
@@ -48,26 +135,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
       currentTab: "url"
     }
 
-  # Override to determine if a load is needed. Not called on mounting
-  isLoadNeeded: (newProps, oldProps) ->
-    return newProps.design.expr and (not _.isEqual(newProps.design.expr, oldProps.design.expr) or not _.isEqual(newProps.filters, oldProps.filters))
-
-  # Call callback with state changes
-  load: (props, prevProps, callback) -> 
-    # Get data
-    props.widgetDataSource.getData(props.design, props.filters, (error, data) =>
-      callback(error: error, data: data )
-    )
-    
-  setCurrentTab: ->
-    tab = "upload"
-
-    if @props.design.url then tab = "url"
-    if @props.design.expr then tab = "expression"
-
-    @setState(currentTab: tab)
-
-  handleStartEditing: =>
+  edit: =>
     @setCurrentTab()
     state =
       editing: true
@@ -78,14 +146,32 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
     @setState(state)
 
+  setCurrentTab: ->
+    tab = "upload"
+
+    if @props.design.url then tab = "url"
+    if @props.design.expr then tab = "expression"
+
+    @setState(currentTab: tab)
+
+  handleUrlChange: (e) =>
+    @setState(imageUrl: e.target.value, uid: null, expr: null)
+
+  renderUploadEditor: ->
+    R ImageUploaderComponent,
+      dataSource: @props.dataSource
+      onUpload: @handleFileUpload
+      uid: @props.design.uid
+
+  handleFileUpload: (uid) =>
+    @setState(imageUrl: null, uid: uid, expr: null)
+
+  handleExpressionChange: (expr) =>
+    @setState(imageUrl: null, uid: null, expr: expr)
+
   handleTableChange: (table) => @setState(table: table)
 
-  # Render a link to start editing
-  renderEditLink: ->
-    H.div style: { position: "absolute", bottom: @props.height / 2, left: 0, right: 0, textAlign: "center" },
-      H.a className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Edit"
-
-  onSave: () =>
+  handleSave: () =>
     @setState(editing: false)
     updates =
       imageUrl: @state.imageUrl
@@ -93,54 +179,10 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
       expr: @state.expr
 
     @props.onDesignChange(_.extend({}, @props.design, updates))
-    return
 
-  onCancel: () =>
+  handleCancel: () =>
     @setCurrentTab()
     @setState(editing: false, imageUrl: null, uid: null, expr: null, table: null, files: null, uploading: false)
-
-  renderEditor: ->
-    if not @state.editing
-      return null
-
-    content = R TabbedComponent,
-      tabs: [
-        { id: "upload", label: "Upload", elem: @renderUploadEditor() }
-        { id: "expression", label: "From Data", elem: @renderExpressionEditor() }
-        { id: "url", label: "From URL", elem: @renderUrlEditor() }
-      ]
-      initialTabId: @state.currentTab
-
-    footer =
-      H.div null,
-        H.button(key: "save", type: "button", className: "btn btn-primary", onClick: @onSave, "Save")
-        H.button(key: "cancel", type: "button", className: "btn btn-default", onClick: @onCancel, "Cancel")
-
-    return R ModalPopupComponent,
-      header: if @props.design.url or @props.design.expr or @props.design.uid then "Edit Image" else "Insert Image"
-      onClose: @handleEndEditing
-      scrollDisabled: true
-      footer: footer,
-      content
-
-  renderUrlEditor: ->
-    H.div className: "form-group",
-      H.label null, "URL of image"
-      H.input type: "text", className: "form-control", value: @state.imageUrl or "", onChange: @onUrlChange
-      H.p className: "help-block",
-        'e.g. http://somesite.com/image.jpg'
-
-  onUrlChange: (e) =>
-    @setState(imageUrl: e.target.value, uid: null, expr: null)
-
-  renderUploadEditor: ->
-    R ImageUploaderComponent,
-      dataSource: @props.dataSource
-      onUpload: @onFileUpload
-      uid: @props.design.uid
-
-  onFileUpload: (uid) =>
-    @setState(imageUrl: null, uid: uid, expr: null)
 
   renderExpressionEditor: ->
     H.div className: "form-group",
@@ -166,58 +208,32 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
             aggrStatuses: ["individual", "literal"]
             onChange: @handleExpressionChange
 
-  handleExpressionChange: (expr) =>
-    @setState(imageUrl: null, uid: null, expr: expr)
-
-  renderContent: ->
-    if @props.design.imageUrl or @props.design.uid
-      # Determine approximate height
-      imageHeight = null
-
-      if @props.height <= 160
-        imageHeight = 160
-      else if @props.height <= 320
-        imageHeight = 320
-      else if @props.height <= 640
-        imageHeight = 640
-      else if @props.height <= 1280
-        imageHeight = 1280
-
-      source = @props.design.imageUrl or @props.widgetDataSource.getImageUrl(@props.design.uid, imageHeight)
-      H.img style: { maxWidth: "100%", maxHeight: "100%"}, src: source
-    else
-      @renderExpression()
-
-  renderExpression: ->
-    if @state.loading
-      H.span null, "Loading"
-    else if @state.data
-      # Make into array if not
-      if not _.isArray(@state.data)
-        R ImagelistCarouselComponent,
-          widgetDataSource: @props.widgetDataSource
-          imagelist: [@state.data]
-          height: @props.height
-      else
-        R ImagelistCarouselComponent,
-          widgetDataSource: @props.widgetDataSource
-          imagelist: @state.data
-          height: @props.height
+  renderUrlEditor: ->
+    H.div className: "form-group",
+      H.label null, "URL of image"
+      H.input type: "text", className: "form-control", value: @state.imageUrl or "", onChange: @handleUrlChange
+      H.p className: "help-block",
+        'e.g. http://somesite.com/image.jpg'
 
   render: ->
-    dropdownItems = []
-    if @props.onDesignChange?
-      dropdownItems.push({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
+    if not @state.editing
+      return null
 
-    R DropdownWidgetComponent, 
-      width: @props.width
-      height: @props.height
-      dropdownItems: dropdownItems,
-        @renderEditor()
-        if not @props.design.imageUrl and not @props.design.expr and not @props.design.uid and @props.onDesignChange
-          @renderEditLink()
-        else
-          H.div style: { position: "relative", width: @props.width, height: @props.height, textAlign: "center" },
-            @renderContent()
+    content = R TabbedComponent,
+      tabs: [
+        { id: "upload", label: "Upload", elem: @renderUploadEditor() }
+        { id: "expression", label: "From Data", elem: @renderExpressionEditor() }
+        { id: "url", label: "From URL", elem: @renderUrlEditor() }
+      ]
+      initialTabId: @state.currentTab
 
-          
+    footer =
+      H.div null,
+        H.button(key: "save", type: "button", className: "btn btn-primary", onClick: @handleSave, "Save")
+        H.button(key: "cancel", type: "button", className: "btn btn-default", onClick: @handleCancel, "Cancel")
+
+    return R ModalPopupComponent,
+      header: "Image"
+      scrollDisabled: true
+      footer: footer,
+        content
