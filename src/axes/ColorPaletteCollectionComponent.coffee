@@ -19,7 +19,7 @@ module.exports = class ColorPaletteCollectionComponent extends React.Component
 
   @generatePolyLinearScheme: (startColor, midColor, endColor, number) ->
     color = d3.scaleLinear().domain([-parseInt(number/2),0,parseInt(number/2)]).range([startColor, midColor, endColor])
-    colors = (color i for i in [(-parseInt(number/2))..parseInt((number/2))])
+    colors = (color i for i in [(-parseInt(number/2))..(parseInt(number/2))])
 
     _.map colors, (rgb) =>
       rgbArray = rgb.substring(4,rgb.length-1).split(',').map((item) -> parseInt(item))
@@ -41,8 +41,7 @@ module.exports = class ColorPaletteCollectionComponent extends React.Component
     else
       config = _.find(ColorPaletteCollectionComponent._collection, (item) -> item.type != "static" )
 
-    console.log config
-    scheme = ColorPaletteCollectionComponent.generateColorSet(config, categories.length)
+    scheme = ColorPaletteCollectionComponent.generateColorSet(config, categories.length - 1)
 
     _.map categories, (category, i) ->
       {
@@ -111,7 +110,7 @@ module.exports = class ColorPaletteCollectionComponent extends React.Component
 
   onPaletteSelected: (index) =>
     #generate color map
-    scheme = ColorPaletteCollectionComponent.generateColorSet(ColorPaletteCollectionComponent._collection[index], @props.categories.length)
+    scheme = ColorPaletteCollectionComponent.generateColorSet(ColorPaletteCollectionComponent._collection[index], @props.categories.length - 1)
 
     colorMap = _.map @props.categories, (category, i) ->
       {
