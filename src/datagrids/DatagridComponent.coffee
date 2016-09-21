@@ -126,7 +126,7 @@ module.exports = class DatagridComponent extends React.Component
 
     hasQuickfilters = @props.design.quickfilters?[0]?
 
-    return H.div style: { width: "100%", height: "100%", position: "relative" },
+    return H.div style: { width: "100%", height: "100%", position: "relative", paddingTop: (if hasQuickfilters then 90 else 40) },
       @renderTitleBar()
       @renderQuickfilter()
 
@@ -134,26 +134,25 @@ module.exports = class DatagridComponent extends React.Component
 
       # Do not render if no table
       if @props.design.table
-        H.div style: { position: "absolute", top: (if hasQuickfilters then 90 else 40), left: 0, right: 0, bottom: 0 },
-          R AutoSizeComponent, injectWidth: true, injectHeight: true,
-            (size) =>
-              # Clean before displaying
-              design = new DatagridUtils(@props.schema).cleanDesign(@props.design)
-              if not new DatagridUtils(@props.schema).validateDesign(design)
-                R DatagridViewComponent, {
-                  width: size.width
-                  height: size.height
-                  pageSize: 100
-                  schema: @props.schema
-                  dataSource: @props.dataSource
-                  design: @props.design
-                  filters: filters
-                  onDesignChange: @props.onDesignChange
-                  onRowDoubleClick: @props.onRowDoubleClick
-                  canEditCell: @props.canEditCell
-                  updateCell: @props.updateCell
-                }
-              else
-                H.div style: { textAlign: "center", marginTop: size.height / 2 }, 
-                  H.a onClick: @handleEdit,
-                    "Click to configure"
+        R AutoSizeComponent, injectWidth: true, injectHeight: true,
+          (size) =>
+            # Clean before displaying
+            design = new DatagridUtils(@props.schema).cleanDesign(@props.design)
+            if not new DatagridUtils(@props.schema).validateDesign(design)
+              R DatagridViewComponent, {
+                width: size.width
+                height: size.height
+                pageSize: 100
+                schema: @props.schema
+                dataSource: @props.dataSource
+                design: @props.design
+                filters: filters
+                onDesignChange: @props.onDesignChange
+                onRowDoubleClick: @props.onRowDoubleClick
+                canEditCell: @props.canEditCell
+                updateCell: @props.updateCell
+              }
+            else
+              H.div style: { textAlign: "center", marginTop: size.height / 2 }, 
+                H.a onClick: @handleEdit,
+                  "Click to configure"
