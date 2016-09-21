@@ -32,6 +32,9 @@ module.exports = class DecoratedBlockComponent extends React.Component
     document.removeEventListener("mouseup", @handleMouseUp)
 
   handleAspectMouseDown: (ev) =>
+    # Prevent html5 drag
+    ev.preventDefault()
+
     # Get height of overall block
     @setState(aspectDragY: ev.currentTarget.parentElement.offsetHeight, initialAspectDragY: ev.currentTarget.parentElement.offsetHeight)
 

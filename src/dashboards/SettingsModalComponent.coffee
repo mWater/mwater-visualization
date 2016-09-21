@@ -31,9 +31,6 @@ module.exports = class SettingsModalComponent extends React.Component
 
   handleDesignChange: (design) => @setState(design: design)
 
-  handleStyleChange: (ev) =>
-    @handleDesignChange(_.extend({}, @state.design, { style: ev.target.value or null }))
-
   render: ->
     # Don't show if not editing
     if not @state.design
@@ -49,10 +46,3 @@ module.exports = class SettingsModalComponent extends React.Component
           schema: @props.schema
           dataSource: @props.dataSource
         }
-        H.br()
-        H.div className: "form-group",
-          H.label null, "Style"
-          H.select className: "form-control", value: @state.design.style or "", onChange: @handleStyleChange,
-            H.option key: "none", value: "", "Default"
-            H.option key: "greybg", value: "greybg", "White on Grey"
-            H.option key: "medium", value: "medium", "Medium"

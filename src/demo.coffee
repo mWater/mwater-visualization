@@ -99,7 +99,7 @@ class MWaterDirectDashboardPane extends React.Component
     @state = {
       # design: { items: {}, layout: "grid" } # dashboardDesign
       # design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" } # dashboardDesign
-      design: design
+      design: testMedium
       # design: imageWidgetDashboardDesign
       # design: dashboardDesign
       extraTables: [] #['responses:e24f0a0ec11643cab3c21c07de2f6889']
@@ -3154,4 +3154,117 @@ autoBoundsMap = {
     "s": -3.424320686307251
   },
   autoBounds: true
+}
+
+
+testMedium = {
+  "items": {
+    "id": "root",
+    "type": "root",
+    "blocks": [
+      {
+        "type": "widget",
+        "widgetType": "Text",
+        "design": {
+          "style": "title",
+          "items": [
+            "The Water Situation"
+          ]
+        },
+        "id": "2fb6f7f9-212f-4488-abb6-9662eacc879f"
+      },
+      {
+        "id": "bf69f1c3-aa74-4f53-b3d1-878a5cc2c71f",
+        "type": "horizontal",
+        "blocks": [
+          {
+            "type": "widget",
+            "widgetType": "Text",
+            "design": {
+              "items": [
+                {
+                  "type": "element",
+                  "tag": "h1",
+                  "items": [
+                    "How it is"
+                  ]
+                },
+                "The new Sustainable Development Goal target for safely managed drinking water raises the bar from simply providing access to a water source to proving that the water is safe to drink and is being managed to prevent contamination. ",
+                {
+                  "type": "element",
+                  "tag": "h2",
+                  "items": [
+                    "What's new"
+                  ]
+                },
+                {
+                  "type": "element",
+                  "tag": "div",
+                  "items": [
+                    "The water quality crisis is a significant new challenge, with studies indicating that up to 2 billion people drink contaminated water every day. Recent evidence from nationally representative surveys by UNICEF indicates that water stored in households is at the greatest risk and over 80% of samples tested contain fecal bacteria. "
+                  ]
+                },
+                {
+                  "type": "element",
+                  "tag": "div",
+                  "items": [
+                    "Improving water safety means more than just testing; local water managers must be empowered to identify and control risks, monitor operations, and respond quickly to changing conditions such as drought or contamination events."
+                  ]
+                }
+              ]
+            },
+            "id": "09c8981b-3869-410d-bd90-4a5a012314a8"
+          },
+          {
+            "type": "spacer",
+            "aspectRatio": 1.4,
+            "id": "ba931d1d-3e29-47d5-b264-04ca5e0f10da"
+          }
+        ],
+        "weights": [
+          1.6406417112299465,
+          0.3593582887700535
+        ]
+      },
+      {
+        "id": "d640a32c-2ed6-4a3e-b746-07dcc2c0b1cc",
+        "type": "horizontal",
+        "blocks": [
+          {
+            "type": "widget",
+            "widgetType": "Text",
+            "design": {
+              "items": [
+                {
+                  "type": "element",
+                  "tag": "span",
+                  "items": [
+                    "Managing digital data and implementing mobile data collection, and how they are now scaling globally. The Water Trust and the Millennium Water Alliance will also talk about the real world issues faced every day in the process of using mWater: planning a digital M&E strategy, training staff to move from paper to mobiles, im"
+                  ]
+                }
+              ]
+            },
+            "id": "8eabe8c1-e23b-4d89-8179-a5ec84f9d538"
+          },
+          {
+            "type": "widget",
+            "aspectRatio": 1.4,
+            "widgetType": "Image",
+            "design": {
+              "imageUrl": "https://cdn-images-1.medium.com/max/600/1*7o1w_pkB_jHoKSUeYotY1Q.jpeg",
+              "uid": null,
+              "expr": null
+            },
+            "id": "2412f938-7b5e-4ab4-984d-5e04beca5956"
+          }
+        ],
+        "weights": [
+          1.1358288770053475,
+          0.8641711229946524
+        ]
+      }
+    ]
+  },
+  "layout": "blocks",
+  "style": "default"
 }

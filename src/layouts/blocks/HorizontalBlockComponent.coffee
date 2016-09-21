@@ -30,6 +30,9 @@ module.exports = class HorizontalBlockComponent extends React.Component
     document.removeEventListener("mouseup", @handleMouseUp)
     
   handleMouseDown: (index, ev) =>
+    # Prevent html5 drag
+    ev.preventDefault()
+
     # Get sizes of two blocks
     @setState(dragIndex: index, leftSize: @refs["block#{index}"].offsetWidth, rightSize: @refs["block#{index + 1}"].offsetWidth)
 

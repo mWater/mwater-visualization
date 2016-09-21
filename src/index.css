@@ -181,80 +181,7 @@
   min-width: 50px;
 }
 
-/* DEFAULT */
-.mwater-visualization-block-parent-outer-default {
-}
 
-.mwater-visualization-block-parent-inner-default {
-  margin-left: auto;
-  margin-right: auto;
-  padding: 30px;
-  min-width: 1000px;
-  max-width: 1800px;
-}
-
-.mwater-visualization-block-parent-outer-default .mwater-visualization-block {
-  padding-left: 15px;
-  padding-right: 15px;
-  padding-bottom: 15px;
-}
-
-/* GREYBG */
-.mwater-visualization-block-parent-outer-greybg {
-  background-color: #DDD;
-}
-
-.mwater-visualization-block-parent-inner-greybg {
-  margin-left: auto;
-  margin-right: auto;
-  padding: 15px;
-  min-width: 1000px;
-  max-width: 1800px;
-}
-
-.mwater-visualization-block-parent-outer-greybg .mwater-visualization-block {
-  margin: 9px;
-  padding: 8px;
-  border-radius: 5px;
-  background-color: white;
-}
-
-.mwater-visualization-block-parent-outer-greybg .mwater-visualization-block-spacer {
-  background-color: #DDD;
-}
-
-/* MEDIUM */
-.mwater-visualization-block-parent-outer-medium {
-}
-
-.mwater-visualization-block-parent-inner-medium {
-  padding: 15px;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 1000px;
-}
-
-.mwater-visualization-block-parent-outer-medium .mwater-visualization-block {
-  padding-left: 15px;
-  padding-right: 15px;
-  padding-bottom: 15px;
-}
-
-.mwater-visualization-block-parent-outer-medium .mwater-visualization-text-widget-style-default {
-  font-size: 20px;
-}
-
-@media only screen and (max-width: 1000px) {
-  /* Fill screen when small */
-  .mwater-visualization-block-parent-outer-medium.mwater-visualization-block-viewing .mwater-visualization-horizontal-block-item {
-    width: 100% !important;
-  }
-
-  /* Hide spacers when small */
-  .mwater-visualization-block-parent-outer-medium.mwater-visualization-block-viewing .mwater-visualization-block-spacer {
-    display: none;
-  }
-}
 
 
 /* Block splitters */
@@ -271,6 +198,7 @@
 .mwater-visualization-horizontal-block-splitter.active {
   background-color: #38D;
 }
+
 
 
 
@@ -332,78 +260,6 @@
   background-color: #2485dd;
 }
 
-.mwater-visualization-text-widget-style-default {
-  font-size: 15px;
-}
-
-.mwater-visualization-block-parent-medium .mwater-visualization-text-widget-style-default {
-  color: rgba(0, 0, 0, 0.8);
-  font-family: medium-content-serif-font, Georgia, Cambria, "Times New Roman", Times, serif;
-  font-size: 18px;
-  font-style: normal;
-  font-weight: normal;
-  line-height: 33px;
-  word-wrap: break-word;
- -webkit-font-smoothing: antialiased;
-}
-
-
-/* Text styles */
-.mwater-visualization-text-widget-style-default h1 {
-  font-size: initial;
-  margin: 0px;
-  font-family: inherit;
-  font-weight: normal;
-  line-height: 1;
-  color: inherit;
-}
-
-.mwater-visualization-text-widget-style-default h2 {
-  font-size: initial;
-  margin: 0px;
-  font-family: inherit;
-  font-weight: normal;
-  line-height: 1;
-  color: inherit;
-}
-
-.mwater-visualization-text-widget-style-default h3 {
-  font-size: initial;
-  margin: 0px;
-  font-family: inherit;
-  font-weight: normal;
-  line-height: 1;
-  color: inherit;
-}
-
-.mwater-visualization-text-widget-style-default h1 {
-  font-size: 19px;
-}
-
-.mwater-visualization-text-widget-style-default h2 {
-  font-size: 17px;
-}
-
-.mwater-visualization-text-widget-style-default h3 {
-  font-size: 15px;
-  font-weight: bold;
-}
-
-.mwater-visualization-text-widget-style-title {
-  font-size: 25px;
-}
-
-/* For InlineExprEditorComponent */
-.mwater-visualization-text-widget-expr {
-  cursor: pointer;
-  border-radius: 2px;
-  padding-left: 2px;
-  padding-right: 2px;
-  background-color: rgba(212, 235, 255, 0.8);
-}
-
-
-
 .dropzone {
   width: 100%;
   padding: 80px 40px;
@@ -429,3 +285,5 @@
     vertical-align: middle;
     display: inline-block;
 }
+
+@import "./layout-styles.css";
