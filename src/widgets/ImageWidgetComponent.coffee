@@ -107,9 +107,10 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
         if not @props.design.imageUrl and not @props.design.expr and not @props.design.uid and @props.onDesignChange
           @renderEditLink()
         else
-          H.div style: { position: "relative", width: @props.width, height: @props.height, textAlign: "center" },
-            @renderContent()
-
+          H.div className: "mwater-visualization-image-widget", style: { position: "relative", width: @props.width, height: @props.height },
+            H.div className: "image",
+              @renderContent()
+            H.div className: "caption", @props.design.caption
   
 class ImageWidgetDesignComponent extends React.Component
   @propTypes: 
@@ -132,6 +133,7 @@ class ImageWidgetDesignComponent extends React.Component
       uid: null
       files: null
       uploading: false
+      caption: null
       currentTab: "url"
     }
 
@@ -143,6 +145,7 @@ class ImageWidgetDesignComponent extends React.Component
       uid: @props.design.uid
       expr: @props.design.expr
       table: @props.design.expr?.table
+      caption: @props.design.caption
 
     @setState(state)
 
@@ -170,6 +173,7 @@ class ImageWidgetDesignComponent extends React.Component
     @setState(imageUrl: null, uid: null, expr: expr)
 
   handleTableChange: (table) => @setState(table: table)
+  handleCaptionChange: (ev) => @setState(caption: ev.target.value)
 
   handleSave: () =>
     @setState(editing: false)
@@ -177,6 +181,7 @@ class ImageWidgetDesignComponent extends React.Component
       imageUrl: @state.imageUrl
       uid: @state.uid
       expr: @state.expr
+      caption: @state.caption
 
     @props.onDesignChange(_.extend({}, @props.design, updates))
 
@@ -219,13 +224,18 @@ class ImageWidgetDesignComponent extends React.Component
     if not @state.editing
       return null
 
-    content = R TabbedComponent,
-      tabs: [
-        { id: "upload", label: "Upload", elem: @renderUploadEditor() }
-        { id: "expression", label: "From Data", elem: @renderExpressionEditor() }
-        { id: "url", label: "From URL", elem: @renderUrlEditor() }
-      ]
-      initialTabId: @state.currentTab
+    content = H.div null,
+      H.div className: "form-group",
+        H.label null, "Caption"
+        H.input type: "text", className: "form-control", value: @state.caption or "", onChange: @handleCaptionChange, placeholder: "Optional caption to display below image"
+
+      R TabbedComponent,
+        tabs: [
+          { id: "upload", label: "Upload", elem: @renderUploadEditor() }
+          { id: "expression", label: "From Data", elem: @renderExpressionEditor() }
+          { id: "url", label: "From URL", elem: @renderUrlEditor() }
+        ]
+        initialTabId: @state.currentTab
 
     footer =
       H.div null,

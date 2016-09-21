@@ -49,6 +49,26 @@
   font-weight: bold;
 }
 
+.mwater-visualization-image-widget {
+  display: flex;
+  flex-flow: column;
+  text-align: center;
+}
+
+.mwater-visualization-image-widget .image {
+  flex: 1;
+  overflow: auto;
+}
+
+.mwater-visualization-image-widget .caption {
+  font-family: "Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Arial,sans-serif;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 1.4;
+  color: rgba(0,0,0,.6);
+  margin-top: 10px;
+}
+
 .mwater-visualization-page-break {
   width: 100%;
   border-bottom: dashed 1px #AAA;

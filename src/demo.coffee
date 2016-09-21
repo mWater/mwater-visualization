@@ -34,8 +34,8 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
@@ -3233,7 +3233,8 @@ testMedium = {
             "design": {
               "imageUrl": "https://cdn-images-1.medium.com/max/600/1*7o1w_pkB_jHoKSUeYotY1Q.jpeg",
               "uid": null,
-              "expr": null
+              "expr": null,
+              caption: "Some serious stuff here"
             },
             "id": "2412f938-7b5e-4ab4-984d-5e04beca5956"
           }
