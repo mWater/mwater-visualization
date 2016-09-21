@@ -5,6 +5,11 @@ R = React.createElement
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
+DatagridViewComponent = require './DatagridViewComponent'
+DatagridDesignerComponent = require './DatagridDesignerComponent'
+DatagridUtils = require './DatagridUtils'
+QuickfiltersComponent = require '../quickfilter/QuickfiltersComponent'
+QuickfilterCompiler = require '../quickfilter/QuickfilterCompiler'
 
 # Datagrid with decorations 
 # See README.md for description of datagrid format
@@ -37,6 +42,7 @@ module.exports = class DatagridComponent extends React.Component
     @state = {
       editingDesign: null   # Design being edited
       cellEditingEnabled: false  # True if cells can be edited directly
+      quickfiltersValues: null
     }
 
   handleCellEditingToggle: =>
@@ -46,9 +52,12 @@ module.exports = class DatagridComponent extends React.Component
       if confirm("Turn on cell editing? This is allow you to edit the live data and is an advanced feature.")
         @setState(cellEditingEnabled: true)
 
+  handleEdit: =>
+    @setState(editingDesign: @props.design)
+
   # Toggle to allow cell editing
   renderCellEdit: ->
-    if not @props.canEditCell
+    if not @props.canEditCell or not @props.onDesignChange?
       return null
 
     label = [
@@ -63,14 +72,14 @@ module.exports = class DatagridComponent extends React.Component
       onClick: @handleCellEditingToggle,
         label
 
-  renderEditButton: (design) ->
+  renderEditButton: ->
     if not @props.onDesignChange
       return null
 
     H.button 
       type: "button"
       className: "btn btn-primary"
-      onClick: (=> @setState(editingDesign: design)),
+      onClick: @handleEdit,
         H.span className: "glyphicon glyphicon-cog"
         " "
         "Settings"
@@ -80,7 +89,18 @@ module.exports = class DatagridComponent extends React.Component
       H.div style: { float: "right" },
         @renderCellEdit()
         @renderEditButton()
+        @props.extraTitleButtonsElem
       @props.titleElem
+
+  renderQuickfilter: ->
+    H.div style: { position: "absolute", top: 40, left: 0, right: 0, height: 50, padding: 4 },    
+      R QuickfiltersComponent, {
+        design: @props.design.quickfilters
+        schema: @props.schema
+        dataSource: @props.dataSource
+        values: @state.quickfiltersValues
+        onValuesChange: (values) => @setState(quickfiltersValues: values)
+      }
 
   # Renders the editor modal
   renderEditor:  ->
@@ -95,40 +115,45 @@ module.exports = class DatagridComponent extends React.Component
       onCancel: => @setState(editingDesign: null)
       size: "large",
         R DatagridDesignerComponent,
-          schema: config.schema
-          dataSource: config.dataSource
+          schema: @props.schema
+          dataSource: @props.dataSource
           design: @state.editingDesign
           onDesignChange: (design) => @setState(editingDesign: design)
 
   render: ->
+    # Compile quickfilters
+    filters = new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues)
+
+    hasQuickfilters = @props.design.quickfilters?[0]?
+
     return H.div style: { width: "100%", height: "100%", position: "relative" },
       @renderTitleBar()
-      @renderEditor(config)
-      H.div style: { height: 40, padding: 4 },
-        H.div style: { float: "right" },
-          if not readonly
-            @renderCellEdit()
-          @renderExtraTitleButtonsElem()
-          @renderDownload()
-          if not readonly
-            @renderEditButton(design)
-        @renderTitleElem()
+      @renderQuickfilter()
+
+      @renderEditor()
 
       # Do not render if no table
-      if design.table
-        H.div style: { position: "absolute", top: 40, left: 0, right: 0, bottom: 0 },
+      if @props.design.table
+        H.div style: { position: "absolute", top: (if hasQuickfilters then 90 else 40), left: 0, right: 0, bottom: 0 },
           R AutoSizeComponent, injectWidth: true, injectHeight: true,
             (size) =>
-              R DatagridComponent, {
-                width: size.width
-                height: size.height
-                pageSize: 100
-                schema: @props.schema
-                dataSource: @props.dataSource
-                design: design
-                onDesignChange: @props.onDesignChange
-                onRowDoubleClick: @props.onRowDoubleClick
-                canEditCell: @props.canEditCell
-                updateCell: @props.updateCell
-              }
-
+              # Clean before displaying
+              design = new DatagridUtils(@props.schema).cleanDesign(@props.design)
+              if not new DatagridUtils(@props.schema).validateDesign(design)
+                R DatagridViewComponent, {
+                  width: size.width
+                  height: size.height
+                  pageSize: 100
+                  schema: @props.schema
+                  dataSource: @props.dataSource
+                  design: @props.design
+                  filters: filters
+                  onDesignChange: @props.onDesignChange
+                  onRowDoubleClick: @props.onRowDoubleClick
+                  canEditCell: @props.canEditCell
+                  updateCell: @props.updateCell
+                }
+              else
+                H.div style: { textAlign: "center", marginTop: size.height / 2 }, 
+                  H.a onClick: @handleEdit,
+                    "Click to configure"

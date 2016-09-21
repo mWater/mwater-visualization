@@ -9,6 +9,7 @@ ExprComponent = require('mwater-expressions-ui').ExprComponent
 FilterExprComponent = require('mwater-expressions-ui').FilterExprComponent
 OrderBysDesignerComponent = require './OrderBysDesignerComponent'
 ReactReorderable = require 'react-reorderable'
+QuickfiltersDesignComponent = require '../quickfilter/QuickfiltersDesignComponent'
 
 TableSelectComponent = require('../TableSelectComponent')
 
@@ -86,16 +87,11 @@ module.exports = class DatagridDesignerComponent extends React.Component
           label: "Quickfilters"
           elem: H.div style: { marginBottom: 200 },
             R QuickfiltersDesignComponent, {
-              design: @state.design.quickfilters
-              onDesignChange: (design) => @handleDesignChange(update(@state.design, { quickfilters: { $set: design } }))
+              design: @props.design.quickfilters
+              onDesignChange: (design) => @props.onDesignChange(update(@props.design, { quickfilters: { $set: design } }))
               schema: @props.schema
               dataSource: @props.dataSource
             }
-            R(OrderBysDesignerComponent, {
-              table: @props.design.table
-              orderBys: @props.design.orderBys
-              onChange: @handleOrderBysChange
-            }) 
         }
       ]
 

@@ -24,6 +24,11 @@ module.exports = class DatagridComponent extends React.Component
     design: React.PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
     onDesignChange: React.PropTypes.func           # Called when design changes
 
+    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
+      table: React.PropTypes.string.isRequired    # id table to filter
+      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    }))
+
     # Check if cell is editable
     # If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
     canEditCell: React.PropTypes.func             
@@ -48,23 +53,23 @@ module.exports = class DatagridComponent extends React.Component
     }
 
   componentWillReceiveProps: (nextProps) ->
-    # If design changed, delete all rows
+    # If design or filters changed, delete all rows
     # TODO won't this reload on column resize?
-    if not _.isEqual(nextProps.design, @props.design)
+    if not _.isEqual(nextProps.design, @props.design) or not _.isEqual(nextProps.filters, @props.filters)
       @setState(rows: [], entirelyLoaded: false)
 
   # Load more rows starting at a particular offset and with a specific design. Call callback with new rows
-  performLoad: (loadState, callback) =>
+  performLoad: (design, offset, limit, filters, callback) =>
+    queryBuilder = new DatagridQueryBuilder(@props.schema)
+    
     # Create query to get the page of rows at the specific offset
-    query = new DatagridQueryBuilder(@props.schema).createQuery(loadState.design, { offset: loadState.offset, limit: loadState.pageSize })
+    query = queryBuilder.createQuery(design, { 
+      offset: offset
+      limit: limit
+      filters: filters
+    })
 
-    @props.dataSource.performQuery(query, (error, rows) =>
-      if error
-        # TODO what to do?
-        throw error
-
-      callback(rows)      
-      )
+    @props.dataSource.performQuery(query, callback)
 
   # Loads more rows because the placeholder last row has been rendered
   loadMoreRows: ->
@@ -72,7 +77,8 @@ module.exports = class DatagridComponent extends React.Component
     loadState = {
       design: @props.design
       offset: @state.rows.length
-      pageSize: @props.pageSize
+      limit: @props.pageSize
+      filters: @props.filters
     }
 
     # If already loading what we want, return
@@ -83,7 +89,12 @@ module.exports = class DatagridComponent extends React.Component
     @loadState = loadState
 
     # Perform the actual load
-    @performLoad(loadState, (newRows) =>
+    @performLoad(loadState.design, loadState.offset, loadState.limit, loadState.filters, (error, newRows) =>
+      if error
+        console.error error
+        alert("Error loading data")
+        return
+
       # Check that the required load state has not changed
       if _.isEqual(loadState, @loadState)
         # Load is complete
@@ -99,14 +110,12 @@ module.exports = class DatagridComponent extends React.Component
     # Create query to get a single row
     query = new DatagridQueryBuilder(@props.schema).createQuery(@props.design, { offset: rowIndex, limit: 1 })
 
-    @props.dataSource.performQuery(query, (error, rows) =>
-      if error
-        # TODO what to do?
-        throw error
-
-      if not rows[0]
-        # TODO what to do?
-        throw new Error("Missing row")
+    @performLoad(@props.design, rowIndex, 1, @props.filters, (error, rows) =>
+      if error or not rows[0]
+        console.error error
+        alert("Error loading data")
+        callback()
+        return
 
       # Set row
       newRows = @state.rows.slice()

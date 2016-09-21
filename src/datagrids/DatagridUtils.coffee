@@ -32,3 +32,9 @@ module.exports = class DatagridUtils
 
     return design
   
+  validateDesign: (design) ->
+    if not design.table
+      return "Missing table"
+
+    if not design.columns?[0]
+      return "No columns"

@@ -1,6 +1,7 @@
 React = require 'react'
 ReactDOM = require 'react-dom'
 H = React.DOM
+R = React.createElement
 querystring = require 'querystring'
 
 Schema = require('mwater-expressions').Schema
@@ -31,8 +32,8 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDatagridDesignerPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
@@ -270,7 +271,7 @@ class MWaterDatagridPane extends React.Component
     console.log JSON.stringify(design, null, 2)
 
   render: ->
-    React.createElement(MWaterLoaderComponent, {
+    R MWaterLoaderComponent, {
       apiUrl: @props.apiUrl
       client: @props.client
       user: @props.user
@@ -278,27 +279,20 @@ class MWaterDatagridPane extends React.Component
       extraTables: @state.extraTables
     }, (error, config) =>
       H.div style: { height: "100%" },
-        React.createElement(AutoSizeComponent, injectWidth: true, injectHeight: true,
-          (size) =>
-            React.createElement(visualization.DatagridComponent, {
-              width: size.width
-              height: size.height
-              schema: config.schema
-              dataSource: config.dataSource
-              design: @state.design
-              onDesignChange: @handleDesignChange
-              onRowDoubleClick: => console.log(arguments)
-              # Called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
-              canEditCell: (tableId, rowId, expr, callback) => callback(null, true)
-              updateCell: (tableId, rowId, expr, value, callback) =>
-                console.log value
-                setTimeout () =>
-                  callback(null)
-              , 500
-            })
-        )
-    )
-
+        R visualization.DatagridComponent, 
+          schema: config.schema
+          dataSource: config.dataSource
+          design: @state.design
+          onDesignChange: @handleDesignChange
+          titleElem: "Sample"
+          onRowDoubleClick: => console.log(arguments)
+          # Called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
+          canEditCell: (tableId, rowId, expr, callback) => callback(null, true)
+          updateCell: (tableId, rowId, expr, value, callback) =>
+            console.log value
+            setTimeout () =>
+              callback(null)
+            , 500
 
 
 # class MapPane extends React.Component
@@ -449,6 +443,17 @@ datagridDesign = {
       }
     }
   ]
+  "quickfilters": [
+    {
+      "table": "entities.water_point",
+      "expr": {
+        "type": "field",
+        "table": "entities.water_point",
+        "column": "type"
+      },
+      "label": null
+    }
+  ]  
 }
 
 # Caching data source for mWater. Requires jQuery
