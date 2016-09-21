@@ -173,13 +173,14 @@ module.exports = class DashboardComponent extends React.Component
       @props.titleElem
 
   renderQuickfilter: ->
-    R QuickfiltersComponent, {
-      design: @props.design.quickfilters
-      schema: @props.schema
-      dataSource: @props.dataSource
-      values: @state.quickfiltersValues
-      onValuesChange: (values) => @setState(quickfiltersValues: values)
-    }
+    H.div style: { position: "absolute", top: 40, left: 0, right: 0, height: 50 },    
+      R QuickfiltersComponent, {
+        design: @props.design.quickfilters
+        schema: @props.schema
+        dataSource: @props.dataSource
+        values: @state.quickfiltersValues
+        onValuesChange: (values) => @setState(quickfiltersValues: values)
+      }
 
   refDashboardView: (el) =>
     @dashboardView = el

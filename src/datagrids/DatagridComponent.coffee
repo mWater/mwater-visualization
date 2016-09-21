@@ -94,7 +94,7 @@ module.exports = class DatagridComponent extends React.Component
       @props.titleElem
 
   renderQuickfilter: ->
-    H.div style: { position: "absolute", top: 40, left: 0, right: 0, height: 50, padding: 4 },    
+    H.div style: { position: "absolute", top: 40, left: 0, right: 0, height: 50 },    
       R QuickfiltersComponent, {
         design: @props.design.quickfilters
         schema: @props.schema
