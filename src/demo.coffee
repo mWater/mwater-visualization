@@ -18,6 +18,8 @@ MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
+DirectDatagridDataSource = require './datagrids/DirectDatagridDataSource'
+
 DirectDashboardDataSource = require './dashboards/DirectDashboardDataSource'
 DirectMapDataSource = require './maps/DirectMapDataSource'
 
@@ -227,36 +229,6 @@ class MWaterDirectMapPane extends React.Component
         })
     )
 
-class MWaterDatagridDesignerPane extends React.Component
-  constructor: (props) ->
-    super
-
-    @state = {
-      design: {}
-      extraTables: []
-    }
-
-  handleDesignChange: (design) =>
-    @setState(design: design)
-    console.log JSON.stringify(design, null, 2)
-
-  render: ->
-    React.createElement(MWaterLoaderComponent, {
-      apiUrl: @props.apiUrl
-      client: @props.client
-      user: @props.user
-      onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
-      extraTables: @state.extraTables
-    }, (error, config) =>
-      H.div style: { height: "100%" },
-        React.createElement(visualization.DatagridDesignerComponent, {
-          schema: config.schema
-          dataSource: config.dataSource
-          design: @state.design
-          onDesignChange: @handleDesignChange
-        })
-    )
-
 class MWaterDatagridPane extends React.Component
   constructor: (props) ->
     super
@@ -278,10 +250,13 @@ class MWaterDatagridPane extends React.Component
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
       extraTables: @state.extraTables
     }, (error, config) =>
+      datagridDataSource = new DirectDatagridDataSource(schema: config.schema, dataSource: config.dataSource)
+
       H.div style: { height: "100%" },
         R visualization.DatagridComponent, 
           schema: config.schema
           dataSource: config.dataSource
+          datagridDataSource: datagridDataSource
           design: @state.design
           onDesignChange: @handleDesignChange
           titleElem: "Sample"

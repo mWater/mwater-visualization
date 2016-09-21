@@ -18,6 +18,7 @@ module.exports = class DatagridComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired     # schema to use
     dataSource: React.PropTypes.object.isRequired # dataSource to use
+    datagridDataSource: React.PropTypes.object.isRequired # datagrid dataSource to use
 
     design: React.PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
     onDesignChange: React.PropTypes.func          # Called when design changes
@@ -99,6 +100,7 @@ module.exports = class DatagridComponent extends React.Component
         schema: @props.schema
         dataSource: @props.dataSource
         values: @state.quickfiltersValues
+        table: @props.design.table
         onValuesChange: (values) => @setState(quickfiltersValues: values)
       }
 
@@ -138,6 +140,7 @@ module.exports = class DatagridComponent extends React.Component
           (size) =>
             # Clean before displaying
             design = new DatagridUtils(@props.schema).cleanDesign(@props.design)
+
             if not new DatagridUtils(@props.schema).validateDesign(design)
               R DatagridViewComponent, {
                 width: size.width
@@ -145,6 +148,7 @@ module.exports = class DatagridComponent extends React.Component
                 pageSize: 100
                 schema: @props.schema
                 dataSource: @props.dataSource
+                datagridDataSource: @props.datagridDataSource
                 design: @props.design
                 filters: filters
                 onDesignChange: @props.onDesignChange

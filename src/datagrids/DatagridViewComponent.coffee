@@ -19,8 +19,11 @@ module.exports = class DatagridComponent extends React.Component
     width: React.PropTypes.number.isRequired      # Width of control
     height: React.PropTypes.number.isRequired     # Height of control
     pageSize: React.PropTypes.number
+
     schema: React.PropTypes.object.isRequired     # schema to use
     dataSource: React.PropTypes.object.isRequired # dataSource to use
+    datagridDataSource: React.PropTypes.object.isRequired # datagrid dataSource to use
+
     design: React.PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
     onDesignChange: React.PropTypes.func           # Called when design changes
 
@@ -58,19 +61,6 @@ module.exports = class DatagridComponent extends React.Component
     if not _.isEqual(nextProps.design, @props.design) or not _.isEqual(nextProps.filters, @props.filters)
       @setState(rows: [], entirelyLoaded: false)
 
-  # Load more rows starting at a particular offset and with a specific design. Call callback with new rows
-  performLoad: (design, offset, limit, filters, callback) =>
-    queryBuilder = new DatagridQueryBuilder(@props.schema)
-    
-    # Create query to get the page of rows at the specific offset
-    query = queryBuilder.createQuery(design, { 
-      offset: offset
-      limit: limit
-      filters: filters
-    })
-
-    @props.dataSource.performQuery(query, callback)
-
   # Loads more rows because the placeholder last row has been rendered
   loadMoreRows: ->
     # Get the current load state (the values that determine what to load and if the loaded results can still be used or are stale)
@@ -89,7 +79,7 @@ module.exports = class DatagridComponent extends React.Component
     @loadState = loadState
 
     # Perform the actual load
-    @performLoad(loadState.design, loadState.offset, loadState.limit, loadState.filters, (error, newRows) =>
+    @props.datagridDataSource.getRows(loadState.design, loadState.offset, loadState.limit, loadState.filters, (error, newRows) =>
       if error
         console.error error
         alert("Error loading data")
@@ -107,10 +97,7 @@ module.exports = class DatagridComponent extends React.Component
 
   # Reload a single row
   reloadRow: (rowIndex, callback) ->
-    # Create query to get a single row
-    query = new DatagridQueryBuilder(@props.schema).createQuery(@props.design, { offset: rowIndex, limit: 1 })
-
-    @performLoad(@props.design, rowIndex, 1, @props.filters, (error, rows) =>
+    @props.datagridDataSource.getRows(@props.design, rowIndex, 1, @props.filters, (error, rows) =>
       if error or not rows[0]
         console.error error
         alert("Error loading data")

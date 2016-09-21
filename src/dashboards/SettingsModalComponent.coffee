@@ -40,9 +40,14 @@ module.exports = class SettingsModalComponent extends React.Component
       size: "large"
       onCancel: @handleCancel
       onAction: @handleSave,
-        R QuickfiltersDesignComponent, {
-          design: @state.design.quickfilters
-          onDesignChange: (design) => @handleDesignChange(update(@state.design, { quickfilters: { $set: design } }))
-          schema: @props.schema
-          dataSource: @props.dataSource
-        }
+        H.div null,
+          H.h4 null, "Quick Filters"
+          H.div className: "text-muted", 
+            "Quick filters are shown to the user at the top of the dashboard and can be used to filter data of widgets."
+         
+          R QuickfiltersDesignComponent, {
+            design: @state.design.quickfilters
+            onDesignChange: (design) => @handleDesignChange(update(@state.design, { quickfilters: { $set: design } }))
+            schema: @props.schema
+            dataSource: @props.dataSource
+          }

@@ -46,10 +46,6 @@ module.exports = class QuickfiltersDesignComponent extends React.Component
 
   render: ->
     H.div null,
-      H.h4 null, "Quick Filters"
-      H.div className: "text-muted", 
-        "Quick filters are shown to the user at the top of the dashboard and can be used to filter data of widgets."
-
       _.map @props.design, (item, index) => @renderQuickfilter(item, index)
 
       H.button type: "button", className: "btn btn-sm btn-default", onClick: @handleAdd,
