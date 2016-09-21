@@ -356,9 +356,10 @@ module.exports = class LayeredChartCompiler
     categories = @axisBuilder.getCategories(xAxis, xValues, locale)
 
     # Limit categories to prevent crashes in C3 (https://github.com/mWater/mwater-visualization/issues/272)
-    # Take last ones to make dates prettier
-    categories = _.takeRight(categories, 40)
-    categoryXs = _.indexBy(categories, "value")
+    if xType != "enumset"
+      # Take last ones to make dates prettier
+      categories = _.takeRight(categories, 40)
+      categoryXs = _.indexBy(categories, "value")
 
     # Create map of category value to index
     categoryMap = _.object(_.map(categories, (c, i) -> [c.value, i]))
@@ -372,7 +373,8 @@ module.exports = class LayeredChartCompiler
       layerData = data["layer#{layerIndex}"]
 
       # Filter out categories that were removed
-      layerData = _.filter(layerData, (row) -> categoryXs[row.x]?)
+      if xType != "enumset"
+        layerData = _.filter(layerData, (row) -> categoryXs[row.x]?)
 
       # Fix string y values
       layerData = @fixStringYValues(layerData)

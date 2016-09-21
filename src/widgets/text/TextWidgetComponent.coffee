@@ -158,11 +158,9 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
       if @props.design.style != "title"
         [
           H.div key: "h1", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H1>"),
-            "h1"
+            H.i className: "fa fa-header"
           H.div key: "h2", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H2>"),
-            "h2"
-          H.div key: "h3", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H3>"),
-            "h3"
+            H.i className: "fa fa-header", style: { fontSize: "80%" }
           H.div key: "p", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<div>"),
             "\u00b6"
         ]

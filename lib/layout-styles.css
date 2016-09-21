@@ -1,0 +1,212 @@
+/* TEXT WIDGET STYLES */
+.mwater-visualization-text-widget-style-default {
+  font-size: 15px;
+}
+
+.mwater-visualization-text-widget-style-default h1 {
+  font-size: 19px;
+  margin: 0px;
+  font-family: inherit;
+  font-weight: normal;
+  line-height: 1;
+  color: inherit;
+}
+
+.mwater-visualization-text-widget-style-default h2 {
+  font-size: 17px;
+  margin: 0px;
+  font-family: inherit;
+  font-weight: normal;
+  line-height: 1;
+  color: inherit;
+}
+
+/* h3 is deprecated */
+.mwater-visualization-text-widget-style-default h3 {
+  font-size: 15px;
+  margin: 0px;
+  font-weight: bold;
+  font-family: inherit;
+  line-height: 1;
+  color: inherit;
+}
+
+.mwater-visualization-text-widget-style-title {
+  font-size: 25px;
+}
+
+/* For InlineExprEditorComponent */
+.mwater-visualization-text-widget-expr {
+  cursor: pointer;
+  border-radius: 2px;
+  padding-left: 2px;
+  padding-right: 2px;
+  background-color: rgba(212, 235, 255, 0.8);
+}
+
+
+/* 
+There are several styles of block layouts:
+ default: dashboard look
+ greybg: dashboard look with grey background
+ story: story-style (large text, fixed width)
+*/
+
+/* DEFAULT */
+.mwater-visualization-block-parent-outer-default {
+}
+
+.mwater-visualization-block-parent-inner-default {
+  margin-left: auto;
+  margin-right: auto;
+  padding: 30px;
+  min-width: 1000px;
+  max-width: 1800px;
+}
+
+.mwater-visualization-block-parent-outer-default .mwater-visualization-block {
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 15px;
+}
+
+.mwater-visualization-block-parent-outer-default .mwater-visualization-text-widget-style-default div {
+  margin-top: 5px;
+}
+
+.mwater-visualization-block-parent-outer-default .mwater-visualization-text-widget-style-default h1 {
+  margin-top: 10px;
+}
+
+.mwater-visualization-block-parent-outer-default .mwater-visualization-text-widget-style-default h2 {
+  margin-top: 8px;
+}
+
+.mwater-visualization-block-parent-outer-default .mwater-visualization-text-widget-style-default h3 {
+  margin-top: 5px;
+}
+
+
+/* GREYBG */
+.mwater-visualization-block-parent-outer-greybg {
+  background-color: #DDD;
+}
+
+.mwater-visualization-block-parent-inner-greybg {
+  margin-left: auto;
+  margin-right: auto;
+  padding: 15px;
+  min-width: 1000px;
+  max-width: 1800px;
+}
+
+.mwater-visualization-block-parent-outer-greybg .mwater-visualization-block {
+  margin: 9px;
+  padding: 8px;
+  border-radius: 5px;
+  background-color: white;
+}
+
+.mwater-visualization-block-parent-outer-greybg .mwater-visualization-block-spacer {
+  background-color: #DDD;
+}
+
+.mwater-visualization-block-parent-outer-greybg .mwater-visualization-text-widget-style-default div:not(:first-child) {
+  margin-top: 5px;
+}
+
+.mwater-visualization-block-parent-outer-greybg .mwater-visualization-text-widget-style-default h1:not(:first-child) {
+  margin-top: 10px;
+}
+
+.mwater-visualization-block-parent-outer-greybg .mwater-visualization-text-widget-style-default h2:not(:first-child) {
+  margin-top: 8px;
+}
+
+.mwater-visualization-block-parent-outer-greybg .mwater-visualization-text-widget-style-default h3:not(:first-child) {
+  margin-top: 5px;
+}
+
+
+
+/* STORY */
+.mwater-visualization-block-parent-outer-story {
+}
+
+.mwater-visualization-block-parent-inner-story {
+  padding: 15px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1000px;
+}
+
+.mwater-visualization-block-parent-outer-story .mwater-visualization-block {
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 15px;
+}
+
+.mwater-visualization-block-parent-outer-story .mwater-visualization-text-widget-style-default {
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: 20px;
+  color: #333;
+  font-style: normal;
+  font-weight: normal;
+  word-wrap: break-word;
+ -webkit-font-smoothing: antialiased;
+  line-height: 33px;
+}
+
+.mwater-visualization-block-parent-outer-story .mwater-visualization-text-widget-style-default div {
+  margin-top: 8px;
+}
+
+.mwater-visualization-block-parent-outer-story .mwater-visualization-text-widget-style-default ul {
+  line-height: 28px;
+}
+
+.mwater-visualization-block-parent-outer-story .mwater-visualization-text-widget-style-default h1 {
+  font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Arial, sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  margin-top: 40px;
+  color: black;
+}
+
+.mwater-visualization-block-parent-outer-story .mwater-visualization-text-widget-style-default h2 {
+  font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  margin-top: 30px;
+  color: black;
+}
+
+/* h3 is deprecated */
+.mwater-visualization-block-parent-outer-story .mwater-visualization-text-widget-style-default h3 {
+  font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Arial, sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 20px;
+  color: black;
+}
+
+.mwater-visualization-block-parent-outer-story .mwater-visualization-text-widget-style-title {
+  font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Arial, sans-serif;
+  font-size: 40px;
+  font-weight: bold;
+}
+
+@media only screen and (max-width: 1000px) {
+  /* Fill screen when small */
+  .mwater-visualization-block-parent-outer-story.mwater-visualization-block-viewing .mwater-visualization-horizontal-block-item {
+    width: 100% !important;
+  }
+
+  /* Hide spacers when small */
+  .mwater-visualization-block-parent-outer-story.mwater-visualization-block-viewing .mwater-visualization-block-spacer {
+    display: none;
+  }
+}
+
+
+

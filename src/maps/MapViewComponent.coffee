@@ -85,8 +85,8 @@ module.exports = class MapViewComponent extends React.Component
 
   componentDidUpdate: (prevProps) ->
     if @props.design.autoBounds
-      # Autozoom if filters changed
-      if not _.isEqual(@props.design.filters, prevProps.design.filters) or not _.isEqual(@props.extraFilters, prevProps.extraFilters)
+      # Autozoom if filters or autozoom changed
+      if not _.isEqual(@props.design.filters, prevProps.design.filters) or not _.isEqual(@props.extraFilters, prevProps.extraFilters) or not prevProps.design.autoBounds 
         @performAutoZoom()
     else
       # Update bounds
@@ -160,16 +160,14 @@ module.exports = class MapViewComponent extends React.Component
 
   # Get filters from extraFilters combined with map filters
   getCompiledFilters: ->
-    exprUtils = new ExprUtils(@props.schema)
+    exprCompiler = new ExprCompiler(@props.schema)
 
-    filters = _.values(@props.design.filters)
+    compiledFilters = []
 
     # Compile filters to JsonQL expected by layers
-    exprCompiler = new ExprCompiler(@props.schema)
-    compiledFilters = _.map filters, (expr) =>
-      table = exprUtils.getExprTable(expr)
+    for table, expr of (@props.design.filters or {})
       jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
-      return { table: table, jsonql: jsonql }
+      compiledFilters.push({ table: table, jsonql: jsonql })
 
     # Add extra filters
     if @props.extraFilters

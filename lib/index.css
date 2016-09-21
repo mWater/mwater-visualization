@@ -4,6 +4,7 @@
 @import "fixed-data-table/dist/fixed-data-table.min.css";
 @import "rc-slider/assets/index.css";
 @import "leaflet-loading/src/Control.Loading.css";
+@import "./layouts/decorated-block.css";
 
 /* http://stackoverflow.com/questions/19305821/multiple-modals-overlay */
 .modal { overflow-y: auto; }
@@ -180,145 +181,10 @@
   min-width: 50px;
 }
 
-/* DEFAULT */
-.mwater-visualization-block-parent-default {
-  padding: 30px;
-}
-
-.mwater-visualization-block-parent-default .mwater-visualization-block {
-  padding-left: 15px;
-  padding-right: 15px;
-  padding-bottom: 15px;
-}
 
 
-/* GREYBG */
-.mwater-visualization-block-parent-greybg {
-  background-color: #DDD;
-  padding: 15px;
-}
 
-.mwater-visualization-block-parent-greybg .mwater-visualization-block {
-  margin: 9px;
-  padding: 8px;
-  border-radius: 5px;
-  background-color: white;
-}
-
-.mwater-visualization-block-parent-greybg .mwater-visualization-block-spacer {
-  background-color: #DDD;
-}
-
-/* MEDIUM */
-.mwater-visualization-block-parent-medium {
-  margin-left: auto;
-  margin-right: auto;
-  padding: 15px;
-  width: 1000px;
-}
-
-.mwater-visualization-block-parent-medium .mwater-visualization-block {
-  padding-left: 15px;
-  padding-right: 15px;
-  padding-bottom: 15px;
-}
-
-.mwater-visualization-decorated-block {
-  border: solid 1px transparent;
-  padding: 5px;
-  margin: -5px;
-  border-radius: 4px;
-  position: relative;
-}
-
-.mwater-visualization-decorated-block:hover {
-  border: solid 1px #88ceff;
-}
-
-.mwater-visualization-decorated-block-move, .mwater-visualization-decorated-block-remove, .mwater-visualization-decorated-block-aspect, .mwater-visualization-decorated-block-resize {
-  display: none;
-}
-
-.mwater-visualization-decorated-block:hover > .mwater-visualization-decorated-block-move {
-    display: block;
-    position: absolute;
-    left: -14px;
-    top: -11px;
-    border: solid 1px #88ceff;
-    color: #88ceff;
-    background-color: white;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 5px;
-    border-radius: 5px;
-    padding-right: 5px;
-    cursor: move;
-}  
-
-.mwater-visualization-decorated-block-move:hover {
-  background-color: #88ceff !important;
-  color: white !important;
-}
-  
-.mwater-visualization-decorated-block:hover > .mwater-visualization-decorated-block-remove {
-    display: block;
-    position: absolute;
-    right: -5px;
-    top: -10px;
-    border: solid 1px #88ceff;
-    background-color: white;
-    color: #88ceff;
-    padding-left: 4px;
-    padding-right: 4px;
-}
-
-.mwater-visualization-decorated-block-remove:hover {
-  background-color: #88ceff !important;
-  color: white !important;
-  /*background-color: red !important;*/
-  /*color: white !important;*/
-}
-
-.mwater-visualization-decorated-block:hover > .mwater-visualization-decorated-block-aspect {
-    display: block;
-    position: absolute;
-    right: 50%;
-    bottom: -12px;
-    border: solid 1px #88ceff;
-    color: #88ceff;
-    background-color: white;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 5px;
-    border-radius: 5px;
-    padding-right: 5px;
-    cursor: move;
-}  
-
-.mwater-visualization-decorated-block-aspect:hover {
-  background-color: #88ceff !important;
-  color: white !important;
-}
-
-.mwater-visualization-decorated-block:hover > .mwater-visualization-decorated-block-resize {
-    display: block;
-    position: absolute;
-    right: -10px;
-    bottom: -10px;
-    border: solid 1px #88ceff;
-    color: #88ceff;
-    background-color: white;
-    border-radius: 5px;
-    padding-left: 5px;
-    padding-right: 5px;
-    cursor: move;
-}  
-
-.mwater-visualization-decorated-block-resize:hover {
-  background-color: #88ceff !important;
-  color: white !important;
-}
-
+/* Block splitters */
 .mwater-visualization-horizontal-block-splitter {
   height: 100%;
   cursor: ew-resize;
@@ -333,6 +199,10 @@
   background-color: #38D;
 }
 
+
+
+
+/* Palette */
 .mwater-visualization-palette {
   background-color: #363b3e;
   padding: 5px;
@@ -390,78 +260,6 @@
   background-color: #2485dd;
 }
 
-.mwater-visualization-text-widget-style-default {
-  font-size: 15px;
-}
-
-.mwater-visualization-block-parent-medium .mwater-visualization-text-widget-style-default {
-  color: rgba(0, 0, 0, 0.8);
-  font-family: medium-content-serif-font, Georgia, Cambria, "Times New Roman", Times, serif;
-  font-size: 21px;
-  font-style: normal;
-  font-weight: normal;
-  line-height: 33.18px;
-  margin-top: 38px;
-  /*width: 700px;*/
-  word-wrap: break-word;
- -webkit-font-smoothing: antialiased;
-}
-
-
-/* Reset styles */
-.mwater-visualization-text-widget-style-default h1 {
-  font-size: initial;
-  margin: 0px;
-  font-family: inherit;
-  font-weight: normal;
-  line-height: 1;
-  color: inherit;
-}
-
-.mwater-visualization-text-widget-style-default h2 {
-  font-size: initial;
-  margin: 0px;
-  font-family: inherit;
-  font-weight: normal;
-  line-height: 1;
-  color: inherit;
-}
-
-.mwater-visualization-text-widget-style-default h3 {
-  font-size: initial;
-  margin: 0px;
-  font-family: inherit;
-  font-weight: normal;
-  line-height: 1;
-  color: inherit;
-}
-
-.mwater-visualization-text-widget-style-default h1 {
-  font-size: 19px;
-}
-
-.mwater-visualization-text-widget-style-default h2 {
-  font-size: 17px;
-}
-
-.mwater-visualization-text-widget-style-default h3 {
-  font-size: 15px;
-  font-weight: bold;
-}
-
-.mwater-visualization-text-widget-style-title {
-  font-size: 25px;
-}
-
-/* For InlineExprEditorComponent */
-.mwater-visualization-text-widget-expr {
-  cursor: pointer;
-  border-radius: 2px;
-  padding-left: 2px;
-  padding-right: 2px;
-  background-color: rgba(212, 235, 255, 0.8);
-}
-
 .dropzone {
   width: 100%;
   padding: 80px 40px;
@@ -471,19 +269,21 @@
   vertical-align: middle;
 }
 
-.image-carousel-component .item{
+.image-carousel-component .item {
     text-align: center;
     white-space: nowrap;
 }
 
-.image-carousel-component .item:before{
+.image-carousel-component .item:before {
     content: " ";
     display: inline-block;
     height: 100%;
     vertical-align: middle;
 }
 
-.image-carousel-component .item img{
+.image-carousel-component .item img {
     vertical-align: middle;
     display: inline-block;
 }
+
+@import "./layout-styles.css";

@@ -50,10 +50,8 @@ module.exports = class MarkerSymbolSelectComponent extends React.Component
       { value: "font-awesome/thumbs-down", label: "Thumbs Down" }
       { value: "font-awesome/ticket", label: "Ticket" }
       { value: "font-awesome/tint", label: "Tint" }
-      { value: "font-awesome/times", label: "Times" }
       { value: "font-awesome/times-circle", label: "Times Circle" }
       { value: "font-awesome/tree", label: "Tree" }
-      { value: "font-awesome/wheelchair", label: "Wheelchair" }
       { value: "font-awesome/file", label: "File" }
       { value: "font-awesome/usd", label: "USD" }
       { value: "font-awesome/caret-up", label: "Caret Up" }

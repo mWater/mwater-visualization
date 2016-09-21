@@ -86,6 +86,9 @@ module.exports = class DashboardComponent extends React.Component
   handleToggleEditing: =>
     @setState(editing: not @state.editing)
 
+  handleStyleChange: (style) =>
+    @props.onDesignChange(_.extend({}, @props.design, { style: style or null }))
+
   renderEditingSwitch: ->
     # H.a key: "edit", className: "btn btn-link btn-sm", onClick: @handleToggleEditing,
     #   if @state.editing
@@ -96,6 +99,44 @@ module.exports = class DashboardComponent extends React.Component
     H.a key: "edit", className: "btn btn-primary btn-sm #{if @state.editing then "active" else ""}", onClick: @handleToggleEditing,
       H.span(className: "glyphicon glyphicon-pencil")
       if @state.editing then " Editing" else " Edit"
+
+  renderStyleItem: (style) ->
+    isActive = (@props.design.style or "default") == style
+
+    content = switch style
+      when "default"
+        [
+          H.h4 className: "list-group-item-heading", "Classic Dashboard"
+          H.p className: "list-group-item-text", "Ideal for data display with minimal text"
+        ]
+      when "greybg"
+        [
+          H.h4 className: "list-group-item-heading", "Framed Dashboard"
+          H.p className: "list-group-item-text", "Each widget is white on a grey background"
+        ]
+      when "story"
+        [
+          H.h4 className: "list-group-item-heading", "Story"
+          H.p className: "list-group-item-text", "Ideal for data-driven storytelling with lots of text. Responsive and mobile-friendly"
+        ]
+
+    H.a 
+      key: style
+      className: "list-group-item #{if isActive then "active" else ""}"
+      onClick: @handleStyleChange.bind(null, style),
+       content
+
+  renderStyle: ->
+    return H.div key: "style", className: "btn-group",
+      H.button type: "button", "data-toggle": "dropdown", className: "btn btn-link btn-sm dropdown-toggle",
+        H.span className: "fa fa-th-large"
+        " Layout "
+        H.span className: "caret"
+      H.div className: "dropdown-menu dropdown-menu-right list-group", style: { padding: 0, zIndex: 10000, width: 300 },
+        @renderStyleItem("default")
+        @renderStyleItem("greybg")
+        @renderStyleItem("story")
+
 
   renderActionLinks: ->
     H.div null,
@@ -119,6 +160,8 @@ module.exports = class DashboardComponent extends React.Component
         H.a key: "settings", className: "btn btn-link btn-sm", onClick: @handleSettings,
           H.span(className: "glyphicon glyphicon-cog")
           " Settings"
+      if @state.editing
+        @renderStyle()
       @props.extraTitleButtonsElem
       if @props.onDesignChange?
         @renderEditingSwitch()

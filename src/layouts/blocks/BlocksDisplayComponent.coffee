@@ -185,12 +185,13 @@ class BlocksDisplayComponent extends React.Component
     if @props.onItemsChange
       return H.div style: { width: "100%", height: "100%", overflow: "hidden", position: "relative" }, 
         @renderPalette()
-        H.div key: "design", className: "mwater-visualization-block-parent-#{@props.style or "default"}", style: { height: "100%", overflow: "scroll", marginLeft: 185 },
-          @renderBlock(@props.items)
+        H.div style: { position: "absolute", left: 185, top: 0, bottom: 0, right: 0, overflow: "auto" }, className: "mwater-visualization-block-parent-outer-#{@props.style or "default"} mwater-visualization-block-editing", 
+          H.div key: "inner", className: "mwater-visualization-block-parent-inner-#{@props.style or "default"}", style: { minHeight: "100%", height: 1  },
+            @renderBlock(@props.items)
     else
-      return H.div style: { width: "100%", height: "100%" },
-        H.div key: "design", className: "mwater-visualization-block-parent-#{@props.style or "default"}", style: { minHeight: "100%" },
-          @renderBlock(@props.items)
+      return H.div style: { width: "100%", height: "100%", overflowX: "auto" }, className: "mwater-visualization-block-parent-outer-#{@props.style or "default"} mwater-visualization-block-viewing",
+          H.div key: "inner", className: "mwater-visualization-block-parent-inner-#{@props.style or "default"}", style: { minHeight: "100%", height: 1 },
+            @renderBlock(@props.items)
 
 module.exports = NestableDragDropContext(HTML5Backend)(BlocksDisplayComponent)
 
