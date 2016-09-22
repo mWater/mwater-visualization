@@ -3,6 +3,7 @@ H = React.DOM
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprUtils = require('mwater-expressions').ExprUtils
+PopoverHelpComponent = require 'react-library/lib/PopoverHelpComponent'
 
 LayerFactory = require './LayerFactory'
 
@@ -55,7 +56,9 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
 
     return H.div className: "form-group",
       H.label className: "text-muted", 
-        "Filters"
+        "Filters "
+        R PopoverHelpComponent, placement: "left",
+          '''Filters all layers in the map. Individual layers can be filtered by clicking on Customize...'''
 
       H.div style: { margin: 5 }, 
         _.map(filterableTables, @renderFilterableTable)

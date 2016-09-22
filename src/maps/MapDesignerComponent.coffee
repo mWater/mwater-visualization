@@ -7,6 +7,7 @@ ClickOutHandler = require('react-onclickout')
 MapLayersDesignerComponent = require './MapLayersDesignerComponent'
 MapFiltersDesignerComponent = require './MapFiltersDesignerComponent'
 BaseLayerDesignerComponent = require './BaseLayerDesignerComponent'
+PopoverHelpComponent = require 'react-library/lib/PopoverHelpComponent'
 
 module.exports = class MapDesignerComponent extends React.Component
   @propTypes:
@@ -49,7 +50,11 @@ module.exports = class MapDesignerComponent extends React.Component
       R CheckboxComponent, 
         checked: @props.design.autoBounds
         onChange: @handleAutoBoundsChange,
-          H.span className: "text-muted", "Automatic zoom"
+          H.span className: "text-muted", 
+            "Automatic zoom "
+            R PopoverHelpComponent, placement: "left",
+              '''Automatically zoom to the complete data whenever the map is loaded or the filters change'''
+
 
       R AttributionComponent,
         text: @props.design.attribution
