@@ -34,11 +34,11 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDirectMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(BlocksDesignerComponent, renderBlock: [])
      # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
@@ -199,7 +199,7 @@ class MWaterDirectMapPane extends React.Component
     super
 
     @state = {
-      design: autoBoundsMap
+      design: badColorsMap
       extraTables: []
     }
 
@@ -3248,4 +3248,130 @@ testMedium = {
   },
   "layout": "blocks",
   "style": "default"
+}
+
+badColorsMap = {
+  "baseLayer": "cartodb_positron",
+  "layerViews": [
+    {
+      "id": "f17c9aca-f418-4718-a349-0aecc708fdc4",
+      "name": "Untitled Layer",
+      "desc": "",
+      "type": "AdminChoropleth",
+      "visible": true,
+      "opacity": 1,
+      "design": {
+        "color": "#FFFFFF",
+        "adminRegionExpr": {
+          "type": "field",
+          "table": "entities.water_point",
+          "column": "admin_region"
+        },
+        "axes": {
+          "color": {
+            "expr": {
+              "type": "op",
+              "op": "percent where",
+              "table": "entities.water_point",
+              "exprs": [
+                {
+                  "type": "op",
+                  "table": "entities.water_point",
+                  "op": "= any",
+                  "exprs": [
+                    {
+                      "type": "field",
+                      "table": "entities.water_point",
+                      "column": "type"
+                    },
+                    {
+                      "type": "literal",
+                      "valueType": "enumset",
+                      "value": [
+                        "Protected dug well",
+                        "Unprotected dug well"
+                      ]
+                    }
+                  ]
+                },
+                null
+              ]
+            },
+            "xform": {
+              "type": "bin",
+              "numBins": 6,
+              "min": 0,
+              "max": 100
+            },
+            "colorMap": [
+              {
+                "value": 0,
+                "color": "#9e0142"
+              },
+              {
+                "value": 1,
+                "color": "#e1524a"
+              },
+              {
+                "value": 2,
+                "color": "#fba35e"
+              },
+              {
+                "value": 3,
+                "color": "#fee89a"
+              },
+              {
+                "value": 4,
+                "color": "#ebf7a6"
+              },
+              {
+                "value": 5,
+                "color": "#a0d9a3"
+              },
+              {
+                "value": 6,
+                "color": "#4ba0b1"
+              },
+              {
+                "value": 7,
+                "color": "#5e4fa2"
+              },
+              {
+                "value": null,
+                "color": "#aaaaaa"
+              }
+            ],
+            "drawOrder": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              null
+            ]
+          }
+        },
+        "fillOpacity": 0.75,
+        "displayNames": true,
+        "filter": null,
+        "table": "entities.water_point",
+        "scope": "eb3e12a2-de1e-49a9-8afd-966eb55d47eb",
+        "scopeLevel": 0,
+        "detailLevel": 1
+      }
+    }
+  ],
+  "filters": {
+    "entities.water_point": null
+  },
+  "bounds": {
+    "w": 24.873046874999996,
+    "n": 3.469557303061473,
+    "e": 45.6591796875,
+    "s": -19.16592425362801
+  },
+  "autoBounds": false
 }
