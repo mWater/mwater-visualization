@@ -92,7 +92,7 @@ module.exports = class ColorPaletteCollectionComponent extends React.Component
         R ColorPaletteComponent,
           key: index
           index: index
-          colorSet: ColorPaletteCollectionComponent.generateColorSet(config, @props.categories.length - 1)
+          colorSet: ColorPaletteCollectionComponent.generateColorSet(config, Math.min(@props.categories.length - 1, 6))
           onPaletteSelected: @onPaletteSelected
           number: @props.categories.length
       @renderCancel()
@@ -112,7 +112,7 @@ class ColorPaletteComponent extends React.Component
 
   render: ->
     H.div onClick: @handleSelect ,className: "axis-palette",
-      _.map @props.colorSet.slice(0,Math.min(@props.number, 6)), (color, i) =>
+      _.map @props.colorSet.slice(0,@props.number), (color, i) =>
         cellStyle =
           display: 'inline-block'
           height: 20
