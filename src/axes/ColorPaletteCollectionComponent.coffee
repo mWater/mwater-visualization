@@ -2,6 +2,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
+ColorSchemeFactory = require '../ColorSchemeFactory'
 c_c = require 'color-mixer'
 d3 = require 'd3-scale'
 
@@ -12,36 +13,13 @@ module.exports = class ColorPaletteCollectionComponent extends React.Component
     categories: React.PropTypes.array
     onCancel: React.PropTypes.func.isRequired
 
-  @generateColorFadeScheme: (baseColor, number) ->
-    base = new c_c.Color(baseColor)
-    _.map  base.darken_set(number), (subcolor, i) ->
-      subcolor.hex()
-
-  @generatePolyLinearScheme: (startColor, midColor, endColor, number) ->
-    color = d3.scaleLinear().domain([-parseInt(number/2),0,parseInt(number/2)]).range([startColor, midColor, endColor])
-    colors = (color i for i in [(-parseInt(number/2))..(parseInt(number/2))])
-
-    _.map colors, (rgb) =>
-      rgbArray = rgb.substring(4,rgb.length-1).split(',').map((item) -> parseInt(item))
-      _color = new c_c.Color({rgb: rgbArray})
-      _color.hex()
-
-  @generateLinearScheme: (startColor, endColor, number) ->
-    color = d3.scaleLinear().domain([0,number]).range([startColor, endColor])
-    colors = (color i for i in [0..number])
-
-    _.map colors, (rgb) =>
-      rgbArray = rgb.substring(4,rgb.length-1).split(',').map((item) -> parseInt(item))
-      _color = new c_c.Color({rgb: rgbArray})
-      _color.hex()
-
   @getColorMapForCategories: (categories, isCategorical = true) ->
     if isCategorical
-      config = _.find(ColorPaletteCollectionComponent._collection, {type: 'static'})
+      type = "schemeAccent"
     else
-      config = _.find(ColorPaletteCollectionComponent._collection, (item) -> item.type != "static" )
+      type = "interpolateBlues"
 
-    scheme = ColorPaletteCollectionComponent.generateColorSet(config, categories.length - 1)
+    scheme = ColorPaletteCollectionComponent.generateColorSet(type, categories.length - 1)
 
     _.map categories, (category, i) ->
       {
@@ -51,63 +29,46 @@ module.exports = class ColorPaletteCollectionComponent extends React.Component
 
   @_collection:
     [
-      {
-        type: "static"
-        set: ["#2ca02c", "#1f77b4", "#ff7f0e", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
-      }
-      {
-        type: "static"
-        set: ["#ff7f0e", "#1f77b4", "#aec7e8", "#ffbb78", "#2ca02c", "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5", "#8c564b", "#c49c94", "#e377c2", "#f7b6d2", "#7f7f7f", "#c7c7c7", "#bcbd22", "#dbdb8d", "#17becf", "#9edae5"]
-      }
-      {
-        type: "static"
-        set: ["#9c9ede", "#7375b5", "#4a5584", "#cedb9c", "#b5cf6b", "#8ca252", "#637939", "#e7cb94", "#e7ba52", "#bd9e39", "#8c6d31", "#e7969c", "#d6616b", "#ad494a", "#843c39", "#de9ed6", "#ce6dbd", "#a55194", "#7b4173"]
-      }
-      {
-        type: "poly-linear"
-        args: ['red','yellow','green']
-      }
-      {
-        type: "poly-linear"
-        args: ['green','yellow','red']
-      }
-      {
-        type: "fade"
-        args: [{hex:'#D49097'}]
-      }
-      {
-        type: "fade"
-        args: [{hex:'#C1CCE6'}]
-      }
-      {
-        type: "fade"
-        args: [{hex:'#C8E6C1'}]
-      }
-      {
-        type: "fade"
-        args: [{hex:'#E6D6C1'}]
-      }
-      {
-        type: "fade"
-        args: [{hex:'#C1E6E6'}]
-      }
-      {
-        type: "fade"
-        args: [{hex:'#DFC1E6'}]
-      }
+      "schemeAccent"
+      "schemeDark2"
+      "schemePaired"
+      "schemePastel1"
+      "schemePastel2"
+      "schemeSet1"
+      "schemeSet2"
+      "schemeSet3"
+      "interpolateBlues"
+      "interpolateGreens"
+      "interpolateGreys"
+      "interpolateOranges"
+      "interpolatePurples"
+      "interpolateReds"
+      "interpolateBuGn"
+      "interpolateBuPu"
+      "interpolateGnBu"
+      "interpolateOrRd"
+      "interpolatePuBuGn"
+      "interpolatePuBu"
+      "interpolatePuRd"
+      "interpolateRdPu"
+      "interpolateYlGnBu"
+      "interpolateYlGn"
+      "interpolateYlOrBr"
+      "interpolateYlOrRd"
+      "interpolateBrBG"
+      "interpolatePRGn"
+      "interpolatePiYG"
+      "interpolatePuOr"
+      "interpolateRdBu"
+      "interpolateRdGy"
+      "interpolateRdYlBu"
+      "interpolateRdYlGn"
+      "interpolateSpectral"
     ]
 
-  @generateColorSet: (config, length) ->
-    switch config.type
-      when "fade" then ColorPaletteCollectionComponent.generateColorFadeScheme.apply(undefined , config.args.concat(length))
-      when "poly-linear" then ColorPaletteCollectionComponent.generatePolyLinearScheme.apply(undefined , config.args.concat(length))
-      when "linear" then ColorPaletteCollectionComponent.generateLinearScheme.apply(undefined , config.args.concat(length))
-      else
-        if not config.set
-          throw("Color set which is not fade or poly-linear must have a 'set' property")
-        (config.set[i % config.set.length ] for i in [0..length])
-
-
+  @generateColorSet: (type, length) ->
+    ColorSchemeFactory.createColorScheme({type: type, number: length})
+    
   onPaletteSelected: (index) =>
     #generate color map
     scheme = ColorPaletteCollectionComponent.generateColorSet(ColorPaletteCollectionComponent._collection[index], @props.categories.length - 1)
