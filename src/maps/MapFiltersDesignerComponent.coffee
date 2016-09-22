@@ -1,5 +1,6 @@
 React = require 'react'
 H = React.DOM
+R = React.createElement
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprUtils = require('mwater-expressions').ExprUtils
