@@ -1,7 +1,7 @@
 /* Special workaround for CSS fill issues */
 .mwater-visualization-block-parent-inner {
   min-height: 100%;
-  height: 1;
+  height: 1px;
 }
 
 @media print {
@@ -84,7 +84,7 @@ There are several styles of block layouts:
   padding-bottom: 15px;
 }
 
-.mwater-visualization-block-parent-outer-default .mwater-visualization-text-widget-style-default div {
+.mwater-visualization-block-parent-outer-default .mwater-visualization-text-widget-style-default div:not(:first-child) {
   margin-top: 5px;
 }
 
@@ -171,7 +171,7 @@ There are several styles of block layouts:
   line-height: 33px;
 }
 
-.mwater-visualization-block-parent-outer-story .mwater-visualization-text-widget-style-default div {
+.mwater-visualization-block-parent-outer-story .mwater-visualization-text-widget-style-default div:not(:first-child) {
   margin-top: 8px;
 }
 
@@ -206,7 +206,7 @@ There are several styles of block layouts:
 
 .mwater-visualization-block-parent-outer-story .mwater-visualization-text-widget-style-title {
   font-family: "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Arial, sans-serif;
-  font-size: 40px;
+  font-size: 38px;
   font-weight: bold;
 }
 
