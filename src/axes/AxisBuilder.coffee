@@ -421,7 +421,7 @@ module.exports = class AxisBuilder
       return categories
 
     if axis.xform and axis.xform.type == "month"
-      return [
+      categories = [
         { value: "01", label: "January" }
         { value: "02", label: "February" }
         { value: "03", label: "March" }
@@ -434,8 +434,13 @@ module.exports = class AxisBuilder
         { value: "10", label: "October" }
         { value: "11", label: "November" }
         { value: "12", label: "December" }
-        noneCategory
       ]
+
+      # Add none if needed
+      if _.any(values, (v) -> not v?)
+        categories.push(noneCategory)
+
+      return categories
 
     if axis.xform and axis.xform.type == "year"
       values = _.compact(values)
@@ -450,7 +455,10 @@ module.exports = class AxisBuilder
         categories.push({ value: "#{year}-01-01", label: "#{year}"})
         if categories.length >= 1000
           break
-      categories.push(noneCategory)
+
+      # Add none if needed
+      if _.any(values, (v) -> not v?)
+        categories.push(noneCategory)
 
       return categories
 
@@ -472,8 +480,11 @@ module.exports = class AxisBuilder
         current.add(1, "months")
         if categories.length >= 1000
           break
-      
-      categories.push(noneCategory)
+
+      # Add none if needed
+      if _.any(values, (v) -> not v?)
+        categories.push(noneCategory)
+
       return categories
 
     switch @getAxisType(axis)
