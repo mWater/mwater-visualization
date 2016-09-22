@@ -68,7 +68,7 @@ module.exports = class ColorPaletteCollectionComponent extends React.Component
 
   @generateColorSet: (type, length) ->
     ColorSchemeFactory.createColorScheme({type: type, number: length})
-    
+
   onPaletteSelected: (index) =>
     #generate color map
     scheme = ColorPaletteCollectionComponent.generateColorSet(ColorPaletteCollectionComponent._collection[index], @props.categories.length - 1)
@@ -92,7 +92,7 @@ module.exports = class ColorPaletteCollectionComponent extends React.Component
         R ColorPaletteComponent,
           key: index
           index: index
-          colorSet: ColorPaletteCollectionComponent.generateColorSet(config, 6)
+          colorSet: ColorPaletteCollectionComponent.generateColorSet(config, @props.categories.length - 1)
           onPaletteSelected: @onPaletteSelected
           number: @props.categories.length
       @renderCancel()
