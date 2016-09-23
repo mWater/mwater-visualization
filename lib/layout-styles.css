@@ -142,6 +142,7 @@ There are several styles of block layouts:
 
 /* STORY */
 .mwater-visualization-block-parent-outer-story {
+  padding: 15px;
 }
 
 .mwater-visualization-block-parent-inner-story {
