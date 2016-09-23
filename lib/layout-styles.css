@@ -60,6 +60,9 @@
   background-color: rgba(212, 235, 255, 0.8);
 }
 
+.mwater-visualization-block-parent-inner {
+  height: 100%;
+}
 
 /* 
 There are several styles of block layouts:
