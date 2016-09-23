@@ -322,6 +322,7 @@ module.exports = class AdminChoroplethLayer extends Layer
 
         results.popup = new BlocksLayoutManager().renderLayout({
           items: clickOptions.design.popup.items
+          style: "popup"
           renderWidget: (options) =>
             widget = WidgetFactory.createWidget(options.type)
 

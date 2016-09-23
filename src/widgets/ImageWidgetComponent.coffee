@@ -7,6 +7,7 @@ uuid = require 'node-uuid'
 Dropzone = require 'react-dropzone'
 
 AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
+AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
 DropdownWidgetComponent = require './DropdownWidgetComponent'
 ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
@@ -65,15 +66,19 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
     else if @state.data
       # Make into array if not
       if not _.isArray(@state.data)
-        R ImagelistCarouselComponent,
-          widgetDataSource: @props.widgetDataSource
-          imagelist: [@state.data]
-          height: @props.height
+        R AutoSizeComponent, { injectHeight: true }, 
+          (size) =>
+            R ImagelistCarouselComponent,
+              widgetDataSource: @props.widgetDataSource
+              imagelist: [@state.data]
+              height: size.height
       else
-        R ImagelistCarouselComponent,
-          widgetDataSource: @props.widgetDataSource
-          imagelist: @state.data
-          height: @props.height
+        R AutoSizeComponent, { injectHeight: true }, 
+          (size) =>
+            R ImagelistCarouselComponent,
+              widgetDataSource: @props.widgetDataSource
+              imagelist: @state.data
+              height: size.height
 
   renderContent: ->
     if @props.design.imageUrl or @props.design.uid

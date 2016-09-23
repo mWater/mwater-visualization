@@ -46,6 +46,7 @@ module.exports = class EditPopupComponent extends React.Component
         R ModalWindowComponent, isOpen: true, onRequestClose: (=> @setState(editing: false)),
           new BlocksLayoutManager().renderLayout({
             items: @props.design.popup?.items
+            style: "popup"
             onItemsChange: @handleItemsChange
             disableMaps: true
             renderWidget: (options) =>
