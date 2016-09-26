@@ -99,7 +99,7 @@ module.exports = class MapViewComponent extends React.Component
         @refs.leafletMap?.setBounds(bounds, 0.2)
 
         # Also record if editable as part of bounds
-        if not @props.onDesignChange?
+        if @props.onDesignChange?
           @props.onDesignChange(_.extend({}, @props.design, bounds: bounds))
       )
 
