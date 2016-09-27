@@ -29,14 +29,15 @@ module.exports = class ColorPaletteCollectionComponent extends React.Component
 
   @_collection:
     [
+      "schemeSet1"
+      "schemeSet2"
+      "schemeSet3"
       "schemeAccent"
       "schemeDark2"
       "schemePaired"
       "schemePastel1"
       "schemePastel2"
-      "schemeSet1"
-      "schemeSet2"
-      "schemeSet3"
+      "interpolateSpectral"
       "interpolateBlues"
       "interpolateGreens"
       "interpolateGreys"
@@ -63,7 +64,6 @@ module.exports = class ColorPaletteCollectionComponent extends React.Component
       "interpolateRdGy"
       "interpolateRdYlBu"
       "interpolateRdYlGn"
-      "interpolateSpectral"
     ]
 
   @generateColorSet: (type, length) ->
