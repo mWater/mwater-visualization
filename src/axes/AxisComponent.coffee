@@ -46,9 +46,9 @@ module.exports = class AxisComponent extends React.Component
     if not expr
       @props.onChange(null)
       return
-      
+
     # Set expression and clear xform
-    @props.onChange(@cleanAxis(_.extend({}, _.omit(@props.value, ["colorMap", "drawOrder"]), { expr: expr })))
+    @props.onChange(@cleanAxis(_.extend({}, _.omit(@props.value, ["drawOrder"]), { expr: expr })))
 
   handleXformTypeChange: (type) =>
     # Remove
@@ -80,7 +80,7 @@ module.exports = class AxisComponent extends React.Component
     @props.onChange(update(_.omit(@props.value, ["colorMap", "drawOrder"]), { xform: { $set: xform }}))
 
   handleXformChange: (xform) =>
-    @props.onChange(@cleanAxis(update(_.omit(@props.value, ["colorMap", "drawOrder"]), { xform: { $set: xform } })))
+    @props.onChange(@cleanAxis(update(_.omit(@props.value, ["drawOrder"]), { xform: { $set: xform } })))
 
   cleanAxis: (axis) ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
@@ -92,14 +92,14 @@ module.exports = class AxisComponent extends React.Component
 
     if axis.xform and axis.xform.type in ["bin", "ranges"]
       if axis.xform.type == "ranges"
-        comp = R(RangesComponent, 
+        comp = R(RangesComponent,
           schema: @props.schema
           dataSource: @props.dataSource
           expr: axis.expr
           xform: axis.xform
           onChange: @handleXformChange)
       else
-        comp = R(BinsComponent, 
+        comp = R(BinsComponent,
           schema: @props.schema
           dataSource: @props.dataSource
           expr: axis.expr
@@ -117,7 +117,7 @@ module.exports = class AxisComponent extends React.Component
         comp
 
     exprUtils = new ExprUtils(@props.schema)
-    exprType = exprUtils.getExprType(axis.expr) 
+    exprType = exprUtils.getExprType(axis.expr)
 
     switch exprType
       when "date"
@@ -174,10 +174,10 @@ module.exports = class AxisComponent extends React.Component
         aggrStatuses = ["literal", "individual", "aggregate"]
       when "required"
         aggrStatuses = ["literal", "aggregate"]
-   
+
     H.div null,
-      H.div null, 
-        React.createElement(ExprComponent, 
+      H.div null,
+        React.createElement(ExprComponent,
           schema: @props.schema
           dataSource: @props.dataSource
           table: @props.table
@@ -186,7 +186,6 @@ module.exports = class AxisComponent extends React.Component
           onChange: @handleExprChange
           value: if @props.value then @props.value.expr
           aggrStatuses: aggrStatuses
-          )  
+          )
       @renderXform(axis)
       @renderColorMap(axis)
-
