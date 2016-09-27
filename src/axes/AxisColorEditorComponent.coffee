@@ -50,7 +50,7 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
       newState =
         categories: categories
 
-      if not props.axis.colorMap
+      if not props.axis.colorMap or props.axis.colorMap.length != categories.length
         colorMap = ColorPaletteCollectionComponent.getColorMapForCategories(categories, axisBuilder.isCategorical(props.axis))
         @onPaletteChange(colorMap)
         newState.mode = "normal"
