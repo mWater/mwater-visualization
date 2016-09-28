@@ -80,6 +80,33 @@ describe "AxisBuilder", ->
         ]
       }
 
+    it "compiles bin xform with excludeUpper", ->
+      axis = {
+        expr: @exprNumber
+        xform: { type: "bin", numBins: 3, min: 2, max: 5, excludeUpper: true }
+      }
+
+      jql = @ab.compileAxis(axis: axis, tableAlias: "T1")
+      assert _.isEqual jql, {
+        type: "op"
+        op: "width_bucket"
+        exprs: [
+          # Needs a cast to prevent error
+          { 
+            type: "op"
+            op: "::decimal"
+            exprs: [
+              {
+                type: "field"
+                tableAlias: "T1"
+                column: "number"
+              }
+            ] 
+          }
+          { type: "literal", value: [2, 3, 4, 5.000000001] }
+        ]
+      }
+
     it "compiles date xform", ->
       axis = {
         expr: @exprDate
@@ -474,6 +501,35 @@ describe "AxisBuilder", ->
         { value: null, label: "None" }
       ])
 
+    it "gets bins by name with exclusions", ->
+      axis = {
+        expr: @exprNumber
+        xform: { type: "bin", numBins: 3, min: 1, max: 4, excludeLower: true }
+      }
+
+      categories = @ab.getCategories(axis, [])
+      compare(categories, [
+        { value: 1, label: "1 - 2" }
+        { value: 2, label: "2 - 3" }
+        { value: 3, label: "3 - 4" }
+        { value: 4, label: "> 4" }
+        { value: null, label: "None" }
+      ])
+
+      axis = {
+        expr: @exprNumber
+        xform: { type: "bin", numBins: 3, min: 1, max: 4, excludeUpper: true }
+      }
+
+      categories = @ab.getCategories(axis, [])
+      compare(categories, [
+        { value: 0, label: "< 1" }
+        { value: 1, label: "1 - 2" }
+        { value: 2, label: "2 - 3" }
+        { value: 3, label: "3 - 4" }
+        { value: null, label: "None" }
+      ])
+
     it "gets ranges by name, overriding with label", ->
       axis = {
         expr: @exprNumber
@@ -496,7 +552,7 @@ describe "AxisBuilder", ->
         xform: { type: "month" }
       }
 
-      categories = @ab.getCategories(axis, [])
+      categories = @ab.getCategories(axis, ['2010-02-01', null])
       compare(categories, [
         { value: "01", label: "January" }
         { value: "02", label: "February" }

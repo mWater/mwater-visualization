@@ -17,7 +17,7 @@ aggregation and transforms are mutually exclusive.
 
 types: 
 
-`bin`: convert into bins. always has `numBins` integer and `min` and `max`. type enum
+`bin`: convert into bins. always has `numBins` integer and `min` and `max`. Can have `excludeUpper` and/or `excludeLower` to remove open bin on top or bottem. type enum
 `date`: convert to complete date e.g. `2015-02-08`. type date
 `year`: year only e.g. `2015-01-01`. type date
 `yearmonth`: year and month only e.g. `2015-02-01`. type date

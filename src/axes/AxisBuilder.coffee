@@ -104,7 +104,7 @@ module.exports = class AxisBuilder
     if axis.xform and axis.xform.type == "bin"
       # Add number of bins
       if not axis.xform.numBins
-        axis.xform.numBins = 6
+        axis.xform.numBins = 5
 
     if axis.xform and axis.xform.type == "ranges"
       # Add ranges
@@ -165,16 +165,29 @@ module.exports = class AxisBuilder
         if max == min # If was too big to add epsilon
           max = min * 1.00001
 
-        compiledExpr = {
-          type: "op"
-          op: "width_bucket"
-          exprs: [
-            compiledExpr
-            min
-            max
-            options.axis.xform.numBins
-          ]
-        }
+        # Special case for excludeUpper as we need to include upper bound (e.g. 100 for percentages) in the lower bin. Do it by adding epsilon
+        if options.axis.xform.excludeUpper
+          thresholds = _.map(_.range(0, options.axis.xform.numBins), (bin) -> min + (max-min)*bin/options.axis.xform.numBins)
+          thresholds.push(max + epsilon)
+          compiledExpr = {
+            type: "op"
+            op: "width_bucket"
+            exprs: [
+              { type: "op", op: "::decimal", exprs: [compiledExpr] }
+              { type: "literal", value: thresholds }
+            ]
+          }
+        else
+          compiledExpr = {
+            type: "op"
+            op: "width_bucket"
+            exprs: [
+              compiledExpr
+              min
+              max
+              options.axis.xform.numBins
+            ]
+          }
 
       if options.axis.xform.type == "date"
         compiledExpr = {
@@ -410,12 +423,18 @@ module.exports = class AxisBuilder
       format = d3Format.format(",." + precision + "f")
 
       categories = []
-      categories.push({ value: 0, label: "< #{format(min)}"})
+  
+      if not axis.xform.excludeLower
+        categories.push({ value: 0, label: "< #{format(min)}"})
+  
       for i in [1..numBins]
         start = (i-1) / numBins * (max - min) + min
         end = (i) / numBins * (max - min) + min
         categories.push({ value: i, label: "#{format(start)} - #{format(end)}"})
-      categories.push({ value: axis.xform.numBins + 1, label: "> #{format(max)}"})
+  
+      if not axis.xform.excludeUpper
+        categories.push({ value: axis.xform.numBins + 1, label: "> #{format(max)}"})
+  
       categories.push(noneCategory)
 
       return categories
@@ -443,6 +462,7 @@ module.exports = class AxisBuilder
       return categories
 
     if axis.xform and axis.xform.type == "year"
+      hasNone = _.any(values, (v) -> not v?)
       values = _.compact(values)
       if values.length == 0 
         return [noneCategory]
@@ -457,12 +477,13 @@ module.exports = class AxisBuilder
           break
 
       # Add none if needed
-      if _.any(values, (v) -> not v?)
+      if hasNone
         categories.push(noneCategory)
 
       return categories
 
     if axis.xform and axis.xform.type == "yearmonth"
+      hasNone = _.any(values, (v) -> not v?)
       values = _.compact(values)
       if values.length == 0 
         return [noneCategory]
@@ -482,7 +503,7 @@ module.exports = class AxisBuilder
           break
 
       # Add none if needed
-      if _.any(values, (v) -> not v?)
+      if hasNone
         categories.push(noneCategory)
 
       return categories

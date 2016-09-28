@@ -32,7 +32,7 @@ module.exports = class BinsComponent extends React.Component
       if exprUtils.getExprAggrStatus(@props.expr) != "individual"
         # Percent is a special case where 0-100
         if @props.expr?.op == "percent where"
-          @props.onChange(update(@props.xform, { min: { $set: 0 }, max: { $set: 100 }}))
+          @props.onChange(update(@props.xform, { min: { $set: 0 }, max: { $set: 100 }, excludeLower: { $set: true }, excludeUpper: { $set: true }}))
 
         return
 
@@ -63,16 +63,26 @@ module.exports = class BinsComponent extends React.Component
 
   render: ->
     H.div null,
-      R LabeledInlineComponent, key: "min", label: "Min:",
-        R NumberInputComponent, small: true, value: @props.xform.min, onChange: (v) => @props.onChange(update(@props.xform, { min: { $set: v }}))
-      " "
-      R LabeledInlineComponent, key: "max", label: "Max:",
-        R NumberInputComponent, small: true, value: @props.xform.max, onChange: (v) => @props.onChange(update(@props.xform, { max: { $set: v }}))
-      " "
-      R LabeledInlineComponent, key: "numBins", label: "# of Bins:",
-        R NumberInputComponent, small: true, value: @props.xform.numBins, decimal: false, onChange: (v) => @props.onChange(update(@props.xform, { numBins: { $set: v }}))
-      if @state.guessing
-        H.i className: "fa fa-spinner fa-spin"
+      H.div key: "vals",
+        R LabeledInlineComponent, key: "min", label: "Min:",
+          R NumberInputComponent, small: true, value: @props.xform.min, onChange: (v) => @props.onChange(update(@props.xform, { min: { $set: v }}))
+        " "
+        R LabeledInlineComponent, key: "max", label: "Max:",
+          R NumberInputComponent, small: true, value: @props.xform.max, onChange: (v) => @props.onChange(update(@props.xform, { max: { $set: v }}))
+        " "
+        R LabeledInlineComponent, key: "numBins", label: "# of Bins:",
+          R NumberInputComponent, small: true, value: @props.xform.numBins, decimal: false, onChange: (v) => @props.onChange(update(@props.xform, { numBins: { $set: v }}))
+        if @state.guessing
+          H.i className: "fa fa-spinner fa-spin"
+      if @props.xform.min? and @props.xform.max? and @props.xform.numBins
+        H.div key: "excludes",
+            H.label className: "checkbox-inline", key: "lower",
+              H.input type: "checkbox", checked: not @props.xform.excludeLower, onChange: (ev) => @props.onChange(update(@props.xform, { excludeLower: { $set: not ev.target.checked }}))
+              "Include < #{@props.xform.min}"
+            H.label className: "checkbox-inline", key: "upper",
+              H.input type: "checkbox", checked: not @props.xform.excludeUpper, onChange: (ev) => @props.onChange(update(@props.xform, { excludeUpper: { $set: not ev.target.checked }}))
+              "Include > #{@props.xform.max}"
+
 
 LabeledInlineComponent = (props) ->
   H.div style: { display: "inline-block" },

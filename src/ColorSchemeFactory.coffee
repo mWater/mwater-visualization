@@ -1,3 +1,4 @@
+_ = require 'lodash'
 d3 = require 'd3-scale'
 brewer = require 'd3-scale-chromatic'
 c_c = require 'color-mixer'
