@@ -1,3 +1,4 @@
+_ = require 'lodash'
 AxisBuilder = require '../axes/AxisBuilder'
 ExprCompiler = require('mwater-expressions').ExprCompiler
 injectTableAlias = require('mwater-expressions').injectTableAlias
