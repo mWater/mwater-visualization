@@ -28,7 +28,7 @@ Design is:
 
 axes:
   geometry: where to draw buffers around
-  color: color axis 
+  color: color axis
 
 ###
 module.exports = class BufferLayer extends Layer
@@ -47,12 +47,12 @@ module.exports = class BufferLayer extends Layer
     layerDef = {
       layers: [{ id: "layer0", jsonql: @createJsonQL(design, schema, filters) }]
       css: @createCss(design, schema, filters)
-      interactivity: { 
+      interactivity: {
         layer: "layer0"
         fields: ["id"]
       }
     }
-    
+
     return layerDef
 
   createJsonQL: (design, schema, filters) ->
@@ -61,7 +61,7 @@ module.exports = class BufferLayer extends Layer
 
     ###
     Query:
-      select 
+      select
       <primary key> as id,
       [<color axis> as color,
       st_transform(<geometry axis>, 3857) as the_geom_webmercator,
@@ -69,10 +69,10 @@ module.exports = class BufferLayer extends Layer
       from <table> as main
       where
         <geometry axis> is not null
-        # Bounding box filter for speed 
-      and <geometry axis> && 
+        # Bounding box filter for speed
+      and <geometry axis> &&
       ST_Transform(ST_Expand(
-        # Prevent 3857 overflow (i.e. > 85 degrees lat) 
+        # Prevent 3857 overflow (i.e. > 85 degrees lat)
         ST_Intersection(
           ST_Transform(!bbox!, 4326),
           ST_Expand(ST_MakeEnvelope(-180, -85, 180, 85, 4326), -<radius in degrees>))
@@ -91,7 +91,7 @@ module.exports = class BufferLayer extends Layer
     widthExpr = {
       type: "op"
       op: "+"
-      exprs: [      
+      exprs: [
         {
           type: "op"
           op: "/"
@@ -112,7 +112,7 @@ module.exports = class BufferLayer extends Layer
 
     selects = [
       { type: "select", expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table).primaryKey }, alias: "id" } # main primary key as id
-      { type: "select", expr: geometryExpr, alias: "the_geom_webmercator" } 
+      { type: "select", expr: geometryExpr, alias: "the_geom_webmercator" }
       { type: "select", expr: widthExpr, alias: "width" } # Width of circles
     ]
 
@@ -120,16 +120,16 @@ module.exports = class BufferLayer extends Layer
     if design.axes.color
       colorExpr = axisBuilder.compileAxis(axis: design.axes.color, tableAlias: "main")
       selects.push({ type: "select", expr: colorExpr, alias: "color" })
-    
+
     # Select _id, location and clustered row number
-    query = { 
+    query = {
       type: "query"
       selects: selects
       from: exprCompiler.compileTable(design.table, "main")
     }
 
     # ST_Transform(ST_Expand(
-    #     # Prevent 3857 overflow (i.e. > 85 degrees lat) 
+    #     # Prevent 3857 overflow (i.e. > 85 degrees lat)
     #     ST_Intersection(
     #       ST_Transform(!bbox!, 4326),
     #       ST_Expand(ST_MakeEnvelope(-180, -85, 180, 85, 4326), -<radius in degrees>))
@@ -145,7 +145,7 @@ module.exports = class BufferLayer extends Layer
         { type: "op", op: "ST_Expand", exprs: [
           { type: "op", op: "ST_Intersection", exprs: [
             { type: "op", op: "ST_Transform", exprs: [
-              { type: "token", token: "!bbox!" } 
+              { type: "token", token: "!bbox!" }
               4326
               ]}
             { type: "op", op: "ST_Expand", exprs: [
@@ -162,7 +162,7 @@ module.exports = class BufferLayer extends Layer
     # Create filters. First ensure geometry and limit to bounding box
     whereClauses = [
       { type: "op", op: "is not null", exprs: [geometryExpr] }
-      { 
+      {
         type: "op"
         op: "&&"
         exprs: [
@@ -183,7 +183,7 @@ module.exports = class BufferLayer extends Layer
       whereClauses.push(injectTableAlias(filter.jsonql, "main"))
 
     whereClauses = _.compact(whereClauses)
-    
+
     # Wrap if multiple
     if whereClauses.length > 1
       query.where = { type: "op", op: "and", exprs: whereClauses }
@@ -226,7 +226,7 @@ module.exports = class BufferLayer extends Layer
         marker-fill: ''' + (design.color or "transparent") + ''';
       }
     '''
-    
+
     if design.color
       css += '''
         #layer0 {
@@ -254,18 +254,18 @@ module.exports = class BufferLayer extends Layer
 
     return css
 
-  # Called when the interactivity grid is clicked. 
+  # Called when the interactivity grid is clicked.
   # arguments:
   #   ev: { data: interactivty data e.g. `{ id: 123 }` }
-  #   options: 
+  #   options:
   #     design: design of layer
   #     schema: schema to use
   #     dataSource: data source to use
   #     layerDataSource: layer data source
   #     scopeData: current scope data if layer is scoping
-  # 
+  #
   # Returns:
-  #   null/undefined 
+  #   null/undefined
   #   or
   #   {
   #     scope: scope to apply ({ name, filter, data })
@@ -287,12 +287,12 @@ module.exports = class BufferLayer extends Layer
           ids = ids.concat([ev.data.id])
 
         # Create filter for rows
-        filter = { 
+        filter = {
           table: table
           jsonql: { type: "op", op: "=", modifier: "any", exprs: [
             { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table).primaryKey }
             { type: "literal", value: ids }
-          ]} 
+          ]}
         }
 
         # Scope to item
@@ -317,12 +317,12 @@ module.exports = class BufferLayer extends Layer
             widget = WidgetFactory.createWidget(options.type)
 
             # Create filters for single row
-            filter = { 
+            filter = {
               table: table
               jsonql: { type: "op", op: "=", exprs: [
                 { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table).primaryKey }
                 { type: "literal", value: ev.data.id }
-              ]} 
+              ]}
             }
 
             filters = [filter]
@@ -342,7 +342,7 @@ module.exports = class BufferLayer extends Layer
               width: options.width
               height: options.height
               standardWidth: options.standardWidth
-            })  
+            })
           })
       else if not ev.event.originalEvent.shiftKey
         results.row = { tableId: table, primaryKey: ev.data.id }
@@ -360,7 +360,7 @@ module.exports = class BufferLayer extends Layer
 
   # Removed as was making deceptively not present
   # # Get min and max zoom levels
-  # getMinZoom: (design) -> 
+  # getMinZoom: (design) ->
   #   # Earth is 40000km around, is 256 pixels. So zoom z radius map of r takes up 2*r*256*2^z/40000000 meters.
   #   # So zoom with 5 pixels across = log2(4000000*5/(2*r*256))
   #   if design.radius
@@ -385,7 +385,7 @@ module.exports = class BufferLayer extends Layer
       defaultColor: design.color
 
   # Get a list of table ids that can be filtered on
-  getFilterableTables: (design, schema) -> 
+  getFilterableTables: (design, schema) ->
     return if design.table then [design.table] else []
 
   # True if layer can be edited
@@ -452,7 +452,7 @@ module.exports = class BufferLayer extends Layer
 
     error = axisBuilder.validateAxis(axis: design.axes.color)
     if error then return error
-  
+
     return null
 
   createKMLExportJsonQL: (design, schema, filters) ->
@@ -475,7 +475,7 @@ module.exports = class BufferLayer extends Layer
 
     selects = [
       { type: "select", expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table).primaryKey }, alias: "id" } # main primary key as id
-      { type: "select", expr: bufferedGeometry, alias: "the_geom_webmercator" } 
+      { type: "select", expr: bufferedGeometry, alias: "the_geom_webmercator" }
     ]
 
     extraFields = ["code", "name", "desc", "type", "photos"]
@@ -484,22 +484,24 @@ module.exports = class BufferLayer extends Layer
       column = schema.getColumn(design.table, field)
 
       if column
-        selects.push({ type: "select", expr: { type: "field", tableAlias: "main", column: field }, alias: field })  
+        selects.push({ type: "select", expr: { type: "field", tableAlias: "main", column: field }, alias: field })
 
     # Add color select if color axis
     if design.axes.color
+      valueExpr = exprCompiler.compileExpr(expr: design.axes.color.expr, tableAlias: "main")
       colorExpr = axisBuilder.compileAxis(axis: design.axes.color, tableAlias: "main")
+      selects.push({ type: "select", expr: valueExpr, alias: "value" })
       selects.push({ type: "select", expr: colorExpr, alias: "color" })
-    
+
     # Select _id, location and clustered row number
-    query = { 
+    query = {
       type: "query"
       selects: selects
       from: exprCompiler.compileTable(design.table, "main")
     }
 
     # ST_Transform(ST_Expand(
-    #     # Prevent 3857 overflow (i.e. > 85 degrees lat) 
+    #     # Prevent 3857 overflow (i.e. > 85 degrees lat)
     #     ST_Intersection(
     #       ST_Transform(!bbox!, 4326),
     #       ST_Expand(ST_MakeEnvelope(-180, -85, 180, 85, 4326), -<radius in degrees>))
@@ -524,7 +526,7 @@ module.exports = class BufferLayer extends Layer
       whereClauses.push(injectTableAlias(filter.jsonql, "main"))
 
     whereClauses = _.compact(whereClauses)
-    
+
     # Wrap if multiple
     if whereClauses.length > 1
       query.where = { type: "op", op: "and", exprs: whereClauses }
@@ -561,11 +563,11 @@ module.exports = class BufferLayer extends Layer
 
     if design.axes.color and design.axes.color.colorMap
       style.colorMap = design.axes.color.colorMap
-      
+
     layerDef = {
       layers: [{ id: "layer0", jsonql: @createKMLExportJsonQL(design, schema, filters) , style: style}]
     }
-    
+
     return layerDef
 
   acceptKmlVisitorForRow: (visitor, row) ->
@@ -579,4 +581,3 @@ module.exports = class BufferLayer extends Layer
     )
 
     visitor.addPolygon(list.join(" "), row.color, false, row.name, visitor.buildDescription(row))
-
