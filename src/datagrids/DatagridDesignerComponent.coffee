@@ -138,6 +138,7 @@ class ColumnsDesignerComponent extends React.Component
 
   handleAddIdColumn: =>
     columns = @props.columns.slice()
+    # TODO we should display label when available but without breaking Peter's id downloads. Need format field to indicate raw id.
     columns.push({ id: uuid.v4(), type: "expr", width: 150, expr: { type: "id", table: @props.table }, label: "Unique Id" })
     @props.onColumnsChange(columns)
 
@@ -318,6 +319,10 @@ class DefaultColumnsBuilder
       # Skip joins
       if col.type == "join"
         continue 
+
+      # Skip deprecated
+      if col.deprecated
+        continue
 
       columns.push({ 
          id: uuid.v4()
