@@ -51,7 +51,7 @@ module.exports = class MarkersLayer extends Layer
         }
       ]
       css: @createCss(design, schema)
-      interactivity: { 
+      interactivity: {
         layer: "layer0"
         fields: ["id"]
       }
@@ -70,8 +70,8 @@ module.exports = class MarkersLayer extends Layer
     geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
 
     # row_number() over (partition by st_snaptogrid(location, !pixel_width!*5, !pixel_height!*5)) AS r
-    cluster = { 
-      type: "select" 
+    cluster = {
+      type: "select"
       expr: { type: "op", op: "row_number", exprs: [] }
       over: { partitionBy: [
         { type: "op", op: "ST_SnapToGrid", exprs: [
@@ -84,7 +84,7 @@ module.exports = class MarkersLayer extends Layer
     }
 
     # Select _id, location and clustered row number
-    innerquery = { 
+    innerquery = {
       type: "query"
       selects: [
         { type: "select", expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(design.table).primaryKey }, alias: "id" } # main primary key as id
@@ -101,7 +101,7 @@ module.exports = class MarkersLayer extends Layer
 
     # Create filters. First limit to bounding box
     whereClauses = [
-      { 
+      {
         type: "op"
         op: "&&"
         exprs: [
@@ -122,7 +122,7 @@ module.exports = class MarkersLayer extends Layer
       whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
 
     whereClauses = _.compact(whereClauses)
-    
+
     # Wrap if multiple
     if whereClauses.length > 1
       innerquery.where = { type: "op", op: "and", exprs: whereClauses }
@@ -178,18 +178,18 @@ module.exports = class MarkersLayer extends Layer
 
     return css
 
-  # Called when the interactivity grid is clicked. 
+  # Called when the interactivity grid is clicked.
   # arguments:
   #   ev: { data: interactivty data e.g. `{ id: 123 }` }
-  #   options: 
+  #   options:
   #     design: design of layer
   #     schema: schema to use
   #     dataSource: data source to use
   #     layerDataSource: layer data source
   #     scopeData: current scope data if layer is scoping
-  # 
+  #
   # Returns:
-  #   null/undefined 
+  #   null/undefined
   #   or
   #   {
   #     scope: scope to apply ({ name, filter, data })
@@ -211,12 +211,12 @@ module.exports = class MarkersLayer extends Layer
           ids = ids.concat([ev.data.id])
 
         # Create filter for rows
-        filter = { 
+        filter = {
           table: table
           jsonql: { type: "op", op: "=", modifier: "any", exprs: [
             { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table).primaryKey }
             { type: "literal", value: ids }
-          ]} 
+          ]}
         }
 
         # Scope to item
@@ -241,12 +241,12 @@ module.exports = class MarkersLayer extends Layer
             widget = WidgetFactory.createWidget(options.type)
 
             # Create filters for single row
-            filter = { 
+            filter = {
               table: table
               jsonql: { type: "op", op: "=", exprs: [
                 { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table).primaryKey }
                 { type: "literal", value: ev.data.id }
-              ]} 
+              ]}
             }
 
             filters = [filter]
@@ -266,7 +266,7 @@ module.exports = class MarkersLayer extends Layer
               width: options.width
               height: options.height
               standardWidth: options.standardWidth
-            })  
+            })
           })
       else if not ev.event.originalEvent.shiftKey
         results.row = { tableId: table, primaryKey: ev.data.id }
@@ -385,12 +385,14 @@ module.exports = class MarkersLayer extends Layer
       column = schema.getColumn(design.table, field)
 
       if column
-        innerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "innerquery", column: field }, alias: field })  
+        innerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "innerquery", column: field }, alias: field })
 
     # Add color select if color axis
     if design.axes.color
       colorExpr = axisBuilder.compileAxis(axis: design.axes.color, tableAlias: "innerquery")
+      valueExpr = exprCompiler.compileExpr(expr: design.axes.color.expr, tableAlias: "innerquery")
       innerquery.selects.push({ type: "select", expr: colorExpr, alias: "color" })
+      innerquery.selects.push({ type: "select", expr: valueExpr, alias: "value" })
 
     # Create filters. First limit to bounding box
     whereClauses = []
@@ -429,7 +431,7 @@ module.exports = class MarkersLayer extends Layer
 
     if design.axes.color and design.axes.color.colorMap
       style.colorMap = design.axes.color.colorMap
-      
+
     return style
 
   getKMLExportJsonQL: (design, schema, filters) ->
@@ -447,4 +449,3 @@ module.exports = class MarkersLayer extends Layer
 
   acceptKmlVisitorForRow: (visitor, row) ->
     visitor.addPoint(row.latitude, row.longitude, row.name, visitor.buildDescription(row), row.color)
-

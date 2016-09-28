@@ -17,7 +17,7 @@ Layer that is composed of administrative regions colored
 Design is:
   scope: _id of overall admin region. Null for whole world.
   scopeLevel: admin level of scope. Default is 0 (entire country) if scope is set
-  detailLevel: admin level to disaggregate to 
+  detailLevel: admin level to disaggregate to
 
   table: table to get data from
   adminRegionExpr: expression to get admin region id for calculations
@@ -35,7 +35,7 @@ Design is:
   maxZoom: maximum zoom level
 
 axes:
-  color: color axis 
+  color: color axis
   label: overrides the nameLabels to display text on each region
 
 ###
@@ -55,12 +55,12 @@ module.exports = class AdminChoroplethLayer extends Layer
     layerDef = {
       layers: [{ id: "layer0", jsonql: @createJsonQL(design, schema, filters) }]
       css: @createCss(design, schema, filters)
-      interactivity: { 
+      interactivity: {
         layer: "layer0"
         fields: ["id", "name"]
       }
     }
-    
+
     return layerDef
 
   createJsonQL: (design, schema, filters) ->
@@ -69,20 +69,20 @@ module.exports = class AdminChoroplethLayer extends Layer
 
     ###
     E.g:
-    select name, shape_simplified, regions.color from 
+    select name, shape_simplified, regions.color from
     admin_regions as admin_regions2
     left outer join
     (
-      select admin_regions.level2 as id, 
+      select admin_regions.level2 as id,
       count(innerquery.*) as color
-      from 
-      admin_regions inner join 
+      from
+      admin_regions inner join
       entities.water_point as innerquery
       on innerquery.admin_region = admin_regions._id
       where admin_regions.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
       group by 1
-    ) as regions on regions.id = admin_regions2._id 
-    where admin_regions2.level = 2 and admin_regions2.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb' 
+    ) as regions on regions.id = admin_regions2._id
+    where admin_regions2.level = 2 and admin_regions2.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
     ###
 
     # Verify that scopeLevel is an integer to prevent injection
@@ -141,7 +141,7 @@ module.exports = class AdminChoroplethLayer extends Layer
         ]
       })
 
-    # Then add filters 
+    # Then add filters
     if design.filter
       whereClauses.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "innerquery"))
 
@@ -231,7 +231,7 @@ module.exports = class AdminChoroplethLayer extends Layer
       css += '''
       #layer0::labels {
         text-name: [name];
-        text-face-name: 'Arial Regular'; 
+        text-face-name: 'Arial Regular';
         text-halo-radius: 2;
         text-halo-opacity: 0.5;
         text-halo-fill: #FFF;
@@ -260,18 +260,18 @@ module.exports = class AdminChoroplethLayer extends Layer
 
     return css
 
-  # Called when the interactivity grid is clicked. 
+  # Called when the interactivity grid is clicked.
   # arguments:
   #   ev: { data: interactivty data e.g. `{ id: 123 }` }
-  #   options: 
+  #   options:
   #     design: design of layer
   #     schema: schema to use
   #     dataSource: data source to use
   #     layerDataSource: layer data source
   #     scopeData: current scope data if layer is scoping
-  # 
+  #
   # Returns:
-  #   null/undefined 
+  #   null/undefined
   #   or
   #   {
   #     scope: scope to apply ({ name, filter, data })
@@ -285,7 +285,7 @@ module.exports = class AdminChoroplethLayer extends Layer
 
       # Create filter for single row
       table = clickOptions.design.table
-      
+
       # Compile adminRegionExpr
       exprCompiler = new ExprCompiler(clickOptions.schema)
       filterExpr = {
@@ -300,9 +300,9 @@ module.exports = class AdminChoroplethLayer extends Layer
       compiledFilterExpr = exprCompiler.compileExpr(expr: filterExpr, tableAlias: "{alias}")
 
       # Filter within
-      filter = { 
+      filter = {
         table: table
-        jsonql: compiledFilterExpr 
+        jsonql: compiledFilterExpr
       }
 
       if ev.event.originalEvent.shiftKey
@@ -344,7 +344,7 @@ module.exports = class AdminChoroplethLayer extends Layer
               width: options.width
               height: options.height
               standardWidth: options.standardWidth
-            })  
+            })
           })
 
       return results
@@ -440,7 +440,7 @@ module.exports = class AdminChoroplethLayer extends Layer
     if design.axes.label
       error = axisBuilder.validateAxis(axis: design.axes.label)
       if error then return error
-  
+
     return null
 
   # Creates a design element with specified options
@@ -467,123 +467,157 @@ module.exports = class AdminChoroplethLayer extends Layer
 
     ###
     E.g.:
-    select admin_regions._id, shape_simplified, 
-      (select count(wp.*) as cnt from 
-      admin_region_subtrees 
+    select admin_regions._id, shape_simplified,
+      (select count(wp.*) as cnt from
+      admin_region_subtrees
       inner join entities.water_point as wp on wp.admin_region = admin_region_subtrees.descendant
       where admin_region_subtrees.ancestor = admin_regions._id) as color
 
-    from admin_regions 
-    where shape && !bbox! and  path ->> 0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb' and level = 1  
+    from admin_regions
+    where shape && !bbox! and  path ->> 0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb' and level = 1
     ###
+
+    # Verify that scopeLevel is an integer to prevent injection
+    if design.scopeLevel? and design.scopeLevel not in [0, 1, 2, 3, 4, 5]
+      throw new Error("Invalid scope level")
+
+    # Verify that detailLevel is an integer to prevent injection
+    if design.detailLevel not in [0, 1, 2, 3, 4, 5]
+      throw new Error("Invalid detail level")
 
     # Compile adminRegionExpr
     compiledAdminRegionExpr = exprCompiler.compileExpr(expr: design.adminRegionExpr, tableAlias: "innerquery")
+
+    # Create inner query
+    innerQuery = {
+      type: "query"
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "admin_regions", column: "level#{design.detailLevel}" }, alias: "id" }
+      ]
+      from: {
+        type: "join"
+        kind: "inner"
+        left: { type: "table", table: "admin_regions", alias: "admin_regions" }
+        right: exprCompiler.compileTable(design.table, "innerquery")
+        on: {
+          type: "op"
+          op: "="
+          exprs: [
+            compiledAdminRegionExpr
+            { type: "field", tableAlias: "admin_regions", column: "_id" }
+          ]
+        }
+      }
+      groupBy: [1]
+    }
+
+    # Add color select if color axis
+    if design.axes.color
+      valueExpr = exprCompiler.compileExpr(expr: design.axes.color.expr, tableAlias: "innerquery")
+      colorExpr = axisBuilder.compileAxis(axis: design.axes.color, tableAlias: "innerquery")
+      innerQuery.selects.push({ type: "select", expr: colorExpr, alias: "color" })
+      innerQuery.selects.push({ type: "select", expr: valueExpr, alias: "value" })
+
+    # Add label select if color axis
+    if design.axes.label
+      labelExpr = axisBuilder.compileAxis(axis: design.axes.label, tableAlias: "innerquery")
+      innerQuery.selects.push({ type: "select", expr: labelExpr, alias: "label" })
+
+    whereClauses = []
+
+    if design.scope
+      whereClauses.push({
+        type: "op"
+        op: "="
+        exprs: [
+          { type: "field", tableAlias: "admin_regions", column: "level#{design.scopeLevel or 0}" }
+          design.scope
+        ]
+      })
+
+    # Then add filters
+    if design.filter
+      whereClauses.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "innerquery"))
+
+    # Then add extra filters passed in, if relevant
+    relevantFilters = _.where(filters, table: design.table)
+    for filter in relevantFilters
+      whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
+
+    whereClauses = _.compact(whereClauses)
+
+    if whereClauses.length > 0
+      innerQuery.where = { type: "op", op: "and", exprs: whereClauses }
 
     adminGeometry = {
       type: "op", op: "ST_AsGeoJson", exprs: [
         {
           type: "op", op: "ST_Transform", exprs: [
-            {type: "field", tableAlias: "admin_regions", column: "shape_simplified"},
+            {type: "field", tableAlias: "admin_regions2", column: "shape_simplified"},
             4326
           ]
         }
       ]
     }
 
-    selects = [
-      { type: "select", expr: { type: "field", tableAlias: "admin_regions", column: "_id" }, alias: "id" }
-      { type: "select", expr: adminGeometry, alias: "the_geom_webmercator" }
-      { type: "select", expr: { type: "field", tableAlias: "admin_regions", column: "name" }, alias: "name" }
-    ]
-
-    # Makes the scalar subquery needed to get a value
-    createScalar = (expr) =>
-      whereClauses = [
-        {
+    # Now create outer query
+    query = {
+      type: "query"
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "admin_regions2", column: "_id" }, alias: "id" }
+        { type: "select", expr: adminGeometry, alias: "the_geom_webmercator" }
+        { type: "select", expr: { type: "field", tableAlias: "admin_regions2", column: "name" }, alias: "name" }
+      ]
+      from: {
+        type: "join"
+        kind: "left"
+        left: { type: "table", table: "admin_regions", alias: "admin_regions2" }
+        right: { type: "subquery", query: innerQuery, alias: "regions" }
+        on: {
           type: "op"
           op: "="
           exprs: [
-            { type: "field", tableAlias: "admin_region_subtrees", column: "ancestor" }
-            { type: "field", tableAlias: "admin_regions", column: "_id" }
+            { type: "field", tableAlias: "regions", column: "id" }
+            { type: "field", tableAlias: "admin_regions2", column: "_id" }
           ]
-        }      
-      ]
-
-      # Then add filters baked into layer
-      if design.filter
-        whereClauses.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "innerquery"))
-
-      # Then add extra filters passed in, if relevant
-      relevantFilters = _.where(filters, table: design.table)
-      for filter in relevantFilters
-        whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
-  
-      whereClauses = _.compact(whereClauses)
-      
-      return {
-        type: "scalar"
-        expr: colorExpr
-        from: {
-          type: "join"
-          left: exprCompiler.compileTable(design.table, "innerquery")
-          right: { type: "table", table: "admin_region_subtrees", alias: "admin_region_subtrees" }
-          kind: "inner"
-          on: {
+        }
+      }
+      where: {
+        type: "op"
+        op: "and"
+        exprs: [
+          # Level to display
+          {
             type: "op"
             op: "="
             exprs: [
-              compiledAdminRegionExpr
-              { type: "field", tableAlias: "admin_region_subtrees", column: "descendant" }
+              { type: "field", tableAlias: "admin_regions2", column: "level" }
+              design.detailLevel
             ]
           }
-        }
-        where: { type: "op", op: "and", exprs: whereClauses }
+        ]
       }
+    }
 
-    # Add color select if color axis
-    if design.axes.color
-      colorExpr = axisBuilder.compileAxis(axis: design.axes.color, tableAlias: "innerquery")
-      selects.push({ type: "select", expr: createScalar(colorExpr), alias: "color" })
-
-    # Add label select if color axis
-    if design.axes.label
-      labelExpr = axisBuilder.compileAxis(axis: design.axes.label, tableAlias: "innerquery")
-      selects.push({ type: "select", expr: createScalar(labelExpr), alias: "label" })
-
-    # Now create outer query
-    wheres = []
-
+    # Scope overall
     if design.scope
-      wheres.push({
+      query.where.exprs.push({
         type: "op"
         op: "="
         exprs: [
-          { type: "op", op: "->>", exprs: [{ type: "field", tableAlias: "admin_regions", column: "path" }, 0] }
+          { type: "field", tableAlias: "admin_regions2", column: "level#{design.scopeLevel or 0}" }
           design.scope
         ]
       })
 
-    # Level to display
-    wheres.push({
-      type: "op"
-      op: "="
-      exprs: [
-        { type: "field", tableAlias: "admin_regions", column: "level" }
-        design.detailLevel
-      ]
-    })
+    # Bubble up color and label
+    if design.axes.color
+      query.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "color"}, alias: "color" })
+      query.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "value"}, alias: "value" })
 
-    query = {
-      type: "query"
-      selects: selects
-      from: { type: "table", table: "admin_regions", alias: "admin_regions" }
-      where: {
-        type: "op"
-        op: "and"
-        exprs: wheres
-      }
-    }
+    # Add label select if color axis
+    if design.axes.label
+      query.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "label"}, alias: "label" })
 
     return query
 
@@ -595,11 +629,11 @@ module.exports = class AdminChoroplethLayer extends Layer
 
     if design.axes.color and design.axes.color.colorMap
       style.colorMap = design.axes.color.colorMap
-      
+
     layerDef = {
       layers: [{ id: "layer0", jsonql: @createKMLExportJsonQL(design, schema, filters) , style: style}]
     }
-    
+
     return layerDef
 
   acceptKmlVisitorForRow: (visitor, row) ->
@@ -615,7 +649,7 @@ module.exports = class AdminChoroplethLayer extends Layer
       return
 
     if data.type == "MultiPolygon"
-      outer = data.coordinates[0][0]  
+      outer = data.coordinates[0][0]
     else
       outer = data.coordinates[0]
 
@@ -625,4 +659,3 @@ module.exports = class AdminChoroplethLayer extends Layer
     )
 
     visitor.addPolygon(list.join(" "), row.color, data.type == "MultiPolygon", row.name, visitor.buildDescription(row))
-    
