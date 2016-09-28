@@ -465,18 +465,6 @@ module.exports = class AdminChoroplethLayer extends Layer
     axisBuilder = new AxisBuilder(schema: schema)
     exprCompiler = new ExprCompiler(schema)
 
-    ###
-    E.g.:
-    select admin_regions._id, shape_simplified,
-      (select count(wp.*) as cnt from
-      admin_region_subtrees
-      inner join entities.water_point as wp on wp.admin_region = admin_region_subtrees.descendant
-      where admin_region_subtrees.ancestor = admin_regions._id) as color
-
-    from admin_regions
-    where shape && !bbox! and  path ->> 0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb' and level = 1
-    ###
-
     # Verify that scopeLevel is an integer to prevent injection
     if design.scopeLevel? and design.scopeLevel not in [0, 1, 2, 3, 4, 5]
       throw new Error("Invalid scope level")
