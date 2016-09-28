@@ -1,3 +1,4 @@
+_ = require 'lodash'
 async = require 'async'
 LayerFactory = require './LayerFactory'
 ExprCompiler = require('mwater-expressions').ExprCompiler
