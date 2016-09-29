@@ -17,7 +17,7 @@ module.exports = class ColorPaletteCollectionComponent extends React.Component
     if isCategorical
       type = "schemeSet1"
     else
-      type = "interpolateSpectral"
+      type = "interpolateBlues"
 
     scheme = ColorPaletteCollectionComponent.generateColorSet(type, categories.length - 1)
 
