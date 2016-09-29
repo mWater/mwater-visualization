@@ -186,6 +186,7 @@ module.exports = class MapViewComponent extends React.Component
 
     return R ModalPopupComponent, 
       onClose: => @setState(popupContents: null)
+      showCloseX: true
       size: "large",
         @state.popupContents
         H.div style: { textAlign: "right", marginTop: 10 },
