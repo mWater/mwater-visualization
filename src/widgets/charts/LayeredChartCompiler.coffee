@@ -4,8 +4,11 @@ ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../../axes/AxisBuilder'
 injectTableAlias = require('mwater-expressions').injectTableAlias
 
-
-tickFormatter = d3.format(",")
+# Only set up if d3 is available (hack for using on server)
+if global.d3
+  tickFormatter = d3.format(",")
+else
+  tickFormatter = null
 
 
 # Compiles various parts of a layered chart (line, bar, scatter, spline, area) to C3.js format
