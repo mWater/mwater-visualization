@@ -2,6 +2,8 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
+NumberInputComponent = require('react-library/lib/NumberInputComponent')
+
 CheckboxComponent = require '../CheckboxComponent'
 ClickOutHandler = require('react-onclickout')
 MapLayersDesignerComponent = require './MapLayersDesignerComponent'
@@ -55,10 +57,15 @@ module.exports = class MapDesignerComponent extends React.Component
             R PopoverHelpComponent, placement: "left",
               '''Automatically zoom to the complete data whenever the map is loaded or the filters change'''
 
-
       R AttributionComponent,
         text: @props.design.attribution
         onTextChange: @handleAttributionChange
+
+      H.br()
+      
+      R AdvancedOptionsComponent, 
+        design: @props.design
+        onDesignChange: @props.onDesignChange
 
 
 # Attribution inline editing
@@ -109,3 +116,36 @@ class AttributionComponent extends React.Component
         elem
 
     return elem
+
+# Advanced options control
+class AdvancedOptionsComponent extends React.Component
+  @propTypes:
+    design: React.PropTypes.object.isRequired
+    onDesignChange: React.PropTypes.func.isRequired
+
+  constructor: (props) ->
+    super
+
+    @state = {
+      expanded: false
+    }
+
+  render: ->
+    if not @state.expanded
+      return H.div null,
+        H.a className: "btn btn-link btn-xs", onClick: (=> @setState(expanded: true)),
+          "Advanced options..."
+
+    return H.div className: "form-group",
+      H.label className: "text-muted", "Advanced"
+
+      H.div null,
+        H.span className: "text-muted", "Maximum Zoom Level: "
+        " "
+        R NumberInputComponent, 
+          small: true
+          style: { display: "inline-block"}
+          placeholder: "None"
+          value: @props.design.maxZoom
+          onChange: (v) => @props.onDesignChange(_.extend({}, @props.design, maxZoom: v))
+

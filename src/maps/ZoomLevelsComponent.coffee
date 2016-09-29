@@ -5,8 +5,7 @@ R = React.createElement
 
 NumberInputComponent = require('react-library/lib/NumberInputComponent')
 
-# Dropdown to add a new layer. 
-# Can be overridden by context of addLayerElementFactory which is called with all props
+# Zoom level min and max control
 module.exports = class ZoomLevelsComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired
@@ -27,7 +26,7 @@ module.exports = class ZoomLevelsComponent extends React.Component
 
     return H.div className: "form-group",
       H.label className: "text-muted", "Advanced"
-      H.div null,
+      H.div key: "min",
         H.span className: "text-muted", "Minimum Zoom Level:"
         " "
         R NumberInputComponent, 
@@ -37,7 +36,7 @@ module.exports = class ZoomLevelsComponent extends React.Component
           value: @props.design.minZoom
           onChange: (v) => @props.onDesignChange(_.extend({}, @props.design, minZoom: v))
 
-      H.div null,
+      H.div key: "max",
         H.span className: "text-muted", "Maximum Zoom Level: "
         " "
         R NumberInputComponent, 

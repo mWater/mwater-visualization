@@ -263,3 +263,4 @@ module.exports = class MapViewComponent extends React.Component
         onBoundsChange: @handleBoundsChange
         extraAttribution: @props.design.attribution
         loadingSpinner: true
+        maxZoom: @props.design.maxZoom

@@ -165,7 +165,13 @@ module.exports = class LeafletMapComponent extends React.Component
     if prevProps and (prevProps.width != @props.width or prevProps.height != @props.height)
       @map.invalidateSize()
 
-    #update attribution
+    # Update maxZoom
+    if prevProps and prevProps.maxZoom != @props.maxZoom
+      @map.options.maxZoom = @props.maxZoom
+      if @map.getZoom() > @props.maxZoom
+        @map.setZoom(@props.maxZoom)
+
+    # Update attribution
     if not prevProps or @props.extraAttribution != prevProps.extraAttribution
       if @baseLayer
         @baseLayer._map.attributionControl.removeAttribution(prevProps.extraAttribution)
