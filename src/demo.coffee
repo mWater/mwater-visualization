@@ -199,7 +199,7 @@ class MWaterDirectMapPane extends React.Component
     super
 
     @state = {
-      design: badColorsMap
+      design: badColorsMap2
       extraTables: []
     }
 
@@ -3372,6 +3372,131 @@ badColorsMap = {
     "n": 3.469557303061473,
     "e": 45.6591796875,
     "s": -19.16592425362801
+  },
+  "autoBounds": false
+}
+
+
+badColorsMap2 = {
+  "baseLayer": "cartodb_positron",
+  "layerViews": [
+    {
+      "id": "8e22dc94-049a-4b20-85dc-70429328eb68",
+      "name": "Untitled Layer",
+      "desc": "",
+      "type": "Markers",
+      "visible": true,
+      "opacity": 1,
+      "design": {
+        "axes": {
+          "geometry": {
+            "expr": {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "location"
+            }
+          },
+          "color": {
+            "expr": {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "type"
+            },
+            "colorMap": [
+              {
+                "value": "Unprotected dug well",
+                "color": "#fdc086"
+              },
+              {
+                "value": "Borehole or tubewell",
+                "color": "#ffff99"
+              },
+              {
+                "value": "Protected spring",
+                "color": "#386cb0"
+              },
+              {
+                "value": "Unprotected spring",
+                "color": "#f0027f"
+              },
+              {
+                "value": "Rainwater",
+                "color": "#bf5b17"
+              },
+              {
+                "value": "Surface water",
+                "color": "#666666"
+              },
+              {
+                "value": "Piped into dwelling",
+                "color": "#7fc97f"
+              },
+              {
+                "value": "Piped into yard/plot",
+                "color": "#beaed4"
+              },
+              {
+                "value": "Piped into public tap or basin",
+                "color": "#fdc086"
+              },
+              {
+                "value": "Bottled water",
+                "color": "#ffff99"
+              },
+              {
+                "value": "Tanker truck",
+                "color": "#386cb0"
+              },
+              {
+                "value": "Cart with small tank/drum",
+                "color": "#f0027f"
+              },
+              {
+                "value": "other",
+                "color": "#bf5b17"
+              },
+              {
+                "value": null,
+                "color": "#aaaaaa"
+              },
+              {
+                "value": "Protected dug well",
+                "color": "#d0021b"
+              }
+            ],
+            "drawOrder": [
+              "Protected dug well",
+              "Unprotected dug well",
+              "Borehole or tubewell",
+              "Protected spring",
+              "Unprotected spring",
+              "Rainwater",
+              "Surface water",
+              "Piped into dwelling",
+              "Piped into yard/plot",
+              "Piped into public tap or basin",
+              "Bottled water",
+              "Tanker truck",
+              "Cart with small tank/drum",
+              "other",
+              null
+            ]
+          }
+        },
+        "color": "#0088FF",
+        "filter": null,
+        "table": "entities.water_point"
+      }
+    }
+  ],
+  "filters": {
+    "entities.water_point": null
+  },
+  "bounds": {
+    "w": 20.50048828125,
+    "n": 3.6888551431470478,
+    "e": 50.03173828125,
+    "s": -19.373340713364044
   },
   "autoBounds": false
 }
