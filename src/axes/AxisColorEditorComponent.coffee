@@ -50,8 +50,6 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
       newState =
         categories: categories
 
-      console.log _.pluck(props.axis.colorMap, "value")
-      console.log _.pluck(categories, "value")
       if not props.axis.colorMap or !_.isEqual(_.pluck(props.axis.colorMap, "value").sort(), _.pluck(categories, "value").sort())
         colorMap = ColorPaletteCollectionComponent.getColorMapForCategories(categories, axisBuilder.isCategorical(props.axis))
         @onPaletteChange(colorMap)
