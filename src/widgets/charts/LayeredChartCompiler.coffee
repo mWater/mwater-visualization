@@ -5,6 +5,9 @@ AxisBuilder = require '../../axes/AxisBuilder'
 injectTableAlias = require('mwater-expressions').injectTableAlias
 
 
+tickFormatter = d3.format(",")
+
+
 # Compiles various parts of a layered chart (line, bar, scatter, spline, area) to C3.js format
 module.exports = class LayeredChartCompiler
   # Pass in schema
@@ -124,7 +127,7 @@ module.exports = class LayeredChartCompiler
           max: if options.design.type == "bar" and options.design.proportional then 100
           padding: if options.design.type == "bar" and options.design.proportional then { top: 0, bottom: 0 }
           tick: {
-            format: d3.format(",")
+            format: tickFormatter
           }
         }
         rotated: options.design.transpose
