@@ -50,7 +50,7 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
       newState =
         categories: categories
 
-      if not props.axis.colorMap or !_.isEqual(_.pluck(props.axis.colorMap, "value"), _.pluck(categories, "value"))
+      if not props.axis.colorMap or !_.isEqual(_.pluck(props.axis.colorMap, "value").sort(), _.pluck(categories, "value").sort())
         colorMap = ColorPaletteCollectionComponent.getColorMapForCategories(categories, axisBuilder.isCategorical(props.axis))
         @onPaletteChange(colorMap)
         newState.mode = "normal"
@@ -92,7 +92,7 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
       newState =
         categories: categories
 
-      if not props.axis.colorMap or !_.isEqual(_.pluck(props.axis.colorMap, "value"), _.pluck(categories, "value"))
+      if not props.axis.colorMap or !_.isEqual(_.pluck(props.axis.colorMap, "value").sort(), _.pluck(categories, "value").sort())
         colorMap = ColorPaletteCollectionComponent.getColorMapForCategories(categories, axisBuilder.isCategorical(axis))
         @onPaletteChange(colorMap)
         newState.mode = "normal"
