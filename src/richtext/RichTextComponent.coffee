@@ -5,6 +5,7 @@ _ = require 'lodash'
 
 ContentEditableComponent = require('mwater-expressions-ui').ContentEditableComponent
 ClickOutHandler = require('react-onclickout')
+ItemsHtmlConverter = require './ItemsHtmlConverter'
 
 module.exports = class RichTextComponent extends React.Component
   @propTypes: 
@@ -18,7 +19,7 @@ module.exports = class RichTextComponent extends React.Component
     style: React.PropTypes.object  # Optional style of editor wrapper
 
     # Converter to use for editing
-    itemsHtmlConverter: React.PropTypes.object.isRequired
+    itemsHtmlConverter: React.PropTypes.object
 
     # True (default) to include heading h1, h2 in palette
     includeHeadings: React.PropTypes.bool
@@ -29,6 +30,7 @@ module.exports = class RichTextComponent extends React.Component
   @defaultProps:
     includeHeadings: true
     items: []
+    itemsHtmlConverter: new ItemsHtmlConverter()
 
   constructor: (props) ->
     super(props)
