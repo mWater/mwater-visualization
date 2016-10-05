@@ -3,13 +3,12 @@ H = React.DOM
 R = React.createElement
 _ = require 'lodash'
 
-ContentEditableComponent = require('mwater-expressions-ui').ContentEditableComponent
+RichTextComponent = require '../../richtext/RichTextComponent'
 ExprInsertModalComponent = require './ExprInsertModalComponent'
 ExprUpdateModalComponent = require './ExprUpdateModalComponent'
 
-ItemsHtmlConverter = require './ItemsHtmlConverter'
+ExprItemsHtmlConverter = require '../../richtext/ExprItemsHtmlConverter'
 AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
-ClickOutHandler = require('react-onclickout')
 
 module.exports = class TextWidgetComponent extends AsyncLoadComponent
   @propTypes: 
@@ -34,7 +33,6 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
       # Map of expression id to expression value
       exprValues: {}
       error: null
-      focused: false
     }
 
   # Override to determine if a load is needed. Not called on mounting
@@ -64,48 +62,16 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
     exprValues = if not @state.loading then @state.exprValues else {}
 
     # Display summaries if in design more and singleRowTable is set
-    return new ItemsHtmlConverter(@props.schema, @props.onDesignChange?, exprValues, @props.onDesignChange? and @props.singleRowTable?)
+    return new ExprItemsHtmlConverter(@props.schema, @props.onDesignChange?, exprValues, @props.onDesignChange? and @props.singleRowTable?)
 
-  createHtml: ->
-    # If loading, don't display old values
-    exprValues = if not @state.loading then @state.exprValues else {}
-
-    return @createItemsHtmlConverter().itemsToHtml(@props.design.items)
-
-  handleChange: (elem) =>
-    design = _.extend({}, @props.design, items: @createItemsHtmlConverter().elemToItems(elem))
-    if not _.isEqual(design, @props.design)
-      @props.onDesignChange(design)
-    else
-      # Re-render as HTML may have been mangled and needs a round-trip
-      @forceUpdate()
-
-  handleFocus: => @setState(focused: true)
-  handleClickOut: => @setState(focused: false)
-
-  handleCommand: (command, param, ev) =>
-    # Shift args
-    if param.preventDefault
-      ev = param
-      param = null
-
-    # Don't lose focus
-    ev.preventDefault()
-    document.execCommand(command, false, param)
+  handleItemsChange: (items) =>
+    design = _.extend({}, @props.design, items: items)
+    @props.onDesignChange(design)
 
   handleInsertExpr: (item) =>
     html = '''<div data-embed="''' + _.escape(JSON.stringify(item)) + '''"></div>'''
 
-    @refs.contentEditable.pasteHTML(html)
-
-  handleCreateLink: (ev) =>
-    # Don't lose focus
-    ev.preventDefault()
-
-    # Ask for url
-    url = window.prompt("Enter URL to link to")
-    if url
-      document.execCommand("createLink", false, url)
+    @refs.editor.pasteHTML(html)
 
   replaceItem: (item) ->
     replaceItemInItems = (items, item) ->
@@ -121,61 +87,20 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
     items = replaceItemInItems(@props.design.items or [], item)
     @props.onDesignChange(_.extend({}, @props.design, items: items))
 
-  handleClick: (ev) =>
-    # Be sure focused
-    if not @state.focused
-      @setState(focused: true)
+  handleItemClick: (item) =>
+    @refs.exprUpdateModal.open(item, (item) =>
+      # Replace in items
+      @replaceItem(item)
+    )
 
-    if ev.target.dataset?.embed or ev.target.parentElement?.dataset?.embed
-      item = JSON.parse(ev.target.dataset?.embed or ev.target.parentElement?.dataset?.embed)
-      @refs.exprUpdateModal.open(item, (item) =>
-        # Replace in items
-        @replaceItem(item)
-      )
+  handleAddExpr: (ev) =>
+    ev.preventDefault()
+    @refs.exprInsertModal.open()
 
-  renderMenu: ->
-    H.div key: "palette", className: "mwater-visualization-text-palette",
-      H.div key: "bold", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "bold"),
-        H.b null, "B"
-      H.div key: "italic", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "italic"),
-        H.i null, "I"
-      H.div key: "underline", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "underline"),
-        H.span style: { textDecoration: "underline" }, "U"
-      H.div key: "link", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCreateLink,
-        H.i className: "fa fa-link"
-      H.div key: "justifyLeft", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyLeft"),
-        H.i className: "fa fa-align-left"
-      H.div key: "justifyCenter", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyCenter"),
-        H.i className: "fa fa-align-center"
-      H.div key: "justifyRight", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyRight"),
-        H.i className: "fa fa-align-right"
-      H.div key: "justifyFull", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyFull"),
-        H.i className: "fa fa-align-justify"
-      H.div key: "insertUnorderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertUnorderedList"),
-        H.i className: "fa fa-list-ul"
-      H.div key: "insertOrderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertOrderedList"),
-        H.i className: "fa fa-list-ol"
-      if @props.design.style != "title"
-        [
-          H.div key: "h1", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H1>"),
-            H.i className: "fa fa-header"
-          H.div key: "h2", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H2>"),
-            H.i className: "fa fa-header", style: { fontSize: "80%" }
-          H.div key: "p", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<div>"),
-            "\u00b6"
-        ]
-      H.div key: "expr", className: "mwater-visualization-text-palette-item", onClick: (ev) =>
-        @refs.exprInsertModal.open()
-      , 
-        H.i className: "fa fa-plus"
-        " Field"
-      # H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "undo"),
-      #   H.i className: "fa fa-undo"
-      # H.div className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "redo"),
-      #   H.i className: "fa fa-repeat"
-      # if @props.onStopEditing
-      #   H.div className: "mwater-visualization-text-palette-item", onClick: @props.onStopEditing,
-      #     "Close"
+  renderExtraPaletteButtons: ->
+    H.div key: "expr", className: "mwater-visualization-text-palette-item", onMouseDown: @handleAddExpr,
+      H.i className: "fa fa-plus"
+      " Field"
 
   renderModals: ->
     [
@@ -183,22 +108,6 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
       R ExprUpdateModalComponent, key: "exprUpdateModal", ref: "exprUpdateModal", schema: @props.schema, dataSource: @props.dataSource, singleRowTable: @props.singleRowTable
     ]
   
-  renderHtml: ->
-    if @props.onDesignChange?
-      return H.div key: "contents", className: "mwater-visualization-text-widget-style-#{@props.design.style or "default"}", 
-        R ContentEditableComponent, 
-          ref: "contentEditable"
-          style: { outline: "none" }
-          html: @createHtml()
-          onChange: @handleChange
-          onClick: @handleClick
-          onFocus: @handleFocus
-        if not @props.design.items?[0]?
-          H.div key: "placeholder", style: { color: "#DDD", position: "absolute", top: 0, left: 0, pointerEvents: "none" }, "Click to Edit"
-
-    else
-      return H.div key: "contents", className: "mwater-visualization-text-widget-style-#{@props.design.style or "default"}", dangerouslySetInnerHTML: { __html: @createHtml() }
-
   render: ->
     style = { 
       position: "relative"
@@ -214,9 +123,15 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
       style.width = @props.width
       style.height = @props.height
 
-    R ClickOutHandler, onClickOut: @handleClickOut,
-      H.div style: style,
-        @renderModals()
-        @renderHtml()
-        if @state.focused
-          @renderMenu()
+    return H.div null,
+      @renderModals()
+      R RichTextComponent,
+        ref: "editor"
+        className: "mwater-visualization-text-widget-style-#{@props.design.style or "default"}"
+        style: style
+        items: @props.design.items
+        onItemsChange: if @props.onDesignChange then @handleItemsChange
+        onItemClick: @handleItemClick
+        itemsHtmlConverter: @createItemsHtmlConverter()
+        includeHeadings: @props.design.style != "title"
+        extraPaletteButtons: @renderExtraPaletteButtons()

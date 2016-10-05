@@ -14,6 +14,9 @@ module.exports = class RichTextComponent extends React.Component
 
     onItemClick: React.PropTypes.func
 
+    className: React.PropTypes.string  # Optional className of editor wrapper
+    style: React.PropTypes.object  # Optional style of editor wrapper
+
     # Converter to use for editing
     itemsHtmlConverter: React.PropTypes.object.isRequired
 
@@ -128,7 +131,7 @@ module.exports = class RichTextComponent extends React.Component
     
   renderHtml: ->
     if @props.onItemsChange?
-      return H.div key: "contents", 
+      return H.div key: "contents", style: @props.style, className: @props.className,
         R ContentEditableComponent, 
           ref: "contentEditable"
           style: { outline: "none" }
@@ -141,7 +144,7 @@ module.exports = class RichTextComponent extends React.Component
           H.div key: "placeholder", style: { color: "#DDD", position: "absolute", top: 0, left: 0, pointerEvents: "none" }, "Click to Edit"
 
     else
-      return H.div key: "contents", dangerouslySetInnerHTML: { __html: @createHtml() }
+      return H.div key: "contents", style: @props.style, className: @props.className, dangerouslySetInnerHTML: { __html: @createHtml() }
 
   render: ->
     # R ClickOutHandler, onClickOut: @handleClickOut,

@@ -25,6 +25,8 @@ DirectMapDataSource = require './maps/DirectMapDataSource'
 
 ServerMapDataSource = require './maps/ServerMapDataSource'
 ServerDashboardDataSource = require './dashboards/ServerDashboardDataSource'
+RichTextComponent = require './richtext/RichTextComponent'
+ItemsHtmlConverter = require './richtext/ItemsHtmlConverter'
 
 dashboardId = "366702069dba44249d14bfccaa2d333e"
 
@@ -32,13 +34,14 @@ dashboardId = "366702069dba44249d14bfccaa2d333e"
 $ ->
   sample = H.div className: "container-fluid", style: { height: "100%", paddingLeft: 0, paddingRight: 0 },
     H.style null, '''html, body, #main { height: 100% }'''
+    # React.createElement(RichTextPane)
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDirectMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(BlocksDesignerComponent, renderBlock: [])
      # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
@@ -48,6 +51,30 @@ $ ->
   ReactDOM.render(sample, document.getElementById("main"))
 
 
+class RichTextPane extends React.Component
+  constructor: (props) ->
+    super
+
+    @state = {
+      items: null
+    }
+
+  handleInsert: (ev) =>
+    ev.preventDefault()
+    @refs.editor.pasteHTML("x")
+
+  renderExtraButtons: ->
+    H.div key: "x", className: "mwater-visualization-text-palette-item", onMouseDown: @handleInsert,
+      "x"
+
+  render: ->
+    H.div style: { paddingTop: 100 },
+      R RichTextComponent,
+        ref: "editor"
+        items: @state.items
+        onItemsChange: (items) => @setState(items: items)
+        itemsHtmlConverter: new ItemsHtmlConverter()
+        extraPaletteButtons: @renderExtraButtons()
 
 class MWaterDashboardPane extends React.Component
   constructor: (props) ->

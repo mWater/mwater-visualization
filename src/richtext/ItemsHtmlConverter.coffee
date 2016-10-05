@@ -5,6 +5,18 @@ _ = require 'lodash'
 #  string (html text) 
 #  { type: "element", tag: "h1", items: [nested items] }
 module.exports = class ItemsHtmlConverter 
+  # Check if blank (no text or special expressions)
+  @isBlank: (items) =>
+    if not items
+      return true
+
+    return _.all items, (item) =>
+      if _.isString(item) 
+        return item.length == 0
+      if _.isObject(item) and item.type == "element"
+        return @isBlank(item.items)
+      return false
+
   # Converts list of items to html
   convertItemsToHtml: (items) ->
     html = ""
