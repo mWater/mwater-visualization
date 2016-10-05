@@ -4,7 +4,7 @@ ExprUtils = require('mwater-expressions').ExprUtils
 # Converts widget design to html and back
 # Text widgets are an array of items: each one of:
 #  string (html text) 
-#  { type: "element", tag: "h1", items: [nested items] }
+#  { type: "element", tag: "h1", style: css-style map (e.g. { "font-weight": "bold" }) items: [nested items] }
 #  { type: "expr", id: unique id, expr: expression, includeLabel: true to include label, labelText: override label text } 
 module.exports = class ItemsHtmlConverter 
   # designMode is true to display in design mode (exprs as blocks)
