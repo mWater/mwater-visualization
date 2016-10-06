@@ -145,6 +145,7 @@ module.exports = class ItemsHtmlConverter
 
         # Convert align (Firefox)
         if node.align
+          item.style = item.style or {}
           item.style['text-align'] = node.align
 
         # Add href and target
