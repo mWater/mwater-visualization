@@ -3,6 +3,7 @@ H = React.DOM
 
 ClickOutHandler = require('react-onclickout')
 SketchPicker = require("react-color").SketchPicker
+SwatchesPicker = require('react-color').SwatchesPicker
 
 # Simple color well with popup
 module.exports = class ColorComponent extends React.Component
@@ -12,10 +13,10 @@ module.exports = class ColorComponent extends React.Component
 
   constructor: ->
     super
-    @state = { open: false }
+    @state = { open: false, advanced: false }
 
   handleClick: =>
-    @setState(open: not @state.open)
+    @setState(open: not @state.open, advanced: false)
 
   handleClose: (color) =>
     @setState(open: false)
@@ -28,6 +29,9 @@ module.exports = class ColorComponent extends React.Component
   handleTransparent: =>
     @setState(open: false)
     @props.onChange("transparent")
+
+  handleAdvanced: =>
+    @setState(advanced: not @state.advanced)
 
   render: ->
     style = {
@@ -63,9 +67,15 @@ module.exports = class ColorComponent extends React.Component
             H.button type: "button", className: "btn btn-link btn-sm", onClick: @handleReset,
               H.i className: "fa fa-undo"
               " Reset Color"
-            H.button type: "button", className: "btn btn-link btn-sm", onClick: @handleTransparent,
-              H.i className: "fa fa-ban"
-              " Transparent"
-            React.createElement(SketchPicker, type: "sketch", color: @props.color or undefined, onChangeComplete: @handleClose)
+            # H.button type: "button", className: "btn btn-link btn-sm", onClick: @handleTransparent,
+            #   H.i className: "fa fa-ban"
+            #   " None"
+            H.button type: "button", className: "btn btn-link btn-sm", onClick: @handleAdvanced,
+              if @state.advanced then "Basic" else "Advanced"
+              
+            if @state.advanced
+              React.createElement(SketchPicker, color: @props.color or undefined, onChangeComplete: @handleClose)
+            else
+              React.createElement(SwatchesPicker, color: @props.color or undefined, onChangeComplete: @handleClose)
 
 
