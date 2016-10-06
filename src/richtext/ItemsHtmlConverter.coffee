@@ -28,7 +28,7 @@ module.exports = class ItemsHtmlConverter
       else if item.type == "element"
         if not allowedTags[item.tag]
           # Ignore and do contents
-          html += @converItemsToHtml(item.items)
+          html += @convertItemsToHtml(item.items)
           continue
 
         attrs = ""
