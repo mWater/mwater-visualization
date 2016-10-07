@@ -23,6 +23,10 @@ module.exports = class MapBoundsCalculator
       # Create layer
       layer = LayerFactory.createLayer(layerView.type)
       
+      # Ensure that valid
+      if layer.validateDesign(layerView.design, @schema)
+        return cb(null)
+
       # Compile map filters
       allFilters = (filters or []).slice()
 
