@@ -6,6 +6,7 @@ _ = require 'lodash'
 async = require 'async'
 
 ExprCompiler = require('mwater-expressions').ExprCompiler
+ExprCleaner = require('mwater-expressions').ExprCleaner
 injectTableAlias = require('mwater-expressions').injectTableAlias
 
 Widget = require '../Widget'
@@ -67,11 +68,15 @@ module.exports = class TextWidget extends Widget
 
       exprCompiler = new ExprCompiler(schema)
 
+      # Clean expression
+      exprCleaner = new ExprCleaner(schema)
+      expr = exprCleaner.cleanExpr(exprItem.expr, aggrStatuses: ["individual", "literal", "aggregate"])
+
       # Get two distinct examples to know if unique
       query = {
         distinct: true
         selects: [
-          { type: "select", expr: exprCompiler.compileExpr(expr: exprItem.expr, tableAlias: "main"), alias: "value" }
+          { type: "select", expr: exprCompiler.compileExpr(expr: expr, tableAlias: "main"), alias: "value" }
         ]
         from: { type: "table", table: table, alias: "main" }
         limit: 2

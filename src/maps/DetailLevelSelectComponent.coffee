@@ -42,7 +42,7 @@ module.exports = class DetailLevelSelectComponent extends React.Component
     # Execute query
     props.dataSource.performQuery query, (err, rows) =>
       if err
-        cb(err)
+        alert("Error loading detail levels")
         return 
 
       countryId = rows[0].level0
@@ -62,7 +62,7 @@ module.exports = class DetailLevelSelectComponent extends React.Component
       # Execute query
       props.dataSource.performQuery query, (err, rows) =>
         if err
-          cb(err)
+          alert("Error loading detail levels")
           return 
         console.log rows
         options = _.map(_.filter(rows, (r) => r.level > props.scopeLevel), (r) -> { value: r.level, label: r.name })
