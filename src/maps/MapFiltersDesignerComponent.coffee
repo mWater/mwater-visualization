@@ -52,6 +52,9 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
       # Get filterable tables
       filterableTables = _.uniq(filterableTables.concat(layer.getFilterableTables(layerView.design, @props.schema)))
 
+    # Remove non-existant tables
+    filterableTables = _.filter(filterableTables, (table) => @props.schema.getTable(table))
+
     if filterableTables.length == 0
       return null
 
