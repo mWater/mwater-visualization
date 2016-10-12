@@ -121,7 +121,6 @@ class MapWidgetComponent extends React.Component
         extraFilters: @props.filters
         width: width - 20
         height: height - 20
-        touchZoom: false    # Prevent accidental zooming
         scrollWheelZoom: false # Prevent accidental zooming
         onRowClick: @props.onRowClick
       })
