@@ -165,7 +165,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
 
   renderFilter: ->
     # If no data, hide
-    if not @props.design.axes.geometry
+    if not @props.design.table
       return null
 
     return H.div className: "form-group",
