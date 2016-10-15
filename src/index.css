@@ -79,9 +79,16 @@
   .mwater-visualization-page-break {
     border-bottom: none;
     /*
-    Removed since needs to be normal display, not absolute to work 
+    Removed since needs to be normal display, not absolute to work
     page-break-after: always;
     */
+  }
+
+  .mwater-visualization-block-parent-outer-story {
+    overflow-x: initial !important;
+  }
+  .mwater-visualization-block {
+    page-break-inside: avoid;
   }
 }
 
@@ -149,7 +156,7 @@
 .mwater-visualization-big-options {
   border: solid 1px #DDD;
 }
- 
+
 .mwater-visualization-big-option {
   border: solid 1px transparent;
   border-bottom: solid 1px #DDD;
