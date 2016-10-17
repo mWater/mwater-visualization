@@ -79,9 +79,17 @@
   .mwater-visualization-page-break {
     border-bottom: none;
     /*
-    Removed since needs to be normal display, not absolute to work 
+    Removed since needs to be normal display, not absolute to work
     page-break-after: always;
     */
+  }
+
+  /* overflow auto is set which prevents print breaks from working, so override */
+  .mwater-visualization-block-parent-outer {
+    overflow: initial !important;
+  }
+  .mwater-visualization-block {
+    page-break-inside: avoid;
   }
 }
 
@@ -149,7 +157,7 @@
 .mwater-visualization-big-options {
   border: solid 1px #DDD;
 }
- 
+
 .mwater-visualization-big-option {
   border: solid 1px transparent;
   border-bottom: solid 1px #DDD;
