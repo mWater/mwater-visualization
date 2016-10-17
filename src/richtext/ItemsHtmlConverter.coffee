@@ -117,7 +117,7 @@ module.exports = class ItemsHtmlConverter
     for node in elem.childNodes
       if node.nodeType == 1 # Element
         # Handle embeds
-        if node.dataset.embed
+        if node.dataset?.embed
           items.push(JSON.parse(node.dataset.embed))
           continue
 
