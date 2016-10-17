@@ -28,16 +28,13 @@ ServerDashboardDataSource = require './dashboards/ServerDashboardDataSource'
 RichTextComponent = require './richtext/RichTextComponent'
 ItemsHtmlConverter = require './richtext/ItemsHtmlConverter'
 
-dashboardId = "366702069dba44249d14bfccaa2d333e"
-
-
 $ ->
   sample = H.div className: "container-fluid", style: { height: "100%", paddingLeft: 0, paddingRight: 0 },
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(RichTextPane)
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
-    # React.createElement(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "a855eb0587d845d3ac27aed03c463976", share: "817c76088c7649ec8cc0b8193e547a09")
+    # React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
@@ -87,7 +84,7 @@ class MWaterDashboardPane extends React.Component
 
   componentWillMount: ->
     # Load dashboard
-    url = @props.apiUrl + "dashboards/#{dashboardId}?" + querystring.stringify({ client: @props.client, share: @props.share })
+    url = @props.apiUrl + "dashboards/#{@props.dashboardId}?" + querystring.stringify({ client: @props.client, share: @props.share })
     $.getJSON url, (dashboard) => 
       @setState(design: dashboard.design, extraTables: dashboard.extra_tables)
 
@@ -103,11 +100,15 @@ class MWaterDashboardPane extends React.Component
       apiUrl: @props.apiUrl
       client: @props.client
       user: @props.user
+      share: @props.share
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
       extraTables: @state.extraTables
     }, (error, config) =>
+      if error
+        return H.div null, "Error: #{error.message}"
+
       dashboardDataSource = new ServerDashboardDataSource({
-        apiUrl: @props.apiUrl, client: @props.client, share: share, dashboardId: dashboardId
+        apiUrl: @props.apiUrl, client: @props.client, share: @props.share, dashboardId: @props.dashboardId
         })
       # dashboardDataSource = new DirectDashboardDataSource(@props.apiUrl, @props.client, @state.design, config.schema, config.dataSource)
 
