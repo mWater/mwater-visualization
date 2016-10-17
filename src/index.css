@@ -84,8 +84,9 @@
     */
   }
 
-  .mwater-visualization-block-parent-outer-default {
-    overflow-x: initial !important;
+  /* overflow auto is set which prevents print breaks from working, so override */
+  .mwater-visualization-block-parent-outer {
+    overflow: initial !important;
   }
   .mwater-visualization-block {
     page-break-inside: avoid;
