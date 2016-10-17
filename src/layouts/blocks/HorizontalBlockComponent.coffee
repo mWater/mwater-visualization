@@ -91,7 +91,7 @@ module.exports = class HorizontalBlockComponent extends React.Component
       percentages[index] = (weight * 100) / totalWeight
 
     if @props.onBlockUpdate?
-      elem = H.table style: { width: "100%", tableLayout: "fixed", position: "relative", paddingTop: 5 },  # Add padding to allow dropping
+      elem = H.table style: { width: "100%", tableLayout: "fixed", position: "relative", paddingTop: 5 }, className: "mwater-visualization-horizontal-block", # Add padding to allow dropping
         H.tbody null,
           H.tr null,
             _.map @props.block.blocks, (block, index) =>
@@ -115,7 +115,7 @@ module.exports = class HorizontalBlockComponent extends React.Component
       return elem
 
     else  # Simplify in this case for printing
-      return H.div null,
+      return H.div className: "mwater-visualization-horizontal-block",
         _.map @props.block.blocks, (block, index) =>
           [
             H.div style: { width: "#{percentages[index]}%", verticalAlign: "top", display: "inline-block" }, key: block.id, ref: "block#{index}", className: "mwater-visualization-horizontal-block-item",

@@ -89,7 +89,7 @@
     overflow: initial !important;
   }
 
-  .mwater-visualization-block-parent-inner > div > div {
+  .mwater-visualization-horizontal-block {
     page-break-inside: avoid;
   }
   .mwater-visualization-block {
