@@ -88,8 +88,16 @@
   .mwater-visualization-block-parent-outer {
     overflow: initial !important;
   }
+
+  .mwater-visualization-horizontal-block {
+    page-break-inside: avoid;
+  }
   .mwater-visualization-block {
     page-break-inside: avoid;
+  }
+
+  #react_element_printer{
+    height: 100%;
   }
 }
 
