@@ -39,7 +39,13 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
     compiler = new LayeredChartCompiler(schema: props.schema)
     el = ReactDOM.findDOMNode(@refs.chart)
-    chartOptions = compiler.createChartOptions(@props)
+    chartOptions = compiler.createChartOptions({
+      design: @props.design
+      data: @props.data
+      width: @props.width
+      height: @props.height
+      locale: @context.locale
+    })
     
     chartOptions.bindto = el
     chartOptions.data.onclick = @handleDataClick
@@ -48,13 +54,26 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
     @chart = c3.generate(chartOptions)
 
-  componentDidUpdate: (prevProps) ->
+  componentDidUpdate: (prevProps, prevState, prevContext) ->
     # Check if options changed
     oldCompiler = new LayeredChartCompiler(schema: prevProps.schema) 
     newCompiler = new LayeredChartCompiler(schema: @props.schema)
 
-    oldChartOptions = oldCompiler.createChartOptions(prevProps)
-    newChartOptions = newCompiler.createChartOptions(@props)
+    oldChartOptions = oldCompiler.createChartOptions({
+      design: prevProps.design
+      data: prevProps.data
+      width: prevProps.width
+      height: prevProps.height
+      locale: prevContext.locale
+    })
+
+    newChartOptions = newCompiler.createChartOptions({
+      design: @props.design
+      data: @props.data
+      width: @props.width
+      height: @props.height
+      locale: @context.locale
+    })
 
     # If chart changed
     if not _.isEqual(oldChartOptions, newChartOptions)
