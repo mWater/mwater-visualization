@@ -10,6 +10,7 @@ QuickfiltersComponent = require '../quickfilter/QuickfiltersComponent'
 QuickfilterCompiler = require '../quickfilter/QuickfilterCompiler'
 SettingsModalComponent = require './SettingsModalComponent'
 LayoutManager = require '../layouts/LayoutManager'
+DashboardUpgrader = require './DashboardUpgrader'
 
 # Dashboard component that includes an action bar at the top
 # Manages undo stack and quickfilter value
@@ -89,6 +90,15 @@ module.exports = class DashboardComponent extends React.Component
   handleStyleChange: (style) =>
     @props.onDesignChange(_.extend({}, @props.design, { style: style or null }))
 
+  handleUpgrade: =>
+    if not confirm("This will upgrade your dashboard to the new kind with enhanced features. You can click Undo immediately afterwards if you wish to revert it. Continue?")
+      return
+
+    design = new DashboardUpgrader().upgrade(@props.design)
+    @props.onDesignChange(design)
+
+    alert("Upgrade completed. Some widgets may need to be resized. Click Undo to revert back to old dashboard style.")
+
   renderEditingSwitch: ->
     # H.a key: "edit", className: "btn btn-link btn-sm", onClick: @handleToggleEditing,
     #   if @state.editing
@@ -137,9 +147,11 @@ module.exports = class DashboardComponent extends React.Component
         @renderStyleItem("greybg")
         @renderStyleItem("story")
 
-
   renderActionLinks: ->
     H.div null,
+      if @state.editing and (@props.design.layout or "grid") == "grid"
+        H.a key: "upgrade", className: "btn btn-info btn-sm", onClick: @handleUpgrade,
+          "Upgrade Dashboard..."
       if @state.editing
         [
           H.a key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,

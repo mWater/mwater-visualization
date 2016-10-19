@@ -33,8 +33,8 @@ $ ->
     H.style null, '''html, body, #main { height: 100% }'''
     # React.createElement(RichTextPane)
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
-    React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "a855eb0587d845d3ac27aed03c463976", share: "817c76088c7649ec8cc0b8193e547a09")
-    # React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "a855eb0587d845d3ac27aed03c463976", share: "817c76088c7649ec8cc0b8193e547a09")
+    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
@@ -130,7 +130,7 @@ class MWaterDirectDashboardPane extends React.Component
     @state = {
       # design: { items: {}, layout: "grid" } # dashboardDesign
       # design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" } # dashboardDesign
-      design: pageBreakProblem
+      design: oldDashboardDesign
       # design: imageWidgetDashboardDesign
       # design: dashboardDesign
       extraTables: [] #['responses:e24f0a0ec11643cab3c21c07de2f6889']
@@ -1757,170 +1757,170 @@ oldDashboardDesign = {
 #   }
 # }
 
-# dashboardDesign = {
-#   "items": {
-#     "e08ef8a3-34db-467d-ac78-f0f273d49f25": {
-#       "layout": {
-#         "x": 0,
-#         "y": 0,
-#         "w": 8,
-#         "h": 8
-#       },
-#       "widget": {
-#         "type": "Markdown",
-#         "design": {
-#           "markdown": "# Header 1\n## Header 2\n### Header 3\nText Text Text More Text\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-#         }
-#       }
-#     },
-#     "9d8df869-8869-4191-aa18-b58142f9c961": {
-#       "layout": {
-#         "x": 8,
-#         "y": 0,
-#         "w": 10,
-#         "h": 8
-#       },
-#       "widget": {
-#         "type": "LayeredChart",
-#         "design": {
-#           "version": 1,
-#           "layers": [
-#             {
-#               "axes": {
-#                 "color": {
-#                   "expr": {
-#                     "type": "scalar",
-#                     "table": "entities.water_point",
-#                     "joins": [],
-#                     "expr": {
-#                       "type": "field",
-#                       "table": "entities.water_point",
-#                       "column": "type"
-#                     }
-#                   },
-#                   "xform": null
-#                 },
-#                 "y": {
-#                   "expr": {
-#                     "type": "scalar",
-#                     "table": "entities.water_point",
-#                     "expr": {
-#                       "type": "count",
-#                       "table": "entities.water_point"
-#                     },
-#                     "joins": []
-#                   },
-#                   "aggr": "count",
-#                   "xform": null
-#                 }
-#               },
-#               "filter": null,
-#               "table": "entities.water_point"
-#             }
-#           ],
-#           "type": "donut"
-#         }
-#       }
-#     },
-#     "409d7b5b-e1d9-4e18-bd45-afdead7fe18f": {
-#       "layout": {
-#         "x": 0,
-#         "y": 8,
-#         "w": 18,
-#         "h": 8
-#       },
-#       "widget": {
-#         "type": "LayeredChart",
-#         "design": {
-#           "version": 1,
-#           "layers": [
-#             {
-#               "axes": {
-#                 "x": {
-#                   "expr": {
-#                     "type": "scalar",
-#                     "table": "entities.news_item",
-#                     "joins": [],
-#                     "expr": {
-#                       "type": "field",
-#                       "table": "entities.news_item",
-#                       "column": "post_country"
-#                     }
-#                   },
-#                   "xform": null
-#                 },
-#                 "y": {
-#                   "expr": {
-#                     "type": "scalar",
-#                     "table": "entities.news_item",
-#                     "expr": {
-#                       "type": "count",
-#                       "table": "entities.news_item"
-#                     },
-#                     "joins": []
-#                   },
-#                   "aggr": "count",
-#                   "xform": null
-#                 }
-#               },
-#               "filter": null,
-#               "table": "entities.news_item"
-#             }
-#           ],
-#           "type": "bar",
-#           "titleText": "Some Title"
-#         }
-#       }
-#     },
-#     "d41a2dd2-85bd-46d8-af9a-a650af4c0047": {
-#       "layout": {
-#         "x": 0,
-#         "y": 16,
-#         "w": 8,
-#         "h": 8
-#       },
-#       "widget": {
-#         "type": "TableChart",
-#         "design": {
-#           "version": 1,
-#           "columns": [
-#             {
-#               "textAxis": {
-#                 "expr": {
-#                   "type": "scalar",
-#                   "table": "entities.water_point",
-#                   "joins": [],
-#                   "expr": {
-#                     "type": "field",
-#                     "table": "entities.water_point",
-#                     "column": "type"
-#                   }
-#                 }
-#               }
-#             },
-#             {
-#               "textAxis": {
-#                 "expr": {
-#                   "type": "scalar",
-#                   "table": "entities.water_point",
-#                   "joins": [],
-#                   "expr": {
-#                     "type": "count",
-#                     "table": "entities.water_point"
-#                   }
-#                 },
-#                 "aggr": "count"
-#               }
-#             }
-#           ],
-#           "orderings": [],
-#           "table": "entities.water_point",
-#           "titleText": "TEST"
-#         }
-#       }
-#     }
-#   }
-# }
+oldDashboardDesign = {
+  "items": {
+    "e08ef8a3-34db-467d-ac78-f0f273d49f25": {
+      "layout": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 8
+      },
+      "widget": {
+        "type": "Markdown",
+        "design": {
+          "markdown": "# Header 1\n## Header 2\n### Header 3\nText Text Text More Text\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+        }
+      }
+    },
+    "9d8df869-8869-4191-aa18-b58142f9c961": {
+      "layout": {
+        "x": 8,
+        "y": 0,
+        "w": 10,
+        "h": 8
+      },
+      "widget": {
+        "type": "LayeredChart",
+        "design": {
+          "version": 1,
+          "layers": [
+            {
+              "axes": {
+                "color": {
+                  "expr": {
+                    "type": "scalar",
+                    "table": "entities.water_point",
+                    "joins": [],
+                    "expr": {
+                      "type": "field",
+                      "table": "entities.water_point",
+                      "column": "type"
+                    }
+                  },
+                  "xform": null
+                },
+                "y": {
+                  "expr": {
+                    "type": "scalar",
+                    "table": "entities.water_point",
+                    "expr": {
+                      "type": "count",
+                      "table": "entities.water_point"
+                    },
+                    "joins": []
+                  },
+                  "aggr": "count",
+                  "xform": null
+                }
+              },
+              "filter": null,
+              "table": "entities.water_point"
+            }
+          ],
+          "type": "donut"
+        }
+      }
+    },
+    "409d7b5b-e1d9-4e18-bd45-afdead7fe18f": {
+      "layout": {
+        "x": 0,
+        "y": 8,
+        "w": 18,
+        "h": 8
+      },
+      "widget": {
+        "type": "LayeredChart",
+        "design": {
+          "version": 1,
+          "layers": [
+            {
+              "axes": {
+                "x": {
+                  "expr": {
+                    "type": "scalar",
+                    "table": "entities.news_item",
+                    "joins": [],
+                    "expr": {
+                      "type": "field",
+                      "table": "entities.news_item",
+                      "column": "post_country"
+                    }
+                  },
+                  "xform": null
+                },
+                "y": {
+                  "expr": {
+                    "type": "scalar",
+                    "table": "entities.news_item",
+                    "expr": {
+                      "type": "count",
+                      "table": "entities.news_item"
+                    },
+                    "joins": []
+                  },
+                  "aggr": "count",
+                  "xform": null
+                }
+              },
+              "filter": null,
+              "table": "entities.news_item"
+            }
+          ],
+          "type": "bar",
+          "titleText": "Some Title"
+        }
+      }
+    },
+    "d41a2dd2-85bd-46d8-af9a-a650af4c0047": {
+      "layout": {
+        "x": 0,
+        "y": 16,
+        "w": 8,
+        "h": 8
+      },
+      "widget": {
+        "type": "TableChart",
+        "design": {
+          "version": 1,
+          "columns": [
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "scalar",
+                  "table": "entities.water_point",
+                  "joins": [],
+                  "expr": {
+                    "type": "field",
+                    "table": "entities.water_point",
+                    "column": "type"
+                  }
+                }
+              }
+            },
+            {
+              "textAxis": {
+                "expr": {
+                  "type": "scalar",
+                  "table": "entities.water_point",
+                  "joins": [],
+                  "expr": {
+                    "type": "count",
+                    "table": "entities.water_point"
+                  }
+                },
+                "aggr": "count"
+              }
+            }
+          ],
+          "orderings": [],
+          "table": "entities.water_point",
+          "titleText": "TEST"
+        }
+      }
+    }
+  }
+}
 #   "items": {
 #     "b854aa65-7644-4b67-b0a4-d2344e7eb43a": {
 #       "layout": {
