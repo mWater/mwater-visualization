@@ -182,6 +182,5 @@ module.exports = class CalendarChart extends Chart
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->
-    # Remove non-existant tables
-    filterableTables = _.filter(_.compact([design.table]), (table) => schema.getTable(table))
-    return filterableTables
+    return _.compact([design.table])
+    

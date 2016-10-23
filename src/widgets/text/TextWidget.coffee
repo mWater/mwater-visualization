@@ -132,7 +132,6 @@ module.exports = class TextWidget extends Widget
 
     filterableTables = _.map(exprItems, (exprItem) -> exprItem.expr)
 
-    # Remove non-existant tables
-    filterableTables = _.filter(_.uniq(_.compact(filterableTables)), (table) => schema.getTable(table))
+    filterableTables = _.uniq(_.compact(filterableTables))
     return filterableTables
 

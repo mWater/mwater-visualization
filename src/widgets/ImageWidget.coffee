@@ -105,7 +105,7 @@ module.exports = class ImageWidget extends Widget
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->
-    if design.expr?.table and schema.getTable(design.expr.table)
+    if design.expr?.table
       return [design.expr.table]
 
     return []

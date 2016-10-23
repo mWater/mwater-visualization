@@ -52,10 +52,7 @@ module.exports = class MapWidget extends Widget
       # Get filterable tables
       filterableTables = filterableTables.concat(layer.getFilterableTables(layerView.design, schema))
 
-    # Remove non-existant tables
-    filterableTables = _.filter(_.uniq(filterableTables), (table) => schema.getTable(table))
-
-    return filterableTables
+    return _.uniq(_.compact(filterableTables))
 
 class MapWidgetComponent extends React.Component
   @propTypes:
