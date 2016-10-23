@@ -179,3 +179,9 @@ module.exports = class CalendarChart extends Chart
     header = ["Date", "Value"]
     rows = _.map(data, (row) -> [moment(row.date).format("YYYY-MM-DD"), row.value])
     return [header].concat(rows)
+
+  # Get a list of table ids that can be filtered on
+  getFilterableTables: (design, schema) ->
+    # Remove non-existant tables
+    filterableTables = _.filter(_.compact([design.table]), (table) => schema.getTable(table))
+    return filterableTables
