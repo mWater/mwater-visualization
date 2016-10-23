@@ -76,12 +76,12 @@ module.exports = class BinsComponent extends React.Component
           H.i className: "fa fa-spinner fa-spin"
       if @props.xform.min? and @props.xform.max? and @props.xform.numBins
         H.div key: "excludes",
-            H.label className: "checkbox-inline", key: "lower",
-              H.input type: "checkbox", checked: not @props.xform.excludeLower, onChange: (ev) => @props.onChange(update(@props.xform, { excludeLower: { $set: not ev.target.checked }}))
-              "Include < #{@props.xform.min}"
-            H.label className: "checkbox-inline", key: "upper",
-              H.input type: "checkbox", checked: not @props.xform.excludeUpper, onChange: (ev) => @props.onChange(update(@props.xform, { excludeUpper: { $set: not ev.target.checked }}))
-              "Include > #{@props.xform.max}"
+          H.label className: "checkbox-inline", key: "lower",
+            H.input type: "checkbox", checked: not @props.xform.excludeLower, onChange: (ev) => @props.onChange(update(@props.xform, { excludeLower: { $set: not ev.target.checked }}))
+            "Include < #{@props.xform.min}"
+          H.label className: "checkbox-inline", key: "upper",
+            H.input type: "checkbox", checked: not @props.xform.excludeUpper, onChange: (ev) => @props.onChange(update(@props.xform, { excludeUpper: { $set: not ev.target.checked }}))
+            "Include > #{@props.xform.max}"
 
 
 LabeledInlineComponent = (props) ->
