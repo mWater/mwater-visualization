@@ -44,8 +44,8 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
 
       H.div style: { margin: 5 }, 
         R FiltersDesignerComponent, 
-          schema: schema
-          dataSource: dataSource
+          schema: @props.schema
+          dataSource: @props.dataSource
           filters: @props.design.filters
           onFiltersChange: @handleFiltersChange
           filterableTables: filterableTables

@@ -14,6 +14,10 @@ module.exports = class LayoutManager
   # Gets { type, design } of a widget
   getWidgetTypeAndDesign: (items, widgetId) -> null
 
+  # Gets all widgets in items as array of { type, design }
+  getAllWidgets: (items) ->
+    return []
+
   @createLayoutManager: (type) ->
     # Default is old grid type
     type = type or "grid"

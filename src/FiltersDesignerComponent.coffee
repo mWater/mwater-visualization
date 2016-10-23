@@ -6,8 +6,6 @@ ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprUtils = require('mwater-expressions').ExprUtils
 PopoverHelpComponent = require 'react-library/lib/PopoverHelpComponent'
 
-LayerFactory = require './LayerFactory'
-
 # Designer for filters of multiple tables. Used for maps and dashboards
 # Filters are in format mwater-expression filter expression indexed by table. e.g. { sometable: logical expression, etc. }
 module.exports = class FiltersDesignerComponent extends React.Component
@@ -28,7 +26,7 @@ module.exports = class FiltersDesignerComponent extends React.Component
     filters = _.clone(@props.filters or {})
     filters[table] = expr
 
-    @props.onFiltersChange(design)
+    @props.onFiltersChange(filters)
 
   renderFilterableTable: (table) =>
     name = ExprUtils.localizeString(@props.schema.getTable(table).name, @context.locale)
@@ -40,7 +38,7 @@ module.exports = class FiltersDesignerComponent extends React.Component
         dataSource: @props.dataSource
         onChange: @handleFilterChange.bind(null, table)
         table: table
-        value: @props.design.filters[table])
+        value: @props.filters?[table])
 
   render: ->
     return H.div null,

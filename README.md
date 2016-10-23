@@ -43,6 +43,7 @@ Dashboard design is:
 
 `layout`: layout engine to use (`blocks` is new default) 
 `style`: optional stylesheet to use
+`filters`: filter expression indexed by table. e.g. { sometable: logical expression, etc. }
 
 ### Widget data
 

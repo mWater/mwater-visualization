@@ -99,7 +99,7 @@ module.exports = class TextWidget extends Widget
     # Map of value by id
     exprValues = {}
 
-    async.each getExprItems(design.items), (exprItem, cb) =>
+    async.each @getExprItems(design.items), (exprItem, cb) =>
       evalExprItem(exprItem, (error, value) =>
         if error
           cb(error)
@@ -128,7 +128,7 @@ module.exports = class TextWidget extends Widget
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->
-    exprItems = getExprItems(design.items)
+    exprItems = @getExprItems(design.items)
 
     filterableTables = _.map(exprItems, (exprItem) -> exprItem.expr)
 

@@ -41,6 +41,16 @@ module.exports = class BlocksLayoutManager extends LayoutManager
         
     return null
 
+  # Gets all widgets in items as array of { type, design }
+  getAllWidgets: (items) ->
+    if items.type == "widget" 
+      return [{ type: items.widgetType, design: items.design }]
+
+    if items.blocks
+      return _.flatten(_.map(items.blocks, (item) => @getAllWidgets(item)))
+      
+    return []
+
   # Add a widget, returning new items
   addWidget: (items, widgetType, widgetDesign) ->
     # Add to root block

@@ -4,8 +4,12 @@ H = React.DOM
 R = React.createElement
 update = require 'update-object'
 
+LayoutManager = require '../layouts/LayoutManager'
+WidgetFactory = require '../widgets/WidgetFactory'
+
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
 QuickfiltersDesignComponent = require '../quickfilter/QuickfiltersDesignComponent'
+FiltersDesignerComponent = require '../FiltersDesignerComponent'
 
 # Popup with settings for dashboard
 module.exports = class SettingsModalComponent extends React.Component
@@ -31,16 +35,34 @@ module.exports = class SettingsModalComponent extends React.Component
 
   handleDesignChange: (design) => @setState(design: design)
 
+  handleFiltersChange: (filters) =>
+    design = _.extend({}, @state.design, filters: filters)
+    @handleDesignChange(design)
+
   render: ->
     # Don't show if not editing
     if not @state.design
       return null
 
+    layoutManager = LayoutManager.createLayoutManager(@state.design.layout)
+
+    # Get filterable tables
+    filterableTables = []
+    for widgetItem in layoutManager.getAllWidgets(@state.design.items)
+      # Create widget
+      widget = WidgetFactory.createWidget(widgetItem.type)
+
+      # Get filterable tables
+      filterableTables = filterableTables.concat(widget.getFilterableTables(widgetItem.design, @props.schema))
+
+    # Remove non-existant tables
+    filterableTables = _.filter(_.uniq(filterableTables), (table) => @props.schema.getTable(table))
+
     return R ActionCancelModalComponent, 
       size: "large"
       onCancel: @handleCancel
       onAction: @handleSave,
-        H.div null,
+        H.div style: { paddingBottom: 200 },
           H.h4 null, "Quick Filters"
           H.div className: "text-muted", 
             "Quick filters are shown to the user at the top of the dashboard and can be used to filter data of widgets."
@@ -51,3 +73,18 @@ module.exports = class SettingsModalComponent extends React.Component
             schema: @props.schema
             dataSource: @props.dataSource
           }
+
+          H.h4 style: { paddingTop: 10 },
+            "Filters"
+          H.div className: "text-muted", 
+            "Filters are built in to the dashboard and cannot be changed by viewers of the dashboard."
+          
+          if filterableTables.length > 0         
+            R FiltersDesignerComponent, 
+              schema: @props.schema
+              dataSource: @props.dataSource
+              filters: @state.design.filters
+              onFiltersChange: @handleFiltersChange
+              filterableTables: filterableTables
+          else
+            "Nothing to filter. Add widgets to the dashboard"
