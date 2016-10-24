@@ -55,6 +55,13 @@ module.exports = class ChartWidget extends Widget
 
     @chart.getData(design, schema, dataSource, filters, callback)
 
+  # Get a list of table ids that can be filtered on
+  getFilterableTables: (design, schema) ->
+    # Clean design first
+    design = @chart.cleanDesign(design, schema)
+
+    return @chart.getFilterableTables(design, schema)
+
 # Complete chart widget
 class ChartWidgetComponent extends React.Component
   @propTypes:

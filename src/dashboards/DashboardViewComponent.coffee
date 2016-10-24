@@ -7,6 +7,7 @@ uuid = require 'node-uuid'
 HTML5Backend = require('react-dnd-html5-backend')
 NestableDragDropContext = require  "react-library/lib/NestableDragDropContext"
 
+ExprCompiler = require('mwater-expressions').ExprCompiler
 WidgetFactory = require '../widgets/WidgetFactory'
 WidgetScoper = require '../widgets/WidgetScoper'
 ReactElementPrinter = require 'react-library/lib/ReactElementPrinter'
@@ -14,7 +15,7 @@ LayoutManager = require '../layouts/LayoutManager'
 WidgetScopesViewComponent = require '../widgets/WidgetScopesViewComponent'
 
 # Displays a dashboard, handling removing of widgets. No title bar or other decorations.
-# Handles scoping
+# Handles scoping and stores the state of scope
 module.exports = class DashboardViewComponent extends React.Component
   @propTypes: 
     schema: React.PropTypes.object.isRequired # schema to use
@@ -64,18 +65,36 @@ module.exports = class DashboardViewComponent extends React.Component
     printer = new ReactElementPrinter()
     printer.print(elem, { delay: 5000 })
 
+  # Get filters from props filters combined with dashboard filters
+  getCompiledFilters: ->
+    exprCompiler = new ExprCompiler(@props.schema)
+
+    compiledFilters = []
+
+    # Compile filters to JsonQL expected by layers
+    for table, expr of (@props.design.filters or {})
+      jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
+      compiledFilters.push({ table: table, jsonql: jsonql })
+
+    # Add props filters
+    if @props.filters
+      compiledFilters = compiledFilters.concat(@props.filters)
+
+    return compiledFilters
+
   renderScopes: ->
     R(WidgetScopesViewComponent, scopes: @state.widgetScoper.getScopes(), onRemoveScope: @handleRemoveScope)
 
   render: ->
     layoutManager = LayoutManager.createLayoutManager(@props.design.layout)
 
+    compiledFilters = @getCompiledFilters()
+
     renderWidget = (options) =>
       widget = WidgetFactory.createWidget(options.type)
 
-      # Get filters (passed in plus widget scoper filters)
-      filters = @props.filters or []
-      filters = filters.concat(@state.widgetScoper.getFilters(options.id))
+      # Get filters (passed in plus dashboard widget scoper filters)
+      filters = compiledFilters.concat(@state.widgetScoper.getFilters(options.id))
 
       return widget.createViewElement({
         schema: @props.schema

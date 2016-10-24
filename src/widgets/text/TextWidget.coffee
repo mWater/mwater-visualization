@@ -49,16 +49,6 @@ module.exports = class TextWidget extends Widget
   #   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   #   callback: (error, data)
   getData: (design, schema, dataSource, filters, callback) ->
-    # Get expression items recursively
-    getExprItems = (items) ->
-      exprItems = []
-      for item in (items or [])
-        if item.type == "expr"
-          exprItems.push(item)
-        if item.items
-          exprItems = exprItems.concat(getExprItems(item.items))
-      return exprItems
-
     # Evaluates a single exprItem
     evalExprItem = (exprItem, cb) =>
       if not exprItem.expr
@@ -109,7 +99,7 @@ module.exports = class TextWidget extends Widget
     # Map of value by id
     exprValues = {}
 
-    async.each getExprItems(design.items), (exprItem, cb) =>
+    async.each @getExprItems(design.items), (exprItem, cb) =>
       evalExprItem(exprItem, (error, value) =>
         if error
           cb(error)
@@ -125,3 +115,23 @@ module.exports = class TextWidget extends Widget
 
   # Determine if widget is auto-height, which means that a vertical height is not required.
   isAutoHeight: -> true
+
+  # Get expression items recursively
+  getExprItems: (items) ->
+    exprItems = []
+    for item in (items or [])
+      if item.type == "expr"
+        exprItems.push(item)
+      if item.items
+        exprItems = exprItems.concat(@getExprItems(item.items))
+    return exprItems
+
+  # Get a list of table ids that can be filtered on
+  getFilterableTables: (design, schema) ->
+    exprItems = @getExprItems(design.items)
+
+    filterableTables = _.map(exprItems, (exprItem) -> exprItem.expr)
+
+    filterableTables = _.uniq(_.compact(filterableTables))
+    return filterableTables
+

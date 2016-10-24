@@ -57,3 +57,6 @@ module.exports = class Chart
   createDataTable: (design, schema, data, locale) ->
     throw new Error("Not implemented")
 
+  # Get a list of table ids that can be filtered on
+  getFilterableTables: (design, schema) ->
+    throw new Error("Not implemented")

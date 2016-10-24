@@ -32,3 +32,7 @@ module.exports = class Widget
 
   # Determine if widget is auto-height, which means that a vertical height is not required.
   isAutoHeight: -> false
+
+  # Get a list of table ids that can be filtered on
+  getFilterableTables: (design, schema) ->
+    return []

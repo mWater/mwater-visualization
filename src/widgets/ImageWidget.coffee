@@ -102,3 +102,10 @@ module.exports = class ImageWidget extends Widget
 
   # Determine if widget is auto-height, which means that a vertical height is not required.
   isAutoHeight: -> false
+
+  # Get a list of table ids that can be filtered on
+  getFilterableTables: (design, schema) ->
+    if design.expr?.table
+      return [design.expr.table]
+
+    return []

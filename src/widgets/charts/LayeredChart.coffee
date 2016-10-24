@@ -215,3 +215,8 @@ module.exports = class LayeredChart extends Chart
   #   table.concat(_.map(data, renderRow))
   # else []
 
+
+  # Get a list of table ids that can be filtered on
+  getFilterableTables: (design, schema) ->
+    filterableTables = _.uniq(_.compact(_.map(design.layers, (layer) -> layer.table)))
+    return filterableTables

@@ -174,3 +174,6 @@ module.exports = class ImageMosaicChart extends Chart
     # table = table.concat(_.map(data.main, renderRow))
     # return table
 
+  # Get a list of table ids that can be filtered on
+  getFilterableTables: (design, schema) ->
+    return _.compact([design.table])

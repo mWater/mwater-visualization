@@ -90,6 +90,14 @@ module.exports = class GridLayoutManager extends LayoutManager
   getWidgetTypeAndDesign: (items, widgetId) -> 
     return items[widgetId]?.widget
 
+  # Gets all widgets in items as array of { type, design }
+  getAllWidgets: (items) ->
+    widgets = []
+    for id, item of items
+      widgets.push({ type: item.widget.type, design: item.widget.design }) 
+
+    return widgets
+
   # Add a widget to the items
   addWidget: (items, widgetType, widgetDesign) ->
     # Find place for new item
