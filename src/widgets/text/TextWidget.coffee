@@ -130,7 +130,7 @@ module.exports = class TextWidget extends Widget
   getFilterableTables: (design, schema) ->
     exprItems = @getExprItems(design.items)
 
-    filterableTables = _.map(exprItems, (exprItem) -> exprItem.expr)
+    filterableTables = _.map(exprItems, (exprItem) -> exprItem.expr?.table)
 
     filterableTables = _.uniq(_.compact(filterableTables))
     return filterableTables
