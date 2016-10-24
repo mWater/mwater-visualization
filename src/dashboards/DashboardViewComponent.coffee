@@ -6,7 +6,9 @@ uuid = require 'node-uuid'
 
 HTML5Backend = require('react-dnd-html5-backend')
 NestableDragDropContext = require  "react-library/lib/NestableDragDropContext"
+ImplicitFilterBuilder = require '../ImplicitFilterBuilder'
 
+DashboardUtils = require './DashboardUtils'
 ExprCompiler = require('mwater-expressions').ExprCompiler
 WidgetFactory = require '../widgets/WidgetFactory'
 WidgetScoper = require '../widgets/WidgetScoper'
@@ -90,11 +92,18 @@ module.exports = class DashboardViewComponent extends React.Component
 
     compiledFilters = @getCompiledFilters()
 
+    # Get filterable tables
+    filterableTables = DashboardUtils.getFilterableTables(@props.design, @props.schema)
+
     renderWidget = (options) =>
       widget = WidgetFactory.createWidget(options.type)
 
       # Get filters (passed in plus dashboard widget scoper filters)
       filters = compiledFilters.concat(@state.widgetScoper.getFilters(options.id))
+
+      # Extend the filters to include implicit filters (filter children in 1-n relationships)
+      implicitFilterBuilder = new ImplicitFilterBuilder(@props.schema)
+      filters = implicitFilterBuilder.extendFilters(filterableTables, filters)
 
       return widget.createViewElement({
         schema: @props.schema
