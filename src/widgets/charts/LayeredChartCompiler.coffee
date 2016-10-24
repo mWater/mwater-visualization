@@ -234,6 +234,7 @@ module.exports = class LayeredChartCompiler
     _.each design.layers, (layer, layerIndex) =>
       # Get data of layer
       layerData = data["layer#{layerIndex}"]
+      @fixStringYValues(layerData)
 
       # If has color axis
       if layer.axes.color
@@ -254,7 +255,7 @@ module.exports = class LayeredChartCompiler
           # Get rows for this series
           rows = _.where(layerData, color: colorValue)
 
-          yValues = _.map(_.pluck(rows, "y"), (v) -> parseFloat(v))
+          yValues = _.pluck(rows, "y")
           if layer.cumulative
             @makeCumulative(yValues)
 
@@ -272,7 +273,7 @@ module.exports = class LayeredChartCompiler
         seriesX = "#{layerIndex}:x"
         seriesY = "#{layerIndex}:y"
 
-        yValues = _.map(_.pluck(layerData, "y"), (v) -> parseFloat(v))
+        yValues = _.pluck(layerData, "y")
         if layer.cumulative
           @makeCumulative(yValues)
 
@@ -415,8 +416,7 @@ module.exports = class LayeredChartCompiler
           _.each rows, (row) =>
             # Get index
             index = categoryMap[row.x]
-            # Data arrives as string sometimes
-            column[index] = if row.y then parseFloat(row.y) else null
+            column[index] = row.y
             dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
 
           if layer.cumulative
@@ -439,8 +439,7 @@ module.exports = class LayeredChartCompiler
         _.each layerData, (row) =>
           # Get index
           index = categoryMap[row.x]
-          # Data arrives as string sometimes
-          column[index] = if row.y then parseFloat(row.y) else null
+          column[index] = row.y
           dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
 
         if layer.cumulative
@@ -608,5 +607,6 @@ module.exports = class LayeredChartCompiler
   makeCumulative: (column) ->
     total = 0
     for i in [0...column.length]
-      total += column[i]
+      if column[i]?
+        total += column[i]
       column[i] = total
