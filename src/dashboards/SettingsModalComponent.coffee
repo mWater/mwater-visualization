@@ -4,9 +4,7 @@ H = React.DOM
 R = React.createElement
 update = require 'update-object'
 
-LayoutManager = require '../layouts/LayoutManager'
-WidgetFactory = require '../widgets/WidgetFactory'
-
+DashboardUtils = require './DashboardUtils'
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
 QuickfiltersDesignComponent = require '../quickfilter/QuickfiltersDesignComponent'
 FiltersDesignerComponent = require '../FiltersDesignerComponent'
@@ -44,19 +42,8 @@ module.exports = class SettingsModalComponent extends React.Component
     if not @state.design
       return null
 
-    layoutManager = LayoutManager.createLayoutManager(@state.design.layout)
-
     # Get filterable tables
-    filterableTables = []
-    for widgetItem in layoutManager.getAllWidgets(@state.design.items)
-      # Create widget
-      widget = WidgetFactory.createWidget(widgetItem.type)
-
-      # Get filterable tables
-      filterableTables = filterableTables.concat(widget.getFilterableTables(widgetItem.design, @props.schema))
-
-    # Remove non-existant tables
-    filterableTables = _.filter(_.uniq(filterableTables), (table) => @props.schema.getTable(table))
+    filterableTables = DashboardUtils.getFilterableTables(@state.design, @props.schema)
 
     return R ActionCancelModalComponent, 
       size: "large"
