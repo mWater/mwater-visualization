@@ -16,11 +16,8 @@
   ],
   "dependencies": {
     "bootstrap": "^3.3.4",
-    "c3": "353c770",
+    "c3": "mWater/c3#clipped-title-fix",
     "d3": "v3.5.0",
     "lodash": "~3.10.1"
-  },
-  "resolutions": {
-    "c3": "~0.4.11"
   }
 }
