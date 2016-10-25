@@ -6,6 +6,8 @@ module.exports = class LayoutManager
   #  items: opaque items object that layout manager understands
   #  onItemsChange: Called when items changes
   #  renderWidget: called with ({ id:, type:, design:, onDesignChange:, width:, height:  })
+  #  style: style to use for layout. null for default
+  #  disableMaps: true to disable maps
   renderLayout: (options) -> null
 
   # Tests if dashboard has any items
