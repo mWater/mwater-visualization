@@ -417,6 +417,9 @@ module.exports = class AdminChoroplethLayer extends Layer
 
     design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table })
 
+    if not design.detailLevel
+      design.detailLevel = 0
+
     return design
 
   # Validates design. Null if ok, message otherwise
