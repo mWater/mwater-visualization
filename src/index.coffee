@@ -46,6 +46,7 @@ exports.DirectMapDataSource = require './maps/DirectMapDataSource'
 
 exports.ServerDatagridDataSource = require './datagrids/ServerDatagridDataSource'
 exports.DirectDatagridDataSource = require './datagrids/DirectDatagridDataSource'
+exports.LabeledExprGenerator = require './datagrids/LabeledExprGenerator'
 
 exports.LayoutManager = require './layouts/LayoutManager'
 exports.RegionSelectComponent = require './maps/RegionSelectComponent'
