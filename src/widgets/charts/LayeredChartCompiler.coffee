@@ -181,6 +181,10 @@ module.exports = class LayeredChartCompiler
       if layer.axes.color
         # Create a series for each row
         _.each data["layer#{layerIndex}"], (row, rowIndex) =>
+          # Skip if value excluded
+          if _.includes(layer.axes.color.excludedValues, row.color)
+            return
+
           series = "#{layerIndex}:#{rowIndex}"
           # Pie series contain a single value
           columns.push([series, row.y])
@@ -242,6 +246,10 @@ module.exports = class LayeredChartCompiler
         colorValues = _.uniq(_.pluck(layerData, "color"))
 
         _.each colorValues, (colorValue) =>
+          # Skip if value excluded
+          if _.includes(layer.axes.color.excludedValues, colorValue)
+            return
+
           # One series for x values, one for y
           seriesX = "#{layerIndex}:#{colorValue}:x"
           seriesY = "#{layerIndex}:#{colorValue}:y"
@@ -396,6 +404,9 @@ module.exports = class LayeredChartCompiler
         # Create a series for each color value
         colorValues = _.uniq(_.pluck(layerData, "color"))
 
+        # Exclude excluded ones
+        colorValues = _.difference(colorValues, layer.axes.color.excludedValues)
+
         _.each colorValues, (colorValue) =>
           # One series for y values
           series = "#{layerIndex}:#{colorValue}"
@@ -414,6 +425,10 @@ module.exports = class LayeredChartCompiler
 
           # Set rows
           _.each rows, (row) =>
+            # Skip if value excluded
+            if _.includes(layer.axes.x.excludedValues, row.x)
+              return
+
             # Get index
             index = categoryMap[row.x]
             column[index] = row.y
@@ -437,6 +452,10 @@ module.exports = class LayeredChartCompiler
 
         # Set rows
         _.each layerData, (row) =>
+          # Skip if value excluded
+          if _.includes(layer.axes.x.excludedValues, row.x)
+            return
+            
           # Get index
           index = categoryMap[row.x]
           column[index] = row.y
