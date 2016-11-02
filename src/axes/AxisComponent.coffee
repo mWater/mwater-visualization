@@ -9,10 +9,10 @@ LinkComponent = require('mwater-expressions-ui').LinkComponent
 AxisBuilder = require './AxisBuilder'
 update = require 'update-object'
 ui = require '../UIComponents'
-ColorMapComponent = require './ColorMapComponent'
 BinsComponent = require './BinsComponent'
 RangesComponent = require './RangesComponent'
 AxisColorEditorComponent = require './AxisColorEditorComponent'
+CategoryMapComponent = require './CategoryMapComponent'
 
 # Axis component that allows designing of an axis
 module.exports = class AxisComponent extends React.Component
@@ -163,6 +163,33 @@ module.exports = class AxisComponent extends React.Component
         allowExcludedValues: @props.allowExcludedValues
       ]
 
+  renderExcludedValues: (axis) ->
+    # Only if no color map
+    if @props.showColorMap or not axis or not axis.expr
+      return null
+
+    # TODO should probably get categories in this class using code from AxisColorEditorComponent
+    # Get categories (only works if no values are required)
+    axisBuilder = new AxisBuilder(schema: @props.schema)
+
+    # Get categories (value + label)
+    categories = axisBuilder.getCategories(axis)
+    if categories.length <= 1
+      return null
+
+    return [
+      H.br()
+      R CategoryMapComponent,
+        schema: @props.schema
+        dataSource: @props.dataSource
+        axis: axis
+        onChange: @props.onChange
+        categories: categories
+        reorderable: false
+        showColorMap: false
+        allowExcludedValues: true
+      ]
+
   render: ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
 
@@ -191,3 +218,4 @@ module.exports = class AxisComponent extends React.Component
           aggrStatuses: aggrStatuses
       @renderXform(axis)
       @renderColorMap(axis)
+      @renderExcludedValues(axis)

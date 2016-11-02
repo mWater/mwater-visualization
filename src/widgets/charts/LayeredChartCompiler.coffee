@@ -371,6 +371,9 @@ module.exports = class LayeredChartCompiler
     # Categories will be in form [{ value, label }]
     categories = @axisBuilder.getCategories(xAxis, xValues, locale)
 
+    # Exclude excluded values
+    categories = _.filter(categories, (category) => not _.includes(xAxis.excludedValues, category.value))
+
     # Limit categories to prevent crashes in C3 (https://github.com/mWater/mwater-visualization/issues/272)
     if xType != "enumset"
       # Take last ones to make dates prettier
@@ -425,14 +428,11 @@ module.exports = class LayeredChartCompiler
 
           # Set rows
           _.each rows, (row) =>
-            # Skip if value excluded
-            if _.includes(layer.axes.x.excludedValues, row.x)
-              return
-
             # Get index
             index = categoryMap[row.x]
-            column[index] = row.y
-            dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
+            if index?
+              column[index] = row.y
+              dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
 
           if layer.cumulative
             @makeCumulative(column)

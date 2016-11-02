@@ -9,8 +9,8 @@ ColorComponent = require '../ColorComponent'
 ExprUtils = require('mwater-expressions').ExprUtils
 ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
 
-# Color map for an axis
-module.exports = class ColorMapComponent extends React.Component
+# Category map for an axis. Controls the colorMap values and excludedValues
+module.exports = class CategoryMapComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired 
     dataSource: React.PropTypes.object.isRequired
@@ -18,6 +18,7 @@ module.exports = class ColorMapComponent extends React.Component
     onChange: React.PropTypes.func.isRequired
     categories: React.PropTypes.array
     reorderable: React.PropTypes.bool
+    showColorMap: React.PropTypes.bool  # True to allow editing the color map
     allowExcludedValues: React.PropTypes.bool # True to allow excluding of values via checkboxes
 
   handleReorder: (map) =>
@@ -68,7 +69,7 @@ module.exports = class ColorMapComponent extends React.Component
   renderCategory: (category, index, connectDragSource, connectDragPreview, connectDropTarget) =>
     labelStyle =
       verticalAlign: 'middle'
-      marginLeft: 8
+      marginLeft: 5
 
     iconStyle =
       cursor: "move"
@@ -81,6 +82,7 @@ module.exports = class ColorMapComponent extends React.Component
       verticalAlign: 'middle'
       lineHeight: 1
       display: 'inline-block'
+      marginLeft: 5
 
     elem = H.div null,
       if connectDragSource
@@ -89,15 +91,17 @@ module.exports = class ColorMapComponent extends React.Component
       if @props.allowExcludedValues
         H.input 
           type: "checkbox"
-          style: { marginLeft: 5, marginRight: 5, marginBottom: 5, verticalAlign: "middle" }
+          style: { marginLeft: 5, marginBottom: 5, verticalAlign: "middle" }
           checked: not _.includes(@props.axis.excludedValues, category.value)
           onChange: @handleExcludeChange.bind(null, category.value)
 
-      H.div style: colorPickerStyle,
-        R ColorComponent,
-          key: 'color'
-          color: @lookupColor(category.value)
-          onChange: (color) => @handleColorChange(category.value, color)
+      if @props.showColorMap
+        H.div style: colorPickerStyle,
+          R ColorComponent,
+            key: 'color'
+            color: @lookupColor(category.value)
+            onChange: (color) => @handleColorChange(category.value, color)
+
       H.span style: labelStyle,
         @renderLabel(category)
 

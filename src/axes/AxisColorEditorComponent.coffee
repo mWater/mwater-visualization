@@ -2,7 +2,7 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 R = React.createElement
-ColorMapComponent = require './ColorMapComponent'
+CategoryMapComponent = require './CategoryMapComponent'
 ColorPaletteCollectionComponent = require './ColorPaletteCollectionComponent'
 update = require 'update-object'
 AxisBuilder = require './AxisBuilder'
@@ -143,7 +143,7 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
           if @props.axis.colorMap
             H.div key: "selected-palette",
               H.div null,
-                R ColorMapComponent,
+                R CategoryMapComponent,
                   schema: @props.schema
                   dataSource: @props.dataSource
                   axis: @props.axis
@@ -152,3 +152,4 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
                   key: "colorMap"
                   reorderable: @props.colorMapReorderable
                   allowExcludedValues: @props.allowExcludedValues
+                  showColorMap: true

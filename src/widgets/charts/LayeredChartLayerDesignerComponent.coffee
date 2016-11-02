@@ -7,6 +7,7 @@ FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
 ColorComponent = require '../../ColorComponent'
 LayeredChartUtils = require './LayeredChartUtils'
+LayeredChartCompiler = require './LayeredChartCompiler'
 ui = require '../../UIComponents'
 TableSelectComponent = require '../../TableSelectComponent'
 
