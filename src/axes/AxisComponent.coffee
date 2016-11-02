@@ -32,11 +32,13 @@ module.exports = class AxisComponent extends React.Component
     showColorMap: React.PropTypes.bool # Shows the color map
     colorMapOptional: React.PropTypes.bool # Is the color map optional
     colorMapReorderable: React.PropTypes.bool # Is the color map reorderable
+    allowExcludedValues: React.PropTypes.bool # True to allow excluding of values via checkboxes
     defaultColor: React.PropTypes.string
 
   @defaultProps:
     colorMapOptional: false
     colorMapReorderable: false
+    allowExcludedValues: false
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
@@ -158,6 +160,7 @@ module.exports = class AxisComponent extends React.Component
         table: @props.table
         types: @props.types
         aggrNeed: @props.aggrNeed
+        allowExcludedValues: @props.allowExcludedValues
       ]
 
   render: ->
@@ -177,7 +180,7 @@ module.exports = class AxisComponent extends React.Component
 
     H.div null,
       H.div null,
-        React.createElement(ExprComponent,
+        R ExprComponent,
           schema: @props.schema
           dataSource: @props.dataSource
           table: @props.table
@@ -186,6 +189,5 @@ module.exports = class AxisComponent extends React.Component
           onChange: @handleExprChange
           value: if @props.value then @props.value.expr
           aggrStatuses: aggrStatuses
-          )
       @renderXform(axis)
       @renderColorMap(axis)

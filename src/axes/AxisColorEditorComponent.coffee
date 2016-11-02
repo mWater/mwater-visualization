@@ -14,13 +14,14 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
     axis: React.PropTypes.object.isRequired
-    onChange: React.PropTypes.func.isRequired
+    onChange: React.PropTypes.func.isRequired # Called with new axis
     colorMapOptional: React.PropTypes.bool # is colorMap optional
     colorMapReorderable: React.PropTypes.bool # is the color map reorderable
     defaultColor: React.PropTypes.string
     table: React.PropTypes.string.isRequired # Table to use
     types: React.PropTypes.array # Optional types to limit to
     aggrNeed: React.PropTypes.oneOf(['none', 'optional', 'required']).isRequired
+    allowExcludedValues: React.PropTypes.bool # True to allow excluding of values via checkboxes
 
   @defaultProps:
     colorMapOptional: false
@@ -52,7 +53,7 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
 
       if not props.axis.colorMap or !_.isEqual(_.pluck(props.axis.colorMap, "value").sort(), _.pluck(categories, "value").sort())
         colorMap = ColorPaletteCollectionComponent.getColorMapForCategories(categories, axisBuilder.isCategorical(props.axis))
-        @onPaletteChange(colorMap)
+        @handlePaletteChange(colorMap)
         newState.mode = "normal"
       callback(newState)
       return
@@ -94,7 +95,7 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
 
       if not props.axis.colorMap or !_.isEqual(_.pluck(props.axis.colorMap, "value").sort(), _.pluck(categories, "value").sort())
         colorMap = ColorPaletteCollectionComponent.getColorMapForCategories(categories, axisBuilder.isCategorical(axis))
-        @onPaletteChange(colorMap)
+        @handlePaletteChange(colorMap)
         newState.mode = "normal"
       callback(newState)
     )
@@ -105,12 +106,9 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
   handleSelectPalette: =>
     @setState(mode: "palette")
 
-  onPaletteChange: (palette) =>
+  handlePaletteChange: (palette) =>
     @props.onChange(update(@props.axis, { colorMap: { $set: palette }, drawOrder: { $set: _.pluck(palette, "value") }}))
     @setState(mode: "normal")
-
-  handleDrawOrderChange: (order) =>
-    @props.onChange(update(@props.axis, { drawOrder: { $set: order }}))
 
   handleCancelCustomize: =>
     @setState(mode: "normal")
@@ -127,15 +125,13 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
         H.div style: cellStyle, key: i, " "
 
   render: ->
-    drawOrder = @props.axis.drawOrder or _.pluck(@props.axis.colorMap, "value")
-
     H.div null,
       if @state.mode == "palette"
         if @state.loading
           H.span null, "Loading..."
         else
           R ColorPaletteCollectionComponent, {
-            onPaletteSelected: @onPaletteChange
+            onPaletteSelected: @handlePaletteChange
             axis: @props.axis
             categories: @state.categories
             onCancel: @handleCancelCustomize
@@ -154,6 +150,5 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
                   onChange: @props.onChange
                   categories: @state.categories
                   key: "colorMap"
-                  reorderable: drawOrder and @props.colorMapReorderable
-                  order: drawOrder
-                  onOrderChange: @handleDrawOrderChange
+                  reorderable: @props.colorMapReorderable
+                  allowExcludedValues: @props.allowExcludedValues

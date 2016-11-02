@@ -18,11 +18,11 @@ module.exports = class ColorMapComponent extends React.Component
     onChange: React.PropTypes.func.isRequired
     categories: React.PropTypes.array
     reorderable: React.PropTypes.bool
-    onOrderChange: React.PropTypes.func
-    order: React.PropTypes.array
+    allowExcludedValues: React.PropTypes.bool # True to allow excluding of values via checkboxes
 
   handleReorder: (map) =>
-    @props.onOrderChange(_.pluck(map, "value"))
+    order = _.pluck(map, "value")
+    @props.onChange(update(@props.axis, { drawOrder: { $set: order }}))
 
   handleColorChange: (value, color) =>
     # Delete if present for value
@@ -33,6 +33,14 @@ module.exports = class ColorMapComponent extends React.Component
       colorMap.push({ value: value, color: color })
 
     @props.onChange(update(@props.axis, { colorMap: { $set: colorMap }}))
+
+  handleExcludeChange: (value, ev) =>
+    if ev.target.checked
+      excludedValues = _.difference(@props.axis.excludedValues, [value])
+    else
+      excludedValues = _.union(@props.axis.excludedValues, [value])
+
+    @props.onChange(update(@props.axis, { excludedValues: { $set: excludedValues }}))
 
   # Gets the current color value if known
   lookupColor: (value) ->
@@ -56,7 +64,8 @@ module.exports = class ColorMapComponent extends React.Component
         label
         H.span style: {fontSize: 12, marginLeft: 4}, "(click to change label for none value)"
 
-  renderItem: (item, index, connectDragSource, connectDragPreview, connectDropTarget) =>
+  # Category is { value: category value, label: category label }
+  renderCategory: (category, index, connectDragSource, connectDragPreview, connectDropTarget) =>
     labelStyle =
       verticalAlign: 'middle'
       marginLeft: 8
@@ -71,48 +80,54 @@ module.exports = class ColorMapComponent extends React.Component
     colorPickerStyle =
       verticalAlign: 'middle'
       lineHeight: 1
-      display: 'inline'
+      display: 'inline-block'
 
-    connectDragPreview(connectDropTarget(H.div null,
-      connectDragSource(H.i(className: "fa fa-bars", style: iconStyle))
+    elem = H.div null,
+      if connectDragSource
+        connectDragSource(H.i(className: "fa fa-bars", style: iconStyle))
+
+      if @props.allowExcludedValues
+        H.input 
+          type: "checkbox"
+          style: { marginLeft: 5, marginRight: 5, marginBottom: 5, verticalAlign: "middle" }
+          checked: not _.includes(@props.axis.excludedValues, category.value)
+          onChange: @handleExcludeChange.bind(null, category.value)
+
       H.div style: colorPickerStyle,
         R ColorComponent,
           key: 'color'
-          color: @lookupColor(item.value)
-          onChange: (color) => @handleColorChange(item.value, color)
-      H.span style: labelStyle ,
-        @renderLabel(item)
-    ))
+          color: @lookupColor(category.value)
+          onChange: (color) => @handleColorChange(category.value, color)
+      H.span style: labelStyle,
+        @renderLabel(category)
+
+    if connectDropTarget
+      elem = connectDropTarget(elem)
+    if connectDragPreview
+      elem = connectDragPreview(elem)
+
+    return elem
 
   renderReorderable: ->
-    ordered = _.sortBy(@props.categories, (item) =>
-      _.indexOf(@props.order, item.value)
-    )
+    drawOrder = @props.axis.drawOrder or _.pluck(@props.axis.colorMap, "value")
 
-    items = _.map ordered, (category) =>
-      {value: category.value, color: @lookupColor(category.value), label: category.label }
+    orderedCategories = _.sortBy(@props.categories, (category) =>
+      _.indexOf(drawOrder, category.value)
+    )
 
     H.div null,
       R ReorderableListComponent,
-        items: items
+        items: orderedCategories
         onReorder: @handleReorder
-        renderItem: @renderItem
+        renderItem: @renderCategory
         getItemId: (item) => item.value
+
+  renderNonReorderable: ->
+    H.div null,
+      _.map @props.categories, (category) => @renderCategory(category)
 
   render: ->
     if @props.reorderable
-      @renderReorderable()
+      return @renderReorderable()
     else
-      H.div null,
-        H.table style: { width: "auto" },
-          H.tbody null,
-            _.map @props.categories, (category) =>
-              H.tr key: category.value,
-                H.td key: "color",
-                  R ColorComponent,
-                    color: @lookupColor(category.value)
-                    onChange: (color) => @handleColorChange(category.value, color)
-                H.td key: "label", style: { paddingLeft: 8 },
-                  @renderLabel(category)
-
-
+      return @renderNonReorderable()
