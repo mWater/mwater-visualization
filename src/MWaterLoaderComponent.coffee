@@ -3,7 +3,6 @@ React = require 'react'
 H = React.DOM
 
 Schema = require('mwater-expressions').Schema
-LayerFactory = require './maps/LayerFactory'
 MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 MWaterTableSelectComponent = require './MWaterTableSelectComponent'
 querystring = require 'querystring'

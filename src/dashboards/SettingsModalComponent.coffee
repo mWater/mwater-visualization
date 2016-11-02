@@ -52,7 +52,7 @@ module.exports = class SettingsModalComponent extends React.Component
         H.div style: { paddingBottom: 200 },
           H.h4 null, "Quick Filters"
           H.div className: "text-muted", 
-            "Quick filters are shown to the user at the top of the dashboard and can be used to filter data of widgets."
+            "Quick filters are shown to the user as a dropdown at the top of the dashboard and can be used to filter data of widgets."
          
           R QuickfiltersDesignComponent, {
             design: @state.design.quickfilters

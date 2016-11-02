@@ -130,7 +130,7 @@ class MWaterDirectDashboardPane extends React.Component
     @state = {
       # design: { items: {}, layout: "grid" } # dashboardDesign
       # design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" } # dashboardDesign
-      design: design
+      design: simplePieChart
       # design: imageWidgetDashboardDesign
       # design: dashboardDesign
       extraTables: [] #['responses:e24f0a0ec11643cab3c21c07de2f6889']
@@ -3680,4 +3680,174 @@ pageBreakProblem = {
   },
   "layout": "blocks",
   "style": "default"
+}
+
+simpleBarChart = {
+  "items": {
+    "id": "root",
+    "type": "root",
+    "blocks": [
+      {
+        "type": "widget",
+        "aspectRatio": 1.4,
+        "widgetType": "LayeredChart",
+        "design": {
+          "version": 2,
+          "layers": [
+            {
+              "axes": {
+                "x": {
+                  "expr": {
+                    "type": "field",
+                    "table": "entities.water_point",
+                    "column": "type"
+                  }
+                },
+                "y": {
+                  "expr": {
+                    "type": "op",
+                    "op": "count",
+                    "table": "entities.water_point",
+                    "exprs": []
+                  }
+                }
+              },
+              "filter": null,
+              "table": "entities.water_point"
+            }
+          ],
+          "type": "bar",
+          "transpose": true
+        },
+        "id": "f375fe0a-04ff-454e-8269-fbbafa7e3f8d"
+      }
+    ]
+  },
+  "layout": "blocks",
+  "style": "greybg"
+}
+
+simplePieChart = {
+  "items": {
+    "id": "root",
+    "type": "root",
+    "blocks": [
+      {
+        "type": "widget",
+        "aspectRatio": 1.4,
+        "widgetType": "LayeredChart",
+        "design": {
+          "version": 2,
+          "layers": [
+            {
+              "axes": {
+                "y": {
+                  "expr": {
+                    "type": "op",
+                    "op": "count",
+                    "table": "entities.water_point",
+                    "exprs": []
+                  }
+                },
+                "color": {
+                  "expr": {
+                    "type": "field",
+                    "table": "entities.water_point",
+                    "column": "type"
+                  },
+                  "colorMap": [
+                    {
+                      "value": "Protected dug well",
+                      "color": "#377eb8"
+                    },
+                    {
+                      "value": "Unprotected dug well",
+                      "color": "#4daf4a"
+                    },
+                    {
+                      "value": "Borehole or tubewell",
+                      "color": "#984ea3"
+                    },
+                    {
+                      "value": "Protected spring",
+                      "color": "#ff7f00"
+                    },
+                    {
+                      "value": "Unprotected spring",
+                      "color": "#ffff33"
+                    },
+                    {
+                      "value": "Rainwater",
+                      "color": "#a65628"
+                    },
+                    {
+                      "value": "Surface water",
+                      "color": "#f781bf"
+                    },
+                    {
+                      "value": "Piped into dwelling",
+                      "color": "#999999"
+                    },
+                    {
+                      "value": "Piped into yard/plot",
+                      "color": "#e41a1c"
+                    },
+                    {
+                      "value": "Piped into public tap or basin",
+                      "color": "#377eb8"
+                    },
+                    {
+                      "value": "Bottled water",
+                      "color": "#4daf4a"
+                    },
+                    {
+                      "value": "Tanker truck",
+                      "color": "#984ea3"
+                    },
+                    {
+                      "value": "Cart with small tank/drum",
+                      "color": "#ff7f00"
+                    },
+                    {
+                      "value": "other",
+                      "color": "#ffff33"
+                    },
+                    {
+                      "value": null,
+                      "color": "#aaaaaa"
+                    }
+                  ],
+                  "drawOrder": [
+                    "Protected dug well",
+                    "Unprotected dug well",
+                    "Borehole or tubewell",
+                    "Protected spring",
+                    "Unprotected spring",
+                    "Rainwater",
+                    "Surface water",
+                    "Piped into dwelling",
+                    "Piped into yard/plot",
+                    "Piped into public tap or basin",
+                    "Bottled water",
+                    "Tanker truck",
+                    "Cart with small tank/drum",
+                    "other",
+                    null
+                  ],
+                  "excludedValues": []
+                }
+              },
+              "filter": null,
+              "table": "entities.water_point"
+            }
+          ],
+          "type": "pie",
+          "transpose": true
+        },
+        "id": "f375fe0a-04ff-454e-8269-fbbafa7e3f8d"
+      }
+    ]
+  },
+  "layout": "blocks",
+  "style": "greybg"
 }
