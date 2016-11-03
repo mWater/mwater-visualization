@@ -6,7 +6,7 @@ ui = require('../UIComponents')
 ColorComponent = require '../ColorComponent'
 AxisComponent = require './AxisComponent'
 
-# binds together the default color control and color map control
+# Binds together the default color control and color map control
 module.exports = class ColorAxisComponent extends React.Component
   @propTypes:
     defaultColor: React.PropTypes.string # the default color
@@ -18,11 +18,12 @@ module.exports = class ColorAxisComponent extends React.Component
     table: React.PropTypes.string
 
     # directly passed on to AxisComponent
-    showColorMap: React.PropTypes.bool # Shows the color map
+    showColorMap: React.PropTypes.bool # Shows the color map TODO how can this be false??
     colorMapOptional: React.PropTypes.bool # Is the color map optional
     colorMapReorderable: React.PropTypes.bool # Is the color map reorderable
     aggrNeed: React.PropTypes.oneOf(['none', 'optional', 'required']).isRequired
     types: React.PropTypes.array # Optional types to limit to
+    allowExcludedValues: React.PropTypes.bool # True to allow excluding of values via checkboxes
 
   constructor: ->
     super
@@ -69,3 +70,4 @@ module.exports = class ColorAxisComponent extends React.Component
               colorMapOptional: @props.colorMapOptional
               colorMapReorderable: @props.colorMapReorderable
               onChange: @props.onColorAxisChange
+              allowExcludedValues: @props.allowExcludedValues

@@ -75,28 +75,6 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
       ": "
       React.createElement(NumberInputComponent, value: @props.design.radius, onChange: @handleRadiusChange)
 
-  renderColorAxis: ->
-    if not @props.design.axes.geometry
-      return
-
-    title = H.span null,
-      H.span className: "glyphicon glyphicon glyphicon-tint"
-      " Color By"
-
-    H.div className: "form-group",
-      H.label className: "text-muted", title
-      H.div style: { marginLeft: 10 }, 
-        React.createElement(AxisComponent, 
-          schema: @props.schema
-          dataSource: @props.dataSource
-          table: @props.design.table
-          types: ["text", "enum", "boolean"]
-          aggrNeed: "none"
-          value: @props.design.axes.color
-          showColorMap: true
-          colorMapReorderable: true
-          onChange: @handleColorAxisChange)
-
   renderColor: ->
     if not @props.design.axes.geometry
       return
@@ -119,7 +97,7 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
           types: ["text", "enum", "boolean", "date"]
           aggrNeed: "none"
           colorMapReorderable: true
-#        React.createElement(ColorComponent, color: @props.desidefaultColor: @props.design.colorgn.color, onChange: @handleColorChange)
+          allowExcludedValues: true
 
   renderFillOpacity: ->
     return H.div className: "form-group",
@@ -137,7 +115,7 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
 
   renderFilter: ->
     # If no data, hide
-    if not @props.design.axes.geometry
+      if not @props.design.axes.geometry
       return null
 
     return H.div className: "form-group",

@@ -26,3 +26,5 @@ types:
 ## Color map
 
 The color map is kept in sync with the values of the axis after transformation.
+
+TODO does color map order matter?
