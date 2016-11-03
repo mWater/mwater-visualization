@@ -7,11 +7,10 @@ It contains:
  expr: expression
  aggr: DEPRECATED: optional aggregation (e.g. sum)
  xform: optional transformation to be applied. object with `type` field. See below
- colorMap: optional array of { value: value of expression, post-transform, color: html color }
+ colorMap: optional array of color mappings. See below
  drawOrder: optional array of category values which define the order in which categories should be rendered
  nullLabel: optional string for null category
-
-aggregation and transforms are mutually exclusive.
+ excludedValues: Array of post-xform values to exclude when displaying. 
 
 ## Xforms
 
@@ -24,3 +23,10 @@ types:
 `month`: month only e.g. `02`. type enum
 `ranges`: convert to ranges. type enum. `ranges` is array of { id (unique id), label (optional label), minValue (null for none), maxValue (null for none), minOpen (true for >, false for >=), maxOpen (true for <, false for <=) }
 
+## Color map
+
+Array of { value: post-transform value of expression, color: html color }
+
+The color map is kept in sync with the values of the axis after transformation.
+
+The order is not important.

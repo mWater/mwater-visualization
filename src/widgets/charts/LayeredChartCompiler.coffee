@@ -181,6 +181,10 @@ module.exports = class LayeredChartCompiler
       if layer.axes.color
         # Create a series for each row
         _.each data["layer#{layerIndex}"], (row, rowIndex) =>
+          # Skip if value excluded
+          if _.includes(layer.axes.color.excludedValues, row.color)
+            return
+
           series = "#{layerIndex}:#{rowIndex}"
           # Pie series contain a single value
           columns.push([series, row.y])
@@ -242,6 +246,10 @@ module.exports = class LayeredChartCompiler
         colorValues = _.uniq(_.pluck(layerData, "color"))
 
         _.each colorValues, (colorValue) =>
+          # Skip if value excluded
+          if _.includes(layer.axes.color.excludedValues, colorValue)
+            return
+
           # One series for x values, one for y
           seriesX = "#{layerIndex}:#{colorValue}:x"
           seriesY = "#{layerIndex}:#{colorValue}:y"
@@ -363,6 +371,9 @@ module.exports = class LayeredChartCompiler
     # Categories will be in form [{ value, label }]
     categories = @axisBuilder.getCategories(xAxis, xValues, locale)
 
+    # Exclude excluded values
+    categories = _.filter(categories, (category) => not _.includes(xAxis.excludedValues, category.value))
+
     # Limit categories to prevent crashes in C3 (https://github.com/mWater/mwater-visualization/issues/272)
     if xType != "enumset"
       # Take last ones to make dates prettier
@@ -396,6 +407,9 @@ module.exports = class LayeredChartCompiler
         # Create a series for each color value
         colorValues = _.uniq(_.pluck(layerData, "color"))
 
+        # Exclude excluded ones
+        colorValues = _.difference(colorValues, layer.axes.color.excludedValues)
+
         _.each colorValues, (colorValue) =>
           # One series for y values
           series = "#{layerIndex}:#{colorValue}"
@@ -416,8 +430,9 @@ module.exports = class LayeredChartCompiler
           _.each rows, (row) =>
             # Get index
             index = categoryMap[row.x]
-            column[index] = row.y
-            dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
+            if index?
+              column[index] = row.y
+              dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
 
           if layer.cumulative
             @makeCumulative(column)
@@ -437,6 +452,10 @@ module.exports = class LayeredChartCompiler
 
         # Set rows
         _.each layerData, (row) =>
+          # Skip if value excluded
+          if _.includes(layer.axes.x.excludedValues, row.x)
+            return
+            
           # Get index
           index = categoryMap[row.x]
           column[index] = row.y

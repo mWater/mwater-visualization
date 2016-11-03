@@ -7,6 +7,7 @@ FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
 ColorComponent = require '../../ColorComponent'
 LayeredChartUtils = require './LayeredChartUtils'
+LayeredChartCompiler = require './LayeredChartCompiler'
 ui = require '../../UIComponents'
 TableSelectComponent = require '../../TableSelectComponent'
 
@@ -143,7 +144,10 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
         aggrNeed: "none"
         required: true
         value: layer.axes.x, 
-        onChange: @handleXAxisChange)
+        onChange: @handleXAxisChange
+        # Categorical X can exclude values
+        allowExcludedValues: new LayeredChartCompiler(schema: @props.schema).isCategoricalX(@props.design)
+        )
 
   renderColorAxis: ->
     layer = @props.design.layers[@props.index]
@@ -165,7 +169,9 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
           showColorMap: true
           value: layer.axes.color
           colorMapOptional: true
-          onChange: @handleColorAxisChange)
+          onChange: @handleColorAxisChange
+          allowExcludedValues: true
+          )
 
   renderYAxis: ->
     layer = @props.design.layers[@props.index]

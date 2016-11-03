@@ -227,30 +227,14 @@ module.exports = class BufferLayer extends Layer
       }
     '''
 
-    if design.color
-      css += '''
-        #layer0 {
-          marker-fill: ''' + design.color + ''';
-        }
-      '''
-    # css += '''
-    #   #layer0 {
-    #     marker-fill: ''' + (design.color or "#666666") + ''';
-    #     marker-width: 10;
-    #     marker-line-color: white;
-    #     ''' + stroke + '''
-    #     marker-line-opacity: 0.6;
-    #     marker-placement: point;
-    #     ''' + symbol + '''
-    #     marker-allow-overlap: true;
-
-    #     }
-    #   '''
-
     # If color axes, add color conditions
     if design.axes.color?.colorMap
       for item in design.axes.color.colorMap
-        css += "#layer0 [color=#{JSON.stringify(item.value)}] { marker-fill: #{item.color}; }\n"
+        # If invisible
+        if _.includes(design.axes.color.excludedValues, item.value)
+          css += "#layer0 [color=#{JSON.stringify(item.value)}] { marker-fill-opacity: 0; }\n"  
+        else
+          css += "#layer0 [color=#{JSON.stringify(item.value)}] { marker-fill: #{item.color}; }\n"
 
     return css
 

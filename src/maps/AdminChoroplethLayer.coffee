@@ -223,6 +223,7 @@ module.exports = class AdminChoroplethLayer extends Layer
         line-opacity: 0.6;
         polygon-opacity: ''' + design.fillOpacity + ''';
         polygon-fill: ''' + (design.color or "transparent") + ''';
+        opacity: ''' +  design.fillOpacity + '''; 
       }
 
     '''
@@ -241,22 +242,13 @@ module.exports = class AdminChoroplethLayer extends Layer
     # If color axes, add color conditions
     if design.axes.color and design.axes.color.colorMap
       for item in design.axes.color.colorMap
-        css += "#layer0 [color=#{JSON.stringify(item.value)}] { polygon-fill: #{item.color}; opacity: #{design.fillOpacity}; }\n"
-
-    # colors = [
-    #   "#f7fbff"
-    #   "#deebf7"
-    #   "#c6dbef"
-    #   "#9ecae1"
-    #   "#6baed6"
-    #   "#4292c6"
-    #   "#2171b5"
-    #   "#08519c"
-    #   "#08306b"
-    # ]
-
-    # for i in [0...9]
-    #   css += "\n#layer0 [value >= #{i/9}][value <= #{(i+1)/9}] { polygon-fill: #{colors[i]} }"
+        # If invisible
+        if _.includes(design.axes.color.excludedValues, item.value)
+          css += "#layer0 [color=#{JSON.stringify(item.value)}] { line-color: transparent; polygon-opacity: 0; polygon-fill: transparent; }\n"  
+          if design.displayNames
+            css += "#layer0::labels [color=#{JSON.stringify(item.value)}] { text-opacity: 0; text-halo-opacity: 0; }\n"  
+        else
+          css += "#layer0 [color=#{JSON.stringify(item.value)}] { polygon-fill: #{item.color}; }\n"
 
     return css
 

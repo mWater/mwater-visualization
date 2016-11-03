@@ -67,27 +67,6 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
           value: @props.design.axes.geometry
           onChange: @handleGeometryAxisChange)
 
-  renderColorAxis: ->
-    if not @props.design.axes.geometry
-      return
-
-    title = H.span null,
-      H.span className: "glyphicon glyphicon glyphicon-tint"
-      " Color By"
-
-    H.div className: "form-group",
-      H.label className: "text-muted", title
-      H.div style: { marginLeft: 10 }, 
-        R(AxisComponent, 
-          schema: @props.schema
-          dataSource: @props.dataSource
-          table: @props.design.table
-          types: ["text", "enum", "boolean"]
-          aggrNeed: "none"
-          value: @props.design.axes.color
-          showColorMap: true
-          onChange: @handleColorAxisChange)
-
   renderColor: ->
     if not @props.design.axes.geometry
       return
@@ -109,7 +88,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
           showColorMap: true
           types: ["text", "enum", "boolean",'date']
           aggrNeed: "none"
-#        R(ColorComponent, color: @props.design.color, onChange: @handleColorChange)
+          allowExcludedValues: true
 
   renderSymbol: ->
     if not @props.design.axes.geometry
@@ -150,7 +129,6 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
       @renderTable()
       @renderGeometryAxis()
       @renderColor()
-#      @renderColorAxis()
       @renderSymbol()
       @renderFilter()
       @renderPopup()
