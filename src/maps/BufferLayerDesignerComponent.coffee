@@ -115,7 +115,7 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
 
   renderFilter: ->
     # If no data, hide
-      if not @props.design.axes.geometry
+    if not @props.design.axes.geometry
       return null
 
     return H.div className: "form-group",

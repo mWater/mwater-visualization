@@ -105,28 +105,8 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
           showColorMap: true
           types: ["text", "enum", "boolean", 'date']
           aggrNeed: "required"
-#        R(ColorComponent, color: @props.design.color, onChange: updt(@props.onDesignChange, @props.design, "color"))
+          allowExcludedValues: true
 
-  renderColorAxis: ->
-    if not @props.design.table
-      return
-
-    title = H.span null,
-      H.span className: "glyphicon glyphicon glyphicon-tint"
-      " Color By"
-
-    H.div className: "form-group",
-      H.label className: "text-muted", title
-      H.div style: { marginLeft: 10 }, 
-        R(AxisComponent, 
-          schema: @props.schema
-          dataSource: @props.dataSource
-          table: @props.design.table
-          types: ["text", "enum", "boolean"]
-          aggrNeed: "required"
-          value: @props.design.axes.color
-          showColorMap: true
-          onChange: updt(@props.onDesignChange, @props.design, ["axes", "color"]))
 
   # renderLabelAxis: ->
   #   if not @props.design.table

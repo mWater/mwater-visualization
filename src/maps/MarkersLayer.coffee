@@ -174,7 +174,11 @@ module.exports = class MarkersLayer extends Layer
     # If color axes, add color conditions
     if design.axes.color and design.axes.color.colorMap
       for item in design.axes.color.colorMap
-        css += "#layer0 [color=#{JSON.stringify(item.value)}] { marker-fill: #{item.color} }\n"
+        # If invisible
+        if _.includes(design.axes.color.excludedValues, item.value)
+          css += "#layer0 [color=#{JSON.stringify(item.value)}] { marker-line-opacity: 0; marker-fill-opacity: 0; }\n"  
+        else
+          css += "#layer0 [color=#{JSON.stringify(item.value)}] { marker-fill: #{item.color} }\n"
 
     return css
 
