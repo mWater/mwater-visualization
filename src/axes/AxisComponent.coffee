@@ -31,13 +31,13 @@ module.exports = class AxisComponent extends React.Component
     required: React.PropTypes.bool  # Makes this a required value
     showColorMap: React.PropTypes.bool # Shows the color map
     colorMapOptional: React.PropTypes.bool # Is the color map optional
-    colorMapReorderable: React.PropTypes.bool # Is the color map reorderable
+    reorderable: React.PropTypes.bool # Is the draw order reorderable
     allowExcludedValues: React.PropTypes.bool # True to allow excluding of values via checkboxes
     defaultColor: React.PropTypes.string
 
   @defaultProps:
     colorMapOptional: false
-    colorMapReorderable: false
+    reorderable: false
     allowExcludedValues: false
 
   @contextTypes:
@@ -155,7 +155,7 @@ module.exports = class AxisComponent extends React.Component
         axis: axis
         onChange: @props.onChange
         colorMapOptional: @props.colorMapOptional
-        colorMapReorderable: @props.colorMapReorderable
+        reorderable: @props.reorderable
         defaultColor: @props.defaultColor
         table: @props.table
         types: @props.types

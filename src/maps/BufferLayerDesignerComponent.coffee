@@ -96,7 +96,7 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
           showColorMap: true
           types: ["text", "enum", "boolean", "date"]
           aggrNeed: "none"
-          colorMapReorderable: true
+          reorderable: true
           allowExcludedValues: true
 
   renderFillOpacity: ->

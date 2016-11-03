@@ -15,8 +15,8 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
     dataSource: React.PropTypes.object.isRequired
     axis: React.PropTypes.object.isRequired
     onChange: React.PropTypes.func.isRequired # Called with new axis
-    colorMapOptional: React.PropTypes.bool # is colorMap optional
-    colorMapReorderable: React.PropTypes.bool # is the color map reorderable
+    colorMapOptional: React.PropTypes.bool # is colorMap optional TODO what does it mean to be optional?
+    reorderable: React.PropTypes.bool # is the color map reorderable
     defaultColor: React.PropTypes.string
     table: React.PropTypes.string.isRequired # Table to use
     types: React.PropTypes.array # Optional types to limit to
@@ -25,13 +25,13 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
 
   @defaultProps:
     colorMapOptional: false
-    colorMapReorderable: false
+    reorderable: false
 
   constructor: (props) ->
     super(props)
     @state = {
       error: null
-      mode: if props.axis.colorMap or props.colorMapOptional then "normal" else "palette"
+      mode: if props.axis.colorMap or props.colorMapOptional then "normal" else "palette" # TODO When do we ever start in palette mode? Isn't color map auto-generated?
       categories: []
     }
 
@@ -150,6 +150,6 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
                   onChange: @props.onChange
                   categories: @state.categories
                   key: "colorMap"
-                  reorderable: @props.colorMapReorderable
+                  reorderable: @props.reorderable
                   allowExcludedValues: @props.allowExcludedValues
                   showColorMap: true
