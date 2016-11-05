@@ -1,6 +1,7 @@
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
+uuid = require 'node-uuid'
 
 injectTableAlias = require('mwater-expressions').injectTableAlias
 Chart = require './Chart'
@@ -11,7 +12,7 @@ TableChartViewComponent = require './TableChartViewComponent'
 
 ###
 Design is:
-  
+
   table: table to use for data source
   titleText: title text
   columns: array of columns
@@ -30,7 +31,7 @@ ordering:
 module.exports = class TableChart extends Chart
   cleanDesign: (design, schema) ->
     ExprCleaner = require('mwater-expressions').ExprCleaner
-    
+
     exprCleaner = new ExprCleaner(schema)
     axisBuilder = new AxisBuilder(schema: schema)
 
@@ -42,7 +43,7 @@ module.exports = class TableChart extends Chart
     # Always have at least one column
     design.columns = design.columns or []
     if design.columns.length == 0
-      design.columns.push({})
+      design.columns.push({id: uuid.v4()})
 
     design.orderings = design.orderings or []
 
@@ -50,6 +51,8 @@ module.exports = class TableChart extends Chart
     for columnId in [0...design.columns.length]
       column = design.columns[columnId]
 
+      if not column.id
+        column.id = uuid.v4()
       # Clean textAxis
       column.textAxis = axisBuilder.cleanAxis(axis: column.textAxis, table: design.table, aggrNeed: "optional")
 
@@ -92,12 +95,12 @@ module.exports = class TableChart extends Chart
   # options include:
   #   schema: schema to use
   #   dataSource: dataSource to use
-  #   design: design 
+  #   design: design
   #   onDesignChange: function
   createDesignerElement: (options) ->
     # Require here to prevent server require problems
     TableChartDesignerComponent = require './TableChartDesignerComponent'
-    
+
     props = {
       schema: options.schema
       design: @cleanDesign(options.design, options.schema)
@@ -109,7 +112,7 @@ module.exports = class TableChart extends Chart
     }
     return React.createElement(TableChartDesignerComponent, props)
 
-  # Get data for the chart asynchronously 
+  # Get data for the chart asynchronously
   # design: design of the chart
   # schema: schema to use
   # dataSource: data source to get data from
@@ -136,10 +139,10 @@ module.exports = class TableChart extends Chart
 
       expr = axisBuilder.compileAxis(axis: column.textAxis, tableAlias: "main")
 
-      query.selects.push({ 
+      query.selects.push({
         type: "select"
         expr: expr
-        alias: "c#{colNum}" 
+        alias: "c#{colNum}"
       })
 
       # Add group by if not aggregate
@@ -154,7 +157,7 @@ module.exports = class TableChart extends Chart
         expr: axisBuilder.compileAxis(axis: ordering.axis, tableAlias: "main")
         alias: "o#{i}"
       })
-      
+
       query.orderBy.push({ ordinal: design.columns.length + i + 1, direction: ordering.direction })
       # Add group by if non-aggregate
       if not axisBuilder.isAxisAggr(ordering.axis)
@@ -164,18 +167,18 @@ module.exports = class TableChart extends Chart
     query.selects.push({
       type: "select"
       expr: { type: "op", op: "min", exprs: [{ type: "field", tableAlias: "main", column: schema.getTable(design.table).primaryKey }] }
-      alias: "id" 
+      alias: "id"
     })
 
     query.selects.push({
       type: "select"
       expr: { type: "op", op: "count", exprs: [] }
-      alias: "num_ids" 
+      alias: "num_ids"
     })
 
     # Get relevant filters
     filters = _.where(filters or [], table: design.table)
-    whereClauses = _.map(filters, (f) -> injectTableAlias(f.jsonql, "main")) 
+    whereClauses = _.map(filters, (f) -> injectTableAlias(f.jsonql, "main"))
 
     # Compile filter
     if design.filter

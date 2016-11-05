@@ -12,9 +12,9 @@ ReorderableListComponent = require("react-library/lib/reorderable/ReorderableLis
 # Category map for an axis. Controls the colorMap values and excludedValues
 module.exports = class CategoryMapComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired 
+    schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
-    axis: React.PropTypes.object.isRequired   
+    axis: React.PropTypes.object.isRequired
     onChange: React.PropTypes.func.isRequired
     categories: React.PropTypes.array
     reorderable: React.PropTypes.bool
@@ -89,7 +89,7 @@ module.exports = class CategoryMapComponent extends React.Component
         connectDragSource(H.i(className: "fa fa-bars", style: iconStyle))
 
       if @props.allowExcludedValues
-        H.input 
+        H.input
           type: "checkbox"
           style: { marginLeft: 5, marginBottom: 5, verticalAlign: "middle" }
           checked: not _.includes(@props.axis.excludedValues, category.value)
