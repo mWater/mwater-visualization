@@ -10,7 +10,7 @@ module.exports = class ColorPaletteCollectionComponent extends React.Component
   @propTypes:
     onPaletteSelected: React.PropTypes.func.isRequired
     axis: React.PropTypes.object.isRequired
-    categories: React.PropTypes.array
+    categories: React.PropTypes.array.isRequired
     onCancel: React.PropTypes.func.isRequired
 
   @getColorMapForCategories: (categories, isCategorical = true) ->

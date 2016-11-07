@@ -6,15 +6,15 @@ CategoryMapComponent = require './CategoryMapComponent'
 ColorPaletteCollectionComponent = require './ColorPaletteCollectionComponent'
 update = require 'update-object'
 AxisBuilder = require './AxisBuilder'
-AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
 
 # Color editor for axis
-module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
+module.exports = class AxisColorEditorComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
     axis: React.PropTypes.object.isRequired
     onChange: React.PropTypes.func.isRequired # Called with new axis
+    categories: React.PropTypes.array # Categories of the axis
     colorMapOptional: React.PropTypes.bool # is colorMap optional TODO what does it mean to be optional?
     reorderable: React.PropTypes.bool # is the color map reorderable
     defaultColor: React.PropTypes.string
@@ -29,79 +29,33 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
 
   constructor: (props) ->
     super(props)
+
     @state = {
-      error: null
       mode: if props.axis.colorMap or props.colorMapOptional then "normal" else "palette" # TODO When do we ever start in palette mode? Isn't color map auto-generated?
-      categories: []
     }
+
+  componentWillMount: ->
+    @updateColorMap(@props.categories)
 
   componentWillReceiveProps: (nextProps) ->
-    super(nextProps)
     @setState(mode: if nextProps.axis.colorMap or nextProps.colorMapOptional then "normal" else "palette")
 
-  isLoadNeeded: (newProps, oldProps) ->
-    return not _.isEqual(_.omit(newProps.axis, ["colorMap", "drawOrder"]), _.omit(oldProps.axis, ["colorMap", "drawOrder"]))
+  componentDidUpdate: ->
+    @updateColorMap(@props.categories)
 
-  load: (props, prevProps, callback) ->
-    axisBuilder = new AxisBuilder(schema: props.schema)
+  # Update color map if categories no longer match
+  updateColorMap: (categories) ->
+    axisBuilder = new AxisBuilder(schema: @props.schema)
 
-    # Get categories (value + label)
-    categories = axisBuilder.getCategories(props.axis)
-    if categories.length > 1
-      newState =
-        categories: categories
-
-      if not props.axis.colorMap or !_.isEqual(_.pluck(props.axis.colorMap, "value").sort(), _.pluck(categories, "value").sort())
-        colorMap = ColorPaletteCollectionComponent.getColorMapForCategories(categories, axisBuilder.isCategorical(props.axis))
-        @handlePaletteChange(colorMap)
-        newState.mode = "normal"
-      callback(newState)
+    # If no categories, can't do anything
+    if not categories
       return
 
-    # Check for axis
-    axis = axisBuilder.cleanAxis(axis: props.axis, table: @props.table, types: @props.types, aggrNeed: @props.aggrNeed)
-    # Ignore if error
-    if not axis or axisBuilder.validateAxis(axis: axis)
-      return
-
-    # Can't get values of aggregate axis
-    if axisBuilder.isAxisAggr(axis)
-      return
-
-    axisCompiledExpr = axisBuilder.compileAxis(axis: axis, tableAlias: "main")
-
-    # If no categories, we need values as input
-    valuesQuery = {
-      type: "query"
-      selects: [
-        { type: "select", expr: axisCompiledExpr, alias: "val" }
-      ]
-      from: { type: "table", table: axis.expr.table, alias: "main" }
-      groupBy: [1]
-      limit: 50
-    }
-
-    props.dataSource.performQuery(valuesQuery, (error, rows) =>
-      if @unmounted
-        return
-
-      if error
-        return # Ignore
-
-      # Get categories (value + label)
-      categories = axisBuilder.getCategories(props.axis, _.pluck(rows, "val"))
-      newState =
-        categories: categories
-
-      if not props.axis.colorMap or !_.isEqual(_.pluck(props.axis.colorMap, "value").sort(), _.pluck(categories, "value").sort())
-        colorMap = ColorPaletteCollectionComponent.getColorMapForCategories(categories, axisBuilder.isCategorical(axis))
-        @handlePaletteChange(colorMap)
-        newState.mode = "normal"
-      callback(newState)
-    )
-
-  componentWillUnmount: ->
-    @unmounted = true
+    # If no color map or color map values have changed
+    if not @props.axis.colorMap or not _.isEqual(_.pluck(@props.axis.colorMap, "value").sort(), _.pluck(categories, "value").sort())
+      colorMap = ColorPaletteCollectionComponent.getColorMapForCategories(categories, axisBuilder.isCategorical(@props.axis))
+      @handlePaletteChange(colorMap)
+      @setState(mode: "normal")
 
   handleSelectPalette: =>
     @setState(mode: "palette")
@@ -115,7 +69,7 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
 
   renderPreview: ->
     H.div className: "axis-palette",
-      _.map @state.categories.slice(0,6), (category, i) =>
+      _.map @props.categories.slice(0,6), (category, i) =>
         color = _.find(@props.axis.colorMap, {value: category.value})
         cellStyle =
           display: 'inline-block'
@@ -127,13 +81,13 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
   render: ->
     H.div null,
       if @state.mode == "palette"
-        if @state.loading
+        if not @props.categories
           H.span null, "Loading..."
         else
           R ColorPaletteCollectionComponent, {
             onPaletteSelected: @handlePaletteChange
             axis: @props.axis
-            categories: @state.categories
+            categories: @props.categories
             onCancel: @handleCancelCustomize
           }
       if @state.mode == "normal"
@@ -148,7 +102,7 @@ module.exports = class AxisColorEditorComponent extends AsyncLoadComponent
                   dataSource: @props.dataSource
                   axis: @props.axis
                   onChange: @props.onChange
-                  categories: @state.categories
+                  categories: @props.categories
                   key: "colorMap"
                   reorderable: @props.reorderable
                   allowExcludedValues: @props.allowExcludedValues

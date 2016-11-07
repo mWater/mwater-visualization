@@ -49,19 +49,26 @@ module.exports = class LayerLegendComponent extends React.Component
 
   render: ->
     if @props.axis and @props.axis.colorMap
-      colors = _.map @state.categories, (category) =>
+      items = _.map @state.categories, (category) =>
+        # Exclude if excluded
+        if _.includes(@props.axis.excludedValues, category.value)
+          return null
+
         label = ExprUtils.localizeString(category.label)
         color = _.find(@props.axis.colorMap, {value: category.value})
         if color
           return { color: color.color, name: label }
         else # old color maps dont have null value
           return { color: @props.defaultColor, name: label }
+
+      # Compact out nulls
+      items = _.compact(items)
     else
-      colors = []
+      items = []
 
     React.createElement LegendGroup,
       symbol: @props.symbol
-      items: colors
+      items: items
       defaultColor: @props.defaultColor
       name: @props.name
       radiusLayer: @props.radiusLayer

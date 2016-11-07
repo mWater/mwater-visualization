@@ -2,6 +2,8 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 uuid = require 'node-uuid'
+AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
+
 ExprComponent = require("mwater-expressions-ui").ExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
 ExprCompiler = require('mwater-expressions').ExprCompiler
@@ -15,7 +17,7 @@ AxisColorEditorComponent = require './AxisColorEditorComponent'
 CategoryMapComponent = require './CategoryMapComponent'
 
 # Axis component that allows designing of an axis
-module.exports = class AxisComponent extends React.Component
+module.exports = class AxisComponent extends AsyncLoadComponent
   @propTypes:
     schema: React.PropTypes.object.isRequired # schema to use
     dataSource: React.PropTypes.object.isRequired
@@ -42,6 +44,60 @@ module.exports = class AxisComponent extends React.Component
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
+
+  constructor: (props) ->
+    super(props)
+
+    @state = {
+      categories: null # Categories of the axis. Loaded whenever axis is changed
+    }
+
+  isLoadNeeded: (newProps, oldProps) ->
+    return not _.isEqual(_.omit(newProps.value, ["colorMap", "drawOrder"]), _.omit(oldProps.value, ["colorMap", "drawOrder"]))
+
+  # Asynchronously get the categories of the axis, which requires a query when the field is a text field or other non-enum type
+  load: (props, prevProps, callback) ->
+    axisBuilder = new AxisBuilder(schema: props.schema)
+
+    # Clean axis first
+    axis = axisBuilder.cleanAxis(axis: props.value, table: props.table, types: props.types, aggrNeed: props.aggrNeed)
+
+    # Ignore if error
+    if not axis or axisBuilder.validateAxis(axis: axis)
+      return
+
+    # Get categories (value + label)
+    categories = axisBuilder.getCategories(axis)
+
+    # Just "None" and so doesn't count
+    if not _.any(categories, (category) -> category.value?)
+      callback({ categories: categories })
+      return
+
+    # Can't get values of aggregate axis
+    if axisBuilder.isAxisAggr(axis)
+      callback({ categories: [] })
+      return
+
+    # If no categories, we need values as input
+    valuesQuery = {
+      type: "query"
+      selects: [
+        { type: "select", expr: axisBuilder.compileAxis(axis: axis, tableAlias: "main"), alias: "val" }
+      ]
+      from: { type: "table", table: axis.expr.table, alias: "main" }
+      groupBy: [1]
+      limit: 50
+    }
+
+    props.dataSource.performQuery(valuesQuery, (error, rows) =>
+      if error
+        return # Ignore errors
+
+      # Get categories (value + label)
+      categories = axisBuilder.getCategories(axis, _.pluck(rows, "val"))
+      callback({ categories: categories })
+    )
 
   handleExprChange: (expr) =>
     # If no expression, reset
@@ -153,6 +209,7 @@ module.exports = class AxisComponent extends React.Component
         schema: @props.schema
         dataSource: @props.dataSource
         axis: axis
+        categories: @state.categories
         onChange: @props.onChange
         colorMapOptional: @props.colorMapOptional
         reorderable: @props.reorderable
@@ -168,13 +225,8 @@ module.exports = class AxisComponent extends React.Component
     if @props.showColorMap or not axis or not axis.expr
       return null
 
-    # TODO should probably get categories in this class using code from AxisColorEditorComponent
-    # Get categories (only works if no values are required)
-    axisBuilder = new AxisBuilder(schema: @props.schema)
-
-    # Get categories (value + label)
-    categories = axisBuilder.getCategories(axis)
-    if categories.length <= 1
+    # Use categories
+    if not @state.categories or @state.categories.length <= 1
       return null
 
     return [
@@ -184,7 +236,7 @@ module.exports = class AxisComponent extends React.Component
         dataSource: @props.dataSource
         axis: axis
         onChange: @props.onChange
-        categories: categories
+        categories: @state.categories
         reorderable: false
         showColorMap: false
         allowExcludedValues: true
