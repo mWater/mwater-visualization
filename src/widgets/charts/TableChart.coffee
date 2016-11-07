@@ -20,6 +20,7 @@ Design is:
   orderings: array of orderings
 
 column:
+  id: unique id of column (uuid v4)
   headerText: header text
   textAxis: axis that creates the text value of the column
 
