@@ -73,10 +73,6 @@ module.exports = class ChartViewComponent extends React.Component
     if @state.dataLoading
       style.opacity = 0.5
 
-    # Faded if design is different than valid design (clean first to ensure that consistent)
-    if not _.isEqual(@props.chart.cleanDesign(@props.design, @props.schema), @state.validDesign)
-      style.opacity = 0.5
-
     # If nothing to show, show grey
     if not @state.validDesign
       # Invalid. Show faded with background
