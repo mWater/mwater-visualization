@@ -113,6 +113,9 @@ class ChartWidgetComponent extends React.Component
       # Convert to csv
       csv = new CsvBuilder().build(table)
 
+      # Add BOM
+      csv = "\uFEFF" + csv
+
       # Make a blob and save
       blob = new Blob([csv], {type: "text/csv"})
 
