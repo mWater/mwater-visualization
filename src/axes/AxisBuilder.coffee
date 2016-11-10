@@ -574,7 +574,7 @@ module.exports = class AxisBuilder
   # Get a string (or React DOM actually) representation of an axis value
   formatValue: (axis, value, locale) ->
     if not value?
-      return "None"
+      return axis.nullLabel or "None"
 
     type = @getAxisType(axis)
 

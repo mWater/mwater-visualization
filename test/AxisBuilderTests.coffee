@@ -400,6 +400,9 @@ describe "AxisBuilder", ->
     it "formats None", ->
       assert.equal @ab.formatValue(@axisNumber, null), "None"
 
+    it "formats None overriden", ->
+      assert.equal @ab.formatValue(_.extend({}, @axisNumber, nullLabel: "xyz"), null), "xyz"
+
     it "formats axes with categories", ->
       axis = {
         expr: @exprNumber
