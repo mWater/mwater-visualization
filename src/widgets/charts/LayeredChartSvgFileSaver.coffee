@@ -1,3 +1,4 @@
+saveSvgAsPng = require 'save-svg-as-png'
 LayeredChartCompiler = require './LayeredChartCompiler'
 
 # Get the css rules corresponding to .c3 directly out of the document object
@@ -45,7 +46,8 @@ saveSvgToFile = (containerDiv, title) ->
 # design: design of the chart
 # data: results from queries
 # schema: the chart's schema
-module.exports = save: (design, data, schema) ->
+# format: "svg" or "png"
+module.exports = save: (design, data, schema, format) ->
   compiler = new LayeredChartCompiler(schema: schema)
   props =
     design: design
@@ -59,7 +61,10 @@ module.exports = save: (design, data, schema) ->
   chart = null
   onRender = => 
     _.defer(->
-      saveSvgToFile(containerDiv, title)
+      if format == "svg"
+        saveSvgToFile(containerDiv, title)
+      else if format == "png"
+        saveSvgAsPng.saveSvgAsPng($(containerDiv).find("svg")[0], "#{title or "untitled"}.png");
       chart.destroy())
   chartOptions.onrendered = _.debounce(_.once(onRender), 1000)
   chart = c3.generate(chartOptions)
