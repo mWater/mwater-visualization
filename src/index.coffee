@@ -57,6 +57,8 @@ exports.AxisColorEditorComponent = require './axes/AxisColorEditorComponent'
 exports.RichTextComponent = require './richtext/RichTextComponent'
 exports.ItemsHtmlConverter = require './richtext/ItemsHtmlConverter'
 
+exports.DropdownWidgetComponent = require './widgets/DropdownWidgetComponent'
+
 # Polyfill pathseg https://github.com/masayuki0812/c3/issues/1529
 require './pathseg-polyfill.js'
 
