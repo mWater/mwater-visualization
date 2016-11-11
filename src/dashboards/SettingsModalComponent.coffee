@@ -3,6 +3,9 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 update = require 'update-object'
+languages = require 'languages'
+
+ReactSelect = require 'react-select'
 
 DashboardUtils = require './DashboardUtils'
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
@@ -45,6 +48,12 @@ module.exports = class SettingsModalComponent extends React.Component
     # Get filterable tables
     filterableTables = DashboardUtils.getFilterableTables(@state.design, @props.schema)
 
+    localeOptions = _.map languages.getAllLanguageCode(), (code) =>
+      { 
+        value: code
+        label: languages.getLanguageInfo(code).name + " (" + languages.getLanguageInfo(code).nativeName + ")" 
+      }
+
     return R ActionCancelModalComponent, 
       size: "large"
       onCancel: @handleCancel
@@ -75,3 +84,14 @@ module.exports = class SettingsModalComponent extends React.Component
               filterableTables: filterableTables
           else
             "Nothing to filter. Add widgets to the dashboard"
+
+          H.h4 style: { paddingTop: 10 },
+            "Language"
+          H.div className: "text-muted", 
+            "Controls the preferred language of widgets and uses specified language when available"
+
+          R ReactSelect, 
+            value: @state.design.locale or "en"
+            options: localeOptions
+            clearable: false
+            onChange: (value) => @handleDesignChange(update(@state.design, { locale: { $set: value } }))

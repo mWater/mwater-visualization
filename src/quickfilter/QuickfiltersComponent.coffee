@@ -81,6 +81,9 @@ class EnumQuickfilterComponent extends React.Component
     value: React.PropTypes.any              # Current value of quickfilter (state of filter selected)
     onValueChange: React.PropTypes.func.isRequired # Called when value changes
 
+  @contextTypes:
+    locale: React.PropTypes.string  # e.g. "en"
+
   handleChange: (val) =>
     if val
       @props.onValueChange(val)
@@ -96,7 +99,7 @@ class EnumQuickfilterComponent extends React.Component
           placeholder: "All"
           value: @props.value
           multi: false
-          options: _.map(@props.options, (opt) -> { value: opt.id, label: opt.name.en }) # TODO localize
+          options: _.map(@props.options, (opt) -> { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
           onChange: @handleChange
         }
 

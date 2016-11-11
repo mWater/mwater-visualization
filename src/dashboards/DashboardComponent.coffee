@@ -32,6 +32,12 @@ module.exports = class DashboardComponent extends React.Component
   @defaultProps:
     printScaling: true
 
+  @childContextTypes:
+    locale: React.PropTypes.string
+
+  # Pass locale down. Both here and DashboardViewComponent to ensure that quickfilters also get context
+  getChildContext: -> { locale: @props.design.locale }
+
   constructor: (props) ->
     super
     @state = { 

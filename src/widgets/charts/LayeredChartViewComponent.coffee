@@ -76,10 +76,9 @@ module.exports = class LayeredChartViewComponent extends React.Component
     })
 
     # If chart changed
-    if not _.isEqual(oldChartOptions, newChartOptions)
-
+    if not _.isEqual(oldChartOptions, newChartOptions) or @context.locale != prevContext.locale
       # Check if size alone changed
-      if _.isEqual(_.omit(oldChartOptions, "size"), _.omit(newChartOptions, "size"))
+      if _.isEqual(_.omit(oldChartOptions, "size"), _.omit(newChartOptions, "size")) and @context.locale == prevContext.locale
         @chart.resize(width: @props.width, height: @props.height)
         @updateScope()
         return
