@@ -99,7 +99,7 @@ class EnumQuickfilterComponent extends React.Component
           placeholder: "All"
           value: @props.value
           multi: false
-          options: _.map(@props.options, (opt) -> { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
+          options: _.map(@props.options, (opt) => { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
           onChange: @handleChange
         }
 
