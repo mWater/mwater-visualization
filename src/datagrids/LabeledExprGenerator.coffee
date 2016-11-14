@@ -1,13 +1,13 @@
 _ = require 'lodash'
 ExprUtils = require('mwater-expressions').ExprUtils
 
-# Generates labeled expressions (expr, label and rosterId) for a form. Used to make a datagrid, do export or import.
+# Generates labeled expressions (expr, label and joins) for a table. Used to make a datagrid, do export or import.
 module.exports = class LabeledExprGenerator
-  constructor: (schema, table) ->
+  constructor: (schema) ->
     @schema = schema
-    @table = table
 
-  # Generate labeled exprs, an array of ({ expr: mwater expression, label: plain string, rosterId: id of roster if from roster })
+  # Generate labeled exprs, an array of ({ expr: mwater expression, label: plain string, joins: array of join column ids to get to current table. Usually []. Only present for 1-n joins })
+  # table is id of table to generate from
   # options are: [default]
   #  locale: e.g. "en". Uses _base by default, then en [null]
   #  headerFormat: "text", "code" or "both" ["code"]
@@ -15,8 +15,9 @@ module.exports = class LabeledExprGenerator
   #  splitLatLng: split geometry into lat/lng [false]
   #  splitEnumset: split enumset into true/false expressions [false]
   #  useJoinIds: use ids of n-1 joins, not the code/name/etc [false]
-  #  skipJoins: array containing the joins to skip, defaults to []
-  generate: (options = {}) ->
+  #  columnFilter: optional boolean predicate to filter columns included. Called with table id, column object
+  #  multipleJoinCondition: optional boolean predicate to filter 1-n/n-n joins to include. Called with table id, join object. Default is to not include those joins
+  generate: (table, options = {}) ->
     _.defaults(options, {
       locale: null
       headerFormat: "code"
@@ -24,10 +25,9 @@ module.exports = class LabeledExprGenerator
       splitLatLng: false
       splitEnumset: false
       useJoinIds: false
-      skipJoins: []
+      columnFilter: null
+      multipleJoinCondition: null
      })
-
-    table = @table
 
     # Create a label for a column
     createLabel = (column, suffix) ->
@@ -51,17 +51,21 @@ module.exports = class LabeledExprGenerator
       return label
 
     # Convert a table + schema column into multiple labeled expres
-    convertColumn = (table, column, rosterId) =>
+    convertColumn = (table, column, joins) =>
+      # Filter if present
+      if options.columnFilter and not columnFilter(table, column)
+        return []
+
       if column.type == "join"
-        # If n-1 join, create scalar
-        if column.join.type == "n-1" and not _.contains(options.skipJoins, column.join.type)
+        # If n-1, 1-1 join, create scalar
+        if column.join.type in ["n-1", "1-1"]
           # Use id if that option is enabled
           if options.useJoinIds
             return [
               {
                 expr: { type: "scalar", table: table, joins: [column.id], expr: { type: "id", table: column.join.toTable } }
                 label: createLabel(column)
-                rosterId: rosterId
+                joins: joins
               }
             ]
           else # use code, full name, or name of dest table
@@ -74,31 +78,26 @@ module.exports = class LabeledExprGenerator
                 {
                   expr: { type: "scalar", table: table, joins: [column.id], expr: { type: "field", table: column.join.toTable, column: joinColumn.id } }
                   label: createLabel(column)
-                  rosterId: rosterId
+                  joins: joins
                 }
               ]
             else
               return []
 
-        # If 1-n and roster, convert each child
-        if column.join.type == "1-n" and column.join.toTable.match(/:roster:/) and not _.contains(options.skipJoins, column.join.type)
-          rosterLabelledExprs = []
+        # If 1-n/n-1, convert each child
+        if column.join.type in ["1-n", "n-n"] and options.multipleJoinCondition and options.multipleJoinCondition(table, column)
+          childExprs = []
 
-          for rosterColumn in @schema.getColumns(column.join.toTable)
-            # Skip if response
-            if rosterColumn.id == "response"
-              continue
+          for childColumn in @schema.getColumns(column.join.toTable)
+            childExprs = childExprs.concat(convertColumn(column.join.toTable, childColumn, joins.concat([column.id])))
 
-            rosterId = column.id.split(":")[1]
-            rosterLabelledExprs = rosterLabelledExprs.concat(convertColumn(column.join.toTable, rosterColumn, rosterId))
-
-          return rosterLabelledExprs
+          return childExprs
 
       else if column.type == "geometry" and options.splitLatLng
         # Use lat/lng
         return [
-          { expr: { table: table, type: "op", op: "latitude", exprs: [{ type: "field", table: table, column: column.id }] }, label: createLabel(column, "latitude"), rosterId: rosterId }
-          { expr: { table: table, type: "op", op: "longitude", exprs: [{ type: "field", table: table, column: column.id }] }, label: createLabel(column, "longitude"), rosterId: rosterId }
+          { expr: { table: table, type: "op", op: "latitude", exprs: [{ type: "field", table: table, column: column.id }] }, label: createLabel(column, "latitude"), joins: joins }
+          { expr: { table: table, type: "op", op: "longitude", exprs: [{ type: "field", table: table, column: column.id }] }, label: createLabel(column, "longitude"), joins: joins }
         ]
       else if column.type == "enumset" and options.splitEnumset
         # Split into one for each enumset value
@@ -109,18 +108,18 @@ module.exports = class LabeledExprGenerator
                 { type: "literal", valueType: "enumset", value: [ev.id] }
               ]}
             label: createLabel(column, if options.enumFormat == "text" then ev.name else ev.code or ev.name)
-            rosterId: rosterId
+            joins: joins
            }
         )
       else # Simple columns
         return [
-          { expr: { type: "field", table: table, column: column.id }, label: createLabel(column), rosterId: rosterId }
+          { expr: { type: "field", table: table, column: column.id }, label: createLabel(column), joins: joins }
         ]
 
     # For each column in form
     labeledExprs = []
     for column in @schema.getColumns(table)
       # Convert column into labels and exprs
-      labeledExprs = labeledExprs.concat(convertColumn(table, column))
+      labeledExprs = labeledExprs.concat(convertColumn(table, column, []))
 
     return _.compact(labeledExprs)
