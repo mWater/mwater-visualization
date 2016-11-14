@@ -16,7 +16,7 @@ module.exports = class LabeledExprGenerator
   #  splitEnumset: split enumset into true/false expressions [false]
   #  useJoinIds: use ids of n-1 joins, not the code/name/etc [false]
   #  columnFilter: optional boolean predicate to filter columns included. Called with table id, column object
-  #  multipleJoinCondition: optional boolean predicate to filter 1-n/n-n joins to include. Called with table id, join object. Default is to not include those joins
+  #  multipleJoinCondition: optional boolean predicate to filter 1-n/n-n joins to include. Called with table id, join column object. Default is to not include those joins
   generate: (table, options = {}) ->
     _.defaults(options, {
       locale: null
@@ -53,7 +53,7 @@ module.exports = class LabeledExprGenerator
     # Convert a table + schema column into multiple labeled expres
     convertColumn = (table, column, joins) =>
       # Filter if present
-      if options.columnFilter and not columnFilter(table, column)
+      if options.columnFilter and not options.columnFilter(table, column)
         return []
 
       if column.type == "join"
