@@ -6,7 +6,7 @@ ExprCompiler = require("mwater-expressions").ExprCompiler
 # Displays a combo box that allows selecting single text value from an expression
 module.exports = class TextLiteralComponent extends React.Component
   @propTypes: 
-    value: React.PropTypes.object
+    value: React.PropTypes.string
     onChange: React.PropTypes.func.isRequired 
     refExpr: React.PropTypes.object.isRequired # Expression for the text values to select from
     schema: React.PropTypes.object.isRequired # Schema of the database
