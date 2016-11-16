@@ -70,7 +70,7 @@ module.exports = class AxisComponent extends AsyncLoadComponent
     categories = axisBuilder.getCategories(axis)
 
     # Just "None" and so doesn't count
-    if not _.any(categories, (category) -> category.value?)
+    if _.any(categories, (category) -> category.value?)
       callback({ categories: categories })
       return
 
