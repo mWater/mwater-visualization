@@ -153,8 +153,8 @@ module.exports = class DatagridComponent extends React.Component
                 filters: filters
                 onDesignChange: @props.onDesignChange
                 onRowDoubleClick: @props.onRowDoubleClick
-                canEditCell: @props.canEditValue
-                updateCell: @props.updateValue
+                canEditCell: if @state.cellEditingEnabled then @props.canEditValue
+                updateCell: if @state.cellEditingEnabled then @props.updateValue
               }
             else
               H.div style: { textAlign: "center", marginTop: size.height / 2 }, 
