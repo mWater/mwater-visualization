@@ -48,7 +48,7 @@ module.exports = class FindReplaceModalComponent extends React.Component
     }
 
   show: ->
-    @setState(open: true)
+    @setState(open: true, progress: null)
 
   performReplace: ->
     exprUtils = new ExprUtils(@props.schema)
@@ -196,7 +196,7 @@ module.exports = class FindReplaceModalComponent extends React.Component
     H.div null,
       H.div key: "replace", className: "form-group",
         H.label null, "Replace: "
-        H.select value: @state.replaceColumn, onChange: ((ev) => @setState(replaceColumn: ev.target.value)), className: "form-control",
+        H.select value: @state.replaceColumn or "", onChange: ((ev) => @setState(replaceColumn: ev.target.value)), className: "form-control",
           H.option key: "_none", value: "", "Select..."
           _.map(replaceColumnOptions, (option) => H.option(key: option.value, value: option.value, option.label))
 
