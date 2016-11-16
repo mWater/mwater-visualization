@@ -26,13 +26,13 @@ module.exports = class DatagridComponent extends React.Component
     titleElem: React.PropTypes.node                     # Extra element to include in title at left
     extraTitleButtonsElem: React.PropTypes.node         # Extra elements to add to right
 
-    # Check if cell is editable
+    # Check if expression of table row is editable
     # If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
-    canEditCell: React.PropTypes.func             
+    canEditValue: React.PropTypes.func             
 
-    # Update cell value
+    # Update table row expression with a new value
     # Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
-    updateCell:  React.PropTypes.func
+    updateValue:  React.PropTypes.func
 
     # Called when row is double-clicked with (tableId, rowId)
     onRowDoubleClick: React.PropTypes.func
@@ -58,7 +58,7 @@ module.exports = class DatagridComponent extends React.Component
 
   # Toggle to allow cell editing
   renderCellEdit: ->
-    if not @props.canEditCell or not @props.onDesignChange?
+    if not @props.canEditValue or not @props.onDesignChange?
       return null
 
     label = [
@@ -153,8 +153,8 @@ module.exports = class DatagridComponent extends React.Component
                 filters: filters
                 onDesignChange: @props.onDesignChange
                 onRowDoubleClick: @props.onRowDoubleClick
-                canEditCell: @props.canEditCell
-                updateCell: @props.updateCell
+                canEditCell: @props.canEditValue
+                updateCell: @props.updateValue
               }
             else
               H.div style: { textAlign: "center", marginTop: size.height / 2 }, 
