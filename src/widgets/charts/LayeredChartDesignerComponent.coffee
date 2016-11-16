@@ -30,6 +30,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
 
   handleStackedChange: (ev) => @updateDesign(stacked: ev.target.checked)
   handleProportionalChange: (ev) => @updateDesign(proportional: ev.target.checked)
+  handleLabelsChange: (ev) => @updateDesign(labels: ev.target.checked)
 
   handleLayerChange: (index, layer) =>
     layers = @props.design.layers.slice()
@@ -165,6 +166,9 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
         H.label className: "checkbox-inline", key: "proportional",
           H.input type: "checkbox", checked: design.proportional, onChange: @handleProportionalChange
           "Proportional"
+      H.label className: "checkbox-inline", key: "labels",
+        H.input type: "checkbox", checked: design.labels or false, onChange: @handleLabelsChange
+        "Show Values"
 
   render: ->
     tabs = []

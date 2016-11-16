@@ -7,7 +7,8 @@
   yAxisLabelText: text of y axis label, display default value if "", display nothing if null
   transpose: true to flip axes
   stacked: true to stack all 
-  proportinal: true to stack proportionally (100 %). Only applicable if stacked
+  proportional: true to stack proportionally (100 %). Only applicable if stacked
+  labels: true to show labels on values
 
 layer:
   type: bar/line/spline/scatter/area/pie/donut (overrides main one)

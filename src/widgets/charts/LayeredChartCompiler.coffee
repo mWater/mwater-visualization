@@ -115,6 +115,7 @@ module.exports = class LayeredChartCompiler
         groups: c3Data.groups
         xs: c3Data.xs
         colors: c3Data.colors
+        labels: options.design.labels
       }
       # Hide if one layer with no color axis
       legend: { hide: (options.design.layers.length == 1 and not options.design.layers[0].axes.color) }
