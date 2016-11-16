@@ -2,6 +2,7 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 R = React.createElement
+async = require 'async'
 
 ReactSelect = require 'react-select'
 
@@ -13,6 +14,7 @@ ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
 ExprComponent = require("mwater-expressions-ui").ExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
 ExprCompiler = require('mwater-expressions').ExprCompiler
+injectTableAlias = require('mwater-expressions').injectTableAlias
 
 # Modal to perform find/replace on datagrid
 module.exports = class FindReplaceModalComponent extends React.Component
@@ -42,10 +44,104 @@ module.exports = class FindReplaceModalComponent extends React.Component
       replaceColumn: null # Column id to replace
       withExpr: null  # Replace with expression
       conditionExpr: null # Condition expr
+      progress: null # 0-100 when working
     }
 
   show: ->
     @setState(open: true)
+
+  performReplace: ->
+    exprUtils = new ExprUtils(@props.schema)
+    exprCompiler = new ExprCompiler(@props.schema)
+
+    # Get expr of replace column
+    replaceExpr = _.findWhere(@props.design.columns, id: @state.replaceColumn).expr
+
+    # Get ids and with value, filtered by filters, design.filter and conditionExpr (if present)
+    query = {
+      type: "query"
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "main", column: @props.schema.getTable(@props.design.table).primaryKey }, alias: "id" }
+        { type: "select", expr: exprCompiler.compileExpr(expr: @state.withExpr, tableAlias: "main"), alias: "withValue" }
+      ]
+      from: { type: "table", table: @props.design.table, alias: "main" }
+    }
+
+    # Filter by filter
+    wheres = []
+    if @props.design.filter
+      wheres.push(exprCompiler.compileExpr(expr: @props.design.filter, tableAlias: "main"))
+
+    # Filter by conditionExpr
+    if @state.conditionExpr
+      wheres.push(exprCompiler.compileExpr(expr: @state.conditionExpr, tableAlias: "main"))
+
+    # Add extra filters
+    for extraFilter in (@props.filters or [])
+      if extraFilter.table == @props.design.table
+        wheres.push(injectTableAlias(extraFilter.jsonql, "main"))
+
+    query.where = { type: "op", op: "and", exprs: _.compact(wheres) }
+
+    @setState(progress: 0)
+    # Number completed (twice for each row, once to check can edit and other to perform)
+    completed = 0
+    @props.dataSource.performQuery query, (error, rows) =>
+      if error
+        @setState(progress: null)
+        alert("Error: #{error.message}")
+        return
+
+      # Check canEditValue on each one
+      async.mapLimit rows, 10, (row, cb) => 
+        # Abort if closed
+        if not @state.open
+          return 
+
+        # Prevent stack overflow
+        _.defer () =>
+          # First half
+          completed += 1
+          @setState(progress: completed * 50 / rows.length)
+
+          @props.canEditValue(@props.design.table, row.id, replaceExpr, cb)
+      , (error, canEdits) =>
+        if error
+          @setState(progress: null)
+          alert("Error: #{error.message}")
+          return
+
+        if not _.all(canEdits)
+          @setState(progress: null)
+          alert("You not have permission to replace all values")
+          return
+
+        # Confirm
+        if not confirm("Replace #{canEdits.length} values? This cannot be undone.")
+          @setState(progress: null)
+          return
+
+        # Perform updateValue on each one
+        async.eachLimit rows, 10, (row, cb) => 
+          # Abort if closed
+          if not @state.open
+            return 
+
+          # Prevent stack overflow
+          _.defer () =>
+            # First half
+            completed += 1
+            @setState(progress: completed * 50 / rows.length)
+
+            @props.updateValue(@props.design.table, row.id, replaceExpr, row.withValue, cb)
+        , (error) =>
+          if error
+            @setState(progress: null)
+            alert("Error: #{error.message}")
+            return
+
+          alert("Success")
+          @setState(progress: null, open: false)
 
   renderPreview: ->
     exprUtils = new ExprUtils(@props.schema)
@@ -86,9 +182,16 @@ module.exports = class FindReplaceModalComponent extends React.Component
   renderContents: ->
     exprUtils = new ExprUtils(@props.schema)
 
-    # Determine which columns are replace-able. Excludes subtables
-    replaceColumns = _.filter(@props.design.columns, (column) -> not column.subtable)
+    # Determine which columns are replace-able. Excludes subtables and aggregates
+    replaceColumns = _.filter(@props.design.columns, (column) -> not column.subtable and exprUtils.getExprAggrStatus(column.expr) == "individual")
     replaceColumnOptions = _.map(replaceColumns, (column) => { value: column.id, label: column.label or exprUtils.summarizeExpr(column.expr, @props.design.locale)})
+
+    # Show progress
+    if @state.progress?
+      return H.div null,
+        H.h3 null, "Working..."
+        H.div className: 'progress',
+          H.div className: 'progress-bar', style: { width: "#{@state.progress}%" }
 
     H.div null,
       H.div key: "replace", className: "form-group",
@@ -96,12 +199,6 @@ module.exports = class FindReplaceModalComponent extends React.Component
         H.select value: @state.replaceColumn, onChange: ((ev) => @setState(replaceColumn: ev.target.value)), className: "form-control",
           H.option key: "_none", value: "", "Select..."
           _.map(replaceColumnOptions, (option) => H.option(key: option.value, value: option.value, option.label))
-
-        # R ReactSelect, 
-        #   value: @state.replaceColumn
-        #   options: replaceColumnOptions
-        #   clearable: false
-        #   onChange: (value) => @setState(replaceColumn: value)
 
       if @state.replaceColumn
         # Get expr of replace column
@@ -119,21 +216,24 @@ module.exports = class FindReplaceModalComponent extends React.Component
             enumValues: exprUtils.getExprEnumValues(replaceExpr)
             idTable: exprUtils.getExprIdTable(replaceExpr)
             preferLiteral: true
+            placeholder: "Blank"
 
-      H.div key: "condition", className: "form-group",
-        H.label null, "In rows that: "
-        R ExprComponent,
-          schema: @props.schema
-          dataSource: @props.dataSource
-          table: @props.design.table
-          value: @state.conditionExpr
-          onChange: (value) => @setState(conditionExpr: value)
-          types: ["boolean"]
-          placeholder: "All Rows"
+      if @state.replaceColumn
+        H.div key: "condition", className: "form-group",
+          H.label null, "In rows that: "
+          R ExprComponent,
+            schema: @props.schema
+            dataSource: @props.dataSource
+            table: @props.design.table
+            value: @state.conditionExpr
+            onChange: (value) => @setState(conditionExpr: value)
+            types: ["boolean"]
+            placeholder: "All Rows"
 
-      H.div key: "preview",
-        H.h4 null, "Preview"
-        @renderPreview()
+      if @state.replaceColumn
+        H.div key: "preview",
+          H.h4 null, "Preview"
+          @renderPreview()
 
   render: ->
     if not @state.open
@@ -152,8 +252,8 @@ module.exports = class FindReplaceModalComponent extends React.Component
         H.button 
           key: "apply"
           type: "button"
-          disabled: not @state.replaceColumn
-          onClick: @props.onAction
+          disabled: not @state.replaceColumn or @state.progress?
+          onClick: => @performReplace()
           className: "btn btn-primary",
             "Apply"
       ],

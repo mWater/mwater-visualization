@@ -375,8 +375,8 @@ module.exports = class DatagridQueryBuilder
 
     # Handle special case of geometry, converting to GeoJSON
     if exprType == "geometry"
-      # Convert to 4326 (lat/long)
-      compiledExpr = { type: "op", op: "ST_AsGeoJSON", exprs: [{ type: "op", op: "ST_Transform", exprs: [compiledExpr, 4326] }] }
+      # Convert to 4326 (lat/long). Force ::geometry for null
+      compiledExpr = { type: "op", op: "ST_AsGeoJSON", exprs: [{ type: "op", op: "ST_Transform", exprs: [{ type: "op", op: "::geometry", exprs: [compiledExpr]}, 4326] }] }
 
     return { type: "select", expr: compiledExpr, alias: "c#{columnIndex}" }
 
