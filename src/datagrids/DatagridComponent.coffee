@@ -10,6 +10,7 @@ DatagridDesignerComponent = require './DatagridDesignerComponent'
 DatagridUtils = require './DatagridUtils'
 QuickfiltersComponent = require '../quickfilter/QuickfiltersComponent'
 QuickfilterCompiler = require '../quickfilter/QuickfilterCompiler'
+FindReplaceModalComponent = require './FindReplaceModalComponent'
 
 # Datagrid with decorations 
 # See README.md for description of datagrid format
@@ -85,9 +86,20 @@ module.exports = class DatagridComponent extends React.Component
         " "
         "Settings"
 
+  renderFindReplace: ->
+    if not @state.cellEditingEnabled
+      return null
+
+    return H.a 
+      key: "findreplace"
+      className: "btn btn-link btn-sm"
+      onClick: (=> @refs.findReplaceModal.show()),
+        "Find/Replace"
+
   renderTitleBar: ->
     H.div style: { position: "absolute", top: 0, left: 0, right: 0, height: 40, padding: 4 },
       H.div style: { float: "right" },
+        @renderFindReplace()
         @renderCellEdit()
         @renderEditButton()
         @props.extraTitleButtonsElem
@@ -122,6 +134,17 @@ module.exports = class DatagridComponent extends React.Component
           design: @state.editingDesign
           onDesignChange: (design) => @setState(editingDesign: design)
 
+  renderFindReplaceModal: (filters) ->
+    R FindReplaceModalComponent, 
+      ref: "findReplaceModal"
+      schema: @props.schema
+      dataSource: @props.dataSource
+      datagridDataSource: @props.datagridDataSource
+      design: @props.design
+      filters: filters
+      canEditValue: @props.canEditValue
+      updateValue: @props.updateValue
+
   render: ->
     # Compile quickfilters
     filters = new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues)
@@ -129,10 +152,11 @@ module.exports = class DatagridComponent extends React.Component
     hasQuickfilters = @props.design.quickfilters?[0]?
 
     return H.div style: { width: "100%", height: "100%", position: "relative", paddingTop: (if hasQuickfilters then 90 else 40) },
-      @renderTitleBar()
+      @renderTitleBar(filters)
       @renderQuickfilter()
 
       @renderEditor()
+      @renderFindReplaceModal(filters)
 
       # Do not render if no table
       if @props.design.table
