@@ -14,7 +14,7 @@ EditExprCellComponent = require './EditExprCellComponent'
 # Datagrid table itself without decorations such as edit button etc.
 # See README.md for description of datagrid format
 # Design should be cleaned already before being passed in (see DatagridUtils)
-module.exports = class DatagridComponent extends React.Component
+module.exports = class DatagridViewComponent extends React.Component
   @propTypes:
     width: React.PropTypes.number.isRequired      # Width of control
     height: React.PropTypes.number.isRequired     # Height of control

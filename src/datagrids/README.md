@@ -13,6 +13,7 @@
 ### Column
 
 `id`: unique id of the column
+`label`: optional label for the column
 `subtable`: subtable from which column is from. Null/undefined for main table
 `width`: width of column in pixels
 `type`: type of the column. see below
