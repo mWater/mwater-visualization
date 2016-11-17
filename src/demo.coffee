@@ -85,13 +85,13 @@ class MWaterDashboardPane extends React.Component
   componentWillMount: ->
     # Load dashboard
     url = @props.apiUrl + "dashboards/#{@props.dashboardId}?" + querystring.stringify({ client: @props.client, share: @props.share })
-    $.getJSON url, (dashboard) => 
+    $.getJSON url, (dashboard) =>
       @setState(design: dashboard.design, extraTables: dashboard.extra_tables)
 
   handleDesignChange: (design) =>
     # @setState(design: design, extraTables: )
     # console.log JSON.stringify(design, null, 2)
-    
+
   render: ->
     if not @state.design
       return H.div null, "Loading..."
@@ -281,7 +281,7 @@ class MWaterDatagridPane extends React.Component
       datagridDataSource = new DirectDatagridDataSource(schema: config.schema, dataSource: config.dataSource)
 
       H.div style: { height: "100%" },
-        R visualization.DatagridComponent, 
+        R visualization.DatagridComponent,
           schema: config.schema
           dataSource: config.dataSource
           datagridDataSource: datagridDataSource
@@ -456,7 +456,7 @@ datagridDesign = {
       },
       "label": null
     }
-  ]  
+  ]
 }
 
 # Caching data source for mWater. Requires jQuery
@@ -487,26 +487,26 @@ class MWaterDataSource extends DataSource
 #   "baseLayer": "bing_road",
 #   "layerViews": [
 #      # { name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
-#     #  { 
+#     #  {
 #     #   id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
 #     #   name: "Choropleth"
 #     #   type: "AdminIndicatorChoropleth"
-#     #   design: { 
+#     #   design: {
 #     #     scope: 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
-#     #     table: "entities.water_point" 
+#     #     table: "entities.water_point"
 #     #     adminRegionExpr: { type: "scalar", table: "entities.water_point", joins: ['admin_region'], expr: { type: "id", table: "admin_regions" } }
 #     #     detailLevel: 1
-#     #     condition: { 
+#     #     condition: {
 #     #       type: "op"
 #     #       op: "="
 #     #       table: "entities.water_point"
 #     #       exprs: [
 #     #         { type: "field", table: "entities.water_point", column: "type" }
 #     #         { type: "literal", valueType: "enum", value: "Protected dug well" }
-#     #       ] 
+#     #       ]
 #     #     }
 #     #   }
-#     #   visible: true 
+#     #   visible: true
 #     # }
 #     # {
 #     #   "id": "afbf76a3-29b8-4a11-882c-42aa21a3ca7a",
@@ -576,7 +576,7 @@ class MWaterDataSource extends DataSource
 #     # }
 #   ]
 #   filters: {}
-#   bounds: { 
+#   bounds: {
 #     "w": 23.1591796875,
 #     "n": 4.214943141390651,
 #     "e": 44.2529296875,
@@ -893,12 +893,12 @@ mapDesign = {
 # mapDesign = {
 #   "baseLayer": "bing_road",
 #   "layerViews": [
-#      { 
+#      {
 #       id: "4ed3415c-30c1-45fe-8984-dbffb9dd42d1"
 #       name: "Buffer"
 #       type: "Buffer"
-#       design: { 
-#         table: "entities.water_point" 
+#       design: {
+#         table: "entities.water_point"
 #         opacity: 0.5
 #         radius: 1000
 #         "axes": {
@@ -936,7 +936,7 @@ mapDesign = {
 #         color: "#9b9b9b"
 #         filter: null
 #       }
-#       visible: true 
+#       visible: true
 #     }
 #      { id: "old_func_status", name: "Functional Status", type: "MWaterServer", design: { type: "functional_status", table: "entities.water_point" }, visible: true }
 #   ]
@@ -1693,7 +1693,7 @@ oldDashboardDesign = {
 #                         },
 #                         "xform": null
 #                       }
-#                     },                    
+#                     },
 #                     "color": "#0088FF",
 #                     "filter": null,
 #                     "table": "entities.community",
@@ -2080,7 +2080,7 @@ oldDashboardDesign = {
 #   componentDidMount: ->
 #     $.getJSON @props.apiUrl + "jsonql/schema", (schemaJson) =>
 #       @setState()
-#     visualization_mwater.setup { 
+#     visualization_mwater.setup {
 #       apiUrl: @props.apiUrl
 #       client: @props.client
 #       onMarkerClick: (table, id) => alert("#{table}:#{id}")
@@ -2107,7 +2107,7 @@ oldDashboardDesign = {
 #     if not @state.widgetFactory
 #       return H.div null, "Loading..."
 
-#     React.createElement(LayeredChartDesignerComponent, 
+#     React.createElement(LayeredChartDesignerComponent,
 #       design: @state.design
 #       schema: @state.schema
 #       dataSource: @state.dataSource
@@ -2233,7 +2233,7 @@ rosterDatagridDesign = {
 #         onMarkerClick: (table, id) => alert("#{table}:#{id}")
 #       })
 
-#       widgetFactory = new WidgetFactory(schema: schema, dataSource: dataSource, layerFactory: layerFactory)    
+#       widgetFactory = new WidgetFactory(schema: schema, dataSource: dataSource, layerFactory: layerFactory)
 
 #       @setState(schema: schema, dataSource: dataSource, layerFactory: layerFactory, widgetFactory: widgetFactory)
 
@@ -3849,5 +3849,34 @@ simplePieChart = {
     ]
   },
   "layout": "blocks",
-  "style": "greybg"
+  "style": "greybg",
+  "quickfilters": [
+    {
+      "table": "entities.water_point",
+      "expr": {
+        "type": "field",
+        "table": "entities.water_point",
+        "column": "type"
+      },
+      "label": "Really really long filter name that is going to wrap insode the asd lasjda lksjda lsdkja sdlkajsd alskdja lskdasld "
+    },
+    {
+      "table": "entities.water_point",
+      "expr": {
+        "type": "field",
+        "table": "entities.water_point",
+        "column": "cw_piped_system_type"
+      },
+      "label": "Really really long filter name that is going to "
+    },
+    {
+      "table": "entities.water_point",
+      "expr": {
+        "type": "field",
+        "table": "entities.water_point",
+        "column": "drilling_method"
+      },
+      "label": "Drilling Method"
+    }
+  ]
 }
