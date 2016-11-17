@@ -11,7 +11,7 @@ module.exports = class QuickfiltersComponent extends React.Component
     design: React.PropTypes.array             # Design of quickfilters. See README.md
     values: React.PropTypes.array             # Current values of quickfilters (state of filters selected)
     onValuesChange: React.PropTypes.func.isRequired # Called when value changes
-    
+
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
 
@@ -23,7 +23,7 @@ module.exports = class QuickfiltersComponent extends React.Component
     type = new ExprUtils(@props.schema).getExprType(item.expr)
 
     if type == "enum"
-      return React.createElement EnumQuickfilterComponent, 
+      return React.createElement EnumQuickfilterComponent,
         key: index
         label: item.label
         expr: item.expr
@@ -36,7 +36,7 @@ module.exports = class QuickfiltersComponent extends React.Component
           @props.onValuesChange(values)
 
     if type == "text"
-      return React.createElement TextQuickfilterComponent, 
+      return React.createElement TextQuickfilterComponent,
         key: index
         label: item.label
         expr: item.expr
@@ -49,7 +49,7 @@ module.exports = class QuickfiltersComponent extends React.Component
           @props.onValuesChange(values)
 
     if type in ["date", "datetime"]
-      return React.createElement DateQuickfilterComponent, 
+      return React.createElement DateQuickfilterComponent,
         key: index
         label: item.label
         expr: item.expr
@@ -65,7 +65,7 @@ module.exports = class QuickfiltersComponent extends React.Component
     if not @props.design or @props.design.length == 0
       return null
 
-    H.div style: { borderTop: "solid 1px #E8E8E8", borderBottom: "solid 1px #E8E8E8", padding: 5 },
+    H.div style: { borderTop: "solid 1px #E8E8E8", borderBottom: "solid 1px #E8E8E8", padding: 5, display: 'flex', flexFlow: 'row wrap' },
       _.map @props.design, (item, i) => @renderQuickfilter(item, i)
 
 # Quickfilter for an enum
@@ -91,7 +91,7 @@ class EnumQuickfilterComponent extends React.Component
       @props.onValueChange(null)
 
   render: ->
-    H.div style: { display: "inline-block", paddingRight: 10 },
+    H.div style: { marginBottom: 4, paddingRight: 10 },
       if @props.label
         H.span style: { color: "gray" }, @props.label + ":\u00a0"
       H.div style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
@@ -99,7 +99,7 @@ class EnumQuickfilterComponent extends React.Component
           placeholder: "All"
           value: @props.value
           multi: false
-          options: _.map(@props.options, (opt) => { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
+          options: _.map(@props.options, (opt) => { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) })
           onChange: @handleChange
         }
 
@@ -115,7 +115,7 @@ class TextQuickfilterComponent extends React.Component
     onValueChange: React.PropTypes.func.isRequired # Called when value changes
 
   render: ->
-    H.div style: { display: "inline-block", paddingRight: 10 },
+    H.div style: { marginBottom: 4, paddingRight: 10 },
       if @props.label
         H.span style: { color: "gray" }, @props.label + ":\u00a0"
       H.div style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
@@ -139,7 +139,7 @@ class DateQuickfilterComponent extends React.Component
     onValueChange: React.PropTypes.func.isRequired # Called when value changes
 
   render: ->
-    H.div style: { display: "inline-block", paddingRight: 10 },
+    H.div style: { marginBottom: 4, paddingRight: 10 },
       if @props.label
         H.span style: { color: "gray" }, @props.label + ":\u00a0"
       H.div style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
@@ -194,7 +194,7 @@ class DateExprComponent extends React.Component
             ]
           }), label: moment().startOf("month").subtract(i, 'months').format("MMM YYYY") })
 
-    H.div style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
+    H.div style: { marginBottom: 4, minWidth: "20em", verticalAlign: "middle" },
       React.createElement ReactSelect, {
         placeholder: "All"
         value: if @props.value then JSON.stringify(@props.value) else ""
@@ -202,4 +202,3 @@ class DateExprComponent extends React.Component
         options: options
         onChange: @handleChange
       }
-

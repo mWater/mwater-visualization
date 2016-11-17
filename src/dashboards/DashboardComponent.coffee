@@ -40,10 +40,10 @@ module.exports = class DashboardComponent extends React.Component
 
   constructor: (props) ->
     super
-    @state = { 
-      undoStack: new UndoStack().push(props.design) 
+    @state = {
+      undoStack: new UndoStack().push(props.design)
       quickfiltersValues: null
-      editing: LayoutManager.createLayoutManager(props.design.layout).isEmpty(props.design.items) 
+      editing: LayoutManager.createLayoutManager(props.design.layout).isEmpty(props.design.items)
     }
 
   componentWillReceiveProps: (nextProps) ->
@@ -67,7 +67,7 @@ module.exports = class DashboardComponent extends React.Component
   handlePrint: =>
     @dashboardView.print()
 
-  handleUndo: => 
+  handleUndo: =>
     undoStack = @state.undoStack.undo()
 
     # We need to use callback as state is applied later
@@ -136,7 +136,7 @@ module.exports = class DashboardComponent extends React.Component
           H.p className: "list-group-item-text", "Ideal for data-driven storytelling with lots of text. Responsive and mobile-friendly"
         ]
 
-    H.a 
+    H.a
       key: style
       className: "list-group-item #{if isActive then "active" else ""}"
       onClick: @handleStyleChange.bind(null, style),
@@ -164,7 +164,7 @@ module.exports = class DashboardComponent extends React.Component
             H.span className: "glyphicon glyphicon-triangle-left"
             " Undo"
           " "
-          H.a key: "redo", className: "btn btn-link btn-sm #{if not @state.undoStack.canRedo() then "disabled" else ""}", onClick: @handleRedo, 
+          H.a key: "redo", className: "btn btn-link btn-sm #{if not @state.undoStack.canRedo() then "disabled" else ""}", onClick: @handleRedo,
             H.span className: "glyphicon glyphicon-triangle-right"
             " Redo"
         ]
@@ -185,13 +185,13 @@ module.exports = class DashboardComponent extends React.Component
         @renderEditingSwitch()
 
   renderTitleBar: ->
-    H.div style: { position: "absolute", top: 0, left: 0, right: 0, height: 40, padding: 4 },
+    H.div style: { height: 40, padding: 4 },
       H.div style: { float: "right" },
         @renderActionLinks()
       @props.titleElem
 
   renderQuickfilter: ->
-    H.div style: { position: "absolute", top: 40, left: 0, right: 0, height: 50 },    
+    H.div style: {  },
       R QuickfiltersComponent, {
         design: @props.design.quickfilters
         schema: @props.schema
@@ -203,20 +203,34 @@ module.exports = class DashboardComponent extends React.Component
   refDashboardView: (el) =>
     @dashboardView = el
 
+  refHeaderElement: (el) =>
+    @headerElement = el
+
+  refContainerElement: (el) =>
+    @containerElement = el
+
+  componentDidUpdate: ->
+    $(@containerElement).css({paddingTop: $(@headerElement).height()})
+
+  componentDidMount: ->
+    $(@containerElement).css({paddingTop: $(@headerElement).height()})
+    #, paddingTop: (if hasQuickfilters then 90 else 40)
+
   render: ->
     # Compile quickfilters
     filters = new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues)
 
     hasQuickfilters = @props.design.quickfilters?[0]?
 
-    H.div key: "view", style: { height: "100%", paddingTop: (if hasQuickfilters then 90 else 40), position: "relative" },
-      @renderTitleBar()
-      @renderQuickfilter()
+    H.div key: "view", ref: @refContainerElement, style: { height: "100%", position: "relative" },
+      H.div ref: @refHeaderElement ,style: {position: "absolute", top: 0, left: 0, right: 0},
+        @renderTitleBar()
+        @renderQuickfilter()
       if @props.onDesignChange?
         R SettingsModalComponent, { onDesignChange: @props.onDesignChange, schema: @props.schema, dataSource: @props.dataSource, ref: "settings" }
 
       # Dashboard view requires width, so use auto size component to inject it
-      R AutoSizeComponent, { injectWidth: true, injectHeight: true }, 
+      R AutoSizeComponent, { injectWidth: true, injectHeight: true },
         (size) =>
           R DashboardViewComponent, {
             schema: @props.schema
@@ -231,4 +245,3 @@ module.exports = class DashboardComponent extends React.Component
             standardWidth: if @props.printScaling then 1440 else size.width
             onRowClick: @props.onRowClick
           }
-      
