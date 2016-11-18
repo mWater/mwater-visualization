@@ -63,7 +63,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     compiler = new LayeredChartCompiler(schema: @props.schema)
 
     H.div null,
-      H.p className: "help-text", "Click on title to edit"
+      H.p className: "help-block", "To edit title of chart, click on it directly"
       if @areAxesLabelsNeeded()
         H.div className: "form-group",
           H.span null,
