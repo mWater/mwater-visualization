@@ -48,7 +48,7 @@ module.exports = class QuickfilterCompiler
         continue
 
       filters.push({
-        table: design[index].table
+        table: design[index].expr.table
         jsonql: jsonql
         })
 

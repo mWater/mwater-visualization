@@ -36,7 +36,7 @@ module.exports = class QuickfiltersDesignComponent extends React.Component
 
   handleAdd: =>
     # Add blank to end
-    design = @props.design.concat([{ table: @props.table }])
+    design = @props.design.concat([{ }])
     @props.onDesignChange(design)
 
   handleRemove: (index) =>
@@ -63,9 +63,22 @@ class QuickfilterDesignComponent extends React.Component
 
     table: React.PropTypes.string     # If present, forces table
 
+  constructor: (props) ->
+    super
+
+    # Store table to allow selecting table first, then expression
+    @state = {
+      table: props.table or props.design.expr?.table
+    }
+
+  componentWillReceiveProps: (nextProps) ->
+    table = nextProps.table or nextProps.design.expr?.table
+    if table and table != @state.table
+      @setState(table: table)
+
   handleTableChange: (table) => 
+    @setState(table: table)
     design = {
-      table: table
       expr: null
       label: null
     }
@@ -82,16 +95,16 @@ class QuickfilterDesignComponent extends React.Component
           if not @props.table
             H.div className: "form-group", key: "table",
               H.label className: "text-muted", "Data Source"
-              R TableSelectComponent, schema: @props.schema, value: @props.design.table, onChange: @handleTableChange
+              R TableSelectComponent, schema: @props.schema, value: @state.table, onChange: @handleTableChange
 
-          if @props.design.table
+          if @state.table
             H.div className: "form-group", key: "expr",
               H.label className: "text-muted", "Filter By"
               H.div null,
                 R ExprComponent,
                   schema: @props.schema
                   dataSource: @props.dataSource
-                  table: @props.design.table
+                  table: @state.table
                   value: @props.design.expr
                   onChange: @handleExprChange
                   types: ['enum', 'text', 'date', 'datetime']

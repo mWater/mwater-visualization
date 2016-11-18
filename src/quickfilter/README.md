@@ -2,7 +2,7 @@
 
 design is an array of quick filters (user-selectable filters). Each contains:
  
- `table`: table of filter
+ `table`: (deprecated) table of filter
  `expr`: filter expression (left hand side only. Usually enum or text)
  `label`: optional label
 
