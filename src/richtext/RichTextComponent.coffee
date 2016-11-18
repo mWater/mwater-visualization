@@ -6,6 +6,7 @@ _ = require 'lodash'
 ContentEditableComponent = require('mwater-expressions-ui').ContentEditableComponent
 ClickOutHandler = require('react-onclickout')
 ItemsHtmlConverter = require './ItemsHtmlConverter'
+FloatAffixed = require 'react-float-affixed'
 
 module.exports = class RichTextComponent extends React.Component
   @propTypes: 
@@ -99,37 +100,38 @@ module.exports = class RichTextComponent extends React.Component
     @props.itemsHtmlConverter.convertItemsToHtml(@props.items)
 
   renderPalette: ->
-    H.div key: "palette", className: "mwater-visualization-text-palette",
-      H.div key: "bold", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "bold"),
-        H.b null, "B"
-      H.div key: "italic", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "italic"),
-        H.i null, "I"
-      H.div key: "underline", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "underline"),
-        H.span style: { textDecoration: "underline" }, "U"
-      H.div key: "link", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCreateLink,
-        H.i className: "fa fa-link"
-      H.div key: "justifyLeft", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyLeft"),
-        H.i className: "fa fa-align-left"
-      H.div key: "justifyCenter", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyCenter"),
-        H.i className: "fa fa-align-center"
-      H.div key: "justifyRight", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyRight"),
-        H.i className: "fa fa-align-right"
-      H.div key: "justifyFull", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyFull"),
-        H.i className: "fa fa-align-justify"
-      H.div key: "insertUnorderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertUnorderedList"),
-        H.i className: "fa fa-list-ul"
-      H.div key: "insertOrderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertOrderedList"),
-        H.i className: "fa fa-list-ol"
-      if @props.includeHeadings
-        [
-          H.div key: "h1", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H1>"),
-            H.i className: "fa fa-header"
-          H.div key: "h2", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H2>"),
-            H.i className: "fa fa-header", style: { fontSize: "80%" }
-          H.div key: "p", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<div>"),
-            "\u00b6"
-        ]
-      @props.extraPaletteButtons
+    return R FloatAffixed, edges: "over,under,left,right", align: "center",
+      H.div key: "palette", className: "mwater-visualization-text-palette",
+        H.div key: "bold", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "bold"),
+          H.b null, "B"
+        H.div key: "italic", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "italic"),
+          H.i null, "I"
+        H.div key: "underline", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "underline"),
+          H.span style: { textDecoration: "underline" }, "U"
+        H.div key: "link", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCreateLink,
+          H.i className: "fa fa-link"
+        H.div key: "justifyLeft", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyLeft"),
+          H.i className: "fa fa-align-left"
+        H.div key: "justifyCenter", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyCenter"),
+          H.i className: "fa fa-align-center"
+        H.div key: "justifyRight", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyRight"),
+          H.i className: "fa fa-align-right"
+        H.div key: "justifyFull", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyFull"),
+          H.i className: "fa fa-align-justify"
+        H.div key: "insertUnorderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertUnorderedList"),
+          H.i className: "fa fa-list-ul"
+        H.div key: "insertOrderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertOrderedList"),
+          H.i className: "fa fa-list-ol"
+        if @props.includeHeadings
+          [
+            H.div key: "h1", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H1>"),
+              H.i className: "fa fa-header"
+            H.div key: "h2", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H2>"),
+              H.i className: "fa fa-header", style: { fontSize: "80%" }
+            H.div key: "p", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<div>"),
+              "\u00b6"
+          ]
+        @props.extraPaletteButtons
     
   renderHtml: ->
     if @props.onItemsChange?
@@ -143,14 +145,14 @@ module.exports = class RichTextComponent extends React.Component
           onFocus: @handleFocus
           onBlur: @handleBlur
         if not @props.items?[0]?
-          H.div key: "placeholder", style: { color: "#DDD", position: "absolute", top: 0, left: 0, pointerEvents: "none" }, "Click to Edit"
+          H.div key: "placeholder", style: { color: "#DDD", position: "absolute", top: 0, left: 0, right: 0, pointerEvents: "none" }, "Click to Edit"
 
     else
       return H.div key: "contents", style: @props.style, className: @props.className, dangerouslySetInnerHTML: { __html: @createHtml() }
 
   render: ->
     # R ClickOutHandler, onClickOut: @handleClickOut,
-    H.div style: { position: "relative" },
+    H.div style: { position: "relative", marginRight: 1 }, # Hack for https://github.com/warrenfalk/react-float-affixed/issues/1
       @renderHtml()
       if @state.focused
         @renderPalette()

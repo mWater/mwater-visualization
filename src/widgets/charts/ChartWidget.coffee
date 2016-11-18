@@ -134,10 +134,11 @@ class ChartWidgetComponent extends React.Component
   handleEditDesignChange: (design) =>
     @setState(editDesign: design)
 
-  renderChart: (design, width, height, standardWidth) ->
+  renderChart: (design, onDesignChange, width, height, standardWidth) ->
     React.createElement(ChartViewComponent, 
       chart: @props.chart
       design: design
+      onDesignChange: onDesignChange
       schema: @props.schema
       dataSource: @props.dataSource
       widgetDataSource: @props.widgetDataSource
@@ -158,13 +159,14 @@ class ChartWidgetComponent extends React.Component
     editor = @props.chart.createDesignerElement(schema: @props.schema, dataSource: @props.dataSource, design: @state.editDesign, onDesignChange: @handleEditDesignChange)
 
     # Create chart (maxing out at half of width of screen)
-    width = Math.min(document.body.clientWidth/2, @props.width)
-    chart = @renderChart(@state.editDesign, width, @props.height * (width / @props.width), width)
+    chartWidth = Math.min(document.body.clientWidth/2, @props.width)
+    chartHeight = @props.height * (chartWidth / @props.width)
+    chart = @renderChart(@state.editDesign, ((design) => @setState(editDesign: design)), chartWidth, chartHeight, chartWidth)
 
     content = H.div style: { height: "100%", width: "100%" },
-      H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: width + 20, height: @props.height + 20 },
+      H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: chartWidth + 20, height: chartHeight + 20, overflow: "hidden" },
         chart
-      H.div style: { width: "100%", height: "100%", paddingLeft: width + 40 },
+      H.div style: { width: "100%", height: "100%", paddingLeft: chartWidth + 40 },
         H.div style: { width: "100%", height: "100%", overflowY: "auto", paddingLeft: 20, borderLeft: "solid 3px #AAA" },
           editor
 
@@ -200,7 +202,7 @@ class ChartWidgetComponent extends React.Component
         width: @props.width
         height: @props.height
         dropdownItems: dropdownItems,
-          @renderChart(@props.design, @props.width, @props.height, @props.standardWidth)
+          @renderChart(@props.design, @props.onDesignChange, @props.width, @props.height, @props.standardWidth)
       )
       if (emptyDesign or not validDesign) and @props.onDesignChange?
         @renderEditLink()

@@ -9,6 +9,7 @@ module.exports = class ChartViewComponent extends React.Component
   @propTypes:
     chart: React.PropTypes.object.isRequired # Chart object to use
     design: React.PropTypes.object.isRequired # Design of chart
+    onDesignChange: React.PropTypes.func      # When design change
 
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired # Data source to use for chart
@@ -89,6 +90,7 @@ module.exports = class ChartViewComponent extends React.Component
           schema: @props.schema
           dataSource: @props.dataSource
           design: @state.validDesign
+          onDesignChange: @props.onDesignChange
           data: @state.data
           scope: @props.scope
           onScopeChange: @props.onScopeChange

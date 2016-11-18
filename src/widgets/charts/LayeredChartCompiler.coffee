@@ -101,8 +101,6 @@ module.exports = class LayeredChartCompiler
   #   height: chart height
   #   locale: locale to use
   createChartOptions: (options) ->
-    titlePadding = { top: 0, right: 0, bottom: 15, left: 0 } # TODO move to CSS or make it configurable
-
     c3Data = @compileData(options.design, options.data, options.locale)
 
     # Create chart
@@ -139,7 +137,6 @@ module.exports = class LayeredChartCompiler
       }
       size: { width: options.width, height: options.height }
       pie: {  expand: false } # Don't expand/contract
-      title: { text: c3Data.titleText, padding: titlePadding }
       transition: { duration: 0 } # Transitions interfere with scoping
     }
 
