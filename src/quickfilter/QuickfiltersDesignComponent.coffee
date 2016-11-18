@@ -14,7 +14,7 @@ module.exports = class QuickfiltersDesignComponent extends React.Component
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
 
-    table: React.PropTypes.string     # If present, forces table
+    table: React.PropTypes.string     # If present, forces table. TODO does not appear to be used
 
   @defaultProps:
     design: []

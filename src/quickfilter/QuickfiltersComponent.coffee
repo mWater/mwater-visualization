@@ -8,9 +8,18 @@ moment = require 'moment'
 # Displays quick filters and allows their value to be modified
 module.exports = class QuickfiltersComponent extends React.Component
   @propTypes:
-    design: React.PropTypes.array             # Design of quickfilters. See README.md
+    design: React.PropTypes.arrayOf(React.PropTypes.shape({
+      expr: React.PropTypes.object.isRequired
+      label: React.PropTypes.string
+      }))       # Design of quickfilters. See README.md
     values: React.PropTypes.array             # Current values of quickfilters (state of filters selected)
     onValuesChange: React.PropTypes.func.isRequired # Called when value changes
+
+    # Locked quickfilters. Locked ones cannot be changed and are shown with a lock
+    locks: React.PropTypes.arrayOf(React.PropTypes.shape({
+      expr: React.PropTypes.object.isRequired
+      value: React.PropTypes.any
+      }))
     
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
@@ -22,6 +31,20 @@ module.exports = class QuickfiltersComponent extends React.Component
     # Get type of expr
     type = new ExprUtils(@props.schema).getExprType(item.expr)
 
+    # Determine if locked
+    lock = _.find(@props.locks, (lock) -> _.isEqual(lock.expr, item.expr))
+
+    if lock
+      # Overrides item value
+      itemValue = lock.value
+      onValueChange = null
+    else
+      # Can change value if not locked
+      onValueChange = (v) =>
+        values = (@props.values or []).slice()
+        values[index] = v
+        @props.onValuesChange(values)
+
     if type == "enum"
       return React.createElement EnumQuickfilterComponent, 
         key: index
@@ -30,10 +53,7 @@ module.exports = class QuickfiltersComponent extends React.Component
         schema: @props.schema
         options: new ExprUtils(@props.schema).getExprEnumValues(item.expr)
         value: itemValue
-        onValueChange: (v) =>
-          values = (@props.values or []).slice()
-          values[index] = v
-          @props.onValuesChange(values)
+        onValueChange: onValueChange
 
     if type == "text"
       return React.createElement TextQuickfilterComponent, 
@@ -43,10 +63,7 @@ module.exports = class QuickfiltersComponent extends React.Component
         schema: @props.schema
         dataSource: @props.dataSource
         value: itemValue
-        onValueChange: (v) =>
-          values = (@props.values or []).slice()
-          values[index] = v
-          @props.onValuesChange(values)
+        onValueChange: onValueChange
 
     if type in ["date", "datetime"]
       return React.createElement DateQuickfilterComponent, 
@@ -56,10 +73,7 @@ module.exports = class QuickfiltersComponent extends React.Component
         schema: @props.schema
         dataSource: @props.dataSource
         value: itemValue
-        onValueChange: (v) =>
-          values = (@props.values or []).slice()
-          values[index] = v
-          @props.onValuesChange(values)
+        onValueChange: onValueChange
 
   render: ->
     if not @props.design or @props.design.length == 0
@@ -79,7 +93,7 @@ class EnumQuickfilterComponent extends React.Component
     })).isRequired
 
     value: React.PropTypes.any              # Current value of quickfilter (state of filter selected)
-    onValueChange: React.PropTypes.func.isRequired # Called when value changes
+    onValueChange: React.PropTypes.func     # Called when value changes
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
@@ -100,8 +114,11 @@ class EnumQuickfilterComponent extends React.Component
           value: @props.value
           multi: false
           options: _.map(@props.options, (opt) => { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
-          onChange: @handleChange
+          onChange: if @props.onValueChange then @handleChange
+          disabled: not @props.onValueChange?
         }
+      if not @props.onValueChange
+        H.i className: "text-warning fa fa-fw fa-lock"
 
 
 # Quickfilter for a text value
@@ -112,7 +129,7 @@ class TextQuickfilterComponent extends React.Component
     expr: React.PropTypes.object.isRequired
 
     value: React.PropTypes.any                     # Current value of quickfilter (state of filter selected)
-    onValueChange: React.PropTypes.func.isRequired # Called when value changes
+    onValueChange: React.PropTypes.func    # Called when value changes
 
   render: ->
     H.div style: { display: "inline-block", paddingRight: 10 },
@@ -126,6 +143,8 @@ class TextQuickfilterComponent extends React.Component
           schema: @props.schema
           dataSource: @props.dataSource
         }
+      if not @props.onValueChange
+        H.i className: "text-warning fa fa-fw fa-lock"
 
 
 # Quickfilter for a date value
@@ -148,12 +167,14 @@ class DateQuickfilterComponent extends React.Component
           value: @props.value
           onValueChange: @props.onValueChange
         }
+      if not @props.onValueChange
+        H.i className: "text-warning fa fa-fw fa-lock"
 
 class DateExprComponent extends React.Component
   @propTypes:
     type: React.PropTypes.string.isRequired        # date or datetime
     value: React.PropTypes.any                     # Current value of quickfilter (state of filter selected)
-    onValueChange: React.PropTypes.func.isRequired # Called when value changes
+    onValueChange: React.PropTypes.func     # Called when value changes
 
   handleChange: (val) =>
     if val
@@ -200,6 +221,7 @@ class DateExprComponent extends React.Component
         value: if @props.value then JSON.stringify(@props.value) else ""
         multi: false
         options: options
-        onChange: @handleChange
+        onChange: if @props.onValueChange then @handleChange
+        disabled: not @props.onValueChange?
       }
 
