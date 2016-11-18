@@ -133,5 +133,5 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
         onItemsChange: if @props.onDesignChange then @handleItemsChange
         onItemClick: @handleItemClick
         itemsHtmlConverter: @createItemsHtmlConverter()
-        includeHeadings: @props.design.style != "title"
+        includeHeadings: @props.design.style == "default" or not @props.design.style
         extraPaletteButtons: @renderExtraPaletteButtons()

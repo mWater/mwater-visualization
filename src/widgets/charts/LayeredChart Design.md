@@ -2,13 +2,15 @@
   
   type: bar/line/spline/scatter/area/pie/donut
   layers: array of layers
-  titleText: title text
+  titleText: (deprecated by headerItems) title text 
   xAxisLabelText: text of x axis label, display default value if "", display nothing if null
   yAxisLabelText: text of y axis label, display default value if "", display nothing if null
   transpose: true to flip axes
   stacked: true to stack all 
   proportional: true to stack proportionally (100 %). Only applicable if stacked
   labels: true to show labels on values
+  headerItems: text widget items to display in header (replaces title)
+  footerItems: text widget items to display in header 
 
 layer:
   type: bar/line/spline/scatter/area/pie/donut (overrides main one)

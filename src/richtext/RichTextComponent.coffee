@@ -143,7 +143,7 @@ module.exports = class RichTextComponent extends React.Component
           onFocus: @handleFocus
           onBlur: @handleBlur
         if not @props.items?[0]?
-          H.div key: "placeholder", style: { color: "#DDD", position: "absolute", top: 0, left: 0, pointerEvents: "none" }, "Click to Edit"
+          H.div key: "placeholder", style: { color: "#DDD", position: "absolute", top: 0, left: 0, right: 0, pointerEvents: "none" }, "Click to Edit"
 
     else
       return H.div key: "contents", style: @props.style, className: @props.className, dangerouslySetInnerHTML: { __html: @createHtml() }

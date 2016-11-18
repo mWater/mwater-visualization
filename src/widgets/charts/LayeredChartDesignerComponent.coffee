@@ -47,7 +47,6 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     layers.push({})
     @updateDesign(layers: layers)
 
-  handleTitleTextChange: (ev) =>  @updateDesign(titleText: ev.target.value)
   handleXAxisLabelTextChange: (ev) =>  @updateDesign(xAxisLabelText: ev.target.value)
   handleYAxisLabelTextChange: (ev) =>  @updateDesign(yAxisLabelText: ev.target.value)
 
@@ -64,9 +63,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     compiler = new LayeredChartCompiler(schema: @props.schema)
 
     H.div null,
-      H.div className: "form-group",
-        H.label className: "text-muted", "Title"
-        H.input type: "text", className: "form-control input-sm", value: @props.design.titleText, onChange: @handleTitleTextChange, placeholder: "Untitled"
+      H.p className: "help-text", "Click on title to edit"
       if @areAxesLabelsNeeded()
         H.div className: "form-group",
           H.span null,

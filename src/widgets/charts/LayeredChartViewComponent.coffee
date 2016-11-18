@@ -1,10 +1,12 @@
 _ = require 'lodash'
 React = require 'react'
 ReactDOM = require 'react-dom'
+R = React.createElement
 H = React.DOM
 
 ExprUtils = require('mwater-expressions').ExprUtils
 LayeredChartCompiler = require './LayeredChartCompiler'
+TextWidget = require '../text/TextWidget'
 
 # Displays a layered chart
 module.exports = class LayeredChartViewComponent extends React.Component
@@ -12,6 +14,99 @@ module.exports = class LayeredChartViewComponent extends React.Component
     schema: React.PropTypes.object.isRequired
     design: React.PropTypes.object.isRequired
     data: React.PropTypes.object.isRequired
+    onDesignChange: React.PropTypes.func
+
+    width: React.PropTypes.number.isRequired
+    height: React.PropTypes.number.isRequired
+    standardWidth: React.PropTypes.number.isRequired
+
+    scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
+    onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+
+  @contextTypes:
+    locale: React.PropTypes.string  # e.g. "en"
+
+  constructor: ->
+    super
+
+    @state = {
+      headerHeight: null  # Height of header 
+      footerHeight: null  # Height of footer
+    }
+
+  componentDidMount: -> 
+    @updateHeights()
+
+  componentDidUpdate: ->
+    @updateHeights()
+
+  updateHeights: ->
+    # Calculate header and footer heights
+    if @refs.header and @state.headerHeight != @refs.header.offsetHeight
+      @setState(headerHeight: @refs.header.offsetHeight)
+    if @refs.footer and @state.footerHeight != @refs.footer.offsetHeight
+      @setState(footerHeight: @refs.footer.offsetHeight)
+
+  handleHeaderDesignChange: (headerDesign) =>
+    @props.onDesignChange(_.extend({}, @props.design, headerItems: headerDesign.items))
+
+  handleFooterDesignChange: (footerDesign) =>
+    @props.onDesignChange(_.extend({}, @props.design, footerItems: footerDesign.items))
+
+  renderHeader: ->
+    return H.div ref: "header",
+      new TextWidget().createViewElement({
+        schema: @props.schema
+        dataSource: @props.dataSource
+        widgetDataSource: {
+          getData: (design, filters, callback) =>
+            callback(null, @props.data.header)
+        }
+        filters: @props.filters
+        # Default to titleText for legacy
+        design: { style: "header", items: @props.design.headerItems or _.compact([@props.design.titleText or null])}
+        onDesignChange: if @props.onDesignChange then @handleHeaderDesignChange
+        width: @props.width
+      })
+
+  renderFooter: ->
+    return H.div ref: "footer",
+      new TextWidget().createViewElement({
+        schema: @props.schema
+        dataSource: @props.dataSource
+        widgetDataSource: {
+          getData: (design, filters, callback) =>
+            callback(null, @props.data.footer)
+        }
+        filters: @props.filters
+        design: { style: "footer", items: @props.design.footerItems or [] }
+        onDesignChange: if @props.onDesignChange then @handleFooterDesignChange
+        width: @props.width
+      })
+
+  render: ->
+    H.div style: { width: @props.width, height: @props.height },
+      @renderHeader()
+      if @state.headerHeight? and @state.footerHeight?
+        R C3ChartComponent, 
+          schema: @props.schema
+          design: @props.design
+          data: @props.data
+          onDesignChange: @props.onDesignChange
+          width: @props.width
+          height: @props.height - @state.headerHeight - @state.footerHeight
+          standardWidth: @props.standardWidth
+          scope: @props.scope
+          onScopeChange: @props.onScopeChange
+      @renderFooter()
+
+# Displays the inner C3 component itself
+class C3ChartComponent extends React.Component
+  @propTypes: 
+    schema: React.PropTypes.object.isRequired
+    design: React.PropTypes.object.isRequired
+    data: React.PropTypes.object.isRequired
+    onDesignChange: React.PropTypes.func
 
     width: React.PropTypes.number.isRequired
     height: React.PropTypes.number.isRequired
