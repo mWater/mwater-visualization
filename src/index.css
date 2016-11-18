@@ -257,9 +257,6 @@
 }
 
 .mwater-visualization-text-palette {
-  position: absolute;
-  top: -32px;
-  left: 7px;
   background-color: #4B5155;
   border-radius: 3px;
   white-space: nowrap;

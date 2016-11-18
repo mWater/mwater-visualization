@@ -223,5 +223,14 @@ There are several styles of block layouts:
   }
 }
 
+/* Used for TextWidgets inside of other widgets */
+.mwater-visualization-text-widget-style-header {
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
 
-
+.mwater-visualization-text-widget-style-footer {
+  font-size: 12px;
+  text-align: center;
+}

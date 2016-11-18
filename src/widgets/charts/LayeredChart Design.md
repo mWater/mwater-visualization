@@ -9,8 +9,8 @@
   stacked: true to stack all 
   proportional: true to stack proportionally (100 %). Only applicable if stacked
   labels: true to show labels on values
-  headerItems: text widget items to display in header (replaces title)
-  footerItems: text widget items to display in header 
+  header: text widget design to display in header (replaces title)
+  footer: text widget design to display in header 
 
 layer:
   type: bar/line/spline/scatter/area/pie/donut (overrides main one)

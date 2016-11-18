@@ -10,6 +10,7 @@ AxisBuilder = require './../../axes/AxisBuilder'
 LayeredChartViewComponent = require './LayeredChartViewComponent'
 LayeredChartSvgFileSaver = require './LayeredChartSvgFileSaver'
 LayeredChartUtils = require './LayeredChartUtils'
+TextWidget = require '../text/TextWidget'
 
 # See LayeredChart Design.md for the design
 module.exports = class LayeredChart extends Chart
@@ -24,6 +25,10 @@ module.exports = class LayeredChart extends Chart
     # Fill in defaults
     design.version = design.version or 2
     design.layers = design.layers or [{}]
+
+    # Default to titleText (legacy)
+    design.header = design.header or { style: "header", items: _.compact([design.titleText or null]) }
+    design.footer = design.footer or { style: "footer", items: [] }
 
     # Default value is now ""
     if design.version < 2
@@ -138,8 +143,24 @@ module.exports = class LayeredChart extends Chart
     , (err, items) =>
       if err
         return callback(err)
-      else
-        callback(null, _.object(items))
+
+      data = _.object(items)
+
+      # Add header and footer data
+      textWidget = new TextWidget()
+      textWidget.getData design.header, schema, dataSource, filters, (error, headerData) =>
+        if error
+          return callback(error)
+
+        data.header = headerData
+
+        textWidget.getData design.footer, schema, dataSource, filters, (error, footerData) =>
+          if error
+            return callback(error)
+
+          data.footer = footerData
+    
+          callback(null, data)
 
   # Create a view element for the chart
   # Options include:
@@ -224,4 +245,10 @@ module.exports = class LayeredChart extends Chart
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->
     filterableTables = _.uniq(_.compact(_.map(design.layers, (layer) -> layer.table)))
+
+    # Get filterable tables from header and footer
+    textWidget = new TextWidget()
+    filterableTables = _.union(filterableTables, textWidget.getFilterableTables(design.header, schema))
+    filterableTables = _.union(filterableTables, textWidget.getFilterableTables(design.footer, schema))
+
     return filterableTables

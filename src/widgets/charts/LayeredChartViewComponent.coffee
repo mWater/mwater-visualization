@@ -47,11 +47,11 @@ module.exports = class LayeredChartViewComponent extends React.Component
     if @refs.footer and @state.footerHeight != @refs.footer.offsetHeight
       @setState(footerHeight: @refs.footer.offsetHeight)
 
-  handleHeaderDesignChange: (headerDesign) =>
-    @props.onDesignChange(_.extend({}, @props.design, headerItems: headerDesign.items))
+  handleHeaderChange: (header) =>
+    @props.onDesignChange(_.extend({}, @props.design, header: header))
 
-  handleFooterDesignChange: (footerDesign) =>
-    @props.onDesignChange(_.extend({}, @props.design, footerItems: footerDesign.items))
+  handleFooterChange: (footer) =>
+    @props.onDesignChange(_.extend({}, @props.design, footer: footer))
 
   renderHeader: ->
     return H.div ref: "header",
@@ -63,9 +63,8 @@ module.exports = class LayeredChartViewComponent extends React.Component
             callback(null, @props.data.header)
         }
         filters: @props.filters
-        # Default to titleText for legacy
-        design: { style: "header", items: @props.design.headerItems or _.compact([@props.design.titleText or null])}
-        onDesignChange: if @props.onDesignChange then @handleHeaderDesignChange
+        design: @props.design.header
+        onDesignChange: if @props.onDesignChange then @handleHeaderChange
         width: @props.width
       })
 
@@ -79,8 +78,8 @@ module.exports = class LayeredChartViewComponent extends React.Component
             callback(null, @props.data.footer)
         }
         filters: @props.filters
-        design: { style: "footer", items: @props.design.footerItems or [] }
-        onDesignChange: if @props.onDesignChange then @handleFooterDesignChange
+        design: @props.design.footer
+        onDesignChange: if @props.onDesignChange then @handleFooterChange
         width: @props.width
       })
 
