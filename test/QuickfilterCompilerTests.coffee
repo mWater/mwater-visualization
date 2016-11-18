@@ -13,7 +13,7 @@ describe "QuickfilterCompiler", ->
     @qc = new QuickfilterCompiler(@schema)
 
   it "compiles filter", ->
-    filters = @qc.compile([{ table: "t1", expr: { type: "field", table: "t1", column: "enum"}, label: "Enum" }], ["a"])
+    filters = @qc.compile([{ expr: { type: "field", table: "t1", column: "enum"}, label: "Enum" }], ["a"])
     compare(filters, [
       { 
         table: "t1"
@@ -23,6 +23,22 @@ describe "QuickfilterCompiler", ->
           exprs: [
             { type: "field", tableAlias: "{alias}", column: "enum" }
             { type: "literal", value: "a" }
+          ]
+        }
+      }
+      ])
+
+  it "compiles filter with locks", ->
+    filters = @qc.compile([{ expr: { type: "field", table: "t1", column: "enum" }, label: "Enum" }], ["a"], [{ expr: { type: "field", table: "t1", column: "enum"}, value: "b" }])
+    compare(filters, [
+      { 
+        table: "t1"
+        jsonql: { 
+          type: "op"
+          op: "="
+          exprs: [
+            { type: "field", tableAlias: "{alias}", column: "enum" }
+            { type: "literal", value: "b" }
           ]
         }
       }

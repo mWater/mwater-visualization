@@ -28,6 +28,7 @@ module.exports = class DashboardComponent extends React.Component
     printScaling: React.PropTypes.bool                  # True to scale for printing
 
     onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    quickfilterLocks: React.PropTypes.array             # Locked quickfilter values. See README in quickfilters
 
   @defaultProps:
     printScaling: true
@@ -198,6 +199,7 @@ module.exports = class DashboardComponent extends React.Component
         dataSource: @props.dataSource
         values: @state.quickfiltersValues
         onValuesChange: (values) => @setState(quickfiltersValues: values)
+        locks: @props.quickfilterLocks
       }
 
   refDashboardView: (el) =>
@@ -205,7 +207,7 @@ module.exports = class DashboardComponent extends React.Component
 
   render: ->
     # Compile quickfilters
-    filters = new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues)
+    filters = new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues, @props.quickfilterLocks)
 
     hasQuickfilters = @props.design.quickfilters?[0]?
 
