@@ -38,6 +38,8 @@ module.exports = class DatagridComponent extends React.Component
     # Called when row is double-clicked with (tableId, rowId)
     onRowDoubleClick: React.PropTypes.func
 
+    quickfilterLocks: React.PropTypes.array             # Locked quickfilter values. See README in quickfilters
+
   constructor: (props) ->
     super(props)
 
@@ -46,6 +48,10 @@ module.exports = class DatagridComponent extends React.Component
       cellEditingEnabled: false  # True if cells can be edited directly
       quickfiltersValues: null
     }
+
+  # Get the values of the quick filters
+  getQuickfilterValues: =>
+    return @state.quickfiltersValues or []
 
   handleCellEditingToggle: =>
     if @state.cellEditingEnabled
@@ -114,6 +120,7 @@ module.exports = class DatagridComponent extends React.Component
         values: @state.quickfiltersValues
         table: @props.design.table
         onValuesChange: (values) => @setState(quickfiltersValues: values)
+        locks: @props.quickfilterLocks
       }
 
   # Renders the editor modal
@@ -147,7 +154,7 @@ module.exports = class DatagridComponent extends React.Component
 
   render: ->
     # Compile quickfilters
-    filters = new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues)
+    filters = new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues, @props.quickfilterLocks)
 
     hasQuickfilters = @props.design.quickfilters?[0]?
 

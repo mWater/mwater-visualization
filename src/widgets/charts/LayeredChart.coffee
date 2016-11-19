@@ -176,6 +176,7 @@ module.exports = class LayeredChart extends Chart
     # Create chart
     props = {
       schema: options.schema
+      dataSource: options.dataSource
       design: @cleanDesign(options.design, options.schema)
       onDesignChange: options.onDesignChange
       data: options.data

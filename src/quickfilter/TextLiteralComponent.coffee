@@ -7,7 +7,7 @@ ExprCompiler = require("mwater-expressions").ExprCompiler
 module.exports = class TextLiteralComponent extends React.Component
   @propTypes: 
     value: React.PropTypes.string
-    onChange: React.PropTypes.func.isRequired 
+    onChange: React.PropTypes.func
     refExpr: React.PropTypes.object.isRequired # Expression for the text values to select from
     schema: React.PropTypes.object.isRequired # Schema of the database
     dataSource: React.PropTypes.object.isRequired # Data source to use to get values
@@ -68,6 +68,7 @@ module.exports = class TextLiteralComponent extends React.Component
         placeholder: "All"
         value: value
         asyncOptions: @getOptions
-        onChange: @handleChange
+        onChange: if @props.onChange then @handleChange
+        disabled: not @props.onChange?
       })
 
