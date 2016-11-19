@@ -168,6 +168,7 @@ class MWaterDirectDashboardPane extends React.Component
           design: @state.design
           onDesignChange: @handleDesignChange
           titleElem: "Sample"
+          quickfilterLocks: [{ expr: { type: "field", table: "entities.water_point", column: "type" }, value: "Protected dug well" }]
         })
     )
 
@@ -3849,5 +3850,15 @@ simplePieChart = {
     ]
   },
   "layout": "blocks",
-  "style": "greybg"
+  "style": "greybg",
+  "quickfilters": [
+    {
+      "expr": {
+        "type": "field",
+        "table": "entities.water_point",
+        "column": "type"
+      },
+      "label": null
+    }
+  ]  
 }

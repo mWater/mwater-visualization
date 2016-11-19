@@ -49,6 +49,10 @@ module.exports = class DatagridComponent extends React.Component
       quickfiltersValues: null
     }
 
+  # Get the values of the quick filters
+  getQuickfilterValues: =>
+    return @state.quickfiltersValues or []
+
   handleCellEditingToggle: =>
     if @state.cellEditingEnabled
       @setState(cellEditingEnabled: false)

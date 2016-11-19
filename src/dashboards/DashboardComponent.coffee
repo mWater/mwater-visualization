@@ -47,6 +47,10 @@ module.exports = class DashboardComponent extends React.Component
       editing: LayoutManager.createLayoutManager(props.design.layout).isEmpty(props.design.items) 
     }
 
+  # Get the values of the quick filters
+  getQuickfilterValues: =>
+    return @state.quickfiltersValues or []
+
   componentWillReceiveProps: (nextProps) ->
     undoStack = @state.undoStack
 
