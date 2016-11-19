@@ -32,27 +32,8 @@ module.exports = class QuickfilterCompiler
       if not value
         continue
 
-      # Get type of expr
-      type = new ExprUtils(@schema).getExprType(item.expr)
-
-      if type in ['enum', 'text']
-        # Create simple = expression
-        filterExpr = {
-          type: "op"
-          op: "="
-          table: item.expr.table
-          exprs: [
-            item.expr
-            { type: "literal", valueType: "enum", value: value }
-          ]
-        }
-      else if type in ['date', 'datetime']
-        filterExpr = {
-          type: "op"
-          op: value.op
-          table: item.expr.table
-          exprs: [item.expr].concat(value.exprs)
-        }
+      # Compile to boolean expression
+      filterExpr = @compileToFilterExpr(item.expr, value)
 
       jsonql = new ExprCompiler(@schema).compileExpr(expr: filterExpr, tableAlias: "{alias}")
       # Only keep if compiles to something
@@ -62,6 +43,29 @@ module.exports = class QuickfilterCompiler
       filters.push({
         table: item.expr.table
         jsonql: jsonql
-        })
+      })
 
     return filters
+
+  compileToFilterExpr: (expr, value) ->
+    # Get type of expr
+    type = new ExprUtils(@schema).getExprType(expr)
+
+    if type in ['enum', 'text']
+      # Create simple = expression
+      return {
+        type: "op"
+        op: "="
+        table: expr.table
+        exprs: [
+          expr
+          { type: "literal", valueType: "enum", value: value }
+        ]
+      }
+    else if type in ['date', 'datetime']
+      return {
+        type: "op"
+        op: value.op
+        table: expr.table
+        exprs: [expr].concat(value.exprs)
+      }

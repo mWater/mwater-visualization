@@ -12,6 +12,7 @@ TextWidget = require '../text/TextWidget'
 module.exports = class LayeredChartViewComponent extends React.Component
   @propTypes: 
     schema: React.PropTypes.object.isRequired
+    dataSource: React.PropTypes.object.isRequired
     design: React.PropTypes.object.isRequired
     data: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func
