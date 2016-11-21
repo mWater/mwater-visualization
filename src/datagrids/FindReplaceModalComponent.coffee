@@ -195,17 +195,23 @@ module.exports = class FindReplaceModalComponent extends React.Component
 
     H.div null,
       H.div key: "replace", className: "form-group",
-        H.label null, "Replace: "
-        H.select value: @state.replaceColumn or "", onChange: ((ev) => @setState(replaceColumn: ev.target.value)), className: "form-control",
-          H.option key: "_none", value: "", "Select..."
-          _.map(replaceColumnOptions, (option) => H.option(key: option.value, value: option.value, option.label))
+        H.label null, "Column with data to replace: "
+        R ReactSelect,
+          options: replaceColumnOptions
+          clearable: false
+          value: @state.replaceColumn
+          onChange: (value) => @setState(replaceColumn: value)
+          placeholder: "Select Column..."
+        # H.select value: @state.replaceColumn or "", onChange: ((ev) => @setState(replaceColumn: ev.target.value)), className: "form-control",
+        #   H.option key: "_none", value: "", "Select..."
+        #   _.map(replaceColumnOptions, (option) => H.option(key: option.value, value: option.value, option.label))
 
       if @state.replaceColumn
         # Get expr of replace column
         replaceExpr = _.findWhere(@props.design.columns, id: @state.replaceColumn).expr
 
         H.div key: "with", className: "form-group",
-          H.label null, "With: "
+          H.label null, "Value to replace data with: "
           R ExprComponent,
             schema: @props.schema
             dataSource: @props.dataSource
@@ -216,24 +222,22 @@ module.exports = class FindReplaceModalComponent extends React.Component
             enumValues: exprUtils.getExprEnumValues(replaceExpr)
             idTable: exprUtils.getExprIdTable(replaceExpr)
             preferLiteral: true
-            placeholder: "Blank"
+            placeholder: "(Blank)"
 
-      if @state.replaceColumn
-        H.div key: "condition", className: "form-group",
-          H.label null, "In rows that: "
-          R ExprComponent,
-            schema: @props.schema
-            dataSource: @props.dataSource
-            table: @props.design.table
-            value: @state.conditionExpr
-            onChange: (value) => @setState(conditionExpr: value)
-            types: ["boolean"]
-            placeholder: "All Rows"
+      H.div key: "condition", className: "form-group",
+        H.label null, "Only in rows that (optional):"
+        R ExprComponent,
+          schema: @props.schema
+          dataSource: @props.dataSource
+          table: @props.design.table
+          value: @state.conditionExpr
+          onChange: (value) => @setState(conditionExpr: value)
+          types: ["boolean"]
+          placeholder: "All Rows"
 
-      if @state.replaceColumn
-        H.div key: "preview",
-          H.h4 null, "Preview"
-          @renderPreview()
+      H.div key: "preview",
+        H.h4 null, "Preview"
+        @renderPreview()
 
   render: ->
     if not @state.open
