@@ -204,7 +204,9 @@ module.exports = class DatagridViewComponent extends React.Component
   renderCell: (column, columnIndex, exprType, cellProps) =>
     # If rendering placeholder row
     if cellProps.rowIndex >= @state.rows.length
-      @loadMoreRows()
+      # Load next tick as cannot update while rendering
+      _.defer () =>
+        @loadMoreRows()
       return R Cell, cellProps,
         H.i className: "fa fa-spinner fa-spin"
 
