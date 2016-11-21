@@ -37,6 +37,8 @@ module.exports = class FindReplaceModalComponent extends React.Component
     # Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
     updateValue:  React.PropTypes.func
 
+    onUpdate: React.PropTypes.func      # Called when values have been updated
+
   constructor: (props) ->
     super
     @state = {
@@ -113,7 +115,7 @@ module.exports = class FindReplaceModalComponent extends React.Component
 
         if not _.all(canEdits)
           @setState(progress: null)
-          alert("You not have permission to replace all values")
+          alert("You do not have permission to replace all values")
           return
 
         # Confirm
@@ -142,6 +144,7 @@ module.exports = class FindReplaceModalComponent extends React.Component
 
           alert("Success")
           @setState(progress: null, open: false)
+          @props.onUpdate?()
 
   renderPreview: ->
     exprUtils = new ExprUtils(@props.schema)

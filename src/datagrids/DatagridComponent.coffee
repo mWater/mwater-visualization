@@ -151,6 +151,9 @@ module.exports = class DatagridComponent extends React.Component
       filters: filters
       canEditValue: @props.canEditValue
       updateValue: @props.updateValue
+      onUpdate: =>
+        # Reload
+        @datagridView?.reload()
 
   render: ->
     # Compile quickfilters
@@ -174,6 +177,7 @@ module.exports = class DatagridComponent extends React.Component
 
             if not new DatagridUtils(@props.schema).validateDesign(design)
               R DatagridViewComponent, {
+                ref: (view) => @datagridView = view
                 width: size.width
                 height: size.height
                 pageSize: 100
