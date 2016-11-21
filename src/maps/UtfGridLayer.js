@@ -54,8 +54,7 @@ function ajax(url, cb) {
 	request.send();
 };
 
-module.exports = L.Class.extend({
-	includes: L.Mixin.Events,
+module.exports = L.Layer.extend({
 	options: {
 		subdomains: 'abc',
 
@@ -194,6 +193,9 @@ module.exports = L.Class.extend({
 			return;
 		}
 
+		// Round down for fractional zooms
+		zoom = Math.floor(zoom);
+
 		var nwTilePoint = new L.Point(
 				Math.floor(bounds.min.x / tileSize),
 				Math.floor(bounds.min.y / tileSize)),
@@ -222,6 +224,12 @@ module.exports = L.Class.extend({
 		}
 	},
 
+	_getSubdomain: function (x, y) {
+		var index = Math.abs(x + y) % this.options.subdomains.length;
+		return this.options.subdomains[index];
+	},
+
+
 	_loadTileP: function (zoom, x, y) {
 		var head = document.getElementsByTagName('head')[0],
 		    key = zoom + '_' + x + '_' + y,
@@ -230,7 +238,7 @@ module.exports = L.Class.extend({
 		    self = this;
 
 		var url = L.Util.template(this._url, L.Util.extend({
-			s: L.TileLayer.prototype._getSubdomain.call(this, { x: x, y: y }),
+			s: this._getSubdomain(x, y),
 			z: zoom,
 			x: x,
 			y: y,
@@ -252,7 +260,7 @@ module.exports = L.Class.extend({
 
 	_loadTile: function (zoom, x, y) {
 		var url = L.Util.template(this._url, L.Util.extend({
-			s: L.TileLayer.prototype._getSubdomain.call(this, { x: x, y: y }),
+	  	s: this._getSubdomain(x, y),
 			z: zoom,
 			x: x,
 			y: y

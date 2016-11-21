@@ -54,7 +54,7 @@ module.exports = class LegendComponent extends React.Component
       bottom: 35
       maxHeight: '85%'
       overflowY: 'auto'
-      zIndex: 9
+      zIndex: 1000
       fontSize: 12
     }
 
