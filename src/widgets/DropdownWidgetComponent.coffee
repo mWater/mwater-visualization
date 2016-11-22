@@ -30,6 +30,7 @@ module.exports = class DropdownWidgetComponent extends React.Component
       right: 5
       top: 5
       cursor: "pointer"
+      zIndex: 10000
     }
 
     elem = H.div style: dropdownStyle, "data-toggle": "dropdown",

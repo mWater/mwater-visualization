@@ -111,12 +111,6 @@ module.exports = class DashboardComponent extends React.Component
     alert("Upgrade completed. Some widgets may need to be resized. Click Undo to revert back to old dashboard style.")
 
   renderEditingSwitch: ->
-    # H.a key: "edit", className: "btn btn-link btn-sm", onClick: @handleToggleEditing,
-    #   if @state.editing
-    #     H.i className: "fa fa-fw fa-check-square"
-    #   else
-    #     H.i className: "fa fa-fw fa-square-o"
-    #   if @state.editing then " Editing" else " Edit Dashboard"
     H.a key: "edit", className: "btn btn-primary btn-sm #{if @state.editing then "active" else ""}", onClick: @handleToggleEditing,
       H.span(className: "glyphicon glyphicon-pencil")
       if @state.editing then " Editing" else " Edit"
