@@ -46,8 +46,23 @@ module.exports = class DatagridComponent extends React.Component
     @state = {
       editingDesign: null   # Design being edited
       cellEditingEnabled: false  # True if cells can be edited directly
+      quickfiltersHeight: null   # Height of quickfilters
       quickfiltersValues: null
     }
+
+  componentDidMount: -> 
+    @updateHeight()
+
+  componentDidUpdate: ->
+    @updateHeight()
+
+  updateHeight: ->
+    # Calculate quickfilters height
+    if @refs.quickfilters 
+      if @state.quickfiltersHeight != @refs.quickfilters.offsetHeight
+        @setState(quickfiltersHeight: @refs.quickfilters.offsetHeight)
+    else
+      @setState(quickfiltersHeight: 0)
 
   # Get the values of the quick filters
   getQuickfilterValues: =>
@@ -112,7 +127,7 @@ module.exports = class DatagridComponent extends React.Component
       @props.titleElem
 
   renderQuickfilter: ->
-    H.div style: { position: "absolute", top: 40, left: 0, right: 0, height: 50 },    
+    H.div style: { position: "absolute", top: 40, left: 0, right: 0 }, ref: "quickfilters",
       R QuickfiltersComponent, {
         design: @props.design.quickfilters
         schema: @props.schema
@@ -161,7 +176,7 @@ module.exports = class DatagridComponent extends React.Component
 
     hasQuickfilters = @props.design.quickfilters?[0]?
 
-    return H.div style: { width: "100%", height: "100%", position: "relative", paddingTop: (if hasQuickfilters then 90 else 40) },
+    return H.div style: { width: "100%", height: "100%", position: "relative", paddingTop: 40 + (@state.quickfiltersHeight or 0) },
       @renderTitleBar(filters)
       @renderQuickfilter()
 

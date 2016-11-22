@@ -44,8 +44,23 @@ module.exports = class DashboardComponent extends React.Component
     @state = { 
       undoStack: new UndoStack().push(props.design) 
       quickfiltersValues: null
+      quickfiltersHeight: null   # Height of quickfilters
       editing: LayoutManager.createLayoutManager(props.design.layout).isEmpty(props.design.items) 
     }
+
+  componentDidMount: -> 
+    @updateHeight()
+
+  componentDidUpdate: ->
+    @updateHeight()
+
+  updateHeight: ->
+    # Calculate quickfilters height
+    if @refs.quickfilters 
+      if @state.quickfiltersHeight != @refs.quickfilters.offsetHeight
+        @setState(quickfiltersHeight: @refs.quickfilters.offsetHeight)
+    else
+      @setState(quickfiltersHeight: 0)
 
   # Get the values of the quick filters
   getQuickfilterValues: =>
@@ -190,7 +205,7 @@ module.exports = class DashboardComponent extends React.Component
       @props.titleElem
 
   renderQuickfilter: ->
-    H.div style: { position: "absolute", top: 40, left: 0, right: 0, height: 50 },    
+    H.div style: { position: "absolute", top: 40, left: 0, right: 0 }, ref: "quickfilters",
       R QuickfiltersComponent, {
         design: @props.design.quickfilters
         schema: @props.schema
@@ -207,9 +222,7 @@ module.exports = class DashboardComponent extends React.Component
     # Compile quickfilters
     filters = new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues, @props.quickfilterLocks)
 
-    hasQuickfilters = @props.design.quickfilters?[0]?
-
-    H.div key: "view", style: { height: "100%", paddingTop: (if hasQuickfilters then 90 else 40), position: "relative" },
+    H.div key: "view", style: { height: "100%", paddingTop: 40 + (@state.quickfiltersHeight or 0), position: "relative" },
       @renderTitleBar()
       @renderQuickfilter()
       if @props.onDesignChange?
