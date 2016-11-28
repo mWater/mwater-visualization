@@ -17,7 +17,8 @@ module.exports = class AdminScopeAndDetailLevelComponent extends React.Component
 
   handleScopeChange: (scope, scopeLevel) =>
     if scope
-      @props.onScopeAndDetailLevelChange(scope, scopeLevel, scopeLevel + 1)
+      # Detail level will be set by DetailLevelSelectComponent
+      @props.onScopeAndDetailLevelChange(scope, scopeLevel, null)
     else
       @props.onScopeAndDetailLevelChange(null, null, 0)
 

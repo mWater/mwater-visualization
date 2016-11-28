@@ -64,8 +64,15 @@ module.exports = class DetailLevelSelectComponent extends React.Component
         if err
           alert("Error loading detail levels")
           return 
-        console.log rows
-        options = _.map(_.filter(rows, (r) => r.level > props.scopeLevel), (r) -> { value: r.level, label: r.name })
+
+        # Only greater than current scope level
+        rows = _.filter(rows, (r) => r.level > props.scopeLevel)
+
+        # If detail level set (defaults to zero), and has an option, auto-select
+        if @props.detailLevel <= @props.scopeLevel and rows.length > 0
+          @props.onChange(rows[0].level)
+
+        options = _.map(rows, (r) -> { value: r.level, label: r.name })
         @setState(options: options)
 
   render: ->
