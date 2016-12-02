@@ -24,6 +24,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 var L = require("leaflet");
 
+// Store last absorbed (data != null) event to prevent multiple layers from triggering click event
+var absorbedEvent = null;
+
 function ajax(url, cb) {
 	// the following is from JavaScript: The Definitive Guide
 	// and https://developer.mozilla.org/en-US/docs/DOM/XMLHttpRequest/Using_XMLHttpRequest_in_IE6
@@ -120,7 +123,18 @@ module.exports = L.Layer.extend({
 			return;
 		}
 
-		this.fire('click', this._objectForEvent(e));
+		// Get object for event
+		obj = this._objectForEvent(e);
+
+		// Ignore if event has been dealt with
+		if (e === absorbedEvent)
+			return;
+
+		// Store event if absorbed
+		if (obj.data !== null)
+			absorbedEvent = e;
+
+		this.fire('click', obj);
 	},
 	_move: function (e) {
 		var zoom = this._map.getZoom();

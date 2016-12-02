@@ -36,6 +36,9 @@ module.exports = class ImageUploaderComponent extends React.Component
     @setState(uid: id)
 
   uploadProgress: (e) =>
+    if not @progressBar
+      return
+
     if e.lengthComputable
       percentComplete = Math.round(e.loaded * 100 / e.total)
       @progressBar.style.width = "#{percentComplete}%"

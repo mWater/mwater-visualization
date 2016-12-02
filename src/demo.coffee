@@ -34,11 +34,11 @@ $ ->
     # React.createElement(RichTextPane)
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "a855eb0587d845d3ac27aed03c463976", share: "817c76088c7649ec8cc0b8193e547a09")
-    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDirectMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(BlocksDesignerComponent, renderBlock: [])
      # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
@@ -228,7 +228,7 @@ class MWaterDirectMapPane extends React.Component
     super
 
     @state = {
-      design: badColorsMap2
+      design: doubleClickMap
       extraTables: []
     }
 
@@ -254,6 +254,7 @@ class MWaterDirectMapPane extends React.Component
           design: @state.design
           mapDataSource: mapDataSource
           onDesignChange: @handleDesignChange
+          onRowClick: (tableId, rowId) => console.log "Click #{tableId}:#{rowId}"
           titleElem: "Sample"
         })
     )
@@ -4064,4 +4065,81 @@ mapAndChartDashboard = {
       "label": null
     }
   ]
+}
+
+doubleClickMap = {
+  "baseLayer": "cartodb_positron",
+  "layerViews": [
+    {
+      "id": "8e22dc94-049a-4b20-85dc-70429328eb68",
+      "name": "Untitled Layer",
+      "desc": "",
+      "type": "Markers",
+      "visible": true,
+      "opacity": 1,
+      "design": {
+        "axes": {
+          "geometry": {
+            "expr": {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "location"
+            }
+          }
+        },
+        "color": "#b71c1c",
+        "filter": {
+          "type": "op",
+          "table": "entities.water_point",
+          "op": "within",
+          "exprs": [
+            {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "admin_region"
+            },
+            {
+              "type": "literal",
+              "valueType": "id",
+              "idTable": "admin_regions",
+              "value": "316f16a2-89e1-46b4-8a4b-561478997000"
+            }
+          ]
+        },
+        "table": "entities.water_point"
+      }
+    },
+    {
+      "id": "8397c6b6-9d22-493c-b28a-a9604d977e38",
+      "name": "Untitled Layer",
+      "desc": "",
+      "type": "Markers",
+      "visible": true,
+      "opacity": 1,
+      "design": {
+        "axes": {
+          "geometry": {
+            "expr": {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "location"
+            }
+          }
+        },
+        "color": "#0088FF",
+        "filter": null,
+        "table": "entities.water_point"
+      }
+    }
+  ],
+  "filters": {
+    "entities.water_point": null
+  },
+  "bounds": {
+    "n": -1.71348600000001,
+    "e": 33.775625,
+    "s": -3.4254440000000197,
+    "w": 32.045458
+  },
+  "autoBounds": true
 }
