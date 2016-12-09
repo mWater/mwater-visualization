@@ -21,6 +21,7 @@ module.exports = class MWaterServerLayer extends Layer
   #     design: design of layer
   #     schema: schema to use
   #     dataSource: data source to use
+  #     filters: compiled filters to apply to the popup
   # 
   # Returns:
   #   null/undefined to do nothing

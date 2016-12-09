@@ -131,6 +131,7 @@ module.exports = class MapViewComponent extends React.Component
       dataSource: @props.dataSource
       layerDataSource: @props.mapDataSource.getLayerDataSource(layerViewId) 
       scopeData: if @props.scope?.data?.layerViewId == layerViewId then @props.scope.data.data
+      filters: @getCompiledFilters()
     })
 
     if not results

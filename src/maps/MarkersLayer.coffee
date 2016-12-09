@@ -191,6 +191,7 @@ module.exports = class MarkersLayer extends Layer
   #     dataSource: data source to use
   #     layerDataSource: layer data source
   #     scopeData: current scope data if layer is scoping
+  #     filters: compiled filters to apply to the popup
   #
   # Returns:
   #   null/undefined
@@ -253,7 +254,7 @@ module.exports = class MarkersLayer extends Layer
               ]}
             }
 
-            filters = [filter]
+            filters = clickOptions.filters.concat([filter])
 
             # Get data source for widget
             widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(clickOptions.design, options.id)

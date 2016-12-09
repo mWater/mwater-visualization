@@ -28,6 +28,7 @@ module.exports = class Layer
   #     dataSource: data source to use
   #     layerDataSource: layer data source
   #     scopeData: current scope data if layer is scoping
+  #     filters: compiled filters to apply to the popup
   # 
   # Returns:
   #   null/undefined 
