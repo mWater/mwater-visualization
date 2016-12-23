@@ -35,22 +35,35 @@ describe "ImplicitFilterBuilder", ->
         table: "t2"
         jsonql: {
           type: "op"
-          op: "exists"
+          op: "or"
           exprs: [
-            { 
-              type: "query"
-              selects: []
-              from: { type: "table", table: "t1", alias: "explicit" }
-              where: {
-                type: "op"
-                op: "and"
-                exprs: [
-                  # Join
-                  { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "explicit", column: "primary"}, { type: "field", tableAlias: "{alias}", column: "t1"}]}
-                  # Filter
-                  { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "explicit", column: "number"}, 3] }
-                ]
-              }
+            {
+              type: "op"
+              op: "exists"
+              exprs: [
+                { 
+                  type: "query"
+                  selects: []
+                  from: { type: "table", table: "t1", alias: "explicit" }
+                  where: {
+                    type: "op"
+                    op: "and"
+                    exprs: [
+                      # Join
+                      { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "explicit", column: "primary"}, { type: "field", tableAlias: "{alias}", column: "t1"}]}
+                      # Filter
+                      { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "explicit", column: "number"}, 3] }
+                    ]
+                  }
+                }
+              ]
+            }
+            {
+              type: "op"
+              op: "is null"
+              exprs: [
+                { type: "field", tableAlias: "{alias}", column: "t1" }
+              ]
             }
           ]
         }

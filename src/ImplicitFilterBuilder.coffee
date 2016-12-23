@@ -53,26 +53,39 @@ module.exports = class ImplicitFilterBuilder
 
       joinColumn = @schema.getColumn(join.table, join.column)
 
-      # Create where exists with join to parent table
+      # Create where exists with join to parent table (filtered) OR no parent exists
       implicitFilter = {
         table: join.table
         jsonql: {
           type: "op"
-          op: "exists"
+          op: "or"
           exprs: [
             {
-              type: "query"
-              # select null
-              selects: []
-              from: { type: "table", table: joinColumn.join.toTable, alias: "explicit" }
-              where: {
-                type: "op"
-                op: "and"
-                exprs: [                  
-                  # Join two tables
-                  exprCompiler.compileJoin(joinColumn.join, "{alias}", "explicit")
-                ]
-              }
+              type: "op"
+              op: "exists"
+              exprs: [
+                {
+                  type: "query"
+                  # select null
+                  selects: []
+                  from: { type: "table", table: joinColumn.join.toTable, alias: "explicit" }
+                  where: {
+                    type: "op"
+                    op: "and"
+                    exprs: [                  
+                      # Join two tables
+                      exprCompiler.compileJoin(joinColumn.join, "{alias}", "explicit")
+                    ]
+                  }
+                }
+              ]
+            }
+            {
+              type: "op"
+              op: "is null"
+              exprs: [
+                exprCompiler.compileExpr(expr: { type: "field", table: join.table, column: join.column }, tableAlias: "{alias}")
+              ]
             }
           ]
         }
@@ -80,7 +93,7 @@ module.exports = class ImplicitFilterBuilder
 
       # Add filters
       for parentFilter in parentFilters
-        implicitFilter.jsonql.exprs[0].where.exprs.push(injectTableAlias(parentFilter.jsonql, "explicit"))
+        implicitFilter.jsonql.exprs[0].exprs[0].where.exprs.push(injectTableAlias(parentFilter.jsonql, "explicit"))
 
       implicitFilters.push(implicitFilter)
 
