@@ -47,7 +47,7 @@ module.exports = class ImplicitFilterBuilder
 
     # For each join, find filters on parent table
     for join in joins
-      parentFilters = _.filter(filters, (f) => f.table == @schema.getColumn(join.table, join.column).join.toTable)
+      parentFilters = _.filter(filters, (f) => f.table == @schema.getColumn(join.table, join.column).join.toTable and f.jsonql)
       if parentFilters.length == 0
         continue
 
