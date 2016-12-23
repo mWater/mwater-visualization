@@ -73,8 +73,8 @@ module.exports = class TextWidget extends Widget
       }
 
       # Get relevant filters
-      filters = _.where(filters or [], table: table)
-      whereClauses = _.map(filters, (f) -> injectTableAlias(f.jsonql, "main")) 
+      relevantFilters = _.where(filters or [], table: table)
+      whereClauses = _.map(relevantFilters, (f) -> injectTableAlias(f.jsonql, "main")) 
 
       whereClauses = _.compact(whereClauses)
 
