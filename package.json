@@ -9,8 +9,7 @@
   },
   "browserify": {
     "transform": [
-      "coffeeify",
-      "brfs"
+      "coffeeify"
     ]
   },
   "style": "lib/index.css",
