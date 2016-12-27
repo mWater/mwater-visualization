@@ -40,6 +40,7 @@ $ ->
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDirectMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+    # React.createElement(WaterOrgDashboardPane, apiUrl: "http://localhost:1235/mwater/")
     # React.createElement(BlocksDesignerComponent, renderBlock: [])
      # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
 #     React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
@@ -299,6 +300,50 @@ class MWaterDatagridPane extends React.Component
               callback(null)
             , 500
 
+
+class WaterOrgDashboardPane extends React.Component
+  constructor: (props) ->
+    super
+
+    @state = {
+      design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" }
+    }
+
+  componentWillMount: ->
+    url = @props.apiUrl + "jsonql/schema"
+    $.getJSON url, (schemaJson) =>
+      schema = new Schema(schemaJson)
+      dataSource = new MWaterDataSource(@props.apiUrl, null, { serverCaching: false, localCaching: true })
+
+      @setState(schema: schema, dataSource: dataSource)
+    .fail (xhr) =>
+      console.log xhr.responseText
+      throw new Error("Cannot connect")
+
+  handleDesignChange: (design) =>
+    @setState(design: design)
+    console.log JSON.stringify(design, null, 2)
+
+  render: ->
+    if not @state.schema
+      return H.div null, "Loading..."
+
+    dashboardDataSource = new DirectDashboardDataSource({
+      apiUrl: @props.apiUrl
+      design: @state.design
+      schema: @state.schema
+      dataSource: @state.dataSource
+    })
+
+    H.div style: { height: "100%" },
+      React.createElement(visualization.DashboardComponent, {
+        schema: @state.schema
+        dataSource: @state.dataSource
+        dashboardDataSource: dashboardDataSource
+        design: @state.design
+        onDesignChange: @handleDesignChange
+        titleElem: "Sample"
+      })
 
 # class MapPane extends React.Component
 #   constructor: (props) ->

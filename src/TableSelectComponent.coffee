@@ -1,6 +1,7 @@
 React = require 'react'
 ui = require './UIComponents'
 ExprUtils = require("mwater-expressions").ExprUtils
+H = React.DOM
 
 module.exports = class TableSelectComponent extends React.Component
   @propTypes:
@@ -26,6 +27,6 @@ module.exports = class TableSelectComponent extends React.Component
             name: ExprUtils.localizeString(table.name, @context.locale)
             desc: ExprUtils.localizeString(table.desc, @context.locale)
             onClick: () =>
-              onClose() # Close popover first
-              onChange(table.id)
+              onClose()
+              @props.onChange(table.id)
           }))
