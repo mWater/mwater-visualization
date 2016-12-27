@@ -5,7 +5,6 @@ exports.UndoStack = require './UndoStack'
 
 exports.DashboardComponent = require './dashboards/DashboardComponent'
 exports.DashboardViewComponent = require './dashboards/DashboardViewComponent'
-exports.TabbedDashboardComponent = require './dashboards/TabbedDashboardComponent'
 
 exports.BingLayer = require './maps/BingLayer'
 exports.UtfGridLayer = require './maps/UtfGridLayer'
