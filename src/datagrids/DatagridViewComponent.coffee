@@ -40,7 +40,7 @@ module.exports = class DatagridViewComponent extends React.Component
     # Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
     updateCell:  React.PropTypes.func
 
-    # Called when row is double-clicked with (tableId, rowId)
+    # Called when row is double-clicked with (tableId, rowId, rowIndex)
     onRowDoubleClick: React.PropTypes.func
 
   @defaultProps:
@@ -202,7 +202,7 @@ module.exports = class DatagridViewComponent extends React.Component
 
   handleRowDoubleClick: (ev, rowIndex) =>
     if @props.onRowDoubleClick? and @state.rows[rowIndex].id
-      @props.onRowDoubleClick(@props.design.table, @state.rows[rowIndex].id)
+      @props.onRowDoubleClick(@props.design.table, @state.rows[rowIndex].id, rowIndex)
 
   # Render a single cell. exprType is passed in for performance purposes and is calculated once per column
   renderCell: (column, columnIndex, exprType, cellProps) =>
