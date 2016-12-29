@@ -114,18 +114,18 @@ class MarkdownWidgetViewComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired # Design of chart
 
-    width: React.PropTypes.number.isRequired
-    height: React.PropTypes.number.isRequired
-    standardWidth: React.PropTypes.number.isRequired
+    width: React.PropTypes.number
+    height: React.PropTypes.number
+    standardWidth: React.PropTypes.number
 
   render: ->
     # Render in a standard width container and then scale up to ensure that widget always looks consistent
     H.div 
       style: { 
         width: @props.standardWidth
-        height: @props.height * (@props.standardWidth / @props.width)
-        transform: "scale(#{@props.width/@props.standardWidth}, #{@props.width/@props.standardWidth})"
-        transformOrigin: "0 0"
+        height: if @props.height and @props.standardWidth and @props.width then @props.height * (@props.standardWidth / @props.width)
+        transform: if @props.height and @props.standardWidth and @props.width then "scale(#{@props.width/@props.standardWidth}, #{@props.width/@props.standardWidth})"
+        transformOrigin: if @props.height and @props.standardWidth and @props.width then "0 0"
       }
       className: "mwater-visualization-markdown"
       dangerouslySetInnerHTML: { __html: markdown.toHTML(@props.design.markdown or "") }
