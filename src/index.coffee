@@ -35,6 +35,7 @@ exports.AxisBuilder = require './axes/AxisBuilder'
 exports.ColorPaletteCollectionComponent = require './axes/ColorPaletteCollectionComponent'
 
 exports.DatagridComponent = require './datagrids/DatagridComponent'
+exports.DatagridViewComponent = require './datagrids/DatagridViewComponent'
 exports.DatagridUtils = require './datagrids/DatagridUtils'
 
 exports.ServerDashboardDataSource = require './dashboards/ServerDashboardDataSource'
