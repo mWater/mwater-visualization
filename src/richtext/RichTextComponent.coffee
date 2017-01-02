@@ -152,7 +152,7 @@ module.exports = class RichTextComponent extends React.Component
 
   render: ->
     # R ClickOutHandler, onClickOut: @handleClickOut,
-    H.div style: { position: "relative", marginRight: 1 }, # Hack for https://github.com/warrenfalk/react-float-affixed/issues/1
+    H.div style: { position: "relative" }, 
       @renderHtml()
       if @state.focused
         @renderPalette()
