@@ -45,7 +45,7 @@ module.exports = class DashboardComponent extends React.Component
       undoStack: new UndoStack().push(props.design) 
       quickfiltersValues: null
       quickfiltersHeight: null   # Height of quickfilters
-      editing: LayoutManager.createLayoutManager(props.design.layout).isEmpty(props.design.items) 
+      editing: LayoutManager.createLayoutManager(props.design.layout).isEmpty(props.design.items) and props.onDesignChange?
     }
 
   componentDidMount: -> 

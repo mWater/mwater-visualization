@@ -136,7 +136,13 @@ module.exports = class LayeredChartCompiler
         rotated: options.design.transpose
       }
       size: { width: options.width, height: options.height }
-      pie: {  expand: false } # Don't expand/contract
+      pie: { 
+        label: {
+          format: if options.design.labels then (value, ratio, id) => "#{d3.format(",")(value)} (#{d3.format('.1%')(ratio)})"
+        }
+        expand: false # Don't expand/contract
+      } 
+
       transition: { duration: 0 } # Transitions interfere with scoping
     }
 
