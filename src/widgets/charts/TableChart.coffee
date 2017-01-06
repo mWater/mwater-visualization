@@ -225,7 +225,7 @@ module.exports = class TableChart extends Chart
     return React.createElement(TableChartViewComponent, props)
 
   createDataTable: (design, schema, data, locale) ->
-    exprUtils = new ExprUtils(schema: schema)
+    exprUtils = new ExprUtils(schema)
 
     renderHeaderCell = (column) =>
       column.headerText or exprUtils.summarizeExpr(column.textAxis?.expr, locale)
