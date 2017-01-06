@@ -225,17 +225,17 @@ module.exports = class TableChart extends Chart
     return React.createElement(TableChartViewComponent, props)
 
   createDataTable: (design, schema, data, locale) ->
-    axisBuilder = new AxisBuilder(schema: schema)
+    exprUtils = new ExprUtils(schema: schema)
 
     renderHeaderCell = (column) =>
-      column.headerText or axisBuilder.summarizeAxis(column.textAxis, locale)
+      column.headerText or exprUtils.summarizeExpr(column.textAxis?.expr, locale)
 
     header = _.map(design.columns, renderHeaderCell)
     table = [header]
     renderRow = (record) =>
       renderCell = (column, columnIndex) =>
         value = record["c#{columnIndex}"]
-        return axisBuilder.formatValue(column.textAxis, value, locale)
+        return exprUtils.stringifyExprLiteral(column.textAxis?.expr, value, locale)
 
       return _.map(design.columns, renderCell)
 
