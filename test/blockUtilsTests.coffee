@@ -73,6 +73,29 @@ describe "blockUtils", ->
       ]
     })
 
+  it "simplifies vertical inside root", ->
+    design = {
+      id: "root"
+      type: "root"
+      blocks: [
+        { id: "a", type: "a" }
+        { id: "b", type: "b" }
+        { id: "c", type: "vertical", blocks: [{ id: "d", type: "d" }, { id: "e", type: "e" }] }
+      ]
+    }
+
+    newDesign = blockUtils.cleanBlock(design)
+    compare(newDesign, {
+      id: "root"
+      type: "root"
+      blocks: [
+        { id: "a", type: "a" }
+        { id: "b", type: "b" }
+        { id: "d", type: "d" }
+        { id: "e", type: "e" }
+      ]
+    })
+
 
   it "removes empty vertical"
 

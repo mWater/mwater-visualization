@@ -124,6 +124,17 @@ exports.cleanBlock = (rootBlock) ->
     if blocks.length == 1 and rootBlock.type != "root"
       return blocks[0]
 
+    # Simplify nested blocks of same type (e.g. vertical inside root becomes a flat list)
+    blocks = _.flatten(_.map(blocks, (b) -> 
+      if b.type == "horizontal" and rootBlock.type == "horizontal"
+        return b.blocks
+
+      if b.type == "vertical" and rootBlock.type in ["root", "vertical"]
+        return b.blocks
+        
+      return b
+      ))
+
     # TODO # Truncate weights
     # weights = null
     # if rootBlock.type == "horizontal" and rootBlock.weights

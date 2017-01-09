@@ -50,6 +50,7 @@ class BlocksDisplayComponent extends React.Component
 
   handleBlockUpdate: (block) =>
     items = blockUtils.updateBlock(@props.items, block)
+    items = blockUtils.cleanBlock(items)
     @props.onItemsChange(items)
 
   renderBlock: (block) =>
