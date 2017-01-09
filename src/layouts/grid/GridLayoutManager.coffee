@@ -3,7 +3,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 LayoutManager = require '../LayoutManager'
 LegoLayoutEngine = require './LegoLayoutEngine'
 
@@ -13,7 +13,7 @@ module.exports = class GridLayoutManager extends LayoutManager
 
     createWidgetItem = (type, design) ->
       # Add unique id
-      return () -> { id: uuid.v4(), widget: { type: type, design: design }, bounds: { x: 0, y: 0, width: width/3, height: width/4 } } 
+      return () -> { id: uuid(), widget: { type: type, design: design }, bounds: { x: 0, y: 0, width: width/3, height: width/4 } } 
 
     H.div className: "mwater-visualization-palette", style: { position: "absolute", top: 0, left: 0, bottom: 0, width: 185 },
       R PaletteItemComponent, 
@@ -112,7 +112,7 @@ module.exports = class GridLayoutManager extends LayoutManager
       }
     }
 
-    id = uuid.v4()
+    id = uuid()
 
     # Add item
     items = _.clone(items)

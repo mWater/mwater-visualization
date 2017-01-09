@@ -1,7 +1,7 @@
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 
 injectTableAlias = require('mwater-expressions').injectTableAlias
 Chart = require './Chart'
@@ -44,7 +44,7 @@ module.exports = class TableChart extends Chart
     # Always have at least one column
     design.columns = design.columns or []
     if design.columns.length == 0
-      design.columns.push({id: uuid.v4()})
+      design.columns.push({id: uuid()})
 
     design.orderings = design.orderings or []
 
@@ -53,7 +53,7 @@ module.exports = class TableChart extends Chart
       column = design.columns[columnId]
 
       if not column.id
-        column.id = uuid.v4()
+        column.id = uuid()
       # Clean textAxis
       column.textAxis = axisBuilder.cleanAxis(axis: column.textAxis, table: design.table, aggrNeed: "optional")
 

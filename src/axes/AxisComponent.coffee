@@ -1,7 +1,7 @@
 React = require 'react'
 H = React.DOM
 R = React.createElement
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
 
 ExprComponent = require("mwater-expressions-ui").ExprComponent
@@ -119,12 +119,12 @@ module.exports = class AxisComponent extends AsyncLoadComponent
       max = @props.value.xform.max
       numBins = @props.value.xform.numBins
 
-      ranges = [{ id: uuid.v4(), maxValue: min, minOpen: false, maxOpen: true }]
+      ranges = [{ id: uuid(), maxValue: min, minOpen: false, maxOpen: true }]
       for i in [1..numBins]
         start = (i-1) / numBins * (max - min) + min
         end = (i) / numBins * (max - min) + min
-        ranges.push({ id: uuid.v4(), minValue: start, minOpen: false, maxValue: end, maxOpen: true })
-      ranges.push({ id: uuid.v4(), minValue: max, minOpen: true, maxOpen: true })
+        ranges.push({ id: uuid(), minValue: start, minOpen: false, maxValue: end, maxOpen: true })
+      ranges.push({ id: uuid(), minValue: max, minOpen: true, maxOpen: true })
 
       xform = {
         type: "ranges"

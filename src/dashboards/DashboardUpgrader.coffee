@@ -1,5 +1,5 @@
 _ = require 'lodash'
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 WidgetFactory = require '../widgets/WidgetFactory'
 
 # Upgrades old dashboards to new ones (grid -> blocks)
@@ -45,7 +45,7 @@ module.exports = class DashboardUpgrader
       # Convert
       if lineItems.length > 1
         newItems.blocks.push({
-          id: uuid.v4()
+          id: uuid()
           type: "horizontal"
           blocks: _.map(lineItems, (li) -> convertBlock(li, items[li]))
         })

@@ -54,7 +54,8 @@
     "react-select": "^0.9.1",
     "save-svg-as-png": "^1.0.3",
     "shallowequal": "^0.2.2",
-    "update-object": "^1.0.0"
+    "update-object": "^1.0.0",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "brfs": "^1.4.1",

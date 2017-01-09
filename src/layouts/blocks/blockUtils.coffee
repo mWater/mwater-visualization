@@ -1,5 +1,5 @@
 _ = require 'lodash'
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 
 # When block is dropped on it. side is top, left, bottom, right)
 # returns new root block
@@ -28,10 +28,10 @@ exports.dropBlock = (rootBlock, sourceBlock, targetBlock, side) ->
           blocks.splice(index + 1, 0, sourceBlock)
 
         when "left"
-          blocks.splice(index, 1, { id: uuid.v4(), type: "horizontal", blocks: [sourceBlock, targetBlock] })
+          blocks.splice(index, 1, { id: uuid(), type: "horizontal", blocks: [sourceBlock, targetBlock] })
 
         when "right"
-          blocks.splice(index, 1, { id: uuid.v4(), type: "horizontal", blocks: [targetBlock, sourceBlock] })
+          blocks.splice(index, 1, { id: uuid(), type: "horizontal", blocks: [targetBlock, sourceBlock] })
 
       return _.extend({}, rootBlock, blocks: blocks)
     else
@@ -60,10 +60,10 @@ exports.dropBlock = (rootBlock, sourceBlock, targetBlock, side) ->
           blocks.splice(index + 1, 0, sourceBlock)
 
         when "top"
-          blocks.splice(index, 1, { id: uuid.v4(), type: "vertical", blocks: [sourceBlock, targetBlock] })
+          blocks.splice(index, 1, { id: uuid(), type: "vertical", blocks: [sourceBlock, targetBlock] })
 
         when "bottom"
-          blocks.splice(index, 1, { id: uuid.v4(), type: "vertical", blocks: [targetBlock, sourceBlock] })
+          blocks.splice(index, 1, { id: uuid(), type: "vertical", blocks: [targetBlock, sourceBlock] })
 
       return _.extend({}, rootBlock, blocks: blocks)
     else

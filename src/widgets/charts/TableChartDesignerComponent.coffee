@@ -2,7 +2,7 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 R = React.createElement
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 
 ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require './../../axes/AxisBuilder'
@@ -42,7 +42,7 @@ module.exports = class TableChartDesignerComponent extends React.Component
 
   handleAddColumn: =>
     columns = @props.design.columns.slice()
-    columns.push({id: uuid.v4()})
+    columns.push({id: uuid()})
     @updateDesign(columns: columns)
 
   renderTable: ->

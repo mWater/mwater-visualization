@@ -2,7 +2,7 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 R = React.createElement
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 
 HTML5Backend = require('react-dnd-html5-backend')
 NestableDragDropContext = require  "react-library/lib/NestableDragDropContext"
@@ -134,7 +134,7 @@ class BlocksDisplayComponent extends React.Component
 
   createBlockItem: (block) ->
     # Add unique id
-    return () -> { block: _.extend({}, block, id: uuid.v4()) }
+    return () -> { block: _.extend({}, block, id: uuid()) }
 
   renderPalette: ->
     H.div key: "palette", style: { width: 185, height: "100%", position: "absolute", top: 0, left: 0 }, 

@@ -3,7 +3,7 @@
 # H = React.DOM
 # visualization_mwater = require './systems/mwater'
 # visualization = require './index'
-# uuid = require 'node-uuid'
+# uuid = require 'uuid'
 
 # class MapDemoComponent extends React.Component
 #   constructor: (props) ->
@@ -54,7 +54,7 @@
 #   }
   
 #   layerViews.push { 
-#     id: uuid.v4()
+#     id: uuid()
 #     name: options.name
 #     visible: options.visible == true
 #     opacity: 1

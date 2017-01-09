@@ -2,7 +2,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 
 ExprUtils = require("mwater-expressions").ExprUtils
 ExprComponent = require("mwater-expressions-ui").ExprComponent
@@ -39,7 +39,7 @@ module.exports = class ExprInsertModalComponent extends React.Component
 
     # Close first to avoid strange effects when mixed with pojoviews
     @setState(open: false, =>
-      item = { type: "expr", id: uuid.v4(), expr: @state.expr, includeLabel: @state.includeLabel, labelText: (if @state.includeLabel then @state.labelText) }
+      item = { type: "expr", id: uuid(), expr: @state.expr, includeLabel: @state.includeLabel, labelText: (if @state.includeLabel then @state.labelText) }
 
       @props.onInsert(item)
     )

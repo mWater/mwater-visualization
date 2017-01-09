@@ -1,7 +1,7 @@
 _ = require 'lodash'
 ItemsHtmlConverter = require './ItemsHtmlConverter'
 ExprUtils = require('mwater-expressions').ExprUtils
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 
 # ItemsHtmlConverter that supports embedded mwater expressions
 
@@ -68,7 +68,7 @@ module.exports = class ExprItemsHtmlConverter extends ItemsHtmlConverter
       for item in items
         if item.type == "expr"
           if takenIds[item.id]
-            item.id = uuid.v4()
+            item.id = uuid()
           takenIds[item.id] = true
 
         if item.items

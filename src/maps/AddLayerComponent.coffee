@@ -3,7 +3,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 LayerFactory = require './LayerFactory'
 
 # Dropdown to add a new layer. 
@@ -22,7 +22,7 @@ module.exports = class AddLayerComponent extends React.Component
 
   handleAddLayer: (newLayer) =>
     layerView = {
-      id: uuid.v4()
+      id: uuid()
       name: newLayer.name
       desc: ""
       type: newLayer.type

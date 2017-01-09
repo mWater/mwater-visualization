@@ -13,7 +13,7 @@ QuickfiltersDesignComponent = require '../quickfilter/QuickfiltersDesignComponen
 
 TableSelectComponent = require('../TableSelectComponent')
 
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 update = require 'update-object'
 
 # Designer for the datagrid. Currenly allows only single-table designs (no subtable rows)
@@ -133,13 +133,13 @@ class ColumnsDesignerComponent extends React.Component
 
   handleAddColumn: =>
     columns = @props.columns.slice()
-    columns.push({ id: uuid.v4(), type: "expr", width: 150 })
+    columns.push({ id: uuid(), type: "expr", width: 150 })
     @props.onColumnsChange(columns)
 
   handleAddIdColumn: =>
     columns = @props.columns.slice()
     # TODO we should display label when available but without breaking Peter's id downloads. Need format field to indicate raw id.
-    columns.push({ id: uuid.v4(), type: "expr", width: 150, expr: { type: "id", table: @props.table }, label: "Unique Id" })
+    columns.push({ id: uuid(), type: "expr", width: 150, expr: { type: "id", table: @props.table }, label: "Unique Id" })
     @props.onColumnsChange(columns)
 
   handleReorder: (elems) =>
@@ -218,7 +218,7 @@ class ColumnDesignerComponent extends React.Component
 
     @props.onColumnChange(_.map(exprUtils.getExprEnumValues(@props.column.expr), (enumVal) =>
       {
-        id: uuid.v4()
+        id: uuid()
         type: "expr"
         width: 150
         expr: {
@@ -236,7 +236,7 @@ class ColumnDesignerComponent extends React.Component
   handleSplitGeometry: =>
     @props.onColumnChange([
       {
-        id: uuid.v4()
+        id: uuid()
         type: "expr"
         width: 150
         expr: {
@@ -247,7 +247,7 @@ class ColumnDesignerComponent extends React.Component
         }
       }      
       {
-        id: uuid.v4()
+        id: uuid()
         type: "expr"
         width: 150
         expr: {
@@ -325,7 +325,7 @@ class DefaultColumnsBuilder
         continue
 
       columns.push({ 
-         id: uuid.v4()
+         id: uuid()
          type: "expr"
          width: 150
          expr: { type: "field", table: table, column: col.id }

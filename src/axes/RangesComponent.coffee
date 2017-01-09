@@ -1,7 +1,7 @@
 React = require 'react'
 H = React.DOM
 R = React.createElement
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 
 update = require 'update-object'
 
@@ -27,7 +27,7 @@ module.exports = class RangesComponent extends React.Component
 
   handleAddRange: =>
     ranges = @props.xform.ranges.slice()
-    ranges.push({ id: uuid.v4(), minOpen: false, maxOpen: true })
+    ranges.push({ id: uuid(), minOpen: false, maxOpen: true })
     @props.onChange(update(@props.xform, { ranges: { $set: ranges }}))
 
   handleRemoveRange: (index) =>

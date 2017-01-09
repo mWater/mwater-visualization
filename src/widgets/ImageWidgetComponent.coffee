@@ -3,7 +3,7 @@ H = React.DOM
 R = React.createElement
 _ = require 'lodash'
 
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 Dropzone = require 'react-dropzone'
 
 AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'

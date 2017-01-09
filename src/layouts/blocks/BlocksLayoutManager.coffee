@@ -2,7 +2,7 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 R = React.createElement
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 
 LayoutManager = require '../LayoutManager'
 
@@ -55,6 +55,6 @@ module.exports = class BlocksLayoutManager extends LayoutManager
   addWidget: (items, widgetType, widgetDesign) ->
     # Add to root block
     items = items or { type: "root", id: "root", blocks: [] }
-    items.blocks.push({ type: "widget", id: uuid.v4(), widgetType: widgetType, design: widgetDesign, aspectRatio: 1.4 })
+    items.blocks.push({ type: "widget", id: uuid(), widgetType: widgetType, design: widgetDesign, aspectRatio: 1.4 })
 
     return items

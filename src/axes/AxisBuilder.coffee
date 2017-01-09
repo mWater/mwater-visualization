@@ -1,5 +1,5 @@
 _ = require 'lodash'
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 ExprCompiler = require('mwater-expressions').ExprCompiler
 ExprUtils = require('mwater-expressions').ExprUtils
 ExprCleaner = require('mwater-expressions').ExprCleaner
@@ -109,7 +109,7 @@ module.exports = class AxisBuilder
     if axis.xform and axis.xform.type == "ranges"
       # Add ranges
       if not axis.xform.ranges
-        axis.xform.ranges = [{ id: uuid.v4(), minOpen: false, maxOpen: true }]
+        axis.xform.ranges = [{ id: uuid(), minOpen: false, maxOpen: true }]
 
     return axis
 

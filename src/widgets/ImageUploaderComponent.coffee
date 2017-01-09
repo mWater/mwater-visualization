@@ -3,7 +3,7 @@ H = React.DOM
 R = React.createElement
 Dropzone = require 'react-dropzone'
 
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 
 module.exports = class ImageUploaderComponent extends React.Component
   @propTypes:
@@ -52,7 +52,7 @@ module.exports = class ImageUploaderComponent extends React.Component
     else
       alert "Upload failed: #{e.target.responseText}",
 
-  createId: -> uuid.v4().replace(/-/g, "")
+  createId: -> uuid().replace(/-/g, "")
   
   renderUploader: ->
     H.div null,

@@ -2,7 +2,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
-uuid = require 'node-uuid'
+uuid = require 'uuid'
 
 HTML5Backend = require('react-dnd-html5-backend')
 NestableDragDropContext = require  "react-library/lib/NestableDragDropContext"
