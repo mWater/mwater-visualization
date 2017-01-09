@@ -239,6 +239,7 @@ module.exports = class LayeredChartCompiler
     dataMap = {}
     colors = {}
     xs = {}
+    groups = []
 
     xType = @axisBuilder.getAxisType(design.layers[0].axes.x)
 
@@ -305,10 +306,15 @@ module.exports = class LayeredChartCompiler
         _.each layerData, (row, rowIndex) =>
           dataMap["#{seriesY}:#{rowIndex}"] = { layerIndex: layerIndex, row: row }
 
+    # Stack by putting into groups
+    if design.stacked
+      groups = [_.keys(names)]
+
     return {
       columns: columns
       types: types
       names: names
+      groups: groups
       dataMap: dataMap
       colors: colors
       xs: xs
