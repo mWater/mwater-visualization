@@ -10,6 +10,7 @@ ExprUtils = require('mwater-expressions').ExprUtils
 ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
 
 # Category map for an axis. Controls the colorMap values and excludedValues
+# Can be collapsed
 module.exports = class CategoryMapComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired
@@ -20,6 +21,13 @@ module.exports = class CategoryMapComponent extends React.Component
     reorderable: React.PropTypes.bool
     showColorMap: React.PropTypes.bool  # True to allow editing the color map
     allowExcludedValues: React.PropTypes.bool # True to allow excluding of values via checkboxes
+
+  constructor: ->
+    super
+
+    @state = {
+      collapsed: true  # Start collapsed
+    }
 
   handleReorder: (map) =>
     order = _.pluck(map, "value")
@@ -54,6 +62,9 @@ module.exports = class CategoryMapComponent extends React.Component
     name = prompt("Enter label for none value", @props.axis.nullLabel or ExprUtils.localizeString("None"))
     if name
       @props.onChange(update(@props.axis, { nullLabel: { $set: name }}))
+
+  handleToggle: =>
+    @setState(collapsed: not @state.collapsed)
 
   renderLabel: (category) ->
     label = ExprUtils.localizeString(category.label)
@@ -120,6 +131,7 @@ module.exports = class CategoryMapComponent extends React.Component
     )
 
     H.div null,
+      @renderToggle()
       R ReorderableListComponent,
         items: orderedCategories
         onReorder: @handleReorder
@@ -128,9 +140,25 @@ module.exports = class CategoryMapComponent extends React.Component
 
   renderNonReorderable: ->
     H.div null,
+      @renderToggle()
       _.map @props.categories, (category) => @renderCategory(category)
 
+  renderToggle: ->
+    if @state.collapsed
+      return H.div null,
+        H.a onClick: @handleToggle, 
+          "Show Values "
+          H.i className: "fa fa-caret-down"
+    else
+      return H.div null,
+        H.a onClick: @handleToggle, 
+          "Hide Values "
+          H.i className: "fa fa-caret-up"
+
   render: ->
+    if @state.collapsed
+      return @renderToggle()
+
     if @props.reorderable
       return @renderReorderable()
     else
