@@ -13,65 +13,80 @@ module.exports = class ColorPaletteCollectionComponent extends React.Component
     categories: React.PropTypes.array.isRequired
     onCancel: React.PropTypes.func.isRequired
 
-  @getColorMapForCategories: (categories, isCategorical = true) ->
-    if isCategorical
-      type = "schemeSet1"
-    else
-      type = "interpolateBlues"
-
-    scheme = ColorPaletteCollectionComponent.generateColorSet(type, categories.length - 1)
-
-    _.map categories, (category, i) ->
-      {
-        value: category.value
-        color: if category.value == null then "#aaaaaa" else scheme[i % scheme.length]
-      }
-
-  @_collection:
+  @palettes:
     [
-      "schemeSet1"
-      "schemeSet2"
-      "schemeSet3"
-      "schemeAccent"
-      "schemeDark2"
-      "schemePaired"
-      "schemePastel1"
-      "schemePastel2"
-      "interpolateSpectral"
-      "interpolateBlues"
-      "interpolateGreens"
-      "interpolateGreys"
-      "interpolateOranges"
-      "interpolatePurples"
-      "interpolateReds"
-      "interpolateBuGn"
-      "interpolateBuPu"
-      "interpolateGnBu"
-      "interpolateOrRd"
-      "interpolatePuBuGn"
-      "interpolatePuBu"
-      "interpolatePuRd"
-      "interpolateRdPu"
-      "interpolateYlGnBu"
-      "interpolateYlGn"
-      "interpolateYlOrBr"
-      "interpolateYlOrRd"
-      "interpolateBrBG"
-      "interpolatePRGn"
-      "interpolatePiYG"
-      "interpolatePuOr"
-      "interpolateRdBu"
-      "interpolateRdGy"
-      "interpolateRdYlBu"
-      "interpolateRdYlGn"
+      { type: "schemeSet1", reversed: false }
+      { type: "schemeSet2", reversed: false }
+      { type: "schemeSet3", reversed: false }
+      { type: "schemeAccent", reversed: false }
+      { type: "schemeDark2", reversed: false }
+      { type: "schemePaired", reversed: false }
+      { type: "schemePastel1", reversed: false }
+      { type: "schemePastel2", reversed: false }
+      { type: "interpolateSpectral", reversed: false }
+      { type: "interpolateSpectral", reversed: true }
+      { type: "interpolateBlues", reversed: false }
+      { type: "interpolateBlues", reversed: true }
+      { type: "interpolateGreens", reversed: false }
+      { type: "interpolateGreens", reversed: true }
+      { type: "interpolateGreys", reversed: false }
+      { type: "interpolateGreys", reversed: true }
+      { type: "interpolateOranges", reversed: false }
+      { type: "interpolateOranges", reversed: true }
+      { type: "interpolatePurples", reversed: false }
+      { type: "interpolatePurples", reversed: true }
+      { type: "interpolateReds", reversed: false }
+      { type: "interpolateReds", reversed: true }
+      { type: "interpolateBuGn", reversed: false }
+      { type: "interpolateBuGn", reversed: true }
+      { type: "interpolateBuPu", reversed: false }
+      { type: "interpolateBuPu", reversed: true }
+      { type: "interpolateGnBu", reversed: false }
+      { type: "interpolateGnBu", reversed: true }
+      { type: "interpolateOrRd", reversed: false }
+      { type: "interpolateOrRd", reversed: true }
+      { type: "interpolatePuBuGn", reversed: false }
+      { type: "interpolatePuBuGn", reversed: true }
+      { type: "interpolatePuBu", reversed: false }
+      { type: "interpolatePuBu", reversed: true }
+      { type: "interpolatePuRd", reversed: false }
+      { type: "interpolatePuRd", reversed: true }
+      { type: "interpolateRdPu", reversed: false }
+      { type: "interpolateRdPu", reversed: true }
+      { type: "interpolateYlGnBu", reversed: false }
+      { type: "interpolateYlGnBu", reversed: true }
+      { type: "interpolateYlGn", reversed: false }
+      { type: "interpolateYlGn", reversed: true }
+      { type: "interpolateYlOrBr", reversed: false }
+      { type: "interpolateYlOrBr", reversed: true }
+      { type: "interpolateYlOrRd", reversed: false }
+      { type: "interpolateYlOrRd", reversed: true }
+      { type: "interpolateBrBG", reversed: false }
+      { type: "interpolateBrBG", reversed: true }
+      { type: "interpolatePRGn", reversed: false }
+      { type: "interpolatePRGn", reversed: true }
+      { type: "interpolatePiYG", reversed: false }
+      { type: "interpolatePiYG", reversed: true }
+      { type: "interpolatePuOr", reversed: false }
+      { type: "interpolatePuOr", reversed: true }
+      { type: "interpolateRdBu", reversed: false }
+      { type: "interpolateRdBu", reversed: true }
+      { type: "interpolateRdGy", reversed: false }
+      { type: "interpolateRdGy", reversed: true }
+      { type: "interpolateRdYlBu", reversed: false }
+      { type: "interpolateRdYlBu", reversed: true }
+      { type: "interpolateRdYlGn", reversed: false }
+      { type: "interpolateRdYlGn", reversed: true }
     ]
 
-  @generateColorSet: (type, length) ->
-    ColorSchemeFactory.createColorScheme({type: type, number: length})
-
   onPaletteSelected: (index) =>
-    #generate color map
-    scheme = ColorPaletteCollectionComponent.generateColorSet(ColorPaletteCollectionComponent._collection[index], @props.categories.length - 1)
+    # Generate color map
+    scheme = ColorSchemeFactory.createColorScheme({
+      type: ColorPaletteCollectionComponent.palettes[index].type
+      # Null doesn't count to length
+      number: if _.any(@props.categories, (c) -> not c.value?) then @props.categories.length - 1 else @props.categories.length 
+      reversed: ColorPaletteCollectionComponent.palettes[index].reversed
+    })
 
     colorMap = _.map @props.categories, (category, i) ->
       {
@@ -88,11 +103,11 @@ module.exports = class ColorPaletteCollectionComponent extends React.Component
   render: ->
     H.div null,
       H.p null, "Please select a color scheme"
-      _.map ColorPaletteCollectionComponent._collection, (config, index) =>
+      _.map ColorPaletteCollectionComponent.palettes, (config, index) =>
         R ColorPaletteComponent,
           key: index
           index: index
-          colorSet: ColorPaletteCollectionComponent.generateColorSet(config, Math.min(@props.categories.length - 1, 6))
+          colorSet: ColorSchemeFactory.createColorScheme({type: config.type, number: Math.min(@props.categories.length - 1, 6), reversed: config.reversed })
           onPaletteSelected: @onPaletteSelected
           number: @props.categories.length
       @renderCancel()

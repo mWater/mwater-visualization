@@ -3,6 +3,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 CategoryMapComponent = require './CategoryMapComponent'
+ColorSchemeFactory = require '../ColorSchemeFactory'
 ColorPaletteCollectionComponent = require './ColorPaletteCollectionComponent'
 update = require 'update-object'
 AxisBuilder = require './AxisBuilder'
@@ -53,7 +54,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
 
     # If no color map or color map values have changed
     if not @props.axis.colorMap or not _.isEqual(_.pluck(@props.axis.colorMap, "value").sort(), _.pluck(categories, "value").sort())
-      colorMap = ColorPaletteCollectionComponent.getColorMapForCategories(categories, axisBuilder.isCategorical(@props.axis))
+      colorMap = ColorSchemeFactory.createColorMapForCategories(categories, axisBuilder.isCategorical(@props.axis))
       @handlePaletteChange(colorMap)
       @setState(mode: "normal")
 

@@ -32,7 +32,7 @@ exports.WidgetScopesViewComponent = require './widgets/WidgetScopesViewComponent
 
 exports.TableSelectComponent = require './TableSelectComponent'
 exports.AxisBuilder = require './axes/AxisBuilder'
-exports.ColorPaletteCollectionComponent = require './axes/ColorPaletteCollectionComponent'
+exports.ColorSchemeFactory = require './axes/ColorSchemeFactory'
 
 exports.DatagridComponent = require './datagrids/DatagridComponent'
 exports.DatagridViewComponent = require './datagrids/DatagridViewComponent'

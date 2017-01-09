@@ -8,14 +8,14 @@ rgbStringToHex = (rgbString) ->
   _color = new c_c.Color({rgb: rgbArray})
   _color.hex()
 
-generateCategoricalSet = (set, number) ->
-  (set[i % set.length ] for i in [1..number])
+generateCategoricalSet = (set, number, reversed) ->
+  (set[(if reversed then number - i - 1 else i) % set.length] for i in [0...number])
 
-generateSequentialSet = (set, number) ->
+generateSequentialSet = (set, number, reversed) ->
   color = d3.scaleLinear()
     .domain([0,number-1])
     .range([0,1])
-  colors = (set(color(i)) for i in [0..(number-1)])
+  colors = (set(color((if reversed then number - i - 1 else i))) for i in [0...number])
   _.map colors, (color) -> rgbStringToHex(color)
 
 module.exports = class ColorSchemeFactory
@@ -23,42 +23,64 @@ module.exports = class ColorSchemeFactory
   # options:
   #   type: string (type of the color scheme)
   #   number: int (number of colors to be generated)
+  #   reversed: true to reversed
   @createColorScheme: (options) ->
     switch options.type
-      when 'schemeAccent' then return generateCategoricalSet(brewer.schemeAccent, options.number)
-      when 'schemeDark2' then return generateCategoricalSet(brewer.schemeDark2, options.number)
-      when 'schemePaired' then return generateCategoricalSet(brewer.schemePaired, options.number)
-      when 'schemePastel1' then return generateCategoricalSet(brewer.schemePastel1, options.number)
-      when 'schemePastel2' then return generateCategoricalSet(brewer.schemePastel2, options.number)
-      when 'schemeSet1' then return generateCategoricalSet(brewer.schemeSet1, options.number)
-      when 'schemeSet2' then return generateCategoricalSet(brewer.schemeSet2, options.number)
-      when 'schemeSet3' then return generateCategoricalSet(brewer.schemeSet3, options.number)
-      when 'interpolateBlues' then return generateSequentialSet(brewer.interpolateBlues, options.number)
-      when 'interpolateGreens' then return generateSequentialSet(brewer.interpolateGreens, options.number)
-      when 'interpolateGreys' then return generateSequentialSet(brewer.interpolateGreys, options.number)
-      when 'interpolateOranges' then return generateSequentialSet(brewer.interpolateOranges, options.number)
-      when 'interpolatePurples' then return generateSequentialSet(brewer.interpolatePurples, options.number)
-      when 'interpolateReds' then return generateSequentialSet(brewer.interpolateReds, options.number)
-      when 'interpolateBuGn' then return generateSequentialSet(brewer.interpolateBuGn, options.number)
-      when 'interpolateBuPu' then return generateSequentialSet(brewer.interpolateBuPu, options.number)
-      when 'interpolateGnBu' then return generateSequentialSet(brewer.interpolateGnBu, options.number)
-      when 'interpolateOrRd' then return generateSequentialSet(brewer.interpolateOrRd, options.number)
-      when 'interpolatePuBuGn' then return generateSequentialSet(brewer.interpolatePuBuGn, options.number)
-      when 'interpolatePuBu' then return generateSequentialSet(brewer.interpolatePuBu, options.number)
-      when 'interpolatePuRd' then return generateSequentialSet(brewer.interpolatePuRd, options.number)
-      when 'interpolateRdPu' then return generateSequentialSet(brewer.interpolateRdPu, options.number)
-      when 'interpolateYlGnBu' then return generateSequentialSet(brewer.interpolateYlGnBu, options.number)
-      when 'interpolateYlGn' then return generateSequentialSet(brewer.interpolateYlGn, options.number)
-      when 'interpolateYlOrBr' then return generateSequentialSet(brewer.interpolateYlOrBr, options.number)
-      when 'interpolateYlOrRd' then return generateSequentialSet(brewer.interpolateYlOrRd, options.number)
-      when 'interpolateBrBG' then return generateSequentialSet(brewer.interpolateBrBG, options.number)
-      when 'interpolatePRGn' then return generateSequentialSet(brewer.interpolatePRGn, options.number)
-      when 'interpolatePiYG' then return generateSequentialSet(brewer.interpolatePiYG, options.number)
-      when 'interpolatePuOr' then return generateSequentialSet(brewer.interpolatePuOr, options.number)
-      when 'interpolateRdBu' then return generateSequentialSet(brewer.interpolateRdBu, options.number)
-      when 'interpolateRdGy' then return generateSequentialSet(brewer.interpolateRdGy, options.number)
-      when 'interpolateRdYlBu' then return generateSequentialSet(brewer.interpolateRdYlBu, options.number)
-      when 'interpolateRdYlGn' then return generateSequentialSet(brewer.interpolateRdYlGn, options.number)
-      when 'interpolateSpectral' then return generateSequentialSet(brewer.interpolateSpectral, options.number)
+      when 'schemeAccent' then generateCategoricalSet(brewer.schemeAccent, options.number, options.reversed)
+      when 'schemeDark2' then generateCategoricalSet(brewer.schemeDark2, options.number, options.reversed)
+      when 'schemePaired' then generateCategoricalSet(brewer.schemePaired, options.number, options.reversed)
+      when 'schemePastel1' then generateCategoricalSet(brewer.schemePastel1, options.number, options.reversed)
+      when 'schemePastel2' then generateCategoricalSet(brewer.schemePastel2, options.number, options.reversed)
+      when 'schemeSet1' then generateCategoricalSet(brewer.schemeSet1, options.number, options.reversed)
+      when 'schemeSet2' then generateCategoricalSet(brewer.schemeSet2, options.number, options.reversed)
+      when 'schemeSet3' then generateCategoricalSet(brewer.schemeSet3, options.number, options.reversed)
+      when 'interpolateBlues' then generateSequentialSet(brewer.interpolateBlues, options.number, options.reversed)
+      when 'interpolateGreens' then generateSequentialSet(brewer.interpolateGreens, options.number, options.reversed)
+      when 'interpolateGreys' then generateSequentialSet(brewer.interpolateGreys, options.number, options.reversed)
+      when 'interpolateOranges' then generateSequentialSet(brewer.interpolateOranges, options.number, options.reversed)
+      when 'interpolatePurples' then generateSequentialSet(brewer.interpolatePurples, options.number, options.reversed)
+      when 'interpolateReds' then generateSequentialSet(brewer.interpolateReds, options.number, options.reversed)
+      when 'interpolateBuGn' then generateSequentialSet(brewer.interpolateBuGn, options.number, options.reversed)
+      when 'interpolateBuPu' then generateSequentialSet(brewer.interpolateBuPu, options.number, options.reversed)
+      when 'interpolateGnBu' then generateSequentialSet(brewer.interpolateGnBu, options.number, options.reversed)
+      when 'interpolateOrRd' then generateSequentialSet(brewer.interpolateOrRd, options.number, options.reversed)
+      when 'interpolatePuBuGn' then generateSequentialSet(brewer.interpolatePuBuGn, options.number, options.reversed)
+      when 'interpolatePuBu' then generateSequentialSet(brewer.interpolatePuBu, options.number, options.reversed)
+      when 'interpolatePuRd' then generateSequentialSet(brewer.interpolatePuRd, options.number, options.reversed)
+      when 'interpolateRdPu' then generateSequentialSet(brewer.interpolateRdPu, options.number, options.reversed)
+      when 'interpolateYlGnBu' then generateSequentialSet(brewer.interpolateYlGnBu, options.number, options.reversed)
+      when 'interpolateYlGn' then generateSequentialSet(brewer.interpolateYlGn, options.number, options.reversed)
+      when 'interpolateYlOrBr' then generateSequentialSet(brewer.interpolateYlOrBr, options.number, options.reversed)
+      when 'interpolateYlOrRd' then generateSequentialSet(brewer.interpolateYlOrRd, options.number, options.reversed)
+      when 'interpolateBrBG' then generateSequentialSet(brewer.interpolateBrBG, options.number, options.reversed)
+      when 'interpolatePRGn' then generateSequentialSet(brewer.interpolatePRGn, options.number, options.reversed)
+      when 'interpolatePiYG' then generateSequentialSet(brewer.interpolatePiYG, options.number, options.reversed)
+      when 'interpolatePuOr' then generateSequentialSet(brewer.interpolatePuOr, options.number, options.reversed)
+      when 'interpolateRdBu' then generateSequentialSet(brewer.interpolateRdBu, options.number, options.reversed)
+      when 'interpolateRdGy' then generateSequentialSet(brewer.interpolateRdGy, options.number, options.reversed)
+      when 'interpolateRdYlBu' then generateSequentialSet(brewer.interpolateRdYlBu, options.number, options.reversed)
+      when 'interpolateRdYlGn' then generateSequentialSet(brewer.interpolateRdYlGn, options.number, options.reversed)
+      when 'interpolateSpectral' then generateSequentialSet(brewer.interpolateSpectral, options.number, options.reversed)
       else
         throw("Scheme type is not valid")
+
+  # Create a color map for a series of categories. Null is treated specially and assumed to be last.
+  @createColorMapForCategories: (categories, isCategorical) ->
+    if isCategorical
+      type = "schemeSet1"
+    else
+      type = "interpolateBlues"
+
+    scheme = ColorSchemeFactory.createColorScheme({
+      type: type
+      # Null doesn't count to length
+      number: if _.any(categories, (c) -> not c.value?) then categories.length - 1 else categories.length 
+    })
+
+    colorMap = _.map categories, (category, i) ->
+      {
+        value: category.value
+        color: if category.value == null then "#aaaaaa" else scheme[i % scheme.length]
+      }
+
+    return colorMap

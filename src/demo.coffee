@@ -131,7 +131,7 @@ class MWaterDirectDashboardPane extends React.Component
     @state = {
       # design: { items: {}, layout: "grid" } # dashboardDesign
       # design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" } # dashboardDesign
-      design: mapAndChartDashboard
+      design: if window.localStorage.getItem("MWaterDirectDashboardPane.design") then JSON.parse(window.localStorage.getItem("MWaterDirectDashboardPane.design")) else mapAndChartDashboard
       # design: imageWidgetDashboardDesign
       # design: dashboardDesign
       extraTables: [] #['responses:e24f0a0ec11643cab3c21c07de2f6889']
@@ -140,6 +140,7 @@ class MWaterDirectDashboardPane extends React.Component
   handleDesignChange: (design) =>
     @setState(design: design)
     console.log JSON.stringify(design, null, 2)
+    window.localStorage.setItem("MWaterDirectDashboardPane.design", JSON.stringify(design))
 
   render: ->
     React.createElement(MWaterLoaderComponent, {
