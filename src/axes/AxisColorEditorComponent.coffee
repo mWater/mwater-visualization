@@ -82,9 +82,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
   render: ->
     H.div null,
       if @state.mode == "palette"
-        if not @props.categories
-          H.span null, "Loading..."
-        else
+        if @props.categories
           R ColorPaletteCollectionComponent, {
             onPaletteSelected: @handlePaletteChange
             axis: @props.axis
