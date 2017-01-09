@@ -74,6 +74,8 @@ module.exports = class BinsComponent extends React.Component
           R NumberInputComponent, small: true, value: @props.xform.numBins, decimal: false, onChange: (v) => @props.onChange(update(@props.xform, { numBins: { $set: v }}))
         if @state.guessing
           H.i className: "fa fa-spinner fa-spin"
+        else if not @props.xform.min? or not @props.xform.max? or not @props.xform.numBins
+          H.span className: "text-danger", style: { paddingLeft: 10 }, "Min and max are required"
       if @props.xform.min? and @props.xform.max? and @props.xform.numBins
         H.div key: "excludes",
           H.label className: "checkbox-inline", key: "lower",
