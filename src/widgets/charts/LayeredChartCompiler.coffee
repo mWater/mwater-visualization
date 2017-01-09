@@ -146,9 +146,10 @@ module.exports = class LayeredChartCompiler
       transition: { duration: 0 } # Transitions interfere with scoping
     }
 
-    # If x axis is year only, display year in ticks
-    if options.design.layers[0]?.axes.x?.xform?.type == "year"
-      chartDesign.axis.x.tick.format = (x) -> if _.isDate(x) then x.getFullYear() else x
+    # This doesn't work in new C3. Removing.
+    # # If x axis is year only, display year in ticks
+    # if options.design.layers[0]?.axes.x?.xform?.type == "year"
+    #   chartDesign.axis.x.tick.format = (x) -> if _.isDate(x) then x.getFullYear() else x
 
     return chartDesign
 
