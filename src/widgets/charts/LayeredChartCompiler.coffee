@@ -148,7 +148,7 @@ module.exports = class LayeredChartCompiler
 
     # If x axis is year only, display year in ticks
     if options.design.layers[0]?.axes.x?.xform?.type == "year"
-      chartDesign.axis.x.tick.format = (x) -> x.getFullYear()
+      chartDesign.axis.x.tick.format = (x) -> if _.isDate(x) then x.getFullYear() else x
 
     return chartDesign
 
