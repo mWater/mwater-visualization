@@ -528,15 +528,16 @@ module.exports = class BufferLayer extends Layer
           then: order.indexOf(category.value) or -1
         }
 
-      query.orderBy = [
-        {
-          expr: {
-            type: "case"
-            cases: cases
+      if cases.length > 0
+        query.orderBy = [
+          {
+            expr: {
+              type: "case"
+              cases: cases
+            }
+            direction: "desc" # Reverse color map order
           }
-          direction: "desc" # Reverse color map order
-        }
-      ]
+        ]
 
     return query
 
