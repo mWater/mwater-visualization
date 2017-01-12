@@ -7,9 +7,10 @@ injectTableAlias = require('mwater-expressions').injectTableAlias
 # Only set up if d3 is available (hack for using on server)
 if global.d3
   tickFormatter = d3.format(",")
+  pieLabelValueFormatter = (value, ratio, id) => "#{d3.format(",")(value)} (#{d3.format('.1%')(ratio)})"
 else
   tickFormatter = null
-
+  pieLabelValueFormatter = null
 
 # Compiles various parts of a layered chart (line, bar, scatter, spline, area) to C3.js format
 module.exports = class LayeredChartCompiler
@@ -104,6 +105,7 @@ module.exports = class LayeredChartCompiler
     c3Data = @compileData(options.design, options.data, options.locale)
 
     # Create chart
+    # NOTE: this structure must be comparable with _.isEqual, so don't add any inline functiona
     chartDesign = {
       data: {
         types: c3Data.types
@@ -138,7 +140,7 @@ module.exports = class LayeredChartCompiler
       size: { width: options.width, height: options.height }
       pie: { 
         label: {
-          format: if options.design.labels then (value, ratio, id) => "#{d3.format(",")(value)} (#{d3.format('.1%')(ratio)})"
+          format: if options.design.labels then pieLabelValueFormatter
         }
         expand: false # Don't expand/contract
       } 
