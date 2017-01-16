@@ -67,10 +67,6 @@ module.exports = class MapLayersDesignerComponent extends React.Component
   render: ->
     H.div className: "form-group",
       if @props.design.layerViews.length > 0
-        H.label className: "text-muted", key: "header",
-          "Layers"
-
-      if @props.design.layerViews.length > 0
         H.div style: { padding: 5 }, key: "layers",
           H.div className: "list-group", key: "layers", style: { marginBottom: 10 },
             # _.map(@props.design.layerViews, @renderLayerView)

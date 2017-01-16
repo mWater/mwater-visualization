@@ -2,6 +2,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
+TabbedComponent = require 'react-library/lib/TabbedComponent'
 NumberInputComponent = require('react-library/lib/NumberInputComponent')
 
 CheckboxComponent = require '../CheckboxComponent'
@@ -26,21 +27,8 @@ module.exports = class MapDesignerComponent extends React.Component
     design = _.extend({}, @props.design, {autoBounds: value})
     @props.onDesignChange(design)
 
-  render: ->
-    H.div style: { padding: 5 },
-      R MapLayersDesignerComponent, 
-        schema: @props.schema
-        dataSource: @props.dataSource
-        design: @props.design
-        onDesignChange: @props.onDesignChange
-        allowEditingLayers: true
-
-      R MapFiltersDesignerComponent, 
-        schema: @props.schema
-        dataSource: @props.dataSource
-        design: @props.design
-        onDesignChange: @props.onDesignChange
-
+  renderOptionsTab: ->
+    H.div null,
       H.div className: "form-group",
         H.label className: "text-muted", 
           "Map Style"
@@ -67,6 +55,37 @@ module.exports = class MapDesignerComponent extends React.Component
         design: @props.design
         onDesignChange: @props.onDesignChange
 
+  render: ->
+    H.div style: { padding: 5 },
+      R TabbedComponent,
+        initialTabId: "layers"
+        tabs: [
+          {
+            id: "layers"
+            label: [H.i(className: "fa fa-bars"), " Layers"]
+            elem: R MapLayersDesignerComponent, 
+              schema: @props.schema
+              dataSource: @props.dataSource
+              design: @props.design
+              onDesignChange: @props.onDesignChange
+              allowEditingLayers: true
+          }
+          {
+            id: "filters"
+            label: [H.i(className: "fa fa-filter"), " Filters"]
+            elem: R MapFiltersDesignerComponent, 
+              schema: @props.schema
+              dataSource: @props.dataSource
+              design: @props.design
+              onDesignChange: @props.onDesignChange
+          }
+          {
+            id: "options"
+            label: [H.i(className: "fa fa-cog"), " Options"]
+            elem: @renderOptionsTab()
+          }
+        ]
+ 
 
 # Attribution inline editing
 class AttributionComponent extends React.Component
