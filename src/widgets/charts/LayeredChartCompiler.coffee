@@ -123,11 +123,11 @@ module.exports = class LayeredChartCompiler
       axis: {
         x: {
           type: c3Data.xAxisType
-          label: { text: c3Data.xAxisLabelText, position: if options.design.transpose then 'outer-middle' else 'outer-center' }
+          label: { text: cleanString(c3Data.xAxisLabelText), position: if options.design.transpose then 'outer-middle' else 'outer-center' }
           tick: { fit: c3Data.xAxisTickFit }
         }
         y: {
-          label: { text: c3Data.yAxisLabelText, position: if options.design.transpose then 'outer-center' else 'outer-middle' }
+          label: { text: cleanString(c3Data.yAxisLabelText), position: if options.design.transpose then 'outer-center' else 'outer-middle' }
           # Set max to 100 if proportional (with no padding)
           max: if options.design.type == "bar" and options.design.proportional then 100
           padding: if options.design.type == "bar" and options.design.proportional then { top: 0, bottom: 0 }
@@ -646,3 +646,9 @@ module.exports = class LayeredChartCompiler
       if column[i]?
         total += column[i]
       column[i] = total
+
+# Clean out nbsp (U+00A0) as it causes c3 errors
+cleanString = (str) ->
+  if not str
+    return str
+  return str.replace("\u00A0", " ")
