@@ -5,6 +5,7 @@ querystring = require 'querystring'
 TabbedComponent = require('react-library/lib/TabbedComponent')
 ui = require './UIComponents'
 ExprUtils = require("mwater-expressions").ExprUtils
+moment = require 'moment'
 
 siteTypes = [
   "entities.water_point"
@@ -191,7 +192,8 @@ class FormsListComponent extends React.Component
       @setState(forms: _.map(forms, (form) => { 
         id: form._id
         name: ExprUtils.localizeString(form.design.name, @context.locale)
-        desc: "Created by #{form.created.by}" 
+        # desc: "Created by #{form.created.by}" 
+        desc: "Modified #{moment(form.modified.on, moment.ISO_8601).format("ll")}"
       }))
     .fail (xhr) =>
       @setState(error: xhr.responseText)
