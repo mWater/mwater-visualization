@@ -37,6 +37,7 @@
     "moment": "^2.10.6",
     "mwater-expressions": "git+ssh://git@github.com/mWater/mwater-expressions.git",
     "mwater-expressions-ui": "git+ssh://git@github.com/mWater/mwater-expressions-ui.git",
+    "mwater-forms": "git+ssh://git@github.com/mWater/mwater-forms.git",
     "node-uuid": "^1.4.3",
     "rc-slider": "^3.7.0",
     "react": "^15.4.1",
