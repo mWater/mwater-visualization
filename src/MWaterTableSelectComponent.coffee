@@ -137,7 +137,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       R TabbedComponent,
         tabs: [
           { id: "sites", label: "Sites", elem: @renderSites() }
-          { id: "forms", label: "Forms", elem: @renderForms() }
+          { id: "forms", label: "Surveys", elem: @renderForms() }
           { id: "indicators", label: "Indicators", elem: @renderIndicators() }
           { id: "other", label: "Other", elem: @renderOther() }
         ]
@@ -232,7 +232,7 @@ class FormsListComponent extends React.Component
     tables = _.sortBy(tables, (t) -> t.name.en)
 
     H.div null,
-      H.label null, "Included Forms:"
+      H.label null, "Included Surveys:"
       if tables.length > 0
         R ui.OptionListComponent,
           items: _.map(tables, (table) =>
@@ -248,7 +248,7 @@ class FormsListComponent extends React.Component
 
       H.br()
 
-      H.label null, "All Forms:"
+      H.label null, "All Surveys:"
       if not @state.forms or @state.forms.length == 0
         H.div className: "alert alert-info", 
           H.i className: "fa fa-spinner fa-spin"
