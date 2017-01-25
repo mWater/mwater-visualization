@@ -1,10 +1,12 @@
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
+R = React.createElement
 
 Schema = require('mwater-expressions').Schema
 MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 MWaterTableSelectComponent = require './MWaterTableSelectComponent'
+MWaterAddRelatedFormComponent = require './MWaterAddRelatedFormComponent'
 querystring = require 'querystring'
 AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
 LoadingComponent = require 'react-library/lib/LoadingComponent'
@@ -71,6 +73,8 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
   @childContextTypes: 
     tableSelectElementFactory: React.PropTypes.func
     addLayerElementFactory: React.PropTypes.func
+    # Decorates sections (the children element, specifically) in the expression picker
+    decorateScalarExprTreeSectionChildren: React.PropTypes.func
   
   getChildContext: ->
     context = {}
@@ -90,7 +94,27 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
     if @props.addLayerElementFactory
       context.addLayerElementFactory = @props.addLayerElementFactory
 
+    context.decorateScalarExprTreeSectionChildren = (options) =>
+      # If related forms section of entities table
+      if options.tableId.match(/^entities\./) and options.section.id == "!related_forms"
+        return H.div null,
+          options.children
+          R MWaterAddRelatedFormComponent, 
+            table: options.tableId
+            apiUrl: @props.apiUrl
+            client: @props.client
+            user: @props.user
+            schema: @state.schema
+            onSelect: @handleAddTable
+
+      else
+        return options.children
+
     return context
+
+  handleAddTable: (table) =>
+    extraTables = _.union(@props.extraTables, [table])
+    @props.onExtraTablesChange(extraTables)
 
   render: ->
     if not @state.schema and not @state.error
@@ -100,3 +124,4 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
       schema: @state.schema
       dataSource: @state.dataSource
     })
+

@@ -279,6 +279,16 @@ class ColumnDesignerComponent extends React.Component
   render: =>
     exprUtils = new ExprUtils(@props.schema)
 
+    # Get type of current expression
+    type = exprUtils.getExprType(@props.column.expr)
+
+    # Determine allowed types
+    allowedTypes = ['text', 'number', 'enum', 'enumset', 'boolean', 'date', 'datetime', 'image', 'imagelist', 'text[]', 'geometry']
+
+    # If type id, allow id (e.g. don't allow to be added directly, but keep if present)
+    if type == "id"
+      allowedTypes.push("id")
+
     H.div className: "row",
       H.div className: "col-xs-1",
         H.span className: "text-muted glyphicon glyphicon-move drag-handle"
@@ -290,6 +300,7 @@ class ColumnDesignerComponent extends React.Component
           table: @props.table
           value: @props.column.expr
           aggrStatuses: ['literal', 'individual', 'aggregate']
+          types: allowedTypes
           onChange: @handleExprChange
         @renderSplit()
 
