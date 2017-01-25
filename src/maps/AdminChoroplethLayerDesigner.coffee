@@ -25,6 +25,15 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
     design: React.PropTypes.object.isRequired  # Design of the marker layer
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
 
+  # Apply updates to design
+  update: (updates) ->
+    @props.onDesignChange(_.extend({}, @props.design, updates))
+
+  # Update axes with specified changes
+  updateAxes: (changes) ->
+    axes = _.extend({}, @props.design.axes, changes)
+    @update(axes: axes)
+
   handleScopeAndDetailLevelChange: (scope, scopeLevel, detailLevel) => 
     @props.onDesignChange(_.extend({}, @props.design, { scope: scope, scopeLevel: scopeLevel, detailLevel: detailLevel }))
   
@@ -39,6 +48,9 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
           break
     
     @props.onDesignChange(_.extend({}, @props.design, { table: table, adminRegionExpr: adminRegionExpr }))
+
+  handleColorChange: (color) => @update(color: color)
+  handleColorAxisChange: (axis) => @updateAxes(color: axis)
 
   renderTable: ->
     return H.div className: "form-group",
@@ -88,25 +100,34 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
     if not @props.design.table
       return
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.span className: "glyphicon glyphicon glyphicon-tint"
-        "Color"
-      H.div style: {marginLeft: 8},
-        R ColorAxisComponent,
-          defaultColor: @props.design.color
+    return H.div null,
+      if not @props.design.axes.color
+        H.div className: "form-group",
+          H.label className: "text-muted", 
+            H.span className: "glyphicon glyphicon glyphicon-tint"
+            "Fill Color"
+
+          H.div null, 
+            R ColorComponent,
+              color: @props.design.color
+              onChange: @handleColorChange
+
+      H.div className: "form-group",
+        H.label className: "text-muted", 
+          H.span className: "glyphicon glyphicon glyphicon-tint"
+          "Color By Data"
+
+        R AxisComponent,
           schema: @props.schema
           dataSource: @props.dataSource
-          axis: @props.design.axes.color
           table: @props.design.table
-          onColorChange: updt(@props.onDesignChange, @props.design, "color")
-          onColorAxisChange: updt(@props.onDesignChange, @props.design, ["axes", "color"])
-          table: @props.design.table
-          showColorMap: true
-          types: ["text", "enum", "boolean", 'date']
+          types: ["text", "enum", "boolean",'date']
           aggrNeed: "required"
+          value: @props.design.axes.color
+          defaultColor: @props.design.color
+          showColorMap: true
+          onChange: @handleColorAxisChange
           allowExcludedValues: true
-
 
   # renderLabelAxis: ->
   #   if not @props.design.table

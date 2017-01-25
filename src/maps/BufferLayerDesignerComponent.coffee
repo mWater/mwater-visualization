@@ -34,9 +34,9 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
   handleTableChange: (table) => @update(table: table)
   handleRadiusChange: (radius) => @update(radius: radius)
   handleGeometryAxisChange: (axis) => @updateAxes(geometry: axis)
-  handleColorAxisChange: (axis) => @updateAxes(color: axis)
   handleFilterChange: (expr) => @update(filter: expr)
   handleColorChange: (color) => @update(color: color)
+  handleColorAxisChange: (axis) => @updateAxes(color: axis)
   handleFillOpacityChange: (fillOpacity) => @update(fillOpacity: fillOpacity/100)
 
   renderTable: ->
@@ -79,24 +79,33 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
     if not @props.design.axes.geometry
       return
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.span className: "glyphicon glyphicon glyphicon-tint"
-        "Color"
-      H.div style: {marginLeft: 8},
-        R ColorAxisComponent,
-          defaultColor: @props.design.color
+    return H.div null,
+      if not @props.design.axes.color
+        H.div className: "form-group",
+          H.label className: "text-muted", 
+            H.span className: "glyphicon glyphicon glyphicon-tint"
+            "Circle Color"
+
+          H.div null, 
+            R ColorComponent,
+              color: @props.design.color
+              onChange: @handleColorChange
+
+      H.div className: "form-group",
+        H.label className: "text-muted", 
+          H.span className: "glyphicon glyphicon glyphicon-tint"
+          "Color By Data"
+
+        R AxisComponent,
           schema: @props.schema
           dataSource: @props.dataSource
-          axis: @props.design.axes.color
           table: @props.design.table
-          onColorChange: @handleColorChange
-          onColorAxisChange: @handleColorAxisChange
-          table: @props.design.table
-          showColorMap: true
-          types: ["text", "enum", "boolean", "date"]
+          types: ["text", "enum", "boolean",'date']
           aggrNeed: "none"
-          reorderable: true
+          value: @props.design.axes.color
+          defaultColor: @props.design.color
+          showColorMap: true
+          onChange: @handleColorAxisChange
           allowExcludedValues: true
 
   renderFillOpacity: ->
