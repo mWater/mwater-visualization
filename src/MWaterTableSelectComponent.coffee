@@ -104,23 +104,9 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       onExtraTableAdd: @handleExtraTableAdd
       onExtraTableRemove: @handleExtraTableRemove
 
-  renderIndicators: ->
-    tables = _.filter(@props.schema.getTables(), (table) => table.id.match(/^indicator_values:/) and not table.deprecated)
-    tables = _.sortBy(tables, (t) -> t.name.en)
-
-    # Add all indicators to top
-    table = @props.schema.getTable("response_indicators")
-    if table
-      tables.unshift(table)
-
-    R ui.OptionListComponent,
-      items: _.map(tables, (table) =>
-        return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @handleChange.bind(null, table.id) }
-      )
-
   renderOther: ->
-    otherTables = _.filter(@props.schema.getTables(), (table) => (table.id not in siteTypes and not table.id.match(/^responses:/) and not table.id.match(/^indicator_values:/) and table.id != "response_indicators") and not table.deprecated)
-    otherTables = _.sortBy(otherTables, "name")
+    otherTables = _.filter(@props.schema.getTables(), (table) => (table.id not in siteTypes and not table.id.match(/^responses:/)) and not table.deprecated)
+    otherTables = _.sortBy(otherTables, (table) -> table.name.en)
     R ui.OptionListComponent,
       items: _.map(otherTables, (table) =>
         return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @handleChange.bind(null, table.id) }
@@ -136,10 +122,9 @@ module.exports = class MWaterTableSelectComponent extends React.Component
 
       R TabbedComponent,
         tabs: [
-          { id: "sites", label: "Sites", elem: @renderSites() }
-          { id: "forms", label: "Surveys", elem: @renderForms() }
-          { id: "indicators", label: "Indicators", elem: @renderIndicators() }
-          { id: "other", label: "Other", elem: @renderOther() }
+          { id: "sites", label: [H.i(className: "fa fa-map-marker"), " Sites"], elem: @renderSites() }
+          { id: "forms", label: [H.i(className: "fa fa-th-list"), " Surveys"], elem: @renderForms() }
+          { id: "other", label: "Advanced", elem: @renderOther() }
         ]
         initialTabId: "sites"
 
@@ -267,12 +252,9 @@ class FormsListComponent extends React.Component
 
           R ui.OptionListComponent,
             items: _.map(forms, (form) => { 
-              name: [
-                H.span(className: "glyphicon glyphicon-plus")
-                " " + form.name
-              ]
+              name: form.name
               desc: form.desc
-              onClick: @handleTableAdd.bind(null, "responses:" + form.id) 
+              onClick:  @props.onChange.bind(null, "responses:" + form.id)
             })
         ]
 
