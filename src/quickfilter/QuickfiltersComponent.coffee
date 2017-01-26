@@ -2,6 +2,7 @@ React = require 'react'
 H = React.DOM
 ReactSelect = require 'react-select'
 ExprUtils = require('mwater-expressions').ExprUtils
+ExprCleaner = require('mwater-expressions').ExprCleaner
 TextLiteralComponent = require './TextLiteralComponent'
 moment = require 'moment'
 
@@ -28,11 +29,18 @@ module.exports = class QuickfiltersComponent extends React.Component
     values = (@props.values or [])
     itemValue = values[index]
 
+    # Clean expression first
+    expr = new ExprCleaner(@props.schema).cleanExpr(item.expr)
+
+    # Do not render if nothing
+    if not expr
+      return null
+
     # Get type of expr
-    type = new ExprUtils(@props.schema).getExprType(item.expr)
+    type = new ExprUtils(@props.schema).getExprType(expr)
 
     # Determine if locked
-    lock = _.find(@props.locks, (lock) -> _.isEqual(lock.expr, item.expr))
+    lock = _.find(@props.locks, (lock) -> _.isEqual(lock.expr, expr))
 
     if lock
       # Overrides item value
@@ -49,9 +57,9 @@ module.exports = class QuickfiltersComponent extends React.Component
       return React.createElement EnumQuickfilterComponent, 
         key: index
         label: item.label
-        expr: item.expr
+        expr: expr
         schema: @props.schema
-        options: new ExprUtils(@props.schema).getExprEnumValues(item.expr)
+        options: new ExprUtils(@props.schema).getExprEnumValues(expr)
         value: itemValue
         onValueChange: onValueChange
 
@@ -59,7 +67,7 @@ module.exports = class QuickfiltersComponent extends React.Component
       return React.createElement TextQuickfilterComponent, 
         key: index
         label: item.label
-        expr: item.expr
+        expr: expr
         schema: @props.schema
         dataSource: @props.dataSource
         value: itemValue
@@ -69,7 +77,7 @@ module.exports = class QuickfiltersComponent extends React.Component
       return React.createElement DateQuickfilterComponent, 
         key: index
         label: item.label
-        expr: item.expr
+        expr: expr
         schema: @props.schema
         dataSource: @props.dataSource
         value: itemValue

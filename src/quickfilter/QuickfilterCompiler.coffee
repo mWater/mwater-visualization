@@ -1,5 +1,6 @@
 _ = require 'lodash'
 ExprCompiler = require('mwater-expressions').ExprCompiler
+ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprUtils = require('mwater-expressions').ExprUtils
 
 # Compiles quickfilter values into filters.
@@ -32,8 +33,15 @@ module.exports = class QuickfilterCompiler
       if not value
         continue
 
+      # Clean expression first
+      expr = new ExprCleaner(@schema).cleanExpr(item.expr)
+
+      # Do not render if nothing
+      if not expr
+        continue
+
       # Compile to boolean expression
-      filterExpr = @compileToFilterExpr(item.expr, value)
+      filterExpr = @compileToFilterExpr(expr, value)
 
       jsonql = new ExprCompiler(@schema).compileExpr(expr: filterExpr, tableAlias: "{alias}")
       # Only keep if compiles to something
@@ -41,7 +49,7 @@ module.exports = class QuickfilterCompiler
         continue
 
       filters.push({
-        table: item.expr.table
+        table: expr.table
         jsonql: jsonql
       })
 
