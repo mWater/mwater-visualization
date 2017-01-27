@@ -146,6 +146,6 @@ class AddRelatedFormModalComponent extends React.Component
     R ModalPopupComponent,
       showCloseX: true
       onClose: @props.onCancel
-      header: "Add Related Form",
+      header: "Add Related Survey",
         @renderContents()
 
