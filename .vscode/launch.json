@@ -1,0 +1,35 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Chromium",
+            "type": "chrome",
+            "request": "launch",
+            "runtimeExecutable": "chromium-browser",
+            "runtimeArgs": [
+                "--remote-debugging-port=9222"
+            ],
+            "port": 9222,
+            "url": "http://localhost:3000/demo.html",
+            "webRoot": "${workspaceRoot}/src",
+            "sourceMapPathOverrides": {
+               "*": "${webRoot}/*"
+            }
+        },
+        {
+            "name": "Run Tests",
+            "type": "chrome",
+            "request": "launch",
+            "runtimeExecutable": "chromium-browser",
+            "runtimeArgs": [
+                "--remote-debugging-port=9222"
+            ],
+            "port": 9222,
+            "url": "http://localhost:9876/debug.html",
+            "webRoot": "${workspaceRoot}",
+            "sourceMapPathOverrides": {
+               "*": "${webRoot}/*"
+            }
+        }
+    ]
+}

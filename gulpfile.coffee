@@ -31,6 +31,7 @@ makeBrowserifyBundle = ->
   shim(browserify("./demo.coffee",
     extensions: [".coffee"]
     basedir: "./src/"
+    debug: true
   ))
 
 bundleDemoJs = (bundle) ->
@@ -49,35 +50,6 @@ gulp.task "dist", ->
   .on("error", gutil.log)
   .pipe(source("mwater-visualization.js"))
   .pipe(gulp.dest("./dist/js/"))
-
-gulp.task "water_org_libs_css", ->
-  return gulp.src([
-    "bower_components/bootstrap/dist/css/bootstrap.min.css"
-    "bower_components/bootstrap/dist/css/bootstrap-theme.min.css"
-    "bower_components/c3/c3.min.css"
-  ]).pipe(concat("libs.css"))
-    .pipe(gulp.dest("./dist/water_org/"))
-
-gulp.task "water_org_libs_js", ->
-  return gulp.src([
-    "bower_components/bootstrap/dist/js/bootstrap.js"
-    "bower_components/lodash/lodash.min.js"
-    "bower_components/c3/c3.min.js"
-  ]).pipe(concat("libs.js"))
-    .pipe(gulp.dest("./dist/water_org/"))
-
-gulp.task "water_org_index_js", ->
-  shim(browserify({ extensions: [".coffee"], basedir: "./src/" }))
-  .require('./water_org.coffee', { expose: 'water-org-visualization' })
-  .bundle()
-  .on("error", gutil.log)
-  .pipe(source("index.js"))
-  .pipe(gulp.dest("./dist/water_org/"))
-
-gulp.task "water_org_index_css", ->
-  return gulp.src("./src/index.css")
-    .pipe(rework(reworkNpm("./src/")))
-    .pipe(gulp.dest("./dist/water_org/"))
 
 gulp.task "libs_css", ->
   return gulp.src([
@@ -132,14 +104,6 @@ gulp.task 'prepare_tests', ->
     .pipe(source('browserified.js'))
     .pipe(gulp.dest('./test'))
 
-gulp.task "water_org", gulp.parallel([
-  "copy_assets"
-  "water_org_libs_js"
-  "water_org_libs_css"
-  "water_org_index_js"
-  "water_org_index_css"
-  ])
-
 gulp.task "build", gulp.parallel([
   "browserify"
   "dist"
@@ -151,7 +115,6 @@ gulp.task "build", gulp.parallel([
   "index_css"
 ])
 
-
 gulp.task 'watch', gulp.series([
   'build', 
   ->
@@ -161,7 +124,7 @@ gulp.task 'watch', gulp.series([
     first = true
     w.on 'bytes', ->
       if first
-        browserSync({ server: "./dist", startPath: "/demo.html", ghostMode: false,  notify: false })
+        browserSync({ server: "./dist", startPath: "/demo.html", ghostMode: false,  notify: false, open: false })
         first = false
       else
         browserSync.reload()
