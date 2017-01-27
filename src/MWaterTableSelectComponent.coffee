@@ -120,6 +120,9 @@ module.exports = class MWaterTableSelectComponent extends React.Component
           H.i className: "fa fa-spinner fa-spin"
           "\u00a0Please wait..."
 
+      H.div className: "text-muted",
+        "Select data from sites, surveys or an advanced category below. Indicators can be found within their associated site types."
+
       R TabbedComponent,
         tabs: [
           { id: "sites", label: [H.i(className: "fa fa-map-marker"), " Sites"], elem: @renderSites() }
