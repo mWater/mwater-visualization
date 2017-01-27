@@ -55,7 +55,7 @@ module.exports = class MWaterAddRelatedFormComponent extends React.Component
           " Adding..."
       else 
         H.a className: "btn btn-link", onClick: @handleOpen,
-          "+ Add Related Form"
+          "+ Add Related Survey"
       if @state.open
         R AddRelatedFormModalComponent,
           table: @props.table
