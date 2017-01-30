@@ -183,30 +183,28 @@ module.exports = class DatagridComponent extends React.Component
       @renderEditor()
       @renderFindReplaceModal(filters)
 
-      # Do not render if no table
-      if @props.design.table
-        R AutoSizeComponent, injectWidth: true, injectHeight: true,
-          (size) =>
-            # Clean before displaying
-            design = new DatagridUtils(@props.schema).cleanDesign(@props.design)
+      R AutoSizeComponent, injectWidth: true, injectHeight: true,
+        (size) =>
+          # Clean before displaying
+          design = new DatagridUtils(@props.schema).cleanDesign(@props.design)
 
-            if not new DatagridUtils(@props.schema).validateDesign(design)
-              R DatagridViewComponent, {
-                ref: (view) => @datagridView = view
-                width: size.width
-                height: size.height
-                pageSize: 100
-                schema: @props.schema
-                dataSource: @props.dataSource
-                datagridDataSource: @props.datagridDataSource
-                design: @props.design
-                filters: filters
-                onDesignChange: @props.onDesignChange
-                onRowDoubleClick: @props.onRowDoubleClick
-                canEditCell: if @state.cellEditingEnabled then @props.canEditValue
-                updateCell: if @state.cellEditingEnabled then @props.updateValue
-              }
-            else
-              H.div style: { textAlign: "center", marginTop: size.height / 2 }, 
-                H.a onClick: @handleEdit,
-                  "Click to configure"
+          if not new DatagridUtils(@props.schema).validateDesign(design)
+            R DatagridViewComponent, {
+              ref: (view) => @datagridView = view
+              width: size.width
+              height: size.height
+              pageSize: 100
+              schema: @props.schema
+              dataSource: @props.dataSource
+              datagridDataSource: @props.datagridDataSource
+              design: @props.design
+              filters: filters
+              onDesignChange: @props.onDesignChange
+              onRowDoubleClick: @props.onRowDoubleClick
+              canEditCell: if @state.cellEditingEnabled then @props.canEditValue
+              updateCell: if @state.cellEditingEnabled then @props.updateValue
+            }
+          else
+            H.div style: { textAlign: "center", marginTop: size.height / 2 }, 
+              H.a className: "btn btn-link", onClick: @handleEdit, 
+                "Click Here to Configure"
