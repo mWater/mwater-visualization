@@ -98,7 +98,6 @@ module.exports = class CalendarChartViewComponent extends React.Component
 
   # Redraw component
   redraw: ->
-    @reloading = true
     container = @refs.chart_container
     container.innerHTML = ''
     cellSize = @getCellSize()
@@ -147,6 +146,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
       .append("g")
       .attr("transform", "translate("+yearGroupTranslateX+",0)")
 
+
     svg.call(tip)
 
     svg.append("text")
@@ -169,16 +169,12 @@ module.exports = class CalendarChartViewComponent extends React.Component
       .attr("height", cellSize)
       .attr("x", (d) -> d3.time.weekOfYear(d) * cellSize )
       .attr("y", (d) -> d.getDay() * cellSize )
-      .on("mouseenter", () => 
-        if not @reloading
-          tip.show()
-      )
+      .on("mouseenter", tip.show)
       .on("mouseleave", tip.hide)
       .datum(format)
 
     rect.on "click", (e) ->
       tip.hide()
-      # tip.destroy()
       selectedRect = d3.select(this)
       self.handleCellClick selectedRect, e
 
@@ -215,7 +211,6 @@ module.exports = class CalendarChartViewComponent extends React.Component
       .attr("stroke-width", @props.monthsStrokeWidth)
       .attr("d", monthPath)
 
-    @reloading = false  
     return
 
   render: ->
@@ -236,3 +231,4 @@ module.exports = class CalendarChartViewComponent extends React.Component
       if title
         H.p {style: titleStyle, ref: "title"}, title,
       H.div { ref: "chart_container"}
+
