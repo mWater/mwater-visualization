@@ -61,7 +61,10 @@ module.exports = class ExprCellComponent extends React.Component
         when "imagelist"
           node = _.map(value, (v) => @renderImage(v.id))
         when "geometry"
-          node = "#{value.coordinates[1].toFixed(6)} #{value.coordinates[0].toFixed(6)}" 
+          if value.type == "Point"
+            node = "#{value.coordinates[1].toFixed(6)} #{value.coordinates[0].toFixed(6)}" 
+          else
+            node = value.type
         else
           node = "" + value
 
