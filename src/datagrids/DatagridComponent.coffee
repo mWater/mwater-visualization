@@ -197,7 +197,7 @@ module.exports = class DatagridComponent extends React.Component
               schema: @props.schema
               dataSource: @props.dataSource
               datagridDataSource: @props.datagridDataSource
-              design: @props.design
+              design: design
               filters: filters
               onDesignChange: @props.onDesignChange
               onRowDoubleClick: @props.onRowDoubleClick
