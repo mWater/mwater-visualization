@@ -42,6 +42,9 @@ module.exports = class DatagridViewComponent extends React.Component
 
     # Called when row is double-clicked with (tableId, rowId, rowIndex)
     onRowDoubleClick: React.PropTypes.func
+    
+    # Called when a row is clicked with (tableId, rowId, rowIndex)
+    onRowClick: React.PropTypes.func
 
   @defaultProps:
     pageSize: 100
@@ -203,6 +206,10 @@ module.exports = class DatagridViewComponent extends React.Component
   handleRowDoubleClick: (ev, rowIndex) =>
     if @props.onRowDoubleClick? and @state.rows[rowIndex].id
       @props.onRowDoubleClick(@props.design.table, @state.rows[rowIndex].id, rowIndex)
+  
+  handleRowClick: (ev, rowIndex) =>
+    if @props.onRowClick? and @state.rows[rowIndex].id
+      @props.onRowClick(@props.design.table, @state.rows[rowIndex].id, rowIndex)
 
   # Render a single cell. exprType is passed in for performance purposes and is calculated once per column
   renderCell: (column, columnIndex, exprType, cellProps) =>
@@ -286,7 +293,7 @@ module.exports = class DatagridViewComponent extends React.Component
       width: @props.width
       height: @props.height
       onRowDoubleClick: @handleRowDoubleClick
+      onRowClick: @handleRowClick
       isColumnResizing: false
       onColumnResizeEndCallback: @handleColumnResize,
         @renderColumns()
-
