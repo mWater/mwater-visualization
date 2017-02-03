@@ -24,7 +24,8 @@ module.exports = class MapBoundsCalculator
       layer = LayerFactory.createLayer(layerView.type)
       
       # Ensure that valid
-      if layer.validateDesign(layerView.design, @schema)
+      layerDesign = layer.cleanDesign(layerView.design, @schema)
+      if layer.validateDesign(layerDesign, @schema)
         return cb(null)
 
       # Compile map filters
@@ -35,7 +36,7 @@ module.exports = class MapBoundsCalculator
         allFilters.push({ table: table, jsonql: jsonql })
 
       # Get bounds, including filters from map  
-      layer.getBounds(layerView.design, @schema, @dataSource, allFilters, (error, bounds) =>
+      layer.getBounds(layerDesign, @schema, @dataSource, allFilters, (error, bounds) =>
         if error
           return cb(error)
 
