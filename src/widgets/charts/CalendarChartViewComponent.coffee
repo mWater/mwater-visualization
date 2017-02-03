@@ -169,9 +169,9 @@ module.exports = class CalendarChartViewComponent extends React.Component
       .attr("height", cellSize)
       .attr("x", (d) -> d3.time.weekOfYear(d) * cellSize )
       .attr("y", (d) -> d.getDay() * cellSize )
-      .on("mouseenter", () => 
+      .on("mouseenter", (d, i) => 
         if not @reloading
-          tip.show()
+          tip.show(d, i)
       )
       .on("mouseleave", tip.hide)
       .datum(format)
