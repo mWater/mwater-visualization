@@ -211,9 +211,6 @@ module.exports = class AxisComponent extends AsyncLoadComponent
         onChange: @props.onChange
         reorderable: @props.reorderable
         defaultColor: @props.defaultColor
-        table: @props.table
-        types: @props.types
-        aggrNeed: @props.aggrNeed
         allowExcludedValues: @props.allowExcludedValues
       ]
 

@@ -19,9 +19,6 @@ module.exports = class AxisColorEditorComponent extends React.Component
     categories: React.PropTypes.array # Categories of the axis
     reorderable: React.PropTypes.bool # is the color map reorderable
     defaultColor: React.PropTypes.string
-    table: React.PropTypes.string.isRequired # Table to use
-    types: React.PropTypes.array # Optional types to limit to
-    aggrNeed: React.PropTypes.oneOf(['none', 'optional', 'required']).isRequired
     allowExcludedValues: React.PropTypes.bool # True to allow excluding of values via checkboxes
 
   @defaultProps:
