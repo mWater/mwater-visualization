@@ -9,7 +9,6 @@ ColorComponent = require '../ColorComponent'
 TableSelectComponent = require '../TableSelectComponent'
 ReactSelect = require 'react-select'
 EditPopupComponent = require './EditPopupComponent'
-ColorAxisComponent = require '../axes/ColorAxisComponent'
 ZoomLevelsComponent = require './ZoomLevelsComponent'
 MarkerSymbolSelectComponent = require './MarkerSymbolSelectComponent'
 

@@ -12,7 +12,6 @@ ColorComponent = require '../ColorComponent'
 TableSelectComponent = require '../TableSelectComponent'
 Rcslider = require 'rc-slider'
 EditPopupComponent = require './EditPopupComponent'
-ColorAxisComponent = require '../axes/ColorAxisComponent'
 ZoomLevelsComponent = require './ZoomLevelsComponent'
 
 module.exports = class BufferLayerDesignerComponent extends React.Component
