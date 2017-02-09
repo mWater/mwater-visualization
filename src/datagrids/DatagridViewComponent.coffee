@@ -102,6 +102,13 @@ module.exports = class DatagridViewComponent extends React.Component
   reload: =>
     @setState(rows: [], entirelyLoaded: false)    
 
+
+  deleteRow: (rowIndex, callback) ->
+    newRows = @state.rows.slice()
+    _.pullAt newRows, rowIndex
+    @setState(rows: newRows)
+    callback()
+
   # Reload a single row
   reloadRow: (rowIndex, callback) ->
     @props.datagridDataSource.getRows(@props.design, rowIndex, 1, @props.filters, (error, rows) =>
