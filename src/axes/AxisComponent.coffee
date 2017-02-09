@@ -32,13 +32,11 @@ module.exports = class AxisComponent extends AsyncLoadComponent
 
     required: React.PropTypes.bool  # Makes this a required value
     showColorMap: React.PropTypes.bool # Shows the color map
-    colorMapOptional: React.PropTypes.bool # Is the color map optional
     reorderable: React.PropTypes.bool # Is the draw order reorderable
     allowExcludedValues: React.PropTypes.bool # True to allow excluding of values via checkboxes
     defaultColor: React.PropTypes.string
 
   @defaultProps:
-    colorMapOptional: false
     reorderable: false
     allowExcludedValues: false
 
@@ -211,7 +209,6 @@ module.exports = class AxisComponent extends AsyncLoadComponent
         axis: axis
         categories: @state.categories
         onChange: @props.onChange
-        colorMapOptional: @props.colorMapOptional
         reorderable: @props.reorderable
         defaultColor: @props.defaultColor
         table: @props.table

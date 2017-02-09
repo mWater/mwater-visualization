@@ -16,7 +16,6 @@ module.exports = class AxisColorEditorComponent extends React.Component
     axis: React.PropTypes.object.isRequired
     onChange: React.PropTypes.func.isRequired # Called with new axis
     categories: React.PropTypes.array # Categories of the axis
-    colorMapOptional: React.PropTypes.bool # is colorMap optional TODO what does it mean to be optional?
     reorderable: React.PropTypes.bool # is the color map reorderable
     defaultColor: React.PropTypes.string
     table: React.PropTypes.string.isRequired # Table to use
@@ -25,21 +24,17 @@ module.exports = class AxisColorEditorComponent extends React.Component
     allowExcludedValues: React.PropTypes.bool # True to allow excluding of values via checkboxes
 
   @defaultProps:
-    colorMapOptional: false
     reorderable: false
 
   constructor: (props) ->
     super(props)
 
     @state = {
-      mode: if props.axis.colorMap or props.colorMapOptional then "normal" else "palette" # TODO When do we ever start in palette mode? Isn't color map auto-generated?
+      mode: "normal"
     }
 
   componentWillMount: ->
     @updateColorMap(@props.categories)
-
-  componentWillReceiveProps: (nextProps) ->
-    @setState(mode: if nextProps.axis.colorMap or nextProps.colorMapOptional then "normal" else "palette")
 
   componentDidUpdate: ->
     @updateColorMap(@props.categories)

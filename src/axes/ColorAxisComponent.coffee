@@ -19,7 +19,6 @@ module.exports = class ColorAxisComponent extends React.Component
 
     # directly passed on to AxisComponent
     showColorMap: React.PropTypes.bool # Shows the color map TODO how can this be false??
-    colorMapOptional: React.PropTypes.bool # Is the color map optional TODO when is it optional?
     reorderable: React.PropTypes.bool # Is the color map reorderable
     aggrNeed: React.PropTypes.oneOf(['none', 'optional', 'required']).isRequired
     types: React.PropTypes.array # Optional types to limit to
@@ -67,7 +66,6 @@ module.exports = class ColorAxisComponent extends React.Component
               value: @state.axis
               defaultColor: @props.defaultColor
               showColorMap: @props.showColorMap
-              colorMapOptional: @props.colorMapOptional
               reorderable: @props.reorderable
               onChange: @props.onColorAxisChange
               allowExcludedValues: @props.allowExcludedValues
