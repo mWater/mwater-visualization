@@ -8,7 +8,8 @@ ColorPaletteCollectionComponent = require './ColorPaletteCollectionComponent'
 update = require 'update-object'
 AxisBuilder = require './AxisBuilder'
 
-# Color editor for axis
+# Color editor for axis. Allows switching between editing individial colors (using CategoryMapComponent) 
+# and setting the colors from a palette (using ColorPaletteCollectionComponent)
 module.exports = class AxisColorEditorComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired
