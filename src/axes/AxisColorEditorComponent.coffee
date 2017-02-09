@@ -20,6 +20,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
     reorderable: React.PropTypes.bool # is the color map reorderable
     defaultColor: React.PropTypes.string
     allowExcludedValues: React.PropTypes.bool # True to allow excluding of values via checkboxes
+    initiallyExpanded: React.PropTypes.bool  # True to start values expanded
 
   @defaultProps:
     reorderable: false
@@ -99,3 +100,5 @@ module.exports = class AxisColorEditorComponent extends React.Component
                   reorderable: @props.reorderable
                   allowExcludedValues: @props.allowExcludedValues
                   showColorMap: true
+                  initiallyExpanded: @props.initiallyExpanded
+

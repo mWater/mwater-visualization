@@ -21,12 +21,13 @@ module.exports = class CategoryMapComponent extends React.Component
     reorderable: React.PropTypes.bool
     showColorMap: React.PropTypes.bool  # True to allow editing the color map
     allowExcludedValues: React.PropTypes.bool # True to allow excluding of values via checkboxes
+    initiallyExpanded: React.PropTypes.bool  # True to start expanded
 
-  constructor: ->
+  constructor: (props) ->
     super
 
     @state = {
-      collapsed: true  # Start collapsed
+      collapsed: not props.initiallyExpanded  # Start collapsed
     }
 
   handleReorder: (map) =>
