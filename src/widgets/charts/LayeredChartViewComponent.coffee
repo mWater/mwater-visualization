@@ -277,11 +277,11 @@ class C3ChartComponent extends React.Component
     scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @context.locale)
 
     # If same scope data, remove scope
-    if @props.scope and _.isEqual(scope.data, @props.scope.data)
-      @props.onScopeChange(null)
+    if @props.scope and _.isEqual(scope.data, @props.scope.data) 
+      @props.onScopeChange?(null)
       return
 
-    @props.onScopeChange(scope)
+    @props.onScopeChange?(scope)
 
   componentWillUnmount: ->
     @chart.destroy()
