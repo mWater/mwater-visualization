@@ -526,6 +526,27 @@ describe "LayeredChartCompiler", ->
           ["0:a", "0:b"]
           ])
 
+      it "groups partially for stacked", ->
+        design = {
+          type: "bar"
+          layers: [
+            { table: "t1", axes: { x: @axisText, y: @axisNumberSum, color: @axisEnum } }
+            { table: "t1", axes: { x: @axisText, y: @axisNumberSum } }
+          ]
+          stacked: false
+        }
+
+        data = { 
+          layer0: [{ x: "t1", y: 11, color: "a" }, { x: "t2", y: 12, color: "b" }]
+          layer1: [{ x: "t1", y: 11 }, { x: "t2", y: 12 }]
+        }
+
+        res = @compiler.compileData(design, data)
+
+        compare(res.groups, [
+          ["0:a", "0:b"]
+          ])
+
       it "percentages for proportional", ->
         design = {
           type: "bar"

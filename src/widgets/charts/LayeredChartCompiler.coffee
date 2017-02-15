@@ -491,6 +491,12 @@ module.exports = class LayeredChartCompiler
     # Stack by putting into groups
     if design.stacked
       groups = [_.keys(names)]
+    else if design.layers.length > 1 and _.any(design.layers, (layer) -> layer.axes.color)
+      # Has multiple layers and color axes within layers. Stack individual layers
+      groups = _.groupBy(_.keys(names), (series) -> series.split(":")[0])
+
+      # Remove empty groups
+      groups = _.filter(groups, (g) -> g.length > 1)
 
     # If proportional
     if design.proportional
