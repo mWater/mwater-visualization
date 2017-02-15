@@ -365,9 +365,14 @@ module.exports = class DatagridQueryBuilder
     if column.subtable and not subtable
       return { type: "select", expr: @createNullExpr(exprType), alias: "c#{columnIndex}" }
 
-    if column.subtable and subtable    
+    # Null if from wrong subtable 
+    if column.subtable and subtable 
       if subtable.id != column.subtable
         return { type: "select", expr: @createNullExpr(exprType), alias: "c#{columnIndex}" }
+
+    # Null if main column and in subtable
+    if not column.subtable and subtable
+      return { type: "select", expr: @createNullExpr(exprType), alias: "c#{columnIndex}" }
 
     # Compile expression
     exprCompiler = new ExprCompiler(@schema)

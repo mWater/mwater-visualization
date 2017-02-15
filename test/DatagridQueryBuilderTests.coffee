@@ -290,7 +290,7 @@ describe "DatagridQueryBuilder", ->
       union all
       (
         select main.primary as id, 0 as subtable, main.primary as s0, st.number as st0s0, st.primary as st0s1,
-          main.text as c0, st.number as c1
+          null::text as c0, st.number as c1
         from t1 as main inner join t2 as st on st.t1 = main.primary
       )
     ) as unioned
@@ -327,8 +327,8 @@ describe "DatagridQueryBuilder", ->
         { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "s0" }
         { type: "select", expr: { type: "field", tableAlias: "st", column: "number" }, alias: "st0s0" }
         { type: "select", expr: { type: "field", tableAlias: "st", column: "primary" }, alias: "st0s1" }
-        # Includes column
-        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
+        # Includes null for parent
+        { type: "select", expr: { type: "op", op: "::text", exprs: [null] }, alias: "c0" }
         # Includes subtable column
         { type: "select", expr: { type: "field", tableAlias: "st", column: "number" }, alias: "c1" }
       ]
