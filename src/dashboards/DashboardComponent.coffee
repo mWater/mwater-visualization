@@ -30,6 +30,12 @@ module.exports = class DashboardComponent extends React.Component
     onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
     quickfilterLocks: React.PropTypes.array             # Locked quickfilter values. See README in quickfilters
 
+    # Filters to add to the dashboard
+    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
+      table: React.PropTypes.string.isRequired    # id table to filter
+      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    }))
+
   @defaultProps:
     printScaling: true
 
@@ -219,8 +225,10 @@ module.exports = class DashboardComponent extends React.Component
     @dashboardView = el
 
   render: ->
+    filters = @props.filters or []
+
     # Compile quickfilters
-    filters = new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues, @props.quickfilterLocks)
+    filters = filters.concat(new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues, @props.quickfilterLocks))
 
     H.div key: "view", style: { height: "100%", paddingTop: 40 + (@state.quickfiltersHeight or 0), position: "relative" },
       @renderTitleBar()
