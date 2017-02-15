@@ -11,8 +11,8 @@ module.exports = class ImplicitFilterBuilder
   constructor: (schema) ->
     @schema = schema
 
-  # Find joins between filterable tables that can be used to extend explicit filters
-  # To be a useable join, must be only n-1 join between the two tables.
+  # Find joins between parent and child tables that can be used to extend explicit filters. 
+  # To be a useable join, must be only n-1 join between child and parent and child must be filterable table 
   # filterableTables: array of table ids of filterable tables
   # Returns list of { table, column } of joins from child to parent
   findJoins: (filterableTables) ->
@@ -25,7 +25,7 @@ module.exports = class ImplicitFilterBuilder
         continue
 
       # Find n-1 joins to another filterable table that are not self-references
-      joins = _.filter(@schema.getColumns(filterableTable), (column) => column.type == "join" and column.join.type == "n-1" and column.join.toTable in filterableTables and column.join.toTable != filterableTable)
+      joins = _.filter(@schema.getColumns(filterableTable), (column) => column.type == "join" and column.join.type == "n-1" and column.join.toTable != filterableTable)
 
       # Only keep if singular
       joins = _.flatten(_.filter(_.values(_.groupBy(joins, (join) -> join.join.toTable)), (list) -> list.length == 1))

@@ -12,15 +12,12 @@ describe "ImplicitFilterBuilder", ->
     @schema = fixtures.simpleSchema()
     @builder = new ImplicitFilterBuilder(@schema)
 
-  it "finds n-1 join if both present", ->
+  it "finds n-1 join if child filterable", ->
     joins = @builder.findJoins(["t1", "t2"])
     compare joins, [{ table: "t2", column: "2-1" }]
 
-  it "finds nothing if one present", ->
+  it "finds nothing if child not filterable", ->
     joins = @builder.findJoins(["t1"])
-    compare joins, []
-
-    joins = @builder.findJoins(["t2"])
     compare joins, []
 
   it "extends filter", ->
