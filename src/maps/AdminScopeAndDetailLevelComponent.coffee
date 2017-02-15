@@ -5,14 +5,15 @@ R = React.createElement
 
 RegionSelectComponent = require './RegionSelectComponent'
 DetailLevelSelectComponent = require './DetailLevelSelectComponent'
+ReactSelect = require 'react-select'
 
 module.exports = class AdminScopeAndDetailLevelComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
     dataSource: React.PropTypes.object.isRequired
-    scope: React.PropTypes.string     # admin region
-    scopeLevel: React.PropTypes.number # Scope level within
-    detailLevel: React.PropTypes.number # Detail level within
+    scope: React.PropTypes.string     # admin region that is outside bounds. null for whole world
+    scopeLevel: React.PropTypes.number # level of scope region. null for whole world
+    detailLevel: React.PropTypes.number # Detail level within scope region
     onScopeAndDetailLevelChange: React.PropTypes.func.isRequired # Called with (scope, scopeLevel, detailLevel)
 
   handleScopeChange: (scope, scopeLevel) =>
@@ -42,4 +43,16 @@ module.exports = class AdminScopeAndDetailLevelComponent extends React.Component
             onChange: @handleDetailLevelChange
             schema: @props.schema
             dataSource: @props.dataSource
+      else if not @props.scope? and @props.detailLevel?
+        # Case of whole world. Allow selecting country or admin level 1
+        H.div className: "form-group",
+          H.label className: "text-muted", 
+            "Detail Level"
+          R ReactSelect, {
+            value: @props.detailLevel
+            options: [{ value: 0, label: "Countries" }, { value: 1, label: "Level 1 (State/Province/District)" }]
+            clearable: false
+            onChange: (value) => @handleDetailLevelChange(parseInt(value))
+          }
+
 
