@@ -456,13 +456,13 @@ module.exports = class LayeredChartCompiler
 
         # Sort color values by category order:
         # Get categories
-        categories = @axisBuilder.getCategories(layer.axes.color, colorValues, locale)
+        colorCategories = @axisBuilder.getCategories(layer.axes.color, colorValues, locale)
 
         # Get indexed ordering of categories (lookup from value to index) without removing excluded values
-        categoryOrder = _.zipObject(_.map(categories, (c, i) -> [c.value, i]))
+        colorCategoryOrder = _.zipObject(_.map(colorCategories, (c, i) -> [c.value, i]))
 
         # Sort
-        colorValues = _.sortBy(colorValues, (v) -> categoryOrder[v])
+        colorValues = _.sortBy(colorValues, (v) -> colorCategoryOrder[v])
 
         # Exclude excluded ones
         colorValues = _.difference(colorValues, layer.axes.color.excludedValues)
