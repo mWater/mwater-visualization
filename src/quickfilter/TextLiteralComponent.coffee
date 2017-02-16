@@ -23,7 +23,7 @@ module.exports = class TextLiteralComponent extends React.Component
     # Create query to get matches ordered by most frequent to least
     exprCompiler = new ExprCompiler(@props.schema)
 
-    # select <compiled expr> as value, count(*) as number from <table> where <compiled expr> like 'input%' group by value order by number desc limit 50
+    # select <compiled expr> as value, count(*) as number from <table> where <compiled expr> like 'input%' group by value order by number desc limit 250
     query = {
       type: "query"
       selects: [
@@ -41,7 +41,7 @@ module.exports = class TextLiteralComponent extends React.Component
       }
       groupBy: [1]
       orderBy: [{ ordinal: 2, direction: "desc" }, { ordinal: 1, direction: "asc" }]
-      limit: 50
+      limit: 250
     }
 
     # Execute query
