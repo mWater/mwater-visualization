@@ -48,7 +48,7 @@ module.exports = class OrderingsComponent extends React.Component
 
 class OrderingComponent extends React.Component
   @propTypes: 
-    ordering: React.PropTypes.array.isRequired
+    ordering: React.PropTypes.object.isRequired
     onOrderingChange: React.PropTypes.func.isRequired
     onOrderingRemove: React.PropTypes.func.isRequired
     schema: React.PropTypes.object.isRequired

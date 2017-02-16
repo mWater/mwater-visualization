@@ -159,8 +159,8 @@ module.exports = class TableChart extends Chart
         alias: "o#{i}"
       })
 
-      query.orderBy.push({ ordinal: design.columns.length + i + 1, direction: ordering.direction })
-      
+      query.orderBy.push({ ordinal: design.columns.length + i + 1, direction: ordering.direction, nulls: (if ordering.direction == "desc" then "last" else "first") })
+
       # Add group by if non-aggregate
       if exprUtils.getExprAggrStatus(ordering.axis?.expr) == "individual"
         query.groupBy.push(design.columns.length + i + 1)
