@@ -190,8 +190,19 @@ module.exports = class LayeredChartCompiler
     _.each design.layers, (layer, layerIndex) =>
       # If has color axis
       if layer.axes.color
+        layerData = data["layer#{layerIndex}"]
+
+        # Categories will be in form [{ value, label }]
+        categories = @axisBuilder.getCategories(layer.axes.color, _.pluck(layerData, "color"), locale)
+
+        # Get indexed ordering of categories (lookup from value to index) without removing excluded values
+        categoryOrder = _.zipObject(_.map(categories, (c, i) -> [c.value, i]))
+
+        # Sort by category order
+        layerData = _.sortBy(layerData, (row) -> categoryOrder[row.color])
+
         # Create a series for each row
-        _.each data["layer#{layerIndex}"], (row, rowIndex) =>
+        _.each layerData, (row, rowIndex) =>
           # Skip if value excluded
           if _.includes(layer.axes.color.excludedValues, row.color)
             return
@@ -252,11 +263,25 @@ module.exports = class LayeredChartCompiler
       layerData = data["layer#{layerIndex}"]
       @fixStringYValues(layerData)
 
+      if layer.cumulative
+        @makeRowsCumulative(layerData)
+
       # If has color axis
       if layer.axes.color
         # Create a series for each color value
         colorValues = _.uniq(_.pluck(layerData, "color"))
 
+        # Sort color values by category order:
+        # Get categories
+        categories = @axisBuilder.getCategories(layer.axes.color, colorValues, locale)
+
+        # Get indexed ordering of categories (lookup from value to index) without removing excluded values
+        categoryOrder = _.zipObject(_.map(categories, (c, i) -> [c.value, i]))
+
+        # Sort
+        colorValues = _.sortBy(colorValues, (v) -> categoryOrder[v])
+
+        # For each color value
         _.each colorValues, (colorValue) =>
           # Skip if value excluded
           if _.includes(layer.axes.color.excludedValues, colorValue)
@@ -276,8 +301,6 @@ module.exports = class LayeredChartCompiler
           rows = _.where(layerData, color: colorValue)
 
           yValues = _.pluck(rows, "y")
-          if layer.cumulative
-            @makeCumulative(yValues)
 
           columns.push([seriesY].concat(yValues))
           columns.push([seriesX].concat(_.pluck(rows, "x")))
@@ -294,8 +317,6 @@ module.exports = class LayeredChartCompiler
         seriesY = "#{layerIndex}:y"
 
         yValues = _.pluck(layerData, "y")
-        if layer.cumulative
-          @makeCumulative(yValues)
 
         columns.push([seriesY].concat(yValues))
         columns.push([seriesX].concat(_.pluck(layerData, "x")))
@@ -388,6 +409,9 @@ module.exports = class LayeredChartCompiler
     # Categories will be in form [{ value, label }]
     categories = @axisBuilder.getCategories(xAxis, xValues, locale)
 
+    # Get indexed ordering of categories (lookup from value to index) without removing excluded values
+    categoryOrder = _.zipObject(_.map(categories, (c, i) -> [c.value, i]))
+
     # Exclude excluded values
     categories = _.filter(categories, (category) => not _.includes(xAxis.excludedValues, category.value))
 
@@ -408,16 +432,23 @@ module.exports = class LayeredChartCompiler
       # Get data of layer
       layerData = data["layer#{layerIndex}"]
 
-      # Filter out categories that were removed
-      if xType != "enumset"
-        layerData = _.filter(layerData, (row) -> categoryXs[row.x]?)
-
       # Fix string y values
       layerData = @fixStringYValues(layerData)
 
       # Flatten if x-type is enumset. e.g. if one row has x = ["a", "b"], make into two rows with x="a" and x="b", summing if already exists
       if xType == "enumset"
         layerData = @flattenRowData(layerData)
+
+      # Reorder to category order for x-axis
+      layerData = _.sortBy(layerData, (row) -> categoryOrder[row.x])
+
+      # Make rows cumulative
+      if layer.cumulative
+        @makeRowsCumulative(layerData)
+
+      # Filter out categories that were removed
+      if xType != "enumset"
+        layerData = _.filter(layerData, (row) -> categoryXs[row.x]?)
 
       # If has color axis
       if layer.axes.color
@@ -451,9 +482,6 @@ module.exports = class LayeredChartCompiler
               column[index] = row.y
               dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
 
-          if layer.cumulative
-            @makeCumulative(column)
-
           columns.push([series].concat(column))
 
           types[series] = @getLayerType(design, layerIndex)
@@ -477,9 +505,6 @@ module.exports = class LayeredChartCompiler
           index = categoryMap[row.x]
           column[index] = row.y
           dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
-
-        if layer.cumulative
-          @makeCumulative(column)
 
         columns.push([series].concat(column))
 
@@ -645,13 +670,14 @@ module.exports = class LayeredChartCompiler
 
     return scope
 
-  # Converts an array [value, value...] to be cumulative
-  makeCumulative: (column) ->
-    total = 0
-    for i in [0...column.length]
-      if column[i]?
-        total += column[i]
-      column[i] = total
+  # Converts a series of rows to have cumulative y axis, separating out by color axis if present
+  makeRowsCumulative: (rows) ->
+    # Indexed by color
+    totals = {}
+    for row in rows
+      total = totals[row.color] or 0
+      row.y = total + row.y
+      totals[row.color] = row.y
 
 # Clean out nbsp (U+00A0) as it causes c3 errors
 cleanString = (str) ->

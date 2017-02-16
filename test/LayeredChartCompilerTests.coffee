@@ -214,9 +214,10 @@ describe "LayeredChartCompiler", ->
             ]
           }
 
+          # Intentionally scramble order for enum value as sort is not always same as enum order
           @data = { layer0: [
-            { color: "a", y: 1 }
             { color: "b", y: 2 }
+            { color: "a", y: 1 }
           ]}
 
           @res = @compiler.compileData(@design, @data)
@@ -234,8 +235,8 @@ describe "LayeredChartCompiler", ->
 
         it "maps back to rows", ->
           compare(@res.dataMap, {
-            "0:0": { layerIndex: 0, row: @data.layer0[0] }
-            "0:1": { layerIndex: 0, row: @data.layer0[1] }
+            "0:0": { layerIndex: 0, row: @data.layer0[1] }
+            "0:1": { layerIndex: 0, row: @data.layer0[0] }
             })
 
         it "names", ->
@@ -419,12 +420,14 @@ describe "LayeredChartCompiler", ->
             ]
           }
 
+          # Intentionally scramble enum order
           @data = { 
             layer0: [
+              { x: 1, color: "b", y: 2 }
+              { x: 2, color: "b", y: 5 }            
               { x: 1, color: "a", y: 1 }
               { x: 2, color: "a", y: 4 }
-              { x: 1, color: "b", y: 2 }
-              { x: 2, color: "b", y: 5 }            ]
+            ]
           }
 
           @res = @compiler.compileData(@design, @data)
@@ -451,10 +454,10 @@ describe "LayeredChartCompiler", ->
 
         it "maps back to rows", ->
           compare(@res.dataMap, {
-            "0:a:y:0": { layerIndex: 0, row: @data.layer0[0] }
-            "0:a:y:1": { layerIndex: 0, row: @data.layer0[1] }
-            "0:b:y:0": { layerIndex: 0, row: @data.layer0[2] }
-            "0:b:y:1": { layerIndex: 0, row: @data.layer0[3] }
+            "0:a:y:0": { layerIndex: 0, row: @data.layer0[2] }
+            "0:a:y:1": { layerIndex: 0, row: @data.layer0[3] }
+            "0:b:y:0": { layerIndex: 0, row: @data.layer0[0] }
+            "0:b:y:1": { layerIndex: 0, row: @data.layer0[1] }
             })
 
         it "names", ->
@@ -546,6 +549,43 @@ describe "LayeredChartCompiler", ->
         compare(res.groups, [
           ["0:a", "0:b"]
           ])
+
+      it "totals for cumulative", ->
+        design = {
+          type: "bar"
+          layers: [
+            { table: "t1", axes: { x: @axisText, y: @axisNumberSum }, cumulative: true }
+          ]
+        }
+
+        data = { 
+          layer0: [{ x: "t1", y: 1 }, { x: "t2", y: 2 }, { x: "t3", y: 3 }]
+        }
+
+        res = @compiler.compileData(design, data)
+        compare(res.columns, [
+          ["x", "t1", "t2", "t3", "None"]
+          ["0", 1, 3, 6, null]
+        ])
+
+      it "totals for cumulative, including excluded x-values", ->
+        design = {
+          type: "bar"
+          layers: [
+            { table: "t1", axes: { x: @axisText, y: @axisNumberSum }, cumulative: true }
+          ]
+        }
+        design.layers[0].axes.x = _.extend({}, design.layers[0].axes.x, { excludedValues: ["t1", null] })
+
+        data = { 
+          layer0: [{ x: "t1", y: 3 }, { x: "t2", y: 4 }, { x: "t3", y: 5 }]
+        }
+
+        res = @compiler.compileData(design, data)
+        compare(res.columns, [
+          ["x", "t2", "t3"]
+          ["0", 7, 12]
+        ])
 
       it "percentages for proportional", ->
         design = {
