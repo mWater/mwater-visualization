@@ -264,7 +264,7 @@ module.exports = class LayeredChartCompiler
       @fixStringYValues(layerData)
 
       if layer.cumulative
-        @makeRowsCumulative(layerData)
+        layerData = @makeRowsCumulative(layerData)
 
       # If has color axis
       if layer.axes.color
@@ -444,7 +444,7 @@ module.exports = class LayeredChartCompiler
 
       # Make rows cumulative
       if layer.cumulative
-        @makeRowsCumulative(layerData)
+        layerData = @makeRowsCumulative(layerData)
 
       # Filter out categories that were removed
       if xType != "enumset"
@@ -674,10 +674,15 @@ module.exports = class LayeredChartCompiler
   makeRowsCumulative: (rows) ->
     # Indexed by color
     totals = {}
+
+    newRows = []
     for row in rows
       total = totals[row.color] or 0
-      row.y = total + row.y
-      totals[row.color] = row.y
+      y = total + row.y
+      totals[row.color] = y
+      newRows.push(_.extend({}, row, y: y))
+
+    return newRows
 
 # Clean out nbsp (U+00A0) as it causes c3 errors
 cleanString = (str) ->
