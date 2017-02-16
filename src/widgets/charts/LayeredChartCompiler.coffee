@@ -491,6 +491,12 @@ module.exports = class LayeredChartCompiler
               column[index] = row.y
               dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
 
+          # Fill in nulls if cumulative
+          if layer.cumulative
+            for value, i in column
+              if not value? and i > 0
+                column[i] = column[i - 1]
+
           columns.push([series].concat(column))
 
           types[series] = @getLayerType(design, layerIndex)
@@ -686,9 +692,12 @@ module.exports = class LayeredChartCompiler
 
     newRows = []
     for row in rows
+      # Add up total
       total = totals[row.color] or 0
       y = total + row.y
       totals[row.color] = y
+
+      # Create new row
       newRows.push(_.extend({}, row, y: y))
 
     return newRows

@@ -587,6 +587,25 @@ describe "LayeredChartCompiler", ->
           ["0", 7, 12]
         ])
 
+      it "totals for cumulative with color split missing values", ->
+        design = {
+          type: "bar"
+          layers: [
+            { table: "t1", axes: { x: @axisText, y: @axisNumberSum, color: @axisEnum }, cumulative: true }
+          ]
+        }
+
+        data = { 
+          layer0: [{ x: "t1", y: 3, color: "a" }, { x: "t1", y: 4, color: "b" }, { x: "t2", y: 8, color: "a" }]
+        }
+
+        res = @compiler.compileData(design, data)
+        compare(res.columns, [
+          ["x", "t1", "t2", "None"]
+          ["0:a", 3, 11, null]
+          ["0:b", 4, 4, null]
+        ])
+
       it "percentages for proportional", ->
         design = {
           type: "bar"
