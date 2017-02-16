@@ -25,7 +25,15 @@ module.exports = class CalendarChartDesignerComponent extends React.Component
   handleTitleTextChange: (ev) =>  @updateDesign(titleText: ev.target.value)
   handleTableChange: (table) => @updateDesign(table: table)
   handleFilterChange: (filter) => @updateDesign(filter: filter)
-  handleDateAxisChange: (dateAxis) => @updateDesign(dateAxis: dateAxis)
+  
+  handleDateAxisChange: (dateAxis) => 
+    # Default value axis to count if date axis present
+    if not @props.design.valueAxis and dateAxis
+      # Create count expr
+      valueAxis = { expr: { type: "op", op: "count", table: @props.design.table, exprs: [] }, xform: null }
+      @updateDesign(dateAxis: dateAxis, valueAxis: valueAxis)
+    else
+      @updateDesign(dateAxis: dateAxis)
   handleValueAxisChange: (valueAxis) => @updateDesign(valueAxis: valueAxis)
 
   renderTable: ->

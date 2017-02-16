@@ -34,11 +34,6 @@ module.exports = class CalendarChart extends Chart
     design.dateAxis = axisBuilder.cleanAxis(axis: design.dateAxis, table: design.table, aggrNeed: "none", types: ["date"])
     design.valueAxis = axisBuilder.cleanAxis(axis: design.valueAxis, table: design.table, aggrNeed: "required", types: ["number"])
 
-    # Default value axis to count if date axis present
-    if not design.valueAxis and design.dateAxis
-      # Create count expr
-      design.valueAxis = { expr: { type: "id", table: design.table }, aggr: "count", xform: null }
-
     # Clean filter
     design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ["boolean"] })
 
