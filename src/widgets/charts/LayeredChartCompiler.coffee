@@ -266,6 +266,9 @@ module.exports = class LayeredChartCompiler
       if layer.cumulative
         layerData = @makeRowsCumulative(layerData)
 
+      # Remove excluded values
+      layerData = _.filter(layerData, (row) => not _.includes(layer.axes.x.excludedValues, row.x))
+
       # If has color axis
       if layer.axes.color
         # Create a series for each color value

@@ -602,8 +602,8 @@ describe "LayeredChartCompiler", ->
         res = @compiler.compileData(design, data)
         compare(res.columns, [
           ["x", "t1", "t2", "None"]
-          ["0:a", 3, 11, null]
-          ["0:b", 4, 4, null]
+          ["0:a", 3, 11, 11]
+          ["0:b", 4, 4, 4]
         ])
 
       it "percentages for proportional", ->
