@@ -2,6 +2,7 @@ _ = require 'lodash'
 ItemsHtmlConverter = require './ItemsHtmlConverter'
 ExprUtils = require('mwater-expressions').ExprUtils
 uuid = require 'uuid'
+d3Format = require 'd3-format'
 
 # ItemsHtmlConverter that supports embedded mwater expressions
 
@@ -9,7 +10,7 @@ uuid = require 'uuid'
 # Items are array of:
 #  string (html text) 
 #  { type: "element", tag: "h1", items: [nested items] }
-#  { type: "expr", id: unique id, expr: expression, includeLabel: true to include label, labelText: override label text } 
+#  { type: "expr", id: unique id, expr: expression, includeLabel: true to include label, labelText: override label text, format: d3 format if number } 
 module.exports = class ExprItemsHtmlConverter extends ItemsHtmlConverter 
   # designMode is true to display in design mode (exprs as blocks)
   # exprValues is map of expr id to value 
@@ -38,7 +39,12 @@ module.exports = class ExprItemsHtmlConverter extends ItemsHtmlConverter
         exprUtils = new ExprUtils(@schema)
 
         if @exprValues[item.id]?
-          text = exprUtils.stringifyExprLiteral(item.expr, @exprValues[item.id]) # TODO locale
+          # Use d3 format if number and has format
+          if item.format and exprUtils.getExprType(item.expr) == "number"
+            text = d3Format.format(item.format)(@exprValues[item.id])
+          else
+            text = exprUtils.stringifyExprLiteral(item.expr, @exprValues[item.id]) # TODO locale
+
           exprHtml = _.escape(text)
         else
           exprHtml = '<span style="color: #DDD">---</span>'

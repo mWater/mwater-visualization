@@ -38,7 +38,21 @@ module.exports = class ExprItemEditorComponent extends React.Component
     exprItem = _.extend({}, @props.exprItem, labelText: ev.target.value or null)
     @props.onChange(exprItem)
 
+  handleFormatChange: (ev) =>
+    exprItem = _.extend({}, @props.exprItem, format: ev.target.value or null)
+    @props.onChange(exprItem)
+
   render: ->
+    formats = [
+      { value: "", label: "Normal: 1234.567" }
+      { value: ",.0f", label: "Rounded: 1,234"  }
+      { value: ",.2f", label: "Two decimals: 1,234.56" }
+      { value: "$,.2f", label: "Currency: $1,234.56" }
+      { value: "$,.0f", label: "Currency rounded: $1,234" }
+    ]
+
+    exprUtils = new ExprUtils(@props.schema)
+
     H.div style: { paddingBottom: 200 },
       H.div className: "form-group",
         H.label className: "text-muted", 
@@ -62,18 +76,29 @@ module.exports = class ExprItemEditorComponent extends React.Component
             value: @props.exprItem.expr
             aggrStatuses: ["individual", "literal", "aggregate"]
             onChange: @handleExprChange
-
+      
       if @state.table and @props.exprItem.expr
-        H.label key: "includeLabel",
-          H.input type: "checkbox", checked: @props.exprItem.includeLabel, onChange: @handleIncludeLabelChange
-          " Include Label"
+        H.div className: "form-group",
+          H.label key: "includeLabel",
+            H.input type: "checkbox", checked: @props.exprItem.includeLabel, onChange: @handleIncludeLabelChange
+            " Include Label"
 
-      if @state.table and @props.exprItem.expr and @props.exprItem.includeLabel
-        H.input 
-          key: "labelText"
-          className: "form-control"
-          type: "text"
-          value: @props.exprItem.labelText or ""
-          onChange: @handleLabelTextChange 
-          placeholder: new ExprUtils(@props.schema).summarizeExpr(@props.exprItem.expr) + ": "
+          if @props.exprItem.includeLabel
+            H.input 
+              key: "labelText"
+              className: "form-control"
+              type: "text"
+              value: @props.exprItem.labelText or ""
+              onChange: @handleLabelTextChange 
+              placeholder: new ExprUtils(@props.schema).summarizeExpr(@props.exprItem.expr) + ": "
+
+      if @props.exprItem.expr and exprUtils.getExprType(@props.exprItem.expr) == "number"
+        H.div className: "form-group",
+          H.label className: "text-muted", 
+            "Format"
+          ": "
+          H.select value: @props.exprItem.format or "", className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
+            _.map(formats, (format) -> H.option(key: format.value, value: format.value, format.label))
+
+
 
