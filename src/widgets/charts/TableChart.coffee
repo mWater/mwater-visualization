@@ -22,10 +22,10 @@ Design is:
 column:
   id: unique id of column (uuid v4)
   headerText: header text
-  textAxis: axis that creates the text value of the column
+  textAxis: axis that creates the text value of the column. NOTE: now no longer using as an axis, but only using expression within!
 
 ordering:
-  axis: axis that creates the order expression
+  axis: axis that creates the order expression. NOTE: now no longer using as an axis, but only using expression within!
   direction: "asc"/"desc"
 
 ###
@@ -138,7 +138,7 @@ module.exports = class TableChart extends Chart
     for colNum in [0...design.columns.length]
       column = design.columns[colNum]
 
-      expr = axisBuilder.compileAxis(axis: column.textAxis, tableAlias: "main")
+      expr = exprCompiler.compileExpr(expr: column.textAxis?.expr, tableAlias: "main")
 
       query.selects.push({
         type: "select"
@@ -155,13 +155,14 @@ module.exports = class TableChart extends Chart
       # Add as select so we can use ordinals. Prevents https://github.com/mWater/mwater-visualization/issues/165
       query.selects.push({
         type: "select"
-        expr: axisBuilder.compileAxis(axis: ordering.axis, tableAlias: "main")
+        expr: exprCompiler.compileExpr(expr: ordering.axis?.expr, tableAlias: "main")
         alias: "o#{i}"
       })
 
       query.orderBy.push({ ordinal: design.columns.length + i + 1, direction: ordering.direction })
+      
       # Add group by if non-aggregate
-      if not axisBuilder.isAxisAggr(ordering.axis)
+      if exprUtils.getExprAggrStatus(ordering.axis?.expr) == "individual"
         query.groupBy.push(design.columns.length + i + 1)
 
     # Add id. Also add num_ids so we can tell if unique

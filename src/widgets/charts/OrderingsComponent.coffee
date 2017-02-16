@@ -3,10 +3,11 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
-AxisComponent = require '../../axes/AxisComponent'
+ExprComponent = require("mwater-expressions-ui").ExprComponent
 
 # Edits the orderings of a chart
 # Orderings are an array of { axis: axis to order by, direction: "asc"/"desc" }
+# NOTE: no longer uses complete axis, just the expr
 module.exports = class OrderingsComponent extends React.Component
   @propTypes: 
     orderings: React.PropTypes.array.isRequired
@@ -57,6 +58,10 @@ class OrderingComponent extends React.Component
   handleAxisChange: (axis) =>
     @props.onOrderingChange(_.extend({}, @props.ordering, axis: axis))
 
+  handleExprChange: (expr) =>
+    axis = _.extend({}, @props.ordering.axis or {}, expr: expr)
+    @handleAxisChange(axis)
+
   handleDirectionChange: (ev) =>
     @props.onOrderingChange(_.extend({}, @props.ordering, direction: if ev.target.checked then "desc" else "asc"))
 
@@ -65,14 +70,14 @@ class OrderingComponent extends React.Component
       H.div style: { textAlign: "right" },
         H.button className: "btn btn-xs btn-link", type: "button", onClick: @props.onOrderingRemove,
           H.span className: "glyphicon glyphicon-remove"
-      R AxisComponent,
+      R ExprComponent,
         schema: @props.schema
         dataSource: @props.dataSource
         table: @props.table
         types: ['text', 'number', 'boolean', 'date', 'datetime']
-        aggrNeed: 'optional'
-        value: @props.ordering.axis
-        onChange: @handleAxisChange
+        aggrStatuses: ['individual', 'aggregate']
+        value: @props.ordering.axis?.expr
+        onChange: @handleExprChange
       H.div null, 
         H.div className: "checkbox-inline",
           H.label null,
