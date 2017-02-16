@@ -281,12 +281,11 @@ module.exports = class LayeredChartCompiler
         # Sort
         colorValues = _.sortBy(colorValues, (v) -> categoryOrder[v])
 
+        # Exclude excluded ones
+        colorValues = _.difference(colorValues, layer.axes.color.excludedValues)
+
         # For each color value
         _.each colorValues, (colorValue) =>
-          # Skip if value excluded
-          if _.includes(layer.axes.color.excludedValues, colorValue)
-            return
-
           # One series for x values, one for y
           seriesX = "#{layerIndex}:#{colorValue}:x"
           seriesY = "#{layerIndex}:#{colorValue}:y"
@@ -454,6 +453,16 @@ module.exports = class LayeredChartCompiler
       if layer.axes.color
         # Create a series for each color value
         colorValues = _.uniq(_.pluck(layerData, "color"))
+
+        # Sort color values by category order:
+        # Get categories
+        categories = @axisBuilder.getCategories(layer.axes.color, colorValues, locale)
+
+        # Get indexed ordering of categories (lookup from value to index) without removing excluded values
+        categoryOrder = _.zipObject(_.map(categories, (c, i) -> [c.value, i]))
+
+        # Sort
+        colorValues = _.sortBy(colorValues, (v) -> categoryOrder[v])
 
         # Exclude excluded ones
         colorValues = _.difference(colorValues, layer.axes.color.excludedValues)
