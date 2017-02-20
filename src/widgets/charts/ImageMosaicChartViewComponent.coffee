@@ -4,7 +4,7 @@ H = React.DOM
 R = React.createElement
 
 AxisBuilder = require '../../axes/AxisBuilder'
-LazyLoad = require 'react-lazy-load'
+LazyLoad = require('react-lazy-load').default
 
 # creates a d3 calendar visualization
 module.exports = class ImageMosaicChartViewComponent extends React.Component

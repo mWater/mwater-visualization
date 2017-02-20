@@ -46,7 +46,7 @@
     "react-dom": "^15.4.1",
     "react-dropzone": "^3.5.3",
     "react-float-affixed": "^0.1.8",
-    "react-lazy-load": "^3.0.10",
+    "react-lazy-load": "^3.0.11",
     "react-library": "github:mwater/react-library",
     "react-motion": "^0.3.0",
     "react-onclickout": "^2.0.4",
