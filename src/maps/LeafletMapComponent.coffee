@@ -144,7 +144,7 @@ module.exports = class LeafletMapComponent extends React.Component
     @updateMap(prevProps)
 
   componentWillUnmount: ->
-    @map.remove()
+    @map?.remove()
 
   # Open a popup.
   # Options:
