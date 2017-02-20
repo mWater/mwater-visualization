@@ -7,13 +7,14 @@ AxisBuilder = require '../../axes/AxisBuilder'
 ExprUtils = require('mwater-expressions').ExprUtils
 
 # Require d3-tip to use it
-require('d3-tip')(d3)
+d3Tip = require('d3-tip')
+d3.tip = d3Tip
 
 # creates a d3 calendar visualization
 module.exports = class CalendarChartViewComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired # Design of chart
-    data: React.PropTypes.array.isRequired # Data that the chart has requested. In format [{ date: <YYYY-MM-DD>, value: <number value> }, { date: ... }...] 
+    data: React.PropTypes.array.isRequired # Data that the chart has requested. In format [{ date: <YYYY-MM-DD>, value: <number value> }, { date: ... }...]
 
     width: React.PropTypes.number
     height: React.PropTypes.number
@@ -71,7 +72,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
     years = _.filter(years, (y) -> y > 1970 and y < 2050)
 
     # Take only max of 10 years to display
-    years = _.take(years, 10) 
+    years = _.take(years, 10)
 
     return years
 
@@ -169,7 +170,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
       .attr("height", cellSize)
       .attr("x", (d) -> d3.time.weekOfYear(d) * cellSize )
       .attr("y", (d) -> d.getDay() * cellSize )
-      .on("mouseenter", (d, i) => 
+      .on("mouseenter", (d, i) =>
         if not @reloading
           tip.show(d, i)
       )
@@ -215,7 +216,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
       .attr("stroke-width", @props.monthsStrokeWidth)
       .attr("d", monthPath)
 
-    @reloading = false  
+    @reloading = false
     return
 
   render: ->

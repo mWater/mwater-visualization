@@ -31,22 +31,22 @@ module.exports = class DatagridDesignerComponent extends React.Component
     }
 
     @props.onDesignChange(design)
- 
-  handleColumnsChange: (columns) => 
+
+  handleColumnsChange: (columns) =>
     @props.onDesignChange(update(@props.design, columns: { $set: columns }))
 
-  handleFilterChange: (filter) => 
+  handleFilterChange: (filter) =>
     @props.onDesignChange(update(@props.design, filter: { $set: filter }))
 
-  handleOrderBysChange: (orderBys) => 
+  handleOrderBysChange: (orderBys) =>
     @props.onDesignChange(update(@props.design, orderBys: { $set: orderBys }))
 
   # Render the tabs of the designer
   renderTabs: ->
-    R TabbedComponent, 
+    R TabbedComponent,
       initialTabId: "columns"
       tabs: [
-        { 
+        {
           id: "columns"
           label: "Columns"
           elem: R(ColumnsDesignerComponent, {
@@ -55,9 +55,9 @@ module.exports = class DatagridDesignerComponent extends React.Component
             table: @props.design.table
             columns: @props.design.columns
             onColumnsChange: @handleColumnsChange
-          }) 
+          })
         }
-        { 
+        {
           id: "filter"
           label: "Filter"
           # Here because of modal scroll issue
@@ -68,9 +68,9 @@ module.exports = class DatagridDesignerComponent extends React.Component
               table: @props.design.table
               value: @props.design.filter
               onChange: @handleFilterChange
-            }) 
+            })
         }
-        { 
+        {
           id: "order"
           label: "Sorting"
           elem: H.div style: { marginBottom: 200 },
@@ -80,9 +80,9 @@ module.exports = class DatagridDesignerComponent extends React.Component
               table: @props.design.table
               orderBys: @props.design.orderBys
               onChange: @handleOrderBysChange
-            }) 
+            })
         }
-        { 
+        {
           id: "quickfilters"
           label: "Quickfilters"
           elem: H.div style: { marginBottom: 200 },
@@ -98,7 +98,7 @@ module.exports = class DatagridDesignerComponent extends React.Component
   render: ->
     H.div null,
       H.label null, "Data Source:"
-      R TableSelectComponent, 
+      R TableSelectComponent,
         schema: @props.schema
         value: @props.design.table
         onChange: @handleTableChange
@@ -128,7 +128,7 @@ class ColumnsDesignerComponent extends React.Component
       Array.prototype.splice.apply(columns, [columnIndex, 1].concat(column))
     else
       columns[columnIndex] = column
-      
+
     @props.onColumnsChange(columns)
 
   handleAddColumn: =>
@@ -151,11 +151,11 @@ class ColumnsDesignerComponent extends React.Component
     columns = @props.columns.concat(new DefaultColumnsBuilder(@props.schema).buildColumns(@props.table))
     @props.onColumnsChange(columns)
 
-  handleRemoveAllColumns: => 
+  handleRemoveAllColumns: =>
     @props.onColumnsChange([])
 
   render: ->
-    H.div style: { height: 800, overflowY: "auto", overflowX: "hidden" }, 
+    H.div style: { height: "auto",overflowY: "auto",  overflowX: "hidden" },
       H.div style: { textAlign: "right" }, key: "options",
         H.button
           key: "addAll"
@@ -174,7 +174,7 @@ class ColumnsDesignerComponent extends React.Component
 
       R ReactReorderable, onDrop: @handleReorder, handle: ".drag-handle",
         _.map @props.columns, (column, columnIndex) =>
-          R ColumnDesignerComponent, 
+          R ColumnDesignerComponent,
             key: columnIndex
             schema: @props.schema
             table: @props.table
@@ -245,7 +245,7 @@ class ColumnDesignerComponent extends React.Component
           table: @props.table
           exprs: [@props.column.expr]
         }
-      }      
+      }
       {
         id: uuid()
         type: "expr"
@@ -256,7 +256,7 @@ class ColumnDesignerComponent extends React.Component
           table: @props.table
           exprs: [@props.column.expr]
         }
-      }      
+      }
     ])
 
   # Render options to split a column, such as an enumset to booleans or geometry to lat/lng
@@ -293,7 +293,7 @@ class ColumnDesignerComponent extends React.Component
       H.div className: "col-xs-1",
         H.span className: "text-muted glyphicon glyphicon-move drag-handle"
 
-      H.div className: "col-xs-5", # style: { border: "solid 1px #DDD", padding: 4 }, 
+      H.div className: "col-xs-5", # style: { border: "solid 1px #DDD", padding: 4 },
         R ExprComponent,
           schema: @props.schema
           dataSource: @props.dataSource
@@ -329,13 +329,13 @@ class DefaultColumnsBuilder
     for col in @schema.getColumns(table)
       # Skip joins
       if col.type == "join"
-        continue 
+        continue
 
       # Skip deprecated
       if col.deprecated
         continue
 
-      columns.push({ 
+      columns.push({
          id: uuid()
          type: "expr"
          width: 150
