@@ -23,7 +23,7 @@
     "d3-format": "^1.0.2",
     "d3-scale": "^1.0.3",
     "d3-scale-chromatic": "^1.0.2",
-    "d3-tip": "^0.6.7",
+    "d3-tip": "^0.6.8",
     "filesaver.js": "^0.1.1",
     "fixed-data-table": "^0.6.0",
     "immutable-setter": "^1.1.1",

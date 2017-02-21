@@ -7,7 +7,7 @@ AxisBuilder = require '../../axes/AxisBuilder'
 ExprUtils = require('mwater-expressions').ExprUtils
 
 # Require d3-tip to use it
-d3.tip = require('d3-tip')
+d3Tip = require('d3-tip')
 
 # creates a d3 calendar visualization
 module.exports = class CalendarChartViewComponent extends React.Component
@@ -120,7 +120,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
       .rollup( (d) -> d[0].value )
       .map(@props.data, d3.map)
 
-    tip = d3.tip().attr('class', 'd3-tip').html( (d) ->
+    tip = d3Tip().attr('class', 'd3-tip').html( (d) ->
       _date = moment(d)
 
       title = '<p>' + _date.format('LL') + '</p>'
