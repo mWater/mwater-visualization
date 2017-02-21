@@ -161,7 +161,7 @@ module.exports = class LayeredChartCompiler
 
     # Check if x axis is categorical type
     xType = @axisBuilder.getAxisType(design.layers[0].axes.x)
-    if xType in ["enum", "text", "boolean"]
+    if xType in ["enum", "text", "boolean", "date"]
       categoricalX = true
 
     return categoricalX
