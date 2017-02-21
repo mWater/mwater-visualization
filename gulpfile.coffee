@@ -12,6 +12,8 @@ reload = browserSync.reload
 coffee = require 'gulp-coffee' 
 watchify = require 'watchify'
 replace = require 'gulp-replace'
+webpack = require 'webpack'
+WebpackDevServer = require 'webpack-dev-server'
 
 # Compile coffeescript to js in lib/
 gulp.task 'coffee', ->
@@ -68,8 +70,8 @@ gulp.task "libs_js", ->
     "bower_components/lodash/lodash.js"
     "bower_components/d3/d3.js"
     "bower_components/c3/c3.js"
-    "vendor/react-15.0.2.js"
-    "vendor/react-dom-15.0.2.js"
+    # "vendor/react-15.0.2.js"
+    # "vendor/react-dom-15.0.2.js"
   ]).pipe(concat("libs.js"))
     .pipe(gulp.dest("./dist/js/"))
 
@@ -115,28 +117,31 @@ gulp.task "build", gulp.parallel([
   "index_css"
 ])
 
-gulp.task 'watch', gulp.series([
-  'build', 
+gulp.task "watch", gulp.series([
+  "libs_js"
+  "libs_css"
+  "copy_fonts"
+  "copy_assets"
+  "index_css"
   ->
-    b = makeBrowserifyBundle()
-    w = watchify(b)
+    webpackConfig = require './webpack.config.js'
 
-    first = true
-    w.on 'bytes', ->
-      if first
-        browserSync({ server: "./dist", startPath: "/demo.html", ghostMode: false,  notify: false, open: false })
-        first = false
-      else
-        browserSync.reload()
+    # Include version
+    webpackConfig.plugins = [
+      new webpack.HotModuleReplacementPlugin(),
+      new webpack.NamedModulesPlugin(),
+    ]
+    webpackConfig.entry.unshift('webpack-dev-server/client?http://localhost:3000', 'webpack/hot/only-dev-server');
 
-    # Needs to be run at least once
-    bundleDemoJs(w)
+    compiler = webpack(webpackConfig)
 
-    # Redo on update
-    w.on 'update', ->
-      bundleDemoJs(w)
-  ])
+    new WebpackDevServer(compiler, { hot: true, contentBase: "dist", publicPath: "/js/" }).listen 3000, "localhost", (err) =>
+      if err 
+        throw new gutil.PluginError("webpack-dev-server", err)
 
+      # Server listening
+      gutil.log("[webpack-dev-server]", "http://localhost:3000/demo.html")
+])
 
 gulp.task "default", gulp.series("copy", "coffee")
 
