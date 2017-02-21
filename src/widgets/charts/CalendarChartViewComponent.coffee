@@ -7,8 +7,7 @@ AxisBuilder = require '../../axes/AxisBuilder'
 ExprUtils = require('mwater-expressions').ExprUtils
 
 # Require d3-tip to use it
-d3Tip = require('d3-tip')
-d3.tip = d3Tip
+d3.tip = require('d3-tip')
 
 # creates a d3 calendar visualization
 module.exports = class CalendarChartViewComponent extends React.Component
