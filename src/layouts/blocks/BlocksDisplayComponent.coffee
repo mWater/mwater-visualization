@@ -37,8 +37,12 @@ class BlocksDisplayComponent extends React.Component
     disableMaps: React.PropTypes.bool
 
   handleBlockDrop: (sourceBlock, targetBlock, side) =>
-    # Remove source
+    # Remove source from items
     items = blockUtils.removeBlock(@props.items, sourceBlock)
+
+    # Remove source from target also
+    targetBlock = blockUtils.removeBlock(targetBlock, sourceBlock)
+
     items = blockUtils.dropBlock(items, sourceBlock, targetBlock, side)
     items = blockUtils.cleanBlock(items)
     @props.onItemsChange(items)
