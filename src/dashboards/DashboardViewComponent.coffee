@@ -133,7 +133,7 @@ module.exports = class DashboardViewComponent extends React.Component
     }
 
     # Render widget container
-    return R DragDropContextComponent, style: style, 
+    return H.div style: style, 
       @renderScopes()
 
       layoutManager.renderLayout({

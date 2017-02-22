@@ -142,18 +142,18 @@ module.exports = class DashboardComponent extends React.Component
     content = switch style
       when "default"
         [
-          H.h4 className: "list-group-item-heading", "Classic Dashboard"
-          H.p className: "list-group-item-text", "Ideal for data display with minimal text"
+          H.h4 key: "name", className: "list-group-item-heading", "Classic Dashboard"
+          H.p key: "description", className: "list-group-item-text", "Ideal for data display with minimal text"
         ]
       when "greybg"
         [
-          H.h4 className: "list-group-item-heading", "Framed Dashboard"
-          H.p className: "list-group-item-text", "Each widget is white on a grey background"
+          H.h4 key: "name", className: "list-group-item-heading", "Framed Dashboard"
+          H.p key: "description", className: "list-group-item-text", "Each widget is white on a grey background"
         ]
       when "story"
         [
-          H.h4 className: "list-group-item-heading", "Story"
-          H.p className: "list-group-item-text", "Ideal for data-driven storytelling with lots of text. Responsive and mobile-friendly"
+          H.h4 key: "name", className: "list-group-item-heading", "Story"
+          H.p key: "description", className: "list-group-item-text", "Ideal for data-driven storytelling with lots of text. Responsive and mobile-friendly"
         ]
 
     H.a 

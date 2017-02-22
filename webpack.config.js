@@ -2,7 +2,7 @@ path = require('path');
 
 module.exports = {
   entry: ['./src/demo.coffee'],
-  devtool: "eval",
+  devtool: "source-map",
   output: {
     filename: 'demo.js',
     path: path.resolve(__dirname, 'dist', 'js'),
