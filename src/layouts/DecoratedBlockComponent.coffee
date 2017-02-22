@@ -94,7 +94,8 @@ module.exports = class DecoratedBlockComponent extends React.Component
         @props.connectResizeHandle(H.div key: "resize", className: "mwater-visualization-decorated-block-resize",
           H.i className: "fa fa-expand fa-rotate-90")
 
-    if @props.connectDragPreview
-      elem = @props.connectDragPreview(elem)
+      if @props.connectDragPreview
+        preview = H.div style: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0}, " "
+        @props.connectDragPreview(preview)
 
     return elem
