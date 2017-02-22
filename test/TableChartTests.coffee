@@ -24,7 +24,7 @@ describe "TableChart", ->
     @exprEnumset = { type: "field", table: "t1", column: "enumset" }
 
     @axisNumber = { expr: @exprNumber }
-    @axisNumberSum = { expr: @exprNumber, aggr: "sum" }
+    @axisNumberSum = { expr: { type: "op", op: "sum", table: "t1", exprs: [@exprNumber] } }
     @axisEnum = { expr: @exprEnum } 
     @axisEnumset = { expr: @exprEnumset } 
     @axisText = { expr: @exprText } 
@@ -111,7 +111,7 @@ describe "TableChart", ->
         ]
         from: { type: "table", table: "t1", alias: "main" }
         groupBy: [1, 3]
-        orderBy: [{ ordinal: 3, direction: "desc" }]
+        orderBy: [{ ordinal: 3, direction: "desc", nulls: "last" }]
         limit: 1000
       }
 

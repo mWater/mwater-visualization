@@ -161,7 +161,11 @@ module.exports = class LayeredChartCompiler
 
     # Check if x axis is categorical type
     xType = @axisBuilder.getAxisType(design.layers[0].axes.x)
-    if xType in ["enum", "text", "boolean", "date"]
+    if xType in ["enum", "text", "boolean"]
+      categoricalX = true
+
+    # Dates that are stacked must be categorical to make stacking work in C3
+    if xType == "date" and design.stacked
       categoricalX = true
 
     return categoricalX
@@ -596,7 +600,7 @@ module.exports = class LayeredChartCompiler
     return @getLayerType(design, layerIndex) not in ['pie', 'donut']
 
   isXAxisRequired: (design, layerIndex) ->
-    return @getLayerType(design, layerIndex) not in ['pie', 'donut']
+    return _.any(design.layers, (layer, i) => @getLayerType(design, i) not in ['pie', 'donut'])
 
   isColorAxisRequired: (design, layerIndex) ->
     return @getLayerType(design, layerIndex) in ['pie', 'donut']
