@@ -95,7 +95,7 @@ module.exports = class DecoratedBlockComponent extends React.Component
           H.i className: "fa fa-expand fa-rotate-90")
 
       if @props.connectDragPreview
-        preview = H.div style: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0}, " "
+        preview = H.div style: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none"}, " "
         @props.connectDragPreview(preview)
 
     return elem
