@@ -133,6 +133,7 @@ module.exports = class DashboardViewComponent extends React.Component
     }
 
     # Render widget container
+    # TODO REMOVE DragDropContextComponent and change to H.div when grid layout is gone.
     return R DragDropContextComponent, style: style, 
       @renderScopes()
 
