@@ -101,14 +101,21 @@ module.exports = class LeafletMapComponent extends React.Component
   componentDidMount: ->
     # Create map
     mapElem = ReactDOM.findDOMNode(@refs.map)
-    @map = L.map(mapElem, {
+
+    mapOptions = {
       fadeAnimation: false
       dragging: @props.dragging
       touchZoom: @props.touchZoom
       scrollWheelZoom: @props.scrollWheelZoom
       maxZoom: @props.maxZoom
       minZoom: 1  # Bing doesn't allow going to zero
-    })
+    }
+
+    # Must not be null, or will not zoom
+    if @props.maxZoom?
+      mapOptions.maxZoom = @props.maxZoom
+
+    @map = L.map(mapElem, mapOptions)
 
     # Update legend on zoom
     @map.on "zoomend", => @forceUpdate()
