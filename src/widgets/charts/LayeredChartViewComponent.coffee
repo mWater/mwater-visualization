@@ -6,7 +6,7 @@ H = React.DOM
 
 ExprUtils = require('mwater-expressions').ExprUtils
 LayeredChartCompiler = require './LayeredChartCompiler'
-TextWidget = require '../text/TextWidget'
+TextComponent = require '../text/TextComponent'
 
 # Displays a layered chart
 module.exports = class LayeredChartViewComponent extends React.Component
@@ -56,33 +56,25 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
   renderHeader: ->
     return H.div ref: "header",
-      new TextWidget().createViewElement({
-        schema: @props.schema
-        dataSource: @props.dataSource
-        widgetDataSource: {
-          getData: (design, filters, callback) =>
-            callback(null, @props.data.header)
-        }
-        filters: @props.filters
+      R TextComponent,
         design: @props.design.header
         onDesignChange: if @props.onDesignChange then @handleHeaderChange
+        schema: @props.schema
+        dataSource: @props.dataSource
+        exprValues: @props.data.header or {}
         width: @props.width
-      })
+        standardWidth: @props.standardWidth
 
   renderFooter: ->
     return H.div ref: "footer",
-      new TextWidget().createViewElement({
-        schema: @props.schema
-        dataSource: @props.dataSource
-        widgetDataSource: {
-          getData: (design, filters, callback) =>
-            callback(null, @props.data.footer)
-        }
-        filters: @props.filters
+      R TextComponent,
         design: @props.design.footer
         onDesignChange: if @props.onDesignChange then @handleFooterChange
+        schema: @props.schema
+        dataSource: @props.dataSource
+        exprValues: @props.data.footer or {}
         width: @props.width
-      })
+        standardWidth: @props.standardWidth
 
   render: ->
     H.div style: { width: @props.width, height: @props.height },
