@@ -5,7 +5,6 @@ R = React.createElement
 
 ExprUtils = require("mwater-expressions").ExprUtils
 ExprComponent = require('mwater-expressions-ui').ExprComponent
-ReactReorderable = require 'react-reorderable'
 
 # Edits an orderBys which is a list of expressions and directions. See README.md
 module.exports = class OrderBysDesignerComponent extends React.Component

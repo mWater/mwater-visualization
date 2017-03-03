@@ -50,7 +50,6 @@
     "react-library": "github:mwater/react-library",
     "react-motion": "^0.3.0",
     "react-onclickout": "^2.0.4",
-    "react-reorderable": "^0.2.3",
     "react-select": "^0.9.1",
     "save-svg-as-png": "^1.0.3",
     "shallowequal": "^0.2.2",

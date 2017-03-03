@@ -8,8 +8,9 @@ TabbedComponent = require 'react-library/lib/TabbedComponent'
 ExprComponent = require('mwater-expressions-ui').ExprComponent
 FilterExprComponent = require('mwater-expressions-ui').FilterExprComponent
 OrderBysDesignerComponent = require './OrderBysDesignerComponent'
-ReactReorderable = require 'react-reorderable'
+ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
 QuickfiltersDesignComponent = require '../quickfilter/QuickfiltersDesignComponent'
+LabeledExprGenerator = require './LabeledExprGenerator'
 
 TableSelectComponent = require('../TableSelectComponent')
 
@@ -115,7 +116,6 @@ class ColumnsDesignerComponent extends React.Component
     table: React.PropTypes.string.isRequired
     columns: React.PropTypes.array.isRequired     # Columns list See README.md of this folder
     onColumnsChange: React.PropTypes.func.isRequired # Called when columns changes
-    onAddAllColumns: React.PropTypes.func.isRequired  # Called to add all columns
 
   handleColumnChange: (columnIndex, column) =>
     columns = @props.columns.slice()
@@ -142,17 +142,39 @@ class ColumnsDesignerComponent extends React.Component
     columns.push({ id: uuid(), type: "expr", width: 150, expr: { type: "id", table: @props.table }, label: "Unique Id" })
     @props.onColumnsChange(columns)
 
-  handleReorder: (elems) =>
-    # Extract columns
-    columns = _.map(elems, (e) -> e.props.column)
-    @props.onColumnsChange(columns)
-
   handleAddDefaultColumns: =>
-    columns = @props.columns.concat(new DefaultColumnsBuilder(@props.schema).buildColumns(@props.table))
+    # Create labeled expressions
+    labeledExprs = new LabeledExprGenerator(@props.schema).generate(@props.table, {
+      headerFormat: "text"
+    })
+
+    columns = []
+    for labeledExpr in labeledExprs
+      columns.push({
+        id: uuid()
+        width: 150
+        type: "expr"
+        label: null # Use default label instead. # labeledExpr.label
+        expr: labeledExpr.expr
+      })
+
+    columns = @props.columns.concat(columns)
     @props.onColumnsChange(columns)
 
   handleRemoveAllColumns: =>
     @props.onColumnsChange([])
+
+  renderColumn: (column, columnIndex, connectDragSource, connectDragPreview, connectDropTarget) =>
+    R ColumnDesignerComponent,
+      key: columnIndex
+      schema: @props.schema
+      table: @props.table
+      dataSource: @props.dataSource
+      column: column
+      onColumnChange: @handleColumnChange.bind(null, columnIndex)
+      connectDragSource: connectDragSource
+      connectDragPreview: connectDragPreview
+      connectDropTarget: connectDropTarget
 
   render: ->
     H.div style: { height: "auto",overflowY: "auto",  overflowX: "hidden" },
@@ -172,15 +194,11 @@ class ColumnsDesignerComponent extends React.Component
             H.span className: "glyphicon glyphicon-remove"
             " Remove All Columns"
 
-      R ReactReorderable, onDrop: @handleReorder, handle: ".drag-handle",
-        _.map @props.columns, (column, columnIndex) =>
-          R ColumnDesignerComponent,
-            key: columnIndex
-            schema: @props.schema
-            table: @props.table
-            dataSource: @props.dataSource
-            column: column
-            onColumnChange: @handleColumnChange.bind(null, columnIndex)
+      R ReorderableListComponent,
+        items: @props.columns
+        onReorder: @props.onColumnsChange
+        renderItem: @renderColumn
+        getItemId: (item) => item.id
 
       H.button
         key: "add"
@@ -206,6 +224,9 @@ class ColumnDesignerComponent extends React.Component
     table: React.PropTypes.string.isRequired
     column: React.PropTypes.object.isRequired     # Column See README.md of this folder
     onColumnChange: React.PropTypes.func.isRequired # Called when column changes. Null to remove. Array to replace with multiple entries
+    connectDragSource: React.PropTypes.func.isRequired # Connect drag source (handle) here       
+    connectDragPreview: React.PropTypes.func.isRequired # Connect drag preview here
+    connectDropTarget: React.PropTypes.func.isRequired # Connect drop target
 
   handleExprChange: (expr) =>
     @props.onColumnChange(update(@props.column, expr: { $set: expr }))
@@ -289,9 +310,9 @@ class ColumnDesignerComponent extends React.Component
     if type == "id"
       allowedTypes.push("id")
 
-    H.div className: "row",
+    elem = H.div className: "row",
       H.div className: "col-xs-1",
-        H.span className: "text-muted glyphicon glyphicon-move drag-handle"
+        @props.connectDragSource(H.span(className: "text-muted fa fa-bars"))
 
       H.div className: "col-xs-5", # style: { border: "solid 1px #DDD", padding: 4 },
         R ExprComponent,
@@ -316,31 +337,4 @@ class ColumnDesignerComponent extends React.Component
         H.a onClick: @props.onColumnChange.bind(null, null),
           H.span className: "glyphicon glyphicon-remove"
 
-
-# Builds default columns
-class DefaultColumnsBuilder
-  constructor: (schema) ->
-    @schema = schema
-
-  buildColumns: (table) ->
-    # Create default columns
-    columns = []
-
-    for col in @schema.getColumns(table)
-      # Skip joins
-      if col.type == "join"
-        continue
-
-      # Skip deprecated
-      if col.deprecated
-        continue
-
-      columns.push({
-         id: uuid()
-         type: "expr"
-         width: 150
-         expr: { type: "field", table: table, column: col.id }
-      })
-
-    return columns
-
+    return @props.connectDropTarget(@props.connectDragPreview(elem))

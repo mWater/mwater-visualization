@@ -119,6 +119,10 @@ module.exports = class LabeledExprGenerator
     # For each column in form
     labeledExprs = []
     for column in @schema.getColumns(table)
+      # Skip deprecated
+      if column.deprecated
+        continue
+        
       # Convert column into labels and exprs
       labeledExprs = labeledExprs.concat(convertColumn(table, column, []))
 
