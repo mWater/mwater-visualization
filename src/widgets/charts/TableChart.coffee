@@ -138,11 +138,18 @@ module.exports = class TableChart extends Chart
     for colNum in [0...design.columns.length]
       column = design.columns[colNum]
 
-      expr = exprCompiler.compileExpr(expr: column.textAxis?.expr, tableAlias: "main")
+      exprType = exprUtils.getExprType(column.textAxis?.expr)
+
+      compiledExpr = exprCompiler.compileExpr(expr: column.textAxis?.expr, tableAlias: "main")
+
+      # Handle special case of geometry, converting to GeoJSON
+      if exprType == "geometry"
+        # Convert to 4326 (lat/long). Force ::geometry for null
+        compiledExpr = { type: "op", op: "ST_AsGeoJSON", exprs: [{ type: "op", op: "ST_Transform", exprs: [{ type: "op", op: "::geometry", exprs: [compiledExpr]}, 4326] }] }
 
       query.selects.push({
         type: "select"
-        expr: expr
+        expr: compiledExpr
         alias: "c#{colNum}"
       })
 
@@ -210,6 +217,7 @@ module.exports = class TableChart extends Chart
     # Create chart
     props = {
       schema: options.schema
+      dataSource: options.dataSource
       design: @cleanDesign(options.design, options.schema)
       data: options.data
 

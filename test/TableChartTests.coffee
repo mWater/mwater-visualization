@@ -22,6 +22,7 @@ describe "TableChart", ->
     @exprDate = { type: "field", table: "t1", column: "date" }
     @exprEnum = { type: "field", table: "t1", column: "enum" }
     @exprEnumset = { type: "field", table: "t1", column: "enumset" }
+    @exprGeometry = { type: "field", table: "t1", column: "geometry" }
 
     @axisNumber = { expr: @exprNumber }
     @axisNumberSum = { expr: { type: "op", op: "sum", table: "t1", exprs: [@exprNumber] } }
@@ -29,6 +30,7 @@ describe "TableChart", ->
     @axisEnumset = { expr: @exprEnumset } 
     @axisText = { expr: @exprText } 
     @axisDate = { expr: @exprDate } 
+    @axisGeometry = { expr: @exprGeometry } 
 
   describe "createQueries", ->
     # it "includes _id if no grouping", ->
@@ -116,6 +118,31 @@ describe "TableChart", ->
       }
 
       compare(@query, expectedQuery)
+
+    it "gets geojson for geometry", ->
+      design = {
+        table: "t1"
+        columns: [
+          { textAxis: @axisGeometry }
+        ]
+      }
+
+      @chart.getData(design, @schema, @dataSource, [])
+      expectedQuery = {
+        type: "query"
+        selects: [
+          { type: "select", expr: { type: "op", op: "ST_AsGeoJSON", exprs: [{ type: "op", op: "ST_Transform", exprs: [{ type: "op", op: "::geometry", exprs: [{ type: "field", tableAlias: "main", column: "geometry" }]}, 4326] }] }, alias: "c0" }
+          { type: "select", expr: { type: "op", op: "min", exprs: [{ type: "field", tableAlias: "main", column: "primary" }] }, alias: "id" }
+          { type: "select", expr: { type: "op", op: "count", exprs: [] }, alias: "num_ids" }
+        ]
+        from: { type: "table", table: "t1", alias: "main" }
+        groupBy: [1]
+        orderBy: []
+        limit: 1000
+      }
+
+      compare(@query, expectedQuery)
+
 
   # describe "cleanDesign", ->
   #   it "cleans column expressions", ->

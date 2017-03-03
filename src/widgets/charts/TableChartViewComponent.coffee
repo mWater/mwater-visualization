@@ -4,6 +4,7 @@ H = React.DOM
 R = React.createElement
 
 AxisBuilder = require './../../axes/AxisBuilder'
+ExprUtils = require('mwater-expressions').ExprUtils
 
 module.exports = class TableChartViewComponent extends React.Component
   @propTypes:
@@ -20,9 +21,6 @@ module.exports = class TableChartViewComponent extends React.Component
   
     onRowClick: React.PropTypes.func # Called with (tableId, rowId) when item is clicked
 
-  @contextTypes:
-    locale: React.PropTypes.string  # e.g. "en"
-
   shouldComponentUpdate: (prevProps) ->
     not _.isEqual(prevProps, @props)
 
@@ -37,16 +35,26 @@ module.exports = class TableChartViewComponent extends React.Component
 
     return H.div style: style, className: "overflow-auto-except-print",
       H.div {style: { fontWeight: "bold", textAlign: "center" }, ref: "title"}, @props.design.titleText
-      R TableContentsComponent, columns: @props.design.columns, table: @props.design.table, data: @props.data, schema: @props.schema, onRowClick: @props.onRowClick
+      R TableContentsComponent, 
+        columns: @props.design.columns
+        table: @props.design.table
+        data: @props.data
+        schema: @props.schema
+        dataSource: @props.dataSource
+        onRowClick: @props.onRowClick
 
 class TableContentsComponent extends React.Component
   @propTypes:
     columns: React.PropTypes.array.isRequired # Columns of chart
     data: React.PropTypes.object.isRequired # Data that the table has requested
     schema: React.PropTypes.object.isRequired # Schema to use
+    dataSource: React.PropTypes.object.isRequired # Data source to use
     table: React.PropTypes.string.isRequired
 
     onRowClick: React.PropTypes.func # Called with (tableId, rowId) when item is clicked
+
+  @contextTypes:
+    locale: React.PropTypes.string  # e.g. "en"
 
   shouldComponentUpdate: (prevProps) ->
     if prevProps.columns != @props.columns and not _.isEqual(prevProps.columns, @props.columns)
@@ -80,17 +88,50 @@ class TableContentsComponent extends React.Component
       H.tr key: "head",
         _.map(@props.columns, (column, i) => @renderHeaderCell(i))
 
+  renderImage: (id) ->
+    url = @props.dataSource.getImageUrl(id)
+    return H.a(href: url, key: id, target: "_blank", style: { paddingLeft: 5, paddingRight: 5 }, "Image")
+
   renderCell: (rowIndex, columnIndex) ->
     row = @props.data.main[rowIndex]  
     column = @props.columns[columnIndex]
 
+    exprUtils = new ExprUtils(@props.schema)
+    exprType = exprUtils.getExprType(column.textAxis?.expr)
+
     # Get value
     value = row["c#{columnIndex}"]
 
-    # Convert to string
-    axisBuilder = new AxisBuilder(schema: @props.schema)
-    str = axisBuilder.formatValue(column.textAxis, value, @context.locale)
-    return H.td(key: columnIndex, str)
+    if not value?
+      node = null
+    else
+      # Parse if should be JSON
+      if exprType in ['image', 'imagelist', 'geometry', 'text[]'] and _.isString(value)
+        value = JSON.parse(value)
+
+      # Convert to node based on type
+      switch exprType
+        when "text", "number"
+          node = value
+        when "boolean", "enum", "enumset", "text[]"
+          node = exprUtils.stringifyExprLiteral(@props.expr, value, @context.locale)
+        when "date"
+          node = moment(value, "YYYY-MM-DD").format("ll")
+        when "datetime"
+          node = moment(value, moment.ISO_8601).format("lll")
+        when "image"
+          node = @renderImage(value.id)
+        when "imagelist"
+          node = _.map(value, (v) => @renderImage(v.id))
+        when "geometry"
+          if value.type == "Point"
+            node = "#{value.coordinates[1].toFixed(6)} #{value.coordinates[0].toFixed(6)}" 
+          else
+            node = value.type
+        else
+          node = "" + value
+
+    return H.td(key: columnIndex, node)
 
   renderRow: (index) ->
     H.tr key: index, onClick: @handleRowClick.bind(null, index),
