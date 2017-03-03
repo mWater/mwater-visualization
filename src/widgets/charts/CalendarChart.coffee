@@ -170,7 +170,7 @@ module.exports = class CalendarChart extends Chart
 
     return React.createElement(CalendarChartViewComponent, props)
 
-  createDataTable: (design, schema, data) ->
+  createDataTable: (design, schema, dataSource, data) ->
     header = ["Date", "Value"]
     rows = _.map(data, (row) -> [moment(row.date).format("YYYY-MM-DD"), row.value])
     return [header].concat(rows)

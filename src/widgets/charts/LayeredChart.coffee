@@ -210,7 +210,7 @@ module.exports = class LayeredChart extends Chart
       { label: "Save as PNG", icon: "camera", onClick: save.bind(null, "png") }
     ]
 
-  createDataTable: (design, schema, data, locale) ->
+  createDataTable: (design, schema, dataSource, data, locale) ->
     axisBuilder = new AxisBuilder(schema: schema)
 
     # Export only first layer

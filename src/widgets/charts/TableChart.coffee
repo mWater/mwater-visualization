@@ -233,7 +233,7 @@ module.exports = class TableChart extends Chart
 
     return React.createElement(TableChartViewComponent, props)
 
-  createDataTable: (design, schema, data, locale) ->
+  createDataTable: (design, schema, dataSource, data, locale) ->
     exprUtils = new ExprUtils(schema)
 
     renderHeaderCell = (column) =>
@@ -244,6 +244,17 @@ module.exports = class TableChart extends Chart
     renderRow = (record) =>
       renderCell = (column, columnIndex) =>
         value = record["c#{columnIndex}"]
+
+        exprUtils = new ExprUtils(schema)
+        exprType = exprUtils.getExprType(column.textAxis?.expr)
+
+        # Special case for images
+        if exprType == "image" and value
+          return dataSource.getImageUrl(value.id)
+
+        if exprType == "imagelist" and value 
+          return _.map(value, (img) -> dataSource.getImageUrl(img.id)).join(" ")
+
         return exprUtils.stringifyExprLiteral(column.textAxis?.expr, value, locale)
 
       return _.map(design.columns, renderCell)

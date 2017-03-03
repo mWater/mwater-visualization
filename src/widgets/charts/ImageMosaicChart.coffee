@@ -155,7 +155,7 @@ module.exports = class ImageMosaicChart extends Chart
 
     return React.createElement(ImageMosaicChartViewComponent, props)
 
-  createDataTable: (design, schema, data) ->
+  createDataTable: (design, schema, dataSource, data) ->
     alert("Not available for Image Mosaics")
     return null
     # TODO

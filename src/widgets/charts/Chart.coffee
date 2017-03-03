@@ -55,7 +55,7 @@ module.exports = class Chart
     return []
 
   # Creates a table form of the chart data. Array of arrays
-  createDataTable: (design, schema, data, locale) ->
+  createDataTable: (design, schema, dataSource, data, locale) ->
     throw new Error("Not implemented")
 
   # Get a list of table ids that can be filtered on
