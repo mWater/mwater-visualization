@@ -114,7 +114,7 @@ class TableContentsComponent extends React.Component
         when "text", "number"
           node = value
         when "boolean", "enum", "enumset", "text[]"
-          node = exprUtils.stringifyExprLiteral(@props.expr, value, @context.locale)
+          node = exprUtils.stringifyExprLiteral(column.textAxis?.expr, value, @context.locale)
         when "date"
           node = moment(value, "YYYY-MM-DD").format("ll")
         when "datetime"
