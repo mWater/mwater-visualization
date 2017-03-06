@@ -116,6 +116,7 @@ module.exports = class LayeredChartCompiler
         xs: c3Data.xs
         colors: c3Data.colors
         labels: options.design.labels
+        order: c3Data.order
       }
       # Hide if one layer with no color axis
       legend: { hide: (options.design.layers.length == 1 and not options.design.layers[0].axes.color) }
@@ -247,6 +248,7 @@ module.exports = class LayeredChartCompiler
       colors: colors
       xAxisType: "category" # Polar charts are always category x-axis
       titleText: @compileTitleText(design, locale)
+      order: "desc" # Use descending order
     }
 
   # Compiles data for a chart like line or scatter that does not have a categorical x axis
@@ -353,6 +355,7 @@ module.exports = class LayeredChartCompiler
       xAxisLabelText: @compileXAxisLabelText(design, locale)
       yAxisLabelText: @compileYAxisLabelText(design, locale)
       titleText: @compileTitleText(design, locale)
+      order: null # Use order of data for stacking
     }
 
 
@@ -580,6 +583,7 @@ module.exports = class LayeredChartCompiler
       xAxisLabelText: @compileXAxisLabelText(design, locale)
       yAxisLabelText: @compileYAxisLabelText(design, locale)
       titleText: @compileTitleText(design, locale)
+      order: null # Use order of data for stacking
     }
 
   # Compile an expression

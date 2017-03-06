@@ -59,7 +59,7 @@ module.exports = class MarkerSymbolSelectComponent extends React.Component
       { value: "font-awesome/chevron-circle-down", label: "Chevron Down" }
       { value: "font-awesome/medkit", label: "Medkit" }
       { value: "font-awesome/cloud", label: "Cloud" }
-      { value: "font-awesome/beer", label: "Beer" }
+      { value: "font-awesome/beer", label: "Cup" }
     ]
 
     optionRenderer = (option) ->
