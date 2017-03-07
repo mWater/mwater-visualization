@@ -7,7 +7,6 @@ Chart = require './Chart'
 LayeredChartCompiler = require './LayeredChartCompiler'
 ExprCleaner = require('mwater-expressions').ExprCleaner
 AxisBuilder = require './../../axes/AxisBuilder'
-LayeredChartViewComponent = require './LayeredChartViewComponent'
 LayeredChartSvgFileSaver = require './LayeredChartSvgFileSaver'
 LayeredChartUtils = require './LayeredChartUtils'
 TextWidget = require '../text/TextWidget'
@@ -173,6 +172,8 @@ module.exports = class LayeredChart extends Chart
   #   scope: current scope of the view element
   #   onScopeChange: called when scope changes with new scope
   createViewElement: (options) ->
+    LayeredChartViewComponent = require './LayeredChartViewComponent'
+    
     # Create chart
     props = {
       schema: options.schema
