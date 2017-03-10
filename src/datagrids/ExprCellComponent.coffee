@@ -16,13 +16,13 @@ module.exports = class ExprCellComponent extends React.Component
 
     locale: React.PropTypes.string      # Locale to use
 
-    exprType: React.PropTypes.string.isRequired
+    exprType: React.PropTypes.string
 
     width: React.PropTypes.number.isRequired
     height: React.PropTypes.number.isRequired
 
     value: React.PropTypes.any
-    expr: React.PropTypes.object.isRequired
+    expr: React.PropTypes.object
 
     muted: React.PropTypes.bool       # True to show muted
 
@@ -39,7 +39,7 @@ module.exports = class ExprCellComponent extends React.Component
     exprUtils = new ExprUtils(@props.schema)
     value = @props.value
 
-    if not value?
+    if not value? or not @props.expr
       node = null
     else
       # Parse if should be JSON
