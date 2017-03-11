@@ -145,11 +145,17 @@ module.exports = class LayeredChartCompiler
         }
         expand: false # Don't expand/contract
       } 
+      donut: { 
+        label: {
+          format: if options.design.labels then pieLabelValueFormatter
+        }
+        expand: false # Don't expand/contract
+      } 
 
       transition: { duration: 0 } # Transitions interfere with scoping
     }
 
-    if options.design.labels and options.design.type == "pie"
+    if options.design.labels and ( options.design.type == "pie" or options.design.type == "donut")
       chartDesign.tooltip = {
         format: {
           value: pieLabelValueFormatter
