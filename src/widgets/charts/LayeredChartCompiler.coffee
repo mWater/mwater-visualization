@@ -145,15 +145,27 @@ module.exports = class LayeredChartCompiler
         }
         expand: false # Don't expand/contract
       } 
+      donut: { 
+        label: {
+          format: if options.design.labels then pieLabelValueFormatter
+        }
+        expand: false # Don't expand/contract
+      } 
 
       transition: { duration: 0 } # Transitions interfere with scoping
     }
+
+    if options.design.labels and ( options.design.type == "pie" or options.design.type == "donut")
+      chartDesign.tooltip = {
+        format: {
+          value: pieLabelValueFormatter
+        }
+      }
 
     # This doesn't work in new C3. Removing.
     # # If x axis is year only, display year in ticks
     # if options.design.layers[0]?.axes.x?.xform?.type == "year"
     #   chartDesign.axis.x.tick.format = (x) -> if _.isDate(x) then x.getFullYear() else x
-
     return chartDesign
 
   isCategoricalX: (design) ->
