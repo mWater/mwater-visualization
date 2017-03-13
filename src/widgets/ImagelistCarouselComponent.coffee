@@ -32,7 +32,6 @@ module.exports = class ImagelistCarouselComponent extends React.Component
   renderImage: (img, i, imageManager) ->
     H.div className: "item #{if i == @state.activeImage then "active" else ""}", style: {height: @props.height},
       R RotationAwareImageComponent, imageManager: imageManager, image: img
-      # H.img style: { margin: '0 auto', height: @props.height }, src: @props.widgetDataSource.getImageUrl(img.id, 640)
 
   renderImages: ->
     imageManager = {
