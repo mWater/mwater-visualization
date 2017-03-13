@@ -5,6 +5,7 @@ R = React.createElement
 
 AxisBuilder = require '../../axes/AxisBuilder'
 LazyLoad = require('react-lazy-load').default
+RotationAwareImageComponent = require("mwater-forms/lib/RotationAwareImageComponent")
 
 # creates a d3 calendar visualization
 module.exports = class ImageMosaicChartViewComponent extends React.Component
@@ -24,13 +25,17 @@ module.exports = class ImageMosaicChartViewComponent extends React.Component
     not _.isEqual(prevProps, @props)
 
   # Render a single image
-  renderImage: (image) ->
-    R LazyLoad, key: image.id, height: 100,
-      H.img src: @props.dataSource.getImageUrl(image.id, 100), alt: image.caption, className: "img-thumbnail", style: { height: 100, minWidth: 50 }
+  renderImage: (image, imageManager) ->
+    R LazyLoad, key: image.id,
+      R RotationAwareImageComponent, imageManager: imageManager, image: image, thumbnail: true, height: 120, width: 80
 
   # Render images
   renderImages: ->
     imageElems = []
+    imageManager = {
+      getImageThumbnailUrl: (id, success, error) => success(@props.dataSource.getImageUrl(id, 100))
+      getImageUrl: (id, success, error) => success(@props.dataSource.getImageUrl(id))
+    }
 
     # For each image
     for row in @props.data
@@ -45,9 +50,9 @@ module.exports = class ImageMosaicChartViewComponent extends React.Component
 
       if _.isArray(imageObj)
         for image in imageObj
-          @renderImage(image)
+          @renderImage(image, imageManager)
       else
-        @renderImage(imageObj)
+        @renderImage(imageObj, imageManager)
 
   render: ->
     titleStyle =
