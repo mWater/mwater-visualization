@@ -2,6 +2,7 @@
 React = require 'react'
 H = React.DOM
 R = React.createElement
+RotationAwareImageComponent = require("mwater-forms/lib/RotationAwareImageComponent")
 
 # Bootstrap carousel for an image list
 module.exports = class ImagelistCarouselComponent extends React.Component
@@ -28,13 +29,18 @@ module.exports = class ImagelistCarouselComponent extends React.Component
       activeImage = (@state.activeImage + 1 + @props.imagelist.length) % @props.imagelist.length
       @setState(activeImage: activeImage)
 
-  renderImage: (img, i) ->
+  renderImage: (img, i, imageManager) ->
     H.div className: "item #{if i == @state.activeImage then "active" else ""}", style: {height: @props.height},
-      H.img style: { margin: '0 auto', height: @props.height }, src: @props.widgetDataSource.getImageUrl(img.id, 640)
+      R RotationAwareImageComponent, imageManager: imageManager, image: img
+      # H.img style: { margin: '0 auto', height: @props.height }, src: @props.widgetDataSource.getImageUrl(img.id, 640)
 
   renderImages: ->
+    imageManager = {
+      getImageThumbnailUrl: (id, success, error) => success(@props.widgetDataSource.getImageUrl(id, 100))
+      getImageUrl: (id, success, error) => success(@props.widgetDataSource.getImageUrl(id, 640))
+    }
     for imageObj, i in @props.imagelist
-      @renderImage(imageObj, i)
+      @renderImage(imageObj, i, imageManager)
 
   render: ->
     if @props.imagelist.length == 1
