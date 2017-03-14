@@ -86,6 +86,8 @@ module.exports = save: (design, data, schema, format) ->
 
         saveSvgAsPng.saveSvgAsPng(el, "#{title or "untitled"}.png", {
           selectorRemap: (selector) -> 
+            if selector == ".c3 path, .c3 line"
+              return "path, line"
             return if selector.indexOf(".c3 ") == 0 then selector.substr(4) else selector
           backgroundColor: "#fff"
         });
