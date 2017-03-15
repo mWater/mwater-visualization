@@ -3,7 +3,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
-AxisBuilder = require './../../axes/AxisBuilder'
+AxisBuilder = require '../../../axes/AxisBuilder'
 ExprUtils = require('mwater-expressions').ExprUtils
 
 module.exports = class TableChartViewComponent extends React.Component

@@ -1,7 +1,7 @@
 _ = require 'lodash'
 ExprCompiler = require('mwater-expressions').ExprCompiler
 ExprUtils = require('mwater-expressions').ExprUtils
-AxisBuilder = require '../../axes/AxisBuilder'
+AxisBuilder = require '../../../axes/AxisBuilder'
 injectTableAlias = require('mwater-expressions').injectTableAlias
 
 # Only set up if d3 is available (hack for using on server)

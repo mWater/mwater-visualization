@@ -3,13 +3,13 @@ React = require 'react'
 H = React.DOM
 async = require 'async'
 
-Chart = require './Chart'
+Chart = require '../Chart'
 LayeredChartCompiler = require './LayeredChartCompiler'
 ExprCleaner = require('mwater-expressions').ExprCleaner
-AxisBuilder = require './../../axes/AxisBuilder'
+AxisBuilder = require '../../../axes/AxisBuilder'
 LayeredChartSvgFileSaver = require './LayeredChartSvgFileSaver'
 LayeredChartUtils = require './LayeredChartUtils'
-TextWidget = require '../text/TextWidget'
+TextWidget = require '../../text/TextWidget'
 
 # See LayeredChart Design.md for the design
 module.exports = class LayeredChart extends Chart

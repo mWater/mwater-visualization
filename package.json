@@ -5,7 +5,9 @@
   "repository": "git@github.com:mWater/mwater-visualization.git",
   "main": "lib/index.js",
   "scripts": {
-    "test": "testem ci"
+    "test": "testem ci",
+    "storybook": "start-storybook -s . -p 6006",
+    "build-storybook": "build-storybook"
   },
   "browserify": {
     "transform": [
@@ -92,6 +94,7 @@
     "watchify": "^3.7.0",
     "webpack": "^2.2.1",
     "webpack-dev-server": "^2.4.1",
-    "xml2js": "^0.4.5"
+    "xml2js": "^0.4.5",
+    "@kadira/storybook": "^2.21.0"
   }
 }

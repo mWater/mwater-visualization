@@ -8,10 +8,8 @@ Schema = require('mwater-expressions').Schema
 DataSource = require('mwater-expressions').DataSource
 
 visualization = require './index'
-LayeredChart = require './widgets/charts/LayeredChart'
-LayeredChartDesignerComponent = require './widgets/charts/LayeredChartDesignerComponent'
 
-CalendarChartViewComponent = require './widgets/charts/CalendarChartViewComponent'
+# CalendarChartViewComponent = require './widgets/charts/CalendarChartViewComponent'
 
 MWaterLoaderComponent = require './MWaterLoaderComponent'
 MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')

@@ -1,23 +1,25 @@
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
+moment = require 'moment'
 
 injectTableAlias = require('mwater-expressions').injectTableAlias
-Chart = require './Chart'
+Chart = require '../Chart'
 ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprCompiler = require('mwater-expressions').ExprCompiler
-AxisBuilder = require './../../axes/AxisBuilder'
+AxisBuilder = require '../../../axes/AxisBuilder'
 
 ###
 Design is:
   
   table: table to use for data source
   titleText: title text
-  imageAxis: image axis to use
+  dateAxis: date axis to use
+  valueAxis: axis for value
   filter: optional logical expression to filter by
 
 ###
-module.exports = class ImageMosaicChart extends Chart
+module.exports = class CalendarChart extends Chart
   cleanDesign: (design, schema) ->
     exprCleaner = new ExprCleaner(schema)
     axisBuilder = new AxisBuilder(schema: schema)
@@ -28,8 +30,9 @@ module.exports = class ImageMosaicChart extends Chart
     # Fill in defaults
     design.version = design.version or 1
 
-    # Clean axis
-    design.imageAxis = axisBuilder.cleanAxis(axis: design.imageAxis, table: design.table, aggrNeed: "none", types: ["image", "imagelist"])
+    # Clean axes
+    design.dateAxis = axisBuilder.cleanAxis(axis: design.dateAxis, table: design.table, aggrNeed: "none", types: ["date"])
+    design.valueAxis = axisBuilder.cleanAxis(axis: design.valueAxis, table: design.table, aggrNeed: "required", types: ["number"])
 
     # Clean filter
     design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ["boolean"] })
@@ -46,15 +49,18 @@ module.exports = class ImageMosaicChart extends Chart
     # Check that has axes
     error = null
 
-    if not design.imageAxis
-      error = error or "Missing image"
+    if not design.dateAxis
+      error = error or "Missing date"
+    if not design.valueAxis
+      error = error or "Missing value"
 
-    error = error or axisBuilder.validateAxis(axis: design.imageAxis)
+    error = error or axisBuilder.validateAxis(axis: design.dateAxis)
+    error = error or axisBuilder.validateAxis(axis: design.valueAxis)
 
     return error
 
   isEmpty: (design) ->
-    return not design.imageAxis
+    return not design.dateAxis or not design.valueAxis
 
   # Creates a design element with specified options
   # options include:
@@ -64,7 +70,7 @@ module.exports = class ImageMosaicChart extends Chart
   #   onDesignChange: function
   createDesignerElement: (options) ->
     # Require here to prevent server require problems
-    ImageMosaicChartDesignerComponent = require './ImageMosaicChartDesignerComponent'
+    CalendarChartDesignerComponent = require './CalendarChartDesignerComponent'
 
     props = {
       schema: options.schema
@@ -75,7 +81,7 @@ module.exports = class ImageMosaicChart extends Chart
         design = @cleanDesign(design, options.schema)
         options.onDesignChange(design)
     }
-    return React.createElement(ImageMosaicChartDesignerComponent, props)
+    return React.createElement(CalendarChartDesignerComponent, props)
 
   # Get data for the chart asynchronously 
   # design: design of the chart
@@ -92,16 +98,25 @@ module.exports = class ImageMosaicChart extends Chart
       type: "query"
       selects: []
       from: exprCompiler.compileTable(design.table, "main")
-      limit: 500
+      groupBy: [1]
+      orderBy: [{ ordinal: 1 }]
+      limit: 5000
     }
 
-    # Add image axis
-    imageExpr = axisBuilder.compileAxis(axis: design.imageAxis, tableAlias: "main")
+    # Add date axis
+    dateExpr = axisBuilder.compileAxis(axis: design.dateAxis, tableAlias: "main")
 
     query.selects.push({ 
       type: "select"
-      expr: imageExpr
-      alias: "image" 
+      expr: dateExpr
+      alias: "date" 
+    })
+
+    # Add value axis
+    query.selects.push({
+      type: "select"      
+      expr: axisBuilder.compileAxis(axis: design.valueAxis, tableAlias: "main")
+      alias: "value"
     })
 
     # Get relevant filters
@@ -112,8 +127,8 @@ module.exports = class ImageMosaicChart extends Chart
     if design.filter
       whereClauses.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "main"))
 
-    # Add null filter for image
-    whereClauses.push({ type: "op", op: "is not null", exprs: [imageExpr] })
+    # Add null filter for date
+    whereClauses.push({ type: "op", op: "is not null", exprs: [dateExpr] })
 
     whereClauses = _.compact(whereClauses)
 
@@ -136,14 +151,13 @@ module.exports = class ImageMosaicChart extends Chart
   #   onScopeChange: called when scope changes with new scope
   createViewElement: (options) ->
     # Require here to prevent server require problems
-    ImageMosaicChartViewComponent = require './ImageMosaicChartViewComponent'
-
+    CalendarChartViewComponent = require './CalendarChartViewComponent'
+    
     # Create chart
     props = {
       schema: options.schema
       design: @cleanDesign(options.design, options.schema)
       data: options.data
-      dataSource: options.dataSource
 
       width: options.width
       height: options.height
@@ -151,29 +165,17 @@ module.exports = class ImageMosaicChart extends Chart
 
       scope: options.scope
       onScopeChange: options.onScopeChange
+      cellStrokeColor: "#DDD"
     }
 
-    return React.createElement(ImageMosaicChartViewComponent, props)
+    return React.createElement(CalendarChartViewComponent, props)
 
   createDataTable: (design, schema, dataSource, data) ->
-    alert("Not available for Image Mosaics")
-    return null
-    # TODO
-    # renderHeaderCell = (column) =>
-    #   column.headerText or @axisBuilder.summarizeAxis(column.textAxis)
-
-    # header = _.map(design.columns, renderHeaderCell)
-    # table = [header]
-    # renderRow = (record) =>
-    #   renderCell = (column, columnIndex) =>
-    #     value = record["c#{columnIndex}"]
-    #     return @axisBuilder.formatValue(column.textAxis, value)
-
-    #   return _.map(design.columns, renderCell)
-
-    # table = table.concat(_.map(data.main, renderRow))
-    # return table
+    header = ["Date", "Value"]
+    rows = _.map(data, (row) -> [moment(row.date).format("YYYY-MM-DD"), row.value])
+    return [header].concat(rows)
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->
     return _.compact([design.table])
+    

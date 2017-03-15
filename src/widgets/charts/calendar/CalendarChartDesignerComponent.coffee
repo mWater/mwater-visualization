@@ -3,29 +3,38 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
-ui = require '../../UIComponents'
+ui = require '../../../UIComponents'
 ExprUtils = require('mwater-expressions').ExprUtils
-AxisBuilder = require './../../axes/AxisBuilder'
-AxisComponent = require './../../axes/AxisComponent'
+AxisBuilder = require '../../../axes/AxisBuilder'
+AxisComponent = require '../../../axes/AxisComponent'
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
-TableSelectComponent = require '../../TableSelectComponent'
+TableSelectComponent = require '../../../TableSelectComponent'
 
-module.exports = class ImageMosaicChartDesignerComponent extends React.Component
+module.exports = class CalendarChartDesignerComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func.isRequired
 
-  # Upimages design with the specified changes
-  upimageDesign: (changes) ->
+  # Updates design with the specified changes
+  updateDesign: (changes) ->
     design = _.extend({}, @props.design, changes)
     @props.onDesignChange(design)
 
-  handleTitleTextChange: (ev) =>  @upimageDesign(titleText: ev.target.value)
-  handleTableChange: (table) => @upimageDesign(table: table)
-  handleFilterChange: (filter) => @upimageDesign(filter: filter)
-  handleImageAxisChange: (imageAxis) => @upimageDesign(imageAxis: imageAxis)
+  handleTitleTextChange: (ev) =>  @updateDesign(titleText: ev.target.value)
+  handleTableChange: (table) => @updateDesign(table: table)
+  handleFilterChange: (filter) => @updateDesign(filter: filter)
+  
+  handleDateAxisChange: (dateAxis) => 
+    # Default value axis to count if date axis present
+    if not @props.design.valueAxis and dateAxis
+      # Create count expr
+      valueAxis = { expr: { type: "op", op: "count", table: @props.design.table, exprs: [] }, xform: null }
+      @updateDesign(dateAxis: dateAxis, valueAxis: valueAxis)
+    else
+      @updateDesign(dateAxis: dateAxis)
+  handleValueAxisChange: (valueAxis) => @updateDesign(valueAxis: valueAxis)
 
   renderTable: ->
     return H.div className: "form-group",
@@ -59,25 +68,42 @@ module.exports = class ImageMosaicChartDesignerComponent extends React.Component
           table: @props.design.table
           value: @props.design.filter)
 
-  renderImageAxis: ->
+  renderDateAxis: ->
     if not @props.design.table
       return
 
-    R ui.SectionComponent, label: "Image Axis",
+    R ui.SectionComponent, label: "Date Axis",
       R(AxisComponent, 
         schema: @props.schema
         dataSource: @props.dataSource
         table: @props.design.table
-        types: ["image", "imagelist"]
+        types: ["date"]
         aggrNeed: "none"
         required: true
-        value: @props.design.imageAxis 
-        onChange: @handleImageAxisChange)
+        value: @props.design.dateAxis 
+        onChange: @handleDateAxisChange)
+
+  renderValueAxis: ->
+    if not @props.design.table or not @props.design.dateAxis
+      return
+
+    R ui.SectionComponent, label: "Value Axis",
+      R(AxisComponent, 
+        schema: @props.schema
+        dataSource: @props.dataSource
+        table: @props.design.table
+        types: ["number"]
+        aggrNeed: "required"
+        required: true
+        value: @props.design.valueAxis 
+        onChange: @handleValueAxisChange)
+
 
   render: ->
     H.div null,
       @renderTable()
-      @renderImageAxis()
+      @renderDateAxis()
+      @renderValueAxis()
       @renderFilter()
       H.hr()
       @renderTitle()

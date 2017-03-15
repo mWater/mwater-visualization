@@ -3,7 +3,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
-AxisBuilder = require '../../axes/AxisBuilder'
+AxisBuilder = require '../../../axes/AxisBuilder'
 LazyLoad = require('react-lazy-load').default
 
 # creates a d3 calendar visualization

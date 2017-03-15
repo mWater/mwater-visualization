@@ -21,10 +21,11 @@ exports.CheckboxComponent = require './CheckboxComponent'
 
 exports.MWaterLoaderComponent = require './MWaterLoaderComponent'
 
-exports.LayeredChart = require './widgets/charts/LayeredChart'
-exports.TableChart = require './widgets/charts/TableChart'
-exports.CalendarChart = require './widgets/charts/CalendarChart'
-exports.ImageMosaicChart = require './widgets/charts/ImageMosaicChart'
+exports.LayeredChart = require './widgets/charts/layered/LayeredChart'
+exports.TableChart = require './widgets/charts/table/TableChart'
+exports.CalendarChart = require './widgets/charts/calendar/CalendarChart'
+exports.ImageMosaicChart = require './widgets/charts/imagemosaic/ImageMosaicChart'
+
 exports.ChartViewComponent = require './widgets/charts/ChartViewComponent'
 
 exports.WidgetScoper = require './widgets/WidgetScoper'
