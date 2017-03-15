@@ -14,7 +14,7 @@ Segments can be nested to allow sub-division and are ordered.
 ### Intersection
 
 These compose the data area of the table. There is an intersection for each possible combination that makes sense of segments that form
-a rectangle.
+a rectangle. An intersection is id-ed by "rowid:columnid" or "rowid,rowid:columnid,columnid" etc. depending on its component ids.
 
 ### Section
 
@@ -39,4 +39,4 @@ segment:
   children: array of child segments if any
 
 intersection:
-  textAxis: axis that determines text to display in cells. Must be aggregate
+  valueAxis: axis that determines value to display in cells. Must be aggregate

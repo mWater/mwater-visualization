@@ -1,7 +1,7 @@
 _ = require 'lodash'
 assert = require('chai').assert
 fixtures = require './fixtures'
-LayeredChartCompiler = require '../src/widgets/charts/LayeredChartCompiler'
+LayeredChartCompiler = require '../src/widgets/charts/layered/LayeredChartCompiler'
 canonical = require 'canonical-json'
 
 compare = (actual, expected) ->
