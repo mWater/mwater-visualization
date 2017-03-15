@@ -62,6 +62,9 @@ module.exports = class ChartWidget extends Widget
 
     return @chart.getFilterableTables(design, schema)
 
+  # Determine if widget is auto-height, which means that a vertical height is not required.
+  isAutoHeight: -> @chart.isAutoHeight()
+
 # Complete chart widget
 class ChartWidgetComponent extends React.Component
   @propTypes:
@@ -177,8 +180,12 @@ class ChartWidgetComponent extends React.Component
 
   # Render a link to start editing
   renderEditLink: ->
-    H.div style: { position: "absolute", bottom: @props.height / 2, left: 0, right: 0, textAlign: "center" },
-      H.a className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Edit"
+    if @props.height
+      H.div style: { position: "absolute", bottom: @props.height / 2, left: 0, right: 0, textAlign: "center" },
+        H.a className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Edit"
+    else
+      H.div style: { position: "absolute", top: "50%", marginTop: -20, left: 0, right: 0, textAlign: "center" },
+        H.a className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Edit"
 
   render: ->
     # Determine if valid design

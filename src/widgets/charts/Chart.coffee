@@ -12,6 +12,9 @@ module.exports = class Chart
   isEmpty: (design) ->
     return false
 
+  # Determine if widget is auto-height, which means that a vertical height is not required.
+  isAutoHeight: -> false
+
   # Creates a design element with specified options
   # options include:
   #   schema: schema to use

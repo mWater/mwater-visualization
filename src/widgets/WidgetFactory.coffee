@@ -3,6 +3,7 @@ LayeredChart = require './charts/layered/LayeredChart'
 TableChart = require './charts/table/TableChart'
 CalendarChart = require './charts/calendar/CalendarChart'
 ImageMosaicChart = require './charts/imagemosaic/ImageMosaicChart'
+PivotChart = require './charts/pivot/PivotChart'
 MarkdownWidget = require './MarkdownWidget'
 TextWidget = require './text/TextWidget'
 ImageWidget = require './ImageWidget'
@@ -21,6 +22,8 @@ module.exports = class WidgetFactory
         return new ChartWidget(new CalendarChart())
       when "ImageMosaicChart"
         return new ChartWidget(new ImageMosaicChart())
+      when "WidgetFactory"
+        return new ChartWidget(new PivotChart())
       when "Markdown"
         return new MarkdownWidget()
       when "Map"

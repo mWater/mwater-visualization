@@ -80,6 +80,10 @@ module.exports = class ChartViewComponent extends React.Component
       style.backgroundColor = "#E0E0E0"
       style.opacity = 0.35
 
+      # Set height to 1.6 ratio if not set so the control is visible
+      if not @props.height and @props.width
+        style.height = @props.width / 1.6
+
     if @state.dataError
       return H.div className: "alert alert-danger",
        "Error loading data: #{@state.dataError.message or @state.dataError}" 

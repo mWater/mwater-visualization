@@ -5,6 +5,8 @@ R = React.createElement
 storiesOf = require('@kadira/storybook').storiesOf
 action = require('@kadira/storybook').action
 
+require './pivotChart'
+
 storiesOf('Pivot', module)
   .add 'test', => 
     R HoverTable
