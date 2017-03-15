@@ -3,7 +3,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
-AxisBuilder = require '../../axes/AxisBuilder'
+AxisBuilder = require '../../../axes/AxisBuilder'
 LazyLoad = require('react-lazy-load').default
 RotationAwareImageComponent = require("mwater-forms/lib/RotationAwareImageComponent")
 

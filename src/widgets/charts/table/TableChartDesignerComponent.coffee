@@ -5,12 +5,12 @@ R = React.createElement
 uuid = require 'uuid'
 
 ExprUtils = require('mwater-expressions').ExprUtils
-AxisBuilder = require './../../axes/AxisBuilder'
+AxisBuilder = require '../../../axes/AxisBuilder'
 LinkComponent = require('mwater-expressions-ui').LinkComponent
 ExprComponent = require("mwater-expressions-ui").ExprComponent
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 OrderingsComponent = require './OrderingsComponent'
-TableSelectComponent = require '../../TableSelectComponent'
+TableSelectComponent = require '../../../TableSelectComponent'
 ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
 
 module.exports = class TableChartDesignerComponent extends React.Component

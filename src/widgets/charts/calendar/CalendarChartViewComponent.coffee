@@ -3,7 +3,7 @@ React = require 'react'
 H = React.DOM
 moment = require 'moment'
 
-AxisBuilder = require '../../axes/AxisBuilder'
+AxisBuilder = require '../../../axes/AxisBuilder'
 ExprUtils = require('mwater-expressions').ExprUtils
 
 # Require d3-tip to use it

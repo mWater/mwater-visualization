@@ -6,7 +6,7 @@ H = React.DOM
 
 ExprUtils = require('mwater-expressions').ExprUtils
 LayeredChartCompiler = require './LayeredChartCompiler'
-TextComponent = require '../text/TextComponent'
+TextComponent = require '../../text/TextComponent'
 
 # Displays a layered chart
 module.exports = class LayeredChartViewComponent extends React.Component

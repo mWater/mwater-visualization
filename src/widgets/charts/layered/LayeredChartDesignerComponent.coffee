@@ -4,7 +4,7 @@ R = React.createElement
 LayeredChartLayerDesignerComponent = require './LayeredChartLayerDesignerComponent'
 LayeredChartCompiler = require './LayeredChartCompiler'
 TabbedComponent = require('react-library/lib/TabbedComponent')
-ui = require '../../UIComponents'
+ui = require '../../../UIComponents'
 
 module.exports = class LayeredChartDesignerComponent extends React.Component
   @propTypes: 

@@ -4,10 +4,10 @@ H = React.DOM
 uuid = require 'uuid'
 
 injectTableAlias = require('mwater-expressions').injectTableAlias
-Chart = require './Chart'
+Chart = require '../Chart'
 ExprUtils = require('mwater-expressions').ExprUtils
 ExprCompiler = require('mwater-expressions').ExprCompiler
-AxisBuilder = require './../../axes/AxisBuilder'
+AxisBuilder = require '../../../axes/AxisBuilder'
 TableChartViewComponent = require './TableChartViewComponent'
 
 ###
