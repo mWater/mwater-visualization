@@ -32,7 +32,7 @@ describe "PivotChartQueryBuilder", ->
       ]
       intersections: {
         "r1:c1": {
-          textAxis: @axisNumberSum
+          valueAxis: @axisNumberSum
         }
       }
     }
@@ -45,8 +45,8 @@ describe "PivotChartQueryBuilder", ->
       type: "query"
       selects: [
         { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "value" }
-        { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "r1" }
-        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c1" }
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "r0" }
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
       ]
       from: { type: "table", table: "t1", alias: "main" }
       limit: 1000
