@@ -10,6 +10,7 @@ TextWidget = require '../../text/TextWidget'
 
 PivotChartDesignerComponent = require './PivotChartDesignerComponent'
 PivotChartViewComponent = require './PivotChartViewComponent'
+PivotChartQueryBuilder = require './PivotChartQueryBuilder'
 
 # See PivotChart Design.md for the design
 module.exports = class PivotChart extends Chart
@@ -56,7 +57,9 @@ module.exports = class PivotChart extends Chart
 
   validateDesign: (design, schema) ->
     axisBuilder = new AxisBuilder(schema: schema)
-    return "NOT DONE"
+
+    return null
+    # return "NOT DONE"
     # compiler = new LayeredChartCompiler(schema: schema)
 
     # # Check that layers have same x axis type
@@ -126,36 +129,35 @@ module.exports = class PivotChart extends Chart
   # filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   # callback: (error, data)
   getData: (design, schema, dataSource, filters, callback) ->
-    callback(null, {})
-    # compiler = new LayeredChartCompiler(schema: schema)
-    # queries = compiler.createQueries(design, filters)
+    queryBuilder = new PivotChartQueryBuilder(schema: schema)
+    queries = queryBuilder.createQueries(design, filters)
 
-    # # Run queries in parallel
-    # async.map _.pairs(queries), (item, cb) =>
-    #   dataSource.performQuery(item[1], (err, rows) =>
-    #     cb(err, [item[0], rows])
-    #     )
-    # , (err, items) =>
-    #   if err
-    #     return callback(err)
+    # Run queries in parallel
+    async.map _.pairs(queries), (item, cb) =>
+      dataSource.performQuery(item[1], (err, rows) =>
+        cb(err, [item[0], rows])
+        )
+    , (err, items) =>
+      if err
+        return callback(err)
 
-    #   data = _.object(items)
+      data = _.object(items)
 
-    #   # Add header and footer data
-    #   textWidget = new TextWidget()
-    #   textWidget.getData design.header, schema, dataSource, filters, (error, headerData) =>
-    #     if error
-    #       return callback(error)
+      # Add header and footer data
+      textWidget = new TextWidget()
+      textWidget.getData design.header, schema, dataSource, filters, (error, headerData) =>
+        if error
+          return callback(error)
 
-    #     data.header = headerData
+        data.header = headerData
 
-    #     textWidget.getData design.footer, schema, dataSource, filters, (error, footerData) =>
-    #       if error
-    #         return callback(error)
+        textWidget.getData design.footer, schema, dataSource, filters, (error, footerData) =>
+          if error
+            return callback(error)
 
-    #       data.footer = footerData
+          data.footer = footerData
     
-    #       callback(null, data)
+          callback(null, data)
 
   # Create a view element for the chart
   # Options include:

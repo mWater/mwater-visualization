@@ -13,7 +13,16 @@ MWaterLoaderComponent = require '../src/MWaterLoaderComponent'
 storiesOf('Pivot Chart', module)
   .add 'blank', => 
     return R UpdateableComponent, 
-      design: {},
+      design: {
+        table: "entities.water_point"
+        rows: [{ id: "row1", label: "Test" }]
+        columns: [{ id: "col1", label: "Test" }]
+        intersections: {
+          "row1:col1": {
+            valueAxis: { expr: { type: "op", op: "count", table: "entities.water_point", exprs: [] } }
+          }
+        }
+      },
       (state, update) =>
         R MWaterLoaderComponent, {
           apiUrl: "https://api.mwater.co/v3/"

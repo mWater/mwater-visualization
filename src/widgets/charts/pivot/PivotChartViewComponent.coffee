@@ -6,6 +6,8 @@ H = React.DOM
 
 ExprUtils = require('mwater-expressions').ExprUtils
 TextComponent = require '../../text/TextComponent'
+PivotChartLayoutComponent = require './PivotChartLayoutComponent'
+PivotChartLayoutBuilder = require './PivotChartLayoutBuilder'
 
 # Displays a pivot chart
 module.exports = class PivotChartViewComponent extends React.Component
@@ -17,8 +19,7 @@ module.exports = class PivotChartViewComponent extends React.Component
     onDesignChange: React.PropTypes.func
 
     width: React.PropTypes.number.isRequired
-    height: React.PropTypes.number.isRequired
-    standardWidth: React.PropTypes.number.isRequired
+    standardWidth: React.PropTypes.number  # Deprecated
 
     scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
@@ -55,17 +56,10 @@ module.exports = class PivotChartViewComponent extends React.Component
         standardWidth: @props.standardWidth
 
   render: ->
+    layout = new PivotChartLayoutBuilder(schema: @props.schema).buildLayout(@props.design, @props.data, @context.locale)
+
     H.div style: { width: @props.width, height: @props.height },
       @renderHeader()
-      H.div null, "TODO"
-        # R C3ChartComponent, 
-        #   schema: @props.schema
-        #   design: @props.design
-        #   data: @props.data
-        #   onDesignChange: @props.onDesignChange
-        #   width: @props.width
-        #   height: @props.height - @state.headerHeight - @state.footerHeight
-        #   standardWidth: @props.standardWidth
-        #   scope: @props.scope
-        #   onScopeChange: @props.onScopeChange
+      H.div key: "layout", style: { margin: 10 },  # Leave room for gear menu
+        R PivotChartLayoutComponent, layout: layout
       @renderFooter()
