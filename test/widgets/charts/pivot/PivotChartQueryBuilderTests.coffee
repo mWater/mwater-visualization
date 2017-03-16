@@ -6,7 +6,7 @@ PivotChartQueryBuilder = require '../../../../src/widgets/charts/pivot/PivotChar
 
 canonical = require 'canonical-json'
 compare = (actual, expected) ->
-  assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected)
+  assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n"
 
 describe "PivotChartQueryBuilder", ->
   before ->

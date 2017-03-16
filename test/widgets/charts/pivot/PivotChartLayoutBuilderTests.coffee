@@ -7,7 +7,11 @@ PivotChartLayoutBuilder = require '../../../../src/widgets/charts/pivot/PivotCha
 
 canonical = require 'canonical-json'
 compare = (actual, expected) ->
-  assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected)
+  assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n"
+
+# Plucks from layout 
+layoutPluck = (layout, key) ->
+  _.map(layout.rows, (row) -> _.pluck(row.cells, key))
 
 describe "PivotChartLayoutBuilder", ->
   before ->
@@ -120,3 +124,83 @@ describe "PivotChartLayoutBuilder", ->
           [{ segment: segment, label: "x", value: "x" }, { segment: segment.children[0], label: "r", value: "r" }]
           [{ segment: segment, label: "y", value: "y" }, { segment: segment.children[0], label: "s", value: "s" }]
         ]
+
+  describe "buildLayout", ->
+    it "simple enum/text with no labels", ->
+      design = {
+        table: "t1"
+        columns: [{ id: "c1", valueAxis: @axisEnum }]
+        rows: [{ id: "r1", valueAxis: @axisText }]
+        intersections: {
+          "r1:c1": { valueAxis: @axisNumberSum }
+        }
+      }
+
+      data = {
+        "r1:c1": [
+          { r0: "x", c0: "a", value: 2 }
+          { r0: "y", c0: "b", value: 4 }
+        ]
+      }
+
+      layout = @lb.buildLayout(design, data)
+
+      # Check text
+      compare layoutPluck(layout, "text"), [
+        [null, "A", "B", "None"]
+        ["x", "2", null, null]
+        ["y", null, "4", null]
+      ]
+
+      # Check types
+      compare layoutPluck(layout, "type"), [
+        ["blank", "columnSegment", "columnSegment", "columnSegment"]
+        ["rowSegment", "intersection", "intersection", "intersection"]
+        ["rowSegment", "intersection", "intersection", "intersection"]
+      ]
+
+    it "adds labels for segments with axes", ->
+      design = {
+        table: "t1"
+        columns: [{ id: "c1", valueAxis: @axisEnum, label: "C1" }]
+        rows: [{ id: "r1", valueAxis: @axisText, label: "R1" }]
+        intersections: {
+          "r1:c1": { valueAxis: @axisNumberSum }
+        }
+      }
+
+      data = {
+        "r1:c1": [
+          { r0: "x", c0: "a", value: 2 }
+          { r0: "y", c0: "b", value: 4 }
+        ]
+      }
+
+      layout = @lb.buildLayout(design, data)
+
+      # Check text
+      compare layoutPluck(layout, "text"), [
+        [null, "C1", "C1", "C1"]
+        [null, "A", "B", "None"]
+        ["R1", null, null, null]
+        ["x", "2", null, null]
+        ["y", null, "4", null]
+      ]
+
+      # Check types
+      compare layoutPluck(layout, "type"), [
+        ["blank", "columnLabel", "skip", "skip"]
+        ["blank", "columnSegment", "columnSegment", "columnSegment"]
+        ["rowLabel", "blank", "blank", "blank"]
+        ["rowSegment", "intersection", "intersection", "intersection"]
+        ["rowSegment", "intersection", "intersection", "intersection"]
+      ]
+
+      # Check column spans
+      compare layoutPluck(layout, "columnSpan"), [
+        [undefined, 3, undefined, undefined]
+        [undefined, undefined, undefined, undefined]
+        [undefined, undefined, undefined, undefined]
+        [undefined, undefined, undefined, undefined]
+        [undefined, undefined, undefined, undefined]
+      ]
