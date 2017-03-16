@@ -18,6 +18,7 @@
     "bootstrap": "^3.3.4",
     "c3": "mWater/c3#clipped-title-fix",
     "d3": "v3.5.0",
-    "lodash": "~3.10.1"
+    "lodash": "~3.10.1",
+    "react": "~15.4.2"
   }
 }
