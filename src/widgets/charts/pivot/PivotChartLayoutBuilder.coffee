@@ -43,7 +43,7 @@ module.exports = class PivotChartLayoutBuilder
         for i in [1..rowsDepth]
           cells.push({ type: "blank", text: null })
         for column in columns
-          cells.push({ type: "columnLabel", section: column[depth]?.segment.id, text: column[depth]?.segment.label })
+          cells.push({ type: "columnLabel", section: column[depth]?.segment.id, text: column[depth]?.segment.label, align: "center" })
         layout.rows.push({ cells: cells })
     
       # Emit column labels
@@ -51,7 +51,7 @@ module.exports = class PivotChartLayoutBuilder
       for i in [1..rowsDepth]
         cells.push({ type: "blank", text: null })
       for column in columns
-        cells.push({ type: "columnSegment", section: column[depth]?.segment.id, text: column[depth]?.label })
+        cells.push({ type: "columnSegment", section: column[depth]?.segment.id, text: column[depth]?.label, align: "center" })
 
       layout.rows.push({ cells: cells })
 

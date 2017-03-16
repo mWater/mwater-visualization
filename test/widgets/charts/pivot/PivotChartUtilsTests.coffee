@@ -17,3 +17,9 @@ describe "PivotChartUtils", ->
       segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
       compare PivotChartUtils.getSegmentPaths(segments), [[segments[0], { id: "c" }], [segments[0], { id: "d" }], [segments[1]]]
 
+  describe "getAllSegments", ->
+    it 'gets nested paths', ->
+      segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
+      compare PivotChartUtils.getAllSegments(segments), [segments[0], { id: "c" }, { id: "d" }, segments[1]]
+
+

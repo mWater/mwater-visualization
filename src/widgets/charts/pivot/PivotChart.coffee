@@ -8,13 +8,13 @@ ExprCleaner = require('mwater-expressions').ExprCleaner
 AxisBuilder = require '../../../axes/AxisBuilder'
 TextWidget = require '../../text/TextWidget'
 
+PivotChartUtils = require './PivotChartUtils'
 PivotChartDesignerComponent = require './PivotChartDesignerComponent'
 PivotChartViewComponent = require './PivotChartViewComponent'
 PivotChartQueryBuilder = require './PivotChartQueryBuilder'
 
 # See PivotChart Design.md for the design
 module.exports = class PivotChart extends Chart
-
   cleanDesign: (design, schema) ->
     exprCleaner = new ExprCleaner(schema)
     axisBuilder = new AxisBuilder(schema: schema)
@@ -26,77 +26,63 @@ module.exports = class PivotChart extends Chart
     design.version = design.version or 1
     design.rows = design.rows or []
     design.columns = design.columns or []
+    design.intersections = design.intersections or {}
     design.header = design.header or { style: "footer", items: [] }
     design.footer = design.footer or { style: "footer", items: [] }
 
-    # # Clean each layer
-    # for layerId in [0...design.layers.length]
-    #   layer = design.layers[layerId]
+    # Clean all segments
+    for segment in PivotChartUtils.getAllSegments(design.rows)
+      if segment.valueAxis
+        segment.valueAxis = axisBuilder.cleanAxis(axis: segment.valueAxis, table: design.table, aggrNeed: "none", types: ["enum", "text", "boolean", "date"])
 
-    #   layer.axes = layer.axes or {}
+    for segment in PivotChartUtils.getAllSegments(design.columns)
+      if segment.valueAxis
+        segment.valueAxis = axisBuilder.cleanAxis(axis: segment.valueAxis, table: design.table, aggrNeed: "none", types: ["enum", "text", "boolean", "date"])
 
-    #   for axisKey, axis of layer.axes
-    #     # Determine what aggregation axis requires
-    #     if axisKey == "y" and compiler.doesLayerNeedGrouping(design, layerId)
-    #       aggrNeed = "required"
-    #     else
-    #       aggrNeed = "none"
-    #     layer.axes[axisKey] = axisBuilder.cleanAxis(axis: axis, table: layer.table, aggrNeed: aggrNeed, types: LayeredChartUtils.getAxisTypes(design, layer, axisKey))
+    # Clean all intersections
+    for intersectionId, intersection of design.intersections
+      if intersection.valueAxis
+        intersection.valueAxis = axisBuilder.cleanAxis(axis: intersection.valueAxis, table: design.table, aggrNeed: "required", types: ["enum", "text", "boolean", "date", "number"])
 
-    #   # Remove x axis if not required
-    #   if not compiler.canLayerUseXExpr(design, layerId) and layer.axes.x
-    #     delete layer.axes.x
-
-    #   # Remove cumulative if x is not date or number
-    #   if not layer.axes.x or axisBuilder.getAxisType(layer.axes.x) not in ['date', 'number']
-    #     delete layer.cumulative
-
-    #   layer.filter = exprCleaner.cleanExpr(layer.filter, { table: layer.table, types: ['boolean'] })
+    # Clean filter
+    design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ['boolean'] })
 
     return design
 
   validateDesign: (design, schema) ->
     axisBuilder = new AxisBuilder(schema: schema)
 
-    return null
-    # return "NOT DONE"
-    # compiler = new LayeredChartCompiler(schema: schema)
+    # Check that has table
+    if not design.table
+      return "Missing data source"
 
-    # # Check that layers have same x axis type
-    # xAxisTypes = _.uniq(_.map(design.layers, (l) => 
-    #   axisBuilder = new AxisBuilder(schema: schema)
-    #   return axisBuilder.getAxisType(l.axes.x)))
+    # Check that has rows
+    if design.rows.length == 0
+      return "Missing rows"
 
-    # if xAxisTypes.length > 1
-    #   return "All x axes must be of same type"
-
-    # for layerId in [0...design.layers.length]
-    #   layer = design.layers[layerId]
-
-    #   # Check that has table
-    #   if not layer.table
-    #     return "Missing data source"
-
-    #   # Check that has y axis
-    #   if not layer.axes.y
-    #     return "Missing Y Axis"
-
-    #   if not layer.axes.x and compiler.isXAxisRequired(design, layerId)
-    #     return "Missing X Axis"
-    #   if not layer.axes.color and compiler.isColorAxisRequired(design, layerId)
-    #     return "Missing Color Axis"
+    # Check that has columns
+    if design.columns.length == 0
+      return "Missing columns"
 
     error = null
 
-    #   # Validate axes
-    #   error = error or axisBuilder.validateAxis(axis: layer.axes.x)
-    #   error = error or axisBuilder.validateAxis(axis: layer.axes.y)
-    #   error = error or axisBuilder.validateAxis(axis: layer.axes.color)
+    # Validate axes
+    for segment in PivotChartUtils.getAllSegments(design.rows)
+      if segment.valueAxis
+        error = error or axisBuilder.validateAxis(axis: segment.valueAxis)
+
+    for segment in PivotChartUtils.getAllSegments(design.columns)
+      if segment.valueAxis
+        error = error or axisBuilder.validateAxis(axis: segment.valueAxis)
+
+    for intersectionId, intersection of design.intersections
+      if intersection.valueAxis
+        error = error or axisBuilder.validateAxis(axis: intersection.valueAxis)
+
     return error
 
   # Determine if widget is auto-height, which means that a vertical height is not required.
   isAutoHeight: -> false
-
 
   isEmpty: (design) ->
     return not design.table or design.rows.length == 0 or design.columns.length == 0
@@ -242,7 +228,6 @@ module.exports = class PivotChart extends Chart
   #      _.map(fields, (field) -> record[field])
   #   table.concat(_.map(data, renderRow))
   # else []
-
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->
