@@ -1,5 +1,6 @@
 # Karma configuration
 # Generated on Fri Sep 18 2015 08:23:23 GMT-0400 (EDT)
+webpack = require 'webpack'
 
 module.exports = (config) ->
   config.set
@@ -10,12 +11,21 @@ module.exports = (config) ->
 
     # frameworks to use
     # available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['browserify', 'mocha']
+    frameworks: ['mocha']
 
 
     # list of files / patterns to load in the browser
     files: [
-      'test/**/*Tests.coffee'
+      "bower_components/jquery/dist/jquery.js"
+      "bower_components/bootstrap/dist/js/bootstrap.js"
+      "bower_components/lodash/lodash.js"
+      "bower_components/react/react-with-addons.js"
+      "bower_components/react/react-dom.js"
+      'test/test_index.coffee'
+      {
+        pattern: '**/*.js.map',
+        included: false
+      }
     ]
 
 
@@ -27,21 +37,44 @@ module.exports = (config) ->
     # preprocess matching files before serving them to the browser
     # available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'test/**/*.coffee': [ 'browserify' ] 
+      'test/test_index.coffee': ['webpack']
     }
 
-    browserify: {
-      debug: true,
-      transform: [ ]
-      extensions: ['.js', '.coffee']
+    webpack: {
+      devtool: 'inline-source-map',
+      module: {
+        loaders: [
+          { test: /\.coffee$/, loader: ["coffee-loader"] },
+        ]
+      },
+      resolve: {
+        extensions: [".coffee", ".js", ".json"]
+      },
+      externals: {
+        xlsx: "XLSX"
+        react: "React",
+        "react-dom": "ReactDOM",
+        jquery: "$"
+        lodash: '_'
+        d3: "d3"
+        leaflet: "L"
+        'react/lib/ExecutionEnvironment': true
+        'react/addons': true,
+        'react/lib/ReactContext': 'window'      
+      }    
+      # Needed for bugs that don't show source maps https://github.com/webpack-contrib/karma-webpack/issues/188
+      plugins: [
+        new webpack.SourceMapDevToolPlugin({
+          filename: null, # if no value is provided the sourcemap is inlined
+          test: /\.(coffee|js)($|\?)/i # process .js and .coffee files only
+        })
+      ]
     }
-
 
     # test results reporter to use
     # possible values: 'dots', 'progress'
     # available reporters: https://npmjs.org/browse/keyword/karma-reporter
     reporters: ['progress']
-
 
     # web server port
     port: 9876
@@ -74,3 +107,5 @@ module.exports = (config) ->
     # Continuous Integration mode
     # if true, Karma captures browsers, runs the tests and exits
     singleRun: false
+
+    plugins: ['karma-webpack', 'karma-mocha', 'karma-chrome-launcher']
