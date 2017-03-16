@@ -15,15 +15,139 @@ module.exports = class PivotChartLayoutBuilder
     @exprUtils = new ExprUtils(@schema)
     @axisBuilder = new AxisBuilder(schema: @schema)
 
-  buildLayout: (design, data) ->
+  buildLayout: (design, data, locale) ->
+    # Create empty layout
+    layout = {
+      rows: []
+    }
 
     # Get all columns
+    columns = []
+    for segment in design.columns
+      columns = columns.concat(@getRowsOrColumns(false, segment, data, locale))
 
     # Get all rows
+    rows = []
+    for segment in design.rows
+      rows = rows.concat(@getRowsOrColumns(true, segment, data, locale))
 
-    # Emit column headers
+    # Determine depth of row headers and column headers (how deeply nested segments are)
+    rowsDepth = _.max(_.map(rows, (row) -> row.length))
+    columnsDepth = _.max(_.map(columns, (column) -> column.length))
+
+    # Emit column headers, leaving blank space at left for row headers
+    for depth in [0...columnsDepth]
+      # If any segment has label and axis, add a special row of just labels
+      if _.any(columns, (column) -> column[depth] and column[depth].segment.label and column[depth].segment.valueAxis)
+        cells = []
+        for i in [1..rowsDepth]
+          cells.push({ type: "blank", text: null })
+        for column in columns
+          cells.push({ type: "columnLabel", section: column[depth]?.segment.id, text: column[depth]?.segment.label })
+        layout.rows.push({ cells: cells })
+    
+      # Emit column labels
+      cells = []
+      for i in [1..rowsDepth]
+        cells.push({ type: "blank", text: null })
+      for column in columns
+        cells.push({ type: "columnSegment", section: column[depth]?.segment.id, text: column[depth]?.label })
+
+      layout.rows.push({ cells: cells })
+
+    # TODO add level and section everywhere
+
     # Emit main section
+    # Keep track of current row segment, so we can re-emit headers for row segments that have both axis and label
+    rowSegments = []
+    for row in rows
+      # Emit special row header for any segments that have changed and have both axis and label
+      needsSpecialRowHeader = []
+      for depth in [0...rowsDepth]
+        if row[depth] and rowSegments[depth] != row[depth].segment and row[depth].segment.label and row[depth].segment.valueAxis
+          needsSpecialRowHeader.push(true)
+        else
+          needsSpecialRowHeader.push(false)
 
+      if _.any(needsSpecialRowHeader)
+        cells = []
+        for i in [0...rowsDepth]
+          if needsSpecialRowHeader[i]
+            cells.push({ type: "rowLabel", text: row[i].segment.label })
+          else
+            cells.push({ type: "rowSegment", text: row[i].label })
+
+        # Add blank columns
+        for column in columns
+          cells.push({ type: "blank", text: null })
+
+        layout.rows.push({ cells: cells })
+
+      # Reset row segments
+      rowSegments = _.pluck(row, "segment")
+          
+      # Emit normal row headers
+      cells = []
+      for depth in [0...rowsDepth]
+        cells.push({ type: "rowSegment", section: row[depth]?.segment.id, text: row[depth]?.label })
+
+      # Emit contents
+      for column in columns
+        cells.push(@buildIntersectionCell(design, data, locale, row, column))
+
+      layout.rows.push({ cells: cells })
+
+    # Span column headers and column segments that have same segment and value
+    for layoutRow in layout.rows
+      for cell, i in layoutRow.cells
+        if i == 0
+          refCell = cell
+          continue
+
+        # If matches, span columns
+        if cell.type in ['columnLabel', 'columnSegment'] and cell.text == refCell.text and cell.type == refCell.type and cell.section == refCell.section
+          layoutRow.cells[i].type = "skip"
+          refCell.columnSpan = (refCell.columnSpan or 1) + 1
+        else
+          refCell = cell
+
+    return layout
+
+  # Build a cell which is the intersection of a row and column, where row and column are nested arrays
+  # from getRowsOrColumns
+  buildIntersectionCell: (design, data, locale, row, column) ->
+    # Get intersection id
+    intersectionId = _.map(row, (r) -> r.segment.id).join(",") + ":" + _.map(column, (c) -> c.segment.id).join(",")
+
+    # Lookup intersection 
+    intersection = design.intersections[intersectionId]
+    if not intersection
+      return { type: "blank", text: null }
+    
+    # Lookup data
+    intersectionData = data[intersectionId]
+
+    # Lookup value (very slow!)
+    # Do this by finding an entry which matches all of the row and column values
+    entry = _.find(intersectionData, (e) ->
+      for part, i in row
+        if e["r#{i}"] != part.value
+          return false
+      for part, i in column
+        if e["c#{i}"] != part.value
+          return false
+      return true
+      )
+
+    value = entry?.value
+
+    # Format using axis builder if present. Blank otherwise
+    if value?
+      text = @axisBuilder.formatValue(intersection.valueAxis, value, locale)
+    else
+      text = null
+
+    return { type: "intersection", section: intersectionId, text: text }
 
   # Get rows or columns in format of array of
   # [{ segment:, label:, value:  }, ...] 
@@ -63,7 +187,10 @@ module.exports = class PivotChartLayoutBuilder
           return true
         )
 
-        allValues = allValues.concat(_.pluck(relevantData, "c#{parentSegments.length}"))
+        if isRow
+          allValues = allValues.concat(_.pluck(relevantData, "r#{parentSegments.length}"))
+        else
+          allValues = allValues.concat(_.pluck(relevantData, "c#{parentSegments.length}"))
 
       # Get categories
       categories = @axisBuilder.getCategories(segment.valueAxis, allValues, locale)

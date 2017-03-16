@@ -59,15 +59,15 @@ row:
   cells: array of cells
 
 cell: 
+  type: rowSegment/rowLabel/columnSegment/columnLabel/intersection/blank/skip
   text: text content of cell
   align: left/center/right
   section: section id (see above)
   bold: true if bold
   italic: true if italic
-  type: rowSegment/rowLabel/columnSegment/columnLabel/intersection/spacer
   level: 0, 1, 2 if segment
-  rowSpan: if spans more than one row. Next n-1 cells below will be missing
-  columnSpan: if spans more than one column. Next n-1 cells will be missing
+  rowSpan: if spans more than one row. Next n-1 cells below will be type "skip"
+  columnSpan: if spans more than one column. Next n-1 cells will be type "skip"
 
 
 
