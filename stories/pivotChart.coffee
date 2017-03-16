@@ -46,6 +46,31 @@ storiesOf('Pivot Chart', module)
       }
     }
 
+  .add 'water types by functionality', => 
+    R PivotTest, design: {
+      table: "entities.water_point"
+      rows: [
+        { 
+          id: "row1"
+          valueAxis: { expr: { type: "field", table: "entities.water_point", column: "type" } }
+          label: "Type"
+        }
+      ]
+      columns: [
+        { 
+          id: "col1"
+          valueAxis: {"expr":{"type":"scalar","table":"entities.water_point","joins":["!indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9.Water point"],"expr":{"type":"op","op":"last","table":"indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9","exprs":[{"type":"field","table":"indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9","column":"Functionality"}]}}}
+          label: "Functionality"
+        }
+      ]
+      intersections: {
+        "row1:col1": {
+          valueAxis: { expr: { type: "op", op: "count", table: "entities.water_point", exprs: [] } }
+        }
+      }
+    }
+
+
 class PivotTest extends React.Component
   render: ->
     R UpdateableComponent, 

@@ -61,5 +61,13 @@ module.exports = class PivotChartViewComponent extends React.Component
     H.div style: { width: @props.width, height: @props.height },
       @renderHeader()
       H.div key: "layout", style: { margin: 10 },  # Leave room for gear menu
-        R PivotChartLayoutComponent, layout: layout
+        R PivotChartLayoutComponent, 
+          layout: layout
+          editable: @props.onDesignChange?
+          onEditSegment: => alert("TODO")
+          onRemoveSegment: => alert("TODO")
+          onInsertBeforeSegment: => alert("TODO")
+          onInsertAfterSegment: => alert("TODO")
+          onAddChildSegment: => alert("TODO")
+
       @renderFooter()

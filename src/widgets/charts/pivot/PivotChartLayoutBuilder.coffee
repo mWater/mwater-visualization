@@ -99,6 +99,7 @@ module.exports = class PivotChartLayoutBuilder
 
     # Span column headers and column segments that have same segment and value
     for layoutRow in layout.rows
+      refCell = null
       for cell, i in layoutRow.cells
         if i == 0
           refCell = cell
@@ -106,8 +107,25 @@ module.exports = class PivotChartLayoutBuilder
 
         # If matches, span columns
         if cell.type in ['columnLabel', 'columnSegment'] and cell.text == refCell.text and cell.type == refCell.type and cell.section == refCell.section
-          layoutRow.cells[i].type = "skip"
+          cell.type = "skip"
           refCell.columnSpan = (refCell.columnSpan or 1) + 1
+        else
+          refCell = cell
+
+    # Span row headers and row segments that have same segment and value
+    for columnIndex in [0...layout.rows[0].cells.length]
+      refCell = null
+      for rowIndex in [0...layout.rows.length]
+        cell = layout.rows[rowIndex].cells[columnIndex]
+
+        if i == 0
+          refCell = cell
+          continue
+
+        # If matches, span rows
+        if cell.type in ['rowLabel', 'rowSegment'] and cell.text == refCell.text and cell.type == refCell.type and cell.section == refCell.section
+          cell.type = "skip"
+          refCell.rowSpan = (refCell.rowSpan or 1) + 1
         else
           refCell = cell
 
@@ -147,7 +165,7 @@ module.exports = class PivotChartLayoutBuilder
     else
       text = null
 
-    return { type: "intersection", section: intersectionId, text: text }
+    return { type: "intersection", section: intersectionId, text: text, align: "right" }
 
   # Get rows or columns in format of array of
   # [{ segment:, label:, value:  }, ...] 
@@ -164,6 +182,10 @@ module.exports = class PivotChartLayoutBuilder
 
       # To find all values, first need all intersections that are relevant
       for intersectionId, intersectionData of data
+        # Ignore non-intersection data (header + footer)
+        if not intersectionId.match(":")
+          continue
+
         # Get segment ids
         if isRow
           segIds = intersectionId.split(":")[0].split(",")
