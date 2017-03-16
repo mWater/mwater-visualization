@@ -18,7 +18,7 @@ a rectangle. An intersection is id-ed by "rowid:columnid" or "rowid,rowid:column
 
 ### Section
 
-Either a segment or intersection or blank area. Always a rectangle.
+Either a segment or intersection or blank area. Always a rectangle. Id is like intersection id if intersection, id of segment if segment
 
 ## Design
 
@@ -35,8 +35,41 @@ design:
 segment:
   id: id of segment
   label: optional label of segment
-  valueAxis: enum/text axis that determines values
-  children: array of child segments if any
+  valueAxis: enum/text axis that determines values. Optional.
+  children: array of child segments if any. Optional
 
 intersection:
   valueAxis: axis that determines value to display in cells. Must be aggregate
+
+
+## Rendering 
+
+Rendering a pivot chart is first done by getting the data for each intersection (see PivotChartQueryBuilder).
+
+The data results from the queries is a lookup of intersection id to array of rows ([{ value: , r0: , c0: ,... }, ...])
+
+The data and design together are passed to the PivotChartLayoutBuilder which converts it into a layout which is
+the list of rows and cells.
+
+Layout format is as follows:
+
+  rows: array of rows
+
+row:
+  cells: array of cells
+
+cell: 
+  text: text content of cell
+  align: left/center/right
+  section: section id (see above)
+  bold: true if bold
+  italic: true if italic
+  type: rowSegment/rowLabel/columnSegment/columnLabel/intersection/spacer
+  level: 0, 1, 2 if segment
+  rowSpan: if spans more than one row. Next n-1 cells below will be missing
+  columnSpan: if spans more than one column. Next n-1 cells will be missing
+
+
+
+
+
