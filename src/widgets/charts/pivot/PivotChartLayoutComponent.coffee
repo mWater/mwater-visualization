@@ -9,6 +9,13 @@ module.exports = class PivotChartLayoutComponent extends React.Component
   @propTypes: 
     layout: React.PropTypes.object.isRequired  # See PivotChart Design.md
 
+    editable: React.PropTypes.bool   # If true, all below must be present
+    onEditSegment: React.PropTypes.func  # Called with id of section (not segment id!)
+    onRemoveSegment: React.PropTypes.func  # Called with id of section (not segment id!)
+    onInsertBeforeSegment: React.PropTypes.func  # Called with id of section (not segment id!)
+    onInsertAfterSegment: React.PropTypes.func  # Called with id of section (not segment id!)
+    onAddChildSegment: React.PropTypes.func  # Called with id of section (not segment id!)
+
   constructor: (props) ->
     super
 
@@ -24,8 +31,13 @@ module.exports = class PivotChartLayoutComponent extends React.Component
           layout: @props.layout
           rowIndex: rowIndex
           columnIndex: columnIndex
-          onHover: => @setState(hoverSection: cell.section)
-          hoverSection: @state.hoverSection
+          onHover: if @props.editable then (=> @setState(hoverSection: cell.section))
+          hoverSection: if @props.editable then @state.hoverSection
+          onEditSegment: if @props.onEditSegment then @props.onEditSegment.bind(null, cell.section)
+          onRemoveSegment: if @props.onRemoveSegment then @props.onRemoveSegment.bind(null, cell.section)
+          onInsertBeforeSegment: if @props.onInsertBeforeSegment then @props.onInsertBeforeSegment.bind(null, cell.section)
+          onInsertAfterSegment: if @props.onInsertAfterSegment then @props.onInsertAfterSegment.bind(null, cell.section)
+          onAddChildSegment: if @props.onAddChildSegment then @props.onAddChildSegment.bind(null, cell.section)
 
   render: ->
     style = {
@@ -44,9 +56,46 @@ class LayoutCellComponent extends React.Component
     rowIndex: React.PropTypes.number.isRequired  
     columnIndex: React.PropTypes.number.isRequired
     hoverSection: React.PropTypes.string       # Which section is currently hovered over
-    onHover: React.PropTypes.func
+    onHover: React.PropTypes.func # Called when hovered over
 
-  renderEditMenu: ->
+    onEditSegment: React.PropTypes.func
+    onRemoveSegment: React.PropTypes.func
+    onInsertBeforeSegment: React.PropTypes.func
+    onInsertAfterSegment: React.PropTypes.func
+    onAddChildSegment: React.PropTypes.func
+
+  handleDoubleClick: (ev) =>
+    if @props.onEditSegment
+      ev.stopPropagation()
+      @props.onEditSegment()
+
+
+  renderMenuItems: (cell) ->
+    [
+      if @props.onEditSegment
+        H.li key: "edit",
+          H.a onClick: @props.onEditSegment, "Edit"
+      if @props.onRemoveSegment and cell.type in ["rowLabel", "rowSegment", "columnLabel", "columnSegment"]
+        H.li key: "remove",
+          H.a onClick: @props.onRemoveSegment, "Remove"
+      if @props.onInsertBeforeSegment and cell.type in ["rowLabel", "rowSegment"]
+        H.li key: "before",
+          H.a onClick: @props.onInsertBeforeSegment, "Insert Above"
+      if @props.onInsertAfterSegment and cell.type in ["rowLabel", "rowSegment"]
+        H.li key: "after",
+          H.a onClick: @props.onInsertAfterSegment, "Insert Below"
+      if @props.onInsertBeforeSegment and cell.type in ["columnLabel", "columnSegment"]
+        H.li key: "before",
+          H.a onClick: @props.onInsertBeforeSegment, "Insert Left"
+      if @props.onInsertAfterSegment and cell.type in ["columnLabel", "columnSegment"]
+        H.li key: "after",
+          H.a onClick: @props.onInsertAfterSegment, "Insert Right"
+      if @props.onAddChildSegment and cell.type in ["rowLabel", "rowSegment", "columnLabel", "columnSegment"]
+        H.li key: "child",
+          H.a onClick: @props.onAddChildSegment, "Subdivide"
+    ]
+
+  renderMenu: (cell) ->
     outerStyle = {
       position: "absolute"
       top: 5
@@ -66,11 +115,13 @@ class LayoutCellComponent extends React.Component
       H.div style: innerStyle, "data-toggle": "dropdown",
         H.i className: "fa fa-pencil fa-fw"
       H.ul className: "dropdown-menu dropdown-menu-right", style: { top: 20 },
-        H.li key: "1",
-          H.a null, "TEST" # onClick: item.onClick, 
+        @renderMenuItems(cell)
 
   render: ->
     cell = @props.layout.rows[@props.rowIndex].cells[@props.columnIndex]
+
+    if cell.type == "skip"
+      return null
 
     # Determine if top right of section
     isTop = cell.section and (@props.rowIndex == 0 or @props.layout.rows[@props.rowIndex - 1].cells[@props.columnIndex].section != cell.section) 
@@ -81,14 +132,16 @@ class LayoutCellComponent extends React.Component
     style = {
       backgroundColor: if isHover then "#F8F8F8"
       position: "relative"
+      textAlign: cell.align
     }
 
     H.td 
       onMouseEnter: @props.onHover, 
+      onDoubleClick: @handleDoubleClick
       style: style,
       colSpan: cell.columnSpan or 1
       rowSpan: cell.rowSpan or 1,
         if isTop and isRight and isHover
-          @renderEditMenu()
+          @renderMenu(cell)
 
         cell.text
