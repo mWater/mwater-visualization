@@ -481,6 +481,14 @@ describe "AxisBuilder", ->
         { value: "a", label: "a" }
         { value: "b", label: "b" }
         { value: "c", label: "c" }
+        ])
+
+    it "gets text values with none", ->
+      categories = @ab.getCategories(@axisText, ["a", "b", "a", "c", null])
+      compare(categories, [
+        { value: "a", label: "a" }
+        { value: "b", label: "b" }
+        { value: "c", label: "c" }
         { value: null, label: "None" }
         ])
 

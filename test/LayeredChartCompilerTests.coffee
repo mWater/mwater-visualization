@@ -564,8 +564,8 @@ describe "LayeredChartCompiler", ->
 
         res = @compiler.compileData(design, data)
         compare(res.columns, [
-          ["x", "t1", "t2", "t3", "None"]
-          ["0", 1, 3, 6, null]
+          ["x", "t1", "t2", "t3"]
+          ["0", 1, 3, 6]
         ])
 
       it "totals for cumulative, including excluded x-values", ->
@@ -575,7 +575,7 @@ describe "LayeredChartCompiler", ->
             { table: "t1", axes: { x: @axisText, y: @axisNumberSum }, cumulative: true }
           ]
         }
-        design.layers[0].axes.x = _.extend({}, design.layers[0].axes.x, { excludedValues: ["t1", null] })
+        design.layers[0].axes.x = _.extend({}, design.layers[0].axes.x, { excludedValues: ["t1"] })
 
         data = { 
           layer0: [{ x: "t1", y: 3 }, { x: "t2", y: 4 }, { x: "t3", y: 5 }]
@@ -601,9 +601,9 @@ describe "LayeredChartCompiler", ->
 
         res = @compiler.compileData(design, data)
         compare(res.columns, [
-          ["x", "t1", "t2", "None"]
-          ["0:a", 3, 11, 11]
-          ["0:b", 4, 4, 4]
+          ["x", "t1", "t2"]
+          ["0:a", 3, 11]
+          ["0:b", 4, 4]
         ])
 
       it "percentages for proportional", ->
@@ -631,9 +631,9 @@ describe "LayeredChartCompiler", ->
           ])
 
         compare(res.columns, [
-          ["x", "t1", "t2", "None"]
-          ["0:a", 25, 100, null]
-          ["0:b", 75, null, null]
+          ["x", "t1", "t2"]
+          ["0:a", 25, 100]
+          ["0:b", 75, null]
           ])
 
       it "colors based on color map", ->

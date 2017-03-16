@@ -514,7 +514,12 @@ module.exports = class AxisBuilder
         return _.map(@exprUtils.getExprEnumValues(axis.expr), (ev) -> { value: ev.id, label: ExprUtils.localizeString(ev.name, locale) }).concat([noneCategory])
       when "text"
         # Return unique values
-        return _.map(_.compact(_.uniq(values)).sort(), (v) -> { value: v, label: v or "None" }).concat([noneCategory])
+        hasNone = _.any(values, (v) -> not v?)
+        categories = _.map(_.compact(_.uniq(values)).sort(), (v) -> { value: v, label: v or "None" })
+        if hasNone
+          categories.push(noneCategory)
+          
+        return categories
       when "boolean"
         # Return unique values
         return [{ value: true, label: "True" }, { value: false, label: "False" }, noneCategory]
