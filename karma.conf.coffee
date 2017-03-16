@@ -22,10 +22,6 @@ module.exports = (config) ->
       "bower_components/react/react-with-addons.js"
       "bower_components/react/react-dom.js"
       'test/test_index.coffee'
-      {
-        pattern: '**/*.js.map',
-        included: false
-      }
     ]
 
 
@@ -62,13 +58,13 @@ module.exports = (config) ->
         'react/addons': true,
         'react/lib/ReactContext': 'window'      
       }    
-      # Needed for bugs that don't show source maps https://github.com/webpack-contrib/karma-webpack/issues/188
-      plugins: [
-        new webpack.SourceMapDevToolPlugin({
-          filename: null, # if no value is provided the sourcemap is inlined
-          test: /\.(coffee|js)($|\?)/i # process .js and .coffee files only
-        })
-      ]
+      # # Needed for bugs that don't show source maps https://github.com/webpack-contrib/karma-webpack/issues/188
+      # plugins: [
+      #   new webpack.SourceMapDevToolPlugin({
+      #     filename: null, # if no value is provided the sourcemap is inlined
+      #     test: /\.(coffee|js)($|\?)/i # process .js and .coffee files only
+      #   })
+      # ]
     }
 
     # test results reporter to use

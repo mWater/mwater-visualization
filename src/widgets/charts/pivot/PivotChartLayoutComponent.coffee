@@ -69,7 +69,6 @@ class LayoutCellComponent extends React.Component
       ev.stopPropagation()
       @props.onEditSegment()
 
-
   renderMenuItems: (cell) ->
     [
       if @props.onEditSegment

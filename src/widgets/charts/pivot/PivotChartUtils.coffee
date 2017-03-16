@@ -16,5 +16,14 @@ exports.getSegmentPaths = (segments) ->
 
   return paths
 
-# # Get a list of intersections. array of { rowSegments: array of row segments, columnSegments: array of column segments }
-# exports.getIntersections = (design) ->
+# Get all paths through a set of segments (e.g. if a contains b, c, then [[a,b], [a,c]])
+exports.getAllSegments = (segments) ->
+  allSegments = []
+
+  # Use recursive 
+  for segment in segments
+    allSegments.push(segment)
+    if segment.children and segment.children.length > 0
+      allSegments = allSegments.concat(exports.getAllSegments(segment.children))
+
+  return allSegments
