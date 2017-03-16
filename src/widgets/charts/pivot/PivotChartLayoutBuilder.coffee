@@ -71,11 +71,11 @@ module.exports = class PivotChartLayoutBuilder
 
       if _.any(needsSpecialRowHeader)
         cells = []
-        for i in [0...rowsDepth]
-          if needsSpecialRowHeader[i]
-            cells.push({ type: "rowLabel", text: row[i].segment.label })
+        for depth in [0...rowsDepth]
+          if needsSpecialRowHeader[depth]
+            cells.push({ type: "rowLabel", section: row[depth]?.segment.id, text: row[depth].segment.label })
           else
-            cells.push({ type: "rowSegment", text: row[i].label })
+            cells.push({ type: "rowSegment", section: row[depth]?.segment.id, text: row[depth].label })
 
         # Add blank columns
         for column in columns

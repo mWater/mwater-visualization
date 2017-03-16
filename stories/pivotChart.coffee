@@ -11,18 +11,45 @@ DirectWidgetDataSource = require '../src/widgets/DirectWidgetDataSource'
 MWaterLoaderComponent = require '../src/MWaterLoaderComponent'
 
 storiesOf('Pivot Chart', module)
-  .add 'blank', => 
-    return R UpdateableComponent, 
-      design: {
-        table: "entities.water_point"
-        rows: [{ id: "row1", label: "Test" }]
-        columns: [{ id: "col1", label: "Test" }]
-        intersections: {
-          "row1:col1": {
-            valueAxis: { expr: { type: "op", op: "count", table: "entities.water_point", exprs: [] } }
-          }
+  .add 'water types', => 
+    R PivotTest, design: {
+      table: "entities.water_point"
+      rows: [
+        { 
+          id: "row1"
+          valueAxis: { expr: { type: "field", table: "entities.water_point", column: "type" } }
         }
-      },
+      ]
+      columns: [{ id: "col1", label: "Test" }]
+      intersections: {
+        "row1:col1": {
+          valueAxis: { expr: { type: "op", op: "count", table: "entities.water_point", exprs: [] } }
+        }
+      }
+    }
+
+  .add 'water types with label', => 
+    R PivotTest, design: {
+      table: "entities.water_point"
+      rows: [
+        { 
+          id: "row1"
+          valueAxis: { expr: { type: "field", table: "entities.water_point", column: "type" } }
+          label: "Type"
+        }
+      ]
+      columns: [{ id: "col1", label: "Count" }]
+      intersections: {
+        "row1:col1": {
+          valueAxis: { expr: { type: "op", op: "count", table: "entities.water_point", exprs: [] } }
+        }
+      }
+    }
+
+class PivotTest extends React.Component
+  render: ->
+    R UpdateableComponent, 
+      design: @props.design,
       (state, update) =>
         R MWaterLoaderComponent, {
           apiUrl: "https://api.mwater.co/v3/"
@@ -54,6 +81,7 @@ storiesOf('Pivot Chart', module)
             onDesignChange: update("design")
             width: 800
           })
+
 
 # Convenience wrapper that allows updating state
 class UpdateableComponent extends React.Component
