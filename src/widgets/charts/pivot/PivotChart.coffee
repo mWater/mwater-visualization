@@ -2,6 +2,7 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 async = require 'async'
+uuid = require 'uuid'
 
 Chart = require '../Chart'
 ExprCleaner = require('mwater-expressions').ExprCleaner
@@ -29,6 +30,12 @@ module.exports = class PivotChart extends Chart
     design.intersections = design.intersections or {}
     design.header = design.header or { style: "footer", items: [] }
     design.footer = design.footer or { style: "footer", items: [] }
+
+    # Add default row and column
+    if design.rows.length == 0
+      design.rows.push({ id: uuid() })
+    if design.columns.length == 0
+      design.columns.push({ id: uuid() })
 
     # Clean all segments
     for segment in PivotChartUtils.getAllSegments(design.rows)

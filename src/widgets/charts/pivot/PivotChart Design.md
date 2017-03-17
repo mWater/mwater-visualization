@@ -68,6 +68,7 @@ cell:
   level: 0, 1, 2 if segment
   rowSpan: if spans more than one row. Next n-1 cells below will be type "skip"
   columnSpan: if spans more than one column. Next n-1 cells will be type "skip"
+  unconfigured: true if cell is a placeholder that needs to be configured
 
 
 

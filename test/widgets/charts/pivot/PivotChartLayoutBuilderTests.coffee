@@ -204,3 +204,38 @@ describe "PivotChartLayoutBuilder", ->
         [undefined, undefined, undefined, undefined]
         [undefined, undefined, undefined, undefined]
       ]
+
+    it "sets segments with no axis or label as unconfigured", ->
+      design = {
+        table: "t1"
+        columns: [{ id: "c1", valueAxis: null, label: null }]
+        rows: [{ id: "r1", valueAxis: @axisText, label: null }]
+        intersections: {
+          "r1:c1": { valueAxis: @axisNumberSum }
+        }
+      }
+
+      data = {
+        "r1:c1": [
+          { r0: "x", c0: null, value: 2 }
+          { r0: "y", c0: null, value: 4 }
+        ]
+      }
+
+      layout = @lb.buildLayout(design, data)
+
+      # Check text
+      compare layoutPluck(layout, "text"), [
+        [null, null]
+        ["x", "2"]
+        ["y", "4"]
+      ]
+
+      # Check unconfigured
+      compare layoutPluck(layout, "unconfigured"), [
+        [null, true]
+        [false, null]
+        [false, null]
+      ]
+
+

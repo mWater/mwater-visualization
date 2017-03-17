@@ -7,23 +7,6 @@ action = require('@kadira/storybook').action
 
 require './pivotChart'
 
-storiesOf('Pivot', module)
-  .add 'test', => 
-    R HoverTable
-  .add 'test2', => 
-    R HoverTable2
-
-    # R UpdateableComponent, 
-    #   deployment: deployment,
-    #   (state, update) =>
-    #     R DeploymentEditorComp, 
-    #       value: state.deployment
-    #       onChange: update("deployment")
-    #       ctx: createCtx()
-    #       form: form
-
-
-
 
 # Convenience wrapper that allows updating state
 class UpdateableComponent extends React.Component
