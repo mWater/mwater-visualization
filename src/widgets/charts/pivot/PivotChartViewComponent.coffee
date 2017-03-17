@@ -27,11 +27,21 @@ module.exports = class PivotChartViewComponent extends React.Component
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
 
+  constructor: ->
+    super
+
+    @state = {
+      editSegment: null   # Segment being edited
+    }
+
   handleHeaderChange: (header) =>
     @props.onDesignChange(_.extend({}, @props.design, header: header))
 
   handleFooterChange: (footer) =>
     @props.onDesignChange(_.extend({}, @props.design, footer: footer))
+
+  handleEditSection: (sectionId) =>
+    alert(sectionId)
 
   renderHeader: ->
     return H.div ref: "header",
@@ -64,10 +74,10 @@ module.exports = class PivotChartViewComponent extends React.Component
         R PivotChartLayoutComponent, 
           layout: layout
           editable: @props.onDesignChange?
-          onEditSegment: => alert("TODO")
-          onRemoveSegment: => alert("TODO")
-          onInsertBeforeSegment: => alert("TODO")
-          onInsertAfterSegment: => alert("TODO")
-          onAddChildSegment: => alert("TODO")
+          onEditSection: @handleEditSection
+          # onRemoveSegment: => alert("TODO")
+          # onInsertBeforeSegment: => alert("TODO")
+          # onInsertAfterSegment: => alert("TODO")
+          # onAddChildSegment: => alert("TODO")
 
       @renderFooter()
