@@ -7,7 +7,6 @@ CsvBuilder = require './../../CsvBuilder'
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
 ChartViewComponent = require './ChartViewComponent'
 ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
-ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
 
 # A widget which is a chart
 module.exports = class ChartWidget extends Widget

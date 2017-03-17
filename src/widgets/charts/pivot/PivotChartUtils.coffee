@@ -27,3 +27,38 @@ exports.getAllSegments = (segments) ->
       allSegments = allSegments.concat(exports.getAllSegments(segment.children))
 
   return allSegments
+
+exports.findSegment = (segments, id) ->
+  return _.findWhere(exports.getAllSegments(segments), { id: id })
+
+# Recursively map segments, flattening and compacting
+mapSegments = (segments, mapFunc) ->
+  segments = _.map(segments, mapFunc)
+
+  # Map children
+  segments = _.map(segments, (segment) ->
+    if not segment or not segment.children or segment.children.length == 0
+      return segment
+
+    return _.extend({}, segment, { children: mapSegments(segment.children, mapFunc )})
+    )
+
+  # Flatten and compact
+  return _.compact(_.flatten(segments))
+
+# Replace segment. 
+exports.replaceSegment = (segments, replacement) ->
+  mapSegments(segments, (segment) ->
+    if segment.id == replacement.id
+      return replacement
+    return segment
+    )
+
+# Remove segment. 
+exports.removeSegment = (segments, id) ->
+  mapSegments(segments, (segment) ->
+    if segment.id == id
+      return null
+    return segment
+    )
+
