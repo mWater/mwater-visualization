@@ -1,5 +1,5 @@
 _ = require 'lodash'
-
+uuid = require 'uuid'
 
 # Misc utils for working with pivot charts
 
@@ -54,7 +54,7 @@ exports.replaceSegment = (segments, replacement) ->
     return segment
     )
 
-# Remove segment. 
+# Remove segment
 exports.removeSegment = (segments, id) ->
   mapSegments(segments, (segment) ->
     if segment.id == id
@@ -62,3 +62,26 @@ exports.removeSegment = (segments, id) ->
     return segment
     )
 
+# Inserts before
+exports.insertBeforeSegment = (segments, id) ->
+  mapSegments(segments, (segment) ->
+    if segment.id == id
+      return [{ id: uuid() }, segment]
+    return segment
+    )
+
+# Inserts after
+exports.insertAfterSegment = (segments, id) ->
+  mapSegments(segments, (segment) ->
+    if segment.id == id
+      return [segment, { id: uuid() }]
+    return segment
+    )
+
+# Adds child
+exports.addChildSegment = (segments, id) ->
+  mapSegments(segments, (segment) ->
+    if segment.id == id
+      return _.extend({}, segment, children: (segment.children or []).concat([{ id: uuid() }]))
+    return segment
+    )

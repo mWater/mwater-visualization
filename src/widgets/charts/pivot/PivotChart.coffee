@@ -51,6 +51,15 @@ module.exports = class PivotChart extends Chart
       if intersection.valueAxis
         intersection.valueAxis = axisBuilder.cleanAxis(axis: intersection.valueAxis, table: design.table, aggrNeed: "required", types: ["enum", "text", "boolean", "date", "number"])
 
+    # Add missing intersections
+    intersections = {}
+    for rowPath in PivotChartUtils.getSegmentPaths(design.rows)
+      for columnPath in PivotChartUtils.getSegmentPaths(design.columns)
+        intersectionId = "#{_.pluck(rowPath, "id").join(",")}:#{_.pluck(columnPath, "id").join(",")}"
+        intersections[intersectionId] = design.intersections[intersectionId] or {}
+
+    design.intersections = intersections
+
     # Clean filter
     design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ['boolean'] })
 

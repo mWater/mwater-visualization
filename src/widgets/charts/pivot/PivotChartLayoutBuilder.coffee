@@ -83,7 +83,7 @@ module.exports = class PivotChartLayoutBuilder
             cells.push({ 
               type: "rowSegment"
               section: row[depth]?.segment.id
-              text: row[depth].label 
+              text: row[depth]?.label 
               # Unconfigured if segment has no label or value
               unconfigured: row[depth]?.segment and not row[depth]?.segment.label? and not row[depth]?.segment.valueAxis
             })

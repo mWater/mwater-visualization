@@ -40,3 +40,30 @@ describe "PivotChartUtils", ->
     it "removes nested", ->
       segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
       compare PivotChartUtils.removeSegment(segments, "c"), [{ id: "a", children: [{ id: "d" }] }, { id: "b" }]
+
+  describe "insertBeforeSegment", ->
+    it "handles nested", ->
+      segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
+      segments = PivotChartUtils.insertBeforeSegment(segments, "c")
+      assert.equal segments[0].children.length, 3
+      assert.equal segments[0].children[1].id, "c"
+
+  describe "insertAfterSegment", ->
+    it "handles simple", ->
+      segments = [{ id: "a" }, { id: "b" }, { id: "c" }]
+      segments = PivotChartUtils.insertAfterSegment(segments, "b")
+      assert.equal segments.length, 4
+      assert.equal segments[3].id, "c"
+
+    it "handles nested", ->
+      segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
+      segments = PivotChartUtils.insertAfterSegment(segments, "c")
+      assert.equal segments[0].children.length, 3
+      assert.equal segments[0].children[0].id, "c"
+
+  describe "addChildSegment", ->
+    it "handles simple", ->
+      segments = [{ id: "a" }, { id: "b" }, { id: "c" }]
+      segments = PivotChartUtils.addChildSegment(segments, "b")
+      assert.equal segments.length, 3
+      assert.equal segments[1].children.length, 1
