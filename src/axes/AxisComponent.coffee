@@ -234,6 +234,7 @@ module.exports = class AxisComponent extends AsyncLoadComponent
         reorderable: false
         showColorMap: false
         allowExcludedValues: true
+        initiallyExpanded: true
       ]
 
   render: ->

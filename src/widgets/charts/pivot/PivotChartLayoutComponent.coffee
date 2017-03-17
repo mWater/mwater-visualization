@@ -72,6 +72,11 @@ class LayoutCellComponent extends React.Component
         return
       elem = elem.parentElement
 
+    # Ignore blanks
+    cell = @props.layout.rows[@props.rowIndex].cells[@props.columnIndex]
+    if not cell.section
+      return 
+
     if @props.onEditSection
       @props.onEditSection()
 
@@ -138,9 +143,9 @@ class LayoutCellComponent extends React.Component
       padding: 5
       backgroundColor: 
         if cell.unconfigured and not isHover and @props.onEditSection
-          "#abcbe7"
+          "#dfebf6"
         else if cell.unconfigured and @props.onEditSection
-          "#b7d3eb"
+          "#eff5fb"
         else if isHover 
           "#F8F8F8"
       position: "relative"
