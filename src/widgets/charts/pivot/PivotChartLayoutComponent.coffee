@@ -64,9 +64,15 @@ class LayoutCellComponent extends React.Component
     onInsertAfterSegment: React.PropTypes.func
     onAddChildSegment: React.PropTypes.func
 
-  handleDoubleClick: (ev) =>
+  handleClick: (ev) =>
+    # Ignore if part of dropdown
+    elem = ev.target
+    while elem 
+      if elem == @menuEl
+        return
+      elem = elem.parentElement
+
     if @props.onEditSegment
-      ev.stopPropagation()
       @props.onEditSegment()
 
   renderMenuItems: (cell) ->
@@ -110,7 +116,7 @@ class LayoutCellComponent extends React.Component
       cursor: "pointer" 
     }
 
-    H.div className: "dropdown", style: outerStyle,
+    H.div className: "dropdown", style: outerStyle, ref: ((el) => @menuEl = el),
       H.div style: innerStyle, "data-toggle": "dropdown",
         H.i className: "fa fa-pencil fa-fw"
       H.ul className: "dropdown-menu dropdown-menu-right", style: { top: 20 },
@@ -124,23 +130,34 @@ class LayoutCellComponent extends React.Component
 
     # Determine if top right of section
     isTop = cell.section and (@props.rowIndex == 0 or @props.layout.rows[@props.rowIndex - 1].cells[@props.columnIndex].section != cell.section) 
-    isRight = cell.section and (@props.columnIndex >= @props.layout.rows[0].cells.length - 1 or @props.layout.rows[@props.rowIndex].cells[@props.columnIndex + 1].section != cell.section)
+    isRight = cell.section and (@props.columnIndex >= @props.layout.rows[0].cells.length - (cell.columnSpan or 1) or @props.layout.rows[@props.rowIndex].cells[@props.columnIndex + (cell.columnSpan or 1)].section != cell.section)
 
     isHover = @props.hoverSection and cell.section == @props.hoverSection
 
     style = {
-      backgroundColor: if isHover then "#F8F8F8"
+      backgroundColor: 
+        if cell.unconfigured and not isHover
+          "#abcbe7"
+        else if cell.unconfigured
+          "#b7d3eb"
+        else if isHover 
+          "#F8F8F8"
       position: "relative"
       textAlign: cell.align
+      cursor: if isHover then "pointer"
     }
 
     H.td 
-      onMouseEnter: @props.onHover, 
-      onDoubleClick: @handleDoubleClick
+      onMouseEnter: @props.onHover
+      onClick: @handleClick
       style: style,
       colSpan: cell.columnSpan or 1
       rowSpan: cell.rowSpan or 1,
         if isTop and isRight and isHover
           @renderMenu(cell)
 
+        if cell.unconfigured and cell.type == "rowSegment"
+          "Click to set up row"
+        if cell.unconfigured and cell.type == "columnSegment"
+          "Click to set up column"
         cell.text

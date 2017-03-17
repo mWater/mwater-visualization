@@ -17,15 +17,15 @@ module.exports = class ImageMosaicChartDesignerComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func.isRequired
 
-  # Upimages design with the specified changes
-  upimageDesign: (changes) ->
+  # Updates design with the specified changes
+  updateDesign: (changes) ->
     design = _.extend({}, @props.design, changes)
     @props.onDesignChange(design)
 
-  handleTitleTextChange: (ev) =>  @upimageDesign(titleText: ev.target.value)
-  handleTableChange: (table) => @upimageDesign(table: table)
-  handleFilterChange: (filter) => @upimageDesign(filter: filter)
-  handleImageAxisChange: (imageAxis) => @upimageDesign(imageAxis: imageAxis)
+  handleTitleTextChange: (ev) =>  @updateDesign(titleText: ev.target.value)
+  handleTableChange: (table) => @updateDesign(table: table)
+  handleFilterChange: (filter) => @updateDesign(filter: filter)
+  handleImageAxisChange: (imageAxis) => @updateDesign(imageAxis: imageAxis)
 
   renderTable: ->
     return H.div className: "form-group",

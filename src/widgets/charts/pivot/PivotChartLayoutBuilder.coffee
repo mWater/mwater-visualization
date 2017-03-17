@@ -51,11 +51,16 @@ module.exports = class PivotChartLayoutBuilder
       for i in [1..rowsDepth]
         cells.push({ type: "blank", text: null })
       for column in columns
-        cells.push({ type: "columnSegment", section: column[depth]?.segment.id, text: column[depth]?.label, align: "center" })
+        cells.push({ 
+          type: "columnSegment"
+          section: column[depth]?.segment.id
+          text: column[depth]?.label
+          align: "center"
+          # Unconfigured if segment has no label or value
+          unconfigured: column[depth]?.segment and not column[depth]?.segment.label? and not column[depth]?.segment.valueAxis
+        })
 
       layout.rows.push({ cells: cells })
-
-    # TODO add level and section everywhere
 
     # Emit main section
     # Keep track of current row segment, so we can re-emit headers for row segments that have both axis and label
@@ -75,7 +80,13 @@ module.exports = class PivotChartLayoutBuilder
           if needsSpecialRowHeader[depth]
             cells.push({ type: "rowLabel", section: row[depth]?.segment.id, text: row[depth].segment.label })
           else
-            cells.push({ type: "rowSegment", section: row[depth]?.segment.id, text: row[depth].label })
+            cells.push({ 
+              type: "rowSegment"
+              section: row[depth]?.segment.id
+              text: row[depth].label 
+              # Unconfigured if segment has no label or value
+              unconfigured: row[depth]?.segment and not row[depth]?.segment.label? and not row[depth]?.segment.valueAxis
+            })
 
         # Add blank columns
         for column in columns
@@ -89,7 +100,13 @@ module.exports = class PivotChartLayoutBuilder
       # Emit normal row headers
       cells = []
       for depth in [0...rowsDepth]
-        cells.push({ type: "rowSegment", section: row[depth]?.segment.id, text: row[depth]?.label })
+        cells.push({ 
+          type: "rowSegment"
+          section: row[depth]?.segment.id
+          text: row[depth]?.label 
+          # Unconfigured if segment has no label or value
+          unconfigured: row[depth]?.segment and not row[depth]?.segment.label? and not row[depth]?.segment.valueAxis
+        })
 
       # Emit contents
       for column in columns

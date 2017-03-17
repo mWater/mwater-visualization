@@ -11,6 +11,18 @@ DirectWidgetDataSource = require '../src/widgets/DirectWidgetDataSource'
 MWaterLoaderComponent = require '../src/MWaterLoaderComponent'
 
 storiesOf('Pivot Chart', module)
+  .add 'blank', => 
+    R PivotTest, design: {
+    }
+
+  .add 'water point (new)', => 
+    R PivotTest, design: {
+      table: "entities.water_point"
+      rows: [{ id: "row1" }]
+      columns: [{ id: "col1" }]
+      intersections: {} 
+    }
+
   .add 'water types', => 
     R PivotTest, design: {
       table: "entities.water_point"
