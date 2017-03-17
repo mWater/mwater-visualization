@@ -9,7 +9,7 @@ module.exports = class PivotChartLayoutComponent extends React.Component
   @propTypes: 
     layout: React.PropTypes.object.isRequired  # See PivotChart Design.md
 
-    editable: React.PropTypes.bool   # If true, all below must be present
+    editable: React.PropTypes.bool   # If true, all below must be present. If false, none must be present
     onEditSection: React.PropTypes.func  # Called with id of section (segment id or intersection id)
     onRemoveSegment: React.PropTypes.func  # Called with id of segment
     onInsertBeforeSegment: React.PropTypes.func  # Called with id of segment
@@ -137,9 +137,9 @@ class LayoutCellComponent extends React.Component
     style = {
       padding: 5
       backgroundColor: 
-        if cell.unconfigured and not isHover
+        if cell.unconfigured and not isHover and @props.onEditSection
           "#abcbe7"
-        else if cell.unconfigured
+        else if cell.unconfigured and @props.onEditSection
           "#b7d3eb"
         else if isHover 
           "#F8F8F8"
@@ -161,6 +161,6 @@ class LayoutCellComponent extends React.Component
         if isTop and isRight and isHover
           @renderMenu(cell)
 
-        if cell.unconfigured
+        if cell.unconfigured and @props.onEditSection
           "Click to configure"
-        cell.text
+        cell.text or "\u00A0" # Placeholder

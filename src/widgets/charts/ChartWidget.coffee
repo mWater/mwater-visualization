@@ -199,14 +199,16 @@ class ChartWidgetComponent extends React.Component
         H.a className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Edit"
 
   render: ->
+    design = @props.chart.cleanDesign(@props.design, @props.schema)
+
     # Determine if valid design
-    validDesign = not @props.chart.validateDesign(@props.chart.cleanDesign(@props.design, @props.schema), @props.schema)
+    validDesign = not @props.chart.validateDesign(design, @props.schema)
 
     # Determine if empty
-    emptyDesign = @props.chart.isEmpty(@props.design)
+    emptyDesign = @props.chart.isEmpty(design)
 
     # Create dropdown items
-    dropdownItems = @props.chart.createDropdownItems(@props.design, @props.schema, @props.widgetDataSource, @props.filters)
+    dropdownItems = @props.chart.createDropdownItems(design, @props.schema, @props.widgetDataSource, @props.filters)
     if validDesign
       dropdownItems.push({ label: "Export Data", icon: "save-file", onClick: @handleSaveCsvFile })
     if @props.onDesignChange?      
@@ -220,7 +222,7 @@ class ChartWidgetComponent extends React.Component
         width: @props.width
         height: @props.height
         dropdownItems: dropdownItems,
-          @renderChart(@props.design, @props.onDesignChange, @props.width, @props.height, @props.standardWidth)
+          @renderChart(design, @props.onDesignChange, @props.width, @props.height, @props.standardWidth)
       )
       if (emptyDesign or not validDesign) and @props.onDesignChange?
         @renderEditLink()

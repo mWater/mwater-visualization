@@ -183,10 +183,10 @@ module.exports = class PivotChartViewComponent extends React.Component
         R PivotChartLayoutComponent, 
           layout: layout
           editable: @props.onDesignChange?
-          onEditSection: @handleEditSection
-          onRemoveSegment: @handleRemoveSegment
-          onInsertBeforeSegment: @handleInsertBeforeSegment
-          onInsertAfterSegment: @handleInsertAfterSegment
-          onAddChildSegment: @handleAddChildSegment
+          onEditSection: if @props.onDesignChange? then @handleEditSection
+          onRemoveSegment: if @props.onDesignChange? then @handleRemoveSegment
+          onInsertBeforeSegment: if @props.onDesignChange? then @handleInsertBeforeSegment
+          onInsertAfterSegment: if @props.onDesignChange? then @handleInsertAfterSegment
+          onAddChildSegment: if @props.onDesignChange? then @handleAddChildSegment
 
       @renderFooter()
