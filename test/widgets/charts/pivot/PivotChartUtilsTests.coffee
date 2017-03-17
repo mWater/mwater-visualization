@@ -22,4 +22,21 @@ describe "PivotChartUtils", ->
       segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
       compare PivotChartUtils.getAllSegments(segments), [segments[0], { id: "c" }, { id: "d" }, segments[1]]
 
+  describe "findSegment", ->
+    it "finds nested", ->
+      segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
+      compare PivotChartUtils.findSegment(segments, "c"), { id: "c" }
 
+    it "finds null if not found", ->
+      segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
+      assert not PivotChartUtils.findSegment(segments, "x")
+
+  describe "replaceSegment", ->
+    it "replaces nested", ->
+      segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
+      compare PivotChartUtils.replaceSegment(segments, { id: "c", x: 1 }), [{ id: "a", children: [{ id: "c", x: 1 }, { id: "d" }] }, { id: "b" }]
+
+  describe "removeSegment", ->
+    it "removes nested", ->
+      segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
+      compare PivotChartUtils.removeSegment(segments, "c"), [{ id: "a", children: [{ id: "d" }] }, { id: "b" }]
