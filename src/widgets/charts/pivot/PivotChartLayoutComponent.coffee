@@ -10,11 +10,11 @@ module.exports = class PivotChartLayoutComponent extends React.Component
     layout: React.PropTypes.object.isRequired  # See PivotChart Design.md
 
     editable: React.PropTypes.bool   # If true, all below must be present
-    onEditSegment: React.PropTypes.func  # Called with id of section (not segment id!)
-    onRemoveSegment: React.PropTypes.func  # Called with id of section (not segment id!)
-    onInsertBeforeSegment: React.PropTypes.func  # Called with id of section (not segment id!)
-    onInsertAfterSegment: React.PropTypes.func  # Called with id of section (not segment id!)
-    onAddChildSegment: React.PropTypes.func  # Called with id of section (not segment id!)
+    onEditSection: React.PropTypes.func  # Called with id of section (segment id or intersection id)
+    onRemoveSegment: React.PropTypes.func  # Called with id of segment
+    onInsertBeforeSegment: React.PropTypes.func  # Called with id of segment
+    onInsertAfterSegment: React.PropTypes.func  # Called with id of segment
+    onAddChildSegment: React.PropTypes.func  # Called with id of segment
 
   constructor: (props) ->
     super
@@ -33,7 +33,7 @@ module.exports = class PivotChartLayoutComponent extends React.Component
           columnIndex: columnIndex
           onHover: if @props.editable then (=> @setState(hoverSection: cell.section))
           hoverSection: if @props.editable then @state.hoverSection
-          onEditSegment: if @props.onEditSegment then @props.onEditSegment.bind(null, cell.section)
+          onEditSection: if @props.onEditSection then @props.onEditSection.bind(null, cell.section)
           onRemoveSegment: if @props.onRemoveSegment then @props.onRemoveSegment.bind(null, cell.section)
           onInsertBeforeSegment: if @props.onInsertBeforeSegment then @props.onInsertBeforeSegment.bind(null, cell.section)
           onInsertAfterSegment: if @props.onInsertAfterSegment then @props.onInsertAfterSegment.bind(null, cell.section)
@@ -58,7 +58,7 @@ class LayoutCellComponent extends React.Component
     hoverSection: React.PropTypes.string       # Which section is currently hovered over
     onHover: React.PropTypes.func # Called when hovered over
 
-    onEditSegment: React.PropTypes.func
+    onEditSection: React.PropTypes.func
     onRemoveSegment: React.PropTypes.func
     onInsertBeforeSegment: React.PropTypes.func
     onInsertAfterSegment: React.PropTypes.func
@@ -72,14 +72,14 @@ class LayoutCellComponent extends React.Component
         return
       elem = elem.parentElement
 
-    if @props.onEditSegment
-      @props.onEditSegment()
+    if @props.onEditSection
+      @props.onEditSection()
 
   renderMenuItems: (cell) ->
     [
-      if @props.onEditSegment
+      if @props.onEditSection
         H.li key: "edit",
-          H.a onClick: @props.onEditSegment, "Edit"
+          H.a onClick: @props.onEditSection, "Edit"
       if @props.onRemoveSegment and cell.type in ["rowLabel", "rowSegment", "columnLabel", "columnSegment"]
         H.li key: "remove",
           H.a onClick: @props.onRemoveSegment, "Remove"
