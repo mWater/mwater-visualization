@@ -49,6 +49,16 @@ describe "PivotChartLayoutBuilder", ->
           [{ segment: segment, label: "None", value: null }]
         ]
 
+      it 'gets categories of simple enum segment with excludedValues', ->
+        segment = { id: "seg1", valueAxis: { expr: @exprEnum, excludedValues: ["b"] } }
+        data = {}
+        columns = @lb.getRowsOrColumns(false, segment, data, "en")
+
+        compare columns, [
+          [{ segment: segment, label: "A", value: "a" }]
+          [{ segment: segment, label: "None", value: null }]
+        ]
+
       it 'gets categories of text segment with two data intersections', ->
         segment = { id: "seg1", valueAxis: @axisText }
         data = {
