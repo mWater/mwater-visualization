@@ -234,6 +234,9 @@ module.exports = class PivotChartLayoutBuilder
       # Get categories
       categories = @axisBuilder.getCategories(segment.valueAxis, allValues, locale)
 
+      # Filter excluded values
+      categories = _.filter(categories, (category) -> category.value not in (segment.valueAxis.excludedValues or []))
+
     # If no children segments, return 
     if not segment.children or segment.children.length == 0
       return _.map(categories, (category) -> [{ segment: segment, value: category.value, label: category.label }])
