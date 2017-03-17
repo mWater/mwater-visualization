@@ -18,12 +18,13 @@ describe "PivotChart", ->
     @exprEnum = { type: "field", table: "t1", column: "enum" }
 
     @axisNumber = { expr: @exprNumber }
+    @axisCount = { expr: { type: "op", op: "count", table: "t1", exprs: [] } }
     @axisNumberSum = { expr: { type: "op", op: "sum", table: "t1", exprs: [@exprNumber] }}
     @axisEnum = { expr: @exprEnum } 
     @axisText = { expr: @exprText } 
 
   describe "cleanDesign", ->
-    it "adds missing intersections", ->
+    it "adds missing intersections as counts", ->
       design = {
         table: "t1"
         rows: [{ id: "row1"}]
@@ -32,7 +33,7 @@ describe "PivotChart", ->
 
       design = @pc.cleanDesign(design, @schema)
       compare design.intersections, {
-        "row1:col1": {}
+        "row1:col1": { valueAxis: { }}
       }
 
     it "removes extra intersections", ->

@@ -13,6 +13,7 @@ PivotChartUtils = require './PivotChartUtils'
 PivotChartDesignerComponent = require './PivotChartDesignerComponent'
 PivotChartViewComponent = require './PivotChartViewComponent'
 PivotChartQueryBuilder = require './PivotChartQueryBuilder'
+PivotChartLayoutBuilder = require './PivotChartLayoutBuilder'
 
 # See PivotChart Design.md for the design
 module.exports = class PivotChart extends Chart
@@ -31,37 +32,39 @@ module.exports = class PivotChart extends Chart
     design.header = design.header or { style: "footer", items: [] }
     design.footer = design.footer or { style: "footer", items: [] }
 
-    # Add default row and column
-    if design.rows.length == 0
-      design.rows.push({ id: uuid() })
-    if design.columns.length == 0
-      design.columns.push({ id: uuid() })
+    if design.table
+      # Add default row and column
+      if design.rows.length == 0
+        design.rows.push({ id: uuid() })
+      if design.columns.length == 0
+        design.columns.push({ id: uuid() })
 
-    # Clean all segments
-    for segment in PivotChartUtils.getAllSegments(design.rows)
-      if segment.valueAxis
-        segment.valueAxis = axisBuilder.cleanAxis(axis: segment.valueAxis, table: design.table, aggrNeed: "none", types: ["enum", "text", "boolean", "date"])
+      # Clean all segments
+      for segment in PivotChartUtils.getAllSegments(design.rows)
+        if segment.valueAxis
+          segment.valueAxis = axisBuilder.cleanAxis(axis: segment.valueAxis, table: design.table, aggrNeed: "none", types: ["enum", "text", "boolean", "date"])
 
-    for segment in PivotChartUtils.getAllSegments(design.columns)
-      if segment.valueAxis
-        segment.valueAxis = axisBuilder.cleanAxis(axis: segment.valueAxis, table: design.table, aggrNeed: "none", types: ["enum", "text", "boolean", "date"])
+      for segment in PivotChartUtils.getAllSegments(design.columns)
+        if segment.valueAxis
+          segment.valueAxis = axisBuilder.cleanAxis(axis: segment.valueAxis, table: design.table, aggrNeed: "none", types: ["enum", "text", "boolean", "date"])
 
-    # Clean all intersections
-    for intersectionId, intersection of design.intersections
-      if intersection.valueAxis
-        intersection.valueAxis = axisBuilder.cleanAxis(axis: intersection.valueAxis, table: design.table, aggrNeed: "required", types: ["enum", "text", "boolean", "date", "number"])
+      # Clean all intersections
+      for intersectionId, intersection of design.intersections
+        if intersection.valueAxis
+          intersection.valueAxis = axisBuilder.cleanAxis(axis: intersection.valueAxis, table: design.table, aggrNeed: "required", types: ["enum", "text", "boolean", "date", "number"])
 
-    # Add missing intersections
-    intersections = {}
-    for rowPath in PivotChartUtils.getSegmentPaths(design.rows)
-      for columnPath in PivotChartUtils.getSegmentPaths(design.columns)
-        intersectionId = "#{_.pluck(rowPath, "id").join(",")}:#{_.pluck(columnPath, "id").join(",")}"
-        intersections[intersectionId] = design.intersections[intersectionId] or {}
+      # Add missing intersections
+      intersections = {}
+      for rowPath in PivotChartUtils.getSegmentPaths(design.rows)
+        for columnPath in PivotChartUtils.getSegmentPaths(design.columns)
+          intersectionId = "#{_.pluck(rowPath, "id").join(",")}:#{_.pluck(columnPath, "id").join(",")}"
+          # Default to count
+          intersections[intersectionId] = design.intersections[intersectionId] or { valueAxis: { expr: { type: "op", op: "count", table: design.table, exprs: [] } } }
 
-    design.intersections = intersections
+      design.intersections = intersections
 
-    # Clean filter
-    design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ['boolean'] })
+      # Clean filter
+      design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ['boolean'] })
 
     return design
 
@@ -197,56 +200,12 @@ module.exports = class PivotChart extends Chart
 
   createDropdownItems: (design, schema, widgetDataSource, filters) ->
     return []
-    # # TODO validate design before allowing save
-    # save = (format) =>
-    #   design = @cleanDesign(design, schema)
-    #   widgetDataSource.getData design, filters, (err, data) =>
-    #     if err
-    #       alert("Unable to load data")
-    #     else
-    #       LayeredChartSvgFileSaver.save(design, data, schema, format)
-
-    # # Don't save image of invalid design
-    # if @validateDesign(@cleanDesign(design, schema), schema)
-    #   return []
-
-    # return [
-    #   { label: "Save as SVG", icon: "picture", onClick: save.bind(null, "svg") }
-    #   { label: "Save as PNG", icon: "camera", onClick: save.bind(null, "png") }
-    # ]
 
   createDataTable: (design, schema, dataSource, data, locale) ->
-    return []
-    # axisBuilder = new AxisBuilder(schema: schema)
+    # Create layout
+    layout = new PivotChartLayoutBuilder(schema: schema).buildLayout(design, data, locale)
 
-    # # Export only first layer
-    # headers = []
-    # if design.layers[0].axes.x
-    #   headers.push(axisBuilder.summarizeAxis(design.layers[0].axes.x, locale))
-    # if design.layers[0].axes.color
-    #   headers.push(axisBuilder.summarizeAxis(design.layers[0].axes.color, locale))
-    # if design.layers[0].axes.y
-    #   headers.push(axisBuilder.summarizeAxis(design.layers[0].axes.y, locale))
-    # table = [headers]
-
-    # for row in data.layer0
-    #   r = []
-    #   if design.layers[0].axes.x
-    #     r.push(axisBuilder.formatValue(design.layers[0].axes.x, row.x, locale))
-    #   if design.layers[0].axes.color
-    #     r.push(axisBuilder.formatValue(design.layers[0].axes.color, row.color, locale))
-    #   if design.layers[0].axes.y
-    #     r.push(axisBuilder.formatValue(design.layers[0].axes.y, row.y, locale))
-    #   table.push(r)
-
-    # return table
-  #   if data.length > 0
-  #   fields = Object.getOwnPropertyNames(data[0])
-  #   table = [fields] # header
-  #   renderRow = (record) ->
-  #      _.map(fields, (field) -> record[field])
-  #   table.concat(_.map(data, renderRow))
-  # else []
+    return _.map(layout.rows, (row) -> _.map(row.cells, (cell) -> cell.text))
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->
