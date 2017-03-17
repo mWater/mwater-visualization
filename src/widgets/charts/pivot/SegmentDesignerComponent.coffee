@@ -15,6 +15,9 @@ module.exports = class SegmentDesignerComponent extends React.Component
     segmentType: React.PropTypes.string.isRequired  # "row" or "column"
     onChange: React.PropTypes.func.isRequired
 
+  componentDidMount: ->
+    @labelElem?.focus()
+
   # Updates segment with the specified changes
   update: (changes) ->
     segment = _.extend({}, @props.segment, changes)
@@ -30,6 +33,7 @@ module.exports = class SegmentDesignerComponent extends React.Component
       H.label className: "text-muted", 
         "Label"
       H.input 
+        ref: (elem) => @labelElem = elem
         type: "text"
         className: "form-control"
         value: @props.segment.label or ""
