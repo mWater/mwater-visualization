@@ -238,4 +238,22 @@ describe "PivotChartLayoutBuilder", ->
         [false, null]
       ]
 
+    it "uses label type for unconfigured segments", ->
+      design = {
+        table: "t1"
+        columns: [{ id: "c1", valueAxis: null, label: null }]
+        rows: [{ id: "r1", valueAxis: null, label: null }]
+        intersections: {
+          "r1:c1": { valueAxis: null }
+        }
+      }
 
+      data = {}
+
+      layout = @lb.buildLayout(design, data)
+
+      # Check text
+      compare layoutPluck(layout, "type"), [
+        ["blank", "columnLabel"]
+        ["rowLabel", "intersection"]
+      ]

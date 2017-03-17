@@ -22,7 +22,7 @@ module.exports = class WidgetFactory
         return new ChartWidget(new CalendarChart())
       when "ImageMosaicChart"
         return new ChartWidget(new ImageMosaicChart())
-      when "WidgetFactory"
+      when "PivotChart"
         return new ChartWidget(new PivotChart())
       when "Markdown"
         return new MarkdownWidget()
