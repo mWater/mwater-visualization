@@ -33,7 +33,7 @@ describe "PivotChart", ->
 
       design = @pc.cleanDesign(design, @schema)
       compare design.intersections, {
-        "row1:col1": { valueAxis: { }}
+        "row1:col1": { valueAxis: @axisCount }
       }
 
     it "removes extra intersections", ->
