@@ -12,6 +12,7 @@ PivotChartUtils = require './PivotChartUtils'
 PivotChartLayoutComponent = require './PivotChartLayoutComponent'
 PivotChartLayoutBuilder = require './PivotChartLayoutBuilder'
 SegmentDesignerComponent = require './SegmentDesignerComponent'
+IntersectionDesignerComponent = require './IntersectionDesignerComponent'
 
 # Displays a pivot chart
 module.exports = class PivotChartViewComponent extends React.Component
@@ -36,6 +37,8 @@ module.exports = class PivotChartViewComponent extends React.Component
 
     @state = {
       editSegment: null   # Segment being edited
+      editIntersectionId: null # id of intersection being edited
+      editIntersection: null # value of intersection being edited
     }
 
   handleHeaderChange: (header) =>
@@ -47,7 +50,7 @@ module.exports = class PivotChartViewComponent extends React.Component
   handleEditSection: (sectionId) =>
     # If intersection
     if sectionId.match(":")
-      alert("TODO")
+      @setState(editIntersectionId: sectionId, editIntersection: @props.design.intersections[sectionId] or {})
     else
       # Find segment
       segment = PivotChartUtils.findSegment(@props.design.rows, sectionId) or PivotChartUtils.findSegment(@props.design.columns, sectionId)
@@ -64,6 +67,17 @@ module.exports = class PivotChartViewComponent extends React.Component
 
   handleCancelEditSegment: =>
     @setState(editSegment: null)
+
+  handleSaveEditIntersection: =>
+    intersections = _.clone(@props.design.intersections)
+    intersections[@state.editIntersectionId] = @state.editIntersection
+
+    design = _.extend({}, @props.design, intersections: intersections)
+    @props.onDesignChange(design)
+    @setState(editIntersectionId: null, editIntersection: null)
+
+  handleCancelEditIntersection: =>
+    @setState(editIntersectionId: null, editIntersection: null)
 
   renderHeader: ->
     return H.div ref: "header",
@@ -94,6 +108,7 @@ module.exports = class PivotChartViewComponent extends React.Component
     segmentType = if PivotChartUtils.findSegment(@props.design.rows, @state.editSegment.id) then "row" else "column"
 
     R ActionCancelModalComponent,
+      header: "Edit #{segmentType}"
       onAction: @handleSaveEditSegment
       onCancel: @handleCancelEditSegment,
         R SegmentDesignerComponent,
@@ -104,12 +119,28 @@ module.exports = class PivotChartViewComponent extends React.Component
           segmentType: segmentType
           onChange: (segment) => @setState(editSegment: segment)
 
+  renderEditIntersectionModal: ->
+    if not @state.editIntersectionId
+      return
+
+    R ActionCancelModalComponent,
+      header: "Edit Value"
+      onAction: @handleSaveEditIntersection
+      onCancel: @handleCancelEditIntersection,
+        R IntersectionDesignerComponent,
+          intersection: @state.editIntersection
+          table: @props.design.table
+          schema: @props.schema
+          dataSource: @props.dataSource
+          onChange: (intersection) => @setState(editIntersection: intersection)
+
   render: ->
     layout = new PivotChartLayoutBuilder(schema: @props.schema).buildLayout(@props.design, @props.data, @context.locale)
 
     H.div style: { width: @props.width, height: @props.height },
       @renderHeader()
       @renderEditSegmentModal()
+      @renderEditIntersectionModal()
       H.div key: "layout", style: { margin: 10 },  # Leave room for gear menu
         R PivotChartLayoutComponent, 
           layout: layout
