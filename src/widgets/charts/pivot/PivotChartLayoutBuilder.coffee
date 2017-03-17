@@ -52,7 +52,7 @@ module.exports = class PivotChartLayoutBuilder
         cells.push({ type: "blank", text: null })
       for column in columns
         cells.push({ 
-          type: "columnSegment"
+          type: if column[depth]?.segment?.valueAxis then "columnSegment" else "columnLabel"
           section: column[depth]?.segment.id
           text: column[depth]?.label
           align: "center"

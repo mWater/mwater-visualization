@@ -135,6 +135,7 @@ class LayoutCellComponent extends React.Component
     isHover = @props.hoverSection and cell.section == @props.hoverSection
 
     style = {
+      padding: 5
       backgroundColor: 
         if cell.unconfigured and not isHover
           "#abcbe7"
@@ -145,6 +146,10 @@ class LayoutCellComponent extends React.Component
       position: "relative"
       textAlign: cell.align
       cursor: if isHover then "pointer"
+      color: 
+        if cell.type in ['rowSegment', 'columnSegment']
+          # Fade
+          "#666"
     }
 
     H.td 
