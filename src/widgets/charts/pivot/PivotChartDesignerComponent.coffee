@@ -52,11 +52,12 @@ module.exports = class PivotChartDesignerComponent extends React.Component
       @renderTable()
       @renderFilter()
       if @props.design.table and (not @props.design.rows[0].label? and not @props.design.rows[0].valueAxis? or not @props.design.columns[0].label? and not @props.design.columns[0].valueAxis?)
-        H.div className: "alert alert-info",
+        H.div className: "alert alert-success",
           '''
-          Your pivot table is ready to configure! Close this popup with the "x" at the top right corner
-          and then click on the rows, columns or the data areas to set up the table. 
+          Your pivot table is ready to configure! Click on the Save button below and
+          then click on the rows, columns or the data areas to set up the table. 
           '''
+          H.br()
           H.br()
           '''
           For advanced options, click on the pencil menu that appears when you hover over a section. 

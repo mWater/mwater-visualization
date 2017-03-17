@@ -94,6 +94,9 @@ module.exports = class PivotChart extends Chart
   isEmpty: (design) ->
     return not design.table or design.rows.length == 0 or design.columns.length == 0
 
+  # True if designer should have a preview pane to the left
+  hasDesignerPreview: -> false
+
   # Creates a design element with specified options
   # options include:
   #   schema: schema to use
