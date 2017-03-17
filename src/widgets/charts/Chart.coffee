@@ -15,6 +15,9 @@ module.exports = class Chart
   # Determine if widget is auto-height, which means that a vertical height is not required.
   isAutoHeight: -> false
 
+  # True if designer should have a preview pane to the left
+  hasDesignerPreview: -> true
+
   # Creates a design element with specified options
   # options include:
   #   schema: schema to use

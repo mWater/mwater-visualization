@@ -1,11 +1,13 @@
 React = require 'react'
 H = React.DOM
+R = React.createElement
 Widget = require './../Widget'
 DropdownWidgetComponent = require './../DropdownWidgetComponent'
 CsvBuilder = require './../../CsvBuilder'
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
 ChartViewComponent = require './ChartViewComponent'
 ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
+ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
 
 # A widget which is a chart
 module.exports = class ChartWidget extends Widget
@@ -27,7 +29,7 @@ module.exports = class ChartWidget extends Widget
   #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
   #  onRowClick: Called with (tableId, rowId) when item is clicked
   createViewElement: (options) ->
-    return React.createElement(ChartWidgetComponent,
+    return R(ChartWidgetComponent,
       chart: @chart
       design: options.design
       schema: options.schema
@@ -134,11 +136,14 @@ class ChartWidgetComponent extends React.Component
     @props.onDesignChange(@state.editDesign)
     @setState(editDesign: null)
 
+  handleCancelEditing: =>
+    @setState(editDesign: null)
+
   handleEditDesignChange: (design) =>
     @setState(editDesign: design)
 
   renderChart: (design, onDesignChange, width, height, standardWidth) ->
-    React.createElement(ChartViewComponent, 
+    R(ChartViewComponent, 
       chart: @props.chart
       design: design
       onDesignChange: onDesignChange
@@ -161,22 +166,29 @@ class ChartWidgetComponent extends React.Component
     # Create editor
     editor = @props.chart.createDesignerElement(schema: @props.schema, dataSource: @props.dataSource, design: @state.editDesign, onDesignChange: @handleEditDesignChange)
 
-    # Create chart (maxing out at half of width of screen)
-    chartWidth = Math.min(document.body.clientWidth/2, @props.width)
-    chartHeight = @props.height * (chartWidth / @props.width)
-    chart = @renderChart(@state.editDesign, ((design) => @setState(editDesign: design)), chartWidth, chartHeight, chartWidth)
+    if @props.chart.hasDesignerPreview()
+      # Create chart (maxing out at half of width of screen)
+      chartWidth = Math.min(document.body.clientWidth/2, @props.width)
+      chartHeight = @props.height * (chartWidth / @props.width)
+      chart = @renderChart(@state.editDesign, ((design) => @setState(editDesign: design)), chartWidth, chartHeight, chartWidth)
 
-    content = H.div style: { height: "100%", width: "100%" },
-      H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: chartWidth + 20, height: chartHeight + 20, overflow: "hidden" },
-        chart
-      H.div style: { width: "100%", height: "100%", paddingLeft: chartWidth + 40 },
-        H.div style: { width: "100%", height: "100%", overflowY: "auto", paddingLeft: 20, borderLeft: "solid 3px #AAA" },
+      content = H.div style: { height: "100%", width: "100%" },
+        H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: chartWidth + 20, height: chartHeight + 20, overflow: "hidden" },
+          chart
+        H.div style: { width: "100%", height: "100%", paddingLeft: chartWidth + 40 },
+          H.div style: { width: "100%", height: "100%", overflowY: "auto", paddingLeft: 20, borderLeft: "solid 3px #AAA" },
+            editor
+
+      return R ModalWindowComponent,
+        isOpen: true
+        onRequestClose: @handleEndEditing,
+          content
+    else
+      return R ActionCancelModalComponent, 
+        size: "large"
+        onCancel: @handleCancelEditing
+        onAction: @handleEndEditing,
           editor
-
-    React.createElement(ModalWindowComponent,
-      isOpen: true
-      onRequestClose: @handleEndEditing,
-        content)
 
   # Render a link to start editing
   renderEditLink: ->
