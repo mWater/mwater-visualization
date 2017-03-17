@@ -57,9 +57,15 @@ module.exports = class PivotChartViewComponent extends React.Component
       @setState(editSegment: segment)
 
   handleSaveEditSegment: =>
+    # Always has label when saved
+    segment = @state.editSegment
+
+    if not segment.label?
+      segment = _.extend({}, segment, label: "")
+    
     design = _.extend({}, @props.design, {
-      rows: PivotChartUtils.replaceSegment(@props.design.rows, @state.editSegment)
-      columns: PivotChartUtils.replaceSegment(@props.design.columns, @state.editSegment)
+      rows: PivotChartUtils.replaceSegment(@props.design.rows, segment)
+      columns: PivotChartUtils.replaceSegment(@props.design.columns, segment)
       })
 
     @props.onDesignChange(design)
@@ -87,12 +93,29 @@ module.exports = class PivotChartViewComponent extends React.Component
 
     @props.onDesignChange(design)
 
-  # handleInsertBeforeSegment: (segmentId) =>
+  handleInsertBeforeSegment: (segmentId) =>
+    design = _.extend({}, @props.design, {
+      rows: PivotChartUtils.insertBeforeSegment(@props.design.rows, segmentId)
+      columns: PivotChartUtils.insertBeforeSegment(@props.design.columns, segmentId)
+      })
 
-  # handleInsertAfterSegment: (segmentId) =>
+    @props.onDesignChange(design)
 
-  # handleAddChildSegment: (segmentId) =>
+  handleInsertAfterSegment: (segmentId) =>
+    design = _.extend({}, @props.design, {
+      rows: PivotChartUtils.insertAfterSegment(@props.design.rows, segmentId)
+      columns: PivotChartUtils.insertAfterSegment(@props.design.columns, segmentId)
+      })
 
+    @props.onDesignChange(design)
+
+  handleAddChildSegment: (segmentId) =>
+    design = _.extend({}, @props.design, {
+      rows: PivotChartUtils.addChildSegment(@props.design.rows, segmentId)
+      columns: PivotChartUtils.addChildSegment(@props.design.columns, segmentId)
+      })
+
+    @props.onDesignChange(design)
 
   renderHeader: ->
     return H.div ref: "header",

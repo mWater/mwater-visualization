@@ -18,11 +18,6 @@ module.exports = class SegmentDesignerComponent extends React.Component
   # Updates segment with the specified changes
   update: (changes) ->
     segment = _.extend({}, @props.segment, changes)
-
-    # Always has label when saved
-    if not segment.label?
-      segment = _.extend({}, segment, label: "")
-      
     @props.onChange(segment)
 
   handleValueAxisChange: (valueAxis) => @update(valueAxis: valueAxis)
