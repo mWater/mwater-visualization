@@ -161,8 +161,6 @@ class LayoutCellComponent extends React.Component
         if isTop and isRight and isHover
           @renderMenu(cell)
 
-        if cell.unconfigured and cell.type == "rowSegment"
-          "Click to set up row"
-        if cell.unconfigured and cell.type == "columnSegment"
-          "Click to set up column"
+        if cell.unconfigured
+          "Click to configure"
         cell.text

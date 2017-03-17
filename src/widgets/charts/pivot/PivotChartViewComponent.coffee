@@ -79,6 +79,21 @@ module.exports = class PivotChartViewComponent extends React.Component
   handleCancelEditIntersection: =>
     @setState(editIntersectionId: null, editIntersection: null)
 
+  handleRemoveSegment: (segmentId) =>
+    design = _.extend({}, @props.design, {
+      rows: PivotChartUtils.removeSegment(@props.design.rows, segmentId)
+      columns: PivotChartUtils.removeSegment(@props.design.columns, segmentId)
+      })
+
+    @props.onDesignChange(design)
+
+  # handleInsertBeforeSegment: (segmentId) =>
+
+  # handleInsertAfterSegment: (segmentId) =>
+
+  # handleAddChildSegment: (segmentId) =>
+
+
   renderHeader: ->
     return H.div ref: "header",
       R TextComponent,
@@ -146,9 +161,9 @@ module.exports = class PivotChartViewComponent extends React.Component
           layout: layout
           editable: @props.onDesignChange?
           onEditSection: @handleEditSection
-          # onRemoveSegment: => alert("TODO")
-          # onInsertBeforeSegment: => alert("TODO")
-          # onInsertAfterSegment: => alert("TODO")
-          # onAddChildSegment: => alert("TODO")
+          onRemoveSegment: @handleRemoveSegment
+          onInsertBeforeSegment: @handleInsertBeforeSegment
+          onInsertAfterSegment: @handleInsertAfterSegment
+          onAddChildSegment: @handleAddChildSegment
 
       @renderFooter()
