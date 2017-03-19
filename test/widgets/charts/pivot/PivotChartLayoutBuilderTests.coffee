@@ -59,6 +59,16 @@ describe "PivotChartLayoutBuilder", ->
           [{ segment: segment, label: "None", value: null }]
         ]
 
+      it 'gets categories of simple text segment with no values', ->
+        segment = { id: "seg1", valueAxis: @axisText }
+        data = {}
+        columns = @lb.getRowsOrColumns(false, segment, data, "en")
+
+        compare columns, [
+          [{ segment: segment, label: null, value: null }]
+        ]
+
+
       it 'gets categories of text segment with two data intersections', ->
         segment = { id: "seg1", valueAxis: @axisText }
         data = {
@@ -166,6 +176,34 @@ describe "PivotChartLayoutBuilder", ->
       compare layoutPluck(layout, "type"), [
         ["blank", "columnSegment", "columnSegment", "columnSegment"]
         ["rowSegment", "intersection", "intersection", "intersection"]
+        ["rowSegment", "intersection", "intersection", "intersection"]
+      ]
+
+    it "simple enum/text with no values", ->
+      design = {
+        table: "t1"
+        columns: [{ id: "c1", valueAxis: @axisEnum }]
+        rows: [{ id: "r1", valueAxis: @axisText }]
+        intersections: {
+          "r1:c1": { valueAxis: @axisNumberSum }
+        }
+      }
+
+      data = {
+        "r1:c1": []
+      }
+
+      layout = @lb.buildLayout(design, data)
+
+      # Check text
+      compare layoutPluck(layout, "text"), [
+        [null, "A", "B", "None"]
+        [null, null, null, null]
+      ]
+
+      # Check types
+      compare layoutPluck(layout, "type"), [
+        ["blank", "columnSegment", "columnSegment", "columnSegment"]
         ["rowSegment", "intersection", "intersection", "intersection"]
       ]
 
