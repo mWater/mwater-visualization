@@ -77,12 +77,16 @@ module.exports = class PivotChartQueryBuilder
         # Add where
         whereClauses = []
         if design.filter
-          whereClauses.push(exprCompiler.compileExpr(design.filter))
+          whereClauses.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "main"))
 
         # Add filters
         if extraFilters and extraFilters.length > 0
           # Get relevant filters
           relevantFilters = _.where(extraFilters, table: design.table)
+
+          # Add 
+          for filter in relevantFilters
+            whereClauses.push(injectTableAlias(filter.jsonql, "main"))
 
         if whereClauses.length == 1
           query.where = whereClauses[0]
