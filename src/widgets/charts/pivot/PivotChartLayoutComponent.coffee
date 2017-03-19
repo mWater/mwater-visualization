@@ -148,6 +148,8 @@ class LayoutCellComponent extends React.Component
           "#eff5fb"
         else if isHover 
           "#F8F8F8"
+        else
+          cell.backgroundColor
       position: "relative"
       textAlign: cell.align
       cursor: if isHover then "pointer"

@@ -40,7 +40,8 @@ segment:
 
 intersection:
   valueAxis: axis that determines value to display in cells. Must be aggregate
-
+  backgroundColorAxis: color axis for background of cells
+  backgroundColorOpacity: fractional background opacity
 
 ## Rendering 
 
@@ -65,6 +66,7 @@ cell:
   section: section id (see above)
   bold: true if bold
   italic: true if italic
+  backgroundColor: background color of cell
   level: 0, 1, 2 if segment
   rowSpan: if spans more than one row. Next n-1 cells below will be type "skip"
   columnSpan: if spans more than one column. Next n-1 cells will be type "skip"

@@ -23,7 +23,6 @@ describe "PivotChartLayoutBuilder", ->
 
     @axisNumber = { expr: @exprNumber }
     @axisNumberSum = { expr: @exprNumber, aggr: "sum" }
-    @axisNumberCount = { expr: @exprCount, aggr: "count" }
     @axisEnum = { expr: @exprEnum } 
     @axisText = { expr: @exprText } 
 
@@ -304,4 +303,43 @@ describe "PivotChartLayoutBuilder", ->
       compare layoutPluck(layout, "type"), [
         ["blank", "columnLabel"]
         ["rowLabel", "intersection"]
+      ]
+
+    it "adds background color", ->
+      design = {
+        table: "t1"
+        columns: [{ id: "c1", valueAxis: @axisEnum }]
+        rows: [{ id: "r1", valueAxis: @axisText }]
+        intersections: {
+          "r1:c1": { 
+            valueAxis: @axisNumberSum 
+            backgroundColorAxis: {
+              expr: @axisNumberSum
+              xform: "bin"
+              min: 0
+              max: 2
+              numBins: 2
+              colorMap: [
+                { value: 0, color: "#FF8800"}
+              ]
+            }
+            backgroundColorOpacity: 0.5
+          }
+        }
+      }
+
+      data = {
+        "r1:c1": [
+          { r0: "x", c0: "a", value: 2, backgroundColor: 0 }
+          { r0: "y", c0: "b", value: 4, backgroundColor: null }
+        ]
+      }
+
+      layout = @lb.buildLayout(design, data)
+
+      # Check colors
+      compare layoutPluck(layout, "backgroundColor"), [
+        [null, null, null, null]
+        [null, "rgba(255, 136, 0, 0.5)", null, null]
+        [null, null, null, null]
       ]
