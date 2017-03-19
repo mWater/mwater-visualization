@@ -124,7 +124,7 @@ class PivotTest extends React.Component
             alert("Error: " + error.message)
             return null
 
-          widget = WidgetFactory.createWidget("WidgetFactory")
+          widget = WidgetFactory.createWidget("PivotChart")
       
           widgetDataSource = new DirectWidgetDataSource({
             widget: widget

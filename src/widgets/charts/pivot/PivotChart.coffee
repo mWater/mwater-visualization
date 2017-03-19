@@ -53,11 +53,18 @@ module.exports = class PivotChart extends Chart
         if intersection.valueAxis
           intersection.valueAxis = axisBuilder.cleanAxis(axis: intersection.valueAxis, table: design.table, aggrNeed: "required", types: ["enum", "text", "boolean", "date", "number"])
 
+        if intersection.backgroundColorAxis
+          intersection.backgroundColorAxis = axisBuilder.cleanAxis(axis: intersection.backgroundColorAxis, table: design.table, aggrNeed: "required", types: ["enum", "text", "boolean", "date"])
+          
+          if not intersection.backgroundColorOpacity?
+            intersection.backgroundColorOpacity = 0.3
+
       # Add missing intersections
       intersections = {}
       for rowPath in PivotChartUtils.getSegmentPaths(design.rows)
         for columnPath in PivotChartUtils.getSegmentPaths(design.columns)
           intersectionId = "#{_.pluck(rowPath, "id").join(",")}:#{_.pluck(columnPath, "id").join(",")}"
+
           # Default to count
           intersections[intersectionId] = design.intersections[intersectionId] or { valueAxis: { expr: { type: "op", op: "count", table: design.table, exprs: [] } } }
 

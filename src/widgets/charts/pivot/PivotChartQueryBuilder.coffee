@@ -50,13 +50,6 @@ module.exports = class PivotChartQueryBuilder
           groupBy: []
         }
 
-        # Add value
-        query.selects.push({
-          type: "select"
-          expr: @axisBuilder.compileAxis(axis: intersection?.valueAxis, tableAlias: "main")
-          alias: "value"
-        })
-
         # Add segments
         for rowSegment, i in rowPath
           query.selects.push({
@@ -64,7 +57,7 @@ module.exports = class PivotChartQueryBuilder
             expr: @axisBuilder.compileAxis(axis: rowSegment.valueAxis, tableAlias: "main")
             alias: "r#{i}"
           })
-          query.groupBy.push(i + 2)
+          query.groupBy.push(i + 1)
 
         for columnSegment, i in columnPath
           query.selects.push({
@@ -72,7 +65,22 @@ module.exports = class PivotChartQueryBuilder
             expr: @axisBuilder.compileAxis(axis: columnSegment.valueAxis, tableAlias: "main")
             alias: "c#{i}"
           })
-          query.groupBy.push(i + 2 + rowPath.length)
+          query.groupBy.push(i + 1 + rowPath.length)
+
+        # Add value
+        query.selects.push({
+          type: "select"
+          expr: @axisBuilder.compileAxis(axis: intersection?.valueAxis, tableAlias: "main")
+          alias: "value"
+        })
+
+        # Add background color
+        if intersection?.backgroundColorAxis
+          query.selects.push({
+            type: "select"
+            expr: @axisBuilder.compileAxis(axis: intersection?.backgroundColorAxis, tableAlias: "main")
+            alias: "backgroundColor"
+          })
 
         # Add where
         whereClauses = []
@@ -89,7 +97,7 @@ module.exports = class PivotChartQueryBuilder
             whereClauses.push(injectTableAlias(filter.jsonql, "main"))
 
         whereClauses = _.compact(whereClauses)
-        
+
         if whereClauses.length == 1
           query.where = whereClauses[0]
         else if whereClauses.length > 1

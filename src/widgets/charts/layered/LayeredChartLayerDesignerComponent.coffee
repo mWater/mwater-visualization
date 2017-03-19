@@ -77,7 +77,7 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
 
   handleXAxisChange: (axis) => 
     layer = @props.design.layers[@props.index]
-    axesChanges ={ x: axis }
+    axesChanges = { x: axis }
     
     # Default y to count if x or color present and not scatter
     if axis and @doesLayerNeedGrouping(layer) and not layer.axes?.y

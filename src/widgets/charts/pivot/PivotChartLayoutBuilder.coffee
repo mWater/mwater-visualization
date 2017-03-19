@@ -1,9 +1,8 @@
 _ = require 'lodash'
-# ExprCompiler = require('mwater-expressions').ExprCompiler
 ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../../../axes/AxisBuilder'
-# injectTableAlias = require('mwater-expressions').injectTableAlias
 
+Color = require 'color'
 PivotChartUtils = require './PivotChartUtils'
 
 # Builds pivot table layout from the design and data
@@ -182,7 +181,23 @@ module.exports = class PivotChartLayoutBuilder
     else
       text = null
 
-    return { type: "intersection", section: intersectionId, text: text, align: "right" }
+    cell = { 
+      type: "intersection"
+      section: intersectionId
+      text: text
+      align: "right" 
+    }
+
+    # Set background color
+    if intersection.backgroundColorAxis and entry?.backgroundColor?
+      backgroundColor = @axisBuilder.getValueColor(intersection.backgroundColorAxis, entry?.backgroundColor)
+
+      if backgroundColor
+        backgroundColor = Color(backgroundColor).alpha(intersection.backgroundColorOpacity).string()
+        
+      cell.backgroundColor = backgroundColor
+
+    return cell
 
   # Get rows or columns in format of array of
   # [{ segment:, label:, value:  }, ...] 
