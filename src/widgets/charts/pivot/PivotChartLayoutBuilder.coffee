@@ -237,6 +237,10 @@ module.exports = class PivotChartLayoutBuilder
       # Filter excluded values
       categories = _.filter(categories, (category) -> category.value not in (segment.valueAxis.excludedValues or []))
 
+      # Always have placeholder category
+      if categories.length == 0
+        categories = [{ value: null, label: null }]
+
     # If no children segments, return 
     if not segment.children or segment.children.length == 0
       return _.map(categories, (category) -> [{ segment: segment, value: category.value, label: category.label }])

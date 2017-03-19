@@ -84,7 +84,7 @@ module.exports = class PivotChartQueryBuilder
           # Get relevant filters
           relevantFilters = _.where(extraFilters, table: design.table)
 
-          # Add 
+          # Add filters
           for filter in relevantFilters
             whereClauses.push(injectTableAlias(filter.jsonql, "main"))
 
