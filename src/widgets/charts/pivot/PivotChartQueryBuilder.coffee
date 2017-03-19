@@ -77,7 +77,7 @@ module.exports = class PivotChartQueryBuilder
         # Add where
         whereClauses = []
         if design.filter
-          whereClauses.push(@compileExpr(design.filter))
+          whereClauses.push(exprCompiler.compileExpr(design.filter))
 
         # Add filters
         if extraFilters and extraFilters.length > 0
