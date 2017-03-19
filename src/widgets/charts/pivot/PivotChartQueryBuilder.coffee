@@ -88,6 +88,8 @@ module.exports = class PivotChartQueryBuilder
           for filter in relevantFilters
             whereClauses.push(injectTableAlias(filter.jsonql, "main"))
 
+        whereClauses = _.compact(whereClauses)
+        
         if whereClauses.length == 1
           query.where = whereClauses[0]
         else if whereClauses.length > 1
