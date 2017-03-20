@@ -21,7 +21,7 @@ module.exports = class IntersectionDesignerComponent extends React.Component
     @props.onChange(intersection)
 
   handleValueAxisChange: (valueAxis) => @update(valueAxis: valueAxis)
-  
+
   handleBackgroundColorAxisChange: (backgroundColorAxis) => 
     opacity = @props.intersection.backgroundColorOpacity or 0.3
 
@@ -46,6 +46,18 @@ module.exports = class IntersectionDesignerComponent extends React.Component
 
       H.p className: "help-block",
         "This is the calculated value that is displayed. Leave as blank to make an empty section"
+
+  renderStyling: ->
+    H.div className: 'form-group', style: { paddingTop: 10 }, key: "styling",
+      H.label className: 'text-muted',
+        "Styling"
+      H.div null,
+        H.label className: "checkbox-inline", key: "bold",
+          H.input type: "checkbox", checked: @props.intersection.bold == true, onChange: (ev) => @update({ bold: ev.target.checked })
+          "Bold"
+        H.label className: "checkbox-inline", key: "italic",
+          H.input type: "checkbox", checked: @props.intersection.italic == true, onChange: (ev) => @update({ italic: ev.target.checked })
+          "Italic"
 
   renderBackgroundColorAxis: ->
     return H.div className: "form-group",
@@ -85,6 +97,7 @@ module.exports = class IntersectionDesignerComponent extends React.Component
   render: ->
     H.div null,
       @renderValueAxis()
+      @renderStyling()
       @renderBackgroundColorAxis()
       @renderBackgroundColorOpacityControl()
 

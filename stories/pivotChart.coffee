@@ -48,6 +48,7 @@ storiesOf('Pivot Chart', module)
           id: "row1"
           valueAxis: { expr: { type: "field", table: "entities.water_point", column: "type" } }
           label: "Type"
+          italic: true
         }
       ]
       columns: [{ id: "col1", label: "Count" }]

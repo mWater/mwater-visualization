@@ -60,7 +60,20 @@ module.exports = class SegmentDesignerComponent extends React.Component
       H.p className: "help-block",
         "This is an optional field for the #{@props.segmentType}. Leave blank to make a totals #{@props.segmentType}."
 
+  renderStyling: ->
+    H.div className: 'form-group', style: { paddingTop: 10 }, key: "styling",
+      H.label className: 'text-muted',
+        "Styling"
+      H.div null,
+        H.label className: "checkbox-inline", key: "bold",
+          H.input type: "checkbox", checked: @props.segment.bold == true, onChange: (ev) => @update({ bold: ev.target.checked })
+          "Bold"
+        H.label className: "checkbox-inline", key: "italic",
+          H.input type: "checkbox", checked: @props.segment.italic == true, onChange: (ev) => @update({ italic: ev.target.checked })
+          "Italic"
+
   render: ->
     H.div null,
       @renderLabel()
       @renderValueAxis()
+      @renderStyling()

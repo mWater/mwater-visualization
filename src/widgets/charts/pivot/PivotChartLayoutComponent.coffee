@@ -158,6 +158,12 @@ class LayoutCellComponent extends React.Component
       borderBottom: if cell.sectionBottom then "solid 1px #ccc" else if cell.section then "solid 1px #eee"
       borderLeft: if cell.sectionLeft then "solid 1px #ccc" else if cell.section then "solid 1px #eee"
       borderRight: if cell.sectionRight then "solid 1px #ccc" else if cell.section then "solid 1px #eee"
+    }
+
+    # Style that should not affect popup menu
+    innerStyle = {
+      fontWeight: if cell.bold then "bold"
+      fontStyle: if cell.italic then "italic"
       color: 
         if cell.type in ['rowSegment', 'columnSegment']
           # Fade
@@ -173,6 +179,7 @@ class LayoutCellComponent extends React.Component
         if cell.sectionTop and cell.sectionRight and isHover
           @renderMenu(cell)
 
-        if cell.unconfigured and @props.onEditSection
-          "Click to configure"
-        cell.text or "\u00A0" # Placeholder
+        H.span style: innerStyle,
+          if cell.unconfigured and @props.onEditSection
+            "Click to configure"
+          cell.text or "\u00A0" # Placeholder
