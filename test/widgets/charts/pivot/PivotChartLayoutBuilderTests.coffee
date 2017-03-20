@@ -238,7 +238,7 @@ describe "PivotChartLayoutBuilder", ->
       compare layoutPluck(layout, "type"), [
         ["blank", "columnLabel", "skip", "skip"]
         ["blank", "columnSegment", "columnSegment", "columnSegment"]
-        ["rowLabel", "blank", "blank", "blank"]
+        ["rowLabel", "intersection", "intersection", "intersection"]
         ["rowSegment", "intersection", "intersection", "intersection"]
         ["rowSegment", "intersection", "intersection", "intersection"]
       ]
@@ -367,8 +367,8 @@ describe "PivotChartLayoutBuilder", ->
       compare layoutPluck(layout, "sectionTop"), [
         [false, true, true, true]
         [false, false, false, false]
-        [true, false, false, false]
-        [false, true, true, true]
+        [true, true, true, true]
+        [false, false, false, false]
         [false, false, false, false]
       ]
 
@@ -376,7 +376,7 @@ describe "PivotChartLayoutBuilder", ->
       compare layoutPluck(layout, "sectionRight"), [
         [false, true, false, true]
         [false, false, false, true]
-        [true, false, false, false]
+        [true, false, false, true]
         [true, false, false, true]
         [true, false, false, true]
       ], JSON.stringify(layoutPluck(layout, "section"))
@@ -385,7 +385,7 @@ describe "PivotChartLayoutBuilder", ->
       compare layoutPluck(layout, "sectionLeft"), [
         [false, true, false, false]
         [false, true, false, false]
-        [true, false, false, false]
+        [true, true, false, false]
         [true, true, false, false]
         [true, true, false, false]
       ]
