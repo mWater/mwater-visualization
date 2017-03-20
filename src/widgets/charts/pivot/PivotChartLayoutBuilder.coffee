@@ -87,9 +87,12 @@ module.exports = class PivotChartLayoutBuilder
               unconfigured: row[depth]?.segment and not row[depth]?.segment.label? and not row[depth]?.segment.valueAxis
             })
 
-        # Add blank columns
+        # Add intersection columns
         for column in columns
-          cells.push({ type: "blank", text: null })
+          # Get intersection id
+          intersectionId = _.map(row, (r) -> r.segment.id).join(",") + ":" + _.map(column, (c) -> c.segment.id).join(",")
+
+          cells.push({ type: "intersection", section: intersectionId, text: null })
 
         layout.rows.push({ cells: cells })
 
