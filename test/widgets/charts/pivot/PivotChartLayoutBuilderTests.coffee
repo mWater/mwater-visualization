@@ -6,8 +6,8 @@ fixtures = require '../../../fixtures'
 PivotChartLayoutBuilder = require '../../../../src/widgets/charts/pivot/PivotChartLayoutBuilder'
 
 canonical = require 'canonical-json'
-compare = (actual, expected) ->
-  assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n"
+compare = (actual, expected, message = "") ->
+  assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n" + message
 
 # Plucks from layout 
 layoutPluck = (layout, key) ->
@@ -342,4 +342,59 @@ describe "PivotChartLayoutBuilder", ->
         [null, null, null, null]
         [null, "rgba(255, 136, 0, 0.5)", null, null]
         [null, null, null, null]
+      ]
+
+    it "sets section top/left/bottom/right", ->
+      design = {
+        table: "t1"
+        columns: [{ id: "c1", valueAxis: @axisEnum, label: "C1" }]
+        rows: [{ id: "r1", valueAxis: @axisText, label: "R1" }]
+        intersections: {
+          "r1:c1": { valueAxis: @axisNumberSum }
+        }
+      }
+
+      data = {
+        "r1:c1": [
+          { r0: "x", c0: "a", value: 2 }
+          { r0: "y", c0: "b", value: 4 }
+        ]
+      }
+
+      layout = @lb.buildLayout(design, data)
+
+      # Check top
+      compare layoutPluck(layout, "sectionTop"), [
+        [false, true, true, true]
+        [false, false, false, false]
+        [true, false, false, false]
+        [false, true, true, true]
+        [false, false, false, false]
+      ]
+
+      # Check right (spanned columns have it true)
+      compare layoutPluck(layout, "sectionRight"), [
+        [false, true, false, true]
+        [false, false, false, true]
+        [true, false, false, false]
+        [true, false, false, true]
+        [true, false, false, true]
+      ], JSON.stringify(layoutPluck(layout, "section"))
+
+      # Check left
+      compare layoutPluck(layout, "sectionLeft"), [
+        [false, true, false, false]
+        [false, true, false, false]
+        [true, false, false, false]
+        [true, true, false, false]
+        [true, true, false, false]
+      ]
+
+      # Check bottom
+      compare layoutPluck(layout, "sectionBottom"), [
+        [false, false, false, false]
+        [false, true, true, true]
+        [false, false, false, false]
+        [false, false, false, false]
+        [true, true, true, true]
       ]

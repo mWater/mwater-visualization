@@ -64,6 +64,10 @@ cell:
   text: text content of cell
   align: left/center/right
   section: section id (see above)
+  sectionTop: true if cell is on top edge of section
+  sectionBottom: true if cell is on bottom edge of section
+  sectionLeft: true if cell is on left edge of section
+  sectionRight: true if cell is on right edge of section
   bold: true if bold
   italic: true if italic
   backgroundColor: background color of cell

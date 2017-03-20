@@ -4,6 +4,8 @@ ReactDOM = require 'react-dom'
 R = React.createElement
 H = React.DOM
 
+Color = require 'color'
+
 # Displays a pivot chart from a layout
 module.exports = class PivotChartLayoutComponent extends React.Component
   @propTypes: 
@@ -42,9 +44,11 @@ module.exports = class PivotChartLayoutComponent extends React.Component
   render: ->
     style = {
       width: "100%"
+      borderSpacing: 0
+      borderCollapse: "collapse"
     }
 
-    H.table style: style, className: "table table-bordered",
+    H.table style: style, # className: "table table-bordered",
       H.tbody onMouseLeave: (=> @setState(hoverSection: null)),
         _.map @props.layout.rows, (row, rowIndex) =>
           @renderRow(row, rowIndex)
@@ -133,26 +137,27 @@ class LayoutCellComponent extends React.Component
     if cell.type == "skip"
       return null
 
-    # Determine if top right of section
-    isTop = cell.section and (@props.rowIndex == 0 or @props.layout.rows[@props.rowIndex - 1].cells[@props.columnIndex].section != cell.section) 
-    isRight = cell.section and (@props.columnIndex >= @props.layout.rows[0].cells.length - (cell.columnSpan or 1) or @props.layout.rows[@props.rowIndex].cells[@props.columnIndex + (cell.columnSpan or 1)].section != cell.section)
-
     isHover = @props.hoverSection and cell.section == @props.hoverSection
+
+    backgroundColor = if cell.unconfigured and @props.onEditSection
+      "#eff5fb"
+    else
+      cell.backgroundColor or "#FFFFFF"
+
+    if isHover
+      backgroundColor = Color(backgroundColor).darken(0.03)
 
     style = {
       padding: 5
-      backgroundColor: 
-        if cell.unconfigured and not isHover and @props.onEditSection
-          "#dfebf6"
-        else if cell.unconfigured and @props.onEditSection
-          "#eff5fb"
-        else if isHover 
-          "#F8F8F8"
-        else
-          cell.backgroundColor
+      verticalAlign: "top"
+      backgroundColor: backgroundColor
       position: "relative"
       textAlign: cell.align
       cursor: if isHover then "pointer"
+      borderTop: if cell.sectionTop then "solid 1px #ccc" else if cell.section then "solid 1px #eee"
+      borderBottom: if cell.sectionBottom then "solid 1px #ccc" else if cell.section then "solid 1px #eee"
+      borderLeft: if cell.sectionLeft then "solid 1px #ccc" else if cell.section then "solid 1px #eee"
+      borderRight: if cell.sectionRight then "solid 1px #ccc" else if cell.section then "solid 1px #eee"
       color: 
         if cell.type in ['rowSegment', 'columnSegment']
           # Fade
@@ -165,7 +170,7 @@ class LayoutCellComponent extends React.Component
       style: style,
       colSpan: cell.columnSpan or 1
       rowSpan: cell.rowSpan or 1,
-        if isTop and isRight and isHover
+        if cell.sectionTop and cell.sectionRight and isHover
           @renderMenu(cell)
 
         if cell.unconfigured and @props.onEditSection
