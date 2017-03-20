@@ -113,6 +113,16 @@ module.exports = class PivotChartLayoutBuilder
 
       layout.rows.push({ cells: cells })
 
+    # Set up section top/left/bottom/right info
+    for columnIndex in [0...layout.rows[0].cells.length]
+      for rowIndex in [0...layout.rows.length]
+        cell = layout.rows[rowIndex].cells[columnIndex]
+
+        cell.sectionTop = cell.section? and (rowIndex == 0 or layout.rows[rowIndex - 1].cells[columnIndex].section != cell.section) 
+        cell.sectionLeft = cell.section? and (columnIndex == 0 or layout.rows[rowIndex].cells[columnIndex - 1].section != cell.section) 
+        cell.sectionRight = cell.section? and (columnIndex >= layout.rows[0].cells.length - 1 or layout.rows[rowIndex].cells[columnIndex + 1].section != cell.section)
+        cell.sectionBottom = cell.section? and (rowIndex >= layout.rows.length - 1 or layout.rows[rowIndex + 1].cells[columnIndex].section != cell.section)
+
     # Span column headers and column segments that have same segment and value
     for layoutRow in layout.rows
       refCell = null
@@ -125,6 +135,7 @@ module.exports = class PivotChartLayoutBuilder
         if cell.type in ['columnLabel', 'columnSegment'] and cell.text == refCell.text and cell.type == refCell.type and cell.section == refCell.section
           cell.type = "skip"
           refCell.columnSpan = (refCell.columnSpan or 1) + 1
+          refCell.sectionRight = true
         else
           refCell = cell
 
@@ -142,6 +153,7 @@ module.exports = class PivotChartLayoutBuilder
         if cell.type in ['rowLabel', 'rowSegment'] and cell.text == refCell.text and cell.type == refCell.type and cell.section == refCell.section
           cell.type = "skip"
           refCell.rowSpan = (refCell.rowSpan or 1) + 1
+          refCell.sectionBottom = true
         else
           refCell = cell
 
@@ -194,7 +206,7 @@ module.exports = class PivotChartLayoutBuilder
 
       if backgroundColor
         backgroundColor = Color(backgroundColor).alpha(intersection.backgroundColorOpacity).string()
-        
+
       cell.backgroundColor = backgroundColor
 
     return cell
