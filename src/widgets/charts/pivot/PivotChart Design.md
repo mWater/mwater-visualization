@@ -37,11 +37,15 @@ segment:
   label: optional label of segment
   valueAxis: enum/text axis that determines values. Optional.
   children: array of child segments if any. Optional
+  bold: true if bold
+  italic: true if italic
 
 intersection:
   valueAxis: axis that determines value to display in cells. Must be aggregate
   backgroundColorAxis: color axis for background of cells
   backgroundColorOpacity: fractional background opacity
+  bold: true if bold
+  italic: true if italic
 
 ## Rendering 
 

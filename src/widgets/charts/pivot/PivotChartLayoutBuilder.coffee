@@ -42,7 +42,14 @@ module.exports = class PivotChartLayoutBuilder
         for i in [1..rowsDepth]
           cells.push({ type: "blank", text: null })
         for column in columns
-          cells.push({ type: "columnLabel", section: column[depth]?.segment.id, text: column[depth]?.segment.label, align: "center" })
+          cells.push({ 
+            type: "columnLabel"
+            section: column[depth]?.segment.id
+            text: column[depth]?.segment.label
+            align: "center" 
+            bold: column[depth]?.segment.bold
+            italic: column[depth]?.segment.italic
+          })
         layout.rows.push({ cells: cells })
     
       # Emit column labels
@@ -57,6 +64,8 @@ module.exports = class PivotChartLayoutBuilder
           align: "center"
           # Unconfigured if segment has no label or value
           unconfigured: column[depth]?.segment and not column[depth]?.segment.label? and not column[depth]?.segment.valueAxis
+          bold: column[depth]?.segment.bold
+          italic: column[depth]?.segment.italic
         })
 
       layout.rows.push({ cells: cells })
@@ -77,7 +86,13 @@ module.exports = class PivotChartLayoutBuilder
         cells = []
         for depth in [0...rowsDepth]
           if needsSpecialRowHeader[depth]
-            cells.push({ type: "rowLabel", section: row[depth]?.segment.id, text: row[depth].segment.label })
+            cells.push({ 
+              type: "rowLabel"
+              section: row[depth]?.segment.id
+              text: row[depth].segment.label 
+              bold: row[depth]?.segment.bold
+              italic: row[depth]?.segment.italic
+            })
           else
             cells.push({ 
               type: "rowLabel"
@@ -85,6 +100,8 @@ module.exports = class PivotChartLayoutBuilder
               text: null 
               # Unconfigured if segment has no label or value
               unconfigured: row[depth]?.segment and not row[depth]?.segment.label? and not row[depth]?.segment.valueAxis
+              bold: row[depth]?.segment.bold
+              italic: row[depth]?.segment.italic
             })
 
         # Add intersection columns
@@ -108,6 +125,8 @@ module.exports = class PivotChartLayoutBuilder
           text: row[depth]?.label 
           # Unconfigured if segment has no label or value
           unconfigured: row[depth]?.segment and not row[depth]?.segment.label? and not row[depth]?.segment.valueAxis
+          bold: row[depth]?.segment.bold
+          italic: row[depth]?.segment.italic
         })
 
       # Emit contents
@@ -201,6 +220,8 @@ module.exports = class PivotChartLayoutBuilder
       section: intersectionId
       text: text
       align: "right" 
+      bold: intersection.bold
+      italic: intersection.italic
     }
 
     # Set background color
