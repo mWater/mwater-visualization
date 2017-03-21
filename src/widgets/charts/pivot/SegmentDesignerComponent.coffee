@@ -102,6 +102,10 @@ module.exports = class SegmentDesignerComponent extends React.Component
           H.label className: "checkbox-inline", key: "valueLabelBold",
             H.input type: "checkbox", checked: @props.segment.valueLabelBold == true, onChange: (ev) => @update({ valueLabelBold: ev.target.checked })
             "Header Bold"
+        if @props.segment.valueAxis and @props.segment.label
+          H.label className: "checkbox-inline", key: "fillerColor",
+            H.input type: "checkbox", checked: @props.segment.fillerColor?, onChange: (ev) => @update({ fillerColor: if ev.target.checked then "#EEE" else null })
+            "Shade Filler Cells"
 
   renderBorders: ->
     R FormGroup, 

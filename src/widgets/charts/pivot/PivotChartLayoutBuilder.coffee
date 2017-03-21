@@ -118,7 +118,13 @@ module.exports = class PivotChartLayoutBuilder
           # Get intersection id
           intersectionId = _.map(row, (r) -> r.segment.id).join(",") + ":" + _.map(column, (c) -> c.segment.id).join(",")
 
-          cells.push({ type: "intersection", subtype: "filler", section: intersectionId, text: null })
+          cells.push({ 
+            type: "intersection"
+            subtype: "filler"
+            section: intersectionId
+            text: null
+            backgroundColor: _.reduce(row, ((total, r) -> total or r.segment?.fillerColor or null), null) 
+          })
 
         layout.rows.push({ cells: cells })
 
@@ -294,10 +300,10 @@ module.exports = class PivotChartLayoutBuilder
 
         if cell.type == "intersection"
           cell.borderLeft = borderLefts[columnIndex]
-          cell.borderRight = borderRights[columnIndex]
+          cell.borderRight = borderRights[columnIndex + (cell.columnSpan or 1) - 1]
 
           cell.borderTop = borderTops[rowIndex]
-          cell.borderBottom = borderBottoms[rowIndex]
+          cell.borderBottom = borderBottoms[rowIndex + (cell.rowSpan or 1) - 1]
 
     return layout
 

@@ -142,8 +142,6 @@ class LayoutCellComponent extends React.Component
     # Determine background color
     backgroundColor = if cell.unconfigured and @props.onEditSection
       "#eff5fb"
-    else if cell.subtype == "filler"
-      "#DDD"
     else
       cell.backgroundColor or "#FFFFFF"
 
