@@ -185,6 +185,46 @@ describe "PivotChartLayoutBuilder", ->
         ["value", "value", "value", "value"]
       ]
 
+    it "uses nullLabel", ->
+      design = {
+        table: "t1"
+        columns: [{ id: "c1", valueAxis: @axisEnum }]
+        rows: [{ id: "r1", valueAxis: @axisText }]
+        intersections: {
+          "r1:c1": { valueAxis: _.extend({}, @axisNumberSum, { nullLabel: "-" }) }
+        }
+      }
+
+      data = {
+        "r1:c1": [
+          { r0: "x", c0: "a", value: 2 }
+          { r0: "y", c0: "b", value: 4 }
+        ]
+      }
+
+      layout = @lb.buildLayout(design, data)
+
+      # Check text
+      compare layoutPluck(layout, "text"), [
+        [null, "A", "B", "None"]
+        ["x", "2", "-", "-"]
+        ["y", "-", "4", "-"]
+      ]
+
+      # Check types
+      compare layoutPluck(layout, "type"), [
+        ["blank", "column", "column", "column"]
+        ["row", "intersection", "intersection", "intersection"]
+        ["row", "intersection", "intersection", "intersection"]
+      ]
+
+      # Check subtypes
+      compare layoutPluck(layout, "subtype"), [
+        [null, "value", "value", "value"]
+        ["value", "value", "value", "value"]
+        ["value", "value", "value", "value"]
+      ]
+
     it "simple enum/text with no values", ->
       design = {
         table: "t1"

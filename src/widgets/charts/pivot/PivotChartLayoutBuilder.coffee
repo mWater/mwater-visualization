@@ -237,7 +237,7 @@ module.exports = class PivotChartLayoutBuilder
     if value?
       text = @axisBuilder.formatValue(intersection.valueAxis, value, locale)
     else
-      text = null
+      text = intersection.valueAxis?.nullLabel or null
 
     cell = { 
       type: "intersection"
