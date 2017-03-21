@@ -143,6 +143,24 @@ gulp.task "watch", gulp.series([
       gutil.log("[webpack-dev-server]", "http://localhost:3000/demo.html")
 ])
 
+gulp.task "test", gulp.series([
+  "copy_assets"
+  ->
+    webpackConfig = require './webpack.config.tests.js'
+
+    # webpackConfig.entry.unshift('webpack-dev-server/client?http://localhost:3000');
+
+    compiler = webpack(webpackConfig)
+
+    new WebpackDevServer(compiler, { contentBase: ".", publicPath: "." }).listen 3000, "localhost", (err) =>
+      if err 
+        throw new gutil.PluginError("webpack-dev-server", err)
+
+      # Server listening
+      gutil.log("[webpack-dev-server]", "http://localhost:3000/mocha.html")
+])
+
+
 gulp.task "default", gulp.series("copy", "coffee")
 
 # Shim non-browserify friendly libraries to allow them to be 'require'd
