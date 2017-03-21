@@ -156,6 +156,10 @@ class LayoutCellComponent extends React.Component
 
     borderWeights = [null, "solid 1px #f4f4f4", "solid 1px #ccc", "solid 1px #888"]
 
+    # Collapsed borders mean that weights need to be combined for adjacent cells
+    borderBottom = Math.max(cell.borderBottom or 0, @props.layout.rows[@props.rowIndex + 1]?.cells[@props.columnIndex].borderTop or 0)
+    borderRight = Math.max(cell.borderRight or 0, @props.layout.rows[@props.rowIndex].cells[@props.columnIndex + 1]?.borderLeft or 0)
+
     style = {
       padding: 5
       verticalAlign: "top"
@@ -164,9 +168,9 @@ class LayoutCellComponent extends React.Component
       textAlign: cell.align
       cursor: if isHover then "pointer"
       borderTop: borderWeights[cell.borderTop or 0]
-      borderBottom: borderWeights[cell.borderBottom or 0]
+      borderBottom: borderWeights[borderBottom]
       borderLeft: borderWeights[cell.borderLeft or 0]
-      borderRight: borderWeights[cell.borderRight or 0]
+      borderRight: borderWeights[borderRight]
     }
 
     # Style that should not affect popup menu
