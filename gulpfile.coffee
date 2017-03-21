@@ -147,17 +147,14 @@ gulp.task "test", gulp.series([
   "copy_assets"
   ->
     webpackConfig = require './webpack.config.tests.js'
-
-    # webpackConfig.entry.unshift('webpack-dev-server/client?http://localhost:3000');
-
     compiler = webpack(webpackConfig)
 
-    new WebpackDevServer(compiler, { contentBase: ".", publicPath: "." }).listen 3000, "localhost", (err) =>
+    new WebpackDevServer(compiler, { }).listen 8081, "localhost", (err) =>
       if err 
         throw new gutil.PluginError("webpack-dev-server", err)
 
       # Server listening
-      gutil.log("[webpack-dev-server]", "http://localhost:3000/mocha.html")
+      gutil.log("[webpack-dev-server]", "http://localhost:8081/mocha.html")
 ])
 
 
