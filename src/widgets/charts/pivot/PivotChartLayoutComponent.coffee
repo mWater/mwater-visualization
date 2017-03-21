@@ -173,7 +173,7 @@ class LayoutCellComponent extends React.Component
 
     # Style that should not affect popup menu
     innerStyle = {
-      fontWeight: if cell.bold or cell.subtype == "valueLabel" then "bold"
+      fontWeight: if cell.bold then "bold"
       fontStyle: if cell.italic then "italic"
       marginLeft: if cell.indent then cell.indent * 5
     }

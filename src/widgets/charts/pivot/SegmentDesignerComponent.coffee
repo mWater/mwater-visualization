@@ -98,6 +98,10 @@ module.exports = class SegmentDesignerComponent extends React.Component
         H.label className: "checkbox-inline", key: "italic",
           H.input type: "checkbox", checked: @props.segment.italic == true, onChange: (ev) => @update({ italic: ev.target.checked })
           "Italic"
+        if @props.segment.valueAxis and @props.segment.label
+          H.label className: "checkbox-inline", key: "valueLabelBold",
+            H.input type: "checkbox", checked: @props.segment.valueLabelBold == true, onChange: (ev) => @update({ valueLabelBold: ev.target.checked })
+            "Header Bold"
 
   renderBorders: ->
     R FormGroup, 
