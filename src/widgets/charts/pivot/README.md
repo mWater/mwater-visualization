@@ -38,9 +38,12 @@ segment:
   label: optional label of segment
   valueAxis: enum/text axis that determines values. Optional.
   children: array of child segments if any. Optional
+  fillerColor: color of filler for intersections that are filler type
+
   bold: true if bold (values and label)
   italic: true if italic
   valueLabelBold: true if label alone is bold (only when has valueAxis and label)
+
   borderBefore: weight of border before segment (0 = none, 1 = light, 2 = medium (default), 3 = heavy)
   borderWithin: weight of border within segment (0 = none, 1 = light (default), 2 = medium, 3 = heavy)
   borderAfter: weight of border after segment (0 = none, 1 = light, 2 = medium (default), 3 = heavy)
