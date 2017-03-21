@@ -252,10 +252,11 @@ module.exports = class PivotChartLayoutBuilder
     # Set background color
     if intersection.backgroundColorAxis and entry?.backgroundColor?
       backgroundColor = @axisBuilder.getValueColor(intersection.backgroundColorAxis, entry?.backgroundColor)
+    else if intersection.backgroundColor and not intersection.colorAxis
+      backgroundColor = intersection.backgroundColor
 
-      if backgroundColor
-        backgroundColor = Color(backgroundColor).alpha(intersection.backgroundColorOpacity).string()
-
+    if backgroundColor
+      backgroundColor = Color(backgroundColor).alpha(intersection.backgroundColorOpacity).string()
       cell.backgroundColor = backgroundColor
 
     return cell
