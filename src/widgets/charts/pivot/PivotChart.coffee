@@ -10,8 +10,6 @@ AxisBuilder = require '../../../axes/AxisBuilder'
 TextWidget = require '../../text/TextWidget'
 
 PivotChartUtils = require './PivotChartUtils'
-PivotChartDesignerComponent = require './PivotChartDesignerComponent'
-PivotChartViewComponent = require './PivotChartViewComponent'
 PivotChartQueryBuilder = require './PivotChartQueryBuilder'
 PivotChartLayoutBuilder = require './PivotChartLayoutBuilder'
 
