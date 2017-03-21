@@ -45,6 +45,7 @@ intersection:
   valueAxis: axis that determines value to display in cells. Must be aggregate
   backgroundColorAxis: color axis for background of cells
   backgroundColorOpacity: fractional background opacity
+  backgroundColor: color of background if no color axis
   bold: true if bold
   italic: true if italic
 

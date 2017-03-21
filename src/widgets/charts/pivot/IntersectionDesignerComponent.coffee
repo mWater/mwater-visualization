@@ -5,6 +5,7 @@ R = React.createElement
 
 Rcslider = require 'rc-slider'
 AxisComponent = require '../../../axes/AxisComponent'
+ColorComponent = require '../../../ColorComponent'
 
 # Design an intersection of a pivot table
 module.exports = class IntersectionDesignerComponent extends React.Component
@@ -24,8 +25,11 @@ module.exports = class IntersectionDesignerComponent extends React.Component
 
   handleBackgroundColorAxisChange: (backgroundColorAxis) => 
     opacity = @props.intersection.backgroundColorOpacity or 0.3
-
     @update(backgroundColorAxis: backgroundColorAxis, backgroundColorOpacity: opacity)
+
+  handleBackgroundColorChange: (backgroundColor) => 
+    opacity = @props.intersection.backgroundColorOpacity or 0.3
+    @update(backgroundColor: backgroundColor, backgroundColorOpacity: opacity)
 
   handleBackgroundColorOpacityChange: (newValue) =>
     @update(backgroundColorOpacity: newValue / 100)
@@ -72,10 +76,9 @@ module.exports = class IntersectionDesignerComponent extends React.Component
           "Italic"
 
   renderBackgroundColorAxis: ->
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        "Background Color"
-      H.div style: { marginLeft: 8 }, 
+    return R FormGroup, 
+      label: "Background Color From Values"
+      help: "This is an optional background color to set on cells that is controlled by the data",
         R AxisComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
@@ -86,11 +89,19 @@ module.exports = class IntersectionDesignerComponent extends React.Component
           onChange: @handleBackgroundColorAxisChange
           showColorMap: true
 
-      H.p className: "help-block",
-        "This is an optional background color to set on cells that is controlled by the data"
+  renderBackgroundColor: ->
+    if @props.intersection.backgroundColorAxis
+      return
+      
+    return R FormGroup, 
+      label: "Background Color"
+      help: "This is an optional background color to set on all cells",
+        R ColorComponent,
+          color: @props.intersection.backgroundColor
+          onChange: @handleBackgroundColorChange
 
   renderBackgroundColorOpacityControl: ->
-    if not @props.intersection.backgroundColorAxis
+    if not @props.intersection.backgroundColorAxis and not @props.intersection.backgroundColor
       return
 
     H.div className: 'form-group', style: { paddingTop: 10 },
@@ -112,6 +123,7 @@ module.exports = class IntersectionDesignerComponent extends React.Component
       @renderNullValue()
       @renderStyling()
       @renderBackgroundColorAxis()
+      @renderBackgroundColor()
       @renderBackgroundColorOpacityControl()
 
 FormGroup = (props) ->
