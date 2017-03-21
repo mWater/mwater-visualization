@@ -18,6 +18,7 @@ module.exports = class PivotChartLayoutBuilder
     # Create empty layout
     layout = {
       rows: []
+      striping: design.striping
     }
 
     # Get all columns
@@ -162,6 +163,22 @@ module.exports = class PivotChartLayoutBuilder
 
         # If matches, span columns
         if cell.type == 'column' and cell.text == refCell.text and cell.type == refCell.type and cell.section == refCell.section
+          cell.skip = true
+          refCell.columnSpan = (refCell.columnSpan or 1) + 1
+          refCell.sectionRight = true
+        else
+          refCell = cell
+
+    # Span intersections that are fillers
+    for layoutRow in layout.rows
+      refCell = null
+      for cell, i in layoutRow.cells
+        if i == 0
+          refCell = cell
+          continue
+
+        # If matches, span columns
+        if cell.type == 'intersection' and cell.subtype == "filler" and cell.type == refCell.type and cell.subtype == refCell.subtype
           cell.skip = true
           refCell.columnSpan = (refCell.columnSpan or 1) + 1
           refCell.sectionRight = true

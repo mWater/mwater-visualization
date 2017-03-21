@@ -150,6 +150,12 @@ class LayoutCellComponent extends React.Component
     if isHover
       backgroundColor = Color(backgroundColor).darken(0.03)
 
+    # Add striping
+    if @props.layout.striping == "columns" and cell.type in ['column', 'intersection'] and @props.columnIndex % 2 == 0
+      backgroundColor = Color(backgroundColor).darken(0.03)
+    else if @props.layout.striping == "rows" and cell.type in ['row', 'intersection'] and @props.rowIndex % 2 == 0
+      backgroundColor = Color(backgroundColor).darken(0.03)
+
     style = {
       padding: 5
       verticalAlign: "top"

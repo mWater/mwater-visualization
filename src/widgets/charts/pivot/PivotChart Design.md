@@ -31,6 +31,7 @@ design:
   columns: array of segments that make up columns
   intersections: lookup of intersection id (e.g. "rowid:columnid" or "rowid,rowid:columnid,columnid" etc.) to intersection
   filter: optional logical expression to filter by
+  striping: "columns"/"rows" to put in light striping
 
 segment:
   id: id of segment
@@ -59,6 +60,7 @@ the list of rows and cells.
 Layout format is as follows:
 
   rows: array of rows
+  striping: "columns"/"rows" to put in light striping
 
 row:
   cells: array of cells

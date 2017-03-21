@@ -47,10 +47,29 @@ module.exports = class PivotChartDesignerComponent extends React.Component
           table: @props.design.table
           value: @props.design.filter)
 
+  renderStriping: ->
+    R FormGroup, 
+      label: "Striping",
+        H.div key: "none", className: "radio",
+          H.label null,
+            H.input type: "radio", checked: not @props.design.striping, onClick: => @updateDesign(striping: null)
+            "None"
+
+        H.div key: "columns", className: "radio",
+          H.label null,
+            H.input type: "radio", checked: @props.design.striping == "columns", onClick: => @updateDesign(striping: "columns")
+            "Columns"
+
+        H.div key: "rows", className: "radio",
+          H.label null,
+            H.input type: "radio", checked: @props.design.striping == "rows", onClick: => @updateDesign(striping: "rows")
+            "Rows"
+
   render: ->
     H.div null,
       @renderTable()
       @renderFilter()
+      @renderStriping()
       if @props.design.table and (not @props.design.rows[0].label? and not @props.design.rows[0].valueAxis? or not @props.design.columns[0].label? and not @props.design.columns[0].valueAxis?)
         H.div className: "alert alert-success",
           H.i className: "fa fa-check"
@@ -62,3 +81,13 @@ module.exports = class PivotChartDesignerComponent extends React.Component
           '''
           For advanced options, click on the pencil menu that appears when you hover over a section. 
           '''
+
+FormGroup = (props) ->
+  H.div className: "form-group",
+    H.label className: "text-muted", 
+      props.label
+    H.div style: { marginLeft: 5 }, 
+      props.children
+    if props.help
+      H.p className: "help-block", style: { marginLeft: 5 },
+        props.help
