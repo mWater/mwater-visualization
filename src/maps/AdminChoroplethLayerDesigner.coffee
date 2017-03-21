@@ -3,7 +3,6 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
-updt = require '../updt'
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprComponent = require("mwater-expressions-ui").ExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
@@ -92,7 +91,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
     H.div className: "form-group",
       H.div className: "checkbox",
         H.label null,
-          H.input type: "checkbox", checked: @props.design.displayNames, onChange: (ev) => updt(@props.onDesignChange, @props.design, "displayNames", ev.target.checked)
+          H.input type: "checkbox", checked: @props.design.displayNames, onChange: (ev) => @update({ displayNames: ev.target.checked })
           "Display Region Names"
 
   renderColor: ->
@@ -160,7 +159,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
         step: 1
         tipTransitionName: "rc-slider-tooltip-zoom-down",
         value: @props.design.fillOpacity * 100,
-        onChange: (val) => updt(@props.onDesignChange, @props.design, "fillOpacity", val/100)
+        onChange: (val) => @update(fillOpacity: val/100)
       )
 
   renderFilter: ->
@@ -176,7 +175,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
         R(FilterExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
-          onChange: updt(@props.onDesignChange, @props.design, "filter")
+          onChange: (filter) => @update(filter: filter)
           table: @props.design.table
           value: @props.design.filter)
 
