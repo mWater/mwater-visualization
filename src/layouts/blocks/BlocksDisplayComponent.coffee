@@ -169,10 +169,11 @@ class BlocksDisplayComponent extends React.Component
           createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "TableChart", design: {} })
           title: H.i className: "fa fa-table"
           subtitle: "Table"
-        R PaletteItemComponent,
-          createItem: @createBlockItem({ type: "widget", widgetType: "PivotChart", design: {} })
-          title: H.img width: 24, height: 24, src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAb0lEQVRIx91VQQrAIAwzo/7/ydllG0MQS21EzMW2ICFtoyBZlLDn/LOgySPAG1xFDDmBtZI6efoMvODozkyL2IlTCOisfS2KrqG0RXus6fkEVBIw08khE62aQY0ogMdEswqwYouwvQ8s+4M576m4Ae/tET/u1taEAAAAAElFTkSuQmCC"
-          subtitle: "Pivot"
+        if window.ENABLE_PIVOT_CHARTS
+          R PaletteItemComponent,
+            createItem: @createBlockItem({ type: "widget", widgetType: "PivotChart", design: {} })
+            title: H.img width: 24, height: 24, src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAb0lEQVRIx91VQQrAIAwzo/7/ydllG0MQS21EzMW2ICFtoyBZlLDn/LOgySPAG1xFDDmBtZI6efoMvODozkyL2IlTCOisfS2KrqG0RXus6fkEVBIw08khE62aQY0ogMdEswqwYouwvQ8s+4M576m4Ae/tET/u1taEAAAAAElFTkSuQmCC"
+            subtitle: "Pivot"
         R PaletteItemComponent,
           createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "CalendarChart", design: {} })
           title: H.i className: "fa fa-calendar"
