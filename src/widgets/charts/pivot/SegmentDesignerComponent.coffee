@@ -4,6 +4,7 @@ H = React.DOM
 R = React.createElement
 
 AxisComponent = require '../../../axes/AxisComponent'
+ColorComponent = require '../../../ColorComponent'
 
 # Design a single segment of a pivot table
 module.exports = class SegmentDesignerComponent extends React.Component
@@ -103,9 +104,9 @@ module.exports = class SegmentDesignerComponent extends React.Component
             H.input type: "checkbox", checked: @props.segment.valueLabelBold == true, onChange: (ev) => @update({ valueLabelBold: ev.target.checked })
             "Header Bold"
         if @props.segment.valueAxis and @props.segment.label
-          H.label className: "checkbox-inline", key: "fillerColor",
-            H.input type: "checkbox", checked: @props.segment.fillerColor?, onChange: (ev) => @update({ fillerColor: if ev.target.checked then "#EEE" else null })
-            "Shade Filler Cells"
+          H.div style: { paddingTop: 5 },
+            "Shade filler cells: "
+            R ColorComponent, color: @props.segment.fillerColor, onChange: (color) => @update({ fillerColor: color })
 
   renderBorders: ->
     R FormGroup, 
