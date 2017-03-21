@@ -64,7 +64,8 @@ row:
   cells: array of cells
 
 cell: 
-  type: rowSegment/rowLabel/columnSegment/columnLabel/intersection/blank/skip
+  type: row/column/blank/intersection. See below
+  subtype: value/filler/label/valueLabel. See below
   text: text content of cell
   align: left/center/right
   section: section id (see above)
@@ -74,12 +75,27 @@ cell:
   sectionRight: true if cell is on right edge of section
   bold: true if bold
   italic: true if italic
+  indent: number of units to indent cell
   backgroundColor: background color of cell
   level: 0, 1, 2 if segment
   rowSpan: if spans more than one row. Next n-1 cells below will be type "skip"
   columnSpan: if spans more than one column. Next n-1 cells will be type "skip"
+  skip: true if should skip cell because of row/column span
   unconfigured: true if cell is a placeholder that needs to be configured
 
+### Cell types
+
+row: part of rows, has section as row segment id
+column: part of columns, has section as column segment id
+intersection: part of intersections, has section as intersection path
+blank: filler cells at top left
+
+### Cell subtypes
+
+value: data-driven value
+label: label row/column
+valueLabel: header for values (rows and columns that have value and label)
+filler: intersection cells that have no data but fill space for row label
 
 
 

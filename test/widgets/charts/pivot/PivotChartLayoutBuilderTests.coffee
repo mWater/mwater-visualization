@@ -173,9 +173,16 @@ describe "PivotChartLayoutBuilder", ->
 
       # Check types
       compare layoutPluck(layout, "type"), [
-        ["blank", "columnSegment", "columnSegment", "columnSegment"]
-        ["rowSegment", "intersection", "intersection", "intersection"]
-        ["rowSegment", "intersection", "intersection", "intersection"]
+        ["blank", "column", "column", "column"]
+        ["row", "intersection", "intersection", "intersection"]
+        ["row", "intersection", "intersection", "intersection"]
+      ]
+
+      # Check subtypes
+      compare layoutPluck(layout, "subtype"), [
+        [null, "value", "value", "value"]
+        ["value", "value", "value", "value"]
+        ["value", "value", "value", "value"]
       ]
 
     it "simple enum/text with no values", ->
@@ -202,8 +209,14 @@ describe "PivotChartLayoutBuilder", ->
 
       # Check types
       compare layoutPluck(layout, "type"), [
-        ["blank", "columnSegment", "columnSegment", "columnSegment"]
-        ["rowSegment", "intersection", "intersection", "intersection"]
+        ["blank", "column", "column", "column"]
+        ["row", "intersection", "intersection", "intersection"]
+      ]
+
+      # Check subtypes
+      compare layoutPluck(layout, "subtype"), [
+        [null, "value", "value", "value"]
+        ["value", "value", "value", "value"]
       ]
 
     it "adds labels for segments with axes", ->
@@ -236,11 +249,29 @@ describe "PivotChartLayoutBuilder", ->
 
       # Check types
       compare layoutPluck(layout, "type"), [
-        ["blank", "columnLabel", "skip", "skip"]
-        ["blank", "columnSegment", "columnSegment", "columnSegment"]
-        ["rowLabel", "intersection", "intersection", "intersection"]
-        ["rowSegment", "intersection", "intersection", "intersection"]
-        ["rowSegment", "intersection", "intersection", "intersection"]
+        ["blank", "column", "column", "column"]
+        ["blank", "column", "column", "column"]
+        ["row", "intersection", "intersection", "intersection"]
+        ["row", "intersection", "intersection", "intersection"]
+        ["row", "intersection", "intersection", "intersection"]
+      ]
+
+      # Check subtypes
+      compare layoutPluck(layout, "subtype"), [
+        [null, "valueLabel", "valueLabel", "valueLabel"]
+        [null, "value", "value", "value"]
+        ["valueLabel", "filler", "filler", "filler"]
+        ["value", "value", "value", "value"]
+        ["value", "value", "value", "value"]
+      ]
+
+      # Check skips
+      compare layoutPluck(layout, "skip"), [
+        [null, null, true, true]
+        [null, null, null, null]
+        [null, null, null, null]
+        [null, null, null, null]
+        [null, null, null, null]
       ]
 
       # Check column spans
@@ -299,10 +330,10 @@ describe "PivotChartLayoutBuilder", ->
 
       layout = @lb.buildLayout(design, data)
 
-      # Check text
-      compare layoutPluck(layout, "type"), [
-        ["blank", "columnLabel"]
-        ["rowLabel", "intersection"]
+      # Check subtype
+      compare layoutPluck(layout, "subtype"), [
+        [null, "label"]
+        ["label", "value"]
       ]
 
     it "adds background color", ->
