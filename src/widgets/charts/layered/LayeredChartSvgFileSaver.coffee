@@ -27,6 +27,12 @@ getC3String = (c3Node) =>
   styleNode = xml.createElement("style")
   styleNode.setAttribute("type", "text/css")
   css = getC3Css()
+
+  # few styles are defined as .c3 [selector]
+  # which does not apply when exporting svg as parent element is not available
+  css += "svg { font-style: normal; font-variant: normal; font-weight: normal; font-stretch: normal; font-size: 10px; line-height: normal; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }\n"
+  css += "path, line { fill: none; stroke: rgb(0, 0, 0); }\n"
+  css += "text { user-select: none; }\n"
   cdata = xml.createCDATASection(css)
   styleNode.appendChild(cdata)
   svgNode.insertBefore(styleNode, svgNode.firstChild)
@@ -56,6 +62,7 @@ module.exports = save: (design, data, schema, format) ->
     height: 600
   chartOptions = compiler.createChartOptions(props)
   containerDiv = document.createElement("div")
+  containerDiv.className += "c3"
   chartOptions.bindto = containerDiv
   title = design.titleText
   chart = null
@@ -64,7 +71,26 @@ module.exports = save: (design, data, schema, format) ->
       if format == "svg"
         saveSvgToFile(containerDiv, title)
       else if format == "png"
-        saveSvgAsPng.saveSvgAsPng($(containerDiv).find("svg")[0], "#{title or "untitled"}.png");
+
+        # saveSvgAsPng does not include the styles for the svg element itself
+        # so set the styles inline
+        # see: https://github.com/exupero/saveSvgAsPng/issues/110
+        el = $(containerDiv).find("svg")[0]
+        el.style.fontFamily = "sans-serif";
+        el.style.fontStyle = "normal";
+        el.style.fontVariant = "normal";
+        el.style.fontWeight = "normal";
+        el.style.fontStretch = "normal";
+        el.style.fontSize = "10px";
+        el.style.lineHeight = "normal";
+
+        saveSvgAsPng.saveSvgAsPng(el, "#{title or "untitled"}.png", {
+          selectorRemap: (selector) -> 
+            if selector == ".c3 path, .c3 line"
+              return "path, line"
+            return if selector.indexOf(".c3 ") == 0 then selector.substr(4) else selector
+          backgroundColor: "#fff"
+        });
       chart.destroy())
   chartOptions.onrendered = _.debounce(_.once(onRender), 1000)
   chart = c3.generate(chartOptions)
