@@ -1,18 +1,9 @@
-path = require('path');
-
 module.exports = {
-  entry: ['./test/tests.js'],
-  devtool: "source-map",
+  entry: './test/index.js',
   output: {
     path: __dirname,
-    filename: 'bundle.js',
-    publicPath: "/"
+    filename: 'bundle.js'
   },
-  // output: {
-  //   filename: 'bundle.js',
-  //   path: path.resolve(__dirname, 'dist', 'js'),
-  //   publicPath: 'http://localhost:3000/dist/'
-  // },
   module: {
     loaders: [
       { test: /\.coffee$/, loader: ["coffee-loader"] }
@@ -20,8 +11,5 @@ module.exports = {
   },
   resolve: {
     extensions: [".coffee", ".js", ".json"]
-  },
-  externals: {
-    xlsx: "XLSX"
-  }  
-}
+  }
+};
