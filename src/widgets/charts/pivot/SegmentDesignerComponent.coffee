@@ -99,6 +99,19 @@ module.exports = class SegmentDesignerComponent extends React.Component
           H.input type: "checkbox", checked: @props.segment.italic == true, onChange: (ev) => @update({ italic: ev.target.checked })
           "Italic"
 
+  renderBorders: ->
+    R FormGroup, 
+      label: "Borders",
+        H.div key: "before",
+          if @props.segmentType == "row" then "Top: " else "Left: "
+        R BorderComponent, value: @props.segment.borderBefore, defaultValue: 2, onChange: (value) => @update(borderBefore: value)
+        H.div key: "within",
+          "Within: "
+        R BorderComponent, value: @props.segment.borderWithin, defaultValue: 1, onChange: (value) => @update(borderWithin: value)
+        H.div key: "after",
+          if @props.segmentType == "row" then "Bottom: " else "Right: "
+        R BorderComponent, value: @props.segment.borderAfter, defaultValue: 2, onChange: (value) => @update(borderAfter: value)
+
   render: ->
     H.div null,
       @renderMode()
@@ -106,6 +119,31 @@ module.exports = class SegmentDesignerComponent extends React.Component
       if @state.mode == "multiple"
         @renderValueAxis()
       @renderStyling()
+      @renderBorders()
+
+# Allows setting border heaviness
+class BorderComponent extends React.Component
+  @propTypes:
+    value: React.PropTypes.number
+    defaultValue: React.PropTypes.number
+    onChange: React.PropTypes.func.isRequired
+
+  render: ->
+    value = if @props.value? then @props.value else @props.defaultValue
+
+    H.span null,
+      H.label className: "radio-inline",
+        H.input type: "radio", checked: value == 0, onClick: => @props.onChange(0)
+        "None"
+      H.label className: "radio-inline",
+        H.input type: "radio", checked: value == 1, onClick: => @props.onChange(1)
+        "Light"
+      H.label className: "radio-inline",
+        H.input type: "radio", checked: value == 2, onClick: => @props.onChange(2)
+        "Medium"
+      H.label className: "radio-inline",
+        H.input type: "radio", checked: value == 3, onClick: => @props.onChange(3)
+        "Heavy"
 
 FormGroup = (props) ->
   H.div className: "form-group",

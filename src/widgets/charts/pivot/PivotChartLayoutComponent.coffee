@@ -156,6 +156,8 @@ class LayoutCellComponent extends React.Component
     else if @props.layout.striping == "rows" and cell.type in ['row', 'intersection'] and @props.rowIndex % 2 == 0
       backgroundColor = Color(backgroundColor).darken(0.03)
 
+    borderWeights = [null, "solid 1px #f4f4f4", "solid 1px #ccc", "solid 1px #888"]
+
     style = {
       padding: 5
       verticalAlign: "top"
@@ -163,10 +165,10 @@ class LayoutCellComponent extends React.Component
       position: "relative"
       textAlign: cell.align
       cursor: if isHover then "pointer"
-      borderTop: if cell.sectionTop then "solid 1px #ccc" else if cell.section then "solid 1px #eee"
-      borderBottom: if cell.sectionBottom then "solid 1px #ccc" else if cell.section then "solid 1px #eee"
-      borderLeft: if cell.sectionLeft then "solid 1px #ccc" else if cell.section then "solid 1px #eee"
-      borderRight: if cell.sectionRight then "solid 1px #ccc" else if cell.section then "solid 1px #eee"
+      borderTop: borderWeights[cell.borderTop or 0]
+      borderBottom: borderWeights[cell.borderBottom or 0]
+      borderLeft: borderWeights[cell.borderLeft or 0]
+      borderRight: borderWeights[cell.borderRight or 0]
     }
 
     # Style that should not affect popup menu

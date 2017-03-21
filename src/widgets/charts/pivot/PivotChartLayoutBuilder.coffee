@@ -46,6 +46,7 @@ module.exports = class PivotChartLayoutBuilder
           cells.push({ 
             type: "column"
             subtype: "valueLabel"
+            segment: column[depth]?.segment
             section: column[depth]?.segment.id
             text: column[depth]?.segment.label
             align: "center" 
@@ -62,6 +63,7 @@ module.exports = class PivotChartLayoutBuilder
         cells.push({ 
           type: "column"
           subtype: if column[depth]?.segment?.valueAxis then "value" else "label"
+          segment: column[depth]?.segment
           section: column[depth]?.segment.id
           text: column[depth]?.label
           align: "center"
@@ -92,6 +94,7 @@ module.exports = class PivotChartLayoutBuilder
             cells.push({ 
               type: "row"
               subtype: "valueLabel"
+              segment: row[depth]?.segment
               section: row[depth]?.segment.id
               text: row[depth].segment.label 
               bold: row[depth]?.segment.bold
@@ -101,6 +104,7 @@ module.exports = class PivotChartLayoutBuilder
             cells.push({ 
               type: "row"
               subtype: "label"
+              segment: row[depth]?.segment
               section: row[depth]?.segment.id
               text: null 
               # Unconfigured if segment has no label or value
@@ -127,6 +131,7 @@ module.exports = class PivotChartLayoutBuilder
         cells.push({ 
           type: "row"
           subtype: if row[depth]?.segment?.valueAxis then "value" else "label"
+          segment: row[depth]?.segment
           section: row[depth]?.segment.id
           text: row[depth]?.label 
           # Unconfigured if segment has no label or value
@@ -202,6 +207,97 @@ module.exports = class PivotChartLayoutBuilder
           refCell.sectionBottom = true
         else
           refCell = cell
+
+
+    # Set up borders for row and column cells
+    borderTops = [] # Array of border top information for intersections. index is layout row number
+    borderBottoms = [] # Array of border bottom information for intersections. index is layout row number
+    borderLefts = [] # Array of border left information for intersections. index is layout column number
+    borderRights = [] # Array of border right information for intersections. index is layout column number
+
+    for columnIndex in [0...layout.rows[0].cells.length]
+      for rowIndex in [0...layout.rows.length]
+        cell = layout.rows[rowIndex].cells[columnIndex]
+
+        if cell.type == "row"
+          # Rows have always left and right = 2
+          cell.borderLeft = 2
+          cell.borderRight = 2
+
+          # Top is from segment (default 2) if section left, otherwise from segment (default 1). 
+          # TODO for nested segments, within is zero if data did not change
+          if cell.sectionTop
+            if cell.segment?.borderBefore?
+              cell.borderTop = cell.segment?.borderBefore
+            else
+              cell.borderTop = 2
+          else
+            if cell.segment?.borderWithin?
+              cell.borderTop = cell.segment?.borderWithin
+            else
+              cell.borderTop = 1
+
+          # Bottom is from segment (default 2) if section right, otherwise from segment (default 1)
+          if cell.sectionBottom
+            if cell.segment?.borderAfter?
+              cell.borderBottom = cell.segment?.borderAfter
+            else
+              cell.borderBottom = 2
+          else
+            if cell.segment?.borderWithin?
+              cell.borderBottom = cell.segment?.borderWithin
+            else
+              cell.borderBottom = 1
+
+          # Save for intersections
+          borderTops[rowIndex] = Math.max(borderTops[rowIndex] or 0, cell.borderTop)
+          borderBottoms[rowIndex] = Math.max(borderBottoms[rowIndex] or 0, cell.borderBottom)
+
+        # Columns have always top and bottom = 2
+        if cell.type == "column"
+          cell.borderTop = 2
+          cell.borderBottom = 2
+
+          # Left is from segment (default 2) if section left, otherwise from segment (default 1). 
+          # TODO for nested segments, within is zero if data did not change
+          if cell.sectionLeft
+            if cell.segment?.borderBefore?
+              cell.borderLeft = cell.segment?.borderBefore
+            else
+              cell.borderLeft = 2
+          else
+            if cell.segment?.borderWithin?
+              cell.borderLeft = cell.segment?.borderWithin
+            else
+              cell.borderLeft = 1
+
+          # Right is from segment (default 2) if section right, otherwise from segment (default 1)
+          if cell.sectionRight
+            if cell.segment?.borderAfter?
+              cell.borderRight = cell.segment?.borderAfter
+            else
+              cell.borderRight = 2
+          else
+            if cell.segment?.borderWithin?
+              cell.borderRight = cell.segment?.borderWithin
+            else
+              cell.borderRight = 1
+
+          # Save for intersections, keeping heaviest
+          borderLefts[columnIndex] = Math.max(borderLefts[columnIndex] or 0, cell.borderLeft)
+          borderRights[columnIndex + (cell.columnSpan or 1) - 1] = Math.max(borderRights[columnIndex + (cell.columnSpan or 1) - 1] or 0, cell.borderRight)
+
+    # Setup borders
+    for columnIndex in [0...layout.rows[0].cells.length]
+      for rowIndex in [0...layout.rows.length]
+        cell = layout.rows[rowIndex].cells[columnIndex]
+
+        if cell.type == "intersection"
+          cell.borderLeft = borderLefts[columnIndex]
+          cell.borderRight = borderRights[columnIndex]
+
+          cell.borderTop = borderTops[rowIndex]
+          cell.borderBottom = borderBottoms[rowIndex]
 
     return layout
 

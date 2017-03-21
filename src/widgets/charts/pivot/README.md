@@ -40,6 +40,9 @@ segment:
   children: array of child segments if any. Optional
   bold: true if bold
   italic: true if italic
+  borderBefore: weight of border before segment (0 = none, 1 = light, 2 = medium (default), 3 = heavy)
+  borderWithin: weight of border within segment (0 = none, 1 = light (default), 2 = medium, 3 = heavy)
+  borderAfter: weight of border after segment (0 = none, 1 = light, 2 = medium (default), 3 = heavy)
 
 intersection:
   valueAxis: axis that determines value to display in cells. Must be aggregate
@@ -71,19 +74,30 @@ cell:
   subtype: value/filler/label/valueLabel. See below
   text: text content of cell
   align: left/center/right
+
   section: section id (see above)
   sectionTop: true if cell is on top edge of section
   sectionBottom: true if cell is on bottom edge of section
   sectionLeft: true if cell is on left edge of section
   sectionRight: true if cell is on right edge of section
+
+  segment: segment if a row or column cell
+
+  borderLeft: weight of border (0 = none, 1 = light, 2 = medium, 3 = heavy)
+  borderRight: weight of border (0 = none, 1 = light, 2 = medium, 3 = heavy)
+  borderTop: weight of border (0 = none, 1 = light, 2 = medium, 3 = heavy)
+  borderBottom: weight of border (0 = none, 1 = light, 2 = medium, 3 = heavy)
+  
   bold: true if bold
   italic: true if italic
   indent: number of units to indent cell
+  
   backgroundColor: background color of cell
-  level: 0, 1, 2 if segment
+
   rowSpan: if spans more than one row. Next n-1 cells below will be type "skip"
   columnSpan: if spans more than one column. Next n-1 cells will be type "skip"
   skip: true if should skip cell because of row/column span
+
   unconfigured: true if cell is a placeholder that needs to be configured
 
 ### Cell types

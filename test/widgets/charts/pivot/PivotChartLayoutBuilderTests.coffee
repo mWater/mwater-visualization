@@ -499,3 +499,76 @@ describe "PivotChartLayoutBuilder", ->
         [false, false, false, false]
         [true, true, true, true]
       ]
+
+    describe "borders", ->
+      it "sets default borders for all cells", ->
+        design = {
+          table: "t1"
+          columns: [{ id: "c1", valueAxis: @axisEnum }]
+          rows: [{ id: "r1", valueAxis: @axisEnum }]
+          intersections: {
+            "r1:c1": { }
+          }
+        }
+
+        data = {
+          "r1:c1": []
+        }
+
+        layout = @lb.buildLayout(design, data)
+
+        # Check text
+        compare layoutPluck(layout, "borderLeft"), [
+          [null, 2, 1, 1]
+          [2, 2, 1, 1]
+          [2, 2, 1, 1]
+          [2, 2, 1, 1]
+        ]
+
+      it "sets custom borders for all cells", ->
+        design = {
+          table: "t1"
+          columns: [{ id: "c1", valueAxis: @axisEnum, borderBefore: 1, borderWithin: 2, borderAfter: 3 }]
+          rows: [{ id: "r1", valueAxis: @axisEnum, borderBefore: 0, borderWithin: 1, borderAfter: 2 }]
+          intersections: {
+            "r1:c1": { }
+          }
+        }
+
+        data = {
+          "r1:c1": []
+        }
+
+        layout = @lb.buildLayout(design, data)
+
+        # Check left
+        compare layoutPluck(layout, "borderLeft"), [
+          [null, 1, 2, 2]
+          [2, 1, 2, 2]
+          [2, 1, 2, 2]
+          [2, 1, 2, 2]
+        ]
+
+        # Check right
+        compare layoutPluck(layout, "borderRight"), [
+          [null, 2, 2, 3]
+          [2, 2, 2, 3]
+          [2, 2, 2, 3]
+          [2, 2, 2, 3]
+        ]
+
+        # Check top
+        compare layoutPluck(layout, "borderTop"), [
+          [null, 2, 2, 2]
+          [0, 0, 0, 0]
+          [1, 1, 1, 1]
+          [1, 1, 1, 1]
+        ]
+
+        # Check bottom
+        compare layoutPluck(layout, "borderBottom"), [
+          [null, 2, 2, 2]
+          [1, 1, 1, 1]
+          [1, 1, 1, 1]
+          [2, 2, 2, 2]
+        ]
