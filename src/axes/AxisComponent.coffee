@@ -35,6 +35,7 @@ module.exports = class AxisComponent extends AsyncLoadComponent
     reorderable: React.PropTypes.bool # Is the draw order reorderable
     allowExcludedValues: React.PropTypes.bool # True to allow excluding of values via checkboxes
     defaultColor: React.PropTypes.string
+    showFormat: React.PropTypes.bool  # Show format control for numeric values
 
   @defaultProps:
     reorderable: false
@@ -105,6 +106,9 @@ module.exports = class AxisComponent extends AsyncLoadComponent
 
     # Set expression and clear xform
     @props.onChange(@cleanAxis(_.extend({}, _.omit(@props.value, ["drawOrder"]), { expr: expr })))
+
+  handleFormatChange: (ev) =>
+    @props.onChange(_.extend({}, @props.value, { format: ev.target.value }))
 
   handleXformTypeChange: (type) =>
     # Remove
@@ -237,6 +241,24 @@ module.exports = class AxisComponent extends AsyncLoadComponent
         initiallyExpanded: true
       ]
 
+  renderFormat: (axis) ->
+    formats = [
+      { value: ",", label: "Normal: 1,234.567" }
+      { value: "", label: "Plain: 1234.567" }
+      { value: ",.0f", label: "Rounded: 1,234"  }
+      { value: ",.2f", label: "Two decimals: 1,234.56" }
+      { value: "$,.2f", label: "Currency: $1,234.56" }
+      { value: "$,.0f", label: "Currency rounded: $1,234" }
+      { value: ".0%", label: "Percent rounded: 12%" }
+    ]
+
+    H.div className: "form-group",
+      H.label className: "text-muted", 
+        "Format"
+      ": "
+      H.select value: (if axis.format? then axis.format else ","), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
+        _.map(formats, (format) -> H.option(key: format.value, value: format.value, format.label))
+
   render: ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
 
@@ -264,5 +286,8 @@ module.exports = class AxisComponent extends AsyncLoadComponent
           value: if @props.value then @props.value.expr
           aggrStatuses: aggrStatuses
       @renderXform(axis)
+      # Only show format is number type
+      if @props.showFormat and axisBuilder.getAxisType(axis) == "number"
+        @renderFormat(axis)
       @renderColorMap(axis)
       @renderExcludedValues(axis)

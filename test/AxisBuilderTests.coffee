@@ -427,6 +427,10 @@ describe "AxisBuilder", ->
       compare(@ab.formatValue(@axisTextarr, ["a", "b"]), H.div(null, H.div(key: 0, "a"), H.div(key: 1, "b")))
       compare(@ab.formatValue(@axisTextarr, JSON.stringify(["a", "b"])), H.div(null, H.div(key: 0, "a"), H.div(key: 1, "b")))
 
+    it "formats numbers", ->
+      axisNumberFormatted = { expr: @exprNumber, format: ",.2f" }
+      assert.equal @ab.formatValue(axisNumberFormatted, "1234"), "1,234.00"
+
   describe "getValueColor", ->
     it "gets if in color map", ->
       axis = {

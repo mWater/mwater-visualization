@@ -11,6 +11,7 @@ It contains:
  drawOrder: optional array of category values which define the order in which categories should be rendered
  nullLabel: optional string for null category
  excludedValues: Array of post-xform values to exclude when displaying. 
+ format: optional d3-format format for numeric values. Default if null is ","
 
 ## Xforms
 

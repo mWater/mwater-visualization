@@ -43,6 +43,7 @@ module.exports = class IntersectionDesignerComponent extends React.Component
           aggrNeed: "required"
           value: @props.intersection.valueAxis
           onChange: @handleValueAxisChange
+          showFormat: true
 
       H.p className: "help-block",
         "This is the calculated value that is displayed. Leave as blank to make an empty section"
