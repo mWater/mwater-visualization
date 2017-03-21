@@ -39,14 +39,21 @@ module.exports = class PivotChart extends Chart
       if design.columns.length == 0
         design.columns.push({ id: uuid() })
 
-      # Clean all segments
-      for segment in PivotChartUtils.getAllSegments(design.rows)
+      # Cleans a single segment
+      cleanSegment = (segment) =>
         if segment.valueAxis
           segment.valueAxis = axisBuilder.cleanAxis(axis: segment.valueAxis, table: design.table, aggrNeed: "none", types: ["enum", "text", "boolean", "date"])
 
+        # Remove valueLabelBold if no valueAxis
+        if not segment.valueAxis
+          delete segment.valueLabelBold
+
+      # Clean all segments
+      for segment in PivotChartUtils.getAllSegments(design.rows)
+        cleanSegment(segment)
+        
       for segment in PivotChartUtils.getAllSegments(design.columns)
-        if segment.valueAxis
-          segment.valueAxis = axisBuilder.cleanAxis(axis: segment.valueAxis, table: design.table, aggrNeed: "none", types: ["enum", "text", "boolean", "date"])
+        cleanSegment(segment)
 
       # Clean all intersections
       for intersectionId, intersection of design.intersections

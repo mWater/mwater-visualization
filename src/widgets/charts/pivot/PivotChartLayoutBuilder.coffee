@@ -50,7 +50,7 @@ module.exports = class PivotChartLayoutBuilder
             section: column[depth]?.segment.id
             text: column[depth]?.segment.label
             align: "center" 
-            bold: column[depth]?.segment.bold
+            bold: column[depth]?.segment.bold or column[depth]?.segment.valueLabelBold 
             italic: column[depth]?.segment.italic
           })
         layout.rows.push({ cells: cells })
@@ -97,7 +97,7 @@ module.exports = class PivotChartLayoutBuilder
               segment: row[depth]?.segment
               section: row[depth]?.segment.id
               text: row[depth].segment.label 
-              bold: row[depth]?.segment.bold
+              bold: row[depth]?.segment.bold or row[depth]?.segment.valueLabelBold 
               italic: row[depth]?.segment.italic
             })
           else
