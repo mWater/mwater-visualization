@@ -219,8 +219,8 @@ module.exports = class AxisComponent extends AsyncLoadComponent
       ]
 
   renderExcludedValues: (axis) ->
-    # Only if no color map
-    if @props.showColorMap or not axis or not axis.expr
+    # Only if no color map and allows excluded values
+    if @props.showColorMap or not axis or not axis.expr or not @props.allowExcludedValues
       return null
 
     # Use categories
