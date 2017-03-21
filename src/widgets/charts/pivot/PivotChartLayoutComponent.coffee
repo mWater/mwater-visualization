@@ -89,22 +89,22 @@ class LayoutCellComponent extends React.Component
       if @props.onEditSection
         H.li key: "edit",
           H.a onClick: @props.onEditSection, "Edit"
-      if @props.onRemoveSegment and cell.type in ["rowLabel", "rowSegment", "columnLabel", "columnSegment"]
+      if @props.onRemoveSegment and cell.type in ["row", "column"]
         H.li key: "remove",
           H.a onClick: @props.onRemoveSegment, "Remove"
-      if @props.onInsertBeforeSegment and cell.type in ["rowLabel", "rowSegment"]
+      if @props.onInsertBeforeSegment and cell.type == "row"
         H.li key: "before",
           H.a onClick: @props.onInsertBeforeSegment, "Insert Above"
-      if @props.onInsertAfterSegment and cell.type in ["rowLabel", "rowSegment"]
+      if @props.onInsertAfterSegment and cell.type == "row"
         H.li key: "after",
           H.a onClick: @props.onInsertAfterSegment, "Insert Below"
-      if @props.onInsertBeforeSegment and cell.type in ["columnLabel", "columnSegment"]
+      if @props.onInsertBeforeSegment and cell.type == "column"
         H.li key: "before",
           H.a onClick: @props.onInsertBeforeSegment, "Insert Left"
-      if @props.onInsertAfterSegment and cell.type in ["columnLabel", "columnSegment"]
+      if @props.onInsertAfterSegment and cell.type == "column"
         H.li key: "after",
           H.a onClick: @props.onInsertAfterSegment, "Insert Right"
-      if @props.onAddChildSegment and cell.type in ["rowLabel", "rowSegment", "columnLabel", "columnSegment"]
+      if @props.onAddChildSegment and cell.type in ["row", "column"]
         H.li key: "child",
           H.a onClick: @props.onAddChildSegment, "Subdivide"
     ]
@@ -134,13 +134,16 @@ class LayoutCellComponent extends React.Component
   render: ->
     cell = @props.layout.rows[@props.rowIndex].cells[@props.columnIndex]
 
-    if cell.type == "skip"
+    if cell.skip
       return null
 
     isHover = @props.hoverSection and cell.section == @props.hoverSection
 
+    # Determine background color
     backgroundColor = if cell.unconfigured and @props.onEditSection
       "#eff5fb"
+    else if cell.subtype == "filler"
+      "#DDD"
     else
       cell.backgroundColor or "#FFFFFF"
 
@@ -162,12 +165,9 @@ class LayoutCellComponent extends React.Component
 
     # Style that should not affect popup menu
     innerStyle = {
-      fontWeight: if cell.bold then "bold"
+      fontWeight: if cell.bold or cell.subtype == "valueLabel" then "bold"
       fontStyle: if cell.italic then "italic"
-      color: 
-        if cell.type in ['rowSegment', 'columnSegment']
-          # Fade
-          "#666"
+      marginLeft: if cell.indent then cell.indent * 5
     }
 
     H.td 

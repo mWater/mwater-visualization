@@ -43,7 +43,8 @@ module.exports = class PivotChartLayoutBuilder
           cells.push({ type: "blank", text: null })
         for column in columns
           cells.push({ 
-            type: "columnLabel"
+            type: "column"
+            subtype: "valueLabel"
             section: column[depth]?.segment.id
             text: column[depth]?.segment.label
             align: "center" 
@@ -58,7 +59,8 @@ module.exports = class PivotChartLayoutBuilder
         cells.push({ type: "blank", text: null })
       for column in columns
         cells.push({ 
-          type: if column[depth]?.segment?.valueAxis then "columnSegment" else "columnLabel"
+          type: "column"
+          subtype: if column[depth]?.segment?.valueAxis then "value" else "label"
           section: column[depth]?.segment.id
           text: column[depth]?.label
           align: "center"
@@ -87,7 +89,8 @@ module.exports = class PivotChartLayoutBuilder
         for depth in [0...rowsDepth]
           if needsSpecialRowHeader[depth]
             cells.push({ 
-              type: "rowLabel"
+              type: "row"
+              subtype: "valueLabel"
               section: row[depth]?.segment.id
               text: row[depth].segment.label 
               bold: row[depth]?.segment.bold
@@ -95,7 +98,8 @@ module.exports = class PivotChartLayoutBuilder
             })
           else
             cells.push({ 
-              type: "rowLabel"
+              type: "row"
+              subtype: "label"
               section: row[depth]?.segment.id
               text: null 
               # Unconfigured if segment has no label or value
@@ -109,7 +113,7 @@ module.exports = class PivotChartLayoutBuilder
           # Get intersection id
           intersectionId = _.map(row, (r) -> r.segment.id).join(",") + ":" + _.map(column, (c) -> c.segment.id).join(",")
 
-          cells.push({ type: "intersection", section: intersectionId, text: null })
+          cells.push({ type: "intersection", subtype: "filler", section: intersectionId, text: null })
 
         layout.rows.push({ cells: cells })
 
@@ -120,13 +124,16 @@ module.exports = class PivotChartLayoutBuilder
       cells = []
       for depth in [0...rowsDepth]
         cells.push({ 
-          type: if row[depth]?.segment?.valueAxis then "rowSegment" else "rowLabel"
+          type: "row"
+          subtype: if row[depth]?.segment?.valueAxis then "value" else "label"
           section: row[depth]?.segment.id
           text: row[depth]?.label 
           # Unconfigured if segment has no label or value
           unconfigured: row[depth]?.segment and not row[depth]?.segment.label? and not row[depth]?.segment.valueAxis
           bold: row[depth]?.segment.bold
           italic: row[depth]?.segment.italic
+          # Indent if has value and label
+          indent: if row[depth]?.segment?.valueAxis and row[depth]?.segment?.label then 1
         })
 
       # Emit contents
@@ -154,8 +161,8 @@ module.exports = class PivotChartLayoutBuilder
           continue
 
         # If matches, span columns
-        if cell.type in ['columnLabel', 'columnSegment'] and cell.text == refCell.text and cell.type == refCell.type and cell.section == refCell.section
-          cell.type = "skip"
+        if cell.type == 'column' and cell.text == refCell.text and cell.type == refCell.type and cell.section == refCell.section
+          cell.skip = true
           refCell.columnSpan = (refCell.columnSpan or 1) + 1
           refCell.sectionRight = true
         else
@@ -172,8 +179,8 @@ module.exports = class PivotChartLayoutBuilder
           continue
 
         # If matches, span rows
-        if cell.type in ['rowLabel', 'rowSegment'] and cell.text == refCell.text and cell.type == refCell.type and cell.section == refCell.section
-          cell.type = "skip"
+        if cell.type == 'row' and cell.text == refCell.text and cell.type == refCell.type and cell.section == refCell.section
+          cell.skip = true
           refCell.rowSpan = (refCell.rowSpan or 1) + 1
           refCell.sectionBottom = true
         else
@@ -189,7 +196,7 @@ module.exports = class PivotChartLayoutBuilder
 
     # Lookup intersection 
     intersection = design.intersections[intersectionId]
-    if not intersection
+    if not intersection # Should not happen
       return { type: "blank", text: null }
     
     # Lookup data
@@ -217,6 +224,7 @@ module.exports = class PivotChartLayoutBuilder
 
     cell = { 
       type: "intersection"
+      subtype: "value"
       section: intersectionId
       text: text
       align: "right" 
