@@ -30,6 +30,10 @@ module.exports = class IntersectionDesignerComponent extends React.Component
   handleBackgroundColorOpacityChange: (newValue) =>
     @update(backgroundColorOpacity: newValue / 100)
 
+  handleNullLabelChange: (ev) =>
+    valueAxis = _.extend({}, @props.intersection.valueAxis, { nullLabel: ev.target.value or null })
+    @update({ valueAxis: valueAxis })
+
   renderValueAxis: ->
     return H.div className: "form-group",
       H.label className: "text-muted", 
@@ -47,6 +51,13 @@ module.exports = class IntersectionDesignerComponent extends React.Component
 
       H.p className: "help-block",
         "This is the calculated value that is displayed. Leave as blank to make an empty section"
+
+  renderNullValue: ->
+    if not @props.intersection.valueAxis
+      return null
+
+    R FormGroup, label: "Show Empty Cells as",
+      H.input type: "text", className: "form-control", value: @props.intersection.valueAxis.nullLabel or "", onChange: @handleNullLabelChange, placeholder: "Blank"
 
   renderStyling: ->
     H.div className: 'form-group', style: { paddingTop: 10 }, key: "styling",
@@ -98,7 +109,17 @@ module.exports = class IntersectionDesignerComponent extends React.Component
   render: ->
     H.div null,
       @renderValueAxis()
+      @renderNullValue()
       @renderStyling()
       @renderBackgroundColorAxis()
       @renderBackgroundColorOpacityControl()
 
+FormGroup = (props) ->
+  H.div className: "form-group",
+    H.label className: "text-muted", 
+      props.label
+    H.div style: { marginLeft: 5 }, 
+      props.children
+    if props.help
+      H.p className: "help-block", style: { marginLeft: 5 },
+        props.help

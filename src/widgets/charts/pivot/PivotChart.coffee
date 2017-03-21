@@ -65,8 +65,8 @@ module.exports = class PivotChart extends Chart
         for columnPath in PivotChartUtils.getSegmentPaths(design.columns)
           intersectionId = "#{_.pluck(rowPath, "id").join(",")}:#{_.pluck(columnPath, "id").join(",")}"
 
-          # Default to count
-          intersections[intersectionId] = design.intersections[intersectionId] or { valueAxis: { expr: { type: "op", op: "count", table: design.table, exprs: [] } } }
+          # Default to blank
+          intersections[intersectionId] = design.intersections[intersectionId] or { }
 
       design.intersections = intersections
 

@@ -24,7 +24,7 @@ describe "PivotChart", ->
     @axisText = { expr: @exprText } 
 
   describe "cleanDesign", ->
-    it "adds missing intersections as counts", ->
+    it "adds missing intersections as blank", ->
       design = {
         table: "t1"
         rows: [{ id: "row1"}]
@@ -33,7 +33,7 @@ describe "PivotChart", ->
 
       design = @pc.cleanDesign(design, @schema)
       compare design.intersections, {
-        "row1:col1": { valueAxis: @axisCount }
+        "row1:col1": { }
       }
 
     it "removes extra intersections", ->
