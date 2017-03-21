@@ -269,7 +269,7 @@ describe "PivotChartLayoutBuilder", ->
       compare layoutPluck(layout, "skip"), [
         [null, null, true, true]
         [null, null, null, null]
-        [null, null, null, null]
+        [null, null, true, true]
         [null, null, null, null]
         [null, null, null, null]
       ]
@@ -278,7 +278,7 @@ describe "PivotChartLayoutBuilder", ->
       compare layoutPluck(layout, "columnSpan"), [
         [undefined, 3, undefined, undefined]
         [undefined, undefined, undefined, undefined]
-        [undefined, undefined, undefined, undefined]
+        [undefined, 3, undefined, undefined]
         [undefined, undefined, undefined, undefined]
         [undefined, undefined, undefined, undefined]
       ]
@@ -407,7 +407,7 @@ describe "PivotChartLayoutBuilder", ->
       compare layoutPluck(layout, "sectionRight"), [
         [false, true, false, true]
         [false, false, false, true]
-        [true, false, false, true]
+        [true, true, false, true]
         [true, false, false, true]
         [true, false, false, true]
       ], JSON.stringify(layoutPluck(layout, "section"))

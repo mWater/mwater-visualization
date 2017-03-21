@@ -609,7 +609,8 @@ module.exports = class AxisBuilder
         return value
       when "number"
         num = parseFloat(value)
-        return d3Format.format(",")(num)
+        format = d3Format.format(if axis.format? then axis.format else ",")
+        return format(num)
       when "text[]"
         # Parse if string
         if _.isString(value)
