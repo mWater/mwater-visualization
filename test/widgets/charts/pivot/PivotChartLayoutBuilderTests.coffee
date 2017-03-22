@@ -572,3 +572,48 @@ describe "PivotChartLayoutBuilder", ->
           [1, 1, 1, 1]
           [2, 2, 2, 2]
         ]
+
+      it "handles nested rows", ->
+        design = {
+          table: "t1"
+          columns: [{ id: "c1" }]
+          rows: [
+            { 
+              id: "r1"
+              valueAxis: @axisEnum 
+              children: [
+                { 
+                  id: "r2"
+                  valueAxis: @axisText
+                }
+              ]
+            }
+          ]
+          intersections: {
+            "r1,r2:c1": { valueAxis: @axisNumberSum }
+          }
+        }
+
+        data = {
+          "r1,r2:c1": [
+            # Two distinct r2 values
+            { r0: "a", r1: "x", value: 2 }
+            { r0: "a", r1: "y", value: 4 }
+            { r0: "b", r1: "x", value: 2 }
+            { r0: "b", r1: "y", value: 4 }
+          ]
+        }
+
+        layout = @lb.buildLayout(design, data)
+
+        console.log layout
+
+        # Check text
+        compare layoutPluck(layout, "borderTop"), [
+          [null, null, 2]
+          [2, 2, 2]
+          [1, 2, 2]
+          [2, 2, 2]
+          [1, 2, 2]
+          [2, 2, 2]
+        ]

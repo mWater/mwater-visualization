@@ -67,6 +67,10 @@ module.exports = class ChartViewComponent extends React.Component
     # Get data from widget data source
     props.widgetDataSource.getData(props.design, props.filters, callback)
 
+  renderSpinner: ->
+    H.div style: { position: "absolute", bottom: "50%", left: 0, right: 0, textAlign: "center", fontSize: 20 },
+      H.i className: "fa fa-spinner fa-spin"
+
   render: ->
     style = { width: @props.width, height: @props.height }
 
@@ -103,3 +107,5 @@ module.exports = class ChartViewComponent extends React.Component
           standardWidth: @props.standardWidth
           onRowClick: @props.onRowClick
           })
+      if @state.dataLoading
+        @renderSpinner()
