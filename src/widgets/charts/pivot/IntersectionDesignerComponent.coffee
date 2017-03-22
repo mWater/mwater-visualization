@@ -3,6 +3,9 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
+ui = require 'react-library/lib/bootstrap'
+update = require 'react-library/lib/update'
+
 Rcslider = require 'rc-slider'
 AxisComponent = require '../../../axes/AxisComponent'
 ColorComponent = require '../../../ColorComponent'
@@ -17,11 +20,7 @@ module.exports = class IntersectionDesignerComponent extends React.Component
     onChange: React.PropTypes.func.isRequired
 
   # Updates intersection with the specified changes
-  update: (changes) ->
-    intersection = _.extend({}, @props.intersection, changes)
-    @props.onChange(intersection)
-
-  handleValueAxisChange: (valueAxis) => @update(valueAxis: valueAxis)
+  update: => update(@props.intersection, @props.onChange, arguments)
 
   handleBackgroundColorAxisChange: (backgroundColorAxis) => 
     opacity = @props.intersection.backgroundColorOpacity or 0.3
@@ -34,15 +33,10 @@ module.exports = class IntersectionDesignerComponent extends React.Component
   handleBackgroundColorOpacityChange: (newValue) =>
     @update(backgroundColorOpacity: newValue / 100)
 
-  handleNullLabelChange: (ev) =>
-    valueAxis = _.extend({}, @props.intersection.valueAxis, { nullLabel: ev.target.value or null })
-    @update({ valueAxis: valueAxis })
-
   renderValueAxis: ->
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        "Calculation"
-      H.div style: { marginLeft: 8 }, 
+    R ui.FormGroup, 
+      label: "Calculation"
+      help: "This is the calculated value that is displayed. Leave as blank to make an empty section",
         R AxisComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
@@ -50,33 +44,21 @@ module.exports = class IntersectionDesignerComponent extends React.Component
           types: ["enum", "text", "boolean", "date", "number"]
           aggrNeed: "required"
           value: @props.intersection.valueAxis
-          onChange: @handleValueAxisChange
+          onChange: @update("valueAxis")
           showFormat: true
 
-      H.p className: "help-block",
-        "This is the calculated value that is displayed. Leave as blank to make an empty section"
-
   renderNullValue: ->
-    if not @props.intersection.valueAxis
-      return null
-
-    R FormGroup, label: "Show Empty Cells as",
-      H.input type: "text", className: "form-control", value: @props.intersection.valueAxis.nullLabel or "", onChange: @handleNullLabelChange, placeholder: "Blank"
+    if @props.intersection.valueAxis
+      R ui.FormGroup, label: "Show Empty Cells as",
+        R ui.TextInput, value: @props.intersection.valueAxis.nullLabel, emptyNull: true, onChange: @update("valueAxis.nullLabel"), placeholder: "Blank"
 
   renderStyling: ->
-    H.div className: 'form-group', style: { paddingTop: 10 }, key: "styling",
-      H.label className: 'text-muted',
-        "Styling"
-      H.div null,
-        H.label className: "checkbox-inline", key: "bold",
-          H.input type: "checkbox", checked: @props.intersection.bold == true, onChange: (ev) => @update({ bold: ev.target.checked })
-          "Bold"
-        H.label className: "checkbox-inline", key: "italic",
-          H.input type: "checkbox", checked: @props.intersection.italic == true, onChange: (ev) => @update({ italic: ev.target.checked })
-          "Italic"
+    R ui.FormGroup, key: "styling", label: "Styling",
+      R ui.Checkbox, key: "bold", inline: true, value: @props.intersection.bold, onChange: @update("bold"), "Bold"
+      R ui.Checkbox, key: "italic", inline: true, value: @props.intersection.italic, onChange: @update("italic"), "Italic"
 
   renderBackgroundColorAxis: ->
-    return R FormGroup, 
+    return R ui.FormGroup, 
       label: "Background Color From Values"
       help: "This is an optional background color to set on cells that is controlled by the data",
         R AxisComponent, 
@@ -93,7 +75,7 @@ module.exports = class IntersectionDesignerComponent extends React.Component
     if @props.intersection.backgroundColorAxis
       return
       
-    return R FormGroup, 
+    return R ui.FormGroup, 
       label: "Background Color"
       help: "This is an optional background color to set on all cells",
         R ColorComponent,
@@ -104,11 +86,8 @@ module.exports = class IntersectionDesignerComponent extends React.Component
     if not @props.intersection.backgroundColorAxis and not @props.intersection.backgroundColor
       return
 
-    H.div className: 'form-group', style: { paddingTop: 10 },
-      H.label className: 'text-muted',
-        H.span null,
-          "Background Opacity: #{Math.round(@props.intersection.backgroundColorOpacity * 100) }%"
-      H.div style: {padding: '10px'},
+    R ui.FormGroup, 
+      label: "Background Opacity: #{Math.round(@props.intersection.backgroundColorOpacity * 100) }%",
         R Rcslider,
           min: 0
           max: 100
@@ -125,13 +104,3 @@ module.exports = class IntersectionDesignerComponent extends React.Component
       @renderBackgroundColorAxis()
       @renderBackgroundColor()
       @renderBackgroundColorOpacityControl()
-
-FormGroup = (props) ->
-  H.div className: "form-group",
-    H.label className: "text-muted", 
-      props.label
-    H.div style: { marginLeft: 5 }, 
-      props.children
-    if props.help
-      H.p className: "help-block", style: { marginLeft: 5 },
-        props.help
