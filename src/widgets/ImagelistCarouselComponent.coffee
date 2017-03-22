@@ -33,17 +33,18 @@ module.exports = class ImagelistCarouselComponent extends React.Component
     H.div className: "item #{if i == @state.activeImage then "active" else ""}", style: {height: @props.height},
       R RotationAwareImageComponent, imageManager: imageManager, image: img
 
-  renderImages: ->
-    imageManager = {
-      getImageThumbnailUrl: (id, success, error) => success(@props.widgetDataSource.getImageUrl(id, 100))
-      getImageUrl: (id, success, error) => success(@props.widgetDataSource.getImageUrl(id, 640))
-    }
+  renderImages: (imageManager) ->
     for imageObj, i in @props.imagelist
       @renderImage(imageObj, i, imageManager)
 
   render: ->
+    imageManager = {
+      getImageThumbnailUrl: (id, success, error) => success(@props.widgetDataSource.getImageUrl(id, 100))
+      getImageUrl: (id, success, error) => success(@props.widgetDataSource.getImageUrl(id, 640))
+    }
+
     if @props.imagelist.length == 1
-      return @renderImage(@props.imagelist[0], 0)
+      return @renderImage(@props.imagelist[0], 0, imageManager)
 
     if @props.imagelist.length == 0
       return null
@@ -56,7 +57,7 @@ module.exports = class ImagelistCarouselComponent extends React.Component
 
       # Wrapper for slides
       H.div className: "carousel-inner",
-        @renderImages()
+        @renderImages(imageManager)
 
       H.a className: "left carousel-control",
         H.span className: "glyphicon glyphicon-chevron-left", onClick: @handleLeft
