@@ -581,6 +581,9 @@ describe "PivotChartLayoutBuilder", ->
             { 
               id: "r1"
               valueAxis: @axisEnum 
+              borderBefore: 3
+              borderWithin: 2
+              borderAfter: 3
               children: [
                 { 
                   id: "r2"
@@ -597,10 +600,10 @@ describe "PivotChartLayoutBuilder", ->
         data = {
           "r1,r2:c1": [
             # Two distinct r2 values
-            { r0: "a", r1: "x", value: 2 }
-            { r0: "a", r1: "y", value: 4 }
-            { r0: "b", r1: "x", value: 2 }
-            { r0: "b", r1: "y", value: 4 }
+            { r0: "a", r1: "x", c0: null, value: 2 }
+            { r0: "a", r1: "y", c0: null, value: 4 }
+            { r0: "b", r1: "x", c0: null, value: 2 }
+            { r0: "b", r1: "y", c0: null, value: 4 }
           ]
         }
 
@@ -609,11 +612,29 @@ describe "PivotChartLayoutBuilder", ->
         console.log layout
 
         # Check text
+        compare layoutPluck(layout, "text"), [
+          [null, null, null]
+          ["A", "x", "2"]
+          ["A", "y", "4"]
+          ["B", "x", "2"]
+          ["B", "y", "4"]
+          ["None", null, null]
+        ]
+
         compare layoutPluck(layout, "borderTop"), [
           [null, null, 2]
+          [3, 3, 3]
+          [0, 1, 1]
           [2, 2, 2]
-          [1, 2, 2]
+          [0, 1, 1]
           [2, 2, 2]
-          [1, 2, 2]
+        ]
+
+        compare layoutPluck(layout, "borderBottom"), [
+          [null, null, 2]
+          [2, 1, 1]
           [2, 2, 2]
+          [2, 1, 1]
+          [2, 2, 2]
+          [3, 3, 3]
         ]
