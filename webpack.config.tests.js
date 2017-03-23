@@ -1,5 +1,5 @@
 module.exports = {
-  entry: './test/index.js',
+  entry: ['webpack-dev-server/client?http://localhost:8081', './test/index.js'],
   devtool: "source-map",
   output: {
     path: __dirname,
