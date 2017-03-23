@@ -72,7 +72,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
         R(ExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
-          onChange: updt(@props.onDesignChange, @props.design, "adminRegionExpr")
+          onChange: (expr) => @update(adminRegionExpr: expr)
           table: @props.design.table
           types: ["id"]
           idTable: "admin_regions"
