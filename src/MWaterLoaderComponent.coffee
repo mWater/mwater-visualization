@@ -10,6 +10,7 @@ MWaterAddRelatedFormComponent = require './MWaterAddRelatedFormComponent'
 querystring = require 'querystring'
 AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
 LoadingComponent = require 'react-library/lib/LoadingComponent'
+mWaterLoader = require './mWaterLoader'
 
 # Loads an mWater schema from the server and creates child with schema and dataSource
 # Also creates a tableSelectElementFactory context to allow selecting of a table in an mWater-friendly way
@@ -45,30 +46,19 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
 
   # Call callback with state changes
   load: (props, prevProps, callback) -> 
-    # Load schema
-    query = {}
-    if props.client
-      query.client = props.client
-    if props.share
-      query.share = props.share
-    if props.asUser
-      query.asUser = props.asUser
-    if props.extraTables and props.extraTables.length > 0
-      query.extraTables = props.extraTables.join(',')
-
-    url = props.apiUrl + "jsonql/schema?" + querystring.stringify(query)
-
-    $.getJSON url, (schemaJson) =>
-      schema = new Schema(schemaJson)
-      dataSource = new MWaterDataSource(props.apiUrl, props.client, { serverCaching: false, localCaching: true })
-
-      callback({
-        schema: schema
-        dataSource: dataSource
-        })
-    .fail (xhr) =>
-      console.log xhr.responseText
-      callback(error: "Cannot load one of the forms that this depends on. Perhaps the administrator has not shared the form with you?")
+    # Load schema and data source
+    mWaterLoader({
+      apiUrl: props.apiUrl
+      client: props.client
+      share: props.share
+      asUser: props.asUser
+      extraTables: props.extraTables
+      }, (error, config) =>
+        if error
+          console.log error.message
+          return callback(error: "Cannot load one of the forms that this depends on. Perhaps the administrator has not shared the form with you?")
+        callback({ schema: config.schema, dataSource: config.dataSource })
+    )
 
   @childContextTypes: 
     tableSelectElementFactory: React.PropTypes.func
