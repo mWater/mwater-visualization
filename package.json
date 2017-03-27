@@ -1,6 +1,6 @@
 {
   "name": "mwater-visualization",
-  "version": "4.1.1",
+  "version": "4.2.0",
   "description": "Visualization library",
   "repository": "git@github.com:mWater/mwater-visualization.git",
   "main": "lib/index.js",
