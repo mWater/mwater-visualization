@@ -19,6 +19,7 @@ exports.VerticalLayoutComponent = require './VerticalLayoutComponent'
 exports.RadioButtonComponent = require './RadioButtonComponent'
 exports.CheckboxComponent = require './CheckboxComponent'
 
+exports.mWaterLoader = require './mWaterLoader'
 exports.MWaterLoaderComponent = require './MWaterLoaderComponent'
 
 exports.LayeredChart = require './widgets/charts/layered/LayeredChart'
