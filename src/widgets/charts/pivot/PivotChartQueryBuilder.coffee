@@ -50,6 +50,9 @@ module.exports = class PivotChartQueryBuilder
           groupBy: []
         }
 
+        # Filters to add (not yet compiled)
+        filters = []
+
         # Add segments
         for rowSegment, i in rowPath
           query.selects.push({
@@ -58,6 +61,8 @@ module.exports = class PivotChartQueryBuilder
             alias: "r#{i}"
           })
           query.groupBy.push(i + 1)
+          if rowSegment.filter
+            filters.push(rowSegment.filter)
 
         for columnSegment, i in columnPath
           query.selects.push({
@@ -66,6 +71,8 @@ module.exports = class PivotChartQueryBuilder
             alias: "c#{i}"
           })
           query.groupBy.push(i + 1 + rowPath.length)
+          if columnSegment.filter
+            filters.push(columnSegment.filter)
 
         # Add value
         query.selects.push({
@@ -73,6 +80,8 @@ module.exports = class PivotChartQueryBuilder
           expr: @axisBuilder.compileAxis(axis: intersection?.valueAxis, tableAlias: "main")
           alias: "value"
         })
+        if intersection?.filter
+          filters.push(intersection.filter)
 
         # Add background color
         if intersection?.backgroundColorAxis
@@ -86,6 +95,9 @@ module.exports = class PivotChartQueryBuilder
         whereClauses = []
         if design.filter
           whereClauses.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "main"))
+
+        # Add other filters
+        whereClauses = whereClauses.concat(_.map(filters, (filter) -> exprCompiler.compileExpr(expr: filter, tableAlias: "main")))
 
         # Add filters
         if extraFilters and extraFilters.length > 0

@@ -212,7 +212,7 @@ class ChartWidgetComponent extends React.Component
     if validDesign
       dropdownItems.push({ label: "Export Data", icon: "save-file", onClick: @handleSaveCsvFile })
     if @props.onDesignChange?      
-      dropdownItems.unshift({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
+      dropdownItems.unshift({ label: @props.chart.getEditLabel(), icon: "pencil", onClick: @handleStartEditing })
 
     # Wrap in a simple widget
     return H.div onDoubleClick: (if @props.onDesignChange? then @handleStartEditing), style: { position: "relative", width: @props.width },

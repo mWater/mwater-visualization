@@ -40,6 +40,8 @@ segment:
   children: array of child segments if any. Optional
   fillerColor: color of filler for intersections that are filler type
 
+  filter: optional logical expression to filter by (filters all intersections related to it)
+
   bold: true if bold (values and label)
   italic: true if italic
   valueLabelBold: true if label alone is bold (only when has valueAxis and label)
@@ -50,9 +52,13 @@ segment:
 
 intersection:
   valueAxis: axis that determines value to display in cells. Must be aggregate
+
+  filter: optional logical expression to filter by
+
   backgroundColorAxis: color axis for background of cells
   backgroundColorOpacity: fractional background opacity
   backgroundColor: color of background if no color axis
+
   bold: true if bold
   italic: true if italic
 

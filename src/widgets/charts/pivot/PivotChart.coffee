@@ -62,7 +62,7 @@ module.exports = class PivotChart extends Chart
           intersection.backgroundColorAxis = axisBuilder.cleanAxis(axis: intersection.backgroundColorAxis, table: design.table, aggrNeed: "required", types: ["enum", "text", "boolean", "date"])
           
           if not intersection.backgroundColorOpacity?
-            intersection.backgroundColorOpacity = 0.3
+            intersection.backgroundColorOpacity = 1
 
       # Add missing intersections
       intersections = {}
@@ -120,6 +120,9 @@ module.exports = class PivotChart extends Chart
 
   # True if designer should have a preview pane to the left
   hasDesignerPreview: -> false
+
+  # Label for the edit gear dropdown
+  getEditLabel: -> "Configure Table" 
 
   # Creates a design element with specified options
   # options include:

@@ -22,7 +22,7 @@ module.exports = class SegmentDesignerComponent extends React.Component
     @state = {
       # Mode switcher to make UI clearer
       mode: if not props.segment.label and not props.segment.valueAxis
-          "multiple" # New row/column
+          null
         else if props.segment.valueAxis
           "multiple"
         else 
@@ -124,11 +124,14 @@ module.exports = class SegmentDesignerComponent extends React.Component
   render: ->
     H.div null,
       @renderMode()
-      @renderLabel()
+      if @state.mode
+        @renderLabel()
       if @state.mode == "multiple"
         @renderValueAxis()
-      @renderStyling()
-      @renderBorders()
+      if @state.mode
+        @renderStyling()
+      if @state.mode
+        @renderBorders()
 
 # Allows setting border heaviness
 class BorderComponent extends React.Component

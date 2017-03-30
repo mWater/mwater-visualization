@@ -3,9 +3,9 @@ H = React.DOM
 R = React.createElement
 uuid = require 'uuid'
 
+ui = require 'react-library/lib/bootstrap'
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 TableSelectComponent = require '../../../TableSelectComponent'
-
 AxisComponent = require '../../../axes/AxisComponent'
 
 module.exports = class PivotChartDesignerComponent extends React.Component
@@ -79,7 +79,12 @@ module.exports = class PivotChartDesignerComponent extends React.Component
           value: @props.design.filter)
 
   renderStriping: ->
-    R FormGroup, 
+    # If no table, hide
+    if not @props.design.table
+      return null
+
+    R ui.FormGroup, 
+      mutedLabel: true
       label: "Striping",
         H.label key: "none", className: "radio-inline",
           H.input type: "radio", checked: not @props.design.striping, onClick: => @updateDesign(striping: null)
@@ -98,7 +103,8 @@ module.exports = class PivotChartDesignerComponent extends React.Component
     intersectionId = "#{@props.design.rows[0].id}:#{@props.design.columns[0].id}"
 
     H.div null,
-      R FormGroup,
+      R ui.FormGroup,
+        mutedLabel: true
         label: "Columns"
         help: "Field to optionally make columns out of",
           H.div style: { marginLeft: 8 }, 
@@ -111,7 +117,8 @@ module.exports = class PivotChartDesignerComponent extends React.Component
               value: @props.design.columns[0].valueAxis
               onChange: (axis) => @updateDesign(columns: [_.extend({}, @props.design.columns[0], valueAxis: axis)])
 
-      R FormGroup,
+      R ui.FormGroup,
+        mutedLabel: true
         label: "Rows"
         help: "Field to optionally make rows out of",
           H.div style: { marginLeft: 8 }, 
@@ -124,7 +131,8 @@ module.exports = class PivotChartDesignerComponent extends React.Component
               value: @props.design.rows[0].valueAxis
               onChange: (axis) => @updateDesign(rows: [_.extend({}, @props.design.rows[0], valueAxis: axis)])
 
-      R FormGroup,
+      R ui.FormGroup,
+        mutedLabel: true
         label: "Value"
         help: "Field show in cells",
           H.div style: { marginLeft: 8 }, 
@@ -156,13 +164,3 @@ module.exports = class PivotChartDesignerComponent extends React.Component
       #     '''
       #     For advanced options, click on the pencil menu that appears when you hover over a section. 
       #     '''
-
-FormGroup = (props) ->
-  H.div className: "form-group",
-    H.label className: "text-muted", 
-      props.label
-    H.div style: { marginLeft: 5 }, 
-      props.children
-    if props.help
-      H.p className: "help-block", style: { marginLeft: 5 },
-        props.help

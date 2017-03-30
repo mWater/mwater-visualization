@@ -18,6 +18,9 @@ module.exports = class Chart
   # True if designer should have a preview pane to the left
   hasDesignerPreview: -> true
 
+  # Label for the edit gear dropdown
+  getEditLabel: -> "Edit" 
+
   # Creates a design element with specified options
   # options include:
   #   schema: schema to use

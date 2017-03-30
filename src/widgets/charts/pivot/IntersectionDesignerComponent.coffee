@@ -23,11 +23,11 @@ module.exports = class IntersectionDesignerComponent extends React.Component
   update: => update(@props.intersection, @props.onChange, arguments)
 
   handleBackgroundColorAxisChange: (backgroundColorAxis) => 
-    opacity = @props.intersection.backgroundColorOpacity or 0.3
+    opacity = @props.intersection.backgroundColorOpacity or 1
     @update(backgroundColorAxis: backgroundColorAxis, backgroundColorOpacity: opacity)
 
   handleBackgroundColorChange: (backgroundColor) => 
-    opacity = @props.intersection.backgroundColorOpacity or 0.3
+    opacity = @props.intersection.backgroundColorOpacity or 1
     @update(backgroundColor: backgroundColor, backgroundColorOpacity: opacity)
 
   handleBackgroundColorOpacityChange: (newValue) =>
