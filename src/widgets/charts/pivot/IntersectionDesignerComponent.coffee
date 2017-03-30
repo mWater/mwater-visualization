@@ -9,6 +9,7 @@ update = require 'react-library/lib/update'
 Rcslider = require 'rc-slider'
 AxisComponent = require '../../../axes/AxisComponent'
 ColorComponent = require '../../../ColorComponent'
+FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 
 # Design an intersection of a pivot table
 module.exports = class IntersectionDesignerComponent extends React.Component
@@ -33,8 +34,11 @@ module.exports = class IntersectionDesignerComponent extends React.Component
   handleBackgroundColorOpacityChange: (newValue) =>
     @update(backgroundColorOpacity: newValue / 100)
 
+  handleFilterChange: (filter) => @update(filter: filter)
+
   renderValueAxis: ->
     R ui.FormGroup, 
+      labelMuted: true
       label: "Calculation"
       help: "This is the calculated value that is displayed. Leave as blank to make an empty section",
         R AxisComponent, 
@@ -49,16 +53,33 @@ module.exports = class IntersectionDesignerComponent extends React.Component
 
   renderNullValue: ->
     if @props.intersection.valueAxis
-      R ui.FormGroup, label: "Show Empty Cells as",
-        R ui.TextInput, value: @props.intersection.valueAxis.nullLabel, emptyNull: true, onChange: @update("valueAxis.nullLabel"), placeholder: "Blank"
+      R ui.FormGroup, 
+        labelMuted: true
+        label: "Show Empty Cells as",
+          R ui.TextInput, value: @props.intersection.valueAxis.nullLabel, emptyNull: true, onChange: @update("valueAxis.nullLabel"), placeholder: "Blank"
+
+  renderFilter: ->
+    R ui.FormGroup, 
+      labelMuted: true
+      label: [R(ui.Icon, id: "glyphicon-filter"), " Filters"],
+        R FilterExprComponent, 
+          schema: @props.schema
+          dataSource: @props.dataSource
+          onChange: @handleFilterChange
+          table: @props.table
+          value: @props.intersection.filter
 
   renderStyling: ->
-    R ui.FormGroup, key: "styling", label: "Styling",
-      R ui.Checkbox, key: "bold", inline: true, value: @props.intersection.bold, onChange: @update("bold"), "Bold"
-      R ui.Checkbox, key: "italic", inline: true, value: @props.intersection.italic, onChange: @update("italic"), "Italic"
+    R ui.FormGroup, 
+      labelMuted: true
+      key: "styling"
+      label: "Styling",
+        R ui.Checkbox, key: "bold", inline: true, value: @props.intersection.bold, onChange: @update("bold"), "Bold"
+        R ui.Checkbox, key: "italic", inline: true, value: @props.intersection.italic, onChange: @update("italic"), "Italic"
 
   renderBackgroundColorAxis: ->
     return R ui.FormGroup, 
+      labelMuted: true
       label: "Background Color From Values"
       help: "This is an optional background color to set on cells that is controlled by the data",
         R AxisComponent, 
@@ -76,6 +97,7 @@ module.exports = class IntersectionDesignerComponent extends React.Component
       return
       
     return R ui.FormGroup, 
+      labelMuted: true
       label: "Background Color"
       help: "This is an optional background color to set on all cells",
         R ColorComponent,
@@ -87,6 +109,7 @@ module.exports = class IntersectionDesignerComponent extends React.Component
       return
 
     R ui.FormGroup, 
+      labelMuted: true
       label: "Background Opacity: #{Math.round(@props.intersection.backgroundColorOpacity * 100) }%",
         R Rcslider,
           min: 0
@@ -100,6 +123,7 @@ module.exports = class IntersectionDesignerComponent extends React.Component
     H.div null,
       @renderValueAxis()
       @renderNullValue()
+      @renderFilter()
       @renderStyling()
       @renderBackgroundColorAxis()
       @renderBackgroundColor()

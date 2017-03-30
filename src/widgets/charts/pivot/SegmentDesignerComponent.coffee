@@ -3,8 +3,10 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
+ui = require 'react-library/lib/bootstrap'
 AxisComponent = require '../../../axes/AxisComponent'
 ColorComponent = require '../../../ColorComponent'
+FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 
 # Design a single segment of a pivot table
 module.exports = class SegmentDesignerComponent extends React.Component
@@ -49,8 +51,12 @@ module.exports = class SegmentDesignerComponent extends React.Component
   handleLabelChange: (ev) =>
     @update(label: ev.target.value)
 
+  handleFilterChange: (filter) =>
+    @update(filter: filter)
+
   renderMode: ->
-    R FormGroup, 
+    R ui.FormGroup, 
+      labelMuted: true
       label: "Type",
         H.div key: "single", className: "radio",
           H.label null,
@@ -65,7 +71,8 @@ module.exports = class SegmentDesignerComponent extends React.Component
             H.span className: "text-muted", " - disaggregate data by a field"
 
   renderLabel: ->
-    R FormGroup, 
+    R ui.FormGroup, 
+      labelMuted: true
       label: "Label"
       help: (if @state.mode == "multiple" then "Optional label for the #{@props.segmentType}s"),
         H.input 
@@ -76,7 +83,8 @@ module.exports = class SegmentDesignerComponent extends React.Component
           onChange: @handleLabelChange
 
   renderValueAxis: ->
-    R FormGroup, 
+    R ui.FormGroup, 
+      labelMuted: true
       label: "Field"
       help: "Field to disaggregate data by",
         H.div style: { marginLeft: 8 }, 
@@ -90,8 +98,21 @@ module.exports = class SegmentDesignerComponent extends React.Component
             onChange: @handleValueAxisChange
             allowExcludedValues: true
 
+  renderFilter: ->
+    R ui.FormGroup, 
+      labelMuted: true
+      label: [R(ui.Icon, id: "glyphicon-filter"), " Filters"]
+      hint: "Filters all data associated with this #{@props.segmentType}",
+        R FilterExprComponent, 
+          schema: @props.schema
+          dataSource: @props.dataSource
+          onChange: @handleFilterChange
+          table: @props.table
+          value: @props.segment.filter
+
   renderStyling: ->
-    R FormGroup, 
+    R ui.FormGroup, 
+      labelMuted: true
       label: "Styling",
         H.label className: "checkbox-inline", key: "bold",
           H.input type: "checkbox", checked: @props.segment.bold == true, onChange: (ev) => @update({ bold: ev.target.checked })
@@ -109,7 +130,8 @@ module.exports = class SegmentDesignerComponent extends React.Component
             R ColorComponent, color: @props.segment.fillerColor, onChange: (color) => @update({ fillerColor: color })
 
   renderBorders: ->
-    R FormGroup, 
+    R ui.FormGroup, 
+      labelMuted: true
       label: "Borders",
         H.div key: "before",
           if @props.segmentType == "row" then "Top: " else "Left: "
@@ -128,6 +150,8 @@ module.exports = class SegmentDesignerComponent extends React.Component
         @renderLabel()
       if @state.mode == "multiple"
         @renderValueAxis()
+      if @state.mode
+        @renderFilter()
       if @state.mode
         @renderStyling()
       if @state.mode
@@ -156,13 +180,3 @@ class BorderComponent extends React.Component
       H.label className: "radio-inline",
         H.input type: "radio", checked: value == 3, onClick: => @props.onChange(3)
         "Heavy"
-
-FormGroup = (props) ->
-  H.div className: "form-group",
-    H.label className: "text-muted", 
-      props.label
-    H.div style: { marginLeft: 5 }, 
-      props.children
-    if props.help
-      H.p className: "help-block", style: { marginLeft: 5 },
-        props.help

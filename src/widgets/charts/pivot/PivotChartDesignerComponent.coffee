@@ -84,7 +84,7 @@ module.exports = class PivotChartDesignerComponent extends React.Component
       return null
 
     R ui.FormGroup, 
-      mutedLabel: true
+      labelMuted: true
       label: "Striping",
         H.label key: "none", className: "radio-inline",
           H.input type: "radio", checked: not @props.design.striping, onClick: => @updateDesign(striping: null)
@@ -104,7 +104,7 @@ module.exports = class PivotChartDesignerComponent extends React.Component
 
     H.div null,
       R ui.FormGroup,
-        mutedLabel: true
+        labelMuted: true
         label: "Columns"
         help: "Field to optionally make columns out of",
           H.div style: { marginLeft: 8 }, 
@@ -118,7 +118,7 @@ module.exports = class PivotChartDesignerComponent extends React.Component
               onChange: (axis) => @updateDesign(columns: [_.extend({}, @props.design.columns[0], valueAxis: axis)])
 
       R ui.FormGroup,
-        mutedLabel: true
+        labelMuted: true
         label: "Rows"
         help: "Field to optionally make rows out of",
           H.div style: { marginLeft: 8 }, 
@@ -132,7 +132,7 @@ module.exports = class PivotChartDesignerComponent extends React.Component
               onChange: (axis) => @updateDesign(rows: [_.extend({}, @props.design.rows[0], valueAxis: axis)])
 
       R ui.FormGroup,
-        mutedLabel: true
+        labelMuted: true
         label: "Value"
         help: "Field show in cells",
           H.div style: { marginLeft: 8 }, 
