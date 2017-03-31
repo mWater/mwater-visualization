@@ -50,10 +50,6 @@ module.exports = class PivotChartLayoutComponent extends React.Component
           onHover: if @props.editable then (=> @setState(hoverSection: cell.section))
           hoverSection: if @props.editable then @state.hoverSection
           onEditSection: if @props.onEditSection then @props.onEditSection.bind(null, cell.section)
-          onRemoveSegment: if @props.onRemoveSegment then @props.onRemoveSegment.bind(null, cell.section)
-          onInsertBeforeSegment: if @props.onInsertBeforeSegment then @props.onInsertBeforeSegment.bind(null, cell.section)
-          onInsertAfterSegment: if @props.onInsertAfterSegment then @props.onInsertAfterSegment.bind(null, cell.section)
-          onAddChildSegment: if @props.onAddChildSegment then @props.onAddChildSegment.bind(null, cell.section)
 
   renderHoverPlusIcon: (key, x, y, onClick) =>
     # Render a plus box
@@ -171,21 +167,9 @@ class LayoutCellComponent extends React.Component
     columnIndex: React.PropTypes.number.isRequired
     hoverSection: React.PropTypes.string       # Which section is currently hovered over
     onHover: React.PropTypes.func # Called when hovered over
-
     onEditSection: React.PropTypes.func
-    onRemoveSegment: React.PropTypes.func
-    onInsertBeforeSegment: React.PropTypes.func
-    onInsertAfterSegment: React.PropTypes.func
-    onAddChildSegment: React.PropTypes.func
 
   handleClick: (ev) =>
-    # Ignore if part of dropdown
-    elem = ev.target
-    while elem 
-      if elem == @menuComp
-        return
-      elem = elem.parentElement
-
     # Ignore blanks
     cell = @props.layout.rows[@props.rowIndex].cells[@props.columnIndex]
     if not cell.section
@@ -300,9 +284,6 @@ class LayoutCellComponent extends React.Component
       style: style,
       colSpan: cell.columnSpan or 1
       rowSpan: cell.rowSpan or 1,
-        if cell.sectionTop and cell.sectionRight and isHover
-          @renderMenu(cell)
-
         H.span style: innerStyle,
           if cell.unconfigured and @props.onEditSection
             "Click to configure"
