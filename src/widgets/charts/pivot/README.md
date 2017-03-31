@@ -59,6 +59,9 @@ intersection:
   backgroundColorOpacity: fractional background opacity
   backgroundColor: color of background if no color axis
 
+  backgroundColorConditions: array of conditional colors that override axis and background color
+    Each contains: { condition: aggregate boolean expression, color: color value }
+
   bold: true if bold
   italic: true if italic
 

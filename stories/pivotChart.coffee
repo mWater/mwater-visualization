@@ -108,6 +108,74 @@ storiesOf('Pivot Chart', module)
       }
     }
 
+  .add 'conditional color', =>
+    R PivotTest, design: {
+      "table": "entities.water_point",
+      "rows": [
+        {
+          "id": "row1",
+          "valueAxis": {
+            "expr": {
+              "type": "field",
+              "table": "entities.water_point",
+              "column": "type"
+            }
+          }
+        }
+      ],
+      "columns": [
+        {
+          "id": "col1",
+          "label": "Test"
+        }
+      ],
+      "intersections": {
+        "row1:col1": {
+          "valueAxis": {
+            "expr": {
+              "type": "op",
+              "op": "count",
+              "table": "entities.water_point",
+              "exprs": []
+            }
+          },
+          "backgroundColorConditions": [
+            {
+              "condition": {
+                "type": "op",
+                "table": "entities.water_point",
+                "op": ">",
+                "exprs": [
+                  {
+                    "type": "op",
+                    "op": "count",
+                    "table": "entities.water_point",
+                    "exprs": []
+                  },
+                  {
+                    "type": "literal",
+                    "valueType": "number",
+                    "value": 10000
+                  }
+                ]
+              },
+              "color": "#880e4f"
+            }
+          ],
+          "backgroundColorOpacity": 1
+        }
+      },
+      "version": 1,
+      "header": {
+        "style": "footer",
+        "items": []
+      },
+      "footer": {
+        "style": "footer",
+        "items": []
+      },
+      "filter": null
+    }
 
 class PivotTest extends React.Component
   render: ->
@@ -158,6 +226,7 @@ class UpdateableComponent extends React.Component
       upt = {}
       upt[name] = value
       @setState(upt)
+      console.log JSON.stringify(upt, null, 2)
       action("update")(upt)
 
   render: ->

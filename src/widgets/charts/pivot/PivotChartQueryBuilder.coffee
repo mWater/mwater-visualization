@@ -88,7 +88,15 @@ module.exports = class PivotChartQueryBuilder
           query.selects.push({
             type: "select"
             expr: @axisBuilder.compileAxis(axis: intersection?.backgroundColorAxis, tableAlias: "main")
-            alias: "backgroundColor"
+            alias: "bc"
+          })
+
+        # Add background color conditions
+        for backgroundColorCondition, i in intersection.backgroundColorConditions or []
+          query.selects.push({
+            type: "select"
+            expr: exprCompiler.compileExpr(expr: backgroundColorCondition.condition, tableAlias: "main")
+            alias: "bcc#{i}"
           })
 
         # If all selects are null, don't create query

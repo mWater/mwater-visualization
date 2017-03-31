@@ -10,6 +10,7 @@ Rcslider = require 'rc-slider'
 AxisComponent = require '../../../axes/AxisComponent'
 ColorComponent = require '../../../ColorComponent'
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
+ExprComponent = require("mwater-expressions-ui").ExprComponent
 
 # Design an intersection of a pivot table
 module.exports = class IntersectionDesignerComponent extends React.Component
@@ -30,6 +31,10 @@ module.exports = class IntersectionDesignerComponent extends React.Component
   handleBackgroundColorChange: (backgroundColor) => 
     opacity = @props.intersection.backgroundColorOpacity or 1
     @update(backgroundColor: backgroundColor, backgroundColorOpacity: opacity)
+
+  handleBackgroundColorConditionsChange: (backgroundColorConditions) =>
+    opacity = @props.intersection.backgroundColorOpacity or 1
+    @update(backgroundColorConditions: backgroundColorConditions, backgroundColorOpacity: opacity)
 
   handleBackgroundColorOpacityChange: (newValue) =>
     @update(backgroundColorOpacity: newValue / 100)
@@ -77,6 +82,14 @@ module.exports = class IntersectionDesignerComponent extends React.Component
         R ui.Checkbox, key: "bold", inline: true, value: @props.intersection.bold, onChange: @update("bold"), "Bold"
         R ui.Checkbox, key: "italic", inline: true, value: @props.intersection.italic, onChange: @update("italic"), "Italic"
 
+  renderBackgroundColorConditions: ->
+    R BackgroundColorConditionsComponent,
+      schema: @props.schema
+      dataSource: @props.dataSource
+      table: @props.table
+      colorConditions: @props.intersection.backgroundColorConditions
+      onChange: @handleBackgroundColorConditionsChange
+
   renderBackgroundColorAxis: ->
     return R ui.FormGroup, 
       labelMuted: true
@@ -105,7 +118,7 @@ module.exports = class IntersectionDesignerComponent extends React.Component
           onChange: @handleBackgroundColorChange
 
   renderBackgroundColorOpacityControl: ->
-    if not @props.intersection.backgroundColorAxis and not @props.intersection.backgroundColor
+    if not @props.intersection.backgroundColorAxis and not @props.intersection.backgroundColor and not @props.intersection.backgroundColorConditions?[0]
       return
 
     R ui.FormGroup, 
@@ -126,5 +139,84 @@ module.exports = class IntersectionDesignerComponent extends React.Component
       @renderFilter()
       @renderStyling()
       @renderBackgroundColorAxis()
+      @renderBackgroundColorConditions()
       @renderBackgroundColor()
       @renderBackgroundColorOpacityControl()
+
+# Displays background color conditions
+class BackgroundColorConditionsComponent extends React.Component
+  @propTypes: 
+    colorConditions: React.PropTypes.array
+    table: React.PropTypes.string.isRequired
+    schema: React.PropTypes.object.isRequired
+    dataSource: React.PropTypes.object.isRequired
+    onChange: React.PropTypes.func.isRequired
+
+  handleAdd: =>
+    colorConditions = (@props.colorConditions or []).slice()
+    colorConditions.push({})
+    @props.onChange(colorConditions)
+
+  handleChange: (index, colorCondition) =>
+    colorConditions = @props.colorConditions.slice()
+    colorConditions[index] = colorCondition
+    @props.onChange(colorConditions)
+
+  handleRemove: (index) =>
+    colorConditions = @props.colorConditions.slice()
+    colorConditions.splice(index, 1)
+    @props.onChange(colorConditions)
+
+  render: ->
+    # List conditions
+    R ui.FormGroup, 
+      label: "Color Conditions"
+      labelMuted: true
+      help: "Add conditions that, if met, set the color of the cell. Useful for flagging certain values",
+        _.map @props.colorConditions, (colorCondition, i) => 
+          R BackgroundColorConditionComponent,
+            key: i
+            colorCondition: colorCondition
+            table: @props.table
+            schema: @props.schema
+            dataSource: @props.dataSource
+            onChange: @handleChange.bind(null, i)
+            onRemove: @handleRemove.bind(null, i)
+        R ui.Button, type: "link", size: "sm", onClick: @handleAdd,
+          R ui.Icon, id: "fa-plus"
+          " Add Condition"
+
+# Displays single background color condition
+class BackgroundColorConditionComponent extends React.Component
+  @propTypes: 
+    colorCondition: React.PropTypes.object.isRequired
+    table: React.PropTypes.string.isRequired
+    schema: React.PropTypes.object.isRequired
+    dataSource: React.PropTypes.object.isRequired
+    onChange: React.PropTypes.func.isRequired
+
+  # Updates intersection with the specified changes
+  update: => update(@props.colorCondition, @props.onChange, arguments)
+
+  render: ->
+    H.div className: "panel panel-default",
+      H.div className: "panel-body",
+        R ui.FormGroup, 
+          labelMuted: true
+          label: "Condition",
+            R ExprComponent, 
+              schema: @props.schema
+              dataSource: @props.dataSource
+              onChange: @update("condition")
+              types: ['boolean']
+              aggrStatuses: ["aggregate", "literal"]
+              table: @props.table
+              value: @props.colorCondition.condition
+
+        R ui.FormGroup, 
+          labelMuted: true
+          label: "Color"
+          hint: "Color to display when condition is met",
+            R ColorComponent,
+              color: @props.colorCondition.color
+              onChange: @update("color")

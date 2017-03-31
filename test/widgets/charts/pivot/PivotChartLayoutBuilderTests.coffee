@@ -20,9 +20,10 @@ describe "PivotChartLayoutBuilder", ->
     @exprNumber = { type: "field", table: "t1", column: "number" }
     @exprText = { type: "field", table: "t1", column: "text" }
     @exprEnum = { type: "field", table: "t1", column: "enum" }
+    @exprNumberSum = { type: "op", op: "sum", table: "t1", exprs: [{ type: "field", table: "t1", column: "number" }] }
 
     @axisNumber = { expr: @exprNumber }
-    @axisNumberSum = { expr: @exprNumber, aggr: "sum" }
+    @axisNumberSum = { expr: @exprNumberSum }
     @axisEnum = { expr: @exprEnum } 
     @axisText = { expr: @exprText } 
 
@@ -482,8 +483,8 @@ describe "PivotChartLayoutBuilder", ->
 
       data = {
         "r1:c1": [
-          { r0: "x", c0: "a", value: 2, backgroundColor: 0 }
-          { r0: "y", c0: "b", value: 4, backgroundColor: null }
+          { r0: "x", c0: "a", value: 2, bc: 0 }
+          { r0: "y", c0: "b", value: 4, bc: null }
         ]
       }
 
@@ -494,6 +495,38 @@ describe "PivotChartLayoutBuilder", ->
         [null, null, null, null]
         [null, "rgba(255, 136, 0, 0.5)", null, null]
         [null, null, null, null]
+      ]
+
+    it "adds background color conditional", ->
+      design = {
+        table: "t1"
+        columns: [{ id: "c1", valueAxis: @axisEnum }]
+        rows: [{ id: "r1", valueAxis: @axisText }]
+        intersections: {
+          "r1:c1": { 
+            valueAxis: @axisNumberSum 
+            backgroundColorConditions: [
+              { condition: { type: "op", op: ">", table: "t1", exprs: [@exprNumberSum, { type: "literal", valueType: "number", value: 5 }]}, color: "#FF8800" }
+            ]
+            backgroundColorOpacity: 0.5
+          }
+        }
+      }
+
+      data = {
+        "r1:c1": [
+          { r0: "x", c0: "a", value: 2, bcc0: false }
+          { r0: "y", c0: "b", value: 4, bcc0: true }
+        ]
+      }
+
+      layout = @lb.buildLayout(design, data)
+
+      # Check colors
+      compare layoutPluck(layout, "backgroundColor"), [
+        [null, null, null, null]
+        [null, null, null, null]
+        [null, null, "rgba(255, 136, 0, 0.5)", null]
       ]
 
     it "sets section top/left/bottom/right", ->

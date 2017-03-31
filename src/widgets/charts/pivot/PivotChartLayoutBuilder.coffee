@@ -288,9 +288,16 @@ module.exports = class PivotChartLayoutBuilder
     }
 
     # Set background color
-    if intersection.backgroundColorAxis and entry?.backgroundColor?
-      backgroundColor = @axisBuilder.getValueColor(intersection.backgroundColorAxis, entry?.backgroundColor)
-    else if intersection.backgroundColor and not intersection.colorAxis
+    backgroundColor = null
+
+    for backgroundColorCondition, i in intersection.backgroundColorConditions or []
+      if entry?["bcc#{i}"]
+        backgroundColor = backgroundColorCondition.color
+
+    if not backgroundColor and intersection.backgroundColorAxis and entry?.bc?
+      backgroundColor = @axisBuilder.getValueColor(intersection.backgroundColorAxis, entry?.bc)
+
+    if not backgroundColor and intersection.backgroundColor and not intersection.colorAxis
       backgroundColor = intersection.backgroundColor
 
     if backgroundColor
