@@ -27,8 +27,8 @@ module.exports = class DropdownWidgetComponent extends React.Component
 
     dropdownStyle = {
       position: "absolute"
-      right: 5
-      top: 5
+      right: 3
+      top: 3
       cursor: "pointer"
       zIndex: 10000
     }

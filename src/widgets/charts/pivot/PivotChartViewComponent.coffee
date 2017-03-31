@@ -179,7 +179,7 @@ module.exports = class PivotChartViewComponent extends React.Component
       @renderHeader()
       @renderEditSegmentModal()
       @renderEditIntersectionModal()
-      H.div key: "layout", style: { margin: 10 },  # Leave room for gear menu
+      H.div key: "layout", style: { margin: 10, marginTop: 15 },  # Leave room for gear menu
         R PivotChartLayoutComponent, 
           layout: layout
           editable: @props.onDesignChange?

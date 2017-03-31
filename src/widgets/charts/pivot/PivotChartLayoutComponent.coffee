@@ -5,11 +5,12 @@ R = React.createElement
 H = React.DOM
 
 Color = require 'color'
+ui = require 'react-library/lib/bootstrap'
 
 # Displays a pivot chart from a layout
 module.exports = class PivotChartLayoutComponent extends React.Component
   @propTypes: 
-    layout: React.PropTypes.object.isRequired  # See PivotChart Design.md
+    layout: React.PropTypes.object.isRequired  # See README.md
 
     editable: React.PropTypes.bool   # If true, all below must be present. If false, none must be present
     onEditSection: React.PropTypes.func  # Called with id of section (segment id or intersection id)
@@ -25,10 +26,23 @@ module.exports = class PivotChartLayoutComponent extends React.Component
       hoverSection: null # Current section being hovered over
     }
 
+    # Index of cell components by "<rowIndex>:<columnIndex>"
+    @cellComps = {}
+
+  # Records the cell components. This is to be able to calculate the bounds of sections
+  # to allow floating hover controls
+  recordCellComp: (rowIndex, columnIndex, comp) =>
+    key = "#{rowIndex}:#{columnIndex}"
+    if comp
+      @cellComps[key] = comp
+    else
+      delete @cellComps[key]
+
   renderRow: (row, rowIndex) ->
     H.tr key: rowIndex,
       _.map row.cells, (cell, columnIndex) =>
         R LayoutCellComponent,
+          ref: @recordCellComp.bind(null, rowIndex, columnIndex)
           key: columnIndex
           layout: @props.layout
           rowIndex: rowIndex
@@ -41,17 +55,113 @@ module.exports = class PivotChartLayoutComponent extends React.Component
           onInsertAfterSegment: if @props.onInsertAfterSegment then @props.onInsertAfterSegment.bind(null, cell.section)
           onAddChildSegment: if @props.onAddChildSegment then @props.onAddChildSegment.bind(null, cell.section)
 
+  renderHoverPlusIcon: (key, x, y, onClick) =>
+    # Render a plus box
+    H.div key: key, onClick: onClick, style: { 
+      position: "absolute"
+      left: x - 7
+      top: y - 6
+      border: "solid 1px #337ab7"
+      backgroundColor: "white"
+      paddingLeft: 3
+      paddingRight: 3
+      paddingTop: 0
+      color: "#337ab7" 
+      fontSize: 9
+      cursor: "pointer"
+      opacity: 0.8
+    },
+      R ui.Icon, id: "fa-plus"
+
+  renderHoverRemoveIcon: (key, x, y, onClick) =>
+    # Render a plus box
+    H.div key: key, onClick: onClick, style: { 
+      position: "absolute"
+      left: x - 7
+      top: y - 6
+      border: "solid 1px #337ab7"
+      backgroundColor: "white"
+      paddingLeft: 3
+      paddingRight: 3
+      paddingTop: 0
+      color: "#337ab7"
+      fontSize: 9
+      cursor: "pointer"
+      opacity: 0.8
+    },
+      R ui.Icon, id: "fa-remove"
+
+  # Render floating hover controls
+  renderHoverControls: =>
+    if not @state.hoverSection
+      return 
+
+    # Determine hover rectangle and section type (row, column or intersection)
+    minX = maxX = minY = maxY = null
+    sectionType = null
+    for key, cell of @cellComps
+      rowIndex = parseInt(key.split(":")[0])
+      columnIndex = parseInt(key.split(":")[1])
+
+      cellTd = cell.getTdComponent()
+      if not cellTd
+        continue
+
+      # If hover
+      if @props.layout.rows[rowIndex]?.cells[columnIndex]?.section == @state.hoverSection 
+        # Add bounds
+        minX = if not minX? or cellTd.offsetLeft < minX then cellTd.offsetLeft else minX
+        minY = if not minY? or cellTd.offsetTop < minY then cellTd.offsetTop else minY
+        maxX = if not maxX? or cellTd.offsetLeft + cellTd.offsetWidth > maxX then cellTd.offsetLeft + cellTd.offsetWidth else maxX
+        maxY = if not maxY? or cellTd.offsetTop + cellTd.offsetHeight > maxY then cellTd.offsetTop + cellTd.offsetHeight else maxY
+
+        # Record type
+        sectionType = @props.layout.rows[rowIndex].cells[columnIndex].type
+
+    if not minX? or not sectionType
+      return null
+
+    # Determine types of controls to show
+    controls = []
+    if sectionType == "row" and @props.onInsertBeforeSegment
+      controls.push(@renderHoverPlusIcon("top", (minX + maxX) / 2, minY, @props.onInsertBeforeSegment.bind(null, @state.hoverSection)))
+
+    if sectionType == "row" and @props.onInsertAfterSegment
+      controls.push(@renderHoverPlusIcon("bottom", (minX + maxX) / 2, maxY, @props.onInsertAfterSegment.bind(null, @state.hoverSection)))
+
+    if sectionType == "row" and @props.onAddChildSegment
+      controls.push(@renderHoverPlusIcon("right", maxX, (minY + maxY) / 2, @props.onAddChildSegment.bind(null, @state.hoverSection)))
+
+    if sectionType == "column" and @props.onInsertBeforeSegment
+      controls.push(@renderHoverPlusIcon("left", minX, (minY + maxY) / 2, @props.onInsertBeforeSegment.bind(null, @state.hoverSection)))
+
+    if sectionType == "column" and @props.onInsertAfterSegment
+      controls.push(@renderHoverPlusIcon("right", maxX, (minY + maxY) / 2, @props.onInsertAfterSegment.bind(null, @state.hoverSection)))
+
+    if sectionType == "column" and @props.onAddChildSegment
+      controls.push(@renderHoverPlusIcon("bottom", (minX + maxX) / 2, maxY, @props.onAddChildSegment.bind(null, @state.hoverSection)))
+
+    if sectionType in ['row', 'column'] and @props.onRemoveSegment
+      controls.push(@renderHoverRemoveIcon("topright", maxX, minY, @props.onRemoveSegment.bind(null, @state.hoverSection)))
+
+    return H.div key: "hover-controls", controls
+
   render: ->
     style = {
       width: "100%"
       borderSpacing: 0
       borderCollapse: "collapse"
+      position: "relative"
     }
 
-    H.table style: style, # className: "table table-bordered",
-      H.tbody onMouseLeave: (=> @setState(hoverSection: null)),
-        _.map @props.layout.rows, (row, rowIndex) =>
-          @renderRow(row, rowIndex)
+    H.div 
+      style: { position: "relative" }
+      onMouseLeave: (=> @setState(hoverSection: null)),
+        H.table style: style,
+          H.tbody null,
+            _.map @props.layout.rows, (row, rowIndex) =>
+              @renderRow(row, rowIndex)
+        @renderHoverControls()
 
 # Single layout cell
 class LayoutCellComponent extends React.Component
@@ -72,7 +182,7 @@ class LayoutCellComponent extends React.Component
     # Ignore if part of dropdown
     elem = ev.target
     while elem 
-      if elem == @menuEl
+      if elem == @menuComp
         return
       elem = elem.parentElement
 
@@ -125,11 +235,14 @@ class LayoutCellComponent extends React.Component
       cursor: "pointer" 
     }
 
-    H.div className: "dropdown", style: outerStyle, ref: ((el) => @menuEl = el),
+    H.div className: "dropdown", style: outerStyle, ref: ((comp) => @menuComp = comp),
       H.div style: innerStyle, "data-toggle": "dropdown",
         H.i className: "fa fa-pencil fa-fw"
       H.ul className: "dropdown-menu dropdown-menu-right", style: { top: 20 },
         @renderMenuItems(cell)
+
+  # Gets cell component
+  getTdComponent: -> @tdComponent
 
   render: ->
     cell = @props.layout.rows[@props.rowIndex].cells[@props.columnIndex]
@@ -181,6 +294,7 @@ class LayoutCellComponent extends React.Component
     }
 
     H.td 
+      ref: ((c) => @tdComponent = c)
       onMouseEnter: @props.onHover
       onClick: @handleClick
       style: style,
