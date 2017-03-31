@@ -8,6 +8,7 @@ FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 TableSelectComponent = require '../../../TableSelectComponent'
 AxisComponent = require '../../../axes/AxisComponent'
 
+# Designer for overall chart. Has a special setup mode first time it is run
 module.exports = class PivotChartDesignerComponent extends React.Component
   @propTypes: 
     design: React.PropTypes.object.isRequired
@@ -41,6 +42,12 @@ module.exports = class PivotChartDesignerComponent extends React.Component
       columns: [column]
       intersections: intersections
     })
+
+  handleColumnChange: (axis) =>
+    @updateDesign(columns: [_.extend({}, @props.design.columns[0], valueAxis: axis)])
+
+  handleRowChange: (axis) =>
+    @updateDesign(rows: [_.extend({}, @props.design.rows[0], valueAxis: axis)])
 
   handleFilterChange: (filter) => @updateDesign(filter: filter)
 
@@ -107,44 +114,42 @@ module.exports = class PivotChartDesignerComponent extends React.Component
         labelMuted: true
         label: "Columns"
         help: "Field to optionally make columns out of",
-          H.div style: { marginLeft: 8 }, 
-            R AxisComponent, 
-              schema: @props.schema
-              dataSource: @props.dataSource
-              table: @props.design.table
-              types: ["enum", "text", "boolean", "date"]
-              aggrNeed: "none"
-              value: @props.design.columns[0].valueAxis
-              onChange: (axis) => @updateDesign(columns: [_.extend({}, @props.design.columns[0], valueAxis: axis)])
+          R AxisComponent, 
+            schema: @props.schema
+            dataSource: @props.dataSource
+            table: @props.design.table
+            types: ["enum", "text", "boolean", "date"]
+            aggrNeed: "none"
+            value: @props.design.columns[0].valueAxis
+            onChange: @handleColumnChange
 
       R ui.FormGroup,
         labelMuted: true
         label: "Rows"
         help: "Field to optionally make rows out of",
-          H.div style: { marginLeft: 8 }, 
-            R AxisComponent, 
-              schema: @props.schema
-              dataSource: @props.dataSource
-              table: @props.design.table
-              types: ["enum", "text", "boolean", "date"]
-              aggrNeed: "none"
-              value: @props.design.rows[0].valueAxis
-              onChange: (axis) => @updateDesign(rows: [_.extend({}, @props.design.rows[0], valueAxis: axis)])
+          R AxisComponent, 
+            schema: @props.schema
+            dataSource: @props.dataSource
+            table: @props.design.table
+            types: ["enum", "text", "boolean", "date"]
+            aggrNeed: "none"
+            value: @props.design.rows[0].valueAxis
+            onChange: @handleRowChange
+
 
       R ui.FormGroup,
         labelMuted: true
         label: "Value"
         help: "Field show in cells",
-          H.div style: { marginLeft: 8 }, 
-            R AxisComponent, 
-              schema: @props.schema
-              dataSource: @props.dataSource
-              table: @props.design.table
-              types: ["enum", "text", "boolean", "date", "number"]
-              aggrNeed: "required"
-              value: @props.design.intersections[intersectionId].valueAxis
-              onChange: (axis) => @handleIntersectionAxisUpdate
-              showFormat: true
+          R AxisComponent, 
+            schema: @props.schema
+            dataSource: @props.dataSource
+            table: @props.design.table
+            types: ["enum", "text", "boolean", "date", "number"]
+            aggrNeed: "required"
+            value: @props.design.intersections[intersectionId].valueAxis
+            onChange: (axis) => @handleIntersectionAxisUpdate
+            showFormat: true
 
   render: ->
     H.div null,
@@ -153,14 +158,3 @@ module.exports = class PivotChartDesignerComponent extends React.Component
         @renderSetup()
       @renderFilter()
       @renderStriping()
-      # if @state.isNew and @props.design.table and (not @props.design.rows[0].label? and not @props.design.rows[0].valueAxis? or not @props.design.columns[0].label? and not @props.design.columns[0].valueAxis?)
-      #   H.div className: "alert alert-success",
-      #     H.i className: "fa fa-check"
-      #     ''' Your pivot table is ready to configure! Click on the Save button below and
-      #     then click on the rows, columns or the data areas to configure the table. 
-      #     '''
-      #     H.br()
-      #     H.br()
-      #     '''
-      #     For advanced options, click on the pencil menu that appears when you hover over a section. 
-      #     '''

@@ -23,7 +23,7 @@ module.exports = class SegmentDesignerComponent extends React.Component
 
     @state = {
       # Mode switcher to make UI clearer
-      mode: if not props.segment.label and not props.segment.valueAxis
+      mode: if not props.segment.label? and not props.segment.valueAxis
           null
         else if props.segment.valueAxis
           "multiple"

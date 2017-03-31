@@ -18,6 +18,7 @@ module.exports = class PivotChartLayoutComponent extends React.Component
     onInsertBeforeSegment: React.PropTypes.func  # Called with id of segment
     onInsertAfterSegment: React.PropTypes.func  # Called with id of segment
     onAddChildSegment: React.PropTypes.func  # Called with id of segment
+    onSummarizeSegment: React.PropTypes.func  # Called with id of segment. Summarizes the segment
 
   constructor: (props) ->
     super
@@ -50,6 +51,7 @@ module.exports = class PivotChartLayoutComponent extends React.Component
           onHover: if @props.editable then (=> @setState(hoverSection: cell.section))
           hoverSection: if @props.editable then @state.hoverSection
           onEditSection: if @props.onEditSection then @props.onEditSection.bind(null, cell.section)
+          onSummarizeSegment: if @props.onSummarizeSegment then @props.onSummarizeSegment.bind(null, cell.section)
 
   renderHoverPlusIcon: (key, x, y, onClick) =>
     # Render a plus box
@@ -168,6 +170,7 @@ class LayoutCellComponent extends React.Component
     hoverSection: React.PropTypes.string       # Which section is currently hovered over
     onHover: React.PropTypes.func # Called when hovered over
     onEditSection: React.PropTypes.func
+    onSummarizeSegment: React.PropTypes.func
 
   handleClick: (ev) =>
     # Ignore blanks
@@ -194,7 +197,7 @@ class LayoutCellComponent extends React.Component
         [
           H.span className: "text-muted",
             " / "
-          H.a style: { cursor: "pointer" },
+          H.a style: { cursor: "pointer" }, onClick: @props.onSummarizeSegment,
             "Summarize"
         ]
 
@@ -258,4 +261,4 @@ class LayoutCellComponent extends React.Component
           if cell.unconfigured and @props.onEditSection
             @renderUnconfigured(cell)
           else
-            cell.text or "\u00A0" # Placeholder
+            cell.text or "\u00A0\u00A0\u00A0" # Placeholder

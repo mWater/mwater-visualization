@@ -50,6 +50,8 @@ module.exports = class PivotChartLayoutBuilder
             section: column[depth]?.segment.id
             text: column[depth]?.segment.label
             align: "center" 
+            # Unconfigured if segment has no label or value
+            unconfigured: column[depth]?.segment and not column[depth]?.segment.label? and not column[depth]?.segment.valueAxis
             bold: column[depth]?.segment.bold or column[depth]?.segment.valueLabelBold 
             italic: column[depth]?.segment.italic
           })
@@ -116,7 +118,7 @@ module.exports = class PivotChartLayoutBuilder
         # Add intersection columns
         for column in columns
           # Get intersection id
-          intersectionId = _.map(row, (r) -> r.segment.id).join(",") + ":" + _.map(column, (c) -> c.segment.id).join(",")
+          intersectionId = PivotChartUtils.getIntersectionId(_.map(row, (r) -> r.segment), _.map(column, (c) -> c.segment))
 
           cells.push({ 
             type: "intersection"
@@ -164,6 +166,7 @@ module.exports = class PivotChartLayoutBuilder
         cell.sectionRight = cell.section? and (columnIndex >= layout.rows[0].cells.length - 1 or layout.rows[rowIndex].cells[columnIndex + 1].section != cell.section)
         cell.sectionBottom = cell.section? and (rowIndex >= layout.rows.length - 1 or layout.rows[rowIndex + 1].cells[columnIndex].section != cell.section)
 
+    @setupSummarize(design, layout)
     @setupBorders(layout)
 
     # Span column headers and column segments that have same segment and value (TODO: uses text right now)
@@ -206,12 +209,31 @@ module.exports = class PivotChartLayoutBuilder
       for rowIndex in [0...layout.rows.length]
         cell = layout.rows[rowIndex].cells[columnIndex]
 
-        if i == 0
+        if rowIndex == 0
           refCell = cell
           continue
 
         # If matches, span rows
         if cell.type == 'row' and cell.text == refCell.text and cell.type == refCell.type and cell.section == refCell.section
+          cell.skip = true
+          refCell.rowSpan = (refCell.rowSpan or 1) + 1
+          refCell.sectionBottom = true
+          refCell.borderBottom = cell.borderBottom
+        else
+          refCell = cell
+
+    # Span column headers that have the same segment and value (TODO: uses text right now)
+    for columnIndex in [0...layout.rows[0].cells.length]
+      refCell = null
+      for rowIndex in [0...layout.rows.length]
+        cell = layout.rows[rowIndex].cells[columnIndex]
+
+        if rowIndex == 0
+          refCell = cell
+          continue
+
+        # If matches, span rows
+        if cell.type == 'column' and cell.text == refCell.text and cell.type == refCell.type and cell.section == refCell.section
           cell.skip = true
           refCell.rowSpan = (refCell.rowSpan or 1) + 1
           refCell.sectionBottom = true
@@ -225,7 +247,7 @@ module.exports = class PivotChartLayoutBuilder
   # from getRowsOrColumns
   buildIntersectionCell: (design, data, locale, row, column) ->
     # Get intersection id
-    intersectionId = _.map(row, (r) -> r.segment.id).join(",") + ":" + _.map(column, (c) -> c.segment.id).join(",")
+    intersectionId = PivotChartUtils.getIntersectionId(_.map(row, (r) -> r.segment), _.map(column, (c) -> c.segment))
 
     # Lookup intersection 
     intersection = design.intersections[intersectionId]
@@ -276,6 +298,18 @@ module.exports = class PivotChartLayoutBuilder
       cell.backgroundColor = backgroundColor
 
     return cell
+
+  # Determine summarize value for unconfigured cells
+  setupSummarize: (design, layout) ->
+    for columnIndex in [0...layout.rows[0].cells.length]
+      for rowIndex in [0...layout.rows.length]
+        cell = layout.rows[rowIndex].cells[columnIndex]
+
+        if cell.unconfigured and cell.type == "row"
+          cell.summarize = PivotChartUtils.canSummarizeSegment(design.rows, cell.section)
+
+        if cell.unconfigured and cell.type == "column"
+          cell.summarize = PivotChartUtils.canSummarizeSegment(design.columns, cell.section)
 
   # Determine borders, mutating cells
   setupBorders: (layout) ->

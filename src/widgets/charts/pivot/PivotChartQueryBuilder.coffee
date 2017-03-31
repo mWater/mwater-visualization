@@ -36,7 +36,7 @@ module.exports = class PivotChartQueryBuilder
       for columnPath in PivotChartUtils.getSegmentPaths(design.columns)
         
         # Get id of intersection
-        intersectionId = _.pluck(rowPath, "id").join(",") + ":" + _.pluck(columnPath, "id").join(",")
+        intersectionId = PivotChartUtils.getIntersectionId(rowPath, columnPath)
 
         # Get intersection
         intersection = design.intersections[intersectionId]
@@ -90,6 +90,10 @@ module.exports = class PivotChartQueryBuilder
             expr: @axisBuilder.compileAxis(axis: intersection?.backgroundColorAxis, tableAlias: "main")
             alias: "backgroundColor"
           })
+
+        # If all selects are null, don't create query
+        if _.all(query.selects, (select) -> not select.expr?)
+          continue
 
         # Add where
         whereClauses = []

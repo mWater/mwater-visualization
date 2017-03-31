@@ -1,6 +1,6 @@
 module.exports = {
   entry: ['webpack-dev-server/client?http://localhost:8081', './test/index.js'],
-  devtool: "source-map",
+  devtool: "eval",
   output: {
     path: __dirname,
     filename: 'bundle.js'

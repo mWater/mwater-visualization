@@ -117,6 +117,11 @@ module.exports = class PivotChartViewComponent extends React.Component
 
     @props.onDesignChange(design)
 
+  handleSummarizeSegment: (segmentId) =>
+    design = PivotChartUtils.summarizeSegment(@props.design, segmentId, "Summary")
+
+    @props.onDesignChange(design)
+
   renderHeader: ->
     return H.div ref: "header", style: { paddingLeft: 10, paddingRight: 10 },
       R TextComponent,
@@ -188,5 +193,6 @@ module.exports = class PivotChartViewComponent extends React.Component
           onInsertBeforeSegment: if @props.onDesignChange? then @handleInsertBeforeSegment
           onInsertAfterSegment: if @props.onDesignChange? then @handleInsertAfterSegment
           onAddChildSegment: if @props.onDesignChange? then @handleAddChildSegment
+          onSummarizeSegment: if @props.onDesignChange? then @handleSummarizeSegment
 
       @renderFooter()

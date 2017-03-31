@@ -31,6 +31,70 @@ describe "PivotChartUtils", ->
       segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
       assert not PivotChartUtils.findSegment(segments, "x")
 
+  describe "canSummarizeSegment", ->
+    it "is false if first", ->
+      segments = [{ id: "a" }, { id: "b" }]
+      assert.isFalse PivotChartUtils.canSummarizeSegment(segments, "a")
+
+    it "is false if before is label only", ->
+      segments = [{ id: "a", label: "A" }, { id: "b" }]
+      assert.isFalse PivotChartUtils.canSummarizeSegment(segments, "b")
+
+    it "is true if before has value axis", ->
+      segments = [{ id: "a", label: "A", valueAxis: { expr: { type: "field", table: "t1", column: "number" }}}, { id: "b" }]
+      assert.isTrue PivotChartUtils.canSummarizeSegment(segments, "b")
+
+    it "is false if before has children", ->
+      segments = [{ id: "a", label: "A", valueAxis: { expr: { type: "field", table: "t1", column: "number" }}, children: [{ id: "z"}]}, { id: "b" }]
+      assert.isFalse PivotChartUtils.canSummarizeSegment(segments, "b")
+
+    it "works on nested", ->
+      segments = [{ id: "a", label: "A", children: [{ id: "b", valueAxis: { expr: { type: "field", table: "t1", column: "number" }}}, { id: "c" }] } ]
+      assert.isTrue PivotChartUtils.canSummarizeSegment(segments, "c")
+
+  describe "summarizeSegment", ->
+    it "creates intersections", ->
+      # Intersection axes
+      sum1 = { expr: { type: "op", op: "sum", exprs: [{ type: "field", table: "t1", column: "number1" }]}} 
+      sum2 = { expr: { type: "op", op: "sum", exprs: [{ type: "field", table: "t1", column: "number2" }]}}
+
+      design = {
+        rows: [
+          { id: "r1", label: "A", valueAxis: { expr: { type: "field", table: "t1", column: "enum" }}}
+          { id: "r2" }
+        ]
+        columns: [
+          { id: "c1", label: "C1" }
+          { id: "c2", label: "C2" }
+        ]
+        intersections: {
+          "r1:c1": { valueAxis: sum1 }
+          "r1:c2": { valueAxis: sum2 }
+          "r2:c1": { }
+          "r2:c2": { }
+        }
+      }
+
+      newDesign = PivotChartUtils.summarizeSegment(design, "r2", "Total")
+
+      compare newDesign, {
+        rows: [
+          { id: "r1", label: "A", valueAxis: { expr: { type: "field", table: "t1", column: "enum" }}}
+          { id: "r2", label: "Total" }
+        ]
+        columns: [
+          { id: "c1", label: "C1" }
+          { id: "c2", label: "C2" }
+        ]
+        intersections: {
+          "r1:c1": { valueAxis: sum1 }
+          "r1:c2": { valueAxis: sum2 }
+          "r2:c1": { valueAxis: sum1 }
+          "r2:c2": { valueAxis: sum2 }
+        }
+      }
+
+
   describe "replaceSegment", ->
     it "replaces nested", ->
       segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]

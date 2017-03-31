@@ -68,7 +68,7 @@ module.exports = class PivotChart extends Chart
       intersections = {}
       for rowPath in PivotChartUtils.getSegmentPaths(design.rows)
         for columnPath in PivotChartUtils.getSegmentPaths(design.columns)
-          intersectionId = "#{_.pluck(rowPath, "id").join(",")}:#{_.pluck(columnPath, "id").join(",")}"
+          intersectionId = PivotChartUtils.getIntersectionId(rowPath, columnPath)
 
           # Default to blank
           intersections[intersectionId] = design.intersections[intersectionId] or { }

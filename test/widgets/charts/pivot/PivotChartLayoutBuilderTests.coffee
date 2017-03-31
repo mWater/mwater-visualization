@@ -376,6 +376,57 @@ describe "PivotChartLayoutBuilder", ->
         ["label", "value"]
       ]
 
+    it "sets summarize unconfigured segments", ->
+      design = {
+        table: "t1"
+        columns: [{ id: "c1", valueAxis: null, label: null }]
+        rows: [
+          { id: "r1", valueAxis: @axisText }
+          { id: "r2", valueAxis: null, label: null }
+        ]
+        intersections: {
+          "r1:c1": { valueAxis: null }
+          "r2:c1": { valueAxis: null }
+        }
+      }
+
+      data = {}
+
+      layout = @lb.buildLayout(design, data)
+
+      # Check subtype
+      compare layoutPluck(layout, "summarize"), [
+        [null, false]
+        [null, null]
+        [true, null]
+      ]
+
+    it "spans column headers down when same", ->
+      design = {
+        table: "t1"
+        columns: [
+          { id: "c1", valueAxis: @axisEnum, label: "Enum" }
+          { id: "c2", label: "Total" }
+        ]
+        rows: [
+          { id: "r1", label: "Row" }
+        ]
+        intersections: {
+          "r1:c1": { valueAxis: null }
+          "r1:c2": { valueAxis: null }
+        }
+      }
+
+      data = {}
+
+      layout = @lb.buildLayout(design, data)
+
+      compare layoutPluck(layout, "rowSpan"), [
+        [null, null, null, null, 2]
+        [null, null, null, null, null]
+        [null, null, null, null, null]
+      ]
+
     it "adds background color", ->
       design = {
         table: "t1"
