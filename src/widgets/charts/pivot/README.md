@@ -109,6 +109,7 @@ cell:
   skip: true if should skip cell because of row/column span
 
   unconfigured: true if cell is a placeholder that needs to be configured
+  summarize: true if cell is unconfigured and can be turned into a summary
 
 ### Cell types
 

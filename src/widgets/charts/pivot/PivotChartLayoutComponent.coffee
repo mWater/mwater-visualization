@@ -175,58 +175,28 @@ class LayoutCellComponent extends React.Component
     if not cell.section
       return 
 
+    # Ignore unconfigured cells
+    if cell.unconfigured
+      return
+
     if @props.onEditSection
       @props.onEditSection()
 
-  renderMenuItems: (cell) ->
-    [
-      if @props.onEditSection
-        H.li key: "edit",
-          H.a onClick: @props.onEditSection, "Edit"
-      if @props.onRemoveSegment and cell.type in ["row", "column"]
-        H.li key: "remove",
-          H.a onClick: @props.onRemoveSegment, "Remove"
-      if @props.onInsertBeforeSegment and cell.type == "row"
-        H.li key: "before",
-          H.a onClick: @props.onInsertBeforeSegment, "Insert Above"
-      if @props.onInsertAfterSegment and cell.type == "row"
-        H.li key: "after",
-          H.a onClick: @props.onInsertAfterSegment, "Insert Below"
-      if @props.onInsertBeforeSegment and cell.type == "column"
-        H.li key: "before",
-          H.a onClick: @props.onInsertBeforeSegment, "Insert Left"
-      if @props.onInsertAfterSegment and cell.type == "column"
-        H.li key: "after",
-          H.a onClick: @props.onInsertAfterSegment, "Insert Right"
-      if @props.onAddChildSegment and cell.type in ["row", "column"]
-        H.li key: "child",
-          H.a onClick: @props.onAddChildSegment, "Subdivide"
-    ]
-
-  renderMenu: (cell) ->
-    outerStyle = {
-      position: "absolute"
-      top: 5
-      right: 5
-      zIndex: 1000
-    }
-
-    innerStyle = {
-      backgroundColor: "white"
-      border: "solid 1px #337ab7"
-      opacity: 0.7
-      color: "#337ab7" 
-      cursor: "pointer" 
-    }
-
-    H.div className: "dropdown", style: outerStyle, ref: ((comp) => @menuComp = comp),
-      H.div style: innerStyle, "data-toggle": "dropdown",
-        H.i className: "fa fa-pencil fa-fw"
-      H.ul className: "dropdown-menu dropdown-menu-right", style: { top: 20 },
-        @renderMenuItems(cell)
-
   # Gets cell component
   getTdComponent: -> @tdComponent
+
+  # Render an unconfigured cell
+  renderUnconfigured: (cell) ->
+    H.span style: { fontSize: "90%" },
+      H.a style: { cursor: "pointer" }, onClick: @props.onEditSection,
+        "Edit"
+      if cell.summarize
+        [
+          H.span className: "text-muted",
+            " / "
+          H.a style: { cursor: "pointer" },
+            "Summarize"
+        ]
 
   render: ->
     cell = @props.layout.rows[@props.rowIndex].cells[@props.columnIndex]
@@ -263,7 +233,7 @@ class LayoutCellComponent extends React.Component
       backgroundColor: backgroundColor
       position: "relative"
       textAlign: cell.align
-      cursor: if isHover then "pointer"
+      cursor: if isHover and not cell.unconfigured then "pointer"
       borderTop: borderWeights[cell.borderTop or 0]
       borderBottom: borderWeights[borderBottom]
       borderLeft: borderWeights[cell.borderLeft or 0]
@@ -286,5 +256,6 @@ class LayoutCellComponent extends React.Component
       rowSpan: cell.rowSpan or 1,
         H.span style: innerStyle,
           if cell.unconfigured and @props.onEditSection
-            "Click to configure"
-          cell.text or "\u00A0" # Placeholder
+            @renderUnconfigured(cell)
+          else
+            cell.text or "\u00A0" # Placeholder
