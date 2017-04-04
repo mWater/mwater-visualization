@@ -4115,13 +4115,15 @@ doubleClickMap = {
   "baseLayer": "cartodb_positron",
   "layerViews": [
     {
-      "id": "8e22dc94-049a-4b20-85dc-70429328eb68",
+      "id": "82fbf0ef-b3b3-4506-b87e-6d727e593cbd",
       "name": "Untitled Layer",
       "desc": "",
-      "type": "Markers",
+      "type": "Cluster",
       "visible": true,
       "opacity": 1,
       "design": {
+        "textColor": "white",
+        "fillColor": "#337ab7",
         "axes": {
           "geometry": {
             "expr": {
@@ -4131,46 +4133,6 @@ doubleClickMap = {
             }
           }
         },
-        "color": "#b71c1c",
-        "filter": {
-          "type": "op",
-          "table": "entities.water_point",
-          "op": "within",
-          "exprs": [
-            {
-              "type": "field",
-              "table": "entities.water_point",
-              "column": "admin_region"
-            },
-            {
-              "type": "literal",
-              "valueType": "id",
-              "idTable": "admin_regions",
-              "value": "316f16a2-89e1-46b4-8a4b-561478997000"
-            }
-          ]
-        },
-        "table": "entities.water_point"
-      }
-    },
-    {
-      "id": "8397c6b6-9d22-493c-b28a-a9604d977e38",
-      "name": "Untitled Layer",
-      "desc": "",
-      "type": "Markers",
-      "visible": true,
-      "opacity": 1,
-      "design": {
-        "axes": {
-          "geometry": {
-            "expr": {
-              "type": "field",
-              "table": "entities.water_point",
-              "column": "location"
-            }
-          }
-        },
-        "color": "#0088FF",
         "filter": null,
         "table": "entities.water_point"
       }

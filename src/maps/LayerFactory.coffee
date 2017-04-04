@@ -2,6 +2,7 @@ MWaterServerLayer = require './MWaterServerLayer'
 MarkersLayer = require './MarkersLayer'
 BufferLayer = require './BufferLayer'
 AdminChoroplethLayer = require './AdminChoroplethLayer'
+ClusterLayer = require './ClusterLayer'
 TileUrlLayer = require './TileUrlLayer'
 
 module.exports = class LayerFactory
@@ -18,6 +19,9 @@ module.exports = class LayerFactory
 
       when "AdminChoropleth"
         return new AdminChoroplethLayer()
+
+      when "Cluster"
+        return new ClusterLayer()
 
       when "TileUrl"
         return new TileUrlLayer()

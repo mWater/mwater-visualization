@@ -68,6 +68,12 @@ module.exports = class AddLayerComponent extends React.Component
         design: { }
       }
       {
+        label: "Cluster Layer"
+        name: "Untitled Layer"
+        type: "Cluster"
+        design: { }
+      }
+      {
         label: "Custom Tile Url (advanced)"
         name: "Untitled Layer"
         type: "TileUrl"
