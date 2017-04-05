@@ -6,6 +6,11 @@
 @import "leaflet-loading/src/Control.Loading.css";
 @import "./layouts/decorated-block.css";
 
+/* Put dropdowns over top of leaflet controls */
+.Select-menu-outer {
+  z-index: 1100;
+}
+
 /* http://stackoverflow.com/questions/19305821/multiple-modals-overlay */
 .modal { overflow-y: auto; }
 
