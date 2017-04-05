@@ -11,6 +11,7 @@ MapLayersDesignerComponent = require './MapLayersDesignerComponent'
 MapFiltersDesignerComponent = require './MapFiltersDesignerComponent'
 BaseLayerDesignerComponent = require './BaseLayerDesignerComponent'
 PopoverHelpComponent = require 'react-library/lib/PopoverHelpComponent'
+MapUtils = require './MapUtils'
 
 module.exports = class MapDesignerComponent extends React.Component
   @propTypes:
@@ -26,6 +27,9 @@ module.exports = class MapDesignerComponent extends React.Component
   handleAutoBoundsChange: (value) =>
     design = _.extend({}, @props.design, {autoBounds: value})
     @props.onDesignChange(design)
+
+  handleConvertToClusterMap: =>
+    @props.onDesignChange(MapUtils.convertToClusterMap(@props.design)) 
 
   renderOptionsTab: ->
     H.div null,
@@ -44,6 +48,11 @@ module.exports = class MapDesignerComponent extends React.Component
             "Automatic zoom "
             R PopoverHelpComponent, placement: "left",
               '''Automatically zoom to the complete data whenever the map is loaded or the filters change'''
+
+      if MapUtils.canConvertToClusterMap(@props.design)
+        H.div key: "tocluster",
+          H.a onClick: @handleConvertToClusterMap, className: "btn btn-link btn-sm",
+            "Convert to cluster map"
 
       R AttributionComponent,
         text: @props.design.attribution
@@ -125,7 +134,7 @@ class AttributionComponent extends React.Component
           H.span onClick: @handleTextClick, style: { cursor: "pointer" },
             @props.text
         else
-          H.a onClick: @handleTextClick, style: { fontSize: 12 },
+          H.a onClick: @handleTextClick, className: "btn btn-link btn-sm",
             "+ Add attribution"
 
     if @props.text or @state.editing
