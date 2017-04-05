@@ -199,6 +199,7 @@ class DateExprComponent extends React.Component
       { value: JSON.stringify({ op: "lastmonth", exprs: [] }), label: 'Last Month' }
       { value: JSON.stringify({ op: "today", exprs: [] }), label: 'Today' }
       { value: JSON.stringify({ op: "yesterday", exprs: [] }), label: 'Yesterday' }
+      { value: JSON.stringify({ op: "last24hours", exprs: [] }), label: 'In Last 24 Hours' }
       { value: JSON.stringify({ op: "last7days", exprs: [] }), label: 'In Last 7 Days' }
       { value: JSON.stringify({ op: "last30days", exprs: [] }), label: 'In Last 30 Days' }
       { value: JSON.stringify({ op: "last365days", exprs: [] }), label: 'In Last 365 Days' }

@@ -137,7 +137,6 @@ module.exports = class ClusterLayer extends Layer
 
     # Create filters. First ensure geometry and limit to bounding box
     whereClauses = [
-      { type: "op", op: "is not null", exprs: [geometryExpr] }
       {
         type: "op"
         op: "&&"
