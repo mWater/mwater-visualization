@@ -54,7 +54,7 @@
     "react-library": "github:mwater/react-library",
     "react-motion": "^0.3.0",
     "react-onclickout": "^2.0.4",
-    "react-select": "^0.9.1",
+    "react-select": "github:mwater/react-select#fix_690",
     "save-svg-as-png": "^1.0.3",
     "shallowequal": "^0.2.2",
     "update-object": "^1.0.0",
