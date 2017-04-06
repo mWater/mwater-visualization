@@ -148,7 +148,7 @@ module.exports = class PivotChartDesignerComponent extends React.Component
             types: ["enum", "text", "boolean", "date", "number"]
             aggrNeed: "required"
             value: @props.design.intersections[intersectionId].valueAxis
-            onChange: (axis) => @handleIntersectionAxisUpdate
+            onChange: @handleIntersectionAxisUpdate
             showFormat: true
 
   render: ->
