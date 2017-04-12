@@ -15,8 +15,9 @@ module.exports = class ExprItemsHtmlConverter extends ItemsHtmlConverter
   # designMode is true to display in design mode (exprs as blocks)
   # exprValues is map of expr id to value 
   # summarizeExprs shows summaries of expressions, not values
-  constructor: (schema, designMode, exprValues, summarizeExprs = false) ->
-    super()
+  # namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+  constructor: (schema, designMode, exprValues, summarizeExprs, namedStrings) ->
+    super(namedStrings)
 
     @schema = schema
     @designMode = designMode

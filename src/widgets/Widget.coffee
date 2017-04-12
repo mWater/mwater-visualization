@@ -18,6 +18,7 @@ module.exports = class Widget
   #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
   #  singleRowTable: optional table name of table that will be filtered to have a single row present. Widget designer should optionally account for this
   #  onRowClick: Called with (tableId, rowId) when item is clicked
+  #  namedStrings: optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
   createViewElement: (options) ->
     throw new Error("Not implemented")
 

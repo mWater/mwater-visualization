@@ -31,6 +31,7 @@ module.exports = class DashboardViewComponent extends React.Component
     standardWidth: React.PropTypes.number   # Width for scaling
 
     onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
     # Filters to add to the dashboard
     filters: React.PropTypes.arrayOf(React.PropTypes.shape({
@@ -125,6 +126,7 @@ module.exports = class DashboardViewComponent extends React.Component
         height: options.height
         standardWidth: options.standardWidth 
         onRowClick: @props.onRowClick
+        namedStrings: @props.namedStrings
       })  
 
     style = {

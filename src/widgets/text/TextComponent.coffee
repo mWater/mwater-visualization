@@ -25,10 +25,18 @@ module.exports = class TextComponent extends React.Component
     standardWidth: React.PropTypes.number
 
     singleRowTable: React.PropTypes.string  # Table that is filtered to have one row
+    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
   createItemsHtmlConverter: ->
-    # Display summaries if in design more and singleRowTable is set
-    return new ExprItemsHtmlConverter(@props.schema, @props.onDesignChange?, @props.exprValues, @props.onDesignChange? and @props.singleRowTable?)
+    return new ExprItemsHtmlConverter(
+      @props.schema, 
+      @props.onDesignChange?, 
+      @props.exprValues, 
+      # Display summaries if in design more and singleRowTable is set
+      @props.onDesignChange? and @props.singleRowTable?,
+      # Only replace named strings if not editing
+      if not @props.onDesignChange? then @props.namedStrings
+    )
 
   handleItemsChange: (items) =>
     design = _.extend({}, @props.design, items: items)

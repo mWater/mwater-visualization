@@ -26,6 +26,7 @@ module.exports = class TextWidget extends Widget
   #  height: height in pixels on screen
   #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
   #  singleRowTable: optional table name of table that will be filtered to have a single row present. Widget designer should optionally account for this
+  #  namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
   createViewElement: (options) ->
     # Put here so TextWidget can be created on server
     TextWidgetComponent = require './TextWidgetComponent'
@@ -41,6 +42,7 @@ module.exports = class TextWidget extends Widget
       height: options.height
       standardWidth: options.standardWidth
       singleRowTable: options.singleRowTable
+      namedStrings: options.namedStrings
 
   # Get the data that the widget needs. This will be called on the server, typically.
   #   design: design of the chart

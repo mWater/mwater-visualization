@@ -5,6 +5,10 @@ _ = require 'lodash'
 #  string (html text) 
 #  { type: "element", tag: "h1", items: [nested items] }
 module.exports = class ItemsHtmlConverter 
+  # namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings 
+  constructor: (namedStrings) ->
+    @namedStrings = namedStrings
+
   # Check if blank (no text or special expressions)
   @isBlank: (items) =>
     if not items
@@ -23,8 +27,18 @@ module.exports = class ItemsHtmlConverter
 
     for item in (items or [])
       if _.isString(item)
+        # Replace named strings
+        itemStr = item
+        itemStr = itemStr.replace(/\{\{.+?\}\}/, (match) =>
+          name = match.substr(2, match.length - 4)
+          if @namedStrings and @namedStrings[name]?
+            return @namedStrings[name]
+          else
+            return match
+          )
+
         # Escape HTML
-        html += _.escape(item)
+        html += _.escape(itemStr)
       else if item.type == "element"
         if not allowedTags[item.tag]
           # Ignore and do contents

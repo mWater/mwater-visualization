@@ -22,6 +22,7 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
     standardWidth: React.PropTypes.number
 
     singleRowTable: React.PropTypes.string  # Table that is filtered to have one row
+    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
   constructor: (props) ->
     super(props)
@@ -69,3 +70,4 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
       height: @props.height
       standardWidth: @props.standardWidth
       singleRowTable: @props.singleRowTable
+      namedStrings: @props.namedStrings

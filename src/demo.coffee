@@ -169,6 +169,7 @@ class MWaterDirectDashboardPane extends React.Component
           onDesignChange: @handleDesignChange
           titleElem: "Sample"
           # quickfilterLocks: [{ expr: { type: "field", table: "entities.water_point", column: "type" }, value: "Protected dug well" }]
+          namedStrings: { branding: "mWater" }
         })
     )
 

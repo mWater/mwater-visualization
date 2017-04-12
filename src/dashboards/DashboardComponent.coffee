@@ -28,6 +28,8 @@ module.exports = class DashboardComponent extends React.Component
     printScaling: React.PropTypes.bool                  # True to scale for printing
 
     onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+
     quickfilterLocks: React.PropTypes.array             # Locked quickfilter values. See README in quickfilters
 
     # Filters to add to the dashboard
@@ -251,5 +253,6 @@ module.exports = class DashboardComponent extends React.Component
             width: size.width
             standardWidth: if @props.printScaling then 1440 else size.width
             onRowClick: @props.onRowClick
+            namedStrings: @props.namedStrings
           }
       
