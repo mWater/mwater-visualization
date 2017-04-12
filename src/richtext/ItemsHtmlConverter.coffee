@@ -29,7 +29,7 @@ module.exports = class ItemsHtmlConverter
       if _.isString(item)
         # Replace named strings
         itemStr = item
-        itemStr = itemStr.replace(/\{\{.+?\}\}/, (match) =>
+        itemStr = itemStr.replace(/\{\{.+?\}\}/g, (match) =>
           name = match.substr(2, match.length - 4)
           if @namedStrings and @namedStrings[name]?
             return @namedStrings[name]
