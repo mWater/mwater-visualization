@@ -342,7 +342,7 @@ module.exports = class PivotChartLayoutBuilder
             else
               cell.borderTop = 2
           # Only border within if changed value (TODO: uses text right now)
-          else if layout.rows[rowIndex - 1].cells[columnIndex].text != cell.text
+          else if rowIndex > 0 and layout.rows[rowIndex - 1].cells[columnIndex].text != cell.text
             if cell.segment?.borderWithin?
               cell.borderTop = cell.segment?.borderWithin
             else
@@ -357,7 +357,7 @@ module.exports = class PivotChartLayoutBuilder
             else
               cell.borderBottom = 2
           # Only border within if changed value (TODO: uses text right now)
-          else if layout.rows[rowIndex + 1].cells[columnIndex].text != cell.text
+          else if rowIndex < layout.rows.length - 1 and layout.rows[rowIndex + 1].cells[columnIndex].text != cell.text
             if cell.segment?.borderWithin?
               cell.borderBottom = cell.segment?.borderWithin
             else
@@ -382,7 +382,7 @@ module.exports = class PivotChartLayoutBuilder
             else
               cell.borderLeft = 2
           # Only border within if changed value (TODO: uses text right now)
-          else if layout.rows[rowIndex].cells[columnIndex - 1].text != cell.text
+          else if columnIndex > 0 and layout.rows[rowIndex].cells[columnIndex - 1].text != cell.text
             if cell.segment?.borderWithin?
               cell.borderLeft = cell.segment?.borderWithin
             else
@@ -397,7 +397,7 @@ module.exports = class PivotChartLayoutBuilder
             else
               cell.borderRight = 2
           # Only border within if changed value (TODO: uses text right now)
-          else if layout.rows[rowIndex].cells[columnIndex + 1].text != cell.text
+          else if columnIndex < layout.rows[rowIndex].cells.length - 1 and layout.rows[rowIndex].cells[columnIndex + 1].text != cell.text
             if cell.segment?.borderWithin?
               cell.borderRight = cell.segment?.borderWithin
             else
