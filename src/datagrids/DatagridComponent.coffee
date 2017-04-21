@@ -143,7 +143,7 @@ module.exports = class DatagridComponent extends React.Component
     if not @state.editingDesign
       return
 
-    R DataGridEditorComponent,
+    R DatagridEditorComponent,
       schema: @props.schema
       dataSource: @props.dataSource
       design: @props.design
@@ -204,7 +204,7 @@ module.exports = class DatagridComponent extends React.Component
               H.a className: "btn btn-link", onClick: @handleEdit, 
                 "Click Here to Configure"
 
-class DataGridEditorComponent extends React.Component
+class DatagridEditorComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired     # schema to use
     dataSource: React.PropTypes.object.isRequired # dataSource to use
