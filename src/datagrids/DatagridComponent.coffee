@@ -44,7 +44,7 @@ module.exports = class DatagridComponent extends React.Component
     super(props)
 
     @state = {
-      editingDesign: null   # Design being edited
+      editingDesign: false   # is design being edited
       cellEditingEnabled: false  # True if cells can be edited directly
       quickfiltersHeight: null   # Height of quickfilters
       quickfiltersValues: null
@@ -143,18 +143,13 @@ module.exports = class DatagridComponent extends React.Component
     if not @state.editingDesign
       return
 
-    R ActionCancelModalComponent, 
-      onAction: => 
-        @props.onDesignChange(@state.editingDesign)
-        @setState(editingDesign: null)
-
-      onCancel: => @setState(editingDesign: null)
-      size: "large",
-        R DatagridDesignerComponent,
-          schema: @props.schema
-          dataSource: @props.dataSource
-          design: @state.editingDesign
-          onDesignChange: (design) => @setState(editingDesign: design)
+    R DataGridEditorComponent,
+      schema: @props.schema
+      dataSource: @props.dataSource
+      design: @props.design
+      onDesignChange: (design) => 
+        @props.onDesignChange(design)
+        @setState(editingDesign: false)
 
   renderFindReplaceModal: (filters) ->
     R FindReplaceModalComponent, 
@@ -208,3 +203,31 @@ module.exports = class DatagridComponent extends React.Component
             H.div style: { textAlign: "center", marginTop: size.height / 2 }, 
               H.a className: "btn btn-link", onClick: @handleEdit, 
                 "Click Here to Configure"
+
+class DataGridEditorComponent extends React.Component
+  @propTypes:
+    schema: React.PropTypes.object.isRequired     # schema to use
+    dataSource: React.PropTypes.object.isRequired # dataSource to use
+    design: React.PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
+    onDesignChange: React.PropTypes.func.isRequired # Called when design changes
+
+  constructor: (props) ->
+    super(props)
+
+    @state = {
+      design: props.design   
+    }
+
+  render: ->
+    R ActionCancelModalComponent, 
+      onAction: => 
+        @props.onDesignChange(@state.design)
+        @setState(design: @props.design)
+
+      onCancel: => @setState(design: @props.design)
+      size: "large",
+        R DatagridDesignerComponent,
+          schema: @props.schema
+          dataSource: @props.dataSource
+          design: @state.design
+          onDesignChange: (design) => @setState(design: design)
