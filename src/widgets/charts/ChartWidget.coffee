@@ -7,6 +7,13 @@ CsvBuilder = require './../../CsvBuilder'
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
 ChartViewComponent = require './ChartViewComponent'
 ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
+ui = require 'react-library/lib/bootstrap'
+
+placeholderIconMap = 
+  "table": "fa-table"
+  "chart": "fa-bar-chart" 
+  "image-mosaic": "fa-th"
+  "calendar": "fa-calendar"
 
 # A widget which is a chart
 module.exports = class ChartWidget extends Widget
@@ -191,12 +198,8 @@ class ChartWidgetComponent extends React.Component
 
   # Render a link to start editing
   renderEditLink: ->
-    if @props.height
-      H.div style: { position: "absolute", bottom: @props.height / 2, left: 0, right: 0, textAlign: "center" },
-        H.a className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Edit"
-    else
-      H.div style: { position: "absolute", top: "50%", marginTop: -20, left: 0, right: 0, textAlign: "center" },
-        H.a className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Edit"
+    H.div className: "mwater-visualization-widget-placeholder", onClick: @handleStartEditing,
+      R ui.Icon, id: placeholderIconMap[@props.chart.getType()]
 
   render: ->
     design = @props.chart.cleanDesign(@props.design, @props.schema)

@@ -265,3 +265,6 @@ module.exports = class TableChart extends Chart
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->
     return _.compact([design.table])
+
+  getType: ->
+    return "table"

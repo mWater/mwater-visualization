@@ -48,8 +48,8 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
   # Render a link to start editing
   renderEditLink: ->
-    H.div style: { position: "absolute", bottom: @props.height / 2, left: 0, right: 0, textAlign: "center" },
-      H.a className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Edit"
+    H.div className: "mwater-visualization-widget-placeholder", onClick: @handleStartEditing, 
+      H.i className: "icon fa fa-image"
 
   renderEditor: ->
     R ImageWidgetDesignComponent,
