@@ -179,3 +179,5 @@ module.exports = class CalendarChart extends Chart
   getFilterableTables: (design, schema) ->
     return _.compact([design.table])
     
+  getType: ->
+    return "calendar"

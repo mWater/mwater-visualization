@@ -70,3 +70,7 @@ module.exports = class Chart
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->
     throw new Error("Not implemented")
+
+  # Get the chart type
+  getType: ->
+    return 'chart'

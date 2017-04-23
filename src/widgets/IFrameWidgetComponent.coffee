@@ -2,6 +2,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 _ = require 'lodash'
+ui = require 'react-library/lib/bootstrap'
 
 DropdownWidgetComponent = require './DropdownWidgetComponent'
 ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
@@ -46,8 +47,10 @@ module.exports = class IFrameWidgetComponent extends React.Component
 
   # Render a link to start editing
   renderEditLink: ->
-    H.div style: { position: "absolute", bottom: @props.height / 2, left: 0, right: 0, textAlign: "center" },
-      H.a className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Configure"
+    H.div className: "mwater-visualization-widget-placeholder", onClick: @handleStartEditing,
+      R ui.Icon, id: "fa-youtube-play"
+    # H.div style: { position: "absolute", bottom: @props.height / 2, left: 0, right: 0, textAlign: "center" },
+    #   H.a className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Configure"
 
   render: ->
     dropdownItems = []

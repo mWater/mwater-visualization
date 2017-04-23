@@ -234,3 +234,24 @@ There are several styles of block layouts:
   font-size: 13px;
   text-align: center;
 }
+
+.mwater-visualization-widget-placeholder {
+  position: absolute;
+  bottom: 0;
+  left: 0px;
+  right: 0px;
+  text-align: center;
+  top: 0;
+  cursor: pointer;
+  background: #f8f8f8;
+}
+
+.mwater-visualization-widget-placeholder .fa,
+.mwater-visualization-widget-placeholder .glyphicon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #f0f0f0;
+  font-size: 60px;
+}
