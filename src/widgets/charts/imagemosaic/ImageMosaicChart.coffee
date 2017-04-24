@@ -178,5 +178,5 @@ module.exports = class ImageMosaicChart extends Chart
   getFilterableTables: (design, schema) ->
     return _.compact([design.table])
 
-  getType: ->
-    return "image-mosaic"
+  # Get the chart placeholder icon. fa-XYZ or glyphicon-XYZ
+  getPlaceholderIcon: -> "fa-th"

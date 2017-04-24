@@ -266,5 +266,5 @@ module.exports = class TableChart extends Chart
   getFilterableTables: (design, schema) ->
     return _.compact([design.table])
 
-  getType: ->
-    return "table"
+  # Get the chart placeholder icon. fa-XYZ or glyphicon-XYZ
+  getPlaceholderIcon: -> "fa-table"

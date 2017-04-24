@@ -71,6 +71,5 @@ module.exports = class Chart
   getFilterableTables: (design, schema) ->
     throw new Error("Not implemented")
 
-  # Get the chart type
-  getType: ->
-    return 'chart'
+  # Get the chart placeholder icon. fa-XYZ or glyphicon-XYZ
+  getPlaceholderIcon: -> ""

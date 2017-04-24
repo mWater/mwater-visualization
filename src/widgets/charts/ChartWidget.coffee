@@ -9,12 +9,6 @@ ChartViewComponent = require './ChartViewComponent'
 ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
 ui = require 'react-library/lib/bootstrap'
 
-placeholderIconMap = 
-  "table": "fa-table"
-  "chart": "fa-bar-chart" 
-  "image-mosaic": "fa-th"
-  "calendar": "fa-calendar"
-
 # A widget which is a chart
 module.exports = class ChartWidget extends Widget
   constructor: (chart) ->
@@ -199,7 +193,7 @@ class ChartWidgetComponent extends React.Component
   # Render a link to start editing
   renderEditLink: ->
     H.div className: "mwater-visualization-widget-placeholder", onClick: @handleStartEditing,
-      R ui.Icon, id: placeholderIconMap[@props.chart.getType()]
+      R ui.Icon, id: @props.chart.getPlaceholderIcon()
 
   render: ->
     design = @props.chart.cleanDesign(@props.design, @props.schema)

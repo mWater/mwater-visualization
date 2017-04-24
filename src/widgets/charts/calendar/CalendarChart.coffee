@@ -179,5 +179,5 @@ module.exports = class CalendarChart extends Chart
   getFilterableTables: (design, schema) ->
     return _.compact([design.table])
     
-  getType: ->
-    return "calendar"
+  # Get the chart placeholder icon. fa-XYZ or glyphicon-XYZ
+  getPlaceholderIcon: -> "fa-calendar"
