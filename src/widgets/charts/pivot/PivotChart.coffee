@@ -232,3 +232,6 @@ module.exports = class PivotChart extends Chart
     filterableTables = _.union(filterableTables, textWidget.getFilterableTables(design.footer, schema))
 
     return filterableTables
+
+  # Get the chart placeholder icon. fa-XYZ or glyphicon-XYZ
+  getPlaceholderIcon: -> "fa-magic"
