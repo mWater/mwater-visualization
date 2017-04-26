@@ -4,6 +4,8 @@ H = React.DOM
 R = React.createElement
 
 ui = require 'react-library/lib/bootstrap'
+update = require 'react-library/lib/update'
+
 AxisComponent = require '../../../axes/AxisComponent'
 ColorComponent = require '../../../ColorComponent'
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
@@ -31,13 +33,11 @@ module.exports = class SegmentDesignerComponent extends React.Component
           "single"
     }
 
+  # Updates segment with the specified changes
+  update: => update(@props.segment, @props.onChange, arguments)
+
   componentDidMount: ->
     @labelElem?.focus()
-
-  # Updates segment with the specified changes
-  update: (changes) ->
-    segment = _.extend({}, @props.segment, changes)
-    @props.onChange(segment)
 
   handleSingleMode: =>
     @update(valueAxis: null)
@@ -127,7 +127,7 @@ module.exports = class SegmentDesignerComponent extends React.Component
         if @props.segment.valueAxis and @props.segment.label
           H.div style: { paddingTop: 5 },
             "Shade filler cells: "
-            R ColorComponent, color: @props.segment.fillerColor, onChange: (color) => @update({ fillerColor: color })
+            R ColorComponent, color: @props.segment.fillerColor, onChange: @update("fillerColor")
 
   renderBorders: ->
     R ui.FormGroup, 
@@ -135,13 +135,30 @@ module.exports = class SegmentDesignerComponent extends React.Component
       label: "Borders",
         H.div key: "before",
           if @props.segmentType == "row" then "Top: " else "Left: "
-        R BorderComponent, value: @props.segment.borderBefore, defaultValue: 2, onChange: (value) => @update(borderBefore: value)
+        R BorderComponent, value: @props.segment.borderBefore, defaultValue: 2, onChange: @update("borderBefore")
         H.div key: "within",
           "Within: "
-        R BorderComponent, value: @props.segment.borderWithin, defaultValue: 1, onChange: (value) => @update(borderWithin: value)
+        R BorderComponent, value: @props.segment.borderWithin, defaultValue: 1, onChange: @update("borderWithin")
         H.div key: "after",
           if @props.segmentType == "row" then "Bottom: " else "Right: "
-        R BorderComponent, value: @props.segment.borderAfter, defaultValue: 2, onChange: (value) => @update(borderAfter: value)
+        R BorderComponent, value: @props.segment.borderAfter, defaultValue: 2, onChange: @update("borderAfter")
+
+  renderAdvanced: ->
+    if @props.segment.valueAxis
+      R ui.CollapsibleSection,
+        label: "Advanced"
+        labelMuted: true,
+          R ui.FormGroup, 
+            labelMuted: true
+            label: "When #{@props.segmentType} value is clicked:",
+              R ui.Select,
+                value: @props.segment.clickAction or null
+                onChange: @update("clickAction")
+                options: [
+                  { value: null, label: "Do nothing"}
+                  { value: "scope", label: "Filter other widgets"}
+                  { value: "popup", label: "Open popup"}
+                ]
 
   render: ->
     H.div null,
@@ -156,6 +173,8 @@ module.exports = class SegmentDesignerComponent extends React.Component
         @renderStyling()
       if @state.mode
         @renderBorders()
+      if @state.mode
+        @renderAdvanced()
 
 # Allows setting border heaviness
 class BorderComponent extends React.Component

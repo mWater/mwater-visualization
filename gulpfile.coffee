@@ -128,6 +128,31 @@ gulp.task "watch", gulp.series([
 
     # Include version
     webpackConfig.plugins = [
+      new webpack.NamedModulesPlugin()
+    ]
+    webpackConfig.entry.unshift('webpack-dev-server/client?http://localhost:3000');
+
+    compiler = webpack(webpackConfig)
+
+    new WebpackDevServer(compiler, { contentBase: "dist", publicPath: "/js/" }).listen 3000, "localhost", (err) =>
+      if err 
+        throw new gutil.PluginError("webpack-dev-server", err)
+
+      # Server listening
+      gutil.log("[webpack-dev-server]", "http://localhost:3000/demo.html")
+])
+
+gulp.task "watch_hot", gulp.series([
+  "libs_js"
+  "libs_css"
+  "copy_fonts"
+  "copy_assets"
+  "index_css"
+  ->
+    webpackConfig = require './webpack.config.js'
+
+    # Include version
+    webpackConfig.plugins = [
       new webpack.HotModuleReplacementPlugin(),
       new webpack.NamedModulesPlugin(),
     ]

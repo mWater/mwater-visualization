@@ -245,7 +245,7 @@ class LayoutCellComponent extends React.Component
       backgroundColor: backgroundColor
       position: "relative"
       textAlign: cell.align
-      cursor: if isHover and not cell.unconfigured then "pointer"
+      cursor: if cell.type != "blank" then "pointer"
       borderTop: borderWeights[cell.borderTop or 0]
       borderBottom: borderWeights[borderBottom]
       borderLeft: borderWeights[cell.borderLeft or 0]

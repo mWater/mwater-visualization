@@ -132,6 +132,22 @@ module.exports = class IntersectionDesignerComponent extends React.Component
           value: @props.intersection.backgroundColorOpacity * 100,
           onChange: @handleBackgroundColorOpacityChange
 
+  renderAdvanced: ->
+    R ui.CollapsibleSection,
+      label: "Advanced"
+      labelMuted: true,
+        R ui.FormGroup, 
+          labelMuted: true
+          label: "When cell is clicked:",
+            R ui.Select,
+              value: @props.intersection.clickAction or null
+              onChange: @update("clickAction")
+              options: [
+                { value: null, label: "Do nothing"}
+                { value: "scope", label: "Filter other widgets"}
+                { value: "popup", label: "Open popup"}
+              ]
+
   render: ->
     H.div null,
       @renderValueAxis()
@@ -142,6 +158,7 @@ module.exports = class IntersectionDesignerComponent extends React.Component
       @renderBackgroundColorConditions()
       @renderBackgroundColor()
       @renderBackgroundColorOpacityControl()
+      @renderAdvanced()
 
 # Displays background color conditions
 class BackgroundColorConditionsComponent extends React.Component

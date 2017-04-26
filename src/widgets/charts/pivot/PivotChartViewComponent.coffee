@@ -127,8 +127,7 @@ module.exports = class PivotChartViewComponent extends React.Component
 
     @props.onDesignChange(design)
 
-  handleCellClick: (cell) =>
-    # Scope cell unless already scoped, in which case, clear scope
+  performScopeAction: (cell) ->
     if cell.scoped
       @props.onScopeChange?()
     else if cell.segmentValues and not _.isEmpty(cell.segmentValues)
@@ -142,6 +141,25 @@ module.exports = class PivotChartViewComponent extends React.Component
       }
 
       @props.onScopeChange?(scope)
+
+  handleCellClick: (cell) =>
+    # If segment
+    if cell.type in ['row', 'column']
+      segment = PivotChartUtils.findSegment(@props.design.rows, cell.section) or PivotChartUtils.findSegment(@props.design.columns, cell.section)
+
+      # Determine action
+      if segment.clickAction == "scope"
+        @performScopeAction(cell)
+      else if segment.clickAction == "popup"
+        console.log "TODO"
+    else if cell.type == "intersection"
+      intersection = @props.design.intersections[cell.section]
+
+      # Determine action
+      if intersection.clickAction == "scope"
+        @performScopeAction(cell)
+      else if intersection.clickAction == "popup"
+        console.log "TODO"
 
   renderHeader: ->
     return H.div ref: "header", style: { paddingLeft: 10, paddingRight: 10 },
