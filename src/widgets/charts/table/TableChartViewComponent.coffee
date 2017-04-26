@@ -5,6 +5,7 @@ R = React.createElement
 
 AxisBuilder = require '../../../axes/AxisBuilder'
 ExprUtils = require('mwater-expressions').ExprUtils
+ui = require 'react-library/lib/bootstrap'
 
 module.exports = class TableChartViewComponent extends React.Component
   @propTypes:
@@ -36,8 +37,7 @@ module.exports = class TableChartViewComponent extends React.Component
     return H.div style: style, className: "overflow-auto-except-print",
       H.div {style: { fontWeight: "bold", textAlign: "center" }, ref: "title"}, @props.design.titleText
       R TableContentsComponent, 
-        columns: @props.design.columns
-        table: @props.design.table
+        design: @props.design
         data: @props.data
         schema: @props.schema
         dataSource: @props.dataSource
@@ -45,25 +45,34 @@ module.exports = class TableChartViewComponent extends React.Component
 
 class TableContentsComponent extends React.Component
   @propTypes:
-    columns: React.PropTypes.array.isRequired # Columns of chart
+    design: React.PropTypes.object.isRequired # Design of chart
     data: React.PropTypes.object.isRequired # Data that the table has requested
     schema: React.PropTypes.object.isRequired # Schema to use
     dataSource: React.PropTypes.object.isRequired # Data source to use
-    table: React.PropTypes.string.isRequired
 
     onRowClick: React.PropTypes.func # Called with (tableId, rowId) when item is clicked
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
 
-  shouldComponentUpdate: (prevProps) ->
-    if prevProps.columns != @props.columns and not _.isEqual(prevProps.columns, @props.columns)
+  constructor: ->
+    super
+
+    @state = {
+      selectedIds: {}   # Map of row id to true if selected
+    }
+
+  shouldComponentUpdate: (prevProps, prevState) ->
+    if prevProps.design != @props.design and not _.isEqual(prevProps.design, @props.design)
       return true
 
     if prevProps.data != @props.data and not _.isEqual(prevProps.data, @props.data)
       return true
 
     if prevProps.schema != @props.schema
+      return true
+
+    if prevState.selectedIds != @state.selectedIds
       return true
 
     return false
@@ -73,20 +82,55 @@ class TableContentsComponent extends React.Component
 
     # If there is only one id (num_ids = 1)
     if row and row.id and row.num_ids == 1 and @props.onRowClick
-      @props.onRowClick(@props.table, row.id)
+      @props.onRowClick(@props.design.table, row.id)
+
+  # Toggle selection of a row
+  handleSelectRow: (index, selected) =>
+    id = @props.data.main[index].id
+
+    selectedIds = _.clone(@state.selectedIds)
+    if selected
+      delete selectedIds[id]
+    else
+      selectedIds[id] = true
+
+    @setState(selectedIds: selectedIds)
+
+  # Select all or deselect
+  handleSelectAll: (selected) =>
+    if selected
+      selectedIds = {}
+    else
+      selectedIds = {}
+      for row in @props.data.main
+        selectedIds[row.id] = true
+
+    @setState(selectedIds: selectedIds)
 
   renderHeaderCell: (index) ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
-    column = @props.columns[index]
+    column = @props.design.columns[index]
 
     text = column.headerText or axisBuilder.summarizeAxis(column.textAxis, @context.locale)
     H.th { key: index },
       text
 
+  # Render checkbox to select all
+  renderSelectAll: ->
+    selected = _.keys(@state.selectedIds).length >= @props.data.main.length
+
+    H.th style: { width: 1, color: "#888" }, onClick: @handleSelectAll.bind(null, selected),
+      if selected
+        H.i className: "fa fa-fw fa-check-square", style: { color: "#2E6DA4" }
+      else
+        H.i className: "fa fa-fw fa-square-o", style: { color: "#888" }
+
   renderHeader: ->
     H.thead key: "head",
       H.tr key: "head",
-        _.map(@props.columns, (column, i) => @renderHeaderCell(i))
+        if @props.design.multiselect
+          @renderSelectAll()
+        _.map(@props.design.columns, (column, i) => @renderHeaderCell(i))
 
   renderImage: (id) ->
     url = @props.dataSource.getImageUrl(id)
@@ -94,7 +138,7 @@ class TableContentsComponent extends React.Component
 
   renderCell: (rowIndex, columnIndex) ->
     row = @props.data.main[rowIndex]  
-    column = @props.columns[columnIndex]
+    column = @props.design.columns[columnIndex]
 
     exprUtils = new ExprUtils(@props.schema)
     exprType = exprUtils.getExprType(column.textAxis?.expr)
@@ -133,18 +177,43 @@ class TableContentsComponent extends React.Component
 
     return H.td(key: columnIndex, node)
 
+  # Render checkbox column
+  renderCheckbox: (index, selected) ->
+    H.td key: "checkbox", style: { width: 1 }, onClick: @handleSelectRow.bind(null, index, selected),
+      if selected
+        H.i className: "fa fa-fw fa-check-square", style: { color: "#2E6DA4" }
+      else
+        H.i className: "fa fa-fw fa-square-o", style: { color: "#888" }
+
   renderRow: (index) ->
-    H.tr key: index, onClick: @handleRowClick.bind(null, index),
-      _.map(@props.columns, (column, i) => @renderCell(index, i))
+    # Determine if row is selected
+    selected = @props.design.multiselect and @props.data.main[index].id and @state.selectedIds[@props.data.main[index].id]
+
+    H.tr key: index, onClick: @handleRowClick.bind(null, index), style: { backgroundColor: (if selected then "#eee") },
+      [
+        if @props.design.multiselect
+          @renderCheckbox(index, selected)
+        _.map(@props.design.columns, (column, i) => @renderCell(index, i))
+      ]
 
   renderBody: ->
     H.tbody key: "body",
       _.map(@props.data.main, (row, i) => @renderRow(i))
 
+  renderActions: ->
+    if @props.design.multiselect
+      H.div null,
+        R ui.Button, 
+          disabled: _.isEmpty(@state.selectedIds)
+          size: "xs", 
+            "Approve Selected"
+
   render: ->
-    H.table className: "table table-condensed table-hover", style: { fontSize: "10pt", marginBottom: 0 },
-      @renderHeader()
-      @renderBody()
+    H.div null,
+      @renderActions()
+      H.table className: "table table-condensed table-hover", style: { fontSize: "10pt", marginBottom: 0 },
+        @renderHeader()
+        @renderBody()
 
 
 #   renderHeaderCell: (index) ->

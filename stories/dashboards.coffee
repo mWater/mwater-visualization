@@ -46,6 +46,7 @@ tableDashboardDesign = {
           ],
           "orderings": [],
           "table": "entities.place_of_worship"
+          multiselect: true
         },
         "id": "193bbc40-9177-4547-8b83-c2b5441f72c3"
       }

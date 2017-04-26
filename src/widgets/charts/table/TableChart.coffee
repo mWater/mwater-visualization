@@ -18,6 +18,8 @@ Design is:
   columns: array of columns
   filter: optional logical expression to filter by
   orderings: array of orderings
+  version: 1
+  multiselect: true to allow multiple selections
 
 column:
   id: unique id of column (uuid v4)
