@@ -19,6 +19,7 @@ module.exports = class PivotChartLayoutComponent extends React.Component
     onInsertAfterSegment: React.PropTypes.func  # Called with id of segment
     onAddChildSegment: React.PropTypes.func  # Called with id of segment
     onSummarizeSegment: React.PropTypes.func  # Called with id of segment. Summarizes the segment
+    onCellClick: React.PropTypes.func  # Called with cell
 
   constructor: (props) ->
     super
@@ -52,6 +53,7 @@ module.exports = class PivotChartLayoutComponent extends React.Component
           hoverSection: if @props.editable then @state.hoverSection
           onEditSection: if @props.onEditSection then @props.onEditSection.bind(null, cell.section)
           onSummarizeSegment: if @props.onSummarizeSegment then @props.onSummarizeSegment.bind(null, cell.section)
+          onCellClick: @props.onCellClick
 
   renderHoverPlusIcon: (key, x, y, onClick) =>
     # Render a plus box
@@ -171,6 +173,7 @@ class LayoutCellComponent extends React.Component
     onHover: React.PropTypes.func # Called when hovered over
     onEditSection: React.PropTypes.func
     onSummarizeSegment: React.PropTypes.func
+    onCellClick: React.PropTypes.func
 
   handleClick: (ev) =>
     # Ignore blanks
@@ -184,6 +187,8 @@ class LayoutCellComponent extends React.Component
 
     if @props.onEditSection
       @props.onEditSection()
+    else if @props.onCellClick
+      @props.onCellClick(cell)
 
   # Gets cell component
   getTdComponent: -> @tdComponent

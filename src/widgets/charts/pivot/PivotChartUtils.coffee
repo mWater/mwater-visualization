@@ -1,5 +1,6 @@
 _ = require 'lodash'
 uuid = require 'uuid'
+AxisBuilder = require '../../../axes/AxisBuilder'
 
 # Misc utils for working with pivot charts
 
@@ -42,6 +43,44 @@ exports.canSummarizeSegment = (segments, id) ->
     return true
 
   return false
+
+# Creates a JsonQL filter that filters the same as the cell's underlying filter.
+# That is, if it's an intersection, then all row and column segments with a valueAxis are included.
+exports.createCellFilter = (design, schema, segmentValues) ->
+  axisBuilder = new AxisBuilder(schema: schema)
+
+  filter = {
+    table: design.table
+    jsonql: {
+      type: "op"
+      op: "and"
+      exprs: []
+    }
+  }
+
+  for segmentId in _.keys(segmentValues).sort()
+    segment = exports.findSegment(design.rows, segmentId) or exports.findSegment(design.columns, segmentId)
+    filter.jsonql.exprs.push(axisBuilder.createValueFilter(segment.valueAxis, segmentValues[segmentId]))
+
+  return filter
+
+# Create a name for the scope created by segments values (e.g. SomeValue is Xyz)
+# Name is an array of React elements
+exports.createScopeName = (design, schema, segmentValues, locale) ->
+  axisBuilder = new AxisBuilder(schema: schema)
+
+  names = []
+
+  for segmentId, i in _.keys(segmentValues).sort()
+    segment = exports.findSegment(design.rows, segmentId) or exports.findSegment(design.columns, segmentId)
+    if i > 0
+      names.push(" and ")
+
+    names.push(axisBuilder.summarizeAxis(segment.valueAxis, locale))
+    names.push(" is ")
+    names.push(axisBuilder.formatValue(segment.valueAxis, segmentValues[segmentId], locale))
+
+  return names
 
 # Finds the segment before one with id
 findPreviousSegment = (segments, id) ->

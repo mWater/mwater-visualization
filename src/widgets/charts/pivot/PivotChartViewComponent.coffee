@@ -127,6 +127,22 @@ module.exports = class PivotChartViewComponent extends React.Component
 
     @props.onDesignChange(design)
 
+  handleCellClick: (cell) =>
+    # Scope cell unless already scoped, in which case, clear scope
+    if cell.scoped
+      @props.onScopeChange?()
+    else if cell.segmentValues and not _.isEmpty(cell.segmentValues)
+      scope = {
+        name: PivotChartUtils.createScopeName(@props.design, @props.schema, cell.segmentValues, @context.locale)
+        filter: PivotChartUtils.createCellFilter(@props.design, @props.schema, cell.segmentValues)
+        data: {
+          section: cell.section
+          segmentValues: cell.segmentValues
+        }
+      }
+
+      @props.onScopeChange?(scope)
+
   renderHeader: ->
     return H.div ref: "header", style: { paddingLeft: 10, paddingRight: 10 },
       R TextComponent,
@@ -199,5 +215,7 @@ module.exports = class PivotChartViewComponent extends React.Component
           onInsertAfterSegment: if @props.onDesignChange? then @handleInsertAfterSegment
           onAddChildSegment: if @props.onDesignChange? then @handleAddChildSegment
           onSummarizeSegment: if @props.onDesignChange? then @handleSummarizeSegment
+          onCellClick: @handleCellClick
+
 
       @renderFooter()

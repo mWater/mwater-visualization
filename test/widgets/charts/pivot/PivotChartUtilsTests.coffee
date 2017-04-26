@@ -2,12 +2,24 @@ assert = require('chai').assert
 _ = require 'lodash'
 
 PivotChartUtils = require '../../../../src/widgets/charts/pivot/PivotChartUtils'
+fixtures = require '../../../fixtures'
 
 canonical = require 'canonical-json'
 compare = (actual, expected) ->
   assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n"
 
 describe "PivotChartUtils", ->
+  before ->
+    @exprNumber = { type: "field", table: "t1", column: "number" }
+    @exprText = { type: "field", table: "t1", column: "text" }
+    @exprEnum = { type: "field", table: "t1", column: "enum" }
+    @exprNumberSum = { type: "op", op: "sum", table: "t1", exprs: [{ type: "field", table: "t1", column: "number" }] }
+
+    @axisNumber = { expr: @exprNumber }
+    @axisNumberSum = { expr: @exprNumberSum }
+    @axisEnum = { expr: @exprEnum } 
+    @axisText = { expr: @exprText } 
+
   describe "getSegmentPaths", ->
     it 'gets simple paths', ->
       segments = [{ id: "a" }, { id: "b" }]
@@ -30,6 +42,59 @@ describe "PivotChartUtils", ->
     it "finds null if not found", ->
       segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
       assert not PivotChartUtils.findSegment(segments, "x")
+
+  describe "createCellFilter", ->
+    it "filters simple intersection", ->
+      schema = fixtures.simpleSchema()
+
+      design = {
+        table: "t1"
+        columns: [{ id: "c1", valueAxis: @axisEnum }]
+        rows: [{ id: "r1", valueAxis: @axisText }]
+        intersections: {
+          "r1:c1": { valueAxis: @axisNumberSum }
+        }
+      }
+
+      filter = PivotChartUtils.createCellFilter(design, schema, { r1: "x", c1: "b" })
+
+      compare filter, {
+        table: "t1"
+        jsonql: {
+          type: "op"
+          op: "and"
+          exprs: [
+            { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "enum" }, { type: "literal", value: "b" }] }
+            { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "text" }, { type: "literal", value: "x" }] }
+          ]
+        }
+      }
+
+  describe "createScopeName", ->
+    it "names simple intersection", ->
+      schema = fixtures.simpleSchema()
+
+      design = {
+        table: "t1"
+        columns: [{ id: "c1", valueAxis: @axisEnum }]
+        rows: [{ id: "r1", valueAxis: @axisText }]
+        intersections: {
+          "r1:c1": { valueAxis: @axisNumberSum }
+        }
+      }
+
+      name = PivotChartUtils.createScopeName(design, schema, { r1: "x", c1: "b" }, "en")
+
+      compare name, [
+        "Enum"
+        " is "
+        "B"
+        " and "
+        "Text"
+        " is "
+        "x"
+      ]
+      
 
   describe "canSummarizeSegment", ->
     it "is false if first", ->
