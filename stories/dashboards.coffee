@@ -1,4 +1,3 @@
-
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -9,18 +8,60 @@ storiesOf = require('@kadira/storybook').storiesOf
 DashboardComponent = require '../src/dashboards/DashboardComponent'
 DirectDashboardDataSource = require '../src/dashboards/DirectDashboardDataSource'
 MWaterLoaderComponent = require '../src/MWaterLoaderComponent'
+UpdateableComponent = require './UpdateableComponent'
 
 storiesOf('dashboard', module)
   .add 'empty dashboard', => 
     R DashboardTest
 
+ .add 'table dashboard', => 
+    R DashboardTest, design: tableDashboardDesign
+
   .add 'popup', => 
     R DashboardPopupTest
 
+
+tableDashboardDesign = {
+  "items": {
+    "id": "root",
+    "type": "root",
+    "blocks": [
+      {
+        "type": "widget",
+        "aspectRatio": 1.4,
+        "widgetType": "TableChart",
+        "design": {
+          "version": 1,
+          "columns": [
+            {
+              "id": "f1532afb-c0ea-48de-8e4e-931b147eeb6f",
+              "textAxis": {
+                "expr": {
+                  "type": "field",
+                  "table": "entities.place_of_worship",
+                  "column": "name"
+                }
+              }
+            }
+          ],
+          "orderings": [],
+          "table": "entities.place_of_worship"
+        },
+        "id": "193bbc40-9177-4547-8b83-c2b5441f72c3"
+      }
+    ]
+  },
+  "layout": "blocks"
+}
+
+
 class DashboardTest extends React.Component
+  @propTypes:
+    design: React.PropTypes.object
+
   render: ->
     R UpdateableComponent, 
-      design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" }
+      design: @props.design or { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" }
       (state, update) =>
         apiUrl = "https://api.mwater.co/v3/"
         R MWaterLoaderComponent, {
@@ -37,7 +78,7 @@ class DashboardTest extends React.Component
           dashboardDataSource = new DirectDashboardDataSource({
             apiUrl: apiUrl
             client: null
-            design: state.popup.design
+            design: state.design
             schema: config.schema
             dataSource: config.dataSource
           })
@@ -74,7 +115,7 @@ class DashboardPopupTest extends React.Component
           dashboardDataSource = new DirectDashboardDataSource({
             apiUrl: apiUrl
             client: null
-            design: state.design
+            design: state.popup.design
             schema: config.schema
             dataSource: config.dataSource
           })
@@ -139,28 +180,9 @@ class DashboardPopupComponent extends React.Component
           dashboardDataSource: @props.dashboardDataSource
           design: @props.popup.design
           onDesignChange: @update("design")
-          titleElem: H.span style: { fontSize: 20, cursor: "pointer" },
-            H.span className: "text-muted", onClick: (=> @setState(open: false)),
-              R ui.Icon, id: "fa-arrow-left"
-            " Popup"
+          # titleElem: H.span style: { fontSize: 20, cursor: "pointer" },
+          #   H.span className: "text-muted", onClick: (=> @setState(open: false)),
+          #     R ui.Icon, id: "fa-arrow-left"
         }
 
-
-
-# Convenience wrapper that allows updating state
-class UpdateableComponent extends React.Component
-  constructor: (props) ->
-    super
-    @state = _.clone(@props or {})
-
-  # Creates update function
-  update: (name) =>
-    return (value) =>
-      upt = {}
-      upt[name] = value
-      @setState(upt)
-      console.log JSON.stringify(upt, null, 2)
-
-  render: ->
-    @props.children(@state, @update)
 

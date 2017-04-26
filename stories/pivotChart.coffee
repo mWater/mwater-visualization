@@ -9,6 +9,7 @@ action = require('@kadira/storybook').action
 WidgetFactory = require '../src/widgets/WidgetFactory'
 DirectWidgetDataSource = require '../src/widgets/DirectWidgetDataSource'
 MWaterLoaderComponent = require '../src/MWaterLoaderComponent'
+UpdateableComponent = require './UpdateableComponent'
 
 storiesOf('Pivot Chart', module)
   .add 'blank', => 
@@ -212,23 +213,3 @@ class PivotTest extends React.Component
             onDesignChange: update("design")
             width: 800
           })
-
-
-# Convenience wrapper that allows updating state
-class UpdateableComponent extends React.Component
-  constructor: (props) ->
-    super
-    @state = _.clone(@props or {})
-
-  # Creates update function
-  update: (name) =>
-    return (value) =>
-      upt = {}
-      upt[name] = value
-      @setState(upt)
-      console.log JSON.stringify(upt, null, 2)
-      action("update")(upt)
-
-  render: ->
-    @props.children(@state, @update)
-

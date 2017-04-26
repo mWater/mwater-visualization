@@ -17,6 +17,7 @@ siteTypes = [
   "entities.surface_water"
   "entities.place_of_worship"
   "entities.water_system"
+  "entities.wastewater_treatment_system"
 ]
 
 # Allows selection of a mwater-visualization table. Loads forms as well and calls event if modified
