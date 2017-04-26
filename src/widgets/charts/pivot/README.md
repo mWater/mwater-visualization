@@ -132,5 +132,9 @@ valueLabel: header for values (rows and columns that have value and label)
 filler: intersection cells that have no data but fill space for row label
 
 
+## Scoping
 
-
+Pivot tables can be scoped like most other widgets. Scope data is an object containing properties:
+  
+  section: section id that is scoped
+  segmentValues: values of segments that are scoped, keyed by segment id

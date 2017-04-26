@@ -84,7 +84,12 @@ class ChartWidgetComponent extends React.Component
     height: React.PropTypes.number
     standardWidth: React.PropTypes.number   # Standard width to allow widget to scale properly to retain same appearance
 
-    scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
+    # scope of the widget (when the widget self-selects a particular scope)
+    scope: React.PropTypes.shape({ 
+      name: React.PropTypes.string.isRequired
+      filter: React.PropTypes.shape({ table: React.PropTypes.string.isRequired, jsonql: React.PropTypes.object.isRequired })
+      data: React.PropTypes.any
+    }) 
     filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
