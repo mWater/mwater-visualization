@@ -117,6 +117,8 @@ cell:
   segmentValues: map of segment id to values for any values that are part of the cell. If a segment has no expression, it is not included
     If an intersection, contains the values of row and column segments that have a value (including null).
 
+  scoped: true if cell is scoped and should be highlighted
+
 ### Cell types
 
 row: part of rows, has section as row segment id

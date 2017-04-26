@@ -580,6 +580,41 @@ describe "PivotChartLayoutBuilder", ->
         [{ }, { c1: "a" }, { c1: "b" }, { c1: null }]
       ]
 
+    it "sets scoped", ->
+      design = {
+        table: "t1"
+        columns: [{ id: "c1", valueAxis: @axisEnum }]
+        rows: [{ id: "r1", valueAxis: @axisText }]
+        intersections: {
+          "r1:c1": { valueAxis: @axisNumberSum }
+        }
+      }
+
+      data = {
+        "r1:c1": [
+          { r0: "x", c0: "a", value: 2 }
+          { r0: "y", c0: "b", value: 4 }
+        ]
+      }
+
+      scope = {
+        name: "xyz"
+        filter: {}
+        data: {
+          section: "r1:c1"
+          segmentValues: { r1: "x", c1: "b" }
+        }
+      }
+
+      layout = @lb.buildLayout(design, data, null, scope)
+
+      # Check text
+      compare layoutPluck(layout, "scoped"), [
+        [null, null, null, null]
+        [null, null, true, null]
+        [null, null, null, null]
+      ]
+
     it "sets section top/left/bottom/right", ->
       design = {
         table: "t1"

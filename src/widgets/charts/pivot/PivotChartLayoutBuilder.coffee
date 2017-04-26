@@ -14,7 +14,7 @@ module.exports = class PivotChartLayoutBuilder
     @exprUtils = new ExprUtils(@schema)
     @axisBuilder = new AxisBuilder(schema: @schema)
 
-  buildLayout: (design, data, locale) ->
+  buildLayout: (design, data, locale, scope) ->
     # Create empty layout
     layout = {
       rows: []
@@ -169,6 +169,13 @@ module.exports = class PivotChartLayoutBuilder
         cells.push(@buildIntersectionCell(design, data, locale, row, column))
 
       layout.rows.push({ cells: cells })
+
+    # Setup scoped
+    for columnIndex in [0...layout.rows[0].cells.length]
+      for rowIndex in [0...layout.rows.length]
+        cell = layout.rows[rowIndex].cells[columnIndex]
+        if scope and scope.data.section == cell.section and cell.segmentValues and _.isEqual(scope.data.segmentValues, cell.segmentValues)
+          cell.scoped = true
 
     # Set up section top/left/bottom/right info
     for columnIndex in [0...layout.rows[0].cells.length]

@@ -230,6 +230,10 @@ class LayoutCellComponent extends React.Component
     borderBottom = Math.max(cell.borderBottom or 0, @props.layout.rows[@props.rowIndex + 1]?.cells[@props.columnIndex].borderTop or 0)
     borderRight = Math.max(cell.borderRight or 0, @props.layout.rows[@props.rowIndex].cells[@props.columnIndex + 1]?.borderLeft or 0)
 
+    # Scoped wins on background color
+    if cell.scoped
+      backgroundColor = "#bad5f7"
+
     style = {
       padding: 5
       verticalAlign: "top"

@@ -41,6 +41,34 @@ storiesOf('Pivot Chart', module)
       }
     }
 
+  .add 'water types scoped', => 
+    R PivotTest, 
+      design: {
+        table: "entities.water_point"
+        rows: [
+          { 
+            id: "row1"
+            valueAxis: { expr: { type: "field", table: "entities.water_point", column: "type" } }
+          }
+        ]
+        columns: [{ id: "col1", label: "Test" }]
+        intersections: {
+          "row1:col1": {
+            valueAxis: { expr: { type: "op", op: "count", table: "entities.water_point", exprs: [] } }
+          }
+        }
+      }
+      scope: {
+        name: "Nonsuch"
+        filter: {}
+        data: {
+          section: "row1:col1"
+          segmentValues: {
+            row1: "Protected spring"
+          }
+        }
+      }
+
   .add 'water types with label', => 
     R PivotTest, design: {
       table: "entities.water_point"
@@ -179,6 +207,10 @@ storiesOf('Pivot Chart', module)
     }
 
 class PivotTest extends React.Component
+  @propTypes: 
+    design: React.PropTypes.object.isRequired
+    scope: React.PropTypes.object
+
   render: ->
     R UpdateableComponent, 
       design: @props.design,
@@ -207,7 +239,7 @@ class PivotTest extends React.Component
             dataSource: config.dataSource
             widgetDataSource: widgetDataSource
             design: state.design
-            scope: null
+            scope: @props.scope
             filters: null
             onScopeChange: null
             onDesignChange: update("design")

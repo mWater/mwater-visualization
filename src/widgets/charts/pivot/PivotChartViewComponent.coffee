@@ -183,7 +183,7 @@ module.exports = class PivotChartViewComponent extends React.Component
           onChange: (intersection) => @setState(editIntersection: intersection)
 
   render: ->
-    layout = new PivotChartLayoutBuilder(schema: @props.schema).buildLayout(@props.design, @props.data, @context.locale)
+    layout = new PivotChartLayoutBuilder(schema: @props.schema).buildLayout(@props.design, @props.data, @context.locale, @props.scope)
 
     H.div style: { width: @props.width, height: @props.height },
       @renderHeader()
