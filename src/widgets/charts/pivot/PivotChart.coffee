@@ -13,7 +13,7 @@ PivotChartUtils = require './PivotChartUtils'
 PivotChartQueryBuilder = require './PivotChartQueryBuilder'
 PivotChartLayoutBuilder = require './PivotChartLayoutBuilder'
 
-# See PivotChart Design.md for the design
+# See README.md for the design
 module.exports = class PivotChart extends Chart
   cleanDesign: (design, schema) ->
     exprCleaner = new ExprCleaner(schema)

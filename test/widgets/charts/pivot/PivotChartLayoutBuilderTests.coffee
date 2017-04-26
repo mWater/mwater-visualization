@@ -529,6 +529,57 @@ describe "PivotChartLayoutBuilder", ->
         [null, null, "rgba(255, 136, 0, 0.5)", null]
       ]
 
+    it "sets segmentValues", ->
+      design = {
+        table: "t1"
+        columns: [{ id: "c1", valueAxis: @axisEnum }]
+        rows: [{ id: "r1", valueAxis: @axisText }]
+        intersections: {
+          "r1:c1": { valueAxis: @axisNumberSum }
+        }
+      }
+
+      data = {
+        "r1:c1": [
+          { r0: "x", c0: "a", value: 2 }
+          { r0: "y", c0: "b", value: 4 }
+        ]
+      }
+
+      layout = @lb.buildLayout(design, data)
+
+      # Check text
+      compare layoutPluck(layout, "segmentValues"), [
+        [null, { c1: "a" }, { c1: "b" }, { c1: null }]
+        [{ r1: "x" }, { r1: "x", c1: "a" }, { r1: "x", c1: "b" }, { r1: "x", c1: null }]
+        [{ r1: "y" }, { r1: "y", c1: "a" }, { r1: "y", c1: "b" }, { r1: "y", c1: null }]
+      ]
+
+    it "sets segmentValues only when has axis", ->
+      design = {
+        table: "t1"
+        columns: [{ id: "c1", valueAxis: @axisEnum }]
+        rows: [{ id: "r1" }]
+        intersections: {
+          "r1:c1": { valueAxis: @axisNumberSum }
+        }
+      }
+
+      data = {
+        "r1:c1": [
+          { c0: "a", value: 2 }
+          { c0: "b", value: 4 }
+        ]
+      }
+
+      layout = @lb.buildLayout(design, data)
+
+      # Check text
+      compare layoutPluck(layout, "segmentValues"), [
+        [null, { c1: "a" }, { c1: "b" }, { c1: null }]
+        [{ }, { c1: "a" }, { c1: "b" }, { c1: null }]
+      ]
+
     it "sets section top/left/bottom/right", ->
       design = {
         table: "t1"

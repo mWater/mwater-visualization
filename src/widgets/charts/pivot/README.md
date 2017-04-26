@@ -114,6 +114,9 @@ cell:
   unconfigured: true if cell is a placeholder that needs to be configured
   summarize: true if cell is unconfigured and can be turned into a summary
 
+  segmentValues: map of segment id to values for any values that are part of the cell. If a segment has no expression, it is not included
+    If an intersection, contains the values of row and column segments that have a value (including null).
+
 ### Cell types
 
 row: part of rows, has section as row segment id

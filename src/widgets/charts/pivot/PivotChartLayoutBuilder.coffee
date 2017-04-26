@@ -62,6 +62,12 @@ module.exports = class PivotChartLayoutBuilder
       for i in [1..rowsDepth]
         cells.push({ type: "blank", text: null })
       for column in columns
+        # Determine segmentValues which comprise all above segments plus self
+        segmentValues = {}
+        for subdepth in [0..depth]
+          if column[subdepth]?.segment?.valueAxis
+            segmentValues[column[subdepth].segment.id] = column[subdepth].value
+
         cells.push({ 
           type: "column"
           subtype: if column[depth]?.segment?.valueAxis then "value" else "label"
@@ -73,6 +79,7 @@ module.exports = class PivotChartLayoutBuilder
           unconfigured: column[depth]?.segment and not column[depth]?.segment.label? and not column[depth]?.segment.valueAxis
           bold: column[depth]?.segment.bold
           italic: column[depth]?.segment.italic
+          segmentValues: segmentValues
         })
 
       layout.rows.push({ cells: cells })
@@ -136,6 +143,12 @@ module.exports = class PivotChartLayoutBuilder
       # Emit normal row headers
       cells = []
       for depth in [0...rowsDepth]
+        # Determine segmentValues which comprise all above segments plus self
+        segmentValues = {}
+        for subdepth in [0..depth]
+          if row[subdepth]?.segment?.valueAxis
+            segmentValues[row[subdepth].segment.id] = row[subdepth].value
+
         cells.push({ 
           type: "row"
           subtype: if row[depth]?.segment?.valueAxis then "value" else "label"
@@ -148,6 +161,7 @@ module.exports = class PivotChartLayoutBuilder
           italic: row[depth]?.segment.italic
           # Indent if has value and label
           indent: if row[depth]?.segment?.valueAxis and row[depth]?.segment?.label then 1
+          segmentValues: segmentValues
         })
 
       # Emit contents
@@ -286,6 +300,16 @@ module.exports = class PivotChartLayoutBuilder
       bold: intersection.bold
       italic: intersection.italic
     }
+
+    # Build segmentValues
+    cell.segmentValues = {}
+    for rowPart in row
+      if rowPart.segment.valueAxis?
+        cell.segmentValues[rowPart.segment.id] = rowPart.value
+
+    for columnPart in column
+      if columnPart.segment.valueAxis?
+        cell.segmentValues[columnPart.segment.id] = columnPart.value
 
     # Set background color
     backgroundColor = null
