@@ -17,8 +17,23 @@ module.exports = class SegmentDesignerComponent extends React.Component
     table: React.PropTypes.string.isRequired
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
+    widgetDataSource: React.PropTypes.object.isRequired # dashboard data source for widget
     segmentType: React.PropTypes.string.isRequired  # "row" or "column"
     onChange: React.PropTypes.func.isRequired
+
+    # All dashboard popups
+    popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
+    onPopupsChange: React.PropTypes.func               # If not set, readonly
+
+    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+
+    # Filters to add to the dashboard
+    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
+      table: React.PropTypes.string.isRequired    # id table to filter
+      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    }))
+
 
   constructor: (props) ->
     super
@@ -152,13 +167,26 @@ module.exports = class SegmentDesignerComponent extends React.Component
             labelMuted: true
             label: "When #{@props.segmentType} value is clicked:",
               R ui.Select,
-                value: @props.segment.clickAction or null
+                value: @props.intersection.clickAction or null
                 onChange: @update("clickAction")
                 options: [
-                  { value: null, label: "Do nothing"}
+                  { value: "none", label: "Do nothing"}
                   { value: "scope", label: "Filter other widgets"}
                   { value: "popup", label: "Open popup"}
                 ]
+
+          if @props.segment.clickAction == "popup"
+            R DashboardPopupSelectorComponent,
+              popups: @props.popups
+              onPopupsChange: @props.onPopupsChange
+              schema: @props.schema
+              dataSource: @props.dataSource
+              widgetDataSource: @props.widgetDataSource
+              onRowClick: @props.onRowClick
+              namedStrings: @props.namedStrings
+              filters: @props.filters
+              popupId: @props.segment.clickActionPopup
+              onPopupIdChange: @update("clickActionPopup")
 
   render: ->
     H.div null,

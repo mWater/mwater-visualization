@@ -159,7 +159,7 @@ module.exports = class IntersectionDesignerComponent extends React.Component
               value: @props.intersection.clickAction or null
               onChange: @update("clickAction")
               options: [
-                { value: null, label: "Do nothing"}
+                { value: "none", label: "Do nothing"}
                 { value: "scope", label: "Filter other widgets"}
                 { value: "popup", label: "Open popup"}
               ]

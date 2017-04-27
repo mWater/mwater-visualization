@@ -50,7 +50,7 @@ segment:
   borderWithin: weight of border within segment (0 = none, 1 = light (default), 2 = medium, 3 = heavy)
   borderAfter: weight of border after segment (0 = none, 1 = light, 2 = medium (default), 3 = heavy)
 
-  clickAction: null/"scope"/"popup"
+  clickAction: "none"/"scope"/"popup"
   clickActionPopup: popup id to use if clickAction is "popup"
 
 intersection:
@@ -68,7 +68,7 @@ intersection:
   bold: true if bold
   italic: true if italic
 
-  clickAction: null/"scope"/"popup"
+  clickAction: "none"/"scope"/"popup"
   clickActionPopup: popup id to use if clickAction is "popup"
 
 ## Rendering 
