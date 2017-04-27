@@ -30,6 +30,11 @@ module.exports = class ChartViewComponent extends React.Component
 
     onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
 
+    # All dashboard popups
+    popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
+    onPopupsChange: React.PropTypes.func # Sets popups of dashboard. If not set, readonly
+    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+
   constructor: ->
     super
 
@@ -102,6 +107,7 @@ module.exports = class ChartViewComponent extends React.Component
         @props.chart.createViewElement({
           schema: @props.schema
           dataSource: @props.dataSource
+          widgetDataSource: @props.widgetDataSource
           design: @state.validDesign
           onDesignChange: @props.onDesignChange
           data: @state.data
@@ -111,6 +117,9 @@ module.exports = class ChartViewComponent extends React.Component
           height: @props.height
           standardWidth: @props.standardWidth
           onRowClick: @props.onRowClick
+          namedStrings: @props.namedStrings
+          popups: @props.popups
+          onPopupsChange: @props.onPopupsChange
           })
       if @state.dataLoading
         @renderSpinner()

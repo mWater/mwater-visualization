@@ -12,6 +12,8 @@ ColorComponent = require '../../../ColorComponent'
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprComponent = require("mwater-expressions-ui").ExprComponent
 
+DashboardPopupSelectorComponent = require '../../../dashboards/DashboardPopupSelectorComponent'
+
 # Design an intersection of a pivot table
 module.exports = class IntersectionDesignerComponent extends React.Component
   @propTypes: 
@@ -19,7 +21,21 @@ module.exports = class IntersectionDesignerComponent extends React.Component
     table: React.PropTypes.string.isRequired
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
+    widgetDataSource: React.PropTypes.object.isRequired # dashboard data source for widget
     onChange: React.PropTypes.func.isRequired
+
+    # All dashboard popups
+    popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
+    onPopupsChange: React.PropTypes.func               # If not set, readonly
+
+    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+
+    # Filters to add to the dashboard
+    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
+      table: React.PropTypes.string.isRequired    # id table to filter
+      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    }))
 
   # Updates intersection with the specified changes
   update: => update(@props.intersection, @props.onChange, arguments)
@@ -148,6 +164,19 @@ module.exports = class IntersectionDesignerComponent extends React.Component
                 { value: "popup", label: "Open popup"}
               ]
 
+        if @props.intersection.clickAction == "popup"
+          R DashboardPopupSelectorComponent,
+            popups: @props.popups
+            onPopupsChange: @props.onPopupsChange
+            schema: @props.schema
+            dataSource: @props.dataSource
+            widgetDataSource: @props.widgetDataSource
+            onRowClick: @props.onRowClick
+            namedStrings: @props.namedStrings
+            filters: @props.filters
+            popupId: @props.intersection.clickActionPopup
+            onPopupIdChange: @update("clickActionPopup")
+
   render: ->
     H.div null,
       @renderValueAxis()
@@ -237,3 +266,4 @@ class BackgroundColorConditionComponent extends React.Component
             R ColorComponent,
               color: @props.colorCondition.color
               onChange: @update("color")
+

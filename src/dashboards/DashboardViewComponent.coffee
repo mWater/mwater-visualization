@@ -39,6 +39,11 @@ module.exports = class DashboardViewComponent extends React.Component
       jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
     }))
 
+    # All dashboard popups. If not specified, use the popups specified in the dashboard. Should always be null unless
+    # this dashboard is being displayed as a popup
+    popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired }))
+    onPopupsChange: React.PropTypes.func # Sets popups of dashboard. If not set and popups is set, readonly
+
   @defaultProps:
     standardWidth: 1440 # Standard width. Matches 8.5x11" paper with 0.5" margin at 192dpi
 
@@ -62,6 +67,10 @@ module.exports = class DashboardViewComponent extends React.Component
 
   handleItemsChange: (items) =>
     design = _.extend({}, @props.design, items: items)
+    @props.onDesignChange(design)
+
+  handlePopupsChange: (popups) =>
+    design = _.extend({}, @props.design, popups: popups)
     @props.onDesignChange(design)
 
   # Call to print the dashboard
@@ -127,6 +136,8 @@ module.exports = class DashboardViewComponent extends React.Component
         standardWidth: options.standardWidth 
         onRowClick: @props.onRowClick
         namedStrings: @props.namedStrings
+        popups: @props.popups or @props.design.popups or []
+        onPopupsChange: @props.onPopupsChange or (if @props.onDesignChange then @handlePopupsChange)
       })  
 
     style = {

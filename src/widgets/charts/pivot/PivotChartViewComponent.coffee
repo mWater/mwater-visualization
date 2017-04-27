@@ -14,6 +14,8 @@ PivotChartLayoutBuilder = require './PivotChartLayoutBuilder'
 SegmentDesignerComponent = require './SegmentDesignerComponent'
 IntersectionDesignerComponent = require './IntersectionDesignerComponent'
 
+DashboardPopupComponent = require '../../../dashboards/DashboardPopupComponent'
+
 # Displays a pivot chart
 module.exports = class PivotChartViewComponent extends React.Component
   @propTypes: 
@@ -33,6 +35,20 @@ module.exports = class PivotChartViewComponent extends React.Component
       data: React.PropTypes.any
     }) 
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+
+    widgetDataSource: React.PropTypes.object.isRequired # dashboard data source for widget
+
+    # All dashboard popups
+    popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
+    onPopupsChange: React.PropTypes.func # Sets popups of dashboard. If not set, readonly
+    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+
+    # Filters to add to the dashboard
+    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
+      table: React.PropTypes.string.isRequired    # id table to filter
+      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    }))
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
@@ -150,16 +166,18 @@ module.exports = class PivotChartViewComponent extends React.Component
       # Determine action
       if segment.clickAction == "scope"
         @performScopeAction(cell)
-      else if segment.clickAction == "popup"
-        console.log "TODO"
+      else if segment.clickAction == "popup" and segment.clickActionPopup
+        @dashboardPopupComponent.show(segment.clickActionPopup, 
+          _.compact([PivotChartUtils.createCellFilter(@props.design, @props.schema, cell.segmentValues)]))
     else if cell.type == "intersection"
       intersection = @props.design.intersections[cell.section]
 
       # Determine action
       if intersection.clickAction == "scope"
         @performScopeAction(cell)
-      else if intersection.clickAction == "popup"
-        console.log "TODO"
+      else if intersection.clickAction == "popup" and intersection.clickActionPopup
+        @dashboardPopupComponent.show(intersection.clickActionPopup, 
+          _.compact([PivotChartUtils.createCellFilter(@props.design, @props.schema, cell.segmentValues)]))
 
   renderHeader: ->
     return H.div ref: "header", style: { paddingLeft: 10, paddingRight: 10 },
@@ -215,11 +233,30 @@ module.exports = class PivotChartViewComponent extends React.Component
           schema: @props.schema
           dataSource: @props.dataSource
           onChange: (intersection) => @setState(editIntersection: intersection)
+          widgetDataSource: @props.widgetDataSource
+          popups: @props.popups
+          onPopupsChange: @props.onPopupsChange
+          onRowClick: @props.onRowClick
+          namedStrings: @props.namedStrings
+          filters: @props.filters
+
+  renderPopup: ->
+    R DashboardPopupComponent,
+      ref: (c) => @dashboardPopupComponent = c
+      popups: @props.popups
+      onPopupsChange: @props.onPopupsChange
+      schema: @props.schema
+      dataSource: @props.dataSource
+      widgetDataSource: @props.widgetDataSource
+      onRowClick: @props.onRowClick
+      namedStrings: @props.namedStrings
+      filters: @props.filters
 
   render: ->
     layout = new PivotChartLayoutBuilder(schema: @props.schema).buildLayout(@props.design, @props.data, @context.locale, @props.scope)
 
     H.div style: { width: @props.width, height: @props.height },
+      @renderPopup()
       @renderHeader()
       @renderEditSegmentModal()
       @renderEditIntersectionModal()

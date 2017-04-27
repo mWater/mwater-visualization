@@ -38,6 +38,11 @@ module.exports = class DashboardComponent extends React.Component
       jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
     }))
 
+    # All dashboard popups. If not specified, use the popups specified in the dashboard. Should always be null unless
+    # this dashboard is being displayed as a popup
+    popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired }))
+    onPopupsChange: React.PropTypes.func # Sets popups of dashboard. If not set and popups is set, readonly
+
   @defaultProps:
     printScaling: true
 

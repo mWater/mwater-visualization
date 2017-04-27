@@ -50,7 +50,12 @@ module.exports = class Chart
   #   width, height, standardWidth: size of the chart view
   #   scope: current scope of the view element
   #   onScopeChange: called when scope changes with new scope
+  #   widgetDataSource: dashboard data source for widget
+  #   popups: All dashboard popups
+  #   onPopupsChange: Sets popups of dashboard. If not set, readonly
   #   onRowClick: Called with (tableId, rowId) when item is clicked
+  #   namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+  #   filters: Filters to add to the dashboard
   createViewElement: (options) ->
     throw new Error("Not implemented")
 

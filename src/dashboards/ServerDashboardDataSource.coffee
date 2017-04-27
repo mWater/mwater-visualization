@@ -61,6 +61,10 @@ class ServerWidgetDataSource
 
     return url
 
+  # Gets the dashboard data source for the popup with the specified id
+  getPopupDashboardDataSource: (popupId) ->
+    throw new Error("TODO: Not implemented")
+
 class ServerWidgetMapDataSource 
   # options:
   #   apiUrl: API url to use for talking to mWater server

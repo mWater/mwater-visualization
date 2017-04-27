@@ -17,3 +17,8 @@ module.exports = class WidgetDataSource
   # Height, if specified, is minimum height needed. May return larger image
   getImageUrl: (imageId, height) ->
     throw new Error("Not implemented")
+
+  # Gets the dashboard data source for the popup with the specified id
+  getPopupDashboardDataSource: (popupId) ->
+    throw new Error("Not implemented")
+    

@@ -19,6 +19,8 @@ module.exports = class Widget
   #  singleRowTable: optional table name of table that will be filtered to have a single row present. Widget designer should optionally account for this
   #  onRowClick: Called with (tableId, rowId) when item is clicked
   #  namedStrings: optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+  #  popups: array of dashboard popups
+  #  onPopupsChange: called when popups are changed
   createViewElement: (options) ->
     throw new Error("Not implemented")
 

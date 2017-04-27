@@ -43,6 +43,9 @@ module.exports = class ChartWidget extends Widget
       height: options.height
       standardWidth: options.standardWidth
       onRowClick: options.onRowClick
+      namedStrings: options.namedStrings
+      popups: options.popups
+      onPopupsChange: options.onPopupsChange
     )
 
   # Get the data that the widget needs. This will be called on the server, typically.
@@ -94,6 +97,11 @@ class ChartWidgetComponent extends React.Component
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
     onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+
+    # All dashboard popups
+    popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
+    onPopupsChange: React.PropTypes.func # Sets popups of dashboard. If not set, readonly
+    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
     connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent) TODO REMOVE
     connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent) TODO REMOVE
@@ -162,6 +170,9 @@ class ChartWidgetComponent extends React.Component
       standardWidth: standardWidth
       onScopeChange: @props.onScopeChange
       onRowClick: @props.onRowClick
+      popups: @props.popups
+      onPopupsChange: @props.onPopupsChange
+      namedStrings: @props.namedStrings
     )
 
   renderEditor: ->
