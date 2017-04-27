@@ -1,7 +1,7 @@
 _ = require 'lodash'
 assert = require('chai').assert
-fixtures = require './fixtures'
-TableChart = require '../src/widgets/charts/table/TableChart'
+fixtures = require '../../../fixtures'
+TableChart = require '../../../../src/widgets/charts/table/TableChart'
 canonical = require 'canonical-json'
 
 compare = (actual, expected) ->
@@ -35,7 +35,7 @@ describe "TableChart", ->
   describe "createQueries", ->
     # it "includes _id if no grouping", ->
 
-    it "does group all if no aggr", ->
+    it "includes id if no aggr", ->
       design = {
         table: "t1"
         columns: [
@@ -51,11 +51,10 @@ describe "TableChart", ->
         selects: [
           { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
           { type: "select", expr: { type: "field", tableAlias: "main", column: "number" }, alias: "c1" }
-          { type: "select", expr: { type: "op", op: "min", exprs: [{ type: "field", tableAlias: "main", column: "primary" }] }, alias: "id" }
-          { type: "select", expr: { type: "op", op: "count", exprs: [] }, alias: "num_ids" }
+          { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "id" }
         ]
         from: { type: "table", table: "t1", alias: "main" }
-        groupBy: [1, 2]
+        groupBy: []
         orderBy: []
         limit: 1000
       }
@@ -78,8 +77,6 @@ describe "TableChart", ->
         selects: [
           { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
           { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "c1" }
-          { type: "select", expr: { type: "op", op: "min", exprs: [{ type: "field", tableAlias: "main", column: "primary" }] }, alias: "id" }
-          { type: "select", expr: { type: "op", op: "count", exprs: [] }, alias: "num_ids" }
         ]
         from: { type: "table", table: "t1", alias: "main" }
         groupBy: [1]
@@ -108,8 +105,6 @@ describe "TableChart", ->
           { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
           { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "c1" }
           { type: "select", expr: { type: "field", tableAlias: "main", column: "number" }, alias: "o0" }
-          { type: "select", expr: { type: "op", op: "min", exprs: [{ type: "field", tableAlias: "main", column: "primary" }] }, alias: "id" }
-          { type: "select", expr: { type: "op", op: "count", exprs: [] }, alias: "num_ids" }
         ]
         from: { type: "table", table: "t1", alias: "main" }
         groupBy: [1, 3]
@@ -132,11 +127,10 @@ describe "TableChart", ->
         type: "query"
         selects: [
           { type: "select", expr: { type: "op", op: "ST_AsGeoJSON", exprs: [{ type: "op", op: "ST_Transform", exprs: [{ type: "op", op: "::geometry", exprs: [{ type: "field", tableAlias: "main", column: "geometry" }]}, 4326] }] }, alias: "c0" }
-          { type: "select", expr: { type: "op", op: "min", exprs: [{ type: "field", tableAlias: "main", column: "primary" }] }, alias: "id" }
-          { type: "select", expr: { type: "op", op: "count", exprs: [] }, alias: "num_ids" }
+          { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "id" }
         ]
         from: { type: "table", table: "t1", alias: "main" }
-        groupBy: [1]
+        groupBy: []
         orderBy: []
         limit: 1000
       }

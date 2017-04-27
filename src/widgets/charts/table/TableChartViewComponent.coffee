@@ -86,8 +86,8 @@ class TableContentsComponent extends React.Component
     row = @props.data.main[rowIndex]  
 
     # If there is only one id (num_ids = 1)
-    if row and row.id and row.num_ids == 1 and @props.onRowClick
-      @props.onRowClick(@props.design.table, row.id)
+    if row and row.id and @props.onRowClick
+      @props.onRowClick(@props.table, row.id)
 
   # Toggle selection of a row
   handleSelectRow: (index, selected) =>

@@ -136,6 +136,9 @@ module.exports = class TableChart extends Chart
       limit: 1000
     }
 
+    # Determine if any aggregate
+    isAggr = _.any(design.columns, (column) => axisBuilder.isAxisAggr(column.textAxis)) or _.any(design.orderings, (ordering) => axisBuilder.isAxisAggr(ordering.textAxis))
+
     # For each column
     for colNum in [0...design.columns.length]
       column = design.columns[colNum]
@@ -156,7 +159,7 @@ module.exports = class TableChart extends Chart
       })
 
       # Add group by if not aggregate
-      if not axisBuilder.isAxisAggr(column.textAxis)
+      if isAggr and not axisBuilder.isAxisAggr(column.textAxis)
         query.groupBy.push(colNum + 1)
 
     # Compile orderings
@@ -171,21 +174,16 @@ module.exports = class TableChart extends Chart
       query.orderBy.push({ ordinal: design.columns.length + i + 1, direction: ordering.direction, nulls: (if ordering.direction == "desc" then "last" else "first") })
 
       # Add group by if non-aggregate
-      if exprUtils.getExprAggrStatus(ordering.axis?.expr) == "individual"
+      if isAggr and exprUtils.getExprAggrStatus(ordering.axis?.expr) == "individual"
         query.groupBy.push(design.columns.length + i + 1)
 
-    # Add id. Also add num_ids so we can tell if unique
-    query.selects.push({
-      type: "select"
-      expr: { type: "op", op: "min", exprs: [{ type: "field", tableAlias: "main", column: schema.getTable(design.table).primaryKey }] }
-      alias: "id"
-    })
-
-    query.selects.push({
-      type: "select"
-      expr: { type: "op", op: "count", exprs: [] }
-      alias: "num_ids"
-    })
+    # Add id if non-aggr
+    if not isAggr
+      query.selects.push({
+        type: "select"
+        expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table).primaryKey }
+        alias: "id"
+      })
 
     # Get relevant filters
     filters = _.where(filters or [], table: design.table)
