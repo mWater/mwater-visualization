@@ -18,8 +18,16 @@ Design is:
   columns: array of columns
   filter: optional logical expression to filter by
   orderings: array of orderings
-  version: 1
+  version: 2
   multiselect: true to allow multiple selections
+
+  clickAction: null/"scope"/"popup"/"system:<actionid>"  what to do when row is clicked. If system:xyz then call onSystemAction
+    Note: "system:open" was default for rows with no aggregation in version 1
+
+  multiselectActions: actions to display as options when multiple rows are selected
+    array of: 
+      action: action id e.g. "scope", "system:approve"
+      label: label to display on button
 
 column:
   id: unique id of column (uuid v4)

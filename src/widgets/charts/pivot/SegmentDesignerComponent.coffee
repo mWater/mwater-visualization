@@ -170,7 +170,7 @@ module.exports = class SegmentDesignerComponent extends React.Component
                 value: @props.intersection.clickAction or null
                 onChange: @update("clickAction")
                 options: [
-                  { value: "none", label: "Do nothing"}
+                  { value: null, label: "Do nothing"}
                   { value: "scope", label: "Filter other widgets"}
                   { value: "popup", label: "Open popup"}
                 ]

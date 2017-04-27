@@ -46,8 +46,6 @@ module.exports = class PivotChart extends Chart
         if not segment.valueAxis
           delete segment.valueLabelBold
 
-        segment.clickAction = segment.clickAction or "none"
-
       # Clean all segments
       for segment in PivotChartUtils.getAllSegments(design.rows)
         cleanSegment(segment)
@@ -65,8 +63,6 @@ module.exports = class PivotChart extends Chart
           
           if not intersection.backgroundColorOpacity?
             intersection.backgroundColorOpacity = 1
-
-        intersection.clickAction = intersection.clickAction or "none"
 
       # Add missing intersections
       intersections = {}
