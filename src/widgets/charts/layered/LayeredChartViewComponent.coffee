@@ -23,7 +23,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
     # scope of the widget (when the widget self-selects a particular scope)
     scope: React.PropTypes.shape({ 
-      name: React.PropTypes.string.isRequired
+      name: React.PropTypes.node.isRequired
       filter: React.PropTypes.shape({ table: React.PropTypes.string.isRequired, jsonql: React.PropTypes.object.isRequired })
       data: React.PropTypes.any
     }) 
@@ -111,7 +111,7 @@ class C3ChartComponent extends React.Component
 
     # scope of the widget (when the widget self-selects a particular scope)
     scope: React.PropTypes.shape({ 
-      name: React.PropTypes.string.isRequired
+      name: React.PropTypes.node.isRequired
       filter: React.PropTypes.shape({ table: React.PropTypes.string.isRequired, jsonql: React.PropTypes.object.isRequired })
       data: React.PropTypes.any
     }) 
