@@ -566,7 +566,7 @@ module.exports = class AxisBuilder
   # Determines if axis is aggregate
   isAxisAggr: (axis) ->
     # Legacy support of axis.aggr
-    return axis.aggr or @exprUtils.getExprAggrStatus(axis.expr) == "aggregate"
+    return axis? and (axis.aggr or @exprUtils.getExprAggrStatus(axis.expr) == "aggregate")
 
   # Summarize axis as a string
   summarizeAxis: (axis, locale) ->
