@@ -187,7 +187,7 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
           dataSource: @props.dataSource
           table: layer.table
           types: @getAxisTypes(layer, "y")
-          aggrNeed: "required"
+          aggrNeed: if @doesLayerNeedGrouping(layer) then "required" else "none"
           value: layer.axes.y
           required: true
           onChange: @handleYAxisChange)
