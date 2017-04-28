@@ -55,6 +55,14 @@ class TableContentsComponent extends React.Component
     schema: React.PropTypes.object.isRequired # Schema to use
     dataSource: React.PropTypes.object.isRequired # Data source to use
 
+    # scope of the widget (when the widget self-selects a particular scope)
+    scope: React.PropTypes.shape({ 
+      name: React.PropTypes.node.isRequired
+      filter: React.PropTypes.shape({ table: React.PropTypes.string.isRequired, jsonql: React.PropTypes.object.isRequired })
+      data: React.PropTypes.any
+    }) 
+    onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+
     onRowClick: React.PropTypes.func # Called with (tableId, rowId) when item is clicked
 
   @contextTypes:
@@ -75,6 +83,9 @@ class TableContentsComponent extends React.Component
       return true
 
     if prevProps.schema != @props.schema
+      return true
+
+    if prevProps.scope != @props.scope
       return true
 
     if prevState.selectedIds != @state.selectedIds

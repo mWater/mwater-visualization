@@ -29,14 +29,16 @@ Design is:
       action: action id e.g. "scope", "system:approve"
       label: label to display on button
 
-column:
-  id: unique id of column (uuid v4)
-  headerText: header text
-  textAxis: axis that creates the text value of the column. NOTE: now no longer using as an axis, but only using expression within!
+ column:
+   id: unique id of column (uuid v4)
+   headerText: header text
+   textAxis: axis that creates the text value of the column. NOTE: now no longer using as an axis, but only using expression within!
+ 
+ ordering:
+   axis: axis that creates the order expression. NOTE: now no longer using as an axis, but only using expression within!
+   direction: "asc"/"desc"
 
-ordering:
-  axis: axis that creates the order expression. NOTE: now no longer using as an axis, but only using expression within!
-  direction: "asc"/"desc"
+Tables can generate scope for other widgets. Scope data format is object of row values e.g. { id: "abc123" } or { c0: value, c1: value } (all non-aggr columns)
 
 ###
 module.exports = class TableChart extends Chart
