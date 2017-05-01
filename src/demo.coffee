@@ -170,7 +170,10 @@ class MWaterDirectDashboardPane extends React.Component
           titleElem: "Sample"
           # quickfilterLocks: [{ expr: { type: "field", table: "entities.water_point", column: "type" }, value: "Protected dug well" }]
           namedStrings: { branding: "mWater" }
-          getSystemActions: (table) => [{ id: "open", name: "Open #{table}", multiple: false }]
+          getSystemActions: (table) => [
+            { id: "open", name: "Open #{table}", multiple: false }
+            { id: "approve", name: "Approve Selected", multiple: true }
+          ]
           onSystemAction: (actionId, tableId, rowIds) => alert("#{actionId} #{tableId}:#{rowIds.join(",")}")
         })
     )

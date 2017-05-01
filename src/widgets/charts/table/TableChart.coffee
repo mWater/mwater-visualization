@@ -52,6 +52,7 @@ module.exports = class TableChart extends Chart
     # Clone deep for now # TODO
     design = _.cloneDeep(design)
 
+    # TODO upgrade
     design.version = design.version or 1
 
     # Always have at least one column
@@ -64,6 +65,10 @@ module.exports = class TableChart extends Chart
     # Only multiselect if not aggr
     if design.multiselect and TableChartUtils.isTableAggr(design, schema)
       design.multiselect = false
+
+    # Only multiselectActions if multiselect
+    if not design.multiselect
+      delete design.multiselectActions
 
     # Clean each column
     for columnId in [0...design.columns.length]

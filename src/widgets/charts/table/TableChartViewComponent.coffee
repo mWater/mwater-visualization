@@ -151,6 +151,16 @@ class TableContentsComponent extends React.Component
     else if @props.design.clickAction and @props.design.clickAction.match(/^system:/) and row.id and @props.onSystemAction
       @props.onSystemAction(@props.design.clickAction.split(":")[1], @props.design.table, [row.id])
 
+  handleMultiselectAction: (multiselectAction) =>
+    if multiselectAction.action == "scope"
+      alert("TODO")
+
+    else if multiselectAction.action == "popup"
+      alert("TODO")
+
+    else if multiselectAction.action.match(/^system:/) and @props.onSystemAction
+      @props.onSystemAction(multiselectAction.action.split(":")[1], @props.design.table, _.keys(@state.selectedIds))
+    
   # Toggle selection of a row
   handleSelectRow: (index, selected) =>
     id = @props.data.main[index].id
@@ -279,12 +289,15 @@ class TableContentsComponent extends React.Component
       _.map(@props.data.main, (row, i) => @renderRow(i))
 
   renderActions: ->
-    if @props.design.multiselect
+    if @props.design.multiselect and @props.design.multiselectActions
       H.div null,
-        R ui.Button, 
-          disabled: _.isEmpty(@state.selectedIds)
-          size: "xs", 
-            "Approve Selected"
+        _.map @props.design.multiselectActions, (multiselectAction, index) =>
+          R ui.Button, 
+            key: index
+            disabled: _.isEmpty(@state.selectedIds)
+            onClick: @handleMultiselectAction.bind(null, multiselectAction)
+            size: "xs", 
+              multiselectAction.label
 
   renderPopup: ->
     R DashboardPopupComponent,

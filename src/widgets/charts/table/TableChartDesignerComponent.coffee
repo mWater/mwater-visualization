@@ -17,6 +17,7 @@ TableSelectComponent = require '../../../TableSelectComponent'
 ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
 DashboardPopupSelectorComponent = require '../../../dashboards/DashboardPopupSelectorComponent'
 TableChartUtils = require './TableChartUtils'
+MultiselectActionsDesignerComponent = require './MultiselectActionsDesignerComponent'
 
 module.exports = class TableChartDesignerComponent extends React.Component
   @propTypes:
@@ -169,6 +170,15 @@ module.exports = class TableChartDesignerComponent extends React.Component
         if not action.multiple and action.id == "open"
           options.push({ value: "system:#{action.id}", label: action.name })
 
+    availableMultiselectActions = []
+    if @props.getSystemActions and @props.design.multiselect
+      actions = @props.getSystemActions(@props.design.table)
+
+      for action in actions
+        # Include multiple actions 
+        if action.multiple
+          availableMultiselectActions.push({ id: "system:#{action.id}", name: action.name })
+
     R ui.CollapsibleSection,
       label: "Advanced"
       labelMuted: true,
@@ -197,6 +207,15 @@ module.exports = class TableChartDesignerComponent extends React.Component
         if not TableChartUtils.isTableAggr(@props.design, @props.schema)
           R ui.Checkbox, value: @props.design.multiselect, onChange: @update("multiselect"),
             "Allow selecting multiple rows"
+
+        if @props.design.multiselect and availableMultiselectActions and availableMultiselectActions.length > 0
+          R ui.FormGroup, 
+            labelMuted: true
+            label: "Options when multiple rows selected:",
+              R MultiselectActionsDesignerComponent,
+                availableActions: availableMultiselectActions
+                multiselectActions: @props.design.multiselectActions
+                onMultiselectActionsChange: @update("multiselectActions")
 
   render: ->
     H.div null,

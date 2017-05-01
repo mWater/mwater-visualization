@@ -14,7 +14,7 @@ storiesOf('dashboard', module)
   .add 'empty dashboard', => 
     R DashboardTest
 
- .add 'table dashboard', => 
+  .add 'table dashboard', => 
     R DashboardTest, design: tableDashboardDesign
 
   .add 'popup', => 
