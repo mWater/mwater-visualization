@@ -36,10 +36,10 @@ Design is:
    textAxis: axis that creates the text value of the column. NOTE: now no longer using as an axis, but only using expression within!
  
  ordering:
-   axis: axis that creates the order expression. NOTE: now no longer using as an axis, but only using expression within!
+   axis: axis that creates the order expression. NOTE: now no longer using as an axis, but only using expression within! 
    direction: "asc"/"desc"
 
-Tables can generate scope for other widgets. Scope data format is object of row values e.g. { id: "abc123" } or { c0: value, c1: value } (all non-aggr columns)
+Tables can generate scope for other widgets. Scope data format is array of object of row values e.g. [{ id: "abc123" }] or [{ c0: value, c1: value }] (all non-aggr columns)
 
 ###
 module.exports = class TableChart extends Chart
@@ -242,6 +242,7 @@ module.exports = class TableChart extends Chart
     props = {
       schema: options.schema
       dataSource: options.dataSource
+      widgetDataSource: options.widgetDataSource
       design: @cleanDesign(options.design, options.schema)
       data: options.data
 
@@ -253,6 +254,11 @@ module.exports = class TableChart extends Chart
       onScopeChange: options.onScopeChange
 
       onRowClick: options.onRowClick
+
+      popups: options.popups
+      onPopupsChange: options.onPopupsChange
+      namedStrings: options.namedStrings
+      filters: options.filters
     }
 
     return React.createElement(TableChartViewComponent, props)

@@ -54,3 +54,118 @@ describe "TableChartUtils", ->
       }
 
       assert.isFalse(TableChartUtils.isTableAggr(design, @schema))
+
+  describe "createRowFilter", ->
+    it "gets all non-aggr for aggr", ->
+      design = {
+        table: "t1"
+        columns: [
+          { textAxis: @axisText }
+          { textAxis: @axisNumberSum }
+        ]
+        orderings: [{
+          axis: @axisEnum
+        }]
+      }
+
+      compare TableChartUtils.createRowFilter(design, @schema, { c0: "abc", c1: 23, o0: "a" }), 
+        {
+          table: "t1"
+          jsonql: {
+            type: "op"
+            op: "and"
+            exprs: [
+              { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "text" }, { type: "literal", value: "abc" }] }
+              { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "enum" }, { type: "literal", value: "a" }] }
+            ]
+          }
+        }
+
+    it "gets id for non-aggr", ->
+      design = {
+        table: "t1"
+        columns: [
+          { textAxis: @axisText }
+        ]
+        orderings: [{
+          axis: @axisEnum
+        }]
+      }
+
+      compare TableChartUtils.createRowFilter(design, @schema, { id: "123", c0: "abc", o0: "a" }), 
+        {
+          table: "t1"
+          jsonql: {
+            type: "op"
+            op: "and"
+            exprs: [
+              { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "primary" }, { type: "literal", value: "123" }] }
+            ]
+          }
+        }
+
+  describe "createRowScope", ->
+    it "handles non-aggr", ->
+      design = {
+        table: "t1"
+        columns: [
+          { textAxis: @axisText }
+        ]
+        orderings: []
+      }
+
+      compare TableChartUtils.createRowScope(design, @schema, { id: "123", c0: "abc" }), 
+        {
+          name: "Selected Row"
+          filter: {
+            table: "t1"
+            jsonql: {
+              type: "op"
+              op: "and"
+              exprs: [
+                { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "primary" }, { type: "literal", value: "123" }] }
+              ]
+            }
+          }
+          data: [
+            { id: "123" }
+          ]
+        }
+
+    it "handles aggr", ->
+      design = {
+        table: "t1"
+        columns: [
+          { textAxis: @axisText }
+          { textAxis: @axisNumberSum }
+        ]
+        orderings: []
+      }
+
+      compare TableChartUtils.createRowScope(design, @schema, { id: "123", c0: "abc", c1: 123 }), 
+        {
+          name: "Selected Row"
+          filter: {
+            table: "t1"
+            jsonql: {
+              type: "op"
+              op: "and"
+              exprs: [
+                { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "text" }, { type: "literal", value: "abc" }] }
+              ]
+            }
+          }
+          data: [
+            { c0: "abc" }
+          ]
+        }
+
+  describe "isRowScoped", ->
+    it "matches id", ->
+      assert.isTrue(TableChartUtils.isRowScoped({ id: "123", c0: "abc" }, [{ id: "123" }]))
+
+    it "matches column", ->
+      assert.isTrue(TableChartUtils.isRowScoped({ c0: "abc", c1: 123 }, [{ c0: "abc" }]))
+
+    it "fails if missing value", ->
+      assert.isFalse(TableChartUtils.isRowScoped({ c0: "abc" }, [{ c0: "abc", c1: 123 }]))    

@@ -7,6 +7,8 @@ AxisBuilder = require '../../../axes/AxisBuilder'
 ExprUtils = require('mwater-expressions').ExprUtils
 ui = require 'react-library/lib/bootstrap'
 
+TableChartUtils = require './TableChartUtils'
+
 module.exports = class TableChartViewComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired # Design of chart
@@ -26,6 +28,17 @@ module.exports = class TableChartViewComponent extends React.Component
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
   
     onRowClick: React.PropTypes.func # Called with (tableId, rowId) when item is clicked
+
+    popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
+    onPopupsChange: React.PropTypes.func               # If not set, readonly
+
+    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+
+    # Filters to add to the dashboard
+    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
+      table: React.PropTypes.string.isRequired    # id table to filter
+      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    }))
 
   shouldComponentUpdate: (prevProps) ->
     not _.isEqual(prevProps, @props)
@@ -47,6 +60,13 @@ module.exports = class TableChartViewComponent extends React.Component
         schema: @props.schema
         dataSource: @props.dataSource
         onRowClick: @props.onRowClick
+        scope: @props.scope
+        onScopeChange: @props.onScopeChange
+        popups: @props.popups
+        onPopupsChange: @props.onPopupsChange
+        namedStrings: @props.namedStrings
+        filters: @props.filters
+
 
 class TableContentsComponent extends React.Component
   @propTypes:
@@ -64,6 +84,17 @@ class TableContentsComponent extends React.Component
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
     onRowClick: React.PropTypes.func # Called with (tableId, rowId) when item is clicked
+
+    popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
+    onPopupsChange: React.PropTypes.func               # If not set, readonly
+
+    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+
+    # Filters to add to the dashboard
+    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
+      table: React.PropTypes.string.isRequired    # id table to filter
+      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    }))
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
@@ -96,7 +127,19 @@ class TableContentsComponent extends React.Component
   handleRowClick: (rowIndex) =>
     row = @props.data.main[rowIndex]  
 
-    # If there is only one id (num_ids = 1)
+    # Use clickAction
+    if @props.design.clickAction == "scope"
+      # Create scope, unless already scoped in which case clear
+      if @props.scope and TableChartUtils.isRowScoped(row, @props.scope.data)
+        @props.onScopeChange(null)
+      else
+        @props.onScopeChange(TableChartUtils.createRowScope(@props.design, @props.schema, row))
+
+    else if @props.design.clickAction == "popup" and @props.design.clickActionPopup
+      # TODO
+      alert("TODO")
+
+    # If there is an id TODO
     if row and row.id and @props.onRowClick
       @props.onRowClick(@props.table, row.id)
 
@@ -202,10 +245,21 @@ class TableContentsComponent extends React.Component
         H.i className: "fa fa-fw fa-square-o", style: { color: "#888" }
 
   renderRow: (index) ->
-    # Determine if row is selected
-    selected = @props.design.multiselect and @props.data.main[index].id and @state.selectedIds[@props.data.main[index].id]
+    row = @props.data.main[index]  
 
-    H.tr key: index, onClick: @handleRowClick.bind(null, index), style: { backgroundColor: (if selected then "#eee") },
+    # Determine if row is selected
+    selected = @props.design.multiselect and row.id and @state.selectedIds[row.id]
+
+    # Determine if row is scoped
+    scoped = @props.scope and TableChartUtils.isRowScoped(row, @props.scope.data)
+
+    style = {}
+    if scoped
+      style.backgroundColor = "#bad5f7"
+    else if selected
+      style.backgroundColor = "#eee"
+
+    H.tr key: index, onClick: @handleRowClick.bind(null, index), style: style,
       [
         if @props.design.multiselect
           @renderCheckbox(index, selected)
