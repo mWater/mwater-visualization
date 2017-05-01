@@ -9,6 +9,7 @@ ExprUtils = require('mwater-expressions').ExprUtils
 ExprCompiler = require('mwater-expressions').ExprCompiler
 AxisBuilder = require '../../../axes/AxisBuilder'
 TableChartViewComponent = require './TableChartViewComponent'
+TableChartUtils = require './TableChartUtils'
 
 ###
 Design is:
@@ -59,6 +60,10 @@ module.exports = class TableChart extends Chart
       design.columns.push({id: uuid()})
 
     design.orderings = design.orderings or []
+
+    # Only multiselect if not aggr
+    if design.multiselect and TableChartUtils.isTableAggr(design, schema)
+      design.multiselect = false
 
     # Clean each column
     for columnId in [0...design.columns.length]
@@ -131,7 +136,7 @@ module.exports = class TableChart extends Chart
       namedStrings: options.namedStrings
       filters: options.filters
     }
-    
+
     return React.createElement(TableChartDesignerComponent, props)
 
   # Get data for the chart asynchronously
@@ -156,7 +161,7 @@ module.exports = class TableChart extends Chart
     }
 
     # Determine if any aggregate
-    isAggr = _.any(design.columns, (column) => axisBuilder.isAxisAggr(column.textAxis)) or _.any(design.orderings, (ordering) => axisBuilder.isAxisAggr(ordering.textAxis))
+    isAggr = TableChartUtils.isTableAggr(design, schema)
 
     # For each column
     for colNum in [0...design.columns.length]

@@ -16,6 +16,7 @@ OrderingsComponent = require './OrderingsComponent'
 TableSelectComponent = require '../../../TableSelectComponent'
 ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
 DashboardPopupSelectorComponent = require '../../../dashboards/DashboardPopupSelectorComponent'
+TableChartUtils = require './TableChartUtils'
 
 module.exports = class TableChartDesignerComponent extends React.Component
   @propTypes:
@@ -176,6 +177,11 @@ module.exports = class TableChartDesignerComponent extends React.Component
             filters: @props.filters
             popupId: @props.design.clickActionPopup
             onPopupIdChange: @update("clickActionPopup")
+
+        # Allow multiselect if not aggr
+        if not TableChartUtils.isTableAggr(@props.design, @props.schema)
+          R ui.Checkbox, value: @props.design.multiselect, onChange: @update("multiselect"),
+            "Allow selecting multiple rows"
 
   render: ->
     H.div null,
