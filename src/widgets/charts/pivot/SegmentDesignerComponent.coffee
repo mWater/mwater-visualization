@@ -9,6 +9,7 @@ update = require 'react-library/lib/update'
 AxisComponent = require '../../../axes/AxisComponent'
 ColorComponent = require '../../../ColorComponent'
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
+DashboardPopupSelectorComponent = require '../../../dashboards/DashboardPopupSelectorComponent'
 
 # Design a single segment of a pivot table
 module.exports = class SegmentDesignerComponent extends React.Component
@@ -167,7 +168,7 @@ module.exports = class SegmentDesignerComponent extends React.Component
             labelMuted: true
             label: "When #{@props.segmentType} value is clicked:",
               R ui.Select,
-                value: @props.intersection.clickAction or null
+                value: @props.segment.clickAction or null
                 onChange: @update("clickAction")
                 options: [
                   { value: null, label: "Do nothing"}

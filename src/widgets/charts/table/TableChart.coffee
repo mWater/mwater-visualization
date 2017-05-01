@@ -122,7 +122,16 @@ module.exports = class TableChart extends Chart
         # Clean design
         design = @cleanDesign(design, options.schema)
         options.onDesignChange(design)
+
+      widgetDataSource: options.widgetDataSource
+      onDesignChange: options.onDesignChange
+      popups: options.popups
+      onPopupsChange: options.onPopupsChange
+      onRowClick: options.onRowClick
+      namedStrings: options.namedStrings
+      filters: options.filters
     }
+    
     return React.createElement(TableChartDesignerComponent, props)
 
   # Get data for the chart asynchronously

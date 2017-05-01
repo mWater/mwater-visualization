@@ -27,6 +27,12 @@ module.exports = class Chart
   #   dataSource: dataSource to use
   #   design: design 
   #   onDesignChange: function
+  #   widgetDataSource: dashboard data source for widget
+  #   popups: All dashboard popups
+  #   onPopupsChange: Sets popups of dashboard. If not set, readonly
+  #   onRowClick: Called with (tableId, rowId) when item is clicked
+  #   namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+  #   filters: Filters to add to the dashboard
   createDesignerElement: (options) ->
     throw new Error("Not implemented")
 

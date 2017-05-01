@@ -180,7 +180,18 @@ class ChartWidgetComponent extends React.Component
       return null
 
     # Create editor
-    editor = @props.chart.createDesignerElement(schema: @props.schema, dataSource: @props.dataSource, design: @state.editDesign, onDesignChange: @handleEditDesignChange)
+    editor = @props.chart.createDesignerElement({
+      schema: @props.schema
+      dataSource: @props.dataSource
+      design: @state.editDesign
+      onDesignChange: @handleEditDesignChange
+      widgetDataSource: @props.widgetDataSource
+      popups: @props.popups
+      onPopupsChange: @props.onPopupsChange
+      namedStrings: @props.namedStrings
+      onRowClick: @props.onRowClick
+      filters: @props.filters
+    })
 
     if @props.chart.hasDesignerPreview()
       # Create chart (maxing out at half of width of screen)

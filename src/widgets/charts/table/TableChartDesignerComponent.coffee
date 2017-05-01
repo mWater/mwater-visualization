@@ -4,6 +4,9 @@ H = React.DOM
 R = React.createElement
 uuid = require 'uuid'
 
+ui = require 'react-library/lib/bootstrap'
+update = require 'react-library/lib/update'
+
 ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../../../axes/AxisBuilder'
 LinkComponent = require('mwater-expressions-ui').LinkComponent
@@ -12,38 +15,50 @@ FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 OrderingsComponent = require './OrderingsComponent'
 TableSelectComponent = require '../../../TableSelectComponent'
 ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
+DashboardPopupSelectorComponent = require '../../../dashboards/DashboardPopupSelectorComponent'
 
 module.exports = class TableChartDesignerComponent extends React.Component
   @propTypes:
     design: React.PropTypes.object.isRequired
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
+    widgetDataSource: React.PropTypes.object.isRequired # dashboard data source for widget
     onDesignChange: React.PropTypes.func.isRequired
 
-  # Updates design with the specified changes
-  updateDesign: (changes) ->
-    design = _.extend({}, @props.design, changes)
-    @props.onDesignChange(design)
+    # All dashboard popups
+    popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
+    onPopupsChange: React.PropTypes.func               # If not set, readonly
 
-  handleTitleTextChange: (ev) =>  @updateDesign(titleText: ev.target.value)
-  handleTableChange: (table) => @updateDesign(table: table)
-  handleFilterChange: (filter) => @updateDesign(filter: filter)
-  handleOrderingsChange: (orderings) => @updateDesign(orderings: orderings)
+    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+
+    # Filters to add to the dashboard
+    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
+      table: React.PropTypes.string.isRequired    # id table to filter
+      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    }))
+
+  update: => update(@props.design, @props.onDesignChange, arguments)
+
+  handleTitleTextChange: (ev) =>  @update(titleText: ev.target.value)
+  handleTableChange: (table) => @update(table: table)
+  handleFilterChange: (filter) => @update(filter: filter)
+  handleOrderingsChange: (orderings) => @update(orderings: orderings)
 
   handleColumnChange: (index, column) =>
     columns = @props.design.columns.slice()
     columns[index] = column
-    @updateDesign(columns: columns)
+    @update(columns: columns)
 
   handleRemoveColumn: (index) =>
     columns = @props.design.columns.slice()
     columns.splice(index, 1)
-    @updateDesign(columns: columns)
+    @update(columns: columns)
 
   handleAddColumn: =>
     columns = @props.design.columns.slice()
     columns.push({id: uuid()})
-    @updateDesign(columns: columns)
+    @update(columns: columns)
 
   renderTable: ->
     return H.div className: "form-group",
@@ -78,7 +93,7 @@ module.exports = class TableChartDesignerComponent extends React.Component
         })))
 
   handleReorder: (map) =>
-    @updateDesign(columns: map)
+    @update(columns: map)
 
   renderColumns: ->
     if not @props.design.table
@@ -133,6 +148,35 @@ module.exports = class TableChartDesignerComponent extends React.Component
           table: @props.design.table
           value: @props.design.filter)
 
+  renderAdvanced: ->
+    R ui.CollapsibleSection,
+      label: "Advanced"
+      labelMuted: true,
+        R ui.FormGroup, 
+          labelMuted: true
+          label: "When row is clicked:",
+            R ui.Select,
+              value: @props.design.clickAction or null
+              onChange: @update("clickAction")
+              options: [
+                { value: null, label: "Do nothing"}
+                { value: "scope", label: "Filter other widgets"}
+                { value: "popup", label: "Open popup"}
+              ]
+
+        if @props.design.clickAction == "popup"
+          R DashboardPopupSelectorComponent,
+            popups: @props.popups
+            onPopupsChange: @props.onPopupsChange
+            schema: @props.schema
+            dataSource: @props.dataSource
+            widgetDataSource: @props.widgetDataSource
+            onRowClick: @props.onRowClick
+            namedStrings: @props.namedStrings
+            filters: @props.filters
+            popupId: @props.design.clickActionPopup
+            onPopupIdChange: @update("clickActionPopup")
+
   render: ->
     H.div null,
       @renderTable()
@@ -142,6 +186,8 @@ module.exports = class TableChartDesignerComponent extends React.Component
       @renderFilter()
       H.hr()
       @renderTitle()
+      if @props.design.table
+        @renderAdvanced()
 
 class TableChartColumnDesignerComponent extends React.Component
   @propTypes:
