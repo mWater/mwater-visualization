@@ -8,6 +8,7 @@ ExprUtils = require('mwater-expressions').ExprUtils
 ui = require 'react-library/lib/bootstrap'
 
 TableChartUtils = require './TableChartUtils'
+DashboardPopupComponent = require '../../../dashboards/DashboardPopupComponent'
 
 module.exports = class TableChartViewComponent extends React.Component
   @propTypes:
@@ -136,8 +137,8 @@ class TableContentsComponent extends React.Component
         @props.onScopeChange(TableChartUtils.createRowScope(@props.design, @props.schema, row))
 
     else if @props.design.clickAction == "popup" and @props.design.clickActionPopup
-      # TODO
-      alert("TODO")
+      @dashboardPopupComponent.show(@props.design.clickActionPopup, 
+        TableChartUtils.createRowFilter(@props.design, @props.schema, row))
 
     # If there is an id TODO
     if row and row.id and @props.onRowClick
@@ -277,6 +278,18 @@ class TableContentsComponent extends React.Component
           disabled: _.isEmpty(@state.selectedIds)
           size: "xs", 
             "Approve Selected"
+
+  renderPopup: ->
+    R DashboardPopupComponent,
+      ref: (c) => @dashboardPopupComponent = c
+      popups: @props.popups
+      onPopupsChange: @props.onPopupsChange
+      schema: @props.schema
+      dataSource: @props.dataSource
+      widgetDataSource: @props.widgetDataSource
+      onRowClick: @props.onRowClick
+      namedStrings: @props.namedStrings
+      filters: @props.filters
 
   render: ->
     H.div null,

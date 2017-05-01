@@ -1,18 +1,19 @@
-ChartWidget = require './charts/ChartWidget'
-LayeredChart = require './charts/layered/LayeredChart'
-TableChart = require './charts/table/TableChart'
-CalendarChart = require './charts/calendar/CalendarChart'
-ImageMosaicChart = require './charts/imagemosaic/ImageMosaicChart'
-PivotChart = require './charts/pivot/PivotChart'
-MarkdownWidget = require './MarkdownWidget'
-TextWidget = require './text/TextWidget'
-ImageWidget = require './ImageWidget'
-MapWidget = require './MapWidget'
-IFrameWidget = require './IFrameWidget'
-
 # Creates widgets based on type 
 module.exports = class WidgetFactory
   @createWidget: (type) ->
+    # Here to avoid circularity
+    ChartWidget = require './charts/ChartWidget'
+    LayeredChart = require './charts/layered/LayeredChart'
+    TableChart = require './charts/table/TableChart'
+    CalendarChart = require './charts/calendar/CalendarChart'
+    ImageMosaicChart = require './charts/imagemosaic/ImageMosaicChart'
+    PivotChart = require './charts/pivot/PivotChart'
+    MarkdownWidget = require './MarkdownWidget'
+    TextWidget = require './text/TextWidget'
+    ImageWidget = require './ImageWidget'
+    MapWidget = require './MapWidget'
+    IFrameWidget = require './IFrameWidget'
+
     switch type
       when "LayeredChart"
         return new ChartWidget(new LayeredChart())

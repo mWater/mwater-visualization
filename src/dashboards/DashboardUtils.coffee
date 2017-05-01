@@ -1,9 +1,10 @@
-LayoutManager = require '../layouts/LayoutManager'
-WidgetFactory = require '../widgets/WidgetFactory'
-
 module.exports = class DashboardUtils
   # Gets filterable tables for a dashboard
   @getFilterableTables: (design, schema) ->
+    # Here to avoid circularity
+    LayoutManager = require '../layouts/LayoutManager'
+    WidgetFactory = require '../widgets/WidgetFactory'
+
     layoutManager = LayoutManager.createLayoutManager(design.layout)
 
     # Get filterable tables
