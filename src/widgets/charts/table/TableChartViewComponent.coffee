@@ -32,7 +32,7 @@ module.exports = class TableChartViewComponent extends React.Component
     }) 
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
   
-    onRowClick: React.PropTypes.func # Called with (tableId, rowId) when item is clicked
+    onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
 
     popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
     onPopupsChange: React.PropTypes.func               # If not set, readonly
@@ -65,7 +65,7 @@ module.exports = class TableChartViewComponent extends React.Component
         schema: @props.schema
         dataSource: @props.dataSource
         widgetDataSource: @props.widgetDataSource
-        onRowClick: @props.onRowClick
+        onSystemAction: @props.onSystemAction
         scope: @props.scope
         onScopeChange: @props.onScopeChange
         popups: @props.popups
@@ -90,7 +90,7 @@ class TableContentsComponent extends React.Component
     }) 
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
-    onRowClick: React.PropTypes.func # Called with (tableId, rowId) when item is clicked
+    onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
 
     popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
     onPopupsChange: React.PropTypes.func               # If not set, readonly
@@ -142,13 +142,14 @@ class TableContentsComponent extends React.Component
       else
         @props.onScopeChange(TableChartUtils.createRowScope(@props.design, @props.schema, row))
 
+    # Handle popup calse
     else if @props.design.clickAction == "popup" and @props.design.clickActionPopup
       @dashboardPopupComponent.show(@props.design.clickActionPopup, 
         TableChartUtils.createRowFilter(@props.design, @props.schema, row))
 
-    # If there is an id TODO
-    if row and row.id and @props.onRowClick
-      @props.onRowClick(@props.table, row.id)
+    # Handle system action case
+    else if @props.design.clickAction and @props.design.clickAction.match(/^system:/) and row.id and @props.onSystemAction
+      @props.onSystemAction(@props.design.clickAction.split(":")[1], @props.design.table, [row.id])
 
   # Toggle selection of a row
   handleSelectRow: (index, selected) =>
@@ -293,7 +294,7 @@ class TableContentsComponent extends React.Component
       schema: @props.schema
       dataSource: @props.dataSource
       widgetDataSource: @props.widgetDataSource
-      onRowClick: @props.onRowClick
+      onSystemAction: @props.onSystemAction
       namedStrings: @props.namedStrings
       filters: @props.filters
 

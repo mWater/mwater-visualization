@@ -30,8 +30,12 @@ module.exports = class TableChartDesignerComponent extends React.Component
     popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
     onPopupsChange: React.PropTypes.func               # If not set, readonly
 
-    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
     namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+
+    # Gets available system actions for a table. Called with (tableId). 
+    # Returns [{ id: id of action, name: name of action, multiple: true if for multiple rows support, false for single }]
+    getSystemActions: React.PropTypes.func 
 
     # Filters to add to the dashboard
     filters: React.PropTypes.arrayOf(React.PropTypes.shape({
@@ -150,6 +154,21 @@ module.exports = class TableChartDesignerComponent extends React.Component
           value: @props.design.filter)
 
   renderAdvanced: ->
+    options = [
+      { value: null, label: "Do nothing"}
+      { value: "scope", label: "Filter other widgets"}
+      { value: "popup", label: "Open popup"}
+    ]
+
+    # Add system actions if non-multiple
+    if @props.getSystemActions and not TableChartUtils.isTableAggr(@props.design, @props.schema)
+      actions = @props.getSystemActions(@props.design.table)
+
+      for action in actions
+        # Include non-multiple actions that are "open" only
+        if not action.multiple and action.id == "open"
+          options.push({ value: "system:#{action.id}", label: action.name })
+
     R ui.CollapsibleSection,
       label: "Advanced"
       labelMuted: true,
@@ -159,11 +178,7 @@ module.exports = class TableChartDesignerComponent extends React.Component
             R ui.Select,
               value: @props.design.clickAction or null
               onChange: @update("clickAction")
-              options: [
-                { value: null, label: "Do nothing"}
-                { value: "scope", label: "Filter other widgets"}
-                { value: "popup", label: "Open popup"}
-              ]
+              options: options
 
         if @props.design.clickAction == "popup"
           R DashboardPopupSelectorComponent,
@@ -172,7 +187,7 @@ module.exports = class TableChartDesignerComponent extends React.Component
             schema: @props.schema
             dataSource: @props.dataSource
             widgetDataSource: @props.widgetDataSource
-            onRowClick: @props.onRowClick
+            onSystemAction: @props.onSystemAction
             namedStrings: @props.namedStrings
             filters: @props.filters
             popupId: @props.design.clickActionPopup

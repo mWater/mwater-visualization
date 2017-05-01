@@ -23,7 +23,7 @@ module.exports = class MapComponent extends React.Component
     design: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func  # Null/undefined for readonly
 
-    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
 
     titleElem: React.PropTypes.node                     # Extra element to include in title at left
     extraTitleButtonsElem: React.PropTypes.node              # Extra elements to add to right
@@ -114,7 +114,7 @@ module.exports = class MapComponent extends React.Component
         dataSource: @props.dataSource
         design: @getDesign()
         onDesignChange: @handleDesignChange
-        onRowClick: @props.onRowClick
+        onSystemAction: @props.onSystemAction
       )
     )
 

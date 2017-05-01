@@ -32,7 +32,7 @@ module.exports = class MapViewComponent extends React.Component
     width: React.PropTypes.number        # Width in pixels
     height: React.PropTypes.number       # Height in pixels
 
-    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
 
     extraFilters: React.PropTypes.arrayOf(React.PropTypes.shape({
       table: React.PropTypes.string.isRequired
@@ -141,9 +141,10 @@ module.exports = class MapViewComponent extends React.Component
     if results.popup
       @setState(popupContents: results.popup)
 
-    # Handle onRowClick case
-    if results.row and @props.onRowClick
-      @props.onRowClick(results.row.tableId, results.row.primaryKey)
+    # Handle onSystemAction case
+    if results.row and @props.onSystemAction
+      # TODO use clickAction
+      @props.onSystemAction("open", results.row.tableId, [results.row.primaryKey])
 
     # Handle scoping
     if @props.onScopeChange and _.has(results, "scope")

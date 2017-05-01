@@ -30,7 +30,12 @@ module.exports = class DashboardViewComponent extends React.Component
     width: React.PropTypes.number
     standardWidth: React.PropTypes.number   # Width for scaling
 
-    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
+
+    # Gets available system actions for a table. Called with (tableId). 
+    # Returns [{ id: id of action, name: name of action, multiple: true if for multiple rows support, false for single }]
+    getSystemActions: React.PropTypes.func 
+
     namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
     # Filters to add to the dashboard
@@ -134,10 +139,11 @@ module.exports = class DashboardViewComponent extends React.Component
         width: options.width
         height: options.height
         standardWidth: options.standardWidth 
-        onRowClick: @props.onRowClick
         namedStrings: @props.namedStrings
         popups: @props.popups or @props.design.popups or []
         onPopupsChange: @props.onPopupsChange or (if @props.onDesignChange then @handlePopupsChange)
+        onSystemAction: @props.onSystemAction
+        getSystemActions: @props.getSystemActions
       })  
 
     style = {

@@ -30,9 +30,11 @@ module.exports = class Chart
   #   widgetDataSource: dashboard data source for widget
   #   popups: All dashboard popups
   #   onPopupsChange: Sets popups of dashboard. If not set, readonly
-  #   onRowClick: Called with (tableId, rowId) when item is clicked
+  #   onSystemAction: Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
   #   namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
   #   filters: Filters to add to the dashboard
+  #   getSystemActions: Gets available system actions for a table. Called with (tableId). 
+  #     Returns [{ id: id of action, name: name of action, multiple: true if for multiple rows support, false for single }]
   createDesignerElement: (options) ->
     throw new Error("Not implemented")
 
@@ -59,9 +61,11 @@ module.exports = class Chart
   #   widgetDataSource: dashboard data source for widget
   #   popups: All dashboard popups
   #   onPopupsChange: Sets popups of dashboard. If not set, readonly
-  #   onRowClick: Called with (tableId, rowId) when item is clicked
+  #   onSystemAction: Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
   #   namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
   #   filters: Filters to add to the dashboard
+  #   getSystemActions: Gets available system actions for a table. Called with (tableId). 
+  #     Returns [{ id: id of action, name: name of action, multiple: true if for multiple rows support, false for single }]
   createViewElement: (options) ->
     throw new Error("Not implemented")
 

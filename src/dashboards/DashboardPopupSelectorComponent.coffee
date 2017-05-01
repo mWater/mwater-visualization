@@ -19,7 +19,7 @@ module.exports = class DashboardPopupSelectorComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired
     widgetDataSource: React.PropTypes.object.isRequired # widget data source for widget on which popup will be shown
 
-    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
     namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
     # Filters to add to the dashboard
@@ -70,7 +70,7 @@ module.exports = class DashboardPopupSelectorComponent extends React.Component
         schema: @props.schema
         dataSource: @props.dataSource
         widgetDataSource: @props.widgetDataSource
-        onRowClick: @props.onRowClick
+        onSystemAction: @props.onSystemAction
         namedStrings: @props.namedStrings
         filters: @props.filters
 

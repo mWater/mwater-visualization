@@ -22,7 +22,7 @@ Design is:
   version: 2
   multiselect: true to allow multiple selections
 
-  clickAction: null/"scope"/"popup"/"system:<actionid>"  what to do when row is clicked. If system:xyz then call onSystemAction
+  clickAction: null/"scope"/"popup"/"system:<actionid>"  what to do when row is clicked. If system:xyz then call onSystemAction with xyz
     Note: "system:open" was default for rows with no aggregation in version 1
 
   multiselectActions: actions to display as options when multiple rows are selected
@@ -132,9 +132,10 @@ module.exports = class TableChart extends Chart
       onDesignChange: options.onDesignChange
       popups: options.popups
       onPopupsChange: options.onPopupsChange
-      onRowClick: options.onRowClick
+      onSystemAction: options.onSystemAction
       namedStrings: options.namedStrings
       filters: options.filters
+      getSystemActions: options.getSystemActions
     }
 
     return React.createElement(TableChartDesignerComponent, props)
@@ -236,7 +237,7 @@ module.exports = class TableChart extends Chart
   #   width, height, standardWidth: size of the chart view
   #   scope: current scope of the view element
   #   onScopeChange: called when scope changes with new scope
-  #   onRowClick: Called with (tableId, rowId) when item is clicked
+  #   onSystemAction: Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
   createViewElement: (options) ->
     # Create chart
     props = {
@@ -253,7 +254,7 @@ module.exports = class TableChart extends Chart
       scope: options.scope
       onScopeChange: options.onScopeChange
 
-      onRowClick: options.onRowClick
+      onSystemAction: options.onSystemAction
 
       popups: options.popups
       onPopupsChange: options.onPopupsChange

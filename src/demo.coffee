@@ -170,6 +170,8 @@ class MWaterDirectDashboardPane extends React.Component
           titleElem: "Sample"
           # quickfilterLocks: [{ expr: { type: "field", table: "entities.water_point", column: "type" }, value: "Protected dug well" }]
           namedStrings: { branding: "mWater" }
+          getSystemActions: (table) => [{ id: "open", name: "Open #{table}", multiple: false }]
+          onSystemAction: (actionId, tableId, rowIds) => alert("#{actionId} #{tableId}:#{rowIds.join(",")}")
         })
     )
 
@@ -219,7 +221,7 @@ class MWaterMapPane extends React.Component
           design: @state.design
           mapDataSource: mapDataSource
           onDesignChange: @handleDesignChange
-          onRowClick: (tableId, rowId) => alert("#{tableId}:#{rowId}")
+          onSystemAction: (actionId, tableId, rowIds) => alert("#{actionId} #{tableId}:#{rowIds.join(",")}")
           titleElem: "Sample"
         })
     )
@@ -255,7 +257,7 @@ class MWaterDirectMapPane extends React.Component
           design: @state.design
           mapDataSource: mapDataSource
           onDesignChange: @handleDesignChange
-          onRowClick: (tableId, rowId) => console.log "Click #{tableId}:#{rowId}"
+          onSystemAction: (actionId, tableId, rowId) => alert("#{actionId} #{tableId}:#{rowId}")
           titleElem: "Sample"
         })
     )

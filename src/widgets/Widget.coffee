@@ -17,10 +17,12 @@ module.exports = class Widget
   #  height: height in pixels on screen
   #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
   #  singleRowTable: optional table name of table that will be filtered to have a single row present. Widget designer should optionally account for this
-  #  onRowClick: Called with (tableId, rowId) when item is clicked
+  #  onSystemAction: Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
   #  namedStrings: optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
   #  popups: array of dashboard popups
   #  onPopupsChange: called when popups are changed
+  #  getSystemActions: Gets available system actions for a table. Called with (tableId). 
+  #    Returns [{ id: id of action, name: name of action, multiple: true if for multiple rows support, false for single }]
   createViewElement: (options) ->
     throw new Error("Not implemented")
 

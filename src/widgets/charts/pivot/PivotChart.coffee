@@ -195,7 +195,7 @@ module.exports = class PivotChart extends Chart
   #   widgetDataSource: dashboard data source for widget
   #   popups: All dashboard popups
   #   onPopupsChange: Sets popups of dashboard. If not set, readonly
-  #   onRowClick: Called with (tableId, rowId) when item is clicked
+  #   onSystemAction: Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
   #   namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
   #   filters: Filters to add to the dashboard
   createViewElement: (options) ->
@@ -219,7 +219,7 @@ module.exports = class PivotChart extends Chart
       widgetDataSource: options.widgetDataSource
       popups: options.popups
       onPopupsChange: options.onPopupsChange
-      onRowClick: options.onRowClick
+      onSystemAction: options.onSystemAction
       namedStrings: options.namedStrings
       filters: options.filters
     }

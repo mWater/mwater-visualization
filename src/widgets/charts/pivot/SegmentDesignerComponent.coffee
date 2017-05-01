@@ -26,7 +26,7 @@ module.exports = class SegmentDesignerComponent extends React.Component
     popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
     onPopupsChange: React.PropTypes.func               # If not set, readonly
 
-    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
     namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
     # Filters to add to the dashboard
@@ -183,7 +183,7 @@ module.exports = class SegmentDesignerComponent extends React.Component
               schema: @props.schema
               dataSource: @props.dataSource
               widgetDataSource: @props.widgetDataSource
-              onRowClick: @props.onRowClick
+              onSystemAction: @props.onSystemAction
               namedStrings: @props.namedStrings
               filters: @props.filters
               popupId: @props.segment.clickActionPopup

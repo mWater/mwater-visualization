@@ -27,7 +27,9 @@ module.exports = class ChartWidget extends Widget
   #  width: width in pixels on screen
   #  height: height in pixels on screen
   #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
-  #  onRowClick: Called with (tableId, rowId) when item is clicked
+  #  onSystemAction: Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
+  #  getSystemActions: Gets available system actions for a table. Called with (tableId). 
+  #    Returns [{ id: id of action, name: name of action, multiple: true if for multiple rows support, false for single }]
   createViewElement: (options) ->
     return R(ChartWidgetComponent,
       chart: @chart
@@ -42,10 +44,11 @@ module.exports = class ChartWidget extends Widget
       width: options.width
       height: options.height
       standardWidth: options.standardWidth
-      onRowClick: options.onRowClick
+      onSystemAction: options.onSystemAction
       namedStrings: options.namedStrings
       popups: options.popups
       onPopupsChange: options.onPopupsChange
+      getSystemActions: options.getSystemActions
     )
 
   # Get the data that the widget needs. This will be called on the server, typically.
@@ -96,7 +99,11 @@ class ChartWidgetComponent extends React.Component
     filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
-    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
+
+    # Gets available system actions for a table. Called with (tableId). 
+    # Returns [{ id: id of action, name: name of action, multiple: true if for multiple rows support, false for single }]
+    getSystemActions: React.PropTypes.func 
 
     # All dashboard popups
     popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
@@ -169,10 +176,11 @@ class ChartWidgetComponent extends React.Component
       height: height
       standardWidth: standardWidth
       onScopeChange: @props.onScopeChange
-      onRowClick: @props.onRowClick
+      onSystemAction: @props.onSystemAction
       popups: @props.popups
       onPopupsChange: @props.onPopupsChange
       namedStrings: @props.namedStrings
+      getSystemActions: @props.getSystemActions
     )
 
   renderEditor: ->
@@ -189,8 +197,9 @@ class ChartWidgetComponent extends React.Component
       popups: @props.popups
       onPopupsChange: @props.onPopupsChange
       namedStrings: @props.namedStrings
-      onRowClick: @props.onRowClick
+      onSystemAction: @props.onSystemAction
       filters: @props.filters
+      getSystemActions: @props.getSystemActions
     })
 
     if @props.chart.hasDesignerPreview()

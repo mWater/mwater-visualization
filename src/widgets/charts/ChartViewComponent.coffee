@@ -28,7 +28,7 @@ module.exports = class ChartViewComponent extends React.Component
     filters: React.PropTypes.array  # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias }. Use injectAlias to correct
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
-    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
 
     # All dashboard popups
     popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
@@ -116,7 +116,7 @@ module.exports = class ChartViewComponent extends React.Component
           width: @props.width
           height: @props.height
           standardWidth: @props.standardWidth
-          onRowClick: @props.onRowClick
+          onSystemAction: @props.onSystemAction
           namedStrings: @props.namedStrings
           popups: @props.popups
           onPopupsChange: @props.onPopupsChange
