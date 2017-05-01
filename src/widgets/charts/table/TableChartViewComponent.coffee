@@ -15,7 +15,11 @@ module.exports = class TableChartViewComponent extends React.Component
     design: React.PropTypes.object.isRequired # Design of chart
     data: React.PropTypes.object.isRequired # Data that the table has requested
 
+    widgetDataSource: React.PropTypes.object.isRequired # dashboard data source for widget
+
     schema: React.PropTypes.object.isRequired # Schema to use
+    dataSource: React.PropTypes.object.isRequired # Data source to use
+
     width: React.PropTypes.number
     height: React.PropTypes.number
     standardWidth: React.PropTypes.number
@@ -60,6 +64,7 @@ module.exports = class TableChartViewComponent extends React.Component
         data: @props.data
         schema: @props.schema
         dataSource: @props.dataSource
+        widgetDataSource: @props.widgetDataSource
         onRowClick: @props.onRowClick
         scope: @props.scope
         onScopeChange: @props.onScopeChange
@@ -75,6 +80,7 @@ class TableContentsComponent extends React.Component
     data: React.PropTypes.object.isRequired # Data that the table has requested
     schema: React.PropTypes.object.isRequired # Schema to use
     dataSource: React.PropTypes.object.isRequired # Data source to use
+    widgetDataSource: React.PropTypes.object.isRequired # Data source of widget
 
     # scope of the widget (when the widget self-selects a particular scope)
     scope: React.PropTypes.shape({ 
@@ -294,6 +300,7 @@ class TableContentsComponent extends React.Component
   render: ->
     H.div null,
       @renderActions()
+      @renderPopup()
       H.table className: "table table-condensed table-hover", style: { fontSize: "10pt", marginBottom: 0 },
         @renderHeader()
         @renderBody()
