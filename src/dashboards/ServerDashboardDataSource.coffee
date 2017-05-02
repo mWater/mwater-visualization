@@ -2,6 +2,7 @@ querystring = require 'querystring'
 WidgetFactory = require '../widgets/WidgetFactory'
 injectTableAlias = require('mwater-expressions').injectTableAlias
 DirectMapDataSource = require '../maps/DirectMapDataSource'
+WidgetDataSource = require '../widgets/WidgetDataSource'
 
 # Uses mWater server to get widget data to allow sharing with unprivileged users
 module.exports = class ServerDashboardDataSource
@@ -18,7 +19,7 @@ module.exports = class ServerDashboardDataSource
   getWidgetDataSource: (widgetId) ->
     return new ServerWidgetDataSource(_.extend({}, @options, widgetId: widgetId))
 
-class ServerWidgetDataSource
+class ServerWidgetDataSource extends WidgetDataSource
   # options:
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
