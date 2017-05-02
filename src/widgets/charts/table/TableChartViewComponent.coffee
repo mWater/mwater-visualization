@@ -3,6 +3,8 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
+moment = require 'moment'
+
 AxisBuilder = require '../../../axes/AxisBuilder'
 ExprUtils = require('mwater-expressions').ExprUtils
 ui = require 'react-library/lib/bootstrap'
@@ -165,7 +167,7 @@ class TableContentsComponent extends React.Component
   handleSelectRow: (index, selected, ev) =>
     # Prevent click on row
     ev.stopPropagation()
-    
+
     id = @props.data.main[index].id
 
     selectedIds = _.clone(@state.selectedIds)
@@ -311,6 +313,7 @@ class TableContentsComponent extends React.Component
       dataSource: @props.dataSource
       widgetDataSource: @props.widgetDataSource
       onSystemAction: @props.onSystemAction
+      getSystemActions: @props.getSystemActions
       namedStrings: @props.namedStrings
       filters: @props.filters
 

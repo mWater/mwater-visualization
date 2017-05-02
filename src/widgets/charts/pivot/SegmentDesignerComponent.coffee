@@ -29,12 +29,15 @@ module.exports = class SegmentDesignerComponent extends React.Component
     onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
     namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
+    # Gets available system actions for a table. Called with (tableId). 
+    # Returns [{ id: id of action, name: name of action, multiple: true if for multiple rows support, false for single }]
+    getSystemActions: React.PropTypes.func 
+
     # Filters to add to the dashboard
     filters: React.PropTypes.arrayOf(React.PropTypes.shape({
       table: React.PropTypes.string.isRequired    # id table to filter
       jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
     }))
-
 
   constructor: (props) ->
     super
@@ -184,6 +187,7 @@ module.exports = class SegmentDesignerComponent extends React.Component
               dataSource: @props.dataSource
               widgetDataSource: @props.widgetDataSource
               onSystemAction: @props.onSystemAction
+              getSystemActions: @props.getSystemActions
               namedStrings: @props.namedStrings
               filters: @props.filters
               popupId: @props.segment.clickActionPopup

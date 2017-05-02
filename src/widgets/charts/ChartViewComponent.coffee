@@ -30,6 +30,10 @@ module.exports = class ChartViewComponent extends React.Component
 
     onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
 
+    # Gets available system actions for a table. Called with (tableId). 
+    # Returns [{ id: id of action, name: name of action, multiple: true if for multiple rows support, false for single }]
+    getSystemActions: React.PropTypes.func 
+
     # All dashboard popups
     popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
     onPopupsChange: React.PropTypes.func # Sets popups of dashboard. If not set, readonly
@@ -116,7 +120,9 @@ module.exports = class ChartViewComponent extends React.Component
           width: @props.width
           height: @props.height
           standardWidth: @props.standardWidth
+          filters: @props.filters
           onSystemAction: @props.onSystemAction
+          getSystemActions: @props.getSystemActions
           namedStrings: @props.namedStrings
           popups: @props.popups
           onPopupsChange: @props.onPopupsChange

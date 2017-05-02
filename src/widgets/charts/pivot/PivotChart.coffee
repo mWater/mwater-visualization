@@ -220,6 +220,7 @@ module.exports = class PivotChart extends Chart
       popups: options.popups
       onPopupsChange: options.onPopupsChange
       onSystemAction: options.onSystemAction
+      getSystemActions: options.getSystemActions
       namedStrings: options.namedStrings
       filters: options.filters
     }
