@@ -162,7 +162,10 @@ class TableContentsComponent extends React.Component
       @props.onSystemAction(multiselectAction.action.split(":")[1], @props.design.table, _.keys(@state.selectedIds))
     
   # Toggle selection of a row
-  handleSelectRow: (index, selected) =>
+  handleSelectRow: (index, selected, ev) =>
+    # Prevent click on row
+    ev.stopPropagation()
+    
     id = @props.data.main[index].id
 
     selectedIds = _.clone(@state.selectedIds)
