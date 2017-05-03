@@ -78,6 +78,11 @@ module.exports = class AxisComponent extends AsyncLoadComponent
       callback({ categories: [] })
       return
 
+    # If no table, cannot query
+    if not axis.expr.table
+      callback({ categories: [] })
+      return
+
     # If no categories, we need values as input
     valuesQuery = {
       type: "query"
