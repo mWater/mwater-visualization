@@ -76,7 +76,7 @@ module.exports = class DatagridComponent extends React.Component
         @setState(cellEditingEnabled: true)
 
   handleEdit: =>
-    @setState(editingDesign: @props.design)
+    @setState(editingDesign: true)
 
   # Toggle to allow cell editing
   renderCellEdit: ->
@@ -150,6 +150,7 @@ module.exports = class DatagridComponent extends React.Component
       onDesignChange: (design) => 
         @props.onDesignChange(design)
         @setState(editingDesign: false)
+      onCancel: => @setState(editingDesign: false)
 
   renderFindReplaceModal: (filters) ->
     R FindReplaceModalComponent, 
@@ -204,12 +205,14 @@ module.exports = class DatagridComponent extends React.Component
               H.a className: "btn btn-link", onClick: @handleEdit, 
                 "Click Here to Configure"
 
+# Popup editor
 class DatagridEditorComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired     # schema to use
     dataSource: React.PropTypes.object.isRequired # dataSource to use
     design: React.PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
     onDesignChange: React.PropTypes.func.isRequired # Called when design changes
+    onCancel: React.PropTypes.func.isRequired     # Called when cancelled
 
   constructor: (props) ->
     super(props)
@@ -223,8 +226,7 @@ class DatagridEditorComponent extends React.Component
       onAction: => 
         @props.onDesignChange(@state.design)
         @setState(design: @props.design)
-
-      onCancel: => @setState(design: @props.design)
+      onCancel: @props.onCancel
       size: "large",
         R DatagridDesignerComponent,
           schema: @props.schema
