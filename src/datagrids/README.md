@@ -26,6 +26,7 @@
 ### Subtable
 
 `id`: unique id of the subtable (not the id of the table, just a unique id)
+`name`: name of subtable (optional)
 `joins`: array of join columns to get to subtable from the table
 `filter`: mwater-expression
 `orderBys`: array of { expr: expression to order on, direction: "asc"/"desc" }
