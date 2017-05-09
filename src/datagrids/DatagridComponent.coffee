@@ -5,6 +5,7 @@ R = React.createElement
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
+ExprCompiler = require('mwater-expressions').ExprCompiler
 DatagridViewComponent = require './DatagridViewComponent'
 DatagridDesignerComponent = require './DatagridDesignerComponent'
 DatagridUtils = require './DatagridUtils'
@@ -78,6 +79,20 @@ module.exports = class DatagridComponent extends React.Component
   handleEdit: =>
     @setState(editingDesign: true)
 
+  # Get datagrid filter compiled for quickfilter filtering
+  getCompiledFilters: ->
+    exprCompiler = new ExprCompiler(@props.schema)
+
+    compiledFilters = []
+
+    if @props.design.filter
+      compiledFilters.push({
+        table: @props.design.table
+        jsonql: exprCompiler.compileExpr(expr: @props.design.filter, tableAlias: "{alias}")
+      })
+
+    return compiledFilters
+
   # Toggle to allow cell editing
   renderCellEdit: ->
     if not @props.canEditValue or not @props.onDesignChange?
@@ -136,6 +151,7 @@ module.exports = class DatagridComponent extends React.Component
         table: @props.design.table
         onValuesChange: (values) => @setState(quickfiltersValues: values)
         locks: @props.quickfilterLocks
+        filters: @getCompiledFilters()
       }
 
   # Renders the editor modal
