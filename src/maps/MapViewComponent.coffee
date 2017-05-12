@@ -61,7 +61,7 @@ module.exports = class MapViewComponent extends React.Component
   # Call to print the map. Prints landscape. Scale is the scaling factor to apply to increase resolution
   print: (scale) =>
     # Create new design with current bounds
-    design = _.extend({}, @props.design, { bounds: @refs.leafletMap.getBounds() })
+    design = _.extend({}, @props.design, { bounds: @refs.leafletMap.getBounds(), autoBounds: false })
 
     # Create element at 96 dpi (usual for browsers) and 7.5" across (letter - 0.5" each side). 1440 is double, so scale down
     elem = H.div style: { transform: "rotate(90deg) translateY(-720px)", width: 0, height: 0 },
@@ -169,7 +169,8 @@ module.exports = class MapViewComponent extends React.Component
     # Compile filters to JsonQL expected by layers
     for table, expr of (@props.design.filters or {})
       jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
-      compiledFilters.push({ table: table, jsonql: jsonql })
+      if jsonql
+        compiledFilters.push({ table: table, jsonql: jsonql })
 
     # Add extra filters
     if @props.extraFilters

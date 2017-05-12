@@ -3,6 +3,8 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
+ExprCompiler = require("mwater-expressions").ExprCompiler
+
 UndoStack = require '../UndoStack'
 DashboardViewComponent = require './DashboardViewComponent'
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
@@ -142,6 +144,24 @@ module.exports = class DashboardComponent extends React.Component
 
     alert("Upgrade completed. Some widgets may need to be resized. Click Undo to revert back to old dashboard style.")
 
+  # Get filters from props filters combined with dashboard filters
+  getCompiledFilters: ->
+    exprCompiler = new ExprCompiler(@props.schema)
+
+    compiledFilters = []
+
+    # Compile filters to JsonQL expected by widgets
+    for table, expr of (@props.design.filters or {})
+      jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
+      if jsonql
+        compiledFilters.push({ table: table, jsonql: jsonql })
+
+    # Add props filters
+    if @props.filters
+      compiledFilters = compiledFilters.concat(@props.filters)
+
+    return compiledFilters
+
   renderEditingSwitch: ->
     H.a key: "edit", className: "btn btn-primary btn-sm #{if @state.editing then "active" else ""}", onClick: @handleToggleEditing,
       H.span(className: "glyphicon glyphicon-pencil")
@@ -230,6 +250,7 @@ module.exports = class DashboardComponent extends React.Component
         values: @state.quickfiltersValues
         onValuesChange: (values) => @setState(quickfiltersValues: values)
         locks: @props.quickfilterLocks
+        filters: @getCompiledFilters()
       }
 
   refDashboardView: (el) =>

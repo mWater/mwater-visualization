@@ -1,7 +1,7 @@
 _ = require 'lodash'
 assert = require('chai').assert
-fixtures = require './fixtures'
-DatagridQueryBuilder = require '../src/datagrids/DatagridQueryBuilder'
+fixtures = require '../fixtures'
+DatagridQueryBuilder = require '../../src/datagrids/DatagridQueryBuilder'
 canonical = require 'canonical-json'
 
 compare = (actual, expected) ->

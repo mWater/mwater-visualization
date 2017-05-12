@@ -1,5 +1,6 @@
 React = require 'react'
 H = React.DOM
+R = React.createElement
 ReactSelect = require 'react-select'
 ExprUtils = require('mwater-expressions').ExprUtils
 ExprCleaner = require('mwater-expressions').ExprCleaner
@@ -24,6 +25,12 @@ module.exports = class QuickfiltersComponent extends React.Component
     
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
+
+    # Filters to add to restrict quick filter data to
+    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
+      table: React.PropTypes.string.isRequired    # id table to filter
+      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    }))
 
   renderQuickfilter: (item, index) ->
     values = (@props.values or [])
@@ -54,7 +61,7 @@ module.exports = class QuickfiltersComponent extends React.Component
         @props.onValuesChange(values)
 
     if type == "enum"
-      return React.createElement EnumQuickfilterComponent, 
+      return R EnumQuickfilterComponent, 
         key: index
         label: item.label
         expr: expr
@@ -64,7 +71,7 @@ module.exports = class QuickfiltersComponent extends React.Component
         onValueChange: onValueChange
 
     if type == "text"
-      return React.createElement TextQuickfilterComponent, 
+      return R TextQuickfilterComponent, 
         key: index
         label: item.label
         expr: expr
@@ -72,9 +79,10 @@ module.exports = class QuickfiltersComponent extends React.Component
         dataSource: @props.dataSource
         value: itemValue
         onValueChange: onValueChange
+        filters: @props.filters
 
     if type in ["date", "datetime"]
-      return React.createElement DateQuickfilterComponent, 
+      return R DateQuickfilterComponent, 
         key: index
         label: item.label
         expr: expr
@@ -117,7 +125,7 @@ class EnumQuickfilterComponent extends React.Component
       if @props.label
         H.span style: { color: "gray" }, @props.label + ":\u00a0"
       H.div style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
-        React.createElement ReactSelect, {
+        R ReactSelect, {
           placeholder: "All"
           value: @props.value
           multi: false
@@ -139,17 +147,24 @@ class TextQuickfilterComponent extends React.Component
     value: React.PropTypes.any                     # Current value of quickfilter (state of filter selected)
     onValueChange: React.PropTypes.func    # Called when value changes
 
+    # Filters to add to the dashboard
+    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
+      table: React.PropTypes.string.isRequired    # id table to filter
+      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    }))
+
   render: ->
     H.div style: { display: "inline-block", paddingRight: 10 },
       if @props.label
         H.span style: { color: "gray" }, @props.label + ":\u00a0"
       H.div style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
-        React.createElement TextLiteralComponent, {
+        R TextLiteralComponent, {
           value: @props.value
           onChange: @props.onValueChange
           refExpr: @props.expr
           schema: @props.schema
           dataSource: @props.dataSource
+          filters: @props.filters
         }
       if not @props.onValueChange
         H.i className: "text-warning fa fa-fw fa-lock"
@@ -170,7 +185,7 @@ class DateQuickfilterComponent extends React.Component
       if @props.label
         H.span style: { color: "gray" }, @props.label + ":\u00a0"
       H.div style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
-        React.createElement DateExprComponent, {
+        R DateExprComponent, {
           type: new ExprUtils(@props.schema).getExprType(@props.expr)
           value: @props.value
           onValueChange: @props.onValueChange
@@ -225,7 +240,7 @@ class DateExprComponent extends React.Component
           }), label: moment().startOf("month").subtract(i, 'months').format("MMM YYYY") })
 
     H.div style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
-      React.createElement ReactSelect, {
+      R ReactSelect, {
         placeholder: "All"
         value: if @props.value then JSON.stringify(@props.value) else ""
         multi: false

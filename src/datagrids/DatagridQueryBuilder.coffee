@@ -17,6 +17,7 @@ module.exports = class DatagridQueryBuilder
   #  offset: start at row offset
   #  limit: limit rows
   #  extraFilters: array of additional filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. }
+  #  fillSubtableRows: repeat main level values in subtable rows instead of leaving blank
   createQuery: (design, options = {}) ->
     # Create query to get the page of rows at the specific offset
     # Handle simple case
@@ -75,7 +76,7 @@ module.exports = class DatagridQueryBuilder
         if exprUtils.getExprAggrStatus(orderBy.expr) == "individual"
           query.groupBy.push(i + 1 + design.columns.length)
 
-    return query
+    return query 
 
   # Query with subtables
   createComplexQuery: (design, options) ->
@@ -200,7 +201,7 @@ module.exports = class DatagridQueryBuilder
           selects.push({ type: "select", expr: @createNullExpr(types[i]), alias: "st#{stindex}s#{i}" })
 
     # Add columns
-    selects = selects.concat(_.map(design.columns, (column, columnIndex) => @createColumnSelect(column, columnIndex, subtable)))
+    selects = selects.concat(_.map(design.columns, (column, columnIndex) => @createColumnSelect(column, columnIndex, subtable, options.fillSubtableRows)))
 
     # Get subtable actual table
     subtableTable = exprUtils.followJoins(design.table, subtable.joins)
@@ -355,7 +356,7 @@ module.exports = class DatagridQueryBuilder
     return types
 
   # Create the select for a column in JsonQL format
-  createColumnSelect: (column, columnIndex, subtable) ->
+  createColumnSelect: (column, columnIndex, subtable, fillSubtableRows) ->
     exprUtils = new ExprUtils(@schema)
     
     # Get expression type
@@ -370,8 +371,8 @@ module.exports = class DatagridQueryBuilder
       if subtable.id != column.subtable
         return { type: "select", expr: @createNullExpr(exprType), alias: "c#{columnIndex}" }
 
-    # Null if main column and in subtable
-    if not column.subtable and subtable
+    # Null if main column and in subtable and not fillSubtableRows
+    if not column.subtable and subtable and not fillSubtableRows
       return { type: "select", expr: @createNullExpr(exprType), alias: "c#{columnIndex}" }
 
     # Compile expression
