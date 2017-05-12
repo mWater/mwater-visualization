@@ -84,7 +84,8 @@ module.exports = class DashboardViewComponent extends React.Component
     # Compile filters to JsonQL expected by widgets
     for table, expr of (@props.design.filters or {})
       jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
-      compiledFilters.push({ table: table, jsonql: jsonql })
+      if jsonql
+        compiledFilters.push({ table: table, jsonql: jsonql })
 
     # Add props filters
     if @props.filters

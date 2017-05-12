@@ -86,10 +86,12 @@ module.exports = class DatagridComponent extends React.Component
     compiledFilters = []
 
     if @props.design.filter
-      compiledFilters.push({
-        table: @props.design.table
-        jsonql: exprCompiler.compileExpr(expr: @props.design.filter, tableAlias: "{alias}")
-      })
+      jsonql = exprCompiler.compileExpr(expr: @props.design.filter, tableAlias: "{alias}")
+      if jsonql
+        compiledFilters.push({
+          table: @props.design.table
+          jsonql: jsonql
+        })
 
     return compiledFilters
 

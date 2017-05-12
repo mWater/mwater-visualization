@@ -168,7 +168,8 @@ module.exports = class MapViewComponent extends React.Component
     # Compile filters to JsonQL expected by layers
     for table, expr of (@props.design.filters or {})
       jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
-      compiledFilters.push({ table: table, jsonql: jsonql })
+      if jsonql
+        compiledFilters.push({ table: table, jsonql: jsonql })
 
     # Add extra filters
     if @props.extraFilters
