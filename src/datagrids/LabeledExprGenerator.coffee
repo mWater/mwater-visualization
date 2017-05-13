@@ -122,6 +122,10 @@ module.exports = class LabeledExprGenerator
       # Skip deprecated
       if column.deprecated
         continue
+
+      # Skip confidential data
+      if column.confidential
+        continue
         
       # Convert column into labels and exprs
       labeledExprs = labeledExprs.concat(convertColumn(table, column, []))
