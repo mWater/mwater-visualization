@@ -29,7 +29,8 @@ Dashboard design is:
 `filters`: filter expression indexed by table. e.g. { sometable: logical expression, etc. }
 `locale`: optional locale (e.g. "fr") to use for display
 
+`popups`: array of popups for the dashboard. Each is { id:, design: } where design is a complete embedded dashboard, *without* any popups.
+
 ### Widget scoping
 
 Each widget may have a scope (private data indicating which part is highlighted) and apply filters as a result to other widgets
-
