@@ -1,11 +1,13 @@
 querystring = require 'querystring'
 WidgetFactory = require '../widgets/WidgetFactory'
 injectTableAlias = require('mwater-expressions').injectTableAlias
-DirectMapDataSource = require '../maps/DirectMapDataSource'
 WidgetDataSource = require '../widgets/WidgetDataSource'
+MapDataSource = require '../maps/MapDataSource'
+DashboardDataSource = require './DashboardDataSource'
+LayerDataSource = require '../maps/LayerDataSource'
 
 # Uses mWater server to get widget data to allow sharing with unprivileged users
-module.exports = class ServerDashboardDataSource
+module.exports = class ServerDashboardDataSource extends DashboardDataSource
   # options:
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
@@ -19,12 +21,14 @@ module.exports = class ServerDashboardDataSource
   getWidgetDataSource: (widgetId) ->
     return new ServerWidgetDataSource(_.extend({}, @options, widgetId: widgetId))
 
+# Data source for widgets inside and outside popups
 class ServerWidgetDataSource extends WidgetDataSource
   # options:
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
   #   dashboardId: dashboard id to use on server
+  #   popupId: popup if inside popup
   #   rev: revision to use to allow caching
   #   widgetId: widget id to use
   constructor: (options) ->
@@ -41,7 +45,10 @@ class ServerWidgetDataSource extends WidgetDataSource
       rev: @options.rev
     }
 
-    url = @options.apiUrl + "dashboards/#{@options.dashboardId}/widgets/#{@options.widgetId}/data?" + querystring.stringify(query)
+    if @options.popupId
+      url = @options.apiUrl + "dashboards/#{@options.dashboardId}/popups/#{@options.popupId}/widgets/#{@options.widgetId}/data?" + querystring.stringify(query)
+    else
+      url = @options.apiUrl + "dashboards/#{@options.dashboardId}/widgets/#{@options.widgetId}/data?" + querystring.stringify(query)
 
     $.getJSON url, (data) =>
       callback(null, data)
@@ -64,15 +71,33 @@ class ServerWidgetDataSource extends WidgetDataSource
 
   # Gets the dashboard data source for the popup with the specified id
   getPopupDashboardDataSource: (popupId) ->
-    throw new Error("TODO: Not implemented")
+    return new ServerDashboardPopupDataSource(_.extend({}, @options, popupId: popupId))
 
-class ServerWidgetMapDataSource 
+# Dashboard data source for a popup of a dashboard
+class ServerDashboardPopupDataSource extends DashboardDataSource
+  # options:
+  #   apiUrl: API url to use for talking to mWater server
+  #   client: client id to use for talking to mWater server
+  #   share: share id to use for talking to mWater server
+  #   dashboardId: dashboard id to use on server
+  #   popupId: dashboard id to use on server
+  #   rev: revision to use to allow caching
+  constructor: (options) ->
+    @options = options
+
+  # Gets the widget data source for a specific widget
+  getWidgetDataSource: (widgetId) ->
+    return new ServerWidgetDataSource(_.extend({}, @options, widgetId: widgetId))
+
+# Map data source for widgets in a map widget or in a popups map widget
+class ServerWidgetMapDataSource extends MapDataSource
   # options:
   #   apiUrl: API url to use for talking to mWater server
   #   design: design of the map widget
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
   #   dashboardId: dashboard id to use on server
+  #   popupId: popup if inside popup
   #   rev: revision to use to allow caching
   #   widgetId: widget id to use
   constructor: (options) ->
@@ -96,7 +121,10 @@ class ServerWidgetMapDataSource
       rev: @options.rev
     }
 
-    url = @options.apiUrl + "dashboards/#{@options.dashboardId}/widgets/#{@options.widgetId}/bounds?" + querystring.stringify(query)
+    if @options.popupId
+      url = @options.apiUrl + "dashboards/#{@options.dashboardId}/popups/#{@options.popupId}/widgets/#{@options.widgetId}/bounds?" + querystring.stringify(query)
+    else
+      url = @options.apiUrl + "dashboards/#{@options.dashboardId}/widgets/#{@options.widgetId}/bounds?" + querystring.stringify(query)
 
     $.getJSON url, (data) =>
       callback(null, data)
@@ -104,12 +132,14 @@ class ServerWidgetMapDataSource
       console.log xhr.responseText
       callback(new Error(xhr.responseText))
 
-class ServerWidgetLayerDataSource
+# Layer data source for widgets in a map widget or in a popups map widget
+class ServerWidgetLayerDataSource extends LayerDataSource
   # options:
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
   #   dashboardId: dashboard id to use on server
+  #   popupId: popup if inside popup
   #   rev: revision to use to allow caching
   #   widgetId: widget id to use
   #   layerView: layer view of map inside widget
@@ -138,17 +168,21 @@ class ServerWidgetLayerDataSource
 
     return @createUrl(filters, "grid.json")
 
-  # Gets widget data source for a popup widget
+  # Gets widget data source for a popup widget DEPRECATED
   getPopupWidgetDataSource: (design, widgetId) -> 
     return new ServerWidgetLayerPopupWidgetDataSource(_.extend({}, @options, popupWidgetId: widgetId))
+
+  # Gets the dashboard data source for the popup with the specified id
+  getPopupDashboardDataSource: (popupId) -> null # TODO!!!
 
   # Create url
   createUrl: (filters, extension) ->
     query = {
-      type: "dashboard_widget"
+      type: if @options.popupId then "dashboard_popup_widget" else "dashboard_widget"
       client: @options.client
       share: @options.share
       dashboard: @options.dashboardId
+      popup: @options.popupId
       widget: @options.widgetId
       layer: @options.layerView.id
       rev: @options.rev
@@ -196,8 +230,8 @@ class ServerWidgetLayerDataSource
 
     return url
 
-
-class ServerWidgetLayerPopupWidgetDataSource
+# DEPRECATED. Popups in a map in a dashboard widget
+class ServerWidgetLayerPopupWidgetDataSource extends WidgetDataSource
   # options:
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server

@@ -80,7 +80,7 @@ class ServerLayerDataSource
 
     return @createUrl(filters, "grid.json") 
 
-  # Gets widget data source for a popup widget
+  # Gets widget data source for a popup widget DEPRECATED
   getPopupWidgetDataSource: (design, widgetId) -> 
     return new ServerMapLayerPopupWidgetDataSource({
       apiUrl: @options.apiUrl
@@ -91,6 +91,9 @@ class ServerLayerDataSource
       layerId: @options.layerView.id
       popupWidgetId: widgetId
     })
+
+  # Gets the dashboard data source for the popup with the specified id
+  getPopupDashboardDataSource: (popupId) -> null # TODO!!!
 
   createUrl: (filters, extension) ->
     query = {

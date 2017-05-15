@@ -10,5 +10,8 @@ module.exports = class LayerDataSource
   # Only called on layers that are valid
   getUtfGridUrl: (design, filters) -> null
 
-  # Gets widget data source for a popup widget
+  # Gets widget data source for a popup widget DEPRECATED
   getPopupWidgetDataSource: (design, widgetId) -> null
+
+  # Gets the dashboard data source for the popup with the specified id
+  getPopupDashboardDataSource: (popupId) -> null

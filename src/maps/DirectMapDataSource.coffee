@@ -76,7 +76,7 @@ class DirectLayerDataSource
 
     return @createUrl("grid.json", jsonqlCss) 
 
-  # Gets widget data source for a popup widget
+  # Gets widget data source for a popup widget DEPRECATED
   getPopupWidgetDataSource: (design, widgetId) -> 
     # Create layer
     layer = LayerFactory.createLayer(@options.layerView.type)
@@ -94,6 +94,9 @@ class DirectLayerDataSource
       apiUrl: @options.apiUrl
       client: @options.client
     })
+
+  # Gets the dashboard data source for the popup with the specified id
+  getPopupDashboardDataSource: (popupId) -> null # TODO!!!
 
   # Create query string
   createUrl: (extension, jsonqlCss) ->
