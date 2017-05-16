@@ -26,11 +26,11 @@ module.exports = class DirectDashboardDataSource
       widget: widget
       schema: @options.schema
       dataSource: @options.dataSource
-      popupDashboardDataSourceFactory: @_getPopupDashboardDataSource
+      getPopupDashboardDataSource: @getPopupDashboardDataSource
     })
 
   # Gets the dashboard data source for the popup with the specified id. 
-  _getPopupDashboardDataSource: (popupId) =>
+  getPopupDashboardDataSource: (popupId) =>
     # Find popup
     popup = _.findWhere(@options.design.popups or [], { id: popupId })
     if not popup

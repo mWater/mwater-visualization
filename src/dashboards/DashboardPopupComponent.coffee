@@ -18,7 +18,7 @@ module.exports = class DashboardPopupComponent extends React.Component
     onPopupsChange: React.PropTypes.func               # If not set, readonly
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
-    widgetDataSource: React.PropTypes.object.isRequired # widget data source for widget on which popup will be shown
+    getPopupDashboardDataSource: React.PropTypes.func.isRequired # get popup dashboard data source given popup id
 
     onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
     namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
@@ -79,7 +79,7 @@ module.exports = class DashboardPopupComponent extends React.Component
         R DashboardComponent, {
           schema: @props.schema
           dataSource: @props.dataSource
-          dashboardDataSource: @props.widgetDataSource.getPopupDashboardDataSource(popup.id)
+          dashboardDataSource: @props.getPopupDashboardDataSource(popup.id)
           design: popup.design
           onDesignChange: if @props.onPopupsChange then @handlePopupChange
           filters: filters

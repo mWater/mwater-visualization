@@ -259,7 +259,7 @@ module.exports = class PivotChartViewComponent extends React.Component
       onPopupsChange: @props.onPopupsChange
       schema: @props.schema
       dataSource: @props.dataSource
-      widgetDataSource: @props.widgetDataSource
+      getPopupDashboardDataSource: @props.widgetDataSource.getPopupDashboardDataSource
       onSystemAction: @props.onSystemAction
       getSystemActions: @props.getSystemActions
       namedStrings: @props.namedStrings

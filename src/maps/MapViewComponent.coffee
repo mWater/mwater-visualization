@@ -34,6 +34,11 @@ module.exports = class MapViewComponent extends React.Component
 
     onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
 
+    # Gets available system actions for a table. Called with (tableId). 
+    # Returns [{ id: id of action, name: name of action, multiple: true if for multiple rows support, false for single }]
+    getSystemActions: React.PropTypes.func 
+    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+
     extraFilters: React.PropTypes.arrayOf(React.PropTypes.shape({
       table: React.PropTypes.string.isRequired
       jsonql: React.PropTypes.object.isRequired
@@ -51,11 +56,15 @@ module.exports = class MapViewComponent extends React.Component
     touchZoom: React.PropTypes.bool         # Whether the map can be zoomed by touch-dragging with two fingers. Default true
     scrollWheelZoom: React.PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
 
+    # All popups. If not specified, use the popups specified in the map.
+    popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired }))
+    onPopupsChange: React.PropTypes.func # Sets popups of map. If not set and popups is set, readonly
+
   constructor: (props) ->
     super
 
     @state = {
-      popupContents: null   # Element in the popup
+      popupContents: null   # Element in the popup DEPRECATED
     }
 
   # Call to print the map. Prints landscape. Scale is the scaling factor to apply to increase resolution

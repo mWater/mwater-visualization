@@ -23,6 +23,11 @@ module.exports = class MapComponent extends React.Component
     design: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func  # Null/undefined for readonly
 
+    # Gets available system actions for a table. Called with (tableId). 
+    # Returns [{ id: id of action, name: name of action, multiple: true if for multiple rows support, false for single }]
+    getSystemActions: React.PropTypes.func 
+    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+
     onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
 
     titleElem: React.PropTypes.node                     # Extra element to include in title at left

@@ -14,4 +14,4 @@ module.exports = class LayerDataSource
   getPopupWidgetDataSource: (design, widgetId) -> null
 
   # Gets the dashboard data source for the popup with the specified id
-  getPopupDashboardDataSource: (popupId) -> null
+  getPopupDashboardDataSource: (popupId) => null

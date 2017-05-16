@@ -6,7 +6,7 @@ module.exports = class DirectWidgetDataSource
   #   dataSource: general data source
   #   apiUrl: API url to use for talking to mWater server. Not needed if no map widgets
   #   client: client id to use for talking to mWater server. Not needed if no map widgets
-  #   popupDashboardDataSourceFactory: function that when called with popupId, returns DashboardDataSource for the popup
+  #   getPopupDashboardDataSource: function that when called with popupId, returns DashboardDataSource for the popup
   constructor: (options) ->
     @options = options
 
@@ -29,5 +29,5 @@ module.exports = class DirectWidgetDataSource
     return @options.dataSource.getImageUrl(imageId, height)
 
   # Gets the dashboard data source for the popup with the specified id
-  getPopupDashboardDataSource: (popupId) ->
-    return @options.popupDashboardDataSourceFactory(popupId)
+  getPopupDashboardDataSource: (popupId) =>
+    return @options.getPopupDashboardDataSource(popupId)

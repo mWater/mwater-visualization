@@ -93,7 +93,7 @@ class ServerLayerDataSource
     })
 
   # Gets the dashboard data source for the popup with the specified id
-  getPopupDashboardDataSource: (popupId) -> null # TODO!!!
+  getPopupDashboardDataSource: (popupId) => null # TODO!!!
 
   createUrl: (filters, extension) ->
     query = {

@@ -70,7 +70,7 @@ class ServerWidgetDataSource extends WidgetDataSource
     return url
 
   # Gets the dashboard data source for the popup with the specified id
-  getPopupDashboardDataSource: (popupId) ->
+  getPopupDashboardDataSource: (popupId) =>
     return new ServerDashboardPopupDataSource(_.extend({}, @options, popupId: popupId))
 
 # Dashboard data source for a popup of a dashboard
@@ -173,7 +173,7 @@ class ServerWidgetLayerDataSource extends LayerDataSource
     return new ServerWidgetLayerPopupWidgetDataSource(_.extend({}, @options, popupWidgetId: widgetId))
 
   # Gets the dashboard data source for the popup with the specified id
-  getPopupDashboardDataSource: (popupId) -> null # TODO!!!
+  getPopupDashboardDataSource: (popupId) => null # TODO!!!
 
   # Create url
   createUrl: (filters, extension) ->

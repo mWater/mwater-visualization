@@ -96,7 +96,7 @@ class DirectLayerDataSource
     })
 
   # Gets the dashboard data source for the popup with the specified id
-  getPopupDashboardDataSource: (popupId) -> null # TODO!!!
+  getPopupDashboardDataSource: (popupId) => null # TODO!!!
 
   # Create query string
   createUrl: (extension, jsonqlCss) ->

@@ -19,6 +19,6 @@ module.exports = class WidgetDataSource
     throw new Error("Not implemented")
 
   # Gets the dashboard data source for the popup with the specified id
-  getPopupDashboardDataSource: (popupId) ->
+  getPopupDashboardDataSource: (popupId) =>
     throw new Error("Not implemented")
     

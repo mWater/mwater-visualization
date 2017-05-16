@@ -196,7 +196,7 @@ module.exports = class TableChartDesignerComponent extends React.Component
             onPopupsChange: @props.onPopupsChange
             schema: @props.schema
             dataSource: @props.dataSource
-            widgetDataSource: @props.widgetDataSource
+            getPopupDashboardDataSource: @props.widgetDataSource.getPopupDashboardDataSource
             onSystemAction: @props.onSystemAction
             namedStrings: @props.namedStrings
             filters: @props.filters
