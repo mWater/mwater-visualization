@@ -17,6 +17,7 @@ module.exports = class LabeledExprGenerator
   #  useJoinIds: use ids of n-1 joins, not the code/name/etc [false]
   #  columnFilter: optional boolean predicate to filter columns included. Called with table id, column object
   #  multipleJoinCondition: optional boolean predicate to filter 1-n/n-n joins to include. Called with table id, join column object. Default is to not include those joins
+  #  useConfidential: optional boolean to replace redacted columns with unredacted ones
   generate: (table, options = {}) ->
     _.defaults(options, {
       locale: null
@@ -27,6 +28,7 @@ module.exports = class LabeledExprGenerator
       useJoinIds: false
       columnFilter: null
       multipleJoinCondition: null
+      useConfidential: false
      })
 
     # Create a label for a column
@@ -123,8 +125,11 @@ module.exports = class LabeledExprGenerator
       if column.deprecated
         continue
 
+      if column.redacted and options.useConfidential
+        continue
+
       # Skip confidential data
-      if column.confidential
+      if column.confidential and not options.useConfidential
         continue
         
       # Convert column into labels and exprs
