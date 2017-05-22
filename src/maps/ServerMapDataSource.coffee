@@ -44,6 +44,9 @@ module.exports = class ServerMapDataSource extends MapDataSource
       console.log xhr.responseText
       callback(new Error(xhr.responseText))
 
+  # Gets the dashboard data source for the popup with the specified id
+  getPopupDashboardDataSource: (popupId) => null # TODO!!!
+
 class ServerLayerDataSource
   # Create map url source that uses map design stored on server
   # options:

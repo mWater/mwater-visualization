@@ -8,6 +8,7 @@ ExprCompiler = require('mwater-expressions').ExprCompiler
 LayerFactory = require './LayerFactory'
 ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
 ReactElementPrinter = require 'react-library/lib/ReactElementPrinter'
+DashboardPopupComponent = require '../dashboards/DashboardPopupComponent'
 
 LegendComponent = require './LegendComponent'
 
@@ -56,9 +57,9 @@ module.exports = class MapViewComponent extends React.Component
     touchZoom: React.PropTypes.bool         # Whether the map can be zoomed by touch-dragging with two fingers. Default true
     scrollWheelZoom: React.PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
 
-    # All popups. If not specified, use the popups specified in the map.
+    # All dashboard popups
     popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired }))
-    onPopupsChange: React.PropTypes.func # Sets popups of map. If not set and popups is set, readonly
+    onPopupsChange: React.PropTypes.func # Sets popups 
 
   constructor: (props) ->
     super
@@ -141,33 +142,44 @@ module.exports = class MapViewComponent extends React.Component
       layerDataSource: @props.mapDataSource.getLayerDataSource(layerViewId) 
       scopeData: if @props.scope?.data?.layerViewId == layerViewId then @props.scope.data.data
       filters: @getCompiledFilters()
+      showDashboardPopup: @dashboardPopupComponent.show
+      onSystemAction: @props.onSystemAction
+      onScopeChange: (scope) =>
+        if scope
+          # Encode layer id into scope as layer itself doesn't know its ID
+          scope = {
+            name: scope.name
+            filter: scope.filter
+            data: { layerViewId: layerViewId, data: scope.data }
+          }
+        @props.onScopeChange?(scope)
     })
 
-    if not results
-      return
+    # if not results
+    #   return
 
-    # Handle popup first
-    if results.popup
-      @setState(popupContents: results.popup)
+    # # Handle popup first
+    # if results.popup
+    #   @setState(popupContents: results.popup)
 
-    # Handle onSystemAction case
-    if results.row and @props.onSystemAction
-      # TODO use clickAction
-      @props.onSystemAction("open", results.row.tableId, [results.row.primaryKey])
+    # # Handle onSystemAction case
+    # if results.row and @props.onSystemAction
+    #   # TODO use clickAction
+    #   @props.onSystemAction("open", results.row.tableId, [results.row.primaryKey])
 
-    # Handle scoping
-    if @props.onScopeChange and _.has(results, "scope")
-      if results.scope
-        # Encode layer view id into scope
-        scope = {
-          name: results.scope.name
-          filter: results.scope.filter
-          data: { layerViewId: layerViewId, data: results.scope.data }
-        }
-      else
-        scope = null
+    # # Handle scoping
+    # if @props.onScopeChange and _.has(results, "scope")
+    #   if results.scope
+    #     # Encode layer view id into scope
+    #     scope = {
+    #       name: results.scope.name
+    #       filter: results.scope.filter
+    #       data: { layerViewId: layerViewId, data: results.scope.data }
+    #     }
+    #   else
+    #     scope = null
 
-      @props.onScopeChange(scope)
+    #   @props.onScopeChange(scope)
 
   # Get filters from extraFilters combined with map filters
   getCompiledFilters: ->
@@ -192,7 +204,8 @@ module.exports = class MapViewComponent extends React.Component
       schema: @props.schema
       layerViews: @props.design.layerViews
 
-  renderPopup: ->
+  # TODO DEPRECATED
+  renderLegacyPopup: ->
     if not @state.popupContents
       return null
 
@@ -204,6 +217,20 @@ module.exports = class MapViewComponent extends React.Component
         H.div style: { textAlign: "right", marginTop: 10 },
           H.button className: "btn btn-default", onClick: (=> @setState(popupContents: null)),
             "Close"
+
+  # Render the popup dashboard which can display
+  renderPopup: ->
+    R DashboardPopupComponent,
+      ref: (c) => @dashboardPopupComponent = c
+      popups: @props.popups
+      onPopupsChange: @props.onPopupsChange
+      schema: @props.schema
+      dataSource: @props.dataSource
+      getPopupDashboardDataSource: @props.mapDataSource.getPopupDashboardDataSource
+      onSystemAction: @props.onSystemAction
+      getSystemActions: @props.getSystemActions
+      namedStrings: @props.namedStrings
+      filters: @getCompiledFilters()
 
   render: ->
     compiledFilters = @getCompiledFilters()
@@ -261,7 +288,7 @@ module.exports = class MapViewComponent extends React.Component
         leafletLayers.push(leafletLayer)
 
     H.div style: { width: @props.width, height: @props.height, position: 'relative' },
-      @renderPopup()
+      @renderLegacyPopup()
       R LeafletMapComponent,
         ref: "leafletMap"
         initialBounds: @props.design.bounds

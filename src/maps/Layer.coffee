@@ -29,15 +29,9 @@ module.exports = class Layer
   #     layerDataSource: layer data source
   #     scopeData: current scope data if layer is scoping
   #     filters: compiled filters to apply to the popup
-  # 
-  # Returns:
-  #   null/undefined 
-  #   or
-  #   {
-  #     scope: scope to apply ({ name, filter, data })
-  #     row: { tableId:, primaryKey: }  # row that was selected
-  #     popup: React element to put into a popup
-  #   }
+  #     showDashboardPopup: call to show a dashboard popup. Call with (popupId, extraFilters). Includes all filters of the map already
+  #     onSystemAction: call to perform system action
+  #     onScopeChange: call to set the scope. Will be automatically adjusted to encode layer id
   onGridClick: (ev, options) ->
     return null
 

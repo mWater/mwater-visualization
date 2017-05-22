@@ -101,6 +101,11 @@ module.exports = class MapComponent extends React.Component
     else
       @setState(transientDesign: design)
 
+  # Change map-level popups
+  handlePopupsChange: (popups) =>
+    design = _.extend({}, @getDesign(), popups: popups)
+    @handleDesignChange(design)
+
   getDesign: ->
     if @props.onDesignChange
       return @props.design
@@ -120,6 +125,8 @@ module.exports = class MapComponent extends React.Component
         design: @getDesign()
         onDesignChange: @handleDesignChange
         onSystemAction: @props.onSystemAction
+        popups: @getDesign().popups
+        onPopupsChange: @handlePopupsChange
       )
     )
 

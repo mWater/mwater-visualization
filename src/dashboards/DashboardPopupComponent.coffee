@@ -27,7 +27,7 @@ module.exports = class DashboardPopupComponent extends React.Component
     # Returns [{ id: id of action, name: name of action, multiple: true if for multiple rows support, false for single }]
     getSystemActions: React.PropTypes.func 
 
-    # Filters to add to the dashboard
+    # Filters to add to the popup dashboard
     filters: React.PropTypes.arrayOf(React.PropTypes.shape({
       table: React.PropTypes.string.isRequired    # id table to filter
       jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
@@ -45,7 +45,7 @@ module.exports = class DashboardPopupComponent extends React.Component
     }
 
   # Show the popup with the specified id with extra filters appended to filters
-  show: (popupId, extraFilters) ->
+  show: (popupId, extraFilters) =>
     @setState(popupId: popupId, extraFilters: extraFilters or [])
 
   handlePopupChange: (design) =>

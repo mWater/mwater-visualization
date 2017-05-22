@@ -7,3 +7,6 @@ module.exports = class MapDataSource
   # Gets the bounds for the map. Null for no opinion. Callback as { n:, s:, w:, e: }
   getBounds: (design, filters, callback) ->
     callback(null)
+
+  # Gets the dashboard data source for the popup with the specified id
+  getPopupDashboardDataSource: (popupId) => null

@@ -31,6 +31,9 @@ module.exports = class DirectMapDataSource extends MapDataSource
   getBounds: (design, filters, callback) ->
     new MapBoundsCalculator(@options.schema, @options.dataSource).getBounds(design, filters, callback)
 
+  # Gets the dashboard data source for the popup with the specified id
+  getPopupDashboardDataSource: (popupId) => null # TODO
+
 class DirectLayerDataSource
   # Create map url source that uses direct jsonql maps
   # options:
