@@ -42,7 +42,13 @@ module.exports = class ExprItemsHtmlConverter extends ItemsHtmlConverter
         if @exprValues[item.id]?
           # Use d3 format if number and has format
           if item.format and exprUtils.getExprType(item.expr) == "number"
-            text = d3Format.format(item.format)(@exprValues[item.id])
+            num = @exprValues[item.id]
+
+            # Do not convert % (d3Format multiplies by 100 which is annoying)
+            if item.format and item.format.match(/%/)
+              num = num / 100.0
+
+            text = d3Format.format(item.format)(num)
           else
             text = exprUtils.stringifyExprLiteral(item.expr, @exprValues[item.id]) # TODO locale
 

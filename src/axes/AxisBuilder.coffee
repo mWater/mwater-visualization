@@ -610,6 +610,9 @@ module.exports = class AxisBuilder
       when "number"
         num = parseFloat(value)
         format = d3Format.format(if axis.format? then axis.format else ",")
+        # Do not convert % (d3Format multiplies by 100 which is annoying)
+        if axis.format and axis.format.match(/%/)
+          num = num / 100.0
         return format(num)
       when "text[]"
         # Parse if string
