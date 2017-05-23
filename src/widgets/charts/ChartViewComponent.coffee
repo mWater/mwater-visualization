@@ -106,6 +106,7 @@ module.exports = class ChartViewComponent extends React.Component
           height: @props.height
           standardWidth: @props.standardWidth
           onRowClick: @props.onRowClick
+          filters: @props.filters
           })
       if @state.dataLoading
         @renderSpinner()
