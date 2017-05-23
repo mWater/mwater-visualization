@@ -19,6 +19,7 @@ module.exports = class MapDesignerComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired # Data source to use
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
+    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   handleAttributionChange: (text) =>
     design = _.extend({}, @props.design, {attribution: text})
@@ -78,6 +79,7 @@ module.exports = class MapDesignerComponent extends React.Component
               design: @props.design
               onDesignChange: @props.onDesignChange
               allowEditingLayers: true
+              filters: @props.filters
           }
           {
             id: "filters"

@@ -20,6 +20,7 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired
     design: React.PropTypes.object.isRequired  # Design of the design
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
+    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   # Apply updates to design
   update: (updates) ->
@@ -65,7 +66,8 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
           types: ["geometry"]
           aggrNeed: "none"
           value: @props.design.axes.geometry
-          onChange: @handleGeometryAxisChange)
+          onChange: @handleGeometryAxisChange
+          filters: @props.filters)
 
   renderRadius: ->
     return H.div className: "form-group",
@@ -106,6 +108,7 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
           showColorMap: true
           onChange: @handleColorAxisChange
           allowExcludedValues: true
+          filters: @props.filters
 
   renderFillOpacity: ->
     return H.div className: "form-group",

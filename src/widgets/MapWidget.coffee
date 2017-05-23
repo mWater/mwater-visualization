@@ -101,6 +101,7 @@ class MapWidgetComponent extends React.Component
       dataSource: @props.dataSource
       design: @state.editDesign
       onDesignChange: @handleEditDesignChange
+      filters: @props.filters
     )
 
     # Create map (maxing out at half of width of screen)

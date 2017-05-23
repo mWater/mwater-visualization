@@ -16,6 +16,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
     connectDragPreview: React.PropTypes.func  #connector for reorderable
     connectDropTarget: React.PropTypes.func # connector for reorderable
     allowEditingLayer: React.PropTypes.bool.isRequired
+    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   constructor: (props) ->
     super(props)
@@ -62,6 +63,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
           schema: @props.schema
           dataSource: @props.dataSource
           onDesignChange: @handleSaveEditing
+          filters: @props.filters
         })
       @renderOpacityControl()
 
