@@ -23,6 +23,9 @@ Design is:
   minZoom: minimum zoom level
   maxZoom: maximum zoom level
 
+  clickAction: what to do when marker is clicked on. null/"scope"/"popup"/"system:somesystemaction"
+  clickActionPopup: popup id to use if clickAction is "popup"
+
 LEGACY: sublayers array that contains above design
 
 axes:
@@ -182,34 +185,38 @@ module.exports = class MarkersLayer extends Layer
 
     return css
 
-  # Called when the interactivity grid is clicked.
+  # Called when the interactivity grid is clicked. 
   # arguments:
   #   ev: { data: interactivty data e.g. `{ id: 123 }` }
-  #   options:
+  #   options: 
   #     design: design of layer
   #     schema: schema to use
   #     dataSource: data source to use
   #     layerDataSource: layer data source
   #     scopeData: current scope data if layer is scoping
   #     filters: compiled filters to apply to the popup
-  #
-  # Returns:
-  #   null/undefined
-  #   or
-  #   {
-  #     scope: scope to apply ({ name, filter, data })
-  #     row: { tableId:, primaryKey: }  # row that was selected
-  #     popup: React element to put into a popup
-  #   }
-  onGridClick: (ev, clickOptions) ->
-    # TODO abstract most to base class
-    if ev.data and ev.data.id
-      table = clickOptions.design.table
-      results = {}
+  #     showDashboardPopup: call to show a dashboard popup. Call with (popupId, extraFilters). Includes all filters of the map already
+  #     onSystemAction: call to perform system action
+  #     onScopeChange: call to set the scope. Will be automatically adjusted to encode layer id
+  onGridClick: (ev, options) ->
+    if ev.data?.id
+      # Check click action
+      if options.design.clickAction == "popup" and options.design.clickActionPopup
+        # Create filters for single row
+        filter = {
+          table: table
+          jsonql: { type: "op", op: "=", exprs: [
+            { type: "field", tableAlias: "{alias}", column: options.schema.getTable(table).primaryKey }
+            { type: "literal", value: ev.data.id }
+          ]}
+        }
 
-      # Scope toggle item if ctrl-click
-      if ev.event.originalEvent.shiftKey
-        ids = clickOptions.scopeData or []
+        options.showDashboardPopup(options.design.clickActionPopup, [filter])
+
+      # Check scope action
+      if options.design.clickAction == "scope"
+        # Scope toggle item 
+        ids = options.scopeData or []
         if ev.data.id in ids
           ids = _.without(ids, ev.data.id)
         else
@@ -217,68 +224,26 @@ module.exports = class MarkersLayer extends Layer
 
         # Create filter for rows
         filter = {
-          table: table
+          table: options.design.table
           jsonql: { type: "op", op: "=", modifier: "any", exprs: [
-            { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table).primaryKey }
+            { type: "field", tableAlias: "{alias}", column: options.schema.getTable(table).primaryKey }
             { type: "literal", value: ids }
           ]}
         }
 
         # Scope to item
         if ids.length > 0
-          results.scope = {
-            name: "Selected #{ids.length} Markers(s)"
+          options.onScopeChange({
+            name: "Selected #{ids.length} Marker(s)"
             filter: filter
             data: ids
-          }
-        else
-          results.scope = null
-
-      # Popup
-      if clickOptions.design.popup and not ev.event.originalEvent.shiftKey
-        BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
-        WidgetFactory = require '../widgets/WidgetFactory'
-
-        results.popup = new BlocksLayoutManager().renderLayout({
-          items: clickOptions.design.popup.items
-          style: "popup"
-          renderWidget: (options) =>
-            widget = WidgetFactory.createWidget(options.type)
-
-            # Create filters for single row
-            filter = {
-              table: table
-              jsonql: { type: "op", op: "=", exprs: [
-                { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table).primaryKey }
-                { type: "literal", value: ev.data.id }
-              ]}
-            }
-
-            filters = clickOptions.filters.concat([filter])
-
-            # Get data source for widget
-            widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(clickOptions.design, options.id)
-
-            return widget.createViewElement({
-              schema: clickOptions.schema
-              dataSource: clickOptions.dataSource
-              widgetDataSource: widgetDataSource
-              design: options.design
-              scope: null
-              filters: filters
-              onScopeChange: null
-              onDesignChange: null
-              width: options.width
-              height: options.height
-              standardWidth: options.standardWidth
-            })
           })
-      else if not ev.event.originalEvent.shiftKey
-        results.row = { tableId: table, primaryKey: ev.data.id }
+        else
+          options.onScopeChange(null)
 
-      return results
-    else
-      return null
+      # Check system action
+      if options.design.clickAction and options.design.clickAction.match(/^system:/)
+        options.onSystemAction(options.design.clickAction.split(":")[0], options.design.table, [ev.data.id])
 
   # Gets the bounds of the layer as GeoJSON
   getBounds: (design, schema, dataSource, filters, callback) ->

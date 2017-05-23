@@ -17,6 +17,17 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
     connectDropTarget: React.PropTypes.func # connector for reorderable
     allowEditingLayer: React.PropTypes.bool.isRequired
 
+    onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
+
+    # Gets available system actions for a table. Called with (tableId). 
+    # Returns [{ id: id of action, name: name of action, multiple: true if for multiple rows support, false for single }]
+    getSystemActions: React.PropTypes.func 
+
+    # All dashboard popups
+    popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
+    onPopupsChange: React.PropTypes.func # Sets popups of dashboard. If not set, readonly
+    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+
   constructor: (props) ->
     super(props)
 
@@ -62,6 +73,11 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
           schema: @props.schema
           dataSource: @props.dataSource
           onDesignChange: @handleSaveEditing
+          onSystemAction: @props.onSystemAction
+          getSystemActions: @props.getSystemActions
+          popups: @props.popups
+          onPopupsChange: @props.onPopupsChange
+          namedStrings: @props.namedStrings
         })
       @renderOpacityControl()
 

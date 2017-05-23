@@ -23,6 +23,11 @@ module.exports = class MapWidget extends Widget
   #  height: height in pixels on screen
   #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
   #  onSystemAction: Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
+  #  namedStrings: optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+  #  popups: array of dashboard popups
+  #  onPopupsChange: called when popups are changed
+  #  getSystemActions: Gets available system actions for a table. Called with (tableId). 
+  #    Returns [{ id: id of action, name: name of action, multiple: true if for multiple rows support, false for single }]
   createViewElement: (options) ->
     return React.createElement(MapWidgetComponent,
       schema: options.schema
@@ -38,6 +43,9 @@ module.exports = class MapWidget extends Widget
       height: options.height
       standardWidth: options.standardWidth
       onSystemAction: options.onSystemAction
+      namedStrings: options.namedStrings
+      popups: options.popups
+      onPopupsChange: options.onPopupsChange
     )
 
   # Get a list of table ids that can be filtered on
@@ -74,7 +82,17 @@ class MapWidgetComponent extends React.Component
     }) 
     filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+
     onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
+
+    # Gets available system actions for a table. Called with (tableId). 
+    # Returns [{ id: id of action, name: name of action, multiple: true if for multiple rows support, false for single }]
+    getSystemActions: React.PropTypes.func 
+
+    # All dashboard popups
+    popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
+    onPopupsChange: React.PropTypes.func # Sets popups of dashboard. If not set, readonly
+    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
   constructor: (props) ->
     super
@@ -106,6 +124,11 @@ class MapWidgetComponent extends React.Component
       dataSource: @props.dataSource
       design: @state.editDesign
       onDesignChange: @handleEditDesignChange
+      onSystemAction: @props.onSystemAction
+      getSystemActions: @props.getSystemActions
+      namedStrings: @props.namedStrings
+      popups: @props.popups
+      onPopupsChange: @props.onPopupsChange
     )
 
     # Create map (maxing out at half of width of screen)
@@ -143,6 +166,10 @@ class MapWidgetComponent extends React.Component
         height: height - 20
         scrollWheelZoom: false # Prevent accidental zooming
         onSystemAction: @props.onSystemAction
+        getSystemActions: @props.getSystemActions
+        namedStrings: @props.namedStrings
+        popups: @props.popups
+        onPopupsChange: @props.onPopupsChange
       })
 
   render: ->

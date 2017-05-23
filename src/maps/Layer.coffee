@@ -67,6 +67,12 @@ module.exports = class Layer
   #   schema: schema to use
   #   dataSource: data source to use
   #   onDesignChange: function called when design changes
+  #   onSystemAction: Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
+  #   namedStrings: optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+  #   popups: array of dashboard popups
+  #   onPopupsChange: called when popups are changed
+  #   getSystemActions: Gets available system actions for a table. Called with (tableId). 
+  #     Returns [{ id: id of action, name: name of action, multiple: true if for multiple rows support, false for single }]
   createDesignerElement: (options) ->
     throw new Error("Not implemented")
 

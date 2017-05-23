@@ -20,6 +20,17 @@ module.exports = class MapDesignerComponent extends React.Component
     design: React.PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: React.PropTypes.func.isRequired # Called with new design
 
+    onSystemAction: React.PropTypes.func # Called with (actionId, tableId, rowIds) when an action is performed on rows. actionId is id of action e.g. "open"
+
+    # Gets available system actions for a table. Called with (tableId). 
+    # Returns [{ id: id of action, name: name of action, multiple: true if for multiple rows support, false for single }]
+    getSystemActions: React.PropTypes.func 
+
+    # All dashboard popups
+    popups: React.PropTypes.arrayOf(React.PropTypes.shape({ id: React.PropTypes.string.isRequired, design: React.PropTypes.object.isRequired })).isRequired
+    onPopupsChange: React.PropTypes.func # Sets popups of dashboard. If not set, readonly
+    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+
   handleAttributionChange: (text) =>
     design = _.extend({}, @props.design, {attribution: text})
     @props.onDesignChange(design)
