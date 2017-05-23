@@ -12,6 +12,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func.isRequired
+    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   # Determine if axes labels needed
   areAxesLabelsNeeded: (layer) ->
@@ -121,6 +122,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
         schema: @props.schema
         dataSource: @props.dataSource
         index: index
+        filters: @props.filters
         onChange: @handleLayerChange.bind(null, index)
         onRemove: @handleRemoveLayer.bind(null, index)
         })

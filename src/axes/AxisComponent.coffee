@@ -15,6 +15,7 @@ BinsComponent = require './BinsComponent'
 RangesComponent = require './RangesComponent'
 AxisColorEditorComponent = require './AxisColorEditorComponent'
 CategoryMapComponent = require './CategoryMapComponent'
+injectTableAlias = require('mwater-expressions').injectTableAlias
 
 # Axis component that allows designing of an axis
 module.exports = class AxisComponent extends AsyncLoadComponent
@@ -36,6 +37,7 @@ module.exports = class AxisComponent extends AsyncLoadComponent
     allowExcludedValues: React.PropTypes.bool # True to allow excluding of values via checkboxes
     defaultColor: React.PropTypes.string
     showFormat: React.PropTypes.bool  # Show format control for numeric values
+    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   @defaultProps:
     reorderable: false
@@ -93,6 +95,16 @@ module.exports = class AxisComponent extends AsyncLoadComponent
       groupBy: [1]
       limit: 50
     }
+
+    filters = _.where(@props.filters or [], table: axis.expr.table)
+    whereClauses = _.map(@props.filters, (f) -> injectTableAlias(valuesQuery, "main"))
+    whereClauses = _.compact(whereClauses)
+
+    # Wrap if multiple
+    if whereClauses.length > 1
+      query.where = { type: "op", op: "and", exprs: whereClauses }
+    else
+      query.where = whereClauses[0]
 
     props.dataSource.performQuery(valuesQuery, (error, rows) =>
       if error
