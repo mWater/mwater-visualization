@@ -47,10 +47,13 @@ module.exports = class LeafletMapComponent extends React.Component
 
     loadingSpinner: React.PropTypes.bool       # True to add loading spinner
 
+    scaleControl: React.PropTypes.bool      # True to show scale control
+
   @defaultProps: 
     dragging: true
     touchZoom: true
     scrollWheelZoom: true
+    scaleControl: true
 
   # Reload all tiles
   reload: ->
@@ -115,6 +118,9 @@ module.exports = class LeafletMapComponent extends React.Component
       mapOptions.maxZoom = @props.maxZoom
 
     @map = L.map(mapElem, mapOptions)
+
+    if @props.scaleControl
+      L.control.scale().addTo(@map)
 
     # Update legend on zoom
     @map.on "zoomend", => @forceUpdate()
@@ -191,7 +197,11 @@ module.exports = class LeafletMapComponent extends React.Component
 
       switch @props.baseLayerId
         when "bing_road"
-          @baseLayer = new BingLayer("Ao26dWY2IC8PjorsJKFaoR85EPXCnCohrJdisCWXIULAXFo0JAXquGauppTMQbyU", {type: "Road"})
+          # @baseLayer = new BingLayer("Ao26dWY2IC8PjorsJKFaoR85EPXCnCohrJdisCWXIULAXFo0JAXquGauppTMQbyU", {type: "Road"})
+          @baseLayer = L.tileLayer('https://{s}.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZ3Jhc3NpY2siLCJhIjoiY2ozMzU1N3ZoMDA3ZDJxbzh0aTRtOTRoeSJ9.fFWBZ88vbdezyhfw-I-fag', {
+            attribution: "MapBox and OpenStreetMap"
+            subdomains: ["a", "b"]
+            })
         when "bing_aerial"
           @baseLayer = new BingLayer("Ao26dWY2IC8PjorsJKFaoR85EPXCnCohrJdisCWXIULAXFo0JAXquGauppTMQbyU", {type: "AerialWithLabels"})
         when "cartodb_positron"
