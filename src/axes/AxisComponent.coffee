@@ -97,14 +97,14 @@ module.exports = class AxisComponent extends AsyncLoadComponent
     }
 
     filters = _.where(@props.filters or [], table: axis.expr.table)
-    whereClauses = _.map(@props.filters, (f) -> injectTableAlias(valuesQuery, "main"))
+    whereClauses = _.map(@props.filters, (f) -> injectTableAlias(f.jsonql, "main"))
     whereClauses = _.compact(whereClauses)
 
     # Wrap if multiple
     if whereClauses.length > 1
-      query.where = { type: "op", op: "and", exprs: whereClauses }
+      valuesQuery.where = { type: "op", op: "and", exprs: whereClauses }
     else
-      query.where = whereClauses[0]
+      valuesQuery.where = whereClauses[0]
 
     props.dataSource.performQuery(valuesQuery, (error, rows) =>
       if error

@@ -194,6 +194,7 @@ module.exports = class PivotChart extends Chart
   #   width, height, standardWidth: size of the chart view
   #   scope: current scope of the view element
   #   onScopeChange: called when scope changes with new scope
+  #   filters: array of filters
   createViewElement: (options) ->
     PivotChartViewComponent = require './PivotChartViewComponent'
     
@@ -211,6 +212,7 @@ module.exports = class PivotChart extends Chart
 
       scope: options.scope
       onScopeChange: options.onScopeChange
+      filters: options.filters
     }
 
     return React.createElement(PivotChartViewComponent, props)
