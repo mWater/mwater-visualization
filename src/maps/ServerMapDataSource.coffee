@@ -44,6 +44,15 @@ module.exports = class ServerMapDataSource extends MapDataSource
       console.log xhr.responseText
       callback(new Error(xhr.responseText))
 
+  # Gets the URL to call to print the map. 
+  # scale is 2 (normal) or 3 (high-resolution)
+  getPrintUrl: (design, scale) ->
+    return @options.apiUrl + "maps/#{@options.mapId}/print?" + querystring.stringify({
+      client: @options.client
+      scale: scale
+      bounds: JSON.stringify(design.bounds)
+    })
+
 class ServerLayerDataSource
   # Create map url source that uses map design stored on server
   # options:

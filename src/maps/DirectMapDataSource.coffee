@@ -15,6 +15,7 @@ module.exports = class DirectMapDataSource extends MapDataSource
   #   design: design of entire map
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
+  #   mapId: map _id to allow server printing
   constructor: (options) ->
     @options = options
 
@@ -30,6 +31,20 @@ module.exports = class DirectMapDataSource extends MapDataSource
   # Gets the bounds for the map. Null for whole world. Callback as { n:, s:, w:, e: }
   getBounds: (design, filters, callback) ->
     new MapBoundsCalculator(@options.schema, @options.dataSource).getBounds(design, filters, callback)
+
+
+  # Gets the URL to call to print the map. 
+  # scale is 2 (normal) or 3 (high-resolution)
+  getPrintUrl: (design, scale) ->
+    # Needs mapId to print
+    if not @options.mapId
+      return null
+
+    return @options.apiUrl + "maps/#{@options.mapId}/print?" + querystring.stringify({
+      client: @options.client
+      scale: scale
+      bounds: JSON.stringify(design.bounds)
+    })
 
 class DirectLayerDataSource
   # Create map url source that uses direct jsonql maps

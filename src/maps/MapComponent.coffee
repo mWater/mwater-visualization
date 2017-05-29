@@ -58,16 +58,22 @@ module.exports = class MapComponent extends React.Component
     @setState(undoStack: undoStack, => @props.onDesignChange(undoStack.getValue()))
 
   renderPrint: ->
-    return H.div key: "print", className: "btn-group",
-      H.button type: "button", "data-toggle": "dropdown", className: "btn btn-link btn-sm dropdown-toggle",
-        H.span className: "glyphicon glyphicon-print"
-        " Print "
-        H.span className: "caret"
-      H.ul className: "dropdown-menu",
-        H.li key: "scale2",
-          H.a onClick: @handlePrint.bind(null, 2), "Normal"
-        H.li key: "scale3",
-          H.a onClick: @handlePrint.bind(null, 3), "High-Resolution"
+    printScale2Url = @props.mapDataSource.getPrintUrl(@getDesign(), 2)
+    printScale3Url = @props.mapDataSource.getPrintUrl(@getDesign(), 3)
+
+    if printScale2Url and printScale3Url
+      return H.div key: "print", className: "btn-group",
+        H.button type: "button", "data-toggle": "dropdown", className: "btn btn-link btn-sm dropdown-toggle",
+          H.span className: "glyphicon glyphicon-print"
+          " Print "
+          H.span className: "caret"
+        H.ul className: "dropdown-menu",
+          H.li key: "scale2",
+            H.a href: printScale2Url, target: "_blank", "Normal"
+          H.li key: "scale3",
+            H.a href: printScale3Url, target: "_blank", "High-Resolution"
+    else
+      return null
 
   renderActionLinks: ->
     H.div null,
@@ -115,7 +121,6 @@ module.exports = class MapComponent extends React.Component
         design: @getDesign()
         onDesignChange: @handleDesignChange
         onRowClick: @props.onRowClick
-        printUrl: @props.printUrl
       )
     )
 

@@ -7,7 +7,6 @@ ExprUtils = require('mwater-expressions').ExprUtils
 ExprCompiler = require('mwater-expressions').ExprCompiler
 LayerFactory = require './LayerFactory'
 ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
-ReactElementPrinter = require 'react-library/lib/ReactElementPrinter'
 
 LegendComponent = require './LegendComponent'
 
@@ -50,7 +49,6 @@ module.exports = class MapViewComponent extends React.Component
     dragging:  React.PropTypes.bool         # Whether the map be draggable with mouse/touch or not. Default true
     touchZoom: React.PropTypes.bool         # Whether the map can be zoomed by touch-dragging with two fingers. Default true
     scrollWheelZoom: React.PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
-    printUrl: React.PropTypes.string
 
   constructor: (props) ->
     super
@@ -59,13 +57,6 @@ module.exports = class MapViewComponent extends React.Component
       popupContents: null   # Element in the popup
     }
 
-  # Call to print the map. Prints landscape. Scale is the scaling factor to apply to increase resolution
-  print: (scale) =>
-    bounds = @refs.leafletMap.getBounds()
-    printUrl = @props.printUrl + "&scale=#{scale}&bounds=#{JSON.stringify(bounds)}"
-    console.log printUrl
-    window.open(printUrl)
-    
   componentDidMount: ->
     # Autozoom
     if @props.design.autoBounds 
