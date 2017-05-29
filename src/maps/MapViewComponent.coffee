@@ -62,7 +62,8 @@ module.exports = class MapViewComponent extends React.Component
   # Call to print the map. Prints landscape. Scale is the scaling factor to apply to increase resolution
   print: (scale) =>
     bounds = @refs.leafletMap.getBounds()
-    printUrl = @props.printUrl + "&scale=#{scale}&bounds[e]=#{bounds.e}&bounds[n]=#{bounds.n}&bounds[s]=#{bounds.s}&bounds[w]=#{bounds.w}"
+    printUrl = @props.printUrl + "&scale=#{scale}&bounds=#{JSON.stringify(bounds)}"
+    console.log printUrl
     window.open(printUrl)
     
   componentDidMount: ->
