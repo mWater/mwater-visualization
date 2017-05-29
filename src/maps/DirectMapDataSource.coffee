@@ -1,4 +1,5 @@
 _ = require 'lodash'
+querystring = require 'querystring'
 LayerFactory = require './LayerFactory'
 injectTableAlias = require('mwater-expressions').injectTableAlias
 MapDataSource = require './MapDataSource'
