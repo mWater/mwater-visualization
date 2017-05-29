@@ -115,6 +115,7 @@ module.exports = class MapComponent extends React.Component
         design: @getDesign()
         onDesignChange: @handleDesignChange
         onRowClick: @props.onRowClick
+        printUrl: @props.printUrl
       )
     )
 

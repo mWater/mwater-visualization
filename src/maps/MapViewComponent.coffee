@@ -50,6 +50,7 @@ module.exports = class MapViewComponent extends React.Component
     dragging:  React.PropTypes.bool         # Whether the map be draggable with mouse/touch or not. Default true
     touchZoom: React.PropTypes.bool         # Whether the map can be zoomed by touch-dragging with two fingers. Default true
     scrollWheelZoom: React.PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
+    printUrl: React.PropTypes.string
 
   constructor: (props) ->
     super
@@ -60,24 +61,10 @@ module.exports = class MapViewComponent extends React.Component
 
   # Call to print the map. Prints landscape. Scale is the scaling factor to apply to increase resolution
   print: (scale) =>
-    # Create new design with current bounds
-    design = _.extend({}, @props.design, { bounds: @refs.leafletMap.getBounds(), autoBounds: false })
-
-    # Create element at 96 dpi (usual for browsers) and 7.5" across (letter - 0.5" each side). 1440 is double, so scale down
-    elem = H.div style: { transform: "rotate(90deg) translateY(-720px)", width: 0, height: 0 },
-      H.div style: { transform: "scale(#{1/scale})", transformOrigin: "top left" },
-        # Hide zoom control and display background colors
-        H.style null, '''
-        .leaflet-control-zoom { display: none; }
-        @media print {
-          body { -webkit-print-color-adjust: exact; }
-        }      
-        '''
-        R(MapViewComponent, _.extend({}, @props, { width: 960 * scale, height: 720 * scale, design: design, onDesignChange: null }))
+    bounds = @refs.leafletMap.getBounds()
+    printUrl = @props.printUrl + "&scale=#{scale}&bounds[e]=#{bounds.e}&bounds[n]=#{bounds.n}&bounds[s]=#{bounds.s}&bounds[w]=#{bounds.w}"
+    window.open(printUrl)
     
-    printer = new ReactElementPrinter()
-    printer.print(elem, { delay: 8000 })
-
   componentDidMount: ->
     # Autozoom
     if @props.design.autoBounds 
