@@ -51,6 +51,8 @@ module.exports = class ServerMapDataSource extends MapDataSource
       client: @options.client
       scale: scale
       bounds: JSON.stringify(design.bounds)
+      # Include ids of visible layers, comma-delimited
+      layers: _.pluck(_.where(design.layerViews, visible: true), "id").join(",")
     })
 
 class ServerLayerDataSource
