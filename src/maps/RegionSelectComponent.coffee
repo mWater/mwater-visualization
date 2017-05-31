@@ -10,7 +10,7 @@ module.exports = class RegionSelectComponent extends React.Component
   @propTypes:
     schema: React.PropTypes.object.isRequired # Schema to use
     dataSource: React.PropTypes.object.isRequired
-    region: React.PropTypes.string    # _id of region
+    region: React.PropTypes.number    # _id of region
     onChange: React.PropTypes.func.isRequired # Called with (_id, level)
     placeholder: React.PropTypes.string
 
