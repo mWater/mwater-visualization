@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -10,26 +11,26 @@ moment = require 'moment'
 # Displays quick filters and allows their value to be modified
 module.exports = class QuickfiltersComponent extends React.Component
   @propTypes:
-    design: React.PropTypes.arrayOf(React.PropTypes.shape({
-      expr: React.PropTypes.object.isRequired
-      label: React.PropTypes.string
+    design: PropTypes.arrayOf(PropTypes.shape({
+      expr: PropTypes.object.isRequired
+      label: PropTypes.string
       }))       # Design of quickfilters. See README.md
-    values: React.PropTypes.array             # Current values of quickfilters (state of filters selected)
-    onValuesChange: React.PropTypes.func.isRequired # Called when value changes
+    values: PropTypes.array             # Current values of quickfilters (state of filters selected)
+    onValuesChange: PropTypes.func.isRequired # Called when value changes
 
     # Locked quickfilters. Locked ones cannot be changed and are shown with a lock
-    locks: React.PropTypes.arrayOf(React.PropTypes.shape({
-      expr: React.PropTypes.object.isRequired
-      value: React.PropTypes.any
+    locks: PropTypes.arrayOf(PropTypes.shape({
+      expr: PropTypes.object.isRequired
+      value: PropTypes.any
       }))
     
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
 
     # Filters to add to restrict quick filter data to
-    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
-      table: React.PropTypes.string.isRequired    # id table to filter
-      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    filters: PropTypes.arrayOf(PropTypes.shape({
+      table: PropTypes.string.isRequired    # id table to filter
+      jsonql: PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
     }))
 
   renderQuickfilter: (item, index) ->
@@ -101,18 +102,18 @@ module.exports = class QuickfiltersComponent extends React.Component
 # Quickfilter for an enum
 class EnumQuickfilterComponent extends React.Component
   @propTypes:
-    label: React.PropTypes.string
-    schema: React.PropTypes.object.isRequired
-    options: React.PropTypes.arrayOf(React.PropTypes.shape({
-      id: React.PropTypes.string.isRequired   # id of option
-      name: React.PropTypes.object.isRequired # Localized name
+    label: PropTypes.string
+    schema: PropTypes.object.isRequired
+    options: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.string.isRequired   # id of option
+      name: PropTypes.object.isRequired # Localized name
     })).isRequired
 
-    value: React.PropTypes.any              # Current value of quickfilter (state of filter selected)
-    onValueChange: React.PropTypes.func     # Called when value changes
+    value: PropTypes.any              # Current value of quickfilter (state of filter selected)
+    onValueChange: PropTypes.func     # Called when value changes
 
   @contextTypes:
-    locale: React.PropTypes.string  # e.g. "en"
+    locale: PropTypes.string  # e.g. "en"
 
   handleChange: (val) =>
     if val
@@ -140,17 +141,17 @@ class EnumQuickfilterComponent extends React.Component
 # Quickfilter for a text value
 class TextQuickfilterComponent extends React.Component
   @propTypes:
-    label: React.PropTypes.string.isRequired
-    schema: React.PropTypes.object.isRequired
-    expr: React.PropTypes.object.isRequired
+    label: PropTypes.string.isRequired
+    schema: PropTypes.object.isRequired
+    expr: PropTypes.object.isRequired
 
-    value: React.PropTypes.any                     # Current value of quickfilter (state of filter selected)
-    onValueChange: React.PropTypes.func    # Called when value changes
+    value: PropTypes.any                     # Current value of quickfilter (state of filter selected)
+    onValueChange: PropTypes.func    # Called when value changes
 
     # Filters to add to the dashboard
-    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
-      table: React.PropTypes.string.isRequired    # id table to filter
-      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    filters: PropTypes.arrayOf(PropTypes.shape({
+      table: PropTypes.string.isRequired    # id table to filter
+      jsonql: PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
     }))
 
   render: ->
@@ -173,12 +174,12 @@ class TextQuickfilterComponent extends React.Component
 # Quickfilter for a date value
 class DateQuickfilterComponent extends React.Component
   @propTypes:
-    label: React.PropTypes.string
-    schema: React.PropTypes.object.isRequired
-    expr: React.PropTypes.object.isRequired
+    label: PropTypes.string
+    schema: PropTypes.object.isRequired
+    expr: PropTypes.object.isRequired
 
-    value: React.PropTypes.any                     # Current value of quickfilter (state of filter selected)
-    onValueChange: React.PropTypes.func.isRequired # Called when value changes
+    value: PropTypes.any                     # Current value of quickfilter (state of filter selected)
+    onValueChange: PropTypes.func.isRequired # Called when value changes
 
   render: ->
     H.div style: { display: "inline-block", paddingRight: 10 },
@@ -195,9 +196,9 @@ class DateQuickfilterComponent extends React.Component
 
 class DateExprComponent extends React.Component
   @propTypes:
-    type: React.PropTypes.string.isRequired        # date or datetime
-    value: React.PropTypes.any                     # Current value of quickfilter (state of filter selected)
-    onValueChange: React.PropTypes.func     # Called when value changes
+    type: PropTypes.string.isRequired        # date or datetime
+    value: PropTypes.any                     # Current value of quickfilter (state of filter selected)
+    onValueChange: PropTypes.func     # Called when value changes
 
   handleChange: (val) =>
     if val

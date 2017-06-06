@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -16,35 +17,35 @@ EditExprCellComponent = require './EditExprCellComponent'
 # Design should be cleaned already before being passed in (see DatagridUtils)
 module.exports = class DatagridViewComponent extends React.Component
   @propTypes:
-    width: React.PropTypes.number.isRequired      # Width of control
-    height: React.PropTypes.number.isRequired     # Height of control
-    pageSize: React.PropTypes.number
+    width: PropTypes.number.isRequired      # Width of control
+    height: PropTypes.number.isRequired     # Height of control
+    pageSize: PropTypes.number
 
-    schema: React.PropTypes.object.isRequired     # schema to use
-    dataSource: React.PropTypes.object.isRequired # dataSource to use
-    datagridDataSource: React.PropTypes.object.isRequired # datagrid dataSource to use
+    schema: PropTypes.object.isRequired     # schema to use
+    dataSource: PropTypes.object.isRequired # dataSource to use
+    datagridDataSource: PropTypes.object.isRequired # datagrid dataSource to use
 
-    design: React.PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
-    onDesignChange: React.PropTypes.func           # Called when design changes
+    design: PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
+    onDesignChange: PropTypes.func           # Called when design changes
 
-    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
-      table: React.PropTypes.string.isRequired    # id table to filter
-      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    filters: PropTypes.arrayOf(PropTypes.shape({
+      table: PropTypes.string.isRequired    # id table to filter
+      jsonql: PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
     }))
 
     # Check if cell is editable
     # If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
-    canEditCell: React.PropTypes.func             
+    canEditCell: PropTypes.func             
 
     # Update cell value
     # Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
-    updateCell:  React.PropTypes.func
+    updateCell:  PropTypes.func
 
     # Called when row is double-clicked with (tableId, rowId, rowIndex)
-    onRowDoubleClick: React.PropTypes.func
+    onRowDoubleClick: PropTypes.func
     
     # Called when a row is clicked with (tableId, rowId, rowIndex)
-    onRowClick: React.PropTypes.func
+    onRowClick: PropTypes.func
 
   @defaultProps:
     pageSize: 100

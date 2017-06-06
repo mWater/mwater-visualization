@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -13,12 +14,12 @@ ReorderableListComponent = require("react-library/lib/reorderable/ReorderableLis
 # Allows setting of ranges 
 module.exports = class RangesComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired 
-    dataSource: React.PropTypes.object.isRequired
+    schema: PropTypes.object.isRequired 
+    dataSource: PropTypes.object.isRequired
 
-    expr: React.PropTypes.object.isRequired   # Expression for computing min/max
-    xform: React.PropTypes.object.isRequired
-    onChange: React.PropTypes.func.isRequired
+    expr: PropTypes.object.isRequired   # Expression for computing min/max
+    xform: PropTypes.object.isRequired
+    onChange: PropTypes.func.isRequired
 
   handleRangeChange: (index, range) =>
     ranges = @props.xform.ranges.slice()
@@ -78,12 +79,12 @@ module.exports = class RangesComponent extends React.Component
 # Single range (row)
 class RangeComponent extends React.Component
   @propTypes:
-    range: React.PropTypes.object.isRequired   # Range to edit
-    onChange: React.PropTypes.func.isRequired
-    onRemove: React.PropTypes.func.isRequired
-    connectDragSource: React.PropTypes.func.isRequired #reorderable connector
-    connectDragPreview: React.PropTypes.func.isRequired #reorderable connector
-    connectDropTarget: React.PropTypes.func.isRequired #reorderable connector
+    range: PropTypes.object.isRequired   # Range to edit
+    onChange: PropTypes.func.isRequired
+    onRemove: PropTypes.func.isRequired
+    connectDragSource: PropTypes.func.isRequired #reorderable connector
+    connectDragPreview: PropTypes.func.isRequired #reorderable connector
+    connectDropTarget: PropTypes.func.isRequired #reorderable connector
 
   handleMinOpenChange: (minOpen) =>
     @props.onChange(update(@props.range, { minOpen: { $set: minOpen }}))

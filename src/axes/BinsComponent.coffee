@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -10,12 +11,12 @@ NumberInputComponent = require('react-library/lib/NumberInputComponent')
 # Allows setting of bins (min, max and number). Computes defaults if not present
 module.exports = class BinsComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired 
-    dataSource: React.PropTypes.object.isRequired
+    schema: PropTypes.object.isRequired 
+    dataSource: PropTypes.object.isRequired
 
-    expr: React.PropTypes.object.isRequired   # Expression for computing min/max
-    xform: React.PropTypes.object.isRequired
-    onChange: React.PropTypes.func.isRequired
+    expr: PropTypes.object.isRequired   # Expression for computing min/max
+    xform: PropTypes.object.isRequired
+    onChange: PropTypes.func.isRequired
 
   constructor: (props) ->
     super

@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -8,9 +9,9 @@ LayerFactory = require './LayerFactory'
 # Displays legends
 module.exports = class LegendComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired # Schema to use
-    layerViews: React.PropTypes.array.isRequired # Layer views
-    zoom: React.PropTypes.number     # Current zoom level
+    schema: PropTypes.object.isRequired # Schema to use
+    layerViews: PropTypes.array.isRequired # Layer views
+    zoom: PropTypes.number     # Current zoom level
 
   render: ->
     legendItems = _.compact(

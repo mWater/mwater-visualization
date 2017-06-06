@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -9,10 +10,10 @@ ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
 
 module.exports = class IFrameWidgetComponent extends React.Component
   @propTypes: 
-    design: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func # Called with new design. null/undefined for readonly
-    width: React.PropTypes.number
-    height: React.PropTypes.number
+    design: PropTypes.object.isRequired
+    onDesignChange: PropTypes.func # Called with new design. null/undefined for readonly
+    width: PropTypes.number
+    height: PropTypes.number
 
   constructor: (props) ->
     super

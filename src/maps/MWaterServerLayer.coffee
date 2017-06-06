@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 Layer = require './Layer'
 ExprCompiler = require('mwater-expressions').ExprCompiler
 injectTableAlias = require('mwater-expressions').injectTableAlias
@@ -67,7 +68,7 @@ module.exports = class MWaterServerLayer extends Layer
 # Simple class to load legend from server
 class LoadingLegend extends React.Component
   @propTypes:  
-    url: React.PropTypes.string
+    url: PropTypes.string
 
   constructor: ->
     super

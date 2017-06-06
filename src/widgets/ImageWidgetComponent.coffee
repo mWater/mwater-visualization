@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -19,18 +20,18 @@ ImagelistCarouselComponent = require './ImagelistCarouselComponent'
 
 module.exports = class ImageWidgetComponent extends AsyncLoadComponent
   @propTypes: 
-    design: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func # Called with new design. null/undefined for readonly
-    filters: React.PropTypes.array
+    design: PropTypes.object.isRequired
+    onDesignChange: PropTypes.func # Called with new design. null/undefined for readonly
+    filters: PropTypes.array
     
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired # Data source to use for widget
-    widgetDataSource: React.PropTypes.object.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired # Data source to use for widget
+    widgetDataSource: PropTypes.object.isRequired
 
-    width: React.PropTypes.number
-    height: React.PropTypes.number
+    width: PropTypes.number
+    height: PropTypes.number
 
-    singleRowTable: React.PropTypes.string  # Table that is filtered to have one row
+    singleRowTable: PropTypes.string  # Table that is filtered to have one row
 
   # Override to determine if a load is needed. Not called on mounting
   isLoadNeeded: (newProps, oldProps) ->
@@ -119,10 +120,10 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
   
 class ImageWidgetDesignComponent extends React.Component
   @propTypes: 
-    design: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func # Called with new design. null/undefined for readonly
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired # Data source to use for widget
+    design: PropTypes.object.isRequired
+    onDesignChange: PropTypes.func # Called with new design. null/undefined for readonly
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired # Data source to use for widget
 
   constructor: (props) ->
     super(props)

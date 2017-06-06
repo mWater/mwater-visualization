@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 ReactDOM = require 'react-dom'
 H = React.DOM
@@ -5,13 +6,13 @@ H = React.DOM
 # Widget wrapper that adds a dropdown menu in a gear floating
 module.exports = class DropdownWidgetComponent extends React.Component
   @propTypes:
-    width: React.PropTypes.any    # Width specification
-    height: React.PropTypes.any    # Height specification
+    width: PropTypes.any    # Width specification
+    height: PropTypes.any    # Height specification
 
-    dropdownItems: React.PropTypes.arrayOf(React.PropTypes.shape({
-      label: React.PropTypes.node.isRequired
-      icon: React.PropTypes.string # Glyphicon string. e.g. "remove"
-      onClick: React.PropTypes.func.isRequired
+    dropdownItems: PropTypes.arrayOf(PropTypes.shape({
+      label: PropTypes.node.isRequired
+      icon: PropTypes.string # Glyphicon string. e.g. "remove"
+      onClick: PropTypes.func.isRequired
       })).isRequired # A list of {label, icon, onClick} actions for the dropdown
 
   renderDropdownItem: (item, i) =>

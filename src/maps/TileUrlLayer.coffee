@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -53,8 +54,8 @@ module.exports = class TileUrlLayer extends Layer
 
 class TileUrlLayerDesignerComponent extends React.Component
   @propTypes:
-    design: React.PropTypes.object.isRequired  # Design of the marker layer
-    onDesignChange: React.PropTypes.func.isRequired # Called with new design
+    design: PropTypes.object.isRequired  # Design of the marker layer
+    onDesignChange: PropTypes.func.isRequired # Called with new design
 
   handleTileUrlChange: (ev) =>
     @props.onDesignChange(_.extend({}, @props.design, tileUrl: ev.target.value))

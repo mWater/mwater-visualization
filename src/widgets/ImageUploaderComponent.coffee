@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -7,9 +8,9 @@ uuid = require 'uuid'
 
 module.exports = class ImageUploaderComponent extends React.Component
   @propTypes:
-    dataSource: React.PropTypes.object.isRequired # Data source to use for chart
-    onUpload: React.PropTypes.func.isRequired # callback for when upload is successful
-    uid: React.PropTypes.string # existing UID of the image if available
+    dataSource: PropTypes.object.isRequired # Data source to use for chart
+    onUpload: PropTypes.func.isRequired # callback for when upload is successful
+    uid: PropTypes.string # existing UID of the image if available
 
   constructor: (props) ->
     super(props)

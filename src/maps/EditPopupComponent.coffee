@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -11,11 +12,11 @@ DirectWidgetDataSource = require '../widgets/DirectWidgetDataSource'
 
 module.exports = class EditPopupComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired # Schema to use
-    dataSource: React.PropTypes.object.isRequired
-    design: React.PropTypes.object.isRequired  # Design of the marker layer
-    onDesignChange: React.PropTypes.func.isRequired # Called with new design
-    table: React.PropTypes.string.isRequired
+    schema: PropTypes.object.isRequired # Schema to use
+    dataSource: PropTypes.object.isRequired
+    design: PropTypes.object.isRequired  # Design of the marker layer
+    onDesignChange: PropTypes.func.isRequired # Called with new design
+    table: PropTypes.string.isRequired
     
   constructor: ->
     super

@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 ReactDOM = require 'react-dom'
 H = React.DOM
@@ -12,42 +13,42 @@ require('leaflet-loading')
 # Leaflet map component that displays a base layer, a tile layer and an optional interactivity layer
 module.exports = class LeafletMapComponent extends React.Component
   @propTypes:
-    baseLayerId: React.PropTypes.string.isRequired # "bing_road", "bing_aerial", "cartodb_positron", "cartodb_dark_matter"
-    initialBounds: React.PropTypes.shape({
-      w: React.PropTypes.number.isRequired
-      n: React.PropTypes.number.isRequired
-      e: React.PropTypes.number.isRequired
-      s: React.PropTypes.number.isRequired
+    baseLayerId: PropTypes.string.isRequired # "bing_road", "bing_aerial", "cartodb_positron", "cartodb_dark_matter"
+    initialBounds: PropTypes.shape({
+      w: PropTypes.number.isRequired
+      n: PropTypes.number.isRequired
+      e: PropTypes.number.isRequired
+      s: PropTypes.number.isRequired
       }) # Initial bounds. Fit world if none
 
-    width: React.PropTypes.any # Required width
-    height: React.PropTypes.any # Required height
+    width: PropTypes.any # Required width
+    height: PropTypes.any # Required height
 
-    onBoundsChange: React.PropTypes.func # Called with bounds in w, n, s, e format when bounds change
+    onBoundsChange: PropTypes.func # Called with bounds in w, n, s, e format when bounds change
     
-    layers: React.PropTypes.arrayOf(React.PropTypes.shape({
-      tileUrl: React.PropTypes.string # Url in leaflet format
-      utfGridUrl:  React.PropTypes.string # Url of interactivity grid
-      visible: React.PropTypes.bool # Visibility
-      opacity: React.PropTypes.number # 0-1
-      onGridClick: React.PropTypes.func # Function that is called when grid layer is clicked. Passed { data }
-      minZoom: React.PropTypes.number # Minimum zoom level
-      maxZoom: React.PropTypes.number # Maximum zoom level
+    layers: PropTypes.arrayOf(PropTypes.shape({
+      tileUrl: PropTypes.string # Url in leaflet format
+      utfGridUrl:  PropTypes.string # Url of interactivity grid
+      visible: PropTypes.bool # Visibility
+      opacity: PropTypes.number # 0-1
+      onGridClick: PropTypes.func # Function that is called when grid layer is clicked. Passed { data }
+      minZoom: PropTypes.number # Minimum zoom level
+      maxZoom: PropTypes.number # Maximum zoom level
       })).isRequired # List of layers
 
     # Legend. Will have zoom injected
-    legend: React.PropTypes.node # Legend element
+    legend: PropTypes.node # Legend element
 
-    dragging:  React.PropTypes.bool         # Whether the map be draggable with mouse/touch or not. Default true
-    touchZoom: React.PropTypes.bool         # Whether the map can be zoomed by touch-dragging with two fingers. Default true
-    scrollWheelZoom: React.PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
+    dragging:  PropTypes.bool         # Whether the map be draggable with mouse/touch or not. Default true
+    touchZoom: PropTypes.bool         # Whether the map can be zoomed by touch-dragging with two fingers. Default true
+    scrollWheelZoom: PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
 
-    maxZoom: React.PropTypes.number         # Maximum zoom level
-    extraAttribution: React.PropTypes.string # User defined attributions
+    maxZoom: PropTypes.number         # Maximum zoom level
+    extraAttribution: PropTypes.string # User defined attributions
 
-    loadingSpinner: React.PropTypes.bool       # True to add loading spinner
+    loadingSpinner: PropTypes.bool       # True to add loading spinner
 
-    scaleControl: React.PropTypes.bool      # True to show scale control
+    scaleControl: PropTypes.bool      # True to show scale control
 
   @defaultProps: 
     dragging: true

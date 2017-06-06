@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -7,8 +8,8 @@ ReactSelect = require 'react-select'
 # Allows selecting of map marker symbol
 module.exports = class MarkerSymbolSelectComponent extends React.Component
   @propTypes:
-    symbol: React.PropTypes.string
-    onChange: React.PropTypes.func.isRequired
+    symbol: PropTypes.string
+    onChange: PropTypes.func.isRequired
 
   render: ->
     # Create options

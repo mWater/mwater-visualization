@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 # Carousel component for images. Starts with cover photo
 React = require 'react'
 H = React.DOM
@@ -7,9 +8,9 @@ RotationAwareImageComponent = require("mwater-forms/lib/RotationAwareImageCompon
 # Bootstrap carousel for an image list
 module.exports = class ImagelistCarouselComponent extends React.Component
   @propTypes:
-    imagelist: React.PropTypes.array  # Array of { id, cover: true/false }
-    widgetDataSource: React.PropTypes.object.isRequired
-    height: React.PropTypes.number
+    imagelist: PropTypes.array  # Array of { id, cover: true/false }
+    widgetDataSource: PropTypes.object.isRequired
+    height: PropTypes.number
 
   constructor: ->
     super

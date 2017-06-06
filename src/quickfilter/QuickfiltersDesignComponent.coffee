@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -8,13 +9,13 @@ ExprComponent = require('mwater-expressions-ui').ExprComponent
 # Displays quick filters and allows their value to be modified
 module.exports = class QuickfiltersDesignComponent extends React.Component
   @propTypes:
-    design: React.PropTypes.array.isRequired  # Design of quickfilters. See README.md
-    onDesignChange: React.PropTypes.func.isRequired # Called when design changes
+    design: PropTypes.array.isRequired  # Design of quickfilters. See README.md
+    onDesignChange: PropTypes.func.isRequired # Called when design changes
     
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
 
-    table: React.PropTypes.string     # If present, forces table. TODO does not appear to be used
+    table: PropTypes.string     # If present, forces table. TODO does not appear to be used
 
   @defaultProps:
     design: []
@@ -54,14 +55,14 @@ module.exports = class QuickfiltersDesignComponent extends React.Component
 
 class QuickfilterDesignComponent extends React.Component
   @propTypes:
-    design: React.PropTypes.object.isRequired  # Design of a single quickfilters. See README.md
-    onChange: React.PropTypes.func.isRequired
-    onRemove: React.PropTypes.func.isRequired
+    design: PropTypes.object.isRequired  # Design of a single quickfilters. See README.md
+    onChange: PropTypes.func.isRequired
+    onRemove: PropTypes.func.isRequired
 
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
 
-    table: React.PropTypes.string     # If present, forces table
+    table: PropTypes.string     # If present, forces table
 
   constructor: (props) ->
     super
@@ -118,7 +119,7 @@ class QuickfilterDesignComponent extends React.Component
 # Floats an x to the right on hover
 class RemovableComponent extends React.Component
   @propTypes:
-    onRemove: React.PropTypes.func.isRequired
+    onRemove: PropTypes.func.isRequired
 
   render: ->
     H.div style: { display: "flex" }, className: "hover-display-parent",

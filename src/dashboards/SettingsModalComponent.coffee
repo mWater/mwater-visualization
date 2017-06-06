@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -15,9 +16,9 @@ FiltersDesignerComponent = require '../FiltersDesignerComponent'
 # Popup with settings for dashboard
 module.exports = class SettingsModalComponent extends React.Component
   @propTypes:
-    onDesignChange: React.PropTypes.func.isRequired
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
+    onDesignChange: PropTypes.func.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
 
   constructor: (props) ->
     super

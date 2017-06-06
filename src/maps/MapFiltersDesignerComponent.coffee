@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -11,10 +12,10 @@ LayerFactory = require './LayerFactory'
 # Designer for filters for a map
 module.exports = class MapFiltersDesignerComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired # Schema to use
-    dataSource: React.PropTypes.object.isRequired # Data source to use
-    design: React.PropTypes.object.isRequired  # See Map Design.md
-    onDesignChange: React.PropTypes.func.isRequired # Called with new design
+    schema: PropTypes.object.isRequired # Schema to use
+    dataSource: PropTypes.object.isRequired # Data source to use
+    design: PropTypes.object.isRequired  # See Map Design.md
+    onDesignChange: PropTypes.func.isRequired # Called with new design
 
   handleFiltersChange: (filters) =>
     design = _.extend({}, @props.design, filters: filters)

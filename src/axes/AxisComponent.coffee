@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -19,30 +20,30 @@ CategoryMapComponent = require './CategoryMapComponent'
 # Axis component that allows designing of an axis
 module.exports = class AxisComponent extends AsyncLoadComponent
   @propTypes:
-    schema: React.PropTypes.object.isRequired # schema to use
-    dataSource: React.PropTypes.object.isRequired
+    schema: PropTypes.object.isRequired # schema to use
+    dataSource: PropTypes.object.isRequired
 
-    table: React.PropTypes.string.isRequired # Table to use
-    types: React.PropTypes.array # Optional types to limit to
+    table: PropTypes.string.isRequired # Table to use
+    types: PropTypes.array # Optional types to limit to
 
-    aggrNeed: React.PropTypes.oneOf(['none', 'optional', 'required']).isRequired
+    aggrNeed: PropTypes.oneOf(['none', 'optional', 'required']).isRequired
 
-    value: React.PropTypes.object # See Axis Design.md
-    onChange: React.PropTypes.func.isRequired # Called when changes
+    value: PropTypes.object # See Axis Design.md
+    onChange: PropTypes.func.isRequired # Called when changes
 
-    required: React.PropTypes.bool  # Makes this a required value
-    showColorMap: React.PropTypes.bool # Shows the color map
-    reorderable: React.PropTypes.bool # Is the draw order reorderable
-    allowExcludedValues: React.PropTypes.bool # True to allow excluding of values via checkboxes
-    defaultColor: React.PropTypes.string
-    showFormat: React.PropTypes.bool  # Show format control for numeric values
+    required: PropTypes.bool  # Makes this a required value
+    showColorMap: PropTypes.bool # Shows the color map
+    reorderable: PropTypes.bool # Is the draw order reorderable
+    allowExcludedValues: PropTypes.bool # True to allow excluding of values via checkboxes
+    defaultColor: PropTypes.string
+    showFormat: PropTypes.bool  # Show format control for numeric values
 
   @defaultProps:
     reorderable: false
     allowExcludedValues: false
 
   @contextTypes:
-    locale: React.PropTypes.string  # e.g. "en"
+    locale: PropTypes.string  # e.g. "en"
 
   constructor: (props) ->
     super(props)

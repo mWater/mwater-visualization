@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 _ = require 'lodash'
@@ -56,20 +57,20 @@ module.exports = class MapWidget extends Widget
 
 class MapWidgetComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired # Schema to use
-    dataSource: React.PropTypes.object.isRequired # Data source to use
-    widgetDataSource: React.PropTypes.object.isRequired
+    schema: PropTypes.object.isRequired # Schema to use
+    dataSource: PropTypes.object.isRequired # Data source to use
+    widgetDataSource: PropTypes.object.isRequired
 
-    design: React.PropTypes.object.isRequired  # See Map Design.md
-    onDesignChange: React.PropTypes.func # Called with new design.  null/undefined for readonly
+    design: PropTypes.object.isRequired  # See Map Design.md
+    onDesignChange: PropTypes.func # Called with new design.  null/undefined for readonly
 
-    width: React.PropTypes.number
-    height: React.PropTypes.number
+    width: PropTypes.number
+    height: PropTypes.number
 
-    scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
-    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
-    onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
-    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
+    filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+    onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+    onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
 
   constructor: (props) ->
     super

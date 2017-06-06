@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -13,10 +14,10 @@ ZoomLevelsComponent = require './ZoomLevelsComponent'
 
 module.exports = class ClusterLayerDesignerComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired # Schema to use
-    dataSource: React.PropTypes.object.isRequired
-    design: React.PropTypes.object.isRequired  # Design of the design
-    onDesignChange: React.PropTypes.func.isRequired # Called with new design
+    schema: PropTypes.object.isRequired # Schema to use
+    dataSource: PropTypes.object.isRequired
+    design: PropTypes.object.isRequired  # Design of the design
+    onDesignChange: PropTypes.func.isRequired # Called with new design
 
   # Apply updates to design
   update: (updates) ->

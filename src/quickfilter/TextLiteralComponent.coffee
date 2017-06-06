@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -8,16 +9,16 @@ injectTableAlias = require('mwater-expressions').injectTableAlias
 # Displays a combo box that allows selecting single text value from an expression
 module.exports = class TextLiteralComponent extends React.Component
   @propTypes: 
-    value: React.PropTypes.string
-    onChange: React.PropTypes.func
-    refExpr: React.PropTypes.object.isRequired # Expression for the text values to select from
-    schema: React.PropTypes.object.isRequired # Schema of the database
-    dataSource: React.PropTypes.object.isRequired # Data source to use to get values
+    value: PropTypes.string
+    onChange: PropTypes.func
+    refExpr: PropTypes.object.isRequired # Expression for the text values to select from
+    schema: PropTypes.object.isRequired # Schema of the database
+    dataSource: PropTypes.object.isRequired # Data source to use to get values
 
     # Filters to add to the component to restrict values
-    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
-      table: React.PropTypes.string.isRequired    # id table to filter
-      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    filters: PropTypes.arrayOf(PropTypes.shape({
+      table: PropTypes.string.isRequired    # id table to filter
+      jsonql: PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
     }))
 
   handleChange: (val) =>

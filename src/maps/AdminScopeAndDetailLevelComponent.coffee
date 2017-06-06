@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -9,12 +10,12 @@ ReactSelect = require 'react-select'
 
 module.exports = class AdminScopeAndDetailLevelComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired # Schema to use
-    dataSource: React.PropTypes.object.isRequired
-    scope: React.PropTypes.string     # admin region that is outside bounds. null for whole world
-    scopeLevel: React.PropTypes.number # level of scope region. null for whole world
-    detailLevel: React.PropTypes.number # Detail level within scope region
-    onScopeAndDetailLevelChange: React.PropTypes.func.isRequired # Called with (scope, scopeLevel, detailLevel)
+    schema: PropTypes.object.isRequired # Schema to use
+    dataSource: PropTypes.object.isRequired
+    scope: PropTypes.string     # admin region that is outside bounds. null for whole world
+    scopeLevel: PropTypes.number # level of scope region. null for whole world
+    detailLevel: PropTypes.number # Detail level within scope region
+    onScopeAndDetailLevelChange: PropTypes.func.isRequired # Called with (scope, scopeLevel, detailLevel)
 
   handleScopeChange: (scope, scopeLevel) =>
     if scope

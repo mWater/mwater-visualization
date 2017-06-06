@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -11,22 +12,22 @@ FloatAffixed = require 'react-float-affixed'
 module.exports = class RichTextComponent extends React.Component
   @propTypes: 
     # Items (content) to display. See ItemsHtmlConverter
-    items: React.PropTypes.array
-    onItemsChange: React.PropTypes.func # Called with new items
+    items: PropTypes.array
+    onItemsChange: PropTypes.func # Called with new items
 
-    onItemClick: React.PropTypes.func
+    onItemClick: PropTypes.func
 
-    className: React.PropTypes.string  # Optional className of editor wrapper
-    style: React.PropTypes.object  # Optional style of editor wrapper
+    className: PropTypes.string  # Optional className of editor wrapper
+    style: PropTypes.object  # Optional style of editor wrapper
 
     # Converter to use for editing
-    itemsHtmlConverter: React.PropTypes.object
+    itemsHtmlConverter: PropTypes.object
 
     # True (default) to include heading h1, h2 in palette
-    includeHeadings: React.PropTypes.bool
+    includeHeadings: PropTypes.bool
 
     # Extra buttons to put in palette
-    extraPaletteButtons: React.PropTypes.node
+    extraPaletteButtons: PropTypes.node
 
   @defaultProps:
     includeHeadings: true

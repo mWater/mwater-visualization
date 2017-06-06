@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -11,11 +12,11 @@ ReorderableListComponent = require("react-library/lib/reorderable/ReorderableLis
 # Designer for layer selection in the map
 module.exports = class MapLayersDesignerComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired # Schema to use
-    dataSource: React.PropTypes.object.isRequired
-    design: React.PropTypes.object.isRequired  # See Map Design.md
-    onDesignChange: React.PropTypes.func.isRequired # Called with new design
-    allowEditingLayers: React.PropTypes.bool.isRequired  # True to allow editing layers
+    schema: PropTypes.object.isRequired # Schema to use
+    dataSource: PropTypes.object.isRequired
+    design: PropTypes.object.isRequired  # See Map Design.md
+    onDesignChange: PropTypes.func.isRequired # Called with new design
+    allowEditingLayers: PropTypes.bool.isRequired  # True to allow editing layers
 
   # Updates design with the specified changes
   updateDesign: (changes) ->

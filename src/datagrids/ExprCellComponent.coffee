@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -11,22 +12,22 @@ Cell = require('fixed-data-table').Cell
 # Cell that displays an expression column cell
 module.exports = class ExprCellComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired     # schema to use
-    dataSource: React.PropTypes.object.isRequired # dataSource to use
+    schema: PropTypes.object.isRequired     # schema to use
+    dataSource: PropTypes.object.isRequired # dataSource to use
 
-    locale: React.PropTypes.string      # Locale to use
+    locale: PropTypes.string      # Locale to use
 
-    exprType: React.PropTypes.string
+    exprType: PropTypes.string
 
-    width: React.PropTypes.number.isRequired
-    height: React.PropTypes.number.isRequired
+    width: PropTypes.number.isRequired
+    height: PropTypes.number.isRequired
 
-    value: React.PropTypes.any
-    expr: React.PropTypes.object
+    value: PropTypes.any
+    expr: PropTypes.object
 
-    muted: React.PropTypes.bool       # True to show muted
+    muted: PropTypes.bool       # True to show muted
 
-    onClick: React.PropTypes.func
+    onClick: PropTypes.func
 
   handleClick: =>
     @setState(editing: true)

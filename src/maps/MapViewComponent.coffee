@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -13,42 +14,42 @@ LegendComponent = require './LegendComponent'
 # Component that displays just the map
 module.exports = class MapViewComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired # Schema to use
-    dataSource: React.PropTypes.object.isRequired # data source to use
+    schema: PropTypes.object.isRequired # Schema to use
+    dataSource: PropTypes.object.isRequired # data source to use
 
     # Url source for the map
-    mapDataSource: React.PropTypes.shape({
+    mapDataSource: PropTypes.shape({
       # Gets the data source for a layer
-      getLayerDataSource: React.PropTypes.func.isRequired
+      getLayerDataSource: PropTypes.func.isRequired
       
       # Gets the bounds for the map. Null for no opinion. Callback as { n:, s:, w:, e: }
-      getBounds: React.PropTypes.func.isRequired
+      getBounds: PropTypes.func.isRequired
     }).isRequired
     
-    design: React.PropTypes.object.isRequired  # See Map Design.md
-    onDesignChange: React.PropTypes.func   # Called with new design. null/undefined to ignore bounds changes
+    design: PropTypes.object.isRequired  # See Map Design.md
+    onDesignChange: PropTypes.func   # Called with new design. null/undefined to ignore bounds changes
 
-    width: React.PropTypes.number        # Width in pixels
-    height: React.PropTypes.number       # Height in pixels
+    width: PropTypes.number        # Width in pixels
+    height: PropTypes.number       # Height in pixels
 
-    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
 
-    extraFilters: React.PropTypes.arrayOf(React.PropTypes.shape({
-      table: React.PropTypes.string.isRequired
-      jsonql: React.PropTypes.object.isRequired
+    extraFilters: PropTypes.arrayOf(PropTypes.shape({
+      table: PropTypes.string.isRequired
+      jsonql: PropTypes.object.isRequired
     })) # Extra filters to apply to view
 
     # scope of the map (when a layer self-selects a particular scope)
-    scope: React.PropTypes.shape({
-      name: React.PropTypes.string.isRequired
-      filter: React.PropTypes.shape({ table: React.PropTypes.string.isRequired, jsonql: React.PropTypes.object.isRequired })
-      data: React.PropTypes.shape({ layerViewId: React.PropTypes.string.isRequired, data: React.PropTypes.any }).isRequired  
+    scope: PropTypes.shape({
+      name: PropTypes.string.isRequired
+      filter: PropTypes.shape({ table: PropTypes.string.isRequired, jsonql: PropTypes.object.isRequired })
+      data: PropTypes.shape({ layerViewId: PropTypes.string.isRequired, data: PropTypes.any }).isRequired  
       })
-    onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+    onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
-    dragging:  React.PropTypes.bool         # Whether the map be draggable with mouse/touch or not. Default true
-    touchZoom: React.PropTypes.bool         # Whether the map can be zoomed by touch-dragging with two fingers. Default true
-    scrollWheelZoom: React.PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
+    dragging:  PropTypes.bool         # Whether the map be draggable with mouse/touch or not. Default true
+    touchZoom: PropTypes.bool         # Whether the map can be zoomed by touch-dragging with two fingers. Default true
+    scrollWheelZoom: PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
 
   constructor: (props) ->
     super

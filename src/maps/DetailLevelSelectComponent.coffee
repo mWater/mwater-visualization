@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -8,12 +9,12 @@ ReactSelect = require 'react-select'
 # Select detail level within an admin region
 module.exports = class DetailLevelSelectComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired # Schema to use
-    dataSource: React.PropTypes.object.isRequired
-    scope: React.PropTypes.string.isRequired     # admin region
-    scopeLevel: React.PropTypes.number.isRequired    # admin region
-    detailLevel: React.PropTypes.number # Detail level within
-    onChange: React.PropTypes.func.isRequired # Called with (detailLevel)
+    schema: PropTypes.object.isRequired # Schema to use
+    dataSource: PropTypes.object.isRequired
+    scope: PropTypes.string.isRequired     # admin region
+    scopeLevel: PropTypes.number.isRequired    # admin region
+    detailLevel: PropTypes.number # Detail level within
+    onChange: PropTypes.func.isRequired # Called with (detailLevel)
 
   constructor: ->
     super

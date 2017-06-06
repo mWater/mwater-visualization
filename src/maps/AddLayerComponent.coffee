@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -10,15 +11,15 @@ LayerFactory = require './LayerFactory'
 # Can be overridden by context of addLayerElementFactory which is called with all props
 module.exports = class AddLayerComponent extends React.Component
   @propTypes:
-    layerNumber: React.PropTypes.number.isRequired  # Number of layers that already exist
-    design: React.PropTypes.object.isRequired  # See Map Design.md
-    onDesignChange: React.PropTypes.func.isRequired # Called with new design
+    layerNumber: PropTypes.number.isRequired  # Number of layers that already exist
+    design: PropTypes.object.isRequired  # See Map Design.md
+    onDesignChange: PropTypes.func.isRequired # Called with new design
 
-    schema: React.PropTypes.object.isRequired # Schema to use
-    dataSource: React.PropTypes.object.isRequired
+    schema: PropTypes.object.isRequired # Schema to use
+    dataSource: PropTypes.object.isRequired
 
   @contextTypes:
-    addLayerElementFactory: React.PropTypes.func  # Can be overridden by setting addLayerElementFactory in context that takes ({schema: , dataSource, design, onDesignChange, layerNumber})
+    addLayerElementFactory: PropTypes.func  # Can be overridden by setting addLayerElementFactory in context that takes ({schema: , dataSource, design, onDesignChange, layerNumber})
 
   handleAddLayer: (newLayer) =>
     layerView = {

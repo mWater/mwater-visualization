@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -8,11 +9,11 @@ IdLiteralComponent = require('mwater-expressions-ui').IdLiteralComponent
 # Allows selecting of a single admin region
 module.exports = class RegionSelectComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired # Schema to use
-    dataSource: React.PropTypes.object.isRequired
-    region: React.PropTypes.number    # _id of region
-    onChange: React.PropTypes.func.isRequired # Called with (_id, level)
-    placeholder: React.PropTypes.string
+    schema: PropTypes.object.isRequired # Schema to use
+    dataSource: PropTypes.object.isRequired
+    region: PropTypes.number    # _id of region
+    onChange: PropTypes.func.isRequired # Called with (_id, level)
+    placeholder: PropTypes.string
 
   @defaultProps:
     placeholder: "All Countries"

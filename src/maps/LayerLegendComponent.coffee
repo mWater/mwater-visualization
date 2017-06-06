@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 _ = require 'lodash'
@@ -9,12 +10,12 @@ ExprUtils = require('mwater-expressions').ExprUtils
 # wraps the legends for a layer
 module.exports = class LayerLegendComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired
-    name: React.PropTypes.string.isRequired
-    radiusLayer: React.PropTypes.bool
-    axis: React.PropTypes.object
-    symbol: React.PropTypes.string
-    defaultColor: React.PropTypes.string
+    schema: PropTypes.object.isRequired
+    name: PropTypes.string.isRequired
+    radiusLayer: PropTypes.bool
+    axis: PropTypes.object
+    symbol: PropTypes.string
+    defaultColor: PropTypes.string
 
   @defaultProps:
     radiusLayer: false
