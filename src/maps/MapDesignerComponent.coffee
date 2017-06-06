@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -15,10 +16,10 @@ MapUtils = require './MapUtils'
 
 module.exports = class MapDesignerComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired # Schema to use
-    dataSource: React.PropTypes.object.isRequired # Data source to use
-    design: React.PropTypes.object.isRequired  # See Map Design.md
-    onDesignChange: React.PropTypes.func.isRequired # Called with new design
+    schema: PropTypes.object.isRequired # Schema to use
+    dataSource: PropTypes.object.isRequired # Data source to use
+    design: PropTypes.object.isRequired  # See Map Design.md
+    onDesignChange: PropTypes.func.isRequired # Called with new design
 
   handleAttributionChange: (text) =>
     design = _.extend({}, @props.design, {attribution: text})
@@ -99,8 +100,8 @@ module.exports = class MapDesignerComponent extends React.Component
 # Attribution inline editing
 class AttributionComponent extends React.Component
   @propTypes:
-    text: React.PropTypes.string
-    onTextChange: React.PropTypes.func.isRequired
+    text: PropTypes.string
+    onTextChange: PropTypes.func.isRequired
 
   @defaultProps:
     text: null
@@ -148,8 +149,8 @@ class AttributionComponent extends React.Component
 # Advanced options control
 class AdvancedOptionsComponent extends React.Component
   @propTypes:
-    design: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func.isRequired
+    design: PropTypes.object.isRequired
+    onDesignChange: PropTypes.func.isRequired
 
   constructor: (props) ->
     super

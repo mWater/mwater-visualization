@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -18,33 +19,33 @@ DashboardUpgrader = require './DashboardUpgrader'
 # Manages undo stack and quickfilter value
 module.exports = class DashboardComponent extends React.Component
   @propTypes:
-    design: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func               # If not set, readonly
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    dashboardDataSource: React.PropTypes.object.isRequired # dashboard data source
+    design: PropTypes.object.isRequired
+    onDesignChange: PropTypes.func               # If not set, readonly
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    dashboardDataSource: PropTypes.object.isRequired # dashboard data source
 
-    titleElem: React.PropTypes.node                     # Extra element to include in title at left
-    extraTitleButtonsElem: React.PropTypes.node         # Extra elements to add to right
-    undoStackKey: React.PropTypes.any                   # Key that changes when the undo stack should be reset. Usually a document id or suchlike
-    printScaling: React.PropTypes.bool                  # True to scale for printing
+    titleElem: PropTypes.node                     # Extra element to include in title at left
+    extraTitleButtonsElem: PropTypes.node         # Extra elements to add to right
+    undoStackKey: PropTypes.any                   # Key that changes when the undo stack should be reset. Usually a document id or suchlike
+    printScaling: PropTypes.bool                  # True to scale for printing
 
-    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
-    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+    onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    namedStrings: PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
-    quickfilterLocks: React.PropTypes.array             # Locked quickfilter values. See README in quickfilters
+    quickfilterLocks: PropTypes.array             # Locked quickfilter values. See README in quickfilters
 
     # Filters to add to the dashboard
-    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
-      table: React.PropTypes.string.isRequired    # id table to filter
-      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    filters: PropTypes.arrayOf(PropTypes.shape({
+      table: PropTypes.string.isRequired    # id table to filter
+      jsonql: PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
     }))
 
   @defaultProps:
     printScaling: true
 
   @childContextTypes:
-    locale: React.PropTypes.string
+    locale: PropTypes.string
 
   # Pass locale down. Both here and DashboardViewComponent to ensure that quickfilters also get context
   getChildContext: -> { locale: @props.design.locale }

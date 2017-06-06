@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -20,30 +21,30 @@ WidgetScopesViewComponent = require '../widgets/WidgetScopesViewComponent'
 # Handles scoping and stores the state of scope
 module.exports = class DashboardViewComponent extends React.Component
   @propTypes: 
-    schema: React.PropTypes.object.isRequired # schema to use
-    dataSource: React.PropTypes.object.isRequired # data source to use. Only used when designing, for display uses dashboardDataSource
-    dashboardDataSource: React.PropTypes.object.isRequired # dashboard data source
+    schema: PropTypes.object.isRequired # schema to use
+    dataSource: PropTypes.object.isRequired # data source to use. Only used when designing, for display uses dashboardDataSource
+    dashboardDataSource: PropTypes.object.isRequired # dashboard data source
 
-    design: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func      # Leave unset for readonly
+    design: PropTypes.object.isRequired
+    onDesignChange: PropTypes.func      # Leave unset for readonly
 
-    width: React.PropTypes.number
-    standardWidth: React.PropTypes.number   # Width for scaling
+    width: PropTypes.number
+    standardWidth: PropTypes.number   # Width for scaling
 
-    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
-    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+    onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    namedStrings: PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
     # Filters to add to the dashboard
-    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
-      table: React.PropTypes.string.isRequired    # id table to filter
-      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    filters: PropTypes.arrayOf(PropTypes.shape({
+      table: PropTypes.string.isRequired    # id table to filter
+      jsonql: PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
     }))
 
   @defaultProps:
     standardWidth: 1440 # Standard width. Matches 8.5x11" paper with 0.5" margin at 192dpi
 
   @childContextTypes:
-    locale: React.PropTypes.string
+    locale: PropTypes.string
 
   # Pass locale down. Both here and DashboardViewComponent to ensure that quickfilters also get context
   getChildContext: -> { locale: @props.design.locale }

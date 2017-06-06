@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -12,19 +13,19 @@ Cell = require('fixed-data-table').Cell
 # Store edited value here to prevent slow re-render of entire datagrid
 module.exports = class EditExprCellComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired     # schema to use
-    dataSource: React.PropTypes.object.isRequired # dataSource to use
+    schema: PropTypes.object.isRequired     # schema to use
+    dataSource: PropTypes.object.isRequired # dataSource to use
 
-    locale: React.PropTypes.string      # Locale to use
+    locale: PropTypes.string      # Locale to use
 
-    width: React.PropTypes.number.isRequired
-    height: React.PropTypes.number.isRequired
+    width: PropTypes.number.isRequired
+    height: PropTypes.number.isRequired
 
-    value: React.PropTypes.any
-    expr: React.PropTypes.object.isRequired
+    value: PropTypes.any
+    expr: PropTypes.object.isRequired
 
-    onSave: React.PropTypes.func.isRequired       # Called when save is requested (e.g. enter in text box)
-    onCancel: React.PropTypes.func.isRequired     # Called when cancelled
+    onSave: PropTypes.func.isRequired       # Called when save is requested (e.g. enter in text box)
+    onCancel: PropTypes.func.isRequired     # Called when cancelled
 
   constructor: (props) ->
     super(props)
@@ -57,10 +58,10 @@ module.exports = class EditExprCellComponent extends React.Component
 # Simple text box
 class TextEditComponent extends React.Component
   @propTypes:
-    value: React.PropTypes.any
-    onChange: React.PropTypes.func.isRequired     # Called with new value
-    onSave: React.PropTypes.func.isRequired       # Called when enter is pressed
-    onCancel: React.PropTypes.func.isRequired     # Called when cancelled
+    value: PropTypes.any
+    onChange: PropTypes.func.isRequired     # Called with new value
+    onSave: PropTypes.func.isRequired       # Called when enter is pressed
+    onCancel: PropTypes.func.isRequired     # Called when cancelled
 
   componentDidMount: ->
     # Focus when created
@@ -83,10 +84,10 @@ class TextEditComponent extends React.Component
 # Simple number box
 class NumberEditComponent extends React.Component
   @propTypes:
-    value: React.PropTypes.any
-    onChange: React.PropTypes.func.isRequired     # Called with new value
-    onSave: React.PropTypes.func.isRequired       # Called when enter is pressed
-    onCancel: React.PropTypes.func.isRequired     # Called when cancelled
+    value: PropTypes.any
+    onChange: PropTypes.func.isRequired     # Called with new value
+    onSave: PropTypes.func.isRequired       # Called when enter is pressed
+    onCancel: PropTypes.func.isRequired     # Called when cancelled
 
   componentDidMount: ->
     # Focus when created
@@ -116,12 +117,12 @@ class NumberEditComponent extends React.Component
 # Simple enum box
 class EnumEditComponent extends React.Component
   @propTypes:
-    value: React.PropTypes.any
-    enumValues: React.PropTypes.array.isRequired
-    locale: React.PropTypes.string      # Locale to use
-    onChange: React.PropTypes.func.isRequired     # Called with new value
-    onSave: React.PropTypes.func.isRequired       # Called when enter is pressed
-    onCancel: React.PropTypes.func.isRequired     # Called when cancelled
+    value: PropTypes.any
+    enumValues: PropTypes.array.isRequired
+    locale: PropTypes.string      # Locale to use
+    onChange: PropTypes.func.isRequired     # Called with new value
+    onSave: PropTypes.func.isRequired       # Called when enter is pressed
+    onCancel: PropTypes.func.isRequired     # Called when cancelled
 
   render: ->
     H.div style: { paddingTop: 3 },

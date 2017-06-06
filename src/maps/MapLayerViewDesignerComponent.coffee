@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
@@ -7,15 +8,15 @@ LayerFactory = require './LayerFactory'
 # A single row in the table of layer views. Handles the editor state
 module.exports = class MapLayerViewDesignerComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired # Schema to use
-    dataSource: React.PropTypes.object.isRequired
-    layerView: React.PropTypes.object.isRequired  # See Map Design.md
-    onLayerViewChange: React.PropTypes.func.isRequired # Called with new layer view
-    onRemove: React.PropTypes.func.isRequired  # Called to remove
-    connectDragSource: React.PropTypes.func    # connector for reorderable
-    connectDragPreview: React.PropTypes.func  #connector for reorderable
-    connectDropTarget: React.PropTypes.func # connector for reorderable
-    allowEditingLayer: React.PropTypes.bool.isRequired
+    schema: PropTypes.object.isRequired # Schema to use
+    dataSource: PropTypes.object.isRequired
+    layerView: PropTypes.object.isRequired  # See Map Design.md
+    onLayerViewChange: PropTypes.func.isRequired # Called with new layer view
+    onRemove: PropTypes.func.isRequired  # Called to remove
+    connectDragSource: PropTypes.func    # connector for reorderable
+    connectDragPreview: PropTypes.func  #connector for reorderable
+    connectDropTarget: PropTypes.func # connector for reorderable
+    allowEditingLayer: PropTypes.bool.isRequired
 
   constructor: (props) ->
     super(props)

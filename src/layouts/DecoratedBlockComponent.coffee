@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -6,16 +7,16 @@ R = React.createElement
 # TODO make zero border
 module.exports = class DecoratedBlockComponent extends React.Component
   @propTypes:
-    style: React.PropTypes.object   # Style to add to outer div
-    onBlockRemove: React.PropTypes.func.isRequired # Called when block is removed
+    style: PropTypes.object   # Style to add to outer div
+    onBlockRemove: PropTypes.func.isRequired # Called when block is removed
 
-    connectMoveHandle: React.PropTypes.func   # the move handle connector
-    connectDragPreview: React.PropTypes.func   # the drag preview connector
-    connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging. Null to not render
+    connectMoveHandle: PropTypes.func   # the move handle connector
+    connectDragPreview: PropTypes.func   # the drag preview connector
+    connectResizeHandle: PropTypes.func # Connects resize handle for dragging. Null to not render
 
     # Set to allow changing aspect ratio
-    aspectRatio: React.PropTypes.number
-    onAspectRatioChange: React.PropTypes.func
+    aspectRatio: PropTypes.number
+    onAspectRatioChange: PropTypes.func
 
   constructor: ->
     super

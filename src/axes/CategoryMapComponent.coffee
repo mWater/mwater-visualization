@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -13,15 +14,15 @@ ReorderableListComponent = require("react-library/lib/reorderable/ReorderableLis
 # Can be collapsed
 module.exports = class CategoryMapComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    axis: React.PropTypes.object.isRequired
-    onChange: React.PropTypes.func.isRequired
-    categories: React.PropTypes.array
-    reorderable: React.PropTypes.bool
-    showColorMap: React.PropTypes.bool  # True to allow editing the color map
-    allowExcludedValues: React.PropTypes.bool # True to allow excluding of values via checkboxes
-    initiallyExpanded: React.PropTypes.bool  # True to start expanded
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    axis: PropTypes.object.isRequired
+    onChange: PropTypes.func.isRequired
+    categories: PropTypes.array
+    reorderable: PropTypes.bool
+    showColorMap: PropTypes.bool  # True to allow editing the color map
+    allowExcludedValues: PropTypes.bool # True to allow excluding of values via checkboxes
+    initiallyExpanded: PropTypes.bool  # True to start expanded
 
   constructor: (props) ->
     super

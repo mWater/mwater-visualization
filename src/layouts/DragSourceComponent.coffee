@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -20,10 +21,10 @@ collectSource = (connect, monitor) ->
 # Simple drag source that runs a function to get the drag item.
 class DragSourceComponent extends React.Component
   @propTypes:
-    createDragItem: React.PropTypes.func.isRequired # Created DnD item when dragged.
+    createDragItem: PropTypes.func.isRequired # Created DnD item when dragged.
 
-    connectDragSource: React.PropTypes.func.isRequired # the drag source connector, supplied by React DND
-    connectDragPreview: React.PropTypes.func.isRequired # the drag preview connector, supplied by React DND
+    connectDragSource: PropTypes.func.isRequired # the drag source connector, supplied by React DND
+    connectDragPreview: PropTypes.func.isRequired # the drag preview connector, supplied by React DND
 
   render: ->
     @props.connectDragPreview(@props.connectDragSource(@props.children))

@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 ReactDOM = require 'react-dom'
 H = React.DOM
@@ -8,8 +9,8 @@ _ = require 'lodash'
 # Children will be cloned with height: prop set in case of fractional ones
 module.exports = class VerticalLayoutComponent extends React.Component
   @propTypes:
-    height: React.PropTypes.number.isRequired
-    relativeHeights: React.PropTypes.object.isRequired  # Fraction to allocate for fractional heights. Should total 1.0. Keyed by key
+    height: PropTypes.number.isRequired
+    relativeHeights: PropTypes.object.isRequired  # Fraction to allocate for fractional heights. Should total 1.0. Keyed by key
 
   constructor: -> 
     super

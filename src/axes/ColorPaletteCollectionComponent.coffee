@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -8,10 +9,10 @@ d3 = require 'd3-scale'
 
 module.exports = class ColorPaletteCollectionComponent extends React.Component
   @propTypes:
-    onPaletteSelected: React.PropTypes.func.isRequired
-    axis: React.PropTypes.object.isRequired
-    categories: React.PropTypes.array.isRequired
-    onCancel: React.PropTypes.func.isRequired
+    onPaletteSelected: PropTypes.func.isRequired
+    axis: PropTypes.object.isRequired
+    categories: PropTypes.array.isRequired
+    onCancel: PropTypes.func.isRequired
 
   @palettes:
     [
@@ -114,10 +115,10 @@ module.exports = class ColorPaletteCollectionComponent extends React.Component
 
 class ColorPaletteComponent extends React.Component
   @propTypes:
-    index: React.PropTypes.number.isRequired
-    colorSet: React.PropTypes.array.isRequired
-    onPaletteSelected: React.PropTypes.func.isRequired
-    number: React.PropTypes.number
+    index: PropTypes.number.isRequired
+    colorSet: PropTypes.array.isRequired
+    onPaletteSelected: PropTypes.func.isRequired
+    number: PropTypes.number
 
   @defaultProps:
     number: 6

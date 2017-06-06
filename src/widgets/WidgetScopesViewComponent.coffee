@@ -1,11 +1,12 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 
 # Shows widget scopes
 module.exports = class WidgetScopesViewComponent extends React.Component
   @propTypes:
-    scopes: React.PropTypes.object.isRequired # lookup of id to scope (see WidgetScoper for definition)
-    onRemoveScope: React.PropTypes.func.isRequired # Called with id of scope to remove
+    scopes: PropTypes.object.isRequired # lookup of id to scope (see WidgetScoper for definition)
+    onRemoveScope: PropTypes.func.isRequired # Called with id of scope to remove
 
   renderScope: (id, scope) =>
     style = {

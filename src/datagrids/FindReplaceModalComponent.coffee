@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -19,25 +20,25 @@ injectTableAlias = require('mwater-expressions').injectTableAlias
 # Modal to perform find/replace on datagrid
 module.exports = class FindReplaceModalComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired     # schema to use
-    dataSource: React.PropTypes.object.isRequired # dataSource to use
+    schema: PropTypes.object.isRequired     # schema to use
+    dataSource: PropTypes.object.isRequired # dataSource to use
 
-    design: React.PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
+    design: PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
 
-    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
-      table: React.PropTypes.string.isRequired    # id table to filter
-      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    filters: PropTypes.arrayOf(PropTypes.shape({
+      table: PropTypes.string.isRequired    # id table to filter
+      jsonql: PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
     }))
 
     # Check if expression of table row is editable
     # If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
-    canEditValue: React.PropTypes.func             
+    canEditValue: PropTypes.func             
 
     # Update table row expression with a new value
     # Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
-    updateValue:  React.PropTypes.func
+    updateValue:  PropTypes.func
 
-    onUpdate: React.PropTypes.func      # Called when values have been updated
+    onUpdate: PropTypes.func      # Called when values have been updated
 
   constructor: (props) ->
     super

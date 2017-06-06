@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -11,22 +12,22 @@ UndoStack = require '../UndoStack'
 # Map with designer on right
 module.exports = class MapComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired # Data source to use
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired # Data source to use
 
     # Data source for the map
-    mapDataSource: React.PropTypes.shape({
+    mapDataSource: PropTypes.shape({
       # Gets the data source for a layer
-      getLayerDataSource: React.PropTypes.func.isRequired
+      getLayerDataSource: PropTypes.func.isRequired
     }).isRequired
 
-    design: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func  # Null/undefined for readonly
+    design: PropTypes.object.isRequired
+    onDesignChange: PropTypes.func  # Null/undefined for readonly
 
-    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
 
-    titleElem: React.PropTypes.node                     # Extra element to include in title at left
-    extraTitleButtonsElem: React.PropTypes.node              # Extra elements to add to right
+    titleElem: PropTypes.node                     # Extra element to include in title at left
+    extraTitleButtonsElem: PropTypes.node              # Extra elements to add to right
 
   constructor: (props) ->
     super

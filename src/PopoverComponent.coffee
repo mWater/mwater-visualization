@@ -1,12 +1,13 @@
+PropTypes = require('prop-types')
 React = require 'react'
 ReactDOM = require 'react-dom'
 
 # Wraps a child with an optional popover
 module.exports = class PopoverComponent extends React.Component
   @propTypes: 
-    content: React.PropTypes.node.isRequired     # contents of popover
-    placement: React.PropTypes.string # See http://getbootstrap.com/javascript/#popovers
-    visible: React.PropTypes.bool.isRequired
+    content: PropTypes.node.isRequired     # contents of popover
+    placement: PropTypes.string # See http://getbootstrap.com/javascript/#popovers
+    visible: PropTypes.bool.isRequired
 
   componentDidMount: ->
     @updatePopover(@props, null)

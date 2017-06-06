@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -6,8 +7,8 @@ R = React.createElement
 # Designer for config
 module.exports = class BaseLayerDesignerComponent extends React.Component
   @propTypes:
-    design: React.PropTypes.object.isRequired  # See Map Design.md
-    onDesignChange: React.PropTypes.func.isRequired # Called with new design
+    design: PropTypes.object.isRequired  # See Map Design.md
+    onDesignChange: PropTypes.func.isRequired # Called with new design
 
   # Updates design with the specified changes
   updateDesign: (changes) ->

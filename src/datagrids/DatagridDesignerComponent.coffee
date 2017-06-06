@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -20,10 +21,10 @@ update = require 'update-object'
 # Designer for the datagrid. Currenly allows only single-table designs (no subtable rows)
 module.exports = class DatagridDesignerComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired     # schema to use
-    dataSource: React.PropTypes.object.isRequired # dataSource to use
-    design: React.PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
-    onDesignChange: React.PropTypes.func.isRequired # Called when design changes
+    schema: PropTypes.object.isRequired     # schema to use
+    dataSource: PropTypes.object.isRequired # dataSource to use
+    design: PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
+    onDesignChange: PropTypes.func.isRequired # Called when design changes
 
   handleTableChange: (table) =>
     design = {
@@ -111,11 +112,11 @@ module.exports = class DatagridDesignerComponent extends React.Component
 # Columns list
 class ColumnsDesignerComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired     # schema to use
-    dataSource: React.PropTypes.object.isRequired # dataSource to use
-    table: React.PropTypes.string.isRequired
-    columns: React.PropTypes.array.isRequired     # Columns list See README.md of this folder
-    onColumnsChange: React.PropTypes.func.isRequired # Called when columns changes
+    schema: PropTypes.object.isRequired     # schema to use
+    dataSource: PropTypes.object.isRequired # dataSource to use
+    table: PropTypes.string.isRequired
+    columns: PropTypes.array.isRequired     # Columns list See README.md of this folder
+    onColumnsChange: PropTypes.func.isRequired # Called when columns changes
 
   handleColumnChange: (columnIndex, column) =>
     columns = @props.columns.slice()
@@ -219,14 +220,14 @@ class ColumnsDesignerComponent extends React.Component
 # Column item
 class ColumnDesignerComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired     # schema to use
-    dataSource: React.PropTypes.object.isRequired # dataSource to use
-    table: React.PropTypes.string.isRequired
-    column: React.PropTypes.object.isRequired     # Column See README.md of this folder
-    onColumnChange: React.PropTypes.func.isRequired # Called when column changes. Null to remove. Array to replace with multiple entries
-    connectDragSource: React.PropTypes.func.isRequired # Connect drag source (handle) here       
-    connectDragPreview: React.PropTypes.func.isRequired # Connect drag preview here
-    connectDropTarget: React.PropTypes.func.isRequired # Connect drop target
+    schema: PropTypes.object.isRequired     # schema to use
+    dataSource: PropTypes.object.isRequired # dataSource to use
+    table: PropTypes.string.isRequired
+    column: PropTypes.object.isRequired     # Column See README.md of this folder
+    onColumnChange: PropTypes.func.isRequired # Called when column changes. Null to remove. Array to replace with multiple entries
+    connectDragSource: PropTypes.func.isRequired # Connect drag source (handle) here       
+    connectDragPreview: PropTypes.func.isRequired # Connect drag preview here
+    connectDropTarget: PropTypes.func.isRequired # Connect drop target
 
   handleExprChange: (expr) =>
     @props.onColumnChange(update(@props.column, expr: { $set: expr }))

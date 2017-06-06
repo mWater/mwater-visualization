@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -18,28 +19,28 @@ FindReplaceModalComponent = require './FindReplaceModalComponent'
 # Design should be cleaned already before being passed in (see DatagridUtils)
 module.exports = class DatagridComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired     # schema to use
-    dataSource: React.PropTypes.object.isRequired # dataSource to use
-    datagridDataSource: React.PropTypes.object.isRequired # datagrid dataSource to use
+    schema: PropTypes.object.isRequired     # schema to use
+    dataSource: PropTypes.object.isRequired # dataSource to use
+    datagridDataSource: PropTypes.object.isRequired # datagrid dataSource to use
 
-    design: React.PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
-    onDesignChange: React.PropTypes.func          # Called when design changes
+    design: PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
+    onDesignChange: PropTypes.func          # Called when design changes
 
-    titleElem: React.PropTypes.node                     # Extra element to include in title at left
-    extraTitleButtonsElem: React.PropTypes.node         # Extra elements to add to right
+    titleElem: PropTypes.node                     # Extra element to include in title at left
+    extraTitleButtonsElem: PropTypes.node         # Extra elements to add to right
 
     # Check if expression of table row is editable
     # If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
-    canEditValue: React.PropTypes.func             
+    canEditValue: PropTypes.func             
 
     # Update table row expression with a new value
     # Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
-    updateValue:  React.PropTypes.func
+    updateValue:  PropTypes.func
 
     # Called when row is double-clicked with (tableId, rowId)
-    onRowDoubleClick: React.PropTypes.func
+    onRowDoubleClick: PropTypes.func
 
-    quickfilterLocks: React.PropTypes.array             # Locked quickfilter values. See README in quickfilters
+    quickfilterLocks: PropTypes.array             # Locked quickfilter values. See README in quickfilters
 
   constructor: (props) ->
     super(props)
@@ -226,11 +227,11 @@ module.exports = class DatagridComponent extends React.Component
 # Popup editor
 class DatagridEditorComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired     # schema to use
-    dataSource: React.PropTypes.object.isRequired # dataSource to use
-    design: React.PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
-    onDesignChange: React.PropTypes.func.isRequired # Called when design changes
-    onCancel: React.PropTypes.func.isRequired     # Called when cancelled
+    schema: PropTypes.object.isRequired     # schema to use
+    dataSource: PropTypes.object.isRequired # dataSource to use
+    design: PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
+    onDesignChange: PropTypes.func.isRequired # Called when design changes
+    onCancel: PropTypes.func.isRequired     # Called when cancelled
 
   constructor: (props) ->
     super(props)

@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -8,8 +9,8 @@ NumberInputComponent = require('react-library/lib/NumberInputComponent')
 # Zoom level min and max control
 module.exports = class ZoomLevelsComponent extends React.Component
   @propTypes:
-    design: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func.isRequired
+    design: PropTypes.object.isRequired
+    onDesignChange: PropTypes.func.isRequired
 
   constructor: (props) ->
     super

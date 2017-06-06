@@ -1,11 +1,12 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 
 module.exports = ListControl = React.createClass {
   propTypes: {
-    items: React.PropTypes.array.isRequired # List of items as { id: <comparable>, display: <element> }
-    onSelect: React.PropTypes.func.isRequired # Called with id
-    selected: React.PropTypes.string # Currently selected item
+    items: PropTypes.array.isRequired # List of items as { id: <comparable>, display: <element> }
+    onSelect: PropTypes.func.isRequired # Called with id
+    selected: PropTypes.string # Currently selected item
   }
 
   render: ->

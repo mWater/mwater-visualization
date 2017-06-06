@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 ReactDOM = require 'react-dom'
 H = React.DOM
@@ -382,11 +383,11 @@ class WaterOrgDashboardPane extends React.Component
 #   render: ->
 #     React.createElement(visualization.MapComponent, {
 #       layerFactory: @
-#     schema: React.PropTypes.object.isRequired
-#     dataSource: React.PropTypes.object.isRequired # Data source to use
+#     schema: PropTypes.object.isRequired
+#     dataSource: PropTypes.object.isRequired # Data source to use
 
-#     design: React.PropTypes.object.isRequired
-#     onDesignChange: React.PropTypes.func  # Null/undefined for readonly
+#     design: PropTypes.object.isRequired
+#     onDesignChange: PropTypes.func  # Null/undefined for readonly
 #     })
 
 datagridDesign = {

@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -12,15 +13,15 @@ AxisBuilder = require './AxisBuilder'
 # and setting the colors from a palette (using ColorPaletteCollectionComponent)
 module.exports = class AxisColorEditorComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    axis: React.PropTypes.object.isRequired
-    onChange: React.PropTypes.func.isRequired # Called with new axis
-    categories: React.PropTypes.array # Categories of the axis
-    reorderable: React.PropTypes.bool # is the color map reorderable
-    defaultColor: React.PropTypes.string
-    allowExcludedValues: React.PropTypes.bool # True to allow excluding of values via checkboxes
-    initiallyExpanded: React.PropTypes.bool  # True to start values expanded
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    axis: PropTypes.object.isRequired
+    onChange: PropTypes.func.isRequired # Called with new axis
+    categories: PropTypes.array # Categories of the axis
+    reorderable: PropTypes.bool # is the color map reorderable
+    defaultColor: PropTypes.string
+    allowExcludedValues: PropTypes.bool # True to allow excluding of values via checkboxes
+    initiallyExpanded: PropTypes.bool  # True to start values expanded
 
   @defaultProps:
     reorderable: false

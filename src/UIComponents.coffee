@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 ReactDOM = require 'react-dom'
 H = React.DOM
@@ -11,8 +12,8 @@ LinkComponent = require('mwater-expressions-ui').LinkComponent
 # Section with a title and icon
 exports.SectionComponent = class SectionComponent extends React.Component
   @propTypes: 
-    icon: React.PropTypes.string
-    label: React.PropTypes.node
+    icon: PropTypes.string
+    label: PropTypes.node
 
   render: ->
     H.div style: { marginBottom: 15 }, 
@@ -34,8 +35,8 @@ exports.SectionComponent = class SectionComponent extends React.Component
 # List of options with a name and description each
 exports.OptionListComponent = class OptionListComponent extends React.Component
   @propTypes:
-    items: React.PropTypes.array.isRequired # name, desc, onClick, onRemove (optional)
-    hint: React.PropTypes.string
+    items: PropTypes.array.isRequired # name, desc, onClick, onRemove (optional)
+    hint: PropTypes.string
 
   render: ->
     H.div null,
@@ -47,10 +48,10 @@ exports.OptionListComponent = class OptionListComponent extends React.Component
 # Single option
 class OptionComponent extends React.Component
   @propTypes:
-    name: React.PropTypes.string
-    desc: React.PropTypes.string
-    onClick: React.PropTypes.func.isRequired
-    onRemove: React.PropTypes.func          # Displays X to right if present
+    name: PropTypes.string
+    desc: PropTypes.string
+    onClick: PropTypes.func.isRequired
+    onRemove: PropTypes.func          # Displays X to right if present
 
   handleClick: (ev) =>
     ev.stopPropagation()
@@ -67,8 +68,8 @@ class OptionComponent extends React.Component
 # Switches views smoothly
 exports.SwitchViewComponent = class SwitchViewComponent extends React.Component
   @propTypes:
-    views: React.PropTypes.object.isRequired  # Map of view id to view element
-    viewId: React.PropTypes.string.isRequired   # Current view id to display
+    views: PropTypes.object.isRequired  # Map of view id to view element
+    viewId: PropTypes.string.isRequired   # Current view id to display
 
   constructor: (props) ->
     @state = { 
@@ -133,11 +134,11 @@ exports.SwitchViewComponent = class SwitchViewComponent extends React.Component
 # Editor can be node or can be function that takes onClose function as first parameter
 exports.ToggleEditComponent = class ToggleEditComponent extends React.Component
   @propTypes:
-    forceOpen: React.PropTypes.bool
-    initiallyOpen: React.PropTypes.bool
-    label: React.PropTypes.node.isRequired
-    editor: React.PropTypes.any.isRequired
-    onRemove: React.PropTypes.func
+    forceOpen: PropTypes.bool
+    initiallyOpen: PropTypes.bool
+    label: PropTypes.node.isRequired
+    editor: PropTypes.any.isRequired
+    onRemove: PropTypes.func
 
   constructor: (props) ->
     @state = { open: props.initiallyOpen or false }
@@ -174,12 +175,12 @@ exports.ToggleEditComponent = class ToggleEditComponent extends React.Component
 # Switch between several values as a series of radio buttons
 exports.ButtonToggleComponent = class ButtonToggleComponent extends React.Component
   @propTypes:
-    value: React.PropTypes.any
-    options: React.PropTypes.arrayOf(React.PropTypes.shape({
-      label: React.PropTypes.node.isRequired
-      value: React.PropTypes.any
+    value: PropTypes.any
+    options: PropTypes.arrayOf(PropTypes.shape({
+      label: PropTypes.node.isRequired
+      value: PropTypes.any
       })).isRequired # List of layers
-    onChange: React.PropTypes.func.isRequired # Called with value
+    onChange: PropTypes.func.isRequired # Called with value
 
   render: ->
     H.div className: "btn-group btn-group-xs",

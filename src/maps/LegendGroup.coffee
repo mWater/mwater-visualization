@@ -1,14 +1,15 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 _ = require 'lodash'
 
 module.exports = class LegendGroup extends React.Component
   @propTypes:
-    items: React.PropTypes.array
-    radiusLayer: React.PropTypes.bool
-    defaultColor: React.PropTypes.string
-    name: React.PropTypes.string
-    symbol: React.PropTypes.string
+    items: PropTypes.array
+    radiusLayer: PropTypes.bool
+    defaultColor: PropTypes.string
+    name: PropTypes.string
+    symbol: PropTypes.string
 
   @defaultProps:
     items: []
@@ -23,12 +24,12 @@ module.exports = class LegendGroup extends React.Component
 
 class LegendItem extends React.Component
   @propTypes:
-    color: React.PropTypes.string
-    name: React.PropTypes.string
-    radiusLayer: React.PropTypes.bool
-    symbol: React.PropTypes.string
-    hasChildren: React.PropTypes.bool
-    isChild: React.PropTypes.bool
+    color: PropTypes.string
+    name: PropTypes.string
+    radiusLayer: PropTypes.bool
+    symbol: PropTypes.string
+    hasChildren: PropTypes.bool
+    isChild: PropTypes.bool
 
   @defaultProps:
     radiusLayer: false

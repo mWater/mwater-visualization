@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 _ = require 'lodash'
@@ -35,12 +36,12 @@ module.exports = class MarkdownWidget extends Widget
 
 class MarkdownWidgetComponent extends React.Component
   @propTypes:
-    design: React.PropTypes.object.isRequired  # See Map Design.md
-    onDesignChange: React.PropTypes.func # Called with new design. null/undefined for readonly
+    design: PropTypes.object.isRequired  # See Map Design.md
+    onDesignChange: PropTypes.func # Called with new design. null/undefined for readonly
 
-    width: React.PropTypes.number
-    height: React.PropTypes.number
-    standardWidth: React.PropTypes.number
+    width: PropTypes.number
+    height: PropTypes.number
+    standardWidth: PropTypes.number
 
   constructor: (props) ->
     super
@@ -112,11 +113,11 @@ class MarkdownWidgetComponent extends React.Component
 
 class MarkdownWidgetViewComponent extends React.Component
   @propTypes:
-    design: React.PropTypes.object.isRequired # Design of chart
+    design: PropTypes.object.isRequired # Design of chart
 
-    width: React.PropTypes.number
-    height: React.PropTypes.number
-    standardWidth: React.PropTypes.number
+    width: PropTypes.number
+    height: PropTypes.number
+    standardWidth: PropTypes.number
 
   render: ->
     # Render in a standard width container and then scale up to ensure that widget always looks consistent
@@ -132,8 +133,8 @@ class MarkdownWidgetViewComponent extends React.Component
 
 class MarkdownWidgetDesignerComponent extends React.Component 
   @propTypes: 
-    design: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func.isRequired
+    design: PropTypes.object.isRequired
+    onDesignChange: PropTypes.func.isRequired
 
   handleMarkdownChange: (ev) =>
     design = _.extend({}, @props.design, markdown: ev.target.value)

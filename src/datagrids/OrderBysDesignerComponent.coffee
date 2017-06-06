@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -9,11 +10,11 @@ ExprComponent = require('mwater-expressions-ui').ExprComponent
 # Edits an orderBys which is a list of expressions and directions. See README.md
 module.exports = class OrderBysDesignerComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired     # schema to use
-    dataSource: React.PropTypes.object.isRequired # dataSource to use
-    table: React.PropTypes.string.isRequired
-    orderBys: React.PropTypes.array.isRequired     # Columns list See README.md of this folder
-    onChange: React.PropTypes.func.isRequired # Called when columns changes
+    schema: PropTypes.object.isRequired     # schema to use
+    dataSource: PropTypes.object.isRequired # dataSource to use
+    table: PropTypes.string.isRequired
+    orderBys: PropTypes.array.isRequired     # Columns list See README.md of this folder
+    onChange: PropTypes.func.isRequired # Called when columns changes
 
   @defaultProps:
     orderBys: []
@@ -55,12 +56,12 @@ module.exports = class OrderBysDesignerComponent extends React.Component
 
 class OrderByDesignerComponent extends React.Component
   @propTypes: 
-    orderBy: React.PropTypes.array.isRequired
-    onChange: React.PropTypes.func.isRequired
-    onRemove: React.PropTypes.func.isRequired
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    table: React.PropTypes.string # Current table
+    orderBy: PropTypes.array.isRequired
+    onChange: PropTypes.func.isRequired
+    onRemove: PropTypes.func.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    table: PropTypes.string # Current table
 
   handleExprChange: (expr) =>
     @props.onChange(_.extend({}, @props.orderBy, expr: expr))
