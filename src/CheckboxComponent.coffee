@@ -1,12 +1,13 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 
 # Pretty checkbox component
 module.exports = class CheckboxComponent extends React.Component
   @propTypes:
-    checked: React.PropTypes.bool # True to check
-    onClick: React.PropTypes.func # Called when clicked
-    onChange: React.PropTypes.func # Called with new value
+    checked: PropTypes.bool # True to check
+    onClick: PropTypes.func # Called when clicked
+    onChange: PropTypes.func # Called with new value
 
   handleClick: =>
     if @props.onChange 

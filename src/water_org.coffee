@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 visualization = require './index'
 jsyaml = require 'js-yaml'
@@ -76,9 +77,9 @@ exports.loadDashboard = (options) ->
 
 class TabbedDashboard extends React.Component
   @propTypes: 
-    design: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func.isRequired
-    widgetFactory: React.PropTypes.object.isRequired
+    design: PropTypes.object.isRequired
+    onDesignChange: PropTypes.func.isRequired
+    widgetFactory: PropTypes.object.isRequired
 
   handleDesignChange: (index, design) =>
     tabs = @props.design.tabs.slice()

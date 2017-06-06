@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -15,12 +16,12 @@ formUtils = require('mwater-forms/lib/formUtils') # TODO requireing this directl
 # with an Entity/Site question to the extraTables
 module.exports = class MWaterAddRelatedFormComponent extends React.Component
   @propTypes:
-    table: React.PropTypes.string.isRequired
-    apiUrl: React.PropTypes.string.isRequired
-    client: React.PropTypes.string
-    user: React.PropTypes.string                # User id
-    onSelect: React.PropTypes.func.isRequired   # Called with table id e.g. responses:someid
-    schema: React.PropTypes.object.isRequired   
+    table: PropTypes.string.isRequired
+    apiUrl: PropTypes.string.isRequired
+    client: PropTypes.string
+    user: PropTypes.string                # User id
+    onSelect: PropTypes.func.isRequired   # Called with table id e.g. responses:someid
+    schema: PropTypes.object.isRequired   
 
   constructor: ->
     super
@@ -69,15 +70,15 @@ module.exports = class MWaterAddRelatedFormComponent extends React.Component
 # Actual modal that displays the 
 class AddRelatedFormModalComponent extends React.Component
   @propTypes:
-    table: React.PropTypes.string.isRequired
-    apiUrl: React.PropTypes.string.isRequired
-    client: React.PropTypes.string
-    user: React.PropTypes.string              # User id
-    onSelect: React.PropTypes.func.isRequired   # Called with table id e.g. responses:someid
-    onCancel: React.PropTypes.func.isRequired   # When modal is closed
+    table: PropTypes.string.isRequired
+    apiUrl: PropTypes.string.isRequired
+    client: PropTypes.string
+    user: PropTypes.string              # User id
+    onSelect: PropTypes.func.isRequired   # Called with table id e.g. responses:someid
+    onCancel: PropTypes.func.isRequired   # When modal is closed
 
   @contextTypes:
-    locale: React.PropTypes.string  # e.g. "en"
+    locale: PropTypes.string  # e.g. "en"
 
   constructor: ->
     super

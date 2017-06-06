@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -10,14 +11,14 @@ PopoverHelpComponent = require 'react-library/lib/PopoverHelpComponent'
 # Filters are in format mwater-expression filter expression indexed by table. e.g. { sometable: logical expression, etc. }
 module.exports = class FiltersDesignerComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired # Schema to use
-    dataSource: React.PropTypes.object.isRequired # Data source to use
-    filterableTables: React.PropTypes.arrayOf(React.PropTypes.string) # Tables that can be filtered on. Should only include tables that actually exist
-    filters: React.PropTypes.object
-    onFiltersChange: React.PropTypes.func.isRequired # Called with new filters
+    schema: PropTypes.object.isRequired # Schema to use
+    dataSource: PropTypes.object.isRequired # Data source to use
+    filterableTables: PropTypes.arrayOf(PropTypes.string) # Tables that can be filtered on. Should only include tables that actually exist
+    filters: PropTypes.object
+    onFiltersChange: PropTypes.func.isRequired # Called with new filters
 
   @contextTypes:
-    locale: React.PropTypes.string  # e.g. "en"
+    locale: PropTypes.string  # e.g. "en"
 
   handleFilterChange: (table, expr) =>
     # Clean filter

@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -23,19 +24,19 @@ siteTypes = [
 # Allows selection of a mwater-visualization table. Loads forms as well and calls event if modified
 module.exports = class MWaterTableSelectComponent extends React.Component
   @propTypes:
-    apiUrl: React.PropTypes.string.isRequired # Url to hit api
-    client: React.PropTypes.string            # Optional client
-    schema: React.PropTypes.object.isRequired
-    user: React.PropTypes.string              # User id
+    apiUrl: PropTypes.string.isRequired # Url to hit api
+    client: PropTypes.string            # Optional client
+    schema: PropTypes.object.isRequired
+    user: PropTypes.string              # User id
 
-    table: React.PropTypes.string
-    onChange: React.PropTypes.func.isRequired # Called with table selected
+    table: PropTypes.string
+    onChange: PropTypes.func.isRequired # Called with table selected
 
-    extraTables: React.PropTypes.array.isRequired
-    onExtraTablesChange: React.PropTypes.func.isRequired
+    extraTables: PropTypes.array.isRequired
+    onExtraTablesChange: PropTypes.func.isRequired
 
   @contextTypes:
-    locale: React.PropTypes.string  # e.g. "en"
+    locale: PropTypes.string  # e.g. "en"
 
   constructor: ->
     super
@@ -141,17 +142,17 @@ module.exports = class MWaterTableSelectComponent extends React.Component
 # Searchable list of forms
 class FormsListComponent extends React.Component
   @propTypes:
-    apiUrl: React.PropTypes.string.isRequired # Url to hit api
-    client: React.PropTypes.string            # Optional client
-    schema: React.PropTypes.object.isRequired
-    user: React.PropTypes.string              # User id
-    onChange: React.PropTypes.func.isRequired # Called with table selected
-    extraTables: React.PropTypes.array.isRequired
-    onExtraTableAdd: React.PropTypes.func.isRequired
-    onExtraTableRemove: React.PropTypes.func.isRequired
+    apiUrl: PropTypes.string.isRequired # Url to hit api
+    client: PropTypes.string            # Optional client
+    schema: PropTypes.object.isRequired
+    user: PropTypes.string              # User id
+    onChange: PropTypes.func.isRequired # Called with table selected
+    extraTables: PropTypes.array.isRequired
+    onExtraTableAdd: PropTypes.func.isRequired
+    onExtraTableRemove: PropTypes.func.isRequired
 
   @contextTypes:
-    locale: React.PropTypes.string  # e.g. "en"
+    locale: PropTypes.string  # e.g. "en"
 
   constructor: ->
     super

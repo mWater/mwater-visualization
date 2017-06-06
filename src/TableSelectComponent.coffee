@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 ui = require './UIComponents'
 ExprUtils = require("mwater-expressions").ExprUtils
@@ -5,13 +6,13 @@ H = React.DOM
 
 module.exports = class TableSelectComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired
-    value: React.PropTypes.string  # Current table id
-    onChange: React.PropTypes.func.isRequired  # Newly selected table id
+    schema: PropTypes.object.isRequired
+    value: PropTypes.string  # Current table id
+    onChange: PropTypes.func.isRequired  # Newly selected table id
 
   @contextTypes:
-    tableSelectElementFactory: React.PropTypes.func  # Can be overridden by setting tableSelectElementFactory in context that takes (schema, value, onChange)
-    locale: React.PropTypes.string  # e.g. "en"
+    tableSelectElementFactory: PropTypes.func  # Can be overridden by setting tableSelectElementFactory in context that takes (schema, value, onChange)
+    locale: PropTypes.string  # e.g. "en"
 
   render: ->
     if @context.tableSelectElementFactory

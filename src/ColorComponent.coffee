@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 
@@ -8,8 +9,8 @@ SwatchesPicker = require('react-color').SwatchesPicker
 # Simple color well with popup
 module.exports = class ColorComponent extends React.Component
   @propTypes: 
-    color: React.PropTypes.string
-    onChange: React.PropTypes.func
+    color: PropTypes.string
+    onChange: PropTypes.func
 
   constructor: ->
     super

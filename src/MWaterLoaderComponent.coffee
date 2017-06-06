@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -16,19 +17,19 @@ mWaterLoader = require './mWaterLoader'
 # Also creates a tableSelectElementFactory context to allow selecting of a table in an mWater-friendly way
 module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
   @propTypes:
-    apiUrl: React.PropTypes.string.isRequired
-    client: React.PropTypes.string
-    share: React.PropTypes.string
-    user: React.PropTypes.string                              # user id of logged in user
-    asUser: React.PropTypes.string                            # Load schema as a specific user (for shared dashboards, etc)
+    apiUrl: PropTypes.string.isRequired
+    client: PropTypes.string
+    share: PropTypes.string
+    user: PropTypes.string                              # user id of logged in user
+    asUser: PropTypes.string                            # Load schema as a specific user (for shared dashboards, etc)
 
-    extraTables: React.PropTypes.arrayOf(React.PropTypes.string)  # Extra tables to load in schema. Forms are not loaded by default as they are too many
-    onExtraTablesChange: React.PropTypes.func                     # Called when extra tables are changed and schema should be reloaded
+    extraTables: PropTypes.arrayOf(PropTypes.string)  # Extra tables to load in schema. Forms are not loaded by default as they are too many
+    onExtraTablesChange: PropTypes.func                     # Called when extra tables are changed and schema should be reloaded
 
     # Override default add layer component. See AddLayerComponent for details
-    addLayerElementFactory: React.PropTypes.func              
+    addLayerElementFactory: PropTypes.func              
 
-    children: React.PropTypes.func.isRequired                 # Called with (error, { schema:, dataSource: })
+    children: PropTypes.func.isRequired                 # Called with (error, { schema:, dataSource: })
 
   constructor: ->
     super
@@ -61,10 +62,10 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
     )
 
   @childContextTypes: 
-    tableSelectElementFactory: React.PropTypes.func
-    addLayerElementFactory: React.PropTypes.func
+    tableSelectElementFactory: PropTypes.func
+    addLayerElementFactory: PropTypes.func
     # Decorates sections (the children element, specifically) in the expression picker
-    decorateScalarExprTreeSectionChildren: React.PropTypes.func
+    decorateScalarExprTreeSectionChildren: PropTypes.func
   
   getChildContext: ->
     context = {}
