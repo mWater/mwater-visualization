@@ -20,7 +20,6 @@ module.exports = class ColorComponent extends React.Component
     @setState(open: not @state.open, advanced: false)
 
   handleClose: (color) =>
-    @setState(open: false)
     @props.onChange(color.hex)
 
   handleReset: =>
@@ -75,7 +74,7 @@ module.exports = class ColorComponent extends React.Component
               if @state.advanced then "Basic" else "Advanced"
               
             if @state.advanced
-              React.createElement(SketchPicker, color: @props.color or undefined, onChangeComplete: @handleClose)
+              React.createElement(SketchPicker, color: @props.color or undefined, disableAlpha: true, onChangeComplete: @handleClose)
             else
               React.createElement(SwatchesPicker, color: @props.color or undefined, onChangeComplete: @handleClose)
 
