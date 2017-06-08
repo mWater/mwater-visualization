@@ -16,6 +16,7 @@ module.exports = class CalendarChartDesignerComponent extends React.Component
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func.isRequired
+    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   # Updates design with the specified changes
   updateDesign: (changes) ->
@@ -81,7 +82,8 @@ module.exports = class CalendarChartDesignerComponent extends React.Component
         aggrNeed: "none"
         required: true
         value: @props.design.dateAxis 
-        onChange: @handleDateAxisChange)
+        onChange: @handleDateAxisChange
+        filters: @props.filter)
 
   renderValueAxis: ->
     if not @props.design.table or not @props.design.dateAxis
@@ -96,7 +98,8 @@ module.exports = class CalendarChartDesignerComponent extends React.Component
         aggrNeed: "required"
         required: true
         value: @props.design.valueAxis 
-        onChange: @handleValueAxisChange)
+        onChange: @handleValueAxisChange
+        filters: @props.filter)
 
 
   render: ->

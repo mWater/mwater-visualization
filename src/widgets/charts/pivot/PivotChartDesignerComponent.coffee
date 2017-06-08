@@ -15,6 +15,7 @@ module.exports = class PivotChartDesignerComponent extends React.Component
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func.isRequired
+    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   constructor: (props) ->
     super
@@ -122,6 +123,7 @@ module.exports = class PivotChartDesignerComponent extends React.Component
             aggrNeed: "none"
             value: @props.design.columns[0].valueAxis
             onChange: @handleColumnChange
+            filters: @props.filters
 
       R ui.FormGroup,
         labelMuted: true
@@ -135,6 +137,7 @@ module.exports = class PivotChartDesignerComponent extends React.Component
             aggrNeed: "none"
             value: @props.design.rows[0].valueAxis
             onChange: @handleRowChange
+            filters: @props.filters
 
 
       R ui.FormGroup,
@@ -150,6 +153,7 @@ module.exports = class PivotChartDesignerComponent extends React.Component
             value: @props.design.intersections[intersectionId].valueAxis
             onChange: @handleIntersectionValueAxisChange
             showFormat: true
+            filters: @props.filters
 
   render: ->
     H.div null,

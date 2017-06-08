@@ -387,6 +387,7 @@ module.exports = class BufferLayer extends Layer
   #   schema: schema to use
   #   dataSource: data source to use
   #   onDesignChange: function called when design changes
+  #   filters: array of filters
   createDesignerElement: (options) ->
     # Require here to prevent server require problems
     BufferLayerDesignerComponent = require './BufferLayerDesignerComponent'
@@ -396,6 +397,7 @@ module.exports = class BufferLayer extends Layer
       schema: options.schema
       dataSource: options.dataSource
       design: @cleanDesign(options.design, options.schema)
+      filters: options.filters
       onDesignChange: (design) =>
         options.onDesignChange(@cleanDesign(design, options.schema)))
 

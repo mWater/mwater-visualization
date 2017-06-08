@@ -20,6 +20,7 @@ module.exports = class IntersectionDesignerComponent extends React.Component
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
     onChange: React.PropTypes.func.isRequired
+    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   # Updates intersection with the specified changes
   update: => update(@props.intersection, @props.onChange, arguments)
@@ -55,6 +56,7 @@ module.exports = class IntersectionDesignerComponent extends React.Component
           value: @props.intersection.valueAxis
           onChange: @update("valueAxis")
           showFormat: true
+          filters: @props.filters
 
   renderNullValue: ->
     if @props.intersection.valueAxis
@@ -104,6 +106,7 @@ module.exports = class IntersectionDesignerComponent extends React.Component
           value: @props.intersection.backgroundColorAxis
           onChange: @handleBackgroundColorAxisChange
           showColorMap: true
+          filters: @props.filters
 
   renderBackgroundColor: ->
     if @props.intersection.backgroundColorAxis

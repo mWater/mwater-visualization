@@ -17,6 +17,7 @@ module.exports = class SegmentDesignerComponent extends React.Component
     dataSource: React.PropTypes.object.isRequired
     segmentType: React.PropTypes.string.isRequired  # "row" or "column"
     onChange: React.PropTypes.func.isRequired
+    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   constructor: (props) ->
     super
@@ -97,6 +98,7 @@ module.exports = class SegmentDesignerComponent extends React.Component
             value: @props.segment.valueAxis
             onChange: @handleValueAxisChange
             allowExcludedValues: true
+            filters: @props.filters
 
   renderFilter: ->
     R ui.FormGroup, 

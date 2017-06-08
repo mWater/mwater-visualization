@@ -130,6 +130,7 @@ module.exports = class PivotChart extends Chart
   #   dataSource: dataSource to use
   #   design: design 
   #   onDesignChange: function
+  #   filters: array of filters
   createDesignerElement: (options) ->
     # Require here to prevent server require problems
     PivotChartDesignerComponent = require './PivotChartDesignerComponent'
@@ -138,6 +139,7 @@ module.exports = class PivotChart extends Chart
       schema: options.schema
       dataSource: options.dataSource
       design: @cleanDesign(options.design, options.schema)
+      filters: options.filter
       onDesignChange: (design) =>
         # Clean design
         design = @cleanDesign(design, options.schema)
@@ -192,6 +194,7 @@ module.exports = class PivotChart extends Chart
   #   width, height, standardWidth: size of the chart view
   #   scope: current scope of the view element
   #   onScopeChange: called when scope changes with new scope
+  #   filters: array of filters
   createViewElement: (options) ->
     PivotChartViewComponent = require './PivotChartViewComponent'
     
@@ -209,6 +212,7 @@ module.exports = class PivotChart extends Chart
 
       scope: options.scope
       onScopeChange: options.onScopeChange
+      filters: options.filters
     }
 
     return React.createElement(PivotChartViewComponent, props)
