@@ -28,6 +28,7 @@ module.exports = class PivotChartViewComponent extends React.Component
 
     scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   @contextTypes:
     locale: React.PropTypes.string  # e.g. "en"
@@ -161,6 +162,7 @@ module.exports = class PivotChartViewComponent extends React.Component
           dataSource: @props.dataSource
           segmentType: segmentType
           onChange: (segment) => @setState(editSegment: segment)
+          filters: @props.filters
 
   renderEditIntersectionModal: ->
     if not @state.editIntersectionId
@@ -176,6 +178,7 @@ module.exports = class PivotChartViewComponent extends React.Component
           schema: @props.schema
           dataSource: @props.dataSource
           onChange: (intersection) => @setState(editIntersection: intersection)
+          filters: @props.filters
 
   render: ->
     layout = new PivotChartLayoutBuilder(schema: @props.schema).buildLayout(@props.design, @props.data, @context.locale)

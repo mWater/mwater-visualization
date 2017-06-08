@@ -109,6 +109,7 @@ module.exports = class LayeredChart extends Chart
   #   dataSource: dataSource to use
   #   design: design 
   #   onDesignChange: function
+  #   filters: array of filters
   createDesignerElement: (options) ->
     # Require here to prevent server require problems
     LayeredChartDesignerComponent = require './LayeredChartDesignerComponent'
@@ -117,6 +118,7 @@ module.exports = class LayeredChart extends Chart
       schema: options.schema
       dataSource: options.dataSource
       design: @cleanDesign(options.design, options.schema)
+      filters: options.filters
       onDesignChange: (design) =>
         # Clean design
         design = @cleanDesign(design, options.schema)

@@ -20,6 +20,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
     dataSource: PropTypes.object.isRequired
     design: PropTypes.object.isRequired  # Design of the marker layer
     onDesignChange: PropTypes.func.isRequired # Called with new design
+    filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   # Apply updates to design
   update: (updates) ->
@@ -65,7 +66,8 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
           types: ["geometry"]
           aggrNeed: "none"
           value: @props.design.axes.geometry
-          onChange: @handleGeometryAxisChange)
+          onChange: @handleGeometryAxisChange
+          filters: @props.filters)
 
   renderColor: ->
     if not @props.design.axes.geometry
@@ -99,6 +101,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
           showColorMap: true
           onChange: @handleColorAxisChange
           allowExcludedValues: true
+          filters: @props.filters
 
   renderSymbol: ->
     if not @props.design.axes.geometry

@@ -16,6 +16,7 @@ module.exports = class ImageMosaicChartDesignerComponent extends React.Component
     schema: React.PropTypes.object.isRequired
     dataSource: React.PropTypes.object.isRequired
     onDesignChange: React.PropTypes.func.isRequired
+    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   # Updates design with the specified changes
   updateDesign: (changes) ->
@@ -72,7 +73,8 @@ module.exports = class ImageMosaicChartDesignerComponent extends React.Component
         aggrNeed: "none"
         required: true
         value: @props.design.imageAxis 
-        onChange: @handleImageAxisChange)
+        onChange: @handleImageAxisChange
+        filters: @props.filters)
 
   render: ->
     H.div null,

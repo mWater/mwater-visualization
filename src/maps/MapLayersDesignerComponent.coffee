@@ -17,6 +17,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     design: PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: PropTypes.func.isRequired # Called with new design
     allowEditingLayers: PropTypes.bool.isRequired  # True to allow editing layers
+    filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   # Updates design with the specified changes
   updateDesign: (changes) ->
@@ -63,6 +64,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
         connectDragPreview: connectDragPreview
         connectDropTarget: connectDropTarget
         allowEditingLayer: @props.allowEditingLayers
+        filters: @props.filters
       )
 
   render: ->

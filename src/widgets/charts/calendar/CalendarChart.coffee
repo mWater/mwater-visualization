@@ -68,6 +68,7 @@ module.exports = class CalendarChart extends Chart
   #   dataSource: dataSource to use
   #   design: design 
   #   onDesignChange: function
+  #   filters: array of filters
   createDesignerElement: (options) ->
     # Require here to prevent server require problems
     CalendarChartDesignerComponent = require './CalendarChartDesignerComponent'
@@ -76,6 +77,7 @@ module.exports = class CalendarChart extends Chart
       schema: options.schema
       design: @cleanDesign(options.design, options.schema)
       dataSource: options.dataSource
+      filters: options.filter
       onDesignChange: (design) =>
         # Clean design
         design = @cleanDesign(design, options.schema)

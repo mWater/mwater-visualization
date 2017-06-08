@@ -19,6 +19,7 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
     index: React.PropTypes.number.isRequired
     onChange: React.PropTypes.func.isRequired
     onRemove: React.PropTypes.func.isRequired
+    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   isLayerPolar: (layer) ->
     return (layer.type or @props.design.type) in ['pie', 'donut']
@@ -145,6 +146,7 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
         required: true
         value: layer.axes.x, 
         onChange: @handleXAxisChange
+        filters: @props.filters
         # Categorical X can exclude values
         allowExcludedValues: new LayeredChartCompiler(schema: @props.schema).isCategoricalX(@props.design)
         )
@@ -170,6 +172,7 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
           value: layer.axes.color
           onChange: @handleColorAxisChange
           allowExcludedValues: true
+          filters: @props.filters
           )
 
   renderYAxis: ->
@@ -190,6 +193,7 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
           aggrNeed: if @doesLayerNeedGrouping(layer) then "required" else "none"
           value: layer.axes.y
           required: true
+          filters: @props.filters
           onChange: @handleYAxisChange)
         @renderCumulative()
 
