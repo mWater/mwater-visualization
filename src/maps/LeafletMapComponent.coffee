@@ -283,6 +283,10 @@ module.exports = class LeafletMapComponent extends React.Component
 
             if layer.onGridHover
               do (layer) =>
+                utfGridLayer.on 'mouseout', (ev) =>
+                  layer.onGridHover(ev)
+                utfGridLayer.on 'mouseover', (ev) =>
+                  layer.onGridHover(ev)
                 utfGridLayer.on 'mousemove', (ev) =>
                   layer.onGridHover(ev)
 
