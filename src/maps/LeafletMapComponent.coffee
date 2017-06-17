@@ -1,4 +1,5 @@
 PropTypes = require('prop-types')
+_ = require 'lodash'
 React = require 'react'
 ReactDOM = require 'react-dom'
 H = React.DOM
@@ -284,7 +285,7 @@ module.exports = class LeafletMapComponent extends React.Component
             if layer.onGridHover
               do (layer) =>
                 utfGridLayer.on 'mouseout', (ev) =>
-                  layer.onGridHover(ev)
+                  layer.onGridHover(_.omit(ev, "data"))
                 utfGridLayer.on 'mouseover', (ev) =>
                   layer.onGridHover(ev)
                 utfGridLayer.on 'mousemove', (ev) =>
