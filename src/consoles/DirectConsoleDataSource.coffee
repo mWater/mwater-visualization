@@ -26,29 +26,20 @@ module.exports = class DirectConsoleDataSource extends ConsoleDataSource
       design: _.findWhere(@options.design.tabs, id: tabId).design
     })
 
-#   getMapDataSource: (tabId) ->
-#     return new DirectMapDataSource({
-#       schema: @options.schema
-#       dataSource: @options.dataSource
-#       design: design
-#     })
-# # TODO: what about popups? they also need data sources.
+  getMapTabDataSource: (tabId) ->  
+    return new DirectMapDataSource({
+      schema: @options.schema
+      dataSource: @options.dataSource
+      apiUrl: @options.apiUrl
+      client: @options.client
+      design: _.findWhere(@options.design.tabs, id: tabId).design
+    })
+
+  getDatagridTabDataSource: (tabId) ->  
+    return new DirectDatagridDataSource({
+      schema: @options.schema
+      dataSource: @options.dataSource
+    })
 
 # # WHY DO DASHBOARDS need design in direct dataSource?
 
-
-#   # Create map url source that uses direct jsonql maps
-#   # options:
-#   #   schema: schema to use
-#   #   dataSource: general data source
-#   #   design: design of entire map
-#   #   apiUrl: API url to use for talking to mWater server
-#   #   client: client id to use for talking to mWater server
-#   #   mapId: map _id to allow server printing
-
-
-#   getDatagridDataSource: (tabId) ->
-#     return new DirectDatagridDataSource({
-#       schema: @options.schema
-#       dataSource: @options.dataSource
-#     })
