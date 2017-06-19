@@ -27,7 +27,9 @@ module.exports = class ConsoleComponent extends React.Component
 
     # Update table row expression with a new value
     # Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
-    updateValue:  PropTypes.func
+    updateValue: PropTypes.func
+
+    customTabRenderer: PropTypes.func  # Renders a tab. Called with { tab:, onTabChange:, onTabAppend: }
 
   constructor: (props) ->
     super(props)
@@ -125,7 +127,7 @@ module.exports = class ConsoleComponent extends React.Component
       contents = @props.customTabRenderer({
         tab: tab
         onTabChange: @handleTabChange.bind(null, tab)
-        onTabAppend: @handleTabAppend(null, tab)
+        onTabAppend: @handleTabAppend.bind(null, tab)
       })
 
       if contents
