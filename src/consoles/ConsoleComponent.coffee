@@ -102,7 +102,7 @@ module.exports = class ConsoleComponent extends React.Component
             H.span className: "fa fa-times"
 
   renderTabs: ->
-    H.ul key: "tabs", className: "nav nav-tabs", style: { marginBottom: 10 },
+    H.ul key: "tabs", className: "nav nav-tabs", style: { marginBottom: 10, position: "absolute", top: 0, left: 0, right: 0 },
       _.map(@props.design.tabs, @renderTab)
       H.li key: "_add", 
         H.a onClick: @handleAddTab,
@@ -146,7 +146,7 @@ module.exports = class ConsoleComponent extends React.Component
   render: ->
     currentTab = _.findWhere(@props.design.tabs, id: @state.tabId)
 
-    H.div style: { height: "100%", paddingTop: 40, position: "relative" },
+    H.div style: { height: "100%", paddingTop: 45, position: "relative" },
       @renderTabs()
       if currentTab
         @renderContents(currentTab)
