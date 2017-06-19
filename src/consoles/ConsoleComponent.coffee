@@ -6,6 +6,8 @@ R = React.createElement
 uuid = require 'uuid'
 
 DashboardComponent = require '../dashboards/DashboardComponent'
+MapComponent = require '../maps/MapComponent'
+DatagridComponent = require '../datagrids/DatagridComponent'
 
 # Console component that displays a console as a series of tabs
 module.exports = class ConsoleComponent extends React.Component
@@ -18,6 +20,14 @@ module.exports = class ConsoleComponent extends React.Component
 
     onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
     namedStrings: PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+
+    # Check if expression of table row is editable
+    # If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
+    canEditValue: PropTypes.func             
+
+    # Update table row expression with a new value
+    # Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
+    updateValue:  PropTypes.func
 
   constructor: (props) ->
     super(props)
@@ -137,6 +147,27 @@ module.exports = class ConsoleComponent extends React.Component
           onRowClick: @props.onRowClick
           namedStrings: @props.namedStrings
 
+      when "map"
+        return R MapComponent,
+          design: tab.design
+          onDesignChange: @handleTabDesignChange.bind(null, tab)
+          schema: @props.schema
+          dataSource: @props.dataSource
+          mapDataSource: @props.consoleDataSource.getMapTabDataSource(tab.id)
+          onRowClick: @props.onRowClick
+          namedStrings: @props.namedStrings
+
+      when "datagrid"
+        return R DatagridComponent,
+          design: tab.design
+          onDesignChange: @handleTabDesignChange.bind(null, tab)
+          schema: @props.schema
+          dataSource: @props.dataSource
+          datagridDataSource: @props.consoleDataSource.getDatagridTabDataSource(tab.id)
+          onRowDoubleClick: @props.onRowClick
+          canEditValue: @props.canEditValue
+          updateValue: @props.updateValue
+
       when "test" # TODO REMOVE
         return H.div null, "TEST"
       
@@ -154,12 +185,20 @@ module.exports = class ConsoleComponent extends React.Component
 class BlankTabComponent extends React.Component
   render: ->
     H.div null,
-      H.a 
-        onClick: (=> @props.onTabChange({ id: @props.tab.id, name: "New Dashboard", type: "dashboard", design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" }})),
-          "New Dashboard"
-
-
-
-
-
-
+      H.div style: { padding: 10 },
+        H.a 
+          onClick: (=> @props.onTabChange({ id: @props.tab.id, name: "New Dashboard", type: "dashboard", design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" }})),
+            "New Dashboard"
+      H.div style: { padding: 10 },
+        H.a 
+          onClick: (=> @props.onTabChange({ id: @props.tab.id, name: "New Map", type: "map", design: {
+            baseLayer: "cartodb_positron"
+            layerViews: []
+            filters: {}
+            bounds: { w: -130.60546875, n: 65.87472467098549, e: 52.55859375, s: -56.26776108757582 }
+           }})),
+            "New Map"
+      H.div style: { padding: 10 },
+        H.a 
+          onClick: (=> @props.onTabChange({ id: @props.tab.id, name: "New Datagrid", type: "datagrid", design: {}})),
+            "New Datagrid"
