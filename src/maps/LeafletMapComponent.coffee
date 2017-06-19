@@ -1,4 +1,5 @@
 PropTypes = require('prop-types')
+_ = require 'lodash'
 React = require 'react'
 ReactDOM = require 'react-dom'
 H = React.DOM
@@ -32,6 +33,7 @@ module.exports = class LeafletMapComponent extends React.Component
       visible: PropTypes.bool # Visibility
       opacity: PropTypes.number # 0-1
       onGridClick: PropTypes.func # Function that is called when grid layer is clicked. Passed { data }
+      onGridHover: PropTypes.func # Function that is called when grid layer is hovered. Passed { data }
       minZoom: PropTypes.number # Minimum zoom level
       maxZoom: PropTypes.number # Maximum zoom level
       })).isRequired # List of layers
@@ -223,7 +225,7 @@ module.exports = class LeafletMapComponent extends React.Component
       @baseLayer.bringToBack()
 
     # Update layers
-    if not prevProps or JSON.stringify(_.omit(@props.layers, "onGridClick")) != JSON.stringify(_.omit(prevProps.layers, "onGridClick")) # TODO naive
+    if not prevProps or JSON.stringify(_.omit(@props.layers, "onGridClick", "onGridHover")) != JSON.stringify(_.omit(prevProps.layers, "onGridClick", "onGridHover")) # TODO naive
       # TODO This is naive. Could be more surgical about updates
       if @tileLayers
         for tileLayer in @tileLayers        
@@ -279,6 +281,15 @@ module.exports = class LeafletMapComponent extends React.Component
               do (layer) =>
                 utfGridLayer.on 'click', (ev) =>
                   layer.onGridClick(ev)
+
+            if layer.onGridHover
+              do (layer) =>
+                utfGridLayer.on 'mouseout', (ev) =>
+                  layer.onGridHover(_.omit(ev, "data"))
+                utfGridLayer.on 'mouseover', (ev) =>
+                  layer.onGridHover(ev)
+                utfGridLayer.on 'mousemove', (ev) =>
+                  layer.onGridHover(ev)
 
   render: ->
     H.div null,
