@@ -7,5 +7,5 @@ action = require('@kadira/storybook').action
 
 require './dashboards'
 require './pivotChart'
-
+require './consoles'
 require './maps'

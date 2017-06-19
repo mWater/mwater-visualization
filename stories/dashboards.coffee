@@ -1,3 +1,4 @@
+PropTypes = require 'prop-types'
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -57,7 +58,7 @@ tableDashboardDesign = {
 
 class DashboardTest extends React.Component
   @propTypes:
-    design: React.PropTypes.object
+    design: PropTypes.object
 
   render: ->
     R UpdateableComponent, 
@@ -142,19 +143,19 @@ update = require 'react-library/lib/update'
 
 class DashboardPopupComponent extends React.Component
   @propTypes:
-    popup: React.PropTypes.object.isRequired
-    onPopupChange: React.PropTypes.func               # If not set, readonly
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    dashboardDataSource: React.PropTypes.object.isRequired # dashboard data source
+    popup: PropTypes.object.isRequired
+    onPopupChange: PropTypes.func               # If not set, readonly
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    dashboardDataSource: PropTypes.object.isRequired # dashboard data source
 
-    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
-    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+    onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    namedStrings: PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
     # Filters to add to the dashboard
-    filters: React.PropTypes.arrayOf(React.PropTypes.shape({
-      table: React.PropTypes.string.isRequired    # id table to filter
-      jsonql: React.PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    filters: PropTypes.arrayOf(PropTypes.shape({
+      table: PropTypes.string.isRequired    # id table to filter
+      jsonql: PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
     }))
 
   constructor: ->

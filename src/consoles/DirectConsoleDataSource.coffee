@@ -1,16 +1,16 @@
-WorkspaceDataSource = require './WorkspaceDataSource'
+ConsoleDataSource = require './ConsoleDataSource'
 
 DirectDashboardDataSource = require '../dashboards/DirectDashboardDataSource'
-DirectMapDataSource = require '../dashboards/DirectMapDataSource'
-DirectDatagridDataSource = require '../dashboards/DirectDatagridDataSource'
+DirectMapDataSource = require '../maps/DirectMapDataSource'
+DirectDatagridDataSource = require '../datagrids/DirectDatagridDataSource'
 
-# Data source for a workspace to help create the type-specific datasources that maps, dashboards and datagrids need.
-module.exports = class DirectWorkspaceDataSource extends WorkspaceDataSource
-  # Create workspace data source that uses direct jsonql calls
+# Data source for a console to help create the type-specific datasources that maps, dashboards and datagrids need.
+module.exports = class DirectConsoleDataSource extends ConsoleDataSource
+  # Create console data source that uses direct jsonql calls
   # options:
   #   schema: schema to use
   #   dataSource: data source to use
-  #   design: design of entire workspace TODO why is this needed
+  #   design: design of entire console TODO why is this needed
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   constructor: (options) ->
@@ -23,11 +23,10 @@ module.exports = class DirectWorkspaceDataSource extends WorkspaceDataSource
       schema: @options.schema
       dataSource: @options.dataSource
       design: design
-
     })
-TODO: what about popups? they also need data sources.
+# TODO: what about popups? they also need data sources.
 
-WHY DO DASHBOARDS need design in direct dataSource?
+# WHY DO DASHBOARDS need design in direct dataSource?
 
 
   # Create map url source that uses direct jsonql maps
