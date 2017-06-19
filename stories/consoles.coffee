@@ -49,6 +49,7 @@ class ConsoleTest extends React.Component
             client: null
             schema: config.schema
             dataSource: config.dataSource
+            design: state.design
           })
 
           H.div style: { height: 800 },

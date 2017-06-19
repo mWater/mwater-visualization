@@ -1,3 +1,4 @@
+_ = require 'lodash'
 ConsoleDataSource = require './ConsoleDataSource'
 
 DirectDashboardDataSource = require '../dashboards/DirectDashboardDataSource'
@@ -16,31 +17,38 @@ module.exports = class DirectConsoleDataSource extends ConsoleDataSource
   constructor: (options) ->
     @options = options
 
-  getDashboardDataSource: (tabId) ->  
-
-  getMapDataSource: (tabId) ->
-    return new DirectMapDataSource({
+  getDashboardTabDataSource: (tabId) ->  
+    return new DirectDashboardDataSource({
       schema: @options.schema
       dataSource: @options.dataSource
-      design: design
+      apiUrl: @options.apiUrl
+      client: @options.client
+      design: _.findWhere(@options.design.tabs, id: tabId).design
     })
-# TODO: what about popups? they also need data sources.
 
-# WHY DO DASHBOARDS need design in direct dataSource?
+#   getMapDataSource: (tabId) ->
+#     return new DirectMapDataSource({
+#       schema: @options.schema
+#       dataSource: @options.dataSource
+#       design: design
+#     })
+# # TODO: what about popups? they also need data sources.
 
-
-  # Create map url source that uses direct jsonql maps
-  # options:
-  #   schema: schema to use
-  #   dataSource: general data source
-  #   design: design of entire map
-  #   apiUrl: API url to use for talking to mWater server
-  #   client: client id to use for talking to mWater server
-  #   mapId: map _id to allow server printing
+# # WHY DO DASHBOARDS need design in direct dataSource?
 
 
-  getDatagridDataSource: (tabId) ->
-    return new DirectDatagridDataSource({
-      schema: @options.schema
-      dataSource: @options.dataSource
-    })
+#   # Create map url source that uses direct jsonql maps
+#   # options:
+#   #   schema: schema to use
+#   #   dataSource: general data source
+#   #   design: design of entire map
+#   #   apiUrl: API url to use for talking to mWater server
+#   #   client: client id to use for talking to mWater server
+#   #   mapId: map _id to allow server printing
+
+
+#   getDatagridDataSource: (tabId) ->
+#     return new DirectDatagridDataSource({
+#       schema: @options.schema
+#       dataSource: @options.dataSource
+#     })
