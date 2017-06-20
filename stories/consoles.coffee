@@ -59,6 +59,8 @@ class ConsoleTest extends React.Component
               consoleDataSource: consoleDataSource
               design: state.design
               onDesignChange: update("design")
+              activeTabId: state.activeTabId
+              onActiveTabIdChange: update("activeTabId")
               titleElem: "Sample"
             })
 

@@ -18,6 +18,9 @@ module.exports = class ConsoleComponent extends React.Component
     dataSource: PropTypes.object.isRequired
     consoleDataSource: PropTypes.object.isRequired # console data source
 
+    activeTabId: PropTypes.string.isRequired       # id of active tab
+    onActiveTabIdChange: PropTypes.func.isRequired
+
     onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
     namedStrings: PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
@@ -34,33 +37,21 @@ module.exports = class ConsoleComponent extends React.Component
   constructor: (props) ->
     super(props)
 
-    @state = {
-      tabId: null     # Current tab
-    }
-
-  componentWillMount: ->
-    # Select first tab
-    if @props.design.tabs[0]
-      @setState(tabId: @props.design.tabs[0].id)
-
-  componentWillReceiveProps: (nextProps) ->
-    # TODO select tab if none selected
-
   handleAddTab: =>
     tabs = @props.design.tabs.concat([{ id: uuid(), type: "blank", name: "New Tab" }])
     @props.onDesignChange(_.extend({}, @props.design, tabs: tabs))
-    @setState(tabId: _.last(tabs).id)
+    @props.onActiveTabIdChange(_.last(tabs).id)
 
   handleTabClick: (tab) =>
     # If already on tab, rename
-    if tab.id == @state.tabId
+    if tab.id == @props.activeTabId
       name = window.prompt("Enter new name for tab", tab.name)
       if name
         newTab = _.extend({}, tab, name: name)
         @handleTabChange(tab, newTab)
       return
 
-    @setState(tabId: tab.id)
+    @props.onActiveTabIdChange(tab.id)
 
   handleTabRemove: (tab, ev) =>
     # Prevent tab click from hitting
@@ -82,7 +73,7 @@ module.exports = class ConsoleComponent extends React.Component
 
     # Select same index or one before if not possible
     selectedTab = tabs[tabIndex] or tabs[tabIndex - 1]
-    @setState(tabId: selectedTab.id)
+    @props.onActiveTabIdChange(selectedTab.id)
 
   handleTabDesignChange: (tab, design) =>
     # Find index of tab being changed
@@ -111,10 +102,10 @@ module.exports = class ConsoleComponent extends React.Component
     tabs.splice(tabIndex + 1, 0, newTab)
 
     @props.onDesignChange(_.extend({}, @props.design, tabs: tabs))
-    @setState(tabId: newTab.id)
+    @props.onActiveTabIdChange(newTab.id)
 
   renderTab: (tab) =>
-    active = @state.tabId == tab.id
+    active = @props.activeTabId == tab.id
     H.li key: tab.id, className: (if active then "active"),
       H.a onClick: @handleTabClick.bind(null, tab), style: { cursor: (if active then "text" else "pointer") },
         tab.name
@@ -187,14 +178,14 @@ module.exports = class ConsoleComponent extends React.Component
         throw new Error("Unsupported tab type #{tab.type}")
     
   render: ->
-    currentTab = _.findWhere(@props.design.tabs, id: @state.tabId)
+    activeTab = _.findWhere(@props.design.tabs, id: @props.activeTabId)
 
     H.div style: { height: "100%", paddingTop: 45, position: "relative" },
       @renderTabs()
-      if currentTab
+      if activeTab
         # Wrap in key to ensure that different tabs have a new component
-        H.div style: { height: "100%" }, key: currentTab.id,
-          @renderContents(currentTab)
+        H.div style: { height: "100%" }, key: activeTab.id,
+          @renderContents(activeTab)
 
 class BlankTabComponent extends React.Component
   render: ->
