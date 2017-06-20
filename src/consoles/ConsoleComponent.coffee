@@ -5,6 +5,7 @@ H = React.DOM
 R = React.createElement
 uuid = require 'uuid'
 
+BlankTabComponent = require './BlankTabComponent'
 DashboardComponent = require '../dashboards/DashboardComponent'
 MapComponent = require '../maps/MapComponent'
 DatagridComponent = require '../datagrids/DatagridComponent'
@@ -36,6 +37,27 @@ module.exports = class ConsoleComponent extends React.Component
 
   constructor: (props) ->
     super(props)
+
+    @state = {
+      openTabIds: []   # Track which tabs have been opened to render them and preserve state
+    }
+
+    if @props.activeTabId
+      @state.openTabIds = [@props.activeTabId]
+
+  componentWillReceiveProps: (nextProps) ->
+    # Remove dead tabs
+    openTabIds = _.intersection(@state.openTabIds, _.pluck(nextProps.design.tabs, "id"))
+
+    # Add active tab
+    if nextProps.activeTabId
+      openTabIds = _.union(@state.openTabIds, [nextProps.activeTabId])
+
+    # Sort
+    openTabIds.sort()
+
+    if not _.isEqual(openTabIds, @state.openTabIds)
+      @setState(openTabIds: openTabIds)
 
   handleAddTab: =>
     tabs = @props.design.tabs.concat([{ id: uuid(), type: "blank", name: "New Tab" }])
@@ -69,11 +91,11 @@ module.exports = class ConsoleComponent extends React.Component
     if tabs.length == 0
       tabs.push({ id: uuid(), type: "blank", name: "New Tab" })
 
-    @props.onDesignChange(_.extend({}, @props.design, tabs: tabs))
-
     # Select same index or one before if not possible
     selectedTab = tabs[tabIndex] or tabs[tabIndex - 1]
     @props.onActiveTabIdChange(selectedTab.id)
+
+    @props.onDesignChange(_.extend({}, @props.design, tabs: tabs))
 
   handleTabDesignChange: (tab, design) =>
     # Find index of tab being changed
@@ -178,32 +200,16 @@ module.exports = class ConsoleComponent extends React.Component
         throw new Error("Unsupported tab type #{tab.type}")
     
   render: ->
-    activeTab = _.findWhere(@props.design.tabs, id: @props.activeTabId)
-
     H.div style: { height: "100%", paddingTop: 45, position: "relative" },
       @renderTabs()
-      if activeTab
-        # Wrap in key to ensure that different tabs have a new component
-        H.div style: { height: "100%" }, key: activeTab.id,
-          @renderContents(activeTab)
+      _.map @state.openTabIds, (tabId) =>
+        active = tabId == @props.activeTabId
+        tab = _.findWhere(@props.design.tabs, id: tabId)
+        if not tab
+          return null
 
-class BlankTabComponent extends React.Component
-  render: ->
-    H.div null,
-      H.div style: { padding: 10 },
-        H.a 
-          onClick: (=> @props.onTabChange({ id: @props.tab.id, name: "New Dashboard", type: "dashboard", design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" }})),
-            "New Dashboard"
-      H.div style: { padding: 10 },
-        H.a 
-          onClick: (=> @props.onTabChange({ id: @props.tab.id, name: "New Map", type: "map", design: {
-            baseLayer: "cartodb_positron"
-            layerViews: []
-            filters: {}
-            bounds: { w: -130.60546875, n: 65.87472467098549, e: 52.55859375, s: -56.26776108757582 }
-           }})),
-            "New Map"
-      H.div style: { padding: 10 },
-        H.a 
-          onClick: (=> @props.onTabChange({ id: @props.tab.id, name: "New Datagrid", type: "datagrid", design: {}})),
-            "New Datagrid"
+        # Wrap in key to ensure that different tabs have a new component
+        return H.div style: { height: "100%", display: (if active then "block" else "none" ) }, key: tabId,
+          @renderContents(tab)
+
+
