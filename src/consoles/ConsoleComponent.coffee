@@ -192,7 +192,9 @@ module.exports = class ConsoleComponent extends React.Component
     H.div style: { height: "100%", paddingTop: 45, position: "relative" },
       @renderTabs()
       if currentTab
-        @renderContents(currentTab)
+        # Wrap in key to ensure that different tabs have a new component
+        H.div style: { height: "100%", key: currentTab.id },
+          @renderContents(currentTab)
 
 class BlankTabComponent extends React.Component
   render: ->
