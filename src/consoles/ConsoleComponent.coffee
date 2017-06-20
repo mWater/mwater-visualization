@@ -59,7 +59,7 @@ module.exports = class ConsoleComponent extends React.Component
         newTab = _.extend({}, tab, name: name)
         @handleTabChange(tab, newTab)
       return
-      
+
     @setState(tabId: tab.id)
 
   handleTabRemove: (tab, ev) =>
@@ -111,10 +111,12 @@ module.exports = class ConsoleComponent extends React.Component
     tabs.splice(tabIndex + 1, 0, newTab)
 
     @props.onDesignChange(_.extend({}, @props.design, tabs: tabs))
+    @setState(tabId: newTab.id)
 
   renderTab: (tab) =>
-    H.li key: tab.id, className: (if @state.tabId == tab.id then "active"),
-      H.a onClick: @handleTabClick.bind(null, tab), style: { cursor: "pointer" },
+    active = @state.tabId == tab.id
+    H.li key: tab.id, className: (if active then "active"),
+      H.a onClick: @handleTabClick.bind(null, tab), style: { cursor: (if active then "text" else "pointer") },
         tab.name
         # Don't allow deleting only blank tab
         if @props.design.tabs.length > 1 or tab.type != "blank"

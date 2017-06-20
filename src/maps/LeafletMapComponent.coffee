@@ -220,7 +220,7 @@ module.exports = class LeafletMapComponent extends React.Component
       @popupDiv = L.DomUtil.create('div', '')
       ReactDOM.render(@props.popup.contents, @popupDiv)
 
-      @popupLayer = L.popup({ minWidth: 100, offset: L.point(0, 0), autoPan: true, closeButton: false, closeOnClick: false })
+      @popupLayer = L.popup({ minWidth: 100, autoPan: true, closeButton: false, closeOnClick: false })
         .setLatLng(L.latLng(@props.popup.lat, @props.popup.lng))
         .setContent(@popupDiv)
         .openOn(@map)
