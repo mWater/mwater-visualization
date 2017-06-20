@@ -52,6 +52,12 @@ module.exports = class LeafletMapComponent extends React.Component
 
     scaleControl: PropTypes.bool      # True to show scale control
 
+    popup: PropTypes.shape({          # Set to display a Leaflet popup control
+      lat: PropTypes.number.isRequired
+      lng: PropTypes.number.isRequired
+      contents: PropTypes.node.isRequired
+      })
+
   @defaultProps: 
     dragging: true
     touchZoom: true
@@ -191,6 +197,33 @@ module.exports = class LeafletMapComponent extends React.Component
       if @baseLayer
         @baseLayer._map.attributionControl.removeAttribution(prevProps.extraAttribution)
         @baseLayer._map.attributionControl.addAttribution(@props.extraAttribution)
+
+    # Update popup
+    if prevProps and prevProps.popup and not @props.popup
+      # If existing popupDiv, unmount
+      if @popupDiv
+        ReactDOM.unmountComponentAtNode(@popupDiv)
+        @popupDiv = null
+
+      # Close popup
+      @map.removeLayer(@popupLayer)
+      @popupLayer = null
+    else if prevProps and prevProps.popup and @props.popup
+      # Move location
+      if prevProps.popup.lat != @props.popup.lat or prevProps.popup.lng != @props.popup.lng
+        @popupLayer.setLatLng(L.latLng(@props.popup.lat, @props.popup.lng))
+
+      # Re-render contents
+      ReactDOM.render(@props.popup.contents, @popupDiv)
+    else if @props.popup
+      # Create popup
+      @popupDiv = L.DomUtil.create('div', '')
+      ReactDOM.render(@props.popup.contents, @popupDiv)
+
+      @popupLayer = L.popup({ minWidth: 100, offset: L.point(0, 0), autoPan: true, closeButton: false, closeOnClick: false })
+        .setLatLng(L.latLng(@props.popup.lat, @props.popup.lng))
+        .setContent(@popupDiv)
+        .openOn(@map)
 
     # Update base layer
     if not prevProps or @props.baseLayerId != prevProps.baseLayerId

@@ -52,6 +52,14 @@ module.exports = class ConsoleComponent extends React.Component
     @setState(tabId: _.last(tabs).id)
 
   handleTabClick: (tab) =>
+    # If already on tab, rename
+    if tab.id == @state.tabId
+      name = window.prompt("Enter new name for tab", tab.name)
+      if name
+        newTab = _.extend({}, tab, name: name)
+        @handleTabChange(tab, newTab)
+      return
+      
     @setState(tabId: tab.id)
 
   handleTabRemove: (tab, ev) =>
