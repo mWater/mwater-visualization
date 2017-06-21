@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -10,11 +11,11 @@ TableSelectComponent = require '../../TableSelectComponent'
 # Expression editor that allows changing an expression item
 module.exports = class ExprItemEditorComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired   # Schema to use
-    dataSource: React.PropTypes.object.isRequired # Data source to use to get values
-    exprItem: React.PropTypes.object.isRequired  # Expression item to edit
-    onChange: React.PropTypes.func.isRequired   # Called with expr item 
-    singleRowTable: React.PropTypes.string  # Table that is filtered to have one row
+    schema: PropTypes.object.isRequired   # Schema to use
+    dataSource: PropTypes.object.isRequired # Data source to use to get values
+    exprItem: PropTypes.object.isRequired  # Expression item to edit
+    onChange: PropTypes.func.isRequired   # Called with expr item 
+    singleRowTable: PropTypes.string  # Table that is filtered to have one row
 
   constructor: (props) ->
     super

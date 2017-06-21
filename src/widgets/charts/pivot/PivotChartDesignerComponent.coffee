@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -11,11 +12,11 @@ AxisComponent = require '../../../axes/AxisComponent'
 # Designer for overall chart. Has a special setup mode first time it is run
 module.exports = class PivotChartDesignerComponent extends React.Component
   @propTypes: 
-    design: React.PropTypes.object.isRequired
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func.isRequired
-    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+    design: PropTypes.object.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    onDesignChange: PropTypes.func.isRequired
+    filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   constructor: (props) ->
     super

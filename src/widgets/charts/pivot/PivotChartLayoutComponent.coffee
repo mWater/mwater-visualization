@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 ReactDOM = require 'react-dom'
@@ -10,15 +11,15 @@ ui = require 'react-library/lib/bootstrap'
 # Displays a pivot chart from a layout
 module.exports = class PivotChartLayoutComponent extends React.Component
   @propTypes: 
-    layout: React.PropTypes.object.isRequired  # See README.md
+    layout: PropTypes.object.isRequired  # See README.md
 
-    editable: React.PropTypes.bool   # If true, all below must be present. If false, none must be present
-    onEditSection: React.PropTypes.func  # Called with id of section (segment id or intersection id)
-    onRemoveSegment: React.PropTypes.func  # Called with id of segment
-    onInsertBeforeSegment: React.PropTypes.func  # Called with id of segment
-    onInsertAfterSegment: React.PropTypes.func  # Called with id of segment
-    onAddChildSegment: React.PropTypes.func  # Called with id of segment
-    onSummarizeSegment: React.PropTypes.func  # Called with id of segment. Summarizes the segment
+    editable: PropTypes.bool   # If true, all below must be present. If false, none must be present
+    onEditSection: PropTypes.func  # Called with id of section (segment id or intersection id)
+    onRemoveSegment: PropTypes.func  # Called with id of segment
+    onInsertBeforeSegment: PropTypes.func  # Called with id of segment
+    onInsertAfterSegment: PropTypes.func  # Called with id of segment
+    onAddChildSegment: PropTypes.func  # Called with id of segment
+    onSummarizeSegment: PropTypes.func  # Called with id of segment. Summarizes the segment
 
   constructor: (props) ->
     super
@@ -164,13 +165,13 @@ module.exports = class PivotChartLayoutComponent extends React.Component
 # Single layout cell
 class LayoutCellComponent extends React.Component
   @propTypes:
-    layout: React.PropTypes.object.isRequired  # See PivotChart Design.md
-    rowIndex: React.PropTypes.number.isRequired  
-    columnIndex: React.PropTypes.number.isRequired
-    hoverSection: React.PropTypes.string       # Which section is currently hovered over
-    onHover: React.PropTypes.func # Called when hovered over
-    onEditSection: React.PropTypes.func
-    onSummarizeSegment: React.PropTypes.func
+    layout: PropTypes.object.isRequired  # See PivotChart Design.md
+    rowIndex: PropTypes.number.isRequired  
+    columnIndex: PropTypes.number.isRequired
+    hoverSection: PropTypes.string       # Which section is currently hovered over
+    onHover: PropTypes.func # Called when hovered over
+    onEditSection: PropTypes.func
+    onSummarizeSegment: PropTypes.func
 
   handleClick: (ev) =>
     # Ignore blanks

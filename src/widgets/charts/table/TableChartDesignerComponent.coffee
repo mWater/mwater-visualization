@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -15,10 +16,10 @@ ReorderableListComponent = require("react-library/lib/reorderable/ReorderableLis
 
 module.exports = class TableChartDesignerComponent extends React.Component
   @propTypes:
-    design: React.PropTypes.object.isRequired
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func.isRequired
+    design: PropTypes.object.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    onDesignChange: PropTypes.func.isRequired
 
   # Updates design with the specified changes
   updateDesign: (changes) ->
@@ -145,15 +146,15 @@ module.exports = class TableChartDesignerComponent extends React.Component
 
 class TableChartColumnDesignerComponent extends React.Component
   @propTypes:
-    design: React.PropTypes.object.isRequired
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    index: React.PropTypes.number.isRequired
-    onChange: React.PropTypes.func.isRequired
-    onRemove: React.PropTypes.func.isRequired
+    design: PropTypes.object.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    index: PropTypes.number.isRequired
+    onChange: PropTypes.func.isRequired
+    onRemove: PropTypes.func.isRequired
 
   @contextTypes:
-    locale: React.PropTypes.string  # e.g. "en"
+    locale: PropTypes.string  # e.g. "en"
 
   # Updates column with the specified changes
   updateColumn: (changes) ->

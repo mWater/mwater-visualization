@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -11,13 +12,13 @@ FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 # Design a single segment of a pivot table
 module.exports = class SegmentDesignerComponent extends React.Component
   @propTypes: 
-    segment: React.PropTypes.object.isRequired
-    table: React.PropTypes.string.isRequired
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    segmentType: React.PropTypes.string.isRequired  # "row" or "column"
-    onChange: React.PropTypes.func.isRequired
-    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+    segment: PropTypes.object.isRequired
+    table: PropTypes.string.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    segmentType: PropTypes.string.isRequired  # "row" or "column"
+    onChange: PropTypes.func.isRequired
+    filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   constructor: (props) ->
     super
@@ -162,9 +163,9 @@ module.exports = class SegmentDesignerComponent extends React.Component
 # Allows setting border heaviness
 class BorderComponent extends React.Component
   @propTypes:
-    value: React.PropTypes.number
-    defaultValue: React.PropTypes.number
-    onChange: React.PropTypes.func.isRequired
+    value: PropTypes.number
+    defaultValue: PropTypes.number
+    onChange: PropTypes.func.isRequired
 
   render: ->
     value = if @props.value? then @props.value else @props.defaultValue

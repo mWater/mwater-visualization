@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -19,10 +20,10 @@ HorizontalBlockComponent = require './HorizontalBlockComponent'
 
 class BlocksDisplayComponent extends React.Component
   @propTypes:
-    items: React.PropTypes.object.isRequired
-    onItemsChange: React.PropTypes.func
+    items: PropTypes.object.isRequired
+    onItemsChange: PropTypes.func
 
-    style: React.PropTypes.string   # Stylesheet to use. null for default
+    style: PropTypes.string   # Stylesheet to use. null for default
 
     # Renders a widget. Passed (options)
     #  id: id of widget
@@ -31,10 +32,10 @@ class BlocksDisplayComponent extends React.Component
     #  onDesignChange: called with new design of widget
     #  width: width to render. null for auto
     #  height: height to render. null for auto
-    renderWidget: React.PropTypes.func.isRequired
+    renderWidget: PropTypes.func.isRequired
 
     # True to prevent maps
-    disableMaps: React.PropTypes.bool
+    disableMaps: PropTypes.bool
 
   handleBlockDrop: (sourceBlock, targetBlock, side) =>
     # Remove source from items
@@ -206,10 +207,10 @@ module.exports = NestableDragDropContext(HTML5Backend)(BlocksDisplayComponent)
 
 class RootBlockComponent extends React.Component
   @propTypes:
-    block: React.PropTypes.object.isRequired
-    renderBlock: React.PropTypes.func.isRequired
-    onBlockDrop: React.PropTypes.func # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
-    onBlockRemove: React.PropTypes.func # Called with (block) when block is removed
+    block: PropTypes.object.isRequired
+    renderBlock: PropTypes.func.isRequired
+    onBlockDrop: PropTypes.func # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
+    onBlockRemove: PropTypes.func # Called with (block) when block is removed
 
   render: ->
     elem = H.div key: "root",
@@ -229,10 +230,10 @@ class RootBlockComponent extends React.Component
 
 class VerticalBlockComponent extends React.Component
   @propTypes:
-    block: React.PropTypes.object.isRequired
-    renderBlock: React.PropTypes.func.isRequired
-    onBlockDrop: React.PropTypes.func # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
-    onBlockRemove: React.PropTypes.func # Called with (block) when block is removed
+    block: PropTypes.object.isRequired
+    renderBlock: PropTypes.func.isRequired
+    onBlockDrop: PropTypes.func # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
+    onBlockRemove: PropTypes.func # Called with (block) when block is removed
 
   render: ->
     H.div null,

@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 asyncLatest = require 'async-latest'
@@ -7,23 +8,23 @@ asyncLatest = require 'async-latest'
 # invalid
 module.exports = class ChartViewComponent extends React.Component
   @propTypes:
-    chart: React.PropTypes.object.isRequired # Chart object to use
-    design: React.PropTypes.object.isRequired # Design of chart
-    onDesignChange: React.PropTypes.func      # When design change
+    chart: PropTypes.object.isRequired # Chart object to use
+    design: PropTypes.object.isRequired # Design of chart
+    onDesignChange: PropTypes.func      # When design change
 
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired # Data source to use for chart
-    widgetDataSource: React.PropTypes.object.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired # Data source to use for chart
+    widgetDataSource: PropTypes.object.isRequired
 
-    width: React.PropTypes.number
-    height: React.PropTypes.number
-    standardWidth: React.PropTypes.number
+    width: PropTypes.number
+    height: PropTypes.number
+    standardWidth: PropTypes.number
 
-    scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
-    filters: React.PropTypes.array  # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias }. Use injectAlias to correct
-    onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+    scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
+    filters: PropTypes.array  # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias }. Use injectAlias to correct
+    onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
-    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
 
   constructor: ->
     super

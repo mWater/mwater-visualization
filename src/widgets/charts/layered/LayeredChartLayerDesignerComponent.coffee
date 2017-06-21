@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -13,13 +14,13 @@ TableSelectComponent = require '../../../TableSelectComponent'
 
 module.exports = class LayeredChartLayerDesignerComponent extends React.Component
   @propTypes: 
-    design: React.PropTypes.object.isRequired
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    index: React.PropTypes.number.isRequired
-    onChange: React.PropTypes.func.isRequired
-    onRemove: React.PropTypes.func.isRequired
-    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+    design: PropTypes.object.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    index: PropTypes.number.isRequired
+    onChange: PropTypes.func.isRequired
+    onRemove: PropTypes.func.isRequired
+    filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   isLayerPolar: (layer) ->
     return (layer.type or @props.design.type) in ['pie', 'donut']
