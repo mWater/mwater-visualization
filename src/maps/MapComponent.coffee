@@ -71,7 +71,6 @@ module.exports = class MapComponent extends React.Component
             H.span className: "glyphicon glyphicon-triangle-right"
             " Redo"
         ]
-      @renderPrint()
       @props.extraTitleButtonsElem
 
   renderHeader: ->
