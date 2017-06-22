@@ -55,6 +55,10 @@ module.exports = class MapComponent extends React.Component
     # We need to use callback as state is applied later
     @setState(undoStack: undoStack, => @props.onDesignChange(undoStack.getValue()))
 
+  # Gets the current design, whether prop or transient
+  getDesign: ->
+    return @state.transientDesign or @props.design
+
   renderActionLinks: ->
     H.div null,
       if @props.onDesignChange?
