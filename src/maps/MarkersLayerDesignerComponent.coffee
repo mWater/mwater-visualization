@@ -59,7 +59,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
     H.div className: "form-group",
       H.label className: "text-muted", title
       H.div style: { marginLeft: 10 }, 
-        R(AxisComponent, 
+        R AxisComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           table: @props.design.table
@@ -67,7 +67,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
           aggrNeed: "none"
           value: @props.design.axes.geometry
           onChange: @handleGeometryAxisChange
-          filters: @props.filters)
+          filters: (@props.filters or []).concat([@props.design.filter or []])
 
   renderColor: ->
     if not @props.design.axes.geometry

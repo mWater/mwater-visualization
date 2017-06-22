@@ -97,7 +97,7 @@ module.exports = class CategoryMapComponent extends React.Component
       display: 'inline-block'
       marginLeft: 5
 
-    elem = H.div null,
+    elem = H.div key: category.value,
       if connectDragSource
         connectDragSource(H.i(className: "fa fa-bars", style: iconStyle))
 
