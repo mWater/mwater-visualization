@@ -5,7 +5,6 @@ H = React.DOM
 DragSource = require('react-dnd').DragSource
 DropTarget = require('react-dnd').DropTarget
 DragDropContext = require('react-dnd').DragDropContext
-HTML5Backend = require('react-dnd-html5-backend')
 DecoratedBlockComponent = require '../DecoratedBlockComponent'
 
 # Render a child element as draggable, resizable block, injecting handle connectors
