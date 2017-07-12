@@ -6,6 +6,7 @@ R = React.createElement
 
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
+ExprCompiler = require('mwater-expressions').ExprCompiler
 NumberInputComponent = require('react-library/lib/NumberInputComponent')
 
 AxisComponent = require './../axes/AxisComponent'
@@ -56,6 +57,14 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
     title = H.span null,
       H.span className: "glyphicon glyphicon-map-marker"
       " Circle Centers"
+    
+    filters = @props.filters or []
+
+    if design.filter?
+      exprCompiler = new ExprCompiler(@props.schema)
+      jsonql = exprCompiler.compileExpr(expr: @props.design.filter, tableAlias: "{alias}")
+      if jsonql
+        filters.push({ table: design.filter.table, jsonql: jsonql })
 
     H.div className: "form-group",
       H.label className: "text-muted", title
@@ -68,7 +77,7 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
           aggrNeed: "none"
           value: @props.design.axes.geometry
           onChange: @handleGeometryAxisChange
-          filters: @props.filters)
+          filters: filters)
 
   renderRadius: ->
     return H.div className: "form-group",
@@ -80,6 +89,14 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
   renderColor: ->
     if not @props.design.axes.geometry
       return
+    
+    filters = @props.filters or []
+
+    if design.filter?
+      exprCompiler = new ExprCompiler(@props.schema)
+      jsonql = exprCompiler.compileExpr(expr: @props.design.filter, tableAlias: "{alias}")
+      if jsonql
+        filters.push({ table: design.filter.table, jsonql: jsonql })
 
     return H.div null,
       if not @props.design.axes.color
@@ -109,7 +126,7 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
           showColorMap: true
           onChange: @handleColorAxisChange
           allowExcludedValues: true
-          filters: @props.filters
+          filters: filters
 
   renderFillOpacity: ->
     return H.div className: "form-group",
