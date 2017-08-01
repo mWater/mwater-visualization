@@ -17,7 +17,7 @@ layer:
   table: table of layer
   name: label for layer (optional)
   axes: axes (see below)
-  stacked: true to stack (Note: not implemented yet)
+  stacked: true to stack. Defaults true if multiple layers and has color index.
   filter: optional logical expression to filter by
   color: color of layer (e.g. #FF8800)
   cumulative: true to use running total of values
