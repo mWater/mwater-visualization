@@ -106,6 +106,8 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
 
   handleCumulativeChange: (ev) => @updateLayer(cumulative: ev.target.checked)
 
+  handleStackedChange: (ev) => @updateLayer(stacked: ev.target.checked)
+
   renderName: ->
     # Only if multiple
     if @props.design.layers.length <= 1
@@ -206,6 +208,7 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
           filters: @props.filters
           onChange: @handleYAxisChange)
         @renderCumulative()
+        @renderStacked()
 
   renderCumulative: ->
     layer = @props.design.layers[@props.index]
@@ -219,6 +222,20 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
       H.label className: "checkbox-inline", 
         H.input type: "checkbox", checked: layer.cumulative, onChange: @handleCumulativeChange
         "Cumulative"
+
+  renderStacked: ->
+    layer = @props.design.layers[@props.index]
+
+    # Only if has color axis and there are more than one layer
+    if layer.axes.color and @props.design.layers.length > 1
+      stacked = if layer.stacked? then layer.stacked else true
+
+      return H.div key: "stacked",
+        H.label className: "checkbox-inline", 
+          H.input type: "checkbox", checked: stacked, onChange: @handleStackedChange
+          "Stacked"
+
+    return null
 
   renderColor: ->
     layer = @props.design.layers[@props.index]

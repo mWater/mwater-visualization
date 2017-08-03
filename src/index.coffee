@@ -51,9 +51,6 @@ exports.ServerDatagridDataSource = require './datagrids/ServerDatagridDataSource
 exports.DirectDatagridDataSource = require './datagrids/DirectDatagridDataSource'
 exports.LabeledExprGenerator = require './datagrids/LabeledExprGenerator'
 
-exports.DirectConsoleDataSource = require './consoles/DirectConsoleDataSource'
-exports.ConsoleComponent = require './consoles/ConsoleComponent'
-
 exports.LayoutManager = require './layouts/LayoutManager'
 exports.RegionSelectComponent = require './maps/RegionSelectComponent'
 exports.DetailLevelSelectComponent = require './maps/DetailLevelSelectComponent'

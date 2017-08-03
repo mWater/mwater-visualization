@@ -44,6 +44,7 @@ module.exports = class LeafletMapComponent extends React.Component
     dragging:  PropTypes.bool         # Whether the map be draggable with mouse/touch or not. Default true
     touchZoom: PropTypes.bool         # Whether the map can be zoomed by touch-dragging with two fingers. Default true
     scrollWheelZoom: PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
+    keyboard: PropTypes.bool          # Whether the map responds to keyboard. Default true
 
     maxZoom: PropTypes.number         # Maximum zoom level
     extraAttribution: PropTypes.string # User defined attributions
@@ -63,6 +64,7 @@ module.exports = class LeafletMapComponent extends React.Component
     touchZoom: true
     scrollWheelZoom: true
     scaleControl: true
+    keyboard: true
 
   # Reload all tiles
   reload: ->
@@ -120,6 +122,7 @@ module.exports = class LeafletMapComponent extends React.Component
       touchZoom: @props.touchZoom
       scrollWheelZoom: @props.scrollWheelZoom
       minZoom: 1  # Bing doesn't allow going to zero
+      keyboard: @props.keyboard
     }
 
     # Must not be null, or will not zoom

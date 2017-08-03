@@ -1,7 +1,5 @@
 querystring = require 'querystring'
-WidgetFactory = require '../widgets/WidgetFactory'
 injectTableAlias = require('mwater-expressions').injectTableAlias
-DirectMapDataSource = require '../maps/DirectMapDataSource'
 
 # Uses mWater server to get widget data to allow sharing with unprivileged users
 module.exports = class ServerDashboardDataSource

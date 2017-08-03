@@ -75,12 +75,12 @@ class LoadingLegend extends React.Component
     @state = { html: "Loading..." }
 
   componentDidMount: -> 
-    $.get(@props.url).success (data) =>
+    $.get(@props.url).done (data) =>
       @setState(html: data)
 
   componentWillReceiveProps: (nextProps) ->
     if nextProps.url != @props.url
-      $.get(nextProps.url).success (data) =>
+      $.get(nextProps.url).done (data) =>
         @setState(html: data)
 
   render: ->

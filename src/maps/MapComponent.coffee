@@ -43,9 +43,6 @@ module.exports = class MapComponent extends React.Component
     if not _.isEqual(nextProps.design, @props.design)
       @setState(transientDesign: nextProps.design)
 
-  handlePrint: (scale) =>
-    @mapView.print(scale)
-
   handleUndo: => 
     undoStack = @state.undoStack.undo()
 
@@ -58,23 +55,9 @@ module.exports = class MapComponent extends React.Component
     # We need to use callback as state is applied later
     @setState(undoStack: undoStack, => @props.onDesignChange(undoStack.getValue()))
 
-  renderPrint: ->
-    printScale2Url = @props.mapDataSource.getPrintUrl(@getDesign(), 2)
-    printScale3Url = @props.mapDataSource.getPrintUrl(@getDesign(), 3)
-
-    if printScale2Url and printScale3Url
-      return H.div key: "print", className: "btn-group",
-        H.button type: "button", "data-toggle": "dropdown", className: "btn btn-link btn-sm dropdown-toggle",
-          H.span className: "glyphicon glyphicon-print"
-          " Print "
-          H.span className: "caret"
-        H.ul className: "dropdown-menu",
-          H.li key: "scale2",
-            H.a href: printScale2Url, target: "_blank", "Normal"
-          H.li key: "scale3",
-            H.a href: printScale3Url, target: "_blank", "High-Resolution"
-    else
-      return null
+  # Gets the current design, whether prop or transient
+  getDesign: ->
+    return @state.transientDesign or @props.design
 
   renderActionLinks: ->
     H.div null,
@@ -88,7 +71,6 @@ module.exports = class MapComponent extends React.Component
             H.span className: "glyphicon glyphicon-triangle-right"
             " Redo"
         ]
-      @renderPrint()
       @props.extraTitleButtonsElem
 
   renderHeader: ->
