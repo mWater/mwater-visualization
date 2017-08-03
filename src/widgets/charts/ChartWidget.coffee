@@ -163,7 +163,7 @@ class ChartWidgetComponent extends React.Component
   renderEditor: ->
     if not @state.editDesign
       return null
-
+    
     # Create editor
     editor = @props.chart.createDesignerElement(schema: @props.schema, filters: @props.filters, dataSource: @props.dataSource, design: @state.editDesign, onDesignChange: @handleEditDesignChange)
 

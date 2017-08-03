@@ -112,9 +112,9 @@ module.exports = class AxisComponent extends AsyncLoadComponent
     props.dataSource.performQuery(valuesQuery, (error, rows) =>
       if error
         return # Ignore errors
-
+      
       # Get categories (value + label)
-      categories = axisBuilder.getCategories(axis, _.pluck(rows, "val"))      
+      categories = axisBuilder.getCategories(axis, _.pluck(rows, "val"))
       callback({ categories: categories })
     )
 
@@ -244,7 +244,7 @@ module.exports = class AxisComponent extends AsyncLoadComponent
       return null
 
     # Use categories
-    if not @state.categories or @state.categories.length <= 1
+    if not @state.categories or @state.categories.length < 1
       return null
 
     return [

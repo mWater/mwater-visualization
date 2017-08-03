@@ -54,7 +54,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
       marginBottom: -1
       backgroundColor: "#fff"
     
-    filters = @props.filters or []
+    filters = _.clone(@props.filters) or []
     
     if layerView.design.filter?
       exprCompiler = new ExprCompiler(@props.schema)

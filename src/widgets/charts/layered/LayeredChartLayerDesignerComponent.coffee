@@ -6,6 +6,7 @@ AxisComponent = require '../../../axes/AxisComponent'
 AxisBuilder = require '../../../axes/AxisBuilder'
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
+ExprCompiler = require('mwater-expressions').ExprCompiler
 ColorComponent = require '../../../ColorComponent'
 LayeredChartUtils = require './LayeredChartUtils'
 LayeredChartCompiler = require './LayeredChartCompiler'
@@ -137,6 +138,14 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
 
     title = @getXAxisLabel(layer)
 
+    filters = _.clone(@props.filters) or []
+    if layer.filter?
+      exprCompiler = new ExprCompiler(@props.schema)  
+      jsonql = exprCompiler.compileExpr(expr: layer.filter, tableAlias: "{alias}")
+
+      if jsonql
+        filters.push({ table: layer.filter.table, jsonql: jsonql })
+
     R ui.SectionComponent, label: title,
       R(AxisComponent, 
         schema: @props.schema
@@ -147,7 +156,7 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
         required: true
         value: layer.axes.x, 
         onChange: @handleXAxisChange
-        filters: @props.filters
+        filters: filters
         # Categorical X can exclude values
         allowExcludedValues: new LayeredChartCompiler(schema: @props.schema).isCategoricalX(@props.design)
         )

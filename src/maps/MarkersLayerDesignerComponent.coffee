@@ -57,13 +57,13 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
       H.span className: "glyphicon glyphicon-map-marker"
       " Marker Position"
 
-    filters = @props.filters or []
+    filters = _.clone(@props.filters) or []
 
-    if design.filter?
+    if @props.design.filter?
       exprCompiler = new ExprCompiler(@props.schema)
       jsonql = exprCompiler.compileExpr(expr: @props.design.filter, tableAlias: "{alias}")
       if jsonql
-        filters.push({ table: design.filter.table, jsonql: jsonql })
+        filters.push({ table: @props.design.filter.table, jsonql: jsonql })
 
     H.div className: "form-group",
       H.label className: "text-muted", title
@@ -82,13 +82,13 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
     if not @props.design.axes.geometry
       return
     
-    filters = @props.filters or []
+    filters = _.clone(@props.filters) or []
 
-    if design.filter?
+    if @props.design.filter?
       exprCompiler = new ExprCompiler(@props.schema)
       jsonql = exprCompiler.compileExpr(expr: @props.design.filter, tableAlias: "{alias}")
       if jsonql
-        filters.push({ table: design.filter.table, jsonql: jsonql })
+        filters.push({ table: @props.design.filter.table, jsonql: jsonql })
 
     return H.div null,
       if not @props.design.axes.color
