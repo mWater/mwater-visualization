@@ -6,6 +6,7 @@ R = React.createElement
 
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
+ExprCompiler = require('mwater-expressions').ExprCompiler
 
 AxisComponent = require './../axes/AxisComponent'
 ColorComponent = require '../ColorComponent'
@@ -51,6 +52,14 @@ module.exports = class ClusterLayerDesignerComponent extends React.Component
     title = H.span null,
       H.span className: "glyphicon glyphicon-map-marker"
       " Locations to Cluster"
+    
+    filters = _.clone(@props.filters) or []
+
+    if @props.design.filter?
+      exprCompiler = new ExprCompiler(@props.schema)
+      jsonql = exprCompiler.compileExpr(expr: @props.design.filter, tableAlias: "{alias}")
+      if jsonql
+        filters.push({ table: @props.design.filter.table, jsonql: jsonql })
 
     H.div className: "form-group",
       H.label className: "text-muted", title
@@ -63,7 +72,7 @@ module.exports = class ClusterLayerDesignerComponent extends React.Component
           aggrNeed: "none"
           value: @props.design.axes.geometry
           onChange: @handleGeometryAxisChange
-          filters: @props.filters)
+          filters: filters)
 
 
   renderTextColor: ->

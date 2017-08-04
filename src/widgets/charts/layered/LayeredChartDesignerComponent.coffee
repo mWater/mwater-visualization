@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -8,11 +9,11 @@ ui = require '../../../UIComponents'
 
 module.exports = class LayeredChartDesignerComponent extends React.Component
   @propTypes: 
-    design: React.PropTypes.object.isRequired
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func.isRequired
-    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+    design: PropTypes.object.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    onDesignChange: PropTypes.func.isRequired
+    filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   # Determine if axes labels needed
   areAxesLabelsNeeded: (layer) ->

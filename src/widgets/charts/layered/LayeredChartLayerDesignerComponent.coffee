@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -5,6 +6,7 @@ AxisComponent = require '../../../axes/AxisComponent'
 AxisBuilder = require '../../../axes/AxisBuilder'
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
+ExprCompiler = require('mwater-expressions').ExprCompiler
 ColorComponent = require '../../../ColorComponent'
 LayeredChartUtils = require './LayeredChartUtils'
 LayeredChartCompiler = require './LayeredChartCompiler'
@@ -13,13 +15,13 @@ TableSelectComponent = require '../../../TableSelectComponent'
 
 module.exports = class LayeredChartLayerDesignerComponent extends React.Component
   @propTypes: 
-    design: React.PropTypes.object.isRequired
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    index: React.PropTypes.number.isRequired
-    onChange: React.PropTypes.func.isRequired
-    onRemove: React.PropTypes.func.isRequired
-    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+    design: PropTypes.object.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    index: PropTypes.number.isRequired
+    onChange: PropTypes.func.isRequired
+    onRemove: PropTypes.func.isRequired
+    filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   isLayerPolar: (layer) ->
     return (layer.type or @props.design.type) in ['pie', 'donut']
@@ -138,6 +140,14 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
 
     title = @getXAxisLabel(layer)
 
+    filters = _.clone(@props.filters) or []
+    if layer.filter?
+      exprCompiler = new ExprCompiler(@props.schema)  
+      jsonql = exprCompiler.compileExpr(expr: layer.filter, tableAlias: "{alias}")
+
+      if jsonql
+        filters.push({ table: layer.filter.table, jsonql: jsonql })
+
     R ui.SectionComponent, label: title,
       R(AxisComponent, 
         schema: @props.schema
@@ -148,7 +158,7 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
         required: true
         value: layer.axes.x, 
         onChange: @handleXAxisChange
-        filters: @props.filters
+        filters: filters
         # Categorical X can exclude values
         allowExcludedValues: new LayeredChartCompiler(schema: @props.schema).isCategoricalX(@props.design)
         )

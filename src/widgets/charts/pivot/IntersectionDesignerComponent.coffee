@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -15,12 +16,12 @@ ExprComponent = require("mwater-expressions-ui").ExprComponent
 # Design an intersection of a pivot table
 module.exports = class IntersectionDesignerComponent extends React.Component
   @propTypes: 
-    intersection: React.PropTypes.object.isRequired
-    table: React.PropTypes.string.isRequired
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    onChange: React.PropTypes.func.isRequired
-    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+    intersection: PropTypes.object.isRequired
+    table: PropTypes.string.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    onChange: PropTypes.func.isRequired
+    filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   # Updates intersection with the specified changes
   update: => update(@props.intersection, @props.onChange, arguments)
@@ -149,11 +150,11 @@ module.exports = class IntersectionDesignerComponent extends React.Component
 # Displays background color conditions
 class BackgroundColorConditionsComponent extends React.Component
   @propTypes: 
-    colorConditions: React.PropTypes.array
-    table: React.PropTypes.string.isRequired
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    onChange: React.PropTypes.func.isRequired
+    colorConditions: PropTypes.array
+    table: PropTypes.string.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    onChange: PropTypes.func.isRequired
 
   handleAdd: =>
     colorConditions = (@props.colorConditions or []).slice()
@@ -192,11 +193,11 @@ class BackgroundColorConditionsComponent extends React.Component
 # Displays single background color condition
 class BackgroundColorConditionComponent extends React.Component
   @propTypes: 
-    colorCondition: React.PropTypes.object.isRequired
-    table: React.PropTypes.string.isRequired
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    onChange: React.PropTypes.func.isRequired
+    colorCondition: PropTypes.object.isRequired
+    table: PropTypes.string.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    onChange: PropTypes.func.isRequired
 
   # Updates intersection with the specified changes
   update: => update(@props.colorCondition, @props.onChange, arguments)

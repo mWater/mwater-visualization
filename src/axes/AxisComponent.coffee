@@ -55,7 +55,9 @@ module.exports = class AxisComponent extends AsyncLoadComponent
     }
 
   isLoadNeeded: (newProps, oldProps) ->
-    return not _.isEqual(_.omit(newProps.value, ["colorMap", "drawOrder"]), _.omit(oldProps.value, ["colorMap", "drawOrder"]))
+    hasColorChanged = not _.isEqual(_.omit(newProps.value, ["colorMap", "drawOrder"]), _.omit(oldProps.value, ["colorMap", "drawOrder"]))
+    filtersChanged = not _.isEqual(newProps.filters, oldProps.filters)
+    return hasColorChanged or filtersChanged
 
   # Asynchronously get the categories of the axis, which requires a query when the field is a text field or other non-enum type
   load: (props, prevProps, callback) ->
@@ -110,7 +112,7 @@ module.exports = class AxisComponent extends AsyncLoadComponent
     props.dataSource.performQuery(valuesQuery, (error, rows) =>
       if error
         return # Ignore errors
-
+      
       # Get categories (value + label)
       categories = axisBuilder.getCategories(axis, _.pluck(rows, "val"))
       callback({ categories: categories })
@@ -242,7 +244,7 @@ module.exports = class AxisComponent extends AsyncLoadComponent
       return null
 
     # Use categories
-    if not @state.categories or @state.categories.length <= 1
+    if not @state.categories or @state.categories.length < 1
       return null
 
     return [

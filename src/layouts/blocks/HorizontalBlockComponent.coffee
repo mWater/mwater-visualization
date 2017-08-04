@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -7,11 +8,11 @@ DraggableBlockComponent = require "./DraggableBlockComponent"
 
 module.exports = class HorizontalBlockComponent extends React.Component
   @propTypes:
-    block: React.PropTypes.object.isRequired
-    renderBlock: React.PropTypes.func.isRequired
-    onBlockDrop: React.PropTypes.func   # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
-    onBlockRemove: React.PropTypes.func # Called with (block) when block is removed
-    onBlockUpdate: React.PropTypes.func # Called with (block) when block is updated
+    block: PropTypes.object.isRequired
+    renderBlock: PropTypes.func.isRequired
+    onBlockDrop: PropTypes.func   # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
+    onBlockRemove: PropTypes.func # Called with (block) when block is removed
+    onBlockUpdate: PropTypes.func # Called with (block) when block is updated
 
   constructor: ->
     super

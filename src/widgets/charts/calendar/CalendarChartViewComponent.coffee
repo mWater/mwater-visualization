@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -12,23 +13,23 @@ d3Tip = require('d3-tip')
 # creates a d3 calendar visualization
 module.exports = class CalendarChartViewComponent extends React.Component
   @propTypes:
-    design: React.PropTypes.object.isRequired # Design of chart
-    data: React.PropTypes.array.isRequired # Data that the chart has requested. In format [{ date: <YYYY-MM-DD>, value: <number value> }, { date: ... }...]
+    design: PropTypes.object.isRequired # Design of chart
+    data: PropTypes.array.isRequired # Data that the chart has requested. In format [{ date: <YYYY-MM-DD>, value: <number value> }, { date: ... }...]
 
-    width: React.PropTypes.number
-    height: React.PropTypes.number
-    standardWidth: React.PropTypes.number
+    width: PropTypes.number
+    height: PropTypes.number
+    standardWidth: PropTypes.number
 
-    scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
-    onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+    scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
+    onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
-    monthsStrokeColor: React.PropTypes.string
-    monthsStrokeWidth: React.PropTypes.number
+    monthsStrokeColor: PropTypes.string
+    monthsStrokeWidth: PropTypes.number
 
-    cellColor: React.PropTypes.string #the day cell color
-    cellStrokeColor: React.PropTypes.string #the day cell stroke color
+    cellColor: PropTypes.string #the day cell color
+    cellStrokeColor: PropTypes.string #the day cell stroke color
 
-    highlightCellFillColor: React.PropTypes.string #the fill color for highlighted cell
+    highlightCellFillColor: PropTypes.string #the fill color for highlighted cell
 
   constructor: (options) ->
     @schema = options.schema
@@ -41,7 +42,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
     highlightCellFillColor: "#000000"
 
   @contextTypes:
-    locale: React.PropTypes.string  # e.g. "en"
+    locale: PropTypes.string  # e.g. "en"
 
   shouldComponentUpdate: (prevProps) ->
     not _.isEqual(prevProps, @props)

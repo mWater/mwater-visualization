@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 ReactDOM = require 'react-dom'
 _ = require 'lodash'
@@ -11,8 +12,8 @@ DecoratedBlockComponent = require '../DecoratedBlockComponent'
 # to child element
 class LayoutComponent extends React.Component
   @propTypes:
-    dragInfo: React.PropTypes.object.isRequired  # Opaque information to be used when a block is dragged
-    canDrag: React.PropTypes.bool.isRequired     # True if draggable
+    dragInfo: PropTypes.object.isRequired  # Opaque information to be used when a block is dragged
+    canDrag: PropTypes.bool.isRequired     # True if draggable
 
   render: ->
     if @props.canDrag
@@ -50,13 +51,13 @@ MoveResizeLayoutComponent = DragSource("block-resize", resizeSpec, resizeCollect
 # Container contains layouts to layout. It renders widgets at the correct location.
 class Container extends React.Component
   @propTypes:
-    layoutEngine: React.PropTypes.object.isRequired
-    items: React.PropTypes.object.isRequired # Lookup of id -> { widget:, layout: }
-    onItemsChange: React.PropTypes.func # Called with lookup of id -> { widget:, layout: }
-    renderWidget: React.PropTypes.func.isRequired # Renders a widget
-    width: React.PropTypes.number.isRequired # width in pixels
-    standardWidth: React.PropTypes.number.isRequired # width in pixels of a standard container that all other widths should scale to look like. Usually 1440
-    connectDropTarget: React.PropTypes.func.isRequired # Injected by react-dnd wrapper
+    layoutEngine: PropTypes.object.isRequired
+    items: PropTypes.object.isRequired # Lookup of id -> { widget:, layout: }
+    onItemsChange: PropTypes.func # Called with lookup of id -> { widget:, layout: }
+    renderWidget: PropTypes.func.isRequired # Renders a widget
+    width: PropTypes.number.isRequired # width in pixels
+    standardWidth: PropTypes.number.isRequired # width in pixels of a standard container that all other widths should scale to look like. Usually 1440
+    connectDropTarget: PropTypes.func.isRequired # Injected by react-dnd wrapper
 
   constructor: (props) ->
     super

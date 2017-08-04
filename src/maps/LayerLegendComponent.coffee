@@ -6,6 +6,7 @@ R = React.createElement
 AxisBuilder = require '../axes/AxisBuilder'
 LegendGroup = require('./LegendGroup')
 ExprUtils = require('mwater-expressions').ExprUtils
+injectTableAlias = require('mwater-expressions').injectTableAlias
 
 # wraps the legends for a layer
 module.exports = class LayerLegendComponent extends React.Component
@@ -16,6 +17,7 @@ module.exports = class LayerLegendComponent extends React.Component
     axis: PropTypes.object
     symbol: PropTypes.string
     defaultColor: PropTypes.string
+    filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   @defaultProps:
     radiusLayer: false
@@ -30,7 +32,8 @@ module.exports = class LayerLegendComponent extends React.Component
     @loadCategories(@props)
 
   componentWillReceiveProps: (nextProps) ->
-    if not _.isEqual(nextProps.axis, @props.axis)
+    if not _.isEqual(nextProps.axis, @props.axis) or not _.isEqual(nextProps.filters, @props.filters)
+      console.log "reloading categories"
       @loadCategories(nextProps)
 
   componentWillUnmount: ->
@@ -43,10 +46,52 @@ module.exports = class LayerLegendComponent extends React.Component
       return
 
     # Get categories (value + label)
-    categories = axisBuilder.getCategories(props.axis, _.pluck(props.axis.colorMap, "value"))
-    if categories.length > 1
-      @setState(categories: categories)
+    categories = axisBuilder.getCategories(props.axis)
+    
+    # Just "None" and so doesn't count
+    if _.any(categories, (category) -> category.value?)
+      @setState({ categories: categories })
       return
+
+    # Can't get values of aggregate axis
+    if axisBuilder.isAxisAggr(props.axis)
+      @setState({ categories: [] })
+      return
+
+    # If no table, cannot query
+    if not props.axis.expr.table
+      @setState({ categories: [] })
+      return
+
+    # If no categories, we need values as input
+    valuesQuery = {
+      type: "query"
+      selects: [
+        { type: "select", expr: axisBuilder.compileAxis(axis: props.axis, tableAlias: "main"), alias: "val" }
+      ]
+      from: { type: "table", table: props.axis.expr.table, alias: "main" }
+      groupBy: [1]
+      limit: 50
+    }
+
+    filters = _.where(props.filters or [], table: props.axis.expr.table)
+    whereClauses = _.map(filters, (f) -> injectTableAlias(f.jsonql, "main"))
+    whereClauses = _.compact(whereClauses)
+
+    # Wrap if multiple
+    if whereClauses.length > 1
+      valuesQuery.where = { type: "op", op: "and", exprs: whereClauses }
+    else
+      valuesQuery.where = whereClauses[0]
+
+    props.dataSource.performQuery(valuesQuery, (error, rows) =>
+      if error
+        return # Ignore errors
+
+      # Get categories (value + label)
+      categories = axisBuilder.getCategories(props.axis, _.pluck(rows, "val"))   
+      @setState({ categories: categories })
+    )
 
   render: ->
     if @props.axis and @props.axis.colorMap

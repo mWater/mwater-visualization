@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -70,31 +71,31 @@ module.exports = class ChartWidget extends Widget
 # Complete chart widget
 class ChartWidgetComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired # schema to use
-    dataSource: React.PropTypes.object.isRequired # data source to use
-    widgetDataSource: React.PropTypes.object.isRequired
+    schema: PropTypes.object.isRequired # schema to use
+    dataSource: PropTypes.object.isRequired # data source to use
+    widgetDataSource: PropTypes.object.isRequired
 
-    chart: React.PropTypes.object.isRequired # Chart object to use
+    chart: PropTypes.object.isRequired # Chart object to use
 
-    design: React.PropTypes.object.isRequired # Design of chart
-    onDesignChange: React.PropTypes.func # null/undefined for readonly
-    dataSource: React.PropTypes.object.isRequired # Data source to use for chart
+    design: PropTypes.object.isRequired # Design of chart
+    onDesignChange: PropTypes.func # null/undefined for readonly
+    dataSource: PropTypes.object.isRequired # Data source to use for chart
 
-    width: React.PropTypes.number
-    height: React.PropTypes.number
-    standardWidth: React.PropTypes.number   # Standard width to allow widget to scale properly to retain same appearance
+    width: PropTypes.number
+    height: PropTypes.number
+    standardWidth: PropTypes.number   # Standard width to allow widget to scale properly to retain same appearance
 
-    scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
-    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
-    onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+    scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
+    filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+    onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
-    onRowClick: React.PropTypes.func     # Called with (tableId, rowId) when item is clicked
+    onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
 
-    connectMoveHandle: React.PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent) TODO REMOVE
-    connectResizeHandle: React.PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent) TODO REMOVE
+    connectMoveHandle: PropTypes.func # Connects move handle for dragging (see WidgetContainerComponent) TODO REMOVE
+    connectResizeHandle: PropTypes.func # Connects resize handle for dragging (see WidgetContainerComponent) TODO REMOVE
 
   @contextTypes:
-    locale: React.PropTypes.string  # e.g. "en"
+    locale: PropTypes.string  # e.g. "en"
 
   constructor: (props) ->
     super
@@ -162,7 +163,7 @@ class ChartWidgetComponent extends React.Component
   renderEditor: ->
     if not @state.editDesign
       return null
-
+    
     # Create editor
     editor = @props.chart.createDesignerElement(schema: @props.schema, filters: @props.filters, dataSource: @props.dataSource, design: @state.editDesign, onDesignChange: @handleEditDesignChange)
 

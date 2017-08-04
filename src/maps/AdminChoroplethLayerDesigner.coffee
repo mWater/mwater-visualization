@@ -6,6 +6,7 @@ R = React.createElement
 
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprComponent = require("mwater-expressions-ui").ExprComponent
+ExprCompiler = require('mwater-expressions').ExprCompiler
 ExprUtils = require('mwater-expressions').ExprUtils
 AxisComponent = require './../axes/AxisComponent'
 TableSelectComponent = require '../TableSelectComponent'
@@ -99,6 +100,14 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
   renderColor: ->
     if not @props.design.table
       return
+    
+    filters = _.clone(@props.filters) or []
+
+    if @props.design.filter?
+      exprCompiler = new ExprCompiler(@props.schema)
+      jsonql = exprCompiler.compileExpr(expr: @props.design.filter, tableAlias: "{alias}")
+      if jsonql
+        filters.push({ table: @props.design.filter.table, jsonql: jsonql })
 
     return H.div null,
       if not @props.design.axes.color
@@ -128,7 +137,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
           showColorMap: true
           onChange: @handleColorAxisChange
           allowExcludedValues: true
-          filters: @props.filters
+          filters: filters
 
   # renderLabelAxis: ->
   #   if not @props.design.table

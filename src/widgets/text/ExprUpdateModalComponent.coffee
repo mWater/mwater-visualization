@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -12,9 +13,9 @@ ExprItemEditorComponent = require './ExprItemEditorComponent'
 # Modal that displays an expression builder for updating an expression
 module.exports = class ExprUpdateModalComponent extends React.Component
   @propTypes:
-    schema: React.PropTypes.object.isRequired   # Schema to use
-    dataSource: React.PropTypes.object.isRequired # Data source to use to get values
-    singleRowTable: React.PropTypes.string  # Table that is filtered to have one row
+    schema: PropTypes.object.isRequired   # Schema to use
+    dataSource: PropTypes.object.isRequired # Data source to use to get values
+    singleRowTable: PropTypes.string  # Table that is filtered to have one row
 
   constructor: ->
     super

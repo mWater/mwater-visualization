@@ -5,6 +5,7 @@ H = React.DOM
 R = React.createElement
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
+ExprCompiler = require('mwater-expressions').ExprCompiler
 AxisComponent = require './../axes/AxisComponent'
 ColorComponent = require '../ColorComponent'
 TableSelectComponent = require '../TableSelectComponent'
@@ -56,10 +57,18 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
       H.span className: "glyphicon glyphicon-map-marker"
       " Marker Position"
 
+    filters = _.clone(@props.filters) or []
+
+    if @props.design.filter?
+      exprCompiler = new ExprCompiler(@props.schema)
+      jsonql = exprCompiler.compileExpr(expr: @props.design.filter, tableAlias: "{alias}")
+      if jsonql
+        filters.push({ table: @props.design.filter.table, jsonql: jsonql })
+
     H.div className: "form-group",
       H.label className: "text-muted", title
       H.div style: { marginLeft: 10 }, 
-        R(AxisComponent, 
+        R AxisComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
           table: @props.design.table
@@ -67,11 +76,19 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
           aggrNeed: "none"
           value: @props.design.axes.geometry
           onChange: @handleGeometryAxisChange
-          filters: @props.filters)
+          filters: filters
 
   renderColor: ->
     if not @props.design.axes.geometry
       return
+    
+    filters = _.clone(@props.filters) or []
+
+    if @props.design.filter?
+      exprCompiler = new ExprCompiler(@props.schema)
+      jsonql = exprCompiler.compileExpr(expr: @props.design.filter, tableAlias: "{alias}")
+      if jsonql
+        filters.push({ table: @props.design.filter.table, jsonql: jsonql })
 
     return H.div null,
       if not @props.design.axes.color
@@ -101,7 +118,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
           showColorMap: true
           onChange: @handleColorAxisChange
           allowExcludedValues: true
-          filters: @props.filters
+          filters: filters
 
   renderSymbol: ->
     if not @props.design.axes.geometry
