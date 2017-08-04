@@ -60,14 +60,15 @@ module.exports = class LabeledExprGenerator
 
       # Skip deprecated
       if column.deprecated
-        continue
+        return []
 
+      # Skip redacted if confidential on
       if column.redacted and options.useConfidential
-        continue
+        return []
 
       # Skip confidential data
       if column.confidential and not options.useConfidential
-        continue
+        return []
         
       if column.type == "join"
         # If n-1, 1-1 join, create scalar
