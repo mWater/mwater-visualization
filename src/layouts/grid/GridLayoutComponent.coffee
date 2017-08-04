@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -8,11 +9,11 @@ LegoLayoutEngine = require './LegoLayoutEngine'
 
 module.exports = class GridLayoutComponent extends React.Component
   @propTypes:
-    width: React.PropTypes.number.isRequired
-    standardWidth: React.PropTypes.number.isRequired  # TODO needed?
-    items: React.PropTypes.any
-    onItemsChange: React.PropTypes.func
-    renderWidget: React.PropTypes.func.isRequired
+    width: PropTypes.number.isRequired
+    standardWidth: PropTypes.number.isRequired  # TODO needed?
+    items: PropTypes.any
+    onItemsChange: PropTypes.func
+    renderWidget: PropTypes.func.isRequired
 
   renderPageBreaks: (layoutEngine, layouts) ->
     # Get height

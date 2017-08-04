@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -7,9 +8,9 @@ DragSourceComponent = require('../DragSourceComponent')("block")
 # Item in a palette that can be dragged to add a widget or other item
 module.exports = class PaletteItemComponent extends React.Component
   @propTypes:
-    createItem: React.PropTypes.func.isRequired   # Create the drag item
-    title: React.PropTypes.any
-    subtitle: React.PropTypes.any
+    createItem: PropTypes.func.isRequired   # Create the drag item
+    title: PropTypes.any
+    subtitle: PropTypes.any
 
   render: ->
     R DragSourceComponent, 

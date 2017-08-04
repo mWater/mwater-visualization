@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -10,11 +11,11 @@ ExprComponent = require("mwater-expressions-ui").ExprComponent
 # NOTE: no longer uses complete axis, just the expr
 module.exports = class OrderingsComponent extends React.Component
   @propTypes: 
-    orderings: React.PropTypes.array.isRequired
-    onOrderingsChange: React.PropTypes.func.isRequired
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    table: React.PropTypes.string # Current table
+    orderings: PropTypes.array.isRequired
+    onOrderingsChange: PropTypes.func.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    table: PropTypes.string # Current table
 
   handleAdd: =>
     orderings = @props.orderings.slice()
@@ -48,12 +49,12 @@ module.exports = class OrderingsComponent extends React.Component
 
 class OrderingComponent extends React.Component
   @propTypes: 
-    ordering: React.PropTypes.object.isRequired
-    onOrderingChange: React.PropTypes.func.isRequired
-    onOrderingRemove: React.PropTypes.func.isRequired
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    table: React.PropTypes.string # Current table
+    ordering: PropTypes.object.isRequired
+    onOrderingChange: PropTypes.func.isRequired
+    onOrderingRemove: PropTypes.func.isRequired
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    table: PropTypes.string # Current table
 
   handleAxisChange: (axis) =>
     @props.onOrderingChange(_.extend({}, @props.ordering, axis: axis))

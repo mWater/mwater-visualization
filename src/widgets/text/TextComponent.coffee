@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
 R = React.createElement
@@ -13,19 +14,19 @@ ExprItemsHtmlConverter = require '../../richtext/ExprItemsHtmlConverter'
 # Used by TextWidgetComponent and also by other components that embed text fields
 module.exports = class TextComponent extends React.Component
   @propTypes: 
-    design: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func # Called with new design. null/undefined for readonly
+    design: PropTypes.object.isRequired
+    onDesignChange: PropTypes.func # Called with new design. null/undefined for readonly
     
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired # Data source to use for chart
-    exprValues: React.PropTypes.object.isRequired # Expression values
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired # Data source to use for chart
+    exprValues: PropTypes.object.isRequired # Expression values
 
-    width: React.PropTypes.number
-    height: React.PropTypes.number
-    standardWidth: React.PropTypes.number
+    width: PropTypes.number
+    height: PropTypes.number
+    standardWidth: PropTypes.number
 
-    singleRowTable: React.PropTypes.string  # Table that is filtered to have one row
-    namedStrings: React.PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+    singleRowTable: PropTypes.string  # Table that is filtered to have one row
+    namedStrings: PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
   createItemsHtmlConverter: ->
     return new ExprItemsHtmlConverter(

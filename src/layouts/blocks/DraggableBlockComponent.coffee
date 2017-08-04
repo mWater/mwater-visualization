@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 React = require 'react'
 ReactDOM = require 'react-dom'
 H = React.DOM
@@ -9,20 +10,20 @@ DropTarget = require('react-dnd').DropTarget
 # Block which can be dragged around in block layout.
 class DraggableBlockComponent extends React.Component
   @propTypes:
-    block: React.PropTypes.object.isRequired # Block to display
+    block: PropTypes.object.isRequired # Block to display
 
-    onBlockDrop: React.PropTypes.func.isRequired # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
-    style: React.PropTypes.object # Merge in style
+    onBlockDrop: PropTypes.func.isRequired # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
+    style: PropTypes.object # Merge in style
 
-    onlyBottom: React.PropTypes.bool # True to only allow dropping at bottom (root block)
+    onlyBottom: PropTypes.bool # True to only allow dropping at bottom (root block)
 
     # Injected by React-dnd
-    isDragging: React.PropTypes.bool.isRequired # internally used for tracking if an item is being dragged
-    isOver: React.PropTypes.bool.isRequired # internally used to check if an item is over the current component
+    isDragging: PropTypes.bool.isRequired # internally used for tracking if an item is being dragged
+    isOver: PropTypes.bool.isRequired # internally used to check if an item is over the current component
 
-    connectDragSource: React.PropTypes.func.isRequired # the drag source connector, supplied by React DND
-    connectDropTarget: React.PropTypes.func.isRequired # the drop target connector, supplied by React DND
-    connectDragPreview: React.PropTypes.func.isRequired # the drag preview connector, supplied by React DND
+    connectDragSource: PropTypes.func.isRequired # the drag source connector, supplied by React DND
+    connectDropTarget: PropTypes.func.isRequired # the drop target connector, supplied by React DND
+    connectDragPreview: PropTypes.func.isRequired # the drag preview connector, supplied by React DND
 
   constructor: (props) ->
     super(props)

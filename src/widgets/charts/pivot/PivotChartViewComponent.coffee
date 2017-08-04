@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 ReactDOM = require 'react-dom'
@@ -17,21 +18,21 @@ IntersectionDesignerComponent = require './IntersectionDesignerComponent'
 # Displays a pivot chart
 module.exports = class PivotChartViewComponent extends React.Component
   @propTypes: 
-    schema: React.PropTypes.object.isRequired
-    dataSource: React.PropTypes.object.isRequired
-    design: React.PropTypes.object.isRequired
-    data: React.PropTypes.object.isRequired
-    onDesignChange: React.PropTypes.func
+    schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
+    design: PropTypes.object.isRequired
+    data: PropTypes.object.isRequired
+    onDesignChange: PropTypes.func
 
-    width: React.PropTypes.number.isRequired
-    standardWidth: React.PropTypes.number  # Deprecated
+    width: PropTypes.number.isRequired
+    standardWidth: PropTypes.number  # Deprecated
 
-    scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
-    onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
-    filters: React.PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+    scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
+    onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+    filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   @contextTypes:
-    locale: React.PropTypes.string  # e.g. "en"
+    locale: PropTypes.string  # e.g. "en"
 
   constructor: ->
     super

@@ -1,3 +1,4 @@
+PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
@@ -10,16 +11,16 @@ RotationAwareImageComponent = require("mwater-forms/lib/RotationAwareImageCompon
 # creates a d3 calendar visualization
 module.exports = class ImageMosaicChartViewComponent extends React.Component
   @propTypes:
-    design: React.PropTypes.object.isRequired # Design of chart
-    data: React.PropTypes.array.isRequired # Data that the chart has requested. In format  [image: {image data or imagelist data}]
-    dataSource: React.PropTypes.object.isRequired # Data source to use
+    design: PropTypes.object.isRequired # Design of chart
+    data: PropTypes.array.isRequired # Data that the chart has requested. In format  [image: {image data or imagelist data}]
+    dataSource: PropTypes.object.isRequired # Data source to use
 
-    width: React.PropTypes.number
-    height: React.PropTypes.number
-    standardWidth: React.PropTypes.number
+    width: PropTypes.number
+    height: PropTypes.number
+    standardWidth: PropTypes.number
 
-    scope: React.PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
-    onScopeChange: React.PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+    scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
+    onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
   shouldComponentUpdate: (prevProps) ->
     not _.isEqual(prevProps, @props)

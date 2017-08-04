@@ -13,6 +13,7 @@ MapFiltersDesignerComponent = require './MapFiltersDesignerComponent'
 BaseLayerDesignerComponent = require './BaseLayerDesignerComponent'
 PopoverHelpComponent = require 'react-library/lib/PopoverHelpComponent'
 MapUtils = require './MapUtils'
+ExprCompiler = require('mwater-expressions').ExprCompiler
 
 module.exports = class MapDesignerComponent extends React.Component
   @propTypes:
@@ -67,6 +68,14 @@ module.exports = class MapDesignerComponent extends React.Component
         onDesignChange: @props.onDesignChange
 
   render: ->
+    filters = _.clone(@props.filters) or []
+    exprCompiler = new ExprCompiler(@props.schema)
+
+    for table, expr of (@props.design.filters or {})
+      jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
+      if jsonql
+        filters.push({ table: table, jsonql: jsonql })
+
     H.div style: { padding: 5 },
       R TabbedComponent,
         initialTabId: "layers"
@@ -80,7 +89,7 @@ module.exports = class MapDesignerComponent extends React.Component
               design: @props.design
               onDesignChange: @props.onDesignChange
               allowEditingLayers: true
-              filters: @props.filters
+              filters: _.compact(filters)
           }
           {
             id: "filters"

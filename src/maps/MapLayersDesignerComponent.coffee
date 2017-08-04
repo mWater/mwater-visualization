@@ -8,6 +8,7 @@ LayerFactory = require './LayerFactory'
 AddLayerComponent = require './AddLayerComponent'
 MapLayerViewDesignerComponent = require './MapLayerViewDesignerComponent'
 ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
+ExprCompiler = require('mwater-expressions').ExprCompiler
 
 # Designer for layer selection in the map
 module.exports = class MapLayersDesignerComponent extends React.Component
@@ -52,7 +53,15 @@ module.exports = class MapLayersDesignerComponent extends React.Component
       border: "1px solid #ddd"
       marginBottom: -1
       backgroundColor: "#fff"
-
+    
+    filters = _.clone(@props.filters) or []
+    
+    if layerView.design.filter?
+      exprCompiler = new ExprCompiler(@props.schema)
+      jsonql = exprCompiler.compileExpr(expr: layerView.design.filter, tableAlias: "{alias}")
+      if jsonql
+        filters.push({ table: layerView.design.filter.table, jsonql: jsonql })
+    
     H.div style: style, 
       React.createElement(MapLayerViewDesignerComponent, 
         schema: @props.schema
@@ -64,7 +73,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
         connectDragPreview: connectDragPreview
         connectDropTarget: connectDropTarget
         allowEditingLayer: @props.allowEditingLayers
-        filters: @props.filters
+        filters: _.compact(filters)
       )
 
   render: ->
