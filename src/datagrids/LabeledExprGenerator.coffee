@@ -58,6 +58,17 @@ module.exports = class LabeledExprGenerator
       if options.columnFilter and not options.columnFilter(table, column)
         return []
 
+      # Skip deprecated
+      if column.deprecated
+        continue
+
+      if column.redacted and options.useConfidential
+        continue
+
+      # Skip confidential data
+      if column.confidential and not options.useConfidential
+        continue
+        
       if column.type == "join"
         # If n-1, 1-1 join, create scalar
         if column.join.type in ["n-1", "1-1"]
@@ -121,17 +132,6 @@ module.exports = class LabeledExprGenerator
     # For each column in form
     labeledExprs = []
     for column in @schema.getColumns(table)
-      # Skip deprecated
-      if column.deprecated
-        continue
-
-      if column.redacted and options.useConfidential
-        continue
-
-      # Skip confidential data
-      if column.confidential and not options.useConfidential
-        continue
-        
       # Convert column into labels and exprs
       labeledExprs = labeledExprs.concat(convertColumn(table, column, []))
 
