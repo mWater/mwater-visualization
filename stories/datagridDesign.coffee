@@ -1,8 +1,6 @@
 module.exports = {
     "table": "entities.water_point",
-    "options": {
-        "showRowNumbers": true
-    },
+    "showRowNumbers": true,
     "columns": [
         {
             "id": "31e3afda-35bd-488a-902d-34a301873d52",

@@ -9,6 +9,7 @@
 `subtables`: array of subtables (1-n joins)
 `orderBys`: array of { expr: expression to order on, direction: "asc"/"desc" }
 `quickfilters`: array of quick filters (user-selectable filters). See quickfilters/README.md
+`showRowNumbers`: true to show row numbers
 
 ### Column
 

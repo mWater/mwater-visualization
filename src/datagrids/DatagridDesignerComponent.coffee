@@ -101,8 +101,8 @@ module.exports = class DatagridDesignerComponent extends React.Component
           label: "Options"
           elem: H.div style: { marginBottom: 200 },
             R DatagridOptionsComponent, {
-              options: @props.design.options or {}
-              onOptionChange: (options) => @props.onDesignChange(update(@props.design, { options: { $set: options } }))
+              design: @props.design
+              onDesignChange: @props.onDesignChange
             }
         }
       ]
@@ -121,19 +121,15 @@ module.exports = class DatagridDesignerComponent extends React.Component
 # Datagrid Options
 class DatagridOptionsComponent extends React.Component
   @propTypes:
-    options: PropTypes.object.isRequired     # Datagrid options list See README.md of this folder
-    onOptionChange: PropTypes.func.isRequired # Called when option changes
+    design: PropTypes.object.isRequired       # Datagrid design. See README.md
+    onDesignChange: PropTypes.func.isRequired # Called when design changes
     
   render: ->
-    H.div style: { height: "auto",overflowY: "auto",  overflowX: "hidden" },
-      H.div className: "form-group",
-        H.label className: "col-sm-2 control-label", key: "label", "Datagrid options"
-        H.div key: "contents", style: { marginLeft: 5 }, 
-          H.div className: "col-sm-10",
-              H.div key: "row_number",
-                R ui.Checkbox, inline: true, value: @props.options.showRowNumbers, onChange: ((showRowNumbers) => @props.onOptionChange(update(@props.options, { showRowNumbers: { $set: showRowNumbers } })) ),
-                  H.span(className: "text-muted", R(ui.Icon, id: "glyphicon-number"))
-                  " Show row number"
+    R ui.FormGroup, label: "Display Options",
+      R ui.Checkbox, 
+        value: @props.design.showRowNumbers
+        onChange: ((showRowNumbers) => @props.onDesignChange(update(@props.design, { showRowNumbers: { $set: showRowNumbers } }))),
+          "Show row numbers"
 
 # Columns list
 class ColumnsDesignerComponent extends React.Component

@@ -229,6 +229,7 @@ module.exports = class DatagridViewComponent extends React.Component
       return R Cell, cellProps,
         H.i className: "fa fa-spinner fa-spin"
 
+    # Special case for row number
     if columnIndex == -1
       return R Cell, 
         width: cellProps.width
@@ -297,10 +298,10 @@ module.exports = class DatagridViewComponent extends React.Component
   renderColumns: ->
     columns = _.map(@props.design.columns, (column, columnIndex) => @renderColumn(column, columnIndex))    
 
-    if @props.design.options.showRowNumbers
+    if @props.design.showRowNumbers
       columns.unshift(
         @renderColumn({
-          label: "S.n."
+          label: "#"
           width: 50
         }, -1)
       )
