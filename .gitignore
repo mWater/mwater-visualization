@@ -1,5 +1,6 @@
 node_modules
 bower_components
 .idea/
+.editorconfig
 dist/
 /deploy_dev_water_org.sh

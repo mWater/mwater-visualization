@@ -17,6 +17,7 @@ TableSelectComponent = require('../TableSelectComponent')
 
 uuid = require 'uuid'
 update = require 'update-object'
+ui = require 'react-library/lib/bootstrap'
 
 # Designer for the datagrid. Currenly allows only single-table designs (no subtable rows)
 module.exports = class DatagridDesignerComponent extends React.Component
@@ -95,6 +96,15 @@ module.exports = class DatagridDesignerComponent extends React.Component
               dataSource: @props.dataSource
             }
         }
+        {
+          id: "options"
+          label: "Options"
+          elem: H.div style: { marginBottom: 200 },
+            R DatagridOptionsComponent, {
+              design: @props.design
+              onDesignChange: @props.onDesignChange
+            }
+        }
       ]
 
   render: ->
@@ -108,6 +118,18 @@ module.exports = class DatagridDesignerComponent extends React.Component
       if @props.design.table
         @renderTabs()
 
+# Datagrid Options
+class DatagridOptionsComponent extends React.Component
+  @propTypes:
+    design: PropTypes.object.isRequired       # Datagrid design. See README.md
+    onDesignChange: PropTypes.func.isRequired # Called when design changes
+    
+  render: ->
+    R ui.FormGroup, label: "Display Options",
+      R ui.Checkbox, 
+        value: @props.design.showRowNumbers
+        onChange: ((showRowNumbers) => @props.onDesignChange(update(@props.design, { showRowNumbers: { $set: showRowNumbers } }))),
+          "Show row numbers"
 
 # Columns list
 class ColumnsDesignerComponent extends React.Component

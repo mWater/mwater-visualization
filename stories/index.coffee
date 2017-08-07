@@ -7,6 +7,7 @@ action = require('@kadira/storybook').action
 
 require './dashboards'
 require './pivotChart'
-require './consoles'
+# require './consoles'
 require './maps'
 require './leaflet'
+require './datagrids'
