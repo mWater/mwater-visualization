@@ -17,6 +17,7 @@ TableSelectComponent = require('../TableSelectComponent')
 
 uuid = require 'uuid'
 update = require 'update-object'
+ui = require 'react-library/lib/bootstrap'
 
 # Designer for the datagrid. Currenly allows only single-table designs (no subtable rows)
 module.exports = class DatagridDesignerComponent extends React.Component
@@ -95,6 +96,15 @@ module.exports = class DatagridDesignerComponent extends React.Component
               dataSource: @props.dataSource
             }
         }
+        {
+          id: "options"
+          label: "Options"
+          elem: H.div style: { marginBottom: 200 },
+            R DatagridOptionsComponent, {
+              options: @props.design.options or {}
+              onOptionChange: (options) => @props.onDesignChange(update(@props.design, { options: { $set: options } }))
+            }
+        }
       ]
 
   render: ->
@@ -108,6 +118,22 @@ module.exports = class DatagridDesignerComponent extends React.Component
       if @props.design.table
         @renderTabs()
 
+# Datagrid Options
+class DatagridOptionsComponent extends React.Component
+  @propTypes:
+    options: PropTypes.object.isRequired     # Datagrid options list See README.md of this folder
+    onOptionChange: PropTypes.func.isRequired # Called when option changes
+    
+  render: ->
+    H.div style: { height: "auto",overflowY: "auto",  overflowX: "hidden" },
+      H.div className: "form-group",
+        H.label className: "col-sm-2 control-label", key: "label", "Datagrid options"
+        H.div key: "contents", style: { marginLeft: 5 }, 
+          H.div className: "col-sm-10",
+              H.div key: "row_number",
+                R ui.Checkbox, inline: true, value: @props.options.showRowNumbers, onChange: ((showRowNumbers) => @props.onOptionChange(update(@props.options, { showRowNumbers: { $set: showRowNumbers } })) ),
+                  H.span(className: "text-muted", R(ui.Icon, id: "glyphicon-number"))
+                  " Show row number"
 
 # Columns list
 class ColumnsDesignerComponent extends React.Component

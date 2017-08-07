@@ -229,6 +229,16 @@ module.exports = class DatagridViewComponent extends React.Component
       return R Cell, cellProps,
         H.i className: "fa fa-spinner fa-spin"
 
+    if columnIndex == -1
+      return R Cell, 
+        width: cellProps.width
+        height: cellProps.height
+        style: { 
+          whiteSpace: "nowrap" 
+          textAlign: "right"
+        }, 
+          cellProps.rowIndex + 1
+
     # Get value (columns are c0, c1, c2, etc.)
     value = @state.rows[cellProps.rowIndex]["c#{columnIndex}"]
 
@@ -285,7 +295,17 @@ module.exports = class DatagridViewComponent extends React.Component
 
   # Render all columns
   renderColumns: ->
-    _.map(@props.design.columns, (column, columnIndex) => @renderColumn(column, columnIndex))    
+    columns = _.map(@props.design.columns, (column, columnIndex) => @renderColumn(column, columnIndex))    
+
+    if @props.design.options.showRowNumbers
+      columns.unshift(
+        @renderColumn({
+          label: "S.n."
+          width: 50
+        }, -1)
+      )
+
+    columns
 
   render: ->
     rowsCount = @state.rows.length
