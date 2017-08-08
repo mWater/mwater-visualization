@@ -7,7 +7,7 @@ module.exports = class ServerDatagridDataSource extends DatagridDataSource
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
-  #   datagridId: dashboard id to use on server
+  #   datagridId: datagrid id to use on server
   #   rev: revision to use to allow caching
   constructor: (options) ->
     @options = options
@@ -26,6 +26,38 @@ module.exports = class ServerDatagridDataSource extends DatagridDataSource
     }
 
     url = @options.apiUrl + "datagrids/#{@options.datagridId}/data?" + querystring.stringify(query)
+
+    $.getJSON url, (data) =>
+      callback(null, data)
+    .fail (xhr) =>
+      console.log xhr.responseText
+      callback(new Error(xhr.responseText))
+
+  getQuickfiltersDataSource: ->
+    return new ServerQuickfilterDataSource(@options)
+
+class ServerQuickfilterDataSource
+  # options:
+  #   apiUrl: API url to use for talking to mWater server
+  #   client: client id to use for talking to mWater server
+  #   share: share id to use for talking to mWater server
+  #   datagridId: datagrid id to use on server
+  #   rev: revision to use to allow caching
+  constructor: (options) ->
+    @options = options
+
+  # Gets the values of the quickfilter at index
+  getValues: (index, expr, filters, offset, limit, callback) ->
+    query = {
+      client: @options.client
+      share: @options.share
+      filters: JSON.stringify(filters)
+      offset: offset
+      limit: limit
+      rev: @options.rev
+    }
+
+    url = @options.apiUrl + "datagrids/#{@options.datagridId}/quickfilters/#{index}/values?" + querystring.stringify(query)
 
     $.getJSON url, (data) =>
       callback(null, data)

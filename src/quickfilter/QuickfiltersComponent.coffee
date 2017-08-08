@@ -25,7 +25,7 @@ module.exports = class QuickfiltersComponent extends React.Component
       }))
     
     schema: PropTypes.object.isRequired
-    dataSource: PropTypes.object.isRequired
+    quickfiltersDataSource: PropTypes.object.isRequired # See QuickfiltersDataSource
 
     # Filters to add to restrict quick filter data to
     filters: PropTypes.arrayOf(PropTypes.shape({
@@ -74,10 +74,11 @@ module.exports = class QuickfiltersComponent extends React.Component
     if type == "text"
       return R TextQuickfilterComponent, 
         key: index
+        index: index
         label: item.label
         expr: expr
         schema: @props.schema
-        dataSource: @props.dataSource
+        quickfiltersDataSource: @props.quickfiltersDataSource
         value: itemValue
         onValueChange: onValueChange
         filters: @props.filters
@@ -88,7 +89,6 @@ module.exports = class QuickfiltersComponent extends React.Component
         label: item.label
         expr: expr
         schema: @props.schema
-        dataSource: @props.dataSource
         value: itemValue
         onValueChange: onValueChange
 
@@ -143,12 +143,15 @@ class TextQuickfilterComponent extends React.Component
   @propTypes:
     label: PropTypes.string.isRequired
     schema: PropTypes.object.isRequired
+    quickfiltersDataSource: PropTypes.object.isRequired  # See QuickfiltersDataSource
+
     expr: PropTypes.object.isRequired
+    index: PropTypes.number.isRequired
 
     value: PropTypes.any                     # Current value of quickfilter (state of filter selected)
     onValueChange: PropTypes.func    # Called when value changes
 
-    # Filters to add to the dashboard
+    # Filters to add to the quickfilter to restrict values
     filters: PropTypes.arrayOf(PropTypes.shape({
       table: PropTypes.string.isRequired    # id table to filter
       jsonql: PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
@@ -162,14 +165,14 @@ class TextQuickfilterComponent extends React.Component
         R TextLiteralComponent, {
           value: @props.value
           onChange: @props.onValueChange
-          refExpr: @props.expr
           schema: @props.schema
-          dataSource: @props.dataSource
+          expr: @props.expr
+          index: @props.index
+          quickfiltersDataSource: @props.quickfiltersDataSource
           filters: @props.filters
         }
       if not @props.onValueChange
         H.i className: "text-warning fa fa-fw fa-lock"
-
 
 # Quickfilter for a date value
 class DateQuickfilterComponent extends React.Component

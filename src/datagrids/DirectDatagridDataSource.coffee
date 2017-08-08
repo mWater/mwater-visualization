@@ -1,5 +1,6 @@
 DatagridDataSource = require './DatagridDataSource'
 DatagridQueryBuilder = require './DatagridQueryBuilder'
+QuickfilterUtils = require '../quickfilter/QuickfilterUtils'
 
 # Uses direct DataSource queries
 module.exports = class DirectDatagridDataSource
@@ -22,3 +23,11 @@ module.exports = class DirectDatagridDataSource
     })
 
     @options.dataSource.performQuery(query, callback)
+
+  # Gets the quickfilters data source
+  getQuickfiltersDataSource: ->
+    return {
+      getValues: (index, expr, filters, offset, limit, callback) =>
+        # Perform query
+        QuickfilterUtils.findExprValues(expr, @options.schema, @options.dataSource, filters, offset, limit, callback)
+    }

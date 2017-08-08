@@ -1,3 +1,4 @@
+_ = require 'lodash'
 PropTypes = require('prop-types')
 React = require 'react'
 H = React.DOM
@@ -11,9 +12,11 @@ module.exports = class TextLiteralComponent extends React.Component
   @propTypes: 
     value: PropTypes.string
     onChange: PropTypes.func
-    refExpr: PropTypes.object.isRequired # Expression for the text values to select from
-    schema: PropTypes.object.isRequired # Schema of the database
-    dataSource: PropTypes.object.isRequired # Data source to use to get values
+
+    schema: PropTypes.object.isRequired
+    quickfiltersDataSource: PropTypes.object.isRequired  # See QuickfiltersDataSource
+    expr: PropTypes.object.isRequired
+    index: PropTypes.number.isRequired
 
     # Filters to add to the component to restrict values
     filters: PropTypes.arrayOf(PropTypes.shape({
@@ -25,56 +28,34 @@ module.exports = class TextLiteralComponent extends React.Component
     value = if val then val else null # Blank is null
     @props.onChange(value)
 
-  escapeRegex: (s) ->
-    return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
-
   getOptions: (input, cb) =>
-    # Create query to get matches ordered by most frequent to least
+    # Create query to get matches
     exprCompiler = new ExprCompiler(@props.schema)
 
-    # select <compiled expr> as value, count(*) as number from <table> where <compiled expr> like 'input%' group by value order by number desc limit 250
-    query = {
-      type: "query"
-      selects: [
-        { type: "select", expr: exprCompiler.compileExpr(expr: @props.refExpr, tableAlias: "main"), alias: "value" }
-        { type: "select", expr: { type: "op", op: "count", exprs: [] }, alias: "number" }
-      ]
-      from: exprCompiler.compileTable(@props.refExpr.table, "main") 
-      where: {
+    # Add filter for input
+    filters = (@props.filters or []).concat({
+      table: @props.expr.table
+      jsonql: {
         type: "op"
-        op: "and"
+        op: "~*"
         exprs: [
-          {
-            type: "op"
-            op: "~*"
-            exprs: [
-              exprCompiler.compileExpr(expr: @props.refExpr, tableAlias: "main")
-              "^" + @escapeRegex(input)
-            ]
-          }
+          exprCompiler.compileExpr(expr: @props.expr, tableAlias: "{alias}")
+          "^" + _.escapeRegExp(input)
         ]
       }
-      groupBy: [1]
-      orderBy: [{ ordinal: 2, direction: "desc" }, { ordinal: 1, direction: "asc" }]
-      limit: 250
-    }
-
-    # Add filters if present
-    for filter in (@props.filters or [])
-      if filter.table == @props.refExpr.table
-        query.where.exprs.push(injectTableAlias(filter.jsonql, "main"))
+    })
 
     # Execute query
-    @props.dataSource.performQuery query, (err, rows) =>
+    @props.quickfiltersDataSource.getValues @props.index, @props.expr, filters, null, 250, (err, values) =>
       if err
         cb(err)
         return 
 
       # Filter null and blank
-      rows = _.filter(rows, (r) -> r.value)
+      values = _.filter(values, (value) -> value)
 
       cb(null, {
-        options: _.map(rows, (r) -> { value: r.value, label: r.value })
+        options: _.map(values, (value) -> { value: value, label: value })
         complete: false # TODO rows.length < 50 # Complete if didn't hit limit
       })
       

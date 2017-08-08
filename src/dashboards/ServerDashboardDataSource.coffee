@@ -16,6 +16,38 @@ module.exports = class ServerDashboardDataSource
   getWidgetDataSource: (widgetId) ->
     return new ServerWidgetDataSource(_.extend({}, @options, widgetId: widgetId))
 
+  getQuickfiltersDataSource: ->
+    return new ServerQuickfilterDataSource(@options)
+
+class ServerQuickfilterDataSource
+  # options:
+  #   apiUrl: API url to use for talking to mWater server
+  #   client: client id to use for talking to mWater server
+  #   share: share id to use for talking to mWater server
+  #   dashboardId: dashboard id to use on server
+  #   rev: revision to use to allow caching
+  constructor: (options) ->
+    @options = options
+
+  # Gets the values of the quickfilter at index
+  getValues: (index, expr, filters, offset, limit, callback) ->
+    query = {
+      client: @options.client
+      share: @options.share
+      filters: JSON.stringify(filters)
+      offset: offset
+      limit: limit
+      rev: @options.rev
+    }
+
+    url = @options.apiUrl + "dashboards/#{@options.dashboardId}/quickfilters/#{index}/values?" + querystring.stringify(query)
+
+    $.getJSON url, (data) =>
+      callback(null, data)
+    .fail (xhr) =>
+      console.log xhr.responseText
+      callback(new Error(xhr.responseText))
+
 class ServerWidgetDataSource
   # options:
   #   apiUrl: API url to use for talking to mWater server
