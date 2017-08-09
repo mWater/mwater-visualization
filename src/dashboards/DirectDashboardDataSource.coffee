@@ -1,6 +1,7 @@
 WidgetFactory = require '../widgets/WidgetFactory'
 DirectWidgetDataSource = require '../widgets/DirectWidgetDataSource'
 LayoutManager = require '../layouts/LayoutManager'
+QuickfilterUtils = require '../quickfilter/QuickfilterUtils'
 
 # Uses direct DataSource queries
 module.exports = class DirectDashboardDataSource
@@ -28,3 +29,10 @@ module.exports = class DirectDashboardDataSource
       dataSource: @options.dataSource
     })
 
+  # Gets the quickfilters data source
+  getQuickfiltersDataSource: ->
+    return {
+      getValues: (index, expr, filters, offset, limit, callback) =>
+        # Perform query
+        QuickfilterUtils.findExprValues(expr, @options.schema, @options.dataSource, filters, offset, limit, callback)
+    }
