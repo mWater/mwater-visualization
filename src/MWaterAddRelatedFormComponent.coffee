@@ -126,7 +126,7 @@ class AddRelatedFormModalComponent extends React.Component
 
     # Filter by search
     if @state.search
-      searchStringRegExp = new RegExp(_.escapeRegExp(@state.search), "i")
+      searchStringRegExp = new RegExp(escapeRegex(@state.search), "i")
       items = _.filter(items, (item) => item.name.match(searchStringRegExp))
 
     H.div null,
@@ -150,3 +150,4 @@ class AddRelatedFormModalComponent extends React.Component
       header: "Add Related Survey",
         @renderContents()
 
+escapeRegex = (s) -> s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')

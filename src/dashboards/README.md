@@ -18,11 +18,7 @@ Dashboard design is:
 
 `items`: dashboard items. Format depends on layout of dashboard. See layouts/*/README.md
 
-`quickfilters`: array of quick filters (user-selectable filters). Each contains:
- 
- `table`: table of filter
- `expr`: filter expression (left hand side only. Usually enum or text)
- `label`: optional label
+`quickfilters`: array of quick filters (user-selectable filters). See quickfilter/README.md
 
 `layout`: layout engine to use (`blocks` is new default) 
 `style`: optional stylesheet to use
