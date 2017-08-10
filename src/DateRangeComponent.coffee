@@ -46,9 +46,9 @@ module.exports = class DateRangeComponent extends React.Component
   handleStartChange: (value) =>
     # Clear end if after
     if @props.value?[1] and @fromMoment(value) > @props.value[1]
-      @props.onValueChange([@fromMoment(value), null])
+      @props.onChange([@fromMoment(value), null])
     else
-      @props.onValueChange([@fromMoment(value), @props.value?[1]])
+      @props.onChange([@fromMoment(value), @props.value?[1]])
 
   handleEndChange: (value) =>
     # Go to end of day if datetime
@@ -58,14 +58,14 @@ module.exports = class DateRangeComponent extends React.Component
 
     # Clear start if before
     if @props.value?[0] and @fromMoment(value) < @props.value[0]
-      @props.onValueChange([null, @fromMoment(value)])
+      @props.onChange([null, @fromMoment(value)])
     else
-      @props.onValueChange([@props.value?[0], @fromMoment(value)])
+      @props.onChange([@props.value?[0], @fromMoment(value)])
 
     @setState(dropdownOpen: false)
 
   handlePreset: (preset) =>
-    @props.onValueChange([@fromMoment(preset.value[0]), @fromMoment(preset.value[1])])
+    @props.onChange([@fromMoment(preset.value[0]), @fromMoment(preset.value[1])])
     @setState(dropdownOpen: false)
 
   getPresets: ->
@@ -84,7 +84,7 @@ module.exports = class DateRangeComponent extends React.Component
   renderClear: =>
     H.div 
       style: { position: "absolute", right: 10, top: 7, color: "#AAA" }
-      onClick: (=> @props.onValueChange(null)),
+      onClick: (=> @props.onChange(null)),
         H.i className: "fa fa-remove"
 
   renderSummary: ->
@@ -136,7 +136,7 @@ module.exports = class DateRangeComponent extends React.Component
               @renderSummary()
 
           # Clear button
-          if @props.value and @props.onValueChange?
+          if @props.value and @props.onChange?
             @renderClear()
 
           if @state.dropdownOpen

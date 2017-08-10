@@ -18,7 +18,7 @@ storiesOf('DateExprComponent', module)
       (state, update) =>
         R DateExprComponent,
           value: state.value
-          onValueChange: update("value")
+          onChange: update("value")
 
   .add 'date (today)', => 
     R UpdateableComponent, 
@@ -26,7 +26,7 @@ storiesOf('DateExprComponent', module)
       (state, update) =>
         R DateExprComponent,
           value: state.value
-          onValueChange: update("value")
+          onChange: update("value")
 
   .add 'datetime (blank)', => 
     R UpdateableComponent, 
@@ -35,7 +35,7 @@ storiesOf('DateExprComponent', module)
         R DateExprComponent,
           datetime: true
           value: state.value
-          onValueChange: update("value")
+          onChange: update("value")
 
 storiesOf('DateRangeComponent', module)
   .add 'date (blank)', => 
@@ -44,7 +44,7 @@ storiesOf('DateRangeComponent', module)
       (state, update) =>
         R DateRangeComponent,
           value: state.value
-          onValueChange: update("value")
+          onChange: update("value")
 
   .add 'date (today)', => 
     R UpdateableComponent, 
@@ -52,7 +52,7 @@ storiesOf('DateRangeComponent', module)
       (state, update) =>
         R DateRangeComponent,
           value: state.value
-          onValueChange: update("value")
+          onChange: update("value")
 
   .add 'datetime (blank)', => 
     R UpdateableComponent, 
@@ -61,4 +61,4 @@ storiesOf('DateRangeComponent', module)
         R DateRangeComponent,
           datetime: true
           value: state.value
-          onValueChange: update("value")
+          onChange: update("value")

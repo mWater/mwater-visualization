@@ -12,7 +12,7 @@ DatePicker = require('react-datepicker').default
 module.exports = class DateExprComponent extends React.Component
   @propTypes:
     value: PropTypes.any                     # Current value of quickfilter (state of filter selected)
-    onValueChange: PropTypes.func            # Called when value changes
+    onChange: PropTypes.func            # Called when value changes
     datetime: PropTypes.bool                 # True to use datetime
 
   constructor: ->
@@ -52,9 +52,9 @@ module.exports = class DateExprComponent extends React.Component
   handleStartChange: (value) =>
     # Clear end if after
     if @props.value?.exprs[1] and @fromMoment(value) > @props.value.exprs[1]?.value
-      @props.onValueChange({ type: "op", op: "between", exprs: [@toLiteral(@fromMoment(value)), null]})
+      @props.onChange({ type: "op", op: "between", exprs: [@toLiteral(@fromMoment(value)), null]})
     else
-      @props.onValueChange({ type: "op", op: "between", exprs: [@toLiteral(@fromMoment(value)), @props.value?.exprs[1]]})
+      @props.onChange({ type: "op", op: "between", exprs: [@toLiteral(@fromMoment(value)), @props.value?.exprs[1]]})
 
   handleEndChange: (value) =>
     # Go to end of day if datetime
@@ -64,20 +64,20 @@ module.exports = class DateExprComponent extends React.Component
 
     # Clear start if before
     if @props.value?.exprs[0] and @fromMoment(value) < @props.value.exprs[0]?.value
-      @props.onValueChange({ type: "op", op: "between", exprs: [null, @toLiteral(@fromMoment(value))]})
+      @props.onChange({ type: "op", op: "between", exprs: [null, @toLiteral(@fromMoment(value))]})
     else
-      @props.onValueChange({ type: "op", op: "between", exprs: [@props.value?.exprs[0], @toLiteral(@fromMoment(value))]})
+      @props.onChange({ type: "op", op: "between", exprs: [@props.value?.exprs[0], @toLiteral(@fromMoment(value))]})
 
     @setState(dropdownOpen: false)
 
   handlePreset: (preset) =>
-    @props.onValueChange({ type: "op", op: preset.id, exprs: [] })
+    @props.onChange({ type: "op", op: preset.id, exprs: [] })
     @setState(dropdownOpen: false)
 
   renderClear: =>
     H.div 
       style: { position: "absolute", right: 10, top: 7, color: "#AAA" }
-      onClick: (=> @props.onValueChange(null)),
+      onClick: (=> @props.onChange(null)),
         H.i className: "fa fa-remove"
 
   renderSummary: ->
@@ -136,7 +136,7 @@ module.exports = class DateExprComponent extends React.Component
               @renderSummary()
 
           # Clear button
-          if @props.value and @props.onValueChange?
+          if @props.value and @props.onChange?
             @renderClear()
 
           if @state.dropdownOpen

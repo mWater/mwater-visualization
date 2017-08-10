@@ -192,7 +192,7 @@ class DateQuickfilterComponent extends React.Component
         R DateExprComponent, {
           datetime: (new ExprUtils(@props.schema).getExprType(@props.expr)) == "datetime"
           value: @props.value
-          onValueChange: @props.onValueChange
+          onChange: @props.onValueChange
         }
       if not @props.onValueChange
         H.i className: "text-warning fa fa-fw fa-lock"
