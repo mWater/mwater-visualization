@@ -105,7 +105,7 @@ module.exports = class DateExprComponent extends React.Component
     startDate = @toMoment(@props.value?.exprs[0]?.value)
     endDate = @toMoment(@props.value?.exprs[1]?.value)
 
-    H.div style: { position: "absolute", top: "100%", left: 0, zIndex: 1000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white" },
+    H.div style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white" },
       H.div style: { whiteSpace: "nowrap", verticalAlign: "top" },
         R DatePicker, 
           inline: true

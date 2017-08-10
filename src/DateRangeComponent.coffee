@@ -105,7 +105,7 @@ module.exports = class DateRangeComponent extends React.Component
     startDate = @toMoment(@props.value?[0])
     endDate = @toMoment(@props.value?[1])
 
-    H.div style: { position: "absolute", top: "100%", left: 0, zIndex: 1000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white" },
+    H.div style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white" },
       H.div style: { whiteSpace: "nowrap", verticalAlign: "top" },
         R DatePicker, 
           inline: true
