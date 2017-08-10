@@ -6,6 +6,8 @@ R = React.createElement
 
 DateExprComponent = require '../src/quickfilter/DateExprComponent'
 
+DateRangeComponent = require '../src/DateRangeComponent'
+
 storiesOf = require('@kadira/storybook').storiesOf
 UpdateableComponent = require './UpdateableComponent'
 
@@ -15,7 +17,6 @@ storiesOf('DateExprComponent', module)
       value: null
       (state, update) =>
         R DateExprComponent,
-          type: "date"
           value: state.value
           onValueChange: update("value")
 
@@ -24,7 +25,6 @@ storiesOf('DateExprComponent', module)
       value: { type: "op", op: "today", exprs: [] }
       (state, update) =>
         R DateExprComponent,
-          type: "date"
           value: state.value
           onValueChange: update("value")
 
@@ -33,7 +33,32 @@ storiesOf('DateExprComponent', module)
       value: null
       (state, update) =>
         R DateExprComponent,
-          type: "date"
+          datetime: true
+          value: state.value
+          onValueChange: update("value")
+
+storiesOf('DateRangeComponent', module)
+  .add 'date (blank)', => 
+    R UpdateableComponent, 
+      value: null
+      (state, update) =>
+        R DateRangeComponent,
+          value: state.value
+          onValueChange: update("value")
+
+  .add 'date (today)', => 
+    R UpdateableComponent, 
+      value: [moment().format("YYYY-MM-DD"), moment().format("YYYY-MM-DD")]
+      (state, update) =>
+        R DateRangeComponent,
+          value: state.value
+          onValueChange: update("value")
+
+  .add 'datetime (blank)', => 
+    R UpdateableComponent, 
+      value: null
+      (state, update) =>
+        R DateRangeComponent,
           datetime: true
           value: state.value
           onValueChange: update("value")

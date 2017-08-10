@@ -8,12 +8,12 @@ moment = require 'moment'
 ClickOutHandler = require('react-onclickout')
 DatePicker = require('react-datepicker').default
 
-# Allows selection of a date expressions for quickfilters
-module.exports = class DateExprComponent extends React.Component
+# Allows selection of a date range
+module.exports = class DateRangeComponent extends React.Component
   @propTypes:
-    value: PropTypes.any                     # Current value of quickfilter (state of filter selected)
-    onValueChange: PropTypes.func            # Called when value changes
-    datetime: PropTypes.bool                 # True to use datetime
+    value: PropTypes.array              # Array of [start date, end date] in iso 8601 format
+    onChange: PropTypes.func.isRequired # Array of [start date, end date] in iso 8601 format
+    datetime: PropTypes.bool            # true if for datetime, not date
 
   constructor: ->
     super
@@ -40,21 +40,15 @@ module.exports = class DateExprComponent extends React.Component
     else
       return value.format("YYYY-MM-DD")
 
-  toLiteral: (value) ->
-    if @props.datetime
-      return { type: "literal", valueType: "datetime", value: value }
-    else
-      return { type: "literal", valueType: "date", value: value }
-
   handleClickOut: =>
     @setState(dropdownOpen: false)
 
   handleStartChange: (value) =>
     # Clear end if after
-    if @props.value?.exprs[1] and @fromMoment(value) > @props.value.exprs[1]?.value
-      @props.onValueChange({ type: "op", op: "between", exprs: [@toLiteral(@fromMoment(value)), null]})
+    if @props.value?[1] and @fromMoment(value) > @props.value[1]
+      @props.onValueChange([@fromMoment(value), null])
     else
-      @props.onValueChange({ type: "op", op: "between", exprs: [@toLiteral(@fromMoment(value)), @props.value?.exprs[1]]})
+      @props.onValueChange([@fromMoment(value), @props.value?[1]])
 
   handleEndChange: (value) =>
     # Go to end of day if datetime
@@ -63,16 +57,29 @@ module.exports = class DateExprComponent extends React.Component
       value.endOf("day")
 
     # Clear start if before
-    if @props.value?.exprs[0] and @fromMoment(value) < @props.value.exprs[0]?.value
-      @props.onValueChange({ type: "op", op: "between", exprs: [null, @toLiteral(@fromMoment(value))]})
+    if @props.value?[0] and @fromMoment(value) < @props.value[0]
+      @props.onValueChange([null, @fromMoment(value)])
     else
-      @props.onValueChange({ type: "op", op: "between", exprs: [@props.value?.exprs[0], @toLiteral(@fromMoment(value))]})
+      @props.onValueChange([@props.value?[0], @fromMoment(value)])
 
     @setState(dropdownOpen: false)
 
   handlePreset: (preset) =>
-    @props.onValueChange({ type: "op", op: preset.id, exprs: [] })
+    @props.onValueChange([@fromMoment(preset.value[0]), @fromMoment(preset.value[1])])
     @setState(dropdownOpen: false)
+
+  getPresets: ->
+    presets = [
+      { label: 'Today', value: [moment(), moment()] }
+      { label: 'Yesterday', value: [moment().subtract(1, 'days'), moment().subtract(1, 'days')] }
+      { label: 'Last 7 Days', value: [moment().subtract(6, 'days'), moment()] }
+      { label: 'Last 30 Days', value: [moment().subtract(29, 'days'), moment()] }
+      { label: 'This Month', value: [moment().startOf('month'), moment().endOf('month')] }
+      { label: 'Last Month', value: [moment().subtract(1, 'months').startOf('month'), moment().subtract(1, 'months').endOf('month')] }
+      { label: 'This Year', value: [moment().startOf('year'), moment().endOf('year')] }
+      { label: 'Last Year', value: [moment().subtract(1, 'years').startOf('year'), moment().subtract(1, 'years').endOf('year')] }
+    ]
+    return presets
 
   renderClear: =>
     H.div 
@@ -84,26 +91,19 @@ module.exports = class DateExprComponent extends React.Component
     if not @props.value
       return H.span className: "text-muted", "All"
 
-    preset = _.findWhere(presets, id: @props.value.op)
-    if preset
-      return preset.name
-
-    if @props.value.op == "between"
-      startDate = @toMoment(@props.value.exprs[0]?.value)
-      endDate = @toMoment(@props.value.exprs[1]?.value)
-      return (if startDate then startDate.format("ll") else "") + " - " + (if endDate then endDate.format("ll") else "")
-
-    return "???"
+    startDate = @toMoment(@props.value[0])
+    endDate = @toMoment(@props.value[1])
+    return (if startDate then startDate.format("ll") else "") + " - " + (if endDate then endDate.format("ll") else "")
 
   renderPresets: ->
     H.div null,
-      _.map presets, (preset) =>
+      _.map @getPresets(), (preset) =>
         H.a className: "btn btn-xs btn-link", onClick: @handlePreset.bind(null, preset),
-          preset.name
+          preset.label
 
   renderDropdown: ->
-    startDate = @toMoment(@props.value?.exprs[0]?.value)
-    endDate = @toMoment(@props.value?.exprs[1]?.value)
+    startDate = @toMoment(@props.value?[0])
+    endDate = @toMoment(@props.value?[1])
 
     H.div style: { position: "absolute", top: "100%", left: 0, zIndex: 1000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white" },
       H.div style: { whiteSpace: "nowrap" },
@@ -131,7 +131,7 @@ module.exports = class DateExprComponent extends React.Component
         style: { display: "inline-block", position: "relative" },
           H.div
             className: "form-control"
-            style: { width: 220, height: 36 }
+            style: { width: 220 }
             onClick: (=> @setState(dropdownOpen: true)),
               @renderSummary()
 
@@ -143,15 +143,3 @@ module.exports = class DateExprComponent extends React.Component
             @renderDropdown()
 
 
-presets = [
-  { id: "thisyear", name: "This Year" }
-  { id: "lastyear", name: "Last Year" }
-  { id: "thismonth", name: "This Month" }
-  { id: "lastmonth", name: "Last Month" }
-  { id: "today", name: "Today" }
-  { id: "yesterday", name: "Yesterday" }
-  { id: "last24hours", name: "In Last 24 Hours" }
-  { id: "last7days", name: "In Last 7 Days" }
-  { id: "last30days", name: "In Last 30 Days" }
-  { id: "last365days", name: "In Last 365 Days" }
-]
