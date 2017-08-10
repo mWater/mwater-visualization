@@ -106,23 +106,25 @@ module.exports = class DateRangeComponent extends React.Component
     endDate = @toMoment(@props.value?[1])
 
     H.div style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white" },
-      H.div style: { whiteSpace: "nowrap", verticalAlign: "top" },
-        R DatePicker, 
-          inline: true
-          selectsStart: true
-          selected: startDate
-          startDate: startDate
-          endDate: endDate
-          showYearDropdown: true
-          onChange: @handleStartChange
-        R DatePicker, 
-          inline: true
-          selectsEnd: true
-          selected: endDate
-          startDate: startDate
-          endDate: endDate
-          showYearDropdown: true
-          onChange: @handleEndChange
+      H.div style: { whiteSpace: "nowrap"},
+        H.div style: { display: "inline-block", verticalAlign: "top" },
+          R DatePicker, 
+            inline: true
+            selectsStart: true
+            selected: startDate
+            startDate: startDate
+            endDate: endDate
+            showYearDropdown: true
+            onChange: @handleStartChange
+        H.div style: { display: "inline-block", verticalAlign: "top" },
+          R DatePicker, 
+            inline: true
+            selectsEnd: true
+            selected: endDate
+            startDate: startDate
+            endDate: endDate
+            showYearDropdown: true
+            onChange: @handleEndChange
       @renderPresets()
 
   render: ->
