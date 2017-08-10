@@ -158,7 +158,7 @@ gulp.task "test", gulp.series([
 ])
 
 
-gulp.task "default", gulp.series("copy", "coffee")
+gulp.task "default", gulp.series("copy", "coffee", "index_css")
 
 # Shim non-browserify friendly libraries to allow them to be 'require'd
 shim = (instance) ->

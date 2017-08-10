@@ -6,7 +6,7 @@ ReactSelect = require 'react-select'
 ExprUtils = require('mwater-expressions').ExprUtils
 ExprCleaner = require('mwater-expressions').ExprCleaner
 TextLiteralComponent = require './TextLiteralComponent'
-moment = require 'moment'
+DateExprComponent = require './DateExprComponent'
 
 # Displays quick filters and allows their value to be modified
 module.exports = class QuickfiltersComponent extends React.Component
@@ -190,66 +190,10 @@ class DateQuickfilterComponent extends React.Component
         H.span style: { color: "gray" }, @props.label + ":\u00a0"
       H.div style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
         R DateExprComponent, {
-          type: new ExprUtils(@props.schema).getExprType(@props.expr)
+          datetime: (new ExprUtils(@props.schema).getExprType(@props.expr)) == "datetime"
           value: @props.value
           onValueChange: @props.onValueChange
         }
       if not @props.onValueChange
         H.i className: "text-warning fa fa-fw fa-lock"
-
-class DateExprComponent extends React.Component
-  @propTypes:
-    type: PropTypes.string.isRequired        # date or datetime
-    value: PropTypes.any                     # Current value of quickfilter (state of filter selected)
-    onValueChange: PropTypes.func     # Called when value changes
-
-  handleChange: (val) =>
-    if val
-      @props.onValueChange(JSON.parse(val))
-    else
-      @props.onValueChange(null)
-
-  render: ->
-    # Create list of options
-    options = [
-      { value: JSON.stringify({ op: "thisyear", exprs: [] }), label: 'This Year' }
-      { value: JSON.stringify({ op: "lastyear", exprs: [] }), label: 'Last Year' }
-      { value: JSON.stringify({ op: "thismonth", exprs: [] }), label: 'This Month' }
-      { value: JSON.stringify({ op: "lastmonth", exprs: [] }), label: 'Last Month' }
-      { value: JSON.stringify({ op: "today", exprs: [] }), label: 'Today' }
-      { value: JSON.stringify({ op: "yesterday", exprs: [] }), label: 'Yesterday' }
-      { value: JSON.stringify({ op: "last24hours", exprs: [] }), label: 'In Last 24 Hours' }
-      { value: JSON.stringify({ op: "last7days", exprs: [] }), label: 'In Last 7 Days' }
-      { value: JSON.stringify({ op: "last30days", exprs: [] }), label: 'In Last 30 Days' }
-      { value: JSON.stringify({ op: "last365days", exprs: [] }), label: 'In Last 365 Days' }
-    ]
-
-    # Add last 24 months
-    for i in [1..24]
-      if @props.type == "date"
-        options.push({ value: JSON.stringify({
-            op: "between"
-            exprs: [
-              { type: "literal", valueType: @props.type, value: moment().startOf("month").subtract(i, 'months').format("YYYY-MM-DD") }
-              { type: "literal", valueType: @props.type, value: moment().startOf("month").subtract(i - 1, 'months').subtract(1, "days").format("YYYY-MM-DD") }
-            ]
-          }), label: moment().startOf("month").subtract(i, 'months').format("MMM YYYY") })
-      else if @props.type == "datetime"
-        options.push({ value: JSON.stringify({
-            op: "between"
-            exprs: [
-              { type: "literal", valueType: @props.type, value: moment().startOf("month").subtract(i, 'months').toISOString() }
-              { type: "literal", valueType: @props.type, value: moment().startOf("month").subtract(i - 1, 'months').subtract(1, "milliseconds").toISOString() }
-            ]
-          }), label: moment().startOf("month").subtract(i, 'months').format("MMM YYYY") })
-
-    H.div style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
-      R ReactSelect, {
-        placeholder: "All"
-        value: if @props.value then JSON.stringify(@props.value) else ""
-        multi: false
-        options: options
-        onChange: if @props.onValueChange then @handleChange
-        disabled: not @props.onValueChange?
-      }
 

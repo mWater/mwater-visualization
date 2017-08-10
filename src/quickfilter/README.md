@@ -10,4 +10,4 @@ values:
 
 For text and enum, a plain string
 
-For date and datetime, { op: some op, exprs: array of exprs. The date will be added as first expr when compiled }
+For date and datetime, { op: some op, exprs: array of exprs. The date will be added as first expr when compiled and `table` will be set }
