@@ -83,7 +83,7 @@ module.exports = class DateRangeComponent extends React.Component
 
   renderClear: =>
     H.div 
-      style: { position: "absolute", right: 10, top: 7, color: "#AAA" }
+      style: { position: "absolute", right: 10, top: 7, color: "#AAA", lineHeight: 1.42857143 }
       onClick: (=> @props.onChange(null)),
         H.i className: "fa fa-remove"
 
@@ -106,7 +106,7 @@ module.exports = class DateRangeComponent extends React.Component
     endDate = @toMoment(@props.value?[1])
 
     H.div style: { position: "absolute", top: "100%", left: 0, zIndex: 1000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white" },
-      H.div style: { whiteSpace: "nowrap" },
+      H.div style: { whiteSpace: "nowrap", verticalAlign: "top" },
         R DatePicker, 
           inline: true
           selectsStart: true
