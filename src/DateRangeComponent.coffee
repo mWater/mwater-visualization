@@ -83,7 +83,7 @@ module.exports = class DateRangeComponent extends React.Component
 
   renderClear: =>
     H.div 
-      style: { position: "absolute", right: 10, top: 7, color: "#AAA", lineHeight: 1.42857143 }
+      style: { position: "absolute", right: 10, top: 7, color: "#AAA" }
       onClick: (=> @props.onChange(null)),
         H.i className: "fa fa-remove"
 

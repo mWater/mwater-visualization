@@ -33,7 +33,6 @@ module.exports = class LayerLegendComponent extends React.Component
 
   componentWillReceiveProps: (nextProps) ->
     if not _.isEqual(nextProps.axis, @props.axis) or not _.isEqual(nextProps.filters, @props.filters)
-      console.log "reloading categories"
       @loadCategories(nextProps)
 
   componentWillUnmount: ->
