@@ -20,6 +20,7 @@ module.exports = class DateExprComponent extends React.Component
 
     @state = {
       dropdownOpen: false
+      custom: false  # True when custom dates displayed
     }
 
   toMoment: (value) ->
@@ -96,16 +97,27 @@ module.exports = class DateExprComponent extends React.Component
     return "???"
 
   renderPresets: ->
-    H.div null,
-      _.map presets, (preset) =>
-        H.a className: "btn btn-xs btn-link", onClick: @handlePreset.bind(null, preset),
-          preset.name
+    H.div style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white", borderRadius: 4 },
+      H.ul className: "nav nav-pills nav-stacked",
+        _.map presets, (preset) =>
+          H.li null,
+            H.a style: { padding: 5 }, onClick: @handlePreset.bind(null, preset),
+              preset.name
+        H.li null,
+          H.a style: { padding: 5 }, onClick: (=> @setState(custom: true)),
+            "Custom Date Range..."
 
   renderDropdown: ->
+    if @state.custom
+      return @renderCustomDropdown()
+    else
+      return @renderPresets()
+
+  renderCustomDropdown: ->
     startDate = @toMoment(@props.value?.exprs[0]?.value)
     endDate = @toMoment(@props.value?.exprs[1]?.value)
 
-    H.div style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white" },
+    H.div style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white", borderRadius: 4  },
       H.div style: { whiteSpace: "nowrap"},
         H.div style: { display: "inline-block", verticalAlign: "top" },
           R DatePicker, 
@@ -125,8 +137,7 @@ module.exports = class DateExprComponent extends React.Component
             endDate: endDate
             showYearDropdown: true
             onChange: @handleEndChange
-      @renderPresets()
-
+  
   render: ->
     R ClickOutHandler, onClickOut: @handleClickOut,
       H.div 
@@ -134,7 +145,7 @@ module.exports = class DateExprComponent extends React.Component
           H.div
             className: "form-control"
             style: { width: 220, height: 36 }
-            onClick: (=> @setState(dropdownOpen: true)),
+            onClick: (=> @setState(dropdownOpen: true, custom: false)),
               @renderSummary()
 
           # Clear button

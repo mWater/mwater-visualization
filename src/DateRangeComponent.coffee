@@ -20,6 +20,7 @@ module.exports = class DateRangeComponent extends React.Component
 
     @state = {
       dropdownOpen: false
+      custom: false  # True when custom dates displayed
     }
 
   toMoment: (value) ->
@@ -96,16 +97,21 @@ module.exports = class DateRangeComponent extends React.Component
     return (if startDate then startDate.format("ll") else "") + " - " + (if endDate then endDate.format("ll") else "")
 
   renderPresets: ->
-    H.div null,
-      _.map @getPresets(), (preset) =>
-        H.a className: "btn btn-xs btn-link", onClick: @handlePreset.bind(null, preset),
-          preset.label
+    H.div style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white", borderRadius: 4 },
+      H.ul className: "nav nav-pills nav-stacked",
+        _.map @getPresets(), (preset) =>
+          H.li null,
+            H.a style: { padding: 5 }, onClick: @handlePreset.bind(null, preset),
+              preset.label
+        H.li null,
+          H.a style: { padding: 5 }, onClick: (=> @setState(custom: true)),
+            "Custom Date Range..."
 
-  renderDropdown: ->
+  renderCustomDropdown: ->
     startDate = @toMoment(@props.value?[0])
     endDate = @toMoment(@props.value?[1])
 
-    H.div style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white" },
+    H.div style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white", borderRadius: 4  },
       H.div style: { whiteSpace: "nowrap"},
         H.div style: { display: "inline-block", verticalAlign: "top" },
           R DatePicker, 
@@ -125,7 +131,12 @@ module.exports = class DateRangeComponent extends React.Component
             endDate: endDate
             showYearDropdown: true
             onChange: @handleEndChange
-      @renderPresets()
+
+  renderDropdown: ->
+    if @state.custom
+      return @renderCustomDropdown()
+    else
+      return @renderPresets()
 
   render: ->
     R ClickOutHandler, onClickOut: @handleClickOut,
@@ -134,7 +145,7 @@ module.exports = class DateRangeComponent extends React.Component
           H.div
             className: "form-control"
             style: { width: 220 }
-            onClick: (=> @setState(dropdownOpen: true)),
+            onClick: (=> @setState(dropdownOpen: true, custom: false)),
               @renderSummary()
 
           # Clear button
