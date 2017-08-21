@@ -70,7 +70,7 @@ module.exports = class TextWidget extends Widget
         selects: [
           { type: "select", expr: exprCompiler.compileExpr(expr: expr, tableAlias: "main"), alias: "value" }
         ]
-        from: { type: "table", table: table, alias: "main" }
+        from: exprCompiler.compileTable(table, "main")
         limit: 2
       }
 
