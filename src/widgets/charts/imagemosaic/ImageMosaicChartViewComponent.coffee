@@ -7,6 +7,7 @@ R = React.createElement
 AxisBuilder = require '../../../axes/AxisBuilder'
 LazyLoad = require('react-lazy-load').default
 RotationAwareImageComponent = require("mwater-forms/lib/RotationAwareImageComponent")
+ImagePopupComponent = require './ImagePopupComponent'
 
 # creates a d3 calendar visualization
 module.exports = class ImageMosaicChartViewComponent extends React.Component
@@ -28,15 +29,17 @@ module.exports = class ImageMosaicChartViewComponent extends React.Component
   # Render a single image
   renderImage: (image, imageManager) ->
     R LazyLoad, key: image.id,
-      R RotationAwareImageComponent, imageManager: imageManager, image: image, thumbnail: true, height: 120, width: 80
+      R RotationAwareImageComponent, 
+        imageManager: imageManager 
+        image: image
+        thumbnail: true
+        height: 120
+        width: 80
+        onClick: => @imagePopup?.show(image)
 
   # Render images
-  renderImages: ->
+  renderImages: (imageManager) ->
     imageElems = []
-    imageManager = {
-      getImageThumbnailUrl: (id, success, error) => success(@props.dataSource.getImageUrl(id, 100))
-      getImageUrl: (id, success, error) => success(@props.dataSource.getImageUrl(id))
-    }
 
     # For each image
     for row in @props.data
@@ -68,9 +71,18 @@ module.exports = class ImageMosaicChartViewComponent extends React.Component
 
     title = @props.design.titleText
 
+    imageManager = {
+      getImageThumbnailUrl: (id, success, error) => success(@props.dataSource.getImageUrl(id, 100))
+      getImageUrl: (id, success, error) => success(@props.dataSource.getImageUrl(id))
+    }
+
     H.div style: style, className: 'image-mosaic',
       if title
         H.p style: titleStyle, title
+
+      R ImagePopupComponent, 
+        ref: (c) => @imagePopup = c
+        imageManager: imageManager
       H.div null,
-        @renderImages()
+        @renderImages(imageManager)
 
