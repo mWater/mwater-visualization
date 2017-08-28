@@ -206,8 +206,8 @@ module.exports = class DatagridComponent extends React.Component
           if not new DatagridUtils(@props.schema).validateDesign(design)
             R DatagridViewComponent, {
               ref: (view) => @datagridView = view
-              width: size.width
-              height: size.height
+              width: size.width - 1 # minus 1 px to test if it solves the jitter with scroll
+              height: size.height - 1
               pageSize: 100
               schema: @props.schema
               dataSource: @props.dataSource
