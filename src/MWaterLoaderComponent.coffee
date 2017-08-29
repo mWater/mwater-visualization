@@ -8,6 +8,7 @@ Schema = require('mwater-expressions').Schema
 MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 MWaterTableSelectComponent = require './MWaterTableSelectComponent'
 MWaterAddRelatedFormComponent = require './MWaterAddRelatedFormComponent'
+MWaterAddRelatedIndicatorComponent = require './MWaterAddRelatedIndicatorComponent'
 querystring = require 'querystring'
 AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
 LoadingComponent = require 'react-library/lib/LoadingComponent'
@@ -64,8 +65,17 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
   @childContextTypes: 
     tableSelectElementFactory: PropTypes.func
     addLayerElementFactory: PropTypes.func
+
     # Decorates sections (the children element, specifically) in the expression picker
     decorateScalarExprTreeSectionChildren: PropTypes.func
+
+    # Function to override initial open state of a section. Passed { tableId: id of table, section: section object from schema, filter: optional string filter }
+    # Should return true to set initially open
+    isScalarExprTreeSectionInitiallyOpen: PropTypes.func
+
+    # Function to override filtering of a section. Passed { tableId: id of table, section: section object from schema, filter: optional string filter }
+    # Should return null for default, true to include, false to exclude
+    isScalarExprTreeSectionMatch: PropTypes.func
   
   getChildContext: ->
     context = {}
@@ -88,9 +98,10 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
     context.decorateScalarExprTreeSectionChildren = (options) =>
       # If related forms section of entities table
       if options.tableId.match(/^entities\./) and options.section.id == "!related_forms"
-        return H.div null,
+        return H.div key: "_add_related_form_parent",
           options.children
           R MWaterAddRelatedFormComponent, 
+            key: "_add_related_form"
             table: options.tableId
             apiUrl: @props.apiUrl
             client: @props.client
@@ -98,8 +109,34 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
             schema: @state.schema
             onSelect: @handleAddTable
 
+      # If indicators section of entities table
+      if options.tableId.match(/^entities\./) and options.section.id == "!indicators"
+        return H.div key: "_add_related_indicator_parent",
+          options.children
+          R MWaterAddRelatedIndicatorComponent,
+            key: "_add_related_indicator" 
+            table: options.tableId
+            apiUrl: @props.apiUrl
+            client: @props.client
+            user: @props.user
+            schema: @state.schema
+            onSelect: @handleAddTable
+            filter: options.filter
+
       else
         return options.children
+
+    # Always match indicator section
+    context.isScalarExprTreeSectionMatch = (options) =>
+      if options.tableId.match(/^entities\./) and options.section.id == "!indicators"
+        return true
+      return null
+
+    # Always open indicator section
+    context.isScalarExprTreeSectionInitiallyOpen = (options) =>
+      if options.tableId.match(/^entities\./) and options.section.id == "!indicators"
+        return true
+      return null
 
     return context
 

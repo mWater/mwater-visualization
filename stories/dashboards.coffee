@@ -69,8 +69,8 @@ class DashboardTest extends React.Component
           apiUrl: apiUrl
           client: null
           user: null
-          # onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
-          # extraTables: @state.extraTables
+          onExtraTablesChange: update("extraTables")
+          extraTables: state.extraTables
         }, (error, config) =>
           if error
             alert("Error: " + error.message)

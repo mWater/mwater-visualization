@@ -24,7 +24,7 @@ module.exports = (options, callback) ->
   if options.extraTables and options.extraTables.length > 0
     query.extraTables = options.extraTables.join(',')
 
-  url = options.apiUrl + "jsonql/schema?" + querystring.stringify(query)
+  url = options.apiUrl + "schema?" + querystring.stringify(query)
 
   $.getJSON url, (schemaJson) =>
     schema = new Schema(schemaJson)

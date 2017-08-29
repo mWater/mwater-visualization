@@ -5244,7 +5244,7 @@ mute-stdout@^1.0.0:
 
 "mwater-expressions-ui@git+ssh://git@github.com/mWater/mwater-expressions-ui.git":
   version "4.12.6"
-  resolved "git+ssh://git@github.com/mWater/mwater-expressions-ui.git#79fce7a81005e1ac2ab2d7acb51b83d969891565"
+  resolved "git+ssh://git@github.com/mWater/mwater-expressions-ui.git#6a9fdf8df00a4c00e42491d8de14da4bc3f1e7d8"
   dependencies:
     async "^1.5.0"
     classnames "^2.2.5"
@@ -6570,7 +6570,7 @@ react-dom-factories@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/react-dom-factories/-/react-dom-factories-1.0.0.tgz#f43c05e5051b304f33251618d5bc859b29e46b6d"
 
-react-dom@^15.0.1, react-dom@^15.4.1, react-dom@^15.5.1:
+react-dom@^15.0.1, react-dom@^15.4.1:
   version "15.6.1"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-15.6.1.tgz#2cb0ed4191038e53c209eb3a79a23e2a4cf99470"
   dependencies:
@@ -6761,7 +6761,7 @@ react-stubber@^1.0.0:
   dependencies:
     babel-runtime "^6.5.0"
 
-react@^15.0.1, react@^15.4.1, react@^15.5.1:
+react@^15.0.1, react@^15.4.1:
   version "15.6.1"
   resolved "https://registry.yarnpkg.com/react/-/react-15.6.1.tgz#baa8434ec6780bde997cdc380b79cd33b96393df"
   dependencies:
