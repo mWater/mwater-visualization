@@ -219,10 +219,12 @@ module.exports = class DatagridComponent extends React.Component
               canEditCell: if @state.cellEditingEnabled then @props.canEditValue
               updateCell: if @state.cellEditingEnabled then @props.updateValue
             }
-          else
+          else if @props.onDesignChange
             H.div style: { textAlign: "center", marginTop: size.height / 2 }, 
               H.a className: "btn btn-link", onClick: @handleEdit, 
                 "Click Here to Configure"
+          else
+            null
 
 # Popup editor
 class DatagridEditorComponent extends React.Component
