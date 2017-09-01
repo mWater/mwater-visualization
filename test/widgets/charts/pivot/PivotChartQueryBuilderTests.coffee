@@ -51,7 +51,7 @@ describe "PivotChartQueryBuilder", ->
         { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "value" }
       ]
       from: { type: "table", table: "t1", alias: "main" }
-      limit: 1000
+      limit: 10000
       groupBy: [1, 2]
     }
 
@@ -86,7 +86,7 @@ describe "PivotChartQueryBuilder", ->
       ]
       from: { type: "table", table: "t1", alias: "main" }
       where: { type: "field", tableAlias: "main", column: "boolean" }
-      limit: 1000
+      limit: 10000
       groupBy: [1, 2]
     }
 
@@ -127,7 +127,7 @@ describe "PivotChartQueryBuilder", ->
           { type: "literal", value: true }
         ]
       }
-      limit: 1000
+      limit: 10000
       groupBy: [1, 2]
     }
 
@@ -161,7 +161,7 @@ describe "PivotChartQueryBuilder", ->
         { type: "select", expr: { type: "op", op: "count", exprs: [] }, alias: "bc" }
       ]
       from: { type: "table", table: "t1", alias: "main" }
-      limit: 1000
+      limit: 10000
       groupBy: [1, 2]
     }
 
@@ -208,7 +208,7 @@ describe "PivotChartQueryBuilder", ->
         }
       ]
       from: { type: "table", table: "t1", alias: "main" }
-      limit: 1000
+      limit: 10000
       groupBy: [1, 2]
     }
 

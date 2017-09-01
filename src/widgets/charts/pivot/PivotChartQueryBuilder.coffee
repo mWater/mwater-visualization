@@ -46,7 +46,7 @@ module.exports = class PivotChartQueryBuilder
           type: "query"
           selects: []
           from: exprCompiler.compileTable(design.table, "main")
-          limit: 1000
+          limit: 10000
           groupBy: []
         }
 
