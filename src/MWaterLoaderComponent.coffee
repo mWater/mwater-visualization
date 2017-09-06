@@ -58,7 +58,7 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
       }, (error, config) =>
         if error
           console.log error.message
-          return callback(error: "Cannot load one of the forms that this depends on. Perhaps the administrator has not shared the form with you?")
+          return callback(error: "Cannot load one of the forms that this depends on. Perhaps the administrator has not shared the form with you? Details: #{error.message}")
         callback({ schema: config.schema, dataSource: config.dataSource })
     )
 
