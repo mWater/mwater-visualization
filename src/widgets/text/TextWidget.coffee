@@ -70,13 +70,16 @@ module.exports = class TextWidget extends Widget
         selects: [
           { type: "select", expr: exprCompiler.compileExpr(expr: expr, tableAlias: "main"), alias: "value" }
         ]
-        from: exprCompiler.compileTable(table, "main")
+        from: if table then exprCompiler.compileTable(table, "main")
         limit: 2
       }
 
       # Get relevant filters
-      relevantFilters = _.where(filters or [], table: table)
-      whereClauses = _.map(relevantFilters, (f) -> injectTableAlias(f.jsonql, "main")) 
+      if table
+        relevantFilters = _.where(filters or [], table: table)
+        whereClauses = _.map(relevantFilters, (f) -> injectTableAlias(f.jsonql, "main")) 
+      else 
+        whereClauses = []
 
       whereClauses = _.compact(whereClauses)
 
