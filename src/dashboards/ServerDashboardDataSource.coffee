@@ -18,7 +18,7 @@ module.exports = class ServerDashboardDataSource
     return new ServerWidgetDataSource(_.extend({}, @options, widgetId: widgetId, dashboardDataSource: this))
 
   getQuickfiltersDataSource: ->
-    return new ServerQuickfilterDataSource(_.extend({}, @options, widgetId: widgetId, dashboardDataSource: this))
+    return new ServerQuickfilterDataSource(_.extend({}, @options, dashboardDataSource: this))
 
   # Clears any cached data
   clearCache: -> 
