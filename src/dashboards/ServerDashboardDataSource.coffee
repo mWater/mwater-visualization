@@ -214,8 +214,6 @@ class ServerWidgetLayerDataSource
 
   # Create url
   createUrl: (filters, extension) ->
-    cacheExpiry = @options.dashboardDataSource.getCacheExpiry()
-
     query = {
       type: "dashboard_widget"
       client: @options.client
@@ -228,8 +226,9 @@ class ServerWidgetLayerDataSource
     }
 
     # Make URL change when cache expired
+    cacheExpiry = @options.dashboardDataSource.getCacheExpiry()
     if cacheExpiry
-      querystring.cacheExpiry = cacheExpiry
+      query.cacheExpiry = cacheExpiry
 
     url = "#{@options.apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?" + querystring.stringify(query)
 
