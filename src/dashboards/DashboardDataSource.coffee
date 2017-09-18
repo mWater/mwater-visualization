@@ -9,3 +9,9 @@ module.exports = class DashboardDataSource
   # Gets the quickfilters data source
   getQuickfiltersDataSource: ->
     throw new Error("Not implemented")
+
+  # Clears any cached data
+  clearCache: -> return
+
+  # Returns a different timestamp when cache is cleared, meaning that widgets should reload
+  getCacheExpiry: -> return 0

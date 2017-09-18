@@ -26,7 +26,7 @@ module.exports = class ChartViewComponent extends React.Component
 
     onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
 
-  constructor: ->
+  constructor: (props) ->
     super
 
     @state = {
@@ -34,6 +34,7 @@ module.exports = class ChartViewComponent extends React.Component
       data: null            # data for chart
       dataLoading: false    # True when loading data
       dataError: null       # Set when data loading returned error
+      cacheExpiry: props.widgetDataSource.getCacheExpiry?()  # Save cache expiry to see if changes
     }
 
     # Ensure that only one load at a time
@@ -45,7 +46,10 @@ module.exports = class ChartViewComponent extends React.Component
     @updateData(@props)
 
   componentWillReceiveProps: (nextProps) ->
-    if not _.isEqual(nextProps.design, @props.design) or not _.isEqual(nextProps.filters, @props.filters)
+    if not _.isEqual(nextProps.design, @props.design) or not _.isEqual(nextProps.filters, @props.filters) or nextProps.widgetDataSource.getCacheExpiry?() != @state.cacheExpiry
+      # Save new cache expiry
+      @setState(cacheExpiry: nextProps.widgetDataSource.getCacheExpiry?())
+
       @updateData(nextProps)
 
   updateData: (props) ->

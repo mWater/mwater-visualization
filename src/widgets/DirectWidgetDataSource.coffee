@@ -26,3 +26,10 @@ module.exports = class DirectWidgetDataSource
   # Height, if specified, is minimum height needed. May return larger image
   getImageUrl: (imageId, height) ->
     return @options.dataSource.getImageUrl(imageId, height)
+
+  # Clears any cached data
+  clearCache: -> 
+    @options.dataSource.clearCache()
+
+  # Returns a different timestamp when cache is cleared, meaning that widgets should reload
+  getCacheExpiry: -> @options.dataSource.getCacheExpiry()

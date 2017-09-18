@@ -5265,8 +5265,8 @@ mute-stdout@^1.0.0:
     uuid "^3.0.1"
 
 "mwater-expressions@git+ssh://git@github.com/mWater/mwater-expressions.git":
-  version "2.47.3"
-  resolved "git+ssh://git@github.com/mWater/mwater-expressions.git#cd93e423529532a72fb07517e64ea7baf7d19750"
+  version "2.49.3"
+  resolved "git+ssh://git@github.com/mWater/mwater-expressions.git#4662904f3f0d36b34694e474be3f0e27c4ed66e9"
   dependencies:
     async "^1.5.0"
     lodash "^3.10.1"

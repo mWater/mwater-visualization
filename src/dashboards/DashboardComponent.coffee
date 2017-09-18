@@ -124,6 +124,11 @@ module.exports = class DashboardComponent extends React.Component
   handleToggleEditing: =>
     @setState(editing: not @state.editing)
 
+  handleRefreshData: =>
+    @props.dataSource.clearCache?()
+    @props.dashboardDataSource.clearCache?()
+    @forceUpdate()
+
   handleStyleChange: (style) =>
     @props.onDesignChange(_.extend({}, @props.design, { style: style or null }))
 
@@ -214,6 +219,9 @@ module.exports = class DashboardComponent extends React.Component
       H.a key: "print", className: "btn btn-link btn-sm", onClick: @handlePrint,
         H.span(className: "glyphicon glyphicon-print")
         " Print"
+      H.a key: "refresh", className: "btn btn-link btn-sm", onClick: @handleRefreshData,
+        H.span(className: "glyphicon glyphicon-refresh")
+        " Refresh"
       # H.a key: "export", className: "btn btn-link btn-sm", onClick: @handleSaveDesignFile,
       #   H.span(className: "glyphicon glyphicon-download-alt")
       #   " Export"

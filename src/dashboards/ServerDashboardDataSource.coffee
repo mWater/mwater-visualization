@@ -11,19 +11,28 @@ module.exports = class ServerDashboardDataSource
   #   rev: revision to use to allow caching
   constructor: (options) ->
     @options = options
+    @cacheExpiry = 0
 
   # Gets the widget data source for a specific widget
   getWidgetDataSource: (widgetId) ->
-    return new ServerWidgetDataSource(_.extend({}, @options, widgetId: widgetId))
+    return new ServerWidgetDataSource(_.extend({}, @options, widgetId: widgetId, dashboardDataSource: this))
 
   getQuickfiltersDataSource: ->
-    return new ServerQuickfilterDataSource(@options)
+    return new ServerQuickfilterDataSource(_.extend({}, @options, widgetId: widgetId, dashboardDataSource: this))
+
+  # Clears any cached data
+  clearCache: -> 
+    @cacheExpiry = new Date().getTime()
+
+  # Returns a different timestamp when cache is cleared, meaning that widgets should reload
+  getCacheExpiry: -> @cacheExpiry
 
 class ServerQuickfilterDataSource
   # options:
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
+  #   dashboardDataSource: server dashboard data source
   #   dashboardId: dashboard id to use on server
   #   rev: revision to use to allow caching
   constructor: (options) ->
@@ -42,7 +51,18 @@ class ServerQuickfilterDataSource
 
     url = @options.apiUrl + "dashboards/#{@options.dashboardId}/quickfilters/#{index}/values?" + querystring.stringify(query)
 
-    $.getJSON url, (data) =>
+    headers = {}
+    cacheExpiry = @options.dashboardDataSource.getCacheExpiry()
+    if cacheExpiry
+      seconds = Math.floor((new Date().getTime() - @cacheExpiry) / 1000)
+      headers['Cache-Control'] = "max-age=#{seconds}"
+
+    $.ajax({ 
+      dataType: "json"
+      method: "GET"
+      url: url
+      headers: headers
+    }).done (data) =>
       callback(null, data)
     .fail (xhr) =>
       console.log xhr.responseText
@@ -53,6 +73,7 @@ class ServerWidgetDataSource
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
+  #   dashboardDataSource: server dashboard data source
   #   dashboardId: dashboard id to use on server
   #   rev: revision to use to allow caching
   #   widgetId: widget id to use
@@ -72,7 +93,18 @@ class ServerWidgetDataSource
 
     url = @options.apiUrl + "dashboards/#{@options.dashboardId}/widgets/#{@options.widgetId}/data?" + querystring.stringify(query)
 
-    $.getJSON url, (data) =>
+    headers = {}
+    cacheExpiry = @options.dashboardDataSource.getCacheExpiry()
+    if cacheExpiry
+      seconds = Math.floor((new Date().getTime() - @cacheExpiry) / 1000)
+      headers['Cache-Control'] = "max-age=#{seconds}"
+
+    $.ajax({ 
+      dataType: "json"
+      method: "GET"
+      url: url
+      headers: headers
+    }).done (data) =>
       callback(null, data)
     .fail (xhr) =>
       console.log xhr.responseText
@@ -97,6 +129,7 @@ class ServerWidgetMapDataSource
   #   design: design of the map widget
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
+  #   dashboardDataSource: server dashboard data source
   #   dashboardId: dashboard id to use on server
   #   rev: revision to use to allow caching
   #   widgetId: widget id to use
@@ -123,7 +156,18 @@ class ServerWidgetMapDataSource
 
     url = @options.apiUrl + "dashboards/#{@options.dashboardId}/widgets/#{@options.widgetId}/bounds?" + querystring.stringify(query)
 
-    $.getJSON url, (data) =>
+    headers = {}
+    cacheExpiry = @options.dashboardDataSource.getCacheExpiry()
+    if cacheExpiry
+      seconds = Math.floor((new Date().getTime() - @cacheExpiry) / 1000)
+      headers['Cache-Control'] = "max-age=#{seconds}"
+
+    $.ajax({ 
+      dataType: "json"
+      method: "GET"
+      url: url
+      headers: headers
+    }).done (data) =>
       callback(null, data)
     .fail (xhr) =>
       console.log xhr.responseText
@@ -134,6 +178,7 @@ class ServerWidgetLayerDataSource
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
+  #   dashboardDataSource: server dashboard data source
   #   dashboardId: dashboard id to use on server
   #   rev: revision to use to allow caching
   #   widgetId: widget id to use
@@ -169,6 +214,8 @@ class ServerWidgetLayerDataSource
 
   # Create url
   createUrl: (filters, extension) ->
+    cacheExpiry = @options.dashboardDataSource.getCacheExpiry()
+
     query = {
       type: "dashboard_widget"
       client: @options.client
@@ -179,6 +226,10 @@ class ServerWidgetLayerDataSource
       rev: @options.rev
       filters: JSON.stringify(filters or [])
     }
+
+    # Make URL change when cache expired
+    if cacheExpiry
+      querystring.cacheExpiry = cacheExpiry
 
     url = "#{@options.apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?" + querystring.stringify(query)
 
@@ -227,6 +278,7 @@ class ServerWidgetLayerPopupWidgetDataSource
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
+  #   dashboardDataSource: server dashboard data source
   #   dashboardId: dashboard id to use on server
   #   rev: revision to use to allow caching
   #   widgetId: widget id to use
@@ -248,7 +300,18 @@ class ServerWidgetLayerPopupWidgetDataSource
 
     url = @options.apiUrl + "dashboards/#{@options.dashboardId}/widgets/#{@options.widgetId}/layers/#{@options.layerView.id}/widgets/#{@options.popupWidgetId}/data?" + querystring.stringify(query)
 
-    $.getJSON url, (data) =>
+    headers = {}
+    cacheExpiry = @options.dashboardDataSource.getCacheExpiry()
+    if cacheExpiry
+      seconds = Math.floor((new Date().getTime() - @cacheExpiry) / 1000)
+      headers['Cache-Control'] = "max-age=#{seconds}"
+
+    $.ajax({ 
+      dataType: "json"
+      method: "GET"
+      url: url
+      headers: headers
+    }).done (data) =>
       callback(null, data)
     .fail (xhr) =>
       console.log xhr.responseText

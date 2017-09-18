@@ -133,7 +133,7 @@ class MWaterDirectDashboardPane extends React.Component
       design: if window.localStorage.getItem("MWaterDirectDashboardPane.design") then JSON.parse(window.localStorage.getItem("MWaterDirectDashboardPane.design")) else mapAndChartDashboard
       # design: imageWidgetDashboardDesign
       # design: dashboardDesign
-      extraTables: [] #['responses:e24f0a0ec11643cab3c21c07de2f6889']
+      extraTables: if window.localStorage.getItem("MWaterDirectDashboardPane.extraTables") then JSON.parse(window.localStorage.getItem("MWaterDirectDashboardPane.extraTables")) else []
     }
 
   handleDesignChange: (design) =>
@@ -141,12 +141,16 @@ class MWaterDirectDashboardPane extends React.Component
     console.log JSON.stringify(design, null, 2)
     window.localStorage.setItem("MWaterDirectDashboardPane.design", JSON.stringify(design))
 
+  handleExtraTablesChange: (extraTables) =>
+    @setState(extraTables: extraTables)
+    window.localStorage.setItem("MWaterDirectDashboardPane.extraTables", JSON.stringify(extraTables))
+
   render: ->
     React.createElement(MWaterLoaderComponent, {
       apiUrl: @props.apiUrl
       client: @props.client
       user: @props.user
-      onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
+      onExtraTablesChange: @handleExtraTablesChange
       extraTables: @state.extraTables
     }, (error, config) =>
       if error
