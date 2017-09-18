@@ -98,13 +98,20 @@ class DirectLayerDataSource
 
   # Create query string
   createUrl: (extension, jsonqlCss) ->
-    query = "type=jsonql"
+    query = {
+      type: "jsonql"
+      design: JSON.stringify(jsonqlCss)
+    }
+
     if @options.client
-      query += "&client=" + @options.client
+      query.client = @options.client
 
-    query += "&design=" + encodeURIComponent(JSON.stringify(jsonqlCss))
+    # Make URL change when cache expired
+    cacheExpiry = @options.dataSource.getCacheExpiry?()
+    if cacheExpiry
+      query.cacheExpiry = cacheExpiry
 
-    url = "#{@options.apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?" + query
+    url = "#{@options.apiUrl}maps/tiles/{z}/{x}/{y}.#{extension}?" + querystring.stringify(query)
 
     # Add subdomains: {s} will be substituted with "a", "b" or "c" in leaflet for api.mwater.co only.
     # Used to speed queries
