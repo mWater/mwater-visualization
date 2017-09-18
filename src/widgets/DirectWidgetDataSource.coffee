@@ -28,4 +28,4 @@ module.exports = class DirectWidgetDataSource
     return @options.dataSource.getImageUrl(imageId, height)
 
   # Returns a different timestamp when cache is cleared, meaning that widgets should reload
-  getCacheExpiry: -> @options.dataSource.getCacheExpiry()
+  getCacheExpiry: -> @options.dataSource.getCacheExpiry?()

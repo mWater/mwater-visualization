@@ -42,4 +42,4 @@ module.exports = class DirectDashboardDataSource
     @options.dataSource.clearCache()
 
   # Returns a different timestamp when cache is cleared, meaning that widgets should reload
-  getCacheExpiry: -> @options.dataSource.getCacheExpiry()
+  getCacheExpiry: -> @options.dataSource.getCacheExpiry?()
