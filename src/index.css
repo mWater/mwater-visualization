@@ -89,6 +89,10 @@
   font-weight: bold;
 }
 
+.c3-chart-arc text {
+  fill: black;
+}
+
 .mwater-visualization-image-widget {
   display: flex;
   flex-flow: column;
