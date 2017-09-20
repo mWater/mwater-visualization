@@ -107,7 +107,7 @@ class DirectLayerDataSource
       query.client = @options.client
 
     # Make URL change when cache expired
-    cacheExpiry = @options.dataSource.getCacheExpiry?()
+    cacheExpiry = @options.dataSource.getCacheExpiry()
     if cacheExpiry
       query.cacheExpiry = cacheExpiry
 

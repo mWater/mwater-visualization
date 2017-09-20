@@ -32,7 +32,7 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
       # Map of expression id to expression value
       exprValues: {}
       error: null
-      cacheExpiry: props.widgetDataSource.getCacheExpiry?()  # Save cache expiry to see if changes
+      cacheExpiry: props.dataSource.getCacheExpiry()  # Save cache expiry to see if changes
     }
 
   # Override to determine if a load is needed. Not called on mounting
@@ -48,13 +48,13 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
       return exprItems    
 
     # Reload if filters or expressions have changed or cache expiry
-    return not _.isEqual(newProps.filters, oldProps.filters) or not _.isEqual(getExprItems(newProps.design.items), getExprItems(oldProps.design.items)) or newProps.widgetDataSource.getCacheExpiry?() != @state.cacheExpiry
+    return not _.isEqual(newProps.filters, oldProps.filters) or not _.isEqual(getExprItems(newProps.design.items), getExprItems(oldProps.design.items)) or newProps.dataSource.getCacheExpiry() != @state.cacheExpiry
 
   # Call callback with state changes
   load: (props, prevProps, callback) -> 
     # Get data
     props.widgetDataSource.getData(props.design, props.filters, (error, data) =>
-      callback(error: error, exprValues: data or {}, cacheExpiry: props.widgetDataSource.getCacheExpiry?())
+      callback(error: error, exprValues: data or {}, cacheExpiry: props.dataSource.getCacheExpiry())
     )
 
   render: ->

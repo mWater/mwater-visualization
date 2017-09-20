@@ -5266,7 +5266,7 @@ mute-stdout@^1.0.0:
 
 "mwater-expressions@git+ssh://git@github.com/mWater/mwater-expressions.git":
   version "2.49.3"
-  resolved "git+ssh://git@github.com/mWater/mwater-expressions.git#4662904f3f0d36b34694e474be3f0e27c4ed66e9"
+  resolved "git+ssh://git@github.com/mWater/mwater-expressions.git#01efe48fd52d76a53a58822dbe76dae3320bdffd"
   dependencies:
     async "^1.5.0"
     lodash "^3.10.1"

@@ -126,7 +126,6 @@ module.exports = class DashboardComponent extends React.Component
 
   handleRefreshData: =>
     @props.dataSource.clearCache?()
-    @props.dashboardDataSource.clearCache?()
     @forceUpdate()
 
   handleStyleChange: (style) =>

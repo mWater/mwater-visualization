@@ -36,10 +36,3 @@ module.exports = class DirectDashboardDataSource
         # Perform query
         QuickfilterUtils.findExprValues(expr, @options.schema, @options.dataSource, filters, offset, limit, callback)
     }
-
-  # Clears any cached data
-  clearCache: -> 
-    @options.dataSource.clearCache()
-
-  # Returns a different timestamp when cache is cleared, meaning that widgets should reload
-  getCacheExpiry: -> @options.dataSource.getCacheExpiry?()

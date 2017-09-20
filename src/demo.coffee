@@ -108,7 +108,7 @@ class MWaterDashboardPane extends React.Component
         return H.div null, "Error: #{error.message}"
 
       dashboardDataSource = new ServerDashboardDataSource({
-        apiUrl: @props.apiUrl, client: @props.client, share: @props.share, dashboardId: @props.dashboardId
+        apiUrl: @props.apiUrl, client: @props.client, share: @props.share, dashboardId: @props.dashboardId, dataSource: config.dataSource
         })
       # dashboardDataSource = new DirectDashboardDataSource(@props.apiUrl, @props.client, @state.design, config.schema, config.dataSource)
 

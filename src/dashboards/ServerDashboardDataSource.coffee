@@ -8,31 +8,23 @@ module.exports = class ServerDashboardDataSource
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
   #   dashboardId: dashboard id to use on server
+  #   dataSource: data source that is used for determining cache expiry
   #   rev: revision to use to allow caching
   constructor: (options) ->
     @options = options
-    @cacheExpiry = 0
 
   # Gets the widget data source for a specific widget
   getWidgetDataSource: (widgetId) ->
-    return new ServerWidgetDataSource(_.extend({}, @options, widgetId: widgetId, dashboardDataSource: this))
+    return new ServerWidgetDataSource(_.extend({}, @options, widgetId: widgetId))
 
   getQuickfiltersDataSource: ->
-    return new ServerQuickfilterDataSource(_.extend({}, @options, dashboardDataSource: this))
-
-  # Clears any cached data
-  clearCache: -> 
-    @cacheExpiry = new Date().getTime()
-
-  # Returns a different timestamp when cache is cleared, meaning that widgets should reload
-  getCacheExpiry: -> @cacheExpiry
+    return new ServerQuickfilterDataSource(@options)
 
 class ServerQuickfilterDataSource
   # options:
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
-  #   dashboardDataSource: server dashboard data source
   #   dashboardId: dashboard id to use on server
   #   rev: revision to use to allow caching
   constructor: (options) ->
@@ -52,7 +44,7 @@ class ServerQuickfilterDataSource
     url = @options.apiUrl + "dashboards/#{@options.dashboardId}/quickfilters/#{index}/values?" + querystring.stringify(query)
 
     headers = {}
-    cacheExpiry = @options.dashboardDataSource.getCacheExpiry()
+    cacheExpiry = @options.dataSource.getCacheExpiry()
     if cacheExpiry
       seconds = Math.floor((new Date().getTime() - @cacheExpiry) / 1000)
       headers['Cache-Control'] = "max-age=#{seconds}"
@@ -73,7 +65,6 @@ class ServerWidgetDataSource
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
-  #   dashboardDataSource: server dashboard data source
   #   dashboardId: dashboard id to use on server
   #   rev: revision to use to allow caching
   #   widgetId: widget id to use
@@ -94,7 +85,7 @@ class ServerWidgetDataSource
     url = @options.apiUrl + "dashboards/#{@options.dashboardId}/widgets/#{@options.widgetId}/data?" + querystring.stringify(query)
 
     headers = {}
-    cacheExpiry = @options.dashboardDataSource.getCacheExpiry()
+    cacheExpiry = @options.dataSource.getCacheExpiry()
     if cacheExpiry
       seconds = Math.floor((new Date().getTime() - @cacheExpiry) / 1000)
       headers['Cache-Control'] = "max-age=#{seconds}"
@@ -129,7 +120,6 @@ class ServerWidgetMapDataSource
   #   design: design of the map widget
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
-  #   dashboardDataSource: server dashboard data source
   #   dashboardId: dashboard id to use on server
   #   rev: revision to use to allow caching
   #   widgetId: widget id to use
@@ -157,7 +147,7 @@ class ServerWidgetMapDataSource
     url = @options.apiUrl + "dashboards/#{@options.dashboardId}/widgets/#{@options.widgetId}/bounds?" + querystring.stringify(query)
 
     headers = {}
-    cacheExpiry = @options.dashboardDataSource.getCacheExpiry()
+    cacheExpiry = @options.dataSource.getCacheExpiry()
     if cacheExpiry
       seconds = Math.floor((new Date().getTime() - @cacheExpiry) / 1000)
       headers['Cache-Control'] = "max-age=#{seconds}"
@@ -178,7 +168,6 @@ class ServerWidgetLayerDataSource
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
-  #   dashboardDataSource: server dashboard data source
   #   dashboardId: dashboard id to use on server
   #   rev: revision to use to allow caching
   #   widgetId: widget id to use
@@ -226,7 +215,7 @@ class ServerWidgetLayerDataSource
     }
 
     # Make URL change when cache expired
-    cacheExpiry = @options.dashboardDataSource.getCacheExpiry()
+    cacheExpiry = @options.dataSource.getCacheExpiry()
     if cacheExpiry
       query.cacheExpiry = cacheExpiry
 
@@ -277,7 +266,6 @@ class ServerWidgetLayerPopupWidgetDataSource
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
-  #   dashboardDataSource: server dashboard data source
   #   dashboardId: dashboard id to use on server
   #   rev: revision to use to allow caching
   #   widgetId: widget id to use
@@ -300,7 +288,7 @@ class ServerWidgetLayerPopupWidgetDataSource
     url = @options.apiUrl + "dashboards/#{@options.dashboardId}/widgets/#{@options.widgetId}/layers/#{@options.layerView.id}/widgets/#{@options.popupWidgetId}/data?" + querystring.stringify(query)
 
     headers = {}
-    cacheExpiry = @options.dashboardDataSource.getCacheExpiry()
+    cacheExpiry = @options.dataSource.getCacheExpiry()
     if cacheExpiry
       seconds = Math.floor((new Date().getTime() - @cacheExpiry) / 1000)
       headers['Cache-Control'] = "max-age=#{seconds}"
