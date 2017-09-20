@@ -47,7 +47,7 @@ class ServerQuickfilterDataSource
     headers = {}
     cacheExpiry = @options.dataSource.getCacheExpiry()
     if cacheExpiry
-      seconds = Math.floor((new Date().getTime() - @cacheExpiry) / 1000)
+      seconds = Math.floor((new Date().getTime() - cacheExpiry) / 1000)
       headers['Cache-Control'] = "max-age=#{seconds}"
 
     $.ajax({ 
@@ -89,7 +89,7 @@ class ServerWidgetDataSource
     headers = {}
     cacheExpiry = @options.dataSource.getCacheExpiry()
     if cacheExpiry
-      seconds = Math.floor((new Date().getTime() - @cacheExpiry) / 1000)
+      seconds = Math.floor((new Date().getTime() - cacheExpiry) / 1000)
       headers['Cache-Control'] = "max-age=#{seconds}"
 
     $.ajax({ 
@@ -152,7 +152,7 @@ class ServerWidgetMapDataSource
     headers = {}
     cacheExpiry = @options.dataSource.getCacheExpiry()
     if cacheExpiry
-      seconds = Math.floor((new Date().getTime() - @cacheExpiry) / 1000)
+      seconds = Math.floor((new Date().getTime() - cacheExpiry) / 1000)
       headers['Cache-Control'] = "max-age=#{seconds}"
 
     $.ajax({ 
@@ -295,7 +295,7 @@ class ServerWidgetLayerPopupWidgetDataSource
     headers = {}
     cacheExpiry = @options.dataSource.getCacheExpiry()
     if cacheExpiry
-      seconds = Math.floor((new Date().getTime() - @cacheExpiry) / 1000)
+      seconds = Math.floor((new Date().getTime() - cacheExpiry) / 1000)
       headers['Cache-Control'] = "max-age=#{seconds}"
 
     $.ajax({ 
