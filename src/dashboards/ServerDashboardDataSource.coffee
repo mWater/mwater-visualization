@@ -26,6 +26,7 @@ class ServerQuickfilterDataSource
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
   #   dashboardId: dashboard id to use on server
+  #   dataSource: data source that is used for determining cache expiry
   #   rev: revision to use to allow caching
   constructor: (options) ->
     @options = options
@@ -66,6 +67,7 @@ class ServerWidgetDataSource
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
   #   dashboardId: dashboard id to use on server
+  #   dataSource: data source that is used for determining cache expiry
   #   rev: revision to use to allow caching
   #   widgetId: widget id to use
   constructor: (options) ->
@@ -121,6 +123,7 @@ class ServerWidgetMapDataSource
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
   #   dashboardId: dashboard id to use on server
+  #   dataSource: data source that is used for determining cache expiry
   #   rev: revision to use to allow caching
   #   widgetId: widget id to use
   constructor: (options) ->
@@ -169,6 +172,7 @@ class ServerWidgetLayerDataSource
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
   #   dashboardId: dashboard id to use on server
+  #   dataSource: data source that is used for determining cache expiry
   #   rev: revision to use to allow caching
   #   widgetId: widget id to use
   #   layerView: layer view of map inside widget
@@ -267,6 +271,7 @@ class ServerWidgetLayerPopupWidgetDataSource
   #   client: client id to use for talking to mWater server
   #   share: share id to use for talking to mWater server
   #   dashboardId: dashboard id to use on server
+  #   dataSource: data source that is used for determining cache expiry
   #   rev: revision to use to allow caching
   #   widgetId: widget id to use
   #   layerView: layer view of map inside widget
