@@ -24,6 +24,7 @@ Dashboard design is:
 `style`: optional stylesheet to use
 `filters`: filter expression indexed by table. e.g. { sometable: logical expression, etc. }
 `locale`: optional locale (e.g. "fr") to use for display
+`implicitFiltersEnabled`: true to enable implicit filtering (see ImplicitFilterBuilder). Defaults to true for older dashboards.
 
 ### Widget scoping
 

@@ -112,8 +112,9 @@ module.exports = class DashboardViewComponent extends React.Component
       filters = compiledFilters.concat(@state.widgetScoper.getFilters(options.id))
 
       # Extend the filters to include implicit filters (filter children in 1-n relationships)
-      implicitFilterBuilder = new ImplicitFilterBuilder(@props.schema)
-      filters = implicitFilterBuilder.extendFilters(filterableTables, filters)
+      if @props.design.implicitFiltersEnabled or not @props.design.implicitFiltersEnabled? # Default is true
+        implicitFilterBuilder = new ImplicitFilterBuilder(@props.schema)
+        filters = implicitFilterBuilder.extendFilters(filterableTables, filters)
       
       return widget.createViewElement({
         schema: @props.schema

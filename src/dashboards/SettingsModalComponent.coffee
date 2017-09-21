@@ -6,6 +6,7 @@ R = React.createElement
 update = require 'update-object'
 languages = require 'languages'
 
+ui = require 'react-library/lib/bootstrap'
 ReactSelect = require 'react-select'
 
 DashboardUtils = require './DashboardUtils'
@@ -96,3 +97,10 @@ module.exports = class SettingsModalComponent extends React.Component
             options: localeOptions
             clearable: false
             onChange: (value) => @handleDesignChange(update(@state.design, { locale: { $set: value } }))
+
+          H.h4 style: { paddingTop: 10 },
+            "Advanced"
+          R ui.Checkbox, 
+            value: (if @state.design.implicitFiltersEnabled? then @state.design.implicitFiltersEnabled else true)
+            onChange: ((value) => @handleDesignChange(update(@state.design, { implicitFiltersEnabled: { $set: value } }))),
+              "Enable Implicit Filtering (leave unchecked for new dashboards)"
