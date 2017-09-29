@@ -45,6 +45,11 @@ module.exports = class DateRangeComponent extends React.Component
     @setState(dropdownOpen: false)
 
   handleStartChange: (value) =>
+    # Go to start of day if datetime
+    if @props.datetime
+      value = moment(value)
+      value.startOf("day")
+
     # Clear end if after
     if @props.value?[1] and @fromMoment(value) > @props.value[1]
       @props.onChange([@fromMoment(value), null])
@@ -66,7 +71,17 @@ module.exports = class DateRangeComponent extends React.Component
     @setState(dropdownOpen: false)
 
   handlePreset: (preset) =>
-    @props.onChange([@fromMoment(preset.value[0]), @fromMoment(preset.value[1])])
+    # Go to start/end of day if datetime
+    if @props.datetime
+      start = moment(preset.value[0])
+      start.startOf("day")
+      end = moment(preset.value[1])
+      end.endOf("day")
+    else
+      start = preset.value[0]
+      end = preset.value[1]
+
+    @props.onChange([@fromMoment(start), @fromMoment(end)])
     @setState(dropdownOpen: false)
 
   getPresets: ->
