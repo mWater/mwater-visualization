@@ -5,6 +5,8 @@ R = React.createElement
 update = require 'update-object'
 TableSelectComponent = require '../TableSelectComponent'
 ExprComponent = require('mwater-expressions-ui').ExprComponent
+ExprUtils = require('mwater-expressions').ExprUtils
+ui = require 'react-library/lib/bootstrap'
 
 # Displays quick filters and allows their value to be modified
 module.exports = class QuickfiltersDesignComponent extends React.Component
@@ -20,6 +22,43 @@ module.exports = class QuickfiltersDesignComponent extends React.Component
   @defaultProps:
     design: []
 
+  handleDesignChange: (design) =>
+    design = design.slice()
+    
+    # Update merged, clearing if not mergeable
+    for index in [0...design.length]
+      if design[index].merged and not @isMergeable(design, index)
+        design[index] = _.extend({}, design[index], merged: false)
+
+    @props.onDesignChange(design)
+
+  # Determine if quickfilter at index is mergeable with previous (same type, id table and enum values)
+  isMergeable: (design, index) ->
+    if index == 0
+      return false
+
+    exprUtils = new ExprUtils(@props.schema)
+
+    type = exprUtils.getExprType(design[index].expr)
+    prevType = exprUtils.getExprType(design[index - 1].expr)
+
+    idTable = exprUtils.getExprIdTable(design[index].expr)
+    prevIdTable = exprUtils.getExprIdTable(design[index - 1].expr)
+
+    enumValues = exprUtils.getExprEnumValues(design[index].expr)
+    prevEnumValues = exprUtils.getExprEnumValues(design[index - 1].expr)
+
+    if not type or type != prevType
+      return false
+
+    if idTable != prevIdTable
+      return false
+
+    if enumValues and not _.isEqual(_.pluck(enumValues, "id"), _.pluck(prevEnumValues, "id"))
+      return false
+
+    return true
+
   renderQuickfilter: (item, index) ->
     R QuickfilterDesignComponent, {
       key: index
@@ -27,10 +66,11 @@ module.exports = class QuickfiltersDesignComponent extends React.Component
       schema: @props.schema
       dataSource: @props.dataSource
       table: @props.table
+      mergeable: @isMergeable(@props.design, index)
       onChange: (newItem) => 
         design = @props.design.slice()
         design[index] = newItem
-        @props.onDesignChange(design)
+        @handleDesignChange(design)
 
       onRemove: @handleRemove.bind(null, index)
     }
@@ -58,6 +98,7 @@ class QuickfilterDesignComponent extends React.Component
     design: PropTypes.object.isRequired  # Design of a single quickfilters. See README.md
     onChange: PropTypes.func.isRequired
     onRemove: PropTypes.func.isRequired
+    mergeable: PropTypes.bool            # True if can be merged
 
     schema: PropTypes.object.isRequired
     dataSource: PropTypes.object.isRequired
@@ -87,6 +128,7 @@ class QuickfilterDesignComponent extends React.Component
 
   handleExprChange: (expr) => @props.onChange(update(@props.design, { expr: { $set: expr }}))
   handleLabelChange: (ev) => @props.onChange(update(@props.design, { label: { $set: ev.target.value }}))
+  handleMergedChange: (merged) => @props.onChange(update(@props.design, { merged: { $set: merged }}))
 
   render: ->
     R RemovableComponent, onRemove: @props.onRemove, 
@@ -114,6 +156,12 @@ class QuickfilterDesignComponent extends React.Component
             H.div className: "form-group", key: "label",
               H.label className: "text-muted", "Label"
               H.input type: "text", className: "form-control input-sm", value: @props.design.label or "", onChange: @handleLabelChange, placeholder: "Optional Label"
+
+          if @props.mergeable
+            R ui.Checkbox, 
+              value: @props.design.merged
+              onChange: @handleMergedChange,
+                "Merge with previous quickfilter"
 
 
 # Floats an x to the right on hover

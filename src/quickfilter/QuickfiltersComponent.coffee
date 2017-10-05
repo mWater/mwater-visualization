@@ -34,6 +34,10 @@ module.exports = class QuickfiltersComponent extends React.Component
     }))
 
   renderQuickfilter: (item, index) ->
+    # Skip if merged
+    if item.merged
+      return null
+
     values = (@props.values or [])
     itemValue = values[index]
 
@@ -59,6 +63,12 @@ module.exports = class QuickfiltersComponent extends React.Component
       onValueChange = (v) =>
         values = (@props.values or []).slice()
         values[index] = v
+
+        # Also set any subsequent merged ones
+        for i in [index + 1...@props.design.length]
+          if @props.design[i].merged
+            values[i] = v
+
         @props.onValuesChange(values)
 
     if type == "enum"
