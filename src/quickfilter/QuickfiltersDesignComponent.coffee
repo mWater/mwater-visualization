@@ -161,7 +161,8 @@ class QuickfilterDesignComponent extends React.Component
             R ui.Checkbox, 
               value: @props.design.merged
               onChange: @handleMergedChange,
-                "Merge with previous quickfilter"
+                "Merge with previous quickfilter "
+                H.span className: "text-muted", "- displays as one single control that filters both"
 
 
 # Floats an x to the right on hover
