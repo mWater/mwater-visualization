@@ -5,6 +5,7 @@ H = React.DOM
 R = React.createElement
 
 ExprCompiler = require("mwater-expressions").ExprCompiler
+ExprCleaner = require('mwater-expressions').ExprCleaner
 
 UndoStack = require '../UndoStack'
 DashboardViewComponent = require './DashboardViewComponent'
@@ -143,11 +144,15 @@ module.exports = class DashboardComponent extends React.Component
   # Get filters from props filters combined with dashboard filters
   getCompiledFilters: ->
     exprCompiler = new ExprCompiler(@props.schema)
+    exprCleaner = new ExprCleaner(@props.schema)
 
     compiledFilters = []
 
     # Compile filters to JsonQL expected by widgets
     for table, expr of (@props.design.filters or {})
+      # Clean expression first TODO remove this when dashboards are properly cleaned before being rendered
+      expr = exprCleaner.cleanExpr(expr, { table: table })
+
       jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
       if jsonql
         compiledFilters.push({ table: table, jsonql: jsonql })
