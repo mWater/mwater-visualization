@@ -64,6 +64,13 @@ module.exports = class TextWidget extends Widget
       exprCleaner = new ExprCleaner(schema)
       expr = exprCleaner.cleanExpr(exprItem.expr, aggrStatuses: ["individual", "literal", "aggregate"])
 
+      # Get relevant filters
+      if table
+        relevantFilters = _.where(filters or [], table: table)
+        whereClauses = _.map(relevantFilters, (f) -> injectTableAlias(f.jsonql, "main")) 
+      else 
+        whereClauses = []
+
       # Get two distinct examples to know if unique
       query = {
         distinct: true
@@ -73,13 +80,6 @@ module.exports = class TextWidget extends Widget
         from: if table then exprCompiler.compileTable(table, "main")
         limit: 2
       }
-
-      # Get relevant filters
-      if table
-        relevantFilters = _.where(filters or [], table: table)
-        whereClauses = _.map(relevantFilters, (f) -> injectTableAlias(f.jsonql, "main")) 
-      else 
-        whereClauses = []
 
       whereClauses = _.compact(whereClauses)
 
