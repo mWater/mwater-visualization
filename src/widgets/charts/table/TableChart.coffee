@@ -243,6 +243,10 @@ module.exports = class TableChart extends Chart
       renderCell = (column, columnIndex) =>
         value = record["c#{columnIndex}"]
 
+        # Handle empty as "" not "None"
+        if not value?
+          return ""
+
         exprUtils = new ExprUtils(schema)
         exprType = exprUtils.getExprType(column.textAxis?.expr)
 
