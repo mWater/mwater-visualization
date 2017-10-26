@@ -35,6 +35,7 @@ module.exports = class DashboardComponent extends React.Component
     namedStrings: PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
     quickfilterLocks: PropTypes.array             # Locked quickfilter values. See README in quickfilters
+    quickfiltersValues: PropTypes.array           # Initial quickfilter values
 
     # Filters to add to the dashboard
     filters: PropTypes.arrayOf(PropTypes.shape({
