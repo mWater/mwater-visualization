@@ -55,7 +55,7 @@ module.exports = class DashboardComponent extends React.Component
     super
     @state = { 
       undoStack: new UndoStack().push(props.design) 
-      quickfiltersValues: null
+      quickfiltersValues: props.quickfiltersValues
       quickfiltersHeight: null   # Height of quickfilters
       editing: LayoutManager.createLayoutManager(props.design.layout).isEmpty(props.design.items) and props.onDesignChange?
     }
@@ -91,7 +91,7 @@ module.exports = class DashboardComponent extends React.Component
 
     # Clear quickfilters if definition changed
     if not _.isEqual(@props.design.quickfilters, nextProps.design.quickfilters)
-      @setState(quickfiltersValues: null)
+      @setState(quickfiltersValues: nextProps.quickfiltersValues)
 
     if not nextProps.onDesignChange?
       @setState(editing: false)
