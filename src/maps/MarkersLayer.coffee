@@ -291,11 +291,12 @@ module.exports = class MarkersLayer extends Layer
   # Get the legend to be optionally displayed on the map. Returns
   # a React element
   getLegend: (design, schema, name, dataSource, filters = []) ->
+    _filters = filters.slice()
     if design.filter?
       exprCompiler = new ExprCompiler(schema)
       jsonql = exprCompiler.compileExpr(expr: design.filter, tableAlias: "{alias}")
       if jsonql
-        filters.push({ table: design.filter.table, jsonql: jsonql })
+        _filters.push({ table: design.filter.table, jsonql: jsonql })
         
     axisBuilder = new AxisBuilder(schema: schema)
     React.createElement LayerLegendComponent,
@@ -304,7 +305,7 @@ module.exports = class MarkersLayer extends Layer
       symbol: design.symbol or 'font-awesome/circle'
       name: name
       dataSource: dataSource
-      filters: _.compact(filters)
+      filters: _.compact(_filters)
       axis: axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none")
 
   # Get a list of table ids that can be filtered on
