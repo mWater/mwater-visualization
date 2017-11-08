@@ -7,6 +7,7 @@ DirectWidgetDataSource = require '../widgets/DirectWidgetDataSource'
 BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
 WidgetFactory = require '../widgets/WidgetFactory'
 MapBoundsCalculator = require './MapBoundsCalculator'
+pako = require('pako')
 
 module.exports = class DirectMapDataSource extends MapDataSource
   # Create map url source that uses direct jsonql maps
@@ -100,7 +101,7 @@ class DirectLayerDataSource
   createUrl: (extension, jsonqlCss) ->
     query = {
       type: "jsonql"
-      design: JSON.stringify(jsonqlCss)
+      design: pako.deflate(JSON.stringify(jsonqlCss), {to: 'string'})
     }
 
     if @options.client
