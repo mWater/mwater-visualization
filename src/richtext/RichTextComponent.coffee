@@ -5,9 +5,10 @@ R = React.createElement
 _ = require 'lodash'
 
 ContentEditableComponent = require('mwater-expressions-ui').ContentEditableComponent
-ClickOutHandler = require('react-onclickout')
 ItemsHtmlConverter = require './ItemsHtmlConverter'
 FloatAffixed = require 'react-float-affixed'
+FontColorPaletteItem = require './FontColorPaletteItem'
+FontSizePaletteItem = require './FontSizePaletteItem'
 
 module.exports = class RichTextComponent extends React.Component
   @propTypes: 
@@ -41,6 +42,19 @@ module.exports = class RichTextComponent extends React.Component
       focused: false
     }
 
+  componentWillMount: ->
+    # Detect clicks to handle focus
+    document.body.addEventListener('click', @handleClick, true)
+
+  componentWillUnmount: ->
+    # Un-detect clicks to handle focus
+    document.body.removeEventListener('click', @handleClick, true)
+
+  handleClick: (ev) =>
+    # If click is in component or in palette component, ignore, otherwise remove focus
+    if not @entireComponent.contains(ev.target) and (not @paletteComponent or not @paletteComponent.contains(ev.target))
+      @setState(focused: false)
+
   # Paste HTML in
   pasteHTML: (html) ->
     @refs.contentEditable.pasteHTML(html)
@@ -53,6 +67,18 @@ module.exports = class RichTextComponent extends React.Component
 
     @refs.contentEditable.pasteHTML(html)
 
+  handleSetFontSize: (size) =>
+    # Requires a selection
+    html = @refs.contentEditable.getSelectedHTML()
+    if not html
+      return alert("Please select text first to set size")
+
+    # Clear existing font-size styles. This is clearly a hack, but font sizes are absolute in execCommand which
+    # doesn't mix with our various dashboard stylings, so we need to use percentages
+    html = html.replace(/font-size:\s*\d+%;?/g, "")
+
+    @refs.contentEditable.pasteHTML("<span style=\"font-size:#{size}\">" + html + "</span>")
+
   handleChange: (elem) =>
     items =  @props.itemsHtmlConverter.convertElemToItems(elem)
 
@@ -64,19 +90,19 @@ module.exports = class RichTextComponent extends React.Component
       @forceUpdate()
 
   handleFocus: => @setState(focused: true)
-  # handleClickOut: => @setState(focused: false)
-  handleBlur: => @setState(focused: false)
 
   # Perform a command such as bold, underline, etc.
   handleCommand: (command, param, ev) =>
-    # Shift args
-    if param.preventDefault
-      ev = param
-      param = null
-
     # Don't lose focus
-    ev.preventDefault()
-    document.execCommand(command, false, param)
+    ev?.preventDefault()
+
+    # Use CSS for some commands 
+    if command in ['foreColor']
+      document.execCommand("styleWithCSS", null, true)
+      document.execCommand(command, false, param)
+      document.execCommand("styleWithCSS", null, false)
+    else
+      document.execCommand(command, false, param)
 
   handleCreateLink: (ev) =>
     # Don't lose focus
@@ -87,7 +113,7 @@ module.exports = class RichTextComponent extends React.Component
     if url
       document.execCommand("createLink", false, url)
 
-  handleClick: (ev) =>
+  handleEditorClick: (ev) =>
     # Be sure focused
     if not @state.focused
       @setState(focused: true)
@@ -101,27 +127,29 @@ module.exports = class RichTextComponent extends React.Component
     @props.itemsHtmlConverter.convertItemsToHtml(@props.items)
 
   renderPalette: ->
-    return R FloatAffixed, edges: "over,under,left,right", align: "center",
-      H.div key: "palette", className: "mwater-visualization-text-palette",
-        H.div key: "bold", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "bold"),
+    return R FloatAffixed, edges: "over,under,left,right", align: "center", 
+      H.div key: "palette", className: "mwater-visualization-text-palette", ref: ((c) => @paletteComponent = c),
+        H.div key: "bold", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "bold", null),
           H.b null, "B"
-        H.div key: "italic", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "italic"),
+        H.div key: "italic", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "italic", null),
           H.i null, "I"
-        H.div key: "underline", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "underline"),
+        H.div key: "underline", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "underline", null),
           H.span style: { textDecoration: "underline" }, "U"
+        R FontColorPaletteItem, key: "foreColor", onSetColor: @handleCommand.bind(null, "foreColor")
+        R FontSizePaletteItem, key: "fontSize", onSetSize: @handleSetFontSize
         H.div key: "link", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCreateLink,
           H.i className: "fa fa-link"
-        H.div key: "justifyLeft", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyLeft"),
+        H.div key: "justifyLeft", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyLeft", null),
           H.i className: "fa fa-align-left"
-        H.div key: "justifyCenter", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyCenter"),
+        H.div key: "justifyCenter", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyCenter", null),
           H.i className: "fa fa-align-center"
-        H.div key: "justifyRight", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyRight"),
+        H.div key: "justifyRight", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyRight", null),
           H.i className: "fa fa-align-right"
-        H.div key: "justifyFull", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyFull"),
+        H.div key: "justifyFull", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyFull", null),
           H.i className: "fa fa-align-justify"
-        H.div key: "insertUnorderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertUnorderedList"),
+        H.div key: "insertUnorderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertUnorderedList", null),
           H.i className: "fa fa-list-ul"
-        H.div key: "insertOrderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertOrderedList"),
+        H.div key: "insertOrderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertOrderedList", null),
           H.i className: "fa fa-list-ol"
         if @props.includeHeadings
           [
@@ -132,6 +160,8 @@ module.exports = class RichTextComponent extends React.Component
             H.div key: "p", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<div>"),
               "\u00b6"
           ]
+        H.div key: "removeFormat", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "removeFormat", null), style: { paddingLeft: 5, paddingRight: 5 },
+          H.img src: removeFormatIcon, style: { height: 20 }
         @props.extraPaletteButtons
     
   renderHtml: ->
@@ -142,9 +172,8 @@ module.exports = class RichTextComponent extends React.Component
           style: { outline: "none" }
           html: @createHtml()
           onChange: @handleChange
-          onClick: @handleClick
+          onClick: @handleEditorClick
           onFocus: @handleFocus
-          onBlur: @handleBlur
         if not @props.items?[0]?
           H.div key: "placeholder", style: { color: "#DDD", position: "absolute", top: 0, left: 0, right: 0, pointerEvents: "none" }, "Click to Edit"
 
@@ -152,8 +181,10 @@ module.exports = class RichTextComponent extends React.Component
       return H.div key: "contents", style: @props.style, className: @props.className, dangerouslySetInnerHTML: { __html: @createHtml() }
 
   render: ->
-    # R ClickOutHandler, onClickOut: @handleClickOut,
-    H.div style: { position: "relative" }, 
+    H.div style: { position: "relative" }, ref: ((c) => @entireComponent = c),
       @renderHtml()
       if @state.focused
         @renderPalette()
+
+
+removeFormatIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAr0lEQVQ4y91U2w3CMAy8VB0kbFA2YYVuABOZbsAmGaFscnzgSlGSBgfCB1g6OXbkkx+yHUn0lgFfkN8hHSt/lma71kxdhIv6Dom/HGicflB97NVTD2ACsPQc1En1zUpqKb+pdEumzaVbSNPSRRFL7iNZQ1BstvApsmODZJXUa8A58W9Ea4nwFWkNa0Sc/Q+F1dyDRD30AO6qJV/wtgxNPR3fOEJXALO+5092/0+P9APt7i9xOIlepwAAAABJRU5ErkJggg=="

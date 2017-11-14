@@ -4,6 +4,7 @@ _ = require 'lodash'
 # Items are array of:
 #  string (html text) 
 #  { type: "element", tag: "h1", items: [nested items] }
+#  elements can contain style (object), href, target
 module.exports = class ItemsHtmlConverter 
   # namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings 
   constructor: (namedStrings) ->
@@ -92,7 +93,7 @@ module.exports = class ItemsHtmlConverter
 
   # Converts an HTML DOM element to items
   convertElemToItems: (elem) ->
-    # console.log elem.outerHTML
+    console.log elem.outerHTML
     
     # Walk DOM tree, adding strings and expressions
     items = []
@@ -153,5 +154,5 @@ module.exports = class ItemsHtmlConverter
     return items
 
 # Whitelist allowed tags and styles
-allowedTags = { div: 1, p: 1, ul: 1, ol: 1, li: 1, span: 1, b: 1, u: 1, em: 1, i: 1, br: 1, h1: 1, h2: 1, h3: 1, h4: 1, h5: 1, a: 1, strong: 1 }
-allowedStyles = { "text-align": 1, "font-weight": 1, "font-style": 1, "text-decoration": 1 }
+allowedTags = { div: 1, p: 1, ul: 1, ol: 1, li: 1, span: 1, b: 1, u: 1, em: 1, i: 1, br: 1, h1: 1, h2: 1, h3: 1, h4: 1, h5: 1, a: 1, strong: 1, font: 1 }
+allowedStyles = { "text-align": 1, "font-weight": 1, "font-style": 1, "text-decoration": 1, "color": 1, "font-size": 1 }
