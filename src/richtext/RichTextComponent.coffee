@@ -42,14 +42,6 @@ module.exports = class RichTextComponent extends React.Component
       focused: false
     }
 
-  componentWillMount: ->
-    # Detect clicks to handle focus
-    document.body.addEventListener('click', @handleClick, true)
-
-  componentWillUnmount: ->
-    # Un-detect clicks to handle focus
-    document.body.removeEventListener('click', @handleClick, true)
-
   handleClick: (ev) =>
     # If click is in component or in palette component, ignore, otherwise remove focus
     if not @entireComponent.contains(ev.target) and (not @paletteComponent or not @paletteComponent.contains(ev.target))
@@ -79,6 +71,14 @@ module.exports = class RichTextComponent extends React.Component
 
     @refs.contentEditable.pasteHTML("<span style=\"font-size:#{size}\">" + html + "</span>")
 
+  handleSetFontColor: (color) =>
+    # Requires a selection
+    html = @refs.contentEditable.getSelectedHTML()
+    if not html
+      return alert("Please select text first to set color")
+
+    @handleCommand("foreColor", color)
+
   handleChange: (elem) =>
     items =  @props.itemsHtmlConverter.convertElemToItems(elem)
 
@@ -90,6 +90,7 @@ module.exports = class RichTextComponent extends React.Component
       @forceUpdate()
 
   handleFocus: => @setState(focused: true)
+  handleBlur: => @setState(focused: false)  
 
   # Perform a command such as bold, underline, etc.
   handleCommand: (command, param, ev) =>
@@ -135,7 +136,7 @@ module.exports = class RichTextComponent extends React.Component
           H.i null, "I"
         H.div key: "underline", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "underline", null),
           H.span style: { textDecoration: "underline" }, "U"
-        R FontColorPaletteItem, key: "foreColor", onSetColor: @handleCommand.bind(null, "foreColor")
+        R FontColorPaletteItem, key: "foreColor", onSetColor: @handleSetFontColor
         R FontSizePaletteItem, key: "fontSize", onSetSize: @handleSetFontSize
         H.div key: "link", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCreateLink,
           H.i className: "fa fa-link"
@@ -174,6 +175,7 @@ module.exports = class RichTextComponent extends React.Component
           onChange: @handleChange
           onClick: @handleEditorClick
           onFocus: @handleFocus
+          onBlur: @handleBlur
         if not @props.items?[0]?
           H.div key: "placeholder", style: { color: "#DDD", position: "absolute", top: 0, left: 0, right: 0, pointerEvents: "none" }, "Click to Edit"
 
