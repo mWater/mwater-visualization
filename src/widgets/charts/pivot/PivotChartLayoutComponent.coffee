@@ -154,7 +154,7 @@ module.exports = class PivotChartLayoutComponent extends React.Component
     }
 
     H.div 
-      style: { position: "relative" }
+      style: { position: "relative", overflowX: "auto" } # Allow table to scroll since tables have hard minimum widths
       onMouseLeave: (=> @setState(hoverSection: null)),
         H.table style: style,
           H.tbody null,
