@@ -71,6 +71,14 @@ module.exports = class TextWidget extends Widget
       else 
         whereClauses = []
 
+      # In case of "sum where"/"count where", extract where clause to make faster
+      if expr?.op == 'sum where'
+        whereClauses.push(exprCompiler.compileExpr(expr: expr.exprs[1], tableAlias: "main"))
+        expr = { type: "op", table: expr.table, op: "sum", exprs: [expr.exprs[0]] }
+      else if expr?.op == 'count where'
+        whereClauses.push(exprCompiler.compileExpr(expr: expr.exprs[0], tableAlias: "main"))
+        expr = { type: "op", table: expr.table, op: "count", exprs: [] }
+
       # Get two distinct examples to know if unique
       query = {
         distinct: true
