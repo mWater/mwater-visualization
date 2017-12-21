@@ -128,16 +128,18 @@ module.exports = class RichTextComponent extends React.Component
     @props.itemsHtmlConverter.convertItemsToHtml(@props.items)
 
   renderPalette: ->
-    return R FloatAffixed, edges: "over,under,left,right", align: "center", 
-      H.div key: "palette", className: "mwater-visualization-text-palette", ref: ((c) => @paletteComponent = c),
+    return R FloatAffixed, edges: "over,under,left,right", align: "center", render: @renderPaletteContent
+
+  renderPaletteContent: (schemeName, {edges}) =>
+    return H.div key: "palette", className: "mwater-visualization-text-palette", ref: ((c) => @paletteComponent = c),
         H.div key: "bold", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "bold", null),
           H.b null, "B"
         H.div key: "italic", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "italic", null),
           H.i null, "I"
         H.div key: "underline", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "underline", null),
           H.span style: { textDecoration: "underline" }, "U"
-        R FontColorPaletteItem, key: "foreColor", onSetColor: @handleSetFontColor
-        R FontSizePaletteItem, key: "fontSize", onSetSize: @handleSetFontSize
+        R FontColorPaletteItem, key: "foreColor", onSetColor: @handleSetFontColor, position: if schemeName == "over" then "under" else "over"
+        R FontSizePaletteItem, key: "fontSize", onSetSize: @handleSetFontSize, position: if schemeName == "over" then "under" else "over"
         H.div key: "link", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCreateLink,
           H.i className: "fa fa-link"
         H.div key: "justifyLeft", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyLeft", null),

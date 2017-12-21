@@ -10,6 +10,10 @@ ClickOutHandler = require('react-onclickout')
 module.exports = class FontSizePaletteItem extends React.Component
   @propTypes:
     onSetSize: PropTypes.func.isRequired  # Called with "125%", etc.
+    position: PropTypes.string # should the popup be under or over?
+
+  @defaultProps:
+    position: "under"
 
   constructor: ->
     super
@@ -43,13 +47,17 @@ module.exports = class FontSizePaletteItem extends React.Component
   render: ->
     popupPosition = {
       position: 'absolute'
-      top: 26
       left: 0
       zIndex: 1000
       backgroundColor: "white"
       border: "solid 1px #AAA"
       borderRadius: 3
     }
+
+    if @props.position == "under"
+      popupPosition['top'] = 26
+    else 
+      popupPosition['bottom'] = 26
 
     R ClickOutHandler, onClickOut: (=> @setState(open: false)),
       H.div 
