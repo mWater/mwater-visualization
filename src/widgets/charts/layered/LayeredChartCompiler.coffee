@@ -162,12 +162,8 @@ module.exports = class LayeredChartCompiler
         }
       }
 
-    if options.design.labels
-      _.each options.design.layers, (layer, layerIndex) =>
-        if layer.axes?.y?.format
-          if not chartDesign.data.labels.format
-            chartDesign.data.labels = { format: {} }
-          chartDesign.data.labels.format["#{layerIndex}"] = d3.format(layer.axes.y.format)
+    if options.design.labels and not _.isEmpty(c3Data.format)
+      chartDesign.data.labels = {format: c3Data.format}
 
     # This doesn't work in new C3. Removing.
     # # If x axis is year only, display year in ticks
@@ -209,6 +205,7 @@ module.exports = class LayeredChartCompiler
     names = {}
     dataMap = {}
     colors = {}
+    format = {}
 
     # For each layer
     _.each design.layers, (layer, layerIndex) =>
@@ -268,6 +265,7 @@ module.exports = class LayeredChartCompiler
       xAxisType: "category" # Polar charts are always category x-axis
       titleText: @compileTitleText(design, locale)
       order: "desc" # Use descending order
+      format: format
     }
 
   # Compiles data for a chart like line or scatter that does not have a categorical x axis
@@ -279,6 +277,7 @@ module.exports = class LayeredChartCompiler
     colors = {}
     xs = {}
     groups = []
+    format = {}
 
     xType = @axisBuilder.getAxisType(design.layers[0].axes.x)
 
@@ -375,6 +374,7 @@ module.exports = class LayeredChartCompiler
       yAxisLabelText: @compileYAxisLabelText(design, locale)
       titleText: @compileTitleText(design, locale)
       order: null # Use order of data for stacking
+      format: format
     }
 
 
@@ -421,6 +421,7 @@ module.exports = class LayeredChartCompiler
     colors = {}
     xs = {}
     groups = []
+    format = {}
 
     # Get all values of the x-axis, taking into account values that might be missing
     xAxis = design.layers[0].axes.x
@@ -531,6 +532,9 @@ module.exports = class LayeredChartCompiler
           types[series] = @getLayerType(design, layerIndex)
           names[series] = @axisBuilder.formatValue(layer.axes.color, colorValue, locale)
           xs[series] = "x"
+          
+          if layer.axes?.y?.format
+            format[series] = d3.format(layer.axes.y.format)
 
       else
         # One series for y
@@ -556,6 +560,9 @@ module.exports = class LayeredChartCompiler
         names[series] = layer.name or "Series #{layerIndex+1}"
         xs[series] = "x"
         colors[series] = layer.color
+
+        if layer.axes?.y?.format
+          format[series] = d3.format(layer.axes.y.format)
 
     # Stack by putting into groups
     if design.stacked
@@ -609,6 +616,7 @@ module.exports = class LayeredChartCompiler
       yAxisLabelText: @compileYAxisLabelText(design, locale)
       titleText: @compileTitleText(design, locale)
       order: null # Use order of data for stacking
+      format: format
     }
 
   # Compile an expression
