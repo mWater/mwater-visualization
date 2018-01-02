@@ -206,6 +206,7 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
           value: layer.axes.y
           required: true
           filters: @props.filters
+          showFormat: true
           onChange: @handleYAxisChange)
         @renderCumulative()
         @renderStacked()

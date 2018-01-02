@@ -162,6 +162,13 @@ module.exports = class LayeredChartCompiler
         }
       }
 
+    if options.design.labels
+      _.each options.design.layers, (layer, layerIndex) =>
+        if layer.axes?.y?.format
+          if not chartDesign.data.labels.format
+            chartDesign.data.labels = { format: {} }
+          chartDesign.data.labels.format["#{layerIndex}"] = d3.format(layer.axes.y.format)
+
     # This doesn't work in new C3. Removing.
     # # If x axis is year only, display year in ticks
     # if options.design.layers[0]?.axes.x?.xform?.type == "year"
