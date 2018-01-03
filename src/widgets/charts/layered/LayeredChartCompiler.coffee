@@ -10,7 +10,10 @@ if global.d3
   pieLabelValueFormatter = (value, ratio, id) => "#{d3.format(",")(value)} (#{d3.format('.1%')(ratio)})"
   d3Formatter = (format) -> d3.format(format)
   labelValueFormatter = (format) -> 
-    return (value, ratio, id) -> return if format[id] then format[id](value) else value
+    return (value, ratio, id) -> 
+      console.log(value, ratio, id)
+      console.log format
+      return if format[id] then format[id](value) else value
       
 else
   tickFormatter = null
@@ -111,6 +114,7 @@ module.exports = class LayeredChartCompiler
     c3Data = @compileData(options.design, options.data, options.locale)
 
     # Create chart
+    console.log c3Data
     # NOTE: this structure must be comparable with _.isEqual, so don't add any inline functiona
     chartDesign = {
       data: {
@@ -549,7 +553,7 @@ module.exports = class LayeredChartCompiler
           xs[series] = "x"
           
           if layer.axes?.y?.format
-            format[series] = d3Formatter(format)
+            format[series] = d3Formatter(layer.axes.y.format)
 
       else
         # One series for y
