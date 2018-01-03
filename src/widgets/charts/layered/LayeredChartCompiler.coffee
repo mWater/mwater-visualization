@@ -8,9 +8,15 @@ injectTableAlias = require('mwater-expressions').injectTableAlias
 if global.d3
   tickFormatter = d3.format(",")
   pieLabelValueFormatter = (value, ratio, id) => "#{d3.format(",")(value)} (#{d3.format('.1%')(ratio)})"
+  d3Formatter = (format) -> d3.format(format)
+  labelValueFormatter = (format) -> 
+    return (value, ratio, id) -> return if format[id] then format[id](value) else value
+      
 else
   tickFormatter = null
   pieLabelValueFormatter = null
+  labelValueFormatter = null
+  d3Formatter = null
 
 # Compiles various parts of a layered chart (line, bar, scatter, spline, area) to C3.js format
 module.exports = class LayeredChartCompiler
@@ -155,12 +161,21 @@ module.exports = class LayeredChartCompiler
       transition: { duration: 0 } # Transitions interfere with scoping
     }
 
-    if options.design.labels and ( options.design.type == "pie" or options.design.type == "donut")
-      chartDesign.tooltip = {
-        format: {
-          value: pieLabelValueFormatter
+    if options.design.labels 
+      if options.design.type == "pie" or options.design.type == "donut"
+        chartDesign.tooltip = {
+          format: {
+            value: pieLabelValueFormatter
+          }
         }
-      }
+      else
+        if not _.isEmpty(c3Data.format)
+          chartDesign.tooltip = {
+            format: {
+              value: labelValueFormatter(c3Data.format)
+            }
+          }
+        
 
     if options.design.labels and not _.isEmpty(c3Data.format)
       chartDesign.data.labels = {format: c3Data.format}
@@ -534,7 +549,7 @@ module.exports = class LayeredChartCompiler
           xs[series] = "x"
           
           if layer.axes?.y?.format
-            format[series] = d3.format(layer.axes.y.format)
+            format[series] = d3Formatter(format)
 
       else
         # One series for y
@@ -562,7 +577,7 @@ module.exports = class LayeredChartCompiler
         colors[series] = layer.color
 
         if layer.axes?.y?.format
-          format[series] = d3.format(layer.axes.y.format)
+          format[series] = d3Formatter(layer.axes.y.format)
 
     # Stack by putting into groups
     if design.stacked

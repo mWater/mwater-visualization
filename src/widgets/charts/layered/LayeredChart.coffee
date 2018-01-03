@@ -113,7 +113,6 @@ module.exports = class LayeredChart extends Chart
   createDesignerElement: (options) ->
     # Require here to prevent server require problems
     LayeredChartDesignerComponent = require './LayeredChartDesignerComponent'
-    console.log options.filters
     props = {
       schema: options.schema
       dataSource: options.dataSource
