@@ -11,8 +11,6 @@ if global.d3
   d3Formatter = (format) -> d3.format(format)
   labelValueFormatter = (format) -> 
     return (value, ratio, id) -> 
-      console.log(value, ratio, id)
-      console.log format
       return if format[id] then format[id](value) else value
       
 else
@@ -114,7 +112,6 @@ module.exports = class LayeredChartCompiler
     c3Data = @compileData(options.design, options.data, options.locale)
 
     # Create chart
-    console.log c3Data
     # NOTE: this structure must be comparable with _.isEqual, so don't add any inline functiona
     chartDesign = {
       data: {
@@ -354,6 +351,9 @@ module.exports = class LayeredChartCompiler
           names[seriesY] = @axisBuilder.formatValue(layer.axes.color, colorValue, locale)
           xs[seriesY] = seriesX
 
+          if layer.axes?.y?.format
+            format[seriesY] = d3Formatter(layer.axes.y.format)
+
           _.each rows, (row, rowIndex) =>
             dataMap["#{seriesY}:#{rowIndex}"] = { layerIndex: layerIndex, row: row }
       else
@@ -370,6 +370,9 @@ module.exports = class LayeredChartCompiler
         names[seriesY] = layer.name or "Series #{layerIndex+1}"
         xs[seriesY] = seriesX
         colors[seriesY] = layer.color
+
+        if layer.axes?.y?.format
+          format[seriesY] = d3Formatter(layer.axes.y.format)
 
         # Add data map for each row
         _.each layerData, (row, rowIndex) =>
