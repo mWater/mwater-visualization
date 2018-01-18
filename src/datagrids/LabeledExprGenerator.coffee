@@ -18,6 +18,7 @@ module.exports = class LabeledExprGenerator
   #  columnFilter: optional boolean predicate to filter columns included. Called with table id, column object
   #  multipleJoinCondition: optional boolean predicate to filter 1-n/n-n joins to include. Called with table id, join column object. Default is to not include those joins
   #  useConfidential: optional boolean to replace redacted columns with unredacted ones
+  #  numberDuplicatesLabels: number duplicate label columns with " (1)", " (2)" , etc.
   generate: (table, options = {}) ->
     _.defaults(options, {
       locale: null
@@ -29,6 +30,7 @@ module.exports = class LabeledExprGenerator
       columnFilter: null
       multipleJoinCondition: null
       useConfidential: false
+      numberDuplicatesLabels: false
      })
 
     # Create a label for a column
@@ -135,5 +137,13 @@ module.exports = class LabeledExprGenerator
     for column in @schema.getColumns(table)
       # Convert column into labels and exprs
       labeledExprs = labeledExprs.concat(convertColumn(table, column, []))
+
+    # If numberDuplicatesLabels, label distinctly
+    if options.numberDuplicatesLabels
+      labelGroups = _.groupBy(labeledExprs, "label")
+      for key, group of labelGroups
+        if group.length > 1
+          for item, i in group
+            item.label = item.label + " (#{i + 1})"
 
     return _.compact(labeledExprs)
