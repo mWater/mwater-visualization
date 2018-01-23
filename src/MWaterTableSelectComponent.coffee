@@ -4,7 +4,8 @@ H = React.DOM
 R = React.createElement
 querystring = require 'querystring'
 TabbedComponent = require('react-library/lib/TabbedComponent')
-ui = require './UIComponents'
+ui = require('react-library/lib/bootstrap')
+uiComponents = require './UIComponents'
 ExprUtils = require("mwater-expressions").ExprUtils
 moment = require 'moment'
 
@@ -89,7 +90,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
     @props.onExtraTablesChange(_.without(@props.extraTables, tableId))
 
   renderSites: ->
-    R ui.OptionListComponent,
+    R uiComponents.OptionListComponent,
       items: _.compact(_.map(siteTypes, (tableId) =>
         table = @props.schema.getTable(tableId)
         if not table
@@ -156,7 +157,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
     )
 
     otherTables = _.sortBy(otherTables, (table) -> table.name.en)
-    R ui.OptionListComponent,
+    R uiComponents.OptionListComponent,
       items: _.map(otherTables, (table) =>
         return { 
           name: ExprUtils.localizeString(table.name, @context.locale)
@@ -185,11 +186,12 @@ module.exports = class MWaterTableSelectComponent extends React.Component
         ]
         initialTabId: "sites"
 
-    R ui.ToggleEditComponent,
-      ref: "toggleEdit"
-      forceOpen: not @props.table # Must have table
-      label: if @props.table then ExprUtils.localizeString(@props.schema.getTable(@props.table)?.name, @context.locale) else ""
-      editor: editor
+    H.div null,
+      R uiComponents.ToggleEditComponent,
+        ref: "toggleEdit"
+        forceOpen: not @props.table # Must have table
+        label: if @props.table then ExprUtils.localizeString(@props.schema.getTable(@props.table)?.name, @context.locale) else ""
+        editor: editor
 
 # Searchable list of forms
 class FormsListComponent extends React.Component
@@ -276,7 +278,7 @@ class FormsListComponent extends React.Component
     H.div null,
       H.label null, "Included Surveys:"
       if tables.length > 0
-        R ui.OptionListComponent,
+        R uiComponents.OptionListComponent,
           items: _.map(tables, (table) =>
             return { 
               name: ExprUtils.localizeString(table.name, @context.locale)
@@ -307,7 +309,7 @@ class FormsListComponent extends React.Component
             value: @state.search
             onChange: (ev) => @setState(search: ev.target.value)
 
-          R ui.OptionListComponent,
+          R uiComponents.OptionListComponent,
             items: _.map(forms, (form) => { 
               name: form.name
               desc: form.desc
@@ -399,7 +401,7 @@ class IndicatorsListComponent extends React.Component
     H.div null,
       H.label null, "Included Indicators:"
       if tables.length > 0
-        R ui.OptionListComponent,
+        R uiComponents.OptionListComponent,
           items: _.map(tables, (table) =>
             return { 
               name: ExprUtils.localizeString(table.name, @context.locale)
@@ -430,7 +432,7 @@ class IndicatorsListComponent extends React.Component
             value: @state.search
             onChange: (ev) => @setState(search: ev.target.value)
 
-          R ui.OptionListComponent,
+          R uiComponents.OptionListComponent,
             items: _.map(indicators, (indicator) => { 
               name: indicator.name
               desc: indicator.desc
@@ -521,7 +523,7 @@ class IssuesListComponent extends React.Component
     H.div null,
       H.label null, "Included Issues:"
       if tables.length > 0
-        R ui.OptionListComponent,
+        R uiComponents.OptionListComponent,
           items: _.map(tables, (table) =>
             return { 
               name: ExprUtils.localizeString(table.name, @context.locale)
@@ -552,7 +554,7 @@ class IssuesListComponent extends React.Component
             value: @state.search
             onChange: (ev) => @setState(search: ev.target.value)
 
-          R ui.OptionListComponent,
+          R uiComponents.OptionListComponent,
             items: _.map(issueTypes, (issueType) => { 
               name: issueType.name
               desc: issueType.desc
