@@ -80,17 +80,19 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
   getChildContext: ->
     context = {}
 
-    context.tableSelectElementFactory = (schema, value, onChange) =>
+    context.tableSelectElementFactory = (props) =>
       return React.createElement(MWaterTableSelectComponent,
         apiUrl: @props.apiUrl
         client: @props.client
-        schema: schema
+        schema: props.schema
         user: @props.user
-        table: value
-        onChange: onChange
+        table: props.value
+        onChange: props.onChange
         extraTables: @props.extraTables
         onExtraTablesChange: @props.onExtraTablesChange
-      )
+        filter: props.filter
+        onFilterChange: props.onFilterChange
+     )
 
     if @props.addLayerElementFactory
       context.addLayerElementFactory = @props.addLayerElementFactory

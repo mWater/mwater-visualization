@@ -10,13 +10,17 @@ module.exports = class TableSelectComponent extends React.Component
     value: PropTypes.string  # Current table id
     onChange: PropTypes.func.isRequired  # Newly selected table id
 
+    # Some table select components (not the default) can also perform filtering. Include these props to enable this
+    filter: PropTypes.object
+    onFilterChange: PropTypes.func
+
   @contextTypes:
-    tableSelectElementFactory: PropTypes.func  # Can be overridden by setting tableSelectElementFactory in context that takes (schema, value, onChange)
+    tableSelectElementFactory: PropTypes.func  # Can be overridden by setting tableSelectElementFactory in context that takes ({ schema, value, onChange, filter, onFilterChange })
     locale: PropTypes.string  # e.g. "en"
 
   render: ->
     if @context.tableSelectElementFactory
-      return @context.tableSelectElementFactory(@props.schema, @props.value, @props.onChange)    
+      return @context.tableSelectElementFactory(@props)    
 
     return React.createElement ui.ToggleEditComponent,
       forceOpen: not @props.value

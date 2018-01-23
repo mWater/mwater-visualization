@@ -52,6 +52,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
 
   handleColorChange: (color) => @update(color: color)
   handleColorAxisChange: (axis) => @updateAxes(color: axis)
+  handleFilterChange: (expr) => @update(filter: expr)
 
   renderTable: ->
     return H.div className: "form-group",
@@ -60,7 +61,13 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
         " "
         "Data Source"
       H.div style: { marginLeft: 10 }, 
-        R(TableSelectComponent, { schema: @props.schema, value: @props.design.table, onChange: @handleTableChange })
+        R TableSelectComponent, { 
+          schema: @props.schema
+          value: @props.design.table
+          onChange: @handleTableChange 
+          filter: @props.design.filter
+          onFilterChange: @handleFilterChange
+        }
   
   renderAdminRegionExpr: ->
     # If no data, hide
@@ -187,7 +194,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
         R(FilterExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
-          onChange: (filter) => @update(filter: filter)
+          onChange: @handleFilterChange
           table: @props.design.table
           value: @props.design.filter)
 

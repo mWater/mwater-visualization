@@ -128,7 +128,13 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
     layer = @props.design.layers[@props.index]
 
     R ui.SectionComponent, icon: "fa-database", label: "Data Source",
-      React.createElement(TableSelectComponent, { schema: @props.schema, value: layer.table, onChange: @handleTableChange })
+      R TableSelectComponent, { 
+        schema: @props.schema
+        value: layer.table
+        onChange: @handleTableChange 
+        filter: layer.filter
+        onFilterChange: @handleFilterChange
+      }
 
   renderXAxis: ->
     layer = @props.design.layers[@props.index]

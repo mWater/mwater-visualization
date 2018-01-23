@@ -36,7 +36,13 @@ module.exports = class ImageMosaicChartDesignerComponent extends React.Component
         " "
         "Data Source"
       ": "
-      React.createElement(TableSelectComponent, { schema: @props.schema, value: @props.design.table, onChange: @handleTableChange })
+      R TableSelectComponent, { 
+        schema: @props.schema
+        value: @props.design.table
+        onChange: @handleTableChange 
+        filter: @props.design.filter
+        onFilterChange: @handleFilterChange
+      }
 
   renderTitle: ->
     H.div className: "form-group",

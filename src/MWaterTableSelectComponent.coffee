@@ -8,6 +8,7 @@ ui = require('react-library/lib/bootstrap')
 uiComponents = require './UIComponents'
 ExprUtils = require("mwater-expressions").ExprUtils
 moment = require 'moment'
+MWaterResponsesFilterComponent = require './MWaterResponsesFilterComponent'
 
 siteTypes = [
   "entities.water_point"
@@ -37,6 +38,10 @@ module.exports = class MWaterTableSelectComponent extends React.Component
 
     extraTables: PropTypes.array.isRequired
     onExtraTablesChange: PropTypes.func.isRequired
+
+    # Can also perform filtering for some types. Include these props to enable this
+    filter: PropTypes.object
+    onFilterChange: PropTypes.func
 
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
@@ -192,6 +197,12 @@ module.exports = class MWaterTableSelectComponent extends React.Component
         forceOpen: not @props.table # Must have table
         label: if @props.table then ExprUtils.localizeString(@props.schema.getTable(@props.table)?.name, @context.locale) else ""
         editor: editor
+      if @props.table and @props.onFilterChange and @props.table.match(/^responses:/)
+        R MWaterResponsesFilterComponent, 
+          schema: @props.schema
+          table: @props.table
+          filter: @props.filter
+          onFilterChange: @props.onFilterChange
 
 # Searchable list of forms
 class FormsListComponent extends React.Component

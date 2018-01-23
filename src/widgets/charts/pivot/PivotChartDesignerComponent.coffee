@@ -67,7 +67,13 @@ module.exports = class PivotChartDesignerComponent extends React.Component
         " "
         "Data Source"
       ": "
-      R(TableSelectComponent, { schema: @props.schema, value: @props.design.table, onChange: @handleTableChange })
+      R TableSelectComponent, { 
+        schema: @props.schema
+        value: @props.design.table
+        onChange: @handleTableChange 
+        filter: @props.design.filter
+        onFilterChange: @handleFilterChange
+      }
 
   renderFilter: ->
     # If no table, hide
