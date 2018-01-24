@@ -106,7 +106,7 @@ module.exports = class MWaterResponsesFilterComponent extends React.Component
         if siteColumns.length > 0
           H.div null,
             H.i null, "This data source contains links to monitoring sites. Would you like to:"
-            H.div style: { paddingLeft: 5 },
+            H.div style: { paddingLeft: 8 },
               R ui.Radio, { key: "all", value: siteColumnId, radioValue: null, onChange: @handleSiteChange }, "Show all survey responses (even if there are more than one per site)"
               _.map siteColumns, (column) =>
                 R ui.Radio, { key: column.id, value: siteColumnId, radioValue: column.id, onChange: @handleSiteChange }, 

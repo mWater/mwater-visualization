@@ -67,6 +67,13 @@ module.exports = class MWaterTableSelectComponent extends React.Component
         # Fire change
         nextProps.onChange(table)
 
+    # If table is newly selected and is a responses table and no filters, set filters to final only
+    if nextProps.table and nextProps.table.match(/responses:/) and nextProps.table != @props.table and not nextProps.filter and nextProps.onFilterChange
+      nextProps.onFilterChange({ type: "op", op: "= any", table: nextProps.table, exprs: [
+        { type: "field", table: nextProps.table, column: "status" }
+        { type: "literal", valueType: "enumset", value: ["final"] }
+      ]})
+
   handleChange: (tableId) =>
     # Close toggle edit
     @refs.toggleEdit.close()
