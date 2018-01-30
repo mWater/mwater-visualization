@@ -57,7 +57,7 @@ module.exports = class MWaterResponsesFilterComponent extends React.Component
 
     # Get site columns
     for column in @props.schema.getColumns(@props.table)
-      if column.type == "join" and column.join.type == "n-1" and column.join.toTable.startsWith("entities.")
+      if column.type == "join" and column.join.type == "n-1" and column.join.toTable.startsWith("entities.") and column.id.match(/^data:/)
         # Check for match
         if _.any(filters, (f) => f?.op == "is latest" and _.isEqual(f.exprs[0], { type: "field", table: @props.table, column: column.id }))
           return column.id
@@ -95,7 +95,7 @@ module.exports = class MWaterResponsesFilterComponent extends React.Component
 
   render: ->
     # Get site columns
-    siteColumns = _.filter(@props.schema.getColumns(@props.table), (col) -> col.type == "join" and col.join.type == "n-1" and col.join.toTable.startsWith("entities."))
+    siteColumns = _.filter(@props.schema.getColumns(@props.table), (col) -> col.type == "join" and col.join.type == "n-1" and col.join.toTable.startsWith("entities.") and col.id.match(/^data:/))
 
     siteColumnId = @getSiteValue()
 
