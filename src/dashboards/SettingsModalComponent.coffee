@@ -65,13 +65,16 @@ module.exports = class SettingsModalComponent extends React.Component
           H.div className: "text-muted", 
             "Quick filters are shown to the user as a dropdown at the top of the dashboard and can be used to filter data of widgets."
          
-          R QuickfiltersDesignComponent, {
-            design: @state.design.quickfilters
-            onDesignChange: (design) => @handleDesignChange(update(@state.design, { quickfilters: { $set: design } }))
-            schema: @props.schema
-            dataSource: @props.dataSource
-            tables: filterableTables
-          }
+          if filterableTables.length > 0         
+            R QuickfiltersDesignComponent, {
+              design: @state.design.quickfilters
+              onDesignChange: (design) => @handleDesignChange(update(@state.design, { quickfilters: { $set: design } }))
+              schema: @props.schema
+              dataSource: @props.dataSource
+              tables: filterableTables
+            }
+          else
+            "Nothing to quickfilter. Add widgets to the dashboard"
 
           H.h4 style: { paddingTop: 10 },
             "Filters"

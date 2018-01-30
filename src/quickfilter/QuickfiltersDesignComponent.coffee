@@ -89,9 +89,10 @@ module.exports = class QuickfiltersDesignComponent extends React.Component
     H.div null,
       _.map @props.design, (item, index) => @renderQuickfilter(item, index)
 
-      H.button type: "button", className: "btn btn-sm btn-default", onClick: @handleAdd,
-        H.span className: "glyphicon glyphicon-plus"
-        " Add Quick Filter"
+      if @props.tables.length > 0
+        H.button type: "button", className: "btn btn-sm btn-default", onClick: @handleAdd,
+          H.span className: "glyphicon glyphicon-plus"
+          " Add Quick Filter"
 
 class QuickfilterDesignComponent extends React.Component
   @propTypes:
@@ -129,14 +130,12 @@ class QuickfilterDesignComponent extends React.Component
     R RemovableComponent, onRemove: @props.onRemove, 
       H.div className: "panel panel-default",
         H.div className: "panel-body",
-          # Only show if more than one option
-          if @props.tables.length > 1
-            H.div className: "form-group", key: "table",
-              H.label className: "text-muted", "Data Source"
-              R ui.Select,
-                value: @state.table
-                options: _.map(@props.tables, (table) => { value: table, label: ExprUtils.localizeString(@props.schema.getTable(table).name) })
-                onChange: @handleTableChange
+          H.div className: "form-group", key: "table",
+            H.label className: "text-muted", "Data Source"
+            R ui.Select,
+              value: @state.table
+              options: _.map(@props.tables, (table) => { value: table, label: ExprUtils.localizeString(@props.schema.getTable(table).name) })
+              onChange: @handleTableChange
 
           H.div className: "form-group", key: "expr",
             H.label className: "text-muted", "Filter By"
