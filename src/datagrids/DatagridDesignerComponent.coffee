@@ -94,6 +94,7 @@ module.exports = class DatagridDesignerComponent extends React.Component
               onDesignChange: (design) => @props.onDesignChange(update(@props.design, { quickfilters: { $set: design } }))
               schema: @props.schema
               dataSource: @props.dataSource
+              tables: [@props.design.table]
             }
         }
         {

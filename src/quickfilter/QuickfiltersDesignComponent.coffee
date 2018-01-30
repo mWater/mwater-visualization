@@ -17,7 +17,7 @@ module.exports = class QuickfiltersDesignComponent extends React.Component
     schema: PropTypes.object.isRequired
     dataSource: PropTypes.object.isRequired
 
-    table: PropTypes.string     # If present, forces table. TODO does not appear to be used
+    tables: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired    # List of possible table ids to use
 
   @defaultProps:
     design: []
@@ -65,7 +65,7 @@ module.exports = class QuickfiltersDesignComponent extends React.Component
       design: item
       schema: @props.schema
       dataSource: @props.dataSource
-      table: @props.table
+      tables: @props.tables
       mergeable: @isMergeable(@props.design, index)
       onChange: (newItem) => 
         design = @props.design.slice()
@@ -103,20 +103,15 @@ class QuickfilterDesignComponent extends React.Component
     schema: PropTypes.object.isRequired
     dataSource: PropTypes.object.isRequired
 
-    table: PropTypes.string     # If present, forces table
+    tables: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired    # List of possible table ids to use
 
   constructor: (props) ->
     super
 
     # Store table to allow selecting table first, then expression
     @state = {
-      table: props.table or props.design.expr?.table
+      table: props.design.expr?.table or props.tables[0] 
     }
-
-  componentWillReceiveProps: (nextProps) ->
-    table = nextProps.table or nextProps.design.expr?.table
-    if table and table != @state.table
-      @setState(table: table)
 
   handleTableChange: (table) => 
     @setState(table: table)
@@ -134,23 +129,25 @@ class QuickfilterDesignComponent extends React.Component
     R RemovableComponent, onRemove: @props.onRemove, 
       H.div className: "panel panel-default",
         H.div className: "panel-body",
-          # If table not forced
-          if not @props.table
+          # Only show if more than one option
+          if @props.tables.length > 1
             H.div className: "form-group", key: "table",
               H.label className: "text-muted", "Data Source"
-              R TableSelectComponent, schema: @props.schema, value: @state.table, onChange: @handleTableChange
+              R ui.Select,
+                value: @state.table
+                options: _.map(@props.tables, (table) => { value: table, label: ExprUtils.localizeString(@props.schema.getTable(table).name) })
+                onChange: @handleTableChange
 
-          if @state.table
-            H.div className: "form-group", key: "expr",
-              H.label className: "text-muted", "Filter By"
-              H.div null,
-                R ExprComponent,
-                  schema: @props.schema
-                  dataSource: @props.dataSource
-                  table: @state.table
-                  value: @props.design.expr
-                  onChange: @handleExprChange
-                  types: ['enum', 'text', 'date', 'datetime']
+          H.div className: "form-group", key: "expr",
+            H.label className: "text-muted", "Filter By"
+            H.div null,
+              R ExprComponent,
+                schema: @props.schema
+                dataSource: @props.dataSource
+                table: @state.table
+                value: @props.design.expr
+                onChange: @handleExprChange
+                types: ['enum', 'text', 'date', 'datetime']
 
           if @props.design.expr
             H.div className: "form-group", key: "label",

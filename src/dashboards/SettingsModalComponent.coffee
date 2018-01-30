@@ -70,6 +70,7 @@ module.exports = class SettingsModalComponent extends React.Component
             onDesignChange: (design) => @handleDesignChange(update(@state.design, { quickfilters: { $set: design } }))
             schema: @props.schema
             dataSource: @props.dataSource
+            tables: filterableTables
           }
 
           H.h4 style: { paddingTop: 10 },
