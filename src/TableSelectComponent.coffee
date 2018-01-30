@@ -18,6 +18,10 @@ module.exports = class TableSelectComponent extends React.Component
     tableSelectElementFactory: PropTypes.func  # Can be overridden by setting tableSelectElementFactory in context that takes ({ schema, value, onChange, filter, onFilterChange })
     locale: PropTypes.string  # e.g. "en"
 
+    # Optional list of tables (ids) being used. Some overrides of the table select component may use this to present
+    # an initially short list to select from
+    activeTables: PropTypes.arrayOf(PropTypes.string.isRequired)  
+
   render: ->
     if @context.tableSelectElementFactory
       return @context.tableSelectElementFactory(@props)    

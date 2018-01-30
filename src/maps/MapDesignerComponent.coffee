@@ -23,6 +23,14 @@ module.exports = class MapDesignerComponent extends React.Component
     onDesignChange: PropTypes.func.isRequired # Called with new design
     filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
+  @childContextTypes:
+    activeTables: PropTypes.arrayOf(PropTypes.string.isRequired) # List of tables (ids) being used. Use this to present an initially short list to select from
+
+  getChildContext: -> { 
+    # Pass active tables down to table select components so they can present a shorter list
+    activeTables: MapUtils.getFilterableTables(@props.design, @props.schema)
+  }
+
   handleAttributionChange: (text) =>
     design = _.extend({}, @props.design, {attribution: text})
     @props.onDesignChange(design)

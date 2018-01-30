@@ -7,7 +7,7 @@ ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprUtils = require('mwater-expressions').ExprUtils
 PopoverHelpComponent = require 'react-library/lib/PopoverHelpComponent'
 FiltersDesignerComponent = require '../FiltersDesignerComponent'
-LayerFactory = require './LayerFactory'
+MapUtils = require './MapUtils'
 
 # Designer for filters for a map
 module.exports = class MapFiltersDesignerComponent extends React.Component
@@ -23,17 +23,7 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
 
   render: ->
     # Get filterable tables
-    filterableTables = []
-    for layerView in @props.design.layerViews
-      # Create layer
-      layer = LayerFactory.createLayer(layerView.type)
-
-      # Get filterable tables
-      filterableTables = _.uniq(filterableTables.concat(layer.getFilterableTables(layerView.design, @props.schema)))
-
-    # Remove non-existant tables
-    filterableTables = _.filter(filterableTables, (table) => @props.schema.getTable(table))
-
+    filterableTables = MapUtils.getFilterableTables(@props.design, @props.schema)
     if filterableTables.length == 0
       return null
 

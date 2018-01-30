@@ -8,6 +8,7 @@ ExprCompiler = require("mwater-expressions").ExprCompiler
 ExprCleaner = require('mwater-expressions').ExprCleaner
 
 UndoStack = require '../UndoStack'
+DashboardUtils = require './DashboardUtils'
 DashboardViewComponent = require './DashboardViewComponent'
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 QuickfiltersComponent = require '../quickfilter/QuickfiltersComponent'
@@ -48,9 +49,15 @@ module.exports = class DashboardComponent extends React.Component
 
   @childContextTypes:
     locale: PropTypes.string
+    activeTables: PropTypes.arrayOf(PropTypes.string.isRequired) # List of tables (ids) being used. Use this to present an initially short list to select from
 
-  # Pass locale down. Both here and DashboardViewComponent to ensure that quickfilters also get context
-  getChildContext: -> { locale: @props.design.locale }
+  getChildContext: -> { 
+    # Pass locale down. Both here and DashboardViewComponent to ensure that quickfilters also get context
+    locale: @props.design.locale 
+
+    # Pass active tables down to table select components so they can present a shorter list
+    activeTables: DashboardUtils.getFilterableTables(@props.design, @props.schema)
+  }
 
   constructor: (props) ->
     super

@@ -1,4 +1,5 @@
 _ = require 'lodash'
+LayerFactory = require './LayerFactory'
 
 # General utilities for a map
 
@@ -29,3 +30,16 @@ exports.convertToClusterMap = (design) ->
     return lv
 
   return _.extend({}, design, layerViews: layerViews)
+
+# Get ids of filterable tables
+exports.getFilterableTables = (design, schema) ->
+  filterableTables = []
+  for layerView in design.layerViews
+    # Create layer
+    layer = LayerFactory.createLayer(layerView.type)
+
+    # Get filterable tables
+    filterableTables = _.uniq(filterableTables.concat(layer.getFilterableTables(layerView.design, schema)))
+
+  # Remove non-existant tables
+  filterableTables = _.filter(filterableTables, (table) => schema.getTable(table))

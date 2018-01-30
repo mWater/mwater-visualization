@@ -7,6 +7,7 @@ Widget = require './Widget'
 DropdownWidgetComponent = require './DropdownWidgetComponent'
 ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
 LayerFactory = require '../maps/LayerFactory'
+MapUtils = require '../maps/MapUtils'
 
 # Design is the map design specified in maps/Map Design.md
 module.exports = class MapWidget extends Widget
@@ -44,16 +45,7 @@ module.exports = class MapWidget extends Widget
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->
     # Get filterable tables
-    filterableTables = []
-
-    for layerView in design.layerViews
-      # Create layer
-      layer = LayerFactory.createLayer(layerView.type)
-
-      # Get filterable tables
-      filterableTables = filterableTables.concat(layer.getFilterableTables(layerView.design, schema))
-
-    return _.uniq(_.compact(filterableTables))
+    return MapUtils.getFilterableTables(design, schema)
 
 class MapWidgetComponent extends React.Component
   @propTypes:

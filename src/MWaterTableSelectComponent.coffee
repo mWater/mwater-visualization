@@ -46,6 +46,9 @@ module.exports = class MWaterTableSelectComponent extends React.Component
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
+    # Optional list of tables (ids) being used. Use this to present an initially short list to select from
+    activeTables: PropTypes.arrayOf(PropTypes.string.isRequired)  
+
   constructor: ->
     super
 
@@ -91,6 +94,131 @@ module.exports = class MWaterTableSelectComponent extends React.Component
     else
       @handleChange(tableId)
 
+  render: ->
+    editor = R EditModeTableSelectComponent,
+      apiUrl: @props.apiUrl
+      client: @props.client
+      schema: @props.schema
+      user: @props.user
+      table: @props.table
+      onChange: @handleTableChange
+      extraTables: @props.extraTables
+      onExtraTablesChange: @props.onExtraTablesChange
+
+    H.div null,
+      # Show message if loading
+      if @state.pendingExtraTable
+        H.div className: "alert alert-info", key: "pendingExtraTable",
+          H.i className: "fa fa-spinner fa-spin"
+          "\u00a0Please wait..."
+
+      R uiComponents.ToggleEditComponent,
+        ref: "toggleEdit"
+        forceOpen: not @props.table # Must have table
+        label: if @props.table then ExprUtils.localizeString(@props.schema.getTable(@props.table)?.name, @context.locale) else ""
+        editor: editor
+
+      if @props.table and @props.onFilterChange and @props.table.match(/^responses:/)
+        R MWaterResponsesFilterComponent, 
+          schema: @props.schema
+          table: @props.table
+          filter: @props.filter
+          onFilterChange: @props.onFilterChange
+
+
+# Is the table select component when in edit mode. Toggles between complete list and simplified list
+class EditModeTableSelectComponent extends React.Component
+  @propTypes:
+    apiUrl: PropTypes.string.isRequired # Url to hit api
+    client: PropTypes.string            # Optional client
+    schema: PropTypes.object.isRequired
+    user: PropTypes.string              # User id
+
+    table: PropTypes.string
+    onChange: PropTypes.func.isRequired # Called with table selected
+
+    extraTables: PropTypes.array.isRequired
+    onExtraTablesChange: PropTypes.func.isRequired
+
+  @contextTypes:
+    locale: PropTypes.string  # e.g. "en"
+
+    # Optional list of tables (ids) being used. Use this to present an initially short list to select from
+    activeTables: PropTypes.arrayOf(PropTypes.string.isRequired)  
+
+  constructor: (props) ->
+    super(props)
+
+    @state = {
+      # True when in expanded mode that shows all tables
+      completeMode: false
+    }
+
+  componentWillMount: ->
+    # True when in expanded mode that shows all tables. Default complete if none present
+    if @getTableShortlist().length == 0
+      @setState(completeMode: true)
+
+  handleShowMore: =>
+    @setState(completeMode: true)
+
+  # Get list of tables that should be included in shortlist
+  # This is all active tables and all responses tables in schema (so as to include rosters)
+  # Also includes current table
+  getTableShortlist: ->
+    tables = @context.activeTables or []
+    tables = _.union(tables, _.filter(_.pluck(@props.schema.getTables(), "id"), (t) -> t.match(/^responses:/)))
+    if @props.table
+      tables = _.union(tables, [@props.table])
+
+    return tables
+
+  render: ->
+    if @state.completeMode
+      return R CompleteTableSelectComponent,
+      apiUrl: @props.apiUrl
+      client: @props.client
+      schema: @props.schema
+      user: @props.user
+      table: @props.table
+      onChange: @props.onChange
+      extraTables: @props.extraTables
+      onExtraTablesChange: @props.onExtraTablesChange
+    else
+      return H.div null,
+        H.div className: "text-muted", 
+          "Select Data Source:"
+          
+        R uiComponents.OptionListComponent,
+          items: _.map @getTableShortlist(), (tableId) =>
+            table = @props.schema.getTable(tableId)
+
+            return { 
+              name: ExprUtils.localizeString(table.name, @context.locale)
+              desc: ExprUtils.localizeString(table.desc, @context.locale)
+              onClick: @props.onChange.bind(null, table.id) 
+            }
+        H.div null,
+          H.button type: "button", className: "btn btn-link btn-sm", onClick: @handleShowMore,
+            "Show All Available Data Sources..."
+
+# Allows selection of a table. Is the complete list mode of the above control
+class CompleteTableSelectComponent extends React.Component
+  @propTypes:
+    apiUrl: PropTypes.string.isRequired # Url to hit api
+    client: PropTypes.string            # Optional client
+    schema: PropTypes.object.isRequired
+    user: PropTypes.string              # User id
+
+    table: PropTypes.string
+    onChange: PropTypes.func.isRequired # Called with table selected
+
+    extraTables: PropTypes.array.isRequired
+    onExtraTablesChange: PropTypes.func.isRequired
+
+  @contextTypes:
+    locale: PropTypes.string  # e.g. "en"
+
   handleExtraTableAdd: (tableId) =>
     @props.onExtraTablesChange(_.union(@props.extraTables, [tableId]))
 
@@ -107,7 +235,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
         table = @props.schema.getTable(tableId)
         if not table
           return null
-        return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @handleChange.bind(null, table.id) }
+        return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @props.onChange.bind(null, table.id) }
       ))
 
   renderForms: ->
@@ -116,7 +244,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       client: @props.client
       apiUrl: @props.apiUrl
       user: @props.user
-      onChange: @handleTableChange
+      onChange: @props.onChange
       extraTables: @props.extraTables
       onExtraTableAdd: @handleExtraTableAdd
       onExtraTableRemove: @handleExtraTableRemove
@@ -127,7 +255,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       client: @props.client
       apiUrl: @props.apiUrl
       user: @props.user
-      onChange: @handleTableChange
+      onChange: @props.onChange
       extraTables: @props.extraTables
       onExtraTableAdd: @handleExtraTableAdd
       onExtraTableRemove: @handleExtraTableRemove
@@ -138,7 +266,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       client: @props.client
       apiUrl: @props.apiUrl
       user: @props.user
-      onChange: @handleTableChange
+      onChange: @props.onChange
       extraTables: @props.extraTables
       onExtraTableAdd: @handleExtraTableAdd
       onExtraTableRemove: @handleExtraTableRemove
@@ -174,17 +302,11 @@ module.exports = class MWaterTableSelectComponent extends React.Component
         return { 
           name: ExprUtils.localizeString(table.name, @context.locale)
           desc: ExprUtils.localizeString(table.desc, @context.locale)
-          onClick: @handleChange.bind(null, table.id) 
+          onClick: @props.onChange.bind(null, table.id) 
         })
 
   render: ->
-    editor = H.div null,
-      # Show message if loading
-      if @state.pendingExtraTable
-        H.div className: "alert alert-info", key: "pendingExtraTable",
-          H.i className: "fa fa-spinner fa-spin"
-          "\u00a0Please wait..."
-
+    return H.div null,
       H.div className: "text-muted",
         "Select data from sites, surveys or an advanced category below. Indicators can be found within their associated site types."
 
@@ -198,18 +320,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
         ]
         initialTabId: "sites"
 
-    H.div null,
-      R uiComponents.ToggleEditComponent,
-        ref: "toggleEdit"
-        forceOpen: not @props.table # Must have table
-        label: if @props.table then ExprUtils.localizeString(@props.schema.getTable(@props.table)?.name, @context.locale) else ""
-        editor: editor
-      if @props.table and @props.onFilterChange and @props.table.match(/^responses:/)
-        R MWaterResponsesFilterComponent, 
-          schema: @props.schema
-          table: @props.table
-          filter: @props.filter
-          onFilterChange: @props.onFilterChange
+
 
 # Searchable list of forms
 class FormsListComponent extends React.Component
