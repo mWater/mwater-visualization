@@ -133,6 +133,13 @@ module.exports = class DashboardComponent extends React.Component
   handleStyleChange: (style) =>
     @props.onDesignChange(_.extend({}, @props.design, { style: style or null }))
 
+  handleDesignChange: (design) =>
+    # If quickfilters have changed, reset values
+    if not _.isEqual(@props.design.quickfilters, design.quickfilters)
+      @setState(quickfiltersValues: null)
+
+    @props.onDesignChange(design)
+
   handleUpgrade: =>
     if not confirm("This will upgrade your dashboard to the new kind with enhanced features. You can click Undo immediately afterwards if you wish to revert it. Continue?")
       return
@@ -271,7 +278,7 @@ module.exports = class DashboardComponent extends React.Component
       @renderTitleBar()
       @renderQuickfilter()
       if @props.onDesignChange?
-        R SettingsModalComponent, { onDesignChange: @props.onDesignChange, schema: @props.schema, dataSource: @props.dataSource, ref: "settings" }
+        R SettingsModalComponent, { onDesignChange: @handleDesignChange, schema: @props.schema, dataSource: @props.dataSource, ref: "settings" }
 
       # Dashboard view requires width, so use auto size component to inject it
       R AutoSizeComponent, { injectWidth: true, injectHeight: true }, 

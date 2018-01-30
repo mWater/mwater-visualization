@@ -167,7 +167,12 @@ module.exports = class DatagridComponent extends React.Component
       dataSource: @props.dataSource
       design: @props.design
       onDesignChange: (design) => 
+        # If quickfilters have changed, reset values
+        if not _.isEqual(@props.design.quickfilters, design.quickfilters)
+          @setState(quickfiltersValues: null)
+          
         @props.onDesignChange(design)
+
         @setState(editingDesign: false)
       onCancel: => @setState(editingDesign: false)
 

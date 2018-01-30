@@ -70,10 +70,12 @@ module.exports = class QuickfilterCompiler
           { type: "literal", valueType: "enum", value: value }
         ]
       }
-    else if type in ['date', 'datetime']
+    else if type in ['date', 'datetime'] and value.op
       return {
         type: "op"
         op: value.op
         table: expr.table
         exprs: [expr].concat(value.exprs)
       }
+    else
+      return null
