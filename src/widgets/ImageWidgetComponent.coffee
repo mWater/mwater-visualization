@@ -3,6 +3,8 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 _ = require 'lodash'
+classNames = require('classnames')
+ui = require('react-library/lib/bootstrap')
 
 uuid = require 'uuid'
 Dropzone = require 'react-dropzone'
@@ -96,7 +98,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
         imageHeight = 1280
 
       source = @props.design.imageUrl or @props.widgetDataSource.getImageUrl(@props.design.uid, imageHeight)
-      H.img style: { maxWidth: "100%", maxHeight: "100%"}, src: source
+      R RotatedImageComponent, url: source, rotation: @props.design.rotation
     else
       @renderExpression()
 
@@ -141,17 +143,20 @@ class ImageWidgetDesignComponent extends React.Component
       uploading: false
       caption: null
       currentTab: "url"
+      rotation: null
     }
 
   edit: =>
     @setCurrentTab()
-    state =
+    state = {
       editing: true
       imageUrl: @props.design.imageUrl
       uid: @props.design.uid
       expr: @props.design.expr
       table: @props.design.expr?.table
       caption: @props.design.caption
+      rotation: @props.design.rotation
+    }
 
     @setState(state)
 
@@ -167,10 +172,12 @@ class ImageWidgetDesignComponent extends React.Component
     @setState(imageUrl: e.target.value, uid: null, expr: null)
 
   renderUploadEditor: ->
-    R ImageUploaderComponent,
-      dataSource: @props.dataSource
-      onUpload: @handleFileUpload
-      uid: @props.design.uid
+    H.div null,
+      R ImageUploaderComponent,
+        dataSource: @props.dataSource
+        onUpload: @handleFileUpload
+        uid: @props.design.uid
+      @renderRotation()
 
   handleFileUpload: (uid) =>
     @setState(imageUrl: null, uid: uid, expr: null)
@@ -180,6 +187,7 @@ class ImageWidgetDesignComponent extends React.Component
 
   handleTableChange: (table) => @setState(table: table)
   handleCaptionChange: (ev) => @setState(caption: ev.target.value)
+  handleRotationChange: (rotation) => @setState(rotation: rotation)
 
   handleSave: () =>
     @setState(editing: false)
@@ -188,6 +196,7 @@ class ImageWidgetDesignComponent extends React.Component
       uid: @state.uid
       expr: @state.expr
       caption: @state.caption
+      rotation: @state.rotation
 
     @props.onDesignChange(_.extend({}, @props.design, updates))
 
@@ -219,12 +228,21 @@ class ImageWidgetDesignComponent extends React.Component
             aggrStatuses: ["individual", "literal"]
             onChange: @handleExpressionChange
 
+  renderRotation: ->
+    H.div style: { paddingTop: 10 }, 
+      "Rotation: "
+      R ui.Radio, value: @state.rotation or null, radioValue: null, onChange: @handleRotationChange, inline: true, "0 degrees"
+      R ui.Radio, value: @state.rotation or null, radioValue: 90, onChange: @handleRotationChange, inline: true, "90 degrees"
+      R ui.Radio, value: @state.rotation or null, radioValue: 180, onChange: @handleRotationChange, inline: true, "180 degrees"
+      R ui.Radio, value: @state.rotation or null, radioValue: 270, onChange: @handleRotationChange, inline: true, "270 degrees"
+
   renderUrlEditor: ->
     H.div className: "form-group",
       H.label null, "URL of image"
       H.input type: "text", className: "form-control", value: @state.imageUrl or "", onChange: @handleUrlChange
       H.p className: "help-block",
         'e.g. http://somesite.com/image.jpg'
+      @renderRotation()
 
   render: ->
     if not @state.editing
@@ -253,3 +271,43 @@ class ImageWidgetDesignComponent extends React.Component
       scrollDisabled: true
       footer: footer,
         content
+
+
+# Image which is rotated by x degrees (0, 90, 180, 270)
+class RotatedImageComponent extends React.Component
+  @propTypes: 
+    url: PropTypes.string.isRequired
+    rotation: PropTypes.number
+    onClick: PropTypes.func
+    caption: PropTypes.string
+
+  render: ->
+    R AutoSizeComponent, injectWidth: true, injectHeight: true, 
+      (size) =>
+        imageStyle = {}
+        containerStyle = {}
+
+        # These css classes are defined in mwater-forms
+        classes = classNames({
+          "rotated": @props.rotation
+          "rotate-90": @props.rotation and @props.rotation == 90
+          "rotate-180": @props.rotation and @props.rotation == 180
+          "rotate-270": @props.rotation and @props.rotation == 270 
+        })
+
+        imageStyle.maxWidth = "100%"
+        imageStyle.maxHeight = "100%"
+
+        # Set width if rotated left or right
+        if @props.rotation == 90 or @props.rotation == 270
+          imageStyle.width = size.height
+
+        return H.span 
+          className: "rotated-image-container"
+          style: containerStyle,
+            H.img
+              src: @props.url
+              style: imageStyle
+              className: classes
+              onClick: @props.onClick
+              alt: @props.caption or ""

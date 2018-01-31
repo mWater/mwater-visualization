@@ -365,3 +365,33 @@
 }
 
 @import "./layout-styles.css";
+
+
+.rotated-image-container.rotated-thumbnail{
+  display: inline-block;
+  overflow: hidden;
+}
+
+.rotated-image-container .rotated{
+  transform-origin: top left;
+  -ms-transform-origin: top left;
+  -webkit-transform-origin: top left;
+}
+
+.rotated-image-container img.rotate-90 {
+  transform: rotate(90deg) translateY(-100%);
+  -webkit-transform:  rotate(90deg) translateY(-100%);
+  -ms-transform:  rotate(90deg) translateY(-100%);
+}
+
+.rotated-image-container img.rotate-180 {
+  transform: rotate(180deg) translateY(-100%) translateX(-100%); 
+  -webkit-transform: rotate(180deg) translateY(-100%) translateX(-100%);
+  -ms-transform: rotate(180deg) translateY(-100%) translateX(-100%);
+}
+
+.rotated-image-container img.rotate-270 {
+  transform: rotate(270deg) translateX(-100%); 
+  -webkit-transform: rotate(270deg) translateX(-100%);
+  -ms-transform: rotate(270deg) translateX(-100%);
+}
