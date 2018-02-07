@@ -20,6 +20,7 @@ siteTypes = [
   "entities.surface_water"
   "entities.place_of_worship"
   "entities.water_system"
+  "entities.water_system_component"
   "entities.waste_disposal_site"
   "entities.wastewater_treatment_system"
   "entities.handwashing_facility"
@@ -188,7 +189,7 @@ class EditModeTableSelectComponent extends React.Component
       return H.div null,
         H.div className: "text-muted", 
           "Select Data Source:"
-          
+
         R uiComponents.OptionListComponent,
           items: _.map @getTableShortlist(), (tableId) =>
             table = @props.schema.getTable(tableId)
