@@ -15,40 +15,40 @@ describe "MWaterResponsesFilterComponent", ->
     @schema = @schema.addTable({ id: "responses:xyz", name: { en: "Survey" }, primaryKey: "_id", contents: [
       { id: "status", type: "enum", name: { en: "Status" }, enumValues: [{ id: "final", name: { en: "Final" } }] }
       { 
-        id: "site1"
+        id: "data:site1"
         type: "join"
         name: { en: "Site1" }
         join: {
           type: "n-1"
           toTable: "entities.water_point"
-          fromColumn: "site1"
+          fromColumn: "data:site1"
           toColumn: "code"
         }
       }
       { 
-        id: "site2"
+        id: "data:site2"
         type: "join"
         name: { en: "Site2" }
         join: {
           type: "n-1"
           toTable: "entities.community"
-          fromColumn: "site2"
+          fromColumn: "data:site2"
           toColumn: "code"
         }
       }
     ]})
 
-    @finalFilter = { type: "op", op: "=", table: "responses:xyz", exprs: [
+    @finalFilter = { type: "op", op: "= any", table: "responses:xyz", exprs: [
       { type: "field", table: "responses:xyz", column: "status" }
-      { type: "literal", valueType: "enum", value: "final" }
+      { type: "literal", valueType: "enumset", value: ["final"] }
     ]}
 
     @latestFilter = { type: "op", op: "is latest", table: "responses:xyz", exprs: [
-      { type: "field", table: "responses:xyz", column: "site1" }
+      { type: "field", table: "responses:xyz", column: "data:site1" }
     ]}
 
     @latestFinalFilter = { type: "op", op: "is latest", table: "responses:xyz", exprs: [
-      { type: "field", table: "responses:xyz", column: "site1" }
+      { type: "field", table: "responses:xyz", column: "data:site1" }
       @finalFilter
     ]}
 
