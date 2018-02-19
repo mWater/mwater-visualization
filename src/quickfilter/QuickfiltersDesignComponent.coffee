@@ -125,8 +125,12 @@ class QuickfilterDesignComponent extends React.Component
   handleExprChange: (expr) => @props.onChange(update(@props.design, { expr: { $set: expr }}))
   handleLabelChange: (ev) => @props.onChange(update(@props.design, { label: { $set: ev.target.value }}))
   handleMergedChange: (merged) => @props.onChange(update(@props.design, { merged: { $set: merged }}))
+  handleMultiChange: (multi) => @props.onChange(update(@props.design, { multi: { $set: multi }}))
 
   render: ->
+    # Determine type of expression
+    exprType = new ExprUtils(@props.schema).getExprType(@props.design.expr)
+
     R RemovableComponent, onRemove: @props.onRemove, 
       H.div className: "panel panel-default",
         H.div className: "panel-body",
@@ -160,6 +164,11 @@ class QuickfilterDesignComponent extends React.Component
                 "Merge with previous quickfilter "
                 H.span className: "text-muted", "- displays as one single control that filters both"
 
+          if exprType in ['enum', 'text']
+            R ui.Checkbox, 
+              value: @props.design.multi
+              onChange: @handleMultiChange,
+                "Allow multiple selections"
 
 # Floats an x to the right on hover
 class RemovableComponent extends React.Component

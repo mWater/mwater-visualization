@@ -28,6 +28,23 @@ describe "QuickfilterCompiler", ->
       }
       ])
 
+  it "compiles multi filter", ->
+    filters = @qc.compile([{ expr: { type: "field", table: "t1", column: "enum"}, label: "Enum", multi: true }], [["a"]])
+    compare(filters, [
+      { 
+        table: "t1"
+        jsonql: { 
+          type: "op"
+          op: "="
+          modifier: "any"
+          exprs: [
+            { type: "field", tableAlias: "{alias}", column: "enum" }
+            { type: "literal", value: ["a"] }
+          ]
+        }
+      }
+      ])
+
   it "compiles filter with locks", ->
     filters = @qc.compile([{ expr: { type: "field", table: "t1", column: "enum" }, label: "Enum" }], ["a"], [{ expr: { type: "field", table: "t1", column: "enum"}, value: "b" }])
     compare(filters, [

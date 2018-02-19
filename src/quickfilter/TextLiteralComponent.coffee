@@ -10,13 +10,14 @@ injectTableAlias = require('mwater-expressions').injectTableAlias
 # Displays a combo box that allows selecting single text value from an expression
 module.exports = class TextLiteralComponent extends React.Component
   @propTypes: 
-    value: PropTypes.string
+    value: PropTypes.any
     onChange: PropTypes.func
 
     schema: PropTypes.object.isRequired
     quickfiltersDataSource: PropTypes.object.isRequired  # See QuickfiltersDataSource
     expr: PropTypes.object.isRequired
     index: PropTypes.number.isRequired
+    multi: PropTypes.bool       # true to display multiple values
 
     # Filters to add to the component to restrict values
     filters: PropTypes.arrayOf(PropTypes.shape({
@@ -24,9 +25,17 @@ module.exports = class TextLiteralComponent extends React.Component
       jsonql: PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
     }))
 
-  handleChange: (val) =>
+  handleSingleChange: (val) =>
     value = if val then val else null # Blank is null
     @props.onChange(value)
+
+  handleMultipleChange: (val) =>
+    value = if val then val.split("\n") else []
+
+    if value.length > 0
+      @props.onChange(value)
+    else
+      @props.onChange(null)
 
   getOptions: (input, cb) =>
     # Create query to get matches
@@ -61,16 +70,29 @@ module.exports = class TextLiteralComponent extends React.Component
       
     return
 
-  render: ->
-    value = @props.value or "" 
+  renderSingle: ->
+    R ReactSelect, 
+      placeholder: "All"
+      value: @props.value or ""
+      asyncOptions: @getOptions
+      onChange: if @props.onChange then @handleSingleChange
+      disabled: not @props.onChange?
 
+  renderMultiple: ->
+    R ReactSelect, 
+      placeholder: "All"
+      value: (@props.value or []).join("\n")
+      multi: true
+      delimiter: "\n"
+      asyncOptions: @getOptions
+      onChange: if @props.onChange then @handleMultipleChange
+      disabled: not @props.onChange?
+
+  render: ->
     H.div style: { width: "100%" },
-      R(ReactSelect, { 
-        placeholder: "All"
-        value: value
-        asyncOptions: @getOptions
-        onChange: if @props.onChange then @handleChange
-        disabled: not @props.onChange?
-      })
+      if @props.multi
+        @renderMultiple()
+      else
+        @renderSingle()
 
 escapeRegex = (s) -> s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')

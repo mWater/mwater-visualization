@@ -6,6 +6,7 @@ design is an array of quick filters (user-selectable filters). Each contains:
  `expr`: filter expression (left hand side only. Usually enum or text)
  `label`: optional label
  `merged`: true to merge on display with the previous quickfilter. Only applicable if previous one has same type and enum values and id table (if applicable). 
+ `multi`: true for multi-select (text and enum only)
 
 values:
 

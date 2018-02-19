@@ -80,6 +80,7 @@ module.exports = class QuickfiltersComponent extends React.Component
         options: new ExprUtils(@props.schema).getExprEnumValues(expr)
         value: itemValue
         onValueChange: onValueChange
+        multi: item.multi
 
     if type == "text"
       return R TextQuickfilterComponent, 
@@ -92,6 +93,7 @@ module.exports = class QuickfiltersComponent extends React.Component
         value: itemValue
         onValueChange: onValueChange
         filters: @props.filters
+        multi: item.multi
 
     if type in ["date", "datetime"]
       return R DateQuickfilterComponent, 
@@ -119,31 +121,57 @@ class EnumQuickfilterComponent extends React.Component
       name: PropTypes.object.isRequired # Localized name
     })).isRequired
 
+    multi: PropTypes.bool       # true to display multiple values
+
     value: PropTypes.any              # Current value of quickfilter (state of filter selected)
     onValueChange: PropTypes.func     # Called when value changes
 
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  handleChange: (val) =>
+  handleSingleChange: (val) =>
     if val
       @props.onValueChange(val)
     else
       @props.onValueChange(null)
+
+  handleMultiChange: (val) =>
+    value = if val then val.split("\n") else []
+    value = _.map(value, JSON.parse)
+
+    if value.length > 0
+      @props.onValueChange(value)
+    else
+      @props.onValueChange(null)
+
+  renderSingleSelect: ->
+    R ReactSelect, 
+      placeholder: "All"
+      value: @props.value
+      multi: false
+      options: _.map(@props.options, (opt) => { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
+      onChange: if @props.onValueChange then @handleSingleChange
+      disabled: not @props.onValueChange?
+  
+  renderMultiSelect: ->
+    R ReactSelect, 
+      placeholder: "All"
+      value: _.map(@props.value or [], JSON.stringify).join("\n")
+      multi: true
+      delimiter: "\n"
+      options: _.map(@props.options, (opt) => { value: JSON.stringify(opt.id), label: ExprUtils.localizeString(opt.name, @context.locale) }) 
+      onChange: if @props.onValueChange then @handleMultiChange
+      disabled: not @props.onValueChange?
 
   render: ->
     H.div style: { display: "inline-block", paddingRight: 10 },
       if @props.label
         H.span style: { color: "gray" }, @props.label + ":\u00a0"
       H.div style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
-        R ReactSelect, {
-          placeholder: "All"
-          value: @props.value
-          multi: false
-          options: _.map(@props.options, (opt) => { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
-          onChange: if @props.onValueChange then @handleChange
-          disabled: not @props.onValueChange?
-        }
+        if @props.multi
+          @renderMultiSelect()
+        else
+          @renderSingleSelect()
       if not @props.onValueChange
         H.i className: "text-warning fa fa-fw fa-lock"
 
@@ -160,6 +188,8 @@ class TextQuickfilterComponent extends React.Component
 
     value: PropTypes.any                     # Current value of quickfilter (state of filter selected)
     onValueChange: PropTypes.func    # Called when value changes
+
+    multi: PropTypes.bool       # true to display multiple values
 
     # Filters to add to the quickfilter to restrict values
     filters: PropTypes.arrayOf(PropTypes.shape({
@@ -178,6 +208,7 @@ class TextQuickfilterComponent extends React.Component
           schema: @props.schema
           expr: @props.expr
           index: @props.index
+          multi: @props.multi
           quickfiltersDataSource: @props.quickfiltersDataSource
           filters: @props.filters
         }
