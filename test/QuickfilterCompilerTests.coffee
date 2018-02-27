@@ -12,7 +12,7 @@ describe "QuickfilterCompiler", ->
     @schema = fixtures.simpleSchema()
     @qc = new QuickfilterCompiler(@schema)
 
-  it "compiles filter", ->
+  it "compiles enum filter", ->
     filters = @qc.compile([{ expr: { type: "field", table: "t1", column: "enum"}, label: "Enum" }], ["a"])
     compare(filters, [
       { 
@@ -27,6 +27,22 @@ describe "QuickfilterCompiler", ->
         }
       }
       ])
+
+  it "compiles enumset filter", ->
+    filters = @qc.compile([{ expr: { type: "field", table: "t1", column: "enumset"}, label: "Enumset" }], ["a"])
+    compare(filters, [
+      { 
+        table: "t1"
+        jsonql: { 
+          type: "op"
+          op: "@>"
+          exprs: [
+            { type: "op", op: "::jsonb", exprs: [{ type: "op", op: "to_json", exprs: [{ type: "field", tableAlias: "{alias}", column: "enumset" }] }] }
+            { type: "op", op: "::jsonb", exprs: [{ type: "op", op: "to_json", exprs: [{ type: "literal", value: ["a"] }] }] }
+          ]
+        }        
+      }
+    ])
 
   it "compiles multi filter", ->
     filters = @qc.compile([{ expr: { type: "field", table: "t1", column: "enum"}, label: "Enum", multi: true }], [["a"]])
@@ -44,6 +60,22 @@ describe "QuickfilterCompiler", ->
         }
       }
       ])
+
+  it "compiles enumset multi filter", ->
+    filters = @qc.compile([{ expr: { type: "field", table: "t1", column: "enumset"}, label: "Enumset", multi: true }], [["a"]])
+    compare(filters, [
+      { 
+        table: "t1"
+        jsonql: { 
+          type: "op"
+          op: "@>"
+          exprs: [
+            { type: "op", op: "::jsonb", exprs: [{ type: "op", op: "to_json", exprs: [{ type: "field", tableAlias: "{alias}", column: "enumset" }] }] }
+            { type: "op", op: "::jsonb", exprs: [{ type: "op", op: "to_json", exprs: [{ type: "literal", value: ["a"] }] }] }
+          ]
+        }        
+      }
+    ])
 
   it "compiles filter with locks", ->
     filters = @qc.compile([{ expr: { type: "field", table: "t1", column: "enum" }, label: "Enum" }], ["a"], [{ expr: { type: "field", table: "t1", column: "enum"}, value: "b" }])

@@ -71,7 +71,7 @@ module.exports = class QuickfiltersComponent extends React.Component
 
         @props.onValuesChange(values)
 
-    if type == "enum"
+    if type in ["enum", "enumset"]
       return R EnumQuickfilterComponent, 
         key: index
         label: item.label

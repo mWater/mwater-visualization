@@ -81,6 +81,28 @@ module.exports = class QuickfilterCompiler
             { type: "literal", valueType: "enum", value: value }
           ]
         }
+    else if type == "enumset"
+      # Create contains expression
+      if multi
+        return {
+          type: "op"
+          op: "contains"
+          table: expr.table
+          exprs: [
+            expr
+            { type: "literal", valueType: "enumset", value: value }
+          ]
+        }
+      else
+        return {
+          type: "op"
+          op: "contains"
+          table: expr.table
+          exprs: [
+            expr
+            { type: "literal", valueType: "enum", value: [value] }
+          ]
+        }
     else if type in ['date', 'datetime'] and value.op
       return {
         type: "op"
