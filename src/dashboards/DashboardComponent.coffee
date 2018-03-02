@@ -158,24 +158,8 @@ module.exports = class DashboardComponent extends React.Component
 
   # Get filters from props filters combined with dashboard filters
   getCompiledFilters: ->
-    exprCompiler = new ExprCompiler(@props.schema)
-    exprCleaner = new ExprCleaner(@props.schema)
-
-    compiledFilters = []
-
-    # Compile filters to JsonQL expected by widgets
-    for table, expr of (@props.design.filters or {})
-      # Clean expression first TODO remove this when dashboards are properly cleaned before being rendered
-      expr = exprCleaner.cleanExpr(expr, { table: table })
-
-      jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
-      if jsonql
-        compiledFilters.push({ table: table, jsonql: jsonql })
-
-    # Add props filters
-    if @props.filters
-      compiledFilters = compiledFilters.concat(@props.filters)
-
+    compiledFilters = DashboardUtils.getCompiledFilters(@props.design, @props.schema, DashboardUtils.getFilterableTables(@props.design, @props.schema))
+    compiledFilters = compiledFilters.concat(@props.filters or [])
     return compiledFilters
 
   renderEditingSwitch: ->
