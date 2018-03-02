@@ -9,6 +9,7 @@ uiComponents = require './UIComponents'
 ExprUtils = require("mwater-expressions").ExprUtils
 moment = require 'moment'
 MWaterResponsesFilterComponent = require './MWaterResponsesFilterComponent'
+ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
 
 siteTypes = [
   "entities.water_point"
@@ -507,6 +508,13 @@ class IndicatorsListComponent extends React.Component
     if comp
       comp.focus()
 
+  handleSelect: (tableId) =>
+    # Add table if not present
+    if not @props.schema.getTable(tableId)
+      @props.onExtraTableAdd(tableId)
+
+    @addIndicatorConfirmPopup.show(tableId)
+
   render: ->
     if @state.error
       return H.div className: "alert alert-danger", @state.error
@@ -529,6 +537,12 @@ class IndicatorsListComponent extends React.Component
     tables = _.sortBy(tables, (t) -> t.name.en)
 
     H.div null,
+      R AddIndicatorConfirmPopupComponent,
+        schema: @props.schema
+        onChange: @props.onChange
+        onExtraTableAdd: @props.onExtraTableAdd
+        ref: (c) => @addIndicatorConfirmPopup = c
+
       H.label null, "Included Indicators:"
       if tables.length > 0
         R uiComponents.OptionListComponent,
@@ -536,7 +550,7 @@ class IndicatorsListComponent extends React.Component
             return { 
               name: ExprUtils.localizeString(table.name, @context.locale)
               desc: ExprUtils.localizeString(table.desc, @context.locale)
-              onClick: @props.onChange.bind(null, table.id) 
+              onClick: @handleSelect.bind(null, table.id) 
               onRemove: @handleTableRemove.bind(null, table)
             }
           )
@@ -566,9 +580,70 @@ class IndicatorsListComponent extends React.Component
             items: _.map(indicators, (indicator) => { 
               name: indicator.name
               desc: indicator.desc
-              onClick:  @props.onChange.bind(null, "indicator_values:" + indicator.id)
+              onClick: @handleSelect.bind(null, "indicator_values:" + indicator.id)
             })
         ]
+
+class AddIndicatorConfirmPopupComponent extends React.Component
+  @propTypes:
+    schema: PropTypes.object.isRequired
+    onChange: PropTypes.func.isRequired # Called with table selected
+    onExtraTableAdd: PropTypes.func.isRequired
+
+  @contextTypes:
+    locale: PropTypes.string  # e.g. "en"
+
+  constructor: ->
+    super
+    @state = { 
+      visible: false
+      indicatorTable: null
+    }
+
+  show: (indicatorTable) ->
+    @setState(visible: true, indicatorTable: indicatorTable)
+
+  renderContents: ->
+    # Show loading if table not loaded
+    if not @props.schema.getTable(@state.indicatorTable)
+      return H.div className: "alert alert-info", 
+        H.i className: "fa fa-spinner fa-spin"
+        "\u00A0Loading..."
+
+    # Find entity links
+    entityColumns = _.filter(@props.schema.getColumns(@state.indicatorTable), (col) => col.join?.toTable?.match(/^entities\./))
+
+    H.div null,
+      H.p null, 
+        '''In general, it is better to get indicator values from the related site. Please select the site 
+        below, then find the indicator values in the 'Related Indicators' section. Or click on 'Use Raw Indicator' if you 
+        are certain that you want to use the raw indicator table'''
+
+      R uiComponents.OptionListComponent,
+        items: _.map(entityColumns, (entityColumn) => { 
+          name: ExprUtils.localizeString(entityColumn.name, @context.locale)
+          desc: ExprUtils.localizeString(entityColumn.desc, @context.locale)
+          onClick: => 
+            # Select table
+            @props.onChange(entityColumn.join.toTable)
+            @setState(visible: false)
+        })
+
+      H.br()
+
+      H.div null,
+        H.a onClick: @props.onChange.bind(null, @state.indicatorTable),
+          "Use Raw Indicator"
+
+  render: ->
+    if not @state.visible
+      return null
+
+    R ModalPopupComponent,
+      showCloseX: true
+      onClose: => @setState(visible: false)
+      header: "Add Indicator",
+        @renderContents()
 
 
 # Searchable list of issue types
