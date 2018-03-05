@@ -1,3 +1,4 @@
+_ = require 'lodash'
 LayoutManager = require '../layouts/LayoutManager'
 WidgetFactory = require '../widgets/WidgetFactory'
 ExprCompiler = require('mwater-expressions').ExprCompiler
