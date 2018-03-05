@@ -21,6 +21,9 @@ module.exports = class SettingsModalComponent extends React.Component
     schema: PropTypes.object.isRequired
     dataSource: PropTypes.object.isRequired
 
+  @contextTypes:
+    globalFiltersElementFactory: PropTypes.func # Call with props { schema, dataSource, globalFilters, onChange }. Displays a component to edit global filters
+
   constructor: (props) ->
     super
     @state = { 
@@ -40,6 +43,10 @@ module.exports = class SettingsModalComponent extends React.Component
 
   handleFiltersChange: (filters) =>
     design = _.extend({}, @state.design, filters: filters)
+    @handleDesignChange(design)
+
+  handleGlobalFiltersChange: (globalFilters) =>
+    design = _.extend({}, @state.design, globalFilters: globalFilters)
     @handleDesignChange(design)
 
   render: ->
@@ -90,6 +97,19 @@ module.exports = class SettingsModalComponent extends React.Component
               filterableTables: filterableTables
           else
             "Nothing to filter. Add widgets to the dashboard"
+
+          if @context.globalFiltersElementFactory
+            H.div null,
+              H.h4 style: { paddingTop: 10 },
+                "Global Filters"
+
+              @context.globalFiltersElementFactory({ 
+                schema: @props.schema
+                dataSource: @props.dataSource
+                filterableTables: filterableTables
+                globalFilters: @state.design.globalFilters or []
+                onChange: @handleGlobalFiltersChange
+              })
 
           H.h4 style: { paddingTop: 10 },
             "Language"

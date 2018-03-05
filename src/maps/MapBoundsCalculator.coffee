@@ -1,7 +1,7 @@
 _ = require 'lodash'
 async = require 'async'
 LayerFactory = require './LayerFactory'
-ExprCompiler = require('mwater-expressions').ExprCompiler
+MapUtils = require './MapUtils'
 
 # Calculates map bounds given layers by unioning together
 module.exports = class MapBoundsCalculator
@@ -11,8 +11,6 @@ module.exports = class MapBoundsCalculator
 
   # Gets the bounds for the map. Null for whole world. Callback as { n:, s:, w:, e: }
   getBounds: (design, filters, callback) ->
-    exprCompiler = new ExprCompiler(@schema)
-
     allBounds = []
 
     # For each layer
@@ -29,11 +27,7 @@ module.exports = class MapBoundsCalculator
         return cb(null)
 
       # Compile map filters
-      allFilters = (filters or []).slice()
-
-      for table, expr of (design.filters or {})
-        jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
-        allFilters.push({ table: table, jsonql: jsonql })
+      allFilters = (filters or []).concat(MapUtils.getCompiledFilters(design, @schema, MapUtils.getFilterableTables(design, @schema)))
 
       # Get bounds, including filters from map  
       layer.getBounds(layerDesign, @schema, @dataSource, allFilters, (error, bounds) =>

@@ -35,7 +35,7 @@ module.exports = class DashboardViewComponent extends React.Component
     onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
     namedStrings: PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
-    # Filters to add to the dashboard
+    # Filters to add to the dashboard (includes extra filters and any quickfilters from the dashboard component. Does not include dashboard level filters)
     filters: PropTypes.arrayOf(PropTypes.shape({
       table: PropTypes.string.isRequired    # id table to filter
       jsonql: PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
@@ -79,24 +79,8 @@ module.exports = class DashboardViewComponent extends React.Component
 
   # Get filters from props filters combined with dashboard filters
   getCompiledFilters: ->
-    exprCompiler = new ExprCompiler(@props.schema)
-    exprCleaner = new ExprCleaner(@props.schema)
-
-    compiledFilters = []
-
-    # Compile filters to JsonQL expected by widgets
-    for table, expr of (@props.design.filters or {})
-      # Clean expression first TODO remove this when dashboards are properly cleaned before being rendered
-      expr = exprCleaner.cleanExpr(expr, { table: table })
-
-      jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
-      if jsonql
-        compiledFilters.push({ table: table, jsonql: jsonql })
-
-    # Add props filters
-    if @props.filters
-      compiledFilters = compiledFilters.concat(@props.filters)
-
+    compiledFilters = DashboardUtils.getCompiledFilters(@props.design, @props.schema, DashboardUtils.getFilterableTables(@props.design, @props.schema))
+    compiledFilters = compiledFilters.concat(@props.filters or [])
     return compiledFilters
 
   renderScopes: ->

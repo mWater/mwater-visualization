@@ -9,6 +9,7 @@ MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
 MWaterTableSelectComponent = require './MWaterTableSelectComponent'
 MWaterAddRelatedFormComponent = require './MWaterAddRelatedFormComponent'
 MWaterAddRelatedIndicatorComponent = require './MWaterAddRelatedIndicatorComponent'
+MWaterGlobalFiltersComponent = require './MWaterGlobalFiltersComponent'
 querystring = require 'querystring'
 AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
 LoadingComponent = require 'react-library/lib/LoadingComponent'
@@ -16,6 +17,7 @@ mWaterLoader = require './mWaterLoader'
 
 # Loads an mWater schema from the server and creates child with schema and dataSource
 # Also creates a tableSelectElementFactory context to allow selecting of a table in an mWater-friendly way
+# and several other context items
 module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
   @propTypes:
     apiUrl: PropTypes.string.isRequired
@@ -63,8 +65,9 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
     )
 
   @childContextTypes: 
-    tableSelectElementFactory: PropTypes.func
-    addLayerElementFactory: PropTypes.func
+    tableSelectElementFactory: PropTypes.func  # Call with props of TableSelectComponent
+    addLayerElementFactory: PropTypes.func     # Call with props of AddLayerComponent
+    globalFiltersElementFactory: PropTypes.func # Call with props { schema, dataSource, filterableTables, globalFilters, onChange }. Displays a component to edit global filters
 
     # Decorates sections (the children element, specifically) in the expression picker
     decorateScalarExprTreeSectionChildren: PropTypes.func
@@ -96,6 +99,9 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
 
     if @props.addLayerElementFactory
       context.addLayerElementFactory = @props.addLayerElementFactory
+
+    context.globalFiltersElementFactory = (props) =>
+      return React.createElement(MWaterGlobalFiltersComponent, props)
 
     context.decorateScalarExprTreeSectionChildren = (options) =>
       # If related forms section of entities table

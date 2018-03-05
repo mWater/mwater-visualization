@@ -76,13 +76,7 @@ module.exports = class MapDesignerComponent extends React.Component
         onDesignChange: @props.onDesignChange
 
   render: ->
-    filters = _.clone(@props.filters) or []
-    exprCompiler = new ExprCompiler(@props.schema)
-
-    for table, expr of (@props.design.filters or {})
-      jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
-      if jsonql
-        filters.push({ table: table, jsonql: jsonql })
+    filters = (@props.filters or []).concat(MapUtils.getCompiledFilters(@props.design, @props.schema, MapUtils.getFilterableTables(@props.design, @props.schema)))
 
     H.div style: { padding: 5 },
       R TabbedComponent,
