@@ -11,6 +11,7 @@ Maps are stored as a base layer, a series of layers and filters.
 	attribution: User defined attribution string, added with other required attributions to the map
 	autoBounds: true to automatically zoom to bounds of data
 	maxZoom: maximum allowed zoom level
+	globalFilters: array of global filters. See below.
 }
 ```
 
@@ -30,3 +31,15 @@ Is a view of a layer including whether visible, opacity.
 	group: optional group. layers in the same group act as radio buttons
 }
 ```
+
+### Global Filters
+
+Global filters apply to multiple tables at once if a certain column is present. User-interface to set them is application-specific
+and the default (non-mWater) dashboard applies them but does not allow editing.
+
+Array of:
+
+columnId: id of column to filter
+columnType: type of column to filter (to ensure that consistent)
+op: op of expression for filtering
+exprs: array of expressions to use for filtering. field expression for column will be injected as expression 0 in the resulting filter expression

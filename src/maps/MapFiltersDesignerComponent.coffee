@@ -17,8 +17,15 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
     design: PropTypes.object.isRequired  # See Map Design.md
     onDesignChange: PropTypes.func.isRequired # Called with new design
 
+  @contextTypes:
+    globalFiltersElementFactory: PropTypes.func # Call with props { schema, dataSource, globalFilters, onChange }. Displays a component to edit global filters
+
   handleFiltersChange: (filters) =>
     design = _.extend({}, @props.design, filters: filters)
+    @props.onDesignChange(design)
+
+  handleGlobalFiltersChange: (globalFilters) =>
+    design = _.extend({}, @props.design, globalFilters: globalFilters)
     @props.onDesignChange(design)
 
   render: ->
@@ -27,16 +34,31 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
     if filterableTables.length == 0
       return null
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        "Filters "
-        R PopoverHelpComponent, placement: "left",
-          '''Filters all layers in the map. Individual layers can be filtered by clicking on Customize...'''
+    return H.div null,
+      H.div className: "form-group",
+        H.label className: "text-muted", 
+          "Filters "
+          R PopoverHelpComponent, placement: "left",
+            '''Filters all layers in the map. Individual layers can be filtered by clicking on Customize...'''
 
-      H.div style: { margin: 5 }, 
-        R FiltersDesignerComponent, 
-          schema: @props.schema
-          dataSource: @props.dataSource
-          filters: @props.design.filters
-          onFiltersChange: @handleFiltersChange
-          filterableTables: filterableTables
+        H.div style: { margin: 5 }, 
+          R FiltersDesignerComponent, 
+            schema: @props.schema
+            dataSource: @props.dataSource
+            filters: @props.design.filters
+            onFiltersChange: @handleFiltersChange
+            filterableTables: filterableTables
+
+      if @context.globalFiltersElementFactory
+        H.div className: "form-group",
+          H.label className: "text-muted", 
+            "Global Filters "
+
+          H.div style: { margin: 5 }, 
+            @context.globalFiltersElementFactory({ 
+              schema: @props.schema
+              dataSource: @props.dataSource
+              filterableTables: filterableTables
+              globalFilters: @props.design.globalFilters or []
+              onChange: @handleGlobalFiltersChange
+            })

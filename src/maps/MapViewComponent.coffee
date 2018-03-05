@@ -8,6 +8,7 @@ ExprUtils = require('mwater-expressions').ExprUtils
 ExprCompiler = require('mwater-expressions').ExprCompiler
 LayerFactory = require './LayerFactory'
 ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
+MapUtils = require './MapUtils'
 
 LegendComponent = require './LegendComponent'
 
@@ -66,7 +67,7 @@ module.exports = class MapViewComponent extends React.Component
   componentDidUpdate: (prevProps) ->
     if @props.design.autoBounds
       # Autozoom if filters or autozoom changed
-      if not _.isEqual(@props.design.filters, prevProps.design.filters) or not _.isEqual(@props.extraFilters, prevProps.extraFilters) or not prevProps.design.autoBounds 
+      if not _.isEqual(@props.design.filters, prevProps.design.filters) or not _.isEqual(@props.design.globalFilters, prevProps.design.globalFilters) or not _.isEqual(@props.extraFilters, prevProps.extraFilters) or not prevProps.design.autoBounds 
         @performAutoZoom()
     else
       # Update bounds
@@ -141,21 +142,7 @@ module.exports = class MapViewComponent extends React.Component
 
   # Get filters from extraFilters combined with map filters
   getCompiledFilters: ->
-    exprCompiler = new ExprCompiler(@props.schema)
-
-    compiledFilters = []
-
-    # Compile filters to JsonQL expected by layers
-    for table, expr of (@props.design.filters or {})
-      jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
-      if jsonql
-        compiledFilters.push({ table: table, jsonql: jsonql })
-
-    # Add extra filters
-    if @props.extraFilters
-      compiledFilters = compiledFilters.concat(@props.extraFilters)
-
-    return compiledFilters
+    return (@props.extraFilters or []).concat(MapUtils.getCompiledFilters(@props.design, @props.schema, MapUtils.getFilterableTables(@props.design, @props.schema)))
 
   renderLegend: ->
     return R LegendComponent,
