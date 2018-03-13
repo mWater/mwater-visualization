@@ -22,7 +22,7 @@ module.exports = class SettingsModalComponent extends React.Component
     dataSource: PropTypes.object.isRequired
 
   @contextTypes:
-    globalFiltersElementFactory: PropTypes.func # Call with props { schema, dataSource, globalFilters, onChange }. Displays a component to edit global filters
+    globalFiltersElementFactory: PropTypes.func # Call with props { schema, dataSource, globalFilters, onChange, nullIfIrrelevant }. Displays a component to edit global filters
 
   constructor: (props) ->
     super

@@ -18,7 +18,7 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
     onDesignChange: PropTypes.func.isRequired # Called with new design
 
   @contextTypes:
-    globalFiltersElementFactory: PropTypes.func # Call with props { schema, dataSource, globalFilters, onChange }. Displays a component to edit global filters
+    globalFiltersElementFactory: PropTypes.func # Call with props { schema, dataSource, globalFilters, filterableTables, onChange, nullIfIrrelevant }. Displays a component to edit global filters
 
   handleFiltersChange: (filters) =>
     design = _.extend({}, @props.design, filters: filters)

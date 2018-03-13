@@ -27,6 +27,9 @@ module.exports = class DatagridDesignerComponent extends React.Component
     design: PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
     onDesignChange: PropTypes.func.isRequired # Called when design changes
 
+  @contextTypes:
+    globalFiltersElementFactory: PropTypes.func # Call with props { schema, dataSource, globalFilters, filterableTables, onChange, nullIfIrrelevant }. Displays a component to edit global filters
+
   handleTableChange: (table) =>
     design = {
       table: table
@@ -40,6 +43,9 @@ module.exports = class DatagridDesignerComponent extends React.Component
 
   handleFilterChange: (filter) =>
     @props.onDesignChange(update(@props.design, filter: { $set: filter }))
+
+  handleGlobalFiltersChange: (globalFilters) =>
+    @props.onDesignChange(update(@props.design, globalFilters: { $set: globalFilters }))
 
   handleOrderBysChange: (orderBys) =>
     @props.onDesignChange(update(@props.design, orderBys: { $set: orderBys }))
@@ -72,6 +78,16 @@ module.exports = class DatagridDesignerComponent extends React.Component
               value: @props.design.filter
               onChange: @handleFilterChange
             })
+            if @context.globalFiltersElementFactory
+              H.div style: { marginTop: 20 },
+                @context.globalFiltersElementFactory({
+                  schema: @props.schema
+                  dataSource: @props.dataSource
+                  filterableTables: [@props.design.table]
+                  globalFilters: @props.design.globalFilters
+                  onChange: @handleGlobalFiltersChange
+                  nullIfIrrelevant: true
+                })
         }
         {
           id: "order"

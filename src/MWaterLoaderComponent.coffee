@@ -67,7 +67,8 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
   @childContextTypes: 
     tableSelectElementFactory: PropTypes.func  # Call with props of TableSelectComponent
     addLayerElementFactory: PropTypes.func     # Call with props of AddLayerComponent
-    globalFiltersElementFactory: PropTypes.func # Call with props { schema, dataSource, filterableTables, globalFilters, onChange }. Displays a component to edit global filters
+    globalFiltersElementFactory: PropTypes.func # Call with props { schema, dataSource, filterableTables, globalFilters, onChange, nullIfIrrelevant }. 
+    # Displays a component to edit global filters. nullIfIrrelevant causes null element if not applicable to filterableTables
 
     # Decorates sections (the children element, specifically) in the expression picker
     decorateScalarExprTreeSectionChildren: PropTypes.func
@@ -101,6 +102,9 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
       context.addLayerElementFactory = @props.addLayerElementFactory
 
     context.globalFiltersElementFactory = (props) =>
+      if props.nullIfIrrelevant and not _.any(props.filterableTables, (t) -> t.match(/^entities./))
+        return null
+        
       return React.createElement(MWaterGlobalFiltersComponent, props)
 
     context.decorateScalarExprTreeSectionChildren = (options) =>

@@ -1,5 +1,6 @@
 _ = require 'lodash'
 ExprCompiler = require("mwater-expressions").ExprCompiler
+ExprCleaner = require("mwater-expressions").ExprCleaner
 ExprUtils = require("mwater-expressions").ExprUtils
 injectTableAlias = require('mwater-expressions').injectTableAlias
 
@@ -30,6 +31,7 @@ module.exports = class DatagridQueryBuilder
   createSimpleQuery: (design, options) ->
     exprUtils = new ExprUtils(@schema)
     exprCompiler = new ExprCompiler(@schema)
+    exprCleaner = new ExprCleaner(@schema)
 
     isAggr = @isMainAggr(design)
 
@@ -46,6 +48,25 @@ module.exports = class DatagridQueryBuilder
     wheres = []
     if design.filter
       wheres.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "main"))
+
+    # Add global filters
+    for filter in (design.globalFilters or [])
+      # Check if exists and is correct type
+      column = @schema.getColumn(design.table, filter.columnId)
+      if not column
+        continue
+
+      columnExpr = { type: "field", table: design.table, column: column.id }
+      if exprUtils.getExprType(columnExpr) != filter.columnType
+        continue
+
+      # Create expr
+      expr = { type: "op", op: filter.op, table: design.table, exprs: [columnExpr].concat(filter.exprs) }
+
+      # Clean expr
+      expr = exprCleaner.cleanExpr(expr, { table: design.table })
+
+      wheres.push(exprCompiler.compileExpr(expr: expr, tableAlias: "main"))
 
     # Add extra filters
     for extraFilter in (options.extraFilters or [])
@@ -129,6 +150,7 @@ module.exports = class DatagridQueryBuilder
   # Create the main query (not joined to subtables) part of the overall complex query. See tests for more details
   createComplexMainQuery: (design, options) ->
     exprCompiler = new ExprCompiler(@schema)
+    exprCleaner = new ExprCleaner(@schema)
 
     # Create selects
     selects = [
@@ -159,6 +181,25 @@ module.exports = class DatagridQueryBuilder
     wheres = []
     if design.filter
       wheres.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "main"))
+
+    # Add global filters
+    for filter in (design.globalFilters or [])
+      # Check if exists and is correct type
+      column = @schema.getColumn(design.table, filter.columnId)
+      if not column
+        continue
+
+      columnExpr = { type: "field", table: design.table, column: column.id }
+      if exprUtils.getExprType(columnExpr) != filter.columnType
+        continue
+
+      # Create expr
+      expr = { type: "op", op: filter.op, table: design.table, exprs: [columnExpr].concat(filter.exprs) }
+
+      # Clean expr
+      expr = exprCleaner.cleanExpr(expr, { table: design.table })
+
+      wheres.push(exprCompiler.compileExpr(expr: expr, tableAlias: "main"))
 
     # Add extra filters
     for extraFilter in (options.extraFilters or [])
