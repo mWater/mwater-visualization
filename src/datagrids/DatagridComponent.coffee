@@ -6,7 +6,9 @@ R = React.createElement
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
+ExprUtils = require('mwater-expressions').ExprUtils
 ExprCompiler = require('mwater-expressions').ExprCompiler
+ExprCleaner = require('mwater-expressions').ExprCleaner
 DatagridViewComponent = require './DatagridViewComponent'
 DatagridDesignerComponent = require './DatagridDesignerComponent'
 DatagridUtils = require './DatagridUtils'
@@ -83,11 +85,37 @@ module.exports = class DatagridComponent extends React.Component
   # Get datagrid filter compiled for quickfilter filtering
   getCompiledFilters: ->
     exprCompiler = new ExprCompiler(@props.schema)
+    exprUtils = new ExprUtils(@props.schema)
+    exprCleaner = new ExprCleaner(@props.schema)
 
     compiledFilters = []
 
     if @props.design.filter
       jsonql = exprCompiler.compileExpr(expr: @props.design.filter, tableAlias: "{alias}")
+      if jsonql
+        compiledFilters.push({
+          table: @props.design.table
+          jsonql: jsonql
+        })
+
+    # Add global filters
+    for filter in (@props.design.globalFilters or [])
+      # Check if exists and is correct type
+      column = @props.schema.getColumn(@props.design.table, filter.columnId)
+      if not column
+        continue
+
+      columnExpr = { type: "field", table: @props.design.table, column: column.id }
+      if exprUtils.getExprType(columnExpr) != filter.columnType
+        continue
+
+      # Create expr
+      expr = { type: "op", op: filter.op, table: @props.design.table, exprs: [columnExpr].concat(filter.exprs) }
+
+      # Clean expr
+      expr = exprCleaner.cleanExpr(expr, { table: @props.design.table })
+
+      jsonql = exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
       if jsonql
         compiledFilters.push({
           table: @props.design.table
