@@ -56,6 +56,8 @@ module.exports = class DashboardViewComponent extends React.Component
       widgetScoper: new WidgetScoper() # Empty scoping
     }
 
+    @widgetComps = {} # Lookup of widget components by id
+
   handleScopeChange: (id, scope) => 
     @setState(widgetScoper: @state.widgetScoper.applyScope(id, scope))
 
@@ -83,6 +85,26 @@ module.exports = class DashboardViewComponent extends React.Component
     compiledFilters = compiledFilters.concat(@props.filters or [])
     return compiledFilters
 
+  # Get list of TOC entries
+  getTOCEntries: (layoutManager) ->
+    entries = []
+
+    for { id, type, design } in layoutManager.getAllWidgets(@props.design.items)
+      widget = WidgetFactory.createWidget(type)
+      # Add widgetId to each one
+      for entry in widget.getTOCEntries(design)
+        entries.push(_.extend({}, entry, widgetId: id))
+
+    return entries
+
+  handleScrollToTOCEntry: (widgetId, entryId) =>
+    widgetComp = @widgetComps[widgetId]
+    if not widgetComp
+      return
+
+    # Call scrollToTOCEntry if present
+    widgetComp.scrollToTOCEntry?(entryId)
+
   renderScopes: ->
     R(WidgetScopesViewComponent, scopes: @state.widgetScoper.getScopes(), onRemoveScope: @handleRemoveScope)
 
@@ -93,6 +115,9 @@ module.exports = class DashboardViewComponent extends React.Component
 
     # Get filterable tables
     filterableTables = DashboardUtils.getFilterableTables(@props.design, @props.schema)
+
+    # Determine toc entries
+    tocEntries = @getTOCEntries(layoutManager)
 
     renderWidget = (options) =>
       widget = WidgetFactory.createWidget(options.type)
@@ -105,7 +130,7 @@ module.exports = class DashboardViewComponent extends React.Component
         implicitFilterBuilder = new ImplicitFilterBuilder(@props.schema)
         filters = implicitFilterBuilder.extendFilters(filterableTables, filters)
       
-      return widget.createViewElement({
+      widgetElem = widget.createViewElement({
         schema: @props.schema
         dataSource: @props.dataSource
         widgetDataSource: @props.dashboardDataSource.getWidgetDataSource(options.id)
@@ -119,7 +144,13 @@ module.exports = class DashboardViewComponent extends React.Component
         standardWidth: options.standardWidth 
         onRowClick: @props.onRowClick
         namedStrings: @props.namedStrings
+        tocEntries: tocEntries
+        onScrollToTOCEntry: @handleScrollToTOCEntry
       })  
+
+      # Keep references to widget elements
+      widgetElem = React.cloneElement(widgetElem, ref: ((c) => @widgetComps[options.id] = c))
+      return widgetElem
 
     style = {
       height: "100%"

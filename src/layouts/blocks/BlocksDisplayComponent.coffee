@@ -190,6 +190,11 @@ class BlocksDisplayComponent extends React.Component
           createItem: @createBlockItem({ type: "widget", aspectRatio: 16.0/9.0, widgetType: "IFrame", design: {} })
           title: H.i className: "fa fa-youtube-play"
           subtitle: "Video"
+        R PaletteItemComponent,
+          createItem: @createBlockItem({ type: "widget", widgetType: "TOC", design: {} })
+          title: H.i className: "fa fa-list-ol"
+          subtitle: "TOC"
+
 
   render: ->
     if @props.onItemsChange

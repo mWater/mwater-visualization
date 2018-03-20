@@ -148,3 +148,29 @@ module.exports = class TextWidget extends Widget
     filterableTables = _.uniq(_.compact(filterableTables))
     return filterableTables
 
+  # Get table of contents entries for the widget, entries that should be displayed in the TOC.
+  # returns `[{ id: "id that is unique within widget", text: "text of TOC entry", level: 1, 2, etc. }]
+  # For simplicity, the h1, h2, etc. have ids of 0, 1, 2 in the order they appear. h1, h2 will be given ids 0, 1 respectively.
+  getTOCEntries: (design) ->
+    # Find all items that are h1, h2, etc
+    entries = []
+
+    # Convert items into flat text
+    flattenText = (items) ->
+      return _.map(items, (item) ->
+        if _.isString(item)
+          return item
+        if item?.items
+          return flattenText(item.items)
+        ).join("")
+
+    findRecursive = (items) ->
+      for item in (items or [])
+        if item?.type == "element" and item.tag.match(/^h[1-9]$/)
+          entries.push({ id: entries.length, level: parseInt(item.tag.substr(1)), text: flattenText(item.items) })
+        if item?.items
+          findRecursive(item.items)
+
+    findRecursive(design.items)
+
+    return entries

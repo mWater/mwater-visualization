@@ -57,19 +57,29 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
       callback(error: error, exprValues: data or {}, cacheExpiry: props.dataSource.getCacheExpiry())
     )
 
+  scrollToTOCEntry: (entryId) ->
+    # Find entry in divComp
+    entries = @divComp.querySelectorAll("h1,h2,h3,h4,h5,h6,h7,h8,h9")
+
+    entry = entries[entryId]
+    if entry
+      entry.scrollIntoView(true)
+
   render: ->
     # If loading, don't display old values
     exprValues = if not @state.loading then @state.exprValues else {}
 
-    R TextComponent,
-      design: @props.design
-      onDesignChange: @props.onDesignChange
-      filters: @props.filters
-      schema: @props.schema
-      dataSource: @props.dataSource
-      exprValues: exprValues
-      width: @props.width
-      height: @props.height
-      standardWidth: @props.standardWidth
-      singleRowTable: @props.singleRowTable
-      namedStrings: @props.namedStrings
+    H.div 
+      ref: ((c) => @divComp = c),
+        R TextComponent,
+          design: @props.design
+          onDesignChange: @props.onDesignChange
+          filters: @props.filters
+          schema: @props.schema
+          dataSource: @props.dataSource
+          exprValues: exprValues
+          width: @props.width
+          height: @props.height
+          standardWidth: @props.standardWidth
+          singleRowTable: @props.singleRowTable
+          namedStrings: @props.namedStrings

@@ -94,7 +94,7 @@ module.exports = class GridLayoutManager extends LayoutManager
   getAllWidgets: (items) ->
     widgets = []
     for id, item of items
-      widgets.push({ type: item.widget.type, design: item.widget.design }) 
+      widgets.push({ id: id, type: item.widget.type, design: item.widget.design }) 
 
     return widgets
 

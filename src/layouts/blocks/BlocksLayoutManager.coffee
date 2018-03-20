@@ -41,10 +41,10 @@ module.exports = class BlocksLayoutManager extends LayoutManager
         
     return null
 
-  # Gets all widgets in items as array of { type, design }
+  # Gets all widgets in items as array of { id, type, design }
   getAllWidgets: (items) ->
     if items.type == "widget" 
-      return [{ type: items.widgetType, design: items.design }]
+      return [{ id: items.id, type: items.widgetType, design: items.design }]
 
     if items.blocks
       return _.flatten(_.map(items.blocks, (item) => @getAllWidgets(item)))
