@@ -4,6 +4,7 @@ AxisBuilder = require '../../../axes/AxisBuilder'
 
 Color = require 'color'
 PivotChartUtils = require './PivotChartUtils'
+canonical = require 'canonical-json'
 
 # Builds pivot table layout from the design and data
 # See PivotChart Design.md for more detauls
@@ -34,6 +35,11 @@ module.exports = class PivotChartLayoutBuilder
     # Determine depth of row headers and column headers (how deeply nested segments are)
     rowsDepth = _.max(_.map(rows, (row) -> row.length))
     columnsDepth = _.max(_.map(columns, (column) -> column.length))
+
+    # Create indexed data (index each intersection's array by canonical json of rX and cX)
+    dataIndexed = _.mapValues(data, (list) -> 
+      _.zipObject(_.map(list, (row) -> 
+        [canonical(_.pick(row, ((v, k) -> k.match(/^[rc]\d$/)))), row])))
 
     # Emit column headers, leaving blank space at left for row headers
     for depth in [0...columnsDepth]
@@ -152,7 +158,7 @@ module.exports = class PivotChartLayoutBuilder
 
       # Emit contents
       for column in columns
-        cells.push(@buildIntersectionCell(design, data, locale, row, column))
+        cells.push(@buildIntersectionCell(design, dataIndexed, locale, row, column))
 
       layout.rows.push({ cells: cells })
 
@@ -245,7 +251,8 @@ module.exports = class PivotChartLayoutBuilder
 
   # Build a cell which is the intersection of a row and column, where row and column are nested arrays
   # from getRowsOrColumns
-  buildIntersectionCell: (design, data, locale, row, column) ->
+  # dataIndexed is created above. See there for format
+  buildIntersectionCell: (design, dataIndexed, locale, row, column) ->
     # Get intersection id
     intersectionId = PivotChartUtils.getIntersectionId(_.map(row, (r) -> r.segment), _.map(column, (c) -> c.segment))
 
@@ -255,20 +262,17 @@ module.exports = class PivotChartLayoutBuilder
       return { type: "blank", text: null }
     
     # Lookup data
-    intersectionData = data[intersectionId]
+    intersectionData = dataIndexed[intersectionId]
 
-    # Lookup value (very slow!)
-    # Do this by finding an entry which matches all of the row and column values
-    entry = _.find(intersectionData, (e) ->
-      for part, i in row
-        if e["r#{i}"] != part.value
-          return false
-      for part, i in column
-        if e["c#{i}"] != part.value
-          return false
-      return true
-      )
+    # Create key to lookup value
+    key = {}
+    for part, i in row
+      key["r#{i}"] = part.value
+    for part, i in column
+      key["c#{i}"] = part.value
 
+    # Lookup value by finding an entry which matches all of the row and column values
+    entry = intersectionData?[canonical(key)]
     value = entry?.value
 
     # Format using axis builder if present. Blank otherwise
