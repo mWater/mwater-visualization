@@ -40,5 +40,5 @@ module.exports = class Widget
 
   # Get table of contents entries for the widget, entries that should be displayed in the TOC.
   # returns `[{ id: "id that is unique within widget", text: "text of TOC entry", level: 1, 2, etc. }]
-  getTOCEntries: (design) ->
+  getTOCEntries: (design, namedStrings) ->
     return []

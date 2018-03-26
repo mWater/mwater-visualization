@@ -92,7 +92,7 @@ module.exports = class DashboardViewComponent extends React.Component
     for { id, type, design } in layoutManager.getAllWidgets(@props.design.items)
       widget = WidgetFactory.createWidget(type)
       # Add widgetId to each one
-      for entry in widget.getTOCEntries(design)
+      for entry in widget.getTOCEntries(design, @props.namedStrings)
         entries.push(_.extend({}, entry, widgetId: id))
 
     return entries
