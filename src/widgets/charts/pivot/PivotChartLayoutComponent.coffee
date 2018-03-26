@@ -7,6 +7,7 @@ H = React.DOM
 
 Color = require 'color'
 ui = require 'react-library/lib/bootstrap'
+classNames = require('classnames')
 
 # Displays a pivot chart from a layout
 module.exports = class PivotChartLayoutComponent extends React.Component
@@ -146,17 +147,42 @@ module.exports = class PivotChartLayoutComponent extends React.Component
     return H.div key: "hover-controls", controls
 
   render: ->
-    style = {
-      width: "100%"
-      borderSpacing: 0
-      borderCollapse: "collapse"
-      position: "relative"
-    }
-
     H.div 
       style: { position: "relative" } 
       onMouseLeave: (=> @setState(hoverSection: null)),
-        H.table style: style,
+        # Define CSS classes to keep HTML as small as possible
+        H.style null, '''
+          .pivot-chart-table {
+            width: 100%;
+            border-spacing: 0;
+            border-collapse: collapse;
+            position: relative;
+          }
+
+          .pivot-chart-table .cell {
+            padding: 5px;
+            vertical-align: top;
+            position: relative;
+            background-color: white;
+          }
+
+          .pivot-chart-table .bt1 { border-top: solid 1px #f4f4f4 }
+          .pivot-chart-table .bt2 { border-top: solid 1px #ccc }
+          .pivot-chart-table .bt3 { border-top: solid 1px #888 }
+
+          .pivot-chart-table .bb1 { border-bottom: solid 1px #f4f4f4 }
+          .pivot-chart-table .bb2 { border-bottom: solid 1px #ccc }
+          .pivot-chart-table .bb3 { border-bottom: solid 1px #888 }
+
+          .pivot-chart-table .bl1 { border-left: solid 1px #f4f4f4 }
+          .pivot-chart-table .bl2 { border-left: solid 1px #ccc }
+          .pivot-chart-table .bl3 { border-left: solid 1px #888 }
+
+          .pivot-chart-table .br1 { border-right: solid 1px #f4f4f4 }
+          .pivot-chart-table .br2 { border-right: solid 1px #ccc }
+          .pivot-chart-table .br3 { border-right: solid 1px #888 }
+        '''
+        H.table className: "pivot-chart-table",
           H.tbody null,
             _.map @props.layout.rows, (row, rowIndex) =>
               @renderRow(row, rowIndex)
@@ -214,16 +240,16 @@ class LayoutCellComponent extends React.Component
     backgroundColor = if cell.unconfigured and @props.onEditSection
       "#eff5fb"
     else
-      cell.backgroundColor or "#FFFFFF"
+      cell.backgroundColor or null
 
     if isHover
-      backgroundColor = Color(backgroundColor).darken(0.03)
+      backgroundColor = Color(backgroundColor or "#ffffff").darken(0.03)
 
     # Add striping
     if @props.layout.striping == "columns" and cell.type in ['column', 'intersection'] and @props.columnIndex % 2 == 0
-      backgroundColor = Color(backgroundColor).darken(0.03)
+      backgroundColor = Color(backgroundColor or "#ffffff").darken(0.03)
     else if @props.layout.striping == "rows" and cell.type in ['row', 'intersection'] and @props.rowIndex % 2 == 0
-      backgroundColor = Color(backgroundColor).darken(0.03)
+      backgroundColor = Color(backgroundColor or "#ffffff").darken(0.03)
 
     borderWeights = [null, "solid 1px #f4f4f4", "solid 1px #ccc", "solid 1px #888"]
 
@@ -232,17 +258,26 @@ class LayoutCellComponent extends React.Component
     borderRight = Math.max(cell.borderRight or 0, @props.layout.rows[@props.rowIndex].cells[@props.columnIndex + 1]?.borderLeft or 0)
 
     style = {
-      padding: 5
-      verticalAlign: "top"
       backgroundColor: backgroundColor
-      position: "relative"
       textAlign: cell.align
       cursor: if isHover and not cell.unconfigured then "pointer"
-      borderTop: borderWeights[cell.borderTop or 0]
-      borderBottom: borderWeights[borderBottom]
-      borderLeft: borderWeights[cell.borderLeft or 0]
-      borderRight: borderWeights[borderRight]
     }
+    classes = classNames({
+      cell: true
+      # List out borders in compact way to keep HTML smaller
+      bt1: cell.borderTop == 1
+      bt2: cell.borderTop == 2
+      bt3: cell.borderTop == 3
+      bb1: cell.borderBottom == 1
+      bb2: cell.borderBottom == 2
+      bb3: cell.borderBottom == 3
+      bl1: cell.borderLeft == 1
+      bl2: cell.borderLeft == 2
+      bl3: cell.borderLeft == 3
+      br1: cell.borderRight == 1
+      br2: cell.borderRight == 2
+      br3: cell.borderRight == 3
+    })
 
     # Style that should not affect popup menu
     innerStyle = {
@@ -255,9 +290,10 @@ class LayoutCellComponent extends React.Component
       ref: ((c) => @tdComponent = c)
       onMouseEnter: @props.onHover
       onClick: @handleClick
+      className: classes
       style: style,
-      colSpan: cell.columnSpan or 1
-      rowSpan: cell.rowSpan or 1,
+      colSpan: cell.columnSpan or null
+      rowSpan: cell.rowSpan or null,
         H.span style: innerStyle,
           if cell.unconfigured and @props.onEditSection
             @renderUnconfigured(cell)
