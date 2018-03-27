@@ -182,6 +182,16 @@ module.exports = class PivotChartLayoutComponent extends React.Component
           .pivot-chart-table .br2 { border-right: solid 1px #ccc }
           .pivot-chart-table .br3 { border-right: solid 1px #888 }
         '''
+        if @props.layout.tooManyRows
+          H.div className: "text-warning", style: { fontSize: 12 },
+            H.i(className: "fa fa-exclamation-circle")
+            " Warning: Too many rows in table to display"
+
+        if @props.layout.tooManyColumns
+          H.div className: "text-warning", style: { fontSize: 12 },
+            H.i(className: "fa fa-exclamation-circle")
+            " Warning: Too many columns in table to display"
+
         H.table className: "pivot-chart-table",
           H.tbody null,
             _.map @props.layout.rows, (row, rowIndex) =>

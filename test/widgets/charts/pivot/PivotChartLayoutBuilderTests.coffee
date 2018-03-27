@@ -68,7 +68,6 @@ describe "PivotChartLayoutBuilder", ->
           [{ segment: segment, label: null, value: null }]
         ]
 
-
       it 'gets categories of text segment with two data intersections', ->
         segment = { id: "seg1", valueAxis: @axisText }
         data = {
@@ -185,6 +184,25 @@ describe "PivotChartLayoutBuilder", ->
         ["value", "value", "value", "value"]
         ["value", "value", "value", "value"]
       ]
+
+    it "limits rows", ->
+      design = {
+        table: "t1"
+        columns: [{ id: "c1" }]
+        rows: [{ id: "r1", valueAxis: @axisText }]
+        intersections: {
+          "r1:c1": { valueAxis: @axisNumberSum }
+        }
+      }
+
+      data = {
+        "r1:c1": _.map(_.range(0, 1000), (i) => { r0: "#{i}", value: i })
+      }
+
+      layout = @lb.buildLayout(design, data)
+
+      assert.isTrue layout.tooManyRows
+      assert.equal layout.rows.length, 501, "Should have extra row for headers"
 
     it "uses nullLabel", ->
       design = {

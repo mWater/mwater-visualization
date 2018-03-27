@@ -6,6 +6,9 @@ Color = require 'color'
 PivotChartUtils = require './PivotChartUtils'
 canonical = require 'canonical-json'
 
+maxRows = 500
+maxColumns = 50
+
 # Builds pivot table layout from the design and data
 # See PivotChart Design.md for more detauls
 module.exports = class PivotChartLayoutBuilder 
@@ -31,6 +34,16 @@ module.exports = class PivotChartLayoutBuilder
     rows = []
     for segment in design.rows
       rows = rows.concat(@getRowsOrColumns(true, segment, data, locale))
+
+    # Limit rows
+    if rows.length > maxRows
+      rows = rows.slice(0, maxRows)
+      layout.tooManyRows = true
+
+    # Limit columns
+    if columns.length > maxColumns
+      columns = columns.slice(0, maxColumns)
+      layout.tooManyColumns = true
 
     # Determine depth of row headers and column headers (how deeply nested segments are)
     rowsDepth = _.max(_.map(rows, (row) -> row.length))

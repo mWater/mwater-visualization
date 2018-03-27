@@ -78,6 +78,8 @@ Layout format is as follows:
 
   rows: array of rows
   striping: "columns"/"rows" to put in light striping
+  tooManyRows: true if row limit exceeded
+  tooManyColumns: true if column limit exceeded
 
 row:
   cells: array of cells
