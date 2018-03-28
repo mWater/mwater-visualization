@@ -82,8 +82,8 @@ class MarkdownWidgetComponent extends React.Component
           editor
 
     React.createElement(ModalWindowComponent,
-      isOpen: @state.editing
-      onRequestClose: (=> @setState(editing: false)),
+      isOpen: true
+      onRequestClose: @handleEndEditing,
         content)
 
   renderContent: (design) ->

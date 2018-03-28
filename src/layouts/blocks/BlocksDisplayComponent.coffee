@@ -191,7 +191,7 @@ class BlocksDisplayComponent extends React.Component
           title: H.i className: "fa fa-youtube-play"
           subtitle: "Video"
         R PaletteItemComponent,
-          createItem: @createBlockItem({ type: "widget", widgetType: "TOC", design: {} })
+          createItem: @createBlockItem({ type: "widget", widgetType: "TOC", design: { numbering: false, borderWeight: 2, header: "Contents" } })
           title: H.i className: "fa fa-list-ol"
           subtitle: "TOC"
 
