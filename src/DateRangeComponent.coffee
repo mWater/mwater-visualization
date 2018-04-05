@@ -105,7 +105,7 @@ module.exports = class DateRangeComponent extends React.Component
 
   renderSummary: ->
     if not @props.value
-      return H.span className: "text-muted", "All"
+      return H.span className: "text-muted", "All Dates"
 
     startDate = @toMoment(@props.value[0])
     endDate = @toMoment(@props.value[1])
