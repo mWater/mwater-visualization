@@ -92,7 +92,11 @@ module.exports = class DateExprComponent extends React.Component
     if @props.value.op == "between"
       startDate = @toMoment(@props.value.exprs[0]?.value)
       endDate = @toMoment(@props.value.exprs[1]?.value)
-      return (if startDate then startDate.format("ll") else "") + " - " + (if endDate then endDate.format("ll") else "")
+      # Add/subtract hours to work around https://github.com/moment/moment/issues/2749
+      if @props.datetime
+        return (if startDate then startDate.add("hours", 3).format("ll") else "") + " - " + (if endDate then endDate.subtract("hours", 3).format("ll") else "")
+      else
+        return (if startDate then startDate.format("ll") else "") + " - " + (if endDate then endDate.format("ll") else "")
 
     return "???"
 
