@@ -28,6 +28,9 @@ module.exports = class TextComponent extends React.Component
     singleRowTable: PropTypes.string  # Table that is filtered to have one row
     namedStrings: PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
+  @contextTypes:
+    locale: PropTypes.string  # e.g. "en"
+
   createItemsHtmlConverter: ->
     return new ExprItemsHtmlConverter(
       @props.schema, 
@@ -36,7 +39,8 @@ module.exports = class TextComponent extends React.Component
       # Display summaries if in design more and singleRowTable is set
       @props.onDesignChange? and @props.singleRowTable?,
       # Only replace named strings if not editing
-      if not @props.onDesignChange? then @props.namedStrings
+      if not @props.onDesignChange? then @props.namedStrings,
+      @context.locale
     )
 
   handleItemsChange: (items) =>

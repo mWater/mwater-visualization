@@ -16,13 +16,15 @@ module.exports = class ExprItemsHtmlConverter extends ItemsHtmlConverter
   # exprValues is map of expr id to value 
   # summarizeExprs shows summaries of expressions, not values
   # namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
-  constructor: (schema, designMode, exprValues, summarizeExprs, namedStrings) ->
+  # locale: locale to use e.g. "en"
+  constructor: (schema, designMode, exprValues, summarizeExprs, namedStrings, locale) ->
     super(namedStrings)
 
     @schema = schema
     @designMode = designMode
     @exprValues = exprValues
     @summarizeExprs = summarizeExprs
+    @locale = locale
 
   # Converts an item that is not an element to html. Override in subclass.
   # To be reversible, should contain data-embed which contains JSON of item
@@ -31,7 +33,7 @@ module.exports = class ExprItemsHtmlConverter extends ItemsHtmlConverter
 
     if item.type == "expr"
       if @summarizeExprs
-        text = new ExprUtils(@schema).summarizeExpr(item.expr)
+        text = new ExprUtils(@schema).summarizeExpr(item.expr, @locale)
         if text.length > 30
           text = text.substr(0, 30) + "..."
 
@@ -50,7 +52,7 @@ module.exports = class ExprItemsHtmlConverter extends ItemsHtmlConverter
 
             text = d3Format.format(item.format)(num)
           else
-            text = exprUtils.stringifyExprLiteral(item.expr, @exprValues[item.id]) # TODO locale
+            text = exprUtils.stringifyExprLiteral(item.expr, @exprValues[item.id], @locale)
 
           exprHtml = _.escape(text)
         else
@@ -61,7 +63,7 @@ module.exports = class ExprItemsHtmlConverter extends ItemsHtmlConverter
 
       # Add label
       if item.includeLabel
-        label = item.labelText or (new ExprUtils(@schema).summarizeExpr(item.expr) + ":\u00A0")
+        label = item.labelText or (new ExprUtils(@schema).summarizeExpr(item.expr, @locale) + ":\u00A0")
         exprHtml = '<span class="text-muted">' + _.escape(label) + "</span>" + exprHtml
 
       if @designMode 
