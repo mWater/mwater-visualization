@@ -161,6 +161,7 @@ class TOCWidgetViewComponent extends React.Component
         height: @props.height
         border: border
         padding: 5
+        margin: 1
       },
       # Render header
       H.div style: { fontWeight: "bold" },
