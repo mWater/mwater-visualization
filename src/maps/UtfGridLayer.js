@@ -99,6 +99,7 @@ module.exports = L.Layer.extend({
 		this._map = map;
 		this._container = this._map._container;
 
+		this._resetView();
 		this._update();
 
 		map.on('click', this._click, this);
@@ -115,6 +116,40 @@ module.exports = L.Layer.extend({
 			this._container.style.cursor = '';
 		}
 	},
+	getTileSize: function () {
+		var s = this.options.tileSize;
+		return s instanceof L.Point ? s : new L.Point(s, s);
+	},
+	_resetView: function(e){
+		this._resetGrid()
+	},
+	_pxBoundsToTileRange: function (bounds) {
+		var tileSize = this.getTileSize();
+		return new L.Bounds(
+			bounds.min.unscaleBy(tileSize).floor(),
+			bounds.max.unscaleBy(tileSize).ceil().subtract([1, 1]));
+	},
+	_resetGrid: function () {
+		var map = this._map,
+		    crs = map.options.crs,
+		    tileSize = this._tileSize = this.getTileSize(),
+		    tileZoom = this._tileZoom;
+
+		var bounds = this._map.getPixelWorldBounds(this._tileZoom);
+		if (bounds) {
+			this._globalTileRange = this._pxBoundsToTileRange(bounds);
+		}
+
+		this._wrapX = crs.wrapLng && [
+			Math.floor(map.project([0, crs.wrapLng[0]], tileZoom).x / tileSize.x),
+			Math.ceil(map.project([0, crs.wrapLng[1]], tileZoom).x / tileSize.y)
+		];
+		this._wrapY = crs.wrapLat && [
+			Math.floor(map.project([crs.wrapLat[0], 0], tileZoom).y / tileSize.x),
+			Math.ceil(map.project([crs.wrapLat[1], 0], tileZoom).y / tileSize.y)
+		];
+	},
+
 
 	_click: function (e) {
 		var zoom = this._map.getZoom();
@@ -227,7 +262,6 @@ module.exports = L.Layer.extend({
 
 				if (!this._cache.hasOwnProperty(key)) {
 					this._cache[key] = null;
-
 					if (this.options.useJsonP) {
 						this._loadTileP(zoom, xw, yw);
 					} else {
@@ -245,6 +279,7 @@ module.exports = L.Layer.extend({
 
 
 	_loadTileP: function (zoom, x, y) {
+		var coords = this._wrapCoords({x: x, y:y, z:zoom})
 		var head = document.getElementsByTagName('head')[0],
 		    key = zoom + '_' + x + '_' + y,
 		    functionName = 'lu_' + key,
@@ -253,9 +288,9 @@ module.exports = L.Layer.extend({
 
 		var url = L.Util.template(this._url, L.Util.extend({
 			s: this._getSubdomain(x, y),
-			z: zoom,
-			x: x,
-			y: y,
+			z: coords.z,
+			x: coords.x,
+			y: coords.y,
 			cb: wk + '.' + functionName
 		}, this.options));
 
@@ -271,13 +306,21 @@ module.exports = L.Layer.extend({
 
 		head.appendChild(script);
 	},
+	_wrapCoords: function (coords) {
+		var newCoords = new L.Point(
+			this._wrapX ? L.Util.wrapNum(coords.x, this._wrapX) : coords.x,
+			this._wrapY ? L.Util.wrapNum(coords.y, this._wrapY) : coords.y);
+		newCoords.z = coords.z;
+		return newCoords;
+	},
 
 	_loadTile: function (zoom, x, y) {
+		var coords = this._wrapCoords({x: x, y:y, z:zoom})
 		var url = L.Util.template(this._url, L.Util.extend({
 	  	s: this._getSubdomain(x, y),
-			z: zoom,
-			x: x,
-			y: y
+			z: coords.z,
+			x: coords.x,
+			y: coords.y
 		}, this.options));
 
 		var key = zoom + '_' + x + '_' + y;
