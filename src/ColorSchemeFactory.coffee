@@ -1,5 +1,5 @@
 _ = require 'lodash'
-d3 = require 'd3-scale'
+d3Scale = require 'd3-scale'
 brewer = require 'd3-scale-chromatic'
 c_c = require 'color-mixer'
 
@@ -12,7 +12,7 @@ generateCategoricalSet = (set, number, reversed) ->
   (set[(if reversed then number - i - 1 else i) % set.length] for i in [0...number])
 
 generateSequentialSet = (set, number, reversed) ->
-  color = d3.scaleLinear()
+  color = d3Scale.scaleLinear()
     .domain([0,number-1])
     .range([0,1])
   colors = (set(color((if reversed then number - i - 1 else i))) for i in [0...number])

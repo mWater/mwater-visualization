@@ -4,20 +4,15 @@ ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../../../axes/AxisBuilder'
 injectTableAlias = require('mwater-expressions').injectTableAlias
 
-# Only set up if d3 is available (hack for using on server)
-if global.d3
-  tickFormatter = d3.format(",")
-  pieLabelValueFormatter = (value, ratio, id) => "#{d3.format(",")(value)} (#{d3.format('.1%')(ratio)})"
-  d3Formatter = (format) -> d3.format(format)
-  labelValueFormatter = (format) -> 
-    return (value, ratio, id) -> 
-      return if format[id] then format[id](value) else value
-      
-else
-  tickFormatter = null
-  pieLabelValueFormatter = null
-  labelValueFormatter = null
-  d3Formatter = null
+d3Format = require 'd3-format'
+
+tickFormatter = d3Format.format(",")
+pieLabelValueFormatter = (value, ratio, id) => "#{d3Format.format(",")(value)} (#{d3Format.format('.1%')(ratio)})"
+d3Formatter = (format) -> d3Format.format(format)
+labelValueFormatter = (format) -> 
+  return (value, ratio, id) -> 
+    return if format[id] then format[id](value) else value
+    
 
 # Compiles various parts of a layered chart (line, bar, scatter, spline, area) to C3.js format
 module.exports = class LayeredChartCompiler

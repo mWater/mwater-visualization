@@ -7,8 +7,11 @@ moment = require 'moment'
 AxisBuilder = require '../../../axes/AxisBuilder'
 ExprUtils = require('mwater-expressions').ExprUtils
 
+d3 = require('d3')
+d3Format = require('d3-format')
+
 # Require d3-tip to use it
-d3Tip = require('d3-tip')
+d3Tip = require('d3-tip').default
 
 # creates a d3 calendar visualization
 module.exports = class CalendarChartViewComponent extends React.Component
@@ -104,7 +107,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
     container.innerHTML = ''
     cellSize = @getCellSize()
     height = Math.ceil(cellSize * 7) + 7
-    format = d3.time.format("%Y-%m-%d")
+    format = d3.timeFormat("%Y-%m-%d")
     percent = d3.format(".1%")
     cellStroke = @props.cellStrokeColor || @props.cellColor
     self = this
@@ -130,7 +133,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
       title
     )
 
-    color = d3.scale.quantize()
+    color = d3.scaleQuantize()
       .domain([1, d3.max(data.values())])
       .range(d3.range(10).map( (d) ->
         rgb.darker( d * 0.1).toString()
@@ -159,8 +162,10 @@ module.exports = class CalendarChartViewComponent extends React.Component
       .style("text-anchor", "middle")
 
 
+    _this = this
+
     rect = svg.selectAll(".calendar-chart-day")
-      .data( (d) -> d3.time.days(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
+      .data( (d) -> d3.timeDays(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
       .enter().append("rect")
       .attr("class", "calendar-chart-day")
       .attr("fill", "#fff")
@@ -168,11 +173,11 @@ module.exports = class CalendarChartViewComponent extends React.Component
       .attr("stroke-width", @props.monthsStrokeWidth)
       .attr("width", cellSize)
       .attr("height", cellSize)
-      .attr("x", (d) -> d3.time.weekOfYear(d) * cellSize )
+      .attr("x", (d) -> d3.timeWeek.count(d3.timeYear(d), d) * cellSize )
       .attr("y", (d) -> d.getDay() * cellSize )
-      .on("mouseenter", (d, i) =>
-        if not @reloading
-          tip.show(d, i)
+      .on("mouseenter", (d, i) ->
+        if not _this.reloading
+          tip.show(d, i, this)
       )
       .on("mouseleave", tip.hide)
       .datum(format)
@@ -197,9 +202,9 @@ module.exports = class CalendarChartViewComponent extends React.Component
     monthPath = (t0) ->
       t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0)
       d0 = t0.getDay()
-      w0 = d3.time.weekOfYear(t0)
+      w0 = d3.timeWeek.count(d3.timeYear(t0), t0)
       d1 = t1.getDay()
-      w1 = d3.time.weekOfYear(t1)
+      w1 = d3.timeWeek.count(d3.timeYear(t1), t1)
 
       "M" + (w0 + 1) * cellSize + "," + d0 * cellSize +
         "H" + w0 * cellSize + "V" + 7 * cellSize +
@@ -208,7 +213,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
         "H" + (w0 + 1) * cellSize + "Z"
 
     svg.selectAll(".calendar-chart-month")
-      .data( (d) -> d3.time.months(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
+      .data( (d) -> d3.timeMonths(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
       .enter().append("path")
       .attr("fill", "none")
       .attr("class", "calendar-chart-month")

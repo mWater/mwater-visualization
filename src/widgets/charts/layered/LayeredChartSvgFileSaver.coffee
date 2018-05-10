@@ -1,5 +1,6 @@
 saveSvgAsPng = require 'save-svg-as-png'
 LayeredChartCompiler = require './LayeredChartCompiler'
+c3 = require 'c3'
 
 # Get the css rules corresponding to .c3 directly out of the document object
 getC3Css = () =>

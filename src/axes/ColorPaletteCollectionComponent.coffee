@@ -4,7 +4,6 @@ H = React.DOM
 R = React.createElement
 
 ColorSchemeFactory = require '../ColorSchemeFactory'
-d3 = require 'd3-scale'
 
 module.exports = class ColorPaletteCollectionComponent extends React.Component
   @propTypes:

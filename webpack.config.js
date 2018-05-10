@@ -18,10 +18,6 @@ module.exports = {
   },
   externals: {
     jquery: "$",
-    lodash: '_',
-    underscore: '_',
-    backbone: 'Backbone',
-    d3: "d3",
-    c3: "c3"
+    lodash: '_'
   }
 };
