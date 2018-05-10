@@ -1,6 +1,6 @@
 {
   "name": "mwater-visualization",
-  "version": "4.12.0",
+  "version": "5.0.0",
   "private": true,
   "description": "Visualization library",
   "repository": "git@github.com:mWater/mwater-visualization.git",
