@@ -11,21 +11,19 @@ moment = require 'moment'
 MWaterResponsesFilterComponent = require './MWaterResponsesFilterComponent'
 ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
 
-siteTypes = [
-  "entities.water_point"
-  "entities.household"
-  "entities.sanitation_facility"
-  "entities.community"
-  "entities.school"
-  "entities.health_facility"
-  "entities.surface_water"
-  "entities.place_of_worship"
-  "entities.water_system"
-  "entities.water_system_component"
-  "entities.waste_disposal_site"
-  "entities.wastewater_treatment_system"
-  "entities.handwashing_facility"
-]
+order = {
+  "water_point": 1
+  "sanitation_facility": 2
+  "household": 3
+  "community": 4
+  "school": 5
+  "health_facility": 6
+  "place_of_worship": 7
+  "water_system": 8
+  "water_system_component": 9
+  "wastewater_treatment_system": 10
+  "waste_disposal_site": 11
+}
 
 # Allows selection of a mwater-visualization table. Loads forms as well and calls event if modified
 module.exports = class MWaterTableSelectComponent extends React.Component
@@ -232,8 +230,23 @@ class CompleteTableSelectComponent extends React.Component
     @props.onExtraTablesChange(_.without(@props.extraTables, tableId))
 
   renderSites: ->
+    types = []
+
+    for table in @props.schema.getTables()
+      if table.deprecated
+        continue
+
+      if not table.id.match(/^entities\./)
+        continue
+    
+      types.push(table.id)
+    
+    # Sort by order if present
+    types = _.sortBy(types, (type) -> order[type.value] or 999)
+    console.log types
+
     R uiComponents.OptionListComponent,
-      items: _.compact(_.map(siteTypes, (tableId) =>
+      items: _.compact(_.map(types, (tableId) =>
         table = @props.schema.getTable(tableId)
         if not table
           return null
@@ -280,7 +293,7 @@ class CompleteTableSelectComponent extends React.Component
         return false
 
       # Remove sites
-      if table.id in siteTypes
+      if table.id.match(/^entities\./)
         return false
 
       # Remove responses
