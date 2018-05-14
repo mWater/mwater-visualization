@@ -11,7 +11,7 @@ moment = require 'moment'
 MWaterResponsesFilterComponent = require './MWaterResponsesFilterComponent'
 ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
 
-order = {
+sitesOrder = {
   "water_point": 1
   "sanitation_facility": 2
   "household": 3
@@ -242,14 +242,11 @@ class CompleteTableSelectComponent extends React.Component
       types.push(table.id)
     
     # Sort by order if present
-    types = _.sortBy(types, (type) -> order[type.value] or 999)
-    console.log types
+    types = _.sortBy(types, (type) -> sitesOrder[type.value] or 999)
 
     R uiComponents.OptionListComponent,
       items: _.compact(_.map(types, (tableId) =>
         table = @props.schema.getTable(tableId)
-        if not table
-          return null
         return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @props.onChange.bind(null, table.id) }
       ))
 
