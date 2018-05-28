@@ -399,6 +399,7 @@ module.exports = class DatagridQueryBuilder
   # Create the select for a column in JsonQL format
   createColumnSelect: (column, columnIndex, subtable, fillSubtableRows) ->
     exprUtils = new ExprUtils(@schema)
+    exprCleaner = new ExprCleaner(@schema)
     
     # Get expression type
     exprType = exprUtils.getExprType(column.expr)
@@ -418,7 +419,7 @@ module.exports = class DatagridQueryBuilder
 
     # Compile expression
     exprCompiler = new ExprCompiler(@schema)
-    compiledExpr = exprCompiler.compileExpr(expr: column.expr, tableAlias: if column.subtable then "st" else "main")
+    compiledExpr = exprCompiler.compileExpr(expr: exprCleaner.cleanExpr(column.expr), tableAlias: if column.subtable then "st" else "main")
 
     # Handle special case of geometry, converting to GeoJSON
     if exprType == "geometry"
