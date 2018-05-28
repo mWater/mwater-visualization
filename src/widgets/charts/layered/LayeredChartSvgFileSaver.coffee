@@ -1,6 +1,5 @@
 saveSvgAsPng = require 'save-svg-as-png'
 LayeredChartCompiler = require './LayeredChartCompiler'
-c3 = require 'c3'
 
 # Get the css rules corresponding to .c3 directly out of the document object
 getC3Css = () =>
@@ -94,4 +93,5 @@ module.exports = save: (design, data, schema, format) ->
         });
       chart.destroy())
   chartOptions.onrendered = _.debounce(_.once(onRender), 1000)
+  c3 = require 'c3'
   chart = c3.generate(chartOptions)
