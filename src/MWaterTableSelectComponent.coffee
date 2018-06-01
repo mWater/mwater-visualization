@@ -12,17 +12,17 @@ MWaterResponsesFilterComponent = require './MWaterResponsesFilterComponent'
 ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
 
 sitesOrder = {
-  "water_point": 1
-  "sanitation_facility": 2
-  "household": 3
-  "community": 4
-  "school": 5
-  "health_facility": 6
-  "place_of_worship": 7
-  "water_system": 8
-  "water_system_component": 9
-  "wastewater_treatment_system": 10
-  "waste_disposal_site": 11
+  "entities.water_point": 1
+  "entities.sanitation_facility": 2
+  "entities.household": 3
+  "entities.community": 4
+  "entities.school": 5
+  "entities.health_facility": 6
+  "entities.place_of_worship": 7
+  "entities.water_system": 8
+  "entities.water_system_component": 9
+  "entities.wastewater_treatment_system": 10
+  "entities.waste_disposal_site": 11
 }
 
 # Allows selection of a mwater-visualization table. Loads forms as well and calls event if modified
@@ -242,7 +242,7 @@ class CompleteTableSelectComponent extends React.Component
       types.push(table.id)
     
     # Sort by order if present
-    types = _.sortBy(types, (type) -> sitesOrder[type.value] or 999)
+    types = _.sortBy(types, (type) -> sitesOrder[type] or 999)
 
     R uiComponents.OptionListComponent,
       items: _.compact(_.map(types, (tableId) =>

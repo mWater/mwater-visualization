@@ -9,7 +9,6 @@ ExprUtils = require('mwater-expressions').ExprUtils
 LayeredChartCompiler = require './LayeredChartCompiler'
 TextComponent = require '../../text/TextComponent'
 d3 = require 'd3'
-c3 = require 'c3'
 
 # Displays a layered chart
 module.exports = class LayeredChartViewComponent extends React.Component
@@ -142,6 +141,7 @@ class C3ChartComponent extends React.Component
     # Update scope after rendering. Needs a delay to make it happen
     chartOptions.onrendered = => _.defer(@updateScope)
 
+    c3 = require 'c3'
     @chart = c3.generate(chartOptions)
 
   componentDidUpdate: (prevProps, prevState, prevContext) ->
