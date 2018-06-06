@@ -134,7 +134,7 @@ describe "DatagridQueryBuilder", ->
       columns: [{
         id: "cid1"
         type: "expr"
-        expr: { type: "op", op: "sum", exprs: [@exprNumber] }
+        expr: { table: "t1", type: "op", op: "sum", exprs: [@exprNumber] }
       }]
     }
 
@@ -159,7 +159,7 @@ describe "DatagridQueryBuilder", ->
         {
           id: "cid1"
           type: "expr"
-          expr: { type: "op", op: "sum", exprs: [@exprNumber] }
+          expr: { table: "t1", type: "op", op: "sum", exprs: [@exprNumber] }
         }
         {
           id: "cid2"
@@ -192,7 +192,7 @@ describe "DatagridQueryBuilder", ->
         {
           id: "cid1"
           type: "expr"
-          expr: { type: "op", op: "sum", exprs: [@exprNumber] }
+          expr: { table: "t1", type: "op", op: "sum", exprs: [@exprNumber] }
         }
       ]
       orderBys: [
