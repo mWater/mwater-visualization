@@ -69,6 +69,6 @@ describe "PopupFilterJoinsUtils", ->
             where: {"exprs":[{"column":"t1","tableAlias":"inner","type":"field"},{"column":"primary","tableAlias":"{alias}","type":"field"}],"op":"=","type":"op"}
             limit: 1
           }
-          { type: "literal", value: ["abc"] }
+          { type: "op", op: "::jsonb", exprs: [{ type: "literal", value: '["abc"]' }] }
         ]}
     }])

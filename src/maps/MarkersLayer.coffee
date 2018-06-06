@@ -240,7 +240,7 @@ module.exports = class MarkersLayer extends Layer
       if clickOptions.design.popup and not ev.event.originalEvent.shiftKey
         # Create filter using popupFilterJoins
         popupFilterJoins = clickOptions.design.popupFilterJoins or PopupFilterJoinsUtils.createDefaultPopupFilterJoins(table)
-        popupFilters = PopupFilterJoinsUtils.createPopupFilters(clickOptions.design.popupFilterJoins, clickOptions.schema, table, ev.data.id)
+        popupFilters = PopupFilterJoinsUtils.createPopupFilters(popupFilterJoins, clickOptions.schema, table, ev.data.id)
 
         BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
         WidgetFactory = require '../widgets/WidgetFactory'

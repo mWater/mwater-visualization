@@ -29,7 +29,7 @@ module.exports = class PopupFilterJoinsUtils
           table: table
           jsonql: { type: "op", op: "@>", exprs: [
             exprCompiler.compileExpr(expr: expr, tableAlias: "{alias}")
-            { type: "literal", value: [rowId] }
+            { type: "op", op: "::jsonb", exprs: [{ type: "literal", value: JSON.stringify([rowId]) }] }
           ]}
         }
         filters.push(filter)
