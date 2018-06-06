@@ -33,11 +33,11 @@ $ ->
     # React.createElement(RichTextPane)
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "a855eb0587d845d3ac27aed03c463976", share: "817c76088c7649ec8cc0b8193e547a09")
-    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-    # React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDirectMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(WaterOrgDashboardPane, apiUrl: "http://localhost:1235/mwater/")
     # React.createElement(BlocksDesignerComponent, renderBlock: [])
@@ -234,13 +234,18 @@ class MWaterDirectMapPane extends React.Component
     super
 
     @state = {
-      design: doubleClickMap
-      extraTables: []
+      design: if window.localStorage.getItem("MWaterDirectMapPane.design") then JSON.parse(window.localStorage.getItem("MWaterDirectMapPane.design")) else doubleClickMap
+      extraTables: if window.localStorage.getItem("MWaterDirectMapPane.extraTables") then JSON.parse(window.localStorage.getItem("MWaterDirectMapPane.extraTables")) else []
     }
 
   handleDesignChange: (design) =>
     @setState(design: design)
-    console.log JSON.stringify(design, null, 2)
+    # console.log JSON.stringify(design, null, 2)
+    window.localStorage.setItem("MWaterDirectMapPane.design", JSON.stringify(design))
+
+  handleExtraTablesChange: (extraTables) =>
+    @setState(extraTables: extraTables)
+    window.localStorage.setItem("MWaterDirectMapPane.extraTables", JSON.stringify(extraTables))
 
   render: ->
     React.createElement(MWaterLoaderComponent, {
@@ -248,7 +253,7 @@ class MWaterDirectMapPane extends React.Component
       client: @props.client
       user: @props.user
       extraTables: @state.extraTables
-      onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
+      onExtraTablesChange: @handleExtraTablesChange
     }, (error, config) =>
       # Create map url source
       mapDataSource = new DirectMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, dataSource: config.dataSource, design: @state.design })

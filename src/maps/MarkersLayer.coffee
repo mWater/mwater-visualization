@@ -10,6 +10,7 @@ ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../axes/AxisBuilder'
 LegendGroup = require('./LegendGroup')
 LayerLegendComponent = require './LayerLegendComponent'
+PopupFilterJoinsUtils = require './PopupFilterJoinsUtils'
 
 ###
 Layer that is composed of markers
@@ -20,6 +21,7 @@ Design is:
   color: color of layer (e.g. #FF8800). Color axis overrides
   symbol: symbol to use for layer. e.g. "font-awesome/bell". Will be converted on server to proper uri.
   popup: contains items: which is BlocksLayoutManager items. Will be displayed when the marker is clicked
+  popupFilterJoins: customizable filtering for popup. See PopupFilterJoins.md
   minZoom: minimum zoom level
   maxZoom: maximum zoom level
 
@@ -185,7 +187,7 @@ module.exports = class MarkersLayer extends Layer
   # Called when the interactivity grid is clicked.
   # arguments:
   #   ev: { data: interactivty data e.g. `{ id: 123 }` }
-  #   options:
+  #   clickOptions:
   #     design: design of layer
   #     schema: schema to use
   #     dataSource: data source to use
@@ -236,6 +238,10 @@ module.exports = class MarkersLayer extends Layer
 
       # Popup
       if clickOptions.design.popup and not ev.event.originalEvent.shiftKey
+        # Create filter using popupFilterJoins
+        popupFilterJoins = clickOptions.design.popupFilterJoins or PopupFilterJoinsUtils.createDefaultPopupFilterJoins(table)
+        popupFilters = PopupFilterJoinsUtils.createPopupFilters(clickOptions.design.popupFilterJoins, clickOptions.schema, table, ev.data.id)
+
         BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
         WidgetFactory = require '../widgets/WidgetFactory'
 
@@ -245,16 +251,7 @@ module.exports = class MarkersLayer extends Layer
           renderWidget: (options) =>
             widget = WidgetFactory.createWidget(options.type)
 
-            # Create filters for single row
-            filter = {
-              table: table
-              jsonql: { type: "op", op: "=", exprs: [
-                { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table).primaryKey }
-                { type: "literal", value: ev.data.id }
-              ]}
-            }
-
-            filters = clickOptions.filters.concat([filter])
+            filters = clickOptions.filters.concat(popupFilters)
 
             # Get data source for widget
             widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(clickOptions.design, options.id)

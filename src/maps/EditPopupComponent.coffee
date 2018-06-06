@@ -9,6 +9,7 @@ ModalWindowComponent = require 'react-library/lib/ModalWindowComponent'
 BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
 WidgetFactory = require '../widgets/WidgetFactory'
 DirectWidgetDataSource = require '../widgets/DirectWidgetDataSource'
+DashboardUtils = require '../dashboards/DashboardUtils'
 
 module.exports = class EditPopupComponent extends React.Component
   @propTypes:
@@ -33,6 +34,11 @@ module.exports = class EditPopupComponent extends React.Component
     @props.onDesignChange(design)
 
   render: ->
+    # Get filterable tables of popup
+    if @props.design.popup
+      popupDashboard = { items: @props.design.popup.items, layout: "blocks" }
+      filterableTables = DashboardUtils.getFilterableTables(popupDashboard, @props.schema)
+
     H.div null, 
       H.a className: "btn btn-link", onClick: (=> @setState(editing: true)),
         H.i className: "fa fa-pencil"
@@ -42,6 +48,8 @@ module.exports = class EditPopupComponent extends React.Component
         H.a className: "btn btn-link", onClick: @handleRemovePopup,
           H.i className: "fa fa-times"
           " Remove Popup"
+
+      H.pre null, JSON.stringify(filterableTables, null, 2)
 
       if @state.editing
         R ModalWindowComponent, isOpen: true, onRequestClose: (=> @setState(editing: false)),
