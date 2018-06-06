@@ -4,12 +4,14 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
-# Modal for editing design of popup
 ModalWindowComponent = require 'react-library/lib/ModalWindowComponent'
 BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
 WidgetFactory = require '../widgets/WidgetFactory'
 DirectWidgetDataSource = require '../widgets/DirectWidgetDataSource'
 
+PopupFilterJoinsEditComponent = require './PopupFilterJoinsEditComponent'
+
+# Modal for editing design of popup
 module.exports = class EditPopupComponent extends React.Component
   @propTypes:
     schema: PropTypes.object.isRequired # Schema to use
@@ -42,6 +44,15 @@ module.exports = class EditPopupComponent extends React.Component
         H.a className: "btn btn-link", onClick: @handleRemovePopup,
           H.i className: "fa fa-times"
           " Remove Popup"
+
+      if @props.design.popup
+        R PopupFilterJoinsEditComponent,
+          schema: @props.schema
+          dataSource: @props.dataSource
+          table: @props.table
+          popup: @props.design.popup
+          design: @props.design.popupFilterJoins
+          onDesignChange: (popupFilterJoins) => @props.onDesignChange(_.extend({}, @props.design, popupFilterJoins: popupFilterJoins))
 
       if @state.editing
         R ModalWindowComponent, isOpen: true, onRequestClose: (=> @setState(editing: false)),

@@ -10,6 +10,7 @@ ExprUtils = require('mwater-expressions').ExprUtils
 AxisBuilder = require '../axes/AxisBuilder'
 LegendGroup = require('./LegendGroup')
 LayerLegendComponent = require './LayerLegendComponent'
+PopupFilterJoinsUtils = require './PopupFilterJoinsUtils'
 
 ###
 Layer which draws a buffer around geometries (i.e. a radius circle around points)
@@ -25,6 +26,7 @@ Design is:
   maxZoom: maximum zoom level
 
   popup: contains items: which is BlocksLayoutManager items. Will be displayed when the circle is clicked
+  popupFilterJoins: customizable filtering for popup. See PopupFilterJoins.md
 
 axes:
   geometry: where to draw buffers around
@@ -242,7 +244,7 @@ module.exports = class BufferLayer extends Layer
   # Called when the interactivity grid is clicked.
   # arguments:
   #   ev: { data: interactivty data e.g. `{ id: 123 }` }
-  #   options:
+  #   clickOptions:
   #     design: design of layer
   #     schema: schema to use
   #     dataSource: data source to use
@@ -293,6 +295,10 @@ module.exports = class BufferLayer extends Layer
 
       # Popup
       if clickOptions.design.popup and not ev.event.originalEvent.shiftKey
+        # Create filter using popupFilterJoins
+        popupFilterJoins = clickOptions.design.popupFilterJoins or PopupFilterJoinsUtils.createDefaultPopupFilterJoins(table)
+        popupFilters = PopupFilterJoinsUtils.createPopupFilters(popupFilterJoins, clickOptions.schema, table, ev.data.id)
+
         BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
         WidgetFactory = require '../widgets/WidgetFactory'
 
@@ -302,16 +308,7 @@ module.exports = class BufferLayer extends Layer
           renderWidget: (options) =>
             widget = WidgetFactory.createWidget(options.type)
 
-            # Create filters for single row
-            filter = {
-              table: table
-              jsonql: { type: "op", op: "=", exprs: [
-                { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table).primaryKey }
-                { type: "literal", value: ev.data.id }
-              ]}
-            }
-
-            filters = clickOptions.filters.concat([filter])
+            filters = clickOptions.filters.concat(popupFilters)
 
             # Get data source for widget
             widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(clickOptions.design, options.id)

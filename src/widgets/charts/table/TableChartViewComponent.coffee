@@ -3,6 +3,7 @@ _ = require 'lodash'
 React = require 'react'
 H = React.DOM
 R = React.createElement
+moment = require 'moment'
 
 AxisBuilder = require '../../../axes/AxisBuilder'
 ExprUtils = require('mwater-expressions').ExprUtils
