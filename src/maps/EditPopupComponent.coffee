@@ -4,13 +4,14 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 
-# Modal for editing design of popup
 ModalWindowComponent = require 'react-library/lib/ModalWindowComponent'
 BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
 WidgetFactory = require '../widgets/WidgetFactory'
 DirectWidgetDataSource = require '../widgets/DirectWidgetDataSource'
-DashboardUtils = require '../dashboards/DashboardUtils'
 
+PopupFilterJoinsEditComponent = require './PopupFilterJoinsEditComponent'
+
+# Modal for editing design of popup
 module.exports = class EditPopupComponent extends React.Component
   @propTypes:
     schema: PropTypes.object.isRequired # Schema to use
@@ -34,11 +35,6 @@ module.exports = class EditPopupComponent extends React.Component
     @props.onDesignChange(design)
 
   render: ->
-    # Get filterable tables of popup
-    if @props.design.popup
-      popupDashboard = { items: @props.design.popup.items, layout: "blocks" }
-      filterableTables = DashboardUtils.getFilterableTables(popupDashboard, @props.schema)
-
     H.div null, 
       H.a className: "btn btn-link", onClick: (=> @setState(editing: true)),
         H.i className: "fa fa-pencil"
@@ -49,7 +45,14 @@ module.exports = class EditPopupComponent extends React.Component
           H.i className: "fa fa-times"
           " Remove Popup"
 
-      H.pre null, JSON.stringify(filterableTables, null, 2)
+      if @props.design.popup
+        R PopupFilterJoinsEditComponent,
+          schema: @props.schema
+          dataSource: @props.dataSource
+          table: @props.table
+          popup: @props.design.popup
+          design: @props.design.popupFilterJoins
+          onDesignChange: (popupFilterJoins) => @props.onDesignChange(_.extend({}, @props.design, popupFilterJoins: popupFilterJoins))
 
       if @state.editing
         R ModalWindowComponent, isOpen: true, onRequestClose: (=> @setState(editing: false)),
