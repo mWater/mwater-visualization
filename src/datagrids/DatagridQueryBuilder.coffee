@@ -419,7 +419,7 @@ module.exports = class DatagridQueryBuilder
 
     # Compile expression
     exprCompiler = new ExprCompiler(@schema)
-    compiledExpr = exprCompiler.compileExpr(expr: exprCleaner.cleanExpr(column.expr), tableAlias: if column.subtable then "st" else "main")
+    compiledExpr = exprCompiler.compileExpr(expr: exprCleaner.cleanExpr(column.expr, aggrStatuses: ["individual", "literal", "aggregate"]), tableAlias: if column.subtable then "st" else "main")
 
     # Handle special case of geometry, converting to GeoJSON
     if exprType == "geometry"
