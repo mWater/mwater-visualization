@@ -10,7 +10,8 @@
   proportional: true to stack proportionally (100 %). Only applicable if stacked
   labels: true to show labels on values
   header: text widget design to display in header (replaces title)
-  footer: text widget design to display in header 
+  footer: text widget design to display in header
+  yThresholds: array of { value:, label: } thresholds to draw on y-axis. Only for non-polar
 
 layer:
   type: bar/line/spline/scatter/area/pie/donut (overrides main one)

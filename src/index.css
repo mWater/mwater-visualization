@@ -41,6 +41,11 @@
 /* ================= */
 
 
+/* Dashed thresholds */
+.c3-grid line {
+    stroke-dasharray: 3;
+}
+
 /* Put dropdowns over top of leaflet controls */
 .Select-menu-outer {
   z-index: 1100;

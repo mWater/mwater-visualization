@@ -5,7 +5,8 @@ R = React.createElement
 LayeredChartLayerDesignerComponent = require './LayeredChartLayerDesignerComponent'
 LayeredChartCompiler = require './LayeredChartCompiler'
 TabbedComponent = require('react-library/lib/TabbedComponent')
-ui = require '../../../UIComponents'
+uiComponents = require '../../../UIComponents'
+ui = require('react-library/lib/bootstrap')
 
 module.exports = class LayeredChartDesignerComponent extends React.Component
   @propTypes: 
@@ -33,6 +34,8 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
   handleStackedChange: (ev) => @updateDesign(stacked: ev.target.checked)
   handleProportionalChange: (ev) => @updateDesign(proportional: ev.target.checked)
   handleLabelsChange: (ev) => @updateDesign(labels: ev.target.checked)
+
+  handleYThresholdsChange: (yThresholds) => @updateDesign(yThresholds: yThresholds)
 
   handleLayerChange: (index, layer) =>
     layers = @props.design.layers.slice()
@@ -96,12 +99,12 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
 
     current = _.findWhere(chartTypes, { id: @props.design.type })
 
-    R ui.SectionComponent, icon: "glyphicon-th", label: "Chart Type",
-      R ui.ToggleEditComponent,
+    R uiComponents.SectionComponent, icon: "glyphicon-th", label: "Chart Type",
+      R uiComponents.ToggleEditComponent,
         forceOpen: not @props.design.type
         label: if current then current.name else ""
         editor: (onClose) =>
-          R ui.OptionListComponent, 
+          R uiComponents.OptionListComponent, 
             hint: "Select a Chart Type"
             items: _.map(chartTypes, (ct) => { 
               name: ct.name
@@ -170,6 +173,14 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
         H.input type: "checkbox", checked: design.labels or false, onChange: @handleLabelsChange
         "Show Values"
 
+  renderThresholds: ->
+    # Doesn't apply to polar
+    if @props.design.type not in ['pie', 'donut']
+      R uiComponents.SectionComponent, label: "Y Threshold Lines",
+        R ThresholdsComponent, 
+          thresholds: @props.design.yThresholds
+          onThresholdsChange: @handleYThresholdsChange
+
   render: ->
     tabs = []
 
@@ -180,6 +191,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
         H.br()
         @renderType()
         @renderLayers()
+        @renderThresholds()
     }
 
     if @props.design.type
@@ -195,3 +207,54 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
       initialTabId: "design"
       tabs: tabs      
 
+# Thresholds are lines that are added at certain values
+class ThresholdsComponent extends React.Component
+  @propTypes: 
+    thresholds: PropTypes.arrayOf(PropTypes.shape(value: PropTypes.number, label: PropTypes.string))
+    onThresholdsChange: PropTypes.func.isRequired
+
+  handleAdd: =>
+    thresholds = (@props.thresholds or []).slice()
+    thresholds.push({ value: null, label: "" })
+    @props.onThresholdsChange(thresholds)
+
+  handleChange: (index, value) =>
+    thresholds = (@props.thresholds or []).slice()
+    thresholds[index] = value
+    @props.onThresholdsChange(thresholds)
+
+  handleRemove: (index) =>
+    thresholds = (@props.thresholds or []).slice()
+    thresholds.splice(index, 1)
+    @props.onThresholdsChange(thresholds)
+
+  render: ->
+    H.div null,
+      _.map @props.thresholds, (threshold, index) =>
+        R ThresholdComponent, threshold: threshold, onThresholdChange: @handleChange.bind(null, index), onRemove: @handleRemove.bind(null, index)
+
+      H.button type: "button", className: "btn btn-xs btn-link", onClick: @handleAdd,
+        H.i className: "fa fa-plus"
+        " Add Y Threshold"
+
+class ThresholdComponent extends React.Component
+  @propTypes: 
+    threshold: PropTypes.shape(value: PropTypes.number, label: PropTypes.string).isRequired
+    onThresholdChange: PropTypes.func.isRequired
+    onRemove: PropTypes.func.isRequired
+
+  render: ->
+    H.div null,
+      R LabeledInlineComponent, key: "value", label: "Value:",
+        R ui.NumberInput, style: { display: "inline-block" }, size: "sm", value: @props.threshold.value, onChange: (v) => @props.onThresholdChange(_.extend({}, @props.threshold, value: v))
+      "  "
+      R LabeledInlineComponent, key: "label", label: "Label:",
+        R ui.TextInput, style: { display: "inline-block", width: "8em" }, size: "sm", value: @props.threshold.label, onChange: (v) => @props.onThresholdChange(_.extend({}, @props.threshold, label: v))
+      "  "
+      H.button className: "btn btn-xs btn-link", onClick: @props.onRemove, 
+        H.i className: "fa fa-remove"
+
+LabeledInlineComponent = (props) ->
+  H.div style: { display: "inline-block" },
+    H.label className: "text-muted", props.label
+    props.children

@@ -176,6 +176,9 @@ module.exports = class LayeredChartCompiler
     if options.design.labels and not _.isEmpty(c3Data.format)
       chartDesign.data.labels = {format: c3Data.format}
 
+    if options.design.yThresholds
+      chartDesign.grid.y = { lines: _.map(options.design.yThresholds, (t) -> { value: t.value, text: t.label }) }
+
     # This doesn't work in new C3. Removing.
     # # If x axis is year only, display year in ticks
     # if options.design.layers[0]?.axes.x?.xform?.type == "year"
