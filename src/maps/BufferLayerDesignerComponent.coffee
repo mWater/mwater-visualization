@@ -15,6 +15,7 @@ TableSelectComponent = require '../TableSelectComponent'
 Rcslider = require 'rc-slider'
 EditPopupComponent = require './EditPopupComponent'
 ZoomLevelsComponent = require './ZoomLevelsComponent'
+PopupFilterJoinsUtils = require './PopupFilterJoinsUtils'
 
 module.exports = class BufferLayerDesignerComponent extends React.Component
   @propTypes:
@@ -175,6 +176,8 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
       schema: @props.schema
       dataSource: @props.dataSource
       table: @props.design.table
+      idTable: @props.design.table
+      defaultPopupFilterJoins: PopupFilterJoinsUtils.createDefaultPopupFilterJoins(@props.design.table)
 
   render: ->
     H.div null,

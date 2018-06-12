@@ -9,7 +9,6 @@ ExprUtils = require('mwater-expressions').ExprUtils
 ExprCompiler = require('mwater-expressions').ExprCompiler
 
 DashboardUtils = require '../dashboards/DashboardUtils'
-PopupFilterJoinsUtils = require './PopupFilterJoinsUtils'
 
 # Designer for popup filter joins (see PopupFilterJoins.md)
 module.exports = class PopupFilterJoinsEditComponent extends React.Component
@@ -17,6 +16,8 @@ module.exports = class PopupFilterJoinsEditComponent extends React.Component
     schema: PropTypes.object.isRequired # Schema to use
     dataSource: PropTypes.object.isRequired
     table: PropTypes.string.isRequired  # table of the row that the popup will be for
+    idTable: PropTypes.string.isRequired # table of the row that join is to. Usually same as table except for choropleth maps
+    defaultPopupFilterJoins: PropTypes.object.isRequired # Default popup filter joins
     popup: PropTypes.object.isRequired  # Design of the popup this is for
     design: PropTypes.object            # popup filter joins object
     onDesignChange: PropTypes.func.isRequired # Called with new design
@@ -29,7 +30,7 @@ module.exports = class PopupFilterJoinsEditComponent extends React.Component
     }
 
   handleExprChange: (table, expr) => 
-    design = @props.design or PopupFilterJoinsUtils.createDefaultPopupFilterJoins(@props.table)
+    design = @props.design or @props.defaultPopupFilterJoins
 
     design = _.clone(design)
     design[table] = expr
@@ -48,7 +49,7 @@ module.exports = class PopupFilterJoinsEditComponent extends React.Component
     filterableTables = [@props.table].concat(_.without(filterableTables, @props.table))
 
     # Get popupFilterJoins
-    popupFilterJoins = @props.design or PopupFilterJoinsUtils.createDefaultPopupFilterJoins(@props.table)
+    popupFilterJoins = @props.design or @props.defaultPopupFilterJoins
 
     return H.div null,
       H.div className: "text-muted", 
@@ -70,8 +71,8 @@ module.exports = class PopupFilterJoinsEditComponent extends React.Component
                   table: filterableTable
                   value: popupFilterJoins[filterableTable]
                   onChange: @handleExprChange.bind(null, filterableTable)
-                  types: ["id", "id[]"]
-                  idTable: @props.table
+                  types: if @props.table == @props.idTable then ["id", "id[]"] else ["id"]  # TODO support id[] some day for admin choropleth maps too
+                  idTable: @props.idTable
                   preferLiteral: false
                   placeholder: "None"
 

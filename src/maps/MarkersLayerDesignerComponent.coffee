@@ -13,6 +13,7 @@ ReactSelect = require 'react-select'
 EditPopupComponent = require './EditPopupComponent'
 ZoomLevelsComponent = require './ZoomLevelsComponent'
 MarkerSymbolSelectComponent = require './MarkerSymbolSelectComponent'
+PopupFilterJoinsUtils = require './PopupFilterJoinsUtils'
 
 # Designer for a markers layer
 module.exports = class MarkersLayerDesignerComponent extends React.Component
@@ -159,6 +160,8 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
       schema: @props.schema
       dataSource: @props.dataSource
       table: @props.design.table
+      idTable: @props.design.table
+      defaultPopupFilterJoins: PopupFilterJoinsUtils.createDefaultPopupFilterJoins(@props.design.table)
 
   render: ->
     H.div null,

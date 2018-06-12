@@ -312,9 +312,20 @@ module.exports = class AdminChoroplethLayer extends Layer
           }
 
       else if clickOptions.design.popup
+        # Create default popup filter joins
+        defaultPopupFilterJoins = {}
+        if clickOptions.design.adminRegionExpr
+          defaultPopupFilterJoins[clickOptions.design.table] = clickOptions.design.adminRegionExpr
+
         # Create filter using popupFilterJoins
-        popupFilterJoins = clickOptions.design.popupFilterJoins or PopupFilterJoinsUtils.createDefaultPopupFilterJoins(table)
-        popupFilters = PopupFilterJoinsUtils.createPopupFilters(popupFilterJoins, clickOptions.schema, table, ev.data.id)
+        popupFilterJoins = clickOptions.design.popupFilterJoins or defaultPopupFilterJoins
+        popupFilters = PopupFilterJoinsUtils.createPopupFilters(popupFilterJoins, clickOptions.schema, table, ev.data.id, true)
+
+        # Add filter for admin region
+        popupFilters.push({
+          table: "admin_regions"
+          jsonql: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "_id" }, { type: "literal", value: ev.data.id }]}
+        })
 
         BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
         WidgetFactory = require '../widgets/WidgetFactory'

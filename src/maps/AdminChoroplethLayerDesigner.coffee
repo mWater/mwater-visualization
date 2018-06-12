@@ -202,12 +202,18 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
     if not @props.design.table
       return null
 
+    defaultPopupFilterJoins = {}
+    if @props.design.adminRegionExpr
+      defaultPopupFilterJoins[@props.design.table] = @props.design.adminRegionExpr
+
     return R EditPopupComponent, 
       design: @props.design
       onDesignChange: @props.onDesignChange
       schema: @props.schema
       dataSource: @props.dataSource
       table: @props.design.table
+      idTable: "admin_regions"
+      defaultPopupFilterJoins: defaultPopupFilterJoins
 
   render: ->
     H.div null,

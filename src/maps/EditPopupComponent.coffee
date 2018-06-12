@@ -18,8 +18,10 @@ module.exports = class EditPopupComponent extends React.Component
     dataSource: PropTypes.object.isRequired
     design: PropTypes.object.isRequired  # Design of the marker layer
     onDesignChange: PropTypes.func.isRequired # Called with new design
-    table: PropTypes.string.isRequired
-    
+    table: PropTypes.string.isRequired    # Table that popup is for
+    idTable: PropTypes.string.isRequired  # Table of the row that join is to. Usually same as table except for choropleth maps
+    defaultPopupFilterJoins: PropTypes.object.isRequired # Default popup filter joins
+
   constructor: ->
     super
     @state = { editing: false }
@@ -50,6 +52,8 @@ module.exports = class EditPopupComponent extends React.Component
           schema: @props.schema
           dataSource: @props.dataSource
           table: @props.table
+          idTable: @props.idTable
+          defaultPopupFilterJoins: @props.defaultPopupFilterJoins
           popup: @props.design.popup
           design: @props.design.popupFilterJoins
           onDesignChange: (popupFilterJoins) => @props.onDesignChange(_.extend({}, @props.design, popupFilterJoins: popupFilterJoins))
