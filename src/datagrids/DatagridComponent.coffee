@@ -39,6 +39,9 @@ module.exports = class DatagridComponent extends React.Component
     # Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
     updateValue:  PropTypes.func
 
+    # Called when row is clicked with (tableId, rowId)
+    onRowClick: PropTypes.func
+
     # Called when row is double-clicked with (tableId, rowId)
     onRowDoubleClick: PropTypes.func
 
@@ -251,6 +254,7 @@ module.exports = class DatagridComponent extends React.Component
               design: design
               filters: filters
               onDesignChange: @props.onDesignChange
+              onRowClick: @props.onRowClick
               onRowDoubleClick: @props.onRowDoubleClick
               canEditCell: if @state.cellEditingEnabled then @props.canEditValue
               updateCell: if @state.cellEditingEnabled then @props.updateValue
