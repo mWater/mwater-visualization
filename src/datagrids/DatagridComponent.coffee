@@ -54,6 +54,9 @@ module.exports = class DatagridComponent extends React.Component
       quickfiltersValues: null
     }
 
+  reload: ->
+    @datagridView?.reload()
+
   componentDidMount: -> 
     @updateHeight()
 
