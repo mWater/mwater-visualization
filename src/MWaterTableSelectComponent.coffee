@@ -282,6 +282,18 @@ class CompleteTableSelectComponent extends React.Component
       extraTables: @props.extraTables
       onExtraTableAdd: @handleExtraTableAdd
       onExtraTableRemove: @handleExtraTableRemove
+    
+  renderSweetSense: ->
+    sweetSenseTables = @getSweetSenseTables()
+
+    sweetSenseTables = _.sortBy(sweetSenseTables, (table) -> table.name.en)
+    R uiComponents.OptionListComponent,
+      items: _.map(sweetSenseTables, (table) =>
+        return { 
+          name: ExprUtils.localizeString(table.name, @context.locale)
+          desc: ExprUtils.localizeString(table.desc, @context.locale)
+          onClick: @props.onChange.bind(null, table.id) 
+        })
 
   renderOther: ->
     otherTables = _.filter(@props.schema.getTables(), (table) => 
@@ -291,6 +303,10 @@ class CompleteTableSelectComponent extends React.Component
 
       # Remove sites
       if table.id.match(/^entities\./)
+        return false
+
+      # sweetsense tables
+      if table.id.match(/^sweetsense/)
         return false
 
       # Remove responses
@@ -317,19 +333,38 @@ class CompleteTableSelectComponent extends React.Component
           onClick: @props.onChange.bind(null, table.id) 
         })
 
+  getSweetSenseTables: ->
+    _.filter(@props.schema.getTables(), (table) => 
+      if table.deprecated
+        return false
+
+      if table.id.match(/^sweetsense/)
+        return true
+      
+      return false
+    )
+
   render: ->
+    sweetSenseTables = @getSweetSenseTables()
+     
+    tabs = [
+      { id: "sites", label: [H.i(className: "fa fa-map-marker"), " Sites"], elem: @renderSites() }
+      { id: "forms", label: [H.i(className: "fa fa-th-list"), " Surveys"], elem: @renderForms() }
+      { id: "indicators", label: [H.i(className: "fa fa-check-circle"), " Indicators"], elem: @renderIndicators() }
+      { id: "issues", label: [H.i(className: "fa fa-exclamation-circle"), " Issues"], elem: @renderIssues() }
+    ]
+
+    if sweetSenseTables.length > 0
+      tabs.push({ id: "sensors", label: " Sensors", elem: @renderSweetSense() })
+    
+    tabs.push({ id: "other", label: "Advanced", elem: @renderOther() })
+
     return H.div null,
       H.div className: "text-muted",
         "Select data from sites, surveys or an advanced category below. Indicators can be found within their associated site types."
 
       R TabbedComponent,
-        tabs: [
-          { id: "sites", label: [H.i(className: "fa fa-map-marker"), " Sites"], elem: @renderSites() }
-          { id: "forms", label: [H.i(className: "fa fa-th-list"), " Surveys"], elem: @renderForms() }
-          { id: "indicators", label: [H.i(className: "fa fa-check-circle"), " Indicators"], elem: @renderIndicators() }
-          { id: "issues", label: [H.i(className: "fa fa-exclamation-circle"), " Issues"], elem: @renderIssues() }
-          { id: "other", label: "Advanced", elem: @renderOther() }
-        ]
+        tabs: tabs
         initialTabId: "sites"
 
 
