@@ -217,24 +217,51 @@ module.exports = class LayeredChart extends Chart
 
     # Export only first layer
     headers = []
-    if design.layers[0].axes.x
-      headers.push(axisBuilder.summarizeAxis(design.layers[0].axes.x, locale))
-    if design.layers[0].axes.color
-      headers.push(axisBuilder.summarizeAxis(design.layers[0].axes.color, locale))
-    if design.layers[0].axes.y
-      headers.push(axisBuilder.summarizeAxis(design.layers[0].axes.y, locale))
-    table = [headers]
 
+    # for layer, data of 
+    xAdded = false
+    for layer in design.layers
+      if layer.axes.x and not xAdded
+        headers.push(axisBuilder.summarizeAxis(layer.axes.x, locale))
+        xAdded = true
+      if layer.axes.color
+        headers.push(axisBuilder.summarizeAxis(layer.axes.color, locale))
+      if layer.axes.y
+        headers.push(axisBuilder.summarizeAxis(layer.axes.y, locale))
+      table = [headers]
+
+    k = 0
     for row in data.layer0
       r = []
-      if design.layers[0].axes.x
-        r.push(axisBuilder.formatValue(design.layers[0].axes.x, row.x, locale))
-      if design.layers[0].axes.color
-        r.push(axisBuilder.formatValue(design.layers[0].axes.color, row.color, locale))
-      if design.layers[0].axes.y
-        r.push(axisBuilder.formatValue(design.layers[0].axes.y, row.y, locale))
+      xAdded = false
+      for j in [0..design.layers.length-1]
+        _row = data["layer#{j}"][k]
+        if design.layers[j].axes.x and not xAdded
+          r.push(axisBuilder.formatValue(design.layers[j].axes.x, _row.x, locale))
+          xAdded = true
+        if design.layers[j].axes.color
+          r.push(axisBuilder.formatValue(design.layers[j].axes.color, _row.color, locale))
+        if design.layers[j].axes.y
+          r.push(axisBuilder.formatValue(design.layers[j].axes.y, _row.y, locale))
+      
+      k++
       table.push(r)
 
+    # k = 0
+    # for layer, layerData of data
+    #   xAdded = false
+    #   r = []
+    #   for row in layerData
+    #     if design.layers[k].axes.x and not xAdded
+    #       r.push(axisBuilder.formatValue(design.layers[k].axes.x, row.x, locale))
+    #       xAdded = true
+    #     if design.layers[k].axes.color
+    #       r.push(axisBuilder.formatValue(design.layers[k].axes.color, row.color, locale))
+    #     if design.layers[k].axes.y
+    #       r.push(axisBuilder.formatValue(design.layers[k].axes.y, row.y, locale))
+        
+    #   table.push(r)
+    #   k++
     return table
   #   if data.length > 0
   #   fields = Object.getOwnPropertyNames(data[0])
