@@ -72,6 +72,7 @@ module.exports = class TextLiteralComponent extends React.Component
 
   renderSingle: ->
     R ReactSelect, 
+      key: JSON.stringify(@props.filters)  # Include to force a change when filters change
       placeholder: "All"
       value: @props.value or ""
       asyncOptions: @getOptions
@@ -82,6 +83,7 @@ module.exports = class TextLiteralComponent extends React.Component
     R ReactSelect, 
       placeholder: "All"
       value: (@props.value or []).join("\n")
+      key: JSON.stringify(@props.filters)  # Include to force a change when filters change
       multi: true
       delimiter: "\n"
       asyncOptions: @getOptions

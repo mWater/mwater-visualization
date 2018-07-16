@@ -7,6 +7,7 @@ ExprUtils = require('mwater-expressions').ExprUtils
 ExprCleaner = require('mwater-expressions').ExprCleaner
 TextLiteralComponent = require './TextLiteralComponent'
 DateExprComponent = require './DateExprComponent'
+QuickfilterCompiler = require './QuickfilterCompiler'
 
 # Displays quick filters and allows their value to be modified
 module.exports = class QuickfiltersComponent extends React.Component
@@ -71,6 +72,18 @@ module.exports = class QuickfiltersComponent extends React.Component
 
         @props.onValuesChange(values)
 
+    # Determine additional filters that come from other quickfilters. This is to make sure that each quickfilter is filtered
+    # by any other active quickfilters (excluding self)
+    compiler = new QuickfilterCompiler(@props.schema)
+    otherDesign = (@props.design or []).slice()
+    otherValues = (@props.values or []).slice()
+    otherLocks = (@props.locks or []).slice()
+    otherDesign.splice(index, 1)
+    otherValues.splice(index, 1)
+    otherLocks.splice(index, 1)
+    otherQuickFilterFilters = compiler.compile(otherDesign, otherValues, otherLocks)
+    filters = (@props.filters or []).concat(otherQuickFilterFilters)
+
     if type in ["enum", "enumset"]
       return R EnumQuickfilterComponent, 
         key: index
@@ -92,7 +105,7 @@ module.exports = class QuickfiltersComponent extends React.Component
         quickfiltersDataSource: @props.quickfiltersDataSource
         value: itemValue
         onValueChange: onValueChange
-        filters: @props.filters
+        filters: filters
         multi: item.multi
 
     if type in ["date", "datetime"]
