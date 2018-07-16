@@ -33,7 +33,7 @@ $ ->
     # React.createElement(RichTextPane)
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "a855eb0587d845d3ac27aed03c463976", share: "817c76088c7649ec8cc0b8193e547a09")
-    React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
@@ -41,8 +41,9 @@ $ ->
     # React.createElement(MWaterDirectMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
     # React.createElement(WaterOrgDashboardPane, apiUrl: "http://localhost:1235/mwater/")
     # React.createElement(BlocksDesignerComponent, renderBlock: [])
-     # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-#     React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
+    # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+    React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+    # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
     # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
   ReactDOM.render(sample, document.getElementById("main"))
@@ -179,7 +180,8 @@ class MWaterDirectDashboardPane extends React.Component
     )
 
 
-mapId = "fb92ca9ca9a04bfd8dc156b5ac71380d"
+# mapId = "fb92ca9ca9a04bfd8dc156b5ac71380d"
+mapId = "5e9a90f0f52e4690b42378534752ebfc"
 share = "testshareid"
 
 class MWaterMapPane extends React.Component

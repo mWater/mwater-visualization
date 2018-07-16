@@ -400,3 +400,11 @@
   -webkit-transform: rotate(270deg) translateX(-100%);
   -ms-transform: rotate(270deg) translateX(-100%);
 }
+
+.fa.red {
+  color: #ff5400;
+}
+
+.fa.green{
+  color: green;
+}

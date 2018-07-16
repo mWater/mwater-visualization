@@ -2,12 +2,14 @@ PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 H = React.DOM
+R = React.createElement
 
 MapViewComponent = require './MapViewComponent'
 MapDesignerComponent = require './MapDesignerComponent'
 MapControlComponent = require './MapControlComponent'
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 UndoStack = require '../UndoStack'
+PopoverHelpComponent = require 'react-library/lib/PopoverHelpComponent'
 
 # Map with designer on right
 module.exports = class MapComponent extends React.Component
@@ -34,6 +36,7 @@ module.exports = class MapComponent extends React.Component
     @state = { 
       undoStack: new UndoStack().push(props.design) 
       transientDesign: props.design  # Temporary design for read-only maps
+      zoomLocked: true
     }
 
   componentWillReceiveProps: (nextProps) ->
@@ -58,11 +61,18 @@ module.exports = class MapComponent extends React.Component
   # Gets the current design, whether prop or transient
   getDesign: ->
     return @state.transientDesign or @props.design
+  
+  handleZoomLockClick: => 
+    @setState(zoomLocked: not @state.zoomLocked)
 
   renderActionLinks: ->
     H.div null,
       if @props.onDesignChange?
         [
+          H.a key: "lock", className: "btn btn-link btn-sm", onClick: @handleZoomLockClick, 
+            H.span className: "fa #{if @state.zoomLocked then "fa-lock red" else "fa-unlock green"}", style: {marginRight: 5}
+            R PopoverHelpComponent, placement: "bottom",
+              '''Changes to zoom level wont be saved in locked mode'''
           H.a key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
             H.span className: "glyphicon glyphicon-triangle-left"
             " Undo"
@@ -103,6 +113,7 @@ module.exports = class MapComponent extends React.Component
         dataSource: @props.dataSource
         design: @getDesign()
         onDesignChange: @handleDesignChange
+        zoomLocked: @state.zoomLocked
         onRowClick: @props.onRowClick
       )
     )

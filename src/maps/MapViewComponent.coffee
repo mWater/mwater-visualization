@@ -51,6 +51,7 @@ module.exports = class MapViewComponent extends React.Component
     dragging:  PropTypes.bool         # Whether the map be draggable with mouse/touch or not. Default true
     touchZoom: PropTypes.bool         # Whether the map can be zoomed by touch-dragging with two fingers. Default true
     scrollWheelZoom: PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
+    zoomLocked: PropTypes.bool   # Whether changes to zoom level should be persisted. Default false
 
   constructor: (props) ->
     super
@@ -87,6 +88,9 @@ module.exports = class MapViewComponent extends React.Component
   handleBoundsChange: (bounds) =>
     # Ignore if readonly
     if not @props.onDesignChange?
+      return
+    
+    if @props.zoomLocked
       return
 
     # Ignore if autoBounds
