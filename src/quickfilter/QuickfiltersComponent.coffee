@@ -86,7 +86,7 @@ module.exports = class QuickfiltersComponent extends React.Component
 
     if type in ["enum", "enumset"]
       return R EnumQuickfilterComponent, 
-        key: index
+        key: JSON.stringify(item)
         label: item.label
         expr: expr
         schema: @props.schema
@@ -97,7 +97,7 @@ module.exports = class QuickfiltersComponent extends React.Component
 
     if type == "text"
       return R TextQuickfilterComponent, 
-        key: index
+        key: JSON.stringify(item)
         index: index
         label: item.label
         expr: expr
@@ -110,7 +110,7 @@ module.exports = class QuickfiltersComponent extends React.Component
 
     if type in ["date", "datetime"]
       return R DateQuickfilterComponent, 
-        key: index
+        key: JSON.stringify(item)
         label: item.label
         expr: expr
         schema: @props.schema
