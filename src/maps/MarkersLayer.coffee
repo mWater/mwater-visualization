@@ -20,6 +20,7 @@ Design is:
   filter: optional logical expression to filter by
   color: color of layer (e.g. #FF8800). Color axis overrides
   symbol: symbol to use for layer. e.g. "font-awesome/bell". Will be converted on server to proper uri.
+  markerSize: size in pixels of the markers. Default 10.
   popup: contains items: which is BlocksLayoutManager items. Will be displayed when the marker is clicked
   popupFilterJoins: customizable filtering for popup. See PopupFilterJoins.md
   minZoom: minimum zoom level
@@ -162,7 +163,7 @@ module.exports = class MarkersLayer extends Layer
     css += '''
       #layer0 {
         marker-fill: ''' + (design.color or "#666666") + ''';
-        marker-width: 10;
+        marker-width: ''' + (design.markerSize or 10) + ''';
         marker-line-color: white;
         ''' + stroke + '''
         marker-line-opacity: 0.6;

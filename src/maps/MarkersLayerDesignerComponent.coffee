@@ -9,11 +9,11 @@ ExprCompiler = require('mwater-expressions').ExprCompiler
 AxisComponent = require './../axes/AxisComponent'
 ColorComponent = require '../ColorComponent'
 TableSelectComponent = require '../TableSelectComponent'
-ReactSelect = require 'react-select'
 EditPopupComponent = require './EditPopupComponent'
 ZoomLevelsComponent = require './ZoomLevelsComponent'
 MarkerSymbolSelectComponent = require './MarkerSymbolSelectComponent'
 PopupFilterJoinsUtils = require './PopupFilterJoinsUtils'
+ui = require 'react-library/lib/bootstrap'
 
 # Designer for a markers layer
 module.exports = class MarkersLayerDesignerComponent extends React.Component
@@ -40,6 +40,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
   handleColorChange: (color) => @update(color: color)
   handleSymbolChange: (symbol) => @update(symbol: symbol)
   handleNameChange: (e) => @update(name: e.target.value)
+  handleMarkerSizeChange: (markerSize) => @update(markerSize: markerSize)
 
   renderTable: ->
     return H.div className: "form-group",
@@ -133,6 +134,24 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
 
     R MarkerSymbolSelectComponent, symbol: @props.design.symbol, onChange: @handleSymbolChange
 
+  renderMarkerSize: ->
+    if not @props.design.axes.geometry
+      return
+
+    return H.div className: "form-group",
+      H.label className: "text-muted", 
+        "Marker Size"
+      R ui.Select,
+        value: @props.design.markerSize or 10
+        options: [
+          { value: 5, label: "Extra small" }
+          { value: 8, label: "Small" }
+          { value: 10, label: "Normal" }
+          { value: 13, label: "Large" }
+          { value: 16, label: "Extra large" }
+        ]
+        onChange: @handleMarkerSizeChange
+
   renderFilter: ->
     # If no data, hide
     if not @props.design.axes.geometry
@@ -169,6 +188,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
       @renderGeometryAxis()
       @renderColor()
       @renderSymbol()
+      @renderMarkerSize()
       @renderFilter()
       @renderPopup()
       if @props.design.table
