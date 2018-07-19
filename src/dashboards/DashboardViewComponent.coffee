@@ -41,6 +41,9 @@ module.exports = class DashboardViewComponent extends React.Component
       jsonql: PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
     }))
 
+    # Entry to scroll to initially when dashboard is loaded
+    initialTOCEntryScroll: PropTypes.shape({ widgetId: PropTypes.string.isRequired, entryId: PropTypes.any })
+
   @defaultProps:
     standardWidth: 1440 # Standard width. Matches 8.5x11" paper with 0.5" margin at 192dpi
 
@@ -57,6 +60,13 @@ module.exports = class DashboardViewComponent extends React.Component
     }
 
     @widgetComps = {} # Lookup of widget components by id
+
+  componentDidMount: ->
+    if @props.initialTOCEntryScroll
+      # Getting heights of widgets properly requires a 0 length timeout
+      setTimeout () =>
+        @handleScrollToTOCEntry(@props.initialTOCEntryScroll.widgetId, @props.initialTOCEntryScroll.entryId)
+      , 0
 
   handleScopeChange: (id, scope) => 
     @setState(widgetScoper: @state.widgetScoper.applyScope(id, scope))
