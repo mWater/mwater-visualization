@@ -5,6 +5,7 @@ R = React.createElement
 _ = require 'lodash'
 
 TextComponent = require './TextComponent'
+TextWidget = require './TextWidget'
 AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
 
 # Widget which displays styled text with embedded expressions
@@ -51,7 +52,13 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
     return not _.isEqual(newProps.filters, oldProps.filters) or not _.isEqual(getExprItems(newProps.design.items), getExprItems(oldProps.design.items)) or newProps.dataSource.getCacheExpiry() != @state.cacheExpiry
 
   # Call callback with state changes
-  load: (props, prevProps, callback) -> 
+  load: (props, prevProps, callback) ->
+    # Shortcut if no expressions in text widget
+    widget = new TextWidget()
+    if widget.getExprItems(props.design.items).length == 0
+      callback(error: null, exprValues: {}, props.dataSource.getCacheExpiry())
+      return
+
     # Get data
     props.widgetDataSource.getData(props.design, props.filters, (error, data) =>
       callback(error: error, exprValues: data or {}, cacheExpiry: props.dataSource.getCacheExpiry())
