@@ -44,7 +44,7 @@ class MarkdownWidgetComponent extends React.Component
     standardWidth: PropTypes.number
 
   constructor: (props) ->
-    super
+    super(props)
     @state = { 
       # Design that is being edited. Change is propagated on closing window
       editDesign: null

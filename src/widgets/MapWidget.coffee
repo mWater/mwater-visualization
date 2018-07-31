@@ -65,7 +65,7 @@ class MapWidgetComponent extends React.Component
     onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
 
   constructor: (props) ->
-    super
+    super(props)
     @state = { 
       # Design that is being edited. Change is propagated on closing window
       editDesign: null

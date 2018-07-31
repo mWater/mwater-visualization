@@ -27,7 +27,7 @@ module.exports = class ChartViewComponent extends React.Component
     onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
 
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       validDesign: null     # last valid design

@@ -22,8 +22,8 @@ module.exports = class LayerLegendComponent extends React.Component
   @defaultProps:
     radiusLayer: false
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = {
       categories: []
     }

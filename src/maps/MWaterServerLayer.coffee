@@ -70,8 +70,8 @@ class LoadingLegend extends React.Component
   @propTypes:  
     url: PropTypes.string
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = { html: "Loading..." }
 
   componentDidMount: -> 

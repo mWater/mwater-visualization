@@ -58,7 +58,7 @@ class TOCWidgetComponent extends React.Component
     onScrollToTOCEntry: PropTypes.func
 
   constructor: (props) ->
-    super
+    super(props)
     @state = { 
       editing: false # true if editing
     }  

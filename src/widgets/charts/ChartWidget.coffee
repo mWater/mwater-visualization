@@ -13,6 +13,7 @@ ui = require 'react-library/lib/bootstrap'
 # A widget which is a chart
 module.exports = class ChartWidget extends Widget
   constructor: (chart) ->
+    super()
     @chart = chart
 
   # Creates a view of the widget.
@@ -98,7 +99,8 @@ class ChartWidgetComponent extends React.Component
     locale: PropTypes.string  # e.g. "en"
 
   constructor: (props) ->
-    super
+    super(props)
+    
     @state = { 
       # Design that is being edited. Change is propagated on closing window
       editDesign: null
