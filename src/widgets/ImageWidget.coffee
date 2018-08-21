@@ -14,6 +14,7 @@ Widget = require './Widget'
 # expr: image or imagelist expression if using expression
 # caption: string caption
 # rotation: optional rotation in degrees for imageUrl or uid
+# captionPosition: "top"/"bottom". Defaults to "bottom"
 module.exports = class ImageWidget extends Widget
   # Creates a React element that is a view of the widget 
   # options:

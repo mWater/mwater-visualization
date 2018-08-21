@@ -107,6 +107,8 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
     if @props.onDesignChange?
       dropdownItems.push({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
 
+    captionPosition = @props.design.captionPosition or "bottom"
+
     R DropdownWidgetComponent, 
       width: @props.width
       height: @props.height
@@ -116,9 +118,12 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
           @renderEditLink()
         else
           H.div className: "mwater-visualization-image-widget", style: { position: "relative", width: @props.width, height: @props.height },
+            if captionPosition == "top"
+              H.div className: "caption", @props.design.caption
             H.div className: "image",
               @renderContent()
-            H.div className: "caption", @props.design.caption
+            if captionPosition == "bottom"
+              H.div className: "caption", @props.design.caption
   
 class ImageWidgetDesignComponent extends React.Component
   @propTypes: 
@@ -144,6 +149,7 @@ class ImageWidgetDesignComponent extends React.Component
       caption: null
       currentTab: "url"
       rotation: null
+      captionPosition: null
     }
 
   edit: =>
@@ -156,6 +162,7 @@ class ImageWidgetDesignComponent extends React.Component
       table: @props.design.expr?.table
       caption: @props.design.caption
       rotation: @props.design.rotation
+      captionPosition: @props.design.captionPosition
     }
 
     @setState(state)
@@ -188,6 +195,7 @@ class ImageWidgetDesignComponent extends React.Component
   handleTableChange: (table) => @setState(table: table)
   handleCaptionChange: (ev) => @setState(caption: ev.target.value)
   handleRotationChange: (rotation) => @setState(rotation: rotation)
+  handleCaptionPositionChange: (captionPosition) => @setState(captionPosition: captionPosition)
 
   handleSave: () =>
     @setState(editing: false)
@@ -197,12 +205,13 @@ class ImageWidgetDesignComponent extends React.Component
       expr: @state.expr
       caption: @state.caption
       rotation: @state.rotation
+      captionPosition: @state.captionPosition
 
     @props.onDesignChange(_.extend({}, @props.design, updates))
 
   handleCancel: () =>
     @setCurrentTab()
-    @setState(editing: false, imageUrl: null, uid: null, expr: null, table: null, files: null, uploading: false)
+    @setState(editing: false, imageUrl: null, uid: null, expr: null, table: null, files: null, uploading: false, captionPosition: null)
 
   renderExpressionEditor: ->
     H.div className: "form-group",
@@ -252,6 +261,14 @@ class ImageWidgetDesignComponent extends React.Component
       H.div className: "form-group",
         H.label null, "Caption"
         H.input type: "text", className: "form-control", value: @state.caption or "", onChange: @handleCaptionChange, placeholder: "Optional caption to display below image"
+
+      if @state.caption
+        H.div className: "form-group",
+          H.label null, "Caption position"
+          R ui.Select, 
+            options: [{ value: "bottom", label: "Bottom" }, { value: "top", label: "Top" }]
+            value: @state.captionPosition
+            onChange: @handleCaptionPositionChange
 
       R TabbedComponent,
         tabs: [
