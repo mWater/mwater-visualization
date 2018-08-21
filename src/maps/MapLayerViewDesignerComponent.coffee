@@ -34,6 +34,9 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
   handleVisibleClick: (index) =>
     @update(visible: not @props.layerView.visible)
 
+  handleHideLegendClick: (index) =>
+    @update(hideLegend: not @props.layerView.hideLegend)
+
   handleToggleEditing: => @setState(editing: not @state.editing)
   handleSaveEditing: (design) => @update(design: design)
 
@@ -48,6 +51,14 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
       H.i className: "fa fa-fw fa-check-square", style: { color: "#2E6DA4" }, onClick: @handleVisibleClick
     else
       H.i className: "fa fa-fw fa-square", style: { color: "#DDDDDD" }, onClick: @handleVisibleClick
+
+  renderHideLegend: ->
+    H.div style: { fontSize: 12, cursor: "pointer" }, onClick: @handleHideLegendClick, 
+      if @props.layerView.hideLegend
+        H.i className: "fa fa-fw fa-check-square", style: { color: "#2E6DA4" }
+      else
+        H.i className: "fa fa-fw fa-square", style: { color: "#DDDDDD" }
+      " Hide Legend"
 
   renderName: ->
     H.span className: "hover-display-parent", onClick: @handleRename, style: { cursor: "pointer" },
@@ -67,6 +78,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
           filters: @props.filters
         })
       @renderOpacityControl()
+      @renderHideLegend()
 
   renderLayerEditToggle: ->
     return H.div key: "edit", style: { marginBottom: (if @state.editing then 10) },

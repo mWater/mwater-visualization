@@ -176,14 +176,14 @@ class EditModeTableSelectComponent extends React.Component
   render: ->
     if @state.completeMode
       return R CompleteTableSelectComponent,
-      apiUrl: @props.apiUrl
-      client: @props.client
-      schema: @props.schema
-      user: @props.user
-      table: @props.table
-      onChange: @props.onChange
-      extraTables: @props.extraTables
-      onExtraTablesChange: @props.onExtraTablesChange
+        apiUrl: @props.apiUrl
+        client: @props.client
+        schema: @props.schema
+        user: @props.user
+        table: @props.table
+        onChange: @props.onChange
+        extraTables: @props.extraTables
+        onExtraTablesChange: @props.onExtraTablesChange
     else
       return H.div null,
         H.div className: "text-muted", 

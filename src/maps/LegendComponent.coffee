@@ -17,6 +17,10 @@ module.exports = class LegendComponent extends React.Component
   render: ->
     legendItems = _.compact(
       _.map(@props.layerViews, (layerView) => 
+        # Ignore if legend hidden
+        if layerView.hideLegend
+          return
+
         # Create layer
         layer = LayerFactory.createLayer(layerView.type)
 

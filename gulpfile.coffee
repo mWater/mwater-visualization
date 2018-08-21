@@ -96,22 +96,22 @@ gulp.task "watch", gulp.series([
   ->
     webpackConfig = require './webpack.config.js'
 
-    webpackConfig.output.publicPath = 'http://localhost:3000/js/'
+    webpackConfig.output.publicPath = 'http://localhost:3012/js/'
 
     # Include version
     webpackConfig.plugins = [
       new webpack.NamedModulesPlugin()
     ]
-    webpackConfig.entry.unshift('webpack-dev-server/client?http://localhost:3000');
+    webpackConfig.entry.unshift('webpack-dev-server/client?http://localhost:3012');
 
     compiler = webpack(webpackConfig)
 
-    new WebpackDevServer(compiler, { contentBase: "dist", publicPath: "/js/" }).listen 3000, "localhost", (err) =>
+    new WebpackDevServer(compiler, { contentBase: "dist", publicPath: "/js/" }).listen 3012, "localhost", (err) =>
       if err 
         throw new gutil.PluginError("webpack-dev-server", err)
 
       # Server listening
-      gutil.log("[webpack-dev-server]", "http://localhost:3000/demo.html")
+      gutil.log("[webpack-dev-server]", "http://localhost:3012/demo.html")
 ])
 
 gulp.task "watch_hot", gulp.series([
@@ -128,16 +128,16 @@ gulp.task "watch_hot", gulp.series([
       new webpack.HotModuleReplacementPlugin(),
       new webpack.NamedModulesPlugin(),
     ]
-    webpackConfig.entry.unshift('webpack-dev-server/client?http://localhost:3000', 'webpack/hot/only-dev-server');
+    webpackConfig.entry.unshift('webpack-dev-server/client?http://localhost:3012', 'webpack/hot/only-dev-server');
 
     compiler = webpack(webpackConfig)
 
-    new WebpackDevServer(compiler, { hot: true, contentBase: "dist", publicPath: "/js/" }).listen 3000, "localhost", (err) =>
+    new WebpackDevServer(compiler, { hot: true, contentBase: "dist", publicPath: "/js/" }).listen 3012, "localhost", (err) =>
       if err 
         throw new gutil.PluginError("webpack-dev-server", err)
 
       # Server listening
-      gutil.log("[webpack-dev-server]", "http://localhost:3000/demo.html")
+      gutil.log("[webpack-dev-server]", "http://localhost:3012/demo.html")
 ])
 
 

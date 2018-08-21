@@ -29,6 +29,7 @@ Is a view of a layer including whether visible, opacity.
 	visible: true/false
 	opacity: 0.0-1.0
 	group: optional group. layers in the same group act as radio buttons
+	hideLegend: true to hide legend
 }
 ```
 
