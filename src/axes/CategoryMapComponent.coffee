@@ -71,7 +71,7 @@ module.exports = class CategoryMapComponent extends React.Component
   renderLabel: (category) ->
     label = ExprUtils.localizeString(category.label)
 
-    if category.value
+    if category.value?
       label
     else
       H.a onClick: @handleNullLabelChange, style: {cursor: 'pointer'},
