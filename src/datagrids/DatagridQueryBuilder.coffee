@@ -300,7 +300,7 @@ module.exports = class DatagridQueryBuilder
       # Natural order if present
       ordering = @schema.getTable(design.table).ordering
       if ordering
-        exprs.push({ type: "field", tableAlias: "main", column: ordering })
+        exprs.push(exprCompiler.compileExpr(expr: { type: "field", table: design.table, column: ordering }, tableAlias: "main"))
 
       # Always primary key
       exprs.push({ type: "field", tableAlias: "main", column: @schema.getTable(design.table).primaryKey })
@@ -345,7 +345,7 @@ module.exports = class DatagridQueryBuilder
     # Natural order if present
     ordering = @schema.getTable(subtableTable).ordering
     if ordering
-      exprs.push({ type: "field", tableAlias: "st", column: ordering })
+      exprs.push(exprCompiler.compileExpr(expr: { type: "field", table: subtableTable, column: ordering }, tableAlias: "st"))
 
     # Always primary key
     exprs.push({ type: "field", tableAlias: "st", column: @schema.getTable(subtableTable).primaryKey })
@@ -373,7 +373,7 @@ module.exports = class DatagridQueryBuilder
     directions.push("asc")
     return directions
 
-  # Get types of expressions to order subtable query by. Tricky since ordering is a column, not an expression
+  # Get types of expressions to order subtable query by.
   getSubtableOrderByExprTypes: (design, subtable) ->
     exprUtils = new ExprUtils(@schema)
 
@@ -389,7 +389,7 @@ module.exports = class DatagridQueryBuilder
     # Natural order if present
     ordering = @schema.getTable(subtableTable).ordering
     if ordering
-      types.push(@schema.getColumn(subtableTable, ordering).type)
+      types.push(exprUtils.getExprType({ type: "field", table: subtableTable, column: ordering }))
 
     # Always primary key. Assume text
     types.push("text")

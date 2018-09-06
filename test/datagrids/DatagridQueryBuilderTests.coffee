@@ -3,6 +3,7 @@ assert = require('chai').assert
 fixtures = require '../fixtures'
 DatagridQueryBuilder = require '../../src/datagrids/DatagridQueryBuilder'
 canonical = require 'canonical-json'
+Schema = require('mwater-expressions').Schema
 
 compare = (actual, expected) ->
   assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n"
@@ -47,6 +48,44 @@ describe "DatagridQueryBuilder", ->
       limit: null
       offset: null
     }
+
+  it "creates simple query with natural ordering", ->
+    schemaJson = _.cloneDeep(@schema.toJSON())
+    schemaJson.tables[0].ordering = "number"
+    schema = new Schema(schemaJson)
+    qb = new DatagridQueryBuilder(schema)
+
+    design = {
+      table: "t1"
+      columns: [{
+        id: "cid1"
+        type: "expr"
+        expr: @exprText
+      }]
+    }
+
+    jsonql = qb.createQuery(design, { limit: null, offset: null })
+    compare jsonql, {
+      type: "query"
+      selects: [
+        # Includes id
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "id" }
+        # Includes column
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
+        # Orders by natural order
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "number" }, alias: "s0" }
+        # Orders by primary key for consistency
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "s1" }
+      ]
+      from: { type: "table", table: "t1", alias: "main" }
+      orderBy: [
+        { ordinal: 3, direction: "asc" }
+        { ordinal: 4, direction: "asc" }
+      ]
+      limit: null
+      offset: null
+    }
+
 
   it "creates filtered simple query", ->
     design = {
