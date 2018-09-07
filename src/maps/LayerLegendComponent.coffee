@@ -16,6 +16,7 @@ module.exports = class LayerLegendComponent extends React.Component
     radiusLayer: PropTypes.bool
     axis: PropTypes.object
     symbol: PropTypes.string
+    markerSize: PropTypes.number
     defaultColor: PropTypes.string
     filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
@@ -113,6 +114,7 @@ module.exports = class LayerLegendComponent extends React.Component
 
     React.createElement LegendGroup,
       symbol: @props.symbol
+      markerSize: @props.markerSize
       items: items
       defaultColor: @props.defaultColor
       name: @props.name

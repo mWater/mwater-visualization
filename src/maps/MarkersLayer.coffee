@@ -301,6 +301,7 @@ module.exports = class MarkersLayer extends Layer
       schema: schema
       defaultColor: design.color
       symbol: design.symbol or 'font-awesome/circle'
+      markerSize: design.markerSize
       name: name
       dataSource: dataSource
       filters: _.compact(_filters)

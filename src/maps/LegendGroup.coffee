@@ -10,6 +10,7 @@ module.exports = class LegendGroup extends React.Component
     defaultColor: PropTypes.string
     name: PropTypes.string
     symbol: PropTypes.string
+    markerSize: PropTypes.number
 
   @defaultProps:
     items: []
@@ -18,9 +19,9 @@ module.exports = class LegendGroup extends React.Component
 
   render: ->
     H.div style: { marginBottom: 5},
-      React.createElement(LegendItem, {hasChildren: @props.items.length > 0,symbol:@props.symbol,color: @props.defaultColor, name: @props.name, key: @props.name, radiusLayer: @props.radiusLayer})
+      React.createElement(LegendItem, {hasChildren: @props.items.length > 0,symbol:@props.symbol, markerSize: @props.markerSize, color: @props.defaultColor, name: @props.name, key: @props.name, radiusLayer: @props.radiusLayer})
       _.map @props.items, (item) =>
-        React.createElement(LegendItem, {isChild: true, symbol:@props.symbol,color: item.color, name: item.name, key: item.name, radiusLayer: @props.radiusLayer})
+        React.createElement(LegendItem, {isChild: true, symbol: @props.symbol, markerSize: @props.markerSize, color: item.color, name: item.name, key: item.name, radiusLayer: @props.radiusLayer})
 
 class LegendItem extends React.Component
   @propTypes:
@@ -28,6 +29,7 @@ class LegendItem extends React.Component
     name: PropTypes.string
     radiusLayer: PropTypes.bool
     symbol: PropTypes.string
+    markerSize: PropTypes.number
     hasChildren: PropTypes.bool
     isChild: PropTypes.bool
 
@@ -41,6 +43,7 @@ class LegendItem extends React.Component
       color: @props.color
       display: 'inline-block'
       marginRight: 4
+      fontSize: @props.markerSize
 
     className = @props.symbol.replace('font-awesome/' , 'fa fa-')
     H.span {className: className, style: symbolStyle}, ""
