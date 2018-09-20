@@ -106,6 +106,13 @@ module.exports = class ImageMosaicChart extends Chart
       alias: "image" 
     })
 
+    # Add primary key
+    query.selects.push({ 
+      type: "select"
+      expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table).primaryKey }
+      alias: "id" 
+    })
+
     # Get relevant filters
     filters = _.where(filters or [], table: design.table)
     whereClauses = _.map(filters, (f) -> injectTableAlias(f.jsonql, "main")) 
@@ -136,6 +143,7 @@ module.exports = class ImageMosaicChart extends Chart
   #   width, height, standardWidth: size of the chart view
   #   scope: current scope of the view element
   #   onScopeChange: called when scope changes with new scope
+  #   onRowClick: Called with (tableId, rowId) when item is clicked
   createViewElement: (options) ->
     # Require here to prevent server require problems
     ImageMosaicChartViewComponent = require './ImageMosaicChartViewComponent'
@@ -153,6 +161,7 @@ module.exports = class ImageMosaicChart extends Chart
 
       scope: options.scope
       onScopeChange: options.onScopeChange
+      onRowClick: options.onRowClick
     }
 
     return React.createElement(ImageMosaicChartViewComponent, props)

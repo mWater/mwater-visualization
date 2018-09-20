@@ -176,6 +176,7 @@ class MWaterDirectDashboardPane extends React.Component
           titleElem: "Sample"
           # quickfilterLocks: [{ expr: { type: "field", table: "entities.water_point", column: "type" }, value: "Protected dug well" }]
           namedStrings: { branding: "mWater" }
+          onRowClick: (table, rowId) => alert("Row clicked: #{table} #{rowId}")
         })
     )
 

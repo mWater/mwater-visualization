@@ -20,14 +20,19 @@ module.exports = class ImageMosaicChartViewComponent extends React.Component
     height: PropTypes.number
     standardWidth: PropTypes.number
 
-    scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
-    onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+    onRowClick: PropTypes.func # Called with (tableId, rowId) when item is clicked
 
   shouldComponentUpdate: (prevProps) ->
     not _.isEqual(prevProps, @props)
 
+  handleClick: (primaryKey, image) => 
+    if @props.onRowClick
+      @props.onRowClick(@props.design.table, primaryKey)
+    else
+      @imagePopup?.show(image)
+
   # Render a single image
-  renderImage: (image, imageManager) ->
+  renderImage: (primaryKey, image, imageManager) =>
     R LazyLoad, key: image.id,
       R RotationAwareImageComponent, 
         imageManager: imageManager 
@@ -35,7 +40,7 @@ module.exports = class ImageMosaicChartViewComponent extends React.Component
         thumbnail: true
         height: 120
         width: 80
-        onClick: => @imagePopup?.show(image)
+        onClick: => @handleClick(primaryKey, image)
 
   # Render images
   renderImages: (imageManager) ->
@@ -54,9 +59,9 @@ module.exports = class ImageMosaicChartViewComponent extends React.Component
 
       if _.isArray(imageObj)
         for image in imageObj
-          @renderImage(image, imageManager)
+          @renderImage(row.id, image, imageManager)
       else
-        @renderImage(imageObj, imageManager)
+        @renderImage(row.id, imageObj, imageManager)
 
   render: ->
     titleStyle =
