@@ -175,6 +175,8 @@ class TableChartColumnDesignerComponent extends React.Component
   handleHeaderTextChange: (ev) => @updateColumn(headerText: ev.target.value)
   handleAggrChange: (aggr) => @updateTextAxis(aggr: aggr)
 
+  handleFormatChange: (ev) => @updateColumn(format: ev.target.value)
+
   renderRemove: ->
     if @props.design.columns.length > 1
       H.button className: "btn btn-xs btn-link pull-right", type: "button", onClick: @props.onRemove,
@@ -196,6 +198,33 @@ class TableChartColumnDesignerComponent extends React.Component
         onChange: @handleExprChange
         aggrStatuses: ["literal", "individual", "aggregate"]
       )
+
+  renderFormat: ->
+    column = @props.design.columns[@props.index]
+
+    # Only for number typ
+    exprUtils = new ExprUtils(@props.schema)
+    if exprUtils.getExprType(column.textAxis?.expr) != "number"
+      return null
+
+    formats = [
+      { value: "", label: "Plain: 1234.567" }
+      { value: ",", label: "Normal: 1,234.567" }
+      { value: ",.0f", label: "Rounded: 1,234"  }
+      { value: ",.2f", label: "Two decimals: 1,234.56" }
+      { value: "$,.2f", label: "Currency: $1,234.56" }
+      { value: "$,.0f", label: "Currency rounded: $1,234" }
+      { value: ".0%", label: "Percent rounded: 12%" }
+      { value: ".2%", label: "Percent decimal: 12.34%" }
+    ]
+
+    H.div className: "form-group",
+      H.label className: "text-muted", 
+        "Format"
+      ": "
+      H.select value: (if column.format? then column.format else ","), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
+        _.map(formats, (format) -> H.option(key: format.value, value: format.value, format.label))
+
 
   renderHeader: ->
     column = @props.design.columns[@props.index]
@@ -227,4 +256,5 @@ class TableChartColumnDesignerComponent extends React.Component
       H.label null, "Column #{@props.index+1}"
       H.div style: { marginLeft: 5 },
         @renderExpr()
+        @renderFormat()
         @renderHeader()

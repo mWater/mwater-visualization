@@ -4,6 +4,7 @@ React = require 'react'
 H = React.DOM
 R = React.createElement
 moment = require 'moment'
+d3Format = require 'd3-format'
 
 AxisBuilder = require '../../../axes/AxisBuilder'
 ExprUtils = require('mwater-expressions').ExprUtils
@@ -112,8 +113,17 @@ class TableContentsComponent extends React.Component
 
       # Convert to node based on type
       switch exprType
-        when "text", "number"
+        when "text"
           node = value
+        when "number"
+          # Use d3 format if number
+          format = if column.format? then column.format else ","
+
+          # Do not convert % (d3Format multiplies by 100 which is annoying)
+          if format.match(/%/)
+            value = value / 100.0
+
+          node = d3Format.format(format)(value)
         when "boolean", "enum", "enumset", "text[]"
           node = exprUtils.stringifyExprLiteral(column.textAxis?.expr, value, @context.locale)
         when "date"
