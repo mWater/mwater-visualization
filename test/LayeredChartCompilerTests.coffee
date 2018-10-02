@@ -170,7 +170,7 @@ describe "LayeredChartCompiler", ->
           from: { type: "table", table: "t1", alias: "main" }
           groupBy: []
           orderBy: [{ ordinal: 1 }]
-          limit: 1000
+          limit: 10000
         }
       }
 

@@ -33,12 +33,17 @@ module.exports = class LayeredChartCompiler
     for layerIndex in [0...design.layers.length]
       layer = design.layers[layerIndex]
 
+      # Limit depends on layer type
+      limit = 1000
+      if layer.type == "scatter" or design.type == "scatter"
+        limit = 10000 # More possible for scatter chart
+
       # Create shell of query
       query = {
         type: "query"
         selects: []
         from: exprCompiler.compileTable(layer.table, "main")
-        limit: 1000
+        limit: limit
         groupBy: []
         orderBy: []
       }
