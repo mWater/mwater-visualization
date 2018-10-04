@@ -1,5 +1,5 @@
+require './index.css'
 require "leaflet/dist/leaflet.css"
-require "react-select/dist/react-select.css"
 require "fixed-data-table/dist/fixed-data-table.min.css"
 require "rc-slider/assets/index.css"
 require "leaflet-loading/src/Control.Loading.css"

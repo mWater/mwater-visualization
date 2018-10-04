@@ -11,7 +11,10 @@ module.exports = {
   module: {
     rules: [
       { test: /\.coffee$/, use: "coffee-loader" },
-      { test: /\.css$/, use: "css-loader" },
+      { test: /\.css$/, use: [
+          { loader: "style-loader" },
+          { loader: "css-loader" }
+      ]},
       {   
         test: /\.(png|jpg|gif)$/i,
         use: [

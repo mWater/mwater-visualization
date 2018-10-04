@@ -91,6 +91,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
           standardWidth: @props.standardWidth
           scope: @props.scope
           onScopeChange: @props.onScopeChange
+          locale: @context.locale
       @renderFooter()
 
 # Displays the inner C3 component itself
@@ -107,8 +108,6 @@ class C3ChartComponent extends React.Component
 
     scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
-
-  @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
   constructor: (props) ->
@@ -142,7 +141,7 @@ class C3ChartComponent extends React.Component
     c3 = require 'c3'
     @chart = c3.generate(chartOptions)
 
-  componentDidUpdate: (prevProps, prevState, prevContext) ->
+  componentDidUpdate: (prevProps, prevState) ->
     # Check if options changed
     oldCompiler = new LayeredChartCompiler(schema: prevProps.schema) 
     newCompiler = new LayeredChartCompiler(schema: @props.schema)
@@ -152,7 +151,7 @@ class C3ChartComponent extends React.Component
       data: prevProps.data
       width: prevProps.width
       height: prevProps.height
-      locale: prevContext.locale
+      locale: prevProps.locale
     })
 
     newChartOptions = newCompiler.createChartOptions({
@@ -160,13 +159,13 @@ class C3ChartComponent extends React.Component
       data: @props.data
       width: @props.width
       height: @props.height
-      locale: @context.locale
+      locale: @props.locale
     })
 
     # If chart changed
-    if not _.isEqual(oldChartOptions, newChartOptions) or @context.locale != prevContext.locale
+    if not _.isEqual(oldChartOptions, newChartOptions)
       # Check if size alone changed
-      if _.isEqual(_.omit(oldChartOptions, "size"), _.omit(newChartOptions, "size")) and @context.locale == prevContext.locale
+      if _.isEqual(_.omit(oldChartOptions, "size"), _.omit(newChartOptions, "size")) and @props.locale == prevProps.locale
         @chart.resize(width: @props.width, height: @props.height)
         @updateScope()
         return
@@ -205,7 +204,7 @@ class C3ChartComponent extends React.Component
       .style("opacity", (d,i) =>
         dataPoint = @lookupDataPoint(dataMap, d)
         if dataPoint
-          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @context.locale)
+          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @props.locale)
 
         # Determine if scoped
         if scope and @props.scope 
@@ -224,7 +223,7 @@ class C3ChartComponent extends React.Component
       .style("opacity", (d, i) =>
         dataPoint = @lookupDataPoint(dataMap, d)
         if dataPoint
-          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @context.locale)
+          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @props.locale)
 
         # Determine if scoped
         if @props.scope 
@@ -267,7 +266,7 @@ class C3ChartComponent extends React.Component
 
     # Create scope
     compiler = new LayeredChartCompiler(schema: @props.schema)
-    scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @context.locale)
+    scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @props.locale)
 
     # If same scope data, remove scope
     if @props.scope and _.isEqual(scope.data, @props.scope.data) 

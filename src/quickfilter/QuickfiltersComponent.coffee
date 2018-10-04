@@ -1,7 +1,7 @@
 PropTypes = require('prop-types')
 React = require 'react'
 R = React.createElement
-ReactSelect = require 'react-select'
+ReactSelect = require('react-select').default
 ExprUtils = require('mwater-expressions').ExprUtils
 ExprCleaner = require('mwater-expressions').ExprCleaner
 TextLiteralComponent = require './TextLiteralComponent'
@@ -157,13 +157,15 @@ class EnumQuickfilterComponent extends React.Component
       @props.onValueChange(null)
 
   renderSingleSelect: ->
+    options = _.map(@props.options, (opt) => { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
+
     R ReactSelect, 
       placeholder: "All"
-      value: @props.value
-      multi: false
-      options: _.map(@props.options, (opt) => { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
-      onChange: if @props.onValueChange then @handleSingleChange
-      disabled: not @props.onValueChange?
+      value: _.find(options, value: @props.value)
+      options: options
+      isClearable: true
+      onChange: (value) => if @props.onValueChange then @handleSingleChange(value?.value)
+      isDisabled: not @props.onValueChange?
   
   renderMultiSelect: ->
     R ReactSelect, 
