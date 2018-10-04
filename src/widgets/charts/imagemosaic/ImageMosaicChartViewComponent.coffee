@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 AxisBuilder = require '../../../axes/AxisBuilder'
@@ -81,13 +80,13 @@ module.exports = class ImageMosaicChartViewComponent extends React.Component
       getImageUrl: (id, success, error) => success(@props.dataSource.getImageUrl(id))
     }
 
-    H.div style: style, className: 'image-mosaic',
+    R 'div', style: style, className: 'image-mosaic',
       if title
-        H.p style: titleStyle, title
+        R 'p', style: titleStyle, title
 
       R ImagePopupComponent, 
         ref: (c) => @imagePopup = c
         imageManager: imageManager
-      H.div null,
+      R 'div', null,
         @renderImages(imageManager)
 

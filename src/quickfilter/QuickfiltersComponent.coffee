@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 ReactSelect = require 'react-select'
 ExprUtils = require('mwater-expressions').ExprUtils
@@ -121,7 +120,7 @@ module.exports = class QuickfiltersComponent extends React.Component
     if not @props.design or @props.design.length == 0
       return null
 
-    H.div style: { borderTop: "solid 1px #E8E8E8", borderBottom: "solid 1px #E8E8E8", padding: 5 },
+    R 'div', style: { borderTop: "solid 1px #E8E8E8", borderBottom: "solid 1px #E8E8E8", padding: 5 },
       _.map @props.design, (item, i) => @renderQuickfilter(item, i)
 
 # Quickfilter for an enum
@@ -177,16 +176,16 @@ class EnumQuickfilterComponent extends React.Component
       disabled: not @props.onValueChange?
 
   render: ->
-    H.div style: { display: "inline-block", paddingRight: 10 },
+    R 'div', style: { display: "inline-block", paddingRight: 10 },
       if @props.label
-        H.span style: { color: "gray" }, @props.label + ":\u00a0"
-      H.div style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
+        R 'span', style: { color: "gray" }, @props.label + ":\u00a0"
+      R 'div', style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
         if @props.multi
           @renderMultiSelect()
         else
           @renderSingleSelect()
       if not @props.onValueChange
-        H.i className: "text-warning fa fa-fw fa-lock"
+        R 'i', className: "text-warning fa fa-fw fa-lock"
 
 
 # Quickfilter for a text value
@@ -211,10 +210,10 @@ class TextQuickfilterComponent extends React.Component
     }))
 
   render: ->
-    H.div style: { display: "inline-block", paddingRight: 10 },
+    R 'div', style: { display: "inline-block", paddingRight: 10 },
       if @props.label
-        H.span style: { color: "gray" }, @props.label + ":\u00a0"
-      H.div style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
+        R 'span', style: { color: "gray" }, @props.label + ":\u00a0"
+      R 'div', style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
         R TextLiteralComponent, {
           value: @props.value
           onChange: @props.onValueChange
@@ -226,7 +225,7 @@ class TextQuickfilterComponent extends React.Component
           filters: @props.filters
         }
       if not @props.onValueChange
-        H.i className: "text-warning fa fa-fw fa-lock"
+        R 'i', className: "text-warning fa fa-fw fa-lock"
 
 # Quickfilter for a date value
 class DateQuickfilterComponent extends React.Component
@@ -239,15 +238,15 @@ class DateQuickfilterComponent extends React.Component
     onValueChange: PropTypes.func.isRequired # Called when value changes
 
   render: ->
-    H.div style: { display: "inline-block", paddingRight: 10 },
+    R 'div', style: { display: "inline-block", paddingRight: 10 },
       if @props.label
-        H.span style: { color: "gray" }, @props.label + ":\u00a0"
-      H.div style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
+        R 'span', style: { color: "gray" }, @props.label + ":\u00a0"
+      R 'div', style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
         R DateExprComponent, {
           datetime: (new ExprUtils(@props.schema).getExprType(@props.expr)) == "datetime"
           value: @props.value
           onChange: @props.onValueChange
         }
       if not @props.onValueChange
-        H.i className: "text-warning fa fa-fw fa-lock"
+        R 'i', className: "text-warning fa fa-fw fa-lock"
 

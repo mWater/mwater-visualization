@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 LeafletMapComponent = require './LeafletMapComponent'
 ExprUtils = require('mwater-expressions').ExprUtils
@@ -164,8 +163,8 @@ module.exports = class MapViewComponent extends React.Component
       showCloseX: true
       size: "large",
         @state.popupContents
-        H.div style: { textAlign: "right", marginTop: 10 },
-          H.button className: "btn btn-default", onClick: (=> @setState(popupContents: null)),
+        R 'div', style: { textAlign: "right", marginTop: 10 },
+          R 'button', className: "btn btn-default", onClick: (=> @setState(popupContents: null)),
             "Close"
 
   render: ->
@@ -223,7 +222,7 @@ module.exports = class MapViewComponent extends React.Component
 
         leafletLayers.push(leafletLayer)
 
-    H.div style: { width: @props.width, height: @props.height, position: 'relative' },
+    R 'div', style: { width: @props.width, height: @props.height, position: 'relative' },
       @renderPopup()
       R LeafletMapComponent,
         ref: (c) => @leafletMap = c

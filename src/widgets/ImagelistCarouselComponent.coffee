@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 # Carousel component for images. Starts with cover photo
 React = require 'react'
-H = React.DOM
 R = React.createElement
 RotationAwareImageComponent = require("mwater-forms/lib/RotationAwareImageComponent")
 
@@ -31,7 +30,7 @@ module.exports = class ImagelistCarouselComponent extends React.Component
       @setState(activeImage: activeImage)
 
   renderImage: (img, i, imageManager) ->
-    H.div className: "item #{if i == @state.activeImage then "active" else ""}", style: {height: @props.height},
+    R 'div', className: "item #{if i == @state.activeImage then "active" else ""}", style: {height: @props.height},
       R RotationAwareImageComponent, imageManager: imageManager, image: img
 
   renderImages: (imageManager) ->
@@ -50,17 +49,17 @@ module.exports = class ImagelistCarouselComponent extends React.Component
     if @props.imagelist.length == 0
       return null
 
-    H.div className: "image-carousel-component carousel slide", style: {height: @props.height, overflow: 'hidden'},
+    R 'div', className: "image-carousel-component carousel slide", style: {height: @props.height, overflow: 'hidden'},
       if @props.imagelist.length < 10
-        H.ol className: "carousel-indicators",
+        R 'ol', className: "carousel-indicators",
           _.map @props.imagelist, (img, i) =>
-            H.li className: if i == @state.activeImage then "active"
+            R 'li', className: if i == @state.activeImage then "active"
 
       # Wrapper for slides
-      H.div className: "carousel-inner",
+      R 'div', className: "carousel-inner",
         @renderImages(imageManager)
 
-      H.a className: "left carousel-control",
-        H.span className: "glyphicon glyphicon-chevron-left", onClick: @handleLeft
-      H.a className: "right carousel-control",
-        H.span className: "glyphicon glyphicon-chevron-right", onClick: @handleRight
+      R 'a', className: "left carousel-control",
+        R 'span', className: "glyphicon glyphicon-chevron-left", onClick: @handleLeft
+      R 'a', className: "right carousel-control",
+        R 'span', className: "glyphicon glyphicon-chevron-right", onClick: @handleRight

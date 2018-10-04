@@ -1,7 +1,7 @@
 React = require('react')
 ReactDOM = require('react-dom')
 TestUtils = require('react-addons-test-utils')
-H = React.DOM
+R = React.createElement
 
 module.exports = class TestComponent
   constructor: (elem) ->
@@ -33,6 +33,6 @@ class ComponentWrapper extends React.Component
     return ReactDOM.findDOMNode(@refs.comp)
 
   render: ->
-    H.div null,
+    R 'div', null,
       React.cloneElement(@state.elem, ref: "comp")
 

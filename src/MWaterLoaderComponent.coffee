@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 Schema = require('mwater-expressions').Schema
@@ -110,7 +109,7 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
     context.decorateScalarExprTreeSectionChildren = (options) =>
       # If related forms section of entities table
       if options.tableId.match(/^entities\./) and options.section.id == "!related_forms"
-        return H.div key: "_add_related_form_parent",
+        return R 'div', key: "_add_related_form_parent",
           options.children
           R MWaterAddRelatedFormComponent, 
             key: "_add_related_form"
@@ -123,7 +122,7 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
 
       # If indicators section of entities table
       if options.tableId.match(/^entities\./) and options.section.id == "!indicators"
-        return H.div key: "_add_related_indicator_parent",
+        return R 'div', key: "_add_related_indicator_parent",
           options.children
           R MWaterAddRelatedIndicatorComponent,
             key: "_add_related_indicator" 

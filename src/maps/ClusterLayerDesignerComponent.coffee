@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
@@ -37,12 +36,12 @@ module.exports = class ClusterLayerDesignerComponent extends React.Component
   handleFillColorChange: (color) => @update(fillColor: color)
 
   renderTable: ->
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.i(className: "fa fa-database")
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        R('i', className: "fa fa-database")
         " "
         "Data Source"
-      H.div style: { marginLeft: 10 }, 
+      R 'div', style: { marginLeft: 10 }, 
         R TableSelectComponent, { 
           schema: @props.schema
           value: @props.design.table
@@ -55,8 +54,8 @@ module.exports = class ClusterLayerDesignerComponent extends React.Component
     if not @props.design.table
       return
 
-    title = H.span null,
-      H.span className: "glyphicon glyphicon-map-marker"
+    title = R 'span', null,
+      R 'span', className: "glyphicon glyphicon-map-marker"
       " Locations to Cluster"
     
     filters = _.clone(@props.filters) or []
@@ -67,9 +66,9 @@ module.exports = class ClusterLayerDesignerComponent extends React.Component
       if jsonql
         filters.push({ table: @props.design.filter.table, jsonql: jsonql })
 
-    H.div className: "form-group",
-      H.label className: "text-muted", title
-      H.div style: { marginLeft: 10 }, 
+    R 'div', className: "form-group",
+      R 'label', className: "text-muted", title
+      R 'div', style: { marginLeft: 10 }, 
         React.createElement(AxisComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
@@ -85,12 +84,12 @@ module.exports = class ClusterLayerDesignerComponent extends React.Component
     if not @props.design.axes.geometry
       return
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.span className: "glyphicon glyphicon glyphicon-tint"
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        R 'span', className: "glyphicon glyphicon glyphicon-tint"
         "Text Color"
 
-      H.div null, 
+      R 'div', null, 
         R ColorComponent,
           color: @props.design.textColor
           onChange: @handleTextColorChange
@@ -100,12 +99,12 @@ module.exports = class ClusterLayerDesignerComponent extends React.Component
     if not @props.design.axes.geometry
       return
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.span className: "glyphicon glyphicon glyphicon-tint"
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        R 'span', className: "glyphicon glyphicon glyphicon-tint"
         "Marker Color"
 
-      H.div null, 
+      R 'div', null, 
         R ColorComponent,
           color: @props.design.fillColor
           onChange: @handleFillColorChange
@@ -115,11 +114,11 @@ module.exports = class ClusterLayerDesignerComponent extends React.Component
     if not @props.design.axes.geometry
       return null
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.span(className: "glyphicon glyphicon-filter")
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        R('span', className: "glyphicon glyphicon-filter")
         " Filters"
-      H.div style: { marginLeft: 8 }, 
+      R 'div', style: { marginLeft: 8 }, 
         React.createElement(FilterExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
@@ -128,7 +127,7 @@ module.exports = class ClusterLayerDesignerComponent extends React.Component
           value: @props.design.filter)
 
   render: ->
-    H.div null,
+    R 'div', null,
       @renderTable()
       @renderGeometryAxis()
       @renderTextColor()

@@ -4,7 +4,7 @@ ExprCompiler = require('mwater-expressions').ExprCompiler
 injectTableAlias = require('mwater-expressions').injectTableAlias
 
 React = require 'react'
-H = React.DOM
+R = React.createElement
 
 # TODO DEPRECATED. REPLACE WITH REAL MARKER AND BUFFER LAYERS
 
@@ -84,6 +84,6 @@ class LoadingLegend extends React.Component
         @setState(html: data)
 
   render: ->
-    H.div 
+    R 'div', 
       style: { font: "14px/16px Arial, Helvetica, sans-serif", color: "#555" }
       dangerouslySetInnerHTML: { __html: @state.html }

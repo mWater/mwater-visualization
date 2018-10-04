@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 Dropzone = require 'react-dropzone'
 
@@ -56,20 +55,20 @@ module.exports = class ImageUploaderComponent extends React.Component
   createId: -> uuid().replace(/-/g, "")
   
   renderUploader: ->
-    H.div null,
+    R 'div', null,
       R Dropzone,
         className: 'dropzone'
         multiple: false
         onDrop: @onFileDrop,
 
         if @state.uploading
-          H.div className: 'progress',
-            H.div className: 'progress-bar', style: { width: '0%'}, ref: (c) => @progressBar = c
+          R 'div', className: 'progress',
+            R 'div', className: 'progress-bar', style: { width: '0%'}, ref: (c) => @progressBar = c
         else
-          H.div null, "Drop file here or click to select file"
+          R 'div', null, "Drop file here or click to select file"
           
       if @state.uid
-        H.a onClick: (() => @setState(editing: false)),
+        R 'a', onClick: (() => @setState(editing: false)),
           "Cancel"
 
   renderPreview: ->
@@ -80,15 +79,15 @@ module.exports = class ImageUploaderComponent extends React.Component
       padding: 4
       border: '1px solid #aeaeae'
       marginRight: 20
-    H.div null,
-      H.img style: thumbnailStyle, src: @props.dataSource.getImageUrl(@state.uid)
-      H.a className: 'btn btn-default', onClick: @handleChangeImage, "Change"
+    R 'div', null,
+      R 'img', style: thumbnailStyle, src: @props.dataSource.getImageUrl(@state.uid)
+      R 'a', className: 'btn btn-default', onClick: @handleChangeImage, "Change"
 
   handleChangeImage: () =>
     @setState(editing: true)
 
   render: ->
-    H.div null,
+    R 'div', null,
       if @state.uid and not @state.editing
         @renderPreview()
       if @state.editing or not @state.uid

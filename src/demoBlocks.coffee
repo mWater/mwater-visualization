@@ -1,6 +1,5 @@
 React = require 'react'
 ReactDOM = require 'react-dom'
-H = React.DOM
 R = React.createElement
 
 MWaterLoaderComponent = require './MWaterLoaderComponent'
@@ -67,8 +66,8 @@ class DemoComponent extends React.Component
         onDesignChange: (design) => @setState(design: design)
 
 $ ->
-  sample = H.div className: "container-fluid", style: { height: "100%", paddingLeft: 0, paddingRight: 0 },
-    H.style null, '''html, body, #main { height: 100% }'''
+  sample = R 'div', className: "container-fluid", style: { height: "100%", paddingLeft: 0, paddingRight: 0 },
+    R 'style', null, '''html, body, #main { height: 100% }'''
     React.createElement(DemoComponent, apiUrl: "https://api.mwater.co/v3/")
 
   ReactDOM.render(sample, document.getElementById("main"))

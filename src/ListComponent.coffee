@@ -1,6 +1,6 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
+R = React.createElement
 
 module.exports = ListControl = React.createClass {
   propTypes: {
@@ -10,7 +10,7 @@ module.exports = ListControl = React.createClass {
   }
 
   render: ->
-    H.div null, 
+    R 'div', null, 
       _.map @props.items, (item) =>
         React.createElement(ListItem, { 
           key: item.id
@@ -38,7 +38,7 @@ ListItem = React.createClass {
     else if @state.hover
       style.backgroundColor = "#EEE"
 
-    H.div style: style, onMouseOver: @mouseOver, onMouseOut: @mouseOut, onClick: @props.onSelect,
+    R 'div', style: style, onMouseOver: @mouseOver, onMouseOut: @mouseOut, onClick: @props.onSelect,
       @props.children
 }
 

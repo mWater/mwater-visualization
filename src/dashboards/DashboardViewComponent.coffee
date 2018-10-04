@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 uuid = require 'uuid'
@@ -82,8 +81,8 @@ module.exports = class DashboardViewComponent extends React.Component
   print: =>
     # Create element at 96 dpi (usual for browsers) and 7.5" across (letter - 0.5" each side). 1440 is double, so scale down
     # props are immutable in React 0.14+
-    elem = H.div style: { transform: "scale(0.5)", transformOrigin: "top left" },
-      H.div style: { width: 1440 }, 
+    elem = R 'div', style: { transform: "scale(0.5)", transformOrigin: "top left" },
+      R 'div', style: { width: 1440 }, 
         R(DashboardViewComponent, _.extend({}, @props, { width: 1440, standardWidth: 1440, onDesignChange: null }))
     
     printer = new ReactElementPrinter()
@@ -168,7 +167,7 @@ module.exports = class DashboardViewComponent extends React.Component
     }
 
     # Render widget container
-    # TODO REMOVE DragDropContextComponent and change to H.div when grid layout is gone.
+    # TODO REMOVE DragDropContextComponent and change to R 'div', when grid layout is gone.
     return R DragDropContextComponent, style: style, 
       @renderScopes()
 
@@ -184,6 +183,6 @@ module.exports = class DashboardViewComponent extends React.Component
 # Wrapper that has a nestable drag drop context
 class DragDropContextComponent extends React.Component
   render: ->
-    return H.div @props
+    return R 'div', @props
         
 DragDropContextComponent = NestableDragDropContext(HTML5Backend)(DragDropContextComponent)

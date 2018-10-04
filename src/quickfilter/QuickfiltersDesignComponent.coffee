@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 update = require 'update-object'
 TableSelectComponent = require '../TableSelectComponent'
@@ -86,12 +85,12 @@ module.exports = class QuickfiltersDesignComponent extends React.Component
     @props.onDesignChange(design)
 
   render: ->
-    H.div null,
+    R 'div', null,
       _.map @props.design, (item, index) => @renderQuickfilter(item, index)
 
       if @props.tables.length > 0
-        H.button type: "button", className: "btn btn-sm btn-default", onClick: @handleAdd,
-          H.span className: "glyphicon glyphicon-plus"
+        R 'button', type: "button", className: "btn btn-sm btn-default", onClick: @handleAdd,
+          R 'span', className: "glyphicon glyphicon-plus"
           " Add Quick Filter"
 
 class QuickfilterDesignComponent extends React.Component
@@ -132,18 +131,18 @@ class QuickfilterDesignComponent extends React.Component
     exprType = new ExprUtils(@props.schema).getExprType(@props.design.expr)
 
     R RemovableComponent, onRemove: @props.onRemove, 
-      H.div className: "panel panel-default",
-        H.div className: "panel-body",
-          H.div className: "form-group", key: "table",
-            H.label className: "text-muted", "Data Source"
+      R 'div', className: "panel panel-default",
+        R 'div', className: "panel-body",
+          R 'div', className: "form-group", key: "table",
+            R 'label', className: "text-muted", "Data Source"
             R ui.Select,
               value: @state.table
               options: _.map(@props.tables, (table) => { value: table, label: ExprUtils.localizeString(@props.schema.getTable(table).name) })
               onChange: @handleTableChange
 
-          H.div className: "form-group", key: "expr",
-            H.label className: "text-muted", "Filter By"
-            H.div null,
+          R 'div', className: "form-group", key: "expr",
+            R 'label', className: "text-muted", "Filter By"
+            R 'div', null,
               R ExprComponent,
                 schema: @props.schema
                 dataSource: @props.dataSource
@@ -153,16 +152,16 @@ class QuickfilterDesignComponent extends React.Component
                 types: ['enum', 'text', 'enumset', 'date', 'datetime']
 
           if @props.design.expr
-            H.div className: "form-group", key: "label",
-              H.label className: "text-muted", "Label"
-              H.input type: "text", className: "form-control input-sm", value: @props.design.label or "", onChange: @handleLabelChange, placeholder: "Optional Label"
+            R 'div', className: "form-group", key: "label",
+              R 'label', className: "text-muted", "Label"
+              R 'input', type: "text", className: "form-control input-sm", value: @props.design.label or "", onChange: @handleLabelChange, placeholder: "Optional Label"
 
           if @props.mergeable
             R ui.Checkbox, 
               value: @props.design.merged
               onChange: @handleMergedChange,
                 "Merge with previous quickfilter "
-                H.span className: "text-muted", "- displays as one single control that filters both"
+                R 'span', className: "text-muted", "- displays as one single control that filters both"
 
           if exprType in ['enum', 'text', 'enumset']
             R ui.Checkbox, 
@@ -176,9 +175,9 @@ class RemovableComponent extends React.Component
     onRemove: PropTypes.func.isRequired
 
   render: ->
-    H.div style: { display: "flex" }, className: "hover-display-parent",
-      H.div style: { flex: "1 1 auto" }, key: "main", 
+    R 'div', style: { display: "flex" }, className: "hover-display-parent",
+      R 'div', style: { flex: "1 1 auto" }, key: "main", 
         @props.children
-      H.div style: { flex: "0 0 auto", alignSelf: "center" }, className: "hover-display-child", key: "remove",
-        H.a onClick: @props.onRemove, style: { fontSize: "80%", cursor: "pointer", marginLeft: 5 },
-          H.span className: "glyphicon glyphicon-remove"
+      R 'div', style: { flex: "0 0 auto", alignSelf: "center" }, className: "hover-display-child", key: "remove",
+        R 'a', onClick: @props.onRemove, style: { fontSize: "80%", cursor: "pointer", marginLeft: 5 },
+          R 'span', className: "glyphicon glyphicon-remove"

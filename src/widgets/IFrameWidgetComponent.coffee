@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 _ = require 'lodash'
 ui = require 'react-library/lib/bootstrap'
@@ -34,10 +33,10 @@ module.exports = class IFrameWidgetComponent extends React.Component
     if not @state.editing
       return null
 
-    content = H.div className: "form-group",
-      H.label null, "URL to embed"
-      H.input type: "text", className: "form-control", value: @state.editUrl or "", onChange: (ev) => @setState(editUrl: ev.target.value)
-      H.p className: "help-block",
+    content = R 'div', className: "form-group",
+      R 'label', null, "URL to embed"
+      R 'input', type: "text", className: "form-control", value: @state.editUrl or "", onChange: (ev) => @setState(editUrl: ev.target.value)
+      R 'p', className: "help-block",
         'e.g. https://www.youtube.com/embed/dQw4w9WgXcQ'
 
     return R ModalPopupComponent,
@@ -48,10 +47,10 @@ module.exports = class IFrameWidgetComponent extends React.Component
 
   # Render a link to start editing
   renderEditLink: ->
-    H.div className: "mwater-visualization-widget-placeholder", onClick: @handleStartEditing,
+    R 'div', className: "mwater-visualization-widget-placeholder", onClick: @handleStartEditing,
       R ui.Icon, id: "fa-youtube-play"
-    # H.div style: { position: "absolute", bottom: @props.height / 2, left: 0, right: 0, textAlign: "center" },
-    #   H.a className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Configure"
+    # R 'div', style: { position: "absolute", bottom: @props.height / 2, left: 0, right: 0, textAlign: "center" },
+    #   R 'a', className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Configure"
 
   render: ->
     dropdownItems = []
@@ -64,7 +63,7 @@ module.exports = class IFrameWidgetComponent extends React.Component
       dropdownItems: dropdownItems,
         @renderEditor()
         if @props.design.url
-          H.iframe 
+          R 'iframe', 
             src: @props.design.url
             width: @props.width
             height: @props.height

@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 React = require 'react'
 ReactDOM = require 'react-dom'
-H = React.DOM
 R = React.createElement
 
 DragSource = require('react-dnd').DragSource
@@ -60,7 +59,7 @@ class DraggableBlockComponent extends React.Component
           lineStyle.left = 0
           lineStyle.right = 0
 
-      return H.div style: lineStyle
+      return R 'div', style: lineStyle
     else
       return null
 
@@ -71,8 +70,8 @@ class DraggableBlockComponent extends React.Component
     if @props.isDragging
       style.visibility = "hidden"
 
-    return @props.connectDropTarget(H.div style: @props.style,
-      H.div style: { position: "relative" },
+    return @props.connectDropTarget(R 'div', style: @props.style,
+      R 'div', style: { position: "relative" },
         @renderHover()
         React.cloneElement(React.Children.only(@props.children), {
           connectMoveHandle: @props.connectDragSource

@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 uuid = require 'uuid'
 
@@ -90,7 +89,7 @@ class BlocksDisplayComponent extends React.Component
       when "spacer"
         elem = R AutoSizeComponent, { injectWidth: true, key: block.id }, 
           (size) =>
-            H.div id: block.id, style: {
+            R 'div', id: block.id, style: {
               width: size.width
               height: if block.aspectRatio? then size.width / block.aspectRatio
             }
@@ -135,7 +134,7 @@ class BlocksDisplayComponent extends React.Component
         throw new Error("Unknown block type #{block.type}")
 
     # Wrap block in padding
-    return H.div key: block.id, className: "mwater-visualization-block mwater-visualization-block-#{block.type}",
+    return R 'div', key: block.id, className: "mwater-visualization-block mwater-visualization-block-#{block.type}",
       elem
 
   createBlockItem: (block) ->
@@ -143,69 +142,69 @@ class BlocksDisplayComponent extends React.Component
     return () -> { block: _.extend({}, block, id: uuid()) }
 
   renderPalette: ->
-    H.div key: "palette", style: { width: 185, height: "100%", position: "absolute", top: 0, left: 0 }, 
-      H.div className: "mwater-visualization-palette", style: { height: "100%" },
+    R 'div', key: "palette", style: { width: 185, height: "100%", position: "absolute", top: 0, left: 0 }, 
+      R 'div', className: "mwater-visualization-palette", style: { height: "100%" },
         R PaletteItemComponent, 
           createItem: @createBlockItem({ type: "widget", widgetType: "Text", design: { style: "title" } })
-          title: H.i className: "fa fa-font"
+          title: R 'i', className: "fa fa-font"
           subtitle: "Title"
         R PaletteItemComponent, 
           createItem: @createBlockItem({ type: "widget", widgetType: "Text", design: {} })
-          title: H.i className: "fa fa-align-left"
+          title: R 'i', className: "fa fa-align-left"
           subtitle: "Text"
         R PaletteItemComponent,
           createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "Image", design: {} })
-          title: H.i className: "fa fa-picture-o"
+          title: R 'i', className: "fa fa-picture-o"
           subtitle: "Image"
         R PaletteItemComponent,
           createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "LayeredChart", design: {} })
-          title: H.i className: "fa fa-bar-chart"
+          title: R 'i', className: "fa fa-bar-chart"
           subtitle: "Chart"
         if not @props.disableMaps
           R PaletteItemComponent,
             createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "Map", design: { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } } })
-            title: H.i className: "fa fa-map-o"
+            title: R 'i', className: "fa fa-map-o"
             subtitle: "Map"
         R PaletteItemComponent,
           createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "TableChart", design: {} })
-          title: H.i className: "fa fa-table"
+          title: R 'i', className: "fa fa-table"
           subtitle: "Table"
         R PaletteItemComponent,
           createItem: @createBlockItem({ type: "widget", widgetType: "PivotChart", design: {} })
-          title: H.img width: 24, height: 24, src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAb0lEQVRIx91VQQrAIAwzo/7/ydllG0MQS21EzMW2ICFtoyBZlLDn/LOgySPAG1xFDDmBtZI6efoMvODozkyL2IlTCOisfS2KrqG0RXus6fkEVBIw08khE62aQY0ogMdEswqwYouwvQ8s+4M576m4Ae/tET/u1taEAAAAAElFTkSuQmCC"
+          title: R 'img', width: 24, height: 24, src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAb0lEQVRIx91VQQrAIAwzo/7/ydllG0MQS21EzMW2ICFtoyBZlLDn/LOgySPAG1xFDDmBtZI6efoMvODozkyL2IlTCOisfS2KrqG0RXus6fkEVBIw08khE62aQY0ogMdEswqwYouwvQ8s+4M576m4Ae/tET/u1taEAAAAAElFTkSuQmCC"
           subtitle: "Pivot"
         R PaletteItemComponent,
           createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "CalendarChart", design: {} })
-          title: H.i className: "fa fa-calendar"
+          title: R 'i', className: "fa fa-calendar"
           subtitle: "Calendar"
         R PaletteItemComponent,
           createItem: @createBlockItem({ type: "widget", aspectRatio: 1.4, widgetType: "ImageMosaicChart", design: {} })
-          title: H.i className: "fa fa-th"
+          title: R 'i', className: "fa fa-th"
           subtitle: "Mosaic"
         R PaletteItemComponent,
           createItem: @createBlockItem({ type: "spacer", aspectRatio: 1.4 })
-          title: H.i className: "fa fa-square-o"
+          title: R 'i', className: "fa fa-square-o"
           subtitle: "Spacer"
         R PaletteItemComponent,
           createItem: @createBlockItem({ type: "widget", aspectRatio: 16.0/9.0, widgetType: "IFrame", design: {} })
-          title: H.i className: "fa fa-youtube-play"
+          title: R 'i', className: "fa fa-youtube-play"
           subtitle: "Video"
         R PaletteItemComponent,
           createItem: @createBlockItem({ type: "widget", widgetType: "TOC", design: { numbering: false, borderWeight: 2, header: "Contents" } })
-          title: H.i className: "fa fa-list-ol"
+          title: R 'i', className: "fa fa-list-ol"
           subtitle: "TOC"
 
 
   render: ->
     if @props.onItemsChange
-      return H.div style: { width: "100%", height: "100%", overflow: "hidden", position: "relative" }, 
+      return R 'div', style: { width: "100%", height: "100%", overflow: "hidden", position: "relative" }, 
         @renderPalette()
-        H.div style: { position: "absolute", left: 185, top: 0, bottom: 0, right: 0, overflow: "auto" }, className: "mwater-visualization-block-parent-outer mwater-visualization-block-parent-outer-#{@props.style or "default"} mwater-visualization-block-editing", 
-          H.div key: "inner", className: "mwater-visualization-block-parent-inner mwater-visualization-block-parent-inner-#{@props.style or "default"}",
+        R 'div', style: { position: "absolute", left: 185, top: 0, bottom: 0, right: 0, overflow: "auto" }, className: "mwater-visualization-block-parent-outer mwater-visualization-block-parent-outer-#{@props.style or "default"} mwater-visualization-block-editing", 
+          R 'div', key: "inner", className: "mwater-visualization-block-parent-inner mwater-visualization-block-parent-inner-#{@props.style or "default"}",
             @renderBlock(@props.items)
     else
-      return H.div style: { width: "100%", height: "100%", overflowX: "auto" }, className: "mwater-visualization-block-parent-outer mwater-visualization-block-parent-outer-#{@props.style or "default"} mwater-visualization-block-viewing",
-          H.div key: "inner", className: "mwater-visualization-block-parent-inner mwater-visualization-block-parent-inner-#{@props.style or "default"}",
+      return R 'div', style: { width: "100%", height: "100%", overflowX: "auto" }, className: "mwater-visualization-block-parent-outer mwater-visualization-block-parent-outer-#{@props.style or "default"} mwater-visualization-block-viewing",
+          R 'div', key: "inner", className: "mwater-visualization-block-parent-inner mwater-visualization-block-parent-inner-#{@props.style or "default"}",
             @renderBlock(@props.items)
 
 module.exports = NestableDragDropContext(HTML5Backend)(BlocksDisplayComponent)
@@ -218,7 +217,7 @@ class RootBlockComponent extends React.Component
     onBlockRemove: PropTypes.func # Called with (block) when block is removed
 
   render: ->
-    elem = H.div key: "root",
+    elem = R 'div', key: "root",
       _.map @props.block.blocks, (block) =>
         @props.renderBlock(block)
 
@@ -241,7 +240,7 @@ class VerticalBlockComponent extends React.Component
     onBlockRemove: PropTypes.func # Called with (block) when block is removed
 
   render: ->
-    H.div null,
+    R 'div', null,
       _.map @props.block.blocks, (block) =>
         @props.renderBlock(block)
 

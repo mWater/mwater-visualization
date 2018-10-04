@@ -1,7 +1,6 @@
 _ = require 'lodash'
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 ReactSelect = require 'react-select'
 ExprCompiler = require('mwater-expressions').ExprCompiler
@@ -91,7 +90,7 @@ module.exports = class TextLiteralComponent extends React.Component
       disabled: not @props.onChange?
 
   render: ->
-    H.div style: { width: "100%" },
+    R 'div', style: { width: "100%" },
       if @props.multi
         @renderMultiple()
       else

@@ -3,7 +3,6 @@ _ = require 'lodash'
 React = require 'react'
 ReactDOM = require 'react-dom'
 R = React.createElement
-H = React.DOM
 
 ExprUtils = require('mwater-expressions').ExprUtils
 LayeredChartCompiler = require './LayeredChartCompiler'
@@ -57,7 +56,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
     @props.onDesignChange(_.extend({}, @props.design, footer: footer))
 
   renderHeader: ->
-    return H.div ref: ((c) => @header = c),
+    return R 'div', ref: ((c) => @header = c),
       R TextComponent,
         design: @props.design.header
         onDesignChange: if @props.onDesignChange then @handleHeaderChange
@@ -68,7 +67,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
         standardWidth: @props.standardWidth
 
   renderFooter: ->
-    return H.div ref: ((c) => @footer = c),
+    return R 'div', ref: ((c) => @footer = c),
       R TextComponent,
         design: @props.design.footer
         onDesignChange: if @props.onDesignChange then @handleFooterChange
@@ -79,7 +78,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
         standardWidth: @props.standardWidth
 
   render: ->
-    H.div style: { width: @props.width, height: @props.height },
+    R 'div', style: { width: @props.width, height: @props.height },
       @renderHeader()
       if @state.headerHeight? and @state.footerHeight?
         R C3ChartComponent, 
@@ -290,6 +289,6 @@ class C3ChartComponent extends React.Component
     css += ".c3-chart-arc text { font-size: #{scale * 13}px; }\n"
     css += ".c3-title { font-size: #{scale * 14}px; }\n"
 
-    H.div null,
-      H.style null, css
-      H.div ref: (c) => @chartDiv = c
+    R 'div', null,
+      R 'style', null, css
+      R 'div', ref: (c) => @chartDiv = c

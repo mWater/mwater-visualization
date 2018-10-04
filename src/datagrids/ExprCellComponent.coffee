@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 moment = require 'moment'
 
@@ -34,7 +33,7 @@ module.exports = class ExprCellComponent extends React.Component
 
   renderImage: (id) ->
     url = @props.dataSource.getImageUrl(id)
-    return H.a(href: url, key: id, target: "_blank", style: { paddingLeft: 5, paddingRight: 5 }, "Image")
+    return R('a', href: url, key: id, target: "_blank", style: { paddingLeft: 5, paddingRight: 5 }, "Image")
 
   render: ->
     exprUtils = new ExprUtils(@props.schema)

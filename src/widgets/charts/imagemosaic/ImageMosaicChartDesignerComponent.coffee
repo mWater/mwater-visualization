@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 ui = require '../../../UIComponents'
@@ -30,9 +29,9 @@ module.exports = class ImageMosaicChartDesignerComponent extends React.Component
   handleImageAxisChange: (imageAxis) => @updateDesign(imageAxis: imageAxis)
 
   renderTable: ->
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.i(className: "fa fa-database")
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        R('i', className: "fa fa-database")
         " "
         "Data Source"
       ": "
@@ -45,21 +44,21 @@ module.exports = class ImageMosaicChartDesignerComponent extends React.Component
       }
 
   renderTitle: ->
-    H.div className: "form-group",
-      H.label className: "text-muted", "Title"
-      H.input type: "text", className: "form-control input-sm", value: @props.design.titleText, onChange: @handleTitleTextChange, placeholder: "Untitled"
+    R 'div', className: "form-group",
+      R 'label', className: "text-muted", "Title"
+      R 'input', type: "text", className: "form-control input-sm", value: @props.design.titleText, onChange: @handleTitleTextChange, placeholder: "Untitled"
 
   renderFilter: ->
     # If no table, hide
     if not @props.design.table
       return null
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.span(className: "glyphicon glyphicon-filter")
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        R('span', className: "glyphicon glyphicon-filter")
         " "
         "Filters"
-      H.div style: { marginLeft: 8 }, 
+      R 'div', style: { marginLeft: 8 }, 
         React.createElement(FilterExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
@@ -84,9 +83,9 @@ module.exports = class ImageMosaicChartDesignerComponent extends React.Component
         filters: @props.filters)
 
   render: ->
-    H.div null,
+    R 'div', null,
       @renderTable()
       @renderImageAxis()
       @renderFilter()
-      H.hr()
+      R('hr')
       @renderTitle()

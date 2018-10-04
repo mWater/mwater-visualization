@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 uuid = require 'uuid'
 
@@ -50,30 +49,30 @@ module.exports = class RangesComponent extends React.Component
     @props.onChange(update(@props.xform, { ranges: { $set: ranges }}))
 
   render: ->
-    H.div null,
-      H.table null,
+    R 'div', null,
+      R 'table', null,
         if @props.xform.ranges.length > 0
-          H.thead null,
-            H.tr null,
-              H.th null, " "
-              H.th key: "min", colSpan: 2, style: { textAlign: "center" }, "From"
-              H.th key: "and", ""
-              H.th key: "max", colSpan: 2, style: { textAlign: "center" }, "To"
-              H.th key: "label", colSpan: 1, style: { textAlign: "center" }, "Label"
-              H.th key: "remove"
+          R 'thead', null,
+            R 'tr', null,
+              R 'th', null, " "
+              R 'th', key: "min", colSpan: 2, style: { textAlign: "center" }, "From"
+              R 'th', key: "and", ""
+              R 'th', key: "max", colSpan: 2, style: { textAlign: "center" }, "To"
+              R 'th', key: "label", colSpan: 1, style: { textAlign: "center" }, "Label"
+              R 'th', key: "remove"
 
         React.createElement(ReorderableListComponent,
           items: @props.xform.ranges
           onReorder: @handleReorder
           renderItem: @renderRange
           getItemId: (range) => range.id
-          element: H.tbody null
+          element: R 'tbody', null
         )
 #          _.map @props.xform.ranges, (range, i) =>
 #            R RangeComponent, key: range.id, range: range, onChange: @handleRangeChange.bind(null, i), onRemove: @handleRemoveRange.bind(null, i)
 
-      H.button className: "btn btn-link btn-sm", type: "button", onClick: @handleAddRange,
-        H.span className: "glyphicon glyphicon-plus"
+      R 'button', className: "btn btn-link btn-sm", type: "button", onClick: @handleAddRange,
+        R 'span', className: "glyphicon glyphicon-plus"
         " Add Range"
 
 # Single range (row)
@@ -108,35 +107,35 @@ class RangeComponent extends React.Component
       else
         placeholder += "<= #{@props.range.maxValue}"
 
-    @props.connectDragPreview(@props.connectDropTarget(H.tr null,
-      H.td null,
-        @props.connectDragSource(H.span className: "fa fa-bars")
-      H.td key: "minOpen",
+    @props.connectDragPreview(@props.connectDropTarget(R 'tr', null,
+      R 'td', null,
+        @props.connectDragSource(R 'span', className: "fa fa-bars")
+      R 'td', key: "minOpen",
         R LinkComponent, 
           dropdownItems: [{ id: true, name: "greater than"}, { id: false, name: "greater than or equal to"}]
           onDropdownItemClicked: @handleMinOpenChange
           if @props.range.minOpen then "greater than" else "greater than or equal to"
 
-      H.td key: "minValue",
+      R 'td', key: "minValue",
         R NumberInputComponent, value: @props.range.minValue, placeholder: "None", small: true, onChange: (v) => @props.onChange(update(@props.range, { minValue: { $set: v }}))
 
-      H.td key: "and", "\u00A0and\u00A0"
+      R 'td', key: "and", "\u00A0and\u00A0"
 
-      H.td key: "maxOpen",
+      R 'td', key: "maxOpen",
         R LinkComponent, 
           dropdownItems: [{ id: true, name: "less than"}, { id: false, name: "less than or equal to"}]
           onDropdownItemClicked: @handleMaxOpenChange
           if @props.range.maxOpen then "less than" else "less than or equal to"
 
-      H.td key: "maxValue",
+      R 'td', key: "maxValue",
         R NumberInputComponent, value: @props.range.maxValue, placeholder: "None", small: true, onChange: (v) => @props.onChange(update(@props.range, { maxValue: { $set: v }}))
 
-      H.td key: "label",
-        H.input type: "text", className: "form-control input-sm", value: @props.range.label or "", placeholder: placeholder, onChange: (ev) => @props.onChange(update(@props.range, { label: { $set: ev.target.value or null }}))
+      R 'td', key: "label",
+        R 'input', type: "text", className: "form-control input-sm", value: @props.range.label or "", placeholder: placeholder, onChange: (ev) => @props.onChange(update(@props.range, { label: { $set: ev.target.value or null }}))
 
-      H.td key: "remove",
-        H.button className: "btn btn-xs btn-link", type: "button", onClick: @props.onRemove,
-          H.span className: "glyphicon glyphicon-remove"
+      R 'td', key: "remove",
+        R 'button', className: "btn btn-xs btn-link", type: "button", onClick: @props.onRemove,
+          R 'span', className: "glyphicon glyphicon-remove"
     ))
 
 

@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 TabbedComponent = require 'react-library/lib/TabbedComponent'
@@ -43,9 +42,9 @@ module.exports = class MapDesignerComponent extends React.Component
     @props.onDesignChange(MapUtils.convertToClusterMap(@props.design)) 
 
   renderOptionsTab: ->
-    H.div null,
-      H.div className: "form-group",
-        H.label className: "text-muted", 
+    R 'div', null,
+      R 'div', className: "form-group",
+        R 'label', className: "text-muted", 
           "Map Style"
   
         R BaseLayerDesignerComponent,
@@ -55,21 +54,21 @@ module.exports = class MapDesignerComponent extends React.Component
       R CheckboxComponent, 
         checked: @props.design.autoBounds
         onChange: @handleAutoBoundsChange,
-          H.span className: "text-muted", 
+          R 'span', className: "text-muted", 
             "Automatic zoom "
             R PopoverHelpComponent, placement: "left",
               '''Automatically zoom to the complete data whenever the map is loaded or the filters change'''
 
       if MapUtils.canConvertToClusterMap(@props.design)
-        H.div key: "tocluster",
-          H.a onClick: @handleConvertToClusterMap, className: "btn btn-link btn-sm",
+        R 'div', key: "tocluster",
+          R 'a', onClick: @handleConvertToClusterMap, className: "btn btn-link btn-sm",
             "Convert to cluster map"
 
       R AttributionComponent,
         text: @props.design.attribution
         onTextChange: @handleAttributionChange
 
-      H.br()
+      R('br')
       
       R AdvancedOptionsComponent, 
         design: @props.design
@@ -78,13 +77,13 @@ module.exports = class MapDesignerComponent extends React.Component
   render: ->
     filters = (@props.filters or []).concat(MapUtils.getCompiledFilters(@props.design, @props.schema, MapUtils.getFilterableTables(@props.design, @props.schema)))
 
-    H.div style: { padding: 5 },
+    R 'div', style: { padding: 5 },
       R TabbedComponent,
         initialTabId: "layers"
         tabs: [
           {
             id: "layers"
-            label: [H.i(className: "fa fa-bars"), " Layers"]
+            label: [R('i', className: "fa fa-bars"), " Layers"]
             elem: R MapLayersDesignerComponent, 
               schema: @props.schema
               dataSource: @props.dataSource
@@ -95,7 +94,7 @@ module.exports = class MapDesignerComponent extends React.Component
           }
           {
             id: "filters"
-            label: [H.i(className: "fa fa-filter"), " Filters"]
+            label: [R('i', className: "fa fa-filter"), " Filters"]
             elem: R MapFiltersDesignerComponent, 
               schema: @props.schema
               dataSource: @props.dataSource
@@ -104,7 +103,7 @@ module.exports = class MapDesignerComponent extends React.Component
           }
           {
             id: "options"
-            label: [H.i(className: "fa fa-cog"), " Options"]
+            label: [R('i', className: "fa fa-cog"), " Options"]
             elem: @renderOptionsTab()
           }
         ]
@@ -134,26 +133,26 @@ class AttributionComponent extends React.Component
 
   renderEditor: ->
     R ClickOutHandler, onClickOut: @handleClickOut,
-      H.input { onChange: @handleTextChange, value: @props.text, className: 'form-control'}
+      R 'input', { onChange: @handleTextChange, value: @props.text, className: 'form-control'}
 
   handleTextClick: =>
     @setState(editing: true)
 
   render: ->
-    elem = H.div style: { marginLeft: 5 }, 
+    elem = R 'div', style: { marginLeft: 5 }, 
       if @state.editing
         @renderEditor()
       else
         if @props.text
-          H.span onClick: @handleTextClick, style: { cursor: "pointer" },
+          R 'span', onClick: @handleTextClick, style: { cursor: "pointer" },
             @props.text
         else
-          H.a onClick: @handleTextClick, className: "btn btn-link btn-sm",
+          R 'a', onClick: @handleTextClick, className: "btn btn-link btn-sm",
             "+ Add attribution"
 
     if @props.text or @state.editing
-      elem = H.div className: "form-group",
-        H.label className: "text-muted",
+      elem = R 'div', className: "form-group",
+        R 'label', className: "text-muted",
           "Attribution"
         elem
 
@@ -174,15 +173,15 @@ class AdvancedOptionsComponent extends React.Component
 
   render: ->
     if not @state.expanded
-      return H.div null,
-        H.a className: "btn btn-link btn-xs", onClick: (=> @setState(expanded: true)),
+      return R 'div', null,
+        R 'a', className: "btn btn-link btn-xs", onClick: (=> @setState(expanded: true)),
           "Advanced options..."
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", "Advanced"
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", "Advanced"
 
-      H.div null,
-        H.span className: "text-muted", "Maximum Zoom Level: "
+      R 'div', null,
+        R 'span', className: "text-muted", "Maximum Zoom Level: "
         " "
         R NumberInputComponent, 
           small: true

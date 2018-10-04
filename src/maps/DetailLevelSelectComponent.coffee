@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 ReactSelect = require 'react-select'
@@ -85,6 +84,6 @@ module.exports = class DetailLevelSelectComponent extends React.Component
         onChange: (value) => @props.onChange(parseInt(value))
       }
     else
-      H.div className: "text-muted",
-        H.i className: "fa fa-spinner fa-spin"
+      R 'div', className: "text-muted",
+        R 'i', className: "fa fa-spinner fa-spin"
         " Loading..."

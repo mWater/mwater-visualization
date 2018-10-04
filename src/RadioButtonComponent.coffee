@@ -1,6 +1,6 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
+R = React.createElement
 
 # Pretty radio button component
 module.exports = class RadioButtonComponent extends React.Component
@@ -16,7 +16,7 @@ module.exports = class RadioButtonComponent extends React.Component
       @props.onClick()
 
   render: ->
-    H.div 
+    R 'div', 
       className: (if @props.checked then "mwater-visualization-radio checked" else "mwater-visualization-radio")
       onClick: @handleClick,
         @props.children

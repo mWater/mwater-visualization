@@ -1,7 +1,7 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
+R = React.createElement
 moment = require 'moment'
 
 AxisBuilder = require '../../../axes/AxisBuilder'
@@ -238,7 +238,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
 
     title = @props.design.titleText
 
-    H.div style: style,
+    R 'div', style: style,
       if title
-        H.p {style: titleStyle, ref: (c) => @title = c}, title,
-      H.div { ref: (c) => @chart_container = c }
+        R 'p', {style: titleStyle, ref: (c) => @title = c}, title,
+      R 'div', { ref: (c) => @chart_container = c }

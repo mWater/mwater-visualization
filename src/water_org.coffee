@@ -4,7 +4,6 @@ visualization = require './index'
 jsyaml = require 'js-yaml'
 TabbedComponent = require('react-library/lib/TabbedComponent')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 # Pass in:
@@ -117,12 +116,12 @@ class TabbedDashboard extends React.Component
         widgetFactory: @props.widgetFactory,
         onDesignChange: @handleDesignChange.bind(null, index)
         extraTitleButtonsElem: [
-          H.a key: "renametab", className: "btn btn-link btn-sm", onClick: @handleRenameTab.bind(null, index),
-            H.span className: "glyphicon glyphicon-pencil"
+          R 'a', key: "renametab", className: "btn btn-link btn-sm", onClick: @handleRenameTab.bind(null, index),
+            R 'span', className: "glyphicon glyphicon-pencil"
             " Rename Tab"
           " "
-          H.a key: "removetab", className: "btn btn-link btn-sm", onClick: @handleRemoveTab.bind(null, index),
-            H.span className: "glyphicon glyphicon-remove"
+          R 'a', key: "removetab", className: "btn btn-link btn-sm", onClick: @handleRemoveTab.bind(null, index),
+            R 'span', className: "glyphicon glyphicon-remove"
             " Remove Tab"
         ]
       })

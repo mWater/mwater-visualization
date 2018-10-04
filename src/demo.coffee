@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 React = require 'react'
 ReactDOM = require 'react-dom'
-H = React.DOM
 R = React.createElement
 querystring = require 'querystring'
 
@@ -28,8 +27,8 @@ RichTextComponent = require './richtext/RichTextComponent'
 ItemsHtmlConverter = require './richtext/ItemsHtmlConverter'
 
 $ ->
-  sample = H.div className: "container-fluid", style: { height: "100%", paddingLeft: 0, paddingRight: 0 },
-    H.style null, '''html, body, #main { height: 100% }'''
+  sample = R 'div', className: "container-fluid", style: { height: "100%", paddingLeft: 0, paddingRight: 0 },
+    R 'style', null, '''html, body, #main { height: 100% }'''
     # React.createElement(RichTextPane)
     # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
     # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "a855eb0587d845d3ac27aed03c463976", share: "817c76088c7649ec8cc0b8193e547a09")
@@ -62,11 +61,11 @@ class RichTextPane extends React.Component
     @editor.pasteHTML("x")
 
   renderExtraButtons: ->
-    H.div key: "x", className: "mwater-visualization-text-palette-item", onMouseDown: @handleInsert,
+    R 'div', key: "x", className: "mwater-visualization-text-palette-item", onMouseDown: @handleInsert,
       "x"
 
   render: ->
-    H.div style: { paddingTop: 100 },
+    R 'div', style: { paddingTop: 100 },
       R RichTextComponent,
         ref: (c) => @editor = c
         items: @state.items
@@ -95,7 +94,7 @@ class MWaterDashboardPane extends React.Component
     
   render: ->
     if not @state.design
-      return H.div null, "Loading..."
+      return R 'div', null, "Loading..."
 
     return React.createElement(MWaterLoaderComponent, {
       apiUrl: @props.apiUrl
@@ -106,14 +105,14 @@ class MWaterDashboardPane extends React.Component
       extraTables: @state.extraTables
     }, (error, config) =>
       if error
-        return H.div null, "Error: #{error.message}"
+        return R 'div', null, "Error: #{error.message}"
 
       dashboardDataSource = new ServerDashboardDataSource({
         apiUrl: @props.apiUrl, client: @props.client, share: @props.share, dashboardId: @props.dashboardId, dataSource: config.dataSource
         })
       # dashboardDataSource = new DirectDashboardDataSource(@props.apiUrl, @props.client, @state.design, config.schema, config.dataSource)
 
-      H.div style: { height: "100%" },
+      R 'div', style: { height: "100%" },
         React.createElement(visualization.DashboardComponent, {
           schema: config.schema
           dataSource: config.dataSource
@@ -166,7 +165,7 @@ class MWaterDirectDashboardPane extends React.Component
         dataSource: config.dataSource
       })
 
-      H.div style: { height: "100%" },
+      R 'div', style: { height: "100%" },
         React.createElement(visualization.DashboardComponent, {
           schema: config.schema
           dataSource: config.dataSource
@@ -206,7 +205,7 @@ class MWaterMapPane extends React.Component
 
   render: ->
     if not @state.design
-      return H.div null, "Loading..."
+      return R 'div', null, "Loading..."
 
     React.createElement(MWaterLoaderComponent, {
       apiUrl: @props.apiUrl
@@ -220,7 +219,7 @@ class MWaterMapPane extends React.Component
 #      mapDataSource = new DirectMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
       mapDataSource = new ServerMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, mapId: mapId, design: @state.design })
 
-      H.div style: { height: "100%" },
+      R 'div', style: { height: "100%" },
         React.createElement(visualization.MapComponent, {
           schema: config.schema
           dataSource: config.dataSource
@@ -261,7 +260,7 @@ class MWaterDirectMapPane extends React.Component
       # Create map url source
       mapDataSource = new DirectMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, dataSource: config.dataSource, design: @state.design })
 
-      H.div style: { height: "100%" },
+      R 'div', style: { height: "100%" },
         React.createElement(visualization.MapComponent, {
           schema: config.schema
           dataSource: config.dataSource
@@ -296,7 +295,7 @@ class MWaterDatagridPane extends React.Component
     }, (error, config) =>
       datagridDataSource = new DirectDatagridDataSource(schema: config.schema, dataSource: config.dataSource)
 
-      H.div style: { height: "100%" },
+      R 'div', style: { height: "100%" },
         R visualization.DatagridComponent, 
           schema: config.schema
           dataSource: config.dataSource
@@ -339,7 +338,7 @@ class WaterOrgDashboardPane extends React.Component
 
   render: ->
     if not @state.schema
-      return H.div null, "Loading..."
+      return R 'div', null, "Loading..."
 
     dashboardDataSource = new DirectDashboardDataSource({
       apiUrl: @props.apiUrl
@@ -348,7 +347,7 @@ class WaterOrgDashboardPane extends React.Component
       dataSource: @state.dataSource
     })
 
-    H.div style: { height: "100%" },
+    R 'div', style: { height: "100%" },
       React.createElement(visualization.DashboardComponent, {
         schema: @state.schema
         dataSource: @state.dataSource
@@ -2165,7 +2164,7 @@ oldDashboardDesign = {
 
 #   render: ->
 #     if not @state.widgetFactory
-#       return H.div null, "Loading..."
+#       return R 'div', null, "Loading..."
 
 #     React.createElement(LayeredChartDesignerComponent, 
 #       design: @state.design
@@ -2303,9 +2302,9 @@ rosterDatagridDesign = {
 
 #   render: ->
 #     if not @state.widgetFactory
-#       return H.div null, "Loading..."
+#       return R 'div', null, "Loading..."
 
-#     return H.div style: { height: "100%" },
+#     return R 'div', style: { height: "100%" },
 #       React.createElement(visualization.DashboardComponent, {
 #         design: @state.design
 #         widgetFactory: @state.widgetFactory

@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 ExprUtils = require("mwater-expressions").ExprUtils

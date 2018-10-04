@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 ColorSchemeFactory = require '../ColorSchemeFactory'
@@ -96,12 +95,12 @@ module.exports = class ColorPaletteCollectionComponent extends React.Component
 
   renderCancel: =>
     if @props.axis.colorMap
-      H.div null,
-        H.a style: { cursor: "pointer" }, onClick: @props.onCancel, key: "cancel-customize", "Cancel"
+      R 'div', null,
+        R 'a', style: { cursor: "pointer" }, onClick: @props.onCancel, key: "cancel-customize", "Cancel"
 
   render: ->
-    H.div null,
-      H.p null, "Please select a color scheme"
+    R 'div', null,
+      R 'p', null, "Please select a color scheme"
       _.map ColorPaletteCollectionComponent.palettes, (config, index) =>
         R ColorPaletteComponent,
           key: index
@@ -125,11 +124,11 @@ class ColorPaletteComponent extends React.Component
     @props.onPaletteSelected(@props.index)
 
   render: ->
-    H.div onClick: @handleSelect ,className: "axis-palette",
+    R 'div', onClick: @handleSelect ,className: "axis-palette",
       _.map @props.colorSet.slice(0,@props.number), (color, i) =>
         cellStyle =
           display: 'inline-block'
           height: 20
           width: 20
           backgroundColor: color
-        H.div style: cellStyle, key: i, " "
+        R 'div', style: cellStyle, key: i, " "

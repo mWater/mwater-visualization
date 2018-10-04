@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 _ = require 'lodash'
 
@@ -27,7 +26,7 @@ module.exports = class FontSizePaletteItem extends React.Component
     @setState(open: not @state.open)
 
   renderSize: (label, value) ->
-    H.div 
+    R 'div', 
       className: "font-size-palette-menu-item"
       onMouseDown: (ev) => 
         ev.preventDefault()
@@ -37,7 +36,7 @@ module.exports = class FontSizePaletteItem extends React.Component
         label
 
   renderSizes: ->
-    H.div null,
+    R 'div', null,
       @renderSize("Tiny", "50%")
       @renderSize("Small", "66%")
       @renderSize("Normal", "100%")
@@ -60,11 +59,11 @@ module.exports = class FontSizePaletteItem extends React.Component
       popupPosition['bottom'] = 26
 
     R ClickOutHandler, onClickOut: (=> @setState(open: false)),
-      H.div 
+      R 'div', 
         className: "mwater-visualization-text-palette-item"
         onMouseDown: @handleMouseDown
         style: { position: "relative" },
-          H.style null, '''
+          R 'style', null, '''
           .font-size-palette-menu-item {
             color: black;
             background-color: white;
@@ -77,10 +76,10 @@ module.exports = class FontSizePaletteItem extends React.Component
           }
           '''
           if @state.open
-            H.div style: popupPosition,
+            R 'div', style: popupPosition,
               @renderSizes()
 
-          H.i className: "fa fa-arrows-v"
+          R 'i', className: "fa fa-arrows-v"
 
 
 class ColorPaletteComponent extends React.Component
@@ -88,8 +87,8 @@ class ColorPaletteComponent extends React.Component
     onSetColor: PropTypes.func.isRequired
 
   renderColor: (color) ->
-    H.td null,
-      H.div 
+    R 'td', null,
+      R 'div', 
         style: { width: 16, height: 15, backgroundColor: color, margin: 1 }
         onMouseDown: (ev) =>
           ev.preventDefault()
@@ -106,27 +105,27 @@ class ColorPaletteComponent extends React.Component
       "#9900FF" # purple
       "#FF00FF" # magenta
     ]
-    H.div style: { padding: 5 },
-      H.table null,
-        H.tbody null,
+    R 'div', style: { padding: 5 },
+      R 'table', null,
+        R 'tbody', null,
           # Grey shades
-          H.tr null,
+          R 'tr', null,
             _.map _.range(0, 8), (i) =>
               @renderColor(Color(r: i * 255 / 7, g: i * 255 / 7, b: i * 255 / 7).hex())
-          H.tr style: { height: 5 }
+          R 'tr', style: { height: 5 }
           # Base colors
-          H.tr null,
+          R 'tr', null,
             _.map baseColors, (c) => @renderColor(c)
-          H.tr style: { height: 5 }
-          H.tr null,
+          R 'tr', style: { height: 5 }
+          R 'tr', null,
             _.map baseColors, (c) => @renderColor(Color(c).lighten(0.7).hex())
-          H.tr null,
+          R 'tr', null,
             _.map baseColors, (c) => @renderColor(Color(c).lighten(0.5).hex())
-          H.tr null,
+          R 'tr', null,
             _.map baseColors, (c) => @renderColor(Color(c).lighten(0.3).hex())
-          H.tr null,
+          R 'tr', null,
             _.map baseColors, (c) => @renderColor(Color(c).darken(0.3).hex())
-          H.tr null,
+          R 'tr', null,
             _.map baseColors, (c) => @renderColor(Color(c).darken(0.5).hex())
-          H.tr null,
+          R 'tr', null,
             _.map baseColors, (c) => @renderColor(Color(c).darken(0.7).hex())

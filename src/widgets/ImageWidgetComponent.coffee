@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 _ = require 'lodash'
 classNames = require('classnames')
@@ -51,8 +50,8 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
   # Render a link to start editing
   renderEditLink: ->
-    H.div className: "mwater-visualization-widget-placeholder", onClick: @handleStartEditing, 
-      H.i className: "icon fa fa-image"
+    R 'div', className: "mwater-visualization-widget-placeholder", onClick: @handleStartEditing, 
+      R 'i', className: "icon fa fa-image"
 
   renderEditor: ->
     R ImageWidgetDesignComponent,
@@ -65,7 +64,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
   renderExpression: ->
     if @state.loading
-      H.span null, "Loading"
+      R 'span', null, "Loading"
     else if @state.data
       # Make into array if not
       if not _.isArray(@state.data)
@@ -117,13 +116,13 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
         if not @props.design.imageUrl and not @props.design.expr and not @props.design.uid and @props.onDesignChange
           @renderEditLink()
         else
-          H.div className: "mwater-visualization-image-widget", style: { position: "relative", width: @props.width, height: @props.height },
+          R 'div', className: "mwater-visualization-image-widget", style: { position: "relative", width: @props.width, height: @props.height },
             if captionPosition == "top"
-              H.div className: "caption", @props.design.caption
-            H.div className: "image",
+              R 'div', className: "caption", @props.design.caption
+            R 'div', className: "image",
               @renderContent()
             if captionPosition == "bottom"
-              H.div className: "caption", @props.design.caption
+              R 'div', className: "caption", @props.design.caption
   
 class ImageWidgetDesignComponent extends React.Component
   @propTypes: 
@@ -179,7 +178,7 @@ class ImageWidgetDesignComponent extends React.Component
     @setState(imageUrl: e.target.value, uid: null, expr: null)
 
   renderUploadEditor: ->
-    H.div null,
+    R 'div', null,
       R ImageUploaderComponent,
         dataSource: @props.dataSource
         onUpload: @handleFileUpload
@@ -214,18 +213,18 @@ class ImageWidgetDesignComponent extends React.Component
     @setState(editing: false, imageUrl: null, uid: null, expr: null, table: null, files: null, uploading: false, captionPosition: null)
 
   renderExpressionEditor: ->
-    H.div className: "form-group",
-      H.label className: "text-muted",
-        H.i(className: "fa fa-database")
+    R 'div', className: "form-group",
+      R 'label', className: "text-muted",
+        R('i', className: "fa fa-database")
         " "
         "Data Source"
       ": "
       R(TableSelectComponent, { schema: @props.schema, value: @state.table, onChange: @handleTableChange })
-      H.br()
+      R('br')
 
       if @state.table
-        H.div className: "form-group",
-          H.label className: "text-muted",
+        R 'div', className: "form-group",
+          R 'label', className: "text-muted",
             "Field"
           ": "
           R ExprComponent,
@@ -238,7 +237,7 @@ class ImageWidgetDesignComponent extends React.Component
             onChange: @handleExpressionChange
 
   renderRotation: ->
-    H.div style: { paddingTop: 10 }, 
+    R 'div', style: { paddingTop: 10 }, 
       "Rotation: "
       R ui.Radio, value: @state.rotation or null, radioValue: null, onChange: @handleRotationChange, inline: true, "0 degrees"
       R ui.Radio, value: @state.rotation or null, radioValue: 90, onChange: @handleRotationChange, inline: true, "90 degrees"
@@ -246,10 +245,10 @@ class ImageWidgetDesignComponent extends React.Component
       R ui.Radio, value: @state.rotation or null, radioValue: 270, onChange: @handleRotationChange, inline: true, "270 degrees"
 
   renderUrlEditor: ->
-    H.div className: "form-group",
-      H.label null, "URL of image"
-      H.input type: "text", className: "form-control", value: @state.imageUrl or "", onChange: @handleUrlChange
-      H.p className: "help-block",
+    R 'div', className: "form-group",
+      R 'label', null, "URL of image"
+      R 'input', type: "text", className: "form-control", value: @state.imageUrl or "", onChange: @handleUrlChange
+      R 'p', className: "help-block",
         'e.g. http://somesite.com/image.jpg'
       @renderRotation()
 
@@ -257,14 +256,14 @@ class ImageWidgetDesignComponent extends React.Component
     if not @state.editing
       return null
 
-    content = H.div null,
-      H.div className: "form-group",
-        H.label null, "Caption"
-        H.input type: "text", className: "form-control", value: @state.caption or "", onChange: @handleCaptionChange, placeholder: "Optional caption to display below image"
+    content = R 'div', null,
+      R 'div', className: "form-group",
+        R 'label', null, "Caption"
+        R 'input', type: "text", className: "form-control", value: @state.caption or "", onChange: @handleCaptionChange, placeholder: "Optional caption to display below image"
 
       if @state.caption
-        H.div className: "form-group",
-          H.label null, "Caption position"
+        R 'div', className: "form-group",
+          R 'label', null, "Caption position"
           R ui.Select, 
             options: [{ value: "bottom", label: "Bottom" }, { value: "top", label: "Top" }]
             value: @state.captionPosition
@@ -279,9 +278,9 @@ class ImageWidgetDesignComponent extends React.Component
         initialTabId: @state.currentTab
 
     footer =
-      H.div null,
-        H.button(key: "save", type: "button", className: "btn btn-primary", onClick: @handleSave, "Save")
-        H.button(key: "cancel", type: "button", className: "btn btn-default", onClick: @handleCancel, "Cancel")
+      R 'div', null,
+        R('button', key: "save", type: "button", className: "btn btn-primary", onClick: @handleSave, "Save")
+        R('button', key: "cancel", type: "button", className: "btn btn-default", onClick: @handleCancel, "Cancel")
 
     return R ModalPopupComponent,
       header: "Image"
@@ -319,10 +318,10 @@ class RotatedImageComponent extends React.Component
         if @props.rotation == 90 or @props.rotation == 270
           imageStyle.width = size.height
 
-        return H.span 
+        return R 'span', 
           className: "rotated-image-container"
           style: containerStyle,
-            H.img
+            R 'img',
               src: @props.url
               style: imageStyle
               className: classes

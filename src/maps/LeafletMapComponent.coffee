@@ -2,7 +2,7 @@ PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 ReactDOM = require 'react-dom'
-H = React.DOM
+R = React.createElement
 L = require 'leaflet'
 BingLayer = require './BingLayer'
 UtfGridLayer = require './UtfGridLayer'
@@ -326,10 +326,10 @@ module.exports = class LeafletMapComponent extends React.Component
                   layer.onGridHover(ev)
 
   render: ->
-    H.div null,
+    R 'div', null,
       if @props.legend and @loaded
         # Inject zoom
         React.cloneElement(@props.legend, zoom: @map.getZoom())
-      H.div 
+      R 'div', 
         ref: (c) => @mapElem = c, 
         style: { width: @props.width, height: @props.height }

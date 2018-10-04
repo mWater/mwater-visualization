@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 moment = require 'moment'
 
@@ -227,7 +226,7 @@ module.exports = class DatagridViewComponent extends React.Component
       _.defer () =>
         @loadMoreRows()
       return R Cell, cellProps,
-        H.i className: "fa fa-spinner fa-spin"
+        R 'i', className: "fa fa-spinner fa-spin"
 
     # Special case for row number
     if columnIndex == -1
@@ -248,7 +247,7 @@ module.exports = class DatagridViewComponent extends React.Component
       # Special if saving
       if @state.savingCell
         return R Cell, cellProps,
-          H.i className: "fa fa-spinner fa-spin"
+          R 'i', className: "fa fa-spinner fa-spin"
 
       return R EditExprCellComponent, 
         ref: @refEditCell

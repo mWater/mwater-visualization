@@ -1,6 +1,6 @@
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
+R = React.createElement
 
 Layer = require './Layer'
 ExprCompiler = require('mwater-expressions').ExprCompiler

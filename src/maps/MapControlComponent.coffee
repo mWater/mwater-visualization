@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 MapLayersDesignerComponent = require './MapLayersDesignerComponent'
@@ -15,7 +14,7 @@ module.exports = class MapControlComponent extends React.Component
     onDesignChange: PropTypes.func.isRequired # Called with new design
 
   render: ->
-    H.div style: { padding: 5 },
+    R 'div', style: { padding: 5 },
       R MapLayersDesignerComponent, 
         schema: @props.schema
         dataSource: @props.dataSource
@@ -23,10 +22,10 @@ module.exports = class MapControlComponent extends React.Component
         onDesignChange: @props.onDesignChange
         allowEditingLayers: false
 
-      H.br()
+      R('br')
 
-      H.div className: "form-group",
-        H.label className: "text-muted", 
+      R 'div', className: "form-group",
+        R 'label', className: "text-muted", 
           "Map Style"
   
         R BaseLayerDesignerComponent,

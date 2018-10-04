@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 ExprUtils = require("mwater-expressions").ExprUtils
@@ -35,7 +34,7 @@ module.exports = class OrderBysDesignerComponent extends React.Component
     @props.onChange(orderBys)
 
   render: ->
-    H.div null,
+    R 'div', null,
       _.map @props.orderBys, (orderBy, index) =>
         R OrderByDesignerComponent, 
           key: index
@@ -46,12 +45,12 @@ module.exports = class OrderBysDesignerComponent extends React.Component
           onChange: @handleChange.bind(null, index)
           onRemove: @handleRemove.bind(null, index)
 
-      H.button
+      R 'button',
         key: "add"
         type: "button"
         className: "btn btn-link"
         onClick: @handleAdd,
-          H.span className: "glyphicon glyphicon-plus"
+          R 'span', className: "glyphicon glyphicon-plus"
           " Add Ordering"
 
 class OrderByDesignerComponent extends React.Component
@@ -70,8 +69,8 @@ class OrderByDesignerComponent extends React.Component
     @props.onChange(_.extend({}, @props.orderBy, direction: if ev.target.checked then "desc" else "asc"))
 
   render: ->
-    H.div className: "row",
-      H.div className: "col-xs-7",
+    R 'div', className: "row",
+      R 'div', className: "col-xs-7",
         R ExprComponent,
           schema: @props.schema
           dataSource: @props.dataSource
@@ -80,11 +79,11 @@ class OrderByDesignerComponent extends React.Component
           aggrStatuses: ["individual", "literal", "aggregate"]
           value: @props.orderBy.expr
           onChange: @handleExprChange
-      H.div className: "col-xs-3",
-        H.div className: "checkbox-inline",
-          H.label null,
-            H.input type: "checkbox", checked: @props.orderBy.direction == "desc", onChange: @handleDirectionChange
+      R 'div', className: "col-xs-3",
+        R 'div', className: "checkbox-inline",
+          R 'label', null,
+            R 'input', type: "checkbox", checked: @props.orderBy.direction == "desc", onChange: @handleDirectionChange
             "Reverse"
-      H.div className: "col-xs-1",
-        H.button className: "btn btn-xs btn-link", type: "button", onClick: @props.onRemove,
-          H.span className: "glyphicon glyphicon-remove"
+      R 'div', className: "col-xs-1",
+        R 'button', className: "btn btn-xs btn-link", type: "button", onClick: @props.onRemove,
+          R 'span', className: "glyphicon glyphicon-remove"

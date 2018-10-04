@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 _ = require 'lodash'
 
@@ -77,8 +76,8 @@ module.exports = class TextComponent extends React.Component
     @exprInsertModal.open()
 
   renderExtraPaletteButtons: ->
-    H.div key: "expr", className: "mwater-visualization-text-palette-item", onMouseDown: @handleAddExpr,
-      H.i className: "fa fa-plus"
+    R 'div', key: "expr", className: "mwater-visualization-text-palette-item", onMouseDown: @handleAddExpr,
+      R 'i', className: "fa fa-plus"
       " Field"
 
   renderModals: ->
@@ -102,7 +101,7 @@ module.exports = class TextComponent extends React.Component
       style.width = @props.width
       style.height = @props.height
 
-    return H.div null,
+    return R 'div', null,
       @renderModals()
       R RichTextComponent,
         ref: (c) => @editor = c

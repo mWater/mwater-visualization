@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 ModalWindowComponent = require 'react-library/lib/ModalWindowComponent'
@@ -37,14 +36,14 @@ module.exports = class EditPopupComponent extends React.Component
     @props.onDesignChange(design)
 
   render: ->
-    H.div null, 
-      H.a className: "btn btn-link", onClick: (=> @setState(editing: true)),
-        H.i className: "fa fa-pencil"
+    R 'div', null, 
+      R 'a', className: "btn btn-link", onClick: (=> @setState(editing: true)),
+        R 'i', className: "fa fa-pencil"
         " Customize Popup"
 
       if @props.design.popup
-        H.a className: "btn btn-link", onClick: @handleRemovePopup,
-          H.i className: "fa fa-times"
+        R 'a', className: "btn btn-link", onClick: @handleRemovePopup,
+          R 'i', className: "fa fa-times"
           " Remove Popup"
 
       if @props.design.popup

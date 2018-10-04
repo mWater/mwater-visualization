@@ -1,7 +1,7 @@
 PropTypes = require('prop-types')
 React = require 'react'
 ReactDOM = require 'react-dom'
-H = React.DOM
+R = React.createElement
 _ = require 'lodash'
 
 # Lays out divs vertically, allowing fractional allocation combined with auto-sized ones
@@ -43,7 +43,7 @@ module.exports = class VerticalLayoutComponent extends React.Component
 
   render: ->
     # Calculate scaling
-    H.div style: { height: @props.height }, 
+    R 'div', style: { height: @props.height }, 
       React.Children.map(@props.children, (child) =>
         if not child
           return
@@ -53,14 +53,14 @@ module.exports = class VerticalLayoutComponent extends React.Component
           # If available height is known, render variable
           if @state.availableHeight
             height = @state.availableHeight * @props.relativeHeights[child.key]
-            return H.div style: { height: height, position: "relative" },
-              H.div 
+            return R 'div', style: { height: height, position: "relative" },
+              R 'div', 
                 style: { height: height }, 
                 ref: ((c) => @childRefs[child.key] = c),
                 React.cloneElement(child, { height: height })
           # Otherwise don't show until available height is known
           return null
-        return H.div ref: ((c) => @childRefs[child.key] = c),
+        return R 'div', ref: ((c) => @childRefs[child.key] = c),
           child
         )
 

@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 RegionSelectComponent = require './RegionSelectComponent'
@@ -28,14 +27,14 @@ module.exports = class AdminScopeAndDetailLevelComponent extends React.Component
     @props.onScopeAndDetailLevelChange(@props.scope, @props.scopeLevel, detailLevel)
 
   render: ->
-    H.div null,
-      H.div className: "form-group",
-        H.label className: "text-muted", 
+    R 'div', null,
+      R 'div', className: "form-group",
+        R 'label', className: "text-muted", 
           "Region to Map"
         R RegionSelectComponent, region: @props.scope, onChange: @handleScopeChange, schema: @props.schema, dataSource: @props.dataSource
       if @props.scope? and @props.detailLevel?
-        H.div className: "form-group",
-          H.label className: "text-muted", 
+        R 'div', className: "form-group",
+          R 'label', className: "text-muted", 
             "Detail Level"
           R DetailLevelSelectComponent, 
             scope: @props.scope
@@ -46,8 +45,8 @@ module.exports = class AdminScopeAndDetailLevelComponent extends React.Component
             dataSource: @props.dataSource
       else if not @props.scope? and @props.detailLevel?
         # Case of whole world. Allow selecting country or admin level 1
-        H.div className: "form-group",
-          H.label className: "text-muted", 
+        R 'div', className: "form-group",
+          R 'label', className: "text-muted", 
             "Detail Level"
           R ReactSelect, {
             value: @props.detailLevel

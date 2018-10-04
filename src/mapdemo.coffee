@@ -1,6 +1,6 @@
 # React = require 'react'
 # ReactDOM = require 'react-dom'
-# H = React.DOM
+# R = React.createElement
 # visualization_mwater = require './systems/mwater'
 # visualization = require './index'
 # uuid = require 'uuid'
@@ -27,10 +27,10 @@
     
 #   render: ->
 #     if not @state.schema
-#       return H.div null, "Loading..."
+#       return R 'div', null, "Loading..."
 
-#     return H.div style: { height: "100%" },
-#       H.style null, '''html, body { height: 100% }'''
+#     return R 'div', style: { height: "100%" },
+#       R 'style', null, '''html, body { height: 100% }'''
 #       React.createElement(visualization.MapComponent, {
 #         layerFactory: @state.layerFactory
 #         schema: @state.schema

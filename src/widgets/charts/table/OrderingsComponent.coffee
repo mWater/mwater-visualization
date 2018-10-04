@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 ExprComponent = require("mwater-expressions-ui").ExprComponent
@@ -33,7 +32,7 @@ module.exports = class OrderingsComponent extends React.Component
     @props.onOrderingsChange(orderings)
 
   render: ->
-    H.div null,
+    R 'div', null,
       _.map @props.orderings, (ordering, i) => 
         R(OrderingComponent, 
           schema: @props.schema
@@ -43,8 +42,8 @@ module.exports = class OrderingsComponent extends React.Component
           onOrderingChange: @handleOrderingChange.bind(null, i)
           onOrderingRemove: @handleOrderingRemove.bind(null, i))
 
-      H.button type: "button", className: "btn btn-sm btn-default", onClick: @handleAdd, key: "add",
-        H.span className: "glyphicon glyphicon-plus"
+      R 'button', type: "button", className: "btn btn-sm btn-default", onClick: @handleAdd, key: "add",
+        R 'span', className: "glyphicon glyphicon-plus"
         " Add Ordering"
 
 class OrderingComponent extends React.Component
@@ -67,10 +66,10 @@ class OrderingComponent extends React.Component
     @props.onOrderingChange(_.extend({}, @props.ordering, direction: if ev.target.checked then "desc" else "asc"))
 
   render: ->
-    H.div style: { marginLeft: 5 },
-      H.div style: { textAlign: "right" },
-        H.button className: "btn btn-xs btn-link", type: "button", onClick: @props.onOrderingRemove,
-          H.span className: "glyphicon glyphicon-remove"
+    R 'div', style: { marginLeft: 5 },
+      R 'div', style: { textAlign: "right" },
+        R 'button', className: "btn btn-xs btn-link", type: "button", onClick: @props.onOrderingRemove,
+          R 'span', className: "glyphicon glyphicon-remove"
       R ExprComponent,
         schema: @props.schema
         dataSource: @props.dataSource
@@ -79,8 +78,8 @@ class OrderingComponent extends React.Component
         aggrStatuses: ['individual', 'aggregate']
         value: @props.ordering.axis?.expr
         onChange: @handleExprChange
-      H.div null, 
-        H.div className: "checkbox-inline",
-          H.label null,
-            H.input type: "checkbox", checked: @props.ordering.direction == "desc", onChange: @handleDirectionChange
+      R 'div', null, 
+        R 'div', className: "checkbox-inline",
+          R 'label', null,
+            R 'input', type: "checkbox", checked: @props.ordering.direction == "desc", onChange: @handleDirectionChange
             "Reverse"

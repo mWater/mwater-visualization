@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 _ = require 'lodash'
 
@@ -76,7 +75,7 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
     # If loading, don't display old values
     exprValues = if not @state.loading then @state.exprValues else {}
 
-    H.div 
+    R 'div', 
       ref: ((c) => @divComp = c),
         R TextComponent,
           design: @props.design

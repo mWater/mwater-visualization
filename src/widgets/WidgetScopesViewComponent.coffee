@@ -1,6 +1,6 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
+R = React.createElement
 
 # Shows widget scopes
 module.exports = class WidgetScopesViewComponent extends React.Component
@@ -24,17 +24,17 @@ module.exports = class WidgetScopesViewComponent extends React.Component
     if not scope
       return null
 
-    return H.div key: id, style: style, onClick: @props.onRemoveScope.bind(null, id),
+    return R 'div', key: id, style: style, onClick: @props.onRemoveScope.bind(null, id),
       scope.name
       " "
-      H.span className: "glyphicon glyphicon-remove"
+      R 'span', className: "glyphicon glyphicon-remove"
 
   render: ->
     scopes = @props.scopes
     if _.compact(_.values(scopes)).length == 0
       return null
 
-    return H.div className: "alert alert-info", 
-      H.span(className: "glyphicon glyphicon-filter")
+    return R 'div', className: "alert alert-info", 
+      R('span', className: "glyphicon glyphicon-filter")
       " Filters: "
       _.map(_.keys(scopes), (id) => @renderScope(id, scopes[id]))

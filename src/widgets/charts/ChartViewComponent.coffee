@@ -1,6 +1,6 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
+R = React.createElement
 asyncLatest = require 'async-latest'
 
 # Inner view part of the chart widget. Uses a query data loading component
@@ -73,8 +73,8 @@ module.exports = class ChartViewComponent extends React.Component
     props.widgetDataSource.getData(props.design, props.filters, callback)
 
   renderSpinner: ->
-    H.div style: { position: "absolute", bottom: "50%", left: 0, right: 0, textAlign: "center", fontSize: 20 },
-      H.i className: "fa fa-spinner fa-spin"
+    R 'div', style: { position: "absolute", bottom: "50%", left: 0, right: 0, textAlign: "center", fontSize: 20 },
+      R 'i', className: "fa fa-spinner fa-spin"
 
   render: ->
     style = { width: @props.width, height: @props.height }
@@ -94,10 +94,10 @@ module.exports = class ChartViewComponent extends React.Component
         style.height = @props.width / 1.6
 
     if @state.dataError
-      return H.div className: "alert alert-danger",
+      return R 'div', className: "alert alert-danger",
        "Error loading data: #{@state.dataError.message or @state.dataError}" 
 
-    return H.div style: style,
+    return R 'div', style: style,
       if @state.validDesign
         @props.chart.createViewElement({
           schema: @props.schema

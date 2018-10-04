@@ -5,7 +5,7 @@
 # Chart = require '../src/widgets/charts/Chart'
 # DataSource = require '../src/DataSource'
 # React = require('react')
-# H = React.DOM
+# R = React.createElement
 # TestComponent = require './TestComponent'
 
 # describe "ChartWidget", ->
@@ -80,5 +80,5 @@
 #   # data: results from queries
 #   # width, height: size of the chart view
 #   createViewElement: (options) ->
-#     return H.div null, JSON.stringify(options.data)
+#     return R 'div', null, JSON.stringify(options.data)
 

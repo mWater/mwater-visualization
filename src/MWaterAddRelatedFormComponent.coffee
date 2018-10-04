@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 moment = require 'moment'
@@ -49,13 +48,13 @@ module.exports = class MWaterAddRelatedFormComponent extends React.Component
     @props.onSelect(table)
 
   render: ->
-    H.div null,
+    R 'div', null,
       if @state.waitingForTable
-        H.div null,
-          H.i className: "fa fa-spin fa-spinner"
+        R 'div', null,
+          R 'i', className: "fa fa-spin fa-spinner"
           " Adding..."
       else 
-        H.a className: "btn btn-link", onClick: @handleOpen,
+        R 'a', className: "btn btn-link", onClick: @handleOpen,
           "+ Add Related Survey"
       if @state.open
         R AddRelatedFormModalComponent,
@@ -118,8 +117,8 @@ class AddRelatedFormModalComponent extends React.Component
 
   renderContents: ->
     if not @state.items
-      return H.div className: "alert alert-info",
-        H.i className: "fa fa-spin fa-spinner"
+      return R 'div', className: "alert alert-info",
+        R 'i', className: "fa fa-spin fa-spinner"
         " Loading..."
 
     items = @state.items
@@ -129,8 +128,8 @@ class AddRelatedFormModalComponent extends React.Component
       searchStringRegExp = new RegExp(escapeRegex(@state.search), "i")
       items = _.filter(items, (item) => item.name.match(searchStringRegExp))
 
-    H.div null,
-      H.input 
+    R 'div', null,
+      R 'input', 
         type: "text"
         className: "form-control"
         placeholder: "Search..."

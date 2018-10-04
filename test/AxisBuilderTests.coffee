@@ -2,7 +2,7 @@ assert = require('chai').assert
 fixtures = require './fixtures'
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
+R = React.createElement
 
 AxisBuilder = require '../src/axes/AxisBuilder'
 
@@ -424,8 +424,8 @@ describe "AxisBuilder", ->
       assert.equal @ab.formatValue(@axisNumber, "123456"), "123,456", "Should parse string"
 
     it "wraps text[]", ->
-      compare(@ab.formatValue(@axisTextarr, ["a", "b"]), H.div(null, H.div(key: 0, "a"), H.div(key: 1, "b")))
-      compare(@ab.formatValue(@axisTextarr, JSON.stringify(["a", "b"])), H.div(null, H.div(key: 0, "a"), H.div(key: 1, "b")))
+      compare(@ab.formatValue(@axisTextarr, ["a", "b"]), R('div', null, R('div', key: 0, "a"), R('div', key: 1, "b")))
+      compare(@ab.formatValue(@axisTextarr, JSON.stringify(["a", "b"])), R('div', null, R('div', key: 0, "a"), R('div', key: 1, "b")))
 
     it "formats numbers", ->
       axisNumberFormatted = { expr: @exprNumber, format: ",.2f" }

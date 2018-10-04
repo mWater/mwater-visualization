@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 DraggableBlockComponent = require "./DraggableBlockComponent"
@@ -94,18 +93,18 @@ module.exports = class HorizontalBlockComponent extends React.Component
       percentages[index] = (weight * 100) / totalWeight
 
     if @props.onBlockUpdate?
-      elem = H.table style: { width: "100%", tableLayout: "fixed", position: "relative", paddingTop: 5 }, className: "mwater-visualization-horizontal-block", # Add padding to allow dropping
-        H.tbody null,
-          H.tr null,
+      elem = R 'table', style: { width: "100%", tableLayout: "fixed", position: "relative", paddingTop: 5 }, className: "mwater-visualization-horizontal-block", # Add padding to allow dropping
+        R 'tbody', null,
+          R 'tr', null,
             _.map @props.block.blocks, (block, index) =>
               [
                 if index > 0 and @props.onBlockUpdate?
-                  H.td 
+                  R 'td', 
                     style: { width: 5, position: "relative", left: @state.dragXOffset }
                     key: "splitter#{index}"
                     className: "mwater-visualization-horizontal-block-splitter #{if index - 1 == @state.dragIndex then "active" else ""}"
                     onMouseDown: @handleMouseDown.bind(null, index - 1)
-                H.td 
+                R 'td', 
                   style: { width: "#{percentages[index]}%", verticalAlign: "top" }, 
                   key: block.id, 
                   ref: ((c) => @blockRefs["block#{index}"] = c),
@@ -121,10 +120,10 @@ module.exports = class HorizontalBlockComponent extends React.Component
       return elem
 
     else  # Simplify in this case for printing
-      return H.div className: "mwater-visualization-horizontal-block",
+      return R 'div', className: "mwater-visualization-horizontal-block",
         _.map @props.block.blocks, (block, index) =>
           [
-            H.div style: { width: "#{percentages[index]}%", verticalAlign: "top", display: "inline-block" }, key: block.id, ref: "block#{index}", className: "mwater-visualization-horizontal-block-item",
+            R 'div', style: { width: "#{percentages[index]}%", verticalAlign: "top", display: "inline-block" }, key: block.id, ref: "block#{index}", className: "mwater-visualization-horizontal-block-item",
               @props.renderBlock(block)
           ]              
 
@@ -162,32 +161,32 @@ module.exports = class HorizontalBlockComponent extends React.Component
   #       left: 0
   #       right: 0
   #     }
-  #     return H.div style: lineStyle, key: "aspectDrag"
+  #     return R 'div', style: lineStyle, key: "aspectDrag"
   #   else
   #     return null
   
   # render: ->
-  #   elem = H.div className: "mwater-visualization-decorated-block", style: @props.style,
+  #   elem = R 'div', className: "mwater-visualization-decorated-block", style: @props.style,
   #     @props.children
     
   #     @renderAspectDrag()
 
   #     if not @props.isDragging and @props.connectMoveHandle?
-  #       @props.connectMoveHandle(H.div key: "move", className: "mwater-visualization-decorated-block-move",
-  #         H.i className: "fa fa-arrows")
+  #       @props.connectMoveHandle(R 'div', key: "move", className: "mwater-visualization-decorated-block-move",
+  #         R 'i', className: "fa fa-arrows")
 
   #     if not @props.isDragging and @props.onBlockRemove?
-  #       H.div key: "remove", className: "mwater-visualization-decorated-block-remove", onClick: @props.onBlockRemove,
-  #         H.i className: "fa fa-times"
+  #       R 'div', key: "remove", className: "mwater-visualization-decorated-block-remove", onClick: @props.onBlockRemove,
+  #         R 'i', className: "fa fa-times"
 
   #     if not @props.isDragging and @props.onAspectRatioChange?
   #       # TODO sometimes drags (onDragStart) and so doesn't work. Disable dragging?
-  #       H.div key: "aspect", className: "mwater-visualization-decorated-block-aspect", onMouseDown: @handleAspectMouseDown,
-  #         H.i className: "fa fa-arrows-v"
+  #       R 'div', key: "aspect", className: "mwater-visualization-decorated-block-aspect", onMouseDown: @handleAspectMouseDown,
+  #         R 'i', className: "fa fa-arrows-v"
 
   #     if not @props.isDragging and @props.connectResizeHandle?
-  #       @props.connectResizeHandle(H.div key: "resize", className: "mwater-visualization-decorated-block-resize",
-  #         H.i className: "fa fa-expand fa-rotate-90")
+  #       @props.connectResizeHandle(R 'div', key: "resize", className: "mwater-visualization-decorated-block-resize",
+  #         R 'i', className: "fa fa-expand fa-rotate-90")
 
   #   if @props.connectDragPreview
   #     elem = @props.connectDragPreview(elem)
