@@ -53,7 +53,7 @@ module.exports = class MapViewComponent extends React.Component
     zoomLocked: PropTypes.bool   # Whether changes to zoom level should be persisted. Default false
 
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       popupContents: null   # Element in the popup

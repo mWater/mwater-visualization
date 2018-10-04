@@ -22,7 +22,7 @@ module.exports = class PivotChartLayoutComponent extends React.Component
     onSummarizeSegment: PropTypes.func  # Called with id of segment. Summarizes the segment
 
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       hoverSection: null # Current section being hovered over

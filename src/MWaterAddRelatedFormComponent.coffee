@@ -22,8 +22,8 @@ module.exports = class MWaterAddRelatedFormComponent extends React.Component
     onSelect: PropTypes.func.isRequired   # Called with table id e.g. responses:someid
     schema: PropTypes.object.isRequired   
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = { 
       open: false
@@ -79,8 +79,8 @@ class AddRelatedFormModalComponent extends React.Component
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = { 
       items: null 
       search: ""

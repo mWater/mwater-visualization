@@ -15,8 +15,8 @@ module.exports = class FontColorPaletteItem extends React.Component
   @defaultProps:
     position: "under"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = {
       open: false
     }

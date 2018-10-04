@@ -13,8 +13,8 @@ module.exports = class HorizontalBlockComponent extends React.Component
     onBlockRemove: PropTypes.func # Called with (block) when block is removed
     onBlockUpdate: PropTypes.func # Called with (block) when block is updated
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = {
       dragIndex: null       # index of splitter being dragged

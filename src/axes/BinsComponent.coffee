@@ -18,7 +18,7 @@ module.exports = class BinsComponent extends React.Component
     onChange: PropTypes.func.isRequired
 
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       guessing: false   # True when guessing ranges

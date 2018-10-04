@@ -34,9 +34,10 @@ module.exports = class CalendarChartViewComponent extends React.Component
 
     highlightCellFillColor: PropTypes.string #the fill color for highlighted cell
 
-  constructor: (options) ->
-    @schema = options.schema
-    @axisBuilder = new AxisBuilder(schema: @schema)
+  constructor: (props) ->
+    super(props)
+
+    @axisBuilder = new AxisBuilder(schema: options.schema)
 
   @defaultProps:
     monthsStrokeColor: "#222"

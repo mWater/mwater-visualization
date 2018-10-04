@@ -48,8 +48,8 @@ module.exports = class MWaterTableSelectComponent extends React.Component
     # Optional list of tables (ids) being used. Use this to present an initially short list to select from
     activeTables: PropTypes.arrayOf(PropTypes.string.isRequired)  
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = {
       pendingExtraTable: null   # Set when waiting for a table to load
@@ -383,8 +383,8 @@ class FormsListComponent extends React.Component
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = { 
       forms: null 
       search: ""
@@ -507,8 +507,8 @@ class IndicatorsListComponent extends React.Component
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = { 
       indicators: null 
       search: ""
@@ -637,8 +637,8 @@ class AddIndicatorConfirmPopupComponent extends React.Component
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = { 
       visible: false
       indicatorTable: null
@@ -705,8 +705,8 @@ class IssuesListComponent extends React.Component
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = { 
       issueTypes: null 
       search: ""

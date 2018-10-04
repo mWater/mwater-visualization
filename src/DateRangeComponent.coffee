@@ -14,8 +14,8 @@ module.exports = class DateRangeComponent extends React.Component
     onChange: PropTypes.func.isRequired # Array of [start date, end date] in iso 8601 format
     datetime: PropTypes.bool            # true if for datetime, not date
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = {
       dropdownOpen: false

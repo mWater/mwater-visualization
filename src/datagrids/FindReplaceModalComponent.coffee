@@ -40,7 +40,7 @@ module.exports = class FindReplaceModalComponent extends React.Component
     onUpdate: PropTypes.func      # Called when values have been updated
 
   constructor: (props) ->
-    super
+    super(props)
     @state = {
       open: false  # True if modal is open
       replaceColumn: null # Column id to replace

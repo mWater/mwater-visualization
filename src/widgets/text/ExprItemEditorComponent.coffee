@@ -17,7 +17,7 @@ module.exports = class ExprItemEditorComponent extends React.Component
     singleRowTable: PropTypes.string  # Table that is filtered to have one row
 
   constructor: (props) ->
-    super
+    super(props)
 
     # Keep table in state as it can be set before the expression
     @state = {

@@ -23,8 +23,8 @@ module.exports = class MWaterAddRelatedIndicatorComponent extends React.Componen
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = { 
       addingTables: []  # Set to table ids that have been added

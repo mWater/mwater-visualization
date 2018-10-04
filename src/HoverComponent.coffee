@@ -2,8 +2,8 @@ React = require 'react'
 ReactDOM = require 'react-dom'
 
 module.exports = class HoverComponent extends React.Component
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = { hovered: false }
 
   componentDidMount: ->

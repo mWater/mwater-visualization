@@ -5,6 +5,7 @@ LRU = require("lru-cache")
 # Pass in option of perform which is function with signature (query, cb) where cb is called with (null, rows) on success
 module.exports = class CachingDataSource extends DataSource
   constructor: (options) ->
+    super()
     @perform = options.perform
 
     @cache = LRU({ max: 500, maxAge: 1000 * 15 * 60 })

@@ -28,8 +28,8 @@ module.exports = class LayeredChartViewComponent extends React.Component
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = {
       headerHeight: null  # Height of header 
@@ -111,8 +111,8 @@ class C3ChartComponent extends React.Component
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     # Create throttled createChart
     @throttledCreateChart = _.throttle(@createChart, 1000)

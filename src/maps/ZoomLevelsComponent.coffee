@@ -12,7 +12,7 @@ module.exports = class ZoomLevelsComponent extends React.Component
     onDesignChange: PropTypes.func.isRequired
 
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       expanded: false

@@ -31,7 +31,7 @@ module.exports = class MapComponent extends React.Component
     extraTitleButtonsElem: PropTypes.node              # Extra elements to add to right
 
   constructor: (props) ->
-    super
+    super(props)
     @state = { 
       undoStack: new UndoStack().push(props.design) 
       transientDesign: props.design  # Temporary design for read-only maps

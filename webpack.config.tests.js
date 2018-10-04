@@ -6,8 +6,20 @@ module.exports = {
     filename: 'bundle.js'
   },
   module: {
-    loaders: [
-      { test: /\.coffee$/, loader: ["coffee-loader"] }
+    rules: [
+      { test: /\.coffee$/, use: "coffee-loader" },
+      { test: /\.css$/, use: "css-loader" },
+      {   
+        test: /\.(png|jpg|gif)$/i,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192
+            }
+          }
+        ]
+      }      
     ]
   },
   resolve: {

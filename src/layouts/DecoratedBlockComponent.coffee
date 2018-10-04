@@ -17,8 +17,8 @@ module.exports = class DecoratedBlockComponent extends React.Component
     aspectRatio: PropTypes.number
     onAspectRatioChange: PropTypes.func
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = {
       aspectDragY: null   # y position of aspect ratio drag

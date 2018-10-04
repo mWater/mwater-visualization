@@ -10,6 +10,7 @@ module.exports = class ServerDatagridDataSource extends DatagridDataSource
   #   datagridId: datagrid id to use on server
   #   rev: revision to use to allow caching
   constructor: (options) ->
+    super()
     @options = options
 
   # Get the data that the widget needs. The widget should implement getData method (see above) to get the data from the server

@@ -33,8 +33,8 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
 
     children: PropTypes.func.isRequired                 # Called with (error, { schema:, dataSource: })
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = {
       error: null
       schema: null

@@ -21,8 +21,8 @@ module.exports = class EditPopupComponent extends React.Component
     idTable: PropTypes.string.isRequired  # Table of the row that join is to. Usually same as table except for choropleth maps
     defaultPopupFilterJoins: PropTypes.object.isRequired # Default popup filter joins
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = { editing: false }
 
   handleItemsChange: (items) =>

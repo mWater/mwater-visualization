@@ -24,7 +24,7 @@ module.exports = class CategoryMapComponent extends React.Component
     initiallyExpanded: PropTypes.bool  # True to start expanded
 
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       collapsed: not props.initiallyExpanded  # Start collapsed

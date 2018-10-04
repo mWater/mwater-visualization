@@ -24,7 +24,7 @@ module.exports = class SettingsModalComponent extends React.Component
     globalFiltersElementFactory: PropTypes.func # Call with props { schema, dataSource, globalFilters, onChange, nullIfIrrelevant }. Displays a component to edit global filters
 
   constructor: (props) ->
-    super
+    super(props)
     @state = { 
       design: null # Set when being edited
     }

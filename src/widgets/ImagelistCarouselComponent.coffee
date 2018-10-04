@@ -11,8 +11,8 @@ module.exports = class ImagelistCarouselComponent extends React.Component
     widgetDataSource: PropTypes.object.isRequired
     height: PropTypes.number
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = {
       activeImage: _.findIndex(@props.imagelist, { cover: true })
     }

@@ -60,7 +60,7 @@ class Container extends React.Component
     connectDropTarget: PropTypes.func.isRequired # Injected by react-dnd wrapper
 
   constructor: (props) ->
-    super
+    super(props)
     @state = { moveHover: null, resizeHover: null }
 
   setMoveHover: (hoverInfo) ->

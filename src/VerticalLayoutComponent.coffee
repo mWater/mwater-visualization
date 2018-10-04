@@ -12,8 +12,8 @@ module.exports = class VerticalLayoutComponent extends React.Component
     height: PropTypes.number.isRequired
     relativeHeights: PropTypes.object.isRequired  # Fraction to allocate for fractional heights. Should total 1.0. Keyed by key
 
-  constructor: -> 
-    super
+  constructor: (props) ->
+    super(props)
     @state = { availableHeight: 0 }
     @childRefs = {}
 

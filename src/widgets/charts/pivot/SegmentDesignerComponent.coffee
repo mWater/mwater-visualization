@@ -20,7 +20,7 @@ module.exports = class SegmentDesignerComponent extends React.Component
     filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       # Mode switcher to make UI clearer

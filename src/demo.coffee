@@ -50,7 +50,7 @@ $ ->
 
 class RichTextPane extends React.Component
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       items: null
@@ -75,7 +75,7 @@ class RichTextPane extends React.Component
 
 class MWaterDashboardPane extends React.Component
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       design: null
@@ -125,7 +125,7 @@ class MWaterDashboardPane extends React.Component
 
 class MWaterDirectDashboardPane extends React.Component
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       # design: { items: {}, layout: "grid" } # dashboardDesign
@@ -186,7 +186,7 @@ share = "testshareid"
 
 class MWaterMapPane extends React.Component
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       design: null
@@ -233,7 +233,7 @@ class MWaterMapPane extends React.Component
 
 class MWaterDirectMapPane extends React.Component
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       design: if window.localStorage.getItem("MWaterDirectMapPane.design") then JSON.parse(window.localStorage.getItem("MWaterDirectMapPane.design")) else doubleClickMap
@@ -274,7 +274,7 @@ class MWaterDirectMapPane extends React.Component
 
 class MWaterDatagridPane extends React.Component
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       design: datagridDesign
@@ -315,7 +315,7 @@ class MWaterDatagridPane extends React.Component
 
 class WaterOrgDashboardPane extends React.Component
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       design: { items: { id: "root", type: "root", blocks: [] }, layout: "blocks" }
@@ -522,6 +522,7 @@ datagridDesign = {
 class MWaterDataSource extends DataSource
   # Caching allows server to send cached results
   constructor: (apiUrl, client, caching = true) ->
+    super()
     @apiUrl = apiUrl
     @client = client
     @caching = caching

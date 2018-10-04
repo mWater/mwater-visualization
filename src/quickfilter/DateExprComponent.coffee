@@ -14,8 +14,8 @@ module.exports = class DateExprComponent extends React.Component
     onChange: PropTypes.func            # Called when value changes
     datetime: PropTypes.bool                 # True to use datetime
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = {
       dropdownOpen: false

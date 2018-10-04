@@ -33,8 +33,8 @@ module.exports = class PivotChartViewComponent extends React.Component
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = {
       editSegment: null   # Segment being edited

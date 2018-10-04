@@ -53,7 +53,7 @@ module.exports = class DashboardViewComponent extends React.Component
   getChildContext: -> { locale: @props.design.locale }
 
   constructor: (props) ->
-    super
+    super(props)
     @state = {
       widgetScoper: new WidgetScoper() # Empty scoping
     }

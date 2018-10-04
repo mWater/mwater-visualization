@@ -15,8 +15,8 @@ module.exports = class DetailLevelSelectComponent extends React.Component
     detailLevel: PropTypes.number # Detail level within
     onChange: PropTypes.func.isRequired # Called with (detailLevel)
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = { options: null }
 
   componentWillMount: ->

@@ -106,7 +106,7 @@ class QuickfilterDesignComponent extends React.Component
     tables: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired    # List of possible table ids to use
 
   constructor: (props) ->
-    super
+    super(props)
 
     # Store table to allow selecting table first, then expression
     @state = {

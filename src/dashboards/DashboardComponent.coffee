@@ -59,7 +59,7 @@ module.exports = class DashboardComponent extends React.Component
   }
 
   constructor: (props) ->
-    super
+    super(props)
     @state = { 
       undoStack: new UndoStack().push(props.design) 
       quickfiltersValues: props.quickfiltersValues

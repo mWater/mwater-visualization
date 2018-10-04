@@ -12,8 +12,8 @@ module.exports = class ColorComponent extends React.Component
     color: PropTypes.string
     onChange: PropTypes.func
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = { open: false, advanced: false }
 
   handleClick: =>

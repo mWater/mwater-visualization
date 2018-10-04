@@ -118,8 +118,8 @@ class AttributionComponent extends React.Component
   @defaultProps:
     text: null
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = {
       editing: false
@@ -165,7 +165,7 @@ class AdvancedOptionsComponent extends React.Component
     onDesignChange: PropTypes.func.isRequired
 
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       expanded: false

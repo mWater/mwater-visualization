@@ -18,8 +18,8 @@ module.exports = class ExprInsertModalComponent extends React.Component
     onInsert: PropTypes.func.isRequired   # Called with expr item to insert
     singleRowTable: PropTypes.string  # Table that is filtered to have one row
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = {
       open: false

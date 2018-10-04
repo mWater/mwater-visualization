@@ -18,7 +18,7 @@ module.exports = class PivotChartDesignerComponent extends React.Component
     filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       isNew: not props.design.table  # True if new pivot table

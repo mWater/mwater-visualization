@@ -50,7 +50,7 @@ module.exports = class DatagridViewComponent extends React.Component
     pageSize: 100
 
   constructor: (props) ->
-    super
+    super(props)
     @state = {
       rows: []
       entirelyLoaded: false

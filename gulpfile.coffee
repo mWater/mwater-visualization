@@ -2,7 +2,6 @@ _ = require 'lodash'
 gulp = require 'gulp'
 gutil = require 'gulp-util'
 glob = require 'glob'
-browserify = require 'browserify'
 source = require 'vinyl-source-stream'
 concat = require 'gulp-concat'
 rework = require 'gulp-rework'
@@ -64,19 +63,6 @@ gulp.task "index_css", ->
 gulp.task 'copy_assets', ->
   return gulp.src("assets/**/*")
     .pipe(gulp.dest('dist/'))
-
-gulp.task 'prepare_tests', ->
-  files = glob.sync("./test/**/*Tests.coffee")
-  files = _.map(files, (f) -> "." + f)
-  bundler = shim(browserify({ 
-    entries: files, 
-    basedir: "./src/"
-    extensions: [".js", ".coffee"] }))
-  return bundler.bundle()
-    .on('error', gutil.log)
-    .on('error', -> throw "Failed")
-    .pipe(source('browserified.js'))
-    .pipe(gulp.dest('./test'))
 
 gulp.task "build", gulp.parallel([
   "libs_js"

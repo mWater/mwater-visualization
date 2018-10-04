@@ -14,8 +14,8 @@ module.exports = class FontSizePaletteItem extends React.Component
   @defaultProps:
     position: "under"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = {
       open: false
     }

@@ -8,8 +8,8 @@ DirectWidgetDataSource = require './widgets/DirectWidgetDataSource'
 WidgetFactory = require './widgets/WidgetFactory'
 
 class DemoComponent extends React.Component
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = { 
       design: design 

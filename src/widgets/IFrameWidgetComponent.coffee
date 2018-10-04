@@ -15,7 +15,7 @@ module.exports = class IFrameWidgetComponent extends React.Component
     height: PropTypes.number
 
   constructor: (props) ->
-    super
+    super(props)
     @state = { 
       # True when editing chart
       editing: false
