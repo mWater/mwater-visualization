@@ -6,7 +6,7 @@ update = require 'update-object'
 languages = require 'languages'
 
 ui = require 'react-library/lib/bootstrap'
-ReactSelect = require 'react-select'
+ReactSelect = require('react-select').default
 
 DashboardUtils = require './DashboardUtils'
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')

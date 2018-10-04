@@ -148,11 +148,8 @@ class EnumQuickfilterComponent extends React.Component
       @props.onValueChange(null)
 
   handleMultiChange: (val) =>
-    value = if val then val.split("\n") else []
-    value = _.map(value, JSON.parse)
-
-    if value.length > 0
-      @props.onValueChange(value)
+    if val?.length > 0
+      @props.onValueChange(_.pluck(val, "value"))
     else
       @props.onValueChange(null)
 
@@ -168,14 +165,16 @@ class EnumQuickfilterComponent extends React.Component
       isDisabled: not @props.onValueChange?
   
   renderMultiSelect: ->
+    options = _.map(@props.options, (opt) => { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
+    
     R ReactSelect, 
       placeholder: "All"
-      value: _.map(@props.value or [], JSON.stringify).join("\n")
-      multi: true
-      delimiter: "\n"
-      options: _.map(@props.options, (opt) => { value: JSON.stringify(opt.id), label: ExprUtils.localizeString(opt.name, @context.locale) }) 
+      value: _.map(@props.value, (v) => _.find(options, (o) => o.value == v))
+      isClearable: true
+      isMulti: true
+      options: options
       onChange: if @props.onValueChange then @handleMultiChange
-      disabled: not @props.onValueChange?
+      isDisabled: not @props.onValueChange?
 
   render: ->
     R 'div', style: { display: "inline-block", paddingRight: 10 },
