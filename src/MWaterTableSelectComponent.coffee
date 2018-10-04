@@ -65,7 +65,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
         @setState(pendingExtraTable: null)
 
         # Close toggle edit
-        @refs.toggleEdit.close()
+        @toggleEdit.close()
         
         # Fire change
         nextProps.onChange(table)
@@ -79,7 +79,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
 
   handleChange: (tableId) =>
     # Close toggle edit
-    @refs.toggleEdit.close()
+    @toggleEdit.close()
 
     # Call onChange if different
     if tableId != @props.table
@@ -113,7 +113,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
           "\u00a0Please wait..."
 
       R uiComponents.ToggleEditComponent,
-        ref: "toggleEdit"
+        ref: (c) => @toggleEdit = c
         forceOpen: not @props.table # Must have table
         label: if @props.table then ExprUtils.localizeString(@props.schema.getTable(@props.table)?.name, @context.locale) else ""
         editor: editor

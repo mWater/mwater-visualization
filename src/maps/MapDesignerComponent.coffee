@@ -134,7 +134,7 @@ class AttributionComponent extends React.Component
 
   renderEditor: ->
     R ClickOutHandler, onClickOut: @handleClickOut,
-      H.input { ref: "attributionInput", onChange: @handleTextChange, value: @props.text, className: 'form-control'}
+      H.input { onChange: @handleTextChange, value: @props.text, className: 'form-control'}
 
   handleTextClick: =>
     @setState(editing: true)

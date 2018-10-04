@@ -45,10 +45,10 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
   updateHeights: ->
     # Calculate header and footer heights
-    if @refs.header and @state.headerHeight != @refs.header.offsetHeight
-      @setState(headerHeight: @refs.header.offsetHeight)
-    if @refs.footer and @state.footerHeight != @refs.footer.offsetHeight
-      @setState(footerHeight: @refs.footer.offsetHeight)
+    if @header and @state.headerHeight != @header.offsetHeight
+      @setState(headerHeight: @header.offsetHeight)
+    if @footer and @state.footerHeight != @footer.offsetHeight
+      @setState(footerHeight: @footer.offsetHeight)
 
   handleHeaderChange: (header) =>
     @props.onDesignChange(_.extend({}, @props.design, header: header))
@@ -57,7 +57,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
     @props.onDesignChange(_.extend({}, @props.design, footer: footer))
 
   renderHeader: ->
-    return H.div ref: "header",
+    return H.div ref: ((c) => @header = c),
       R TextComponent,
         design: @props.design.header
         onDesignChange: if @props.onDesignChange then @handleHeaderChange
@@ -68,7 +68,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
         standardWidth: @props.standardWidth
 
   renderFooter: ->
-    return H.div ref: "footer",
+    return H.div ref: ((c) => @footer = c),
       R TextComponent,
         design: @props.design.footer
         onDesignChange: if @props.onDesignChange then @handleFooterChange
@@ -127,7 +127,6 @@ class C3ChartComponent extends React.Component
       @chart.destroy()
 
     compiler = new LayeredChartCompiler(schema: props.schema)
-    el = ReactDOM.findDOMNode(@refs.chart)
     chartOptions = compiler.createChartOptions({
       design: @props.design
       data: @props.data
@@ -136,7 +135,7 @@ class C3ChartComponent extends React.Component
       locale: @context.locale
     })
     
-    chartOptions.bindto = el
+    chartOptions.bindto = @chartDiv
     chartOptions.data.onclick = @handleDataClick
     # Update scope after rendering. Needs a delay to make it happen
     chartOptions.onrendered = => _.defer(@updateScope)
@@ -198,7 +197,7 @@ class C3ChartComponent extends React.Component
   updateScope: =>
     dataMap = @getDataMap()
     compiler = new LayeredChartCompiler(schema: @props.schema)
-    el = ReactDOM.findDOMNode(@refs.chart)
+    el = @chartDiv
 
     # Handle line and bar charts
     d3.select(el)
@@ -293,4 +292,4 @@ class C3ChartComponent extends React.Component
 
     H.div null,
       H.style null, css
-      H.div ref: "chart"
+      H.div ref: (c) => @chartDiv = c

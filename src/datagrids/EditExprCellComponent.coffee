@@ -65,12 +65,12 @@ class TextEditComponent extends React.Component
 
   componentDidMount: ->
     # Focus when created
-    @refs.input?.focus()
+    @input?.focus()
 
   render: ->
     H.div style: { paddingTop: 3 },
       H.input 
-        ref: "input"
+        ref: (c) => @input = c
         type: "text"
         className: "form-control"
         value: @props.value or ""
@@ -91,7 +91,7 @@ class NumberEditComponent extends React.Component
 
   componentDidMount: ->
     # Focus when created
-    @refs.input?.focus()
+    @input?.focus()
 
   handleChange: (ev) =>
     if ev.target.value
@@ -102,7 +102,7 @@ class NumberEditComponent extends React.Component
   render: ->
     H.div style: { paddingTop: 3 },
       H.input 
-        ref: "input"
+        ref: (c) => @input = c
         type: "number"
         step: "any"
         className: "form-control"

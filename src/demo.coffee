@@ -59,7 +59,7 @@ class RichTextPane extends React.Component
 
   handleInsert: (ev) =>
     ev.preventDefault()
-    @refs.editor.pasteHTML("x")
+    @editor.pasteHTML("x")
 
   renderExtraButtons: ->
     H.div key: "x", className: "mwater-visualization-text-palette-item", onMouseDown: @handleInsert,
@@ -68,7 +68,7 @@ class RichTextPane extends React.Component
   render: ->
     H.div style: { paddingTop: 100 },
       R RichTextComponent,
-        ref: "editor"
+        ref: (c) => @editor = c
         items: @state.items
         onItemsChange: (items) => @setState(items: items)
         itemsHtmlConverter: new ItemsHtmlConverter()

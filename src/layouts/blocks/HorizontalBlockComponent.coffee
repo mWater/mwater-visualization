@@ -25,6 +25,8 @@ module.exports = class HorizontalBlockComponent extends React.Component
       rightSize: null
     }
 
+    @blockRefs = {}
+
   componentWillUnmount: ->
     # Remove listeners
     document.removeEventListener("mousemove", @handleMouseMove)
@@ -35,7 +37,7 @@ module.exports = class HorizontalBlockComponent extends React.Component
     ev.preventDefault()
 
     # Get sizes of two blocks
-    @setState(dragIndex: index, leftSize: @refs["block#{index}"].offsetWidth, rightSize: @refs["block#{index + 1}"].offsetWidth)
+    @setState(dragIndex: index, leftSize: @blockRefs["block#{index}"].offsetWidth, rightSize: @blockRefs["block#{index + 1}"].offsetWidth)
 
     document.addEventListener("mousemove", @handleMouseMove)
     document.addEventListener("mouseup", @handleMouseUp)
@@ -103,8 +105,11 @@ module.exports = class HorizontalBlockComponent extends React.Component
                     key: "splitter#{index}"
                     className: "mwater-visualization-horizontal-block-splitter #{if index - 1 == @state.dragIndex then "active" else ""}"
                     onMouseDown: @handleMouseDown.bind(null, index - 1)
-                H.td style: { width: "#{percentages[index]}%", verticalAlign: "top" }, key: block.id, ref: "block#{index}",
-                  @props.renderBlock(block)
+                H.td 
+                  style: { width: "#{percentages[index]}%", verticalAlign: "top" }, 
+                  key: block.id, 
+                  ref: ((c) => @blockRefs["block#{index}"] = c),
+                    @props.renderBlock(block)
               ]              
 
       # Allow dropping

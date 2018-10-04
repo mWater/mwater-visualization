@@ -49,19 +49,19 @@ module.exports = class RichTextComponent extends React.Component
 
   # Paste HTML in
   pasteHTML: (html) ->
-    @refs.contentEditable.pasteHTML(html)
+    @contentEditable.pasteHTML(html)
 
   focus: ->
-    @refs.contentEditable.focus()
+    @contentEditable.focus()
 
   handleInsertExpr: (item) =>
     html = '''<div data-embed="''' + _.escape(JSON.stringify(item)) + '''"></div>'''
 
-    @refs.contentEditable.pasteHTML(html)
+    @contentEditable.pasteHTML(html)
 
   handleSetFontSize: (size) =>
     # Requires a selection
-    html = @refs.contentEditable.getSelectedHTML()
+    html = @contentEditable.getSelectedHTML()
     if not html
       return alert("Please select text first to set size")
 
@@ -69,11 +69,11 @@ module.exports = class RichTextComponent extends React.Component
     # doesn't mix with our various dashboard stylings, so we need to use percentages
     html = html.replace(/font-size:\s*\d+%;?/g, "")
 
-    @refs.contentEditable.pasteHTML("<span style=\"font-size:#{size}\">" + html + "</span>")
+    @contentEditable.pasteHTML("<span style=\"font-size:#{size}\">" + html + "</span>")
 
   handleSetFontColor: (color) =>
     # Requires a selection
-    html = @refs.contentEditable.getSelectedHTML()
+    html = @contentEditable.getSelectedHTML()
     if not html
       return alert("Please select text first to set color")
 
@@ -171,7 +171,7 @@ module.exports = class RichTextComponent extends React.Component
     if @props.onItemsChange?
       return H.div key: "contents", style: @props.style, className: @props.className,
         R ContentEditableComponent, 
-          ref: "contentEditable"
+          ref: (c) => @contentEditable = c
           style: { outline: "none" }
           html: @createHtml()
           onChange: @handleChange

@@ -125,7 +125,7 @@ module.exports = class PivotChartViewComponent extends React.Component
     @props.onDesignChange(design)
 
   renderHeader: ->
-    return H.div ref: "header", style: { paddingLeft: 10, paddingRight: 10 },
+    return H.div style: { paddingLeft: 10, paddingRight: 10 },
       R TextComponent,
         design: @props.design.header
         onDesignChange: if @props.onDesignChange then @handleHeaderChange
@@ -136,7 +136,7 @@ module.exports = class PivotChartViewComponent extends React.Component
         standardWidth: @props.standardWidth
 
   renderFooter: ->
-    return H.div ref: "footer", style: { paddingLeft: 10, paddingRight: 10 },
+    return H.div style: { paddingLeft: 10, paddingRight: 10 },
       R TextComponent,
         design: @props.design.footer
         onDesignChange: if @props.onDesignChange then @handleFooterChange

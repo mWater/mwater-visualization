@@ -7,12 +7,12 @@ module.exports = class HoverComponent extends React.Component
     @state = { hovered: false }
 
   componentDidMount: ->
-    ReactDOM.findDOMNode(@refs.main).addEventListener("mouseover", @onOver)
-    ReactDOM.findDOMNode(@refs.main).addEventListener("mouseout", @onOut)
+    ReactDOM.findDOMNode(@main).addEventListener("mouseover", @onOver)
+    ReactDOM.findDOMNode(@main).addEventListener("mouseout", @onOut)
 
   componentWillUnmount: ->
-      ReactDOM.findDOMNode(@refs.main).removeEventListener("mouseover", @onOver)
-      ReactDOM.findDOMNode(@refs.main).removeEventListener("mouseout", @onOut)
+    ReactDOM.findDOMNode(@main).removeEventListener("mouseover", @onOver)
+    ReactDOM.findDOMNode(@main).removeEventListener("mouseout", @onOut)
 
   onOver: =>
     @setState(hovered: true)
@@ -21,4 +21,4 @@ module.exports = class HoverComponent extends React.Component
     @setState(hovered: false)
 
   render: ->
-    React.cloneElement(React.Children.only(@props.children), ref: "main", hovered: @state.hovered)
+    React.cloneElement(React.Children.only(@props.children), ref: ((c) => @main = c), hovered: @state.hovered)

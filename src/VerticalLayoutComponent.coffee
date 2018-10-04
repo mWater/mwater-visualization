@@ -15,6 +15,7 @@ module.exports = class VerticalLayoutComponent extends React.Component
   constructor: -> 
     super
     @state = { availableHeight: 0 }
+    @childRefs = {}
 
   componentWillReceiveProps: (nextProps) -> 
     if nextProps.height != @props.height or not _.isEqual(nextProps.relativeHeights, @props.relativeHeights)
@@ -31,14 +32,14 @@ module.exports = class VerticalLayoutComponent extends React.Component
       if not child then continue
       if props.relativeHeights[child.key] then continue
 
-      node = ReactDOM.findDOMNode(@refs[child.key])
+      node = ReactDOM.findDOMNode(@childRefs[child.key])
       availableHeight -= $(node).outerHeight()
 
     @setState(availableHeight: availableHeight)
 
   # Get a subcomponent
   getComponent: (key) ->
-    return @refs[key]
+    return @childRefs[key]
 
   render: ->
     # Calculate scaling
@@ -53,11 +54,13 @@ module.exports = class VerticalLayoutComponent extends React.Component
           if @state.availableHeight
             height = @state.availableHeight * @props.relativeHeights[child.key]
             return H.div style: { height: height, position: "relative" },
-              H.div style: { height: height }, ref: child.key,
+              H.div 
+                style: { height: height }, 
+                ref: ((c) => @childRefs[child.key] = c),
                 React.cloneElement(child, { height: height })
           # Otherwise don't show until available height is known
           return null
-        return H.div ref: child.key,
+        return H.div ref: ((c) => @childRefs[child.key] = c),
           child
         )
 

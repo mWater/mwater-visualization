@@ -68,9 +68,9 @@ module.exports = class DatagridComponent extends React.Component
 
   updateHeight: ->
     # Calculate quickfilters height
-    if @refs.quickfilters 
-      if @state.quickfiltersHeight != @refs.quickfilters.offsetHeight
-        @setState(quickfiltersHeight: @refs.quickfilters.offsetHeight)
+    if @quickfilters 
+      if @state.quickfiltersHeight != @quickfilters.offsetHeight
+        @setState(quickfiltersHeight: @quickfilters.offsetHeight)
     else
       @setState(quickfiltersHeight: 0)
 
@@ -166,7 +166,7 @@ module.exports = class DatagridComponent extends React.Component
     return H.a 
       key: "findreplace"
       className: "btn btn-link btn-sm"
-      onClick: (=> @refs.findReplaceModal.show()),
+      onClick: (=> @findReplaceModal.show()),
         "Find/Replace"
 
   renderTitleBar: ->
@@ -179,7 +179,7 @@ module.exports = class DatagridComponent extends React.Component
       @props.titleElem
 
   renderQuickfilter: ->
-    H.div style: { position: "absolute", top: 40, left: 0, right: 0 }, ref: "quickfilters",
+    H.div style: { position: "absolute", top: 40, left: 0, right: 0 }, ref: ((c) => @quickfilters = c),
       R QuickfiltersComponent, {
         design: @props.design.quickfilters
         schema: @props.schema
@@ -212,7 +212,7 @@ module.exports = class DatagridComponent extends React.Component
 
   renderFindReplaceModal: (filters) ->
     R FindReplaceModalComponent, 
-      ref: "findReplaceModal"
+      ref: (c) => @findReplaceModal = c
       schema: @props.schema
       dataSource: @props.dataSource
       datagridDataSource: @props.datagridDataSource

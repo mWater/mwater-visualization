@@ -37,7 +37,7 @@ module.exports = class TableChartViewComponent extends React.Component
     }
 
     return H.div style: style, className: "overflow-auto-except-print",
-      H.div {style: { fontWeight: "bold", textAlign: "center" }, ref: "title"}, @props.design.titleText
+      H.div {style: { fontWeight: "bold", textAlign: "center" }}, @props.design.titleText
       R TableContentsComponent, 
         columns: @props.design.columns
         table: @props.design.table

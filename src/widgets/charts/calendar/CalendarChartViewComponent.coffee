@@ -59,7 +59,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
     remainingSpace = (@props.height - years.length * 7 - @props.monthsStrokeWidth * 2 * years.length)
 
     if @props.design.titleText
-      remainingSpace = remainingSpace - $(@refs.title).outerHeight()
+      remainingSpace = remainingSpace - $(@title).outerHeight()
 
     cellSizeForHeight = remainingSpace / (years.length * 7)
 
@@ -103,7 +103,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
   # Redraw component
   redraw: ->
     @reloading = true
-    container = @refs.chart_container
+    container = @chart_container
     container.innerHTML = ''
     cellSize = @getCellSize()
     height = Math.ceil(cellSize * 7) + 7
@@ -240,5 +240,5 @@ module.exports = class CalendarChartViewComponent extends React.Component
 
     H.div style: style,
       if title
-        H.p {style: titleStyle, ref: "title"}, title,
-      H.div { ref: "chart_container"}
+        H.p {style: titleStyle, ref: (c) => @title = c}, title,
+      H.div { ref: (c) => @chart_container = c }

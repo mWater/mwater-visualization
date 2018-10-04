@@ -47,7 +47,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
     )
     
   handleStartEditing: =>
-    @refs.editor.edit()
+    @editor.edit()
 
   # Render a link to start editing
   renderEditLink: ->
@@ -56,7 +56,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
   renderEditor: ->
     R ImageWidgetDesignComponent,
-      ref: "editor"
+      ref: (c) => @editor = c
       key: "editor"
       design: @props.design
       onDesignChange: @props.onDesignChange
