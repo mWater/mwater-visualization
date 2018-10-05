@@ -1,12 +1,3 @@
-@import "leaflet/dist/leaflet.css";
-@import "react-select/dist/react-select.css";
-@import "mwater-expressions-ui";
-@import "fixed-data-table/dist/fixed-data-table.min.css";
-@import "rc-slider/assets/index.css";
-@import "leaflet-loading/src/Control.Loading.css";
-@import "./layouts/decorated-block.css";
-@import "react-datepicker/dist/react-datepicker.css";
-
 /* For https://github.com/Hacker0x01/react-datepicker/issues/624 */
 .react-datepicker {
   font-size: 1em;
