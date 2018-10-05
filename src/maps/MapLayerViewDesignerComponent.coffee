@@ -2,7 +2,7 @@ PropTypes = require('prop-types')
 React = require 'react'
 R = React.createElement
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
-Rcslider = require 'rc-slider'
+Rcslider = require('rc-slider').default
 LayerFactory = require './LayerFactory'
 ui = require('react-library/lib/bootstrap')
 

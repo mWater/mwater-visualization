@@ -10,7 +10,7 @@ ExprUtils = require('mwater-expressions').ExprUtils
 AxisComponent = require './../axes/AxisComponent'
 TableSelectComponent = require '../TableSelectComponent'
 ColorComponent = require '../ColorComponent'
-Rcslider = require 'rc-slider'
+Rcslider = require('rc-slider').default
 EditPopupComponent = require './EditPopupComponent'
 ZoomLevelsComponent = require './ZoomLevelsComponent'
 

@@ -5,7 +5,7 @@ R = React.createElement
 
 RegionSelectComponent = require './RegionSelectComponent'
 DetailLevelSelectComponent = require './DetailLevelSelectComponent'
-ReactSelect = require 'react-select'
+ReactSelect = require('react-select').default
 
 module.exports = class AdminScopeAndDetailLevelComponent extends React.Component
   @propTypes:
@@ -27,6 +27,8 @@ module.exports = class AdminScopeAndDetailLevelComponent extends React.Component
     @props.onScopeAndDetailLevelChange(@props.scope, @props.scopeLevel, detailLevel)
 
   render: ->
+    basicDetailLevelOptions = [{ value: 0, label: "Countries" }, { value: 1, label: "Level 1 (State/Province/District)" }]
+
     R 'div', null,
       R 'div', className: "form-group",
         R 'label', className: "text-muted", 
@@ -49,10 +51,7 @@ module.exports = class AdminScopeAndDetailLevelComponent extends React.Component
           R 'label', className: "text-muted", 
             "Detail Level"
           R ReactSelect, {
-            value: @props.detailLevel
-            options: [{ value: 0, label: "Countries" }, { value: 1, label: "Level 1 (State/Province/District)" }]
-            clearable: false
-            onChange: (value) => @handleDetailLevelChange(parseInt(value))
+            value: _.findWhere(basicDetailLevelOptions, value: @props.detailLevel)
+            options: basicDetailLevelOptions
+            onChange: (opt) => @handleDetailLevelChange(opt.value) 
           }
-
-

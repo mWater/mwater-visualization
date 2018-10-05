@@ -2,7 +2,7 @@ PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 R = React.createElement
-ReactSelect = require 'react-select'
+ReactSelect = require('react-select').default
 
 # Allows selecting of map marker symbol
 module.exports = class MarkerSymbolSelectComponent extends React.Component
@@ -74,9 +74,9 @@ module.exports = class MarkerSymbolSelectComponent extends React.Component
         "Symbol"
       R ReactSelect, {
         placeholder: "Circle"
-        value: @props.symbol
+        value: _.findWhere(options, value: @props.symbol)
         options: options
-        optionRenderer: optionRenderer
-        valueRenderer: optionRenderer
-        onChange: @props.onChange
+        formatOptionLabel: optionRenderer
+        isClearable: true
+        onChange: (opt) => @props.onChange(opt?.value or null)
       }

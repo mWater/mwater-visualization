@@ -4,7 +4,7 @@ React = require 'react'
 R = React.createElement
 async = require 'async'
 
-ReactSelect = require 'react-select'
+ReactSelect = require('react-select').default
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 DatagridViewComponent = require './DatagridViewComponent'
@@ -201,9 +201,8 @@ module.exports = class FindReplaceModalComponent extends React.Component
         R 'label', null, "Column with data to replace: "
         R ReactSelect,
           options: replaceColumnOptions
-          clearable: false
-          value: @state.replaceColumn
-          onChange: (value) => @setState(replaceColumn: value)
+          value: _.findWhere(replaceColumnOptions, value: @state.replaceColumn)
+          onChange: (opt) => @setState(replaceColumn: opt.value)
           placeholder: "Select Column..."
         # R 'select', value: @state.replaceColumn or "", onChange: ((ev) => @setState(replaceColumn: ev.target.value)), className: "form-control",
         #   R 'option', key: "_none", value: "", "Select..."

@@ -6,7 +6,7 @@ R = React.createElement
 ui = require 'react-library/lib/bootstrap'
 update = require 'react-library/lib/update'
 
-Rcslider = require 'rc-slider'
+Rcslider = require('rc-slider').default
 AxisComponent = require '../../../axes/AxisComponent'
 ColorComponent = require '../../../ColorComponent'
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent

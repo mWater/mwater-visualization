@@ -3,7 +3,7 @@ _ = require 'lodash'
 React = require 'react'
 R = React.createElement
 
-ReactSelect = require 'react-select'
+ReactSelect = require('react-select').default
 
 # Select detail level within an admin region
 module.exports = class DetailLevelSelectComponent extends React.Component
@@ -78,10 +78,9 @@ module.exports = class DetailLevelSelectComponent extends React.Component
   render: ->
     if @state.options
       R ReactSelect, {
-        value: @props.detailLevel or ""
+        value: _.findWhere(@state.options, value: @props.detailLevel)
         options: @state.options
-        clearable: false
-        onChange: (value) => @props.onChange(parseInt(value))
+        onChange: (opt) => @props.onChange(opt.value)
       }
     else
       R 'div', className: "text-muted",

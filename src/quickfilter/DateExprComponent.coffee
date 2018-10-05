@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 React = require 'react'
 R = React.createElement
-ReactSelect = require 'react-select'
 moment = require 'moment'
 
 ClickOutHandler = require('react-onclickout')
