@@ -163,6 +163,10 @@ class EnumQuickfilterComponent extends React.Component
       isClearable: true
       onChange: (value) => if @props.onValueChange then @handleSingleChange(value?.value)
       isDisabled: not @props.onValueChange?
+      styles: { 
+        # Keep menu above fixed data table headers
+        menu: (style) => _.extend({}, style, zIndex: 2)
+      }
   
   renderMultiSelect: ->
     options = _.map(@props.options, (opt) => { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
@@ -175,6 +179,10 @@ class EnumQuickfilterComponent extends React.Component
       options: options
       onChange: if @props.onValueChange then @handleMultiChange
       isDisabled: not @props.onValueChange?
+      styles: { 
+        # Keep menu above fixed data table headers
+        menu: (style) => _.extend({}, style, zIndex: 2)
+      }
 
   render: ->
     R 'div', style: { display: "inline-block", paddingRight: 10 },

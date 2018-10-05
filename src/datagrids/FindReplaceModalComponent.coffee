@@ -199,14 +199,15 @@ module.exports = class FindReplaceModalComponent extends React.Component
     R 'div', null,
       R 'div', key: "replace", className: "form-group",
         R 'label', null, "Column with data to replace: "
-        R ReactSelect,
-          options: replaceColumnOptions
-          value: _.findWhere(replaceColumnOptions, value: @state.replaceColumn)
-          onChange: (opt) => @setState(replaceColumn: opt.value)
-          placeholder: "Select Column..."
-        # R 'select', value: @state.replaceColumn or "", onChange: ((ev) => @setState(replaceColumn: ev.target.value)), className: "form-control",
-        #   R 'option', key: "_none", value: "", "Select..."
-        #   _.map(replaceColumnOptions, (option) => R('option', key: option.value, value: option.value, option.label))
+          R ReactSelect,
+            options: replaceColumnOptions
+            value: _.findWhere(replaceColumnOptions, value: @state.replaceColumn)
+            onChange: (opt) => @setState(replaceColumn: opt.value)
+            placeholder: "Select Column..."
+            styles: { 
+              # Keep menu above fixed data table headers
+              menu: (style) => _.extend({}, style, zIndex: 2)
+            }
 
       if @state.replaceColumn
         # Get expr of replace column
