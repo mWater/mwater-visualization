@@ -26,7 +26,7 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
     asUser: PropTypes.string                            # Load schema as a specific user (for shared dashboards, etc)
 
     extraTables: PropTypes.arrayOf(PropTypes.string)  # Extra tables to load in schema. Forms are not loaded by default as they are too many
-    onExtraTablesChange: PropTypes.func                     # Called when extra tables are changed and schema should be reloaded
+    onExtraTablesChange: PropTypes.func                     # Called when extra tables are changed and schema will be reloaded
 
     # Override default add layer component. See AddLayerComponent for details
     addLayerElementFactory: PropTypes.func              

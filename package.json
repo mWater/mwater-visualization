@@ -55,7 +55,7 @@
     "react-dnd-html5-backend": "^2.1.2",
     "react-dom": "^16.5.2",
     "react-dropzone": "^3.5.3",
-    "react-float-affixed": "^0.1.8",
+    "react-float-affixed": "^1.0.0",
     "react-lazy-load": "^3.0.11",
     "react-library": "github:mwater/react-library#react16",
     "react-motion": "^0.5.2",
