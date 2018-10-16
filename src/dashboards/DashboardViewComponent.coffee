@@ -4,8 +4,6 @@ R = React.createElement
 
 uuid = require 'uuid'
 
-HTML5Backend = require('react-dnd-html5-backend')
-NestableDragDropContext = require  "react-library/lib/NestableDragDropContext"
 ImplicitFilterBuilder = require '../ImplicitFilterBuilder'
 
 DashboardUtils = require './DashboardUtils'
@@ -167,8 +165,7 @@ module.exports = class DashboardViewComponent extends React.Component
     }
 
     # Render widget container
-    # TODO REMOVE DragDropContextComponent and change to R 'div', when grid layout is gone.
-    return R DragDropContextComponent, style: style, 
+    return R "div", style: style, 
       @renderScopes()
 
       layoutManager.renderLayout({
@@ -179,10 +176,3 @@ module.exports = class DashboardViewComponent extends React.Component
         style: @props.design.style
         renderWidget: renderWidget
       })
-
-# Wrapper that has a nestable drag drop context
-class DragDropContextComponent extends React.Component
-  render: ->
-    return R 'div', @props
-        
-DragDropContextComponent = NestableDragDropContext(HTML5Backend)(DragDropContextComponent)

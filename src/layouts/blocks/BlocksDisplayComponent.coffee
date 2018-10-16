@@ -4,9 +4,6 @@ React = require 'react'
 R = React.createElement
 uuid = require 'uuid'
 
-HTML5Backend = require('react-dnd-html5-backend')
-NestableDragDropContext = require  "react-library/lib/NestableDragDropContext"
-
 DraggableBlockComponent = require "./DraggableBlockComponent"
 DecoratedBlockComponent = require '../DecoratedBlockComponent'
 
@@ -207,7 +204,7 @@ class BlocksDisplayComponent extends React.Component
           R 'div', key: "inner", className: "mwater-visualization-block-parent-inner mwater-visualization-block-parent-inner-#{@props.style or "default"}",
             @renderBlock(@props.items)
 
-module.exports = NestableDragDropContext(HTML5Backend)(BlocksDisplayComponent)
+module.exports = BlocksDisplayComponent
 
 class RootBlockComponent extends React.Component
   @propTypes:
