@@ -5,7 +5,6 @@ _ = require 'lodash'
 R = React.createElement
 DragSource = require('react-dnd').DragSource
 DropTarget = require('react-dnd').DropTarget
-DragDropContext = require('react-dnd').DragDropContext
 DecoratedBlockComponent = require '../DecoratedBlockComponent'
 
 # Render a child element as draggable, resizable block, injecting handle connectors
