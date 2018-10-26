@@ -4,15 +4,11 @@ React = require 'react'
 R = React.createElement
 
 Schema = require('mwater-expressions').Schema
-MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
-MWaterTableSelectComponent = require './MWaterTableSelectComponent'
-MWaterAddRelatedFormComponent = require './MWaterAddRelatedFormComponent'
-MWaterAddRelatedIndicatorComponent = require './MWaterAddRelatedIndicatorComponent'
-MWaterGlobalFiltersComponent = require './MWaterGlobalFiltersComponent'
 querystring = require 'querystring'
 AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
 LoadingComponent = require 'react-library/lib/LoadingComponent'
 mWaterLoader = require './mWaterLoader'
+MWaterContextComponent = require './MWaterContextComponent'
 
 # Loads an mWater schema from the server and creates child with schema and dataSource
 # Also creates a tableSelectElementFactory context to allow selecting of a table in an mWater-friendly way
@@ -63,104 +59,19 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
         callback({ schema: config.schema, dataSource: config.dataSource })
     )
 
-  @childContextTypes: 
-    tableSelectElementFactory: PropTypes.func  # Call with props of TableSelectComponent
-    addLayerElementFactory: PropTypes.func     # Call with props of AddLayerComponent
-    globalFiltersElementFactory: PropTypes.func # Call with props { schema, dataSource, filterableTables, globalFilters, onChange, nullIfIrrelevant }. 
-    # Displays a component to edit global filters. nullIfIrrelevant causes null element if not applicable to filterableTables
-
-    # Decorates sections (the children element, specifically) in the expression picker
-    decorateScalarExprTreeSectionChildren: PropTypes.func
-
-    # Function to override initial open state of a section. Passed { tableId: id of table, section: section object from schema, filter: optional string filter }
-    # Should return true to set initially open
-    isScalarExprTreeSectionInitiallyOpen: PropTypes.func
-
-    # Function to override filtering of a section. Passed { tableId: id of table, section: section object from schema, filter: optional string filter }
-    # Should return null for default, true to include, false to exclude
-    isScalarExprTreeSectionMatch: PropTypes.func
-  
-  getChildContext: ->
-    context = {}
-
-    context.tableSelectElementFactory = (props) =>
-      return React.createElement(MWaterTableSelectComponent,
-        apiUrl: @props.apiUrl
-        client: @props.client
-        schema: props.schema
-        user: @props.user
-        table: props.value
-        onChange: props.onChange
-        extraTables: @props.extraTables
-        onExtraTablesChange: @props.onExtraTablesChange
-        filter: props.filter
-        onFilterChange: props.onFilterChange
-     )
-
-    if @props.addLayerElementFactory
-      context.addLayerElementFactory = @props.addLayerElementFactory
-
-    context.globalFiltersElementFactory = (props) =>
-      if props.nullIfIrrelevant and not _.any(props.filterableTables, (t) -> t.match(/^entities./))
-        return null
-        
-      return React.createElement(MWaterGlobalFiltersComponent, props)
-
-    context.decorateScalarExprTreeSectionChildren = (options) =>
-      # If related forms section of entities table
-      if options.tableId.match(/^entities\./) and options.section.id == "!related_forms"
-        return R 'div', key: "_add_related_form_parent",
-          options.children
-          R MWaterAddRelatedFormComponent, 
-            key: "_add_related_form"
-            table: options.tableId
-            apiUrl: @props.apiUrl
-            client: @props.client
-            user: @props.user
-            schema: @state.schema
-            onSelect: @handleAddTable
-
-      # If indicators section of entities table
-      if options.tableId.match(/^entities\./) and options.section.id == "!indicators"
-        return R 'div', key: "_add_related_indicator_parent",
-          options.children
-          R MWaterAddRelatedIndicatorComponent,
-            key: "_add_related_indicator" 
-            table: options.tableId
-            apiUrl: @props.apiUrl
-            client: @props.client
-            user: @props.user
-            schema: @state.schema
-            onSelect: @handleAddTable
-            filter: options.filter
-
-      else
-        return options.children
-
-    # Always match indicator section
-    context.isScalarExprTreeSectionMatch = (options) =>
-      if options.tableId.match(/^entities\./) and options.section.id == "!indicators"
-        return true
-      return null
-
-    # Always open indicator section
-    context.isScalarExprTreeSectionInitiallyOpen = (options) =>
-      if options.tableId.match(/^entities\./) and options.section.id == "!indicators"
-        return true
-      return null
-
-    return context
-
-  handleAddTable: (table) =>
-    extraTables = _.union(@props.extraTables, [table])
-    @props.onExtraTablesChange(extraTables)
-
   render: ->
     if not @state.schema and not @state.error
       return React.createElement(LoadingComponent)
 
-    return @props.children(@state.error, {
-      schema: @state.schema
-      dataSource: @state.dataSource
-    })
-
+    # Inject context
+    return R MWaterContextComponent, 
+      apiUrl: @props.apiUrl
+      client: @props.client
+      user: @props.user
+      extraTables: @props.extraTables
+      onExtraTablesChange: @props.onExtraTablesChange
+      addLayerElementFactory: @props.addLayerElementFactory,
+        @props.children(@state.error, {
+          schema: @state.schema
+          dataSource: @state.dataSource
+        })

@@ -29,6 +29,7 @@ exports.CheckboxComponent = require './CheckboxComponent'
 
 exports.mWaterLoader = require './mWaterLoader'
 exports.MWaterLoaderComponent = require './MWaterLoaderComponent'
+exports.MWaterContextComponent = require './MWaterContextComponent'
 
 exports.LayeredChart = require './widgets/charts/layered/LayeredChart'
 exports.TableChart = require './widgets/charts/table/TableChart'
