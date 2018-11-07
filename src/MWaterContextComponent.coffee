@@ -17,6 +17,7 @@ module.exports = class MWaterContextComponent extends React.Component
     user: PropTypes.string                              # user id of logged in user
     extraTables: PropTypes.arrayOf(PropTypes.string)  # Extra tables to load in schema. Forms are not loaded by default as they are too many
     onExtraTablesChange: PropTypes.func                     # Called when extra tables are changed and schema will be reloaded
+    schema: PropTypes.object.isRequired
 
     # Override default add layer component. See AddLayerComponent for details
     addLayerElementFactory: PropTypes.func              
@@ -75,7 +76,7 @@ module.exports = class MWaterContextComponent extends React.Component
             apiUrl: @props.apiUrl
             client: @props.client
             user: @props.user
-            schema: @state.schema
+            schema: @props.schema
             onSelect: @handleAddTable
 
       # If indicators section of entities table
@@ -88,7 +89,7 @@ module.exports = class MWaterContextComponent extends React.Component
             apiUrl: @props.apiUrl
             client: @props.client
             user: @props.user
-            schema: @state.schema
+            schema: @props.schema
             onSelect: @handleAddTable
             filter: options.filter
 

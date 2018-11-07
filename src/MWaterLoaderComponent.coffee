@@ -68,6 +68,7 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
       apiUrl: @props.apiUrl
       client: @props.client
       user: @props.user
+      schema: @state.schema
       extraTables: @props.extraTables
       onExtraTablesChange: @props.onExtraTablesChange
       addLayerElementFactory: @props.addLayerElementFactory,
