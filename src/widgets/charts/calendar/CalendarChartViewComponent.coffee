@@ -18,6 +18,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
   @propTypes:
     design: PropTypes.object.isRequired # Design of chart
     data: PropTypes.array.isRequired # Data that the chart has requested. In format [{ date: <YYYY-MM-DD>, value: <number value> }, { date: ... }...]
+    schema: PropTypes.object.isRequired
 
     width: PropTypes.number
     height: PropTypes.number
@@ -37,7 +38,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
   constructor: (props) ->
     super(props)
 
-    @axisBuilder = new AxisBuilder(schema: options.schema)
+    @axisBuilder = new AxisBuilder(schema: props.schema) 
 
   @defaultProps:
     monthsStrokeColor: "#222"

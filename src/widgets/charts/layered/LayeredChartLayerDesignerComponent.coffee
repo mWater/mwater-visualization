@@ -108,10 +108,6 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
   handleStackedChange: (ev) => @updateLayer(stacked: ev.target.checked)
 
   renderName: ->
-    # Only if multiple
-    if @props.design.layers.length <= 1
-      return
-
     layer = @props.design.layers[@props.index]
 
     # R 'div', className: "form-group",
