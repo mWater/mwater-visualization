@@ -116,7 +116,7 @@ module.exports = class SettingsModalComponent extends React.Component
             "Controls the preferred language of widgets and uses specified language when available"
 
           R ReactSelect, 
-            value: _.find(localeOptions, value: @state.design.locale or "en")
+            value: _.findWhere(localeOptions, value: @state.design.locale or "en") or null
             options: localeOptions
             onChange: (locale) => @handleDesignChange(update(@state.design, { locale: { $set: locale.value } }))
 

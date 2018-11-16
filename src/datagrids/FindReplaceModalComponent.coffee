@@ -201,7 +201,7 @@ module.exports = class FindReplaceModalComponent extends React.Component
         R 'label', null, "Column with data to replace: "
           R ReactSelect,
             options: replaceColumnOptions
-            value: _.findWhere(replaceColumnOptions, value: @state.replaceColumn)
+            value: _.findWhere(replaceColumnOptions, value: @state.replaceColumn) or null
             onChange: (opt) => @setState(replaceColumn: opt.value)
             placeholder: "Select Column..."
             styles: { 

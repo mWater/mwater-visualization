@@ -78,7 +78,7 @@ module.exports = class DetailLevelSelectComponent extends React.Component
   render: ->
     if @state.options
       R ReactSelect, {
-        value: _.findWhere(@state.options, value: @props.detailLevel)
+        value: _.findWhere(@state.options, value: @props.detailLevel) or null
         options: @state.options
         onChange: (opt) => @props.onChange(opt.value)
       }

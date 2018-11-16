@@ -51,7 +51,7 @@ module.exports = class AdminScopeAndDetailLevelComponent extends React.Component
           R 'label', className: "text-muted", 
             "Detail Level"
           R ReactSelect, {
-            value: _.findWhere(basicDetailLevelOptions, value: @props.detailLevel)
+            value: _.findWhere(basicDetailLevelOptions, value: @props.detailLevel) or null
             options: basicDetailLevelOptions
             onChange: (opt) => @handleDetailLevelChange(opt.value) 
           }

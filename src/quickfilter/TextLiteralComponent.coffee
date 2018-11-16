@@ -66,7 +66,7 @@ module.exports = class TextLiteralComponent extends React.Component
     return
 
   renderSingle: ->
-    currentValue = if @props.value then { value: @props.value, label: @props.value }
+    currentValue = if @props.value then { value: @props.value, label: @props.value } else null
 
     R AsyncReactSelect, 
       key: JSON.stringify(@props.filters)  # Include to force a change when filters change
@@ -84,7 +84,7 @@ module.exports = class TextLiteralComponent extends React.Component
 
 
   renderMultiple: ->
-    currentValue = if @props.value then _.map(@props.value, (v) => { value: v, label: v })
+    currentValue = if @props.value then _.map(@props.value, (v) => { value: v, label: v }) else null
 
     R AsyncReactSelect, 
       placeholder: "All"

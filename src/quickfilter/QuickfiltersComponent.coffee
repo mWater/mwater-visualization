@@ -158,7 +158,7 @@ class EnumQuickfilterComponent extends React.Component
 
     R ReactSelect, 
       placeholder: "All"
-      value: _.find(options, value: @props.value)
+      value: _.findWhere(options, value: @props.value) or null
       options: options
       isClearable: true
       onChange: (value) => if @props.onValueChange then @handleSingleChange(value?.value)

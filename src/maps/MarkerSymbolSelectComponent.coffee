@@ -74,7 +74,7 @@ module.exports = class MarkerSymbolSelectComponent extends React.Component
         "Symbol"
       R ReactSelect, {
         placeholder: "Circle"
-        value: _.findWhere(options, value: @props.symbol)
+        value: _.findWhere(options, value: @props.symbol) or null
         options: options
         formatOptionLabel: optionRenderer
         isClearable: true
