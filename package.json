@@ -58,6 +58,7 @@
     "react-float-affixed": "^0.1.8",
     "react-lazy-load": "^3.0.11",
     "react-library": "github:mwater/react-library",
+    "react-linkify": "^0.2.2",
     "react-motion": "^0.3.0",
     "react-onclickout": "^2.0.4",
     "react-select": "github:mwater/react-select#fix_690",

@@ -5,6 +5,7 @@ H = React.DOM
 R = React.createElement
 moment = require 'moment'
 d3Format = require 'd3-format'
+Linkify = require('react-linkify').default
 
 AxisBuilder = require '../../../axes/AxisBuilder'
 ExprUtils = require('mwater-expressions').ExprUtils
@@ -114,7 +115,7 @@ class TableContentsComponent extends React.Component
       # Convert to node based on type
       switch exprType
         when "text"
-          node = value
+          node = R(Linkify, null, value)
         when "number"
           # Use d3 format if number
           format = if column.format? then column.format else ","
