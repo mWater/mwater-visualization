@@ -67,7 +67,7 @@ module.exports = class BufferLayer extends Layer
       <primary key> as id,
       [<color axis> as color,
       st_transform(<geometry axis>, 3857) as the_geom_webmercator,
-      radius * 2 / (!pixel_width! * cos(st_y(st_transform(geometryExpr, 4326)) * 0.017453293) as width
+      radius * 2 / (!pixel_width! * cos(st_ymin(st_transform(geometryExpr, 4326)) * 0.017453293) as width
       from <table> as main
       where
         <geometry axis> is not null
@@ -89,7 +89,7 @@ module.exports = class BufferLayer extends Layer
     # Convert to Web mercator (3857)
     geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
 
-    # radius * 2 / (!pixel_width! * cos(st_y(st_transform(geometryExpr, 4326)) * 0.017453293) + 1 # add one to make always visible
+    # radius * 2 / (!pixel_width! * cos(st_ymin(st_transform(geometryExpr, 4326)) * 0.017453293) + 1 # add one to make always visible
     widthExpr = {
       type: "op"
       op: "+"
@@ -101,7 +101,7 @@ module.exports = class BufferLayer extends Layer
             { type: "token", token: "!pixel_height!" }
             { type: "op", op: "cos", exprs: [
               { type: "op", op: "*", exprs: [
-                { type: "op", op: "ST_Y", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326]}] }
+                { type: "op", op: "ST_YMIN", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326]}] }
                 0.017453293
               ]}
             ]}
