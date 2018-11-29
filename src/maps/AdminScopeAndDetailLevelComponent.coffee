@@ -8,6 +8,7 @@ RegionSelectComponent = require './RegionSelectComponent'
 DetailLevelSelectComponent = require './DetailLevelSelectComponent'
 ReactSelect = require 'react-select'
 
+# Scope and detail level setter for AdminChoropleth layers when using admin_regions
 module.exports = class AdminScopeAndDetailLevelComponent extends React.Component
   @propTypes:
     schema: PropTypes.object.isRequired # Schema to use

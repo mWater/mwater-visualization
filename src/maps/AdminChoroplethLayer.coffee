@@ -14,8 +14,11 @@ LayerLegendComponent = require './LayerLegendComponent'
 PopupFilterJoinsUtils = require './PopupFilterJoinsUtils'
 
 ###
-Layer that is composed of administrative regions colored
+Layer that is composed of administrative regions colored. Now extended to any other regions as well, so name
+is legacy, as is adminRegionExpr field.
+
 Design is:
+  regionsTable: null for "admin_regions" (default). id of region table if not using admin regions (e.g. regions.catchments)
   scope: _id of overall admin region. Null for whole world.
   scopeLevel: admin level of scope. Default is 0 (entire country) if scope is set
   detailLevel: admin level to disaggregate to
@@ -72,7 +75,7 @@ module.exports = class AdminChoroplethLayer extends Layer
     ###
     E.g:
     select name, shape_simplified, regions.color from
-    admin_regions as admin_regions2
+    admin_regions as regions2
     left outer join
     (
       select admin_regions.level2 as id,
@@ -83,8 +86,8 @@ module.exports = class AdminChoroplethLayer extends Layer
       on innerquery.admin_region = admin_regions._id
       where admin_regions.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
       group by 1
-    ) as regions on regions.id = admin_regions2._id
-    where admin_regions2.level = 2 and admin_regions2.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
+    ) as regions on regions.id = regions2._id
+    where regions2.level = 2 and regions2.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
     ###
 
     # Verify that scopeLevel is an integer to prevent injection
@@ -95,6 +98,8 @@ module.exports = class AdminChoroplethLayer extends Layer
     if design.detailLevel not in [0, 1, 2, 3, 4, 5]
       throw new Error("Invalid detail level")
 
+    regionsTable = design.regionsTable or "admin_regions"
+
     # Compile adminRegionExpr
     compiledAdminRegionExpr = exprCompiler.compileExpr(expr: design.adminRegionExpr, tableAlias: "innerquery")
 
@@ -102,19 +107,19 @@ module.exports = class AdminChoroplethLayer extends Layer
     innerQuery = {
       type: "query"
       selects: [
-        { type: "select", expr: { type: "field", tableAlias: "admin_regions", column: "level#{design.detailLevel}" }, alias: "id" }
+        { type: "select", expr: { type: "field", tableAlias: "regions", column: "level#{design.detailLevel}" }, alias: "id" }
       ]
       from: {
         type: "join"
         kind: "inner"
-        left: { type: "table", table: "admin_regions", alias: "admin_regions" }
+        left: { type: "table", table: regionsTable, alias: "regions" }
         right: exprCompiler.compileTable(design.table, "innerquery")
         on: {
           type: "op"
           op: "="
           exprs: [
             compiledAdminRegionExpr
-            { type: "field", tableAlias: "admin_regions", column: "_id" }
+            { type: "field", tableAlias: "regions", column: "_id" }
           ]
         }
       }
@@ -138,7 +143,7 @@ module.exports = class AdminChoroplethLayer extends Layer
         type: "op"
         op: "="
         exprs: [
-          { type: "field", tableAlias: "admin_regions", column: "level#{design.scopeLevel or 0}" }
+          { type: "field", tableAlias: "regions", column: "level#{design.scopeLevel or 0}" }
           design.scope
         ]
       })
@@ -161,21 +166,21 @@ module.exports = class AdminChoroplethLayer extends Layer
     query = {
       type: "query"
       selects: [
-        { type: "select", expr: { type: "field", tableAlias: "admin_regions2", column: "_id" }, alias: "id" }
-        { type: "select", expr: { type: "field", tableAlias: "admin_regions2", column: "shape_simplified" }, alias: "the_geom_webmercator" }
-        { type: "select", expr: { type: "field", tableAlias: "admin_regions2", column: "name" }, alias: "name" }
+        { type: "select", expr: { type: "field", tableAlias: "regions2", column: "_id" }, alias: "id" }
+        { type: "select", expr: { type: "field", tableAlias: "regions2", column: "shape_simplified" }, alias: "the_geom_webmercator" }
+        { type: "select", expr: { type: "field", tableAlias: "regions2", column: "name" }, alias: "name" }
       ]
       from: {
         type: "join"
         kind: "left"
-        left: { type: "table", table: "admin_regions", alias: "admin_regions2" }
+        left: { type: "table", table: regionsTable, alias: "regions2" }
         right: { type: "subquery", query: innerQuery, alias: "regions" }
         on: {
           type: "op"
           op: "="
           exprs: [
             { type: "field", tableAlias: "regions", column: "id" }
-            { type: "field", tableAlias: "admin_regions2", column: "_id" }
+            { type: "field", tableAlias: "regions2", column: "_id" }
           ]
         }
       }
@@ -188,7 +193,7 @@ module.exports = class AdminChoroplethLayer extends Layer
             type: "op"
             op: "="
             exprs: [
-              { type: "field", tableAlias: "admin_regions2", column: "level" }
+              { type: "field", tableAlias: "regions2", column: "level" }
               design.detailLevel
             ]
           }
@@ -202,7 +207,7 @@ module.exports = class AdminChoroplethLayer extends Layer
         type: "op"
         op: "="
         exprs: [
-          { type: "field", tableAlias: "admin_regions2", column: "level#{design.scopeLevel or 0}" }
+          { type: "field", tableAlias: "regions2", column: "level#{design.scopeLevel or 0}" }
           design.scope
         ]
       })
@@ -274,6 +279,8 @@ module.exports = class AdminChoroplethLayer extends Layer
   #     popup: React element to put into a popup
   #   }
   onGridClick: (ev, clickOptions) ->
+    regionsTable = clickOptions.design.regionsTable or "admin_regions"
+
     # TODO abstract most to base class
     if ev.data and ev.data.id
       results = { }
@@ -289,7 +296,7 @@ module.exports = class AdminChoroplethLayer extends Layer
         table: table
         exprs: [
           clickOptions.design.adminRegionExpr
-          { type: "literal", idTable: "admin_regions", valueType: "id", value: ev.data.id }
+          { type: "literal", idTable: regionsTable, valueType: "id", value: ev.data.id }
         ]
       }
       compiledFilterExpr = exprCompiler.compileExpr(expr: filterExpr, tableAlias: "{alias}")
@@ -323,7 +330,7 @@ module.exports = class AdminChoroplethLayer extends Layer
 
         # Add filter for admin region
         popupFilters.push({
-          table: "admin_regions"
+          table: regionsTable
           jsonql: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "_id" }, { type: "literal", value: ev.data.id }]}
         })
 
@@ -363,13 +370,15 @@ module.exports = class AdminChoroplethLayer extends Layer
 
   # Gets the bounds of the layer as GeoJSON
   getBounds: (design, schema, dataSource, filters, callback) ->
+    regionsTable = design.regionsTable or "admin_regions"
+
     # Whole world
     if not design.scope
       return callback(null)
 
     # Get just scope. Ignore filters and get entire scope
     filters = [{
-      table: "admin_regions"
+      table: regionsTable
       jsonql: {
         type: "op"
         op: "="
@@ -380,7 +389,7 @@ module.exports = class AdminChoroplethLayer extends Layer
       }
     }]
 
-    @getBoundsFromExpr(schema, dataSource, "admin_regions", { type: "field", table: "admin_regions", column: "shape" }, null, filters, callback)
+    @getBoundsFromExpr(schema, dataSource, regionsTable, { type: "field", table: regionsTable, column: "shape" }, null, filters, callback)
 
   # Get min and max zoom levels
   getMinZoom: (design) -> return design.minZoom
@@ -415,6 +424,7 @@ module.exports = class AdminChoroplethLayer extends Layer
 
   # Returns a cleaned design
   cleanDesign: (design, schema) ->
+    regionsTable = design.regionsTable or "admin_regions"
     exprCleaner = new ExprCleaner(schema)
     axisBuilder = new AxisBuilder(schema: schema)
 
@@ -424,7 +434,7 @@ module.exports = class AdminChoroplethLayer extends Layer
     # Default color
     design.color = design.color or "#FFFFFF"
 
-    design.adminRegionExpr = exprCleaner.cleanExpr(design.adminRegionExpr, { table: design.table, types: ["id"], idTable: "admin_regions" })
+    design.adminRegionExpr = exprCleaner.cleanExpr(design.adminRegionExpr, { table: design.table, types: ["id"], idTable: regionsTable })
 
     design.axes = design.axes or {}
     design.fillOpacity = if design.fillOpacity? then design.fillOpacity else 0.75
@@ -485,6 +495,7 @@ module.exports = class AdminChoroplethLayer extends Layer
         options.onDesignChange(@cleanDesign(design, options.schema)))
 
   createKMLExportJsonQL: (design, schema, filters) ->
+    regionsTable = design.regionsTable or "admin_regions"
     axisBuilder = new AxisBuilder(schema: schema)
     exprCompiler = new ExprCompiler(schema)
 
@@ -503,19 +514,19 @@ module.exports = class AdminChoroplethLayer extends Layer
     innerQuery = {
       type: "query"
       selects: [
-        { type: "select", expr: { type: "field", tableAlias: "admin_regions", column: "level#{design.detailLevel}" }, alias: "id" }
+        { type: "select", expr: { type: "field", tableAlias: "regions", column: "level#{design.detailLevel}" }, alias: "id" }
       ]
       from: {
         type: "join"
         kind: "inner"
-        left: { type: "table", table: "admin_regions", alias: "admin_regions" }
+        left: { type: "table", table: regionsTable, alias: "regions" }
         right: exprCompiler.compileTable(design.table, "innerquery")
         on: {
           type: "op"
           op: "="
           exprs: [
             compiledAdminRegionExpr
-            { type: "field", tableAlias: "admin_regions", column: "_id" }
+            { type: "field", tableAlias: "regions", column: "_id" }
           ]
         }
       }
@@ -541,7 +552,7 @@ module.exports = class AdminChoroplethLayer extends Layer
         type: "op"
         op: "="
         exprs: [
-          { type: "field", tableAlias: "admin_regions", column: "level#{design.scopeLevel or 0}" }
+          { type: "field", tableAlias: "regions", column: "level#{design.scopeLevel or 0}" }
           design.scope
         ]
       })
@@ -564,7 +575,7 @@ module.exports = class AdminChoroplethLayer extends Layer
       type: "op", op: "ST_AsGeoJson", exprs: [
         {
           type: "op", op: "ST_Transform", exprs: [
-            {type: "field", tableAlias: "admin_regions2", column: "shape_simplified"},
+            {type: "field", tableAlias: "regions2", column: "shape_simplified"},
             4326
           ]
         }
@@ -575,21 +586,21 @@ module.exports = class AdminChoroplethLayer extends Layer
     query = {
       type: "query"
       selects: [
-        { type: "select", expr: { type: "field", tableAlias: "admin_regions2", column: "_id" }, alias: "id" }
+        { type: "select", expr: { type: "field", tableAlias: "regions2", column: "_id" }, alias: "id" }
         { type: "select", expr: adminGeometry, alias: "the_geom_webmercator" }
-        { type: "select", expr: { type: "field", tableAlias: "admin_regions2", column: "name" }, alias: "name" }
+        { type: "select", expr: { type: "field", tableAlias: "regions2", column: "name" }, alias: "name" }
       ]
       from: {
         type: "join"
         kind: "left"
-        left: { type: "table", table: "admin_regions", alias: "admin_regions2" }
+        left: { type: "table", table: regionsTable, alias: "regions2" }
         right: { type: "subquery", query: innerQuery, alias: "regions" }
         on: {
           type: "op"
           op: "="
           exprs: [
             { type: "field", tableAlias: "regions", column: "id" }
-            { type: "field", tableAlias: "admin_regions2", column: "_id" }
+            { type: "field", tableAlias: "regions2", column: "_id" }
           ]
         }
       }
@@ -602,7 +613,7 @@ module.exports = class AdminChoroplethLayer extends Layer
             type: "op"
             op: "="
             exprs: [
-              { type: "field", tableAlias: "admin_regions2", column: "level" }
+              { type: "field", tableAlias: "regions2", column: "level" }
               design.detailLevel
             ]
           }
@@ -616,7 +627,7 @@ module.exports = class AdminChoroplethLayer extends Layer
         type: "op"
         op: "="
         exprs: [
-          { type: "field", tableAlias: "admin_regions2", column: "level#{design.scopeLevel or 0}" }
+          { type: "field", tableAlias: "regions2", column: "level#{design.scopeLevel or 0}" }
           design.scope
         ]
       })

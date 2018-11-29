@@ -14,8 +14,10 @@ ColorComponent = require '../ColorComponent'
 Rcslider = require 'rc-slider'
 EditPopupComponent = require './EditPopupComponent'
 ZoomLevelsComponent = require './ZoomLevelsComponent'
+ui = require 'react-library/lib/bootstrap'
 
 AdminScopeAndDetailLevelComponent = require './AdminScopeAndDetailLevelComponent'
+ScopeAndDetailLevelComponent = require './ScopeAndDetailLevelComponent'
 
 # Designer for a choropleth layer
 module.exports = class AdminChoroplethLayerDesigner extends React.Component
@@ -39,12 +41,14 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
     @props.onDesignChange(_.extend({}, @props.design, { scope: scope, scopeLevel: scopeLevel, detailLevel: detailLevel }))
   
   handleTableChange: (table) =>
-    # Autoselect admin region if present
+    # Autoselect region if present
     adminRegionExpr = null
+
+    regionsTable = @props.design.regionsTable or "admin_regions"
 
     if table
       for column in @props.schema.getColumns(table)
-        if column.type == "join" and column.join.type == "n-1" and column.join.toTable == "admin_regions"
+        if column.type == "join" and column.join.type == "n-1" and column.join.toTable == regionsTable
           adminRegionExpr = { type: "field", table: table, column: column.id }
           break
     
@@ -69,10 +73,23 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
           onFilterChange: @handleFilterChange
         }
   
+  renderRegionsTable: ->
+    return H.div className: "form-group",
+      H.label className: "text-muted", 
+        "Regions Type"
+      H.div style: { marginLeft: 8 }, 
+        R ui.Select,
+          value: @props.design.regionsTable
+          onChange: (value) => @update(regionsTable: value, scope: null, scopeLevel: null, detailLevel: 0, adminRegionExpr: null) 
+          options: _.map(_.filter(@props.schema.getTables(), (table) => table.id.startsWith("regions.")), (table) => { value: table.id, label: table.name.en })
+          nullLabel: "Administrative Regions"
+
   renderAdminRegionExpr: ->
     # If no data, hide
     if not @props.design.table
       return null
+
+    regionsTable = @props.design.regionsTable or "admin_regions"
 
     return H.div className: "form-group",
       H.label className: "text-muted", 
@@ -85,17 +102,29 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
           onChange: (expr) => @update(adminRegionExpr: expr)
           table: @props.design.table
           types: ["id"]
-          idTable: "admin_regions"
+          idTable: regionsTable
           value: @props.design.adminRegionExpr)
 
   renderScopeAndDetailLevel: ->
-    R AdminScopeAndDetailLevelComponent,
-      schema: @props.schema
-      dataSource: @props.dataSource
-      scope: @props.design.scope
-      scopeLevel: @props.design.scopeLevel or 0
-      detailLevel: @props.design.detailLevel
-      onScopeAndDetailLevelChange: @handleScopeAndDetailLevelChange
+    regionsTable = @props.design.regionsTable or "admin_regions"
+
+    if regionsTable == "admin_regions"
+      return R AdminScopeAndDetailLevelComponent,
+        schema: @props.schema
+        dataSource: @props.dataSource
+        scope: @props.design.scope
+        scopeLevel: @props.design.scopeLevel or 0
+        detailLevel: @props.design.detailLevel
+        onScopeAndDetailLevelChange: @handleScopeAndDetailLevelChange
+    else 
+      return R ScopeAndDetailLevelComponent,
+        schema: @props.schema
+        dataSource: @props.dataSource
+        scope: @props.design.scope
+        scopeLevel: @props.design.scopeLevel
+        detailLevel: @props.design.detailLevel
+        onScopeAndDetailLevelChange: @handleScopeAndDetailLevelChange
+        regionsTable: regionsTable
 
   renderDisplayNames: ->
     H.div className: "form-group",
@@ -202,6 +231,8 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
     if not @props.design.table
       return null
 
+    regionsTable = @props.design.regionsTable or "admin_regions"
+
     defaultPopupFilterJoins = {}
     if @props.design.adminRegionExpr
       defaultPopupFilterJoins[@props.design.table] = @props.design.adminRegionExpr
@@ -212,12 +243,13 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
       schema: @props.schema
       dataSource: @props.dataSource
       table: @props.design.table
-      idTable: "admin_regions"
+      idTable: regionsTable
       defaultPopupFilterJoins: defaultPopupFilterJoins
 
   render: ->
     H.div null,
       @renderTable()
+      @renderRegionsTable()
       @renderAdminRegionExpr()
       @renderScopeAndDetailLevel()
       @renderDisplayNames()
