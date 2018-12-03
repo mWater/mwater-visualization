@@ -138,6 +138,7 @@ module.exports = class MarkersLayer extends Layer
       selects: [
         { type: "select", expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "innerquery", column: "id" }]}, alias: "id" } # innerquery._id::text as id
         { type: "select", expr: { type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }, alias: "the_geom_webmercator" } # innerquery.the_geom_webmercator as the_geom_webmercator
+        { type: "select", expr: { type: "op", op: "ST_GeometryType", exprs: [{ type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }] }, alias: "geometry_type" } # ST_GeometryType(innerquery.the_geom_webmercator) as geometry_type
       ]
       from: { type: "subquery", query: innerquery, alias: "innerquery" }
       where: { type: "op", op: "<=", exprs: [{ type: "field", tableAlias: "innerquery", column: "r" }, 3]}
@@ -160,8 +161,9 @@ module.exports = class MarkersLayer extends Layer
       symbol = "marker-type: ellipse;"
       stroke = "marker-line-width: 1;"
 
+    # Should only display markers when it is a point geometry
     css += '''
-      #layer0 {
+      #layer0[geometry_type='ST_Point'] {
         marker-fill: ''' + (design.color or "#666666") + ''';
         marker-width: ''' + (design.markerSize or 10) + ''';
         marker-line-color: white;
@@ -170,6 +172,14 @@ module.exports = class MarkersLayer extends Layer
         marker-placement: point;
         ''' + symbol + '''
         marker-allow-overlap: true;
+      }
+      #layer0 {
+        line-color: ''' + (design.color or "#666666") + ''';
+        line-width: 3;
+      }
+      #layer0[geometry_type='ST_Polygon'],#layer0[geometry_type='ST_MultiPolygon'] {
+        polygon-fill: ''' + (design.color or "#666666") + ''';
+        polygon-opacity: 0.25;
       }
 
     '''
@@ -388,8 +398,8 @@ module.exports = class MarkersLayer extends Layer
       type: "query"
       selects: [
         { type: "select", expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(design.table).primaryKey }, alias: "id" } # main primary key as id
-        { type: "select", expr: { type: "op", op: "ST_X", exprs: [geometryExpr]}, alias: "longitude" } # innerquery.the_geom_webmercator as the_geom_webmercator
-        { type: "select", expr: { type: "op", op: "ST_Y", exprs: [geometryExpr]}, alias: "latitude" } # innerquery.the_geom_webmercator as the_geom_webmercator
+        { type: "select", expr: { type: "op", op: "ST_XMIN", exprs: [geometryExpr]}, alias: "longitude" } # innerquery.the_geom_webmercator as the_geom_webmercator
+        { type: "select", expr: { type: "op", op: "ST_YMIN", exprs: [geometryExpr]}, alias: "latitude" } # innerquery.the_geom_webmercator as the_geom_webmercator
       ]
       from: exprCompiler.compileTable(design.table, "innerquery")
     }
