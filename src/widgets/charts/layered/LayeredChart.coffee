@@ -1,6 +1,6 @@
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
+R = React.createElement
 async = require 'async'
 
 Chart = require '../Chart'

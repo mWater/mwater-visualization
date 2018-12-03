@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 DragSource = require('react-dnd').DragSource

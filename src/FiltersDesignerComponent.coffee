@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprCleaner = require('mwater-expressions').ExprCleaner
@@ -32,8 +31,8 @@ module.exports = class FiltersDesignerComponent extends React.Component
   renderFilterableTable: (table) =>
     name = ExprUtils.localizeString(@props.schema.getTable(table).name, @context.locale)
 
-    H.div key: table, 
-      H.label null, name
+    R 'div', key: table, 
+      R 'label', null, name
       React.createElement(FilterExprComponent, 
         schema: @props.schema
         dataSource: @props.dataSource
@@ -42,5 +41,5 @@ module.exports = class FiltersDesignerComponent extends React.Component
         value: @props.filters?[table])
 
   render: ->
-    return H.div null,
+    return R 'div', null,
       _.map(@props.filterableTables, @renderFilterableTable)

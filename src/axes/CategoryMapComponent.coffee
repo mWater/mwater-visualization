@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 ExprCompiler = require('mwater-expressions').ExprCompiler
 AxisBuilder = require './AxisBuilder'
@@ -25,7 +24,7 @@ module.exports = class CategoryMapComponent extends React.Component
     initiallyExpanded: PropTypes.bool  # True to start expanded
 
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       collapsed: not props.initiallyExpanded  # Start collapsed
@@ -74,9 +73,9 @@ module.exports = class CategoryMapComponent extends React.Component
     if category.value?
       label
     else
-      H.a onClick: @handleNullLabelChange, style: {cursor: 'pointer'},
+      R 'a', onClick: @handleNullLabelChange, style: {cursor: 'pointer'},
         label
-        H.span style: {fontSize: 12, marginLeft: 4}, "(click to change label for none value)"
+        R 'span', style: {fontSize: 12, marginLeft: 4}, "(click to change label for none value)"
 
   # Category is { value: category value, label: category label }
   renderCategory: (category, index, connectDragSource, connectDragPreview, connectDropTarget) =>
@@ -97,25 +96,25 @@ module.exports = class CategoryMapComponent extends React.Component
       display: 'inline-block'
       marginLeft: 5
 
-    elem = H.div key: category.value,
+    elem = R 'div', key: category.value,
       if connectDragSource
-        connectDragSource(H.i(className: "fa fa-bars", style: iconStyle))
+        connectDragSource(R('i', className: "fa fa-bars", style: iconStyle))
 
       if @props.allowExcludedValues
-        H.input
+        R 'input',
           type: "checkbox"
           style: { marginLeft: 5, marginBottom: 5, verticalAlign: "middle" }
           checked: not _.includes(@props.axis.excludedValues, category.value)
           onChange: @handleExcludeChange.bind(null, category.value)
 
       if @props.showColorMap
-        H.div style: colorPickerStyle,
+        R 'div', style: colorPickerStyle,
           R ColorComponent,
             key: 'color'
             color: @lookupColor(category.value)
             onChange: (color) => @handleColorChange(category.value, color)
 
-      H.span style: labelStyle,
+      R 'span', style: labelStyle,
         @renderLabel(category)
 
     if connectDropTarget
@@ -132,7 +131,7 @@ module.exports = class CategoryMapComponent extends React.Component
       _.indexOf(drawOrder, category.value)
     )
 
-    H.div null,
+    R 'div', null,
       @renderToggle()
       R ReorderableListComponent,
         items: orderedCategories
@@ -141,21 +140,21 @@ module.exports = class CategoryMapComponent extends React.Component
         getItemId: (item) => item.value
 
   renderNonReorderable: ->
-    H.div null,
+    R 'div', null,
       @renderToggle()
       _.map @props.categories, (category) => @renderCategory(category)
 
   renderToggle: ->
     if @state.collapsed
-      return H.div null,
-        H.a onClick: @handleToggle, 
+      return R 'div', null,
+        R 'a', onClick: @handleToggle, 
           "Show Values "
-          H.i className: "fa fa-caret-down"
+          R 'i', className: "fa fa-caret-down"
     else
-      return H.div null,
-        H.a onClick: @handleToggle, 
+      return R 'div', null,
+        R 'a', onClick: @handleToggle, 
           "Hide Values "
-          H.i className: "fa fa-caret-up"
+          R 'i', className: "fa fa-caret-up"
 
   render: ->
     if @state.collapsed

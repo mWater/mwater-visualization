@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 moment = require 'moment'
@@ -24,8 +23,8 @@ module.exports = class MWaterAddRelatedIndicatorComponent extends React.Componen
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = { 
       addingTables: []  # Set to table ids that have been added
@@ -79,37 +78,37 @@ module.exports = class MWaterAddRelatedIndicatorComponent extends React.Componen
     if @props.filter
       indicators = _.filter(indicators, (indicator) => filterMatches(@props.filter, ExprUtils.localizeString(indicator.design.name, @context.locale)))
 
-    return H.div null,
-      H.div style: { paddingLeft: 5 }, className: "text-muted", 
+    return R 'div', null,
+      R 'div', style: { paddingLeft: 5 }, className: "text-muted", 
         "Other Available Indicators. Click to enable. "
-          H.i className: "fa fa-check-circle"
+          R 'i', className: "fa fa-check-circle"
           " = recommended"
 
         if not @state.indicators
-          H.div className: "text-muted",
-            H.i className: "fa fa-spin fa-spinner"
+          R 'div', className: "text-muted",
+            R 'i', className: "fa fa-spin fa-spinner"
             " Loading..."
 
-        H.div style: { paddingLeft: 10 },
+        R 'div', style: { paddingLeft: 10 },
           _.map indicators, (indicator) =>
             name = ExprUtils.localizeString(indicator.design.name, @context.locale)
             desc = ExprUtils.localizeString(indicator.design.desc, @context.locale)
 
             # If added, put special message
             if @props.schema.getTable("indicator_values:#{indicator._id}")
-              return H.div key: indicator._id, style: { cursor: "pointer", padding: 4 }, className: "text-success",
+              return R 'div', key: indicator._id, style: { cursor: "pointer", padding: 4 }, className: "text-success",
                 "#{name} added. See above."
 
-            return H.div key: indicator._id, style: { cursor: "pointer", color: "#478", padding: 4 }, onClick: @handleSelect.bind(null, "indicator_values:#{indicator._id}"),
+            return R 'div', key: indicator._id, style: { cursor: "pointer", color: "#478", padding: 4 }, onClick: @handleSelect.bind(null, "indicator_values:#{indicator._id}"),
               # If in process of adding
               if indicator._id in @state.addingTables
-                H.i className: "fa fa-spin fa-spinner"
+                R 'i', className: "fa fa-spin fa-spinner"
 
               if indicator.design.recommended
-                H.i className: "fa fa-check-circle fa-fw", style: { color: "#337ab7" }
+                R 'i', className: "fa fa-check-circle fa-fw", style: { color: "#337ab7" }
               name
               if desc
-                H.span className: "text-muted", style: { fontSize: 12, paddingLeft: 3 }, 
+                R 'span', className: "text-muted", style: { fontSize: 12, paddingLeft: 3 }, 
                   " - " + desc
 
 # Flattens a nested list of properties

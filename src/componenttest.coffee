@@ -1,6 +1,6 @@
 React = require 'react'
 ReactDOM = require 'react-dom'
-H = React.DOM
+R = React.createElement
 
 # LargeListComponent = require './LargeListComponent'
 
@@ -11,17 +11,17 @@ class Parent extends React.Component
     console.log @refs
 
   render: ->
-    H.div null,
-      H.div ref: "simple",
-        H.div ref: "complex"
+    R 'div', null,
+      R 'div', ref: "simple",
+        R 'div', ref: "complex"
       React.createElement(Child, {},
-        H.div ref: "simple2",
-          H.div ref: "complex2"
+        R 'div', ref: "simple2",
+          R 'div', ref: "complex2"
         )
 
 class Child extends React.Component
   render: ->
-    H.div style: { height: @props.height, backgroundColor: @props.backgroundColor },
+    R 'div', style: { height: @props.height, backgroundColor: @props.backgroundColor },
       @props.children
 
 $ ->
@@ -41,7 +41,7 @@ $ ->
   #       cb(null, _.range(start, start + number))
   #     , 200
 
-  #   renderRow: (row, index) -> H.div(style: { height: 25 }, key: index + "", "" + row)
+  #   renderRow: (row, index) -> R('div', style: { height: 25 }, key: index + "", "" + row)
   #   rowHeight: 25
   #   pageSize: 100
   #   height: 500

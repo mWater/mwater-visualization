@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 CategoryMapComponent = require './CategoryMapComponent'
 ColorSchemeFactory = require '../ColorSchemeFactory'
@@ -64,7 +63,7 @@ module.exports = class AxisColorEditorComponent extends React.Component
     @setState(mode: "normal")
 
   renderPreview: ->
-    H.div className: "axis-palette",
+    R 'div', className: "axis-palette",
       _.map @props.categories.slice(0,6), (category, i) =>
         color = _.find(@props.axis.colorMap, {value: category.value})
         cellStyle =
@@ -72,10 +71,10 @@ module.exports = class AxisColorEditorComponent extends React.Component
           height: 20
           width: 20
           backgroundColor: if color then color.color else @props.defaultColor
-        H.div style: cellStyle, key: i, " "
+        R 'div', style: cellStyle, key: i, " "
 
   render: ->
-    H.div null,
+    R 'div', null,
       if @state.mode == "palette"
         if @props.categories
           R ColorPaletteCollectionComponent, {
@@ -85,12 +84,12 @@ module.exports = class AxisColorEditorComponent extends React.Component
             onCancel: @handleCancelCustomize
           }
       if @state.mode == "normal"
-        H.div null,
-          H.p null,
-            H.a style: { cursor: "pointer" }, onClick: @handleSelectPalette, key: "select-palette", "Change color scheme"
+        R 'div', null,
+          R 'p', null,
+            R 'a', style: { cursor: "pointer" }, onClick: @handleSelectPalette, key: "select-palette", "Change color scheme"
           if @props.axis.colorMap
-            H.div key: "selected-palette",
-              H.div null,
+            R 'div', key: "selected-palette",
+              R 'div', null,
                 R CategoryMapComponent,
                   schema: @props.schema
                   dataSource: @props.dataSource

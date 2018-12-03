@@ -2,7 +2,7 @@ PropTypes = require('prop-types')
 React = require 'react'
 ui = require './UIComponents'
 ExprUtils = require("mwater-expressions").ExprUtils
-H = React.DOM
+R = React.createElement
 
 module.exports = class TableSelectComponent extends React.Component
   @propTypes:
@@ -28,7 +28,7 @@ module.exports = class TableSelectComponent extends React.Component
 
     return React.createElement ui.ToggleEditComponent,
       forceOpen: not @props.value
-      label: if @props.value then ExprUtils.localizeString(@props.schema.getTable(@props.value).name, @context.locale) else H.i(null, "Select...")
+      label: if @props.value then ExprUtils.localizeString(@props.schema.getTable(@props.value).name, @context.locale) else R('i', null, "Select...")
       editor: (onClose) =>
         React.createElement(ui.OptionListComponent, 
           hint: "Select source to get data from"

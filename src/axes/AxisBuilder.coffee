@@ -6,7 +6,7 @@ ExprCleaner = require('mwater-expressions').ExprCleaner
 d3Format = require 'd3-format'
 moment = require 'moment'
 React = require 'react'
-H = React.DOM
+R = React.createElement
 
 xforms = [
   { type: "bin", input: "number", output: "enum" }
@@ -618,7 +618,7 @@ module.exports = class AxisBuilder
         # Parse if string
         if _.isString(value)
           value = JSON.parse(value)
-        return H.div(null, _.map(value, (v, i) -> H.div(key: i, v)))
+        return R('div', null, _.map(value, (v, i) -> R('div', key: i, v)))
       when "date"
         return moment(value, moment.ISO_8601).format("ll")
       when "datetime"

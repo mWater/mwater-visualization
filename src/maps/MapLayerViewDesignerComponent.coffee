@@ -1,9 +1,8 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
-Rcslider = require 'rc-slider'
+Rcslider = require('rc-slider').default
 LayerFactory = require './LayerFactory'
 ui = require('react-library/lib/bootstrap')
 
@@ -50,23 +49,23 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
 
   renderVisible: ->
     if @props.layerView.visible
-      H.i className: "fa fa-fw fa-check-square", style: { color: "#2E6DA4" }, onClick: @handleVisibleClick
+      R 'i', className: "fa fa-fw fa-check-square", style: { color: "#2E6DA4" }, onClick: @handleVisibleClick
     else
-      H.i className: "fa fa-fw fa-square", style: { color: "#DDDDDD" }, onClick: @handleVisibleClick
+      R 'i', className: "fa fa-fw fa-square", style: { color: "#DDDDDD" }, onClick: @handleVisibleClick
 
   renderHideLegend: ->
     R ui.Checkbox, value: @props.layerView.hideLegend, onChange: @handleHideLegend,
       "Hide Legend"
 
   renderName: ->
-    H.span className: "hover-display-parent", onClick: @handleRename, style: { cursor: "pointer" },
+    R 'span', className: "hover-display-parent", onClick: @handleRename, style: { cursor: "pointer" },
       @props.layerView.name
       " "
-      H.span className: "hover-display-child glyphicon glyphicon-pencil text-muted"
+      R 'span', className: "hover-display-child glyphicon glyphicon-pencil text-muted"
 
   renderEditor: ->
     layer = LayerFactory.createLayer(@props.layerView.type)
-    return H.div null,
+    return R 'div', null,
       if layer.isEditable()
         layer.createDesignerElement({
           design: @props.layerView.design
@@ -79,16 +78,16 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
       @renderHideLegend()
 
   renderLayerEditToggle: ->
-    return H.div key: "edit", style: { marginBottom: (if @state.editing then 10) },
-      H.a onClick: @handleToggleEditing, style: { fontSize: 12, cursor: "pointer" },
+    return R 'div', key: "edit", style: { marginBottom: (if @state.editing then 10) },
+      R 'a', onClick: @handleToggleEditing, style: { fontSize: 12, cursor: "pointer" },
         if @state.editing
           [
-            H.i className: "fa fa-caret-up"
+            R 'i', className: "fa fa-caret-up"
             " Close"
           ]
         else
           [
-            H.i className: "fa fa-cog"
+            R 'i', className: "fa fa-cog"
             " Customize..."
           ]
 
@@ -100,11 +99,11 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
       @props.onRemove()
 
   renderOpacityControl: ->
-    H.div className: 'form-group', style: { paddingTop: 10 },
-      H.label className: 'text-muted',
-        H.span null,
+    R 'div', className: 'form-group', style: { paddingTop: 10 },
+      R 'label', className: 'text-muted',
+        R 'span', null,
           "Opacity: #{Math.round(@props.layerView.opacity * 100) }%"
-      H.div style: {padding: '10px'},
+      R 'div', style: {padding: '10px'},
         React.createElement(Rcslider,
           min: 0
           max: 100
@@ -115,9 +114,9 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
         )
 
   renderDeleteLayer: ->
-    H.div style: { float: "right", cursor: "pointer", marginLeft: 10 }, key: "delete",
-      H.a onClick: @handleRemove,
-        H.i className: "fa fa-remove"
+    R 'div', style: { float: "right", cursor: "pointer", marginLeft: 10 }, key: "delete",
+      R 'a', onClick: @handleRemove,
+        R 'i', className: "fa fa-remove"
 
   render: ->
     layer = LayerFactory.createLayer(@props.layerView.type)
@@ -127,10 +126,10 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
       opacity: 0.5
       # float: "right"
 
-    @props.connectDragPreview(@props.connectDropTarget(H.div null,
-      H.div style: { fontSize: 16 }, key: "layerView",
+    @props.connectDragPreview(@props.connectDropTarget(R 'div', null,
+      R 'div', style: { fontSize: 16 }, key: "layerView",
         if @props.connectDragSource
-          @props.connectDragSource(H.i(className: "fa fa-bars", style: style))
+          @props.connectDragSource(R('i', className: "fa fa-bars", style: style))
         if @props.allowEditingLayer
           @renderDeleteLayer()
         @renderVisible()

@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 LayerFactory = require './LayerFactory'
@@ -64,10 +63,10 @@ module.exports = class LegendComponent extends React.Component
       fontSize: 12
     }
 
-    return H.div style: style,
+    return R 'div', style: style,
       _.map legendItems, (item, i) =>
         [
-          H.div key: item.key,
+          R 'div', key: item.key,
             item.legend
         ]
 

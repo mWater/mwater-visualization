@@ -1,6 +1,6 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
+R = React.createElement
 _ = require 'lodash'
 
 Widget = require './Widget'
@@ -74,11 +74,11 @@ class MarkdownWidgetComponent extends React.Component
     width = Math.min(document.body.clientWidth/2, @props.width)
     chart = @renderContent(@state.editDesign)
 
-    content = H.div style: { height: "100%", width: "100%" },
-      H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: width + 20, height: @props.height + 20 },
+    content = R 'div', style: { height: "100%", width: "100%" },
+      R 'div', style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: width + 20, height: @props.height + 20 },
         chart
-      H.div style: { width: "100%", height: "100%", paddingLeft: width + 40 },
-        H.div style: { width: "100%", height: "100%", overflowY: "auto", paddingLeft: 20, borderLeft: "solid 3px #AAA" },
+      R 'div', style: { width: "100%", height: "100%", paddingLeft: width + 40 },
+        R 'div', style: { width: "100%", height: "100%", overflowY: "auto", paddingLeft: 20, borderLeft: "solid 3px #AAA" },
           editor
 
     React.createElement(ModalWindowComponent,
@@ -100,7 +100,7 @@ class MarkdownWidgetComponent extends React.Component
       dropdownItems.push({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
 
     # Wrap in a simple widget
-    return H.div onDoubleClick: @handleStartEditing, 
+    return R 'div', onDoubleClick: @handleStartEditing, 
       if @props.onDesignChange?
         @renderEditor()
       React.createElement(DropdownWidgetComponent, 
@@ -121,7 +121,7 @@ class MarkdownWidgetViewComponent extends React.Component
 
   render: ->
     # Render in a standard width container and then scale up to ensure that widget always looks consistent
-    H.div 
+    R 'div', 
       style: { 
         width: @props.standardWidth
         height: if @props.height and @props.standardWidth and @props.width then @props.height * (@props.standardWidth / @props.width)
@@ -141,4 +141,4 @@ class MarkdownWidgetDesignerComponent extends React.Component
     @props.onDesignChange(design)
 
   render: ->
-    H.textarea className: "form-control", style: { width: "100%", height: "100%" }, value: @props.design.markdown, onChange: @handleMarkdownChange
+    R 'textarea', className: "form-control", style: { width: "100%", height: "100%" }, value: @props.design.markdown, onChange: @handleMarkdownChange

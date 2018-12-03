@@ -1,6 +1,6 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
+R = React.createElement
 _ = require 'lodash'
 
 module.exports = class LegendGroup extends React.Component
@@ -18,7 +18,7 @@ module.exports = class LegendGroup extends React.Component
     symbol: null
 
   render: ->
-    H.div style: { marginBottom: 5},
+    R 'div', style: { marginBottom: 5},
       React.createElement(LegendItem, {hasChildren: @props.items.length > 0,symbol:@props.symbol, markerSize: @props.markerSize, color: @props.defaultColor, name: @props.name, key: @props.name, radiusLayer: @props.radiusLayer})
       _.map @props.items, (item) =>
         React.createElement(LegendItem, {isChild: true, symbol: @props.symbol, markerSize: @props.markerSize, color: item.color, name: item.name, key: item.name, radiusLayer: @props.radiusLayer})
@@ -46,7 +46,7 @@ class LegendItem extends React.Component
       fontSize: @props.markerSize
 
     className = @props.symbol.replace('font-awesome/' , 'fa fa-')
-    H.span {className: className, style: symbolStyle}, ""
+    R 'span', {className: className, style: symbolStyle}, ""
 
   renderColorIndicator: ->
     indicatorStyle =
@@ -59,7 +59,7 @@ class LegendItem extends React.Component
     if @props.radiusLayer
       indicatorStyle['borderRadius'] = 5
 
-    H.span style: indicatorStyle, ""
+    R 'span', style: indicatorStyle, ""
 
   renderIndicator: ->
     if @props.symbol
@@ -78,7 +78,7 @@ class LegendItem extends React.Component
     containerStyle =
       paddingLeft: if @props.isChild then 5 else 0
 
-    H.div style: containerStyle,
+    R 'div', style: containerStyle,
       if not @props.hasChildren
         @renderIndicator()
-      H.span {style: titleStyle}, @props.name
+      R 'span', {style: titleStyle}, @props.name

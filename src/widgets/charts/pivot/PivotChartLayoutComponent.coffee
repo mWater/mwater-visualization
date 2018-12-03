@@ -3,7 +3,6 @@ _ = require 'lodash'
 React = require 'react'
 ReactDOM = require 'react-dom'
 R = React.createElement
-H = React.DOM
 
 Color = require 'color'
 ui = require 'react-library/lib/bootstrap'
@@ -23,7 +22,7 @@ module.exports = class PivotChartLayoutComponent extends React.Component
     onSummarizeSegment: PropTypes.func  # Called with id of segment. Summarizes the segment
 
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       hoverSection: null # Current section being hovered over
@@ -42,7 +41,7 @@ module.exports = class PivotChartLayoutComponent extends React.Component
       delete @cellComps[key]
 
   renderRow: (row, rowIndex) ->
-    H.tr key: rowIndex,
+    R 'tr', key: rowIndex,
       _.map row.cells, (cell, columnIndex) =>
         R LayoutCellComponent,
           ref: @recordCellComp.bind(null, rowIndex, columnIndex)
@@ -57,7 +56,7 @@ module.exports = class PivotChartLayoutComponent extends React.Component
 
   renderHoverPlusIcon: (key, x, y, onClick) =>
     # Render a plus box
-    H.div key: key, onClick: onClick, style: { 
+    R 'div', key: key, onClick: onClick, style: { 
       position: "absolute"
       left: x - 7
       top: y - 6
@@ -75,7 +74,7 @@ module.exports = class PivotChartLayoutComponent extends React.Component
 
   renderHoverRemoveIcon: (key, x, y, onClick) =>
     # Render a plus box
-    H.div key: key, onClick: onClick, style: { 
+    R 'div', key: key, onClick: onClick, style: { 
       position: "absolute"
       left: x - 7
       top: y - 6
@@ -144,14 +143,14 @@ module.exports = class PivotChartLayoutComponent extends React.Component
     if sectionType in ['row', 'column'] and @props.onRemoveSegment
       controls.push(@renderHoverRemoveIcon("topright", maxX, minY, @props.onRemoveSegment.bind(null, @state.hoverSection)))
 
-    return H.div key: "hover-controls", controls
+    return R 'div', key: "hover-controls", controls
 
   render: ->
-    H.div 
+    R 'div', 
       style: { position: "relative" } 
       onMouseLeave: (=> @setState(hoverSection: null)),
         # Define CSS classes to keep HTML as small as possible
-        H.style null, '''
+        R 'style', null, '''
           .pivot-chart-table {
             width: 100%;
             border-spacing: 0;
@@ -183,17 +182,17 @@ module.exports = class PivotChartLayoutComponent extends React.Component
           .pivot-chart-table .br3 { border-right: solid 1px #888 }
         '''
         if @props.layout.tooManyRows
-          H.div className: "text-warning", style: { fontSize: 12 },
-            H.i(className: "fa fa-exclamation-circle")
+          R 'div', className: "text-warning", style: { fontSize: 12 },
+            R('i', className: "fa fa-exclamation-circle")
             " Warning: Too many rows in table to display"
 
         if @props.layout.tooManyColumns
-          H.div className: "text-warning", style: { fontSize: 12 },
-            H.i(className: "fa fa-exclamation-circle")
+          R 'div', className: "text-warning", style: { fontSize: 12 },
+            R('i', className: "fa fa-exclamation-circle")
             " Warning: Too many columns in table to display"
 
-        H.table className: "pivot-chart-table",
-          H.tbody null,
+        R 'table', className: "pivot-chart-table",
+          R 'tbody', null,
             _.map @props.layout.rows, (row, rowIndex) =>
               @renderRow(row, rowIndex)
         @renderHoverControls()
@@ -227,14 +226,14 @@ class LayoutCellComponent extends React.Component
 
   # Render an unconfigured cell
   renderUnconfigured: (cell) ->
-    H.span style: { fontSize: "90%" },
-      H.a style: { cursor: "pointer" }, onClick: @props.onEditSection,
+    R 'span', style: { fontSize: "90%" },
+      R 'a', style: { cursor: "pointer" }, onClick: @props.onEditSection,
         "Edit"
       if cell.summarize
         [
-          H.span className: "text-muted",
+          R 'span', className: "text-muted",
             " / "
-          H.a style: { cursor: "pointer" }, onClick: @props.onSummarizeSegment,
+          R 'a', style: { cursor: "pointer" }, onClick: @props.onSummarizeSegment,
             "Summarize"
         ]
 
@@ -296,7 +295,7 @@ class LayoutCellComponent extends React.Component
       marginLeft: if cell.indent then cell.indent * 5
     }
 
-    H.td 
+    R 'td', 
       ref: ((c) => @tdComponent = c)
       onMouseEnter: @props.onHover
       onClick: @handleClick
@@ -304,7 +303,7 @@ class LayoutCellComponent extends React.Component
       style: style,
       colSpan: cell.columnSpan or null
       rowSpan: cell.rowSpan or null,
-        H.span style: innerStyle,
+        R 'span', style: innerStyle,
           if cell.unconfigured and @props.onEditSection
             @renderUnconfigured(cell)
           else

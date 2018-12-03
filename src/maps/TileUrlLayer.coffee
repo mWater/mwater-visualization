@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 Layer = require './Layer'
@@ -61,6 +60,6 @@ class TileUrlLayerDesignerComponent extends React.Component
     @props.onDesignChange(_.extend({}, @props.design, tileUrl: ev.target.value))
 
   render: ->
-    H.div className: "form-group",
-      H.label className: "text-muted", "Url (containing {z}, {x} and {y})"
-      H.input type: "text", className: "form-control", value: @props.design.tileUrl or "", onChange: @handleTileUrlChange
+    R 'div', className: "form-group",
+      R 'label', className: "text-muted", "Url (containing {z}, {x} and {y})"
+      R 'input', type: "text", className: "form-control", value: @props.design.tileUrl or "", onChange: @handleTileUrlChange

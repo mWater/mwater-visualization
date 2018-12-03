@@ -1,7 +1,7 @@
 PropTypes = require('prop-types')
 React = require 'react'
 ReactDOM = require 'react-dom'
-H = React.DOM
+R = React.createElement
 
 # Widget wrapper that adds a dropdown menu in a gear floating
 module.exports = class DropdownWidgetComponent extends React.Component
@@ -16,9 +16,9 @@ module.exports = class DropdownWidgetComponent extends React.Component
       })).isRequired # A list of {label, icon, onClick} actions for the dropdown
 
   renderDropdownItem: (item, i) =>
-    return H.li key: "#{i}",
-      H.a onClick: item.onClick, 
-        if item.icon then H.span(className: "glyphicon glyphicon-#{item.icon} text-muted")
+    return R 'li', key: "#{i}",
+      R 'a', onClick: item.onClick, 
+        if item.icon then R('span', className: "glyphicon glyphicon-#{item.icon} text-muted")
         if item.icon then " "
         item.label
 
@@ -34,19 +34,19 @@ module.exports = class DropdownWidgetComponent extends React.Component
       zIndex: 10000
     }
 
-    elem = H.div style: dropdownStyle, "data-toggle": "dropdown",
-      H.div className: "mwater-visualization-simple-widget-gear-button",
-        H.span className: "glyphicon glyphicon-cog"
+    elem = R 'div', style: dropdownStyle, "data-toggle": "dropdown",
+      R 'div', className: "mwater-visualization-simple-widget-gear-button",
+        R 'span', className: "glyphicon glyphicon-cog"
 
-    return H.div style: dropdownStyle,
+    return R 'div', style: dropdownStyle,
       elem
-      H.ul className: "dropdown-menu dropdown-menu-right", style: { top: 25 },
+      R 'ul', className: "dropdown-menu dropdown-menu-right", style: { top: 25 },
         _.map(@props.dropdownItems, @renderDropdownItem)        
 
   closeMenu: =>
     $(ReactDOM.findDOMNode(this)).find('[data-toggle="dropdown"]').parent().removeClass('open')
 
   render: ->
-    return H.div className: "mwater-visualization-simple-widget", onMouseLeave: @closeMenu, style: { width: @props.width, height: @props.height },
+    return R 'div', className: "mwater-visualization-simple-widget", onMouseLeave: @closeMenu, style: { width: @props.width, height: @props.height },
       @props.children
       @renderDropdown()

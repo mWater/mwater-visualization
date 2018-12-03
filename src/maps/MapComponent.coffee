@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 MapViewComponent = require './MapViewComponent'
@@ -32,7 +31,7 @@ module.exports = class MapComponent extends React.Component
     extraTitleButtonsElem: PropTypes.node              # Extra elements to add to right
 
   constructor: (props) ->
-    super
+    super(props)
     @state = { 
       undoStack: new UndoStack().push(props.design) 
       transientDesign: props.design  # Temporary design for read-only maps
@@ -66,26 +65,26 @@ module.exports = class MapComponent extends React.Component
     @setState(zoomLocked: not @state.zoomLocked)
 
   renderActionLinks: ->
-    H.div null,
+    R 'div', null,
       if @props.onDesignChange?
         [
-          H.a key: "lock", className: "btn btn-link btn-sm", onClick: @handleZoomLockClick, 
-            H.span className: "fa #{if @state.zoomLocked then "fa-lock red" else "fa-unlock green"}", style: {marginRight: 5}
+          R 'a', key: "lock", className: "btn btn-link btn-sm", onClick: @handleZoomLockClick, 
+            R 'span', className: "fa #{if @state.zoomLocked then "fa-lock red" else "fa-unlock green"}", style: {marginRight: 5}
             R PopoverHelpComponent, placement: "bottom",
               '''Changes to zoom level wont be saved in locked mode'''
-          H.a key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
-            H.span className: "glyphicon glyphicon-triangle-left"
+          R 'a', key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
+            R 'span', className: "glyphicon glyphicon-triangle-left"
             " Undo"
           " "
-          H.a key: "redo", className: "btn btn-link btn-sm #{if not @state.undoStack.canRedo() then "disabled" else ""}", onClick: @handleRedo, 
-            H.span className: "glyphicon glyphicon-triangle-right"
+          R 'a', key: "redo", className: "btn btn-link btn-sm #{if not @state.undoStack.canRedo() then "disabled" else ""}", onClick: @handleRedo, 
+            R 'span', className: "glyphicon glyphicon-triangle-right"
             " Redo"
         ]
       @props.extraTitleButtonsElem
 
   renderHeader: ->
-    H.div style: { position: "absolute", top: 0, left: 0, right: 0, height: 40, padding: 4, borderBottom: "solid 2px #AAA" },
-      H.div style: { float: "right" },
+    R 'div', style: { position: "absolute", top: 0, left: 0, right: 0, height: 40, padding: 4, borderBottom: "solid 2px #AAA" },
+      R 'div', style: { float: "right" },
         @renderActionLinks()
       @props.titleElem
 
@@ -135,10 +134,10 @@ module.exports = class MapComponent extends React.Component
       )
 
   render: ->
-    return H.div style: { width: "100%", height: "100%", position: "relative" },
-      H.div style: { position: "absolute", width: "70%", height: "100%", paddingTop: 40 }, 
+    return R 'div', style: { width: "100%", height: "100%", position: "relative" },
+      R 'div', style: { position: "absolute", width: "70%", height: "100%", paddingTop: 40 }, 
         @renderHeader()
-        H.div style: { width: "100%", height: "100%" }, 
+        R 'div', style: { width: "100%", height: "100%" }, 
           @renderView()
-      H.div style: { position: "absolute", left: "70%", width: "30%", height: "100%", borderLeft: "solid 3px #AAA", overflowY: "auto" }, 
+      R 'div', style: { position: "absolute", left: "70%", width: "30%", height: "100%", borderLeft: "solid 3px #AAA", overflowY: "auto" }, 
         @renderDesigner()

@@ -1,6 +1,5 @@
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 uuid = require 'uuid'
@@ -15,42 +14,42 @@ module.exports = class GridLayoutManager extends LayoutManager
       # Add unique id
       return () -> { id: uuid(), widget: { type: type, design: design }, bounds: { x: 0, y: 0, width: width/3, height: width/4 } } 
 
-    H.div className: "mwater-visualization-palette", style: { position: "absolute", top: 0, left: 0, bottom: 0, width: 185 },
+    R 'div', className: "mwater-visualization-palette", style: { position: "absolute", top: 0, left: 0, bottom: 0, width: 185 },
       R PaletteItemComponent, 
         createItem: createWidgetItem("Text", { style: "title" })
-        title: H.i className: "fa fa-font"
+        title: R 'i', className: "fa fa-font"
         subtitle: "Title"
       R PaletteItemComponent, 
         createItem: createWidgetItem("Text", {})
-        title: H.i className: "fa fa-align-left"
+        title: R 'i', className: "fa fa-align-left"
         subtitle: "Text"
       R PaletteItemComponent,
         createItem: createWidgetItem("LayeredChart", {})
-        title: H.i className: "fa fa-bar-chart"
+        title: R 'i', className: "fa fa-bar-chart"
         subtitle: "Chart"
       R PaletteItemComponent,
         createItem: createWidgetItem("Image", {})
-        title: H.i className: "fa fa-image"
+        title: R 'i', className: "fa fa-image"
         subtitle: "Image"
       R PaletteItemComponent,
         createItem: createWidgetItem("Map", { baseLayer: "bing_road", layerViews: [], filters: {}, bounds: { w: -40, n: 25, e: 40, s: -25 } })
-        title: H.i className: "fa fa-map-o"
+        title: R 'i', className: "fa fa-map-o"
         subtitle: "Map"
       R PaletteItemComponent,
         createItem: createWidgetItem("TableChart", {})
-        title: H.i className: "fa fa-table"
+        title: R 'i', className: "fa fa-table"
         subtitle: "Table"
       R PaletteItemComponent,
         createItem: createWidgetItem("CalendarChart", {})
-        title: H.i className: "fa fa-calendar"
+        title: R 'i', className: "fa fa-calendar"
         subtitle: "Calendar"
       R PaletteItemComponent,
         createItem: createWidgetItem("ImageMosaicChart", {})
-        title: H.i className: "fa fa-th"
+        title: R 'i', className: "fa fa-th"
         subtitle: "Mosaic"
       R PaletteItemComponent,
         createItem: createWidgetItem("IFrame", {})
-        title: H.i className: "fa fa-youtube-play"
+        title: R 'i', className: "fa fa-youtube-play"
         subtitle: "Video"
 
   # Renders the layout as a react element
@@ -63,10 +62,10 @@ module.exports = class GridLayoutManager extends LayoutManager
     GridLayoutComponent = require './GridLayoutComponent'
 
     if options.onItemsChange?
-      return H.div style: { position: "relative", height: "100%", overflow: "hidden" }, 
+      return R 'div', style: { position: "relative", height: "100%", overflow: "hidden" }, 
         @renderPalette(options.width)
-        H.div style: { position: "absolute", left: 185, top: 0, right: 0, bottom: 0, overflow: "scroll" },
-          H.div style: { position: "absolute", left: 20, top: 20, right: 20, bottom: 20 },
+        R 'div', style: { position: "absolute", left: 185, top: 0, right: 0, bottom: 0, overflow: "scroll" },
+          R 'div', style: { position: "absolute", left: 20, top: 20, right: 20, bottom: 20 },
             R GridLayoutComponent, 
               width: options.width - 40 - 185
               standardWidth: options.standardWidth - 40 - 185 # TODO 185? doc. needed?
@@ -74,7 +73,7 @@ module.exports = class GridLayoutManager extends LayoutManager
               onItemsChange: options.onItemsChange
               renderWidget: options.renderWidget
     else
-      return H.div style: { position: "relative", height: "100%", width: options.width, padding: 20 },
+      return R 'div', style: { position: "relative", height: "100%", width: options.width, padding: 20 },
         R GridLayoutComponent, 
           width: options.width - 40
           standardWidth: options.standardWidth - 40

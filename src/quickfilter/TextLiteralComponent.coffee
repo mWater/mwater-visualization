@@ -1,9 +1,8 @@
 _ = require 'lodash'
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
-ReactSelect = require 'react-select'
+AsyncReactSelect = require('react-select/lib/Async').default
 ExprCompiler = require('mwater-expressions').ExprCompiler
 injectTableAlias = require('mwater-expressions').injectTableAlias
 
@@ -26,11 +25,11 @@ module.exports = class TextLiteralComponent extends React.Component
     }))
 
   handleSingleChange: (val) =>
-    value = if val then val else null # Blank is null
+    value = if val then (val.value or null) else null # Blank is null
     @props.onChange(value)
 
   handleMultipleChange: (val) =>
-    value = if val then val.split("\n") else []
+    value = if val then _.pluck(val, "value") else []
 
     if value.length > 0
       @props.onChange(value)
@@ -57,41 +56,53 @@ module.exports = class TextLiteralComponent extends React.Component
     # Execute query
     @props.quickfiltersDataSource.getValues @props.index, @props.expr, filters, null, 250, (err, values) =>
       if err
-        cb(err)
         return 
 
       # Filter null and blank
       values = _.filter(values, (value) -> value)
 
-      cb(null, {
-        options: _.map(values, (value) -> { value: value, label: value })
-        complete: false # TODO rows.length < 50 # Complete if didn't hit limit
-      })
+      cb(_.map(values, (value) -> { value: value, label: value }))
       
     return
 
   renderSingle: ->
-    R ReactSelect, 
+    currentValue = if @props.value then { value: @props.value, label: @props.value } else null
+
+    R AsyncReactSelect, 
       key: JSON.stringify(@props.filters)  # Include to force a change when filters change
       placeholder: "All"
-      value: @props.value or ""
-      asyncOptions: @getOptions
+      value: currentValue
+      loadOptions: @getOptions
       onChange: if @props.onChange then @handleSingleChange
-      disabled: not @props.onChange?
+      isClearable: true
+      isDisabled: not @props.onChange?
+      noOptionsMessage: () => "Type to search"
+      styles: { 
+        # Keep menu above fixed data table headers
+        menu: (style) => _.extend({}, style, zIndex: 2)
+      }
+
 
   renderMultiple: ->
-    R ReactSelect, 
+    currentValue = if @props.value then _.map(@props.value, (v) => { value: v, label: v }) else null
+
+    R AsyncReactSelect, 
       placeholder: "All"
-      value: (@props.value or []).join("\n")
+      value: currentValue
       key: JSON.stringify(@props.filters)  # Include to force a change when filters change
-      multi: true
-      delimiter: "\n"
-      asyncOptions: @getOptions
+      isMulti: true
+      loadOptions: @getOptions
       onChange: if @props.onChange then @handleMultipleChange
-      disabled: not @props.onChange?
+      isClearable: true
+      isDisabled: not @props.onChange?
+      noOptionsMessage: () => "Type to search"
+      styles: { 
+        # Keep menu above fixed data table headers
+        menu: (style) => _.extend({}, style, zIndex: 2)
+      }
 
   render: ->
-    H.div style: { width: "100%" },
+    R 'div', style: { width: "100%" },
       if @props.multi
         @renderMultiple()
       else

@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 # Block decorated with drag/remove hover controls
@@ -18,8 +17,8 @@ module.exports = class DecoratedBlockComponent extends React.Component
     aspectRatio: PropTypes.number
     onAspectRatioChange: PropTypes.func
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = {
       aspectDragY: null   # y position of aspect ratio drag
@@ -68,35 +67,35 @@ module.exports = class DecoratedBlockComponent extends React.Component
         left: 0
         right: 0
       }
-      return H.div style: lineStyle, key: "aspectDrag"
+      return R 'div', style: lineStyle, key: "aspectDrag"
     else
       return null
   
   render: ->
-    elem = H.div className: "mwater-visualization-decorated-block", style: @props.style,
+    elem = R 'div', className: "mwater-visualization-decorated-block", style: @props.style,
       @props.children
     
       @renderAspectDrag()
 
       if not @props.isDragging and @props.connectMoveHandle?
-        @props.connectMoveHandle(H.div key: "move", className: "mwater-visualization-decorated-block-move",
-          H.i className: "fa fa-arrows")
+        @props.connectMoveHandle(R 'div', key: "move", className: "mwater-visualization-decorated-block-move",
+          R 'i', className: "fa fa-arrows")
 
       if not @props.isDragging and @props.onBlockRemove?
-        H.div key: "remove", className: "mwater-visualization-decorated-block-remove", onClick: @props.onBlockRemove,
-          H.i className: "fa fa-times"
+        R 'div', key: "remove", className: "mwater-visualization-decorated-block-remove", onClick: @props.onBlockRemove,
+          R 'i', className: "fa fa-times"
 
       if not @props.isDragging and @props.onAspectRatioChange?
         # TODO sometimes drags (onDragStart) and so doesn't work. Disable dragging?
-        H.div key: "aspect", className: "mwater-visualization-decorated-block-aspect", onMouseDown: @handleAspectMouseDown,
-          H.i className: "fa fa-arrows-v"
+        R 'div', key: "aspect", className: "mwater-visualization-decorated-block-aspect", onMouseDown: @handleAspectMouseDown,
+          R 'i', className: "fa fa-arrows-v"
 
       if not @props.isDragging and @props.connectResizeHandle?
-        @props.connectResizeHandle(H.div key: "resize", className: "mwater-visualization-decorated-block-resize",
-          H.i className: "fa fa-expand fa-rotate-90")
+        @props.connectResizeHandle(R 'div', key: "resize", className: "mwater-visualization-decorated-block-resize",
+          R 'i', className: "fa fa-expand fa-rotate-90")
 
       if @props.connectDragPreview
-        preview = H.div style: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none"}, " "
+        preview = R 'div', style: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none"}, " "
         @props.connectDragPreview(preview)
 
     return elem

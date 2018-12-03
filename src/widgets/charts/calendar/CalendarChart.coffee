@@ -1,6 +1,6 @@
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
+R = React.createElement
 moment = require 'moment'
 
 injectTableAlias = require('mwater-expressions').injectTableAlias

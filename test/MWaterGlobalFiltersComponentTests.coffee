@@ -8,7 +8,7 @@ IdLiteralComponent = require('mwater-expressions-ui').IdLiteralComponent
 
 MWaterGlobalFiltersComponent = require '../src/MWaterGlobalFiltersComponent'
 
-enzyme.configure({ adapter: new (require('enzyme-adapter-react-15'))() }) # Configure enzyme for react 15
+enzyme.configure({ adapter: new (require('enzyme-adapter-react-16'))() }) # Configure enzyme for react 16
 
 describe "MWaterGlobalFiltersComponent", ->
   it "extracts _managed_by filter", ->

@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 uuid = require 'uuid'
 
@@ -47,9 +46,9 @@ module.exports = class TableChartDesignerComponent extends React.Component
     @updateDesign(columns: columns)
 
   renderTable: ->
-    return H.div className: "form-group",
-      H.label className: "text-muted",
-        H.i(className: "fa fa-database")
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted",
+        R('i', className: "fa fa-database")
         " "
         "Data Source"
       ": "
@@ -62,9 +61,9 @@ module.exports = class TableChartDesignerComponent extends React.Component
       }
 
   renderTitle: ->
-    H.div className: "form-group",
-      H.label className: "text-muted", "Title"
-      H.input type: "text", className: "form-control input-sm", value: @props.design.titleText, onChange: @handleTitleTextChange, placeholder: "Untitled"
+    R 'div', className: "form-group",
+      R 'label', className: "text-muted", "Title"
+      R 'input', type: "text", className: "form-control input-sm", value: @props.design.titleText, onChange: @handleTitleTextChange, placeholder: "Untitled"
 
   renderColumn: (column, index, connectDragSource, connectDragPreview, connectDropTarget) =>
     style = {
@@ -73,7 +72,7 @@ module.exports = class TableChartDesignerComponent extends React.Component
       paddingBottom: 10
     }
 
-    connectDragPreview(connectDropTarget(H.div key: index, style: style,
+    connectDragPreview(connectDropTarget(R 'div', key: index, style: style,
       React.createElement(TableChartColumnDesignerComponent, {
         design: @props.design
         schema: @props.schema
@@ -91,16 +90,16 @@ module.exports = class TableChartDesignerComponent extends React.Component
     if not @props.design.table
       return
 
-    H.div null,
+    R 'div', null,
       R ReorderableListComponent,
         items: @props.design.columns
         onReorder: @handleReorder
         renderItem: @renderColumn
         getItemId: (item) => item.id
-      H.button className: "btn btn-default btn-sm", type: "button", onClick: @handleAddColumn,
-        H.span className: "glyphicon glyphicon-plus"
+      R 'button', className: "btn btn-default btn-sm", type: "button", onClick: @handleAddColumn,
+        R 'span', className: "glyphicon glyphicon-plus"
         " Add Column"
-    # return H.div className: "form-group",
+    # return R 'div', className: "form-group",
     #   _.map(@props.design.columns, (column, i) => @renderColumn(i))
     #
 
@@ -109,12 +108,12 @@ module.exports = class TableChartDesignerComponent extends React.Component
     if not @props.design.table
       return null
 
-    return H.div className: "form-group",
-      H.label className: "text-muted",
-        H.span(className: "glyphicon glyphicon-sort-by-attributes")
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted",
+        R('span', className: "glyphicon glyphicon-sort-by-attributes")
         " "
         "Ordering"
-      H.div style: { marginLeft: 8 },
+      R 'div', style: { marginLeft: 8 },
         React.createElement(OrderingsComponent,
           schema: @props.schema
           dataSource: @props.dataSource
@@ -127,12 +126,12 @@ module.exports = class TableChartDesignerComponent extends React.Component
     if not @props.design.table
       return null
 
-    return H.div className: "form-group",
-      H.label className: "text-muted",
-        H.span(className: "glyphicon glyphicon-filter")
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted",
+        R('span', className: "glyphicon glyphicon-filter")
         " "
         "Filters"
-      H.div style: { marginLeft: 8 },
+      R 'div', style: { marginLeft: 8 },
         React.createElement(FilterExprComponent,
           schema: @props.schema
           dataSource: @props.dataSource
@@ -141,13 +140,13 @@ module.exports = class TableChartDesignerComponent extends React.Component
           value: @props.design.filter)
 
   render: ->
-    H.div null,
+    R 'div', null,
       @renderTable()
       @renderColumns()
-      if @props.design.table then H.hr()
+      if @props.design.table then R('hr')
       @renderOrderings()
       @renderFilter()
-      H.hr()
+      R('hr')
       @renderTitle()
 
 class TableChartColumnDesignerComponent extends React.Component
@@ -179,16 +178,16 @@ class TableChartColumnDesignerComponent extends React.Component
 
   renderRemove: ->
     if @props.design.columns.length > 1
-      H.button className: "btn btn-xs btn-link pull-right", type: "button", onClick: @props.onRemove,
-        H.span className: "glyphicon glyphicon-remove"
+      R 'button', className: "btn btn-xs btn-link pull-right", type: "button", onClick: @props.onRemove,
+        R 'span', className: "glyphicon glyphicon-remove"
 
   renderExpr: ->
     column = @props.design.columns[@props.index]
 
     title = "Value"
 
-    H.div null,
-      H.label className: "text-muted", title
+    R 'div', null,
+      R 'label', className: "text-muted", title
       ": "
       React.createElement(ExprComponent,
         schema: @props.schema
@@ -218,12 +217,12 @@ class TableChartColumnDesignerComponent extends React.Component
       { value: ".2%", label: "Percent decimal: 12.34%" }
     ]
 
-    H.div className: "form-group",
-      H.label className: "text-muted", 
+    R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
         "Format"
       ": "
-      H.select value: (if column.format? then column.format else ","), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
-        _.map(formats, (format) -> H.option(key: format.value, value: format.value, format.label))
+      R 'select', value: (if column.format? then column.format else ","), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
+        _.map(formats, (format) -> R('option', key: format.value, value: format.value, format.label))
 
 
   renderHeader: ->
@@ -232,10 +231,10 @@ class TableChartColumnDesignerComponent extends React.Component
     axisBuilder = new AxisBuilder(schema: @props.schema)
     placeholder = axisBuilder.summarizeAxis(column.textAxis, @context.locale)
 
-    H.div null,
-      H.label className: "text-muted", "Header"
+    R 'div', null,
+      R 'label', className: "text-muted", "Header"
       ": "
-      H.input
+      R 'input',
         type: "text"
         className: "form-control input-sm"
         style: { display: "inline-block", width: "15em" }
@@ -250,11 +249,11 @@ class TableChartColumnDesignerComponent extends React.Component
       opacity: 0.5
       fontSize: 12
       height: 20
-    H.div null,
-      @props.connectDragSource(H.i(className: "fa fa-bars", style: iconStyle))
+    R 'div', null,
+      @props.connectDragSource(R('i', className: "fa fa-bars", style: iconStyle))
       @renderRemove()
-      H.label null, "Column #{@props.index+1}"
-      H.div style: { marginLeft: 5 },
+      R 'label', null, "Column #{@props.index+1}"
+      R 'div', style: { marginLeft: 5 },
         @renderExpr()
         @renderFormat()
         @renderHeader()

@@ -1,12 +1,11 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 RegionSelectComponent = require './RegionSelectComponent'
 DetailLevelSelectComponent = require './DetailLevelSelectComponent'
-ReactSelect = require 'react-select'
+ReactSelect = require('react-select').default
 
 module.exports = class AdminScopeAndDetailLevelComponent extends React.Component
   @propTypes:
@@ -28,14 +27,16 @@ module.exports = class AdminScopeAndDetailLevelComponent extends React.Component
     @props.onScopeAndDetailLevelChange(@props.scope, @props.scopeLevel, detailLevel)
 
   render: ->
-    H.div null,
-      H.div className: "form-group",
-        H.label className: "text-muted", 
+    basicDetailLevelOptions = [{ value: 0, label: "Countries" }, { value: 1, label: "Level 1 (State/Province/District)" }]
+
+    R 'div', null,
+      R 'div', className: "form-group",
+        R 'label', className: "text-muted", 
           "Region to Map"
         R RegionSelectComponent, region: @props.scope, onChange: @handleScopeChange, schema: @props.schema, dataSource: @props.dataSource
       if @props.scope? and @props.detailLevel?
-        H.div className: "form-group",
-          H.label className: "text-muted", 
+        R 'div', className: "form-group",
+          R 'label', className: "text-muted", 
             "Detail Level"
           R DetailLevelSelectComponent, 
             scope: @props.scope
@@ -46,14 +47,11 @@ module.exports = class AdminScopeAndDetailLevelComponent extends React.Component
             dataSource: @props.dataSource
       else if not @props.scope? and @props.detailLevel?
         # Case of whole world. Allow selecting country or admin level 1
-        H.div className: "form-group",
-          H.label className: "text-muted", 
+        R 'div', className: "form-group",
+          R 'label', className: "text-muted", 
             "Detail Level"
           R ReactSelect, {
-            value: @props.detailLevel
-            options: [{ value: 0, label: "Countries" }, { value: 1, label: "Level 1 (State/Province/District)" }]
-            clearable: false
-            onChange: (value) => @handleDetailLevelChange(parseInt(value))
+            value: _.findWhere(basicDetailLevelOptions, value: @props.detailLevel) or null
+            options: basicDetailLevelOptions
+            onChange: (opt) => @handleDetailLevelChange(opt.value) 
           }
-
-

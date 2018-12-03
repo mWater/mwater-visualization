@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 _ = require 'lodash'
 
@@ -49,19 +48,19 @@ module.exports = class RichTextComponent extends React.Component
 
   # Paste HTML in
   pasteHTML: (html) ->
-    @refs.contentEditable.pasteHTML(html)
+    @contentEditable.pasteHTML(html)
 
   focus: ->
-    @refs.contentEditable.focus()
+    @contentEditable.focus()
 
   handleInsertExpr: (item) =>
     html = '''<div data-embed="''' + _.escape(JSON.stringify(item)) + '''"></div>'''
 
-    @refs.contentEditable.pasteHTML(html)
+    @contentEditable.pasteHTML(html)
 
   handleSetFontSize: (size) =>
     # Requires a selection
-    html = @refs.contentEditable.getSelectedHTML()
+    html = @contentEditable.getSelectedHTML()
     if not html
       return alert("Please select text first to set size")
 
@@ -69,11 +68,11 @@ module.exports = class RichTextComponent extends React.Component
     # doesn't mix with our various dashboard stylings, so we need to use percentages
     html = html.replace(/font-size:\s*\d+%;?/g, "")
 
-    @refs.contentEditable.pasteHTML("<span style=\"font-size:#{size}\">" + html + "</span>")
+    @contentEditable.pasteHTML("<span style=\"font-size:#{size}\">" + html + "</span>")
 
   handleSetFontColor: (color) =>
     # Requires a selection
-    html = @refs.contentEditable.getSelectedHTML()
+    html = @contentEditable.getSelectedHTML()
     if not html
       return alert("Please select text first to set color")
 
@@ -131,47 +130,47 @@ module.exports = class RichTextComponent extends React.Component
     return R FloatAffixed, edges: "over,under,left,right", align: "center", render: @renderPaletteContent
 
   renderPaletteContent: (schemeName, {edges}) =>
-    return H.div key: "palette", className: "mwater-visualization-text-palette", ref: ((c) => @paletteComponent = c),
-        H.div key: "bold", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "bold", null),
-          H.b null, "B"
-        H.div key: "italic", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "italic", null),
-          H.i null, "I"
-        H.div key: "underline", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "underline", null),
-          H.span style: { textDecoration: "underline" }, "U"
+    return R 'div', key: "palette", className: "mwater-visualization-text-palette", ref: ((c) => @paletteComponent = c),
+        R 'div', key: "bold", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "bold", null),
+          R 'b', null, "B"
+        R 'div', key: "italic", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "italic", null),
+          R 'i', null, "I"
+        R 'div', key: "underline", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "underline", null),
+          R 'span', style: { textDecoration: "underline" }, "U"
         R FontColorPaletteItem, key: "foreColor", onSetColor: @handleSetFontColor, position: if schemeName == "over" then "under" else "over"
         R FontSizePaletteItem, key: "fontSize", onSetSize: @handleSetFontSize, position: if schemeName == "over" then "under" else "over"
-        H.div key: "link", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCreateLink,
-          H.i className: "fa fa-link"
-        H.div key: "justifyLeft", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyLeft", null),
-          H.i className: "fa fa-align-left"
-        H.div key: "justifyCenter", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyCenter", null),
-          H.i className: "fa fa-align-center"
-        H.div key: "justifyRight", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyRight", null),
-          H.i className: "fa fa-align-right"
-        H.div key: "justifyFull", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyFull", null),
-          H.i className: "fa fa-align-justify"
-        H.div key: "insertUnorderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertUnorderedList", null),
-          H.i className: "fa fa-list-ul"
-        H.div key: "insertOrderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertOrderedList", null),
-          H.i className: "fa fa-list-ol"
+        R 'div', key: "link", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCreateLink,
+          R 'i', className: "fa fa-link"
+        R 'div', key: "justifyLeft", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyLeft", null),
+          R 'i', className: "fa fa-align-left"
+        R 'div', key: "justifyCenter", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyCenter", null),
+          R 'i', className: "fa fa-align-center"
+        R 'div', key: "justifyRight", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyRight", null),
+          R 'i', className: "fa fa-align-right"
+        R 'div', key: "justifyFull", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyFull", null),
+          R 'i', className: "fa fa-align-justify"
+        R 'div', key: "insertUnorderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertUnorderedList", null),
+          R 'i', className: "fa fa-list-ul"
+        R 'div', key: "insertOrderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertOrderedList", null),
+          R 'i', className: "fa fa-list-ol"
         if @props.includeHeadings
           [
-            H.div key: "h1", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H1>"),
-              H.i className: "fa fa-header"
-            H.div key: "h2", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H2>"),
-              H.i className: "fa fa-header", style: { fontSize: "80%" }
-            H.div key: "p", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<div>"),
+            R 'div', key: "h1", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H1>"),
+              R 'i', className: "fa fa-header"
+            R 'div', key: "h2", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H2>"),
+              R 'i', className: "fa fa-header", style: { fontSize: "80%" }
+            R 'div', key: "p", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<div>"),
               "\u00b6"
           ]
-        H.div key: "removeFormat", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "removeFormat", null), style: { paddingLeft: 5, paddingRight: 5 },
-          H.img src: removeFormatIcon, style: { height: 20 }
+        R 'div', key: "removeFormat", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "removeFormat", null), style: { paddingLeft: 5, paddingRight: 5 },
+          R 'img', src: removeFormatIcon, style: { height: 20 }
         @props.extraPaletteButtons
     
   renderHtml: ->
     if @props.onItemsChange?
-      return H.div key: "contents", style: @props.style, className: @props.className,
+      return R 'div', key: "contents", style: @props.style, className: @props.className,
         R ContentEditableComponent, 
-          ref: "contentEditable"
+          ref: (c) => @contentEditable = c
           style: { outline: "none" }
           html: @createHtml()
           onChange: @handleChange
@@ -179,13 +178,13 @@ module.exports = class RichTextComponent extends React.Component
           onFocus: @handleFocus
           onBlur: @handleBlur
         if not @props.items?[0]?
-          H.div key: "placeholder", style: { color: "#DDD", position: "absolute", top: 0, left: 0, right: 0, pointerEvents: "none" }, "Click to Edit"
+          R 'div', key: "placeholder", style: { color: "#DDD", position: "absolute", top: 0, left: 0, right: 0, pointerEvents: "none" }, "Click to Edit"
 
     else
-      return H.div key: "contents", style: @props.style, className: @props.className, dangerouslySetInnerHTML: { __html: @createHtml() }
+      return R 'div', key: "contents", style: @props.style, className: @props.className, dangerouslySetInnerHTML: { __html: @createHtml() }
 
   render: ->
-    H.div style: { position: "relative" }, ref: ((c) => @entireComponent = c),
+    R 'div', style: { position: "relative" }, ref: ((c) => @entireComponent = c),
       @renderHtml()
       if @state.focused
         @renderPalette()

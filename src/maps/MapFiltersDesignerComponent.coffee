@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprCleaner = require('mwater-expressions').ExprCleaner
@@ -34,14 +33,14 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
     if filterableTables.length == 0
       return null
 
-    return H.div null,
-      H.div className: "form-group",
-        H.label className: "text-muted", 
+    return R 'div', null,
+      R 'div', className: "form-group",
+        R 'label', className: "text-muted", 
           "Filters "
           R PopoverHelpComponent, placement: "left",
             '''Filters all layers in the map. Individual layers can be filtered by clicking on Customize...'''
 
-        H.div style: { margin: 5 }, 
+        R 'div', style: { margin: 5 }, 
           R FiltersDesignerComponent, 
             schema: @props.schema
             dataSource: @props.dataSource
@@ -50,11 +49,11 @@ module.exports = class MapFiltersDesignerComponent extends React.Component
             filterableTables: filterableTables
 
       if @context.globalFiltersElementFactory
-        H.div className: "form-group",
-          H.label className: "text-muted", 
+        R 'div', className: "form-group",
+          R 'label', className: "text-muted", 
             "Global Filters "
 
-          H.div style: { margin: 5 }, 
+          R 'div', style: { margin: 5 }, 
             @context.globalFiltersElementFactory({ 
               schema: @props.schema
               dataSource: @props.dataSource

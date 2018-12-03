@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 update = require 'update-object'
 
@@ -19,7 +18,7 @@ module.exports = class BinsComponent extends React.Component
     onChange: PropTypes.func.isRequired
 
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       guessing: false   # True when guessing ranges
@@ -63,8 +62,8 @@ module.exports = class BinsComponent extends React.Component
     @unmounted = true
 
   render: ->
-    H.div null,
-      H.div key: "vals",
+    R 'div', null,
+      R 'div', key: "vals",
         R LabeledInlineComponent, key: "min", label: "Min:",
           R NumberInputComponent, small: true, value: @props.xform.min, onChange: (v) => @props.onChange(update(@props.xform, { min: { $set: v }}))
         " "
@@ -74,21 +73,21 @@ module.exports = class BinsComponent extends React.Component
         R LabeledInlineComponent, key: "numBins", label: "# of Bins:",
           R NumberInputComponent, small: true, value: @props.xform.numBins, decimal: false, onChange: (v) => @props.onChange(update(@props.xform, { numBins: { $set: v }}))
         if @state.guessing
-          H.i className: "fa fa-spinner fa-spin"
+          R 'i', className: "fa fa-spinner fa-spin"
         else if not @props.xform.min? or not @props.xform.max? or not @props.xform.numBins
-          H.span className: "text-danger", style: { paddingLeft: 10 }, "Min and max are required"
+          R 'span', className: "text-danger", style: { paddingLeft: 10 }, "Min and max are required"
       if @props.xform.min? and @props.xform.max? and @props.xform.numBins
-        H.div key: "excludes",
-          H.label className: "checkbox-inline", key: "lower",
-            H.input type: "checkbox", checked: not @props.xform.excludeLower, onChange: (ev) => @props.onChange(update(@props.xform, { excludeLower: { $set: not ev.target.checked }}))
+        R 'div', key: "excludes",
+          R 'label', className: "checkbox-inline", key: "lower",
+            R 'input', type: "checkbox", checked: not @props.xform.excludeLower, onChange: (ev) => @props.onChange(update(@props.xform, { excludeLower: { $set: not ev.target.checked }}))
             "Include < #{@props.xform.min}"
-          H.label className: "checkbox-inline", key: "upper",
-            H.input type: "checkbox", checked: not @props.xform.excludeUpper, onChange: (ev) => @props.onChange(update(@props.xform, { excludeUpper: { $set: not ev.target.checked }}))
+          R 'label', className: "checkbox-inline", key: "upper",
+            R 'input', type: "checkbox", checked: not @props.xform.excludeUpper, onChange: (ev) => @props.onChange(update(@props.xform, { excludeUpper: { $set: not ev.target.checked }}))
             "Include > #{@props.xform.max}"
 
 
 LabeledInlineComponent = (props) ->
-  H.div style: { display: "inline-block" },
-    H.label className: "text-muted", props.label
+  R 'div', style: { display: "inline-block" },
+    R 'label', className: "text-muted", props.label
     props.children
 

@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
@@ -12,7 +11,7 @@ NumberInputComponent = require('react-library/lib/NumberInputComponent')
 AxisComponent = require './../axes/AxisComponent'
 ColorComponent = require '../ColorComponent'
 TableSelectComponent = require '../TableSelectComponent'
-Rcslider = require 'rc-slider'
+Rcslider = require('rc-slider').default
 EditPopupComponent = require './EditPopupComponent'
 ZoomLevelsComponent = require './ZoomLevelsComponent'
 PopupFilterJoinsUtils = require './PopupFilterJoinsUtils'
@@ -43,12 +42,12 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
   handleFillOpacityChange: (fillOpacity) => @update(fillOpacity: fillOpacity/100)
 
   renderTable: ->
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.i(className: "fa fa-database")
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        R('i', className: "fa fa-database")
         " "
         "Data Source"
-      H.div style: { marginLeft: 10 }, 
+      R 'div', style: { marginLeft: 10 }, 
         R TableSelectComponent, { 
           schema: @props.schema
           value: @props.design.table
@@ -61,8 +60,8 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
     if not @props.design.table
       return
 
-    title = H.span null,
-      H.span className: "glyphicon glyphicon-map-marker"
+    title = R 'span', null,
+      R 'span', className: "glyphicon glyphicon-map-marker"
       " Circle Centers"
     
     filters = _.clone(@props.filters) or []
@@ -73,9 +72,9 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
       if jsonql
         filters.push({ table: @props.design.filter.table, jsonql: jsonql })
 
-    H.div className: "form-group",
-      H.label className: "text-muted", title
-      H.div style: { marginLeft: 10 }, 
+    R 'div', className: "form-group",
+      R 'label', className: "text-muted", title
+      R 'div', style: { marginLeft: 10 }, 
         React.createElement(AxisComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
@@ -87,8 +86,8 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
           filters: filters)
 
   renderRadius: ->
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
         "Radius (meters)"
       ": "
       React.createElement(NumberInputComponent, value: @props.design.radius, onChange: @handleRadiusChange)
@@ -105,21 +104,21 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
       if jsonql
         filters.push({ table: @props.design.filter.table, jsonql: jsonql })
 
-    return H.div null,
+    return R 'div', null,
       if not @props.design.axes.color
-        H.div className: "form-group",
-          H.label className: "text-muted", 
-            H.span className: "glyphicon glyphicon glyphicon-tint"
+        R 'div', className: "form-group",
+          R 'label', className: "text-muted", 
+            R 'span', className: "glyphicon glyphicon glyphicon-tint"
             "Circle Color"
 
-          H.div null, 
+          R 'div', null, 
             R ColorComponent,
               color: @props.design.color
               onChange: @handleColorChange
 
-      H.div className: "form-group",
-        H.label className: "text-muted", 
-          H.span className: "glyphicon glyphicon glyphicon-tint"
+      R 'div', className: "form-group",
+        R 'label', className: "text-muted", 
+          R 'span', className: "glyphicon glyphicon glyphicon-tint"
           "Color By Data"
 
         R AxisComponent,
@@ -136,8 +135,8 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
           filters: filters
 
   renderFillOpacity: ->
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
         "Circle Opacity (%)"
       ": "
       React.createElement(Rcslider,
@@ -154,11 +153,11 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
     if not @props.design.axes.geometry
       return null
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.span(className: "glyphicon glyphicon-filter")
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        R('span', className: "glyphicon glyphicon-filter")
         " Filters"
-      H.div style: { marginLeft: 8 }, 
+      R 'div', style: { marginLeft: 8 }, 
         React.createElement(FilterExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
@@ -180,7 +179,7 @@ module.exports = class BufferLayerDesignerComponent extends React.Component
       defaultPopupFilterJoins: PopupFilterJoinsUtils.createDefaultPopupFilterJoins(@props.design.table)
 
   render: ->
-    H.div null,
+    R 'div', null,
       @renderTable()
       @renderGeometryAxis()
       @renderRadius()

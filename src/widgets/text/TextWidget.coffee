@@ -1,5 +1,4 @@
 React = require 'react'
-H = React.DOM
 R = React.createElement
 _ = require 'lodash'
 

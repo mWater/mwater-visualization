@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 moment = require 'moment'
 
@@ -65,12 +64,12 @@ class TextEditComponent extends React.Component
 
   componentDidMount: ->
     # Focus when created
-    @refs.input?.focus()
+    @input?.focus()
 
   render: ->
-    H.div style: { paddingTop: 3 },
-      H.input 
-        ref: "input"
+    R 'div', style: { paddingTop: 3 },
+      R 'input', 
+        ref: (c) => @input = c
         type: "text"
         className: "form-control"
         value: @props.value or ""
@@ -91,7 +90,7 @@ class NumberEditComponent extends React.Component
 
   componentDidMount: ->
     # Focus when created
-    @refs.input?.focus()
+    @input?.focus()
 
   handleChange: (ev) =>
     if ev.target.value
@@ -100,9 +99,9 @@ class NumberEditComponent extends React.Component
       @props.onChange(null)
 
   render: ->
-    H.div style: { paddingTop: 3 },
-      H.input 
-        ref: "input"
+    R 'div', style: { paddingTop: 3 },
+      R 'input', 
+        ref: (c) => @input = c
         type: "number"
         step: "any"
         className: "form-control"
@@ -125,11 +124,11 @@ class EnumEditComponent extends React.Component
     onCancel: PropTypes.func.isRequired     # Called when cancelled
 
   render: ->
-    H.div style: { paddingTop: 3 },
-      H.select 
+    R 'div', style: { paddingTop: 3 },
+      R 'select', 
         value: @props.value or ""
         onChange: (ev) => @props.onChange(ev.target.value or null)
         className: "form-control",
-          H.option key: "", value: "", ""
+          R 'option', key: "", value: "", ""
           _.map @props.enumValues, (ev) =>
-            H.option key: ev.id, value: ev.id, ExprUtils.localizeString(ev.name, @props.locale)
+            R 'option', key: ev.id, value: ev.id, ExprUtils.localizeString(ev.name, @props.locale)

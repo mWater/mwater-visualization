@@ -16,6 +16,7 @@ module.exports = class ServerMapDataSource extends MapDataSource
   #   mapId: map id to use on server
   #   rev: revision to use to allow caching
   constructor: (options) ->
+    super()
     @options = options
 
   # Gets the data source for a layer

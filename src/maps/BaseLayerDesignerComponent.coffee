@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 # Designer for config
@@ -23,7 +22,7 @@ module.exports = class BaseLayerDesignerComponent extends React.Component
     if id == @props.design.baseLayer
       className += " checked"
     
-    H.div 
+    R 'div', 
       key: id
       className: className
       style: { display: "inline-block" },
@@ -31,7 +30,7 @@ module.exports = class BaseLayerDesignerComponent extends React.Component
         name
 
   render: ->
-    H.div style: { marginLeft: 10 }, 
+    R 'div', style: { marginLeft: 10 }, 
       @renderBaseLayer("cartodb_positron", "Light")
       @renderBaseLayer("cartodb_dark_matter", "Dark")
       @renderBaseLayer("bing_road", "Roads")
@@ -41,12 +40,12 @@ module.exports = class BaseLayerDesignerComponent extends React.Component
   #   @updateDesign(baseLayer: ev.target.value)
 
   # render: ->
-  #   H.select className: "form-control", value: @props.design.baseLayer, onChange: @handleBaseLayerChange,
-  #     H.option key: "bing_road", value: "bing_road",
+  #   R 'select', className: "form-control", value: @props.design.baseLayer, onChange: @handleBaseLayerChange,
+  #     R 'option', key: "bing_road", value: "bing_road",
   #       "Roads"
-  #     H.option key: "bing_aerial", value: "bing_aerial",
+  #     R 'option', key: "bing_aerial", value: "bing_aerial",
   #       "Satellite"
-  #     H.option key: "cartodb_positron", value: "cartodb_positron",
+  #     R 'option', key: "cartodb_positron", value: "cartodb_positron",
   #       "Light"
-  #     H.option key: "cartodb_dark_matter", value: "cartodb_dark_matter",
+  #     R 'option', key: "cartodb_dark_matter", value: "cartodb_dark_matter",
   #       "Dark"

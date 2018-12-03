@@ -1,8 +1,7 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
-ReactSelect = require 'react-select'
+ReactSelect = require('react-select').default
 ExprUtils = require('mwater-expressions').ExprUtils
 ExprCleaner = require('mwater-expressions').ExprCleaner
 TextLiteralComponent = require './TextLiteralComponent'
@@ -121,7 +120,7 @@ module.exports = class QuickfiltersComponent extends React.Component
     if not @props.design or @props.design.length == 0
       return null
 
-    H.div style: { borderTop: "solid 1px #E8E8E8", borderBottom: "solid 1px #E8E8E8", padding: 5 },
+    R 'div', style: { borderTop: "solid 1px #E8E8E8", borderBottom: "solid 1px #E8E8E8", padding: 5 },
       _.map @props.design, (item, i) => @renderQuickfilter(item, i)
 
 # Quickfilter for an enum
@@ -149,44 +148,53 @@ class EnumQuickfilterComponent extends React.Component
       @props.onValueChange(null)
 
   handleMultiChange: (val) =>
-    value = if val then val.split("\n") else []
-    value = _.map(value, JSON.parse)
-
-    if value.length > 0
-      @props.onValueChange(value)
+    if val?.length > 0
+      @props.onValueChange(_.pluck(val, "value"))
     else
       @props.onValueChange(null)
 
   renderSingleSelect: ->
+    options = _.map(@props.options, (opt) => { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
+
     R ReactSelect, 
       placeholder: "All"
-      value: @props.value
-      multi: false
-      options: _.map(@props.options, (opt) => { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
-      onChange: if @props.onValueChange then @handleSingleChange
-      disabled: not @props.onValueChange?
+      value: _.findWhere(options, value: @props.value) or null
+      options: options
+      isClearable: true
+      onChange: (value) => if @props.onValueChange then @handleSingleChange(value?.value)
+      isDisabled: not @props.onValueChange?
+      styles: { 
+        # Keep menu above fixed data table headers
+        menu: (style) => _.extend({}, style, zIndex: 2)
+      }
   
   renderMultiSelect: ->
+    options = _.map(@props.options, (opt) => { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
+    
     R ReactSelect, 
       placeholder: "All"
-      value: _.map(@props.value or [], JSON.stringify).join("\n")
-      multi: true
-      delimiter: "\n"
-      options: _.map(@props.options, (opt) => { value: JSON.stringify(opt.id), label: ExprUtils.localizeString(opt.name, @context.locale) }) 
+      value: _.map(@props.value, (v) => _.find(options, (o) => o.value == v))
+      isClearable: true
+      isMulti: true
+      options: options
       onChange: if @props.onValueChange then @handleMultiChange
-      disabled: not @props.onValueChange?
+      isDisabled: not @props.onValueChange?
+      styles: { 
+        # Keep menu above fixed data table headers
+        menu: (style) => _.extend({}, style, zIndex: 2)
+      }
 
   render: ->
-    H.div style: { display: "inline-block", paddingRight: 10 },
+    R 'div', style: { display: "inline-block", paddingRight: 10 },
       if @props.label
-        H.span style: { color: "gray" }, @props.label + ":\u00a0"
-      H.div style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
+        R 'span', style: { color: "gray" }, @props.label + ":\u00a0"
+      R 'div', style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
         if @props.multi
           @renderMultiSelect()
         else
           @renderSingleSelect()
       if not @props.onValueChange
-        H.i className: "text-warning fa fa-fw fa-lock"
+        R 'i', className: "text-warning fa fa-fw fa-lock"
 
 
 # Quickfilter for a text value
@@ -211,10 +219,10 @@ class TextQuickfilterComponent extends React.Component
     }))
 
   render: ->
-    H.div style: { display: "inline-block", paddingRight: 10 },
+    R 'div', style: { display: "inline-block", paddingRight: 10 },
       if @props.label
-        H.span style: { color: "gray" }, @props.label + ":\u00a0"
-      H.div style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
+        R 'span', style: { color: "gray" }, @props.label + ":\u00a0"
+      R 'div', style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
         R TextLiteralComponent, {
           value: @props.value
           onChange: @props.onValueChange
@@ -226,7 +234,7 @@ class TextQuickfilterComponent extends React.Component
           filters: @props.filters
         }
       if not @props.onValueChange
-        H.i className: "text-warning fa fa-fw fa-lock"
+        R 'i', className: "text-warning fa fa-fw fa-lock"
 
 # Quickfilter for a date value
 class DateQuickfilterComponent extends React.Component
@@ -239,15 +247,15 @@ class DateQuickfilterComponent extends React.Component
     onValueChange: PropTypes.func.isRequired # Called when value changes
 
   render: ->
-    H.div style: { display: "inline-block", paddingRight: 10 },
+    R 'div', style: { display: "inline-block", paddingRight: 10 },
       if @props.label
-        H.span style: { color: "gray" }, @props.label + ":\u00a0"
-      H.div style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
+        R 'span', style: { color: "gray" }, @props.label + ":\u00a0"
+      R 'div', style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
         R DateExprComponent, {
           datetime: (new ExprUtils(@props.schema).getExprType(@props.expr)) == "datetime"
           value: @props.value
           onChange: @props.onValueChange
         }
       if not @props.onValueChange
-        H.i className: "text-warning fa fa-fw fa-lock"
+        R 'i', className: "text-warning fa fa-fw fa-lock"
 

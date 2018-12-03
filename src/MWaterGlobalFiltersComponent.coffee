@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 querystring = require 'querystring'
@@ -53,7 +52,7 @@ module.exports = class MWaterGlobalFiltersComponent extends React.Component
     else
       adminRegions = null
 
-    H.div null,
+    R 'div', null,
       R ui.FormGroup, label: "Only sites managed by", labelMuted: true, 
         R IdLiteralComponent,
           value: managedBy

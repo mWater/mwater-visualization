@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 uuid = require 'uuid'
@@ -82,13 +81,13 @@ module.exports = class AddLayerComponent extends React.Component
       }
     ]
 
-    return H.div style: { margin: 5 }, key: "addLayer", className: "btn-group",
-      H.button type: "button", "data-toggle": "dropdown", className: "btn btn-primary dropdown-toggle",
-        H.span className: "glyphicon glyphicon-plus"
+    return R 'div', style: { margin: 5 }, key: "addLayer", className: "btn-group",
+      R 'button', type: "button", "data-toggle": "dropdown", className: "btn btn-primary dropdown-toggle",
+        R 'span', className: "glyphicon glyphicon-plus"
         " Add Layer "
-        H.span className: "caret"
-      H.ul className: "dropdown-menu",
+        R 'span', className: "caret"
+      R 'ul', className: "dropdown-menu",
         _.map(newLayers, (layer, i) =>
-          H.li key: "" + i,
-            H.a onClick: @handleAddLayer.bind(null, layer), layer.label or layer.name
+          R 'li', key: "" + i,
+            R 'a', onClick: @handleAddLayer.bind(null, layer), layer.label or layer.name
           )

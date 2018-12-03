@@ -2,10 +2,9 @@ PropTypes = require('prop-types')
 React = require 'react'
 ReactDOM = require 'react-dom'
 _ = require 'lodash'
-H = React.DOM
+R = React.createElement
 DragSource = require('react-dnd').DragSource
 DropTarget = require('react-dnd').DropTarget
-DragDropContext = require('react-dnd').DragDropContext
 DecoratedBlockComponent = require '../DecoratedBlockComponent'
 
 # Render a child element as draggable, resizable block, injecting handle connectors
@@ -60,7 +59,7 @@ class Container extends React.Component
     connectDropTarget: PropTypes.func.isRequired # Injected by react-dnd wrapper
 
   constructor: (props) ->
-    super
+    super(props)
     @state = { moveHover: null, resizeHover: null }
 
   setMoveHover: (hoverInfo) ->
@@ -142,7 +141,7 @@ class Container extends React.Component
     @props.onItemsChange(items)
 
   renderPlaceholder: (bounds) ->
-    H.div key: "placeholder", style: { 
+    R 'div', key: "placeholder", style: { 
       position: "absolute", 
       left: bounds.x
       top: bounds.y
@@ -194,12 +193,12 @@ class Container extends React.Component
         onBlockRemove: @handleRemove.bind(null, id),
           elem
     else
-      elem = H.div className: "mwater-visualization-block-view",
+      elem = R 'div', className: "mwater-visualization-block-view",
         # style: { width: bounds.width, height: bounds.height },
         elem
 
     # Clone element, injecting width, height, standardWidth and enclosing in a dnd block
-    return H.div style: style, key: id,
+    return R 'div', style: style, key: id,
       React.createElement(MoveResizeLayoutComponent, { dragInfo: dragInfo, canDrag: @props.onItemsChange? }, 
         elem)
 
@@ -294,7 +293,7 @@ class Container extends React.Component
 
     # Connect as a drop target
     @props.connectDropTarget(
-      H.div style: style, 
+      R 'div', style: style, 
         @renderItems(@props.items)
     )
 

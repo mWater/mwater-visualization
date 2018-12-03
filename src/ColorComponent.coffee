@@ -1,6 +1,6 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
+R = React.createElement
 
 ClickOutHandler = require('react-onclickout')
 SketchPicker = require("react-color").SketchPicker
@@ -12,8 +12,8 @@ module.exports = class ColorComponent extends React.Component
     color: PropTypes.string
     onChange: PropTypes.func
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = { open: false, advanced: false }
 
   handleClick: =>
@@ -59,18 +59,18 @@ module.exports = class ColorComponent extends React.Component
       borderRadius: 3
     }
 
-    H.div style: { position: "relative", display: "inline-block" },
-      H.div(style: style, onClick: @handleClick)
+    R 'div', style: { position: "relative", display: "inline-block" },
+      R('div', style: style, onClick: @handleClick)
       if @state.open
         React.createElement ClickOutHandler, onClickOut: (=> @setState(open: false)),
-          H.div style: popupPosition,
-            H.button type: "button", className: "btn btn-link btn-sm", onClick: @handleReset,
-              H.i className: "fa fa-undo"
+          R 'div', style: popupPosition,
+            R 'button', type: "button", className: "btn btn-link btn-sm", onClick: @handleReset,
+              R 'i', className: "fa fa-undo"
               " Reset Color"
-            # H.button type: "button", className: "btn btn-link btn-sm", onClick: @handleTransparent,
-            #   H.i className: "fa fa-ban"
+            # R 'button', type: "button", className: "btn btn-link btn-sm", onClick: @handleTransparent,
+            #   R 'i', className: "fa fa-ban"
             #   " None"
-            H.button type: "button", className: "btn btn-link btn-sm", onClick: @handleAdvanced,
+            R 'button', type: "button", className: "btn btn-link btn-sm", onClick: @handleAdvanced,
               if @state.advanced then "Basic" else "Advanced"
               
             if @state.advanced

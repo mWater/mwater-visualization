@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 moment = require 'moment'
 d3Format = require 'd3-format'
@@ -37,8 +36,8 @@ module.exports = class TableChartViewComponent extends React.Component
       transformOrigin: "0 0"
     }
 
-    return H.div style: style, className: "overflow-auto-except-print",
-      H.div {style: { fontWeight: "bold", textAlign: "center" }, ref: "title"}, @props.design.titleText
+    return R 'div', style: style, className: "overflow-auto-except-print",
+      R 'div', {style: { fontWeight: "bold", textAlign: "center" }}, @props.design.titleText
       R TableContentsComponent, 
         columns: @props.design.columns
         table: @props.design.table
@@ -83,17 +82,17 @@ class TableContentsComponent extends React.Component
     column = @props.columns[index]
 
     text = column.headerText or axisBuilder.summarizeAxis(column.textAxis, @context.locale)
-    H.th { key: index },
+    R 'th', { key: index },
       text
 
   renderHeader: ->
-    H.thead key: "head",
-      H.tr key: "head",
+    R 'thead', key: "head",
+      R 'tr', key: "head",
         _.map(@props.columns, (column, i) => @renderHeaderCell(i))
 
   renderImage: (id) ->
     url = @props.dataSource.getImageUrl(id)
-    return H.a(href: url, key: id, target: "_blank", style: { paddingLeft: 5, paddingRight: 5 }, "Image")
+    return R('a', href: url, key: id, target: "_blank", style: { paddingLeft: 5, paddingRight: 5 }, "Image")
 
   renderCell: (rowIndex, columnIndex) ->
     row = @props.data.main[rowIndex]  
@@ -143,18 +142,18 @@ class TableContentsComponent extends React.Component
         else
           node = "" + value
 
-    return H.td(key: columnIndex, node)
+    return R('td', key: columnIndex, node)
 
   renderRow: (index) ->
-    H.tr key: index, onClick: @handleRowClick.bind(null, index),
+    R 'tr', key: index, onClick: @handleRowClick.bind(null, index),
       _.map(@props.columns, (column, i) => @renderCell(index, i))
 
   renderBody: ->
-    H.tbody key: "body",
+    R 'tbody', key: "body",
       _.map(@props.data.main, (row, i) => @renderRow(i))
 
   render: ->
-    H.table className: "table table-condensed table-hover", style: { fontSize: "10pt", marginBottom: 0 },
+    R 'table', className: "table table-condensed table-hover", style: { fontSize: "10pt", marginBottom: 0 },
       @renderHeader()
       @renderBody()
 
@@ -164,12 +163,12 @@ class TableContentsComponent extends React.Component
 #     column = @props.design.columns[index]
 
 #     text = column.headerText or axisBuilder.summarizeAxis(column.textAxis, @context.locale)
-#     H.th {key: index},
+#     R 'th', {key: index},
 #       text
 
 #   renderHeader: ->
-#     H.thead null,
-#       H.tr { style: { position: "relative"}, ref: "tableHeader"},
+#     R 'thead', null,
+#       R 'tr', { style: { position: "relative"}, ref: "tableHeader"},
 #         _.map(@props.design.columns, (column, i) => @renderHeaderCell(i))
 
 #   renderCell: (rowIndex, columnIndex) ->
@@ -182,10 +181,10 @@ class TableContentsComponent extends React.Component
 #     # Convert to string
 #     axisBuilder = new AxisBuilder(schema: @props.schema)
 #     str = axisBuilder.formatValue(column.textAxis, value, @context.locale)
-#     return H.td(key: columnIndex, str)
+#     return R('td', key: columnIndex, str)
 
 #   renderRow: (index) ->
-#     H.tr key: index,
+#     R 'tr', key: index,
 #       _.map(@props.design.columns, (column, i) => @renderCell(index, i))
 
 #   componentDidUpdate: (prevProps, prevState) ->
@@ -220,7 +219,7 @@ class TableContentsComponent extends React.Component
 # #    tbodyStyle =
 
 
-#     H.tbody { ref: "tableBody"},
+#     R 'tbody', { ref: "tableBody"},
 #       _.map(@props.data.main, (row, i) => @renderRow(i))
 
 #   shouldComponentUpdate: (prevProps) ->
@@ -242,11 +241,11 @@ class TableContentsComponent extends React.Component
 
 #     height = @props.height * (@props.standardWidth / @props.width) - $(@refs.title).outerHeight() - 25
 
-#     return H.div style: style, className: "overflow-auto-except-print",
-#       H.div {style: { fontWeight: "bold", textAlign: "center" }, ref: "title"}, @props.design.titleText
-#       H.table className: "table table-condensed table-hover", style: { fontSize: "10pt", marginBottom: 0 },
+#     return R 'div', style: style, className: "overflow-auto-except-print",
+#       R 'div', {style: { fontWeight: "bold", textAlign: "center" }, ref: "title"}, @props.design.titleText
+#       R 'table', className: "table table-condensed table-hover", style: { fontSize: "10pt", marginBottom: 0 },
 #         @renderHeader()
-#       H.div {ref: "tableBodyContainer", style: containerStyle},
-#         H.table className: "table table-condensed table-hover", style: { fontSize: "10pt" },
+#       R 'div', {ref: "tableBodyContainer", style: containerStyle},
+#         R 'table', className: "table table-condensed table-hover", style: { fontSize: "10pt" },
 #           @renderBody()
 

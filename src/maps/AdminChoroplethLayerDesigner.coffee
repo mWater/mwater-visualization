@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
@@ -11,7 +10,7 @@ ExprUtils = require('mwater-expressions').ExprUtils
 AxisComponent = require './../axes/AxisComponent'
 TableSelectComponent = require '../TableSelectComponent'
 ColorComponent = require '../ColorComponent'
-Rcslider = require 'rc-slider'
+Rcslider = require('rc-slider').default
 EditPopupComponent = require './EditPopupComponent'
 ZoomLevelsComponent = require './ZoomLevelsComponent'
 
@@ -55,12 +54,12 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
   handleFilterChange: (expr) => @update(filter: expr)
 
   renderTable: ->
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.i(className: "fa fa-database")
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        R('i', className: "fa fa-database")
         " "
         "Data Source"
-      H.div style: { marginLeft: 10 }, 
+      R 'div', style: { marginLeft: 10 }, 
         R TableSelectComponent, { 
           schema: @props.schema
           value: @props.design.table
@@ -74,11 +73,11 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
     if not @props.design.table
       return null
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.span(className: "glyphicon glyphicon-map-marker")
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        R('span', className: "glyphicon glyphicon-map-marker")
         " Location"
-      H.div style: { marginLeft: 8 }, 
+      R 'div', style: { marginLeft: 8 }, 
         R(ExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
@@ -98,10 +97,10 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
       onScopeAndDetailLevelChange: @handleScopeAndDetailLevelChange
 
   renderDisplayNames: ->
-    H.div className: "form-group",
-      H.div className: "checkbox",
-        H.label null,
-          H.input type: "checkbox", checked: @props.design.displayNames, onChange: (ev) => @update({ displayNames: ev.target.checked })
+    R 'div', className: "form-group",
+      R 'div', className: "checkbox",
+        R 'label', null,
+          R 'input', type: "checkbox", checked: @props.design.displayNames, onChange: (ev) => @update({ displayNames: ev.target.checked })
           "Display Region Names"
 
   renderColor: ->
@@ -116,21 +115,21 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
       if jsonql
         filters.push({ table: @props.design.filter.table, jsonql: jsonql })
 
-    return H.div null,
+    return R 'div', null,
       if not @props.design.axes.color
-        H.div className: "form-group",
-          H.label className: "text-muted", 
-            H.span className: "glyphicon glyphicon glyphicon-tint"
+        R 'div', className: "form-group",
+          R 'label', className: "text-muted", 
+            R 'span', className: "glyphicon glyphicon glyphicon-tint"
             "Fill Color"
 
-          H.div null, 
+          R 'div', null, 
             R ColorComponent,
               color: @props.design.color
               onChange: @handleColorChange
 
-      H.div className: "form-group",
-        H.label className: "text-muted", 
-          H.span className: "glyphicon glyphicon glyphicon-tint"
+      R 'div', className: "form-group",
+        R 'label', className: "text-muted", 
+          R 'span', className: "glyphicon glyphicon glyphicon-tint"
           "Color By Data"
 
         R AxisComponent,
@@ -150,13 +149,13 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
   #   if not @props.design.table
   #     return
 
-  #   title = H.span null,
-  #     H.span className: "glyphicon glyphicon glyphicon-tint"
+  #   title = R 'span', null,
+  #     R 'span', className: "glyphicon glyphicon glyphicon-tint"
   #     " Color By"
 
-  #   H.div className: "form-group",
-  #     H.label className: "text-muted", title
-  #     H.div style: { marginLeft: 10 }, 
+  #   R 'div', className: "form-group",
+  #     R 'label', className: "text-muted", title
+  #     R 'div', style: { marginLeft: 10 }, 
   #       R(AxisComponent, 
   #         schema: @props.schema
   #         dataSource: @props.dataSource
@@ -168,8 +167,8 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
   #         onChange: @handleColorAxisChange)
 
   renderFillOpacity: ->
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
         "Fill Opacity (%)"
       ": "
       R(Rcslider,
@@ -186,11 +185,11 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
     if not @props.design.table
       return null
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.span(className: "glyphicon glyphicon-filter")
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        R('span', className: "glyphicon glyphicon-filter")
         " Filters"
-      H.div style: { marginLeft: 8 }, 
+      R 'div', style: { marginLeft: 8 }, 
         R(FilterExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
@@ -216,7 +215,7 @@ module.exports = class AdminChoroplethLayerDesigner extends React.Component
       defaultPopupFilterJoins: defaultPopupFilterJoins
 
   render: ->
-    H.div null,
+    R 'div', null,
       @renderTable()
       @renderAdminRegionExpr()
       @renderScopeAndDetailLevel()

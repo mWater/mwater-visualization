@@ -3,7 +3,6 @@ _ = require 'lodash'
 React = require 'react'
 ReactDOM = require 'react-dom'
 R = React.createElement
-H = React.DOM
 
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
 ExprUtils = require('mwater-expressions').ExprUtils
@@ -34,8 +33,8 @@ module.exports = class PivotChartViewComponent extends React.Component
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = {
       editSegment: null   # Segment being edited
@@ -125,7 +124,7 @@ module.exports = class PivotChartViewComponent extends React.Component
     @props.onDesignChange(design)
 
   renderHeader: ->
-    return H.div ref: "header", style: { paddingLeft: 10, paddingRight: 10 },
+    return R 'div', style: { paddingLeft: 10, paddingRight: 10 },
       R TextComponent,
         design: @props.design.header
         onDesignChange: if @props.onDesignChange then @handleHeaderChange
@@ -136,7 +135,7 @@ module.exports = class PivotChartViewComponent extends React.Component
         standardWidth: @props.standardWidth
 
   renderFooter: ->
-    return H.div ref: "footer", style: { paddingLeft: 10, paddingRight: 10 },
+    return R 'div', style: { paddingLeft: 10, paddingRight: 10 },
       R TextComponent,
         design: @props.design.footer
         onDesignChange: if @props.onDesignChange then @handleFooterChange
@@ -184,11 +183,11 @@ module.exports = class PivotChartViewComponent extends React.Component
   render: ->
     layout = new PivotChartLayoutBuilder(schema: @props.schema).buildLayout(@props.design, @props.data, @context.locale)
 
-    H.div style: { width: @props.width, height: @props.height },
+    R 'div', style: { width: @props.width, height: @props.height },
       @renderHeader()
       @renderEditSegmentModal()
       @renderEditIntersectionModal()
-      H.div key: "layout", style: { margin: 5, marginTop: 12, overflowX: "auto", padding: 7 }, # Allow table to scroll since tables have hard minimum widths, Leave room for gear menu
+      R 'div', key: "layout", style: { margin: 5, marginTop: 12, overflowX: "auto", padding: 7 }, # Allow table to scroll since tables have hard minimum widths, Leave room for gear menu
         R PivotChartLayoutComponent, 
           layout: layout
           editable: @props.onDesignChange?

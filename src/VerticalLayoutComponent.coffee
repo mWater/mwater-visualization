@@ -1,7 +1,7 @@
 PropTypes = require('prop-types')
 React = require 'react'
 ReactDOM = require 'react-dom'
-H = React.DOM
+R = React.createElement
 _ = require 'lodash'
 
 # Lays out divs vertically, allowing fractional allocation combined with auto-sized ones
@@ -12,9 +12,10 @@ module.exports = class VerticalLayoutComponent extends React.Component
     height: PropTypes.number.isRequired
     relativeHeights: PropTypes.object.isRequired  # Fraction to allocate for fractional heights. Should total 1.0. Keyed by key
 
-  constructor: -> 
-    super
+  constructor: (props) ->
+    super(props)
     @state = { availableHeight: 0 }
+    @childRefs = {}
 
   componentWillReceiveProps: (nextProps) -> 
     if nextProps.height != @props.height or not _.isEqual(nextProps.relativeHeights, @props.relativeHeights)
@@ -31,18 +32,18 @@ module.exports = class VerticalLayoutComponent extends React.Component
       if not child then continue
       if props.relativeHeights[child.key] then continue
 
-      node = ReactDOM.findDOMNode(@refs[child.key])
+      node = ReactDOM.findDOMNode(@childRefs[child.key])
       availableHeight -= $(node).outerHeight()
 
     @setState(availableHeight: availableHeight)
 
   # Get a subcomponent
   getComponent: (key) ->
-    return @refs[key]
+    return @childRefs[key]
 
   render: ->
     # Calculate scaling
-    H.div style: { height: @props.height }, 
+    R 'div', style: { height: @props.height }, 
       React.Children.map(@props.children, (child) =>
         if not child
           return
@@ -52,12 +53,14 @@ module.exports = class VerticalLayoutComponent extends React.Component
           # If available height is known, render variable
           if @state.availableHeight
             height = @state.availableHeight * @props.relativeHeights[child.key]
-            return H.div style: { height: height, position: "relative" },
-              H.div style: { height: height }, ref: child.key,
+            return R 'div', style: { height: height, position: "relative" },
+              R 'div', 
+                style: { height: height }, 
+                ref: ((c) => @childRefs[child.key] = c),
                 React.cloneElement(child, { height: height })
           # Otherwise don't show until available height is known
           return null
-        return H.div ref: child.key,
+        return R 'div', ref: ((c) => @childRefs[child.key] = c),
           child
         )
 

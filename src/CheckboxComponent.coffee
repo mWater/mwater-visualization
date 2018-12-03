@@ -1,6 +1,6 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
+R = React.createElement
 
 # Pretty checkbox component
 module.exports = class CheckboxComponent extends React.Component
@@ -16,7 +16,7 @@ module.exports = class CheckboxComponent extends React.Component
       @props.onClick()
 
   render: ->
-    H.div 
+    R 'div', 
       className: (if @props.checked then "mwater-visualization-checkbox checked" else "mwater-visualization-checkbox")
       onClick: @handleClick,
         @props.children
