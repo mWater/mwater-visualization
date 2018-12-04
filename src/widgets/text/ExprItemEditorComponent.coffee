@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 ExprUtils = require("mwater-expressions").ExprUtils
@@ -18,7 +17,7 @@ module.exports = class ExprItemEditorComponent extends React.Component
     singleRowTable: PropTypes.string  # Table that is filtered to have one row
 
   constructor: (props) ->
-    super
+    super(props)
 
     # Keep table in state as it can be set before the expression
     @state = {
@@ -55,19 +54,19 @@ module.exports = class ExprItemEditorComponent extends React.Component
 
     exprUtils = new ExprUtils(@props.schema)
 
-    H.div style: { paddingBottom: 200 },
-      H.div className: "form-group",
-        H.label className: "text-muted", 
-          H.i(className: "fa fa-database")
+    R 'div', style: { paddingBottom: 200 },
+      R 'div', className: "form-group",
+        R 'label', className: "text-muted", 
+          R('i', className: "fa fa-database")
           " "
           "Data Source"
         ": "
         R(TableSelectComponent, { schema: @props.schema, value: @state.table, onChange: @handleTableChange })
-        H.br()
+        R('br')
 
       if @state.table
-        H.div className: "form-group",
-          H.label className: "text-muted", 
+        R 'div', className: "form-group",
+          R 'label', className: "text-muted", 
             "Field"
           ": "
           R ExprComponent, 
@@ -80,13 +79,13 @@ module.exports = class ExprItemEditorComponent extends React.Component
             onChange: @handleExprChange
       
       if @state.table and @props.exprItem.expr
-        H.div className: "form-group",
-          H.label key: "includeLabel",
-            H.input type: "checkbox", checked: @props.exprItem.includeLabel, onChange: @handleIncludeLabelChange
+        R 'div', className: "form-group",
+          R 'label', key: "includeLabel",
+            R 'input', type: "checkbox", checked: @props.exprItem.includeLabel, onChange: @handleIncludeLabelChange
             " Include Label"
 
           if @props.exprItem.includeLabel
-            H.input 
+            R 'input', 
               key: "labelText"
               className: "form-control"
               type: "text"
@@ -95,12 +94,12 @@ module.exports = class ExprItemEditorComponent extends React.Component
               placeholder: new ExprUtils(@props.schema).summarizeExpr(@props.exprItem.expr) + ": "
 
       if @props.exprItem.expr and exprUtils.getExprType(@props.exprItem.expr) == "number"
-        H.div className: "form-group",
-          H.label className: "text-muted", 
+        R 'div', className: "form-group",
+          R 'label', className: "text-muted", 
             "Format"
           ": "
-          H.select value: @props.exprItem.format or "", className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
-            _.map(formats, (format) -> H.option(key: format.value, value: format.value, format.label))
+          R 'select', value: @props.exprItem.format or "", className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
+            _.map(formats, (format) -> R('option', key: format.value, value: format.value, format.label))
 
 
 

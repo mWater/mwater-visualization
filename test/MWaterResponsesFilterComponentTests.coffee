@@ -7,7 +7,7 @@ ui = require 'react-library/lib/bootstrap'
 
 MWaterResponsesFilterComponent = require '../src/MWaterResponsesFilterComponent'
 
-enzyme.configure({ adapter: new (require('enzyme-adapter-react-15'))() }) # Configure enzyme for react 15
+enzyme.configure({ adapter: new (require('enzyme-adapter-react-16'))() }) # Configure enzyme for react 16
 
 describe "MWaterResponsesFilterComponent", ->
   before ->

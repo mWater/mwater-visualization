@@ -1,11 +1,10 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 async = require 'async'
 
-ReactSelect = require 'react-select'
+ReactSelect = require('react-select').default
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 DatagridViewComponent = require './DatagridViewComponent'
@@ -41,7 +40,7 @@ module.exports = class FindReplaceModalComponent extends React.Component
     onUpdate: PropTypes.func      # Called when values have been updated
 
   constructor: (props) ->
-    super
+    super(props)
     @state = {
       open: false  # True if modal is open
       replaceColumn: null # Column id to replace
@@ -192,30 +191,30 @@ module.exports = class FindReplaceModalComponent extends React.Component
 
     # Show progress
     if @state.progress?
-      return H.div null,
-        H.h3 null, "Working..."
-        H.div className: 'progress',
-          H.div className: 'progress-bar', style: { width: "#{@state.progress}%" }
+      return R 'div', null,
+        R 'h3', null, "Working..."
+        R 'div', className: 'progress',
+          R 'div', className: 'progress-bar', style: { width: "#{@state.progress}%" }
 
-    H.div null,
-      H.div key: "replace", className: "form-group",
-        H.label null, "Column with data to replace: "
-        R ReactSelect,
-          options: replaceColumnOptions
-          clearable: false
-          value: @state.replaceColumn
-          onChange: (value) => @setState(replaceColumn: value)
-          placeholder: "Select Column..."
-        # H.select value: @state.replaceColumn or "", onChange: ((ev) => @setState(replaceColumn: ev.target.value)), className: "form-control",
-        #   H.option key: "_none", value: "", "Select..."
-        #   _.map(replaceColumnOptions, (option) => H.option(key: option.value, value: option.value, option.label))
+    R 'div', null,
+      R 'div', key: "replace", className: "form-group",
+        R 'label', null, "Column with data to replace: "
+          R ReactSelect,
+            options: replaceColumnOptions
+            value: _.findWhere(replaceColumnOptions, value: @state.replaceColumn) or null
+            onChange: (opt) => @setState(replaceColumn: opt.value)
+            placeholder: "Select Column..."
+            styles: { 
+              # Keep menu above fixed data table headers
+              menu: (style) => _.extend({}, style, zIndex: 2)
+            }
 
       if @state.replaceColumn
         # Get expr of replace column
         replaceExpr = _.findWhere(@props.design.columns, id: @state.replaceColumn).expr
 
-        H.div key: "with", className: "form-group",
-          H.label null, "Value to replace data with: "
+        R 'div', key: "with", className: "form-group",
+          R 'label', null, "Value to replace data with: "
           R ExprComponent,
             schema: @props.schema
             dataSource: @props.dataSource
@@ -228,8 +227,8 @@ module.exports = class FindReplaceModalComponent extends React.Component
             preferLiteral: true
             placeholder: "(Blank)"
 
-      H.div key: "condition", className: "form-group",
-        H.label null, "Only in rows that (optional):"
+      R 'div', key: "condition", className: "form-group",
+        R 'label', null, "Only in rows that (optional):"
         R ExprComponent,
           schema: @props.schema
           dataSource: @props.dataSource
@@ -239,8 +238,8 @@ module.exports = class FindReplaceModalComponent extends React.Component
           types: ["boolean"]
           placeholder: "All Rows"
 
-      H.div key: "preview",
-        H.h4 null, "Preview"
+      R 'div', key: "preview",
+        R 'h4', null, "Preview"
         @renderPreview()
 
   render: ->
@@ -251,13 +250,13 @@ module.exports = class FindReplaceModalComponent extends React.Component
       size: "large"
       header: "Find/Replace"
       footer: [
-        H.button 
+        R 'button', 
           key: "cancel"
           type: "button"
           onClick: => @setState(open: false)
           className: "btn btn-default", 
             "Cancel"
-        H.button 
+        R 'button', 
           key: "apply"
           type: "button"
           disabled: not @state.replaceColumn or @state.progress?

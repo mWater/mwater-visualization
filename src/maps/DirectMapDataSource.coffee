@@ -18,6 +18,7 @@ module.exports = class DirectMapDataSource extends MapDataSource
   #   apiUrl: API url to use for talking to mWater server
   #   client: client id to use for talking to mWater server
   constructor: (options) ->
+    super()
     @options = options
 
   # Gets the data source for a layer

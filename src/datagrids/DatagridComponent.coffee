@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
@@ -68,9 +67,9 @@ module.exports = class DatagridComponent extends React.Component
 
   updateHeight: ->
     # Calculate quickfilters height
-    if @refs.quickfilters 
-      if @state.quickfiltersHeight != @refs.quickfilters.offsetHeight
-        @setState(quickfiltersHeight: @refs.quickfilters.offsetHeight)
+    if @quickfilters 
+      if @state.quickfiltersHeight != @quickfilters.offsetHeight
+        @setState(quickfiltersHeight: @quickfilters.offsetHeight)
     else
       @setState(quickfiltersHeight: 0)
 
@@ -136,12 +135,12 @@ module.exports = class DatagridComponent extends React.Component
       return null
 
     label = [
-      H.i className: if @state.cellEditingEnabled then "fa fa-fw fa-check-square" else "fa fa-fw fa-square-o"
+      R 'i', className: if @state.cellEditingEnabled then "fa fa-fw fa-check-square" else "fa fa-fw fa-square-o"
       " "
       "Cell Editing"
     ]
 
-    return H.a 
+    return R 'a', 
       key: "cell-edit"
       className: "btn btn-link btn-sm"
       onClick: @handleCellEditingToggle,
@@ -151,11 +150,11 @@ module.exports = class DatagridComponent extends React.Component
     if not @props.onDesignChange
       return null
 
-    H.button 
+    R 'button', 
       type: "button"
       className: "btn btn-primary"
       onClick: @handleEdit,
-        H.span className: "glyphicon glyphicon-cog"
+        R 'span', className: "glyphicon glyphicon-cog"
         " "
         "Settings"
 
@@ -163,15 +162,15 @@ module.exports = class DatagridComponent extends React.Component
     if not @state.cellEditingEnabled
       return null
 
-    return H.a 
+    return R 'a', 
       key: "findreplace"
       className: "btn btn-link btn-sm"
-      onClick: (=> @refs.findReplaceModal.show()),
+      onClick: (=> @findReplaceModal.show()),
         "Find/Replace"
 
   renderTitleBar: ->
-    H.div style: { position: "absolute", top: 0, left: 0, right: 0, height: 40, padding: 4 },
-      H.div style: { float: "right" },
+    R 'div', style: { position: "absolute", top: 0, left: 0, right: 0, height: 40, padding: 4 },
+      R 'div', style: { float: "right" },
         @renderFindReplace()
         @renderCellEdit()
         @renderEditButton()
@@ -179,7 +178,7 @@ module.exports = class DatagridComponent extends React.Component
       @props.titleElem
 
   renderQuickfilter: ->
-    H.div style: { position: "absolute", top: 40, left: 0, right: 0 }, ref: "quickfilters",
+    R 'div', style: { position: "absolute", top: 40, left: 0, right: 0 }, ref: ((c) => @quickfilters = c),
       R QuickfiltersComponent, {
         design: @props.design.quickfilters
         schema: @props.schema
@@ -212,7 +211,7 @@ module.exports = class DatagridComponent extends React.Component
 
   renderFindReplaceModal: (filters) ->
     R FindReplaceModalComponent, 
-      ref: "findReplaceModal"
+      ref: (c) => @findReplaceModal = c
       schema: @props.schema
       dataSource: @props.dataSource
       datagridDataSource: @props.datagridDataSource
@@ -230,7 +229,7 @@ module.exports = class DatagridComponent extends React.Component
 
     hasQuickfilters = @props.design.quickfilters?[0]?
 
-    return H.div style: { width: "100%", height: "100%", position: "relative", paddingTop: 40 + (@state.quickfiltersHeight or 0) },
+    return R 'div', style: { width: "100%", height: "100%", position: "relative", paddingTop: 40 + (@state.quickfiltersHeight or 0) },
       @renderTitleBar(filters)
       @renderQuickfilter()
 
@@ -260,8 +259,8 @@ module.exports = class DatagridComponent extends React.Component
               updateCell: if @state.cellEditingEnabled then @props.updateValue
             }
           else if @props.onDesignChange
-            H.div style: { textAlign: "center", marginTop: size.height / 2 }, 
-              H.a className: "btn btn-link", onClick: @handleEdit, 
+            R 'div', style: { textAlign: "center", marginTop: size.height / 2 }, 
+              R 'a', className: "btn btn-link", onClick: @handleEdit, 
                 "Click Here to Configure"
           else
             null

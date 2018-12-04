@@ -2,7 +2,7 @@ PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
 ReactDOM = require 'react-dom'
-H = React.DOM
+R = React.createElement
 L = require 'leaflet'
 BingLayer = require './BingLayer'
 UtfGridLayer = require './UtfGridLayer'
@@ -114,8 +114,6 @@ module.exports = class LeafletMapComponent extends React.Component
 
   componentDidMount: ->
     # Create map
-    mapElem = ReactDOM.findDOMNode(@refs.map)
-
     mapOptions = {
       fadeAnimation: false
       dragging: @props.dragging
@@ -129,7 +127,7 @@ module.exports = class LeafletMapComponent extends React.Component
     if @props.maxZoom?
       mapOptions.maxZoom = @props.maxZoom
 
-    @map = L.map(mapElem, mapOptions)
+    @map = L.map(@mapElem, mapOptions)
 
     if @props.scaleControl
       L.control.scale().addTo(@map)
@@ -328,8 +326,10 @@ module.exports = class LeafletMapComponent extends React.Component
                   layer.onGridHover(ev)
 
   render: ->
-    H.div null,
+    R 'div', null,
       if @props.legend and @loaded
         # Inject zoom
         React.cloneElement(@props.legend, zoom: @map.getZoom())
-      H.div(ref: "map", style: { width: @props.width, height: @props.height })
+      R 'div', 
+        ref: (c) => @mapElem = c, 
+        style: { width: @props.width, height: @props.height }

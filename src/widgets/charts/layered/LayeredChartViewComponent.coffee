@@ -3,7 +3,6 @@ _ = require 'lodash'
 React = require 'react'
 ReactDOM = require 'react-dom'
 R = React.createElement
-H = React.DOM
 
 ExprUtils = require('mwater-expressions').ExprUtils
 LayeredChartCompiler = require './LayeredChartCompiler'
@@ -29,8 +28,8 @@ module.exports = class LayeredChartViewComponent extends React.Component
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = {
       headerHeight: null  # Height of header 
@@ -45,10 +44,10 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
   updateHeights: ->
     # Calculate header and footer heights
-    if @refs.header and @state.headerHeight != @refs.header.offsetHeight
-      @setState(headerHeight: @refs.header.offsetHeight)
-    if @refs.footer and @state.footerHeight != @refs.footer.offsetHeight
-      @setState(footerHeight: @refs.footer.offsetHeight)
+    if @header and @state.headerHeight != @header.offsetHeight
+      @setState(headerHeight: @header.offsetHeight)
+    if @footer and @state.footerHeight != @footer.offsetHeight
+      @setState(footerHeight: @footer.offsetHeight)
 
   handleHeaderChange: (header) =>
     @props.onDesignChange(_.extend({}, @props.design, header: header))
@@ -57,7 +56,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
     @props.onDesignChange(_.extend({}, @props.design, footer: footer))
 
   renderHeader: ->
-    return H.div ref: "header",
+    return R 'div', ref: ((c) => @header = c),
       R TextComponent,
         design: @props.design.header
         onDesignChange: if @props.onDesignChange then @handleHeaderChange
@@ -68,7 +67,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
         standardWidth: @props.standardWidth
 
   renderFooter: ->
-    return H.div ref: "footer",
+    return R 'div', ref: ((c) => @footer = c),
       R TextComponent,
         design: @props.design.footer
         onDesignChange: if @props.onDesignChange then @handleFooterChange
@@ -79,7 +78,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
         standardWidth: @props.standardWidth
 
   render: ->
-    H.div style: { width: @props.width, height: @props.height },
+    R 'div', style: { width: @props.width, height: @props.height },
       @renderHeader()
       if @state.headerHeight? and @state.footerHeight?
         R C3ChartComponent, 
@@ -92,6 +91,7 @@ module.exports = class LayeredChartViewComponent extends React.Component
           standardWidth: @props.standardWidth
           scope: @props.scope
           onScopeChange: @props.onScopeChange
+          locale: @context.locale
       @renderFooter()
 
 # Displays the inner C3 component itself
@@ -108,12 +108,10 @@ class C3ChartComponent extends React.Component
 
     scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
-
-  @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     # Create throttled createChart
     @throttledCreateChart = _.throttle(@createChart, 1000)
@@ -127,7 +125,6 @@ class C3ChartComponent extends React.Component
       @chart.destroy()
 
     compiler = new LayeredChartCompiler(schema: props.schema)
-    el = ReactDOM.findDOMNode(@refs.chart)
     chartOptions = compiler.createChartOptions({
       design: @props.design
       data: @props.data
@@ -136,7 +133,7 @@ class C3ChartComponent extends React.Component
       locale: @context.locale
     })
     
-    chartOptions.bindto = el
+    chartOptions.bindto = @chartDiv
     chartOptions.data.onclick = @handleDataClick
     # Update scope after rendering. Needs a delay to make it happen
     chartOptions.onrendered = => _.defer(@updateScope)
@@ -144,7 +141,7 @@ class C3ChartComponent extends React.Component
     c3 = require 'c3'
     @chart = c3.generate(chartOptions)
 
-  componentDidUpdate: (prevProps, prevState, prevContext) ->
+  componentDidUpdate: (prevProps, prevState) ->
     # Check if options changed
     oldCompiler = new LayeredChartCompiler(schema: prevProps.schema) 
     newCompiler = new LayeredChartCompiler(schema: @props.schema)
@@ -154,7 +151,7 @@ class C3ChartComponent extends React.Component
       data: prevProps.data
       width: prevProps.width
       height: prevProps.height
-      locale: prevContext.locale
+      locale: prevProps.locale
     })
 
     newChartOptions = newCompiler.createChartOptions({
@@ -162,13 +159,13 @@ class C3ChartComponent extends React.Component
       data: @props.data
       width: @props.width
       height: @props.height
-      locale: @context.locale
+      locale: @props.locale
     })
 
     # If chart changed
-    if not _.isEqual(oldChartOptions, newChartOptions) or @context.locale != prevContext.locale
+    if not _.isEqual(oldChartOptions, newChartOptions)
       # Check if size alone changed
-      if _.isEqual(_.omit(oldChartOptions, "size"), _.omit(newChartOptions, "size")) and @context.locale == prevContext.locale
+      if _.isEqual(_.omit(oldChartOptions, "size"), _.omit(newChartOptions, "size")) and @props.locale == prevProps.locale
         @chart.resize(width: @props.width, height: @props.height)
         @updateScope()
         return
@@ -198,7 +195,7 @@ class C3ChartComponent extends React.Component
   updateScope: =>
     dataMap = @getDataMap()
     compiler = new LayeredChartCompiler(schema: @props.schema)
-    el = ReactDOM.findDOMNode(@refs.chart)
+    el = @chartDiv
 
     # Handle line and bar charts
     d3.select(el)
@@ -207,7 +204,7 @@ class C3ChartComponent extends React.Component
       .style("opacity", (d,i) =>
         dataPoint = @lookupDataPoint(dataMap, d)
         if dataPoint
-          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @context.locale)
+          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @props.locale)
 
         # Determine if scoped
         if scope and @props.scope 
@@ -226,7 +223,7 @@ class C3ChartComponent extends React.Component
       .style("opacity", (d, i) =>
         dataPoint = @lookupDataPoint(dataMap, d)
         if dataPoint
-          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @context.locale)
+          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @props.locale)
 
         # Determine if scoped
         if @props.scope 
@@ -269,7 +266,7 @@ class C3ChartComponent extends React.Component
 
     # Create scope
     compiler = new LayeredChartCompiler(schema: @props.schema)
-    scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @context.locale)
+    scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @props.locale)
 
     # If same scope data, remove scope
     if @props.scope and _.isEqual(scope.data, @props.scope.data) 
@@ -291,6 +288,6 @@ class C3ChartComponent extends React.Component
     css += ".c3-chart-arc text { font-size: #{scale * 13}px; }\n"
     css += ".c3-title { font-size: #{scale * 14}px; }\n"
 
-    H.div null,
-      H.style null, css
-      H.div ref: "chart"
+    R 'div', null,
+      R 'style', null, css
+      R 'div', ref: (c) => @chartDiv = c

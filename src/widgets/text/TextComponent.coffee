@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 _ = require 'lodash'
 
@@ -50,7 +49,7 @@ module.exports = class TextComponent extends React.Component
   handleInsertExpr: (item) =>
     html = '''<div data-embed="''' + _.escape(JSON.stringify(item)) + '''"></div>'''
 
-    @refs.editor.pasteHTML(html)
+    @editor.pasteHTML(html)
 
   replaceItem: (item) ->
     replaceItemInItems = (items, item) ->
@@ -67,24 +66,24 @@ module.exports = class TextComponent extends React.Component
     @props.onDesignChange(_.extend({}, @props.design, items: items))
 
   handleItemClick: (item) =>
-    @refs.exprUpdateModal.open(item, (item) =>
+    @exprUpdateModal.open(item, (item) =>
       # Replace in items
       @replaceItem(item)
     )
 
   handleAddExpr: (ev) =>
     ev.preventDefault()
-    @refs.exprInsertModal.open()
+    @exprInsertModal.open()
 
   renderExtraPaletteButtons: ->
-    H.div key: "expr", className: "mwater-visualization-text-palette-item", onMouseDown: @handleAddExpr,
-      H.i className: "fa fa-plus"
+    R 'div', key: "expr", className: "mwater-visualization-text-palette-item", onMouseDown: @handleAddExpr,
+      R 'i', className: "fa fa-plus"
       " Field"
 
   renderModals: ->
     [
-      R ExprInsertModalComponent, key: "exprInsertModal", ref: "exprInsertModal", schema: @props.schema, dataSource: @props.dataSource, onInsert: @handleInsertExpr, singleRowTable: @props.singleRowTable
-      R ExprUpdateModalComponent, key: "exprUpdateModal", ref: "exprUpdateModal", schema: @props.schema, dataSource: @props.dataSource, singleRowTable: @props.singleRowTable
+      R ExprInsertModalComponent, key: "exprInsertModal", ref: ((c) => @exprInsertModal = c), schema: @props.schema, dataSource: @props.dataSource, onInsert: @handleInsertExpr, singleRowTable: @props.singleRowTable
+      R ExprUpdateModalComponent, key: "exprUpdateModal", ref: ((c) => @exprUpdateModal = c), schema: @props.schema, dataSource: @props.dataSource, singleRowTable: @props.singleRowTable
     ]
   
   render: ->
@@ -102,10 +101,10 @@ module.exports = class TextComponent extends React.Component
       style.width = @props.width
       style.height = @props.height
 
-    return H.div null,
+    return R 'div', null,
       @renderModals()
       R RichTextComponent,
-        ref: "editor"
+        ref: (c) => @editor = c
         className: "mwater-visualization-text-widget-style-#{@props.design.style or "default"}"
         style: style
         items: @props.design.items

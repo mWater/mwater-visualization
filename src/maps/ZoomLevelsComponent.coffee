@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 NumberInputComponent = require('react-library/lib/NumberInputComponent')
@@ -13,7 +12,7 @@ module.exports = class ZoomLevelsComponent extends React.Component
     onDesignChange: PropTypes.func.isRequired
 
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       expanded: false
@@ -21,14 +20,14 @@ module.exports = class ZoomLevelsComponent extends React.Component
 
   render: ->
     if not @state.expanded
-      return H.div null,
-        H.a className: "btn btn-link btn-xs", onClick: (=> @setState(expanded: true)),
+      return R 'div', null,
+        R 'a', className: "btn btn-link btn-xs", onClick: (=> @setState(expanded: true)),
           "Advanced options..."
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", "Advanced"
-      H.div key: "min",
-        H.span className: "text-muted", "Minimum Zoom Level:"
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", "Advanced"
+      R 'div', key: "min",
+        R 'span', className: "text-muted", "Minimum Zoom Level:"
         " "
         R NumberInputComponent, 
           small: true
@@ -37,8 +36,8 @@ module.exports = class ZoomLevelsComponent extends React.Component
           value: @props.design.minZoom
           onChange: (v) => @props.onDesignChange(_.extend({}, @props.design, minZoom: v))
 
-      H.div key: "max",
-        H.span className: "text-muted", "Maximum Zoom Level: "
+      R 'div', key: "max",
+        R 'span', className: "text-muted", "Maximum Zoom Level: "
         " "
         R NumberInputComponent, 
           small: true

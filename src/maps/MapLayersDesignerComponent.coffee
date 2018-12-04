@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 LayerFactory = require './LayerFactory'
@@ -62,7 +61,7 @@ module.exports = class MapLayersDesignerComponent extends React.Component
       if jsonql
         filters.push({ table: layerView.design.filter.table, jsonql: jsonql })
     
-    H.div style: style, 
+    R 'div', style: style, 
       React.createElement(MapLayerViewDesignerComponent, 
         schema: @props.schema
         dataSource: @props.dataSource
@@ -77,10 +76,10 @@ module.exports = class MapLayersDesignerComponent extends React.Component
       )
 
   render: ->
-    H.div className: "form-group",
+    R 'div', className: "form-group",
       if @props.design.layerViews.length > 0
-        H.div style: { padding: 5 }, key: "layers",
-          H.div className: "list-group", key: "layers", style: { marginBottom: 10 },
+        R 'div', style: { padding: 5 }, key: "layers",
+          R 'div', className: "list-group", key: "layers", style: { marginBottom: 10 },
             # _.map(@props.design.layerViews, @renderLayerView)
             React.createElement(ReorderableListComponent,
               items: @props.design.layerViews

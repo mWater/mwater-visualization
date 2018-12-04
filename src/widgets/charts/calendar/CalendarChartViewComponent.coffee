@@ -1,7 +1,7 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
+R = React.createElement
 moment = require 'moment'
 
 AxisBuilder = require '../../../axes/AxisBuilder'
@@ -18,6 +18,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
   @propTypes:
     design: PropTypes.object.isRequired # Design of chart
     data: PropTypes.array.isRequired # Data that the chart has requested. In format [{ date: <YYYY-MM-DD>, value: <number value> }, { date: ... }...]
+    schema: PropTypes.object.isRequired
 
     width: PropTypes.number
     height: PropTypes.number
@@ -34,9 +35,10 @@ module.exports = class CalendarChartViewComponent extends React.Component
 
     highlightCellFillColor: PropTypes.string #the fill color for highlighted cell
 
-  constructor: (options) ->
-    @schema = options.schema
-    @axisBuilder = new AxisBuilder(schema: @schema)
+  constructor: (props) ->
+    super(props)
+
+    @axisBuilder = new AxisBuilder(schema: props.schema) 
 
   @defaultProps:
     monthsStrokeColor: "#222"
@@ -59,7 +61,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
     remainingSpace = (@props.height - years.length * 7 - @props.monthsStrokeWidth * 2 * years.length)
 
     if @props.design.titleText
-      remainingSpace = remainingSpace - $(@refs.title).outerHeight()
+      remainingSpace = remainingSpace - $(@title).outerHeight()
 
     cellSizeForHeight = remainingSpace / (years.length * 7)
 
@@ -103,7 +105,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
   # Redraw component
   redraw: ->
     @reloading = true
-    container = @refs.chart_container
+    container = @chart_container
     container.innerHTML = ''
     cellSize = @getCellSize()
     height = Math.ceil(cellSize * 7) + 7
@@ -238,7 +240,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
 
     title = @props.design.titleText
 
-    H.div style: style,
+    R 'div', style: style,
       if title
-        H.p {style: titleStyle, ref: "title"}, title,
-      H.div { ref: "chart_container"}
+        R 'p', {style: titleStyle, ref: (c) => @title = c}, title,
+      R 'div', { ref: (c) => @chart_container = c }

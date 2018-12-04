@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 DragSourceComponent = require('../DragSourceComponent')("block")
@@ -15,8 +14,8 @@ module.exports = class PaletteItemComponent extends React.Component
   render: ->
     R DragSourceComponent, 
       createDragItem: @props.createItem,
-        H.div className: "mwater-visualization-palette-item",
-          H.div className: "title", key: "title",
+        R 'div', className: "mwater-visualization-palette-item",
+          R 'div', className: "title", key: "title",
             @props.title
-          H.div className: "subtitle", key: "subtitle",
+          R 'div', className: "subtitle", key: "subtitle",
             @props.subtitle

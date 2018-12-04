@@ -1,3 +1,11 @@
+require './index.css'
+require "leaflet/dist/leaflet.css"
+require "fixed-data-table/dist/fixed-data-table.min.css"
+require "rc-slider/assets/index.css"
+require "leaflet-loading/src/Control.Loading.css"
+require "./layouts/decorated-block.css"
+require "react-datepicker/dist/react-datepicker.css" 
+
 exports.CachingDataSource = require './CachingDataSource'
 exports.WidgetFactory = require './widgets/WidgetFactory'
 
@@ -21,6 +29,7 @@ exports.CheckboxComponent = require './CheckboxComponent'
 
 exports.mWaterLoader = require './mWaterLoader'
 exports.MWaterLoaderComponent = require './MWaterLoaderComponent'
+exports.MWaterContextComponent = require './MWaterContextComponent'
 
 exports.LayeredChart = require './widgets/charts/layered/LayeredChart'
 exports.TableChart = require './widgets/charts/table/TableChart'

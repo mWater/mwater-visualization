@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 ExprComponent = require("mwater-expressions-ui").ExprComponent
@@ -38,7 +37,7 @@ module.exports = class PopupFilterJoinsEditComponent extends React.Component
 
   render: ->
     if not @state.expanded
-      return H.a className: "btn btn-link", onClick: (=> @setState(expanded: true)),
+      return R 'a', className: "btn btn-link", onClick: (=> @setState(expanded: true)),
         "Advanced Popup Options"
 
     # Get filterable tables of popup
@@ -51,20 +50,20 @@ module.exports = class PopupFilterJoinsEditComponent extends React.Component
     # Get popupFilterJoins
     popupFilterJoins = @props.design or @props.defaultPopupFilterJoins
 
-    return H.div null,
-      H.div className: "text-muted", 
+    return R 'div', null,
+      R 'div', className: "text-muted", 
         "Optional connections for other tables to filtering the popup"
-      H.table className: "table table-condensed table-bordered",
-        H.thead null,
-          H.tr null,
-            H.th null, "Data Source"
-            H.th null, "Connection"
-        H.tbody null,
+      R 'table', className: "table table-condensed table-bordered",
+        R 'thead', null,
+          R 'tr', null,
+            R 'th', null, "Data Source"
+            R 'th', null, "Connection"
+        R 'tbody', null,
           _.map filterableTables, (filterableTable) =>
-            H.tr key: filterableTable,
-              H.td style: { verticalAlign: "middle" }, 
+            R 'tr', key: filterableTable,
+              R 'td', style: { verticalAlign: "middle" }, 
                 ExprUtils.localizeString(@props.schema.getTable(filterableTable)?.name)
-              H.td null,
+              R 'td', null,
                 R ExprComponent,
                   schema: @props.schema
                   dataSource: @props.dataSource

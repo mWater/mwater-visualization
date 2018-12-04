@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 querystring = require 'querystring'
 TabbedComponent = require('react-library/lib/TabbedComponent')
@@ -49,8 +48,8 @@ module.exports = class MWaterTableSelectComponent extends React.Component
     # Optional list of tables (ids) being used. Use this to present an initially short list to select from
     activeTables: PropTypes.arrayOf(PropTypes.string.isRequired)  
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = {
       pendingExtraTable: null   # Set when waiting for a table to load
@@ -65,7 +64,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
         @setState(pendingExtraTable: null)
 
         # Close toggle edit
-        @refs.toggleEdit.close()
+        @toggleEdit.close()
         
         # Fire change
         nextProps.onChange(table)
@@ -79,7 +78,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
 
   handleChange: (tableId) =>
     # Close toggle edit
-    @refs.toggleEdit.close()
+    @toggleEdit.close()
 
     # Call onChange if different
     if tableId != @props.table
@@ -105,15 +104,15 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       extraTables: @props.extraTables
       onExtraTablesChange: @props.onExtraTablesChange
 
-    H.div null,
+    R 'div', null,
       # Show message if loading
       if @state.pendingExtraTable
-        H.div className: "alert alert-info", key: "pendingExtraTable",
-          H.i className: "fa fa-spinner fa-spin"
+        R 'div', className: "alert alert-info", key: "pendingExtraTable",
+          R 'i', className: "fa fa-spinner fa-spin"
           "\u00a0Please wait..."
 
       R uiComponents.ToggleEditComponent,
-        ref: "toggleEdit"
+        ref: (c) => @toggleEdit = c
         forceOpen: not @props.table # Must have table
         label: if @props.table then ExprUtils.localizeString(@props.schema.getTable(@props.table)?.name, @context.locale) else ""
         editor: editor
@@ -185,8 +184,8 @@ class EditModeTableSelectComponent extends React.Component
         extraTables: @props.extraTables
         onExtraTablesChange: @props.onExtraTablesChange
     else
-      return H.div null,
-        H.div className: "text-muted", 
+      return R 'div', null,
+        R 'div', className: "text-muted", 
           "Select Data Source:"
 
         R uiComponents.OptionListComponent,
@@ -198,8 +197,8 @@ class EditModeTableSelectComponent extends React.Component
               desc: ExprUtils.localizeString(table.desc, @context.locale)
               onClick: @props.onChange.bind(null, table.id) 
             }
-        H.div null,
-          H.button type: "button", className: "btn btn-link btn-sm", onClick: @handleShowMore,
+        R 'div', null,
+          R 'button', type: "button", className: "btn btn-link btn-sm", onClick: @handleShowMore,
             "Show All Available Data Sources..."
 
 # Allows selection of a table. Is the complete list mode of the above control
@@ -348,10 +347,10 @@ class CompleteTableSelectComponent extends React.Component
     sweetSenseTables = @getSweetSenseTables()
      
     tabs = [
-      { id: "sites", label: [H.i(className: "fa fa-map-marker"), " Sites"], elem: @renderSites() }
-      { id: "forms", label: [H.i(className: "fa fa-th-list"), " Surveys"], elem: @renderForms() }
-      { id: "indicators", label: [H.i(className: "fa fa-check-circle"), " Indicators"], elem: @renderIndicators() }
-      { id: "issues", label: [H.i(className: "fa fa-exclamation-circle"), " Issues"], elem: @renderIssues() }
+      { id: "sites", label: [R('i', className: "fa fa-map-marker"), " Sites"], elem: @renderSites() }
+      { id: "forms", label: [R('i', className: "fa fa-th-list"), " Surveys"], elem: @renderForms() }
+      { id: "indicators", label: [R('i', className: "fa fa-check-circle"), " Indicators"], elem: @renderIndicators() }
+      { id: "issues", label: [R('i', className: "fa fa-exclamation-circle"), " Issues"], elem: @renderIssues() }
     ]
 
     if sweetSenseTables.length > 0
@@ -359,8 +358,8 @@ class CompleteTableSelectComponent extends React.Component
     
     tabs.push({ id: "other", label: "Advanced", elem: @renderOther() })
 
-    return H.div null,
-      H.div className: "text-muted",
+    return R 'div', null,
+      R 'div', className: "text-muted",
         "Select data from sites, surveys or an advanced category below. Indicators can be found within their associated site types."
 
       R TabbedComponent,
@@ -384,8 +383,8 @@ class FormsListComponent extends React.Component
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = { 
       forms: null 
       search: ""
@@ -432,7 +431,7 @@ class FormsListComponent extends React.Component
 
   render: ->
     if @state.error
-      return H.div className: "alert alert-danger", @state.error
+      return R 'div', className: "alert alert-danger", @state.error
 
     # Filter forms
     if @state.search
@@ -451,8 +450,8 @@ class FormsListComponent extends React.Component
     tables = _.filter(@props.schema.getTables(), (table) => (table.id.match(/^responses:/) or table.id.match(/^master_responses:/)) and not table.deprecated)
     tables = _.sortBy(tables, (t) -> t.name.en)
 
-    H.div null,
-      H.label null, "Included Surveys:"
+    R 'div', null,
+      R 'label', null, "Included Surveys:"
       if tables.length > 0
         R uiComponents.OptionListComponent,
           items: _.map(tables, (table) =>
@@ -464,18 +463,18 @@ class FormsListComponent extends React.Component
             }
           )
       else
-        H.div null, "None"
+        R 'div', null, "None"
 
-      H.br()
+      R('br')
 
-      H.label null, "All Surveys:"
+      R 'label', null, "All Surveys:"
       if not @state.forms or @state.forms.length == 0
-        H.div className: "alert alert-info", 
-          H.i className: "fa fa-spinner fa-spin"
+        R 'div', className: "alert alert-info", 
+          R 'i', className: "fa fa-spinner fa-spin"
           "\u00A0Loading..."
       else
         [
-          H.input 
+          R 'input', 
             type: "text"
             className: "form-control input-sm"
             placeholder: "Search..."
@@ -508,8 +507,8 @@ class IndicatorsListComponent extends React.Component
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = { 
       indicators: null 
       search: ""
@@ -562,7 +561,7 @@ class IndicatorsListComponent extends React.Component
 
   render: ->
     if @state.error
-      return H.div className: "alert alert-danger", @state.error
+      return R 'div', className: "alert alert-danger", @state.error
 
     # Filter indicators
     if @state.search
@@ -581,14 +580,14 @@ class IndicatorsListComponent extends React.Component
     tables = _.filter(@props.schema.getTables(), (table) => table.id.match(/^indicator_values:/) and not table.deprecated)
     tables = _.sortBy(tables, (t) -> t.name.en)
 
-    H.div null,
+    R 'div', null,
       R AddIndicatorConfirmPopupComponent,
         schema: @props.schema
         onChange: @props.onChange
         onExtraTableAdd: @props.onExtraTableAdd
         ref: (c) => @addIndicatorConfirmPopup = c
 
-      H.label null, "Included Indicators:"
+      R 'label', null, "Included Indicators:"
       if tables.length > 0
         R uiComponents.OptionListComponent,
           items: _.map(tables, (table) =>
@@ -600,18 +599,18 @@ class IndicatorsListComponent extends React.Component
             }
           )
       else
-        H.div null, "None"
+        R 'div', null, "None"
 
-      H.br()
+      R('br')
 
-      H.label null, "All Indicators:"
+      R 'label', null, "All Indicators:"
       if not @state.indicators or @state.indicators.length == 0
-        H.div className: "alert alert-info", 
-          H.i className: "fa fa-spinner fa-spin"
+        R 'div', className: "alert alert-info", 
+          R 'i', className: "fa fa-spinner fa-spin"
           "\u00A0Loading..."
       else
         [
-          H.input 
+          R 'input', 
             type: "text"
             className: "form-control input-sm"
             placeholder: "Search..."
@@ -638,8 +637,8 @@ class AddIndicatorConfirmPopupComponent extends React.Component
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = { 
       visible: false
       indicatorTable: null
@@ -651,15 +650,15 @@ class AddIndicatorConfirmPopupComponent extends React.Component
   renderContents: ->
     # Show loading if table not loaded
     if not @props.schema.getTable(@state.indicatorTable)
-      return H.div className: "alert alert-info", 
-        H.i className: "fa fa-spinner fa-spin"
+      return R 'div', className: "alert alert-info", 
+        R 'i', className: "fa fa-spinner fa-spin"
         "\u00A0Loading..."
 
     # Find entity links
     entityColumns = _.filter(@props.schema.getColumns(@state.indicatorTable), (col) => col.join?.toTable?.match(/^entities\./))
 
-    H.div null,
-      H.p null, 
+    R 'div', null,
+      R 'p', null, 
         '''In general, it is better to get indicator values from the related site. Please select the site 
         below, then find the indicator values in the 'Related Indicators' section. Or click on 'Use Raw Indicator' if you 
         are certain that you want to use the raw indicator table'''
@@ -674,10 +673,10 @@ class AddIndicatorConfirmPopupComponent extends React.Component
             @setState(visible: false)
         })
 
-      H.br()
+      R('br')
 
-      H.div null,
-        H.a onClick: @props.onChange.bind(null, @state.indicatorTable),
+      R 'div', null,
+        R 'a', onClick: @props.onChange.bind(null, @state.indicatorTable),
           "Use Raw Indicator"
 
   render: ->
@@ -706,8 +705,8 @@ class IssuesListComponent extends React.Component
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = { 
       issueTypes: null 
       search: ""
@@ -751,7 +750,7 @@ class IssuesListComponent extends React.Component
 
   render: ->
     if @state.error
-      return H.div className: "alert alert-danger", @state.error
+      return R 'div', className: "alert alert-danger", @state.error
 
     # Filter issueTypes
     if @state.search
@@ -770,8 +769,8 @@ class IssuesListComponent extends React.Component
     tables = _.filter(@props.schema.getTables(), (table) => (table.id.match(/^issues:/) or table.id.match(/^issue_events:/)) and not table.deprecated)
     tables = _.sortBy(tables, (t) -> t.name.en)
 
-    H.div null,
-      H.label null, "Included Issues:"
+    R 'div', null,
+      R 'label', null, "Included Issues:"
       if tables.length > 0
         R uiComponents.OptionListComponent,
           items: _.map(tables, (table) =>
@@ -783,18 +782,18 @@ class IssuesListComponent extends React.Component
             }
           )
       else
-        H.div null, "None"
+        R 'div', null, "None"
 
-      H.br()
+      R('br')
 
-      H.label null, "All Issues:"
+      R 'label', null, "All Issues:"
       if not @state.issueTypes or @state.issueTypes.length == 0
-        H.div className: "alert alert-info", 
-          H.i className: "fa fa-spinner fa-spin"
+        R 'div', className: "alert alert-info", 
+          R 'i', className: "fa fa-spinner fa-spin"
           "\u00A0Loading..."
       else
         [
-          H.input 
+          R 'input', 
             type: "text"
             className: "form-control input-sm"
             placeholder: "Search..."

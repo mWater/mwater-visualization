@@ -1,7 +1,6 @@
 _ = require 'lodash'
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 ExprUtils = require('mwater-expressions').ExprUtils
@@ -100,21 +99,21 @@ module.exports = class MWaterResponsesFilterComponent extends React.Component
 
     siteColumnId = @getSiteValue()
 
-    H.div style: { paddingLeft: 5, paddingTop: 5 },
-      H.div style: { paddingBottom: 5 }, "Data Source Options:"
+    R 'div', style: { paddingLeft: 5, paddingTop: 5 },
+      R 'div', style: { paddingBottom: 5 }, "Data Source Options:"
 
-      H.div style: { paddingLeft: 5 },
+      R 'div', style: { paddingLeft: 5 },
         if siteColumns.length > 0
-          H.div null,
-            H.i null, "This data source contains links to monitoring sites. Would you like to:"
-            H.div style: { paddingLeft: 8 },
+          R 'div', null,
+            R 'i', null, "This data source contains links to monitoring sites. Would you like to:"
+            R 'div', style: { paddingLeft: 8 },
               R ui.Radio, { key: "all", value: siteColumnId, radioValue: null, onChange: @handleSiteChange }, "Show all survey responses (even if there are more than one per site)"
               _.map siteColumns, (column) =>
                 R ui.Radio, { key: column.id, value: siteColumnId, radioValue: column.id, onChange: @handleSiteChange }, 
                   "Show only the latest response for each "
-                  H.i null, "#{ExprUtils.localizeString(@props.schema.getTable(column.join.toTable)?.name)}"
+                  R 'i', null, "#{ExprUtils.localizeString(@props.schema.getTable(column.join.toTable)?.name)}"
                   " in the question "
-                  H.i null, "'#{ExprUtils.localizeString(column.name)}'"
+                  R 'i', null, "'#{ExprUtils.localizeString(column.name)}'"
 
         R ui.Checkbox, value: @isFinal(), onChange: @handleFinalChange, 
           "Only include final responses (recommended)"

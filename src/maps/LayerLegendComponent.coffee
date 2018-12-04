@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 _ = require 'lodash'
 R = React.createElement
 AxisBuilder = require '../axes/AxisBuilder'

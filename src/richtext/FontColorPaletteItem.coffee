@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 _ = require 'lodash'
 
@@ -16,8 +15,8 @@ module.exports = class FontColorPaletteItem extends React.Component
   @defaultProps:
     position: "under"
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = {
       open: false
     }
@@ -43,18 +42,18 @@ module.exports = class FontColorPaletteItem extends React.Component
       popupPosition['bottom'] = 26
 
     R ClickOutHandler, onClickOut: (=> @setState(open: false)),
-      H.div 
+      R 'div', 
         className: "mwater-visualization-text-palette-item"
         onMouseDown: @handleMouseDown
         style: { position: "relative" },
           if @state.open
-            H.div style: popupPosition,
+            R 'div', style: popupPosition,
               R ColorPaletteComponent, 
                 onSetColor: (color) => 
                   @props.onSetColor(color)
                   @setState(open: false)
 
-          H.i className: "fa fa-tint"
+          R 'i', className: "fa fa-tint"
 
 
 class ColorPaletteComponent extends React.Component
@@ -62,8 +61,8 @@ class ColorPaletteComponent extends React.Component
     onSetColor: PropTypes.func.isRequired
 
   renderColor: (color) ->
-    H.td null,
-      H.div 
+    R 'td', null,
+      R 'div', 
         style: { width: 16, height: 15, backgroundColor: color, margin: 1 }
         onMouseDown: (ev) =>
           ev.preventDefault()
@@ -80,27 +79,27 @@ class ColorPaletteComponent extends React.Component
       "#9900FF" # purple
       "#FF00FF" # magenta
     ]
-    H.div style: { padding: 5 },
-      H.table null,
-        H.tbody null,
+    R 'div', style: { padding: 5 },
+      R 'table', null,
+        R 'tbody', null,
           # Grey shades
-          H.tr null,
+          R 'tr', null,
             _.map _.range(0, 8), (i) =>
               @renderColor(Color(r: i * 255 / 7, g: i * 255 / 7, b: i * 255 / 7).hex())
-          H.tr style: { height: 5 }
+          R 'tr', style: { height: 5 }
           # Base colors
-          H.tr null,
+          R 'tr', null,
             _.map baseColors, (c) => @renderColor(c)
-          H.tr style: { height: 5 }
-          H.tr null,
+          R 'tr', style: { height: 5 }
+          R 'tr', null,
             _.map baseColors, (c) => @renderColor(Color(c).lighten(0.7).hex())
-          H.tr null,
+          R 'tr', null,
             _.map baseColors, (c) => @renderColor(Color(c).lighten(0.5).hex())
-          H.tr null,
+          R 'tr', null,
             _.map baseColors, (c) => @renderColor(Color(c).lighten(0.3).hex())
-          H.tr null,
+          R 'tr', null,
             _.map baseColors, (c) => @renderColor(Color(c).darken(0.3).hex())
-          H.tr null,
+          R 'tr', null,
             _.map baseColors, (c) => @renderColor(Color(c).darken(0.5).hex())
-          H.tr null,
+          R 'tr', null,
             _.map baseColors, (c) => @renderColor(Color(c).darken(0.7).hex())

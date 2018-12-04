@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprUtils = require('mwater-expressions').ExprUtils
@@ -43,12 +42,12 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
   handleMarkerSizeChange: (markerSize) => @update(markerSize: markerSize)
 
   renderTable: ->
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.i(className: "fa fa-database")
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        R('i', className: "fa fa-database")
         " "
         "Data Source"
-      H.div style: { marginLeft: 10 }, 
+      R 'div', style: { marginLeft: 10 }, 
         R TableSelectComponent, { 
           schema: @props.schema
           value: @props.design.table
@@ -61,8 +60,8 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
     if not @props.design.table
       return
 
-    title = H.span null,
-      H.span className: "glyphicon glyphicon-map-marker"
+    title = R 'span', null,
+      R 'span', className: "glyphicon glyphicon-map-marker"
       " Marker Position"
 
     filters = _.clone(@props.filters) or []
@@ -73,9 +72,9 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
       if jsonql
         filters.push({ table: @props.design.filter.table, jsonql: jsonql })
 
-    H.div className: "form-group",
-      H.label className: "text-muted", title
-      H.div style: { marginLeft: 10 }, 
+    R 'div', className: "form-group",
+      R 'label', className: "text-muted", title
+      R 'div', style: { marginLeft: 10 }, 
         R AxisComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
@@ -98,21 +97,21 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
       if jsonql
         filters.push({ table: @props.design.filter.table, jsonql: jsonql })
 
-    return H.div null,
+    return R 'div', null,
       if not @props.design.axes.color
-        H.div className: "form-group",
-          H.label className: "text-muted", 
-            H.span className: "glyphicon glyphicon glyphicon-tint"
+        R 'div', className: "form-group",
+          R 'label', className: "text-muted", 
+            R 'span', className: "glyphicon glyphicon glyphicon-tint"
             "Marker Color"
 
-          H.div null, 
+          R 'div', null, 
             R ColorComponent,
               color: @props.design.color
               onChange: @handleColorChange
 
-      H.div className: "form-group",
-        H.label className: "text-muted", 
-          H.span className: "glyphicon glyphicon glyphicon-tint"
+      R 'div', className: "form-group",
+        R 'label', className: "text-muted", 
+          R 'span', className: "glyphicon glyphicon glyphicon-tint"
           "Color By Data"
 
         R AxisComponent,
@@ -138,8 +137,8 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
     if not @props.design.axes.geometry
       return
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
         "Marker Size"
       R ui.Select,
         value: @props.design.markerSize or 10
@@ -157,11 +156,11 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
     if not @props.design.axes.geometry
       return null
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.span(className: "glyphicon glyphicon-filter")
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        R('span', className: "glyphicon glyphicon-filter")
         " Filters"
-      H.div style: { marginLeft: 8 }, 
+      R 'div', style: { marginLeft: 8 }, 
         R(FilterExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
@@ -183,7 +182,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
       defaultPopupFilterJoins: PopupFilterJoinsUtils.createDefaultPopupFilterJoins(@props.design.table)
 
   render: ->
-    H.div null,
+    R 'div', null,
       @renderTable()
       @renderGeometryAxis()
       @renderColor()

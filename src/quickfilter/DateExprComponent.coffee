@@ -1,8 +1,6 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
-ReactSelect = require 'react-select'
 moment = require 'moment'
 
 ClickOutHandler = require('react-onclickout')
@@ -15,8 +13,8 @@ module.exports = class DateExprComponent extends React.Component
     onChange: PropTypes.func            # Called when value changes
     datetime: PropTypes.bool                 # True to use datetime
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = {
       dropdownOpen: false
@@ -76,14 +74,14 @@ module.exports = class DateExprComponent extends React.Component
     @setState(dropdownOpen: false)
 
   renderClear: =>
-    H.div 
+    R 'div', 
       style: { position: "absolute", right: 10, top: 7, color: "#AAA" }
       onClick: (=> @props.onChange(null)),
-        H.i className: "fa fa-remove"
+        R 'i', className: "fa fa-remove"
 
   renderSummary: ->
     if not @props.value
-      return H.span className: "text-muted", "All"
+      return R 'span', className: "text-muted", "All"
 
     preset = _.findWhere(presets, id: @props.value.op)
     if preset
@@ -101,14 +99,14 @@ module.exports = class DateExprComponent extends React.Component
     return "???"
 
   renderPresets: ->
-    H.div style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white", borderRadius: 4 },
-      H.ul className: "nav nav-pills nav-stacked",
+    R 'div', style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white", borderRadius: 4 },
+      R 'ul', className: "nav nav-pills nav-stacked",
         _.map presets, (preset) =>
-          H.li null,
-            H.a style: { padding: 5 }, onClick: @handlePreset.bind(null, preset),
+          R 'li', null,
+            R 'a', style: { padding: 5 }, onClick: @handlePreset.bind(null, preset),
               preset.name
-        H.li null,
-          H.a style: { padding: 5 }, onClick: (=> @setState(custom: true)),
+        R 'li', null,
+          R 'a', style: { padding: 5 }, onClick: (=> @setState(custom: true)),
             "Custom Date Range..."
 
   renderDropdown: ->
@@ -121,9 +119,9 @@ module.exports = class DateExprComponent extends React.Component
     startDate = @toMoment(@props.value?.exprs[0]?.value)
     endDate = @toMoment(@props.value?.exprs[1]?.value)
 
-    H.div style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white", borderRadius: 4  },
-      H.div style: { whiteSpace: "nowrap"},
-        H.div style: { display: "inline-block", verticalAlign: "top" },
+    R 'div', style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white", borderRadius: 4  },
+      R 'div', style: { whiteSpace: "nowrap"},
+        R 'div', style: { display: "inline-block", verticalAlign: "top" },
           R DatePicker, 
             inline: true
             selectsStart: true
@@ -132,7 +130,7 @@ module.exports = class DateExprComponent extends React.Component
             endDate: endDate
             showYearDropdown: true
             onChange: @handleStartChange
-        H.div style: { display: "inline-block", verticalAlign: "top" },
+        R 'div', style: { display: "inline-block", verticalAlign: "top" },
           R DatePicker, 
             inline: true
             selectsEnd: true
@@ -144,9 +142,9 @@ module.exports = class DateExprComponent extends React.Component
   
   render: ->
     R ClickOutHandler, onClickOut: @handleClickOut,
-      H.div 
+      R 'div', 
         style: { display: "inline-block", position: "relative" },
-          H.div
+          R 'div',
             className: "form-control"
             style: { width: 220, height: 36 }
             onClick: (=> @setState(dropdownOpen: true, custom: false)),

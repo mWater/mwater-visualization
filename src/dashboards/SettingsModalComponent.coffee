@@ -1,13 +1,12 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 update = require 'update-object'
 languages = require 'languages'
 
 ui = require 'react-library/lib/bootstrap'
-ReactSelect = require 'react-select'
+ReactSelect = require('react-select').default
 
 DashboardUtils = require './DashboardUtils'
 ActionCancelModalComponent = require('react-library/lib/ActionCancelModalComponent')
@@ -25,7 +24,7 @@ module.exports = class SettingsModalComponent extends React.Component
     globalFiltersElementFactory: PropTypes.func # Call with props { schema, dataSource, globalFilters, onChange, nullIfIrrelevant }. Displays a component to edit global filters
 
   constructor: (props) ->
-    super
+    super(props)
     @state = { 
       design: null # Set when being edited
     }
@@ -67,9 +66,9 @@ module.exports = class SettingsModalComponent extends React.Component
       size: "large"
       onCancel: @handleCancel
       onAction: @handleSave,
-        H.div style: { paddingBottom: 200 },
-          H.h4 null, "Quick Filters"
-          H.div className: "text-muted", 
+        R 'div', style: { paddingBottom: 200 },
+          R 'h4', null, "Quick Filters"
+          R 'div', className: "text-muted", 
             "Quick filters are shown to the user as a dropdown at the top of the dashboard and can be used to filter data of widgets."
          
           if filterableTables.length > 0         
@@ -83,9 +82,9 @@ module.exports = class SettingsModalComponent extends React.Component
           else
             "Nothing to quickfilter. Add widgets to the dashboard"
 
-          H.h4 style: { paddingTop: 10 },
+          R 'h4', style: { paddingTop: 10 },
             "Filters"
-          H.div className: "text-muted", 
+          R 'div', className: "text-muted", 
             "Filters are built in to the dashboard and cannot be changed by viewers of the dashboard."
           
           if filterableTables.length > 0         
@@ -99,8 +98,8 @@ module.exports = class SettingsModalComponent extends React.Component
             "Nothing to filter. Add widgets to the dashboard"
 
           if @context.globalFiltersElementFactory
-            H.div null,
-              H.h4 style: { paddingTop: 10 },
+            R 'div', null,
+              R 'h4', style: { paddingTop: 10 },
                 "Global Filters"
 
               @context.globalFiltersElementFactory({ 
@@ -111,18 +110,17 @@ module.exports = class SettingsModalComponent extends React.Component
                 onChange: @handleGlobalFiltersChange
               })
 
-          H.h4 style: { paddingTop: 10 },
+          R 'h4', style: { paddingTop: 10 },
             "Language"
-          H.div className: "text-muted", 
+          R 'div', className: "text-muted", 
             "Controls the preferred language of widgets and uses specified language when available"
 
           R ReactSelect, 
-            value: @state.design.locale or "en"
+            value: _.findWhere(localeOptions, value: @state.design.locale or "en") or null
             options: localeOptions
-            clearable: false
-            onChange: (value) => @handleDesignChange(update(@state.design, { locale: { $set: value } }))
+            onChange: (locale) => @handleDesignChange(update(@state.design, { locale: { $set: locale.value } }))
 
-          H.h4 style: { paddingTop: 10 },
+          R 'h4', style: { paddingTop: 10 },
             "Advanced"
           R ui.Checkbox, 
             value: (if @state.design.implicitFiltersEnabled? then @state.design.implicitFiltersEnabled else true)

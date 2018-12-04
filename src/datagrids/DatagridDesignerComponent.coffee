@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 ExprUtils = require("mwater-expressions").ExprUtils
@@ -70,7 +69,7 @@ module.exports = class DatagridDesignerComponent extends React.Component
           id: "filter"
           label: "Filter"
           # Here because of modal scroll issue
-          elem: H.div style: { marginBottom: 200 },
+          elem: R 'div', style: { marginBottom: 200 },
             R(FilterExprComponent, {
               schema: @props.schema
               dataSource: @props.dataSource
@@ -79,7 +78,7 @@ module.exports = class DatagridDesignerComponent extends React.Component
               onChange: @handleFilterChange
             })
             if @context.globalFiltersElementFactory
-              H.div style: { marginTop: 20 },
+              R 'div', style: { marginTop: 20 },
                 @context.globalFiltersElementFactory({
                   schema: @props.schema
                   dataSource: @props.dataSource
@@ -92,7 +91,7 @@ module.exports = class DatagridDesignerComponent extends React.Component
         {
           id: "order"
           label: "Sorting"
-          elem: H.div style: { marginBottom: 200 },
+          elem: R 'div', style: { marginBottom: 200 },
             R(OrderBysDesignerComponent, {
               schema: @props.schema
               dataSource: @props.dataSource
@@ -104,7 +103,7 @@ module.exports = class DatagridDesignerComponent extends React.Component
         {
           id: "quickfilters"
           label: "Quickfilters"
-          elem: H.div style: { marginBottom: 200 },
+          elem: R 'div', style: { marginBottom: 200 },
             R QuickfiltersDesignComponent, {
               design: @props.design.quickfilters
               onDesignChange: (design) => @props.onDesignChange(update(@props.design, { quickfilters: { $set: design } }))
@@ -116,7 +115,7 @@ module.exports = class DatagridDesignerComponent extends React.Component
         {
           id: "options"
           label: "Options"
-          elem: H.div style: { marginBottom: 200 },
+          elem: R 'div', style: { marginBottom: 200 },
             R DatagridOptionsComponent, {
               design: @props.design
               onDesignChange: @props.onDesignChange
@@ -125,8 +124,8 @@ module.exports = class DatagridDesignerComponent extends React.Component
       ]
 
   render: ->
-    H.div null,
-      H.label null, "Data Source:"
+    R 'div', null,
+      R 'label', null, "Data Source:"
       R TableSelectComponent,
         schema: @props.schema
         value: @props.design.table
@@ -217,21 +216,21 @@ class ColumnsDesignerComponent extends React.Component
       connectDropTarget: connectDropTarget
 
   render: ->
-    H.div style: { height: "auto",overflowY: "auto",  overflowX: "hidden" },
-      H.div style: { textAlign: "right" }, key: "options",
-        H.button
+    R 'div', style: { height: "auto",overflowY: "auto",  overflowX: "hidden" },
+      R 'div', style: { textAlign: "right" }, key: "options",
+        R 'button',
           key: "addAll"
           type: "button"
           className: "btn btn-link btn-xs"
           onClick: @handleAddDefaultColumns,
-            H.span className: "glyphicon glyphicon-plus"
+            R 'span', className: "glyphicon glyphicon-plus"
             " Add Default Columns"
-        H.button
+        R 'button',
           key: "removeAll"
           type: "button"
           className: "btn btn-link btn-xs"
           onClick: @handleRemoveAllColumns,
-            H.span className: "glyphicon glyphicon-remove"
+            R 'span', className: "glyphicon glyphicon-remove"
             " Remove All Columns"
 
       R ReorderableListComponent,
@@ -240,20 +239,20 @@ class ColumnsDesignerComponent extends React.Component
         renderItem: @renderColumn
         getItemId: (item) => item.id
 
-      H.button
+      R 'button',
         key: "add"
         type: "button"
         className: "btn btn-link"
         onClick: @handleAddColumn,
-          H.span className: "glyphicon glyphicon-plus"
+          R 'span', className: "glyphicon glyphicon-plus"
           " Add Column"
 
-      H.button
+      R 'button',
         key: "add-id"
         type: "button"
         className: "btn btn-link"
         onClick: @handleAddIdColumn,
-          H.span className: "glyphicon glyphicon-plus"
+          R 'span', className: "glyphicon glyphicon-plus"
           " Add Unique Id (advanced)"
 
 # Column item
@@ -327,12 +326,12 @@ class ColumnDesignerComponent extends React.Component
 
     switch exprType
       when "enumset"
-        return H.a className: "btn btn-xs btn-link", onClick: @handleSplitEnumset,
-          H.i className: "fa fa-chain-broken"
+        return R 'a', className: "btn btn-xs btn-link", onClick: @handleSplitEnumset,
+          R 'i', className: "fa fa-chain-broken"
           " Split by options"
       when "geometry"
-        return H.a className: "btn btn-xs btn-link", onClick: @handleSplitGeometry,
-          H.i className: "fa fa-chain-broken"
+        return R 'a', className: "btn btn-xs btn-link", onClick: @handleSplitGeometry,
+          R 'i', className: "fa fa-chain-broken"
           " Split by lat/lng"
 
     return null
@@ -350,11 +349,11 @@ class ColumnDesignerComponent extends React.Component
     if type == "id"
       allowedTypes.push("id")
 
-    elem = H.div className: "row",
-      H.div className: "col-xs-1",
-        @props.connectDragSource(H.span(className: "text-muted fa fa-bars"))
+    elem = R 'div', className: "row",
+      R 'div', className: "col-xs-1",
+        @props.connectDragSource(R('span', className: "text-muted fa fa-bars"))
 
-      H.div className: "col-xs-5", # style: { border: "solid 1px #DDD", padding: 4 },
+      R 'div', className: "col-xs-5", # style: { border: "solid 1px #DDD", padding: 4 },
         R ExprComponent,
           schema: @props.schema
           dataSource: @props.dataSource
@@ -365,16 +364,16 @@ class ColumnDesignerComponent extends React.Component
           onChange: @handleExprChange
         @renderSplit()
 
-      H.div className: "col-xs-5",
-        H.input
+      R 'div', className: "col-xs-5",
+        R 'input',
           type: "text"
           className: "form-control"
           placeholder: exprUtils.summarizeExpr(@props.column.expr)
           value: @props.column.label
           onChange: (ev) => @handleLabelChange(ev.target.value)
 
-      H.div className: "col-xs-1",
-        H.a onClick: @props.onColumnChange.bind(null, null),
-          H.span className: "glyphicon glyphicon-remove"
+      R 'div', className: "col-xs-1",
+        R 'a', onClick: @props.onColumnChange.bind(null, null),
+          R 'span', className: "glyphicon glyphicon-remove"
 
     return @props.connectDropTarget(@props.connectDragPreview(elem))

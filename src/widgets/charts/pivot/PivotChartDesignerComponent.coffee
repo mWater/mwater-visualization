@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 uuid = require 'uuid'
 
@@ -19,7 +18,7 @@ module.exports = class PivotChartDesignerComponent extends React.Component
     filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       isNew: not props.design.table  # True if new pivot table
@@ -61,9 +60,9 @@ module.exports = class PivotChartDesignerComponent extends React.Component
     @updateDesign(intersections: intersections)
 
   renderTable: ->
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.i(className: "fa fa-database")
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        R('i', className: "fa fa-database")
         " "
         "Data Source"
       ": "
@@ -80,12 +79,12 @@ module.exports = class PivotChartDesignerComponent extends React.Component
     if not @props.design.table
       return null
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.span(className: "glyphicon glyphicon-filter")
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        R('span', className: "glyphicon glyphicon-filter")
         " "
         "Filters"
-      H.div style: { marginLeft: 8 }, 
+      R 'div', style: { marginLeft: 8 }, 
         R(FilterExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
@@ -101,23 +100,23 @@ module.exports = class PivotChartDesignerComponent extends React.Component
     R ui.FormGroup, 
       labelMuted: true
       label: "Striping",
-        H.label key: "none", className: "radio-inline",
-          H.input type: "radio", checked: not @props.design.striping, onClick: => @updateDesign(striping: null)
+        R 'label', key: "none", className: "radio-inline",
+          R 'input', type: "radio", checked: not @props.design.striping, onClick: => @updateDesign(striping: null)
           "None"
 
-        H.label key: "columns", className: "radio-inline",
-          H.input type: "radio", checked: @props.design.striping == "columns", onClick: => @updateDesign(striping: "columns")
+        R 'label', key: "columns", className: "radio-inline",
+          R 'input', type: "radio", checked: @props.design.striping == "columns", onClick: => @updateDesign(striping: "columns")
           "Columns"
 
-        H.label key: "rows", className: "radio-inline",
-          H.input type: "radio", checked: @props.design.striping == "rows", onClick: => @updateDesign(striping: "rows")
+        R 'label', key: "rows", className: "radio-inline",
+          R 'input', type: "radio", checked: @props.design.striping == "rows", onClick: => @updateDesign(striping: "rows")
           "Rows"
 
   # Show setup options
   renderSetup: ->
     intersectionId = "#{@props.design.rows[0].id}:#{@props.design.columns[0].id}"
 
-    H.div null,
+    R 'div', null,
       R ui.FormGroup,
         labelMuted: true
         label: "Columns"
@@ -163,7 +162,7 @@ module.exports = class PivotChartDesignerComponent extends React.Component
             filters: @props.filters
 
   render: ->
-    H.div null,
+    R 'div', null,
       @renderTable()
       if @state.isNew and @props.design.table
         @renderSetup()

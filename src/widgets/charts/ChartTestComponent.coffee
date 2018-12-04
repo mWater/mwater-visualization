@@ -1,5 +1,5 @@
 # React = require 'react'
-# H = React.DOM
+# R = React.createElement
 
 # module.exports = class ChartTestComponent extends React.Component
 #   constructor: ->
@@ -13,10 +13,10 @@
 #     @setState(design: design)
 
 #   render: ->
-#     H.div className: "row",
-#       H.div className: "col-xs-6",
+#     R 'div', className: "row",
+#       R 'div', className: "col-xs-6",
 #         @props.chart.createViewElement(design: @state.design, data: data, width: 300, height: 300)
-#       H.div className: "col-xs-6",
+#       R 'div', className: "col-xs-6",
 #         @props.chart.createDesignerElement(design: @state.design, onChange: @handleDesignChange)
     
 # data = {"main":[{"x":"broken","y":"48520"},{"x":null,"y":"2976"},{"x":"ok","y":"173396"},{"x":"maint","y":"12103"},{"x":"missing","y":"3364"}]}    

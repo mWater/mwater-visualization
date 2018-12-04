@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 ExprUtils = require("mwater-expressions").ExprUtils
@@ -17,8 +16,8 @@ module.exports = class ExprUpdateModalComponent extends React.Component
     dataSource: PropTypes.object.isRequired # Data source to use to get values
     singleRowTable: PropTypes.string  # Table that is filtered to have one row
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = {
       open: false

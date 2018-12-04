@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 _ = require 'lodash'
 ui = require 'react-library/lib/bootstrap'
@@ -97,7 +96,7 @@ class TOCWidgetComponent extends React.Component
       dropdownItems.push({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
 
     # Wrap in a simple widget
-    return H.div onDoubleClick: @handleStartEditing, 
+    return R 'div', onDoubleClick: @handleStartEditing, 
       if @props.onDesignChange?
         @renderEditor()
       R DropdownWidgetComponent, 
@@ -141,10 +140,10 @@ class TOCWidgetViewComponent extends React.Component
         indentation += "#{value}."
       indentation += " "
 
-    H.div key: index, style: { paddingLeft: tocEntry.level * 8 - 8 },
-      H.a onClick: @handleEntryClick.bind(null, tocEntry), style: { cursor: "pointer" },
+    R 'div', key: index, style: { paddingLeft: tocEntry.level * 8 - 8 },
+      R 'a', onClick: @handleEntryClick.bind(null, tocEntry), style: { cursor: "pointer" },
         indentation
-        H.span null, tocEntry.text
+        R 'span', null, tocEntry.text
 
   render: ->
     # Get border
@@ -155,7 +154,7 @@ class TOCWidgetViewComponent extends React.Component
       when 3 then "solid 1px #888"
 
     # Render in a standard width container and then scale up to ensure that widget always looks consistent
-    H.div 
+    R 'div', 
       style: { 
         width: @props.standardWidth
         height: @props.height
@@ -164,14 +163,14 @@ class TOCWidgetViewComponent extends React.Component
         margin: 1
       },
       # Render header
-      H.div style: { fontWeight: "bold" },
+      R 'div', style: { fontWeight: "bold" },
         @props.design.header
       _.map @props.tocEntries, (tocEntry, i) =>
         @renderTOCEntry(tocEntry, i)
 
       # Add placeholder if none and editable
       if @props.onDesignChange and @props.tocEntries.length == 0
-        H.div className: "text-muted",
+        R 'div', className: "text-muted",
           "Table of Contents will appear here as text blocks with headings are added to the dashboard"
 
 # Designer for TOC widget options
@@ -188,7 +187,7 @@ class TOCWidgetDesignerComponent extends React.Component
     @props.onDesignChange(design)
 
   render: ->
-    H.div null,
+    R 'div', null,
       R ui.FormGroup, label: "Header",
         R ui.TextInput, value: @props.design.header or "", onChange: @update("header"), placeholder: "None"
       R ui.FormGroup, label: "Border",
@@ -209,7 +208,7 @@ class BorderComponent extends React.Component
   render: ->
     value = if @props.value? then @props.value else @props.defaultValue
 
-    H.div null,
+    R 'div', null,
       R ui.Radio, inline: true, value: value, radioValue: 0, onChange: @props.onChange,
         "None"
       R ui.Radio, inline: true, value: value, radioValue: 1, onChange: @props.onChange,

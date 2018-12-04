@@ -2,7 +2,7 @@ assert = require('chai').assert
 fixtures = require '../fixtures'
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
+R = React.createElement
 
 DashboardUtils = require '../../src/dashboards/DashboardUtils'
 

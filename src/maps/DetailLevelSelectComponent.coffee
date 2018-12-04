@@ -1,10 +1,9 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
-ReactSelect = require 'react-select'
+ReactSelect = require('react-select').default
 
 # Select detail level within an admin region
 module.exports = class DetailLevelSelectComponent extends React.Component
@@ -16,8 +15,8 @@ module.exports = class DetailLevelSelectComponent extends React.Component
     detailLevel: PropTypes.number # Detail level within
     onChange: PropTypes.func.isRequired # Called with (detailLevel)
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
     @state = { options: null }
 
   componentWillMount: ->
@@ -79,12 +78,11 @@ module.exports = class DetailLevelSelectComponent extends React.Component
   render: ->
     if @state.options
       R ReactSelect, {
-        value: @props.detailLevel or ""
+        value: _.findWhere(@state.options, value: @props.detailLevel) or null
         options: @state.options
-        clearable: false
-        onChange: (value) => @props.onChange(parseInt(value))
+        onChange: (opt) => @props.onChange(opt.value)
       }
     else
-      H.div className: "text-muted",
-        H.i className: "fa fa-spinner fa-spin"
+      R 'div', className: "text-muted",
+        R 'i', className: "fa fa-spinner fa-spin"
         " Loading..."

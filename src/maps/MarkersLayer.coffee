@@ -1,6 +1,6 @@
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
+R = React.createElement
 
 Layer = require './Layer'
 ExprCompiler = require('mwater-expressions').ExprCompiler
@@ -176,6 +176,8 @@ module.exports = class MarkersLayer extends Layer
       #layer0 {
         line-color: ''' + (design.color or "#666666") + ''';
         line-width: 3;
+      }
+      #layer0[geometry_type='ST_Polygon'],#layer0[geometry_type='ST_MultiPolygon'] {
         polygon-fill: ''' + (design.color or "#666666") + ''';
         polygon-opacity: 0.25;
       }

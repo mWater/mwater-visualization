@@ -2,7 +2,6 @@ _ = require 'lodash'
 gulp = require 'gulp'
 gutil = require 'gulp-util'
 glob = require 'glob'
-browserify = require 'browserify'
 source = require 'vinyl-source-stream'
 concat = require 'gulp-concat'
 rework = require 'gulp-rework'
@@ -56,27 +55,14 @@ gulp.task "copy_fonts", ->
 #     # "./bower_components/select2/*.gif"
 #   ]).pipe(gulp.dest("./dist/css/"))
 
-gulp.task "index_css", ->
-  return gulp.src("./src/index.css")
-    .pipe(rework(reworkNpm("./src/")))
-    .pipe gulp.dest("./dist/css/")
+# gulp.task "index_css", ->
+#   return gulp.src("./src/index.css")
+#     .pipe(rework(reworkNpm("./src/")))
+#     .pipe gulp.dest("./dist/css/")
 
 gulp.task 'copy_assets', ->
   return gulp.src("assets/**/*")
     .pipe(gulp.dest('dist/'))
-
-gulp.task 'prepare_tests', ->
-  files = glob.sync("./test/**/*Tests.coffee")
-  files = _.map(files, (f) -> "." + f)
-  bundler = shim(browserify({ 
-    entries: files, 
-    basedir: "./src/"
-    extensions: [".js", ".coffee"] }))
-  return bundler.bundle()
-    .on('error', gutil.log)
-    .on('error', -> throw "Failed")
-    .pipe(source('browserified.js'))
-    .pipe(gulp.dest('./test'))
 
 gulp.task "build", gulp.parallel([
   "libs_js"
@@ -84,7 +70,7 @@ gulp.task "build", gulp.parallel([
   # "copy_images"
   "copy_fonts"
   "copy_assets"
-  "index_css"
+  # "index_css"
 ])
 
 gulp.task "watch", gulp.series([
@@ -92,7 +78,7 @@ gulp.task "watch", gulp.series([
   "libs_css"
   "copy_fonts"
   "copy_assets"
-  "index_css"
+  # "index_css"
   ->
     webpackConfig = require './webpack.config.js'
 
@@ -114,31 +100,31 @@ gulp.task "watch", gulp.series([
       gutil.log("[webpack-dev-server]", "http://localhost:3012/demo.html")
 ])
 
-gulp.task "watch_hot", gulp.series([
-  "libs_js"
-  "libs_css"
-  "copy_fonts"
-  "copy_assets"
-  "index_css"
-  ->
-    webpackConfig = require './webpack.config.js'
+# gulp.task "watch_hot", gulp.series([
+#   "libs_js"
+#   "libs_css"
+#   "copy_fonts"
+#   "copy_assets"
+#   "index_css"
+#   ->
+#     webpackConfig = require './webpack.config.js'
 
-    # Include version
-    webpackConfig.plugins = [
-      new webpack.HotModuleReplacementPlugin(),
-      new webpack.NamedModulesPlugin(),
-    ]
-    webpackConfig.entry.unshift('webpack-dev-server/client?http://localhost:3012', 'webpack/hot/only-dev-server');
+#     # Include version
+#     webpackConfig.plugins = [
+#       new webpack.HotModuleReplacementPlugin(),
+#       new webpack.NamedModulesPlugin(),
+#     ]
+#     webpackConfig.entry.unshift('webpack-dev-server/client?http://localhost:3012', 'webpack/hot/only-dev-server');
 
-    compiler = webpack(webpackConfig)
+#     compiler = webpack(webpackConfig)
 
-    new WebpackDevServer(compiler, { hot: true, contentBase: "dist", publicPath: "/js/" }).listen 3012, "localhost", (err) =>
-      if err 
-        throw new gutil.PluginError("webpack-dev-server", err)
+#     new WebpackDevServer(compiler, { hot: true, contentBase: "dist", publicPath: "/js/" }).listen 3012, "localhost", (err) =>
+#       if err 
+#         throw new gutil.PluginError("webpack-dev-server", err)
 
-      # Server listening
-      gutil.log("[webpack-dev-server]", "http://localhost:3012/demo.html")
-])
+#       # Server listening
+#       gutil.log("[webpack-dev-server]", "http://localhost:3012/demo.html")
+# ])
 
 
 gulp.task "test", gulp.series([
@@ -156,4 +142,4 @@ gulp.task "test", gulp.series([
 ])
 
 
-gulp.task "default", gulp.series("copy", "coffee", "index_css")
+gulp.task "default", gulp.series("copy", "coffee")

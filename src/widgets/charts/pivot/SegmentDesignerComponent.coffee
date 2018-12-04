@@ -1,7 +1,6 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 ui = require 'react-library/lib/bootstrap'
@@ -21,7 +20,7 @@ module.exports = class SegmentDesignerComponent extends React.Component
     filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
   constructor: (props) ->
-    super
+    super(props)
 
     @state = {
       # Mode switcher to make UI clearer
@@ -60,24 +59,24 @@ module.exports = class SegmentDesignerComponent extends React.Component
     R ui.FormGroup, 
       labelMuted: true
       label: "Type",
-        H.div key: "single", className: "radio",
-          H.label null,
-            H.input type: "radio", checked: @state.mode == "single", onChange: @handleSingleMode
+        R 'div', key: "single", className: "radio",
+          R 'label', null,
+            R 'input', type: "radio", checked: @state.mode == "single", onChange: @handleSingleMode
             "Single #{@props.segmentType}"
-            H.span className: "text-muted", " - used for summary #{@props.segmentType}s and empty #{@props.segmentType}s"
+            R 'span', className: "text-muted", " - used for summary #{@props.segmentType}s and empty #{@props.segmentType}s"
 
-        H.div key: "multiple", className: "radio",
-          H.label null,
-            H.input type: "radio", checked: @state.mode == "multiple", onChange: @handleMultipleMode
+        R 'div', key: "multiple", className: "radio",
+          R 'label', null,
+            R 'input', type: "radio", checked: @state.mode == "multiple", onChange: @handleMultipleMode
             "Multiple #{@props.segmentType}s"
-            H.span className: "text-muted", " - disaggregate data by a field"
+            R 'span', className: "text-muted", " - disaggregate data by a field"
 
   renderLabel: ->
     R ui.FormGroup, 
       labelMuted: true
       label: "Label"
       help: (if @state.mode == "multiple" then "Optional label for the #{@props.segmentType}s"),
-        H.input 
+        R 'input', 
           ref: (elem) => @labelElem = elem
           type: "text"
           className: "form-control"
@@ -89,7 +88,7 @@ module.exports = class SegmentDesignerComponent extends React.Component
       labelMuted: true
       label: "Field"
       help: "Field to disaggregate data by",
-        H.div style: { marginLeft: 8 }, 
+        R 'div', style: { marginLeft: 8 }, 
           R AxisComponent, 
             schema: @props.schema
             dataSource: @props.dataSource
@@ -117,18 +116,18 @@ module.exports = class SegmentDesignerComponent extends React.Component
     R ui.FormGroup, 
       labelMuted: true
       label: "Styling",
-        H.label className: "checkbox-inline", key: "bold",
-          H.input type: "checkbox", checked: @props.segment.bold == true, onChange: (ev) => @update({ bold: ev.target.checked })
+        R 'label', className: "checkbox-inline", key: "bold",
+          R 'input', type: "checkbox", checked: @props.segment.bold == true, onChange: (ev) => @update({ bold: ev.target.checked })
           "Bold"
-        H.label className: "checkbox-inline", key: "italic",
-          H.input type: "checkbox", checked: @props.segment.italic == true, onChange: (ev) => @update({ italic: ev.target.checked })
+        R 'label', className: "checkbox-inline", key: "italic",
+          R 'input', type: "checkbox", checked: @props.segment.italic == true, onChange: (ev) => @update({ italic: ev.target.checked })
           "Italic"
         if @props.segment.valueAxis and @props.segment.label
-          H.label className: "checkbox-inline", key: "valueLabelBold",
-            H.input type: "checkbox", checked: @props.segment.valueLabelBold == true, onChange: (ev) => @update({ valueLabelBold: ev.target.checked })
+          R 'label', className: "checkbox-inline", key: "valueLabelBold",
+            R 'input', type: "checkbox", checked: @props.segment.valueLabelBold == true, onChange: (ev) => @update({ valueLabelBold: ev.target.checked })
             "Header Bold"
         if @props.segment.valueAxis and @props.segment.label
-          H.div style: { paddingTop: 5 },
+          R 'div', style: { paddingTop: 5 },
             "Shade filler cells: "
             R ColorComponent, color: @props.segment.fillerColor, onChange: (color) => @update({ fillerColor: color })
 
@@ -136,18 +135,18 @@ module.exports = class SegmentDesignerComponent extends React.Component
     R ui.FormGroup, 
       labelMuted: true
       label: "Borders",
-        H.div key: "before",
+        R 'div', key: "before",
           if @props.segmentType == "row" then "Top: " else "Left: "
         R BorderComponent, value: @props.segment.borderBefore, defaultValue: 2, onChange: (value) => @update(borderBefore: value)
-        H.div key: "within",
+        R 'div', key: "within",
           "Within: "
         R BorderComponent, value: @props.segment.borderWithin, defaultValue: 1, onChange: (value) => @update(borderWithin: value)
-        H.div key: "after",
+        R 'div', key: "after",
           if @props.segmentType == "row" then "Bottom: " else "Right: "
         R BorderComponent, value: @props.segment.borderAfter, defaultValue: 2, onChange: (value) => @update(borderAfter: value)
 
   render: ->
-    H.div null,
+    R 'div', null,
       @renderMode()
       if @state.mode
         @renderLabel()
@@ -170,16 +169,16 @@ class BorderComponent extends React.Component
   render: ->
     value = if @props.value? then @props.value else @props.defaultValue
 
-    H.span null,
-      H.label className: "radio-inline",
-        H.input type: "radio", checked: value == 0, onClick: => @props.onChange(0)
+    R 'span', null,
+      R 'label', className: "radio-inline",
+        R 'input', type: "radio", checked: value == 0, onClick: => @props.onChange(0)
         "None"
-      H.label className: "radio-inline",
-        H.input type: "radio", checked: value == 1, onClick: => @props.onChange(1)
+      R 'label', className: "radio-inline",
+        R 'input', type: "radio", checked: value == 1, onClick: => @props.onChange(1)
         "Light"
-      H.label className: "radio-inline",
-        H.input type: "radio", checked: value == 2, onClick: => @props.onChange(2)
+      R 'label', className: "radio-inline",
+        R 'input', type: "radio", checked: value == 2, onClick: => @props.onChange(2)
         "Medium"
-      H.label className: "radio-inline",
-        H.input type: "radio", checked: value == 3, onClick: => @props.onChange(3)
+      R 'label', className: "radio-inline",
+        R 'input', type: "radio", checked: value == 3, onClick: => @props.onChange(3)
         "Heavy"

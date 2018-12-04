@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
@@ -11,8 +10,8 @@ module.exports = class ImagePopupComponent extends React.Component
   @propTypes:
     imageManager: PropTypes.object.isRequired
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = {
       image: null # Set to display

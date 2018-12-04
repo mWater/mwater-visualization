@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 uuid = require 'uuid'
 AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
@@ -186,7 +185,7 @@ module.exports = class AxisComponent extends AsyncLoadComponent
           xform: axis.xform
           onChange: @handleXformChange)
 
-      return H.div null,
+      return R 'div', null,
         R ui.ButtonToggleComponent,
           value: if axis.xform then axis.xform.type else null
           options: [
@@ -226,7 +225,7 @@ module.exports = class AxisComponent extends AsyncLoadComponent
       return null
 
     return [
-      H.br()
+      R('br')
       R AxisColorEditorComponent,
         schema: @props.schema
         dataSource: @props.dataSource
@@ -248,7 +247,7 @@ module.exports = class AxisComponent extends AsyncLoadComponent
       return null
 
     return [
-      H.br()
+      R('br')
       R CategoryMapComponent,
         schema: @props.schema
         dataSource: @props.dataSource
@@ -272,12 +271,12 @@ module.exports = class AxisComponent extends AsyncLoadComponent
       { value: ".0%", label: "Percent rounded: 12%" }
     ]
 
-    H.div className: "form-group",
-      H.label className: "text-muted", 
+    R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
         "Format"
       ": "
-      H.select value: (if axis.format? then axis.format else ","), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
-        _.map(formats, (format) -> H.option(key: format.value, value: format.value, format.label))
+      R 'select', value: (if axis.format? then axis.format else ","), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
+        _.map(formats, (format) -> R('option', key: format.value, value: format.value, format.label))
 
   render: ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
@@ -294,8 +293,8 @@ module.exports = class AxisComponent extends AsyncLoadComponent
       when "required"
         aggrStatuses = ["literal", "aggregate"]
 
-    H.div null,
-      H.div null,
+    R 'div', null,
+      R 'div', null,
         R ExprComponent,
           schema: @props.schema
           dataSource: @props.dataSource

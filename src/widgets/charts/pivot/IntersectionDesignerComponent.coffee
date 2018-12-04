@@ -1,13 +1,12 @@
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'
-H = React.DOM
 R = React.createElement
 
 ui = require 'react-library/lib/bootstrap'
 update = require 'react-library/lib/update'
 
-Rcslider = require 'rc-slider'
+Rcslider = require('rc-slider').default
 AxisComponent = require '../../../axes/AxisComponent'
 ColorComponent = require '../../../ColorComponent'
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
@@ -137,7 +136,7 @@ module.exports = class IntersectionDesignerComponent extends React.Component
           onChange: @handleBackgroundColorOpacityChange
 
   render: ->
-    H.div null,
+    R 'div', null,
       @renderValueAxis()
       @renderNullValue()
       @renderFilter()
@@ -203,8 +202,8 @@ class BackgroundColorConditionComponent extends React.Component
   update: => update(@props.colorCondition, @props.onChange, arguments)
 
   render: ->
-    H.div className: "panel panel-default",
-      H.div className: "panel-body",
+    R 'div', className: "panel panel-default",
+      R 'div', className: "panel-body",
         R ui.FormGroup, 
           labelMuted: true
           label: "Condition",

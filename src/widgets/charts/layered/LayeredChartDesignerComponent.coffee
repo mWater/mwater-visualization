@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 LayeredChartLayerDesignerComponent = require './LayeredChartLayerDesignerComponent'
 LayeredChartCompiler = require './LayeredChartCompiler'
@@ -67,24 +66,24 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
 
     compiler = new LayeredChartCompiler(schema: @props.schema)
 
-    H.div null,
-      H.p className: "help-block", "To edit title of chart, click on it directly"
+    R 'div', null,
+      R 'p', className: "help-block", "To edit title of chart, click on it directly"
       if @areAxesLabelsNeeded()
-        H.div className: "form-group",
-          H.span null,
-            H.label className: "text-muted", if @props.design.transpose then "Vertical Axis Label" else "Horizontal Axis Label"
+        R 'div', className: "form-group",
+          R 'span', null,
+            R 'label', className: "text-muted", if @props.design.transpose then "Vertical Axis Label" else "Horizontal Axis Label"
             " ",
-            H.button({className: "btn btn-default btn-xs", onClick: @handleToggleXAxisLabelClick}, if @props.design.xAxisLabelText? then "Hide" else "Show")
+            R('button', {className: "btn btn-default btn-xs", onClick: @handleToggleXAxisLabelClick}, if @props.design.xAxisLabelText? then "Hide" else "Show")
           if @props.design.xAxisLabelText?
-            H.input type: "text", className: "form-control input-sm", value: @props.design.xAxisLabelText, onChange: @handleXAxisLabelTextChange, placeholder: compiler.compileDefaultXAxisLabelText(@props.design)
+            R 'input', type: "text", className: "form-control input-sm", value: @props.design.xAxisLabelText, onChange: @handleXAxisLabelTextChange, placeholder: compiler.compileDefaultXAxisLabelText(@props.design)
       if @areAxesLabelsNeeded()
-        H.div className: "form-group",
-          H.span null,
-            H.label({className: "text-muted"}, if not @props.design.transpose then "Vertical Axis Label" else "Horizontal Axis Label"),
+        R 'div', className: "form-group",
+          R 'span', null,
+            R('label', {className: "text-muted"}, if not @props.design.transpose then "Vertical Axis Label" else "Horizontal Axis Label"),
             " ",
-            H.button({className: "btn btn-default btn-xs", onClick: @handleToggleYAxisLabelClick}, if @props.design.yAxisLabelText? then "Hide" else "Show")
+            R('button', {className: "btn btn-default btn-xs", onClick: @handleToggleYAxisLabelClick}, if @props.design.yAxisLabelText? then "Hide" else "Show")
           if @props.design.yAxisLabelText?
-            H.input type: "text", className: "form-control input-sm", value: @props.design.yAxisLabelText, onChange: @handleYAxisLabelTextChange, placeholder: compiler.compileDefaultYAxisLabelText(@props.design)
+            R 'input', type: "text", className: "form-control input-sm", value: @props.design.yAxisLabelText, onChange: @handleYAxisLabelTextChange, placeholder: compiler.compileDefaultYAxisLabelText(@props.design)
 
   renderType: ->
     chartTypes =  [
@@ -120,7 +119,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
       paddingTop: 10
       paddingBottom: 10
     }
-    H.div style: style, key: index,
+    R 'div', style: style, key: index,
       R(LayeredChartLayerDesignerComponent, {
         design: @props.design
         schema: @props.schema
@@ -135,12 +134,12 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     if not @props.design.type
       return 
 
-    H.div null, 
+    R 'div', null, 
       _.map(@props.design.layers, (layer, i) => @renderLayer(i))
       # Only add if last has table
       if @props.design.layers.length > 0 and _.last(@props.design.layers).table
-        H.button className: "btn btn-link", type: "button", onClick: @handleAddLayer,
-          H.span className: "glyphicon glyphicon-plus"
+        R 'button', className: "btn btn-link", type: "button", onClick: @handleAddLayer,
+          R 'span', className: "glyphicon glyphicon-plus"
           " Add Another Series"
 
   renderOptions: ->
@@ -156,21 +155,21 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     # Don't include if transpose
     canTranspose = design.type not in ['pie', 'donut']
 
-    H.div className: "text-muted",
+    R 'div', className: "text-muted",
       if canTranspose
-        H.label className: "checkbox-inline", key: "transpose",
-          H.input type: "checkbox", checked: design.transpose, onChange: @handleTransposeChange
+        R 'label', className: "checkbox-inline", key: "transpose",
+          R 'input', type: "checkbox", checked: design.transpose, onChange: @handleTransposeChange
           "Horizontal"
       if canStack
-        H.label className: "checkbox-inline", key: "stacked",
-          H.input type: "checkbox", checked: design.stacked, onChange: @handleStackedChange
+        R 'label', className: "checkbox-inline", key: "stacked",
+          R 'input', type: "checkbox", checked: design.stacked, onChange: @handleStackedChange
           "Stacked"
       if canStack
-        H.label className: "checkbox-inline", key: "proportional",
-          H.input type: "checkbox", checked: design.proportional, onChange: @handleProportionalChange
+        R 'label', className: "checkbox-inline", key: "proportional",
+          R 'input', type: "checkbox", checked: design.proportional, onChange: @handleProportionalChange
           "Proportional"
-      H.label className: "checkbox-inline", key: "labels",
-        H.input type: "checkbox", checked: design.labels or false, onChange: @handleLabelsChange
+      R 'label', className: "checkbox-inline", key: "labels",
+        R 'input', type: "checkbox", checked: design.labels or false, onChange: @handleLabelsChange
         "Show Values"
 
   renderThresholds: ->
@@ -187,8 +186,8 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     tabs.push {
       id: "design"
       label: "Design"
-      elem: H.div null, 
-        H.br()
+      elem: R 'div', null, 
+        R('br')
         @renderType()
         @renderLayers()
         @renderThresholds()
@@ -198,8 +197,8 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
       tabs.push {
         id: "labels"
         label: "Labels"
-        elem: H.div null,
-          H.br()
+        elem: R 'div', null,
+          R('br')
           @renderLabels()
       }
 
@@ -229,12 +228,12 @@ class ThresholdsComponent extends React.Component
     @props.onThresholdsChange(thresholds)
 
   render: ->
-    H.div null,
+    R 'div', null,
       _.map @props.thresholds, (threshold, index) =>
         R ThresholdComponent, threshold: threshold, onThresholdChange: @handleChange.bind(null, index), onRemove: @handleRemove.bind(null, index)
 
-      H.button type: "button", className: "btn btn-xs btn-link", onClick: @handleAdd,
-        H.i className: "fa fa-plus"
+      R 'button', type: "button", className: "btn btn-xs btn-link", onClick: @handleAdd,
+        R 'i', className: "fa fa-plus"
         " Add Y Threshold"
 
 class ThresholdComponent extends React.Component
@@ -244,17 +243,17 @@ class ThresholdComponent extends React.Component
     onRemove: PropTypes.func.isRequired
 
   render: ->
-    H.div null,
+    R 'div', null,
       R LabeledInlineComponent, key: "value", label: "Value:",
         R ui.NumberInput, style: { display: "inline-block" }, size: "sm", value: @props.threshold.value, onChange: (v) => @props.onThresholdChange(_.extend({}, @props.threshold, value: v))
       "  "
       R LabeledInlineComponent, key: "label", label: "Label:",
         R ui.TextInput, style: { display: "inline-block", width: "8em" }, size: "sm", value: @props.threshold.label, onChange: (v) => @props.onThresholdChange(_.extend({}, @props.threshold, label: v))
       "  "
-      H.button className: "btn btn-xs btn-link", onClick: @props.onRemove, 
-        H.i className: "fa fa-remove"
+      R 'button', className: "btn btn-xs btn-link", onClick: @props.onRemove, 
+        R 'i', className: "fa fa-remove"
 
 LabeledInlineComponent = (props) ->
-  H.div style: { display: "inline-block" },
-    H.label className: "text-muted", props.label
+  R 'div', style: { display: "inline-block" },
+    R 'label', className: "text-muted", props.label
     props.children

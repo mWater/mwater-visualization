@@ -1,6 +1,6 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
+R = React.createElement
 _ = require 'lodash'
 
 Widget = require './Widget'
@@ -102,11 +102,11 @@ class MapWidgetComponent extends React.Component
     height = @props.height * width / @props.width
     chart = @renderContent(@state.editDesign, @handleEditDesignChange, width, height)
 
-    content = H.div style: { height: "100%", width: "100%" },
-      H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: width + 20, height: height + 20 },
+    content = R 'div', style: { height: "100%", width: "100%" },
+      R 'div', style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: width + 20, height: height + 20 },
         chart
-      H.div style: { width: "100%", height: "100%", paddingLeft: width + 40 },
-        H.div style: { width: "100%", height: "100%", overflowY: "auto", paddingLeft: 20, borderLeft: "solid 3px #AAA" },
+      R 'div', style: { width: "100%", height: "100%", paddingLeft: width + 40 },
+        R 'div', style: { width: "100%", height: "100%", overflowY: "auto", paddingLeft: 20, borderLeft: "solid 3px #AAA" },
           editor
 
     React.createElement(ModalWindowComponent,
@@ -118,7 +118,7 @@ class MapWidgetComponent extends React.Component
     # Require here to prevent server require problems
     MapViewComponent = require '../maps/MapViewComponent'
 
-    H.div style: { width: width, height: height, padding: 10 },
+    R 'div', style: { width: width, height: height, padding: 10 },
       React.createElement(MapViewComponent, {
         schema: @props.schema
         design: design
@@ -140,7 +140,7 @@ class MapWidgetComponent extends React.Component
       dropdownItems.push({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
 
     # Wrap in a simple widget
-    return H.div null,
+    return R 'div', null,
       if @props.onDesignChange?
         @renderEditor()
       React.createElement(DropdownWidgetComponent, 

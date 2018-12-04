@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 AxisComponent = require '../../../axes/AxisComponent'
 AxisBuilder = require '../../../axes/AxisBuilder'
@@ -37,8 +36,8 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
     return LayeredChartUtils.getAxisTypes(@props.design, layer, axisKey)
 
   getAxisLabel: (icon, label) ->
-    H.span null,
-      H.span className: ("glyphicon glyphicon-" + icon)
+    R 'span', null,
+      R 'span', className: ("glyphicon glyphicon-" + icon)
       " " + label
 
   # Determine icon/label for color axis
@@ -109,20 +108,16 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
   handleStackedChange: (ev) => @updateLayer(stacked: ev.target.checked)
 
   renderName: ->
-    # Only if multiple
-    if @props.design.layers.length <= 1
-      return
-
     layer = @props.design.layers[@props.index]
 
-    # H.div className: "form-group",
-    #   H.label className: "text-muted", "Series Name"
-    H.input type: "text", className: "form-control input-sm", value: layer.name, onChange: @handleNameChange, placeholder: "Series #{@props.index+1}"
+    # R 'div', className: "form-group",
+    #   R 'label', className: "text-muted", "Series Name"
+    R 'input', type: "text", className: "form-control input-sm", value: layer.name, onChange: @handleNameChange, placeholder: "Series #{@props.index+1}"
 
   renderRemove: ->
     if @props.design.layers.length > 1
-      H.button className: "btn btn-xs btn-link pull-right", type: "button", onClick: @props.onRemove,
-        H.span className: "glyphicon glyphicon-remove"
+      R 'button', className: "btn btn-xs btn-link pull-right", type: "button", onClick: @props.onRemove,
+        R 'span', className: "glyphicon glyphicon-remove"
 
   renderTable: ->
     layer = @props.design.layers[@props.index]
@@ -176,9 +171,9 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
 
     title = @getColorAxisLabel(layer)
 
-    H.div className: "form-group",
-      H.label className: "text-muted", title
-      H.div style: { marginLeft: 10 }, 
+    R 'div', className: "form-group",
+      R 'label', className: "text-muted", title
+      R 'div', style: { marginLeft: 10 }, 
         R(AxisComponent, 
           schema: @props.schema, 
           dataSource: @props.dataSource
@@ -200,9 +195,9 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
 
     title = @getYAxisLabel(layer)
 
-    H.div className: "form-group",
-      H.label className: "text-muted", title
-      H.div style: { marginLeft: 10 }, 
+    R 'div', className: "form-group",
+      R 'label', className: "text-muted", title
+      R 'div', style: { marginLeft: 10 }, 
         R(AxisComponent, 
           schema: @props.schema, 
           dataSource: @props.dataSource
@@ -225,9 +220,9 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
     if not layer.axes.y or not layer.axes.x or axisBuilder.getAxisType(layer.axes.x) not in ['date', 'number']
       return 
 
-    H.div key: "cumulative",
-      H.label className: "checkbox-inline", 
-        H.input type: "checkbox", checked: layer.cumulative, onChange: @handleCumulativeChange
+    R 'div', key: "cumulative",
+      R 'label', className: "checkbox-inline", 
+        R 'input', type: "checkbox", checked: layer.cumulative, onChange: @handleCumulativeChange
         "Cumulative"
 
   renderStacked: ->
@@ -237,9 +232,9 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
     if layer.axes.color and @props.design.layers.length > 1
       stacked = if layer.stacked? then layer.stacked else true
 
-      return H.div key: "stacked",
-        H.label className: "checkbox-inline", 
-          H.input type: "checkbox", checked: stacked, onChange: @handleStackedChange
+      return R 'div', key: "stacked",
+        R 'label', className: "checkbox-inline", 
+          R 'input', type: "checkbox", checked: stacked, onChange: @handleStackedChange
           "Stacked"
 
     return null
@@ -251,10 +246,10 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
     if not layer.table 
       return
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
         if layer.axes.color then "Default Color" else "Color"
-      H.div style: { marginLeft: 8 }, 
+      R 'div', style: { marginLeft: 8 }, 
         R(ColorComponent, color: layer.color, onChange: @handleColorChange)
 
   renderFilter: ->
@@ -264,12 +259,12 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
     if not layer.table
       return null
 
-    return H.div className: "form-group",
-      H.label className: "text-muted", 
-        H.span(className: "glyphicon glyphicon-filter")
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        R('span', className: "glyphicon glyphicon-filter")
         " "
         "Filters"
-      H.div style: { marginLeft: 8 }, 
+      R 'div', style: { marginLeft: 8 }, 
         R(FilterExprComponent, 
           schema: @props.schema
           dataSource: @props.dataSource
@@ -279,9 +274,9 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
 
   render: ->
     layer = @props.design.layers[@props.index]
-    H.div null, 
+    R 'div', null, 
       if @props.index > 0
-        H.hr()
+        R('hr')
       @renderRemove()
       @renderTable()
       # Color axis first for pie

@@ -1,6 +1,5 @@
 PropTypes = require('prop-types')
 React = require 'react'
-H = React.DOM
 R = React.createElement
 Widget = require './../Widget'
 DropdownWidgetComponent = require './../DropdownWidgetComponent'
@@ -175,11 +174,11 @@ class ChartWidgetComponent extends React.Component
       chartHeight = @props.height * (chartWidth / @props.width)
       chart = @renderChart(@state.editDesign, ((design) => @setState(editDesign: design)), chartWidth, chartHeight, chartWidth)
 
-      content = H.div style: { height: "100%", width: "100%" },
-        H.div style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: chartWidth + 20, height: chartHeight + 20, overflow: "hidden" },
+      content = R 'div', style: { height: "100%", width: "100%" },
+        R 'div', style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: chartWidth + 20, height: chartHeight + 20, overflow: "hidden" },
           chart
-        H.div style: { width: "100%", height: "100%", paddingLeft: chartWidth + 40 },
-          H.div style: { width: "100%", height: "100%", overflowY: "auto", paddingLeft: 20, borderLeft: "solid 3px #AAA" },
+        R 'div', style: { width: "100%", height: "100%", paddingLeft: chartWidth + 40 },
+          R 'div', style: { width: "100%", height: "100%", overflowY: "auto", paddingLeft: 20, borderLeft: "solid 3px #AAA" },
             editor
 
       return R ModalWindowComponent,
@@ -195,7 +194,7 @@ class ChartWidgetComponent extends React.Component
 
   # Render a link to start editing
   renderEditLink: ->
-    H.div className: "mwater-visualization-widget-placeholder", onClick: @handleStartEditing,
+    R 'div', className: "mwater-visualization-widget-placeholder", onClick: @handleStartEditing,
       R ui.Icon, id: @props.chart.getPlaceholderIcon()
 
   render: ->
@@ -215,7 +214,7 @@ class ChartWidgetComponent extends React.Component
       dropdownItems.unshift({ label: @props.chart.getEditLabel(), icon: "pencil", onClick: @handleStartEditing })
 
     # Wrap in a simple widget
-    return H.div onDoubleClick: (if @props.onDesignChange? then @handleStartEditing), style: { position: "relative", width: @props.width },
+    return R 'div', onDoubleClick: (if @props.onDesignChange? then @handleStartEditing), style: { position: "relative", width: @props.width },
       if @props.onDesignChange?
         @renderEditor()
       React.createElement(DropdownWidgetComponent, 
