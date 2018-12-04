@@ -43,9 +43,9 @@ module.exports = class ScopeAndDetailLevelComponent extends React.Component
         if level > (if @props.scopeLevel? then @props.scopeLevel else -1)
           detailLevelOptions.push({ value: level, label: ExprUtils.localizeString(levelColumn.name) })
 
-    H.div null,
-      H.div className: "form-group",
-        H.label className: "text-muted", 
+    R 'div', null,
+      R 'div', className: "form-group",
+        R 'label', className: "text-muted", 
           "Region to Map"
         R RegionSelectComponent, 
           region: @props.scope, 
@@ -55,8 +55,8 @@ module.exports = class ScopeAndDetailLevelComponent extends React.Component
           regionsTable: @props.regionsTable
           maxLevel: maxLevel - 1
           placeholder: "All Regions"
-      H.div className: "form-group",
-        H.label className: "text-muted", 
+      R 'div', className: "form-group",
+        R 'label', className: "text-muted", 
           "Detail Level"
         R ui.Select, 
           value: @props.detailLevel
