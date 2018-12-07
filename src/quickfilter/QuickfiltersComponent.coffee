@@ -68,6 +68,8 @@ module.exports = class QuickfiltersComponent extends React.Component
         for i in [index + 1...@props.design.length]
           if @props.design[i].merged
             values[i] = v
+          else
+            break
 
         @props.onValuesChange(values)
 
