@@ -38,6 +38,10 @@ segment:
   label: optional label of segment
   valueAxis: enum/text axis that determines values. Optional.
   children: array of child segments if any. Optional
+  
+  orderExpr: optional aggregate ordering expression
+  orderDir: "asc" (default)/ "desc"
+
   fillerColor: color of filler for intersections that are filler type
 
   filter: optional logical expression to filter by (filters all intersections related to it)

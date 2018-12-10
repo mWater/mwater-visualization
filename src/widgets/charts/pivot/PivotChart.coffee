@@ -46,6 +46,12 @@ module.exports = class PivotChart extends Chart
         if not segment.valueAxis
           delete segment.valueLabelBold
 
+        if segment.filter
+          segment.filter = exprCleaner.cleanExpr(segment.filter, { table: design.table, types: ["boolean"] })
+
+        if segment.orderExpr
+          segment.orderExpr = exprCleaner.cleanExpr(segment.orderExpr, { table: design.table, aggrStatuses: ["aggregate"], types: ["enum", "text", "boolean", "date", "datetime", "number"] })
+
       # Clean all segments
       for segment in PivotChartUtils.getAllSegments(design.rows)
         cleanSegment(segment)

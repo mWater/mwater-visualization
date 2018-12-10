@@ -509,6 +509,16 @@ module.exports = class PivotChartLayoutBuilder
       if categories.length == 0
         categories = [{ value: null, label: null }]
 
+      # Sort categories if segment is sorted
+      if segment.orderExpr
+        # Index the ordering by the JSON.stringify to make it O(n)
+        orderIndex = {}
+        for value, index in _.pluck(data[segment.id], "value")
+          orderIndex[JSON.stringify(value)] = index
+
+        # Sort the categories
+        categories = _.sortBy(categories, (category) => orderIndex[JSON.stringify(category.value)])
+
     # If no children segments, return 
     if not segment.children or segment.children.length == 0
       return _.map(categories, (category) -> [{ segment: segment, value: category.value, label: category.label }])

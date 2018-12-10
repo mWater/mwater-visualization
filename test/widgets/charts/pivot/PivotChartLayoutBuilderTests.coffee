@@ -49,6 +49,23 @@ describe "PivotChartLayoutBuilder", ->
           [{ segment: segment, label: "None", value: null }]
         ]
 
+      it 'gets categories of sorted enum segment', ->
+        segment = { id: "seg1", valueAxis: @axisEnum, orderExpr: @exprNumberSum }
+        data = {
+          "seg1": [
+            { value: "b" }
+            { value: null }
+            { value: "a" }
+          ]
+        }
+        columns = @lb.getRowsOrColumns(false, segment, data, "en")
+
+        compare columns, [
+          [{ segment: segment, label: "B", value: "b" }]
+          [{ segment: segment, label: "None", value: null }]
+          [{ segment: segment, label: "A", value: "a" }]
+        ]
+
       it 'gets categories of simple enum segment with excludedValues', ->
         segment = { id: "seg1", valueAxis: { expr: @exprEnum, excludedValues: ["b"] } }
         data = {}

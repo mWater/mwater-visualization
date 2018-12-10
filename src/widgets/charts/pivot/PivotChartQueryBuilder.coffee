@@ -7,7 +7,7 @@ injectTableAlias = require('mwater-expressions').injectTableAlias
 PivotChartUtils = require './PivotChartUtils'
 
 # Builds pivot table queries. 
-# Result is flat list containing each cell with data for a single section of the grid
+# Result is flat list for each intersection with each row being data for a single cell
 # columns of result are: 
 #  value: value of the cell (aggregate)
 #  r0: row segment value (if present)
@@ -16,6 +16,9 @@ PivotChartUtils = require './PivotChartUtils'
 #  c0: column segment value (if present)
 #  c1: inner column segment value (if present)
 #  ...
+# Also produces queries needed to order row/column segments when ordered
+# These are indexed by the segment id and contain the values in order (already asc/desc corrected)
+# each row containing only { value: }
 module.exports = class PivotChartQueryBuilder 
   # Pass in schema
   constructor: (options) ->
@@ -128,5 +131,44 @@ module.exports = class PivotChartQueryBuilder
           query.where = { type: "op", op: "and", exprs: whereClauses }
 
         queries[intersectionId] = query
+
+    # For each segment
+    segments = PivotChartUtils.getAllSegments(design.rows).concat(PivotChartUtils.getAllSegments(design.columns))
+    for segment in segments
+      if segment.orderExpr
+        # Create where which includes the segments filter (if present) and the "or" of all intersections that are present
+        where = {
+          type: "op"
+          op: "and"
+          exprs: []
+        }
+
+        if segment.filter
+          where.exprs.push(exprCompiler.compileExpr(expr: segment.filter, tableAlias: "main"))
+
+        # Get all intersection filters
+        intersectionFilters = []
+        for intersectionId in _.keys(design.intersections)
+          if intersectionId.includes(segment.id) 
+            filter = design.intersections[intersectionId].filter
+            if filter
+              intersectionFilters.push(filter)
+        
+        if intersectionFilters.length > 0
+          where.exprs.push({
+            type: "op"
+            op: "or"
+            exprs: _.map(intersectionFilters, (filter) => exprCompiler.compileExpr(expr: filter, tableAlias: "main"))
+          })
+
+        # Create query to get ordering
+        queries[segment.id] = {
+          type: "query"
+          selects: [{ type: "select", expr: @axisBuilder.compileAxis(axis: segment.valueAxis, tableAlias: "main"), alias: "value" }]
+          from: exprCompiler.compileTable(design.table, "main")
+          where: if where.exprs.length > 0 then where else null
+          groupBy: [1]
+          orderBy: [{ expr: exprCompiler.compileExpr(expr: segment.orderExpr, tableAlias: "main"), direction: segment.orderDir or "asc" }]
+        }
 
     return queries

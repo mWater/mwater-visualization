@@ -212,4 +212,78 @@ describe "PivotChartQueryBuilder", ->
       groupBy: [1, 2]
     }
 
+  it "creates ordered single query", ->
+    design = {
+      table: "t1"
+      rows: [
+        { id: "r1", valueAxis: @axisEnum, orderExpr: @exprNumberSum, orderDir: "desc" }
+      ]
+      columns: [
+        { id: "c1", valueAxis: @axisText }
+      ]
+      intersections: {
+        "r1:c1": {
+          valueAxis: @axisNumberSum
+        }
+      }
+    }
+
+    queries = @qb.createQueries(design)
+
+    query = queries["r1"]
+    compare query, {
+      type: "query"
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "value" }
+      ]
+      from: { type: "table", table: "t1", alias: "main" }
+      where: null
+      groupBy: [1]
+      orderBy: [{ expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, direction: "desc" }]
+    }
+
+
+  it "creates ordered single query which includes filters", ->
+    design = {
+      table: "t1"
+      rows: [
+        { id: "r1", valueAxis: @axisEnum, orderExpr: @exprNumberSum, orderDir: "desc", filter: @exprBoolean }
+      ]
+      columns: [
+        { id: "c1", valueAxis: @axisText }
+      ]
+      intersections: {
+        "r1:c1": {
+          valueAxis: @axisNumberSum
+          filter: { type: "literal", valueType: "boolean", value: true }
+        }
+      }
+    }
+
+    queries = @qb.createQueries(design)
+
+    query = queries["r1"]
+    compare query, {
+      type: "query"
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "value" }
+      ]
+      from: { type: "table", table: "t1", alias: "main" }
+      where: {
+        type: "op"
+        op: "and"
+        exprs: [
+          { type: "field", tableAlias: "main", column: "boolean" }
+          {
+            type: "op"
+            op: "or"
+            exprs: [
+              { type: "literal", value: true }
+            ]
+          }
+        ]
+      }
+      groupBy: [1]
+      orderBy: [{ expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, direction: "desc" }]
+    }
 

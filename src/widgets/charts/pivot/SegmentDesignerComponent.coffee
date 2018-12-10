@@ -6,6 +6,7 @@ R = React.createElement
 ui = require 'react-library/lib/bootstrap'
 AxisComponent = require '../../../axes/AxisComponent'
 ColorComponent = require '../../../ColorComponent'
+ExprComponent = require("mwater-expressions-ui").ExprComponent
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 
 # Design a single segment of a pivot table
@@ -54,6 +55,12 @@ module.exports = class SegmentDesignerComponent extends React.Component
 
   handleFilterChange: (filter) =>
     @update(filter: filter)
+
+  handleOrderExprChange: (orderExpr) =>
+    @update(orderExpr: orderExpr)
+
+  handleOrderDirChange: (orderDir) =>
+    @update(orderDir: orderDir)
 
   renderMode: ->
     R ui.FormGroup, 
@@ -145,6 +152,27 @@ module.exports = class SegmentDesignerComponent extends React.Component
           if @props.segmentType == "row" then "Bottom: " else "Right: "
         R BorderComponent, value: @props.segment.borderAfter, defaultValue: 2, onChange: (value) => @update(borderAfter: value)
 
+  renderOrderExpr: ->
+    R ui.FormGroup, 
+      labelMuted: true
+      label: [R(ui.Icon, id: "fa-sort-amount-asc"), " Sort"]
+      hint: "Sorts the display of this #{@props.segmentType}",
+        R ExprComponent, 
+          schema: @props.schema
+          dataSource: @props.dataSource
+          onChange: @handleOrderExprChange
+          table: @props.table
+          types: ["enum", "text", "boolean", "date", "datetime", "number"]
+          aggrStatuses: ["aggregate"]
+          value: @props.segment.orderExpr
+
+        if @props.segment.orderExpr
+          R "div", null,
+            R ui.Radio, value: @props.segment.orderDir or "asc", radioValue: "asc", onChange: @handleOrderDirChange, inline: true,
+              "Ascending"
+            R ui.Radio, value: @props.segment.orderDir or "asc", radioValue: "desc", onChange: @handleOrderDirChange, inline: true,
+              "Descending"
+
   render: ->
     R 'div', null,
       @renderMode()
@@ -154,6 +182,8 @@ module.exports = class SegmentDesignerComponent extends React.Component
         @renderValueAxis()
       if @state.mode
         @renderFilter()
+      if @state.mode == "multiple"
+        @renderOrderExpr()
       if @state.mode
         @renderStyling()
       if @state.mode
