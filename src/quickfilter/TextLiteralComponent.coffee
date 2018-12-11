@@ -75,6 +75,7 @@ module.exports = class TextLiteralComponent extends React.Component
       loadOptions: @getOptions
       onChange: if @props.onChange then @handleSingleChange
       isClearable: true
+      defaultOptions: true
       isDisabled: not @props.onChange?
       noOptionsMessage: () => "Type to search"
       styles: { 
@@ -92,6 +93,7 @@ module.exports = class TextLiteralComponent extends React.Component
       key: JSON.stringify(@props.filters)  # Include to force a change when filters change
       isMulti: true
       loadOptions: @getOptions
+      defaultOptions: true
       onChange: if @props.onChange then @handleMultipleChange
       isClearable: true
       isDisabled: not @props.onChange?
