@@ -128,6 +128,11 @@ There are several styles of block layouts:
     height: auto;
     min-height: auto;
   }
+
+  /* Add a border on printing */
+  .mwater-visualization-block-parent-outer-greybg .mwater-visualization-block {
+    border: solid 1px #AAA;
+  }
 }
 
 
