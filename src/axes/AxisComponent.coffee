@@ -207,6 +207,7 @@ module.exports = class AxisComponent extends AsyncLoadComponent
             { value: "year", label: "Year" }
             { value: "yearmonth", label: "Year/Month" }
             { value: "month", label: "Month" }
+            { value: "week", label: "Week" }
           ]
           onChange: @handleXformTypeChange
       when "datetime"
@@ -217,6 +218,7 @@ module.exports = class AxisComponent extends AsyncLoadComponent
             { value: "year", label: "Year" }
             { value: "yearmonth", label: "Year/Month" }
             { value: "month", label: "Month" }
+            { value: "week", label: "Week" }
           ]
           onChange: @handleXformTypeChange
 

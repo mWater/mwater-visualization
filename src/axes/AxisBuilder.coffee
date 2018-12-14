@@ -18,6 +18,8 @@ xforms = [
   { type: "yearmonth", input: "datetime", output: "date" }
   { type: "month", input: "date", output: "enum" }
   { type: "month", input: "datetime", output: "enum" }
+  { type: "week", input: "date", output: "enum" }
+  { type: "week", input: "datetime", output: "enum" }
 ]
 
 # Small number to prevent width_bucket errors on auto binning with only one value
@@ -230,6 +232,16 @@ module.exports = class AxisBuilder
             compiledExpr
             6
             2
+          ]
+        }
+
+      if options.axis.xform.type == "week"
+        compiledExpr = {
+          type: "op"
+          op: "to_char"
+          exprs: [
+            { type: "op", op: "::date", exprs: [compiledExpr] }
+            "IW"
           ]
         }
 
@@ -461,6 +473,20 @@ module.exports = class AxisBuilder
 
       return categories
 
+    if axis.xform and axis.xform.type == "week"
+      categories = []
+      for week in [1..53]
+        value = "" + week
+        if value.length == 1
+          value = "0" + value
+        categories.push({ value: value, label: value })
+
+      # Add none if needed
+      if _.any(values, (v) -> not v?)
+        categories.push(noneCategory)
+
+      return categories
+
     if axis.xform and axis.xform.type == "year"
       hasNone = _.any(values, (v) -> not v?)
       values = _.compact(values)
@@ -648,7 +674,7 @@ module.exports = class AxisBuilder
       }
 
   isCategorical: (axis) ->
-    nonCategoricalTypes = ["bin","ranges", "date", "yearmonth"]
+    nonCategoricalTypes = ["bin", "ranges", "date", "yearmonth"]
     if axis.xform
       type = axis.xform.type
     else

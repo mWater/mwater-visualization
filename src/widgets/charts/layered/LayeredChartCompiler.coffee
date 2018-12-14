@@ -471,8 +471,8 @@ module.exports = class LayeredChartCompiler
 
     # Limit categories to prevent crashes in C3 (https://github.com/mWater/mwater-visualization/issues/272)
     if xType != "enumset"
-      # Take last ones to make dates prettier
-      categories = _.takeRight(categories, 40)
+      # Take last ones to make dates prettier (enough to show all weeks)
+      categories = _.takeRight(categories, 55) 
       categoryXs = _.indexBy(categories, "value")
 
     # Create map of category value to index

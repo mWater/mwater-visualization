@@ -22,6 +22,7 @@ types:
 `year`: year only e.g. `2015-01-01`. type date
 `yearmonth`: year and month only e.g. `2015-02-01`. type date
 `month`: month only e.g. `02`. type enum
+`week`: ISO week of year e.g. `01` for the first week that contains January 4th
 `ranges`: convert to ranges. type enum. `ranges` is array of { id (unique id), label (optional label), minValue (null for none), maxValue (null for none), minOpen (true for >, false for >=), maxOpen (true for <, false for <=) }
 
 ## Color map
