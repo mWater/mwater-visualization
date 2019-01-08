@@ -137,14 +137,10 @@ module.exports = class PivotChartQueryBuilder
     for segment in segments
       if segment.orderExpr
         # Create where which includes the segments filter (if present) and the "or" of all intersections that are present
-        where = {
-          type: "op"
-          op: "and"
-          exprs: []
-        }
+        whereClauses = []
 
         if segment.filter
-          where.exprs.push(exprCompiler.compileExpr(expr: segment.filter, tableAlias: "main"))
+          whereClauses.push(exprCompiler.compileExpr(expr: segment.filter, tableAlias: "main"))
 
         # Get all intersection filters
         intersectionFilters = []
@@ -155,18 +151,38 @@ module.exports = class PivotChartQueryBuilder
               intersectionFilters.push(filter)
         
         if intersectionFilters.length > 0
-          where.exprs.push({
+          whereClauses.push({
             type: "op"
             op: "or"
             exprs: _.map(intersectionFilters, (filter) => exprCompiler.compileExpr(expr: filter, tableAlias: "main"))
           })
+
+        if design.filter
+          whereClauses.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "main"))
+
+        # Add extra filters
+        if extraFilters and extraFilters.length > 0
+          # Get relevant filters
+          relevantFilters = _.where(extraFilters, table: design.table)
+
+          # Add filters
+          for filter in relevantFilters
+            whereClauses.push(injectTableAlias(filter.jsonql, "main"))
+
+        whereClauses = _.compact(whereClauses)
+
+        where = null
+        if whereClauses.length == 1
+          where = whereClauses[0]
+        else if whereClauses.length > 1
+          where = { type: "op", op: "and", exprs: whereClauses }
 
         # Create query to get ordering
         queries[segment.id] = {
           type: "query"
           selects: [{ type: "select", expr: @axisBuilder.compileAxis(axis: segment.valueAxis, tableAlias: "main"), alias: "value" }]
           from: exprCompiler.compileTable(design.table, "main")
-          where: if where.exprs.length > 0 then where else null
+          where: where
           groupBy: [1]
           orderBy: [{ expr: exprCompiler.compileExpr(expr: segment.orderExpr, tableAlias: "main"), direction: segment.orderDir or "asc" }]
         }

@@ -287,3 +287,32 @@ describe "PivotChartQueryBuilder", ->
       orderBy: [{ expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, direction: "desc" }]
     }
 
+  it "creates ordered single query with extraFilters", ->
+    design = {
+      table: "t1"
+      rows: [
+        { id: "r1", valueAxis: @axisEnum, orderExpr: @exprNumberSum, orderDir: "desc" }
+      ]
+      columns: [
+        { id: "c1", valueAxis: @axisText }
+      ]
+      intersections: {
+        "r1:c1": {
+          valueAxis: @axisNumberSum
+        }
+      }
+    }
+
+    queries = @qb.createQueries(design, [{ table: "t1", jsonql: { type: "literal", value: false }}, { table: "t2", jsonql: { type: "literal", value: true }}])
+
+    query = queries["r1"]
+    compare query, {
+      type: "query"
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "value" }
+      ]
+      from: { type: "table", table: "t1", alias: "main" }
+      where: { type: "literal", value: false }
+      groupBy: [1]
+      orderBy: [{ expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, direction: "desc" }]
+    }
