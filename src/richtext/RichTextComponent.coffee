@@ -127,7 +127,7 @@ module.exports = class RichTextComponent extends React.Component
     @props.itemsHtmlConverter.convertItemsToHtml(@props.items)
 
   renderPalette: ->
-    return R FloatAffixed, edges: "over,under,left,right", align: "center", render: @renderPaletteContent
+    return R FloatAffixed, style: {zIndex: 9999}, edges: "over,under,left,right", align: "center", render: @renderPaletteContent
 
   renderPaletteContent: (schemeName, {edges}) =>
     return R 'div', key: "palette", className: "mwater-visualization-text-palette", ref: ((c) => @paletteComponent = c),
