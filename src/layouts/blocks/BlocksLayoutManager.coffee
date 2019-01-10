@@ -14,6 +14,9 @@ module.exports = class BlocksLayoutManager extends LayoutManager
   #  renderWidget: called with ({ id:, type:, design:, onDesignChange:, width:, height:  })
   #  style: style to use for layout. null for default
   #  disableMaps: true to disable maps
+  #  clipboard: clipboard contents
+  #  onClipboardChange: called when clipboard is changed
+  #  cantPasteMesssage: message to display if clipboard can't be pasted into current dashboard
   renderLayout: (options) ->
     BlocksDisplayComponent = require './BlocksDisplayComponent'
     return R BlocksDisplayComponent,
@@ -22,6 +25,9 @@ module.exports = class BlocksLayoutManager extends LayoutManager
       style: options.style
       renderWidget: options.renderWidget
       disableMaps: options.disableMaps
+      clipboard: options.clipboard
+      onClipboardChange: options.onClipboardChange
+      cantPasteMessage: options.cantPasteMessage
 
   # Tests if dashboard has any items
   isEmpty: (items) ->

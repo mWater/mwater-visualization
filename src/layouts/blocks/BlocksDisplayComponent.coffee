@@ -8,12 +8,17 @@ DraggableBlockComponent = require "./DraggableBlockComponent"
 DecoratedBlockComponent = require '../DecoratedBlockComponent'
 
 PaletteItemComponent = require './PaletteItemComponent'
+ClipboardPaletteItemComponent = require './ClipboardPaletteItemComponent'
 blockUtils = require './blockUtils'
 
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
 HorizontalBlockComponent = require './HorizontalBlockComponent'
 
+###
+Renders the complete layout of the blocks and also optionally a palette to the left
+that can be used to drag new items into the layout. Palette is only displayed if onItemsChange is not null
+###
 class BlocksDisplayComponent extends React.Component
   @propTypes:
     items: PropTypes.object.isRequired
@@ -32,6 +37,11 @@ class BlocksDisplayComponent extends React.Component
 
     # True to prevent maps
     disableMaps: PropTypes.bool
+
+    # Including onClipboardChange adds a clipboard palette item that can be used to copy and paste widgets
+    clipboard: PropTypes.object
+    onClipboardChange: PropTypes.func
+    cantPasteMessage: PropTypes.string  # Set if can't paste current contents (usually because missing extra tables)
 
   handleBlockDrop: (sourceBlock, targetBlock, side) =>
     # Remove source from items
@@ -190,7 +200,11 @@ class BlocksDisplayComponent extends React.Component
           createItem: @createBlockItem({ type: "widget", widgetType: "TOC", design: { numbering: false, borderWeight: 2, header: "Contents" } })
           title: R 'i', className: "fa fa-list-ol"
           subtitle: "TOC"
-
+        if @props.onClipboardChange
+          R ClipboardPaletteItemComponent,
+            clipboard: @props.clipboard
+            onClipboardChange: @props.onClipboardChange
+            cantPasteMessage: @props.cantPasteMessage
 
   render: ->
     if @props.onItemsChange

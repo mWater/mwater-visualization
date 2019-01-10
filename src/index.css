@@ -294,6 +294,7 @@
   width: 72px;
   text-align: center;
   display: inline-block;
+  position: relative;
 }
 
 .mwater-visualization-text-palette {
@@ -316,6 +317,14 @@
   background-color: #2485dd;
 }
 
+.mwater-visualization-palette-item.disabled {
+  cursor: default !important;
+}
+
+.mwater-visualization-palette-item.disabled:hover {
+  background-color: #4B5155;
+}
+
 .mwater-visualization-palette-item > .title {
   color: white;
   text-align: center;
@@ -332,6 +341,32 @@
 .mwater-visualization-palette-item:hover {
   cursor: move;
   background-color: #2485dd;
+}
+
+/* Tooltip text */
+.mwater-visualization-palette-item .tooltiptext {
+  visibility: hidden;
+  width: 140px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 5px;
+  border-radius: 6px;
+  font-size: 8pt;
+ 
+  position: absolute;
+  z-index: 1;
+}
+
+.mwater-visualization-palette-item:hover .tooltiptext {
+  visibility: visible;
+}
+
+.mwater-visualization-palette-item .clearclipboard {
+  position: absolute;
+  top: -3px;
+  right: 1px;
+  cursor: pointer;
 }
 
 .dropzone {

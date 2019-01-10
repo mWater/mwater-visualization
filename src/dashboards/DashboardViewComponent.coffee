@@ -65,6 +65,17 @@ module.exports = class DashboardViewComponent extends React.Component
         @handleScrollToTOCEntry(@props.initialTOCEntryScroll.widgetId, @props.initialTOCEntryScroll.entryId)
       , 0
 
+    # Add listener to localstorage to update clipboard display
+    window.addEventListener 'storage', @handleStorageChange
+
+  componentWillUnmount: ->
+    # Remove listener
+    window.addEventListener 'storage', @handleStorageChange
+
+  handleStorageChange: =>
+    @forceUpdate()
+
+
   handleScopeChange: (id, scope) => 
     @setState(widgetScoper: @state.widgetScoper.applyScope(id, scope))
 
@@ -74,6 +85,24 @@ module.exports = class DashboardViewComponent extends React.Component
   handleItemsChange: (items) =>
     design = _.extend({}, @props.design, items: items)
     @props.onDesignChange(design)
+
+  # Handle a change of the clipboard and determine which tables the clipboard block uses
+  handleClipboardChange: (block) => 
+    # If empty, just set it
+    if not block
+      window.localStorage.removeItem("DashboardViewComponent.clipboard")
+      @forceUpdate()
+      return
+    
+    # Determine which tables are used (just peek for any uses of the table name. Not ideal, but easy)
+    tables = _.pluck(_.filter(@props.schema.getTables(), (table) => JSON.stringify(block).includes(JSON.stringify(table.id))), "id")
+
+    # Store in clipboard
+    window.localStorage.setItem("DashboardViewComponent.clipboard", JSON.stringify({ block: block, tables: tables }))
+    @forceUpdate()
+
+  getClipboardContents: ->
+    return JSON.parse(window.localStorage.getItem("DashboardViewComponent.clipboard") or "null")
 
   # Call to print the dashboard
   print: =>
@@ -126,6 +155,13 @@ module.exports = class DashboardViewComponent extends React.Component
     # Determine toc entries
     tocEntries = @getTOCEntries(layoutManager)
 
+    # Get clipboard contents
+    clipboardContents = @getClipboardContents()
+
+    # Check if can't paste because of missing table
+    if clipboardContents and not _.all(clipboardContents.tables, (table) => @props.schema.getTable(table))
+      cantPasteMessage = "Dashboard is missing one or more data sources for the copied item."
+
     renderWidget = (options) =>
       widget = WidgetFactory.createWidget(options.type)
 
@@ -175,4 +211,7 @@ module.exports = class DashboardViewComponent extends React.Component
         onItemsChange: if @props.onDesignChange? then @handleItemsChange
         style: @props.design.style
         renderWidget: renderWidget
+        clipboard: clipboardContents?.block
+        onClipboardChange: @handleClipboardChange
+        cantPasteMessage: cantPasteMessage
       })
