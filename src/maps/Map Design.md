@@ -4,7 +4,8 @@ Maps are stored as a base layer, a series of layers and filters.
 
 ```
 {
-	baseLayer: "bing_road"/"bing_aerial"
+	baseLayer: "bing_road"/"bing_aerial"/"cartodb_positron"/"cartodb_dark_matter"/"blank"
+	baseLayerOpacity: 0-1 opacity. null/undefined = 1
 	layerViews: [ see layer view below ]
 	filters: filter expression indexed by table. e.g. { sometable: logical expression, etc. }
 	bounds: bounds as { w:, n:, e:, s: }

@@ -228,6 +228,7 @@ module.exports = class MapViewComponent extends React.Component
         ref: (c) => @leafletMap = c
         initialBounds: @props.design.bounds
         baseLayerId: @props.design.baseLayer
+        baseLayerOpacity: @props.design.baseLayerOpacity
         layers: leafletLayers
         width: @props.width
         height: @props.height

@@ -14,7 +14,9 @@ require('leaflet-loading')
 # Leaflet map component that displays a base layer, a tile layer and an optional interactivity layer
 module.exports = class LeafletMapComponent extends React.Component
   @propTypes:
-    baseLayerId: PropTypes.string.isRequired # "bing_road", "bing_aerial", "cartodb_positron", "cartodb_dark_matter"
+    baseLayerId: PropTypes.string.isRequired # "bing_road", "bing_aerial", "cartodb_positron", "cartodb_dark_matter", "white"
+    baseLayerOpacity: PropTypes.number       # Optional opacity 0-1
+
     initialBounds: PropTypes.shape({
       w: PropTypes.number.isRequired
       n: PropTypes.number.isRequired
@@ -227,7 +229,7 @@ module.exports = class LeafletMapComponent extends React.Component
         .openOn(@map)
 
     # Update base layer
-    if not prevProps or @props.baseLayerId != prevProps.baseLayerId
+    if not prevProps or @props.baseLayerId != prevProps.baseLayerId or @props.baseLayerOpacity != prevProps.baseLayerOpacity
       if @baseLayer
         @map.removeLayer(@baseLayer)
         @baseLayer = null
@@ -250,13 +252,16 @@ module.exports = class LeafletMapComponent extends React.Component
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>'
           })
 
-      @map.addLayer(@baseLayer)
+      if @baseLayer
+        @map.addLayer(@baseLayer)
+        if @props.baseLayerOpacity?
+          @baseLayer.setOpacity(@props.baseLayerOpacity)
 
-      if @props.extraAttribution
-        @baseLayer._map.attributionControl.addAttribution(@props.extraAttribution)
+        if @props.extraAttribution
+          @baseLayer._map.attributionControl.addAttribution(@props.extraAttribution)
 
-      # Base layers are always at back
-      @baseLayer.bringToBack()
+        # Base layers are always at back
+        @baseLayer.bringToBack()
 
     # Update layers
     if not prevProps or JSON.stringify(_.omit(@props.layers, "onGridClick", "onGridHover")) != JSON.stringify(_.omit(prevProps.layers, "onGridClick", "onGridHover")) # TODO naive

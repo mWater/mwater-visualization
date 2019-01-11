@@ -43,13 +43,9 @@ module.exports = class MapDesignerComponent extends React.Component
 
   renderOptionsTab: ->
     R 'div', null,
-      R 'div', className: "form-group",
-        R 'label', className: "text-muted", 
-          "Map Style"
-  
-        R BaseLayerDesignerComponent,
-          design: @props.design
-          onDesignChange: @props.onDesignChange
+      R BaseLayerDesignerComponent,
+        design: @props.design
+        onDesignChange: @props.onDesignChange
 
       R CheckboxComponent, 
         checked: @props.design.autoBounds
