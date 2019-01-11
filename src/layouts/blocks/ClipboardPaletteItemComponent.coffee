@@ -35,7 +35,7 @@ class ClipboardPaletteItemComponent extends React.Component
             R 'div', className: "tooltiptext", @props.cantPasteMessage
           else
             R 'div', className: "tooltiptext", 
-              "Clipboard allows copying widgets even between dashboards. Drop a widget on it to copy."
+              "Clipboard allows copying widgets for pasting on this dashboard or another dashboard. Drag a widget on to this clipboard to copy it."
           if @props.clipboard
             R 'div', className: "clearclipboard", onClick: @handleClear,
               R 'i', className: "fa fa-trash-o"

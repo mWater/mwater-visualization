@@ -3,6 +3,7 @@ _ = require 'lodash'
 React = require 'react'
 R = React.createElement
 Rcslider = require('rc-slider').default
+PopoverHelpComponent = require 'react-library/lib/PopoverHelpComponent'
 
 # Designer for config
 module.exports = class BaseLayerDesignerComponent extends React.Component
@@ -65,5 +66,9 @@ module.exports = class BaseLayerDesignerComponent extends React.Component
           @renderBaseLayer("bing_road", "Roads")
           @renderBaseLayer("bing_aerial", "Satellite")
           @renderBaseLayer("blank", "Blank")
+          " "
+          R PopoverHelpComponent, placement: "bottom",
+            'Blank map backgrounds work best with chloropleth map layers'
+
   
         @renderOpacityControl()
