@@ -30,13 +30,14 @@ class ClipboardPaletteItemComponent extends React.Component
             if @props.isOver then R('i', className: "fa fa-clone") else R('i', className: "fa fa-clipboard")
           R 'div', className: "subtitle", key: "subtitle",
             if @props.isOver then "Copy" else "Clipboard"
-          if not @props.clipboard
-            R 'div', className: "tooltiptext", "Clipboard is empty. Drop a widget onto it to copy."
           if @props.cantPasteMessage
             R 'div', className: "tooltiptext", @props.cantPasteMessage
+          else
+            R 'div', className: "tooltiptext", 
+              "Clipboard allows copying widgets even between dashboards. Drop a widget on it to copy."
           if @props.clipboard
             R 'div', className: "clearclipboard", onClick: @handleClear,
-              R 'i', className: "fa fa-times-circle"
+              R 'i', className: "fa fa-trash-o"
     )
 
     if @props.clipboard and not @props.cantPasteMessage

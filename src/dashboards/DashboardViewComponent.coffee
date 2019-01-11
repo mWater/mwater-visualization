@@ -160,7 +160,7 @@ module.exports = class DashboardViewComponent extends React.Component
 
     # Check if can't paste because of missing table
     if clipboardContents and not _.all(clipboardContents.tables, (table) => @props.schema.getTable(table))
-      cantPasteMessage = "Dashboard is missing one or more data sources for the copied item."
+      cantPasteMessage = "Dashboard is missing one or more data sources needed for the copied item."
 
     renderWidget = (options) =>
       widget = WidgetFactory.createWidget(options.type)

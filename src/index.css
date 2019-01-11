@@ -364,9 +364,10 @@
 
 .mwater-visualization-palette-item .clearclipboard {
   position: absolute;
-  top: -3px;
-  right: 1px;
+  top: 0px;
+  right: 3px;
   cursor: pointer;
+  color: #AAA;
 }
 
 .dropzone {
