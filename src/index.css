@@ -282,21 +282,77 @@
 .mwater-visualization-palette {
   background-color: #363b3e;
   padding: 5px;
-  padding-top: 10px;
+  padding-top: 6px;
 }
 
 .mwater-visualization-palette-item {
   cursor: move;
   background-color: #4B5155;
-  margin: 7px;
-  border-radius: 5px;
+  margin: 5px;
+  border-radius: 3px;
   color: white;
-  width: 72px;
+  width: 55px;
   text-align: center;
   display: inline-block;
   position: relative;
 }
 
+.mwater-visualization-palette-item.disabled {
+  cursor: default !important;
+}
+
+.mwater-visualization-palette-item.disabled:hover {
+  background-color: #4B5155;
+}
+
+.mwater-visualization-palette-item > .title {
+  color: white;
+  text-align: center;
+  font-size: 14pt;
+  padding-top: 3px;
+}
+
+.mwater-visualization-palette-item > .subtitle {
+  color: #DDD;
+  text-align: center;
+  padding-bottom: 3px;
+  font-size: 8pt;
+}
+
+.mwater-visualization-palette-item:hover {
+  cursor: move;
+  background-color: #2485dd;
+}
+
+.mwater-visualization-palette-item .tooltiptext {
+  visibility: hidden;
+  width: 140px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 5px;
+  border-radius: 6px;
+  font-size: 8pt;
+  position: absolute;
+  left: 54px;
+  top: 8px;
+  z-index: 1;
+}
+
+.mwater-visualization-palette-item:hover .tooltiptext {
+  visibility: visible;
+}
+
+.mwater-visualization-palette-item .clearclipboard {
+  position: absolute;
+  top: 1px;
+  right: 3px;
+  cursor: pointer;
+  color: #BBB;
+  font-size: 12px;
+}
+
+/* For richtext control palette */
 .mwater-visualization-text-palette {
   background-color: #4B5155;
   border-radius: 3px;
@@ -317,58 +373,6 @@
   background-color: #2485dd;
 }
 
-.mwater-visualization-palette-item.disabled {
-  cursor: default !important;
-}
-
-.mwater-visualization-palette-item.disabled:hover {
-  background-color: #4B5155;
-}
-
-.mwater-visualization-palette-item > .title {
-  color: white;
-  text-align: center;
-  font-size: 18pt;
-  padding-top: 5px;
-}
-
-.mwater-visualization-palette-item > .subtitle {
-  color: #DDD;
-  text-align: center;
-  padding-bottom: 5px;
-}
-
-.mwater-visualization-palette-item:hover {
-  cursor: move;
-  background-color: #2485dd;
-}
-
-/* Tooltip text */
-.mwater-visualization-palette-item .tooltiptext {
-  visibility: hidden;
-  width: 140px;
-  background-color: black;
-  color: #fff;
-  text-align: center;
-  padding: 5px 5px;
-  border-radius: 6px;
-  font-size: 8pt;
- 
-  position: absolute;
-  z-index: 1;
-}
-
-.mwater-visualization-palette-item:hover .tooltiptext {
-  visibility: visible;
-}
-
-.mwater-visualization-palette-item .clearclipboard {
-  position: absolute;
-  top: 0px;
-  right: 3px;
-  cursor: pointer;
-  color: #AAA;
-}
 
 .dropzone {
   width: 100%;

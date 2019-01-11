@@ -19,7 +19,8 @@ class ClipboardPaletteItemComponent extends React.Component
     return { block: _.extend({}, @props.clipboard, id: uuid()) }
 
   handleClear: =>
-    @props.onClipboardChange(null)
+    if confirm("Clear clipboard?")
+      @props.onClipboardChange(null)
 
   render: ->
     elem = @props.connectDropTarget(
