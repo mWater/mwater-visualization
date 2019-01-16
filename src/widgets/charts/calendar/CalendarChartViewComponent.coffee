@@ -1,3 +1,4 @@
+$ = require 'jquery'
 PropTypes = require('prop-types')
 _ = require 'lodash'
 React = require 'react'

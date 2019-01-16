@@ -1,3 +1,4 @@
+$ = require 'jquery'
 querystring = require 'querystring'
 DatagridDataSource = require './DatagridDataSource'
 

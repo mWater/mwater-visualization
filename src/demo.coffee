@@ -3,6 +3,7 @@ React = require 'react'
 ReactDOM = require 'react-dom'
 R = React.createElement
 querystring = require 'querystring'
+$ = require 'jquery'
 
 Schema = require('mwater-expressions').Schema
 DataSource = require('mwater-expressions').DataSource
