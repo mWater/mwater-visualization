@@ -10,6 +10,8 @@ DataSource = require('mwater-expressions').DataSource
 
 visualization = require './index'
 
+require('./index.css')
+
 # CalendarChartViewComponent = require './widgets/charts/CalendarChartViewComponent'
 
 MWaterLoaderComponent = require './MWaterLoaderComponent'
