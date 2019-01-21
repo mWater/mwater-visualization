@@ -14,7 +14,6 @@ ReorderableListComponent = require("react-library/lib/reorderable/ReorderableLis
 module.exports = class RangesComponent extends React.Component
   @propTypes:
     schema: PropTypes.object.isRequired 
-    dataSource: PropTypes.object.isRequired
 
     expr: PropTypes.object.isRequired   # Expression for computing min/max
     xform: PropTypes.object.isRequired

@@ -14,7 +14,6 @@ ReorderableListComponent = require("react-library/lib/reorderable/ReorderableLis
 module.exports = class CategoryMapComponent extends React.Component
   @propTypes:
     schema: PropTypes.object.isRequired
-    dataSource: PropTypes.object.isRequired
     axis: PropTypes.object.isRequired
     onChange: PropTypes.func.isRequired
     categories: PropTypes.array

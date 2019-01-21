@@ -34,6 +34,7 @@ module.exports = class AxisComponent extends AsyncLoadComponent
     required: PropTypes.bool  # Makes this a required value
     showColorMap: PropTypes.bool # Shows the color map
     reorderable: PropTypes.bool # Is the draw order reorderable
+    autosetColors: PropTypes.bool # Should a color map be automatically created from a default palette
     allowExcludedValues: PropTypes.bool # True to allow excluding of values via checkboxes
     defaultColor: PropTypes.string
     showFormat: PropTypes.bool  # Show format control for numeric values
@@ -42,6 +43,7 @@ module.exports = class AxisComponent extends AsyncLoadComponent
   @defaultProps:
     reorderable: false
     allowExcludedValues: false
+    autosetColors: true
 
   @contextTypes:
     locale: PropTypes.string  # e.g. "en"
@@ -173,7 +175,6 @@ module.exports = class AxisComponent extends AsyncLoadComponent
       if axis.xform.type == "ranges"
         comp = R(RangesComponent,
           schema: @props.schema
-          dataSource: @props.dataSource
           expr: axis.expr
           xform: axis.xform
           onChange: @handleXformChange)
@@ -230,13 +231,14 @@ module.exports = class AxisComponent extends AsyncLoadComponent
       R('br')
       R AxisColorEditorComponent,
         schema: @props.schema
-        dataSource: @props.dataSource
         axis: axis
         categories: @state.categories
         onChange: @props.onChange
         reorderable: @props.reorderable
         defaultColor: @props.defaultColor
         allowExcludedValues: @props.allowExcludedValues
+        autosetColors: @props.autosetColors
+        initiallyExpanded: true
       ]
 
   renderExcludedValues: (axis) ->
@@ -252,7 +254,6 @@ module.exports = class AxisComponent extends AsyncLoadComponent
       R('br')
       R CategoryMapComponent,
         schema: @props.schema
-        dataSource: @props.dataSource
         axis: axis
         onChange: @props.onChange
         categories: @state.categories

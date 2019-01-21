@@ -22,6 +22,7 @@ layer:
   filter: optional logical expression to filter by
   color: color of layer (e.g. #FF8800)
   cumulative: true to use running total of values
+  xColorMap: true if has a color map for x-axis
 
 axes:
   x: x axis

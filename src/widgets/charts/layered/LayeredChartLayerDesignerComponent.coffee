@@ -9,8 +9,9 @@ ExprCompiler = require('mwater-expressions').ExprCompiler
 ColorComponent = require '../../../ColorComponent'
 LayeredChartUtils = require './LayeredChartUtils'
 LayeredChartCompiler = require './LayeredChartCompiler'
-ui = require '../../../UIComponents'
+uiComponents = require '../../../UIComponents'
 TableSelectComponent = require '../../../TableSelectComponent'
+ui = require('react-library/lib/bootstrap')
 
 module.exports = class LayeredChartLayerDesignerComponent extends React.Component
   @propTypes: 
@@ -87,6 +88,10 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
 
     @updateAxes(axesChanges)
 
+  handleXColorMapChange: (xColorMap) =>
+    layer = @props.design.layers[@props.index]
+    @updateLayer({ xColorMap: xColorMap })
+
   handleColorAxisChange: (axis) => 
     layer = @props.design.layers[@props.index]
     axesChanges ={ color: axis }
@@ -122,7 +127,7 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
   renderTable: ->
     layer = @props.design.layers[@props.index]
 
-    R ui.SectionComponent, icon: "fa-database", label: "Data Source",
+    R uiComponents.SectionComponent, icon: "fa-database", label: "Data Source",
       R TableSelectComponent, { 
         schema: @props.schema
         value: layer.table
@@ -149,7 +154,9 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
       if jsonql
         filters.push({ table: layer.filter.table, jsonql: jsonql })
 
-    R ui.SectionComponent, label: title,
+    categoricalX = new LayeredChartCompiler(schema: @props.schema).isCategoricalX(@props.design)
+
+    R uiComponents.SectionComponent, label: title,
       R(AxisComponent, 
         schema: @props.schema
         dataSource: @props.dataSource
@@ -160,9 +167,17 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
         value: layer.axes.x, 
         onChange: @handleXAxisChange
         filters: filters
+        # Only show x color map if no color axis and is categorical and enabled
+        showColorMap: layer.xColorMap and categoricalX and not layer.axes.color
+        autosetColors: false
         # Categorical X can exclude values
-        allowExcludedValues: new LayeredChartCompiler(schema: @props.schema).isCategoricalX(@props.design)
-        )
+        allowExcludedValues: categoricalX
+      )
+
+      # Allow toggling of colors
+      if categoricalX and not layer.axes.color
+        R ui.Checkbox, value: layer.xColorMap, onChange: @handleXColorMapChange, 
+          "Set Individual Colors"
 
   renderColorAxis: ->
     layer = @props.design.layers[@props.index]

@@ -13,7 +13,6 @@ AxisBuilder = require './AxisBuilder'
 module.exports = class AxisColorEditorComponent extends React.Component
   @propTypes:
     schema: PropTypes.object.isRequired
-    dataSource: PropTypes.object.isRequired
     axis: PropTypes.object.isRequired
     onChange: PropTypes.func.isRequired # Called with new axis
     categories: PropTypes.array # Categories of the axis
@@ -21,9 +20,11 @@ module.exports = class AxisColorEditorComponent extends React.Component
     defaultColor: PropTypes.string
     allowExcludedValues: PropTypes.bool # True to allow excluding of values via checkboxes
     initiallyExpanded: PropTypes.bool  # True to start values expanded
+    autosetColors: PropTypes.bool      # True to automatically set the colors if blank
 
   @defaultProps:
     reorderable: false
+    autosetColors: true
 
   constructor: (props) ->
     super(props)
@@ -33,27 +34,48 @@ module.exports = class AxisColorEditorComponent extends React.Component
     }
 
   componentWillMount: ->
-    @updateColorMap(@props.categories)
+    @updateColorMap()
 
   componentDidUpdate: ->
-    @updateColorMap(@props.categories)
+    @updateColorMap()
 
   # Update color map if categories no longer match
-  updateColorMap: (categories) ->
+  updateColorMap: ->
     axisBuilder = new AxisBuilder(schema: @props.schema)
 
     # If no categories, can't do anything
-    if not categories
+    if not @props.categories
       return
 
     # If no color map or color map values have changed
-    if not @props.axis.colorMap or not _.isEqual(_.pluck(@props.axis.colorMap, "value").sort(), _.pluck(categories, "value").sort())
-      colorMap = ColorSchemeFactory.createColorMapForCategories(categories, axisBuilder.isCategorical(@props.axis))
+    if not @props.axis.colorMap or not _.isEqual(_.pluck(@props.axis.colorMap, "value").sort(), _.pluck(@props.categories, "value").sort())
+      if @props.autosetColors
+        colorMap = ColorSchemeFactory.createColorMapForCategories(@props.categories, axisBuilder.isCategorical(@props.axis))
+      else 
+        # Keep existing 
+        existing = _.indexBy(@props.axis.colorMap or [], "value")
+        colorMap = _.map @props.categories, (category, i) ->
+          {
+            value: category.value
+            color: if existing[category.value] then existing[category.value].color else null
+          }
+      
       @handlePaletteChange(colorMap)
       @setState(mode: "normal")
 
   handleSelectPalette: =>
     @setState(mode: "palette")
+
+  handleResetPalette: =>
+    # Completely reset
+    colorMap = _.map @props.categories, (category, i) ->
+      {
+        value: category.value
+        color: null
+      }
+      
+    @handlePaletteChange(colorMap)
+    @setState(mode: "normal")
 
   handlePaletteChange: (palette) =>
     @props.onChange(update(@props.axis, { colorMap: { $set: palette }, drawOrder: { $set: _.pluck(palette, "value") }}))
@@ -87,12 +109,13 @@ module.exports = class AxisColorEditorComponent extends React.Component
         R 'div', null,
           R 'p', null,
             R 'a', style: { cursor: "pointer" }, onClick: @handleSelectPalette, key: "select-palette", "Change color scheme"
+            if not @props.autosetColors
+              R 'a', style: { cursor: "pointer", marginLeft: 10 }, onClick: @handleResetPalette, key: "reset-palette", "Reset colors"
           if @props.axis.colorMap
             R 'div', key: "selected-palette",
               R 'div', null,
                 R CategoryMapComponent,
                   schema: @props.schema
-                  dataSource: @props.dataSource
                   axis: @props.axis
                   onChange: @props.onChange
                   categories: @props.categories

@@ -124,6 +124,7 @@ module.exports = class LayeredChartCompiler
         colors: c3Data.colors
         labels: options.design.labels
         order: c3Data.order
+        color: c3Data.color
       }
       # Hide if one layer with no color axis
       legend: { hide: (options.design.layers.length == 1 and not options.design.layers[0].axes.color) }
@@ -447,6 +448,7 @@ module.exports = class LayeredChartCompiler
     xs = {}
     groups = []
     format = {}
+    colorOverrides = {}  # Mapping of "<layer>:<index>" to color if overridden
 
     # Get all values of the x-axis, taking into account values that might be missing
     xAxis = design.layers[0].axes.x
@@ -545,7 +547,7 @@ module.exports = class LayeredChartCompiler
             if index?
               column[index] = row.y
               dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
-
+              
           # Fill in nulls if cumulative
           if layer.cumulative
             for value, i in column
@@ -578,6 +580,12 @@ module.exports = class LayeredChartCompiler
           index = categoryMap[row.x]
           column[index] = row.y
           dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
+
+          # Get color override
+          if layer.xColorMap 
+            color = @axisBuilder.getValueColor(layer.axes.x, row.x)
+            if color
+              colorOverrides["#{series}:#{index}"] = color
 
         columns.push([series].concat(column))
 
@@ -642,6 +650,18 @@ module.exports = class LayeredChartCompiler
       titleText: @compileTitleText(design, locale)
       order: null # Use order of data for stacking
       format: format
+      color: (color, d) =>
+        console.log("Color: #{color} #{JSON.stringify(d)}")
+        # Handle overall series color which calls with a non-object for d
+        if typeof(d) != "object"
+          # Overall series is not changed in color
+          return color
+
+        key = "#{d.id}:#{d.index}"
+        if colorOverrides[key]
+          return colorOverrides[key]
+        
+        return color
     }
 
   # Compile an expression
