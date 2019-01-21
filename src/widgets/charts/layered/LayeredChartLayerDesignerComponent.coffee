@@ -174,11 +174,6 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
         allowExcludedValues: categoricalX
       )
 
-      # Allow toggling of colors
-      if categoricalX and not layer.axes.color
-        R ui.Checkbox, value: layer.xColorMap, onChange: @handleXColorMapChange, 
-          "Set Individual Colors"
-
   renderColorAxis: ->
     layer = @props.design.layers[@props.index]
     if not layer.table
@@ -261,11 +256,17 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
     if not layer.table 
       return
 
+    categoricalX = new LayeredChartCompiler(schema: @props.schema).isCategoricalX(@props.design)
+
     return R 'div', className: "form-group",
       R 'label', className: "text-muted", 
         if layer.axes.color then "Default Color" else "Color"
       R 'div', style: { marginLeft: 8 }, 
         R(ColorComponent, color: layer.color, onChange: @handleColorChange)
+        # Allow toggling of colors
+        if layer.axes.x and categoricalX and not layer.axes.color
+          R ui.Checkbox, value: layer.xColorMap, onChange: @handleXColorMapChange, 
+            "Set Individual Colors"
 
   renderFilter: ->
     layer = @props.design.layers[@props.index]

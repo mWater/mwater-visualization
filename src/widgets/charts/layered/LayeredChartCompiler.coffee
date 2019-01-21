@@ -651,7 +651,6 @@ module.exports = class LayeredChartCompiler
       order: null # Use order of data for stacking
       format: format
       color: (color, d) =>
-        console.log("Color: #{color} #{JSON.stringify(d)}")
         # Handle overall series color which calls with a non-object for d
         if typeof(d) != "object"
           # Overall series is not changed in color
