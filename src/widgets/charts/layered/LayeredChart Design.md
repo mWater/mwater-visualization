@@ -11,7 +11,7 @@
   labels: true to show labels on values
   header: text widget design to display in header (replaces title)
   footer: text widget design to display in header
-  yThresholds: array of { value:, label: } thresholds to draw on y-axis. Only for non-polar
+  yThresholds: array of { value:, label:, color: } thresholds to draw on y-axis. Only for non-polar. Color takes effect if y > threshold
 
 layer:
   type: bar/line/spline/scatter/area/pie/donut (overrides main one)

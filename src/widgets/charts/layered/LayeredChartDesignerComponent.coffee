@@ -5,6 +5,7 @@ LayeredChartLayerDesignerComponent = require './LayeredChartLayerDesignerCompone
 LayeredChartCompiler = require './LayeredChartCompiler'
 TabbedComponent = require('react-library/lib/TabbedComponent')
 uiComponents = require '../../../UIComponents'
+ColorComponent = require '../../../ColorComponent'
 ui = require('react-library/lib/bootstrap')
 
 module.exports = class LayeredChartDesignerComponent extends React.Component
@@ -186,7 +187,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
     tabs.push {
       id: "design"
       label: "Design"
-      elem: R 'div', null, 
+      elem: R 'div', style: { paddingBottom: 200 }, 
         R('br')
         @renderType()
         @renderLayers()
@@ -209,12 +210,12 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
 # Thresholds are lines that are added at certain values
 class ThresholdsComponent extends React.Component
   @propTypes: 
-    thresholds: PropTypes.arrayOf(PropTypes.shape(value: PropTypes.number, label: PropTypes.string))
+    thresholds: PropTypes.arrayOf(PropTypes.shape(value: PropTypes.number, label: PropTypes.string, highlightColor: PropTypes.string))
     onThresholdsChange: PropTypes.func.isRequired
 
   handleAdd: =>
     thresholds = (@props.thresholds or []).slice()
-    thresholds.push({ value: null, label: "" })
+    thresholds.push({ value: null, label: "", highlightColor: null })
     @props.onThresholdsChange(thresholds)
 
   handleChange: (index, value) =>
@@ -238,7 +239,7 @@ class ThresholdsComponent extends React.Component
 
 class ThresholdComponent extends React.Component
   @propTypes: 
-    threshold: PropTypes.shape(value: PropTypes.number, label: PropTypes.string).isRequired
+    threshold: PropTypes.shape(value: PropTypes.number, label: PropTypes.string, highlightColor: PropTypes.string).isRequired
     onThresholdChange: PropTypes.func.isRequired
     onRemove: PropTypes.func.isRequired
 
@@ -250,10 +251,15 @@ class ThresholdComponent extends React.Component
       R LabeledInlineComponent, key: "label", label: "Label:",
         R ui.TextInput, style: { display: "inline-block", width: "8em" }, size: "sm", value: @props.threshold.label, onChange: (v) => @props.onThresholdChange(_.extend({}, @props.threshold, label: v))
       "  "
+      R LabeledInlineComponent, key: "color", label: "Highlight color:",
+        R 'div', style: { verticalAlign: "middle", display: "inline-block" },
+          R ColorComponent, color: @props.threshold.highlightColor, onChange: (v) => @props.onThresholdChange(_.extend({}, @props.threshold, highlightColor: v))
+      "  "
       R 'button', className: "btn btn-xs btn-link", onClick: @props.onRemove, 
         R 'i', className: "fa fa-remove"
 
 LabeledInlineComponent = (props) ->
   R 'div', style: { display: "inline-block" },
     R 'label', className: "text-muted", props.label
+    " "
     props.children

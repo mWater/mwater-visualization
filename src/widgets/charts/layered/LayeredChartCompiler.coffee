@@ -658,7 +658,13 @@ module.exports = class LayeredChartCompiler
 
         key = "#{d.id}:#{d.index}"
         if colorOverrides[key]
-          return colorOverrides[key]
+          color = colorOverrides[key]
+
+        # Apply thresholds (in order)
+        sortedYThresholds = _.sortBy(design.yThresholds or [], "value")
+        for yThreshold in sortedYThresholds
+          if d.value > yThreshold.value and yThreshold.highlightColor
+            color = yThreshold.highlightColor
         
         return color
     }
