@@ -175,7 +175,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
 
   renderThresholds: ->
     # Doesn't apply to polar
-    if @props.design.type not in ['pie', 'donut']
+    if @props.design.type and @props.design.type not in ['pie', 'donut']
       R uiComponents.SectionComponent, label: "Y Threshold Lines",
         R ThresholdsComponent, 
           thresholds: @props.design.yThresholds
