@@ -1,3 +1,4 @@
+$ = require 'jquery'
 PropTypes = require('prop-types')
 Layer = require './Layer'
 ExprCompiler = require('mwater-expressions').ExprCompiler

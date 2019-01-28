@@ -1,3 +1,4 @@
+$ = require 'jquery'
 _ = require 'lodash'
 
 Schema = require('mwater-expressions').Schema

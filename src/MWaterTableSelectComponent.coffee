@@ -1,3 +1,4 @@
+$ = require 'jquery'
 PropTypes = require('prop-types')
 React = require 'react'
 R = React.createElement

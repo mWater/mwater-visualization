@@ -1,3 +1,4 @@
+$ = require 'jquery'
 querystring = require 'querystring'
 injectTableAlias = require('mwater-expressions').injectTableAlias
 

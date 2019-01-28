@@ -1,3 +1,4 @@
+$ = require 'jquery'
 _ = require 'lodash'
 querystring = require 'querystring'
 MapDataSource = require './MapDataSource'

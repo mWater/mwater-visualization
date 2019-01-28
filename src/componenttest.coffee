@@ -1,6 +1,7 @@
 React = require 'react'
 ReactDOM = require 'react-dom'
 R = React.createElement
+$ = require 'jquery'
 
 # LargeListComponent = require './LargeListComponent'
 

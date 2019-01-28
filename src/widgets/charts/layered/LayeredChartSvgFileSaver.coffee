@@ -1,3 +1,4 @@
+$ = require 'jquery'
 saveSvgAsPng = require 'save-svg-as-png'
 LayeredChartCompiler = require './LayeredChartCompiler'
 
