@@ -6,7 +6,8 @@
   "repository": "git@github.com:mWater/mwater-visualization.git",
   "main": "lib/index.js",
   "scripts": {
-    "test": "mocha -r coffeescript/register -r jsdom-global/register --require ignore-styles --recursive \"test/**/*Tests.coffee\"",
+    "test": "node_modules/build-library/test-cli",
+    "watch": "node_modules/build-library/watch",
     "storybook": "start-storybook -s . -p 6006",
     "build-storybook": "build-storybook"
   },
@@ -25,6 +26,7 @@
     "c3": "github:mWater/c3#d3v4-fix-mouse",
     "canonical-json": "0.0.4",
     "classnames": "^2.2.5",
+    "coffeescript-library": "github:mWater/build-library",
     "color": "^1.0.3",
     "color-mixer": "^1.0.0",
     "d3-format": "^1.0.2",
@@ -69,8 +71,10 @@
   },
   "devDependencies": {
     "@kadira/storybook": "^2.21.0",
+    "@types/lodash": "^3.10.2",
     "brfs": "^1.4.1",
     "browser-sync": "^2.5.0",
+    "build-library": "github:mWater/build-library",
     "chai": "~2.0.0",
     "coffee-loader": "^0.9.0",
     "coffeeify": "^2.1.0",
