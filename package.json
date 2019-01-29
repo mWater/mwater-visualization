@@ -35,6 +35,7 @@
     "d3-tip": "^0.9.0",
     "filesaver.js": "^0.1.1",
     "fixed-data-table": "^0.6.0",
+    "immer": "^1.12.1",
     "immutable-setter": "^1.1.1",
     "js-yaml": "^3.4.0",
     "languages": "github:mwater/languages.js",
@@ -72,6 +73,7 @@
   "devDependencies": {
     "@kadira/storybook": "^2.21.0",
     "@types/lodash": "^3.10.2",
+    "@types/rc-slider": "^8.6.0",
     "brfs": "^1.4.1",
     "browser-sync": "^2.5.0",
     "build-library": "github:mWater/build-library",

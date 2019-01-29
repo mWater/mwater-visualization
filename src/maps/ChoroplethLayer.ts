@@ -139,7 +139,7 @@ export = class ChoroplethLayer extends Layer {
     }
 
     // Now create outer query
-    const query = {
+    const query: JsonQLQuery = {
       type: "query",
       selects: [
         { type: "select", expr: { type: "field", tableAlias: "regions2", column: "_id" }, alias: "id" },
@@ -179,12 +179,12 @@ export = class ChoroplethLayer extends Layer {
 
     // Scope overall
     if (design.scope) {
-      query.where.exprs.push({
+      query.where!.exprs.push({
         type: "op",
         op: "=",
         exprs: [
           { type: "field", tableAlias: "regions2", column: `level${design.scopeLevel || 0}` },
-          design.scope
+          { type: "literal", value: design.scope }
         ]
       })
     }
@@ -451,7 +451,7 @@ opacity: ` +  design.fillOpacity + `;
     // Default color
     design.color = design.color || "#FFFFFF";
 
-    design.adminRegionExpr = exprCleaner.cleanExpr(design.adminRegionExpr, { table: design.table, types: ["id"], idTable: regionsTable });
+    design.adminRegionExpr = exprCleaner.cleanExpr(design.adminRegionExpr, { table: design.table || undefined, types: ["id"], idTable: regionsTable });
 
     design.axes = design.axes || {};
     design.fillOpacity = (design.fillOpacity != null) ? design.fillOpacity : 0.75;
@@ -460,7 +460,7 @@ opacity: ` +  design.fillOpacity + `;
     design.axes.color = axisBuilder.cleanAxis({axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"});
     design.axes.label = axisBuilder.cleanAxis({axis: design.axes.label, table: design.table, types: ['text', 'number'], aggrNeed: "required"});
 
-    design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table });
+    design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table || undefined });
 
     if ((design.detailLevel == null)) {
       design.detailLevel = 0;
@@ -626,7 +626,7 @@ opacity: ` +  design.fillOpacity + `;
     };
 
     // Now create outer query
-    const query = {
+    const query: JsonQLQuery = {
       type: "query",
       selects: [
         { type: "select", expr: { type: "field", tableAlias: "regions2", column: "_id" }, alias: "id" },
@@ -666,12 +666,12 @@ opacity: ` +  design.fillOpacity + `;
 
     // Scope overall
     if (design.scope) {
-      query.where.exprs.push({
+      query.where!.exprs.push({
         type: "op",
         op: "=",
         exprs: [
           { type: "field", tableAlias: "regions2", column: `level${design.scopeLevel || 0}` },
-          design.scope
+          { type: "literal", value: design.scope }
         ]
       });
     }
@@ -691,7 +691,7 @@ opacity: ` +  design.fillOpacity + `;
   }
 
   getKMLExportJsonQL(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
-    const style: { color?: string, opacity?: number, colorMap: any } = {
+    const style: { color?: string | null, opacity?: number, colorMap: any } = {
       color: design.color,
       opacity: design.fillOpacity,
       colorMap: null

@@ -13,7 +13,7 @@ declare class AxisBuilder {
      aggrNeed is "none", "optional" or "required"
      types: optional list of types to require it to be one of
   */
-  cleanAxis(options: { axis: Axis, table?: string, aggrNeed?: AggrNeed, types?: string[] }): Axis
+  cleanAxis(options: { axis: Axis, table?: string | null, aggrNeed?: AggrNeed, types?: string[] }): Axis
 
   /** Checks whether an axis is valid 
     options:
