@@ -5,9 +5,9 @@ import { produce } from "immer"
 
 import { ExprComponent, FilterExprComponent } from "mwater-expressions-ui"
 import { ExprCompiler, Schema, DataSource, Expr, OpExpr } from 'mwater-expressions'
-const AxisComponent = require('./../axes/AxisComponent');
+import AxisComponent = require('./../axes/AxisComponent');
 import TableSelectComponent = require('../TableSelectComponent');
-const ColorComponent = require('../ColorComponent');
+import ColorComponent = require('../ColorComponent');
 import Rcslider from 'rc-slider'
 import ChoroplethLayerDesign = require('./ChoroplethLayerDesign');
 import { JsonQLFilter } from 'src';
@@ -87,6 +87,10 @@ class ChoroplethLayerDesigner extends React.Component<{
     this.update((d) => { d.adminRegionExpr = expr })
   }
 
+  handleRegionModeChange = (regionMode: "plain" | "indirect" | "direct") => {
+    this.update((d) => { d.regionMode = regionMode })
+  }
+
   handleFillOpacityChange = (fillOpacity: number) => {
     this.update((d) => { d.fillOpacity = fillOpacity })
   }
@@ -95,27 +99,25 @@ class ChoroplethLayerDesigner extends React.Component<{
     this.update((d) => { d.displayNames = displayNames })
   }
 
-  // renderRegionMode() {
-  //   return (
-  //     <div className="form-group">
-  //       <label className="text-muted">Mode</label>
-  //     </div>
-  //   )
-  //   return R('div', {className: "form-group"},
-  //     R('label', {className: "text-muted"}, 
-  //       "Mode"),
-  //     R('div', {style: { marginLeft: 10 }}, 
-  //       R(TableSelectComponent, { 
-  //         schema: this.props.schema,
-  //         value: this.props.design.table,
-  //         onChange: this.handleTableChange, 
-  //         filter: this.props.design.filter,
-  //         onFilterChange: this.handleFilterChange
-  //       })));
-  // }
-
+  renderRegionMode() {
+    return (
+      <div className="form-group">
+        <label className="text-muted">Mode</label>
+        <div style={{ marginLeft: 10 }}>
+          <ui.Radio inline radioValue="plain" value={this.props.design.regionMode} onChange={this.handleRegionModeChange}>Single Color</ui.Radio>
+          <ui.Radio inline radioValue="indirect" value={this.props.design.regionMode} onChange={this.handleRegionModeChange}>Color By Data</ui.Radio>
+          <ui.Radio inline radioValue="direct" value={this.props.design.regionMode} onChange={this.handleRegionModeChange}>Advanced</ui.Radio>
+        </div>
+      </div>
+    )
+  }
 
   renderTable() {
+    // Only for indirect
+    if (this.props.design.regionMode !== "indirect") {
+      return null
+    }
+
     return (
       <div className="form-group">
         <label className="text-muted">
@@ -151,6 +153,11 @@ class ChoroplethLayerDesigner extends React.Component<{
   }
 
   renderAdminRegionExpr() {
+    // Only for indirect
+    if (this.props.design.regionMode !== "indirect") {
+      return null
+    }
+
     // If no data, hide
     if (!this.props.design.table) {
       return null;
@@ -217,58 +224,118 @@ class ChoroplethLayerDesigner extends React.Component<{
   }
 
   renderColor() {
-    if (!this.props.design.table) {
-      return;
+    // Only if plain
+    if (this.props.design.regionMode !== "plain") {
+      return null
     }
-  
-    const filters = _.clone(this.props.filters) || [];
 
-    if (this.props.design.filter) {
-      const exprCompiler = new ExprCompiler(this.props.schema);
-      const jsonql = exprCompiler.compileExpr({expr: this.props.design.filter, tableAlias: "{alias}"});
-      let filterTable = (this.props.design.filter as OpExpr).table
-      if (jsonql && filterTable) {
-        filters.push({ table: filterTable, jsonql });
+    return R('div', {className: "form-group"},
+      R('label', {className: "text-muted"}, 
+        R('span', {className: "glyphicon glyphicon glyphicon-tint"}),
+        "Fill Color"),
+
+      R('div', null, 
+        R(ColorComponent, {
+          color: this.props.design.color,
+          onChange: this.handleColorChange
+        }
+      )
+      )
+    )   
+  }
+
+  renderColorAxis() {
+    // Not applicable if in plain mode, or if in indirect mode with no table
+    if (this.props.design.regionMode === "plain") {
+      return
+    }
+    else if (this.props.design.regionMode === "indirect") {
+      if (!this.props.design.table) {
+        return null
       }
-    }
 
-    return R('div', null,
-      !this.props.design.axes.color ?
+      const filters = _.clone(this.props.filters) || [];
+
+      if (this.props.design.filter) {
+        const exprCompiler = new ExprCompiler(this.props.schema);
+        const jsonql = exprCompiler.compileExpr({expr: this.props.design.filter, tableAlias: "{alias}"});
+        let filterTable = (this.props.design.filter as OpExpr).table
+        if (jsonql && filterTable) {
+          filters.push({ table: filterTable, jsonql });
+        }
+      }
+
+      const table = this.props.design.table
+
+      return R('div', null,
         R('div', {className: "form-group"},
           R('label', {className: "text-muted"}, 
             R('span', {className: "glyphicon glyphicon glyphicon-tint"}),
-            "Fill Color"),
+            "Color By Data"),
 
-          R('div', null, 
-            R(ColorComponent, {
-              color: this.props.design.color,
-              onChange: this.handleColorChange
-            }
-            )
-          )
-        ) : undefined,
-
-      R('div', {className: "form-group"},
-        R('label', {className: "text-muted"}, 
-          R('span', {className: "glyphicon glyphicon glyphicon-tint"}),
-          "Color By Data"),
-
-        R(AxisComponent, {
-          schema: this.props.schema,
-          dataSource: this.props.dataSource,
-          table: this.props.design.table,
-          types: ["text", "enum", "boolean",'date'],
-          aggrNeed: "required",
-          value: this.props.design.axes.color,
-          defaultColor: this.props.design.color,
-          showColorMap: true,
-          onChange: this.handleColorAxisChange,
-          allowExcludedValues: true,
-          filters
-        }
+          R(AxisComponent, {
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            table: this.props.design.table,
+            types: ["text", "enum", "boolean", "date"],
+            aggrNeed: "required",
+            value: this.props.design.axes.color,
+            defaultColor: this.props.design.color,
+            showColorMap: true,
+            onChange: this.handleColorAxisChange,
+            allowExcludedValues: true,
+            filters: filters
+          })
         )
       )
-    );
+    }
+    else { // direct mode
+      const filters = _.clone(this.props.filters) || [];
+      const regionsTable = this.props.design.regionsTable || "admin_regions"
+
+      // Filter to level and scope
+      filters.push({ table: regionsTable, jsonql: {
+        type: "op",
+        op: "=",
+        exprs: [
+          { type: "field", tableAlias: "{alias}", column: "level" },
+          this.props.design.detailLevel
+        ]
+      }})
+
+      if (this.props.design.scope) {
+        filters.push({ table: regionsTable, jsonql: {
+          type: "op",
+          op: "=",
+          exprs: [
+            { type: "field", tableAlias: "{alias}", column: `level${this.props.design.scopeLevel || 0}` },
+            { type: "literal", value: this.props.design.scope }
+          ]
+        }})
+      }
+
+      return R('div', null,
+        R('div', {className: "form-group"},
+          R('label', {className: "text-muted"}, 
+            R('span', {className: "glyphicon glyphicon glyphicon-tint"}),
+            "Color By Data"),
+
+          R(AxisComponent, {
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            table: regionsTable,
+            types: ["text", "enum", "boolean", "date"],
+            aggrNeed: "none",
+            value: this.props.design.axes.color,
+            defaultColor: this.props.design.color,
+            showColorMap: true,
+            onChange: this.handleColorAxisChange,
+            allowExcludedValues: true,
+            filters: filters
+          })
+        )
+      )
+    }
   }
 
   // renderLabelAxis: ->
@@ -310,9 +377,9 @@ class ChoroplethLayerDesigner extends React.Component<{
   }
 
   renderFilter() {
-    // If no data, hide
-    if (!this.props.design.table) {
-      return null;
+    // If not in indirect mode with table, hide
+    if (this.props.design.regionMode !== "indirect" || !this.props.design.table) {
+      return null
     }
 
     return R('div', {className: "form-group"},
@@ -332,8 +399,9 @@ class ChoroplethLayerDesigner extends React.Component<{
   }
 
   renderPopup() {
-    if (!this.props.design.table) {
-      return null;
+    // If not in indirect mode with table, hide
+    if (this.props.design.regionMode !== "indirect" || !this.props.design.table) {
+      return null
     }
 
     const regionsTable = this.props.design.regionsTable || "admin_regions";
@@ -351,23 +419,23 @@ class ChoroplethLayerDesigner extends React.Component<{
       table: this.props.design.table,
       idTable: regionsTable,
       defaultPopupFilterJoins
-    }
-    );
+    })
   }
 
   render() {
     return R('div', null,
-      this.renderTable(),
+      this.renderRegionMode(),
       this.renderRegionsTable(),
+      this.renderTable(),
       this.renderAdminRegionExpr(),
       this.renderScopeAndDetailLevel(),
       this.renderDisplayNames(),
       this.renderColor(),
+      this.renderColorAxis(),
       this.renderFillOpacity(),
       this.renderFilter(),
       this.renderPopup(),
-      this.props.design.table ?
-        R(ZoomLevelsComponent, {design: this.props.design, onDesignChange: this.props.onDesignChange}) : undefined
+      R(ZoomLevelsComponent, {design: this.props.design, onDesignChange: this.props.onDesignChange})
     );
   }
 }

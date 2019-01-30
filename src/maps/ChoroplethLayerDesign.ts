@@ -44,7 +44,7 @@ interface ChoroplethLayerDesign {
   /** optional logical expression to filter by. Only when region mode is "indirect" */
   filter: Expr
 
-  /** default color (e.g. #FF8800). Color axis overrides */
+  /** default color (e.g. #FF8800). Color axis overrides. Only in plain mode */
   color?: string | null
 
   /** opacity of fill of regions (0-1) */
@@ -53,10 +53,10 @@ interface ChoroplethLayerDesign {
   /** true to display name labels on regions */
   displayNames: boolean
 
-  /** contains items: which is BlocksLayoutManager items. Will be displayed when the region is clicked */
+  /** contains items: which is BlocksLayoutManager items. Will be displayed when the region is clicked. Only when region mode is "indirect" */
   popup: any
 
-  /** customizable filtering for popup. See PopupFilterJoins.md */
+  /** customizable filtering for popup. See PopupFilterJoins.md. Only when region mode is "indirect"  */
   popupFilterJoins: any
 
   /** minimum zoom level */

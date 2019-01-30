@@ -40,24 +40,6 @@ export = class ChoroplethLayer extends Layer {
     const axisBuilder = new AxisBuilder({schema});
     const exprCompiler = new ExprCompiler(schema);
 
-    /*
-    E.g:
-    select name, shape_simplified, regions.color from
-    admin_regions as regions2
-    left outer join
-    (
-      select admin_regions.level2 as id,
-      count(innerquery.*) as color
-      from
-      admin_regions inner join
-      entities.water_point as innerquery
-      on innerquery.admin_region = admin_regions._id
-      where admin_regions.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
-      group by 1
-    ) as regions on regions.id = regions2._id
-    where regions2.level = 2 and regions2.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
-    */
-
     // Verify that scopeLevel is an integer to prevent injection
     if ((design.scopeLevel != null) && ![0, 1, 2, 3, 4, 5].includes(design.scopeLevel)) {
       throw new Error("Invalid scope level");
@@ -69,137 +51,263 @@ export = class ChoroplethLayer extends Layer {
     }
 
     const regionsTable = design.regionsTable || "admin_regions";
+    
+    if (design.regionMode === "plain") {
+      /*
+      E.g:
+      select name, shape_simplified from
+        admin_regions as regions
+        where regions.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
+        and regions.level = 2
+      */
+      const query: JsonQLQuery = {
+        type: "query",
+        selects: [
+          { type: "select", expr: { type: "field", tableAlias: "regions", column: "_id" }, alias: "id" },
+          { type: "select", expr: { type: "field", tableAlias: "regions", column: "shape_simplified" }, alias: "the_geom_webmercator" },
+          { type: "select", expr: { type: "field", tableAlias: "regions", column: "name" }, alias: "name" }
+        ],
+        from: { type: "table", table: regionsTable, alias: "regions" },
+        where: {
+          type: "op",
+          op: "and",
+          exprs: [
+            // Level to display
+            {
+              type: "op",
+              op: "=",
+              exprs: [
+                { type: "field", tableAlias: "regions", column: "level" },
+                design.detailLevel
+              ]
+            }
+          ]
+        }
+      }
 
-    // Compile adminRegionExpr
-    const compiledAdminRegionExpr = exprCompiler.compileExpr({expr: design.adminRegionExpr, tableAlias: "innerquery"});
-
-    // Create inner query
-    const innerQuery: JsonQLQuery = {
-      type: "query",
-      selects: [
-        { type: "select", expr: { type: "field", tableAlias: "regions", column: `level${design.detailLevel}` }, alias: "id" }
-      ],
-      from: {
-        type: "join",
-        kind: "inner",
-        left: { type: "table", table: regionsTable, alias: "regions" },
-        right: exprCompiler.compileTable(design.table!, "innerquery"),
-        on: {
+      // Scope overall
+      if (design.scope) {
+        query.where!.exprs.push({
           type: "op",
           op: "=",
           exprs: [
-            compiledAdminRegionExpr,
-            { type: "field", tableAlias: "regions", column: "_id" }
+            { type: "field", tableAlias: "regions", column: `level${design.scopeLevel || 0}` },
+            { type: "literal", value: design.scope }
           ]
-        }
-      },
-      groupBy: [1]
-    };
-
-    // Add color select if color axis
-    if (design.axes.color) {
-      const colorExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "innerquery"});
-      innerQuery.selects.push({ type: "select", expr: colorExpr, alias: "color" });
+        })
+      }
+      return query
     }
 
-    // Add label select if color axis
-    if (design.axes.label) {
-      const labelExpr = axisBuilder.compileAxis({axis: design.axes.label, tableAlias: "innerquery"});
-      innerQuery.selects.push({ type: "select", expr: labelExpr, alias: "label" });
-    }
+    if (design.regionMode === "indirect" || !design.regionMode) {
+      /*
+      E.g:
+      select name, shape_simplified, regions.color from
+      admin_regions as regions2
+      left outer join
+      (
+        select admin_regions.level2 as id,
+        count(innerquery.*) as color
+        from
+        admin_regions inner join
+        entities.water_point as innerquery
+        on innerquery.admin_region = admin_regions._id
+        where admin_regions.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
+        group by 1
+      ) as regions on regions.id = regions2._id
+      where regions2.level = 2 and regions2.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
+      */
+      const compiledAdminRegionExpr = exprCompiler.compileExpr({expr: design.adminRegionExpr, tableAlias: "innerquery"});
 
-    let whereClauses = [];
-
-    if (design.scope) {
-      whereClauses.push({
-        type: "op",
-        op: "=",
-        exprs: [
-          { type: "field", tableAlias: "regions", column: `level${design.scopeLevel || 0}` },
-          design.scope
-        ]
-      });
-    }
-
-    // Then add filters
-    if (design.filter) {
-      whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "innerquery"}));
-    }
-
-    // Then add extra filters passed in, if relevant
-    const relevantFilters = _.where(filters, {table: design.table});
-    for (let filter of relevantFilters) {
-      whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"));
-    }
-
-    whereClauses = _.compact(whereClauses);
-
-    if (whereClauses.length > 0) {
-      innerQuery.where = { type: "op", op: "and", exprs: whereClauses };
-    }
-
-    // Now create outer query
-    const query: JsonQLQuery = {
-      type: "query",
-      selects: [
-        { type: "select", expr: { type: "field", tableAlias: "regions2", column: "_id" }, alias: "id" },
-        { type: "select", expr: { type: "field", tableAlias: "regions2", column: "shape_simplified" }, alias: "the_geom_webmercator" },
-        { type: "select", expr: { type: "field", tableAlias: "regions2", column: "name" }, alias: "name" }
-      ],
-      from: {
-        type: "join",
-        kind: "left",
-        left: { type: "table", table: regionsTable, alias: "regions2" },
-        right: { type: "subquery", query: innerQuery, alias: "regions" },
-        on: {
-          type: "op",
-          op: "=",
-          exprs: [
-            { type: "field", tableAlias: "regions", column: "id" },
-            { type: "field", tableAlias: "regions2", column: "_id" }
-          ]
-        }
-      },
-      where: {
-        type: "op",
-        op: "and",
-        exprs: [
-          // Level to display
-          {
+      // Create inner query
+      const innerQuery: JsonQLQuery = {
+        type: "query",
+        selects: [
+          { type: "select", expr: { type: "field", tableAlias: "regions", column: `level${design.detailLevel}` }, alias: "id" }
+        ],
+        from: {
+          type: "join",
+          kind: "inner",
+          left: { type: "table", table: regionsTable, alias: "regions" },
+          right: exprCompiler.compileTable(design.table!, "innerquery"),
+          on: {
             type: "op",
             op: "=",
             exprs: [
-              { type: "field", tableAlias: "regions2", column: "level" },
-              design.detailLevel
+              compiledAdminRegionExpr,
+              { type: "field", tableAlias: "regions", column: "_id" }
             ]
           }
-        ]
+        },
+        groupBy: [1]
+      };
+
+      // Add color select if color axis
+      if (design.axes.color) {
+        const colorExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "innerquery"});
+        innerQuery.selects.push({ type: "select", expr: colorExpr, alias: "color" });
       }
+
+      // Add label select if color axis
+      if (design.axes.label) {
+        const labelExpr = axisBuilder.compileAxis({axis: design.axes.label, tableAlias: "innerquery"});
+        innerQuery.selects.push({ type: "select", expr: labelExpr, alias: "label" });
+      }
+
+      let whereClauses = [];
+
+      if (design.scope) {
+        whereClauses.push({
+          type: "op",
+          op: "=",
+          exprs: [
+            { type: "field", tableAlias: "regions", column: `level${design.scopeLevel || 0}` },
+            design.scope
+          ]
+        });
+      }
+
+      // Then add filters
+      if (design.filter) {
+        whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "innerquery"}));
+      }
+
+      // Then add extra filters passed in, if relevant
+      const relevantFilters = _.where(filters, {table: design.table});
+      for (let filter of relevantFilters) {
+        whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"));
+      }
+
+      whereClauses = _.compact(whereClauses);
+
+      if (whereClauses.length > 0) {
+        innerQuery.where = { type: "op", op: "and", exprs: whereClauses };
+      }
+
+      // Now create outer query
+      const query: JsonQLQuery = {
+        type: "query",
+        selects: [
+          { type: "select", expr: { type: "field", tableAlias: "regions2", column: "_id" }, alias: "id" },
+          { type: "select", expr: { type: "field", tableAlias: "regions2", column: "shape_simplified" }, alias: "the_geom_webmercator" },
+          { type: "select", expr: { type: "field", tableAlias: "regions2", column: "name" }, alias: "name" }
+        ],
+        from: {
+          type: "join",
+          kind: "left",
+          left: { type: "table", table: regionsTable, alias: "regions2" },
+          right: { type: "subquery", query: innerQuery, alias: "regions" },
+          on: {
+            type: "op",
+            op: "=",
+            exprs: [
+              { type: "field", tableAlias: "regions", column: "id" },
+              { type: "field", tableAlias: "regions2", column: "_id" }
+            ]
+          }
+        },
+        where: {
+          type: "op",
+          op: "and",
+          exprs: [
+            // Level to display
+            {
+              type: "op",
+              op: "=",
+              exprs: [
+                { type: "field", tableAlias: "regions2", column: "level" },
+                design.detailLevel
+              ]
+            }
+          ]
+        }
+      }
+
+      // Scope overall
+      if (design.scope) {
+        query.where!.exprs.push({
+          type: "op",
+          op: "=",
+          exprs: [
+            { type: "field", tableAlias: "regions2", column: `level${design.scopeLevel || 0}` },
+            { type: "literal", value: design.scope }
+          ]
+        })
+      }
+
+      // Bubble up color and label
+      if (design.axes.color) {
+        query.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "color"}, alias: "color" })
+      }
+
+      // Add label select if color axis
+      if (design.axes.label) {
+        query.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "label"}, alias: "label" })
+      }
+
+      return query
     }
 
-    // Scope overall
-    if (design.scope) {
-      query.where!.exprs.push({
-        type: "op",
-        op: "=",
-        exprs: [
-          { type: "field", tableAlias: "regions2", column: `level${design.scopeLevel || 0}` },
-          { type: "literal", value: design.scope }
-        ]
-      })
+    if (design.regionMode === "direct") {
+      /*
+      E.g:
+      select name, shape_simplified from
+        admin_regions as regions
+        where regions.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
+        and regions.level = 2
+      */
+      const query: JsonQLQuery = {
+        type: "query",
+        selects: [
+          { type: "select", expr: { type: "field", tableAlias: "regions", column: "_id" }, alias: "id" },
+          { type: "select", expr: { type: "field", tableAlias: "regions", column: "shape_simplified" }, alias: "the_geom_webmercator" },
+          { type: "select", expr: { type: "field", tableAlias: "regions", column: "name" }, alias: "name" }
+        ],
+        from: { type: "table", table: regionsTable, alias: "regions" },
+        where: {
+          type: "op",
+          op: "and",
+          exprs: [
+            // Level to display
+            {
+              type: "op",
+              op: "=",
+              exprs: [
+                { type: "field", tableAlias: "regions", column: "level" },
+                design.detailLevel
+              ]
+            }
+          ]
+        }
+      }
+
+      // Add color select 
+      if (design.axes.color) {
+        const colorExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "regions"});
+        query.selects.push({ type: "select", expr: colorExpr, alias: "color" });
+      }
+
+      // Add label select if color axis
+      if (design.axes.label) {
+        const labelExpr = axisBuilder.compileAxis({axis: design.axes.label, tableAlias: "regions"});
+        query.selects.push({ type: "select", expr: labelExpr, alias: "label" });
+      }
+      
+      // Scope overall
+      if (design.scope) {
+        query.where!.exprs.push({
+          type: "op",
+          op: "=",
+          exprs: [
+            { type: "field", tableAlias: "regions", column: `level${design.scopeLevel || 0}` },
+            { type: "literal", value: design.scope }
+          ]
+        })
+      }
+      return query
     }
 
-    // Bubble up color and label
-    if (design.axes.color) {
-      query.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "color"}, alias: "color" })
-    }
-
-    // Add label select if color axis
-    if (design.axes.label) {
-      query.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "label"}, alias: "label" })
-    }
-
-    return query
+    throw new Error(`Unsupported regionMode ${design.regionMode}`)
   }
 
   createCss(design: any, schema: Schema, filters: JsonQLFilter[]): string {
@@ -279,6 +387,11 @@ opacity: ` +  design.fillOpacity + `;
     /** compiled filters to apply to the popup */
     filters: JsonQLFilter[]
   }): OnGridClickResults {
+    // Ignore if not indirect with table
+    if (clickOptions.design.regionMode !== "indirect" || !clickOptions.design.table) {
+      return null
+    }
+
     const regionsTable = clickOptions.design.regionsTable || "admin_regions";
 
     // TODO abstract most to base class
@@ -448,25 +561,57 @@ opacity: ` +  design.fillOpacity + `;
     // TODO clones entirely
     design = _.cloneDeep(design);
 
-    // Default color
-    design.color = design.color || "#FFFFFF";
-
-    design.adminRegionExpr = exprCleaner.cleanExpr(design.adminRegionExpr, { table: design.table || undefined, types: ["id"], idTable: regionsTable });
-
     design.axes = design.axes || {};
+
+    // Default region mode
+    if (!design.regionMode) {
+      design.regionMode = design.axes.color ? "indirect" : "plain"
+    }
+
+    // Default color
+    if (design.regionMode === "plain") {
+      design.color = design.color || "#FFFFFF";
+    }
+    else {
+      design.color = "#FFFFFF"
+    }
+
+    if (design.regionMode === "indirect" && design.table) {
+      design.adminRegionExpr = exprCleaner.cleanExpr(design.adminRegionExpr, { table: design.table, types: ["id"], idTable: regionsTable });
+    }
+    else {
+      delete design.adminRegionExpr
+      delete design.table
+    }
+
     design.fillOpacity = (design.fillOpacity != null) ? design.fillOpacity : 0.75;
     design.displayNames = (design.displayNames != null) ? design.displayNames : true;
 
-    design.axes.color = axisBuilder.cleanAxis({axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"});
-    design.axes.label = axisBuilder.cleanAxis({axis: design.axes.label, table: design.table, types: ['text', 'number'], aggrNeed: "required"});
-
-    design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table || undefined });
-
-    if ((design.detailLevel == null)) {
-      design.detailLevel = 0;
+    // Clean the axes
+    if (design.regionMode === "indirect" && design.table) {
+      design.axes.color = axisBuilder.cleanAxis({axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"});
+      design.axes.label = axisBuilder.cleanAxis({axis: design.axes.label, table: design.table, types: ['text', 'number'], aggrNeed: "required"});
+    } else if (design.regionMode === "plain" || (design.regionMode === "indirect" && !design.table)) {
+      delete design.axes.color
+      delete design.axes.label
+    } else if (design.regionMode === "direct") {
+      design.axes.color = axisBuilder.cleanAxis({axis: design.axes.color, table: regionsTable, types: ['enum', 'text', 'boolean', 'date'], aggrNeed: "none"});
+      design.axes.label = axisBuilder.cleanAxis({axis: design.axes.label, table: regionsTable, types: ['text', 'number'], aggrNeed: "none"});
     }
 
-    return design;
+    // Filter is only for indirect
+    if (design.regionMode === "indirect" && design.table) {
+      design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table })
+    }
+    else {
+      delete design.filter
+    }
+
+    if ((design.detailLevel == null)) {
+      design.detailLevel = 0
+    }
+
+    return design
   }
 
   // Validates design. Null if ok, message otherwise
@@ -475,26 +620,30 @@ opacity: ` +  design.fillOpacity + `;
     const exprUtils = new ExprUtils(schema);
     const axisBuilder = new AxisBuilder({schema});
 
-    if (!design.table) {
-      return "Missing table";
-    }
+    if (design.regionMode === "indirect") {
+      if (!design.table) {
+        return "Missing table";
+      }
+      if (!design.adminRegionExpr || (exprUtils.getExprType(design.adminRegionExpr) !== "id")) {
+        return "Missing admin region expr";
+      }
 
+      error = axisBuilder.validateAxis({ axis: design.axes.color });
+      if (error) { return error; }
+
+      error = axisBuilder.validateAxis({ axis: design.axes.label });
+      if (error) { return error; }
+    }
+    else if (design.regionMode === "direct") {
+      error = axisBuilder.validateAxis({ axis: design.axes.color });
+      if (error) { return error; }
+
+      error = axisBuilder.validateAxis({ axis: design.axes.label });
+      if (error) { return error; }
+    }
+  
     if ((design.detailLevel == null)) {
       return "Missing detail level";
-    }
-
-    if (!design.adminRegionExpr || (exprUtils.getExprType(design.adminRegionExpr) !== "id")) {
-      return "Missing admin region expr";
-    }
-
-    if (design.axes.color) {
-      error = axisBuilder.validateAxis({axis: design.axes.color});
-      if (error) { return error; }
-    }
-
-    if (design.axes.label) {
-      error = axisBuilder.validateAxis({axis: design.axes.label});
-      if (error) { return error; }
     }
 
     return null;

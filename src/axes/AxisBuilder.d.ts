@@ -1,7 +1,7 @@
 import { Schema, JsonQL } from "mwater-expressions";
 import { Axis } from "./Axis";
 
-type AggrNeed = "none" | "optiona" | "required"
+type AggrNeed = "none" | "optional" | "required"
 
 declare class AxisBuilder {
   constructor(options: { schema: Schema })
