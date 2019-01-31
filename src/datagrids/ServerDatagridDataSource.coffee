@@ -1,6 +1,7 @@
 $ = require 'jquery'
 querystring = require 'querystring'
 DatagridDataSource = require './DatagridDataSource'
+compressJson = require '../compressJson'
 
 # Uses mWater server to get datagrid data to allow sharing with unprivileged users
 module.exports = class ServerDatagridDataSource extends DatagridDataSource
@@ -21,7 +22,7 @@ module.exports = class ServerDatagridDataSource extends DatagridDataSource
     query = {
       client: @options.client
       share: @options.share
-      filters: JSON.stringify(filters)
+      filters: compressJson(filters)
       rev: @options.rev
       offset: offset
       limit: limit
@@ -53,7 +54,7 @@ class ServerQuickfilterDataSource
     query = {
       client: @options.client
       share: @options.share
-      filters: JSON.stringify(filters)
+      filters: compressJson(filters)
       offset: offset
       limit: limit
       rev: @options.rev

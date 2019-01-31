@@ -1,6 +1,7 @@
 $ = require 'jquery'
 querystring = require 'querystring'
 injectTableAlias = require('mwater-expressions').injectTableAlias
+compressJson = require '../compressJson'
 
 # Uses mWater server to get widget data to allow sharing with unprivileged users
 module.exports = class ServerDashboardDataSource
@@ -37,7 +38,7 @@ class ServerQuickfilterDataSource
     query = {
       client: @options.client
       share: @options.share
-      filters: JSON.stringify(filters)
+      filters: compressJson(filters)
       offset: offset
       limit: limit
       rev: @options.rev
@@ -81,7 +82,7 @@ class ServerWidgetDataSource
     query = {
       client: @options.client
       share: @options.share
-      filters: JSON.stringify(filters)
+      filters: compressJson(filters)
       rev: @options.rev
     }
 
@@ -144,7 +145,7 @@ class ServerWidgetMapDataSource
     query = {
       client: @options.client
       share: @options.share
-      filters: JSON.stringify(filters)
+      filters: compressJson(filters)
       rev: @options.rev
     }
 
@@ -216,7 +217,7 @@ class ServerWidgetLayerDataSource
       widget: @options.widgetId
       layer: @options.layerView.id
       rev: @options.rev
-      filters: JSON.stringify(filters or [])
+      filters: compressJson(filters or [])
     }
 
     # Make URL change when cache expired
@@ -261,7 +262,7 @@ class ServerWidgetLayerDataSource
       where = whereClauses[0]
 
     if where 
-      url += "&where=" + encodeURIComponent(JSON.stringify(where))
+      url += "&where=" + encodeURIComponent(compressJson(where))
 
     return url
 
@@ -287,7 +288,7 @@ class ServerWidgetLayerPopupWidgetDataSource
     query = {
       client: @options.client
       share: @options.share
-      filters: JSON.stringify(filters)
+      filters: compressJson(filters)
       rev: @options.rev
     }
 
