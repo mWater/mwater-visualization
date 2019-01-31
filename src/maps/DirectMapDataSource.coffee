@@ -7,7 +7,7 @@ DirectWidgetDataSource = require '../widgets/DirectWidgetDataSource'
 BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
 WidgetFactory = require '../widgets/WidgetFactory'
 MapBoundsCalculator = require './MapBoundsCalculator'
-pako = require('pako')
+compressJson = require('../compressJson')
 
 module.exports = class DirectMapDataSource extends MapDataSource
   # Create map url source that uses direct jsonql maps
@@ -102,7 +102,7 @@ class DirectLayerDataSource
   createUrl: (extension, jsonqlCss) ->
     query = {
       type: "jsonql"
-      design: pako.deflate(JSON.stringify(jsonqlCss), {to: 'string'})
+      design: compressJson(jsonqlCss)
     }
 
     if @options.client
@@ -147,6 +147,6 @@ class DirectLayerDataSource
       where = whereClauses[0]
 
     if where 
-      url += "&where=" + encodeURIComponent(JSON.stringify(where))
+      url += "&where=" + encodeURIComponent(compressJson(where))
 
     return url

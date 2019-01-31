@@ -4,6 +4,7 @@ querystring = require 'querystring'
 MapDataSource = require './MapDataSource'
 LayerFactory = require './LayerFactory'
 injectTableAlias = require('mwater-expressions').injectTableAlias
+compressJson = require '../compressJson'
 
 # Get map urls for map stored on server
 module.exports = class ServerMapDataSource extends MapDataSource
@@ -34,7 +35,7 @@ module.exports = class ServerMapDataSource extends MapDataSource
     query = {
       client: @options.client
       share: @options.share
-      filters: JSON.stringify(filters)
+      filters: compressJson(filters)
       rev: @options.rev
     }
 
@@ -101,7 +102,7 @@ class ServerLayerDataSource
       share: @options.share
       map: @options.mapId
       layer: @options.layerView.id
-      filters: JSON.stringify(filters or [])
+      filters: compressJson(filters or [])
       rev: @options.rev
     }
 
@@ -142,7 +143,7 @@ class ServerLayerDataSource
       where = whereClauses[0]
 
     if where 
-      url += "&where=" + encodeURIComponent(JSON.stringify(where))
+      url += "&where=" + encodeURIComponent(compressJson(where))
 
     return url
 
@@ -165,7 +166,7 @@ class ServerMapLayerPopupWidgetDataSource
     query = {
       client: @options.client
       share: @options.share
-      filters: JSON.stringify(filters)
+      filters: compressJson(filters)
       rev: @options.rev
     }
 
