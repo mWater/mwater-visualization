@@ -1,3 +1,4 @@
+_ = require 'lodash'
 PropTypes = require('prop-types')
 # Carousel component for images. Starts with cover photo
 React = require 'react'
