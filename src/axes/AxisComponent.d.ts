@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Schema, Expr, DataSource, LiteralType } from "mwater-expressions";
 import { Axis } from './Axis';
-import { JsonQLFilter } from 'src';
+import { JsonQLFilter } from '../index';
 
 declare class AxisComponent extends React.Component<{
   schema: Schema 

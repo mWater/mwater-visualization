@@ -1,5 +1,5 @@
 import { JsonQL, Schema, DataSource } from "mwater-expressions";
-import { JsonQLFilter } from "src";
+import { JsonQLFilter } from "../index";
 import { OnGridClickResults } from "./maps";
 
 declare interface LayerDefinition {

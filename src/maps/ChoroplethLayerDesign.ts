@@ -1,5 +1,5 @@
 import { Expr } from "mwater-expressions";
-import { Axis } from "src/axes/Axis";
+import { Axis } from "../axes/Axis";
 
 /**
  * Layer that is composed of regions colored. Now extended to any other regions as well, so name

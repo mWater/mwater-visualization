@@ -5,10 +5,11 @@ const Layer = require('./Layer');
 import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, JsonQL, JsonQLQuery, Expr, DataSource, OpExpr } from 'mwater-expressions';
 import AxisBuilder = require('../axes/AxisBuilder');
 import { LayerDefinition, OnGridClickResults } from './maps';
-import { JsonQLFilter } from 'src';
+import { JsonQLFilter } from '../index';
 import ChoroplethLayerDesign = require('./ChoroplethLayerDesign');
 const LayerLegendComponent = require('./LayerLegendComponent');
 const PopupFilterJoinsUtils = require('./PopupFilterJoinsUtils');
+import FillDownwardComponent from 'react-library/lib/FillDownwardComponent'
 
 export = class ChoroplethLayer extends Layer {
   /** Gets the layer definition as JsonQL + CSS in format:

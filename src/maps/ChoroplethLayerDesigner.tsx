@@ -10,11 +10,11 @@ import TableSelectComponent = require('../TableSelectComponent');
 import ColorComponent = require('../ColorComponent');
 import Rcslider from 'rc-slider'
 import ChoroplethLayerDesign = require('./ChoroplethLayerDesign');
-import { JsonQLFilter } from 'src';
+import { JsonQLFilter } from '../index';
 const EditPopupComponent = require('./EditPopupComponent');
 const ZoomLevelsComponent = require('./ZoomLevelsComponent');
 import ui = require('react-library/lib/bootstrap');
-import { Axis } from 'src/axes/Axis';
+import { Axis } from '../axes/Axis';
 
 const AdminScopeAndDetailLevelComponent = require('./AdminScopeAndDetailLevelComponent');
 const ScopeAndDetailLevelComponent = require('./ScopeAndDetailLevelComponent');
