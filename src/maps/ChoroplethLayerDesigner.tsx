@@ -20,7 +20,7 @@ const AdminScopeAndDetailLevelComponent = require('./AdminScopeAndDetailLevelCom
 const ScopeAndDetailLevelComponent = require('./ScopeAndDetailLevelComponent');
 
 // Designer for a choropleth layer
-class ChoroplethLayerDesigner extends React.Component<{
+export default class ChoroplethLayerDesigner extends React.Component<{
   schema: Schema
   dataSource: DataSource
   design: ChoroplethLayerDesign
@@ -439,5 +439,3 @@ class ChoroplethLayerDesigner extends React.Component<{
     );
   }
 }
-
-export = ChoroplethLayerDesigner

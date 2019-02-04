@@ -11,7 +11,7 @@ const LayerLegendComponent = require('./LayerLegendComponent');
 const PopupFilterJoinsUtils = require('./PopupFilterJoinsUtils');
 import FillDownwardComponent from 'react-library/lib/FillDownwardComponent'
 
-export = class ChoroplethLayer extends Layer {
+export default class ChoroplethLayer extends Layer {
   /** Gets the layer definition as JsonQL + CSS in format:
    *   {
    *     layers: array of { id: layer id, jsonql: jsonql that includes "the_webmercator_geom" as a column }
@@ -665,7 +665,7 @@ opacity: ` +  design.fillOpacity + `;
     filters: JsonQLFilter[]
   }): React.ReactElement<{}> {
     // Require here to prevent server require problems
-    const ChoroplethLayerDesigner = require('./ChoroplethLayerDesigner');
+    const ChoroplethLayerDesigner = require('./ChoroplethLayerDesigner').default;
 
     // Clean on way in and out
     return React.createElement(ChoroplethLayerDesigner, {
