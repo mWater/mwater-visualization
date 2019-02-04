@@ -6,10 +6,9 @@ import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, JsonQL,
 import AxisBuilder = require('../axes/AxisBuilder');
 import { LayerDefinition, OnGridClickResults } from './maps';
 import { JsonQLFilter } from '../index';
-import ChoroplethLayerDesign = require('./ChoroplethLayerDesign');
+import ChoroplethLayerDesign from './ChoroplethLayerDesign'
 const LayerLegendComponent = require('./LayerLegendComponent');
 const PopupFilterJoinsUtils = require('./PopupFilterJoinsUtils');
-import FillDownwardComponent from 'react-library/lib/FillDownwardComponent'
 
 export default class ChoroplethLayer extends Layer {
   /** Gets the layer definition as JsonQL + CSS in format:
@@ -532,12 +531,15 @@ opacity: ` +  design.fillOpacity + `;
     }
     const axisBuilder = new AxisBuilder({schema});
 
+    const regionsTable = design.regionsTable || "admin_regions"
+    const axisTable = design.regionMode === "direct" ? regionsTable : design.table
+
     return React.createElement(LayerLegendComponent, {
       schema,
       name,
       dataSource,
       filters: _.compact(_filters),
-      axis: axisBuilder.cleanAxis({axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"}),
+      axis: axisBuilder.cleanAxis({axis: design.axes.color, table: axisTable, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"}),
       defaultColor: design.color
     }
     );

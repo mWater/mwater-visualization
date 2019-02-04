@@ -5,7 +5,7 @@ import { Axis } from "../axes/Axis";
  * Layer that is composed of regions colored. Now extended to any other regions as well, so name
  * is legacy, as is adminRegionExpr field.
  */
-interface ChoroplethLayerDesign {
+export default interface ChoroplethLayerDesign {
   /**
    * Mode of map made from regions. 
    * "plain": no axes, just displays regions
@@ -65,5 +65,3 @@ interface ChoroplethLayerDesign {
   /** maximum zoom level */
   maxZoom?: number 
 }
-
-export = ChoroplethLayerDesign

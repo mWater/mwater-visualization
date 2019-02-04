@@ -9,7 +9,7 @@ import AxisComponent = require('./../axes/AxisComponent');
 import TableSelectComponent = require('../TableSelectComponent');
 import ColorComponent = require('../ColorComponent');
 import Rcslider from 'rc-slider'
-import ChoroplethLayerDesign = require('./ChoroplethLayerDesign');
+import ChoroplethLayerDesign from './ChoroplethLayerDesign'
 import { JsonQLFilter } from '../index';
 const EditPopupComponent = require('./EditPopupComponent');
 const ZoomLevelsComponent = require('./ZoomLevelsComponent');
