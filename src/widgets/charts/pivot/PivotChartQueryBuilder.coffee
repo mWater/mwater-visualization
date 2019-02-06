@@ -149,6 +149,8 @@ module.exports = class PivotChartQueryBuilder
             filter = design.intersections[intersectionId].filter
             if filter
               intersectionFilters.push(filter)
+            else  # If intersection has no filter, still needs to "or" with true
+              intersectionFilters.push({ type: "literal", valueType: "boolean", value: true })
         
         if intersectionFilters.length > 0
           whereClauses.push({
