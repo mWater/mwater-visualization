@@ -100,7 +100,7 @@ module.exports = class TextLiteralComponent extends React.Component
       noOptionsMessage: () => "Type to search"
       styles: { 
         # Keep menu above fixed data table headers
-        menu: (style) => _.extend({}, style, zIndex: 2)
+        menu: (style) => _.extend({}, style, zIndex: 2000)
       }
 
   render: ->

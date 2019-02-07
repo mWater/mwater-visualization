@@ -165,7 +165,7 @@ class EnumQuickfilterComponent extends React.Component
       isDisabled: not @props.onValueChange?
       styles: { 
         # Keep menu above fixed data table headers
-        menu: (style) => _.extend({}, style, zIndex: 2)
+        menu: (style) => _.extend({}, style, zIndex: 2000)
       }
   
   renderMultiSelect: (options) ->
@@ -179,7 +179,7 @@ class EnumQuickfilterComponent extends React.Component
       isDisabled: not @props.onValueChange?
       styles: { 
         # Keep menu above fixed data table headers
-        menu: (style) => _.extend({}, style, zIndex: 2)
+        menu: (style) => _.extend({}, style, zIndex: 2000)
       }
 
   render: ->
