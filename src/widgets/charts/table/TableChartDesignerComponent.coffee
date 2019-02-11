@@ -12,6 +12,7 @@ FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 OrderingsComponent = require './OrderingsComponent'
 TableSelectComponent = require '../../../TableSelectComponent'
 ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
+ui = require('react-library/lib/bootstrap')
 
 module.exports = class TableChartDesignerComponent extends React.Component
   @propTypes:
@@ -29,6 +30,7 @@ module.exports = class TableChartDesignerComponent extends React.Component
   handleTableChange: (table) => @updateDesign(table: table)
   handleFilterChange: (filter) => @updateDesign(filter: filter)
   handleOrderingsChange: (orderings) => @updateDesign(orderings: orderings)
+  handleLimitChange: (limit) => @updateDesign(limit: limit)
 
   handleColumnChange: (index, column) =>
     columns = @props.design.columns.slice()
@@ -139,6 +141,21 @@ module.exports = class TableChartDesignerComponent extends React.Component
           table: @props.design.table
           value: @props.design.filter)
 
+  renderLimit: ->
+    # If no table, hide
+    if not @props.design.table
+      return null
+
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted",
+        "Maximum Number of Rows (up to 1000)"
+      R 'div', style: { marginLeft: 8 },
+        R ui.NumberInput,
+          value: @props.design.limit
+          onChange: @handleLimitChange
+          decimal: false
+          placeholder: "1000"
+
   render: ->
     R 'div', null,
       @renderTable()
@@ -146,6 +163,7 @@ module.exports = class TableChartDesignerComponent extends React.Component
       if @props.design.table then R('hr')
       @renderOrderings()
       @renderFilter()
+      @renderLimit()
       R('hr')
       @renderTitle()
 

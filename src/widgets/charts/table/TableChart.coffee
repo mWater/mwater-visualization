@@ -18,6 +18,7 @@ Design is:
   columns: array of columns
   filter: optional logical expression to filter by
   orderings: array of orderings
+  limit: optional limit to number of rows
 
 column:
   id: unique id of column (uuid v4)
@@ -64,6 +65,10 @@ module.exports = class TableChart extends Chart
 
     if design.filter
       design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ['boolean'] })
+
+    # Limit 
+    if design.limit and design.limit > 1000
+      delete design.limit
 
     return design
 
@@ -132,7 +137,7 @@ module.exports = class TableChart extends Chart
       from: exprCompiler.compileTable(design.table, "main")
       groupBy: []
       orderBy: []
-      limit: 1000
+      limit: Math.min(design.limit or 1000, 1000)
     }
 
     # Determine if any aggregate
