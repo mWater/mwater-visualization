@@ -5,6 +5,7 @@ require "rc-slider/assets/index.css"
 require "leaflet-loading/src/Control.Loading.css"
 require "./layouts/decorated-block.css"
 require "react-datepicker/dist/react-datepicker.css" 
+require 'c3/c3.css'
 
 exports.CachingDataSource = require './CachingDataSource'
 exports.WidgetFactory = require './widgets/WidgetFactory'
