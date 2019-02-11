@@ -36,7 +36,7 @@
     "d3-scale": "^1.0.3",
     "d3-scale-chromatic": "^1.0.2",
     "d3-tip": "^0.9.0",
-    "filesaver.js": "^0.1.1",
+    "file-saver": "^2.0.0",
     "fixed-data-table": "^0.6.0",
     "immer": "^1.12.1",
     "immutable-setter": "^1.1.1",

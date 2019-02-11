@@ -237,7 +237,7 @@ describe "PivotChartQueryBuilder", ->
         { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "value" }
       ]
       from: { type: "table", table: "t1", alias: "main" }
-      where: null
+      where: { type: "op", op: "or", exprs: [{ type: "literal", value: true }] }
       groupBy: [1]
       orderBy: [{ expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, direction: "desc" }]
     }
@@ -312,7 +312,10 @@ describe "PivotChartQueryBuilder", ->
         { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "value" }
       ]
       from: { type: "table", table: "t1", alias: "main" }
-      where: { type: "literal", value: false }
+      where: { type: "op", op: "and", exprs: [
+        { type: "op", op: "or", exprs: [{ type: "literal", value: true }] }
+        { type: "literal", value: false }
+      ]}
       groupBy: [1]
       orderBy: [{ expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, direction: "desc" }]
     }

@@ -156,9 +156,7 @@ class EnumQuickfilterComponent extends React.Component
     else
       @props.onValueChange(null)
 
-  renderSingleSelect: ->
-    options = _.map(@props.options, (opt) => { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
-
+  renderSingleSelect: (options) ->
     R ReactSelect, 
       placeholder: "All"
       value: _.findWhere(options, value: @props.value) or null
@@ -168,12 +166,10 @@ class EnumQuickfilterComponent extends React.Component
       isDisabled: not @props.onValueChange?
       styles: { 
         # Keep menu above fixed data table headers
-        menu: (style) => _.extend({}, style, zIndex: 2)
+        menu: (style) => _.extend({}, style, zIndex: 2000)
       }
   
-  renderMultiSelect: ->
-    options = _.map(@props.options, (opt) => { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
-    
+  renderMultiSelect: (options) ->
     R ReactSelect, 
       placeholder: "All"
       value: _.map(@props.value, (v) => _.find(options, (o) => o.value == v))
@@ -184,18 +180,25 @@ class EnumQuickfilterComponent extends React.Component
       isDisabled: not @props.onValueChange?
       styles: { 
         # Keep menu above fixed data table headers
-        menu: (style) => _.extend({}, style, zIndex: 2)
+        menu: (style) => _.extend({}, style, zIndex: 2000)
       }
 
   render: ->
+    options = _.map(@props.options, (opt) => { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
+
+    # Determine width, estimating about 8 px per letter with 70px padding
+    width = _.max(options, (o) => o.label.length)?.label.length
+    width = if width then width * 8 + 70 else 280
+    minWidth = if width > 280 or @props.multi then "280px" else "#{width}px"
+
     R 'div', style: { display: "inline-block", paddingRight: 10 },
       if @props.label
         R 'span', style: { color: "gray" }, @props.label + ":\u00a0"
-      R 'div', style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
+      R 'div', style: { display: "inline-block", minWidth: minWidth, verticalAlign: "middle" },
         if @props.multi
-          @renderMultiSelect()
+          @renderMultiSelect(options)
         else
-          @renderSingleSelect()
+          @renderSingleSelect(options)
       if not @props.onValueChange
         R 'i', className: "text-warning fa fa-fw fa-lock"
 
@@ -225,7 +228,7 @@ class TextQuickfilterComponent extends React.Component
     R 'div', style: { display: "inline-block", paddingRight: 10 },
       if @props.label
         R 'span', style: { color: "gray" }, @props.label + ":\u00a0"
-      R 'div', style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
+      R 'div', style: { display: "inline-block", minWidth: "280px", verticalAlign: "middle" },
         R TextLiteralComponent, {
           value: @props.value
           onChange: @props.onValueChange
@@ -253,7 +256,7 @@ class DateQuickfilterComponent extends React.Component
     R 'div', style: { display: "inline-block", paddingRight: 10 },
       if @props.label
         R 'span', style: { color: "gray" }, @props.label + ":\u00a0"
-      R 'div', style: { display: "inline-block", minWidth: "20em", verticalAlign: "middle" },
+      R 'div', style: { display: "inline-block", minWidth: "280px", verticalAlign: "middle" },
         R DateExprComponent, {
           datetime: (new ExprUtils(@props.schema).getExprType(@props.expr)) == "datetime"
           value: @props.value
