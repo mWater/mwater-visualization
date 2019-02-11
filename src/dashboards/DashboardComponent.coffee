@@ -123,8 +123,8 @@ module.exports = class DashboardComponent extends React.Component
     # Make a blob and save
     blob = new Blob([JSON.stringify(@props.design, null, 2)], {type: "text/json"})
     # Require at use as causes server problems
-    filesaver = require 'filesaver.js'
-    filesaver(blob, "Dashboard.json")
+    FileSaver = require 'file-saver'
+    FileSaver.saveAs(blob, "Dashboard.json")
 
   handleSettings: =>
     @settings.show(@props.design)

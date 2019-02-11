@@ -127,8 +127,8 @@ class ChartWidgetComponent extends React.Component
       blob = new Blob([csv], {type: "text/csv"})
 
       # Require at use as causes server problems
-      filesaver = require 'filesaver.js'
-      filesaver(blob, "Exported Data.csv")
+      FileSaver = require 'file-saver'
+      FileSaver.saveAs(blob, "Exported Data.csv")
     )
 
   handleStartEditing: =>

@@ -46,8 +46,8 @@ saveSvgToFile = (containerDiv, title) ->
   svgFinalStr = getC3String(containerDiv.firstChild)
   blob = new Blob([svgFinalStr], {type: "image/svg+xml"})
   # Require at use as causes server problems
-  filesaver = require 'filesaver.js'
-  filesaver(blob, (title or "unnamed-chart") + ".svg")
+  FileSaver = require 'file-saver'
+  FileSaver.saveAs(blob, (title or "unnamed-chart") + ".svg")
 
 # Saves svg files from layered charts
 # design: design of the chart
