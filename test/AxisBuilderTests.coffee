@@ -210,6 +210,40 @@ describe "AxisBuilder", ->
         ]
       }
 
+    it "compiles yearweek xform", ->
+      # to_char('2011-12-21T'::date, "YYYY-IW")
+      axis = {
+        expr: @exprDate
+        xform: { type: "yearweek" }
+      }
+
+      jql = @ab.compileAxis(axis: axis, tableAlias: "T1")
+      assert _.isEqual jql, {
+        type: "op"
+        op: "to_char"
+        exprs: [
+          { type: "op", op: "::date", exprs: [{ type: "field", tableAlias: "T1", column: "date" }] }
+          "IYYY-IW"
+        ]
+      }
+
+    it "compiles yearquarter xform", ->
+      # to_char('2011-12-21T'::date, "YYYY-Q")
+      axis = {
+        expr: @exprDate
+        xform: { type: "yearquarter" }
+      }
+
+      jql = @ab.compileAxis(axis: axis, tableAlias: "T1")
+      assert _.isEqual jql, {
+        type: "op"
+        op: "to_char"
+        exprs: [
+          { type: "op", op: "::date", exprs: [{ type: "field", tableAlias: "T1", column: "date" }] }
+          "YYYY-Q"
+        ]
+      }
+
     it "compiles ranges xform", ->
       axis = {
         expr: @exprNumber
@@ -612,6 +646,36 @@ describe "AxisBuilder", ->
         { value: "2010-03-01", label: "Mar 2010" }
         { value: null, label: "None" }
       ])
+
+    it "gets yearweeks", ->
+      axis = {
+        expr: @exprDate
+        xform: { type: "yearweek" }
+      }
+
+      categories = @ab.getCategories(axis, ['2010-51', '2011-01', null])
+      compare(categories, [
+        { value: "2010-51", label: "2010-51" }
+        { value: "2010-52", label: "2010-52" }
+        { value: "2011-01", label: "2011-01" }
+        { value: null, label: "None" }
+      ])
+
+    it "gets yearquarters", ->
+      axis = {
+        expr: @exprDate
+        xform: { type: "yearquarter" }
+      }
+
+      categories = @ab.getCategories(axis, ['2010-2', '2011-1', null])
+      compare(categories, [
+        { value: "2010-2", label: "2010-2nd" }
+        { value: "2010-3", label: "2010-3rd" }
+        { value: "2010-4", label: "2010-4th" }
+        { value: "2011-1", label: "2011-1st" }
+        { value: null, label: "None" }
+      ])
+
 
     it "gets days", ->
       axis = {

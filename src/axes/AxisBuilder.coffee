@@ -16,6 +16,10 @@ xforms = [
   { type: "year", input: "datetime", output: "date" }
   { type: "yearmonth", input: "date", output: "date" }
   { type: "yearmonth", input: "datetime", output: "date" }
+  { type: "yearquarter", input: "date", output: "enum" }
+  { type: "yearquarter", input: "datetime", output: "enum" }
+  { type: "yearweek", input: "date", output: "enum" }
+  { type: "yearweek", input: "datetime", output: "enum" }
   { type: "month", input: "date", output: "enum" }
   { type: "month", input: "datetime", output: "enum" }
   { type: "week", input: "date", output: "enum" }
@@ -242,6 +246,26 @@ module.exports = class AxisBuilder
           exprs: [
             { type: "op", op: "::date", exprs: [compiledExpr] }
             "IW"
+          ]
+        }
+
+      if options.axis.xform.type == "yearquarter"
+        compiledExpr = {
+          type: "op"
+          op: "to_char"
+          exprs: [
+            { type: "op", op: "::date", exprs: [compiledExpr] }
+            "YYYY-Q"
+          ]
+        }
+
+      if options.axis.xform.type == "yearweek"
+        compiledExpr = {
+          type: "op"
+          op: "to_char"
+          exprs: [
+            { type: "op", op: "::date", exprs: [compiledExpr] }
+            "IYYY-IW"
           ]
         }
 
@@ -525,6 +549,58 @@ module.exports = class AxisBuilder
       while not current.isAfter(end)
         categories.push({ value: current.format("YYYY-MM-DD"), label: current.format("MMM YYYY")})
         current.add(1, "months")
+        if categories.length >= 1000
+          break
+
+      # Add none if needed
+      if hasNone
+        categories.push(noneCategory)
+
+      return categories
+
+    if axis.xform and axis.xform.type == "yearweek"
+      hasNone = _.any(values, (v) -> not v?)
+      values = _.compact(values)
+      if values.length == 0 
+        return [noneCategory]
+
+      # Get min and max
+      min = values.sort()[0]
+      max = values.sort().slice(-1)[0]
+
+      # Use moment to get range
+      current = moment(min, "GGGG-WW")
+      end = moment(max, "GGGG-WW")
+      categories = []
+      while not current.isAfter(end)
+        categories.push({ value: current.format("GGGG-WW"), label: current.format("GGGG-WW")})
+        current.add(1, "weeks")
+        if categories.length >= 1000
+          break
+
+      # Add none if needed
+      if hasNone
+        categories.push(noneCategory)
+
+      return categories
+
+    if axis.xform and axis.xform.type == "yearquarter"
+      hasNone = _.any(values, (v) -> not v?)
+      values = _.compact(values)
+      if values.length == 0 
+        return [noneCategory]
+
+      # Get min and max
+      min = values.sort()[0]
+      max = values.sort().slice(-1)[0]
+
+      # Use moment to get range
+      current = moment(min, "YYYY-Q")
+      end = moment(max, "YYYY-Q")
+      categories = []
+      while not current.isAfter(end)
+        categories.push({ value: current.format("YYYY-Q"), label: current.format("YYYY-Qo")})
+        current.add(1, "quarters")
         if categories.length >= 1000
           break
 
