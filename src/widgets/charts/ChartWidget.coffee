@@ -132,6 +132,9 @@ class ChartWidgetComponent extends React.Component
     )
 
   handleStartEditing: =>
+    # Can't edit if already editing
+    if @state.editDesign
+      return
     @setState(editDesign: @props.design)
 
   handleEndEditing: =>
