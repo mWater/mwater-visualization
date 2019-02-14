@@ -669,10 +669,10 @@ describe "AxisBuilder", ->
 
       categories = @ab.getCategories(axis, ['2010-2', '2011-1', null])
       compare(categories, [
-        { value: "2010-2", label: "2010-2nd" }
-        { value: "2010-3", label: "2010-3rd" }
-        { value: "2010-4", label: "2010-4th" }
-        { value: "2011-1", label: "2011-1st" }
+        { value: "2010-2", label: "2010 Apr-Jun" }
+        { value: "2010-3", label: "2010 Jul-Sep" }
+        { value: "2010-4", label: "2010 Oct-Dec" }
+        { value: "2011-1", label: "2011 Jan-Mar" }
         { value: null, label: "None" }
       ])
 

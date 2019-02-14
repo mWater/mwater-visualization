@@ -599,7 +599,18 @@ module.exports = class AxisBuilder
       end = moment(max, "YYYY-Q")
       categories = []
       while not current.isAfter(end)
-        categories.push({ value: current.format("YYYY-Q"), label: current.format("YYYY-Qo")})
+        value = current.format("YYYY-Q")
+        quarter = current.format("Q")
+        year = current.format("YYYY")
+        if quarter == "1"
+          label = "#{year} Jan-Mar"
+        if quarter == "2"
+          label = "#{year} Apr-Jun"
+        if quarter == "3"
+          label = "#{year} Jul-Sep"
+        if quarter == "4"
+          label = "#{year} Oct-Dec"
+        categories.push({ value: value, label: label })
         current.add(1, "quarters")
         if categories.length >= 1000
           break
