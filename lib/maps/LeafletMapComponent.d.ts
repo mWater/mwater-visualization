@@ -19,7 +19,7 @@ export default class LeafletMapComponent {
   height: any 
   
   /** Called with bounds in w, n, s, e format when bounds change */
-  onBoundsChange: (bounds: { w: number, n: number, s: number, e: number }) => void
+  onBoundsChange?: (bounds: { w: number, n: number, s: number, e: number }) => void
   
   /** List of layers */
   layers: Array<{
@@ -42,7 +42,7 @@ export default class LeafletMapComponent {
     }>
   
   /** Legend. Will have zoom injected */
-  legend: ReactNode
+  legend?: ReactNode
   
   /** Whether the map be draggable with mouse/touch or not. Default true */
   dragging?: boolean         
