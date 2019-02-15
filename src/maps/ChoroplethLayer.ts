@@ -1,9 +1,9 @@
-import _ = require('lodash');
-import React = require('react');
+import _ from 'lodash';
+import React from 'react';
 
 const Layer = require('./Layer');
 import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, JsonQL, JsonQLQuery, Expr, DataSource, OpExpr } from 'mwater-expressions';
-import AxisBuilder = require('../axes/AxisBuilder');
+import AxisBuilder from '../axes/AxisBuilder';
 import { LayerDefinition, OnGridClickResults } from './maps';
 import { JsonQLFilter } from '../index';
 import ChoroplethLayerDesign from './ChoroplethLayerDesign'

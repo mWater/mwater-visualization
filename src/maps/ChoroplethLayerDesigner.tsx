@@ -1,19 +1,19 @@
-import _ = require('lodash')
-import React = require('react')
-import R = React.createElement
+import _ from 'lodash'
+import React from 'react'
+const R = React.createElement
 import { produce } from "immer"
 
 import { ExprComponent, FilterExprComponent } from "mwater-expressions-ui"
 import { ExprCompiler, Schema, DataSource, Expr, OpExpr } from 'mwater-expressions'
-import AxisComponent = require('./../axes/AxisComponent');
-import TableSelectComponent = require('../TableSelectComponent');
-import ColorComponent = require('../ColorComponent');
+import AxisComponent from './../axes/AxisComponent'
+import TableSelectComponent from '../TableSelectComponent'
+import ColorComponent from '../ColorComponent'
 import Rcslider from 'rc-slider'
 import ChoroplethLayerDesign from './ChoroplethLayerDesign'
 import { JsonQLFilter } from '../index';
 const EditPopupComponent = require('./EditPopupComponent');
 const ZoomLevelsComponent = require('./ZoomLevelsComponent');
-import ui = require('react-library/lib/bootstrap');
+import ui from 'react-library/lib/bootstrap'
 import { Axis } from '../axes/Axis';
 
 const AdminScopeAndDetailLevelComponent = require('./AdminScopeAndDetailLevelComponent');

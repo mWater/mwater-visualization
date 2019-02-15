@@ -1,18 +1,20 @@
 import { Schema, DataSource, JsonQL } from "mwater-expressions";
 import { ReactElement } from "react";  
-import React = require("react");
+import React from "react"
 
-declare class WidgetFactory {
+export { default as LeafletMapComponent } from "./maps/LeafletMapComponent";
+
+export class WidgetFactory {
   static createWidget(type: string): Widget
 }
 
-declare interface JsonQLFilter {
+export interface JsonQLFilter {
   table: string
   /** jsonql condition with {alias} for tableAlias. Use injectAlias to correct */
   jsonql: JsonQL
 }
 
-declare class Widget {
+export class Widget {
   /** Creates a React element that is a view of the widget */
   createViewElement(options: {
     /** schema to use **/
@@ -65,7 +67,7 @@ declare class Widget {
 //   return []
 }
 
-declare class MWaterLoaderComponent extends React.Component<{
+export class MWaterLoaderComponent extends React.Component<{
   apiUrl: string
   client?: string
   share?: string
@@ -82,7 +84,7 @@ declare class MWaterLoaderComponent extends React.Component<{
   children: (error: any, config: { schema: Schema, dataSource: DataSource }) => ReactElement<any>
 }> {}
 
-declare class MWaterContextComponent extends React.Component<{
+export class MWaterContextComponent extends React.Component<{
   apiUrl: string
   client?: string
   /**  user id of logged in user */
@@ -97,7 +99,7 @@ declare class MWaterContextComponent extends React.Component<{
 }> {}
 
 /** Loads a schema and data source that is specific to mWater server */
-declare function mWaterLoader(options: {
+export function mWaterLoader(options: {
   /** e.g. "https://api.mwater.co/v3/". required */
   apiUrl: string
   /** client id if logged in. optional */
@@ -110,7 +112,7 @@ declare function mWaterLoader(options: {
   extraTables: string[]
 }, callback: (error: any, config: { schema: Schema, dataSource: DataSource }) => void): void
 
-declare class DirectWidgetDataSource {
+export class DirectWidgetDataSource {
   constructor(options: {
     /** widget object */
     widget: Widget
