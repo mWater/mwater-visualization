@@ -32,9 +32,9 @@ interface Props {
     /** 0-1 */
     opacity: number 
     /** Function that is called when grid layer is clicked. Passed { data } */
-    onGridClick?: (data: any) => void
+    onGridClick?: (ev: { data: any }) => void
     /** Function that is called when grid layer is hovered. Passed { data } */
-    onGridHover?: (data: any) => void
+    onGridHover?: (ev: { data: any }) => void
     /** Minimum zoom level  */
     minZoom?: number 
     /** Maximum zoom level */
