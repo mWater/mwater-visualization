@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
+import { ReactNode, Component } from "react";
 
-export default class LeafletMapComponent {
+interface Props {
   baseLayerId: "bing_road" | "bing_aerial" | "cartodb_positron" | "cartodb_dark_matter" | "white"
   /** Optional opacity 0-1 */
   baseLayerOpacity?: number
@@ -71,3 +71,5 @@ export default class LeafletMapComponent {
     contents: ReactNode
   }
 }
+
+export default class LeafletMapComponent extends Component<Props> {}
