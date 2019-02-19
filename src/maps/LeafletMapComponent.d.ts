@@ -1,5 +1,24 @@
 import { ReactNode, Component } from "react";
 
+export interface Layer {
+  /** Url in leaflet format */
+  tileUrl: string 
+  /** Url of interactivity grid */
+  utfGridUrl?: string
+  /** Visibility */
+  visible: boolean
+  /** 0-1 */
+  opacity: number 
+  /** Function that is called when grid layer is clicked. Passed { data } */
+  onGridClick?: (ev: { data: any }) => void
+  /** Function that is called when grid layer is hovered. Passed { data } */
+  onGridHover?: (ev: { data: any }) => void
+  /** Minimum zoom level  */
+  minZoom?: number 
+  /** Maximum zoom level */
+  maxZoom?: number 
+}
+
 interface Props {
   baseLayerId: "bing_road" | "bing_aerial" | "cartodb_positron" | "cartodb_dark_matter" | "white"
   /** Optional opacity 0-1 */
@@ -22,24 +41,7 @@ interface Props {
   onBoundsChange?: (bounds: { w: number, n: number, s: number, e: number }) => void
   
   /** List of layers */
-  layers: Array<{
-    /** Url in leaflet format */
-    tileUrl: string 
-    /** Url of interactivity grid */
-    utfGridUrl?: string
-    /** Visibility */
-    visible: boolean
-    /** 0-1 */
-    opacity: number 
-    /** Function that is called when grid layer is clicked. Passed { data } */
-    onGridClick?: (ev: { data: any }) => void
-    /** Function that is called when grid layer is hovered. Passed { data } */
-    onGridHover?: (ev: { data: any }) => void
-    /** Minimum zoom level  */
-    minZoom?: number 
-    /** Maximum zoom level */
-    maxZoom?: number 
-    }>
+  layers: Layer[]
   
   /** Legend. Will have zoom injected */
   legend?: ReactNode
@@ -72,4 +74,7 @@ interface Props {
   }
 }
 
-export default class LeafletMapComponent extends Component<Props> {}
+export default class LeafletMapComponent extends Component<Props> {
+  /** Reloads all layers */
+  reload(): void
+}
