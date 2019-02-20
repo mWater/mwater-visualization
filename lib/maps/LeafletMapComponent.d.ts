@@ -1,4 +1,5 @@
-import { ReactNode, Component } from "react";
+import { ReactNode, Component } from "react"
+import L from 'leaflet'
 
 export interface Layer {
   /** Url in leaflet format */
@@ -77,4 +78,7 @@ interface Props {
 export default class LeafletMapComponent extends Component<Props> {
   /** Reloads all layers */
   reload(): void
+
+  /** Gets the underlying Leaflet map */
+  getLeafletMap(): L.Map
 }

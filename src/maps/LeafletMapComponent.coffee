@@ -74,6 +74,9 @@ module.exports = class LeafletMapComponent extends React.Component
     for tileLayer in @tileLayers
       tileLayer.redraw()
 
+  # Get underlying leaflet map
+  getLeafletMap: -> @map
+
   # Get bounds. Bounds are in { w, n, s, e } format
   getBounds: ->
     curBounds = @map.getBounds()
