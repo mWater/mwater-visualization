@@ -181,6 +181,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
         R ThresholdsComponent, 
           thresholds: @props.design.yThresholds
           onThresholdsChange: @handleYThresholdsChange
+          showHighlightColor: @props.design.type == "bar"
 
   render: ->
     tabs = []
@@ -213,6 +214,7 @@ class ThresholdsComponent extends React.Component
   @propTypes: 
     thresholds: PropTypes.arrayOf(PropTypes.shape(value: PropTypes.number, label: PropTypes.string, highlightColor: PropTypes.string))
     onThresholdsChange: PropTypes.func.isRequired
+    showHighlightColor: PropTypes.bool.isRequired   # True to show highlight color
 
   handleAdd: =>
     thresholds = (@props.thresholds or []).slice()
@@ -232,7 +234,7 @@ class ThresholdsComponent extends React.Component
   render: ->
     R 'div', null,
       _.map @props.thresholds, (threshold, index) =>
-        R ThresholdComponent, threshold: threshold, onThresholdChange: @handleChange.bind(null, index), onRemove: @handleRemove.bind(null, index)
+        R ThresholdComponent, threshold: threshold, onThresholdChange: @handleChange.bind(null, index), onRemove: @handleRemove.bind(null, index), showHighlightColor: @props.showHighlightColor
 
       R 'button', type: "button", className: "btn btn-xs btn-link", onClick: @handleAdd,
         R 'i', className: "fa fa-plus"
@@ -243,6 +245,7 @@ class ThresholdComponent extends React.Component
     threshold: PropTypes.shape(value: PropTypes.number, label: PropTypes.string, highlightColor: PropTypes.string).isRequired
     onThresholdChange: PropTypes.func.isRequired
     onRemove: PropTypes.func.isRequired
+    showHighlightColor: PropTypes.bool.isRequired   # True to show highlight color
 
   render: ->
     R 'div', null,
@@ -252,9 +255,10 @@ class ThresholdComponent extends React.Component
       R LabeledInlineComponent, key: "label", label: "Label:",
         R ui.TextInput, style: { display: "inline-block", width: "8em" }, size: "sm", value: @props.threshold.label, onChange: (v) => @props.onThresholdChange(_.extend({}, @props.threshold, label: v))
       "  "
-      R LabeledInlineComponent, key: "color", label: "Highlight color:",
-        R 'div', style: { verticalAlign: "middle", display: "inline-block" },
-          R ColorComponent, color: @props.threshold.highlightColor, onChange: (v) => @props.onThresholdChange(_.extend({}, @props.threshold, highlightColor: v))
+      if @props.showHighlightColor
+        R LabeledInlineComponent, key: "color", label: "Highlight color:",
+          R 'div', style: { verticalAlign: "middle", display: "inline-block" },
+            R ColorComponent, color: @props.threshold.highlightColor, onChange: (v) => @props.onThresholdChange(_.extend({}, @props.threshold, highlightColor: v))
       "  "
       R 'button', className: "btn btn-xs btn-link", onClick: @props.onRemove, 
         R 'i', className: "fa fa-remove"
