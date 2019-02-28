@@ -139,7 +139,7 @@ module.exports = class Layer
               n: results[0].bounds.coordinates[0][2][1] + 0.001
             }
         else
-          # Default bounds
-          bounds = { w: -165.9375, n: 76.9206135182968, e: 38.67187499999999, s: -62.431074232920906 }
+          # Null if no bounds can be calculated
+          bounds = null
 
         callback(null, bounds)
