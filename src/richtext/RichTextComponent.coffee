@@ -165,12 +165,14 @@ module.exports = class RichTextComponent extends React.Component
         R 'div', key: "removeFormat", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "removeFormat", null), style: { paddingLeft: 5, paddingRight: 5 },
           R 'img', src: removeFormatIcon, style: { height: 20 }
         @props.extraPaletteButtons
+
+  refContentEditable = (c) => @contentEditable = c
     
   renderHtml: ->
     if @props.onItemsChange?
       return R 'div', key: "contents", style: @props.style, className: @props.className,
         R ContentEditableComponent, 
-          ref: (c) => @contentEditable = c
+          ref: @refContentEditable
           style: { outline: "none" }
           html: @createHtml()
           onChange: @handleChange
