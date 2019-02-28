@@ -166,7 +166,7 @@ module.exports = class RichTextComponent extends React.Component
           R 'img', src: removeFormatIcon, style: { height: 20 }
         @props.extraPaletteButtons
 
-  refContentEditable = (c) => @contentEditable = c
+  refContentEditable: (c) => @contentEditable = c
     
   renderHtml: ->
     if @props.onItemsChange?
