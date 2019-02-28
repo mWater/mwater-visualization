@@ -86,6 +86,8 @@ module.exports = class TextComponent extends React.Component
       R ExprUpdateModalComponent, key: "exprUpdateModal", ref: ((c) => @exprUpdateModal = c), schema: @props.schema, dataSource: @props.dataSource, singleRowTable: @props.singleRowTable
     ]
   
+  refRichTextComponent: (c) => @editor = c
+  
   render: ->
     style = { 
       position: "relative"
@@ -104,7 +106,7 @@ module.exports = class TextComponent extends React.Component
     return R 'div', null,
       @renderModals()
       R RichTextComponent,
-        ref: (c) => @editor = c
+        ref: @refRichTextComponent
         className: "mwater-visualization-text-widget-style-#{@props.design.style or "default"}"
         style: style
         items: @props.design.items
