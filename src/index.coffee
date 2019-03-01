@@ -1,4 +1,3 @@
-require './index.css'
 require "leaflet/dist/leaflet.css"
 require "fixed-data-table/dist/fixed-data-table.min.css"
 require "rc-slider/assets/index.css"
@@ -6,6 +5,7 @@ require "leaflet-loading/src/Control.Loading.css"
 require "./layouts/decorated-block.css"
 require "react-datepicker/dist/react-datepicker.css" 
 require 'c3/c3.css'
+require './index.css'
 
 exports.CachingDataSource = require './CachingDataSource'
 exports.WidgetFactory = require './widgets/WidgetFactory'

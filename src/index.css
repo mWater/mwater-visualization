@@ -37,6 +37,11 @@
     stroke-dasharray: 3;
 }
 
+/* Black text on donut/pie */
+.c3-chart-arc text {
+  fill: #000;
+}
+
 /* Put dropdowns over top of leaflet controls */
 .Select-menu-outer {
   z-index: 1100;

@@ -12,3 +12,6 @@ Requires C3, D3, Bootstrap and Font Awesome
 * After any change design is cleaned before being stored
 * Stored design is always cleaned before being edited or displayed
 
+## Quick start
+
+Run `npm run watch` to start the demo
