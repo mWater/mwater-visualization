@@ -77,6 +77,10 @@ module.exports = class DatagridComponent extends React.Component
   getQuickfilterValues: =>
     return @state.quickfiltersValues or []
 
+  # Get filters that are applied by the quickfilters
+  getQuickfilterFilters: =>
+    return new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues, @props.quickfilterLocks)
+
   handleCellEditingToggle: =>
     if @state.cellEditingEnabled
       @setState(cellEditingEnabled: false)
@@ -225,7 +229,7 @@ module.exports = class DatagridComponent extends React.Component
 
   render: ->
     # Compile quickfilters
-    filters = new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues, @props.quickfilterLocks)
+    filters = @getQuickfilterFilters()
 
     hasQuickfilters = @props.design.quickfilters?[0]?
 
