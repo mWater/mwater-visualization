@@ -1,6 +1,13 @@
 import { ReactNode, Component } from "react"
 import L from 'leaflet'
 
+export interface Bounds {
+  w: number
+  n: number
+  e: number
+  s: number
+}
+
 export interface Layer {
   /** Url in leaflet format */
   tileUrl: string 
@@ -26,12 +33,7 @@ interface Props {
   baseLayerOpacity?: number
   
   /** Initial bounds. Fit world if none */
-  initialBounds?: { 
-    w: number
-    n: number
-    e: number
-    s: number
-  }
+  initialBounds?: Bounds
   
   /**  Required width in any css units */
   width: any 
@@ -81,4 +83,7 @@ export default class LeafletMapComponent extends Component<Props> {
 
   /** Gets the underlying Leaflet map */
   getLeafletMap(): L.Map
+
+  /** Set bounds. Padding is optional fractional pad */
+  setBounds(bounds: Bounds | null, pad?: number): void
 }
