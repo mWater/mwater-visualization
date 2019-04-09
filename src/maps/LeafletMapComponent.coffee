@@ -48,6 +48,7 @@ module.exports = class LeafletMapComponent extends React.Component
     scrollWheelZoom: PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
     keyboard: PropTypes.bool          # Whether the map responds to keyboard. Default true
 
+    minZoom: PropTypes.number         # Minimum zoom level
     maxZoom: PropTypes.number         # Maximum zoom level
     extraAttribution: PropTypes.string # User defined attributions
 
@@ -131,6 +132,9 @@ module.exports = class LeafletMapComponent extends React.Component
     # Must not be null, or will not zoom
     if @props.maxZoom?
       mapOptions.maxZoom = @props.maxZoom
+
+    if @props.minZoom?
+      mapOptions.minZoom = @props.minZoom
 
     @map = L.map(@mapElem, mapOptions)
 

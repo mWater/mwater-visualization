@@ -60,6 +60,10 @@ interface Props {
   
   /** Maximum zoom level */
   maxZoom?: number
+
+  /** Minimum zoom level */
+  minZoom?: number
+
   /** User defined attributions */
   extraAttribution?: string 
   

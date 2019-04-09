@@ -5,7 +5,6 @@ R = React.createElement
 FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
 ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprUtils = require('mwater-expressions').ExprUtils
-PopoverHelpComponent = require 'react-library/lib/PopoverHelpComponent'
 
 # Designer for filters of multiple tables. Used for maps and dashboards
 # Filters are in format mwater-expression filter expression indexed by table. e.g. { sometable: logical expression, etc. }
