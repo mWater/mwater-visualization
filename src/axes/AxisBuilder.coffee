@@ -321,6 +321,7 @@ module.exports = class AxisBuilder
   # Inspired by: http://dba.stackexchange.com/questions/17086/fast-general-method-to-calculate-percentiles
   # expr is mwater expression on table
   # filterExpr is optional filter on values to include
+  # Result can be null if no query could be computed
   compileBinMinMax: (expr, table, filterExpr, numBins) ->
     exprCompiler = new ExprCompiler(@schema)
     compiledExpr = exprCompiler.compileExpr(expr: expr, tableAlias: "binrange")
@@ -335,6 +336,9 @@ module.exports = class AxisBuilder
       op: "is not null"
       exprs: [compiledExpr]
     }
+
+    if not compileExpr
+      return null
 
     # If filtering, compile and add to inner where
     if filterExpr

@@ -40,6 +40,8 @@ module.exports = class BinsComponent extends React.Component
 
       # Get min and max from a query
       minMaxQuery = axisBuilder.compileBinMinMax(@props.expr, @props.expr.table, null, @props.xform.numBins)
+      if not minMaxQuery
+        return
 
       @setState(guessing: true)
       @props.dataSource.performQuery(minMaxQuery, (error, rows) =>
