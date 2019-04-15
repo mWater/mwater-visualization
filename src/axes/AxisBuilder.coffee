@@ -337,7 +337,7 @@ module.exports = class AxisBuilder
       exprs: [compiledExpr]
     }
 
-    if not compileExpr
+    if not compiledExpr
       return null
 
     # If filtering, compile and add to inner where
