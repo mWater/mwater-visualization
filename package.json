@@ -23,6 +23,7 @@
   "license": "LGPL-3.0",
   "dependencies": {
     "@babel/runtime": "^7.3.1",
+    "@turf/bbox": "^6.0.1",
     "async": "^1.2.1",
     "async-latest": "^1.0.0",
     "backbone": "~1.1.2",

@@ -2,6 +2,7 @@ _ = require 'lodash'
 AxisBuilder = require '../axes/AxisBuilder'
 ExprCompiler = require('mwater-expressions').ExprCompiler
 injectTableAlias = require('mwater-expressions').injectTableAlias
+bbox = require("@turf/bbox").default
 
 # Defines a layer for a map which has all the logic for rendering the specific data to be viewed
 module.exports = class Layer
@@ -123,23 +124,26 @@ module.exports = class Layer
       if err
         callback(err)
       else
+        # Null if no bounds can be calculated
+        bounds = null
+
         if results[0].bounds
-          if results[0].bounds.type == "Point"
+          [w, s, e, n] = bbox(results[0].bounds)
+          # Pad to 10km if point
+          if w == e and n == s
             bounds = {
-              w: results[0].bounds.coordinates[0] - 0.1 # Single point; zoom to 10km bounds
-              s: results[0].bounds.coordinates[1] - 0.1
-              e: results[0].bounds.coordinates[0] + 0.1
-              n: results[0].bounds.coordinates[1] + 0.1
-            }            
-          else
+              w: w - 0.1 
+              s: s - 0.1
+              e: e + 0.1
+              n: n + 0.1
+            }        
+          # Pad bounds to prevent too small box (10m)
+          else 
             bounds = {
-              w: results[0].bounds.coordinates[0][0][0] - 0.001 # Add 10 meters to prevent too small box
-              s: results[0].bounds.coordinates[0][0][1] - 0.001
-              e: results[0].bounds.coordinates[0][2][0] + 0.001
-              n: results[0].bounds.coordinates[0][2][1] + 0.001
+              w: w - 0.001
+              s: s - 0.001
+              e: e + 0.001
+              n: n + 0.001
             }
-        else
-          # Null if no bounds can be calculated
-          bounds = null
 
         callback(null, bounds)
