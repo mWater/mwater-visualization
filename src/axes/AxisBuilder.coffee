@@ -326,6 +326,9 @@ module.exports = class AxisBuilder
     exprCompiler = new ExprCompiler(@schema)
     compiledExpr = exprCompiler.compileExpr(expr: expr, tableAlias: "binrange")
 
+    if not compiledExpr
+      return null
+
     # Create expression that selects the min or max
     minExpr = { type: "op", op: "min", exprs: [{ type: "field", tableAlias: "inner", column: "val" }]}
     maxExpr = { type: "op", op: "max", exprs: [{ type: "field", tableAlias: "inner", column: "val" }]}
@@ -336,9 +339,6 @@ module.exports = class AxisBuilder
       op: "is not null"
       exprs: [compiledExpr]
     }
-
-    if not compiledExpr
-      return null
 
     # If filtering, compile and add to inner where
     if filterExpr

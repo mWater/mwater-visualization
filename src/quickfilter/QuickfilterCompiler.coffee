@@ -59,7 +59,29 @@ module.exports = class QuickfilterCompiler
     # Get type of expr
     type = new ExprUtils(@schema).getExprType(expr)
 
-    if type in ['enum', 'text']
+    if type == 'text'
+      # Create simple = expression
+      if multi
+        return {
+          type: "op"
+          op: "= any"
+          table: expr.table
+          exprs: [
+            expr
+            { type: "literal", valueType: "text[]", value: value }
+          ]
+        }
+      else
+        return {
+          type: "op"
+          op: "="
+          table: expr.table
+          exprs: [
+            expr
+            { type: "literal", valueType: "text", value: value }
+          ]
+        }
+    else if type == 'enum'
       # Create simple = expression
       if multi
         return {
