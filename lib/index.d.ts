@@ -4,6 +4,8 @@ import React from "react"
 
 export { default as LeafletMapComponent } from "./maps/LeafletMapComponent";
 
+export { default as DateRangeComponent } from "./DateRangeComponent";
+
 export class WidgetFactory {
   static createWidget(type: string): Widget
 }
