@@ -130,7 +130,7 @@ class C3ChartComponent extends React.Component
       data: @props.data
       width: @props.width
       height: @props.height
-      locale: @context.locale
+      locale: @props.locale
     })
     
     chartOptions.bindto = @chartDiv
