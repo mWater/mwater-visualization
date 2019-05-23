@@ -16,11 +16,14 @@ LegendGroup = require('./LegendGroup')
 Layer that is a custom Leaflet-style url tile layer
 Design is:
   tileUrl: Url with {s}, {z}, {x}, {y}
+  minZoom: optional min zoom level
+  maxZoom: optional max zoom level
+  readonly: if true, hides url and prevents editing
 ###
 module.exports = class TileUrlLayer extends Layer
   # Get min and max zoom levels
-  getMinZoom: (design) -> return null
-  getMaxZoom: (design) -> return null
+  getMinZoom: (design) -> return design.minZoom
+  getMaxZoom: (design) -> return design.maxZoom
 
   # True if layer can be edited
   isEditable: () ->
@@ -60,6 +63,10 @@ class TileUrlLayerDesignerComponent extends React.Component
     @props.onDesignChange(_.extend({}, @props.design, tileUrl: ev.target.value))
 
   render: ->
+    # Readonly is non-editable and shows only description
+    if @props.design.readonly
+      return null
+
     R 'div', className: "form-group",
       R 'label', className: "text-muted", "Url (containing {z}, {x} and {y})"
       R 'input', type: "text", className: "form-control", value: @props.design.tileUrl or "", onChange: @handleTileUrlChange
