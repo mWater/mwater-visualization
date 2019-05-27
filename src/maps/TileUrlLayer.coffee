@@ -21,6 +21,18 @@ Design is:
   readonly: if true, hides url and prevents editing
 ###
 module.exports = class TileUrlLayer extends Layer
+  # Gets the type of layer definition ("JsonQLCss"/"TileUrl")
+  getLayerDefinitionType: ->
+    return "TileUrl"
+
+  # Gets the tile url for definition type "TileUrl"
+  getTileUrl: (design, filters) ->
+    return design.tileUrl
+
+  # Gets the utf grid url for definition type "TileUrl"
+  getUtfGridUrl: (design, filters) ->
+    return null
+
   # Get min and max zoom levels
   getMinZoom: (design) -> return design.minZoom
   getMaxZoom: (design) -> return design.maxZoom

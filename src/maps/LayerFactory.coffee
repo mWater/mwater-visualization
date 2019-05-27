@@ -4,6 +4,7 @@ BufferLayer = require './BufferLayer'
 ChoroplethLayer = require('./ChoroplethLayer').default
 ClusterLayer = require './ClusterLayer'
 TileUrlLayer = require './TileUrlLayer'
+SwitchableTileUrlLayer = require('./SwitchableTileUrlLayer').default
 
 module.exports = class LayerFactory
   @createLayer: (type) ->
@@ -26,5 +27,8 @@ module.exports = class LayerFactory
 
       when "TileUrl"
         return new TileUrlLayer()
+
+      when "SwitchableTileUrl"
+        return new SwitchableTileUrlLayer()
 
     throw new Error("Unknown type #{type}")

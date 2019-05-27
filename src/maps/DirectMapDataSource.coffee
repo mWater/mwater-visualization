@@ -54,8 +54,10 @@ class DirectLayerDataSource
     # Handle special cases
     if @options.layerView.type == "MWaterServer"
       return @createLegacyUrl(design, "png", filters)
-    if @options.layerView.type == "TileUrl"
-      return design.tileUrl
+
+    # If layer has tiles url directly available
+    if layer.getLayerDefinitionType() == "TileUrl"
+      return layer.getTileUrl(design, filters)
 
     # Get JsonQLCss
     jsonqlCss = layer.getJsonQLCss(design, @options.schema, filters)
@@ -71,8 +73,10 @@ class DirectLayerDataSource
     # Handle special cases
     if @options.layerView.type == "MWaterServer"
       return @createLegacyUrl(design, "grid.json", filters)
-    if @options.layerView.type == "TileUrl"
-      return null
+
+    # If layer has tiles url directly available
+    if layer.getLayerDefinitionType() == "TileUrl"
+      return layer.getUtfGridUrl(design, filters)
 
     # Get JsonQLCss
     jsonqlCss = layer.getJsonQLCss(design, @options.schema, filters)

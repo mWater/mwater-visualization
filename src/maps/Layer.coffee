@@ -6,6 +6,10 @@ bbox = require("@turf/bbox").default
 
 # Defines a layer for a map which has all the logic for rendering the specific data to be viewed
 module.exports = class Layer
+  # Gets the type of layer definition ("JsonQLCss"/"TileUrl")
+  getLayerDefinitionType: ->
+    return "JsonQLCss"
+
   # Gets the layer definition as JsonQL + CSS in format:
   #   {
   #     layers: array of { id: layer id, jsonql: jsonql that includes "the_webmercator_geom" as a column }
@@ -17,6 +21,14 @@ module.exports = class Layer
   #   schema: schema to use
   #   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
   getJsonQLCss: (design, schema, filters) ->
+    throw new Error("Not implemented")
+
+  # Gets the tile url for definition type "TileUrl"
+  getTileUrl: (design, filters) ->
+    throw new Error("Not implemented")
+
+  # Gets the utf grid url for definition type "TileUrl"
+  getUtfGridUrl: (design, filters) ->
     throw new Error("Not implemented")
 
   # Called when the interactivity grid is clicked. 

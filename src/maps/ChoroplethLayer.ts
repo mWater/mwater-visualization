@@ -550,7 +550,7 @@ opacity: ` +  design.fillOpacity + `;
     if (design.table) { return [design.table]; } else { return []; }
   }
 
-  // True if layer can be edited
+  /** True if layer can be edited */
   isEditable() {
     return true;
   }

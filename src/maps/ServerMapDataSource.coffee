@@ -67,8 +67,13 @@ class ServerLayerDataSource
     # Handle special cases
     if @options.layerView.type == "MWaterServer"
       return @createLegacyUrl(design, "png", filters)
-    if @options.layerView.type == "TileUrl"
-      return design.tileUrl
+
+    # Create layer
+    layer = LayerFactory.createLayer(@options.layerView.type)
+
+    # If layer has tiles url directly available
+    if layer.getLayerDefinitionType() == "TileUrl"
+      return layer.getTileUrl(@options.layerView.design, filters)
 
     return @createUrl(filters, "png") 
 
@@ -78,8 +83,13 @@ class ServerLayerDataSource
     # Handle special cases
     if @options.layerView.type == "MWaterServer"
       return @createLegacyUrl(design, "grid.json", filters)
-    if @options.layerView.type == "TileUrl"
-      return null
+
+    # Create layer
+    layer = LayerFactory.createLayer(@options.layerView.type)
+
+    # If layer has tiles url directly available
+    if layer.getLayerDefinitionType() == "TileUrl"
+      return layer.getUtfGridUrl(@options.layerView.design, filters)
 
     return @createUrl(filters, "grid.json") 
 

@@ -3,6 +3,7 @@ $ = require 'jquery'
 querystring = require 'querystring'
 injectTableAlias = require('mwater-expressions').injectTableAlias
 compressJson = require '../compressJson'
+LayerFactory = require '../maps/LayerFactory'
 
 # Uses mWater server to get widget data to allow sharing with unprivileged users
 module.exports = class ServerDashboardDataSource
@@ -181,15 +182,20 @@ class ServerWidgetLayerDataSource
   #   layerView: layer view of map inside widget
   constructor: (options) ->
     @options = options
-
+ 
   # Get the url for the image tiles with the specified filters applied
   # Called with (design, filters) where design is the layer design and filters are filters to apply. Returns URL
   getTileUrl: (design, filters) -> 
     # Handle special cases
     if @options.layerView.type == "MWaterServer"
       return @createLegacyUrl(@options.layerView.design, "png", filters)
-    if @options.layerView.type == "TileUrl"
-      return @options.layerView.design.tileUrl
+
+    # Create layer
+    layer = LayerFactory.createLayer(@options.layerView.type)
+
+    # If layer has tiles url directly available
+    if layer.getLayerDefinitionType() == "TileUrl"
+      return layer.getTileUrl(@options.layerView.design, filters)
 
     return @createUrl(filters, "png")
 
@@ -199,8 +205,13 @@ class ServerWidgetLayerDataSource
     # Handle special cases
     if @options.layerView.type == "MWaterServer"
       return @createLegacyUrl(@options.layerView.design, "grid.json", filters)
-    if @options.layerView.type == "TileUrl"
-      return null
+
+    # Create layer
+    layer = LayerFactory.createLayer(@options.layerView.type)
+
+    # If layer has tiles url directly available
+    if layer.getLayerDefinitionType() == "TileUrl"
+      return layer.getUtfGridUrl(@options.layerView.design, filters)
 
     return @createUrl(filters, "grid.json")
 

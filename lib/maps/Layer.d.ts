@@ -1,8 +1,9 @@
 import { JsonQL, Schema, DataSource } from "mwater-expressions";
 import { JsonQLFilter } from "../index";
 import { OnGridClickResults } from "./maps";
+import { ReactNode } from "react";
 
-declare interface LayerDefinition {
+declare interface JsonQLCssLayerDefinition {
   layers: Array<{ 
     /** Layer id */
     id: string
@@ -23,13 +24,22 @@ declare interface LayerDefinition {
 
 /** Defines a layer for a map which has all the logic for rendering the specific data to be viewed */
 declare class Layer {
+  /** Gets the type of layer definition */
+  getLayerDefinitionType(): "JsonQLCss" | "TileUrl"
+
   /** Gets the layer definition as JsonQL + CSS
-    # arguments:
-    #   design: design of layer
-    #   schema: schema to use
-    #   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
+      arguments:
+        design: design of layer
+        schema: schema to use
+        filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
    */
-  getJsonQLCss(design: any, schema: Schema, filters: JsonQLFilter[]): LayerDefinition
+  getJsonQLCss(design: any, schema: Schema, filters: JsonQLFilter[]): JsonQLCssLayerDefinition
+
+  /** Gets the tile url for definition type "TileUrl" */
+  getTileUrl(design: any, filters: JsonQLFilter[]): string | null
+
+  /** Gets the utf grid url for definition type "TileUrl" */
+  getUtfGridUrl(design: any, filters: JsonQLFilter[]): string | null
 
   /**  
    * Called when the interactivity grid is clicked. 
@@ -65,6 +75,9 @@ declare class Layer {
     /** compiled filters to apply to the popup */
     filters: JsonQLFilter[]
   }): OnGridClickResults
+
+  /** Get the legend to be optionally displayed on the map. Returns a React element */
+  getLegend(design: any, schema: Schema, name: string, dataSource: DataSource, filters: JsonQLFilter[]): ReactNode
 
     // # Gets the bounds of the layer as GeoJSON
     // getBounds: (design, schema, dataSource, filters, callback) ->
