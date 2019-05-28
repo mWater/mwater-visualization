@@ -49,6 +49,14 @@ export default class SwitchableTileUrlLayer extends Layer {
     return "TileUrl" 
   }
 
+  getMinZoom(design: SwitchableTileUrlLayerDesign) {
+    return design.minZoom || null
+  }
+
+  getMaxZoom(design: SwitchableTileUrlLayerDesign) {
+    return design.maxZoom || null
+  }
+
   /** Gets the tile url for definition type "TileUrl" */
   getTileUrl(design: SwitchableTileUrlLayerDesign, filters: JsonQLFilter[]): string | null {
     // Find active option

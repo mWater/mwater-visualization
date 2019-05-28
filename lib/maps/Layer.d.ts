@@ -79,49 +79,51 @@ declare class Layer {
   /** Get the legend to be optionally displayed on the map. Returns a React element */
   getLegend(design: any, schema: Schema, name: string, dataSource: DataSource, filters: JsonQLFilter[]): ReactNode
 
-    // # Gets the bounds of the layer as GeoJSON
-    // getBounds: (design, schema, dataSource, filters, callback) ->
-  
-    // # Get min and max zoom levels
-    // getMinZoom: (design) -> return null
-    // getMaxZoom: (design) -> return null
-  
-    // # Get the legend to be optionally displayed on the map. Returns
-    // # a React element
-    // getLegend: (design, schema, name, dataSource, filters = []) ->
-  
-    // # Get a list of table ids that can be filtered on
-    // getFilterableTables: (design, schema) ->
-  
-    // # True if layer can be edited
-    // isEditable: () ->
-  
-    // # True if layer is incomplete (e.g. brand new) and should be editable immediately
-    // isIncomplete: (design, schema) ->
-  
-    // # Creates a design element with specified options.
-    // # Design should be cleaned on the way in and on way out.
-    // # options:
-    // #   design: design of layer
-    // #   schema: schema to use
-    // #   dataSource: data source to use
-    // #   onDesignChange: function called when design changes
-    // createDesignerElement: (options) ->
-  
-    // # Returns a cleaned design
-    // cleanDesign: (design, schema) ->
-  
-    // # Validates design. Null if ok, message otherwise
-    // validateDesign: (design, schema) ->
-  
-    // # arguments:
-    // #   design: design of layer
-    // #   schema: schema to use
-    // #   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
-    // getKMLExportJsonQL: (design, schema, filters) ->
-  
-    // # Convenience function to get the bounds of a geometry expression with filters
-    // getBoundsFromExpr: (schema, dataSource, table, geometryExpr, filterExpr, filters, callback) ->
+  /** Get min zoom level */
+  getMinZoom(design: any): number | null
+
+  /** Get max zoom level */
+  getMaxZoom(design: any): number | null
+
+  // # Gets the bounds of the layer as GeoJSON
+  // getBounds: (design, schema, dataSource, filters, callback) ->
+
+  // # Get the legend to be optionally displayed on the map. Returns
+  // # a React element
+  // getLegend: (design, schema, name, dataSource, filters = []) ->
+
+  // # Get a list of table ids that can be filtered on
+  // getFilterableTables: (design, schema) ->
+
+  // # True if layer can be edited
+  // isEditable: () ->
+
+  // # True if layer is incomplete (e.g. brand new) and should be editable immediately
+  // isIncomplete: (design, schema) ->
+
+  // # Creates a design element with specified options.
+  // # Design should be cleaned on the way in and on way out.
+  // # options:
+  // #   design: design of layer
+  // #   schema: schema to use
+  // #   dataSource: data source to use
+  // #   onDesignChange: function called when design changes
+  // createDesignerElement: (options) ->
+
+  // # Returns a cleaned design
+  // cleanDesign: (design, schema) ->
+
+  // # Validates design. Null if ok, message otherwise
+  // validateDesign: (design, schema) ->
+
+  // # arguments:
+  // #   design: design of layer
+  // #   schema: schema to use
+  // #   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
+  // getKMLExportJsonQL: (design, schema, filters) ->
+
+  // # Convenience function to get the bounds of a geometry expression with filters
+  // getBoundsFromExpr: (schema, dataSource, table, geometryExpr, filterExpr, filters, callback) ->
 }
 
 export = Layer
