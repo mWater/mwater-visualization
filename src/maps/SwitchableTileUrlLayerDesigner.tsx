@@ -36,10 +36,13 @@ export default class SwitchableTileUrlLayerDesigner extends React.Component<{
   }
 
   render() {
-    return <div>
-      { this.props.design.options.map(opt => {
-        return <Radio key={opt.id} value={this.props.design.activeOption} radioValue={opt.id} onChange={this.handleChange} inline={false}>{opt.name}</Radio>
-      })}
-    </div>
+    return (
+      <div>
+        <div className="text-muted" style={{ paddingBottom: 5 }}>{this.props.design.note}</div>
+        { this.props.design.options.map(opt => {
+          return <Radio key={opt.id} value={this.props.design.activeOption} radioValue={opt.id} onChange={this.handleChange} inline={false}>{opt.name}</Radio>
+        })}
+      </div>
+    )
   }
 }

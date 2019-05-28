@@ -20,6 +20,9 @@ export interface SwitchableTileUrlLayerDesign {
 
   /** Maximum zoom level allowed */
   maxZoom?: number
+
+  /** Optional note to display */
+  note?: string
 }
 
 /** One option that can be selected with its own urls */
@@ -128,6 +131,16 @@ class HtmlUrlLegend extends React.Component<HtmlUrlLegendProps, HtmlUrlLegendSta
   }
 
   componentDidMount() {
+    this.loadLegend()
+  }
+
+  componentDidUpdate(prevProps: HtmlUrlLegendProps) {
+    if (prevProps.url !== this.props.url) {
+      this.loadLegend()
+    }
+  }
+
+  loadLegend() {
     const url = this.props.url.replace(/\{name\}/, encodeURIComponent(this.props.name))
     window.fetch(url)
       .then(response => response.text())
