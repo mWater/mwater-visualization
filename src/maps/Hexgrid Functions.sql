@@ -1,5 +1,14 @@
 /* Set of functions in PostgreSQL to convert from hex coordinates to xy and to make hexagons */
 
+/* Convert a column (q) and row (r) of hex coordinates to the center point */
+create or replace function mwater_hex_qr_to_xy (q integer, r integer, size numeric) 
+   returns table(x double precision, y double precision)
+as $$
+begin
+   return query select (size * 3.0/2 * q)::double precision as x, (size * sqrt(3) * (r + 0.5 * (mod(q,2))))::double precision as y;
+end; $$ 
+language 'plpgsql';
+
 /* Convert an x, y point to hex row (r) and column (q) https://www.redblobgames.com/grids/hexagons/#rounding */
 create or replace function mwater_hex_xy_to_qr (x double precision, y double precision, size numeric) 
   returns table(q integer, r integer)
