@@ -2,6 +2,8 @@
 
 Requires C3, D3, Bootstrap and Font Awesome
 
+Also requires that server has hexgrid functions (src/maps/Hexgrid Functions.sql)
+
 ## Expressions
 
 [Expressions](docs/Expressions.md)

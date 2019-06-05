@@ -74,6 +74,12 @@ module.exports = class AddLayerComponent extends React.Component
         design: { }
       }
       {
+        label: "Hex grid Layer"
+        name: "Untitled Layer"
+        type: "Hexgrid"
+        design: { }
+      }
+      {
         label: "Custom Tile Url (advanced)"
         name: "Untitled Layer"
         type: "TileUrl"

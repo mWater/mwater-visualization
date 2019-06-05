@@ -40,7 +40,7 @@
     "dompurify": "^1.0.10",
     "file-saver": "^2.0.0",
     "fixed-data-table": "^0.6.0",
-    "immer": "^1.12.1",
+    "immer": "^3.1.2",
     "immutable-setter": "^1.1.1",
     "js-yaml": "^3.4.0",
     "languages": "github:mWater/languages.js",
@@ -91,6 +91,7 @@
     "jquery": "^2.1.4",
     "react-addons-test-utils": "^0.14.0",
     "react-test-renderer": "^16.5.2",
-    "sinon": "^4.2.0"
+    "sinon": "^4.2.0",
+    "typescript": "^3.5.1"
   }
 }

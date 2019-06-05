@@ -1,7 +1,8 @@
-import { JsonQL, Schema, DataSource } from "mwater-expressions";
+import { JsonQL, Schema, DataSource, Expr } from "mwater-expressions";
 import { JsonQLFilter } from "../index";
 import { OnGridClickResults } from "./maps";
 import { ReactNode } from "react";
+import { SecureClientSessionOptions } from "http2";
 
 declare interface JsonQLCssLayerDefinition {
   layers: Array<{ 
@@ -23,7 +24,7 @@ declare interface JsonQLCssLayerDefinition {
 }
 
 /** Defines a layer for a map which has all the logic for rendering the specific data to be viewed */
-declare class Layer {
+declare class Layer<LayerDesign> {
   /** Gets the type of layer definition */
   getLayerDefinitionType(): "JsonQLCss" | "TileUrl"
 
@@ -33,13 +34,13 @@ declare class Layer {
         schema: schema to use
         filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
    */
-  getJsonQLCss(design: any, schema: Schema, filters: JsonQLFilter[]): JsonQLCssLayerDefinition
+  getJsonQLCss(design: LayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLCssLayerDefinition
 
   /** Gets the tile url for definition type "TileUrl" */
-  getTileUrl(design: any, filters: JsonQLFilter[]): string | null
+  getTileUrl(design: LayerDesign, filters: JsonQLFilter[]): string | null
 
   /** Gets the utf grid url for definition type "TileUrl" */
-  getUtfGridUrl(design: any, filters: JsonQLFilter[]): string | null
+  getUtfGridUrl(design: LayerDesign, filters: JsonQLFilter[]): string | null
 
   /**  
    * Called when the interactivity grid is clicked. 
@@ -63,7 +64,7 @@ declare class Layer {
    */
   onGridClick(ev: { data: any }, options: {
     /** design of layer */
-    design: any
+    design: LayerDesign
     /** schema to use */
     schema: Schema
     /** data source to use */
@@ -77,16 +78,16 @@ declare class Layer {
   }): OnGridClickResults
 
   /** Get the legend to be optionally displayed on the map. Returns a React element */
-  getLegend(design: any, schema: Schema, name: string, dataSource: DataSource, filters: JsonQLFilter[]): ReactNode
+  getLegend(design: LayerDesign, schema: Schema, name: string, dataSource: DataSource, filters: JsonQLFilter[]): ReactNode
 
   /** Get min zoom level */
-  getMinZoom(design: any): number | null
+  getMinZoom(design: LayerDesign): number | null | undefined
 
   /** Get max zoom level */
-  getMaxZoom(design: any): number | null
+  getMaxZoom(design: LayerDesign): number | null | undefined
 
-  // # Gets the bounds of the layer as GeoJSON
-  // getBounds: (design, schema, dataSource, filters, callback) ->
+  /** Gets the bounds of the layer as GeoJSON */
+  getBounds(design: LayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: (err: any, bounds: any) => void): void
 
   // # Get the legend to be optionally displayed on the map. Returns
   // # a React element
@@ -110,11 +111,11 @@ declare class Layer {
   // #   onDesignChange: function called when design changes
   // createDesignerElement: (options) ->
 
-  // # Returns a cleaned design
-  // cleanDesign: (design, schema) ->
+  /** Returns a cleaned design */
+  cleanDesign(design: LayerDesign, schema: Schema): LayerDesign
 
-  // # Validates design. Null if ok, message otherwise
-  // validateDesign: (design, schema) ->
+  /** Validates design. Null if ok, message otherwise */
+  validateDesign(design: LayerDesign, schema: Schema): string | null
 
   // # arguments:
   // #   design: design of layer
@@ -122,8 +123,8 @@ declare class Layer {
   // #   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
   // getKMLExportJsonQL: (design, schema, filters) ->
 
-  // # Convenience function to get the bounds of a geometry expression with filters
-  // getBoundsFromExpr: (schema, dataSource, table, geometryExpr, filterExpr, filters, callback) ->
+  /** Convenience function to get the bounds of a geometry expression with filters */
+  getBoundsFromExpr(schema: Schema, dataSource: DataSource, table: string, geometryExpr: Expr, filterExpr: Expr, filters: JsonQLFilter[], callback: (err: any, bounds: any) => void): void
 }
 
 export = Layer

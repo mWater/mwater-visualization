@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
 
-const Layer = require('./Layer');
+import Layer from './Layer';
 import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, JsonQL, JsonQLQuery, Expr, DataSource, OpExpr } from 'mwater-expressions';
 import AxisBuilder from '../axes/AxisBuilder';
 import { LayerDefinition, OnGridClickResults } from './maps';
@@ -10,7 +10,7 @@ import ChoroplethLayerDesign from './ChoroplethLayerDesign'
 const LayerLegendComponent = require('./LayerLegendComponent');
 const PopupFilterJoinsUtils = require('./PopupFilterJoinsUtils');
 
-export default class ChoroplethLayer extends Layer {
+export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
   /** Gets the layer definition as JsonQL + CSS in format:
    *   {
    *     layers: array of { id: layer id, jsonql: jsonql that includes "the_webmercator_geom" as a column }
@@ -489,7 +489,7 @@ opacity: ` +  design.fillOpacity + `;
   }
 
   // Gets the bounds of the layer as GeoJSON
-  getBounds(design: ChoroplethLayer, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any) {
+  getBounds(design: ChoroplethLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any) {
     const regionsTable = design.regionsTable || "admin_regions";
 
     // Whole world

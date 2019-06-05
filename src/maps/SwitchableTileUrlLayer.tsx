@@ -44,7 +44,7 @@ interface SwitchableOption {
 }
 
 /** Layer that has multiple tile urls that it can display. Switchable but not editable */
-export default class SwitchableTileUrlLayer extends Layer {
+export default class SwitchableTileUrlLayer extends Layer<SwitchableTileUrlLayerDesign> {
   getLayerDefinitionType(): "TileUrl" { 
     return "TileUrl" 
   }
