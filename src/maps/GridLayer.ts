@@ -389,7 +389,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
       // Default size units
       if (!design.sizeUnits) {
         design.sizeUnits = "pixels"
-        design.size = 20
+        design.size = 30
       }
 
       // Remove extreme sizes

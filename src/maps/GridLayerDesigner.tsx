@@ -51,7 +51,7 @@ export default class GridLayerDesigner extends React.Component<{
 
   handleSizeUnitsChange = (sizeUnits: "pixels" | "meters") => {
     if (sizeUnits === "pixels") {
-      this.update((d) => { d.sizeUnits = sizeUnits; d.size = 20 })
+      this.update((d) => { d.sizeUnits = sizeUnits; d.size = 30 })
     }
     else {
       this.update((d) => { d.sizeUnits = sizeUnits; d.size = 1000 })
