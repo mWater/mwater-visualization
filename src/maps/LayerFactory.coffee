@@ -5,7 +5,7 @@ ChoroplethLayer = require('./ChoroplethLayer').default
 ClusterLayer = require './ClusterLayer'
 TileUrlLayer = require './TileUrlLayer'
 SwitchableTileUrlLayer = require('./SwitchableTileUrlLayer').default
-HexgridLayer = require('./HexgridLayer').default
+GridLayer = require('./GridLayer').default
 
 module.exports = class LayerFactory
   @createLayer: (type) ->
@@ -32,7 +32,7 @@ module.exports = class LayerFactory
       when "SwitchableTileUrl"
         return new SwitchableTileUrlLayer()
 
-      when "Hexgrid"
-        return new HexgridLayer()
+      when "Grid"
+        return new GridLayer()
 
     throw new Error("Unknown type #{type}")

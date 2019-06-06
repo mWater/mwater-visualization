@@ -5,27 +5,31 @@ import { produce } from "immer"
 
 import { ExprComponent, FilterExprComponent } from "mwater-expressions-ui"
 import { ExprCompiler, Schema, DataSource, Expr, OpExpr } from 'mwater-expressions'
-import AxisComponent from './../axes/AxisComponent'
+import AxisComponent from '../axes/AxisComponent'
 import TableSelectComponent from '../TableSelectComponent'
 import Rcslider from 'rc-slider'
-import HexgridLayerDesign from './HexgridLayerDesign'
+import GridLayerDesign from './GridLayerDesign'
 import { JsonQLFilter } from '../index';
 const EditPopupComponent = require('./EditPopupComponent');
 const ZoomLevelsComponent = require('./ZoomLevelsComponent');
 import ui from 'react-library/lib/bootstrap'
 import { Axis } from '../axes/Axis';
 
-// Designer for a choropleth layer
-export default class HexgridLayerDesigner extends React.Component<{
+/** Designer for a grid layer */
+export default class GridLayerDesigner extends React.Component<{
   schema: Schema
   dataSource: DataSource
-  design: HexgridLayerDesign
-  onDesignChange: (design: HexgridLayerDesign) => void
+  design: GridLayerDesign
+  onDesignChange: (design: GridLayerDesign) => void
   /** array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct */
   filters: JsonQLFilter[]
 }> {
-  update(mutation: (d: HexgridLayerDesign) => void) {
+  update(mutation: (d: GridLayerDesign) => void) {
     this.props.onDesignChange(produce(this.props.design, mutation))
+  }
+
+  handleShapeChange = (shape: "square" | "hex") => {
+    this.update((d) => { d.shape = shape })
   }
 
   handleTableChange = (table: string) => {
@@ -46,7 +50,7 @@ export default class HexgridLayerDesigner extends React.Component<{
 
   handleSizeUnitsChange = (sizeUnits: "pixels" | "meters") => {
     if (sizeUnits === "pixels") {
-      this.update((d) => { d.sizeUnits = sizeUnits; d.size = 30 })
+      this.update((d) => { d.sizeUnits = sizeUnits; d.size = 20 })
     }
     else {
       this.update((d) => { d.sizeUnits = sizeUnits; d.size = 1000 })
@@ -59,6 +63,26 @@ export default class HexgridLayerDesigner extends React.Component<{
 
   handleFillOpacityChange = (fillOpacity: number) => {
     this.update((d) => { d.fillOpacity = fillOpacity })
+  }
+
+  handleBorderStyleChange = (borderStyle: "none" | "color") => {
+    this.update((d) => { d.borderStyle = borderStyle })
+  }
+
+  renderShape() {
+    return (
+      <div className="form-group">
+        <label className="text-muted">Grid Type</label>
+        <div style={{ marginLeft: 10 }}>
+          <ui.Toggle<("square"|"hex"|undefined)> 
+            allowReset={false} 
+            value={this.props.design.shape as any} 
+            onChange={this.handleShapeChange}
+            size="sm"
+            options={[{ value: "hex", label: "Hexagonal"}, { value: "square", label: "Square" }]} />
+        </div>
+      </div>
+    )
   }
 
   renderSize() {
@@ -184,6 +208,21 @@ export default class HexgridLayerDesigner extends React.Component<{
     );
   }
 
+  renderBorderStyle() {
+    return (
+      <div className="form-group">
+        <label className="text-muted">Border Style</label>
+        <div style={{ marginLeft: 10 }}>
+          <ui.Toggle<("none"|"color"|undefined)> 
+            allowReset={false} 
+            value={this.props.design.borderStyle as any} 
+            onChange={this.handleBorderStyleChange}
+            size="sm"
+            options={[{ value: "none", label: "None"}, { value: "color", label: "Line" }]} />
+        </div>
+      </div>
+    )
+  }
   renderFilter() {
     // If not with table, hide
     if (!this.props.design.table) {
@@ -232,11 +271,13 @@ export default class HexgridLayerDesigner extends React.Component<{
 
   render() {
     return R('div', null,
+      this.renderShape(),
       this.renderSize(),
       this.renderTable(),
       this.renderGeometryExpr(),
       this.renderColorAxis(),
       this.renderFillOpacity(),
+      this.renderBorderStyle(),
       this.renderFilter(),
       // this.renderPopup(),
       R(ZoomLevelsComponent, {design: this.props.design, onDesignChange: this.props.onDesignChange})

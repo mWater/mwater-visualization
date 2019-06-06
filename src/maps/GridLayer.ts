@@ -6,14 +6,14 @@ import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, JsonQL,
 import AxisBuilder from '../axes/AxisBuilder';
 import { LayerDefinition, OnGridClickResults } from './maps';
 import { JsonQLFilter } from '../index';
-import HexgridLayerDesign from './HexgridLayerDesign'
+import GridLayerDesign from './GridLayerDesign'
 import produce from 'immer';
 import { Axis } from '../axes/Axis';
 const LayerLegendComponent = require('./LayerLegendComponent');
 const PopupFilterJoinsUtils = require('./PopupFilterJoinsUtils');
 
-/** Layer which is a grid of flat-topped hexagons. Depends on "Hexgrid Functions.sql" having been run */
-export default class HexgridLayer extends Layer<HexgridLayerDesign> {
+/** Layer which is a grid of squares or flat-topped hexagons. Depends on "Grid Functions.sql" having been run */
+export default class GridLayer extends Layer<GridLayerDesign> {
   /** Gets the layer definition as JsonQL + CSS in format:
    *   {
    *     layers: array of { id: layer id, jsonql: jsonql that includes "the_webmercator_geom" as a column }
@@ -25,7 +25,7 @@ export default class HexgridLayer extends Layer<HexgridLayerDesign> {
    *   schema: schema to use
    *   filters: array of filters to apply
    */
-  getJsonQLCss(design: HexgridLayerDesign, schema: Schema, filters: JsonQLFilter[]): LayerDefinition {
+  getJsonQLCss(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): LayerDefinition {
     // Create design
     const layerDef = {
       layers: [{ id: "layer0", jsonql: this.createJsonQL(design, schema, filters) }],
@@ -39,7 +39,7 @@ export default class HexgridLayer extends Layer<HexgridLayerDesign> {
     return layerDef
   }
 
-  createJsonQL(design: HexgridLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQL {
+  createJsonQL(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQL {
     const axisBuilder = new AxisBuilder({ schema })
     const exprCompiler = new ExprCompiler(schema)
 
@@ -56,10 +56,24 @@ export default class HexgridLayer extends Layer<HexgridLayerDesign> {
     */
     const compiledGeometryExpr = exprCompiler.compileExpr({ expr: design.geometryExpr, tableAlias: "innerquery" })
     const colorExpr = axisBuilder.compileAxis({axis: design.colorAxis, tableAlias: "innerquery"});
-    const compiledSizeExpr = design.sizeUnits == "pixels" ? 
-      { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_width!" }, design.size! / 2] }
-      : { type: "literal", value: design.size! / 2 }
-
+    let compiledSizeExpr: JsonQLExpr
+    
+    if (design.shape == "hex") {
+      // Hex needs distance from center to points
+      compiledSizeExpr = design.sizeUnits == "pixels" ? 
+        { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_width!" }, design.size! / 1.73205] }
+        : { type: "literal", value: design.size! / 1.73205 }
+    }
+    else if (design.shape == "square") {
+      // Square needs distance from center to center
+      compiledSizeExpr = design.sizeUnits == "pixels" ? 
+        { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_width!" }, design.size!] }
+        : { type: "literal", value: design.size! }
+    }
+    else {
+      throw new Error("Unknown shape")
+    }
+     
     // Create inner query
     const innerQuery: JsonQLQuery = {
       type: "query",
@@ -72,7 +86,7 @@ export default class HexgridLayer extends Layer<HexgridLayerDesign> {
         type: "join",
         kind: "inner",
         left: { type: "table", table: design.table!, alias: "innerquery" },
-        right: { type: "subexpr", expr: { type: "op", op: "mwater_hex_xy_to_qr", exprs: [
+        right: { type: "subexpr", expr: { type: "op", op: `mwater_${design.shape}_xy_to_qr`, exprs: [
           { type: "op", op: "ST_XMin", exprs: [compiledGeometryExpr] },
           { type: "op", op: "ST_YMin", exprs: [compiledGeometryExpr] },
           compiledSizeExpr
@@ -114,7 +128,7 @@ export default class HexgridLayer extends Layer<HexgridLayerDesign> {
     const query: JsonQLQuery = {
       type: "query",
       selects: [
-        { type: "select", expr: { type: "op", op: "mwater_hex_make", exprs: [
+        { type: "select", expr: { type: "op", op: `mwater_${design.shape}_make`, exprs: [
           { type: "field", tableAlias: "grid", column: "q" },
           { type: "field", tableAlias: "grid", column: "r" },
           compiledSizeExpr
@@ -124,7 +138,7 @@ export default class HexgridLayer extends Layer<HexgridLayerDesign> {
       from: {
         type: "join",
         kind: "left",
-        left: { type: "subexpr", expr: { type: "op", op: "mwater_hex_grid", exprs: [
+        left: { type: "subexpr", expr: { type: "op", op: `mwater_${design.shape}_grid`, exprs: [
           { type: "token", token: "!bbox!" },
           compiledSizeExpr
         ]}, alias: "grid" },
@@ -158,10 +172,11 @@ export default class HexgridLayer extends Layer<HexgridLayerDesign> {
     return query
   }
 
-  createCss(design: HexgridLayerDesign, schema: Schema, filters: JsonQLFilter[]): string {
-    let css = `\
+  createCss(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): string {
+    let css = `
 #layer0 {
   polygon-opacity: ` + design.fillOpacity + `;
+  ` + (design.borderStyle == "color" ? `line-opacity: ` + (1 - (1 - design.fillOpacity!) / 2) + `; ` : `line-width: 0;`) + `
   polygon-fill: transparent;
 }
 \
@@ -174,9 +189,17 @@ export default class HexgridLayer extends Layer<HexgridLayerDesign> {
       for (let item of design.colorAxis.colorMap) {
         // If invisible
         if (design.colorAxis.excludedValues && _.any(design.colorAxis.excludedValues, ev => ev === item.value)) {
-          css += `#layer0 [color=${JSON.stringify(item.value)}] { polygon-opacity: 0; polygon-fill: transparent; }\n`;  
+          css += `#layer0 [color=${JSON.stringify(item.value)}] { 
+            line-color: transparent; 
+            line-opacity: 0; 
+            polygon-opacity: 0; 
+            polygon-fill: transparent; 
+          }\n`;  
         } else {
-          css += `#layer0 [color=${JSON.stringify(item.value)}] { polygon-fill: ${item.color}; }\n`;
+          css += `#layer0 [color=${JSON.stringify(item.value)}] { 
+            ` + (design.borderStyle == "color" ? `line-color: ${item.color};` : "") + ` 
+            polygon-fill: ${item.color}; 
+          }\n`;
         }
       }
     }
@@ -314,7 +337,7 @@ export default class HexgridLayer extends Layer<HexgridLayerDesign> {
   // }
 
   // Get min and max zoom levels
-  getMinZoom(design: HexgridLayerDesign) { 
+  getMinZoom(design: GridLayerDesign) { 
     // Determine if too zoomed out to safely display (zoom 6 at 20000 is limit)
     if (design.sizeUnits === "meters") {
       const minSafeZoom = Math.log2(1280000.0 / (design.size || 1000))
@@ -327,11 +350,11 @@ export default class HexgridLayer extends Layer<HexgridLayerDesign> {
     }
     return design.minZoom; 
   }
-  getMaxZoom(design: HexgridLayerDesign) { return design.maxZoom; }
+  getMaxZoom(design: GridLayerDesign) { return design.maxZoom; }
 
   /** Get the legend to be optionally displayed on the map. Returns
    * a React element */
-  getLegend(design: HexgridLayerDesign, schema: Schema, name: string, dataSource: DataSource, filters: JsonQLFilter[]) {
+  getLegend(design: GridLayerDesign, schema: Schema, name: string, dataSource: DataSource, filters: JsonQLFilter[]) {
     const axisBuilder = new AxisBuilder({schema});
 
     return React.createElement(LayerLegendComponent, {
@@ -343,7 +366,7 @@ export default class HexgridLayer extends Layer<HexgridLayerDesign> {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design: HexgridLayerDesign, schema: Schema): string[] {
+  getFilterableTables(design: GridLayerDesign, schema: Schema): string[] {
     if (design.table) { return [design.table] } else { return [] }
   }
 
@@ -353,15 +376,20 @@ export default class HexgridLayer extends Layer<HexgridLayerDesign> {
   }
 
   /** Returns a cleaned design */
-  cleanDesign(design: HexgridLayerDesign, schema: Schema): HexgridLayerDesign {
+  cleanDesign(design: GridLayerDesign, schema: Schema): GridLayerDesign {
     return produce(design, (design) => {
       const exprCleaner = new ExprCleaner(schema)
       const axisBuilder = new AxisBuilder({ schema })
-  
+
+      // Default shape
+      if (!design.shape) {
+        design.shape = "hex"
+      }
+
       // Default size units
       if (!design.sizeUnits) {
         design.sizeUnits = "pixels"
-        design.size = 30
+        design.size = 20
       }
 
       // Remove extreme sizes
@@ -375,6 +403,8 @@ export default class HexgridLayer extends Layer<HexgridLayerDesign> {
       }
   
       design.fillOpacity = (design.fillOpacity != null) ? design.fillOpacity : 0.75
+
+      design.borderStyle = design.borderStyle || "none"
   
       // Clean the axis
       if (design.colorAxis) {
@@ -389,11 +419,14 @@ export default class HexgridLayer extends Layer<HexgridLayerDesign> {
   }
 
   /** Validates design. Null if ok, message otherwise */
-  validateDesign(design: HexgridLayerDesign, schema: Schema) {
+  validateDesign(design: GridLayerDesign, schema: Schema) {
     let error;
     const exprUtils = new ExprUtils(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
+    if (!design.shape) {
+      return "Missing shape";
+    }
     if (!design.table) {
       return "Missing table";
     }
@@ -421,22 +454,22 @@ export default class HexgridLayer extends Layer<HexgridLayerDesign> {
   //   onDesignChange: function called when design changes
   //   filters: array of filters
   createDesignerElement(options: {
-    design: HexgridLayerDesign
+    design: GridLayerDesign
     schema: Schema
     dataSource: DataSource
-    onDesignChange: (design: HexgridLayerDesign) => void
+    onDesignChange: (design: GridLayerDesign) => void
     filters: JsonQLFilter[]
   }): React.ReactElement<{}> {
     // Require here to prevent server require problems
-    const HexgridLayerDesigner = require('./HexgridLayerDesigner').default;
+    const GridLayerDesigner = require('./GridLayerDesigner').default;
 
     // Clean on way in and out
-    return React.createElement(HexgridLayerDesigner, {
+    return React.createElement(GridLayerDesigner, {
       schema: options.schema,
       dataSource: options.dataSource,
       design: this.cleanDesign(options.design, options.schema),
       filters: options.filters,
-      onDesignChange: (design: HexgridLayerDesign) => {
+      onDesignChange: (design: GridLayerDesign) => {
         return options.onDesignChange(this.cleanDesign(design, options.schema));
       }
     });

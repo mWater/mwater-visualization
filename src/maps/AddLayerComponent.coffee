@@ -74,9 +74,9 @@ module.exports = class AddLayerComponent extends React.Component
         design: { }
       }
       {
-        label: "Hex grid Layer"
+        label: "Grid Layer"
         name: "Untitled Layer"
-        type: "Hexgrid"
+        type: "Grid"
         design: { }
       }
       {
