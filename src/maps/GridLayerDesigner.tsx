@@ -14,6 +14,7 @@ const EditPopupComponent = require('./EditPopupComponent');
 const ZoomLevelsComponent = require('./ZoomLevelsComponent');
 import ui from 'react-library/lib/bootstrap'
 import { Axis } from '../axes/Axis';
+import PopoverHelpComponent from 'react-library/lib/PopoverHelpComponent'
 
 /** Designer for a grid layer */
 export default class GridLayerDesigner extends React.Component<{
@@ -74,6 +75,7 @@ export default class GridLayerDesigner extends React.Component<{
       <div className="form-group">
         <label className="text-muted">Grid Type</label>
         <div style={{ marginLeft: 10 }}>
+          
           <ui.Toggle<("square"|"hex"|undefined)> 
             allowReset={false} 
             value={this.props.design.shape as any} 
@@ -102,6 +104,11 @@ export default class GridLayerDesigner extends React.Component<{
               size="sm"
               options={[{ value: "pixels", label: "Pixels" }, { value: "meters", label: "Meters (approximate)"}]} />
           </div>
+          &nbsp;
+          <PopoverHelpComponent placement="bottom">
+            Pixel grids always appear to be the same size when zoomed. 
+            Meters are for a fixed-size grid and have limits on how far the user can zoom out.
+          </PopoverHelpComponent>
         </div>
       </div>
     )
