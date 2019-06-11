@@ -8,6 +8,7 @@ AddLayerComponent = require './AddLayerComponent'
 MapLayerViewDesignerComponent = require './MapLayerViewDesignerComponent'
 ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
 ExprCompiler = require('mwater-expressions').ExprCompiler
+ExprCleaner = require("mwater-expressions").ExprCleaner
 
 # Designer for layer selection in the map
 module.exports = class MapLayersDesignerComponent extends React.Component
@@ -57,9 +58,14 @@ module.exports = class MapLayersDesignerComponent extends React.Component
     
     if layerView.design.filter?
       exprCompiler = new ExprCompiler(@props.schema)
-      jsonql = exprCompiler.compileExpr(expr: layerView.design.filter, tableAlias: "{alias}")
-      if jsonql
-        filters.push({ table: layerView.design.filter.table, jsonql: jsonql })
+      exprCleaner = new ExprCleaner(@props.schema)
+
+      # Clean filter first
+      filter = exprCleaner.cleanExpr(layerView.design.filter, { types: ["boolean"] })
+      if filter
+        jsonql = exprCompiler.compileExpr(expr: filter, tableAlias: "{alias}")
+        if jsonql
+          filters.push({ table: filter.table, jsonql: jsonql })
     
     R 'div', style: style, 
       React.createElement(MapLayerViewDesignerComponent, 
