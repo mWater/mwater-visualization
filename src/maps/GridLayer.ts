@@ -50,7 +50,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
           (select qr.q as q, qr.r as r, COLOREXPR as color from TABLE as innerquery
             inner join mwater_hex_xy_to_qr(st_xmin(innerquery.LOCATIONEXPR), st_ymin(innerquery.LOCATIONEXPR), !pixel_width!*10) as qr 
             on true
-            where innerquery.LOCATIONEXPR && !bbox!
+            where innerquery.LOCATIONEXPR && ST_Expand(!bbox!, SIZE)
           group by 1, 2) as data
         on data.q = grid.q and data.r = grid.r 
     */
@@ -103,7 +103,10 @@ export default class GridLayer extends Layer<GridLayerDesign> {
         op: "&&",
         exprs: [
           compiledGeometryExpr,
-          { type: "token", token: "!bbox!" }
+          { type: "op", op: "ST_Expand", exprs: [
+            { type: "token", token: "!bbox!" },
+            compiledSizeExpr
+          ]}
         ]
       }
     ]
