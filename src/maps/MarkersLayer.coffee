@@ -190,7 +190,7 @@ module.exports = class MarkersLayer extends Layer
         # If invisible
         if _.includes(design.axes.color.excludedValues, item.value)
           css += '''
-            #layer0[color=''' + JSON.stringify(item.value) + '''] { line-color: 0; marker-line-opacity: 0; marker-fill-opacity: 0; polygon-opacity: 0; }
+            #layer0[color=''' + JSON.stringify(item.value) + '''] { line-opacity: 0; marker-line-opacity: 0; marker-fill-opacity: 0; polygon-opacity: 0; }
           '''  
         else
           css += '''
