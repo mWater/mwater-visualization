@@ -189,9 +189,17 @@ module.exports = class MarkersLayer extends Layer
       for item in design.axes.color.colorMap
         # If invisible
         if _.includes(design.axes.color.excludedValues, item.value)
-          css += "#layer0 [color=#{JSON.stringify(item.value)}] { marker-line-opacity: 0; marker-fill-opacity: 0; }\n"  
+          css += '''
+            #layer0[color=''' + JSON.stringify(item.value) + '''] { line-color: 0; marker-line-opacity: 0; marker-fill-opacity: 0; polygon-opacity: 0; }
+          '''  
         else
-          css += "#layer0 [color=#{JSON.stringify(item.value)}] { marker-fill: #{item.color} }\n"
+          css += '''
+            #layer0[color=''' + JSON.stringify(item.value) + '''] { line-color: ''' + item.color + ''' }
+            #layer0[color=''' + JSON.stringify(item.value) + '''][geometry_type='ST_Point'] { marker-fill: ''' + item.color + ''' }
+            #layer0[color=''' + JSON.stringify(item.value) + '''][geometry_type='ST_Polygon'],#layer0[color=''' + JSON.stringify(item.value) + '''][geometry_type='ST_MultiPolygon'] { 
+              polygon-fill: ''' + item.color + '''
+            }
+          '''
 
     return css
 
