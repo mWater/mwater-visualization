@@ -54,7 +54,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
           group by 1, 2) as data
         on data.q = grid.q and data.r = grid.r 
     */
-    const compiledGeometryExpr = exprCompiler.compileExpr({ expr: design.geometryExpr, tableAlias: "innerquery" })
+    const compiledGeometryExpr = { type: "op", op: "ST_Transform", exprs: [exprCompiler.compileExpr({ expr: design.geometryExpr, tableAlias: "innerquery" }), 3857] }
     const colorExpr = axisBuilder.compileAxis({axis: design.colorAxis, tableAlias: "innerquery"});
     let compiledSizeExpr: JsonQLExpr
     
