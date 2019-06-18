@@ -70,6 +70,9 @@ module.exports = class PivotChart extends Chart
           if not intersection.backgroundColorOpacity?
             intersection.backgroundColorOpacity = 1
 
+        if intersection.filter
+          intersection.filter = exprCleaner.cleanExpr(intersection.filter, { table: design.table, types: ["boolean"] })
+
       # Add missing intersections
       intersections = {}
       for rowPath in PivotChartUtils.getSegmentPaths(design.rows)
