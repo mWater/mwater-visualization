@@ -134,7 +134,16 @@ module.exports = class ItemsHtmlConverter
 
         # Add href and target
         if node.href
-          item.href = node.href
+          # There is a quirk of the href property that it includes the complete url, even if 
+          # it is just an anchor. Strip all except the hash in that case
+          hrefBase = node.href.split("#")[0]
+          currentBase = window.location.href.split("#")[0]
+          if hrefBase == currentBase
+            href = node.href.substr(hrefBase.length)
+          else 
+            href = node.href
+
+          item.href = href
         if node.target
           item.target = node.target
 
