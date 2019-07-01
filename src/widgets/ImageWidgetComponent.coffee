@@ -97,7 +97,7 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
         imageHeight = 1280
 
       source = @props.design.imageUrl or @props.widgetDataSource.getImageUrl(@props.design.uid, imageHeight)
-      R RotatedImageComponent, url: source, rotation: @props.design.rotation
+      R RotatedImageComponent, imgUrl: source, url: @props.design.url, rotation: @props.design.rotation
     else
       @renderExpression()
 
@@ -149,6 +149,7 @@ class ImageWidgetDesignComponent extends React.Component
       currentTab: "url"
       rotation: null
       captionPosition: null
+      url: null
     }
 
   edit: =>
@@ -162,6 +163,7 @@ class ImageWidgetDesignComponent extends React.Component
       caption: @props.design.caption
       rotation: @props.design.rotation
       captionPosition: @props.design.captionPosition
+      url: @props.design.url
     }
 
     @setState(state)
@@ -174,8 +176,11 @@ class ImageWidgetDesignComponent extends React.Component
 
     @setState(currentTab: tab)
 
-  handleUrlChange: (e) =>
+  handleImageUrlChange: (e) =>
     @setState(imageUrl: e.target.value, uid: null, expr: null)
+
+  handleUrlChange: (e) =>
+    @setState(url: e.target.value)
 
   renderUploadEditor: ->
     R 'div', null,
@@ -189,7 +194,7 @@ class ImageWidgetDesignComponent extends React.Component
     @setState(imageUrl: null, uid: uid, expr: null)
 
   handleExpressionChange: (expr) =>
-    @setState(imageUrl: null, uid: null, expr: expr)
+    @setState(imageUrl: null, uid: null, expr: expr, url: null)
 
   handleTableChange: (table) => @setState(table: table)
   handleCaptionChange: (ev) => @setState(caption: ev.target.value)
@@ -200,6 +205,7 @@ class ImageWidgetDesignComponent extends React.Component
     @setState(editing: false)
     updates =
       imageUrl: @state.imageUrl
+      url: @state.url
       uid: @state.uid
       expr: @state.expr
       caption: @state.caption
@@ -210,7 +216,7 @@ class ImageWidgetDesignComponent extends React.Component
 
   handleCancel: () =>
     @setCurrentTab()
-    @setState(editing: false, imageUrl: null, uid: null, expr: null, table: null, files: null, uploading: false, captionPosition: null)
+    @setState(editing: false, imageUrl: null, url: null, uid: null, expr: null, table: null, files: null, uploading: false, captionPosition: null)
 
   renderExpressionEditor: ->
     R 'div', className: "form-group",
@@ -244,13 +250,22 @@ class ImageWidgetDesignComponent extends React.Component
       R ui.Radio, value: @state.rotation or null, radioValue: 180, onChange: @handleRotationChange, inline: true, "180 degrees"
       R ui.Radio, value: @state.rotation or null, radioValue: 270, onChange: @handleRotationChange, inline: true, "270 degrees"
 
-  renderUrlEditor: ->
+  renderImageUrlEditor: ->
     R 'div', className: "form-group",
       R 'label', null, "URL of image"
-      R 'input', type: "text", className: "form-control", value: @state.imageUrl or "", onChange: @handleUrlChange
+      R 'input', type: "text", className: "form-control", value: @state.imageUrl or "", onChange: @handleImageUrlChange
       R 'p', className: "help-block",
         'e.g. http://somesite.com/image.jpg'
       @renderRotation()
+
+  renderUrlEditor: ->
+    R 'div', className: "form-group",
+      R 'label', null, "URL to open"
+      R 'input', type: "text", className: "form-control", value: @state.url or "", onChange: @handleUrlChange
+      R 'p', className: "help-block",
+        'e.g. http://somesite.com/'
+      R 'p', className: "help-block",
+        'When clicked on image, this link will open in a new tab'
 
   render: ->
     if not @state.editing
@@ -273,9 +288,12 @@ class ImageWidgetDesignComponent extends React.Component
         tabs: [
           { id: "upload", label: "Upload", elem: @renderUploadEditor() }
           { id: "expression", label: "From Data", elem: @renderExpressionEditor() }
-          { id: "url", label: "From URL", elem: @renderUrlEditor() }
+          { id: "url", label: "From URL", elem: @renderImageUrlEditor() }
         ]
         initialTabId: @state.currentTab
+      # No target URL when using expressions
+      if @state.imageUrl or @state.uid
+        @renderUrlEditor()
 
     footer =
       R 'div', null,
@@ -292,10 +310,11 @@ class ImageWidgetDesignComponent extends React.Component
 # Image which is rotated by x degrees (0, 90, 180, 270)
 class RotatedImageComponent extends React.Component
   @propTypes: 
-    url: PropTypes.string.isRequired
+    imgUrl: PropTypes.string.isRequired
     rotation: PropTypes.number
     onClick: PropTypes.func
     caption: PropTypes.string
+    url: PropTypes.string
 
   render: ->
     R AutoSizeComponent, injectWidth: true, injectHeight: true, 
@@ -318,12 +337,17 @@ class RotatedImageComponent extends React.Component
         if @props.rotation == 90 or @props.rotation == 270
           imageStyle.width = size.height
 
-        return R 'span', 
+        img = R 'span', 
           className: "rotated-image-container"
           style: containerStyle,
             R 'img',
-              src: @props.url
+              src: @props.imgUrl
               style: imageStyle
               className: classes
               onClick: @props.onClick
               alt: @props.caption or ""
+
+        if not @props.url
+          return img
+        else
+          return R 'a', href: @props.url, target: '_blank', img
