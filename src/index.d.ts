@@ -6,6 +6,8 @@ export { default as LeafletMapComponent } from "./maps/LeafletMapComponent";
 
 export { default as DateRangeComponent } from "./DateRangeComponent";
 
+export { default as RegionSelectComponent } from './maps/RegionSelectComponent'
+
 export class WidgetFactory {
   static createWidget(type: string): Widget
 }
