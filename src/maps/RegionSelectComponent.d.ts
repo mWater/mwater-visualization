@@ -7,7 +7,7 @@ export default class RegionSelectComponent extends React.Component<{
   dataSource: DataSource
   /** _id of region */
   region: number | null    
-  onChange: (region: number, level: number) => void
+  onChange: (region: number | null, level: number | null) => void
   /** Default "All Countries" */
   placeholder?: string 
   /** e.g. "admin_regions" */
