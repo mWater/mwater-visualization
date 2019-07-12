@@ -2,7 +2,7 @@ import { ReactNode, Component } from "react"
 import L, { PathOptions, CircleMarkerOptions } from 'leaflet'
 import { GeoJsonObject } from "geojson";
 
-export interface Bounds {
+export interface MapBounds {
   w: number
   n: number
   e: number
@@ -55,7 +55,7 @@ interface Props {
   baseLayerOpacity?: number
   
   /** Initial bounds. Fit world if none */
-  initialBounds?: Bounds
+  initialBounds?: MapBounds
   
   /**  Required width in any css units */
   width: any 
@@ -111,5 +111,5 @@ export default class LeafletMapComponent extends Component<Props> {
   getLeafletMap(): L.Map
 
   /** Set bounds. Padding is optional fractional pad */
-  setBounds(bounds: Bounds | null, pad?: number): void
+  setBounds(bounds: MapBounds | null, pad?: number): void
 }
