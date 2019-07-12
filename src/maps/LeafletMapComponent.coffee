@@ -29,16 +29,8 @@ module.exports = class LeafletMapComponent extends React.Component
 
     onBoundsChange: PropTypes.func # Called with bounds in w, n, s, e format when bounds change
     
-    layers: PropTypes.arrayOf(PropTypes.shape({
-      tileUrl: PropTypes.string # Url in leaflet format
-      utfGridUrl:  PropTypes.string # Url of interactivity grid
-      visible: PropTypes.bool # Visibility
-      opacity: PropTypes.number # 0-1
-      onGridClick: PropTypes.func # Function that is called when grid layer is clicked. Passed { data }
-      onGridHover: PropTypes.func # Function that is called when grid layer is hovered. Passed { data }
-      minZoom: PropTypes.number # Minimum zoom level
-      maxZoom: PropTypes.number # Maximum zoom level
-      })).isRequired # List of layers
+    # See .d.ts for docs on this
+    layers: PropTypes.any # List of layers
 
     # Legend. Will have zoom injected
     legend: PropTypes.node # Legend element
@@ -271,41 +263,63 @@ module.exports = class LeafletMapComponent extends React.Component
         @baseLayer.bringToBack()
 
     # Update layers
-    if not prevProps or JSON.stringify(_.omit(@props.layers, "onGridClick", "onGridHover")) != JSON.stringify(_.omit(prevProps.layers, "onGridClick", "onGridHover")) # TODO naive
+    if not prevProps or JSON.stringify(_.omit(@props.layers, "onGridClick", "onGridHover", "onClick")) != JSON.stringify(_.omit(prevProps.layers, "onGridClick", "onGridHover", "onClick")) # TODO naive
       # TODO This is naive. Could be more surgical about updates
       if @tileLayers
         for tileLayer in @tileLayers        
           @map.removeLayer(tileLayer)
-        @tileLayer = null
+        @tileLayers = null
 
       if @utfGridLayers
         for utfGridLayer in @utfGridLayers
           @map.removeLayer(utfGridLayer)
         @utfGridLayers = null
 
+      # Remove Geojson layers
+      if @geoJsonLayers
+        for geoJsonLayer in @geoJsonLayers
+          @map.removeLayer(geoJsonLayer)
+        @geoJsonLayers = null
+
       if @props.layers
         @tileLayers = []
+        @geoJsonLayers = []
+
         for layer in @props.layers
-          # Do not display if not visible or no tile url
-          if not layer.visible or not layer.tileUrl
-            continue
+          # Handle Tile layer
+          if layer.tileUrl
+            # Do not display if not visible
+            if not layer.visible
+              continue
 
-          options = { opacity: layer.opacity }
-          
-          # Putting null seems to make layer vanish
-          if layer.minZoom
-            options.minZoom = layer.minZoom
-          if layer.maxZoom
-            options.maxZoom = layer.maxZoom
+            options = { opacity: layer.opacity }
+            
+            # Putting null seems to make layer vanish
+            if layer.minZoom
+              options.minZoom = layer.minZoom
+            if layer.maxZoom
+              options.maxZoom = layer.maxZoom
 
-          tileLayer = L.tileLayer(layer.tileUrl, options)
-          @tileLayers.push(tileLayer)
+            tileLayer = L.tileLayer(layer.tileUrl, options)
+            @tileLayers.push(tileLayer)
 
-          # TODO Hack for animated zooming
-          @map._zoomAnimated = false
-          @map.addLayer(tileLayer)
-          @map._zoomAnimated = true
-          tileLayer._container.className += ' leaflet-zoom-hide'
+            # TODO Hack for animated zooming
+            @map._zoomAnimated = false
+            @map.addLayer(tileLayer)
+            @map._zoomAnimated = true
+            tileLayer._container.className += ' leaflet-zoom-hide'
+          else if layer.geometry
+            geoJsonLayer = L.geoJSON(layer.geometry, {
+              # Put in front
+              pane: "markerPane",
+              style: layer.style,
+              pointToLayer: (geojson, latlng) => 
+                return L.circleMarker(latlng, layer.pointStyle)
+            })
+            if layer.onClick
+              geoJsonLayer.on("click", layer.onClick)
+            @geoJsonLayers.push(geoJsonLayer)
+            @map.addLayer(geoJsonLayer)
 
         @utfGridLayers = []
         # Add grid layers in reverse order

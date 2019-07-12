@@ -1,5 +1,6 @@
 import { ReactNode, Component } from "react"
-import L from 'leaflet'
+import L, { PathOptions, CircleMarkerOptions } from 'leaflet'
+import { GeoJsonObject } from "geojson";
 
 export interface Bounds {
   w: number
@@ -8,7 +9,8 @@ export interface Bounds {
   s: number
 }
 
-export interface Layer {
+/** Layer that is loaded from a tile url */
+export interface TileLayer {
   /** Url in leaflet format */
   tileUrl: string 
   /** Url of interactivity grid */
@@ -26,6 +28,26 @@ export interface Layer {
   /** Maximum zoom level */
   maxZoom?: number 
 }
+
+/** Layer that contains GeoJSON objects to display */
+export interface GeoJsonLayer {
+  /** Geometry of layer to display */
+  geometry: GeoJsonObject
+
+  /** Optional key for click events */
+  key?: any
+  
+  /** Style for all but points */
+  style?: PathOptions
+
+  /** Style for points */
+  pointStyle?: CircleMarkerOptions
+
+  /** Handle clicks */
+  onClick?: () => void
+}
+
+export type Layer = TileLayer | GeoJsonLayer
 
 interface Props {
   baseLayerId: "bing_road" | "bing_aerial" | "cartodb_positron" | "cartodb_dark_matter" | "white"

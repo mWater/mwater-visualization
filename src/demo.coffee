@@ -23,6 +23,7 @@ DirectDashboardDataSource = require './dashboards/DirectDashboardDataSource'
 DirectMapDataSource = require './maps/DirectMapDataSource'
 
 ServerMapDataSource = require './maps/ServerMapDataSource'
+LeafletMapComponent = require './maps/LeafletMapComponent'
 ServerDashboardDataSource = require './dashboards/ServerDashboardDataSource'
 RichTextComponent = require './richtext/RichTextComponent'
 ItemsHtmlConverter = require './richtext/ItemsHtmlConverter'
@@ -35,22 +36,29 @@ $ ->
   sample = R DragDropContextProvider, backend: HTML5Backend, 
     R 'div', className: "container-fluid", style: { height: "100%", paddingLeft: 0, paddingRight: 0 },
       R 'style', null, '''html, body, #main { height: 100% }'''
-      # React.createElement(RichTextPane)
-      # React.createElement(TestPane, apiUrl: "https://api.mwater.co/v3/")
-      # React.createElement(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "a855eb0587d845d3ac27aed03c463976", share: "817c76088c7649ec8cc0b8193e547a09")
-      React.createElement(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-      # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-      # React.createElement(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-      # React.createElement(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-      # React.createElement(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-      # React.createElement(MWaterDirectMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-      # React.createElement(WaterOrgDashboardPane, apiUrl: "http://localhost:1235/mwater/")
-      # React.createElement(BlocksDesignerComponent, renderBlock: [])
-      # React.createElement(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-      # React.createElement(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-      # React.createElement(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
-      # React.createElement(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
-      # React.createElement(DashboardPane, apiUrl: "http://localhost:1234/v3/")
+      # R(RichTextPane)
+      # R(TestPane, apiUrl: "https://api.mwater.co/v3/")
+      # R(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "a855eb0587d845d3ac27aed03c463976", share: "817c76088c7649ec8cc0b8193e547a09")
+      R(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+      # R(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+      # R(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+      # R(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+      # R(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+      # R(MWaterDirectMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+      # R(WaterOrgDashboardPane, apiUrl: "http://localhost:1235/mwater/")
+      # R(BlocksDesignerComponent, renderBlock: [])
+      # R(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
+      # R(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+      # R(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
+      # R(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
+      # R(DashboardPane, apiUrl: "http://localhost:1234/v3/")
+      # R(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+      # R LeafletMapComponent, baseLayerId: "bing_road", width: "100%", height: 400, layers: [
+      #   {
+      #     geometry: { type: "Point", coordinates: [-73.5, 45.5]}
+      #     onClick: => alert("clicked!")
+      #   }
+      # ]
   ReactDOM.render(sample, document.getElementById("main"))
 
 
