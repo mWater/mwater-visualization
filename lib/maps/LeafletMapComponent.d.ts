@@ -40,7 +40,7 @@ export interface GeoJsonLayer {
   /** Style for all but points */
   style?: PathOptions
 
-  /** Style for points */
+  /** Style for points. If blank, use a standard marker */
   pointStyle?: CircleMarkerOptions
 
   /** Handle clicks */
