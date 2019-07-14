@@ -2,7 +2,7 @@ import { Schema, DataSource, JsonQL } from "mwater-expressions";
 import { ReactElement } from "react";  
 import React from "react"
 
-export { default as LeafletMapComponent, MapBounds as MapBounds } from "./maps/LeafletMapComponent";
+export { default as LeafletMapComponent, MapBounds, TileLayer, GeoJsonLayer, MapLayer } from "./maps/LeafletMapComponent";
 
 export { default as DateRangeComponent } from "./DateRangeComponent";
 

@@ -47,7 +47,7 @@ export interface GeoJsonLayer {
   onClick?: () => void
 }
 
-export type Layer = TileLayer | GeoJsonLayer
+export type MapLayer = TileLayer | GeoJsonLayer
 
 interface Props {
   baseLayerId: "bing_road" | "bing_aerial" | "cartodb_positron" | "cartodb_dark_matter" | "white"
@@ -66,7 +66,7 @@ interface Props {
   onBoundsChange?: (bounds: { w: number, n: number, s: number, e: number }) => void
   
   /** List of layers */
-  layers: Layer[]
+  layers: MapLayer[]
   
   /** Legend. Will have zoom injected */
   legend?: ReactNode
