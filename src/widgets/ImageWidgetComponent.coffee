@@ -310,11 +310,11 @@ class ImageWidgetDesignComponent extends React.Component
 # Image which is rotated by x degrees (0, 90, 180, 270)
 class RotatedImageComponent extends React.Component
   @propTypes: 
-    imgUrl: PropTypes.string.isRequired
+    imgUrl: PropTypes.string.isRequired # Url of the image
     rotation: PropTypes.number
     onClick: PropTypes.func
     caption: PropTypes.string
-    url: PropTypes.string
+    url: PropTypes.string # Url to be opened when the image is clicked
 
   render: ->
     R AutoSizeComponent, injectWidth: true, injectHeight: true, 

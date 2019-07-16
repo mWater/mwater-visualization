@@ -19,13 +19,13 @@ module.exports = class DropdownWidgetComponent extends React.Component
 
   renderDropdownItem: (item, i) =>
     return R 'li', key: "#{i}",
-      R 'a', onClick: item.onClick, 
+      R 'a', onClick: item.onClick,
         if item.icon then R('span', className: "glyphicon glyphicon-#{item.icon} text-muted")
         if item.icon then " "
         item.label
 
   renderDropdown: ->
-    if @props.dropdownItems.length == 0 
+    if @props.dropdownItems.length == 0
       return null
 
     dropdownStyle = {
@@ -33,7 +33,7 @@ module.exports = class DropdownWidgetComponent extends React.Component
       right: 3
       top: 3
       cursor: "pointer"
-      zIndex: 10000
+      zIndex: 1029
     }
 
     elem = R 'div', style: dropdownStyle, "data-toggle": "dropdown",
@@ -43,7 +43,7 @@ module.exports = class DropdownWidgetComponent extends React.Component
     return R 'div', style: dropdownStyle,
       elem
       R 'ul', className: "dropdown-menu dropdown-menu-right", style: { top: 25 },
-        _.map(@props.dropdownItems, @renderDropdownItem)        
+        _.map(@props.dropdownItems, @renderDropdownItem)
 
   closeMenu: =>
     $(ReactDOM.findDOMNode(this)).find('[data-toggle="dropdown"]').parent().removeClass('open')
