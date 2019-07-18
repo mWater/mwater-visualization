@@ -45,6 +45,9 @@ export interface GeoJsonLayer {
 
   /** Handle clicks */
   onClick?: () => void
+
+  /** Makes non-interactive if true */
+  nonInteractive?: boolean
 }
 
 export type MapLayer = TileLayer | GeoJsonLayer

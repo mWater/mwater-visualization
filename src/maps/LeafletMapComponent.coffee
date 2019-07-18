@@ -321,11 +321,12 @@ module.exports = class LeafletMapComponent extends React.Component
               # Put in front
               pane: "markerPane",
               style: layer.style,
+              interactive: (if layer.nonInteractive then false else true),
               pointToLayer: (geojson, latlng) =>
                 if layer.pointStyle 
-                  return L.circleMarker(latlng, layer.pointStyle)
+                  return L.circleMarker(latlng, _.extend({}, layer.pointStyle, { interactive: (if layer.nonInteractive then false else true) }))
                 else 
-                  return L.marker(latlng)
+                  return L.marker(latlng, { interactive: (if layer.nonInteractive then false else true) })
             })
             if layer.onClick
               geoJsonLayer.on("click", layer.onClick)
