@@ -35,7 +35,7 @@ exports.SectionComponent = class SectionComponent extends React.Component
 # List of options with a name and description each
 exports.OptionListComponent = class OptionListComponent extends React.Component
   @propTypes:
-    items: PropTypes.array.isRequired # name, desc, onClick, onRemove (optional)
+    items: PropTypes.array.isRequired # name, desc, modified, onClick, onRemove (optional)
     hint: PropTypes.string
 
   render: ->
@@ -43,13 +43,14 @@ exports.OptionListComponent = class OptionListComponent extends React.Component
       R 'div', style: { color: "#AAA", fontStyle: "italic" }, key: "hint", @props.hint
       R 'div', className: "mwater-visualization-big-options", key: "options",
         _.map @props.items, (item, i) =>
-          R OptionComponent, name: item.name, desc: item.desc, onClick: item.onClick, onRemove: item.onRemove, key: i
+          R OptionComponent, name: item.name, desc: item.desc, modified: item.modified, onClick: item.onClick, onRemove: item.onRemove, key: i
 
 # Single option
 class OptionComponent extends React.Component
   @propTypes:
     name: PropTypes.string
     desc: PropTypes.string
+    modified: PropTypes.string
     onClick: PropTypes.func.isRequired
     onRemove: PropTypes.func          # Displays X to right if present
 
@@ -58,12 +59,17 @@ class OptionComponent extends React.Component
     @props.onRemove()
 
   render: ->
+    description = ""
+    if @props.desc != undefined then description = @props.desc
+    if @props.modified != undefined then description = @props.modified
+    if @props.desc != undefined & @props.modified != undefined then description = @props.desc + " - " + @props.modified
+    
     R 'div', className: "mwater-visualization-big-option", onClick: @props.onClick,
       if @props.onRemove
         R 'button', type: "button", className: "btn btn-link btn-xs pull-right", onClick: @handleClick, 
           R 'span', className: "glyphicon glyphicon-remove"
       R 'div', style: { fontWeight: "bold" }, @props.name
-      R 'div', style: { color: "#888" }, @props.desc
+      R 'div', style: { color: "#888" }, description
 
 # Switches views smoothly
 exports.SwitchViewComponent = class SwitchViewComponent extends React.Component

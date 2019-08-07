@@ -395,7 +395,7 @@ class FormsListComponent extends React.Component
   componentDidMount: ->
     # Get names and basic of forms
     query = {}
-    query.fields = JSON.stringify({ "design.name": 1, roles: 1, created: 1, modified: 1, state: 1, isMaster: 1 })
+    query.fields = JSON.stringify({ "design.name": 1, "design.description": 1, roles: 1, created: 1, modified: 1, state: 1, isMaster: 1 })
     query.selector = JSON.stringify({ design: { $exists: true }, state: { $ne: "deleted" } })
     query.client = @props.client
 
@@ -413,12 +413,13 @@ class FormsListComponent extends React.Component
       @setState(forms: _.map(forms, (form) => { 
         id: form._id
         name: ExprUtils.localizeString(form.design.name, @context.locale)
-        # desc: "Created by #{form.created.by}" 
-        desc: "Modified #{moment(form.modified.on, moment.ISO_8601).format("ll")}"
+        # desc: "Created by #{form.created.by}"
+        desc: ExprUtils.localizeString(form.design.description, @context.locale)
+        modified: "Modified #{moment(form.modified.on, moment.ISO_8601).format("ll")}" 
+        # form.design.description == 'undefined' ? ExprUtils.localizeString(form.design.description, @context.locale) + "- Modified #{moment(form.modified.on, moment.ISO_8601).format("ll")}" : "Modified #{moment(form.modified.on, moment.ISO_8601).format("ll")}"
       }))
     .fail (xhr) =>
       @setState(error: xhr.responseText)
-
   handleTableAdd: (tableId) =>
     @props.onExtraTableAdd(tableId)
 
@@ -490,6 +491,7 @@ class FormsListComponent extends React.Component
             items: _.map(forms, (form) => { 
               name: form.name
               desc: form.desc
+              modified: form.modified
               onClick:  @props.onChange.bind(null, "responses:" + form.id)
             })
         ]
