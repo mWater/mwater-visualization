@@ -88,7 +88,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
 
   handleTableChange: (tableId) =>
     # If not part of formIds, add it and wait for new schema
-    if not @props.schema.getTable(tableId)
+    if tableId and not @props.schema.getTable(tableId)
       @setState(pendingExtraTable: tableId, =>
         @props.onExtraTablesChange(_.union(@props.extraTables, [tableId]))
       )
@@ -119,7 +119,8 @@ module.exports = class MWaterTableSelectComponent extends React.Component
         label: if @props.table then ExprUtils.localizeString(@props.schema.getTable(@props.table)?.name, @context.locale) else ""
         editor: editor
 
-      if @props.table and @props.onFilterChange and @props.table.match(/^responses:/)
+      # Make sure table still exists
+      if @props.table and @props.onFilterChange and @props.table.match(/^responses:/) and @props.schema.getTable(@props.table)
         R MWaterResponsesFilterComponent, 
           schema: @props.schema
           table: @props.table
