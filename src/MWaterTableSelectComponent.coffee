@@ -410,16 +410,20 @@ class FormsListComponent extends React.Component
         ], ['desc', 'desc', 'desc'])
 
       # TODO use name instead of design.name
-      @setState(forms: _.map(forms, (form) => { 
-        id: form._id
-        name: ExprUtils.localizeString(form.design.name, @context.locale)
-        # desc: "Created by #{form.created.by}"
-        desc: ExprUtils.localizeString(form.design.description, @context.locale)
-        modified: "Modified #{moment(form.modified.on, moment.ISO_8601).format("ll")}" 
-        # form.design.description == 'undefined' ? ExprUtils.localizeString(form.design.description, @context.locale) + "- Modified #{moment(form.modified.on, moment.ISO_8601).format("ll")}" : "Modified #{moment(form.modified.on, moment.ISO_8601).format("ll")}"
-      }))
+      @setState(forms: _.map(forms, (form) => 
+        desc = ExprUtils.localizeString(form.design.description, @context.locale) or ""
+        if desc
+          desc += " - "
+        desc += "Modified #{moment(form.modified.on, moment.ISO_8601).format("ll")}"
+
+        return { 
+          id: form._id
+          name: ExprUtils.localizeString(form.design.name, @context.locale)
+          desc: desc
+        }))
     .fail (xhr) =>
       @setState(error: xhr.responseText)
+
   handleTableAdd: (tableId) =>
     @props.onExtraTableAdd(tableId)
 
@@ -491,7 +495,6 @@ class FormsListComponent extends React.Component
             items: _.map(forms, (form) => { 
               name: form.name
               desc: form.desc
-              modified: form.modified
               onClick:  @props.onChange.bind(null, "responses:" + form.id)
             })
         ]

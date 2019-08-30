@@ -50,7 +50,6 @@ class OptionComponent extends React.Component
   @propTypes:
     name: PropTypes.string
     desc: PropTypes.string
-    modified: PropTypes.string
     onClick: PropTypes.func.isRequired
     onRemove: PropTypes.func          # Displays X to right if present
 
@@ -59,17 +58,12 @@ class OptionComponent extends React.Component
     @props.onRemove()
 
   render: ->
-    description = ""
-    if @props.desc != undefined then description = @props.desc
-    if @props.modified != undefined then description = @props.modified
-    if @props.desc != undefined & @props.modified != undefined then description = @props.desc + " - " + @props.modified
-    
     R 'div', className: "mwater-visualization-big-option", onClick: @props.onClick,
       if @props.onRemove
         R 'button', type: "button", className: "btn btn-link btn-xs pull-right", onClick: @handleClick, 
           R 'span', className: "glyphicon glyphicon-remove"
       R 'div', style: { fontWeight: "bold" }, @props.name
-      R 'div', style: { color: "#888" }, description
+      R 'div', style: { color: "#888" }, @props.desc
 
 # Switches views smoothly
 exports.SwitchViewComponent = class SwitchViewComponent extends React.Component
