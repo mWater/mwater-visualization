@@ -48,6 +48,12 @@ module.exports = class QuickfiltersDesignComponent extends React.Component
     enumValues = exprUtils.getExprEnumValues(design[index].expr)
     prevEnumValues = exprUtils.getExprEnumValues(design[index - 1].expr)
 
+    multi = design[index].multi or false
+    prevMulti = design[index].multi or false
+
+    if multi != prevMulti
+      return false
+
     if not type or type != prevType
       return false
 
@@ -150,7 +156,7 @@ class QuickfilterDesignComponent extends React.Component
                 table: @state.table
                 value: @props.design.expr
                 onChange: @handleExprChange
-                types: ['enum', 'text', 'enumset', 'date', 'datetime']
+                types: ['enum', 'text', 'enumset', 'date', 'datetime', 'id[]']
 
           if @props.design.expr
             R 'div', className: "form-group", key: "label",
@@ -164,7 +170,7 @@ class QuickfilterDesignComponent extends React.Component
                 "Merge with previous quickfilter "
                 R 'span', className: "text-muted", "- displays as one single control that filters both"
 
-          if exprType in ['enum', 'text', 'enumset']
+          if exprType in ['enum', 'text', 'enumset', 'id[]']
             R ui.Checkbox, 
               value: @props.design.multi
               onChange: @handleMultiChange,

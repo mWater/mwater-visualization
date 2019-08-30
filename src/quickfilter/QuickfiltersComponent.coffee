@@ -8,6 +8,7 @@ ExprCleaner = require('mwater-expressions').ExprCleaner
 TextLiteralComponent = require './TextLiteralComponent'
 DateExprComponent = require './DateExprComponent'
 QuickfilterCompiler = require './QuickfilterCompiler'
+IdArrayQuickfilterComponent = require './IdArrayQuickfilterComponent'
 
 # Displays quick filters and allows their value to be modified
 module.exports = class QuickfiltersComponent extends React.Component
@@ -26,6 +27,7 @@ module.exports = class QuickfiltersComponent extends React.Component
       }))
     
     schema: PropTypes.object.isRequired
+    dataSource: PropTypes.object.isRequired
     quickfiltersDataSource: PropTypes.object.isRequired # See QuickfiltersDataSource
 
     # Filters to add to restrict quick filter data to
@@ -118,6 +120,19 @@ module.exports = class QuickfiltersComponent extends React.Component
         schema: @props.schema
         value: itemValue
         onValueChange: onValueChange
+
+    if type == "id[]"
+      return R IdArrayQuickfilterComponent, 
+        key: JSON.stringify(item)
+        index: index
+        label: item.label
+        expr: expr
+        schema: @props.schema
+        dataSource: @props.dataSource
+        value: itemValue
+        onValueChange: onValueChange
+        filters: filters
+        multi: item.multi
 
   render: ->
     if not @props.design or @props.design.length == 0
@@ -264,4 +279,3 @@ class DateQuickfilterComponent extends React.Component
         }
       if not @props.onValueChange
         R 'i', className: "text-warning fa fa-fw fa-lock"
-

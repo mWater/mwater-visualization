@@ -248,6 +248,7 @@ module.exports = class DashboardComponent extends React.Component
       R QuickfiltersComponent, {
         design: @props.design.quickfilters
         schema: @props.schema
+        dataSource: @props.dataSource
         quickfiltersDataSource: @props.dashboardDataSource.getQuickfiltersDataSource()
         values: @state.quickfiltersValues
         onValuesChange: (values) => @setState(quickfiltersValues: values)

@@ -1,4 +1,4 @@
-# Data source that returns values for text-based quickfilters. Allows client-server model that supports sharing 
+# Data source that returns values for text-based and id-based quickfilters. Allows client-server model that supports sharing 
 module.exports = class QuickfiltersDataSource
   # Gets the values of the quickfilter at index
   getValues: (index, expr, filters, offset, limit, callback) ->

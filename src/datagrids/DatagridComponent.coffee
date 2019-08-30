@@ -186,6 +186,7 @@ module.exports = class DatagridComponent extends React.Component
       R QuickfiltersComponent, {
         design: @props.design.quickfilters
         schema: @props.schema
+        dataSource: @props.dataSource
         quickfiltersDataSource: @props.datagridDataSource.getQuickfiltersDataSource()
         values: @state.quickfiltersValues
         table: @props.design.table

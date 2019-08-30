@@ -58,6 +58,7 @@ module.exports = class QuickfilterCompiler
   compileToFilterExpr: (expr, value, multi) ->
     # Get type of expr
     type = new ExprUtils(@schema).getExprType(expr)
+    idTable = new ExprUtils(@schema).getExprIdTable(expr)
 
     if type == 'text'
       # Create simple = expression
@@ -132,5 +133,26 @@ module.exports = class QuickfilterCompiler
         table: expr.table
         exprs: [expr].concat(value.exprs)
       }
+    else if type in ['id[]']
+      if multi
+        return {
+          type: "op"
+          op: "contains"
+          table: expr.table
+          exprs: [
+            expr
+            { type: "literal", valueType: "id[]", idTable: idTable, value: value }
+          ]
+        }
+      else
+        return {
+          type: "op"
+          op: "contains"
+          table: expr.table
+          exprs: [
+            expr
+            { type: "literal", valueType: "id[]", idTable: idTable, value: [value] }
+          ]
+        }
     else
       return null
