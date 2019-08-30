@@ -173,7 +173,7 @@ module.exports = class DatagridComponent extends React.Component
         "Find/Replace"
 
   renderTitleBar: ->
-    R 'div', style: { position: "absolute", top: 0, left: 0, right: 0, height: 50, padding: 4 },
+    R 'div', style: { position: "absolute", top: 0, left: 0, right: 0, height: 40, padding: 4 },
       R 'div', style: { float: "right" },
         @renderFindReplace()
         @renderCellEdit()
@@ -234,7 +234,7 @@ module.exports = class DatagridComponent extends React.Component
 
     hasQuickfilters = @props.design.quickfilters?[0]?
 
-    return R 'div', style: { width: "100%", height: "100%", position: "relative", paddingTop: 50 + (@state.quickfiltersHeight or 0) },
+    return R 'div', style: { width: "100%", height: "100%", position: "relative", paddingTop: 40 + (@state.quickfiltersHeight or 0) },
       @renderTitleBar(filters)
       @renderQuickfilter()
 

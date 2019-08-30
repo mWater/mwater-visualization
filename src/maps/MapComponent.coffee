@@ -83,7 +83,7 @@ module.exports = class MapComponent extends React.Component
       @props.extraTitleButtonsElem
 
   renderHeader: ->
-    R 'div', style: { position: "absolute", top: 0, left: 0, right: 0, height: 50, padding: 4, borderBottom: "solid 2px #AAA" },
+    R 'div', style: { position: "absolute", top: 0, left: 0, right: 0, height: 40, padding: 4, borderBottom: "solid 2px #AAA" },
       R 'div', style: { float: "right" },
         @renderActionLinks()
       @props.titleElem
@@ -135,7 +135,7 @@ module.exports = class MapComponent extends React.Component
 
   render: ->
     return R 'div', style: { width: "100%", height: "100%", position: "relative" },
-      R 'div', style: { position: "absolute", width: "70%", height: "100%", paddingTop: 50 }, 
+      R 'div', style: { position: "absolute", width: "70%", height: "100%", paddingTop: 40 }, 
         @renderHeader()
         R 'div', style: { width: "100%", height: "100%" }, 
           @renderView()

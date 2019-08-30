@@ -238,7 +238,7 @@ module.exports = class DashboardComponent extends React.Component
         @renderEditingSwitch()
 
   renderTitleBar: ->
-    R 'div', style: { position: "absolute", top: 0, left: 0, right: 0, height: 50, padding: 4 },
+    R 'div', style: { position: "absolute", top: 0, left: 0, right: 0, height: 40, padding: 4 },
       R 'div', style: { float: "right" },
         @renderActionLinks()
       @props.titleElem
@@ -265,7 +265,7 @@ module.exports = class DashboardComponent extends React.Component
     # Compile quickfilters
     filters = filters.concat(new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues, @props.quickfilterLocks))
 
-    R 'div', key: "view", style: { height: "100%", paddingTop: 50 + (@state.quickfiltersHeight or 0), position: "relative" },
+    R 'div', key: "view", style: { height: "100%", paddingTop: 40 + (@state.quickfiltersHeight or 0), position: "relative" },
       @renderTitleBar()
       @renderQuickfilter()
       if @props.onDesignChange?
