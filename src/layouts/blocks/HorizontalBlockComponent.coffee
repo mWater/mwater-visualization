@@ -123,8 +123,12 @@ module.exports = class HorizontalBlockComponent extends React.Component
       return R 'div', className: "mwater-visualization-horizontal-block",
         _.map @props.block.blocks, (block, index) =>
           [
-            R 'div', style: { width: "#{percentages[index]}%", verticalAlign: "top", display: "inline-block" }, key: block.id, ref: "block#{index}", className: "mwater-visualization-horizontal-block-item",
-              @props.renderBlock(block)
+            R 'div', 
+              style: { width: "#{percentages[index]}%", verticalAlign: "top", display: "inline-block" }, 
+              key: block.id, 
+              ref: ((c) => @blockRefs["block#{index}"] = c),
+              className: "mwater-visualization-horizontal-block-item",
+                @props.renderBlock(block)
           ]              
 
 
