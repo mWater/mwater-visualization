@@ -127,6 +127,11 @@ module.exports = class LabeledExprGenerator
             joins: joins
            }
         )
+      # If expression
+      else if column.expr
+        return [
+          { expr: column.expr, label: createLabel(column), joins: joins }
+        ]
       else # Simple columns
         return [
           { expr: { type: "field", table: table, column: column.id }, label: createLabel(column), joins: joins }

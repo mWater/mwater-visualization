@@ -12,6 +12,7 @@ exports.simpleSchema = ->
     { id: "boolean", name: { en: "Boolean" }, type: "boolean" }
     { id: "geometry", name: { en: "Geometry" }, type: "geometry" }
     { id: "text[]", name: { en: "Textarr" }, type: "text[]" }
+    { id: "expr", name: { en: "Expr" }, type: "number", expr: { type: "op", op: "+", table: "t1", exprs: [{ type: "field", table: "t1", column: "number" }, { type: "literal", valueType: "number", value: 1 }]}}
     { id: "1-2", name: { en: "T1->T2" }, type: "join", join: { fromColumn: "primary", toTable: "t2", toColumn: "t1", type: "1-n" }}
   ]})
 
