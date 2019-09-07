@@ -19,10 +19,7 @@ describe "LabeledExprGenerator", ->
     expectedLes = []
     for column in @schema.getColumns("t1")
       if column.type != "join"
-        if not column.expr
-          expectedLes.push({ expr: { type: "field", table: "t1", column: column.id }, label: column.name.en, joins: [] })
-        else
-          expectedLes.push({ expr: column.expr, label: column.name.en, joins: [] })
+        expectedLes.push({ expr: { type: "field", table: "t1", column: column.id }, label: column.name.en, joins: [] })
 
     compare les, expectedLes
 
@@ -33,10 +30,7 @@ describe "LabeledExprGenerator", ->
     expectedLes = []
     for column in @schema.getColumns("t1")
       if column.type != "join"
-        if not column.expr
-          expectedLes.push({ expr: { type: "field", table: "t1", column: column.id }, label: column.name.en, joins: [] })
-        else
-          expectedLes.push({ expr: column.expr, label: column.name.en, joins: [] })
+        expectedLes.push({ expr: { type: "field", table: "t1", column: column.id }, label: column.name.en, joins: [] })
 
     # Add t2
     for column in @schema.getColumns("t2")
@@ -58,10 +52,7 @@ describe "LabeledExprGenerator", ->
     expectedLes = []
     for column in schema.getColumns("t1")
       if column.type != "join"
-        if not column.expr
-          expectedLes.push({ expr: { type: "field", table: "t1", column: column.id }, label: column.name.en, joins: [] })
-        else
-          expectedLes.push({ expr: column.expr, label: column.name.en, joins: [] })
+        expectedLes.push({ expr: { type: "field", table: "t1", column: column.id }, label: column.name.en, joins: [] })
 
     expectedLes[0].label = "Text (1)"
     _.last(expectedLes).label = "Text (2)"
