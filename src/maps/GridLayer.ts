@@ -2,13 +2,14 @@ import _ from 'lodash';
 import React from 'react';
 
 import Layer from './Layer'
-import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, JsonQL, JsonQLQuery, Expr, DataSource, JsonQLExpr } from 'mwater-expressions';
+import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, Expr, DataSource } from 'mwater-expressions';
 import AxisBuilder from '../axes/AxisBuilder';
 import { LayerDefinition, OnGridClickResults } from './maps';
 import { JsonQLFilter } from '../index';
 import GridLayerDesign from './GridLayerDesign'
 import produce from 'immer';
 import { Axis } from '../axes/Axis';
+import { JsonQL, JsonQLExpr, JsonQLQuery } from 'jsonql';
 const LayerLegendComponent = require('./LayerLegendComponent');
 const PopupFilterJoinsUtils = require('./PopupFilterJoinsUtils');
 

@@ -1,5 +1,6 @@
-import { Schema, JsonQL } from "mwater-expressions";
+import { Schema } from "mwater-expressions";
 import { Axis } from "./Axis";
+import { JsonQL } from "jsonql";
 
 type AggrNeed = "none" | "optional" | "required"
 

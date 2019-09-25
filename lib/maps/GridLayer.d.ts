@@ -1,10 +1,11 @@
 import React from 'react';
 import Layer from './Layer';
-import { Schema, JsonQL, DataSource } from 'mwater-expressions';
+import { Schema, DataSource } from 'mwater-expressions';
 import { LayerDefinition } from './maps';
 import { JsonQLFilter } from '../index';
 import GridLayerDesign from './GridLayerDesign';
 import { Axis } from '../axes/Axis';
+import { JsonQL } from 'jsonql';
 /** Layer which is a grid of squares or flat-topped hexagons. Depends on "Grid Functions.sql" having been run */
 export default class GridLayer extends Layer<GridLayerDesign> {
     /** Gets the layer definition as JsonQL + CSS in format:

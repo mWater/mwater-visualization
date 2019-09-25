@@ -1,8 +1,9 @@
-import { JsonQL, Schema, DataSource, Expr } from "mwater-expressions";
+import { Schema, DataSource, Expr } from "mwater-expressions";
 import { JsonQLFilter } from "../index";
 import { OnGridClickResults } from "./maps";
 import { ReactNode } from "react";
 import { SecureClientSessionOptions } from "http2";
+import { JsonQL } from "jsonql";
 
 declare interface JsonQLCssLayerDefinition {
   layers: Array<{ 

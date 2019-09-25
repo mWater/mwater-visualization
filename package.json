@@ -39,7 +39,7 @@
     "dompurify": "^1.0.10",
     "file-saver": "^2.0.0",
     "fixed-data-table": "^0.6.0",
-    "immer": "^3.1.2",
+    "immer": "^4.0.0",
     "immutable-setter": "^1.1.1",
     "js-yaml": "^3.4.0",
     "languages": "github:mWater/languages.js",

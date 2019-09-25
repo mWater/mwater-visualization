@@ -1,6 +1,7 @@
-import { Schema, DataSource, JsonQL } from "mwater-expressions";
+import { Schema, DataSource } from "mwater-expressions";
 import { ReactElement } from "react";  
 import React from "react"
+import { JsonQL } from "jsonql";
 
 export { default as LeafletMapComponent, MapBounds, TileLayer, GeoJsonLayer, MapLayer } from "./maps/LeafletMapComponent";
 

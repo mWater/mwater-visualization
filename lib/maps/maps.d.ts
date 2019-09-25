@@ -1,4 +1,4 @@
-import { JsonQL } from "mwater-expressions";
+import { JsonQL } from "jsonql";
 
 declare interface LayerDefinition {
   layers: Array<{ 

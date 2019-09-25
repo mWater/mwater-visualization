@@ -2,11 +2,12 @@ import _ from 'lodash';
 import React from 'react';
 
 import Layer from './Layer';
-import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, JsonQL, JsonQLQuery, Expr, DataSource, OpExpr } from 'mwater-expressions';
+import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, Expr, DataSource, OpExpr } from 'mwater-expressions';
 import AxisBuilder from '../axes/AxisBuilder';
 import { LayerDefinition, OnGridClickResults } from './maps';
 import { JsonQLFilter } from '../index';
 import ChoroplethLayerDesign from './ChoroplethLayerDesign'
+import { JsonQL, JsonQLQuery } from 'jsonql';
 const LayerLegendComponent = require('./LayerLegendComponent');
 const PopupFilterJoinsUtils = require('./PopupFilterJoinsUtils');
 

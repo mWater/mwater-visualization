@@ -1,9 +1,10 @@
 import React from 'react';
 import Layer from './Layer';
-import { Schema, JsonQL, JsonQLQuery, DataSource } from 'mwater-expressions';
+import { Schema, DataSource } from 'mwater-expressions';
 import { LayerDefinition, OnGridClickResults } from './maps';
 import { JsonQLFilter } from '../index';
 import ChoroplethLayerDesign from './ChoroplethLayerDesign';
+import { JsonQL, JsonQLQuery } from 'jsonql';
 export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     /** Gets the layer definition as JsonQL + CSS in format:
      *   {
