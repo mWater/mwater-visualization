@@ -172,20 +172,22 @@ module.exports = class AxisComponent extends AsyncLoadComponent
     if not axis
       return
 
-    if axis.xform and axis.xform.type in ["bin", "ranges"]
+    if axis.xform and axis.xform.type in ["bin", "ranges", "floor"]
       if axis.xform.type == "ranges"
         comp = R(RangesComponent,
           schema: @props.schema
           expr: axis.expr
           xform: axis.xform
           onChange: @handleXformChange)
-      else
+      else if axis.xform.type == "bin"
         comp = R(BinsComponent,
           schema: @props.schema
           dataSource: @props.dataSource
           expr: axis.expr
           xform: axis.xform
           onChange: @handleXformChange)
+      else
+        comp = null
 
       return R 'div', null,
         R ui.ButtonToggleComponent,
@@ -193,6 +195,7 @@ module.exports = class AxisComponent extends AsyncLoadComponent
           options: [
             { value: "bin", label: "Equal Bins" }
             { value: "ranges", label: "Custom Ranges" }
+            { value: "floor", label: "Whole Numbers" }
           ]
           onChange: @handleXformTypeChange
         comp

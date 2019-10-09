@@ -11,6 +11,7 @@ R = React.createElement
 xforms = [
   { type: "bin", input: "number", output: "enum" }
   { type: "ranges", input: "number", output: "enum" }
+  { type: "floor", input: "number", output: "enum" }
   { type: "date", input: "datetime", output: "date" }
   { type: "year", input: "date", output: "date" }
   { type: "year", input: "datetime", output: "date" }
@@ -308,6 +309,13 @@ module.exports = class AxisBuilder
           }
         else
           compiledExpr = null
+      
+      if options.axis.xform.type == "floor"
+        compiledExpr = {
+          type: "op"
+          op: "floor"
+          exprs: [compiledExpr]
+        }
 
     return compiledExpr
 
@@ -477,6 +485,26 @@ module.exports = class AxisBuilder
   
       categories.push(noneCategory)
 
+      return categories
+
+    # Handle floor
+    if axis.xform and axis.xform.type == "floor"
+      # Get min and max
+      min = _.min(_.filter(values, (v) => v?))
+      max = _.max(_.filter(values, (v) => v?))
+      hasNull = _.filter(values, (v) => not v?).length > 0
+      if not _.isFinite(min) or not _.isFinite(max)
+        return [noneCategory]
+
+      # Floor and get range
+      if max - min > 50
+        max = min + 50
+      categories = []
+
+      for value in _.range(Math.floor(min), Math.floor(max) + 1)
+        categories.push({ value: value, label: "" + value })
+      if hasNull
+        categories.push(noneCategory)
       return categories
 
     if axis.xform and axis.xform.type == "month"
@@ -765,10 +793,10 @@ module.exports = class AxisBuilder
       }
 
   isCategorical: (axis) ->
-    nonCategoricalTypes = ["bin", "ranges", "date", "yearmonth"]
+    nonCategoricalTypes = ["bin", "ranges", "date", "yearmonth", "floor"]
     if axis.xform
       type = axis.xform.type
     else
       type = @exprUtils.getExprType(axis.expr)
 
-    nonCategoricalTypes.indexOf(type) == -1
+    return nonCategoricalTypes.indexOf(type) == -1

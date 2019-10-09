@@ -31,8 +31,9 @@ export interface Axis {
    * `month`: month only e.g. `02`. type enum
    * `week`: ISO week of year e.g. `01` for the first week that contains January 4th
    * `ranges`: convert to ranges. type enum. `ranges` is array of { id (unique id), label (optional label), minValue (null for none), maxValue (null for none), minOpen (true for >, false for >=), maxOpen (true for <, false for <=) }
+   * `floor`: convert to floor. type enum
    */
-  xform?: "bin" | "date" | "year" | "yearmonth" | "month" | "week" | "ranges" | "yearweek" | "yearquarter"
+  xform?: "bin" | "date" | "year" | "yearmonth" | "month" | "week" | "ranges" | "yearweek" | "yearquarter" | "floor"
   colorMap?: ColorMap
   /** optional array of category values which define the order in which categories should be rendered */
   drawOrder?: any[]

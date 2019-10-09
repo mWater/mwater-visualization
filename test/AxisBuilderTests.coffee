@@ -306,15 +306,6 @@ describe "AxisBuilder", ->
       axis = @ab.cleanAxis(axis: axis, table: "t1", aggrNeed: "optional")
       assert not axis
 
-    it "nulls if expression has no type", ->
-      axis = {
-        expr: { type: "scalar", expr: null, joins: [] }
-        aggr: "sum"
-      }
-
-      axis = @ab.cleanAxis(axis: axis, table: "t1", aggrNeed: "optional")
-      assert not axis
-
     it "removes bin xform if wrong input type", ->
       axis = {
         expr: @exprEnum
@@ -593,6 +584,19 @@ describe "AxisBuilder", ->
         { value: "a", label: ">= 0 and < 50" }
         { value: "b", label: "High" }
         { value: null, label: "None" }
+     ])
+
+    it "gets floor", ->
+      axis = {
+        expr: @exprNumber
+        xform: { type: "floor" }
+      }
+
+      categories = @ab.getCategories(axis, [2.5, 4.5])
+      compare(categories, [
+        { value: 2, label: "2" }
+        { value: 3, label: "3" }
+        { value: 4, label: "4" }
      ])
 
     it "gets months", ->
