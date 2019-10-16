@@ -118,7 +118,8 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
 
     # R 'div', className: "form-group",
     #   R 'label', className: "text-muted", "Series Name"
-    R 'input', type: "text", className: "form-control input-sm", value: layer.name, onChange: @handleNameChange, placeholder: "Series #{@props.index+1}"
+    placeholder = if @props.design.layers.length == 1 then "Value" else "Series #{@props.index+1}"
+    R 'input', type: "text", className: "form-control input-sm", value: layer.name, onChange: @handleNameChange, placeholder: placeholder
 
   renderRemove: ->
     if @props.design.layers.length > 1

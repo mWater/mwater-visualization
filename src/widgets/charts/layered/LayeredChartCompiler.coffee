@@ -269,7 +269,7 @@ module.exports = class LayeredChartCompiler
           types[series] = @getLayerType(design, layerIndex)
 
           # Name is name of entire layer
-          names[series] = layer.name or "Series #{layerIndex+1}"
+          names[series] = layer.name or (if design.layers.length == 1 then "Value" else "Series #{layerIndex+1}") 
           dataMap[series] = { layerIndex: layerIndex, row: row }
 
           # Set color if present
@@ -371,7 +371,7 @@ module.exports = class LayeredChartCompiler
         columns.push([seriesX].concat(_.pluck(layerData, "x")))
 
         types[seriesY] = @getLayerType(design, layerIndex)
-        names[seriesY] = layer.name or "Series #{layerIndex+1}"
+        names[seriesY] = layer.name or (if design.layers.length == 1 then "Value" else "Series #{layerIndex+1}") 
         xs[seriesY] = seriesX
         colors[seriesY] = layer.color
 
@@ -590,7 +590,7 @@ module.exports = class LayeredChartCompiler
         columns.push([series].concat(column))
 
         types[series] = @getLayerType(design, layerIndex)
-        names[series] = layer.name or "Series #{layerIndex+1}"
+        names[series] = layer.name or (if design.layers.length == 1 then "Value" else "Series #{layerIndex+1}") 
         xs[series] = "x"
         colors[series] = layer.color
 
