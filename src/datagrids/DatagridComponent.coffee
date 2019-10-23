@@ -46,6 +46,12 @@ module.exports = class DatagridComponent extends React.Component
 
     quickfilterLocks: PropTypes.array             # Locked quickfilter values. See README in quickfilters
 
+    # Filters to add to the datagrid
+    filters: PropTypes.arrayOf(PropTypes.shape({
+      table: PropTypes.string.isRequired    # id table to filter
+      jsonql: PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    }))
+
   constructor: (props) ->
     super(props)
 
@@ -229,8 +235,10 @@ module.exports = class DatagridComponent extends React.Component
         @datagridView?.reload()
 
   render: ->
+    filters = @props.filters or []
+
     # Compile quickfilters
-    filters = @getQuickfilterFilters()
+    filters = filters.concat(@getQuickfilterFilters())
 
     hasQuickfilters = @props.design.quickfilters?[0]?
 
