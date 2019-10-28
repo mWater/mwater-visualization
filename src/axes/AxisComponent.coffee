@@ -72,8 +72,13 @@ module.exports = class AxisComponent extends AsyncLoadComponent
     if not axis or axisBuilder.validateAxis(axis: axis)
       return
 
+    # Handle literal expression
+    values = [] 
+    if axis.expr?.type == "literal"
+      values.push(axis.expr.value)
+
     # Get categories (value + label)
-    categories = axisBuilder.getCategories(axis)
+    categories = axisBuilder.getCategories(axis, values)
 
     # Just "None" and so doesn't count
     if _.any(categories, (category) -> category.value?)
