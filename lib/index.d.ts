@@ -9,6 +9,8 @@ export { default as DateRangeComponent } from "./DateRangeComponent";
 
 export { default as RegionSelectComponent } from './maps/RegionSelectComponent'
 
+export * from './datagrids/DatagridDesign'
+
 export class WidgetFactory {
   static createWidget(type: string): Widget
 }
