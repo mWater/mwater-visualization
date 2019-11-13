@@ -389,6 +389,10 @@ module.exports = class MarkersLayer extends Layer
     error = axisBuilder.validateAxis(axis: design.axes.geometry)
     if error then return error
 
+    # Check that doesn't compile to null (persistent bug that haven't been able to track down)
+    if not axisBuilder.compileAxis(axis: design.axes.geometry, tableAlias: "innerquery")
+      return "Null geometry axis"
+
     return null
 
   createKMLExportJsonQL: (design, schema, filters) ->

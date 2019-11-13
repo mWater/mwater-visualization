@@ -1,6 +1,7 @@
 _ = require 'lodash'
 uuid = require 'uuid'
 ExprCompiler = require('mwater-expressions').ExprCompiler
+ExprValidator = require('mwater-expressions').ExprValidator
 ExprUtils = require('mwater-expressions').ExprUtils
 ExprCleaner = require('mwater-expressions').ExprCleaner
 d3Format = require 'd3-format'
@@ -37,6 +38,7 @@ module.exports = class AxisBuilder
     @schema = options.schema
     @exprUtils = new ExprUtils(@schema)
     @exprCleaner = new ExprCleaner(@schema)
+    @exprValidator = new ExprValidator(@schema)
 
   # Clean an axis with respect to a specific table
   # Options:
@@ -126,6 +128,11 @@ module.exports = class AxisBuilder
     # Nothing is ok
     if not options.axis
       return
+
+    # Validate expression
+    error = @exprValidator.validateExpr(options.axis.expr)
+    if error
+      return error
 
     # xform validation
     if options.axis.xform and options.axis.xform.type == "bin"
