@@ -250,7 +250,7 @@ class ThresholdComponent extends React.Component
   render: ->
     R 'div', null,
       R LabeledInlineComponent, key: "value", label: "Value:",
-        R ui.NumberInput, style: { display: "inline-block" }, size: "sm", value: @props.threshold.value, onChange: (v) => @props.onThresholdChange(_.extend({}, @props.threshold, value: v))
+        R ui.NumberInput, decimal: true, style: { display: "inline-block" }, size: "sm", value: @props.threshold.value, onChange: (v) => @props.onThresholdChange(_.extend({}, @props.threshold, value: v))
       "  "
       R LabeledInlineComponent, key: "label", label: "Label:",
         R ui.TextInput, style: { display: "inline-block", width: "8em" }, size: "sm", value: @props.threshold.label, onChange: (v) => @props.onThresholdChange(_.extend({}, @props.threshold, label: v))
