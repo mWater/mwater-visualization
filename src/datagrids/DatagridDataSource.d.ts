@@ -4,7 +4,7 @@ import { Row } from "mwater-expressions"
 import QuickfiltersDataSource from "../quickfilter/QuickfiltersDataSource"
 
 /** Data source for a datagrid that allows client-server model that supports sharing of datagrids */
-export default class DashboardDataSource {
+export default class DatagridDataSource {
   /** Gets the rows specified */
   getRows(design: DatagridDesign, offset: number, limit: number, filters: JsonQLFilter[], callback: (error: any, rows: Row[]) => void): void
 
