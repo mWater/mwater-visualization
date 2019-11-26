@@ -6,7 +6,7 @@ moment = require 'moment'
 
 ExprUtils = require("mwater-expressions").ExprUtils
 
-Cell = require('fixed-data-table').Cell
+Cell = require('fixed-data-table-2').Cell
 
 # Cell allows editing an expression column cell
 # Store edited value here to prevent slow re-render of entire datagrid

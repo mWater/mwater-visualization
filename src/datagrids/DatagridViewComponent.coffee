@@ -4,7 +4,7 @@ React = require 'react'
 R = React.createElement
 moment = require 'moment'
 
-{Table, Column, Cell} = require('fixed-data-table')
+{Table, Column, Cell} = require('fixed-data-table-2')
 
 DatagridQueryBuilder = require './DatagridQueryBuilder'
 ExprUtils = require("mwater-expressions").ExprUtils
@@ -323,5 +323,6 @@ module.exports = class DatagridViewComponent extends React.Component
       onRowDoubleClick: @handleRowDoubleClick
       onRowClick: @handleRowClick
       isColumnResizing: false
+      allowCellsRecycling: true
       onColumnResizeEndCallback: @handleColumnResize,
         @renderColumns()

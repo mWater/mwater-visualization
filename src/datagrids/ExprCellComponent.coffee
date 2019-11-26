@@ -6,7 +6,7 @@ moment = require 'moment'
 
 ExprUtils = require("mwater-expressions").ExprUtils
 
-Cell = require('fixed-data-table').Cell
+Cell = require('fixed-data-table-2').Cell
 
 # Cell that displays an expression column cell
 module.exports = class ExprCellComponent extends React.Component
