@@ -151,6 +151,7 @@ module.exports = class MapViewComponent extends React.Component
     return R LegendComponent,
       schema: @props.schema
       layerViews: @props.design.layerViews
+      design: @props.design.legend
       filters: @getCompiledFilters()
       dataSource: @props.dataSource
 
