@@ -54,8 +54,7 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
       extraTables: props.extraTables
       }, (error, config) =>
         if error
-          console.log error.message
-          return callback(error: "Cannot load one of the forms that this depends on. Perhaps the administrator has not shared the form with you? Details: #{error.message}")
+          return callback(error: JSON.parse(error.message))
         callback({ schema: config.schema, dataSource: config.dataSource })
     )
 
