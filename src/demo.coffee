@@ -38,12 +38,12 @@ $ ->
       R 'style', null, '''html, body, #main { height: 100% }'''
       # R(RichTextPane)
       # R(TestPane, apiUrl: "https://api.mwater.co/v3/")
-      # R(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "a855eb0587d845d3ac27aed03c463976", share: "817c76088c7649ec8cc0b8193e547a09")
+      R(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "a855eb0587d845d3ac27aed03c463976", share: "817c76088c7649ec8cc0b8193e547a09")
       # R(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
       # R(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
       # R(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
       # R(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-      R(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+      # R(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
       # R(MWaterDirectMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
       # R(WaterOrgDashboardPane, apiUrl: "http://localhost:1235/mwater/")
       # R(BlocksDesignerComponent, renderBlock: [])
@@ -119,7 +119,10 @@ class MWaterDashboardPane extends React.Component
       extraTables: @state.extraTables
     }, (error, config) =>
       if error
-        return R 'div', null, "Error: #{error.message}"
+        if error.error.match(/Cannot view form with id (\w+)/)
+          formId = error.error.match(/Cannot view form with id (\w+)/)[1]
+          console.log formId
+        return R 'div', null, JSON.stringify(error)
 
       dashboardDataSource = new ServerDashboardDataSource({
         apiUrl: @props.apiUrl, client: @props.client, share: @props.share, dashboardId: @props.dashboardId, dataSource: config.dataSource
