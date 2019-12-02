@@ -27,6 +27,11 @@ module.exports = class MapComponent extends React.Component
 
     onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
 
+    extraFilters: PropTypes.arrayOf(PropTypes.shape({
+      table: PropTypes.string.isRequired
+      jsonql: PropTypes.object.isRequired
+    })) # Extra filters to apply to view
+
     titleElem: PropTypes.node                     # Extra element to include in title at left
     extraTitleButtonsElem: PropTypes.node              # Extra elements to add to right
 
@@ -114,6 +119,7 @@ module.exports = class MapComponent extends React.Component
         onDesignChange: @handleDesignChange
         zoomLocked: @state.zoomLocked
         onRowClick: @props.onRowClick
+        extraFilters: @props.extraFilters
       )
     )
 
