@@ -9,6 +9,7 @@ uiComponents = require './UIComponents'
 ExprUtils = require("mwater-expressions").ExprUtils
 moment = require 'moment'
 ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
+CustomTablesetListComponent = require('./CustomTablesetListComponent').CustomTablesetListComponent
 
 sitesOrder = {
   "entities.water_point": 1
@@ -117,6 +118,18 @@ module.exports = class MWaterCompleteTableSelectComponent extends React.Componen
           onClick: @props.onChange.bind(null, table.id) 
         })
 
+  renderTablesets: ->
+    R CustomTablesetListComponent, 
+      schema: @props.schema
+      client: @props.client
+      apiUrl: @props.apiUrl
+      user: @props.user
+      onChange: @props.onChange
+      extraTables: @props.extraTables
+      onExtraTableAdd: @handleExtraTableAdd
+      onExtraTableRemove: @handleExtraTableRemove
+      locale: @context.locale
+
   renderOther: ->
     otherTables = _.filter(@props.schema.getTables(), (table) => 
       # Remove deprecated
@@ -141,6 +154,10 @@ module.exports = class MWaterCompleteTableSelectComponent extends React.Componen
 
       # Remove issues
       if table.id.match(/^(issues|issue_events):/)
+        return false
+
+      # Remove custom tablesets
+      if table.id.match(/^custom\./)
         return false
 
       return true
@@ -174,6 +191,7 @@ module.exports = class MWaterCompleteTableSelectComponent extends React.Componen
       { id: "forms", label: [R('i', className: "fa fa-th-list"), " Surveys"], elem: @renderForms() }
       { id: "indicators", label: [R('i', className: "fa fa-check-circle"), " Indicators"], elem: @renderIndicators() }
       { id: "issues", label: [R('i', className: "fa fa-exclamation-circle"), " Issues"], elem: @renderIssues() }
+      { id: "tablesets", label: [R('i', className: "fa fa-table"), " Tables"], elem: @renderTablesets() }
     ]
 
     if sweetSenseTables.length > 0

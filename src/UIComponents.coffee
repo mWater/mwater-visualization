@@ -35,7 +35,7 @@ exports.SectionComponent = class SectionComponent extends React.Component
 # List of options with a name and description each
 exports.OptionListComponent = class OptionListComponent extends React.Component
   @propTypes:
-    items: PropTypes.array.isRequired # name, desc, modified, onClick, onRemove (optional)
+    items: PropTypes.array.isRequired # name, desc, onClick, onRemove (optional)
     hint: PropTypes.string
 
   render: ->
@@ -43,7 +43,7 @@ exports.OptionListComponent = class OptionListComponent extends React.Component
       R 'div', style: { color: "#AAA", fontStyle: "italic" }, key: "hint", @props.hint
       R 'div', className: "mwater-visualization-big-options", key: "options",
         _.map @props.items, (item, i) =>
-          R OptionComponent, name: item.name, desc: item.desc, modified: item.modified, onClick: item.onClick, onRemove: item.onRemove, key: i
+          R OptionComponent, name: item.name, desc: item.desc, onClick: item.onClick, onRemove: item.onRemove, key: i
 
 # Single option
 class OptionComponent extends React.Component
