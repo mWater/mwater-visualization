@@ -86,6 +86,17 @@ module.exports = save: (design, data, schema, format) ->
         el.style.fontSize = "10px";
         el.style.lineHeight = "normal";
 
+        customStyle = document.createElement('style')
+        customStyle.type = 'text/css';
+        customStyle.appendChild(document.createTextNode(
+          '''<![CDATA[
+          line, path {fill: none;stroke: rgb(0, 0, 0);}
+          ]]>
+          '''
+        ))
+
+        el.appendChild(customStyle)
+
         saveSvgAsPng.saveSvgAsPng(el, "#{title or "untitled"}.png", {
           selectorRemap: (selector) -> 
             if selector in [".c3 path, .c3 line", ".c3 line, .c3 path"]
