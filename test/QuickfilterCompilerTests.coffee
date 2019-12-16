@@ -38,7 +38,7 @@ describe "QuickfilterCompiler", ->
           op: "@>"
           exprs: [
             { type: "op", op: "::jsonb", exprs: [{ type: "op", op: "to_json", exprs: [{ type: "field", tableAlias: "{alias}", column: "enumset" }] }] }
-            { type: "op", op: "::jsonb", exprs: [{ type: "op", op: "to_json", exprs: [{ type: "literal", value: ["a"] }] }] }
+            { type: "op", op: "::jsonb", exprs: [{ type: "literal", value: '["a"]' }] }
           ]
         }        
       }
@@ -71,7 +71,7 @@ describe "QuickfilterCompiler", ->
           op: "@>"
           exprs: [
             { type: "op", op: "::jsonb", exprs: [{ type: "op", op: "to_json", exprs: [{ type: "field", tableAlias: "{alias}", column: "enumset" }] }] }
-            { type: "op", op: "::jsonb", exprs: [{ type: "op", op: "to_json", exprs: [{ type: "literal", value: ["a"] }] }] }
+            { type: "op", op: "::jsonb", exprs: [{ type: "literal", value: '["a"]' }] }
           ]
         }        
       }
