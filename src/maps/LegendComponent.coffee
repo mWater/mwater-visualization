@@ -50,7 +50,7 @@ module.exports = class LegendComponent extends React.Component
     if legendItems.length == 0
       return null
     
-    if @props.design? and @props.design?.showLegend == false
+    if @props.design? and !@props.design?.showLegend
       return null
     
     style = {
@@ -72,19 +72,15 @@ module.exports = class LegendComponent extends React.Component
       when "topRight"
         style.top = 10
         style.right = 10
-        style.transformOrigin = "top right"
       when "topLeft"
         style.top = 10
         style.left = 50
-        style.transformOrigin = "top left"
       when "bottomLeft"
         style.bottom = 50
         style.left = 10
-        style.transformOrigin = "bottom left"
       when "bottomRight"
         style.bottom = 35
         style.right = 10
-        style.transformOrigin = "bottom right"
     
     switch scale
       when "small"

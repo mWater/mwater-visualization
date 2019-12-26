@@ -39,7 +39,7 @@ $ ->
       # R(RichTextPane)
       # R(TestPane, apiUrl: "https://api.mwater.co/v3/")
       # R(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "a855eb0587d845d3ac27aed03c463976", share: "817c76088c7649ec8cc0b8193e547a09")
-      # R(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+      R(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
       # R(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
       # R(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
       # R(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
@@ -48,7 +48,7 @@ $ ->
       # R(WaterOrgDashboardPane, apiUrl: "http://localhost:1235/mwater/")
       # R(BlocksDesignerComponent, renderBlock: [])
       # R(MWaterMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
-      R(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+      # R(MWaterMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
       # R(DashboardPane, apiUrl: "https://api.mwater.co/v3/")
       # R(FloatingWindowComponent, initialBounds: { x: 100, y: 100, width: 400, height: 600 })
       # R(DashboardPane, apiUrl: "http://localhost:1234/v3/")
@@ -198,7 +198,7 @@ class MWaterDirectDashboardPane extends React.Component
 
 
 # mapId = "fb92ca9ca9a04bfd8dc156b5ac71380d"
-mapId = "d2efe1c36c884b7d89c4e6229aaa6ee9"
+mapId = "5e9a90f0f52e4690b42378534752ebfc"
 share = "testshareid"
 
 class MWaterMapPane extends React.Component
