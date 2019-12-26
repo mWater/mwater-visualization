@@ -73,7 +73,7 @@ module.exports = class MapDesignerComponent extends React.Component
 
       R('br')
       R LegendDesignControl,
-        design: @props.design.legend or {}
+        design: @props.design.legend
         onChange: @handleLegendOptionsChange
 
       R('br')
