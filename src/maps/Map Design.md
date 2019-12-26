@@ -13,17 +13,12 @@ Maps are stored as a base layer, a series of layers and filters.
 	autoBounds: true to automatically zoom to bounds of data
 	maxZoom: maximum allowed zoom level
 	globalFilters: array of global filters. See below.
-	legend: {
-		position: topRight | bottomRight | topLeft | bottomLeft
-		scale: small | medium | normal
-		showLegend: boolean
-	}
 }
 ```
 
 ## LayerView
 
-Is a view of a layer including whether visible, opacity.
+Is a view of a layer including whether visible, opacity. 
 
 ```
 {

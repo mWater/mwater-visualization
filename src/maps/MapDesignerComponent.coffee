@@ -5,8 +5,6 @@ R = React.createElement
 
 TabbedComponent = require 'react-library/lib/TabbedComponent'
 NumberInputComponent = require('react-library/lib/NumberInputComponent')
-ui = require('react-library/lib/bootstrap')
-update = require('react-library/lib/update')
 
 CheckboxComponent = require '../CheckboxComponent'
 ClickOutHandler = require('react-onclickout')
@@ -44,10 +42,6 @@ module.exports = class MapDesignerComponent extends React.Component
   handleConvertToClusterMap: =>
     @props.onDesignChange(MapUtils.convertToClusterMap(@props.design)) 
 
-  handleLegendOptionsChange: (value) =>
-    design = _.extend({}, @props.design, {legend: value})
-    @props.onDesignChange(design)
-
   renderOptionsTab: ->
     R 'div', null,
       R BaseLayerDesignerComponent,
@@ -70,11 +64,6 @@ module.exports = class MapDesignerComponent extends React.Component
       R AttributionComponent,
         text: @props.design.attribution
         onTextChange: @handleAttributionChange
-
-      R('br')
-      R LegendDesignControl,
-        design: @props.design.legend
-        onChange: @handleLegendOptionsChange
 
       R('br')
       
@@ -198,40 +187,3 @@ class AdvancedOptionsComponent extends React.Component
           value: @props.design.maxZoom
           onChange: (v) => @props.onDesignChange(_.extend({}, @props.design, maxZoom: v))
 
-# Legend position and scale component
-LegendDesignControl = ({design, onChange}) => 
-  updateLegend = -> update(design, onChange, arguments)
-
-  return  R 'div', className: "form-group",
-    R 'label', className: "text-muted", "Legend"
-      R 'div', style: {marginLeft: 10},
-        R CheckboxComponent, 
-          checked: if design.showLegend? then design.showLegend else true
-          onChange: updateLegend("showLegend"),
-            R 'span', className: "text-muted", 
-              "Show legend "
-        R 'div', className: "form-group",
-          R 'label', className: "text-muted", "Position"
-          R 'div', null,
-            R ui.Toggle,
-              value: design.position or 'bottomRight'
-              size: 'xs'
-              onChange: updateLegend("position")
-              options: [
-                {value: 'topLeft', label: 'Top Left'}
-                {value: 'topRight', label: 'Top Right'}
-                {value: 'bottomLeft', label: 'Bottom Left'}
-                {value: 'bottomRight', label: 'Bottom Right'}
-              ]
-        R 'div', className: "form-group",
-          R 'label', className: "text-muted", "Size"
-          R 'div', null,
-            R ui.Toggle,
-              value: design.scale or 'normal'
-              onChange: updateLegend("scale")
-              size: 'xs'
-              options: [
-                {value: 'small', label: 'Small'}
-                {value: 'medium', label: 'Medium'}
-                {value: 'normal', label: 'Normal'}
-              ]

@@ -10,7 +10,6 @@ module.exports = class LegendComponent extends React.Component
   @propTypes:
     schema: PropTypes.object.isRequired # Schema to use
     layerViews: PropTypes.array.isRequired # Layer views
-    design: PropTypes.object # Legend Options
     zoom: PropTypes.number     # Current zoom level
     filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
 
@@ -49,44 +48,20 @@ module.exports = class LegendComponent extends React.Component
 
     if legendItems.length == 0
       return null
-    
-    if @props.design? and !@props.design?.showLegend
-      return null
-    
+
     style = {
       padding: 7
       background: "rgba(255,255,255,0.8)"
       boxShadow: "0 0 15px rgba(0,0,0,0.2)"
       borderRadius: 5
       position: 'absolute'
+      right: 10
+      bottom: 35
       maxHeight: '85%'
       overflowY: 'auto'
       zIndex: 1000
       fontSize: 12
     }
-
-    position = @props.design?.position or 'bottomRight'
-    scale = @props.design?.scale or 'normal'
-
-    switch position
-      when "topRight"
-        style.top = 10
-        style.right = 10
-      when "topLeft"
-        style.top = 10
-        style.left = 50
-      when "bottomLeft"
-        style.bottom = 50
-        style.left = 10
-      when "bottomRight"
-        style.bottom = 35
-        style.right = 10
-    
-    switch scale
-      when "small"
-        style.transform = 'scale(0.6)'
-      when "medium"
-        style.transform = 'scale(0.8)'
 
     return R 'div', style: style,
       _.map legendItems, (item, i) =>
