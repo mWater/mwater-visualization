@@ -47,6 +47,7 @@ export const CustomTablesetListComponent = (props: {
     // If already included, select it
     if (props.schema.getTable(qualifiedTableId)) {
       props.onChange(qualifiedTableId)
+      return
     }
 
     // Request extra tables
