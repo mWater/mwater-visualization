@@ -21,6 +21,11 @@ export interface JsonQLFilter {
   jsonql: JsonQL
 }
 
+export { default as DashboardComponent } from './dashboards/DashboardComponent'
+export { default as DashboardDataSource } from './dashboards/DashboardDataSource'
+export { default as DirectDashboardDataSource } from './dashboards/DirectDashboardDataSource'
+export * from './dashboards/DashboardDesign'
+
 export class Widget {
   /** Creates a React element that is a view of the widget */
   createViewElement(options: {
