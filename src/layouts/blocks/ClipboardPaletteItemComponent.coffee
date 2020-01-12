@@ -4,7 +4,7 @@ React = require 'react'
 R = React.createElement
 uuid = require 'uuid'
 
-DragSourceComponent = require('../DragSourceComponent')("block")
+DragSourceComponent = require('../DragSourceComponent')("visualization-block")
 DropTarget = require('react-dnd').DropTarget
 
 # Clipboard item in a palette that has special properties
@@ -65,4 +65,4 @@ collectTarget = (connect, monitor) ->
     canDrop: monitor.canDrop()
   }
 
-module.exports = _.flow(DropTarget("block", blockTargetSpec, collectTarget))(ClipboardPaletteItemComponent)
+module.exports = _.flow(DropTarget("visualization-block", blockTargetSpec, collectTarget))(ClipboardPaletteItemComponent)

@@ -170,4 +170,4 @@ collectSource = (connect, monitor) ->
   }
 
 
-module.exports = _.flow(DragSource("block", blockSourceSpec, collectSource), DropTarget("block", blockTargetSpec, collectTarget))(DraggableBlockComponent)
+module.exports = _.flow(DragSource("visualization-block", blockSourceSpec, collectSource), DropTarget("visualization-block", blockTargetSpec, collectTarget))(DraggableBlockComponent)

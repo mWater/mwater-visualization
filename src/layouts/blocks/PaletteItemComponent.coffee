@@ -2,7 +2,7 @@ PropTypes = require('prop-types')
 React = require 'react'
 R = React.createElement
 
-DragSourceComponent = require('../DragSourceComponent')("block")
+DragSourceComponent = require('../DragSourceComponent')("visualization-block")
 
 # Item in a palette that can be dragged to add a widget or other item
 module.exports = class PaletteItemComponent extends React.Component
