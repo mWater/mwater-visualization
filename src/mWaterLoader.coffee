@@ -36,5 +36,4 @@ module.exports = (options, callback) ->
       dataSource: dataSource
       })
   .fail (xhr) =>
-    console.error xhr.responseText
     callback(new Error(xhr.responseText))

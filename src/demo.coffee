@@ -39,7 +39,8 @@ $ ->
       # R(RichTextPane)
       # R(TestPane, apiUrl: "https://api.mwater.co/v3/")
       # R(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "a855eb0587d845d3ac27aed03c463976", share: "817c76088c7649ec8cc0b8193e547a09")
-      R(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+      R(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: "674fd648e9693e1e0d2eb2ef29107d0e", dashboardId: "c58048c3c3384a5aab3d984ac1f3750e")
+      # R(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
       # R(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
       # R(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
       # R(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
@@ -100,7 +101,7 @@ class MWaterDashboardPane extends React.Component
     # Load dashboard
     url = @props.apiUrl + "dashboards/#{@props.dashboardId}?" + querystring.stringify({ client: @props.client, share: @props.share })
     $.getJSON url, (dashboard) => 
-      @setState(design: dashboard.design, extraTables: dashboard.extra_tables)
+      @setState(design: dashboard.design, extraTables: dashboard.extraTables)
 
   handleDesignChange: (design) =>
     # @setState(design: design, extraTables: )
@@ -117,12 +118,15 @@ class MWaterDashboardPane extends React.Component
       share: @props.share
       onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
       extraTables: @state.extraTables
+      errorFormatter: (err, defaultError) => 
+        if not err.form 
+          return defaultError
+        return "This dashboard depends on the survey #{err.form.name} which cannot be loaded. 
+        Perhaps the administrator of the survey has not shared it with you? 
+        The survey was created by #{err.form.created_by}"
     }, (error, config) =>
       if error
-        if error.error.match(/Cannot view form with id (\w+)/)
-          formId = error.error.match(/Cannot view form with id (\w+)/)[1]
-          console.log formId
-        return R 'div', null, JSON.stringify(error)
+        return R 'div', className: "alert alert-danger", error 
 
       dashboardDataSource = new ServerDashboardDataSource({
         apiUrl: @props.apiUrl, client: @props.client, share: @props.share, dashboardId: @props.dashboardId, dataSource: config.dataSource

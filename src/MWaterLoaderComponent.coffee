@@ -28,6 +28,7 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
     addLayerElementFactory: PropTypes.func              
 
     children: PropTypes.func.isRequired                 # Called with (error, { schema:, dataSource: })
+    errorFormatter: PropTypes.func    # Custom error formatter that returns React node or string, gets passed the error response from server
 
   constructor: (props) ->
     super(props)
@@ -54,7 +55,10 @@ module.exports = class MWaterLoaderComponent extends AsyncLoadComponent
       extraTables: props.extraTables
       }, (error, config) =>
         if error
-          return callback(error: "Cannot load one of the forms that this depends on. Perhaps the administrator has not shared the form with you? Details: #{error.message}")
+          defaultError = "Cannot load one of the forms that this depends on. Perhaps the administrator has not shared the form with you? Details: #{error.message}"
+          if @props.errorFormatter
+            return callback(error: @props.errorFormatter(JSON.parse(error.message), defaultError))
+          return callback(error: defaultError)
         callback({ schema: config.schema, dataSource: config.dataSource })
     )
 
