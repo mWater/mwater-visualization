@@ -60,9 +60,8 @@ module.exports = class ChartWidget extends Widget
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->
-    # Removing for https://github.com/mWater/mwater-portal/issues/1119
-    # # Clean design first
-    # design = @chart.cleanDesign(design, schema)
+    # Clean design first
+    design = @chart.cleanDesign(design, schema)
 
     return @chart.getFilterableTables(design, schema)
 
