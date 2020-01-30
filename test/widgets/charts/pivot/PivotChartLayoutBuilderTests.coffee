@@ -728,8 +728,6 @@ describe "PivotChartLayoutBuilder", ->
 
         layout = @lb.buildLayout(design, data)
 
-        console.log layout
-
         # Check text
         compare layoutPluck(layout, "text"), [
           [null, null, null]

@@ -526,8 +526,9 @@ opacity: ` +  design.fillOpacity + `;
     if (design.filter != null) {
       const exprCompiler = new ExprCompiler(schema);
       const jsonql = exprCompiler.compileExpr({expr: design.filter, tableAlias: "{alias}"});
-      if (jsonql) {
-        _filters.push({ table: (design.filter as OpExpr).table, jsonql });
+      const table = (design.filter as OpExpr).table
+      if (jsonql && table) {
+        _filters.push({ table: table, jsonql });
       }
     }
     const axisBuilder = new AxisBuilder({schema});
