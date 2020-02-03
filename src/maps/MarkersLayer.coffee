@@ -1,6 +1,8 @@
 _ = require 'lodash'
 React = require 'react'
 R = React.createElement
+produce = require('immer').default
+original = require('immer').original
 
 Layer = require './Layer'
 ExprCompiler = require('mwater-expressions').ExprCompiler
@@ -359,20 +361,21 @@ module.exports = class MarkersLayer extends Layer
     axisBuilder = new AxisBuilder(schema: schema)
 
     # TODO clones entirely
-    design = _.cloneDeep(design)
+    design = produce(design, (draft) =>
+      # Migrate legacy sublayers
+      if draft.sublayers?[0]
+        draft = _.extend(draft, design.sublayers[0])
+      delete draft.sublayers
 
-    # Migrate legacy sublayers
-    if design.sublayers?[0]
-      design = _.extend({}, design, design.sublayers[0])
-    delete design.sublayers
+      draft.axes = design.axes or {}
+      draft.color = design.color or "#0088FF"
 
-    design.axes = design.axes or {}
-    design.color = design.color or "#0088FF"
+      draft.axes.geometry = axisBuilder.cleanAxis(axis: original(draft.axes.geometry), table: design.table, types: ['geometry'], aggrNeed: "none")
+      draft.axes.color = axisBuilder.cleanAxis(axis: original(draft.axes.color), table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none")
 
-    design.axes.geometry = axisBuilder.cleanAxis(axis: design.axes.geometry, table: design.table, types: ['geometry'], aggrNeed: "none")
-    design.axes.color = axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none")
-
-    design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table })
+      draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table })
+      return
+    )
 
     return design
 

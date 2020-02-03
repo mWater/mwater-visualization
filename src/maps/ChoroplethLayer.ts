@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import React from 'react';
 
+import { original, produce } from 'immer'
+
 import Layer from './Layer';
 import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, Expr, DataSource, OpExpr } from 'mwater-expressions';
 import AxisBuilder from '../axes/AxisBuilder';
@@ -563,58 +565,57 @@ opacity: ` +  design.fillOpacity + `;
     const exprCleaner = new ExprCleaner(schema);
     const axisBuilder = new AxisBuilder({schema});
 
-    // TODO clones entirely
-    design = _.cloneDeep(design);
+    design = produce(design, draft => {
+      draft.axes = design.axes || {};
 
-    design.axes = design.axes || {};
+      // Default region mode
+      if (!design.regionMode) {
+        draft.regionMode = draft.axes.color ? "indirect" : "plain"
+      }
 
-    // Default region mode
-    if (!design.regionMode) {
-      design.regionMode = design.axes.color ? "indirect" : "plain"
-    }
+      // Default color
+      if (draft.regionMode === "plain") {
+        draft.color = design.color || "#FFFFFF";
+      }
+      else {
+        draft.color = "#FFFFFF"
+      }
 
-    // Default color
-    if (design.regionMode === "plain") {
-      design.color = design.color || "#FFFFFF";
-    }
-    else {
-      design.color = "#FFFFFF"
-    }
+      if (draft.regionMode === "indirect" && design.table) {
+        draft.adminRegionExpr = exprCleaner.cleanExpr(design.adminRegionExpr, { table: design.table, types: ["id"], idTable: regionsTable });
+      }
+      else {
+        delete draft.adminRegionExpr
+        delete draft.table
+      }
 
-    if (design.regionMode === "indirect" && design.table) {
-      design.adminRegionExpr = exprCleaner.cleanExpr(design.adminRegionExpr, { table: design.table, types: ["id"], idTable: regionsTable });
-    }
-    else {
-      delete design.adminRegionExpr
-      delete design.table
-    }
+      draft.fillOpacity = (design.fillOpacity != null) ? design.fillOpacity : 0.75;
+      draft.displayNames = (design.displayNames != null) ? design.displayNames : true;
 
-    design.fillOpacity = (design.fillOpacity != null) ? design.fillOpacity : 0.75;
-    design.displayNames = (design.displayNames != null) ? design.displayNames : true;
+      // Clean the axes
+      if (draft.regionMode === "indirect" && design.table) {
+        draft.axes.color = axisBuilder.cleanAxis({axis: original(draft.axes.color) || null, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"});
+        draft.axes.label = axisBuilder.cleanAxis({axis: original(draft.axes.label) || null, table: design.table, types: ['text', 'number'], aggrNeed: "required"});
+      } else if (draft.regionMode === "plain" || (draft.regionMode === "indirect" && !design.table)) {
+        delete draft.axes.color
+        delete draft.axes.label
+      } else if (draft.regionMode === "direct") {
+        draft.axes.color = axisBuilder.cleanAxis({axis: original(draft.axes.color) || null, table: regionsTable, types: ['enum', 'text', 'boolean', 'date'], aggrNeed: "none"});
+        draft.axes.label = axisBuilder.cleanAxis({axis: original(draft.axes.label) || null, table: regionsTable, types: ['text', 'number'], aggrNeed: "none"});
+      }
 
-    // Clean the axes
-    if (design.regionMode === "indirect" && design.table) {
-      design.axes.color = axisBuilder.cleanAxis({axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"});
-      design.axes.label = axisBuilder.cleanAxis({axis: design.axes.label, table: design.table, types: ['text', 'number'], aggrNeed: "required"});
-    } else if (design.regionMode === "plain" || (design.regionMode === "indirect" && !design.table)) {
-      delete design.axes.color
-      delete design.axes.label
-    } else if (design.regionMode === "direct") {
-      design.axes.color = axisBuilder.cleanAxis({axis: design.axes.color, table: regionsTable, types: ['enum', 'text', 'boolean', 'date'], aggrNeed: "none"});
-      design.axes.label = axisBuilder.cleanAxis({axis: design.axes.label, table: regionsTable, types: ['text', 'number'], aggrNeed: "none"});
-    }
+      // Filter is only for indirect
+      if (draft.regionMode === "indirect" && design.table) {
+        draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table })
+      }
+      else {
+        delete draft.filter
+      }
 
-    // Filter is only for indirect
-    if (design.regionMode === "indirect" && design.table) {
-      design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table })
-    }
-    else {
-      delete design.filter
-    }
-
-    if ((design.detailLevel == null)) {
-      design.detailLevel = 0
-    }
+      if ((design.detailLevel == null)) {
+        draft.detailLevel = 0
+      }
+    })
 
     return design
   }

@@ -104,7 +104,7 @@ module.exports = class AxisBuilder
         if "number" not in options.types or type != "id"
           return null
 
-    return produce(axis, (draft) =>
+    axis = produce(axis, (draft) =>
       draft.expr = expr
 
       if not xform and axis.xform
@@ -124,6 +124,8 @@ module.exports = class AxisBuilder
 
       return
     )
+    
+    return axis
 
   # Checks whether an axis is valid
   #  axis: axis to validate

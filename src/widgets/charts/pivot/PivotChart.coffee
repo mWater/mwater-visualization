@@ -5,6 +5,7 @@ async = require 'async'
 uuid = require 'uuid'
 produce = require('immer').default
 original = require('immer').original
+WeakCache = require('mwater-expressions').WeakCache
 
 Chart = require '../Chart'
 ExprCleaner = require('mwater-expressions').ExprCleaner
@@ -15,13 +16,20 @@ PivotChartUtils = require './PivotChartUtils'
 PivotChartQueryBuilder = require './PivotChartQueryBuilder'
 PivotChartLayoutBuilder = require './PivotChartLayoutBuilder'
 
+# Store true as a weakly cached value if a design is already clean
+cleanDesignCache = new WeakCache()
+
 # See README.md for the design
 module.exports = class PivotChart extends Chart
   cleanDesign: (design, schema) ->
     exprCleaner = new ExprCleaner(schema)
     axisBuilder = new AxisBuilder(schema: schema)
 
-    return produce(design, (draft) => 
+    # Use weak caching to improve performance of cleaning complex pivot charts
+    if cleanDesignCache.get([design, schema], []) == true
+      return design
+
+    cleanedDesign = produce(design, (draft) => 
       # Fill in defaults
       draft.version = design.version or 1
       draft.rows = design.rows or []
@@ -93,7 +101,11 @@ module.exports = class PivotChart extends Chart
         return
     )
 
-    return design
+    # Cache if unchanged (and therefore clean)
+    if design == cleanedDesign
+      cleanDesignCache.set([design, schema], [], true)
+
+    return cleanedDesign
 
   validateDesign: (design, schema) ->
     axisBuilder = new AxisBuilder(schema: schema)

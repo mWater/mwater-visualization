@@ -142,41 +142,35 @@ class C3ChartComponent extends React.Component
     @chart = c3.generate(chartOptions)
 
   componentDidUpdate: (prevProps, prevState) ->
-    # Check if options changed
-    oldCompiler = new LayeredChartCompiler(schema: prevProps.schema) 
-    newCompiler = new LayeredChartCompiler(schema: @props.schema)
+    # Check if schema, data or design (except for header + footer) changed
+    changed = false
 
-    oldChartOptions = oldCompiler.createChartOptions({
-      design: prevProps.design
-      data: prevProps.data
-      width: prevProps.width
-      height: prevProps.height
-      locale: prevProps.locale
-    })
+    changed = changed or prevProps.schema != @props.schema
+    changed = changed or not _.isEqual(prevProps.data, @props.data)
+    changed = changed or prevProps.locale != @props.locale 
+    changed = changed or (prevProps.design != @props.design and not _.isEqual(_.omit(prevProps.design, "header", "footer"), _.omit(@props.design, "header", "footer")))
 
-    newChartOptions = newCompiler.createChartOptions({
-      design: @props.design
-      data: @props.data
-      width: @props.width
-      height: @props.height
-      locale: @props.locale
-    })
-
-    # If chart changed
-    if not _.isEqual(oldChartOptions, newChartOptions)
-      # Check if size alone changed
-      if _.isEqual(_.omit(oldChartOptions, "size"), _.omit(newChartOptions, "size")) and @props.locale == prevProps.locale
-        @chart.resize(width: @props.width, height: @props.height)
-        @updateScope()
-        return
-
+    if changed
+      newCompiler = new LayeredChartCompiler(schema: @props.schema)
+      newChartOptions = newCompiler.createChartOptions({
+        design: @props.design
+        data: @props.data
+        width: @props.width
+        height: @props.height
+        locale: @props.locale
+      })
+    
       # TODO check if only data changed
       # Use throttled update to bypass https://github.com/mWater/mwater-visualization/issues/92
       @throttledCreateChart(@props)
-    else
-      # Check scope
-      if not _.isEqual(@props.scope, prevProps.scope)
-        @updateScope()
+    # Check if size alone changed
+    else if @props.width != prevProps.width or @props.height != prevProps.height
+      @chart.resize(width: @props.width, height: @props.height)
+      @updateScope()
+      return
+    # Check scope
+    else if not _.isEqual(@props.scope, prevProps.scope)
+      @updateScope()
 
     # if not _.isEqual(@props.data, nextProps.data)
     #   # # If length of data is different, re-create chart

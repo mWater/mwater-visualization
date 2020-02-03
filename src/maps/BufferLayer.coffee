@@ -1,6 +1,8 @@
 _ = require 'lodash'
 React = require 'react'
 R = React.createElement
+produce = require('immer').default
+original = require('immer').original
 
 Layer = require './Layer'
 ExprCompiler = require('mwater-expressions').ExprCompiler
@@ -412,19 +414,20 @@ module.exports = class BufferLayer extends Layer
     exprCleaner = new ExprCleaner(schema)
     axisBuilder = new AxisBuilder(schema: schema)
 
-    # TODO clones entirely
-    design = _.cloneDeep(design)
-    # Default color
-    design.color = design.color or "#0088FF"
+    design = produce(design, (draft) =>
+      # Default color
+      draft.color = design.color or "#0088FF"
 
-    design.axes = design.axes or {}
-    design.radius = design.radius or 1000
-    design.fillOpacity = if design.fillOpacity? then design.fillOpacity else 0.5
+      draft.axes = design.axes or {}
+      draft.radius = design.radius or 1000
+      draft.fillOpacity = if design.fillOpacity? then design.fillOpacity else 0.5
 
-    design.axes.geometry = axisBuilder.cleanAxis(axis: design.axes.geometry, table: design.table, types: ['geometry'], aggrNeed: "none")
-    design.axes.color = axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none")
+      draft.axes.geometry = axisBuilder.cleanAxis(axis: original(draft.axes.geometry), table: design.table, types: ['geometry'], aggrNeed: "none")
+      draft.axes.color = axisBuilder.cleanAxis(axis: original(draft.axes.color), table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none")
 
-    design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table })
+      draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table })
+      return
+    )
 
     return design
 
