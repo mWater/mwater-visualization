@@ -360,24 +360,19 @@ module.exports = class MarkersLayer extends Layer
     exprCleaner = new ExprCleaner(schema)
     axisBuilder = new AxisBuilder(schema: schema)
 
+    # Migrate legacy sublayers
+    if design.sublayers?[0]
+      design = _.extend({}, design, design.sublayers[0])
+      delete design.sublayers
+
     design = produce(design, (draft) =>
-      # Migrate legacy sublayers
-      if design.sublayers?[0]
-        draft.axes = design.sublayers[0].axes
-        draft.table = design.sublayers[0].table
-        draft.filter = design.sublayers[0].filter
-        draft.color = design.sublayers[0].color
-        draft.symbol = design.sublayers[0].symbol
-        draft.markerSize = design.sublayers[0].markerSize
-        delete draft.sublayers
+      draft.axes = design.axes or {}
+      draft.color = design.color or "#0088FF"
 
-      draft.axes = draft.axes or {}
-      draft.color = draft.color or "#0088FF"
+      draft.axes.geometry = axisBuilder.cleanAxis(axis: original(draft.axes.geometry), table: design.table, types: ['geometry'], aggrNeed: "none")
+      draft.axes.color = axisBuilder.cleanAxis(axis: original(draft.axes.color), table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none")
 
-      draft.axes.geometry = axisBuilder.cleanAxis(axis: original(draft.axes.geometry), table: draft.table, types: ['geometry'], aggrNeed: "none")
-      draft.axes.color = axisBuilder.cleanAxis(axis: original(draft.axes.color), table: draft.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none")
-
-      draft.filter = exprCleaner.cleanExpr(original(draft.filter), { table: draft.table })
+      draft.filter = exprCleaner.cleanExpr(design.filter, { table: draft.table })
       return
     )
 
