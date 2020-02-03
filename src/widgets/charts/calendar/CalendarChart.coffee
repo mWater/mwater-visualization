@@ -2,6 +2,8 @@ _ = require 'lodash'
 React = require 'react'
 R = React.createElement
 moment = require 'moment'
+produce = require('immer').default
+original = require('immer').original
 
 injectTableAlias = require('mwater-expressions').injectTableAlias
 Chart = require '../Chart'
@@ -24,19 +26,18 @@ module.exports = class CalendarChart extends Chart
     exprCleaner = new ExprCleaner(schema)
     axisBuilder = new AxisBuilder(schema: schema)
 
-    # Clone deep for now # TODO
-    design = _.cloneDeep(design)
+    design = produce(design, (draft) =>
+      # Fill in defaults
+      draft.version = design.version or 1
 
-    # Fill in defaults
-    design.version = design.version or 1
+      # Clean axes
+      draft.dateAxis = axisBuilder.cleanAxis(axis: design.dateAxis, table: design.table, aggrNeed: "none", types: ["date"])
+      draft.valueAxis = axisBuilder.cleanAxis(axis: design.valueAxis, table: design.table, aggrNeed: "required", types: ["number"])
 
-    # Clean axes
-    design.dateAxis = axisBuilder.cleanAxis(axis: design.dateAxis, table: design.table, aggrNeed: "none", types: ["date"])
-    design.valueAxis = axisBuilder.cleanAxis(axis: design.valueAxis, table: design.table, aggrNeed: "required", types: ["number"])
-
-    # Clean filter
-    design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ["boolean"] })
-
+      # Clean filter
+      draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ["boolean"] })
+      return
+    )
     return design
 
   validateDesign: (design, schema) ->

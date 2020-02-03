@@ -51,7 +51,7 @@ module.exports = class CalendarChartViewComponent extends React.Component
     locale: PropTypes.string  # e.g. "en"
 
   shouldComponentUpdate: (prevProps) ->
-    not _.isEqual(prevProps, @props)
+    not _.isEqual(_.omit(prevProps, "onScopeChange"), _.omit(@props, "onScopeChange"))
 
   getCellSize: ->
     # ((total width) - (total required month stroke) - (left and right padding) - (space for year text) ) / weeks in year

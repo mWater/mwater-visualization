@@ -93,7 +93,7 @@ module.exports = class ItemsHtmlConverter
 
   # Converts an HTML DOM element to items
   convertElemToItems: (elem) ->
-    console.log elem.outerHTML
+    # console.log elem.outerHTML
     
     # Walk DOM tree, adding strings and expressions
     items = []

@@ -9,7 +9,7 @@ AxisBuilder = require '../src/axes/AxisBuilder'
 canonical = require 'canonical-json'
 
 compare = (actual, expected) ->
-  assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected)
+  assert.equal canonical(actual), canonical(expected), "\ngot:" + canonical(actual) + "\nexp:" + canonical(expected)
 
 describe "AxisBuilder", ->
   before ->
@@ -276,16 +276,16 @@ describe "AxisBuilder", ->
       }
 
   describe "cleanAxis", ->
-    it "moves legacy aggr into expr", ->
-      axis = {
-        expr: { type: "field", table: "t1", column: "number" }
-        aggr: "sum"
-      }
+    # it "moves legacy aggr into expr", ->
+    #   axis = {
+    #     expr: { type: "field", table: "t1", column: "number" }
+    #     aggr: "sum"
+    #   }
 
-      axis = @ab.cleanAxis(axis: axis, table: "t1", aggrNeed: "optional")
-      compare(axis, {
-        expr: { type: "op", op: "sum", table: "t1", exprs: [{ type: "field", table: "t1", column: "number" }] }
-      })
+    #   axis = @ab.cleanAxis(axis: axis, table: "t1", aggrNeed: "optional")
+    #   compare(axis, {
+    #     expr: { type: "op", op: "sum", table: "t1", exprs: [{ type: "field", table: "t1", column: "number" }] }
+    #   })
 
     it "cleans expression", ->
       axis = {

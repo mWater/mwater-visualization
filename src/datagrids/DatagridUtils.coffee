@@ -2,6 +2,8 @@ _ = require 'lodash'
 update = require 'update-object'
 ExprCleaner = require('mwater-expressions').ExprCleaner
 ExprUtils = require("mwater-expressions").ExprUtils
+produce = require('immer').default
+original = require('immer').original
 
 module.exports = class DatagridUtils
   constructor: (schema) ->
@@ -16,20 +18,22 @@ module.exports = class DatagridUtils
       return {}
 
     # Clean columns
-    design = _.cloneDeep(design)
-    for column in design.columns
-      if column.type == "expr"
-        # Determine if subtable
-        if column.subtable
-          subtable = _.findWhere(design.subtables, id: column.subtable)
+    design = produce(design, (draft) =>
+      for column in draft.columns
+        if column.type == "expr"
+          # Determine if subtable
+          if column.subtable
+            subtable = _.findWhere(design.subtables, id: column.subtable)
 
-          # Now get destination table
-          table = new ExprUtils(@schema).followJoins(design.table, subtable.joins)
-        else
-          table = design.table
+            # Now get destination table
+            table = new ExprUtils(@schema).followJoins(design.table, subtable.joins)
+          else
+            table = design.table
 
-        column.expr = exprCleaner.cleanExpr(column.expr, { table: table, aggrStatuses: ["individual", "literal", "aggregate"] })
+          column.expr = exprCleaner.cleanExpr(original(column.expr), { table: table, aggrStatuses: ["individual", "literal", "aggregate"] })
 
+      return
+    )
     return design
   
   validateDesign: (design) ->

@@ -1,6 +1,8 @@
 _ = require 'lodash'
 React = require 'react'
 R = React.createElement
+produce = require('immer').default
+original = require('immer').original
 
 Layer = require './Layer'
 ExprCompiler = require('mwater-expressions').ExprCompiler
@@ -428,19 +430,18 @@ module.exports = class ClusterLayer extends Layer
     exprCleaner = new ExprCleaner(schema)
     axisBuilder = new AxisBuilder(schema: schema)
 
-    # TODO clones entirely
-    design = _.cloneDeep(design)
+    design = produce(design, (draft) =>
+      # Default colors
+      draft.textColor = design.textColor or "white"
+      draft.fillColor = design.fillColor or "#337ab7"
 
-    # Default colors
-    design.textColor = design.textColor or "white"
-    design.fillColor = design.fillColor or "#337ab7"
+      draft.axes = design.axes or {}
 
-    design.axes = design.axes or {}
+      draft.axes.geometry = axisBuilder.cleanAxis(axis: original(draft.axes.geometry), table: design.table, types: ['geometry'], aggrNeed: "none")
 
-    design.axes.geometry = axisBuilder.cleanAxis(axis: design.axes.geometry, table: design.table, types: ['geometry'], aggrNeed: "none")
-
-    design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table })
-
+      draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table })
+      return 
+    )
     return design
 
   # Validates design. Null if ok, message otherwise

@@ -2,6 +2,8 @@ _ = require 'lodash'
 React = require 'react'
 R = React.createElement
 uuid = require 'uuid'
+produce = require('immer').default
+original = require('immer').original
 
 injectTableAlias = require('mwater-expressions').injectTableAlias
 Chart = require '../Chart'
@@ -38,37 +40,38 @@ module.exports = class TableChart extends Chart
     exprCleaner = new ExprCleaner(schema)
     axisBuilder = new AxisBuilder(schema: schema)
 
-    # Clone deep for now # TODO
-    design = _.cloneDeep(design)
+    design = produce(design, (draft) =>
+      draft.version = design.version or 1
 
-    design.version = design.version or 1
+      # Always have at least one column
+      draft.columns = design.columns or []
+      if draft.columns.length == 0
+        draft.columns.push({id: uuid()})
 
-    # Always have at least one column
-    design.columns = design.columns or []
-    if design.columns.length == 0
-      design.columns.push({id: uuid()})
+      draft.orderings = design.orderings or []
 
-    design.orderings = design.orderings or []
+      # Clean each column
+      for columnId in [0...draft.columns.length]
+        column = draft.columns[columnId]
 
-    # Clean each column
-    for columnId in [0...design.columns.length]
-      column = design.columns[columnId]
+        if not column.id
+          column.id = uuid()
+        # Clean textAxis
+        column.textAxis = axisBuilder.cleanAxis(axis: original(column.textAxis), table: design.table, aggrNeed: "optional")
 
-      if not column.id
-        column.id = uuid()
-      # Clean textAxis
-      column.textAxis = axisBuilder.cleanAxis(axis: column.textAxis, table: design.table, aggrNeed: "optional")
+      # Clean orderings
+      for ordering in draft.orderings
+        ordering.axis = axisBuilder.cleanAxis(axis: original(ordering.axis), table: design.table, aggrNeed: "optional")
 
-    # Clean orderings
-    for ordering in design.orderings
-      ordering.axis = axisBuilder.cleanAxis(axis: ordering.axis, table: design.table, aggrNeed: "optional")
+      if design.filter
+        draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ['boolean'] })
 
-    if design.filter
-      design.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ['boolean'] })
+      # Limit 
+      if design.limit and design.limit > 1000
+        delete draft.limit
 
-    # Limit 
-    if design.limit and design.limit > 1000
-      delete design.limit
+      return
+    )
 
     return design
 

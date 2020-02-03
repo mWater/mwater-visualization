@@ -2,6 +2,8 @@ _ = require 'lodash'
 React = require 'react'
 R = React.createElement
 async = require 'async'
+produce = require('immer').default
+original = require('immer').original
 
 Chart = require '../Chart'
 LayeredChartCompiler = require './LayeredChartCompiler'
@@ -18,50 +20,51 @@ module.exports = class LayeredChart extends Chart
     axisBuilder = new AxisBuilder(schema: schema)
     compiler = new LayeredChartCompiler(schema: schema)
 
-    # Clone deep for now # TODO
-    design = _.cloneDeep(design)
+    layers = design.layers or [{}]
 
-    # Fill in defaults
-    design.version = design.version or 2
-    design.layers = design.layers or [{}]
+    return produce(design, (draft) =>
+      # Fill in defaults
+      draft.version = design.version or 2
+      draft.layers = layers
 
-    # Default to titleText (legacy)
-    design.header = design.header or { style: "header", items: _.compact([design.titleText or null]) }
-    design.footer = design.footer or { style: "footer", items: [] }
+      # Default to titleText (legacy)
+      draft.header = design.header or { style: "header", items: _.compact([design.titleText or null]) }
+      draft.footer = design.footer or { style: "footer", items: [] }
 
-    # Default value is now ""
-    if design.version < 2
-      if not design.xAxisLabelText?
-        design.xAxisLabelText = ""
-      if not design.yAxisLabelText?
-        design.yAxisLabelText = ""
-      design.version = 2
+      # Default value is now ""
+      if draft.version < 2
+        if not design.xAxisLabelText?
+          draft.xAxisLabelText = ""
+        if not design.yAxisLabelText?
+          draft.yAxisLabelText = ""
+        draft.version = 2
 
-    # Clean each layer
-    for layerId in [0...design.layers.length]
-      layer = design.layers[layerId]
+      # Clean each layer
+      for layerId in [0...layers.length]
+        layer = draft.layers[layerId]
 
-      layer.axes = layer.axes or {}
+        layer.axes = layer.axes or {}
 
-      for axisKey, axis of layer.axes
-        # Determine what aggregation axis requires
-        if axisKey == "y" and compiler.doesLayerNeedGrouping(design, layerId)
-          aggrNeed = "required"
-        else
-          aggrNeed = "none"
-        layer.axes[axisKey] = axisBuilder.cleanAxis(axis: axis, table: layer.table, aggrNeed: aggrNeed, types: LayeredChartUtils.getAxisTypes(design, layer, axisKey))
+        for axisKey, axis of layer.axes
+          # Determine what aggregation axis requires
+          if axisKey == "y" and compiler.doesLayerNeedGrouping(design, layerId)
+            aggrNeed = "required"
+          else
+            aggrNeed = "none"
+          layer.axes[axisKey] = axisBuilder.cleanAxis(axis: original(axis), table: layer.table, aggrNeed: aggrNeed, types: LayeredChartUtils.getAxisTypes(design, original(axis), axisKey))
 
-      # Remove x axis if not required
-      if not compiler.canLayerUseXExpr(design, layerId) and layer.axes.x
-        delete layer.axes.x
+        # Remove x axis if not required
+        if not compiler.canLayerUseXExpr(design, layerId) and layer.axes.x
+          delete layer.axes.x
 
-      # Remove cumulative if x is not date or number
-      if not layer.axes.x or axisBuilder.getAxisType(layer.axes.x) not in ['date', 'number']
-        delete layer.cumulative
+        # Remove cumulative if x is not date or number
+        if not layer.axes.x or axisBuilder.getAxisType(layer.axes.x) not in ['date', 'number']
+          delete layer.cumulative
 
-      layer.filter = exprCleaner.cleanExpr(layer.filter, { table: layer.table, types: ['boolean'] })
+        layer.filter = exprCleaner.cleanExpr(original(layer.filter), { table: layer.table, types: ['boolean'] })
 
-    return design
+      return
+    )
 
   validateDesign: (design, schema) ->
     axisBuilder = new AxisBuilder(schema: schema)

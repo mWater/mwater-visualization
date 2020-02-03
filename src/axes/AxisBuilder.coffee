@@ -8,6 +8,7 @@ d3Format = require 'd3-format'
 moment = require 'moment'
 React = require 'react'
 R = React.createElement
+produce = require('immer').default
 
 xforms = [
   { type: "bin", input: "number", output: "enum" }
@@ -47,16 +48,15 @@ module.exports = class AxisBuilder
   #  aggrNeed is "none", "optional" or "required"
   #  types: optional list of types to require it to be one of
   cleanAxis: (options) ->
-    if not options.axis
+    axis = options.axis
+
+    if not axis
       return
 
-    # TODO always clones
-    axis = _.clone(options.axis)
-
-    # Move aggr inside since aggr is deprecated at axis level
-    if axis.aggr and axis.expr
-      axis.expr = { type: "op", op: axis.aggr, table: axis.expr.table, exprs: (if axis.aggr != "count" then [axis.expr] else []) }
-      delete axis.aggr
+    # # Move aggr inside since aggr is deprecated at axis level DEPRECATED
+    # if axis.aggr and axis.expr
+    #   axis.expr = { type: "op", op: axis.aggr, table: axis.expr.table, exprs: (if axis.aggr != "count" then [axis.expr] else []) }
+    #   delete axis.aggr
 
     # Determine aggrStatuses that are possible
     switch options.aggrNeed
@@ -68,15 +68,15 @@ module.exports = class AxisBuilder
         aggrStatuses = ["literal", "aggregate"]
 
     # Clean expression
-    axis.expr = @exprCleaner.cleanExpr(axis.expr, { table: options.table, aggrStatuses: aggrStatuses })
-
-    # Allow no type here, as if/then has no type temporarily
-    if not axis.expr
+    expr = @exprCleaner.cleanExpr(axis.expr, { table: options.table, aggrStatuses: aggrStatuses })
+    if not expr
       return null
       
-    type = @exprUtils.getExprType(axis.expr)
+    type = @exprUtils.getExprType(expr)
 
     # Validate xform type
+    xform = null
+
     if axis.xform
       # Find valid xform
       xform = _.find(xforms, (xf) ->
@@ -92,34 +92,39 @@ module.exports = class AxisBuilder
         if options.types and xf.output not in options.types
           return false
         return true
-        )
-
-      if not xform
-        delete axis.xform
+      )
 
     # If no xform and using an xform would allow satisfying output types, pick first
-    if not axis.xform and options.types and type and type not in options.types
+    if not xform and options.types and type and type not in options.types
       xform = _.find(xforms, (xf) -> xf.input == type and xf.output in options.types)
-      if xform
-        axis.xform = { type: xform.type }
-        type = xform.output
-      else
+      if not xform
         # Unredeemable if no xform possible and cannot use count to get number
         if options.aggrNeed == "none" 
           return null
         if "number" not in options.types or type != "id"
           return null
 
-    if axis.xform and axis.xform.type == "bin"
-      # Add number of bins
-      if not axis.xform.numBins
-        axis.xform.numBins = 5
+    axis = produce(axis, (draft) =>
+      draft.expr = expr
 
-    if axis.xform and axis.xform.type == "ranges"
-      # Add ranges
-      if not axis.xform.ranges
-        axis.xform.ranges = [{ id: uuid(), minOpen: false, maxOpen: true }]
+      if not xform and axis.xform
+        delete draft.xform
+      else if xform and (not axis.xform or axis.xform.type != xform.type)
+        draft.xform = { type: xform.type }
 
+      if draft.xform and draft.xform.type == "bin"
+        # Add number of bins
+        if not draft.xform.numBins
+          draft.xform.numBins = 5
+
+      if draft.xform and draft.xform.type == "ranges"
+        # Add ranges
+        if not draft.xform.ranges
+          draft.xform.ranges = [{ id: uuid(), minOpen: false, maxOpen: true }]
+
+      return
+    )
+    
     return axis
 
   # Checks whether an axis is valid
