@@ -54,7 +54,7 @@ module.exports = class LayeredChart extends Chart
           layer.axes[axisKey] = axisBuilder.cleanAxis(axis: original(axis), table: layer.table, aggrNeed: aggrNeed, types: LayeredChartUtils.getAxisTypes(design, original(axis), axisKey))
 
         # Remove x axis if not required
-        if not compiler.canLayerUseXExpr(design, layerId) and layer.axes.x
+        if not compiler.canLayerUseXExpr(draft, layerId) and layer.axes.x
           delete layer.axes.x
 
         # Remove cumulative if x is not date or number
