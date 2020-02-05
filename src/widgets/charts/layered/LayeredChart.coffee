@@ -47,11 +47,11 @@ module.exports = class LayeredChart extends Chart
 
         for axisKey, axis of layer.axes
           # Determine what aggregation axis requires
-          if axisKey == "y" and compiler.doesLayerNeedGrouping(design, layerId)
+          if axisKey == "y" and compiler.doesLayerNeedGrouping(draft, layerId)
             aggrNeed = "required"
           else
             aggrNeed = "none"
-          layer.axes[axisKey] = axisBuilder.cleanAxis(axis: original(axis), table: layer.table, aggrNeed: aggrNeed, types: LayeredChartUtils.getAxisTypes(design, original(axis), axisKey))
+          layer.axes[axisKey] = axisBuilder.cleanAxis(axis: original(axis), table: layer.table, aggrNeed: aggrNeed, types: LayeredChartUtils.getAxisTypes(draft, layer, axisKey))
 
         # Remove x axis if not required
         if not compiler.canLayerUseXExpr(draft, layerId) and layer.axes.x
