@@ -180,9 +180,10 @@ module.exports = class LayeredChartCompiler
             }
           }
         
-
     if options.design.labels and not _.isEmpty(c3Data.format)
-      chartDesign.data.labels = {format: c3Data.format}
+      format = _.map options.design.layers, (layer, layerIndex) =>
+        return if c3Data.format[layerIndex] then c3Data.format[layerIndex] else true
+      chartDesign.data.labels = {format: format}
 
     if options.design.yThresholds
       chartDesign.grid.y = { lines: _.map(options.design.yThresholds, (t) -> { value: t.value, text: t.label }) }
