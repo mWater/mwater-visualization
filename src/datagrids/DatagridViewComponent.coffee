@@ -149,7 +149,7 @@ module.exports = class DatagridViewComponent extends React.Component
       return
 
     # Save editing if editing and return
-    if @state.editingCell
+    if @state.editingCell 
       @handleSaveEdit()
       return
 
@@ -184,7 +184,7 @@ module.exports = class DatagridViewComponent extends React.Component
   # Called to save 
   handleSaveEdit: =>
     # Ignore if not changed
-    if not @editCellComp.hasChanged()
+    if not @editCellComp or not @editCellComp.hasChanged()
       @setState(editingCell: null, savingCell: false)
       return
 
