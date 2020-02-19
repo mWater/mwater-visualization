@@ -50,6 +50,7 @@ module.exports = class ExprItemEditorComponent extends React.Component
       { value: "$,.2f", label: "Currency: $1,234.56" }
       { value: "$,.0f", label: "Currency rounded: $1,234" }
       { value: ".0%", label: "Percent rounded: 12%" }
+      { value: ".2%", label: "Percent decimal: 12.34%" }
     ]
 
     exprUtils = new ExprUtils(@props.schema)
