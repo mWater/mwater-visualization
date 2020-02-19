@@ -279,6 +279,16 @@ module.exports = class LayeredChartCompiler
           if layer.color
             colors[series] = layer.color
 
+    # Determine order (default is desc)
+    if design.polarOrder == "desc"
+      order = "desc"
+    else if design.polarOrder == "asc"
+      order = "asc"
+    else if design.polarOrder == "natural"
+      order = null
+    else 
+      order = "desc"
+
     return {
       columns: columns
       types: types
@@ -287,7 +297,7 @@ module.exports = class LayeredChartCompiler
       colors: colors
       xAxisType: "category" # Polar charts are always category x-axis
       titleText: @compileTitleText(design, locale)
-      order: "desc" # Use descending order
+      order: order
       format: format
     }
 
