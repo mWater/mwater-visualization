@@ -53,10 +53,10 @@ module.exports = class AxisBuilder
     if not axis
       return
 
-    # # Move aggr inside since aggr is deprecated at axis level DEPRECATED
-    # if axis.aggr and axis.expr
-    #   axis.expr = { type: "op", op: axis.aggr, table: axis.expr.table, exprs: (if axis.aggr != "count" then [axis.expr] else []) }
-    #   delete axis.aggr
+    # Move aggr inside since aggr is deprecated at axis level DEPRECATED
+    if axis.aggr and axis.expr
+      axis.expr = { type: "op", op: axis.aggr, table: axis.expr.table, exprs: (if axis.aggr != "count" then [axis.expr] else []) }
+      delete axis.aggr
 
     # Determine aggrStatuses that are possible
     switch options.aggrNeed
