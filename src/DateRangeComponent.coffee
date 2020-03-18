@@ -44,9 +44,6 @@ module.exports = class DateRangeComponent extends React.Component
     @setState(dropdownOpen: false)
 
   handleStartChange: (value) =>
-    if value
-      value = moment(value)
-
     # Go to start of day if datetime
     if @props.datetime
       value = moment(value)
@@ -59,9 +56,6 @@ module.exports = class DateRangeComponent extends React.Component
       @props.onChange([@fromMoment(value), @props.value?[1]])
 
   handleEndChange: (value) =>
-    if value
-      value = moment(value)
-
     # Go to end of day if datetime
     if @props.datetime
       value = moment(value)
@@ -130,9 +124,6 @@ module.exports = class DateRangeComponent extends React.Component
   renderCustomDropdown: ->
     startDate = @toMoment(@props.value?[0])
     endDate = @toMoment(@props.value?[1])
-
-    startDate = if startDate then startDate.toDate() else null
-    endDate = if endDate then endDate.toDate() else null
 
     R 'div', style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white", borderRadius: 4  },
       R 'div', style: { whiteSpace: "nowrap"},
