@@ -50,6 +50,9 @@ module.exports = class DateExprComponent extends React.Component
     @setState(dropdownOpen: false)
 
   handleStartChange: (value) =>
+    if value
+      value = moment(value)
+
     # Clear end if after
     if @props.value?.exprs[1] and @fromMoment(value) > @props.value.exprs[1]?.value
       @props.onChange({ type: "op", op: "between", exprs: [@toLiteral(@fromMoment(value)), null]})
@@ -57,6 +60,9 @@ module.exports = class DateExprComponent extends React.Component
       @props.onChange({ type: "op", op: "between", exprs: [@toLiteral(@fromMoment(value)), @props.value?.exprs[1]]})
 
   handleEndChange: (value) =>
+    if value
+      value = moment(value)
+
     # Go to end of day if datetime
     if @props.datetime
       value = moment(value)
@@ -119,6 +125,9 @@ module.exports = class DateExprComponent extends React.Component
   renderCustomDropdown: ->
     startDate = @toMoment(@props.value?.exprs[0]?.value)
     endDate = @toMoment(@props.value?.exprs[1]?.value)
+
+    startDate = if startDate then startDate.toDate() else null
+    endDate = if endDate then endDate.toDate() else null
 
     R 'div', style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white", borderRadius: 4  },
       R 'div', style: { whiteSpace: "nowrap"},
