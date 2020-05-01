@@ -68,10 +68,10 @@ describe "QuickfilterCompiler", ->
         table: "t1"
         jsonql: { 
           type: "op"
-          op: "@>"
+          op: "?|"
           exprs: [
             { type: "op", op: "::jsonb", exprs: [{ type: "op", op: "to_json", exprs: [{ type: "field", tableAlias: "{alias}", column: "enumset" }] }] }
-            { type: "op", op: "::jsonb", exprs: [{ type: "literal", value: '["a"]' }] }
+            { type: "literal", value: ["a"] }
           ]
         }        
       }

@@ -109,7 +109,7 @@ module.exports = class QuickfilterCompiler
       if multi
         return {
           type: "op"
-          op: "contains"
+          op: "intersects"
           table: expr.table
           exprs: [
             expr
