@@ -30,7 +30,9 @@ module.exports = L.TileLayer.extend({
 		subdomains: [0, 1, 2, 3],
 		type: 'Aerial',
 		attribution: 'Bing',
-		culture: ''
+		culture: '',
+		maxZoom: 21,
+		maxNativeZoom: 19
 	},
 
 	initialize: function(key, options) {

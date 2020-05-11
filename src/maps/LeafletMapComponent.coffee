@@ -247,7 +247,8 @@ module.exports = class LeafletMapComponent extends React.Component
           @baseLayer = L.tileLayer('https://{s}.api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
             attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
             tileSize: 512,
-            maxZoom: 18,
+            maxZoom: 21,
+            maxNativeZoom: 19,
             subdomains: ["a", "b"],
             zoomOffset: -1,
             id: 'mapbox/streets-v11',
@@ -258,10 +259,12 @@ module.exports = class LeafletMapComponent extends React.Component
         when "cartodb_positron"
           @baseLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>'
+            maxZoom: 21
           })
         when "cartodb_dark_matter"
           @baseLayer = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',{
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://cartodb.com/attributions">CartoDB</a>'
+            maxZoom: 21
           })
 
       if @baseLayer
