@@ -374,7 +374,7 @@ module.exports = class ClusterLayer extends Layer
 
   getMinZoom: (design) -> design.minZoom
 
-  getMaxZoom: (design) -> design.maxZoom
+  getMaxZoom: (design) -> design.maxZoom or 21
 
   # Get the legend to be optionally displayed on the map. Returns
   # a React element

@@ -354,7 +354,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     }
     return design.minZoom; 
   }
-  getMaxZoom(design: GridLayerDesign) { return design.maxZoom; }
+  getMaxZoom(design: GridLayerDesign) { return design.maxZoom || 21; }
 
   /** Get the legend to be optionally displayed on the map. Returns
    * a React element */

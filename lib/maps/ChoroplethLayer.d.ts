@@ -59,7 +59,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     }): OnGridClickResults;
     getBounds(design: ChoroplethLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): any;
     getMinZoom(design: ChoroplethLayerDesign): number | undefined;
-    getMaxZoom(design: ChoroplethLayerDesign): number | undefined;
+    getMaxZoom(design: ChoroplethLayerDesign): number;
     getLegend(design: ChoroplethLayerDesign, schema: Schema, name: string, dataSource: DataSource, filters: JsonQLFilter[]): React.ComponentElement<{
         schema: Schema;
         name: string;

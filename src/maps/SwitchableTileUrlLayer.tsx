@@ -54,7 +54,7 @@ export default class SwitchableTileUrlLayer extends Layer<SwitchableTileUrlLayer
   }
 
   getMaxZoom(design: SwitchableTileUrlLayerDesign) {
-    return design.maxZoom || null
+    return design.maxZoom || 21
   }
 
   /** Gets the tile url for definition type "TileUrl" */

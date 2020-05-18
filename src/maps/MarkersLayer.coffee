@@ -304,7 +304,7 @@ module.exports = class MarkersLayer extends Layer
 
   # Get min and max zoom levels
   getMinZoom: (design) -> return design.minZoom
-  getMaxZoom: (design) -> return design.maxZoom
+  getMaxZoom: (design) -> return design.maxZoom or 21
 
   # Get the legend to be optionally displayed on the map. Returns
   # a React element

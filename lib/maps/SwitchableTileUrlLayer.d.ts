@@ -34,7 +34,7 @@ interface SwitchableOption {
 export default class SwitchableTileUrlLayer extends Layer<SwitchableTileUrlLayerDesign> {
     getLayerDefinitionType(): "TileUrl";
     getMinZoom(design: SwitchableTileUrlLayerDesign): number | null;
-    getMaxZoom(design: SwitchableTileUrlLayerDesign): number | null;
+    getMaxZoom(design: SwitchableTileUrlLayerDesign): number;
     /** Gets the tile url for definition type "TileUrl" */
     getTileUrl(design: SwitchableTileUrlLayerDesign, filters: JsonQLFilter[]): string | null;
     /** Gets the utf grid url for definition type "TileUrl" */

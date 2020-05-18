@@ -356,7 +356,7 @@ module.exports = class BufferLayer extends Layer
   #   else
   #     return design.minZoom
 
-  getMaxZoom: (design) -> design.maxZoom
+  getMaxZoom: (design) -> design.maxZoom or 21
 
   # Get the legend to be optionally displayed on the map. Returns
   # a React element

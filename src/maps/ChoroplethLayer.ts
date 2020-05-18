@@ -518,7 +518,7 @@ opacity: ` +  design.fillOpacity + `;
 
   // Get min and max zoom levels
   getMinZoom(design: ChoroplethLayerDesign) { return design.minZoom; }
-  getMaxZoom(design: ChoroplethLayerDesign) { return design.maxZoom; }
+  getMaxZoom(design: ChoroplethLayerDesign) { return design.maxZoom || 21; }
 
   // Get the legend to be optionally displayed on the map. Returns
   // a React element

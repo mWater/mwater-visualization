@@ -23,7 +23,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     createJsonQL(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQL;
     createCss(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): string;
     getMinZoom(design: GridLayerDesign): number | undefined;
-    getMaxZoom(design: GridLayerDesign): number | undefined;
+    getMaxZoom(design: GridLayerDesign): number;
     /** Get the legend to be optionally displayed on the map. Returns
      * a React element */
     getLegend(design: GridLayerDesign, schema: Schema, name: string, dataSource: DataSource, filters: JsonQLFilter[]): React.ComponentElement<{
