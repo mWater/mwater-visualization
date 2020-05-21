@@ -146,6 +146,7 @@ class QuickfilterDesignComponent extends React.Component
               value: @state.table
               options: _.map(@props.tables, (table) => { value: table, label: ExprUtils.localizeString(@props.schema.getTable(table).name) })
               onChange: @handleTableChange
+              nullLabel: "Select..."
 
           R 'div', className: "form-group", key: "expr",
             R 'label', className: "text-muted", "Filter By"
