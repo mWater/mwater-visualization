@@ -94,12 +94,14 @@ module.exports = class CalendarChartViewComponent extends React.Component
       @props.onScopeChange?(null)
       return
 
-    scopeData =
+    scopeData = {
       name: @axisBuilder.summarizeAxis(@props.design.dateAxis, @context.locale) + " is " + @axisBuilder.formatValue(@props.design.dateAxis, data, @context.locale)
       filter:
         jsonql: @axisBuilder.createValueFilter(@props.design.dateAxis, data)
         table: @props.design.table
+      filterExpr: @axisBuilder.createValueFilterExpr(@props.design.dateAxis, data)
       data: data
+    }
 
     @props.onScopeChange?(scopeData)
 

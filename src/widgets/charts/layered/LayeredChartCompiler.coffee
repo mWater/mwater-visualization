@@ -742,6 +742,7 @@ module.exports = class LayeredChartCompiler
     layer = design.layers[layerIndex]
 
     filters = []
+    filterExprs = []
     names = []
     data = { layerIndex: layerIndex }
     
@@ -757,15 +758,27 @@ module.exports = class LayeredChartCompiler
             { type: "op", op: "::jsonb", exprs: [JSON.stringify(row.x)] }
           ]
         })
+        filterExprs.push({
+          table: layer.table
+          type: "op"
+          op: "contains"
+          exprs: [
+            @axisBuilder.convertAxisToExpr(layer.axes.x)
+            { type: "literal", valueType: "enumset", value: [row.x] }
+          ]
+        })
+
         names.push(@axisBuilder.summarizeAxis(layer.axes.x, locale) + " includes " + @exprUtils.stringifyExprLiteral(layer.axes.x.expr, [row.x], locale))
         data.x = row.x
       else        
         filters.push(@axisBuilder.createValueFilter(layer.axes.x, row.x))
+        filterExprs.push(@axisBuilder.createValueFilterExpr(layer.axes.x, row.x))
         names.push(@axisBuilder.summarizeAxis(layer.axes.x, locale) + " is " + @axisBuilder.formatValue(layer.axes.x, row.x, locale))
         data.x = row.x
 
     if layer.axes.color
       filters.push(@axisBuilder.createValueFilter(layer.axes.color, row.color))
+      filterExprs.push(@axisBuilder.createValueFilterExpr(layer.axes.color, row.color))
       names.push(@axisBuilder.summarizeAxis(layer.axes.color, locale) + " is " + @axisBuilder.formatValue(layer.axes.color, row.color, locale))
       data.color = row.color
 
@@ -778,15 +791,23 @@ module.exports = class LayeredChartCompiler
           exprs: filters
         }
       }
+      filterExpr = {
+        table: layer.table
+        type: "op"
+        op: "and"
+        exprs: filterExprs
+      }
     else
       filter = {
         table: layer.table
         jsonql: filters[0]
       }
+      filterExpr = filterExprs[0]
 
     scope = {
       name: ExprUtils.localizeString(@schema.getTable(layer.table).name, locale) + " " + names.join(" and ")
       filter: filter
+      filterExpr: filterExpr
       data: data
     }
 

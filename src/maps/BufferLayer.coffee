@@ -285,11 +285,23 @@ module.exports = class BufferLayer extends Layer
           ]}
         }
 
+        # Create filter expression for rows
+        filterExpr = {
+          table: table
+          type: "op"
+          op: "= any"
+          exprs: [
+            { type: "id", table: table }
+            { type: "literal", valueType: "id[]", value: ids }
+          ]
+        }
+
         # Scope to item
         if ids.length > 0
           results.scope = {
             name: "Selected #{ids.length} Circle(s)"
             filter: filter
+            filterExpr: filterExpr
             data: ids
           }
         else

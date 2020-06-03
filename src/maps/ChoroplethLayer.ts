@@ -432,6 +432,7 @@ opacity: ` +  design.fillOpacity + `;
           results.scope = {
             name: ev.data.name,
             filter,
+            filterExpr,
             data: ev.data.id
           };
         }

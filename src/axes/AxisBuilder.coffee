@@ -784,7 +784,7 @@ module.exports = class AxisBuilder
     return "" + value
 
   # Creates a filter (jsonql with {alias} for table name) based on a specific value
-  # of the axis. Used to filter by a specific point.
+  # of the axis. Used to filter by a specific point/bar.
   createValueFilter: (axis, value) ->
     if value?
       return {
@@ -804,6 +804,32 @@ module.exports = class AxisBuilder
         ]
       }
 
+  # Creates a filter expression (mwater-expression) based on a specific value
+  # of the axis. Used to filter by a specific point/bar.
+  createValueFilterExpr: (axis, value) ->
+    axisExpr = @convertAxisToExpr(axis)
+    axisExprType = @exprUtils.getExprType(axisExpr)
+
+    if value?
+      return {
+        table: axis.expr.table
+        type: "op"
+        op: "="
+        exprs: [
+          axisExpr
+          { type: "literal", valueType: axisExprType, value: value }
+        ]
+      }
+    else
+      return {
+        table: axis.expr.table
+        type: "op"
+        op: "is null"
+        exprs: [
+          axisExpr
+        ]
+      }
+
   isCategorical: (axis) ->
     nonCategoricalTypes = ["bin", "ranges", "date", "yearmonth", "floor"]
     if axis.xform
@@ -812,3 +838,148 @@ module.exports = class AxisBuilder
       type = @exprUtils.getExprType(axis.expr)
 
     return nonCategoricalTypes.indexOf(type) == -1
+
+  # Converts an axis to an expression (mwater-expression)
+  convertAxisToExpr: (axis) ->
+    expr = axis.expr
+    table = expr.table
+
+    # Bin
+    if axis.xform 
+      xform = axis.xform
+      if xform.type == "bin"
+        min = xform.min
+        max = xform.max
+        # Add epsilon to prevent width_bucket from crashing
+        if max == min
+          max += epsilon
+        if max == min # If was too big to add epsilon
+          max = min * 1.00001
+
+        # if xform.excludeUpper
+        # Create op least(greatest(floor((expr - min)/((max - min) / numBins)) - (-1), 0), numBins + 1)
+        expr = { table: table, type: "op", op: "-", exprs: [expr, { type: "literal", valueType: "number", value: min }] }
+        expr = { table: table, type: "op", op: "/", exprs: [expr, { type: "literal", valueType: "number", value: (max - min) / xform.numBins }] }
+        expr = { table: table, type: "op", op: "floor", exprs: [expr] }
+        expr = { table: table, type: "op", op: "+", exprs: [expr, { type: "literal", valueType: "number", value: 1 }] } 
+        expr = { table: table, type: "op", op: "greatest", exprs: [expr, { type: "literal", valueType: "number", value: 0 }] } 
+        expr = { table: table, type: "op", op: "least", exprs: [expr, { type: "literal", valueType: "number", value: xform.numBins + 1 }] } 
+        
+        # Handle nulls specially
+        expr = { table: table, type: "case", cases: [{ when: { table: table, type: "op", op: "is null", exprs: [axis.expr] }, then: null }], else: expr }
+
+        # Special case for excludeUpper as we need to include upper bound (e.g. 100 for percentages) in the lower bin
+        if xform.excludeUpper
+          expr.cases.push({ 
+            when: { table: table, type: "op", op: "=", exprs: [axis.expr, { type: "literal", valueType: "number", value: max }] }, 
+            then: { type: "literal", valueType: "number", value: xform.numBins } 
+          })
+
+      if xform.type == "date"
+        expr = {
+          table: table
+          type: "op"
+          op: "to date"
+          exprs: [expr]
+        }
+
+      if xform.type == "year"
+        expr = {
+          table: table
+          type: "op"
+          op: "year"
+          exprs: [expr]
+        }
+
+      if xform.type == "yearmonth"
+        expr = {
+          table: table
+          type: "op"
+          op: "yearmonth"
+          exprs: [expr]
+        }
+
+      if xform.type == "month"
+        expr = {
+          table: table
+          type: "op"
+          op: "month"
+          exprs: [expr]
+        }
+
+      if xform.type == "week"
+        expr = {
+          table: table
+          type: "op"
+          op: "weekofyear"
+          exprs: [expr]
+        }
+
+      if xform.type == "yearquarter"
+        expr = {
+          table: table
+          type: "op"
+          op: "yearquarter"
+          exprs: [expr]
+        }
+
+      if xform.type == "yearweek"
+        expr = {
+          table: table
+          type: "op"
+          op: "yearweek"
+          exprs: [expr]
+        }
+
+      # Ranges
+      if xform.type == "ranges"
+        cases = []
+        for range in xform.ranges
+          whens = []
+          if range.minValue?
+            if range.minOpen
+              whens.push({ table: table, type: "op", op: ">", exprs: [expr, { type: "literal", valueType: "number", value: range.minValue }] })
+            else
+              whens.push({ table: table, type: "op", op: ">=", exprs: [expr, { type: "literal", valueType: "number", value: range.minValue }] })
+
+          if range.maxValue?
+            if range.maxOpen
+              whens.push({ table: table, type: "op", op: "<", exprs: [expr, { type: "literal", valueType: "number", value: range.maxValue }] })
+            else
+              whens.push({ table: table, type: "op", op: "<=", exprs: [expr, { type: "literal", valueType: "number", value: range.maxValue }] })
+
+          if whens.length > 1
+            cases.push({
+              when: {
+                table: table
+                type: "op"
+                op: "and"
+                exprs: whens
+              }
+              then: { type: "literal", valueType: "enum", value: range.id }
+            })
+          else if whens.length == 1
+            cases.push({
+              when: whens[0]
+              then: { type: "literal", valueType: "enum", value: range.id }
+            })
+
+        if cases.length > 0 
+          expr = {
+            table: table
+            type: "case"
+            cases: cases
+          }
+        else
+          expr = null
+      
+      if xform.type == "floor"
+        expr = {
+          table: table
+          type: "op"
+          op: "floor"
+          exprs: [expr]
+        }
+
+    return expr
+
