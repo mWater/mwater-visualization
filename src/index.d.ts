@@ -1,4 +1,4 @@
-import { Schema, DataSource } from "mwater-expressions";
+import { Schema, DataSource, Expr } from "mwater-expressions";
 import { ReactElement } from "react";  
 import React from "react"
 import { JsonQL } from "jsonql";
@@ -26,6 +26,21 @@ export { default as DashboardDataSource } from './dashboards/DashboardDataSource
 export { default as DirectDashboardDataSource } from './dashboards/DirectDashboardDataSource'
 export * from './dashboards/DashboardDesign'
 
+/** Scope that a particular widget can apply when a part of it is clicked */
+export interface WidgetScope {
+  /** Human-readable name of the scope */
+  name: string
+
+  /** Filter as JsonQL */
+  filter: JsonQLFilter
+
+  /** Filter as an expression */
+  filterExpr: Expr
+
+  /** Widget-specific data */
+  data: any
+}
+
 export class Widget {
   /** Creates a React element that is a view of the widget */
   createViewElement(options: {
@@ -38,11 +53,11 @@ export class Widget {
     /** widget design **/
     design: object
     /** scope of the widget (when the widget self-selects a particular scope) **/
-    scope: any // TODO
+    scope?: WidgetScope | null
     /** array of filters to apply.**/
     filters: JsonQLFilter[]
     /** called with scope of widget **/
-    onScopeChange: any // TODO
+    onScopeChange: (scope: WidgetScope | null) => void
     /** called with new design. null/undefined for readonly **/
     onDesignChange?: { (design: object): void } | null
     /** width in pixels on screen **/
