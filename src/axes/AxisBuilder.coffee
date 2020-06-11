@@ -725,6 +725,11 @@ module.exports = class AxisBuilder
     # Legacy support of axis.aggr
     return axis? and (axis.aggr or @exprUtils.getExprAggrStatus(axis.expr) == "aggregate")
 
+  # Converts a category to a string (uses label or override)
+  formatCategory: (axis, category) ->
+    categoryLabel = if axis.categoryLabels then axis.categoryLabels[JSON.stringify(category.value)]
+    return if categoryLabel then categoryLabel else category.label
+
   # Summarize axis as a string
   summarizeAxis: (axis, locale) ->
     if not axis
@@ -747,17 +752,17 @@ module.exports = class AxisBuilder
         # Parse if string
         if _.isString(value)
           value = JSON.parse(value)
-        return _.map(value, (v) ->
+        return _.map(value, (v) =>
           category = _.findWhere(categories, value: v)
           if category
-            return category.label
+            return @formatCategory(axis, category)
           else
             return "???"
         ).join(", ")
       else
         category = _.findWhere(categories, value: value)
         if category
-          return category.label
+          return @formatCategory(axis, category)
         else
           return "???"
 

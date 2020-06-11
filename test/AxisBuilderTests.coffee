@@ -438,8 +438,14 @@ describe "AxisBuilder", ->
     it "formats enum", ->
       assert.equal @ab.formatValue(@axisEnum, "a"), "A"
 
+    it "formats enum overridden", ->
+      assert.equal @ab.formatValue(_.extend({}, @axisEnum, { categoryLabels: { '"a"': "A2"}}), "a"), "A2"
+
     it "formats enumset", ->
       assert.equal @ab.formatValue(@axisEnumset, ["a","b"]), "A, B"
+
+    it "formats enumset overridden", ->
+      assert.equal @ab.formatValue(_.extend({}, @axisEnumset, { categoryLabels: { '"a"': "A2"}}), ["a", "b"]), "A2, B"
 
     it "converts to string", ->
       assert.equal @ab.formatValue(@axisNumber, 2), "2"

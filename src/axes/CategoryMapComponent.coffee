@@ -8,6 +8,7 @@ update = require 'update-object'
 ColorComponent = require '../ColorComponent'
 ExprUtils = require('mwater-expressions').ExprUtils
 ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
+produce = require('immer').default
 
 # Category map for an axis. Controls the colorMap values and excludedValues
 # Can be collapsed
@@ -59,18 +60,41 @@ module.exports = class CategoryMapComponent extends React.Component
     return null
 
   handleNullLabelChange: (e) =>
-    name = prompt("Enter label for none value", @props.axis.nullLabel or ExprUtils.localizeString("None"))
+    name = prompt("Enter label for none value", @props.axis.nullLabel or "None")
     if name
       @props.onChange(update(@props.axis, { nullLabel: { $set: name }}))
+
+  handleCategoryLabelChange: (category, e) =>
+    label = category.label
+    if @props.axis.categoryLabels
+      label = @props.axis.categoryLabels[JSON.stringify(category.value)] or label
+
+    name = prompt("Enter label or blank to reset", label)
+    if name?
+      if name
+        @props.onChange(produce(@props.axis, (draft) =>
+          draft.categoryLabels = draft.categoryLabels or {}
+          draft.categoryLabels[JSON.stringify(category.value)] = name
+          return
+        ))
+      else
+        @props.onChange(produce(@props.axis, (draft) =>
+          draft.categoryLabels = draft.categoryLabels or {}
+          delete draft.categoryLabels[JSON.stringify(category.value)]
+          return
+        ))
 
   handleToggle: =>
     @setState(collapsed: not @state.collapsed)
 
   renderLabel: (category) ->
-    label = ExprUtils.localizeString(category.label)
+    label = category.label
+    if @props.axis.categoryLabels
+      label = @props.axis.categoryLabels[JSON.stringify(category.value)] or label
 
     if category.value?
-      label
+      R 'a', onClick: @handleCategoryLabelChange.bind(null, category), style: {cursor: 'pointer'},
+        label
     else
       R 'a', onClick: @handleNullLabelChange, style: {cursor: 'pointer'},
         label

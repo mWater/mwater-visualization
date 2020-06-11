@@ -499,8 +499,9 @@ module.exports = class PivotChartLayoutBuilder
         else
           allValues = allValues.concat(_.pluck(relevantData, "c#{parentSegments.length}"))
 
-      # Get categories
-      categories = @axisBuilder.getCategories(segment.valueAxis, allValues, locale)
+      # Get categories, mapping label
+      categories = _.map(@axisBuilder.getCategories(segment.valueAxis, allValues, locale), (category) =>
+        return { value: category.value, label: @axisBuilder.formatCategory(segment.valueAxis, category) })
 
       # Filter excluded values
       categories = _.filter(categories, (category) -> category.value not in (segment.valueAxis.excludedValues or []))

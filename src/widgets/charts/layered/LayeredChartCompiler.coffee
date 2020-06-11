@@ -494,7 +494,7 @@ module.exports = class LayeredChartCompiler
     categoryMap = _.object(_.map(categories, (c, i) -> [c.value, i]))
 
     # Create common x series
-    columns.push(["x"].concat(_.pluck(categories, "label")))
+    columns.push(["x"].concat(_.map(categories, (category) => @axisBuilder.formatCategory(xAxis, category))))
 
     # For each layer
     _.each design.layers, (layer, layerIndex) =>

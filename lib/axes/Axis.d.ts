@@ -37,8 +37,13 @@ export interface Axis {
   colorMap?: ColorMap
   /** optional array of category values which define the order in which categories should be rendered */
   drawOrder?: any[]
+
+  /** optional labels for categories. Indexed by JSON of category value */
+  categoryLabels?: { [valueJson: string]: string }
+
   /** optional string for null category */
   nullLabel?: string
+
   excludedValues?: any[]
   format?: string
 }
