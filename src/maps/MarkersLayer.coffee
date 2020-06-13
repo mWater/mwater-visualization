@@ -308,7 +308,7 @@ module.exports = class MarkersLayer extends Layer
 
   # Get the legend to be optionally displayed on the map. Returns
   # a React element
-  getLegend: (design, schema, name, dataSource, filters = []) ->
+  getLegend: (design, schema, name, dataSource, locale, filters = []) ->
     _filters = filters.slice()
     if design.filter?
       exprCompiler = new ExprCompiler(schema)
@@ -326,6 +326,7 @@ module.exports = class MarkersLayer extends Layer
       dataSource: dataSource
       filters: _.compact(_filters)
       axis: axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none")
+      locale: locale
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->

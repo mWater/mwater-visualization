@@ -12,6 +12,7 @@ module.exports = class LegendComponent extends React.Component
     layerViews: PropTypes.array.isRequired # Layer views
     zoom: PropTypes.number     # Current zoom level
     filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+    locale: PropTypes.string.isRequired
 
   render: ->
     legendItems = _.compact(
@@ -42,7 +43,7 @@ module.exports = class LegendComponent extends React.Component
         if maxZoom? and @props.zoom? and @props.zoom > maxZoom
           return null
 
-        return { key: layerView.id, legend: layer.getLegend(design, @props.schema, layerView.name, @props.dataSource, @props.filters) }
+        return { key: layerView.id, legend: layer.getLegend(design, @props.schema, layerView.name, @props.dataSource, @props.locale, @props.filters) }
       )
     )
 

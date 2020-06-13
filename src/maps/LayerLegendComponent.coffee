@@ -18,6 +18,7 @@ module.exports = class LayerLegendComponent extends React.Component
     markerSize: PropTypes.number
     defaultColor: PropTypes.string
     filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+    locale: PropTypes.string
 
   @defaultProps:
     radiusLayer: false
@@ -29,7 +30,7 @@ module.exports = class LayerLegendComponent extends React.Component
       return
 
     # Get categories (value + label)
-    categories = axisBuilder.getCategories(@props.axis)
+    categories = axisBuilder.getCategories(@props.axis, null, @props.locale)
     
     # Just "None" and so doesn't count
     if _.any(categories, (category) -> category.value?)
@@ -40,9 +41,10 @@ module.exports = class LayerLegendComponent extends React.Component
       return []
 
     # If no categories, use values from color map as input
-    return axisBuilder.getCategories(@props.axis, _.pluck(@props.axis.colorMap, "value"))   
+    return axisBuilder.getCategories(@props.axis, _.pluck(@props.axis.colorMap, "value"), @props.locale)
 
   render: ->
+    axisBuilder = new AxisBuilder(schema: @props.schema)
     categories = @getCategories()
 
     if @props.axis and @props.axis.colorMap
@@ -51,8 +53,8 @@ module.exports = class LayerLegendComponent extends React.Component
         if _.includes(@props.axis.excludedValues, category.value)
           return null
 
-        label = ExprUtils.localizeString(category.label)
-        color = _.find(@props.axis.colorMap, {value: category.value})
+        label = axisBuilder.formatCategory(@props.axis, category)
+        color = _.find(@props.axis.colorMap, { value: category.value })
         if color
           return { color: color.color, name: label }
         else # old color maps dont have null value

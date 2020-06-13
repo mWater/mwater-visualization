@@ -358,14 +358,15 @@ export default class GridLayer extends Layer<GridLayerDesign> {
 
   /** Get the legend to be optionally displayed on the map. Returns
    * a React element */
-  getLegend(design: GridLayerDesign, schema: Schema, name: string, dataSource: DataSource, filters: JsonQLFilter[]) {
+  getLegend(design: GridLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]) {
     const axisBuilder = new AxisBuilder({schema});
 
     return React.createElement(LayerLegendComponent, {
       schema,
       name,
       dataSource,
-      axis: axisBuilder.cleanAxis({axis: design.colorAxis!, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"})
+      axis: axisBuilder.cleanAxis({axis: design.colorAxis!, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"}),
+      locale
     })
   }
 

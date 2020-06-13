@@ -378,7 +378,7 @@ module.exports = class ClusterLayer extends Layer
 
   # Get the legend to be optionally displayed on the map. Returns
   # a React element
-  getLegend: (design, schema, name, dataSource, filters = []) ->
+  getLegend: (design, schema, name, dataSource, locale, filters = []) ->
     _filters = filters.slice()
     if design.filter?
       exprCompiler = new ExprCompiler(schema)
@@ -393,6 +393,7 @@ module.exports = class ClusterLayer extends Layer
       name: name
       dataSource: dataSource
       filters: _.compact(_filters)
+      locale: locale
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->

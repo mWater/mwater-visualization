@@ -51,6 +51,9 @@ module.exports = class MapViewComponent extends React.Component
     touchZoom: PropTypes.bool         # Whether the map can be zoomed by touch-dragging with two fingers. Default true
     scrollWheelZoom: PropTypes.bool   # Whether the map can be zoomed by using the mouse wheel. Default true
     zoomLocked: PropTypes.bool   # Whether changes to zoom level should be persisted. Default false
+  
+  @contextTypes:
+    locale: PropTypes.string
 
   constructor: (props) ->
     super(props)
@@ -153,6 +156,7 @@ module.exports = class MapViewComponent extends React.Component
       layerViews: @props.design.layerViews
       filters: @getCompiledFilters()
       dataSource: @props.dataSource
+      locale: @context.locale
 
   renderPopup: ->
     if not @state.popupContents

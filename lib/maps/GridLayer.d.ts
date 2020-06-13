@@ -26,16 +26,18 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     getMaxZoom(design: GridLayerDesign): number;
     /** Get the legend to be optionally displayed on the map. Returns
      * a React element */
-    getLegend(design: GridLayerDesign, schema: Schema, name: string, dataSource: DataSource, filters: JsonQLFilter[]): React.ComponentElement<{
+    getLegend(design: GridLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): React.ComponentElement<{
         schema: Schema;
         name: string;
         dataSource: DataSource;
         axis: Axis;
+        locale: string;
     }, React.Component<{
         schema: Schema;
         name: string;
         dataSource: DataSource;
         axis: Axis;
+        locale: string;
     }, any, any>>;
     getFilterableTables(design: GridLayerDesign, schema: Schema): string[];
     /** True if layer can be edited */

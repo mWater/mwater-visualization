@@ -372,7 +372,7 @@ module.exports = class BufferLayer extends Layer
 
   # Get the legend to be optionally displayed on the map. Returns
   # a React element
-  getLegend: (design, schema, name, dataSource, filters = []) ->
+  getLegend: (design, schema, name, dataSource, locale, filters = []) ->
     _filters = filters.slice()
     if design.filter?
       exprCompiler = new ExprCompiler(schema)
@@ -389,6 +389,7 @@ module.exports = class BufferLayer extends Layer
       axis: axisBuilder.cleanAxis(axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none")
       radiusLayer: true
       defaultColor: design.color
+      locale: locale
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->

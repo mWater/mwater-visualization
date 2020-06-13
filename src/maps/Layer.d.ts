@@ -79,7 +79,7 @@ declare class Layer<LayerDesign> {
   }): OnGridClickResults
 
   /** Get the legend to be optionally displayed on the map. Returns a React element */
-  getLegend(design: LayerDesign, schema: Schema, name: string, dataSource: DataSource, filters: JsonQLFilter[]): ReactNode
+  getLegend(design: LayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): ReactNode
 
   /** Get min zoom level */
   getMinZoom(design: LayerDesign): number | null | undefined

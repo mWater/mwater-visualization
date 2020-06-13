@@ -79,7 +79,7 @@ export default class SwitchableTileUrlLayer extends Layer<SwitchableTileUrlLayer
     return option.utfGridUrl || null
   }
 
-  getLegend(design: SwitchableTileUrlLayerDesign, schema: Schema, name: string, dataSource: DataSource, filters: JsonQLFilter[]) {
+  getLegend(design: SwitchableTileUrlLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]) {
     // Find active option
     const option = design.options.find(d => d.id === design.activeOption)
     if (!option || !option.legendUrl) {

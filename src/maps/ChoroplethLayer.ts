@@ -523,7 +523,7 @@ opacity: ` +  design.fillOpacity + `;
 
   // Get the legend to be optionally displayed on the map. Returns
   // a React element
-  getLegend(design: ChoroplethLayerDesign, schema: Schema, name: string, dataSource: DataSource, filters: JsonQLFilter[]) {
+  getLegend(design: ChoroplethLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]) {
     if (filters == null) { filters = []; }
     const _filters = filters.slice();
     if (design.filter != null) {
@@ -545,9 +545,9 @@ opacity: ` +  design.fillOpacity + `;
       dataSource,
       filters: _.compact(_filters),
       axis: axisBuilder.cleanAxis({axis: design.axes.color, table: axisTable, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"}),
-      defaultColor: design.color
-    }
-    );
+      defaultColor: design.color,
+      locale
+    });
   }
 
   // Get a list of table ids that can be filtered on

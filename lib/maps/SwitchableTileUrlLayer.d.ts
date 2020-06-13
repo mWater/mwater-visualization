@@ -39,7 +39,7 @@ export default class SwitchableTileUrlLayer extends Layer<SwitchableTileUrlLayer
     getTileUrl(design: SwitchableTileUrlLayerDesign, filters: JsonQLFilter[]): string | null;
     /** Gets the utf grid url for definition type "TileUrl" */
     getUtfGridUrl(design: SwitchableTileUrlLayerDesign, filters: JsonQLFilter[]): string | null;
-    getLegend(design: SwitchableTileUrlLayerDesign, schema: Schema, name: string, dataSource: DataSource, filters: JsonQLFilter[]): JSX.Element | null;
+    getLegend(design: SwitchableTileUrlLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): JSX.Element | null;
     /** True if layer can be edited */
     isEditable(): boolean;
     createDesignerElement(options: {
