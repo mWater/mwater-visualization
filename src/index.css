@@ -42,9 +42,20 @@
     stroke-dasharray: 3;
 }
 
-/* Black text on donut/pie */
+/* Dark text on donut/pie */
 .c3-chart-arc text {
-  fill: #000;
+  fill: #444;
+}
+
+/* Less dark charts */
+.c3 text {
+  fill: #444;
+  font-family: "Helvetica Neue", sans-serif
+}
+
+.c3 path, .c3 line {
+  fill: none;
+  stroke: #CCC;
 }
 
 /* Put dropdowns over top of leaflet controls */
