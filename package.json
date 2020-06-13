@@ -27,7 +27,7 @@
     "async": "^1.2.1",
     "async-latest": "^1.0.0",
     "backbone": "~1.1.2",
-    "c3": "github:mWater/c3#d3v4-fix-mouse",
+    "c3": "^0.7.15",
     "canonical-json": "0.0.4",
     "classnames": "^2.2.5",
     "color": "^1.0.3",
