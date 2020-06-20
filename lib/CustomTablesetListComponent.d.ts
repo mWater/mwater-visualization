@@ -8,7 +8,7 @@ export declare const CustomTablesetListComponent: (props: {
     /** User id */
     user?: string | undefined;
     /** Called with table selected */
-    onChange: (tableId: string) => void;
+    onChange: (tableId: string | null) => void;
     extraTables: string[];
     onExtraTableAdd: (tableId: string) => void;
     onExtraTableRemove: (tableId: string) => void;

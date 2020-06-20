@@ -263,9 +263,6 @@ class FormsListComponent extends React.Component
     .fail (xhr) =>
       @setState(error: xhr.responseText)
 
-  handleTableAdd: (tableId) =>
-    @props.onExtraTableAdd(tableId)
-
   handleTableRemove: (table) =>
     if confirm("Remove #{ExprUtils.localizeString(table.name, @context.locale)}? Any widgets that depend on it will no longer work properly.")
       @props.onExtraTableRemove(table.id)
@@ -385,9 +382,6 @@ class IndicatorsListComponent extends React.Component
       }))
     .fail (xhr) =>
       @setState(error: xhr.responseText)
-
-  handleTableAdd: (tableId) =>
-    @props.onExtraTableAdd(tableId)
 
   handleTableRemove: (table) =>
     if confirm("Remove #{ExprUtils.localizeString(table.name, @context.locale)}? Any widgets that depend on it will no longer work properly.")
@@ -581,9 +575,6 @@ class IssuesListComponent extends React.Component
       }))
     .fail (xhr) =>
       @setState(error: xhr.responseText)
-
-  handleTableAdd: (tableId) =>
-    @props.onExtraTableAdd(tableId)
 
   handleTableRemove: (table) =>
     if confirm("Remove #{ExprUtils.localizeString(table.name, @context.locale)}? Any widgets that depend on it will no longer work properly.")

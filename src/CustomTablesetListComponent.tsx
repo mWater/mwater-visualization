@@ -16,7 +16,7 @@ export const CustomTablesetListComponent = (props: {
   user?: string
 
   /** Called with table selected */
-  onChange: (tableId: string) => void 
+  onChange: (tableId: string | null) => void 
   extraTables: string[]
   onExtraTableAdd: (tableId: string) => void
   onExtraTableRemove: (tableId: string) => void
@@ -31,12 +31,16 @@ export const CustomTablesetListComponent = (props: {
   // Get list of all tablesets
   useEffect(() => {
     fetch(`${props.apiUrl}custom_tablesets?client=${props.client || ""}`).then(response => response.json()).then(body => {
-      setTablesets(_.sortBy(body, ts => ts.code))
+      // Put included ones first
+      setTablesets(_.sortByAll(body, [
+        ts => props.extraTables.some(t => (t || "").startsWith(`custom.${ts.code}.`)) ? 0 : 1,
+        ts => ExprUtils.localizeString(ts.design.name, props.locale)
+      ]))
     })
   }, [])
 
   useEffect(() => {
-    if (extraTableNeeded && props.extraTables.includes(extraTableNeeded)) {
+    if (extraTableNeeded && props.schema.getTable(extraTableNeeded)) {
       props.onChange(extraTableNeeded)
     }
   })
@@ -50,9 +54,9 @@ export const CustomTablesetListComponent = (props: {
       return
     }
 
-    // Request extra tables
+    // Request extra tables as wildcard
     setExtraTableNeeded(qualifiedTableId)
-    props.onExtraTableAdd(qualifiedTableId)
+    props.onExtraTableAdd(`custom.${ts.code}.*`)
   }
 
   const handleRemove = (ts: CustomTableset) => {
@@ -60,6 +64,7 @@ export const CustomTablesetListComponent = (props: {
     const match = props.extraTables.find(t => (t || "").startsWith(`custom.${ts.code}.`))
     if (match) {
       if (confirm("Remove this set of tables? Some widgets may not work correctly.")) {
+        props.onChange(null)
         props.onExtraTableRemove(match)
       }
     }

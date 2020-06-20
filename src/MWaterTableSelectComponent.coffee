@@ -70,7 +70,7 @@ module.exports = class MWaterTableSelectComponent extends React.Component
       @props.onChange(tableId)
 
   handleTableChange: (tableId) =>
-    # If not part of formIds, add it and wait for new schema
+    # If not part of extra tables, add it and wait for new schema
     if tableId and not @props.schema.getTable(tableId)
       @setState(pendingExtraTable: tableId, =>
         @props.onExtraTablesChange(_.union(@props.extraTables, [tableId]))
@@ -147,6 +147,9 @@ class EditModeTableSelectComponent extends React.Component
   # Also includes current table
   getTableShortlist: ->
     tables = @context.activeTables or []
+
+    # Remove dead tables
+    tables = tables.filter((t) => @props.schema.getTable(t)?)
     tables = _.union(tables, _.filter(_.pluck(@props.schema.getTables(), "id"), (t) -> t.match(/^responses:/)))
     if @props.table
       tables = _.union(tables, [@props.table])
@@ -161,6 +164,9 @@ class EditModeTableSelectComponent extends React.Component
         # Add if exists
         if @props.schema.getTable(extraTable)
           tables = _.union(tables, [extraTable])
+
+    # Sort by name
+    tables = _.sortBy(tables, (tableId) => ExprUtils.localizeString(@props.schema.getTable(tableId).name, @context.locale))
 
     return tables
 
