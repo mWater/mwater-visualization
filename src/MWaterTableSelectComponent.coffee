@@ -143,13 +143,24 @@ class EditModeTableSelectComponent extends React.Component
     @setState(completeMode: true)
 
   # Get list of tables that should be included in shortlist
-  # This is all active tables and all responses tables in schema (so as to include rosters)
+  # This is all active tables and all responses tables in schema (so as to include rosters) and all extra tables
   # Also includes current table
   getTableShortlist: ->
     tables = @context.activeTables or []
     tables = _.union(tables, _.filter(_.pluck(@props.schema.getTables(), "id"), (t) -> t.match(/^responses:/)))
     if @props.table
       tables = _.union(tables, [@props.table])
+
+    for extraTable in @props.extraTables or []
+      # Check if wildcard
+      if extraTable.match(/\*$/)
+        for table in @props.schema.getTables()
+          if table.id.startsWith(extraTable.substr(0, extraTable.length - 1))
+            tables = _.union(tables, [table.id])
+      else
+        # Add if exists
+        if @props.schema.getTable(extraTable)
+          tables = _.union(tables, [extraTable])
 
     return tables
 
