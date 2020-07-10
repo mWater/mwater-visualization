@@ -6,7 +6,7 @@ import { Expr } from "mwater-expressions";
 export interface Quickfilter {
   // `table`: (deprecated) table of filter
 
-  /** filter expression (left hand side only. Usually enum, enumset, text, date, datetime, id[]) */
+  /** filter expression (left hand side only. Usually enum, enumset, text, date, datetime, id[], text[]) */
   expr: Expr
 
   /** optional label */

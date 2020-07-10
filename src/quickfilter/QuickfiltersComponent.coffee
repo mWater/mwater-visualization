@@ -134,6 +134,19 @@ module.exports = class QuickfiltersComponent extends React.Component
         filters: filters
         multi: item.multi
 
+    if type == "text[]"
+      return R TextArrayQuickfilterComponent, 
+        key: JSON.stringify(item)
+        index: index
+        label: item.label
+        expr: expr
+        schema: @props.schema
+        quickfiltersDataSource: @props.quickfiltersDataSource
+        value: itemValue
+        onValueChange: onValueChange
+        filters: filters
+        multi: item.multi
+
   render: ->
     if not @props.design or @props.design.length == 0
       return null
@@ -276,6 +289,45 @@ class DateQuickfilterComponent extends React.Component
           datetime: (new ExprUtils(@props.schema).getExprType(@props.expr)) == "datetime"
           value: @props.value
           onChange: @props.onValueChange
+        }
+      if not @props.onValueChange
+        R 'i', className: "text-warning fa fa-fw fa-lock"
+
+# Quickfilter for a text value
+class TextArrayQuickfilterComponent extends React.Component
+  @propTypes:
+    label: PropTypes.string.isRequired
+    schema: PropTypes.object.isRequired
+    quickfiltersDataSource: PropTypes.object.isRequired  # See QuickfiltersDataSource
+
+    expr: PropTypes.object.isRequired
+    index: PropTypes.number.isRequired
+
+    value: PropTypes.any                     # Current value of quickfilter (state of filter selected)
+    onValueChange: PropTypes.func    # Called when value changes
+
+    multi: PropTypes.bool       # true to display multiple values
+
+    # Filters to add to the quickfilter to restrict values
+    filters: PropTypes.arrayOf(PropTypes.shape({
+      table: PropTypes.string.isRequired    # id table to filter
+      jsonql: PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
+    }))
+
+  render: ->
+    R 'div', style: { display: "inline-block", paddingRight: 10 },
+      if @props.label
+        R 'span', style: { color: "gray" }, @props.label + ":\u00a0"
+      R 'div', style: { display: "inline-block", minWidth: "280px", verticalAlign: "middle" },
+        R TextLiteralComponent, {
+          value: @props.value
+          onChange: @props.onValueChange
+          schema: @props.schema
+          expr: @props.expr
+          index: @props.index
+          multi: @props.multi
+          quickfiltersDataSource: @props.quickfiltersDataSource
+          filters: @props.filters
         }
       if not @props.onValueChange
         R 'i', className: "text-warning fa fa-fw fa-lock"

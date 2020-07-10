@@ -104,7 +104,7 @@ module.exports = class QuickfilterCompiler
             { type: "literal", valueType: "enum", value: value }
           ]
         }
-    else if type == "enumset"
+    else if type in ["enumset", "text[]"]
       # Create contains expression
       if multi
         return {
@@ -113,7 +113,7 @@ module.exports = class QuickfilterCompiler
           table: expr.table
           exprs: [
             expr
-            { type: "literal", valueType: "enumset", value: value }
+            { type: "literal", valueType: type, value: value }
           ]
         }
       else
@@ -123,21 +123,14 @@ module.exports = class QuickfilterCompiler
           table: expr.table
           exprs: [
             expr
-            { type: "literal", valueType: "enum", value: [value] }
+            { type: "literal", valueType: type, value: [value] }
           ]
         }
-    else if type in ['date', 'datetime'] and value.op
-      return {
-        type: "op"
-        op: value.op
-        table: expr.table
-        exprs: [expr].concat(value.exprs)
-      }
     else if type in ['id[]']
       if multi
         return {
           type: "op"
-          op: "contains"
+          op: "intersects"
           table: expr.table
           exprs: [
             expr
@@ -154,5 +147,12 @@ module.exports = class QuickfilterCompiler
             { type: "literal", valueType: "id[]", idTable: idTable, value: [value] }
           ]
         }
+    else if type in ['date', 'datetime'] and value.op
+      return {
+        type: "op"
+        op: value.op
+        table: expr.table
+        exprs: [expr].concat(value.exprs)
+      }
     else
       return null

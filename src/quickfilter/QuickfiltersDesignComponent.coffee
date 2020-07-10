@@ -157,7 +157,7 @@ class QuickfilterDesignComponent extends React.Component
                 table: @state.table
                 value: @props.design.expr
                 onChange: @handleExprChange
-                types: ['enum', 'text', 'enumset', 'date', 'datetime', 'id[]']
+                types: ['enum', 'text', 'enumset', 'date', 'datetime', 'id[]', 'text[]']
 
           if @props.design.expr
             R 'div', className: "form-group", key: "label",
@@ -171,7 +171,7 @@ class QuickfilterDesignComponent extends React.Component
                 "Merge with previous quickfilter "
                 R 'span', className: "text-muted", "- displays as one single control that filters both"
 
-          if exprType in ['enum', 'text', 'enumset', 'id[]']
+          if exprType in ['enum', 'text', 'enumset', 'id[]', 'text[]']
             R ui.Checkbox, 
               value: @props.design.multi
               onChange: @handleMultiChange,

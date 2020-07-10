@@ -4,9 +4,11 @@ React = require 'react'
 R = React.createElement
 AsyncReactSelect = require('react-select/lib/Async').default
 ExprCompiler = require('mwater-expressions').ExprCompiler
+ExprUtils = require('mwater-expressions').ExprUtils
 injectTableAlias = require('mwater-expressions').injectTableAlias
 
-# Displays a combo box that allows selecting single text value from an expression
+# Displays a combo box that allows selecting single or multiple text values from an expression
+# The expression can be type `text` or `text[]`
 module.exports = class TextLiteralComponent extends React.Component
   @propTypes: 
     value: PropTypes.any
@@ -37,21 +39,41 @@ module.exports = class TextLiteralComponent extends React.Component
       @props.onChange(null)
 
   getOptions: (input, cb) =>
+    # Determine type of expression
+    exprUtils = new ExprUtils(@props.schema)
+    exprType = exprUtils.getExprType(@props.expr)
+
     # Create query to get matches
     exprCompiler = new ExprCompiler(@props.schema)
 
-    # Add filter for input
-    filters = (@props.filters or []).concat({
-      table: @props.expr.table
-      jsonql: {
-        type: "op"
-        op: "~*"
-        exprs: [
-          exprCompiler.compileExpr(expr: @props.expr, tableAlias: "{alias}")
-          "^" + escapeRegex(input)  # Don't use _.escapeRegExp as adds weird backslashes that postgres doesn't like
-        ]
-      }
-    })
+    # Add filter for input (simple if just text)
+    if exprType == "text"
+      filters = (@props.filters or []).concat({
+        table: @props.expr.table
+        jsonql: {
+          type: "op"
+          op: "~*"
+          exprs: [
+            exprCompiler.compileExpr(expr: @props.expr, tableAlias: "{alias}")
+            "^" + escapeRegex(input)  # Don't use _.escapeRegExp as adds weird backslashes that postgres doesn't like
+          ]
+        }
+      })
+    else if exprType == "text[]"
+      # Special filter for text[]
+      filters = (@props.filters or []).concat({
+        table: "_values_"
+        jsonql: {
+          type: "op"
+          op: "~*"
+          exprs: [
+            { type: "field", tableAlias: "{alias}", column: "value" }
+            "^" + escapeRegex(input)  # Don't use _.escapeRegExp as adds weird backslashes that postgres doesn't like
+          ]
+        }
+      })
+    else
+      return
 
     # Execute query
     @props.quickfiltersDataSource.getValues @props.index, @props.expr, filters, null, 250, (err, values) =>
