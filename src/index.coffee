@@ -76,6 +76,8 @@ exports.QuickfilterCompiler = require './quickfilter/QuickfilterCompiler'
 
 exports.DateRangeComponent = require './DateRangeComponent'
 
+exports.LocaleContextInjector = require('./LocaleContextInjector').default
+
 # Polyfill pathseg https://github.com/masayuki0812/c3/issues/1529
 require './pathseg-polyfill.js'
 
