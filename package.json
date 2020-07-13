@@ -46,7 +46,7 @@
     "languages": "github:mWater/languages.js",
     "leaflet": "^1.0.2",
     "leaflet-loading": "github:mWater/Leaflet.loading",
-    "lodash": "^3.1.0",
+    "lodash": "^4.17.13",
     "lru-cache": "^4.0.1",
     "markdown": "^0.5.0",
     "moment": "^2.10.6",
