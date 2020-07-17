@@ -74,7 +74,7 @@ module.exports = class ImplicitFilterBuilder
                     op: "and"
                     exprs: [                  
                       # Join two tables
-                      exprCompiler.compileJoin(joinColumn.join, "{alias}", "explicit")
+                      exprCompiler.compileJoin(join.table, joinColumn, "{alias}", "explicit")
                     ]
                   }
                 }

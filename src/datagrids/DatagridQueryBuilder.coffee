@@ -259,7 +259,7 @@ module.exports = class DatagridQueryBuilder
         kind: "inner"
         left: { type: "table", table: design.table, alias: "main" }
         right: { type: "table", table: subtableTable, alias: "st" }
-        on: exprCompiler.compileJoin(@schema.getColumn(design.table, subtable.joins[0]).join, "main", "st")
+        on: exprCompiler.compileJoin(design.table, @schema.getColumn(design.table, subtable.joins[0]), "main", "st")
       }
     }
 
