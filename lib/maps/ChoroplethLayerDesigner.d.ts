@@ -19,14 +19,14 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     handleColorAxisChange: (axis: Axis) => void;
     handleRegionsTableChange: (regionsTable: string | null) => void;
     handleAdminRegionExprChange: (expr: Expr) => void;
-    handleRegionModeChange: (regionMode: "direct" | "plain" | "indirect") => void;
+    handleRegionModeChange: (regionMode: "plain" | "indirect" | "direct") => void;
     handleFillOpacityChange: (fillOpacity: number) => void;
     handleDisplayNamesChange: (displayNames: boolean) => void;
     renderRegionMode(): JSX.Element;
     renderTable(): JSX.Element | null;
     renderRegionsTable(): JSX.Element;
     renderAdminRegionExpr(): JSX.Element | null;
-    renderScopeAndDetailLevel(): React.ComponentElement<{
+    renderScopeAndDetailLevel(): React.CElement<{
         schema: Schema;
         dataSource: DataSource;
         scope: string | number | null;
@@ -40,7 +40,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
         scopeLevel: number;
         detailLevel: number;
         onScopeAndDetailLevelChange: (scope: string | number | null, scopeLevel: number | null, detailLevel: number) => void;
-    }, any, any>> | React.ComponentElement<{
+    }, any, any>> | React.CElement<{
         schema: Schema;
         dataSource: DataSource;
         scope: string | number | null;
@@ -70,7 +70,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     renderFilter(): React.DetailedReactHTMLElement<{
         className: string;
     }, HTMLElement> | null;
-    renderPopup(): React.ComponentElement<{
+    renderPopup(): React.CElement<{
         design: ChoroplethLayerDesign;
         onDesignChange: (design: ChoroplethLayerDesign) => void;
         schema: Schema;
