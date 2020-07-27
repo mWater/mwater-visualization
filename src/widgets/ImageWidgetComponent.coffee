@@ -110,13 +110,13 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
     R DropdownWidgetComponent, 
       width: @props.width
-      height: @props.height
+      # height: @props.height
       dropdownItems: dropdownItems,
         @renderEditor()
         if not @props.design.imageUrl and not @props.design.expr and not @props.design.uid and @props.onDesignChange
           @renderEditLink()
         else
-          R 'div', className: "mwater-visualization-image-widget", style: { position: "relative", width: @props.width, height: @props.height },
+          R 'div', className: "mwater-visualization-image-widget", style: { position: "relative", width: @props.width},
             if captionPosition == "top"
               R 'div', className: "caption", @props.design.caption
             R 'div', className: "image",
