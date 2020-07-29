@@ -110,13 +110,13 @@ module.exports = class ImageWidgetComponent extends AsyncLoadComponent
 
     R DropdownWidgetComponent, 
       width: @props.width
-      # height: @props.height
+      height: @props.height
       dropdownItems: dropdownItems,
         @renderEditor()
         if not @props.design.imageUrl and not @props.design.expr and not @props.design.uid and @props.onDesignChange
           @renderEditLink()
         else
-          R 'div', className: "mwater-visualization-image-widget", style: { position: "relative", width: @props.width},
+          R 'div', className: "mwater-visualization-image-widget", style: { position: "relative", width: @props.width, height: @props.height},
             if captionPosition == "top"
               R 'div', className: "caption", @props.design.caption
             R 'div', className: "image",
@@ -330,8 +330,9 @@ class RotatedImageComponent extends React.Component
           "rotate-270": @props.rotation and @props.rotation == 270 
         })
 
-        imageStyle.maxWidth = "100%"
-        imageStyle.maxHeight = "100%"
+        imageStyle.width = "100%"
+        imageStyle.height = "100%"
+        imageStyle.objectFit = "contain"
 
         # Set width if rotated left or right
         if @props.rotation == 90 or @props.rotation == 270
