@@ -4,7 +4,7 @@ React = require 'react'
 R = React.createElement
 
 AxisBuilder = require '../../../axes/AxisBuilder'
-LazyLoad = require('react-lazy-load').default
+LazyLoad = require('react-lazyload').default
 RotationAwareImageComponent = require("mwater-forms/lib/RotationAwareImageComponent")
 ImagePopupComponent = require './ImagePopupComponent'
 
@@ -32,7 +32,7 @@ module.exports = class ImageMosaicChartViewComponent extends React.Component
 
   # Render a single image
   renderImage: (primaryKey, image, imageManager) =>
-    R LazyLoad, key: image.id,
+    R LazyLoad, key: image.id, scrollContainer: '.mwater-visualization-block-parent-outer',
       R RotationAwareImageComponent, 
         imageManager: imageManager 
         image: image
