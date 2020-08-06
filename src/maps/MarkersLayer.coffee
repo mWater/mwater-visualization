@@ -23,6 +23,7 @@ Design is:
   color: color of layer (e.g. #FF8800). Color axis overrides
   symbol: symbol to use for layer. e.g. "font-awesome/bell". Will be converted on server to proper uri.
   markerSize: size in pixels of the markers. Default 10.
+  lineWidth: size of the lines in pixels. Default 3
   popup: contains items: which is BlocksLayoutManager items. Will be displayed when the marker is clicked
   popupFilterJoins: customizable filtering for popup. See PopupFilterJoins.md
   minZoom: minimum zoom level
@@ -177,7 +178,7 @@ module.exports = class MarkersLayer extends Layer
       }
       #layer0 {
         line-color: ''' + (design.color or "#666666") + ''';
-        line-width: 3;
+        line-width: ''' + (if design.lineWidth? then design.lineWidth else "3") + ''';
       }
       #layer0[geometry_type='ST_Polygon'],#layer0[geometry_type='ST_MultiPolygon'] {
         polygon-fill: ''' + (design.color or "#666666") + ''';

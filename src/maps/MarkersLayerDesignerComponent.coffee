@@ -40,6 +40,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
   handleSymbolChange: (symbol) => @update(symbol: symbol)
   handleNameChange: (e) => @update(name: e.target.value)
   handleMarkerSizeChange: (markerSize) => @update(markerSize: markerSize)
+  handleLineWidthChange: (lineWidth) => @update(lineWidth: lineWidth)
 
   renderTable: ->
     return R 'div', className: "form-group",
@@ -62,7 +63,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
 
     title = R 'span', null,
       R 'span', className: "glyphicon glyphicon-map-marker"
-      " Marker Position"
+      " Location"
 
     filters = _.clone(@props.filters) or []
 
@@ -102,7 +103,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
         R 'div', className: "form-group",
           R 'label', className: "text-muted", 
             R 'span', className: "glyphicon glyphicon glyphicon-tint"
-            "Marker Color"
+            "Color"
 
           R 'div', null, 
             R ColorComponent,
@@ -151,6 +152,26 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
         ]
         onChange: @handleMarkerSizeChange
 
+  renderLineWidth: -> 
+    if not @props.design.axes.geometry
+      return
+
+    return R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        "Line Width (for shapes)"
+      R ui.Select,
+        value: if @props.design.lineWidth? then @props.design.lineWidth else 3
+        options: [
+          { value: 0, label: "None" }
+          { value: 1, label: "1 pixel" }
+          { value: 2, label: "2 pixels" }
+          { value: 3, label: "3 pixels" }
+          { value: 4, label: "4 pixels" }
+          { value: 5, label: "5 pixels" }
+          { value: 6, label: "6 pixels" }
+        ]
+        onChange: @handleLineWidthChange
+
   renderFilter: ->
     # If no data, hide
     if not @props.design.axes.geometry
@@ -188,6 +209,7 @@ module.exports = class MarkersLayerDesignerComponent extends React.Component
       @renderColor()
       @renderSymbol()
       @renderMarkerSize()
+      @renderLineWidth()
       @renderFilter()
       @renderPopup()
       if @props.design.table
