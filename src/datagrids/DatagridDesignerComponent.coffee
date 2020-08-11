@@ -18,6 +18,9 @@ uuid = require 'uuid'
 update = require 'update-object'
 ui = require 'react-library/lib/bootstrap'
 
+getFormatOptions = require('../valueFormatter').getFormatOptions
+getDefaultFormat = require('../valueFormatter').getDefaultFormat
+
 # Designer for the datagrid. Currenly allows only single-table designs (no subtable rows)
 module.exports = class DatagridDesignerComponent extends React.Component
   @propTypes:
@@ -273,6 +276,9 @@ class ColumnDesignerComponent extends React.Component
   handleLabelChange: (label) =>
     @props.onColumnChange(update(@props.column, label: { $set: label }))
 
+  handleFormatChange: (ev) =>
+    @props.onColumnChange(update(@props.column, format: { $set: ev.target.value }))
+
   handleSplitEnumset: =>
     exprUtils = new ExprUtils(@props.schema)
 
@@ -336,6 +342,21 @@ class ColumnDesignerComponent extends React.Component
 
     return null
 
+  renderFormat: ->
+    exprUtils = new ExprUtils(@props.schema)
+    exprType = exprUtils.getExprType(@props.column.expr)
+
+    formats = getFormatOptions(exprType)
+    if not formats
+      return null
+   
+    R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        "Format"
+      ": "
+      R 'select', value: (if @props.column.format? then @props.column.format else getDefaultFormat(exprType)), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
+        _.map(formats, (format) -> R('option', key: format.value, value: format.value, format.label))
+
   render: =>
     exprUtils = new ExprUtils(@props.schema)
 
@@ -353,7 +374,7 @@ class ColumnDesignerComponent extends React.Component
       R 'div', className: "col-xs-1",
         @props.connectDragSource(R('span', className: "text-muted fa fa-bars"))
 
-      R 'div', className: "col-xs-5", # style: { border: "solid 1px #DDD", padding: 4 },
+      R 'div', className: "col-xs-6", # style: { border: "solid 1px #DDD", padding: 4 },
         R ExprComponent,
           schema: @props.schema
           dataSource: @props.dataSource
@@ -363,8 +384,9 @@ class ColumnDesignerComponent extends React.Component
           types: allowedTypes
           onChange: @handleExprChange
         @renderSplit()
+        @renderFormat()
 
-      R 'div', className: "col-xs-5",
+      R 'div', className: "col-xs-4",
         R 'input',
           type: "text"
           className: "form-control"

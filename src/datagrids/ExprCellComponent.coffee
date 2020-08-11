@@ -8,6 +8,9 @@ ExprUtils = require("mwater-expressions").ExprUtils
 
 Cell = require('fixed-data-table-2').Cell
 
+canFormatType = require('../valueFormatter').canFormatType
+formatValue = require('../valueFormatter').formatValue
+
 # Cell that displays an expression column cell
 module.exports = class ExprCellComponent extends React.Component
   @propTypes:
@@ -17,6 +20,8 @@ module.exports = class ExprCellComponent extends React.Component
     locale: PropTypes.string      # Locale to use
 
     exprType: PropTypes.string
+
+    format: PropTypes.string      # Optional format
 
     width: PropTypes.number.isRequired
     height: PropTypes.number.isRequired
@@ -46,27 +51,26 @@ module.exports = class ExprCellComponent extends React.Component
       if @props.exprType in ['image', 'imagelist', 'geometry', 'text[]'] and _.isString(value)
         value = JSON.parse(value)
 
-      # Convert to node based on type
-      switch @props.exprType
-        when "text", "number"
-          node = value
-        when "boolean", "enum", "enumset", "text[]"
-          node = exprUtils.stringifyExprLiteral(@props.expr, value, @props.locale)
-        when "date"
-          node = moment(value, "YYYY-MM-DD").format("ll")
-        when "datetime"
-          node = moment(value, moment.ISO_8601).format("lll")
-        when "image"
-          node = @renderImage(value.id)
-        when "imagelist"
-          node = _.map(value, (v) => @renderImage(v.id))
-        when "geometry"
-          if value.type == "Point"
-            node = "#{value.coordinates[1].toFixed(6)} #{value.coordinates[0].toFixed(6)}" 
+      # Format if possible
+      if canFormatType(@props.exprType)
+        node = formatValue(@props.exprType, value, @props.format)
+      else 
+        # Convert to node based on type
+        switch @props.exprType
+          when "text"
+            node = value
+          when "boolean", "enum", "enumset", "text[]"
+            node = exprUtils.stringifyExprLiteral(@props.expr, value, @props.locale)
+          when "date"
+            node = moment(value, "YYYY-MM-DD").format("ll")
+          when "datetime"
+            node = moment(value, moment.ISO_8601).format("lll")
+          when "image"
+            node = @renderImage(value.id)
+          when "imagelist"
+            node = _.map(value, (v) => @renderImage(v.id))
           else
-            node = value.type
-        else
-          node = "" + value
+            node = "" + value
 
     return R Cell, 
       width: @props.width

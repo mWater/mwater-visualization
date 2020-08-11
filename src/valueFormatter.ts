@@ -51,7 +51,7 @@ export function getDefaultFormat(type: LiteralType): string {
   throw new Error("Not supported")
 }
 
-export function formatValue(type: LiteralType, value: any, format: string | null | undefined, locale: string): string {
+export function formatValue(type: LiteralType, value: any, format: string | null | undefined, locale?: string): string {
   if (value == null) {
     return ""
   }

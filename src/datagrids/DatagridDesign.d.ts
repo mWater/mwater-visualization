@@ -48,6 +48,8 @@ export interface DatagridDesignColumn {
 
   /** Expression */
   expr: Expr
+
+  /** Format for formattable types (number and geometry) */
 }
 
 export interface DatagridDesignSubtable {

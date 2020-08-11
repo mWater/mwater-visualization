@@ -273,6 +273,7 @@ module.exports = class DatagridViewComponent extends React.Component
         height: cellProps.height
         value: value
         expr: column.expr
+        format: column.format
         exprType: exprType
         muted: muted
         onClick: @handleCellClick.bind(null, cellProps.rowIndex, columnIndex)
