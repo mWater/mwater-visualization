@@ -9,6 +9,7 @@ moment = require 'moment'
 React = require 'react'
 R = React.createElement
 produce = require('immer').default
+formatValue = require('../valueFormatter').formatValue
 
 xforms = [
   { type: "bin", input: "number", output: "enum" }
@@ -771,11 +772,9 @@ module.exports = class AxisBuilder
         return value
       when "number"
         num = parseFloat(value)
-        format = d3Format.format(if axis.format? then axis.format else ",")
-        # Do not convert % (d3Format multiplies by 100 which is annoying)
-        if axis.format and axis.format.match(/%/)
-          num = num / 100.0
-        return format(num)
+        return formatValue(type, num, axis.format)
+      when "geometry"
+        return formatValue(type, value, axis.format)
       when "text[]"
         # Parse if string
         if _.isString(value)

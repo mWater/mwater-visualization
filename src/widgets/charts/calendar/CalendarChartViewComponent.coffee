@@ -9,7 +9,6 @@ AxisBuilder = require '../../../axes/AxisBuilder'
 ExprUtils = require('mwater-expressions').ExprUtils
 
 d3 = require('d3')
-d3Format = require('d3-format')
 
 # Require d3-tip to use it
 d3Tip = require('d3-tip').default

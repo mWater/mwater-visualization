@@ -2,7 +2,9 @@ _ = require 'lodash'
 ItemsHtmlConverter = require './ItemsHtmlConverter'
 ExprUtils = require('mwater-expressions').ExprUtils
 uuid = require 'uuid'
-d3Format = require 'd3-format'
+utm = require 'utm'
+formatValue = require('../valueFormatter').formatValue
+canFormatType = require('../valueFormatter').canFormatType
 
 # ItemsHtmlConverter that supports embedded mwater expressions
 
@@ -40,19 +42,17 @@ module.exports = class ExprItemsHtmlConverter extends ItemsHtmlConverter
         exprHtml = _.escape(text)
       else if _.has(@exprValues, item.id) # If has data
         exprUtils = new ExprUtils(@schema)
+        value = @exprValues[item.id]
 
-        if @exprValues[item.id]?
-          # Use d3 format if number and has format
-          if item.format and exprUtils.getExprType(item.expr) == "number"
-            num = @exprValues[item.id]
+        if value?
+          # Get expression type
+          exprType = exprUtils.getExprType(item.expr)
 
-            # Do not convert % (d3Format multiplies by 100 which is annoying)
-            if item.format and item.format.match(/%/)
-              num = num / 100.0
-
-            text = d3Format.format(item.format)(num)
+          # Format if can format
+          if canFormatType(exprType)
+            text = formatValue(exprType, value, item.format)
           else
-            text = exprUtils.stringifyExprLiteral(item.expr, @exprValues[item.id], @locale)
+            text = exprUtils.stringifyExprLiteral(item.expr, value, @locale)
 
           exprHtml = _.escape(text)
         else

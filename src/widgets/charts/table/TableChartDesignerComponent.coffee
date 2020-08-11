@@ -13,6 +13,8 @@ OrderingsComponent = require './OrderingsComponent'
 TableSelectComponent = require '../../../TableSelectComponent'
 ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
 ui = require('react-library/lib/bootstrap')
+getFormatOptions = require('../../../valueFormatter').getFormatOptions
+getDefaultFormat = require('../../../valueFormatter').getDefaultFormat
 
 module.exports = class TableChartDesignerComponent extends React.Component
   @propTypes:
@@ -219,29 +221,20 @@ class TableChartColumnDesignerComponent extends React.Component
   renderFormat: ->
     column = @props.design.columns[@props.index]
 
-    # Only for number typ
+    # Get type
     exprUtils = new ExprUtils(@props.schema)
-    if exprUtils.getExprType(column.textAxis?.expr) != "number"
+    exprType = exprUtils.getExprType(column.textAxis?.expr)
+
+    formats = getFormatOptions(exprType)
+    if not formats
       return null
-
-    formats = [
-      { value: "", label: "Plain: 1234.567" }
-      { value: ",", label: "Normal: 1,234.567" }
-      { value: ",.0f", label: "Rounded: 1,234"  }
-      { value: ",.2f", label: "Two decimals: 1,234.56" }
-      { value: "$,.2f", label: "Currency: $1,234.56" }
-      { value: "$,.0f", label: "Currency rounded: $1,234" }
-      { value: ".0%", label: "Percent rounded: 12%" }
-      { value: ".2%", label: "Percent decimal: 12.34%" }
-    ]
-
+   
     R 'div', className: "form-group",
       R 'label', className: "text-muted", 
         "Format"
       ": "
-      R 'select', value: (if column.format? then column.format else ","), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
+      R 'select', value: (if column.format? then column.format else getDefaultFormat(exprType)), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
         _.map(formats, (format) -> R('option', key: format.value, value: format.value, format.label))
-
 
   renderHeader: ->
     column = @props.design.columns[@props.index]

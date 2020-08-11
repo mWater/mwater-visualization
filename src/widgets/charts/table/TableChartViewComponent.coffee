@@ -4,11 +4,11 @@ _ = require 'lodash'
 React = require 'react'
 R = React.createElement
 moment = require 'moment'
-d3Format = require 'd3-format'
 Linkify = require('react-linkify').default
 
 AxisBuilder = require '../../../axes/AxisBuilder'
 ExprUtils = require('mwater-expressions').ExprUtils
+formatValue = require('../../../valueFormatter').formatValue
 
 module.exports = class TableChartViewComponent extends React.Component
   @propTypes:
@@ -116,15 +116,8 @@ class TableContentsComponent extends React.Component
       switch exprType
         when "text"
           node = R(Linkify, null, value)
-        when "number"
-          # Use d3 format if number
-          format = if column.format? then column.format else ","
-
-          # Do not convert % (d3Format multiplies by 100 which is annoying)
-          if format.match(/%/)
-            value = value / 100.0
-
-          node = d3Format.format(format)(value)
+        when "number", "geometry"
+          node = formatValue(exprType, value, column.format)
         when "boolean", "enum", "enumset", "text[]"
           node = exprUtils.stringifyExprLiteral(column.textAxis?.expr, value, @context.locale)
         when "date"
@@ -135,11 +128,6 @@ class TableContentsComponent extends React.Component
           node = @renderImage(value.id)
         when "imagelist"
           node = _.map(value, (v) => @renderImage(v.id))
-        when "geometry"
-          if value.type == "Point"
-            node = "#{value.coordinates[1].toFixed(6)} #{value.coordinates[0].toFixed(6)}" 
-          else
-            node = value.type
         else
           node = "" + value
 

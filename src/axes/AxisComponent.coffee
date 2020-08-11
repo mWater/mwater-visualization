@@ -17,6 +17,8 @@ RangesComponent = require './RangesComponent'
 AxisColorEditorComponent = require './AxisColorEditorComponent'
 CategoryMapComponent = require './CategoryMapComponent'
 injectTableAlias = require('mwater-expressions').injectTableAlias
+getFormatOptions = require('../valueFormatter').getFormatOptions
+getDefaultFormat = require('../valueFormatter').getDefaultFormat
 
 # Axis component that allows designing of an axis
 module.exports = class AxisComponent extends AsyncLoadComponent
@@ -277,22 +279,19 @@ module.exports = class AxisComponent extends AsyncLoadComponent
       ]
 
   renderFormat: (axis) ->
-    formats = [
-      { value: ",", label: "Normal: 1,234.567" }
-      { value: "", label: "Plain: 1234.567" }
-      { value: ",.0f", label: "Rounded: 1,234"  }
-      { value: ",.2f", label: "Two decimals: 1,234.56" }
-      { value: "$,.2f", label: "Currency: $1,234.56" }
-      { value: "$,.0f", label: "Currency rounded: $1,234" }
-      { value: ".0%", label: "Percent rounded: 12%" }
-      { value: ".2%", label: "Percent decimal: 12.34%" }
-    ]
+    axisBuilder = new AxisBuilder(schema: @props.schema)
+
+    valueType = axisBuilder.getAxisType(axis)
+
+    formats = getFormatOptions(valueType)
+    if not formats
+      return null
 
     R 'div', className: "form-group",
       R 'label', className: "text-muted", 
         "Format"
       ": "
-      R 'select', value: (if axis.format? then axis.format else ","), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
+      R 'select', value: (if axis.format? then axis.format else getDefaultFormat(valueType)), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
         _.map(formats, (format) -> R('option', key: format.value, value: format.value, format.label))
 
   render: ->
@@ -322,8 +321,7 @@ module.exports = class AxisComponent extends AsyncLoadComponent
           value: if @props.value then @props.value.expr
           aggrStatuses: aggrStatuses
       @renderXform(axis)
-      # Only show format is number type
-      if @props.showFormat and axisBuilder.getAxisType(axis) == "number"
+      if @props.showFormat
         @renderFormat(axis)
       @renderColorMap(axis)
       @renderExcludedValues(axis)

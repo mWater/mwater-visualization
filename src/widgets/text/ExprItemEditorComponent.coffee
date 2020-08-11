@@ -6,6 +6,8 @@ R = React.createElement
 ExprUtils = require("mwater-expressions").ExprUtils
 ExprComponent = require("mwater-expressions-ui").ExprComponent
 TableSelectComponent = require '../../TableSelectComponent'
+getFormatOptions = require('../../valueFormatter').getFormatOptions
+getDefaultFormat = require('../../valueFormatter').getDefaultFormat
 
 # Expression editor that allows changing an expression item
 module.exports = class ExprItemEditorComponent extends React.Component
@@ -42,19 +44,22 @@ module.exports = class ExprItemEditorComponent extends React.Component
     exprItem = _.extend({}, @props.exprItem, format: ev.target.value or null)
     @props.onChange(exprItem)
 
-  render: ->
-    formats = [
-      { value: "", label: "Normal: 1234.567" }
-      { value: ",.0f", label: "Rounded: 1,234"  }
-      { value: ",.2f", label: "Two decimals: 1,234.56" }
-      { value: "$,.2f", label: "Currency: $1,234.56" }
-      { value: "$,.0f", label: "Currency rounded: $1,234" }
-      { value: ".0%", label: "Percent rounded: 12%" }
-      { value: ".2%", label: "Percent decimal: 12.34%" }
-    ]
-
+  renderFormat: ->
     exprUtils = new ExprUtils(@props.schema)
+    exprType = exprUtils.getExprType(@props.exprItem.expr)
 
+    formats = getFormatOptions(exprType)
+    if not formats
+      return null
+   
+    R 'div', className: "form-group",
+      R 'label', className: "text-muted", 
+        "Format"
+      ": "
+      R 'select', value: (if @props.exprItem.format? then @props.exprItem.format else getDefaultFormat(exprType)), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
+        _.map(formats, (format) -> R('option', key: format.value, value: format.value, format.label))
+
+  render: ->
     R 'div', style: { paddingBottom: 200 },
       R 'div', className: "form-group",
         R 'label', className: "text-muted", 
@@ -74,7 +79,7 @@ module.exports = class ExprItemEditorComponent extends React.Component
             schema: @props.schema
             dataSource: @props.dataSource
             table: @state.table
-            types: ['text', 'number', 'enum', 'date', 'datetime', 'boolean', 'enumset']
+            types: ['text', 'number', 'enum', 'date', 'datetime', 'boolean', 'enumset', 'geometry']
             value: @props.exprItem.expr
             aggrStatuses: ["individual", "literal", "aggregate"]
             onChange: @handleExprChange
@@ -94,13 +99,5 @@ module.exports = class ExprItemEditorComponent extends React.Component
               onChange: @handleLabelTextChange 
               placeholder: new ExprUtils(@props.schema).summarizeExpr(@props.exprItem.expr) + ": "
 
-      if @props.exprItem.expr and exprUtils.getExprType(@props.exprItem.expr) == "number"
-        R 'div', className: "form-group",
-          R 'label', className: "text-muted", 
-            "Format"
-          ": "
-          R 'select', value: @props.exprItem.format or "", className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
-            _.map(formats, (format) -> R('option', key: format.value, value: format.value, format.label))
-
-
+      @renderFormat()
 

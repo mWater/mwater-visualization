@@ -368,7 +368,7 @@ module.exports = class LayeredChartCompiler
           names[seriesY] = @axisBuilder.formatValue(layer.axes.color, colorValue, locale)
           xs[seriesY] = seriesX
 
-          if layer.axes?.y?.format
+          if layer.axes?.y?.format?
             format[seriesY] = d3Formatter(layer.axes.y.format)
 
           _.each rows, (row, rowIndex) =>
@@ -388,7 +388,7 @@ module.exports = class LayeredChartCompiler
         xs[seriesY] = seriesX
         colors[seriesY] = layer.color
 
-        if layer.axes?.y?.format
+        if layer.axes?.y?.format?
           format[seriesY] = d3Formatter(layer.axes.y.format)
 
         # Add data map for each row
@@ -573,7 +573,7 @@ module.exports = class LayeredChartCompiler
           names[series] = @axisBuilder.formatValue(layer.axes.color, colorValue, locale)
           xs[series] = "x"
           
-          if layer.axes?.y?.format
+          if layer.axes?.y?.format?
             format[series] = d3Formatter(layer.axes.y.format)
 
       else
@@ -607,7 +607,7 @@ module.exports = class LayeredChartCompiler
         xs[series] = "x"
         colors[series] = layer.color
 
-        if layer.axes?.y?.format
+        if layer.axes?.y?.format?
           format[series] = d3Formatter(layer.axes.y.format)
 
     # Stack by putting into groups

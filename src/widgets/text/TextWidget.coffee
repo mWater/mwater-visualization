@@ -4,6 +4,7 @@ _ = require 'lodash'
 
 async = require 'async'
 
+ExprUtils = require('mwater-expressions').ExprUtils
 ExprCompiler = require('mwater-expressions').ExprCompiler
 ExprCleaner = require('mwater-expressions').ExprCleaner
 injectTableAlias = require('mwater-expressions').injectTableAlias
@@ -58,6 +59,7 @@ module.exports = class TextWidget extends Widget
       table = exprItem.expr.table
 
       exprCompiler = new ExprCompiler(schema)
+      exprUtils = new ExprUtils(schema)
 
       # Clean expression
       exprCleaner = new ExprCleaner(schema)
@@ -78,11 +80,21 @@ module.exports = class TextWidget extends Widget
         whereClauses.push(exprCompiler.compileExpr(expr: expr.exprs[0], tableAlias: "main"))
         expr = { type: "op", table: expr.table, op: "count", exprs: [] }
 
+      compiledExpr = exprCompiler.compileExpr(expr: expr, tableAlias: "main")
+      exprType = exprUtils.getExprType(expr)
+
+      # Handle special case of geometry, converting to GeoJSON
+      if exprType == "geometry"
+        # Convert to 4326 (lat/long). Force ::geometry for null
+        compiledExpr = { type: "op", op: "::jsonb", exprs: [
+          { type: "op", op: "ST_AsGeoJSON", exprs: [{ type: "op", op: "ST_Transform", exprs: [{ type: "op", op: "::geometry", exprs: [compiledExpr]}, 4326] }] }
+        ]}
+
       # Get two distinct examples to know if unique
       query = {
         distinct: true
         selects: [
-          { type: "select", expr: exprCompiler.compileExpr(expr: expr, tableAlias: "main"), alias: "value" }
+          { type: "select", expr: compiledExpr, alias: "value" }
         ]
         from: if table then exprCompiler.compileTable(table, "main")
         limit: 2
