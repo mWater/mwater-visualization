@@ -26,8 +26,6 @@ export { default as DashboardDataSource } from './dashboards/DashboardDataSource
 export { default as DirectDashboardDataSource } from './dashboards/DirectDashboardDataSource'
 export * from './dashboards/DashboardDesign'
 
-export { canFormatType, formatValue } from './valueFormatter'
-
 export { default as LocaleContextInjector } from './LocaleContextInjector'
 
 /** Scope that a particular widget can apply when a part of it is clicked */
