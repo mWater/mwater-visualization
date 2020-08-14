@@ -47,7 +47,8 @@ module.exports = class DatagridQueryBuilder
     # Filter by filter
     wheres = []
     if design.filter
-      wheres.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "main"))
+      expr = exprCleaner.cleanExpr(design.filter, { table: design.table })
+      wheres.push(exprCompiler.compileExpr(expr: expr, tableAlias: "main"))
 
     # Add global filters
     for filter in (design.globalFilters or [])
@@ -198,7 +199,6 @@ module.exports = class DatagridQueryBuilder
 
       # Clean expr
       expr = exprCleaner.cleanExpr(expr, { table: design.table })
-
       wheres.push(exprCompiler.compileExpr(expr: expr, tableAlias: "main"))
 
     # Add extra filters
@@ -219,6 +219,7 @@ module.exports = class DatagridQueryBuilder
   createComplexSubtableQuery: (design, options, subtable, subtableIndex) ->
     exprUtils = new ExprUtils(@schema)
     exprCompiler = new ExprCompiler(@schema)
+    exprCleaner = new ExprCleaner(@schema)
 
     # Create selects
     selects = [
@@ -266,7 +267,8 @@ module.exports = class DatagridQueryBuilder
     # Filter by filter
     wheres = []
     if design.filter
-      wheres.push(exprCompiler.compileExpr(expr: design.filter, tableAlias: "main"))
+      expr = exprCleaner.cleanExpr(design.filter, { table: design.table })
+      wheres.push(exprCompiler.compileExpr(expr: expr, tableAlias: "main"))
 
     # Add extra filters
     for extraFilter in (options.extraFilters or [])
@@ -289,12 +291,15 @@ module.exports = class DatagridQueryBuilder
   # If so, only use explicit ordering
   getMainOrderByExprs: (design, isAggr = false) ->
     exprCompiler = new ExprCompiler(@schema)
+    exprCleaner = new ExprCleaner(@schema)
 
     exprs = []
   
     # First explicit order bys
     for orderBy in design.orderBys or []
-      exprs.push(exprCompiler.compileExpr(expr: orderBy.expr, tableAlias: "main"))
+      # Clean first
+      orderByExpr = exprCleaner.cleanExpr(orderBy.expr, { table: design.table })
+      exprs.push(exprCompiler.compileExpr(expr: orderByExpr, tableAlias: "main"))
 
     if not isAggr
       # Natural order if present
@@ -332,6 +337,7 @@ module.exports = class DatagridQueryBuilder
   getSubtableOrderByExprs: (design, subtable) ->
     exprUtils = new ExprUtils(@schema)
     exprCompiler = new ExprCompiler(@schema)
+    exprCleaner = new ExprCleaner(@schema)
 
     # Get subtable actual table
     subtableTable = exprUtils.followJoins(design.table, subtable.joins)
@@ -340,7 +346,8 @@ module.exports = class DatagridQueryBuilder
 
     # First explicit order bys
     for orderBy in subtable.orderBys or []
-      exprs.push(exprCompiler.compileExpr(expr: orderBy.expr, tableAlias: "st"))
+      expr = exprCleaner.cleanExpr(orderBy.expr, { table: subtableTable })
+      exprs.push(exprCompiler.compileExpr(expr: expr, tableAlias: "st"))
   
     # Natural order if present
     ordering = @schema.getTable(subtableTable).ordering
