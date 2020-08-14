@@ -82,7 +82,7 @@ export const CustomTablesetListComponent = (props: {
       return null
     }
 
-    const items = ts.design.tables.map(t => ({ 
+    const items = ts.design.tables.filter(t => !t.deprecated).map(t => ({ 
       name: ExprUtils.localizeString(t.name, props.locale), 
       onClick: () => selectTable(ts, t.id)
     }))
