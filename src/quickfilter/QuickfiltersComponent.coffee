@@ -36,6 +36,9 @@ module.exports = class QuickfiltersComponent extends React.Component
       jsonql: PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
     }))
 
+    # True to hide top border
+    hideTopBorder: PropTypes.bool
+
   renderQuickfilter: (item, index) ->
     # Skip if merged
     if item.merged
@@ -151,7 +154,7 @@ module.exports = class QuickfiltersComponent extends React.Component
     if not @props.design or @props.design.length == 0
       return null
 
-    R 'div', style: { borderTop: "solid 1px #E8E8E8", borderBottom: "solid 1px #E8E8E8", padding: 5 },
+    R 'div', style: { borderTop: (if not @props.hideTopBorder then "solid 1px #E8E8E8"), borderBottom: "solid 1px #E8E8E8", padding: 5 },
       _.map @props.design, (item, i) => @renderQuickfilter(item, i)
 
 # Quickfilter for an enum

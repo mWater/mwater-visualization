@@ -256,6 +256,7 @@ module.exports = class DashboardComponent extends React.Component
         onValuesChange: (values) => @setState(quickfiltersValues: values)
         locks: @props.quickfilterLocks
         filters: @getCompiledFilters()
+        hideTopBorder: @props.hideTitleBar
       }
 
   refDashboardView: (el) =>
