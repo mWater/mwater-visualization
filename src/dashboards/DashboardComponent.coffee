@@ -43,6 +43,8 @@ module.exports = class DashboardComponent extends React.Component
       jsonql: PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
     }))
 
+    hideTitleBar: PropTypes.bool    # True to hide title bar and related controls
+
   @defaultProps:
     printScaling: true
 
@@ -266,7 +268,8 @@ module.exports = class DashboardComponent extends React.Component
     filters = filters.concat(new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues, @props.quickfilterLocks))
 
     R 'div', key: "view", style: { height: "100%", paddingTop: 40 + (@state.quickfiltersHeight or 0), position: "relative" },
-      @renderTitleBar()
+      if not @props.hideTitleBar
+        @renderTitleBar()
       @renderQuickfilter()
       if @props.onDesignChange?
         R SettingsModalComponent, { onDesignChange: @handleDesignChange, schema: @props.schema, dataSource: @props.dataSource, ref: (c) => @settings = c }

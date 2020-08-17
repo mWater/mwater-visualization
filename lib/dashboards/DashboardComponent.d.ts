@@ -43,4 +43,7 @@ export default class DashboardComponent extends React.Component<{
 
   /** Filters to add to the dashboard */
   filters?: JsonQLFilter[]
+
+  /** True to hide title bar and related controls */
+  hideTitleBar?: boolean
 }> {}
