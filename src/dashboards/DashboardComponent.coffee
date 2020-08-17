@@ -246,7 +246,7 @@ module.exports = class DashboardComponent extends React.Component
       @props.titleElem
 
   renderQuickfilter: ->
-    R 'div', style: { position: "absolute", top: 40, left: 0, right: 0 }, ref: ((c) => @quickfilters = c),
+    R 'div', style: { position: "absolute", top: (if @props.hideTitleBar then 0 else 40), left: 0, right: 0 }, ref: ((c) => @quickfilters = c),
       R QuickfiltersComponent, {
         design: @props.design.quickfilters
         schema: @props.schema
