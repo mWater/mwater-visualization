@@ -150,6 +150,9 @@ module.exports = class PivotChartLayoutComponent extends React.Component
       style: { position: "relative" } 
       onMouseLeave: (=> @setState(hoverSection: null)),
         # Define CSS classes to keep HTML as small as possible
+        # https://stackoverflow.com/a/19047221/876117
+        # https://github.com/mWater/mwater-portal/issues/1183
+        # cell borders not visible in firefox when you have a cell with position relative inside a table with collapsed borders
         R 'style', null, '''
           .pivot-chart-table {
             width: 100%;
@@ -161,7 +164,6 @@ module.exports = class PivotChartLayoutComponent extends React.Component
           .pivot-chart-table .cell {
             padding: 5px;
             vertical-align: top;
-            position: relative;
             background-color: white;
           }
 
