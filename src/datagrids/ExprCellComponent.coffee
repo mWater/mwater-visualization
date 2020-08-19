@@ -5,7 +5,7 @@ R = React.createElement
 moment = require 'moment'
 
 ExprUtils = require("mwater-expressions").ExprUtils
-
+Linkify = require('react-linkify').default
 Cell = require('fixed-data-table-2').Cell
 
 canFormatType = require('../valueFormatter').canFormatType
@@ -58,7 +58,7 @@ module.exports = class ExprCellComponent extends React.Component
         # Convert to node based on type
         switch @props.exprType
           when "text"
-            node = value
+            node = R(Linkify, null, value)
           when "boolean", "enum", "enumset", "text[]"
             node = exprUtils.stringifyExprLiteral(@props.expr, value, @props.locale)
           when "date"
