@@ -9,7 +9,7 @@ declare class TableSelectComponent extends React.Component<{
 
   /** Some table select components (not the default) can also perform filtering. Include these props to enable this */
   filter?: Expr
-  onFilterChange: (expr: Expr) => void
+  onFilterChange?: (expr: Expr) => void
 }> {}
 
 export = TableSelectComponent
