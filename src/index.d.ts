@@ -11,6 +11,8 @@ export { default as RegionSelectComponent } from './maps/RegionSelectComponent'
 
 export * from './datagrids/DatagridDesign'
 
+export { default as TableSelectComponent } from './TableSelectComponent'
+
 export class WidgetFactory {
   static createWidget(type: string): Widget
 }
