@@ -89,21 +89,27 @@ module.exports = class DashboardViewComponent extends React.Component
 
   # Handle a change of the clipboard and determine which tables the clipboard block uses
   handleClipboardChange: (block) => 
-    # If empty, just set it
-    if not block
-      window.localStorage.removeItem("DashboardViewComponent.clipboard")
-      @forceUpdate()
-      return
-    
-    # Determine which tables are used (just peek for any uses of the table name. Not ideal, but easy)
-    tables = _.pluck(_.filter(@props.schema.getTables(), (table) => JSON.stringify(block).includes(JSON.stringify(table.id))), "id")
+    try
+      # If empty, just set it
+      if not block
+        window.localStorage.removeItem("DashboardViewComponent.clipboard")
+        @forceUpdate()
+        return
+      
+      # Determine which tables are used (just peek for any uses of the table name. Not ideal, but easy)
+      tables = _.pluck(_.filter(@props.schema.getTables(), (table) => JSON.stringify(block).includes(JSON.stringify(table.id))), "id")
 
-    # Store in clipboard
-    window.localStorage.setItem("DashboardViewComponent.clipboard", JSON.stringify({ block: block, tables: tables }))
-    @forceUpdate()
+      # Store in clipboard
+      window.localStorage.setItem("DashboardViewComponent.clipboard", JSON.stringify({ block: block, tables: tables }))
+      @forceUpdate()
+    catch err
+      alert("Clipboard not available")
 
   getClipboardContents: ->
-    return JSON.parse(window.localStorage.getItem("DashboardViewComponent.clipboard") or "null")
+    try
+      return JSON.parse(window.localStorage.getItem("DashboardViewComponent.clipboard") or "null")
+    catch err
+      return null
 
   # Call to print the dashboard
   print: =>
