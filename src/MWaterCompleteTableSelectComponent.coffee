@@ -9,7 +9,8 @@ uiComponents = require './UIComponents'
 ExprUtils = require("mwater-expressions").ExprUtils
 moment = require 'moment'
 ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
-CustomTablesetListComponent = require('./CustomTablesetListComponent').CustomTablesetListComponent
+MWaterCustomTablesetListComponent = require('./MWaterCustomTablesetListComponent').MWaterCustomTablesetListComponent
+MWaterMetricsTableListComponent = require('./MWaterMetricsTableListComponent').MWaterMetricsTableListComponent
 
 sitesOrder = {
   "entities.water_point": 1
@@ -119,7 +120,19 @@ module.exports = class MWaterCompleteTableSelectComponent extends React.Componen
         })
 
   renderTablesets: ->
-    R CustomTablesetListComponent, 
+    R MWaterCustomTablesetListComponent, 
+      schema: @props.schema
+      client: @props.client
+      apiUrl: @props.apiUrl
+      user: @props.user
+      onChange: @props.onChange
+      extraTables: @props.extraTables
+      onExtraTableAdd: @handleExtraTableAdd
+      onExtraTableRemove: @handleExtraTableRemove
+      locale: @context.locale
+
+  renderMetrics: ->
+    R MWaterMetricsTableListComponent, 
       schema: @props.schema
       client: @props.client
       apiUrl: @props.apiUrl
@@ -160,6 +173,10 @@ module.exports = class MWaterCompleteTableSelectComponent extends React.Componen
       if table.id.match(/^custom\./)
         return false
 
+      # Remove metrics
+      if table.id.match(/^metric:/)
+        return false
+
       return true
     )
 
@@ -192,6 +209,7 @@ module.exports = class MWaterCompleteTableSelectComponent extends React.Componen
       { id: "indicators", label: [R('i', className: "fa fa-check-circle"), " Indicators"], elem: @renderIndicators() }
       { id: "issues", label: [R('i', className: "fa fa-exclamation-circle"), " Issues"], elem: @renderIssues() }
       { id: "tablesets", label: [R('i', className: "fa fa-table"), " Tables"], elem: @renderTablesets() }
+      { id: "metrics", label: [R('i', className: "fa fa-line-chart"), " Metrics"], elem: @renderMetrics() }
     ]
 
     if sweetSenseTables.length > 0

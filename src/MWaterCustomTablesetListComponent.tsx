@@ -7,7 +7,7 @@ import { TextInput } from "react-library/lib/bootstrap"
 
 
 /** Searchable list of custom tables */
-export const CustomTablesetListComponent = (props: {
+export const MWaterCustomTablesetListComponent = (props: {
   apiUrl: string
   schema: Schema
   client?: string
