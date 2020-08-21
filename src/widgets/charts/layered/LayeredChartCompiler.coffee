@@ -825,8 +825,12 @@ module.exports = class LayeredChartCompiler
       y = total + row.y
       totals[row.color] = y
 
-      # Create new row
-      newRows.push(_.extend({}, row, y: y))
+      # If x is null, don't make cumulative
+      if row.x == null
+        newRows.push(row)
+      else
+        # Create new row
+        newRows.push(_.extend({}, row, y: y))
 
     return newRows
 

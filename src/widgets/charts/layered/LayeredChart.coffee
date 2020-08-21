@@ -58,7 +58,7 @@ module.exports = class LayeredChart extends Chart
           delete layer.axes.x
 
         # Remove cumulative if x is not date or number
-        if not layer.axes.x or axisBuilder.getAxisType(layer.axes.x) not in ['date', 'number']
+        if not layer.axes.x or not axisBuilder.doesAxisSupportCumulative(layer.axes.x)
           delete layer.cumulative
 
         layer.filter = exprCleaner.cleanExpr(original(layer.filter), { table: layer.table, types: ['boolean'] })

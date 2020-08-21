@@ -726,6 +726,10 @@ module.exports = class AxisBuilder
     # Legacy support of axis.aggr
     return axis? and (axis.aggr or @exprUtils.getExprAggrStatus(axis.expr) == "aggregate")
 
+  # Determines if axis supports cumulative values (number, date or year-quarter)
+  doesAxisSupportCumulative: (axis) ->
+    return @getAxisType(axis) in ['date', 'number'] or axis.xform?.type == "yearquarter"
+
   # Converts a category to a string (uses label or override)
   formatCategory: (axis, category) ->
     categoryLabel = if axis.categoryLabels then axis.categoryLabels[JSON.stringify(category.value)]
