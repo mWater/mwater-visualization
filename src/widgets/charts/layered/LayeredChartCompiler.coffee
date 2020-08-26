@@ -140,8 +140,9 @@ module.exports = class LayeredChartCompiler
         y: {
           label: { text: cleanString(c3Data.yAxisLabelText), position: if options.design.transpose then 'outer-center' else 'outer-middle' }
           # Set max to 100 if proportional (with no padding)
-          max: if options.design.type == "bar" and options.design.proportional then 100
-          padding: if options.design.type == "bar" and options.design.proportional then { top: 0, bottom: 0 }
+          max: if options.design.type == "bar" and options.design.proportional then 100 else options.design.yMax
+          min: if options.design.type == "bar" and options.design.proportional then 0 else options.design.yMin
+          padding: if options.design.type == "bar" and options.design.proportional then { top: 0, bottom: 0 } else ({ top: (if options.design.yMax? then 0 else undefined), bottom: (if options.design.yMin? then 0 else undefined) })
           tick: {
             format: tickFormatter
           }

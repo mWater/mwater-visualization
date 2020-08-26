@@ -13,6 +13,8 @@
   footer: text widget design to display in header
   yThresholds: array of { value:, label:, color: } thresholds to draw on y-axis. Only for non-polar. Color takes effect if y > threshold
   polarOrder: order of pie/donut charts. Default is "desc" (if undefined). Can be "desc", "asc", "natural"
+  yMax: optional maximum for y axis
+  yMin: optional minimum for y axis
 
 layer:
   type: bar/line/spline/scatter/area/pie/donut (overrides main one)

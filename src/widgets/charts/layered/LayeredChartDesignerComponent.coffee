@@ -63,6 +63,12 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
   handleToggleYAxisLabelClick: (ev) =>
     @updateDesign(yAxisLabelText: if @props.design.yAxisLabelText? then null else "")
 
+  handleYMinChange: (yMin) =>
+    @updateDesign(yMin: yMin)
+
+  handleYMaxChange: (yMax) =>
+    @updateDesign(yMax: yMax)
+
   renderLabels: ->
     if not @props.design.type
       return 
@@ -179,9 +185,6 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
           R 'input', type: "checkbox", checked: (design.polarOrder or "desc") == "desc", onChange: @handlePolarOrderChange
           "Descending Order"
 
-
-
-
   renderThresholds: ->
     # Doesn't apply to polar
     if @props.design.type and @props.design.type not in ['pie', 'donut']
@@ -190,6 +193,16 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
           thresholds: @props.design.yThresholds
           onThresholdsChange: @handleYThresholdsChange
           showHighlightColor: @props.design.type == "bar"
+
+  renderYRange: ->
+    # Doesn't apply to polar
+    if @props.design.type and @props.design.type not in ['pie', 'donut']
+      R uiComponents.SectionComponent, label: "Y Axis Range",
+        R LabeledInlineComponent, key: "min", label: "Min:",
+          R ui.NumberInput, decimal: true, style: { display: "inline-block" }, size: "sm", value: @props.design.yMin, onChange: @handleYMinChange, placeholder: "Auto"
+        "  "
+        R LabeledInlineComponent, key: "label", label: "Max:",
+          R ui.NumberInput, decimal: true, style: { display: "inline-block" }, size: "sm", value: @props.design.yMax, onChange: @handleYMaxChange, placeholder: "Auto"
 
   render: ->
     tabs = []
@@ -202,6 +215,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
         @renderType()
         @renderLayers()
         @renderThresholds()
+        @renderYRange()
     }
 
     if @props.design.type
