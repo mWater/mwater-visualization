@@ -208,7 +208,7 @@ class C3ChartComponent extends React.Component
             return 0.3
         else
           # Not scoped
-          return 1
+          return if dataPoint?.row.y != null then 1 else 0
       )
 
     # Handle pie charts
