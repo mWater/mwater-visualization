@@ -8,7 +8,6 @@ d3Format = require 'd3-format'
 
 commaFormatter = d3Format.format(",")
 pieLabelValueFormatter = (value, ratio, id) => "#{d3Format.format(",")(value)} (#{d3Format.format('.1%')(ratio)})"
-d3Formatter = (format) -> d3Format.format(format)
 labelValueFormatter = (format) -> 
   return (value, ratio, id) -> 
     return if format[id] then format[id](value) else value
@@ -182,9 +181,9 @@ module.exports = class LayeredChartCompiler
           }
         
     if options.design.labels and not _.isEmpty(c3Data.format)
-      format = _.map options.design.layers, (layer, layerIndex) =>
-        return if c3Data.format[layerIndex] then c3Data.format[layerIndex] else true
-      chartDesign.data.labels = {format: format}
+      # format = _.map options.design.layers, (layer, layerIndex) =>
+      #   return if c3Data.format[layerIndex] then c3Data.format[layerIndex] else true
+      chartDesign.data.labels = {format: c3Data.format}
 
     if options.design.yThresholds
       chartDesign.grid.y = { lines: _.map(options.design.yThresholds, (t) -> { value: t.value, text: t.label }) }
@@ -368,9 +367,7 @@ module.exports = class LayeredChartCompiler
           types[seriesY] = @getLayerType(design, layerIndex)
           names[seriesY] = @axisBuilder.formatValue(layer.axes.color, colorValue, locale)
           xs[seriesY] = seriesX
-
-          if layer.axes?.y?.format?
-            format[seriesY] = d3Formatter(layer.axes.y.format)
+          format[seriesY] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value) else ""
 
           _.each rows, (row, rowIndex) =>
             dataMap["#{seriesY}:#{rowIndex}"] = { layerIndex: layerIndex, row: row }
@@ -388,9 +385,7 @@ module.exports = class LayeredChartCompiler
         names[seriesY] = layer.name or (if design.layers.length == 1 then "Value" else "Series #{layerIndex+1}") 
         xs[seriesY] = seriesX
         colors[seriesY] = layer.color
-
-        if layer.axes?.y?.format?
-          format[seriesY] = d3Formatter(layer.axes.y.format)
+        format[seriesY] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value) else ""
 
         # Add data map for each row
         _.each layerData, (row, rowIndex) =>
@@ -573,9 +568,7 @@ module.exports = class LayeredChartCompiler
           types[series] = @getLayerType(design, layerIndex)
           names[series] = @axisBuilder.formatValue(layer.axes.color, colorValue, locale)
           xs[series] = "x"
-          
-          if layer.axes?.y?.format?
-            format[series] = d3Formatter(layer.axes.y.format)
+          format[series] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value) else ""
 
       else
         # One series for y
@@ -607,9 +600,7 @@ module.exports = class LayeredChartCompiler
         names[series] = layer.name or (if design.layers.length == 1 then "Value" else "Series #{layerIndex+1}") 
         xs[series] = "x"
         colors[series] = layer.color
-
-        if layer.axes?.y?.format?
-          format[series] = d3Formatter(layer.axes.y.format)
+        format[series] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value) else ""
 
     # Stack by putting into groups
     if design.stacked
