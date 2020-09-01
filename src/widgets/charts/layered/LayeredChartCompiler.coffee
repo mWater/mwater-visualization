@@ -255,7 +255,7 @@ module.exports = class LayeredChartCompiler
           # Pie series contain a single value
           columns.push([series, row.y])
           types[series] = @getLayerType(design, layerIndex)
-          names[series] = @axisBuilder.formatValue(layer.axes.color, row.color, locale)
+          names[series] = @axisBuilder.formatValue(layer.axes.color, row.color, locale, true)
           dataMap[series] = { layerIndex: layerIndex, row: row }
 
           # Get specific color if present
@@ -365,9 +365,9 @@ module.exports = class LayeredChartCompiler
           columns.push([seriesX].concat(_.pluck(rows, "x")))
 
           types[seriesY] = @getLayerType(design, layerIndex)
-          names[seriesY] = @axisBuilder.formatValue(layer.axes.color, colorValue, locale)
+          names[seriesY] = @axisBuilder.formatValue(layer.axes.color, colorValue, locale, true)
           xs[seriesY] = seriesX
-          format[seriesY] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value) else ""
+          format[seriesY] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
 
           _.each rows, (row, rowIndex) =>
             dataMap["#{seriesY}:#{rowIndex}"] = { layerIndex: layerIndex, row: row }
@@ -385,7 +385,7 @@ module.exports = class LayeredChartCompiler
         names[seriesY] = layer.name or (if design.layers.length == 1 then "Value" else "Series #{layerIndex+1}") 
         xs[seriesY] = seriesX
         colors[seriesY] = layer.color
-        format[seriesY] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value) else ""
+        format[seriesY] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
 
         # Add data map for each row
         _.each layerData, (row, rowIndex) =>
@@ -566,9 +566,9 @@ module.exports = class LayeredChartCompiler
           columns.push([series].concat(column))
 
           types[series] = @getLayerType(design, layerIndex)
-          names[series] = @axisBuilder.formatValue(layer.axes.color, colorValue, locale)
+          names[series] = @axisBuilder.formatValue(layer.axes.color, colorValue, locale, true)
           xs[series] = "x"
-          format[series] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value) else ""
+          format[series] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
 
       else
         # One series for y
@@ -600,7 +600,7 @@ module.exports = class LayeredChartCompiler
         names[series] = layer.name or (if design.layers.length == 1 then "Value" else "Series #{layerIndex+1}") 
         xs[series] = "x"
         colors[series] = layer.color
-        format[series] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value) else ""
+        format[series] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
 
     # Stack by putting into groups
     if design.stacked
@@ -765,13 +765,13 @@ module.exports = class LayeredChartCompiler
       else        
         filters.push(@axisBuilder.createValueFilter(layer.axes.x, row.x))
         filterExprs.push(@axisBuilder.createValueFilterExpr(layer.axes.x, row.x))
-        names.push(@axisBuilder.summarizeAxis(layer.axes.x, locale) + " is " + @axisBuilder.formatValue(layer.axes.x, row.x, locale))
+        names.push(@axisBuilder.summarizeAxis(layer.axes.x, locale) + " is " + @axisBuilder.formatValue(layer.axes.x, row.x, locale, true))
         data.x = row.x
 
     if layer.axes.color
       filters.push(@axisBuilder.createValueFilter(layer.axes.color, row.color))
       filterExprs.push(@axisBuilder.createValueFilterExpr(layer.axes.color, row.color))
-      names.push(@axisBuilder.summarizeAxis(layer.axes.color, locale) + " is " + @axisBuilder.formatValue(layer.axes.color, row.color, locale))
+      names.push(@axisBuilder.summarizeAxis(layer.axes.color, locale) + " is " + @axisBuilder.formatValue(layer.axes.color, row.color, locale, true))
       data.color = row.color
 
     if filters.length > 1

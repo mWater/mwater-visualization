@@ -51,7 +51,10 @@ export function getDefaultFormat(type: LiteralType): string {
   throw new Error("Not supported")
 }
 
-export function formatValue(type: LiteralType, value: any, format: string | null | undefined, locale?: string): string {
+/** Format a value of a specified type as a string. For historical reasons, 
+ * LayeredCharts multiply by 100 before adding the % sign. Set legacyPercentFormat to true to replicate
+ */
+export function formatValue(type: LiteralType, value: any, format: string | null | undefined, locale?: string, legacyPercentFormat?: boolean): string {
   if (value == null) {
     return ""
   }
@@ -62,7 +65,7 @@ export function formatValue(type: LiteralType, value: any, format: string | null
   // Use d3 format if number
   if (type == "number") {
     // Do not convert % (d3Format multiplies by 100 which is annoying)
-    if (format.match(/%/)) {
+    if (format.match(/%/) && !legacyPercentFormat) {
       value = value / 100.0
     }
 

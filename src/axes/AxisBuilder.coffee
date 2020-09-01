@@ -744,7 +744,7 @@ module.exports = class AxisBuilder
     # TODO add xform support
 
   # Get a string (or React DOM actually) representation of an axis value
-  formatValue: (axis, value, locale) ->
+  formatValue: (axis, value, locale, legacyPercentFormat) ->
     if not value?
       return axis.nullLabel or "None"
 
@@ -776,9 +776,9 @@ module.exports = class AxisBuilder
         return value
       when "number"
         num = parseFloat(value)
-        return formatValue(type, num, axis.format)
+        return formatValue(type, num, axis.format, locale, legacyPercentFormat)
       when "geometry"
-        return formatValue(type, value, axis.format)
+        return formatValue(type, value, axis.format, locale, legacyPercentFormat)
       when "text[]"
         # Parse if string
         if _.isString(value)

@@ -10,4 +10,7 @@ export declare function canFormatType(type: LiteralType): boolean;
 export declare function getFormatOptions(type: LiteralType): FormatOption[] | null;
 /** Get default format */
 export declare function getDefaultFormat(type: LiteralType): string;
-export declare function formatValue(type: LiteralType, value: any, format: string | null | undefined, locale?: string): string;
+/** Format a value of a specified type as a string. For historical reasons,
+ * LayeredCharts multiply by 100 before adding the % sign. Set legacyPercentFormat to true to replicate
+ */
+export declare function formatValue(type: LiteralType, value: any, format: string | null | undefined, locale?: string, legacyPercentFormat?: boolean): string;
