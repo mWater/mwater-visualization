@@ -55,7 +55,7 @@ module.exports = class TextLiteralComponent extends React.Component
           op: "~*"
           exprs: [
             exprCompiler.compileExpr(expr: @props.expr, tableAlias: "{alias}")
-            "^" + escapeRegex(input)  # Don't use _.escapeRegExp as adds weird backslashes that postgres doesn't like
+            escapeRegex(input)  # Don't use _.escapeRegExp as adds weird backslashes that postgres doesn't like
           ]
         }
       })
