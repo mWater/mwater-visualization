@@ -48,30 +48,34 @@ module.exports = class TextLiteralComponent extends React.Component
 
     # Add filter for input (simple if just text)
     if exprType == "text"
-      filters = (@props.filters or []).concat({
-        table: @props.expr.table
-        jsonql: {
-          type: "op"
-          op: "~*"
-          exprs: [
-            exprCompiler.compileExpr(expr: @props.expr, tableAlias: "{alias}")
-            escapeRegex(input)  # Don't use _.escapeRegExp as adds weird backslashes that postgres doesn't like
-          ]
-        }
-      })
+      filters = (@props.filters or [])
+      if input
+        filters.push({
+          table: @props.expr.table
+          jsonql: {
+            type: "op"
+            op: "~*"
+            exprs: [
+              exprCompiler.compileExpr(expr: @props.expr, tableAlias: "{alias}")
+              escapeRegex(input)  # Don't use _.escapeRegExp as adds weird backslashes that postgres doesn't like
+            ]
+          }
+        })
     else if exprType == "text[]"
       # Special filter for text[]
-      filters = (@props.filters or []).concat({
-        table: "_values_"
-        jsonql: {
-          type: "op"
-          op: "~*"
-          exprs: [
-            { type: "field", tableAlias: "{alias}", column: "value" }
-            "^" + escapeRegex(input)  # Don't use _.escapeRegExp as adds weird backslashes that postgres doesn't like
-          ]
-        }
-      })
+      filters = (@props.filters or [])
+      if input
+        filters.push({
+          table: "_values_"
+          jsonql: {
+            type: "op"
+            op: "~*"
+            exprs: [
+              { type: "field", tableAlias: "{alias}", column: "value" }
+              "^" + escapeRegex(input)  # Don't use _.escapeRegExp as adds weird backslashes that postgres doesn't like
+            ]
+          }
+        })
     else
       return
 
