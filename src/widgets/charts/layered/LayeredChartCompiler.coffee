@@ -7,7 +7,9 @@ injectTableAlias = require('mwater-expressions').injectTableAlias
 d3Format = require 'd3-format'
 
 commaFormatter = d3Format.format(",")
-pieLabelValueFormatter = (value, ratio, id) => "#{d3Format.format(",")(value)} (#{d3Format.format('.1%')(ratio)})"
+pieLabelValueFormatter = (format) -> 
+  return (value, ratio, id) -> 
+    return if format[id] then "#{format[id](value)} (#{d3Format.format('.1%')(ratio)})" else "#{d3Format.format(",")(value)} (#{d3Format.format('.1%')(ratio)})"
 labelValueFormatter = (format) -> 
   return (value, ratio, id) -> 
     return if format[id] then format[id](value) else value
@@ -108,7 +110,6 @@ module.exports = class LayeredChartCompiler
   #   locale: locale to use
   createChartOptions: (options) ->
     c3Data = @compileData(options.design, options.data, options.locale)
-
     # Pick first format to use as the tick formatter
     tickFormatter = if _.keys(c3Data.format).length > 0 then c3Data.format[_.keys(c3Data.format)[0]] else commaFormatter
 
@@ -151,13 +152,13 @@ module.exports = class LayeredChartCompiler
       size: { width: options.width, height: options.height }
       pie: { 
         label: {
-          format: if options.design.labels then pieLabelValueFormatter
+          format: if options.design.labels then pieLabelValueFormatter(c3Data.format)
         }
         expand: false # Don't expand/contract
       } 
       donut: { 
         label: {
-          format: if options.design.labels then pieLabelValueFormatter
+          format: if options.design.labels then pieLabelValueFormatter(c3Data.format)
         }
         expand: false # Don't expand/contract
       } 
@@ -169,7 +170,7 @@ module.exports = class LayeredChartCompiler
       if options.design.type == "pie" or options.design.type == "donut"
         chartDesign.tooltip = {
           format: {
-            value: pieLabelValueFormatter
+            value: pieLabelValueFormatter(c3Data.format)
           }
         }
       else
@@ -257,7 +258,7 @@ module.exports = class LayeredChartCompiler
           types[series] = @getLayerType(design, layerIndex)
           names[series] = @axisBuilder.formatValue(layer.axes.color, row.color, locale, true)
           dataMap[series] = { layerIndex: layerIndex, row: row }
-
+          format[series] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
           # Get specific color if present
           color = @axisBuilder.getValueColor(layer.axes.color, row.color)
           #color = color or layer.color
@@ -274,6 +275,7 @@ module.exports = class LayeredChartCompiler
           # Name is name of entire layer
           names[series] = layer.name or (if design.layers.length == 1 then "Value" else "Series #{layerIndex+1}") 
           dataMap[series] = { layerIndex: layerIndex, row: row }
+          format[series] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
 
           # Set color if present
           if layer.color
@@ -640,6 +642,7 @@ module.exports = class LayeredChartCompiler
           if column[i] > 0
             column[i] = Math.round(100 * column[i] / xtotals[i] * 10) / 10
 
+    console.log(format)
     return {
       columns: columns
       types: types
