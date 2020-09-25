@@ -115,7 +115,7 @@ class TableContentsComponent extends React.Component
       # Convert to node based on type
       switch exprType
         when "text"
-          node = R(Linkify, null, value)
+          node = R(Linkify, { properties: { target: '_blank' }}, value)
         when "number", "geometry"
           node = formatValue(exprType, value, column.format)
         when "boolean", "enum", "enumset", "text[]"

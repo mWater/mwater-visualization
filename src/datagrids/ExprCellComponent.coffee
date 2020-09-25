@@ -58,7 +58,7 @@ module.exports = class ExprCellComponent extends React.Component
         # Convert to node based on type
         switch @props.exprType
           when "text"
-            node = R(Linkify, null, value)
+            node = R(Linkify, { properties: { target: '_blank' }}, value)
           when "boolean", "enum", "enumset", "text[]"
             node = exprUtils.stringifyExprLiteral(@props.expr, value, @props.locale)
           when "date"
