@@ -129,19 +129,7 @@ export class MWaterContextComponent extends React.Component<{
   addLayerElementFactory?: any              
 }> {}
 
-/** Loads a schema and data source that is specific to mWater server */
-export function mWaterLoader(options: {
-  /** e.g. "https://api.mwater.co/v3/". required */
-  apiUrl: string
-  /** client id if logged in. optional */
-  client?: string
-  /** share if using a share to get schema. optional */
-  share?: string
-  /** Load schema as a specific user (for shared dashboards, etc). optional */
-  asUser?: string
-  /** Extra tables to load in schema. Forms are not loaded by default as they are too many */
-  extraTables: string[]
-}, callback: (error: any, config: { schema: Schema, dataSource: DataSource }) => void): void
+export { default as mWaterLoader } from './mWaterLoader'
 
 export class DirectWidgetDataSource {
   constructor(options: {

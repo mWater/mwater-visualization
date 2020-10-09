@@ -12,6 +12,7 @@ querystring = require 'querystring'
 #   share: share if using a share to get schema. optional
 #   asUser: Load schema as a specific user (for shared dashboards, etc). optional
 #   extraTables: Extra tables to load in schema. Forms are not loaded by default as they are too many
+#   localCaching: default true. False to disable local caching of queries
 # callback is called with (error, config) where config is { schema, dataSource }
 module.exports = (options, callback) ->
   # Load schema
@@ -29,7 +30,10 @@ module.exports = (options, callback) ->
 
   $.getJSON url, (schemaJson) =>
     schema = new Schema(schemaJson)
-    dataSource = new MWaterDataSource(options.apiUrl, options.client, { serverCaching: false, localCaching: true })
+    dataSource = new MWaterDataSource(options.apiUrl, options.client, { 
+      serverCaching: false, 
+      localCaching: (if options.localCaching? then options.localCaching else true)
+    })
 
     callback(null, {
       schema: schema
