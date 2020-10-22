@@ -72,8 +72,9 @@ export class Widget {
     singleRowTable?: string
     /** Called with (tableId, rowId) when item is clicked **/
     onRowClick?: (tableId: string, rowId: any) => void
-    /** optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget **/
-    namedStrings?: any // TODO
+    /** Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget */
+    namedStrings?: { [key: string]: string }
+
   }): ReactElement<any>
 
 // # Get the data that the widget needs. This will be called on the server, typically.
