@@ -144,7 +144,7 @@ module.exports = class TableChart extends Chart
     }
 
     # Determine if any aggregate
-    isAggr = _.any(design.columns, (column) => axisBuilder.isAxisAggr(column.textAxis)) or _.any(design.orderings, (ordering) => axisBuilder.isAxisAggr(ordering.textAxis))
+    isAggr = _.any(design.columns, (column) => axisBuilder.isAxisAggr(column.textAxis)) or _.any(design.orderings, (ordering) => axisBuilder.isAxisAggr(ordering.axis))
 
     # For each column
     for colNum in [0...design.columns.length]
