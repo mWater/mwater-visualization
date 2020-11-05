@@ -40,6 +40,21 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     })
   }
 
+  autoselectAdminRegionExpr = (table: string, regionsTable: string | null): Expr =>  {
+    // Autoselect region if present
+    let adminRegionExpr: Expr = null
+
+    for (let column of this.props.schema.getColumns(table)) {
+      if ((column.type === "join") && (column.join!.type === "n-1") && (column.join!.toTable === regionsTable)) {
+        return { type: "field", table, column: column.id }
+      }
+      if ((column.type === "id") && (column.idTable === regionsTable)) {
+        return { type: "field", table, column: column.id }
+      }
+    }
+    return null
+  }
+
   handleTableChange = (table: string | null) => {
     // Autoselect region if present
     let adminRegionExpr: Expr = null
@@ -47,12 +62,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     const regionsTable = this.props.design.regionsTable || "admin_regions"
 
     if (table) {
-      for (let column of this.props.schema.getColumns(table)) {
-        if ((column.type === "join") && (column.join!.type === "n-1") && (column.join!.toTable === regionsTable)) {
-          adminRegionExpr = { type: "field", table, column: column.id };
-          break;
-        }
-      }
+      adminRegionExpr = this.autoselectAdminRegionExpr(table, regionsTable)
     }
   
     this.update((d) => { 
@@ -73,13 +83,13 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     this.update((d) => { d.axes.color = axis })
   } 
 
-  handleRegionsTableChange = (regionsTable: string | null) => {
+  handleRegionsTableChange = (regionsTable: string) => {
     this.update((d) => {
-      d.regionsTable = regionsTable
+      d.regionsTable = regionsTable == "admin_regions" ? null : regionsTable
       d.scope = null
       d.scopeLevel = null
       d.detailLevel = 0,
-      d.adminRegionExpr = null
+      d.adminRegionExpr = this.props.design.table ? this.autoselectAdminRegionExpr(this.props.design.table, regionsTable) : null
     }) 
   }
 
@@ -137,16 +147,18 @@ export default class ChoroplethLayerDesigner extends React.Component<{
 
   renderRegionsTable() {
     let options = _.map(_.filter(this.props.schema.getTables(), table => table.id.startsWith("regions.")), table => ({ value: table.id, label: table.name.en }))
+
+    const regionsTable = this.props.design.regionsTable || "admin_regions"
+
     return (
       <div className="form-group">
         <label className="text-muted">Regions Type</label>
         <div style={{ marginLeft: 8 }}>
-          <ui.Select
-            value={this.props.design.regionsTable}
-            onChange={this.handleRegionsTableChange}
-            options={options}
-            nullLabel="Administrative Regions"
-          />
+          <select value={regionsTable} onChange={ev => this.handleRegionsTableChange(ev.target.value)} className="form-control">
+            <option value="admin_regions">Administrative Regions (from mWater global database)</option>
+            <option disabled>── Custom regions (special regions uploaded for specific purposes) ──</option>
+            { options.map(opt => (<option value={opt.value}>{opt.label}</option>))}
+          </select>
         </div> 
       </div>
     )

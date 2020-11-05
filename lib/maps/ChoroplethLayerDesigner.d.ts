@@ -13,11 +13,12 @@ export default class ChoroplethLayerDesigner extends React.Component<{
 }> {
     update(mutation: (d: ChoroplethLayerDesign) => void): void;
     handleScopeAndDetailLevelChange: (scope: string | number | null, scopeLevel: number | null, detailLevel: number) => void;
+    autoselectAdminRegionExpr: (table: string, regionsTable: string | null) => Expr;
     handleTableChange: (table: string | null) => void;
     handleColorChange: (color: string | null) => void;
     handleFilterChange: (filter: Expr) => void;
     handleColorAxisChange: (axis: Axis) => void;
-    handleRegionsTableChange: (regionsTable: string | null) => void;
+    handleRegionsTableChange: (regionsTable: string) => void;
     handleAdminRegionExprChange: (expr: Expr) => void;
     handleRegionModeChange: (regionMode: "plain" | "indirect" | "direct") => void;
     handleFillOpacityChange: (fillOpacity: number) => void;
