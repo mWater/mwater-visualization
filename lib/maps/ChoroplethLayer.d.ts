@@ -19,7 +19,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
      */
     getJsonQLCss(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): LayerDefinition;
     createJsonQL(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQL;
-    createCss(design: any, schema: Schema, filters: JsonQLFilter[]): string;
+    createCss(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): string;
     /**
      * Called when the interactivity grid is clicked.
      * arguments:

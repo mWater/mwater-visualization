@@ -75,6 +75,10 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     this.update((d) => { d.color = color })
   }
 
+  handleBorderColorChange = (color: string | null) => {
+    this.update((d) => { d.borderColor = color })
+  }
+
   handleFilterChange = (filter: Expr) => {
     this.update((d) => { d.filter = filter })
   }
@@ -191,7 +195,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
             table={this.props.design.table}
             types={["id"]}
             idTable={regionsTable}
-            value={this.props.design.adminRegionExpr}
+            value={this.props.design.adminRegionExpr || null}
           />
         </div>
       </div>
@@ -388,6 +392,22 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     );
   }
 
+  renderBorderColor() {
+    return R('div', {className: "form-group"},
+      R('label', {className: "text-muted"}, 
+        R('span', {className: "glyphicon glyphicon glyphicon-tint"}),
+        "Border Color"),
+
+      R('div', null, 
+        R(ColorComponent, {
+          color: this.props.design.borderColor || "#000",
+          onChange: this.handleBorderColorChange
+        }
+      )
+      )
+    )   
+  }
+
   renderFilter() {
     // If not in indirect mode with table, hide
     if (this.props.design.regionMode !== "indirect" || !this.props.design.table) {
@@ -445,6 +465,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
       this.renderColor(),
       this.renderColorAxis(),
       this.renderFillOpacity(),
+      this.renderBorderColor(),
       this.renderFilter(),
       this.renderPopup(),
       R(ZoomLevelsComponent, {design: this.props.design, onDesignChange: this.props.onDesignChange})

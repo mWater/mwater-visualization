@@ -23,20 +23,22 @@ export default interface ChoroplethLayerDesign {
     /** table to get data from for regionMode = "indirect" */
     table?: string | null;
     /** expression to get admin region id for calculations. Only if regionMode = "indirect" */
-    adminRegionExpr: Expr;
+    adminRegionExpr?: Expr;
     /** axes (see below) */
     axes: {
         /** color axis. If in region mode "indirect", aggregate on table, if in region mode "direct", from region table, non-aggregate */
-        color: Axis;
+        color?: Axis;
         /** overrides the nameLabels to display text on each region. If in region mode "indirect", aggregate on table, if in region mode "direct", from region table, non-aggregate */
-        label: Axis;
+        label?: Axis;
     };
     /** optional logical expression to filter by. Only when region mode is "indirect" */
-    filter: Expr;
+    filter?: Expr;
     /** default color (e.g. #FF8800). Color axis overrides. Only in plain mode */
     color?: string | null;
     /** opacity of fill of regions (0-1) */
     fillOpacity: number;
+    /** Border color (default to #000) */
+    borderColor?: string | null;
     /** true to display name labels on regions */
     displayNames: boolean;
     /** contains items: which is BlocksLayoutManager items. Will be displayed when the region is clicked. Only when region mode is "indirect" */

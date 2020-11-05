@@ -120,7 +120,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       ) as regions on regions.id = regions2._id
       where regions2.level = 2 and regions2.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
       */
-      const compiledAdminRegionExpr = exprCompiler.compileExpr({expr: design.adminRegionExpr, tableAlias: "innerquery"});
+      const compiledAdminRegionExpr = exprCompiler.compileExpr({expr: design.adminRegionExpr || null, tableAlias: "innerquery"});
 
       // Create inner query
       const innerQuery: JsonQLQuery = {
@@ -313,10 +313,10 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     throw new Error(`Unsupported regionMode ${design.regionMode}`)
   }
 
-  createCss(design: any, schema: Schema, filters: JsonQLFilter[]): string {
+  createCss(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): string {
     let css = `\
 #layer0 {
-  line-color: #000;
+  line-color: ${design.borderColor || "#000"};
   line-width: 1.5;
   line-opacity: 0.6;
   polygon-opacity: ` + design.fillOpacity + `;
@@ -342,7 +342,7 @@ opacity: ` +  design.fillOpacity + `;
     if (design.axes.color && design.axes.color.colorMap) {
       for (let item of design.axes.color.colorMap) {
         // If invisible
-        if (_.includes(design.axes.color.excludedValues, item.value)) {
+        if (_.includes(design.axes.color.excludedValues || [], item.value)) {
           css += `#layer0 [color=${JSON.stringify(item.value)}] { line-color: transparent; polygon-opacity: 0; polygon-fill: transparent; }\n`;  
           if (design.displayNames) {
             css += `#layer0::labels [color=${JSON.stringify(item.value)}] { text-opacity: 0; text-halo-opacity: 0; }\n`;  
@@ -544,7 +544,7 @@ opacity: ` +  design.fillOpacity + `;
       name,
       dataSource,
       filters: _.compact(_filters),
-      axis: axisBuilder.cleanAxis({axis: design.axes.color, table: axisTable, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"}),
+      axis: axisBuilder.cleanAxis({axis: design.axes.color || null, table: axisTable, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"}),
       defaultColor: design.color,
       locale
     });
@@ -583,7 +583,7 @@ opacity: ` +  design.fillOpacity + `;
       }
 
       if (draft.regionMode === "indirect" && design.table) {
-        draft.adminRegionExpr = exprCleaner.cleanExpr(design.adminRegionExpr, { table: design.table, types: ["id"], idTable: regionsTable });
+        draft.adminRegionExpr = exprCleaner.cleanExpr(design.adminRegionExpr || null, { table: design.table, types: ["id"], idTable: regionsTable });
       }
       else {
         delete draft.adminRegionExpr
@@ -607,7 +607,7 @@ opacity: ` +  design.fillOpacity + `;
 
       // Filter is only for indirect
       if (draft.regionMode === "indirect" && design.table) {
-        draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table })
+        draft.filter = exprCleaner.cleanExpr(design.filter || null, { table: design.table })
       }
       else {
         delete draft.filter
@@ -635,17 +635,17 @@ opacity: ` +  design.fillOpacity + `;
         return "Missing admin region expr";
       }
 
-      error = axisBuilder.validateAxis({ axis: design.axes.color });
+      error = axisBuilder.validateAxis({ axis: design.axes.color || null });
       if (error) { return error; }
 
-      error = axisBuilder.validateAxis({ axis: design.axes.label });
+      error = axisBuilder.validateAxis({ axis: design.axes.label || null });
       if (error) { return error; }
     }
     else if (design.regionMode === "direct") {
-      error = axisBuilder.validateAxis({ axis: design.axes.color });
+      error = axisBuilder.validateAxis({ axis: design.axes.color || null });
       if (error) { return error; }
 
-      error = axisBuilder.validateAxis({ axis: design.axes.label });
+      error = axisBuilder.validateAxis({ axis: design.axes.label || null });
       if (error) { return error; }
     }
   
@@ -701,7 +701,7 @@ opacity: ` +  design.fillOpacity + `;
     }
 
     // Compile adminRegionExpr
-    const compiledAdminRegionExpr = exprCompiler.compileExpr({expr: design.adminRegionExpr, tableAlias: "innerquery"});
+    const compiledAdminRegionExpr = exprCompiler.compileExpr({expr: design.adminRegionExpr || null, tableAlias: "innerquery"});
 
     // Create inner query
     const innerQuery: JsonQLQuery = {

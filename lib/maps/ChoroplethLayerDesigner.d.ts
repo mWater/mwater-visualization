@@ -16,6 +16,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     autoselectAdminRegionExpr: (table: string, regionsTable: string | null) => Expr;
     handleTableChange: (table: string | null) => void;
     handleColorChange: (color: string | null) => void;
+    handleBorderColorChange: (color: string | null) => void;
     handleFilterChange: (filter: Expr) => void;
     handleColorAxisChange: (axis: Axis) => void;
     handleRegionsTableChange: (regionsTable: string) => void;
@@ -66,6 +67,9 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     }, HTMLElement> | null;
     renderColorAxis(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement> | null | undefined;
     renderFillOpacity(): React.DetailedReactHTMLElement<{
+        className: string;
+    }, HTMLElement>;
+    renderBorderColor(): React.DetailedReactHTMLElement<{
         className: string;
     }, HTMLElement>;
     renderFilter(): React.DetailedReactHTMLElement<{
