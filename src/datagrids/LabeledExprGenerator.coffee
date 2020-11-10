@@ -71,7 +71,33 @@ module.exports = class LabeledExprGenerator
       # Skip confidential data
       if column.confidential and not options.useConfidential
         return []
-        
+
+      if column.type == "id"
+        # Use id if that option is enabled
+        if options.useJoinIds
+          return [
+            {
+              expr: { type: "scalar", table: table, joins: [column.id], expr: { type: "id", table: column.join.toTable } }
+              label: createLabel(column)
+              joins: joins
+            }
+          ]
+        else # use code, full name, or name of dest table
+          joinColumn = @schema.getColumn(column.idTable, "code")
+          joinColumn = joinColumn or @schema.getColumn(column.idTable, "full_name")
+          joinColumn = joinColumn or @schema.getColumn(column.idTable, "name")
+          joinColumn = joinColumn or @schema.getColumn(column.idTable, "username")
+          if joinColumn
+            return [
+              {
+                expr: { type: "scalar", table: table, joins: [column.id], expr: { type: "field", table: column.idTable, column: joinColumn.id } }
+                label: createLabel(column)
+                joins: joins
+              }
+            ]
+          else
+            return []
+
       if column.type == "join"
         # If n-1, 1-1 join, create scalar
         if column.join.type in ["n-1", "1-1"]
