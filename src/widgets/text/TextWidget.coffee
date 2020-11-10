@@ -58,6 +58,10 @@ module.exports = class TextWidget extends Widget
 
       table = exprItem.expr.table
 
+      # If table doesn't exist, return null
+      if table and not schema.getTable(table)
+        return cb(null)
+
       exprCompiler = new ExprCompiler(schema)
       exprUtils = new ExprUtils(schema)
 
