@@ -65,23 +65,8 @@ module.exports = class DashboardComponent extends React.Component
     @state = { 
       undoStack: new UndoStack().push(props.design) 
       quickfiltersValues: props.quickfiltersValues
-      quickfiltersHeight: null   # Height of quickfilters
       editing: LayoutManager.createLayoutManager(props.design.layout).isEmpty(props.design.items) and props.onDesignChange?
     }
-
-  componentDidMount: -> 
-    @updateHeight()
-
-  componentDidUpdate: ->
-    @updateHeight()
-
-  updateHeight: ->
-    # Calculate quickfilters height
-    if @quickfilters 
-      if @state.quickfiltersHeight != @quickfilters.offsetHeight
-        @setState(quickfiltersHeight: @quickfilters.offsetHeight)
-    else
-      @setState(quickfiltersHeight: 0)
 
   # Get the values of the quick filters
   getQuickfilterValues: =>
@@ -240,13 +225,13 @@ module.exports = class DashboardComponent extends React.Component
         @renderEditingSwitch()
 
   renderTitleBar: ->
-    R 'div', style: { position: "absolute", top: 0, left: 0, right: 0, height: 40, padding: 4 },
+    R 'div', style: { height: 40, padding: 4 },
       R 'div', style: { float: "right" },
         @renderActionLinks()
       @props.titleElem
 
   renderQuickfilter: ->
-    R 'div', style: { position: "absolute", top: (if @props.hideTitleBar then 0 else 40), left: 0, right: 0 }, ref: ((c) => @quickfilters = c),
+    R 'div', style: { }, ref: ((c) => @quickfilters = c),
       R QuickfiltersComponent, {
         design: @props.design.quickfilters
         schema: @props.schema
@@ -268,14 +253,11 @@ module.exports = class DashboardComponent extends React.Component
     # Compile quickfilters
     filters = filters.concat(new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues, @props.quickfilterLocks))
 
-    R 'div', key: "view", style: { height: "100%", paddingTop: (if @props.hideTitleBar then 0 else 40) + (@state.quickfiltersHeight or 0), position: "relative" },
+    return R 'div', style: { display: "grid", gridTemplateRows: (if @props.hideTitleBar then "auto 1fr" else "auto auto 1fr"), height: "100%" },
       if not @props.hideTitleBar
         @renderTitleBar()
       @renderQuickfilter()
-      if @props.onDesignChange?
-        R SettingsModalComponent, { onDesignChange: @handleDesignChange, schema: @props.schema, dataSource: @props.dataSource, ref: (c) => @settings = c }
-
-      # Dashboard view requires width, so use auto size component to inject it
+      # Dashboard view requires width, so use auto size component to inject it. Set injectHeight: true to make 100% height
       R AutoSizeComponent, { injectWidth: true, injectHeight: true }, 
         (size) =>
           R DashboardViewComponent, {
@@ -291,4 +273,5 @@ module.exports = class DashboardComponent extends React.Component
             onRowClick: @props.onRowClick
             namedStrings: @props.namedStrings
           }
-      
+      if @props.onDesignChange?
+        R SettingsModalComponent, { onDesignChange: @handleDesignChange, schema: @props.schema, dataSource: @props.dataSource, ref: (c) => @settings = c }
