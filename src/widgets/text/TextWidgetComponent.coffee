@@ -20,7 +20,6 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
 
     width: PropTypes.number
     height: PropTypes.number
-    standardWidth: PropTypes.number
 
     singleRowTable: PropTypes.string  # Table that is filtered to have one row
     namedStrings: PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
@@ -86,6 +85,5 @@ module.exports = class TextWidgetComponent extends AsyncLoadComponent
           exprValues: exprValues
           width: @props.width
           height: @props.height
-          standardWidth: @props.standardWidth
           singleRowTable: @props.singleRowTable
           namedStrings: @props.namedStrings

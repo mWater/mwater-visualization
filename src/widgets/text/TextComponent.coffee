@@ -22,7 +22,6 @@ module.exports = class TextComponent extends React.Component
 
     width: PropTypes.number
     height: PropTypes.number
-    standardWidth: PropTypes.number
 
     singleRowTable: PropTypes.string  # Table that is filtered to have one row
     namedStrings: PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
@@ -93,15 +92,8 @@ module.exports = class TextComponent extends React.Component
       position: "relative"
     }
 
-    # Handle scaled case
-    if @props.standardWidth and @props.standardWidth != @props.width
-      style.width = @props.standardWidth
-      style.height = @props.height * (@props.standardWidth / @props.width)
-      style.transform = "scale(#{@props.width/@props.standardWidth}, #{@props.width/@props.standardWidth})"
-      style.transformOrigin = "0 0"
-    else
-      style.width = @props.width
-      style.height = @props.height
+    style.width = @props.width
+    style.height = @props.height
 
     return R 'div', null,
       @renderModals()

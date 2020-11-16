@@ -19,7 +19,6 @@ module.exports = class ChartViewComponent extends React.Component
 
     width: PropTypes.number
     height: PropTypes.number
-    standardWidth: PropTypes.number
 
     scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     filters: PropTypes.array  # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias }. Use injectAlias to correct
@@ -110,7 +109,6 @@ module.exports = class ChartViewComponent extends React.Component
           onScopeChange: @props.onScopeChange
           width: @props.width
           height: @props.height
-          standardWidth: @props.standardWidth
           onRowClick: @props.onRowClick
           filters: @props.filters
           })

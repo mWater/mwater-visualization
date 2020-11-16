@@ -28,7 +28,6 @@ module.exports = class DashboardViewComponent extends React.Component
     onDesignChange: PropTypes.func      # Leave unset for readonly
 
     width: PropTypes.number
-    standardWidth: PropTypes.number   # Width for scaling
 
     onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
     namedStrings: PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
@@ -41,9 +40,6 @@ module.exports = class DashboardViewComponent extends React.Component
 
     # Entry to scroll to initially when dashboard is loaded
     initialTOCEntryScroll: PropTypes.shape({ widgetId: PropTypes.string.isRequired, entryId: PropTypes.any })
-
-  @defaultProps:
-    standardWidth: 1440 # Standard width. Matches 8.5x11" paper with 0.5" margin at 192dpi
 
   @childContextTypes:
     locale: PropTypes.string
@@ -117,7 +113,7 @@ module.exports = class DashboardViewComponent extends React.Component
     # props are immutable in React 0.14+
     elem = R 'div', style: { transform: "scale(0.5)", transformOrigin: "top left" },
       R 'div', style: { width: 1440 }, 
-        R(DashboardViewComponent, _.extend({}, @props, { width: 1440, standardWidth: 1440, onDesignChange: null }))
+        R(DashboardViewComponent, _.extend({}, @props, { width: 1440, onDesignChange: null }))
     
     printer = new ReactElementPrinter()
     printer.print(elem, { delay: 5000 })
@@ -191,7 +187,6 @@ module.exports = class DashboardViewComponent extends React.Component
         onDesignChange: options.onDesignChange
         width: options.width
         height: options.height
-        standardWidth: options.standardWidth 
         onRowClick: @props.onRowClick
         namedStrings: @props.namedStrings
         tocEntries: tocEntries
@@ -213,7 +208,6 @@ module.exports = class DashboardViewComponent extends React.Component
 
       layoutManager.renderLayout({
         width: @props.width 
-        standardWidth: @props.standardWidth
         items: @props.design.items
         onItemsChange: if @props.onDesignChange? then @handleItemsChange
         style: @props.design.style

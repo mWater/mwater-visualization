@@ -20,7 +20,6 @@ module.exports = class LayeredChartViewComponent extends React.Component
 
     width: PropTypes.number.isRequired
     height: PropTypes.number.isRequired
-    standardWidth: PropTypes.number.isRequired
 
     scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
@@ -64,7 +63,6 @@ module.exports = class LayeredChartViewComponent extends React.Component
         dataSource: @props.dataSource
         exprValues: @props.data.header or {}
         width: @props.width
-        standardWidth: @props.standardWidth
 
   renderFooter: ->
     return R 'div', ref: ((c) => @footer = c),
@@ -75,7 +73,6 @@ module.exports = class LayeredChartViewComponent extends React.Component
         dataSource: @props.dataSource
         exprValues: @props.data.footer or {}
         width: @props.width
-        standardWidth: @props.standardWidth
 
   render: ->
     R 'div', style: { width: @props.width, height: @props.height },
@@ -88,7 +85,6 @@ module.exports = class LayeredChartViewComponent extends React.Component
           onDesignChange: @props.onDesignChange
           width: @props.width
           height: @props.height - @state.headerHeight - @state.footerHeight
-          standardWidth: @props.standardWidth
           scope: @props.scope
           onScopeChange: @props.onScopeChange
           locale: @context.locale
@@ -104,7 +100,6 @@ class C3ChartComponent extends React.Component
 
     width: PropTypes.number.isRequired
     height: PropTypes.number.isRequired
-    standardWidth: PropTypes.number.isRequired
 
     scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
@@ -273,15 +268,11 @@ class C3ChartComponent extends React.Component
     @chart.destroy()
 
   render: ->
-    scale = @props.width / @props.standardWidth
-    # Don't grow fonts as it causes overlap
-    scale = Math.min(scale, 1)
+    # # Don't grow fonts as it causes overlap TODO remove
+    # scale = Math.min(scale, 1)
+    # css = ".c3 svg { font-size: #{scale * 10}px; }\n"
+    # css += ".c3-legend-item { font-size: #{scale * 12}px; }\n"
+    # css += ".c3-chart-arc text { font-size: #{scale * 13}px; }\n"
+    # css += ".c3-title { font-size: #{scale * 14}px; }\n"
 
-    css = ".c3 svg { font-size: #{scale * 10}px; }\n"
-    css += ".c3-legend-item { font-size: #{scale * 12}px; }\n"
-    css += ".c3-chart-arc text { font-size: #{scale * 13}px; }\n"
-    css += ".c3-title { font-size: #{scale * 14}px; }\n"
-
-    R 'div', null,
-      R 'style', null, css
-      R 'div', ref: (c) => @chartDiv = c
+    R 'div', ref: (c) => @chartDiv = c

@@ -328,7 +328,6 @@ export default class GridLayer extends Layer<GridLayerDesign> {
   //             onDesignChange: null,
   //             width: options.width,
   //             height: options.height,
-  //             standardWidth: options.standardWidth
   //           });
   //         }
   //         });

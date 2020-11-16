@@ -68,7 +68,6 @@ module.exports = class GridLayoutManager extends LayoutManager
           R 'div', style: { position: "absolute", left: 20, top: 20, right: 20, bottom: 20 },
             R GridLayoutComponent, 
               width: options.width - 40 - 185
-              standardWidth: options.standardWidth - 40 - 185 # TODO 185? doc. needed?
               items: options.items
               onItemsChange: options.onItemsChange
               renderWidget: options.renderWidget
@@ -76,7 +75,6 @@ module.exports = class GridLayoutManager extends LayoutManager
       return R 'div', style: { position: "relative", height: "100%", width: options.width, padding: 20 },
         R GridLayoutComponent, 
           width: options.width - 40
-          standardWidth: options.standardWidth - 40
           items: options.items
           onItemsChange: options.onItemsChange
           renderWidget: options.renderWidget

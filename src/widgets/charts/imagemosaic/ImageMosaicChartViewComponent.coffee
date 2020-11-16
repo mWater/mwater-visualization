@@ -17,7 +17,6 @@ module.exports = class ImageMosaicChartViewComponent extends React.Component
 
     width: PropTypes.number
     height: PropTypes.number
-    standardWidth: PropTypes.number
 
     onRowClick: PropTypes.func # Called with (tableId, rowId) when item is clicked
 

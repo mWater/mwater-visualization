@@ -122,7 +122,6 @@ class BlocksDisplayComponent extends React.Component
               design: block.design
               onDesignChange: if @props.onItemsChange then (design) => @props.onItemsChange(blockUtils.updateBlock(@props.items, _.extend({}, block, design: design)))
               width: size.width
-              standardWidth: size.width
               height: if block.aspectRatio? then size.width / block.aspectRatio
             })
 

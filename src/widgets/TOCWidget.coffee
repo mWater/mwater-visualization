@@ -153,10 +153,9 @@ class TOCWidgetViewComponent extends React.Component
       when 2 then "solid 1px #ccc"
       when 3 then "solid 1px #888"
 
-    # Render in a standard width container and then scale up to ensure that widget always looks consistent
     R 'div', 
       style: { 
-        width: @props.standardWidth
+        width: @props.width
         height: @props.height
         border: border
         padding: 5

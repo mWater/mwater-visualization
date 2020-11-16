@@ -47,7 +47,7 @@ module.exports = class Chart
   #   design: design of the chart
   #   onDesignChange: when design changes
   #   data: results from queries
-  #   width, height, standardWidth: size of the chart view
+  #   width, height: size of the chart view
   #   scope: current scope of the view element
   #   onScopeChange: called when scope changes with new scope
   #   onRowClick: Called with (tableId, rowId) when item is clicked

@@ -172,7 +172,7 @@ module.exports = class LayeredChart extends Chart
   #   design: design of the chart
   #   onDesignChange: when design changes
   #   data: results from queries
-  #   width, height, standardWidth: size of the chart view
+  #   width, height: size of the chart view
   #   scope: current scope of the view element
   #   onScopeChange: called when scope changes with new scope
   createViewElement: (options) ->
@@ -188,7 +188,6 @@ module.exports = class LayeredChart extends Chart
 
       width: options.width
       height: options.height
-      standardWidth: options.standardWidth
 
       scope: options.scope
       onScopeChange: options.onScopeChange

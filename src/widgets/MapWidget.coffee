@@ -23,7 +23,6 @@ module.exports = class MapWidget extends Widget
   #  onDesignChange: called with new design. null/undefined for readonly
   #  width: width in pixels on screen
   #  height: height in pixels on screen
-  #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
   #  onRowClick: Called with (tableId, rowId) when item is clicked
   createViewElement: (options) ->
     return React.createElement(MapWidgetComponent,
@@ -38,7 +37,6 @@ module.exports = class MapWidget extends Widget
       onScopeChange: options.onScopeChange
       width: options.width
       height: options.height
-      standardWidth: options.standardWidth
       onRowClick: options.onRowClick
     )
 

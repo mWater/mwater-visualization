@@ -24,7 +24,6 @@ module.exports = class TextWidget extends Widget
   #  onDesignChange: called with new design. null/undefined for readonly
   #  width: width in pixels on screen
   #  height: height in pixels on screen
-  #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
   #  singleRowTable: optional table name of table that will be filtered to have a single row present. Widget designer should optionally account for this
   #  namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
   createViewElement: (options) ->
@@ -40,7 +39,6 @@ module.exports = class TextWidget extends Widget
       onDesignChange: options.onDesignChange
       width: options.width
       height: options.height
-      standardWidth: options.standardWidth
       singleRowTable: options.singleRowTable
       namedStrings: options.namedStrings
 

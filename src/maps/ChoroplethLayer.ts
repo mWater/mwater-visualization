@@ -480,7 +480,6 @@ opacity: ` +  design.fillOpacity + `;
               onDesignChange: null,
               width: options.width,
               height: options.height,
-              standardWidth: options.standardWidth
             });
           }
           });

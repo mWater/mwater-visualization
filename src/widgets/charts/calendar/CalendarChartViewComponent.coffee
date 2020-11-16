@@ -22,7 +22,6 @@ module.exports = class CalendarChartViewComponent extends React.Component
 
     width: PropTypes.number
     height: PropTypes.number
-    standardWidth: PropTypes.number
 
     scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details

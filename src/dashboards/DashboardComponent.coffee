@@ -288,7 +288,6 @@ module.exports = class DashboardComponent extends React.Component
             onDesignChange: if @state.editing then @props.onDesignChange
             filters: filters
             width: size.width
-            standardWidth: if @props.printScaling then 1440 else size.width
             onRowClick: @props.onRowClick
             namedStrings: @props.namedStrings
           }

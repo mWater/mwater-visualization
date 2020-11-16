@@ -289,7 +289,6 @@ module.exports = class MarkersLayer extends Layer
               onDesignChange: null
               width: options.width
               height: options.height
-              standardWidth: options.standardWidth
             })
           })
       else if not ev.event.originalEvent.shiftKey

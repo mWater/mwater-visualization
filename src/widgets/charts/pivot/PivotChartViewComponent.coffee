@@ -24,7 +24,6 @@ module.exports = class PivotChartViewComponent extends React.Component
     onDesignChange: PropTypes.func
 
     width: PropTypes.number.isRequired
-    standardWidth: PropTypes.number  # Deprecated
 
     scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
@@ -132,7 +131,6 @@ module.exports = class PivotChartViewComponent extends React.Component
         dataSource: @props.dataSource
         exprValues: @props.data.header or {}
         width: @props.width
-        standardWidth: @props.standardWidth
 
   renderFooter: ->
     return R 'div', style: { paddingLeft: 10, paddingRight: 10 },
@@ -143,7 +141,6 @@ module.exports = class PivotChartViewComponent extends React.Component
         dataSource: @props.dataSource
         exprValues: @props.data.footer or {}
         width: @props.width
-        standardWidth: @props.standardWidth
 
   renderEditSegmentModal: ->
     if not @state.editSegment

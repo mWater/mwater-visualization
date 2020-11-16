@@ -15,7 +15,6 @@ module.exports = class Widget
   #  onDesignChange: called with new design. null/undefined for readonly
   #  width: width in pixels on screen
   #  height: height in pixels on screen
-  #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
   #  singleRowTable: optional table name of table that will be filtered to have a single row present. Widget designer should optionally account for this
   #  onRowClick: Called with (tableId, rowId) when item is clicked
   #  namedStrings: optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget

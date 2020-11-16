@@ -8,7 +8,7 @@ LayoutManager = require '../LayoutManager'
 module.exports = class BlocksLayoutManager extends LayoutManager
   # Renders the layout as a react element
   # options:
-  #  width: width of layout (ignored here) TODO use for printing? standardWidth?
+  #  width: width of layout (ignored here) TODO use for printing?
   #  items: opaque items object that layout manager understands
   #  onItemsChange: Called when items changes
   #  renderWidget: called with ({ id:, type:, design:, onDesignChange:, width:, height:  })

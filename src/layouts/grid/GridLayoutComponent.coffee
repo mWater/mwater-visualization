@@ -9,7 +9,6 @@ LegoLayoutEngine = require './LegoLayoutEngine'
 module.exports = class GridLayoutComponent extends React.Component
   @propTypes:
     width: PropTypes.number.isRequired
-    standardWidth: PropTypes.number.isRequired  # TODO needed?
     items: PropTypes.any
     onItemsChange: PropTypes.func
     renderWidget: PropTypes.func.isRequired
@@ -50,6 +49,5 @@ module.exports = class GridLayoutComponent extends React.Component
         onItemsChange: @props.onItemsChange
         renderWidget: @props.renderWidget
         width: @props.width 
-        standardWidth: @props.standardWidth
       @renderPageBreaks(layoutEngine, layouts)
 

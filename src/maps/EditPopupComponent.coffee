@@ -84,7 +84,6 @@ module.exports = class EditPopupComponent extends React.Component
                 onDesignChange: options.onDesignChange
                 width: options.width
                 height: options.height
-                standardWidth: options.standardWidth
                 singleRowTable: @props.table
               })  
             })
