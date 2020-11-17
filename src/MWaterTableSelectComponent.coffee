@@ -158,11 +158,11 @@ class EditModeTableSelectComponent extends React.Component
       # Check if wildcard
       if extraTable.match(/\*$/)
         for table in @props.schema.getTables()
-          if table.id.startsWith(extraTable.substr(0, extraTable.length - 1))
+          if table.id.startsWith(extraTable.substr(0, extraTable.length - 1)) and not table.deprecated
             tables = _.union(tables, [table.id])
       else
         # Add if exists
-        if @props.schema.getTable(extraTable)
+        if @props.schema.getTable(extraTable) and not table.deprecated
           tables = _.union(tables, [extraTable])
 
     # Sort by name
