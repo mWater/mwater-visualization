@@ -15,6 +15,8 @@ QuickfilterCompiler = require '../quickfilter/QuickfilterCompiler'
 SettingsModalComponent = require './SettingsModalComponent'
 LayoutManager = require '../layouts/LayoutManager'
 DashboardUpgrader = require './DashboardUpgrader'
+LayoutOptionsComponent = require('./LayoutOptionsComponent').LayoutOptionsComponent
+ModalWindowComponent = require 'react-library/lib/ModalWindowComponent'
 
 # Dashboard component that includes an action bar at the top
 # Manages undo stack and quickfilter value
@@ -66,6 +68,7 @@ module.exports = class DashboardComponent extends React.Component
       undoStack: new UndoStack().push(props.design) 
       quickfiltersValues: props.quickfiltersValues
       editing: LayoutManager.createLayoutManager(props.design.layout).isEmpty(props.design.items) and props.onDesignChange?
+      layoutOptionsOpen: false
     }
 
   # Get the values of the quick filters
@@ -118,6 +121,9 @@ module.exports = class DashboardComponent extends React.Component
 
   handleToggleEditing: =>
     @setState(editing: not @state.editing)
+
+  handleOpenLayoutOptions: =>
+    @setState(layoutOptionsOpen: true)
 
   handleRefreshData: =>
     @props.dataSource.clearCache?()
@@ -180,15 +186,9 @@ module.exports = class DashboardComponent extends React.Component
        content
 
   renderStyle: ->
-    return R 'div', key: "style", className: "btn-group",
-      R 'button', type: "button", "data-toggle": "dropdown", className: "btn btn-link btn-sm dropdown-toggle",
-        R 'span', className: "fa fa-th-large"
-        " Layout "
-        R 'span', className: "caret"
-      R 'div', className: "dropdown-menu dropdown-menu-right list-group", style: { padding: 0, zIndex: 10000, width: 300 },
-        @renderStyleItem("default")
-        @renderStyleItem("greybg")
-        @renderStyleItem("story")
+    return R 'button', type: "button", key: "style", className: "btn btn-link btn-sm", onClick: @handleOpenLayoutOptions,
+      R 'span', className: "fa fa-mobile"
+      " Layout "
 
   renderActionLinks: ->
     R 'div', null,
@@ -253,21 +253,41 @@ module.exports = class DashboardComponent extends React.Component
     # Compile quickfilters
     filters = filters.concat(new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues, @props.quickfilterLocks))
 
+    dashboardView = R DashboardViewComponent, {
+      schema: @props.schema
+      dataSource: @props.dataSource
+      dashboardDataSource: @props.dashboardDataSource
+      ref: @refDashboardView
+      design: @props.design
+      onDesignChange: if @state.editing then @props.onDesignChange
+      filters: filters
+      onRowClick: @props.onRowClick
+      namedStrings: @props.namedStrings
+    }
+
+    readonlyDashboardView = R DashboardViewComponent, {
+      schema: @props.schema
+      dataSource: @props.dataSource
+      dashboardDataSource: @props.dashboardDataSource
+      ref: @refDashboardView
+      design: @props.design
+      filters: filters
+      onRowClick: @props.onRowClick
+      namedStrings: @props.namedStrings
+    }
+
     return R 'div', style: { display: "grid", gridTemplateRows: (if @props.hideTitleBar then "auto 1fr" else "auto auto 1fr"), height: "100%" },
       if not @props.hideTitleBar
         @renderTitleBar()
       @renderQuickfilter()
-      R DashboardViewComponent, {
-        schema: @props.schema
-        dataSource: @props.dataSource
-        dashboardDataSource: @props.dashboardDataSource
-
-        ref: @refDashboardView
-        design: @props.design
-        onDesignChange: if @state.editing then @props.onDesignChange
-        filters: filters
-        onRowClick: @props.onRowClick
-        namedStrings: @props.namedStrings
-      }
+      dashboardView
       if @props.onDesignChange?
         R SettingsModalComponent, { onDesignChange: @handleDesignChange, schema: @props.schema, dataSource: @props.dataSource, ref: (c) => @settings = c }
+      if @state.layoutOptionsOpen
+        R ModalWindowComponent, isOpen: true, outerPadding: 10, innerPadding: 10,
+          R LayoutOptionsComponent, {
+            design: @props.design
+            onDesignChange: @props.onDesignChange
+            onClose: () => @setState(layoutOptionsOpen: false)
+          }, readonlyDashboardView
+

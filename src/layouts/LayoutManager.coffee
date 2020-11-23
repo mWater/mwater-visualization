@@ -7,6 +7,7 @@ module.exports = class LayoutManager
   #  onItemsChange: Called when items changes
   #  renderWidget: called with ({ id:, type:, design:, onDesignChange:, width:, height:  })
   #  style: style to use for layout. null for default
+  #  layoutOptions: layout options to use
   #  disableMaps: true to disable maps
   renderLayout: (options) -> null
 

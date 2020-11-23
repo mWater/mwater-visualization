@@ -14,6 +14,7 @@ blockUtils = require './blockUtils'
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
 HorizontalBlockComponent = require './HorizontalBlockComponent'
+shouldCollapseColumns = require('../../dashboards/layoutOptions').shouldCollapseColumns
 
 ###
 Renders the complete layout of the blocks and also optionally a palette to the left
@@ -25,6 +26,7 @@ class BlocksDisplayComponent extends React.Component
     onItemsChange: PropTypes.func
 
     style: PropTypes.string   # Stylesheet to use. null for default
+    layoutOptions: PropTypes.object.isRequired # layout options to use
 
     # Renders a widget. Passed (options)
     #  id: id of widget
@@ -64,7 +66,7 @@ class BlocksDisplayComponent extends React.Component
     items = blockUtils.cleanBlock(items)
     @props.onItemsChange(items)
 
-  renderBlock: (block) =>
+  renderBlock: (block, collapseColumns = false) =>
     elem = null
 
     switch block.type
@@ -72,6 +74,7 @@ class BlocksDisplayComponent extends React.Component
         return R RootBlockComponent, 
           key: block.id 
           block: block 
+          collapseColumns: collapseColumns
           renderBlock: @renderBlock
           onBlockDrop: if @props.onItemsChange? then @handleBlockDrop
           onBlockRemove: if @props.onItemsChange? then @handleBlockRemove
@@ -80,6 +83,7 @@ class BlocksDisplayComponent extends React.Component
         return R VerticalBlockComponent, 
           key: block.id 
           block: block 
+          collapseColumns: collapseColumns
           renderBlock: @renderBlock
           onBlockDrop: if @props.onItemsChange? then @handleBlockDrop
           onBlockRemove: if @props.onItemsChange? then @handleBlockRemove
@@ -88,6 +92,7 @@ class BlocksDisplayComponent extends React.Component
         return R HorizontalBlockComponent, 
           key: block.id 
           block: block 
+          collapseColumns: collapseColumns
           renderBlock: @renderBlock
           onBlockDrop: if @props.onItemsChange? then @handleBlockDrop
           onBlockRemove: if @props.onItemsChange? then @handleBlockRemove
@@ -205,6 +210,23 @@ class BlocksDisplayComponent extends React.Component
             onClipboardChange: @props.onClipboardChange
             cantPasteMessage: @props.cantPasteMessage
 
+  # Creates css for styles based on width
+  createResponsiveStyles: (width) ->
+    # if width < 900
+    #   return '''
+    #     /* Fill screen when small */
+    #     .mwater-visualization-horizontal-block-item {
+    #       width: 100% !important;
+    #     }
+
+    #     /* Hide spacers when small */
+    #     .mwater-visualization-block-spacer {
+    #       display: none;
+    #     }
+    #   '''
+
+    return ""
+
   render: ->
     if @props.onItemsChange
       return R 'div', style: { width: "100%", height: "100%", overflow: "hidden", position: "relative" }, 
@@ -213,15 +235,18 @@ class BlocksDisplayComponent extends React.Component
           R 'div', key: "inner", className: "mwater-visualization-block-parent-inner mwater-visualization-block-parent-inner-#{@props.style or "default"}",
             @renderBlock(@props.items)
     else
-      return R 'div', style: { width: "100%", height: "100%", overflowX: "auto" }, className: "mwater-visualization-block-parent-outer mwater-visualization-block-parent-outer-#{@props.style or "default"} mwater-visualization-block-viewing",
-        R 'div', key: "inner", className: "mwater-visualization-block-parent-inner mwater-visualization-block-parent-inner-#{@props.style or "default"}",
-          @renderBlock(@props.items)
+      return R AutoSizeComponent, { injectWidth: true, injectHeight: true }, 
+        (size) => 
+          R 'div', style: { width: "100%", height: "100%", overflowX: "auto" }, className: "mwater-visualization-block-parent-outer mwater-visualization-block-parent-outer-#{@props.style or "default"} mwater-visualization-block-viewing",
+            R 'div', key: "inner", className: "mwater-visualization-block-parent-inner mwater-visualization-block-parent-inner-#{@props.style or "default"}",
+              @renderBlock(@props.items, shouldCollapseColumns(@props.layoutOptions, size.width))
 
 module.exports = BlocksDisplayComponent
 
 class RootBlockComponent extends React.Component
   @propTypes:
     block: PropTypes.object.isRequired
+    collapseColumns: PropTypes.bool
     renderBlock: PropTypes.func.isRequired
     onBlockDrop: PropTypes.func # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
     onBlockRemove: PropTypes.func # Called with (block) when block is removed
@@ -229,7 +254,7 @@ class RootBlockComponent extends React.Component
   render: ->
     elem = R 'div', key: "root",
       _.map @props.block.blocks, (block) =>
-        @props.renderBlock(block)
+        @props.renderBlock(block, @props.collapseColumns)
 
     # If draggable
     if @props.onBlockDrop?
@@ -245,6 +270,7 @@ class RootBlockComponent extends React.Component
 class VerticalBlockComponent extends React.Component
   @propTypes:
     block: PropTypes.object.isRequired
+    collapseColumns: PropTypes.bool
     renderBlock: PropTypes.func.isRequired
     onBlockDrop: PropTypes.func # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
     onBlockRemove: PropTypes.func # Called with (block) when block is removed
@@ -252,6 +278,6 @@ class VerticalBlockComponent extends React.Component
   render: ->
     R 'div', null,
       _.map @props.block.blocks, (block) =>
-        @props.renderBlock(block)
+        @props.renderBlock(block, @props.collapseColumns)
 
 

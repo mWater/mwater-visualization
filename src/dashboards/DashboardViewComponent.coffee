@@ -15,6 +15,7 @@ WidgetScoper = require '../widgets/WidgetScoper'
 ReactElementPrinter = require 'react-library/lib/ReactElementPrinter'
 LayoutManager = require '../layouts/LayoutManager'
 WidgetScopesViewComponent = require '../widgets/WidgetScopesViewComponent'
+getLayoutOptions = require('./layoutOptions').getLayoutOptions
 
 # Displays a dashboard, handling removing of widgets. No title bar or other decorations.
 # Handles scoping and stores the state of scope
@@ -209,6 +210,7 @@ module.exports = class DashboardViewComponent extends React.Component
         items: @props.design.items
         onItemsChange: if @props.onDesignChange? then @handleItemsChange
         style: @props.design.style
+        layoutOptions: getLayoutOptions(@props.design)
         renderWidget: renderWidget
         clipboard: clipboardContents?.block
         onClipboardChange: @handleClipboardChange
