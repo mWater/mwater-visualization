@@ -214,8 +214,8 @@ class BlocksDisplayComponent extends React.Component
             @renderBlock(@props.items)
     else
       return R 'div', style: { width: "100%", height: "100%", overflowX: "auto" }, className: "mwater-visualization-block-parent-outer mwater-visualization-block-parent-outer-#{@props.style or "default"} mwater-visualization-block-viewing",
-          R 'div', key: "inner", className: "mwater-visualization-block-parent-inner mwater-visualization-block-parent-inner-#{@props.style or "default"}",
-            @renderBlock(@props.items)
+        R 'div', key: "inner", className: "mwater-visualization-block-parent-inner mwater-visualization-block-parent-inner-#{@props.style or "default"}",
+          @renderBlock(@props.items)
 
 module.exports = BlocksDisplayComponent
 

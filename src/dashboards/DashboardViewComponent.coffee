@@ -27,8 +27,6 @@ module.exports = class DashboardViewComponent extends React.Component
     design: PropTypes.object.isRequired
     onDesignChange: PropTypes.func      # Leave unset for readonly
 
-    width: PropTypes.number
-
     onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
     namedStrings: PropTypes.object # Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
@@ -200,6 +198,7 @@ module.exports = class DashboardViewComponent extends React.Component
     style = {
       height: "100%"
       position: "relative"
+      overflow: "hidden"  # Prevent this block from taking up too much space. Scrolling handled by layout manager
     }
 
     # Render widget container
@@ -207,7 +206,6 @@ module.exports = class DashboardViewComponent extends React.Component
       @renderScopes()
 
       layoutManager.renderLayout({
-        width: @props.width 
         items: @props.design.items
         onItemsChange: if @props.onDesignChange? then @handleItemsChange
         style: @props.design.style

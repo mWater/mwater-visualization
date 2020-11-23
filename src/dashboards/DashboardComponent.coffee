@@ -257,21 +257,17 @@ module.exports = class DashboardComponent extends React.Component
       if not @props.hideTitleBar
         @renderTitleBar()
       @renderQuickfilter()
-      # Dashboard view requires width, so use auto size component to inject it. Set injectHeight: true to make 100% height
-      R AutoSizeComponent, { injectWidth: true, injectHeight: true }, 
-        (size) =>
-          R DashboardViewComponent, {
-            schema: @props.schema
-            dataSource: @props.dataSource
-            dashboardDataSource: @props.dashboardDataSource
+      R DashboardViewComponent, {
+        schema: @props.schema
+        dataSource: @props.dataSource
+        dashboardDataSource: @props.dashboardDataSource
 
-            ref: @refDashboardView
-            design: @props.design
-            onDesignChange: if @state.editing then @props.onDesignChange
-            filters: filters
-            width: size.width
-            onRowClick: @props.onRowClick
-            namedStrings: @props.namedStrings
-          }
+        ref: @refDashboardView
+        design: @props.design
+        onDesignChange: if @state.editing then @props.onDesignChange
+        filters: filters
+        onRowClick: @props.onRowClick
+        namedStrings: @props.namedStrings
+      }
       if @props.onDesignChange?
         R SettingsModalComponent, { onDesignChange: @handleDesignChange, schema: @props.schema, dataSource: @props.dataSource, ref: (c) => @settings = c }
