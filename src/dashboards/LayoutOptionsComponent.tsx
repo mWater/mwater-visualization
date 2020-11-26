@@ -1,8 +1,21 @@
+import { number } from "prop-types"
 import React from "react"
 import { useState } from "react"
-import { FormGroup, Toggle } from "react-library/lib/bootstrap"
+import { FormGroup, Select, Toggle } from "react-library/lib/bootstrap"
 import { DashboardDesign } from "./DashboardDesign"
-import { BlocksLayoutOptions, getDefaultLayoutOptions, getLayoutOptions, sampleWidthsByBucket, WidthBucket } from "./layoutOptions"
+import { BlocksLayoutOptions, DashboardTheme, getDefaultLayoutOptions, getLayoutOptions, WidthBucket } from "./layoutOptions"
+
+interface Size { 
+  width: number
+  height: number
+}
+
+const sizeOptions: { value: Size, label: string }[] = [
+  { value: { width: 360, height: 640 }, label: "Phone (360x640)" },
+  { value: { width: 768, height: 1024 }, label: "Tablet (768x1024)" },
+  { value: { width: 1000, height: 800 }, label: "Laptop (1000x800)" },
+  { value: { width: 1280, height: 1024 }, label: "Desktop (1280x1024)" },
+]
 
 export function LayoutOptionsComponent(props: {
   design: DashboardDesign
@@ -10,66 +23,89 @@ export function LayoutOptionsComponent(props: {
   onClose: () => void,
   children: any
 }) {
-  const [bucket, setBucket] = useState<WidthBucket>("lg")
-
+  const [previewSize, setPreviewSize] = useState(2)
   const layoutOptions = getLayoutOptions(props.design)
 
   function setLayoutOptions(layoutOptions: BlocksLayoutOptions) {
     props.onDesignChange({ ...props.design, layoutOptions })
   }
   
-  return <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", height: "100%" }}>
-    <div style={{ padding: 5 }}>
+  return <div style={{ display: "grid", gridTemplateRows: "auto 1fr", gridTemplateColumns: "auto 1fr", height: "100%" }}>
+    <div style={{ padding: 5, gridRow: "1 / 3" }}>
       <div key="back">
         <button className="btn btn-xs btn-link" onClick={props.onClose}>
           <i className="fa fa-arrow-left"/> Close
         </button>
       </div>
       <br/>
-      <FormGroup label="Preview As" key="preview">
-        <Toggle 
-          value={bucket}
-          onChange={setBucket}
-          size="xs"
-          options={[
-            { value: "sm", label: "Phone" },
-            { value: "md", label: "Tablet" },
-            { value: "lg", label: "Laptop" },
-            { value: "xl", label: "Desktop" },
-          ]}
-        />
-      </FormGroup>
       <ThemeToggle
         theme={props.design.style}
         onChange={theme => { props.onDesignChange({ ...props.design, style: theme, layoutOptions: getDefaultLayoutOptions(theme) })}}
         />
+      <br/>
+      <h4>Advanced</h4>
       <FormGroup label="Collapse to Single Column">
-        <Toggle 
-          value={layoutOptions.collapseColumns}
-          onChange={collapseColumns => { setLayoutOptions({ ...layoutOptions, collapseColumns: collapseColumns as WidthBucket | null })}}
-          size="xs"
+        <WidthSelector
+          value={layoutOptions.collapseColumnsWidth}
+          onChange={collapseColumnsWidth => { setLayoutOptions({ ...layoutOptions, collapseColumnsWidth })}}
+          sign="< "
+        />
+      </FormGroup>
+      <FormGroup label="Minimum Width (before scrolling or scaling)">
+        <WidthSelector
+          value={layoutOptions.minimumWidth}
+          onChange={minimumWidth => { setLayoutOptions({ ...layoutOptions, minimumWidth })}}
+          sign="< "
+        />
+      </FormGroup>
+      <FormGroup label="When Below Minimum Width">
+        <Toggle
+          value={layoutOptions.belowMinimumWidth}
+          onChange={belowMinimumWidth => { setLayoutOptions({ ...layoutOptions, belowMinimumWidth: belowMinimumWidth as "scale" | "scroll" })}}
           options={[
-            { value: null, label: "Never" },
-            { value: "sm", label: "Phone" },
-            { value: "md", label: "Tablet" },
-            { value: "lg", label: "Laptop" },
+            { value: "scroll", label: "Scroll" },
+            { value: "scale", label: "Scale" },
           ]}
         />
       </FormGroup>
+      <FormGroup label="Maximum Width (before padding)">
+        <WidthSelector
+          value={layoutOptions.maximumWidth}
+          onChange={maximumWidth => { setLayoutOptions({ ...layoutOptions, maximumWidth })}}
+          sign="> "
+        />
+      </FormGroup>
     </div>
-    <div style={{ overflowX: "auto" }}>
-      <div style={{ display: "grid", gridTemplateColumns: `1fr ${sampleWidthsByBucket[bucket]}px 1fr`, height: "100%", border: "solid 1px #AAA" }}>
+    <div style={{ textAlign: "center", padding: 3 }}>
+      <span className="text-muted">Preview As:&nbsp;</span>
+      <Toggle 
+        value={previewSize}
+        onChange={setPreviewSize}
+        size="xs"
+        options={sizeOptions.map((so, index) => ({ value: index, label: so.label }))}
+      />
+    </div>
+    <div style={{ overflow: "auto" }}>
+      <div style={{ 
+        display: "grid", 
+        gridTemplateColumns: `1fr ${sizeOptions[previewSize].value.width}px 1fr`, 
+        gridTemplateRows: `1fr ${sizeOptions[previewSize].value.height}px 1fr`, 
+        height: "100%", 
+        border: "solid 1px #AAA" 
+      }}>
+        <div style={{ backgroundColor: "#888", gridColumn: "1 / 4" }}></div>
         <div style={{ backgroundColor: "#888" }}></div>
         {props.children}
         <div style={{ backgroundColor: "#888" }}></div>
+        <div style={{ backgroundColor: "#888", gridColumn: "1 / 4" }}></div>
       </div>
     </div>
   </div>
 }
 
 function ThemeToggle(props: {
-  theme?: string
-  onChange: (theme: string) => void
+  theme?: DashboardTheme
+  onChange: (theme: DashboardTheme) => void
 }) {
   function renderStyleItem(theme: string) {
     const isActive = (props.theme || "default") == theme
@@ -100,4 +136,24 @@ function ThemeToggle(props: {
     {renderStyleItem("greybg")}
     {renderStyleItem("story")}
   </FormGroup>
+}
+
+function WidthSelector(props: {
+  value: number | null
+  onChange: (value: number | null) => void
+  /** E.g. >=, <= */
+  sign: string
+}) {
+  return <Select
+    value={props.value}
+    onChange={props.onChange}
+    nullLabel="N/A"
+    options={[
+      { value: 400, label: `${props.sign}400px (Phone)` },
+      { value: 600, label: `${props.sign}600px (Small tablet)` },
+      { value: 800, label: `${props.sign}800px (Tablet)` },
+      { value: 1000, label: `${props.sign}1000px (Laptop)` },
+      { value: 1200, label: `${props.sign}1200px (Desktop)` },
+      { value: 1600, label: `${props.sign}1600px (Wide Desktop)` }
+    ]} />
 }

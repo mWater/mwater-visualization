@@ -14,7 +14,6 @@ blockUtils = require './blockUtils'
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
 HorizontalBlockComponent = require './HorizontalBlockComponent'
-shouldCollapseColumns = require('../../dashboards/layoutOptions').shouldCollapseColumns
 
 ###
 Renders the complete layout of the blocks and also optionally a palette to the left
@@ -210,23 +209,6 @@ class BlocksDisplayComponent extends React.Component
             onClipboardChange: @props.onClipboardChange
             cantPasteMessage: @props.cantPasteMessage
 
-  # Creates css for styles based on width
-  createResponsiveStyles: (width) ->
-    # if width < 900
-    #   return '''
-    #     /* Fill screen when small */
-    #     .mwater-visualization-horizontal-block-item {
-    #       width: 100% !important;
-    #     }
-
-    #     /* Hide spacers when small */
-    #     .mwater-visualization-block-spacer {
-    #       display: none;
-    #     }
-    #   '''
-
-    return ""
-
   render: ->
     if @props.onItemsChange
       return R 'div', style: { width: "100%", height: "100%", overflow: "hidden", position: "relative" }, 
@@ -237,9 +219,28 @@ class BlocksDisplayComponent extends React.Component
     else
       return R AutoSizeComponent, { injectWidth: true, injectHeight: true }, 
         (size) => 
-          R 'div', style: { width: "100%", height: "100%", overflowX: "auto" }, className: "mwater-visualization-block-parent-outer mwater-visualization-block-parent-outer-#{@props.style or "default"} mwater-visualization-block-viewing",
-            R 'div', key: "inner", className: "mwater-visualization-block-parent-inner mwater-visualization-block-parent-inner-#{@props.style or "default"}",
-              @renderBlock(@props.items, shouldCollapseColumns(@props.layoutOptions, size.width))
+          outerParentStyle = { width: "100%", height: "100%", overflowX: "auto" }
+          innerParentStyle = {}
+
+          # Remove padding if small
+          if size.width < 600
+            innerParentStyle.padding = "0px"
+            
+          # Scroll/scale
+          if @props.layoutOptions.belowMinimumWidth == "scroll"
+            innerParentStyle.minWidth = @props.layoutOptions.minimumWidth or undefined
+            innerParentStyle.maxWidth = @props.layoutOptions.maximumWidth or undefined
+          else
+            if @props.layoutOptions.minimumWidth? and size.width < @props.layoutOptions.minimumWidth
+              scale = size.width / @props.layoutOptions.minimumWidth
+              outerParentStyle.transform = "scale(#{scale})"
+              outerParentStyle.width = size.width / scale
+              outerParentStyle.height = size.height / scale
+              outerParentStyle.transformOrigin = "top left"
+
+          return R 'div', style: outerParentStyle, className: "mwater-visualization-block-parent-outer mwater-visualization-block-parent-outer-#{@props.style or "default"} mwater-visualization-block-viewing",
+            R 'div', key: "inner", className: "mwater-visualization-block-parent-inner mwater-visualization-block-parent-inner-#{@props.style or "default"}", style: innerParentStyle,
+              @renderBlock(@props.items, @props.layoutOptions.collapseColumnsWidth? and size.width <= @props.layoutOptions.collapseColumnsWidth)
 
 module.exports = BlocksDisplayComponent
 

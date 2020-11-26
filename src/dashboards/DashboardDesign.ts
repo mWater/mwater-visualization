@@ -1,7 +1,7 @@
 import { JsonQLFilter } from "..";
 import { Quickfilter } from '../quickfilter/Quickfilter'
 import { LiteralType, Expr } from "mwater-expressions";
-import { BlocksLayoutOptions } from "./layoutOptions";
+import { BlocksLayoutOptions, DashboardTheme } from "./layoutOptions";
 
 /** Dashboard design
  * Each understands enough of the dashboard design to create widgets.
@@ -18,7 +18,7 @@ export interface DashboardDesign {
   layout: "blocks" | "grid"
 
   /** optional theme to use */
-  style?: string
+  style?: DashboardTheme
 
   /** Options for layout including responsiveness, scaling, etc */
   layoutOptions?: BlocksLayoutOptions
