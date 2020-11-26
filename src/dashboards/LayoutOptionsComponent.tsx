@@ -29,6 +29,10 @@ export function LayoutOptionsComponent(props: {
   function setLayoutOptions(layoutOptions: BlocksLayoutOptions) {
     props.onDesignChange({ ...props.design, layoutOptions })
   }
+
+  function handleResetDefaults() {
+    props.onDesignChange({ ...props.design, layoutOptions: getDefaultLayoutOptions(props.design.style) })
+  }
   
   return <div style={{ display: "grid", gridTemplateRows: "auto 1fr", gridTemplateColumns: "auto 1fr", height: "100%" }}>
     <div style={{ padding: 5, gridRow: "1 / 3" }}>
@@ -44,6 +48,9 @@ export function LayoutOptionsComponent(props: {
         />
       <br/>
       <h4>Advanced</h4>
+      <a className="btn btn-xs btn-link" style={{ float: "right" }} onClick={handleResetDefaults}>
+        Reset to Defaults
+      </a>
       <FormGroup label="Collapse to Single Column">
         <WidthSelector
           value={layoutOptions.collapseColumnsWidth}
