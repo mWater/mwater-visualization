@@ -35,7 +35,7 @@ export default interface ChoroplethLayerDesign {
     filter?: Expr;
     /** default color (e.g. #FF8800). Color axis overrides. Only in plain mode */
     color?: string | null;
-    /** opacity of fill of regions (0-1) */
+    /** opacity of fill of regions (0-1). Note: this is the square root of the true opacity for historical reasons */
     fillOpacity: number;
     /** Border color (default to #000) */
     borderColor?: string | null;

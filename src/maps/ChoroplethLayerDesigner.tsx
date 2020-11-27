@@ -378,15 +378,15 @@ export default class ChoroplethLayerDesigner extends React.Component<{
   renderFillOpacity() {
     return R('div', {className: "form-group"},
       R('label', {className: "text-muted"}, 
-        "Fill Opacity (%)"),
+        `Fill Opacity: ${(this.props.design.fillOpacity * this.props.design.fillOpacity * 100).toFixed(0)}%`),
       ": ",
       R(Rcslider, {
         min: 0,
         max: 100,
         step: 1,
         tipTransitionName: "rc-slider-tooltip-zoom-down",
-        value: this.props.design.fillOpacity * 100,
-        onChange: (val: number) => this.handleFillOpacityChange(val/100)
+        value: Math.round((this.props.design.fillOpacity * this.props.design.fillOpacity) * 100),
+        onChange: (val: number) => this.handleFillOpacityChange(Math.sqrt(val/100))
       }
       )
     );
