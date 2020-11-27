@@ -318,10 +318,9 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 #layer0 {
   line-color: ${design.borderColor || "#000"};
   line-width: 1.5;
-  line-opacity: 0.6;
-  polygon-opacity: ` + design.fillOpacity + `;
-polygon-fill: ` + (design.color || "transparent") + `;
-opacity: ` +  design.fillOpacity + `; 
+  line-opacity: 0.5;
+  polygon-opacity: ` + (design.fillOpacity * design.fillOpacity) + `;
+  polygon-fill: ` + (design.color || "transparent") + `;
 }
 \
 `;

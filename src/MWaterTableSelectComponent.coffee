@@ -149,7 +149,7 @@ class EditModeTableSelectComponent extends React.Component
     tables = @context.activeTables or []
 
     # Remove dead tables
-    tables = tables.filter((t) => @props.schema.getTable(t)?)
+    tables = tables.filter((t) => @props.schema.getTable(t)? and not @props.schema.getTable(t).deprecated)
     tables = _.union(tables, _.filter(_.pluck(@props.schema.getTables(), "id"), (t) -> t.match(/^responses:/)))
     if @props.table
       tables = _.union(tables, [@props.table])
@@ -158,11 +158,11 @@ class EditModeTableSelectComponent extends React.Component
       # Check if wildcard
       if extraTable.match(/\*$/)
         for table in @props.schema.getTables()
-          if table.id.startsWith(extraTable.substr(0, extraTable.length - 1))
+          if table.id.startsWith(extraTable.substr(0, extraTable.length - 1)) and not table.deprecated
             tables = _.union(tables, [table.id])
       else
         # Add if exists
-        if @props.schema.getTable(extraTable)
+        if @props.schema.getTable(extraTable) and not @props.schema.getTable(extraTable).deprecated
           tables = _.union(tables, [extraTable])
 
     # Sort by name

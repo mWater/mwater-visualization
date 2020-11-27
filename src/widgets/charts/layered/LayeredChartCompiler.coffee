@@ -642,7 +642,7 @@ module.exports = class LayeredChartCompiler
           if column[i] > 0
             column[i] = Math.round(100 * column[i] / xtotals[i] * 10) / 10
 
-    console.log(format)
+    # console.log(format)
     return {
       columns: columns
       types: types
