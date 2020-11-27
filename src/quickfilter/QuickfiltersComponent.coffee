@@ -39,6 +39,9 @@ module.exports = class QuickfiltersComponent extends React.Component
     # True to hide top border
     hideTopBorder: PropTypes.bool
 
+    # Called when user hides the quickfilter bar
+    onHide: PropTypes.func
+
   renderQuickfilter: (item, index) ->
     # Skip if merged
     if item.merged
@@ -156,6 +159,9 @@ module.exports = class QuickfiltersComponent extends React.Component
 
     R 'div', style: { borderTop: (if not @props.hideTopBorder then "solid 1px #E8E8E8"), borderBottom: "solid 1px #E8E8E8", padding: 5 },
       _.map @props.design, (item, i) => @renderQuickfilter(item, i)
+      if @props.onHide
+        R 'button', className: "btn btn-xs btn-link", onClick: @props.onHide,
+          R 'i', className: "fa fa-angle-double-up"
 
 # Quickfilter for an enum
 class EnumQuickfilterComponent extends React.Component

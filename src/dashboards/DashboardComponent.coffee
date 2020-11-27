@@ -69,6 +69,7 @@ module.exports = class DashboardComponent extends React.Component
       quickfiltersValues: props.quickfiltersValues
       editing: LayoutManager.createLayoutManager(props.design.layout).isEmpty(props.design.items) and props.onDesignChange?
       layoutOptionsOpen: false
+      hideQuickfilters: false
     }
 
   # Get the values of the quick filters
@@ -138,6 +139,9 @@ module.exports = class DashboardComponent extends React.Component
       @setState(quickfiltersValues: null)
 
     @props.onDesignChange(design)
+  
+  handleShowQuickfilters: => 
+    @setState(hideQuickfilters: false)
 
   handleUpgrade: =>
     if not confirm("This will upgrade your dashboard to the new kind with enhanced features. You can click Undo immediately afterwards if you wish to revert it. Continue?")
@@ -211,6 +215,11 @@ module.exports = class DashboardComponent extends React.Component
       R 'a', key: "refresh", className: "btn btn-link btn-sm", onClick: @handleRefreshData,
         R('span', className: "glyphicon glyphicon-refresh")
         " Refresh"
+      if @state.hideQuickfilters and @props.design.quickfilters and @props.design.quickfilters.length > 0
+        R 'a', key: "showQuickfilters", className: "btn btn-link btn-sm", onClick: @handleShowQuickfilters,
+          R('span', className: "fa fa-filter")
+          " Show Filters"
+
       # R 'a', key: "export", className: "btn btn-link btn-sm", onClick: @handleSaveDesignFile,
       #   R('span', className: "glyphicon glyphicon-download-alt")
       #   " Export"
@@ -231,18 +240,20 @@ module.exports = class DashboardComponent extends React.Component
       @props.titleElem
 
   renderQuickfilter: ->
-    R 'div', style: { }, ref: ((c) => @quickfilters = c),
-      R QuickfiltersComponent, {
-        design: @props.design.quickfilters
-        schema: @props.schema
-        dataSource: @props.dataSource
-        quickfiltersDataSource: @props.dashboardDataSource.getQuickfiltersDataSource()
-        values: @state.quickfiltersValues
-        onValuesChange: (values) => @setState(quickfiltersValues: values)
-        locks: @props.quickfilterLocks
-        filters: @getCompiledFilters()
-        hideTopBorder: @props.hideTitleBar
-      }
+    R 'div', style: { },
+      if not @state.hideQuickfilters
+        R QuickfiltersComponent, {
+          design: @props.design.quickfilters
+          schema: @props.schema
+          dataSource: @props.dataSource
+          quickfiltersDataSource: @props.dashboardDataSource.getQuickfiltersDataSource()
+          values: @state.quickfiltersValues
+          onValuesChange: (values) => @setState(quickfiltersValues: values)
+          locks: @props.quickfilterLocks
+          filters: @getCompiledFilters()
+          hideTopBorder: @props.hideTitleBar
+          onHide: () => @setState(hideQuickfilters: true)
+        }
 
   refDashboardView: (el) =>
     @dashboardView = el
