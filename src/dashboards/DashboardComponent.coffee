@@ -17,6 +17,7 @@ LayoutManager = require '../layouts/LayoutManager'
 DashboardUpgrader = require './DashboardUpgrader'
 LayoutOptionsComponent = require('./LayoutOptionsComponent').LayoutOptionsComponent
 ModalWindowComponent = require 'react-library/lib/ModalWindowComponent'
+getLayoutOptions = require('./layoutOptions').getLayoutOptions
 
 # Dashboard component that includes an action bar at the top
 # Manages undo stack and quickfilter value
@@ -64,12 +65,15 @@ module.exports = class DashboardComponent extends React.Component
 
   constructor: (props) ->
     super(props)
+
+    layoutOptions = getLayoutOptions(props.design)
+
     @state = { 
       undoStack: new UndoStack().push(props.design) 
       quickfiltersValues: props.quickfiltersValues
       editing: LayoutManager.createLayoutManager(props.design.layout).isEmpty(props.design.items) and props.onDesignChange?
       layoutOptionsOpen: false
-      hideQuickfilters: false
+      hideQuickfilters: layoutOptions.hideQuickfiltersWidth? and layoutOptions.hideQuickfiltersWidth > document.body.clientWidth
     }
 
   # Get the values of the quick filters
@@ -240,20 +244,18 @@ module.exports = class DashboardComponent extends React.Component
       @props.titleElem
 
   renderQuickfilter: ->
-    R 'div', style: { },
-      if not @state.hideQuickfilters
-        R QuickfiltersComponent, {
-          design: @props.design.quickfilters
-          schema: @props.schema
-          dataSource: @props.dataSource
-          quickfiltersDataSource: @props.dashboardDataSource.getQuickfiltersDataSource()
-          values: @state.quickfiltersValues
-          onValuesChange: (values) => @setState(quickfiltersValues: values)
-          locks: @props.quickfilterLocks
-          filters: @getCompiledFilters()
-          hideTopBorder: @props.hideTitleBar
-          onHide: () => @setState(hideQuickfilters: true)
-        }
+    R QuickfiltersComponent, {
+      design: @props.design.quickfilters
+      schema: @props.schema
+      dataSource: @props.dataSource
+      quickfiltersDataSource: @props.dashboardDataSource.getQuickfiltersDataSource()
+      values: @state.quickfiltersValues
+      onValuesChange: (values) => @setState(quickfiltersValues: values)
+      locks: @props.quickfilterLocks
+      filters: @getCompiledFilters()
+      hideTopBorder: @props.hideTitleBar
+      onHide: () => @setState(hideQuickfilters: true)
+    }
 
   refDashboardView: (el) =>
     @dashboardView = el
@@ -274,6 +276,7 @@ module.exports = class DashboardComponent extends React.Component
       filters: filters
       onRowClick: @props.onRowClick
       namedStrings: @props.namedStrings
+      hideScopes: @state.hideQuickfilters
     }
 
     readonlyDashboardView = R DashboardViewComponent, {
@@ -285,12 +288,15 @@ module.exports = class DashboardComponent extends React.Component
       filters: filters
       onRowClick: @props.onRowClick
       namedStrings: @props.namedStrings
+      hideScopes: @state.hideQuickfilters
     }
 
     return R 'div', style: { display: "grid", gridTemplateRows: (if @props.hideTitleBar then "auto 1fr" else "auto auto 1fr"), height: "100%" },
       if not @props.hideTitleBar
         @renderTitleBar()
-      @renderQuickfilter()
+      R 'div', null,
+        if not @state.hideQuickfilters
+          @renderQuickfilter()
       dashboardView
       if @props.onDesignChange?
         R SettingsModalComponent, { onDesignChange: @handleDesignChange, schema: @props.schema, dataSource: @props.dataSource, ref: (c) => @settings = c }
@@ -300,5 +306,7 @@ module.exports = class DashboardComponent extends React.Component
             design: @props.design
             onDesignChange: @props.onDesignChange
             onClose: () => @setState(layoutOptionsOpen: false)
-          }, readonlyDashboardView
+            dashboardView: readonlyDashboardView
+            quickfiltersView: @renderQuickfilter()
+          }
 

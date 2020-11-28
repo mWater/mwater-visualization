@@ -17,37 +17,10 @@ export interface BlocksLayoutOptions {
 
   /** Width above which pads */
   maximumWidth: number | null
+
+  /** Width at which to hide quickfilters. Null for never */
+  hideQuickfiltersWidth: number | null
 }
-
-// /** Sample widths by bucket */
-// export const sampleWidthsByBucket: { [bucket in WidthBucket]: number } = {
-//   sm: 400,
-//   md: 768,
-//   lg: 1024,
-//   xl: 1280
-// }
-
-// /** Minimum widths by bucket */
-// export const minWidthsByBucket: { [bucket in WidthBucket]: number | null } = {
-//   sm: null,
-//   md: 700,
-//   lg: 1000,
-//   xl: 1200
-// }
-
-// /** Determine which width bucket to use */
-// export function determineBucket(width: number) {
-//   if (width > minWidthsByBucket["xl"]!) {
-//     return "xl"
-//   }
-//   if (width > minWidthsByBucket["lg"]!) {
-//     return "lg"
-//   }
-//   if (width > minWidthsByBucket["md"]!) {
-//     return "md"
-//   }
-//   return "sm"
-
 
 /** Get default layout options for a theme */
 export function getDefaultLayoutOptions(theme: DashboardTheme | undefined): BlocksLayoutOptions {
@@ -57,7 +30,8 @@ export function getDefaultLayoutOptions(theme: DashboardTheme | undefined): Bloc
     collapseColumnsWidth: 600,
     minimumWidth: theme == "story" ? 400 : 1000,
     belowMinimumWidth: "scroll",
-    maximumWidth: theme == "story" ? 1000 : 1600
+    maximumWidth: theme == "story" ? 1000 : 1600,
+    hideQuickfiltersWidth: 600
   }
 }
 

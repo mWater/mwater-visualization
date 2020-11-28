@@ -32,5 +32,8 @@ export default class DashboardViewComponent extends React.Component<{
 
   /** Entry to scroll to initially when dashboard is loaded */
   initialTOCEntryScroll?: { widgetId: string, entryId: any }
+
+  /** True to hide scope display */
+  hideScopes?: boolean
 }> {
 }

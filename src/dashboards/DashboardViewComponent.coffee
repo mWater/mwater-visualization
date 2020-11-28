@@ -40,6 +40,9 @@ module.exports = class DashboardViewComponent extends React.Component
     # Entry to scroll to initially when dashboard is loaded
     initialTOCEntryScroll: PropTypes.shape({ widgetId: PropTypes.string.isRequired, entryId: PropTypes.any })
 
+    # True to hide scope display
+    hideScopes: PropTypes.bool
+
   @childContextTypes:
     locale: PropTypes.string
 
@@ -204,7 +207,8 @@ module.exports = class DashboardViewComponent extends React.Component
 
     # Render widget container
     return R "div", style: style, 
-      @renderScopes()
+      if not @props.hideScopes
+        @renderScopes()
 
       layoutManager.renderLayout({
         items: @props.design.items

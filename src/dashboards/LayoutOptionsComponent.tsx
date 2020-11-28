@@ -1,5 +1,4 @@
-import { number } from "prop-types"
-import React from "react"
+import React, { ReactNode } from "react"
 import { useState } from "react"
 import { FormGroup, Select, Toggle } from "react-library/lib/bootstrap"
 import { DashboardDesign } from "./DashboardDesign"
@@ -21,7 +20,12 @@ export function LayoutOptionsComponent(props: {
   design: DashboardDesign
   onDesignChange: (design: DashboardDesign) => void
   onClose: () => void,
-  children: any
+
+  /** Dashboard view to preview*/
+  dashboardView: ReactNode
+
+  /** Quickfilters to preview */
+  quickfiltersView: ReactNode
 }) {
   const [previewSize, setPreviewSize] = useState(2)
   const layoutOptions = getLayoutOptions(props.design)
@@ -58,22 +62,30 @@ export function LayoutOptionsComponent(props: {
           sign="< "
         />
       </FormGroup>
+      <FormGroup label="Hide Quickfilters">
+        <WidthSelector
+          value={layoutOptions.hideQuickfiltersWidth}
+          onChange={hideQuickfiltersWidth => { setLayoutOptions({ ...layoutOptions, hideQuickfiltersWidth })}}
+          sign="< "
+        />
+      </FormGroup>
       <FormGroup label="Minimum Width (before scrolling or scaling)">
         <WidthSelector
           value={layoutOptions.minimumWidth}
           onChange={minimumWidth => { setLayoutOptions({ ...layoutOptions, minimumWidth })}}
           sign="< "
-        />
+        />      
+        <FormGroup label="When Below Minimum Width">
+          <Toggle
+            value={layoutOptions.belowMinimumWidth}
+            onChange={belowMinimumWidth => { setLayoutOptions({ ...layoutOptions, belowMinimumWidth: belowMinimumWidth as "scale" | "scroll" })}}
+            options={[
+              { value: "scroll", label: "Scroll" },
+              { value: "scale", label: "Scale" },
+            ]}
+          />
       </FormGroup>
-      <FormGroup label="When Below Minimum Width">
-        <Toggle
-          value={layoutOptions.belowMinimumWidth}
-          onChange={belowMinimumWidth => { setLayoutOptions({ ...layoutOptions, belowMinimumWidth: belowMinimumWidth as "scale" | "scroll" })}}
-          options={[
-            { value: "scroll", label: "Scroll" },
-            { value: "scale", label: "Scale" },
-          ]}
-        />
+
       </FormGroup>
       <FormGroup label="Maximum Width (before padding)">
         <WidthSelector
@@ -102,7 +114,14 @@ export function LayoutOptionsComponent(props: {
       }}>
         <div style={{ backgroundColor: "#888", gridColumn: "1 / 4" }}></div>
         <div style={{ backgroundColor: "#888" }}></div>
-        {props.children}
+        <div style={{ height: "100%", display: "grid", gridTemplateRows: "auto 1fr" }}>
+          {
+            layoutOptions.hideQuickfiltersWidth == null || sizeOptions[previewSize].value.width > layoutOptions.hideQuickfiltersWidth ?
+              props.quickfiltersView
+            : <div/>
+          }
+          {props.dashboardView}
+        </div>
         <div style={{ backgroundColor: "#888" }}></div>
         <div style={{ backgroundColor: "#888", gridColumn: "1 / 4" }}></div>
       </div>

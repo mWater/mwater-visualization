@@ -1,6 +1,7 @@
 import { JsonQLFilter } from "..";
 import { Quickfilter } from '../quickfilter/Quickfilter';
 import { LiteralType, Expr } from "mwater-expressions";
+import { BlocksLayoutOptions, DashboardTheme } from "./layoutOptions";
 /** Dashboard design
  * Each understands enough of the dashboard design to create widgets.
  * Widget refers to the widget itself, where *item* refers also to the layout and id that it has in the dashboard.
@@ -12,8 +13,10 @@ export interface DashboardDesign {
     quickfilters: Quickfilter[];
     /** layout engine to use (`blocks` is new default)  */
     layout: "blocks" | "grid";
-    /** optional stylesheet to use */
-    style?: string;
+    /** optional theme to use */
+    style?: DashboardTheme;
+    /** Options for layout including responsiveness, scaling, etc */
+    layoutOptions?: BlocksLayoutOptions;
     /** filter expression indexed by table. e.g. { sometable: logical expression, etc. } */
     filters?: JsonQLFilter[];
     /** optional locale (e.g. "fr") to use for display */
