@@ -72,7 +72,7 @@ export function findExprValues(
         right: {
           type: "subexpr",
           expr: { type: "op", op: "jsonb_array_elements_text", exprs: [
-            exprCompiler.compileExpr({ expr, tableAlias: "main" })
+            { type: "op", op: "to_jsonb", exprs: [exprCompiler.compileExpr({ expr, tableAlias: "main" })] }
           ]},
           alias: "value"
         }
