@@ -195,8 +195,8 @@ module.exports = class DashboardComponent extends React.Component
 
   renderStyle: ->
     return R 'button', type: "button", key: "style", className: "btn btn-link btn-sm", onClick: @handleOpenLayoutOptions,
-      R 'span', className: "fa fa-mobile"
-      " Layout "
+      R 'span', className: "fa fa-mobile"  
+      R 'span', className: "hide-600px", " Layout "
 
   renderActionLinks: ->
     R 'div', null,
@@ -207,22 +207,22 @@ module.exports = class DashboardComponent extends React.Component
         [
           R 'a', key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
             R 'span', className: "glyphicon glyphicon-triangle-left"
-            " Undo"
+            R 'span', className: "hide-600px", " Undo"
           " "
           R 'a', key: "redo", className: "btn btn-link btn-sm #{if not @state.undoStack.canRedo() then "disabled" else ""}", onClick: @handleRedo, 
             R 'span', className: "glyphicon glyphicon-triangle-right"
-            " Redo"
+            R 'span', className: "hide-600px", " Redo"
         ]
       R 'a', key: "print", className: "btn btn-link btn-sm", onClick: @handlePrint,
         R('span', className: "glyphicon glyphicon-print")
-        " Print"
+        R 'span', className: "hide-600px", " Print"
       R 'a', key: "refresh", className: "btn btn-link btn-sm", onClick: @handleRefreshData,
         R('span', className: "glyphicon glyphicon-refresh")
-        " Refresh"
+        R 'span', className: "hide-600px", " Refresh"
       if @state.hideQuickfilters and @props.design.quickfilters and @props.design.quickfilters.length > 0
         R 'a', key: "showQuickfilters", className: "btn btn-link btn-sm", onClick: @handleShowQuickfilters,
           R('span', className: "fa fa-filter")
-          " Show Filters"
+          R 'span', className: "hide-600px", " Show Filters"
 
       # R 'a', key: "export", className: "btn btn-link btn-sm", onClick: @handleSaveDesignFile,
       #   R('span', className: "glyphicon glyphicon-download-alt")
@@ -230,7 +230,7 @@ module.exports = class DashboardComponent extends React.Component
       if @state.editing
         R 'a', key: "settings", className: "btn btn-link btn-sm", onClick: @handleSettings,
           R('span', className: "glyphicon glyphicon-cog")
-          " Settings"
+          R 'span', className: "hide-600px", " Settings"
       if @state.editing
         @renderStyle()
       @props.extraTitleButtonsElem

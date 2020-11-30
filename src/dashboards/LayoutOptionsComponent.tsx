@@ -115,11 +115,13 @@ export function LayoutOptionsComponent(props: {
         <div style={{ backgroundColor: "#888", gridColumn: "1 / 4" }}></div>
         <div style={{ backgroundColor: "#888" }}></div>
         <div style={{ height: "100%", display: "grid", gridTemplateRows: "auto 1fr" }}>
-          {
-            layoutOptions.hideQuickfiltersWidth == null || sizeOptions[previewSize].value.width > layoutOptions.hideQuickfiltersWidth ?
-              props.quickfiltersView
-            : <div/>
-          }
+          <div key="quickfilters">
+            {
+              layoutOptions.hideQuickfiltersWidth == null || sizeOptions[previewSize].value.width > layoutOptions.hideQuickfiltersWidth ?
+                props.quickfiltersView
+              : null
+            }
+          </div>
           {props.dashboardView}
         </div>
         <div style={{ backgroundColor: "#888" }}></div>

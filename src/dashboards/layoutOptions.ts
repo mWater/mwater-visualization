@@ -28,8 +28,8 @@ export function getDefaultLayoutOptions(theme: DashboardTheme | undefined): Bloc
 
   return {
     collapseColumnsWidth: 600,
-    minimumWidth: theme == "story" ? 400 : 1000,
-    belowMinimumWidth: "scroll",
+    minimumWidth: theme == "story" ? 400 : 600,
+    belowMinimumWidth: "scale",
     maximumWidth: theme == "story" ? 1000 : 1600,
     hideQuickfiltersWidth: 600
   }

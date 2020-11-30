@@ -15,6 +15,8 @@ AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
 HorizontalBlockComponent = require './HorizontalBlockComponent'
 
+getDefaultLayoutOptions = require('../../dashboards/layoutOptions').getDefaultLayoutOptions
+
 ###
 Renders the complete layout of the blocks and also optionally a palette to the left
 that can be used to drag new items into the layout. Palette is only displayed if onItemsChange is not null
@@ -25,7 +27,7 @@ class BlocksDisplayComponent extends React.Component
     onItemsChange: PropTypes.func
 
     style: PropTypes.string   # Stylesheet to use. null for default
-    layoutOptions: PropTypes.object.isRequired # layout options to use
+    layoutOptions: PropTypes.object # layout options to use
 
     # Renders a widget. Passed (options)
     #  id: id of widget
@@ -210,6 +212,7 @@ class BlocksDisplayComponent extends React.Component
             cantPasteMessage: @props.cantPasteMessage
 
   render: ->
+    layoutOptions = @props.layoutOptions or getDefaultLayoutOptions()
     if @props.onItemsChange
       return R 'div', style: { width: "100%", height: "100%", overflow: "hidden", position: "relative" }, 
         @renderPalette()
@@ -227,12 +230,12 @@ class BlocksDisplayComponent extends React.Component
             innerParentStyle.padding = "0px"
             
           # Scroll/scale
-          if @props.layoutOptions.belowMinimumWidth == "scroll"
-            innerParentStyle.minWidth = @props.layoutOptions.minimumWidth or undefined
-            innerParentStyle.maxWidth = @props.layoutOptions.maximumWidth or undefined
+          if layoutOptions.belowMinimumWidth == "scroll"
+            innerParentStyle.minWidth = layoutOptions.minimumWidth or undefined
+            innerParentStyle.maxWidth = layoutOptions.maximumWidth or undefined
           else
-            if @props.layoutOptions.minimumWidth? and size.width < @props.layoutOptions.minimumWidth
-              scale = size.width / @props.layoutOptions.minimumWidth
+            if layoutOptions.minimumWidth? and size.width < layoutOptions.minimumWidth
+              scale = size.width / layoutOptions.minimumWidth
               outerParentStyle.transform = "scale(#{scale})"
               outerParentStyle.width = size.width / scale
               outerParentStyle.height = size.height / scale
@@ -240,7 +243,7 @@ class BlocksDisplayComponent extends React.Component
 
           return R 'div', style: outerParentStyle, className: "mwater-visualization-block-parent-outer mwater-visualization-block-parent-outer-#{@props.style or "default"} mwater-visualization-block-viewing",
             R 'div', key: "inner", className: "mwater-visualization-block-parent-inner mwater-visualization-block-parent-inner-#{@props.style or "default"}", style: innerParentStyle,
-              @renderBlock(@props.items, @props.layoutOptions.collapseColumnsWidth? and size.width <= @props.layoutOptions.collapseColumnsWidth)
+              @renderBlock(@props.items, layoutOptions.collapseColumnsWidth? and size.width <= layoutOptions.collapseColumnsWidth)
 
 module.exports = BlocksDisplayComponent
 

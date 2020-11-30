@@ -79,11 +79,11 @@ module.exports = class MapComponent extends React.Component
               '''Changes to zoom level wont be saved in locked mode'''
           R 'a', key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
             R 'span', className: "glyphicon glyphicon-triangle-left"
-            " Undo"
+            R 'span', className: "hide-600px", " Undo"
           " "
           R 'a', key: "redo", className: "btn btn-link btn-sm #{if not @state.undoStack.canRedo() then "disabled" else ""}", onClick: @handleRedo, 
             R 'span', className: "glyphicon glyphicon-triangle-right"
-            " Redo"
+            R 'span', className: "hide-600px", " Redo"
         ]
       @props.extraTitleButtonsElem
 
