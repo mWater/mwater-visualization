@@ -230,9 +230,10 @@ class BlocksDisplayComponent extends React.Component
             innerParentStyle.padding = "0px"
             
           # Scroll/scale
+          innerParentStyle.maxWidth = layoutOptions.maximumWidth or undefined
+          
           if layoutOptions.belowMinimumWidth == "scroll"
             innerParentStyle.minWidth = layoutOptions.minimumWidth or undefined
-            innerParentStyle.maxWidth = layoutOptions.maximumWidth or undefined
           else
             if layoutOptions.minimumWidth? and size.width < layoutOptions.minimumWidth
               scale = size.width / layoutOptions.minimumWidth
