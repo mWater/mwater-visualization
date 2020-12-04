@@ -160,7 +160,7 @@
   }
 
   .mwater-visualization-horizontal-block {
-    page-break-inside: avoid;
+    /* page-break-inside: avoid; */
   }
   .mwater-visualization-block {
     page-break-inside: avoid;
