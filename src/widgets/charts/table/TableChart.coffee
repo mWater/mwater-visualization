@@ -4,6 +4,7 @@ R = React.createElement
 uuid = require 'uuid'
 produce = require('immer').default
 original = require('immer').original
+isDraft = require('immer').isDraft
 
 injectTableAlias = require('mwater-expressions').injectTableAlias
 Chart = require '../Chart'
@@ -57,11 +58,11 @@ module.exports = class TableChart extends Chart
         if not column.id
           column.id = uuid()
         # Clean textAxis
-        column.textAxis = axisBuilder.cleanAxis(axis: original(column.textAxis), table: design.table, aggrNeed: "optional")
+        column.textAxis = axisBuilder.cleanAxis(axis: (if column.textAxis then original(column.textAxis) else null), table: design.table, aggrNeed: "optional")
 
       # Clean orderings
       for ordering in draft.orderings
-        ordering.axis = axisBuilder.cleanAxis(axis: original(ordering.axis), table: design.table, aggrNeed: "optional")
+        ordering.axis = axisBuilder.cleanAxis(axis: (if ordering.axis then original(ordering.axis) else null), table: design.table, aggrNeed: "optional")
 
       if design.filter
         draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ['boolean'] })

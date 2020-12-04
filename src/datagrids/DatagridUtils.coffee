@@ -30,7 +30,7 @@ module.exports = class DatagridUtils
           else
             table = design.table
 
-          column.expr = exprCleaner.cleanExpr(original(column.expr), { table: table, aggrStatuses: ["individual", "literal", "aggregate"] })
+          column.expr = exprCleaner.cleanExpr((if column.expr then original(column.expr) else null), { table: table, aggrStatuses: ["individual", "literal", "aggregate"] })
 
       return
     )

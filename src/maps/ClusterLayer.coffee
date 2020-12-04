@@ -437,7 +437,7 @@ module.exports = class ClusterLayer extends Layer
 
       draft.axes = design.axes or {}
 
-      draft.axes.geometry = axisBuilder.cleanAxis(axis: original(draft.axes.geometry), table: design.table, types: ['geometry'], aggrNeed: "none")
+      draft.axes.geometry = axisBuilder.cleanAxis(axis: (if draft.axes.geometry then original(draft.axes.geometry) else null), table: design.table, types: ['geometry'], aggrNeed: "none")
 
       draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table })
       return 
