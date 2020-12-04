@@ -4,7 +4,6 @@ R = React.createElement
 uuid = require 'uuid'
 produce = require('immer').default
 original = require('immer').original
-isDraft = require('immer').isDraft
 
 injectTableAlias = require('mwater-expressions').injectTableAlias
 Chart = require '../Chart'

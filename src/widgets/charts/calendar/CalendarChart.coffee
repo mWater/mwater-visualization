@@ -3,7 +3,6 @@ React = require 'react'
 R = React.createElement
 moment = require 'moment'
 produce = require('immer').default
-original = require('immer').original
 
 injectTableAlias = require('mwater-expressions').injectTableAlias
 Chart = require '../Chart'

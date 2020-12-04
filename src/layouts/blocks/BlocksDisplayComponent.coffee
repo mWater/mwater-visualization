@@ -214,10 +214,13 @@ class BlocksDisplayComponent extends React.Component
   render: ->
     layoutOptions = @props.layoutOptions or getDefaultLayoutOptions()
     if @props.onItemsChange
+      innerParentStyle = {}
+      innerParentStyle.maxWidth = layoutOptions.maximumWidth or undefined
+
       return R 'div', style: { width: "100%", height: "100%", overflow: "hidden", position: "relative" }, 
         @renderPalette()
         R 'div', style: { position: "absolute", left: 141, top: 0, bottom: 0, right: 0, overflow: "auto" }, className: "mwater-visualization-block-parent-outer mwater-visualization-block-parent-outer-#{@props.style or "default"} mwater-visualization-block-editing", 
-          R 'div', key: "inner", className: "mwater-visualization-block-parent-inner mwater-visualization-block-parent-inner-#{@props.style or "default"}",
+          R 'div', key: "inner", className: "mwater-visualization-block-parent-inner mwater-visualization-block-parent-inner-#{@props.style or "default"}", style: innerParentStyle,
             @renderBlock(@props.items)
     else
       return R AutoSizeComponent, { injectWidth: true, injectHeight: true }, 
