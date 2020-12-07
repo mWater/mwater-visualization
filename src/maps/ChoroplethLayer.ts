@@ -377,7 +377,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
    */
   onGridClick(ev: { data: any, event: any }, clickOptions: {
     /** design of layer */
-    design: any
+    design: ChoroplethLayerDesign
     /** schema to use */
     schema: Schema
     /** data source to use */
@@ -389,16 +389,30 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     /** compiled filters to apply to the popup */
     filters: JsonQLFilter[]
   }): OnGridClickResults {
-    // Ignore if not indirect with table
-    if (clickOptions.design.regionMode !== "indirect" || !clickOptions.design.table) {
+    const regionsTable = clickOptions.design.regionsTable || "admin_regions";
+
+    // Row only if mode is "plain" or "direct"
+    if (clickOptions.design.regionMode == "plain" || clickOptions.design.regionMode == "direct") {
+      if (ev.data && ev.data.id) {
+        return {
+          row: { tableId: regionsTable, primaryKey: ev.data.id }
+        }
+      }
+      else {
+        return null
+      }
+    }
+
+    // Ignore if indirect with no table
+    if (!clickOptions.design.table) {
       return null
     }
 
-    const regionsTable = clickOptions.design.regionsTable || "admin_regions";
-
     // TODO abstract most to base class
     if (ev.data && ev.data.id) {
-      const results: OnGridClickResults = {}
+      const results: OnGridClickResults = {
+        row: { tableId: regionsTable, primaryKey: ev.data.id }
+      }
 
       // Create filter for single row
       const { table } = clickOptions.design;
@@ -410,18 +424,18 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         op: "within",
         table,
         exprs: [
-          clickOptions.design.adminRegionExpr,
+          clickOptions.design.adminRegionExpr!,
           { type: "literal", idTable: regionsTable, valueType: "id", value: ev.data.id }
         ]
       }
 
-      const compiledFilterExpr = exprCompiler.compileExpr({ expr: filterExpr, tableAlias: "{alias}"});
+      const compiledFilterExpr = exprCompiler.compileExpr({ expr: filterExpr, tableAlias: "{alias}"})
 
       // Filter within
       const filter = {
         table,
         jsonql: compiledFilterExpr
-      };
+      }
 
       if (ev.event.originalEvent.shiftKey) {
         // Scope to region, unless already scoped
@@ -433,28 +447,28 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
             filter,
             filterExpr,
             data: ev.data.id
-          };
+          }
         }
 
       } else if (clickOptions.design.popup) {
         // Create default popup filter joins
         const defaultPopupFilterJoins = {};
         if (clickOptions.design.adminRegionExpr) {
-          defaultPopupFilterJoins[clickOptions.design.table] = clickOptions.design.adminRegionExpr;
+          defaultPopupFilterJoins[clickOptions.design.table] = clickOptions.design.adminRegionExpr
         }
 
         // Create filter using popupFilterJoins
-        const popupFilterJoins = clickOptions.design.popupFilterJoins || defaultPopupFilterJoins;
-        const popupFilters = PopupFilterJoinsUtils.createPopupFilters(popupFilterJoins, clickOptions.schema, table, ev.data.id, true);
+        const popupFilterJoins = clickOptions.design.popupFilterJoins || defaultPopupFilterJoins
+        const popupFilters = PopupFilterJoinsUtils.createPopupFilters(popupFilterJoins, clickOptions.schema, table, ev.data.id, true)
 
         // Add filter for admin region
         popupFilters.push({
           table: regionsTable,
           jsonql: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "_id" }, { type: "literal", value: ev.data.id }]}
-        });
+        })
 
-        const BlocksLayoutManager = require('../layouts/blocks/BlocksLayoutManager');
-        const WidgetFactory = require('../widgets/WidgetFactory');
+        const BlocksLayoutManager = require('../layouts/blocks/BlocksLayoutManager')
+        const WidgetFactory = require('../widgets/WidgetFactory')
 
         results.popup = new BlocksLayoutManager().renderLayout({
           items: clickOptions.design.popup.items,
@@ -479,14 +493,14 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
               onDesignChange: null,
               width: options.width,
               height: options.height,
-            });
+            })
           }
-          });
+        })
       }
 
-      return results;
+      return results
     } else {
-      return null;
+      return null
     }
   }
 

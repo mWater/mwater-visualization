@@ -19,4 +19,4 @@ declare interface LayerDefinition {
   }
 }
 
-declare type OnGridClickResults = { scope?: any, row?: any, popup?: React.ReactElement<{}> } | null
+declare type OnGridClickResults = { scope?: any, row?: { tableId: string, primaryKey: any }, popup?: React.ReactElement<{}> } | null

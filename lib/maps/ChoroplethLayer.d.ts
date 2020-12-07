@@ -45,7 +45,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         event: any;
     }, clickOptions: {
         /** design of layer */
-        design: any;
+        design: ChoroplethLayerDesign;
         /** schema to use */
         schema: Schema;
         /** data source to use */
