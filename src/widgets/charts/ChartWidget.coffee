@@ -27,7 +27,6 @@ module.exports = class ChartWidget extends Widget
   #  onDesignChange: called with new design. null/undefined for readonly
   #  width: width in pixels on screen
   #  height: height in pixels on screen
-  #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
   #  onRowClick: Called with (tableId, rowId) when item is clicked
   createViewElement: (options) ->
     return R(ChartWidgetComponent,
@@ -42,7 +41,6 @@ module.exports = class ChartWidget extends Widget
       onDesignChange: options.onDesignChange
       width: options.width
       height: options.height
-      standardWidth: options.standardWidth
       onRowClick: options.onRowClick
     )
 
@@ -83,7 +81,6 @@ class ChartWidgetComponent extends React.Component
 
     width: PropTypes.number
     height: PropTypes.number
-    standardWidth: PropTypes.number   # Standard width to allow widget to scale properly to retain same appearance
 
     scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
@@ -147,7 +144,7 @@ class ChartWidgetComponent extends React.Component
   handleEditDesignChange: (design) =>
     @setState(editDesign: design)
 
-  renderChart: (design, onDesignChange, width, height, standardWidth) ->
+  renderChart: (design, onDesignChange, width, height) ->
     R(ChartViewComponent, 
       chart: @props.chart
       design: design
@@ -159,7 +156,6 @@ class ChartWidgetComponent extends React.Component
       filters: @props.filters
       width: width
       height: height
-      standardWidth: standardWidth
       onScopeChange: @props.onScopeChange
       onRowClick: @props.onRowClick
     )
@@ -224,7 +220,7 @@ class ChartWidgetComponent extends React.Component
         width: @props.width
         height: @props.height
         dropdownItems: dropdownItems,
-          @renderChart(design, @props.onDesignChange, @props.width, @props.height, @props.standardWidth)
+          @renderChart(design, @props.onDesignChange, @props.width, @props.height)
       )
       if (emptyDesign or not validDesign) and @props.onDesignChange?
         @renderEditLink()

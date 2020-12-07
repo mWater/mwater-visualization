@@ -58,7 +58,6 @@ class DemoComponent extends React.Component
         }), {
           width: options.width
           height: if widget.isAutoHeight() then null else options.height
-          standardWidth: options.width
         })
 
       return R BlocksDesignerComponent, 

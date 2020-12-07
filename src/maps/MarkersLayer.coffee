@@ -289,7 +289,6 @@ module.exports = class MarkersLayer extends Layer
               onDesignChange: null
               width: options.width
               height: options.height
-              standardWidth: options.standardWidth
             })
           })
       else if not ev.event.originalEvent.shiftKey
@@ -371,8 +370,8 @@ module.exports = class MarkersLayer extends Layer
       draft.axes = design.axes or {}
       draft.color = design.color or "#0088FF"
 
-      draft.axes.geometry = axisBuilder.cleanAxis(axis: original(draft.axes.geometry), table: design.table, types: ['geometry'], aggrNeed: "none")
-      draft.axes.color = axisBuilder.cleanAxis(axis: original(draft.axes.color), table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none")
+      draft.axes.geometry = axisBuilder.cleanAxis(axis: (if draft.axes.geometry then original(draft.axes.geometry) else null), table: design.table, types: ['geometry'], aggrNeed: "none")
+      draft.axes.color = axisBuilder.cleanAxis(axis: (if draft.axes.color then original(draft.axes.color) else null), table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none")
 
       draft.filter = exprCleaner.cleanExpr(design.filter, { table: draft.table })
       return

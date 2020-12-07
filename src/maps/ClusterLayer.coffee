@@ -358,7 +358,6 @@ module.exports = class ClusterLayer extends Layer
   #             onDesignChange: null
   #             width: options.width
   #             height: options.height
-  #             standardWidth: options.standardWidth
   #           })
   #         })
   #     else if not ev.event.originalEvent.shiftKey
@@ -438,7 +437,7 @@ module.exports = class ClusterLayer extends Layer
 
       draft.axes = design.axes or {}
 
-      draft.axes.geometry = axisBuilder.cleanAxis(axis: original(draft.axes.geometry), table: design.table, types: ['geometry'], aggrNeed: "none")
+      draft.axes.geometry = axisBuilder.cleanAxis(axis: (if draft.axes.geometry then original(draft.axes.geometry) else null), table: design.table, types: ['geometry'], aggrNeed: "none")
 
       draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table })
       return 

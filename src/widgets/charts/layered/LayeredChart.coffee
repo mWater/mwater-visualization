@@ -51,7 +51,7 @@ module.exports = class LayeredChart extends Chart
             aggrNeed = "required"
           else
             aggrNeed = "none"
-          layer.axes[axisKey] = axisBuilder.cleanAxis(axis: original(axis), table: layer.table, aggrNeed: aggrNeed, types: LayeredChartUtils.getAxisTypes(draft, layer, axisKey))
+          layer.axes[axisKey] = axisBuilder.cleanAxis(axis: (if axis then original(axis) else null), table: layer.table, aggrNeed: aggrNeed, types: LayeredChartUtils.getAxisTypes(draft, layer, axisKey))
 
         # Remove x axis if not required
         if not compiler.canLayerUseXExpr(draft, layerId) and layer.axes.x
@@ -61,7 +61,7 @@ module.exports = class LayeredChart extends Chart
         if not layer.axes.x or not axisBuilder.doesAxisSupportCumulative(layer.axes.x)
           delete layer.cumulative
 
-        layer.filter = exprCleaner.cleanExpr(original(layer.filter), { table: layer.table, types: ['boolean'] })
+        layer.filter = exprCleaner.cleanExpr((if layer.filter then original(layer.filter) else null), { table: layer.table, types: ['boolean'] })
 
       return
     )
@@ -172,7 +172,7 @@ module.exports = class LayeredChart extends Chart
   #   design: design of the chart
   #   onDesignChange: when design changes
   #   data: results from queries
-  #   width, height, standardWidth: size of the chart view
+  #   width, height: size of the chart view
   #   scope: current scope of the view element
   #   onScopeChange: called when scope changes with new scope
   createViewElement: (options) ->
@@ -188,7 +188,6 @@ module.exports = class LayeredChart extends Chart
 
       width: options.width
       height: options.height
-      standardWidth: options.standardWidth
 
       scope: options.scope
       onScopeChange: options.onScopeChange

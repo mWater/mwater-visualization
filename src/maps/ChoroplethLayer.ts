@@ -479,7 +479,6 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
               onDesignChange: null,
               width: options.width,
               height: options.height,
-              standardWidth: options.standardWidth
             });
           }
           });
@@ -594,14 +593,14 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 
       // Clean the axes
       if (draft.regionMode === "indirect" && design.table) {
-        draft.axes.color = axisBuilder.cleanAxis({axis: original(draft.axes.color) || null, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"});
-        draft.axes.label = axisBuilder.cleanAxis({axis: original(draft.axes.label) || null, table: design.table, types: ['text', 'number'], aggrNeed: "required"});
+        draft.axes.color = axisBuilder.cleanAxis({axis: draft.axes.color ? original(draft.axes.color) || null : null, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"});
+        draft.axes.label = axisBuilder.cleanAxis({axis: draft.axes.label ? original(draft.axes.label) || null : null, table: design.table, types: ['text', 'number'], aggrNeed: "required"});
       } else if (draft.regionMode === "plain" || (draft.regionMode === "indirect" && !design.table)) {
         delete draft.axes.color
         delete draft.axes.label
       } else if (draft.regionMode === "direct") {
-        draft.axes.color = axisBuilder.cleanAxis({axis: original(draft.axes.color) || null, table: regionsTable, types: ['enum', 'text', 'boolean', 'date'], aggrNeed: "none"});
-        draft.axes.label = axisBuilder.cleanAxis({axis: original(draft.axes.label) || null, table: regionsTable, types: ['text', 'number'], aggrNeed: "none"});
+        draft.axes.color = axisBuilder.cleanAxis({axis: draft.axes.color ? original(draft.axes.color) || null : null, table: regionsTable, types: ['enum', 'text', 'boolean', 'date'], aggrNeed: "none"});
+        draft.axes.label = axisBuilder.cleanAxis({axis: draft.axes.label ? original(draft.axes.label) || null : null, table: regionsTable, types: ['text', 'number'], aggrNeed: "none"});
       }
 
       // Filter is only for indirect

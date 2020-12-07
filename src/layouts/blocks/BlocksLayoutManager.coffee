@@ -8,11 +8,11 @@ LayoutManager = require '../LayoutManager'
 module.exports = class BlocksLayoutManager extends LayoutManager
   # Renders the layout as a react element
   # options:
-  #  width: width of layout (ignored here) TODO use for printing? standardWidth?
   #  items: opaque items object that layout manager understands
   #  onItemsChange: Called when items changes
   #  renderWidget: called with ({ id:, type:, design:, onDesignChange:, width:, height:  })
   #  style: style to use for layout. null for default
+  #  layoutOptions: layout options to use
   #  disableMaps: true to disable maps
   #  clipboard: clipboard contents
   #  onClipboardChange: called when clipboard is changed
@@ -23,6 +23,7 @@ module.exports = class BlocksLayoutManager extends LayoutManager
       items: options.items or { id: "root", type: "root", blocks: [] }
       onItemsChange: options.onItemsChange
       style: options.style
+      layoutOptions: options.layoutOptions
       renderWidget: options.renderWidget
       disableMaps: options.disableMaps
       clipboard: options.clipboard

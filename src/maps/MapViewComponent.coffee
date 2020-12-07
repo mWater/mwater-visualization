@@ -166,7 +166,9 @@ module.exports = class MapViewComponent extends React.Component
       onClose: => @setState(popupContents: null)
       showCloseX: true
       size: "large",
-        @state.popupContents
+        # Render in fixed height div so that dashboard doesn't collapse to nothing
+        R 'div', style: { height: "80vh" },
+          @state.popupContents
         R 'div', style: { textAlign: "right", marginTop: 10 },
           R 'button', className: "btn btn-default", onClick: (=> @setState(popupContents: null)),
             "Close"

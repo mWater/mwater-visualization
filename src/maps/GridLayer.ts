@@ -10,6 +10,7 @@ import GridLayerDesign from './GridLayerDesign'
 import produce from 'immer';
 import { Axis } from '../axes/Axis';
 import { JsonQL, JsonQLExpr, JsonQLQuery } from 'jsonql';
+import { original } from 'immer'
 const LayerLegendComponent = require('./LayerLegendComponent');
 const PopupFilterJoinsUtils = require('./PopupFilterJoinsUtils');
 
@@ -328,7 +329,6 @@ export default class GridLayer extends Layer<GridLayerDesign> {
   //             onDesignChange: null,
   //             width: options.width,
   //             height: options.height,
-  //             standardWidth: options.standardWidth
   //           });
   //         }
   //         });
@@ -382,43 +382,43 @@ export default class GridLayer extends Layer<GridLayerDesign> {
 
   /** Returns a cleaned design */
   cleanDesign(design: GridLayerDesign, schema: Schema): GridLayerDesign {
-    return produce(design, (design) => {
+    return produce(design, (draft) => {
       const exprCleaner = new ExprCleaner(schema)
       const axisBuilder = new AxisBuilder({ schema })
 
       // Default shape
-      if (!design.shape) {
-        design.shape = "hex"
+      if (!draft.shape) {
+        draft.shape = "hex"
       }
 
       // Default size units
-      if (!design.sizeUnits) {
-        design.sizeUnits = "pixels"
-        design.size = 30
+      if (!draft.sizeUnits) {
+        draft.sizeUnits = "pixels"
+        draft.size = 30
       }
 
       // Remove extreme sizes
-      if (design.size != null && design.size < 10 && design.sizeUnits == "pixels") {
-        design.size = 10;
+      if (draft.size != null && draft.size < 10 && draft.sizeUnits == "pixels") {
+        draft.size = 10;
       } 
   
       // Clean geometry (no idea why the cast is needed. TS is giving strange error)
-      if (design.geometryExpr) {
-        design.geometryExpr = exprCleaner.cleanExpr((design.geometryExpr as Expr), { table: design.table, types: ["geometry"] })
+      if (draft.geometryExpr) {
+        draft.geometryExpr = exprCleaner.cleanExpr(design.geometryExpr, { table: draft.table, types: ["geometry"] })
       }
   
-      design.fillOpacity = (design.fillOpacity != null) ? design.fillOpacity : 0.75
+      draft.fillOpacity = (draft.fillOpacity != null) ? draft.fillOpacity : 0.75
 
-      design.borderStyle = design.borderStyle || "none"
+      draft.borderStyle = draft.borderStyle || "none"
   
       // Clean the axis
-      if (design.colorAxis) {
-        design.colorAxis = axisBuilder.cleanAxis({ axis: (design.colorAxis as Axis), table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"})
+      if (draft.colorAxis) {
+        draft.colorAxis = axisBuilder.cleanAxis({ axis: design.colorAxis, table: draft.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"})
       }
 
       // Clean filter
-      if (design.table) {
-        design.filter = exprCleaner.cleanExpr((design.filter as Expr), { table: design.table })
+      if (draft.table) {
+        draft.filter = exprCleaner.cleanExpr(design.filter || null, { table: draft.table })
       }
     })
   }

@@ -37,6 +37,12 @@
 }
 /* ================= */
 
+@media only screen and (max-width: 600px) {
+  .hide-600px {
+    display: none;
+  }
+}
+
 /* Dashed thresholds */
 .c3-grid line {
   stroke-dasharray: 3;
@@ -153,9 +159,6 @@
     overflow: initial !important;
   }
 
-  .mwater-visualization-horizontal-block {
-    page-break-inside: avoid;
-  }
   .mwater-visualization-block {
     page-break-inside: avoid;
   }

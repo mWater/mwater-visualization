@@ -74,14 +74,15 @@ There are several styles of block layouts:
 
 /* DEFAULT */
 .mwater-visualization-block-parent-outer-default {
+  padding: 20px;
 }
 
 .mwater-visualization-block-parent-inner-default {
   margin-left: auto;
   margin-right: auto;
-  padding: 30px;
-  min-width: 1000px;
-  max-width: 1800px;
+  padding: 10px;
+  /* min-width: 1000px;
+  max-width: 1800px; */
 }
 
 .mwater-visualization-block-parent-outer-default .mwater-visualization-block {
@@ -113,9 +114,7 @@ There are several styles of block layouts:
 .mwater-visualization-block-parent-inner-greybg {
   margin-left: auto;
   margin-right: auto;
-  padding: 15px;
-  min-width: 1000px;
-  max-width: 1800px;
+  padding: 10px;
 
   /* Special workaround for CSS fill issues */
   min-height: 100%;
@@ -150,14 +149,13 @@ There are several styles of block layouts:
 
 /* STORY */
 .mwater-visualization-block-parent-outer-story {
-  padding: 15px;
+  padding: 20px;
 }
 
 .mwater-visualization-block-parent-inner-story {
-  padding: 15px;
+  padding: 10px;
   margin-left: auto;
   margin-right: auto;
-  max-width: 1000px;
 }
 
 .mwater-visualization-block-parent-outer-story .mwater-visualization-block {

@@ -3,7 +3,6 @@ React = require 'react'
 R = React.createElement
 moment = require 'moment'
 produce = require('immer').default
-original = require('immer').original
 
 injectTableAlias = require('mwater-expressions').injectTableAlias
 Chart = require '../Chart'
@@ -149,7 +148,7 @@ module.exports = class CalendarChart extends Chart
   #   dataSource: dataSource to use
   #   design: design of the chart
   #   data: results from queries
-  #   width, height, standardWidth: size of the chart view
+  #   width, height: size of the chart view
   #   scope: current scope of the view element
   #   onScopeChange: called when scope changes with new scope
   createViewElement: (options) ->
@@ -164,7 +163,6 @@ module.exports = class CalendarChart extends Chart
 
       width: options.width
       height: options.height
-      standardWidth: options.standardWidth
 
       scope: options.scope
       onScopeChange: options.onScopeChange

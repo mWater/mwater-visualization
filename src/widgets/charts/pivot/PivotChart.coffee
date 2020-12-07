@@ -48,17 +48,17 @@ module.exports = class PivotChart extends Chart
         # Cleans a single segment
         cleanSegment = (segment) =>
           if segment.valueAxis
-            segment.valueAxis = axisBuilder.cleanAxis(axis: original(segment.valueAxis), table: design.table, aggrNeed: "none", types: ["enum", "text", "boolean", "date"])
+            segment.valueAxis = axisBuilder.cleanAxis(axis: (if segment.valueAxis then original(segment.valueAxis) else null), table: design.table, aggrNeed: "none", types: ["enum", "text", "boolean", "date"])
 
           # Remove valueLabelBold if no valueAxis
           if not segment.valueAxis
             delete segment.valueLabelBold
 
           if segment.filter
-            segment.filter = exprCleaner.cleanExpr(original(segment.filter), { table: design.table, types: ["boolean"] })
+            segment.filter = exprCleaner.cleanExpr((if segment.filter then original(segment.filter) else null), { table: design.table, types: ["boolean"] })
 
           if segment.orderExpr
-            segment.orderExpr = exprCleaner.cleanExpr(original(segment.orderExpr), { table: design.table, aggrStatuses: ["aggregate"], types: ["enum", "text", "boolean", "date", "datetime", "number"] })
+            segment.orderExpr = exprCleaner.cleanExpr((if segment.orderExpr then original(segment.orderExpr) else null), { table: design.table, aggrStatuses: ["aggregate"], types: ["enum", "text", "boolean", "date", "datetime", "number"] })
 
         # Clean all segments
         for segment in PivotChartUtils.getAllSegments(draft.rows)
@@ -70,16 +70,16 @@ module.exports = class PivotChart extends Chart
         # Clean all intersections
         for intersectionId, intersection of draft.intersections
           if intersection.valueAxis
-            intersection.valueAxis = axisBuilder.cleanAxis(axis: original(intersection.valueAxis), table: design.table, aggrNeed: "required", types: ["enum", "text", "boolean", "date", "number"])
+            intersection.valueAxis = axisBuilder.cleanAxis(axis: (if intersection.valueAxis then original(intersection.valueAxis) else null), table: design.table, aggrNeed: "required", types: ["enum", "text", "boolean", "date", "number"])
 
           if intersection.backgroundColorAxis
-            intersection.backgroundColorAxis = axisBuilder.cleanAxis(axis: original(intersection.backgroundColorAxis), table: design.table, aggrNeed: "required", types: ["enum", "text", "boolean", "date"])
+            intersection.backgroundColorAxis = axisBuilder.cleanAxis(axis: (if intersection.backgroundColorAxis then original(intersection.backgroundColorAxis) else null), table: design.table, aggrNeed: "required", types: ["enum", "text", "boolean", "date"])
             
             if not intersection.backgroundColorOpacity?
               intersection.backgroundColorOpacity = 1
 
           if intersection.filter
-            intersection.filter = exprCleaner.cleanExpr(original(intersection.filter), { table: design.table, types: ["boolean"] })
+            intersection.filter = exprCleaner.cleanExpr((if intersection.filter then original(intersection.filter) else null), { table: design.table, types: ["boolean"] })
 
         # Get all intersection ids
         allIntersectionIds = []
@@ -96,7 +96,7 @@ module.exports = class PivotChart extends Chart
           delete draft.intersections[intersectionId]
 
         # Clean filter
-        draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ['boolean'] })
+        draft.filter = exprCleaner.cleanExpr((if design.filter then original(design.filter) else null), { table: design.table, types: ['boolean'] })
 
         return
     )
@@ -218,7 +218,7 @@ module.exports = class PivotChart extends Chart
   #   design: design of the chart
   #   onDesignChange: when design changes
   #   data: results from queries
-  #   width, height, standardWidth: size of the chart view
+  #   width, height: size of the chart view
   #   scope: current scope of the view element
   #   onScopeChange: called when scope changes with new scope
   #   filters: array of filters
@@ -235,7 +235,6 @@ module.exports = class PivotChart extends Chart
 
       width: options.width
       height: options.height
-      standardWidth: options.standardWidth
 
       scope: options.scope
       onScopeChange: options.onScopeChange

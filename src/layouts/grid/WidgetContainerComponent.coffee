@@ -55,7 +55,6 @@ class Container extends React.Component
     onItemsChange: PropTypes.func # Called with lookup of id -> { widget:, layout: }
     renderWidget: PropTypes.func.isRequired # Renders a widget
     width: PropTypes.number.isRequired # width in pixels
-    standardWidth: PropTypes.number.isRequired # width in pixels of a standard container that all other widths should scale to look like. Usually 1440
     connectDropTarget: PropTypes.func.isRequired # Injected by react-dnd wrapper
 
   constructor: (props) ->
@@ -183,7 +182,6 @@ class Container extends React.Component
       onDesignChange: if @props.onItemsChange? then @handleWidgetDesignChange.bind(null, id)
       width: bounds.width - 10
       height: bounds.height - 10 
-      standardWidth: ((bounds.width - 10) / @props.width) * @props.standardWidth 
     })
 
     # Render decorated if editable
@@ -197,7 +195,7 @@ class Container extends React.Component
         # style: { width: bounds.width, height: bounds.height },
         elem
 
-    # Clone element, injecting width, height, standardWidth and enclosing in a dnd block
+    # Clone element, injecting width, height and enclosing in a dnd block
     return R 'div', style: style, key: id,
       React.createElement(MoveResizeLayoutComponent, { dragInfo: dragInfo, canDrag: @props.onItemsChange? }, 
         elem)

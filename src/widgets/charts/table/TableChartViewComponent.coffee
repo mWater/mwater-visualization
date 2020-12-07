@@ -18,7 +18,6 @@ module.exports = class TableChartViewComponent extends React.Component
     schema: PropTypes.object.isRequired # Schema to use
     width: PropTypes.number
     height: PropTypes.number
-    standardWidth: PropTypes.number
 
     scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
     onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
@@ -29,12 +28,9 @@ module.exports = class TableChartViewComponent extends React.Component
     not _.isEqual(prevProps, @props)
 
   render: ->
-    # Render in a standard width container and then scale up to ensure that widget always looks consistent
     style = {
-      width: @props.standardWidth
-      height: @props.height * (@props.standardWidth / @props.width)
-      transform: "scale(#{@props.width/@props.standardWidth}, #{@props.width/@props.standardWidth})"
-      transformOrigin: "0 0"
+      width: @props.width
+      height: @props.height
     }
 
     return R 'div', style: style, className: "overflow-auto-except-print",
@@ -195,7 +191,7 @@ class TableContentsComponent extends React.Component
 #       if headers.eq(i).width() != cellWIdth
 #         @setColumnWidth(i, headers.eq(i).width())
 
-#     height = @props.height * (@props.standardWidth / @props.width) - $(@refs.title).outerHeight() - $(@refs.tableHeader).outerHeight()
+#     height = @props.height - $(@refs.title).outerHeight() - $(@refs.tableHeader).outerHeight()
 #     bodyContainer.height(height)
 
 #   setColumnWidth: (column,width) ->
@@ -204,7 +200,7 @@ class TableContentsComponent extends React.Component
 #       $(el).find('td').eq(column).width(width)
 
 #   renderBody: ->
-# #    height = @props.height * (@props.standardWidth / @props.width) - $(@refs.title).outerHeight()
+# #    height = @props.height - $(@refs.title).outerHeight()
 # #    tbodyStyle =
 
 
@@ -215,20 +211,16 @@ class TableContentsComponent extends React.Component
 #     not _.isEqual(prevProps, @props)
 
 #   render: ->
-#     # Render in a standard width container and then scale up to ensure that widget always looks consistent
 #     style = {
-#       width: @props.standardWidth
-#       height: @props.height * (@props.standardWidth / @props.width)
-#       transform: "scale(#{@props.width/@props.standardWidth}, #{@props.width/@props.standardWidth})"
-#       transformOrigin: "0 0"
-#       overflow: 'hidden'
+#       width: @props.width
+#       height: @props.height
 #     }
 
 #     containerStyle =
 #       overflow: "auto"
 #       height: height
 
-#     height = @props.height * (@props.standardWidth / @props.width) - $(@refs.title).outerHeight() - 25
+#     height = @props.height - $(@refs.title).outerHeight() - 25
 
 #     return R 'div', style: style, className: "overflow-auto-except-print",
 #       R 'div', {style: { fontWeight: "bold", textAlign: "center" }, ref: "title"}, @props.design.titleText

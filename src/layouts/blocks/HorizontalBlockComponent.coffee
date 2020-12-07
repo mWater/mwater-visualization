@@ -8,6 +8,7 @@ DraggableBlockComponent = require "./DraggableBlockComponent"
 module.exports = class HorizontalBlockComponent extends React.Component
   @propTypes:
     block: PropTypes.object.isRequired
+    collapseColumns: PropTypes.bool
     renderBlock: PropTypes.func.isRequired
     onBlockDrop: PropTypes.func   # Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
     onBlockRemove: PropTypes.func # Called with (block) when block is removed
@@ -81,6 +82,11 @@ module.exports = class HorizontalBlockComponent extends React.Component
     @setState(dragIndex: null, dragInitialX: null, dragXOffset: null)
 
   render: ->
+    # Handle simple case of collapseColumns (no editing allowed)
+    if @props.collapseColumns
+      return R 'div', null,
+        _.map @props.block.blocks, (block, index) => @props.renderBlock(block, true)
+
     # Calculate widths (percentages)
     totalWeight = 0
     for index in [0...@props.block.blocks.length]

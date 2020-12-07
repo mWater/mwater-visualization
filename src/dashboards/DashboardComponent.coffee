@@ -15,6 +15,9 @@ QuickfilterCompiler = require '../quickfilter/QuickfilterCompiler'
 SettingsModalComponent = require './SettingsModalComponent'
 LayoutManager = require '../layouts/LayoutManager'
 DashboardUpgrader = require './DashboardUpgrader'
+LayoutOptionsComponent = require('./LayoutOptionsComponent').LayoutOptionsComponent
+ModalWindowComponent = require 'react-library/lib/ModalWindowComponent'
+getLayoutOptions = require('./layoutOptions').getLayoutOptions
 
 # Dashboard component that includes an action bar at the top
 # Manages undo stack and quickfilter value
@@ -62,26 +65,16 @@ module.exports = class DashboardComponent extends React.Component
 
   constructor: (props) ->
     super(props)
+
+    layoutOptions = getLayoutOptions(props.design)
+
     @state = { 
       undoStack: new UndoStack().push(props.design) 
       quickfiltersValues: props.quickfiltersValues
-      quickfiltersHeight: null   # Height of quickfilters
       editing: LayoutManager.createLayoutManager(props.design.layout).isEmpty(props.design.items) and props.onDesignChange?
+      layoutOptionsOpen: false
+      hideQuickfilters: layoutOptions.hideQuickfiltersWidth? and layoutOptions.hideQuickfiltersWidth > document.body.clientWidth
     }
-
-  componentDidMount: -> 
-    @updateHeight()
-
-  componentDidUpdate: ->
-    @updateHeight()
-
-  updateHeight: ->
-    # Calculate quickfilters height
-    if @quickfilters 
-      if @state.quickfiltersHeight != @quickfilters.offsetHeight
-        @setState(quickfiltersHeight: @quickfilters.offsetHeight)
-    else
-      @setState(quickfiltersHeight: 0)
 
   # Get the values of the quick filters
   getQuickfilterValues: =>
@@ -134,6 +127,9 @@ module.exports = class DashboardComponent extends React.Component
   handleToggleEditing: =>
     @setState(editing: not @state.editing)
 
+  handleOpenLayoutOptions: =>
+    @setState(layoutOptionsOpen: true)
+
   handleRefreshData: =>
     @props.dataSource.clearCache?()
     @forceUpdate()
@@ -147,6 +143,9 @@ module.exports = class DashboardComponent extends React.Component
       @setState(quickfiltersValues: null)
 
     @props.onDesignChange(design)
+  
+  handleShowQuickfilters: => 
+    @setState(hideQuickfilters: false)
 
   handleUpgrade: =>
     if not confirm("This will upgrade your dashboard to the new kind with enhanced features. You can click Undo immediately afterwards if you wish to revert it. Continue?")
@@ -195,15 +194,9 @@ module.exports = class DashboardComponent extends React.Component
        content
 
   renderStyle: ->
-    return R 'div', key: "style", className: "btn-group",
-      R 'button', type: "button", "data-toggle": "dropdown", className: "btn btn-link btn-sm dropdown-toggle",
-        R 'span', className: "fa fa-th-large"
-        " Layout "
-        R 'span', className: "caret"
-      R 'div', className: "dropdown-menu dropdown-menu-right list-group", style: { padding: 0, zIndex: 10000, width: 300 },
-        @renderStyleItem("default")
-        @renderStyleItem("greybg")
-        @renderStyleItem("story")
+    return R 'button', type: "button", key: "style", className: "btn btn-link btn-sm", onClick: @handleOpenLayoutOptions,
+      R 'span', className: "fa fa-mobile"  
+      R 'span', className: "hide-600px", " Layout "
 
   renderActionLinks: ->
     R 'div', null,
@@ -214,25 +207,30 @@ module.exports = class DashboardComponent extends React.Component
         [
           R 'a', key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
             R 'span', className: "glyphicon glyphicon-triangle-left"
-            " Undo"
+            R 'span', className: "hide-600px", " Undo"
           " "
           R 'a', key: "redo", className: "btn btn-link btn-sm #{if not @state.undoStack.canRedo() then "disabled" else ""}", onClick: @handleRedo, 
             R 'span', className: "glyphicon glyphicon-triangle-right"
-            " Redo"
+            R 'span', className: "hide-600px", " Redo"
         ]
       R 'a', key: "print", className: "btn btn-link btn-sm", onClick: @handlePrint,
         R('span', className: "glyphicon glyphicon-print")
-        " Print"
+        R 'span', className: "hide-600px", " Print"
       R 'a', key: "refresh", className: "btn btn-link btn-sm", onClick: @handleRefreshData,
         R('span', className: "glyphicon glyphicon-refresh")
-        " Refresh"
+        R 'span', className: "hide-600px", " Refresh"
+      if @state.hideQuickfilters and @props.design.quickfilters and @props.design.quickfilters.length > 0
+        R 'a', key: "showQuickfilters", className: "btn btn-link btn-sm", onClick: @handleShowQuickfilters,
+          R('span', className: "fa fa-filter")
+          R 'span', className: "hide-600px", " Show Filters"
+
       # R 'a', key: "export", className: "btn btn-link btn-sm", onClick: @handleSaveDesignFile,
       #   R('span', className: "glyphicon glyphicon-download-alt")
       #   " Export"
       if @state.editing
         R 'a', key: "settings", className: "btn btn-link btn-sm", onClick: @handleSettings,
           R('span', className: "glyphicon glyphicon-cog")
-          " Settings"
+          R 'span', className: "hide-600px", " Settings"
       if @state.editing
         @renderStyle()
       @props.extraTitleButtonsElem
@@ -240,24 +238,24 @@ module.exports = class DashboardComponent extends React.Component
         @renderEditingSwitch()
 
   renderTitleBar: ->
-    R 'div', style: { position: "absolute", top: 0, left: 0, right: 0, height: 40, padding: 4 },
+    R 'div', style: { height: 40, padding: 4 },
       R 'div', style: { float: "right" },
         @renderActionLinks()
       @props.titleElem
 
   renderQuickfilter: ->
-    R 'div', style: { position: "absolute", top: (if @props.hideTitleBar then 0 else 40), left: 0, right: 0 }, ref: ((c) => @quickfilters = c),
-      R QuickfiltersComponent, {
-        design: @props.design.quickfilters
-        schema: @props.schema
-        dataSource: @props.dataSource
-        quickfiltersDataSource: @props.dashboardDataSource.getQuickfiltersDataSource()
-        values: @state.quickfiltersValues
-        onValuesChange: (values) => @setState(quickfiltersValues: values)
-        locks: @props.quickfilterLocks
-        filters: @getCompiledFilters()
-        hideTopBorder: @props.hideTitleBar
-      }
+    R QuickfiltersComponent, {
+      design: @props.design.quickfilters
+      schema: @props.schema
+      dataSource: @props.dataSource
+      quickfiltersDataSource: @props.dashboardDataSource.getQuickfiltersDataSource()
+      values: @state.quickfiltersValues
+      onValuesChange: (values) => @setState(quickfiltersValues: values)
+      locks: @props.quickfilterLocks
+      filters: @getCompiledFilters()
+      hideTopBorder: @props.hideTitleBar
+      onHide: () => @setState(hideQuickfilters: true)
+    }
 
   refDashboardView: (el) =>
     @dashboardView = el
@@ -268,28 +266,47 @@ module.exports = class DashboardComponent extends React.Component
     # Compile quickfilters
     filters = filters.concat(new QuickfilterCompiler(@props.schema).compile(@props.design.quickfilters, @state.quickfiltersValues, @props.quickfilterLocks))
 
-    R 'div', key: "view", style: { height: "100%", paddingTop: (if @props.hideTitleBar then 0 else 40) + (@state.quickfiltersHeight or 0), position: "relative" },
+    dashboardView = R DashboardViewComponent, {
+      schema: @props.schema
+      dataSource: @props.dataSource
+      dashboardDataSource: @props.dashboardDataSource
+      ref: @refDashboardView
+      design: @props.design
+      onDesignChange: if @state.editing then @props.onDesignChange
+      filters: filters
+      onRowClick: @props.onRowClick
+      namedStrings: @props.namedStrings
+      hideScopes: @state.hideQuickfilters
+    }
+
+    readonlyDashboardView = R DashboardViewComponent, {
+      schema: @props.schema
+      dataSource: @props.dataSource
+      dashboardDataSource: @props.dashboardDataSource
+      ref: @refDashboardView
+      design: @props.design
+      filters: filters
+      onRowClick: @props.onRowClick
+      namedStrings: @props.namedStrings
+      hideScopes: @state.hideQuickfilters
+    }
+
+    return R 'div', style: { display: "grid", gridTemplateRows: (if @props.hideTitleBar then "auto 1fr" else "auto auto 1fr"), height: "100%" },
       if not @props.hideTitleBar
         @renderTitleBar()
-      @renderQuickfilter()
+      R 'div', null,
+        if not @state.hideQuickfilters
+          @renderQuickfilter()
+      dashboardView
       if @props.onDesignChange?
         R SettingsModalComponent, { onDesignChange: @handleDesignChange, schema: @props.schema, dataSource: @props.dataSource, ref: (c) => @settings = c }
-
-      # Dashboard view requires width, so use auto size component to inject it
-      R AutoSizeComponent, { injectWidth: true, injectHeight: true }, 
-        (size) =>
-          R DashboardViewComponent, {
-            schema: @props.schema
-            dataSource: @props.dataSource
-            dashboardDataSource: @props.dashboardDataSource
-
-            ref: @refDashboardView
+      if @state.layoutOptionsOpen
+        R ModalWindowComponent, isOpen: true, outerPadding: 10, innerPadding: 10,
+          R LayoutOptionsComponent, {
             design: @props.design
-            onDesignChange: if @state.editing then @props.onDesignChange
-            filters: filters
-            width: size.width
-            standardWidth: if @props.printScaling then 1440 else size.width
-            onRowClick: @props.onRowClick
-            namedStrings: @props.namedStrings
+            onDesignChange: @props.onDesignChange
+            onClose: () => @setState(layoutOptionsOpen: false)
+            dashboardView: readonlyDashboardView
+            quickfiltersView: @renderQuickfilter()
           }
-      
+

@@ -57,11 +57,11 @@ module.exports = class TableChart extends Chart
         if not column.id
           column.id = uuid()
         # Clean textAxis
-        column.textAxis = axisBuilder.cleanAxis(axis: original(column.textAxis), table: design.table, aggrNeed: "optional")
+        column.textAxis = axisBuilder.cleanAxis(axis: (if column.textAxis then original(column.textAxis) else null), table: design.table, aggrNeed: "optional")
 
       # Clean orderings
       for ordering in draft.orderings
-        ordering.axis = axisBuilder.cleanAxis(axis: original(ordering.axis), table: design.table, aggrNeed: "optional")
+        ordering.axis = axisBuilder.cleanAxis(axis: (if ordering.axis then original(ordering.axis) else null), table: design.table, aggrNeed: "optional")
 
       if design.filter
         draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ['boolean'] })
@@ -216,7 +216,7 @@ module.exports = class TableChart extends Chart
   #   dataSource: dataSource to use
   #   design: design of the chart
   #   data: results from queries
-  #   width, height, standardWidth: size of the chart view
+  #   width, height: size of the chart view
   #   scope: current scope of the view element
   #   onScopeChange: called when scope changes with new scope
   #   onRowClick: Called with (tableId, rowId) when item is clicked
@@ -230,7 +230,6 @@ module.exports = class TableChart extends Chart
 
       width: options.width
       height: options.height
-      standardWidth: options.standardWidth
 
       scope: options.scope
       onScopeChange: options.onScopeChange

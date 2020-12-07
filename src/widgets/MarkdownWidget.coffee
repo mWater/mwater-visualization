@@ -21,14 +21,12 @@ module.exports = class MarkdownWidget extends Widget
   #  onDesignChange: called with new design. null/undefined for readonly
   #  width: width in pixels on screen
   #  height: height in pixels on screen
-  #  standardWidth: standard width of the widget in pixels. If greater than width, widget should scale up, if less, should scale down.
   createViewElement: (options) ->
     return React.createElement(MarkdownWidgetComponent,
       design: options.design
       onDesignChange: options.onDesignChange
       width: options.width
       height: options.height
-      standardWidth: options.standardWidth
     )
 
   # Determine if widget is auto-height, which means that a vertical height is not required.
@@ -41,7 +39,6 @@ class MarkdownWidgetComponent extends React.Component
 
     width: PropTypes.number
     height: PropTypes.number
-    standardWidth: PropTypes.number
 
   constructor: (props) ->
     super(props)
@@ -91,7 +88,6 @@ class MarkdownWidgetComponent extends React.Component
       design: design
       width: @props.width
       height: @props.height
-      standardWidth: @props.standardWidth
     })
 
   render: ->
@@ -117,16 +113,12 @@ class MarkdownWidgetViewComponent extends React.Component
 
     width: PropTypes.number
     height: PropTypes.number
-    standardWidth: PropTypes.number
 
   render: ->
-    # Render in a standard width container and then scale up to ensure that widget always looks consistent
     R 'div', 
       style: { 
-        width: @props.standardWidth
-        height: if @props.height and @props.standardWidth and @props.width then @props.height * (@props.standardWidth / @props.width)
-        transform: if @props.height and @props.standardWidth and @props.width then "scale(#{@props.width/@props.standardWidth}, #{@props.width/@props.standardWidth})"
-        transformOrigin: if @props.height and @props.standardWidth and @props.width then "0 0"
+        width: @props.width
+        height: @props.height
       }
       className: "mwater-visualization-markdown"
       dangerouslySetInnerHTML: { __html: markdown.toHTML(@props.design.markdown or "") }

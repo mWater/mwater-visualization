@@ -5,6 +5,7 @@ R = React.createElement
 uuid = require 'uuid'
 LayoutManager = require '../LayoutManager'
 LegoLayoutEngine = require './LegoLayoutEngine'
+AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 
 module.exports = class GridLayoutManager extends LayoutManager
   renderPalette: (width) ->
@@ -54,32 +55,31 @@ module.exports = class GridLayoutManager extends LayoutManager
 
   # Renders the layout as a react element
   # options:
-  #  width: width of layout
   #  items: opaque items object that layout manager understands
   #  onItemsChange: Called when items changes
   #  renderWidget: called with ({ id:, type:, design:, onDesignChange:, width:, height:  })
   renderLayout: (options) ->
     GridLayoutComponent = require './GridLayoutComponent'
 
-    if options.onItemsChange?
-      return R 'div', style: { position: "relative", height: "100%", overflow: "hidden" }, 
-        @renderPalette(options.width)
-        R 'div', style: { position: "absolute", left: 185, top: 0, right: 0, bottom: 0, overflow: "scroll" },
-          R 'div', style: { position: "absolute", left: 20, top: 20, right: 20, bottom: 20 },
+    return R AutoSizeComponent, { injectWidth: true, injectHeight: true }, 
+      (size) =>
+        if options.onItemsChange?
+          return R 'div', style: { position: "relative", height: "100%", overflow: "hidden" }, 
+            @renderPalette(size.width)
+            R 'div', style: { position: "absolute", left: 185, top: 0, right: 0, bottom: 0, overflow: "scroll" },
+              R 'div', style: { position: "absolute", left: 20, top: 20, right: 20, bottom: 20 },
+                R GridLayoutComponent, 
+                  width: size.width - 40 - 185
+                  items: options.items
+                  onItemsChange: options.onItemsChange
+                  renderWidget: options.renderWidget
+        else
+          return R 'div', style: { position: "relative", height: "100%", width: size.width, padding: 20 },
             R GridLayoutComponent, 
-              width: options.width - 40 - 185
-              standardWidth: options.standardWidth - 40 - 185 # TODO 185? doc. needed?
+              width: size.width - 40
               items: options.items
               onItemsChange: options.onItemsChange
               renderWidget: options.renderWidget
-    else
-      return R 'div', style: { position: "relative", height: "100%", width: options.width, padding: 20 },
-        R GridLayoutComponent, 
-          width: options.width - 40
-          standardWidth: options.standardWidth - 40
-          items: options.items
-          onItemsChange: options.onItemsChange
-          renderWidget: options.renderWidget
 
   # Tests if dashboard has any items
   isEmpty: (items) ->
