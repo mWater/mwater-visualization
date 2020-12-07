@@ -45,7 +45,6 @@
     "jsonql": "github:mWater/jsonql",
     "languages": "github:mWater/languages.js",
     "leaflet": "^1.7.1",
-    "leaflet-loading": "github:mWater/Leaflet.loading",
     "lodash": "^3.1.0",
     "lru-cache": "^4.0.1",
     "markdown": "^0.5.0",

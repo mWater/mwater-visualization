@@ -6,10 +6,7 @@ R = React.createElement
 L = require 'leaflet'
 BingLayer = require './BingLayer'
 UtfGridLayer = require './UtfGridLayer'
-
-# Setup leaflet loading
-window.L = L
-require('leaflet-loading')
+LeafletLoading = require './LeafletLoading'
 
 # See https://github.com/PaulLeCam/react-leaflet/issues/255#issuecomment-261904061 for issue with CSS + webpack
 delete L.Icon.Default.prototype._getIconUrl
@@ -163,7 +160,7 @@ module.exports = class LeafletMapComponent extends React.Component
     @setBounds(@props.initialBounds)
 
     if @props.loadingSpinner
-      loadingControl = L.Control.loading({
+      loadingControl = new LeafletLoading({
         separate: true
       })
       @map.addControl(loadingControl)
