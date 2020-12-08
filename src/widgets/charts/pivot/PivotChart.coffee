@@ -96,8 +96,7 @@ module.exports = class PivotChart extends Chart
           delete draft.intersections[intersectionId]
 
         # Clean filter
-        draft.filter = exprCleaner.cleanExpr((if design.filter then original(design.filter) else null), { table: design.table, types: ['boolean'] })
-
+        draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ['boolean'] })
         return
     )
 
