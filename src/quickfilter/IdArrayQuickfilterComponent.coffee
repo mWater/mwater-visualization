@@ -2,7 +2,7 @@ _ = require 'lodash'
 PropTypes = require('prop-types')
 React = require 'react'
 R = React.createElement
-AsyncReactSelect = require('react-select').Async
+AsyncReactSelect = require('react-select/async').default
 ExprUtils = require('mwater-expressions').ExprUtils
 IdLiteralComponent = require('mwater-expressions-ui').IdLiteralComponent
 
