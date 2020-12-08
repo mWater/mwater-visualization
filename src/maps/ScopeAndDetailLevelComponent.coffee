@@ -7,7 +7,6 @@ ExprUtils = require('mwater-expressions').ExprUtils
 
 RegionSelectComponent = require './RegionSelectComponent'
 DetailLevelSelectComponent = require './DetailLevelSelectComponent'
-ReactSelect = require 'react-select'
 ui = require 'react-library/lib/bootstrap'
 
 # Generic scope and detail level setter for AdminChoropleth layers 
