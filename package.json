@@ -68,7 +68,7 @@
     "react-linkify": "^0.2.2",
     "react-motion": "^0.5.2",
     "react-onclickout": "^2.0.4",
-    "react-select": "github:mWater/react-select#fix_2682_built",
+    "react-select": "^3.1.1",
     "save-svg-as-png": "^1.4.17",
     "shallowequal": "^0.2.2",
     "ui-builder": "^2.0.1",
