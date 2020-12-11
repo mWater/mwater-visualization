@@ -118,7 +118,7 @@ module.exports = class DashboardViewComponent extends React.Component
     # props are immutable in React 0.14+
     elem = R 'div', style: { transform: "scale(0.5)", transformOrigin: "top left" },
       R 'div', style: { width: 1440 }, 
-        R(DashboardViewComponent, _.extend({}, @props, { width: 1440, onDesignChange: null }))
+        R(DashboardViewComponent, _.extend({}, @props, { onDesignChange: null, printMode: true }))
     
     printer = new ReactElementPrinter()
     printer.print(elem, { delay: 5000 })
