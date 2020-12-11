@@ -35,5 +35,8 @@ export default class DashboardViewComponent extends React.Component<{
 
   /** True to hide scope display */
   hideScopes?: boolean
+
+  /** True to render in print mode (prevents odd clipping issue) */
+  printMode?: boolean
 }> {
 }

@@ -43,6 +43,9 @@ module.exports = class DashboardViewComponent extends React.Component
     # True to hide scope display
     hideScopes: PropTypes.bool
 
+    # True to render in print mode (prevents odd clipping issue)
+    printMode: PropTypes.bool
+
   @childContextTypes:
     locale: PropTypes.string
 
@@ -202,8 +205,12 @@ module.exports = class DashboardViewComponent extends React.Component
     style = {
       height: "100%"
       position: "relative"
-      overflowX: "auto"  # Prevent this block from taking up too much space. Scrolling handled by layout manager
     }
+
+    if not @props.printMode
+      # Prevent this block from taking up too much space. Scrolling handled by layout manager.
+      # Setting overflow-x stops the inner div from becoming too tall
+      style.overflowX = "auto"  
 
     # Render widget container
     return R "div", style: style, 
