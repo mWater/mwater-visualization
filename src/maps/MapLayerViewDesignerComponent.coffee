@@ -6,6 +6,7 @@ ActionCancelModalComponent = require('react-library/lib/ActionCancelModalCompone
 Rcslider = require('rc-slider').default
 LayerFactory = require './LayerFactory'
 ui = require('react-library/lib/bootstrap')
+PopoverHelpComponent = require 'react-library/lib/PopoverHelpComponent'
 
 # A single row in the table of layer views. Handles the editor state
 module.exports = class MapLayerViewDesignerComponent extends React.Component
@@ -39,6 +40,9 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
   handleHideLegend: (hideLegend) =>
     @update(hideLegend: hideLegend)
 
+  handleGroupChange: (group) =>
+    @update(group: group)
+
   handleToggleEditing: => @setState(editing: not @state.editing)
   handleSaveEditing: (design) => @update(design: design)
 
@@ -54,9 +58,15 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
     else
       R 'i', className: "fa fa-fw fa-square", style: { color: "#DDDDDD" }, onClick: @handleVisibleClick
 
-  renderHideLegend: ->
-    R ui.Checkbox, value: @props.layerView.hideLegend, onChange: @handleHideLegend,
-      "Hide Legend"
+  renderAdvanced: ->
+    R 'div', key: "advanced", style: { display: "grid", gridTemplateColumns: "50% auto auto 1fr", alignItems: "center", columnGap: 5 },
+      R ui.Checkbox, value: @props.layerView.hideLegend, onChange: @handleHideLegend, inline: true,
+        "Hide Legend"
+      R 'label', className: "text-muted", key: "label",
+        "Group:"
+      R ui.TextInput, key: "input", value: @props.layerView.group, onChange: @handleGroupChange, style: { width: "5em" }, placeholder: "None",
+      R PopoverHelpComponent, placement: "left", key: "help",
+        '''Layers in the same group can only be selected one at a time'''
 
   renderName: ->
     R 'span', className: "hover-display-parent", onClick: @handleRename, style: { cursor: "pointer" },
@@ -76,7 +86,7 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
           filters: @props.filters
         })
       @renderOpacityControl()
-      @renderHideLegend()
+      @renderAdvanced()
 
   renderLayerEditToggle: ->
     return R 'div', key: "edit", style: { marginBottom: (if @state.editing then 10) },

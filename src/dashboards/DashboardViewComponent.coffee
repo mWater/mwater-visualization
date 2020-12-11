@@ -114,11 +114,9 @@ module.exports = class DashboardViewComponent extends React.Component
 
   # Call to print the dashboard
   print: =>
-    # Create element at 96 dpi (usual for browsers) and 7.5" across (letter - 0.5" each side). 1440 is double, so scale down
-    # props are immutable in React 0.14+
-    elem = R 'div', style: { transform: "scale(0.5)", transformOrigin: "top left" },
-      R 'div', style: { width: 1440 }, 
-        R(DashboardViewComponent, _.extend({}, @props, { onDesignChange: null, printMode: true }))
+    # Create element at 1080 wide (use as standard printing width)
+    elem = R 'div', style: { width: 1080 }, 
+      R(DashboardViewComponent, _.extend({}, @props, { onDesignChange: null, printMode: true }))
     
     printer = new ReactElementPrinter()
     printer.print(elem, { delay: 5000 })
