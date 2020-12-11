@@ -202,7 +202,7 @@ module.exports = class DashboardViewComponent extends React.Component
     style = {
       height: "100%"
       position: "relative"
-      overflow: "hidden"  # Prevent this block from taking up too much space. Scrolling handled by layout manager
+      overflowX: "auto"  # Prevent this block from taking up too much space. Scrolling handled by layout manager
     }
 
     # Render widget container
