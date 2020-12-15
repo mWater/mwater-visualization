@@ -224,7 +224,7 @@ class EnumQuickfilterComponent extends React.Component
     options = _.map(@props.options, (opt) => { value: opt.id, label: ExprUtils.localizeString(opt.name, @context.locale) }) 
 
     # Determine width, estimating about 8 px per letter with 120px padding
-    width = _.max(options, (o) => o.label.length)?.label.length
+    width = _.max(options, (o) => o.label.length)?.label?.length
     width = if width then width * 8 + 120 else 280
     minWidth = if width > 280 or @props.multi then "280px" else "#{width}px"
 
