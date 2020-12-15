@@ -99,6 +99,14 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
           ]
         })
       }
+
+      // Add filters on regions to outer query
+      for (const filter of filters) {
+        if (filter.table == regionsTable) {
+          query.where!.exprs.push(injectTableAlias(filter.jsonql, "regions"))
+        }
+      }
+
       return query
     }
 
@@ -238,6 +246,13 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         })
       }
 
+      // Add filters on regions to outer query
+      for (const filter of filters) {
+        if (filter.table == regionsTable) {
+          query.where!.exprs.push(injectTableAlias(filter.jsonql, "regions2"))
+        }
+      }
+
       // Bubble up color and label
       if (design.axes.color) {
         query.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "color"}, alias: "color" })
@@ -307,6 +322,14 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
           ]
         })
       }
+
+      // Add filters on regions to outer query
+      for (const filter of filters) {
+        if (filter.table == regionsTable) {
+          query.where!.exprs.push(injectTableAlias(filter.jsonql, "regions"))
+        }
+      }
+
       return query
     }
 
@@ -508,25 +531,32 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
   getBounds(design: ChoroplethLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any) {
     const regionsTable = design.regionsTable || "admin_regions";
 
-    // Whole world
-    if (!design.scope) {
-      return callback(null);
+    const appliedFilters: JsonQLFilter[] = []
+
+    // If scoped, use that as filter
+    if (design.scope) {
+      appliedFilters.push({
+        table: regionsTable,
+        jsonql: {
+          type: "op",
+          op: "=",
+          exprs: [
+            { type: "field", tableAlias: "{alias}", column: "_id" },
+            design.scope
+          ]
+        }
+      })
     }
 
-    // Get just scope. Ignore filters and get entire scope
-    filters = [{
-      table: regionsTable,
-      jsonql: {
-        type: "op",
-        op: "=",
-        exprs: [
-          { type: "field", tableAlias: "{alias}", column: "_id" },
-          design.scope
-        ]
+    // If regions table is filtered, use that as filter
+    for (const filter of filters) {
+      if (filter.table == regionsTable) {
+        appliedFilters.push(filter)
       }
-    }];
+    }
 
-    return this.getBoundsFromExpr(schema, dataSource, regionsTable, { type: "field", table: regionsTable, column: "shape" }, null, filters, callback);
+    // Use shape_simplified for speed, as bounds are always approximate
+    return this.getBoundsFromExpr(schema, dataSource, regionsTable, { type: "field", table: regionsTable, column: "shape_simplified" }, null, filters, callback);
   }
 
   // Get min and max zoom levels
