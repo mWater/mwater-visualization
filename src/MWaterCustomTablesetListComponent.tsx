@@ -78,7 +78,8 @@ export const MWaterCustomTablesetListComponent = (props: {
     const name = ExprUtils.localizeString(ts.design.name, props.locale)
 
     // Check search 
-    if (search && !name.toLowerCase().includes(search.toLowerCase())) {
+    if (search && !name.toLowerCase().includes(search.toLowerCase())
+      && !ts.design.tables.some(t => ExprUtils.localizeString(t.name).includes(search.toLowerCase()))) {
       return null
     }
 
