@@ -60,6 +60,7 @@ module.exports = class MapViewComponent extends React.Component
 
     @state = {
       popupContents: null   # Element in the popup
+      legendHidden: false
     }
 
   componentDidMount: ->
@@ -151,12 +152,17 @@ module.exports = class MapViewComponent extends React.Component
     return (@props.extraFilters or []).concat(MapUtils.getCompiledFilters(@props.design, @props.schema, MapUtils.getFilterableTables(@props.design, @props.schema)))
 
   renderLegend: ->
-    return R LegendComponent,
-      schema: @props.schema
-      layerViews: @props.design.layerViews
-      filters: @getCompiledFilters()
-      dataSource: @props.dataSource
-      locale: @context.locale
+    if @state.legendHidden
+      return R HiddenLegend,
+        onShow: () => @setState(legendHidden: false)
+    else
+      return R LegendComponent,
+        schema: @props.schema
+        layerViews: @props.design.layerViews
+        filters: @getCompiledFilters()
+        dataSource: @props.dataSource
+        locale: @context.locale
+        onHide: () => @setState(legendHidden: true)
 
   renderPopup: ->
     if not @state.popupContents
@@ -250,3 +256,26 @@ module.exports = class MapViewComponent extends React.Component
         extraAttribution: @props.design.attribution
         loadingSpinner: true
         maxZoom: @props.design.maxZoom
+
+
+# Legend display tab at bottom right
+class HiddenLegend extends React.Component
+  render: ->
+    style = {
+      zIndex: 1000
+      backgroundColor: "white"
+      position: "absolute"
+      bottom: 34
+      right: 0
+      fontSize: 12
+      color: "#337ab7"
+      cursor: "pointer"
+      paddingTop: 4
+      paddingBottom: 1
+      paddingLeft: 3
+      paddingRight: 3
+      borderRadius: "4px 0px 0px 4px"
+    }
+
+    return R 'div', style: style, onClick: @props.onShow,
+      R 'i', className: "fa fa-angle-double-left"

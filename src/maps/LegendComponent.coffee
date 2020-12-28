@@ -13,6 +13,7 @@ module.exports = class LegendComponent extends React.Component
     zoom: PropTypes.number     # Current zoom level
     filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
     locale: PropTypes.string.isRequired
+    onHide: PropTypes.func.isRequired
 
   render: ->
     legendItems = _.compact(
@@ -50,7 +51,7 @@ module.exports = class LegendComponent extends React.Component
     if legendItems.length == 0
       return null
 
-    style = {
+    legendStyle = {
       padding: 7
       background: "rgba(255,255,255,0.8)"
       boxShadow: "0 0 15px rgba(0,0,0,0.2)"
@@ -64,10 +65,23 @@ module.exports = class LegendComponent extends React.Component
       fontSize: 12
     }
 
-    return R 'div', style: style,
-      _.map legendItems, (item, i) =>
-        [
-          R 'div', key: item.key,
-            item.legend
-        ]
+    hideStyle = {
+      position: "absolute"
+      bottom: 34
+      right: 11
+      zIndex: 1001
+      fontSize: 10
+      color: "#337ab7"
+      cursor: "pointer"
+    }
+
+    return R 'div', null,
+      R 'div', style: legendStyle,
+        _.map legendItems, (item, i) =>
+          [
+            R 'div', key: item.key,
+              item.legend
+          ]
+      R 'div', key: "hide", style: hideStyle, onClick: @props.onHide,
+        R 'i', className: "fa fa-angle-double-right"
 
