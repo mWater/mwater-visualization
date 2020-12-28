@@ -28,6 +28,8 @@ export interface MapDesign {
     globalFilters?: GlobalFilter[];
     /** True to display layer switcher */
     showLayerSwitcher?: boolean;
+    /** Mode of initial legend display. Default is "open" */
+    initialLegendDisplay?: "open" | "closed" | "closedIfSmall";
 }
 /** Is a view of a layer including whether visible, opacity. */
 export interface MapLayerView {

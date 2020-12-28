@@ -14,6 +14,7 @@ BaseLayerDesignerComponent = require './BaseLayerDesignerComponent'
 PopoverHelpComponent = require 'react-library/lib/PopoverHelpComponent'
 MapUtils = require './MapUtils'
 ExprCompiler = require('mwater-expressions').ExprCompiler
+ui = require('react-library/lib/bootstrap')
 
 module.exports = class MapDesignerComponent extends React.Component
   @propTypes:
@@ -46,6 +47,10 @@ module.exports = class MapDesignerComponent extends React.Component
   handleConvertToClusterMap: =>
     @props.onDesignChange(MapUtils.convertToClusterMap(@props.design)) 
 
+  handleInitialLegendDisplayChange: (value) =>
+    design = _.extend({}, @props.design, {initialLegendDisplay: value})
+    @props.onDesignChange(design)
+
   renderOptionsTab: ->
     R 'div', null,
       R BaseLayerDesignerComponent,
@@ -67,6 +72,17 @@ module.exports = class MapDesignerComponent extends React.Component
             "Show Layer Switcher "
             R PopoverHelpComponent, placement: "left",
               '''Show a control in the map allowing switching layers'''
+
+      R ui.FormGroup, label: "Initial Legend Display", labelMuted: true,
+        R ui.Select,
+          value: @props.design.initialLegendDisplay or "open"
+          onChange: @handleInitialLegendDisplayChange
+          options: [
+            { value: "open", label: "Open" }
+            { value: "closed", label: "Closed" }
+            { value: "closedIfSmall", label: "Open if wide enough" }
+          ]
+          style: { width: "auto" }
 
       if MapUtils.canConvertToClusterMap(@props.design)
         R 'div', key: "tocluster",

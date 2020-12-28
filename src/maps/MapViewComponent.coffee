@@ -58,9 +58,11 @@ module.exports = class MapViewComponent extends React.Component
   constructor: (props) ->
     super(props)
 
+    initialLegendDisplay = props.design.initialLegendDisplay or "open"
+
     @state = {
       popupContents: null   # Element in the popup
-      legendHidden: false
+      legendHidden: initialLegendDisplay == "closed" or (props.width < 500 and initialLegendDisplay == "closedIfSmall")
     }
 
   componentDidMount: ->

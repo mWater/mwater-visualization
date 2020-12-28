@@ -31,6 +31,9 @@ export interface MapDesign {
 
   /** True to display layer switcher */
   showLayerSwitcher?: boolean
+
+  /** Mode of initial legend display. Default is "open" */
+  initialLegendDisplay?: "open" | "closed" | "closedIfSmall"
 }
 
 
