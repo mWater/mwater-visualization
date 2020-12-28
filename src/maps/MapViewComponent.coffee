@@ -269,14 +269,16 @@ class HiddenLegend extends React.Component
       position: "absolute"
       bottom: 34
       right: 0
-      fontSize: 12
+      fontSize: 14
       color: "#337ab7"
       cursor: "pointer"
       paddingTop: 4
-      paddingBottom: 1
+      paddingBottom: 3
       paddingLeft: 3
       paddingRight: 3
       borderRadius: "4px 0px 0px 4px"
+      border: "solid 1px #AAA"
+      borderRight: "none"
     }
 
     return R 'div', style: style, onClick: @props.onShow,

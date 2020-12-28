@@ -17,12 +17,12 @@ export function LayerSwitcherComponent(props: {
     paddingBottom: 3,
     borderRadius: 4, 
     border: "solid 1px #AAA",
-    color: "#888",
+    color: "#666",
     position: "absolute",
     right: 0,
     top: 0,
-    opacity: 0.7, 
-    cursor: "pointer"
+    cursor: "pointer",
+    fontSize: 14
   }
 
   function toggleDropdown() {

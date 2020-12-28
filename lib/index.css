@@ -176,6 +176,15 @@
   .overflow-auto-except-print {
     overflow: hidden;
   }
+
+  .leaflet-control-zoom {
+    display: none;
+  }
+
+  /* https://www.itsupportguides.com/knowledge-base/tech-tips-tricks/how-to-hide-urlhref-when-printing-bootstrap-website/ */
+  a[href]:after {
+    content: none !important;
+  }
 }
 
 .mwater-visualization-layer {
