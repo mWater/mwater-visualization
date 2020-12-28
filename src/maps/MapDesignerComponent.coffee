@@ -39,6 +39,10 @@ module.exports = class MapDesignerComponent extends React.Component
     design = _.extend({}, @props.design, {autoBounds: value})
     @props.onDesignChange(design)
 
+  handleShowLayerSwitcherChange: (value) =>
+    design = _.extend({}, @props.design, {showLayerSwitcher: value})
+    @props.onDesignChange(design)
+
   handleConvertToClusterMap: =>
     @props.onDesignChange(MapUtils.convertToClusterMap(@props.design)) 
 
@@ -55,6 +59,14 @@ module.exports = class MapDesignerComponent extends React.Component
             "Automatic zoom "
             R PopoverHelpComponent, placement: "left",
               '''Automatically zoom to the complete data whenever the map is loaded or the filters change'''
+
+      R CheckboxComponent, 
+        checked: @props.design.showLayerSwitcher
+        onChange: @handleShowLayerSwitcherChange,
+          R 'span', className: "text-muted", 
+            "Show Layer Switcher "
+            R PopoverHelpComponent, placement: "left",
+              '''Show a control in the map allowing switching layers'''
 
       if MapUtils.canConvertToClusterMap(@props.design)
         R 'div', key: "tocluster",

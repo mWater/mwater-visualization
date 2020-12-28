@@ -67,7 +67,13 @@ class MapWidgetComponent extends React.Component
     @state = { 
       # Design that is being edited. Change is propagated on closing window
       editDesign: null
+
+      transientDesign: props.design  # Temporary design for read-only maps
     }  
+
+  componentDidUpdate: (prevProps) ->
+    if not _.isEqual(prevProps.design, @props.design)
+      @setState(transientDesign: @props.design)
 
   handleStartEditing: =>
     @setState(editDesign: @props.design)
@@ -137,13 +143,16 @@ class MapWidgetComponent extends React.Component
     if @props.onDesignChange?
       dropdownItems.push({ label: "Edit", icon: "pencil", onClick: @handleStartEditing })
 
+    handleDesignChange = (d) => @setState(transientDesign: d)
+  
     # Wrap in a simple widget
     return R 'div', null,
       if @props.onDesignChange?
         @renderEditor()
+      # Use transient design (as it may be affected by toggling layers)
       React.createElement(DropdownWidgetComponent, 
         width: @props.width
         height: @props.height
         dropdownItems: dropdownItems,
-          @renderContent(@props.design, null, @props.width, @props.height)
+          @renderContent(@state.transientDesign, handleDesignChange, @props.width, @props.height)
       )

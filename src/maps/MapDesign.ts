@@ -28,6 +28,9 @@ export interface MapDesign {
 
   /** array of global filters. See below. */
   globalFilters?: GlobalFilter[]
+
+  /** True to display layer switcher */
+  showLayerSwitcher?: boolean
 }
 
 

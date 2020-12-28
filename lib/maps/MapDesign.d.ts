@@ -26,6 +26,8 @@ export interface MapDesign {
     maxZoom?: boolean;
     /** array of global filters. See below. */
     globalFilters?: GlobalFilter[];
+    /** True to display layer switcher */
+    showLayerSwitcher?: boolean;
 }
 /** Is a view of a layer including whether visible, opacity. */
 export interface MapLayerView {

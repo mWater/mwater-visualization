@@ -8,7 +8,7 @@ ExprCompiler = require('mwater-expressions').ExprCompiler
 LayerFactory = require './LayerFactory'
 ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
 MapUtils = require './MapUtils'
-
+LayerSwitcherComponent = require('./LayerSwitcherComponent').LayerSwitcherComponent
 LegendComponent = require './LegendComponent'
 
 # Component that displays just the map
@@ -230,6 +230,10 @@ module.exports = class MapViewComponent extends React.Component
 
     R 'div', style: { width: @props.width, height: @props.height, position: 'relative' },
       @renderPopup()
+      if @props.onDesignChange and @props.design.showLayerSwitcher
+        R LayerSwitcherComponent,
+          design: @props.design
+          onDesignChange: @props.onDesignChange
       R LeafletMapComponent,
         ref: (c) => @leafletMap = c
         initialBounds: @props.design.bounds

@@ -64,9 +64,10 @@ module.exports = class MapLayerViewDesignerComponent extends React.Component
         "Hide Legend"
       R 'label', className: "text-muted", key: "label",
         "Group:"
-      R ui.TextInput, key: "input", value: @props.layerView.group, onChange: @handleGroupChange, style: { width: "5em" }, placeholder: "None",
-      R PopoverHelpComponent, placement: "left", key: "help",
-        '''Layers in the same group can only be selected one at a time'''
+      R ui.TextInput, key: "input", value: @props.layerView.group, onChange: @handleGroupChange, style: { width: "5em" }, placeholder: "None"
+      R 'div', null,
+        R PopoverHelpComponent, placement: "top", key: "help",
+          '''Layers in the same group can only be selected one at a time'''
 
   renderName: ->
     R 'span', className: "hover-display-parent", onClick: @handleRename, style: { cursor: "pointer" },
