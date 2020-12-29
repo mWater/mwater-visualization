@@ -35,6 +35,7 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
   handleStackedChange: (ev) => @updateDesign(stacked: ev.target.checked)
   handleProportionalChange: (ev) => @updateDesign(proportional: ev.target.checked)
   handleLabelsChange: (ev) => @updateDesign(labels: ev.target.checked)
+  handlePercentageVisibilityChange: (ev) => @updateDesign(hidePercentage: ev.target.checked)
   handlePolarOrderChange: (ev) => @updateDesign(polarOrder: if ev.target.checked then "desc" else "natural")
 
   handleYThresholdsChange: (yThresholds) => @updateDesign(yThresholds: yThresholds)
@@ -181,9 +182,15 @@ module.exports = class LayeredChartDesignerComponent extends React.Component
         R 'input', type: "checkbox", checked: design.labels or false, onChange: @handleLabelsChange
         "Show Values"
       if design.type in ['pie', 'donut']
-        R 'label', className: "checkbox-inline", key: "polarOrder",
-          R 'input', type: "checkbox", checked: (design.polarOrder or "desc") == "desc", onChange: @handlePolarOrderChange
-          "Descending Order"
+        [
+          R 'label', className: "checkbox-inline", key: "polarOrder",
+            R 'input', type: "checkbox", checked: design.hidePercentage, onChange: @handlePercentageVisibilityChange
+            "Hide Percentage",
+          R 'label', className: "checkbox-inline", key: "polarOrder",
+            R 'input', type: "checkbox", checked: (design.polarOrder or "desc") == "desc", onChange: @handlePolarOrderChange
+            "Descending Order"
+        ]
+        
 
   renderThresholds: ->
     # Doesn't apply to polar
