@@ -3,7 +3,8 @@ _ = require 'lodash'
 React = require 'react'
 R = React.createElement
 
-MapViewComponent = require './MapViewComponent'
+# MapViewComponent = require './MapViewComponent'
+NewMapViewComponent = require('./NewMapViewComponent').NewMapViewComponent
 MapDesignerComponent = require './MapDesignerComponent'
 MapControlComponent = require './MapControlComponent'
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
@@ -110,7 +111,7 @@ module.exports = class MapComponent extends React.Component
 
   renderView: ->
     React.createElement(AutoSizeComponent, injectWidth: true, injectHeight: true, 
-      React.createElement(MapViewComponent, 
+      React.createElement(NewMapViewComponent, 
         ref: @refMapView
         mapDataSource: @props.mapDataSource
         schema: @props.schema, 

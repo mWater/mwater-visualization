@@ -6,7 +6,7 @@ bbox = require("@turf/bbox").default
 
 # Defines a layer for a map which has all the logic for rendering the specific data to be viewed
 module.exports = class Layer
-  # Gets the type of layer definition ("JsonQLCss"/"TileUrl")
+  # Gets the type of layer definition ("JsonQLCss"/"TileUrl"/"VectorTile")
   getLayerDefinitionType: ->
     return "JsonQLCss"
 
@@ -29,6 +29,10 @@ module.exports = class Layer
 
   # Gets the utf grid url for definition type "TileUrl"
   getUtfGridUrl: (design, filters) ->
+    throw new Error("Not implemented")
+
+  # Gets the layer definition for "VectorTile" type 
+  getVectorTile: (design, filters) ->
     throw new Error("Not implemented")
 
   # Called when the interactivity grid is clicked. 

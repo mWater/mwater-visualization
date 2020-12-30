@@ -3,7 +3,7 @@ import React from 'react';
 
 import { original, produce } from 'immer'
 
-import Layer from './Layer';
+import Layer, { OnGridClickOptions } from './Layer';
 import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, Expr, DataSource, OpExpr } from 'mwater-expressions';
 import AxisBuilder from '../axes/AxisBuilder';
 import { LayerDefinition, OnGridClickResults } from './maps';
@@ -398,20 +398,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
    *     row: { tableId:, primaryKey: }  # row that was selected
    *     popup: React element to put into a popup
    */
-  onGridClick(ev: { data: any, event: any }, clickOptions: {
-    /** design of layer */
-    design: ChoroplethLayerDesign
-    /** schema to use */
-    schema: Schema
-    /** data source to use */
-    dataSource: DataSource
-    /** layer data source */
-    layerDataSource: any // TODO
-    /** current scope data if layer is scoping */
-    scopeData: any
-    /** compiled filters to apply to the popup */
-    filters: JsonQLFilter[]
-  }): OnGridClickResults {
+  onGridClick(ev: { data: any, event: any }, clickOptions: OnGridClickOptions<ChoroplethLayerDesign>): OnGridClickResults {
     const regionsTable = clickOptions.design.regionsTable || "admin_regions";
 
     // Row only if mode is "plain" or "direct"

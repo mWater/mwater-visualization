@@ -3,9 +3,9 @@ import { JsonQLFilter } from "../index";
 import { OnGridClickResults } from "./maps";
 import { ReactNode } from "react";
 import { SecureClientSessionOptions } from "http2";
-import { JsonQL } from "jsonql";
+import { JsonQL, JsonQLQuery } from "jsonql";
 
-declare interface JsonQLCssLayerDefinition {
+export interface JsonQLCssLayerDefinition {
   layers: Array<{ 
     /** Layer id */
     id: string
@@ -25,11 +25,11 @@ declare interface JsonQLCssLayerDefinition {
 }
 
 /** Defines a layer for a map which has all the logic for rendering the specific data to be viewed */
-declare class Layer<LayerDesign> {
+export default class Layer<LayerDesign> {
   /** Gets the type of layer definition */
-  getLayerDefinitionType(): "JsonQLCss" | "TileUrl"
+  getLayerDefinitionType(): "JsonQLCss" | "TileUrl" | "VectorTile"
 
-  /** Gets the layer definition as JsonQL + CSS
+  /** Gets the layer definition as JsonQL + CSS for type "JsonQLCss"
       arguments:
         design: design of layer
         schema: schema to use
@@ -42,6 +42,9 @@ declare class Layer<LayerDesign> {
 
   /** Gets the utf grid url for definition type "TileUrl" */
   getUtfGridUrl(design: LayerDesign, filters: JsonQLFilter[]): string | null
+
+  /** Gets the layer definition for "VectorTile" type */
+  getVectorTile(design: LayerDesign, filters: JsonQLFilter[]): VectorTileDef
 
   /**  
    * Called when the interactivity grid is clicked. 
@@ -63,20 +66,7 @@ declare class Layer<LayerDesign> {
    *     row: { tableId:, primaryKey: }  # row that was selected
    *     popup: React element to put into a popup
    */
-  onGridClick(ev: { data: any }, options: {
-    /** design of layer */
-    design: LayerDesign
-    /** schema to use */
-    schema: Schema
-    /** data source to use */
-    dataSource: DataSource
-    /** layer data source */
-    layerDataSource: any // TODO
-    /** current scope data if layer is scoping */
-    scopeData: any
-    /** compiled filters to apply to the popup */
-    filters: JsonQLFilter[]
-  }): OnGridClickResults
+  onGridClick(ev: { data: any, event: any }, options: OnGridClickOptions<LayerDesign>): OnGridClickResults
 
   /** Get the legend to be optionally displayed on the map. Returns a React element */
   getLegend(design: LayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): ReactNode
@@ -128,4 +118,35 @@ declare class Layer<LayerDesign> {
   getBoundsFromExpr(schema: Schema, dataSource: DataSource, table: string, geometryExpr: Expr, filterExpr: Expr, filters: JsonQLFilter[], callback: (err: any, bounds: any) => void): void
 }
 
-export = Layer
+export interface OnGridClickOptions<LayerDesign> {
+  /** design of layer */
+  design: LayerDesign
+  /** schema to use */
+  schema: Schema
+  /** data source to use */
+  dataSource: DataSource
+  /** layer data source */
+  layerDataSource: any // TODO
+  /** current scope data if layer is scoping */
+  scopeData: any
+  /** compiled filters to apply to the popup */
+  filters: JsonQLFilter[]
+}
+
+/** Definition of a vector tile layer */
+export interface VectorTileDef {
+  sourceLayers: VectorTileSourceLayer[]
+
+  /** Sublayers must be mapbox layers that reference the source layers */
+  subLayers: mapboxgl.AnyLayer[]
+}
+
+export interface VectorTileSourceLayer {
+  /** Unique id of the source layer */
+  id: string
+
+  /** Query that produces the source layer, without the ST_AsMVT but with the ST_AsMVTGeom. 
+   * References CTE called tile which has x, y, z and envelope.
+   */
+  jsonql: JsonQLQuery
+}
