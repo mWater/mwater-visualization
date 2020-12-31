@@ -51,18 +51,19 @@ export function NewMapViewComponent(props: {
   function addLayers(map: mapboxgl.Map) {
     for (const lv of props.design.layerViews) {
       const layer = LayerFactory.createLayer(lv.type)
-      map.addSource(lv.id, {
-        type: "raster",
-        tiles: [
-          props.mapDataSource.getLayerDataSource(lv.id).getTileUrl(lv.design, [])
-        ]
-      })
+      const tileUrl = props.mapDataSource.getLayerDataSource(lv.id).getTileUrl(lv.design, [])
+      if (tileUrl) {
+        map.addSource(lv.id, {
+          type: "raster",
+          tiles: [tileUrl]
+        })
 
-      map.addLayer({
-        id: lv.id,
-        type: "raster",
-        source: lv.id
-      })
+        map.addLayer({
+          id: lv.id,
+          type: "raster",
+          source: lv.id
+        })
+      }
     }
   }
 

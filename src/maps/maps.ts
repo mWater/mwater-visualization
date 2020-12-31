@@ -28,11 +28,11 @@ export interface MapDataSource {
   getLayerDataSource: (layerId: string) => MapLayerDataSource
   
   /** Gets the bounds for the map. Null for no opinion. Callback as { n:, s:, w:, e: } */
-  getBounds: (callback: (bounds: { w: number, n: number, e: number, s: number }) => void) => void
+  getBounds(design: MapDesign, filters: JsonQLFilter[], callback: (bounds: { w: number, n: number, e: number, s: number } | null) => void): void
 }
 
 /** Data source for a single map layer */
 export interface MapLayerDataSource {
-  getTileUrl: (layerDesign: any, filter: JsonQLFilter[]) => string
-  getUtfGridUrl: (design: MapDesign, filter: JsonQLFilter[]) => string
+  getTileUrl: (layerDesign: any, filter: JsonQLFilter[]) => string | null
+  getUtfGridUrl: (design: MapDesign, filter: JsonQLFilter[]) => string | null
 }

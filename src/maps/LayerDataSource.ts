@@ -13,6 +13,9 @@ export interface LayerDataSource {
    * Only called on layers that are valid */
   getUtfGridUrl(design: any, filters: JsonQLFilter[]): string
 
+  /** Get the url for vector tile source with an expiry time */
+  getVectorTileUrl(layerDesign: any, filters: JsonQLFilter[]): Promise<{ url: string, expiry: string }>
+
   /** Gets widget data source for a popup widget */
   getPopupWidgetDataSource(design: any, widgetId: string): WidgetDataSource
 }
