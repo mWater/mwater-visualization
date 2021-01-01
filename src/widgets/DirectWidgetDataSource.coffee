@@ -19,7 +19,7 @@ module.exports = class DirectWidgetDataSource
   # For map widgets, the following is required
   #  design: design of the widget. Ignored in the case of server-side rendering
   getMapDataSource: (design) ->
-    DirectMapDataSource = require '../maps/DirectMapDataSource'
+    DirectMapDataSource = require('../maps/DirectMapDataSource').default
     return new DirectMapDataSource({ apiUrl: @options.apiUrl, client: @options.client, design: design, schema: @options.schema, dataSource: @options.dataSource })
 
   # Get the url to download an image (by id from an image or imagelist column)

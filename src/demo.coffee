@@ -20,7 +20,7 @@ AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
 DirectDatagridDataSource = require './datagrids/DirectDatagridDataSource'
 
 DirectDashboardDataSource = require './dashboards/DirectDashboardDataSource'
-DirectMapDataSource = require './maps/DirectMapDataSource'
+DirectMapDataSource = require('./maps/DirectMapDataSource').default
 
 ServerMapDataSource = require './maps/ServerMapDataSource'
 LeafletMapComponent = require './maps/LeafletMapComponent'

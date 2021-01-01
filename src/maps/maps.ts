@@ -1,5 +1,6 @@
 import { JsonQL } from "jsonql";
 import { JsonQLFilter } from "..";
+import { LayerDataSource } from "./LayerDataSource";
 import { MapDesign } from "./MapDesign";
 
 export interface LayerDefinition {
@@ -25,14 +26,8 @@ export type OnGridClickResults = { scope?: any, row?: { tableId: string, primary
 
 export interface MapDataSource {
   /** Gets the data source for a layer */
-  getLayerDataSource: (layerId: string) => MapLayerDataSource
+  getLayerDataSource: (layerId: string) => LayerDataSource
   
   /** Gets the bounds for the map. Null for no opinion. Callback as { n:, s:, w:, e: } */
   getBounds(design: MapDesign, filters: JsonQLFilter[], callback: (bounds: { w: number, n: number, e: number, s: number } | null) => void): void
-}
-
-/** Data source for a single map layer */
-export interface MapLayerDataSource {
-  getTileUrl: (layerDesign: any, filter: JsonQLFilter[]) => string | null
-  getUtfGridUrl: (design: MapDesign, filter: JsonQLFilter[]) => string | null
 }

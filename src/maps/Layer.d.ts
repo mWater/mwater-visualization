@@ -43,8 +43,10 @@ export default class Layer<LayerDesign> {
   /** Gets the utf grid url for definition type "TileUrl" */
   getUtfGridUrl(design: LayerDesign, filters: JsonQLFilter[]): string | null
 
-  /** Gets the layer definition for "VectorTile" type */
-  getVectorTile(design: LayerDesign, filters: JsonQLFilter[]): VectorTileDef
+  /** Gets the layer definition for "VectorTile" type
+   * @param sourceId id of the source. Should be prefixed to sublayers with a colon (prefix:id)
+   */
+  getVectorTile(design: LayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[]): VectorTileDef
 
   /**  
    * Called when the interactivity grid is clicked. 

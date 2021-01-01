@@ -3,10 +3,10 @@ import React from 'react';
 
 import { original, produce } from 'immer'
 
-import Layer, { OnGridClickOptions } from './Layer';
-import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, Expr, DataSource, OpExpr } from 'mwater-expressions';
+import Layer, { OnGridClickOptions, VectorTileDef } from './Layer';
+import { ExprCompiler, ExprCleaner, injectTableAlias, Schema, DataSource } from 'mwater-expressions';
 import AxisBuilder from '../axes/AxisBuilder';
-import { LayerDefinition, OnGridClickResults } from './maps';
+import { OnGridClickResults } from './maps';
 import { JsonQLFilter } from '../index';
 import ChoroplethLayerDesign from './ChoroplethLayerDesign'
 import { JsonQL, JsonQLQuery, JsonQLSelect } from 'jsonql';
@@ -17,6 +17,156 @@ const PopupFilterJoinsUtils = require('./PopupFilterJoinsUtils');
 export default class MarkersLayer extends Layer<MarkersLayerDesign> {
   /** Gets the type of layer definition */
   getLayerDefinitionType(): "VectorTile" { return "VectorTile" }
+
+  getVectorTile(design: MarkersLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[]): VectorTileDef {
+    const jsonql = this.createJsonQL(design, schema, filters)
+
+    return {
+      sourceLayers: [
+        { id: "main", jsonql }
+      ],
+      subLayers: [
+        {
+          'id': `${sourceId}:polygons`,
+          'type': 'line',
+          'source': sourceId,
+          'source-layer': 'main',
+          paint: {
+            "line-color": (design.color || "#666666")
+          },
+          filter: ['any', 
+            ['==', ["get", "geometry_type"], 'ST_Polygon'],
+            ['==', ["get", "geometry_type"], 'ST_MultiPolygon']]
+        },
+        {
+          'id': `${sourceId}:main`,
+          'type': 'circle',
+          'source': sourceId,
+          'source-layer': 'main',
+          paint: {
+            "circle-color": (design.color || "#666666"),
+            "circle-opacity": 0.8,
+            "circle-stroke-color": "white",
+            "circle-stroke-width": 1,
+            "circle-stroke-opacity": 0.5
+          },
+          filter: ['==', ["get", "geometry_type"], 'ST_Point']
+        }
+      ]
+    }
+  }
+
+  createJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
+    const axisBuilder = new AxisBuilder({schema});
+    const exprCompiler = new ExprCompiler(schema);
+
+    // Compile geometry axis
+    let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "innerquery"});
+
+    // Convert to Web mercator (3857)
+    geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] };
+
+    // row_number() over (partition by st_snaptogrid(location, tile.scale / 50, tile.scale / 50)) AS r
+    const cluster: JsonQLSelect = {
+      type: "select",
+      expr: { 
+        type: "op", 
+        op: "row_number", 
+        exprs: [], 
+        over: { partitionBy: [
+          { type: "op", op: "ST_SnapToGrid", exprs: [
+            geometryExpr,
+            { type: "op", op: "/", exprs: [{ type: "field", tableAlias: "tile", column: "scale" }, 5]},
+            { type: "op", op: "/", exprs: [{ type: "field", tableAlias: "tile", column: "scale" }, 5]}
+            ] }
+          ]},
+      },
+      alias: "r"
+    };
+
+    // Select _id, location and clustered row number
+    const innerquery: JsonQLQuery = {
+      type: "query",
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(design.table)!.primaryKey }, alias: "id" }, // main primary key as id
+        { type: "select", expr: geometryExpr, alias: "the_geom_webmercator" }, // geometry as the_geom_webmercator
+        cluster
+      ],
+      from: {
+        type: "join", 
+        kind: "cross",
+        left: exprCompiler.compileTable(design.table, "innerquery"),
+        right: { type: "table", table: "tile", alias: "tile" }
+      }
+    };
+
+    // Add color select if color axis
+    if (design.axes.color) {
+      const colorExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "innerquery"});
+      innerquery.selects.push({ type: "select", expr: colorExpr, alias: "color" });
+    }
+
+    // Create filters. First limit to envelope
+    let whereClauses: JsonQL[] = [
+      {
+        type: "op",
+        op: "&&",
+        exprs: [
+          geometryExpr,
+          { type: "field", tableAlias: "tile", column: "envelope" }
+        ]
+      }
+    ];
+
+    // Then add filters baked into layer
+    if (design.filter) {
+      whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "innerquery"}));
+    }
+
+    // Then add extra filters passed in, if relevant
+    // Get relevant filters
+    const relevantFilters = _.where(filters, {table: design.table});
+    for (let filter of relevantFilters) {
+      whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"));
+    }
+
+    whereClauses = _.compact(whereClauses);
+
+    // Wrap if multiple
+    if (whereClauses.length > 1) {
+      innerquery.where = { type: "op", op: "and", exprs: whereClauses };
+    } else {
+      innerquery.where = whereClauses[0];
+    }
+
+    // Create outer query which takes where r <= 3 to limit # of points in a cluster
+    const outerquery: JsonQLQuery = {
+      type: "query",
+      selects: [
+        { type: "select", expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "innerquery", column: "id" }]}, alias: "id" }, // innerquery._id::text as id
+        { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [
+          { type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" },
+          { type: "field", tableAlias: "tile", column: "envelope" }
+        ]}, alias: "the_geom_webmercator" }, // innerquery.the_geom_webmercator as the_geom_webmercator
+        { type: "select", expr: { type: "op", op: "ST_GeometryType", exprs: [{ type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }] }, alias: "geometry_type" } // ST_GeometryType(innerquery.the_geom_webmercator) as geometry_type
+      ],
+      from: { 
+        type: "join", 
+        kind: "cross", 
+        left: { type: "subquery", query: innerquery, alias: "innerquery" },
+        right: { type: "table", table: "tile", alias: "tile" }
+      },
+      where: { type: "op", op: "<=", exprs: [{ type: "field", tableAlias: "innerquery", column: "r" }, 3]}
+    };
+
+    // Add color select if color axis
+    if (design.axes.color) {
+      outerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "innerquery", column: "color" }, alias: "color" }); // innerquery.color as color
+    }
+
+    return outerquery;
+  }
+
 
   // Gets the layer definition as JsonQL + CSS in format:
   //   {
@@ -34,7 +184,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
       layers: [
         {
           id: "layer0",
-          jsonql: this.createJsonQL(design, schema, filters)
+          jsonql: this.createMapnikJsonQL(design, schema, filters)
         }
       ],
       css: this.createCss(design),
@@ -47,7 +197,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     return layerDef;
   }
 
-  createJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
+  createMapnikJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
     const axisBuilder = new AxisBuilder({schema});
     const exprCompiler = new ExprCompiler(schema);
 

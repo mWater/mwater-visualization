@@ -54,7 +54,7 @@ exports.DirectDashboardDataSource = require './dashboards/DirectDashboardDataSou
 exports.DirectWidgetDataSource = require './widgets/DirectWidgetDataSource'
 
 exports.ServerMapDataSource = require './maps/ServerMapDataSource'
-exports.DirectMapDataSource = require './maps/DirectMapDataSource'
+exports.DirectMapDataSource = require('./maps/DirectMapDataSource').default
 
 exports.ServerDatagridDataSource = require './datagrids/ServerDatagridDataSource'
 exports.DirectDatagridDataSource = require './datagrids/DirectDatagridDataSource'

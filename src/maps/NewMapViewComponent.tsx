@@ -48,21 +48,42 @@ export function NewMapViewComponent(props: {
 }) {
   const mapRef = useRef<mapboxgl.Map | null>(null)
 
-  function addLayers(map: mapboxgl.Map) {
+  async function addLayers(map: mapboxgl.Map) {
     for (const lv of props.design.layerViews) {
       const layer = LayerFactory.createLayer(lv.type)
-      const tileUrl = props.mapDataSource.getLayerDataSource(lv.id).getTileUrl(lv.design, [])
-      if (tileUrl) {
+      const defType = layer.getLayerDefinitionType()
+      const layerDataSource = props.mapDataSource.getLayerDataSource(lv.id)
+
+      if (defType == "VectorTile") {
+        // Get source url
+        const { expires, url } = await layerDataSource.getVectorTileUrl(lv.design, [])
+
+        // Add source
         map.addSource(lv.id, {
-          type: "raster",
-          tiles: [tileUrl]
+          type: "vector",
+          tiles: [url]
         })
 
-        map.addLayer({
-          id: lv.id,
-          type: "raster",
-          source: lv.id
-        })
+        // Add layer
+        const subLayers = layer.getVectorTile(lv.design, lv.id, props.schema, []).subLayers
+        for (const sublayer of subLayers) {
+          map.addLayer(sublayer)
+        }
+      }
+      else {
+        const tileUrl = props.mapDataSource.getLayerDataSource(lv.id).getTileUrl(lv.design, [])
+        if (tileUrl) {
+          map.addSource(lv.id, {
+            type: "raster",
+            tiles: [tileUrl]
+          })
+
+          map.addLayer({
+            id: lv.id,
+            type: "raster",
+            source: lv.id
+          })
+        }
       }
     }
   }

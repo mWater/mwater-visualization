@@ -6,11 +6,14 @@ import WidgetFactory from '../widgets/WidgetFactory';
 import LayerFactory from "./LayerFactory";
 import MapBoundsCalculator from "./MapBoundsCalculator";
 import { MapDesign, MapLayerView } from "./MapDesign";
-import { MapDataSource, MapLayerDataSource } from "./maps";
+import { MapDataSource } from "./maps";
 import DirectWidgetDataSource from '../widgets/DirectWidgetDataSource'
-import { JsonQLCssLayerDefinition } from './Layer';
+import { JsonQLCssLayerDefinition, VectorTileSourceLayer } from './Layer';
 import compressJson from '../compressJson'
 import querystring from 'querystring'
+import { LayerDataSource } from './LayerDataSource';
+import { JsonQLQuery } from 'jsonql';
+import LayoutManager from '../layouts/LayoutManager';
 
 interface DirectMapDataSourceOptions {
   /** schema to use */
@@ -38,7 +41,7 @@ export default class DirectMapDataSource implements MapDataSource {
   }
 
   // Gets the data source for a layer
-  getLayerDataSource(layerId: string): MapLayerDataSource {
+  getLayerDataSource(layerId: string): LayerDataSource {
     // Get layerView
     const layerView = _.findWhere(this.options.design.layerViews, { id: layerId });
     if (!layerView) {
@@ -71,8 +74,7 @@ interface DirectLayerDataSourceOptions {
   client?: string
 }
 
-
-class DirectLayerDataSource {
+class DirectLayerDataSource implements LayerDataSource {
   options: DirectLayerDataSourceOptions
 
   // Create map url source that uses direct jsonql maps
@@ -84,6 +86,39 @@ class DirectLayerDataSource {
   //   client: client id to use for talking to mWater server
   constructor(options: DirectLayerDataSourceOptions) {
     this.options = options;
+  }
+
+  /** Get the url for vector tile source with an expiry time. Only for layers of type "VectorTile" */
+  async getVectorTileUrl(layerDesign: any, filters: JsonQLFilter[]): Promise<{ url: string, expires: string }> {
+    // Create layer
+    const layer = LayerFactory.createLayer(this.options.layerView.type);
+
+    const vectorTile = layer.getVectorTile(layerDesign, this.options.layerView.id, this.options.schema, filters)
+
+    const request: {
+      layers: VectorTileSourceLayer[]
+      createdAfter?: string
+      expiresAfter: string
+    } = {
+      layers: vectorTile.sourceLayers,
+      // 12 hours
+      expiresAfter: new Date(Date.now() + 1000 * 3600 * 12).toISOString()
+    }
+
+    const response = await fetch(this.options.apiUrl + "vector_tiles/create_direct_token?client=" + (this.options.client || ""), {
+      method: "POST",
+      body: JSON.stringify(request),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+    if (!response.ok) {
+      throw new Error("Error getting tiles")
+    }
+    const { token, expires } = await response.json()
+
+    return { url: this.options.apiUrl + `vector_tiles/tiles/{z}/{x}/{y}?token=${token}`, expires }
   }
 
   // Get the url for the image tiles with the specified filters applied
