@@ -21,38 +21,96 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
   getVectorTile(design: MarkersLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[]): VectorTileDef {
     const jsonql = this.createJsonQL(design, schema, filters)
 
+    const subLayers: mapboxgl.AnyLayer[] = []
+
+    // If color axes, add color conditions
+    let color: any
+    if (design.axes.color && design.axes.color.colorMap) {
+      const excludedValues = design.axes.color.excludedValues || []
+      // Create match operator
+      color = ["case"]
+      for (let item of design.axes.color.colorMap) {
+        color.push(["==", ["get", "color"], item.value])
+        color.push(excludedValues.includes(item.value) ? "transparent" : item.color)
+      }
+      // Else
+      color.push(design.color || "#666666")
+    }
+    else { 
+      color = design.color || "#666666"
+    }
+
+    // Add polygons
+    subLayers.push({
+      'id': `${sourceId}:polygons`,
+      'type': 'fill',
+      'source': sourceId,
+      'source-layer': 'main',
+      paint: {
+        "fill-color": color,
+        "fill-opacity": 0.25,
+      },
+      filter: ['any', 
+        ['==', ["get", "geometry_type"], 'ST_Polygon'],
+        ['==', ["get", "geometry_type"], 'ST_MultiPolygon']]
+    })
+
+    // Add polygon outlines and lines
+    subLayers.push({
+      'id': `${sourceId}:lines`,
+      'type': 'line',
+      'source': sourceId,
+      'source-layer': 'main',
+      paint: {
+        "line-color": color,
+        "line-width": (design.lineWidth != null) ? design.lineWidth : 3
+      },
+      filter: ['any', 
+        ['==', ["get", "geometry_type"], 'ST_Linestring'],
+        ['==', ["get", "geometry_type"], 'ST_Polygon'],
+        ['==', ["get", "geometry_type"], 'ST_MultiPolygon']]
+    })
+
+    // Add markers
+    if (!design.symbol) {
+      subLayers.push({
+        'id': `${sourceId}:main`,
+        'type': 'circle',
+        'source': sourceId,
+        'source-layer': 'main',
+        paint: {
+          "circle-color": color,
+          "circle-opacity": 0.8,
+          "circle-stroke-color": "white",
+          "circle-stroke-width": 1,
+          "circle-stroke-opacity": 0.5,
+          "circle-radius": (design.markerSize || 10) / 2
+        },
+        filter: ['==', ["get", "geometry_type"], 'ST_Point']
+      })
+    }
+    else {
+      subLayers.push({
+        'id': `${sourceId}:main`,
+        'type': 'symbol',
+        'source': sourceId,
+        'source-layer': 'main',
+        layout: {
+          "icon-image": design.symbol,
+          "icon-allow-overlap": true
+        },
+        paint: {
+          "icon-color": color
+        },
+        filter: ['==', ["get", "geometry_type"], 'ST_Point']
+      })
+    }
+
     return {
       sourceLayers: [
         { id: "main", jsonql }
       ],
-      subLayers: [
-        {
-          'id': `${sourceId}:polygons`,
-          'type': 'line',
-          'source': sourceId,
-          'source-layer': 'main',
-          paint: {
-            "line-color": (design.color || "#666666")
-          },
-          filter: ['any', 
-            ['==', ["get", "geometry_type"], 'ST_Polygon'],
-            ['==', ["get", "geometry_type"], 'ST_MultiPolygon']]
-        },
-        {
-          'id': `${sourceId}:main`,
-          'type': 'circle',
-          'source': sourceId,
-          'source-layer': 'main',
-          paint: {
-            "circle-color": (design.color || "#666666"),
-            "circle-opacity": 0.8,
-            "circle-stroke-color": "white",
-            "circle-stroke-width": 1,
-            "circle-stroke-opacity": 0.5
-          },
-          filter: ['==', ["get", "geometry_type"], 'ST_Point']
-        }
-      ]
+      subLayers
     }
   }
 
@@ -76,8 +134,8 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
         over: { partitionBy: [
           { type: "op", op: "ST_SnapToGrid", exprs: [
             geometryExpr,
-            { type: "op", op: "/", exprs: [{ type: "field", tableAlias: "tile", column: "scale" }, 5]},
-            { type: "op", op: "/", exprs: [{ type: "field", tableAlias: "tile", column: "scale" }, 5]}
+            { type: "op", op: "/", exprs: [{ type: "field", tableAlias: "tile", column: "scale" }, 50]},
+            { type: "op", op: "/", exprs: [{ type: "field", tableAlias: "tile", column: "scale" }, 50]}
             ] }
           ]},
       },
@@ -166,7 +224,6 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
 
     return outerquery;
   }
-
 
   // Gets the layer definition as JsonQL + CSS in format:
   //   {

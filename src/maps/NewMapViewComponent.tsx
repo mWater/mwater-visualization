@@ -1,11 +1,13 @@
 import mapboxgl from "mapbox-gl";
 import { DataSource, Schema } from "mwater-expressions"
-import React from "react";
+import React, { useEffect } from "react";
 import { useRef } from "react";
 import { JsonQLFilter } from "..";
 import { default as LayerFactory } from "./LayerFactory";
 import { MapDesign } from "./MapDesign";
 import { MapDataSource } from "./maps";
+
+const fontAwesomeStar = require('./symbols/font-awesome/star.png').default
 
 /** Component that displays just the map */
 export function NewMapViewComponent(props: {
@@ -47,8 +49,22 @@ export function NewMapViewComponent(props: {
   zoomLocked: boolean 
 }) {
   const mapRef = useRef<mapboxgl.Map | null>(null)
+  const divRef = useRef<HTMLDivElement | null>(null)
 
   async function addLayers(map: mapboxgl.Map) {
+    // Load images
+    await new Promise((resolve, reject) => {
+      map.loadImage(fontAwesomeStar, (err: any, image: any) => { 
+        if (err) { 
+          reject(err) 
+        } 
+        else {
+          map.addImage("font-awesome/star", image, { sdf: true })
+          resolve(null) 
+        }
+      })
+    })
+
     for (const lv of props.design.layerViews) {
       const layer = LayerFactory.createLayer(lv.type)
       const defType = layer.getLayerDefinitionType()
@@ -88,32 +104,31 @@ export function NewMapViewComponent(props: {
     }
   }
 
-  function divRef(elem: HTMLDivElement | null) {
-    if (elem != null) {
-      const map = new mapboxgl.Map({
-        accessToken: 'pk.eyJ1IjoiY2xheXRvbmdyYXNzaWNrIiwiYSI6ImNpcHk4MHMxZDB5NHVma20ya3k1dnp3bzQifQ.lMMb60WxiYfRF0V4Y3UTbQ',
-        container: elem,
-        style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
-        // center: [-74.5, 40], // starting position [lng, lat]
-        // zoom: 4 // starting zoom
-        bounds: props.design.bounds ? [props.design.bounds.w, props.design.bounds.s, props.design.bounds.e, props.design.bounds.n] : undefined        
-      })
-      mapRef.current = map
+  useEffect(() => {
+    const map = new mapboxgl.Map({
+      accessToken: 'pk.eyJ1IjoiY2xheXRvbmdyYXNzaWNrIiwiYSI6ImNpcHk4MHMxZDB5NHVma20ya3k1dnp3bzQifQ.lMMb60WxiYfRF0V4Y3UTbQ',
+      container: divRef.current!,
+      style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
+      // center: [-74.5, 40], // starting position [lng, lat]
+      // zoom: 4 // starting zoom
+      bounds: props.design.bounds ? [props.design.bounds.w, props.design.bounds.s, props.design.bounds.e, props.design.bounds.n] : undefined
+    })
+    mapRef.current = map
 
-      // Speed up wheel scrolling
-      map.scrollZoom.setWheelZoomRate(1/250)
+    // Speed up wheel scrolling
+    map.scrollZoom.setWheelZoomRate(1/250)
 
-      map.on("load", () => {
-        // Add layers
-        addLayers(map)
-      })
+    map.on("load", () => {
+      // Add layers
+      addLayers(map)
+    })
+
+    return () => {
+      map.remove()
     }
-    else {
-      mapRef.current!.remove()
-    }
-  }
+  }, [])
 
-  return <div style={{ width: props.width, height: props.width }} ref={divRef}/>
+  return <div style={{ width: props.width, height: props.height }} ref={divRef}/>
 }
 
 interface MapScope {
