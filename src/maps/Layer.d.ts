@@ -139,8 +139,17 @@ export interface OnGridClickOptions<LayerDesign> {
 export interface VectorTileDef {
   sourceLayers: VectorTileSourceLayer[]
 
+  /** Common table expressions of the tiles */
+  ctes: VectorTileCTE[]
+
   /** Sublayers must be mapbox layers that reference the source layers */
   subLayers: mapboxgl.AnyLayer[]
+
+  /** Enforced minimum zoom level */
+  minZoom?: number
+
+  /** Enforced maximum zoom level */
+  maxZoom?: number
 }
 
 export interface VectorTileSourceLayer {
@@ -150,5 +159,16 @@ export interface VectorTileSourceLayer {
   /** Query that produces the source layer, without the ST_AsMVT but with the ST_AsMVTGeom. 
    * References CTE called tile which has x, y, z and envelope.
    */
+  jsonql: JsonQLQuery
+}
+
+/** Common table expression that a vector tile source layer can reference.
+ * Will be pre-computed and cached. Cannot reference tile parameters.
+ */
+export interface VectorTileCTE {
+  /** tableName of the cte table. Must be [a-z]+ */
+  tableName: string
+
+  /** Contents of the CTE table */
   jsonql: JsonQLQuery
 }

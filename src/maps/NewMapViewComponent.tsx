@@ -128,6 +128,34 @@ export function NewMapViewComponent(props: {
     }
   }, [])
 
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) {
+      return
+    }
+
+    function onMoveEnd() {
+      // Ignore if readonly
+      if (props.onDesignChange == null) {
+        return
+      }
+      if (props.zoomLocked) {
+        return
+      }
+      // Ignore if autoBounds
+      if (props.design.autoBounds) {
+        return
+      }
+      const bounds = map!.getBounds()
+  
+      const design = { ...props.design, bounds: { n: bounds.getNorth(), e: bounds.getEast(), s: bounds.getSouth(), w: bounds.getWest() }}
+      props.onDesignChange(design)
+    }
+
+    map.on("moveend", onMoveEnd)
+    return () => { map.off("moveend", onMoveEnd) }
+  }, [props.onDesignChange, props.zoomLocked, props.design])
+
   return <div style={{ width: props.width, height: props.height }} ref={divRef}/>
 }
 

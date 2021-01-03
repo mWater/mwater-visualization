@@ -1,19 +1,511 @@
-import _ from 'lodash';
-import React from 'react';
+import _ from 'lodash'
+import React from 'react'
 
 import { original, produce } from 'immer'
 
-import Layer, { OnGridClickOptions } from './Layer';
-import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, Expr, DataSource, OpExpr } from 'mwater-expressions';
-import AxisBuilder from '../axes/AxisBuilder';
-import { LayerDefinition, OnGridClickResults } from './maps';
-import { JsonQLFilter } from '../index';
+import Layer, { OnGridClickOptions, VectorTileDef } from './Layer'
+import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, Expr, DataSource, OpExpr } from 'mwater-expressions'
+import AxisBuilder from '../axes/AxisBuilder'
+import { LayerDefinition, OnGridClickResults } from './maps'
+import { JsonQLFilter } from '../index'
 import ChoroplethLayerDesign from './ChoroplethLayerDesign'
-import { JsonQL, JsonQLQuery } from 'jsonql';
-const LayerLegendComponent = require('./LayerLegendComponent');
-const PopupFilterJoinsUtils = require('./PopupFilterJoinsUtils');
+import { JsonQL, JsonQLExpr, JsonQLQuery } from 'jsonql'
+const LayerLegendComponent = require('./LayerLegendComponent')
+const PopupFilterJoinsUtils = require('./PopupFilterJoinsUtils')
 
 export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
+  /** Gets the type of layer definition */
+  getLayerDefinitionType(): "VectorTile" { return "VectorTile" }
+
+  getVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[]): VectorTileDef {
+    // Verify that scopeLevel is an integer to prevent injection
+    if ((design.scopeLevel != null) && ![0, 1, 2, 3, 4, 5].includes(design.scopeLevel)) {
+      throw new Error("Invalid scope level")
+    }
+
+    // Verify that detailLevel is an integer to prevent injection
+    if (![0, 1, 2, 3, 4, 5].includes(design.detailLevel)) {
+      throw new Error("Invalid detail level")
+    }
+
+    if (design.regionMode === "plain") {
+      return this.createPlainVectorTile(design, sourceId, schema, filters)
+    }
+    else if (design.regionMode === "indirect" || !design.regionMode) {
+      return this.createIndirectVectorTile(design, sourceId, schema, filters)
+    }
+    else {
+      throw new Error("NOT IMPLEMENTED")
+    }
+  }
+
+  createPlainVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[]): VectorTileDef {
+    const axisBuilder = new AxisBuilder({schema})
+    const exprCompiler = new ExprCompiler(schema)
+    const regionsTable = design.regionsTable || "admin_regions"
+
+    /*
+    Returns two source layers, "polygons" and "points". Points are used for labels.
+
+    polygons:
+      select name, ST_AsMVTGeom(shape_simplified, tile.envelope) as the_geom_webmercator from
+      admin_regions as regions, tile as tile
+      where regions.level0 = 242
+      and regions.level = 1
+      and shape && tile.envelope
+
+    points:
+      select name, ST_AsMVTGeom(
+        (select ST_Centroid(polys.geom) from ST_Dump(shape_simplified) as polys order by ST_Area(polys.geom) desc limit 1)
+      , tile.envelope) as the_geom_webmercator from
+      admin_regions as regions, tile as tile
+      where regions.level0 = 242
+      and regions.level = 1
+      and shape && tile.envelope
+
+      */
+
+    // Create where
+    const where: JsonQLExpr = {
+      type: "op",
+      op: "and",
+      exprs: [
+        // Level to display
+        {
+          type: "op",
+          op: "=",
+          exprs: [
+            { type: "field", tableAlias: "regions", column: "level" },
+            design.detailLevel
+          ]
+        },
+        // Filter to tile
+        {
+          type: "op",
+          op: "&&",
+          exprs: [
+            { type: "field", tableAlias: "regions", column: "shape" },
+            { type: "field", tableAlias: "tile", column: "envelope" }
+          ]
+        }
+      ]
+    }
+
+    // Scope overall
+    if (design.scope) {
+      where.exprs.push({
+        type: "op",
+        op: "=",
+        exprs: [
+          { type: "field", tableAlias: "regions", column: `level${design.scopeLevel || 0}` },
+          { type: "literal", value: design.scope }
+        ]
+      })
+    }
+
+    // Add filters on regions to outer query
+    for (const filter of filters) {
+      if (filter.table == regionsTable) {
+        where.exprs.push(injectTableAlias(filter.jsonql, "regions"))
+      }
+    }
+    
+    const polygonsQuery: JsonQLQuery = {
+      type: "query",
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "regions", column: "_id" }, alias: "id" },
+        { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [
+          { type: "field", tableAlias: "regions", column: "shape_simplified" },
+          { type: "field", tableAlias: "tile", column: "envelope" }
+        ]}, alias: "the_geom_webmercator" }, 
+        { type: "select", expr: { type: "field", tableAlias: "regions", column: "name" }, alias: "name" }
+      ],
+      from: { 
+        type: "join", 
+        kind: "cross", 
+        left: { type: "table", table: regionsTable, alias: "regions" },
+        right: { type: "table", table: "tile", alias: "tile" }
+      },
+      where: where
+    }
+
+    const pointsQuery: JsonQLQuery = {
+      type: "query",
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "regions", column: "_id" }, alias: "id" },
+        { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [
+          { 
+            type: "scalar", 
+            expr: { type: "op", op: "ST_Centroid", exprs: [
+              { type: "field", tableAlias: "polys", column: "geom" }
+            ]},
+            from: { type: "subexpr", expr: { type: "op", op: "ST_Dump", exprs: [{ type: "field", tableAlias: "regions", column: "shape_simplified" }] }, alias: "polys" },
+            orderBy: [{ expr: { type: "op", op: "ST_Area", exprs: [{ type: "field", tableAlias: "polys", column: "geom" }] }, direction: "desc" }],
+            limit: 1
+          },
+          { type: "field", tableAlias: "tile", column: "envelope" }
+        ]}, alias: "the_geom_webmercator" }, 
+        { type: "select", expr: { type: "field", tableAlias: "regions", column: "name" }, alias: "name" }
+      ],
+      from: { 
+        type: "join", 
+        kind: "cross", 
+        left: { type: "table", table: regionsTable, alias: "regions" },
+        right: { type: "table", table: "tile", alias: "tile" }
+      },
+      where: where
+    }
+
+    // Create layers
+    const subLayers: mapboxgl.AnyLayer[] = []
+
+    subLayers.push({
+      'id': `${sourceId}:polygon-fill`,
+      'type': 'fill',
+      'source': sourceId,
+      'source-layer': 'polygons',
+      paint: {
+        'fill-opacity': (design.fillOpacity * design.fillOpacity),
+        "fill-color": (design.color || "transparent")
+      }
+    })
+
+    subLayers.push({
+      'id': `${sourceId}:polygon-line`,
+      'type': 'line',
+      'source': sourceId,
+      'source-layer': 'polygons',
+      paint: {
+        "line-color": design.borderColor || "#000",
+        "line-opacity": 0.5,
+        "line-width": 1.5
+      }
+    })
+
+    if (design.displayNames) {
+      subLayers.push({
+        'id': `${sourceId}:labels`,
+        'type': 'symbol',
+        'source': sourceId,
+        'source-layer': 'points',
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-size': 12,
+        },
+        paint: {
+          'text-color': "black",
+          "text-halo-color": "white",
+          "text-halo-width": 2,
+        }
+      })
+    }
+
+    return {
+      ctes: [],
+      sourceLayers: [
+        { id: "polygons", jsonql: polygonsQuery },
+        { id: "points", jsonql: pointsQuery }
+      ],
+      subLayers: subLayers,
+      minZoom: design.minZoom,
+      maxZoom: design.maxZoom
+    }
+  }
+
+  createIndirectVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[]): VectorTileDef {
+    const axisBuilder = new AxisBuilder({schema})
+    const exprCompiler = new ExprCompiler(schema)
+    const regionsTable = design.regionsTable || "admin_regions"
+
+    /*
+    Returns two source layers, "polygons" and "points". Points are used for labels.
+
+    Has a CTE (regions) that is the core data that doesn't change by tile. e.g.:
+
+      select admin_regions.level1 as id,
+      count(innerquery.*) as color
+      from
+      admin_regions inner join
+      entities.water_point as innerquery
+      on innerquery.admin_region = admin_regions._id
+      where admin_regions.level0 = 242
+      group by 1
+
+    polygons:
+      select name, ST_AsMVTGeom(shape_simplified, tile.envelope) as the_geom_webmercator, regions.color from
+      admin_regions as regions2
+      left outer join regions as regions on regions.id = regions2._id
+      where regions2.level = 1 and regions2.level0 = 242
+
+    points:
+      select name, ST_AsMVTGeom(
+        (select ST_Centroid(polys.geom) from ST_Dump(shape_simplified) as polys order by ST_Area(polys.geom) desc limit 1), tile.envelope) as the_geom_webmercator, regions.color from
+      admin_regions as regions2
+      left outer join regions as regions on regions.id = regions2._id, tile as tile
+      where regions2.level = 1 and regions2.level0 = 242 and shape && tile.envelope
+
+    */
+    const compiledAdminRegionExpr = exprCompiler.compileExpr({expr: design.adminRegionExpr || null, tableAlias: "innerquery"})
+
+    // Create CTE query
+    const cteQuery: JsonQLQuery = {
+      type: "query",
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "regions", column: `level${design.detailLevel}` }, alias: "id" }
+      ],
+      from: {
+        type: "join",
+        kind: "inner",
+        left: { type: "table", table: regionsTable, alias: "regions" },
+        right: exprCompiler.compileTable(design.table!, "innerquery"),
+        on: {
+          type: "op",
+          op: "=",
+          exprs: [
+            compiledAdminRegionExpr,
+            { type: "field", tableAlias: "regions", column: "_id" }
+          ]
+        }
+      },
+      groupBy: [1]
+    }
+
+    // Add color select if color axis
+    if (design.axes.color) {
+      const colorExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "innerquery"})
+      cteQuery.selects.push({ type: "select", expr: colorExpr, alias: "color" })
+    }
+
+    // Add label select if color axis
+    if (design.axes.label) {
+      const labelExpr = axisBuilder.compileAxis({axis: design.axes.label, tableAlias: "innerquery"})
+      cteQuery.selects.push({ type: "select", expr: labelExpr, alias: "label" })
+    }
+
+    let whereClauses = []
+
+    if (design.scope) {
+      whereClauses.push({
+        type: "op",
+        op: "=",
+        exprs: [
+          { type: "field", tableAlias: "regions", column: `level${design.scopeLevel || 0}` },
+          design.scope
+        ]
+      })
+    }
+
+    // Then add filters
+    if (design.filter) {
+      whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "innerquery"}))
+    }
+
+    // Then add extra filters passed in, if relevant
+    const relevantFilters = _.where(filters, {table: design.table})
+    for (let filter of relevantFilters) {
+      whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
+    }
+
+    whereClauses = _.compact(whereClauses)
+
+    if (whereClauses.length > 0) {
+      cteQuery.where = { type: "op", op: "and", exprs: whereClauses }
+    }
+
+    // Create outer where clause
+    const outerWhere: JsonQLExpr = {
+      type: "op",
+      op: "and",
+      exprs: [
+        // Level to display
+        {
+          type: "op",
+          op: "=",
+          exprs: [
+            { type: "field", tableAlias: "regions2", column: "level" },
+            design.detailLevel
+          ]
+        }
+      ]
+    }
+
+    // Scope overall
+    if (design.scope) {
+      outerWhere.exprs.push({
+        type: "op",
+        op: "=",
+        exprs: [
+          { type: "field", tableAlias: "regions2", column: `level${design.scopeLevel || 0}` },
+          { type: "literal", value: design.scope }
+        ]
+      })
+    }
+
+    // Add filters on regions to outer query
+    for (const filter of filters) {
+      if (filter.table == regionsTable) {
+        outerWhere.exprs.push(injectTableAlias(filter.jsonql, "regions2"))
+      }
+    }
+
+    // Now create outer query
+    const polygonsQuery: JsonQLQuery = {
+      type: "query",
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "regions2", column: "_id" }, alias: "id" },
+        { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [
+          { type: "field", tableAlias: "regions2", column: "shape_simplified" },
+          { type: "field", tableAlias: "tile", column: "envelope" }
+        ]}, alias: "the_geom_webmercator" }, 
+        { type: "select", expr: { type: "field", tableAlias: "regions2", column: "name" }, alias: "name" }
+      ],
+      from: {
+        type: "join", 
+        kind: "cross", 
+        left: {
+          type: "join",
+          kind: "left",
+          left: { type: "table", table: regionsTable, alias: "regions2" },
+          right: { type: "table", table: "regions", alias: "regions" },
+          on: {
+            type: "op",
+            op: "=",
+            exprs: [
+              { type: "field", tableAlias: "regions", column: "id" },
+              { type: "field", tableAlias: "regions2", column: "_id" }
+            ]
+          }
+        },
+        right: { type: "table", table: "tile", alias: "tile" }
+      },
+      where: outerWhere
+    }
+
+    const pointsQuery: JsonQLQuery = {
+      type: "query",
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "regions2", column: "_id" }, alias: "id" },
+        { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [
+          { 
+            type: "scalar", 
+            expr: { type: "op", op: "ST_Centroid", exprs: [
+              { type: "field", tableAlias: "polys", column: "geom" }
+            ]},
+            from: { type: "subexpr", expr: { type: "op", op: "ST_Dump", exprs: [{ type: "field", tableAlias: "regions2", column: "shape_simplified" }] }, alias: "polys" },
+            orderBy: [{ expr: { type: "op", op: "ST_Area", exprs: [{ type: "field", tableAlias: "polys", column: "geom" }] }, direction: "desc" }],
+            limit: 1
+          },
+          { type: "field", tableAlias: "tile", column: "envelope" }
+        ]}, alias: "the_geom_webmercator" }, 
+        { type: "select", expr: { type: "field", tableAlias: "regions2", column: "name" }, alias: "name" }
+      ],
+      from: {
+        type: "join", 
+        kind: "cross", 
+        left: {
+          type: "join",
+          kind: "left",
+          left: { type: "table", table: regionsTable, alias: "regions2" },
+          right: { type: "table", table: "regions", alias: "regions" },
+          on: {
+            type: "op",
+            op: "=",
+            exprs: [
+              { type: "field", tableAlias: "regions", column: "id" },
+              { type: "field", tableAlias: "regions2", column: "_id" }
+            ]
+          }
+        },
+        right: { type: "table", table: "tile", alias: "tile" }
+      },
+      where: outerWhere
+    }
+
+    // Bubble up color and label
+    if (design.axes.color) {
+      polygonsQuery.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "color"}, alias: "color" })
+      pointsQuery.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "color"}, alias: "color" })
+    }
+
+    // Add label select if color axis
+    if (design.axes.label) {
+      polygonsQuery.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "label"}, alias: "label" })
+      pointsQuery.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "label"}, alias: "label" })
+    }
+
+    // If color axes, add color conditions
+    let color: any
+    if (design.axes.color && design.axes.color.colorMap) {
+      const excludedValues = design.axes.color.excludedValues || []
+      // Create match operator
+      color = ["case"]
+      for (let item of design.axes.color.colorMap) {
+        color.push(["==", ["get", "color"], item.value])
+        color.push(excludedValues.includes(item.value) ? "transparent" : item.color)
+      }
+      // Else
+      color.push(design.color || "transparent")
+    }
+    else { 
+      color = design.color || "transparent"
+    }
+
+    // Create layers
+    const subLayers: mapboxgl.AnyLayer[] = []
+
+    subLayers.push({
+      'id': `${sourceId}:polygon-fill`,
+      'type': 'fill',
+      'source': sourceId,
+      'source-layer': 'polygons',
+      paint: {
+        'fill-opacity': (design.fillOpacity * design.fillOpacity),
+        "fill-color": color
+      }
+    })
+
+    subLayers.push({
+      'id': `${sourceId}:polygon-line`,
+      'type': 'line',
+      'source': sourceId,
+      'source-layer': 'polygons',
+      paint: {
+        "line-color": design.borderColor || "#000",
+        "line-opacity": 0.5,
+        "line-width": 1.5
+      }
+    })
+
+    if (design.displayNames) {
+      subLayers.push({
+        'id': `${sourceId}:labels`,
+        'type': 'symbol',
+        'source': sourceId,
+        'source-layer': 'points',
+        layout: {
+          'text-field': design.axes.label ? ['get', 'label'] : ['get', 'name'],
+          'text-size': 12,
+        },
+        paint: {
+          'text-color': "black",
+          "text-halo-color": "white",
+          "text-halo-width": 2,
+        }
+      })
+    }
+
+    return {
+      ctes: [{ tableName: "regions", jsonql: cteQuery }],
+      sourceLayers: [
+        { id: "polygons", jsonql: polygonsQuery },
+        { id: "points", jsonql: pointsQuery }
+      ],
+      subLayers: subLayers,
+      minZoom: design.minZoom,
+      maxZoom: design.maxZoom
+    }
+  }
+
   /** Gets the layer definition as JsonQL + CSS in format:
    *   {
    *     layers: array of { id: layer id, jsonql: jsonql that includes "the_webmercator_geom" as a column }
@@ -28,7 +520,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
   getJsonQLCss(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): LayerDefinition {
     // Create design
     const layerDef = {
-      layers: [{ id: "layer0", jsonql: this.createJsonQL(design, schema, filters) }],
+      layers: [{ id: "layer0", jsonql: this.createMapnikJsonQL(design, schema, filters) }],
       css: this.createCss(design, schema, filters),
       interactivity: {
         layer: "layer0",
@@ -39,21 +531,21 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     return layerDef
   }
 
-  createJsonQL(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQL {
-    const axisBuilder = new AxisBuilder({schema});
-    const exprCompiler = new ExprCompiler(schema);
+  createMapnikJsonQL(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQL {
+    const axisBuilder = new AxisBuilder({schema})
+    const exprCompiler = new ExprCompiler(schema)
 
     // Verify that scopeLevel is an integer to prevent injection
     if ((design.scopeLevel != null) && ![0, 1, 2, 3, 4, 5].includes(design.scopeLevel)) {
-      throw new Error("Invalid scope level");
+      throw new Error("Invalid scope level")
     }
 
     // Verify that detailLevel is an integer to prevent injection
     if (![0, 1, 2, 3, 4, 5].includes(design.detailLevel)) {
-      throw new Error("Invalid detail level");
+      throw new Error("Invalid detail level")
     }
 
-    const regionsTable = design.regionsTable || "admin_regions";
+    const regionsTable = design.regionsTable || "admin_regions"
     
     if (design.regionMode === "plain") {
       /*
@@ -128,7 +620,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       ) as regions on regions.id = regions2._id
       where regions2.level = 2 and regions2.level0 = 'eb3e12a2-de1e-49a9-8afd-966eb55d47eb'
       */
-      const compiledAdminRegionExpr = exprCompiler.compileExpr({expr: design.adminRegionExpr || null, tableAlias: "innerquery"});
+      const compiledAdminRegionExpr = exprCompiler.compileExpr({expr: design.adminRegionExpr || null, tableAlias: "innerquery"})
 
       // Create inner query
       const innerQuery: JsonQLQuery = {
@@ -151,21 +643,21 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
           }
         },
         groupBy: [1]
-      };
+      }
 
       // Add color select if color axis
       if (design.axes.color) {
-        const colorExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "innerquery"});
-        innerQuery.selects.push({ type: "select", expr: colorExpr, alias: "color" });
+        const colorExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "innerquery"})
+        innerQuery.selects.push({ type: "select", expr: colorExpr, alias: "color" })
       }
 
       // Add label select if color axis
       if (design.axes.label) {
-        const labelExpr = axisBuilder.compileAxis({axis: design.axes.label, tableAlias: "innerquery"});
-        innerQuery.selects.push({ type: "select", expr: labelExpr, alias: "label" });
+        const labelExpr = axisBuilder.compileAxis({axis: design.axes.label, tableAlias: "innerquery"})
+        innerQuery.selects.push({ type: "select", expr: labelExpr, alias: "label" })
       }
 
-      let whereClauses = [];
+      let whereClauses = []
 
       if (design.scope) {
         whereClauses.push({
@@ -175,24 +667,24 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
             { type: "field", tableAlias: "regions", column: `level${design.scopeLevel || 0}` },
             design.scope
           ]
-        });
+        })
       }
 
       // Then add filters
       if (design.filter) {
-        whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "innerquery"}));
+        whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "innerquery"}))
       }
 
       // Then add extra filters passed in, if relevant
-      const relevantFilters = _.where(filters, {table: design.table});
+      const relevantFilters = _.where(filters, {table: design.table})
       for (let filter of relevantFilters) {
-        whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"));
+        whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
       }
 
-      whereClauses = _.compact(whereClauses);
+      whereClauses = _.compact(whereClauses)
 
       if (whereClauses.length > 0) {
-        innerQuery.where = { type: "op", op: "and", exprs: whereClauses };
+        innerQuery.where = { type: "op", op: "and", exprs: whereClauses }
       }
 
       // Now create outer query
@@ -301,14 +793,14 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 
       // Add color select 
       if (design.axes.color) {
-        const colorExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "regions"});
-        query.selects.push({ type: "select", expr: colorExpr, alias: "color" });
+        const colorExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "regions"})
+        query.selects.push({ type: "select", expr: colorExpr, alias: "color" })
       }
 
       // Add label select if color axis
       if (design.axes.label) {
-        const labelExpr = axisBuilder.compileAxis({axis: design.axes.label, tableAlias: "regions"});
-        query.selects.push({ type: "select", expr: labelExpr, alias: "label" });
+        const labelExpr = axisBuilder.compileAxis({axis: design.axes.label, tableAlias: "regions"})
+        query.selects.push({ type: "select", expr: labelExpr, alias: "label" })
       }
       
       // Scope overall
@@ -339,25 +831,25 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
   createCss(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): string {
     let css = `\
 #layer0 {
-  line-color: ${design.borderColor || "#000"};
-  line-width: 1.5;
-  line-opacity: 0.5;
-  polygon-opacity: ` + (design.fillOpacity * design.fillOpacity) + `;
-  polygon-fill: ` + (design.color || "transparent") + `;
+  line-color: ${design.borderColor || "#000"}
+  line-width: 1.5
+  line-opacity: 0.5
+  polygon-opacity: ` + (design.fillOpacity * design.fillOpacity) + `
+  polygon-fill: ` + (design.color || "transparent") + `
 }
 \
-`;
+`
 
     if (design.displayNames) {
       css += `\
 #layer0::labels {
-  text-name: [name];
-  text-face-name: 'Arial Regular';
-  text-halo-radius: 2;
-  text-halo-opacity: 0.5;
-  text-halo-fill: #FFF;
+  text-name: [name]
+  text-face-name: 'Arial Regular'
+  text-halo-radius: 2
+  text-halo-opacity: 0.5
+  text-halo-fill: #FFF
 }\
-`;
+`
     }
 
     // If color axes, add color conditions
@@ -370,12 +862,12 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
             css += `#layer0::labels [color=${JSON.stringify(item.value)}] { text-opacity: 0; text-halo-opacity: 0; }\n`;  
           }
         } else {
-          css += `#layer0 [color=${JSON.stringify(item.value)}] { polygon-fill: ${item.color}; }\n`;
+          css += `#layer0 [color=${JSON.stringify(item.value)}] { polygon-fill: ${item.color}; }\n`
         }
       }
     }
 
-    return css;
+    return css
   }
 
   /**  
@@ -399,7 +891,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
    *     popup: React element to put into a popup
    */
   onGridClick(ev: { data: any, event: any }, clickOptions: OnGridClickOptions<ChoroplethLayerDesign>): OnGridClickResults {
-    const regionsTable = clickOptions.design.regionsTable || "admin_regions";
+    const regionsTable = clickOptions.design.regionsTable || "admin_regions"
 
     // Row only if mode is "plain" or "direct"
     if (clickOptions.design.regionMode == "plain" || clickOptions.design.regionMode == "direct") {
@@ -425,10 +917,10 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       }
 
       // Create filter for single row
-      const { table } = clickOptions.design;
+      const { table } = clickOptions.design
 
       // Compile adminRegionExpr
-      const exprCompiler = new ExprCompiler(clickOptions.schema);
+      const exprCompiler = new ExprCompiler(clickOptions.schema)
       const filterExpr: Expr = {
         type: "op",
         op: "within",
@@ -450,7 +942,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       if (ev.event.originalEvent.shiftKey) {
         // Scope to region, unless already scoped
         if (clickOptions.scopeData === ev.data.id) {
-          results.scope = null;
+          results.scope = null
         } else {
           results.scope = {
             name: ev.data.name,
@@ -462,7 +954,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 
       } else if (clickOptions.design.popup) {
         // Create default popup filter joins
-        const defaultPopupFilterJoins = {};
+        const defaultPopupFilterJoins = {}
         if (clickOptions.design.adminRegionExpr) {
           defaultPopupFilterJoins[clickOptions.design.table] = clickOptions.design.adminRegionExpr
         }
@@ -484,13 +976,13 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
           items: clickOptions.design.popup.items,
           style: "popup",
           renderWidget: (options: any) => {
-            const widget = WidgetFactory.createWidget(options.type);
+            const widget = WidgetFactory.createWidget(options.type)
 
             // Create filters for single row
-            const filters = clickOptions.filters.concat(popupFilters);
+            const filters = clickOptions.filters.concat(popupFilters)
 
             // Get data source for widget
-            const widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(clickOptions.design, options.id);
+            const widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(clickOptions.design, options.id)
 
             return widget.createViewElement({
               schema: clickOptions.schema,
@@ -516,7 +1008,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 
   // Gets the bounds of the layer as GeoJSON
   getBounds(design: ChoroplethLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any) {
-    const regionsTable = design.regionsTable || "admin_regions";
+    const regionsTable = design.regionsTable || "admin_regions"
 
     const appliedFilters: JsonQLFilter[] = []
 
@@ -543,7 +1035,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     }
 
     // Use shape_simplified for speed, as bounds are always approximate
-    return this.getBoundsFromExpr(schema, dataSource, regionsTable, { type: "field", table: regionsTable, column: "shape_simplified" }, null, filters, callback);
+    return this.getBoundsFromExpr(schema, dataSource, regionsTable, { type: "field", table: regionsTable, column: "shape_simplified" }, null, filters, callback)
   }
 
   // Get min and max zoom levels
@@ -554,16 +1046,16 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
   // a React element
   getLegend(design: ChoroplethLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]) {
     if (filters == null) { filters = []; }
-    const _filters = filters.slice();
+    const _filters = filters.slice()
     if (design.filter != null) {
-      const exprCompiler = new ExprCompiler(schema);
-      const jsonql = exprCompiler.compileExpr({expr: design.filter, tableAlias: "{alias}"});
+      const exprCompiler = new ExprCompiler(schema)
+      const jsonql = exprCompiler.compileExpr({expr: design.filter, tableAlias: "{alias}"})
       const table = (design.filter as OpExpr).table
       if (jsonql && table) {
-        _filters.push({ table: table, jsonql });
+        _filters.push({ table: table, jsonql })
       }
     }
-    const axisBuilder = new AxisBuilder({schema});
+    const axisBuilder = new AxisBuilder({schema})
 
     const regionsTable = design.regionsTable || "admin_regions"
     const axisTable = design.regionMode === "direct" ? regionsTable : design.table
@@ -576,7 +1068,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       axis: axisBuilder.cleanAxis({axis: design.axes.color || null, table: axisTable, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"}),
       defaultColor: design.color,
       locale
-    });
+    })
   }
 
   // Get a list of table ids that can be filtered on
@@ -586,17 +1078,17 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 
   /** True if layer can be edited */
   isEditable() {
-    return true;
+    return true
   }
 
   // Returns a cleaned design
   cleanDesign(design: ChoroplethLayerDesign, schema: Schema): ChoroplethLayerDesign {
-    const regionsTable = design.regionsTable || "admin_regions";
-    const exprCleaner = new ExprCleaner(schema);
-    const axisBuilder = new AxisBuilder({schema});
+    const regionsTable = design.regionsTable || "admin_regions"
+    const exprCleaner = new ExprCleaner(schema)
+    const axisBuilder = new AxisBuilder({schema})
 
     design = produce(design, draft => {
-      draft.axes = design.axes || {};
+      draft.axes = design.axes || {}
 
       // Default region mode
       if (!design.regionMode) {
@@ -605,33 +1097,33 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 
       // Default color
       if (draft.regionMode === "plain") {
-        draft.color = design.color || "#FFFFFF";
+        draft.color = design.color || "#FFFFFF"
       }
       else {
         draft.color = "#FFFFFF"
       }
 
       if (draft.regionMode === "indirect" && design.table) {
-        draft.adminRegionExpr = exprCleaner.cleanExpr(design.adminRegionExpr || null, { table: design.table, types: ["id"], idTable: regionsTable });
+        draft.adminRegionExpr = exprCleaner.cleanExpr(design.adminRegionExpr || null, { table: design.table, types: ["id"], idTable: regionsTable })
       }
       else {
         delete draft.adminRegionExpr
         delete draft.table
       }
 
-      draft.fillOpacity = (design.fillOpacity != null) ? design.fillOpacity : 0.75;
-      draft.displayNames = (design.displayNames != null) ? design.displayNames : true;
+      draft.fillOpacity = (design.fillOpacity != null) ? design.fillOpacity : 0.75
+      draft.displayNames = (design.displayNames != null) ? design.displayNames : true
 
       // Clean the axes
       if (draft.regionMode === "indirect" && design.table) {
-        draft.axes.color = axisBuilder.cleanAxis({axis: draft.axes.color ? original(draft.axes.color) || null : null, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"});
-        draft.axes.label = axisBuilder.cleanAxis({axis: draft.axes.label ? original(draft.axes.label) || null : null, table: design.table, types: ['text', 'number'], aggrNeed: "required"});
+        draft.axes.color = axisBuilder.cleanAxis({axis: draft.axes.color ? original(draft.axes.color) || null : null, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"})
+        draft.axes.label = axisBuilder.cleanAxis({axis: draft.axes.label ? original(draft.axes.label) || null : null, table: design.table, types: ['text', 'number'], aggrNeed: "required"})
       } else if (draft.regionMode === "plain" || (draft.regionMode === "indirect" && !design.table)) {
         delete draft.axes.color
         delete draft.axes.label
       } else if (draft.regionMode === "direct") {
-        draft.axes.color = axisBuilder.cleanAxis({axis: draft.axes.color ? original(draft.axes.color) || null : null, table: regionsTable, types: ['enum', 'text', 'boolean', 'date'], aggrNeed: "none"});
-        draft.axes.label = axisBuilder.cleanAxis({axis: draft.axes.label ? original(draft.axes.label) || null : null, table: regionsTable, types: ['text', 'number'], aggrNeed: "none"});
+        draft.axes.color = axisBuilder.cleanAxis({axis: draft.axes.color ? original(draft.axes.color) || null : null, table: regionsTable, types: ['enum', 'text', 'boolean', 'date'], aggrNeed: "none"})
+        draft.axes.label = axisBuilder.cleanAxis({axis: draft.axes.label ? original(draft.axes.label) || null : null, table: regionsTable, types: ['text', 'number'], aggrNeed: "none"})
       }
 
       // Filter is only for indirect
@@ -652,37 +1144,37 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 
   // Validates design. Null if ok, message otherwise
   validateDesign(design: ChoroplethLayerDesign, schema: Schema) {
-    let error;
-    const exprUtils = new ExprUtils(schema);
-    const axisBuilder = new AxisBuilder({schema});
+    let error
+    const exprUtils = new ExprUtils(schema)
+    const axisBuilder = new AxisBuilder({schema})
 
     if (design.regionMode === "indirect") {
       if (!design.table) {
-        return "Missing table";
+        return "Missing table"
       }
       if (!design.adminRegionExpr || (exprUtils.getExprType(design.adminRegionExpr) !== "id")) {
-        return "Missing admin region expr";
+        return "Missing admin region expr"
       }
 
-      error = axisBuilder.validateAxis({ axis: design.axes.color || null });
+      error = axisBuilder.validateAxis({ axis: design.axes.color || null })
       if (error) { return error; }
 
-      error = axisBuilder.validateAxis({ axis: design.axes.label || null });
+      error = axisBuilder.validateAxis({ axis: design.axes.label || null })
       if (error) { return error; }
     }
     else if (design.regionMode === "direct") {
-      error = axisBuilder.validateAxis({ axis: design.axes.color || null });
+      error = axisBuilder.validateAxis({ axis: design.axes.color || null })
       if (error) { return error; }
 
-      error = axisBuilder.validateAxis({ axis: design.axes.label || null });
+      error = axisBuilder.validateAxis({ axis: design.axes.label || null })
       if (error) { return error; }
     }
   
     if ((design.detailLevel == null)) {
-      return "Missing detail level";
+      return "Missing detail level"
     }
 
-    return null;
+    return null
   }
 
   // Creates a design element with specified options
@@ -700,7 +1192,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     filters: JsonQLFilter[]
   }): React.ReactElement<{}> {
     // Require here to prevent server require problems
-    const ChoroplethLayerDesigner = require('./ChoroplethLayerDesigner').default;
+    const ChoroplethLayerDesigner = require('./ChoroplethLayerDesigner').default
 
     // Clean on way in and out
     return React.createElement(ChoroplethLayerDesigner, {
@@ -709,28 +1201,28 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       design: this.cleanDesign(options.design, options.schema),
       filters: options.filters,
       onDesignChange: (design: ChoroplethLayerDesign) => {
-        return options.onDesignChange(this.cleanDesign(design, options.schema));
+        return options.onDesignChange(this.cleanDesign(design, options.schema))
       }
-    });
+    })
   }
 
   createKMLExportJsonQL(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
-    const regionsTable = design.regionsTable || "admin_regions";
-    const axisBuilder = new AxisBuilder({schema});
-    const exprCompiler = new ExprCompiler(schema);
+    const regionsTable = design.regionsTable || "admin_regions"
+    const axisBuilder = new AxisBuilder({schema})
+    const exprCompiler = new ExprCompiler(schema)
 
     // Verify that scopeLevel is an integer to prevent injection
     if ((design.scopeLevel != null) && ![0, 1, 2, 3, 4, 5].includes(design.scopeLevel)) {
-      throw new Error("Invalid scope level");
+      throw new Error("Invalid scope level")
     }
 
     // Verify that detailLevel is an integer to prevent injection
     if (![0, 1, 2, 3, 4, 5].includes(design.detailLevel)) {
-      throw new Error("Invalid detail level");
+      throw new Error("Invalid detail level")
     }
 
     // Compile adminRegionExpr
-    const compiledAdminRegionExpr = exprCompiler.compileExpr({expr: design.adminRegionExpr || null, tableAlias: "innerquery"});
+    const compiledAdminRegionExpr = exprCompiler.compileExpr({expr: design.adminRegionExpr || null, tableAlias: "innerquery"})
 
     // Create inner query
     const innerQuery: JsonQLQuery = {
@@ -753,23 +1245,23 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         }
       },
       groupBy: [1]
-    };
+    }
 
     // Add color select if color axis
     if (design.axes.color) {
-      const valueExpr: JsonQL = exprCompiler.compileExpr({expr: design.axes.color.expr, tableAlias: "innerquery"});
-      const colorExpr: JsonQL = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "innerquery"});
-      innerQuery.selects.push({ type: "select", expr: colorExpr, alias: "color" });
-      innerQuery.selects.push({ type: "select", expr: valueExpr, alias: "value" });
+      const valueExpr: JsonQL = exprCompiler.compileExpr({expr: design.axes.color.expr, tableAlias: "innerquery"})
+      const colorExpr: JsonQL = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "innerquery"})
+      innerQuery.selects.push({ type: "select", expr: colorExpr, alias: "color" })
+      innerQuery.selects.push({ type: "select", expr: valueExpr, alias: "value" })
     }
 
     // Add label select if color axis
     if (design.axes.label) {
-      const labelExpr = axisBuilder.compileAxis({axis: design.axes.label, tableAlias: "innerquery"});
-      innerQuery.selects.push({ type: "select", expr: labelExpr, alias: "label" });
+      const labelExpr = axisBuilder.compileAxis({axis: design.axes.label, tableAlias: "innerquery"})
+      innerQuery.selects.push({ type: "select", expr: labelExpr, alias: "label" })
     }
 
-    let whereClauses = [];
+    let whereClauses = []
 
     if (design.scope) {
       whereClauses.push({
@@ -779,24 +1271,24 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
           { type: "field", tableAlias: "regions", column: `level${design.scopeLevel || 0}` },
           design.scope
         ]
-      });
+      })
     }
 
     // Then add filters
     if (design.filter) {
-      whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "innerquery"}));
+      whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "innerquery"}))
     }
 
     // Then add extra filters passed in, if relevant
-    const relevantFilters = _.where(filters, {table: design.table});
+    const relevantFilters = _.where(filters, {table: design.table})
     for (let filter of relevantFilters) {
-      whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"));
+      whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
     }
 
-    whereClauses = _.compact(whereClauses);
+    whereClauses = _.compact(whereClauses)
 
     if (whereClauses.length > 0) {
-      innerQuery.where = { type: "op", op: "and", exprs: whereClauses };
+      innerQuery.where = { type: "op", op: "and", exprs: whereClauses }
     }
 
     const adminGeometry = {
@@ -808,7 +1300,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
           ]
         }
       ]
-    };
+    }
 
     // Now create outer query
     const query: JsonQLQuery = {
@@ -847,7 +1339,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
           }
         ]
       }
-    };
+    }
 
     // Scope overall
     if (design.scope) {
@@ -858,21 +1350,21 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
           { type: "field", tableAlias: "regions2", column: `level${design.scopeLevel || 0}` },
           { type: "literal", value: design.scope }
         ]
-      });
+      })
     }
 
     // Bubble up color and label
     if (design.axes.color) {
-      query.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "color"}, alias: "color" });
-      query.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "value"}, alias: "value" });
+      query.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "color"}, alias: "color" })
+      query.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "value"}, alias: "value" })
     }
 
     // Add label select if color axis
     if (design.axes.label) {
-      query.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "label"}, alias: "label" });
+      query.selects.push({ type: "select", expr: { type: "field", tableAlias: "regions", column: "label"}, alias: "label" })
     }
 
-    return query;
+    return query
   }
 
   getKMLExportJsonQL(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
@@ -880,44 +1372,44 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       color: design.color,
       opacity: design.fillOpacity,
       colorMap: null
-    };
+    }
 
     if (design.axes.color && design.axes.color.colorMap) {
-      style.colorMap = design.axes.color.colorMap;
+      style.colorMap = design.axes.color.colorMap
     }
 
     const layerDef = {
       layers: [{ id: "layer0", jsonql: this.createKMLExportJsonQL(design, schema, filters), style}]
-    };
+    }
 
-    return layerDef;
+    return layerDef
   }
 
   acceptKmlVisitorForRow(visitor: any, row: any) {
-    let outer;
+    let outer
     if (!row.the_geom_webmercator) {
-      return;
+      return
     }
 
     if (row.the_geom_webmercator.length === 0) {
-      return;
+      return
     }
 
-    const data = JSON.parse(row.the_geom_webmercator);
+    const data = JSON.parse(row.the_geom_webmercator)
 
     if (data.coordinates.length === 0) {
-      return;
+      return
     }
 
     if (data.type === "MultiPolygon") {
-      outer = data.coordinates[0][0];
+      outer = data.coordinates[0][0]
     } else {
-      outer = data.coordinates[0];
+      outer = data.coordinates[0]
     }
 
 
-    const list = _.map(outer, (coordinates: any) => coordinates.join(","));
+    const list = _.map(outer, (coordinates: any) => coordinates.join(","))
 
-    return visitor.addPolygon(list.join(" "), row.color, data.type === "MultiPolygon", row.name, visitor.buildDescription(row));
+    return visitor.addPolygon(list.join(" "), row.color, data.type === "MultiPolygon", row.name, visitor.buildDescription(row))
   }
 }

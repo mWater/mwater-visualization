@@ -110,6 +110,9 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
       sourceLayers: [
         { id: "main", jsonql }
       ],
+      ctes: [],
+      minZoom: design.minZoom,
+      maxZoom: design.maxZoom,
       subLayers
     }
   }

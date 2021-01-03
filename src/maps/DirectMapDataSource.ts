@@ -8,7 +8,7 @@ import MapBoundsCalculator from "./MapBoundsCalculator";
 import { MapDesign, MapLayerView } from "./MapDesign";
 import { MapDataSource } from "./maps";
 import DirectWidgetDataSource from '../widgets/DirectWidgetDataSource'
-import { JsonQLCssLayerDefinition, VectorTileSourceLayer } from './Layer';
+import { JsonQLCssLayerDefinition, VectorTileCTE, VectorTileSourceLayer } from './Layer';
 import compressJson from '../compressJson'
 import querystring from 'querystring'
 import { LayerDataSource } from './LayerDataSource';
@@ -97,10 +97,20 @@ class DirectLayerDataSource implements LayerDataSource {
 
     const request: {
       layers: VectorTileSourceLayer[]
+      /** Common table expressions of the tiles */
+      ctes: VectorTileCTE[]
       createdAfter?: string
       expiresAfter: string
+      /** Enforced minimum zoom level */
+      minZoom?: number
+
+      /** Enforced maximum zoom level */
+      maxZoom?: number
     } = {
       layers: vectorTile.sourceLayers,
+      ctes: vectorTile.ctes,
+      minZoom: vectorTile.minZoom,
+      maxZoom: vectorTile.maxZoom,
       // 12 hours
       expiresAfter: new Date(Date.now() + 1000 * 3600 * 12).toISOString()
     }
