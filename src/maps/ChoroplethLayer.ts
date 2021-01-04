@@ -34,6 +34,9 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     else if (design.regionMode === "indirect" || !design.regionMode) {
       return this.createIndirectVectorTile(design, sourceId, schema, filters)
     }
+    else if (design.regionMode == "direct") {
+      return this.createDirectVectorTile(design, sourceId, schema, filters)
+    }
     else {
       throw new Error("NOT IMPLEMENTED")
     }
@@ -496,6 +499,210 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 
     return {
       ctes: [{ tableName: "regions", jsonql: cteQuery }],
+      sourceLayers: [
+        { id: "polygons", jsonql: polygonsQuery },
+        { id: "points", jsonql: pointsQuery }
+      ],
+      subLayers: subLayers,
+      minZoom: design.minZoom,
+      maxZoom: design.maxZoom
+    }
+  }
+
+  createDirectVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[]): VectorTileDef {
+    const axisBuilder = new AxisBuilder({schema})
+    const exprCompiler = new ExprCompiler(schema)
+    const regionsTable = design.regionsTable || "admin_regions"
+
+    /*
+    Returns two source layers, "polygons" and "points". Points are used for labels.
+
+    polygons:
+      select name, ST_AsMVTGeom(shape_simplified, tile.envelope) as the_geom_webmercator from
+      admin_regions as regions, tile as tile
+      where regions.level0 = 242
+      and regions.level = 1
+      and shape && tile.envelope
+
+    points:
+      select name, ST_AsMVTGeom(
+        (select ST_Centroid(polys.geom) from ST_Dump(shape_simplified) as polys order by ST_Area(polys.geom) desc limit 1)
+      , tile.envelope) as the_geom_webmercator from
+      admin_regions as regions, tile as tile
+      where regions.level0 = 242
+      and regions.level = 1
+      and shape && tile.envelope
+
+      */
+
+    // Create where
+    const where: JsonQLExpr = {
+      type: "op",
+      op: "and",
+      exprs: [
+        // Level to display
+        {
+          type: "op",
+          op: "=",
+          exprs: [
+            { type: "field", tableAlias: "regions", column: "level" },
+            design.detailLevel
+          ]
+        },
+        // Filter to tile
+        {
+          type: "op",
+          op: "&&",
+          exprs: [
+            { type: "field", tableAlias: "regions", column: "shape" },
+            { type: "field", tableAlias: "tile", column: "envelope" }
+          ]
+        }
+      ]
+    }
+
+    // Scope overall
+    if (design.scope) {
+      where.exprs.push({
+        type: "op",
+        op: "=",
+        exprs: [
+          { type: "field", tableAlias: "regions", column: `level${design.scopeLevel || 0}` },
+          { type: "literal", value: design.scope }
+        ]
+      })
+    }
+
+    // Add filters on regions to outer query
+    for (const filter of filters) {
+      if (filter.table == regionsTable) {
+        where.exprs.push(injectTableAlias(filter.jsonql, "regions"))
+      }
+    }
+
+    const polygonsQuery: JsonQLQuery = {
+      type: "query",
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "regions", column: "_id" }, alias: "id" },
+        { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [
+          { type: "field", tableAlias: "regions", column: "shape_simplified" },
+          { type: "field", tableAlias: "tile", column: "envelope" }
+        ]}, alias: "the_geom_webmercator" }, 
+        { type: "select", expr: { type: "field", tableAlias: "regions", column: "name" }, alias: "name" }
+      ],
+      from: { 
+        type: "join", 
+        kind: "cross", 
+        left: { type: "table", table: regionsTable, alias: "regions" },
+        right: { type: "table", table: "tile", alias: "tile" }
+      },
+      where: where
+    }
+
+    const pointsQuery: JsonQLQuery = {
+      type: "query",
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "regions", column: "_id" }, alias: "id" },
+        { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [
+          { 
+            type: "scalar", 
+            expr: { type: "op", op: "ST_Centroid", exprs: [
+              { type: "field", tableAlias: "polys", column: "geom" }
+            ]},
+            from: { type: "subexpr", expr: { type: "op", op: "ST_Dump", exprs: [{ type: "field", tableAlias: "regions", column: "shape_simplified" }] }, alias: "polys" },
+            orderBy: [{ expr: { type: "op", op: "ST_Area", exprs: [{ type: "field", tableAlias: "polys", column: "geom" }] }, direction: "desc" }],
+            limit: 1
+          },
+          { type: "field", tableAlias: "tile", column: "envelope" }
+        ]}, alias: "the_geom_webmercator" }, 
+        { type: "select", expr: { type: "field", tableAlias: "regions", column: "name" }, alias: "name" }
+      ],
+      from: { 
+        type: "join", 
+        kind: "cross", 
+        left: { type: "table", table: regionsTable, alias: "regions" },
+        right: { type: "table", table: "tile", alias: "tile" }
+      },
+      where: where
+    }
+
+    // Add color select 
+    if (design.axes.color) {
+      const colorExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "regions"})
+      pointsQuery.selects.push({ type: "select", expr: colorExpr, alias: "color" })
+      polygonsQuery.selects.push({ type: "select", expr: colorExpr, alias: "color" })
+    }
+
+    // Add label select if color axis
+    if (design.axes.label) {
+      const labelExpr = axisBuilder.compileAxis({axis: design.axes.label, tableAlias: "regions"})
+      pointsQuery.selects.push({ type: "select", expr: labelExpr, alias: "label" })
+      polygonsQuery.selects.push({ type: "select", expr: labelExpr, alias: "label" })
+    }
+
+    // If color axes, add color conditions
+    let color: any
+    if (design.axes.color && design.axes.color.colorMap) {
+      const excludedValues = design.axes.color.excludedValues || []
+      // Create match operator
+      color = ["case"]
+      for (let item of design.axes.color.colorMap) {
+        color.push(["==", ["get", "color"], item.value])
+        color.push(excludedValues.includes(item.value) ? "transparent" : item.color)
+      }
+      // Else
+      color.push(design.color || "transparent")
+    }
+    else { 
+      color = design.color || "transparent"
+    }
+
+    // Create layers
+    const subLayers: mapboxgl.AnyLayer[] = []
+
+    subLayers.push({
+      'id': `${sourceId}:polygon-fill`,
+      'type': 'fill',
+      'source': sourceId,
+      'source-layer': 'polygons',
+      paint: {
+        'fill-opacity': (design.fillOpacity * design.fillOpacity),
+        "fill-color": color
+      }
+    })
+
+    subLayers.push({
+      'id': `${sourceId}:polygon-line`,
+      'type': 'line',
+      'source': sourceId,
+      'source-layer': 'polygons',
+      paint: {
+        "line-color": design.borderColor || "#000",
+        "line-opacity": 0.5,
+        "line-width": 1.5
+      }
+    })
+
+    if (design.displayNames) {
+      subLayers.push({
+        'id': `${sourceId}:labels`,
+        'type': 'symbol',
+        'source': sourceId,
+        'source-layer': 'points',
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-size': 10,
+        },
+        paint: {
+          'text-color': "black",
+          "text-halo-color": "rgba(255, 255, 255, 0.5)",
+          "text-halo-width": 2,
+        }
+      })
+    }
+
+    return {
+      ctes: [],
       sourceLayers: [
         { id: "polygons", jsonql: polygonsQuery },
         { id: "points", jsonql: pointsQuery }
