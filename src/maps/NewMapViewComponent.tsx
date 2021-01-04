@@ -1,6 +1,6 @@
 import mapboxgl from "mapbox-gl";
 import { DataSource, Schema } from "mwater-expressions"
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRef } from "react";
 import { JsonQLFilter } from "..";
 import { default as LayerFactory } from "./LayerFactory";
@@ -50,9 +50,26 @@ export function NewMapViewComponent(props: {
   const mapRef = useRef<mapboxgl.Map | null>(null)
   const divRef = useRef<HTMLDivElement | null>(null)
 
-  async function addLayers(map: mapboxgl.Map) {
-    // Add symbols that markers layers require
-    await addSymbolsToMap(map)
+  /** Current design (to detect if has changed) */
+  const designRef = useRef<MapDesign>()
+
+  /** Ids of layers present */
+  const currentLayersRef = useRef<mapboxgl.AnyLayer[]>([])
+
+  /** Ids of sources present */
+  const currentSourcesRef = useRef<{ id: string, sourceData: mapboxgl.AnySourceData }[]>([])
+
+  /** True when symbols have been added to map */
+  const [symbolsAdded, setSymbolsAdded] = useState(false)
+
+  // Store design in ref to detect changes
+  useEffect(() => { designRef.current = props.design }, [props.design])
+
+  /** Make layers of map match the design */
+  async function updateLayers(map: mapboxgl.Map) {
+    // Sources to add
+    const newSources: { id: string, sourceData: mapboxgl.AnySourceData }[] = []
+    const newLayers: mapboxgl.AnyLayer[] = []
 
     for (const lv of props.design.layerViews) {
       const layer = LayerFactory.createLayer(lv.type)
@@ -60,30 +77,31 @@ export function NewMapViewComponent(props: {
       const layerDataSource = props.mapDataSource.getLayerDataSource(lv.id)
 
       if (defType == "VectorTile") {
+        // TODO attempt to re-use sources
         // Get source url
         const { expires, url } = await layerDataSource.getVectorTileUrl(lv.design, [])
 
         // Add source
-        map.addSource(lv.id, {
+        newSources.push({ id: lv.id, sourceData: {
           type: "vector",
           tiles: [url]
-        })
+        }})
 
         // Add layer
         const subLayers = layer.getVectorTile(lv.design, lv.id, props.schema, []).subLayers
         for (const sublayer of subLayers) {
-          map.addLayer(sublayer)
+          newLayers.push(sublayer)
         }
       }
       else {
         const tileUrl = props.mapDataSource.getLayerDataSource(lv.id).getTileUrl(lv.design, [])
         if (tileUrl) {
-          map.addSource(lv.id, {
+          newSources.push({ id: lv.id, sourceData: {
             type: "raster",
             tiles: [tileUrl]
-          })
+          }})
 
-          map.addLayer({
+          newLayers.push({
             id: lv.id,
             type: "raster",
             source: lv.id
@@ -91,8 +109,38 @@ export function NewMapViewComponent(props: {
         }
       }
     }
+
+    // If design has changed, abort update
+    if (props.design != designRef.current) {
+      return
+    }
+
+    // If sources is unchanged TODO
+
+    // Remove existing layers and sources
+    for (const layer of currentLayersRef.current) {
+      map.removeLayer(layer.id)
+    }
+    currentLayersRef.current = []
+
+    for (const source of currentSourcesRef.current) {
+      map.removeSource(source.id)
+    }
+    currentSourcesRef.current = []
+
+    // Add sources and layers
+    for (const source of newSources) {
+      map.addSource(source.id, source.sourceData)
+      currentSourcesRef.current.push(source)
+    }
+
+    for (const layer of newLayers) {
+      map.addLayer(layer)
+      currentLayersRef.current.push(layer)
+    }
   }
 
+  // Load map and symbols
   useEffect(() => {
     const map = new mapboxgl.Map({
       accessToken: 'pk.eyJ1IjoiY2xheXRvbmdyYXNzaWNrIiwiYSI6ImNpcHk4MHMxZDB5NHVma20ya3k1dnp3bzQifQ.lMMb60WxiYfRF0V4Y3UTbQ',
@@ -105,9 +153,10 @@ export function NewMapViewComponent(props: {
     // Speed up wheel scrolling
     map.scrollZoom.setWheelZoomRate(1/250)
 
-    map.on("load", () => {
-      // Add layers
-      addLayers(map)
+    map.on("load", async () => {
+      // Add symbols that markers layers require
+      await addSymbolsToMap(map)
+      setSymbolsAdded(true)
     })
 
     return () => {
@@ -115,6 +164,22 @@ export function NewMapViewComponent(props: {
     }
   }, [])
 
+  // Load layers on map
+  useEffect(() => {
+    // Can't load until added
+    if (!symbolsAdded) {
+      return
+    }
+
+    const map = mapRef.current
+    if (!map) {
+      return
+    }
+
+    updateLayers(map)
+  }, [symbolsAdded, props.design])
+
+  // Capture movements on map to update bounds
   useEffect(() => {
     const map = mapRef.current
     if (!map) {
@@ -158,7 +223,6 @@ function addSymbolsToMap(map: mapboxgl.Map) {
   const promises: Promise<null>[] = []
 
   for (const mapSymbol of mapSymbols) {
-    console.log(mapSymbol.value)
     promises.push(new Promise((resolve, reject) => {
       map.loadImage(mapSymbol.url, (err: any, image: any) => { 
         if (err) { 
