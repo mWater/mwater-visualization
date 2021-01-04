@@ -6,8 +6,7 @@ import { JsonQLFilter } from "..";
 import { default as LayerFactory } from "./LayerFactory";
 import { MapDesign } from "./MapDesign";
 import { MapDataSource } from "./maps";
-
-const fontAwesomeStar = require('./symbols/font-awesome/star.png').default
+import { mapSymbols } from "./mapSymbols";
 
 /** Component that displays just the map */
 export function NewMapViewComponent(props: {
@@ -52,18 +51,8 @@ export function NewMapViewComponent(props: {
   const divRef = useRef<HTMLDivElement | null>(null)
 
   async function addLayers(map: mapboxgl.Map) {
-    // Load images
-    await new Promise((resolve, reject) => {
-      map.loadImage(fontAwesomeStar, (err: any, image: any) => { 
-        if (err) { 
-          reject(err) 
-        } 
-        else {
-          map.addImage("font-awesome/star", image, { sdf: true })
-          resolve(null) 
-        }
-      })
-    })
+    // Add symbols that markers layers require
+    await addSymbolsToMap(map)
 
     for (const lv of props.design.layerViews) {
       const layer = LayerFactory.createLayer(lv.type)
@@ -109,8 +98,6 @@ export function NewMapViewComponent(props: {
       accessToken: 'pk.eyJ1IjoiY2xheXRvbmdyYXNzaWNrIiwiYSI6ImNpcHk4MHMxZDB5NHVma20ya3k1dnp3bzQifQ.lMMb60WxiYfRF0V4Y3UTbQ',
       container: divRef.current!,
       style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
-      // center: [-74.5, 40], // starting position [lng, lat]
-      // zoom: 4 // starting zoom
       bounds: props.design.bounds ? [props.design.bounds.w, props.design.bounds.s, props.design.bounds.e, props.design.bounds.n] : undefined
     })
     mapRef.current = map
@@ -156,11 +143,34 @@ export function NewMapViewComponent(props: {
     return () => { map.off("moveend", onMoveEnd) }
   }, [props.onDesignChange, props.zoomLocked, props.design])
 
-  return <div style={{ width: props.width, height: props.height }} ref={divRef}/>
+  // Overflow hidden because of problem of exceeding div
+  return <div style={{ width: props.width, height: props.height, overflow: "hidden" }} ref={divRef}/>
 }
 
 interface MapScope {
   name: string
   filter: JsonQLFilter
   data: { layerViewId: string, data: any }
+}
+
+/** Add all symbols needed to the map */
+function addSymbolsToMap(map: mapboxgl.Map) {
+  const promises: Promise<null>[] = []
+
+  for (const mapSymbol of mapSymbols) {
+    console.log(mapSymbol.value)
+    promises.push(new Promise((resolve, reject) => {
+      map.loadImage(mapSymbol.url, (err: any, image: any) => { 
+        if (err) { 
+          reject(err) 
+        } 
+        else {
+          map.addImage(mapSymbol.value, image, { sdf: true })
+          resolve(null) 
+        }
+      })
+    }))
+  }
+
+  return Promise.all(promises)
 }

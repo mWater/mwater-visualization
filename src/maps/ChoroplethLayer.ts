@@ -190,11 +190,11 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         'source-layer': 'points',
         layout: {
           'text-field': ['get', 'name'],
-          'text-size': 12,
+          'text-size': 10,
         },
         paint: {
           'text-color': "black",
-          "text-halo-color": "white",
+          "text-halo-color": "rgba(255, 255, 255, 0.5)",
           "text-halo-width": 2,
         }
       })
@@ -484,11 +484,11 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         'source-layer': 'points',
         layout: {
           'text-field': design.axes.label ? ['get', 'label'] : ['get', 'name'],
-          'text-size': 12,
+          'text-size': 10,
         },
         paint: {
           'text-color': "black",
-          "text-halo-color": "white",
+          "text-halo-color": "rgba(255, 255, 255, 0.5)",
           "text-halo-width": 2,
         }
       })
