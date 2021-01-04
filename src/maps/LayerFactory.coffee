@@ -1,6 +1,6 @@
 MWaterServerLayer = require './MWaterServerLayer'
 MarkersLayer = require('./MarkersLayer').default
-BufferLayer = require './BufferLayer'
+BufferLayer = require('./BufferLayer').default
 ChoroplethLayer = require('./ChoroplethLayer').default
 ClusterLayer = require './ClusterLayer'
 TileUrlLayer = require './TileUrlLayer'
