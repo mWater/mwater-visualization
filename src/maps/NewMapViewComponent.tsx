@@ -8,6 +8,8 @@ import { MapDesign } from "./MapDesign";
 import { MapDataSource } from "./maps";
 import { mapSymbols } from "./mapSymbols";
 
+import 'mapbox-gl/dist/mapbox-gl.css'
+
 /** Component that displays just the map */
 export function NewMapViewComponent(props: {
   schema: Schema
@@ -67,6 +69,11 @@ export function NewMapViewComponent(props: {
 
   /** Make layers of map match the design */
   async function updateLayers(map: mapboxgl.Map) {
+    // TODO handle scoping
+    // # If layer is scoping, fade opacity and add extra filtered version
+    // isScoping = @props.scope and @props.scope.data.layerViewId == layerView.id 
+    // TODO handle grid click
+
     // Sources to add
     const newSources: { id: string, sourceData: mapboxgl.AnySourceData }[] = []
     const newLayers: mapboxgl.AnyLayer[] = []
@@ -78,6 +85,15 @@ export function NewMapViewComponent(props: {
       }
 
       const layer = LayerFactory.createLayer(lv.type)
+
+      // Clean design (prevent ever displaying invalid/legacy designs)
+      const design = layer.cleanDesign(lv.design, props.schema)
+  
+      // Ignore if invalid
+      if (layer.validateDesign(design, props.schema)) {
+        continue
+      }
+  
       const defType = layer.getLayerDefinitionType()
       const layerDataSource = props.mapDataSource.getLayerDataSource(lv.id)
 

@@ -6,12 +6,281 @@ import React from "react"
 import { JsonQLFilter } from ".."
 import AxisBuilder from "../axes/AxisBuilder"
 import { ClusterLayerDesign } from "./ClusterLayerDesign"
-import Layer from "./Layer"
+import Layer, { VectorTileDef } from "./Layer"
 
-const LegendGroup = require('./LegendGroup')
 const LayerLegendComponent = require('./LayerLegendComponent')
 
 export default class ClusterLayer extends Layer<ClusterLayerDesign> {
+  /** Gets the type of layer definition */
+  getLayerDefinitionType(): "VectorTile" { return "VectorTile" }
+
+  getVectorTile(design: ClusterLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
+    const jsonql = this.createJsonQL(design, schema, filters)
+
+    const subLayers: mapboxgl.AnyLayer[] = []
+
+    subLayers.push({
+      'id': `${sourceId}:circles-single`,
+      'type': 'circle',
+      'source': sourceId,
+      'source-layer': 'clusters',
+      paint: {
+        "circle-color": design.fillColor || "#337ab7",
+        "circle-opacity": opacity,
+        "circle-stroke-color": "white",
+        "circle-stroke-width": 2,
+        "circle-stroke-opacity": 0.6 * opacity,
+        "circle-radius": 5
+      },
+      filter: ['==', ["to-number", ['get', 'cnt']], 1]
+    })
+
+    subLayers.push({
+      'id': `${sourceId}:circles-multiple`,
+      'type': 'circle',
+      'source': sourceId,
+      'source-layer': 'clusters',
+      paint: {
+        "circle-color": design.fillColor || "#337ab7",
+        "circle-opacity": opacity,
+        "circle-stroke-color": "white",
+        "circle-stroke-width": 4,
+        "circle-stroke-opacity": 0.6 * opacity,
+        "circle-radius": ["to-number", ['get', 'size']]
+      },
+      filter: ['>', ["to-number", ['get', 'cnt']], 1]
+    })
+
+    subLayers.push({
+      'id': `${sourceId}:labels`,
+      'type': 'symbol',
+      'source': sourceId,
+      'source-layer': 'clusters',
+      layout: {
+        "text-field": ['get', 'cnt'],
+        "text-size": 10
+      },
+      paint: {
+        "text-color": (design.textColor || "white"),
+        "text-opacity": 1
+      },
+      filter: ['>', ["to-number", ['get', 'cnt']], 1]
+    })
+
+    return {
+      sourceLayers: [
+        { id: "clusters", jsonql: jsonql }
+      ],
+      ctes: [],
+      subLayers: subLayers
+    }
+  }
+
+  createJsonQL(design: ClusterLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery {
+    const axisBuilder = new AxisBuilder({schema})
+    const exprCompiler = new ExprCompiler(schema)
+
+    /*
+    Query:
+      Works by first snapping to grid and then clustering the clusters with slower DBSCAN method
+
+      select 
+        ST_AsMVTGeom(ST_Centroid(ST_Collect(center)), tile.envelope) as the_geom_webmercator,
+        sum(cnt) as cnt, 
+        log(sum(cnt)) * 6 + 14 as size from 
+          (
+            select 
+            ST_ClusterDBSCAN(center, (tile.scale / 8), 1) over () as clust,
+            sub1.center as center,
+            cnt as cnt
+            from
+            (
+              select 
+              count(*) as cnt, 
+              ST_Centroid(ST_Collect(<geometry axis>)) as center, 
+              ST_Snaptogrid(<geometry axis>, tile.scale/6, tile.scale/6) as grid
+              from <table> as main, tile as tile
+              where <geometry axis> && !bbox! 
+                and <geometry axis> is not null
+                and <other filters>
+              group by 3
+            ) as sub1
+          ) as sub2, tile as tile
+        group by sub2.clust
+
+    */
+
+    // Compile geometry axis
+    let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "main"})
+
+    // Convert to Web mercator (3857)
+    geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
+
+    // ST_Centroid(ST_Collect(<geometry axis>))
+    let centerExpr = {
+      type: "op",
+      op: "ST_Centroid",
+      exprs: [
+        {
+          type: "op",
+          op: "ST_Collect",
+          exprs: [geometryExpr]
+        }
+      ]
+    }
+
+    // ST_Snaptogrid(<geometry axis>, !pixel_width!*40, !pixel_height!*40)
+    const gridExpr = {
+      type: "op",
+      op: "ST_Snaptogrid",
+      exprs: [
+        geometryExpr,
+        {
+          type: "op",
+          op: "/",
+          exprs: [{ type: "field", tableAlias: "tile", column: "scale" }, 6]
+        },
+        {
+          type: "op",
+          op: "/",
+          exprs: [{ type: "field", tableAlias: "tile", column: "scale" }, 6]
+        }
+      ]
+    }
+
+    // Create inner query
+    const innerQuery: JsonQLQuery = {
+      type: "query",
+      selects: [
+        { type: "select", expr: { type: "op", op: "count", exprs: [] }, alias: "cnt" },
+        { type: "select", expr: centerExpr, alias: "center" },
+        { type: "select", expr: gridExpr, alias: "grid" }
+      ],
+      from: {
+        type: "join", 
+        kind: "cross",
+        left: exprCompiler.compileTable(design.table, "main"),
+        right: { type: "table", table: "tile", alias: "tile" }
+      },
+      groupBy: [3]
+    }
+
+    // Create filters. First ensure geometry and limit to bounding box
+    let whereClauses: JsonQLExpr[] = [
+      {
+        type: "op",
+        op: "&&",
+        exprs: [
+          geometryExpr,
+          { type: "field", tableAlias: "tile", column: "envelope" }
+        ]
+      }
+    ]
+
+    // Then add filters baked into layer
+    if (design.filter) {
+      whereClauses.push(exprCompiler.compileExpr({expr: design.filter || null, tableAlias: "main"}))
+    }
+
+    // Then add extra filters passed in, if relevant
+    // Get relevant filters
+    const relevantFilters = _.where(filters, {table: design.table})
+    for (let filter of relevantFilters) {
+      whereClauses.push(injectTableAlias(filter.jsonql, "main"))
+    }
+
+    whereClauses = _.compact(whereClauses)
+
+    // Wrap if multiple
+    if (whereClauses.length > 1) {
+      innerQuery.where = { type: "op", op: "and", exprs: whereClauses }
+    } else {
+      innerQuery.where = whereClauses[0]
+    }
+
+    // Create next level
+    // select 
+    // ST_ClusterDBSCAN(center, (tile.scale / 8), 1) over () as clust,
+    // sub1.center as center,
+    // cnt as cnt from () as innerquery
+    const clustExpr = {
+      type: "op",
+      op: "ST_ClusterDBSCAN",
+      exprs: [
+        { type: "field", tableAlias: "innerquery", column: "center" },
+        { type: "op", op: "/", exprs: [{ type: "field", tableAlias: "tile", column: "scale" }, 8] },
+        1
+      ],
+      over: {}
+    }
+
+    const inner2Query: JsonQLQuery = {
+      type: "query",
+      selects: [
+        { type: "select", expr: clustExpr, alias: "clust" },
+        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: "center" }, alias: "center" },
+        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: "cnt" }, alias: "cnt" }
+      ],
+      from: {
+        type: "join", 
+        kind: "cross",
+        left: { type: "subquery", query: innerQuery, alias: "innerquery" },
+        right: { type: "table", table: "tile", alias: "tile" }
+      }
+    }
+
+    // Create final level
+    // ST_AsMVTGeom(ST_Centroid(ST_Collect(center)), tile.envelope) as the_geom_webmercator,
+    // sum(cnt) as cnt, 
+    // log(sum(cnt)) * 3 + 7 as size from 
+
+    // ST_AsMVTGeom(ST_Centroid(ST_Collect(center)), tile.envelope)
+    const centerExpr2 = { type: "op", op: "ST_AsMVTGeom", exprs: [
+      {
+        type: "op",
+        op: "ST_Centroid",
+        exprs: [
+          {
+            type: "op",
+            op: "ST_Collect",
+            exprs: [{ type: "field", tableAlias: "inner2query", column: "center" }]
+          }
+        ]
+      },
+      { type: "field", tableAlias: "tile", column: "envelope" }
+    ]}
+
+    const cntExpr = { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "inner2query", column: "cnt" }] }
+
+    const sizeExpr = {
+      type: "op",
+      op: "+",
+      exprs: [{ type: "op", op: "*", exprs: [{ type: "op", op: "log", exprs: [cntExpr] }, 3] }, 7]
+    }
+
+    const query: JsonQLQuery = {
+      type: "query",
+      selects: [
+        { type: "select", expr: centerExpr2, alias: "the_geom_webmercator" },
+        { type: "select", expr: cntExpr, alias: "cnt" },
+        { type: "select", expr: sizeExpr, alias: "size" }
+        //###{ type: "select", expr: { type: "literal", value: 12 }, alias: "size" }
+      ],
+      from: {
+        type: "join", 
+        kind: "cross",
+        left: { type: "subquery", query: inner2Query, alias: "inner2query" },
+        right: { type: "table", table: "tile", alias: "tile" }
+      },
+      groupBy: [
+        { type: "field", tableAlias: "inner2query", column: "clust" },
+        { type: "field", tableAlias: "tile", column: "envelope" }
+      ]
+    }
+
+    return query
+  }
+
   // Gets the layer definition as JsonQL + CSS in format:
   //   {
   //     layers: array of { id: layer id, jsonql: jsonql that includes "the_webmercator_geom" as a column }
@@ -25,7 +294,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
   getJsonQLCss(design: ClusterLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
     // Create design
     const layerDef = {
-      layers: [{ id: "layer0", jsonql: this.createJsonQL(design, schema, filters) }],
+      layers: [{ id: "layer0", jsonql: this.createMapnikJsonQL(design, schema, filters) }],
       css: this.createCss(design, schema)
       // interactivity: {
       //   layer: "layer0"
@@ -36,7 +305,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     return layerDef
   }
 
-  createJsonQL(design: ClusterLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
+  createMapnikJsonQL(design: ClusterLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
     const axisBuilder = new AxisBuilder({schema})
     const exprCompiler = new ExprCompiler(schema)
 
