@@ -2,7 +2,6 @@ import { Schema, DataSource, Expr } from "mwater-expressions";
 import { JsonQLFilter } from "../index";
 import { OnGridClickResults } from "./maps";
 import { ReactNode } from "react";
-import { SecureClientSessionOptions } from "http2";
 import { JsonQL, JsonQLQuery } from "jsonql";
 
 export interface JsonQLCssLayerDefinition {
@@ -45,8 +44,9 @@ export default class Layer<LayerDesign> {
 
   /** Gets the layer definition for "VectorTile" type
    * @param sourceId id of the source. Should be prefixed to sublayers with a colon (prefix:id)
+   * @param opacity opacity of the layer, which MapBox does not allow to be implemented for a whole layer (https://github.com/mapbox/mapbox-gl-js/issues/4090)
    */
-  getVectorTile(design: LayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[]): VectorTileDef
+  getVectorTile(design: LayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef
 
   /**  
    * Called when the interactivity grid is clicked. 

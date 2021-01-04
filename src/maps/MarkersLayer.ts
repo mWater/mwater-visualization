@@ -18,7 +18,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
   /** Gets the type of layer definition */
   getLayerDefinitionType(): "VectorTile" { return "VectorTile" }
 
-  getVectorTile(design: MarkersLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[]): VectorTileDef {
+  getVectorTile(design: MarkersLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
     const jsonql = this.createJsonQL(design, schema, filters)
 
     const subLayers: mapboxgl.AnyLayer[] = []
@@ -48,7 +48,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
       'source-layer': 'main',
       paint: {
         "fill-color": color,
-        "fill-opacity": 0.25,
+        "fill-opacity": 0.25 * opacity,
       },
       filter: ['any', 
         ['==', ["get", "geometry_type"], 'ST_Polygon'],
@@ -63,7 +63,8 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
       'source-layer': 'main',
       paint: {
         "line-color": color,
-        "line-width": (design.lineWidth != null) ? design.lineWidth : 3
+        "line-width": (design.lineWidth != null) ? design.lineWidth : 3,
+        "line-opacity": opacity
       },
       filter: ['any', 
         ['==', ["get", "geometry_type"], 'ST_Linestring'],
@@ -80,10 +81,10 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
         'source-layer': 'main',
         paint: {
           "circle-color": color,
-          "circle-opacity": 0.8,
+          "circle-opacity": 0.8 * opacity,
           "circle-stroke-color": "white",
           "circle-stroke-width": 1,
-          "circle-stroke-opacity": 0.5,
+          "circle-stroke-opacity": 0.5 * opacity,
           "circle-radius": (design.markerSize || 10) / 2
         },
         filter: ['==', ["get", "geometry_type"], 'ST_Point']
@@ -100,7 +101,8 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
           "icon-allow-overlap": true
         },
         paint: {
-          "icon-color": color
+          "icon-color": color,
+          "icon-opacity": opacity
         },
         filter: ['==', ["get", "geometry_type"], 'ST_Point']
       })

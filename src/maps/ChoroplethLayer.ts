@@ -17,7 +17,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
   /** Gets the type of layer definition */
   getLayerDefinitionType(): "VectorTile" { return "VectorTile" }
 
-  getVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[]): VectorTileDef {
+  getVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
     // Verify that scopeLevel is an integer to prevent injection
     if ((design.scopeLevel != null) && ![0, 1, 2, 3, 4, 5].includes(design.scopeLevel)) {
       throw new Error("Invalid scope level")
@@ -29,20 +29,20 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     }
 
     if (design.regionMode === "plain") {
-      return this.createPlainVectorTile(design, sourceId, schema, filters)
+      return this.createPlainVectorTile(design, sourceId, schema, filters, opacity)
     }
     else if (design.regionMode === "indirect" || !design.regionMode) {
-      return this.createIndirectVectorTile(design, sourceId, schema, filters)
+      return this.createIndirectVectorTile(design, sourceId, schema, filters, opacity)
     }
     else if (design.regionMode == "direct") {
-      return this.createDirectVectorTile(design, sourceId, schema, filters)
+      return this.createDirectVectorTile(design, sourceId, schema, filters, opacity)
     }
     else {
       throw new Error("NOT IMPLEMENTED")
     }
   }
 
-  createPlainVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[]): VectorTileDef {
+  createPlainVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
     const axisBuilder = new AxisBuilder({schema})
     const exprCompiler = new ExprCompiler(schema)
     const regionsTable = design.regionsTable || "admin_regions"
@@ -168,7 +168,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source': sourceId,
       'source-layer': 'polygons',
       paint: {
-        'fill-opacity': (design.fillOpacity * design.fillOpacity),
+        'fill-opacity': (design.fillOpacity * design.fillOpacity * opacity),
         "fill-color": (design.color || "transparent")
       }
     })
@@ -180,7 +180,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source-layer': 'polygons',
       paint: {
         "line-color": design.borderColor || "#000",
-        "line-opacity": 0.5,
+        "line-opacity": 0.5 * opacity,
         "line-width": 1.5
       }
     })
@@ -199,6 +199,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
           'text-color': "black",
           "text-halo-color": "rgba(255, 255, 255, 0.5)",
           "text-halo-width": 2,
+          "text-opacity": opacity
         }
       })
     }
@@ -215,7 +216,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     }
   }
 
-  createIndirectVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[]): VectorTileDef {
+  createIndirectVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
     const axisBuilder = new AxisBuilder({schema})
     const exprCompiler = new ExprCompiler(schema)
     const regionsTable = design.regionsTable || "admin_regions"
@@ -462,7 +463,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source': sourceId,
       'source-layer': 'polygons',
       paint: {
-        'fill-opacity': (design.fillOpacity * design.fillOpacity),
+        'fill-opacity': (design.fillOpacity * design.fillOpacity * opacity),
         "fill-color": color
       }
     })
@@ -474,7 +475,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source-layer': 'polygons',
       paint: {
         "line-color": design.borderColor || "#000",
-        "line-opacity": 0.5,
+        "line-opacity": 0.5 * opacity,
         "line-width": 1.5
       }
     })
@@ -493,6 +494,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
           'text-color': "black",
           "text-halo-color": "rgba(255, 255, 255, 0.5)",
           "text-halo-width": 2,
+          "text-opacity": opacity
         }
       })
     }
@@ -509,7 +511,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     }
   }
 
-  createDirectVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[]): VectorTileDef {
+  createDirectVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
     const axisBuilder = new AxisBuilder({schema})
     const exprCompiler = new ExprCompiler(schema)
     const regionsTable = design.regionsTable || "admin_regions"
@@ -666,7 +668,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source': sourceId,
       'source-layer': 'polygons',
       paint: {
-        'fill-opacity': (design.fillOpacity * design.fillOpacity),
+        'fill-opacity': (design.fillOpacity * design.fillOpacity * opacity),
         "fill-color": color
       }
     })
@@ -678,7 +680,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source-layer': 'polygons',
       paint: {
         "line-color": design.borderColor || "#000",
-        "line-opacity": 0.5,
+        "line-opacity": 0.5 * opacity,
         "line-width": 1.5
       }
     })
@@ -697,6 +699,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
           'text-color': "black",
           "text-halo-color": "rgba(255, 255, 255, 0.5)",
           "text-halo-width": 2,
+          "text-opacity": opacity
         }
       })
     }

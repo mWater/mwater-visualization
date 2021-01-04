@@ -72,6 +72,11 @@ export function NewMapViewComponent(props: {
     const newLayers: mapboxgl.AnyLayer[] = []
 
     for (const lv of props.design.layerViews) {
+      // TODO better way of hiding/showing layers?
+      if (!lv.visible) {
+        continue
+      }
+
       const layer = LayerFactory.createLayer(lv.type)
       const defType = layer.getLayerDefinitionType()
       const layerDataSource = props.mapDataSource.getLayerDataSource(lv.id)
@@ -88,7 +93,7 @@ export function NewMapViewComponent(props: {
         }})
 
         // Add layer
-        const subLayers = layer.getVectorTile(lv.design, lv.id, props.schema, []).subLayers
+        const subLayers = layer.getVectorTile(lv.design, lv.id, props.schema, [], lv.opacity).subLayers
         for (const sublayer of subLayers) {
           newLayers.push(sublayer)
         }

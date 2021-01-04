@@ -93,7 +93,8 @@ class DirectLayerDataSource implements LayerDataSource {
     // Create layer
     const layer = LayerFactory.createLayer(this.options.layerView.type);
 
-    const vectorTile = layer.getVectorTile(layerDesign, this.options.layerView.id, this.options.schema, filters)
+    // Put in opacity of 1 as it doesn't affect source data
+    const vectorTile = layer.getVectorTile(layerDesign, this.options.layerView.id, this.options.schema, filters, 1)
 
     const request: {
       layers: VectorTileSourceLayer[]
