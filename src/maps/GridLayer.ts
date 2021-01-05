@@ -1,21 +1,278 @@
-import _ from 'lodash';
-import React from 'react';
+import _ from 'lodash'
+import React from 'react'
 
-import Layer from './Layer'
-import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, Expr, DataSource } from 'mwater-expressions';
-import AxisBuilder from '../axes/AxisBuilder';
-import { LayerDefinition, OnGridClickResults } from './maps';
-import { JsonQLFilter } from '../index';
+import Layer, { VectorTileDef } from './Layer'
+import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, Expr, DataSource } from 'mwater-expressions'
+import AxisBuilder from '../axes/AxisBuilder'
+import { LayerDefinition, OnGridClickResults } from './maps'
+import { JsonQLFilter } from '../index'
 import GridLayerDesign from './GridLayerDesign'
-import produce from 'immer';
-import { Axis } from '../axes/Axis';
-import { JsonQL, JsonQLExpr, JsonQLQuery } from 'jsonql';
-import { original } from 'immer'
-const LayerLegendComponent = require('./LayerLegendComponent');
-const PopupFilterJoinsUtils = require('./PopupFilterJoinsUtils');
+import produce from 'immer'
+import { Axis } from '../axes/Axis'
+import { JsonQL, JsonQLExpr, JsonQLQuery } from 'jsonql'
+const LayerLegendComponent = require('./LayerLegendComponent')
 
 /** Layer which is a grid of squares or flat-topped hexagons. Depends on "Grid Functions.sql" having been run */
 export default class GridLayer extends Layer<GridLayerDesign> {
+  /** Gets the type of layer definition */
+  getLayerDefinitionType(): "VectorTile" { return "VectorTile" }
+
+  getVectorTile(design: GridLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
+    const jsonql = this.createJsonQL(design, schema, filters)
+
+    const subLayers: mapboxgl.AnyLayer[] = []
+
+    // If color axes, add color conditions
+    let color: any
+    if (design.colorAxis && design.colorAxis.colorMap) {
+      const excludedValues = design.colorAxis.excludedValues || []
+      // Create match operator
+      color = ["case"]
+      for (let item of design.colorAxis.colorMap) {
+        color.push(["==", ["get", "color"], item.value])
+        color.push(excludedValues.includes(item.value) ? "transparent" : item.color)
+      }
+      // Else
+      color.push("transparent")
+    }
+    else { 
+      color = "transparent"
+    }
+    
+    subLayers.push({
+      'id': `${sourceId}:fill`,
+      'type': 'fill',
+      'source': sourceId,
+      'source-layer': 'grid',
+      paint: {
+        'fill-opacity': design.fillOpacity! * opacity,
+        "fill-color": color,
+        "fill-outline-color": "transparent"
+      }
+    })
+
+    if (design.borderStyle == "color") {
+      subLayers.push({
+        'id': `${sourceId}:line`,
+        'type': 'line',
+        'source': sourceId,
+        'source-layer': 'grid',
+        paint: {
+          "line-color": color,
+          // Make darker if fill opacity is higher
+          "line-opacity": (1 - (1 - design.fillOpacity!) / 2) * opacity,
+          "line-width": 1
+        }
+      })
+    }
+
+    // subLayers.push({
+    //   'id': `${sourceId}:circles-single`,
+    //   'type': 'circle',
+    //   'source': sourceId,
+    //   'source-layer': 'clusters',
+    //   paint: {
+    //     "circle-color": design.fillColor || "#337ab7",
+    //     "circle-opacity": opacity,
+    //     "circle-stroke-color": "white",
+    //     "circle-stroke-width": 2,
+    //     "circle-stroke-opacity": 0.6 * opacity,
+    //     "circle-radius": 5
+    //   },
+    //   filter: ['==', ["to-number", ['get', 'cnt']], 1]
+    // })
+
+    // subLayers.push({
+    //   'id': `${sourceId}:circles-multiple`,
+    //   'type': 'circle',
+    //   'source': sourceId,
+    //   'source-layer': 'clusters',
+    //   paint: {
+    //     "circle-color": design.fillColor || "#337ab7",
+    //     "circle-opacity": opacity,
+    //     "circle-stroke-color": "white",
+    //     "circle-stroke-width": 4,
+    //     "circle-stroke-opacity": 0.6 * opacity,
+    //     "circle-radius": ["to-number", ['get', 'size']]
+    //   },
+    //   filter: ['>', ["to-number", ['get', 'cnt']], 1]
+    // })
+
+    // subLayers.push({
+    //   'id': `${sourceId}:labels`,
+    //   'type': 'symbol',
+    //   'source': sourceId,
+    //   'source-layer': 'clusters',
+    //   layout: {
+    //     "text-field": ['get', 'cnt'],
+    //     "text-size": 10
+    //   },
+    //   paint: {
+    //     "text-color": (design.textColor || "white"),
+    //     "text-opacity": 1
+    //   },
+    //   filter: ['>', ["to-number", ['get', 'cnt']], 1]
+    // })
+
+    return {
+      sourceLayers: [
+        { id: "grid", jsonql: jsonql }
+      ],
+      ctes: [],
+      subLayers: subLayers
+    }
+  }
+
+  createJsonQL(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery {
+    const axisBuilder = new AxisBuilder({ schema })
+    const exprCompiler = new ExprCompiler(schema)
+
+    const pixelWidth = { type: "op", op: "/", exprs: [
+      { 
+        type: "scalar", 
+        from: { type: "table", table: "tile", alias: "tile" },
+        expr: { type: "field", tableAlias: "tile", column: "scale" }
+      }, 256] }
+
+    const envelope = { type: "scalar", from: { type: "table", table: "tile", alias: "tile" },
+        expr: { type: "field", tableAlias: "tile", column: "envelope" } }
+  
+    /* Compile to a query like this:
+      select ST_AsMVTGeom(mwater_hex_make(grid.q, grid.r, tile.scale/256*SIZE), tile.envelope) as the_geom_webmercator, data.color as color from 
+          mwater_hex_grid(!bbox!, tile.scale/256*SIZE) as grid 
+        left outer join
+          (select qr.q as q, qr.r as r, COLOREXPR as color from TABLE as innerquery
+            inner join mwater_hex_xy_to_qr(st_xmin(innerquery.LOCATIONEXPR), st_ymin(innerquery.LOCATIONEXPR), !pixel_width!*10) as qr 
+            on true
+            where innerquery.LOCATIONEXPR && ST_Expand(!bbox!, SIZE)
+          group by 1, 2) as data
+        on data.q = grid.q and data.r = grid.r 
+    */
+    const compiledGeometryExpr = { type: "op", op: "ST_Transform", exprs: [exprCompiler.compileExpr({ expr: design.geometryExpr, tableAlias: "innerquery" }), 3857] }
+    const colorExpr = axisBuilder.compileAxis({axis: design.colorAxis, tableAlias: "innerquery"})
+    let compiledSizeExpr: JsonQLExpr
+    
+    if (design.shape == "hex") {
+      // Hex needs distance from center to points
+      compiledSizeExpr = design.sizeUnits == "pixels" ? 
+        { type: "op", op: "*", exprs: [pixelWidth, design.size! / 1.73205] }
+        : { type: "literal", value: design.size! / 1.73205 }
+    }
+    else if (design.shape == "square") {
+      // Square needs distance from center to center
+      compiledSizeExpr = design.sizeUnits == "pixels" ? 
+        { type: "op", op: "*", exprs: [pixelWidth, design.size!] }
+        : { type: "literal", value: design.size! }
+    }
+    else {
+      throw new Error("Unknown shape")
+    }
+     
+    // Create inner query
+    const innerQuery: JsonQLQuery = {
+      type: "query",
+      selects: [
+        { type: "select", expr: { type: "field", tableAlias: "qr", column: "q" }, alias: "q" },
+        { type: "select", expr: { type: "field", tableAlias: "qr", column: "r" }, alias: "r" },
+        { type: "select", expr: colorExpr, alias: "color" }
+      ],
+      from: {
+        type: "join",
+        kind: "inner",
+        left: { type: "table", table: design.table!, alias: "innerquery" },
+        right: { type: "subexpr", expr: { type: "op", op: `mwater_${design.shape}_xy_to_qr`, exprs: [
+          { type: "op", op: "ST_XMin", exprs: [compiledGeometryExpr] },
+          { type: "op", op: "ST_YMin", exprs: [compiledGeometryExpr] },
+          compiledSizeExpr
+        ]}, alias: "qr"},
+        on: { type: "literal", valueType: "boolean", value: true }
+      },
+      groupBy: [1, 2]
+    }
+
+    // Filter by bounding box
+    let whereClauses: JsonQLExpr[] = [
+      {
+        type: "op",
+        op: "&&",
+        exprs: [
+          compiledGeometryExpr,
+          { type: "op", op: "ST_Expand", exprs: [
+            envelope,
+            compiledSizeExpr
+          ]}
+        ]
+      }
+    ]
+
+    // Then add filters
+    if (design.filter) {
+      whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "innerquery"}))
+    }
+
+    // Then add extra filters passed in, if relevant
+    const relevantFilters = _.where(filters, {table: design.table})
+    for (let filter of relevantFilters) {
+      whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
+    }
+
+    whereClauses = _.compact(whereClauses)
+    if (whereClauses.length > 0) {
+      innerQuery.where = { type: "op", op: "and", exprs: whereClauses }
+    }
+
+    // Now create outer query
+    const query: JsonQLQuery = {
+      type: "query",
+      selects: [
+        { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [
+          { type: "op", op: `mwater_${design.shape}_make`, exprs: [
+            { type: "field", tableAlias: "grid", column: "q" },
+            { type: "field", tableAlias: "grid", column: "r" },
+            compiledSizeExpr
+          ]},
+          envelope
+          ]}
+        , alias: "the_geom_webmercator" },
+        { type: "select", expr: { type: "field", tableAlias: "data", column: "color" }, alias: "color" }
+      ],
+      from: {
+        type: "join",
+        kind: "left",
+        left: { type: "subexpr", expr: { type: "op", op: `mwater_${design.shape}_grid`, exprs: [
+          envelope,
+          compiledSizeExpr
+        ]}, alias: "grid" },
+        right: { type: "subquery", query: innerQuery, alias: "data" },
+        // on data.q = grid.q and data.r = grid.r 
+        on: {
+          type: "op",
+          op: "and",
+          exprs: [
+            {
+              type: "op",
+              op: "=",
+              exprs: [
+                { type: "field", tableAlias: "data", column: "q" },
+                { type: "field", tableAlias: "grid", column: "q" }
+              ]
+            },
+            {
+              type: "op",
+              op: "=",
+              exprs: [
+                { type: "field", tableAlias: "data", column: "r" },
+                { type: "field", tableAlias: "grid", column: "r" }
+              ]
+            }
+          ]
+        }
+      }
+    }
+
+    return query
+  }
+
   /** Gets the layer definition as JsonQL + CSS in format:
    *   {
    *     layers: array of { id: layer id, jsonql: jsonql that includes "the_webmercator_geom" as a column }
@@ -30,7 +287,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
   getJsonQLCss(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): LayerDefinition {
     // Create design
     const layerDef = {
-      layers: [{ id: "layer0", jsonql: this.createJsonQL(design, schema, filters) }],
+      layers: [{ id: "layer0", jsonql: this.createMapnikJsonQL(design, schema, filters) }],
       css: this.createCss(design, schema, filters),
       interactivity: {
         layer: "layer0",
@@ -41,7 +298,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     return layerDef
   }
 
-  createJsonQL(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQL {
+  createMapnikJsonQL(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQL {
     const axisBuilder = new AxisBuilder({ schema })
     const exprCompiler = new ExprCompiler(schema)
 
@@ -57,7 +314,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
         on data.q = grid.q and data.r = grid.r 
     */
     const compiledGeometryExpr = { type: "op", op: "ST_Transform", exprs: [exprCompiler.compileExpr({ expr: design.geometryExpr, tableAlias: "innerquery" }), 3857] }
-    const colorExpr = axisBuilder.compileAxis({axis: design.colorAxis, tableAlias: "innerquery"});
+    const colorExpr = axisBuilder.compileAxis({axis: design.colorAxis, tableAlias: "innerquery"})
     let compiledSizeExpr: JsonQLExpr
     
     if (design.shape == "hex") {
@@ -180,12 +437,12 @@ export default class GridLayer extends Layer<GridLayerDesign> {
   createCss(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): string {
     let css = `
 #layer0 {
-  polygon-opacity: ` + design.fillOpacity + `;
+  polygon-opacity: ` + design.fillOpacity + `
   ` + (design.borderStyle == "color" ? `line-opacity: ` + (1 - (1 - design.fillOpacity!) / 2) + `; ` : `line-width: 0;`) + `
-  polygon-fill: transparent;
+  polygon-fill: transparent
 }
 \
-`;
+`
   if (!design.colorAxis) {
     throw new Error("Color axis not set")
   }
@@ -204,12 +461,12 @@ export default class GridLayer extends Layer<GridLayerDesign> {
           css += `#layer0 [color=${JSON.stringify(item.value)}] { 
             ` + (design.borderStyle == "color" ? `line-color: ${item.color};` : "") + ` 
             polygon-fill: ${item.color}; 
-          }\n`;
+          }\n`
         }
       }
     }
 
-    return css;
+    return css
   }
 
   // TODO
@@ -252,10 +509,10 @@ export default class GridLayer extends Layer<GridLayerDesign> {
   //     const results: OnGridClickResults = {}
 
   //     // Create filter for single row
-  //     const { table } = clickOptions.design;
+  //     const { table } = clickOptions.design
 
   //     // Compile adminRegionExpr
-  //     const exprCompiler = new ExprCompiler(clickOptions.schema);
+  //     const exprCompiler = new ExprCompiler(clickOptions.schema)
   //     const filterExpr: Expr = {
   //       type: "op",
   //       op: "within",
@@ -266,57 +523,57 @@ export default class GridLayer extends Layer<GridLayerDesign> {
   //       ]
   //     }
 
-  //     const compiledFilterExpr = exprCompiler.compileExpr({ expr: filterExpr, tableAlias: "{alias}"});
+  //     const compiledFilterExpr = exprCompiler.compileExpr({ expr: filterExpr, tableAlias: "{alias}"})
 
   //     // Filter within
   //     const filter = {
   //       table,
   //       jsonql: compiledFilterExpr
-  //     };
+  //     }
 
   //     if (ev.event.originalEvent.shiftKey) {
   //       // Scope to region, unless already scoped
   //       if (clickOptions.scopeData === ev.data.id) {
-  //         results.scope = null;
+  //         results.scope = null
   //       } else {
   //         results.scope = {
   //           name: ev.data.name,
   //           filter,
   //           data: ev.data.id
-  //         };
+  //         }
   //       }
 
   //     } else if (clickOptions.design.popup) {
   //       // Create default popup filter joins
-  //       const defaultPopupFilterJoins = {};
+  //       const defaultPopupFilterJoins = {}
   //       if (clickOptions.design.adminRegionExpr) {
-  //         defaultPopupFilterJoins[clickOptions.design.table] = clickOptions.design.adminRegionExpr;
+  //         defaultPopupFilterJoins[clickOptions.design.table] = clickOptions.design.adminRegionExpr
   //       }
 
   //       // Create filter using popupFilterJoins
-  //       const popupFilterJoins = clickOptions.design.popupFilterJoins || defaultPopupFilterJoins;
-  //       const popupFilters = PopupFilterJoinsUtils.createPopupFilters(popupFilterJoins, clickOptions.schema, table, ev.data.id, true);
+  //       const popupFilterJoins = clickOptions.design.popupFilterJoins || defaultPopupFilterJoins
+  //       const popupFilters = PopupFilterJoinsUtils.createPopupFilters(popupFilterJoins, clickOptions.schema, table, ev.data.id, true)
 
   //       // Add filter for admin region
   //       popupFilters.push({
   //         table: regionsTable,
   //         jsonql: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "_id" }, { type: "literal", value: ev.data.id }]}
-  //       });
+  //       })
 
-  //       const BlocksLayoutManager = require('../layouts/blocks/BlocksLayoutManager');
-  //       const WidgetFactory = require('../widgets/WidgetFactory');
+  //       const BlocksLayoutManager = require('../layouts/blocks/BlocksLayoutManager')
+  //       const WidgetFactory = require('../widgets/WidgetFactory')
 
   //       results.popup = new BlocksLayoutManager().renderLayout({
   //         items: clickOptions.design.popup.items,
   //         style: "popup",
   //         renderWidget: (options: any) => {
-  //           const widget = WidgetFactory.createWidget(options.type);
+  //           const widget = WidgetFactory.createWidget(options.type)
 
   //           // Create filters for single row
-  //           const filters = clickOptions.filters.concat(popupFilters);
+  //           const filters = clickOptions.filters.concat(popupFilters)
 
   //           // Get data source for widget
-  //           const widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(clickOptions.design, options.id);
+  //           const widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(clickOptions.design, options.id)
 
   //           return widget.createViewElement({
   //             schema: clickOptions.schema,
@@ -329,14 +586,14 @@ export default class GridLayer extends Layer<GridLayerDesign> {
   //             onDesignChange: null,
   //             width: options.width,
   //             height: options.height,
-  //           });
+  //           })
   //         }
-  //         });
+  //         })
   //     }
 
-  //     return results;
+  //     return results
   //   } else {
-  //     return null;
+  //     return null
   //   }
   // }
 
@@ -359,7 +616,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
   /** Get the legend to be optionally displayed on the map. Returns
    * a React element */
   getLegend(design: GridLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]) {
-    const axisBuilder = new AxisBuilder({schema});
+    const axisBuilder = new AxisBuilder({schema})
 
     return React.createElement(LayerLegendComponent, {
       schema,
@@ -377,7 +634,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
 
   /** True if layer can be edited */
   isEditable() {
-    return true;
+    return true
   }
 
   /** Returns a cleaned design */
@@ -399,7 +656,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
 
       // Remove extreme sizes
       if (draft.size != null && draft.size < 10 && draft.sizeUnits == "pixels") {
-        draft.size = 10;
+        draft.size = 10
       } 
   
       // Clean geometry (no idea why the cast is needed. TS is giving strange error)
@@ -425,30 +682,30 @@ export default class GridLayer extends Layer<GridLayerDesign> {
 
   /** Validates design. Null if ok, message otherwise */
   validateDesign(design: GridLayerDesign, schema: Schema) {
-    let error;
+    let error
     const exprUtils = new ExprUtils(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
     if (!design.shape) {
-      return "Missing shape";
+      return "Missing shape"
     }
     if (!design.table) {
-      return "Missing table";
+      return "Missing table"
     }
     if (!design.geometryExpr || (exprUtils.getExprType(design.geometryExpr) !== "geometry")) {
-      return "Missing geometry expr";
+      return "Missing geometry expr"
     }
     if (!design.size || !design.sizeUnits) {
       return "Missing size"
     }
     if (!design.colorAxis) {
-      return "Missing color axis";
+      return "Missing color axis"
     }
 
-    error = axisBuilder.validateAxis({ axis: (design.colorAxis as Axis) });
+    error = axisBuilder.validateAxis({ axis: (design.colorAxis as Axis) })
     if (error) { return error; }
 
-    return null;
+    return null
   }
 
   // Creates a design element with specified options
@@ -466,7 +723,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     filters: JsonQLFilter[]
   }): React.ReactElement<{}> {
     // Require here to prevent server require problems
-    const GridLayerDesigner = require('./GridLayerDesigner').default;
+    const GridLayerDesigner = require('./GridLayerDesigner').default
 
     // Clean on way in and out
     return React.createElement(GridLayerDesigner, {
@@ -475,8 +732,8 @@ export default class GridLayer extends Layer<GridLayerDesign> {
       design: this.cleanDesign(options.design, options.schema),
       filters: options.filters,
       onDesignChange: (design: GridLayerDesign) => {
-        return options.onDesignChange(this.cleanDesign(design, options.schema));
+        return options.onDesignChange(this.cleanDesign(design, options.schema))
       }
-    });
+    })
   }
 }
