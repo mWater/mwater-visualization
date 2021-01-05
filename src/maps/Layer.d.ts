@@ -86,14 +86,14 @@ export default class Layer<LayerDesign> {
   // # a React element
   // getLegend: (design, schema, name, dataSource, filters = []) ->
 
-  // # Get a list of table ids that can be filtered on
-  // getFilterableTables: (design, schema) ->
+  /** Get a list of table ids that can be filtered on */
+  getFilterableTables(design: LayerDesign, schema: Schema): string[]
 
-  // # True if layer can be edited
-  // isEditable: () ->
+  /** True if layer can be edited */
+  isEditable(): boolean
 
-  // # True if layer is incomplete (e.g. brand new) and should be editable immediately
-  // isIncomplete: (design, schema) ->
+  /** True if layer is incomplete (e.g. brand new) and should be editable immediately */
+  isIncomplete(design: LayerDesign, schema: Schema): boolean
 
   // # Creates a design element with specified options.
   // # Design should be cleaned on the way in and on way out.
