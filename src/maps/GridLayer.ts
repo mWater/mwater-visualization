@@ -66,54 +66,6 @@ export default class GridLayer extends Layer<GridLayerDesign> {
       })
     }
 
-    // subLayers.push({
-    //   'id': `${sourceId}:circles-single`,
-    //   'type': 'circle',
-    //   'source': sourceId,
-    //   'source-layer': 'clusters',
-    //   paint: {
-    //     "circle-color": design.fillColor || "#337ab7",
-    //     "circle-opacity": opacity,
-    //     "circle-stroke-color": "white",
-    //     "circle-stroke-width": 2,
-    //     "circle-stroke-opacity": 0.6 * opacity,
-    //     "circle-radius": 5
-    //   },
-    //   filter: ['==', ["to-number", ['get', 'cnt']], 1]
-    // })
-
-    // subLayers.push({
-    //   'id': `${sourceId}:circles-multiple`,
-    //   'type': 'circle',
-    //   'source': sourceId,
-    //   'source-layer': 'clusters',
-    //   paint: {
-    //     "circle-color": design.fillColor || "#337ab7",
-    //     "circle-opacity": opacity,
-    //     "circle-stroke-color": "white",
-    //     "circle-stroke-width": 4,
-    //     "circle-stroke-opacity": 0.6 * opacity,
-    //     "circle-radius": ["to-number", ['get', 'size']]
-    //   },
-    //   filter: ['>', ["to-number", ['get', 'cnt']], 1]
-    // })
-
-    // subLayers.push({
-    //   'id': `${sourceId}:labels`,
-    //   'type': 'symbol',
-    //   'source': sourceId,
-    //   'source-layer': 'clusters',
-    //   layout: {
-    //     "text-field": ['get', 'cnt'],
-    //     "text-size": 10
-    //   },
-    //   paint: {
-    //     "text-color": (design.textColor || "white"),
-    //     "text-opacity": 1
-    //   },
-    //   filter: ['>', ["to-number", ['get', 'cnt']], 1]
-    // })
-
     return {
       sourceLayers: [
         { id: "grid", jsonql: jsonql }

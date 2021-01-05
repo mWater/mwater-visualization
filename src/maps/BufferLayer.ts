@@ -6,7 +6,7 @@ import React from "react"
 import { JsonQLFilter } from ".."
 import AxisBuilder from "../axes/AxisBuilder"
 import { BufferLayerDesign } from "./BufferLayerDesign"
-import Layer, { OnGridClickOptions } from "./Layer"
+import Layer, { OnGridClickOptions, VectorTileDef } from "./Layer"
 import { OnGridClickResults } from "./maps"
 
 const LegendGroup = require('./LegendGroup')
@@ -35,6 +35,238 @@ axes:
 
 */
 export default class BufferLayer extends Layer<BufferLayerDesign> {
+  /** Gets the type of layer definition */
+  getLayerDefinitionType(): "VectorTile" { return "VectorTile" }
+
+  getVectorTile(design: BufferLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
+    const jsonql = this.createJsonQL(design, schema, filters)
+
+    const subLayers: mapboxgl.AnyLayer[] = []
+
+    // If color axes, add color conditions
+    let color: any
+    if (design.axes.color && design.axes.color.colorMap) {
+      const excludedValues = design.axes.color.excludedValues || []
+      // Create match operator
+      color = ["case"]
+      for (let item of design.axes.color.colorMap) {
+        color.push(["==", ["get", "color"], item.value])
+        color.push(excludedValues.includes(item.value) ? "transparent" : item.color)
+      }
+      // Else
+      color.push(design.color || "transparent")
+    }
+    else { 
+      color = design.color || "transparent"
+    }
+    
+    subLayers.push({
+      'id': `${sourceId}:fill`,
+      'type': 'fill',
+      'source': sourceId,
+      'source-layer': 'circles',
+      paint: {
+        'fill-opacity': design.fillOpacity * opacity,
+        "fill-color": color,
+        "fill-outline-color": "transparent"
+      }
+    })
+
+    // if (design.borderStyle == "color") {
+    //   subLayers.push({
+    //     'id': `${sourceId}:line`,
+    //     'type': 'line',
+    //     'source': sourceId,
+    //     'source-layer': 'grid',
+    //     paint: {
+    //       "line-color": color,
+    //       // Make darker if fill opacity is higher
+    //       "line-opacity": (1 - (1 - design.fillOpacity!) / 2) * opacity,
+    //       "line-width": 1
+    //     }
+    //   })
+    // }
+
+
+    return {
+      sourceLayers: [
+        { id: "circles", jsonql: jsonql }
+      ],
+      ctes: [],
+      subLayers: subLayers
+    }
+  }
+
+  createJsonQL(design: BufferLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery {
+    let colorExpr: JsonQLExpr
+    const axisBuilder = new AxisBuilder({schema})
+    const exprCompiler = new ExprCompiler(schema)
+
+    // Expression for the envelope of the tile
+    const envelope = { type: "scalar", from: { type: "table", table: "tile", alias: "tile" },
+      expr: { type: "field", tableAlias: "tile", column: "envelope" } }
+
+    /*
+    Query:
+      select
+      <primary key> as id,
+      [<color axis> as color,
+      ST_AsMVTGeom(st_transform(<geometry axis>, 3857), (select tile.envelope from tile as tile) as the_geom_webmercator,
+      from <table> as main
+      where
+        <geometry axis> is not null
+        * Bounding box filter for speed
+      and <geometry axis> &&
+      ST_Transform(ST_Expand(
+        * Prevent 3857 overflow (i.e. > 85 degrees lat)
+        ST_Intersection(
+          ST_Transform(!bbox!, 4326),
+          ST_Expand(ST_MakeEnvelope(-180, -85, 180, 85, 4326), -<radius in degrees>))
+        , <radius in degrees>})
+      , 3857)
+      and <other filters>
+    */
+
+    // Compile geometry axis
+    let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "main"})
+
+    // Convert to Web mercator (3857)
+    geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
+
+    // radius / cos(st_ymax(st_transform(geometryExpr, 4326)) * 0.017453293) 
+    const bufferAmountExpr = {
+      type: "op",
+      op: "/",
+      exprs: [
+        design.radius,
+        { type: "op", op: "cos", exprs: [
+          { type: "op", op: "*", exprs: [
+            { type: "op", op: "ST_YMax", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326]}] },
+            0.017453293
+          ]}
+        ]}
+      ]
+    }
+
+    const bufferExpr = {
+      type: "op",
+      op: "ST_Buffer",
+      exprs: [geometryExpr, bufferAmountExpr]
+    }
+
+    const selects: JsonQLSelect[] = [
+      { type: "select", expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table)!.primaryKey }, alias: "id" }, // main primary key as id
+      { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [bufferExpr, envelope]}, alias: "the_geom_webmercator" },
+    ]
+
+    // Add color select if color axis
+    if (design.axes.color) {
+      colorExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "main"})
+      selects.push({ type: "select", expr: colorExpr, alias: "color" })
+    }
+
+    // Create select
+    const query: JsonQLQuery = {
+      type: "query",
+      selects,
+      from: exprCompiler.compileTable(design.table, "main")
+    }
+
+    // To prevent buffer from exceeding coordinates
+    // ST_Transform(ST_Expand(
+    //     # Prevent 3857 overflow (i.e. > 85 degrees lat)
+    //     ST_Intersection(
+    //       ST_Transform(!bbox!, 4326),
+    //       ST_Expand(ST_MakeEnvelope(-180, -85, 180, 85, 4326), -<radius in degrees>))
+    //     , <radius in degrees>})
+    //   , 3857)
+    // TODO document how we compute this
+    const radiusDeg = design.radius / 100000
+
+    const boundingBox = {
+      type: "op",
+      op: "ST_Transform",
+      exprs: [
+        { type: "op", op: "ST_Expand", exprs: [
+          { type: "op", op: "ST_Intersection", exprs: [
+            { type: "op", op: "ST_Transform", exprs: [
+              envelope,
+              4326
+              ]},
+            { type: "op", op: "ST_Expand", exprs: [
+              { type: "op", op: "ST_MakeEnvelope", exprs: [-180, -85, 180, 85, 4326] },
+              -radiusDeg
+              ]}
+            ]},
+          radiusDeg
+          ]},
+        3857
+      ]
+    }
+
+    // Create filters. First ensure geometry and limit to bounding box
+    let whereClauses: JsonQLExpr[] = [
+      { type: "op", op: "is not null", exprs: [geometryExpr] },
+      {
+        type: "op",
+        op: "&&",
+        exprs: [
+          geometryExpr,
+          boundingBox
+        ]
+      }
+    ]
+
+    // Then add filters baked into layer
+    if (design.filter) {
+      whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "main"}))
+    }
+
+    // Then add extra filters passed in, if relevant
+    // Get relevant filters
+    const relevantFilters = _.where(filters, {table: design.table})
+    for (let filter of relevantFilters) {
+      whereClauses.push(injectTableAlias(filter.jsonql, "main"))
+    }
+
+    whereClauses = _.compact(whereClauses)
+
+    // Wrap if multiple
+    if (whereClauses.length > 1) {
+      query.where = { type: "op", op: "and", exprs: whereClauses }
+    } else {
+      query.where = whereClauses[0]
+    }
+
+    // Sort order
+    if (design.axes.color && design.axes.color.colorMap) {
+      // TODO should use categories, not colormap order
+      const order = design.axes.color.drawOrder || _.pluck(design.axes.color.colorMap, "value")
+      const categories = axisBuilder.getCategories(design.axes.color, order)
+
+      const cases = _.map(categories, (category, i) => {
+        return {
+          when: (category.value != null) ? { type: "op", op: "=", exprs: [colorExpr, category.value] } : { type: "op", op: "is null", exprs: [colorExpr] },
+          then: order.indexOf(category.value) || -1
+        }
+      })
+
+      if (cases.length > 0) {
+        query.orderBy = [
+          {
+            expr: {
+              type: "case",
+              cases
+            },
+            direction: "desc" // Reverse color map order
+          }
+        ]
+      }
+    }
+
+    return query
+  }
+
   // Gets the layer definition as JsonQL + CSS in format:
   //   {
   //     layers: array of { id: layer id, jsonql: jsonql that includes "the_webmercator_geom" as a column }
@@ -48,7 +280,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
   getJsonQLCss(design: BufferLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
     // Create design
     const layerDef = {
-      layers: [{ id: "layer0", jsonql: this.createJsonQL(design, schema, filters) }],
+      layers: [{ id: "layer0", jsonql: this.createMapnikJsonQL(design, schema, filters) }],
       css: this.createCss(design, schema),
       interactivity: {
         layer: "layer0",
@@ -59,7 +291,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     return layerDef
   }
 
-  createJsonQL(design: BufferLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
+  createMapnikJsonQL(design: BufferLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
     let colorExpr: JsonQLExpr
     const axisBuilder = new AxisBuilder({schema})
     const exprCompiler = new ExprCompiler(schema)
