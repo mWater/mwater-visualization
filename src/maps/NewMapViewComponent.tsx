@@ -114,6 +114,18 @@ export function NewMapViewComponent(props: {
     const newSources: { id: string, sourceData: mapboxgl.AnySourceData }[] = []
     const newLayers: mapboxgl.AnyLayer[] = []
 
+    // Create background layer to simulate base layer opacity
+    if (props.design.baseLayerOpacity != null && props.design.baseLayerOpacity < 1) {
+      newLayers.push({
+        id: "backgroundOpacity",
+        type: "background",
+        paint: {
+          "background-color": "white",
+          "background-opacity": 1 - props.design.baseLayerOpacity
+        }
+      })
+    }
+
     async function addLayer(layerView: MapLayerView, filters: JsonQLFilter[], opacity: number) {
       // TODO better way of hiding/showing layers?
       if (!layerView.visible) {
@@ -322,7 +334,7 @@ export function NewMapViewComponent(props: {
     }
 
     updateLayers()
-  }, [map, symbolsAdded, props.design.layerViews, props.scope, baseLayerLoaded, layersCreatedAfter])
+  }, [map, symbolsAdded, props.design.layerViews, props.scope, baseLayerLoaded, layersCreatedAfter, props.design.baseLayerOpacity])
 
   // Capture movements on map to update bounds
   useEffect(() => {
