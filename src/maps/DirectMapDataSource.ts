@@ -6,7 +6,7 @@ import WidgetFactory from '../widgets/WidgetFactory';
 import LayerFactory from "./LayerFactory";
 import MapBoundsCalculator from "./MapBoundsCalculator";
 import { MapDesign, MapLayerView } from "./MapDesign";
-import { MapDataSource } from "./maps";
+import { MapDataSource } from "./MapDataSource";
 import DirectWidgetDataSource from '../widgets/DirectWidgetDataSource'
 import { JsonQLCssLayerDefinition, VectorTileCTE, VectorTileSourceLayer } from './Layer';
 import compressJson from '../compressJson'
@@ -113,7 +113,8 @@ class DirectLayerDataSource implements LayerDataSource {
       minZoom: vectorTile.minZoom,
       maxZoom: vectorTile.maxZoom,
       // 12 hours
-      expiresAfter: new Date(Date.now() + 1000 * 3600 * 12).toISOString()
+      expiresAfter: new Date(Date.now() + 1000 * 3600 * 12).toISOString(),
+      // TODO createdAfter (use datasource expiry)
     }
 
     const response = await fetch(this.options.apiUrl + "vector_tiles/create_direct_token?client=" + (this.options.client || ""), {

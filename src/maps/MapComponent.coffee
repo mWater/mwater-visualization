@@ -109,13 +109,9 @@ module.exports = class MapComponent extends React.Component
     else
       return @state.transientDesign
 
-  refMapView: (el) =>
-    @mapView = el
-
   renderView: ->
     React.createElement(AutoSizeComponent, injectWidth: true, injectHeight: true, 
       React.createElement(MapViewComponent, 
-        ref: @refMapView
         mapDataSource: @props.mapDataSource
         schema: @props.schema, 
         dataSource: @props.dataSource

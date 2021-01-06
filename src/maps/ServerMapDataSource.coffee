@@ -1,13 +1,12 @@
 $ = require 'jquery'
 _ = require 'lodash'
 querystring = require 'querystring'
-MapDataSource = require './MapDataSource'
 LayerFactory = require './LayerFactory'
 injectTableAlias = require('mwater-expressions').injectTableAlias
 compressJson = require '../compressJson'
 
 # Get map urls for map stored on server
-module.exports = class ServerMapDataSource extends MapDataSource
+module.exports = class ServerMapDataSource
   # Create map url source that uses map design stored on server
   # options:
   #   schema: schema to use

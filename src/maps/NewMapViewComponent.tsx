@@ -1,3 +1,4 @@
+import _ from "lodash"
 import mapboxgl from "mapbox-gl"
 import { DataSource, Schema } from "mwater-expressions"
 import React, { CSSProperties, ReactNode, useEffect, useState } from "react"
@@ -5,7 +6,7 @@ import { useRef } from "react"
 import { JsonQLFilter } from ".."
 import { default as LayerFactory } from "./LayerFactory"
 import { MapDesign, MapLayerView } from "./MapDesign"
-import { MapDataSource } from "./maps"
+import { MapDataSource } from "./MapDataSource"
 import { mapSymbols } from "./mapSymbols"
 import ModalPopupComponent from 'react-library/lib/ModalPopupComponent'
 import { getCompiledFilters as utilsGetCompiledFilters, getFilterableTables as utilsGetFilterableTables } from './MapUtils'
@@ -39,7 +40,7 @@ export function NewMapViewComponent(props: {
   scope?: MapScope
 
   /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
-  onScopeChange: (scope: MapScope) => void
+  onScopeChange: (scope: MapScope | null) => void
 
   /** Whether the map be draggable with mouse/touch or not. Default true */
   dragging?: boolean 
@@ -90,6 +91,8 @@ export function NewMapViewComponent(props: {
     if (!map) {
       return
     }
+
+    // Keep track of expires
 
     const compiledFilters = getCompiledFilters()
 
@@ -304,6 +307,58 @@ export function NewMapViewComponent(props: {
     }
   }, [map, props.design.bounds])
   
+  function handleGridClick(layerViewId: string, ev: any) {
+    const layerView = props.design.layerViews.find(lv => lv.id == layerViewId)!
+
+    // Create layer
+    const layer = LayerFactory.createLayer(layerView.type)
+
+    // Clean design (prevent ever displaying invalid/legacy designs)
+    const design = layer.cleanDesign(layerView.design, props.schema)
+
+    // Handle click of layer
+    const results = layer.onGridClick(ev, { 
+      design: design,
+      schema: props.schema,
+      dataSource: props.dataSource,
+      layerDataSource: props.mapDataSource.getLayerDataSource(layerViewId),
+      scopeData: (props.scope && props.scope.data && props.scope.data.layerViewId == layerViewId) ? props.scope.data.data : undefined,
+      filters: getCompiledFilters()
+    })
+
+    if (!results) {
+      return
+    }
+
+    // Handle popup first
+    if (results.popup) {
+      setPopupContents(results.popup)
+    }
+
+    // Handle onRowClick case
+    if (results.row && props.onRowClick) {
+      props.onRowClick(results.row.tableId, results.row.primaryKey)
+    }
+
+    // Handle scoping
+    if (props.onScopeChange && _.has(results, "scope")) {
+      let scope: MapScope | null 
+      if (results.scope) {
+        // Encode layer view id into scope
+        scope = {
+          name: results.scope.name,
+          filter: results.scope.filter,
+          data: { layerViewId: layerViewId, data: results.scope.data }
+        }
+      }
+      else {
+        scope = null
+      }
+
+      props.onScopeChange(scope)
+    }
+  }
+
   function renderPopup() {
     if (!popupContents) {
       return null
