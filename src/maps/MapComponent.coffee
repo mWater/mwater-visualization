@@ -36,6 +36,9 @@ module.exports = class MapComponent extends React.Component
     titleElem: PropTypes.node                     # Extra element to include in title at left
     extraTitleButtonsElem: PropTypes.node              # Extra elements to add to right
 
+  @contextTypes:
+    locale: PropTypes.string
+
   constructor: (props) ->
     super(props)
     @state = { 
@@ -121,6 +124,7 @@ module.exports = class MapComponent extends React.Component
         zoomLocked: @state.zoomLocked
         onRowClick: @props.onRowClick
         extraFilters: @props.extraFilters
+        locale: @context.locale
       )
     )
 

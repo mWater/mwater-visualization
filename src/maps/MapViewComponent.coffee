@@ -9,7 +9,7 @@ LayerFactory = require './LayerFactory'
 ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
 MapUtils = require './MapUtils'
 LayerSwitcherComponent = require('./LayerSwitcherComponent').LayerSwitcherComponent
-LegendComponent = require './LegendComponent'
+LegendComponent = require('./LegendComponent').default
 
 # Component that displays just the map
 module.exports = class MapViewComponent extends React.Component
