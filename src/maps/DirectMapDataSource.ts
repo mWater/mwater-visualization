@@ -88,8 +88,10 @@ class DirectLayerDataSource implements LayerDataSource {
     this.options = options;
   }
 
-  /** Get the url for vector tile source with an expiry time. Only for layers of type "VectorTile" */
-  async getVectorTileUrl(layerDesign: any, filters: JsonQLFilter[]): Promise<{ url: string, expires: string }> {
+  /** Get the url for vector tile source with an expiry time. Only for layers of type "VectorTile"
+  * @param createdAfter ISO 8601 timestamp requiring that tile soruce on server is created after specified datetime
+  */
+ async getVectorTileUrl(layerDesign: any, filters: JsonQLFilter[], createdAfter: string): Promise<{ url: string, expires: string }> {
     // Create layer
     const layer = LayerFactory.createLayer(this.options.layerView.type);
 
@@ -112,9 +114,9 @@ class DirectLayerDataSource implements LayerDataSource {
       ctes: vectorTile.ctes,
       minZoom: vectorTile.minZoom,
       maxZoom: vectorTile.maxZoom,
+      createdAfter: createdAfter,
       // 12 hours
       expiresAfter: new Date(Date.now() + 1000 * 3600 * 12).toISOString(),
-      // TODO createdAfter (use datasource expiry)
     }
 
     const response = await fetch(this.options.apiUrl + "vector_tiles/create_direct_token?client=" + (this.options.client || ""), {

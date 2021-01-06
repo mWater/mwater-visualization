@@ -75,7 +75,14 @@ export function NewMapViewComponent(props: {
   /** Base layer id currently loaded */
   const [baseLayerLoaded, setBaseLayerLoaded] = useState("")
 
+  /** Contents of popup if open */
   const [popupContents, setPopupContents] = useState<ReactNode>()
+
+  /** Datetime layers must have been created after on server. Used to support refreshing */
+  const [layersCreatedAfter, setLayersCreatedAfter] = useState(new Date().toISOString())
+
+  /** Datetime layers expire and must be recreated */
+  const layersExpire = useRef<string>()
 
   // State of legend
   const initialLegendDisplay = props.design.initialLegendDisplay || "open"
@@ -96,6 +103,7 @@ export function NewMapViewComponent(props: {
     }
 
     // Keep track of expires
+    let earliestExpires: string | null = null
 
     const compiledFilters = getCompiledFilters()
 
@@ -126,9 +134,13 @@ export function NewMapViewComponent(props: {
       const layerDataSource = props.mapDataSource.getLayerDataSource(layerView.id)
 
       if (defType == "VectorTile") {
-        // TODO attempt to re-use sources
+        // TODO attempt to re-use sources?
+
         // Get source url
-        const { expires, url } = await layerDataSource.getVectorTileUrl(layerView.design, filters)
+        const { expires, url } = await layerDataSource.getVectorTileUrl(layerView.design, filters, layersCreatedAfter)
+        if (!earliestExpires || expires < earliestExpires) {
+          earliestExpires = expires
+        }
 
         // Add source
         newSources.push({ id: layerView.id, sourceData: {
@@ -177,6 +189,11 @@ export function NewMapViewComponent(props: {
       return
     }
 
+    // Save expires
+    if (earliestExpires) {
+      layersExpire.current = earliestExpires
+    }
+
     // If sources is unchanged TODO
 
     // Remove existing layers and sources
@@ -201,6 +218,21 @@ export function NewMapViewComponent(props: {
       currentLayersRef.current.push(layer)
     }
   }
+
+  // Refresh periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // If expired
+      if (layersExpire.current && new Date().toISOString() > layersExpire.current) {
+        // Set created after to now to force refresh
+        setLayersCreatedAfter(new Date().toISOString())
+        layersExpire.current = undefined
+      }
+    }, 5 * 60 * 1000)
+    return () => {
+      clearInterval(interval)
+    }
+  })
 
   // Load map and symbols
   useEffect(() => {
@@ -290,7 +322,7 @@ export function NewMapViewComponent(props: {
     }
 
     updateLayers()
-  }, [map, symbolsAdded, props.design.layerViews, props.scope, baseLayerLoaded])
+  }, [map, symbolsAdded, props.design.layerViews, props.scope, baseLayerLoaded, layersCreatedAfter])
 
   // Capture movements on map to update bounds
   useEffect(() => {
