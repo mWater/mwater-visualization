@@ -1,5 +1,5 @@
 import { JsonQLFilter } from ".."
-import { MapDataSource } from "../maps/maps"
+import { MapDataSource } from "../maps/MapDataSource"
 
 /** Interface for a widget data source that gives the widget access to the data it needs, even if that data is not directly available from the data source
  * For example, Alice might share a widget with Bob. Bob can't access the data directly that Alice sees (since it's private), but he can use the widget 

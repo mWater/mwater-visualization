@@ -72,6 +72,9 @@ export function NewMapViewComponent(props: {
   /** True when symbols have been added to map */
   const [symbolsAdded, setSymbolsAdded] = useState(false)
 
+  /** Base layer id currently loaded */
+  const [baseLayerLoaded, setBaseLayerLoaded] = useState("")
+
   const [popupContents, setPopupContents] = useState<ReactNode>()
 
   // State of legend
@@ -202,15 +205,13 @@ export function NewMapViewComponent(props: {
   // Load map and symbols
   useEffect(() => {
     const m = new mapboxgl.Map({
-      accessToken: 'pk.eyJ1IjoiY2xheXRvbmdyYXNzaWNrIiwiYSI6ImNpcHk4MHMxZDB5NHVma20ya3k1dnp3bzQifQ.lMMb60WxiYfRF0V4Y3UTbQ',
       container: divRef.current!,
-      style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
+      accessToken: "pk.eyJ1IjoiY2xheXRvbmdyYXNzaWNrIiwiYSI6ImNpcHk4MHMxZDB5NHVma20ya3k1dnp3bzQifQ.lMMb60WxiYfRF0V4Y3UTbQ",
       bounds: props.design.bounds ? [props.design.bounds.w, props.design.bounds.s, props.design.bounds.e, props.design.bounds.n] : undefined,
       scrollZoom: props.scrollWheelZoom === false ? false : true,
       dragPan: props.dragging === false ? false : true,
       touchZoomRotate: props.touchZoom === false ? false : true
     })
-    setMap(m)
 
     // Add zoom controls to the map.
     m.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-left")
@@ -218,20 +219,68 @@ export function NewMapViewComponent(props: {
     // Speed up wheel scrolling
     m.scrollZoom.setWheelZoomRate(1/250)
 
-    m.on("load", async () => {
-      // Add symbols that markers layers require
-      await addSymbolsToMap(m)
-      setSymbolsAdded(true)
-    })
+    setMap(m)
 
     return () => {
       m.remove()
     }
   }, [])
 
+  // Load base layer
+  useEffect(() => {
+    if (!map) {
+      return
+    }
+
+    let style: string | undefined
+    if (props.design.baseLayer == "cartodb_positron") {
+      style = 'light-v10' 
+    }
+    else if (props.design.baseLayer == "cartodb_dark_matter") {
+      style = 'dark-v10'
+    }
+    else if (props.design.baseLayer == "bing_road") {
+      style = 'streets-v11'
+    }
+    else if (props.design.baseLayer == "bing_aerial") {
+      style = 'satellite-streets-v11'
+    }
+
+    if (!style) {
+      // Clear style and update layers
+      map.setStyle(null as any)
+      currentLayersRef.current = []
+      currentSourcesRef.current = []
+      setBaseLayerLoaded("blank")
+      return
+    }
+
+    // Load style
+    const styleUrl = `https://api.mapbox.com/styles/v1/mapbox/${style}?access_token=pk.eyJ1IjoiY2xheXRvbmdyYXNzaWNrIiwiYSI6ImNpcHk4MHMxZDB5NHVma20ya3k1dnp3bzQifQ.lMMb60WxiYfRF0V4Y3UTbQ`
+    fetch(styleUrl).then(response => response.json()).then(styleData => {
+      // Set style and update layers
+      map.setStyle(styleData)
+      currentLayersRef.current = []
+      currentSourcesRef.current = []
+      setBaseLayerLoaded(style!)
+    })
+  }, [map, props.design.baseLayer])
+
+  // Load symbols
+  useEffect(() => {
+    if (!map) {
+      return
+    }
+
+    // Add symbols that markers layers require
+    addSymbolsToMap(map).then(() => {
+      setSymbolsAdded(true)
+    })
+  }, [map])
+  
   // Load layers on map
   useEffect(() => {
-    // Can't load until added
+    // Can't load until added 
     if (!symbolsAdded) {
       return
     }
@@ -241,7 +290,7 @@ export function NewMapViewComponent(props: {
     }
 
     updateLayers()
-  }, [map, symbolsAdded, props.design.layerViews, props.scope])
+  }, [map, symbolsAdded, props.design.layerViews, props.scope, baseLayerLoaded])
 
   // Capture movements on map to update bounds
   useEffect(() => {
