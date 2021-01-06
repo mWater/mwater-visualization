@@ -29,5 +29,5 @@ export interface MapDataSource {
   getLayerDataSource: (layerId: string) => LayerDataSource
   
   /** Gets the bounds for the map. Null for no opinion. Callback as { n:, s:, w:, e: } */
-  getBounds(design: MapDesign, filters: JsonQLFilter[], callback: (bounds: { w: number, n: number, e: number, s: number } | null) => void): void
+  getBounds(design: MapDesign, filters: JsonQLFilter[], callback: (error: any, bounds: { w: number, n: number, e: number, s: number } | null) => void): void
 }

@@ -1245,7 +1245,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     }
 
     // Use shape_simplified for speed, as bounds are always approximate
-    return this.getBoundsFromExpr(schema, dataSource, regionsTable, { type: "field", table: regionsTable, column: "shape_simplified" }, null, filters, callback)
+    return this.getBoundsFromExpr(schema, dataSource, regionsTable, { type: "field", table: regionsTable, column: "shape_simplified" }, null, appliedFilters, callback)
   }
 
   // Get min and max zoom levels

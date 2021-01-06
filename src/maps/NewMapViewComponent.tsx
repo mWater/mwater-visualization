@@ -56,7 +56,7 @@ export function NewMapViewComponent(props: {
   /** Locale to use */
   locale: string
 }) {
-  const mapRef = useRef<mapboxgl.Map | null>(null)
+  const [map, setMap] = useState<mapboxgl.Map>()
   const divRef = useRef<HTMLDivElement | null>(null)
 
   /** Current design (to detect if has changed) */
@@ -73,8 +73,8 @@ export function NewMapViewComponent(props: {
 
   const [popupContents, setPopupContents] = useState<ReactNode>()
 
+  // State of legend
   const initialLegendDisplay = props.design.initialLegendDisplay || "open"
-
   const [legendHidden, setLegendHidden] = useState(initialLegendDisplay == "closed" || (props.width < 500 && initialLegendDisplay == "closedIfSmall"))
 
   // Store design in ref to detect changes
@@ -86,7 +86,11 @@ export function NewMapViewComponent(props: {
   }
 
   /** Make layers of map match the design */
-  async function updateLayers(map: mapboxgl.Map) {
+  async function updateLayers() {
+    if (!map) {
+      return
+    }
+
     const compiledFilters = getCompiledFilters()
 
     // Determine scoped filters
@@ -194,7 +198,7 @@ export function NewMapViewComponent(props: {
 
   // Load map and symbols
   useEffect(() => {
-    const map = new mapboxgl.Map({
+    const m = new mapboxgl.Map({
       accessToken: 'pk.eyJ1IjoiY2xheXRvbmdyYXNzaWNrIiwiYSI6ImNpcHk4MHMxZDB5NHVma20ya3k1dnp3bzQifQ.lMMb60WxiYfRF0V4Y3UTbQ',
       container: divRef.current!,
       style: 'mapbox://styles/mapbox/light-v10', // stylesheet location
@@ -203,22 +207,22 @@ export function NewMapViewComponent(props: {
       dragPan: props.dragging === false ? false : true,
       touchZoomRotate: props.touchZoom === false ? false : true
     })
-    mapRef.current = map
+    setMap(m)
 
     // Add zoom controls to the map.
-    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-left")
+    m.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-left")
 
     // Speed up wheel scrolling
-    map.scrollZoom.setWheelZoomRate(1/250)
+    m.scrollZoom.setWheelZoomRate(1/250)
 
-    map.on("load", async () => {
+    m.on("load", async () => {
       // Add symbols that markers layers require
-      await addSymbolsToMap(map)
+      await addSymbolsToMap(m)
       setSymbolsAdded(true)
     })
 
     return () => {
-      map.remove()
+      m.remove()
     }
   }, [])
 
@@ -229,17 +233,15 @@ export function NewMapViewComponent(props: {
       return
     }
 
-    const map = mapRef.current
     if (!map) {
       return
     }
 
-    updateLayers(map)
-  }, [symbolsAdded, props.design, props.scope])
+    updateLayers()
+  }, [map, symbolsAdded, props.design.layerViews, props.scope])
 
   // Capture movements on map to update bounds
   useEffect(() => {
-    const map = mapRef.current
     if (!map) {
       return
     }
@@ -264,8 +266,44 @@ export function NewMapViewComponent(props: {
 
     map.on("moveend", onMoveEnd)
     return () => { map.off("moveend", onMoveEnd) }
-  }, [props.onDesignChange, props.zoomLocked, props.design])
+  }, [props.onDesignChange, props.zoomLocked, props.design, map])
 
+  function performAutoZoom() {
+    props.mapDataSource.getBounds(props.design, getCompiledFilters(), (error, bounds) => {
+      if (bounds) {
+        map!.fitBounds([bounds.w, bounds.s, bounds.e, bounds.n], { padding: 20 })
+
+        // Also record if editable as part of bounds
+        if (props.onDesignChange) {
+          props.onDesignChange({ ...props.design, bounds })
+        }
+      }
+    })
+  }
+
+  // Autozoom if filters or autozoom changed
+  useEffect(() => {
+    if (!map) {
+      return
+    }
+
+    // Autozoom
+    if (props.design.autoBounds) {
+      performAutoZoom()
+    }
+  }, [map, props.design.filters, props.design.globalFilters, props.extraFilters, props.design.autoBounds])
+
+  // Update bounds if changed
+  useEffect(() => {
+    if (!map) {
+      return
+    }
+
+    if (!props.design.autoBounds && props.design.bounds) {
+      map.fitBounds([props.design.bounds.w, props.design.bounds.s, props.design.bounds.e, props.design.bounds.n])
+    }
+  }, [map, props.design.bounds])
+  
   function renderPopup() {
     if (!popupContents) {
       return null
@@ -294,7 +332,7 @@ export function NewMapViewComponent(props: {
         schema={props.schema}
         layerViews={props.design.layerViews}
         filters={getCompiledFilters()}
-        zoom={mapRef.current ? mapRef.current.getZoom() : null}
+        zoom={map ? map.getZoom() : null}
         dataSource={props.dataSource}
         locale={props.locale}
         onHide={() => setLegendHidden(true)}

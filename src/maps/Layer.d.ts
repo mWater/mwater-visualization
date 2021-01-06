@@ -80,7 +80,7 @@ export default class Layer<LayerDesign> {
   getMaxZoom(design: LayerDesign): number | null | undefined
 
   /** Gets the bounds of the layer as GeoJSON */
-  getBounds(design: LayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: (err: any, bounds: any) => void): void
+  getBounds(design: LayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: (err: any, bounds: { n: number, s: number, e: number, w: number } | null) => void): void
 
   // # Get the legend to be optionally displayed on the map. Returns
   // # a React element
