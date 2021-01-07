@@ -1,11 +1,17 @@
 import React from 'react';
-import Layer from './Layer';
+import Layer, { OnGridClickOptions, VectorTileDef } from './Layer';
 import { Schema, DataSource } from 'mwater-expressions';
 import { LayerDefinition, OnGridClickResults } from './maps';
 import { JsonQLFilter } from '../index';
 import ChoroplethLayerDesign from './ChoroplethLayerDesign';
 import { JsonQL, JsonQLQuery } from 'jsonql';
 export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
+    /** Gets the type of layer definition */
+    getLayerDefinitionType(): "VectorTile";
+    getVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef;
+    createPlainVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef;
+    createIndirectVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef;
+    createDirectVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef;
     /** Gets the layer definition as JsonQL + CSS in format:
      *   {
      *     layers: array of { id: layer id, jsonql: jsonql that includes "the_webmercator_geom" as a column }
@@ -18,7 +24,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
      *   filters: array of filters to apply
      */
     getJsonQLCss(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): LayerDefinition;
-    createJsonQL(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQL;
+    createMapnikJsonQL(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQL;
     createCss(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): string;
     /**
      * Called when the interactivity grid is clicked.
@@ -43,20 +49,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     onGridClick(ev: {
         data: any;
         event: any;
-    }, clickOptions: {
-        /** design of layer */
-        design: ChoroplethLayerDesign;
-        /** schema to use */
-        schema: Schema;
-        /** data source to use */
-        dataSource: DataSource;
-        /** layer data source */
-        layerDataSource: any;
-        /** current scope data if layer is scoping */
-        scopeData: any;
-        /** compiled filters to apply to the popup */
-        filters: JsonQLFilter[];
-    }): OnGridClickResults;
+    }, clickOptions: OnGridClickOptions<ChoroplethLayerDesign>): OnGridClickResults;
     getBounds(design: ChoroplethLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): void;
     getMinZoom(design: ChoroplethLayerDesign): number | undefined;
     getMaxZoom(design: ChoroplethLayerDesign): number;

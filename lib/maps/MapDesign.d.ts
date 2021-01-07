@@ -23,7 +23,7 @@ export interface MapDesign {
     /** true to automatically zoom to bounds of data */
     autoBounds?: boolean;
     /** maximum allowed zoom level */
-    maxZoom?: boolean;
+    maxZoom?: number | null;
     /** array of global filters. See below. */
     globalFilters?: GlobalFilter[];
     /** True to display layer switcher */

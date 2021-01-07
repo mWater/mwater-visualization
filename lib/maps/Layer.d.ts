@@ -2,10 +2,9 @@ import { Schema, DataSource, Expr } from "mwater-expressions";
 import { JsonQLFilter } from "../index";
 import { OnGridClickResults } from "./maps";
 import { ReactNode } from "react";
-import { SecureClientSessionOptions } from "http2";
-import { JsonQL } from "jsonql";
+import { JsonQL, JsonQLQuery } from "jsonql";
 
-declare interface JsonQLCssLayerDefinition {
+export interface JsonQLCssLayerDefinition {
   layers: Array<{ 
     /** Layer id */
     id: string
@@ -25,11 +24,11 @@ declare interface JsonQLCssLayerDefinition {
 }
 
 /** Defines a layer for a map which has all the logic for rendering the specific data to be viewed */
-declare class Layer<LayerDesign> {
+export default class Layer<LayerDesign> {
   /** Gets the type of layer definition */
-  getLayerDefinitionType(): "JsonQLCss" | "TileUrl"
+  getLayerDefinitionType(): "JsonQLCss" | "TileUrl" | "VectorTile"
 
-  /** Gets the layer definition as JsonQL + CSS
+  /** Gets the layer definition as JsonQL + CSS for type "JsonQLCss"
       arguments:
         design: design of layer
         schema: schema to use
@@ -42,6 +41,12 @@ declare class Layer<LayerDesign> {
 
   /** Gets the utf grid url for definition type "TileUrl" */
   getUtfGridUrl(design: LayerDesign, filters: JsonQLFilter[]): string | null
+
+  /** Gets the layer definition for "VectorTile" type
+   * @param sourceId id of the source. Should be prefixed to sublayers with a colon (prefix:id)
+   * @param opacity opacity of the layer, which MapBox does not allow to be implemented for a whole layer (https://github.com/mapbox/mapbox-gl-js/issues/4090)
+   */
+  getVectorTile(design: LayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef
 
   /**  
    * Called when the interactivity grid is clicked. 
@@ -63,20 +68,7 @@ declare class Layer<LayerDesign> {
    *     row: { tableId:, primaryKey: }  # row that was selected
    *     popup: React element to put into a popup
    */
-  onGridClick(ev: { data: any }, options: {
-    /** design of layer */
-    design: LayerDesign
-    /** schema to use */
-    schema: Schema
-    /** data source to use */
-    dataSource: DataSource
-    /** layer data source */
-    layerDataSource: any // TODO
-    /** current scope data if layer is scoping */
-    scopeData: any
-    /** compiled filters to apply to the popup */
-    filters: JsonQLFilter[]
-  }): OnGridClickResults
+  onGridClick(ev: { data: any, event: any }, options: OnGridClickOptions<LayerDesign>): OnGridClickResults
 
   /** Get the legend to be optionally displayed on the map. Returns a React element */
   getLegend(design: LayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): ReactNode
@@ -88,20 +80,20 @@ declare class Layer<LayerDesign> {
   getMaxZoom(design: LayerDesign): number | null | undefined
 
   /** Gets the bounds of the layer as GeoJSON */
-  getBounds(design: LayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: (err: any, bounds: any) => void): void
+  getBounds(design: LayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: (err: any, bounds: { n: number, s: number, e: number, w: number } | null) => void): void
 
   // # Get the legend to be optionally displayed on the map. Returns
   // # a React element
   // getLegend: (design, schema, name, dataSource, filters = []) ->
 
-  // # Get a list of table ids that can be filtered on
-  // getFilterableTables: (design, schema) ->
+  /** Get a list of table ids that can be filtered on */
+  getFilterableTables(design: LayerDesign, schema: Schema): string[]
 
-  // # True if layer can be edited
-  // isEditable: () ->
+  /** True if layer can be edited */
+  isEditable(): boolean
 
-  // # True if layer is incomplete (e.g. brand new) and should be editable immediately
-  // isIncomplete: (design, schema) ->
+  /** True if layer is incomplete (e.g. brand new) and should be editable immediately */
+  isIncomplete(design: LayerDesign, schema: Schema): boolean
 
   // # Creates a design element with specified options.
   // # Design should be cleaned on the way in and on way out.
@@ -128,4 +120,58 @@ declare class Layer<LayerDesign> {
   getBoundsFromExpr(schema: Schema, dataSource: DataSource, table: string, geometryExpr: Expr, filterExpr: Expr, filters: JsonQLFilter[], callback: (err: any, bounds: any) => void): void
 }
 
-export = Layer
+export interface OnGridClickOptions<LayerDesign> {
+  /** design of layer */
+  design: LayerDesign
+  /** schema to use */
+  schema: Schema
+  /** data source to use */
+  dataSource: DataSource
+  /** layer data source */
+  layerDataSource: any // TODO
+  /** current scope data if layer is scoping */
+  scopeData: any
+  /** compiled filters to apply to the popup */
+  filters: JsonQLFilter[]
+}
+
+/** Definition of a vector tile layer */
+export interface VectorTileDef {
+  sourceLayers: VectorTileSourceLayer[]
+
+  /** Common table expressions of the tiles */
+  ctes: VectorTileCTE[]
+
+  /** Map layers must be mapbox layers that reference the source layers */
+  mapLayers: mapboxgl.AnyLayer[]
+
+  /** Which layer ids have click handlers attached. Should be non-overlapping */
+  mapLayersHandleClicks: string[]
+
+  /** Enforced minimum zoom level */
+  minZoom?: number
+
+  /** Enforced maximum zoom level */
+  maxZoom?: number
+}
+
+export interface VectorTileSourceLayer {
+  /** Unique id of the source layer */
+  id: string
+
+  /** Query that produces the source layer, without the ST_AsMVT but with the ST_AsMVTGeom. 
+   * References CTE called tile which has x, y, z and envelope.
+   */
+  jsonql: JsonQLQuery
+}
+
+/** Common table expression that a vector tile source layer can reference.
+ * Will be pre-computed and cached. Cannot reference tile parameters.
+ */
+export interface VectorTileCTE {
+  /** tableName of the cte table. Must be [a-z]+ */
+  tableName: string
+
+  /** Contents of the CTE table */
+  jsonql: JsonQLQuery
+}
