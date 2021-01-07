@@ -24,7 +24,7 @@ export interface MapDesign {
   autoBounds?: boolean
 
   /** maximum allowed zoom level */
-  maxZoom?: boolean
+  maxZoom?: number | null
 
   /** array of global filters. See below. */
   globalFilters?: GlobalFilter[]

@@ -502,6 +502,13 @@ export function NewMapViewComponent(props: {
       map.fitBounds([props.design.bounds.w, props.design.bounds.s, props.design.bounds.e, props.design.bounds.n])
     }
   }, [map, props.design.bounds])
+
+  // Update max zoom
+  useEffect(() => {
+    if (map) {
+      map.setMaxZoom(props.design.maxZoom)
+    }
+  }, [map, props.design.maxZoom])
   
   function renderPopup() {
     if (!popupContents) {
