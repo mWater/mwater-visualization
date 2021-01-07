@@ -41,7 +41,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
   getVectorTile(design: BufferLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
     const jsonql = this.createJsonQL(design, schema, filters)
 
-    const subLayers: mapboxgl.AnyLayer[] = []
+    const mapLayers: mapboxgl.AnyLayer[] = []
 
     // If color axes, add color conditions
     let color: any
@@ -60,7 +60,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
       color = design.color || "transparent"
     }
     
-    subLayers.push({
+    mapLayers.push({
       'id': `${sourceId}:fill`,
       'type': 'fill',
       'source': sourceId,
@@ -73,7 +73,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     })
 
     // if (design.borderStyle == "color") {
-    //   subLayers.push({
+    //   mapLayers.push({
     //     'id': `${sourceId}:line`,
     //     'type': 'line',
     //     'source': sourceId,
@@ -93,7 +93,8 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
         { id: "circles", jsonql: jsonql }
       ],
       ctes: [],
-      subLayers: subLayers
+      mapLayers: mapLayers,
+      mapLayersHandleClicks: [`${sourceId}:fill`]
     }
   }
 

@@ -20,7 +20,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
   getVectorTile(design: GridLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
     const jsonql = this.createJsonQL(design, schema, filters)
 
-    const subLayers: mapboxgl.AnyLayer[] = []
+    const mapLayers: mapboxgl.AnyLayer[] = []
 
     // If color axes, add color conditions
     let color: any
@@ -39,7 +39,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
       color = "transparent"
     }
     
-    subLayers.push({
+    mapLayers.push({
       'id': `${sourceId}:fill`,
       'type': 'fill',
       'source': sourceId,
@@ -52,7 +52,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     })
 
     if (design.borderStyle == "color") {
-      subLayers.push({
+      mapLayers.push({
         'id': `${sourceId}:line`,
         'type': 'line',
         'source': sourceId,
@@ -71,7 +71,8 @@ export default class GridLayer extends Layer<GridLayerDesign> {
         { id: "grid", jsonql: jsonql }
       ],
       ctes: [],
-      subLayers: subLayers
+      mapLayers: mapLayers,
+      mapLayersHandleClicks: [`${sourceId}:fill`]
     }
   }
 

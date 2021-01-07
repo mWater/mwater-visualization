@@ -142,8 +142,11 @@ export interface VectorTileDef {
   /** Common table expressions of the tiles */
   ctes: VectorTileCTE[]
 
-  /** Sublayers must be mapbox layers that reference the source layers */
-  subLayers: mapboxgl.AnyLayer[]
+  /** Map layers must be mapbox layers that reference the source layers */
+  mapLayers: mapboxgl.AnyLayer[]
+
+  /** Which layer ids have click handlers attached. Should be non-overlapping */
+  mapLayersHandleClicks: string[]
 
   /** Enforced minimum zoom level */
   minZoom?: number

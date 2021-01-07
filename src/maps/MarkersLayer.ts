@@ -21,7 +21,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
   getVectorTile(design: MarkersLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
     const jsonql = this.createJsonQL(design, schema, filters)
 
-    const subLayers: mapboxgl.AnyLayer[] = []
+    const mapLayers: mapboxgl.AnyLayer[] = []
 
     // If color axes, add color conditions
     let color: any
@@ -41,7 +41,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     }
 
     // Add polygons
-    subLayers.push({
+    mapLayers.push({
       'id': `${sourceId}:polygons`,
       'type': 'fill',
       'source': sourceId,
@@ -56,7 +56,23 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     })
 
     // Add polygon outlines and lines
-    subLayers.push({
+    mapLayers.push({
+      'id': `${sourceId}:polygon-outlines`,
+      'type': 'line',
+      'source': sourceId,
+      'source-layer': 'main',
+      paint: {
+        "line-color": color,
+        "line-width": (design.lineWidth != null) ? design.lineWidth : 3,
+        "line-opacity": opacity
+      },
+      filter: ['any', 
+        ['==', ["get", "geometry_type"], 'ST_Polygon'],
+        ['==', ["get", "geometry_type"], 'ST_MultiPolygon']]
+    })
+    
+    // Add lines
+    mapLayers.push({
       'id': `${sourceId}:lines`,
       'type': 'line',
       'source': sourceId,
@@ -67,15 +83,14 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
         "line-opacity": opacity
       },
       filter: ['any', 
-        ['==', ["get", "geometry_type"], 'ST_Linestring'],
-        ['==', ["get", "geometry_type"], 'ST_Polygon'],
-        ['==', ["get", "geometry_type"], 'ST_MultiPolygon']]
+        ['==', ["get", "geometry_type"], 'ST_Linestring']
+      ]
     })
 
     // Add markers
     if (!design.symbol) {
-      subLayers.push({
-        'id': `${sourceId}:main`,
+      mapLayers.push({
+        'id': `${sourceId}:points`,
         'type': 'circle',
         'source': sourceId,
         'source-layer': 'main',
@@ -91,8 +106,8 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
       })
     }
     else {
-      subLayers.push({
-        'id': `${sourceId}:main`,
+      mapLayers.push({
+        'id': `${sourceId}:points`,
         'type': 'symbol',
         'source': sourceId,
         'source-layer': 'main',
@@ -115,7 +130,8 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
       ctes: [],
       minZoom: design.minZoom,
       maxZoom: design.maxZoom,
-      subLayers
+      mapLayers: mapLayers,
+      mapLayersHandleClicks: [`${sourceId}:polygons`, `${sourceId}:polygon-outlines`, `${sourceId}:lines`, `${sourceId}:points`]
     }
   }
 

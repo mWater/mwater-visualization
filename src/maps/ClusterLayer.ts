@@ -17,9 +17,9 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
   getVectorTile(design: ClusterLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
     const jsonql = this.createJsonQL(design, schema, filters)
 
-    const subLayers: mapboxgl.AnyLayer[] = []
+    const mapLayers: mapboxgl.AnyLayer[] = []
 
-    subLayers.push({
+    mapLayers.push({
       'id': `${sourceId}:circles-single`,
       'type': 'circle',
       'source': sourceId,
@@ -35,7 +35,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       filter: ['==', ["to-number", ['get', 'cnt']], 1]
     })
 
-    subLayers.push({
+    mapLayers.push({
       'id': `${sourceId}:circles-multiple`,
       'type': 'circle',
       'source': sourceId,
@@ -51,7 +51,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       filter: ['>', ["to-number", ['get', 'cnt']], 1]
     })
 
-    subLayers.push({
+    mapLayers.push({
       'id': `${sourceId}:labels`,
       'type': 'symbol',
       'source': sourceId,
@@ -72,7 +72,8 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
         { id: "clusters", jsonql: jsonql }
       ],
       ctes: [],
-      subLayers: subLayers
+      mapLayers: mapLayers,
+      mapLayersHandleClicks: [`${sourceId}:circles-single`, `${sourceId}:circles-multiple`]
     }
   }
 

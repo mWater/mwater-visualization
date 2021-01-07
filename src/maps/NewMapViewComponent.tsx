@@ -14,6 +14,11 @@ import { getCompiledFilters as utilsGetCompiledFilters, getFilterableTables as u
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { LayerSwitcherComponent } from "./LayerSwitcherComponent"
 import LegendComponent from "./LegendComponent"
+import { string } from "prop-types"
+
+type LayerClickHandlerEvent = mapboxgl.MapMouseEvent & {
+  features?: mapboxgl.MapboxGeoJSONFeature[] | undefined;
+} & mapboxgl.EventData
 
 /** Component that displays just the map */
 export function NewMapViewComponent(props: {
@@ -63,11 +68,17 @@ export function NewMapViewComponent(props: {
   /** Current design (to detect if has changed) */
   const designRef = useRef<MapDesign>()
 
-  /** Ids of layers present */
+  /** Layers present */
   const currentLayersRef = useRef<mapboxgl.AnyLayer[]>([])
 
-  /** Ids of sources present */
+  /** Sources present */
   const currentSourcesRef = useRef<{ id: string, sourceData: mapboxgl.AnySourceData }[]>([])
+
+  /** Busy incrementable counter. Is busy if > 0 */
+  const [busy, setBusy] = useState(0)
+
+  /** Layer click handlers present */
+  const currentLayerClickHandlers = useRef<{ layerId: string, clickHandler: (ev: LayerClickHandlerEvent) => void }[]>([])
 
   /** True when symbols have been added to map */
   const [symbolsAdded, setSymbolsAdded] = useState(false)
@@ -91,6 +102,65 @@ export function NewMapViewComponent(props: {
   // Store design in ref to detect changes
   useEffect(() => { designRef.current = props.design }, [props.design])
 
+  // Store handleClick function in a ref
+  const handleLayerClickRef = useRef<(layerViewId: string, ev: { data: any, event: any }) => void>()
+
+  /** Handle a click on a layer */
+  function handleLayerClick(layerViewId: string, ev: { data: any, event: any }) {
+    const layerView = props.design.layerViews.find(lv => lv.id == layerViewId)!
+
+    // Create layer
+    const layer = LayerFactory.createLayer(layerView.type)
+
+    // Clean design (prevent ever displaying invalid/legacy designs)
+    const design = layer.cleanDesign(layerView.design, props.schema)
+
+    // Handle click of layer
+    const results = layer.onGridClick(ev, { 
+      design: design,
+      schema: props.schema,
+      dataSource: props.dataSource,
+      layerDataSource: props.mapDataSource.getLayerDataSource(layerViewId),
+      scopeData: (props.scope && props.scope.data && props.scope.data.layerViewId == layerViewId) ? props.scope.data.data : undefined,
+      filters: getCompiledFilters()
+    })
+
+    if (!results) {
+      return
+    }
+
+    // Handle popup first
+    if (results.popup) {
+      setPopupContents(results.popup)
+    }
+
+    // Handle onRowClick case
+    if (results.row && props.onRowClick) {
+      props.onRowClick(results.row.tableId, results.row.primaryKey)
+    }
+
+    // Handle scoping
+    if (props.onScopeChange && _.has(results, "scope")) {
+      let scope: MapScope | null 
+      if (results.scope) {
+        // Encode layer view id into scope
+        scope = {
+          name: results.scope.name,
+          filter: results.scope.filter,
+          data: { layerViewId: layerViewId, data: results.scope.data }
+        }
+      }
+      else {
+        scope = null
+      }
+
+      props.onScopeChange(scope)
+    }
+  }
+
+  // Store most up-to-date handleClick function in a ref
+  handleLayerClickRef.current = handleLayerClick
+
   /** Get filters from extraFilters combined with map filters */
   function getCompiledFilters() {
     return (props.extraFilters || []).concat(utilsGetCompiledFilters(props.design, props.schema, utilsGetFilterableTables(props.design, props.schema)))
@@ -112,18 +182,21 @@ export function NewMapViewComponent(props: {
 
     // Sources to add
     const newSources: { id: string, sourceData: mapboxgl.AnySourceData }[] = []
-    const newLayers: mapboxgl.AnyLayer[] = []
+    const newLayers: { layerViewId: string | null, layer: mapboxgl.AnyLayer }[] = []
+
+    // Mapbox layers with click handlers. Each is in format 
+    let newClickHandlers: { layerViewId: string, mapLayerId: string }[] = []
 
     // Create background layer to simulate base layer opacity
     if (props.design.baseLayerOpacity != null && props.design.baseLayerOpacity < 1) {
-      newLayers.push({
+      newLayers.push({ layerViewId: null, layer:{
         id: "backgroundOpacity",
         type: "background",
         paint: {
           "background-color": "white",
           "background-opacity": 1 - props.design.baseLayerOpacity
         }
-      })
+      }})
     }
 
     async function addLayer(layerView: MapLayerView, filters: JsonQLFilter[], opacity: number) {
@@ -161,10 +234,11 @@ export function NewMapViewComponent(props: {
         }})
 
         // Add layer
-        const subLayers = layer.getVectorTile(layerView.design, layerView.id, props.schema, filters, opacity).subLayers
-        for (const sublayer of subLayers) {
-          newLayers.push(sublayer)
+        const vectorTileDef = layer.getVectorTile(layerView.design, layerView.id, props.schema, filters, opacity)
+        for (const mapLayer of vectorTileDef.mapLayers) {
+          newLayers.push({ layerViewId: layerView.id, layer: mapLayer })
         }
+        newClickHandlers = newClickHandlers.concat(vectorTileDef.mapLayersHandleClicks.map(mlid => ({ layerViewId: layerView.id, mapLayerId: mlid })))
       }
       else {
         const tileUrl = props.mapDataSource.getLayerDataSource(layerView.id).getTileUrl(layerView.design, [])
@@ -175,59 +249,88 @@ export function NewMapViewComponent(props: {
           }})
 
           newLayers.push({
-            id: layerView.id,
-            type: "raster",
-            source: layerView.id,
-            paint: {
-              "raster-opacity": opacity
+            layerViewId: layerView.id, 
+            layer: {
+              id: layerView.id,
+              type: "raster",
+              source: layerView.id,
+              paint: {
+                "raster-opacity": opacity
+              }
             }
           })
         }
       }
     }
 
-    for (const layerView of props.design.layerViews) {
-      const isScoping = props.scope != null && props.scope.data.layerViewId == layerView.id
+    setBusy(b => b + 1)
 
-      // If layer is scoping, fade opacity and add extra filtered version
-      await addLayer(layerView, isScoping ? compiledFilters : scopedCompiledFilters, isScoping ? layerView.opacity * 0.3 : layerView.opacity)
-      if (isScoping) {
-        await addLayer(layerView, scopedCompiledFilters, layerView.opacity)
+    try {
+      for (const layerView of props.design.layerViews) {
+        const isScoping = props.scope != null && props.scope.data.layerViewId == layerView.id
+
+        // If layer is scoping, fade opacity and add extra filtered version
+        await addLayer(layerView, isScoping ? compiledFilters : scopedCompiledFilters, isScoping ? layerView.opacity * 0.3 : layerView.opacity)
+        if (isScoping) {
+          await addLayer(layerView, scopedCompiledFilters, layerView.opacity)
+        }
+      }
+
+      // If design has changed, abort update
+      if (props.design != designRef.current) {
+        return
+      }
+
+      // Save expires
+      if (earliestExpires) {
+        layersExpire.current = earliestExpires
+      }
+
+      // If sources is unchanged TODO
+
+      // Remove existing layers and sources
+      for (const currentLayer of currentLayersRef.current) {
+        map.removeLayer(currentLayer.id)
+      }
+      currentLayersRef.current = []
+
+      for (const source of currentSourcesRef.current) {
+        map.removeSource(source.id)
+      }
+      currentSourcesRef.current = []
+
+      // Remove click handlers
+      for (const currentLayerClickHandler of currentLayerClickHandlers.current) {
+        map.off("click", currentLayerClickHandler.layerId, currentLayerClickHandler.clickHandler)
+      }
+      currentLayerClickHandlers.current = []
+
+      // Add sources and layers
+      for (const source of newSources) {
+        map.addSource(source.id, source.sourceData)
+        currentSourcesRef.current.push(source)
+      }
+
+      for (const newLayer of newLayers) {
+        map.addLayer(newLayer.layer)
+        currentLayersRef.current.push(newLayer.layer)
+      }
+
+      for (const newClickHandler of newClickHandlers) {
+        const clickHandler = (ev: LayerClickHandlerEvent) => {
+          if (ev.features && ev.features[0]) {
+            handleLayerClickRef.current!(newClickHandler.layerViewId, { 
+              data: ev.features![0].properties, 
+              event: ev
+            })
+          }
+        }
+        map.on("click", newClickHandler.mapLayerId, clickHandler)
+        currentLayerClickHandlers.current.push({ layerId: newClickHandler.mapLayerId, clickHandler })
       }
     }
-
-    // If design has changed, abort update
-    if (props.design != designRef.current) {
-      return
-    }
-
-    // Save expires
-    if (earliestExpires) {
-      layersExpire.current = earliestExpires
-    }
-
-    // If sources is unchanged TODO
-
-    // Remove existing layers and sources
-    for (const layer of currentLayersRef.current) {
-      map.removeLayer(layer.id)
-    }
-    currentLayersRef.current = []
-
-    for (const source of currentSourcesRef.current) {
-      map.removeSource(source.id)
-    }
-    currentSourcesRef.current = []
-
-    // Add sources and layers
-    for (const source of newSources) {
-      map.addSource(source.id, source.sourceData)
-      currentSourcesRef.current.push(source)
-    }
-
-    for (const layer of newLayers) {
-      map.addLayer(layer)
-      currentLayersRef.current.push(layer)
+    finally {
+      setBusy(b => b - 1)
     }
   }
 
@@ -400,58 +503,6 @@ export function NewMapViewComponent(props: {
     }
   }, [map, props.design.bounds])
   
-  function handleGridClick(layerViewId: string, ev: any) {
-    const layerView = props.design.layerViews.find(lv => lv.id == layerViewId)!
-
-    // Create layer
-    const layer = LayerFactory.createLayer(layerView.type)
-
-    // Clean design (prevent ever displaying invalid/legacy designs)
-    const design = layer.cleanDesign(layerView.design, props.schema)
-
-    // Handle click of layer
-    const results = layer.onGridClick(ev, { 
-      design: design,
-      schema: props.schema,
-      dataSource: props.dataSource,
-      layerDataSource: props.mapDataSource.getLayerDataSource(layerViewId),
-      scopeData: (props.scope && props.scope.data && props.scope.data.layerViewId == layerViewId) ? props.scope.data.data : undefined,
-      filters: getCompiledFilters()
-    })
-
-    if (!results) {
-      return
-    }
-
-    // Handle popup first
-    if (results.popup) {
-      setPopupContents(results.popup)
-    }
-
-    // Handle onRowClick case
-    if (results.row && props.onRowClick) {
-      props.onRowClick(results.row.tableId, results.row.primaryKey)
-    }
-
-    // Handle scoping
-    if (props.onScopeChange && _.has(results, "scope")) {
-      let scope: MapScope | null 
-      if (results.scope) {
-        // Encode layer view id into scope
-        scope = {
-          name: results.scope.name,
-          filter: results.scope.filter,
-          data: { layerViewId: layerViewId, data: results.scope.data }
-        }
-      }
-      else {
-        scope = null
-      }
-
-      props.onScopeChange(scope)
-    }
-  }
-
   function renderPopup() {
     if (!popupContents) {
       return null
@@ -488,6 +539,24 @@ export function NewMapViewComponent(props: {
     }
   }
 
+  /** Render a spinner if loading */
+  function renderBusy() {
+    if (busy == 0) {
+      return null
+    }
+
+    return <div key="busy" style={{ 
+      position: "absolute", 
+      top: 80, 
+      left: 9, 
+      backgroundColor: "white", 
+      border: "solid 1px #CCC",
+      padding: 7,
+      borderRadius: 5 }}>
+      <i className="fa fa-spinner fa-spin"/>
+    </div>
+  }
+
   // Overflow hidden because of problem of exceeding div
   return <div style={{ width: props.width, height: props.height, position: "relative" }}>
     { renderPopup() }
@@ -497,6 +566,7 @@ export function NewMapViewComponent(props: {
     }
     <div style={{ width: props.width, height: props.height }} ref={divRef}/>
     { renderLegend() }
+    { renderBusy() }
   </div>
 }
 

@@ -160,9 +160,9 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     }
 
     // Create layers
-    const subLayers: mapboxgl.AnyLayer[] = []
+    const mapLayers: mapboxgl.AnyLayer[] = []
 
-    subLayers.push({
+    mapLayers.push({
       'id': `${sourceId}:polygon-fill`,
       'type': 'fill',
       'source': sourceId,
@@ -173,7 +173,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       }
     })
 
-    subLayers.push({
+    mapLayers.push({
       'id': `${sourceId}:polygon-line`,
       'type': 'line',
       'source': sourceId,
@@ -186,7 +186,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     })
 
     if (design.displayNames) {
-      subLayers.push({
+      mapLayers.push({
         'id': `${sourceId}:labels`,
         'type': 'symbol',
         'source': sourceId,
@@ -210,7 +210,8 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         { id: "polygons", jsonql: polygonsQuery },
         { id: "points", jsonql: pointsQuery }
       ],
-      subLayers: subLayers,
+      mapLayers: mapLayers,
+      mapLayersHandleClicks: [`${sourceId}:polygon-fill`],
       minZoom: design.minZoom,
       maxZoom: design.maxZoom
     }
@@ -455,9 +456,9 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     }
 
     // Create layers
-    const subLayers: mapboxgl.AnyLayer[] = []
+    const mapLayers: mapboxgl.AnyLayer[] = []
 
-    subLayers.push({
+    mapLayers.push({
       'id': `${sourceId}:polygon-fill`,
       'type': 'fill',
       'source': sourceId,
@@ -468,7 +469,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       }
     })
 
-    subLayers.push({
+    mapLayers.push({
       'id': `${sourceId}:polygon-line`,
       'type': 'line',
       'source': sourceId,
@@ -481,7 +482,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     })
 
     if (design.displayNames) {
-      subLayers.push({
+      mapLayers.push({
         'id': `${sourceId}:labels`,
         'type': 'symbol',
         'source': sourceId,
@@ -505,7 +506,8 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         { id: "polygons", jsonql: polygonsQuery },
         { id: "points", jsonql: pointsQuery }
       ],
-      subLayers: subLayers,
+      mapLayers: mapLayers,
+      mapLayersHandleClicks:[`${sourceId}:polygon-fill`],
       minZoom: design.minZoom,
       maxZoom: design.maxZoom
     }
@@ -660,9 +662,9 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     }
 
     // Create layers
-    const subLayers: mapboxgl.AnyLayer[] = []
+    const mapLayers: mapboxgl.AnyLayer[] = []
 
-    subLayers.push({
+    mapLayers.push({
       'id': `${sourceId}:polygon-fill`,
       'type': 'fill',
       'source': sourceId,
@@ -673,7 +675,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       }
     })
 
-    subLayers.push({
+    mapLayers.push({
       'id': `${sourceId}:polygon-line`,
       'type': 'line',
       'source': sourceId,
@@ -686,7 +688,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     })
 
     if (design.displayNames) {
-      subLayers.push({
+      mapLayers.push({
         'id': `${sourceId}:labels`,
         'type': 'symbol',
         'source': sourceId,
@@ -710,7 +712,8 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         { id: "polygons", jsonql: polygonsQuery },
         { id: "points", jsonql: pointsQuery }
       ],
-      subLayers: subLayers,
+      mapLayers: mapLayers,
+      mapLayersHandleClicks: [`${sourceId}:polygon-fill`],
       minZoom: design.minZoom,
       maxZoom: design.maxZoom
     }
