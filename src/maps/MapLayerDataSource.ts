@@ -2,7 +2,7 @@ import { JsonQLFilter } from ".."
 import { WidgetDataSource } from "../widgets/WidgetDataSource";
 
 /** Data source for a layer of a map. Gives urls, popup data */
-export interface LayerDataSource {
+export interface MapLayerDataSource {
   /** Get the url for the image tiles with the specified filters applied
    * Called with (design, filters) where design is the design of the layer and filters are filters to apply. Returns URL
    * Only called on layers that are valid */
@@ -14,7 +14,7 @@ export interface LayerDataSource {
   getUtfGridUrl(design: any, filters: JsonQLFilter[]): string | null
 
   /** Get the url for vector tile source with an expiry time. Only for layers of type "VectorTile"
-   * @param createdAfter ISO 8601 timestamp requiring that tile soruce on server is created after specified datetime
+   * @param createdAfter ISO 8601 timestamp requiring that tile source on server is created after specified datetime
    */
   getVectorTileUrl(layerDesign: any, filters: JsonQLFilter[], createdAfter: string): Promise<{ url: string, expires: string }>
 

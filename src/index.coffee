@@ -49,11 +49,11 @@ exports.DatagridComponent = require './datagrids/DatagridComponent'
 exports.DatagridViewComponent = require './datagrids/DatagridViewComponent'
 exports.DatagridUtils = require './datagrids/DatagridUtils'
 
-exports.ServerDashboardDataSource = require './dashboards/ServerDashboardDataSource'
+exports.ServerDashboardDataSource = require('./dashboards/ServerDashboardDataSource').default
 exports.DirectDashboardDataSource = require './dashboards/DirectDashboardDataSource'
 exports.DirectWidgetDataSource = require './widgets/DirectWidgetDataSource'
 
-exports.ServerMapDataSource = require './maps/ServerMapDataSource'
+exports.ServerMapDataSource = require('./maps/ServerMapDataSource').default
 exports.DirectMapDataSource = require('./maps/DirectMapDataSource').default
 
 exports.ServerDatagridDataSource = require './datagrids/ServerDatagridDataSource'

@@ -22,9 +22,9 @@ DirectDatagridDataSource = require './datagrids/DirectDatagridDataSource'
 DirectDashboardDataSource = require './dashboards/DirectDashboardDataSource'
 DirectMapDataSource = require('./maps/DirectMapDataSource').default
 
-ServerMapDataSource = require './maps/ServerMapDataSource'
+ServerMapDataSource = require('./maps/ServerMapDataSource').default
 LeafletMapComponent = require './maps/LeafletMapComponent'
-ServerDashboardDataSource = require './dashboards/ServerDashboardDataSource'
+ServerDashboardDataSource = require('./dashboards/ServerDashboardDataSource').default
 RichTextComponent = require './richtext/RichTextComponent'
 ItemsHtmlConverter = require './richtext/ItemsHtmlConverter'
 

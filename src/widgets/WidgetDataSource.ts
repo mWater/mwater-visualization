@@ -1,5 +1,6 @@
 import { JsonQLFilter } from ".."
 import { MapDataSource } from "../maps/MapDataSource"
+import { MapDesign } from "../maps/MapDesign"
 
 /** Interface for a widget data source that gives the widget access to the data it needs, even if that data is not directly available from the data source
  * For example, Alice might share a widget with Bob. Bob can't access the data directly that Alice sees (since it's private), but he can use the widget 
@@ -11,10 +12,10 @@ export interface WidgetDataSource {
    *  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
    *  callback: (error, data)
    */
-  getData(design: any, filters: JsonQLFilter[], callback: (error: any, data: any) => void): void
+  getData(design: any, filters: JsonQLFilter[], callback: (error: any, data?: any) => void): void
 
   /** For map widgets, the following is required */
-  getMapDataSource?(design: any): MapDataSource
+  getMapDataSource?(design: MapDesign): MapDataSource
 
   /** Get the url to download an image (by id from an image or imagelist column) 
    * Height, if specified, is minimum height needed. May return larger image */

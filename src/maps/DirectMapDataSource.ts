@@ -11,9 +11,7 @@ import DirectWidgetDataSource from '../widgets/DirectWidgetDataSource'
 import { JsonQLCssLayerDefinition, VectorTileCTE, VectorTileSourceLayer } from './Layer';
 import compressJson from '../compressJson'
 import querystring from 'querystring'
-import { LayerDataSource } from './LayerDataSource';
-import { JsonQLQuery } from 'jsonql';
-import LayoutManager from '../layouts/LayoutManager';
+import { MapLayerDataSource } from './MapLayerDataSource';
 
 interface DirectMapDataSourceOptions {
   /** schema to use */
@@ -41,7 +39,7 @@ export default class DirectMapDataSource implements MapDataSource {
   }
 
   // Gets the data source for a layer
-  getLayerDataSource(layerId: string): LayerDataSource {
+  getLayerDataSource(layerId: string): MapLayerDataSource {
     // Get layerView
     const layerView = _.findWhere(this.options.design.layerViews, { id: layerId });
     if (!layerView) {
@@ -52,7 +50,7 @@ export default class DirectMapDataSource implements MapDataSource {
   }
 
   // Gets the bounds for the map. Null for whole world. Callback as { n:, s:, w:, e: }
-  getBounds(design: MapDesign, filters: JsonQLFilter[], callback: (error: any, bounds: { w: number, n: number, e: number, s: number } | null) => void): void {
+  getBounds(design: MapDesign, filters: JsonQLFilter[], callback: (error: any, bounds?: { w: number, n: number, e: number, s: number } | null) => void): void {
     return new MapBoundsCalculator(this.options.schema, this.options.dataSource).getBounds(design, filters, callback);
   }
 }
@@ -74,7 +72,7 @@ interface DirectLayerDataSourceOptions {
   client?: string
 }
 
-class DirectLayerDataSource implements LayerDataSource {
+class DirectLayerDataSource implements MapLayerDataSource {
   options: DirectLayerDataSourceOptions
 
   // Create map url source that uses direct jsonql maps
@@ -119,7 +117,7 @@ class DirectLayerDataSource implements LayerDataSource {
       expiresAfter: new Date(Date.now() + 1000 * 3600 * 12).toISOString(),
     }
 
-    const response = await fetch(this.options.apiUrl + "vector_tiles/create_direct_token?client=" + (this.options.client || ""), {
+    const response = await fetch(this.options.apiUrl + "vector_tiles/create_token/direct?client=" + (this.options.client || ""), {
       method: "POST",
       body: JSON.stringify(request),
       headers: {
