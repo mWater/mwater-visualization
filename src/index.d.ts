@@ -27,6 +27,7 @@ export { default as DashboardComponent } from './dashboards/DashboardComponent'
 export { default as DashboardDataSource } from './dashboards/DashboardDataSource'
 export { default as DirectDashboardDataSource } from './dashboards/DirectDashboardDataSource'
 export * from './dashboards/DashboardDesign'
+export { MapDesign, MapLayerView } from './maps/MapDesign'
 
 export { default as compressJson } from './compressJson'
 
