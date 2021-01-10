@@ -187,18 +187,6 @@ export function NewMapViewComponent(props: {
     // Mapbox layers with click handlers. Each is in format 
     let newClickHandlers: { layerViewId: string, mapLayerId: string }[] = []
 
-    // Create background layer to simulate base layer opacity
-    if (props.design.baseLayerOpacity != null && props.design.baseLayerOpacity < 1) {
-      newLayers.push({ layerViewId: null, layer:{
-        id: "backgroundOpacity",
-        type: "background",
-        paint: {
-          "background-color": "white",
-          "background-opacity": 1 - props.design.baseLayerOpacity
-        }
-      }})
-    }
-
     async function addLayer(layerView: MapLayerView, filters: JsonQLFilter[], opacity: number) {
       // TODO better way of hiding/showing layers?
       if (!layerView.visible) {
@@ -378,6 +366,18 @@ export function NewMapViewComponent(props: {
     if (!map) {
       return
     }
+  
+    function addBaseLayerOpacity() {
+      // Create background layer to simulate base layer opacity
+      map!.addLayer({
+        id: "baseLayerOpacity",
+        type: "background",
+        paint: {
+          "background-color": "white",
+          "background-opacity": 0
+        }
+      })
+    }
 
     let style: string | undefined
     if (props.design.baseLayer == "cartodb_positron") {
@@ -398,7 +398,11 @@ export function NewMapViewComponent(props: {
       map.setStyle(null as any)
       currentLayersRef.current = []
       currentSourcesRef.current = []
-      setBaseLayerLoaded("blank")
+      // Prevent not loaded error
+      setTimeout(() => {
+        addBaseLayerOpacity()
+        setBaseLayerLoaded("blank")
+      }, 0)
       return
     }
 
@@ -409,9 +413,22 @@ export function NewMapViewComponent(props: {
       map.setStyle(styleData)
       currentLayersRef.current = []
       currentSourcesRef.current = []
-      setBaseLayerLoaded(style!)
+      // Prevent not loaded error
+      setTimeout(() => {
+        addBaseLayerOpacity()
+        setBaseLayerLoaded(style!)
+      }, 0)
     })
   }, [map, props.design.baseLayer])
+
+  // Update base layer opacity
+  useEffect(() => {
+    if (!map || !baseLayerLoaded) {
+      return
+    }
+
+    map.setPaintProperty("baseLayerOpacity", "background-opacity",  1 - (props.design.baseLayerOpacity != null ? props.design.baseLayerOpacity : 1))
+  }, [map, baseLayerLoaded, props.design.baseLayerOpacity])
 
   // Load symbols
   useEffect(() => {
