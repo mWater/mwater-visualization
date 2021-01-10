@@ -136,9 +136,33 @@ class ServerLayerDataSource implements MapLayerDataSource {
   /** Get the url for vector tile source with an expiry time. Only for layers of type "VectorTile"
    * @param createdAfter ISO 8601 timestamp requiring that tile soruce on server is created after specified datetime
    */
-  getVectorTileUrl(layerDesign: any, filters: JsonQLFilter[], createdAfter: string): Promise<{ url: string, expires: string }> {
-    // TODO let url = `${this.options.apiUrl}maps/tiles/{z}/{x}/{y}.${extension}?` + querystring.stringify(query)
-    throw new Error("TODO")
+  async getVectorTileUrl(layerDesign: any, filters: JsonQLFilter[], createdAfter: string): Promise<{ url: string, expires: string }> {
+    throw new Error("TODO") // ###
+    const qs = querystring.stringify({
+      client: this.options.client,
+      share: this.options.share
+    })
+
+    const url =  `${this.options.apiUrl}vector_tiles/create_token/maps/${this.options.mapId}/layers/${this.options.layerView.id}?${qs}`
+
+    const body = {
+      filters: compressJson(filters || []),
+      createdAfter: createdAfter
+    }
+
+    const req = await fetch(url, { 
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+
+    if (!req.ok) {
+      throw new Error("Error getting tiles")
+    }
+    
   }
 
   // Gets widget data source for a popup widget
