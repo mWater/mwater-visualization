@@ -1,7 +1,7 @@
 import _ from "lodash"
 import { DataSource, Schema } from "mwater-expressions"
 import React, { CSSProperties } from "react"
-import { JsonQLFilter } from ".."
+import { JsonQLFilter } from "../JsonQLFilter"
 import LayerFactory from "./LayerFactory"
 import { MapLayerView } from "./MapDesign"
 

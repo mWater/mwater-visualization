@@ -1,7 +1,7 @@
 import { JsonQLQuery } from "jsonql";
 import { DataSource, Schema } from "mwater-expressions";
 import React from "react";
-import { JsonQLFilter } from "..";
+import { JsonQLFilter } from "../JsonQLFilter";
 import { BufferLayerDesign } from "./BufferLayerDesign";
 import Layer, { OnGridClickOptions, VectorTileDef } from "./Layer";
 import { OnGridClickResults } from "./maps";

@@ -1,5 +1,5 @@
 import { DataSource, Schema } from "mwater-expressions"
-import { JsonQLFilter } from ".."
+import { JsonQLFilter } from "../JsonQLFilter"
 import { MapDesign } from "./MapDesign"
 
 /** Calculates map bounds given layers by unioning together */

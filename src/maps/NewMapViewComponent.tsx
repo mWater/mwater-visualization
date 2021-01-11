@@ -3,7 +3,7 @@ import mapboxgl from "mapbox-gl"
 import { DataSource, Schema } from "mwater-expressions"
 import React, { CSSProperties, ReactNode, useEffect, useState } from "react"
 import { useRef } from "react"
-import { JsonQLFilter } from ".."
+import { JsonQLFilter } from "../JsonQLFilter"
 import { default as LayerFactory } from "./LayerFactory"
 import { MapDesign, MapLayerView } from "./MapDesign"
 import { MapDataSource } from "./MapDataSource"
@@ -523,7 +523,7 @@ export function NewMapViewComponent(props: {
   // Update max zoom
   useEffect(() => {
     if (map) {
-      map.setMaxZoom(props.design.maxZoom)
+      map.setMaxZoom(props.design.maxZoom || undefined)
     }
   }, [map, props.design.maxZoom])
   

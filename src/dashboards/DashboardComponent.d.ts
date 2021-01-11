@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react"
 import { DashboardDesign } from "./DashboardDesign"
 import { Schema, DataSource } from "mwater-expressions"
-import { JsonQLFilter } from ".."
+import { JsonQLFilter } from "../JsonQLFilter"
 import DashboardDataSource from './DashboardDataSource'
 
 /** Dashboard component that includes an action bar at the top

@@ -3,6 +3,7 @@ import { ReactElement } from "react";
 import React from "react"
 import { JsonQL } from "jsonql";
 import Widget from "./widgets/Widget";
+import { JsonQLFilter } from "./JsonQLFilter";
 
 export { default as LeafletMapComponent, MapBounds, TileLayer, GeoJsonLayer, MapLayer } from "./maps/LeafletMapComponent";
 
@@ -14,11 +15,7 @@ export * from './datagrids/DatagridDesign'
 
 export { default as TableSelectComponent } from './TableSelectComponent'
 
-export interface JsonQLFilter {
-  table: string
-  /** jsonql condition with {alias} for tableAlias. Use injectAlias to correct */
-  jsonql: JsonQL
-}
+export * from './JsonQLFilter'
 
 export { default as DashboardComponent } from './dashboards/DashboardComponent'
 export { default as DashboardDataSource } from './dashboards/DashboardDataSource'
@@ -30,20 +27,7 @@ export { default as compressJson } from './compressJson'
 
 export { default as LocaleContextInjector } from './LocaleContextInjector'
 
-/** Scope that a particular widget can apply when a part of it is clicked */
-export interface WidgetScope {
-  /** Human-readable name of the scope */
-  name: string
-
-  /** Filter as JsonQL */
-  filter: JsonQLFilter
-
-  /** Filter as an expression */
-  filterExpr: Expr
-
-  /** Widget-specific data */
-  data: any
-}
+export * from './WidgetScope'
 
 export { default as WidgetFactory } from './widgets/WidgetFactory'
 export { default as Widget } from './widgets/Widget'

@@ -1,6 +1,6 @@
 /// <reference types="react" />
 import { DataSource, Schema } from "mwater-expressions";
-import { JsonQLFilter } from "..";
+import { JsonQLFilter } from "../JsonQLFilter";
 import { MapLayerView } from "./MapDesign";
 export default function LegendComponent(props: {
     schema: Schema;

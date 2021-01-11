@@ -1,5 +1,5 @@
 import { injectTableAlias, Schema } from "mwater-expressions"
-import { JsonQLFilter } from ".."
+import { JsonQLFilter } from "../JsonQLFilter"
 import compressJson from '../compressJson'
 import { MapDesign, MapLayerView } from "./MapDesign"
 import querystring from 'querystring'

@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { DataSource, injectTableAlias, Schema } from "mwater-expressions";
-import { JsonQLFilter } from "..";
+import { JsonQLFilter } from "../JsonQLFilter"
 import BlocksLayoutManager from "../layouts/blocks/BlocksLayoutManager";
 import WidgetFactory from '../widgets/WidgetFactory';
 import LayerFactory from "./LayerFactory";

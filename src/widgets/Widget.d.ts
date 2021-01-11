@@ -1,6 +1,7 @@
 import { DataSource, Schema } from "mwater-expressions";
 import { ReactElement } from "react";
-import { JsonQLFilter, WidgetScope } from "..";
+import { JsonQLFilter } from "../JsonQLFilter"
+import { WidgetScope } from "../WidgetScope";
 
 export default class Widget {
   /** Creates a React element that is a view of the widget */

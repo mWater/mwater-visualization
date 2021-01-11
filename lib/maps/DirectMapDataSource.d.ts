@@ -1,8 +1,8 @@
 import { DataSource, Schema } from "mwater-expressions";
-import { JsonQLFilter } from "..";
+import { JsonQLFilter } from "../JsonQLFilter";
 import { MapDesign } from "./MapDesign";
 import { MapDataSource } from "./MapDataSource";
-import { LayerDataSource } from './LayerDataSource';
+import { MapLayerDataSource } from './MapLayerDataSource';
 interface DirectMapDataSourceOptions {
     /** schema to use */
     schema: Schema;
@@ -18,8 +18,8 @@ interface DirectMapDataSourceOptions {
 export default class DirectMapDataSource implements MapDataSource {
     options: DirectMapDataSourceOptions;
     constructor(options: DirectMapDataSourceOptions);
-    getLayerDataSource(layerId: string): LayerDataSource;
-    getBounds(design: MapDesign, filters: JsonQLFilter[], callback: (error: any, bounds: {
+    getLayerDataSource(layerId: string): MapLayerDataSource;
+    getBounds(design: MapDesign, filters: JsonQLFilter[], callback: (error: any, bounds?: {
         w: number;
         n: number;
         e: number;

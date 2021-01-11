@@ -1,4 +1,4 @@
-import { JsonQLFilter } from ".."
+import { JsonQLFilter } from "../JsonQLFilter"
 import { MapDataSource } from "../maps/MapDataSource"
 import { MapDesign } from "../maps/MapDesign"
 

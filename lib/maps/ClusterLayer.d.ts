@@ -1,7 +1,7 @@
 import { JsonQLQuery } from "jsonql";
 import { DataSource, Schema } from "mwater-expressions";
 import React from "react";
-import { JsonQLFilter } from "..";
+import { JsonQLFilter } from "../JsonQLFilter";
 import { ClusterLayerDesign } from "./ClusterLayerDesign";
 import Layer, { VectorTileDef } from "./Layer";
 export default class ClusterLayer extends Layer<ClusterLayerDesign> {

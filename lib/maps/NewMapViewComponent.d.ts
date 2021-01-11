@@ -1,6 +1,6 @@
 /// <reference types="react" />
 import { DataSource, Schema } from "mwater-expressions";
-import { JsonQLFilter } from "..";
+import { JsonQLFilter } from "../JsonQLFilter";
 import { MapDesign } from "./MapDesign";
 import { MapDataSource } from "./MapDataSource";
 import 'mapbox-gl/dist/mapbox-gl.css';

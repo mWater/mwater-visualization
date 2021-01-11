@@ -1,5 +1,5 @@
 import { DataSource, Schema } from "mwater-expressions";
-import { JsonQLFilter } from "..";
+import { JsonQLFilter } from "../JsonQLFilter"
 import { MapDataSource } from "../maps/MapDataSource";
 import Widget from "./Widget";
 import { WidgetDataSource } from "./WidgetDataSource";

@@ -1,4 +1,4 @@
-import { JsonQLFilter } from ".."
+import { JsonQLFilter } from "../JsonQLFilter"
 import { WidgetDataSource } from "../widgets/WidgetDataSource";
 
 /** Data source for a layer of a map. Gives urls, popup data */

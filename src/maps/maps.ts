@@ -1,5 +1,5 @@
 import { JsonQL } from "jsonql";
-import { JsonQLFilter } from "..";
+import { JsonQLFilter } from "../JsonQLFilter"
 import { MapLayerDataSource } from "./MapLayerDataSource";
 import { MapDesign } from "./MapDesign";
 

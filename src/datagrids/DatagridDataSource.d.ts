@@ -1,5 +1,5 @@
 import { DatagridDesign } from "./DatagridDesign"
-import { JsonQLFilter } from ".."
+import { JsonQLFilter } from "../JsonQLFilter"
 import { Row } from "mwater-expressions"
 import { QuickfiltersDataSource } from "../quickfilter/QuickfiltersDataSource"
 

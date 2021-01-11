@@ -1,8 +1,8 @@
 import { DataSource, Schema } from "mwater-expressions";
 import React from "react";
-import { DashboardDataSource, JsonQLFilter } from "..";
 import { DashboardDesign } from "./DashboardDesign";
-
+import { JsonQLFilter } from "../JsonQLFilter"
+import DashboardDataSource from "./DashboardDataSource";
 
 /**
  * Displays a dashboard, handling removing of widgets. No title bar or other decorations.

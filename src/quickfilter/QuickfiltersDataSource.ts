@@ -1,4 +1,4 @@
-import { JsonQLFilter } from "..";
+import { JsonQLFilter } from "../JsonQLFilter"
 import { Expr } from "mwater-expressions";
 
 /** Data source that returns values for text-based and id-based quickfilters. Allows client-server model that supports sharing */

@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import $ from 'jquery'
 import { DataSource, Expr, injectTableAlias } from "mwater-expressions"
-import { compressJson, JsonQLFilter } from ".."
+import { JsonQLFilter } from "../JsonQLFilter"
 import querystring from 'querystring'
 import { QuickfiltersDataSource } from "../quickfilter/QuickfiltersDataSource"
 import { MapDesign, MapLayerView } from '../maps/MapDesign'
@@ -9,6 +9,7 @@ import { MapDataSource } from '../maps/MapDataSource'
 import { MapLayerDataSource } from '../maps/MapLayerDataSource'
 import LayerFactory from '../maps/LayerFactory'
 import { WidgetDataSource } from '../widgets/WidgetDataSource'
+import compressJson from '../compressJson'
 
 interface ServerDashboardDataSourceOptions {
   /** API url to use for talking to mWater server */
