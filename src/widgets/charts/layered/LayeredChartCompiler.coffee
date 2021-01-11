@@ -7,9 +7,10 @@ injectTableAlias = require('mwater-expressions').injectTableAlias
 d3Format = require 'd3-format'
 
 commaFormatter = d3Format.format(",")
-pieLabelValueFormatter = (format) -> 
+pieLabelValueFormatter = (format, hidePercent = false) -> 
+  percent = (ratio) -> if hidePercent then "" else "(#{d3Format.format('.1%')(ratio)})"
   return (value, ratio, id) -> 
-    return if format[id] then "#{format[id](value)} (#{d3Format.format('.1%')(ratio)})" else "#{d3Format.format(",")(value)} (#{d3Format.format('.1%')(ratio)})"
+    return if format[id] then "#{format[id](value)} #{percent(ratio)}" else "#{d3Format.format(",")(value)} #{percent(ratio)}"
 labelValueFormatter = (format) -> 
   return (value, ratio, id) -> 
     return if format[id] then format[id](value) else value
@@ -152,13 +153,15 @@ module.exports = class LayeredChartCompiler
       size: { width: options.width, height: options.height }
       pie: { 
         label: {
-          format: if options.design.labels then pieLabelValueFormatter(c3Data.format)
+          show: !options.design.hidePercentage || !!options.design.labels
+          format: if options.design.labels then pieLabelValueFormatter(c3Data.format, options.design.hidePercentage)
         }
         expand: false # Don't expand/contract
       } 
       donut: { 
         label: {
-          format: if options.design.labels then pieLabelValueFormatter(c3Data.format)
+          show: !options.design.hidePercentage || !!options.design.labels
+          format: if options.design.labels then pieLabelValueFormatter(c3Data.format, options.design.hidePercentage)
         }
         expand: false # Don't expand/contract
       } 
