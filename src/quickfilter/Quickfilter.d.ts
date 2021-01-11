@@ -18,3 +18,12 @@ export interface Quickfilter {
   /** true for multi-select (text and enum and enumset only) */
   multi?: boolean
 }
+
+/** Lock on a quickfilter */
+export interface QuickfilterLock {
+  /** Expression that is locked to a specific value */
+  expr: Expr
+
+  /** Value of the lock */
+  value: any
+}
