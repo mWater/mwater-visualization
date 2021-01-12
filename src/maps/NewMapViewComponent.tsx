@@ -509,7 +509,7 @@ export function NewMapViewComponent(props: {
     }
   }, [map, props.design.filters, props.design.globalFilters, props.extraFilters, props.design.autoBounds])
 
-  // Update bounds if changed
+  // Set initial bounds
   useEffect(() => {
     if (!map) {
       return
@@ -518,7 +518,7 @@ export function NewMapViewComponent(props: {
     if (!props.design.autoBounds && props.design.bounds) {
       map.fitBounds([props.design.bounds.w, props.design.bounds.s, props.design.bounds.e, props.design.bounds.n])
     }
-  }, [map, props.design.bounds])
+  }, [map])
 
   // Update max zoom
   useEffect(() => {
