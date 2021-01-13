@@ -137,7 +137,6 @@ class ServerLayerDataSource implements MapLayerDataSource {
    * @param createdAfter ISO 8601 timestamp requiring that tile source on server is created after specified datetime
    */
   async getVectorTileUrl(layerDesign: any, filters: JsonQLFilter[], createdAfter: string): Promise<{ url: string, expires: string }> {
-    throw new Error("TODO") // ###
     const qs = querystring.stringify({
       client: this.options.client,
       share: this.options.share
@@ -145,24 +144,30 @@ class ServerLayerDataSource implements MapLayerDataSource {
 
     const url =  `${this.options.apiUrl}vector_tiles/create_token/maps/${this.options.mapId}/layers/${this.options.layerView.id}?${qs}`
 
-    const body = {
-      filters: compressJson(filters || []),
-      createdAfter: createdAfter
+    const request: {
+      createdAfter?: string
+      expiresAfter: string
+      filters: string
+    } = {
+      createdAfter: createdAfter,
+      // 12 hours
+      expiresAfter: new Date(Date.now() + 1000 * 3600 * 12).toISOString(),
+      filters: compressJson(filters || [])
     }
 
-    const req = await fetch(url, { 
+    const response = await fetch(url, { 
       method: "POST",
-      body: JSON.stringify(body),
+      body: JSON.stringify(request),
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }
     })
 
-    if (!req.ok) {
-      throw new Error("Error getting tiles")
+    if (!response.ok) {
+      throw new Error("Error getting tiles token")
     }
-    
+    return await response.json()
   }
 
   // Gets widget data source for a popup widget
