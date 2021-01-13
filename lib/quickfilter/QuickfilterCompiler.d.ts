@@ -1,6 +1,6 @@
 import { Schema } from "mwater-expressions"
 import { JsonQLFilter } from "../JsonQLFilter"
-import { Quickfilter } from "./Quickfilter"
+import { Quickfilter, QuickfilterLock } from "./Quickfilter"
 
 /** Compiles quickfilter values into filters */
 export default class QuickfilterCompiler {
@@ -12,5 +12,5 @@ export default class QuickfilterCompiler {
    * Returns array of filters { table: table id, jsonql: JsonQL with {alias} for the table name to filter by }
    * See README for values
    */
-  compile(design: Quickfilter[], values: any[], locks: any[]): JsonQLFilter[]
+  compile(design: Quickfilter[], values: any[] | null, locks: QuickfilterLock[]): JsonQLFilter[]
 }

@@ -42,7 +42,7 @@ declare class ServerLayerDataSource implements MapLayerDataSource {
     getTileUrl(design: any, filters: JsonQLFilter[]): string | null;
     getUtfGridUrl(design: any, filters: JsonQLFilter[]): string | null;
     /** Get the url for vector tile source with an expiry time. Only for layers of type "VectorTile"
-     * @param createdAfter ISO 8601 timestamp requiring that tile soruce on server is created after specified datetime
+     * @param createdAfter ISO 8601 timestamp requiring that tile source on server is created after specified datetime
      */
     getVectorTileUrl(layerDesign: any, filters: JsonQLFilter[], createdAfter: string): Promise<{
         url: string;

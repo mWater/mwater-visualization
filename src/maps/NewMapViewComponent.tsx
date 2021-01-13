@@ -523,7 +523,7 @@ export function NewMapViewComponent(props: {
   // Update max zoom
   useEffect(() => {
     if (map) {
-      map.setMaxZoom(props.design.maxZoom || undefined)
+      map.setMaxZoom(props.design.maxZoom != null ? props.design.maxZoom : undefined)
     }
   }, [map, props.design.maxZoom])
   
