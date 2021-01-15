@@ -11,9 +11,9 @@ LeafletLoading = require './LeafletLoading'
 # See https://github.com/PaulLeCam/react-leaflet/issues/255#issuecomment-261904061 for issue with CSS + webpack
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png').default,
+  iconUrl: require('leaflet/dist/images/marker-icon.png').default,
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png').default,
 })
 
 # Leaflet map component that displays a base layer, a tile layer and an optional interactivity layer
