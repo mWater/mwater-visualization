@@ -389,22 +389,22 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     // Should only display markers when it is a point geometry
     css += `\
 #layer0[geometry_type='ST_Point'] {
-  marker-fill: ` + (design.color || "#666666") + `
-marker-width: ` + (design.markerSize || 10) + `
+  marker-fill: ` + (design.color || "#666666") + `;
+marker-width: ` + (design.markerSize || 10) + `;
 marker-line-color: white;\
 ` + stroke + `\
-marker-line-opacity: 0.6
+marker-line-opacity: 0.6;
 marker-placement: point;\
 ` + symbol + `\
-  marker-allow-overlap: true
+  marker-allow-overlap: true;
 }
 #layer0 {
-  line-color: ` + (design.color || "#666666") + `
-line-width: ` + ((design.lineWidth != null) ? design.lineWidth : "3") + `
+  line-color: ` + (design.color || "#666666") + `;
+line-width: ` + ((design.lineWidth != null) ? design.lineWidth : "3") + `;
 }
 #layer0[geometry_type='ST_Polygon'],#layer0[geometry_type='ST_MultiPolygon'] {
-  polygon-fill: ` + (design.color || "#666666") + `
-  polygon-opacity: 0.25
+  polygon-fill: ` + (design.color || "#666666") + `;
+  polygon-opacity: 0.25;
 }
 \
 `
@@ -422,7 +422,7 @@ line-width: ` + ((design.lineWidth != null) ? design.lineWidth : "3") + `
 #layer0[color=` + JSON.stringify(item.value) + '] { line-color: ' + item.color + ` }
 #layer0[color=` + JSON.stringify(item.value) + '][geometry_type=\'ST_Point\'] { marker-fill: ' + item.color + ` }
 #layer0[color=` + JSON.stringify(item.value) + '][geometry_type=\'ST_Polygon\'],#layer0[color=' + JSON.stringify(item.value) + `][geometry_type='ST_MultiPolygon'] { 
-polygon-fill: ` + item.color + `\
+polygon-fill: ` + item.color + `;\
 }\
 `
         }

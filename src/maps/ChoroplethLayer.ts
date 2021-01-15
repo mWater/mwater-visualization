@@ -1044,11 +1044,11 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
   createCss(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): string {
     let css = `\
 #layer0 {
-  line-color: ${design.borderColor || "#000"}
-  line-width: 1.5
-  line-opacity: 0.5
-  polygon-opacity: ` + (design.fillOpacity * design.fillOpacity) + `
-  polygon-fill: ` + (design.color || "transparent") + `
+  line-color: ${design.borderColor || "#000"};
+  line-width: 1.5;
+  line-opacity: 0.5;
+  polygon-opacity: ` + (design.fillOpacity * design.fillOpacity) + `;
+  polygon-fill: ` + (design.color || "transparent") + `;
 }
 \
 `
@@ -1056,11 +1056,11 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     if (design.displayNames) {
       css += `\
 #layer0::labels {
-  text-name: [name]
-  text-face-name: 'Arial Regular'
-  text-halo-radius: 2
-  text-halo-opacity: 0.5
-  text-halo-fill: #FFF
+  text-name: [name];
+  text-face-name: 'Arial Regular';
+  text-halo-radius: 2;
+  text-halo-opacity: 0.5;
+  text-halo-fill: #FFF;
 }\
 `
     }

@@ -32,6 +32,9 @@ export * from './WidgetScope'
 export { default as WidgetFactory } from './widgets/WidgetFactory'
 export { default as Widget } from './widgets/Widget'
 
+export * from './maps/MapViewComponent'
+export { MapScope } from './maps/MapUtils'
+
 export class MWaterLoaderComponent extends React.Component<{
   apiUrl: string
   client?: string

@@ -19,7 +19,7 @@ exports.UtfGridLayer = require './maps/UtfGridLayer'
 exports.LeafletMapComponent = require './maps/LeafletMapComponent'
 
 exports.LayerFactory = require './maps/LayerFactory'
-exports.MapViewComponent = require './maps/MapViewComponent'
+exports.MapViewComponent = require('./maps/MapViewComponent').MapViewComponent
 exports.MapDesignerComponent = require './maps/MapDesignerComponent'
 exports.MapComponent = require './maps/MapComponent'
 

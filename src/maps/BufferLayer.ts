@@ -464,13 +464,13 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
   createCss(design: BufferLayerDesign, schema: Schema) {
     let css = `\
 #layer0 {
-  marker-fill-opacity: ` + design.fillOpacity + `
-marker-type: ellipse
-marker-width: [width]
-marker-line-width: 0
-marker-allow-overlap: true
-marker-ignore-placement: true
-marker-fill: ` + (design.color || "transparent") + `
+  marker-fill-opacity: ` + design.fillOpacity + `;
+marker-type: ellipse;
+marker-width: [width];
+marker-line-width: 0;
+marker-allow-overlap: true;
+marker-ignore-placement: true;
+marker-fill: ` + (design.color || "transparent") + `;
 }\
 `
 

@@ -2,8 +2,15 @@
 
 import _ from "lodash"
 import { Expr, ExprCleaner, ExprCompiler, ExprUtils, FieldExpr, Schema } from "mwater-expressions"
+import { JsonQLFilter } from "../JsonQLFilter"
 import LayerFactory from "./LayerFactory"
 import { MapDesign } from "./MapDesign"
+
+export interface MapScope {
+  name: string
+  filter: JsonQLFilter
+  data: { layerViewId: string, data: any }
+}
 
 // Check if can convert to a cluster map. Only maps containing marker views can be
 export function canConvertToClusterMap(design: MapDesign) {

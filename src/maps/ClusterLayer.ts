@@ -496,32 +496,32 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
   createCss(design: ClusterLayerDesign, schema: Schema) {
     const css = `\
 #layer0 [cnt>1] {
-  marker-width: [size]
-  marker-line-color: white
-  marker-line-width: 4
-  marker-line-opacity: 0.6
-  marker-placement: point
-  marker-type: ellipse
-  marker-allow-overlap: true
-  marker-fill: ` + (design.fillColor || "#337ab7") + `
+  marker-width: [size];
+  marker-line-color: white;
+  marker-line-width: 4;
+  marker-line-opacity: 0.6;
+  marker-placement: point;
+  marker-type: ellipse;
+  marker-allow-overlap: true;
+  marker-fill: ` + (design.fillColor || "#337ab7") + `;
 }
 
 #layer0::l1 [cnt>1] { 
-  text-name: [cnt]
-  text-face-name: 'Arial Bold'
-  text-allow-overlap: true
-  text-fill: ` + (design.textColor || "white") + `
+  text-name: [cnt];
+  text-face-name: 'Arial Bold';
+  text-allow-overlap: true;
+  text-fill: ` + (design.textColor || "white") + `;
 }
 
 #layer0 [cnt=1] {
-  marker-width: 10
-  marker-line-color: white
-  marker-line-width: 2
-  marker-line-opacity: 0.6
-  marker-placement: point
-  marker-type: ellipse
-  marker-allow-overlap: true
-  marker-fill: ` + (design.fillColor || "#337ab7") + `
+  marker-width: 10;
+  marker-line-color: white;
+  marker-line-width: 2;
+  marker-line-opacity: 0.6;
+  marker-placement: point;
+  marker-type: ellipse;
+  marker-allow-overlap: true;
+  marker-fill: ` + (design.fillColor || "#337ab7") + `;
 }\
 `
 

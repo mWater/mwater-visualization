@@ -12,7 +12,7 @@ LayerSwitcherComponent = require('./LayerSwitcherComponent').LayerSwitcherCompon
 LegendComponent = require('./LegendComponent').default
 
 # Component that displays just the map
-module.exports = class MapViewComponent extends React.Component
+module.exports = class OldMapViewComponent extends React.Component
   @propTypes:
     schema: PropTypes.object.isRequired # Schema to use
     dataSource: PropTypes.object.isRequired # data source to use

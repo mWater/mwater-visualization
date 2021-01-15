@@ -9,12 +9,11 @@ import { MapDesign, MapLayerView } from "./MapDesign"
 import { MapDataSource } from "./MapDataSource"
 import { mapSymbols } from "./mapSymbols"
 import ModalPopupComponent from 'react-library/lib/ModalPopupComponent'
-import { getCompiledFilters as utilsGetCompiledFilters, getFilterableTables as utilsGetFilterableTables } from './MapUtils'
+import { getCompiledFilters as utilsGetCompiledFilters, getFilterableTables as utilsGetFilterableTables, MapScope } from './MapUtils'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { LayerSwitcherComponent } from "./LayerSwitcherComponent"
 import LegendComponent from "./LegendComponent"
-import { string } from "prop-types"
 
 type LayerClickHandlerEvent = mapboxgl.MapMouseEvent & {
   features?: mapboxgl.MapboxGeoJSONFeature[] | undefined;
@@ -592,12 +591,6 @@ export function NewMapViewComponent(props: {
     { renderLegend() }
     { renderBusy() }
   </div>
-}
-
-interface MapScope {
-  name: string
-  filter: JsonQLFilter
-  data: { layerViewId: string, data: any }
 }
 
 /** Add all symbols needed to the map */

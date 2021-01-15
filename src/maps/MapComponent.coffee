@@ -3,8 +3,7 @@ _ = require 'lodash'
 React = require 'react'
 R = React.createElement
 
-# MapViewComponent = require './MapViewComponent'
-MapViewComponent = require('./NewMapViewComponent').NewMapViewComponent
+MapViewComponent = require('./MapViewComponent').MapViewComponent
 MapDesignerComponent = require './MapDesignerComponent'
 MapControlComponent = require './MapControlComponent'
 AutoSizeComponent = require('react-library/lib/AutoSizeComponent')

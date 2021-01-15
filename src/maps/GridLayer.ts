@@ -390,9 +390,9 @@ export default class GridLayer extends Layer<GridLayerDesign> {
   createCss(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): string {
     let css = `
 #layer0 {
-  polygon-opacity: ` + design.fillOpacity + `
+  polygon-opacity: ` + design.fillOpacity + `;
   ` + (design.borderStyle == "color" ? `line-opacity: ` + (1 - (1 - design.fillOpacity!) / 2) + `; ` : `line-width: 0;`) + `
-  polygon-fill: transparent
+  polygon-fill: transparent;
 }
 \
 `
