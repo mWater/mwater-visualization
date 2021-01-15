@@ -120,7 +120,7 @@ class MapWidgetComponent extends React.Component
 
   renderContent: (design, onDesignChange, width, height) ->
     # Require here to prevent server require problems
-    MapViewComponent = require '../maps/MapViewComponent'
+    MapViewComponent = require('../maps/MapViewComponent').MapViewComponent
 
     R 'div', style: { width: width, height: height, padding: 10 },
       React.createElement(MapViewComponent, {
