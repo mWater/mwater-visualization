@@ -3,10 +3,9 @@ import { DataSource, Schema } from "mwater-expressions";
 import { JsonQLFilter } from "../JsonQLFilter";
 import { MapDesign } from "./MapDesign";
 import { MapDataSource } from "./MapDataSource";
-import { MapScope } from './MapUtils';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import { MapScope } from "./MapUtils";
 /** Component that displays just the map */
-export declare function NewMapViewComponent(props: {
+export declare function MapViewComponent(props: {
     schema: Schema;
     dataSource: DataSource;
     mapDataSource: MapDataSource;
