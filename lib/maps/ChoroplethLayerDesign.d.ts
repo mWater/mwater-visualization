@@ -39,8 +39,6 @@ export default interface ChoroplethLayerDesign {
     fillOpacity: number;
     /** Border color (default to #000) */
     borderColor?: string | null;
-    /** Border opacity (default to 0.5) */
-    borderOpacity?: number;
     /** true to display name labels on regions */
     displayNames: boolean;
     /** contains items: which is BlocksLayoutManager items. Will be displayed when the region is clicked. Only when region mode is "indirect" */

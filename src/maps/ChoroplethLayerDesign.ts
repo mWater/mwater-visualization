@@ -53,9 +53,6 @@ export default interface ChoroplethLayerDesign {
   /** Border color (default to #000) */
   borderColor?: string | null
 
-  /** Border opacity (default to 0.5) */
-  borderOpacity?: number
-
   /** true to display name labels on regions */
   displayNames: boolean
 
