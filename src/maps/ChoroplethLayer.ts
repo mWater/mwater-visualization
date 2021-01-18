@@ -184,7 +184,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         // default with grey to compensate
         "line-color": design.borderColor || "#808080",
         "line-opacity": opacity, // 0.5 * opacity,
-        "line-width": 1.5
+        "line-width": 1
       }
     })
 
@@ -483,7 +483,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         // default with grey to compensate
         "line-color": design.borderColor || "#808080",
         "line-opacity": opacity, // 0.5 * opacity,
-        "line-width": 1.5
+        "line-width": 1
       }
     })
 
@@ -692,7 +692,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         // default with grey to compensate
         "line-color": design.borderColor || "#808080" ,
         "line-opacity": opacity, // 0.5 * opacity,
-        "line-width": 1.5
+        "line-width": 1
       }
     })
 
