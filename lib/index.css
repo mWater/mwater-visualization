@@ -468,3 +468,8 @@
 .fa.green {
   color: green;
 }
+
+/* Remove black outline in mapbox map */
+.mapboxgl-map * {
+  outline: none;
+}
