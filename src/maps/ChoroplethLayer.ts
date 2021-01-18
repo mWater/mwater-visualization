@@ -182,7 +182,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       paint: {
         // Because of https://github.com/mapbox/mapbox-gl-js/issues/4090, line opacities < 1 create artifacts. Replace
         // default with grey to compensate
-        "line-color": design.borderColor || "#808080",
+        "line-color": design.borderColor || "#606060",
         "line-opacity": opacity, // 0.5 * opacity,
         "line-width": 1
       }
@@ -481,7 +481,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       paint: {
         // Because of https://github.com/mapbox/mapbox-gl-js/issues/4090, line opacities < 1 create artifacts. Replace
         // default with grey to compensate
-        "line-color": design.borderColor || "#808080",
+        "line-color": design.borderColor || "#606060",
         "line-opacity": opacity, // 0.5 * opacity,
         "line-width": 1
       }
@@ -690,7 +690,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       paint: {
         // Because of https://github.com/mapbox/mapbox-gl-js/issues/4090, line opacities < 1 create artifacts. Replace
         // default with grey to compensate
-        "line-color": design.borderColor || "#808080" ,
+        "line-color": design.borderColor || "#606060" ,
         "line-opacity": opacity, // 0.5 * opacity,
         "line-width": 1
       }
