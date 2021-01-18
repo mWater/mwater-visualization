@@ -311,7 +311,10 @@ export function NewMapViewComponent(props: {
     // Speed up wheel scrolling
     m.scrollZoom.setWheelZoomRate(1/250)
 
-    setMap(m)
+    // Wait until map loaded before setting style
+    m.on("load", () => {
+      setMap(m)
+    })
 
     return () => {
       m.remove()
