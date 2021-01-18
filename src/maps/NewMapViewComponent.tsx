@@ -64,8 +64,10 @@ export function NewMapViewComponent(props: {
   const [map, setMap] = useState<mapboxgl.Map>()
   const divRef = useRef<HTMLDivElement | null>(null)
 
-  /** Current design (to detect if has changed) */
-  const designRef = useRef<MapDesign>()
+  /** Increments when a new user style is being generated. Indicates that
+   * a change was made, so to discard current one
+   */
+  const userStyleIncrRef = useRef(0)
 
   /** Style of the base layer */
   const [baseStyle, setBaseStyle] = useState<mapboxgl.Style>()
@@ -94,9 +96,6 @@ export function NewMapViewComponent(props: {
   // State of legend
   const initialLegendDisplay = props.design.initialLegendDisplay || "open"
   const [legendHidden, setLegendHidden] = useState(initialLegendDisplay == "closed" || (props.width < 500 && initialLegendDisplay == "closedIfSmall"))
-
-  // Store design in ref to detect changes
-  useEffect(() => { designRef.current = props.design }, [props.design])
 
   // Store handleClick function in a ref
   const handleLayerClickRef = useRef<(layerViewId: string, ev: { data: any, event: any }) => void>()
@@ -164,6 +163,10 @@ export function NewMapViewComponent(props: {
 
   /** Determine user style */
   async function updateUserStyle() {
+    // Determine current userStyleIncr
+    userStyleIncrRef.current = userStyleIncrRef.current + 1
+    const currentUserStyleIncr = userStyleIncrRef.current
+
     // Keep track of expires
     let earliestExpires: string | null = null
 
@@ -256,8 +259,8 @@ export function NewMapViewComponent(props: {
         }
       }
 
-      // If design has changed, abort update
-      if (props.design != designRef.current) {
+      // If incremented, abort update, as is stale
+      if (userStyleIncrRef.current != currentUserStyleIncr) {
         return
       }
 
@@ -311,10 +314,7 @@ export function NewMapViewComponent(props: {
     // Speed up wheel scrolling
     m.scrollZoom.setWheelZoomRate(1/250)
 
-    // Wait until map loaded before setting style
-    m.on("load", () => {
-      setMap(m)
-    })
+    setMap(m)
 
     return () => {
       m.remove()
