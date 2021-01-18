@@ -326,7 +326,9 @@ class ServerWidgetLayerDataSource implements MapLayerDataSource {
     if (!response.ok) {
       throw new Error("Error getting tiles token")
     }
-    return await response.json()
+    const { token, expires } = await response.json()
+
+    return { url: this.options.apiUrl + `vector_tiles/tiles/{z}/{x}/{y}?token=${token}`, expires }
   }
 
   // Gets widget data source for a popup widget
