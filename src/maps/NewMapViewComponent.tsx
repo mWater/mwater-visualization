@@ -67,31 +67,28 @@ export function NewMapViewComponent(props: {
   /** Current design (to detect if has changed) */
   const designRef = useRef<MapDesign>()
 
-  /** Layers present */
-  const currentLayersRef = useRef<mapboxgl.AnyLayer[]>([])
+  /** Style of the base layer */
+  const [baseStyle, setBaseStyle] = useState<mapboxgl.Style>()
 
-  /** Sources present */
-  const currentSourcesRef = useRef<{ id: string, sourceData: mapboxgl.AnySourceData }[]>([])
+  /** Style of user layers */
+  const [userStyle, setUserStyle] = useState<mapboxgl.Style>()
 
   /** Busy incrementable counter. Is busy if > 0 */
   const [busy, setBusy] = useState(0)
 
-  /** Layer click handlers present */
-  const currentLayerClickHandlers = useRef<{ layerId: string, clickHandler: (ev: LayerClickHandlerEvent) => void }[]>([])
+  /** Layer click handlers to attach */
+  const [layerClickHandlers, setLayerClickHandlers] = useState<{ layerViewId: string, mapLayerId: string }[]>([])
 
   /** True when symbols have been added to map */
   const [symbolsAdded, setSymbolsAdded] = useState(false)
 
-  /** Base layer id currently loaded */
-  const [baseLayerLoaded, setBaseLayerLoaded] = useState("")
-
   /** Contents of popup if open */
   const [popupContents, setPopupContents] = useState<ReactNode>()
 
-  /** Datetime layers must have been created after on server. Used to support refreshing */
+  /** Date-time layers must have been created after on server. Used to support refreshing */
   const [layersCreatedAfter, setLayersCreatedAfter] = useState(new Date().toISOString())
 
-  /** Datetime layers expire and must be recreated */
+  /** Date-time layers expire and must be recreated */
   const layersExpire = useRef<string>()
 
   // State of legend
@@ -165,12 +162,8 @@ export function NewMapViewComponent(props: {
     return (props.extraFilters || []).concat(utilsGetCompiledFilters(props.design, props.schema, utilsGetFilterableTables(props.design, props.schema)))
   }
 
-  /** Make layers of map match the design */
-  async function updateLayers() {
-    if (!map) {
-      return
-    }
-
+  /** Determine user style */
+  async function updateUserStyle() {
     // Keep track of expires
     let earliestExpires: string | null = null
 
@@ -180,7 +173,7 @@ export function NewMapViewComponent(props: {
     const scopedCompiledFilters = props.scope ? compiledFilters.concat([props.scope.filter]) : compiledFilters
 
     // Sources to add
-    const newSources: { id: string, sourceData: mapboxgl.AnySourceData }[] = []
+    const newSources: { [id: string]: mapboxgl.AnySourceData } = {}
     const newLayers: { layerViewId: string | null, layer: mapboxgl.AnyLayer }[] = []
 
     // Mapbox layers with click handlers. Each is in format 
@@ -215,10 +208,10 @@ export function NewMapViewComponent(props: {
         }
 
         // Add source
-        newSources.push({ id: layerView.id, sourceData: {
+        newSources[layerView.id] = {
           type: "vector",
           tiles: [url]
-        }})
+        }
 
         // Add layer
         const vectorTileDef = layer.getVectorTile(layerView.design, layerView.id, props.schema, filters, opacity)
@@ -230,10 +223,10 @@ export function NewMapViewComponent(props: {
       else {
         const tileUrl = props.mapDataSource.getLayerDataSource(layerView.id).getTileUrl(layerView.design, [])
         if (tileUrl) {
-          newSources.push({ id: layerView.id, sourceData: {
+          newSources[layerView.id] = {
             type: "raster",
             tiles: [tileUrl]
-          }})
+          }
 
           newLayers.push({
             layerViewId: layerView.id, 
@@ -273,48 +266,13 @@ export function NewMapViewComponent(props: {
         layersExpire.current = earliestExpires
       }
 
-      // If sources is unchanged TODO
+      setLayerClickHandlers(newClickHandlers)
 
-      // Remove existing layers and sources
-      for (const currentLayer of currentLayersRef.current) {
-        map.removeLayer(currentLayer.id)
-      }
-      currentLayersRef.current = []
-
-      for (const source of currentSourcesRef.current) {
-        map.removeSource(source.id)
-      }
-      currentSourcesRef.current = []
-
-      // Remove click handlers
-      for (const currentLayerClickHandler of currentLayerClickHandlers.current) {
-        map.off("click", currentLayerClickHandler.layerId, currentLayerClickHandler.clickHandler)
-      }
-      currentLayerClickHandlers.current = []
-
-      // Add sources and layers
-      for (const source of newSources) {
-        map.addSource(source.id, source.sourceData)
-        currentSourcesRef.current.push(source)
-      }
-
-      for (const newLayer of newLayers) {
-        map.addLayer(newLayer.layer)
-        currentLayersRef.current.push(newLayer.layer)
-      }
-
-      for (const newClickHandler of newClickHandlers) {
-        const clickHandler = (ev: LayerClickHandlerEvent) => {
-          if (ev.features && ev.features[0]) {
-            handleLayerClickRef.current!(newClickHandler.layerViewId, { 
-              data: ev.features![0].properties, 
-              event: ev
-            })
-          }
-        }
-        map.on("click", newClickHandler.mapLayerId, clickHandler)
-        currentLayerClickHandlers.current.push({ layerId: newClickHandler.mapLayerId, clickHandler })
-      }
+      setUserStyle({
+        version: 8,
+        sources: newSources,
+        layers: newLayers.map(nl => nl.layer)
+      })
     }
     finally {
       setBusy(b => b - 1)
@@ -366,18 +324,6 @@ export function NewMapViewComponent(props: {
       return
     }
   
-    function addBaseLayerOpacity() {
-      // Create background layer to simulate base layer opacity
-      map!.addLayer({
-        id: "baseLayerOpacity",
-        type: "background",
-        paint: {
-          "background-color": "white",
-          "background-opacity": 0
-        }
-      })
-    }
-
     let style: string | undefined
     if (props.design.baseLayer == "cartodb_positron") {
       style = 'light-v10' 
@@ -393,41 +339,20 @@ export function NewMapViewComponent(props: {
     }
 
     if (!style) {
-      // Clear style and update layers
-      map.setStyle(null as any)
-      currentLayersRef.current = []
-      currentSourcesRef.current = []
-      // Prevent not loaded error
-      setTimeout(() => {
-        addBaseLayerOpacity()
-        setBaseLayerLoaded("blank")
-      }, 0)
-      return
+      setBaseStyle({
+        version: 8,
+        layers: [],
+        sources: {}
+      })
     }
 
     // Load style
     const styleUrl = `https://api.mapbox.com/styles/v1/mapbox/${style}?access_token=pk.eyJ1IjoiY2xheXRvbmdyYXNzaWNrIiwiYSI6ImNpcHk4MHMxZDB5NHVma20ya3k1dnp3bzQifQ.lMMb60WxiYfRF0V4Y3UTbQ`
-    fetch(styleUrl).then(response => response.json()).then(styleData => {
+    fetch(styleUrl).then(response => response.json()).then((styleData: mapboxgl.Style) => {
       // Set style and update layers
-      map.setStyle(styleData)
-      currentLayersRef.current = []
-      currentSourcesRef.current = []
-      // Prevent not loaded error
-      setTimeout(() => {
-        addBaseLayerOpacity()
-        setBaseLayerLoaded(style!)
-      }, 0)
+      setBaseStyle(styleData)
     })
   }, [map, props.design.baseLayer])
-
-  // Update base layer opacity
-  useEffect(() => {
-    if (!map || !baseLayerLoaded) {
-      return
-    }
-
-    map.setPaintProperty("baseLayerOpacity", "background-opacity",  1 - (props.design.baseLayerOpacity != null ? props.design.baseLayerOpacity : 1))
-  }, [map, baseLayerLoaded, props.design.baseLayerOpacity])
 
   // Load symbols
   useEffect(() => {
@@ -440,21 +365,78 @@ export function NewMapViewComponent(props: {
       setSymbolsAdded(true)
     })
   }, [map])
-  
-  // Load layers on map
+
+  // Update user layers
   useEffect(() => {
-    // Can't load until added 
-    if (!symbolsAdded) {
+    updateUserStyle()
+  }, [props.design.layerViews, props.scope, baseStyle, layersCreatedAfter])
+
+  // Update map style
+  useEffect(() => {
+    // Can't load until map, symbols, baseStyle and userStyle are present
+    if (!map || !symbolsAdded || !baseStyle || !userStyle) {
       return
     }
 
+    // Create background layer to simulate base layer opacity
+    const baseLayerOpacityLayer: mapboxgl.AnyLayer = {
+      id: "baseLayerOpacity",
+      type: "background",
+      paint: {
+        "background-color": "white",
+        "background-opacity": 1 - (props.design.baseLayerOpacity != null ? props.design.baseLayerOpacity : 1)
+      }
+    }
+
+    // Create style
+    let layers = baseStyle.layers!
+
+    // Simulate base opacity
+    if (props.design.baseLayerOpacity != null && props.design.baseLayerOpacity < 1) {
+      layers = layers.concat([baseLayerOpacityLayer])
+    }
+
+    layers = layers.concat(userStyle.layers!)
+
+    const style: mapboxgl.Style = {
+      ...baseStyle,
+      sources: {
+        ...baseStyle.sources,
+        ...userStyle.sources
+      },
+      layers
+    }
+
+    map.setStyle(style)
+  }, [map, symbolsAdded, baseStyle, userStyle, props.design.baseLayerOpacity])
+
+  // Setup click handlers
+  useEffect(() => {
     if (!map) {
       return
     }
 
-    updateLayers()
-  }, [map, symbolsAdded, props.design.layerViews, props.scope, baseLayerLoaded, layersCreatedAfter, props.design.baseLayerOpacity])
+    const removes: { (): void }[] = []
 
+    for (const clickHandler of layerClickHandlers) {
+      const onClick = (ev: LayerClickHandlerEvent) => {
+        if (ev.features && ev.features[0]) {
+          handleLayerClickRef.current!(clickHandler.layerViewId, { 
+            data: ev.features![0].properties, 
+            event: ev
+          })
+        }
+      }
+      map.on("click", clickHandler.mapLayerId, onClick)
+      removes.push(() => { map.off("click", clickHandler.mapLayerId, onClick) })
+    }
+    return () => {
+      for (const remove of removes) {
+        remove()
+      }
+    }
+  }, [map, layerClickHandlers])
+  
   // Capture movements on map to update bounds
   useEffect(() => {
     if (!map) {
