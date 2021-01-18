@@ -169,7 +169,8 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source-layer': 'polygons',
       paint: {
         'fill-opacity': (design.fillOpacity * design.fillOpacity * opacity),
-        "fill-color": (design.color || "transparent")
+        "fill-color": (design.color || "transparent"),
+        "fill-outline-color": "transparent"
       }
     })
 
@@ -179,8 +180,10 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source': sourceId,
       'source-layer': 'polygons',
       paint: {
-        "line-color": design.borderColor || "#000",
-        "line-opacity": 0.5 * opacity,
+        // Because of https://github.com/mapbox/mapbox-gl-js/issues/4090, line opacities < 1 create artifacts. Replace
+        // default with grey to compensate
+        "line-color": design.borderColor || "#808080",
+        "line-opacity": opacity, // 0.5 * opacity,
         "line-width": 1.5
       }
     })
@@ -465,7 +468,8 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source-layer': 'polygons',
       paint: {
         'fill-opacity': (design.fillOpacity * design.fillOpacity * opacity),
-        "fill-color": color
+        "fill-color": color,
+        "fill-outline-color": "transparent"
       }
     })
 
@@ -475,8 +479,10 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source': sourceId,
       'source-layer': 'polygons',
       paint: {
-        "line-color": design.borderColor || "#000",
-        "line-opacity": 0.5 * opacity,
+        // Because of https://github.com/mapbox/mapbox-gl-js/issues/4090, line opacities < 1 create artifacts. Replace
+        // default with grey to compensate
+        "line-color": design.borderColor || "#808080",
+        "line-opacity": opacity, // 0.5 * opacity,
         "line-width": 1.5
       }
     })
@@ -671,7 +677,8 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source-layer': 'polygons',
       paint: {
         'fill-opacity': (design.fillOpacity * design.fillOpacity * opacity),
-        "fill-color": color
+        "fill-color": color,
+        "fill-outline-color": "transparent"
       }
     })
 
@@ -681,8 +688,10 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source': sourceId,
       'source-layer': 'polygons',
       paint: {
-        "line-color": design.borderColor || "#000",
-        "line-opacity": 0.5 * opacity,
+        // Because of https://github.com/mapbox/mapbox-gl-js/issues/4090, line opacities < 1 create artifacts. Replace
+        // default with grey to compensate
+        "line-color": design.borderColor || "#808080" ,
+        "line-opacity": opacity, // 0.5 * opacity,
         "line-width": 1.5
       }
     })
