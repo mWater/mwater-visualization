@@ -23,6 +23,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     handleAdminRegionExprChange: (expr: Expr) => void;
     handleRegionModeChange: (regionMode: "plain" | "indirect" | "direct") => void;
     handleFillOpacityChange: (fillOpacity: number) => void;
+    handleBorderOpacityChange: (borderOpacity: number) => void;
     handleDisplayNamesChange: (displayNames: boolean) => void;
     renderRegionMode(): JSX.Element;
     renderTable(): JSX.Element | null;
@@ -70,6 +71,9 @@ export default class ChoroplethLayerDesigner extends React.Component<{
         className: string;
     }, HTMLElement>;
     renderBorderColor(): React.DetailedReactHTMLElement<{
+        className: string;
+    }, HTMLElement>;
+    renderBorderOpacity(): React.DetailedReactHTMLElement<{
         className: string;
     }, HTMLElement>;
     renderFilter(): React.DetailedReactHTMLElement<{

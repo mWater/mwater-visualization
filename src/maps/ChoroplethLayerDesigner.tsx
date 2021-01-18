@@ -109,6 +109,10 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     this.update((d) => { d.fillOpacity = fillOpacity })
   }
 
+  handleBorderOpacityChange = (borderOpacity: number) => {
+    this.update((d) => { d.borderOpacity = borderOpacity })
+  }
+
   handleDisplayNamesChange = (displayNames: boolean) => {
     this.update((d) => { d.displayNames = displayNames })
   }
@@ -408,6 +412,23 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     )   
   }
 
+  renderBorderOpacity() {
+    return R('div', {className: "form-group"},
+      R('label', {className: "text-muted"}, 
+        `Border Opacity: ${(this.props.design.borderOpacity! * 100).toFixed(0)}%`),
+      ": ",
+      R(Rcslider, {
+        min: 0,
+        max: 100,
+        step: 1,
+        tipTransitionName: "rc-slider-tooltip-zoom-down",
+        value: Math.round((this.props.design.borderOpacity!) * 100),
+        onChange: (val: number) => this.handleBorderOpacityChange(val/100)
+      }
+      )
+    );
+  }
+
   renderFilter() {
     // If not in indirect mode with table, hide
     if (this.props.design.regionMode !== "indirect" || !this.props.design.table) {
@@ -466,6 +487,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
       this.renderColorAxis(),
       this.renderFillOpacity(),
       this.renderBorderColor(),
+      this.renderBorderOpacity(),
       this.renderFilter(),
       this.renderPopup(),
       R(ZoomLevelsComponent, {design: this.props.design, onDesignChange: this.props.onDesignChange})

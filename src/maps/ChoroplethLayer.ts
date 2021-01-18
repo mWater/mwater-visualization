@@ -169,7 +169,8 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source-layer': 'polygons',
       paint: {
         'fill-opacity': (design.fillOpacity * design.fillOpacity * opacity),
-        "fill-color": (design.color || "transparent")
+        "fill-color": (design.color || "transparent"),
+        "fill-outline-color": "transparent"
       }
     })
 
@@ -180,7 +181,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source-layer': 'polygons',
       paint: {
         "line-color": design.borderColor || "#000",
-        "line-opacity": 0.5 * opacity,
+        "line-opacity": design.borderOpacity! * opacity,
         "line-width": 1.5
       }
     })
@@ -465,7 +466,8 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source-layer': 'polygons',
       paint: {
         'fill-opacity': (design.fillOpacity * design.fillOpacity * opacity),
-        "fill-color": color
+        "fill-color": color,
+        "fill-outline-color": "transparent"
       }
     })
 
@@ -476,7 +478,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source-layer': 'polygons',
       paint: {
         "line-color": design.borderColor || "#000",
-        "line-opacity": 0.5 * opacity,
+        "line-opacity": design.borderOpacity! * opacity,
         "line-width": 1.5
       }
     })
@@ -671,7 +673,8 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source-layer': 'polygons',
       paint: {
         'fill-opacity': (design.fillOpacity * design.fillOpacity * opacity),
-        "fill-color": color
+        "fill-color": color,
+        "fill-outline-color": "transparent"
       }
     })
 
@@ -682,7 +685,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       'source-layer': 'polygons',
       paint: {
         "line-color": design.borderColor || "#000",
-        "line-opacity": 0.5 * opacity,
+        "line-opacity": design.borderOpacity! * opacity,
         "line-width": 1.5
       }
     })
@@ -1046,7 +1049,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 #layer0 {
   line-color: ${design.borderColor || "#000"};
   line-width: 1.5;
-  line-opacity: 0.5;
+  line-opacity: ${design.borderOpacity!};
   polygon-opacity: ` + (design.fillOpacity * design.fillOpacity) + `;
   polygon-fill: ` + (design.color || "transparent") + `;
 }
@@ -1326,6 +1329,9 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 
       draft.fillOpacity = (design.fillOpacity != null) ? design.fillOpacity : 0.75
       draft.displayNames = (design.displayNames != null) ? design.displayNames : true
+      if (design.borderOpacity == null) {
+        draft.borderOpacity = 0.5
+      }
 
       // Clean the axes
       if (draft.regionMode === "indirect" && design.table) {
