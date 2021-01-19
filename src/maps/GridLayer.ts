@@ -80,16 +80,12 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     const axisBuilder = new AxisBuilder({ schema })
     const exprCompiler = new ExprCompiler(schema)
 
-    const pixelWidth = { type: "op", op: "/", exprs: [
-      { 
-        type: "scalar", 
-        from: { type: "table", table: "tile", alias: "tile" },
-        expr: { type: "field", tableAlias: "tile", column: "scale" }
-      }, 256] }
+    // Expression of scale and envelope from tile table
+    const scaleExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "scale" }, from: { type: "table", table: "tile", alias: "tile" }}
+    const envelopeExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
+    
+    const pixelWidth = { type: "op", op: "/", exprs: [scaleExpr, 256] }
 
-    const envelope = { type: "scalar", from: { type: "table", table: "tile", alias: "tile" },
-        expr: { type: "field", tableAlias: "tile", column: "envelope" } }
-  
     /* Compile to a query like this:
       select ST_AsMVTGeom(mwater_hex_make(grid.q, grid.r, tile.scale/256*SIZE), tile.envelope) as the_geom_webmercator, data.color as color from 
           mwater_hex_grid(!bbox!, tile.scale/256*SIZE) as grid 
@@ -151,7 +147,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
         exprs: [
           compiledGeometryExpr,
           { type: "op", op: "ST_Expand", exprs: [
-            envelope,
+            envelopeExpr,
             compiledSizeExpr
           ]}
         ]
@@ -184,7 +180,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
             { type: "field", tableAlias: "grid", column: "r" },
             compiledSizeExpr
           ]},
-          envelope
+          envelopeExpr
           ]}
         , alias: "the_geom_webmercator" },
         { type: "select", expr: { type: "field", tableAlias: "data", column: "color" }, alias: "color" }
@@ -193,7 +189,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
         type: "join",
         kind: "left",
         left: { type: "subexpr", expr: { type: "op", op: `mwater_${design.shape}_grid`, exprs: [
-          envelope,
+          envelopeExpr,
           compiledSizeExpr
         ]}, alias: "grid" },
         right: { type: "subquery", query: innerQuery, alias: "data" },

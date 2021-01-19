@@ -139,6 +139,10 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     const axisBuilder = new AxisBuilder({schema})
     const exprCompiler = new ExprCompiler(schema)
 
+    // Expression of scale and envelope from tile table
+    const scaleExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "scale" }, from: { type: "table", table: "tile", alias: "tile" }}
+    const envelopeExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
+
     // Compile geometry axis
     let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "innerquery"})
 
@@ -153,12 +157,19 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
         op: "row_number", 
         exprs: [], 
         over: { partitionBy: [
-          { type: "op", op: "ST_SnapToGrid", exprs: [
-            geometryExpr,
-            { type: "op", op: "/", exprs: [{ type: "field", tableAlias: "tile", column: "scale" }, 50]},
-            { type: "op", op: "/", exprs: [{ type: "field", tableAlias: "tile", column: "scale" }, 50]}
-            ] }
+          { type: "op", op: "round", exprs: [
+            { type: "op", op: "/", exprs: [
+              { type: "op", op: "ST_XMin", exprs: [geometryExpr] },
+              { type: "op", op: "/", exprs: [scaleExpr, 40]}
+            ]}
           ]},
+          { type: "op", op: "round", exprs: [
+            { type: "op", op: "/", exprs: [
+              { type: "op", op: "ST_YMin", exprs: [geometryExpr] },
+              { type: "op", op: "/", exprs: [scaleExpr, 40]}
+            ]}
+          ]}
+        ]}
       },
       alias: "r"
     }
@@ -171,12 +182,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
         { type: "select", expr: geometryExpr, alias: "the_geom_webmercator" }, // geometry as the_geom_webmercator
         cluster
       ],
-      from: {
-        type: "join", 
-        kind: "cross",
-        left: exprCompiler.compileTable(design.table, "innerquery"),
-        right: { type: "table", table: "tile", alias: "tile" }
-      }
+      from: exprCompiler.compileTable(design.table, "innerquery")
     }
 
     // Add color select if color axis
@@ -192,7 +198,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
         op: "&&",
         exprs: [
           geometryExpr,
-          { type: "field", tableAlias: "tile", column: "envelope" }
+          envelopeExpr
         ]
       }
     ]
@@ -225,16 +231,11 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
         { type: "select", expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "innerquery", column: "id" }]}, alias: "id" }, // innerquery._id::text as id
         { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [
           { type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" },
-          { type: "field", tableAlias: "tile", column: "envelope" }
+          envelopeExpr
         ]}, alias: "the_geom_webmercator" }, // innerquery.the_geom_webmercator as the_geom_webmercator
         { type: "select", expr: { type: "op", op: "ST_GeometryType", exprs: [{ type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }] }, alias: "geometry_type" } // ST_GeometryType(innerquery.the_geom_webmercator) as geometry_type
       ],
-      from: { 
-        type: "join", 
-        kind: "cross", 
-        left: { type: "subquery", query: innerquery, alias: "innerquery" },
-        right: { type: "table", table: "tile", alias: "tile" }
-      },
+      from: { type: "subquery", query: innerquery, alias: "innerquery" },
       where: { type: "op", op: "<=", exprs: [{ type: "field", tableAlias: "innerquery", column: "r" }, 3]}
     }
 
@@ -285,7 +286,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     // Convert to Web mercator (3857)
     geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
 
-    // row_number() over (partition by st_snaptogrid(location, !pixel_width!*5, !pixel_height!*5)) AS r
+    // row_number() over (partition by round(ST_XMin(location)/!pixel_width!*5), round(ST_YMin(location)/!pixel_height!*5)) AS r
     const cluster: JsonQLSelect = {
       type: "select",
       expr: { 
@@ -293,12 +294,19 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
         op: "row_number", 
         exprs: [], 
         over: { partitionBy: [
-          { type: "op", op: "ST_SnapToGrid", exprs: [
-            geometryExpr,
-            { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_width!" }, 5]},
-            { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_height!" }, 5]}
-            ] }
+          { type: "op", op: "round", exprs: [
+            { type: "op", op: "/", exprs: [
+              { type: "op", op: "ST_XMin", exprs: [geometryExpr] },
+              { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_width!" }, 5]}
+            ]}
           ]},
+          { type: "op", op: "round", exprs: [
+            { type: "op", op: "/", exprs: [
+              { type: "op", op: "ST_YMin", exprs: [geometryExpr] },
+              { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_height!" }, 5]}
+            ]}
+          ]},
+        ]}
       },
       alias: "r"
     }

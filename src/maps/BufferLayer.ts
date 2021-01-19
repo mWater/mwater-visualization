@@ -104,7 +104,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     const exprCompiler = new ExprCompiler(schema)
 
     // Expression for the envelope of the tile
-    const envelope = { type: "scalar", from: { type: "table", table: "tile", alias: "tile" },
+    const envelopeExpr = { type: "scalar", from: { type: "table", table: "tile", alias: "tile" },
       expr: { type: "field", tableAlias: "tile", column: "envelope" } }
 
     /*
@@ -157,7 +157,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
 
     const selects: JsonQLSelect[] = [
       { type: "select", expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table)!.primaryKey }, alias: "id" }, // main primary key as id
-      { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [bufferExpr, envelope]}, alias: "the_geom_webmercator" },
+      { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [bufferExpr, envelopeExpr]}, alias: "the_geom_webmercator" },
     ]
 
     // Add color select if color axis
@@ -191,7 +191,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
         { type: "op", op: "ST_Expand", exprs: [
           { type: "op", op: "ST_Intersection", exprs: [
             { type: "op", op: "ST_Transform", exprs: [
-              envelope,
+              envelopeExpr,
               4326
               ]},
             { type: "op", op: "ST_Expand", exprs: [

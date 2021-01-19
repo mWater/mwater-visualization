@@ -43,9 +43,10 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
   }
 
   createPlainVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
-    const axisBuilder = new AxisBuilder({schema})
-    const exprCompiler = new ExprCompiler(schema)
     const regionsTable = design.regionsTable || "admin_regions"
+
+    // Expression of scale and envelope from tile table
+    const envelopeExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
 
     /*
     Returns two source layers, "polygons" and "points". Points are used for labels.
@@ -88,7 +89,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
           op: "&&",
           exprs: [
             { type: "field", tableAlias: "regions", column: "shape" },
-            { type: "field", tableAlias: "tile", column: "envelope" }
+            envelopeExpr
           ]
         }
       ]
@@ -119,16 +120,11 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         { type: "select", expr: { type: "field", tableAlias: "regions", column: "_id" }, alias: "id" },
         { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [
           { type: "field", tableAlias: "regions", column: "shape_simplified" },
-          { type: "field", tableAlias: "tile", column: "envelope" }
+          envelopeExpr
         ]}, alias: "the_geom_webmercator" }, 
         { type: "select", expr: { type: "field", tableAlias: "regions", column: "name" }, alias: "name" }
       ],
-      from: { 
-        type: "join", 
-        kind: "cross", 
-        left: { type: "table", table: regionsTable, alias: "regions" },
-        right: { type: "table", table: "tile", alias: "tile" }
-      },
+      from: { type: "table", table: regionsTable, alias: "regions" },
       where: where
     }
 
@@ -146,16 +142,11 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
             orderBy: [{ expr: { type: "op", op: "ST_Area", exprs: [{ type: "field", tableAlias: "polys", column: "geom" }] }, direction: "desc" }],
             limit: 1
           },
-          { type: "field", tableAlias: "tile", column: "envelope" }
+          envelopeExpr
         ]}, alias: "the_geom_webmercator" }, 
         { type: "select", expr: { type: "field", tableAlias: "regions", column: "name" }, alias: "name" }
       ],
-      from: { 
-        type: "join", 
-        kind: "cross", 
-        left: { type: "table", table: regionsTable, alias: "regions" },
-        right: { type: "table", table: "tile", alias: "tile" }
-      },
+      from: { type: "table", table: regionsTable, alias: "regions" },
       where: where
     }
 
@@ -225,6 +216,9 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     const exprCompiler = new ExprCompiler(schema)
     const regionsTable = design.regionsTable || "admin_regions"
 
+    // Expression of scale and envelope from tile table
+    const envelopeExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
+    
     /*
     Returns two source layers, "polygons" and "points". Points are used for labels.
 
@@ -363,28 +357,23 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         { type: "select", expr: { type: "field", tableAlias: "regions2", column: "_id" }, alias: "id" },
         { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [
           { type: "field", tableAlias: "regions2", column: "shape_simplified" },
-          { type: "field", tableAlias: "tile", column: "envelope" }
+          envelopeExpr
         ]}, alias: "the_geom_webmercator" }, 
         { type: "select", expr: { type: "field", tableAlias: "regions2", column: "name" }, alias: "name" }
       ],
       from: {
-        type: "join", 
-        kind: "cross", 
-        left: {
-          type: "join",
-          kind: "left",
-          left: { type: "table", table: regionsTable, alias: "regions2" },
-          right: { type: "table", table: "regions", alias: "regions" },
-          on: {
-            type: "op",
-            op: "=",
-            exprs: [
-              { type: "field", tableAlias: "regions", column: "id" },
-              { type: "field", tableAlias: "regions2", column: "_id" }
-            ]
-          }
-        },
-        right: { type: "table", table: "tile", alias: "tile" }
+        type: "join",
+        kind: "left",
+        left: { type: "table", table: regionsTable, alias: "regions2" },
+        right: { type: "table", table: "regions", alias: "regions" },
+        on: {
+          type: "op",
+          op: "=",
+          exprs: [
+            { type: "field", tableAlias: "regions", column: "id" },
+            { type: "field", tableAlias: "regions2", column: "_id" }
+          ]
+        }
       },
       where: outerWhere
     }
@@ -403,28 +392,23 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
             orderBy: [{ expr: { type: "op", op: "ST_Area", exprs: [{ type: "field", tableAlias: "polys", column: "geom" }] }, direction: "desc" }],
             limit: 1
           },
-          { type: "field", tableAlias: "tile", column: "envelope" }
+          envelopeExpr
         ]}, alias: "the_geom_webmercator" }, 
         { type: "select", expr: { type: "field", tableAlias: "regions2", column: "name" }, alias: "name" }
       ],
       from: {
-        type: "join", 
-        kind: "cross", 
-        left: {
-          type: "join",
-          kind: "left",
-          left: { type: "table", table: regionsTable, alias: "regions2" },
-          right: { type: "table", table: "regions", alias: "regions" },
-          on: {
-            type: "op",
-            op: "=",
-            exprs: [
-              { type: "field", tableAlias: "regions", column: "id" },
-              { type: "field", tableAlias: "regions2", column: "_id" }
-            ]
-          }
-        },
-        right: { type: "table", table: "tile", alias: "tile" }
+        type: "join",
+        kind: "left",
+        left: { type: "table", table: regionsTable, alias: "regions2" },
+        right: { type: "table", table: "regions", alias: "regions" },
+        on: {
+          type: "op",
+          op: "=",
+          exprs: [
+            { type: "field", tableAlias: "regions", column: "id" },
+            { type: "field", tableAlias: "regions2", column: "_id" }
+          ]
+        }
       },
       where: outerWhere
     }
@@ -521,9 +505,11 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 
   createDirectVectorTile(design: ChoroplethLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
     const axisBuilder = new AxisBuilder({schema})
-    const exprCompiler = new ExprCompiler(schema)
     const regionsTable = design.regionsTable || "admin_regions"
 
+    // Expression of scale and envelope from tile table
+    const envelopeExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
+    
     /*
     Returns two source layers, "polygons" and "points". Points are used for labels.
 
@@ -565,7 +551,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
           op: "&&",
           exprs: [
             { type: "field", tableAlias: "regions", column: "shape" },
-            { type: "field", tableAlias: "tile", column: "envelope" }
+            envelopeExpr
           ]
         }
       ]
@@ -596,16 +582,11 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         { type: "select", expr: { type: "field", tableAlias: "regions", column: "_id" }, alias: "id" },
         { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [
           { type: "field", tableAlias: "regions", column: "shape_simplified" },
-          { type: "field", tableAlias: "tile", column: "envelope" }
+          envelopeExpr
         ]}, alias: "the_geom_webmercator" }, 
         { type: "select", expr: { type: "field", tableAlias: "regions", column: "name" }, alias: "name" }
       ],
-      from: { 
-        type: "join", 
-        kind: "cross", 
-        left: { type: "table", table: regionsTable, alias: "regions" },
-        right: { type: "table", table: "tile", alias: "tile" }
-      },
+      from: { type: "table", table: regionsTable, alias: "regions" },
       where: where
     }
 
@@ -623,16 +604,11 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
             orderBy: [{ expr: { type: "op", op: "ST_Area", exprs: [{ type: "field", tableAlias: "polys", column: "geom" }] }, direction: "desc" }],
             limit: 1
           },
-          { type: "field", tableAlias: "tile", column: "envelope" }
+          envelopeExpr
         ]}, alias: "the_geom_webmercator" }, 
         { type: "select", expr: { type: "field", tableAlias: "regions", column: "name" }, alias: "name" }
       ],
-      from: { 
-        type: "join", 
-        kind: "cross", 
-        left: { type: "table", table: regionsTable, alias: "regions" },
-        right: { type: "table", table: "tile", alias: "tile" }
-      },
+      from: { type: "table", table: regionsTable, alias: "regions" },
       where: where
     }
 

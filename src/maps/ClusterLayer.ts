@@ -81,6 +81,10 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     const axisBuilder = new AxisBuilder({schema})
     const exprCompiler = new ExprCompiler(schema)
 
+    // Expression of scale and envelope from tile table
+    const scaleExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "scale" }, from: { type: "table", table: "tile", alias: "tile" }}
+    const envelopeExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
+
     /*
     Query:
       Works by first snapping to grid and then clustering the clusters with slower DBSCAN method
@@ -100,7 +104,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
               count(*) as cnt, 
               ST_Centroid(ST_Collect(<geometry axis>)) as center, 
               ST_Snaptogrid(<geometry axis>, tile.scale/6, tile.scale/6) as grid
-              from <table> as main, tile as tile
+              from <table> as main
               where <geometry axis> && !bbox! 
                 and <geometry axis> is not null
                 and <other filters>
@@ -139,12 +143,12 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
         {
           type: "op",
           op: "/",
-          exprs: [{ type: "field", tableAlias: "tile", column: "scale" }, 6]
+          exprs: [scaleExpr, 6]
         },
         {
           type: "op",
           op: "/",
-          exprs: [{ type: "field", tableAlias: "tile", column: "scale" }, 6]
+          exprs: [scaleExpr, 6]
         }
       ]
     }
@@ -157,12 +161,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
         { type: "select", expr: centerExpr, alias: "center" },
         { type: "select", expr: gridExpr, alias: "grid" }
       ],
-      from: {
-        type: "join", 
-        kind: "cross",
-        left: exprCompiler.compileTable(design.table, "main"),
-        right: { type: "table", table: "tile", alias: "tile" }
-      },
+      from: exprCompiler.compileTable(design.table, "main"),
       groupBy: [3]
     }
 
@@ -173,7 +172,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
         op: "&&",
         exprs: [
           geometryExpr,
-          { type: "field", tableAlias: "tile", column: "envelope" }
+          envelopeExpr
         ]
       }
     ]
@@ -209,7 +208,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       op: "ST_ClusterDBSCAN",
       exprs: [
         { type: "field", tableAlias: "innerquery", column: "center" },
-        { type: "op", op: "/", exprs: [{ type: "field", tableAlias: "tile", column: "scale" }, 8] },
+        { type: "op", op: "/", exprs: [scaleExpr, 8] },
         1
       ],
       over: {}
@@ -222,12 +221,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
         { type: "select", expr: { type: "field", tableAlias: "innerquery", column: "center" }, alias: "center" },
         { type: "select", expr: { type: "field", tableAlias: "innerquery", column: "cnt" }, alias: "cnt" }
       ],
-      from: {
-        type: "join", 
-        kind: "cross",
-        left: { type: "subquery", query: innerQuery, alias: "innerquery" },
-        right: { type: "table", table: "tile", alias: "tile" }
-      }
+      from: { type: "subquery", query: innerQuery, alias: "innerquery" }
     }
 
     // Create final level
@@ -248,7 +242,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
           }
         ]
       },
-      { type: "field", tableAlias: "tile", column: "envelope" }
+      envelopeExpr
     ]}
 
     const cntExpr = { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "inner2query", column: "cnt" }] }
@@ -267,15 +261,10 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
         { type: "select", expr: sizeExpr, alias: "size" }
         //###{ type: "select", expr: { type: "literal", value: 12 }, alias: "size" }
       ],
-      from: {
-        type: "join", 
-        kind: "cross",
-        left: { type: "subquery", query: inner2Query, alias: "inner2query" },
-        right: { type: "table", table: "tile", alias: "tile" }
-      },
+      from: { type: "subquery", query: inner2Query, alias: "inner2query" },
       groupBy: [
         { type: "field", tableAlias: "inner2query", column: "clust" },
-        { type: "field", tableAlias: "tile", column: "envelope" }
+        envelopeExpr
       ]
     }
 
