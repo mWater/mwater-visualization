@@ -81,9 +81,6 @@ export function NewMapViewComponent(props: {
   /** Layer click handlers to attach */
   const [layerClickHandlers, setLayerClickHandlers] = useState<{ layerViewId: string, mapLayerId: string }[]>([])
 
-  /** True when symbols have been added to map */
-  const [symbolsAdded, setSymbolsAdded] = useState(false)
-
   /** Contents of popup if open */
   const [popupContents, setPopupContents] = useState<ReactNode>()
 
@@ -314,6 +311,19 @@ export function NewMapViewComponent(props: {
     // Speed up wheel scrolling
     m.scrollZoom.setWheelZoomRate(1/250)
 
+    // Dynamically load symbols
+    m.on("styleimagemissing" as any, function(ev: { id: string}) {
+      // Check if known
+      const mapSymbol = mapSymbols.find(s => s.value == ev.id)
+      if (mapSymbol) {
+        m.loadImage(mapSymbol.url, (err: any, image: any) => { 
+          if (image) {
+            m.addImage(mapSymbol.value, image, { sdf: true })
+          }
+        })
+      }
+    })
+
     setMap(m)
 
     return () => {
@@ -357,18 +367,6 @@ export function NewMapViewComponent(props: {
     })
   }, [map, props.design.baseLayer])
 
-  // Load symbols
-  useEffect(() => {
-    if (!map) {
-      return
-    }
-
-    // Add symbols that markers layers require
-    addSymbolsToMap(map).then(() => {
-      setSymbolsAdded(true)
-    })
-  }, [map])
-
   // Update user layers
   useEffect(() => {
     updateUserStyle()
@@ -376,8 +374,8 @@ export function NewMapViewComponent(props: {
 
   // Update map style
   useEffect(() => {
-    // Can't load until map, symbols, baseStyle and userStyle are present
-    if (!map || !symbolsAdded || !baseStyle || !userStyle) {
+    // Can't load until map, baseStyle and userStyle are present
+    if (!map || !baseStyle || !userStyle) {
       return
     }
 
@@ -411,7 +409,7 @@ export function NewMapViewComponent(props: {
     }
 
     map.setStyle(style)
-  }, [map, symbolsAdded, baseStyle, userStyle, props.design.baseLayerOpacity])
+  }, [map, baseStyle, userStyle, props.design.baseLayerOpacity])
 
   // Setup click handlers
   useEffect(() => {
@@ -576,27 +574,6 @@ export function NewMapViewComponent(props: {
     { renderLegend() }
     { renderBusy() }
   </div>
-}
-
-/** Add all symbols needed to the map */
-function addSymbolsToMap(map: mapboxgl.Map) {
-  const promises: Promise<null>[] = []
-
-  for (const mapSymbol of mapSymbols) {
-    promises.push(new Promise((resolve, reject) => {
-      map.loadImage(mapSymbol.url, (err: any, image: any) => { 
-        if (err) { 
-          reject(err) 
-        } 
-        else {
-          map.addImage(mapSymbol.value, image, { sdf: true })
-          resolve(null) 
-        }
-      })
-    }))
-  }
-
-  return Promise.all(promises)
 }
 
 /** Legend display tab at bottom right */
