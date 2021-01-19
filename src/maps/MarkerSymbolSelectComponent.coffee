@@ -13,7 +13,7 @@ module.exports = class MarkerSymbolSelectComponent extends React.Component
 
   render: ->
     # Create options
-    options = _.pluck(mapSymbols, "value", "label")
+    options = mapSymbols
 
     optionRenderer = (option) ->
       return R 'span', null,
