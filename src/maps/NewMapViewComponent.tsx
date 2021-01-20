@@ -357,6 +357,7 @@ export function NewMapViewComponent(props: {
         layers: [],
         sources: {}
       })
+      return
     }
 
     // Load style
