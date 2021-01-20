@@ -390,14 +390,14 @@ export function NewMapViewComponent(props: {
     }
 
     // Create style
-    let layers = baseStyle.layers!
+    let layers = baseStyle.layers || []
 
     // Simulate base opacity
     if (props.design.baseLayerOpacity != null && props.design.baseLayerOpacity < 1) {
       layers = layers.concat([baseLayerOpacityLayer])
     }
 
-    layers = layers.concat(userStyle.layers!)
+    layers = layers.concat(userStyle.layers || [])
 
     const style: mapboxgl.Style = {
       ...baseStyle,
