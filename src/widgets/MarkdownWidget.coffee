@@ -5,7 +5,7 @@ _ = require 'lodash'
 
 Widget = require './Widget'
 DropdownWidgetComponent = require './DropdownWidgetComponent'
-markdown = require("markdown").markdown
+Markdown = require("markdown-it")
 ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
 
 module.exports = class MarkdownWidget extends Widget
@@ -121,7 +121,7 @@ class MarkdownWidgetViewComponent extends React.Component
         height: @props.height
       }
       className: "mwater-visualization-markdown"
-      dangerouslySetInnerHTML: { __html: markdown.toHTML(@props.design.markdown or "") }
+      dangerouslySetInnerHTML: { __html: new Markdown().render(@props.design.markdown or "") }
 
 class MarkdownWidgetDesignerComponent extends React.Component 
   @propTypes: 
