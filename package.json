@@ -55,6 +55,7 @@
     "mwater-forms": "github:mWater/mwater-forms",
     "pako": "^1.0.11",
     "prop-types": "^15.7.2",
+    "querystring": "^0.2.0",
     "rc-slider": "^8.7.1",
     "react": "^16.14.0",
     "react-color": "^2.19.3",
