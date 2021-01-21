@@ -1,6 +1,8 @@
 import { ReactNode, Component } from "react"
 import L, { PathOptions, CircleMarkerOptions } from 'leaflet'
-import { GeoJsonObject } from "geojson";
+
+// import { GeoJsonObject } from "geojson";
+type GeoJsonObject = any
 
 export interface MapBounds {
   w: number

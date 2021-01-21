@@ -306,7 +306,7 @@ export function NewMapViewComponent(props: {
     })
 
     // Add zoom controls to the map.
-    m.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-left")
+    m.addControl(new mapboxgl.NavigationControl({}), "top-left")
 
     // Speed up wheel scrolling
     m.scrollZoom.setWheelZoomRate(1/250)
