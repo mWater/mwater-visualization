@@ -225,7 +225,8 @@ export function NewMapViewComponent(props: {
         if (tileUrl) {
           newSources[layerView.id] = {
             type: "raster",
-            tiles: [tileUrl]
+            tiles: [tileUrl],
+            tileSize: 256
           }
 
           newLayers.push({
@@ -554,7 +555,7 @@ export function NewMapViewComponent(props: {
 
     return <div key="busy" style={{ 
       position: "absolute", 
-      top: 80, 
+      top: 100, 
       left: 9, 
       backgroundColor: "white", 
       border: "solid 1px #CCC",
