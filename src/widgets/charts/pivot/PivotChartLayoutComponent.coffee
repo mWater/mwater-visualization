@@ -192,12 +192,12 @@ module.exports = class PivotChartLayoutComponent extends React.Component
           R 'div', className: "text-warning", style: { fontSize: 12 },
             R('i', className: "fa fa-exclamation-circle")
             " Warning: Too many columns in table to display"
-
-        R 'table', className: "pivot-chart-table",
-          R 'tbody', null,
-            _.map @props.layout.rows, (row, rowIndex) =>
-              @renderRow(row, rowIndex)
-        @renderHoverControls()
+        R 'div',  style: { position: "relative" },
+          R 'table', className: "pivot-chart-table",
+            R 'tbody', null,
+              _.map @props.layout.rows, (row, rowIndex) =>
+                @renderRow(row, rowIndex)
+          @renderHoverControls()
 
 # Single layout cell
 class LayoutCellComponent extends React.Component
