@@ -8,7 +8,7 @@ module.exports = class CachingDataSource extends DataSource
     super()
     @perform = options.perform
 
-    @cache = LRU({ max: 500, maxAge: 1000 * 15 * 60 })
+    @cache = new LRU({ max: 500, maxAge: 1000 * 15 * 60 })
 
   performQuery: (query, cb) ->
     cacheKey = JSON.stringify(query)
