@@ -652,7 +652,11 @@ polygon-fill: ` + item.color + `;\
       return "Missing axes"
     }
 
-    const error = axisBuilder.validateAxis({axis: design.axes.geometry})
+    let error = axisBuilder.validateAxis({axis: design.axes.geometry})
+    if (error) { return error; }
+
+    // Validate color
+    error = axisBuilder.validateAxis({axis: design.axes.color || null })
     if (error) { return error; }
 
     // Check that doesn't compile to null (persistent bug that haven't been able to track down)
