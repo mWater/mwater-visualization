@@ -202,7 +202,7 @@ export function NewMapViewComponent(props: {
         // TODO attempt to re-use sources?
 
         // Get source url
-        const { expires, url } = await layerDataSource.getVectorTileUrl(layerView.design, filters, layersCreatedAfter)
+        const { expires, url } = await layerDataSource.getVectorTileUrl(design, filters, layersCreatedAfter)
         if (!earliestExpires || expires < earliestExpires) {
           earliestExpires = expires
         }
@@ -214,14 +214,14 @@ export function NewMapViewComponent(props: {
         }
 
         // Add layer
-        const vectorTileDef = layer.getVectorTile(layerView.design, layerView.id, props.schema, filters, opacity)
+        const vectorTileDef = layer.getVectorTile(design, layerView.id, props.schema, filters, opacity)
         for (const mapLayer of vectorTileDef.mapLayers) {
           newLayers.push({ layerViewId: layerView.id, layer: mapLayer })
         }
         newClickHandlers = newClickHandlers.concat(vectorTileDef.mapLayersHandleClicks.map(mlid => ({ layerViewId: layerView.id, mapLayerId: mlid })))
       }
       else {
-        const tileUrl = props.mapDataSource.getLayerDataSource(layerView.id).getTileUrl(layerView.design, [])
+        const tileUrl = props.mapDataSource.getLayerDataSource(layerView.id).getTileUrl(design, [])
         if (tileUrl) {
           newSources[layerView.id] = {
             type: "raster",
