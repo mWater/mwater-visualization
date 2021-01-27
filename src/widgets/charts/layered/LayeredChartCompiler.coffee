@@ -538,43 +538,53 @@ module.exports = class LayeredChartCompiler
         # Exclude excluded ones
         colorValues = _.difference(colorValues, layer.axes.color.excludedValues)
 
-        _.each colorValues, (colorValue) =>
-          # One series for y values
-          series = "#{layerIndex}:#{colorValue}"
+        if colorValues.length > 0
+          _.each colorValues, (colorValue) =>
+            # One series for y values
+            series = "#{layerIndex}:#{colorValue}"
 
-          # Get specific color if present
-          color = @axisBuilder.getValueColor(layer.axes.color, colorValue)
-          color = color or layer.color
-          if color
-            colors[series] = color
+            # Get specific color if present
+            color = @axisBuilder.getValueColor(layer.axes.color, colorValue)
+            color = color or layer.color
+            if color
+              colors[series] = color
 
-          # Get rows for this series
-          rows = _.where(layerData, color: colorValue)
+            # Get rows for this series
+            rows = _.where(layerData, color: colorValue)
 
-          # Create empty series
+            # Create empty series
+            column = _.map(categories, (c) -> null)
+
+            # Set rows
+            _.each rows, (row) =>
+              # Get index
+              index = categoryMap[row.x]
+              if index?
+                column[index] = row.y
+                dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
+                
+            # Fill in nulls if cumulative
+            if layer.cumulative
+              for value, i in column
+                if not value? and i > 0
+                  column[i] = column[i - 1]
+
+            columns.push([series].concat(column))
+
+            types[series] = @getLayerType(design, layerIndex)
+            names[series] = @axisBuilder.formatValue(layer.axes.color, colorValue, locale, true)
+            xs[series] = "x"
+            format[series] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
+        else
+          #c3 acts funny when there is a split axis but no data
+          series = "#{layerIndex}:dumm"
           column = _.map(categories, (c) -> null)
-
-          # Set rows
-          _.each rows, (row) =>
-            # Get index
-            index = categoryMap[row.x]
-            if index?
-              column[index] = row.y
-              dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
-              
-          # Fill in nulls if cumulative
-          if layer.cumulative
-            for value, i in column
-              if not value? and i > 0
-                column[i] = column[i - 1]
-
           columns.push([series].concat(column))
 
           types[series] = @getLayerType(design, layerIndex)
-          names[series] = @axisBuilder.formatValue(layer.axes.color, colorValue, locale, true)
+          names[series] = @axisBuilder.formatValue(layer.axes.color, null, locale, true)
           xs[series] = "x"
           format[series] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
-
       else
         # One series for y
         series = "#{layerIndex}"
