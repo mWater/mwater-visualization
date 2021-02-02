@@ -110,6 +110,15 @@ module.exports = class LabeledExprGenerator
                 joins: joins
               }
             ]
+          # add cascading ref question
+          else if column.join.type == "n-1" and column.join.toTable.match(/^custom./)
+            return @schema.getColumns(column.join.toTable).filter((c) -> c.id[0] == "c").map((c) -> 
+              {
+                expr: { type: "scalar", table: table, joins: [column.id], expr: { type: "field", table: column.join.toTable, column: c.id } }
+                label: "#{createLabel(column)} > #{createLabel(c)}"
+                joins: joins
+              }
+            )
           else # use code, full name, or name of dest table
             joinColumn = @schema.getColumn(column.join.toTable, "code")
             joinColumn = joinColumn or @schema.getColumn(column.join.toTable, "full_name")
