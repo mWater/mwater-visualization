@@ -115,7 +115,7 @@ module.exports = class LabeledExprGenerator
             return @schema.getColumns(column.join.toTable).filter((c) -> c.id[0] == "c").map((c) -> 
               {
                 expr: { type: "scalar", table: table, joins: [column.id], expr: { type: "field", table: column.join.toTable, column: c.id } }
-                label: createLabel(c)
+                label: "#{createLabel(column)} > #{createLabel(c)}"
                 joins: joins
               }
             )
