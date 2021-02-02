@@ -27,10 +27,20 @@ describe "LabeledExprGenerator", ->
     schema = fixtures.cascadingRefSchema()
     labeledExprGenerator = new LabeledExprGenerator(schema)
 
-    les = labeledExprGenerator.generate("t2", { multipleJoinCondition: (-> true) })
-    console.log(les)
+    les = labeledExprGenerator.generate("t2")
+    # Make equivalent list
+    expectedLes = []
+    for column in schema.getColumns("t2")
+      if column.type != "join"
+        expectedLes.push({ expr: { type: "field", table: "t2", column: column.id }, label: column.name.en, joins: [] })
+    
+    for column in schema.getColumns("custom.ts15.t0")
+      if column.id[0] == "c"
+        expectedLes.push({ expr: {table: "t2", type: "scalar", joins: ["2-1"], expr : { type: "field", table: "custom.ts15.t0", column: column.id }}, label: "T2->T1 > #{column.name.en}", joins: [] })
+    
+    compare les, expectedLes
 
-  it "includes n-1 joins", ->
+  it "includes 1-n joins", ->
     les = @labeledExprGenerator.generate("t1", { multipleJoinCondition: (-> true) })
 
     # Make equivalent list
