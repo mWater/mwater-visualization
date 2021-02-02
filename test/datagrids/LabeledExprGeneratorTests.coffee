@@ -23,6 +23,13 @@ describe "LabeledExprGenerator", ->
 
     compare les, expectedLes
 
+  it "includes cascading ref columns", ->
+    schema = fixtures.cascadingRefSchema()
+    labeledExprGenerator = new LabeledExprGenerator(schema)
+
+    les = labeledExprGenerator.generate("t2", { multipleJoinCondition: (-> true) })
+    console.log(les)
+
   it "includes n-1 joins", ->
     les = @labeledExprGenerator.generate("t1", { multipleJoinCondition: (-> true) })
 
