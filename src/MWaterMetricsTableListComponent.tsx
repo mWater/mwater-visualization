@@ -77,7 +77,7 @@ export const MWaterMetricsTableListComponent = (props: {
     const items = metrics.filter(m => !m.design.deprecated).map(m => {
       const alreadyIncluded = props.extraTables.some(t => t == `metrics:${m._id}`)
       return { 
-        name: ExprUtils.localizeString(m.design.name, props.locale), 
+        name: ExprUtils.localizeString(m.design.name, props.locale) || "", 
         onClick: () => selectTable(m),
         onRemove: alreadyIncluded ? handleRemove.bind(null, m) : undefined
       }

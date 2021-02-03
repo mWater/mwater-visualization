@@ -135,8 +135,8 @@ module.exports = class AxisBuilder
     if not options.axis
       return
 
-    # Validate expression
-    error = @exprValidator.validateExpr(options.axis.expr)
+    # Validate expression (allow all statuses since we don't know aggregation)
+    error = @exprValidator.validateExpr(options.axis.expr, { aggrStatuses: ["individual", "literal", "aggregate"] })
     if error
       return error
 

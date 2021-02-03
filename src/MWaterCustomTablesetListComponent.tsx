@@ -75,16 +75,16 @@ export const MWaterCustomTablesetListComponent = (props: {
   }
 
   const renderTableset = (ts: CustomTableset) => {
-    const name = ExprUtils.localizeString(ts.design.name, props.locale)
+    const name = ExprUtils.localizeString(ts.design.name, props.locale) || ""
 
     // Check search 
     if (search && !name.toLowerCase().includes(search.toLowerCase())
-      && !ts.design.tables.some(t => ExprUtils.localizeString(t.name).toLowerCase().includes(search.toLowerCase()))) {
+      && !ts.design.tables.some(t => ExprUtils.localizeString(t.name)!.toLowerCase().includes(search.toLowerCase()))) {
       return null
     }
 
     const items = ts.design.tables.filter(t => !t.deprecated).map(t => ({ 
-      name: ExprUtils.localizeString(t.name, props.locale), 
+      name: ExprUtils.localizeString(t.name, props.locale)!, 
       onClick: () => selectTable(ts, t.id)
     }))
 
