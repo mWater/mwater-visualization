@@ -177,7 +177,7 @@ class ChartWidgetComponent extends React.Component
         R 'div', style: { position: "absolute", left: 0, top: 0, border: "solid 2px #EEE", borderRadius: 8, padding: 10, width: chartWidth + 20, height: chartHeight + 20, overflow: "hidden" },
           chart
         R 'div', style: { width: "100%", height: "100%", paddingLeft: chartWidth + 40 },
-          R 'div', style: { width: "100%", height: "100%", overflowY: "auto", paddingLeft: 20, borderLeft: "solid 3px #AAA" },
+          R 'div', style: { width: "100%", height: "100%", overflowY: "auto", paddingLeft: 20, paddingRight: 20, borderLeft: "solid 3px #AAA" },
             editor
 
       return R ModalWindowComponent,
