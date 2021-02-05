@@ -4,7 +4,7 @@ import React from 'react'
 import { original, produce } from 'immer'
 
 import Layer, { OnGridClickOptions, VectorTileDef } from './Layer'
-import { ExprCompiler, ExprCleaner, injectTableAlias, Schema, DataSource } from 'mwater-expressions'
+import { ExprCompiler, ExprCleaner, injectTableAlias, Schema, DataSource, ExprValidator } from 'mwater-expressions'
 import AxisBuilder from '../axes/AxisBuilder'
 import { OnGridClickResults } from './maps'
 import { JsonQLFilter } from '../index'
@@ -643,6 +643,7 @@ polygon-fill: ` + item.color + `;\
   // Validates design. Null if ok, message otherwise
   validateDesign(design: MarkersLayerDesign, schema: Schema) {
     const axisBuilder = new AxisBuilder({schema})
+    const exprValidator = new ExprValidator(schema)
 
     if (!design.table) {
       return "Missing table"
@@ -663,6 +664,10 @@ polygon-fill: ` + item.color + `;\
     if (!axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "innerquery"})) {
       return "Null geometry axis"
     }
+
+    // Validate filter
+    error = exprValidator.validateExpr(design.filter || null)
+    if (error) { return error; }
 
     return null
   }

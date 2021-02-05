@@ -2,7 +2,7 @@ import _ from 'lodash'
 import React from 'react'
 
 import Layer, { VectorTileDef } from './Layer'
-import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, Expr, DataSource } from 'mwater-expressions'
+import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, Expr, DataSource, ExprValidator } from 'mwater-expressions'
 import AxisBuilder from '../axes/AxisBuilder'
 import { LayerDefinition, OnGridClickResults } from './maps'
 import { JsonQLFilter } from '../index'
@@ -634,6 +634,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     let error
     const exprUtils = new ExprUtils(schema)
     const axisBuilder = new AxisBuilder({ schema })
+    const exprValidator = new ExprValidator(schema)
 
     if (!design.shape) {
       return "Missing shape"
@@ -654,6 +655,10 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     error = axisBuilder.validateAxis({ axis: (design.colorAxis as Axis) })
     if (error) { return error; }
 
+    // Validate filter
+    error = exprValidator.validateExpr(design.filter || null)
+    if (error) { return error; }
+    
     return null
   }
 

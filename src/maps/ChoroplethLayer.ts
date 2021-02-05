@@ -4,7 +4,7 @@ import React from 'react'
 import { original, produce } from 'immer'
 
 import Layer, { OnGridClickOptions, VectorTileDef } from './Layer'
-import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, Expr, DataSource, OpExpr } from 'mwater-expressions'
+import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, Expr, DataSource, OpExpr, ExprValidator } from 'mwater-expressions'
 import AxisBuilder from '../axes/AxisBuilder'
 import { LayerDefinition, OnGridClickResults } from './maps'
 import { JsonQLFilter } from '../index'
@@ -1345,6 +1345,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     let error
     const exprUtils = new ExprUtils(schema)
     const axisBuilder = new AxisBuilder({schema})
+    const exprValidator = new ExprValidator(schema)
 
     if (design.regionMode === "indirect") {
       if (!design.table) {
@@ -1358,6 +1359,10 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       if (error) { return error; }
 
       error = axisBuilder.validateAxis({ axis: design.axes.label || null })
+      if (error) { return error; }
+  
+      // Validate filter
+      error = exprValidator.validateExpr(design.filter || null)
       if (error) { return error; }
     }
     else if (design.regionMode === "direct") {

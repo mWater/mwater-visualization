@@ -1,7 +1,7 @@
 import produce, { original } from "immer"
 import { JsonQLExpr, JsonQLQuery } from "jsonql"
 import _ from "lodash"
-import { DataSource, ExprCleaner, ExprCompiler, injectTableAlias, Schema } from "mwater-expressions"
+import { DataSource, ExprCleaner, ExprCompiler, ExprValidator, injectTableAlias, Schema } from "mwater-expressions"
 import React from "react"
 import { JsonQLFilter } from "../JsonQLFilter"
 import AxisBuilder from "../axes/AxisBuilder"
@@ -711,6 +711,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
   // Validates design. Null if ok, message otherwise
   validateDesign(design: ClusterLayerDesign, schema: Schema) {
     const axisBuilder = new AxisBuilder({schema})
+    const exprValidator = new ExprValidator(schema)
 
     if (!design.table) {
       return "Missing table"
@@ -720,7 +721,11 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       return "Missing axes"
     }
 
-    const error = axisBuilder.validateAxis({axis: design.axes.geometry})
+    let error = axisBuilder.validateAxis({axis: design.axes.geometry})
+    if (error) { return error; }
+
+    // Validate filter
+    error = exprValidator.validateExpr(design.filter || null)
     if (error) { return error; }
 
     return null

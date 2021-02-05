@@ -1,7 +1,7 @@
 import _ from "lodash"
 import produce, { original } from "immer"
 import { JsonQLExpr, JsonQLQuery, JsonQLSelect } from "jsonql"
-import { DataSource, ExprCleaner, ExprCompiler, injectTableAlias, Schema } from "mwater-expressions"
+import { DataSource, ExprCleaner, ExprCompiler, ExprValidator, injectTableAlias, Schema } from "mwater-expressions"
 import React from "react"
 import { JsonQLFilter } from "../JsonQLFilter"
 import AxisBuilder from "../axes/AxisBuilder"
@@ -718,6 +718,7 @@ marker-fill: ` + (design.color || "transparent") + `;
   // Validates design. Null if ok, message otherwise
   validateDesign(design: BufferLayerDesign, schema: Schema) {
     const axisBuilder = new AxisBuilder({schema})
+    const exprValidator = new ExprValidator(schema)
 
     if (!design.table) {
       return "Missing table"
@@ -737,6 +738,10 @@ marker-fill: ` + (design.color || "transparent") + `;
     error = axisBuilder.validateAxis({axis: design.axes.color})
     if (error) { return error; }
 
+    // Validate filter
+    error = exprValidator.validateExpr(design.filter || null)
+    if (error) { return error; }
+    
     return null
   }
 
