@@ -32,6 +32,8 @@ export * from './WidgetScope'
 export { default as WidgetFactory } from './widgets/WidgetFactory'
 export { default as Widget } from './widgets/Widget'
 
+export { default as DatagridUtils } from './datagrids/DatagridUtils'
+
 export * from './maps/MapViewComponent'
 export { MapScope } from './maps/MapUtils'
 

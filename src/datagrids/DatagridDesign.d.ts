@@ -3,7 +3,7 @@ import { Expr, LiteralType } from "mwater-expressions"
 /** Design of data grid */
 export interface DatagridDesign {
   /** table id of main table */
-  table: string
+  table: string | null
 
   /** array of columns */
   columns: DatagridDesignColumn[]

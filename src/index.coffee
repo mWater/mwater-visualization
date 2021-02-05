@@ -47,7 +47,7 @@ exports.ColorSchemeFactory = require './ColorSchemeFactory'
 
 exports.DatagridComponent = require './datagrids/DatagridComponent'
 exports.DatagridViewComponent = require './datagrids/DatagridViewComponent'
-exports.DatagridUtils = require './datagrids/DatagridUtils'
+exports.DatagridUtils = require('./datagrids/DatagridUtils').default
 
 exports.ServerDashboardDataSource = require('./dashboards/ServerDashboardDataSource').default
 exports.DirectDashboardDataSource = require './dashboards/DirectDashboardDataSource'

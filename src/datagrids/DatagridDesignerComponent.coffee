@@ -4,6 +4,7 @@ React = require 'react'
 R = React.createElement
 
 ExprUtils = require("mwater-expressions").ExprUtils
+ExprValidator = require("mwater-expressions").ExprValidator
 TabbedComponent = require 'react-library/lib/TabbedComponent'
 ExprComponent = require('mwater-expressions-ui').ExprComponent
 FilterExprComponent = require('mwater-expressions-ui').FilterExprComponent
@@ -359,6 +360,7 @@ class ColumnDesignerComponent extends React.Component
 
   render: =>
     exprUtils = new ExprUtils(@props.schema)
+    exprValidator = new ExprValidator(@props.schema)
 
     # Get type of current expression
     type = exprUtils.getExprType(@props.column.expr)
@@ -369,6 +371,8 @@ class ColumnDesignerComponent extends React.Component
     # If type id, allow id (e.g. don't allow to be added directly, but keep if present)
     if type == "id"
       allowedTypes.push("id")
+
+    error = exprValidator.validateExpr(@props.column.expr, { aggrStatuses: ["individual", "literal", "aggregate"] })
 
     elem = R 'div', className: "row",
       R 'div', className: "col-xs-1",
@@ -385,6 +389,8 @@ class ColumnDesignerComponent extends React.Component
           onChange: @handleExprChange
         @renderSplit()
         @renderFormat()
+        if error
+          R 'i', className: "fa fa-exclamation-circle text-danger"
 
       R 'div', className: "col-xs-4",
         R 'input',
