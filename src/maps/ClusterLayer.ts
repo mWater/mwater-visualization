@@ -103,12 +103,13 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
               select 
               count(*) as cnt, 
               ST_Centroid(ST_Collect(<geometry axis>)) as center, 
-              ST_Snaptogrid(<geometry axis>, tile.scale/6, tile.scale/6) as grid
+              round(ST_XMin(<geometry axis) / (tile.scale / 6)) as gridx,
+              round(ST_YMin(<geometry axis) / (tile.scale / 6)) as gridy
               from <table> as main
               where <geometry axis> && !bbox! 
                 and <geometry axis> is not null
                 and <other filters>
-              group by 3
+              group by 3, 4
             ) as sub1
           ) as sub2, tile as tile
         group by sub2.clust
@@ -134,24 +135,20 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       ]
     }
 
-    // ST_Snaptogrid(<geometry axis>, !pixel_width!*40, !pixel_height!*40)
-    const gridExpr = {
-      type: "op",
-      op: "ST_Snaptogrid",
-      exprs: [
-        geometryExpr,
-        {
-          type: "op",
-          op: "/",
-          exprs: [scaleExpr, 6]
-        },
-        {
-          type: "op",
-          op: "/",
-          exprs: [scaleExpr, 6]
-        }
-      ]
-    }
+    // round(ST_XMin(<geometry axis) / (tile.scale / 6))
+    const gridXExpr = { type: "op", op: "round", exprs: [
+      { type: "op", op: "/", exprs: [
+        { type: "op", op: "ST_XMin", exprs: [geometryExpr] },
+        { type: "op", op: "/", exprs: [scaleExpr, 6]}
+      ]}
+    ]}
+
+    const gridYExpr = { type: "op", op: "round", exprs: [
+      { type: "op", op: "/", exprs: [
+        { type: "op", op: "ST_YMin", exprs: [geometryExpr] },
+        { type: "op", op: "/", exprs: [scaleExpr, 6]}
+      ]}
+    ]}
 
     // Create inner query
     const innerQuery: JsonQLQuery = {
@@ -159,10 +156,11 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       selects: [
         { type: "select", expr: { type: "op", op: "count", exprs: [] }, alias: "cnt" },
         { type: "select", expr: centerExpr, alias: "center" },
-        { type: "select", expr: gridExpr, alias: "grid" }
+        { type: "select", expr: gridXExpr, alias: "gridx" },
+        { type: "select", expr: gridYExpr, alias: "gridy" }
       ],
       from: exprCompiler.compileTable(design.table, "main"),
-      groupBy: [3]
+      groupBy: [3, 4]
     }
 
     // Create filters. First ensure geometry and limit to bounding box
@@ -317,12 +315,13 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
               select 
               count(*) as cnt, 
               ST_Centroid(ST_Collect(<geometry axis>)) as center, 
-              ST_Snaptogrid(<geometry axis>, !pixel_width!*40, !pixel_height!*40) as grid
+              round(ST_XMin(<geometry axis>) /  (!pixel_width!*40)) as gridx,
+              round(ST_YMin(<geometry axis>) /  (!pixel_width!*40)) as gridy,
               from <table> as main
               where <geometry axis> && !bbox! 
                 and <geometry axis> is not null
                 and <other filters>
-              group by 3
+              group by 3, 4
             ) as sub1
           ) as sub2 
         group by sub2.clust
@@ -348,24 +347,19 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       ]
     }
 
-    // ST_Snaptogrid(<geometry axis>, !pixel_width!*40, !pixel_height!*40)
-    const gridExpr = {
-      type: "op",
-      op: "ST_Snaptogrid",
-      exprs: [
-        geometryExpr,
-        {
-          type: "op",
-          op: "*",
-          exprs: [{ type: "token", token: "!pixel_width!" }, 40]
-        },
-        {
-          type: "op",
-          op: "*",
-          exprs: [{ type: "token", token: "!pixel_width!" }, 40]
-        }
-      ]
-    }
+    const gridXExpr =  { type: "op", op: "round", exprs: [
+      { type: "op", op: "/", exprs: [
+        { type: "op", op: "ST_XMin", exprs: [geometryExpr] },
+        { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_width!" }, 40]}
+      ]}
+    ]}
+
+    const gridYExpr =  { type: "op", op: "round", exprs: [
+      { type: "op", op: "/", exprs: [
+        { type: "op", op: "ST_YMin", exprs: [geometryExpr] },
+        { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_height!" }, 5]}
+      ]}
+    ]}
 
     // Create inner query
     const innerQuery: JsonQLQuery = {
@@ -373,10 +367,11 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       selects: [
         { type: "select", expr: { type: "op", op: "count", exprs: [] }, alias: "cnt" },
         { type: "select", expr: centerExpr, alias: "center" },
-        { type: "select", expr: gridExpr, alias: "grid" }
+        { type: "select", expr: gridXExpr, alias: "gridx" },
+        { type: "select", expr: gridYExpr, alias: "gridy" }
       ],
       from: exprCompiler.compileTable(design.table, "main"),
-      groupBy: [3]
+      groupBy: [3, 4]
     }
 
     // Create filters. First ensure geometry and limit to bounding box
