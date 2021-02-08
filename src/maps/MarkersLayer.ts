@@ -8,9 +8,9 @@ import { ExprCompiler, ExprCleaner, injectTableAlias, Schema, DataSource, ExprVa
 import AxisBuilder from '../axes/AxisBuilder'
 import { OnGridClickResults } from './maps'
 import { JsonQLFilter } from '../index'
-import ChoroplethLayerDesign from './ChoroplethLayerDesign'
 import { JsonQL, JsonQLQuery, JsonQLSelect } from 'jsonql'
 import { MarkersLayerDesign } from './MarkersLayerDesign'
+import { compileColorMapToMapbox } from './mapboxUtils'
 const LayerLegendComponent = require('./LayerLegendComponent')
 const PopupFilterJoinsUtils = require('./PopupFilterJoinsUtils')
 
@@ -24,21 +24,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     const mapLayers: mapboxgl.AnyLayer[] = []
 
     // If color axes, add color conditions
-    let color: any
-    if (design.axes.color && design.axes.color.colorMap) {
-      const excludedValues = design.axes.color.excludedValues || []
-      // Create match operator
-      color = ["case"]
-      for (let item of design.axes.color.colorMap) {
-        color.push(["==", ["get", "color"], item.value])
-        color.push(excludedValues.includes(item.value) ? "transparent" : item.color)
-      }
-      // Else
-      color.push(design.color || "#666666")
-    }
-    else { 
-      color = design.color || "#666666"
-    }
+    const color = compileColorMapToMapbox(design.axes.color, design.color || "#666666")
 
     // Add polygons
     mapLayers.push({

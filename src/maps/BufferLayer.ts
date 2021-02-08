@@ -8,6 +8,7 @@ import AxisBuilder from "../axes/AxisBuilder"
 import { BufferLayerDesign } from "./BufferLayerDesign"
 import Layer, { OnGridClickOptions, VectorTileDef } from "./Layer"
 import { OnGridClickResults } from "./maps"
+import { compileColorMapToMapbox } from './mapboxUtils'
 
 const LegendGroup = require('./LegendGroup')
 const LayerLegendComponent = require('./LayerLegendComponent')
@@ -44,21 +45,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     const mapLayers: mapboxgl.AnyLayer[] = []
 
     // If color axes, add color conditions
-    let color: any
-    if (design.axes.color && design.axes.color.colorMap) {
-      const excludedValues = design.axes.color.excludedValues || []
-      // Create match operator
-      color = ["case"]
-      for (let item of design.axes.color.colorMap) {
-        color.push(["==", ["get", "color"], item.value])
-        color.push(excludedValues.includes(item.value) ? "transparent" : item.color)
-      }
-      // Else
-      color.push(design.color || "transparent")
-    }
-    else { 
-      color = design.color || "transparent"
-    }
+    const color = compileColorMapToMapbox(design.axes.color, design.color || "transparent")
     
     mapLayers.push({
       'id': `${sourceId}:fill`,

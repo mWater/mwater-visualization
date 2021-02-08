@@ -10,6 +10,7 @@ import { LayerDefinition, OnGridClickResults } from './maps'
 import { JsonQLFilter } from '../index'
 import ChoroplethLayerDesign from './ChoroplethLayerDesign'
 import { JsonQL, JsonQLExpr, JsonQLQuery } from 'jsonql'
+import { compileColorMapToMapbox } from './mapboxUtils'
 const LayerLegendComponent = require('./LayerLegendComponent')
 const PopupFilterJoinsUtils = require('./PopupFilterJoinsUtils')
 
@@ -426,21 +427,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     }
 
     // If color axes, add color conditions
-    let color: any
-    if (design.axes.color && design.axes.color.colorMap) {
-      const excludedValues = design.axes.color.excludedValues || []
-      // Create match operator
-      color = ["case"]
-      for (let item of design.axes.color.colorMap) {
-        color.push(["==", ["get", "color"], item.value])
-        color.push(excludedValues.includes(item.value) ? "transparent" : item.color)
-      }
-      // Else
-      color.push(design.color || "transparent")
-    }
-    else { 
-      color = design.color || "transparent"
-    }
+    const color = compileColorMapToMapbox(design.axes.color, design.color || "transparent")
 
     // Create layers
     const mapLayers: mapboxgl.AnyLayer[] = []
@@ -627,21 +614,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     }
 
     // If color axes, add color conditions
-    let color: any
-    if (design.axes.color && design.axes.color.colorMap) {
-      const excludedValues = design.axes.color.excludedValues || []
-      // Create match operator
-      color = ["case"]
-      for (let item of design.axes.color.colorMap) {
-        color.push(["==", ["get", "color"], item.value])
-        color.push(excludedValues.includes(item.value) ? "transparent" : item.color)
-      }
-      // Else
-      color.push(design.color || "transparent")
-    }
-    else { 
-      color = design.color || "transparent"
-    }
+    const color = compileColorMapToMapbox(design.axes.color, design.color || "transparent")
 
     // Create layers
     const mapLayers: mapboxgl.AnyLayer[] = []

@@ -10,6 +10,7 @@ import GridLayerDesign from './GridLayerDesign'
 import produce from 'immer'
 import { Axis } from '../axes/Axis'
 import { JsonQL, JsonQLExpr, JsonQLQuery } from 'jsonql'
+import { compileColorMapToMapbox } from './mapboxUtils'
 const LayerLegendComponent = require('./LayerLegendComponent')
 
 /** Layer which is a grid of squares or flat-topped hexagons. Depends on "Grid Functions.sql" having been run */
@@ -23,21 +24,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     const mapLayers: mapboxgl.AnyLayer[] = []
 
     // If color axes, add color conditions
-    let color: any
-    if (design.colorAxis && design.colorAxis.colorMap) {
-      const excludedValues = design.colorAxis.excludedValues || []
-      // Create match operator
-      color = ["case"]
-      for (let item of design.colorAxis.colorMap) {
-        color.push(["==", ["get", "color"], item.value])
-        color.push(excludedValues.includes(item.value) ? "transparent" : item.color)
-      }
-      // Else
-      color.push("transparent")
-    }
-    else { 
-      color = "transparent"
-    }
+    const color = compileColorMapToMapbox(design.colorAxis, "transparent")
     
     mapLayers.push({
       'id': `${sourceId}:fill`,

@@ -2,6 +2,7 @@
 
 import _ from "lodash"
 import { Expr, ExprCleaner, ExprCompiler, ExprUtils, FieldExpr, Schema } from "mwater-expressions"
+import { Axis } from "../axes/Axis"
 import { JsonQLFilter } from "../JsonQLFilter"
 import LayerFactory from "./LayerFactory"
 import { MapDesign } from "./MapDesign"

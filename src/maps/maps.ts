@@ -1,7 +1,4 @@
 import { JsonQL } from "jsonql";
-import { JsonQLFilter } from "../JsonQLFilter"
-import { MapLayerDataSource } from "./MapLayerDataSource";
-import { MapDesign } from "./MapDesign";
 
 export interface LayerDefinition {
   layers: Array<{ 
