@@ -136,7 +136,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     // Convert to Web mercator (3857)
     geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
 
-    // row_number() over (partition by st_snaptogrid(location, tile.scale / 50, tile.scale / 50)) AS r
+    // row_number() over (partition by st_snaptogrid(location, tile.scale / 150, tile.scale / 150)) AS r
     const cluster: JsonQLSelect = {
       type: "select",
       expr: { 
@@ -147,13 +147,13 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
           { type: "op", op: "round", exprs: [
             { type: "op", op: "/", exprs: [
               { type: "op", op: "ST_XMin", exprs: [geometryExpr] },
-              { type: "op", op: "/", exprs: [scaleExpr, 40]}
+              { type: "op", op: "/", exprs: [scaleExpr, 150]}
             ]}
           ]},
           { type: "op", op: "round", exprs: [
             { type: "op", op: "/", exprs: [
               { type: "op", op: "ST_YMin", exprs: [geometryExpr] },
-              { type: "op", op: "/", exprs: [scaleExpr, 40]}
+              { type: "op", op: "/", exprs: [scaleExpr, 150]}
             ]}
           ]}
         ]}

@@ -71,7 +71,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     const scaleExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "scale" }, from: { type: "table", table: "tile", alias: "tile" }}
     const envelopeExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
     
-    const pixelWidth = { type: "op", op: "/", exprs: [scaleExpr, 256] }
+    const pixelWidth = { type: "op", op: "/", exprs: [scaleExpr, 768] }
 
     /* Compile to a query like this:
       select ST_AsMVTGeom(mwater_hex_make(grid.q, grid.r, tile.scale/256*SIZE), tile.envelope) as the_geom_webmercator, data.color as color from 
