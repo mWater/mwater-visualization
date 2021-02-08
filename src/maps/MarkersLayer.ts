@@ -113,7 +113,8 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
         'source-layer': 'main',
         layout: {
           "icon-image": design.symbol,
-          "icon-allow-overlap": true
+          "icon-allow-overlap": true,
+          "icon-size": (design.markerSize || 10) / 14 // For some reason, scales down from 20 to 14. No idea why
         },
         paint: {
           "icon-color": color,
