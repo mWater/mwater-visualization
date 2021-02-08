@@ -318,7 +318,7 @@ export function NewMapViewComponent(props: {
       const mapSymbol = mapSymbols.find(s => s.value == ev.id)
       if (mapSymbol) {
         m.loadImage(mapSymbol.url, (err: any, image: any) => { 
-          if (image) {
+          if (image && !m.hasImage(mapSymbol.value)) {
             m.addImage(mapSymbol.value, image, { sdf: true })
           }
         })
@@ -407,6 +407,7 @@ export function NewMapViewComponent(props: {
         ...baseStyle.sources,
         ...userStyle.sources
       },
+      glyphs: baseStyle.glyphs || "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
       layers
     }
 
