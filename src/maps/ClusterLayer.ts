@@ -119,9 +119,6 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     // Compile geometry axis
     let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "main"})
 
-    // Convert to Web mercator (3857)
-    geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
-
     // ST_Centroid(ST_Collect(<geometry axis>))
     let centerExpr = {
       type: "op",
@@ -330,9 +327,6 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
 
     // Compile geometry axis
     let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "main"})
-
-    // Convert to Web mercator (3857)
-    geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
 
     // ST_Centroid(ST_Collect(<geometry axis>))
     let centerExpr = {

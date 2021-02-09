@@ -99,7 +99,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
       select
       <primary key> as id,
       [<color axis> as color,
-      ST_AsMVTGeom(st_transform(<geometry axis>, 3857), (select tile.envelope from tile as tile) as the_geom_webmercator,
+      ST_AsMVTGeom(<geometry axis>, (select tile.envelope from tile as tile) as the_geom_webmercator,
       from <table> as main
       where
         <geometry axis> is not null
@@ -117,9 +117,6 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
 
     // Compile geometry axis
     let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "main"})
-
-    // Convert to Web mercator (3857)
-    geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
 
     // radius / cos(st_ymax(st_transform(geometryExpr, 4326)) * 0.017453293) 
     const bufferAmountExpr = {
@@ -308,9 +305,6 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
 
     // Compile geometry axis
     let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "main"})
-
-    // Convert to Web mercator (3857)
-    geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
 
     // radius * 2 / (!pixel_width! * cos(st_ymin(st_transform(geometryExpr, 4326)) * 0.017453293) + 1 # add one to make always visible
     const widthExpr = {

@@ -133,9 +133,6 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     // Compile geometry axis
     let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "innerquery"})
 
-    // Convert to Web mercator (3857)
-    geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
-
     // row_number() over (partition by st_snaptogrid(location, tile.scale / 150, tile.scale / 150)) AS r
     const cluster: JsonQLSelect = {
       type: "select",
@@ -269,9 +266,6 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
 
     // Compile geometry axis
     let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "innerquery"})
-
-    // Convert to Web mercator (3857)
-    geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 3857] }
 
     // row_number() over (partition by round(ST_XMin(location)/!pixel_width!*5), round(ST_YMin(location)/!pixel_height!*5)) AS r
     const cluster: JsonQLSelect = {
@@ -665,9 +659,6 @@ polygon-fill: ` + item.color + `;\
 
     // Compile geometry axis
     let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "innerquery"})
-
-    // Convert to Web mercator (3857)
-    geometryExpr = { type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326] }
 
     // Select _id, location and clustered row number
     const innerquery: JsonQLQuery = {
