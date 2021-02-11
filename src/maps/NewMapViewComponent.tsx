@@ -311,6 +311,12 @@ export function NewMapViewComponent(props: {
     // Add zoom controls to the map.
     m.addControl(new mapboxgl.NavigationControl({}), "top-left")
 
+    // Add scale control
+    const scale = new mapboxgl.ScaleControl({
+      unit: 'metric'
+    })
+    m.addControl(scale)
+
     // Speed up wheel scrolling
     m.scrollZoom.setWheelZoomRate(1/250)
 
