@@ -12,6 +12,7 @@ import ModalPopupComponent from 'react-library/lib/ModalPopupComponent'
 import { getCompiledFilters as utilsGetCompiledFilters, getFilterableTables as utilsGetFilterableTables, MapScope } from './MapUtils'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
+import './NewMapViewComponent.css'
 import { LayerSwitcherComponent } from "./LayerSwitcherComponent"
 import LegendComponent from "./LegendComponent"
 
@@ -303,7 +304,8 @@ export function NewMapViewComponent(props: {
       bounds: props.design.bounds ? [props.design.bounds.w, props.design.bounds.s, props.design.bounds.e, props.design.bounds.n] : undefined,
       scrollZoom: props.scrollWheelZoom === false ? false : true,
       dragPan: props.dragging === false ? false : true,
-      touchZoomRotate: props.touchZoom === false ? false : true
+      touchZoomRotate: props.touchZoom === false ? false : true,
+      attributionControl: false
     })
 
     // Add zoom controls to the map.
@@ -576,6 +578,7 @@ export function NewMapViewComponent(props: {
     <div style={{ width: props.width, height: props.height }} ref={divRef}/>
     { renderLegend() }
     { renderBusy() }
+    <AttributionControl extraText={props.design.attribution}/>
   </div>
 }
 
@@ -604,4 +607,13 @@ function HiddenLegend(props: {
   return <div style={style} onClick={props.onShow}>
     <i className="fa fa-angle-double-left"/>
   </div>
+}
+
+function AttributionControl(props: {
+  extraText?: string
+}) {
+  return <div className="newmap-attribution-control">
+    <a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a> <a href="http://www.openstreetmap.org/about/" target="_blank">© OpenStreetMap</a>
+    { props.extraText ? " " + props.extraText : null }
+  </div> 
 }
