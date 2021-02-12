@@ -91,7 +91,7 @@ module.exports = class DatagridComponent extends React.Component
     if @state.cellEditingEnabled
       @setState(cellEditingEnabled: false)
     else
-      if confirm("Turn on cell editing? This is allow you to edit the live data and is an advanced feature.")
+      if confirm("Turn on cell editing? This will allow you to edit the live data and is an advanced feature.")
         @setState(cellEditingEnabled: true)
 
   handleEdit: =>
