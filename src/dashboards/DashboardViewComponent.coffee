@@ -17,6 +17,8 @@ LayoutManager = require '../layouts/LayoutManager'
 WidgetScopesViewComponent = require '../widgets/WidgetScopesViewComponent'
 getLayoutOptions = require('./layoutOptions').getLayoutOptions
 
+WidgetComponent = require('./WidgetComponent').WidgetComponent
+
 # Displays a dashboard, handling removing of widgets. No title bar or other decorations.
 # Handles scoping and stores the state of scope
 module.exports = class DashboardViewComponent extends React.Component
@@ -179,10 +181,13 @@ module.exports = class DashboardViewComponent extends React.Component
         implicitFilterBuilder = new ImplicitFilterBuilder(@props.schema)
         filters = implicitFilterBuilder.extendFilters(filterableTables, filters)
       
-      widgetElem = widget.createViewElement({
+      widgetElem = R(WidgetComponent, {
+        key: options.id
+        id: options.id
+        type: options.type
         schema: @props.schema
         dataSource: @props.dataSource
-        widgetDataSource: @props.dashboardDataSource.getWidgetDataSource(options.id)
+        dashboardDataSource: @props.dashboardDataSource
         design: options.design
         scope: @state.widgetScoper.getScope(options.id)
         filters: filters
@@ -194,7 +199,7 @@ module.exports = class DashboardViewComponent extends React.Component
         namedStrings: @props.namedStrings
         tocEntries: tocEntries
         onScrollToTOCEntry: @handleScrollToTOCEntry
-      })  
+      })
 
       # Keep references to widget elements
       widgetElem = React.cloneElement(widgetElem, ref: ((c) => @widgetComps[options.id] = c))

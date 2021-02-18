@@ -2,6 +2,7 @@ import { DataSource, Schema } from "mwater-expressions";
 import { ReactElement } from "react";
 import { JsonQLFilter } from "../JsonQLFilter"
 import { WidgetScope } from "../WidgetScope";
+import { WidgetDataSource } from "./WidgetDataSource";
 
 export default class Widget {
   /** Creates a React element that is a view of the widget */
@@ -11,7 +12,7 @@ export default class Widget {
     /** data source to use. Only used when designing, for display uses widgetDataSource **/
     dataSource: DataSource
     /** Gives data to the widget in a way that allows client-server separation and secure sharing. See definition in WidgetDataSource. **/
-    widgetDataSource: any // TODO
+    widgetDataSource: WidgetDataSource
     /** widget design **/
     design: object
     /** scope of the widget (when the widget self-selects a particular scope) **/
@@ -32,7 +33,6 @@ export default class Widget {
     onRowClick?: (tableId: string, rowId: any) => void
     /** Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget */
     namedStrings?: { [key: string]: string }
-
   }): ReactElement<any>
 
   /* Get the data that the widget needs. This will be called on the server, typically.

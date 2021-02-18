@@ -31,7 +31,7 @@ interface ServerWidgetMapDataSourceOptions extends ServerDashboardDataSourceOpti
 export default class ServerDashboardDataSource {
     options: ServerDashboardDataSourceOptions;
     constructor(options: ServerDashboardDataSourceOptions);
-    getWidgetDataSource(widgetId: string): ServerWidgetDataSource;
+    getWidgetDataSource(widgetType: string, widgetId: string): ServerWidgetDataSource;
     getQuickfiltersDataSource(): ServerQuickfilterDataSource;
 }
 declare class ServerQuickfilterDataSource implements QuickfiltersDataSource {

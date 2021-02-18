@@ -50,7 +50,7 @@ export default class ServerDashboardDataSource {
   }
 
   // Gets the widget data source for a specific widget
-  getWidgetDataSource(widgetId: string) {
+  getWidgetDataSource(widgetType: string, widgetId: string) {
     return new ServerWidgetDataSource({ ...this.options, widgetId })
   }
 

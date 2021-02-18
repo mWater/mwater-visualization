@@ -11,31 +11,23 @@ MapWidget = require './MapWidget'
 IFrameWidget = require './IFrameWidget'
 TOCWidget = require './TOCWidget'
 
+widgetTypes = {
+  LayeredChart: new ChartWidget(new LayeredChart())
+  TableChart: new ChartWidget(new TableChart())
+  CalendarChart: new ChartWidget(new CalendarChart())
+  ImageMosaicChart: new ChartWidget(new ImageMosaicChart())
+  PivotChart: new ChartWidget(new PivotChart())
+  Markdown: new MarkdownWidget()
+  Map: new MapWidget()
+  Text: new TextWidget()
+  Image: new ImageWidget()
+  IFrame: new IFrameWidget()
+  TOC: new TOCWidget()
+}
+
 # Creates widgets based on type 
 module.exports = class WidgetFactory
   @createWidget: (type) ->
-    switch type
-      when "LayeredChart"
-        return new ChartWidget(new LayeredChart())
-      when "TableChart"
-        return new ChartWidget(new TableChart())
-      when "CalendarChart"
-        return new ChartWidget(new CalendarChart())
-      when "ImageMosaicChart"
-        return new ChartWidget(new ImageMosaicChart())
-      when "PivotChart"
-        return new ChartWidget(new PivotChart())
-      when "Markdown"
-        return new MarkdownWidget()
-      when "Map"
-        return new MapWidget()
-      when "Text"
-        return new TextWidget()
-      when "Image"
-        return new ImageWidget()
-      when "IFrame"
-        return new IFrameWidget()
-      when "TOC"
-        return new TOCWidget()
-      else    
-        throw new Error("Unknown widget type #{type}")
+    if widgetTypes[type]
+      return widgetTypes[type]
+    throw new Error("Unknown widget type #{type}")

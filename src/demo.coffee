@@ -7,7 +7,7 @@ $ = require 'jquery'
 
 Schema = require('mwater-expressions').Schema
 DataSource = require('mwater-expressions').DataSource
-
+mWaterLoader = require './mWaterLoader'
 visualization = require './index'
 
 # CalendarChartViewComponent = require './widgets/charts/CalendarChartViewComponent'
@@ -40,11 +40,11 @@ $ ->
       # R(TestPane, apiUrl: "https://api.mwater.co/v3/")
       # R(MWaterDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1), dashboardId: "a855eb0587d845d3ac27aed03c463976", share: "817c76088c7649ec8cc0b8193e547a09")
       # R(MWaterDashboardPane, apiUrl: "http://localhost:1234/v3/", client: "674fd648e9693e1e0d2eb2ef29107d0e", dashboardId: "c58048c3c3384a5aab3d984ac1f3750e")
-      # R(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+      R(MWaterDirectDashboardPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
       # R(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
       # R(MWaterDatagridDesignerPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
       # R(MWaterDatagridPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
-      R(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
+      # R(MWaterDirectMapPane, apiUrl: "https://api.mwater.co/v3/", client: window.location.hash.substr(1))
       # R(MWaterDirectMapPane, apiUrl: "http://localhost:1234/v3/", client: window.location.hash.substr(1))
       # R(WaterOrgDashboardPane, apiUrl: "http://localhost:1235/mwater/")
       # R(BlocksDesignerComponent, renderBlock: [])
@@ -157,6 +157,26 @@ class MWaterDirectDashboardPane extends React.Component
       extraTables: if window.localStorage.getItem("MWaterDirectDashboardPane.extraTables") then JSON.parse(window.localStorage.getItem("MWaterDirectDashboardPane.extraTables")) else []
     }
 
+  componentWillMount: ->
+    mWaterLoader({
+      apiUrl: @props.apiUrl
+      client: @props.client
+      onExtraTablesChange: @handleExtraTablesChange
+      extraTables: @state.extraTables
+    }, (error, config) => 
+      if error
+        alert("Error loading")
+        return 
+      dashboardDataSource = new DirectDashboardDataSource({
+        apiUrl: @props.apiUrl
+        client: @props.client
+        schema: config.schema
+        dataSource: config.dataSource
+      })
+
+      @setState(schema: config.schema, dataSource: config.dataSource, dashboardDataSource: dashboardDataSource)
+    )
+
   handleDesignChange: (design) =>
     @setState(design: design)
     # console.log JSON.stringify(design, null, 2)
@@ -167,38 +187,21 @@ class MWaterDirectDashboardPane extends React.Component
     window.localStorage.setItem("MWaterDirectDashboardPane.extraTables", JSON.stringify(extraTables))
 
   render: ->
-    React.createElement(MWaterLoaderComponent, {
-      apiUrl: @props.apiUrl
-      client: @props.client
-      user: @props.user
-      onExtraTablesChange: @handleExtraTablesChange
-      extraTables: @state.extraTables
-    }, (error, config) =>
-      if error
-        alert("Error: " + error.message)
-        return null
+    if not @state.schema
+      return R 'div', null, "Loading..."
 
-      dashboardDataSource = new DirectDashboardDataSource({
-        apiUrl: @props.apiUrl
-        client: @props.client
+    R 'div', style: { height: "100%" },
+      React.createElement(visualization.DashboardComponent, {
+        schema: @state.schema
+        dataSource: @state.dataSource
+        dashboardDataSource: @state.dashboardDataSource
         design: @state.design
-        schema: config.schema
-        dataSource: config.dataSource
+        onDesignChange: @handleDesignChange
+        titleElem: "Sample"
+        # quickfilterLocks: [{ expr: { type: "field", table: "entities.water_point", column: "type" }, value: "Protected dug well" }]
+        namedStrings: { branding: "mWater" }
+        onRowClick: (table, rowId) => alert("Row clicked: #{table} #{rowId}")
       })
-
-      R 'div', style: { height: "100%" },
-        React.createElement(visualization.DashboardComponent, {
-          schema: config.schema
-          dataSource: config.dataSource
-          dashboardDataSource: dashboardDataSource
-          design: @state.design
-          onDesignChange: @handleDesignChange
-          titleElem: "Sample"
-          # quickfilterLocks: [{ expr: { type: "field", table: "entities.water_point", column: "type" }, value: "Protected dug well" }]
-          namedStrings: { branding: "mWater" }
-          onRowClick: (table, rowId) => alert("Row clicked: #{table} #{rowId}")
-        })
-    )
 
 
 # mapId = "fb92ca9ca9a04bfd8dc156b5ac71380d"
@@ -363,7 +366,6 @@ class WaterOrgDashboardPane extends React.Component
 
     dashboardDataSource = new DirectDashboardDataSource({
       apiUrl: @props.apiUrl
-      design: @state.design
       schema: @state.schema
       dataSource: @state.dataSource
     })

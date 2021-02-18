@@ -67,7 +67,7 @@ module.exports = class ChartWidget extends Widget
   isAutoHeight: -> @chart.isAutoHeight()
 
 # Complete chart widget
-class ChartWidgetComponent extends React.Component
+class ChartWidgetComponent extends React.PureComponent
   @propTypes:
     schema: PropTypes.object.isRequired # schema to use
     dataSource: PropTypes.object.isRequired # data source to use
