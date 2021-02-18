@@ -180,7 +180,6 @@ class MWaterDirectDashboardPane extends React.Component
       dashboardDataSource = new DirectDashboardDataSource({
         apiUrl: @props.apiUrl
         client: @props.client
-        design: @state.design
         schema: config.schema
         dataSource: config.dataSource
       })
