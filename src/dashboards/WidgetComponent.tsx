@@ -72,8 +72,9 @@ export function WidgetComponent(props: {
 
   // Stabilize functions
   const onDesignChange = useStabilizeFunction(props.onDesignChange)
-  const onRowClick = useStabilizeFunction(props.onRowClick) || undefined
+  const onRowClick = useStabilizeFunction(props.onRowClick) || undefined  
   const onScopeChange = useStabilizeFunction(props.onScopeChange)!
+  const widgetRef = useStabilizeFunction(props.widgetRef)!
 
   // Stabilize values
   const filters = useStabilizeValue(props.filters)
@@ -95,7 +96,7 @@ export function WidgetComponent(props: {
     namedStrings: props.namedStrings,
     tocEntries: props.tocEntries,
     onScrollToTOCEntry: props.onScrollToTOCEntry,
-    widgetRef: props.widgetRef
+    widgetRef
   })
 }
 
