@@ -152,6 +152,9 @@ module.exports = class DashboardViewComponent extends React.Component
   renderScopes: ->
     R(WidgetScopesViewComponent, scopes: @state.widgetScoper.getScopes(), onRemoveScope: @handleRemoveScope)
 
+  compRef: (options) => (c) =>
+    @widgetComps[options.id] = c
+
   render: ->
     layoutManager = LayoutManager.createLayoutManager(@props.design.layout)
 
@@ -202,7 +205,7 @@ module.exports = class DashboardViewComponent extends React.Component
       })
 
       # Keep references to widget elements
-      widgetElem = React.cloneElement(widgetElem, ref: ((c) => @widgetComps[options.id] = c))
+      widgetElem = React.cloneElement(widgetElem, widgetRef: @compRef(options))
       return widgetElem
 
     style = {

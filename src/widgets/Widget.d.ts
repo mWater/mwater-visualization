@@ -33,6 +33,15 @@ export default class Widget {
     onRowClick?: (tableId: string, rowId: any) => void
     /** Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget */
     namedStrings?: { [key: string]: string }
+
+    /** Entries in the table of content */
+    tocEntries?: string[]
+
+    /** the widget callback ref */
+    widgetRef?: (widget: any) => void
+
+    /** called with (widgetId, tocEntryId) to scroll to TOC entry */
+    onScrollToTOCEntry?: (widgetId: string, tocEntryId: string) => void
   }): ReactElement<any>
 
   /* Get the data that the widget needs. This will be called on the server, typically.

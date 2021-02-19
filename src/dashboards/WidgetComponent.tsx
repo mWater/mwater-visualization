@@ -53,6 +53,15 @@ export function WidgetComponent(props: {
 
   /** Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget */
   namedStrings?: { [key: string]: string }
+
+  /** Entries in the table of content */
+  tocEntries?: string[]
+
+  /** the widget callback ref */
+  widgetRef: (widget: any) => void
+
+  /** called with (widgetId, tocEntryId) to scroll to TOC entry */
+  onScrollToTOCEntry?: (widgetId: string, tocEntryId: string) => void
 }) {
   // Get and stabilize widget data source
   // TODO!!! There is a global problem with DashboardDataSources being re-created on each render. 
@@ -83,7 +92,10 @@ export function WidgetComponent(props: {
     height: props.height,
     singleRowTable: props.singleRowTable,
     onRowClick,
-    namedStrings: props.namedStrings
+    namedStrings: props.namedStrings,
+    tocEntries: props.tocEntries,
+    onScrollToTOCEntry: props.onScrollToTOCEntry,
+    widgetRef: props.widgetRef
   })
 }
 

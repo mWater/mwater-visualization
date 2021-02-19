@@ -41,6 +41,7 @@ module.exports = class TextWidget extends Widget
       height: options.height
       singleRowTable: options.singleRowTable
       namedStrings: options.namedStrings
+      ref: options.widgetRef
 
   # Get the data that the widget needs. This will be called on the server, typically.
   #   design: design of the chart
