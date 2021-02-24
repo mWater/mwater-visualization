@@ -66,7 +66,13 @@ export function WidgetComponent(props: {
   // Get and stabilize widget data source
   // TODO!!! There is a global problem with DashboardDataSources being re-created on each render. 
   // TODO!!! This now only uses the type of the dashboard data source. They should be more stable in the future.
-  const widgetDataSource = useMemo(() => props.dashboardDataSource.getWidgetDataSource(props.type, props.id), [props.dashboardDataSource.constructor, props.type, props.id])
+  const widgetDataSource = useMemo(() => props.dashboardDataSource.getWidgetDataSource(props.type, props.id), [
+    props.dashboardDataSource.constructor, 
+    props.type, 
+    props.id,
+    props.schema,
+    props.dataSource
+  ])
 
   const widget = WidgetFactory.createWidget(props.type)
 
