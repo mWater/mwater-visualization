@@ -300,7 +300,7 @@ export function NewMapViewComponent(props: {
   useEffect(() => {
     const m = new mapboxgl.Map({
       container: divRef.current!,
-      accessToken: "pk.eyJ1IjoiY2xheXRvbmdyYXNzaWNrIiwiYSI6ImNpcHk4MHMxZDB5NHVma20ya3k1dnp3bzQifQ.lMMb60WxiYfRF0V4Y3UTbQ",
+      accessToken: "pk.eyJ1IjoiZ3Jhc3NpY2siLCJhIjoiY2ozMzU1N3ZoMDA3ZDJxbzh0aTRtOTRoeSJ9.fFWBZ88vbdezyhfw-I-fag",
       bounds: props.design.bounds ? [props.design.bounds.w, props.design.bounds.s, props.design.bounds.e, props.design.bounds.n] : undefined,
       scrollZoom: props.scrollWheelZoom === false ? false : true,
       dragPan: props.dragging === false ? false : true,
@@ -370,7 +370,7 @@ export function NewMapViewComponent(props: {
     }
 
     // Load style
-    const styleUrl = `https://api.mapbox.com/styles/v1/mapbox/${style}?access_token=pk.eyJ1IjoiY2xheXRvbmdyYXNzaWNrIiwiYSI6ImNpcHk4MHMxZDB5NHVma20ya3k1dnp3bzQifQ.lMMb60WxiYfRF0V4Y3UTbQ`
+    const styleUrl = `https://api.mapbox.com/styles/v1/mapbox/${style}?access_token=pk.eyJ1IjoiZ3Jhc3NpY2siLCJhIjoiY2ozMzU1N3ZoMDA3ZDJxbzh0aTRtOTRoeSJ9.fFWBZ88vbdezyhfw-I-fag`
     fetch(styleUrl).then(response => response.json()).then((styleData: mapboxgl.Style) => {
       // Set style and update layers
       setBaseStyle(styleData)
