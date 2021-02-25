@@ -224,9 +224,23 @@ export function NewMapViewComponent(props: {
       else {
         const tileUrl = props.mapDataSource.getLayerDataSource(layerView.id).getTileUrl(design, [])
         if (tileUrl) {
+          // Replace "{s}" with "a", "b", "c"
+          let tiles: string[] = []
+
+          if (tileUrl.includes("{s}")) {
+            tiles = [
+              tileUrl.replace("{s}", "a"),
+              tileUrl.replace("{s}", "b"),
+              tileUrl.replace("{s}", "c"),
+            ]
+          }
+          else {
+            tiles = [tileUrl]
+          }
+
           newSources[layerView.id] = {
             type: "raster",
-            tiles: [tileUrl],
+            tiles,
             tileSize: 256
           }
 
