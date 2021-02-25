@@ -54,11 +54,6 @@ module.exports = class AxisBuilder
     if not axis
       return
 
-    # Move aggr inside since aggr is deprecated at axis level DEPRECATED
-    if axis.aggr and axis.expr
-      axis.expr = { type: "op", op: axis.aggr, table: axis.expr.table, exprs: (if axis.aggr != "count" then [axis.expr] else []) }
-      delete axis.aggr
-
     # Determine aggrStatuses that are possible
     switch options.aggrNeed
       when "none"
@@ -106,6 +101,11 @@ module.exports = class AxisBuilder
           return null
 
     axis = produce(axis, (draft) =>
+      # Move aggr inside since aggr is deprecated at axis level DEPRECATED
+      if axis.aggr and axis.expr
+        draft.expr = { type: "op", op: axis.aggr, table: axis.expr.table, exprs: (if axis.aggr != "count" then [axis.expr] else []) }
+        delete draft.aggr
+
       draft.expr = expr
 
       if not xform and axis.xform
