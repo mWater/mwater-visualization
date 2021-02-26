@@ -93,15 +93,24 @@ module.exports = class TextWidget extends Widget
           { type: "op", op: "ST_AsGeoJSON", exprs: [{ type: "op", op: "ST_Transform", exprs: [{ type: "op", op: "::geometry", exprs: [compiledExpr]}, 4326] }] }
         ]}
 
-      # Get two distinct examples to know if unique
-      query = {
-        distinct: true
-        selects: [
-          { type: "select", expr: compiledExpr, alias: "value" }
-        ]
-        from: if table then exprCompiler.compileTable(table, "main")
-        limit: 2
-      }
+      aggrStatus = exprUtils.getExprAggrStatus(expr)
+      if aggrStatus == "individual" or aggrStatus == "literal"
+        # Get two distinct examples to know if unique if not aggregate
+        query = {
+          distinct: true
+          selects: [
+            { type: "select", expr: compiledExpr, alias: "value" }
+          ]
+          from: if table then exprCompiler.compileTable(table, "main")
+          limit: 2
+        }
+      else 
+        query = {
+          selects: [
+            { type: "select", expr: compiledExpr, alias: "value" }
+          ]
+          from: if table then exprCompiler.compileTable(table, "main")
+        }
 
       whereClauses = _.compact(whereClauses)
 
