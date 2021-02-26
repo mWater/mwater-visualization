@@ -74,6 +74,7 @@ module.exports = class DashboardComponent extends React.Component
       editing: LayoutManager.createLayoutManager(props.design.layout).isEmpty(props.design.items) and props.onDesignChange?
       layoutOptionsOpen: false
       hideQuickfilters: layoutOptions.hideQuickfiltersWidth? and layoutOptions.hideQuickfiltersWidth > document.body.clientWidth
+      refreshKey: 1
     }
 
   # Get the values of the quick filters
@@ -132,7 +133,7 @@ module.exports = class DashboardComponent extends React.Component
 
   handleRefreshData: =>
     @props.dataSource.clearCache?()
-    @forceUpdate()
+    @setState(refreshKey: @state.refreshKey + 1)
 
   handleStyleChange: (style) =>
     @props.onDesignChange(_.extend({}, @props.design, { style: style or null }))
@@ -277,6 +278,7 @@ module.exports = class DashboardComponent extends React.Component
       onRowClick: @props.onRowClick
       namedStrings: @props.namedStrings
       hideScopes: @state.hideQuickfilters
+      refreshKey: @state.refreshKey
     }
 
     readonlyDashboardView = R DashboardViewComponent, {

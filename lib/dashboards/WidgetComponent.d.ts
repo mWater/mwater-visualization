@@ -48,4 +48,6 @@ export declare function WidgetComponent(props: {
     widgetRef: (widget: any) => void;
     /** called with (widgetId, tocEntryId) to scroll to TOC entry */
     onScrollToTOCEntry?: (widgetId: string, tocEntryId: string) => void;
+    /** Change to force a refresh */
+    refreshKey?: any;
 }): import("react").ReactElement<any, string | ((props: any) => import("react").ReactElement<any, string | any | (new (props: any) => import("react").Component<any, any, any>)> | null) | (new (props: any) => import("react").Component<any, any, any>)>;

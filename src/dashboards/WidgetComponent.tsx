@@ -62,6 +62,9 @@ export function WidgetComponent(props: {
 
   /** called with (widgetId, tocEntryId) to scroll to TOC entry */
   onScrollToTOCEntry?: (widgetId: string, tocEntryId: string) => void
+
+  /** Change to force a refresh */
+  refreshKey?: any
 }) {
   // Get and stabilize widget data source
   // TODO!!! There is a global problem with DashboardDataSources being re-created on each render. 
@@ -71,7 +74,8 @@ export function WidgetComponent(props: {
     props.type, 
     props.id,
     props.schema,
-    props.dataSource
+    props.dataSource,
+    props.refreshKey
   ])
 
   const widget = WidgetFactory.createWidget(props.type)

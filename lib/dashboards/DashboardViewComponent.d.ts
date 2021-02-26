@@ -38,5 +38,8 @@ export default class DashboardViewComponent extends React.Component<{
 
   /** True to render in print mode (prevents odd clipping issue) */
   printMode?: boolean
+
+  /** Change to force a refresh */
+  refreshKey?: any
 }> {
 }

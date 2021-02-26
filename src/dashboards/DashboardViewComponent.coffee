@@ -204,6 +204,7 @@ module.exports = class DashboardViewComponent extends React.Component
         onScrollToTOCEntry: @handleScrollToTOCEntry
         # Keep references to widget elements
         widgetRef: @compRef.bind(null, options.id)
+        refreshKey: @props.refreshKey
       })
 
       return widgetElem
