@@ -14,4 +14,4 @@ export default function mWaterLoader(options: {
   extraTables: string[]
   /** False to disable local caching of queries. Default true */
   localCaching?: boolean
-}, callback: (error: any, config: { schema: Schema, dataSource: DataSource }) => void): void
+}, callback: (error: string | undefined, config: { schema: Schema, dataSource: DataSource }) => void): void
