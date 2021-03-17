@@ -130,7 +130,7 @@ module.exports = class Layer
     boundsQuery = {
       type: "query"
       selects: [{ type: "select", expr: { type: "op", op: "::json", exprs: [{ type: "op", op: "ST_AsGeoJSON", exprs: [
-        { type: "op", op: "ST_SetSRID", exprs: [{ type: "op", op: "ST_Extent", exprs: [{ type: "op", op: "ST_Transform", exprs: [compiledGeometryExpr, 4326] }] }, 4326 ]}
+        { type: "op", op: "ST_SetSRID", exprs: [{ type: "op", op: "ST_Transform", exprs: [{ type: "op", op: "ST_Extent", exprs: [compiledGeometryExpr] }, 4326] }, 4326 ]}
         ] } ] }, alias: "bounds" }]
       from: { type: "table", table: table, alias: "main" }
       where: where
