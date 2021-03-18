@@ -5,7 +5,7 @@ import { LayerDefinition } from './maps';
 import { JsonQLFilter } from '../index';
 import GridLayerDesign from './GridLayerDesign';
 import { Axis } from '../axes/Axis';
-import { JsonQL, JsonQLQuery } from 'jsonql';
+import { JsonQLQuery } from 'jsonql';
 /** Layer which is a grid of squares or flat-topped hexagons. Depends on "Grid Functions.sql" having been run */
 export default class GridLayer extends Layer<GridLayerDesign> {
     /** Gets the type of layer definition */
@@ -24,7 +24,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
      *   filters: array of filters to apply
      */
     getJsonQLCss(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): LayerDefinition;
-    createMapnikJsonQL(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQL;
+    createMapnikJsonQL(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery;
     createCss(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): string;
     getMinZoom(design: GridLayerDesign): number | undefined;
     getMaxZoom(design: GridLayerDesign): number;

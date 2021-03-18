@@ -5,5 +5,5 @@ export declare function getFilterableTables(design: DashboardDesign, schema: Sch
 /** Get filters from props filters combined with dashboard filters */
 export declare function getCompiledFilters(design: DashboardDesign, schema: Schema, filterableTables: string[]): {
     table: string;
-    jsonql: import("jsonql").JsonQLExpr;
+    jsonql: string | number | true | import("jsonql").JsonQLLiteral | import("jsonql").JsonQLOp | import("jsonql").JsonQLCase | import("jsonql").JsonQLScalar | import("jsonql").JsonQLField | import("jsonql").JsonQLToken;
 }[];

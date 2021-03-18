@@ -82,8 +82,8 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     const exprCompiler = new ExprCompiler(schema)
 
     // Expression of scale and envelope from tile table
-    const scaleExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "scale" }, from: { type: "table", table: "tile", alias: "tile" }}
-    const envelopeExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
+    const scaleExpr: JsonQLExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "scale" }, from: { type: "table", table: "tile", alias: "tile" }}
+    const envelopeExpr: JsonQLExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
 
     /*
     Query:
@@ -120,7 +120,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "main"})
 
     // ST_Centroid(ST_Collect(<geometry axis>))
-    let centerExpr = {
+    let centerExpr: JsonQLExpr = {
       type: "op",
       op: "ST_Centroid",
       exprs: [
@@ -133,14 +133,14 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     }
 
     // round(ST_XMin(<geometry axis) / (tile.scale / 6))
-    const gridXExpr = { type: "op", op: "round", exprs: [
+    const gridXExpr: JsonQLExpr = { type: "op", op: "round", exprs: [
       { type: "op", op: "/", exprs: [
         { type: "op", op: "ST_XMin", exprs: [geometryExpr] },
         { type: "op", op: "/", exprs: [scaleExpr, 6]}
       ]}
     ]}
 
-    const gridYExpr = { type: "op", op: "round", exprs: [
+    const gridYExpr: JsonQLExpr = { type: "op", op: "round", exprs: [
       { type: "op", op: "/", exprs: [
         { type: "op", op: "ST_YMin", exprs: [geometryExpr] },
         { type: "op", op: "/", exprs: [scaleExpr, 6]}
@@ -198,7 +198,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     // ST_ClusterDBSCAN(center, (tile.scale / 8), 1) over () as clust,
     // sub1.center as center,
     // cnt as cnt from () as innerquery
-    const clustExpr = {
+    const clustExpr: JsonQLExpr = {
       type: "op",
       op: "ST_ClusterDBSCAN",
       exprs: [
@@ -225,7 +225,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     // log(sum(cnt)) * 3 + 7 as size from 
 
     // ST_AsMVTGeom(ST_Centroid(ST_Collect(center)), tile.envelope)
-    const centerExpr2 = { type: "op", op: "ST_AsMVTGeom", exprs: [
+    const centerExpr2: JsonQLExpr = { type: "op", op: "ST_AsMVTGeom", exprs: [
       {
         type: "op",
         op: "ST_Centroid",
@@ -240,9 +240,9 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       envelopeExpr
     ]}
 
-    const cntExpr = { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "inner2query", column: "cnt" }] }
+    const cntExpr: JsonQLExpr = { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "inner2query", column: "cnt" }] }
 
-    const sizeExpr = {
+    const sizeExpr: JsonQLExpr = {
       type: "op",
       op: "+",
       exprs: [{ type: "op", op: "*", exprs: [{ type: "op", op: "log", exprs: [cntExpr] }, 3] }, 7]
@@ -290,7 +290,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     return layerDef
   }
 
-  createMapnikJsonQL(design: ClusterLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
+  createMapnikJsonQL(design: ClusterLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery {
     const axisBuilder = new AxisBuilder({schema})
     const exprCompiler = new ExprCompiler(schema)
 
@@ -329,7 +329,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "main"})
 
     // ST_Centroid(ST_Collect(<geometry axis>))
-    let centerExpr = {
+    let centerExpr: JsonQLExpr = {
       type: "op",
       op: "ST_Centroid",
       exprs: [
@@ -341,14 +341,14 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       ]
     }
 
-    const gridXExpr =  { type: "op", op: "round", exprs: [
+    const gridXExpr: JsonQLExpr =  { type: "op", op: "round", exprs: [
       { type: "op", op: "/", exprs: [
         { type: "op", op: "ST_XMin", exprs: [geometryExpr] },
         { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_width!" }, 40]}
       ]}
     ]}
 
-    const gridYExpr =  { type: "op", op: "round", exprs: [
+    const gridYExpr: JsonQLExpr =  { type: "op", op: "round", exprs: [
       { type: "op", op: "/", exprs: [
         { type: "op", op: "ST_YMin", exprs: [geometryExpr] },
         { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_height!" }, 5]}
@@ -406,7 +406,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     // ST_ClusterDBSCAN(center, (!pixel_width!*30 + !pixel_height!*30)/2, 1) over () as clust,
     // sub1.center as center,
     // cnt as cnt from () as innerquery
-    const clustExpr = {
+    const clustExpr: JsonQLExpr = {
       type: "op",
       op: "ST_ClusterDBSCAN",
       exprs: [
@@ -418,13 +418,14 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
             ]}
           , 2]},
         1
-      ]
+      ],
+      over: {}
     }
 
-    const inner2Query = {
+    const inner2Query: JsonQLQuery = {
       type: "query",
       selects: [
-        { type: "select", expr: clustExpr, over: {}, alias: "clust" },
+        { type: "select", expr: clustExpr, alias: "clust" },
         { type: "select", expr: { type: "field", tableAlias: "innerquery", column: "center" }, alias: "center" },
         { type: "select", expr: { type: "field", tableAlias: "innerquery", column: "cnt" }, alias: "cnt" }
       ],
@@ -449,15 +450,15 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       ]
     }
 
-    const cntExpr = { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "inner2query", column: "cnt" }] }
+    const cntExpr: JsonQLExpr = { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "inner2query", column: "cnt" }] }
 
-    const sizeExpr = {
+    const sizeExpr: JsonQLExpr = {
       type: "op",
       op: "+",
       exprs: [{ type: "op", op: "*", exprs: [{ type: "op", op: "log", exprs: [cntExpr] }, 6] }, 14]
     }
 
-    const query = {
+    const query: JsonQLQuery = {
       type: "query",
       selects: [
         { type: "select", expr: centerExpr, alias: "the_geom_webmercator" },

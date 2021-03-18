@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { ExprCompiler, ExprUtils, injectTableAlias, DataSource, Expr, Schema, FieldExpr, OpExpr } from 'mwater-expressions'
 import { JsonQLFilter } from '..'
-import { JsonQLQuery } from 'jsonql'
+import { JsonQLQuery, JsonQLSelectQuery } from 'jsonql'
 
 /** Perform query to find quickfilter values for text and text[] expressions
  * text[] expressions are tricky as they need a special query
@@ -25,7 +25,7 @@ export function findExprValues(
   // Table
   const table = (expr as FieldExpr).table
 
-  let query: JsonQLQuery
+  let query: JsonQLSelectQuery
 
   if (exprType == "text") {
     // select distinct <compiled expr> as value from <table> where <filters> order by 1 offset limit 

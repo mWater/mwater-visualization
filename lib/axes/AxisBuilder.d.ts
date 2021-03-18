@@ -1,6 +1,6 @@
 import { Schema } from "mwater-expressions";
 import { Axis } from "./Axis";
-import { JsonQL } from "jsonql";
+import { JsonQLExpr } from "jsonql";
 
 type AggrNeed = "none" | "optional" | "required"
 
@@ -25,7 +25,7 @@ declare class AxisBuilder {
   /**
    * Compile an axis to JsonQL
    */
-  compileAxis(options: { axis: Axis, tableAlias: string }): JsonQL
+  compileAxis(options: { axis: Axis, tableAlias: string }): JsonQLExpr
 
   /** Get all categories for a given axis type given the known values
    * Returns array of { value, label }

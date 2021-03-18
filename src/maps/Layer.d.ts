@@ -2,14 +2,14 @@ import { Schema, DataSource, Expr } from "mwater-expressions";
 import { JsonQLFilter } from "../index";
 import { OnGridClickResults } from "./maps";
 import { ReactNode } from "react";
-import { JsonQL, JsonQLQuery } from "jsonql";
+import { JsonQLQuery } from "jsonql";
 
 export interface JsonQLCssLayerDefinition {
   layers: Array<{ 
     /** Layer id */
     id: string
     /** jsonql that includes "the_webmercator_geom" as a column */
-    jsonql: JsonQL
+    jsonql: JsonQLQuery
   }>
 
   /** carto css */

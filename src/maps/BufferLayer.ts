@@ -91,7 +91,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     const exprCompiler = new ExprCompiler(schema)
 
     // Expression for the envelope of the tile
-    const envelopeExpr = { type: "scalar", from: { type: "table", table: "tile", alias: "tile" },
+    const envelopeExpr: JsonQLExpr = { type: "scalar", from: { type: "table", table: "tile", alias: "tile" },
       expr: { type: "field", tableAlias: "tile", column: "envelope" } }
 
     /*
@@ -119,7 +119,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "main"})
 
     // radius / cos(st_ymax(st_transform(geometryExpr, 4326)) * 0.017453293) 
-    const bufferAmountExpr = {
+    const bufferAmountExpr: JsonQLExpr = {
       type: "op",
       op: "/",
       exprs: [
@@ -133,7 +133,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
       ]
     }
 
-    const bufferExpr = {
+    const bufferExpr: JsonQLExpr = {
       type: "op",
       op: "ST_Buffer",
       exprs: [geometryExpr, bufferAmountExpr]
@@ -168,7 +168,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     // TODO document how we compute this
     const radiusDeg = design.radius / 100000
 
-    const boundingBox = {
+    const boundingBox: JsonQLExpr = {
       type: "op",
       op: "ST_Transform",
       exprs: [
@@ -231,7 +231,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
 
       const cases = _.map(categories, (category, i) => {
         return {
-          when: (category.value != null) ? { type: "op", op: "=", exprs: [colorExpr, category.value] } : { type: "op", op: "is null", exprs: [colorExpr] },
+          when: (category.value != null) ? { type: "op", op: "=", exprs: [colorExpr, category.value] } as JsonQLExpr : { type: "op", op: "is null", exprs: [colorExpr] } as JsonQLExpr,
           then: order.indexOf(category.value) || -1
         }
       })
@@ -307,7 +307,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "main"})
 
     // radius * 2 / (!pixel_width! * cos(st_ymin(st_transform(geometryExpr, 4326)) * 0.017453293) + 1 # add one to make always visible
-    const widthExpr = {
+    const widthExpr: JsonQLExpr = {
       type: "op",
       op: "+",
       exprs: [
@@ -358,7 +358,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     // TODO document how we compute this
     const radiusDeg = design.radius / 100000
 
-    const boundingBox = {
+    const boundingBox: JsonQLExpr = {
       type: "op",
       op: "ST_Transform",
       exprs: [
@@ -421,7 +421,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
 
       const cases = _.map(categories, (category, i) => {
         return {
-          when: (category.value != null) ? { type: "op", op: "=", exprs: [colorExpr, category.value] } : { type: "op", op: "is null", exprs: [colorExpr] },
+          when: (category.value != null) ? { type: "op", op: "=", exprs: [colorExpr, category.value] } as JsonQLExpr : { type: "op", op: "is null", exprs: [colorExpr] } as JsonQLExpr,
           then: order.indexOf(category.value) || -1
         }
     })
@@ -734,7 +734,7 @@ marker-fill: ` + (design.color || "transparent") + `;
     const geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "main"})
 
     // st_transform(st_buffer(st_transform(<geometry axis>, 4326)::geography, <radius>)::geometry, 3857) as the_geom_webmercator
-    const bufferedGeometry = {
+    const bufferedGeometry: JsonQLExpr = {
       type: "op", op: "ST_AsGeoJson", exprs: [
         { type: "op", op: "::geometry", exprs: [
           { type: "op", op: "ST_Buffer", exprs: [
@@ -817,7 +817,7 @@ marker-fill: ` + (design.color || "transparent") + `;
 
       const cases = _.map(categories, (category, i) => {
         return {
-          when: (category.value != null) ? { type: "op", op: "=", exprs: [colorExpr, category.value] } : { type: "op", op: "is null", exprs: [colorExpr] },
+          when: (category.value != null) ? { type: "op", op: "=", exprs: [colorExpr, category.value] } as JsonQLExpr : { type: "op", op: "is null", exprs: [colorExpr] } as JsonQLExpr,
           then: order.indexOf(category.value) || -1
         }
     })

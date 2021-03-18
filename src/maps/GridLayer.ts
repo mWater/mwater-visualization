@@ -9,7 +9,7 @@ import { JsonQLFilter } from '../index'
 import GridLayerDesign from './GridLayerDesign'
 import produce from 'immer'
 import { Axis } from '../axes/Axis'
-import { JsonQL, JsonQLExpr, JsonQLQuery } from 'jsonql'
+import { JsonQLExpr, JsonQLQuery, JsonQLScalar } from 'jsonql'
 import { compileColorMapToMapbox } from './mapboxUtils'
 const LayerLegendComponent = require('./LayerLegendComponent')
 
@@ -69,7 +69,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
 
     // Expression of scale and envelope from tile table
     const scaleExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "scale" }, from: { type: "table", table: "tile", alias: "tile" }}
-    const envelopeExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
+    const envelopeExpr: JsonQLScalar = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
     
     const pixelWidth = { type: "op", op: "/", exprs: [scaleExpr, 768] }
 
@@ -91,14 +91,14 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     if (design.shape == "hex") {
       // Hex needs distance from center to points
       compiledSizeExpr = design.sizeUnits == "pixels" ? 
-        { type: "op", op: "*", exprs: [pixelWidth, design.size! / 1.73205] }
-        : { type: "literal", value: design.size! / 1.73205 }
+        { type: "op", op: "*", exprs: [pixelWidth, design.size! / 1.73205] } as JsonQLExpr
+        : { type: "literal", value: design.size! / 1.73205 } as JsonQLExpr
     }
     else if (design.shape == "square") {
       // Square needs distance from center to center
       compiledSizeExpr = design.sizeUnits == "pixels" ? 
-        { type: "op", op: "*", exprs: [pixelWidth, design.size!] }
-        : { type: "literal", value: design.size! }
+        { type: "op", op: "*", exprs: [pixelWidth, design.size!] } as JsonQLExpr
+        : { type: "literal", value: design.size! } as JsonQLExpr
     }
     else {
       throw new Error("Unknown shape")
@@ -121,7 +121,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
           { type: "op", op: "ST_YMin", exprs: [compiledGeometryExpr] },
           compiledSizeExpr
         ]}, alias: "qr"},
-        on: { type: "literal", valueType: "boolean", value: true }
+        on: { type: "literal", value: true }
       },
       groupBy: [1, 2]
     }
@@ -234,7 +234,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     return layerDef
   }
 
-  createMapnikJsonQL(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQL {
+  createMapnikJsonQL(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery {
     const axisBuilder = new AxisBuilder({ schema })
     const exprCompiler = new ExprCompiler(schema)
 
@@ -286,7 +286,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
           { type: "op", op: "ST_YMin", exprs: [compiledGeometryExpr] },
           compiledSizeExpr
         ]}, alias: "qr"},
-        on: { type: "literal", valueType: "boolean", value: true }
+        on: { type: "literal", value: true }
       },
       groupBy: [1, 2]
     }

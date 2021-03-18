@@ -8,7 +8,7 @@ import { ExprCompiler, ExprCleaner, injectTableAlias, Schema, DataSource, ExprVa
 import AxisBuilder from '../axes/AxisBuilder'
 import { OnGridClickResults } from './maps'
 import { JsonQLFilter } from '../index'
-import { JsonQL, JsonQLQuery, JsonQLSelect } from 'jsonql'
+import { JsonQLExpr, JsonQLQuery, JsonQLScalar, JsonQLSelect, JsonQLSelectQuery } from 'jsonql'
 import { MarkersLayerDesign } from './MarkersLayerDesign'
 import { compileColorMapToMapbox } from './mapboxUtils'
 const LayerLegendComponent = require('./LayerLegendComponent')
@@ -127,8 +127,8 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     const exprCompiler = new ExprCompiler(schema)
 
     // Expression of scale and envelope from tile table
-    const scaleExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "scale" }, from: { type: "table", table: "tile", alias: "tile" }}
-    const envelopeExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
+    const scaleExpr: JsonQLScalar = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "scale" }, from: { type: "table", table: "tile", alias: "tile" }}
+    const envelopeExpr: JsonQLScalar = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
 
     // Compile geometry axis
     let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "innerquery"})
@@ -159,7 +159,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     }
 
     // Select _id, location and clustered row number
-    const innerquery: JsonQLQuery = {
+    const innerquery: JsonQLSelectQuery = {
       type: "query",
       selects: [
         { type: "select", expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(design.table)!.primaryKey }, alias: "id" }, // main primary key as id
@@ -176,7 +176,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     }
 
     // Create filters. First limit to envelope
-    let whereClauses: JsonQL[] = [
+    let whereClauses: JsonQLExpr[] = [
       {
         type: "op",
         op: "&&",
@@ -260,7 +260,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     return layerDef
   }
 
-  createMapnikJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
+  createMapnikJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery {
     const axisBuilder = new AxisBuilder({schema})
     const exprCompiler = new ExprCompiler(schema)
 
@@ -293,7 +293,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     }
 
     // Select _id, location and clustered row number
-    const innerquery: JsonQLQuery = {
+    const innerquery: JsonQLSelectQuery = {
       type: "query",
       selects: [
         { type: "select", expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(design.table)!.primaryKey }, alias: "id" }, // main primary key as id
@@ -310,7 +310,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     }
 
     // Create filters. First limit to bounding box
-    let whereClauses: JsonQL[] = [
+    let whereClauses: JsonQLExpr[] = [
       {
         type: "op",
         op: "&&",
@@ -343,7 +343,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     }
 
     // Create outer query which takes where r <= 3 to limit # of points in a cluster
-    const outerquery = {
+    const outerquery: JsonQLQuery = {
       type: "query",
       selects: [
         { type: "select", expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "innerquery", column: "id" }]}, alias: "id" }, // innerquery._id::text as id
@@ -661,7 +661,7 @@ polygon-fill: ` + item.color + `;\
     let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "innerquery"})
 
     // Select _id, location and clustered row number
-    const innerquery: JsonQLQuery = {
+    const innerquery: JsonQLSelectQuery = {
       type: "query",
       selects: [
         { type: "select", expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(design.table)!.primaryKey }, alias: "id" }, // main primary key as id

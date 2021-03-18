@@ -13,7 +13,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     getJsonQLCss(design: BufferLayerDesign, schema: Schema, filters: JsonQLFilter[]): {
         layers: {
             id: string;
-            jsonql: JsonQLQuery;
+            jsonql: import("jsonql").JsonQLSelectQuery;
         }[];
         css: string;
         interactivity: {
@@ -21,7 +21,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
             fields: string[];
         };
     };
-    createMapnikJsonQL(design: BufferLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery;
+    createMapnikJsonQL(design: BufferLayerDesign, schema: Schema, filters: JsonQLFilter[]): import("jsonql").JsonQLSelectQuery;
     createCss(design: BufferLayerDesign, schema: Schema): string;
     onGridClick(ev: {
         data: any;
@@ -61,11 +61,11 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     }): React.ReactElement<{}>;
     cleanDesign(design: BufferLayerDesign, schema: Schema): BufferLayerDesign;
     validateDesign(design: BufferLayerDesign, schema: Schema): string | null;
-    createKMLExportJsonQL(design: BufferLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery;
+    createKMLExportJsonQL(design: BufferLayerDesign, schema: Schema, filters: JsonQLFilter[]): import("jsonql").JsonQLSelectQuery;
     getKMLExportJsonQL(design: BufferLayerDesign, schema: Schema, filters: JsonQLFilter[]): {
         layers: {
             id: string;
-            jsonql: JsonQLQuery;
+            jsonql: import("jsonql").JsonQLSelectQuery;
             style: any;
         }[];
     };

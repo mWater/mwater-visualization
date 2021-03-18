@@ -4,7 +4,7 @@ import { Schema, DataSource } from 'mwater-expressions';
 import { LayerDefinition, OnGridClickResults } from './maps';
 import { JsonQLFilter } from '../index';
 import ChoroplethLayerDesign from './ChoroplethLayerDesign';
-import { JsonQL, JsonQLQuery } from 'jsonql';
+import { JsonQLQuery } from 'jsonql';
 export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     /** Gets the type of layer definition */
     getLayerDefinitionType(): "VectorTile";
@@ -24,7 +24,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
      *   filters: array of filters to apply
      */
     getJsonQLCss(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): LayerDefinition;
-    createMapnikJsonQL(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQL;
+    createMapnikJsonQL(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery;
     createCss(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): string;
     /**
      * Called when the interactivity grid is clicked.
@@ -82,11 +82,11 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         onDesignChange: (design: ChoroplethLayerDesign) => void;
         filters: JsonQLFilter[];
     }): React.ReactElement<{}>;
-    createKMLExportJsonQL(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery;
+    createKMLExportJsonQL(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): import("jsonql").JsonQLSelectQuery;
     getKMLExportJsonQL(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): {
         layers: {
             id: string;
-            jsonql: JsonQLQuery;
+            jsonql: import("jsonql").JsonQLSelectQuery;
             style: {
                 color?: string | null | undefined;
                 opacity?: number | undefined;

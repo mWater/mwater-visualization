@@ -3,58 +3,17 @@ import Layer, { OnGridClickOptions, VectorTileDef } from './Layer';
 import { Schema, DataSource } from 'mwater-expressions';
 import { OnGridClickResults } from './maps';
 import { JsonQLFilter } from '../index';
-import { JsonQLQuery } from 'jsonql';
+import { JsonQLQuery, JsonQLSelectQuery } from 'jsonql';
 import { MarkersLayerDesign } from './MarkersLayerDesign';
 export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     /** Gets the type of layer definition */
     getLayerDefinitionType(): "VectorTile";
     getVectorTile(design: MarkersLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef;
-    createJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery;
+    createJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLSelectQuery;
     getJsonQLCss(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]): {
         layers: {
             id: string;
-            jsonql: {
-                type: string;
-                selects: ({
-                    type: string;
-                    expr: {
-                        type: string;
-                        op: string;
-                        exprs: {
-                            type: string;
-                            tableAlias: string;
-                            column: string;
-                        }[];
-                        tableAlias?: undefined;
-                        column?: undefined;
-                    };
-                    alias: string;
-                } | {
-                    type: string;
-                    expr: {
-                        type: string;
-                        tableAlias: string;
-                        column: string;
-                        op?: undefined;
-                        exprs?: undefined;
-                    };
-                    alias: string;
-                })[];
-                from: {
-                    type: string;
-                    query: JsonQLQuery;
-                    alias: string;
-                };
-                where: {
-                    type: string;
-                    op: string;
-                    exprs: (number | {
-                        type: string;
-                        tableAlias: string;
-                        column: string;
-                    })[];
-                };
-            };
+            jsonql: JsonQLQuery;
         }[];
         css: string;
         interactivity: {
@@ -62,48 +21,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
             fields: string[];
         };
     };
-    createMapnikJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]): {
-        type: string;
-        selects: ({
-            type: string;
-            expr: {
-                type: string;
-                op: string;
-                exprs: {
-                    type: string;
-                    tableAlias: string;
-                    column: string;
-                }[];
-                tableAlias?: undefined;
-                column?: undefined;
-            };
-            alias: string;
-        } | {
-            type: string;
-            expr: {
-                type: string;
-                tableAlias: string;
-                column: string;
-                op?: undefined;
-                exprs?: undefined;
-            };
-            alias: string;
-        })[];
-        from: {
-            type: string;
-            query: JsonQLQuery;
-            alias: string;
-        };
-        where: {
-            type: string;
-            op: string;
-            exprs: (number | {
-                type: string;
-                tableAlias: string;
-                column: string;
-            })[];
-        };
-    };
+    createMapnikJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery;
     createCss(design: MarkersLayerDesign): string;
     onGridClick(ev: {
         data: any;
@@ -144,12 +62,12 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     }): React.ReactElement<{}>;
     cleanDesign(design: MarkersLayerDesign, schema: Schema): MarkersLayerDesign;
     validateDesign(design: MarkersLayerDesign, schema: Schema): string | null;
-    createKMLExportJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery;
+    createKMLExportJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLSelectQuery;
     createKMLExportStyleInfo(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]): any;
     getKMLExportJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]): {
         layers: {
             id: string;
-            jsonql: JsonQLQuery;
+            jsonql: JsonQLSelectQuery;
             style: any;
         }[];
     };

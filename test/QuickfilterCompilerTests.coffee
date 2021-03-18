@@ -66,14 +66,27 @@ describe "QuickfilterCompiler", ->
     compare(filters, [
       { 
         table: "t1"
-        jsonql: { 
-          type: "op"
-          op: "?|"
-          exprs: [
-            { type: "op", op: "to_jsonb", exprs: [{ type: "field", tableAlias: "{alias}", column: "enumset" }] }
-            { type: "literal", value: ["a"] }
-          ]
-        }        
+        jsonql: {
+          type: "scalar",
+          expr: { type: "op", op: "bool_or", exprs: [{ type: "field", tableAlias: "elements", column: "value" }] },
+          from: { 
+            type: "subquery",
+            alias: "elements",
+            query: {
+              type: "query",
+              selects: [
+                { 
+                  type: "select", 
+                  expr: { type: "op", op: "@>", exprs: [
+                    { type: "op", op: "to_jsonb", exprs: [{ type: "field", tableAlias: "{alias}", column: "enumset" }] }
+                    { type: "op", op: "jsonb_array_elements", exprs: [{ type: "op", op: "::jsonb", exprs: [{ type: "literal", value: '["a"]' }]}] }
+                  ]}, 
+                  alias: "value" 
+                }
+              ]
+            }
+          }
+        }
       }
     ])
 

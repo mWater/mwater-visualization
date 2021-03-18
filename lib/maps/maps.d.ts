@@ -1,11 +1,11 @@
 /// <reference types="react" />
-import { JsonQL } from "jsonql";
+import { JsonQLQuery } from "jsonql";
 export interface LayerDefinition {
     layers: Array<{
         /** Layer id */
         id: string;
         /** jsonql that includes "the_webmercator_geom" as a column */
-        jsonql: JsonQL;
+        jsonql: JsonQLQuery;
     }>;
     /** carto css */
     css: string;

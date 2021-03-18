@@ -1,8 +1,8 @@
 // General utilities for a map
 
+import { JsonQLExpr } from "jsonql"
 import _ from "lodash"
 import { Expr, ExprCleaner, ExprCompiler, ExprUtils, FieldExpr, Schema } from "mwater-expressions"
-import { Axis } from "../axes/Axis"
 import { JsonQLFilter } from "../JsonQLFilter"
 import LayerFactory from "./LayerFactory"
 import { MapDesign } from "./MapDesign"
@@ -61,7 +61,7 @@ export function getFilterableTables(design: MapDesign, schema: Schema) {
 }
 
 // Compile map filters with global filters
-export function getCompiledFilters(design: MapDesign, schema: Schema, filterableTables: string[]) {
+export function getCompiledFilters(design: MapDesign, schema: Schema, filterableTables: string[]): { table: string, jsonql: JsonQLExpr }[] {
   const exprCompiler = new ExprCompiler(schema)
   const exprCleaner = new ExprCleaner(schema)
   const exprUtils = new ExprUtils(schema)

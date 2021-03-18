@@ -9,7 +9,7 @@ import AxisBuilder from '../axes/AxisBuilder'
 import { LayerDefinition, OnGridClickResults } from './maps'
 import { JsonQLFilter } from '../index'
 import ChoroplethLayerDesign from './ChoroplethLayerDesign'
-import { JsonQL, JsonQLExpr, JsonQLQuery } from 'jsonql'
+import { JsonQLExpr, JsonQLOp, JsonQLQuery, JsonQLScalar } from 'jsonql'
 import { compileColorMapToMapbox } from './mapboxUtils'
 const LayerLegendComponent = require('./LayerLegendComponent')
 const PopupFilterJoinsUtils = require('./PopupFilterJoinsUtils')
@@ -47,7 +47,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     const regionsTable = design.regionsTable || "admin_regions"
 
     // Expression of scale and envelope from tile table
-    const envelopeExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
+    const envelopeExpr: JsonQLScalar = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
 
     /*
     Returns two source layers, "polygons" and "points". Points are used for labels.
@@ -218,7 +218,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     const regionsTable = design.regionsTable || "admin_regions"
 
     // Expression of scale and envelope from tile table
-    const envelopeExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
+    const envelopeExpr: JsonQLScalar = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
     
     /*
     Returns two source layers, "polygons" and "points". Points are used for labels.
@@ -495,7 +495,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     const regionsTable = design.regionsTable || "admin_regions"
 
     // Expression of scale and envelope from tile table
-    const envelopeExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
+    const envelopeExpr: JsonQLScalar = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
     
     /*
     Returns two source layers, "polygons" and "points". Points are used for labels.
@@ -702,7 +702,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     return layerDef
   }
 
-  createMapnikJsonQL(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQL {
+  createMapnikJsonQL(design: ChoroplethLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery {
     const axisBuilder = new AxisBuilder({schema})
     const exprCompiler = new ExprCompiler(schema)
 
@@ -753,7 +753,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 
       // Scope overall
       if (design.scope) {
-        query.where!.exprs.push({
+        (query.where as JsonQLOp).exprs.push({
           type: "op",
           op: "=",
           exprs: [
@@ -766,7 +766,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       // Add filters on regions to outer query
       for (const filter of filters) {
         if (filter.table == regionsTable) {
-          query.where!.exprs.push(injectTableAlias(filter.jsonql, "regions"))
+          (query.where as JsonQLOp).exprs.push(injectTableAlias(filter.jsonql, "regions"))
         }
       }
 
@@ -899,7 +899,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 
       // Scope overall
       if (design.scope) {
-        query.where!.exprs.push({
+        (query.where as JsonQLOp).exprs.push({
           type: "op",
           op: "=",
           exprs: [
@@ -912,7 +912,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       // Add filters on regions to outer query
       for (const filter of filters) {
         if (filter.table == regionsTable) {
-          query.where!.exprs.push(injectTableAlias(filter.jsonql, "regions2"))
+          (query.where as JsonQLOp).exprs.push(injectTableAlias(filter.jsonql, "regions2"))
         }
       }
 
@@ -976,7 +976,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       
       // Scope overall
       if (design.scope) {
-        query.where!.exprs.push({
+        (query.where as JsonQLOp).exprs.push({
           type: "op",
           op: "=",
           exprs: [
@@ -989,7 +989,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       // Add filters on regions to outer query
       for (const filter of filters) {
         if (filter.table == regionsTable) {
-          query.where!.exprs.push(injectTableAlias(filter.jsonql, "regions"))
+          (query.where as JsonQLOp).exprs.push(injectTableAlias(filter.jsonql, "regions"))
         }
       }
 
@@ -1425,8 +1425,8 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 
     // Add color select if color axis
     if (design.axes.color) {
-      const valueExpr: JsonQL = exprCompiler.compileExpr({expr: design.axes.color.expr, tableAlias: "innerquery"})
-      const colorExpr: JsonQL = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "innerquery"})
+      const valueExpr: JsonQLExpr = exprCompiler.compileExpr({expr: design.axes.color.expr, tableAlias: "innerquery"})
+      const colorExpr: JsonQLExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "innerquery"})
       innerQuery.selects.push({ type: "select", expr: colorExpr, alias: "color" })
       innerQuery.selects.push({ type: "select", expr: valueExpr, alias: "value" })
     }
@@ -1467,7 +1467,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
       innerQuery.where = { type: "op", op: "and", exprs: whereClauses }
     }
 
-    const adminGeometry = {
+    const adminGeometry: JsonQLOp = {
       type: "op", op: "ST_AsGeoJson", exprs: [
         {
           type: "op", op: "ST_Transform", exprs: [
@@ -1519,7 +1519,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
 
     // Scope overall
     if (design.scope) {
-      query.where!.exprs.push({
+      (query.where as JsonQLOp).exprs.push({
         type: "op",
         op: "=",
         exprs: [
