@@ -196,6 +196,7 @@ module.exports = class LayeredChartCompiler
     # # If x axis is year only, display year in ticks
     # if options.design.layers[0]?.axes.x?.xform?.type == "year"
     #   chartDesign.axis.x.tick.format = (x) -> if _.isDate(x) then x.getFullYear() else x
+    console.log(chartDesign)
     return chartDesign
 
   isCategoricalX: (design) ->
@@ -465,7 +466,9 @@ module.exports = class LayeredChartCompiler
     colorOverrides = {}  # Mapping of "<layer>:<index>" to color if overridden
 
     # Get all values of the x-axis, taking into account values that might be missing
-    xAxis = design.layers[0].axes.x
+    xAxis = _.extend({}, design.layers[0].axes.x)
+    nullLabel = _.first(_.compact(design.layers.map((l) -> l.axes.x.nullLabel)))
+    xAxis.nullLabel = nullLabel
 
     xType = @axisBuilder.getAxisType(xAxis)
 
