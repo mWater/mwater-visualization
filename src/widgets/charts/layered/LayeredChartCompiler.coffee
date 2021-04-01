@@ -901,6 +901,10 @@ calculateLinearRegression = (ys, xs) ->
   if (_.isString(xs[0]))
     xs = _.map(xs, (x) => Date.parse(x))
 
+  # Remove null ys
+  xs = _.filter(xs, (x, index) => ys[index] != null)
+  ys = _.filter(ys, (y, index) => ys[index] != null)
+
   n = ys.length
 
   sumXY = _.sum(_.map(xs, (x, i) => x * ys[i]))
