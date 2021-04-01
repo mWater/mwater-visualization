@@ -63,6 +63,10 @@ module.exports = class LayeredChart extends Chart
 
         layer.filter = exprCleaner.cleanExpr((if layer.filter then original(layer.filter) else null), { table: layer.table, types: ['boolean'] })
 
+        # No trendline if cumulative, or if has color axis
+        if layer.trendline and (layer.cumulative or layer.axes.color)
+          delete layer.trendline
+
       return
     )
 

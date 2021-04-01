@@ -14,7 +14,9 @@ pieLabelValueFormatter = (format, hidePercent = false) ->
 labelValueFormatter = (format) -> 
   return (value, ratio, id) -> 
     return if format[id] then format[id](value) else value
-    
+
+defaultColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5']
+
 # Compiles various parts of a layered chart (line, bar, scatter, spline, area) to C3.js format
 module.exports = class LayeredChartCompiler
   # Pass in schema
@@ -128,9 +130,10 @@ module.exports = class LayeredChartCompiler
         labels: options.design.labels
         order: c3Data.order
         color: c3Data.color
+        classes: c3Data.classes
       }
       # Hide if one layer with no color axis
-      legend: { hide: (options.design.layers.length == 1 and not options.design.layers[0].axes.color) }
+      legend: { hide: if (options.design.layers.length == 1 and not options.design.layers[0].axes.color) then true else c3Data.legendHide }
       grid: { focus: { show: false } }  # Don't display hover grid
       axis: {
         x: {
@@ -317,6 +320,8 @@ module.exports = class LayeredChartCompiler
     xs = {}
     groups = []
     format = {}
+    legendHide = [] # Which series to hide
+    classes = {} # Custom classes to add to series
 
     xType = @axisBuilder.getAxisType(design.layers[0].axes.x)
 
@@ -383,19 +388,33 @@ module.exports = class LayeredChartCompiler
         seriesY = "#{layerIndex}:y"
 
         yValues = _.pluck(layerData, "y")
+        xValues = _.pluck(layerData, "x")
 
         columns.push([seriesY].concat(yValues))
-        columns.push([seriesX].concat(_.pluck(layerData, "x")))
+        columns.push([seriesX].concat(xValues))
 
         types[seriesY] = @getLayerType(design, layerIndex)
         names[seriesY] = layer.name or (if design.layers.length == 1 then "Value" else "Series #{layerIndex+1}") 
         xs[seriesY] = seriesX
-        colors[seriesY] = layer.color
+        colors[seriesY] = layer.color or defaultColors[layerIndex]
         format[seriesY] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
 
         # Add data map for each row
         _.each layerData, (row, rowIndex) =>
           dataMap["#{seriesY}:#{rowIndex}"] = { layerIndex: layerIndex, row: row }
+
+        # Add trendline
+        if layer.trendline == "linear"
+          trendlineSeries = seriesY + ":trendline"
+          columns.push([trendlineSeries].concat(calculateLinearRegression(yValues, xValues)))
+          types[trendlineSeries] = "line"
+          names[trendlineSeries] = names[seriesY] + " Trendline"
+          xs[trendlineSeries] = seriesX
+          colors[trendlineSeries] = layer.color or defaultColors[layerIndex]
+          legendHide.push(trendlineSeries) # Hide in legend
+          format[trendlineSeries] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
+          # Set dots as invisible in CSS and line as dashed
+          classes[trendlineSeries] = "trendline"
 
     # Stack by putting into groups
     if design.stacked
@@ -409,6 +428,8 @@ module.exports = class LayeredChartCompiler
       dataMap: dataMap
       colors: colors
       xs: xs
+      legendHide: legendHide
+      classes: classes
       xAxisType: if (xType in ["date"]) then "timeseries" else "indexed" 
       xAxisTickFit: false   # Don't put a tick for each point
       xAxisLabelText: @compileXAxisLabelText(design, locale)
@@ -464,6 +485,8 @@ module.exports = class LayeredChartCompiler
     groups = []
     format = {}
     colorOverrides = {}  # Mapping of "<layer>:<index>" to color if overridden
+    legendHide = [] # Which series to hide
+    classes = {} # Custom classes to add to series
 
     # Get all values of the x-axis, taking into account values that might be missing
     xAxis = _.extend({}, design.layers[0].axes.x)
@@ -617,8 +640,27 @@ module.exports = class LayeredChartCompiler
         types[series] = @getLayerType(design, layerIndex)
         names[series] = layer.name or (if design.layers.length == 1 then "Value" else "Series #{layerIndex+1}") 
         xs[series] = "x"
-        colors[series] = layer.color
+        colors[series] = layer.color or defaultColors[layerIndex]
         format[series] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
+
+        # Add trendline
+        if layer.trendline == "linear"
+          trendlineSeries = series + ":trendline"
+          trendXs = _.range(column.length)
+          trendYs = column
+          # Skip null last value
+          if categories.length > 0 and _.last(categories).value == null
+            trendXs = _.initial(trendXs)
+            trendYs = _.initial(trendYs)
+          columns.push([trendlineSeries].concat(calculateLinearRegression(trendYs, trendXs)))
+          types[trendlineSeries] = "line"
+          names[trendlineSeries] = names[series] + " Trendline"
+          xs[trendlineSeries] = "x"
+          colors[trendlineSeries] = layer.color or defaultColors[layerIndex]
+          legendHide.push(trendlineSeries) # Hide in legend
+          format[trendlineSeries] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
+          # Set dots as invisible in CSS and line as dashed
+          classes[trendlineSeries] = "trendline"
 
     # Stack by putting into groups
     if design.stacked
@@ -667,6 +709,8 @@ module.exports = class LayeredChartCompiler
       colors: colors
       xs: xs
       groups: groups
+      legendHide: legendHide
+      classes: classes
       xAxisType: "category" 
       xAxisTickFit: xType != "date"   # Put a tick for each point since categorical unless date
       xAxisLabelText: @compileXAxisLabelText(design, locale)
@@ -850,3 +894,30 @@ cleanString = (str) ->
   if not str
     return str
   return str.replace("\u00A0", " ")
+
+# Calculate a linear regression, returning a series of y values that match the x values
+calculateLinearRegression = (ys, xs) ->
+  # If xs are dates, convert to numbers
+  if (_.isString(xs[0]))
+    xs = _.map(xs, (x) => Date.parse(x))
+
+  n = ys.length
+
+  sumXY = _.sum(_.map(xs, (x, i) => x * ys[i]))
+
+  sumXX = _.sum(_.map(xs, (x) => x * x))
+
+  sumX = _.sum(xs)
+
+  sumY = _.sum(ys)
+
+  # Calculate denominator
+  den = n * sumXX - sumX * sumX
+
+  # Calculate slope
+  slope = (n * sumXY - sumX * sumY) / den
+
+  # Calculate intercept
+  intercept = (sumY * sumXX - sumX * sumXY) / den
+
+  return _.map(xs, (x) => x * slope + intercept)

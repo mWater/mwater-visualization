@@ -82,4 +82,7 @@ export interface LayeredChartDesignLayer {
 
   /** true if has a color map for x-axis */
   xColorMap?: boolean
+
+  /** Optional type of trendline */
+  trendline?: "linear"
 }

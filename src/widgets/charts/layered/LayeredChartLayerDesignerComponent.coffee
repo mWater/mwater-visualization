@@ -111,6 +111,8 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
 
   handleCumulativeChange: (ev) => @updateLayer(cumulative: ev.target.checked)
 
+  handleTrendlineChange: (ev) => @updateLayer(trendline: if ev.target.checked then "linear" else undefined)
+
   handleStackedChange: (ev) => @updateLayer(stacked: ev.target.checked)
 
   renderName: ->
@@ -223,6 +225,7 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
           onChange: @handleYAxisChange)
         @renderCumulative()
         @renderStacked()
+        @renderTrendline()
 
   renderCumulative: ->
     layer = @props.design.layers[@props.index]
@@ -236,6 +239,19 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
       R 'label', className: "checkbox-inline", 
         R 'input', type: "checkbox", checked: layer.cumulative, onChange: @handleCumulativeChange
         "Cumulative"
+
+  renderTrendline: ->
+    layer = @props.design.layers[@props.index]
+
+    # Can only have trendline if non-polar and y + x axis determined
+    axisBuilder = new AxisBuilder(schema: @props.schema)
+    if not layer.axes.y or not layer.axes.x
+      return 
+
+    R 'div', key: "trendline",
+      R 'label', className: "checkbox-inline", 
+        R 'input', type: "checkbox", checked: layer.trendline == "linear", onChange: @handleTrendlineChange
+        "Show linear trend line"
 
   renderStacked: ->
     layer = @props.design.layers[@props.index]
