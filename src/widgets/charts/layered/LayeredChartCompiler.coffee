@@ -902,18 +902,18 @@ calculateLinearRegression = (ys, xs) ->
     xs = _.map(xs, (x) => Date.parse(x))
 
   # Remove null ys
-  xs = _.filter(xs, (x, index) => ys[index] != null)
-  ys = _.filter(ys, (y, index) => ys[index] != null)
+  nonNullxs = _.filter(xs, (x, index) => ys[index] != null)
+  nonNullys = _.filter(ys, (y, index) => ys[index] != null)
 
-  n = ys.length
+  n = nonNullys.length
 
-  sumXY = _.sum(_.map(xs, (x, i) => x * ys[i]))
+  sumXY = _.sum(_.map(nonNullxs, (x, i) => x * nonNullys[i]))
 
-  sumXX = _.sum(_.map(xs, (x) => x * x))
+  sumXX = _.sum(_.map(nonNullxs, (x) => x * x))
 
-  sumX = _.sum(xs)
+  sumX = _.sum(nonNullxs)
 
-  sumY = _.sum(ys)
+  sumY = _.sum(nonNullys)
 
   # Calculate denominator
   den = n * sumXX - sumX * sumX
