@@ -65,6 +65,16 @@
   stroke: #ccc;
 }
 
+/* Hide trendline dots */
+.c3-target-trendline .c3-circles {
+  opacity: 0;
+}
+
+/* Trandlines are dashed */
+.c3-target-trendline .c3-lines {
+  stroke-dasharray: 3;
+}
+
 /* Put dropdowns over top of leaflet controls */
 .Select-menu-outer {
   z-index: 1100;

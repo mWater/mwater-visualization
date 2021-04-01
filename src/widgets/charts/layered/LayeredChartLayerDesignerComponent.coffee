@@ -243,15 +243,15 @@ module.exports = class LayeredChartLayerDesignerComponent extends React.Componen
   renderTrendline: ->
     layer = @props.design.layers[@props.index]
 
-    # Can only have trendline if non-polar and y + x axis determined
+    # Can only have trendline if non-polar and y + x axis determined and not cumulative and not stacked
     axisBuilder = new AxisBuilder(schema: @props.schema)
-    if not layer.axes.y or not layer.axes.x
+    if not layer.axes.y or not layer.axes.x or layer.cumulative or layer.stacked or @props.design.stacked
       return 
 
     R 'div', key: "trendline",
       R 'label', className: "checkbox-inline", 
         R 'input', type: "checkbox", checked: layer.trendline == "linear", onChange: @handleTrendlineChange
-        "Show linear trend line"
+        "Show linear trendline"
 
   renderStacked: ->
     layer = @props.design.layers[@props.index]
