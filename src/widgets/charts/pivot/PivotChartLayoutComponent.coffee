@@ -268,10 +268,17 @@ class LayoutCellComponent extends React.Component
     borderBottom = Math.max(cell.borderBottom or 0, @props.layout.rows[@props.rowIndex + 1]?.cells[@props.columnIndex].borderTop or 0)
     borderRight = Math.max(cell.borderRight or 0, @props.layout.rows[@props.rowIndex].cells[@props.columnIndex + 1]?.borderLeft or 0)
 
+    textColor = null
+
+    if backgroundColor 
+      c = Color(backgroundColor)
+      textColor = if (c.red() + c.green() + c.blue())/765 < 0.5 then 'rgb(204,204,204)'
+
     style = {
       backgroundColor: backgroundColor
       textAlign: cell.align
       cursor: if isHover and not cell.unconfigured then "pointer"
+      color: textColor
     }
     classes = classNames({
       cell: true
