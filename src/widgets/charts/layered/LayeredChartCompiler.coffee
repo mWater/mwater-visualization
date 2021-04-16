@@ -7,6 +7,7 @@ injectTableAlias = require('mwater-expressions').injectTableAlias
 d3Format = require 'd3-format'
 
 commaFormatter = d3Format.format(",")
+compactFormatter = d3Format.format("~s")
 pieLabelValueFormatter = (format, hidePercent = false) -> 
   percent = (ratio) -> if hidePercent then "" else "(#{d3Format.format('.1%')(ratio)})"
   return (value, ratio, id) -> 
@@ -115,6 +116,8 @@ module.exports = class LayeredChartCompiler
     c3Data = @compileData(options.design, options.data, options.locale)
     # Pick first format to use as the tick formatter
     tickFormatter = if _.keys(c3Data.format).length > 0 then c3Data.format[_.keys(c3Data.format)[0]] else commaFormatter
+    if options.design.transpose
+      tickFormatter = compactFormatter
 
     # Create chart
     # NOTE: this structure must be comparable with _.isEqual, so don't add any inline functiona
