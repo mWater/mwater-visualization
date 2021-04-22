@@ -1,3 +1,5 @@
+@import "./layout-styles.css";
+
 /* For https://github.com/Hacker0x01/react-datepicker/issues/624 */
 .react-datepicker {
   font-size: 1em;
@@ -444,8 +446,6 @@
   vertical-align: middle;
   display: inline-block;
 }
-
-@import "./layout-styles.css";
 
 .rotated-image-container.rotated-thumbnail {
   display: inline-block;
