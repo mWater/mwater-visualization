@@ -124,7 +124,8 @@ module.exports = class FindReplaceModalComponent extends React.Component
           return
 
         # Perform updateValue on each one
-        async.eachLimit rows, 10, (row, cb) => 
+        # Do one at a time to prevent conflicts. TODO should do all at once in a transaction.
+        async.eachLimit rows, 1, (row, cb) => 
           # Abort if closed
           if not @state.open
             return 
