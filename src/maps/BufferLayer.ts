@@ -315,7 +315,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
           type: "op",
           op: "/",
           exprs: [{ type: "op", op: "*", exprs: [design.radius, 2] }, { type: "op", op: "*", exprs: [
-            { type: "token", token: "!pixel_height!" },
+            { type: "op", op: "nullif", exprs: [{ type: "token", token: "!pixel_height!" }, 0] },
             { type: "op", op: "cos", exprs: [
               { type: "op", op: "*", exprs: [
                 { type: "op", op: "ST_YMIN", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326]}] },
