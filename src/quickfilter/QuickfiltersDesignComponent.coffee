@@ -49,7 +49,7 @@ module.exports = class QuickfiltersDesignComponent extends React.Component
     prevEnumValues = exprUtils.getExprEnumValues(design[index - 1].expr)
 
     multi = design[index].multi or false
-    prevMulti = design[index].multi or false
+    prevMulti = design[index - 1].multi or false
 
     if multi != prevMulti
       return false

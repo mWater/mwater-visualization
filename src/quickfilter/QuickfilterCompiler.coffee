@@ -39,9 +39,17 @@ module.exports = class QuickfilterCompiler
       # Do not render if nothing
       if not expr
         continue
+      
+      # Due to bug, some quickfilters were merged even though multi was different. Get multi
+      # from original if merged
+      multi = item.multi
+      if item.merged
+        for i in [(index - 1)..0]
+          if not design[i].merged
+            multi = design[i].multi
 
       # Compile to boolean expression
-      filterExpr = @compileToFilterExpr(expr, value, item.multi)
+      filterExpr = @compileToFilterExpr(expr, value, multi)
 
       jsonql = new ExprCompiler(@schema).compileExpr(expr: filterExpr, tableAlias: "{alias}")
       # Only keep if compiles to something
