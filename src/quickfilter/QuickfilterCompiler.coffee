@@ -44,7 +44,7 @@ module.exports = class QuickfilterCompiler
       # from original if merged
       multi = item.multi
       if item.merged
-        for i in [(index - 1)..0]
+        for i in [0...index]
           if not design[i].merged
             multi = design[i].multi
 
