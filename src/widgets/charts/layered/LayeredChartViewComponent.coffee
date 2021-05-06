@@ -265,7 +265,8 @@ class C3ChartComponent extends React.Component
     @props.onScopeChange?(scope)
 
   componentWillUnmount: ->
-    @chart.destroy()
+    if @chart
+      @chart.destroy()
 
   render: ->
     # # Don't grow fonts as it causes overlap TODO remove
