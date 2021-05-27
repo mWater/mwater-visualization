@@ -545,6 +545,17 @@ class MWaterDataSource extends DataSource
     @caching = caching
 
   performQuery: (query, cb) ->
+    # If no callback, use promise
+    if not cb
+      return new Promise((resolve, reject) => 
+        @performQuery(jsonql, (error, rows) =>
+          if error
+            reject(error)
+          else
+            resolve(rows)
+        )
+      )
+
     url = @apiUrl + "jsonql?jsonql=" + encodeURIComponent(JSON.stringify(query))
     if @client
       url += "&client=#{@client}"

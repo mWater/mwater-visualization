@@ -11,6 +11,17 @@ module.exports = class CachingDataSource extends DataSource
     @cache = new LRU({ max: 500, maxAge: 1000 * 15 * 60 })
 
   performQuery: (query, cb) ->
+    # If no callback, use promise
+    if not cb
+      return new Promise((resolve, reject) => 
+        @performQuery(jsonql, (error, rows) =>
+          if error
+            reject(error)
+          else
+            resolve(rows)
+        )
+      )
+
     cacheKey = JSON.stringify(query)
     cachedRows = @cache.get(cacheKey)
     if cachedRows
