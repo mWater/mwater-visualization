@@ -1,1 +1,1 @@
-declare var L: any;
+declare var L: typeof import("leaflet");

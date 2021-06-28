@@ -1,5 +1,6 @@
 /// <reference types="jquery" />
 import React from "react";
+import * as uiComponents from "./UIComponents";
 interface MWaterCompleteTableSelectComponentProps {
     /** Url to hit api */
     apiUrl: string;
@@ -21,32 +22,24 @@ export default class MWaterCompleteTableSelectComponent extends React.Component<
     renderSites(): React.CElement<{
         items: {
             name: string;
-            desc: string;
-            onClick: any;
+            desc?: string | undefined;
+            onClick: () => void;
+            onRemove?: (() => void) | undefined;
         }[];
-    }, React.Component<{
-        items: {
-            name: string;
-            desc: string;
-            onClick: any;
-        }[];
-    }, any, any>>;
+        hint?: string | undefined;
+    }, uiComponents.OptionListComponent>;
     renderForms(): React.CElement<any, FormsListComponent>;
     renderIndicators(): React.CElement<any, IndicatorsListComponent>;
     renderIssues(): React.CElement<any, IssuesListComponent>;
     renderSweetSense(): React.CElement<{
         items: {
             name: string;
-            desc: string;
-            onClick: any;
+            desc?: string | undefined;
+            onClick: () => void;
+            onRemove?: (() => void) | undefined;
         }[];
-    }, React.Component<{
-        items: {
-            name: string;
-            desc: string;
-            onClick: any;
-        }[];
-    }, any, any>>;
+        hint?: string | undefined;
+    }, uiComponents.OptionListComponent>;
     renderTablesets(): React.FunctionComponentElement<{
         apiUrl: string;
         schema: import("mwater-expressions").Schema;
@@ -72,16 +65,12 @@ export default class MWaterCompleteTableSelectComponent extends React.Component<
     renderOther(): React.CElement<{
         items: {
             name: string;
-            desc: string;
-            onClick: any;
+            desc?: string | undefined;
+            onClick: () => void;
+            onRemove?: (() => void) | undefined;
         }[];
-    }, React.Component<{
-        items: {
-            name: string;
-            desc: string;
-            onClick: any;
-        }[];
-    }, any, any>>;
+        hint?: string | undefined;
+    }, uiComponents.OptionListComponent>;
     getSweetSenseTables(): unknown[];
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
