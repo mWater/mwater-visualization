@@ -1,4 +1,5 @@
 require("./LeafletLoading.css")
+import L from 'leaflet'
 
 // FROM: https://github.com/ebrelsford/Leaflet.loading
 /*

@@ -9,7 +9,7 @@ const R = React.createElement
 import moment from "moment"
 import AxisBuilder from "../../../axes/AxisBuilder"
 import { ExprUtils } from "mwater-expressions"
-import d3 from "d3"
+import * as d3 from "d3"
 
 // Require d3-tip to use it
 import { default as d3Tip } from "d3-tip"

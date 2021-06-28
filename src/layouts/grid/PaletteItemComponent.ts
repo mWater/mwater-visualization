@@ -2,7 +2,7 @@ import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 
-const DragSourceComponent = require("../DragSourceComponent")("block-move")
+const DragSourceComponent = require("../DragSourceComponent").default("block-move")
 
 interface PaletteItemComponentProps {
   /** Create the drag item */

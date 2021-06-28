@@ -2,7 +2,7 @@ import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 
-const DragSourceComponent = require("../DragSourceComponent")("visualization-block")
+const DragSourceComponent = require("../DragSourceComponent").default("visualization-block")
 
 interface PaletteItemComponentProps {
   /** Create the drag item */

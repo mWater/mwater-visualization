@@ -1,9 +1,11 @@
 import _ from "lodash"
 import React from "react"
 import ReactDOM from "react-dom"
-import BingLayer from "./BingLayer"
-import UtfGridLayer from "./UtfGridLayer"
 import LeafletLoading from "./LeafletLoading"
+import { ReactNode, Component } from "react"
+import L, { PathOptions, CircleMarkerOptions } from "leaflet"
+let BingLayer = require("./BingLayer")
+let UtfGridLayer = require("./UtfGridLayer")
 
 const R = React.createElement
 
@@ -14,9 +16,6 @@ L.Icon.Default.mergeOptions({
   iconUrl: require("leaflet/dist/images/marker-icon.png").default,
   shadowUrl: require("leaflet/dist/images/marker-shadow.png").default
 })
-
-import { ReactNode, Component } from "react"
-import L, { PathOptions, CircleMarkerOptions } from "leaflet"
 
 // import { GeoJsonObject } from "geojson";
 type GeoJsonObject = any

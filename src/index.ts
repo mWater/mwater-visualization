@@ -85,8 +85,8 @@ import "./index.css"
 export { default as CachingDataSource } from "./CachingDataSource"
 export { default as UndoStack } from "./UndoStack"
 export { default as DashboardViewComponent } from "./dashboards/DashboardViewComponent"
-export { default as BingLayer } from "./maps/BingLayer"
-export { default as UtfGridLayer } from "./maps/UtfGridLayer"
+export let BingLayer = require("./maps/BingLayer")
+export let UtfGridLayer = require("./maps/UtfGridLayer")
 export { default as LayerFactory } from "./maps/LayerFactory"
 export { default as MapDesignerComponent } from "./maps/MapDesignerComponent"
 export { default as MapComponent } from "./maps/MapComponent"
@@ -118,10 +118,9 @@ export { default as RichTextComponent } from "./richtext/RichTextComponent"
 export { default as ItemsHtmlConverter } from "./richtext/ItemsHtmlConverter"
 export { default as DropdownWidgetComponent } from "./widgets/DropdownWidgetComponent"
 export { default as QuickfilterCompiler } from "./quickfilter/QuickfilterCompiler"
-export { MapViewComponent } from "./maps/MapViewComponent"
 
 // Polyfill pathseg https://github.com/masayuki0812/c3/issues/1529
-import "./pathseg-polyfill.js"
+import "./pathseg-polyfill"
 
 // http://stackoverflow.com/questions/19305821/multiple-modals-overlay
 import $ from "jquery"

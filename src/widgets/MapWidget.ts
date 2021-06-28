@@ -172,7 +172,7 @@ class MapWidgetComponent extends React.Component<MapWidgetComponentProps, MapWid
 
   renderContent(design: any, onDesignChange: any, width: any, height: any) {
     // Require here to prevent server require problems
-    const { MapViewComponent } = require("../maps/MapViewComponent").default
+    const { MapViewComponent } = require("../maps/MapViewComponent")
 
     return R(
       "div",

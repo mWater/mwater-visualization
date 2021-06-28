@@ -6,7 +6,7 @@ import React from "react"
 const R = React.createElement
 import uuid from "uuid"
 
-const DragSourceComponent = require("../DragSourceComponent")("visualization-block")
+const DragSourceComponent = require("../DragSourceComponent").default("visualization-block")
 import { DropTarget } from "react-dnd"
 
 interface ClipboardPaletteItemComponentProps {

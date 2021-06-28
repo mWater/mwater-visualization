@@ -35,4 +35,5 @@ class DragSourceComponent extends React.Component<DragSourceComponentProps> {
     return this.props.connectDragPreview(this.props.connectDragSource(this.props.children))
   }
 }
+
 export default (type: any) => DragSource(type, sourceSpec, collectSource)(DragSourceComponent)

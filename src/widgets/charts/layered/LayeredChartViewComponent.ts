@@ -7,7 +7,7 @@ const R = React.createElement
 import { ExprUtils } from "mwater-expressions"
 import LayeredChartCompiler from "./LayeredChartCompiler"
 import TextComponent from "../../text/TextComponent"
-import d3 from "d3"
+import * as d3 from "d3"
 
 interface LayeredChartViewComponentProps {
   schema: any
