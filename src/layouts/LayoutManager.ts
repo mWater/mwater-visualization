@@ -38,12 +38,12 @@ export default LayoutManager = class LayoutManager {
 
     switch (type) {
       case "grid": // Old one
-        var GridLayoutManager = require("./grid/GridLayoutManager")
+        var GridLayoutManager = require("./grid/GridLayoutManager").default
         return new GridLayoutManager()
         break
 
       case "blocks": // New one
-        var BlocksLayoutManager = require("./blocks/BlocksLayoutManager")
+        var BlocksLayoutManager = require("./blocks/BlocksLayoutManager").default
         return new BlocksLayoutManager()
         break
 

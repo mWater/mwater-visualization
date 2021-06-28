@@ -77,7 +77,7 @@ export default ImageMosaicChart = class ImageMosaicChart extends Chart {
   //   filters: array of filters
   createDesignerElement(options: any) {
     // Require here to prevent server require problems
-    const ImageMosaicChartDesignerComponent = require("./ImageMosaicChartDesignerComponent")
+    const ImageMosaicChartDesignerComponent = require("./ImageMosaicChartDesignerComponent").default
 
     const props = {
       schema: options.schema,
@@ -163,7 +163,7 @@ export default ImageMosaicChart = class ImageMosaicChart extends Chart {
   //   onRowClick: Called with (tableId, rowId) when item is clicked
   createViewElement(options: any) {
     // Require here to prevent server require problems
-    const ImageMosaicChartViewComponent = require("./ImageMosaicChartViewComponent")
+    const ImageMosaicChartViewComponent = require("./ImageMosaicChartViewComponent").default
 
     // Create chart
     const props = {

@@ -10,8 +10,8 @@ import TableSelectComponent from "../TableSelectComponent"
 import Rcslider from "rc-slider"
 import GridLayerDesign from "./GridLayerDesign"
 import { JsonQLFilter } from "../index"
-const EditPopupComponent = require("./EditPopupComponent")
-const ZoomLevelsComponent = require("./ZoomLevelsComponent")
+import EditPopupComponent from "./EditPopupComponent"
+import ZoomLevelsComponent from "./ZoomLevelsComponent"
 import ui from "react-library/lib/bootstrap"
 import { Axis } from "../axes/Axis"
 import PopoverHelpComponent from "react-library/lib/PopoverHelpComponent"

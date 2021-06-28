@@ -10,9 +10,9 @@ import Layer, { OnGridClickOptions, VectorTileDef } from "./Layer"
 import { OnGridClickResults } from "./maps"
 import { compileColorMapToMapbox } from "./mapboxUtils"
 
-const LegendGroup = require("./LegendGroup")
-const LayerLegendComponent = require("./LayerLegendComponent")
-const PopupFilterJoinsUtils = require("./PopupFilterJoinsUtils")
+import LegendGroup from "./LegendGroup"
+import LayerLegendComponent from "./LayerLegendComponent"
+import PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
 
 /*
 Layer which draws a buffer around geometries (i.e. a radius circle around points)
@@ -617,8 +617,8 @@ marker-fill: ` +
           ev.data.id
         )
 
-        const BlocksLayoutManager = require("../layouts/blocks/BlocksLayoutManager")
-        const WidgetFactory = require("../widgets/WidgetFactory")
+        const BlocksLayoutManager = require("../layouts/blocks/BlocksLayoutManager").default
+        const WidgetFactory = require("../widgets/WidgetFactory").default
 
         results.popup = new BlocksLayoutManager().renderLayout({
           items: clickOptions.design.popup.items,
@@ -764,7 +764,7 @@ marker-fill: ` +
     filters: JsonQLFilter[]
   }): React.ReactElement<{}> {
     // Require here to prevent server require problems
-    const BufferLayerDesignerComponent = require("./BufferLayerDesignerComponent")
+    const BufferLayerDesignerComponent = require("./BufferLayerDesignerComponent").default
 
     // Clean on way in and out
     return React.createElement(BufferLayerDesignerComponent, {

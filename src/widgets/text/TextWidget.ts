@@ -28,7 +28,7 @@ export default TextWidget = class TextWidget extends Widget {
   //  namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
   createViewElement(options: any) {
     // Put here so TextWidget can be created on server
-    const TextWidgetComponent = require("./TextWidgetComponent")
+    const TextWidgetComponent = require("./TextWidgetComponent").default
 
     return R(TextWidgetComponent, {
       schema: options.schema,

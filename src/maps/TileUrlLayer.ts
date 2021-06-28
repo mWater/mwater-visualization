@@ -11,7 +11,6 @@ import { ExprCompiler } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 import { injectTableAlias } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
-;({ ExprUtils } = require("mwater-expressions"))
 import AxisBuilder from "../axes/AxisBuilder"
 import LegendGroup from "./LegendGroup"
 

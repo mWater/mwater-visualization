@@ -13,6 +13,7 @@ import { ExprUtils } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import AxisBuilder from "../../../axes/AxisBuilder"
 import TableChartViewComponent from "./TableChartViewComponent"
+import { ExprCleaner } from "mwater-expressions"
 
 /*
 Design is:
@@ -37,8 +38,6 @@ ordering:
 */
 export default TableChart = class TableChart extends Chart {
   cleanDesign(design: any, schema: any) {
-    const { ExprCleaner } = require("mwater-expressions")
-
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
@@ -135,7 +134,7 @@ export default TableChart = class TableChart extends Chart {
   //   onDesignChange: function
   createDesignerElement(options: any) {
     // Require here to prevent server require problems
-    const TableChartDesignerComponent = require("./TableChartDesignerComponent")
+    const TableChartDesignerComponent = require("./TableChartDesignerComponent").default
 
     const props = {
       schema: options.schema,

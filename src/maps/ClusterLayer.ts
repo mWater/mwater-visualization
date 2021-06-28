@@ -7,8 +7,7 @@ import { JsonQLFilter } from "../JsonQLFilter"
 import AxisBuilder from "../axes/AxisBuilder"
 import { ClusterLayerDesign } from "./ClusterLayerDesign"
 import Layer, { VectorTileDef } from "./Layer"
-
-const LayerLegendComponent = require("./LayerLegendComponent")
+import LayerLegendComponent from "./LayerLegendComponent"
 
 export default class ClusterLayer extends Layer<ClusterLayerDesign> {
   /** Gets the type of layer definition */
@@ -760,7 +759,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     filters: JsonQLFilter[]
   }): React.ReactElement<{}> {
     // Require here to prevent server require problems
-    const ClusterLayerDesignerComponent = require("./ClusterLayerDesignerComponent")
+    const ClusterLayerDesignerComponent = require("./ClusterLayerDesignerComponent").default
 
     // Clean on way in and out
     return React.createElement(ClusterLayerDesignerComponent, {

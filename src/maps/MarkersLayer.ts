@@ -11,8 +11,8 @@ import { JsonQLFilter } from "../index"
 import { JsonQLExpr, JsonQLQuery, JsonQLScalar, JsonQLSelect, JsonQLSelectQuery } from "jsonql"
 import { MarkersLayerDesign } from "./MarkersLayerDesign"
 import { compileColorMapToMapbox } from "./mapboxUtils"
-const LayerLegendComponent = require("./LayerLegendComponent")
-const PopupFilterJoinsUtils = require("./PopupFilterJoinsUtils")
+import LayerLegendComponent from "./LayerLegendComponent"
+import PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
 
 export default class MarkersLayer extends Layer<MarkersLayerDesign> {
   /** Gets the type of layer definition */
@@ -625,8 +625,8 @@ polygon-fill: ` +
           ev.data.id
         )
 
-        const BlocksLayoutManager = require("../layouts/blocks/BlocksLayoutManager")
-        const WidgetFactory = require("../widgets/WidgetFactory")
+        const BlocksLayoutManager = require("../layouts/blocks/BlocksLayoutManager").default
+        const WidgetFactory = require("../widgets/WidgetFactory").default
 
         results.popup = new BlocksLayoutManager().renderLayout({
           items: clickOptions.design.popup.items,
@@ -760,7 +760,7 @@ polygon-fill: ` +
     filters: JsonQLFilter[]
   }): React.ReactElement<{}> {
     // Require here to prevent server require problems
-    const MarkersLayerDesignerComponent = require("./MarkersLayerDesignerComponent")
+    const MarkersLayerDesignerComponent = require("./MarkersLayerDesignerComponent").default
 
     // Clean on way in and out
     return React.createElement(MarkersLayerDesignerComponent, {

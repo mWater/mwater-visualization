@@ -11,14 +11,14 @@ import ColorComponent from "../ColorComponent"
 import Rcslider from "rc-slider"
 import ChoroplethLayerDesign from "./ChoroplethLayerDesign"
 import { JsonQLFilter } from "../index"
-const EditPopupComponent = require("./EditPopupComponent")
-const ZoomLevelsComponent = require("./ZoomLevelsComponent")
+import EditPopupComponent "./EditPopupComponent"
+import ZoomLevelsComponent "./ZoomLevelsComponent"
 import ui, { Radio } from "react-library/lib/bootstrap"
 import { Axis } from "../axes/Axis"
 import { SwitchableTileUrlLayerDesign } from "./SwitchableTileUrlLayer"
 
-const AdminScopeAndDetailLevelComponent = require("./AdminScopeAndDetailLevelComponent")
-const ScopeAndDetailLevelComponent = require("./ScopeAndDetailLevelComponent")
+import AdminScopeAndDetailLevelComponent from "./AdminScopeAndDetailLevelComponent"
+import ScopeAndDetailLevelComponent from "./ScopeAndDetailLevelComponent"
 
 /** Designer for a switchable tile url layer */
 export default class SwitchableTileUrlLayerDesigner extends React.Component<{

@@ -159,7 +159,7 @@ export default LayeredChart = class LayeredChart extends Chart {
   //   filters: array of filters
   createDesignerElement(options: any) {
     // Require here to prevent server require problems
-    const LayeredChartDesignerComponent = require("./LayeredChartDesignerComponent")
+    const LayeredChartDesignerComponent = require("./LayeredChartDesignerComponent").default
     const props = {
       schema: options.schema,
       dataSource: options.dataSource,
@@ -233,7 +233,7 @@ export default LayeredChart = class LayeredChart extends Chart {
   //   scope: current scope of the view element
   //   onScopeChange: called when scope changes with new scope
   createViewElement(options: any) {
-    const LayeredChartViewComponent = require("./LayeredChartViewComponent")
+    const LayeredChartViewComponent = require("./LayeredChartViewComponent").default
 
     // Create chart
     const props = {

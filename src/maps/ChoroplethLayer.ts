@@ -21,8 +21,8 @@ import { JsonQLFilter } from "../index"
 import ChoroplethLayerDesign from "./ChoroplethLayerDesign"
 import { JsonQLExpr, JsonQLOp, JsonQLQuery, JsonQLScalar } from "jsonql"
 import { compileColorMapToMapbox } from "./mapboxUtils"
-const LayerLegendComponent = require("./LayerLegendComponent")
-const PopupFilterJoinsUtils = require("./PopupFilterJoinsUtils")
+import LayerLegendComponent from "./LayerLegendComponent"
+import PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
 
 export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
   /** Gets the type of layer definition */
@@ -1316,8 +1316,8 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
           }
         })
 
-        const BlocksLayoutManager = require("../layouts/blocks/BlocksLayoutManager")
-        const WidgetFactory = require("../widgets/WidgetFactory")
+        const BlocksLayoutManager = require("../layouts/blocks/BlocksLayoutManager").default
+        const WidgetFactory = require("../widgets/WidgetFactory").default
 
         results.popup = new BlocksLayoutManager().renderLayout({
           items: clickOptions.design.popup.items,

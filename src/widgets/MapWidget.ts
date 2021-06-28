@@ -112,7 +112,7 @@ class MapWidgetComponent extends React.Component<MapWidgetComponentProps, MapWid
     }
 
     // Require here to prevent server require problems
-    const MapDesignerComponent = require("../maps/MapDesignerComponent")
+    const MapDesignerComponent = require("../maps/MapDesignerComponent").default
 
     // Create editor
     const editor = React.createElement(MapDesignerComponent, {
@@ -172,7 +172,7 @@ class MapWidgetComponent extends React.Component<MapWidgetComponentProps, MapWid
 
   renderContent(design: any, onDesignChange: any, width: any, height: any) {
     // Require here to prevent server require problems
-    const { MapViewComponent } = require("../maps/MapViewComponent")
+    const { MapViewComponent } = require("../maps/MapViewComponent").default
 
     return R(
       "div",

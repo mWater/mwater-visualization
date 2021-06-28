@@ -228,7 +228,7 @@ export default PivotChart = class PivotChart extends Chart {
   //   filters: array of filters
   createDesignerElement(options: any) {
     // Require here to prevent server require problems
-    const PivotChartDesignerComponent = require("./PivotChartDesignerComponent")
+    const PivotChartDesignerComponent = require("./PivotChartDesignerComponent").default
 
     const props = {
       schema: options.schema,
@@ -304,7 +304,7 @@ export default PivotChart = class PivotChart extends Chart {
   //   onScopeChange: called when scope changes with new scope
   //   filters: array of filters
   createViewElement(options: any) {
-    const PivotChartViewComponent = require("./PivotChartViewComponent")
+    const PivotChartViewComponent = require("./PivotChartViewComponent").default
 
     // Create chart
     const props = {

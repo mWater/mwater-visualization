@@ -20,7 +20,7 @@ export default BlocksLayoutManager = class BlocksLayoutManager extends LayoutMan
   //  onClipboardChange: called when clipboard is changed
   //  cantPasteMesssage: message to display if clipboard can't be pasted into current dashboard
   renderLayout(options: any) {
-    const BlocksDisplayComponent = require("./BlocksDisplayComponent")
+    const BlocksDisplayComponent = require("./BlocksDisplayComponent").default
     return R(BlocksDisplayComponent, {
       items: options.items || { id: "root", type: "root", blocks: [] },
       onItemsChange: options.onItemsChange,

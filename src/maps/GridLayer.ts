@@ -20,7 +20,7 @@ import produce from "immer"
 import { Axis } from "../axes/Axis"
 import { JsonQLExpr, JsonQLQuery, JsonQLScalar } from "jsonql"
 import { compileColorMapToMapbox } from "./mapboxUtils"
-const LayerLegendComponent = require("./LayerLegendComponent")
+import LayerLegendComponent from "./LayerLegendComponent"
 
 /** Layer which is a grid of squares or flat-topped hexagons. Depends on "Grid Functions.sql" having been run */
 export default class GridLayer extends Layer<GridLayerDesign> {
@@ -561,7 +561,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
   //         jsonql: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "_id" }, { type: "literal", value: ev.data.id }]}
   //       })
 
-  //       const BlocksLayoutManager = require('../layouts/blocks/BlocksLayoutManager')
+  //       const BlocksLayoutManager = require('../layouts/blocks/BlocksLayoutManager').default
   //       const WidgetFactory = require('../widgets/WidgetFactory')
 
   //       results.popup = new BlocksLayoutManager().renderLayout({

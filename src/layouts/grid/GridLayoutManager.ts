@@ -12,7 +12,7 @@ import AutoSizeComponent from "react-library/lib/AutoSizeComponent"
 
 export default GridLayoutManager = class GridLayoutManager extends LayoutManager {
   renderPalette(width: any) {
-    const PaletteItemComponent = require("./PaletteItemComponent")
+    const PaletteItemComponent = require("./PaletteItemComponent").default
 
     const createWidgetItem =
       (
@@ -90,7 +90,7 @@ export default GridLayoutManager = class GridLayoutManager extends LayoutManager
   //  onItemsChange: Called when items changes
   //  renderWidget: called with ({ id:, type:, design:, onDesignChange:, width:, height:  })
   renderLayout(options: any) {
-    const GridLayoutComponent = require("./GridLayoutComponent")
+    const GridLayoutComponent = require("./GridLayoutComponent").default
 
     return R(AutoSizeComponent, { injectWidth: true, injectHeight: true }, (size: any) => {
       if (options.onItemsChange != null) {

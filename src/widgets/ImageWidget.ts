@@ -31,7 +31,7 @@ export default ImageWidget = class ImageWidget extends Widget {
   //  singleRowTable: optional table name of table that will be filtered to have a single row present. Widget designer should optionally account for this
   createViewElement(options: any) {
     // Put here so ImageWidget can be created on server
-    const ImageWidgetComponent = require("./ImageWidgetComponent")
+    const ImageWidgetComponent = require("./ImageWidgetComponent").default
 
     return R(ImageWidgetComponent, {
       schema: options.schema,

@@ -11,13 +11,13 @@ import ColorComponent from "../ColorComponent"
 import Rcslider from "rc-slider"
 import ChoroplethLayerDesign from "./ChoroplethLayerDesign"
 import { JsonQLFilter } from "../index"
-const EditPopupComponent = require("./EditPopupComponent")
-const ZoomLevelsComponent = require("./ZoomLevelsComponent")
+import EditPopupComponent from "./EditPopupComponent"
+import ZoomLevelsComponent from "./ZoomLevelsComponent"
 import ui from "react-library/lib/bootstrap"
 import { Axis } from "../axes/Axis"
 
-const AdminScopeAndDetailLevelComponent = require("./AdminScopeAndDetailLevelComponent")
-const ScopeAndDetailLevelComponent = require("./ScopeAndDetailLevelComponent")
+import AdminScopeAndDetailLevelComponent from "./AdminScopeAndDetailLevelComponent"
+import ScopeAndDetailLevelComponent from "./ScopeAndDetailLevelComponent"
 
 // Designer for a choropleth layer
 export default class ChoroplethLayerDesigner extends React.Component<{

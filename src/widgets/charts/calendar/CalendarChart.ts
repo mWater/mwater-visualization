@@ -88,7 +88,7 @@ export default CalendarChart = class CalendarChart extends Chart {
   //   filters: array of filters
   createDesignerElement(options: any) {
     // Require here to prevent server require problems
-    const CalendarChartDesignerComponent = require("./CalendarChartDesignerComponent")
+    const CalendarChartDesignerComponent = require("./CalendarChartDesignerComponent").default
 
     const props = {
       schema: options.schema,
@@ -175,7 +175,7 @@ export default CalendarChart = class CalendarChart extends Chart {
   //   onScopeChange: called when scope changes with new scope
   createViewElement(options: any) {
     // Require here to prevent server require problems
-    const CalendarChartViewComponent = require("./CalendarChartViewComponent")
+    const CalendarChartViewComponent = require("./CalendarChartViewComponent").default
 
     // Create chart
     const props = {
