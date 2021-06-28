@@ -125,7 +125,7 @@ function useStabilizeFunction<T extends Function>(func: T | undefined | null): T
 }
 
 
-/** Always returns the same value of stringifies the same to prevent unnecessary re-rendering*/
+/** Always returns the same value of stringifies the same to prevent unnecessary re-rendering */
 function useStabilizeValue<T>(value: T): T {
   const stableRef = useRef<T>(value)
 

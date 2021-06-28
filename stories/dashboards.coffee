@@ -158,8 +158,8 @@ class DashboardPopupComponent extends React.Component
       jsonql: PropTypes.object.isRequired   # jsonql filter with {alias} for tableAlias
     }))
 
-  constructor: ->
-    super
+  constructor: (props) ->
+    super(props)
 
     @state = {
       open: false
