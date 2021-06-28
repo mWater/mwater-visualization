@@ -1,133 +1,146 @@
-assert = require('chai').assert
-_ = require 'lodash'
+import { assert } from 'chai';
+import _ from 'lodash';
+import PivotChartUtils from '../../../../src/widgets/charts/pivot/PivotChartUtils';
+import canonical from 'canonical-json';
+const compare = (actual, expected) => assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n");
 
-PivotChartUtils = require '../../../../src/widgets/charts/pivot/PivotChartUtils'
+describe("PivotChartUtils", function() {
+  describe("getSegmentPaths", function() {
+    it('gets simple paths', function() {
+      const segments = [{ id: "a" }, { id: "b" }];
+      return compare(PivotChartUtils.getSegmentPaths(segments), [[{ id: "a" }], [{ id: "b" }]]);
+  });
 
-canonical = require 'canonical-json'
-compare = (actual, expected) ->
-  assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n"
+    return it('gets nested paths', function() {
+      const segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }];
+      return compare(PivotChartUtils.getSegmentPaths(segments), [[segments[0], { id: "c" }], [segments[0], { id: "d" }], [segments[1]]]);
+  });
+});
 
-describe "PivotChartUtils", ->
-  describe "getSegmentPaths", ->
-    it 'gets simple paths', ->
-      segments = [{ id: "a" }, { id: "b" }]
-      compare PivotChartUtils.getSegmentPaths(segments), [[{ id: "a" }], [{ id: "b" }]]
+  describe("getAllSegments", () => it('gets nested paths', function() {
+    const segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }];
+    return compare(PivotChartUtils.getAllSegments(segments), [segments[0], { id: "c" }, { id: "d" }, segments[1]]);
+}));
 
-    it 'gets nested paths', ->
-      segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
-      compare PivotChartUtils.getSegmentPaths(segments), [[segments[0], { id: "c" }], [segments[0], { id: "d" }], [segments[1]]]
+  describe("findSegment", function() {
+    it("finds nested", function() {
+      const segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }];
+      return compare(PivotChartUtils.findSegment(segments, "c"), { id: "c" });
+  });
 
-  describe "getAllSegments", ->
-    it 'gets nested paths', ->
-      segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
-      compare PivotChartUtils.getAllSegments(segments), [segments[0], { id: "c" }, { id: "d" }, segments[1]]
+    return it("finds null if not found", function() {
+      const segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }];
+      return assert(!PivotChartUtils.findSegment(segments, "x"));
+    });
+  });
 
-  describe "findSegment", ->
-    it "finds nested", ->
-      segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
-      compare PivotChartUtils.findSegment(segments, "c"), { id: "c" }
+  describe("canSummarizeSegment", function() {
+    it("is false if first", function() {
+      const segments = [{ id: "a" }, { id: "b" }];
+      return assert.isFalse(PivotChartUtils.canSummarizeSegment(segments, "a"));
+    });
 
-    it "finds null if not found", ->
-      segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
-      assert not PivotChartUtils.findSegment(segments, "x")
+    it("is false if before is label only", function() {
+      const segments = [{ id: "a", label: "A" }, { id: "b" }];
+      return assert.isFalse(PivotChartUtils.canSummarizeSegment(segments, "b"));
+    });
 
-  describe "canSummarizeSegment", ->
-    it "is false if first", ->
-      segments = [{ id: "a" }, { id: "b" }]
-      assert.isFalse PivotChartUtils.canSummarizeSegment(segments, "a")
+    it("is true if before has value axis", function() {
+      const segments = [{ id: "a", label: "A", valueAxis: { expr: { type: "field", table: "t1", column: "number" }}}, { id: "b" }];
+      return assert.isTrue(PivotChartUtils.canSummarizeSegment(segments, "b"));
+    });
 
-    it "is false if before is label only", ->
-      segments = [{ id: "a", label: "A" }, { id: "b" }]
-      assert.isFalse PivotChartUtils.canSummarizeSegment(segments, "b")
+    it("is false if before has children", function() {
+      const segments = [{ id: "a", label: "A", valueAxis: { expr: { type: "field", table: "t1", column: "number" }}, children: [{ id: "z"}]}, { id: "b" }];
+      return assert.isFalse(PivotChartUtils.canSummarizeSegment(segments, "b"));
+    });
 
-    it "is true if before has value axis", ->
-      segments = [{ id: "a", label: "A", valueAxis: { expr: { type: "field", table: "t1", column: "number" }}}, { id: "b" }]
-      assert.isTrue PivotChartUtils.canSummarizeSegment(segments, "b")
+    return it("works on nested", function() {
+      const segments = [{ id: "a", label: "A", children: [{ id: "b", valueAxis: { expr: { type: "field", table: "t1", column: "number" }}}, { id: "c" }] } ];
+      return assert.isTrue(PivotChartUtils.canSummarizeSegment(segments, "c"));
+    });
+  });
 
-    it "is false if before has children", ->
-      segments = [{ id: "a", label: "A", valueAxis: { expr: { type: "field", table: "t1", column: "number" }}, children: [{ id: "z"}]}, { id: "b" }]
-      assert.isFalse PivotChartUtils.canSummarizeSegment(segments, "b")
+  describe("summarizeSegment", () => it("creates intersections", function() {
+    // Intersection axes
+    const sum1 = { expr: { type: "op", op: "sum", exprs: [{ type: "field", table: "t1", column: "number1" }]}}; 
+    const sum2 = { expr: { type: "op", op: "sum", exprs: [{ type: "field", table: "t1", column: "number2" }]}};
 
-    it "works on nested", ->
-      segments = [{ id: "a", label: "A", children: [{ id: "b", valueAxis: { expr: { type: "field", table: "t1", column: "number" }}}, { id: "c" }] } ]
-      assert.isTrue PivotChartUtils.canSummarizeSegment(segments, "c")
-
-  describe "summarizeSegment", ->
-    it "creates intersections", ->
-      # Intersection axes
-      sum1 = { expr: { type: "op", op: "sum", exprs: [{ type: "field", table: "t1", column: "number1" }]}} 
-      sum2 = { expr: { type: "op", op: "sum", exprs: [{ type: "field", table: "t1", column: "number2" }]}}
-
-      design = {
-        rows: [
-          { id: "r1", label: "A", valueAxis: { expr: { type: "field", table: "t1", column: "enum" }}}
-          { id: "r2" }
-        ]
-        columns: [
-          { id: "c1", label: "C1" }
-          { id: "c2", label: "C2" }
-        ]
-        intersections: {
-          "r1:c1": { valueAxis: sum1 }
-          "r1:c2": { valueAxis: sum2 }
-          "r2:c1": { }
-          "r2:c2": { }
-        }
+    const design = {
+      rows: [
+        { id: "r1", label: "A", valueAxis: { expr: { type: "field", table: "t1", column: "enum" }}},
+        { id: "r2" }
+      ],
+      columns: [
+        { id: "c1", label: "C1" },
+        { id: "c2", label: "C2" }
+      ],
+      intersections: {
+        "r1:c1": { valueAxis: sum1 },
+        "r1:c2": { valueAxis: sum2 },
+        "r2:c1": { },
+        "r2:c2": { }
       }
+    };
 
-      newDesign = PivotChartUtils.summarizeSegment(design, "r2", "Total")
+    const newDesign = PivotChartUtils.summarizeSegment(design, "r2", "Total");
 
-      compare newDesign, {
-        rows: [
-          { id: "r1", label: "A", valueAxis: { expr: { type: "field", table: "t1", column: "enum" }}}
-          { id: "r2", label: "Total" }
-        ]
-        columns: [
-          { id: "c1", label: "C1" }
-          { id: "c2", label: "C2" }
-        ]
-        intersections: {
-          "r1:c1": { valueAxis: sum1 }
-          "r1:c2": { valueAxis: sum2 }
-          "r2:c1": { valueAxis: sum1 }
-          "r2:c2": { valueAxis: sum2 }
-        }
+    return compare(newDesign, {
+      rows: [
+        { id: "r1", label: "A", valueAxis: { expr: { type: "field", table: "t1", column: "enum" }}},
+        { id: "r2", label: "Total" }
+      ],
+      columns: [
+        { id: "c1", label: "C1" },
+        { id: "c2", label: "C2" }
+      ],
+      intersections: {
+        "r1:c1": { valueAxis: sum1 },
+        "r1:c2": { valueAxis: sum2 },
+        "r2:c1": { valueAxis: sum1 },
+        "r2:c2": { valueAxis: sum2 }
       }
+    });
+}));
 
 
-  describe "replaceSegment", ->
-    it "replaces nested", ->
-      segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
-      compare PivotChartUtils.replaceSegment(segments, { id: "c", x: 1 }), [{ id: "a", children: [{ id: "c", x: 1 }, { id: "d" }] }, { id: "b" }]
+  describe("replaceSegment", () => it("replaces nested", function() {
+    const segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }];
+    return compare(PivotChartUtils.replaceSegment(segments, { id: "c", x: 1 }), [{ id: "a", children: [{ id: "c", x: 1 }, { id: "d" }] }, { id: "b" }]);
+}));
 
-  describe "removeSegment", ->
-    it "removes nested", ->
-      segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
-      compare PivotChartUtils.removeSegment(segments, "c"), [{ id: "a", children: [{ id: "d" }] }, { id: "b" }]
+  describe("removeSegment", () => it("removes nested", function() {
+    const segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }];
+    return compare(PivotChartUtils.removeSegment(segments, "c"), [{ id: "a", children: [{ id: "d" }] }, { id: "b" }]);
+}));
 
-  describe "insertBeforeSegment", ->
-    it "handles nested", ->
-      segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
-      segments = PivotChartUtils.insertBeforeSegment(segments, "c")
-      assert.equal segments[0].children.length, 3
-      assert.equal segments[0].children[1].id, "c"
+  describe("insertBeforeSegment", () => it("handles nested", function() {
+    let segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }];
+    segments = PivotChartUtils.insertBeforeSegment(segments, "c");
+    assert.equal(segments[0].children.length, 3);
+    return assert.equal(segments[0].children[1].id, "c");
+  }));
 
-  describe "insertAfterSegment", ->
-    it "handles simple", ->
-      segments = [{ id: "a" }, { id: "b" }, { id: "c" }]
-      segments = PivotChartUtils.insertAfterSegment(segments, "b")
-      assert.equal segments.length, 4
-      assert.equal segments[3].id, "c"
+  describe("insertAfterSegment", function() {
+    it("handles simple", function() {
+      let segments = [{ id: "a" }, { id: "b" }, { id: "c" }];
+      segments = PivotChartUtils.insertAfterSegment(segments, "b");
+      assert.equal(segments.length, 4);
+      return assert.equal(segments[3].id, "c");
+    });
 
-    it "handles nested", ->
-      segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }]
-      segments = PivotChartUtils.insertAfterSegment(segments, "c")
-      assert.equal segments[0].children.length, 3
-      assert.equal segments[0].children[0].id, "c"
+    return it("handles nested", function() {
+      let segments = [{ id: "a", children: [{ id: "c" }, { id: "d" }] }, { id: "b" }];
+      segments = PivotChartUtils.insertAfterSegment(segments, "c");
+      assert.equal(segments[0].children.length, 3);
+      return assert.equal(segments[0].children[0].id, "c");
+    });
+  });
 
-  describe "addChildSegment", ->
-    it "handles simple", ->
-      segments = [{ id: "a" }, { id: "b" }, { id: "c" }]
-      segments = PivotChartUtils.addChildSegment(segments, "b")
-      assert.equal segments.length, 3
-      assert.equal segments[1].children.length, 1
+  return describe("addChildSegment", () => it("handles simple", function() {
+    let segments = [{ id: "a" }, { id: "b" }, { id: "c" }];
+    segments = PivotChartUtils.addChildSegment(segments, "b");
+    assert.equal(segments.length, 3);
+    return assert.equal(segments[1].children.length, 1);
+  }));
+});

@@ -1,56 +1,76 @@
-PropTypes = require('prop-types')
-React = require 'react'
-R = React.createElement
+let ExprInsertModalComponent;
+import PropTypes from 'prop-types';
+import React from 'react';
+const R = React.createElement;
 
-uuid = require 'uuid'
+import uuid from 'uuid';
+import { ExprUtils } from "mwater-expressions";
+import { ExprComponent } from "mwater-expressions-ui";
+import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
+import TableSelectComponent from '../../TableSelectComponent';
+import ExprItemEditorComponent from './ExprItemEditorComponent';
 
-ExprUtils = require("mwater-expressions").ExprUtils
-ExprComponent = require("mwater-expressions-ui").ExprComponent
-ActionCancelModalComponent = require("react-library/lib/ActionCancelModalComponent")
-TableSelectComponent = require '../../TableSelectComponent'
-ExprItemEditorComponent = require './ExprItemEditorComponent'
-
-# Modal that displays an expression builder
-module.exports = class ExprInsertModalComponent extends React.Component
-  @propTypes:
-    schema: PropTypes.object.isRequired   # Schema to use
-    dataSource: PropTypes.object.isRequired # Data source to use to get values
-    onInsert: PropTypes.func.isRequired   # Called with expr item to insert
-    singleRowTable: PropTypes.string  # Table that is filtered to have one row
-
-  constructor: (props) ->
-    super(props)
-
-    @state = {
-      open: false
-      exprItem: null
+// Modal that displays an expression builder
+export default ExprInsertModalComponent = (function() {
+  ExprInsertModalComponent = class ExprInsertModalComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        schema: PropTypes.object.isRequired,   // Schema to use
+        dataSource: PropTypes.object.isRequired, // Data source to use to get values
+        onInsert: PropTypes.func.isRequired,   // Called with expr item to insert
+        singleRowTable: PropTypes.string
+      };
+        // Table that is filtered to have one row
     }
 
-  open: ->
-    @setState(open: true, exprItem: { type: "expr", id: uuid() })
+    constructor(props) {
+      this.handleInsert = this.handleInsert.bind(this);
+      super(props);
 
-  handleInsert: (ev) =>
-    if not @state.exprItem
-      return
+      this.state = {
+        open: false,
+        exprItem: null
+      };
+    }
 
-    # Close first to avoid strange effects when mixed with pojoviews
-    @setState(open: false, =>
-      @props.onInsert(@state.exprItem)
-    )
+    open() {
+      return this.setState({open: true, exprItem: { type: "expr", id: uuid() }});
+    }
 
-  render: ->
-    if not @state.open
-      return null
+    handleInsert(ev) {
+      if (!this.state.exprItem) {
+        return;
+      }
 
-    R ActionCancelModalComponent, 
-      actionLabel: "Insert"
-      onAction: @handleInsert 
-      onCancel: => @setState(open: false)
-      title: "Insert Field",
-        R ExprItemEditorComponent, 
-          schema: @props.schema
-          dataSource: @props.dataSource
-          exprItem: @state.exprItem
-          onChange: (exprItem) => @setState(exprItem: exprItem)
-          singleRowTable: @props.singleRowTable
+      // Close first to avoid strange effects when mixed with pojoviews
+      return this.setState({open: false}, () => {
+        return this.props.onInsert(this.state.exprItem);
+      });
+    }
+
+    render() {
+      if (!this.state.open) {
+        return null;
+      }
+
+      return R(ActionCancelModalComponent, { 
+        actionLabel: "Insert",
+        onAction: this.handleInsert, 
+        onCancel: () => this.setState({open: false}),
+        title: "Insert Field"
+      },
+          R(ExprItemEditorComponent, { 
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            exprItem: this.state.exprItem,
+            onChange: exprItem => this.setState({exprItem}),
+            singleRowTable: this.props.singleRowTable
+          }
+          )
+      );
+    }
+  };
+  ExprInsertModalComponent.initClass();
+  return ExprInsertModalComponent;
+})();
 

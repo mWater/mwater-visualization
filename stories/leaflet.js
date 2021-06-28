@@ -1,52 +1,57 @@
-_ = require 'lodash'
-React = require 'react'
-H = React.DOM
-R = React.createElement
+import _ from 'lodash';
+import React from 'react';
+const H = React.DOM;
+const R = React.createElement;
 
-storiesOf = require('@kadira/storybook').storiesOf
-action = require('@kadira/storybook').action
-
-LeafletMapComponent = require '../src/maps/LeafletMapComponent'
+import { storiesOf } from '@kadira/storybook';
+import { action } from '@kadira/storybook';
+import LeafletMapComponent from '../src/maps/LeafletMapComponent';
 
 storiesOf('Leaflet', module)
-  .add 'normal', => 
-    R LeafletMapComponent, 
-      baseLayerId: "bing_road"
-      width: "100%"
-      height: 600
+  .add('normal', () => { 
+    return R(LeafletMapComponent, { 
+      baseLayerId: "bing_road",
+      width: "100%",
+      height: 600,
       layers: []
+    });
+})
     
-  .add 'popup', => 
-    R LeafletMapComponent, 
-      baseLayerId: "bing_road"
-      width: "100%"
-      height: 600
-      layers: []
+  .add('popup', () => { 
+    return R(LeafletMapComponent, { 
+      baseLayerId: "bing_road",
+      width: "100%",
+      height: 600,
+      layers: [],
       popup: {
-        lat: 30
-        lng: -20
-        contents: H.div null, "Hello!!!"
+        lat: 30,
+        lng: -20,
+        contents: H.div(null, "Hello!!!")
       }
+    });
+})
 
-  .add 'popup2', => 
-    R LeafletMapComponent, 
-      baseLayerId: "bing_road"
-      width: "100%"
-      height: 600
-      layers: []
+  .add('popup2', () => { 
+    return R(LeafletMapComponent, { 
+      baseLayerId: "bing_road",
+      width: "100%",
+      height: 600,
+      layers: [],
       popup: {
-        lat: 35
-        lng: -20
-        contents: H.div null, "Hello2!!!"
+        lat: 35,
+        lng: -20,
+        contents: H.div(null, "Hello2!!!")
       }
-  #   R LeafletMapComponent, 
-  #     baseLayerId: "bing_road"
-  #     width: "100%"
-  #     height: 600
-  #     layers: [
-  #       {
-  #         tileUrl: "http://localhost:1234/v3/maps/tiles/{z}/{x}/{y}.png?type=cluster"
-  #         visible: true
-  #       }
-  #     ]
+    });
+});
+//   R LeafletMapComponent, 
+//     baseLayerId: "bing_road"
+//     width: "100%"
+//     height: 600
+//     layers: [
+//       {
+//         tileUrl: "http://localhost:1234/v3/maps/tiles/{z}/{x}/{y}.png?type=cluster"
+//         visible: true
+//       }
+//     ]
     

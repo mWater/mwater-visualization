@@ -1,15 +1,16 @@
-_ = require 'lodash'
-React = require 'react'
-H = React.DOM
-R = React.createElement
-storiesOf = require('@kadira/storybook').storiesOf
-action = require('@kadira/storybook').action
+import _ from 'lodash';
+import React from 'react';
+const H = React.DOM;
+const R = React.createElement;
+import { storiesOf } from '@kadira/storybook';
+import { action } from '@kadira/storybook';
+import './dashboards';
+import './pivotChart';
 
-require './dashboards'
-require './pivotChart'
-# require './consoles'
-require './maps'
-require './leaflet'
-require './datagrids'
-require './dates'
-require './exprcomponent'
+// require './consoles'
+import './maps';
+
+import './leaflet';
+import './datagrids';
+import './dates';
+import './exprcomponent';

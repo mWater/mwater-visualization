@@ -1,84 +1,111 @@
-PropTypes = require('prop-types')
-_ = require 'lodash'
-React = require 'react'
-R = React.createElement
+let TileUrlLayer;
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import React from 'react';
+const R = React.createElement;
 
-Layer = require './Layer'
-ExprCompiler = require('mwater-expressions').ExprCompiler
-ExprUtils = require('mwater-expressions').ExprUtils
-injectTableAlias = require('mwater-expressions').injectTableAlias
-ExprCleaner = require('mwater-expressions').ExprCleaner
-ExprUtils = require('mwater-expressions').ExprUtils
-AxisBuilder = require '../axes/AxisBuilder'
-LegendGroup = require('./LegendGroup')
+import Layer from './Layer';
+import { ExprCompiler } from 'mwater-expressions';
+import { ExprUtils } from 'mwater-expressions';
+import { injectTableAlias } from 'mwater-expressions';
+import { ExprCleaner } from 'mwater-expressions';
+({
+  ExprUtils
+} = require('mwater-expressions'));
+import AxisBuilder from '../axes/AxisBuilder';
+import LegendGroup from './LegendGroup';
 
-###
+/*
 Layer that is a custom Leaflet-style url tile layer
 Design is:
   tileUrl: Url with {s}, {z}, {x}, {y}
   minZoom: optional min zoom level
   maxZoom: optional max zoom level
   readonly: if true, hides url and prevents editing
-###
-module.exports = class TileUrlLayer extends Layer
-  # Gets the type of layer definition ("JsonQLCss"/"TileUrl")
-  getLayerDefinitionType: ->
-    return "TileUrl"
+*/
+export default TileUrlLayer = class TileUrlLayer extends Layer {
+  // Gets the type of layer definition ("JsonQLCss"/"TileUrl")
+  getLayerDefinitionType() {
+    return "TileUrl";
+  }
 
-  # Gets the tile url for definition type "TileUrl"
-  getTileUrl: (design, filters) ->
-    return design.tileUrl
+  // Gets the tile url for definition type "TileUrl"
+  getTileUrl(design, filters) {
+    return design.tileUrl;
+  }
 
-  # Gets the utf grid url for definition type "TileUrl"
-  getUtfGridUrl: (design, filters) ->
-    return null
+  // Gets the utf grid url for definition type "TileUrl"
+  getUtfGridUrl(design, filters) {
+    return null;
+  }
 
-  # Get min and max zoom levels
-  getMinZoom: (design) -> return design.minZoom
-  getMaxZoom: (design) -> return design.maxZoom
+  // Get min and max zoom levels
+  getMinZoom(design) { return design.minZoom; }
+  getMaxZoom(design) { return design.maxZoom; }
 
-  # True if layer can be edited
-  isEditable: () ->
-    return true
+  // True if layer can be edited
+  isEditable() {
+    return true;
+  }
 
-  # True if layer is incomplete (e.g. brand new) and should be editable immediately
-  isIncomplete: (design, schema) ->
-    return @validateDesign(@cleanDesign(design, schema), schema)?
+  // True if layer is incomplete (e.g. brand new) and should be editable immediately
+  isIncomplete(design, schema) {
+    return (this.validateDesign(this.cleanDesign(design, schema), schema) != null);
+  }
 
-  # Creates a design element with specified options.
-  # Design should be cleaned on the way in and on way out.
-  # options:
-  #   design: design of layer
-  #   schema: schema to use
-  #   dataSource: data source to use
-  #   onDesignChange: function called when design changes
-  createDesignerElement: (options) ->
-    return R TileUrlLayerDesignerComponent, design: options.design, onDesignChange: options.onDesignChange
+  // Creates a design element with specified options.
+  // Design should be cleaned on the way in and on way out.
+  // options:
+  //   design: design of layer
+  //   schema: schema to use
+  //   dataSource: data source to use
+  //   onDesignChange: function called when design changes
+  createDesignerElement(options) {
+    return R(TileUrlLayerDesignerComponent, {design: options.design, onDesignChange: options.onDesignChange});
+  }
 
-  # Returns a cleaned design
-  cleanDesign: (design, schema) ->
-    return design
+  // Returns a cleaned design
+  cleanDesign(design, schema) {
+    return design;
+  }
 
-  # Validates design. Null if ok, message otherwise
-  validateDesign: (design, schema) ->
-    if not design.tileUrl
-      return "Missing Url"
-    return null
+  // Validates design. Null if ok, message otherwise
+  validateDesign(design, schema) {
+    if (!design.tileUrl) {
+      return "Missing Url";
+    }
+    return null;
+  }
+};
 
 
-class TileUrlLayerDesignerComponent extends React.Component
-  @propTypes:
-    design: PropTypes.object.isRequired  # Design of the marker layer
-    onDesignChange: PropTypes.func.isRequired # Called with new design
+class TileUrlLayerDesignerComponent extends React.Component {
+  constructor(...args) {
+    super(...args);
+    this.handleTileUrlChange = this.handleTileUrlChange.bind(this);
+  }
 
-  handleTileUrlChange: (ev) =>
-    @props.onDesignChange(_.extend({}, @props.design, tileUrl: ev.target.value))
+  static initClass() {
+    this.propTypes = {
+      design: PropTypes.object.isRequired,  // Design of the marker layer
+      onDesignChange: PropTypes.func.isRequired
+    };
+     // Called with new design
+  }
 
-  render: ->
-    # Readonly is non-editable and shows only description
-    if @props.design.readonly
-      return null
+  handleTileUrlChange(ev) {
+    return this.props.onDesignChange(_.extend({}, this.props.design, {tileUrl: ev.target.value}));
+  }
 
-    R 'div', className: "form-group",
-      R 'label', className: "text-muted", "Url (containing {z}, {x} and {y})"
-      R 'input', type: "text", className: "form-control", value: @props.design.tileUrl or "", onChange: @handleTileUrlChange
+  render() {
+    // Readonly is non-editable and shows only description
+    if (this.props.design.readonly) {
+      return null;
+    }
+
+    return R('div', {className: "form-group"},
+      R('label', {className: "text-muted"}, "Url (containing {z}, {x} and {y})"),
+      R('input', {type: "text", className: "form-control", value: this.props.design.tileUrl || "", onChange: this.handleTileUrlChange}));
+  }
+}
+TileUrlLayerDesignerComponent.initClass();

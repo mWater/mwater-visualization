@@ -1,37 +1,45 @@
-DataSource = require('mwater-expressions').DataSource
-LRU = require("lru-cache")
+let CachingDataSource;
+import { DataSource } from 'mwater-expressions';
+import LRU from "lru-cache";
 
-# Data source that caches requests. Designed to be simple for implementation
-# Pass in option of perform which is function with signature (query, cb) where cb is called with (null, rows) on success
-module.exports = class CachingDataSource extends DataSource
-  constructor: (options) ->
-    super()
-    @perform = options.perform
+// Data source that caches requests. Designed to be simple for implementation
+// Pass in option of perform which is function with signature (query, cb) where cb is called with (null, rows) on success
+export default CachingDataSource = class CachingDataSource extends DataSource {
+  constructor(options) {
+    super();
+    this.perform = options.perform;
 
-    @cache = new LRU({ max: 500, maxAge: 1000 * 15 * 60 })
+    this.cache = new LRU({ max: 500, maxAge: 1000 * 15 * 60 });
+  }
 
-  performQuery: (query, cb) ->
-    # If no callback, use promise
-    if not cb
-      return new Promise((resolve, reject) => 
-        @performQuery(jsonql, (error, rows) =>
-          if error
-            reject(error)
-          else
-            resolve(rows)
-        )
-      )
+  performQuery(query, cb) {
+    // If no callback, use promise
+    if (!cb) {
+      return new Promise((resolve, reject) => { 
+        return this.performQuery(jsonql, (error, rows) => {
+          if (error) {
+            return reject(error);
+          } else {
+            return resolve(rows);
+          }
+        });
+      });
+    }
 
-    cacheKey = JSON.stringify(query)
-    cachedRows = @cache.get(cacheKey)
-    if cachedRows
-      return cb(null, cachedRows)
+    const cacheKey = JSON.stringify(query);
+    const cachedRows = this.cache.get(cacheKey);
+    if (cachedRows) {
+      return cb(null, cachedRows);
+    }
 
-    @perform(query, (err, rows) =>
-      if not err
-        # Cache rows
-        @cache.set(cacheKey, rows)
+    return this.perform(query, (err, rows) => {
+      if (!err) {
+        // Cache rows
+        this.cache.set(cacheKey, rows);
+      }
         
-      cb(err, rows)
-    )
+      return cb(err, rows);
+    });
+  }
+};
 

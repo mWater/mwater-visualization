@@ -1,930 +1,1073 @@
-_ = require 'lodash'
-ExprCompiler = require('mwater-expressions').ExprCompiler
-ExprUtils = require('mwater-expressions').ExprUtils
-AxisBuilder = require '../../../axes/AxisBuilder'
-injectTableAlias = require('mwater-expressions').injectTableAlias
+let LayeredChartCompiler;
+import _ from 'lodash';
+import { ExprCompiler } from 'mwater-expressions';
+import { ExprUtils } from 'mwater-expressions';
+import AxisBuilder from '../../../axes/AxisBuilder';
+import { injectTableAlias } from 'mwater-expressions';
+import d3Format from 'd3-format';
 
-d3Format = require 'd3-format'
+const commaFormatter = d3Format.format(",");
+const compactFormatter = d3Format.format("~s");
+const pieLabelValueFormatter = function(format, hidePercent = false) { 
+  const percent = function(ratio) { if (hidePercent) { return ""; } else { return `(${d3Format.format('.1%')(ratio)})`; } };
+  return function(value, ratio, id) { 
+    if (format[id]) { return `${format[id](value)} ${percent(ratio)}`; } else { return `${d3Format.format(",")(value)} ${percent(ratio)}`; }
+  };
+};
+const labelValueFormatter = format => (function(value, ratio, id) { 
+  if (format[id]) { return format[id](value); } else { return value; }
+});
 
-commaFormatter = d3Format.format(",")
-compactFormatter = d3Format.format("~s")
-pieLabelValueFormatter = (format, hidePercent = false) -> 
-  percent = (ratio) -> if hidePercent then "" else "(#{d3Format.format('.1%')(ratio)})"
-  return (value, ratio, id) -> 
-    return if format[id] then "#{format[id](value)} #{percent(ratio)}" else "#{d3Format.format(",")(value)} #{percent(ratio)}"
-labelValueFormatter = (format) -> 
-  return (value, ratio, id) -> 
-    return if format[id] then format[id](value) else value
+const defaultColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5'];
 
-defaultColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5']
+// Compiles various parts of a layered chart (line, bar, scatter, spline, area) to C3.js format
+export default LayeredChartCompiler = class LayeredChartCompiler {
+  // Pass in schema
+  constructor(options) {
+    this.schema = options.schema;
+    this.exprUtils = new ExprUtils(this.schema);
+    this.axisBuilder = new AxisBuilder({schema: this.schema});
+  }
 
-# Compiles various parts of a layered chart (line, bar, scatter, spline, area) to C3.js format
-module.exports = class LayeredChartCompiler
-  # Pass in schema
-  constructor: (options) ->
-    @schema = options.schema
-    @exprUtils = new ExprUtils(@schema)
-    @axisBuilder = new AxisBuilder(schema: @schema)
+  // Create the queries needed for the chart.
+  // extraFilters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. }
+  createQueries(design, extraFilters) {
+    const exprCompiler = new ExprCompiler(this.schema);
 
-  # Create the queries needed for the chart.
-  # extraFilters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. }
-  createQueries: (design, extraFilters) ->
-    exprCompiler = new ExprCompiler(@schema)
+    const queries = {};
 
-    queries = {}
+    // For each layer
+    for (let layerIndex = 0, end = design.layers.length, asc = 0 <= end; asc ? layerIndex < end : layerIndex > end; asc ? layerIndex++ : layerIndex--) {
+      const layer = design.layers[layerIndex];
 
-    # For each layer
-    for layerIndex in [0...design.layers.length]
-      layer = design.layers[layerIndex]
+      // Limit depends on layer type
+      let limit = 1000;
+      if ((layer.type === "scatter") || (design.type === "scatter")) {
+        limit = 10000; // More possible for scatter chart
+      }
 
-      # Limit depends on layer type
-      limit = 1000
-      if layer.type == "scatter" or design.type == "scatter"
-        limit = 10000 # More possible for scatter chart
-
-      # Create shell of query
-      query = {
-        type: "query"
-        selects: []
-        from: exprCompiler.compileTable(layer.table, "main")
-        limit: limit
-        groupBy: []
+      // Create shell of query
+      const query = {
+        type: "query",
+        selects: [],
+        from: exprCompiler.compileTable(layer.table, "main"),
+        limit,
+        groupBy: [],
         orderBy: []
+      };
+
+      if (layer.axes.x) {
+        query.selects.push({ type: "select", expr: this.axisBuilder.compileAxis({axis: layer.axes.x, tableAlias: "main"}), alias: "x" });
+      }
+      if (layer.axes.color) {
+        query.selects.push({ type: "select", expr: this.axisBuilder.compileAxis({axis: layer.axes.color, tableAlias: "main"}), alias: "color" });
+      }
+      if (layer.axes.y) {
+        query.selects.push({ type: "select", expr: this.axisBuilder.compileAxis({axis: layer.axes.y, tableAlias: "main"}), alias: "y" });
       }
 
-      if layer.axes.x
-        query.selects.push({ type: "select", expr: @axisBuilder.compileAxis(axis: layer.axes.x, tableAlias: "main"), alias: "x" })
-      if layer.axes.color
-        query.selects.push({ type: "select", expr: @axisBuilder.compileAxis(axis: layer.axes.color, tableAlias: "main"), alias: "color" })
-      if layer.axes.y
-        query.selects.push({ type: "select", expr: @axisBuilder.compileAxis(axis: layer.axes.y, tableAlias: "main"), alias: "y" })
+      // Sort by x and color
+      if (layer.axes.x || layer.axes.color) {
+        query.orderBy.push({ ordinal: 1 });
+      }
+      if (layer.axes.x && layer.axes.color) {
+        query.orderBy.push({ ordinal: 2 });
+      }
 
-      # Sort by x and color
-      if layer.axes.x or layer.axes.color
-        query.orderBy.push({ ordinal: 1 })
-      if layer.axes.x and layer.axes.color
-        query.orderBy.push({ ordinal: 2 })
+      // If grouping type
+      if (this.doesLayerNeedGrouping(design, layerIndex)) {
+        if (layer.axes.x || layer.axes.color) {
+          query.groupBy.push(1);
+        }
 
-      # If grouping type
-      if @doesLayerNeedGrouping(design, layerIndex)
-        if layer.axes.x or layer.axes.color
-          query.groupBy.push(1)
+        if (layer.axes.x && layer.axes.color) {
+          query.groupBy.push(2);
+        }
+      }
 
-        if layer.axes.x and layer.axes.color
-          query.groupBy.push(2)
+      // Add where
+      let whereClauses = [];
+      if (layer.filter) {
+        whereClauses.push(this.compileExpr(layer.filter));
+      }
 
-      # Add where
-      whereClauses = []
-      if layer.filter
-        whereClauses.push(@compileExpr(layer.filter))
+      // Add filters
+      if (extraFilters && (extraFilters.length > 0)) {
+        // Get relevant filters
+        const relevantFilters = _.where(extraFilters, {table: layer.table});
 
-      # Add filters
-      if extraFilters and extraFilters.length > 0
-        # Get relevant filters
-        relevantFilters = _.where(extraFilters, table: layer.table)
+        // If any, create and
+        if (relevantFilters.length > 0) {
+          // Add others
+          for (let filter of relevantFilters) {
+            whereClauses.push(injectTableAlias(filter.jsonql, "main"));
+          }
+        }
+      }
 
-        # If any, create and
-        if relevantFilters.length > 0
-          # Add others
-          for filter in relevantFilters
-            whereClauses.push(injectTableAlias(filter.jsonql, "main"))
-
-      # Wrap if multiple
-      whereClauses = _.compact(whereClauses)
+      // Wrap if multiple
+      whereClauses = _.compact(whereClauses);
       
-      if whereClauses.length > 1
-        query.where = { type: "op", op: "and", exprs: whereClauses }
-      else
-        query.where = whereClauses[0]
-
-      queries["layer#{layerIndex}"] = query
-
-    return queries
-
-  # Create data map of "{layer name}" or "{layer name}:{index}" to { layerIndex, row }
-  createDataMap: (design, data) ->
-    return @compileData(design, data).dataMap
-
-  # Create the chartOptions to pass to c3.generate
-  # options is
-  #   design: chart design element
-  #   data: chart data
-  #   width: chart width
-  #   height: chart height
-  #   locale: locale to use
-  createChartOptions: (options) ->
-    c3Data = @compileData(options.design, options.data, options.locale)
-    # Pick first format to use as the tick formatter
-    tickFormatter = if _.keys(c3Data.format).length > 0 then c3Data.format[_.keys(c3Data.format)[0]] else commaFormatter
-    if options.design.transpose
-      tickFormatter = compactFormatter
-
-    # Create chart
-    # NOTE: this structure must be comparable with _.isEqual, so don't add any inline functiona
-    chartDesign = {
-      data: {
-        types: c3Data.types
-        columns: c3Data.columns
-        names: c3Data.names
-        types: c3Data.types
-        groups: c3Data.groups
-        xs: c3Data.xs
-        colors: c3Data.colors
-        labels: options.design.labels
-        order: c3Data.order
-        color: c3Data.color
-        classes: c3Data.classes
+      if (whereClauses.length > 1) {
+        query.where = { type: "op", op: "and", exprs: whereClauses };
+      } else {
+        query.where = whereClauses[0];
       }
-      # Hide if one layer with no color axis
-      legend: { hide: if (options.design.layers.length == 1 and not options.design.layers[0].axes.color) then true else c3Data.legendHide }
-      grid: { focus: { show: false } }  # Don't display hover grid
+
+      queries[`layer${layerIndex}`] = query;
+    }
+
+    return queries;
+  }
+
+  // Create data map of "{layer name}" or "{layer name}:{index}" to { layerIndex, row }
+  createDataMap(design, data) {
+    return this.compileData(design, data).dataMap;
+  }
+
+  // Create the chartOptions to pass to c3.generate
+  // options is
+  //   design: chart design element
+  //   data: chart data
+  //   width: chart width
+  //   height: chart height
+  //   locale: locale to use
+  createChartOptions(options) {
+    const c3Data = this.compileData(options.design, options.data, options.locale);
+    // Pick first format to use as the tick formatter
+    let tickFormatter = _.keys(c3Data.format).length > 0 ? c3Data.format[_.keys(c3Data.format)[0]] : commaFormatter;
+    if (options.design.transpose) {
+      tickFormatter = compactFormatter;
+    }
+
+    // Create chart
+    // NOTE: this structure must be comparable with _.isEqual, so don't add any inline functiona
+    const chartDesign = {
+      data: {
+        types: c3Data.types,
+        columns: c3Data.columns,
+        names: c3Data.names,
+        types: c3Data.types,
+        groups: c3Data.groups,
+        xs: c3Data.xs,
+        colors: c3Data.colors,
+        labels: options.design.labels,
+        order: c3Data.order,
+        color: c3Data.color,
+        classes: c3Data.classes
+      },
+      // Hide if one layer with no color axis
+      legend: { hide: ((options.design.layers.length === 1) && !options.design.layers[0].axes.color) ? true : c3Data.legendHide },
+      grid: { focus: { show: false } },  // Don't display hover grid
       axis: {
         x: {
-          type: c3Data.xAxisType
-          label: { text: cleanString(c3Data.xAxisLabelText), position: if options.design.transpose then 'outer-middle' else 'outer-center' }
+          type: c3Data.xAxisType,
+          label: { text: cleanString(c3Data.xAxisLabelText), position: options.design.transpose ? 'outer-middle' : 'outer-center' },
           tick: { fit: c3Data.xAxisTickFit }
-        }
+        },
         y: {
-          label: { text: cleanString(c3Data.yAxisLabelText), position: if options.design.transpose then 'outer-center' else 'outer-middle' }
-          # Set max to 100 if proportional (with no padding)
-          max: if options.design.type == "bar" and options.design.proportional then 100 else options.design.yMax
-          min: if options.design.type == "bar" and options.design.proportional then 0 else options.design.yMin
-          padding: if options.design.type == "bar" and options.design.proportional then { top: 0, bottom: 0 } else ({ top: (if options.design.yMax? then 0 else undefined), bottom: (if options.design.yMin? then 0 else undefined) })
+          label: { text: cleanString(c3Data.yAxisLabelText), position: options.design.transpose ? 'outer-center' : 'outer-middle' },
+          // Set max to 100 if proportional (with no padding)
+          max: (options.design.type === "bar") && options.design.proportional ? 100 : options.design.yMax,
+          min: (options.design.type === "bar") && options.design.proportional ? 0 : options.design.yMin,
+          padding: (options.design.type === "bar") && options.design.proportional ? { top: 0, bottom: 0 } : ({ top: ((options.design.yMax != null) ? 0 : undefined), bottom: ((options.design.yMin != null) ? 0 : undefined) }),
           tick: {
             format: tickFormatter
           }
-        }
+        },
         rotated: options.design.transpose
-      }
-      size: { width: options.width, height: options.height }
+      },
+      size: { width: options.width, height: options.height },
       pie: { 
         label: {
-          show: !options.design.hidePercentage || !!options.design.labels
-          format: if options.design.labels then pieLabelValueFormatter(c3Data.format, options.design.hidePercentage)
-        }
-        expand: false # Don't expand/contract
-      } 
+          show: !options.design.hidePercentage || !!options.design.labels,
+          format: options.design.labels ? pieLabelValueFormatter(c3Data.format, options.design.hidePercentage) : undefined
+        },
+        expand: false // Don't expand/contract
+      }, 
       donut: { 
         label: {
-          show: !options.design.hidePercentage || !!options.design.labels
-          format: if options.design.labels then pieLabelValueFormatter(c3Data.format, options.design.hidePercentage)
-        }
-        expand: false # Don't expand/contract
-      } 
+          show: !options.design.hidePercentage || !!options.design.labels,
+          format: options.design.labels ? pieLabelValueFormatter(c3Data.format, options.design.hidePercentage) : undefined
+        },
+        expand: false // Don't expand/contract
+      }, 
 
-      transition: { duration: 0 } # Transitions interfere with scoping
-    }
+      transition: { duration: 0 } // Transitions interfere with scoping
+    };
 
-    if options.design.labels 
-      if options.design.type == "pie" or options.design.type == "donut"
+    if (options.design.labels) { 
+      if ((options.design.type === "pie") || (options.design.type === "donut")) {
         chartDesign.tooltip = {
           format: {
             value: pieLabelValueFormatter(c3Data.format)
           }
-        }
-      else
-        if not _.isEmpty(c3Data.format)
+        };
+      } else {
+        if (!_.isEmpty(c3Data.format)) {
           chartDesign.tooltip = {
             format: {
               value: labelValueFormatter(c3Data.format)
             }
-          }
-        
-    if options.design.labels and not _.isEmpty(c3Data.format)
-      # format = _.map options.design.layers, (layer, layerIndex) =>
-      #   return if c3Data.format[layerIndex] then c3Data.format[layerIndex] else true
-      chartDesign.data.labels = {format: c3Data.format}
-
-    if options.design.yThresholds
-      chartDesign.grid.y = { lines: _.map(options.design.yThresholds, (t) -> { value: t.value, text: t.label }) }
-
-    # This doesn't work in new C3. Removing.
-    # # If x axis is year only, display year in ticks
-    # if options.design.layers[0]?.axes.x?.xform?.type == "year"
-    #   chartDesign.axis.x.tick.format = (x) -> if _.isDate(x) then x.getFullYear() else x
-    console.log(chartDesign)
-    return chartDesign
-
-  isCategoricalX: (design) ->
-    # Check if categorical x axis (bar charts always are)
-    categoricalX = design.type == "bar" or _.any(design.layers, (l) -> l.type == "bar")
-
-    # Check if x axis is categorical type
-    xType = @axisBuilder.getAxisType(design.layers[0].axes.x)
-    if xType in ["enum", "text", "boolean"]
-      categoricalX = true
-
-    # Dates that are stacked must be categorical to make stacking work in C3
-    if xType == "date" and design.stacked
-      categoricalX = true
-
-    return categoricalX
-
-  # Compiles data part of C3 chart, including data map back to original data
-  # Outputs: columns, types, names, colors. Also dataMap which is a map of "layername:index" to { layerIndex, row }
-  compileData: (design, data, locale) ->
-    # If polar chart (no x axis)
-    if design.type in ['pie', 'donut'] or _.any(design.layers, (l) -> l.type in ['pie', 'donut'])
-      return @compileDataPolar(design, data, locale)
-
-    if @isCategoricalX(design)
-      return @compileDataCategorical(design, data, locale)
-    else
-      return @compileDataNonCategorical(design, data, locale)
-
-  # Compiles data for a polar chart (pie/donut) with no x axis
-  compileDataPolar: (design, data, locale) ->
-    columns = []
-    types = {}
-    names = {}
-    dataMap = {}
-    colors = {}
-    format = {}
-
-    # For each layer
-    _.each design.layers, (layer, layerIndex) =>
-      # If has color axis
-      if layer.axes.color
-        layerData = data["layer#{layerIndex}"]
-
-        # Categories will be in form [{ value, label }]
-        categories = @axisBuilder.getCategories(layer.axes.color, _.pluck(layerData, "color"), locale)
-
-        # Get indexed ordering of categories (lookup from value to index) without removing excluded values
-        categoryOrder = _.zipObject(_.map(categories, (c, i) -> [c.value, i]))
-
-        # Sort by category order
-        layerData = _.sortBy(layerData, (row) -> categoryOrder[row.color])
-
-        # Create a series for each row
-        _.each layerData, (row, rowIndex) =>
-          # Skip if value excluded
-          if _.includes(layer.axes.color.excludedValues, row.color)
-            return
-
-          series = "#{layerIndex}:#{rowIndex}"
-          # Pie series contain a single value
-          columns.push([series, row.y])
-          types[series] = @getLayerType(design, layerIndex)
-          names[series] = @axisBuilder.formatValue(layer.axes.color, row.color, locale, true)
-          dataMap[series] = { layerIndex: layerIndex, row: row }
-          format[series] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
-          # Get specific color if present
-          color = @axisBuilder.getValueColor(layer.axes.color, row.color)
-          #color = color or layer.color
-          if color
-            colors[series] = color
-      else
-        # Create a single series
-        row = data["layer#{layerIndex}"][0]
-        if row
-          series = "#{layerIndex}"
-          columns.push([series, row.y])
-          types[series] = @getLayerType(design, layerIndex)
-
-          # Name is name of entire layer
-          names[series] = layer.name or (if design.layers.length == 1 then "Value" else "Series #{layerIndex+1}") 
-          dataMap[series] = { layerIndex: layerIndex, row: row }
-          format[series] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
-
-          # Set color if present
-          if layer.color
-            colors[series] = layer.color
-
-    # Determine order (default is desc)
-    if design.polarOrder == "desc"
-      order = "desc"
-    else if design.polarOrder == "asc"
-      order = "asc"
-    else if design.polarOrder == "natural"
-      order = null
-    else 
-      order = "desc"
-
-    return {
-      columns: columns
-      types: types
-      names: names
-      dataMap: dataMap
-      colors: colors
-      xAxisType: "category" # Polar charts are always category x-axis
-      titleText: @compileTitleText(design, locale)
-      order: order
-      format: format
-    }
-
-  # Compiles data for a chart like line or scatter that does not have a categorical x axis
-  compileDataNonCategorical: (design, data, locale) ->
-    columns = []
-    types = {}
-    names = {}
-    dataMap = {}
-    colors = {}
-    xs = {}
-    groups = []
-    format = {}
-    legendHide = [] # Which series to hide
-    classes = {} # Custom classes to add to series
-
-    xType = @axisBuilder.getAxisType(design.layers[0].axes.x)
-
-    # For each layer
-    _.each design.layers, (layer, layerIndex) =>
-      # Get data of layer
-      layerData = data["layer#{layerIndex}"]
-      @fixStringYValues(layerData)
-
-      if layer.cumulative
-        layerData = @makeRowsCumulative(layerData)
-
-      # Remove excluded values
-      layerData = _.filter(layerData, (row) => not _.includes(layer.axes.x.excludedValues, row.x))
-
-      # If has color axis
-      if layer.axes.color
-        # Create a series for each color value
-        colorValues = _.uniq(_.pluck(layerData, "color"))
-
-        # Sort color values by category order:
-        # Get categories
-        categories = @axisBuilder.getCategories(layer.axes.color, colorValues, locale)
-
-        # Get indexed ordering of categories (lookup from value to index) without removing excluded values
-        categoryOrder = _.zipObject(_.map(categories, (c, i) -> [c.value, i]))
-
-        # Sort
-        colorValues = _.sortBy(colorValues, (v) -> categoryOrder[v])
-
-        # Exclude excluded ones
-        colorValues = _.difference(colorValues, layer.axes.color.excludedValues)
-
-        # For each color value
-        _.each colorValues, (colorValue) =>
-          # One series for x values, one for y
-          seriesX = "#{layerIndex}:#{colorValue}:x"
-          seriesY = "#{layerIndex}:#{colorValue}:y"
-
-          # Get specific color if present
-          color = @axisBuilder.getValueColor(layer.axes.color, colorValue)
-          color = color or layer.color
-          if color
-            colors[seriesY] = color
-
-          # Get rows for this series
-          rows = _.where(layerData, color: colorValue)
-
-          yValues = _.pluck(rows, "y")
-
-          columns.push([seriesY].concat(yValues))
-          columns.push([seriesX].concat(_.pluck(rows, "x")))
-
-          types[seriesY] = @getLayerType(design, layerIndex)
-          names[seriesY] = @axisBuilder.formatValue(layer.axes.color, colorValue, locale, true)
-          xs[seriesY] = seriesX
-          format[seriesY] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
-
-          _.each rows, (row, rowIndex) =>
-            dataMap["#{seriesY}:#{rowIndex}"] = { layerIndex: layerIndex, row: row }
-      else
-        # One series for x values, one for y
-        seriesX = "#{layerIndex}:x"
-        seriesY = "#{layerIndex}:y"
-
-        yValues = _.pluck(layerData, "y")
-        xValues = _.pluck(layerData, "x")
-
-        columns.push([seriesY].concat(yValues))
-        columns.push([seriesX].concat(xValues))
-
-        types[seriesY] = @getLayerType(design, layerIndex)
-        names[seriesY] = layer.name or (if design.layers.length == 1 then "Value" else "Series #{layerIndex+1}") 
-        xs[seriesY] = seriesX
-        colors[seriesY] = layer.color or defaultColors[layerIndex]
-        format[seriesY] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
-
-        # Add data map for each row
-        _.each layerData, (row, rowIndex) =>
-          dataMap["#{seriesY}:#{rowIndex}"] = { layerIndex: layerIndex, row: row }
-
-        # Add trendline
-        if layer.trendline == "linear"
-          trendlineSeries = seriesY + ":trendline"
-          columns.push([trendlineSeries].concat(calculateLinearRegression(yValues, xValues)))
-          types[trendlineSeries] = "line"
-          names[trendlineSeries] = names[seriesY] + " Trendline"
-          xs[trendlineSeries] = seriesX
-          colors[trendlineSeries] = layer.color or defaultColors[layerIndex]
-          legendHide.push(trendlineSeries) # Hide in legend
-          format[trendlineSeries] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
-          # Set dots as invisible in CSS and line as dashed
-          classes[trendlineSeries] = "trendline"
-
-    # Stack by putting into groups
-    if design.stacked
-      groups = [_.keys(names)]
-
-    return {
-      columns: columns
-      types: types
-      names: names
-      groups: groups
-      dataMap: dataMap
-      colors: colors
-      xs: xs
-      legendHide: legendHide
-      classes: classes
-      xAxisType: if (xType in ["date"]) then "timeseries" else "indexed" 
-      xAxisTickFit: false   # Don't put a tick for each point
-      xAxisLabelText: @compileXAxisLabelText(design, locale)
-      yAxisLabelText: @compileYAxisLabelText(design, locale)
-      titleText: @compileTitleText(design, locale)
-      order: null # Use order of data for stacking
-      format: format
-    }
-
-
-  # Numbers sometimes arrive as strings from database. Fix by parsing
-  fixStringYValues: (rows) ->
-    for row in rows
-      if _.isString(row.y)
-        row.y = parseFloat(row.y)
-    return rows
-
-  # Flatten if x-type is enumset. e.g. if one row has x = ["a", "b"], make into two rows with x="a" and x="b", summing if already exists
-  flattenRowData: (rows) ->
-    flatRows = []
-    for row in rows
-      # Handle null
-      if not row.x 
-        flatRows.push(row)
-        continue
-
-      if _.isString(row.x)
-        # Handle failed parsings graciously in case question used to be a non-array
-        try
-          xs = JSON.parse(row.x)
-        catch
-          xs = row.x
-      else
-        xs = row.x
-
-      for x in xs
-        # Find existing row
-        existingRow = _.find(flatRows, (r) -> r.x == x and r.color == row.color)
-        if existingRow
-          existingRow.y += row.y
-        else
-          flatRows.push(_.extend({}, row, x: x))
-
-    return flatRows
-
-  compileDataCategorical: (design, data, locale) ->
-    columns = []
-    types = {}
-    names = {}
-    dataMap = {}
-    colors = {}
-    xs = {}
-    groups = []
-    format = {}
-    colorOverrides = {}  # Mapping of "<layer>:<index>" to color if overridden
-    legendHide = [] # Which series to hide
-    classes = {} # Custom classes to add to series
-
-    # Get all values of the x-axis, taking into account values that might be missing
-    xAxis = _.extend({}, design.layers[0].axes.x)
-    nullLabel = _.first(_.compact(design.layers.map((l) -> l.axes.x.nullLabel)))
-    xAxis.nullLabel = nullLabel
-
-    xType = @axisBuilder.getAxisType(xAxis)
-
-    # Get all known values from all layers
-    xValues = []
-    _.each design.layers, (layer, layerIndex) =>
-      # Get data of layer
-      layerData = data["layer#{layerIndex}"]
-      xValues = _.union(xValues, _.uniq(_.pluck(layerData, "x")))
-
-    # Categories will be in form [{ value, label }]
-    categories = @axisBuilder.getCategories(xAxis, xValues, locale)
-
-    # Get indexed ordering of categories (lookup from value to index) without removing excluded values
-    categoryOrder = _.zipObject(_.map(categories, (c, i) -> [c.value, i]))
-
-    # Exclude excluded values
-    categories = _.filter(categories, (category) => not _.includes(xAxis.excludedValues, category.value))
-
-    # Limit categories to prevent crashes in C3 (https://github.com/mWater/mwater-visualization/issues/272)
-    if xType != "enumset"
-      # Take last ones to make dates prettier (enough to show all weeks)
-      categories = _.takeRight(categories, 55) 
-      categoryXs = _.indexBy(categories, "value")
-
-    # Create map of category value to index
-    categoryMap = _.object(_.map(categories, (c, i) -> [c.value, i]))
-
-    # Create common x series
-    columns.push(["x"].concat(_.map(categories, (category) => @axisBuilder.formatCategory(xAxis, category))))
-
-    # For each layer
-    _.each design.layers, (layer, layerIndex) =>
-      # Get data of layer
-      layerData = data["layer#{layerIndex}"]
-
-      # Fix string y values
-      layerData = @fixStringYValues(layerData)
-
-      # Flatten if x-type is enumset. e.g. if one row has x = ["a", "b"], make into two rows with x="a" and x="b", summing if already exists
-      if xType == "enumset"
-        layerData = @flattenRowData(layerData)
-
-      # Reorder to category order for x-axis
-      layerData = _.sortBy(layerData, (row) -> categoryOrder[row.x])
-
-      # Make rows cumulative
-      if layer.cumulative
-        layerData = @makeRowsCumulative(layerData)
-
-      # Filter out categories that were removed
-      if xType != "enumset"
-        layerData = _.filter(layerData, (row) -> categoryXs[row.x]?)
-
-      # If has color axis
-      if layer.axes.color
-        # Create a series for each color value
-        colorValues = _.uniq(_.pluck(layerData, "color"))
-
-        # Sort color values by category order:
-        # Get categories
-        colorCategories = @axisBuilder.getCategories(layer.axes.color, colorValues, locale)
-
-        # Get indexed ordering of categories (lookup from value to index) without removing excluded values
-        colorCategoryOrder = _.zipObject(_.map(colorCategories, (c, i) -> [c.value, i]))
-
-        # Sort
-        colorValues = _.sortBy(colorValues, (v) -> colorCategoryOrder[v])
-
-        # Exclude excluded ones
-        colorValues = _.difference(colorValues, layer.axes.color.excludedValues)
-
-        if colorValues.length > 0
-          _.each colorValues, (colorValue) =>
-            # One series for y values
-            series = "#{layerIndex}:#{colorValue}"
-
-            # Get specific color if present
-            color = @axisBuilder.getValueColor(layer.axes.color, colorValue)
-            color = color or layer.color
-            if color
-              colors[series] = color
-
-            # Get rows for this series
-            rows = _.where(layerData, color: colorValue)
-
-            # Create empty series
-            column = _.map(categories, (c) -> null)
-
-            # Set rows
-            _.each rows, (row) =>
-              # Get index
-              index = categoryMap[row.x]
-              if index?
-                column[index] = row.y
-                dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
-                
-            # Fill in nulls if cumulative
-            if layer.cumulative
-              for value, i in column
-                if not value? and i > 0
-                  column[i] = column[i - 1]
-
-            columns.push([series].concat(column))
-
-            types[series] = @getLayerType(design, layerIndex)
-            names[series] = @axisBuilder.formatValue(layer.axes.color, colorValue, locale, true)
-            xs[series] = "x"
-            format[series] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
-        else
-          #c3 acts funny when there is a split axis but no data
-          series = "#{layerIndex}:dumm"
-          column = _.map(categories, (c) -> null)
-          columns.push([series].concat(column))
-
-          types[series] = @getLayerType(design, layerIndex)
-          names[series] = @axisBuilder.formatValue(layer.axes.color, null, locale, true)
-          xs[series] = "x"
-          format[series] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
-      else
-        # One series for y
-        series = "#{layerIndex}"
-
-        # Create empty series
-        column = _.map(categories, (c) -> null)
-
-        # Set rows
-        _.each layerData, (row) =>
-          # Skip if value excluded
-          if _.includes(layer.axes.x.excludedValues, row.x)
-            return
-            
-          # Get index
-          index = categoryMap[row.x]
-          column[index] = row.y
-          dataMap["#{series}:#{index}"] = { layerIndex: layerIndex, row: row }
-
-          # Get color override
-          if layer.xColorMap 
-            color = @axisBuilder.getValueColor(layer.axes.x, row.x)
-            if color
-              colorOverrides["#{series}:#{index}"] = color
-
-        columns.push([series].concat(column))
-
-        types[series] = @getLayerType(design, layerIndex)
-        names[series] = layer.name or (if design.layers.length == 1 then "Value" else "Series #{layerIndex+1}") 
-        xs[series] = "x"
-        colors[series] = layer.color or defaultColors[layerIndex]
-        format[series] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
-
-        # Add trendline
-        if layer.trendline == "linear"
-          trendlineSeries = series + ":trendline"
-          trendXs = _.range(column.length)
-          trendYs = column
-          # Skip null last value
-          if categories.length > 0 and _.last(categories).value == null
-            trendXs = _.initial(trendXs)
-            trendYs = _.initial(trendYs)
-          columns.push([trendlineSeries].concat(calculateLinearRegression(trendYs, trendXs)))
-          types[trendlineSeries] = "line"
-          names[trendlineSeries] = names[series] + " Trendline"
-          xs[trendlineSeries] = "x"
-          colors[trendlineSeries] = layer.color or defaultColors[layerIndex]
-          legendHide.push(trendlineSeries) # Hide in legend
-          format[trendlineSeries] = (value) => if value? then @axisBuilder.formatValue(layer.axes.y, value, locale, true) else ""
-          # Set dots as invisible in CSS and line as dashed
-          classes[trendlineSeries] = "trendline"
-
-    # Stack by putting into groups
-    if design.stacked
-      groups = [_.keys(names)]
-    else if design.layers.length > 1
-      groups = []
-      for layer, layerIndex in design.layers
-        # If has multiple layers and color axes within layers. Stack individual layers unless stacked is false
-        defaultStacked = layer.axes.color?
-        stacked = if layer.stacked? then layer.stacked else defaultStacked
-
-        if stacked
-          groups.push(_.filter(_.keys(names), (series) -> series.split(":")[0] == "#{layerIndex}"))
-
-      # Remove empty groups
-      groups = _.filter(groups, (g) -> g.length > 1)
-
-    # If proportional
-    if design.proportional
-      # Calculate total for each x
-      xtotals = []
-      for column in columns
-        # Skip x column
-        if column[0] == 'x'
-          continue
-
-        for i in [1...column.length]
-          xtotals[i] = (xtotals[i] or 0) + (column[i] or 0)
-
-      # Now make percentage with one decimal
-      for column in columns
-        # Skip x column
-        if column[0] == 'x'
-          continue
-
-        for i in [1...column.length]
-          if column[i] > 0
-            column[i] = Math.round(100 * column[i] / xtotals[i] * 10) / 10
-
-    # console.log(format)
-    return {
-      columns: columns
-      types: types
-      names: names
-      dataMap: dataMap
-      colors: colors
-      xs: xs
-      groups: groups
-      legendHide: legendHide
-      classes: classes
-      xAxisType: "category" 
-      xAxisTickFit: xType != "date"   # Put a tick for each point since categorical unless date
-      xAxisLabelText: @compileXAxisLabelText(design, locale)
-      yAxisLabelText: @compileYAxisLabelText(design, locale)
-      titleText: @compileTitleText(design, locale)
-      order: null # Use order of data for stacking
-      format: format
-      color: (color, d) =>
-        # Handle overall series color which calls with a non-object for d
-        if typeof(d) != "object"
-          # Overall series is not changed in color
-          return color
-
-        key = "#{d.id}:#{d.index}"
-        if colorOverrides[key]
-          color = colorOverrides[key]
-
-        # Apply thresholds (in order)
-        sortedYThresholds = _.sortBy(design.yThresholds or [], "value")
-        for yThreshold in sortedYThresholds
-          if d.value > yThreshold.value and yThreshold.highlightColor
-            color = yThreshold.highlightColor
-        
-        return color
-    }
-
-  # Compile an expression
-  compileExpr: (expr) ->
-    exprCompiler = new ExprCompiler(@schema)
-    return exprCompiler.compileExpr(expr: expr, tableAlias: "main")
-
-  # Get layer type, defaulting to overall type
-  getLayerType: (design, layerIndex) ->
-    return design.layers[layerIndex].type or design.type
-
-  # Determine if layer required grouping by x (and color)
-  doesLayerNeedGrouping: (design, layerIndex) ->
-    return @getLayerType(design, layerIndex) != "scatter"
-
-  # Determine if layer can use x axis
-  canLayerUseXExpr: (design, layerIndex) ->
-    return @getLayerType(design, layerIndex) not in ['pie', 'donut']
-
-  isXAxisRequired: (design, layerIndex) ->
-    return _.any(design.layers, (layer, i) => @getLayerType(design, i) not in ['pie', 'donut'])
-
-  isColorAxisRequired: (design, layerIndex) ->
-    return @getLayerType(design, layerIndex) in ['pie', 'donut']
-
-  compileDefaultTitleText: (design, locale) ->
-    # Don't default this for now
-    return ""
-    # if design.layers[0].axes.x
-    #   return @compileYAxisLabelText(design) + " by " + @compileXAxisLabelText(design)
-    # else
-    #   return @compileYAxisLabelText(design) + " by " + @axisBuilder.summarizeAxis(design.layers[0].axes.color)
-
-  compileDefaultYAxisLabelText: (design, locale) ->
-    @axisBuilder.summarizeAxis(design.layers[0].axes.y, locale)
-
-  compileDefaultXAxisLabelText: (design, locale) ->
-    @axisBuilder.summarizeAxis(design.layers[0].axes.x, locale)
-
-  compileTitleText: (design, locale) ->
-    return design.titleText or @compileDefaultTitleText(design, locale)
-
-  compileYAxisLabelText: (design, locale) ->
-    if design.yAxisLabelText == ""
-      return @compileDefaultYAxisLabelText(design, locale)
-    return design.yAxisLabelText
-
-  compileXAxisLabelText: (design, locale) ->
-    if design.xAxisLabelText == ""
-      return @compileDefaultXAxisLabelText(design, locale)
-    return design.xAxisLabelText
-
-  # Create a scope based on a row of a layer
-  # Scope data is relevant data from row that uniquely identifies scope
-  # plus a layer index
-  createScope: (design, layerIndex, row, locale) ->
-    expressionBuilder = new ExprUtils(@schema)
-
-    # Get layer
-    layer = design.layers[layerIndex]
-
-    filters = []
-    filterExprs = []
-    names = []
-    data = { layerIndex: layerIndex }
-    
-    # If x
-    if layer.axes.x
-      # Handle special case of enumset which is flattened to enum type
-      if @axisBuilder.getAxisType(layer.axes.x) == "enumset"
-        filters.push({
-          type: "op"
-          op: "@>"
-          exprs: [
-            { type: "op", op: "::jsonb", exprs: [@axisBuilder.compileAxis(axis: layer.axes.x, tableAlias: "{alias}")] }
-            { type: "op", op: "::jsonb", exprs: [JSON.stringify(row.x)] }
-          ]
-        })
-        filterExprs.push({
-          table: layer.table
-          type: "op"
-          op: "contains"
-          exprs: [
-            @axisBuilder.convertAxisToExpr(layer.axes.x)
-            { type: "literal", valueType: "enumset", value: [row.x] }
-          ]
-        })
-
-        names.push(@axisBuilder.summarizeAxis(layer.axes.x, locale) + " includes " + @exprUtils.stringifyExprLiteral(layer.axes.x.expr, [row.x], locale))
-        data.x = row.x
-      else        
-        filters.push(@axisBuilder.createValueFilter(layer.axes.x, row.x))
-        filterExprs.push(@axisBuilder.createValueFilterExpr(layer.axes.x, row.x))
-        names.push(@axisBuilder.summarizeAxis(layer.axes.x, locale) + " is " + @axisBuilder.formatValue(layer.axes.x, row.x, locale, true))
-        data.x = row.x
-
-    if layer.axes.color
-      filters.push(@axisBuilder.createValueFilter(layer.axes.color, row.color))
-      filterExprs.push(@axisBuilder.createValueFilterExpr(layer.axes.color, row.color))
-      names.push(@axisBuilder.summarizeAxis(layer.axes.color, locale) + " is " + @axisBuilder.formatValue(layer.axes.color, row.color, locale, true))
-      data.color = row.color
-
-    if filters.length > 1
-      filter = {
-        table: layer.table
-        jsonql: {
-          type: "op"
-          op: "and"
-          exprs: filters
+          };
         }
       }
-      filterExpr = {
-        table: layer.table
-        type: "op"
-        op: "and"
-        exprs: filterExprs
-      }
-    else
-      filter = {
-        table: layer.table
-        jsonql: filters[0]
-      }
-      filterExpr = filterExprs[0]
-
-    scope = {
-      name: ExprUtils.localizeString(@schema.getTable(layer.table).name, locale) + " " + names.join(" and ")
-      filter: filter
-      filterExpr: filterExpr
-      data: data
+    }
+        
+    if (options.design.labels && !_.isEmpty(c3Data.format)) {
+      // format = _.map options.design.layers, (layer, layerIndex) =>
+      //   return if c3Data.format[layerIndex] then c3Data.format[layerIndex] else true
+      chartDesign.data.labels = {format: c3Data.format};
     }
 
-    return scope
+    if (options.design.yThresholds) {
+      chartDesign.grid.y = { lines: _.map(options.design.yThresholds, t => ({
+        value: t.value,
+        text: t.label
+      })) };
+    }
 
-  # Converts a series of rows to have cumulative y axis, separating out by color axis if present
-  makeRowsCumulative: (rows) ->
-    # Indexed by color
-    totals = {}
+    // This doesn't work in new C3. Removing.
+    // # If x axis is year only, display year in ticks
+    // if options.design.layers[0]?.axes.x?.xform?.type == "year"
+    //   chartDesign.axis.x.tick.format = (x) -> if _.isDate(x) then x.getFullYear() else x
+    console.log(chartDesign);
+    return chartDesign;
+  }
 
-    newRows = []
-    for row in rows
-      # Add up total
-      total = totals[row.color] or 0
-      y = total + row.y
-      totals[row.color] = y
+  isCategoricalX(design) {
+    // Check if categorical x axis (bar charts always are)
+    let categoricalX = (design.type === "bar") || _.any(design.layers, l => l.type === "bar");
 
-      # If x is null, don't make cumulative
-      if row.x == null
-        newRows.push(row)
-      else
-        # Create new row
-        newRows.push(_.extend({}, row, y: y))
+    // Check if x axis is categorical type
+    const xType = this.axisBuilder.getAxisType(design.layers[0].axes.x);
+    if (["enum", "text", "boolean"].includes(xType)) {
+      categoricalX = true;
+    }
 
-    return newRows
+    // Dates that are stacked must be categorical to make stacking work in C3
+    if ((xType === "date") && design.stacked) {
+      categoricalX = true;
+    }
 
-# Clean out nbsp (U+00A0) as it causes c3 errors
-cleanString = (str) ->
-  if not str
-    return str
-  return str.replace("\u00A0", " ")
+    return categoricalX;
+  }
 
-# Calculate a linear regression, returning a series of y values that match the x values
-calculateLinearRegression = (ys, xs) ->
-  # If xs are dates, convert to numbers
-  if (_.isString(xs[0]))
-    xs = _.map(xs, (x) => Date.parse(x))
+  // Compiles data part of C3 chart, including data map back to original data
+  // Outputs: columns, types, names, colors. Also dataMap which is a map of "layername:index" to { layerIndex, row }
+  compileData(design, data, locale) {
+    // If polar chart (no x axis)
+    if (['pie', 'donut'].includes(design.type) || _.any(design.layers, l => ['pie', 'donut'].includes(l.type))) {
+      return this.compileDataPolar(design, data, locale);
+    }
 
-  # Remove null ys
-  nonNullxs = _.filter(xs, (x, index) => ys[index] != null)
-  nonNullys = _.filter(ys, (y, index) => ys[index] != null)
+    if (this.isCategoricalX(design)) {
+      return this.compileDataCategorical(design, data, locale);
+    } else {
+      return this.compileDataNonCategorical(design, data, locale);
+    }
+  }
 
-  n = nonNullys.length
+  // Compiles data for a polar chart (pie/donut) with no x axis
+  compileDataPolar(design, data, locale) {
+    let order;
+    const columns = [];
+    const types = {};
+    const names = {};
+    const dataMap = {};
+    const colors = {};
+    const format = {};
 
-  sumXY = _.sum(_.map(nonNullxs, (x, i) => x * nonNullys[i]))
+    // For each layer
+    _.each(design.layers, (layer, layerIndex) => {
+      // If has color axis
+      if (layer.axes.color) {
+        let layerData = data[`layer${layerIndex}`];
 
-  sumXX = _.sum(_.map(nonNullxs, (x) => x * x))
+        // Categories will be in form [{ value, label }]
+        const categories = this.axisBuilder.getCategories(layer.axes.color, _.pluck(layerData, "color"), locale);
 
-  sumX = _.sum(nonNullxs)
+        // Get indexed ordering of categories (lookup from value to index) without removing excluded values
+        const categoryOrder = _.zipObject(_.map(categories, (c, i) => [c.value, i]));
 
-  sumY = _.sum(nonNullys)
+        // Sort by category order
+        layerData = _.sortBy(layerData, row => categoryOrder[row.color]);
 
-  # Calculate denominator
-  den = n * sumXX - sumX * sumX
+        // Create a series for each row
+        return _.each(layerData, (row, rowIndex) => {
+          // Skip if value excluded
+          if (_.includes(layer.axes.color.excludedValues, row.color)) {
+            return;
+          }
 
-  # Calculate slope
-  slope = (n * sumXY - sumX * sumY) / den
+          const series = `${layerIndex}:${rowIndex}`;
+          // Pie series contain a single value
+          columns.push([series, row.y]);
+          types[series] = this.getLayerType(design, layerIndex);
+          names[series] = this.axisBuilder.formatValue(layer.axes.color, row.color, locale, true);
+          dataMap[series] = { layerIndex, row };
+          format[series] = value => (value != null) ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : "";
+          // Get specific color if present
+          const color = this.axisBuilder.getValueColor(layer.axes.color, row.color);
+          //color = color or layer.color
+          if (color) {
+            return colors[series] = color;
+          }
+        });
+      } else {
+        // Create a single series
+        const row = data[`layer${layerIndex}`][0];
+        if (row) {
+          const series = `${layerIndex}`;
+          columns.push([series, row.y]);
+          types[series] = this.getLayerType(design, layerIndex);
 
-  # Calculate intercept
-  intercept = (sumY * sumXX - sumX * sumXY) / den
+          // Name is name of entire layer
+          names[series] = layer.name || (design.layers.length === 1 ? "Value" : `Series ${layerIndex+1}`); 
+          dataMap[series] = { layerIndex, row };
+          format[series] = value => (value != null) ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : "";
 
-  return _.map(xs, (x) => x * slope + intercept)
+          // Set color if present
+          if (layer.color) {
+            return colors[series] = layer.color;
+          }
+        }
+      }
+    });
+
+    // Determine order (default is desc)
+    if (design.polarOrder === "desc") {
+      order = "desc";
+    } else if (design.polarOrder === "asc") {
+      order = "asc";
+    } else if (design.polarOrder === "natural") {
+      order = null;
+    } else { 
+      order = "desc";
+    }
+
+    return {
+      columns,
+      types,
+      names,
+      dataMap,
+      colors,
+      xAxisType: "category", // Polar charts are always category x-axis
+      titleText: this.compileTitleText(design, locale),
+      order,
+      format
+    };
+  }
+
+  // Compiles data for a chart like line or scatter that does not have a categorical x axis
+  compileDataNonCategorical(design, data, locale) {
+    const columns = [];
+    const types = {};
+    const names = {};
+    const dataMap = {};
+    const colors = {};
+    const xs = {};
+    let groups = [];
+    const format = {};
+    const legendHide = []; // Which series to hide
+    const classes = {}; // Custom classes to add to series
+
+    const xType = this.axisBuilder.getAxisType(design.layers[0].axes.x);
+
+    // For each layer
+    _.each(design.layers, (layer, layerIndex) => {
+      // Get data of layer
+      let layerData = data[`layer${layerIndex}`];
+      this.fixStringYValues(layerData);
+
+      if (layer.cumulative) {
+        layerData = this.makeRowsCumulative(layerData);
+      }
+
+      // Remove excluded values
+      layerData = _.filter(layerData, row => !_.includes(layer.axes.x.excludedValues, row.x));
+
+      // If has color axis
+      if (layer.axes.color) {
+        // Create a series for each color value
+        let colorValues = _.uniq(_.pluck(layerData, "color"));
+
+        // Sort color values by category order:
+        // Get categories
+        const categories = this.axisBuilder.getCategories(layer.axes.color, colorValues, locale);
+
+        // Get indexed ordering of categories (lookup from value to index) without removing excluded values
+        const categoryOrder = _.zipObject(_.map(categories, (c, i) => [c.value, i]));
+
+        // Sort
+        colorValues = _.sortBy(colorValues, v => categoryOrder[v]);
+
+        // Exclude excluded ones
+        colorValues = _.difference(colorValues, layer.axes.color.excludedValues);
+
+        // For each color value
+        return _.each(colorValues, colorValue => {
+          // One series for x values, one for y
+          const seriesX = `${layerIndex}:${colorValue}:x`;
+          const seriesY = `${layerIndex}:${colorValue}:y`;
+
+          // Get specific color if present
+          let color = this.axisBuilder.getValueColor(layer.axes.color, colorValue);
+          color = color || layer.color;
+          if (color) {
+            colors[seriesY] = color;
+          }
+
+          // Get rows for this series
+          const rows = _.where(layerData, {color: colorValue});
+
+          const yValues = _.pluck(rows, "y");
+
+          columns.push([seriesY].concat(yValues));
+          columns.push([seriesX].concat(_.pluck(rows, "x")));
+
+          types[seriesY] = this.getLayerType(design, layerIndex);
+          names[seriesY] = this.axisBuilder.formatValue(layer.axes.color, colorValue, locale, true);
+          xs[seriesY] = seriesX;
+          format[seriesY] = value => (value != null) ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : "";
+
+          return _.each(rows, (row, rowIndex) => {
+            return dataMap[`${seriesY}:${rowIndex}`] = { layerIndex, row };
+        });
+      });
+      } else {
+        // One series for x values, one for y
+        const seriesX = `${layerIndex}:x`;
+        const seriesY = `${layerIndex}:y`;
+
+        const yValues = _.pluck(layerData, "y");
+        const xValues = _.pluck(layerData, "x");
+
+        columns.push([seriesY].concat(yValues));
+        columns.push([seriesX].concat(xValues));
+
+        types[seriesY] = this.getLayerType(design, layerIndex);
+        names[seriesY] = layer.name || (design.layers.length === 1 ? "Value" : `Series ${layerIndex+1}`); 
+        xs[seriesY] = seriesX;
+        colors[seriesY] = layer.color || defaultColors[layerIndex];
+        format[seriesY] = value => (value != null) ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : "";
+
+        // Add data map for each row
+        _.each(layerData, (row, rowIndex) => {
+          return dataMap[`${seriesY}:${rowIndex}`] = { layerIndex, row };
+      });
+
+        // Add trendline
+        if (layer.trendline === "linear") {
+          const trendlineSeries = seriesY + ":trendline";
+          columns.push([trendlineSeries].concat(calculateLinearRegression(yValues, xValues)));
+          types[trendlineSeries] = "line";
+          names[trendlineSeries] = names[seriesY] + " Trendline";
+          xs[trendlineSeries] = seriesX;
+          colors[trendlineSeries] = layer.color || defaultColors[layerIndex];
+          legendHide.push(trendlineSeries); // Hide in legend
+          format[trendlineSeries] = value => (value != null) ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : "";
+          // Set dots as invisible in CSS and line as dashed
+          return classes[trendlineSeries] = "trendline";
+        }
+      }
+    });
+
+    // Stack by putting into groups
+    if (design.stacked) {
+      groups = [_.keys(names)];
+    }
+
+    return {
+      columns,
+      types,
+      names,
+      groups,
+      dataMap,
+      colors,
+      xs,
+      legendHide,
+      classes,
+      xAxisType: (["date"].includes(xType)) ? "timeseries" : "indexed", 
+      xAxisTickFit: false,   // Don't put a tick for each point
+      xAxisLabelText: this.compileXAxisLabelText(design, locale),
+      yAxisLabelText: this.compileYAxisLabelText(design, locale),
+      titleText: this.compileTitleText(design, locale),
+      order: null, // Use order of data for stacking
+      format
+    };
+  }
+
+
+  // Numbers sometimes arrive as strings from database. Fix by parsing
+  fixStringYValues(rows) {
+    for (let row of rows) {
+      if (_.isString(row.y)) {
+        row.y = parseFloat(row.y);
+      }
+    }
+    return rows;
+  }
+
+  // Flatten if x-type is enumset. e.g. if one row has x = ["a", "b"], make into two rows with x="a" and x="b", summing if already exists
+  flattenRowData(rows) {
+    const flatRows = [];
+    for (var row of rows) {
+      // Handle null
+      var xs;
+      if (!row.x) { 
+        flatRows.push(row);
+        continue;
+      }
+
+      if (_.isString(row.x)) {
+        // Handle failed parsings graciously in case question used to be a non-array
+        try {
+          xs = JSON.parse(row.x);
+        } catch (error) {
+          xs = row.x;
+        }
+      } else {
+        xs = row.x;
+      }
+
+      for (var x of xs) {
+        // Find existing row
+        const existingRow = _.find(flatRows, r => (r.x === x) && (r.color === row.color));
+        if (existingRow) {
+          existingRow.y += row.y;
+        } else {
+          flatRows.push(_.extend({}, row, {x}));
+        }
+      }
+    }
+
+    return flatRows;
+  }
+
+  compileDataCategorical(design, data, locale) {
+    let categoryXs;
+    const columns = [];
+    const types = {};
+    const names = {};
+    const dataMap = {};
+    const colors = {};
+    const xs = {};
+    let groups = [];
+    const format = {};
+    const colorOverrides = {};  // Mapping of "<layer>:<index>" to color if overridden
+    const legendHide = []; // Which series to hide
+    const classes = {}; // Custom classes to add to series
+
+    // Get all values of the x-axis, taking into account values that might be missing
+    const xAxis = _.extend({}, design.layers[0].axes.x);
+    const nullLabel = _.first(_.compact(design.layers.map(l => l.axes.x.nullLabel)));
+    xAxis.nullLabel = nullLabel;
+
+    const xType = this.axisBuilder.getAxisType(xAxis);
+
+    // Get all known values from all layers
+    let xValues = [];
+    _.each(design.layers, (layer, layerIndex) => {
+      // Get data of layer
+      const layerData = data[`layer${layerIndex}`];
+      return xValues = _.union(xValues, _.uniq(_.pluck(layerData, "x")));
+    });
+
+    // Categories will be in form [{ value, label }]
+    let categories = this.axisBuilder.getCategories(xAxis, xValues, locale);
+
+    // Get indexed ordering of categories (lookup from value to index) without removing excluded values
+    const categoryOrder = _.zipObject(_.map(categories, (c, i) => [c.value, i]));
+
+    // Exclude excluded values
+    categories = _.filter(categories, category => !_.includes(xAxis.excludedValues, category.value));
+
+    // Limit categories to prevent crashes in C3 (https://github.com/mWater/mwater-visualization/issues/272)
+    if (xType !== "enumset") {
+      // Take last ones to make dates prettier (enough to show all weeks)
+      categories = _.takeRight(categories, 55); 
+      categoryXs = _.indexBy(categories, "value");
+    }
+
+    // Create map of category value to index
+    const categoryMap = _.object(_.map(categories, (c, i) => [c.value, i]));
+
+    // Create common x series
+    columns.push(["x"].concat(_.map(categories, category => this.axisBuilder.formatCategory(xAxis, category))));
+
+    // For each layer
+    _.each(design.layers, (layer, layerIndex) => {
+      // Get data of layer
+      let column, series;
+      let layerData = data[`layer${layerIndex}`];
+
+      // Fix string y values
+      layerData = this.fixStringYValues(layerData);
+
+      // Flatten if x-type is enumset. e.g. if one row has x = ["a", "b"], make into two rows with x="a" and x="b", summing if already exists
+      if (xType === "enumset") {
+        layerData = this.flattenRowData(layerData);
+      }
+
+      // Reorder to category order for x-axis
+      layerData = _.sortBy(layerData, row => categoryOrder[row.x]);
+
+      // Make rows cumulative
+      if (layer.cumulative) {
+        layerData = this.makeRowsCumulative(layerData);
+      }
+
+      // Filter out categories that were removed
+      if (xType !== "enumset") {
+        layerData = _.filter(layerData, row => categoryXs[row.x] != null);
+      }
+
+      // If has color axis
+      if (layer.axes.color) {
+        // Create a series for each color value
+        let colorValues = _.uniq(_.pluck(layerData, "color"));
+
+        // Sort color values by category order:
+        // Get categories
+        const colorCategories = this.axisBuilder.getCategories(layer.axes.color, colorValues, locale);
+
+        // Get indexed ordering of categories (lookup from value to index) without removing excluded values
+        const colorCategoryOrder = _.zipObject(_.map(colorCategories, (c, i) => [c.value, i]));
+
+        // Sort
+        colorValues = _.sortBy(colorValues, v => colorCategoryOrder[v]);
+
+        // Exclude excluded ones
+        colorValues = _.difference(colorValues, layer.axes.color.excludedValues);
+
+        if (colorValues.length > 0) {
+          return _.each(colorValues, colorValue => {
+            // One series for y values
+            const series = `${layerIndex}:${colorValue}`;
+
+            // Get specific color if present
+            let color = this.axisBuilder.getValueColor(layer.axes.color, colorValue);
+            color = color || layer.color;
+            if (color) {
+              colors[series] = color;
+            }
+
+            // Get rows for this series
+            const rows = _.where(layerData, {color: colorValue});
+
+            // Create empty series
+            const column = _.map(categories, c => null);
+
+            // Set rows
+            _.each(rows, row => {
+              // Get index
+              const index = categoryMap[row.x];
+              if (index != null) {
+                column[index] = row.y;
+                return dataMap[`${series}:${index}`] = { layerIndex, row };
+              }
+          });
+                
+            // Fill in nulls if cumulative
+            if (layer.cumulative) {
+              for (let i = 0; i < column.length; i++) {
+                const value = column[i];
+                if ((value == null) && (i > 0)) {
+                  column[i] = column[i - 1];
+                }
+              }
+            }
+
+            columns.push([series].concat(column));
+
+            types[series] = this.getLayerType(design, layerIndex);
+            names[series] = this.axisBuilder.formatValue(layer.axes.color, colorValue, locale, true);
+            xs[series] = "x";
+            return format[series] = value => (value != null) ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : "";
+          });
+        } else {
+          //c3 acts funny when there is a split axis but no data
+          series = `${layerIndex}:dumm`;
+          column = _.map(categories, c => null);
+          columns.push([series].concat(column));
+
+          types[series] = this.getLayerType(design, layerIndex);
+          names[series] = this.axisBuilder.formatValue(layer.axes.color, null, locale, true);
+          xs[series] = "x";
+          return format[series] = value => (value != null) ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : "";
+        }
+      } else {
+        // One series for y
+        series = `${layerIndex}`;
+
+        // Create empty series
+        column = _.map(categories, c => null);
+
+        // Set rows
+        _.each(layerData, row => {
+          // Skip if value excluded
+          if (_.includes(layer.axes.x.excludedValues, row.x)) {
+            return;
+          }
+            
+          // Get index
+          const index = categoryMap[row.x];
+          column[index] = row.y;
+          dataMap[`${series}:${index}`] = { layerIndex, row };
+
+          // Get color override
+          if (layer.xColorMap) { 
+            const color = this.axisBuilder.getValueColor(layer.axes.x, row.x);
+            if (color) {
+              return colorOverrides[`${series}:${index}`] = color;
+            }
+          }
+        });
+
+        columns.push([series].concat(column));
+
+        types[series] = this.getLayerType(design, layerIndex);
+        names[series] = layer.name || (design.layers.length === 1 ? "Value" : `Series ${layerIndex+1}`); 
+        xs[series] = "x";
+        colors[series] = layer.color || defaultColors[layerIndex];
+        format[series] = value => (value != null) ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : "";
+
+        // Add trendline
+        if (layer.trendline === "linear") {
+          const trendlineSeries = series + ":trendline";
+          let trendXs = _.range(column.length);
+          let trendYs = column;
+          // Skip null last value
+          if ((categories.length > 0) && (_.last(categories).value === null)) {
+            trendXs = _.initial(trendXs);
+            trendYs = _.initial(trendYs);
+          }
+          columns.push([trendlineSeries].concat(calculateLinearRegression(trendYs, trendXs)));
+          types[trendlineSeries] = "line";
+          names[trendlineSeries] = names[series] + " Trendline";
+          xs[trendlineSeries] = "x";
+          colors[trendlineSeries] = layer.color || defaultColors[layerIndex];
+          legendHide.push(trendlineSeries); // Hide in legend
+          format[trendlineSeries] = value => (value != null) ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : "";
+          // Set dots as invisible in CSS and line as dashed
+          return classes[trendlineSeries] = "trendline";
+        }
+      }
+    });
+
+    // Stack by putting into groups
+    if (design.stacked) {
+      groups = [_.keys(names)];
+    } else if (design.layers.length > 1) {
+      groups = [];
+      for (var layerIndex = 0; layerIndex < design.layers.length; layerIndex++) {
+        // If has multiple layers and color axes within layers. Stack individual layers unless stacked is false
+        const layer = design.layers[layerIndex];
+        const defaultStacked = (layer.axes.color != null);
+        const stacked = (layer.stacked != null) ? layer.stacked : defaultStacked;
+
+        if (stacked) {
+          groups.push(_.filter(_.keys(names), series => series.split(":")[0] === `${layerIndex}`));
+        }
+      }
+
+      // Remove empty groups
+      groups = _.filter(groups, g => g.length > 1);
+    }
+
+    // If proportional
+    if (design.proportional) {
+      // Calculate total for each x
+      let column, i;
+      const xtotals = [];
+      for (column of columns) {
+        // Skip x column
+        var asc, end;
+        if (column[0] === 'x') {
+          continue;
+        }
+
+        for (i = 1, end = column.length, asc = 1 <= end; asc ? i < end : i > end; asc ? i++ : i--) {
+          xtotals[i] = (xtotals[i] || 0) + (column[i] || 0);
+        }
+      }
+
+      // Now make percentage with one decimal
+      for (column of columns) {
+        // Skip x column
+        var asc1, end1;
+        if (column[0] === 'x') {
+          continue;
+        }
+
+        for (i = 1, end1 = column.length, asc1 = 1 <= end1; asc1 ? i < end1 : i > end1; asc1 ? i++ : i--) {
+          if (column[i] > 0) {
+            column[i] = Math.round(((100 * column[i]) / xtotals[i]) * 10) / 10;
+          }
+        }
+      }
+    }
+
+    // console.log(format)
+    return {
+      columns,
+      types,
+      names,
+      dataMap,
+      colors,
+      xs,
+      groups,
+      legendHide,
+      classes,
+      xAxisType: "category", 
+      xAxisTickFit: xType !== "date",   // Put a tick for each point since categorical unless date
+      xAxisLabelText: this.compileXAxisLabelText(design, locale),
+      yAxisLabelText: this.compileYAxisLabelText(design, locale),
+      titleText: this.compileTitleText(design, locale),
+      order: null, // Use order of data for stacking
+      format,
+      color: (color, d) => {
+        // Handle overall series color which calls with a non-object for d
+        if (typeof(d) !== "object") {
+          // Overall series is not changed in color
+          return color;
+        }
+
+        const key = `${d.id}:${d.index}`;
+        if (colorOverrides[key]) {
+          color = colorOverrides[key];
+        }
+
+        // Apply thresholds (in order)
+        const sortedYThresholds = _.sortBy(design.yThresholds || [], "value");
+        for (let yThreshold of sortedYThresholds) {
+          if ((d.value > yThreshold.value) && yThreshold.highlightColor) {
+            color = yThreshold.highlightColor;
+          }
+        }
+        
+        return color;
+      }
+    };
+  }
+
+  // Compile an expression
+  compileExpr(expr) {
+    const exprCompiler = new ExprCompiler(this.schema);
+    return exprCompiler.compileExpr({expr, tableAlias: "main"});
+  }
+
+  // Get layer type, defaulting to overall type
+  getLayerType(design, layerIndex) {
+    return design.layers[layerIndex].type || design.type;
+  }
+
+  // Determine if layer required grouping by x (and color)
+  doesLayerNeedGrouping(design, layerIndex) {
+    return this.getLayerType(design, layerIndex) !== "scatter";
+  }
+
+  // Determine if layer can use x axis
+  canLayerUseXExpr(design, layerIndex) {
+    let needle;
+    return (needle = this.getLayerType(design, layerIndex), !['pie', 'donut'].includes(needle));
+  }
+
+  isXAxisRequired(design, layerIndex) {
+    let needle;
+    return _.any(design.layers, (layer, i) => (needle = this.getLayerType(design, i), !['pie', 'donut'].includes(needle)));
+  }
+
+  isColorAxisRequired(design, layerIndex) {
+    let needle;
+    return (needle = this.getLayerType(design, layerIndex), ['pie', 'donut'].includes(needle));
+  }
+
+  compileDefaultTitleText(design, locale) {
+    // Don't default this for now
+    return "";
+  }
+    // if design.layers[0].axes.x
+    //   return @compileYAxisLabelText(design) + " by " + @compileXAxisLabelText(design)
+    // else
+    //   return @compileYAxisLabelText(design) + " by " + @axisBuilder.summarizeAxis(design.layers[0].axes.color)
+
+  compileDefaultYAxisLabelText(design, locale) {
+    return this.axisBuilder.summarizeAxis(design.layers[0].axes.y, locale);
+  }
+
+  compileDefaultXAxisLabelText(design, locale) {
+    return this.axisBuilder.summarizeAxis(design.layers[0].axes.x, locale);
+  }
+
+  compileTitleText(design, locale) {
+    return design.titleText || this.compileDefaultTitleText(design, locale);
+  }
+
+  compileYAxisLabelText(design, locale) {
+    if (design.yAxisLabelText === "") {
+      return this.compileDefaultYAxisLabelText(design, locale);
+    }
+    return design.yAxisLabelText;
+  }
+
+  compileXAxisLabelText(design, locale) {
+    if (design.xAxisLabelText === "") {
+      return this.compileDefaultXAxisLabelText(design, locale);
+    }
+    return design.xAxisLabelText;
+  }
+
+  // Create a scope based on a row of a layer
+  // Scope data is relevant data from row that uniquely identifies scope
+  // plus a layer index
+  createScope(design, layerIndex, row, locale) {
+    let filter, filterExpr;
+    const expressionBuilder = new ExprUtils(this.schema);
+
+    // Get layer
+    const layer = design.layers[layerIndex];
+
+    const filters = [];
+    const filterExprs = [];
+    const names = [];
+    const data = { layerIndex };
+    
+    // If x
+    if (layer.axes.x) {
+      // Handle special case of enumset which is flattened to enum type
+      if (this.axisBuilder.getAxisType(layer.axes.x) === "enumset") {
+        filters.push({
+          type: "op",
+          op: "@>",
+          exprs: [
+            { type: "op", op: "::jsonb", exprs: [this.axisBuilder.compileAxis({axis: layer.axes.x, tableAlias: "{alias}"})] },
+            { type: "op", op: "::jsonb", exprs: [JSON.stringify(row.x)] }
+          ]
+        });
+        filterExprs.push({
+          table: layer.table,
+          type: "op",
+          op: "contains",
+          exprs: [
+            this.axisBuilder.convertAxisToExpr(layer.axes.x),
+            { type: "literal", valueType: "enumset", value: [row.x] }
+          ]
+        });
+
+        names.push(this.axisBuilder.summarizeAxis(layer.axes.x, locale) + " includes " + this.exprUtils.stringifyExprLiteral(layer.axes.x.expr, [row.x], locale));
+        data.x = row.x;
+      } else {        
+        filters.push(this.axisBuilder.createValueFilter(layer.axes.x, row.x));
+        filterExprs.push(this.axisBuilder.createValueFilterExpr(layer.axes.x, row.x));
+        names.push(this.axisBuilder.summarizeAxis(layer.axes.x, locale) + " is " + this.axisBuilder.formatValue(layer.axes.x, row.x, locale, true));
+        data.x = row.x;
+      }
+    }
+
+    if (layer.axes.color) {
+      filters.push(this.axisBuilder.createValueFilter(layer.axes.color, row.color));
+      filterExprs.push(this.axisBuilder.createValueFilterExpr(layer.axes.color, row.color));
+      names.push(this.axisBuilder.summarizeAxis(layer.axes.color, locale) + " is " + this.axisBuilder.formatValue(layer.axes.color, row.color, locale, true));
+      data.color = row.color;
+    }
+
+    if (filters.length > 1) {
+      filter = {
+        table: layer.table,
+        jsonql: {
+          type: "op",
+          op: "and",
+          exprs: filters
+        }
+      };
+      filterExpr = {
+        table: layer.table,
+        type: "op",
+        op: "and",
+        exprs: filterExprs
+      };
+    } else {
+      filter = {
+        table: layer.table,
+        jsonql: filters[0]
+      };
+      filterExpr = filterExprs[0];
+    }
+
+    const scope = {
+      name: ExprUtils.localizeString(this.schema.getTable(layer.table).name, locale) + " " + names.join(" and "),
+      filter,
+      filterExpr,
+      data
+    };
+
+    return scope;
+  }
+
+  // Converts a series of rows to have cumulative y axis, separating out by color axis if present
+  makeRowsCumulative(rows) {
+    // Indexed by color
+    const totals = {};
+
+    const newRows = [];
+    for (let row of rows) {
+      // Add up total
+      const total = totals[row.color] || 0;
+      const y = total + row.y;
+      totals[row.color] = y;
+
+      // If x is null, don't make cumulative
+      if (row.x === null) {
+        newRows.push(row);
+      } else {
+        // Create new row
+        newRows.push(_.extend({}, row, {y}));
+      }
+    }
+
+    return newRows;
+  }
+};
+
+// Clean out nbsp (U+00A0) as it causes c3 errors
+var cleanString = function(str) {
+  if (!str) {
+    return str;
+  }
+  return str.replace("\u00A0", " ");
+};
+
+// Calculate a linear regression, returning a series of y values that match the x values
+var calculateLinearRegression = function(ys, xs) {
+  // If xs are dates, convert to numbers
+  if (_.isString(xs[0])) {
+    xs = _.map(xs, x => Date.parse(x));
+  }
+
+  // Remove null ys
+  const nonNullxs = _.filter(xs, (x, index) => ys[index] !== null);
+  const nonNullys = _.filter(ys, (y, index) => ys[index] !== null);
+
+  const n = nonNullys.length;
+
+  const sumXY = _.sum(_.map(nonNullxs, (x, i) => x * nonNullys[i]));
+
+  const sumXX = _.sum(_.map(nonNullxs, x => x * x));
+
+  const sumX = _.sum(nonNullxs);
+
+  const sumY = _.sum(nonNullys);
+
+  // Calculate denominator
+  const den = (n * sumXX) - (sumX * sumX);
+
+  // Calculate slope
+  const slope = ((n * sumXY) - (sumX * sumY)) / den;
+
+  // Calculate intercept
+  const intercept = ((sumY * sumXX) - (sumX * sumXY)) / den;
+
+  return _.map(xs, x => (x * slope) + intercept);
+};

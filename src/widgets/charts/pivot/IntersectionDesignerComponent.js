@@ -1,225 +1,326 @@
-PropTypes = require('prop-types')
-_ = require 'lodash'
-React = require 'react'
-R = React.createElement
+let IntersectionDesignerComponent;
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import React from 'react';
+const R = React.createElement;
 
-ui = require 'react-library/lib/bootstrap'
-update = require 'react-library/lib/update'
+import ui from 'react-library/lib/bootstrap';
+import update from 'react-library/lib/update';
+import { default as Rcslider } from 'rc-slider';
+import AxisComponent from '../../../axes/AxisComponent';
+import ColorComponent from '../../../ColorComponent';
+import { FilterExprComponent } from "mwater-expressions-ui";
+import { ExprComponent } from "mwater-expressions-ui";
 
-Rcslider = require('rc-slider').default
-AxisComponent = require '../../../axes/AxisComponent'
-ColorComponent = require '../../../ColorComponent'
-FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
-ExprComponent = require("mwater-expressions-ui").ExprComponent
+// Design an intersection of a pivot table
+export default IntersectionDesignerComponent = (function() {
+  IntersectionDesignerComponent = class IntersectionDesignerComponent extends React.Component {
+    constructor(...args) {
+      super(...args);
+      this.update = this.update.bind(this);
+      this.handleBackgroundColorAxisChange = this.handleBackgroundColorAxisChange.bind(this);
+      this.handleBackgroundColorChange = this.handleBackgroundColorChange.bind(this);
+      this.handleBackgroundColorConditionsChange = this.handleBackgroundColorConditionsChange.bind(this);
+      this.handleBackgroundColorOpacityChange = this.handleBackgroundColorOpacityChange.bind(this);
+      this.handleFilterChange = this.handleFilterChange.bind(this);
+    }
 
-# Design an intersection of a pivot table
-module.exports = class IntersectionDesignerComponent extends React.Component
-  @propTypes: 
-    intersection: PropTypes.object.isRequired
-    table: PropTypes.string.isRequired
-    schema: PropTypes.object.isRequired
-    dataSource: PropTypes.object.isRequired
-    onChange: PropTypes.func.isRequired
-    filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+    static initClass() {
+      this.propTypes = { 
+        intersection: PropTypes.object.isRequired,
+        table: PropTypes.string.isRequired,
+        schema: PropTypes.object.isRequired,
+        dataSource: PropTypes.object.isRequired,
+        onChange: PropTypes.func.isRequired,
+        filters: PropTypes.array
+      };
+         // array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+    }
 
-  # Updates intersection with the specified changes
-  update: => update(@props.intersection, @props.onChange, arguments)
+    // Updates intersection with the specified changes
+    update() { return update(this.props.intersection, this.props.onChange, arguments); }
 
-  handleBackgroundColorAxisChange: (backgroundColorAxis) => 
-    opacity = @props.intersection.backgroundColorOpacity or 1
-    @update(backgroundColorAxis: backgroundColorAxis, backgroundColorOpacity: opacity)
+    handleBackgroundColorAxisChange(backgroundColorAxis) { 
+      const opacity = this.props.intersection.backgroundColorOpacity || 1;
+      return this.update({backgroundColorAxis, backgroundColorOpacity: opacity});
+    }
 
-  handleBackgroundColorChange: (backgroundColor) => 
-    opacity = @props.intersection.backgroundColorOpacity or 1
-    @update(backgroundColor: backgroundColor, backgroundColorOpacity: opacity)
+    handleBackgroundColorChange(backgroundColor) { 
+      const opacity = this.props.intersection.backgroundColorOpacity || 1;
+      return this.update({backgroundColor, backgroundColorOpacity: opacity});
+    }
 
-  handleBackgroundColorConditionsChange: (backgroundColorConditions) =>
-    opacity = @props.intersection.backgroundColorOpacity or 1
-    @update(backgroundColorConditions: backgroundColorConditions, backgroundColorOpacity: opacity)
+    handleBackgroundColorConditionsChange(backgroundColorConditions) {
+      const opacity = this.props.intersection.backgroundColorOpacity || 1;
+      return this.update({backgroundColorConditions, backgroundColorOpacity: opacity});
+    }
 
-  handleBackgroundColorOpacityChange: (newValue) =>
-    @update(backgroundColorOpacity: newValue / 100)
+    handleBackgroundColorOpacityChange(newValue) {
+      return this.update({backgroundColorOpacity: newValue / 100});
+    }
 
-  handleFilterChange: (filter) => @update(filter: filter)
+    handleFilterChange(filter) { return this.update({filter}); }
 
-  renderValueAxis: ->
-    R ui.FormGroup, 
-      labelMuted: true
-      label: "Calculation"
-      help: "This is the calculated value that is displayed. Leave as blank to make an empty section",
-        R AxisComponent, 
-          schema: @props.schema
-          dataSource: @props.dataSource
-          table: @props.table
-          types: ["enum", "text", "boolean", "date", "number"]
-          aggrNeed: "required"
-          value: @props.intersection.valueAxis
-          onChange: @update("valueAxis")
-          showFormat: true
-          filters: @props.filters
+    renderValueAxis() {
+      return R(ui.FormGroup, { 
+        labelMuted: true,
+        label: "Calculation",
+        help: "This is the calculated value that is displayed. Leave as blank to make an empty section"
+      },
+          R(AxisComponent, { 
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            table: this.props.table,
+            types: ["enum", "text", "boolean", "date", "number"],
+            aggrNeed: "required",
+            value: this.props.intersection.valueAxis,
+            onChange: this.update("valueAxis"),
+            showFormat: true,
+            filters: this.props.filters
+          }
+          )
+      );
+    }
 
-  renderNullValue: ->
-    if @props.intersection.valueAxis
-      R ui.FormGroup, 
-        labelMuted: true
-        label: "Show Empty Cells as",
-          R ui.TextInput, value: @props.intersection.valueAxis.nullLabel, emptyNull: true, onChange: @update("valueAxis.nullLabel"), placeholder: "Blank"
+    renderNullValue() {
+      if (this.props.intersection.valueAxis) {
+        return R(ui.FormGroup, { 
+          labelMuted: true,
+          label: "Show Empty Cells as"
+        },
+            R(ui.TextInput, {value: this.props.intersection.valueAxis.nullLabel, emptyNull: true, onChange: this.update("valueAxis.nullLabel"), placeholder: "Blank"}));
+      }
+    }
 
-  renderFilter: ->
-    R ui.FormGroup, 
-      labelMuted: true
-      label: [R(ui.Icon, id: "glyphicon-filter"), " Filters"],
-        R FilterExprComponent, 
-          schema: @props.schema
-          dataSource: @props.dataSource
-          onChange: @handleFilterChange
-          table: @props.table
-          value: @props.intersection.filter
+    renderFilter() {
+      return R(ui.FormGroup, { 
+        labelMuted: true,
+        label: [R(ui.Icon, {id: "glyphicon-filter"}), " Filters"]
+      },
+          R(FilterExprComponent, { 
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            onChange: this.handleFilterChange,
+            table: this.props.table,
+            value: this.props.intersection.filter
+          }
+          )
+      );
+    }
 
-  renderStyling: ->
-    R ui.FormGroup, 
-      labelMuted: true
-      key: "styling"
-      label: "Styling",
-        R ui.Checkbox, key: "bold", inline: true, value: @props.intersection.bold, onChange: @update("bold"), "Bold"
-        R ui.Checkbox, key: "italic", inline: true, value: @props.intersection.italic, onChange: @update("italic"), "Italic"
+    renderStyling() {
+      return R(ui.FormGroup, { 
+        labelMuted: true,
+        key: "styling",
+        label: "Styling"
+      },
+          R(ui.Checkbox, {key: "bold", inline: true, value: this.props.intersection.bold, onChange: this.update("bold")}, "Bold"),
+          R(ui.Checkbox, {key: "italic", inline: true, value: this.props.intersection.italic, onChange: this.update("italic")}, "Italic"));
+    }
 
-  renderBackgroundColorConditions: ->
-    R BackgroundColorConditionsComponent,
-      schema: @props.schema
-      dataSource: @props.dataSource
-      table: @props.table
-      colorConditions: @props.intersection.backgroundColorConditions
-      onChange: @handleBackgroundColorConditionsChange
+    renderBackgroundColorConditions() {
+      return R(BackgroundColorConditionsComponent, {
+        schema: this.props.schema,
+        dataSource: this.props.dataSource,
+        table: this.props.table,
+        colorConditions: this.props.intersection.backgroundColorConditions,
+        onChange: this.handleBackgroundColorConditionsChange
+      }
+      );
+    }
 
-  renderBackgroundColorAxis: ->
-    return R ui.FormGroup, 
-      labelMuted: true
-      label: "Background Color From Values"
-      help: "This is an optional background color to set on cells that is controlled by the data",
-        R AxisComponent, 
-          schema: @props.schema
-          dataSource: @props.dataSource
-          table: @props.table
-          types: ["enum", "text", "boolean", "date"]
-          aggrNeed: "required"
-          value: @props.intersection.backgroundColorAxis
-          onChange: @handleBackgroundColorAxisChange
-          showColorMap: true
-          filters: @props.filters
+    renderBackgroundColorAxis() {
+      return R(ui.FormGroup, { 
+        labelMuted: true,
+        label: "Background Color From Values",
+        help: "This is an optional background color to set on cells that is controlled by the data"
+      },
+          R(AxisComponent, { 
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            table: this.props.table,
+            types: ["enum", "text", "boolean", "date"],
+            aggrNeed: "required",
+            value: this.props.intersection.backgroundColorAxis,
+            onChange: this.handleBackgroundColorAxisChange,
+            showColorMap: true,
+            filters: this.props.filters
+          }
+          )
+      );
+    }
 
-  renderBackgroundColor: ->
-    if @props.intersection.backgroundColorAxis
-      return
+    renderBackgroundColor() {
+      if (this.props.intersection.backgroundColorAxis) {
+        return;
+      }
       
-    return R ui.FormGroup, 
-      labelMuted: true
-      label: "Background Color"
-      help: "This is an optional background color to set on all cells",
-        R ColorComponent,
-          color: @props.intersection.backgroundColor
-          onChange: @handleBackgroundColorChange
+      return R(ui.FormGroup, { 
+        labelMuted: true,
+        label: "Background Color",
+        help: "This is an optional background color to set on all cells"
+      },
+          R(ColorComponent, {
+            color: this.props.intersection.backgroundColor,
+            onChange: this.handleBackgroundColorChange
+          }
+          )
+      );
+    }
 
-  renderBackgroundColorOpacityControl: ->
-    if not @props.intersection.backgroundColorAxis and not @props.intersection.backgroundColor and not @props.intersection.backgroundColorConditions?[0]
-      return
+    renderBackgroundColorOpacityControl() {
+      if (!this.props.intersection.backgroundColorAxis && !this.props.intersection.backgroundColor && !this.props.intersection.backgroundColorConditions?.[0]) {
+        return;
+      }
 
-    R ui.FormGroup, 
-      labelMuted: true
-      label: "Background Opacity: #{Math.round(@props.intersection.backgroundColorOpacity * 100) }%",
-        R Rcslider,
-          min: 0
-          max: 100
-          step: 1
-          tipTransitionName: "rc-slider-tooltip-zoom-down",
-          value: @props.intersection.backgroundColorOpacity * 100,
-          onChange: @handleBackgroundColorOpacityChange
+      return R(ui.FormGroup, { 
+        labelMuted: true,
+        label: `Background Opacity: ${Math.round(this.props.intersection.backgroundColorOpacity * 100) }%`
+      },
+          R(Rcslider, {
+            min: 0,
+            max: 100,
+            step: 1,
+            tipTransitionName: "rc-slider-tooltip-zoom-down",
+            value: this.props.intersection.backgroundColorOpacity * 100,
+            onChange: this.handleBackgroundColorOpacityChange
+          }
+          )
+      );
+    }
 
-  render: ->
-    R 'div', null,
-      @renderValueAxis()
-      @renderNullValue()
-      @renderFilter()
-      @renderStyling()
-      @renderBackgroundColorAxis()
-      @renderBackgroundColorConditions()
-      @renderBackgroundColor()
-      @renderBackgroundColorOpacityControl()
+    render() {
+      return R('div', null,
+        this.renderValueAxis(),
+        this.renderNullValue(),
+        this.renderFilter(),
+        this.renderStyling(),
+        this.renderBackgroundColorAxis(),
+        this.renderBackgroundColorConditions(),
+        this.renderBackgroundColor(),
+        this.renderBackgroundColorOpacityControl());
+    }
+  };
+  IntersectionDesignerComponent.initClass();
+  return IntersectionDesignerComponent;
+})();
 
-# Displays background color conditions
-class BackgroundColorConditionsComponent extends React.Component
-  @propTypes: 
-    colorConditions: PropTypes.array
-    table: PropTypes.string.isRequired
-    schema: PropTypes.object.isRequired
-    dataSource: PropTypes.object.isRequired
-    onChange: PropTypes.func.isRequired
+// Displays background color conditions
+class BackgroundColorConditionsComponent extends React.Component {
+  constructor(...args) {
+    super(...args);
+    this.handleAdd = this.handleAdd.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleRemove = this.handleRemove.bind(this);
+  }
 
-  handleAdd: =>
-    colorConditions = (@props.colorConditions or []).slice()
-    colorConditions.push({})
-    @props.onChange(colorConditions)
+  static initClass() {
+    this.propTypes = { 
+      colorConditions: PropTypes.array,
+      table: PropTypes.string.isRequired,
+      schema: PropTypes.object.isRequired,
+      dataSource: PropTypes.object.isRequired,
+      onChange: PropTypes.func.isRequired
+    };
+  }
 
-  handleChange: (index, colorCondition) =>
-    colorConditions = @props.colorConditions.slice()
-    colorConditions[index] = colorCondition
-    @props.onChange(colorConditions)
+  handleAdd() {
+    const colorConditions = (this.props.colorConditions || []).slice();
+    colorConditions.push({});
+    return this.props.onChange(colorConditions);
+  }
 
-  handleRemove: (index) =>
-    colorConditions = @props.colorConditions.slice()
-    colorConditions.splice(index, 1)
-    @props.onChange(colorConditions)
+  handleChange(index, colorCondition) {
+    const colorConditions = this.props.colorConditions.slice();
+    colorConditions[index] = colorCondition;
+    return this.props.onChange(colorConditions);
+  }
 
-  render: ->
-    # List conditions
-    R ui.FormGroup, 
-      label: "Color Conditions"
-      labelMuted: true
-      help: "Add conditions that, if met, set the color of the cell. Useful for flagging certain values",
-        _.map @props.colorConditions, (colorCondition, i) => 
-          R BackgroundColorConditionComponent,
-            key: i
-            colorCondition: colorCondition
-            table: @props.table
-            schema: @props.schema
-            dataSource: @props.dataSource
-            onChange: @handleChange.bind(null, i)
-            onRemove: @handleRemove.bind(null, i)
-        R ui.Button, type: "link", size: "sm", onClick: @handleAdd,
-          R ui.Icon, id: "fa-plus"
-          " Add Condition"
+  handleRemove(index) {
+    const colorConditions = this.props.colorConditions.slice();
+    colorConditions.splice(index, 1);
+    return this.props.onChange(colorConditions);
+  }
 
-# Displays single background color condition
-class BackgroundColorConditionComponent extends React.Component
-  @propTypes: 
-    colorCondition: PropTypes.object.isRequired
-    table: PropTypes.string.isRequired
-    schema: PropTypes.object.isRequired
-    dataSource: PropTypes.object.isRequired
-    onChange: PropTypes.func.isRequired
+  render() {
+    // List conditions
+    return R(ui.FormGroup, { 
+      label: "Color Conditions",
+      labelMuted: true,
+      help: "Add conditions that, if met, set the color of the cell. Useful for flagging certain values"
+    },
+        _.map(this.props.colorConditions, (colorCondition, i) => { 
+          return R(BackgroundColorConditionComponent, {
+            key: i,
+            colorCondition,
+            table: this.props.table,
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            onChange: this.handleChange.bind(null, i),
+            onRemove: this.handleRemove.bind(null, i)
+          }
+          );
+        }),
+        R(ui.Button, {type: "link", size: "sm", onClick: this.handleAdd},
+          R(ui.Icon, {id: "fa-plus"}),
+          " Add Condition")
+    );
+  }
+}
+BackgroundColorConditionsComponent.initClass();
 
-  # Updates intersection with the specified changes
-  update: => update(@props.colorCondition, @props.onChange, arguments)
+// Displays single background color condition
+class BackgroundColorConditionComponent extends React.Component {
+  constructor(...args) {
+    super(...args);
+    this.update = this.update.bind(this);
+  }
 
-  render: ->
-    R 'div', className: "panel panel-default",
-      R 'div', className: "panel-body",
-        R ui.FormGroup, 
-          labelMuted: true
-          label: "Condition",
-            R ExprComponent, 
-              schema: @props.schema
-              dataSource: @props.dataSource
-              onChange: @update("condition")
-              types: ['boolean']
-              aggrStatuses: ["aggregate", "literal"]
-              table: @props.table
-              value: @props.colorCondition.condition
+  static initClass() {
+    this.propTypes = { 
+      colorCondition: PropTypes.object.isRequired,
+      table: PropTypes.string.isRequired,
+      schema: PropTypes.object.isRequired,
+      dataSource: PropTypes.object.isRequired,
+      onChange: PropTypes.func.isRequired
+    };
+  }
 
-        R ui.FormGroup, 
-          labelMuted: true
-          label: "Color"
-          hint: "Color to display when condition is met",
-            R ColorComponent,
-              color: @props.colorCondition.color
-              onChange: @update("color")
+  // Updates intersection with the specified changes
+  update() { return update(this.props.colorCondition, this.props.onChange, arguments); }
+
+  render() {
+    return R('div', {className: "panel panel-default"},
+      R('div', {className: "panel-body"},
+        R(ui.FormGroup, { 
+          labelMuted: true,
+          label: "Condition"
+        },
+            R(ExprComponent, { 
+              schema: this.props.schema,
+              dataSource: this.props.dataSource,
+              onChange: this.update("condition"),
+              types: ['boolean'],
+              aggrStatuses: ["aggregate", "literal"],
+              table: this.props.table,
+              value: this.props.colorCondition.condition
+            }
+            )
+        ),
+
+        R(ui.FormGroup, { 
+          labelMuted: true,
+          label: "Color",
+          hint: "Color to display when condition is met"
+        },
+            R(ColorComponent, {
+              color: this.props.colorCondition.color,
+              onChange: this.update("color")
+            }
+            )
+        )
+      )
+    );
+  }
+}
+BackgroundColorConditionComponent.initClass();

@@ -1,137 +1,172 @@
-$ = require 'jquery'
-PropTypes = require('prop-types')
-_ = require 'lodash'
-React = require 'react'
-R = React.createElement
+let MWaterAddRelatedIndicatorComponent;
+import $ from 'jquery';
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import React from 'react';
+const R = React.createElement;
 
-moment = require 'moment'
+import moment from 'moment';
+import querystring from 'querystring';
+import { ExprUtils } from 'mwater-expressions';
+import ui from './UIComponents';
 
-querystring = require 'querystring'
-ExprUtils = require('mwater-expressions').ExprUtils
-ui = require './UIComponents'
-
-# List of indicators related to an entity
-module.exports = class MWaterAddRelatedIndicatorComponent extends React.Component
-  @propTypes:
-    table: PropTypes.string.isRequired
-    apiUrl: PropTypes.string.isRequired
-    client: PropTypes.string
-    user: PropTypes.string                # User id
-    onSelect: PropTypes.func.isRequired   # Called with table id e.g. indicator_values:someid
-    schema: PropTypes.object.isRequired   
-    filter: PropTypes.string              # String filter
-
-  @contextTypes:
-    locale: PropTypes.string  # e.g. "en"
-
-  constructor: (props) ->
-    super(props)
-
-    @state = { 
-      addingTables: []  # Set to table ids that have been added
-      indicators: null
+// List of indicators related to an entity
+export default MWaterAddRelatedIndicatorComponent = (function() {
+  MWaterAddRelatedIndicatorComponent = class MWaterAddRelatedIndicatorComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        table: PropTypes.string.isRequired,
+        apiUrl: PropTypes.string.isRequired,
+        client: PropTypes.string,
+        user: PropTypes.string,                // User id
+        onSelect: PropTypes.func.isRequired,   // Called with table id e.g. indicator_values:someid
+        schema: PropTypes.object.isRequired,   
+        filter: PropTypes.string              // String filter
+      };
+  
+      this.contextTypes =
+        {locale: PropTypes.string};
+        // e.g. "en"
     }
 
-  componentDidMount: ->
-    # Get all response-type indicators 
-    query = {}
-    query.selector = JSON.stringify({ type: "response" })
-    query.fields = JSON.stringify({ "design.name": 1, "design.desc": 1, "design.properties": 1, "design.recommended": 1, "deprecated": 1 })
-    if @props.client
-      query.client = @props.client
+    constructor(props) {
+      this.handleSelect = this.handleSelect.bind(this);
+      super(props);
 
-    # Get list of all indicators
-    $.getJSON @props.apiUrl + "indicators?" + querystring.stringify(query), (indicators) => 
-      # Filter by table reference
-      indicators = _.filter(indicators, (indicator) => @doesIndicatorReferenceTable(indicator, @props.table) and not indicator.deprecated)
+      this.state = { 
+        addingTables: [],  // Set to table ids that have been added
+        indicators: null
+      };
+    }
 
-      # Sort by recommended then name
-      indicators = _.sortByOrder(indicators, [
-        (indicator) => if indicator.design.recommended then 0 else 1
-        (indicator) => ExprUtils.localizeString(indicator.design.name, @context.locale)
-        ], ['asc', 'asc'])
+    componentDidMount() {
+      // Get all response-type indicators 
+      const query = {};
+      query.selector = JSON.stringify({ type: "response" });
+      query.fields = JSON.stringify({ "design.name": 1, "design.desc": 1, "design.properties": 1, "design.recommended": 1, "deprecated": 1 });
+      if (this.props.client) {
+        query.client = this.props.client;
+      }
 
-      @setState(indicators: indicators)
-    .fail (xhr) =>
-      @setState(error: xhr.responseText)
+      // Get list of all indicators
+      return $.getJSON(this.props.apiUrl + "indicators?" + querystring.stringify(query), indicators => { 
+        // Filter by table reference
+        indicators = _.filter(indicators, indicator => this.doesIndicatorReferenceTable(indicator, this.props.table) && !indicator.deprecated);
 
-  # See if a property references the indicator
-  doesIndicatorReferenceTable: (indicator, table) ->
-    for proplist in _.values(indicator.design.properties)
-      for property in flattenProperties(proplist)
-        if property.idTable == table
-          return true
+        // Sort by recommended then name
+        indicators = _.sortByOrder(indicators, [
+          indicator => indicator.design.recommended ? 0 : 1,
+          indicator => ExprUtils.localizeString(indicator.design.name, this.context.locale)
+          ], ['asc', 'asc']);
 
-    return false
+        return this.setState({indicators});
+    }).fail(xhr => {
+        return this.setState({error: xhr.responseText});
+      });
+    }
 
-  handleSelect: (table) =>
-    # Mark as being added
-    @setState(addingTables: _.union(@state.addingTables, [table]))
+    // See if a property references the indicator
+    doesIndicatorReferenceTable(indicator, table) {
+      for (let proplist of _.values(indicator.design.properties)) {
+        for (let property of flattenProperties(proplist)) {
+          if (property.idTable === table) {
+            return true;
+          }
+        }
+      }
 
-    @props.onSelect(table)
+      return false;
+    }
 
-  render: ->
-    # Filter out ones that are known and not recently added
-    indicators = _.filter(@state.indicators, (indicator) => 
-      not @props.schema.getTable("indicator_values:#{indicator._id}") or "indicator_values:#{indicator._id}" in @state.addingTables)
+    handleSelect(table) {
+      // Mark as being added
+      this.setState({addingTables: _.union(this.state.addingTables, [table])});
 
-    # Filter by search
-    if @props.filter
-      indicators = _.filter(indicators, (indicator) => filterMatches(@props.filter, ExprUtils.localizeString(indicator.design.name, @context.locale)))
+      return this.props.onSelect(table);
+    }
 
-    return R 'div', null,
-      R 'div', style: { paddingLeft: 5 }, className: "text-muted", 
-        "Other Available Indicators. Click to enable. "
-          R 'i', className: "fa fa-check-circle"
-          " = recommended"
+    render() {
+      // Filter out ones that are known and not recently added
+      let indicators = _.filter(this.state.indicators, indicator => { 
+        return !this.props.schema.getTable(`indicator_values:${indicator._id}`) || this.state.addingTables.includes(`indicator_values:${indicator._id}`);
+    });
 
-        if not @state.indicators
-          R 'div', className: "text-muted",
-            R 'i', className: "fa fa-spin fa-spinner"
-            " Loading..."
+      // Filter by search
+      if (this.props.filter) {
+        indicators = _.filter(indicators, indicator => filterMatches(this.props.filter, ExprUtils.localizeString(indicator.design.name, this.context.locale)));
+      }
 
-        R 'div', style: { paddingLeft: 10 },
-          _.map indicators, (indicator) =>
-            name = ExprUtils.localizeString(indicator.design.name, @context.locale)
-            desc = ExprUtils.localizeString(indicator.design.desc, @context.locale)
+      return R('div', null,
+        R('div', {style: { paddingLeft: 5 }, className: "text-muted"}, 
+          "Other Available Indicators. Click to enable. ",
+            R('i', {className: "fa fa-check-circle"}),
+            " = recommended",
 
-            # If added, put special message
-            if @props.schema.getTable("indicator_values:#{indicator._id}")
-              return R 'div', key: indicator._id, style: { cursor: "pointer", padding: 4 }, className: "text-success",
-                "#{name} added. See above."
+          !this.state.indicators ?
+            R('div', {className: "text-muted"},
+              R('i', {className: "fa fa-spin fa-spinner"}),
+              " Loading...") : undefined,
 
-            return R 'div', key: indicator._id, style: { cursor: "pointer", color: "#478", padding: 4 }, onClick: @handleSelect.bind(null, "indicator_values:#{indicator._id}"),
-              # If in process of adding
-              if indicator._id in @state.addingTables
-                R 'i', className: "fa fa-spin fa-spinner"
+          R('div', {style: { paddingLeft: 10 }},
+            _.map(indicators, indicator => {
+              const name = ExprUtils.localizeString(indicator.design.name, this.context.locale);
+              const desc = ExprUtils.localizeString(indicator.design.desc, this.context.locale);
 
-              if indicator.design.recommended
-                R 'i', className: "fa fa-check-circle fa-fw", style: { color: "#337ab7" }
-              name
-              if desc
-                R 'span', className: "text-muted", style: { fontSize: 12, paddingLeft: 3 }, 
-                  " - " + desc
+              // If added, put special message
+              if (this.props.schema.getTable(`indicator_values:${indicator._id}`)) {
+                return R('div', {key: indicator._id, style: { cursor: "pointer", padding: 4 }, className: "text-success"},
+                  `${name} added. See above.`);
+              }
 
-# Flattens a nested list of properties
-flattenProperties = (properties) ->
-  # Flatten
-  props = []
-  for prop in properties
-    if prop.contents
-      props = props.concat(flattenProperties(prop.contents))
-    else
-      props.push(prop)
+              return R('div', {key: indicator._id, style: { cursor: "pointer", color: "#478", padding: 4 }, onClick: this.handleSelect.bind(null, `indicator_values:${indicator._id}`)},
+                // If in process of adding
+                this.state.addingTables.includes(indicator._id) ?
+                  R('i', {className: "fa fa-spin fa-spinner"}) : undefined,
 
-  return props
+                indicator.design.recommended ?
+                  R('i', {className: "fa fa-check-circle fa-fw", style: { color: "#337ab7" }}) : undefined,
+                name,
+                desc ?
+                  R('span', {className: "text-muted", style: { fontSize: 12, paddingLeft: 3 }}, 
+                    " - " + desc) : undefined
+              );
+            })
+          )
+        )
+      );
+    }
+  };
+  MWaterAddRelatedIndicatorComponent.initClass();
+  return MWaterAddRelatedIndicatorComponent;
+})();
 
-# Filters text based on lower-case
-filterMatches = (filter, text) ->
-  if not filter
-    return true
+// Flattens a nested list of properties
+var flattenProperties = function(properties) {
+  // Flatten
+  let props = [];
+  for (let prop of properties) {
+    if (prop.contents) {
+      props = props.concat(flattenProperties(prop.contents));
+    } else {
+      props.push(prop);
+    }
+  }
 
-  if not text
-    return false
+  return props;
+};
 
-  if text.match(new RegExp(_.escapeRegExp(filter), "i"))
-    return true
-  return false
+// Filters text based on lower-case
+var filterMatches = function(filter, text) {
+  if (!filter) {
+    return true;
+  }
+
+  if (!text) {
+    return false;
+  }
+
+  if (text.match(new RegExp(_.escapeRegExp(filter), "i"))) {
+    return true;
+  }
+  return false;
+};

@@ -1,321 +1,327 @@
-assert = require('chai').assert
-fixtures = require '../../../fixtures'
-_ = require 'lodash'
+import { assert } from 'chai';
+import fixtures from '../../../fixtures';
+import _ from 'lodash';
+import PivotChartQueryBuilder from '../../../../src/widgets/charts/pivot/PivotChartQueryBuilder';
+import canonical from 'canonical-json';
+const compare = (actual, expected) => assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n");
 
-PivotChartQueryBuilder = require '../../../../src/widgets/charts/pivot/PivotChartQueryBuilder'
+describe("PivotChartQueryBuilder", function() {
+  before(function() {
+    this.qb = new PivotChartQueryBuilder({schema: fixtures.simpleSchema()});
+    this.exprBoolean = { type: "field", table: "t1", column: "boolean" };
+    this.exprNumber = { type: "field", table: "t1", column: "number" };
+    this.exprText = { type: "field", table: "t1", column: "text" };
+    this.exprEnum = { type: "field", table: "t1", column: "enum" };
+    this.exprNumberSum = { type: "op", op: "sum", table: "t1", exprs: [{ type: "field", table: "t1", column: "number" }] };
 
-canonical = require 'canonical-json'
-compare = (actual, expected) ->
-  assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n"
+    this.axisNumber = { expr: this.exprNumber };
+    this.axisNumberSum = { expr: this.exprNumberSum };
+    this.axisCount = { expr: { type: "op", op: "count", table: "t1", exprs: [] } };
+    this.axisEnum = { expr: this.exprEnum }; 
+    return this.axisText = { expr: this.exprText };}); 
 
-describe "PivotChartQueryBuilder", ->
-  before ->
-    @qb = new PivotChartQueryBuilder(schema: fixtures.simpleSchema())
-    @exprBoolean = { type: "field", table: "t1", column: "boolean" }
-    @exprNumber = { type: "field", table: "t1", column: "number" }
-    @exprText = { type: "field", table: "t1", column: "text" }
-    @exprEnum = { type: "field", table: "t1", column: "enum" }
-    @exprNumberSum = { type: "op", op: "sum", table: "t1", exprs: [{ type: "field", table: "t1", column: "number" }] }
-
-    @axisNumber = { expr: @exprNumber }
-    @axisNumberSum = { expr: @exprNumberSum }
-    @axisCount = { expr: { type: "op", op: "count", table: "t1", exprs: [] } }
-    @axisEnum = { expr: @exprEnum } 
-    @axisText = { expr: @exprText } 
-
-  it "creates single query", ->
-    design = {
-      table: "t1"
+  it("creates single query", function() {
+    const design = {
+      table: "t1",
       rows: [
-        { id: "r1", valueAxis: @axisEnum }
-      ]
+        { id: "r1", valueAxis: this.axisEnum }
+      ],
       columns: [
-        { id: "c1", valueAxis: @axisText }
-      ]
+        { id: "c1", valueAxis: this.axisText }
+      ],
       intersections: {
         "r1:c1": {
-          valueAxis: @axisNumberSum
+          valueAxis: this.axisNumberSum
         }
       }
-    }
+    };
 
-    queries = @qb.createQueries(design)
-    assert.equal _.values(queries).length, 1, "Should have single query"
+    const queries = this.qb.createQueries(design);
+    assert.equal(_.values(queries).length, 1, "Should have single query");
 
-    query = queries["r1:c1"]
-    compare query, {
-      type: "query"
+    const query = queries["r1:c1"];
+    return compare(query, {
+      type: "query",
       selects: [
-        { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "r0" }
-        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "r0" },
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" },
         { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "value" }
-      ]
-      from: { type: "table", table: "t1", alias: "main" }
-      limit: 10000
+      ],
+      from: { type: "table", table: "t1", alias: "main" },
+      limit: 10000,
       groupBy: [1, 2]
-    }
+    });
+});
 
-  it "creates nested query"
+  it("creates nested query");
 
-  it "adds filters query", ->
-    design = {
-      table: "t1"
+  it("adds filters query", function() {
+    const design = {
+      table: "t1",
       rows: [
-        { id: "r1", valueAxis: @axisEnum, filter: @exprBoolean }
-      ]
+        { id: "r1", valueAxis: this.axisEnum, filter: this.exprBoolean }
+      ],
       columns: [
-        { id: "c1", valueAxis: @axisText }
-      ]
+        { id: "c1", valueAxis: this.axisText }
+      ],
       intersections: {
         "r1:c1": {
-          valueAxis: @axisNumberSum
+          valueAxis: this.axisNumberSum
         }
       }
-    }
+    };
 
-    queries = @qb.createQueries(design)
-    assert.equal _.values(queries).length, 1, "Should have single query"
+    const queries = this.qb.createQueries(design);
+    assert.equal(_.values(queries).length, 1, "Should have single query");
 
-    query = queries["r1:c1"]
-    compare query, {
-      type: "query"
+    const query = queries["r1:c1"];
+    return compare(query, {
+      type: "query",
       selects: [
-        { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "r0" }
-        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "r0" },
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" },
         { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "value" }
-      ]
-      from: { type: "table", table: "t1", alias: "main" }
-      where: { type: "field", tableAlias: "main", column: "boolean" }
-      limit: 10000
+      ],
+      from: { type: "table", table: "t1", alias: "main" },
+      where: { type: "field", tableAlias: "main", column: "boolean" },
+      limit: 10000,
       groupBy: [1, 2]
-    }
+    });
+});
 
-  it "adds double filtered query", ->
-    design = {
-      table: "t1"
+  it("adds double filtered query", function() {
+    const design = {
+      table: "t1",
       rows: [
-        { id: "r1", valueAxis: @axisEnum, filter: @exprBoolean }
-      ]
+        { id: "r1", valueAxis: this.axisEnum, filter: this.exprBoolean }
+      ],
       columns: [
-        { id: "c1", valueAxis: @axisText }
-      ]
+        { id: "c1", valueAxis: this.axisText }
+      ],
       intersections: {
         "r1:c1": {
-          valueAxis: @axisNumberSum
+          valueAxis: this.axisNumberSum,
           filter: { type: "literal", valueType: "boolean", value: true }
         }
       }
-    }
+    };
 
-    queries = @qb.createQueries(design)
-    assert.equal _.values(queries).length, 1, "Should have single query"
+    const queries = this.qb.createQueries(design);
+    assert.equal(_.values(queries).length, 1, "Should have single query");
 
-    query = queries["r1:c1"]
-    compare query, {
-      type: "query"
+    const query = queries["r1:c1"];
+    return compare(query, {
+      type: "query",
       selects: [
-        { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "r0" }
-        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "r0" },
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" },
         { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "value" }
-      ]
-      from: { type: "table", table: "t1", alias: "main" }
+      ],
+      from: { type: "table", table: "t1", alias: "main" },
       where: {
-        type: "op"
-        op: "and"
+        type: "op",
+        op: "and",
         exprs: [
-          { type: "field", tableAlias: "main", column: "boolean" }
+          { type: "field", tableAlias: "main", column: "boolean" },
           { type: "literal", value: true }
         ]
-      }
-      limit: 10000
+      },
+      limit: 10000,
       groupBy: [1, 2]
-    }
+    });
+});
 
-  it "adds background color axis", ->
-    design = {
-      table: "t1"
+  it("adds background color axis", function() {
+    const design = {
+      table: "t1",
       rows: [
-        { id: "r1", valueAxis: @axisEnum }
-      ]
+        { id: "r1", valueAxis: this.axisEnum }
+      ],
       columns: [
-        { id: "c1", valueAxis: @axisText }
-      ]
+        { id: "c1", valueAxis: this.axisText }
+      ],
       intersections: {
         "r1:c1": {
-          valueAxis: @axisNumberSum
-          backgroundColorAxis: @axisCount
+          valueAxis: this.axisNumberSum,
+          backgroundColorAxis: this.axisCount
         }
       }
-    }
+    };
 
-    queries = @qb.createQueries(design)
-    assert.equal _.values(queries).length, 1, "Should have single query"
+    const queries = this.qb.createQueries(design);
+    assert.equal(_.values(queries).length, 1, "Should have single query");
 
-    query = queries["r1:c1"]
-    compare query, {
-      type: "query"
+    const query = queries["r1:c1"];
+    return compare(query, {
+      type: "query",
       selects: [
-        { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "r0" }
-        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
-        { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "value" }
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "r0" },
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" },
+        { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "value" },
         { type: "select", expr: { type: "op", op: "count", exprs: [] }, alias: "bc" }
-      ]
-      from: { type: "table", table: "t1", alias: "main" }
-      limit: 10000
+      ],
+      from: { type: "table", table: "t1", alias: "main" },
+      limit: 10000,
       groupBy: [1, 2]
-    }
+    });
+});
 
-  it "adds background color conditions", ->
-    design = {
-      table: "t1"
+  it("adds background color conditions", function() {
+    const design = {
+      table: "t1",
       rows: [
-        { id: "r1", valueAxis: @axisEnum }
-      ]
+        { id: "r1", valueAxis: this.axisEnum }
+      ],
       columns: [
-        { id: "c1", valueAxis: @axisText }
-      ]
+        { id: "c1", valueAxis: this.axisText }
+      ],
       intersections: {
         "r1:c1": {
-          valueAxis: @axisNumberSum
+          valueAxis: this.axisNumberSum,
           backgroundColorConditions: [
-            { condition: { type: "op", op: ">", table: "t1", exprs: [@exprNumberSum, { type: "literal", valueType: "number", value: 5 }]}, color: "red" }
+            { condition: { type: "op", op: ">", table: "t1", exprs: [this.exprNumberSum, { type: "literal", valueType: "number", value: 5 }]}, color: "red" }
           ]
         }
       }
-    }
+    };
 
-    queries = @qb.createQueries(design)
-    assert.equal _.values(queries).length, 1, "Should have single query"
+    const queries = this.qb.createQueries(design);
+    assert.equal(_.values(queries).length, 1, "Should have single query");
 
-    query = queries["r1:c1"]
-    compare query, {
-      type: "query"
+    const query = queries["r1:c1"];
+    return compare(query, {
+      type: "query",
       selects: [
-        { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "r0" }
-        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" }
-        { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "value" }
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "r0" },
+        { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c0" },
+        { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "value" },
         { 
-          type: "select"
+          type: "select",
           expr: { 
-            type: "op"
-            op: ">"
+            type: "op",
+            op: ">",
             exprs: [
-              { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }
+              { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] },
               { type: "literal", value: 5 }
             ]
-          }
+          },
           alias: "bcc0" 
         }
-      ]
-      from: { type: "table", table: "t1", alias: "main" }
-      limit: 10000
+      ],
+      from: { type: "table", table: "t1", alias: "main" },
+      limit: 10000,
       groupBy: [1, 2]
-    }
+    });
+});
 
-  it "creates ordered single query", ->
-    design = {
-      table: "t1"
+  it("creates ordered single query", function() {
+    const design = {
+      table: "t1",
       rows: [
-        { id: "r1", valueAxis: @axisEnum, orderExpr: @exprNumberSum, orderDir: "desc" }
-      ]
+        { id: "r1", valueAxis: this.axisEnum, orderExpr: this.exprNumberSum, orderDir: "desc" }
+      ],
       columns: [
-        { id: "c1", valueAxis: @axisText }
-      ]
+        { id: "c1", valueAxis: this.axisText }
+      ],
       intersections: {
         "r1:c1": {
-          valueAxis: @axisNumberSum
+          valueAxis: this.axisNumberSum
         }
       }
-    }
+    };
 
-    queries = @qb.createQueries(design)
+    const queries = this.qb.createQueries(design);
 
-    query = queries["r1"]
-    compare query, {
-      type: "query"
+    const query = queries["r1"];
+    return compare(query, {
+      type: "query",
       selects: [
         { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "value" }
-      ]
-      from: { type: "table", table: "t1", alias: "main" }
-      where: { type: "op", op: "or", exprs: [{ type: "literal", value: true }] }
-      groupBy: [1]
+      ],
+      from: { type: "table", table: "t1", alias: "main" },
+      where: { type: "op", op: "or", exprs: [{ type: "literal", value: true }] },
+      groupBy: [1],
       orderBy: [{ expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, direction: "desc" }]
-    }
+    });
+});
 
 
-  it "creates ordered single query which includes filters", ->
-    design = {
-      table: "t1"
+  it("creates ordered single query which includes filters", function() {
+    const design = {
+      table: "t1",
       rows: [
-        { id: "r1", valueAxis: @axisEnum, orderExpr: @exprNumberSum, orderDir: "desc", filter: @exprBoolean }
-      ]
+        { id: "r1", valueAxis: this.axisEnum, orderExpr: this.exprNumberSum, orderDir: "desc", filter: this.exprBoolean }
+      ],
       columns: [
-        { id: "c1", valueAxis: @axisText }
-      ]
+        { id: "c1", valueAxis: this.axisText }
+      ],
       intersections: {
         "r1:c1": {
-          valueAxis: @axisNumberSum
+          valueAxis: this.axisNumberSum,
           filter: { type: "literal", valueType: "boolean", value: true }
         }
       }
-    }
+    };
 
-    queries = @qb.createQueries(design)
+    const queries = this.qb.createQueries(design);
 
-    query = queries["r1"]
-    compare query, {
-      type: "query"
+    const query = queries["r1"];
+    return compare(query, {
+      type: "query",
       selects: [
         { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "value" }
-      ]
-      from: { type: "table", table: "t1", alias: "main" }
+      ],
+      from: { type: "table", table: "t1", alias: "main" },
       where: {
-        type: "op"
-        op: "and"
+        type: "op",
+        op: "and",
         exprs: [
-          { type: "field", tableAlias: "main", column: "boolean" }
+          { type: "field", tableAlias: "main", column: "boolean" },
           {
-            type: "op"
-            op: "or"
+            type: "op",
+            op: "or",
             exprs: [
               { type: "literal", value: true }
             ]
           }
         ]
-      }
-      groupBy: [1]
+      },
+      groupBy: [1],
       orderBy: [{ expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, direction: "desc" }]
-    }
+    });
+});
 
-  it "creates ordered single query with extraFilters", ->
-    design = {
-      table: "t1"
+  return it("creates ordered single query with extraFilters", function() {
+    const design = {
+      table: "t1",
       rows: [
-        { id: "r1", valueAxis: @axisEnum, orderExpr: @exprNumberSum, orderDir: "desc" }
-      ]
+        { id: "r1", valueAxis: this.axisEnum, orderExpr: this.exprNumberSum, orderDir: "desc" }
+      ],
       columns: [
-        { id: "c1", valueAxis: @axisText }
-      ]
+        { id: "c1", valueAxis: this.axisText }
+      ],
       intersections: {
         "r1:c1": {
-          valueAxis: @axisNumberSum
+          valueAxis: this.axisNumberSum
         }
       }
-    }
+    };
 
-    queries = @qb.createQueries(design, [{ table: "t1", jsonql: { type: "literal", value: false }}, { table: "t2", jsonql: { type: "literal", value: true }}])
+    const queries = this.qb.createQueries(design, [{ table: "t1", jsonql: { type: "literal", value: false }}, { table: "t2", jsonql: { type: "literal", value: true }}]);
 
-    query = queries["r1"]
-    compare query, {
-      type: "query"
+    const query = queries["r1"];
+    return compare(query, {
+      type: "query",
       selects: [
         { type: "select", expr: { type: "field", tableAlias: "main", column: "enum" }, alias: "value" }
-      ]
-      from: { type: "table", table: "t1", alias: "main" }
+      ],
+      from: { type: "table", table: "t1", alias: "main" },
       where: { type: "op", op: "and", exprs: [
-        { type: "op", op: "or", exprs: [{ type: "literal", value: true }] }
+        { type: "op", op: "or", exprs: [{ type: "literal", value: true }] },
         { type: "literal", value: false }
-      ]}
-      groupBy: [1]
+      ]},
+      groupBy: [1],
       orderBy: [{ expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, direction: "desc" }]
-    }
+    });
+});
+});

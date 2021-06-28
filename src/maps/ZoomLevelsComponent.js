@@ -1,48 +1,68 @@
-PropTypes = require('prop-types')
-_ = require 'lodash'
-React = require 'react'
-R = React.createElement
+let ZoomLevelsComponent;
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import React from 'react';
+const R = React.createElement;
 
-NumberInputComponent = require('react-library/lib/NumberInputComponent')
+import NumberInputComponent from 'react-library/lib/NumberInputComponent';
 
-# Zoom level min and max control
-module.exports = class ZoomLevelsComponent extends React.Component
-  @propTypes:
-    design: PropTypes.object.isRequired
-    onDesignChange: PropTypes.func.isRequired
-
-  constructor: (props) ->
-    super(props)
-
-    @state = {
-      expanded: false
+// Zoom level min and max control
+export default ZoomLevelsComponent = (function() {
+  ZoomLevelsComponent = class ZoomLevelsComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        design: PropTypes.object.isRequired,
+        onDesignChange: PropTypes.func.isRequired
+      };
     }
 
-  render: ->
-    if not @state.expanded
-      return R 'div', null,
-        R 'a', className: "btn btn-link btn-xs", onClick: (=> @setState(expanded: true)),
-          "Advanced options..."
+    constructor(props) {
+      super(props);
 
-    return R 'div', className: "form-group",
-      R 'label', className: "text-muted", "Advanced"
-      R 'div', key: "min",
-        R 'span', className: "text-muted", "Minimum Zoom Level:"
-        " "
-        R NumberInputComponent, 
-          small: true
-          style: { display: "inline-block"}
-          placeholder: "None"
-          value: @props.design.minZoom
-          onChange: (v) => @props.onDesignChange(_.extend({}, @props.design, minZoom: v))
+      this.state = {
+        expanded: false
+      };
+    }
 
-      R 'div', key: "max",
-        R 'span', className: "text-muted", "Maximum Zoom Level: "
-        " "
-        R NumberInputComponent, 
-          small: true
-          style: { display: "inline-block"}
-          placeholder: "None"
-          value: @props.design.maxZoom
-          onChange: (v) => @props.onDesignChange(_.extend({}, @props.design, maxZoom: v))
+    render() {
+      if (!this.state.expanded) {
+        return R('div', null,
+          R('a', {className: "btn btn-link btn-xs", onClick: (() => this.setState({expanded: true}))},
+            "Advanced options...")
+        );
+      }
+
+      return R('div', {className: "form-group"},
+        R('label', {className: "text-muted"}, "Advanced"),
+        R('div', {key: "min"},
+          R('span', {className: "text-muted"}, "Minimum Zoom Level:"),
+          " ",
+          R(NumberInputComponent, { 
+            small: true,
+            style: { display: "inline-block"},
+            placeholder: "None",
+            value: this.props.design.minZoom,
+            onChange: v => this.props.onDesignChange(_.extend({}, this.props.design, {minZoom: v}))
+          }
+          )
+        ),
+
+        R('div', {key: "max"},
+          R('span', {className: "text-muted"}, "Maximum Zoom Level: "),
+          " ",
+          R(NumberInputComponent, { 
+            small: true,
+            style: { display: "inline-block"},
+            placeholder: "None",
+            value: this.props.design.maxZoom,
+            onChange: v => this.props.onDesignChange(_.extend({}, this.props.design, {maxZoom: v}))
+          }
+          )
+        )
+      );
+    }
+  };
+  ZoomLevelsComponent.initClass();
+  return ZoomLevelsComponent;
+})();
 

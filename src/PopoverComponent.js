@@ -1,42 +1,59 @@
-_ = require 'lodash'
-$ = require 'jquery'
-PropTypes = require('prop-types')
-React = require 'react'
-ReactDOM = require 'react-dom'
+let PopoverComponent;
+import _ from 'lodash';
+import $ from 'jquery';
+import PropTypes from 'prop-types';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-# Wraps a child with an optional popover
-module.exports = class PopoverComponent extends React.Component
-  @propTypes: 
-    content: PropTypes.node.isRequired     # contents of popover
-    placement: PropTypes.string # See http://getbootstrap.com/javascript/#popovers
-    visible: PropTypes.bool.isRequired
+// Wraps a child with an optional popover
+export default PopoverComponent = (function() {
+  PopoverComponent = class PopoverComponent extends React.Component {
+    static initClass() {
+      this.propTypes = { 
+        content: PropTypes.node.isRequired,     // contents of popover
+        placement: PropTypes.string, // See http://getbootstrap.com/javascript/#popovers
+        visible: PropTypes.bool.isRequired
+      };
+    }
 
-  componentDidMount: ->
-    @updatePopover(@props, null)
+    componentDidMount() {
+      return this.updatePopover(this.props, null);
+    }
 
-  componentWillUnmount: ->
-    @updatePopover(null, @props)
+    componentWillUnmount() {
+      return this.updatePopover(null, this.props);
+    }
 
-  componentDidUpdate: (prevProps) ->
-    if not _.isEqual(prevProps.content, @props.content) or prevProps.visible != @props.visible or prevProps.placement != @props.placement
-      @updatePopover(@props, prevProps)
+    componentDidUpdate(prevProps) {
+      if (!_.isEqual(prevProps.content, this.props.content) || (prevProps.visible !== this.props.visible) || (prevProps.placement !== this.props.placement)) {
+        return this.updatePopover(this.props, prevProps);
+      }
+    }
 
-  updatePopover: (props, oldProps) ->
-    # Destroy old popover
-    if oldProps and oldProps.visible
-      $(ReactDOM.findDOMNode(this)).popover("destroy")      
+    updatePopover(props, oldProps) {
+      // Destroy old popover
+      if (oldProps && oldProps.visible) {
+        $(ReactDOM.findDOMNode(this)).popover("destroy");      
+      }
       
-    if props and props.visible
-      div = document.createElement("div")
-      ReactDOM.render(@props.content, div, =>
-        $(ReactDOM.findDOMNode(this)).popover({
-          content: -> $(div)
-          html: true
-          trigger: "manual"
-          placement: @props.placement
-        })
-        $(ReactDOM.findDOMNode(this)).popover("show")
-      )
+      if (props && props.visible) {
+        const div = document.createElement("div");
+        return ReactDOM.render(this.props.content, div, () => {
+          $(ReactDOM.findDOMNode(this)).popover({
+            content() { return $(div); },
+            html: true,
+            trigger: "manual",
+            placement: this.props.placement
+          });
+          return $(ReactDOM.findDOMNode(this)).popover("show");
+        });
+      }
+    }
       
-  render: ->
-    React.Children.only(@props.children)
+    render() {
+      return React.Children.only(this.props.children);
+    }
+  };
+  PopoverComponent.initClass();
+  return PopoverComponent;
+})();

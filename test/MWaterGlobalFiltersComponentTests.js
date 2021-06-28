@@ -1,70 +1,78 @@
-R = require('react').createElement
-sinon = require 'sinon'
-enzyme = require 'enzyme'
-assert = require('chai').assert
-Schema = require('mwater-expressions').Schema
-ui = require 'react-library/lib/bootstrap'
-IdLiteralComponent = require('mwater-expressions-ui').IdLiteralComponent
+import { createElement as R } from 'react';
+import sinon from 'sinon';
+import enzyme from 'enzyme';
+import { assert } from 'chai';
+import { Schema } from 'mwater-expressions';
+import ui from 'react-library/lib/bootstrap';
+import { IdLiteralComponent } from 'mwater-expressions-ui';
+import MWaterGlobalFiltersComponent from '../src/MWaterGlobalFiltersComponent';
 
-MWaterGlobalFiltersComponent = require '../src/MWaterGlobalFiltersComponent'
+enzyme.configure({ adapter: new (require('enzyme-adapter-react-16'))() }); // Configure enzyme for react 16
 
-enzyme.configure({ adapter: new (require('enzyme-adapter-react-16'))() }) # Configure enzyme for react 16
-
-describe "MWaterGlobalFiltersComponent", ->
-  it "extracts _managed_by filter", ->
-    wrapper = enzyme.shallow(R(MWaterGlobalFiltersComponent, 
+describe("MWaterGlobalFiltersComponent", function() {
+  it("extracts _managed_by filter", function() {
+    const wrapper = enzyme.shallow(R(MWaterGlobalFiltersComponent, { 
       schema: {}, 
       dataSource: {}, 
       filterableTables: [], 
-      globalFilters: [{ columnId: "_managed_by", columnType: "id", op: "within", exprs: [{ type: "literal", valueType: "id", idTable: "subjects", value: "group:xyz" }]}]
-      onChange: (->)
-    ))
+      globalFilters: [{ columnId: "_managed_by", columnType: "id", op: "within", exprs: [{ type: "literal", valueType: "id", idTable: "subjects", value: "group:xyz" }]}],
+      onChange() {}
+    }
+    ));
     
-    managedByControl = wrapper.find(IdLiteralComponent).at(0)
-    assert.equal managedByControl.prop("value"), "xyz", "Should be displaying group"
+    const managedByControl = wrapper.find(IdLiteralComponent).at(0);
+    return assert.equal(managedByControl.prop("value"), "xyz", "Should be displaying group");
+  });
 
-  it "updates _managed_by", ->
-    onChange = sinon.spy()
+  it("updates _managed_by", function() {
+    const onChange = sinon.spy();
 
-    wrapper = enzyme.shallow(R(MWaterGlobalFiltersComponent, 
+    const wrapper = enzyme.shallow(R(MWaterGlobalFiltersComponent, { 
       schema: {}, 
       dataSource: {}, 
       filterableTables: [], 
-      globalFilters: [{ columnId: "_managed_by", columnType: "id", op: "within", exprs: [{ type: "literal", valueType: "id", idTable: "subjects", value: "group:xyz" }]}]
-      onChange: onChange
-    ))
+      globalFilters: [{ columnId: "_managed_by", columnType: "id", op: "within", exprs: [{ type: "literal", valueType: "id", idTable: "subjects", value: "group:xyz" }]}],
+      onChange
+    }
+    ));
     
-    managedByControl = wrapper.find(IdLiteralComponent).at(0)
-    managedByControl.prop("onChange")("abc")
+    const managedByControl = wrapper.find(IdLiteralComponent).at(0);
+    managedByControl.prop("onChange")("abc");
 
-    # Should set filter
-    assert onChange.calledWith([{ columnId: "_managed_by", columnType: "id", op: "within", exprs: [{ type: "literal", valueType: "id", idTable: "subjects", value: "group:abc" }]}])
+    // Should set filter
+    return assert(onChange.calledWith([{ columnId: "_managed_by", columnType: "id", op: "within", exprs: [{ type: "literal", valueType: "id", idTable: "subjects", value: "group:abc" }]}]));
+  });
 
-  it "extracts admin_region", ->
-    wrapper = enzyme.shallow(R(MWaterGlobalFiltersComponent, 
+  it("extracts admin_region", function() {
+    const wrapper = enzyme.shallow(R(MWaterGlobalFiltersComponent, { 
       schema: {}, 
       dataSource: {}, 
       filterableTables: [], 
-      globalFilters: [{ columnId: "admin_region", columnType: "id", op: "within any", exprs: [{ type: "literal", valueType: "id[]", idTable: "admin_regions", value: [123, 456] }]}]
-      onChange: (->)
-    ))
+      globalFilters: [{ columnId: "admin_region", columnType: "id", op: "within any", exprs: [{ type: "literal", valueType: "id[]", idTable: "admin_regions", value: [123, 456] }]}],
+      onChange() {}
+    }
+    ));
     
-    adminRegionsControl = wrapper.find(IdLiteralComponent).at(1)
-    assert.deepEqual adminRegionsControl.prop("value"), [123, 456], "Should be displaying admin_region"
+    const adminRegionsControl = wrapper.find(IdLiteralComponent).at(1);
+    return assert.deepEqual(adminRegionsControl.prop("value"), [123, 456], "Should be displaying admin_region");
+  });
 
-  it "updates admin_region", ->
-    onChange = sinon.spy()
+  return it("updates admin_region", function() {
+    const onChange = sinon.spy();
 
-    wrapper = enzyme.shallow(R(MWaterGlobalFiltersComponent, 
+    const wrapper = enzyme.shallow(R(MWaterGlobalFiltersComponent, { 
       schema: {}, 
       dataSource: {}, 
       filterableTables: [], 
-      globalFilters: [{ columnId: "admin_region", columnType: "id", op: "within any", exprs: [{ type: "literal", valueType: "id[]", idTable: "admin_regions", value: [123, 456] }]}]
-      onChange: onChange
-    ))
+      globalFilters: [{ columnId: "admin_region", columnType: "id", op: "within any", exprs: [{ type: "literal", valueType: "id[]", idTable: "admin_regions", value: [123, 456] }]}],
+      onChange
+    }
+    ));
     
-    adminRegionsControl = wrapper.find(IdLiteralComponent).at(1)
-    adminRegionsControl.prop("onChange")([789])
+    const adminRegionsControl = wrapper.find(IdLiteralComponent).at(1);
+    adminRegionsControl.prop("onChange")([789]);
 
-    # Should set filter
-    assert onChange.calledWith([{ columnId: "admin_region", columnType: "id", op: "within any", exprs: [{ type: "literal", valueType: "id[]", idTable: "admin_regions", value: [789] }]}])
+    // Should set filter
+    return assert(onChange.calledWith([{ columnId: "admin_region", columnType: "id", op: "within any", exprs: [{ type: "literal", valueType: "id[]", idTable: "admin_regions", value: [789] }]}]));
+  });
+});

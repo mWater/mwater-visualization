@@ -1,36 +1,52 @@
-PropTypes = require('prop-types')
-React = require 'react'
-R = React.createElement
+let ImagePopupComponent;
+import PropTypes from 'prop-types';
+import React from 'react';
+const R = React.createElement;
 
-ModalWindowComponent = require('react-library/lib/ModalWindowComponent')
-RotationAwareImageComponent = require("mwater-forms/lib/RotationAwareImageComponent")
+import ModalWindowComponent from 'react-library/lib/ModalWindowComponent';
+import RotationAwareImageComponent from "mwater-forms/lib/RotationAwareImageComponent";
 
-# Displays an image in a popup
-module.exports = class ImagePopupComponent extends React.Component
-  @propTypes:
-    imageManager: PropTypes.object.isRequired
-
-  constructor: (props) ->
-    super(props)
-
-    @state = {
-      image: null # Set to display
-      url: null
+// Displays an image in a popup
+export default ImagePopupComponent = (function() {
+  ImagePopupComponent = class ImagePopupComponent extends React.Component {
+    static initClass() {
+      this.propTypes =
+        {imageManager: PropTypes.object.isRequired};
     }
 
-  # Shows image object
-  show: (image) -> 
-    @props.imageManager.getImageUrl(image.id, (url) =>
-      @setState(image: image, url: url)
-    )
+    constructor(props) {
+      super(props);
 
-  render: ->
-    if not @state.image or not @state.url
-      return null
+      this.state = {
+        image: null, // Set to display
+        url: null
+      };
+    }
 
-    return R ModalWindowComponent, 
-      isOpen: true
-      onRequestClose: (=> @setState(image: null, url: null)),
-        R RotationAwareImageComponent, 
-          imageManager: @props.imageManager
-          image: @state.image
+    // Shows image object
+    show(image) { 
+      return this.props.imageManager.getImageUrl(image.id, url => {
+        return this.setState({image, url});
+      });
+    }
+
+    render() {
+      if (!this.state.image || !this.state.url) {
+        return null;
+      }
+
+      return R(ModalWindowComponent, { 
+        isOpen: true,
+        onRequestClose: (() => this.setState({image: null, url: null}))
+      },
+          R(RotationAwareImageComponent, { 
+            imageManager: this.props.imageManager,
+            image: this.state.image
+          }
+          )
+      );
+    }
+  };
+  ImagePopupComponent.initClass();
+  return ImagePopupComponent;
+})();

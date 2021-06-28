@@ -1,106 +1,111 @@
-R = require('react').createElement
-sinon = require 'sinon'
-enzyme = require 'enzyme'
-assert = require('chai').assert
-Schema = require('mwater-expressions').Schema
-ui = require 'react-library/lib/bootstrap'
+import { createElement as R } from 'react';
+import sinon from 'sinon';
+import enzyme from 'enzyme';
+import { assert } from 'chai';
+import { Schema } from 'mwater-expressions';
+import ui from 'react-library/lib/bootstrap';
+import MWaterResponsesFilterComponent from '../src/MWaterResponsesFilterComponent';
 
-MWaterResponsesFilterComponent = require '../src/MWaterResponsesFilterComponent'
+enzyme.configure({ adapter: new (require('enzyme-adapter-react-16'))() }); // Configure enzyme for react 16
 
-enzyme.configure({ adapter: new (require('enzyme-adapter-react-16'))() }) # Configure enzyme for react 16
-
-describe "MWaterResponsesFilterComponent", ->
-  before ->
-    @schema = new Schema()
-    @schema = @schema.addTable({ id: "responses:xyz", name: { en: "Survey" }, primaryKey: "_id", contents: [
-      { id: "status", type: "enum", name: { en: "Status" }, enumValues: [{ id: "final", name: { en: "Final" } }] }
+describe("MWaterResponsesFilterComponent", function() {
+  before(function() {
+    this.schema = new Schema();
+    this.schema = this.schema.addTable({ id: "responses:xyz", name: { en: "Survey" }, primaryKey: "_id", contents: [
+      { id: "status", type: "enum", name: { en: "Status" }, enumValues: [{ id: "final", name: { en: "Final" } }] },
       { 
-        id: "data:site1"
-        type: "join"
-        name: { en: "Site1" }
+        id: "data:site1",
+        type: "join",
+        name: { en: "Site1" },
         join: {
-          type: "n-1"
-          toTable: "entities.water_point"
-          fromColumn: "data:site1"
+          type: "n-1",
+          toTable: "entities.water_point",
+          fromColumn: "data:site1",
+          toColumn: "code"
+        }
+      },
+      { 
+        id: "data:site2",
+        type: "join",
+        name: { en: "Site2" },
+        join: {
+          type: "n-1",
+          toTable: "entities.community",
+          fromColumn: "data:site2",
           toColumn: "code"
         }
       }
-      { 
-        id: "data:site2"
-        type: "join"
-        name: { en: "Site2" }
-        join: {
-          type: "n-1"
-          toTable: "entities.community"
-          fromColumn: "data:site2"
-          toColumn: "code"
-        }
-      }
-    ]})
+    ]});
 
-    @finalFilter = { type: "op", op: "= any", table: "responses:xyz", exprs: [
-      { type: "field", table: "responses:xyz", column: "status" }
+    this.finalFilter = { type: "op", op: "= any", table: "responses:xyz", exprs: [
+      { type: "field", table: "responses:xyz", column: "status" },
       { type: "literal", valueType: "enumset", value: ["final"] }
-    ]}
+    ]};
 
-    @latestFilter = { type: "op", op: "is latest", table: "responses:xyz", exprs: [
+    this.latestFilter = { type: "op", op: "is latest", table: "responses:xyz", exprs: [
       { type: "field", table: "responses:xyz", column: "data:site1" }
-    ]}
+    ]};
 
-    @latestFinalFilter = { type: "op", op: "is latest", table: "responses:xyz", exprs: [
-      { type: "field", table: "responses:xyz", column: "data:site1" }
-      @finalFilter
-    ]}
+    this.latestFinalFilter = { type: "op", op: "is latest", table: "responses:xyz", exprs: [
+      { type: "field", table: "responses:xyz", column: "data:site1" },
+      this.finalFilter
+    ]};
 
-    @otherFilter = { type: "field", table: "responses:xyz", column: "other" }
+    return this.otherFilter = { type: "field", table: "responses:xyz", column: "other" };});
 
-  it "filters from none to final", ->
-    onChange = sinon.spy()
-    wrapper = enzyme.shallow(R(MWaterResponsesFilterComponent, table: "responses:xyz", schema: @schema, filter: null, onFilterChange: onChange))
+  it("filters from none to final", function() {
+    const onChange = sinon.spy();
+    const wrapper = enzyme.shallow(R(MWaterResponsesFilterComponent, {table: "responses:xyz", schema: this.schema, filter: null, onFilterChange: onChange}));
 
-    # Set checkbox to true
-    wrapper.find(ui.Checkbox).prop("onChange")(true)
+    // Set checkbox to true
+    wrapper.find(ui.Checkbox).prop("onChange")(true);
 
-    # Should set filter
-    assert onChange.calledWith(@finalFilter)
+    // Should set filter
+    return assert(onChange.calledWith(this.finalFilter));
+  });
  
-  it "clears final filter, preserving others", ->
-    onChange = sinon.spy()
-    filter = {
-      type: "op"
-      table: "responses:xyz"
-      op: "and"
-      exprs: [@otherFilter, @finalFilter]
-    }
-    wrapper = enzyme.shallow(R(MWaterResponsesFilterComponent, table: "responses:xyz", schema: @schema, filter: filter, onFilterChange: onChange))
+  it("clears final filter, preserving others", function() {
+    const onChange = sinon.spy();
+    const filter = {
+      type: "op",
+      table: "responses:xyz",
+      op: "and",
+      exprs: [this.otherFilter, this.finalFilter]
+    };
+    const wrapper = enzyme.shallow(R(MWaterResponsesFilterComponent, {table: "responses:xyz", schema: this.schema, filter, onFilterChange: onChange}));
 
-    # Final checkbox should be true
-    assert.isTrue wrapper.find(ui.Checkbox).prop("value")
+    // Final checkbox should be true
+    assert.isTrue(wrapper.find(ui.Checkbox).prop("value"));
 
-    # Set checkbox to false
-    wrapper.find(ui.Checkbox).prop("onChange")(false)
+    // Set checkbox to false
+    wrapper.find(ui.Checkbox).prop("onChange")(false);
 
-    # Should set filter
-    assert.isTrue onChange.calledWith(@otherFilter)
+    // Should set filter
+    return assert.isTrue(onChange.calledWith(this.otherFilter));
+  });
 
-  it "lists site questions + all", ->
-    wrapper = enzyme.shallow(R(MWaterResponsesFilterComponent, table: "responses:xyz", schema: @schema, filter: null, onFilterChange: ->))
-    assert.equal wrapper.find(ui.Radio).length, 3
+  it("lists site questions + all", function() {
+    const wrapper = enzyme.shallow(R(MWaterResponsesFilterComponent, {table: "responses:xyz", schema: this.schema, filter: null, onFilterChange() {}}));
+    return assert.equal(wrapper.find(ui.Radio).length, 3);
+  });
 
-  it "adds non-final site", ->
-    onChange = sinon.spy()
-    wrapper = enzyme.shallow(R(MWaterResponsesFilterComponent, table: "responses:xyz", schema: @schema, filter: null, onFilterChange: onChange))
+  it("adds non-final site", function() {
+    const onChange = sinon.spy();
+    const wrapper = enzyme.shallow(R(MWaterResponsesFilterComponent, {table: "responses:xyz", schema: this.schema, filter: null, onFilterChange: onChange}));
     
-    radio = wrapper.find(ui.Radio).at(1)
-    radio.prop("onChange")(radio.prop("radioValue"))
+    const radio = wrapper.find(ui.Radio).at(1);
+    radio.prop("onChange")(radio.prop("radioValue"));
 
-    assert.isTrue onChange.calledWith(@latestFilter), JSON.stringify(onChange.firstCall.args)
+    return assert.isTrue(onChange.calledWith(this.latestFilter), JSON.stringify(onChange.firstCall.args));
+  });
 
-  it "adds final site", ->
-    onChange = sinon.spy()
-    wrapper = enzyme.shallow(R(MWaterResponsesFilterComponent, table: "responses:xyz", schema: @schema, filter: @finalFilter, onFilterChange: onChange))
+  return it("adds final site", function() {
+    const onChange = sinon.spy();
+    const wrapper = enzyme.shallow(R(MWaterResponsesFilterComponent, {table: "responses:xyz", schema: this.schema, filter: this.finalFilter, onFilterChange: onChange}));
     
-    radio = wrapper.find(ui.Radio).at(1)
-    radio.prop("onChange")(radio.prop("radioValue"))
+    const radio = wrapper.find(ui.Radio).at(1);
+    radio.prop("onChange")(radio.prop("radioValue"));
 
-    assert.isTrue onChange.calledWith(@latestFinalFilter), JSON.stringify(onChange.firstCall.args)
+    return assert.isTrue(onChange.calledWith(this.latestFinalFilter), JSON.stringify(onChange.firstCall.args));
+  });
+});

@@ -1,189 +1,251 @@
-PropTypes = require('prop-types')
-_ = require 'lodash'
-React = require 'react'
-R = React.createElement
-ExprCompiler = require('mwater-expressions').ExprCompiler
-AxisBuilder = require './AxisBuilder'
-update = require 'update-object'
-ColorComponent = require '../ColorComponent'
-ExprUtils = require('mwater-expressions').ExprUtils
-ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
-produce = require('immer').default
+let CategoryMapComponent;
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import React from 'react';
+const R = React.createElement;
+import { ExprCompiler } from 'mwater-expressions';
+import AxisBuilder from './AxisBuilder';
+import update from 'update-object';
+import ColorComponent from '../ColorComponent';
+import { ExprUtils } from 'mwater-expressions';
+import ReorderableListComponent from "react-library/lib/reorderable/ReorderableListComponent";
+import { default as produce } from 'immer';
 
-# Category map for an axis. Controls the colorMap values and excludedValues
-# Can be collapsed
-module.exports = class CategoryMapComponent extends React.Component
-  @propTypes:
-    schema: PropTypes.object.isRequired
-    axis: PropTypes.object.isRequired
-    onChange: PropTypes.func.isRequired
-    categories: PropTypes.array
-    reorderable: PropTypes.bool
-    showColorMap: PropTypes.bool  # True to allow editing the color map
-    allowExcludedValues: PropTypes.bool # True to allow excluding of values via checkboxes
-    initiallyExpanded: PropTypes.bool  # True to start expanded
-
-  constructor: (props) ->
-    super(props)
-
-    @state = {
-      collapsed: not props.initiallyExpanded  # Start collapsed
+// Category map for an axis. Controls the colorMap values and excludedValues
+// Can be collapsed
+export default CategoryMapComponent = (function() {
+  CategoryMapComponent = class CategoryMapComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        schema: PropTypes.object.isRequired,
+        axis: PropTypes.object.isRequired,
+        onChange: PropTypes.func.isRequired,
+        categories: PropTypes.array,
+        reorderable: PropTypes.bool,
+        showColorMap: PropTypes.bool,  // True to allow editing the color map
+        allowExcludedValues: PropTypes.bool, // True to allow excluding of values via checkboxes
+        initiallyExpanded: PropTypes.bool
+      };
+        // True to start expanded
     }
 
-  handleReorder: (map) =>
-    order = _.pluck(map, "value")
-    @props.onChange(update(@props.axis, { drawOrder: { $set: order }}))
+    constructor(props) {
+      this.handleReorder = this.handleReorder.bind(this);
+      this.handleColorChange = this.handleColorChange.bind(this);
+      this.handleExcludeChange = this.handleExcludeChange.bind(this);
+      this.handleNullLabelChange = this.handleNullLabelChange.bind(this);
+      this.handleCategoryLabelChange = this.handleCategoryLabelChange.bind(this);
+      this.handleToggle = this.handleToggle.bind(this);
+      this.renderCategory = this.renderCategory.bind(this);
+      super(props);
 
-  handleColorChange: (value, color) =>
-    # Delete if present for value
-    colorMap = _.filter(@props.axis.colorMap, (item) => item.value != value)
+      this.state = {
+        collapsed: !props.initiallyExpanded  // Start collapsed
+      };
+    }
 
-    # Add if color present
-    if color
-      colorMap.push({ value: value, color: color })
+    handleReorder(map) {
+      const order = _.pluck(map, "value");
+      return this.props.onChange(update(this.props.axis, { drawOrder: { $set: order }}));
+    }
 
-    @props.onChange(update(@props.axis, { colorMap: { $set: colorMap }}))
+    handleColorChange(value, color) {
+      // Delete if present for value
+      const colorMap = _.filter(this.props.axis.colorMap, item => item.value !== value);
 
-  handleExcludeChange: (value, ev) =>
-    if ev.target.checked
-      excludedValues = _.difference(@props.axis.excludedValues, [value])
-    else
-      excludedValues = _.union(@props.axis.excludedValues, [value])
+      // Add if color present
+      if (color) {
+        colorMap.push({ value, color });
+      }
 
-    @props.onChange(update(@props.axis, { excludedValues: { $set: excludedValues }}))
+      return this.props.onChange(update(this.props.axis, { colorMap: { $set: colorMap }}));
+    }
 
-  # Gets the current color value if known
-  lookupColor: (value) ->
-    item = _.find(@props.axis.colorMap, (item) => item.value == value)
-    if item
-      return item.color
-    return null
+    handleExcludeChange(value, ev) {
+      let excludedValues;
+      if (ev.target.checked) {
+        excludedValues = _.difference(this.props.axis.excludedValues, [value]);
+      } else {
+        excludedValues = _.union(this.props.axis.excludedValues, [value]);
+      }
 
-  handleNullLabelChange: (e) =>
-    name = prompt("Enter label for none value", @props.axis.nullLabel or "None")
-    if name
-      @props.onChange(update(@props.axis, { nullLabel: { $set: name }}))
+      return this.props.onChange(update(this.props.axis, { excludedValues: { $set: excludedValues }}));
+    }
 
-  handleCategoryLabelChange: (category, e) =>
-    label = category.label
-    if @props.axis.categoryLabels
-      label = @props.axis.categoryLabels[JSON.stringify(category.value)] or label
+    // Gets the current color value if known
+    lookupColor(value) {
+      const item = _.find(this.props.axis.colorMap, item => item.value === value);
+      if (item) {
+        return item.color;
+      }
+      return null;
+    }
 
-    name = prompt("Enter label or blank to reset", label)
-    if name?
-      if name
-        @props.onChange(produce(@props.axis, (draft) =>
-          draft.categoryLabels = draft.categoryLabels or {}
-          draft.categoryLabels[JSON.stringify(category.value)] = name
-          return
-        ))
-      else
-        @props.onChange(produce(@props.axis, (draft) =>
-          draft.categoryLabels = draft.categoryLabels or {}
-          delete draft.categoryLabels[JSON.stringify(category.value)]
-          return
-        ))
+    handleNullLabelChange(e) {
+      const name = prompt("Enter label for none value", this.props.axis.nullLabel || "None");
+      if (name) {
+        return this.props.onChange(update(this.props.axis, { nullLabel: { $set: name }}));
+      }
+    }
 
-  handleToggle: =>
-    @setState(collapsed: not @state.collapsed)
-
-  renderLabel: (category) ->
-    label = category.label
-    if @props.axis.categoryLabels
-      label = @props.axis.categoryLabels[JSON.stringify(category.value)] or label
-
-    if category.value?
-      R 'a', onClick: @handleCategoryLabelChange.bind(null, category), style: {cursor: 'pointer'},
+    handleCategoryLabelChange(category, e) {
+      let {
         label
-    else
-      R 'a', onClick: @handleNullLabelChange, style: {cursor: 'pointer'},
+      } = category;
+      if (this.props.axis.categoryLabels) {
+        label = this.props.axis.categoryLabels[JSON.stringify(category.value)] || label;
+      }
+
+      const name = prompt("Enter label or blank to reset", label);
+      if (name != null) {
+        if (name) {
+          return this.props.onChange(produce(this.props.axis, draft => {
+            draft.categoryLabels = draft.categoryLabels || {};
+            draft.categoryLabels[JSON.stringify(category.value)] = name;
+          }));
+        } else {
+          return this.props.onChange(produce(this.props.axis, draft => {
+            draft.categoryLabels = draft.categoryLabels || {};
+            delete draft.categoryLabels[JSON.stringify(category.value)];
+          }));
+        }
+      }
+    }
+
+    handleToggle() {
+      return this.setState({collapsed: !this.state.collapsed});
+    }
+
+    renderLabel(category) {
+      let {
         label
-        R 'span', style: {fontSize: 12, marginLeft: 4}, "(click to change label for none value)"
+      } = category;
+      if (this.props.axis.categoryLabels) {
+        label = this.props.axis.categoryLabels[JSON.stringify(category.value)] || label;
+      }
 
-  # Category is { value: category value, label: category label }
-  renderCategory: (category, index, connectDragSource, connectDragPreview, connectDropTarget) =>
-    labelStyle =
-      verticalAlign: 'middle'
-      marginLeft: 5
+      if (category.value != null) {
+        return R('a', {onClick: this.handleCategoryLabelChange.bind(null, category), style: {cursor: 'pointer'}},
+          label);
+      } else {
+        return R('a', {onClick: this.handleNullLabelChange, style: {cursor: 'pointer'}},
+          label,
+          R('span', {style: {fontSize: 12, marginLeft: 4}}, "(click to change label for none value)"));
+      }
+    }
 
-    iconStyle =
-      cursor: "move"
-      marginRight: 8
-      opacity: 0.5
-      fontSize: 12
-      height: 20
+    // Category is { value: category value, label: category label }
+    renderCategory(category, index, connectDragSource, connectDragPreview, connectDropTarget) {
+      const labelStyle = {
+        verticalAlign: 'middle',
+        marginLeft: 5
+      };
 
-    colorPickerStyle =
-      verticalAlign: 'middle'
-      lineHeight: 1
-      display: 'inline-block'
-      marginLeft: 5
+      const iconStyle = {
+        cursor: "move",
+        marginRight: 8,
+        opacity: 0.5,
+        fontSize: 12,
+        height: 20
+      };
 
-    elem = R 'div', key: category.value,
-      if connectDragSource
-        connectDragSource(R('i', className: "fa fa-bars", style: iconStyle))
+      const colorPickerStyle = {
+        verticalAlign: 'middle',
+        lineHeight: 1,
+        display: 'inline-block',
+        marginLeft: 5
+      };
 
-      if @props.allowExcludedValues
-        R 'input',
-          type: "checkbox"
-          style: { marginLeft: 5, marginBottom: 5, verticalAlign: "middle" }
-          checked: not _.includes(@props.axis.excludedValues, category.value)
-          onChange: @handleExcludeChange.bind(null, category.value)
+      let elem = R('div', {key: category.value},
+        connectDragSource ?
+          connectDragSource(R('i', {className: "fa fa-bars", style: iconStyle})) : undefined,
 
-      if @props.showColorMap
-        R 'div', style: colorPickerStyle,
-          R ColorComponent,
-            key: 'color'
-            color: @lookupColor(category.value)
-            onChange: (color) => @handleColorChange(category.value, color)
+        this.props.allowExcludedValues ?
+          R('input', {
+            type: "checkbox",
+            style: { marginLeft: 5, marginBottom: 5, verticalAlign: "middle" },
+            checked: !_.includes(this.props.axis.excludedValues, category.value),
+            onChange: this.handleExcludeChange.bind(null, category.value)
+          }
+          ) : undefined,
 
-      R 'span', style: labelStyle,
-        @renderLabel(category)
+        this.props.showColorMap ?
+          R('div', {style: colorPickerStyle},
+            R(ColorComponent, {
+              key: 'color',
+              color: this.lookupColor(category.value),
+              onChange: color => this.handleColorChange(category.value, color)
+            }
+            )
+          ) : undefined,
 
-    if connectDropTarget
-      elem = connectDropTarget(elem)
-    if connectDragPreview
-      elem = connectDragPreview(elem)
+        R('span', {style: labelStyle},
+          this.renderLabel(category))
+      );
 
-    return elem
+      if (connectDropTarget) {
+        elem = connectDropTarget(elem);
+      }
+      if (connectDragPreview) {
+        elem = connectDragPreview(elem);
+      }
 
-  renderReorderable: ->
-    drawOrder = @props.axis.drawOrder or _.pluck(@props.axis.colorMap, "value")
+      return elem;
+    }
 
-    orderedCategories = _.sortBy(@props.categories, (category) =>
-      _.indexOf(drawOrder, category.value)
-    )
+    renderReorderable() {
+      const drawOrder = this.props.axis.drawOrder || _.pluck(this.props.axis.colorMap, "value");
 
-    R 'div', null,
-      @renderToggle()
-      R ReorderableListComponent,
-        items: orderedCategories
-        onReorder: @handleReorder
-        renderItem: @renderCategory
-        getItemId: (item) => item.value
+      const orderedCategories = _.sortBy(this.props.categories, category => {
+        return _.indexOf(drawOrder, category.value);
+      });
 
-  renderNonReorderable: ->
-    R 'div', null,
-      @renderToggle()
-      _.map @props.categories, (category) => @renderCategory(category)
+      return R('div', null,
+        this.renderToggle(),
+        R(ReorderableListComponent, {
+          items: orderedCategories,
+          onReorder: this.handleReorder,
+          renderItem: this.renderCategory,
+          getItemId: item => item.value
+        }
+        )
+      );
+    }
 
-  renderToggle: ->
-    if @state.collapsed
-      return R 'div', null,
-        R 'a', onClick: @handleToggle, 
-          "Show Values "
-          R 'i', className: "fa fa-caret-down"
-    else
-      return R 'div', null,
-        R 'a', onClick: @handleToggle, 
-          "Hide Values "
-          R 'i', className: "fa fa-caret-up"
+    renderNonReorderable() {
+      return R('div', null,
+        this.renderToggle(),
+        _.map(this.props.categories, category => this.renderCategory(category)));
+    }
 
-  render: ->
-    if @state.collapsed
-      return @renderToggle()
+    renderToggle() {
+      if (this.state.collapsed) {
+        return R('div', null,
+          R('a', {onClick: this.handleToggle}, 
+            "Show Values ",
+            R('i', {className: "fa fa-caret-down"}))
+        );
+      } else {
+        return R('div', null,
+          R('a', {onClick: this.handleToggle}, 
+            "Hide Values ",
+            R('i', {className: "fa fa-caret-up"}))
+        );
+      }
+    }
 
-    if @props.reorderable
-      return @renderReorderable()
-    else
-      return @renderNonReorderable()
+    render() {
+      if (this.state.collapsed) {
+        return this.renderToggle();
+      }
+
+      if (this.props.reorderable) {
+        return this.renderReorderable();
+      } else {
+        return this.renderNonReorderable();
+      }
+    }
+  };
+  CategoryMapComponent.initClass();
+  return CategoryMapComponent;
+})();

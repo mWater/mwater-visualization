@@ -1,10 +1,15 @@
 
-# Data source for a datagrid that allows client-server model that supports sharing of datagrids
-module.exports = class DashboardDataSource
-  # Gets the rows specified
-  getRows: (design, offset, limit, filters, callback) ->
-    throw new Error("Not implemented")
+// Data source for a datagrid that allows client-server model that supports sharing of datagrids
+let DashboardDataSource;
 
-  # Gets the quickfilters data source
-  getQuickfiltersDataSource: ->
-    throw new Error("Not implemented")
+export default DashboardDataSource = class DashboardDataSource {
+  // Gets the rows specified
+  getRows(design, offset, limit, filters, callback) {
+    throw new Error("Not implemented");
+  }
+
+  // Gets the quickfilters data source
+  getQuickfiltersDataSource() {
+    throw new Error("Not implemented");
+  }
+};

@@ -1,135 +1,171 @@
-_ = require 'lodash'
-PropTypes = require('prop-types')
-React = require 'react'
-R = React.createElement
+let ColorPaletteCollectionComponent;
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
+const R = React.createElement;
 
-ColorSchemeFactory = require '../ColorSchemeFactory'
+import ColorSchemeFactory from '../ColorSchemeFactory';
 
-module.exports = class ColorPaletteCollectionComponent extends React.Component
-  @propTypes:
-    onPaletteSelected: PropTypes.func.isRequired
-    axis: PropTypes.object.isRequired
-    categories: PropTypes.array.isRequired
-    onCancel: PropTypes.func.isRequired
+export default ColorPaletteCollectionComponent = (function() {
+  ColorPaletteCollectionComponent = class ColorPaletteCollectionComponent extends React.Component {
+    constructor(...args) {
+      super(...args);
+      this.onPaletteSelected = this.onPaletteSelected.bind(this);
+      this.renderCancel = this.renderCancel.bind(this);
+    }
 
-  @palettes:
-    [
-      { type: "schemeSet1", reversed: false }
-      { type: "schemeSet2", reversed: false }
-      { type: "schemeSet3", reversed: false }
-      { type: "schemeAccent", reversed: false }
-      { type: "schemeDark2", reversed: false }
-      { type: "schemePaired", reversed: false }
-      { type: "schemePastel1", reversed: false }
-      { type: "schemePastel2", reversed: false }
-      { type: "interpolateSpectral", reversed: false }
-      { type: "interpolateSpectral", reversed: true }
-      { type: "interpolateBlues", reversed: false }
-      { type: "interpolateBlues", reversed: true }
-      { type: "interpolateGreens", reversed: false }
-      { type: "interpolateGreens", reversed: true }
-      { type: "interpolateGreys", reversed: false }
-      { type: "interpolateGreys", reversed: true }
-      { type: "interpolateOranges", reversed: false }
-      { type: "interpolateOranges", reversed: true }
-      { type: "interpolatePurples", reversed: false }
-      { type: "interpolatePurples", reversed: true }
-      { type: "interpolateReds", reversed: false }
-      { type: "interpolateReds", reversed: true }
-      { type: "interpolateBuGn", reversed: false }
-      { type: "interpolateBuGn", reversed: true }
-      { type: "interpolateBuPu", reversed: false }
-      { type: "interpolateBuPu", reversed: true }
-      { type: "interpolateGnBu", reversed: false }
-      { type: "interpolateGnBu", reversed: true }
-      { type: "interpolateOrRd", reversed: false }
-      { type: "interpolateOrRd", reversed: true }
-      { type: "interpolatePuBuGn", reversed: false }
-      { type: "interpolatePuBuGn", reversed: true }
-      { type: "interpolatePuBu", reversed: false }
-      { type: "interpolatePuBu", reversed: true }
-      { type: "interpolatePuRd", reversed: false }
-      { type: "interpolatePuRd", reversed: true }
-      { type: "interpolateRdPu", reversed: false }
-      { type: "interpolateRdPu", reversed: true }
-      { type: "interpolateYlGnBu", reversed: false }
-      { type: "interpolateYlGnBu", reversed: true }
-      { type: "interpolateYlGn", reversed: false }
-      { type: "interpolateYlGn", reversed: true }
-      { type: "interpolateYlOrBr", reversed: false }
-      { type: "interpolateYlOrBr", reversed: true }
-      { type: "interpolateYlOrRd", reversed: false }
-      { type: "interpolateYlOrRd", reversed: true }
-      { type: "interpolateBrBG", reversed: false }
-      { type: "interpolateBrBG", reversed: true }
-      { type: "interpolatePRGn", reversed: false }
-      { type: "interpolatePRGn", reversed: true }
-      { type: "interpolatePiYG", reversed: false }
-      { type: "interpolatePiYG", reversed: true }
-      { type: "interpolatePuOr", reversed: false }
-      { type: "interpolatePuOr", reversed: true }
-      { type: "interpolateRdBu", reversed: false }
-      { type: "interpolateRdBu", reversed: true }
-      { type: "interpolateRdGy", reversed: false }
-      { type: "interpolateRdGy", reversed: true }
-      { type: "interpolateRdYlBu", reversed: false }
-      { type: "interpolateRdYlBu", reversed: true }
-      { type: "interpolateRdYlGn", reversed: false }
-      { type: "interpolateRdYlGn", reversed: true }
-    ]
+    static initClass() {
+      this.propTypes = {
+        onPaletteSelected: PropTypes.func.isRequired,
+        axis: PropTypes.object.isRequired,
+        categories: PropTypes.array.isRequired,
+        onCancel: PropTypes.func.isRequired
+      };
+  
+      this.palettes =
+        [
+          { type: "schemeSet1", reversed: false },
+          { type: "schemeSet2", reversed: false },
+          { type: "schemeSet3", reversed: false },
+          { type: "schemeAccent", reversed: false },
+          { type: "schemeDark2", reversed: false },
+          { type: "schemePaired", reversed: false },
+          { type: "schemePastel1", reversed: false },
+          { type: "schemePastel2", reversed: false },
+          { type: "interpolateSpectral", reversed: false },
+          { type: "interpolateSpectral", reversed: true },
+          { type: "interpolateBlues", reversed: false },
+          { type: "interpolateBlues", reversed: true },
+          { type: "interpolateGreens", reversed: false },
+          { type: "interpolateGreens", reversed: true },
+          { type: "interpolateGreys", reversed: false },
+          { type: "interpolateGreys", reversed: true },
+          { type: "interpolateOranges", reversed: false },
+          { type: "interpolateOranges", reversed: true },
+          { type: "interpolatePurples", reversed: false },
+          { type: "interpolatePurples", reversed: true },
+          { type: "interpolateReds", reversed: false },
+          { type: "interpolateReds", reversed: true },
+          { type: "interpolateBuGn", reversed: false },
+          { type: "interpolateBuGn", reversed: true },
+          { type: "interpolateBuPu", reversed: false },
+          { type: "interpolateBuPu", reversed: true },
+          { type: "interpolateGnBu", reversed: false },
+          { type: "interpolateGnBu", reversed: true },
+          { type: "interpolateOrRd", reversed: false },
+          { type: "interpolateOrRd", reversed: true },
+          { type: "interpolatePuBuGn", reversed: false },
+          { type: "interpolatePuBuGn", reversed: true },
+          { type: "interpolatePuBu", reversed: false },
+          { type: "interpolatePuBu", reversed: true },
+          { type: "interpolatePuRd", reversed: false },
+          { type: "interpolatePuRd", reversed: true },
+          { type: "interpolateRdPu", reversed: false },
+          { type: "interpolateRdPu", reversed: true },
+          { type: "interpolateYlGnBu", reversed: false },
+          { type: "interpolateYlGnBu", reversed: true },
+          { type: "interpolateYlGn", reversed: false },
+          { type: "interpolateYlGn", reversed: true },
+          { type: "interpolateYlOrBr", reversed: false },
+          { type: "interpolateYlOrBr", reversed: true },
+          { type: "interpolateYlOrRd", reversed: false },
+          { type: "interpolateYlOrRd", reversed: true },
+          { type: "interpolateBrBG", reversed: false },
+          { type: "interpolateBrBG", reversed: true },
+          { type: "interpolatePRGn", reversed: false },
+          { type: "interpolatePRGn", reversed: true },
+          { type: "interpolatePiYG", reversed: false },
+          { type: "interpolatePiYG", reversed: true },
+          { type: "interpolatePuOr", reversed: false },
+          { type: "interpolatePuOr", reversed: true },
+          { type: "interpolateRdBu", reversed: false },
+          { type: "interpolateRdBu", reversed: true },
+          { type: "interpolateRdGy", reversed: false },
+          { type: "interpolateRdGy", reversed: true },
+          { type: "interpolateRdYlBu", reversed: false },
+          { type: "interpolateRdYlBu", reversed: true },
+          { type: "interpolateRdYlGn", reversed: false },
+          { type: "interpolateRdYlGn", reversed: true }
+        ];
+    }
 
-  onPaletteSelected: (index) =>
-    # Generate color map
-    scheme = ColorSchemeFactory.createColorScheme({
-      type: ColorPaletteCollectionComponent.palettes[index].type
-      # Null doesn't count to length
-      number: if _.any(@props.categories, (c) -> not c.value?) then @props.categories.length - 1 else @props.categories.length 
-      reversed: ColorPaletteCollectionComponent.palettes[index].reversed
-    })
+    onPaletteSelected(index) {
+      // Generate color map
+      const scheme = ColorSchemeFactory.createColorScheme({
+        type: ColorPaletteCollectionComponent.palettes[index].type,
+        // Null doesn't count to length
+        number: _.any(this.props.categories, c => c.value == null) ? this.props.categories.length - 1 : this.props.categories.length, 
+        reversed: ColorPaletteCollectionComponent.palettes[index].reversed
+      });
 
-    colorMap = _.map @props.categories, (category, i) ->
-      {
-        value: category.value
-        color: if category.value == null then "#aaaaaa" else scheme[i % scheme.length]
+      const colorMap = _.map(this.props.categories, (category, i) => ({
+        value: category.value,
+        color: category.value === null ? "#aaaaaa" : scheme[i % scheme.length]
+      }));
+      return this.props.onPaletteSelected(colorMap);
+    }
+
+    renderCancel() {
+      if (this.props.axis.colorMap) {
+        return R('div', null,
+          R('a', {style: { cursor: "pointer" }, onClick: this.props.onCancel, key: "cancel-customize"}, "Cancel"));
       }
-    @props.onPaletteSelected(colorMap)
+    }
 
-  renderCancel: =>
-    if @props.axis.colorMap
-      R 'div', null,
-        R 'a', style: { cursor: "pointer" }, onClick: @props.onCancel, key: "cancel-customize", "Cancel"
+    render() {
+      return R('div', null,
+        R('p', null, "Please select a color scheme"),
+        _.map(ColorPaletteCollectionComponent.palettes, (config, index) => {
+          return R(ColorPaletteComponent, {
+            key: index,
+            index,
+            colorSet: ColorSchemeFactory.createColorScheme({type: config.type, number: Math.min(this.props.categories.length - 1, 6), reversed: config.reversed }),
+            onPaletteSelected: this.onPaletteSelected,
+            number: this.props.categories.length
+          }
+          );
+        }),
+        this.renderCancel());
+    }
+  };
+  ColorPaletteCollectionComponent.initClass();
+  return ColorPaletteCollectionComponent;
+})();
 
-  render: ->
-    R 'div', null,
-      R 'p', null, "Please select a color scheme"
-      _.map ColorPaletteCollectionComponent.palettes, (config, index) =>
-        R ColorPaletteComponent,
-          key: index
-          index: index
-          colorSet: ColorSchemeFactory.createColorScheme({type: config.type, number: Math.min(@props.categories.length - 1, 6), reversed: config.reversed })
-          onPaletteSelected: @onPaletteSelected
-          number: @props.categories.length
-      @renderCancel()
+class ColorPaletteComponent extends React.Component {
+  constructor(...args) {
+    super(...args);
+    this.handleSelect = this.handleSelect.bind(this);
+  }
 
-class ColorPaletteComponent extends React.Component
-  @propTypes:
-    index: PropTypes.number.isRequired
-    colorSet: PropTypes.array.isRequired
-    onPaletteSelected: PropTypes.func.isRequired
-    number: PropTypes.number
+  static initClass() {
+    this.propTypes = {
+      index: PropTypes.number.isRequired,
+      colorSet: PropTypes.array.isRequired,
+      onPaletteSelected: PropTypes.func.isRequired,
+      number: PropTypes.number
+    };
+  
+    this.defaultProps =
+      {number: 6};
+  }
 
-  @defaultProps:
-    number: 6
+  handleSelect() {
+    return this.props.onPaletteSelected(this.props.index);
+  }
 
-  handleSelect: =>
-    @props.onPaletteSelected(@props.index)
-
-  render: ->
-    R 'div', onClick: @handleSelect ,className: "axis-palette",
-      _.map @props.colorSet.slice(0,@props.number), (color, i) =>
-        cellStyle =
-          display: 'inline-block'
-          height: 20
-          width: 20
+  render() {
+    return R('div', {onClick: this.handleSelect ,className: "axis-palette"},
+      _.map(this.props.colorSet.slice(0,this.props.number), (color, i) => {
+        const cellStyle = {
+          display: 'inline-block',
+          height: 20,
+          width: 20,
           backgroundColor: color
-        R 'div', style: cellStyle, key: i, " "
+        };
+        return R('div', {style: cellStyle, key: i}, " ");
+      })
+    );
+  }
+}
+ColorPaletteComponent.initClass();

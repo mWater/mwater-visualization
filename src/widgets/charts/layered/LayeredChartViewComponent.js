@@ -1,279 +1,345 @@
-PropTypes = require('prop-types')
-_ = require 'lodash'
-React = require 'react'
-ReactDOM = require 'react-dom'
-R = React.createElement
+let LayeredChartViewComponent;
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import React from 'react';
+import ReactDOM from 'react-dom';
+const R = React.createElement;
 
-ExprUtils = require('mwater-expressions').ExprUtils
-LayeredChartCompiler = require './LayeredChartCompiler'
-TextComponent = require '../../text/TextComponent'
-d3 = require 'd3'
+import { ExprUtils } from 'mwater-expressions';
+import LayeredChartCompiler from './LayeredChartCompiler';
+import TextComponent from '../../text/TextComponent';
+import d3 from 'd3';
 
-# Displays a layered chart
-module.exports = class LayeredChartViewComponent extends React.Component
-  @propTypes: 
-    schema: PropTypes.object.isRequired
-    dataSource: PropTypes.object.isRequired
-    design: PropTypes.object.isRequired
-    data: PropTypes.object.isRequired
-    onDesignChange: PropTypes.func
-
-    width: PropTypes.number.isRequired
-    height: PropTypes.number.isRequired
-
-    scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
-    onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
-
-  @contextTypes:
-    locale: PropTypes.string  # e.g. "en"
-
-  constructor: (props) ->
-    super(props)
-
-    @state = {
-      headerHeight: null  # Height of header 
-      footerHeight: null  # Height of footer
+// Displays a layered chart
+export default LayeredChartViewComponent = (function() {
+  LayeredChartViewComponent = class LayeredChartViewComponent extends React.Component {
+    static initClass() {
+      this.propTypes = { 
+        schema: PropTypes.object.isRequired,
+        dataSource: PropTypes.object.isRequired,
+        design: PropTypes.object.isRequired,
+        data: PropTypes.object.isRequired,
+        onDesignChange: PropTypes.func,
+  
+        width: PropTypes.number.isRequired,
+        height: PropTypes.number.isRequired,
+  
+        scope: PropTypes.any, // scope of the widget (when the widget self-selects a particular scope)
+        onScopeChange: PropTypes.func // called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+      };
+  
+      this.contextTypes =
+        {locale: PropTypes.string};
+        // e.g. "en"
     }
 
-  componentDidMount: -> 
-    @updateHeights()
+    constructor(props) {
+      this.handleHeaderChange = this.handleHeaderChange.bind(this);
+      this.handleFooterChange = this.handleFooterChange.bind(this);
+      super(props);
 
-  componentDidUpdate: ->
-    @updateHeights()
+      this.state = {
+        headerHeight: null,  // Height of header 
+        footerHeight: null  // Height of footer
+      };
+    }
 
-  updateHeights: ->
-    # Calculate header and footer heights
-    if @header and @state.headerHeight != @header.offsetHeight
-      @setState(headerHeight: @header.offsetHeight)
-    if @footer and @state.footerHeight != @footer.offsetHeight
-      @setState(footerHeight: @footer.offsetHeight)
+    componentDidMount() { 
+      return this.updateHeights();
+    }
 
-  handleHeaderChange: (header) =>
-    @props.onDesignChange(_.extend({}, @props.design, header: header))
+    componentDidUpdate() {
+      return this.updateHeights();
+    }
 
-  handleFooterChange: (footer) =>
-    @props.onDesignChange(_.extend({}, @props.design, footer: footer))
+    updateHeights() {
+      // Calculate header and footer heights
+      if (this.header && (this.state.headerHeight !== this.header.offsetHeight)) {
+        this.setState({headerHeight: this.header.offsetHeight});
+      }
+      if (this.footer && (this.state.footerHeight !== this.footer.offsetHeight)) {
+        return this.setState({footerHeight: this.footer.offsetHeight});
+      }
+    }
 
-  renderHeader: ->
-    return R 'div', ref: ((c) => @header = c),
-      R TextComponent,
-        design: @props.design.header
-        onDesignChange: if @props.onDesignChange then @handleHeaderChange
-        schema: @props.schema
-        dataSource: @props.dataSource
-        exprValues: @props.data.header or {}
-        width: @props.width
+    handleHeaderChange(header) {
+      return this.props.onDesignChange(_.extend({}, this.props.design, {header}));
+    }
 
-  renderFooter: ->
-    return R 'div', ref: ((c) => @footer = c),
-      R TextComponent,
-        design: @props.design.footer
-        onDesignChange: if @props.onDesignChange then @handleFooterChange
-        schema: @props.schema
-        dataSource: @props.dataSource
-        exprValues: @props.data.footer or {}
-        width: @props.width
+    handleFooterChange(footer) {
+      return this.props.onDesignChange(_.extend({}, this.props.design, {footer}));
+    }
 
-  render: ->
-    R 'div', style: { width: @props.width, height: @props.height },
-      @renderHeader()
-      if @state.headerHeight? and @state.footerHeight?
-        R C3ChartComponent, 
-          schema: @props.schema
-          design: @props.design
-          data: @props.data
-          onDesignChange: @props.onDesignChange
-          width: @props.width
-          height: @props.height - @state.headerHeight - @state.footerHeight
-          scope: @props.scope
-          onScopeChange: @props.onScopeChange
-          locale: @context.locale
-      @renderFooter()
+    renderHeader() {
+      return R('div', {ref: (c => { return this.header = c; })},
+        R(TextComponent, {
+          design: this.props.design.header,
+          onDesignChange: this.props.onDesignChange ? this.handleHeaderChange : undefined,
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          exprValues: this.props.data.header || {},
+          width: this.props.width
+        }
+        )
+      );
+    }
 
-# Displays the inner C3 component itself
-class C3ChartComponent extends React.Component
-  @propTypes: 
-    schema: PropTypes.object.isRequired
-    design: PropTypes.object.isRequired
-    data: PropTypes.object.isRequired
-    onDesignChange: PropTypes.func
+    renderFooter() {
+      return R('div', {ref: (c => { return this.footer = c; })},
+        R(TextComponent, {
+          design: this.props.design.footer,
+          onDesignChange: this.props.onDesignChange ? this.handleFooterChange : undefined,
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          exprValues: this.props.data.footer || {},
+          width: this.props.width
+        }
+        )
+      );
+    }
 
-    width: PropTypes.number.isRequired
-    height: PropTypes.number.isRequired
+    render() {
+      return R('div', {style: { width: this.props.width, height: this.props.height }},
+        this.renderHeader(),
+        (this.state.headerHeight != null) && (this.state.footerHeight != null) ?
+          R(C3ChartComponent, { 
+            schema: this.props.schema,
+            design: this.props.design,
+            data: this.props.data,
+            onDesignChange: this.props.onDesignChange,
+            width: this.props.width,
+            height: this.props.height - this.state.headerHeight - this.state.footerHeight,
+            scope: this.props.scope,
+            onScopeChange: this.props.onScopeChange,
+            locale: this.context.locale
+          }
+          ) : undefined,
+        this.renderFooter());
+    }
+  };
+  LayeredChartViewComponent.initClass();
+  return LayeredChartViewComponent;
+})();
 
-    scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
-    onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
-    locale: PropTypes.string  # e.g. "en"
+// Displays the inner C3 component itself
+class C3ChartComponent extends React.Component {
+  static initClass() {
+    this.propTypes = { 
+      schema: PropTypes.object.isRequired,
+      design: PropTypes.object.isRequired,
+      data: PropTypes.object.isRequired,
+      onDesignChange: PropTypes.func,
+  
+      width: PropTypes.number.isRequired,
+      height: PropTypes.number.isRequired,
+  
+      scope: PropTypes.any, // scope of the widget (when the widget self-selects a particular scope)
+      onScopeChange: PropTypes.func, // called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+      locale: PropTypes.string
+    };
+      // e.g. "en"
+  }
 
-  constructor: (props) ->
-    super(props)
+  constructor(props) {
+    this.createChart = this.createChart.bind(this);
+    this.updateScope = this.updateScope.bind(this);
+    this.handleDataClick = this.handleDataClick.bind(this);
+    super(props);
 
-    # Create throttled createChart
-    @throttledCreateChart = _.throttle(@createChart, 1000)
+    // Create throttled createChart
+    this.throttledCreateChart = _.throttle(this.createChart, 1000);
+  }
 
-  componentDidMount: ->
-    @createChart(@props)
-    @updateScope()
+  componentDidMount() {
+    this.createChart(this.props);
+    return this.updateScope();
+  }
 
-  createChart: (props) =>
-    if @chart
-      @chart.destroy()
+  createChart(props) {
+    if (this.chart) {
+      this.chart.destroy();
+    }
 
-    compiler = new LayeredChartCompiler(schema: props.schema)
-    chartOptions = compiler.createChartOptions({
-      design: @props.design
-      data: @props.data
-      width: @props.width
-      height: @props.height
-      locale: @props.locale
-    })
+    const compiler = new LayeredChartCompiler({schema: props.schema});
+    const chartOptions = compiler.createChartOptions({
+      design: this.props.design,
+      data: this.props.data,
+      width: this.props.width,
+      height: this.props.height,
+      locale: this.props.locale
+    });
     
-    chartOptions.bindto = @chartDiv
-    chartOptions.data.onclick = @handleDataClick
-    # Update scope after rendering. Needs a delay to make it happen
-    chartOptions.onrendered = => _.defer(@updateScope)
+    chartOptions.bindto = this.chartDiv;
+    chartOptions.data.onclick = this.handleDataClick;
+    // Update scope after rendering. Needs a delay to make it happen
+    chartOptions.onrendered = () => _.defer(this.updateScope);
 
-    c3 = require 'c3'
-    @chart = c3.generate(chartOptions)
+    const c3 = require('c3');
+    return this.chart = c3.generate(chartOptions);
+  }
 
-  componentDidUpdate: (prevProps, prevState) ->
-    # Check if schema, data or design (except for header + footer) changed
-    changed = false
+  componentDidUpdate(prevProps, prevState) {
+    // Check if schema, data or design (except for header + footer) changed
+    let changed = false;
 
-    changed = changed or prevProps.schema != @props.schema
-    changed = changed or not _.isEqual(prevProps.data, @props.data)
-    changed = changed or prevProps.locale != @props.locale 
-    changed = changed or (prevProps.design != @props.design and not _.isEqual(_.omit(prevProps.design, "header", "footer"), _.omit(@props.design, "header", "footer")))
+    changed = changed || (prevProps.schema !== this.props.schema);
+    changed = changed || !_.isEqual(prevProps.data, this.props.data);
+    changed = changed || (prevProps.locale !== this.props.locale); 
+    changed = changed || ((prevProps.design !== this.props.design) && !_.isEqual(_.omit(prevProps.design, "header", "footer"), _.omit(this.props.design, "header", "footer")));
 
-    if changed
-      newCompiler = new LayeredChartCompiler(schema: @props.schema)
-      newChartOptions = newCompiler.createChartOptions({
-        design: @props.design
-        data: @props.data
-        width: @props.width
-        height: @props.height
-        locale: @props.locale
-      })
+    if (changed) {
+      const newCompiler = new LayeredChartCompiler({schema: this.props.schema});
+      const newChartOptions = newCompiler.createChartOptions({
+        design: this.props.design,
+        data: this.props.data,
+        width: this.props.width,
+        height: this.props.height,
+        locale: this.props.locale
+      });
     
-      # TODO check if only data changed
-      # Use throttled update to bypass https://github.com/mWater/mwater-visualization/issues/92
-      @throttledCreateChart(@props)
-    # Check if size alone changed
-    else if @props.width != prevProps.width or @props.height != prevProps.height
-      @chart.resize(width: @props.width, height: @props.height)
-      @updateScope()
-      return
-    # Check scope
-    else if not _.isEqual(@props.scope, prevProps.scope)
-      @updateScope()
+      // TODO check if only data changed
+      // Use throttled update to bypass https://github.com/mWater/mwater-visualization/issues/92
+      return this.throttledCreateChart(this.props);
+    // Check if size alone changed
+    } else if ((this.props.width !== prevProps.width) || (this.props.height !== prevProps.height)) {
+      this.chart.resize({width: this.props.width, height: this.props.height});
+      this.updateScope();
+      return;
+    // Check scope
+    } else if (!_.isEqual(this.props.scope, prevProps.scope)) {
+      return this.updateScope();
+    }
+  }
 
-    # if not _.isEqual(@props.data, nextProps.data)
-    #   # # If length of data is different, re-create chart
-    #   # if @props.data.main.length != nextProps.data.main.length
-    #   @createChart(nextProps)
-    #   return
+    // if not _.isEqual(@props.data, nextProps.data)
+    //   # # If length of data is different, re-create chart
+    //   # if @props.data.main.length != nextProps.data.main.length
+    //   @createChart(nextProps)
+    //   return
 
-      # # Reload data
-      # @chart.load({ 
-      #   json: @prepareData(nextProps.data).main
-      #   keys: { x: "x", value: ["y"] }
-      #   names: { y: 'Value' } # Name the data
-      # })
+      // # Reload data
+      // @chart.load({ 
+      //   json: @prepareData(nextProps.data).main
+      //   keys: { x: "x", value: ["y"] }
+      //   names: { y: 'Value' } # Name the data
+      // })
 
-  # Update scoped value
-  updateScope: =>
-    dataMap = @getDataMap()
-    compiler = new LayeredChartCompiler(schema: @props.schema)
-    el = @chartDiv
+  // Update scoped value
+  updateScope() {
+    const dataMap = this.getDataMap();
+    const compiler = new LayeredChartCompiler({schema: this.props.schema});
+    const el = this.chartDiv;
 
-    # Handle line and bar charts
+    // Handle line and bar charts
     d3.select(el)
       .selectAll(".c3-chart-bar .c3-bar, .c3-chart-line .c3-circle")
-      # Highlight only scoped
-      .style("opacity", (d,i) =>
-        dataPoint = @lookupDataPoint(dataMap, d)
-        if dataPoint
-          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @props.locale)
+      // Highlight only scoped
+      .style("opacity", (d,i) => {
+        let scope;
+        const dataPoint = this.lookupDataPoint(dataMap, d);
+        if (dataPoint) {
+          scope = compiler.createScope(this.props.design, dataPoint.layerIndex, dataPoint.row, this.props.locale);
+        }
 
-        # Determine if scoped
-        if scope and @props.scope 
-          if _.isEqual(@props.scope.data, scope.data)
-            return 1
-          else
-            return 0.3
-        else
-          # Not scoped
-          return if dataPoint?.row.y != null then 1 else 0
-      )
+        // Determine if scoped
+        if (scope && this.props.scope) { 
+          if (_.isEqual(this.props.scope.data, scope.data)) {
+            return 1;
+          } else {
+            return 0.3;
+          }
+        } else {
+          // Not scoped
+          if (dataPoint?.row.y !== null) { return 1; } else { return 0; }
+        }
+      });
 
-    # Handle pie charts
-    d3.select(el)
+    // Handle pie charts
+    return d3.select(el)
       .selectAll(".c3-chart-arcs .c3-chart-arc")
-      .style("opacity", (d, i) =>
-        dataPoint = @lookupDataPoint(dataMap, d)
-        if dataPoint
-          scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @props.locale)
+      .style("opacity", (d, i) => {
+        let scope;
+        const dataPoint = this.lookupDataPoint(dataMap, d);
+        if (dataPoint) {
+          scope = compiler.createScope(this.props.design, dataPoint.layerIndex, dataPoint.row, this.props.locale);
+        }
 
-        # Determine if scoped
-        if @props.scope 
-          if _.isEqual(@props.scope.data, scope.data)
-            return 1
-          else
-            return 0.3
-        else
-          # Not scoped
-          return 1
-        )
+        // Determine if scoped
+        if (this.props.scope) { 
+          if (_.isEqual(this.props.scope.data, scope.data)) {
+            return 1;
+          } else {
+            return 0.3;
+          }
+        } else {
+          // Not scoped
+          return 1;
+        }
+        });
+  }
 
-  # Gets a data point { layerIndex, row } from a d3 object (d)
-  lookupDataPoint: (dataMap, d) ->
-    if d.data 
-      d = d.data
+  // Gets a data point { layerIndex, row } from a d3 object (d)
+  lookupDataPoint(dataMap, d) {
+    let dataPoint;
+    if (d.data) { 
+      d = d.data;
+    }
       
-    # Lookup layer and row. If pie/donut, index is always zero
-    isPolarChart = @props.design.type in ['pie', 'donut']
-    if isPolarChart
-      dataPoint = dataMap["#{d.id}"]
-    else
-      dataPoint = dataMap["#{d.id}:#{d.index}"]
+    // Lookup layer and row. If pie/donut, index is always zero
+    const isPolarChart = ['pie', 'donut'].includes(this.props.design.type);
+    if (isPolarChart) {
+      dataPoint = dataMap[`${d.id}`];
+    } else {
+      dataPoint = dataMap[`${d.id}:${d.index}`];
+    }
 
-    return dataPoint
+    return dataPoint;
+  }
 
-  getDataMap: ->
-    # Get data map
-    compiler = new LayeredChartCompiler(schema: @props.schema)
-    return compiler.createDataMap(@props.design, @props.data)
+  getDataMap() {
+    // Get data map
+    const compiler = new LayeredChartCompiler({schema: this.props.schema});
+    return compiler.createDataMap(this.props.design, this.props.data);
+  }
 
-  handleDataClick: (d) =>
-    # Get data map
-    dataMap = @getDataMap()
+  handleDataClick(d) {
+    // Get data map
+    const dataMap = this.getDataMap();
 
-    # Look up data point
-    dataPoint = @lookupDataPoint(dataMap, d)
-    if not dataPoint
-      return
+    // Look up data point
+    const dataPoint = this.lookupDataPoint(dataMap, d);
+    if (!dataPoint) {
+      return;
+    }
 
-    # Create scope
-    compiler = new LayeredChartCompiler(schema: @props.schema)
-    scope = compiler.createScope(@props.design, dataPoint.layerIndex, dataPoint.row, @props.locale)
+    // Create scope
+    const compiler = new LayeredChartCompiler({schema: this.props.schema});
+    const scope = compiler.createScope(this.props.design, dataPoint.layerIndex, dataPoint.row, this.props.locale);
 
-    # If same scope data, remove scope
-    if @props.scope and _.isEqual(scope.data, @props.scope.data) 
-      @props.onScopeChange?(null)
-      return
+    // If same scope data, remove scope
+    if (this.props.scope && _.isEqual(scope.data, this.props.scope.data)) { 
+      this.props.onScopeChange?.(null);
+      return;
+    }
 
-    @props.onScopeChange?(scope)
+    return this.props.onScopeChange?.(scope);
+  }
 
-  componentWillUnmount: ->
-    if @chart
-      @chart.destroy()
+  componentWillUnmount() {
+    if (this.chart) {
+      return this.chart.destroy();
+    }
+  }
 
-  render: ->
-    # # Don't grow fonts as it causes overlap TODO remove
-    # scale = Math.min(scale, 1)
-    # css = ".c3 svg { font-size: #{scale * 10}px; }\n"
-    # css += ".c3-legend-item { font-size: #{scale * 12}px; }\n"
-    # css += ".c3-chart-arc text { font-size: #{scale * 13}px; }\n"
-    # css += ".c3-title { font-size: #{scale * 14}px; }\n"
+  render() {
+    // # Don't grow fonts as it causes overlap TODO remove
+    // scale = Math.min(scale, 1)
+    // css = ".c3 svg { font-size: #{scale * 10}px; }\n"
+    // css += ".c3-legend-item { font-size: #{scale * 12}px; }\n"
+    // css += ".c3-chart-arc text { font-size: #{scale * 13}px; }\n"
+    // css += ".c3-title { font-size: #{scale * 14}px; }\n"
 
-    R 'div', ref: (c) => @chartDiv = c
+    return R('div', {ref: c => { return this.chartDiv = c; }});
+  }
+}
+C3ChartComponent.initClass();

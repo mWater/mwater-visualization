@@ -1,116 +1,127 @@
-_ = require 'lodash'
-React = require 'react'
-H = React.DOM
-R = React.createElement
+import _ from 'lodash';
+import React from 'react';
+const H = React.DOM;
+const R = React.createElement;
 
-storiesOf = require('@kadira/storybook').storiesOf
-action = require('@kadira/storybook').action
-
-WidgetFactory = require '../src/widgets/WidgetFactory'
-DirectWidgetDataSource = require '../src/widgets/DirectWidgetDataSource'
-MWaterLoaderComponent = require '../src/MWaterLoaderComponent'
-UpdateableComponent = require './UpdateableComponent'
+import { storiesOf } from '@kadira/storybook';
+import { action } from '@kadira/storybook';
+import WidgetFactory from '../src/widgets/WidgetFactory';
+import DirectWidgetDataSource from '../src/widgets/DirectWidgetDataSource';
+import MWaterLoaderComponent from '../src/MWaterLoaderComponent';
+import UpdateableComponent from './UpdateableComponent';
 
 storiesOf('Pivot Chart', module)
-  .add 'blank', => 
-    R PivotTest, design: {
+  .add('blank', () => { 
+    return R(PivotTest, { design: {
     }
+  });
+})
 
-  .add 'water point (new)', => 
-    R PivotTest, design: {
-      table: "entities.water_point"
-      rows: [{ id: "row1" }]
-      columns: [{ id: "col1" }]
+  .add('water point (new)', () => { 
+    return R(PivotTest, { design: {
+      table: "entities.water_point",
+      rows: [{ id: "row1" }],
+      columns: [{ id: "col1" }],
       intersections: {} 
     }
+  });
+})
 
-  .add 'water types', => 
-    R PivotTest, design: {
-      table: "entities.water_point"
+  .add('water types', () => { 
+    return R(PivotTest, { design: {
+      table: "entities.water_point",
       rows: [
         { 
-          id: "row1"
+          id: "row1",
           valueAxis: { expr: { type: "field", table: "entities.water_point", column: "type" } }
         }
-      ]
-      columns: [{ id: "col1", label: "Test" }]
+      ],
+      columns: [{ id: "col1", label: "Test" }],
       intersections: {
         "row1:col1": {
           valueAxis: { expr: { type: "op", op: "count", table: "entities.water_point", exprs: [] } }
         }
       }
     }
+  });
+})
 
-  .add 'water types with label', => 
-    R PivotTest, design: {
-      table: "entities.water_point"
+  .add('water types with label', () => { 
+    return R(PivotTest, { design: {
+      table: "entities.water_point",
       rows: [
         { 
-          id: "row1"
-          valueAxis: { expr: { type: "field", table: "entities.water_point", column: "type" } }
-          label: "Type"
+          id: "row1",
+          valueAxis: { expr: { type: "field", table: "entities.water_point", column: "type" } },
+          label: "Type",
           italic: true
         }
-      ]
-      columns: [{ id: "col1", label: "Count" }]
+      ],
+      columns: [{ id: "col1", label: "Count" }],
       intersections: {
         "row1:col1": {
           valueAxis: { expr: { type: "op", op: "count", table: "entities.water_point", exprs: [] } }
         }
       }
     }
+  });
+})
 
-  .add 'water types by functionality', => 
-    R PivotTest, design: {
-      table: "entities.water_point"
+  .add('water types by functionality', () => { 
+    return R(PivotTest, { design: {
+      table: "entities.water_point",
       rows: [
         { 
-          id: "row1"
-          valueAxis: { expr: { type: "field", table: "entities.water_point", column: "type" } }
+          id: "row1",
+          valueAxis: { expr: { type: "field", table: "entities.water_point", column: "type" } },
           label: "Type"
         }
-      ]
+      ],
       columns: [
         { 
-          id: "col1"
-          valueAxis: {"expr":{"type":"scalar","table":"entities.water_point","joins":["!indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9.Water point"],"expr":{"type":"op","op":"last","table":"indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9","exprs":[{"type":"field","table":"indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9","column":"Functionality"}]}}}
+          id: "col1",
+          valueAxis: {"expr":{"type":"scalar","table":"entities.water_point","joins":["!indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9.Water point"],"expr":{"type":"op","op":"last","table":"indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9","exprs":[{"type":"field","table":"indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9","column":"Functionality"}]}}},
           label: "Functionality"
         }
-      ]
+      ],
       intersections: {
         "row1:col1": {
           valueAxis: { expr: { type: "op", op: "count", table: "entities.water_point", exprs: [] } }
         }
       }
     }
+  });
+})
 
-  .add 'water types by functionality all vertical', => 
-    R PivotTest, design: {
-      table: "entities.water_point"
+  .add('water types by functionality all vertical', () => { 
+    return R(PivotTest, { design: {
+      table: "entities.water_point",
       rows: [
         { 
-          id: "row1"
-          valueAxis: { expr: { type: "field", table: "entities.water_point", column: "type" } }
-          label: "Type"
+          id: "row1",
+          valueAxis: { expr: { type: "field", table: "entities.water_point", column: "type" } },
+          label: "Type",
           children: [
             { 
-              id: "row2"
-              valueAxis: {"expr":{"type":"scalar","table":"entities.water_point","joins":["!indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9.Water point"],"expr":{"type":"op","op":"last","table":"indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9","exprs":[{"type":"field","table":"indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9","column":"Functionality"}]}}}
+              id: "row2",
+              valueAxis: {"expr":{"type":"scalar","table":"entities.water_point","joins":["!indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9.Water point"],"expr":{"type":"op","op":"last","table":"indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9","exprs":[{"type":"field","table":"indicator_values:c0adc9f1c9be4271af9d722b7e50b4c9","column":"Functionality"}]}}},
               label: "Functionality"
             }
           ]
         }
-      ]
-      columns: [{ id: "col1", label: "Count" }]
+      ],
+      columns: [{ id: "col1", label: "Count" }],
       intersections: {
         "row1,row2:col1": {
           valueAxis: { expr: { type: "op", op: "count", table: "entities.water_point", exprs: [] } }
         }
       }
     }
+  });
+})
 
-  .add 'conditional color', =>
-    R PivotTest, design: {
+  .add('conditional color', () => {
+    return R(PivotTest, { design: {
       "table": "entities.water_point",
       "rows": [
         {
@@ -177,39 +188,46 @@ storiesOf('Pivot Chart', module)
       },
       "filter": null
     }
+  });
+});
 
-class PivotTest extends React.Component
-  render: ->
-    R UpdateableComponent, 
-      design: @props.design,
-      (state, update) =>
-        R MWaterLoaderComponent, {
-          apiUrl: "https://api.mwater.co/v3/"
-          client: null
+class PivotTest extends React.Component {
+  render() {
+    return R(UpdateableComponent, 
+      {design: this.props.design},
+      (state, update) => {
+        return R(MWaterLoaderComponent, {
+          apiUrl: "https://api.mwater.co/v3/",
+          client: null,
           user: null
-          # onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
-          # extraTables: @state.extraTables
-        }, (error, config) =>
-          if error
-            alert("Error: " + error.message)
-            return null
+          // onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
+          // extraTables: @state.extraTables
+        }, (error, config) => {
+          if (error) {
+            alert("Error: " + error.message);
+            return null;
+          }
 
-          widget = WidgetFactory.createWidget("PivotChart")
+          const widget = WidgetFactory.createWidget("PivotChart");
       
-          widgetDataSource = new DirectWidgetDataSource({
-            widget: widget
-            schema: config.schema
+          const widgetDataSource = new DirectWidgetDataSource({
+            widget,
+            schema: config.schema,
             dataSource: config.dataSource
-          })
+          });
 
-          widget.createViewElement({
-            schema: config.schema
-            dataSource: config.dataSource
-            widgetDataSource: widgetDataSource
-            design: state.design
-            scope: null
-            filters: null
-            onScopeChange: null
-            onDesignChange: update("design")
+          return widget.createViewElement({
+            schema: config.schema,
+            dataSource: config.dataSource,
+            widgetDataSource,
+            design: state.design,
+            scope: null,
+            filters: null,
+            onScopeChange: null,
+            onDesignChange: update("design"),
             width: 800
-          })
+          });
+        });
+    });
+  }
+}

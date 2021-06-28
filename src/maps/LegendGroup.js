@@ -1,84 +1,113 @@
-PropTypes = require('prop-types')
-React = require 'react'
-R = React.createElement
-_ = require 'lodash'
+let LegendGroup;
+import PropTypes from 'prop-types';
+import React from 'react';
+const R = React.createElement;
+import _ from 'lodash';
 
-module.exports = class LegendGroup extends React.Component
-  @propTypes:
-    items: PropTypes.array
-    radiusLayer: PropTypes.bool
-    defaultColor: PropTypes.string
-    name: PropTypes.string
-    symbol: PropTypes.string
-    markerSize: PropTypes.number
+export default LegendGroup = (function() {
+  LegendGroup = class LegendGroup extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        items: PropTypes.array,
+        radiusLayer: PropTypes.bool,
+        defaultColor: PropTypes.string,
+        name: PropTypes.string,
+        symbol: PropTypes.string,
+        markerSize: PropTypes.number
+      };
+  
+      this.defaultProps = {
+        items: [],
+        radiusLayer: false,
+        symbol: null
+      };
+    }
 
-  @defaultProps:
-    items: []
-    radiusLayer: false
-    symbol: null
+    render() {
+      return R('div', {style: { marginBottom: 5}},
+        React.createElement(LegendItem, {hasChildren: this.props.items.length > 0,symbol:this.props.symbol, markerSize: this.props.markerSize, color: this.props.defaultColor, name: this.props.name, key: this.props.name, radiusLayer: this.props.radiusLayer}),
+        _.map(this.props.items, item => {
+          return React.createElement(LegendItem, {isChild: true, symbol: this.props.symbol, markerSize: this.props.markerSize, color: item.color, name: item.name, key: item.name, radiusLayer: this.props.radiusLayer});
+        })
+      );
+    }
+  };
+  LegendGroup.initClass();
+  return LegendGroup;
+})();
 
-  render: ->
-    R 'div', style: { marginBottom: 5},
-      React.createElement(LegendItem, {hasChildren: @props.items.length > 0,symbol:@props.symbol, markerSize: @props.markerSize, color: @props.defaultColor, name: @props.name, key: @props.name, radiusLayer: @props.radiusLayer})
-      _.map @props.items, (item) =>
-        React.createElement(LegendItem, {isChild: true, symbol: @props.symbol, markerSize: @props.markerSize, color: item.color, name: item.name, key: item.name, radiusLayer: @props.radiusLayer})
+class LegendItem extends React.Component {
+  static initClass() {
+    this.propTypes = {
+      color: PropTypes.string,
+      name: PropTypes.string,
+      radiusLayer: PropTypes.bool,
+      symbol: PropTypes.string,
+      markerSize: PropTypes.number,
+      hasChildren: PropTypes.bool,
+      isChild: PropTypes.bool
+    };
+  
+    this.defaultProps = {
+      radiusLayer: false,
+      hasChildren: false,
+      isChild: false
+    };
+  }
 
-class LegendItem extends React.Component
-  @propTypes:
-    color: PropTypes.string
-    name: PropTypes.string
-    radiusLayer: PropTypes.bool
-    symbol: PropTypes.string
-    markerSize: PropTypes.number
-    hasChildren: PropTypes.bool
-    isChild: PropTypes.bool
+  renderSymbol() {
+    const symbolStyle = {
+      color: this.props.color,
+      display: 'inline-block',
+      marginRight: 4,
+      fontSize: this.props.markerSize
+    };
 
-  @defaultProps:
-    radiusLayer: false
-    hasChildren: false
-    isChild: false
+    const className = this.props.symbol.replace('font-awesome/' , 'fa fa-');
+    return R('span', {className, style: symbolStyle}, "");
+  }
 
-  renderSymbol: ->
-    symbolStyle =
-      color: @props.color
-      display: 'inline-block'
+  renderColorIndicator() {
+    const indicatorStyle = {
+      height: 10,
+      width: 10,
+      backgroundColor: this.props.color,
+      display: 'inline-block',
       marginRight: 4
-      fontSize: @props.markerSize
+    };
 
-    className = @props.symbol.replace('font-awesome/' , 'fa fa-')
-    R 'span', {className: className, style: symbolStyle}, ""
+    if (this.props.radiusLayer) {
+      indicatorStyle['borderRadius'] = 5;
+    }
 
-  renderColorIndicator: ->
-    indicatorStyle =
-      height: 10
-      width: 10
-      backgroundColor: @props.color
-      display: 'inline-block'
-      marginRight: 4
+    return R('span', {style: indicatorStyle}, "");
+  }
 
-    if @props.radiusLayer
-      indicatorStyle['borderRadius'] = 5
+  renderIndicator() {
+    if (this.props.symbol) {
+      return this.renderSymbol();
+    } else {
+      return this.renderColorIndicator();
+    }
+  }
 
-    R 'span', style: indicatorStyle, ""
+  render() {
 
-  renderIndicator: ->
-    if @props.symbol
-      @renderSymbol()
-    else
-      @renderColorIndicator()
-
-  render: ->
-
-    titleStyle = {}
-    if not @props.isChild
-      titleStyle =
-        margin: 2
+    let titleStyle = {};
+    if (!this.props.isChild) {
+      titleStyle = {
+        margin: 2,
         fontWeight: 'bold'
+      };
+    }
 
-    containerStyle =
-      paddingLeft: if @props.isChild then 5 else 0
+    const containerStyle =
+      {paddingLeft: this.props.isChild ? 5 : 0};
 
-    R 'div', style: containerStyle,
-      if not @props.hasChildren
-        @renderIndicator()
-      R 'span', {style: titleStyle}, @props.name
+    return R('div', {style: containerStyle},
+      !this.props.hasChildren ?
+        this.renderIndicator() : undefined,
+      R('span', {style: titleStyle}, this.props.name));
+  }
+}
+LegendItem.initClass();

@@ -1,116 +1,140 @@
-_ = require 'lodash'
-PropTypes = require('prop-types')
-React = require 'react'
-R = React.createElement
-asyncLatest = require 'async-latest'
+let ChartViewComponent;
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
+const R = React.createElement;
+import asyncLatest from 'async-latest';
 
-# Inner view part of the chart widget. Uses a query data loading component
-# to handle loading and continues to display old data if design becomes
-# invalid
-module.exports = class ChartViewComponent extends React.Component
-  @propTypes:
-    chart: PropTypes.object.isRequired # Chart object to use
-    design: PropTypes.object.isRequired # Design of chart
-    onDesignChange: PropTypes.func      # When design change
-
-    schema: PropTypes.object.isRequired
-    dataSource: PropTypes.object.isRequired # Data source to use for chart
-    widgetDataSource: PropTypes.object.isRequired
-
-    width: PropTypes.number
-    height: PropTypes.number
-
-    scope: PropTypes.any # scope of the widget (when the widget self-selects a particular scope)
-    filters: PropTypes.array  # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias }. Use injectAlias to correct
-    onScopeChange: PropTypes.func # called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
-
-    onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
-
-  constructor: (props) ->
-    super(props)
-
-    @state = {
-      validDesign: null     # last valid design
-      data: null            # data for chart
-      dataLoading: false    # True when loading data
-      dataError: null       # Set when data loading returned error
-      cacheExpiry: props.dataSource.getCacheExpiry()  # Save cache expiry to see if changes
+// Inner view part of the chart widget. Uses a query data loading component
+// to handle loading and continues to display old data if design becomes
+// invalid
+export default ChartViewComponent = (function() {
+  ChartViewComponent = class ChartViewComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        chart: PropTypes.object.isRequired, // Chart object to use
+        design: PropTypes.object.isRequired, // Design of chart
+        onDesignChange: PropTypes.func,      // When design change
+  
+        schema: PropTypes.object.isRequired,
+        dataSource: PropTypes.object.isRequired, // Data source to use for chart
+        widgetDataSource: PropTypes.object.isRequired,
+  
+        width: PropTypes.number,
+        height: PropTypes.number,
+  
+        scope: PropTypes.any, // scope of the widget (when the widget self-selects a particular scope)
+        filters: PropTypes.array,  // array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias }. Use injectAlias to correct
+        onScopeChange: PropTypes.func, // called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+  
+        onRowClick: PropTypes.func
+      };
+           // Called with (tableId, rowId) when item is clicked
     }
 
-    # Ensure that only one load at a time
-    @loadData = asyncLatest(@loadData, { serial: true })
+    constructor(props) {
+      super(props);
 
-    @state = {}
+      this.state = {
+        validDesign: null,     // last valid design
+        data: null,            // data for chart
+        dataLoading: false,    // True when loading data
+        dataError: null,       // Set when data loading returned error
+        cacheExpiry: props.dataSource.getCacheExpiry()  // Save cache expiry to see if changes
+      };
 
-  componentDidMount: ->
-    @updateData(@props)
+      // Ensure that only one load at a time
+      this.loadData = asyncLatest(this.loadData, { serial: true });
 
-  componentWillReceiveProps: (nextProps) ->
-    if not _.isEqual(nextProps.design, @props.design) or not _.isEqual(nextProps.filters, @props.filters) or nextProps.dataSource.getCacheExpiry() != @state.cacheExpiry
-      # Save new cache expiry
-      @setState(cacheExpiry: nextProps.dataSource.getCacheExpiry())
+      this.state = {};
+    }
 
-      @updateData(nextProps)
+    componentDidMount() {
+      return this.updateData(this.props);
+    }
 
-  updateData: (props) ->
-    # Clean design first (needed to validate properly)
-    design = props.chart.cleanDesign(props.design, props.schema)
+    componentWillReceiveProps(nextProps) {
+      if (!_.isEqual(nextProps.design, this.props.design) || !_.isEqual(nextProps.filters, this.props.filters) || (nextProps.dataSource.getCacheExpiry() !== this.state.cacheExpiry)) {
+        // Save new cache expiry
+        this.setState({cacheExpiry: nextProps.dataSource.getCacheExpiry()});
 
-    # If design is not valid, do nothing as can't query invalid design
-    errors = props.chart.validateDesign(design, props.schema)
-    if errors
-      return
+        return this.updateData(nextProps);
+      }
+    }
 
-    # Loading data
-    @setState(dataLoading: true)
+    updateData(props) {
+      // Clean design first (needed to validate properly)
+      const design = props.chart.cleanDesign(props.design, props.schema);
 
-    @loadData(props, (error, data) =>
-      @setState(dataLoading: false, dataError: error, data: data, validDesign: design)
-    )
+      // If design is not valid, do nothing as can't query invalid design
+      const errors = props.chart.validateDesign(design, props.schema);
+      if (errors) {
+        return;
+      }
 
-  loadData: (props, callback) ->
-    # Get data from widget data source
-    props.widgetDataSource.getData(props.design, props.filters, callback)
+      // Loading data
+      this.setState({dataLoading: true});
 
-  renderSpinner: ->
-    R 'div', style: { position: "absolute", bottom: "50%", left: 0, right: 0, textAlign: "center", fontSize: 20 },
-      R 'i', className: "fa fa-spinner fa-spin"
+      return this.loadData(props, (error, data) => {
+        return this.setState({dataLoading: false, dataError: error, data, validDesign: design});
+      });
+    }
 
-  render: ->
-    style = { width: @props.width, height: @props.height }
+    loadData(props, callback) {
+      // Get data from widget data source
+      return props.widgetDataSource.getData(props.design, props.filters, callback);
+    }
 
-    # Faded if loading
-    if @state.dataLoading
-      style.opacity = 0.5
+    renderSpinner() {
+      return R('div', {style: { position: "absolute", bottom: "50%", left: 0, right: 0, textAlign: "center", fontSize: 20 }},
+        R('i', {className: "fa fa-spinner fa-spin"}));
+    }
 
-    # If nothing to show, show grey
-    if not @state.validDesign
-      # Invalid. Show faded with background
-      style.backgroundColor = "#E0E0E0"
-      style.opacity = 0.35
+    render() {
+      const style = { width: this.props.width, height: this.props.height };
 
-      # Set height to 1.6 ratio if not set so the control is visible
-      if not @props.height and @props.width
-        style.height = @props.width / 1.6
+      // Faded if loading
+      if (this.state.dataLoading) {
+        style.opacity = 0.5;
+      }
 
-    if @state.dataError
-      return R 'div', className: "alert alert-danger",
-       "Error loading data: #{@state.dataError.message or @state.dataError}" 
+      // If nothing to show, show grey
+      if (!this.state.validDesign) {
+        // Invalid. Show faded with background
+        style.backgroundColor = "#E0E0E0";
+        style.opacity = 0.35;
 
-    return R 'div', style: style,
-      if @state.validDesign
-        @props.chart.createViewElement({
-          schema: @props.schema
-          dataSource: @props.dataSource
-          design: @state.validDesign
-          onDesignChange: @props.onDesignChange
-          data: @state.data
-          scope: @props.scope
-          onScopeChange: @props.onScopeChange
-          width: @props.width
-          height: @props.height
-          onRowClick: @props.onRowClick
-          filters: @props.filters
-          })
-      if @state.dataLoading
-        @renderSpinner()
+        // Set height to 1.6 ratio if not set so the control is visible
+        if (!this.props.height && this.props.width) {
+          style.height = this.props.width / 1.6;
+        }
+      }
+
+      if (this.state.dataError) {
+        return R('div', {className: "alert alert-danger"},
+         `Error loading data: ${this.state.dataError.message || this.state.dataError}`); 
+      }
+
+      return R('div', {style},
+        this.state.validDesign ?
+          this.props.chart.createViewElement({
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            design: this.state.validDesign,
+            onDesignChange: this.props.onDesignChange,
+            data: this.state.data,
+            scope: this.props.scope,
+            onScopeChange: this.props.onScopeChange,
+            width: this.props.width,
+            height: this.props.height,
+            onRowClick: this.props.onRowClick,
+            filters: this.props.filters
+            }) : undefined,
+        this.state.dataLoading ?
+          this.renderSpinner() : undefined
+      );
+    }
+  };
+  ChartViewComponent.initClass();
+  return ChartViewComponent;
+})();

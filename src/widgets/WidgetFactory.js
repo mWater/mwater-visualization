@@ -1,33 +1,37 @@
-ChartWidget = require './charts/ChartWidget'
-LayeredChart = require './charts/layered/LayeredChart'
-TableChart = require './charts/table/TableChart'
-CalendarChart = require './charts/calendar/CalendarChart'
-ImageMosaicChart = require './charts/imagemosaic/ImageMosaicChart'
-PivotChart = require './charts/pivot/PivotChart'
-MarkdownWidget = require './MarkdownWidget'
-TextWidget = require './text/TextWidget'
-ImageWidget = require './ImageWidget'
-MapWidget = require './MapWidget'
-IFrameWidget = require './IFrameWidget'
-TOCWidget = require './TOCWidget'
+let WidgetFactory;
+import ChartWidget from './charts/ChartWidget';
+import LayeredChart from './charts/layered/LayeredChart';
+import TableChart from './charts/table/TableChart';
+import CalendarChart from './charts/calendar/CalendarChart';
+import ImageMosaicChart from './charts/imagemosaic/ImageMosaicChart';
+import PivotChart from './charts/pivot/PivotChart';
+import MarkdownWidget from './MarkdownWidget';
+import TextWidget from './text/TextWidget';
+import ImageWidget from './ImageWidget';
+import MapWidget from './MapWidget';
+import IFrameWidget from './IFrameWidget';
+import TOCWidget from './TOCWidget';
 
-widgetTypes = {
-  LayeredChart: new ChartWidget(new LayeredChart())
-  TableChart: new ChartWidget(new TableChart())
-  CalendarChart: new ChartWidget(new CalendarChart())
-  ImageMosaicChart: new ChartWidget(new ImageMosaicChart())
-  PivotChart: new ChartWidget(new PivotChart())
-  Markdown: new MarkdownWidget()
-  Map: new MapWidget()
-  Text: new TextWidget()
-  Image: new ImageWidget()
-  IFrame: new IFrameWidget()
+const widgetTypes = {
+  LayeredChart: new ChartWidget(new LayeredChart()),
+  TableChart: new ChartWidget(new TableChart()),
+  CalendarChart: new ChartWidget(new CalendarChart()),
+  ImageMosaicChart: new ChartWidget(new ImageMosaicChart()),
+  PivotChart: new ChartWidget(new PivotChart()),
+  Markdown: new MarkdownWidget(),
+  Map: new MapWidget(),
+  Text: new TextWidget(),
+  Image: new ImageWidget(),
+  IFrame: new IFrameWidget(),
   TOC: new TOCWidget()
-}
+};
 
-# Creates widgets based on type 
-module.exports = class WidgetFactory
-  @createWidget: (type) ->
-    if widgetTypes[type]
-      return widgetTypes[type]
-    throw new Error("Unknown widget type #{type}")
+// Creates widgets based on type 
+export default WidgetFactory = class WidgetFactory {
+  static createWidget(type) {
+    if (widgetTypes[type]) {
+      return widgetTypes[type];
+    }
+    throw new Error(`Unknown widget type ${type}`);
+  }
+};

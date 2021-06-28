@@ -1,103 +1,133 @@
-PropTypes = require('prop-types')
-_ = require 'lodash'
-React = require 'react'
-R = React.createElement
+let ExprItemEditorComponent;
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import React from 'react';
+const R = React.createElement;
 
-ExprUtils = require("mwater-expressions").ExprUtils
-ExprComponent = require("mwater-expressions-ui").ExprComponent
-TableSelectComponent = require '../../TableSelectComponent'
-getFormatOptions = require('../../valueFormatter').getFormatOptions
-getDefaultFormat = require('../../valueFormatter').getDefaultFormat
+import { ExprUtils } from "mwater-expressions";
+import { ExprComponent } from "mwater-expressions-ui";
+import TableSelectComponent from '../../TableSelectComponent';
+import { getFormatOptions } from '../../valueFormatter';
+import { getDefaultFormat } from '../../valueFormatter';
 
-# Expression editor that allows changing an expression item
-module.exports = class ExprItemEditorComponent extends React.Component
-  @propTypes:
-    schema: PropTypes.object.isRequired   # Schema to use
-    dataSource: PropTypes.object.isRequired # Data source to use to get values
-    exprItem: PropTypes.object.isRequired  # Expression item to edit
-    onChange: PropTypes.func.isRequired   # Called with expr item 
-    singleRowTable: PropTypes.string  # Table that is filtered to have one row
-
-  constructor: (props) ->
-    super(props)
-
-    # Keep table in state as it can be set before the expression
-    @state = {
-      table: props.exprItem.expr?.table or props.singleRowTable
+// Expression editor that allows changing an expression item
+export default ExprItemEditorComponent = (function() {
+  ExprItemEditorComponent = class ExprItemEditorComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        schema: PropTypes.object.isRequired,   // Schema to use
+        dataSource: PropTypes.object.isRequired, // Data source to use to get values
+        exprItem: PropTypes.object.isRequired,  // Expression item to edit
+        onChange: PropTypes.func.isRequired,   // Called with expr item 
+        singleRowTable: PropTypes.string
+      };
+        // Table that is filtered to have one row
     }
 
-  handleTableChange: (table) => @setState(table: table)
+    constructor(props) {
+      this.handleTableChange = this.handleTableChange.bind(this);
+      this.handleExprChange = this.handleExprChange.bind(this);
+      this.handleIncludeLabelChange = this.handleIncludeLabelChange.bind(this);
+      this.handleLabelTextChange = this.handleLabelTextChange.bind(this);
+      this.handleFormatChange = this.handleFormatChange.bind(this);
+      super(props);
 
-  handleExprChange: (expr) =>
-    exprItem = _.extend({}, @props.exprItem, expr: expr)
-    @props.onChange(exprItem)
+      // Keep table in state as it can be set before the expression
+      this.state = {
+        table: props.exprItem.expr?.table || props.singleRowTable
+      };
+    }
 
-  handleIncludeLabelChange: (ev) =>
-    exprItem = _.extend({}, @props.exprItem, includeLabel: ev.target.checked, labelText: if ev.target.checked then @props.exprItem.labelText)
-    @props.onChange(exprItem)
+    handleTableChange(table) { return this.setState({table}); }
 
-  handleLabelTextChange: (ev) =>
-    exprItem = _.extend({}, @props.exprItem, labelText: ev.target.value or null)
-    @props.onChange(exprItem)
+    handleExprChange(expr) {
+      const exprItem = _.extend({}, this.props.exprItem, {expr});
+      return this.props.onChange(exprItem);
+    }
 
-  handleFormatChange: (ev) =>
-    exprItem = _.extend({}, @props.exprItem, format: ev.target.value or null)
-    @props.onChange(exprItem)
+    handleIncludeLabelChange(ev) {
+      const exprItem = _.extend({}, this.props.exprItem, {includeLabel: ev.target.checked, labelText: ev.target.checked ? this.props.exprItem.labelText : undefined});
+      return this.props.onChange(exprItem);
+    }
 
-  renderFormat: ->
-    exprUtils = new ExprUtils(@props.schema)
-    exprType = exprUtils.getExprType(@props.exprItem.expr)
+    handleLabelTextChange(ev) {
+      const exprItem = _.extend({}, this.props.exprItem, {labelText: ev.target.value || null});
+      return this.props.onChange(exprItem);
+    }
 
-    formats = getFormatOptions(exprType)
-    if not formats
-      return null
+    handleFormatChange(ev) {
+      const exprItem = _.extend({}, this.props.exprItem, {format: ev.target.value || null});
+      return this.props.onChange(exprItem);
+    }
+
+    renderFormat() {
+      const exprUtils = new ExprUtils(this.props.schema);
+      const exprType = exprUtils.getExprType(this.props.exprItem.expr);
+
+      const formats = getFormatOptions(exprType);
+      if (!formats) {
+        return null;
+      }
    
-    R 'div', className: "form-group",
-      R 'label', className: "text-muted", 
-        "Format"
-      ": "
-      R 'select', value: (if @props.exprItem.format? then @props.exprItem.format else getDefaultFormat(exprType)), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
-        _.map(formats, (format) -> R('option', key: format.value, value: format.value, format.label))
+      return R('div', {className: "form-group"},
+        R('label', {className: "text-muted"}, 
+          "Format"),
+        ": ",
+        R('select', {value: ((this.props.exprItem.format != null) ? this.props.exprItem.format : getDefaultFormat(exprType)), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: this.handleFormatChange},
+          _.map(formats, format => R('option', {key: format.value, value: format.value}, format.label)))
+      );
+    }
 
-  render: ->
-    R 'div', style: { paddingBottom: 200 },
-      R 'div', className: "form-group",
-        R 'label', className: "text-muted", 
-          R('i', className: "fa fa-database")
-          " "
-          "Data Source"
-        ": "
-        R(TableSelectComponent, { schema: @props.schema, value: @state.table, onChange: @handleTableChange })
-        R('br')
+    render() {
+      return R('div', {style: { paddingBottom: 200 }},
+        R('div', {className: "form-group"},
+          R('label', {className: "text-muted"}, 
+            R('i', {className: "fa fa-database"}),
+            " ",
+            "Data Source"),
+          ": ",
+          R(TableSelectComponent, { schema: this.props.schema, value: this.state.table, onChange: this.handleTableChange }),
+          R('br')),
 
-      if @state.table
-        R 'div', className: "form-group",
-          R 'label', className: "text-muted", 
-            "Field"
-          ": "
-          R ExprComponent, 
-            schema: @props.schema
-            dataSource: @props.dataSource
-            table: @state.table
-            types: ['text', 'number', 'enum', 'date', 'datetime', 'boolean', 'enumset', 'geometry']
-            value: @props.exprItem.expr
-            aggrStatuses: ["individual", "literal", "aggregate"]
-            onChange: @handleExprChange
+        this.state.table ?
+          R('div', {className: "form-group"},
+            R('label', {className: "text-muted"}, 
+              "Field"),
+            ": ",
+            R(ExprComponent, { 
+              schema: this.props.schema,
+              dataSource: this.props.dataSource,
+              table: this.state.table,
+              types: ['text', 'number', 'enum', 'date', 'datetime', 'boolean', 'enumset', 'geometry'],
+              value: this.props.exprItem.expr,
+              aggrStatuses: ["individual", "literal", "aggregate"],
+              onChange: this.handleExprChange
+            }
+            )
+          ) : undefined,
       
-      if @state.table and @props.exprItem.expr
-        R 'div', className: "form-group",
-          R 'label', key: "includeLabel",
-            R 'input', type: "checkbox", checked: @props.exprItem.includeLabel, onChange: @handleIncludeLabelChange
-            " Include Label"
+        this.state.table && this.props.exprItem.expr ?
+          R('div', {className: "form-group"},
+            R('label', {key: "includeLabel"},
+              R('input', {type: "checkbox", checked: this.props.exprItem.includeLabel, onChange: this.handleIncludeLabelChange}),
+              " Include Label"),
 
-          if @props.exprItem.includeLabel
-            R 'input', 
-              key: "labelText"
-              className: "form-control"
-              type: "text"
-              value: @props.exprItem.labelText or ""
-              onChange: @handleLabelTextChange 
-              placeholder: new ExprUtils(@props.schema).summarizeExpr(@props.exprItem.expr) + ": "
+            this.props.exprItem.includeLabel ?
+              R('input', { 
+                key: "labelText",
+                className: "form-control",
+                type: "text",
+                value: this.props.exprItem.labelText || "",
+                onChange: this.handleLabelTextChange, 
+                placeholder: new ExprUtils(this.props.schema).summarizeExpr(this.props.exprItem.expr) + ": "
+              }
+              ) : undefined
+          ) : undefined,
 
-      @renderFormat()
+        this.renderFormat());
+    }
+  };
+  ExprItemEditorComponent.initClass();
+  return ExprItemEditorComponent;
+})();
 

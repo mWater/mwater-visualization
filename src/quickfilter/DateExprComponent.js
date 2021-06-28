@@ -1,173 +1,231 @@
-_ = require 'lodash'
-PropTypes = require('prop-types')
-React = require 'react'
-R = React.createElement
-moment = require 'moment'
+let DateExprComponent;
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
+const R = React.createElement;
+import moment from 'moment';
+import ClickOutHandler from 'react-onclickout';
+import { default as DatePicker } from 'react-datepicker';
 
-ClickOutHandler = require('react-onclickout')
-DatePicker = require('react-datepicker').default
-
-# Allows selection of a date expressions for quickfilters
-module.exports = class DateExprComponent extends React.Component
-  @propTypes:
-    value: PropTypes.any                     # Current value of quickfilter (state of filter selected)
-    onChange: PropTypes.func            # Called when value changes
-    datetime: PropTypes.bool                 # True to use datetime
-
-  constructor: (props) ->
-    super(props)
-
-    @state = {
-      dropdownOpen: false
-      custom: false  # True when custom dates displayed
+// Allows selection of a date expressions for quickfilters
+export default DateExprComponent = (function() {
+  DateExprComponent = class DateExprComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        value: PropTypes.any,                     // Current value of quickfilter (state of filter selected)
+        onChange: PropTypes.func,            // Called when value changes
+        datetime: PropTypes.bool
+      };
+                       // True to use datetime
     }
 
-  toMoment: (value) ->
-    if not value
-      return null
+    constructor(props) {
+      this.handleClickOut = this.handleClickOut.bind(this);
+      this.handleStartChange = this.handleStartChange.bind(this);
+      this.handleEndChange = this.handleEndChange.bind(this);
+      this.handlePreset = this.handlePreset.bind(this);
+      this.renderClear = this.renderClear.bind(this);
+      super(props);
 
-    if @props.datetime
-      return moment(value, moment.ISO_8601)
-    else
-      return moment(value, "YYYY-MM-DD")
+      this.state = {
+        dropdownOpen: false,
+        custom: false  // True when custom dates displayed
+      };
+    }
 
-  fromMoment: (value) ->
-    if not value
-      return null
+    toMoment(value) {
+      if (!value) {
+        return null;
+      }
 
-    if @props.datetime
-      return value.toISOString()
-    else
-      return value.format("YYYY-MM-DD")
+      if (this.props.datetime) {
+        return moment(value, moment.ISO_8601);
+      } else {
+        return moment(value, "YYYY-MM-DD");
+      }
+    }
 
-  toLiteral: (value) ->
-    if @props.datetime
-      return { type: "literal", valueType: "datetime", value: value }
-    else
-      return { type: "literal", valueType: "date", value: value }
+    fromMoment(value) {
+      if (!value) {
+        return null;
+      }
 
-  handleClickOut: =>
-    @setState(dropdownOpen: false)
+      if (this.props.datetime) {
+        return value.toISOString();
+      } else {
+        return value.format("YYYY-MM-DD");
+      }
+    }
 
-  handleStartChange: (value) =>
-    # Clear end if after
-    if @props.value?.exprs[1] and @fromMoment(value) > @props.value.exprs[1]?.value
-      @props.onChange({ type: "op", op: "between", exprs: [@toLiteral(@fromMoment(value)), null]})
-    else
-      @props.onChange({ type: "op", op: "between", exprs: [@toLiteral(@fromMoment(value)), @props.value?.exprs[1]]})
+    toLiteral(value) {
+      if (this.props.datetime) {
+        return { type: "literal", valueType: "datetime", value };
+      } else {
+        return { type: "literal", valueType: "date", value };
+      }
+    }
 
-  handleEndChange: (value) =>
-    # Go to end of day if datetime
-    if @props.datetime
-      value = moment(value)
-      value.endOf("day")
+    handleClickOut() {
+      return this.setState({dropdownOpen: false});
+    }
 
-    # Clear start if before
-    if @props.value?.exprs[0] and @fromMoment(value) < @props.value.exprs[0]?.value
-      @props.onChange({ type: "op", op: "between", exprs: [null, @toLiteral(@fromMoment(value))]})
-    else
-      @props.onChange({ type: "op", op: "between", exprs: [@props.value?.exprs[0], @toLiteral(@fromMoment(value))]})
+    handleStartChange(value) {
+      // Clear end if after
+      if (this.props.value?.exprs[1] && (this.fromMoment(value) > this.props.value.exprs[1]?.value)) {
+        return this.props.onChange({ type: "op", op: "between", exprs: [this.toLiteral(this.fromMoment(value)), null]});
+      } else {
+        return this.props.onChange({ type: "op", op: "between", exprs: [this.toLiteral(this.fromMoment(value)), this.props.value?.exprs[1]]});
+      }
+    }
 
-    @setState(dropdownOpen: false)
+    handleEndChange(value) {
+      // Go to end of day if datetime
+      if (this.props.datetime) {
+        value = moment(value);
+        value.endOf("day");
+      }
 
-  handlePreset: (preset) =>
-    @props.onChange({ type: "op", op: preset.id, exprs: [] })
-    @setState(dropdownOpen: false)
+      // Clear start if before
+      if (this.props.value?.exprs[0] && (this.fromMoment(value) < this.props.value.exprs[0]?.value)) {
+        this.props.onChange({ type: "op", op: "between", exprs: [null, this.toLiteral(this.fromMoment(value))]});
+      } else {
+        this.props.onChange({ type: "op", op: "between", exprs: [this.props.value?.exprs[0], this.toLiteral(this.fromMoment(value))]});
+      }
 
-  renderClear: =>
-    R 'div', 
-      style: { position: "absolute", right: 10, top: 7, color: "#AAA" }
-      onClick: (=> @props.onChange(null)),
-        R 'i', className: "fa fa-remove"
+      return this.setState({dropdownOpen: false});
+    }
 
-  renderSummary: ->
-    if not @props.value
-      return R 'span', className: "text-muted", "All"
+    handlePreset(preset) {
+      this.props.onChange({ type: "op", op: preset.id, exprs: [] });
+      return this.setState({dropdownOpen: false});
+    }
 
-    preset = _.findWhere(presets, id: @props.value.op)
-    if preset
-      return preset.name
+    renderClear() {
+      return R('div', { 
+        style: { position: "absolute", right: 10, top: 7, color: "#AAA" },
+        onClick: (() => this.props.onChange(null))
+      },
+          R('i', {className: "fa fa-remove"}));
+    }
 
-    if @props.value.op == "between"
-      startDate = @toMoment(@props.value.exprs[0]?.value)
-      endDate = @toMoment(@props.value.exprs[1]?.value)
-      # Add/subtract hours to work around https://github.com/moment/moment/issues/2749
-      if @props.datetime
-        return (if startDate then startDate.add("hours", 3).format("ll") else "") + " - " + (if endDate then endDate.subtract("hours", 3).format("ll") else "")
-      else
-        return (if startDate then startDate.format("ll") else "") + " - " + (if endDate then endDate.format("ll") else "")
+    renderSummary() {
+      if (!this.props.value) {
+        return R('span', {className: "text-muted"}, "All");
+      }
 
-    return "???"
+      const preset = _.findWhere(presets, {id: this.props.value.op});
+      if (preset) {
+        return preset.name;
+      }
 
-  renderPresets: ->
-    R 'div', style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white", borderRadius: 4 },
-      R 'ul', className: "nav nav-pills nav-stacked",
-        _.map presets, (preset) =>
-          R 'li', null,
-            R 'a', style: { padding: 5 }, onClick: @handlePreset.bind(null, preset),
-              preset.name
-        R 'li', null,
-          R 'a', style: { padding: 5 }, onClick: (=> @setState(custom: true)),
-            "Custom Date Range..."
+      if (this.props.value.op === "between") {
+        const startDate = this.toMoment(this.props.value.exprs[0]?.value);
+        const endDate = this.toMoment(this.props.value.exprs[1]?.value);
+        // Add/subtract hours to work around https://github.com/moment/moment/issues/2749
+        if (this.props.datetime) {
+          return (startDate ? startDate.add("hours", 3).format("ll") : "") + " - " + (endDate ? endDate.subtract("hours", 3).format("ll") : "");
+        } else {
+          return (startDate ? startDate.format("ll") : "") + " - " + (endDate ? endDate.format("ll") : "");
+        }
+      }
 
-  renderDropdown: ->
-    if @state.custom
-      return @renderCustomDropdown()
-    else
-      return @renderPresets()
+      return "???";
+    }
 
-  renderCustomDropdown: ->
-    startDate = @toMoment(@props.value?.exprs[0]?.value)
-    endDate = @toMoment(@props.value?.exprs[1]?.value)
+    renderPresets() {
+      return R('div', {style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white", borderRadius: 4 }},
+        R('ul', {className: "nav nav-pills nav-stacked"},
+          _.map(presets, preset => {
+            return R('li', null,
+              R('a', {style: { padding: 5 }, onClick: this.handlePreset.bind(null, preset)},
+                preset.name)
+            );
+          }),
+          R('li', null,
+            R('a', {style: { padding: 5 }, onClick: (() => this.setState({custom: true}))},
+              "Custom Date Range...")
+          )
+        )
+      );
+    }
 
-    R 'div', style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white", borderRadius: 4  },
-      R 'div', style: { whiteSpace: "nowrap"},
-        R 'div', style: { display: "inline-block", verticalAlign: "top" },
-          R DatePicker, 
-            inline: true
-            selectsStart: true
-            selected: startDate
-            startDate: startDate
-            endDate: endDate
-            showYearDropdown: true
-            onChange: @handleStartChange
-        R 'div', style: { display: "inline-block", verticalAlign: "top" },
-          R DatePicker, 
-            inline: true
-            selectsEnd: true
-            selected: endDate
-            startDate: startDate
-            endDate: endDate
-            showYearDropdown: true
-            onChange: @handleEndChange
+    renderDropdown() {
+      if (this.state.custom) {
+        return this.renderCustomDropdown();
+      } else {
+        return this.renderPresets();
+      }
+    }
+
+    renderCustomDropdown() {
+      const startDate = this.toMoment(this.props.value?.exprs[0]?.value);
+      const endDate = this.toMoment(this.props.value?.exprs[1]?.value);
+
+      return R('div', {style: { position: "absolute", top: "100%", left: 0, zIndex: 4000, padding: 5, border: "solid 1px #AAA", backgroundColor: "white", borderRadius: 4  }},
+        R('div', {style: { whiteSpace: "nowrap"}},
+          R('div', {style: { display: "inline-block", verticalAlign: "top" }},
+            R(DatePicker, { 
+              inline: true,
+              selectsStart: true,
+              selected: startDate,
+              startDate,
+              endDate,
+              showYearDropdown: true,
+              onChange: this.handleStartChange
+            }
+            )
+          ),
+          R('div', {style: { display: "inline-block", verticalAlign: "top" }},
+            R(DatePicker, { 
+              inline: true,
+              selectsEnd: true,
+              selected: endDate,
+              startDate,
+              endDate,
+              showYearDropdown: true,
+              onChange: this.handleEndChange
+            }
+            )
+          )
+        )
+      );
+    }
   
-  render: ->
-    R ClickOutHandler, onClickOut: @handleClickOut,
-      R 'div', 
-        style: { display: "inline-block", position: "relative" },
-          R 'div',
-            className: "form-control"
-            style: { width: 220, height: 36 }
-            onClick: (=> @setState(dropdownOpen: true, custom: false)),
-              @renderSummary()
+    render() {
+      return R(ClickOutHandler, {onClickOut: this.handleClickOut},
+        R('div', 
+          {style: { display: "inline-block", position: "relative" }},
+            R('div', {
+              className: "form-control",
+              style: { width: 220, height: 36 },
+              onClick: (() => this.setState({dropdownOpen: true, custom: false}))
+            },
+                this.renderSummary()),
 
-          # Clear button
-          if @props.value and @props.onChange?
-            @renderClear()
+            // Clear button
+            this.props.value && (this.props.onChange != null) ?
+              this.renderClear() : undefined,
 
-          if @state.dropdownOpen
-            @renderDropdown()
+            this.state.dropdownOpen ?
+              this.renderDropdown() : undefined
+        )
+      );
+    }
+  };
+  DateExprComponent.initClass();
+  return DateExprComponent;
+})();
 
 
-presets = [
-  { id: "thisyear", name: "This Year" }
-  { id: "lastyear", name: "Last Year" }
-  { id: "thismonth", name: "This Month" }
-  { id: "lastmonth", name: "Last Month" }
-  { id: "today", name: "Today" }
-  { id: "yesterday", name: "Yesterday" }
-  { id: "last24hours", name: "In Last 24 Hours" }
-  { id: "last7days", name: "In Last 7 Days" }
-  { id: "last30days", name: "In Last 30 Days" }
+var presets = [
+  { id: "thisyear", name: "This Year" },
+  { id: "lastyear", name: "Last Year" },
+  { id: "thismonth", name: "This Month" },
+  { id: "lastmonth", name: "Last Month" },
+  { id: "today", name: "Today" },
+  { id: "yesterday", name: "Yesterday" },
+  { id: "last24hours", name: "In Last 24 Hours" },
+  { id: "last7days", name: "In Last 7 Days" },
+  { id: "last30days", name: "In Last 30 Days" },
   { id: "last365days", name: "In Last 365 Days" }
-]
+];

@@ -1,191 +1,299 @@
-_ = require 'lodash'
-PropTypes = require('prop-types')
-React = require 'react'
-ReactDOM = require 'react-dom'
-R = React.createElement
-motion = require 'react-motion'
+let ButtonToggleComponent, OptionListComponent, SectionComponent, SwitchViewComponent, ToggleEditComponent;
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
+import ReactDOM from 'react-dom';
+const R = React.createElement;
+import motion from 'react-motion';
+import { LinkComponent } from 'mwater-expressions-ui';
 
-LinkComponent = require('mwater-expressions-ui').LinkComponent
+// Miscellaneous ui components
 
-# Miscellaneous ui components
-
-# Section with a title and icon
-exports.SectionComponent = class SectionComponent extends React.Component
-  @propTypes: 
-    icon: PropTypes.string
-    label: PropTypes.node
-
-  render: ->
-    R 'div', style: { marginBottom: 15 }, 
-      R 'label', className: "text-muted", 
-        if @props.icon and @props.icon.match(/^fa-/)
-          [
-            R('i', className: "fa #{@props.icon}")
-            " "
-          ]
-        if @props.icon and @props.icon.match(/^glyphicon-/)
-          [
-            R('span', className: "glyphicon #{@props.icon}")
-            " "
-          ]
-        @props.label
-      R 'div', style: { marginLeft: 10 },
-        @props.children
-
-# List of options with a name and description each
-exports.OptionListComponent = class OptionListComponent extends React.Component
-  @propTypes:
-    items: PropTypes.array.isRequired # name, desc, onClick, onRemove (optional)
-    hint: PropTypes.string
-
-  render: ->
-    R 'div', null,
-      R 'div', style: { color: "#AAA", fontStyle: "italic" }, key: "hint", @props.hint
-      R 'div', className: "mwater-visualization-big-options", key: "options",
-        _.map @props.items, (item, i) =>
-          R OptionComponent, name: item.name, desc: item.desc, onClick: item.onClick, onRemove: item.onRemove, key: i
-
-# Single option
-class OptionComponent extends React.Component
-  @propTypes:
-    name: PropTypes.string
-    desc: PropTypes.string
-    onClick: PropTypes.func.isRequired
-    onRemove: PropTypes.func          # Displays X to right if present
-
-  handleClick: (ev) =>
-    ev.stopPropagation()
-    @props.onRemove()
-
-  render: ->
-    R 'div', className: "mwater-visualization-big-option", onClick: @props.onClick,
-      if @props.onRemove
-        R 'button', type: "button", className: "btn btn-link btn-xs pull-right", onClick: @handleClick, 
-          R 'span', className: "glyphicon glyphicon-remove"
-      R 'div', style: { fontWeight: "bold" }, @props.name
-      R 'div', style: { color: "#888" }, @props.desc
-
-# Switches views smoothly
-exports.SwitchViewComponent = class SwitchViewComponent extends React.Component
-  @propTypes:
-    views: PropTypes.object.isRequired  # Map of view id to view element
-    viewId: PropTypes.string.isRequired   # Current view id to display
-
-  constructor: (props) ->
-    super(props)
-    @state = { 
-      measuring: false
+// Section with a title and icon
+let _SectionComponent = SectionComponent = (function() {
+  SectionComponent = class SectionComponent extends React.Component {
+    static initClass() {
+      this.propTypes = { 
+        icon: PropTypes.string,
+        label: PropTypes.node
+      };
     }
 
-  componentWillReceiveProps: (nextProps) ->
-    # If view changes, measure all components
-    if nextProps.viewId != @props.viewId
-      @setState(measuring: true)
+    render() {
+      return R('div', {style: { marginBottom: 15 }}, 
+        R('label', {className: "text-muted"}, 
+          this.props.icon && this.props.icon.match(/^fa-/) ?
+            [
+              R('i', {className: `fa ${this.props.icon}`}),
+              " "
+            ] : undefined,
+          this.props.icon && this.props.icon.match(/^glyphicon-/) ?
+            [
+              R('span', {className: `glyphicon ${this.props.icon}`}),
+              " "
+            ] : undefined,
+          this.props.label),
+        R('div', {style: { marginLeft: 10 }},
+          this.props.children)
+      );
+    }
+  };
+  SectionComponent.initClass();
+  return SectionComponent;
+})();
 
-  # Save components
-  refCallback: (id, comp) => 
-    @comps = @comps or {}
-    @comps[id] = comp
+export { _SectionComponent as SectionComponent };
 
-  componentDidUpdate: (prevProps, prevState) ->
-    # If measuring, get the heights to interpolate
-    if @state.measuring
-      @heights = {}
+// List of options with a name and description each
+let _OptionListComponent = OptionListComponent = (function() {
+  OptionListComponent = class OptionListComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        items: PropTypes.array.isRequired, // name, desc, onClick, onRemove (optional)
+        hint: PropTypes.string
+      };
+    }
 
-      # Get heights
-      for id in _.keys(@props.views)
-        @heights[id] = ReactDOM.findDOMNode(@comps[id]).clientHeight
+    render() {
+      return R('div', null,
+        R('div', {style: { color: "#AAA", fontStyle: "italic" }, key: "hint"}, this.props.hint),
+        R('div', {className: "mwater-visualization-big-options", key: "options"},
+          _.map(this.props.items, (item, i) => {
+            return R(OptionComponent, {name: item.name, desc: item.desc, onClick: item.onClick, onRemove: item.onRemove, key: i});
+          })
+        )
+      );
+    }
+  };
+  OptionListComponent.initClass();
+  return OptionListComponent;
+})();
 
-      @setState(measuring: false)
+export { _OptionListComponent as OptionListComponent };
 
-  render: ->
-    # Create the style object that has the opacity for each view
-    style = {}
-    for id, view of @props.views
-      style[id] = motion.spring((if id == @props.viewId then 1 else 0), [332, 34]) # Stiff, quick spring
+// Single option
+class OptionComponent extends React.Component {
+  constructor(...args) {
+    super(...args);
+    this.handleClick = this.handleClick.bind(this);
+  }
 
-    return R motion.Motion,
-      style: style
-      (style) =>
-        # If measuring, display all positioned at top
-        if @state.measuring
-          return R 'div', style: { position: "relative" },
-            _.map _.keys(@props.views), (v) =>
-              R 'div', style: { position: "absolute", top: 0, opacity: style[v] }, ref: @refCallback.bind(null, v), key: v,
-                @props.views[v]
+  static initClass() {
+    this.propTypes = {
+      name: PropTypes.string,
+      desc: PropTypes.string,
+      onClick: PropTypes.func.isRequired,
+      onRemove: PropTypes.func
+    };
+              // Displays X to right if present
+  }
 
-        # If transitioning
-        if style[@props.viewId] != 1
-          # Calculate interpolated height
-          height = 0
-          for id, val of style
-            height += val * @heights[id]
+  handleClick(ev) {
+    ev.stopPropagation();
+    return this.props.onRemove();
+  }
 
-          return R 'div', style: { position: "relative", height: height },
-            _.map _.keys(@props.views), (v) =>
-              R 'div', style: { position: "absolute", top: 0, left: 0, right: 0, opacity: style[v] }, key: v,
-                @props.views[v]
+  render() {
+    return R('div', {className: "mwater-visualization-big-option", onClick: this.props.onClick},
+      this.props.onRemove ?
+        R('button', {type: "button", className: "btn btn-link btn-xs pull-right", onClick: this.handleClick}, 
+          R('span', {className: "glyphicon glyphicon-remove"})) : undefined,
+      R('div', {style: { fontWeight: "bold" }}, this.props.name),
+      R('div', {style: { color: "#888" }}, this.props.desc));
+  }
+}
+OptionComponent.initClass();
 
-        # Just display (but wrapped to keep same component)
-        return R 'div', null,
-          R 'div', key: @props.viewId,
-            @props.views[@props.viewId]
+// Switches views smoothly
+let _SwitchViewComponent = SwitchViewComponent = (function() {
+  SwitchViewComponent = class SwitchViewComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        views: PropTypes.object.isRequired,  // Map of view id to view element
+        viewId: PropTypes.string.isRequired
+      };
+         // Current view id to display
+    }
 
-# Shows as editable link that can be clicked to open 
-# Editor can be node or can be function that takes onClose function as first parameter
-exports.ToggleEditComponent = class ToggleEditComponent extends React.Component
-  @propTypes:
-    forceOpen: PropTypes.bool
-    initiallyOpen: PropTypes.bool
-    label: PropTypes.node.isRequired
-    editor: PropTypes.any.isRequired
-    onRemove: PropTypes.func
+    constructor(props) {
+      this.refCallback = this.refCallback.bind(this);
+      super(props);
+      this.state = { 
+        measuring: false
+      };
+    }
 
-  constructor: (props) ->
-    super(props)
-    @state = { open: props.initiallyOpen or false }
+    componentWillReceiveProps(nextProps) {
+      // If view changes, measure all components
+      if (nextProps.viewId !== this.props.viewId) {
+        return this.setState({measuring: true});
+      }
+    }
 
-  close: =>
-    # Save height of editor
-    if @editorComp
-      @editorHeight = ReactDOM.findDOMNode(@editorComp).clientHeight
+    // Save components
+    refCallback(id, comp) { 
+      this.comps = this.comps || {};
+      return this.comps[id] = comp;
+    }
 
-    @setState(open: false)
+    componentDidUpdate(prevProps, prevState) {
+      // If measuring, get the heights to interpolate
+      if (this.state.measuring) {
+        this.heights = {};
 
-  open: =>
-    @setState(open: true)
+        // Get heights
+        for (let id of _.keys(this.props.views)) {
+          this.heights[id] = ReactDOM.findDOMNode(this.comps[id]).clientHeight;
+        }
+
+        return this.setState({measuring: false});
+      }
+    }
+
+    render() {
+      // Create the style object that has the opacity for each view
+      let id;
+      const style = {};
+      for (id in this.props.views) {
+        const view = this.props.views[id];
+        style[id] = motion.spring((id === this.props.viewId ? 1 : 0), [332, 34]);
+      } // Stiff, quick spring
+
+      return R(motion.Motion,
+        {style},
+        style => {
+          // If measuring, display all positioned at top
+          if (this.state.measuring) {
+            return R('div', {style: { position: "relative" }},
+              _.map(_.keys(this.props.views), v => {
+                return R('div', {style: { position: "absolute", top: 0, opacity: style[v] }, ref: this.refCallback.bind(null, v), key: v},
+                  this.props.views[v]);
+            }));
+          }
+
+          // If transitioning
+          if (style[this.props.viewId] !== 1) {
+            // Calculate interpolated height
+            let height = 0;
+            for (id in style) {
+              const val = style[id];
+              height += val * this.heights[id];
+            }
+
+            return R('div', {style: { position: "relative", height }},
+              _.map(_.keys(this.props.views), v => {
+                return R('div', {style: { position: "absolute", top: 0, left: 0, right: 0, opacity: style[v] }, key: v},
+                  this.props.views[v]);
+            }));
+          }
+
+          // Just display (but wrapped to keep same component)
+          return R('div', null,
+            R('div', {key: this.props.viewId},
+              this.props.views[this.props.viewId]));
+      });
+    }
+  };
+  SwitchViewComponent.initClass();
+  return SwitchViewComponent;
+})();
+
+export { _SwitchViewComponent as SwitchViewComponent };
+
+// Shows as editable link that can be clicked to open 
+// Editor can be node or can be function that takes onClose function as first parameter
+let _ToggleEditComponent = ToggleEditComponent = (function() {
+  ToggleEditComponent = class ToggleEditComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        forceOpen: PropTypes.bool,
+        initiallyOpen: PropTypes.bool,
+        label: PropTypes.node.isRequired,
+        editor: PropTypes.any.isRequired,
+        onRemove: PropTypes.func
+      };
+    }
+
+    constructor(props) {
+      this.close = this.close.bind(this);
+      this.open = this.open.bind(this);
+      this.handleToggle = this.handleToggle.bind(this);
+      this.editorRef = this.editorRef.bind(this);
+      super(props);
+      this.state = { open: props.initiallyOpen || false };
+    }
+
+    close() {
+      // Save height of editor
+      if (this.editorComp) {
+        this.editorHeight = ReactDOM.findDOMNode(this.editorComp).clientHeight;
+      }
+
+      return this.setState({open: false});
+    }
+
+    open() {
+      return this.setState({open: true});
+    }
   
-  handleToggle: => 
-    @setState(open: not @state.open)
+    handleToggle() { 
+      return this.setState({open: !this.state.open});
+    }
 
-  # Save editor comp
-  editorRef: (editorComp) => @editorComp = editorComp
+    // Save editor comp
+    editorRef(editorComp) { return this.editorComp = editorComp; }
 
-  render: ->
-    editor = @props.editor
-    if _.isFunction(editor)
-      editor = editor(@close)
+    render() {
+      let {
+        editor
+      } = this.props;
+      if (_.isFunction(editor)) {
+        editor = editor(this.close);
+      }
 
-    link = R(LinkComponent, onClick: @open, onRemove: @props.onRemove, @props.label)
+      const link = R(LinkComponent, {onClick: this.open, onRemove: this.props.onRemove}, this.props.label);
     
-    isOpen = @state.open or @props.forceOpen
+      const isOpen = this.state.open || this.props.forceOpen;
 
-    return R SwitchViewComponent,
-      views: { editor: editor, link: link },
-      viewId: if isOpen then "editor" else "link"
+      return R(SwitchViewComponent, {
+        views: { editor, link },
+        viewId: isOpen ? "editor" : "link"
+      }
+      );
+    }
+  };
+  ToggleEditComponent.initClass();
+  return ToggleEditComponent;
+})();
 
-# Switch between several values as a series of radio buttons
-exports.ButtonToggleComponent = class ButtonToggleComponent extends React.Component
-  @propTypes:
-    value: PropTypes.any
-    options: PropTypes.arrayOf(PropTypes.shape({
-      label: PropTypes.node.isRequired
-      value: PropTypes.any
-      })).isRequired # List of layers
-    onChange: PropTypes.func.isRequired # Called with value
+export { _ToggleEditComponent as ToggleEditComponent };
 
-  render: ->
-    R 'div', className: "btn-group btn-group-xs",
-      _.map @props.options, (option, i) =>
-        R 'button', type: "button", key: option.value, className: (if option.value == @props.value then "btn btn-default active" else "btn btn-default"), onClick: @props.onChange.bind(null, option.value),
-          option.label
+// Switch between several values as a series of radio buttons
+let _ButtonToggleComponent = ButtonToggleComponent = (function() {
+  ButtonToggleComponent = class ButtonToggleComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        value: PropTypes.any,
+        options: PropTypes.arrayOf(PropTypes.shape({
+          label: PropTypes.node.isRequired,
+          value: PropTypes.any
+          })).isRequired, // List of layers
+        onChange: PropTypes.func.isRequired
+      };
+       // Called with value
+    }
+
+    render() {
+      return R('div', {className: "btn-group btn-group-xs"},
+        _.map(this.props.options, (option, i) => {
+          return R('button', {type: "button", key: option.value, className: (option.value === this.props.value ? "btn btn-default active" : "btn btn-default"), onClick: this.props.onChange.bind(null, option.value)},
+            option.label);
+        })
+      );
+    }
+  };
+  ButtonToggleComponent.initClass();
+  return ButtonToggleComponent;
+})();
+
+export { _ButtonToggleComponent as ButtonToggleComponent };

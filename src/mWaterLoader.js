@@ -1,43 +1,48 @@
-$ = require 'jquery'
-_ = require 'lodash'
+import $ from 'jquery';
+import _ from 'lodash';
+import { Schema } from 'mwater-expressions';
+import MWaterDataSource from 'mwater-expressions/lib/MWaterDataSource';
+import querystring from 'querystring';
 
-Schema = require('mwater-expressions').Schema
-MWaterDataSource = require('mwater-expressions/lib/MWaterDataSource')
-querystring = require 'querystring'
+// Loads a schema and data source that is specific to mWater server
+// options: 
+//   apiUrl: e.g. "https://api.mwater.co/v3/". required
+//   client: client id if logged in. optional
+//   share: share if using a share to get schema. optional
+//   asUser: Load schema as a specific user (for shared dashboards, etc). optional
+//   extraTables: Extra tables to load in schema. Forms are not loaded by default as they are too many
+//   localCaching: default true. False to disable local caching of queries
+// callback is called with (error, config) where config is { schema, dataSource }
+export default function(options, callback) {
+  // Load schema
+  const query = {};
+  if (options.client) {
+    query.client = options.client;
+  }
+  if (options.share) {
+    query.share = options.share;
+  }
+  if (options.asUser) {
+    query.asUser = options.asUser;
+  }
+  if (options.extraTables && (options.extraTables.length > 0)) {
+    query.extraTables = options.extraTables.join(',');
+  }
 
-# Loads a schema and data source that is specific to mWater server
-# options: 
-#   apiUrl: e.g. "https://api.mwater.co/v3/". required
-#   client: client id if logged in. optional
-#   share: share if using a share to get schema. optional
-#   asUser: Load schema as a specific user (for shared dashboards, etc). optional
-#   extraTables: Extra tables to load in schema. Forms are not loaded by default as they are too many
-#   localCaching: default true. False to disable local caching of queries
-# callback is called with (error, config) where config is { schema, dataSource }
-module.exports = (options, callback) ->
-  # Load schema
-  query = {}
-  if options.client
-    query.client = options.client
-  if options.share
-    query.share = options.share
-  if options.asUser
-    query.asUser = options.asUser
-  if options.extraTables and options.extraTables.length > 0
-    query.extraTables = options.extraTables.join(',')
+  const url = options.apiUrl + "schema?" + querystring.stringify(query);
 
-  url = options.apiUrl + "schema?" + querystring.stringify(query)
-
-  $.getJSON url, (schemaJson) =>
-    schema = new Schema(schemaJson)
-    dataSource = new MWaterDataSource(options.apiUrl, options.client, { 
+  return $.getJSON(url, schemaJson => {
+    const schema = new Schema(schemaJson);
+    const dataSource = new MWaterDataSource(options.apiUrl, options.client, { 
       serverCaching: false, 
-      localCaching: (if options.localCaching? then options.localCaching else true)
-    })
+      localCaching: ((options.localCaching != null) ? options.localCaching : true)
+    });
 
-    callback(null, {
-      schema: schema
-      dataSource: dataSource
-      })
-  .fail (xhr) =>
-    callback(new Error(xhr.responseText))
+    return callback(null, {
+      schema,
+      dataSource
+      });
+}).fail(xhr => {
+    return callback(new Error(xhr.responseText));
+  });
+};

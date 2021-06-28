@@ -1,149 +1,185 @@
-PropTypes = require('prop-types')
-_ = require 'lodash'
-React = require 'react'
-R = React.createElement
+let MapComponent;
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import React from 'react';
+const R = React.createElement;
 
-MapViewComponent = require('./MapViewComponent').MapViewComponent
-MapDesignerComponent = require './MapDesignerComponent'
-MapControlComponent = require './MapControlComponent'
-AutoSizeComponent = require('react-library/lib/AutoSizeComponent')
-UndoStack = require '../UndoStack'
-PopoverHelpComponent = require 'react-library/lib/PopoverHelpComponent'
+import { MapViewComponent } from './MapViewComponent';
+import MapDesignerComponent from './MapDesignerComponent';
+import MapControlComponent from './MapControlComponent';
+import AutoSizeComponent from 'react-library/lib/AutoSizeComponent';
+import UndoStack from '../UndoStack';
+import PopoverHelpComponent from 'react-library/lib/PopoverHelpComponent';
 
-# Map with designer on right
-module.exports = class MapComponent extends React.Component
-  @propTypes:
-    schema: PropTypes.object.isRequired
-    dataSource: PropTypes.object.isRequired # Data source to use
-
-    # Data source for the map
-    mapDataSource: PropTypes.shape({
-      # Gets the data source for a layer
-      getLayerDataSource: PropTypes.func.isRequired
-    }).isRequired
-
-    design: PropTypes.object.isRequired
-    onDesignChange: PropTypes.func  # Null/undefined for readonly
-
-    onRowClick: PropTypes.func     # Called with (tableId, rowId) when item is clicked
-
-    extraFilters: PropTypes.arrayOf(PropTypes.shape({
-      table: PropTypes.string.isRequired
-      jsonql: PropTypes.object.isRequired
-    })) # Extra filters to apply to view
-
-    titleElem: PropTypes.node                     # Extra element to include in title at left
-    extraTitleButtonsElem: PropTypes.node              # Extra elements to add to right
-
-  @contextTypes:
-    locale: PropTypes.string
-
-  constructor: (props) ->
-    super(props)
-    @state = { 
-      undoStack: new UndoStack().push(props.design) 
-      transientDesign: props.design  # Temporary design for read-only maps
-      zoomLocked: true
+// Map with designer on right
+export default MapComponent = (function() {
+  MapComponent = class MapComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        schema: PropTypes.object.isRequired,
+        dataSource: PropTypes.object.isRequired, // Data source to use
+  
+        // Data source for the map
+        mapDataSource: PropTypes.shape({
+          // Gets the data source for a layer
+          getLayerDataSource: PropTypes.func.isRequired
+        }).isRequired,
+  
+        design: PropTypes.object.isRequired,
+        onDesignChange: PropTypes.func,  // Null/undefined for readonly
+  
+        onRowClick: PropTypes.func,     // Called with (tableId, rowId) when item is clicked
+  
+        extraFilters: PropTypes.arrayOf(PropTypes.shape({
+          table: PropTypes.string.isRequired,
+          jsonql: PropTypes.object.isRequired
+        })), // Extra filters to apply to view
+  
+        titleElem: PropTypes.node,                     // Extra element to include in title at left
+        extraTitleButtonsElem: PropTypes.node              // Extra elements to add to right
+      };
+  
+      this.contextTypes =
+        {locale: PropTypes.string};
     }
 
-  componentWillReceiveProps: (nextProps) ->
-    # Save on stack
-    @setState(undoStack: @state.undoStack.push(nextProps.design))
+    constructor(props) {
+      this.handleUndo = this.handleUndo.bind(this);
+      this.handleRedo = this.handleRedo.bind(this);
+      this.handleZoomLockClick = this.handleZoomLockClick.bind(this);
+      this.handleDesignChange = this.handleDesignChange.bind(this);
+      super(props);
+      this.state = { 
+        undoStack: new UndoStack().push(props.design), 
+        transientDesign: props.design,  // Temporary design for read-only maps
+        zoomLocked: true
+      };
+    }
 
-    if not _.isEqual(nextProps.design, @props.design)
-      @setState(transientDesign: nextProps.design)
+    componentWillReceiveProps(nextProps) {
+      // Save on stack
+      this.setState({undoStack: this.state.undoStack.push(nextProps.design)});
 
-  handleUndo: => 
-    undoStack = @state.undoStack.undo()
+      if (!_.isEqual(nextProps.design, this.props.design)) {
+        return this.setState({transientDesign: nextProps.design});
+      }
+    }
 
-    # We need to use callback as state is applied later
-    @setState(undoStack: undoStack, => @props.onDesignChange(undoStack.getValue()))
+    handleUndo() { 
+      const undoStack = this.state.undoStack.undo();
 
-  handleRedo: =>
-    undoStack = @state.undoStack.redo()
+      // We need to use callback as state is applied later
+      return this.setState({undoStack}, () => this.props.onDesignChange(undoStack.getValue()));
+    }
 
-    # We need to use callback as state is applied later
-    @setState(undoStack: undoStack, => @props.onDesignChange(undoStack.getValue()))
+    handleRedo() {
+      const undoStack = this.state.undoStack.redo();
 
-  # Gets the current design, whether prop or transient
-  getDesign: ->
-    return @state.transientDesign or @props.design
+      // We need to use callback as state is applied later
+      return this.setState({undoStack}, () => this.props.onDesignChange(undoStack.getValue()));
+    }
+
+    // Gets the current design, whether prop or transient
+    getDesign() {
+      return this.state.transientDesign || this.props.design;
+    }
   
-  handleZoomLockClick: => 
-    @setState(zoomLocked: not @state.zoomLocked)
+    handleZoomLockClick() { 
+      return this.setState({zoomLocked: !this.state.zoomLocked});
+    }
 
-  renderActionLinks: ->
-    R 'div', null,
-      if @props.onDesignChange?
-        [
-          R 'a', key: "lock", className: "btn btn-link btn-sm", onClick: @handleZoomLockClick, 
-            R 'span', className: "fa #{if @state.zoomLocked then "fa-lock red" else "fa-unlock green"}", style: {marginRight: 5}
-            R PopoverHelpComponent, placement: "bottom",
-              '''Changes to zoom level wont be saved in locked mode'''
-          R 'a', key: "undo", className: "btn btn-link btn-sm #{if not @state.undoStack.canUndo() then "disabled" else ""}", onClick: @handleUndo,
-            R 'span', className: "glyphicon glyphicon-triangle-left"
-            R 'span', className: "hide-600px", " Undo"
-          " "
-          R 'a', key: "redo", className: "btn btn-link btn-sm #{if not @state.undoStack.canRedo() then "disabled" else ""}", onClick: @handleRedo, 
-            R 'span', className: "glyphicon glyphicon-triangle-right"
-            R 'span', className: "hide-600px", " Redo"
-        ]
-      @props.extraTitleButtonsElem
+    renderActionLinks() {
+      return R('div', null,
+        (this.props.onDesignChange != null) ?
+          [
+            R('a', {key: "lock", className: "btn btn-link btn-sm", onClick: this.handleZoomLockClick}, 
+              R('span', {className: `fa ${this.state.zoomLocked ? "fa-lock red" : "fa-unlock green"}`, style: {marginRight: 5}}),
+              R(PopoverHelpComponent, {placement: "bottom"},
+                'Changes to zoom level wont be saved in locked mode')
+            ),
+            R('a', {key: "undo", className: `btn btn-link btn-sm ${!this.state.undoStack.canUndo() ? "disabled" : ""}`, onClick: this.handleUndo},
+              R('span', {className: "glyphicon glyphicon-triangle-left"}),
+              R('span', {className: "hide-600px"}, " Undo")),
+            " ",
+            R('a', {key: "redo", className: `btn btn-link btn-sm ${!this.state.undoStack.canRedo() ? "disabled" : ""}`, onClick: this.handleRedo}, 
+              R('span', {className: "glyphicon glyphicon-triangle-right"}),
+              R('span', {className: "hide-600px"}, " Redo"))
+          ] : undefined,
+        this.props.extraTitleButtonsElem);
+    }
 
-  renderHeader: ->
-    R 'div', style: { position: "absolute", top: 0, left: 0, right: 0, height: 40, padding: 4, borderBottom: "solid 2px #AAA" },
-      R 'div', style: { float: "right" },
-        @renderActionLinks()
-      @props.titleElem
+    renderHeader() {
+      return R('div', {style: { position: "absolute", top: 0, left: 0, right: 0, height: 40, padding: 4, borderBottom: "solid 2px #AAA" }},
+        R('div', {style: { float: "right" }},
+          this.renderActionLinks()),
+        this.props.titleElem);
+    }
 
-  handleDesignChange: (design) =>
-    if @props.onDesignChange
-      @props.onDesignChange(design)
-    else
-      @setState(transientDesign: design)
+    handleDesignChange(design) {
+      if (this.props.onDesignChange) {
+        return this.props.onDesignChange(design);
+      } else {
+        return this.setState({transientDesign: design});
+      }
+    }
 
-  getDesign: ->
-    if @props.onDesignChange
-      return @props.design
-    else
-      return @state.transientDesign
+    getDesign() {
+      if (this.props.onDesignChange) {
+        return this.props.design;
+      } else {
+        return this.state.transientDesign;
+      }
+    }
 
-  renderView: ->
-    React.createElement(AutoSizeComponent, injectWidth: true, injectHeight: true, 
-      React.createElement(MapViewComponent, 
-        mapDataSource: @props.mapDataSource
-        schema: @props.schema, 
-        dataSource: @props.dataSource
-        design: @getDesign()
-        onDesignChange: @handleDesignChange
-        zoomLocked: @state.zoomLocked
-        onRowClick: @props.onRowClick
-        extraFilters: @props.extraFilters
-        locale: @context.locale
-      )
-    )
+    renderView() {
+      return React.createElement(AutoSizeComponent, {injectWidth: true, injectHeight: true}, 
+        React.createElement(MapViewComponent, { 
+          mapDataSource: this.props.mapDataSource,
+          schema: this.props.schema, 
+          dataSource: this.props.dataSource,
+          design: this.getDesign(),
+          onDesignChange: this.handleDesignChange,
+          zoomLocked: this.state.zoomLocked,
+          onRowClick: this.props.onRowClick,
+          extraFilters: this.props.extraFilters,
+          locale: this.context.locale
+        }
+        )
+      );
+    }
 
-  renderDesigner: ->
-    if @props.onDesignChange
-      React.createElement(MapDesignerComponent, 
-        schema: @props.schema
-        dataSource: @props.dataSource
-        design: @getDesign()
-        onDesignChange: @handleDesignChange
-      )
-    else
-      React.createElement(MapControlComponent, 
-        schema: @props.schema
-        dataSource: @props.dataSource
-        design: @getDesign()
-        onDesignChange: @handleDesignChange 
-      )
+    renderDesigner() {
+      if (this.props.onDesignChange) {
+        return React.createElement(MapDesignerComponent, { 
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          design: this.getDesign(),
+          onDesignChange: this.handleDesignChange
+        }
+        );
+      } else {
+        return React.createElement(MapControlComponent, { 
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          design: this.getDesign(),
+          onDesignChange: this.handleDesignChange
+        } 
+        );
+      }
+    }
 
-  render: ->
-    return R 'div', style: { width: "100%", height: "100%", position: "relative" },
-      R 'div', style: { position: "absolute", width: "70%", height: "100%", paddingTop: 40 }, 
-        @renderHeader()
-        R 'div', style: { width: "100%", height: "100%" }, 
-          @renderView()
-      R 'div', style: { position: "absolute", left: "70%", width: "30%", height: "100%", borderLeft: "solid 3px #AAA", overflowY: "auto" }, 
-        @renderDesigner()
+    render() {
+      return R('div', {style: { width: "100%", height: "100%", position: "relative" }},
+        R('div', {style: { position: "absolute", width: "70%", height: "100%", paddingTop: 40 }}, 
+          this.renderHeader(),
+          R('div', {style: { width: "100%", height: "100%" }}, 
+            this.renderView())
+        ),
+        R('div', {style: { position: "absolute", left: "70%", width: "30%", height: "100%", borderLeft: "solid 3px #AAA", overflowY: "auto" }}, 
+          this.renderDesigner())
+      );
+    }
+  };
+  MapComponent.initClass();
+  return MapComponent;
+})();

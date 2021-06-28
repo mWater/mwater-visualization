@@ -1,51 +1,55 @@
-_ = require 'lodash'
-assert = require('chai').assert
-fixtures = require '../fixtures'
-DatagridUtils = require '../../src/datagrids/DatagridUtils'
-canonical = require 'canonical-json'
+import _ from 'lodash';
+import { assert } from 'chai';
+import fixtures from '../fixtures';
+import DatagridUtils from '../../src/datagrids/DatagridUtils';
+import canonical from 'canonical-json';
 
-compare = (actual, expected) ->
-  assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected)
+const compare = (actual, expected) => assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected));
 
-describe "DatagridUtils", ->
-  before ->
-    @schema = fixtures.simpleSchema()
-    @datagridUtils = new DatagridUtils(@schema)
+describe("DatagridUtils", function() {
+  before(function() {
+    this.schema = fixtures.simpleSchema();
+    this.datagridUtils = new DatagridUtils(this.schema);
 
-    @exprNumber = { type: "field", table: "t1", column: "number" }
-    @exprText = { type: "field", table: "t1", column: "text" }
-    @exprDate = { type: "field", table: "t1", column: "date" }
-    @exprEnum = { type: "field", table: "t1", column: "enum" }
-    @exprInvalid = { type: "field", table: "t1", column: "NONSUCH" }
+    this.exprNumber = { type: "field", table: "t1", column: "number" };
+    this.exprText = { type: "field", table: "t1", column: "text" };
+    this.exprDate = { type: "field", table: "t1", column: "date" };
+    this.exprEnum = { type: "field", table: "t1", column: "enum" };
+    return this.exprInvalid = { type: "field", table: "t1", column: "NONSUCH" };});
 
-  describe "cleanDesign", ->
-    it "strips if table gone", ->
-      design = {
-        table: "NONSUCH"
+  return describe("cleanDesign", function() {
+    it("strips if table gone", function() {
+      const design = {
+        table: "NONSUCH",
         columns: [
-          { id: "c1", width: 20, type: "expr", label: null, expr: @exprNumber }
+          { id: "c1", width: 20, type: "expr", label: null, expr: this.exprNumber }
         ]
-      }
+      };
 
-      assert.deepEqual @datagridUtils.cleanDesign(design), {}
+      return assert.deepEqual(this.datagridUtils.cleanDesign(design), {});
+  });
 
-    it "leaves valid columns alone", ->
-      design = {
-        table: "t1"
+    it("leaves valid columns alone", function() {
+      const design = {
+        table: "t1",
         columns: [
-          { id: "c1", width: 20, type: "expr", label: null, expr: @exprNumber }
+          { id: "c1", width: 20, type: "expr", label: null, expr: this.exprNumber }
         ]
-      }
+      };
 
-      assert.equal @datagridUtils.cleanDesign(design).columns.length, 1
+      return assert.equal(this.datagridUtils.cleanDesign(design).columns.length, 1);
+    });
 
-    it "cleans invalid columns", ->
-      design = {
-        table: "t1"
+    return it("cleans invalid columns", function() {
+      const design = {
+        table: "t1",
         columns: [
-          { id: "c1", width: 20, type: "expr", label: null, expr: @exprInvalid }
+          { id: "c1", width: 20, type: "expr", label: null, expr: this.exprInvalid }
         ]
-      }
+      };
 
-      assert.equal @datagridUtils.cleanDesign(design).columns.length, 1
-      assert not @datagridUtils.cleanDesign(design).columns[0].expr
+      assert.equal(this.datagridUtils.cleanDesign(design).columns.length, 1);
+      return assert(!this.datagridUtils.cleanDesign(design).columns[0].expr);
+    });
+  });
+});

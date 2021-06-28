@@ -1,90 +1,110 @@
-PropTypes = require('prop-types')
-_ = require 'lodash'
-React = require 'react'
-R = React.createElement
+let EditPopupComponent;
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import React from 'react';
+const R = React.createElement;
 
-ModalWindowComponent = require 'react-library/lib/ModalWindowComponent'
-BlocksLayoutManager = require '../layouts/blocks/BlocksLayoutManager'
-WidgetFactory = require '../widgets/WidgetFactory'
-DirectWidgetDataSource = require '../widgets/DirectWidgetDataSource'
+import ModalWindowComponent from 'react-library/lib/ModalWindowComponent';
+import BlocksLayoutManager from '../layouts/blocks/BlocksLayoutManager';
+import WidgetFactory from '../widgets/WidgetFactory';
+import DirectWidgetDataSource from '../widgets/DirectWidgetDataSource';
+import PopupFilterJoinsEditComponent from './PopupFilterJoinsEditComponent';
 
-PopupFilterJoinsEditComponent = require './PopupFilterJoinsEditComponent'
+// Modal for editing design of popup
+export default EditPopupComponent = (function() {
+  EditPopupComponent = class EditPopupComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        schema: PropTypes.object.isRequired, // Schema to use
+        dataSource: PropTypes.object.isRequired,
+        design: PropTypes.object.isRequired,  // Design of the marker layer
+        onDesignChange: PropTypes.func.isRequired, // Called with new design
+        table: PropTypes.string.isRequired,    // Table that popup is for
+        idTable: PropTypes.string.isRequired,  // Table of the row that join is to. Usually same as table except for choropleth maps
+        defaultPopupFilterJoins: PropTypes.object.isRequired
+      };
+       // Default popup filter joins
+    }
 
-# Modal for editing design of popup
-module.exports = class EditPopupComponent extends React.Component
-  @propTypes:
-    schema: PropTypes.object.isRequired # Schema to use
-    dataSource: PropTypes.object.isRequired
-    design: PropTypes.object.isRequired  # Design of the marker layer
-    onDesignChange: PropTypes.func.isRequired # Called with new design
-    table: PropTypes.string.isRequired    # Table that popup is for
-    idTable: PropTypes.string.isRequired  # Table of the row that join is to. Usually same as table except for choropleth maps
-    defaultPopupFilterJoins: PropTypes.object.isRequired # Default popup filter joins
+    constructor(props) {
+      this.handleItemsChange = this.handleItemsChange.bind(this);
+      this.handleRemovePopup = this.handleRemovePopup.bind(this);
+      super(props);
+      this.state = { editing: false };
+    }
 
-  constructor: (props) ->
-    super(props)
-    @state = { editing: false }
+    handleItemsChange(items) {
+      let popup = this.props.design.popup || {};
+      popup = _.extend({}, popup, {items});
+      const design = _.extend({}, this.props.design, {popup});
+      return this.props.onDesignChange(design);
+    }
 
-  handleItemsChange: (items) =>
-    popup = @props.design.popup or {}
-    popup = _.extend({}, popup, items: items)
-    design = _.extend({}, @props.design, popup: popup)
-    @props.onDesignChange(design)
+    handleRemovePopup() {
+      const design = _.omit(this.props.design, "popup");
+      return this.props.onDesignChange(design);
+    }
 
-  handleRemovePopup: =>
-    design = _.omit(@props.design, "popup")
-    @props.onDesignChange(design)
+    render() {
+      return R('div', null, 
+        R('a', {className: "btn btn-link", onClick: (() => this.setState({editing: true}))},
+          R('i', {className: "fa fa-pencil"}),
+          " Customize Popup"),
 
-  render: ->
-    R 'div', null, 
-      R 'a', className: "btn btn-link", onClick: (=> @setState(editing: true)),
-        R 'i', className: "fa fa-pencil"
-        " Customize Popup"
+        this.props.design.popup ?
+          R('a', {className: "btn btn-link", onClick: this.handleRemovePopup},
+            R('i', {className: "fa fa-times"}),
+            " Remove Popup") : undefined,
 
-      if @props.design.popup
-        R 'a', className: "btn btn-link", onClick: @handleRemovePopup,
-          R 'i', className: "fa fa-times"
-          " Remove Popup"
+        this.props.design.popup ?
+          R(PopupFilterJoinsEditComponent, {
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            table: this.props.table,
+            idTable: this.props.idTable,
+            defaultPopupFilterJoins: this.props.defaultPopupFilterJoins,
+            popup: this.props.design.popup,
+            design: this.props.design.popupFilterJoins,
+            onDesignChange: popupFilterJoins => this.props.onDesignChange(_.extend({}, this.props.design, {popupFilterJoins}))
+          }
+          ) : undefined,
 
-      if @props.design.popup
-        R PopupFilterJoinsEditComponent,
-          schema: @props.schema
-          dataSource: @props.dataSource
-          table: @props.table
-          idTable: @props.idTable
-          defaultPopupFilterJoins: @props.defaultPopupFilterJoins
-          popup: @props.design.popup
-          design: @props.design.popupFilterJoins
-          onDesignChange: (popupFilterJoins) => @props.onDesignChange(_.extend({}, @props.design, popupFilterJoins: popupFilterJoins))
+        this.state.editing ?
+          R(ModalWindowComponent, {isOpen: true, onRequestClose: (() => this.setState({editing: false}))},
+            new BlocksLayoutManager().renderLayout({
+              items: this.props.design.popup?.items,
+              style: "popup",
+              onItemsChange: this.handleItemsChange,
+              disableMaps: true,
+              renderWidget: options => {
+                const widget = WidgetFactory.createWidget(options.type);
 
-      if @state.editing
-        R ModalWindowComponent, isOpen: true, onRequestClose: (=> @setState(editing: false)),
-          new BlocksLayoutManager().renderLayout({
-            items: @props.design.popup?.items
-            style: "popup"
-            onItemsChange: @handleItemsChange
-            disableMaps: true
-            renderWidget: (options) =>
-              widget = WidgetFactory.createWidget(options.type)
+                const widgetDataSource = new DirectWidgetDataSource({
+                  widget,
+                  schema: this.props.schema,
+                  dataSource: this.props.dataSource
+                });
 
-              widgetDataSource = new DirectWidgetDataSource({
-                widget: widget
-                schema: @props.schema
-                dataSource: @props.dataSource
+                return widget.createViewElement({
+                  schema: this.props.schema,
+                  dataSource: this.props.dataSource,
+                  widgetDataSource,
+                  design: options.design,
+                  scope: null,
+                  filters: [],
+                  onScopeChange: null,
+                  onDesignChange: options.onDesignChange,
+                  width: options.width,
+                  height: options.height,
+                  singleRowTable: this.props.table
+                });
+              }  
               })
-
-              return widget.createViewElement({
-                schema: @props.schema
-                dataSource: @props.dataSource
-                widgetDataSource: widgetDataSource
-                design: options.design
-                scope: null
-                filters: []
-                onScopeChange: null
-                onDesignChange: options.onDesignChange
-                width: options.width
-                height: options.height
-                singleRowTable: @props.table
-              })  
-            })
+          ) : undefined
+      );
+    }
+  };
+  EditPopupComponent.initClass();
+  return EditPopupComponent;
+})();
 

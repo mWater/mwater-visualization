@@ -1,2 +1,2 @@
-testsContext = require.context(".", true, /Tests$/)
-testsContext.keys().forEach(testsContext)
+const testsContext = require.context(".", true, /Tests$/);
+testsContext.keys().forEach(testsContext);

@@ -1,69 +1,81 @@
-_ = require 'lodash'
-uuid = require 'uuid'
-WidgetFactory = require '../widgets/WidgetFactory'
+let DashboardUpgrader;
+import _ from 'lodash';
+import uuid from 'uuid';
+import WidgetFactory from '../widgets/WidgetFactory';
 
-# Upgrades old dashboards to new ones (grid -> blocks)
-module.exports = class DashboardUpgrader
-  upgrade: (design) ->
-    # Get list of all items
-    items = _.clone(design.items)
+// Upgrades old dashboards to new ones (grid -> blocks)
+export default DashboardUpgrader = class DashboardUpgrader {
+  upgrade(design) {
+    // Get list of all items
+    const items = _.clone(design.items);
 
-    newItems = {
-      id: "root"
-      type: "root"
+    const newItems = {
+      id: "root",
+      type: "root",
       blocks: []
-    }
+    };
 
-    convertBlock = (id, item) ->
-      widget = WidgetFactory.createWidget(item.widget.type)
+    const convertBlock = function(id, item) {
+      const widget = WidgetFactory.createWidget(item.widget.type);
 
-      block = {
-        type: "widget"
-        widgetType: item.widget.type
-        design: item.widget.design
-        id: id
+      const block = {
+        type: "widget",
+        widgetType: item.widget.type,
+        design: item.widget.design,
+        id
+      };
+
+      if (!widget.isAutoHeight()) {
+        block.aspectRatio = item.layout.w / item.layout.h;
       }
 
-      if not widget.isAutoHeight()
-        block.aspectRatio = item.layout.w / item.layout.h
+      return block;
+    };
 
-      return block
+    // Scan horizontally
+    let y = 0;
 
-    # Scan horizontally
-    y = 0
+    while (_.keys(items).length > 0) {
+      var id;
+      let lineItems = [];
 
-    while _.keys(items).length > 0
-      lineItems = []
+      for (id in items) {
+        const item = items[id];
+        if ((item.layout.y <= y) && ((item.layout.y + item.layout.h) > y)) {
+          lineItems.push(id);
+        }
+      }
 
-      for id, item of items
-        if item.layout.y <= y and item.layout.y + item.layout.h > y
-          lineItems.push(id)
+      // Sort by x
+      lineItems = _.sortBy(lineItems, id => items[id].layout.x);
 
-      # Sort by x
-      lineItems = _.sortBy(lineItems, (id) -> items[id].layout.x)
-
-      # Convert
-      if lineItems.length > 1
+      // Convert
+      if (lineItems.length > 1) {
         newItems.blocks.push({
-          id: uuid()
-          type: "horizontal"
-          blocks: _.map(lineItems, (li) -> convertBlock(li, items[li]))
-        })
-        for li in lineItems
-          delete items[li]
-      else if lineItems.length == 1
-        newItems.blocks.push(convertBlock(lineItems[0], items[lineItems[0]]))
-        delete items[lineItems[0]]
+          id: uuid(),
+          type: "horizontal",
+          blocks: _.map(lineItems, li => convertBlock(li, items[li]))
+        });
+        for (let li of lineItems) {
+          delete items[li];
+        }
+      } else if (lineItems.length === 1) {
+        newItems.blocks.push(convertBlock(lineItems[0], items[lineItems[0]]));
+        delete items[lineItems[0]];
+      }
 
-      y += 1
-
-    return {
-      items: newItems
-      layout: "blocks"
-      style: "default"
+      y += 1;
     }
 
-###
+    return {
+      items: newItems,
+      layout: "blocks",
+      style: "default"
+    };
+  }
+};
+
+/*
 
 Old style:
 
@@ -88,4 +100,4 @@ design: widget design
 weights: weights for proportioning horizontal blocks. Default is 1
 blocks: other blocks if not a widget
 
-###
+*/

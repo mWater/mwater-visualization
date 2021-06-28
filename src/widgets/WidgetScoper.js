@@ -1,37 +1,48 @@
-_ = require 'lodash'
+let WidgetScoper;
+import _ from 'lodash';
 
-# Scopes widgets, applying scope that a widget specifies to itself and the filter to other
-# widgets. Immutable.
-# Scope is a JSON object consisting of:
-#  name: human-readable name for the scope/filter
-#  filter: filter for other widgets in format { table: table id, jsonql: JsonQL with {alias} for the table name to filter by }
-#  data: internal, opaque data that the widget understands. opaque
-module.exports = class WidgetScoper
-  constructor: (scopes) ->
-    @scopes = scopes or {}
+// Scopes widgets, applying scope that a widget specifies to itself and the filter to other
+// widgets. Immutable.
+// Scope is a JSON object consisting of:
+//  name: human-readable name for the scope/filter
+//  filter: filter for other widgets in format { table: table id, jsonql: JsonQL with {alias} for the table name to filter by }
+//  data: internal, opaque data that the widget understands. opaque
+export default WidgetScoper = class WidgetScoper {
+  constructor(scopes) {
+    this.scopes = scopes || {};
+  }
 
-  # Applies a scope to a particular widget. Filter will be applied to all others
-  applyScope: (widgetId, scope) ->
-    data = {}
-    data[widgetId] = scope
-    scopes = _.extend({}, @scopes, data)
-    return new WidgetScoper(scopes)
+  // Applies a scope to a particular widget. Filter will be applied to all others
+  applyScope(widgetId, scope) {
+    const data = {};
+    data[widgetId] = scope;
+    const scopes = _.extend({}, this.scopes, data);
+    return new WidgetScoper(scopes);
+  }
 
-  # Gets the scope of a widget
-  getScope: (widgetId) ->
-    if @scopes[widgetId]
-      return @scopes[widgetId]
+  // Gets the scope of a widget
+  getScope(widgetId) {
+    if (this.scopes[widgetId]) {
+      return this.scopes[widgetId];
+    }
+  }
 
-  # Gets lookup of scopes by widget id
-  getScopes: -> @scopes
+  // Gets lookup of scopes by widget id
+  getScopes() { return this.scopes; }
 
-  getFilters: (widgetId) ->
-    filters = []
-    for key, value of @scopes
-      if key != widgetId and value and value.filter
-        filters.push(value.filter)
+  getFilters(widgetId) {
+    const filters = [];
+    for (let key in this.scopes) {
+      const value = this.scopes[key];
+      if ((key !== widgetId) && value && value.filter) {
+        filters.push(value.filter);
+      }
+    }
 
-    return filters
+    return filters;
+  }
 
-  reset: ->
-    return new WidgetScoper()
+  reset() {
+    return new WidgetScoper();
+  }
+};

@@ -1,95 +1,120 @@
-PropTypes = require('prop-types')
-React = require 'react'
-R = React.createElement
-update = require 'update-object'
+let BinsComponent;
+import PropTypes from 'prop-types';
+import React from 'react';
+const R = React.createElement;
+import update from 'update-object';
+import { ExprUtils } from 'mwater-expressions';
+import AxisBuilder from './AxisBuilder';
+import NumberInputComponent from 'react-library/lib/NumberInputComponent';
 
-ExprUtils = require('mwater-expressions').ExprUtils
-AxisBuilder = require './AxisBuilder'
-NumberInputComponent = require('react-library/lib/NumberInputComponent')
-
-# Allows setting of bins (min, max and number). Computes defaults if not present
-module.exports = class BinsComponent extends React.Component
-  @propTypes:
-    schema: PropTypes.object.isRequired 
-    dataSource: PropTypes.object.isRequired
-
-    expr: PropTypes.object.isRequired   # Expression for computing min/max
-    xform: PropTypes.object.isRequired
-    onChange: PropTypes.func.isRequired
-
-  constructor: (props) ->
-    super(props)
-
-    @state = {
-      guessing: false   # True when guessing ranges
+// Allows setting of bins (min, max and number). Computes defaults if not present
+export default BinsComponent = (function() {
+  BinsComponent = class BinsComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        schema: PropTypes.object.isRequired, 
+        dataSource: PropTypes.object.isRequired,
+  
+        expr: PropTypes.object.isRequired,   // Expression for computing min/max
+        xform: PropTypes.object.isRequired,
+        onChange: PropTypes.func.isRequired
+      };
     }
 
-  componentDidMount: ->
-    # Check if computing is needed
-    if not @props.xform.min? or not @props.xform.max?
-      # Only do for individual (not aggregate) expressions
-      exprUtils = new ExprUtils(@props.schema)
-      if exprUtils.getExprAggrStatus(@props.expr) != "individual"
-        # Percent is a special case where 0-100
-        if @props.expr?.op == "percent where"
-          @props.onChange(update(@props.xform, { min: { $set: 0 }, max: { $set: 100 }, excludeLower: { $set: true }, excludeUpper: { $set: true }}))
+    constructor(props) {
+      super(props);
 
-        return
+      this.state = {
+        guessing: false   // True when guessing ranges
+      };
+    }
 
-      axisBuilder = new AxisBuilder(schema: @props.schema)
+    componentDidMount() {
+      // Check if computing is needed
+      if ((this.props.xform.min == null) || (this.props.xform.max == null)) {
+        // Only do for individual (not aggregate) expressions
+        const exprUtils = new ExprUtils(this.props.schema);
+        if (exprUtils.getExprAggrStatus(this.props.expr) !== "individual") {
+          // Percent is a special case where 0-100
+          if (this.props.expr?.op === "percent where") {
+            this.props.onChange(update(this.props.xform, { min: { $set: 0 }, max: { $set: 100 }, excludeLower: { $set: true }, excludeUpper: { $set: true }}));
+          }
 
-      # Get min and max from a query
-      minMaxQuery = axisBuilder.compileBinMinMax(@props.expr, @props.expr.table, null, @props.xform.numBins)
-      if not minMaxQuery
-        return
+          return;
+        }
 
-      @setState(guessing: true)
-      @props.dataSource.performQuery(minMaxQuery, (error, rows) =>
-        if @unmounted
-          return
+        const axisBuilder = new AxisBuilder({schema: this.props.schema});
+
+        // Get min and max from a query
+        const minMaxQuery = axisBuilder.compileBinMinMax(this.props.expr, this.props.expr.table, null, this.props.xform.numBins);
+        if (!minMaxQuery) {
+          return;
+        }
+
+        this.setState({guessing: true});
+        return this.props.dataSource.performQuery(minMaxQuery, (error, rows) => {
+          let max, min;
+          if (this.unmounted) {
+            return;
+          }
     
-        @setState(guessing: false)
+          this.setState({guessing: false});
 
-        if error
-          return # Ignore
+          if (error) {
+            return; // Ignore
+          }
 
-        if rows[0].min?
-          min = parseFloat(rows[0].min)
-          max = parseFloat(rows[0].max)
+          if (rows[0].min != null) {
+            min = parseFloat(rows[0].min);
+            max = parseFloat(rows[0].max);
+          }
 
-        @props.onChange(update(@props.xform, { min: { $set: min }, max: { $set: max }}))
-      )
+          return this.props.onChange(update(this.props.xform, { min: { $set: min }, max: { $set: max }}));
+        });
+      }
+    }
 
-  componentWillUnmount: ->
-    @unmounted = true
+    componentWillUnmount() {
+      return this.unmounted = true;
+    }
 
-  render: ->
-    R 'div', null,
-      R 'div', key: "vals",
-        R LabeledInlineComponent, key: "min", label: "Min:",
-          R NumberInputComponent, small: true, value: @props.xform.min, onChange: (v) => @props.onChange(update(@props.xform, { min: { $set: v }}))
-        " "
-        R LabeledInlineComponent, key: "max", label: "Max:",
-          R NumberInputComponent, small: true, value: @props.xform.max, onChange: (v) => @props.onChange(update(@props.xform, { max: { $set: v }}))
-        " "
-        R LabeledInlineComponent, key: "numBins", label: "# of Bins:",
-          R NumberInputComponent, small: true, value: @props.xform.numBins, decimal: false, onChange: (v) => @props.onChange(update(@props.xform, { numBins: { $set: v }}))
-        if @state.guessing
-          R 'i', className: "fa fa-spinner fa-spin"
-        else if not @props.xform.min? or not @props.xform.max? or not @props.xform.numBins
-          R 'span', className: "text-danger", style: { paddingLeft: 10 }, "Min and max are required"
-      if @props.xform.min? and @props.xform.max? and @props.xform.numBins
-        R 'div', key: "excludes",
-          R 'label', className: "checkbox-inline", key: "lower",
-            R 'input', type: "checkbox", checked: not @props.xform.excludeLower, onChange: (ev) => @props.onChange(update(@props.xform, { excludeLower: { $set: not ev.target.checked }}))
-            "Include < #{@props.xform.min}"
-          R 'label', className: "checkbox-inline", key: "upper",
-            R 'input', type: "checkbox", checked: not @props.xform.excludeUpper, onChange: (ev) => @props.onChange(update(@props.xform, { excludeUpper: { $set: not ev.target.checked }}))
-            "Include > #{@props.xform.max}"
+    render() {
+      return R('div', null,
+        R('div', {key: "vals"},
+          R(LabeledInlineComponent, {key: "min", label: "Min:"},
+            R(NumberInputComponent, {small: true, value: this.props.xform.min, onChange: v => this.props.onChange(update(this.props.xform, { min: { $set: v }}))})),
+          " ",
+          R(LabeledInlineComponent, {key: "max", label: "Max:"},
+            R(NumberInputComponent, {small: true, value: this.props.xform.max, onChange: v => this.props.onChange(update(this.props.xform, { max: { $set: v }}))})),
+          " ",
+          R(LabeledInlineComponent, {key: "numBins", label: "# of Bins:"},
+            R(NumberInputComponent, {small: true, value: this.props.xform.numBins, decimal: false, onChange: v => this.props.onChange(update(this.props.xform, { numBins: { $set: v }}))})),
+          (() => {
+          if (this.state.guessing) {
+            return R('i', {className: "fa fa-spinner fa-spin"});
+          } else if ((this.props.xform.min == null) || (this.props.xform.max == null) || !this.props.xform.numBins) {
+            return R('span', {className: "text-danger", style: { paddingLeft: 10 }}, "Min and max are required");
+          }
+        })()
+        ),
+        (this.props.xform.min != null) && (this.props.xform.max != null) && this.props.xform.numBins ?
+          R('div', {key: "excludes"},
+            R('label', {className: "checkbox-inline", key: "lower"},
+              R('input', {type: "checkbox", checked: !this.props.xform.excludeLower, onChange: ev => this.props.onChange(update(this.props.xform, { excludeLower: { $set: !ev.target.checked }}))}),
+              `Include < ${this.props.xform.min}`),
+            R('label', {className: "checkbox-inline", key: "upper"},
+              R('input', {type: "checkbox", checked: !this.props.xform.excludeUpper, onChange: ev => this.props.onChange(update(this.props.xform, { excludeUpper: { $set: !ev.target.checked }}))}),
+              `Include > ${this.props.xform.max}`)
+          ) : undefined
+      );
+    }
+  };
+  BinsComponent.initClass();
+  return BinsComponent;
+})();
 
 
-LabeledInlineComponent = (props) ->
-  R 'div', style: { display: "inline-block" },
-    R 'label', className: "text-muted", props.label
-    props.children
+var LabeledInlineComponent = props => R('div', {style: { display: "inline-block" }},
+  R('label', {className: "text-muted"}, props.label),
+  props.children);
 

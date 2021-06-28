@@ -1,101 +1,127 @@
-PropTypes = require('prop-types')
-React = require 'react'
-R = React.createElement
+let DecoratedBlockComponent;
+import PropTypes from 'prop-types';
+import React from 'react';
+const R = React.createElement;
 
-# Block decorated with drag/remove hover controls
-# TODO make zero border
-module.exports = class DecoratedBlockComponent extends React.Component
-  @propTypes:
-    style: PropTypes.object   # Style to add to outer div
-    onBlockRemove: PropTypes.func.isRequired # Called when block is removed
-
-    connectMoveHandle: PropTypes.func   # the move handle connector
-    connectDragPreview: PropTypes.func   # the drag preview connector
-    connectResizeHandle: PropTypes.func # Connects resize handle for dragging. Null to not render
-
-    # Set to allow changing aspect ratio
-    aspectRatio: PropTypes.number
-    onAspectRatioChange: PropTypes.func
-
-  constructor: (props) ->
-    super(props)
-
-    @state = {
-      aspectDragY: null   # y position of aspect ratio drag
-      initialAspectDragY: null   # Initial y position of aspect ratio drag
-      initialClientY: null    # first y of mousemove (for calculating difference)
+// Block decorated with drag/remove hover controls
+// TODO make zero border
+export default DecoratedBlockComponent = (function() {
+  DecoratedBlockComponent = class DecoratedBlockComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        style: PropTypes.object,   // Style to add to outer div
+        onBlockRemove: PropTypes.func.isRequired, // Called when block is removed
+  
+        connectMoveHandle: PropTypes.func,   // the move handle connector
+        connectDragPreview: PropTypes.func,   // the drag preview connector
+        connectResizeHandle: PropTypes.func, // Connects resize handle for dragging. Null to not render
+  
+        // Set to allow changing aspect ratio
+        aspectRatio: PropTypes.number,
+        onAspectRatioChange: PropTypes.func
+      };
     }
 
-  componentWillUnmount: ->
-    # Remove listeners
-    document.removeEventListener("mousemove", @handleMouseMove)
-    document.removeEventListener("mouseup", @handleMouseUp)
+    constructor(props) {
+      this.handleAspectMouseDown = this.handleAspectMouseDown.bind(this);
+      this.handleMouseMove = this.handleMouseMove.bind(this);
+      this.handleMouseUp = this.handleMouseUp.bind(this);
+      super(props);
 
-  handleAspectMouseDown: (ev) =>
-    # Prevent html5 drag
-    ev.preventDefault()
+      this.state = {
+        aspectDragY: null,   // y position of aspect ratio drag
+        initialAspectDragY: null,   // Initial y position of aspect ratio drag
+        initialClientY: null    // first y of mousemove (for calculating difference)
+      };
+    }
 
-    # Get height of overall block
-    @setState(aspectDragY: ev.currentTarget.parentElement.offsetHeight, initialAspectDragY: ev.currentTarget.parentElement.offsetHeight)
+    componentWillUnmount() {
+      // Remove listeners
+      document.removeEventListener("mousemove", this.handleMouseMove);
+      return document.removeEventListener("mouseup", this.handleMouseUp);
+    }
 
-    document.addEventListener("mousemove", @handleMouseMove)
-    document.addEventListener("mouseup", @handleMouseUp)
+    handleAspectMouseDown(ev) {
+      // Prevent html5 drag
+      ev.preventDefault();
 
-  handleMouseMove: (ev) =>
-    if @state.initialClientY?
-      aspectDragY = @state.initialAspectDragY + ev.clientY - @state.initialClientY
-      if aspectDragY > 20
-        @setState(aspectDragY: aspectDragY)
-    else
-      @setState(initialClientY: ev.clientY)
+      // Get height of overall block
+      this.setState({aspectDragY: ev.currentTarget.parentElement.offsetHeight, initialAspectDragY: ev.currentTarget.parentElement.offsetHeight});
 
-  handleMouseUp: (ev) =>
-    # Remove listeners
-    document.removeEventListener("mousemove", @handleMouseMove)
-    document.removeEventListener("mouseup", @handleMouseUp)
+      document.addEventListener("mousemove", this.handleMouseMove);
+      return document.addEventListener("mouseup", this.handleMouseUp);
+    }
 
-    # Fire new aspect ratio
-    @props.onAspectRatioChange(@props.aspectRatio / (@state.aspectDragY / @state.initialAspectDragY))
-    @setState(aspectDragY: null, initialAspectDragY: null, initialClientY: null)
-
-  renderAspectDrag: ->
-    if @state.aspectDragY?
-      lineStyle = { 
-        position: "absolute"
-        borderTop: "solid 3px #38D"
-        top: @state.aspectDragY
-        left: 0
-        right: 0
+    handleMouseMove(ev) {
+      if (this.state.initialClientY != null) {
+        const aspectDragY = (this.state.initialAspectDragY + ev.clientY) - this.state.initialClientY;
+        if (aspectDragY > 20) {
+          return this.setState({aspectDragY});
+        }
+      } else {
+        return this.setState({initialClientY: ev.clientY});
       }
-      return R 'div', style: lineStyle, key: "aspectDrag"
-    else
-      return null
+    }
+
+    handleMouseUp(ev) {
+      // Remove listeners
+      document.removeEventListener("mousemove", this.handleMouseMove);
+      document.removeEventListener("mouseup", this.handleMouseUp);
+
+      // Fire new aspect ratio
+      this.props.onAspectRatioChange(this.props.aspectRatio / (this.state.aspectDragY / this.state.initialAspectDragY));
+      return this.setState({aspectDragY: null, initialAspectDragY: null, initialClientY: null});
+    }
+
+    renderAspectDrag() {
+      if (this.state.aspectDragY != null) {
+        const lineStyle = { 
+          position: "absolute",
+          borderTop: "solid 3px #38D",
+          top: this.state.aspectDragY,
+          left: 0,
+          right: 0
+        };
+        return R('div', {style: lineStyle, key: "aspectDrag"});
+      } else {
+        return null;
+      }
+    }
   
-  render: ->
-    elem = R 'div', className: "mwater-visualization-decorated-block", style: @props.style,
-      @props.children
+    render() {
+      const elem = R('div', {className: "mwater-visualization-decorated-block", style: this.props.style},
+        this.props.children,
     
-      @renderAspectDrag()
+        this.renderAspectDrag(),
 
-      if not @props.isDragging and @props.connectMoveHandle?
-        @props.connectMoveHandle(R 'div', key: "move", className: "mwater-visualization-decorated-block-move",
-          R 'i', className: "fa fa-arrows")
+        !this.props.isDragging && (this.props.connectMoveHandle != null) ?
+          this.props.connectMoveHandle(R('div', {key: "move", className: "mwater-visualization-decorated-block-move"},
+            R('i', {className: "fa fa-arrows"}))) : undefined,
 
-      if not @props.isDragging and @props.onBlockRemove?
-        R 'div', key: "remove", className: "mwater-visualization-decorated-block-remove", onClick: @props.onBlockRemove,
-          R 'i', className: "fa fa-times"
+        !this.props.isDragging && (this.props.onBlockRemove != null) ?
+          R('div', {key: "remove", className: "mwater-visualization-decorated-block-remove", onClick: this.props.onBlockRemove},
+            R('i', {className: "fa fa-times"})) : undefined,
 
-      if not @props.isDragging and @props.onAspectRatioChange?
-        # TODO sometimes drags (onDragStart) and so doesn't work. Disable dragging?
-        R 'div', key: "aspect", className: "mwater-visualization-decorated-block-aspect", onMouseDown: @handleAspectMouseDown,
-          R 'i', className: "fa fa-arrows-v"
+        !this.props.isDragging && (this.props.onAspectRatioChange != null) ?
+          // TODO sometimes drags (onDragStart) and so doesn't work. Disable dragging?
+          R('div', {key: "aspect", className: "mwater-visualization-decorated-block-aspect", onMouseDown: this.handleAspectMouseDown},
+            R('i', {className: "fa fa-arrows-v"})) : undefined,
 
-      if not @props.isDragging and @props.connectResizeHandle?
-        @props.connectResizeHandle(R 'div', key: "resize", className: "mwater-visualization-decorated-block-resize",
-          R 'i', className: "fa fa-expand fa-rotate-90")
+        !this.props.isDragging && (this.props.connectResizeHandle != null) ?
+          this.props.connectResizeHandle(R('div', {key: "resize", className: "mwater-visualization-decorated-block-resize"},
+            R('i', {className: "fa fa-expand fa-rotate-90"}))) : undefined,
 
-      if @props.connectDragPreview
-        preview = R 'div', style: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none"}, " "
-        @props.connectDragPreview(preview)
+        (() => {
+        if (this.props.connectDragPreview) {
+          const preview = R('div', {style: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none"}}, " ");
+          return this.props.connectDragPreview(preview);
+        }
+      })()
+      );
 
-    return elem
+      return elem;
+    }
+  };
+  DecoratedBlockComponent.initClass();
+  return DecoratedBlockComponent;
+})();

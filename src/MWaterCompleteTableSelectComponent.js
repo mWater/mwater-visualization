@@ -1,667 +1,836 @@
-_ = require 'lodash'
-$ = require 'jquery'
-PropTypes = require('prop-types')
-React = require 'react'
-R = React.createElement
-querystring = require 'querystring'
-TabbedComponent = require('react-library/lib/TabbedComponent')
-uiComponents = require './UIComponents'
-ExprUtils = require("mwater-expressions").ExprUtils
-moment = require 'moment'
-ModalPopupComponent = require('react-library/lib/ModalPopupComponent')
-MWaterCustomTablesetListComponent = require('./MWaterCustomTablesetListComponent').MWaterCustomTablesetListComponent
-MWaterMetricsTableListComponent = require('./MWaterMetricsTableListComponent').MWaterMetricsTableListComponent
+let MWaterCompleteTableSelectComponent;
+import _ from 'lodash';
+import $ from 'jquery';
+import PropTypes from 'prop-types';
+import React from 'react';
+const R = React.createElement;
+import querystring from 'querystring';
+import TabbedComponent from 'react-library/lib/TabbedComponent';
+import uiComponents from './UIComponents';
+import { ExprUtils } from "mwater-expressions";
+import moment from 'moment';
+import ModalPopupComponent from 'react-library/lib/ModalPopupComponent';
+import { MWaterCustomTablesetListComponent } from './MWaterCustomTablesetListComponent';
+import { MWaterMetricsTableListComponent } from './MWaterMetricsTableListComponent';
 
-sitesOrder = {
-  "entities.water_point": 1
-  "entities.sanitation_facility": 2
-  "entities.household": 3
-  "entities.community": 4
-  "entities.school": 5
-  "entities.health_facility": 6
-  "entities.place_of_worship": 7
-  "entities.water_system": 8
-  "entities.water_system_component": 9
-  "entities.wastewater_treatment_system": 10
+const sitesOrder = {
+  "entities.water_point": 1,
+  "entities.sanitation_facility": 2,
+  "entities.household": 3,
+  "entities.community": 4,
+  "entities.school": 5,
+  "entities.health_facility": 6,
+  "entities.place_of_worship": 7,
+  "entities.water_system": 8,
+  "entities.water_system_component": 9,
+  "entities.wastewater_treatment_system": 10,
   "entities.waste_disposal_site": 11
-}
+};
 
-# Allows selection of a table. Is the complete list mode of tables
-module.exports = class MWaterCompleteTableSelectComponent extends React.Component
-  @propTypes:
-    apiUrl: PropTypes.string.isRequired # Url to hit api
-    client: PropTypes.string            # Optional client
-    schema: PropTypes.object.isRequired
-    user: PropTypes.string              # User id
-
-    table: PropTypes.string
-    onChange: PropTypes.func.isRequired # Called with table selected
-
-    extraTables: PropTypes.array.isRequired
-    onExtraTablesChange: PropTypes.func.isRequired
-
-  @contextTypes:
-    locale: PropTypes.string  # e.g. "en"
-
-  handleExtraTableAdd: (tableId) =>
-    @props.onExtraTablesChange(_.union(@props.extraTables, [tableId]))
-
-  handleExtraTableRemove: (tableId) =>
-    # Set to null if current table
-    if @props.table == tableId
-      @props.onChange(null)
-
-    @props.onExtraTablesChange(_.without(@props.extraTables, tableId))
-
-  renderSites: ->
-    types = []
-
-    for table in @props.schema.getTables()
-      if table.deprecated
-        continue
-
-      if not table.id.match(/^entities\./)
-        continue
-    
-      types.push(table.id)
-    
-    # Sort by order if present
-    types = _.sortBy(types, (type) -> sitesOrder[type] or 999)
-
-    R uiComponents.OptionListComponent,
-      items: _.compact(_.map(types, (tableId) =>
-        table = @props.schema.getTable(tableId)
-        return { name: ExprUtils.localizeString(table.name, @context.locale), desc: ExprUtils.localizeString(table.desc, @context.locale), onClick: @props.onChange.bind(null, table.id) }
-      ))
-
-  renderForms: ->
-    R FormsListComponent,
-      schema: @props.schema
-      client: @props.client
-      apiUrl: @props.apiUrl
-      user: @props.user
-      onChange: @props.onChange
-      extraTables: @props.extraTables
-      onExtraTableAdd: @handleExtraTableAdd
-      onExtraTableRemove: @handleExtraTableRemove
-
-  renderIndicators: ->
-    R IndicatorsListComponent,
-      schema: @props.schema
-      client: @props.client
-      apiUrl: @props.apiUrl
-      user: @props.user
-      onChange: @props.onChange
-      extraTables: @props.extraTables
-      onExtraTableAdd: @handleExtraTableAdd
-      onExtraTableRemove: @handleExtraTableRemove
-
-  renderIssues: ->
-    R IssuesListComponent,
-      schema: @props.schema
-      client: @props.client
-      apiUrl: @props.apiUrl
-      user: @props.user
-      onChange: @props.onChange
-      extraTables: @props.extraTables
-      onExtraTableAdd: @handleExtraTableAdd
-      onExtraTableRemove: @handleExtraTableRemove
-    
-  renderSweetSense: ->
-    sweetSenseTables = @getSweetSenseTables()
-
-    sweetSenseTables = _.sortBy(sweetSenseTables, (table) -> table.name.en)
-    R uiComponents.OptionListComponent,
-      items: _.map(sweetSenseTables, (table) =>
-        return { 
-          name: ExprUtils.localizeString(table.name, @context.locale)
-          desc: ExprUtils.localizeString(table.desc, @context.locale)
-          onClick: @props.onChange.bind(null, table.id) 
-        })
-
-  renderTablesets: ->
-    R MWaterCustomTablesetListComponent, 
-      schema: @props.schema
-      client: @props.client
-      apiUrl: @props.apiUrl
-      user: @props.user
-      onChange: @props.onChange
-      extraTables: @props.extraTables
-      onExtraTableAdd: @handleExtraTableAdd
-      onExtraTableRemove: @handleExtraTableRemove
-      locale: @context.locale
-
-  renderMetrics: ->
-    R MWaterMetricsTableListComponent, 
-      schema: @props.schema
-      client: @props.client
-      apiUrl: @props.apiUrl
-      user: @props.user
-      onChange: @props.onChange
-      extraTables: @props.extraTables
-      onExtraTableAdd: @handleExtraTableAdd
-      onExtraTableRemove: @handleExtraTableRemove
-      locale: @context.locale
-
-  renderOther: ->
-    otherTables = _.filter(@props.schema.getTables(), (table) => 
-      # Remove deprecated
-      if table.deprecated
-        return false
-
-      # Remove sites
-      if table.id.match(/^entities\./)
-        return false
-
-      # sweetsense tables
-      if table.id.match(/^sweetsense/)
-        return false
-
-      # Remove responses
-      if table.id.match(/^responses:/)
-        return false
-
-      # Remove indicators
-      if table.id.match(/^indicator_values:/)
-        return false
-
-      # Remove issues
-      if table.id.match(/^(issues|issue_events):/)
-        return false
-
-      # Remove custom tablesets
-      if table.id.match(/^custom\./)
-        return false
-
-      # Remove metrics
-      if table.id.match(/^metric:/)
-        return false
-
-      return true
-    )
-
-    otherTables = _.sortBy(otherTables, (table) -> table.name.en)
-    R uiComponents.OptionListComponent,
-      items: _.map(otherTables, (table) =>
-        return { 
-          name: ExprUtils.localizeString(table.name, @context.locale)
-          desc: ExprUtils.localizeString(table.desc, @context.locale)
-          onClick: @props.onChange.bind(null, table.id) 
-        })
-
-  getSweetSenseTables: ->
-    _.filter(@props.schema.getTables(), (table) => 
-      if table.deprecated
-        return false
-
-      if table.id.match(/^sweetsense/)
-        return true
-      
-      return false
-    )
-
-  render: ->
-    sweetSenseTables = @getSweetSenseTables()
-     
-    tabs = [
-      { id: "sites", label: [R('i', className: "fa fa-map-marker"), " Sites"], elem: @renderSites() }
-      { id: "forms", label: [R('i', className: "fa fa-th-list"), " Surveys"], elem: @renderForms() }
-      { id: "indicators", label: [R('i', className: "fa fa-check-circle"), " Indicators"], elem: @renderIndicators() }
-      { id: "issues", label: [R('i', className: "fa fa-exclamation-circle"), " Issues"], elem: @renderIssues() }
-      { id: "tablesets", label: [R('i', className: "fa fa-table"), " Tables"], elem: @renderTablesets() }
-      { id: "metrics", label: [R('i', className: "fa fa-line-chart"), " Metrics"], elem: @renderMetrics() }
-    ]
-
-    if sweetSenseTables.length > 0
-      tabs.push({ id: "sensors", label: " Sensors", elem: @renderSweetSense() })
-    
-    tabs.push({ id: "other", label: "Advanced", elem: @renderOther() })
-
-    return R 'div', null,
-      R 'div', className: "text-muted",
-        "Select data from sites, surveys or an advanced category below. Indicators can be found within their associated site types."
-
-      R TabbedComponent,
-        tabs: tabs
-        initialTabId: "sites"
-
-
-
-# Searchable list of forms
-class FormsListComponent extends React.Component
-  @propTypes:
-    apiUrl: PropTypes.string.isRequired # Url to hit api
-    client: PropTypes.string            # Optional client
-    schema: PropTypes.object.isRequired
-    user: PropTypes.string              # User id
-    onChange: PropTypes.func.isRequired # Called with table selected
-    extraTables: PropTypes.array.isRequired
-    onExtraTableAdd: PropTypes.func.isRequired
-    onExtraTableRemove: PropTypes.func.isRequired
-
-  @contextTypes:
-    locale: PropTypes.string  # e.g. "en"
-
-  constructor: (props) ->
-    super(props)
-    @state = { 
-      forms: null 
-      search: ""
+// Allows selection of a table. Is the complete list mode of tables
+export default MWaterCompleteTableSelectComponent = (function() {
+  MWaterCompleteTableSelectComponent = class MWaterCompleteTableSelectComponent extends React.Component {
+    constructor(...args) {
+      super(...args);
+      this.handleExtraTableAdd = this.handleExtraTableAdd.bind(this);
+      this.handleExtraTableRemove = this.handleExtraTableRemove.bind(this);
     }
 
-  componentDidMount: ->
-    # Get names and basic of forms
-    query = {}
-    query.fields = JSON.stringify({ "design.name": 1, "design.description": 1, roles: 1, created: 1, modified: 1, state: 1, isMaster: 1 })
-    query.selector = JSON.stringify({ design: { $exists: true }, state: { $ne: "deleted" } })
-    query.client = @props.client
+    static initClass() {
+      this.propTypes = {
+        apiUrl: PropTypes.string.isRequired, // Url to hit api
+        client: PropTypes.string,            // Optional client
+        schema: PropTypes.object.isRequired,
+        user: PropTypes.string,              // User id
+  
+        table: PropTypes.string,
+        onChange: PropTypes.func.isRequired, // Called with table selected
+  
+        extraTables: PropTypes.array.isRequired,
+        onExtraTablesChange: PropTypes.func.isRequired
+      };
+  
+      this.contextTypes =
+        {locale: PropTypes.string};
+        // e.g. "en"
+    }
 
-    # Get list of all form names
-    $.getJSON @props.apiUrl + "forms?" + querystring.stringify(query), (forms) => 
-      
-      # Sort by modified.on desc but first by user
-      forms = _.sortByOrder(forms, [
-        (form) => if "responses:" + form._id in (@props.extraTables or []) then 1 else 0
-        (form) => if form.created.by == @props.user then 1 else 0
-        (form) => form.modified.on
-        ], ['desc', 'desc', 'desc'])
+    handleExtraTableAdd(tableId) {
+      return this.props.onExtraTablesChange(_.union(this.props.extraTables, [tableId]));
+    }
 
-      # TODO use name instead of design.name
-      @setState(forms: _.map(forms, (form) => 
-        desc = ExprUtils.localizeString(form.design.description, @context.locale) or ""
-        if desc
-          desc += " - "
-        desc += "Modified #{moment(form.modified.on, moment.ISO_8601).format("ll")}"
+    handleExtraTableRemove(tableId) {
+      // Set to null if current table
+      if (this.props.table === tableId) {
+        this.props.onChange(null);
+      }
 
-        return { 
-          id: form._id
-          name: ExprUtils.localizeString(form.design.name, @context.locale)
-          desc: desc
+      return this.props.onExtraTablesChange(_.without(this.props.extraTables, tableId));
+    }
+
+    renderSites() {
+      let table;
+      let types = [];
+
+      for (table of this.props.schema.getTables()) {
+        if (table.deprecated) {
+          continue;
+        }
+
+        if (!table.id.match(/^entities\./)) {
+          continue;
+        }
+    
+        types.push(table.id);
+      }
+    
+      // Sort by order if present
+      types = _.sortBy(types, type => sitesOrder[type] || 999);
+
+      return R(uiComponents.OptionListComponent, {
+        items: _.compact(_.map(types, tableId => {
+          table = this.props.schema.getTable(tableId);
+          return { name: ExprUtils.localizeString(table.name, this.context.locale), desc: ExprUtils.localizeString(table.desc, this.context.locale), onClick: this.props.onChange.bind(null, table.id) };
         }))
-    .fail (xhr) =>
-      @setState(error: xhr.responseText)
-
-  handleTableRemove: (table) =>
-    if confirm("Remove #{ExprUtils.localizeString(table.name, @context.locale)}? Any widgets that depend on it will no longer work properly.")
-      @props.onExtraTableRemove(table.id)
-
-  searchRef: (comp) =>
-    # Focus
-    if comp
-      comp.focus()
-
-  render: ->
-    if @state.error
-      return R 'div', className: "alert alert-danger", @state.error
-
-    # Filter forms
-    if @state.search
-      escapeRegExp = (s) ->
-        return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
-
-      searchStringRegExp = new RegExp(escapeRegExp(@state.search), "i")
-
-      forms = _.filter(@state.forms, (form) => form.name.match(searchStringRegExp))
-    else
-      forms = @state.forms
-
-    # Remove if already included
-    forms = _.filter(forms, (f) => "responses:#{f.id}" not in (@props.extraTables or []))
-
-    tables = _.filter(@props.schema.getTables(), (table) => (table.id.match(/^responses:/) or table.id.match(/^master_responses:/)) and not table.deprecated)
-    tables = _.sortBy(tables, (t) -> t.name.en)
-
-    R 'div', null,
-      R 'label', null, "Included Surveys:"
-      if tables.length > 0
-        R uiComponents.OptionListComponent,
-          items: _.map(tables, (table) =>
-            return { 
-              name: ExprUtils.localizeString(table.name, @context.locale)
-              desc: ExprUtils.localizeString(table.desc, @context.locale)
-              onClick: @props.onChange.bind(null, table.id) 
-              onRemove: @handleTableRemove.bind(null, table)
-            }
-          )
-      else
-        R 'div', null, "None"
-
-      R('br')
-
-      R 'label', null, "All Surveys:"
-      if not @state.forms or @state.forms.length == 0
-        R 'div', className: "alert alert-info", 
-          R 'i', className: "fa fa-spinner fa-spin"
-          "\u00A0Loading..."
-      else
-        [
-          R 'input', 
-            type: "text"
-            className: "form-control input-sm"
-            placeholder: "Search..."
-            key: "search"
-            ref: @searchRef
-            style: { maxWidth: "20em", marginBottom: 10 }
-            value: @state.search
-            onChange: (ev) => @setState(search: ev.target.value)
-
-          R uiComponents.OptionListComponent,
-            items: _.map(forms, (form) => { 
-              name: form.name
-              desc: form.desc
-              onClick:  @props.onChange.bind(null, "responses:" + form.id)
-            })
-        ]
-
-# Searchable list of indicators
-class IndicatorsListComponent extends React.Component
-  @propTypes:
-    apiUrl: PropTypes.string.isRequired # Url to hit api
-    client: PropTypes.string            # Optional client
-    schema: PropTypes.object.isRequired
-    user: PropTypes.string              # User id
-    onChange: PropTypes.func.isRequired # Called with table selected
-    extraTables: PropTypes.array.isRequired
-    onExtraTableAdd: PropTypes.func.isRequired
-    onExtraTableRemove: PropTypes.func.isRequired
-
-  @contextTypes:
-    locale: PropTypes.string  # e.g. "en"
-
-  constructor: (props) ->
-    super(props)
-    @state = { 
-      indicators: null 
-      search: ""
+      }
+      );
     }
 
-  componentDidMount: ->
-    # Get names and basic of forms
-    query = {}
-    query.fields = JSON.stringify({ "design.name": 1, "design.desc": 1, "design.recommended": 1 , deprecated: 1 })
-    query.client = @props.client
+    renderForms() {
+      return R(FormsListComponent, {
+        schema: this.props.schema,
+        client: this.props.client,
+        apiUrl: this.props.apiUrl,
+        user: this.props.user,
+        onChange: this.props.onChange,
+        extraTables: this.props.extraTables,
+        onExtraTableAdd: this.handleExtraTableAdd,
+        onExtraTableRemove: this.handleExtraTableRemove
+      }
+      );
+    }
 
-    # Get list of all indicator names
-    $.getJSON @props.apiUrl + "indicators?" + querystring.stringify(query), (indicators) => 
-      # Remove deprecated
-      indicators = _.filter(indicators, (indicator) -> not indicator.deprecated)
+    renderIndicators() {
+      return R(IndicatorsListComponent, {
+        schema: this.props.schema,
+        client: this.props.client,
+        apiUrl: this.props.apiUrl,
+        user: this.props.user,
+        onChange: this.props.onChange,
+        extraTables: this.props.extraTables,
+        onExtraTableAdd: this.handleExtraTableAdd,
+        onExtraTableRemove: this.handleExtraTableRemove
+      }
+      );
+    }
+
+    renderIssues() {
+      return R(IssuesListComponent, {
+        schema: this.props.schema,
+        client: this.props.client,
+        apiUrl: this.props.apiUrl,
+        user: this.props.user,
+        onChange: this.props.onChange,
+        extraTables: this.props.extraTables,
+        onExtraTableAdd: this.handleExtraTableAdd,
+        onExtraTableRemove: this.handleExtraTableRemove
+      }
+      );
+    }
+    
+    renderSweetSense() {
+      let sweetSenseTables = this.getSweetSenseTables();
+
+      sweetSenseTables = _.sortBy(sweetSenseTables, table => table.name.en);
+      return R(uiComponents.OptionListComponent, {
+        items: _.map(sweetSenseTables, table => {
+          return { 
+            name: ExprUtils.localizeString(table.name, this.context.locale),
+            desc: ExprUtils.localizeString(table.desc, this.context.locale),
+            onClick: this.props.onChange.bind(null, table.id) 
+          };
+      })
+      }
+      );
+    }
+
+    renderTablesets() {
+      return R(MWaterCustomTablesetListComponent, { 
+        schema: this.props.schema,
+        client: this.props.client,
+        apiUrl: this.props.apiUrl,
+        user: this.props.user,
+        onChange: this.props.onChange,
+        extraTables: this.props.extraTables,
+        onExtraTableAdd: this.handleExtraTableAdd,
+        onExtraTableRemove: this.handleExtraTableRemove,
+        locale: this.context.locale
+      }
+      );
+    }
+
+    renderMetrics() {
+      return R(MWaterMetricsTableListComponent, { 
+        schema: this.props.schema,
+        client: this.props.client,
+        apiUrl: this.props.apiUrl,
+        user: this.props.user,
+        onChange: this.props.onChange,
+        extraTables: this.props.extraTables,
+        onExtraTableAdd: this.handleExtraTableAdd,
+        onExtraTableRemove: this.handleExtraTableRemove,
+        locale: this.context.locale
+      }
+      );
+    }
+
+    renderOther() {
+      let otherTables = _.filter(this.props.schema.getTables(), table => { 
+        // Remove deprecated
+        if (table.deprecated) {
+          return false;
+        }
+
+        // Remove sites
+        if (table.id.match(/^entities\./)) {
+          return false;
+        }
+
+        // sweetsense tables
+        if (table.id.match(/^sweetsense/)) {
+          return false;
+        }
+
+        // Remove responses
+        if (table.id.match(/^responses:/)) {
+          return false;
+        }
+
+        // Remove indicators
+        if (table.id.match(/^indicator_values:/)) {
+          return false;
+        }
+
+        // Remove issues
+        if (table.id.match(/^(issues|issue_events):/)) {
+          return false;
+        }
+
+        // Remove custom tablesets
+        if (table.id.match(/^custom\./)) {
+          return false;
+        }
+
+        // Remove metrics
+        if (table.id.match(/^metric:/)) {
+          return false;
+        }
+
+        return true;
+      });
+
+      otherTables = _.sortBy(otherTables, table => table.name.en);
+      return R(uiComponents.OptionListComponent, {
+        items: _.map(otherTables, table => {
+          return { 
+            name: ExprUtils.localizeString(table.name, this.context.locale),
+            desc: ExprUtils.localizeString(table.desc, this.context.locale),
+            onClick: this.props.onChange.bind(null, table.id) 
+          };
+      })
+      }
+      );
+    }
+
+    getSweetSenseTables() {
+      return _.filter(this.props.schema.getTables(), table => { 
+        if (table.deprecated) {
+          return false;
+        }
+
+        if (table.id.match(/^sweetsense/)) {
+          return true;
+        }
       
-      # Sort by name
+        return false;
+      });
+    }
+
+    render() {
+      const sweetSenseTables = this.getSweetSenseTables();
+     
+      const tabs = [
+        { id: "sites", label: [R('i', {className: "fa fa-map-marker"}), " Sites"], elem: this.renderSites() },
+        { id: "forms", label: [R('i', {className: "fa fa-th-list"}), " Surveys"], elem: this.renderForms() },
+        { id: "indicators", label: [R('i', {className: "fa fa-check-circle"}), " Indicators"], elem: this.renderIndicators() },
+        { id: "issues", label: [R('i', {className: "fa fa-exclamation-circle"}), " Issues"], elem: this.renderIssues() },
+        { id: "tablesets", label: [R('i', {className: "fa fa-table"}), " Tables"], elem: this.renderTablesets() },
+        { id: "metrics", label: [R('i', {className: "fa fa-line-chart"}), " Metrics"], elem: this.renderMetrics() }
+      ];
+
+      if (sweetSenseTables.length > 0) {
+        tabs.push({ id: "sensors", label: " Sensors", elem: this.renderSweetSense() });
+      }
+    
+      tabs.push({ id: "other", label: "Advanced", elem: this.renderOther() });
+
+      return R('div', null,
+        R('div', {className: "text-muted"},
+          "Select data from sites, surveys or an advanced category below. Indicators can be found within their associated site types."),
+
+        R(TabbedComponent, {
+          tabs,
+          initialTabId: "sites"
+        }
+        )
+      );
+    }
+  };
+  MWaterCompleteTableSelectComponent.initClass();
+  return MWaterCompleteTableSelectComponent;
+})();
+
+
+
+// Searchable list of forms
+class FormsListComponent extends React.Component {
+  static initClass() {
+    this.propTypes = {
+      apiUrl: PropTypes.string.isRequired, // Url to hit api
+      client: PropTypes.string,            // Optional client
+      schema: PropTypes.object.isRequired,
+      user: PropTypes.string,              // User id
+      onChange: PropTypes.func.isRequired, // Called with table selected
+      extraTables: PropTypes.array.isRequired,
+      onExtraTableAdd: PropTypes.func.isRequired,
+      onExtraTableRemove: PropTypes.func.isRequired
+    };
+  
+    this.contextTypes =
+      {locale: PropTypes.string};
+      // e.g. "en"
+  }
+
+  constructor(props) {
+    this.handleTableRemove = this.handleTableRemove.bind(this);
+    this.searchRef = this.searchRef.bind(this);
+    super(props);
+    this.state = { 
+      forms: null, 
+      search: ""
+    };
+  }
+
+  componentDidMount() {
+    // Get names and basic of forms
+    const query = {};
+    query.fields = JSON.stringify({ "design.name": 1, "design.description": 1, roles: 1, created: 1, modified: 1, state: 1, isMaster: 1 });
+    query.selector = JSON.stringify({ design: { $exists: true }, state: { $ne: "deleted" } });
+    query.client = this.props.client;
+
+    // Get list of all form names
+    return $.getJSON(this.props.apiUrl + "forms?" + querystring.stringify(query), forms => { 
+      
+      // Sort by modified.on desc but first by user
+      forms = _.sortByOrder(forms, [
+        form => (this.props.extraTables || []).includes("responses:" + form._id) ? 1 : 0,
+        form => form.created.by === this.props.user ? 1 : 0,
+        form => form.modified.on
+        ], ['desc', 'desc', 'desc']);
+
+      // TODO use name instead of design.name
+      return this.setState({forms: _.map(forms, form => { 
+        let desc = ExprUtils.localizeString(form.design.description, this.context.locale) || "";
+        if (desc) {
+          desc += " - ";
+        }
+        desc += `Modified ${moment(form.modified.on, moment.ISO_8601).format("ll")}`;
+
+        return { 
+          id: form._id,
+          name: ExprUtils.localizeString(form.design.name, this.context.locale),
+          desc
+        };
+    })});
+  }).fail(xhr => {
+      return this.setState({error: xhr.responseText});
+    });
+  }
+
+  handleTableRemove(table) {
+    if (confirm(`Remove ${ExprUtils.localizeString(table.name, this.context.locale)}? Any widgets that depend on it will no longer work properly.`)) {
+      return this.props.onExtraTableRemove(table.id);
+    }
+  }
+
+  searchRef(comp) {
+    // Focus
+    if (comp) {
+      return comp.focus();
+    }
+  }
+
+  render() {
+    let forms;
+    if (this.state.error) {
+      return R('div', {className: "alert alert-danger"}, this.state.error);
+    }
+
+    // Filter forms
+    if (this.state.search) {
+      const escapeRegExp = s => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+
+      const searchStringRegExp = new RegExp(escapeRegExp(this.state.search), "i");
+
+      forms = _.filter(this.state.forms, form => form.name.match(searchStringRegExp));
+    } else {
+      ({
+        forms
+      } = this.state);
+    }
+
+    // Remove if already included
+    forms = _.filter(forms, f => !(this.props.extraTables || []).includes(`responses:${f.id}`));
+
+    let tables = _.filter(this.props.schema.getTables(), table => (table.id.match(/^responses:/) || table.id.match(/^master_responses:/)) && !table.deprecated);
+    tables = _.sortBy(tables, t => t.name.en);
+
+    return R('div', null,
+      R('label', null, "Included Surveys:"),
+      tables.length > 0 ?
+        R(uiComponents.OptionListComponent, {
+          items: _.map(tables, table => {
+            return { 
+              name: ExprUtils.localizeString(table.name, this.context.locale),
+              desc: ExprUtils.localizeString(table.desc, this.context.locale),
+              onClick: this.props.onChange.bind(null, table.id), 
+              onRemove: this.handleTableRemove.bind(null, table)
+            };
+          })
+        }
+        )
+      :
+        R('div', null, "None"),
+
+      R('br'),
+
+      R('label', null, "All Surveys:"),
+      !this.state.forms || (this.state.forms.length === 0) ?
+        R('div', {className: "alert alert-info"}, 
+          R('i', {className: "fa fa-spinner fa-spin"}),
+          "\u00A0Loading...")
+      :
+        [
+          R('input', { 
+            type: "text",
+            className: "form-control input-sm",
+            placeholder: "Search...",
+            key: "search",
+            ref: this.searchRef,
+            style: { maxWidth: "20em", marginBottom: 10 },
+            value: this.state.search,
+            onChange: ev => this.setState({search: ev.target.value})
+          }
+          ),
+
+          R(uiComponents.OptionListComponent, {
+            items: _.map(forms, form => ({ 
+              name: form.name,
+              desc: form.desc,
+              onClick:  this.props.onChange.bind(null, "responses:" + form.id)
+            }))
+          }
+          )
+        ]);
+  }
+}
+FormsListComponent.initClass();
+
+// Searchable list of indicators
+class IndicatorsListComponent extends React.Component {
+  static initClass() {
+    this.propTypes = {
+      apiUrl: PropTypes.string.isRequired, // Url to hit api
+      client: PropTypes.string,            // Optional client
+      schema: PropTypes.object.isRequired,
+      user: PropTypes.string,              // User id
+      onChange: PropTypes.func.isRequired, // Called with table selected
+      extraTables: PropTypes.array.isRequired,
+      onExtraTableAdd: PropTypes.func.isRequired,
+      onExtraTableRemove: PropTypes.func.isRequired
+    };
+  
+    this.contextTypes =
+      {locale: PropTypes.string};
+      // e.g. "en"
+  }
+
+  constructor(props) {
+    this.handleTableRemove = this.handleTableRemove.bind(this);
+    this.searchRef = this.searchRef.bind(this);
+    this.handleSelect = this.handleSelect.bind(this);
+    super(props);
+    this.state = { 
+      indicators: null, 
+      search: ""
+    };
+  }
+
+  componentDidMount() {
+    // Get names and basic of forms
+    const query = {};
+    query.fields = JSON.stringify({ "design.name": 1, "design.desc": 1, "design.recommended": 1 , deprecated: 1 });
+    query.client = this.props.client;
+
+    // Get list of all indicator names
+    return $.getJSON(this.props.apiUrl + "indicators?" + querystring.stringify(query), indicators => { 
+      // Remove deprecated
+      indicators = _.filter(indicators, indicator => !indicator.deprecated);
+      
+      // Sort by name
       indicators = _.sortByOrder(indicators, [
-        (indicator) => if "indicator_values:" + indicator._id in (@props.extraTables or []) then 0 else 1
-        (indicator) => if indicator.design.recommended then 0 else 1
-        (indicator) => ExprUtils.localizeString(indicator.design.name, @context.locale)
-        ], ['asc', 'asc', 'asc'])
+        indicator => (this.props.extraTables || []).includes("indicator_values:" + indicator._id) ? 0 : 1,
+        indicator => indicator.design.recommended ? 0 : 1,
+        indicator => ExprUtils.localizeString(indicator.design.name, this.context.locale)
+        ], ['asc', 'asc', 'asc']);
 
-      @setState(indicators: _.map(indicators, (indicator) => { 
-        id: indicator._id
-        name: ExprUtils.localizeString(indicator.design.name, @context.locale)
-        desc: ExprUtils.localizeString(indicator.design.desc, @context.locale)
-      }))
-    .fail (xhr) =>
-      @setState(error: xhr.responseText)
+      return this.setState({indicators: _.map(indicators, indicator => ({ 
+        id: indicator._id,
+        name: ExprUtils.localizeString(indicator.design.name, this.context.locale),
+        desc: ExprUtils.localizeString(indicator.design.desc, this.context.locale)
+      }))});
+  }).fail(xhr => {
+      return this.setState({error: xhr.responseText});
+    });
+  }
 
-  handleTableRemove: (table) =>
-    if confirm("Remove #{ExprUtils.localizeString(table.name, @context.locale)}? Any widgets that depend on it will no longer work properly.")
-      @props.onExtraTableRemove(table.id)
+  handleTableRemove(table) {
+    if (confirm(`Remove ${ExprUtils.localizeString(table.name, this.context.locale)}? Any widgets that depend on it will no longer work properly.`)) {
+      return this.props.onExtraTableRemove(table.id);
+    }
+  }
 
-  searchRef: (comp) =>
-    # Focus
-    if comp
-      comp.focus()
+  searchRef(comp) {
+    // Focus
+    if (comp) {
+      return comp.focus();
+    }
+  }
 
-  handleSelect: (tableId) =>
-    # Add table if not present
-    if not @props.schema.getTable(tableId)
-      @props.onExtraTableAdd(tableId)
+  handleSelect(tableId) {
+    // Add table if not present
+    if (!this.props.schema.getTable(tableId)) {
+      this.props.onExtraTableAdd(tableId);
+    }
 
-    @addIndicatorConfirmPopup.show(tableId)
+    return this.addIndicatorConfirmPopup.show(tableId);
+  }
 
-  render: ->
-    if @state.error
-      return R 'div', className: "alert alert-danger", @state.error
+  render() {
+    let indicators;
+    if (this.state.error) {
+      return R('div', {className: "alert alert-danger"}, this.state.error);
+    }
 
-    # Filter indicators
-    if @state.search
-      escapeRegExp = (s) ->
-        return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+    // Filter indicators
+    if (this.state.search) {
+      const escapeRegExp = s => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 
-      searchStringRegExp = new RegExp(escapeRegExp(@state.search), "i")
+      const searchStringRegExp = new RegExp(escapeRegExp(this.state.search), "i");
 
-      indicators = _.filter(@state.indicators, (indicator) => indicator.name.match(searchStringRegExp))
-    else
-      indicators = @state.indicators
+      indicators = _.filter(this.state.indicators, indicator => indicator.name.match(searchStringRegExp));
+    } else {
+      ({
+        indicators
+      } = this.state);
+    }
 
-    # Remove if already included
-    indicators = _.filter(indicators, (f) => "indicator_values:#{f.id}" not in (@props.extraTables or []))
+    // Remove if already included
+    indicators = _.filter(indicators, f => !(this.props.extraTables || []).includes(`indicator_values:${f.id}`));
 
-    tables = _.filter(@props.schema.getTables(), (table) => table.id.match(/^indicator_values:/) and not table.deprecated)
-    tables = _.sortBy(tables, (t) -> t.name.en)
+    let tables = _.filter(this.props.schema.getTables(), table => table.id.match(/^indicator_values:/) && !table.deprecated);
+    tables = _.sortBy(tables, t => t.name.en);
 
-    R 'div', null,
-      R AddIndicatorConfirmPopupComponent,
-        schema: @props.schema
-        onChange: @props.onChange
-        onExtraTableAdd: @props.onExtraTableAdd
-        ref: (c) => @addIndicatorConfirmPopup = c
+    return R('div', null,
+      R(AddIndicatorConfirmPopupComponent, {
+        schema: this.props.schema,
+        onChange: this.props.onChange,
+        onExtraTableAdd: this.props.onExtraTableAdd,
+        ref: c => { return this.addIndicatorConfirmPopup = c; }
+      }
+      ),
 
-      R 'label', null, "Included Indicators:"
-      if tables.length > 0
-        R uiComponents.OptionListComponent,
-          items: _.map(tables, (table) =>
+      R('label', null, "Included Indicators:"),
+      tables.length > 0 ?
+        R(uiComponents.OptionListComponent, {
+          items: _.map(tables, table => {
             return { 
-              name: ExprUtils.localizeString(table.name, @context.locale)
-              desc: ExprUtils.localizeString(table.desc, @context.locale)
-              onClick: @handleSelect.bind(null, table.id) 
-              onRemove: @handleTableRemove.bind(null, table)
-            }
-          )
-      else
-        R 'div', null, "None"
+              name: ExprUtils.localizeString(table.name, this.context.locale),
+              desc: ExprUtils.localizeString(table.desc, this.context.locale),
+              onClick: this.handleSelect.bind(null, table.id), 
+              onRemove: this.handleTableRemove.bind(null, table)
+            };
+          })
+        }
+        )
+      :
+        R('div', null, "None"),
 
-      R('br')
+      R('br'),
 
-      R 'label', null, "All Indicators:"
-      if not @state.indicators or @state.indicators.length == 0
-        R 'div', className: "alert alert-info", 
-          R 'i', className: "fa fa-spinner fa-spin"
-          "\u00A0Loading..."
-      else
+      R('label', null, "All Indicators:"),
+      !this.state.indicators || (this.state.indicators.length === 0) ?
+        R('div', {className: "alert alert-info"}, 
+          R('i', {className: "fa fa-spinner fa-spin"}),
+          "\u00A0Loading...")
+      :
         [
-          R 'input', 
-            type: "text"
-            className: "form-control input-sm"
-            placeholder: "Search..."
-            key: "search"
-            ref: @searchRef
-            style: { maxWidth: "20em", marginBottom: 10 }
-            value: @state.search
-            onChange: (ev) => @setState(search: ev.target.value)
+          R('input', { 
+            type: "text",
+            className: "form-control input-sm",
+            placeholder: "Search...",
+            key: "search",
+            ref: this.searchRef,
+            style: { maxWidth: "20em", marginBottom: 10 },
+            value: this.state.search,
+            onChange: ev => this.setState({search: ev.target.value})
+          }
+          ),
 
-          R uiComponents.OptionListComponent,
-            items: _.map(indicators, (indicator) => { 
-              name: indicator.name
-              desc: indicator.desc
-              onClick: @handleSelect.bind(null, "indicator_values:" + indicator.id)
-            })
-        ]
+          R(uiComponents.OptionListComponent, {
+            items: _.map(indicators, indicator => ({ 
+              name: indicator.name,
+              desc: indicator.desc,
+              onClick: this.handleSelect.bind(null, "indicator_values:" + indicator.id)
+            }))
+          }
+          )
+        ]);
+  }
+}
+IndicatorsListComponent.initClass();
 
-class AddIndicatorConfirmPopupComponent extends React.Component
-  @propTypes:
-    schema: PropTypes.object.isRequired
-    onChange: PropTypes.func.isRequired # Called with table selected
-    onExtraTableAdd: PropTypes.func.isRequired
+class AddIndicatorConfirmPopupComponent extends React.Component {
+  static initClass() {
+    this.propTypes = {
+      schema: PropTypes.object.isRequired,
+      onChange: PropTypes.func.isRequired, // Called with table selected
+      onExtraTableAdd: PropTypes.func.isRequired
+    };
+  
+    this.contextTypes =
+      {locale: PropTypes.string};
+      // e.g. "en"
+  }
 
-  @contextTypes:
-    locale: PropTypes.string  # e.g. "en"
-
-  constructor: (props) ->
-    super(props)
-    @state = { 
-      visible: false
+  constructor(props) {
+    super(props);
+    this.state = { 
+      visible: false,
       indicatorTable: null
+    };
+  }
+
+  show(indicatorTable) {
+    return this.setState({visible: true, indicatorTable});
+  }
+
+  renderContents() {
+    // Show loading if table not loaded
+    if (!this.props.schema.getTable(this.state.indicatorTable)) {
+      return R('div', {className: "alert alert-info"}, 
+        R('i', {className: "fa fa-spinner fa-spin"}),
+        "\u00A0Loading...");
     }
 
-  show: (indicatorTable) ->
-    @setState(visible: true, indicatorTable: indicatorTable)
+    // Find entity links
+    const entityColumns = _.filter(this.props.schema.getColumns(this.state.indicatorTable), col => col.join?.toTable?.match(/^entities\./));
 
-  renderContents: ->
-    # Show loading if table not loaded
-    if not @props.schema.getTable(@state.indicatorTable)
-      return R 'div', className: "alert alert-info", 
-        R 'i', className: "fa fa-spinner fa-spin"
-        "\u00A0Loading..."
+    return R('div', null,
+      R('p', null, 
+        `In general, it is better to get indicator values from the related site. Please select the site 
+below, then find the indicator values in the 'Related Indicators' section. Or click on 'Use Raw Indicator' if you 
+are certain that you want to use the raw indicator table`
+      ),
 
-    # Find entity links
-    entityColumns = _.filter(@props.schema.getColumns(@state.indicatorTable), (col) => col.join?.toTable?.match(/^entities\./))
+      R(uiComponents.OptionListComponent, {
+        items: _.map(entityColumns, entityColumn => ({ 
+          name: ExprUtils.localizeString(entityColumn.name, this.context.locale),
+          desc: ExprUtils.localizeString(entityColumn.desc, this.context.locale),
+          onClick: () => { 
+            // Select table
+            this.props.onChange(entityColumn.join.toTable);
+            return this.setState({visible: false});
+          }
+        }))
+      }
+      ),
 
-    R 'div', null,
-      R 'p', null, 
-        '''In general, it is better to get indicator values from the related site. Please select the site 
-        below, then find the indicator values in the 'Related Indicators' section. Or click on 'Use Raw Indicator' if you 
-        are certain that you want to use the raw indicator table'''
+      R('br'),
 
-      R uiComponents.OptionListComponent,
-        items: _.map(entityColumns, (entityColumn) => { 
-          name: ExprUtils.localizeString(entityColumn.name, @context.locale)
-          desc: ExprUtils.localizeString(entityColumn.desc, @context.locale)
-          onClick: => 
-            # Select table
-            @props.onChange(entityColumn.join.toTable)
-            @setState(visible: false)
-        })
+      R('div', null,
+        R('a', {onClick: this.props.onChange.bind(null, this.state.indicatorTable)},
+          "Use Raw Indicator")
+      )
+    );
+  }
 
-      R('br')
+  render() {
+    if (!this.state.visible) {
+      return null;
+    }
 
-      R 'div', null,
-        R 'a', onClick: @props.onChange.bind(null, @state.indicatorTable),
-          "Use Raw Indicator"
-
-  render: ->
-    if not @state.visible
-      return null
-
-    R ModalPopupComponent,
-      showCloseX: true
-      onClose: => @setState(visible: false)
-      header: "Add Indicator",
-        @renderContents()
+    return R(ModalPopupComponent, {
+      showCloseX: true,
+      onClose: () => this.setState({visible: false}),
+      header: "Add Indicator"
+    },
+        this.renderContents());
+  }
+}
+AddIndicatorConfirmPopupComponent.initClass();
 
 
-# Searchable list of issue types
-class IssuesListComponent extends React.Component
-  @propTypes:
-    apiUrl: PropTypes.string.isRequired # Url to hit api
-    client: PropTypes.string            # Optional client
-    schema: PropTypes.object.isRequired
-    user: PropTypes.string              # User id
-    onChange: PropTypes.func.isRequired # Called with table selected
-    extraTables: PropTypes.array.isRequired
-    onExtraTableAdd: PropTypes.func.isRequired
-    onExtraTableRemove: PropTypes.func.isRequired
+// Searchable list of issue types
+class IssuesListComponent extends React.Component {
+  static initClass() {
+    this.propTypes = {
+      apiUrl: PropTypes.string.isRequired, // Url to hit api
+      client: PropTypes.string,            // Optional client
+      schema: PropTypes.object.isRequired,
+      user: PropTypes.string,              // User id
+      onChange: PropTypes.func.isRequired, // Called with table selected
+      extraTables: PropTypes.array.isRequired,
+      onExtraTableAdd: PropTypes.func.isRequired,
+      onExtraTableRemove: PropTypes.func.isRequired
+    };
+  
+    this.contextTypes =
+      {locale: PropTypes.string};
+      // e.g. "en"
+  }
 
-  @contextTypes:
-    locale: PropTypes.string  # e.g. "en"
-
-  constructor: (props) ->
-    super(props)
-    @state = { 
-      issueTypes: null 
+  constructor(props) {
+    this.handleTableRemove = this.handleTableRemove.bind(this);
+    this.searchRef = this.searchRef.bind(this);
+    super(props);
+    this.state = { 
+      issueTypes: null, 
       search: ""
+    };
+  }
+
+  componentDidMount() {
+    // Get names and basic of issueTypes
+    const query = {};
+    query.fields = JSON.stringify({ name: 1, desc: 1, roles: 1, created: 1, modified: 1 });
+    query.client = this.props.client;
+
+    // Get list of all issueType names
+    return $.getJSON(this.props.apiUrl + "issue_types?" + querystring.stringify(query), issueTypes => { 
+      
+      // Sort by modified.on desc but first by user
+      issueTypes = _.sortByOrder(issueTypes, [
+        issueType => (this.props.extraTables || []).includes("issues:" + issueType._id) ? 0 : 1,
+        issueType => issueType.created.by === this.props.user ? 0 : 1,
+        issueType => ExprUtils.localizeString(issueType.name, this.context.locale)
+        ], ['asc', 'asc', 'asc']);
+
+      return this.setState({issueTypes: _.map(issueTypes, issueType => ({ 
+        id: issueType._id,
+        name: ExprUtils.localizeString(issueType.name, this.context.locale),
+        desc: ExprUtils.localizeString(issueType.desc, this.context.locale)
+      }))});
+  }).fail(xhr => {
+      return this.setState({error: xhr.responseText});
+    });
+  }
+
+  handleTableRemove(table) {
+    if (confirm(`Remove ${ExprUtils.localizeString(table.name, this.context.locale)}? Any widgets that depend on it will no longer work properly.`)) {
+      return this.props.onExtraTableRemove(table.id);
+    }
+  }
+
+  searchRef(comp) {
+    // Focus
+    if (comp) {
+      return comp.focus();
+    }
+  }
+
+  render() {
+    let issueTypes;
+    if (this.state.error) {
+      return R('div', {className: "alert alert-danger"}, this.state.error);
     }
 
-  componentDidMount: ->
-    # Get names and basic of issueTypes
-    query = {}
-    query.fields = JSON.stringify({ name: 1, desc: 1, roles: 1, created: 1, modified: 1 })
-    query.client = @props.client
+    // Filter issueTypes
+    if (this.state.search) {
+      const escapeRegExp = s => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 
-    # Get list of all issueType names
-    $.getJSON @props.apiUrl + "issue_types?" + querystring.stringify(query), (issueTypes) => 
-      
-      # Sort by modified.on desc but first by user
-      issueTypes = _.sortByOrder(issueTypes, [
-        (issueType) => if "issues:" + issueType._id in (@props.extraTables or []) then 0 else 1
-        (issueType) => if issueType.created.by == @props.user then 0 else 1
-        (issueType) => ExprUtils.localizeString(issueType.name, @context.locale)
-        ], ['asc', 'asc', 'asc'])
+      const searchStringRegExp = new RegExp(escapeRegExp(this.state.search), "i");
 
-      @setState(issueTypes: _.map(issueTypes, (issueType) => { 
-        id: issueType._id
-        name: ExprUtils.localizeString(issueType.name, @context.locale)
-        desc: ExprUtils.localizeString(issueType.desc, @context.locale)
-      }))
-    .fail (xhr) =>
-      @setState(error: xhr.responseText)
+      issueTypes = _.filter(this.state.issueTypes, issueType => issueType.name.match(searchStringRegExp));
+    } else {
+      ({
+        issueTypes
+      } = this.state);
+    }
 
-  handleTableRemove: (table) =>
-    if confirm("Remove #{ExprUtils.localizeString(table.name, @context.locale)}? Any widgets that depend on it will no longer work properly.")
-      @props.onExtraTableRemove(table.id)
+    // Remove if already included
+    issueTypes = _.filter(issueTypes, f => !(this.props.extraTables || []).includes(`issues:${f.id}`));
 
-  searchRef: (comp) =>
-    # Focus
-    if comp
-      comp.focus()
+    let tables = _.filter(this.props.schema.getTables(), table => (table.id.match(/^issues:/) || table.id.match(/^issue_events:/)) && !table.deprecated);
+    tables = _.sortBy(tables, t => t.name.en);
 
-  render: ->
-    if @state.error
-      return R 'div', className: "alert alert-danger", @state.error
-
-    # Filter issueTypes
-    if @state.search
-      escapeRegExp = (s) ->
-        return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
-
-      searchStringRegExp = new RegExp(escapeRegExp(@state.search), "i")
-
-      issueTypes = _.filter(@state.issueTypes, (issueType) => issueType.name.match(searchStringRegExp))
-    else
-      issueTypes = @state.issueTypes
-
-    # Remove if already included
-    issueTypes = _.filter(issueTypes, (f) => "issues:#{f.id}" not in (@props.extraTables or []))
-
-    tables = _.filter(@props.schema.getTables(), (table) => (table.id.match(/^issues:/) or table.id.match(/^issue_events:/)) and not table.deprecated)
-    tables = _.sortBy(tables, (t) -> t.name.en)
-
-    R 'div', null,
-      R 'label', null, "Included Issues:"
-      if tables.length > 0
-        R uiComponents.OptionListComponent,
-          items: _.map(tables, (table) =>
+    return R('div', null,
+      R('label', null, "Included Issues:"),
+      tables.length > 0 ?
+        R(uiComponents.OptionListComponent, {
+          items: _.map(tables, table => {
             return { 
-              name: ExprUtils.localizeString(table.name, @context.locale)
-              desc: ExprUtils.localizeString(table.desc, @context.locale)
-              onClick: @props.onChange.bind(null, table.id) 
-              onRemove: @handleTableRemove.bind(null, table)
-            }
-          )
-      else
-        R 'div', null, "None"
+              name: ExprUtils.localizeString(table.name, this.context.locale),
+              desc: ExprUtils.localizeString(table.desc, this.context.locale),
+              onClick: this.props.onChange.bind(null, table.id), 
+              onRemove: this.handleTableRemove.bind(null, table)
+            };
+          })
+        }
+        )
+      :
+        R('div', null, "None"),
 
-      R('br')
+      R('br'),
 
-      R 'label', null, "All Issues:"
-      if not @state.issueTypes or @state.issueTypes.length == 0
-        R 'div', className: "alert alert-info", 
-          R 'i', className: "fa fa-spinner fa-spin"
-          "\u00A0Loading..."
-      else
+      R('label', null, "All Issues:"),
+      !this.state.issueTypes || (this.state.issueTypes.length === 0) ?
+        R('div', {className: "alert alert-info"}, 
+          R('i', {className: "fa fa-spinner fa-spin"}),
+          "\u00A0Loading...")
+      :
         [
-          R 'input', 
-            type: "text"
-            className: "form-control input-sm"
-            placeholder: "Search..."
-            key: "search"
-            ref: @searchRef
-            style: { maxWidth: "20em", marginBottom: 10 }
-            value: @state.search
-            onChange: (ev) => @setState(search: ev.target.value)
+          R('input', { 
+            type: "text",
+            className: "form-control input-sm",
+            placeholder: "Search...",
+            key: "search",
+            ref: this.searchRef,
+            style: { maxWidth: "20em", marginBottom: 10 },
+            value: this.state.search,
+            onChange: ev => this.setState({search: ev.target.value})
+          }
+          ),
 
-          R uiComponents.OptionListComponent,
-            items: _.map(issueTypes, (issueType) => { 
-              name: issueType.name
-              desc: issueType.desc
-              onClick:  @props.onChange.bind(null, "issues:" + issueType.id)
-            })
-        ]
+          R(uiComponents.OptionListComponent, {
+            items: _.map(issueTypes, issueType => ({ 
+              name: issueType.name,
+              desc: issueType.desc,
+              onClick:  this.props.onChange.bind(null, "issues:" + issueType.id)
+            }))
+          }
+          )
+        ]);
+  }
+}
+IssuesListComponent.initClass();

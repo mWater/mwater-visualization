@@ -1,84 +1,113 @@
-PropTypes = require('prop-types')
-_ = require 'lodash'
-React = require 'react'
-R = React.createElement
-moment = require 'moment'
+let ExprCellComponent;
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import React from 'react';
+const R = React.createElement;
+import moment from 'moment';
+import { ExprUtils } from "mwater-expressions";
+import { default as Linkify } from 'react-linkify';
+import { Cell } from 'fixed-data-table-2';
+import { canFormatType } from '../valueFormatter';
+import { formatValue } from '../valueFormatter';
 
-ExprUtils = require("mwater-expressions").ExprUtils
-Linkify = require('react-linkify').default
-Cell = require('fixed-data-table-2').Cell
+// Cell that displays an expression column cell
+export default ExprCellComponent = (function() {
+  ExprCellComponent = class ExprCellComponent extends React.Component {
+    constructor(...args) {
+      super(...args);
+      this.handleClick = this.handleClick.bind(this);
+    }
 
-canFormatType = require('../valueFormatter').canFormatType
-formatValue = require('../valueFormatter').formatValue
+    static initClass() {
+      this.propTypes = {
+        schema: PropTypes.object.isRequired,     // schema to use
+        dataSource: PropTypes.object.isRequired, // dataSource to use
+  
+        locale: PropTypes.string,      // Locale to use
+  
+        exprType: PropTypes.string,
+  
+        format: PropTypes.string,      // Optional format
+  
+        width: PropTypes.number.isRequired,
+        height: PropTypes.number.isRequired,
+  
+        value: PropTypes.any,
+        expr: PropTypes.object,
+  
+        muted: PropTypes.bool,       // True to show muted
+  
+        onClick: PropTypes.func
+      };
+    }
 
-# Cell that displays an expression column cell
-module.exports = class ExprCellComponent extends React.Component
-  @propTypes:
-    schema: PropTypes.object.isRequired     # schema to use
-    dataSource: PropTypes.object.isRequired # dataSource to use
+    handleClick() {
+      return this.setState({editing: true});
+    }
 
-    locale: PropTypes.string      # Locale to use
+    renderImage(id) {
+      const url = this.props.dataSource.getImageUrl(id);
+      return R('a', {href: url, key: id, target: "_blank", style: { paddingLeft: 5, paddingRight: 5 }}, "Image");
+    }
 
-    exprType: PropTypes.string
+    render() {
+      let node;
+      const exprUtils = new ExprUtils(this.props.schema);
+      let {
+        value
+      } = this.props;
 
-    format: PropTypes.string      # Optional format
+      if ((value == null) || !this.props.expr) {
+        node = null;
+      } else {
+        // Parse if should be JSON
+        if (['image', 'imagelist', 'geometry', 'text[]'].includes(this.props.exprType) && _.isString(value)) {
+          value = JSON.parse(value);
+        }
 
-    width: PropTypes.number.isRequired
-    height: PropTypes.number.isRequired
+        // Format if possible
+        if (canFormatType(this.props.exprType)) {
+          node = formatValue(this.props.exprType, value, this.props.format);
+        } else { 
+          // Convert to node based on type
+          switch (this.props.exprType) {
+            case "text":
+              node = R(Linkify, { properties: { target: '_blank' }}, value);
+              break;
+            case "boolean": case "enum": case "enumset": case "text[]":
+              node = exprUtils.stringifyExprLiteral(this.props.expr, value, this.props.locale);
+              break;
+            case "date":
+              node = moment(value, "YYYY-MM-DD").format("ll");
+              break;
+            case "datetime":
+              node = moment(value, moment.ISO_8601).format("lll");
+              break;
+            case "image":
+              node = this.renderImage(value.id);
+              break;
+            case "imagelist":
+              node = _.map(value, v => this.renderImage(v.id));
+              break;
+            default:
+              node = "" + value;
+          }
+        }
+      }
 
-    value: PropTypes.any
-    expr: PropTypes.object
-
-    muted: PropTypes.bool       # True to show muted
-
-    onClick: PropTypes.func
-
-  handleClick: =>
-    @setState(editing: true)
-
-  renderImage: (id) ->
-    url = @props.dataSource.getImageUrl(id)
-    return R('a', href: url, key: id, target: "_blank", style: { paddingLeft: 5, paddingRight: 5 }, "Image")
-
-  render: ->
-    exprUtils = new ExprUtils(@props.schema)
-    value = @props.value
-
-    if not value? or not @props.expr
-      node = null
-    else
-      # Parse if should be JSON
-      if @props.exprType in ['image', 'imagelist', 'geometry', 'text[]'] and _.isString(value)
-        value = JSON.parse(value)
-
-      # Format if possible
-      if canFormatType(@props.exprType)
-        node = formatValue(@props.exprType, value, @props.format)
-      else 
-        # Convert to node based on type
-        switch @props.exprType
-          when "text"
-            node = R(Linkify, { properties: { target: '_blank' }}, value)
-          when "boolean", "enum", "enumset", "text[]"
-            node = exprUtils.stringifyExprLiteral(@props.expr, value, @props.locale)
-          when "date"
-            node = moment(value, "YYYY-MM-DD").format("ll")
-          when "datetime"
-            node = moment(value, moment.ISO_8601).format("lll")
-          when "image"
-            node = @renderImage(value.id)
-          when "imagelist"
-            node = _.map(value, (v) => @renderImage(v.id))
-          else
-            node = "" + value
-
-    return R Cell, 
-      width: @props.width
-      height: @props.height
-      onClick: @props.onClick
-      style: { 
-        whiteSpace: "nowrap" 
-        textAlign: if @props.exprType in ['number'] then "right" else "left"
-        opacity: if @props.muted then 0.4 
+      return R(Cell, { 
+        width: this.props.width,
+        height: this.props.height,
+        onClick: this.props.onClick,
+        style: { 
+          whiteSpace: "nowrap", 
+          textAlign: ['number'].includes(this.props.exprType) ? "right" : "left",
+          opacity: this.props.muted ? 0.4 : undefined 
+        }
       }, 
-        node
+          node);
+    }
+  };
+  ExprCellComponent.initClass();
+  return ExprCellComponent;
+})();

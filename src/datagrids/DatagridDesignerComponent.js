@@ -1,407 +1,519 @@
-PropTypes = require('prop-types')
-_ = require 'lodash'
-React = require 'react'
-R = React.createElement
+let DatagridDesignerComponent;
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import React from 'react';
+const R = React.createElement;
 
-ExprUtils = require("mwater-expressions").ExprUtils
-ExprValidator = require("mwater-expressions").ExprValidator
-TabbedComponent = require 'react-library/lib/TabbedComponent'
-ExprComponent = require('mwater-expressions-ui').ExprComponent
-FilterExprComponent = require('mwater-expressions-ui').FilterExprComponent
-OrderBysDesignerComponent = require './OrderBysDesignerComponent'
-ReorderableListComponent = require("react-library/lib/reorderable/ReorderableListComponent")
-QuickfiltersDesignComponent = require '../quickfilter/QuickfiltersDesignComponent'
-LabeledExprGenerator = require './LabeledExprGenerator'
+import { ExprUtils } from "mwater-expressions";
+import { ExprValidator } from "mwater-expressions";
+import TabbedComponent from 'react-library/lib/TabbedComponent';
+import { ExprComponent } from 'mwater-expressions-ui';
+import { FilterExprComponent } from 'mwater-expressions-ui';
+import OrderBysDesignerComponent from './OrderBysDesignerComponent';
+import ReorderableListComponent from "react-library/lib/reorderable/ReorderableListComponent";
+import QuickfiltersDesignComponent from '../quickfilter/QuickfiltersDesignComponent';
+import LabeledExprGenerator from './LabeledExprGenerator';
+import TableSelectComponent from '../TableSelectComponent';
+import uuid from 'uuid';
+import update from 'update-object';
+import ui from 'react-library/lib/bootstrap';
+import { getFormatOptions } from '../valueFormatter';
+import { getDefaultFormat } from '../valueFormatter';
 
-TableSelectComponent = require('../TableSelectComponent')
-
-uuid = require 'uuid'
-update = require 'update-object'
-ui = require 'react-library/lib/bootstrap'
-
-getFormatOptions = require('../valueFormatter').getFormatOptions
-getDefaultFormat = require('../valueFormatter').getDefaultFormat
-
-# Designer for the datagrid. Currenly allows only single-table designs (no subtable rows)
-module.exports = class DatagridDesignerComponent extends React.Component
-  @propTypes:
-    schema: PropTypes.object.isRequired     # schema to use
-    dataSource: PropTypes.object.isRequired # dataSource to use
-    design: PropTypes.object.isRequired     # Design of datagrid. See README.md of this folder
-    onDesignChange: PropTypes.func.isRequired # Called when design changes
-
-  @contextTypes:
-    globalFiltersElementFactory: PropTypes.func # Call with props { schema, dataSource, globalFilters, filterableTables, onChange, nullIfIrrelevant }. Displays a component to edit global filters
-
-  handleTableChange: (table) =>
-    design = {
-      table: table
-      columns: []
+// Designer for the datagrid. Currenly allows only single-table designs (no subtable rows)
+export default DatagridDesignerComponent = (function() {
+  DatagridDesignerComponent = class DatagridDesignerComponent extends React.Component {
+    constructor(...args) {
+      super(...args);
+      this.handleTableChange = this.handleTableChange.bind(this);
+      this.handleColumnsChange = this.handleColumnsChange.bind(this);
+      this.handleFilterChange = this.handleFilterChange.bind(this);
+      this.handleGlobalFiltersChange = this.handleGlobalFiltersChange.bind(this);
+      this.handleOrderBysChange = this.handleOrderBysChange.bind(this);
     }
 
-    @props.onDesignChange(design)
+    static initClass() {
+      this.propTypes = {
+        schema: PropTypes.object.isRequired,     // schema to use
+        dataSource: PropTypes.object.isRequired, // dataSource to use
+        design: PropTypes.object.isRequired,     // Design of datagrid. See README.md of this folder
+        onDesignChange: PropTypes.func.isRequired // Called when design changes
+      };
+  
+      this.contextTypes =
+        {globalFiltersElementFactory: PropTypes.func};
+       // Call with props { schema, dataSource, globalFilters, filterableTables, onChange, nullIfIrrelevant }. Displays a component to edit global filters
+    }
 
-  handleColumnsChange: (columns) =>
-    @props.onDesignChange(update(@props.design, columns: { $set: columns }))
+    handleTableChange(table) {
+      const design = {
+        table,
+        columns: []
+      };
 
-  handleFilterChange: (filter) =>
-    @props.onDesignChange(update(@props.design, filter: { $set: filter }))
+      return this.props.onDesignChange(design);
+    }
 
-  handleGlobalFiltersChange: (globalFilters) =>
-    @props.onDesignChange(update(@props.design, globalFilters: { $set: globalFilters }))
+    handleColumnsChange(columns) {
+      return this.props.onDesignChange(update(this.props.design, {columns: { $set: columns }}));
+    }
 
-  handleOrderBysChange: (orderBys) =>
-    @props.onDesignChange(update(@props.design, orderBys: { $set: orderBys }))
+    handleFilterChange(filter) {
+      return this.props.onDesignChange(update(this.props.design, {filter: { $set: filter }}));
+    }
 
-  # Render the tabs of the designer
-  renderTabs: ->
-    R TabbedComponent,
-      initialTabId: "columns"
-      tabs: [
-        {
-          id: "columns"
-          label: "Columns"
-          elem: R(ColumnsDesignerComponent, {
-            schema: @props.schema
-            dataSource: @props.dataSource
-            table: @props.design.table
-            columns: @props.design.columns
-            onColumnsChange: @handleColumnsChange
-          })
-        }
-        {
-          id: "filter"
-          label: "Filter"
-          # Here because of modal scroll issue
-          elem: R 'div', style: { marginBottom: 200 },
-            R(FilterExprComponent, {
-              schema: @props.schema
-              dataSource: @props.dataSource
-              table: @props.design.table
-              value: @props.design.filter
-              onChange: @handleFilterChange
+    handleGlobalFiltersChange(globalFilters) {
+      return this.props.onDesignChange(update(this.props.design, {globalFilters: { $set: globalFilters }}));
+    }
+
+    handleOrderBysChange(orderBys) {
+      return this.props.onDesignChange(update(this.props.design, {orderBys: { $set: orderBys }}));
+    }
+
+    // Render the tabs of the designer
+    renderTabs() {
+      return R(TabbedComponent, {
+        initialTabId: "columns",
+        tabs: [
+          {
+            id: "columns",
+            label: "Columns",
+            elem: R(ColumnsDesignerComponent, {
+              schema: this.props.schema,
+              dataSource: this.props.dataSource,
+              table: this.props.design.table,
+              columns: this.props.design.columns,
+              onColumnsChange: this.handleColumnsChange
             })
-            if @context.globalFiltersElementFactory
-              R 'div', style: { marginTop: 20 },
-                @context.globalFiltersElementFactory({
-                  schema: @props.schema
-                  dataSource: @props.dataSource
-                  filterableTables: [@props.design.table]
-                  globalFilters: @props.design.globalFilters
-                  onChange: @handleGlobalFiltersChange
-                  nullIfIrrelevant: true
-                })
-        }
-        {
-          id: "order"
-          label: "Sorting"
-          elem: R 'div', style: { marginBottom: 200 },
-            R(OrderBysDesignerComponent, {
-              schema: @props.schema
-              dataSource: @props.dataSource
-              table: @props.design.table
-              orderBys: @props.design.orderBys
-              onChange: @handleOrderBysChange
-            })
-        }
-        {
-          id: "quickfilters"
-          label: "Quickfilters"
-          elem: R 'div', style: { marginBottom: 200 },
-            R QuickfiltersDesignComponent, {
-              design: @props.design.quickfilters
-              onDesignChange: (design) => @props.onDesignChange(update(@props.design, { quickfilters: { $set: design } }))
-              schema: @props.schema
-              dataSource: @props.dataSource
-              tables: [@props.design.table]
-            }
-        }
-        {
-          id: "options"
-          label: "Options"
-          elem: R 'div', style: { marginBottom: 200 },
-            R DatagridOptionsComponent, {
-              design: @props.design
-              onDesignChange: @props.onDesignChange
-            }
-        }
-      ]
+          },
+          {
+            id: "filter",
+            label: "Filter",
+            // Here because of modal scroll issue
+            elem: R('div', {style: { marginBottom: 200 }},
+              R(FilterExprComponent, {
+                schema: this.props.schema,
+                dataSource: this.props.dataSource,
+                table: this.props.design.table,
+                value: this.props.design.filter,
+                onChange: this.handleFilterChange
+              }),
+              this.context.globalFiltersElementFactory ?
+                R('div', {style: { marginTop: 20 }},
+                  this.context.globalFiltersElementFactory({
+                    schema: this.props.schema,
+                    dataSource: this.props.dataSource,
+                    filterableTables: [this.props.design.table],
+                    globalFilters: this.props.design.globalFilters,
+                    onChange: this.handleGlobalFiltersChange,
+                    nullIfIrrelevant: true
+                  })
+                ) : undefined
+            )
+          },
+          {
+            id: "order",
+            label: "Sorting",
+            elem: R('div', {style: { marginBottom: 200 }},
+              R(OrderBysDesignerComponent, {
+                schema: this.props.schema,
+                dataSource: this.props.dataSource,
+                table: this.props.design.table,
+                orderBys: this.props.design.orderBys,
+                onChange: this.handleOrderBysChange
+              })
+            )
+          },
+          {
+            id: "quickfilters",
+            label: "Quickfilters",
+            elem: R('div', {style: { marginBottom: 200 }},
+              R(QuickfiltersDesignComponent, {
+                design: this.props.design.quickfilters,
+                onDesignChange: design => this.props.onDesignChange(update(this.props.design, { quickfilters: { $set: design } })),
+                schema: this.props.schema,
+                dataSource: this.props.dataSource,
+                tables: [this.props.design.table]
+              }))
+          },
+          {
+            id: "options",
+            label: "Options",
+            elem: R('div', {style: { marginBottom: 200 }},
+              R(DatagridOptionsComponent, {
+                design: this.props.design,
+                onDesignChange: this.props.onDesignChange
+              }))
+          }
+        ]
+      });
+    }
 
-  render: ->
-    R 'div', null,
-      R 'label', null, "Data Source:"
-      R TableSelectComponent,
-        schema: @props.schema
-        value: @props.design.table
-        onChange: @handleTableChange
+    render() {
+      return R('div', null,
+        R('label', null, "Data Source:"),
+        R(TableSelectComponent, {
+          schema: this.props.schema,
+          value: this.props.design.table,
+          onChange: this.handleTableChange
+        }
+        ),
 
-      if @props.design.table
-        @renderTabs()
+        this.props.design.table ?
+          this.renderTabs() : undefined
+      );
+    }
+  };
+  DatagridDesignerComponent.initClass();
+  return DatagridDesignerComponent;
+})();
 
-# Datagrid Options
-class DatagridOptionsComponent extends React.Component
-  @propTypes:
-    design: PropTypes.object.isRequired       # Datagrid design. See README.md
-    onDesignChange: PropTypes.func.isRequired # Called when design changes
+// Datagrid Options
+class DatagridOptionsComponent extends React.Component {
+  static initClass() {
+    this.propTypes = {
+      design: PropTypes.object.isRequired,       // Datagrid design. See README.md
+      onDesignChange: PropTypes.func.isRequired
+    };
+     // Called when design changes
+  }
     
-  render: ->
-    R ui.FormGroup, label: "Display Options",
-      R ui.Checkbox, 
-        value: @props.design.showRowNumbers
-        onChange: ((showRowNumbers) => @props.onDesignChange(update(@props.design, { showRowNumbers: { $set: showRowNumbers } }))),
-          "Show row numbers"
+  render() {
+    return R(ui.FormGroup, {label: "Display Options"},
+      R(ui.Checkbox, { 
+        value: this.props.design.showRowNumbers,
+        onChange: (showRowNumbers => this.props.onDesignChange(update(this.props.design, { showRowNumbers: { $set: showRowNumbers } })))
+      },
+          "Show row numbers")
+    );
+  }
+}
+DatagridOptionsComponent.initClass();
 
-# Columns list
-class ColumnsDesignerComponent extends React.Component
-  @propTypes:
-    schema: PropTypes.object.isRequired     # schema to use
-    dataSource: PropTypes.object.isRequired # dataSource to use
-    table: PropTypes.string.isRequired
-    columns: PropTypes.array.isRequired     # Columns list See README.md of this folder
-    onColumnsChange: PropTypes.func.isRequired # Called when columns changes
+// Columns list
+class ColumnsDesignerComponent extends React.Component {
+  constructor(...args) {
+    super(...args);
+    this.handleColumnChange = this.handleColumnChange.bind(this);
+    this.handleAddColumn = this.handleAddColumn.bind(this);
+    this.handleAddIdColumn = this.handleAddIdColumn.bind(this);
+    this.handleAddDefaultColumns = this.handleAddDefaultColumns.bind(this);
+    this.handleRemoveAllColumns = this.handleRemoveAllColumns.bind(this);
+    this.renderColumn = this.renderColumn.bind(this);
+  }
 
-  handleColumnChange: (columnIndex, column) =>
-    columns = @props.columns.slice()
+  static initClass() {
+    this.propTypes = {
+      schema: PropTypes.object.isRequired,     // schema to use
+      dataSource: PropTypes.object.isRequired, // dataSource to use
+      table: PropTypes.string.isRequired,
+      columns: PropTypes.array.isRequired,     // Columns list See README.md of this folder
+      onColumnsChange: PropTypes.func.isRequired
+    };
+     // Called when columns changes
+  }
 
-    # Handle remove
-    if not column
-      columns.splice(columnIndex, 1)
-    else if _.isArray(column)
-      # Handle array case
-      Array.prototype.splice.apply(columns, [columnIndex, 1].concat(column))
-    else
-      columns[columnIndex] = column
+  handleColumnChange(columnIndex, column) {
+    const columns = this.props.columns.slice();
 
-    @props.onColumnsChange(columns)
+    // Handle remove
+    if (!column) {
+      columns.splice(columnIndex, 1);
+    } else if (_.isArray(column)) {
+      // Handle array case
+      Array.prototype.splice.apply(columns, [columnIndex, 1].concat(column));
+    } else {
+      columns[columnIndex] = column;
+    }
 
-  handleAddColumn: =>
-    columns = @props.columns.slice()
-    columns.push({ id: uuid(), type: "expr", width: 150 })
-    @props.onColumnsChange(columns)
+    return this.props.onColumnsChange(columns);
+  }
 
-  handleAddIdColumn: =>
-    columns = @props.columns.slice()
-    # TODO we should display label when available but without breaking Peter's id downloads. Need format field to indicate raw id.
-    columns.push({ id: uuid(), type: "expr", width: 150, expr: { type: "id", table: @props.table }, label: "Unique Id" })
-    @props.onColumnsChange(columns)
+  handleAddColumn() {
+    const columns = this.props.columns.slice();
+    columns.push({ id: uuid(), type: "expr", width: 150 });
+    return this.props.onColumnsChange(columns);
+  }
 
-  handleAddDefaultColumns: =>
-    # Create labeled expressions
-    labeledExprs = new LabeledExprGenerator(@props.schema).generate(@props.table, {
+  handleAddIdColumn() {
+    const columns = this.props.columns.slice();
+    // TODO we should display label when available but without breaking Peter's id downloads. Need format field to indicate raw id.
+    columns.push({ id: uuid(), type: "expr", width: 150, expr: { type: "id", table: this.props.table }, label: "Unique Id" });
+    return this.props.onColumnsChange(columns);
+  }
+
+  handleAddDefaultColumns() {
+    // Create labeled expressions
+    const labeledExprs = new LabeledExprGenerator(this.props.schema).generate(this.props.table, {
       headerFormat: "text"
-    })
+    });
 
-    columns = []
-    for labeledExpr in labeledExprs
+    let columns = [];
+    for (let labeledExpr of labeledExprs) {
       columns.push({
-        id: uuid()
-        width: 150
-        type: "expr"
-        label: null # Use default label instead. # labeledExpr.label
+        id: uuid(),
+        width: 150,
+        type: "expr",
+        label: null, // Use default label instead. # labeledExpr.label
         expr: labeledExpr.expr
-      })
+      });
+    }
 
-    columns = @props.columns.concat(columns)
-    @props.onColumnsChange(columns)
+    columns = this.props.columns.concat(columns);
+    return this.props.onColumnsChange(columns);
+  }
 
-  handleRemoveAllColumns: =>
-    @props.onColumnsChange([])
+  handleRemoveAllColumns() {
+    return this.props.onColumnsChange([]);
+  }
 
-  renderColumn: (column, columnIndex, connectDragSource, connectDragPreview, connectDropTarget) =>
-    R ColumnDesignerComponent,
-      key: columnIndex
-      schema: @props.schema
-      table: @props.table
-      dataSource: @props.dataSource
-      column: column
-      onColumnChange: @handleColumnChange.bind(null, columnIndex)
-      connectDragSource: connectDragSource
-      connectDragPreview: connectDragPreview
-      connectDropTarget: connectDropTarget
+  renderColumn(column, columnIndex, connectDragSource, connectDragPreview, connectDropTarget) {
+    return R(ColumnDesignerComponent, {
+      key: columnIndex,
+      schema: this.props.schema,
+      table: this.props.table,
+      dataSource: this.props.dataSource,
+      column,
+      onColumnChange: this.handleColumnChange.bind(null, columnIndex),
+      connectDragSource,
+      connectDragPreview,
+      connectDropTarget
+    }
+    );
+  }
 
-  render: ->
-    R 'div', style: { height: "auto",overflowY: "auto",  overflowX: "hidden" },
-      R 'div', style: { textAlign: "right" }, key: "options",
-        R 'button',
-          key: "addAll"
-          type: "button"
-          className: "btn btn-link btn-xs"
-          onClick: @handleAddDefaultColumns,
-            R 'span', className: "glyphicon glyphicon-plus"
-            " Add Default Columns"
-        R 'button',
-          key: "removeAll"
-          type: "button"
-          className: "btn btn-link btn-xs"
-          onClick: @handleRemoveAllColumns,
-            R 'span', className: "glyphicon glyphicon-remove"
-            " Remove All Columns"
+  render() {
+    return R('div', {style: { height: "auto",overflowY: "auto",  overflowX: "hidden" }},
+      R('div', {style: { textAlign: "right" }, key: "options"},
+        R('button', {
+          key: "addAll",
+          type: "button",
+          className: "btn btn-link btn-xs",
+          onClick: this.handleAddDefaultColumns
+        },
+            R('span', {className: "glyphicon glyphicon-plus"}),
+            " Add Default Columns"),
+        R('button', {
+          key: "removeAll",
+          type: "button",
+          className: "btn btn-link btn-xs",
+          onClick: this.handleRemoveAllColumns
+        },
+            R('span', {className: "glyphicon glyphicon-remove"}),
+            " Remove All Columns")
+      ),
 
-      R ReorderableListComponent,
-        items: @props.columns
-        onReorder: @props.onColumnsChange
-        renderItem: @renderColumn
-        getItemId: (item) => item.id
+      R(ReorderableListComponent, {
+        items: this.props.columns,
+        onReorder: this.props.onColumnsChange,
+        renderItem: this.renderColumn,
+        getItemId: item => item.id
+      }
+      ),
 
-      R 'button',
-        key: "add"
-        type: "button"
-        className: "btn btn-link"
-        onClick: @handleAddColumn,
-          R 'span', className: "glyphicon glyphicon-plus"
-          " Add Column"
+      R('button', {
+        key: "add",
+        type: "button",
+        className: "btn btn-link",
+        onClick: this.handleAddColumn
+      },
+          R('span', {className: "glyphicon glyphicon-plus"}),
+          " Add Column"),
 
-      R 'button',
-        key: "add-id"
-        type: "button"
-        className: "btn btn-link"
-        onClick: @handleAddIdColumn,
-          R 'span', className: "glyphicon glyphicon-plus"
-          " Add Unique Id (advanced)"
+      R('button', {
+        key: "add-id",
+        type: "button",
+        className: "btn btn-link",
+        onClick: this.handleAddIdColumn
+      },
+          R('span', {className: "glyphicon glyphicon-plus"}),
+          " Add Unique Id (advanced)")
+    );
+  }
+}
+ColumnsDesignerComponent.initClass();
 
-# Column item
-class ColumnDesignerComponent extends React.Component
-  @propTypes:
-    schema: PropTypes.object.isRequired     # schema to use
-    dataSource: PropTypes.object.isRequired # dataSource to use
-    table: PropTypes.string.isRequired
-    column: PropTypes.object.isRequired     # Column See README.md of this folder
-    onColumnChange: PropTypes.func.isRequired # Called when column changes. Null to remove. Array to replace with multiple entries
-    connectDragSource: PropTypes.func.isRequired # Connect drag source (handle) here       
-    connectDragPreview: PropTypes.func.isRequired # Connect drag preview here
-    connectDropTarget: PropTypes.func.isRequired # Connect drop target
+// Column item
+class ColumnDesignerComponent extends React.Component {
+  constructor(...args) {
+    super(...args);
+    this.handleExprChange = this.handleExprChange.bind(this);
+    this.handleLabelChange = this.handleLabelChange.bind(this);
+    this.handleFormatChange = this.handleFormatChange.bind(this);
+    this.handleSplitEnumset = this.handleSplitEnumset.bind(this);
+    this.handleSplitGeometry = this.handleSplitGeometry.bind(this);
+    this.render = this.render.bind(this);
+  }
 
-  handleExprChange: (expr) =>
-    @props.onColumnChange(update(@props.column, expr: { $set: expr }))
+  static initClass() {
+    this.propTypes = {
+      schema: PropTypes.object.isRequired,     // schema to use
+      dataSource: PropTypes.object.isRequired, // dataSource to use
+      table: PropTypes.string.isRequired,
+      column: PropTypes.object.isRequired,     // Column See README.md of this folder
+      onColumnChange: PropTypes.func.isRequired, // Called when column changes. Null to remove. Array to replace with multiple entries
+      connectDragSource: PropTypes.func.isRequired, // Connect drag source (handle) here       
+      connectDragPreview: PropTypes.func.isRequired, // Connect drag preview here
+      connectDropTarget: PropTypes.func.isRequired
+    };
+     // Connect drop target
+  }
 
-  handleLabelChange: (label) =>
-    @props.onColumnChange(update(@props.column, label: { $set: label }))
+  handleExprChange(expr) {
+    return this.props.onColumnChange(update(this.props.column, {expr: { $set: expr }}));
+  }
 
-  handleFormatChange: (ev) =>
-    @props.onColumnChange(update(@props.column, format: { $set: ev.target.value }))
+  handleLabelChange(label) {
+    return this.props.onColumnChange(update(this.props.column, {label: { $set: label }}));
+  }
 
-  handleSplitEnumset: =>
-    exprUtils = new ExprUtils(@props.schema)
+  handleFormatChange(ev) {
+    return this.props.onColumnChange(update(this.props.column, {format: { $set: ev.target.value }}));
+  }
 
-    @props.onColumnChange(_.map(exprUtils.getExprEnumValues(@props.column.expr), (enumVal) =>
-      {
-        id: uuid()
-        type: "expr"
-        width: 150
+  handleSplitEnumset() {
+    const exprUtils = new ExprUtils(this.props.schema);
+
+    return this.props.onColumnChange(_.map(exprUtils.getExprEnumValues(this.props.column.expr), enumVal => {
+      return {
+        id: uuid(),
+        type: "expr",
+        width: 150,
         expr: {
-          type: "op"
-          op: "contains"
-          table: @props.table
+          type: "op",
+          op: "contains",
+          table: this.props.table,
           exprs: [
-            @props.column.expr
+            this.props.column.expr,
             { type: "literal", valueType: "enumset", value: [enumVal.id] }
           ]
         }
-      }
-    ))
+      };
+    }));
+  }
 
-  handleSplitGeometry: =>
-    @props.onColumnChange([
+  handleSplitGeometry() {
+    return this.props.onColumnChange([
       {
-        id: uuid()
-        type: "expr"
-        width: 150
+        id: uuid(),
+        type: "expr",
+        width: 150,
         expr: {
-          type: "op"
-          op: "latitude"
-          table: @props.table
-          exprs: [@props.column.expr]
+          type: "op",
+          op: "latitude",
+          table: this.props.table,
+          exprs: [this.props.column.expr]
+        }
+      },
+      {
+        id: uuid(),
+        type: "expr",
+        width: 150,
+        expr: {
+          type: "op",
+          op: "longitude",
+          table: this.props.table,
+          exprs: [this.props.column.expr]
         }
       }
-      {
-        id: uuid()
-        type: "expr"
-        width: 150
-        expr: {
-          type: "op"
-          op: "longitude"
-          table: @props.table
-          exprs: [@props.column.expr]
-        }
-      }
-    ])
+    ]);
+  }
 
-  # Render options to split a column, such as an enumset to booleans or geometry to lat/lng
-  renderSplit: ->
-    exprUtils = new ExprUtils(@props.schema)
-    exprType = exprUtils.getExprType(@props.column.expr)
+  // Render options to split a column, such as an enumset to booleans or geometry to lat/lng
+  renderSplit() {
+    const exprUtils = new ExprUtils(this.props.schema);
+    const exprType = exprUtils.getExprType(this.props.column.expr);
 
-    switch exprType
-      when "enumset"
-        return R 'a', className: "btn btn-xs btn-link", onClick: @handleSplitEnumset,
-          R 'i', className: "fa fa-chain-broken"
-          " Split by options"
-      when "geometry"
-        return R 'a', className: "btn btn-xs btn-link", onClick: @handleSplitGeometry,
-          R 'i', className: "fa fa-chain-broken"
-          " Split by lat/lng"
+    switch (exprType) {
+      case "enumset":
+        return R('a', {className: "btn btn-xs btn-link", onClick: this.handleSplitEnumset},
+          R('i', {className: "fa fa-chain-broken"}),
+          " Split by options");
+        break;
+      case "geometry":
+        return R('a', {className: "btn btn-xs btn-link", onClick: this.handleSplitGeometry},
+          R('i', {className: "fa fa-chain-broken"}),
+          " Split by lat/lng");
+        break;
+    }
 
-    return null
+    return null;
+  }
 
-  renderFormat: ->
-    exprUtils = new ExprUtils(@props.schema)
-    exprType = exprUtils.getExprType(@props.column.expr)
+  renderFormat() {
+    const exprUtils = new ExprUtils(this.props.schema);
+    const exprType = exprUtils.getExprType(this.props.column.expr);
 
-    formats = getFormatOptions(exprType)
-    if not formats
-      return null
+    const formats = getFormatOptions(exprType);
+    if (!formats) {
+      return null;
+    }
    
-    R 'div', className: "form-group",
-      R 'label', className: "text-muted", 
-        "Format"
-      ": "
-      R 'select', value: (if @props.column.format? then @props.column.format else getDefaultFormat(exprType)), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
-        _.map(formats, (format) -> R('option', key: format.value, value: format.value, format.label))
+    return R('div', {className: "form-group"},
+      R('label', {className: "text-muted"}, 
+        "Format"),
+      ": ",
+      R('select', {value: ((this.props.column.format != null) ? this.props.column.format : getDefaultFormat(exprType)), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: this.handleFormatChange},
+        _.map(formats, format => R('option', {key: format.value, value: format.value}, format.label)))
+    );
+  }
 
-  render: =>
-    exprUtils = new ExprUtils(@props.schema)
-    exprValidator = new ExprValidator(@props.schema)
+  render() {
+    const exprUtils = new ExprUtils(this.props.schema);
+    const exprValidator = new ExprValidator(this.props.schema);
 
-    # Get type of current expression
-    type = exprUtils.getExprType(@props.column.expr)
+    // Get type of current expression
+    const type = exprUtils.getExprType(this.props.column.expr);
 
-    # Determine allowed types
-    allowedTypes = ['text', 'number', 'enum', 'enumset', 'boolean', 'date', 'datetime', 'image', 'imagelist', 'text[]', 'geometry']
+    // Determine allowed types
+    const allowedTypes = ['text', 'number', 'enum', 'enumset', 'boolean', 'date', 'datetime', 'image', 'imagelist', 'text[]', 'geometry'];
 
-    # If type id, allow id (e.g. don't allow to be added directly, but keep if present)
-    if type == "id"
-      allowedTypes.push("id")
+    // If type id, allow id (e.g. don't allow to be added directly, but keep if present)
+    if (type === "id") {
+      allowedTypes.push("id");
+    }
 
-    error = exprValidator.validateExpr(@props.column.expr, { aggrStatuses: ["individual", "literal", "aggregate"] })
+    const error = exprValidator.validateExpr(this.props.column.expr, { aggrStatuses: ["individual", "literal", "aggregate"] });
 
-    elem = R 'div', className: "row",
-      R 'div', className: "col-xs-1",
-        @props.connectDragSource(R('span', className: "text-muted fa fa-bars"))
+    const elem = R('div', {className: "row"},
+      R('div', {className: "col-xs-1"},
+        this.props.connectDragSource(R('span', {className: "text-muted fa fa-bars"}))),
 
-      R 'div', className: "col-xs-6", # style: { border: "solid 1px #DDD", padding: 4 },
-        R ExprComponent,
-          schema: @props.schema
-          dataSource: @props.dataSource
-          table: @props.table
-          value: @props.column.expr
-          aggrStatuses: ['literal', 'individual', 'aggregate']
-          types: allowedTypes
-          onChange: @handleExprChange
-        @renderSplit()
-        @renderFormat()
-        if error
-          R 'i', className: "fa fa-exclamation-circle text-danger"
+      R('div', {className: "col-xs-6"}, // style: { border: "solid 1px #DDD", padding: 4 },
+        R(ExprComponent, {
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          table: this.props.table,
+          value: this.props.column.expr,
+          aggrStatuses: ['literal', 'individual', 'aggregate'],
+          types: allowedTypes,
+          onChange: this.handleExprChange
+        }
+        ),
+        this.renderSplit(),
+        this.renderFormat(),
+        error ?
+          R('i', {className: "fa fa-exclamation-circle text-danger"}) : undefined
+      ),
 
-      R 'div', className: "col-xs-4",
-        R 'input',
-          type: "text"
-          className: "form-control"
-          placeholder: exprUtils.summarizeExpr(@props.column.expr)
-          value: @props.column.label
-          onChange: (ev) => @handleLabelChange(ev.target.value)
+      R('div', {className: "col-xs-4"},
+        R('input', {
+          type: "text",
+          className: "form-control",
+          placeholder: exprUtils.summarizeExpr(this.props.column.expr),
+          value: this.props.column.label,
+          onChange: ev => this.handleLabelChange(ev.target.value)
+        }
+        )
+      ),
 
-      R 'div', className: "col-xs-1",
-        R 'a', onClick: @props.onColumnChange.bind(null, null),
-          R 'span', className: "glyphicon glyphicon-remove"
+      R('div', {className: "col-xs-1"},
+        R('a', {onClick: this.props.onColumnChange.bind(null, null)},
+          R('span', {className: "glyphicon glyphicon-remove"}))
+      )
+    );
 
-    return @props.connectDropTarget(@props.connectDragPreview(elem))
+    return this.props.connectDropTarget(this.props.connectDragPreview(elem));
+  }
+}
+ColumnDesignerComponent.initClass();

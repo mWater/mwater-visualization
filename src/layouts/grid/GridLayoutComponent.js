@@ -1,53 +1,68 @@
-PropTypes = require('prop-types')
-_ = require 'lodash'
-React = require 'react'
-R = React.createElement
+let GridLayoutComponent;
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import React from 'react';
+const R = React.createElement;
 
-WidgetContainerComponent = require './WidgetContainerComponent'
-LegoLayoutEngine = require './LegoLayoutEngine'
+import WidgetContainerComponent from './WidgetContainerComponent';
+import LegoLayoutEngine from './LegoLayoutEngine';
 
-module.exports = class GridLayoutComponent extends React.Component
-  @propTypes:
-    width: PropTypes.number.isRequired
-    items: PropTypes.any
-    onItemsChange: PropTypes.func
-    renderWidget: PropTypes.func.isRequired
-
-  renderPageBreaks: (layoutEngine, layouts) ->
-    # Get height
-    height = layoutEngine.calculateHeight(layouts)
-
-    # Page breaks are 8.5x11 with 0.5" margin 
-    pageHeight = @props.width / 7.5 * 10
-
-    number = Math.floor(height/pageHeight)
-
-    elems = []
-    if number > 0
-      for i in [1..number]
-        elems.push(R('div', className: "mwater-visualization-page-break", key: "page#{i}", style: { position: "absolute", top: i * pageHeight }))
-
-    return elems
-
-  render: ->
-    # Create layout engine
-    layoutEngine = new LegoLayoutEngine(@props.width, 24)
-
-    # Get layouts indexed by id
-    layouts = _.mapValues(@props.items, "layout")
-
-    style = {
-      height: "100%"
-      position: "relative"
+export default GridLayoutComponent = (function() {
+  GridLayoutComponent = class GridLayoutComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        width: PropTypes.number.isRequired,
+        items: PropTypes.any,
+        onItemsChange: PropTypes.func,
+        renderWidget: PropTypes.func.isRequired
+      };
     }
 
-    # Render widget container
-    return R 'div', style: style,
-      R WidgetContainerComponent, 
-        layoutEngine: layoutEngine
-        items: @props.items
-        onItemsChange: @props.onItemsChange
-        renderWidget: @props.renderWidget
-        width: @props.width 
-      @renderPageBreaks(layoutEngine, layouts)
+    renderPageBreaks(layoutEngine, layouts) {
+      // Get height
+      const height = layoutEngine.calculateHeight(layouts);
+
+      // Page breaks are 8.5x11 with 0.5" margin 
+      const pageHeight = (this.props.width / 7.5) * 10;
+
+      const number = Math.floor(height/pageHeight);
+
+      const elems = [];
+      if (number > 0) {
+        for (let i = 1, end = number, asc = 1 <= end; asc ? i <= end : i >= end; asc ? i++ : i--) {
+          elems.push(R('div', {className: "mwater-visualization-page-break", key: `page${i}`, style: { position: "absolute", top: i * pageHeight }}));
+        }
+      }
+
+      return elems;
+    }
+
+    render() {
+      // Create layout engine
+      const layoutEngine = new LegoLayoutEngine(this.props.width, 24);
+
+      // Get layouts indexed by id
+      const layouts = _.mapValues(this.props.items, "layout");
+
+      const style = {
+        height: "100%",
+        position: "relative"
+      };
+
+      // Render widget container
+      return R('div', {style},
+        R(WidgetContainerComponent, { 
+          layoutEngine,
+          items: this.props.items,
+          onItemsChange: this.props.onItemsChange,
+          renderWidget: this.props.renderWidget,
+          width: this.props.width
+        }
+        ), 
+        this.renderPageBreaks(layoutEngine, layouts));
+    }
+  };
+  GridLayoutComponent.initClass();
+  return GridLayoutComponent;
+})();
 

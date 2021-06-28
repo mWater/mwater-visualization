@@ -1,195 +1,246 @@
-PropTypes = require('prop-types')
-React = require 'react'
-R = React.createElement
-_ = require 'lodash'
+let RichTextComponent;
+import PropTypes from 'prop-types';
+import React from 'react';
+const R = React.createElement;
+import _ from 'lodash';
+import { ContentEditableComponent } from 'mwater-expressions-ui';
+import ItemsHtmlConverter from './ItemsHtmlConverter';
+import FloatAffixed from 'react-float-affixed';
+import FontColorPaletteItem from './FontColorPaletteItem';
+import FontSizePaletteItem from './FontSizePaletteItem';
 
-ContentEditableComponent = require('mwater-expressions-ui').ContentEditableComponent
-ItemsHtmlConverter = require './ItemsHtmlConverter'
-FloatAffixed = require 'react-float-affixed'
-FontColorPaletteItem = require './FontColorPaletteItem'
-FontSizePaletteItem = require './FontSizePaletteItem'
-
-module.exports = class RichTextComponent extends React.Component
-  @propTypes: 
-    # Items (content) to display. See ItemsHtmlConverter
-    items: PropTypes.array
-    onItemsChange: PropTypes.func # Called with new items
-
-    onItemClick: PropTypes.func
-
-    className: PropTypes.string  # Optional className of editor wrapper
-    style: PropTypes.object  # Optional style of editor wrapper
-
-    # Converter to use for editing
-    itemsHtmlConverter: PropTypes.object
-
-    # True (default) to include heading h1, h2 in palette
-    includeHeadings: PropTypes.bool
-
-    # Extra buttons to put in palette
-    extraPaletteButtons: PropTypes.node
-
-  @defaultProps:
-    includeHeadings: true
-    items: []
-    itemsHtmlConverter: new ItemsHtmlConverter()
-
-  constructor: (props) ->
-    super(props)
-
-    @state = {
-      focused: false
+export default RichTextComponent = (function() {
+  RichTextComponent = class RichTextComponent extends React.Component {
+    static initClass() {
+      this.propTypes = { 
+        // Items (content) to display. See ItemsHtmlConverter
+        items: PropTypes.array,
+        onItemsChange: PropTypes.func, // Called with new items
+  
+        onItemClick: PropTypes.func,
+  
+        className: PropTypes.string,  // Optional className of editor wrapper
+        style: PropTypes.object,  // Optional style of editor wrapper
+  
+        // Converter to use for editing
+        itemsHtmlConverter: PropTypes.object,
+  
+        // True (default) to include heading h1, h2 in palette
+        includeHeadings: PropTypes.bool,
+  
+        // Extra buttons to put in palette
+        extraPaletteButtons: PropTypes.node
+      };
+  
+      this.defaultProps = {
+        includeHeadings: true,
+        items: [],
+        itemsHtmlConverter: new ItemsHtmlConverter()
+      };
     }
 
-  handleClick: (ev) =>
-    # If click is in component or in palette component, ignore, otherwise remove focus
-    if not @entireComponent.contains(ev.target) and (not @paletteComponent or not @paletteComponent.contains(ev.target))
-      @setState(focused: false)
+    constructor(props) {
+      this.handleClick = this.handleClick.bind(this);
+      this.handleInsertExpr = this.handleInsertExpr.bind(this);
+      this.handleSetFontSize = this.handleSetFontSize.bind(this);
+      this.handleSetFontColor = this.handleSetFontColor.bind(this);
+      this.handleChange = this.handleChange.bind(this);
+      this.handleFocus = this.handleFocus.bind(this);
+      this.handleBlur = this.handleBlur.bind(this);
+      this.handleCommand = this.handleCommand.bind(this);
+      this.handleCreateLink = this.handleCreateLink.bind(this);
+      this.handleEditorClick = this.handleEditorClick.bind(this);
+      this.renderPaletteContent = this.renderPaletteContent.bind(this);
+      this.refContentEditable = this.refContentEditable.bind(this);
+      super(props);
 
-  # Paste HTML in
-  pasteHTML: (html) ->
-    @contentEditable.pasteHTML(html)
+      this.state = {
+        focused: false
+      };
+    }
 
-  focus: ->
-    @contentEditable.focus()
+    handleClick(ev) {
+      // If click is in component or in palette component, ignore, otherwise remove focus
+      if (!this.entireComponent.contains(ev.target) && (!this.paletteComponent || !this.paletteComponent.contains(ev.target))) {
+        return this.setState({focused: false});
+      }
+    }
 
-  handleInsertExpr: (item) =>
-    html = '''<div data-embed="''' + _.escape(JSON.stringify(item)) + '''"></div>'''
+    // Paste HTML in
+    pasteHTML(html) {
+      return this.contentEditable.pasteHTML(html);
+    }
 
-    @contentEditable.pasteHTML(html)
+    focus() {
+      return this.contentEditable.focus();
+    }
 
-  handleSetFontSize: (size) =>
-    # Requires a selection
-    html = @contentEditable.getSelectedHTML()
-    if not html
-      return alert("Please select text first to set size")
+    handleInsertExpr(item) {
+      const html = '<div data-embed="' + _.escape(JSON.stringify(item)) + '"></div>';
 
-    # Clear existing font-size styles. This is clearly a hack, but font sizes are absolute in execCommand which
-    # doesn't mix with our various dashboard stylings, so we need to use percentages
-    html = html.replace(/font-size:\s*\d+%;?/g, "")
+      return this.contentEditable.pasteHTML(html);
+    }
 
-    @contentEditable.pasteHTML("<span style=\"font-size:#{size}\">" + html + "</span>")
+    handleSetFontSize(size) {
+      // Requires a selection
+      let html = this.contentEditable.getSelectedHTML();
+      if (!html) {
+        return alert("Please select text first to set size");
+      }
 
-  handleSetFontColor: (color) =>
-    # Requires a selection
-    html = @contentEditable.getSelectedHTML()
-    if not html
-      return alert("Please select text first to set color")
+      // Clear existing font-size styles. This is clearly a hack, but font sizes are absolute in execCommand which
+      // doesn't mix with our various dashboard stylings, so we need to use percentages
+      html = html.replace(/font-size:\s*\d+%;?/g, "");
 
-    @handleCommand("foreColor", color)
+      return this.contentEditable.pasteHTML(`<span style=\"font-size:${size}\">` + html + "</span>");
+    }
 
-  handleChange: (elem) =>
-    items =  @props.itemsHtmlConverter.convertElemToItems(elem)
+    handleSetFontColor(color) {
+      // Requires a selection
+      const html = this.contentEditable.getSelectedHTML();
+      if (!html) {
+        return alert("Please select text first to set color");
+      }
 
-    # Check if changed
-    if not _.isEqual(items, @props.items)
-      @props.onItemsChange(items)
-    else
-      # Re-render as HTML may have been mangled and needs a round-trip
-      @forceUpdate()
+      return this.handleCommand("foreColor", color);
+    }
 
-  handleFocus: => @setState(focused: true)
-  handleBlur: => @setState(focused: false)  
+    handleChange(elem) {
+      const items =  this.props.itemsHtmlConverter.convertElemToItems(elem);
 
-  # Perform a command such as bold, underline, etc.
-  handleCommand: (command, param, ev) =>
-    # Don't lose focus
-    ev?.preventDefault()
+      // Check if changed
+      if (!_.isEqual(items, this.props.items)) {
+        return this.props.onItemsChange(items);
+      } else {
+        // Re-render as HTML may have been mangled and needs a round-trip
+        return this.forceUpdate();
+      }
+    }
 
-    # Use CSS for some commands 
-    if command in ['foreColor']
-      document.execCommand("styleWithCSS", null, true)
-      document.execCommand(command, false, param)
-      document.execCommand("styleWithCSS", null, false)
-    else
-      document.execCommand(command, false, param)
+    handleFocus() { return this.setState({focused: true}); }
+    handleBlur() { return this.setState({focused: false}); }  
 
-  handleCreateLink: (ev) =>
-    # Don't lose focus
-    ev.preventDefault()
+    // Perform a command such as bold, underline, etc.
+    handleCommand(command, param, ev) {
+      // Don't lose focus
+      ev?.preventDefault();
 
-    # Ask for url
-    url = window.prompt("Enter URL to link to")
-    if url
-      document.execCommand("createLink", false, url)
+      // Use CSS for some commands 
+      if (['foreColor'].includes(command)) {
+        document.execCommand("styleWithCSS", null, true);
+        document.execCommand(command, false, param);
+        return document.execCommand("styleWithCSS", null, false);
+      } else {
+        return document.execCommand(command, false, param);
+      }
+    }
 
-  handleEditorClick: (ev) =>
-    # Be sure focused
-    if not @state.focused
-      @setState(focused: true)
+    handleCreateLink(ev) {
+      // Don't lose focus
+      ev.preventDefault();
 
-    if ev.target.dataset?.embed or ev.target.parentElement?.dataset?.embed
-      item = JSON.parse(ev.target.dataset?.embed or ev.target.parentElement?.dataset?.embed)
-      if item?
-        @props.onItemClick?(item)
+      // Ask for url
+      const url = window.prompt("Enter URL to link to");
+      if (url) {
+        return document.execCommand("createLink", false, url);
+      }
+    }
 
-  createHtml: ->
-    @props.itemsHtmlConverter.convertItemsToHtml(@props.items)
+    handleEditorClick(ev) {
+      // Be sure focused
+      if (!this.state.focused) {
+        this.setState({focused: true});
+      }
 
-  renderPalette: ->
-    return R FloatAffixed, style: {zIndex: 9999}, edges: "over,under,left,right", align: "center", render: @renderPaletteContent
+      if (ev.target.dataset?.embed || ev.target.parentElement?.dataset?.embed) {
+        const item = JSON.parse(ev.target.dataset?.embed || ev.target.parentElement?.dataset?.embed);
+        if (item != null) {
+          return this.props.onItemClick?.(item);
+        }
+      }
+    }
 
-  renderPaletteContent: (schemeName, {edges}) =>
-    return R 'div', key: "palette", className: "mwater-visualization-text-palette", ref: ((c) => @paletteComponent = c),
-        R 'div', key: "bold", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "bold", null),
-          R 'b', null, "B"
-        R 'div', key: "italic", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "italic", null),
-          R 'i', null, "I"
-        R 'div', key: "underline", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "underline", null),
-          R 'span', style: { textDecoration: "underline" }, "U"
-        R FontColorPaletteItem, key: "foreColor", onSetColor: @handleSetFontColor, position: if schemeName == "over" then "under" else "over"
-        R FontSizePaletteItem, key: "fontSize", onSetSize: @handleSetFontSize, position: if schemeName == "over" then "under" else "over"
-        R 'div', key: "link", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCreateLink,
-          R 'i', className: "fa fa-link"
-        R 'div', key: "justifyLeft", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyLeft", null),
-          R 'i', className: "fa fa-align-left"
-        R 'div', key: "justifyCenter", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyCenter", null),
-          R 'i', className: "fa fa-align-center"
-        R 'div', key: "justifyRight", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyRight", null),
-          R 'i', className: "fa fa-align-right"
-        R 'div', key: "justifyFull", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "justifyFull", null),
-          R 'i', className: "fa fa-align-justify"
-        R 'div', key: "insertUnorderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertUnorderedList", null),
-          R 'i', className: "fa fa-list-ul"
-        R 'div', key: "insertOrderedList", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "insertOrderedList", null),
-          R 'i', className: "fa fa-list-ol"
-        if @props.includeHeadings
-          [
-            R 'div', key: "h1", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H1>"),
-              R 'i', className: "fa fa-header"
-            R 'div', key: "h2", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<H2>"),
-              R 'i', className: "fa fa-header", style: { fontSize: "80%" }
-            R 'div', key: "p", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "formatBlock", "<div>"),
-              "\u00b6"
-          ]
-        R 'div', key: "removeFormat", className: "mwater-visualization-text-palette-item", onMouseDown: @handleCommand.bind(null, "removeFormat", null), style: { paddingLeft: 5, paddingRight: 5 },
-          R 'img', src: removeFormatIcon, style: { height: 20 }
-        @props.extraPaletteButtons
+    createHtml() {
+      return this.props.itemsHtmlConverter.convertItemsToHtml(this.props.items);
+    }
 
-  refContentEditable: (c) => @contentEditable = c
+    renderPalette() {
+      return R(FloatAffixed, {style: {zIndex: 9999}, edges: "over,under,left,right", align: "center", render: this.renderPaletteContent});
+    }
+
+    renderPaletteContent(schemeName, {edges}) {
+      return R('div', {key: "palette", className: "mwater-visualization-text-palette", ref: (c => { return this.paletteComponent = c; })},
+          R('div', {key: "bold", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleCommand.bind(null, "bold", null)},
+            R('b', null, "B")),
+          R('div', {key: "italic", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleCommand.bind(null, "italic", null)},
+            R('i', null, "I")),
+          R('div', {key: "underline", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleCommand.bind(null, "underline", null)},
+            R('span', {style: { textDecoration: "underline" }}, "U")),
+          R(FontColorPaletteItem, {key: "foreColor", onSetColor: this.handleSetFontColor, position: schemeName === "over" ? "under" : "over"}),
+          R(FontSizePaletteItem, {key: "fontSize", onSetSize: this.handleSetFontSize, position: schemeName === "over" ? "under" : "over"}),
+          R('div', {key: "link", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleCreateLink},
+            R('i', {className: "fa fa-link"})),
+          R('div', {key: "justifyLeft", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleCommand.bind(null, "justifyLeft", null)},
+            R('i', {className: "fa fa-align-left"})),
+          R('div', {key: "justifyCenter", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleCommand.bind(null, "justifyCenter", null)},
+            R('i', {className: "fa fa-align-center"})),
+          R('div', {key: "justifyRight", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleCommand.bind(null, "justifyRight", null)},
+            R('i', {className: "fa fa-align-right"})),
+          R('div', {key: "justifyFull", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleCommand.bind(null, "justifyFull", null)},
+            R('i', {className: "fa fa-align-justify"})),
+          R('div', {key: "insertUnorderedList", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleCommand.bind(null, "insertUnorderedList", null)},
+            R('i', {className: "fa fa-list-ul"})),
+          R('div', {key: "insertOrderedList", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleCommand.bind(null, "insertOrderedList", null)},
+            R('i', {className: "fa fa-list-ol"})),
+          this.props.includeHeadings ?
+            [
+              R('div', {key: "h1", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleCommand.bind(null, "formatBlock", "<H1>")},
+                R('i', {className: "fa fa-header"})),
+              R('div', {key: "h2", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleCommand.bind(null, "formatBlock", "<H2>")},
+                R('i', {className: "fa fa-header", style: { fontSize: "80%" }})),
+              R('div', {key: "p", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleCommand.bind(null, "formatBlock", "<div>")},
+                "\u00b6")
+            ] : undefined,
+          R('div', {key: "removeFormat", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleCommand.bind(null, "removeFormat", null), style: { paddingLeft: 5, paddingRight: 5 }},
+            R('img', {src: removeFormatIcon, style: { height: 20 }})),
+          this.props.extraPaletteButtons);
+    }
+
+    refContentEditable(c) { return this.contentEditable = c; }
     
-  renderHtml: ->
-    if @props.onItemsChange?
-      return R 'div', key: "contents", style: @props.style, className: @props.className,
-        R ContentEditableComponent, 
-          ref: @refContentEditable
-          style: { outline: "none" }
-          html: @createHtml()
-          onChange: @handleChange
-          onClick: @handleEditorClick
-          onFocus: @handleFocus
-          onBlur: @handleBlur
-        if not @props.items?[0]?
-          R 'div', key: "placeholder", style: { color: "#DDD", position: "absolute", top: 0, left: 0, right: 0, pointerEvents: "none" }, "Click to Edit"
+    renderHtml() {
+      if (this.props.onItemsChange != null) {
+        return R('div', {key: "contents", style: this.props.style, className: this.props.className},
+          R(ContentEditableComponent, { 
+            ref: this.refContentEditable,
+            style: { outline: "none" },
+            html: this.createHtml(),
+            onChange: this.handleChange,
+            onClick: this.handleEditorClick,
+            onFocus: this.handleFocus,
+            onBlur: this.handleBlur
+          }
+          ),
+          (this.props.items?.[0] == null) ?
+            R('div', {key: "placeholder", style: { color: "#DDD", position: "absolute", top: 0, left: 0, right: 0, pointerEvents: "none" }}, "Click to Edit") : undefined
+        );
 
-    else
-      return R 'div', key: "contents", style: @props.style, className: @props.className, dangerouslySetInnerHTML: { __html: @createHtml() }
+      } else {
+        return R('div', {key: "contents", style: this.props.style, className: this.props.className, dangerouslySetInnerHTML: { __html: this.createHtml() }});
+      }
+    }
 
-  render: ->
-    R 'div', style: { position: "relative" }, ref: ((c) => @entireComponent = c),
-      @renderHtml()
-      if @state.focused
-        @renderPalette()
+    render() {
+      return R('div', {style: { position: "relative" }, ref: (c => { return this.entireComponent = c; })},
+        this.renderHtml(),
+        this.state.focused ?
+          this.renderPalette() : undefined
+      );
+    }
+  };
+  RichTextComponent.initClass();
+  return RichTextComponent;
+})();
 
 
-removeFormatIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAr0lEQVQ4y91U2w3CMAy8VB0kbFA2YYVuABOZbsAmGaFscnzgSlGSBgfCB1g6OXbkkx+yHUn0lgFfkN8hHSt/lma71kxdhIv6Dom/HGicflB97NVTD2ACsPQc1En1zUpqKb+pdEumzaVbSNPSRRFL7iNZQ1BstvApsmODZJXUa8A58W9Ea4nwFWkNa0Sc/Q+F1dyDRD30AO6qJV/wtgxNPR3fOEJXALO+5092/0+P9APt7i9xOIlepwAAAABJRU5ErkJggg=="
+var removeFormatIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAr0lEQVQ4y91U2w3CMAy8VB0kbFA2YYVuABOZbsAmGaFscnzgSlGSBgfCB1g6OXbkkx+yHUn0lgFfkN8hHSt/lma71kxdhIv6Dom/HGicflB97NVTD2ACsPQc1En1zUpqKb+pdEumzaVbSNPSRRFL7iNZQ1BstvApsmODZJXUa8A58W9Ea4nwFWkNa0Sc/Q+F1dyDRD30AO6qJV/wtgxNPR3fOEJXALO+5092/0+P9APt7i9xOIlepwAAAABJRU5ErkJggg==";

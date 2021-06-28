@@ -1,44 +1,57 @@
-_ = require 'lodash'
-update = require 'update-object'
-ExprCleaner = require('mwater-expressions').ExprCleaner
-ExprUtils = require("mwater-expressions").ExprUtils
-produce = require('immer').default
-original = require('immer').original
+let DatagridUtils;
+import _ from 'lodash';
+import update from 'update-object';
+import { ExprCleaner } from 'mwater-expressions';
+import { ExprUtils } from "mwater-expressions";
+import { default as produce } from 'immer';
+import { original } from 'immer';
 
-module.exports = class DatagridUtils
-  constructor: (schema) ->
-    @schema = schema
+export default DatagridUtils = class DatagridUtils {
+  constructor(schema) {
+    this.schema = schema;
+  }
 
-  # Cleans a datagrid design, removing invalid columns
-  cleanDesign: (design) ->
-    exprCleaner = new ExprCleaner(@schema)
+  // Cleans a datagrid design, removing invalid columns
+  cleanDesign(design) {
+    const exprCleaner = new ExprCleaner(this.schema);
 
-    # Erase all if table doesn't exist
-    if not @schema.getTable(design.table)
-      return {}
+    // Erase all if table doesn't exist
+    if (!this.schema.getTable(design.table)) {
+      return {};
+    }
 
-    # Clean columns
-    design = produce(design, (draft) =>
-      for column in draft.columns
-        if column.type == "expr"
-          # Determine if subtable
-          if column.subtable
-            subtable = _.findWhere(design.subtables, id: column.subtable)
+    // Clean columns
+    design = produce(design, draft => {
+      for (let column of draft.columns) {
+        if (column.type === "expr") {
+          // Determine if subtable
+          var table;
+          if (column.subtable) {
+            const subtable = _.findWhere(design.subtables, {id: column.subtable});
 
-            # Now get destination table
-            table = new ExprUtils(@schema).followJoins(design.table, subtable.joins)
-          else
-            table = design.table
+            // Now get destination table
+            table = new ExprUtils(this.schema).followJoins(design.table, subtable.joins);
+          } else {
+            ({
+              table
+            } = design);
+          }
 
-          column.expr = exprCleaner.cleanExpr((if column.expr then original(column.expr) else null), { table: table, aggrStatuses: ["individual", "literal", "aggregate"] })
+          column.expr = exprCleaner.cleanExpr((column.expr ? original(column.expr) : null), { table, aggrStatuses: ["individual", "literal", "aggregate"] });
+        }
+      }
 
-      return
-    )
-    return design
+    });
+    return design;
+  }
   
-  validateDesign: (design) ->
-    if not design.table
-      return "Missing table"
+  validateDesign(design) {
+    if (!design.table) {
+      return "Missing table";
+    }
 
-    if not design.columns?[0]
-      return "No columns"
+    if (!design.columns?.[0]) {
+      return "No columns";
+    }
+  }
+};

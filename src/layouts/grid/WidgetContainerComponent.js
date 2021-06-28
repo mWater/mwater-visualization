@@ -1,338 +1,405 @@
-PropTypes = require('prop-types')
-React = require 'react'
-ReactDOM = require 'react-dom'
-_ = require 'lodash'
-R = React.createElement
-DragSource = require('react-dnd').DragSource
-DropTarget = require('react-dnd').DropTarget
-DecoratedBlockComponent = require '../DecoratedBlockComponent'
+import PropTypes from 'prop-types';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import _ from 'lodash';
+const R = React.createElement;
+import { DragSource } from 'react-dnd';
+import { DropTarget } from 'react-dnd';
+import DecoratedBlockComponent from '../DecoratedBlockComponent';
 
-# Render a child element as draggable, resizable block, injecting handle connectors
-# to child element
-class LayoutComponent extends React.Component
-  @propTypes:
-    dragInfo: PropTypes.object.isRequired  # Opaque information to be used when a block is dragged
-    canDrag: PropTypes.bool.isRequired     # True if draggable
-
-  render: ->
-    if @props.canDrag
-      return React.cloneElement(React.Children.only(@props.children), {
-        connectMoveHandle: @props.connectMoveHandle
-        connectResizeHandle: @props.connectResizeHandle      
-        })
-    else
-      return @props.children
-
-moveSpec = {
-  beginDrag: (props, monitor, component) -> 
-    return props.dragInfo
-  canDrag: (props, monitor) ->
-    return props.canDrag
-}
-
-moveCollect = (connect, monitor) ->
-  return { connectMoveHandle: connect.dragSource() }
-
-MoveLayoutComponent = DragSource("block-move", moveSpec, moveCollect)(LayoutComponent)
-
-resizeSpec = {
-  beginDrag: (props, monitor, component) ->
-    return props.dragInfo
-  canDrag: (props, monitor) ->
-    return props.canDrag
-}
-
-resizeCollect = (connect, monitor) ->
-  return { connectResizeHandle: connect.dragSource() }
-
-MoveResizeLayoutComponent = DragSource("block-resize", resizeSpec, resizeCollect)(MoveLayoutComponent)
-
-# Container contains layouts to layout. It renders widgets at the correct location.
-class Container extends React.Component
-  @propTypes:
-    layoutEngine: PropTypes.object.isRequired
-    items: PropTypes.object.isRequired # Lookup of id -> { widget:, layout: }
-    onItemsChange: PropTypes.func # Called with lookup of id -> { widget:, layout: }
-    renderWidget: PropTypes.func.isRequired # Renders a widget
-    width: PropTypes.number.isRequired # width in pixels
-    connectDropTarget: PropTypes.func.isRequired # Injected by react-dnd wrapper
-
-  constructor: (props) ->
-    super(props)
-    @state = { moveHover: null, resizeHover: null }
-
-  setMoveHover: (hoverInfo) ->
-    @setState(moveHover: hoverInfo)
-
-  setResizeHover: (hoverInfo) -> 
-    @setState(resizeHover: hoverInfo)
-
-  dropLayout: (id, droppedRect, widget) ->
-    # Stop hover
-    @setState(moveHover: null, resizeHover: null)
-
-    # Convert rect to layout
-    droppedLayout = @props.layoutEngine.rectToLayout(droppedRect)
-
-    # Insert dropped layout
-    items = _.clone(@props.items)
-    items[id] = { layout: droppedLayout, widget: widget }
-
-    layouts = {}
-    for id, item of items
-      layouts[id] = item.layout
-
-    # Perform layout
-    layouts = @props.layoutEngine.performLayout(layouts, id)
-
-    # Update item layouts
-    items = _.mapValues(items, (item, id) =>
-      return _.extend({}, item, layout: layouts[id])
-      )
-
-    @props.onItemsChange(items)
-  
-  # Called when a block is dropped
-  dropMoveLayout: (dropInfo) -> 
-    # Get rectangle of dropped block
-    droppedRect = {
-      x: dropInfo.x
-      y: dropInfo.y
-      width: dropInfo.dragInfo.bounds.width   # width and height are from drop info
-      height: dropInfo.dragInfo.bounds.height
-    }
-
-    @dropLayout(dropInfo.dragInfo.id, droppedRect, dropInfo.dragInfo.widget)
-  
-  dropResizeLayout: (dropInfo) ->
-    # Get rectangle of hovered block
-    droppedRect = {
-      x: dropInfo.dragInfo.bounds.x
-      y: dropInfo.dragInfo.bounds.y
-      width: dropInfo.width
-      height: dropInfo.height
-    }
-
-    @dropLayout(dropInfo.dragInfo.id, droppedRect, dropInfo.dragInfo.widget)
-
-  componentWillReceiveProps: (nextProps) ->
-    # Reset hover if not over
-    if not nextProps.isOver and (@state.moveHover or @state.resizeHover)
-      # Defer to prevent "Cannot dispatch in the middle of a dispatch." error
-      _.defer () =>
-        @setState(moveHover: null, resizeHover: null)
-
-  handleRemove: (id) =>
-    # Update item layouts
-    items = _.omit(@props.items, id)
-    @props.onItemsChange(items)
-
-  handleWidgetDesignChange: (id, widgetDesign) =>
-    widget = @props.items[id].widget
-    widget = _.extend({}, widget, design: widgetDesign)
-
-    item = @props.items[id]
-    item = _.extend({}, item, widget: widget)
-
-    items = _.clone(@props.items)
-    items[id] = item
-
-    @props.onItemsChange(items)
-
-  renderPlaceholder: (bounds) ->
-    R 'div', key: "placeholder", style: { 
-      position: "absolute", 
-      left: bounds.x
-      top: bounds.y
-      width: bounds.width
-      height: bounds.height
-      border: "dashed 3px #AAA"
-      borderRadius: 5
-      padding: 5
-      position: "absolute"
-    }
-
-  # Render a particular layout. Allow visible to be false so that 
-  # dragged elements can retain state
-  renderItem: (id, item, layout, visible=true) =>
-    # Calculate bounds
-    bounds = @props.layoutEngine.getLayoutBounds(layout)
-
-    # Position absolutely
-    style = { 
-      position: "absolute"
-      left: bounds.x
-      top: bounds.y
-    }
-
-    if not visible
-      style.display = "none"
-
-    # Create dragInfo which is all the info needed to drop the layout
-    dragInfo = {
-      id: id
-      bounds: bounds
-      widget: item.widget
-    }
-
-    elem = @props.renderWidget({ 
-      id: id
-      type: item.widget.type
-      design: item.widget.design
-      onDesignChange: if @props.onItemsChange? then @handleWidgetDesignChange.bind(null, id)
-      width: bounds.width - 10
-      height: bounds.height - 10 
-    })
-
-    # Render decorated if editable
-    if @props.onItemsChange
-      elem = React.createElement DecoratedBlockComponent,
-        # style: { width: bounds.width, height: bounds.height }
-        onBlockRemove: @handleRemove.bind(null, id),
-          elem
-    else
-      elem = R 'div', className: "mwater-visualization-block-view",
-        # style: { width: bounds.width, height: bounds.height },
-        elem
-
-    # Clone element, injecting width, height and enclosing in a dnd block
-    return R 'div', style: style, key: id,
-      React.createElement(MoveResizeLayoutComponent, { dragInfo: dragInfo, canDrag: @props.onItemsChange? }, 
-        elem)
-
-  # Calculate a lookup of layouts incorporating hover info
-  calculateLayouts: (props, state) ->
-    # Get hovered block if present
-    hoveredDragInfo = null
-    hoveredLayout = null  # Layout of hovered block
-    if state.moveHover
-      hoveredDragInfo = state.moveHover.dragInfo
-      hoveredRect = {
-        x: state.moveHover.x
-        y: state.moveHover.y
-        width: state.moveHover.dragInfo.bounds.width
-        height: state.moveHover.dragInfo.bounds.height
-      }
-      hoveredLayout = props.layoutEngine.rectToLayout(hoveredRect)
-
-    if state.resizeHover
-      hoveredDragInfo = state.resizeHover.dragInfo
-      hoveredRect = {
-        x: state.resizeHover.dragInfo.bounds.x
-        y: state.resizeHover.dragInfo.bounds.y
-        width: state.resizeHover.width
-        height: state.resizeHover.height
-      }
-      hoveredLayout = props.layoutEngine.rectToLayout(hoveredRect)
-
-    layouts = {}
-    for id, item of props.items
-      layouts[id] = item.layout
-
-    # Add hovered layout
-    if hoveredDragInfo
-      layouts[hoveredDragInfo.id] = hoveredLayout
-
-    # Perform layout
-    layouts = props.layoutEngine.performLayout(layouts, if hoveredDragInfo then hoveredDragInfo.id)
-    return layouts
-
-  renderItems: (items) ->
-    layouts = @calculateLayouts(@props, @state)
-
-    renderElems = []
-    hover = @state.moveHover or @state.resizeHover
-
-    # Render blocks in their adjusted position
-    ids = []
-    for id of items
-      ids.push id
-    if hover and hover.dragInfo.id not in ids
-      ids.push hover.dragInfo.id
-
-    for id in _.sortBy(ids)
-      item = items[id]
-      if not hover or id != hover.dragInfo.id
-        renderElems.push(@renderItem(id, item, layouts[id]))
-      else
-        # Render it anyway so that its state is retained
-        if item
-          renderElems.push(@renderItem(id, item, layouts[id], false))
-        renderElems.push(@renderPlaceholder(@props.layoutEngine.getLayoutBounds(layouts[id])))
-
-    return renderElems
-
-  # This gets called 100s of times when dragging
-  shouldComponentUpdate: (nextProps, nextState) ->
-    if @props.width != nextProps.width
-      return true
-
-    if @props.layoutEngine != nextProps.layoutEngine
-      return true
-
-    layouts = @calculateLayouts(@props, @state)
-    nextLayouts = @calculateLayouts(nextProps, nextState)
-
-    if not _.isEqual(layouts, nextLayouts)
-      return true
-
-    if not _.isEqual(@props.elems, nextProps.elems)
-      return true
-
-    return false
-
-  render: ->
-    # Determine height using layout engine
-    style = {
-      width: @props.width
-      height: "100%" # @props.layoutEngine.calculateHeight(layouts)
-      position: "relative"
-    }
-
-    # Connect as a drop target
-    @props.connectDropTarget(
-      R 'div', style: style, 
-        @renderItems(@props.items)
-    )
-
-targetSpec = {
-  drop: (props, monitor, component) ->
-    if monitor.getItemType() == "block-move"
-      rect = ReactDOM.findDOMNode(component).getBoundingClientRect()
-      component.dropMoveLayout(
-        dragInfo: monitor.getItem()
-        x: monitor.getClientOffset().x - (monitor.getInitialClientOffset().x - monitor.getInitialSourceClientOffset().x) - rect.left
-        y: monitor.getClientOffset().y - (monitor.getInitialClientOffset().y - monitor.getInitialSourceClientOffset().y) - rect.top
-        )
-    if monitor.getItemType() == "block-resize"
-      component.dropResizeLayout({
-        dragInfo: monitor.getItem()
-        width: monitor.getItem().bounds.width + monitor.getDifferenceFromInitialOffset().x
-        height: monitor.getItem().bounds.height + monitor.getDifferenceFromInitialOffset().y
-        })
-    return
-  hover: (props, monitor, component) ->
-    if monitor.getItemType() == "block-move"
-      rect = ReactDOM.findDOMNode(component).getBoundingClientRect()
-      component.setMoveHover(
-        dragInfo: monitor.getItem()
-        x: monitor.getClientOffset().x - (monitor.getInitialClientOffset().x - monitor.getInitialSourceClientOffset().x) - rect.left
-        y: monitor.getClientOffset().y - (monitor.getInitialClientOffset().y - monitor.getInitialSourceClientOffset().y) - rect.top
-        )
-    if monitor.getItemType() == "block-resize"
-      component.setResizeHover({
-        dragInfo: monitor.getItem()
-        width: monitor.getItem().bounds.width + monitor.getDifferenceFromInitialOffset().x
-        height: monitor.getItem().bounds.height + monitor.getDifferenceFromInitialOffset().y
-        })
-    return
-}
-
-targetCollect = (connect, monitor) ->
-  return {
-    connectDropTarget: connect.dropTarget()
-    isOver: monitor.isOver()
-    clientOffset: monitor.getClientOffset()
+// Render a child element as draggable, resizable block, injecting handle connectors
+// to child element
+class LayoutComponent extends React.Component {
+  static initClass() {
+    this.propTypes = {
+      dragInfo: PropTypes.object.isRequired,  // Opaque information to be used when a block is dragged
+      canDrag: PropTypes.bool.isRequired
+    };
+         // True if draggable
   }
 
-module.exports = DropTarget(["block-move", "block-resize"], targetSpec, targetCollect)(Container)
+  render() {
+    if (this.props.canDrag) {
+      return React.cloneElement(React.Children.only(this.props.children), {
+        connectMoveHandle: this.props.connectMoveHandle,
+        connectResizeHandle: this.props.connectResizeHandle      
+        });
+    } else {
+      return this.props.children;
+    }
+  }
+}
+LayoutComponent.initClass();
+
+const moveSpec = {
+  beginDrag(props, monitor, component) { 
+    return props.dragInfo;
+  },
+  canDrag(props, monitor) {
+    return props.canDrag;
+  }
+};
+
+const moveCollect = (connect, monitor) => ({
+  connectMoveHandle: connect.dragSource()
+});
+
+const MoveLayoutComponent = DragSource("block-move", moveSpec, moveCollect)(LayoutComponent);
+
+const resizeSpec = {
+  beginDrag(props, monitor, component) {
+    return props.dragInfo;
+  },
+  canDrag(props, monitor) {
+    return props.canDrag;
+  }
+};
+
+const resizeCollect = (connect, monitor) => ({
+  connectResizeHandle: connect.dragSource()
+});
+
+const MoveResizeLayoutComponent = DragSource("block-resize", resizeSpec, resizeCollect)(MoveLayoutComponent);
+
+// Container contains layouts to layout. It renders widgets at the correct location.
+class Container extends React.Component {
+  static initClass() {
+    this.propTypes = {
+      layoutEngine: PropTypes.object.isRequired,
+      items: PropTypes.object.isRequired, // Lookup of id -> { widget:, layout: }
+      onItemsChange: PropTypes.func, // Called with lookup of id -> { widget:, layout: }
+      renderWidget: PropTypes.func.isRequired, // Renders a widget
+      width: PropTypes.number.isRequired, // width in pixels
+      connectDropTarget: PropTypes.func.isRequired
+    };
+     // Injected by react-dnd wrapper
+  }
+
+  constructor(props) {
+    this.handleRemove = this.handleRemove.bind(this);
+    this.handleWidgetDesignChange = this.handleWidgetDesignChange.bind(this);
+    this.renderItem = this.renderItem.bind(this);
+    super(props);
+    this.state = { moveHover: null, resizeHover: null };
+  }
+
+  setMoveHover(hoverInfo) {
+    return this.setState({moveHover: hoverInfo});
+  }
+
+  setResizeHover(hoverInfo) { 
+    return this.setState({resizeHover: hoverInfo});
+  }
+
+  dropLayout(id, droppedRect, widget) {
+    // Stop hover
+    this.setState({moveHover: null, resizeHover: null});
+
+    // Convert rect to layout
+    const droppedLayout = this.props.layoutEngine.rectToLayout(droppedRect);
+
+    // Insert dropped layout
+    let items = _.clone(this.props.items);
+    items[id] = { layout: droppedLayout, widget };
+
+    let layouts = {};
+    for (id in items) {
+      const item = items[id];
+      layouts[id] = item.layout;
+    }
+
+    // Perform layout
+    layouts = this.props.layoutEngine.performLayout(layouts, id);
+
+    // Update item layouts
+    items = _.mapValues(items, (item, id) => {
+      return _.extend({}, item, {layout: layouts[id]});
+      });
+
+    return this.props.onItemsChange(items);
+  }
+  
+  // Called when a block is dropped
+  dropMoveLayout(dropInfo) { 
+    // Get rectangle of dropped block
+    const droppedRect = {
+      x: dropInfo.x,
+      y: dropInfo.y,
+      width: dropInfo.dragInfo.bounds.width,   // width and height are from drop info
+      height: dropInfo.dragInfo.bounds.height
+    };
+
+    return this.dropLayout(dropInfo.dragInfo.id, droppedRect, dropInfo.dragInfo.widget);
+  }
+  
+  dropResizeLayout(dropInfo) {
+    // Get rectangle of hovered block
+    const droppedRect = {
+      x: dropInfo.dragInfo.bounds.x,
+      y: dropInfo.dragInfo.bounds.y,
+      width: dropInfo.width,
+      height: dropInfo.height
+    };
+
+    return this.dropLayout(dropInfo.dragInfo.id, droppedRect, dropInfo.dragInfo.widget);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // Reset hover if not over
+    if (!nextProps.isOver && (this.state.moveHover || this.state.resizeHover)) {
+      // Defer to prevent "Cannot dispatch in the middle of a dispatch." error
+      return _.defer(() => {
+        return this.setState({moveHover: null, resizeHover: null});
+      });
+    }
+  }
+
+  handleRemove(id) {
+    // Update item layouts
+    const items = _.omit(this.props.items, id);
+    return this.props.onItemsChange(items);
+  }
+
+  handleWidgetDesignChange(id, widgetDesign) {
+    let {
+      widget
+    } = this.props.items[id];
+    widget = _.extend({}, widget, {design: widgetDesign});
+
+    let item = this.props.items[id];
+    item = _.extend({}, item, {widget});
+
+    const items = _.clone(this.props.items);
+    items[id] = item;
+
+    return this.props.onItemsChange(items);
+  }
+
+  renderPlaceholder(bounds) {
+    return R('div', { key: "placeholder", style: { 
+      position: "absolute", 
+      left: bounds.x,
+      top: bounds.y,
+      width: bounds.width,
+      height: bounds.height,
+      border: "dashed 3px #AAA",
+      borderRadius: 5,
+      padding: 5,
+      position: "absolute"
+    }
+  });
+  }
+
+  // Render a particular layout. Allow visible to be false so that 
+  // dragged elements can retain state
+  renderItem(id, item, layout, visible=true) {
+    // Calculate bounds
+    const bounds = this.props.layoutEngine.getLayoutBounds(layout);
+
+    // Position absolutely
+    const style = { 
+      position: "absolute",
+      left: bounds.x,
+      top: bounds.y
+    };
+
+    if (!visible) {
+      style.display = "none";
+    }
+
+    // Create dragInfo which is all the info needed to drop the layout
+    const dragInfo = {
+      id,
+      bounds,
+      widget: item.widget
+    };
+
+    let elem = this.props.renderWidget({ 
+      id,
+      type: item.widget.type,
+      design: item.widget.design,
+      onDesignChange: (this.props.onItemsChange != null) ? this.handleWidgetDesignChange.bind(null, id) : undefined,
+      width: bounds.width - 10,
+      height: bounds.height - 10 
+    });
+
+    // Render decorated if editable
+    if (this.props.onItemsChange) {
+      elem = React.createElement(DecoratedBlockComponent,
+        // style: { width: bounds.width, height: bounds.height }
+        {onBlockRemove: this.handleRemove.bind(null, id)},
+          elem);
+    } else {
+      elem = R('div', {className: "mwater-visualization-block-view"},
+        // style: { width: bounds.width, height: bounds.height },
+        elem);
+    }
+
+    // Clone element, injecting width, height and enclosing in a dnd block
+    return R('div', {style, key: id},
+      React.createElement(MoveResizeLayoutComponent, { dragInfo, canDrag: (this.props.onItemsChange != null) }, 
+        elem)
+    );
+  }
+
+  // Calculate a lookup of layouts incorporating hover info
+  calculateLayouts(props, state) {
+    // Get hovered block if present
+    let hoveredRect, id;
+    let hoveredDragInfo = null;
+    let hoveredLayout = null;  // Layout of hovered block
+    if (state.moveHover) {
+      hoveredDragInfo = state.moveHover.dragInfo;
+      hoveredRect = {
+        x: state.moveHover.x,
+        y: state.moveHover.y,
+        width: state.moveHover.dragInfo.bounds.width,
+        height: state.moveHover.dragInfo.bounds.height
+      };
+      hoveredLayout = props.layoutEngine.rectToLayout(hoveredRect);
+    }
+
+    if (state.resizeHover) {
+      hoveredDragInfo = state.resizeHover.dragInfo;
+      hoveredRect = {
+        x: state.resizeHover.dragInfo.bounds.x,
+        y: state.resizeHover.dragInfo.bounds.y,
+        width: state.resizeHover.width,
+        height: state.resizeHover.height
+      };
+      hoveredLayout = props.layoutEngine.rectToLayout(hoveredRect);
+    }
+
+    let layouts = {};
+    for (id in props.items) {
+      const item = props.items[id];
+      layouts[id] = item.layout;
+    }
+
+    // Add hovered layout
+    if (hoveredDragInfo) {
+      layouts[hoveredDragInfo.id] = hoveredLayout;
+    }
+
+    // Perform layout
+    layouts = props.layoutEngine.performLayout(layouts, hoveredDragInfo ? hoveredDragInfo.id : undefined);
+    return layouts;
+  }
+
+  renderItems(items) {
+    let id;
+    const layouts = this.calculateLayouts(this.props, this.state);
+
+    const renderElems = [];
+    const hover = this.state.moveHover || this.state.resizeHover;
+
+    // Render blocks in their adjusted position
+    const ids = [];
+    for (id in items) {
+      ids.push(id);
+    }
+    if (hover && !ids.includes(hover.dragInfo.id)) {
+      ids.push(hover.dragInfo.id);
+    }
+
+    for (id of _.sortBy(ids)) {
+      const item = items[id];
+      if (!hover || (id !== hover.dragInfo.id)) {
+        renderElems.push(this.renderItem(id, item, layouts[id]));
+      } else {
+        // Render it anyway so that its state is retained
+        if (item) {
+          renderElems.push(this.renderItem(id, item, layouts[id], false));
+        }
+        renderElems.push(this.renderPlaceholder(this.props.layoutEngine.getLayoutBounds(layouts[id])));
+      }
+    }
+
+    return renderElems;
+  }
+
+  // This gets called 100s of times when dragging
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.width !== nextProps.width) {
+      return true;
+    }
+
+    if (this.props.layoutEngine !== nextProps.layoutEngine) {
+      return true;
+    }
+
+    const layouts = this.calculateLayouts(this.props, this.state);
+    const nextLayouts = this.calculateLayouts(nextProps, nextState);
+
+    if (!_.isEqual(layouts, nextLayouts)) {
+      return true;
+    }
+
+    if (!_.isEqual(this.props.elems, nextProps.elems)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  render() {
+    // Determine height using layout engine
+    const style = {
+      width: this.props.width,
+      height: "100%", // @props.layoutEngine.calculateHeight(layouts)
+      position: "relative"
+    };
+
+    // Connect as a drop target
+    return this.props.connectDropTarget(
+      R('div', {style}, 
+        this.renderItems(this.props.items))
+    );
+  }
+}
+Container.initClass();
+
+const targetSpec = {
+  drop(props, monitor, component) {
+    if (monitor.getItemType() === "block-move") {
+      const rect = ReactDOM.findDOMNode(component).getBoundingClientRect();
+      component.dropMoveLayout({
+        dragInfo: monitor.getItem(),
+        x: monitor.getClientOffset().x - (monitor.getInitialClientOffset().x - monitor.getInitialSourceClientOffset().x) - rect.left,
+        y: monitor.getClientOffset().y - (monitor.getInitialClientOffset().y - monitor.getInitialSourceClientOffset().y) - rect.top
+        });
+    }
+    if (monitor.getItemType() === "block-resize") {
+      component.dropResizeLayout({
+        dragInfo: monitor.getItem(),
+        width: monitor.getItem().bounds.width + monitor.getDifferenceFromInitialOffset().x,
+        height: monitor.getItem().bounds.height + monitor.getDifferenceFromInitialOffset().y
+        });
+    }
+  },
+  hover(props, monitor, component) {
+    if (monitor.getItemType() === "block-move") {
+      const rect = ReactDOM.findDOMNode(component).getBoundingClientRect();
+      component.setMoveHover({
+        dragInfo: monitor.getItem(),
+        x: monitor.getClientOffset().x - (monitor.getInitialClientOffset().x - monitor.getInitialSourceClientOffset().x) - rect.left,
+        y: monitor.getClientOffset().y - (monitor.getInitialClientOffset().y - monitor.getInitialSourceClientOffset().y) - rect.top
+        });
+    }
+    if (monitor.getItemType() === "block-resize") {
+      component.setResizeHover({
+        dragInfo: monitor.getItem(),
+        width: monitor.getItem().bounds.width + monitor.getDifferenceFromInitialOffset().x,
+        height: monitor.getItem().bounds.height + monitor.getDifferenceFromInitialOffset().y
+        });
+    }
+  }
+};
+
+const targetCollect = (connect, monitor) => ({
+  connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver(),
+  clientOffset: monitor.getClientOffset()
+});
+
+export default DropTarget(["block-move", "block-resize"], targetSpec, targetCollect)(Container);

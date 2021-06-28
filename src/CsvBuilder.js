@@ -1,50 +1,60 @@
-_ = require 'lodash'
+let CsvBuilder;
+import _ from 'lodash';
 
-# Builds a csv string from an array of arrays
-module.exports = class CsvBuilder
-  # Table is a 2d array [row][column]
-  build: (table) ->
-    return @_stringifyCsv(table, @_csvifyValue)
+// Builds a csv string from an array of arrays
+export default CsvBuilder = class CsvBuilder {
+  // Table is a 2d array [row][column]
+  build(table) {
+    return this._stringifyCsv(table, this._csvifyValue);
+  }
 
-  # Third-party code START
-  _stringifyCsv: (table, replacer) ->
-    replacer = replacer or (r, c, v) ->
-      v
+  // Third-party code START
+  _stringifyCsv(table, replacer) {
+    replacer = replacer || ((r, c, v) => v);
 
-    csv = ""
-    rr = table.length
-    r = 0
-    # for each row
-    while r < rr
-      # Adds a new line if not the first line
-      csv += "\r\n"  if r
-      c = 0
-      cc = table[r].length
-      # for each columns
-      while c < cc
-        # Adds a new , if not the first column
-        csv += ","  if c
-        cell = replacer(r, c, table[r][c])
-        cell = "\"" + cell.replace(/"/g, "\"\"") + "\""  if /[,\r\n"]/.test(cell)
-        csv += (if (cell or 0 is cell) then cell else "")
-        ++c
-      ++r
-    return csv
+    let csv = "";
+    const rr = table.length;
+    let r = 0;
+    // for each row
+    while (r < rr) {
+      // Adds a new line if not the first line
+      if (r) { csv += "\r\n"; }
+      let c = 0;
+      const cc = table[r].length;
+      // for each columns
+      while (c < cc) {
+        // Adds a new , if not the first column
+        if (c) { csv += ","; }
+        let cell = replacer(r, c, table[r][c]);
+        if (/[,\r\n"]/.test(cell)) { cell = "\"" + cell.replace(/"/g, "\"\"") + "\""; }
+        csv += ((cell || (0 === cell)) ? cell : "");
+        ++c;
+      }
+      ++r;
+    }
+    return csv;
+  }
   
-  _csvifyValue: (r, c, value) ->
-    if not value?
-      return ""
+  _csvifyValue(r, c, value) {
+    if ((value == null)) {
+      return "";
+    }
 
-    # Handle case of an array that leaked through without crashing
-    if _.isArray(value)
-      return value.join(",")
+    // Handle case of an array that leaked through without crashing
+    if (_.isArray(value)) {
+      return value.join(",");
+    }
 
-    # Handle true/false as strings
-    if value == true
-      return "true"
-    if value == false
-      return "false"
+    // Handle true/false as strings
+    if (value === true) {
+      return "true";
+    }
+    if (value === false) {
+      return "false";
+    }
 
-    return value
+    return value;
+  }
+};
 
-# Third-party code END
+// Third-party code END

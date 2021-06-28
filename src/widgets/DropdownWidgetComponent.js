@@ -1,54 +1,78 @@
-_ = require 'lodash'
-$ = require 'jquery'
-PropTypes = require('prop-types')
-React = require 'react'
-ReactDOM = require 'react-dom'
-R = React.createElement
+let DropdownWidgetComponent;
+import _ from 'lodash';
+import $ from 'jquery';
+import PropTypes from 'prop-types';
+import React from 'react';
+import ReactDOM from 'react-dom';
+const R = React.createElement;
 
-# Widget wrapper that adds a dropdown menu in a gear floating
-module.exports = class DropdownWidgetComponent extends React.Component
-  @propTypes:
-    width: PropTypes.any    # Width specification
-    height: PropTypes.any    # Height specification
-
-    dropdownItems: PropTypes.arrayOf(PropTypes.shape({
-      label: PropTypes.node.isRequired
-      icon: PropTypes.string # Glyphicon string. e.g. "remove"
-      onClick: PropTypes.func.isRequired
-      })).isRequired # A list of {label, icon, onClick} actions for the dropdown
-
-  renderDropdownItem: (item, i) =>
-    return R 'li', key: "#{i}",
-      R 'a', onClick: item.onClick,
-        if item.icon then R('span', className: "glyphicon glyphicon-#{item.icon} text-muted")
-        if item.icon then " "
-        item.label
-
-  renderDropdown: ->
-    if @props.dropdownItems.length == 0
-      return null
-
-    dropdownStyle = {
-      position: "absolute"
-      right: 3
-      top: 3
-      cursor: "pointer"
-      zIndex: 1029
+// Widget wrapper that adds a dropdown menu in a gear floating
+export default DropdownWidgetComponent = (function() {
+  DropdownWidgetComponent = class DropdownWidgetComponent extends React.Component {
+    constructor(...args) {
+      super(...args);
+      this.renderDropdownItem = this.renderDropdownItem.bind(this);
+      this.closeMenu = this.closeMenu.bind(this);
     }
 
-    elem = R 'div', style: dropdownStyle, "data-toggle": "dropdown",
-      R 'div', className: "mwater-visualization-simple-widget-gear-button",
-        R 'span', className: "glyphicon glyphicon-cog"
+    static initClass() {
+      this.propTypes = {
+        width: PropTypes.any,    // Width specification
+        height: PropTypes.any,    // Height specification
+  
+        dropdownItems: PropTypes.arrayOf(PropTypes.shape({
+          label: PropTypes.node.isRequired,
+          icon: PropTypes.string, // Glyphicon string. e.g. "remove"
+          onClick: PropTypes.func.isRequired
+          })).isRequired
+      };
+       // A list of {label, icon, onClick} actions for the dropdown
+    }
 
-    return R 'div', style: dropdownStyle,
-      elem
-      R 'ul', className: "dropdown-menu dropdown-menu-right", style: { top: 25 },
-        _.map(@props.dropdownItems, @renderDropdownItem)
+    renderDropdownItem(item, i) {
+      return R('li', {key: `${i}`},
+        R('a', {onClick: item.onClick},
+          item.icon ? R('span', {className: `glyphicon glyphicon-${item.icon} text-muted`}) : undefined,
+          item.icon ? " " : undefined,
+          item.label)
+      );
+    }
 
-  closeMenu: =>
-    $(ReactDOM.findDOMNode(this)).find('[data-toggle="dropdown"]').parent().removeClass('open')
+    renderDropdown() {
+      if (this.props.dropdownItems.length === 0) {
+        return null;
+      }
 
-  render: ->
-    return R 'div', className: "mwater-visualization-simple-widget", onMouseLeave: @closeMenu, style: { width: @props.width, height: @props.height },
-      @props.children
-      @renderDropdown()
+      const dropdownStyle = {
+        position: "absolute",
+        right: 3,
+        top: 3,
+        cursor: "pointer",
+        zIndex: 1029
+      };
+
+      const elem = R('div', {style: dropdownStyle, "data-toggle": "dropdown"},
+        R('div', {className: "mwater-visualization-simple-widget-gear-button"},
+          R('span', {className: "glyphicon glyphicon-cog"}))
+      );
+
+      return R('div', {style: dropdownStyle},
+        elem,
+        R('ul', {className: "dropdown-menu dropdown-menu-right", style: { top: 25 }},
+          _.map(this.props.dropdownItems, this.renderDropdownItem))
+      );
+    }
+
+    closeMenu() {
+      return $(ReactDOM.findDOMNode(this)).find('[data-toggle="dropdown"]').parent().removeClass('open');
+    }
+
+    render() {
+      return R('div', {className: "mwater-visualization-simple-widget", onMouseLeave: this.closeMenu, style: { width: this.props.width, height: this.props.height }},
+        this.props.children,
+        this.renderDropdown());
+    }
+  };
+  DropdownWidgetComponent.initClass();
+  return DropdownWidgetComponent;
+})();

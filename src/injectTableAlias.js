@@ -1,24 +1,29 @@
-_ = require 'lodash'
+import _ from 'lodash';
 
-# Recursively inject table alias tableAlias for `{alias}` 
-injectTableAlias = (jsonql, tableAlias) ->
-  # Handle empty
-  if not jsonql
-    return jsonql
+// Recursively inject table alias tableAlias for `{alias}` 
+var injectTableAlias = function(jsonql, tableAlias) {
+  // Handle empty
+  if (!jsonql) {
+    return jsonql;
+  }
 
-  # Handle arrays
-  if _.isArray(jsonql)
-    return _.map(jsonql, (item) => injectTableAlias(item, tableAlias))
+  // Handle arrays
+  if (_.isArray(jsonql)) {
+    return _.map(jsonql, item => injectTableAlias(item, tableAlias));
+  }
 
-  # Handle non-objects by leaving alone
-  if not _.isObject(jsonql)
-    return jsonql
+  // Handle non-objects by leaving alone
+  if (!_.isObject(jsonql)) {
+    return jsonql;
+  }
 
-  # Handle field
-  if jsonql.type == "field" and jsonql.tableAlias == "{alias}"
-    return _.extend({}, jsonql, tableAlias: tableAlias)
+  // Handle field
+  if ((jsonql.type === "field") && (jsonql.tableAlias === "{alias}")) {
+    return _.extend({}, jsonql, {tableAlias});
+  }
 
-  # Recurse object keys
-  return _.mapValues(jsonql, (value) => injectTableAlias(value, tableAlias))
+  // Recurse object keys
+  return _.mapValues(jsonql, value => injectTableAlias(value, tableAlias));
+};
 
-module.exports = injectTableAlias
+export default injectTableAlias;

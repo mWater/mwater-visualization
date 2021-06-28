@@ -1,327 +1,402 @@
-_ = require 'lodash'
-PropTypes = require('prop-types')
-React = require 'react'
-R = React.createElement
-uuid = require 'uuid'
-AsyncLoadComponent = require 'react-library/lib/AsyncLoadComponent'
+let AxisComponent;
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
+const R = React.createElement;
+import uuid from 'uuid';
+import AsyncLoadComponent from 'react-library/lib/AsyncLoadComponent';
+import { ExprComponent } from "mwater-expressions-ui";
+import { ExprUtils } from 'mwater-expressions';
+import { ExprCompiler } from 'mwater-expressions';
+import { LinkComponent } from 'mwater-expressions-ui';
+import AxisBuilder from './AxisBuilder';
+import update from 'update-object';
+import ui from '../UIComponents';
+import BinsComponent from './BinsComponent';
+import RangesComponent from './RangesComponent';
+import AxisColorEditorComponent from './AxisColorEditorComponent';
+import CategoryMapComponent from './CategoryMapComponent';
+import { injectTableAlias } from 'mwater-expressions';
+import { getFormatOptions } from '../valueFormatter';
+import { getDefaultFormat } from '../valueFormatter';
 
-ExprComponent = require("mwater-expressions-ui").ExprComponent
-ExprUtils = require('mwater-expressions').ExprUtils
-ExprCompiler = require('mwater-expressions').ExprCompiler
-LinkComponent = require('mwater-expressions-ui').LinkComponent
-AxisBuilder = require './AxisBuilder'
-update = require 'update-object'
-ui = require '../UIComponents'
-BinsComponent = require './BinsComponent'
-RangesComponent = require './RangesComponent'
-AxisColorEditorComponent = require './AxisColorEditorComponent'
-CategoryMapComponent = require './CategoryMapComponent'
-injectTableAlias = require('mwater-expressions').injectTableAlias
-getFormatOptions = require('../valueFormatter').getFormatOptions
-getDefaultFormat = require('../valueFormatter').getDefaultFormat
-
-# Axis component that allows designing of an axis
-module.exports = class AxisComponent extends AsyncLoadComponent
-  @propTypes:
-    schema: PropTypes.object.isRequired # schema to use
-    dataSource: PropTypes.object.isRequired
-
-    table: PropTypes.string.isRequired # Table to use
-    types: PropTypes.array # Optional types to limit to
-
-    aggrNeed: PropTypes.oneOf(['none', 'optional', 'required']).isRequired
-
-    value: PropTypes.object # See Axis Design.md
-    onChange: PropTypes.func.isRequired # Called when changes
-
-    required: PropTypes.bool  # Makes this a required value
-    showColorMap: PropTypes.bool # Shows the color map
-    reorderable: PropTypes.bool # Is the draw order reorderable
-    autosetColors: PropTypes.bool # Should a color map be automatically created from a default palette
-    allowExcludedValues: PropTypes.bool # True to allow excluding of values via checkboxes
-    defaultColor: PropTypes.string
-    showFormat: PropTypes.bool  # Show format control for numeric values
-    filters: PropTypes.array   # array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
-
-  @defaultProps:
-    reorderable: false
-    allowExcludedValues: false
-    autosetColors: true
-
-  @contextTypes:
-    locale: PropTypes.string  # e.g. "en"
-
-  constructor: (props) ->
-    super(props)
-
-    @state = {
-      categories: null # Categories of the axis. Loaded whenever axis is changed
+// Axis component that allows designing of an axis
+export default AxisComponent = (function() {
+  AxisComponent = class AxisComponent extends AsyncLoadComponent {
+    static initClass() {
+      this.propTypes = {
+        schema: PropTypes.object.isRequired, // schema to use
+        dataSource: PropTypes.object.isRequired,
+  
+        table: PropTypes.string.isRequired, // Table to use
+        types: PropTypes.array, // Optional types to limit to
+  
+        aggrNeed: PropTypes.oneOf(['none', 'optional', 'required']).isRequired,
+  
+        value: PropTypes.object, // See Axis Design.md
+        onChange: PropTypes.func.isRequired, // Called when changes
+  
+        required: PropTypes.bool,  // Makes this a required value
+        showColorMap: PropTypes.bool, // Shows the color map
+        reorderable: PropTypes.bool, // Is the draw order reorderable
+        autosetColors: PropTypes.bool, // Should a color map be automatically created from a default palette
+        allowExcludedValues: PropTypes.bool, // True to allow excluding of values via checkboxes
+        defaultColor: PropTypes.string,
+        showFormat: PropTypes.bool,  // Show format control for numeric values
+        filters: PropTypes.array   // array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+      };
+  
+      this.defaultProps = {
+        reorderable: false,
+        allowExcludedValues: false,
+        autosetColors: true
+      };
+  
+      this.contextTypes =
+        {locale: PropTypes.string};
+        // e.g. "en"
     }
 
-  isLoadNeeded: (newProps, oldProps) ->
-    hasColorChanged = not _.isEqual(_.omit(newProps.value, ["colorMap", "drawOrder"]), _.omit(oldProps.value, ["colorMap", "drawOrder"]))
-    filtersChanged = not _.isEqual(newProps.filters, oldProps.filters)
-    return hasColorChanged or filtersChanged
+    constructor(props) {
+      this.handleExprChange = this.handleExprChange.bind(this);
+      this.handleFormatChange = this.handleFormatChange.bind(this);
+      this.handleXformTypeChange = this.handleXformTypeChange.bind(this);
+      this.handleXformChange = this.handleXformChange.bind(this);
+      super(props);
 
-  # Asynchronously get the categories of the axis, which requires a query when the field is a text field or other non-enum type
-  load: (props, prevProps, callback) ->
-    axisBuilder = new AxisBuilder(schema: props.schema)
-
-    # Clean axis first
-    axis = axisBuilder.cleanAxis(axis: props.value, table: props.table, types: props.types, aggrNeed: props.aggrNeed)
-
-    # Ignore if error
-    if not axis or axisBuilder.validateAxis(axis: axis)
-      return
-
-    # Handle literal expression
-    values = [] 
-    if axis.expr?.type == "literal"
-      values.push(axis.expr.value)
-
-    # Get categories (value + label)
-    categories = axisBuilder.getCategories(axis, values)
-
-    # Just "None" and so doesn't count
-    if _.any(categories, (category) -> category.value?)
-      callback({ categories: categories })
-      return
-
-    # Can't get values of aggregate axis
-    if axisBuilder.isAxisAggr(axis)
-      callback({ categories: [] })
-      return
-
-    # If no table, cannot query
-    if not axis.expr.table
-      callback({ categories: [] })
-      return
-
-    # If no categories, we need values as input
-    valuesQuery = {
-      type: "query"
-      selects: [
-        { type: "select", expr: axisBuilder.compileAxis(axis: axis, tableAlias: "main"), alias: "val" }
-      ]
-      from: { type: "table", table: axis.expr.table, alias: "main" }
-      groupBy: [1]
-      limit: 50
+      this.state = {
+        categories: null // Categories of the axis. Loaded whenever axis is changed
+      };
     }
 
-    filters = _.where(@props.filters or [], table: axis.expr.table)
-    whereClauses = _.map(filters, (f) -> injectTableAlias(f.jsonql, "main"))
-    whereClauses = _.compact(whereClauses)
+    isLoadNeeded(newProps, oldProps) {
+      const hasColorChanged = !_.isEqual(_.omit(newProps.value, ["colorMap", "drawOrder"]), _.omit(oldProps.value, ["colorMap", "drawOrder"]));
+      const filtersChanged = !_.isEqual(newProps.filters, oldProps.filters);
+      return hasColorChanged || filtersChanged;
+    }
 
-    # Wrap if multiple
-    if whereClauses.length > 1
-      valuesQuery.where = { type: "op", op: "and", exprs: whereClauses }
-    else
-      valuesQuery.where = whereClauses[0]
+    // Asynchronously get the categories of the axis, which requires a query when the field is a text field or other non-enum type
+    load(props, prevProps, callback) {
+      const axisBuilder = new AxisBuilder({schema: props.schema});
 
-    props.dataSource.performQuery(valuesQuery, (error, rows) =>
-      if error
-        return # Ignore errors
+      // Clean axis first
+      const axis = axisBuilder.cleanAxis({axis: props.value, table: props.table, types: props.types, aggrNeed: props.aggrNeed});
+
+      // Ignore if error
+      if (!axis || axisBuilder.validateAxis({axis})) {
+        return;
+      }
+
+      // Handle literal expression
+      const values = []; 
+      if (axis.expr?.type === "literal") {
+        values.push(axis.expr.value);
+      }
+
+      // Get categories (value + label)
+      let categories = axisBuilder.getCategories(axis, values);
+
+      // Just "None" and so doesn't count
+      if (_.any(categories, category => category.value != null)) {
+        callback({ categories });
+        return;
+      }
+
+      // Can't get values of aggregate axis
+      if (axisBuilder.isAxisAggr(axis)) {
+        callback({ categories: [] });
+        return;
+      }
+
+      // If no table, cannot query
+      if (!axis.expr.table) {
+        callback({ categories: [] });
+        return;
+      }
+
+      // If no categories, we need values as input
+      const valuesQuery = {
+        type: "query",
+        selects: [
+          { type: "select", expr: axisBuilder.compileAxis({axis, tableAlias: "main"}), alias: "val" }
+        ],
+        from: { type: "table", table: axis.expr.table, alias: "main" },
+        groupBy: [1],
+        limit: 50
+      };
+
+      const filters = _.where(this.props.filters || [], {table: axis.expr.table});
+      let whereClauses = _.map(filters, f => injectTableAlias(f.jsonql, "main"));
+      whereClauses = _.compact(whereClauses);
+
+      // Wrap if multiple
+      if (whereClauses.length > 1) {
+        valuesQuery.where = { type: "op", op: "and", exprs: whereClauses };
+      } else {
+        valuesQuery.where = whereClauses[0];
+      }
+
+      return props.dataSource.performQuery(valuesQuery, (error, rows) => {
+        if (error) {
+          return; // Ignore errors
+        }
       
-      # Get categories (value + label)
-      categories = axisBuilder.getCategories(axis, _.pluck(rows, "val"))
-      callback({ categories: categories })
-    )
+        // Get categories (value + label)
+        categories = axisBuilder.getCategories(axis, _.pluck(rows, "val"));
+        return callback({ categories });
+      });
+    }
 
-  handleExprChange: (expr) =>
-    # If no expression, reset
-    if not expr
-      @props.onChange(null)
-      return
-
-    # Set expression and clear xform
-    @props.onChange(@cleanAxis(_.extend({}, _.omit(@props.value, ["drawOrder"]), { expr: expr })))
-
-  handleFormatChange: (ev) =>
-    @props.onChange(_.extend({}, @props.value, { format: ev.target.value }))
-
-  handleXformTypeChange: (type) =>
-    # Remove
-    if not type
-      @props.onChange(_.omit(@props.value, ["xform", "colorMap", "drawOrder"]))
-
-    # Save bins if going from bins to custom ranges and has ranges
-    if type == "ranges" and @props.value.xform?.type == "bin" and @props.value.xform.min? and @props.value.xform.max? and @props.value.xform.min != @props.value.xform.max and @props.value.xform.numBins
-      min = @props.value.xform.min
-      max = @props.value.xform.max
-      numBins = @props.value.xform.numBins
-
-      ranges = [{ id: uuid(), maxValue: min, minOpen: false, maxOpen: true }]
-      for i in [1..numBins]
-        start = (i-1) / numBins * (max - min) + min
-        end = (i) / numBins * (max - min) + min
-        ranges.push({ id: uuid(), minValue: start, minOpen: false, maxValue: end, maxOpen: true })
-      ranges.push({ id: uuid(), minValue: max, minOpen: true, maxOpen: true })
-
-      xform = {
-        type: "ranges"
-        ranges: ranges
-      }
-    else
-      xform = {
-        type: type
+    handleExprChange(expr) {
+      // If no expression, reset
+      if (!expr) {
+        this.props.onChange(null);
+        return;
       }
 
-    @props.onChange(update(_.omit(@props.value, ["colorMap", "drawOrder"]), { xform: { $set: xform }}))
+      // Set expression and clear xform
+      return this.props.onChange(this.cleanAxis(_.extend({}, _.omit(this.props.value, ["drawOrder"]), { expr })));
+    }
 
-  handleXformChange: (xform) =>
-    @props.onChange(@cleanAxis(update(_.omit(@props.value, ["drawOrder"]), { xform: { $set: xform } })))
+    handleFormatChange(ev) {
+      return this.props.onChange(_.extend({}, this.props.value, { format: ev.target.value }));
+    }
 
-  cleanAxis: (axis) ->
-    axisBuilder = new AxisBuilder(schema: @props.schema)
-    return axisBuilder.cleanAxis(axis: axis, table: @props.table, aggrNeed: @props.aggrNeed, types: @props.types)
+    handleXformTypeChange(type) {
+      // Remove
+      let xform;
+      if (!type) {
+        this.props.onChange(_.omit(this.props.value, ["xform", "colorMap", "drawOrder"]));
+      }
 
-  renderXform: (axis) ->
-    if not axis
-      return
+      // Save bins if going from bins to custom ranges and has ranges
+      if ((type === "ranges") && (this.props.value.xform?.type === "bin") && (this.props.value.xform.min != null) && (this.props.value.xform.max != null) && (this.props.value.xform.min !== this.props.value.xform.max) && this.props.value.xform.numBins) {
+        const {
+          min
+        } = this.props.value.xform;
+        const {
+          max
+        } = this.props.value.xform;
+        const {
+          numBins
+        } = this.props.value.xform;
 
-    if axis.xform and axis.xform.type in ["bin", "ranges", "floor"]
-      if axis.xform.type == "ranges"
-        comp = R(RangesComponent,
-          schema: @props.schema
-          expr: axis.expr
-          xform: axis.xform
-          onChange: @handleXformChange)
-      else if axis.xform.type == "bin"
-        comp = R(BinsComponent,
-          schema: @props.schema
-          dataSource: @props.dataSource
-          expr: axis.expr
-          xform: axis.xform
-          onChange: @handleXformChange)
-      else
-        comp = null
+        const ranges = [{ id: uuid(), maxValue: min, minOpen: false, maxOpen: true }];
+        for (let i = 1, end1 = numBins, asc = 1 <= end1; asc ? i <= end1 : i >= end1; asc ? i++ : i--) {
+          const start = (((i-1) / numBins) * (max - min)) + min;
+          const end = (((i) / numBins) * (max - min)) + min;
+          ranges.push({ id: uuid(), minValue: start, minOpen: false, maxValue: end, maxOpen: true });
+        }
+        ranges.push({ id: uuid(), minValue: max, minOpen: true, maxOpen: true });
 
-      return R 'div', null,
-        R ui.ButtonToggleComponent,
-          value: if axis.xform then axis.xform.type else null
-          options: [
-            { value: "bin", label: "Equal Bins" }
-            { value: "ranges", label: "Custom Ranges" }
-            { value: "floor", label: "Whole Numbers" }
-          ]
-          onChange: @handleXformTypeChange
-        comp
+        xform = {
+          type: "ranges",
+          ranges
+        };
+      } else {
+        xform = {
+          type
+        };
+      }
 
-    exprUtils = new ExprUtils(@props.schema)
-    exprType = exprUtils.getExprType(axis.expr)
+      return this.props.onChange(update(_.omit(this.props.value, ["colorMap", "drawOrder"]), { xform: { $set: xform }}));
+    }
 
-    switch exprType
-      when "date"
-        R ui.ButtonToggleComponent,
-          value: if axis.xform then axis.xform.type else null
-          options: [
-            { value: null, label: "Exact Date" }
-            { value: "year", label: "Year" }
-            { value: "yearmonth", label: "Year/Month" }
-            { value: "month", label: "Month" }
-            { value: "week", label: "Week" }
-            { value: "yearweek", label: "Year/Week" }
-            { value: "yearquarter", label: "Year/Quarter" }
-          ]
-          onChange: @handleXformTypeChange
-      when "datetime"
-        R ui.ButtonToggleComponent,
-          value: if axis.xform then axis.xform.type else null
-          options: [
-            { value: "date", label: "Date" }
-            { value: "year", label: "Year" }
-            { value: "yearmonth", label: "Year/Month" }
-            { value: "month", label: "Month" }
-            { value: "week", label: "Week" }
-            { value: "yearweek", label: "Year/Week" }
-            { value: "yearquarter", label: "Year/Quarter" }
-          ]
-          onChange: @handleXformTypeChange
+    handleXformChange(xform) {
+      return this.props.onChange(this.cleanAxis(update(_.omit(this.props.value, ["drawOrder"]), { xform: { $set: xform } })));
+    }
 
-  renderColorMap: (axis) ->
-    if not @props.showColorMap or not axis or not axis.expr
-      return null
+    cleanAxis(axis) {
+      const axisBuilder = new AxisBuilder({schema: this.props.schema});
+      return axisBuilder.cleanAxis({axis, table: this.props.table, aggrNeed: this.props.aggrNeed, types: this.props.types});
+    }
 
-    return [
-      R('br')
-      R AxisColorEditorComponent,
-        schema: @props.schema
-        axis: axis
-        categories: @state.categories
-        onChange: @props.onChange
-        reorderable: @props.reorderable
-        defaultColor: @props.defaultColor
-        allowExcludedValues: @props.allowExcludedValues
-        autosetColors: @props.autosetColors
-        initiallyExpanded: true
-      ]
+    renderXform(axis) {
+      if (!axis) {
+        return;
+      }
 
-  renderExcludedValues: (axis) ->
-    # Only if no color map and allows excluded values
-    if @props.showColorMap or not axis or not axis.expr or not @props.allowExcludedValues
-      return null
+      if (axis.xform && ["bin", "ranges", "floor"].includes(axis.xform.type)) {
+        let comp;
+        if (axis.xform.type === "ranges") {
+          comp = R(RangesComponent, {
+            schema: this.props.schema,
+            expr: axis.expr,
+            xform: axis.xform,
+            onChange: this.handleXformChange
+          });
+        } else if (axis.xform.type === "bin") {
+          comp = R(BinsComponent, {
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            expr: axis.expr,
+            xform: axis.xform,
+            onChange: this.handleXformChange
+          });
+        } else {
+          comp = null;
+        }
 
-    # Use categories
-    if not @state.categories or @state.categories.length < 1
-      return null
+        return R('div', null,
+          R(ui.ButtonToggleComponent, {
+            value: axis.xform ? axis.xform.type : null,
+            options: [
+              { value: "bin", label: "Equal Bins" },
+              { value: "ranges", label: "Custom Ranges" },
+              { value: "floor", label: "Whole Numbers" }
+            ],
+            onChange: this.handleXformTypeChange
+          }
+          ),
+          comp);
+      }
 
-    return [
-      R('br')
-      R CategoryMapComponent,
-        schema: @props.schema
-        axis: axis
-        onChange: @props.onChange
-        categories: @state.categories
-        reorderable: false
-        showColorMap: false
-        allowExcludedValues: true
-        initiallyExpanded: true
-      ]
+      const exprUtils = new ExprUtils(this.props.schema);
+      const exprType = exprUtils.getExprType(axis.expr);
 
-  renderFormat: (axis) ->
-    axisBuilder = new AxisBuilder(schema: @props.schema)
+      switch (exprType) {
+        case "date":
+          return R(ui.ButtonToggleComponent, {
+            value: axis.xform ? axis.xform.type : null,
+            options: [
+              { value: null, label: "Exact Date" },
+              { value: "year", label: "Year" },
+              { value: "yearmonth", label: "Year/Month" },
+              { value: "month", label: "Month" },
+              { value: "week", label: "Week" },
+              { value: "yearweek", label: "Year/Week" },
+              { value: "yearquarter", label: "Year/Quarter" }
+            ],
+            onChange: this.handleXformTypeChange
+          }
+          );
+        case "datetime":
+          return R(ui.ButtonToggleComponent, {
+            value: axis.xform ? axis.xform.type : null,
+            options: [
+              { value: "date", label: "Date" },
+              { value: "year", label: "Year" },
+              { value: "yearmonth", label: "Year/Month" },
+              { value: "month", label: "Month" },
+              { value: "week", label: "Week" },
+              { value: "yearweek", label: "Year/Week" },
+              { value: "yearquarter", label: "Year/Quarter" }
+            ],
+            onChange: this.handleXformTypeChange
+          }
+          );
+      }
+    }
 
-    valueType = axisBuilder.getAxisType(axis)
+    renderColorMap(axis) {
+      if (!this.props.showColorMap || !axis || !axis.expr) {
+        return null;
+      }
 
-    formats = getFormatOptions(valueType)
-    if not formats
-      return null
+      return [
+        R('br'),
+        R(AxisColorEditorComponent, {
+          schema: this.props.schema,
+          axis,
+          categories: this.state.categories,
+          onChange: this.props.onChange,
+          reorderable: this.props.reorderable,
+          defaultColor: this.props.defaultColor,
+          allowExcludedValues: this.props.allowExcludedValues,
+          autosetColors: this.props.autosetColors,
+          initiallyExpanded: true
+        }
+        )
+        ];
+    }
 
-    R 'div', className: "form-group",
-      R 'label', className: "text-muted", 
-        "Format"
-      ": "
-      R 'select', value: (if axis.format? then axis.format else getDefaultFormat(valueType)), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: @handleFormatChange,
-        _.map(formats, (format) -> R('option', key: format.value, value: format.value, format.label))
+    renderExcludedValues(axis) {
+      // Only if no color map and allows excluded values
+      if (this.props.showColorMap || !axis || !axis.expr || !this.props.allowExcludedValues) {
+        return null;
+      }
 
-  render: ->
-    axisBuilder = new AxisBuilder(schema: @props.schema)
+      // Use categories
+      if (!this.state.categories || (this.state.categories.length < 1)) {
+        return null;
+      }
 
-    # Clean before render
-    axis = @cleanAxis(@props.value)
+      return [
+        R('br'),
+        R(CategoryMapComponent, {
+          schema: this.props.schema,
+          axis,
+          onChange: this.props.onChange,
+          categories: this.state.categories,
+          reorderable: false,
+          showColorMap: false,
+          allowExcludedValues: true,
+          initiallyExpanded: true
+        }
+        )
+        ];
+    }
 
-    # Determine aggrStatuses that are possible
-    switch @props.aggrNeed
-      when "none"
-        aggrStatuses = ["literal", "individual"]
-      when "optional"
-        aggrStatuses = ["literal", "individual", "aggregate"]
-      when "required"
-        aggrStatuses = ["literal", "aggregate"]
+    renderFormat(axis) {
+      const axisBuilder = new AxisBuilder({schema: this.props.schema});
 
-    R 'div', null,
-      R 'div', null,
-        R ExprComponent,
-          schema: @props.schema
-          dataSource: @props.dataSource
-          table: @props.table
-          types: axisBuilder.getExprTypes(@props.types)
-          # preventRemove: @props.required
-          onChange: @handleExprChange
-          value: if @props.value then @props.value.expr
-          aggrStatuses: aggrStatuses
-      @renderXform(axis)
-      if @props.showFormat
-        @renderFormat(axis)
-      @renderColorMap(axis)
-      @renderExcludedValues(axis)
+      const valueType = axisBuilder.getAxisType(axis);
+
+      const formats = getFormatOptions(valueType);
+      if (!formats) {
+        return null;
+      }
+
+      return R('div', {className: "form-group"},
+        R('label', {className: "text-muted"}, 
+          "Format"),
+        ": ",
+        R('select', {value: ((axis.format != null) ? axis.format : getDefaultFormat(valueType)), className: "form-control", style: { width: "auto", display: "inline-block" }, onChange: this.handleFormatChange},
+          _.map(formats, format => R('option', {key: format.value, value: format.value}, format.label)))
+      );
+    }
+
+    render() {
+      let aggrStatuses;
+      const axisBuilder = new AxisBuilder({schema: this.props.schema});
+
+      // Clean before render
+      const axis = this.cleanAxis(this.props.value);
+
+      // Determine aggrStatuses that are possible
+      switch (this.props.aggrNeed) {
+        case "none":
+          aggrStatuses = ["literal", "individual"];
+          break;
+        case "optional":
+          aggrStatuses = ["literal", "individual", "aggregate"];
+          break;
+        case "required":
+          aggrStatuses = ["literal", "aggregate"];
+          break;
+      }
+
+      return R('div', null,
+        R('div', null,
+          R(ExprComponent, {
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            table: this.props.table,
+            types: axisBuilder.getExprTypes(this.props.types),
+            // preventRemove: @props.required
+            onChange: this.handleExprChange,
+            value: this.props.value ? this.props.value.expr : undefined,
+            aggrStatuses
+          }
+          )
+        ),
+        this.renderXform(axis),
+        this.props.showFormat ?
+          this.renderFormat(axis) : undefined,
+        this.renderColorMap(axis),
+        this.renderExcludedValues(axis));
+    }
+  };
+  AxisComponent.initClass();
+  return AxisComponent;
+})();

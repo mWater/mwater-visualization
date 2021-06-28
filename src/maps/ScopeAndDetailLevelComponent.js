@@ -1,64 +1,93 @@
-PropTypes = require('prop-types')
-_ = require 'lodash'
-React = require 'react'
-H = React.DOM
-R = React.createElement
-ExprUtils = require('mwater-expressions').ExprUtils
+let ScopeAndDetailLevelComponent;
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import React from 'react';
+const H = React.DOM;
+const R = React.createElement;
+import { ExprUtils } from 'mwater-expressions';
+import RegionSelectComponent from './RegionSelectComponent';
+import DetailLevelSelectComponent from './DetailLevelSelectComponent';
+import ui from 'react-library/lib/bootstrap';
 
-RegionSelectComponent = require './RegionSelectComponent'
-DetailLevelSelectComponent = require './DetailLevelSelectComponent'
-ui = require 'react-library/lib/bootstrap'
+// Generic scope and detail level setter for AdminChoropleth layers 
+export default ScopeAndDetailLevelComponent = (function() {
+  ScopeAndDetailLevelComponent = class ScopeAndDetailLevelComponent extends React.Component {
+    constructor(...args) {
+      super(...args);
+      this.handleScopeChange = this.handleScopeChange.bind(this);
+      this.handleDetailLevelChange = this.handleDetailLevelChange.bind(this);
+    }
 
-# Generic scope and detail level setter for AdminChoropleth layers 
-module.exports = class ScopeAndDetailLevelComponent extends React.Component
-  @propTypes:
-    schema: PropTypes.object.isRequired # Schema to use
-    dataSource: PropTypes.object.isRequired
-    scope: PropTypes.string     # admin region that is outside bounds. null for whole world
-    scopeLevel: PropTypes.number # level of scope region. null for whole world
-    detailLevel: PropTypes.number # Detail level within scope region
-    onScopeAndDetailLevelChange: PropTypes.func.isRequired # Called with (scope, scopeLevel, detailLevel)
-    regionsTable: PropTypes.string.isRequired # Table name of regions
+    static initClass() {
+      this.propTypes = {
+        schema: PropTypes.object.isRequired, // Schema to use
+        dataSource: PropTypes.object.isRequired,
+        scope: PropTypes.string,     // admin region that is outside bounds. null for whole world
+        scopeLevel: PropTypes.number, // level of scope region. null for whole world
+        detailLevel: PropTypes.number, // Detail level within scope region
+        onScopeAndDetailLevelChange: PropTypes.func.isRequired, // Called with (scope, scopeLevel, detailLevel)
+        regionsTable: PropTypes.string.isRequired
+      };
+       // Table name of regions
+    }
 
-  handleScopeChange: (scope, scopeLevel) =>
-    if scope
-      @props.onScopeAndDetailLevelChange(scope, scopeLevel, scopeLevel + 1)
-    else
-      @props.onScopeAndDetailLevelChange(null, null, 0)
+    handleScopeChange(scope, scopeLevel) {
+      if (scope) {
+        return this.props.onScopeAndDetailLevelChange(scope, scopeLevel, scopeLevel + 1);
+      } else {
+        return this.props.onScopeAndDetailLevelChange(null, null, 0);
+      }
+    }
 
-  handleDetailLevelChange: (detailLevel) =>
-    @props.onScopeAndDetailLevelChange(@props.scope, @props.scopeLevel, detailLevel)
+    handleDetailLevelChange(detailLevel) {
+      return this.props.onScopeAndDetailLevelChange(this.props.scope, this.props.scopeLevel, detailLevel);
+    }
 
-  render: ->
-    # Determine number of levels by looking for levelN field
-    maxLevel = 0
-    detailLevelOptions = []
+    render() {
+      // Determine number of levels by looking for levelN field
+      let maxLevel = 0;
+      const detailLevelOptions = [];
 
-    for level in [0..9]
-      levelColumn = @props.schema.getColumn(@props.regionsTable, "level#{level}")
-      if levelColumn
-        maxLevel = level
-        # Can't select same detail level as scope
-        if level > (if @props.scopeLevel? then @props.scopeLevel else -1)
-          detailLevelOptions.push({ value: level, label: ExprUtils.localizeString(levelColumn.name) })
+      for (let level = 0; level <= 9; level++) {
+        const levelColumn = this.props.schema.getColumn(this.props.regionsTable, `level${level}`);
+        if (levelColumn) {
+          maxLevel = level;
+          // Can't select same detail level as scope
+          if (level > ((this.props.scopeLevel != null) ? this.props.scopeLevel : -1)) {
+            detailLevelOptions.push({ value: level, label: ExprUtils.localizeString(levelColumn.name) });
+          }
+        }
+      }
 
-    R 'div', null,
-      R 'div', className: "form-group",
-        R 'label', className: "text-muted", 
-          "Region to Map"
-        R RegionSelectComponent, 
-          region: @props.scope, 
-          onChange: @handleScopeChange, 
-          schema: @props.schema, 
-          dataSource: @props.dataSource,
-          regionsTable: @props.regionsTable
-          maxLevel: maxLevel - 1
-          placeholder: "All Regions"
-      R 'div', className: "form-group",
-        R 'label', className: "text-muted", 
-          "Detail Level"
-        R ui.Select, 
-          value: @props.detailLevel
-          options: detailLevelOptions
-          onChange: @handleDetailLevelChange
+      return R('div', null,
+        R('div', {className: "form-group"},
+          R('label', {className: "text-muted"}, 
+            "Region to Map"),
+          R(RegionSelectComponent, { 
+            region: this.props.scope, 
+            onChange: this.handleScopeChange, 
+            schema: this.props.schema, 
+            dataSource: this.props.dataSource,
+            regionsTable: this.props.regionsTable,
+            maxLevel: maxLevel - 1,
+            placeholder: "All Regions"
+          }
+          )
+        ),
+        R('div', {className: "form-group"},
+          R('label', {className: "text-muted"}, 
+            "Detail Level"),
+          R(ui.Select, { 
+            value: this.props.detailLevel,
+            options: detailLevelOptions,
+            onChange: this.handleDetailLevelChange
+          }
+          )
+        )
+      );
+    }
+  };
+  ScopeAndDetailLevelComponent.initClass();
+  return ScopeAndDetailLevelComponent;
+})();
 

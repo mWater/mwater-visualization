@@ -1,119 +1,157 @@
-_ = require 'lodash'
-PropTypes = require('prop-types')
-React = require 'react'
-R = React.createElement
+let MWaterResponsesFilterComponent;
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
+const R = React.createElement;
 
-ExprUtils = require('mwater-expressions').ExprUtils
-ui = require('react-library/lib/bootstrap')
+import { ExprUtils } from 'mwater-expressions';
+import ui from 'react-library/lib/bootstrap';
 
-# Implements common filters for responses tables. Allows filtering by final responses only and also
-# by latest for each site type linked to responses.
-module.exports = class MWaterResponsesFilterComponent extends React.Component
-  @propTypes: 
-    schema: PropTypes.object.isRequired
-    table: PropTypes.string.isRequired  # responses:xyz
-    filter: PropTypes.object
-    onFilterChange: PropTypes.func.isRequired
+// Implements common filters for responses tables. Allows filtering by final responses only and also
+// by latest for each site type linked to responses.
+export default MWaterResponsesFilterComponent = (function() {
+  MWaterResponsesFilterComponent = class MWaterResponsesFilterComponent extends React.Component {
+    constructor(...args) {
+      super(...args);
+      this.handleSiteChange = this.handleSiteChange.bind(this);
+      this.handleFinalChange = this.handleFinalChange.bind(this);
+      this.handleChange = this.handleChange.bind(this);
+    }
 
-  # Expand "and" and null filters into a list of filters
-  getFilters: ->
-    if not @props.filter
-      return []
+    static initClass() {
+      this.propTypes = { 
+        schema: PropTypes.object.isRequired,
+        table: PropTypes.string.isRequired,  // responses:xyz
+        filter: PropTypes.object,
+        onFilterChange: PropTypes.func.isRequired
+      };
+    }
 
-    if @props.filter.type == "op" and @props.filter.op == "and"
-      return @props.filter.exprs
+    // Expand "and" and null filters into a list of filters
+    getFilters() {
+      if (!this.props.filter) {
+        return [];
+      }
 
-    return [@props.filter]
+      if ((this.props.filter.type === "op") && (this.props.filter.op === "and")) {
+        return this.props.filter.exprs;
+      }
 
-  # Set filters in most compact way possible
-  setFilters: (filters) ->
-    if filters.length == 0
-      @props.onFilterChange(null)
-    else if filters.length == 1
-      @props.onFilterChange(filters[0])
-    else
-      @props.onFilterChange({
-        type: "op"
-        op: "and"
-        table: @props.table
-        exprs: filters
-      })
+      return [this.props.filter];
+    }
 
-  getFinalFilter: ->
-    return { type: "op", op: "= any", table: @props.table, exprs: [
-      { type: "field", table: @props.table, column: "status" }
-      { type: "literal", valueType: "enumset", value: ["final"] }
-    ]}
+    // Set filters in most compact way possible
+    setFilters(filters) {
+      if (filters.length === 0) {
+        return this.props.onFilterChange(null);
+      } else if (filters.length === 1) {
+        return this.props.onFilterChange(filters[0]);
+      } else {
+        return this.props.onFilterChange({
+          type: "op",
+          op: "and",
+          table: this.props.table,
+          exprs: filters
+        });
+      }
+    }
 
-  isFinal: ->
-    # Determine if final
-    return _.any(@getFilters(), (f) => 
-      _.isEqual(f, @getFinalFilter()) or f?.op == "is latest" and _.isEqual(f.exprs[1], @getFinalFilter())
-    )
+    getFinalFilter() {
+      return { type: "op", op: "= any", table: this.props.table, exprs: [
+        { type: "field", table: this.props.table, column: "status" },
+        { type: "literal", valueType: "enumset", value: ["final"] }
+      ]};
+    }
 
-  # Get column id of site filtering on latest
-  getSiteValue: ->
-    filters = @getFilters()
+    isFinal() {
+      // Determine if final
+      return _.any(this.getFilters(), f => { 
+        return _.isEqual(f, this.getFinalFilter()) || ((f?.op === "is latest") && _.isEqual(f.exprs[1], this.getFinalFilter()));
+      });
+    }
 
-    # Get site columns
-    for column in @props.schema.getColumns(@props.table)
-      if column.type == "join" and column.join.type == "n-1" and column.join.toTable.startsWith("entities.") and column.id.match(/^data:/)
-        # Check for match
-        if _.any(filters, (f) => f?.op == "is latest" and _.isEqual(f.exprs[0], { type: "field", table: @props.table, column: column.id }))
-          return column.id
+    // Get column id of site filtering on latest
+    getSiteValue() {
+      const filters = this.getFilters();
 
-    return null
+      // Get site columns
+      for (var column of this.props.schema.getColumns(this.props.table)) {
+        if ((column.type === "join") && (column.join.type === "n-1") && column.join.toTable.startsWith("entities.") && column.id.match(/^data:/)) {
+          // Check for match
+          if (_.any(filters, f => (f?.op === "is latest") && _.isEqual(f.exprs[0], { type: "field", table: this.props.table, column: column.id }))) {
+            return column.id;
+          }
+        }
+      }
 
-  handleSiteChange: (site) =>
-    @handleChange(@isFinal(), site)
+      return null;
+    }
 
-  handleFinalChange: (final) =>
-    @handleChange(final, @getSiteValue())
+    handleSiteChange(site) {
+      return this.handleChange(this.isFinal(), site);
+    }
 
-  # Recreate all filters
-  handleChange: (final, site) =>
-    # Strip all filters
-    filters = @getFilters()
+    handleFinalChange(final) {
+      return this.handleChange(final, this.getSiteValue());
+    }
 
-    # Strip simple
-    filters = _.filter(filters, (f) => not _.isEqual(f, @getFinalFilter()))
+    // Recreate all filters
+    handleChange(final, site) {
+      // Strip all filters
+      let filters = this.getFilters();
 
-    # Strip "is latest" (simplified. just removes all "is latest" from the filter since is a rare op)
-    filters = _.filter(filters, (f) => f?.op != "is latest")
+      // Strip simple
+      filters = _.filter(filters, f => !_.isEqual(f, this.getFinalFilter()));
 
-    # If site, create is latest
-    if site
-      filter = { type: "op", op: "is latest", table: @props.table, exprs: [{ type: "field", table: @props.table, column: site }]}
-      if final
-        filter.exprs.push(@getFinalFilter())
+      // Strip "is latest" (simplified. just removes all "is latest" from the filter since is a rare op)
+      filters = _.filter(filters, f => f?.op !== "is latest");
 
-      filters.push(filter)
-    else if final
-      filters.push(@getFinalFilter())
+      // If site, create is latest
+      if (site) {
+        const filter = { type: "op", op: "is latest", table: this.props.table, exprs: [{ type: "field", table: this.props.table, column: site }]};
+        if (final) {
+          filter.exprs.push(this.getFinalFilter());
+        }
 
-    @setFilters(filters)
+        filters.push(filter);
+      } else if (final) {
+        filters.push(this.getFinalFilter());
+      }
 
-  render: ->
-    # Get site columns
-    siteColumns = _.filter(@props.schema.getColumns(@props.table), (col) -> col.type == "join" and col.join.type == "n-1" and col.join.toTable.startsWith("entities.") and col.id.match(/^data:/))
+      return this.setFilters(filters);
+    }
 
-    siteColumnId = @getSiteValue()
+    render() {
+      // Get site columns
+      const siteColumns = _.filter(this.props.schema.getColumns(this.props.table), col => (col.type === "join") && (col.join.type === "n-1") && col.join.toTable.startsWith("entities.") && col.id.match(/^data:/));
 
-    R 'div', style: { paddingLeft: 5, paddingTop: 5 },
-      R 'div', style: { paddingBottom: 5 }, "Data Source Options:"
+      const siteColumnId = this.getSiteValue();
 
-      R 'div', style: { paddingLeft: 5 },
-        if siteColumns.length > 0
-          R 'div', null,
-            R 'i', null, "This data source contains links to monitoring sites. Would you like to:"
-            R 'div', style: { paddingLeft: 8 },
-              R ui.Radio, { key: "all", value: siteColumnId, radioValue: null, onChange: @handleSiteChange }, "Show all survey responses (even if there are more than one per site)"
-              _.map siteColumns, (column) =>
-                R ui.Radio, { key: column.id, value: siteColumnId, radioValue: column.id, onChange: @handleSiteChange }, 
-                  "Show only the latest response for each "
-                  R 'i', null, "#{ExprUtils.localizeString(@props.schema.getTable(column.join.toTable)?.name)}"
-                  " in the question "
-                  R 'i', null, "'#{ExprUtils.localizeString(column.name)}'"
+      return R('div', {style: { paddingLeft: 5, paddingTop: 5 }},
+        R('div', {style: { paddingBottom: 5 }}, "Data Source Options:"),
 
-        R ui.Checkbox, value: @isFinal(), onChange: @handleFinalChange, 
-          "Only include final responses (recommended)"
+        R('div', {style: { paddingLeft: 5 }},
+          siteColumns.length > 0 ?
+            R('div', null,
+              R('i', null, "This data source contains links to monitoring sites. Would you like to:"),
+              R('div', {style: { paddingLeft: 8 }},
+                R(ui.Radio, { key: "all", value: siteColumnId, radioValue: null, onChange: this.handleSiteChange }, "Show all survey responses (even if there are more than one per site)"),
+                _.map(siteColumns, column => {
+                  return R(ui.Radio, { key: column.id, value: siteColumnId, radioValue: column.id, onChange: this.handleSiteChange }, 
+                    "Show only the latest response for each ",
+                    R('i', null, `${ExprUtils.localizeString(this.props.schema.getTable(column.join.toTable)?.name)}`),
+                    " in the question ",
+                    R('i', null, `'${ExprUtils.localizeString(column.name)}'`));
+                })
+              )
+            ) : undefined,
+
+          R(ui.Checkbox, {value: this.isFinal(), onChange: this.handleFinalChange}, 
+            "Only include final responses (recommended)")
+        )
+      );
+    }
+  };
+  MWaterResponsesFilterComponent.initClass();
+  return MWaterResponsesFilterComponent;
+})();

@@ -1,21 +1,28 @@
-_ = require 'lodash'
-React = require 'react'
+let UpdateableComponent;
+import _ from 'lodash';
+import React from 'react';
 
-# Convenience wrapper that allows updating state
-module.exports = class UpdateableComponent extends React.Component
-  constructor: (props) ->
-    super(props)
-    @state = _.clone(@props or {})
+// Convenience wrapper that allows updating state
+export default UpdateableComponent = class UpdateableComponent extends React.Component {
+  constructor(props) {
+    this.update = this.update.bind(this);
+    super(props);
+    this.state = _.clone(this.props || {});
+  }
 
-  # Creates update function
-  update: (name) =>
-    return (value) =>
-      upt = {}
-      upt[name] = value
-      @setState(upt)
-      console.log JSON.stringify(upt, null, 2)
-      # action("update")(upt)
+  // Creates update function
+  update(name) {
+    return value => {
+      const upt = {};
+      upt[name] = value;
+      this.setState(upt);
+      return console.log(JSON.stringify(upt, null, 2));
+    };
+  }
+      // action("update")(upt)
 
-  render: ->
-    @props.children(@state, @update)
+  render() {
+    return this.props.children(this.state, this.update);
+  }
+};
 

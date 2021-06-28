@@ -1,757 +1,783 @@
-assert = require('chai').assert
-_ = require 'lodash'
+import { assert } from 'chai';
+import _ from 'lodash';
+import fixtures from '../../../fixtures';
+import PivotChartLayoutBuilder from '../../../../src/widgets/charts/pivot/PivotChartLayoutBuilder';
+import canonical from 'canonical-json';
+const compare = (actual, expected, message = "") => assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n" + message);
 
-fixtures = require '../../../fixtures'
+// Plucks from layout 
+const layoutPluck = (layout, key) => _.map(layout.rows, row => _.pluck(row.cells, key));
 
-PivotChartLayoutBuilder = require '../../../../src/widgets/charts/pivot/PivotChartLayoutBuilder'
+describe("PivotChartLayoutBuilder", function() {
+  before(function() {
+    this.lb = new PivotChartLayoutBuilder({schema: fixtures.simpleSchema()});
 
-canonical = require 'canonical-json'
-compare = (actual, expected, message = "") ->
-  assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n" + message
+    this.exprNumber = { type: "field", table: "t1", column: "number" };
+    this.exprText = { type: "field", table: "t1", column: "text" };
+    this.exprEnum = { type: "field", table: "t1", column: "enum" };
+    this.exprNumberSum = { type: "op", op: "sum", table: "t1", exprs: [{ type: "field", table: "t1", column: "number" }] };
 
-# Plucks from layout 
-layoutPluck = (layout, key) ->
-  _.map(layout.rows, (row) -> _.pluck(row.cells, key))
+    this.axisNumber = { expr: this.exprNumber };
+    this.axisNumberSum = { expr: this.exprNumberSum };
+    this.axisEnum = { expr: this.exprEnum }; 
+    return this.axisText = { expr: this.exprText };}); 
 
-describe "PivotChartLayoutBuilder", ->
-  before ->
-    @lb = new PivotChartLayoutBuilder(schema: fixtures.simpleSchema())
+  describe("getRowsOrColumns", function() {
+    describe("non-nested", function() {
+      it('gets categories of simple label segment', function() {
+        const segment = { id: "seg1", valueAxis: null, label: "xyz" };
+        const data = {};
+        const columns = this.lb.getRowsOrColumns(false, segment, data, "en");
 
-    @exprNumber = { type: "field", table: "t1", column: "number" }
-    @exprText = { type: "field", table: "t1", column: "text" }
-    @exprEnum = { type: "field", table: "t1", column: "enum" }
-    @exprNumberSum = { type: "op", op: "sum", table: "t1", exprs: [{ type: "field", table: "t1", column: "number" }] }
+        return compare(columns, [
+          [{ segment, label: "xyz", value: null }]
+        ]);
+    });
 
-    @axisNumber = { expr: @exprNumber }
-    @axisNumberSum = { expr: @exprNumberSum }
-    @axisEnum = { expr: @exprEnum } 
-    @axisText = { expr: @exprText } 
+      it('gets categories of simple enum segment', function() {
+        const segment = { id: "seg1", valueAxis: this.axisEnum };
+        const data = {};
+        const columns = this.lb.getRowsOrColumns(false, segment, data, "en");
 
-  describe "getRowsOrColumns", ->
-    describe "non-nested", ->
-      it 'gets categories of simple label segment', ->
-        segment = { id: "seg1", valueAxis: null, label: "xyz" }
-        data = {}
-        columns = @lb.getRowsOrColumns(false, segment, data, "en")
+        return compare(columns, [
+          [{ segment, label: "A", value: "a" }],
+          [{ segment, label: "B", value: "b" }],
+          [{ segment, label: "None", value: null }]
+        ]);
+    });
 
-        compare columns, [
-          [{ segment: segment, label: "xyz", value: null }]
-        ]
-
-      it 'gets categories of simple enum segment', ->
-        segment = { id: "seg1", valueAxis: @axisEnum }
-        data = {}
-        columns = @lb.getRowsOrColumns(false, segment, data, "en")
-
-        compare columns, [
-          [{ segment: segment, label: "A", value: "a" }]
-          [{ segment: segment, label: "B", value: "b" }]
-          [{ segment: segment, label: "None", value: null }]
-        ]
-
-      it 'gets categories of sorted enum segment', ->
-        segment = { id: "seg1", valueAxis: @axisEnum, orderExpr: @exprNumberSum }
-        data = {
+      it('gets categories of sorted enum segment', function() {
+        const segment = { id: "seg1", valueAxis: this.axisEnum, orderExpr: this.exprNumberSum };
+        const data = {
           "seg1": [
-            { value: "b" }
-            { value: null }
+            { value: "b" },
+            { value: null },
             { value: "a" }
           ]
-        }
-        columns = @lb.getRowsOrColumns(false, segment, data, "en")
+        };
+        const columns = this.lb.getRowsOrColumns(false, segment, data, "en");
 
-        compare columns, [
-          [{ segment: segment, label: "B", value: "b" }]
-          [{ segment: segment, label: "None", value: null }]
-          [{ segment: segment, label: "A", value: "a" }]
-        ]
+        return compare(columns, [
+          [{ segment, label: "B", value: "b" }],
+          [{ segment, label: "None", value: null }],
+          [{ segment, label: "A", value: "a" }]
+        ]);
+    });
 
-      it 'gets categories of simple enum segment with excludedValues', ->
-        segment = { id: "seg1", valueAxis: { expr: @exprEnum, excludedValues: ["b"] } }
-        data = {}
-        columns = @lb.getRowsOrColumns(false, segment, data, "en")
+      it('gets categories of simple enum segment with excludedValues', function() {
+        const segment = { id: "seg1", valueAxis: { expr: this.exprEnum, excludedValues: ["b"] } };
+        const data = {};
+        const columns = this.lb.getRowsOrColumns(false, segment, data, "en");
 
-        compare columns, [
-          [{ segment: segment, label: "A", value: "a" }]
-          [{ segment: segment, label: "None", value: null }]
-        ]
+        return compare(columns, [
+          [{ segment, label: "A", value: "a" }],
+          [{ segment, label: "None", value: null }]
+        ]);
+    });
 
-      it 'gets categories of simple text segment with no values', ->
-        segment = { id: "seg1", valueAxis: @axisText }
-        data = {}
-        columns = @lb.getRowsOrColumns(false, segment, data, "en")
+      it('gets categories of simple text segment with no values', function() {
+        const segment = { id: "seg1", valueAxis: this.axisText };
+        const data = {};
+        const columns = this.lb.getRowsOrColumns(false, segment, data, "en");
 
-        compare columns, [
-          [{ segment: segment, label: null, value: null }]
-        ]
+        return compare(columns, [
+          [{ segment, label: null, value: null }]
+        ]);
+    });
 
-      it 'gets categories of text segment with two data intersections', ->
-        segment = { id: "seg1", valueAxis: @axisText }
-        data = {
+      it('gets categories of text segment with two data intersections', function() {
+        const segment = { id: "seg1", valueAxis: this.axisText };
+        const data = {
           "r1:seg1": [
-            { value: 1, r0: "a", c0: "x" }
+            { value: 1, r0: "a", c0: "x" },
             { value: 1, r0: "b", c0: "y" }
-          ]
+          ],
           "r2:seg1": [
-            { value: 1, r0: "a", c0: "z" }
-            { value: 1, r0: "b", c0: "x" }  # Repeat
+            { value: 1, r0: "a", c0: "z" },
+            { value: 1, r0: "b", c0: "x" }  // Repeat
           ]
-        }
-        columns = @lb.getRowsOrColumns(false, segment, data, "en")
+        };
+        const columns = this.lb.getRowsOrColumns(false, segment, data, "en");
 
-        compare columns, [
-          [{ segment: segment, label: "x", value: "x" }]
-          [{ segment: segment, label: "y", value: "y" }]
-          [{ segment: segment, label: "z", value: "z" }]
-        ]
+        return compare(columns, [
+          [{ segment, label: "x", value: "x" }],
+          [{ segment, label: "y", value: "y" }],
+          [{ segment, label: "z", value: "z" }]
+        ]);
+    });
 
-      it 'ignores intersections that are not relevant', ->
-        segment = { id: "seg1", valueAxis: @axisText }
-        data = {
+      return it('ignores intersections that are not relevant', function() {
+        const segment = { id: "seg1", valueAxis: this.axisText };
+        const data = {
           "r1:seg1": [
-            { value: 1, r0: "a", c0: "x" }
+            { value: 1, r0: "a", c0: "x" },
             { value: 1, r0: "b", c0: "y" }
-          ]
+          ],
           "r2:segother": [
-            { value: 1, r0: "a", c0: "z" }
+            { value: 1, r0: "a", c0: "z" },
             { value: 1, r0: "b", c0: "x" }
           ]
-        }
-        columns = @lb.getRowsOrColumns(false, segment, data, "en")
+        };
+        const columns = this.lb.getRowsOrColumns(false, segment, data, "en");
 
-        compare columns, [
-          [{ segment: segment, label: "x", value: "x" }]
-          [{ segment: segment, label: "y", value: "y" }]
-        ]
+        return compare(columns, [
+          [{ segment, label: "x", value: "x" }],
+          [{ segment, label: "y", value: "y" }]
+        ]);
+    });
+  });
 
-    describe "nested", ->
-      it 'gets categories of enum inside label segment', ->
-        segment = { id: "seg1", valueAxis: null, label: "xyz", children: [{ id: "seg2", valueAxis: @axisEnum }] }
-        data = {}
-        columns = @lb.getRowsOrColumns(false, segment, data, "en")
+    return describe("nested", function() {
+      it('gets categories of enum inside label segment', function() {
+        const segment = { id: "seg1", valueAxis: null, label: "xyz", children: [{ id: "seg2", valueAxis: this.axisEnum }] };
+        const data = {};
+        const columns = this.lb.getRowsOrColumns(false, segment, data, "en");
 
-        compare columns, [
-          [{ segment: segment, label: "xyz", value: null }, { segment: segment.children[0], label: "A", value: "a" }]
-          [{ segment: segment, label: "xyz", value: null }, { segment: segment.children[0], label: "B", value: "b" }]
-          [{ segment: segment, label: "xyz", value: null }, { segment: segment.children[0], label: "None", value: null }]
-        ]
+        return compare(columns, [
+          [{ segment, label: "xyz", value: null }, { segment: segment.children[0], label: "A", value: "a" }],
+          [{ segment, label: "xyz", value: null }, { segment: segment.children[0], label: "B", value: "b" }],
+          [{ segment, label: "xyz", value: null }, { segment: segment.children[0], label: "None", value: null }]
+        ]);
+    });
 
-      it 'gets categories of text inside text segment', ->
-        segment = { id: "seg1", valueAxis: @axisText, children: [{ id: "seg2", valueAxis: @axisText }] }
-        data = {
+      return it('gets categories of text inside text segment', function() {
+        const segment = { id: "seg1", valueAxis: this.axisText, children: [{ id: "seg2", valueAxis: this.axisText }] };
+        const data = {
           "r1:seg1,seg2": [
-            { value: 1, r0: "a", c0: "x", c1: "q" }
-            { value: 1, r0: "b", c0: "x", c1: "r" }
+            { value: 1, r0: "a", c0: "x", c1: "q" },
+            { value: 1, r0: "b", c0: "x", c1: "r" },
             { value: 1, r0: "b", c0: "y", c1: "s" }
-          ]
+          ],
           "r1:seg1,segother": [
-            { value: 1, r0: "a", c0: "x", c1: "XX" }
+            { value: 1, r0: "a", c0: "x", c1: "XX" },
             { value: 1, r0: "b", c0: "y", c1: "XX" }
-          ]
+          ],
           "r1:segother,seg2": [
-            { value: 1, r0: "a", c0: "x", c1: "XX" }
+            { value: 1, r0: "a", c0: "x", c1: "XX" },
             { value: 1, r0: "b", c0: "y", c1: "XX" }
           ]
-        }
-        columns = @lb.getRowsOrColumns(false, segment, data, "en")
+        };
+        const columns = this.lb.getRowsOrColumns(false, segment, data, "en");
 
-        compare columns, [
-          [{ segment: segment, label: "x", value: "x" }, { segment: segment.children[0], label: "q", value: "q" }]
-          [{ segment: segment, label: "x", value: "x" }, { segment: segment.children[0], label: "r", value: "r" }]
-          [{ segment: segment, label: "y", value: "y" }, { segment: segment.children[0], label: "s", value: "s" }]
-        ]
+        return compare(columns, [
+          [{ segment, label: "x", value: "x" }, { segment: segment.children[0], label: "q", value: "q" }],
+          [{ segment, label: "x", value: "x" }, { segment: segment.children[0], label: "r", value: "r" }],
+          [{ segment, label: "y", value: "y" }, { segment: segment.children[0], label: "s", value: "s" }]
+        ]);
+    });
+  });
+});
 
-  describe "buildLayout", ->
-    it "simple enum/text with no labels", ->
-      design = {
-        table: "t1"
-        columns: [{ id: "c1", valueAxis: @axisEnum }]
-        rows: [{ id: "r1", valueAxis: @axisText }]
+  return describe("buildLayout", function() {
+    it("simple enum/text with no labels", function() {
+      const design = {
+        table: "t1",
+        columns: [{ id: "c1", valueAxis: this.axisEnum }],
+        rows: [{ id: "r1", valueAxis: this.axisText }],
         intersections: {
-          "r1:c1": { valueAxis: @axisNumberSum }
+          "r1:c1": { valueAxis: this.axisNumberSum }
         }
-      }
+      };
 
-      data = {
+      const data = {
         "r1:c1": [
-          { r0: "x", c0: "a", value: 2 }
+          { r0: "x", c0: "a", value: 2 },
           { r0: "y", c0: "b", value: 4 }
         ]
-      }
+      };
 
-      layout = @lb.buildLayout(design, data)
+      const layout = this.lb.buildLayout(design, data);
 
-      # Check text
-      compare layoutPluck(layout, "text"), [
-        [null, "A", "B", "None"]
-        ["x", "2", null, null]
+      // Check text
+      compare(layoutPluck(layout, "text"), [
+        [null, "A", "B", "None"],
+        ["x", "2", null, null],
         ["y", null, "4", null]
-      ]
+      ]);
 
-      # Check types
-      compare layoutPluck(layout, "type"), [
-        ["blank", "column", "column", "column"]
+      // Check types
+      compare(layoutPluck(layout, "type"), [
+        ["blank", "column", "column", "column"],
+        ["row", "intersection", "intersection", "intersection"],
         ["row", "intersection", "intersection", "intersection"]
-        ["row", "intersection", "intersection", "intersection"]
-      ]
+      ]);
 
-      # Check subtypes
-      compare layoutPluck(layout, "subtype"), [
-        [null, "value", "value", "value"]
+      // Check subtypes
+      return compare(layoutPluck(layout, "subtype"), [
+        [null, "value", "value", "value"],
+        ["value", "value", "value", "value"],
         ["value", "value", "value", "value"]
-        ["value", "value", "value", "value"]
-      ]
+      ]);
+  });
 
-    it "limits rows", ->
-      design = {
-        table: "t1"
-        columns: [{ id: "c1" }]
-        rows: [{ id: "r1", valueAxis: @axisText }]
+    it("limits rows", function() {
+      const design = {
+        table: "t1",
+        columns: [{ id: "c1" }],
+        rows: [{ id: "r1", valueAxis: this.axisText }],
         intersections: {
-          "r1:c1": { valueAxis: @axisNumberSum }
+          "r1:c1": { valueAxis: this.axisNumberSum }
         }
-      }
+      };
 
-      data = {
-        "r1:c1": _.map(_.range(0, 1000), (i) => { r0: "#{i}", value: i })
-      }
+      const data = {
+        "r1:c1": _.map(_.range(0, 1000), i => ({ r0: `${i}`, value: i }))
+      };
 
-      layout = @lb.buildLayout(design, data)
+      const layout = this.lb.buildLayout(design, data);
 
-      assert.isTrue layout.tooManyRows
-      assert.equal layout.rows.length, 501, "Should have extra row for headers"
+      assert.isTrue(layout.tooManyRows);
+      return assert.equal(layout.rows.length, 501, "Should have extra row for headers");
+    });
 
-    it "uses nullLabel", ->
-      design = {
-        table: "t1"
-        columns: [{ id: "c1", valueAxis: @axisEnum }]
-        rows: [{ id: "r1", valueAxis: @axisText }]
+    it("uses nullLabel", function() {
+      const design = {
+        table: "t1",
+        columns: [{ id: "c1", valueAxis: this.axisEnum }],
+        rows: [{ id: "r1", valueAxis: this.axisText }],
         intersections: {
-          "r1:c1": { valueAxis: _.extend({}, @axisNumberSum, { nullLabel: "-" }) }
+          "r1:c1": { valueAxis: _.extend({}, this.axisNumberSum, { nullLabel: "-" }) }
         }
-      }
+      };
 
-      data = {
+      const data = {
         "r1:c1": [
-          { r0: "x", c0: "a", value: 2 }
+          { r0: "x", c0: "a", value: 2 },
           { r0: "y", c0: "b", value: 4 }
         ]
-      }
+      };
 
-      layout = @lb.buildLayout(design, data)
+      const layout = this.lb.buildLayout(design, data);
 
-      # Check text
-      compare layoutPluck(layout, "text"), [
-        [null, "A", "B", "None"]
-        ["x", "2", "-", "-"]
+      // Check text
+      compare(layoutPluck(layout, "text"), [
+        [null, "A", "B", "None"],
+        ["x", "2", "-", "-"],
         ["y", "-", "4", "-"]
-      ]
+      ]);
 
-      # Check types
-      compare layoutPluck(layout, "type"), [
-        ["blank", "column", "column", "column"]
+      // Check types
+      compare(layoutPluck(layout, "type"), [
+        ["blank", "column", "column", "column"],
+        ["row", "intersection", "intersection", "intersection"],
         ["row", "intersection", "intersection", "intersection"]
-        ["row", "intersection", "intersection", "intersection"]
-      ]
+      ]);
 
-      # Check subtypes
-      compare layoutPluck(layout, "subtype"), [
-        [null, "value", "value", "value"]
+      // Check subtypes
+      return compare(layoutPluck(layout, "subtype"), [
+        [null, "value", "value", "value"],
+        ["value", "value", "value", "value"],
         ["value", "value", "value", "value"]
-        ["value", "value", "value", "value"]
-      ]
+      ]);
+  });
 
-    it "simple enum/text with no values", ->
-      design = {
-        table: "t1"
-        columns: [{ id: "c1", valueAxis: @axisEnum }]
-        rows: [{ id: "r1", valueAxis: @axisText }]
+    it("simple enum/text with no values", function() {
+      const design = {
+        table: "t1",
+        columns: [{ id: "c1", valueAxis: this.axisEnum }],
+        rows: [{ id: "r1", valueAxis: this.axisText }],
         intersections: {
-          "r1:c1": { valueAxis: @axisNumberSum }
+          "r1:c1": { valueAxis: this.axisNumberSum }
         }
-      }
+      };
 
-      data = {
+      const data = {
         "r1:c1": []
-      }
+      };
 
-      layout = @lb.buildLayout(design, data)
+      const layout = this.lb.buildLayout(design, data);
 
-      # Check text
-      compare layoutPluck(layout, "text"), [
-        [null, "A", "B", "None"]
+      // Check text
+      compare(layoutPluck(layout, "text"), [
+        [null, "A", "B", "None"],
         [null, null, null, null]
-      ]
+      ]);
 
-      # Check types
-      compare layoutPluck(layout, "type"), [
-        ["blank", "column", "column", "column"]
+      // Check types
+      compare(layoutPluck(layout, "type"), [
+        ["blank", "column", "column", "column"],
         ["row", "intersection", "intersection", "intersection"]
-      ]
+      ]);
 
-      # Check subtypes
-      compare layoutPluck(layout, "subtype"), [
-        [null, "value", "value", "value"]
+      // Check subtypes
+      return compare(layoutPluck(layout, "subtype"), [
+        [null, "value", "value", "value"],
         ["value", "value", "value", "value"]
-      ]
+      ]);
+  });
 
-    it "adds labels for segments with axes", ->
-      design = {
-        table: "t1"
-        columns: [{ id: "c1", valueAxis: @axisEnum, label: "C1" }]
-        rows: [{ id: "r1", valueAxis: @axisText, label: "R1" }]
+    it("adds labels for segments with axes", function() {
+      const design = {
+        table: "t1",
+        columns: [{ id: "c1", valueAxis: this.axisEnum, label: "C1" }],
+        rows: [{ id: "r1", valueAxis: this.axisText, label: "R1" }],
         intersections: {
-          "r1:c1": { valueAxis: @axisNumberSum }
+          "r1:c1": { valueAxis: this.axisNumberSum }
         }
-      }
+      };
 
-      data = {
+      const data = {
         "r1:c1": [
-          { r0: "x", c0: "a", value: 2 }
+          { r0: "x", c0: "a", value: 2 },
           { r0: "y", c0: "b", value: 4 }
         ]
-      }
+      };
 
-      layout = @lb.buildLayout(design, data)
+      const layout = this.lb.buildLayout(design, data);
 
-      # Check text
-      compare layoutPluck(layout, "text"), [
-        [null, "C1", "C1", "C1"]
-        [null, "A", "B", "None"]
-        ["R1", null, null, null]
-        ["x", "2", null, null]
+      // Check text
+      compare(layoutPluck(layout, "text"), [
+        [null, "C1", "C1", "C1"],
+        [null, "A", "B", "None"],
+        ["R1", null, null, null],
+        ["x", "2", null, null],
         ["y", null, "4", null]
-      ]
+      ]);
 
-      # Check types
-      compare layoutPluck(layout, "type"), [
-        ["blank", "column", "column", "column"]
-        ["blank", "column", "column", "column"]
+      // Check types
+      compare(layoutPluck(layout, "type"), [
+        ["blank", "column", "column", "column"],
+        ["blank", "column", "column", "column"],
+        ["row", "intersection", "intersection", "intersection"],
+        ["row", "intersection", "intersection", "intersection"],
         ["row", "intersection", "intersection", "intersection"]
-        ["row", "intersection", "intersection", "intersection"]
-        ["row", "intersection", "intersection", "intersection"]
-      ]
+      ]);
 
-      # Check subtypes
-      compare layoutPluck(layout, "subtype"), [
-        [null, "valueLabel", "valueLabel", "valueLabel"]
-        [null, "value", "value", "value"]
-        ["valueLabel", "filler", "filler", "filler"]
+      // Check subtypes
+      compare(layoutPluck(layout, "subtype"), [
+        [null, "valueLabel", "valueLabel", "valueLabel"],
+        [null, "value", "value", "value"],
+        ["valueLabel", "filler", "filler", "filler"],
+        ["value", "value", "value", "value"],
         ["value", "value", "value", "value"]
-        ["value", "value", "value", "value"]
-      ]
+      ]);
 
-      # Check skips
-      compare layoutPluck(layout, "skip"), [
-        [null, null, true, true]
+      // Check skips
+      compare(layoutPluck(layout, "skip"), [
+        [null, null, true, true],
+        [null, null, null, null],
+        [null, null, true, true],
+        [null, null, null, null],
         [null, null, null, null]
-        [null, null, true, true]
-        [null, null, null, null]
-        [null, null, null, null]
-      ]
+      ]);
 
-      # Check column spans
-      compare layoutPluck(layout, "columnSpan"), [
-        [undefined, 3, undefined, undefined]
+      // Check column spans
+      return compare(layoutPluck(layout, "columnSpan"), [
+        [undefined, 3, undefined, undefined],
+        [undefined, undefined, undefined, undefined],
+        [undefined, 3, undefined, undefined],
+        [undefined, undefined, undefined, undefined],
         [undefined, undefined, undefined, undefined]
-        [undefined, 3, undefined, undefined]
-        [undefined, undefined, undefined, undefined]
-        [undefined, undefined, undefined, undefined]
-      ]
+      ]);
+  });
 
-    it "sets segments with no axis or label as unconfigured", ->
-      design = {
-        table: "t1"
-        columns: [{ id: "c1", valueAxis: null, label: null }]
-        rows: [{ id: "r1", valueAxis: @axisText, label: null }]
+    it("sets segments with no axis or label as unconfigured", function() {
+      const design = {
+        table: "t1",
+        columns: [{ id: "c1", valueAxis: null, label: null }],
+        rows: [{ id: "r1", valueAxis: this.axisText, label: null }],
         intersections: {
-          "r1:c1": { valueAxis: @axisNumberSum }
+          "r1:c1": { valueAxis: this.axisNumberSum }
         }
-      }
+      };
 
-      data = {
+      const data = {
         "r1:c1": [
-          { r0: "x", c0: null, value: 2 }
+          { r0: "x", c0: null, value: 2 },
           { r0: "y", c0: null, value: 4 }
         ]
-      }
+      };
 
-      layout = @lb.buildLayout(design, data)
+      const layout = this.lb.buildLayout(design, data);
 
-      # Check text
-      compare layoutPluck(layout, "text"), [
-        [null, null]
-        ["x", "2"]
+      // Check text
+      compare(layoutPluck(layout, "text"), [
+        [null, null],
+        ["x", "2"],
         ["y", "4"]
-      ]
+      ]);
 
-      # Check unconfigured
-      compare layoutPluck(layout, "unconfigured"), [
-        [null, true]
+      // Check unconfigured
+      return compare(layoutPluck(layout, "unconfigured"), [
+        [null, true],
+        [false, null],
         [false, null]
-        [false, null]
-      ]
+      ]);
+  });
 
-    it "uses label type for unconfigured segments", ->
-      design = {
-        table: "t1"
-        columns: [{ id: "c1", valueAxis: null, label: null }]
-        rows: [{ id: "r1", valueAxis: null, label: null }]
+    it("uses label type for unconfigured segments", function() {
+      const design = {
+        table: "t1",
+        columns: [{ id: "c1", valueAxis: null, label: null }],
+        rows: [{ id: "r1", valueAxis: null, label: null }],
         intersections: {
           "r1:c1": { valueAxis: null }
         }
-      }
+      };
 
-      data = {}
+      const data = {};
 
-      layout = @lb.buildLayout(design, data)
+      const layout = this.lb.buildLayout(design, data);
 
-      # Check subtype
-      compare layoutPluck(layout, "subtype"), [
-        [null, "label"]
+      // Check subtype
+      return compare(layoutPluck(layout, "subtype"), [
+        [null, "label"],
         ["label", "value"]
-      ]
+      ]);
+  });
 
-    it "sets summarize unconfigured segments", ->
-      design = {
-        table: "t1"
-        columns: [{ id: "c1", valueAxis: null, label: null }]
+    it("sets summarize unconfigured segments", function() {
+      const design = {
+        table: "t1",
+        columns: [{ id: "c1", valueAxis: null, label: null }],
         rows: [
-          { id: "r1", valueAxis: @axisText }
+          { id: "r1", valueAxis: this.axisText },
           { id: "r2", valueAxis: null, label: null }
-        ]
+        ],
         intersections: {
-          "r1:c1": { valueAxis: null }
+          "r1:c1": { valueAxis: null },
           "r2:c1": { valueAxis: null }
         }
-      }
+      };
 
-      data = {}
+      const data = {};
 
-      layout = @lb.buildLayout(design, data)
+      const layout = this.lb.buildLayout(design, data);
 
-      # Check subtype
-      compare layoutPluck(layout, "summarize"), [
-        [null, false]
-        [null, null]
+      // Check subtype
+      return compare(layoutPluck(layout, "summarize"), [
+        [null, false],
+        [null, null],
         [true, null]
-      ]
+      ]);
+  });
 
-    it "spans column headers down when same", ->
-      design = {
-        table: "t1"
+    it("spans column headers down when same", function() {
+      const design = {
+        table: "t1",
         columns: [
-          { id: "c1", valueAxis: @axisEnum, label: "Enum" }
+          { id: "c1", valueAxis: this.axisEnum, label: "Enum" },
           { id: "c2", label: "Total" }
-        ]
+        ],
         rows: [
           { id: "r1", label: "Row" }
-        ]
+        ],
         intersections: {
-          "r1:c1": { valueAxis: null }
+          "r1:c1": { valueAxis: null },
           "r1:c2": { valueAxis: null }
         }
-      }
+      };
 
-      data = {}
+      const data = {};
 
-      layout = @lb.buildLayout(design, data)
+      const layout = this.lb.buildLayout(design, data);
 
-      compare layoutPluck(layout, "rowSpan"), [
-        [null, null, null, null, 2]
+      return compare(layoutPluck(layout, "rowSpan"), [
+        [null, null, null, null, 2],
+        [null, null, null, null, null],
         [null, null, null, null, null]
-        [null, null, null, null, null]
-      ]
+      ]);
+  });
 
-    it "adds background color", ->
-      design = {
-        table: "t1"
-        columns: [{ id: "c1", valueAxis: @axisEnum }]
-        rows: [{ id: "r1", valueAxis: @axisText }]
+    it("adds background color", function() {
+      const design = {
+        table: "t1",
+        columns: [{ id: "c1", valueAxis: this.axisEnum }],
+        rows: [{ id: "r1", valueAxis: this.axisText }],
         intersections: {
           "r1:c1": { 
-            valueAxis: @axisNumberSum 
-            backgroundColor: "#FF8800"
+            valueAxis: this.axisNumberSum, 
+            backgroundColor: "#FF8800",
             backgroundColorOpacity: 0.5
           }
         }
-      }
+      };
 
-      data = {
+      const data = {
         "r1:c1": [
-          { r0: "x", c0: "a", value: 2 }
+          { r0: "x", c0: "a", value: 2 },
           { r0: "y", c0: "b", value: 4 }
         ]
-      }
+      };
 
-      layout = @lb.buildLayout(design, data)
+      const layout = this.lb.buildLayout(design, data);
 
-      # Check colors
-      compare layoutPluck(layout, "backgroundColor"), [
-        [null, null, null, null]
+      // Check colors
+      return compare(layoutPluck(layout, "backgroundColor"), [
+        [null, null, null, null],
+        [null, "rgba(255, 136, 0, 0.5)", "rgba(255, 136, 0, 0.5)", "rgba(255, 136, 0, 0.5)"],
         [null, "rgba(255, 136, 0, 0.5)", "rgba(255, 136, 0, 0.5)", "rgba(255, 136, 0, 0.5)"]
-        [null, "rgba(255, 136, 0, 0.5)", "rgba(255, 136, 0, 0.5)", "rgba(255, 136, 0, 0.5)"]
-      ]
+      ]);
+  });
 
-    it "adds background color axis", ->
-      design = {
-        table: "t1"
-        columns: [{ id: "c1", valueAxis: @axisEnum }]
-        rows: [{ id: "r1", valueAxis: @axisText }]
+    it("adds background color axis", function() {
+      const design = {
+        table: "t1",
+        columns: [{ id: "c1", valueAxis: this.axisEnum }],
+        rows: [{ id: "r1", valueAxis: this.axisText }],
         intersections: {
           "r1:c1": { 
-            valueAxis: @axisNumberSum 
+            valueAxis: this.axisNumberSum, 
             backgroundColorAxis: {
-              expr: @axisNumberSum
-              xform: "bin"
-              min: 0
-              max: 2
-              numBins: 2
+              expr: this.axisNumberSum,
+              xform: "bin",
+              min: 0,
+              max: 2,
+              numBins: 2,
               colorMap: [
                 { value: 0, color: "#FF8800"}
               ]
-            }
+            },
             backgroundColorOpacity: 0.5
           }
         }
-      }
+      };
 
-      data = {
+      const data = {
         "r1:c1": [
-          { r0: "x", c0: "a", value: 2, bc: 0 }
+          { r0: "x", c0: "a", value: 2, bc: 0 },
           { r0: "y", c0: "b", value: 4, bc: null }
         ]
-      }
+      };
 
-      layout = @lb.buildLayout(design, data)
+      const layout = this.lb.buildLayout(design, data);
 
-      # Check colors
-      compare layoutPluck(layout, "backgroundColor"), [
+      // Check colors
+      return compare(layoutPluck(layout, "backgroundColor"), [
+        [null, null, null, null],
+        [null, "rgba(255, 136, 0, 0.5)", null, null],
         [null, null, null, null]
-        [null, "rgba(255, 136, 0, 0.5)", null, null]
-        [null, null, null, null]
-      ]
+      ]);
+  });
 
-    it "adds background color conditional", ->
-      design = {
-        table: "t1"
-        columns: [{ id: "c1", valueAxis: @axisEnum }]
-        rows: [{ id: "r1", valueAxis: @axisText }]
+    it("adds background color conditional", function() {
+      const design = {
+        table: "t1",
+        columns: [{ id: "c1", valueAxis: this.axisEnum }],
+        rows: [{ id: "r1", valueAxis: this.axisText }],
         intersections: {
           "r1:c1": { 
-            valueAxis: @axisNumberSum 
+            valueAxis: this.axisNumberSum, 
             backgroundColorConditions: [
-              { condition: { type: "op", op: ">", table: "t1", exprs: [@exprNumberSum, { type: "literal", valueType: "number", value: 5 }]}, color: "#FF8800" }
-            ]
+              { condition: { type: "op", op: ">", table: "t1", exprs: [this.exprNumberSum, { type: "literal", valueType: "number", value: 5 }]}, color: "#FF8800" }
+            ],
             backgroundColorOpacity: 0.5
           }
         }
-      }
+      };
 
-      data = {
+      const data = {
         "r1:c1": [
-          { r0: "x", c0: "a", value: 2, bcc0: false }
+          { r0: "x", c0: "a", value: 2, bcc0: false },
           { r0: "y", c0: "b", value: 4, bcc0: true }
         ]
-      }
+      };
 
-      layout = @lb.buildLayout(design, data)
+      const layout = this.lb.buildLayout(design, data);
 
-      # Check colors
-      compare layoutPluck(layout, "backgroundColor"), [
-        [null, null, null, null]
-        [null, null, null, null]
+      // Check colors
+      return compare(layoutPluck(layout, "backgroundColor"), [
+        [null, null, null, null],
+        [null, null, null, null],
         [null, null, "rgba(255, 136, 0, 0.5)", null]
-      ]
+      ]);
+  });
 
-    it "sets section top/left/bottom/right", ->
-      design = {
-        table: "t1"
-        columns: [{ id: "c1", valueAxis: @axisEnum, label: "C1" }]
-        rows: [{ id: "r1", valueAxis: @axisText, label: "R1" }]
+    it("sets section top/left/bottom/right", function() {
+      const design = {
+        table: "t1",
+        columns: [{ id: "c1", valueAxis: this.axisEnum, label: "C1" }],
+        rows: [{ id: "r1", valueAxis: this.axisText, label: "R1" }],
         intersections: {
-          "r1:c1": { valueAxis: @axisNumberSum }
+          "r1:c1": { valueAxis: this.axisNumberSum }
         }
-      }
+      };
 
-      data = {
+      const data = {
         "r1:c1": [
-          { r0: "x", c0: "a", value: 2 }
+          { r0: "x", c0: "a", value: 2 },
           { r0: "y", c0: "b", value: 4 }
         ]
-      }
+      };
 
-      layout = @lb.buildLayout(design, data)
+      const layout = this.lb.buildLayout(design, data);
 
-      # Check top
-      compare layoutPluck(layout, "sectionTop"), [
-        [false, true, true, true]
+      // Check top
+      compare(layoutPluck(layout, "sectionTop"), [
+        [false, true, true, true],
+        [false, false, false, false],
+        [true, true, true, true],
+        [false, false, false, false],
         [false, false, false, false]
-        [true, true, true, true]
-        [false, false, false, false]
-        [false, false, false, false]
-      ]
+      ]);
 
-      # Check right (spanned columns have it true)
-      compare layoutPluck(layout, "sectionRight"), [
-        [false, true, false, true]
-        [false, false, false, true]
-        [true, true, false, true]
+      // Check right (spanned columns have it true)
+      compare(layoutPluck(layout, "sectionRight"), [
+        [false, true, false, true],
+        [false, false, false, true],
+        [true, true, false, true],
+        [true, false, false, true],
         [true, false, false, true]
-        [true, false, false, true]
-      ], JSON.stringify(layoutPluck(layout, "section"))
+      ], JSON.stringify(layoutPluck(layout, "section")));
 
-      # Check left
-      compare layoutPluck(layout, "sectionLeft"), [
-        [false, true, false, false]
-        [false, true, false, false]
+      // Check left
+      compare(layoutPluck(layout, "sectionLeft"), [
+        [false, true, false, false],
+        [false, true, false, false],
+        [true, true, false, false],
+        [true, true, false, false],
         [true, true, false, false]
-        [true, true, false, false]
-        [true, true, false, false]
-      ]
+      ]);
 
-      # Check bottom
-      compare layoutPluck(layout, "sectionBottom"), [
-        [false, false, false, false]
-        [false, true, true, true]
-        [false, false, false, false]
-        [false, false, false, false]
+      // Check bottom
+      return compare(layoutPluck(layout, "sectionBottom"), [
+        [false, false, false, false],
+        [false, true, true, true],
+        [false, false, false, false],
+        [false, false, false, false],
         [true, true, true, true]
-      ]
+      ]);
+  });
 
-    describe "borders", ->
-      it "sets default borders for all cells", ->
-        design = {
-          table: "t1"
-          columns: [{ id: "c1", valueAxis: @axisEnum }]
-          rows: [{ id: "r1", valueAxis: @axisEnum }]
+    return describe("borders", function() {
+      it("sets default borders for all cells", function() {
+        const design = {
+          table: "t1",
+          columns: [{ id: "c1", valueAxis: this.axisEnum }],
+          rows: [{ id: "r1", valueAxis: this.axisEnum }],
           intersections: {
             "r1:c1": { }
           }
-        }
+        };
 
-        data = {
+        const data = {
           "r1:c1": []
-        }
+        };
 
-        layout = @lb.buildLayout(design, data)
+        const layout = this.lb.buildLayout(design, data);
 
-        # Check text
-        compare layoutPluck(layout, "borderLeft"), [
-          [null, 2, 1, 1]
+        // Check text
+        return compare(layoutPluck(layout, "borderLeft"), [
+          [null, 2, 1, 1],
+          [2, 2, 1, 1],
+          [2, 2, 1, 1],
           [2, 2, 1, 1]
-          [2, 2, 1, 1]
-          [2, 2, 1, 1]
-        ]
+        ]);
+    });
 
-      it "sets custom borders for all cells", ->
-        design = {
-          table: "t1"
-          columns: [{ id: "c1", valueAxis: @axisEnum, borderBefore: 1, borderWithin: 2, borderAfter: 3 }]
-          rows: [{ id: "r1", valueAxis: @axisEnum, borderBefore: 0, borderWithin: 1, borderAfter: 2 }]
+      it("sets custom borders for all cells", function() {
+        const design = {
+          table: "t1",
+          columns: [{ id: "c1", valueAxis: this.axisEnum, borderBefore: 1, borderWithin: 2, borderAfter: 3 }],
+          rows: [{ id: "r1", valueAxis: this.axisEnum, borderBefore: 0, borderWithin: 1, borderAfter: 2 }],
           intersections: {
             "r1:c1": { }
           }
-        }
+        };
 
-        data = {
+        const data = {
           "r1:c1": []
-        }
+        };
 
-        layout = @lb.buildLayout(design, data)
+        const layout = this.lb.buildLayout(design, data);
 
-        # Check left
-        compare layoutPluck(layout, "borderLeft"), [
-          [null, 1, 2, 2]
+        // Check left
+        compare(layoutPluck(layout, "borderLeft"), [
+          [null, 1, 2, 2],
+          [2, 1, 2, 2],
+          [2, 1, 2, 2],
           [2, 1, 2, 2]
-          [2, 1, 2, 2]
-          [2, 1, 2, 2]
-        ]
+        ]);
 
-        # Check right
-        compare layoutPluck(layout, "borderRight"), [
-          [null, 2, 2, 3]
+        // Check right
+        compare(layoutPluck(layout, "borderRight"), [
+          [null, 2, 2, 3],
+          [2, 2, 2, 3],
+          [2, 2, 2, 3],
           [2, 2, 2, 3]
-          [2, 2, 2, 3]
-          [2, 2, 2, 3]
-        ]
+        ]);
 
-        # Check top
-        compare layoutPluck(layout, "borderTop"), [
-          [null, 2, 2, 2]
-          [0, 0, 0, 0]
+        // Check top
+        compare(layoutPluck(layout, "borderTop"), [
+          [null, 2, 2, 2],
+          [0, 0, 0, 0],
+          [1, 1, 1, 1],
           [1, 1, 1, 1]
-          [1, 1, 1, 1]
-        ]
+        ]);
 
-        # Check bottom
-        compare layoutPluck(layout, "borderBottom"), [
-          [null, 2, 2, 2]
-          [1, 1, 1, 1]
-          [1, 1, 1, 1]
+        // Check bottom
+        return compare(layoutPluck(layout, "borderBottom"), [
+          [null, 2, 2, 2],
+          [1, 1, 1, 1],
+          [1, 1, 1, 1],
           [2, 2, 2, 2]
-        ]
+        ]);
+    });
 
-      it "handles nested rows", ->
-        design = {
-          table: "t1"
-          columns: [{ id: "c1" }]
+      return it("handles nested rows", function() {
+        const design = {
+          table: "t1",
+          columns: [{ id: "c1" }],
           rows: [
             { 
-              id: "r1"
-              valueAxis: @axisEnum 
-              borderBefore: 3
-              borderWithin: 2
-              borderAfter: 3
+              id: "r1",
+              valueAxis: this.axisEnum, 
+              borderBefore: 3,
+              borderWithin: 2,
+              borderAfter: 3,
               children: [
                 { 
-                  id: "r2"
-                  valueAxis: @axisText
+                  id: "r2",
+                  valueAxis: this.axisText
                 }
               ]
             }
-          ]
+          ],
           intersections: {
-            "r1,r2:c1": { valueAxis: @axisNumberSum }
+            "r1,r2:c1": { valueAxis: this.axisNumberSum }
           }
-        }
+        };
 
-        data = {
+        const data = {
           "r1,r2:c1": [
-            # Two distinct r2 values
-            { r0: "a", r1: "x", c0: null, value: 2 }
-            { r0: "a", r1: "y", c0: null, value: 4 }
-            { r0: "b", r1: "x", c0: null, value: 2 }
+            // Two distinct r2 values
+            { r0: "a", r1: "x", c0: null, value: 2 },
+            { r0: "a", r1: "y", c0: null, value: 4 },
+            { r0: "b", r1: "x", c0: null, value: 2 },
             { r0: "b", r1: "y", c0: null, value: 4 }
           ]
-        }
+        };
 
-        layout = @lb.buildLayout(design, data)
+        const layout = this.lb.buildLayout(design, data);
 
-        # Check text
-        compare layoutPluck(layout, "text"), [
-          [null, null, null]
-          ["A", "x", "2"]
-          ["A", "y", "4"]
-          ["B", "x", "2"]
-          ["B", "y", "4"]
+        // Check text
+        compare(layoutPluck(layout, "text"), [
+          [null, null, null],
+          ["A", "x", "2"],
+          ["A", "y", "4"],
+          ["B", "x", "2"],
+          ["B", "y", "4"],
           ["None", null, null]
-        ]
+        ]);
 
-        compare layoutPluck(layout, "borderTop"), [
-          [null, null, 2]
-          [3, 3, 3]
-          [0, 1, 1]
+        compare(layoutPluck(layout, "borderTop"), [
+          [null, null, 2],
+          [3, 3, 3],
+          [0, 1, 1],
+          [2, 2, 2],
+          [0, 1, 1],
           [2, 2, 2]
-          [0, 1, 1]
-          [2, 2, 2]
-        ]
+        ]);
 
-        compare layoutPluck(layout, "borderBottom"), [
-          [null, null, 2]
-          [2, 1, 1]
-          [2, 2, 2]
-          [2, 1, 1]
-          [2, 2, 2]
+        return compare(layoutPluck(layout, "borderBottom"), [
+          [null, null, 2],
+          [2, 1, 1],
+          [2, 2, 2],
+          [2, 1, 1],
+          [2, 2, 2],
           [3, 3, 3]
-        ]
+        ]);
+    });
+  });
+});
+});

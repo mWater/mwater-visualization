@@ -1,24 +1,34 @@
-React = require 'react'
-ReactDOM = require 'react-dom'
+let HoverComponent;
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-module.exports = class HoverComponent extends React.Component
-  constructor: (props) ->
-    super(props)
-    @state = { hovered: false }
+export default HoverComponent = class HoverComponent extends React.Component {
+  constructor(props) {
+    this.onOver = this.onOver.bind(this);
+    this.onOut = this.onOut.bind(this);
+    super(props);
+    this.state = { hovered: false };
+  }
 
-  componentDidMount: ->
-    ReactDOM.findDOMNode(@main).addEventListener("mouseover", @onOver)
-    ReactDOM.findDOMNode(@main).addEventListener("mouseout", @onOut)
+  componentDidMount() {
+    ReactDOM.findDOMNode(this.main).addEventListener("mouseover", this.onOver);
+    return ReactDOM.findDOMNode(this.main).addEventListener("mouseout", this.onOut);
+  }
 
-  componentWillUnmount: ->
-    ReactDOM.findDOMNode(@main).removeEventListener("mouseover", @onOver)
-    ReactDOM.findDOMNode(@main).removeEventListener("mouseout", @onOut)
+  componentWillUnmount() {
+    ReactDOM.findDOMNode(this.main).removeEventListener("mouseover", this.onOver);
+    return ReactDOM.findDOMNode(this.main).removeEventListener("mouseout", this.onOut);
+  }
 
-  onOver: =>
-    @setState(hovered: true)
+  onOver() {
+    return this.setState({hovered: true});
+  }
 
-  onOut: =>
-    @setState(hovered: false)
+  onOut() {
+    return this.setState({hovered: false});
+  }
 
-  render: ->
-    React.cloneElement(React.Children.only(@props.children), ref: ((c) => @main = c), hovered: @state.hovered)
+  render() {
+    return React.cloneElement(React.Children.only(this.props.children), {ref: (c => { return this.main = c; }), hovered: this.state.hovered});
+  }
+};

@@ -1,29 +1,33 @@
-assert = require('chai').assert
+import { assert } from 'chai';
+import WidgetScoper from '../src/widgets/WidgetScoper';
 
-WidgetScoper = require '../src/widgets/WidgetScoper'
+describe("WidgetScoper", function() {
+  it("applies scope to scoped widget", function() {
+    let scoper = new WidgetScoper({});
+    scoper = scoper.applyScope("a", { data: "scope1", filter: "filter1" });
+    assert.deepEqual(scoper.getScope("a"), { data: "scope1", filter: "filter1" });
+    return assert(!scoper.getScope("b"));
+  });
 
-describe "WidgetScoper", ->
-  it "applies scope to scoped widget", ->
-    scoper = new WidgetScoper({})
-    scoper = scoper.applyScope("a", { data: "scope1", filter: "filter1" })
-    assert.deepEqual scoper.getScope("a"), { data: "scope1", filter: "filter1" }
-    assert not scoper.getScope("b")
+  it("applies filters to other widgets", function() {
+    let scoper = new WidgetScoper({});
+    scoper = scoper.applyScope("a", { data: "scope1", filter: "filter1" });
+    assert.deepEqual(scoper.getFilters("a"), []);
+    return assert.deepEqual(scoper.getFilters("b"), ["filter1"]);
+});
 
-  it "applies filters to other widgets", ->
-    scoper = new WidgetScoper({})
-    scoper = scoper.applyScope("a", { data: "scope1", filter: "filter1" })
-    assert.deepEqual scoper.getFilters("a"), []
-    assert.deepEqual scoper.getFilters("b"), ["filter1"]
+  it("does not apply null filters to other widgets", function() {
+    let scoper = new WidgetScoper({});
+    scoper = scoper.applyScope("a", { data: "scope1", filter: null });
+    assert.deepEqual(scoper.getFilters("a"), []);
+    return assert.deepEqual(scoper.getFilters("b"), []);
+});
 
-  it "does not apply null filters to other widgets", ->
-    scoper = new WidgetScoper({})
-    scoper = scoper.applyScope("a", { data: "scope1", filter: null })
-    assert.deepEqual scoper.getFilters("a"), []
-    assert.deepEqual scoper.getFilters("b"), []
-
-  it "clears scope and filter", ->
-    scoper = new WidgetScoper({})
-    scoper = scoper.applyScope("a", { data: "scope1", filter: "filter1" })
-    scoper = scoper.reset()
-    assert not scoper.getScope("a")
-    assert.deepEqual scoper.getFilters("b"), []
+  return it("clears scope and filter", function() {
+    let scoper = new WidgetScoper({});
+    scoper = scoper.applyScope("a", { data: "scope1", filter: "filter1" });
+    scoper = scoper.reset();
+    assert(!scoper.getScope("a"));
+    return assert.deepEqual(scoper.getFilters("b"), []);
+});
+});

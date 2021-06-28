@@ -1,85 +1,132 @@
-PropTypes = require('prop-types')
-_ = require 'lodash'
-React = require 'react'
-R = React.createElement
+let OrderingsComponent;
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import React from 'react';
+const R = React.createElement;
 
-ExprComponent = require("mwater-expressions-ui").ExprComponent
+import { ExprComponent } from "mwater-expressions-ui";
 
-# Edits the orderings of a chart
-# Orderings are an array of { axis: axis to order by, direction: "asc"/"desc" }
-# NOTE: no longer uses complete axis, just the expr
-module.exports = class OrderingsComponent extends React.Component
-  @propTypes: 
-    orderings: PropTypes.array.isRequired
-    onOrderingsChange: PropTypes.func.isRequired
-    schema: PropTypes.object.isRequired
-    dataSource: PropTypes.object.isRequired
-    table: PropTypes.string # Current table
+// Edits the orderings of a chart
+// Orderings are an array of { axis: axis to order by, direction: "asc"/"desc" }
+// NOTE: no longer uses complete axis, just the expr
+export default OrderingsComponent = (function() {
+  OrderingsComponent = class OrderingsComponent extends React.Component {
+    constructor(...args) {
+      super(...args);
+      this.handleAdd = this.handleAdd.bind(this);
+      this.handleOrderingRemove = this.handleOrderingRemove.bind(this);
+      this.handleOrderingChange = this.handleOrderingChange.bind(this);
+    }
 
-  handleAdd: =>
-    orderings = @props.orderings.slice()
-    orderings.push({ axis: null, direction: "asc" })
-    @props.onOrderingsChange(orderings)
+    static initClass() {
+      this.propTypes = { 
+        orderings: PropTypes.array.isRequired,
+        onOrderingsChange: PropTypes.func.isRequired,
+        schema: PropTypes.object.isRequired,
+        dataSource: PropTypes.object.isRequired,
+        table: PropTypes.string
+      };
+       // Current table
+    }
 
-  handleOrderingRemove: (index) =>
-    orderings = @props.orderings.slice()
-    orderings.splice(index, 1)
-    @props.onOrderingsChange(orderings)
+    handleAdd() {
+      const orderings = this.props.orderings.slice();
+      orderings.push({ axis: null, direction: "asc" });
+      return this.props.onOrderingsChange(orderings);
+    }
 
-  handleOrderingChange: (index, ordering) =>
-    orderings = @props.orderings.slice()
-    orderings[index] = ordering
-    @props.onOrderingsChange(orderings)
+    handleOrderingRemove(index) {
+      const orderings = this.props.orderings.slice();
+      orderings.splice(index, 1);
+      return this.props.onOrderingsChange(orderings);
+    }
 
-  render: ->
-    R 'div', null,
-      _.map @props.orderings, (ordering, i) => 
-        R(OrderingComponent, 
-          schema: @props.schema
-          dataSource: @props.dataSource
-          ordering: ordering
-          table: @props.table
-          onOrderingChange: @handleOrderingChange.bind(null, i)
-          onOrderingRemove: @handleOrderingRemove.bind(null, i))
+    handleOrderingChange(index, ordering) {
+      const orderings = this.props.orderings.slice();
+      orderings[index] = ordering;
+      return this.props.onOrderingsChange(orderings);
+    }
 
-      R 'button', type: "button", className: "btn btn-sm btn-default", onClick: @handleAdd, key: "add",
-        R 'span', className: "glyphicon glyphicon-plus"
-        " Add Ordering"
+    render() {
+      return R('div', null,
+        _.map(this.props.orderings, (ordering, i) => { 
+          return R(OrderingComponent, { 
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            ordering,
+            table: this.props.table,
+            onOrderingChange: this.handleOrderingChange.bind(null, i),
+            onOrderingRemove: this.handleOrderingRemove.bind(null, i)
+          });
+        }),
 
-class OrderingComponent extends React.Component
-  @propTypes: 
-    ordering: PropTypes.object.isRequired
-    onOrderingChange: PropTypes.func.isRequired
-    onOrderingRemove: PropTypes.func.isRequired
-    schema: PropTypes.object.isRequired
-    dataSource: PropTypes.object.isRequired
-    table: PropTypes.string # Current table
+        R('button', {type: "button", className: "btn btn-sm btn-default", onClick: this.handleAdd, key: "add"},
+          R('span', {className: "glyphicon glyphicon-plus"}),
+          " Add Ordering")
+      );
+    }
+  };
+  OrderingsComponent.initClass();
+  return OrderingsComponent;
+})();
 
-  handleAxisChange: (axis) =>
-    @props.onOrderingChange(_.extend({}, @props.ordering, axis: axis))
+class OrderingComponent extends React.Component {
+  constructor(...args) {
+    super(...args);
+    this.handleAxisChange = this.handleAxisChange.bind(this);
+    this.handleExprChange = this.handleExprChange.bind(this);
+    this.handleDirectionChange = this.handleDirectionChange.bind(this);
+  }
 
-  handleExprChange: (expr) =>
-    axis = _.extend({}, @props.ordering.axis or {}, expr: expr)
-    @handleAxisChange(axis)
+  static initClass() {
+    this.propTypes = { 
+      ordering: PropTypes.object.isRequired,
+      onOrderingChange: PropTypes.func.isRequired,
+      onOrderingRemove: PropTypes.func.isRequired,
+      schema: PropTypes.object.isRequired,
+      dataSource: PropTypes.object.isRequired,
+      table: PropTypes.string
+    };
+     // Current table
+  }
 
-  handleDirectionChange: (ev) =>
-    @props.onOrderingChange(_.extend({}, @props.ordering, direction: if ev.target.checked then "desc" else "asc"))
+  handleAxisChange(axis) {
+    return this.props.onOrderingChange(_.extend({}, this.props.ordering, {axis}));
+  }
 
-  render: ->
-    R 'div', style: { marginLeft: 5 },
-      R 'div', style: { textAlign: "right" },
-        R 'button', className: "btn btn-xs btn-link", type: "button", onClick: @props.onOrderingRemove,
-          R 'span', className: "glyphicon glyphicon-remove"
-      R ExprComponent,
-        schema: @props.schema
-        dataSource: @props.dataSource
-        table: @props.table
-        types: ['text', 'number', 'boolean', 'date', 'datetime']
-        aggrStatuses: ['individual', 'aggregate']
-        value: @props.ordering.axis?.expr
-        onChange: @handleExprChange
-      R 'div', null, 
-        R 'div', className: "checkbox-inline",
-          R 'label', null,
-            R 'input', type: "checkbox", checked: @props.ordering.direction == "desc", onChange: @handleDirectionChange
-            "Reverse"
+  handleExprChange(expr) {
+    const axis = _.extend({}, this.props.ordering.axis || {}, {expr});
+    return this.handleAxisChange(axis);
+  }
+
+  handleDirectionChange(ev) {
+    return this.props.onOrderingChange(_.extend({}, this.props.ordering, {direction: ev.target.checked ? "desc" : "asc"}));
+  }
+
+  render() {
+    return R('div', {style: { marginLeft: 5 }},
+      R('div', {style: { textAlign: "right" }},
+        R('button', {className: "btn btn-xs btn-link", type: "button", onClick: this.props.onOrderingRemove},
+          R('span', {className: "glyphicon glyphicon-remove"}))
+      ),
+      R(ExprComponent, {
+        schema: this.props.schema,
+        dataSource: this.props.dataSource,
+        table: this.props.table,
+        types: ['text', 'number', 'boolean', 'date', 'datetime'],
+        aggrStatuses: ['individual', 'aggregate'],
+        value: this.props.ordering.axis?.expr,
+        onChange: this.handleExprChange
+      }
+      ),
+      R('div', null, 
+        R('div', {className: "checkbox-inline"},
+          R('label', null,
+            R('input', {type: "checkbox", checked: this.props.ordering.direction === "desc", onChange: this.handleDirectionChange}),
+            "Reverse")
+        )
+      )
+    );
+  }
+}
+OrderingComponent.initClass();

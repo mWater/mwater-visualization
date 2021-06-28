@@ -1,71 +1,74 @@
-assert = require('chai').assert
-fixtures = require './fixtures'
-_ = require 'lodash'
-QuickfilterCompiler = require '../src/quickfilter/QuickfilterCompiler'
-canonical = require 'canonical-json'
+import { assert } from 'chai';
+import fixtures from './fixtures';
+import _ from 'lodash';
+import QuickfilterCompiler from '../src/quickfilter/QuickfilterCompiler';
+import canonical from 'canonical-json';
 
-compare = (actual, expected) ->
-  assert.equal canonical(actual), canonical(expected)
+const compare = (actual, expected) => assert.equal(canonical(actual), canonical(expected));
 
-describe "QuickfilterCompiler", ->
-  before ->
-    @schema = fixtures.simpleSchema()
-    @qc = new QuickfilterCompiler(@schema)
+describe("QuickfilterCompiler", function() {
+  before(function() {
+    this.schema = fixtures.simpleSchema();
+    return this.qc = new QuickfilterCompiler(this.schema);
+  });
 
-  it "compiles enum filter", ->
-    filters = @qc.compile([{ expr: { type: "field", table: "t1", column: "enum"}, label: "Enum" }], ["a"])
-    compare(filters, [
+  it("compiles enum filter", function() {
+    const filters = this.qc.compile([{ expr: { type: "field", table: "t1", column: "enum"}, label: "Enum" }], ["a"]);
+    return compare(filters, [
       { 
-        table: "t1"
+        table: "t1",
         jsonql: { 
-          type: "op"
-          op: "="
+          type: "op",
+          op: "=",
           exprs: [
-            { type: "field", tableAlias: "{alias}", column: "enum" }
+            { type: "field", tableAlias: "{alias}", column: "enum" },
             { type: "literal", value: "a" }
           ]
         }
       }
-      ])
+      ]);
+  });
 
-  it "compiles enumset filter", ->
-    filters = @qc.compile([{ expr: { type: "field", table: "t1", column: "enumset"}, label: "Enumset" }], ["a"])
-    compare(filters, [
+  it("compiles enumset filter", function() {
+    const filters = this.qc.compile([{ expr: { type: "field", table: "t1", column: "enumset"}, label: "Enumset" }], ["a"]);
+    return compare(filters, [
       { 
-        table: "t1"
+        table: "t1",
         jsonql: { 
-          type: "op"
-          op: "@>"
+          type: "op",
+          op: "@>",
           exprs: [
-            { type: "op", op: "to_jsonb", exprs: [{ type: "field", tableAlias: "{alias}", column: "enumset" }] }
+            { type: "op", op: "to_jsonb", exprs: [{ type: "field", tableAlias: "{alias}", column: "enumset" }] },
             { type: "op", op: "::jsonb", exprs: [{ type: "literal", value: '["a"]' }] }
           ]
         }        
       }
-    ])
+    ]);
+  });
 
-  it "compiles multi filter", ->
-    filters = @qc.compile([{ expr: { type: "field", table: "t1", column: "enum"}, label: "Enum", multi: true }], [["a"]])
-    compare(filters, [
+  it("compiles multi filter", function() {
+    const filters = this.qc.compile([{ expr: { type: "field", table: "t1", column: "enum"}, label: "Enum", multi: true }], [["a"]]);
+    return compare(filters, [
       { 
-        table: "t1"
+        table: "t1",
         jsonql: { 
-          type: "op"
-          op: "="
-          modifier: "any"
+          type: "op",
+          op: "=",
+          modifier: "any",
           exprs: [
-            { type: "field", tableAlias: "{alias}", column: "enum" }
+            { type: "field", tableAlias: "{alias}", column: "enum" },
             { type: "literal", value: ["a"] }
           ]
         }
       }
-      ])
+      ]);
+  });
 
-  it "compiles enumset multi filter", ->
-    filters = @qc.compile([{ expr: { type: "field", table: "t1", column: "enumset"}, label: "Enumset", multi: true }], [["a"]])
-    compare(filters, [
+  it("compiles enumset multi filter", function() {
+    const filters = this.qc.compile([{ expr: { type: "field", table: "t1", column: "enumset"}, label: "Enumset", multi: true }], [["a"]]);
+    return compare(filters, [
       { 
-        table: "t1"
+        table: "t1",
         jsonql: {
           type: "scalar",
           expr: { type: "op", op: "bool_or", exprs: [{ type: "field", tableAlias: "elements", column: "value" }] },
@@ -78,7 +81,7 @@ describe "QuickfilterCompiler", ->
                 { 
                   type: "select", 
                   expr: { type: "op", op: "@>", exprs: [
-                    { type: "op", op: "to_jsonb", exprs: [{ type: "field", tableAlias: "{alias}", column: "enumset" }] }
+                    { type: "op", op: "to_jsonb", exprs: [{ type: "field", tableAlias: "{alias}", column: "enumset" }] },
                     { type: "op", op: "jsonb_array_elements", exprs: [{ type: "op", op: "::jsonb", exprs: [{ type: "literal", value: '["a"]' }]}] }
                   ]}, 
                   alias: "value" 
@@ -88,22 +91,25 @@ describe "QuickfilterCompiler", ->
           }
         }
       }
-    ])
+    ]);
+  });
 
-  it "compiles filter with locks", ->
-    filters = @qc.compile([{ expr: { type: "field", table: "t1", column: "enum" }, label: "Enum" }], ["a"], [{ expr: { type: "field", table: "t1", column: "enum"}, value: "b" }])
-    compare(filters, [
+  it("compiles filter with locks", function() {
+    const filters = this.qc.compile([{ expr: { type: "field", table: "t1", column: "enum" }, label: "Enum" }], ["a"], [{ expr: { type: "field", table: "t1", column: "enum"}, value: "b" }]);
+    return compare(filters, [
       { 
-        table: "t1"
+        table: "t1",
         jsonql: { 
-          type: "op"
-          op: "="
+          type: "op",
+          op: "=",
           exprs: [
-            { type: "field", tableAlias: "{alias}", column: "enum" }
+            { type: "field", tableAlias: "{alias}", column: "enum" },
             { type: "literal", value: "b" }
           ]
         }
       }
-      ])
+      ]);
+  });
 
-  it "ignores null values"
+  return it("ignores null values");
+});

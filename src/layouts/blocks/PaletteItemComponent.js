@@ -1,21 +1,33 @@
-PropTypes = require('prop-types')
-React = require 'react'
-R = React.createElement
+let PaletteItemComponent;
+import PropTypes from 'prop-types';
+import React from 'react';
+const R = React.createElement;
 
-DragSourceComponent = require('../DragSourceComponent')("visualization-block")
+const DragSourceComponent = require('../DragSourceComponent')("visualization-block");
 
-# Item in a palette that can be dragged to add a widget or other item
-module.exports = class PaletteItemComponent extends React.Component
-  @propTypes:
-    createItem: PropTypes.func.isRequired   # Create the drag item
-    title: PropTypes.any
-    subtitle: PropTypes.any
+// Item in a palette that can be dragged to add a widget or other item
+export default PaletteItemComponent = (function() {
+  PaletteItemComponent = class PaletteItemComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        createItem: PropTypes.func.isRequired,   // Create the drag item
+        title: PropTypes.any,
+        subtitle: PropTypes.any
+      };
+    }
 
-  render: ->
-    R DragSourceComponent, 
-      createDragItem: @props.createItem,
-        R 'div', className: "mwater-visualization-palette-item",
-          R 'div', className: "title", key: "title",
-            @props.title
-          R 'div', className: "subtitle", key: "subtitle",
-            @props.subtitle
+    render() {
+      return R(DragSourceComponent, 
+        {createDragItem: this.props.createItem},
+          R('div', {className: "mwater-visualization-palette-item"},
+            R('div', {className: "title", key: "title"},
+              this.props.title),
+            R('div', {className: "subtitle", key: "subtitle"},
+              this.props.subtitle)
+          )
+      );
+    }
+  };
+  PaletteItemComponent.initClass();
+  return PaletteItemComponent;
+})();

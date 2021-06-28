@@ -1,34 +1,51 @@
-PropTypes = require('prop-types')
-React = require 'react'
-R = React.createElement
+let MapControlComponent;
+import PropTypes from 'prop-types';
+import React from 'react';
+const R = React.createElement;
 
-MapLayersDesignerComponent = require './MapLayersDesignerComponent'
-BaseLayerDesignerComponent = require './BaseLayerDesignerComponent'
+import MapLayersDesignerComponent from './MapLayersDesignerComponent';
+import BaseLayerDesignerComponent from './BaseLayerDesignerComponent';
 
-# Allows controlling readonly map
-module.exports = class MapControlComponent extends React.Component
-  @propTypes:
-    schema: PropTypes.object.isRequired # Schema to use
-    dataSource: PropTypes.object.isRequired
-    design: PropTypes.object.isRequired  # See Map Design.md
-    onDesignChange: PropTypes.func.isRequired # Called with new design
+// Allows controlling readonly map
+export default MapControlComponent = (function() {
+  MapControlComponent = class MapControlComponent extends React.Component {
+    static initClass() {
+      this.propTypes = {
+        schema: PropTypes.object.isRequired, // Schema to use
+        dataSource: PropTypes.object.isRequired,
+        design: PropTypes.object.isRequired,  // See Map Design.md
+        onDesignChange: PropTypes.func.isRequired
+      };
+       // Called with new design
+    }
 
-  render: ->
-    R 'div', style: { padding: 5 },
-      R MapLayersDesignerComponent, 
-        schema: @props.schema
-        dataSource: @props.dataSource
-        design: @props.design
-        onDesignChange: @props.onDesignChange
-        allowEditingLayers: false
+    render() {
+      return R('div', {style: { padding: 5 }},
+        R(MapLayersDesignerComponent, { 
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          design: this.props.design,
+          onDesignChange: this.props.onDesignChange,
+          allowEditingLayers: false
+        }
+        ),
 
-      R('br')
+        R('br'),
 
-      R 'div', className: "form-group",
-        R 'label', className: "text-muted", 
-          "Map Style"
+        R('div', {className: "form-group"},
+          R('label', {className: "text-muted"}, 
+            "Map Style"),
   
-        R BaseLayerDesignerComponent,
-          design: @props.design
-          onDesignChange: @props.onDesignChange
+          R(BaseLayerDesignerComponent, {
+            design: this.props.design,
+            onDesignChange: this.props.onDesignChange
+          }
+          )
+        )
+      );
+    }
+  };
+  MapControlComponent.initClass();
+  return MapControlComponent;
+})();
 

@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     "table": "entities.water_point",
     "showRowNumbers": true,
     "columns": [
@@ -109,4 +109,4 @@ module.exports = {
             "width": 150
         }
     ]
-}
+};

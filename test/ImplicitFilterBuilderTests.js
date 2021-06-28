@@ -1,63 +1,65 @@
-_ = require 'lodash'
-assert = require('chai').assert
-fixtures = require './fixtures'
-ImplicitFilterBuilder = require '../src/ImplicitFilterBuilder'
-canonical = require 'canonical-json'
+import _ from 'lodash';
+import { assert } from 'chai';
+import fixtures from './fixtures';
+import ImplicitFilterBuilder from '../src/ImplicitFilterBuilder';
+import canonical from 'canonical-json';
 
-compare = (actual, expected) ->
-  assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n"
+const compare = (actual, expected) => assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n");
 
-describe "ImplicitFilterBuilder", ->
-  before ->
-    @schema = fixtures.simpleSchema()
-    @builder = new ImplicitFilterBuilder(@schema)
+describe("ImplicitFilterBuilder", function() {
+  before(function() {
+    this.schema = fixtures.simpleSchema();
+    return this.builder = new ImplicitFilterBuilder(this.schema);
+  });
 
-  it "finds n-1 join if child filterable", ->
-    joins = @builder.findJoins(["t1", "t2"])
-    compare joins, [{ table: "t2", column: "2-1" }]
+  it("finds n-1 join if child filterable", function() {
+    const joins = this.builder.findJoins(["t1", "t2"]);
+    return compare(joins, [{ table: "t2", column: "2-1" }]);
+});
 
-  it "finds nothing if child not filterable", ->
-    joins = @builder.findJoins(["t1"])
-    compare joins, []
+  it("finds nothing if child not filterable", function() {
+    const joins = this.builder.findJoins(["t1"]);
+    return compare(joins, []);
+});
 
-  it "extends filter", ->
-    filters = [{ table: "t1", jsonql: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "number"}, 3] } }]
+  it("extends filter", function() {
+    const filters = [{ table: "t1", jsonql: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "number"}, 3] } }];
 
-    extFilters = @builder.extendFilters(["t1", "t2"], filters)
+    const extFilters = this.builder.extendFilters(["t1", "t2"], filters);
 
-    compare extFilters, [
-      { table: "t1", jsonql: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "number"}, 3] } }
-      # Uses exists where
+    return compare(extFilters, [
+      { table: "t1", jsonql: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "number"}, 3] } },
+      // Uses exists where
       {
-        table: "t2"
+        table: "t2",
         jsonql: {
-          type: "op"
-          op: "or"
+          type: "op",
+          op: "or",
           exprs: [
             {
-              type: "op"
-              op: "exists"
+              type: "op",
+              op: "exists",
               exprs: [
                 { 
-                  type: "query"
-                  selects: []
-                  from: { type: "table", table: "t1", alias: "explicit" }
+                  type: "query",
+                  selects: [],
+                  from: { type: "table", table: "t1", alias: "explicit" },
                   where: {
-                    type: "op"
-                    op: "and"
+                    type: "op",
+                    op: "and",
                     exprs: [
-                      # Join
-                      { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "explicit", column: "primary"}, { type: "field", tableAlias: "{alias}", column: "t1"}]}
-                      # Filter
+                      // Join
+                      { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "explicit", column: "primary"}, { type: "field", tableAlias: "{alias}", column: "t1"}]},
+                      // Filter
                       { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "explicit", column: "number"}, 3] }
                     ]
                   }
                 }
               ]
-            }
+            },
             {
-              type: "op"
-              op: "is null"
+              type: "op",
+              op: "is null",
               exprs: [
                 { type: "field", tableAlias: "{alias}", column: "t1" }
               ]
@@ -65,6 +67,8 @@ describe "ImplicitFilterBuilder", ->
           ]
         }
       }
-    ]
+    ]);
+});
 
-  it "unifies multiple filters"
+  return it("unifies multiple filters");
+});

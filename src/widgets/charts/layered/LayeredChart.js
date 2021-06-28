@@ -1,293 +1,343 @@
-_ = require 'lodash'
-React = require 'react'
-R = React.createElement
-async = require 'async'
-produce = require('immer').default
-original = require('immer').original
+let LayeredChart;
+import _ from 'lodash';
+import React from 'react';
+const R = React.createElement;
+import async from 'async';
+import { default as produce } from 'immer';
+import { original } from 'immer';
+import Chart from '../Chart';
+import LayeredChartCompiler from './LayeredChartCompiler';
+import { ExprCleaner } from 'mwater-expressions';
+import AxisBuilder from '../../../axes/AxisBuilder';
+import LayeredChartSvgFileSaver from './LayeredChartSvgFileSaver';
+import LayeredChartUtils from './LayeredChartUtils';
+import TextWidget from '../../text/TextWidget';
 
-Chart = require '../Chart'
-LayeredChartCompiler = require './LayeredChartCompiler'
-ExprCleaner = require('mwater-expressions').ExprCleaner
-AxisBuilder = require '../../../axes/AxisBuilder'
-LayeredChartSvgFileSaver = require './LayeredChartSvgFileSaver'
-LayeredChartUtils = require './LayeredChartUtils'
-TextWidget = require '../../text/TextWidget'
+// See LayeredChart Design.md for the design
+export default LayeredChart = class LayeredChart extends Chart {
+  cleanDesign(design, schema) {
+    const exprCleaner = new ExprCleaner(schema);
+    const axisBuilder = new AxisBuilder({schema});
+    const compiler = new LayeredChartCompiler({schema});
 
-# See LayeredChart Design.md for the design
-module.exports = class LayeredChart extends Chart
-  cleanDesign: (design, schema) ->
-    exprCleaner = new ExprCleaner(schema)
-    axisBuilder = new AxisBuilder(schema: schema)
-    compiler = new LayeredChartCompiler(schema: schema)
+    const layers = design.layers || [{}];
 
-    layers = design.layers or [{}]
+    return produce(design, draft => {
+      // Fill in defaults
+      draft.version = design.version || 2;
+      draft.layers = layers;
 
-    return produce(design, (draft) =>
-      # Fill in defaults
-      draft.version = design.version or 2
-      draft.layers = layers
+      // Default to titleText (legacy)
+      draft.header = design.header || { style: "header", items: _.compact([design.titleText || null]) };
+      draft.footer = design.footer || { style: "footer", items: [] };
 
-      # Default to titleText (legacy)
-      draft.header = design.header or { style: "header", items: _.compact([design.titleText or null]) }
-      draft.footer = design.footer or { style: "footer", items: [] }
+      // Default value is now ""
+      if (draft.version < 2) {
+        if ((design.xAxisLabelText == null)) {
+          draft.xAxisLabelText = "";
+        }
+        if ((design.yAxisLabelText == null)) {
+          draft.yAxisLabelText = "";
+        }
+        draft.version = 2;
+      }
 
-      # Default value is now ""
-      if draft.version < 2
-        if not design.xAxisLabelText?
-          draft.xAxisLabelText = ""
-        if not design.yAxisLabelText?
-          draft.yAxisLabelText = ""
-        draft.version = 2
+      // Clean each layer
+      for (let layerId = 0, end = layers.length, asc = 0 <= end; asc ? layerId < end : layerId > end; asc ? layerId++ : layerId--) {
+        const layer = draft.layers[layerId];
 
-      # Clean each layer
-      for layerId in [0...layers.length]
-        layer = draft.layers[layerId]
+        layer.axes = layer.axes || {};
 
-        layer.axes = layer.axes or {}
+        for (let axisKey in layer.axes) {
+          // Determine what aggregation axis requires
+          var aggrNeed;
+          const axis = layer.axes[axisKey];
+          if ((axisKey === "y") && compiler.doesLayerNeedGrouping(draft, layerId)) {
+            aggrNeed = "required";
+          } else {
+            aggrNeed = "none";
+          }
+          layer.axes[axisKey] = axisBuilder.cleanAxis({axis: (axis ? original(axis) : null), table: layer.table, aggrNeed, types: LayeredChartUtils.getAxisTypes(draft, layer, axisKey)});
+        }
 
-        for axisKey, axis of layer.axes
-          # Determine what aggregation axis requires
-          if axisKey == "y" and compiler.doesLayerNeedGrouping(draft, layerId)
-            aggrNeed = "required"
-          else
-            aggrNeed = "none"
-          layer.axes[axisKey] = axisBuilder.cleanAxis(axis: (if axis then original(axis) else null), table: layer.table, aggrNeed: aggrNeed, types: LayeredChartUtils.getAxisTypes(draft, layer, axisKey))
+        // Remove x axis if not required
+        if (!compiler.canLayerUseXExpr(draft, layerId) && layer.axes.x) {
+          delete layer.axes.x;
+        }
 
-        # Remove x axis if not required
-        if not compiler.canLayerUseXExpr(draft, layerId) and layer.axes.x
-          delete layer.axes.x
+        // Remove cumulative if x is not date or number
+        if (!layer.axes.x || !axisBuilder.doesAxisSupportCumulative(layer.axes.x)) {
+          delete layer.cumulative;
+        }
 
-        # Remove cumulative if x is not date or number
-        if not layer.axes.x or not axisBuilder.doesAxisSupportCumulative(layer.axes.x)
-          delete layer.cumulative
+        layer.filter = exprCleaner.cleanExpr((layer.filter ? original(layer.filter) : null), { table: layer.table, types: ['boolean'] });
 
-        layer.filter = exprCleaner.cleanExpr((if layer.filter then original(layer.filter) else null), { table: layer.table, types: ['boolean'] })
+        // No trendline if cumulative, or if has color axis
+        if (layer.trendline && (layer.cumulative || layer.axes.color)) {
+          delete layer.trendline;
+        }
+      }
 
-        # No trendline if cumulative, or if has color axis
-        if layer.trendline and (layer.cumulative or layer.axes.color)
-          delete layer.trendline
+    });
+  }
 
-      return
-    )
+  validateDesign(design, schema) {
+    let error;
+    let axisBuilder = new AxisBuilder({schema});
+    const compiler = new LayeredChartCompiler({schema});
 
-  validateDesign: (design, schema) ->
-    axisBuilder = new AxisBuilder(schema: schema)
-    compiler = new LayeredChartCompiler(schema: schema)
+    // Check that layers have same x axis type
+    const xAxisTypes = _.uniq(_.map(design.layers, l => { 
+      axisBuilder = new AxisBuilder({schema});
+      return axisBuilder.getAxisType(l.axes.x);
+  }));
 
-    # Check that layers have same x axis type
-    xAxisTypes = _.uniq(_.map(design.layers, (l) => 
-      axisBuilder = new AxisBuilder(schema: schema)
-      return axisBuilder.getAxisType(l.axes.x)))
-
-    if xAxisTypes.length > 1
-      return "All x axes must be of same type"
-
-    for layerId in [0...design.layers.length]
-      layer = design.layers[layerId]
-
-      # Check that has table
-      if not layer.table
-        return "Missing data source"
-
-      # Check that has y axis
-      if not layer.axes.y
-        return "Missing Y Axis"
-
-      if not layer.axes.x and compiler.isXAxisRequired(design, layerId)
-        return "Missing X Axis"
-      if not layer.axes.color and compiler.isColorAxisRequired(design, layerId)
-        return "Missing Color Axis"
-
-      error = null
-
-      # Validate axes
-      error = error or axisBuilder.validateAxis(axis: layer.axes.x)
-      error = error or axisBuilder.validateAxis(axis: layer.axes.y)
-      error = error or axisBuilder.validateAxis(axis: layer.axes.color)
-
-    return error
-
-  isEmpty: (design) ->
-    return not design.layers or not design.layers[0] or not design.layers[0].table
-
-  # Creates a design element with specified options
-  # options include:
-  #   schema: schema to use
-  #   dataSource: dataSource to use
-  #   design: design 
-  #   onDesignChange: function
-  #   filters: array of filters
-  createDesignerElement: (options) ->
-    # Require here to prevent server require problems
-    LayeredChartDesignerComponent = require './LayeredChartDesignerComponent'
-    props = {
-      schema: options.schema
-      dataSource: options.dataSource
-      design: @cleanDesign(options.design, options.schema)
-      filters: options.filters
-      onDesignChange: (design) =>
-        # Clean design
-        design = @cleanDesign(design, options.schema)
-        options.onDesignChange(design)
+    if (xAxisTypes.length > 1) {
+      return "All x axes must be of same type";
     }
-    return React.createElement(LayeredChartDesignerComponent, props)
 
-  # Get data for the chart asynchronously 
-  # design: design of the chart
-  # schema: schema to use
-  # dataSource: data source to get data from
-  # filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
-  # callback: (error, data)
-  getData: (design, schema, dataSource, filters, callback) ->
-    compiler = new LayeredChartCompiler(schema: schema)
-    queries = compiler.createQueries(design, filters)
+    for (let layerId = 0, end = design.layers.length, asc = 0 <= end; asc ? layerId < end : layerId > end; asc ? layerId++ : layerId--) {
+      const layer = design.layers[layerId];
 
-    # Run queries in parallel
-    async.map _.pairs(queries), (item, cb) =>
-      dataSource.performQuery(item[1], (err, rows) =>
-        cb(err, [item[0], rows])
-        )
-    , (err, items) =>
-      if err
-        return callback(err)
+      // Check that has table
+      if (!layer.table) {
+        return "Missing data source";
+      }
 
-      data = _.object(items)
+      // Check that has y axis
+      if (!layer.axes.y) {
+        return "Missing Y Axis";
+      }
 
-      # Add header and footer data
-      textWidget = new TextWidget()
-      textWidget.getData design.header, schema, dataSource, filters, (error, headerData) =>
-        if error
-          return callback(error)
+      if (!layer.axes.x && compiler.isXAxisRequired(design, layerId)) {
+        return "Missing X Axis";
+      }
+      if (!layer.axes.color && compiler.isColorAxisRequired(design, layerId)) {
+        return "Missing Color Axis";
+      }
 
-        data.header = headerData
+      error = null;
 
-        textWidget.getData design.footer, schema, dataSource, filters, (error, footerData) =>
-          if error
-            return callback(error)
+      // Validate axes
+      error = error || axisBuilder.validateAxis({axis: layer.axes.x});
+      error = error || axisBuilder.validateAxis({axis: layer.axes.y});
+      error = error || axisBuilder.validateAxis({axis: layer.axes.color});
+    }
 
-          data.footer = footerData
+    return error;
+  }
+
+  isEmpty(design) {
+    return !design.layers || !design.layers[0] || !design.layers[0].table;
+  }
+
+  // Creates a design element with specified options
+  // options include:
+  //   schema: schema to use
+  //   dataSource: dataSource to use
+  //   design: design 
+  //   onDesignChange: function
+  //   filters: array of filters
+  createDesignerElement(options) {
+    // Require here to prevent server require problems
+    const LayeredChartDesignerComponent = require('./LayeredChartDesignerComponent');
+    const props = {
+      schema: options.schema,
+      dataSource: options.dataSource,
+      design: this.cleanDesign(options.design, options.schema),
+      filters: options.filters,
+      onDesignChange: design => {
+        // Clean design
+        design = this.cleanDesign(design, options.schema);
+        return options.onDesignChange(design);
+      }
+    };
+    return React.createElement(LayeredChartDesignerComponent, props);
+  }
+
+  // Get data for the chart asynchronously 
+  // design: design of the chart
+  // schema: schema to use
+  // dataSource: data source to get data from
+  // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
+  // callback: (error, data)
+  getData(design, schema, dataSource, filters, callback) {
+    const compiler = new LayeredChartCompiler({schema});
+    const queries = compiler.createQueries(design, filters);
+
+    // Run queries in parallel
+    return async.map(_.pairs(queries), (item, cb) => {
+      return dataSource.performQuery(item[1], (err, rows) => {
+        return cb(err, [item[0], rows]);
+        });
+    }
+    , (err, items) => {
+      if (err) {
+        return callback(err);
+      }
+
+      const data = _.object(items);
+
+      // Add header and footer data
+      const textWidget = new TextWidget();
+      return textWidget.getData(design.header, schema, dataSource, filters, (error, headerData) => {
+        if (error) {
+          return callback(error);
+        }
+
+        data.header = headerData;
+
+        return textWidget.getData(design.footer, schema, dataSource, filters, (error, footerData) => {
+          if (error) {
+            return callback(error);
+          }
+
+          data.footer = footerData;
     
-          callback(null, data)
+          return callback(null, data);
+        });
+      });
+    });
+  }
 
-  # Create a view element for the chart
-  # Options include:
-  #   schema: schema to use
-  #   dataSource: dataSource to use
-  #   design: design of the chart
-  #   onDesignChange: when design changes
-  #   data: results from queries
-  #   width, height: size of the chart view
-  #   scope: current scope of the view element
-  #   onScopeChange: called when scope changes with new scope
-  createViewElement: (options) ->
-    LayeredChartViewComponent = require './LayeredChartViewComponent'
+  // Create a view element for the chart
+  // Options include:
+  //   schema: schema to use
+  //   dataSource: dataSource to use
+  //   design: design of the chart
+  //   onDesignChange: when design changes
+  //   data: results from queries
+  //   width, height: size of the chart view
+  //   scope: current scope of the view element
+  //   onScopeChange: called when scope changes with new scope
+  createViewElement(options) {
+    const LayeredChartViewComponent = require('./LayeredChartViewComponent');
     
-    # Create chart
-    props = {
-      schema: options.schema
-      dataSource: options.dataSource
-      design: @cleanDesign(options.design, options.schema)
-      onDesignChange: options.onDesignChange
-      data: options.data
+    // Create chart
+    const props = {
+      schema: options.schema,
+      dataSource: options.dataSource,
+      design: this.cleanDesign(options.design, options.schema),
+      onDesignChange: options.onDesignChange,
+      data: options.data,
 
-      width: options.width
-      height: options.height
+      width: options.width,
+      height: options.height,
 
-      scope: options.scope
+      scope: options.scope,
       onScopeChange: options.onScopeChange
+    };
+
+    return React.createElement(LayeredChartViewComponent, props);
+  }
+
+  createDropdownItems(design, schema, widgetDataSource, filters) {
+    // TODO validate design before allowing save
+    const save = format => {
+      design = this.cleanDesign(design, schema);
+      return widgetDataSource.getData(design, filters, (err, data) => {
+        if (err) {
+          return alert("Unable to load data");
+        } else {
+          return LayeredChartSvgFileSaver.save(design, data, schema, format);
+        }
+      });
+    };
+
+    // Don't save image of invalid design
+    if (this.validateDesign(this.cleanDesign(design, schema), schema)) {
+      return [];
     }
-
-    return React.createElement(LayeredChartViewComponent, props)
-
-  createDropdownItems: (design, schema, widgetDataSource, filters) ->
-    # TODO validate design before allowing save
-    save = (format) =>
-      design = @cleanDesign(design, schema)
-      widgetDataSource.getData design, filters, (err, data) =>
-        if err
-          alert("Unable to load data")
-        else
-          LayeredChartSvgFileSaver.save(design, data, schema, format)
-
-    # Don't save image of invalid design
-    if @validateDesign(@cleanDesign(design, schema), schema)
-      return []
 
     return [
-      { label: "Save as SVG", icon: "picture", onClick: save.bind(null, "svg") }
+      { label: "Save as SVG", icon: "picture", onClick: save.bind(null, "svg") },
       { label: "Save as PNG", icon: "camera", onClick: save.bind(null, "png") }
-    ]
+    ];
+  }
 
-  createDataTable: (design, schema, dataSource, data, locale) ->
-    axisBuilder = new AxisBuilder(schema: schema)
+  createDataTable(design, schema, dataSource, data, locale) {
+    let table;
+    const axisBuilder = new AxisBuilder({schema});
 
-    # Export only first layer
-    headers = []
+    // Export only first layer
+    const headers = [];
 
-    # for layer, data of 
-    xAdded = false
-    for layer in design.layers
-      if layer.axes.x and not xAdded
-        headers.push(axisBuilder.summarizeAxis(layer.axes.x, locale))
-        xAdded = true
-      if layer.axes.color
-        headers.push(axisBuilder.summarizeAxis(layer.axes.color, locale))
-      if layer.axes.y
-        headers.push(axisBuilder.summarizeAxis(layer.axes.y, locale))
-      table = [headers]
+    // for layer, data of 
+    let xAdded = false;
+    for (let layer of design.layers) {
+      if (layer.axes.x && !xAdded) {
+        headers.push(axisBuilder.summarizeAxis(layer.axes.x, locale));
+        xAdded = true;
+      }
+      if (layer.axes.color) {
+        headers.push(axisBuilder.summarizeAxis(layer.axes.color, locale));
+      }
+      if (layer.axes.y) {
+        headers.push(axisBuilder.summarizeAxis(layer.axes.y, locale));
+      }
+      table = [headers];
+    }
 
-    k = 0
-    for row in data.layer0
-      r = []
-      xAdded = false
-      for j in [0..design.layers.length-1]
-        _row = data["layer#{j}"][k]
-        if design.layers[j].axes.x and not xAdded
-          r.push(axisBuilder.formatValue(design.layers[j].axes.x, _row.x, locale))
-          xAdded = true
-        if design.layers[j].axes.color
-          r.push(axisBuilder.formatValue(design.layers[j].axes.color, _row.color, locale))
-        if design.layers[j].axes.y
-          r.push(axisBuilder.formatValue(design.layers[j].axes.y, _row.y, locale))
+    let k = 0;
+    for (let row of data.layer0) {
+      const r = [];
+      xAdded = false;
+      for (let j = 0, end = design.layers.length-1, asc = 0 <= end; asc ? j <= end : j >= end; asc ? j++ : j--) {
+        const _row = data[`layer${j}`][k];
+        if (design.layers[j].axes.x && !xAdded) {
+          r.push(axisBuilder.formatValue(design.layers[j].axes.x, _row.x, locale));
+          xAdded = true;
+        }
+        if (design.layers[j].axes.color) {
+          r.push(axisBuilder.formatValue(design.layers[j].axes.color, _row.color, locale));
+        }
+        if (design.layers[j].axes.y) {
+          r.push(axisBuilder.formatValue(design.layers[j].axes.y, _row.y, locale));
+        }
+      }
       
-      k++
-      table.push(r)
+      k++;
+      table.push(r);
+    }
 
-    # k = 0
-    # for layer, layerData of data
-    #   xAdded = false
-    #   r = []
-    #   for row in layerData
-    #     if design.layers[k].axes.x and not xAdded
-    #       r.push(axisBuilder.formatValue(design.layers[k].axes.x, row.x, locale))
-    #       xAdded = true
-    #     if design.layers[k].axes.color
-    #       r.push(axisBuilder.formatValue(design.layers[k].axes.color, row.color, locale))
-    #     if design.layers[k].axes.y
-    #       r.push(axisBuilder.formatValue(design.layers[k].axes.y, row.y, locale))
+    // k = 0
+    // for layer, layerData of data
+    //   xAdded = false
+    //   r = []
+    //   for row in layerData
+    //     if design.layers[k].axes.x and not xAdded
+    //       r.push(axisBuilder.formatValue(design.layers[k].axes.x, row.x, locale))
+    //       xAdded = true
+    //     if design.layers[k].axes.color
+    //       r.push(axisBuilder.formatValue(design.layers[k].axes.color, row.color, locale))
+    //     if design.layers[k].axes.y
+    //       r.push(axisBuilder.formatValue(design.layers[k].axes.y, row.y, locale))
         
-    #   table.push(r)
-    #   k++
-    return table
-  #   if data.length > 0
-  #   fields = Object.getOwnPropertyNames(data[0])
-  #   table = [fields] # header
-  #   renderRow = (record) ->
-  #      _.map(fields, (field) -> record[field])
-  #   table.concat(_.map(data, renderRow))
-  # else []
+    //   table.push(r)
+    //   k++
+    return table;
+  }
+  //   if data.length > 0
+  //   fields = Object.getOwnPropertyNames(data[0])
+  //   table = [fields] # header
+  //   renderRow = (record) ->
+  //      _.map(fields, (field) -> record[field])
+  //   table.concat(_.map(data, renderRow))
+  // else []
 
 
-  # Get a list of table ids that can be filtered on
-  getFilterableTables: (design, schema) ->
-    filterableTables = _.uniq(_.compact(_.map(design.layers, (layer) -> layer.table)))
+  // Get a list of table ids that can be filtered on
+  getFilterableTables(design, schema) {
+    let filterableTables = _.uniq(_.compact(_.map(design.layers, layer => layer.table)));
 
-    # Get filterable tables from header and footer
-    textWidget = new TextWidget()
-    filterableTables = _.union(filterableTables, textWidget.getFilterableTables(design.header, schema))
-    filterableTables = _.union(filterableTables, textWidget.getFilterableTables(design.footer, schema))
+    // Get filterable tables from header and footer
+    const textWidget = new TextWidget();
+    filterableTables = _.union(filterableTables, textWidget.getFilterableTables(design.header, schema));
+    filterableTables = _.union(filterableTables, textWidget.getFilterableTables(design.footer, schema));
 
-    return filterableTables
+    return filterableTables;
+  }
 
-  # Get the chart placeholder icon. fa-XYZ or glyphicon-XYZ
-  getPlaceholderIcon: -> "fa-bar-chart"
+  // Get the chart placeholder icon. fa-XYZ or glyphicon-XYZ
+  getPlaceholderIcon() { return "fa-bar-chart"; }
+};

@@ -1,43 +1,48 @@
-assert = require('chai').assert
-fixtures = require '../fixtures'
-_ = require 'lodash'
-React = require 'react'
-R = React.createElement
+import { assert } from 'chai';
+import fixtures from '../fixtures';
+import _ from 'lodash';
+import React from 'react';
+const R = React.createElement;
 
-DashboardUtils = require '../../src/dashboards/DashboardUtils'
+import DashboardUtils from '../../src/dashboards/DashboardUtils';
+import canonical from 'canonical-json';
 
-canonical = require 'canonical-json'
+const compare = (actual, expected) => assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected));
 
-compare = (actual, expected) ->
-  assert.equal canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected)
+describe("DashboardUtils", function() {
+  before(function() {
+    return this.schema = fixtures.simpleSchema();
+  });
 
-describe "DashboardUtils", ->
-  before ->
-    @schema = fixtures.simpleSchema()
+  it("gets filterable tables", function() {
+    return assert.deepEqual(DashboardUtils.getFilterableTables(simpleDashboardDesign, this.schema), ["t1"]);
+});
 
-  it "gets filterable tables", ->
-    assert.deepEqual DashboardUtils.getFilterableTables(simpleDashboardDesign, @schema), ["t1"]
-
-  it "compiles filters", ->
-    design = _.extend({}, simpleDashboardDesign, filters: {
+  it("compiles filters", function() {
+    const design = _.extend({}, simpleDashboardDesign, { filters: {
       "t1": { type: "op", op: ">", table: "t1", exprs: [{ type: "field", table: "t1", column: "number" }, { type: "literal", value: 4 } ]}
-    })
-    compiledFilters = DashboardUtils.getCompiledFilters(design, @schema, ["t1"])
-    assert.deepEqual compiledFilters, [
+    }
+  });
+    const compiledFilters = DashboardUtils.getCompiledFilters(design, this.schema, ["t1"]);
+    return assert.deepEqual(compiledFilters, [
       {"table":"t1","jsonql":{"type":"op","op":">","exprs":[{"type":"field","tableAlias":"{alias}","column":"number"},{"type":"literal","value":4}]}}
-    ]
+    ]);
+});
 
-  it "compiles global filters", ->
-    design = _.extend({}, simpleDashboardDesign, globalFilters: [
+  return it("compiles global filters", function() {
+    const design = _.extend({}, simpleDashboardDesign, { globalFilters: [
       { columnId: "number", columnType: "number", op: ">", exprs: [{ type: "literal", value: 4 }]}
-    ])
-
-    compiledFilters = DashboardUtils.getCompiledFilters(design, @schema, ["t1"])
-    assert.deepEqual compiledFilters, [
-      {"table":"t1","jsonql":{"type":"op","op":">","exprs":[{"type":"field","tableAlias":"{alias}","column":"number"},{"type":"literal","value":4}]}}
     ]
+  });
 
-simpleDashboardDesign = {
+    const compiledFilters = DashboardUtils.getCompiledFilters(design, this.schema, ["t1"]);
+    return assert.deepEqual(compiledFilters, [
+      {"table":"t1","jsonql":{"type":"op","op":">","exprs":[{"type":"field","tableAlias":"{alias}","column":"number"},{"type":"literal","value":4}]}}
+    ]);
+});
+});
+
+var simpleDashboardDesign = {
   "items": {
     "id": "root",
     "type": "root",
@@ -91,4 +96,4 @@ simpleDashboardDesign = {
   "popups": [],
   "filters": {},
   "implicitFiltersEnabled": false
-}
+};

@@ -1,59 +1,67 @@
-PropTypes = require 'prop-types'
-_ = require 'lodash'
-React = require 'react'
-H = React.DOM
-R = React.createElement
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import React from 'react';
+const H = React.DOM;
+const R = React.createElement;
 
-datagridDesign = require './datagridDesign'
-
-storiesOf = require('@kadira/storybook').storiesOf
-
-DatagridComponent = require '../src/datagrids/DatagridComponent'
-DirectDatagridDataSource = require '../src/datagrids/DirectDatagridDataSource'
-MWaterLoaderComponent = require '../src/MWaterLoaderComponent'
-UpdateableComponent = require './UpdateableComponent'
+import datagridDesign from './datagridDesign';
+import { storiesOf } from '@kadira/storybook';
+import DatagridComponent from '../src/datagrids/DatagridComponent';
+import DirectDatagridDataSource from '../src/datagrids/DirectDatagridDataSource';
+import MWaterLoaderComponent from '../src/MWaterLoaderComponent';
+import UpdateableComponent from './UpdateableComponent';
 
 storiesOf('Datagrid', module)
-  .add 'datagrid with serial number', => 
-    R SerialNumberDatagrid, design: datagridDesign
+  .add('datagrid with serial number', () => { 
+    return R(SerialNumberDatagrid, {design: datagridDesign});
+});
 
 
-class SerialNumberDatagrid extends React.Component
-  @propTypes:
-    design: PropTypes.object.isRequired
+class SerialNumberDatagrid extends React.Component {
+  static initClass() {
+    this.propTypes =
+      {design: PropTypes.object.isRequired};
+  }
 
-  render: ->
-    R UpdateableComponent, 
-      design: @props.design
-      (state, update) =>
-        apiUrl = "https://api.mwater.co/v3/"
-        R MWaterLoaderComponent, {
-          apiUrl: apiUrl
-          client: null
+  render() {
+    return R(UpdateableComponent, 
+      {design: this.props.design},
+      (state, update) => {
+        const apiUrl = "https://api.mwater.co/v3/";
+        return R(MWaterLoaderComponent, {
+          apiUrl,
+          client: null,
           user: null
-          # onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
-          # extraTables: @state.extraTables
-        }, (error, config) =>
-          if error
-            alert("Error: " + error.message)
-            return null
+          // onExtraTablesChange: (extraTables) => @setState(extraTables: extraTables)
+          // extraTables: @state.extraTables
+        }, (error, config) => {
+          if (error) {
+            alert("Error: " + error.message);
+            return null;
+          }
 
-          datagridDataSource = new DirectDatagridDataSource({
-            # apiUrl: apiUrl
-            # client: null
-            # design: state.design
-            schema: config.schema
+          const datagridDataSource = new DirectDatagridDataSource({
+            // apiUrl: apiUrl
+            // client: null
+            // design: state.design
+            schema: config.schema,
             dataSource: config.dataSource
-          })
+          });
 
-          H.div style: { height: 800 },
+          return H.div({style: { height: 800 }},
             React.createElement(DatagridComponent, {
-              schema: config.schema
-              dataSource: config.dataSource
-              datagridDataSource: datagridDataSource
-              design: state.design
-              onDesignChange: update("design")
-              titleElem: "Sample"
+              schema: config.schema,
+              dataSource: config.dataSource,
+              datagridDataSource,
+              design: state.design,
+              onDesignChange: update("design"),
+              titleElem: "Sample",
               height: 400
-              # quickfilterLocks: [{ expr: { type: "field", table: "entities.water_point", column: "type" }, value: "Protected dug well" }]
+              // quickfilterLocks: [{ expr: { type: "field", table: "entities.water_point", column: "type" }, value: "Protected dug well" }]
             })
+          );
+        });
+    });
+  }
+}
+SerialNumberDatagrid.initClass();

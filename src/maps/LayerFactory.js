@@ -1,38 +1,50 @@
-MWaterServerLayer = require './MWaterServerLayer'
-MarkersLayer = require('./MarkersLayer').default
-BufferLayer = require('./BufferLayer').default
-ChoroplethLayer = require('./ChoroplethLayer').default
-ClusterLayer = require('./ClusterLayer').default
-TileUrlLayer = require './TileUrlLayer'
-SwitchableTileUrlLayer = require('./SwitchableTileUrlLayer').default
-GridLayer = require('./GridLayer').default
+let LayerFactory;
+import MWaterServerLayer from './MWaterServerLayer';
+import { default as MarkersLayer } from './MarkersLayer';
+import { default as BufferLayer } from './BufferLayer';
+import { default as ChoroplethLayer } from './ChoroplethLayer';
+import { default as ClusterLayer } from './ClusterLayer';
+import TileUrlLayer from './TileUrlLayer';
+import { default as SwitchableTileUrlLayer } from './SwitchableTileUrlLayer';
+import { default as GridLayer } from './GridLayer';
 
-module.exports = class LayerFactory
-  @createLayer: (type) ->
-    switch type
-      when "MWaterServer"
-        return new MWaterServerLayer()
+export default LayerFactory = class LayerFactory {
+  static createLayer(type) {
+    switch (type) {
+      case "MWaterServer":
+        return new MWaterServerLayer();
+        break;
 
-      when "Markers"
-        return new MarkersLayer()
+      case "Markers":
+        return new MarkersLayer();
+        break;
 
-      when "Buffer"
-        return new BufferLayer()
+      case "Buffer":
+        return new BufferLayer();
+        break;
 
-      # Uses a legacy type name
-      when "AdminChoropleth"
-        return new ChoroplethLayer()
+      // Uses a legacy type name
+      case "AdminChoropleth":
+        return new ChoroplethLayer();
+        break;
 
-      when "Cluster"
-        return new ClusterLayer()
+      case "Cluster":
+        return new ClusterLayer();
+        break;
 
-      when "TileUrl"
-        return new TileUrlLayer()
+      case "TileUrl":
+        return new TileUrlLayer();
+        break;
 
-      when "SwitchableTileUrl"
-        return new SwitchableTileUrlLayer()
+      case "SwitchableTileUrl":
+        return new SwitchableTileUrlLayer();
+        break;
 
-      when "Grid"
-        return new GridLayer()
+      case "Grid":
+        return new GridLayer();
+        break;
+    }
 
-    throw new Error("Unknown type #{type}")
+    throw new Error(`Unknown type ${type}`);
+  }
+};

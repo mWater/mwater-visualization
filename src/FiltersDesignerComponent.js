@@ -1,45 +1,66 @@
-_ = require 'lodash'
-PropTypes = require('prop-types')
-React = require 'react'
-R = React.createElement
-FilterExprComponent = require("mwater-expressions-ui").FilterExprComponent
-ExprCleaner = require('mwater-expressions').ExprCleaner
-ExprUtils = require('mwater-expressions').ExprUtils
+let FiltersDesignerComponent;
+import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
+const R = React.createElement;
+import { FilterExprComponent } from "mwater-expressions-ui";
+import { ExprCleaner } from 'mwater-expressions';
+import { ExprUtils } from 'mwater-expressions';
 
-# Designer for filters of multiple tables. Used for maps and dashboards
-# Filters are in format mwater-expression filter expression indexed by table. e.g. { sometable: logical expression, etc. }
-module.exports = class FiltersDesignerComponent extends React.Component
-  @propTypes:
-    schema: PropTypes.object.isRequired # Schema to use
-    dataSource: PropTypes.object.isRequired # Data source to use
-    filterableTables: PropTypes.arrayOf(PropTypes.string) # Tables that can be filtered on. Should only include tables that actually exist
-    filters: PropTypes.object
-    onFiltersChange: PropTypes.func.isRequired # Called with new filters
+// Designer for filters of multiple tables. Used for maps and dashboards
+// Filters are in format mwater-expression filter expression indexed by table. e.g. { sometable: logical expression, etc. }
+export default FiltersDesignerComponent = (function() {
+  FiltersDesignerComponent = class FiltersDesignerComponent extends React.Component {
+    constructor(...args) {
+      super(...args);
+      this.handleFilterChange = this.handleFilterChange.bind(this);
+      this.renderFilterableTable = this.renderFilterableTable.bind(this);
+    }
 
-  @contextTypes:
-    locale: PropTypes.string  # e.g. "en"
+    static initClass() {
+      this.propTypes = {
+        schema: PropTypes.object.isRequired, // Schema to use
+        dataSource: PropTypes.object.isRequired, // Data source to use
+        filterableTables: PropTypes.arrayOf(PropTypes.string), // Tables that can be filtered on. Should only include tables that actually exist
+        filters: PropTypes.object,
+        onFiltersChange: PropTypes.func.isRequired // Called with new filters
+      };
+  
+      this.contextTypes =
+        {locale: PropTypes.string};
+        // e.g. "en"
+    }
 
-  handleFilterChange: (table, expr) =>
-    # Clean filter
-    expr = new ExprCleaner(@props.schema).cleanExpr(expr, { table: table })
+    handleFilterChange(table, expr) {
+      // Clean filter
+      expr = new ExprCleaner(this.props.schema).cleanExpr(expr, { table });
 
-    filters = _.clone(@props.filters or {})
-    filters[table] = expr
+      const filters = _.clone(this.props.filters || {});
+      filters[table] = expr;
 
-    @props.onFiltersChange(filters)
+      return this.props.onFiltersChange(filters);
+    }
 
-  renderFilterableTable: (table) =>
-    name = ExprUtils.localizeString(@props.schema.getTable(table).name, @context.locale)
+    renderFilterableTable(table) {
+      const name = ExprUtils.localizeString(this.props.schema.getTable(table).name, this.context.locale);
 
-    R 'div', key: table, 
-      R 'label', null, name
-      React.createElement(FilterExprComponent, 
-        schema: @props.schema
-        dataSource: @props.dataSource
-        onChange: @handleFilterChange.bind(null, table)
-        table: table
-        value: @props.filters?[table])
+      return R('div', {key: table}, 
+        R('label', null, name),
+        React.createElement(FilterExprComponent, { 
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          onChange: this.handleFilterChange.bind(null, table),
+          table,
+          value: this.props.filters?.[table]
+        })
+      );
+    }
 
-  render: ->
-    return R 'div', null,
-      _.map(@props.filterableTables, @renderFilterableTable)
+    render() {
+      return R('div', null,
+        _.map(this.props.filterableTables, this.renderFilterableTable));
+    }
+  };
+  FiltersDesignerComponent.initClass();
+  return FiltersDesignerComponent;
+})();
