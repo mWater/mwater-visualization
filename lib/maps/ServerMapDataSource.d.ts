@@ -39,8 +39,8 @@ export default class ServerMapDataSource implements MapDataSource {
 declare class ServerLayerDataSource implements MapLayerDataSource {
     options: ServerMapLayerDataSourceOptions;
     constructor(options: ServerMapLayerDataSourceOptions);
-    getTileUrl(design: any, filters: JsonQLFilter[]): string | null;
-    getUtfGridUrl(design: any, filters: JsonQLFilter[]): string | null;
+    getTileUrl(design: any, filters: JsonQLFilter[]): any;
+    getUtfGridUrl(design: any, filters: JsonQLFilter[]): any;
     /** Get the url for vector tile source with an expiry time. Only for layers of type "VectorTile"
      * @param createdAfter ISO 8601 timestamp requiring that tile source on server is created after specified datetime
      */

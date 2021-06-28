@@ -1,0 +1,176 @@
+/// <reference types="jquery" />
+import React from "react";
+interface MWaterCompleteTableSelectComponentProps {
+    /** Url to hit api */
+    apiUrl: string;
+    /** Optional client */
+    client?: string;
+    schema: any;
+    /** User id */
+    user?: string;
+    table?: string;
+    /** Called with table selected */
+    onChange: any;
+    extraTables: any;
+    onExtraTablesChange: any;
+}
+export default class MWaterCompleteTableSelectComponent extends React.Component<MWaterCompleteTableSelectComponentProps> {
+    static initClass(): void;
+    handleExtraTableAdd: (tableId: any) => any;
+    handleExtraTableRemove: (tableId: any) => any;
+    renderSites(): React.CElement<{
+        items: {
+            name: string;
+            desc: string;
+            onClick: any;
+        }[];
+    }, React.Component<{
+        items: {
+            name: string;
+            desc: string;
+            onClick: any;
+        }[];
+    }, any, any>>;
+    renderForms(): React.CElement<any, FormsListComponent>;
+    renderIndicators(): React.CElement<any, IndicatorsListComponent>;
+    renderIssues(): React.CElement<any, IssuesListComponent>;
+    renderSweetSense(): React.CElement<{
+        items: {
+            name: string;
+            desc: string;
+            onClick: any;
+        }[];
+    }, React.Component<{
+        items: {
+            name: string;
+            desc: string;
+            onClick: any;
+        }[];
+    }, any, any>>;
+    renderTablesets(): React.FunctionComponentElement<{
+        apiUrl: string;
+        schema: import("mwater-expressions").Schema;
+        client?: string | undefined;
+        user?: string | undefined;
+        onChange: (tableId: string | null) => void;
+        extraTables: string[];
+        onExtraTableAdd: (tableId: string) => void;
+        onExtraTableRemove: (tableId: string) => void;
+        locale?: string | undefined;
+    }>;
+    renderMetrics(): React.FunctionComponentElement<{
+        apiUrl: string;
+        schema: import("mwater-expressions").Schema;
+        client?: string | undefined;
+        user?: string | undefined;
+        onChange: (tableId: string | null) => void;
+        extraTables: string[];
+        onExtraTableAdd: (tableId: string) => void;
+        onExtraTableRemove: (tableId: string) => void;
+        locale?: string | undefined;
+    }>;
+    renderOther(): React.CElement<{
+        items: {
+            name: string;
+            desc: string;
+            onClick: any;
+        }[];
+    }, React.Component<{
+        items: {
+            name: string;
+            desc: string;
+            onClick: any;
+        }[];
+    }, any, any>>;
+    getSweetSenseTables(): unknown[];
+    render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+}
+interface FormsListComponentProps {
+    /** Url to hit api */
+    apiUrl: string;
+    /** Optional client */
+    client?: string;
+    schema: any;
+    /** User id */
+    user?: string;
+    /** Called with table selected */
+    onChange: any;
+    extraTables: any;
+    onExtraTableAdd: any;
+    onExtraTableRemove: any;
+}
+interface FormsListComponentState {
+    error: any;
+    search: any;
+    forms: any;
+}
+declare class FormsListComponent extends React.Component<FormsListComponentProps, FormsListComponentState> {
+    static initClass(): void;
+    constructor(props: any);
+    componentDidMount(): JQuery.jqXHR<any>;
+    handleTableRemove: (table: any) => any;
+    searchRef: (comp: any) => any;
+    render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement> | React.DetailedReactHTMLElement<{
+        className: string;
+    }, HTMLElement>;
+}
+interface IndicatorsListComponentProps {
+    /** Url to hit api */
+    apiUrl: string;
+    /** Optional client */
+    client?: string;
+    schema: any;
+    /** User id */
+    user?: string;
+    /** Called with table selected */
+    onChange: any;
+    extraTables: any;
+    onExtraTableAdd: any;
+    onExtraTableRemove: any;
+}
+interface IndicatorsListComponentState {
+    error: any;
+    search: any;
+    indicators: any;
+}
+declare class IndicatorsListComponent extends React.Component<IndicatorsListComponentProps, IndicatorsListComponentState> {
+    static initClass(): void;
+    constructor(props: any);
+    componentDidMount(): JQuery.jqXHR<any>;
+    handleTableRemove: (table: any) => any;
+    searchRef: (comp: any) => any;
+    handleSelect: (tableId: any) => any;
+    render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement> | React.DetailedReactHTMLElement<{
+        className: string;
+    }, HTMLElement>;
+}
+interface IssuesListComponentProps {
+    /** Url to hit api */
+    apiUrl: string;
+    /** Optional client */
+    client?: string;
+    schema: any;
+    /** User id */
+    user?: string;
+    /** Called with table selected */
+    onChange: any;
+    extraTables: any;
+    onExtraTableAdd: any;
+    onExtraTableRemove: any;
+}
+interface IssuesListComponentState {
+    error: any;
+    search: any;
+    issueTypes: any;
+}
+declare class IssuesListComponent extends React.Component<IssuesListComponentProps, IssuesListComponentState> {
+    static initClass(): void;
+    constructor(props: any);
+    componentDidMount(): JQuery.jqXHR<any>;
+    handleTableRemove: (table: any) => any;
+    searchRef: (comp: any) => any;
+    render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement> | React.DetailedReactHTMLElement<{
+        className: string;
+    }, HTMLElement>;
+}
+export {};

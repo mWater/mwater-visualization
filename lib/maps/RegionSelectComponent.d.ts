@@ -1,17 +1,21 @@
-import React from "react"
-import { Schema, DataSource } from "mwater-expressions"
-
-/** Allows selecting of a single region */
-export default class RegionSelectComponent extends React.Component<{
-  schema: Schema
-  dataSource: DataSource
-  /** _id of region */
-  region: number | null
-  onChange: (region: number | null, level: number | null) => void
-  /** Default "All Countries" */
-  placeholder?: string
-  /** e.g. "admin_regions" */
-  regionsTable: string
-  /** Maximum region level allowed */
-  maxLevel?: number
-}> {}
+import React from "react";
+interface RegionSelectComponentProps {
+    /** Schema to use */
+    schema: any;
+    dataSource: any;
+    /** _id of region */
+    region?: number;
+    /** Called with (_id, level) */
+    onChange: any;
+    placeholder?: string;
+    /** e.g. "admin_regions" */
+    regionsTable: string;
+    /** Maximum region level allowed */
+    maxLevel?: number;
+}
+export default class RegionSelectComponent extends React.Component<RegionSelectComponentProps> {
+    static initClass(): void;
+    handleChange: (id: any) => any;
+    render(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+}
+export {};

@@ -1,12 +1,10 @@
-import React from "react"
-
-/** List of options with a name and description each */
-export class OptionListComponent extends React.Component<{
-  items: { 
-    name: string
-    desc?: string
-    onClick: () => void
-    onRemove?: () => void
-  }[]
-  hint?: string
-}> {}
+declare let _SectionComponent: any;
+export { _SectionComponent as SectionComponent };
+declare let _OptionListComponent: any;
+export { _OptionListComponent as OptionListComponent };
+declare let _SwitchViewComponent: any;
+export { _SwitchViewComponent as SwitchViewComponent };
+declare let _ToggleEditComponent: any;
+export { _ToggleEditComponent as ToggleEditComponent };
+declare let _ButtonToggleComponent: any;
+export { _ButtonToggleComponent as ButtonToggleComponent };

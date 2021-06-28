@@ -1,36 +1,94 @@
-import { Schema } from "mwater-expressions";
-import { Axis } from "./Axis";
-import { JsonQLExpr } from "jsonql";
-
-type AggrNeed = "none" | "optional" | "required"
-
-declare class AxisBuilder {
-  constructor(options: { schema: Schema })
-
-  /** Clean an axis with respect to a specific table
-    options:
-     axis: axis to clean
-     table: table that axis is to be for
-     aggrNeed is "none", "optional" or "required"
-     types: optional list of types to require it to be one of
-  */
-  cleanAxis(options: { axis: Axis | null, table?: string | null, aggrNeed?: AggrNeed, types?: string[] }): Axis
-
-  /** Checks whether an axis is valid 
-    options:
-     axis: axis to validate
-  */
-  validateAxis(options: { axis: Axis | null }): string | null
-
-  /**
-   * Compile an axis to JsonQL
-   */
-  compileAxis(options: { axis: Axis, tableAlias: string }): JsonQLExpr
-
-  /** Get all categories for a given axis type given the known values
-   * Returns array of { value, label }
-   */
-  getCategories(axis: Axis, values: any[], locale?: string): { value: any, label: string }[]
-}
-
-export = AxisBuilder
+declare const _default: {
+    new (options: any): {
+        cleanAxis(options: any): any;
+        validateAxis(options: any): any;
+        compileAxis(options: any): import("jsonql").JsonQLExpr;
+        compileBinMinMax(expr: any, table: any, filterExpr: any, numBins: any): {
+            type: string;
+            selects: {
+                type: string;
+                expr: {
+                    type: string;
+                    op: string;
+                    exprs: {
+                        type: string;
+                        tableAlias: string;
+                        column: string;
+                    }[];
+                };
+                alias: string;
+            }[];
+            from: {
+                type: string;
+                query: {
+                    type: string;
+                    selects: ({
+                        type: string;
+                        expr: string | number | true | import("jsonql").JsonQLLiteral | import("jsonql").JsonQLOp | import("jsonql").JsonQLCase | import("jsonql").JsonQLScalar | import("jsonql").JsonQLField | import("jsonql").JsonQLToken;
+                        alias: string;
+                        over?: undefined;
+                    } | {
+                        type: string;
+                        expr: {
+                            type: string;
+                            op: string;
+                            exprs: any[];
+                        };
+                        over: {
+                            orderBy: {
+                                expr: string | number | true | import("jsonql").JsonQLLiteral | import("jsonql").JsonQLOp | import("jsonql").JsonQLCase | import("jsonql").JsonQLScalar | import("jsonql").JsonQLField | import("jsonql").JsonQLToken;
+                                direction: string;
+                            }[];
+                        };
+                        alias: string;
+                    })[];
+                    from: {
+                        type: string;
+                        table: any;
+                        alias: string;
+                    };
+                    where: {
+                        type: string;
+                        op: string;
+                        exprs: (string | number | true | import("jsonql").JsonQLLiteral | import("jsonql").JsonQLOp | import("jsonql").JsonQLCase | import("jsonql").JsonQLScalar | import("jsonql").JsonQLField | import("jsonql").JsonQLToken)[];
+                    };
+                };
+                alias: string;
+            };
+            where: {
+                type: string;
+                op: string;
+                exprs: any[];
+            };
+        } | null;
+        getExprTypes(types: any): any;
+        getValueColor(axis: any, value: any): any;
+        getCategories(axis: any, values: any, locale: any): {
+            value: any;
+            label: any;
+        }[];
+        getAxisType(axis: any): any;
+        isAxisAggr(axis: any): any;
+        doesAxisSupportCumulative(axis: any): boolean;
+        formatCategory(axis: any, category: any): any;
+        summarizeAxis(axis: any, locale: any): any;
+        formatValue(axis: any, value: any, locale: any, legacyPercentFormat: any): any;
+        createValueFilter(axis: any, value: any): {
+            type: string;
+            op: string;
+            exprs: (string | number | boolean | import("jsonql").JsonQLOp | import("jsonql").JsonQLCase | import("jsonql").JsonQLScalar | import("jsonql").JsonQLField | import("jsonql").JsonQLToken | {
+                type: string;
+                value: any;
+            } | null)[];
+        };
+        createValueFilterExpr(axis: any, value: any): {
+            table: any;
+            type: string;
+            op: string;
+            exprs: any[];
+        };
+        isCategorical(axis: any): boolean;
+        convertAxisToExpr(axis: any): any;
+    };
+};
+export default _default;

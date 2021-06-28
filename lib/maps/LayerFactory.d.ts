@@ -1,6 +1,5 @@
-import Layer from "./Layer";
-
-/** Creates a layer */
-export default class LayerFactory {
- static createLayer(type: string): Layer<any>
-}
+declare const _default: {
+    new (): {};
+    createLayer(type: any): any;
+};
+export default _default;

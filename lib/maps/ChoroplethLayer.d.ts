@@ -1,10 +1,10 @@
-import React from 'react';
-import Layer, { OnGridClickOptions, VectorTileDef } from './Layer';
-import { Schema, DataSource } from 'mwater-expressions';
-import { LayerDefinition, OnGridClickResults } from './maps';
-import { JsonQLFilter } from '../index';
-import ChoroplethLayerDesign from './ChoroplethLayerDesign';
-import { JsonQLQuery } from 'jsonql';
+import React from "react";
+import Layer, { OnGridClickOptions, VectorTileDef } from "./Layer";
+import { Schema, DataSource } from "mwater-expressions";
+import { LayerDefinition, OnGridClickResults } from "./maps";
+import { JsonQLFilter } from "../index";
+import ChoroplethLayerDesign from "./ChoroplethLayerDesign";
+import { JsonQLQuery } from "jsonql";
 export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     /** Gets the type of layer definition */
     getLayerDefinitionType(): "VectorTile";
@@ -50,31 +50,15 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         data: any;
         event: any;
     }, clickOptions: OnGridClickOptions<ChoroplethLayerDesign>): OnGridClickResults;
-    getBounds(design: ChoroplethLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): void;
+    getBounds(design: ChoroplethLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): any;
     getMinZoom(design: ChoroplethLayerDesign): number | undefined;
     getMaxZoom(design: ChoroplethLayerDesign): number;
-    getLegend(design: ChoroplethLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): React.CElement<{
-        schema: Schema;
-        name: string;
-        dataSource: DataSource;
-        filters: JsonQLFilter[];
-        axis: import("../axes/Axis").Axis;
-        defaultColor: string | null | undefined;
-        locale: string;
-    }, React.Component<{
-        schema: Schema;
-        name: string;
-        dataSource: DataSource;
-        filters: JsonQLFilter[];
-        axis: import("../axes/Axis").Axis;
-        defaultColor: string | null | undefined;
-        locale: string;
-    }, any, any>>;
+    getLegend(design: ChoroplethLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
     getFilterableTables(design: ChoroplethLayerDesign, schema: Schema): string[];
     /** True if layer can be edited */
     isEditable(): boolean;
     cleanDesign(design: ChoroplethLayerDesign, schema: Schema): ChoroplethLayerDesign;
-    validateDesign(design: ChoroplethLayerDesign, schema: Schema): string | null;
+    validateDesign(design: ChoroplethLayerDesign, schema: Schema): any;
     createDesignerElement(options: {
         design: ChoroplethLayerDesign;
         schema: Schema;

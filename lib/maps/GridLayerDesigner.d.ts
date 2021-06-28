@@ -1,8 +1,8 @@
-import React from 'react';
-import { Schema, DataSource, Expr } from 'mwater-expressions';
-import GridLayerDesign from './GridLayerDesign';
-import { JsonQLFilter } from '../index';
-import { Axis } from '../axes/Axis';
+import React from "react";
+import { Schema, DataSource, Expr } from "mwater-expressions";
+import GridLayerDesign from "./GridLayerDesign";
+import { JsonQLFilter } from "../index";
+import { Axis } from "../axes/Axis";
 /** Designer for a grid layer */
 export default class GridLayerDesigner extends React.Component<{
     schema: Schema;

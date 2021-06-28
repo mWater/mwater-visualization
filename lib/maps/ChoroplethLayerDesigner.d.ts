@@ -1,8 +1,9 @@
-import React from 'react';
-import { Schema, DataSource, Expr } from 'mwater-expressions';
-import ChoroplethLayerDesign from './ChoroplethLayerDesign';
-import { JsonQLFilter } from '../index';
-import { Axis } from '../axes/Axis';
+import React from "react";
+import { Schema, DataSource, Expr } from "mwater-expressions";
+import ChoroplethLayerDesign from "./ChoroplethLayerDesign";
+import { JsonQLFilter } from "../index";
+import EditPopupComponent from "./EditPopupComponent";
+import { Axis } from "../axes/Axis";
 export default class ChoroplethLayerDesigner extends React.Component<{
     schema: Schema;
     dataSource: DataSource;
@@ -28,37 +29,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     renderTable(): JSX.Element | null;
     renderRegionsTable(): JSX.Element;
     renderAdminRegionExpr(): JSX.Element | null;
-    renderScopeAndDetailLevel(): React.CElement<{
-        schema: Schema;
-        dataSource: DataSource;
-        scope: string | number | null;
-        scopeLevel: number;
-        detailLevel: number;
-        onScopeAndDetailLevelChange: (scope: string | number | null, scopeLevel: number | null, detailLevel: number) => void;
-    }, React.Component<{
-        schema: Schema;
-        dataSource: DataSource;
-        scope: string | number | null;
-        scopeLevel: number;
-        detailLevel: number;
-        onScopeAndDetailLevelChange: (scope: string | number | null, scopeLevel: number | null, detailLevel: number) => void;
-    }, any, any>> | React.CElement<{
-        schema: Schema;
-        dataSource: DataSource;
-        scope: string | number | null;
-        scopeLevel: number | null;
-        detailLevel: number;
-        onScopeAndDetailLevelChange: (scope: string | number | null, scopeLevel: number | null, detailLevel: number) => void;
-        regionsTable: string;
-    }, React.Component<{
-        schema: Schema;
-        dataSource: DataSource;
-        scope: string | number | null;
-        scopeLevel: number | null;
-        detailLevel: number;
-        onScopeAndDetailLevelChange: (scope: string | number | null, scopeLevel: number | null, detailLevel: number) => void;
-        regionsTable: string;
-    }, any, any>>;
+    renderScopeAndDetailLevel(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
     renderDisplayNames(): React.DetailedReactHTMLElement<{
         className: string;
     }, HTMLElement>;
@@ -75,22 +46,6 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     renderFilter(): React.DetailedReactHTMLElement<{
         className: string;
     }, HTMLElement> | null;
-    renderPopup(): React.CElement<{
-        design: ChoroplethLayerDesign;
-        onDesignChange: (design: ChoroplethLayerDesign) => void;
-        schema: Schema;
-        dataSource: DataSource;
-        table: string;
-        idTable: string;
-        defaultPopupFilterJoins: {};
-    }, React.Component<{
-        design: ChoroplethLayerDesign;
-        onDesignChange: (design: ChoroplethLayerDesign) => void;
-        schema: Schema;
-        dataSource: DataSource;
-        table: string;
-        idTable: string;
-        defaultPopupFilterJoins: {};
-    }, any, any>> | null;
+    renderPopup(): React.CElement<any, EditPopupComponent> | null;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }

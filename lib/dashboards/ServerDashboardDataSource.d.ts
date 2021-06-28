@@ -2,10 +2,10 @@
 import { DataSource, Expr } from "mwater-expressions";
 import { JsonQLFilter } from "../JsonQLFilter";
 import { QuickfiltersDataSource } from "../quickfilter/QuickfiltersDataSource";
-import { MapDesign, MapLayerView } from '../maps/MapDesign';
-import { MapDataSource } from '../maps/MapDataSource';
-import { MapLayerDataSource } from '../maps/MapLayerDataSource';
-import { WidgetDataSource } from '../widgets/WidgetDataSource';
+import { MapDesign, MapLayerView } from "../maps/MapDesign";
+import { MapDataSource } from "../maps/MapDataSource";
+import { MapLayerDataSource } from "../maps/MapLayerDataSource";
+import { WidgetDataSource } from "../widgets/WidgetDataSource";
 interface ServerDashboardDataSourceOptions {
     /** API url to use for talking to mWater server */
     apiUrl: string;
@@ -65,8 +65,8 @@ interface ServerWidgetLayerDataSourceOptions extends ServerDashboardDataSourceOp
 declare class ServerWidgetLayerDataSource implements MapLayerDataSource {
     options: ServerWidgetLayerDataSourceOptions;
     constructor(options: ServerWidgetLayerDataSourceOptions);
-    getTileUrl(design: any, filters: JsonQLFilter[]): string | null;
-    getUtfGridUrl(design: any, filters: JsonQLFilter[]): string | null;
+    getTileUrl(design: any, filters: JsonQLFilter[]): any;
+    getUtfGridUrl(design: any, filters: JsonQLFilter[]): any;
     /** Get the url for vector tile source with an expiry time. Only for layers of type "VectorTile"
      * @param createdAfter ISO 8601 timestamp requiring that tile source on server is created after specified datetime
      */

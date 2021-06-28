@@ -2,7 +2,7 @@ import { DataSource, Schema } from "mwater-expressions";
 import { JsonQLFilter } from "../JsonQLFilter";
 import { MapDesign } from "./MapDesign";
 import { MapDataSource } from "./MapDataSource";
-import { MapLayerDataSource } from './MapLayerDataSource';
+import { MapLayerDataSource } from "./MapLayerDataSource";
 interface DirectMapDataSourceOptions {
     /** schema to use */
     schema: Schema;

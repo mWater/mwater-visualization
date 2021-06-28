@@ -1,7 +1,7 @@
-import Layer from './Layer';
-import { Schema, DataSource } from 'mwater-expressions';
-import { JsonQLFilter } from '../index';
-import React from 'react';
+import Layer from "./Layer";
+import { Schema, DataSource } from "mwater-expressions";
+import { JsonQLFilter } from "../index";
+import React from "react";
 /**
  * Layer that is composed of multiple tile urls that can be switched between
  * Loads legend from the server as well

@@ -18,26 +18,10 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     };
     createMapnikJsonQL(design: ClusterLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery;
     createCss(design: ClusterLayerDesign, schema: Schema): string;
-    getBounds(design: ClusterLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): void;
+    getBounds(design: ClusterLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): any;
     getMinZoom(design: ClusterLayerDesign): number | undefined;
     getMaxZoom(design: ClusterLayerDesign): number;
-    getLegend(design: ClusterLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters?: JsonQLFilter[]): React.CElement<{
-        schema: Schema;
-        defaultColor: string;
-        symbol: string;
-        name: string;
-        dataSource: DataSource;
-        filters: JsonQLFilter[];
-        locale: string;
-    }, React.Component<{
-        schema: Schema;
-        defaultColor: string;
-        symbol: string;
-        name: string;
-        dataSource: DataSource;
-        filters: JsonQLFilter[];
-        locale: string;
-    }, any, any>>;
+    getLegend(design: ClusterLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters?: JsonQLFilter[]): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
     getFilterableTables(design: ClusterLayerDesign, schema: Schema): string[];
     isEditable(): boolean;
     isIncomplete(design: ClusterLayerDesign, schema: Schema): boolean;
@@ -49,5 +33,5 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
         filters: JsonQLFilter[];
     }): React.ReactElement<{}>;
     cleanDesign(design: ClusterLayerDesign, schema: Schema): ClusterLayerDesign;
-    validateDesign(design: ClusterLayerDesign, schema: Schema): string | null;
+    validateDesign(design: ClusterLayerDesign, schema: Schema): any;
 }

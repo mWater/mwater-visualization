@@ -1,47 +1,51 @@
-import _ from "lodash"
-import { DataSource, Schema } from "mwater-expressions"
-import React from "react"
-import { JsonQLFilter } from "../JsonQLFilter"
-import { MapDesign } from "./MapDesign"
-import { MapDataSource } from "./MapDataSource"
-import { MapScope } from "./MapUtils"
-
-/** Component that displays just the map */
-export default class OldMapViewComponent extends React.Component<{
-  schema: Schema
-  dataSource: DataSource
-  mapDataSource: MapDataSource
-
-  design: MapDesign
-  onDesignChange?: (design: MapDesign) => void
-
-  /** Width in pixels */
-  width: number
-
-  /** Height in pixels */
-  height: number
-
-  /** Called with (tableId, rowId) when item is clicked */
-  onRowClick?: (tableId: string, rowId: any) => void
-
-  /** Extra filters to apply to view */
-  extraFilters?: JsonQLFilter[]
-
-  /** scope of the map (when a layer self-selects a particular scope) */
-  scope?: MapScope
-
-  /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
-  onScopeChange: (scope: MapScope | null) => void
-
-  /** Whether the map be draggable with mouse/touch or not. Default true */
-  dragging?: boolean 
-
-  /** Whether the map can be zoomed by touch-dragging with two fingers. Default true */
-  touchZoom?: boolean 
-
-  /** Whether the map can be zoomed by using the mouse wheel. Default true */
-  scrollWheelZoom?: boolean
-
-  /** Whether changes to zoom level should be persisted. Default false  */
-  zoomLocked?: boolean 
-}> {}
+import React from "react";
+import ModalPopupComponent from "react-library/lib/ModalPopupComponent";
+declare const _default: {
+    new (props: any): {
+        componentDidMount(): any;
+        componentDidUpdate(prevProps: any): any;
+        performAutoZoom(): any;
+        handleBoundsChange: (bounds: any) => any;
+        handleGridClick: (layerViewId: any, ev: any) => any;
+        getCompiledFilters(): any;
+        renderLegend(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+        renderPopup(): React.CElement<{
+            header?: React.ReactNode;
+            footer?: React.ReactNode;
+            size?: "small" | "normal" | "full" | "large" | undefined;
+            width?: number | undefined;
+            showCloseX?: boolean | undefined;
+            onClose?: (() => void) | undefined;
+        }, ModalPopupComponent> | null;
+        render(): React.DetailedReactHTMLElement<{
+            style: {
+                width: any;
+                height: any;
+                position: "relative";
+            };
+        }, HTMLElement>;
+        context: any;
+        setState<K extends never>(state: {} | ((prevState: Readonly<{}>, props: Readonly<{}>) => {} | Pick<{}, K> | null) | Pick<{}, K> | null, callback?: (() => void) | undefined): void;
+        forceUpdate(callback?: (() => void) | undefined): void;
+        readonly props: Readonly<{}> & Readonly<{
+            children?: React.ReactNode;
+        }>;
+        state: Readonly<{}>;
+        refs: {
+            [key: string]: React.ReactInstance;
+        };
+        shouldComponentUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): boolean;
+        componentWillUnmount?(): void;
+        componentDidCatch?(error: Error, errorInfo: React.ErrorInfo): void;
+        getSnapshotBeforeUpdate?(prevProps: Readonly<{}>, prevState: Readonly<{}>): any;
+        componentWillMount?(): void;
+        UNSAFE_componentWillMount?(): void;
+        componentWillReceiveProps?(nextProps: Readonly<{}>, nextContext: any): void;
+        UNSAFE_componentWillReceiveProps?(nextProps: Readonly<{}>, nextContext: any): void;
+        componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
+        UNSAFE_componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
+    };
+    initClass(): void;
+    contextType?: React.Context<any> | undefined;
+};
+export default _default;

@@ -1,5 +1,5 @@
 import { JsonQLFilter } from "../JsonQLFilter";
-import { Quickfilter } from '../quickfilter/Quickfilter';
+import { Quickfilter } from "../quickfilter/Quickfilter";
 import { LiteralType, Expr } from "mwater-expressions";
 import { BlocksLayoutOptions, DashboardTheme } from "./layoutOptions";
 /** Dashboard design

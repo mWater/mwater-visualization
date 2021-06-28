@@ -1,0 +1,31 @@
+import React from "react";
+interface MapDesignerComponentProps {
+    /** Schema to use */
+    schema: any;
+    /** Data source to use */
+    dataSource: any;
+    /** See Map Design.md */
+    design: any;
+    /** Called with new design */
+    onDesignChange: any;
+    /** array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct */
+    filters?: any;
+}
+export default class MapDesignerComponent extends React.Component<MapDesignerComponentProps> {
+    static initClass(): void;
+    getChildContext(): {
+        activeTables: string[];
+    };
+    handleAttributionChange: (text: any) => any;
+    handleAutoBoundsChange: (value: any) => any;
+    handleShowLayerSwitcherChange: (value: any) => any;
+    handleConvertToClusterMap: () => any;
+    handleInitialLegendDisplayChange: (value: any) => any;
+    renderOptionsTab(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+    render(): React.DetailedReactHTMLElement<{
+        style: {
+            padding: number;
+        };
+    }, HTMLElement>;
+}
+export {};

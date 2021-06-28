@@ -1,6 +1,6 @@
-import React from 'react';
-import { JsonQLFilter } from '../index';
-import { SwitchableTileUrlLayerDesign } from './SwitchableTileUrlLayer';
+import React from "react";
+import { JsonQLFilter } from "../index";
+import { SwitchableTileUrlLayerDesign } from "./SwitchableTileUrlLayer";
 /** Designer for a switchable tile url layer */
 export default class SwitchableTileUrlLayerDesigner extends React.Component<{
     design: SwitchableTileUrlLayerDesign;

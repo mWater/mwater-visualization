@@ -1,11 +1,10 @@
-import React from 'react';
-import Layer, { VectorTileDef } from './Layer';
-import { Schema, DataSource } from 'mwater-expressions';
-import { LayerDefinition } from './maps';
-import { JsonQLFilter } from '../index';
-import GridLayerDesign from './GridLayerDesign';
-import { Axis } from '../axes/Axis';
-import { JsonQLQuery } from 'jsonql';
+import React from "react";
+import Layer, { VectorTileDef } from "./Layer";
+import { Schema, DataSource } from "mwater-expressions";
+import { LayerDefinition } from "./maps";
+import { JsonQLFilter } from "../index";
+import GridLayerDesign from "./GridLayerDesign";
+import { JsonQLQuery } from "jsonql";
 /** Layer which is a grid of squares or flat-topped hexagons. Depends on "Grid Functions.sql" having been run */
 export default class GridLayer extends Layer<GridLayerDesign> {
     /** Gets the type of layer definition */
@@ -30,26 +29,14 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     getMaxZoom(design: GridLayerDesign): number;
     /** Get the legend to be optionally displayed on the map. Returns
      * a React element */
-    getLegend(design: GridLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): React.CElement<{
-        schema: Schema;
-        name: string;
-        dataSource: DataSource;
-        axis: Axis;
-        locale: string;
-    }, React.Component<{
-        schema: Schema;
-        name: string;
-        dataSource: DataSource;
-        axis: Axis;
-        locale: string;
-    }, any, any>>;
+    getLegend(design: GridLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
     getFilterableTables(design: GridLayerDesign, schema: Schema): string[];
     /** True if layer can be edited */
     isEditable(): boolean;
     /** Returns a cleaned design */
     cleanDesign(design: GridLayerDesign, schema: Schema): GridLayerDesign;
     /** Validates design. Null if ok, message otherwise */
-    validateDesign(design: GridLayerDesign, schema: Schema): string | null;
+    validateDesign(design: GridLayerDesign, schema: Schema): any;
     createDesignerElement(options: {
         design: GridLayerDesign;
         schema: Schema;

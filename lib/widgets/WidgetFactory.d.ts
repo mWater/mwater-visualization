@@ -1,5 +1,5 @@
-import Widget from "./Widget";
-
-export default class WidgetFactory {
-  static createWidget(type: string): Widget
-}
+declare const _default: {
+    new (): {};
+    createWidget(type: any): any;
+};
+export default _default;

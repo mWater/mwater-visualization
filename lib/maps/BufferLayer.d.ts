@@ -27,28 +27,10 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
         data: any;
         event: any;
     }, clickOptions: OnGridClickOptions<BufferLayerDesign>): OnGridClickResults;
-    getBounds(design: BufferLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): void;
+    getBounds(design: BufferLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): any;
     getMinZoom(design: BufferLayerDesign): number | undefined;
     getMaxZoom(design: BufferLayerDesign): number;
-    getLegend(design: BufferLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): React.CElement<{
-        schema: Schema;
-        name: string;
-        dataSource: DataSource;
-        filters: JsonQLFilter[];
-        axis: import("../axes/Axis").Axis;
-        radiusLayer: boolean;
-        defaultColor: string | undefined;
-        locale: string;
-    }, React.Component<{
-        schema: Schema;
-        name: string;
-        dataSource: DataSource;
-        filters: JsonQLFilter[];
-        axis: import("../axes/Axis").Axis;
-        radiusLayer: boolean;
-        defaultColor: string | undefined;
-        locale: string;
-    }, any, any>>;
+    getLegend(design: BufferLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
     getFilterableTables(design: BufferLayerDesign, schema: Schema): string[];
     isEditable(): boolean;
     isIncomplete(design: BufferLayerDesign, schema: Schema): boolean;
@@ -60,7 +42,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
         filters: JsonQLFilter[];
     }): React.ReactElement<{}>;
     cleanDesign(design: BufferLayerDesign, schema: Schema): BufferLayerDesign;
-    validateDesign(design: BufferLayerDesign, schema: Schema): string | null;
+    validateDesign(design: BufferLayerDesign, schema: Schema): any;
     createKMLExportJsonQL(design: BufferLayerDesign, schema: Schema, filters: JsonQLFilter[]): import("jsonql").JsonQLSelectQuery;
     getKMLExportJsonQL(design: BufferLayerDesign, schema: Schema, filters: JsonQLFilter[]): {
         layers: {
