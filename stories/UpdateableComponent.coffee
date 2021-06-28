@@ -4,7 +4,7 @@ React = require 'react'
 # Convenience wrapper that allows updating state
 module.exports = class UpdateableComponent extends React.Component
   constructor: (props) ->
-    super
+    super(props)
     @state = _.clone(@props or {})
 
   # Creates update function

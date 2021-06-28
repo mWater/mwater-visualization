@@ -20,7 +20,7 @@ module.exports = class TestComponent
 # Wraps a react component, re-render
 class ComponentWrapper extends React.Component
   constructor: (props) ->
-    super
+    super(props)
     @state = { elem: @props.elem }
 
   setElement: (elem) =>
