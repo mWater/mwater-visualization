@@ -9,7 +9,7 @@ import Widget from "./Widget"
 import DropdownWidgetComponent from "./DropdownWidgetComponent"
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent"
 import LayerFactory from "../maps/LayerFactory"
-import MapUtils from "../maps/MapUtils"
+import * as MapUtils from "../maps/MapUtils"
 
 // Design is the map design specified in maps/Map Design.md
 export default MapWidget = class MapWidget extends Widget {

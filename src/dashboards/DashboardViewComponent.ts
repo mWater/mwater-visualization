@@ -8,7 +8,7 @@ const R = React.createElement
 
 import uuid from "uuid"
 import ImplicitFilterBuilder from "../ImplicitFilterBuilder"
-import DashboardUtils from "./DashboardUtils"
+import * as DashboardUtils from "./DashboardUtils"
 import { ExprCompiler } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
 import WidgetFactory from "../widgets/WidgetFactory"

@@ -11,7 +11,7 @@ import MapLayersDesignerComponent from "./MapLayersDesignerComponent"
 import MapFiltersDesignerComponent from "./MapFiltersDesignerComponent"
 import BaseLayerDesignerComponent from "./BaseLayerDesignerComponent"
 import PopoverHelpComponent from "react-library/lib/PopoverHelpComponent"
-import MapUtils from "./MapUtils"
+import * as MapUtils from "./MapUtils"
 import { ExprCompiler } from "mwater-expressions"
 import ui from "react-library/lib/bootstrap"
 

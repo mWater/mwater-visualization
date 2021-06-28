@@ -13,7 +13,7 @@ import TableSelectComponent from "../TableSelectComponent"
 import { default as Rcslider } from "rc-slider"
 import EditPopupComponent from "./EditPopupComponent"
 import ZoomLevelsComponent from "./ZoomLevelsComponent"
-import PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
+import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
 
 interface BufferLayerDesignerComponentProps {
   /** Schema to use */

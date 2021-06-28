@@ -10,7 +10,7 @@ import { ExprUtils } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import LayerFactory from "./LayerFactory"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
-import MapUtils from "./MapUtils"
+import * as MapUtils from "./MapUtils"
 import { LayerSwitcherComponent } from "./LayerSwitcherComponent"
 import { default as LegendComponent } from "./LegendComponent"
 

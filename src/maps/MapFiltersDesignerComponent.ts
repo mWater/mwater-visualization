@@ -7,7 +7,7 @@ import { ExprCleaner } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 import PopoverHelpComponent from "react-library/lib/PopoverHelpComponent"
 import FiltersDesignerComponent from "../FiltersDesignerComponent"
-import MapUtils from "./MapUtils"
+import * as MapUtils from "./MapUtils"
 
 interface MapFiltersDesignerComponentProps {
   /** Schema to use */

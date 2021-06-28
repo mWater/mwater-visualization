@@ -9,7 +9,7 @@ import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 import querystring from "querystring"
 import { ExprUtils } from "mwater-expressions"
 import * as ui from "./UIComponents"
-import formUtils from "mwater-forms/lib/formUtils" // TODO requireing this directly because of bizarre backbone issue
+import * as formUtils from "mwater-forms/lib/formUtils" // TODO requireing this directly because of bizarre backbone issue
 
 interface MWaterAddRelatedFormComponentProps {
   table: string

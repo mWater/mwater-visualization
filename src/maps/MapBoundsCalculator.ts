@@ -4,7 +4,7 @@ let MapBoundsCalculator
 import _ from "lodash"
 import async from "async"
 import LayerFactory from "./LayerFactory"
-import MapUtils from "./MapUtils"
+import * as MapUtils from "./MapUtils"
 
 // Calculates map bounds given layers by unioning together
 export default MapBoundsCalculator = class MapBoundsCalculator {

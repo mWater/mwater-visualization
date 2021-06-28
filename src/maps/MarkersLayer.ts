@@ -12,7 +12,7 @@ import { JsonQLExpr, JsonQLQuery, JsonQLScalar, JsonQLSelect, JsonQLSelectQuery 
 import { MarkersLayerDesign } from "./MarkersLayerDesign"
 import { compileColorMapToMapbox } from "./mapboxUtils"
 import LayerLegendComponent from "./LayerLegendComponent"
-import PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
+import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
 
 export default class MarkersLayer extends Layer<MarkersLayerDesign> {
   /** Gets the type of layer definition */

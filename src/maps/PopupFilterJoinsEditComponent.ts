@@ -6,7 +6,7 @@ const R = React.createElement
 import { ExprComponent } from "mwater-expressions-ui"
 import { ExprUtils } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
-import DashboardUtils from "../dashboards/DashboardUtils"
+import * as DashboardUtils from "../dashboards/DashboardUtils"
 
 interface PopupFilterJoinsEditComponentProps {
   /** Schema to use */

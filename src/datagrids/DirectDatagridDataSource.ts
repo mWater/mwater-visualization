@@ -3,7 +3,7 @@
 let DirectDatagridDataSource
 import DatagridDataSource from "./DatagridDataSource"
 import DatagridQueryBuilder from "./DatagridQueryBuilder"
-import QuickfilterUtils from "../quickfilter/QuickfilterUtils"
+import * as QuickfilterUtils from "../quickfilter/QuickfilterUtils"
 
 // Uses direct DataSource queries
 export default DirectDatagridDataSource = class DirectDatagridDataSource {

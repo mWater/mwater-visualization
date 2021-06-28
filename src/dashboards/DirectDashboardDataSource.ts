@@ -4,7 +4,7 @@ let DirectDashboardDataSource
 import WidgetFactory from "../widgets/WidgetFactory"
 import DirectWidgetDataSource from "../widgets/DirectWidgetDataSource"
 import LayoutManager from "../layouts/LayoutManager"
-import QuickfilterUtils from "../quickfilter/QuickfilterUtils"
+import * as QuickfilterUtils from "../quickfilter/QuickfilterUtils"
 
 // Uses direct DataSource queries
 export default DirectDashboardDataSource = class DirectDashboardDataSource {

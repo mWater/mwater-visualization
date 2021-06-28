@@ -11,7 +11,7 @@ import TableSelectComponent from "../TableSelectComponent"
 import EditPopupComponent from "./EditPopupComponent"
 import ZoomLevelsComponent from "./ZoomLevelsComponent"
 import MarkerSymbolSelectComponent from "./MarkerSymbolSelectComponent"
-import PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
+import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
 import ui from "react-library/lib/bootstrap"
 
 interface MarkersLayerDesignerComponentProps {

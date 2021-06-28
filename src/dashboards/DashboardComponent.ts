@@ -9,7 +9,7 @@ const R = React.createElement
 import { ExprCompiler } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
 import UndoStack from "../UndoStack"
-import DashboardUtils from "./DashboardUtils"
+import * as DashboardUtils from "./DashboardUtils"
 import DashboardViewComponent from "./DashboardViewComponent"
 import AutoSizeComponent from "react-library/lib/AutoSizeComponent"
 import QuickfiltersComponent from "../quickfilter/QuickfiltersComponent"

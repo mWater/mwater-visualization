@@ -12,7 +12,7 @@ import { compileColorMapToMapbox } from "./mapboxUtils"
 
 import LegendGroup from "./LegendGroup"
 import LayerLegendComponent from "./LayerLegendComponent"
-import PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
+import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
 
 /*
 Layer which draws a buffer around geometries (i.e. a radius circle around points)
