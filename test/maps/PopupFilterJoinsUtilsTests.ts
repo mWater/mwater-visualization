@@ -3,7 +3,7 @@
 import _ from "lodash"
 import { assert } from "chai"
 import * as fixtures from "../fixtures"
-import PopupFilterJoinsUtils from "../../src/maps/PopupFilterJoinsUtils"
+import * as PopupFilterJoinsUtils from "../../src/maps/PopupFilterJoinsUtils"
 import canonical from "canonical-json"
 
 function compare(actual: any, expected: any) {

@@ -2,8 +2,8 @@
 // Sanity-check the conversion and remove this comment.
 let ColorSchemeFactory
 import _ from "lodash"
-import d3Scale from "d3-scale"
-import brewer from "d3-scale-chromatic"
+import * as d3Scale from "d3-scale"
+import * as brewer from "d3-scale-chromatic"
 import c_c from "color-mixer"
 
 function rgbStringToHex(rgbString: any) {

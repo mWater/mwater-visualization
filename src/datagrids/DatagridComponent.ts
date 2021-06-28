@@ -13,7 +13,7 @@ import { ExprCompiler } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
 import DatagridViewComponent from "./DatagridViewComponent"
 import DatagridDesignerComponent from "./DatagridDesignerComponent"
-import * as DatagridUtils from "./DatagridUtils"
+import DatagridUtils from "./DatagridUtils"
 
 import QuickfiltersComponent from "../quickfilter/QuickfiltersComponent"
 import QuickfilterCompiler from "../quickfilter/QuickfilterCompiler"

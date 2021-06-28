@@ -2,7 +2,7 @@
 // Sanity-check the conversion and remove this comment.
 import _ from "lodash"
 import { assert } from "chai"
-import MapUtils from "../../src/maps/MapUtils"
+import * as MapUtils from "../../src/maps/MapUtils"
 import canonical from "canonical-json"
 
 function compare(actual: any, expected: any) {

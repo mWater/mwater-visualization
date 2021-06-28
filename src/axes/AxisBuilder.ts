@@ -7,7 +7,7 @@ import { ExprCompiler } from "mwater-expressions"
 import { ExprValidator } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
-import d3Format from "d3-format"
+import * as d3Format from "d3-format"
 import moment from "moment"
 import React from "react"
 const R = React.createElement

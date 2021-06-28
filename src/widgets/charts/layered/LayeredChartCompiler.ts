@@ -6,7 +6,7 @@ import { ExprCompiler } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 import AxisBuilder from "../../../axes/AxisBuilder"
 import { injectTableAlias } from "mwater-expressions"
-import d3Format from "d3-format"
+import * as d3Format from "d3-format"
 
 const commaFormatter = d3Format.format(",")
 const compactFormatter = d3Format.format("~s")

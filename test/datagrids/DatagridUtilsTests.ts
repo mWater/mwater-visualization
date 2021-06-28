@@ -29,7 +29,7 @@ describe("DatagridUtils", function () {
         columns: [{ id: "c1", width: 20, type: "expr", label: null, expr: this.exprNumber }]
       }
 
-      return assert.deepEqual(this.datagridUtils.cleanDesign(design), {})
+      return assert.deepEqual(this.datagridUtils.cleanDesign(design), { table: null, columns: [] })
     })
 
     it("leaves valid columns alone", function () {

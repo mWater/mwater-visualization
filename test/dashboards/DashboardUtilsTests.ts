@@ -6,7 +6,7 @@ import _ from "lodash"
 import React from "react"
 const R = React.createElement
 
-import DashboardUtils from "../../src/dashboards/DashboardUtils"
+import * as DashboardUtils from "../../src/dashboards/DashboardUtils"
 import canonical from "canonical-json"
 
 function compare(actual: any, expected: any) {
