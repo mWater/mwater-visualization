@@ -24,7 +24,7 @@ export default DecoratedBlockComponent = (function () {
       }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -40,7 +40,7 @@ export default DecoratedBlockComponent = (function () {
       return document.removeEventListener("mouseup", this.handleMouseUp)
     }
 
-    handleAspectMouseDown = (ev) => {
+    handleAspectMouseDown = (ev: any) => {
       // Prevent html5 drag
       ev.preventDefault()
 
@@ -54,7 +54,7 @@ export default DecoratedBlockComponent = (function () {
       return document.addEventListener("mouseup", this.handleMouseUp)
     }
 
-    handleMouseMove = (ev) => {
+    handleMouseMove = (ev: any) => {
       if (this.state.initialClientY != null) {
         const aspectDragY = this.state.initialAspectDragY + ev.clientY - this.state.initialClientY
         if (aspectDragY > 20) {
@@ -65,7 +65,7 @@ export default DecoratedBlockComponent = (function () {
       }
     }
 
-    handleMouseUp = (ev) => {
+    handleMouseUp = (ev: any) => {
       // Remove listeners
       document.removeEventListener("mousemove", this.handleMouseMove)
       document.removeEventListener("mouseup", this.handleMouseUp)

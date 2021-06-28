@@ -17,7 +17,7 @@ import { ExprComponent } from "mwater-expressions-ui"
 // Design an intersection of a pivot table
 export default IntersectionDesignerComponent = (function () {
   IntersectionDesignerComponent = class IntersectionDesignerComponent extends React.Component {
-    constructor(...args) {
+    constructor(...args: any[]) {
       super(...args)
       this.update = this.update.bind(this)
     }
@@ -39,26 +39,26 @@ export default IntersectionDesignerComponent = (function () {
       return update(this.props.intersection, this.props.onChange, arguments)
     }
 
-    handleBackgroundColorAxisChange = (backgroundColorAxis) => {
+    handleBackgroundColorAxisChange = (backgroundColorAxis: any) => {
       const opacity = this.props.intersection.backgroundColorOpacity || 1
       return this.update({ backgroundColorAxis, backgroundColorOpacity: opacity })
     }
 
-    handleBackgroundColorChange = (backgroundColor) => {
+    handleBackgroundColorChange = (backgroundColor: any) => {
       const opacity = this.props.intersection.backgroundColorOpacity || 1
       return this.update({ backgroundColor, backgroundColorOpacity: opacity })
     }
 
-    handleBackgroundColorConditionsChange = (backgroundColorConditions) => {
+    handleBackgroundColorConditionsChange = (backgroundColorConditions: any) => {
       const opacity = this.props.intersection.backgroundColorOpacity || 1
       return this.update({ backgroundColorConditions, backgroundColorOpacity: opacity })
     }
 
-    handleBackgroundColorOpacityChange = (newValue) => {
+    handleBackgroundColorOpacityChange = (newValue: any) => {
       return this.update({ backgroundColorOpacity: newValue / 100 })
     }
 
-    handleFilterChange = (filter) => {
+    handleFilterChange = (filter: any) => {
       return this.update({ filter })
     }
 
@@ -254,13 +254,13 @@ class BackgroundColorConditionsComponent extends React.Component {
     return this.props.onChange(colorConditions)
   }
 
-  handleChange = (index, colorCondition) => {
+  handleChange = (index: any, colorCondition: any) => {
     const colorConditions = this.props.colorConditions.slice()
     colorConditions[index] = colorCondition
     return this.props.onChange(colorConditions)
   }
 
-  handleRemove = (index) => {
+  handleRemove = (index: any) => {
     const colorConditions = this.props.colorConditions.slice()
     colorConditions.splice(index, 1)
     return this.props.onChange(colorConditions)
@@ -299,7 +299,7 @@ BackgroundColorConditionsComponent.initClass()
 
 // Displays single background color condition
 class BackgroundColorConditionComponent extends React.Component {
-  constructor(...args) {
+  constructor(...args: any[]) {
     super(...args)
     this.update = this.update.bind(this)
   }

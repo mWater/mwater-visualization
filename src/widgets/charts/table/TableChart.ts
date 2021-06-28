@@ -36,13 +36,13 @@ ordering:
 
 */
 export default TableChart = class TableChart extends Chart {
-  cleanDesign(design, schema) {
+  cleanDesign(design: any, schema: any) {
     const { ExprCleaner } = require("mwater-expressions")
 
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
-    design = produce(design, (draft) => {
+    design = produce(design, (draft: any) => {
       draft.version = design.version || 1
 
       // Always have at least one column
@@ -94,7 +94,7 @@ export default TableChart = class TableChart extends Chart {
     return design
   }
 
-  validateDesign(design, schema) {
+  validateDesign(design: any, schema: any) {
     const axisBuilder = new AxisBuilder({ schema })
 
     // Check that has table
@@ -123,7 +123,7 @@ export default TableChart = class TableChart extends Chart {
     return error
   }
 
-  isEmpty(design) {
+  isEmpty(design: any) {
     return !design.columns || !design.columns[0] || !design.columns[0].textAxis
   }
 
@@ -133,7 +133,7 @@ export default TableChart = class TableChart extends Chart {
   //   dataSource: dataSource to use
   //   design: design
   //   onDesignChange: function
-  createDesignerElement(options) {
+  createDesignerElement(options: any) {
     // Require here to prevent server require problems
     const TableChartDesignerComponent = require("./TableChartDesignerComponent")
 
@@ -141,7 +141,7 @@ export default TableChart = class TableChart extends Chart {
       schema: options.schema,
       design: this.cleanDesign(options.design, options.schema),
       dataSource: options.dataSource,
-      onDesignChange: (design) => {
+      onDesignChange: (design: any) => {
         // Clean design
         design = this.cleanDesign(design, options.schema)
         return options.onDesignChange(design)
@@ -156,7 +156,7 @@ export default TableChart = class TableChart extends Chart {
   // dataSource: data source to get data from
   // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   // callback: (error, data)
-  getData(design, schema, dataSource, filters, callback) {
+  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
     let column
     const exprUtils = new ExprUtils(schema)
     const exprCompiler = new ExprCompiler(schema)
@@ -263,7 +263,7 @@ export default TableChart = class TableChart extends Chart {
       query.where = whereClauses[0]
     }
 
-    return dataSource.performQuery(query, (error, data) => callback(error, { main: data }))
+    return dataSource.performQuery(query, (error: any, data: any) => callback(error, { main: data }));
   }
 
   // Create a view element for the chart
@@ -276,7 +276,7 @@ export default TableChart = class TableChart extends Chart {
   //   scope: current scope of the view element
   //   onScopeChange: called when scope changes with new scope
   //   onRowClick: Called with (tableId, rowId) when item is clicked
-  createViewElement(options) {
+  createViewElement(options: any) {
     // Create chart
     const props = {
       schema: options.schema,
@@ -296,17 +296,17 @@ export default TableChart = class TableChart extends Chart {
     return React.createElement(TableChartViewComponent, props)
   }
 
-  createDataTable(design, schema, dataSource, data, locale) {
+  createDataTable(design: any, schema: any, dataSource: any, data: any, locale: any) {
     let exprUtils = new ExprUtils(schema)
 
-    const renderHeaderCell = (column) => {
+    const renderHeaderCell = (column: any) => {
       return column.headerText || exprUtils.summarizeExpr(column.textAxis?.expr, locale)
     }
 
     const header = _.map(design.columns, renderHeaderCell)
     let table = [header]
-    const renderRow = (record) => {
-      const renderCell = (column, columnIndex) => {
+    const renderRow = (record: any) => {
+      const renderCell = (column: any, columnIndex: any) => {
         const value = record[`c${columnIndex}`]
 
         // Handle empty as "" not "None"
@@ -337,7 +337,7 @@ export default TableChart = class TableChart extends Chart {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design, schema) {
+  getFilterableTables(design: any, schema: any) {
     return _.compact([design.table])
   }
 

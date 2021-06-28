@@ -26,7 +26,7 @@ export default MapWidget = class MapWidget extends Widget {
   //  width: width in pixels on screen
   //  height: height in pixels on screen
   //  onRowClick: Called with (tableId, rowId) when item is clicked
-  createViewElement(options) {
+  createViewElement(options: any) {
     return React.createElement(MapWidgetComponent, {
       schema: options.schema,
       dataSource: options.dataSource,
@@ -44,7 +44,7 @@ export default MapWidget = class MapWidget extends Widget {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design, schema) {
+  getFilterableTables(design: any, schema: any) {
     // Get filterable tables
     return MapUtils.getFilterableTables(design, schema)
   }
@@ -71,7 +71,7 @@ class MapWidgetComponent extends React.Component {
     // Called with (tableId, rowId) when item is clicked
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
     this.state = {
       // Design that is being edited. Change is propagated on closing window
@@ -81,7 +81,7 @@ class MapWidgetComponent extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: any) {
     if (!_.isEqual(prevProps.design, this.props.design)) {
       return this.setState({ transientDesign: this.props.design })
     }
@@ -96,7 +96,7 @@ class MapWidgetComponent extends React.Component {
     return this.setState({ editDesign: null })
   }
 
-  handleEditDesignChange = (design) => {
+  handleEditDesignChange = (design: any) => {
     return this.setState({ editDesign: design })
   }
 
@@ -164,7 +164,7 @@ class MapWidgetComponent extends React.Component {
     )
   }
 
-  renderContent(design, onDesignChange, width, height) {
+  renderContent(design: any, onDesignChange: any, width: any, height: any) {
     // Require here to prevent server require problems
     const { MapViewComponent } = require("../maps/MapViewComponent")
 
@@ -194,7 +194,7 @@ class MapWidgetComponent extends React.Component {
       dropdownItems.push({ label: "Edit", icon: "pencil", onClick: this.handleStartEditing })
     }
 
-    const handleDesignChange = (d) => this.setState({ transientDesign: d })
+    const handleDesignChange = (d: any) => this.setState({ transientDesign: d })
 
     // Wrap in a simple widget
     return R(

@@ -40,7 +40,7 @@ export default ImageWidgetComponent = (function () {
     }
 
     // Override to determine if a load is needed. Not called on mounting
-    isLoadNeeded(newProps, oldProps) {
+    isLoadNeeded(newProps: any, oldProps: any) {
       return (
         newProps.design.expr &&
         (!_.isEqual(newProps.design.expr, oldProps.design.expr) || !_.isEqual(newProps.filters, oldProps.filters))
@@ -48,11 +48,11 @@ export default ImageWidgetComponent = (function () {
     }
 
     // Call callback with state changes
-    load(props, prevProps, callback) {
+    load(props: any, prevProps: any, callback: any) {
       // Get data
-      return props.widgetDataSource.getData(props.design, props.filters, (error, data) => {
+      return props.widgetDataSource.getData(props.design, props.filters, (error: any, data: any) => {
         return callback({ error, data })
-      })
+      });
     }
 
     handleStartEditing = () => {
@@ -70,7 +70,7 @@ export default ImageWidgetComponent = (function () {
 
     renderEditor() {
       return R(ImageWidgetDesignComponent, {
-        ref: (c) => {
+        ref: (c: any) => {
           return (this.editor = c)
         },
         key: "editor",
@@ -78,7 +78,7 @@ export default ImageWidgetComponent = (function () {
         onDesignChange: this.props.onDesignChange,
         schema: this.props.schema,
         dataSource: this.props.dataSource
-      })
+      });
     }
 
     renderExpression() {
@@ -87,21 +87,21 @@ export default ImageWidgetComponent = (function () {
       } else if (this.state.data) {
         // Make into array if not
         if (!_.isArray(this.state.data)) {
-          return R(AutoSizeComponent, { injectHeight: true }, (size) => {
+          return R(AutoSizeComponent, { injectHeight: true }, (size: any) => {
             return R(ImagelistCarouselComponent, {
               widgetDataSource: this.props.widgetDataSource,
               imagelist: [this.state.data],
               height: size.height
             })
-          })
+          });
         } else {
-          return R(AutoSizeComponent, { injectHeight: true }, (size) => {
+          return R(AutoSizeComponent, { injectHeight: true }, (size: any) => {
             return R(ImagelistCarouselComponent, {
               widgetDataSource: this.props.widgetDataSource,
               imagelist: this.state.data,
               height: size.height
             })
-          })
+          });
         }
       }
     }
@@ -179,7 +179,7 @@ class ImageWidgetDesignComponent extends React.Component {
     // Data source to use for widget
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     this.state = {
@@ -231,11 +231,11 @@ class ImageWidgetDesignComponent extends React.Component {
     return this.setState({ currentTab: tab })
   }
 
-  handleImageUrlChange = (e) => {
+  handleImageUrlChange = (e: any) => {
     return this.setState({ imageUrl: e.target.value, uid: null, expr: null })
   }
 
-  handleUrlChange = (e) => {
+  handleUrlChange = (e: any) => {
     return this.setState({ url: e.target.value })
   }
 
@@ -252,24 +252,24 @@ class ImageWidgetDesignComponent extends React.Component {
     )
   }
 
-  handleFileUpload = (uid) => {
+  handleFileUpload = (uid: any) => {
     return this.setState({ imageUrl: null, uid, expr: null })
   }
 
-  handleExpressionChange = (expr) => {
+  handleExpressionChange = (expr: any) => {
     return this.setState({ imageUrl: null, uid: null, expr, url: null })
   }
 
-  handleTableChange = (table) => {
+  handleTableChange = (table: any) => {
     return this.setState({ table })
   }
-  handleCaptionChange = (ev) => {
+  handleCaptionChange = (ev: any) => {
     return this.setState({ caption: ev.target.value })
   }
-  handleRotationChange = (rotation) => {
+  handleRotationChange = (rotation: any) => {
     return this.setState({ rotation })
   }
-  handleCaptionPositionChange = (captionPosition) => {
+  handleCaptionPositionChange = (captionPosition: any) => {
     return this.setState({ captionPosition })
   }
 
@@ -475,7 +475,7 @@ class RotatedImageComponent extends React.Component {
   }
 
   render() {
-    return R(AutoSizeComponent, { injectWidth: true, injectHeight: true }, (size) => {
+    return R(AutoSizeComponent, { injectWidth: true, injectHeight: true }, (size: any) => {
       const imageStyle = {}
       const containerStyle = {}
 
@@ -516,7 +516,7 @@ class RotatedImageComponent extends React.Component {
       } else {
         return R("a", { href: this.props.url, target: "_blank" }, img)
       }
-    })
+    });
   }
 }
 RotatedImageComponent.initClass()

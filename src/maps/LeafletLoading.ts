@@ -47,7 +47,7 @@ module.exports = L.Control.extend({
     }
   },
 
-  initialize: function (options) {
+  initialize: function (options: any) {
     L.setOptions(this, options)
     this._dataLoaders = {}
 
@@ -58,7 +58,7 @@ module.exports = L.Control.extend({
     }
   },
 
-  onAdd: function (map) {
+  onAdd: function (map: any) {
     if (this.options.spinjs && typeof Spinner !== "function") {
       return console.error(
         "Leaflet.loading cannot load because you didn't load spin.js (http://fgnass.github.io/spin.js/), even though you set it in options."
@@ -101,12 +101,12 @@ module.exports = L.Control.extend({
     return container
   },
 
-  onRemove: function (map) {
+  onRemove: function (map: any) {
     this._removeLayerListeners(map)
     this._removeMapListeners(map)
   },
 
-  removeFrom: function (map) {
+  removeFrom: function (map: any) {
     if (this.zoomControl && !this.options.separate) {
       // Override Control.removeFrom() to avoid clobbering the entire
       // _container, which is the same as zoomControl's
@@ -122,7 +122,7 @@ module.exports = L.Control.extend({
     }
   },
 
-  addLoader: function (id) {
+  addLoader: function (id: any) {
     this._dataLoaders[id] = true
     if (this.options.delayIndicator && !this.delayIndicatorTimeout) {
       // If we are delaying showing the indicator and we're not
@@ -138,7 +138,7 @@ module.exports = L.Control.extend({
     }
   },
 
-  removeLoader: function (id) {
+  removeLoader: function (id: any) {
     delete this._dataLoaders[id]
     this.updateIndicator()
 
@@ -217,18 +217,18 @@ module.exports = L.Control.extend({
     return container.children[index]
   },
 
-  _handleLoading: function (e) {
+  _handleLoading: function (e: any) {
     this.addLoader(this.getEventId(e))
   },
 
-  _handleBaseLayerChange: function (e) {
+  _handleBaseLayerChange: function (e: any) {
     var that = this
 
     // Check for a target 'layer' that contains multiple layers, such as
     // L.LayerGroup. This will happen if you have an L.LayerGroup in an
     // L.Control.Layers.
     if (e.layer && e.layer.eachLayer && typeof e.layer.eachLayer === "function") {
-      e.layer.eachLayer(function (layer) {
+      e.layer.eachLayer(function (layer: any) {
         that._handleBaseLayerChange({ layer: layer })
       })
     } else {
@@ -240,11 +240,11 @@ module.exports = L.Control.extend({
     }
   },
 
-  _handleLoad: function (e) {
+  _handleLoad: function (e: any) {
     this.removeLoader(this.getEventId(e))
   },
 
-  getEventId: function (e) {
+  getEventId: function (e: any) {
     if (e.id) {
       return e.id
     } else if (e.layer) {
@@ -253,7 +253,7 @@ module.exports = L.Control.extend({
     return e.target._leaflet_id
   },
 
-  _layerAdd: function (e) {
+  _layerAdd: function (e: any) {
     if (!e.layer || !e.layer.on) return
     try {
       e.layer.on(
@@ -270,7 +270,7 @@ module.exports = L.Control.extend({
     if (e.layer._loading) this._handleLoading({ type: "loading", target: e.layer })
   },
 
-  _layerRemove: function (e) {
+  _layerRemove: function (e: any) {
     if (!e.layer || !e.layer.off) return
     try {
       e.layer.off(
@@ -286,10 +286,10 @@ module.exports = L.Control.extend({
     }
   },
 
-  _addLayerListeners: function (map) {
+  _addLayerListeners: function (map: any) {
     // Add listeners for begin and end of load to any layers already on the
     // map
-    map.eachLayer(function (layer) {
+    map.eachLayer(function(this: any, this: any, this: any, layer: any) {
       if (!layer.on) return
       layer.on(
         {
@@ -306,9 +306,9 @@ module.exports = L.Control.extend({
     map.on("layerremove", this._layerRemove, this)
   },
 
-  _removeLayerListeners: function (map) {
+  _removeLayerListeners: function (map: any) {
     // Remove listeners for begin and end of load from all layers
-    map.eachLayer(function (layer) {
+    map.eachLayer(function(this: any, this: any, this: any, layer: any) {
       if (!layer.off) return
       layer.off(
         {
@@ -324,7 +324,7 @@ module.exports = L.Control.extend({
     map.off("layerremove", this._layerRemove, this)
   },
 
-  _addMapListeners: function (map) {
+  _addMapListeners: function (map: any) {
     // Add listeners to the map for (custom) dataloading and dataload
     // events, eg, for AJAX calls that affect the map but will not be
     // reflected in the above layer events.
@@ -339,7 +339,7 @@ module.exports = L.Control.extend({
     )
   },
 
-  _removeMapListeners: function (map) {
+  _removeMapListeners: function (map: any) {
     map.off(
       {
         baselayerchange: this._handleBaseLayerChange,

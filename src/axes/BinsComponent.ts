@@ -23,7 +23,7 @@ export default BinsComponent = (function () {
       }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -66,7 +66,7 @@ export default BinsComponent = (function () {
         }
 
         this.setState({ guessing: true })
-        return this.props.dataSource.performQuery(minMaxQuery, (error, rows) => {
+        return this.props.dataSource.performQuery(minMaxQuery, (error: any, rows: any) => {
           let max, min
           if (this.unmounted) {
             return
@@ -84,7 +84,7 @@ export default BinsComponent = (function () {
           }
 
           return this.props.onChange(update(this.props.xform, { min: { $set: min }, max: { $set: max } }))
-        })
+        });
       }
     }
 
@@ -105,7 +105,7 @@ export default BinsComponent = (function () {
             R(NumberInputComponent, {
               small: true,
               value: this.props.xform.min,
-              onChange: (v) => this.props.onChange(update(this.props.xform, { min: { $set: v } }))
+              onChange: (v: any) => this.props.onChange(update(this.props.xform, { min: { $set: v } }))
             })
           ),
           " ",
@@ -115,7 +115,7 @@ export default BinsComponent = (function () {
             R(NumberInputComponent, {
               small: true,
               value: this.props.xform.max,
-              onChange: (v) => this.props.onChange(update(this.props.xform, { max: { $set: v } }))
+              onChange: (v: any) => this.props.onChange(update(this.props.xform, { max: { $set: v } }))
             })
           ),
           " ",
@@ -126,7 +126,7 @@ export default BinsComponent = (function () {
               small: true,
               value: this.props.xform.numBins,
               decimal: false,
-              onChange: (v) => this.props.onChange(update(this.props.xform, { numBins: { $set: v } }))
+              onChange: (v: any) => this.props.onChange(update(this.props.xform, { numBins: { $set: v } }))
             })
           ),
           (() => {
@@ -165,14 +165,14 @@ export default BinsComponent = (function () {
               )
             )
           : undefined
-      )
+      );
     }
   }
   BinsComponent.initClass()
   return BinsComponent
 })()
 
-function LabeledInlineComponent(props) {
+function LabeledInlineComponent(props: any) {
   return R(
     "div",
     { style: { display: "inline-block" } },

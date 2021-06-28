@@ -24,7 +24,7 @@ function getC3Css() {
 }
 
 // Get the svg XML text straight from the DOM node, adding the css styling to it as a <style> element
-function getC3String(c3Node) {
+function getC3String(c3Node: any) {
   // Log SVG with stylesheet info
   // First get the svg DOM node and make a copy as an XML doc
   const svgStr = c3Node.outerHTML
@@ -53,7 +53,7 @@ function getC3String(c3Node) {
 }
 
 // Creates the svg string and saves that to file
-function saveSvgToFile(containerDiv, title) {
+function saveSvgToFile(containerDiv: any, title: any) {
   const svgFinalStr = getC3String(containerDiv.firstChild)
   const blob = new Blob([svgFinalStr], { type: "image/svg+xml" })
   // Require at use as causes server problems
@@ -67,7 +67,7 @@ function saveSvgToFile(containerDiv, title) {
 // schema: the chart's schema
 // format: "svg" or "png"
 export default {
-  save(design, data, schema, format) {
+  save(design: any, data: any, schema: any, format: any) {
     const compiler = new LayeredChartCompiler({ schema })
     const props = {
       design,
@@ -80,7 +80,7 @@ export default {
     containerDiv.className += "c3"
     chartOptions.bindto = containerDiv
     const title = design.titleText
-    let chart = null
+    let chart: any = null
     const onRender = () => {
       return _.defer(function () {
         if (format === "svg") {
@@ -112,7 +112,7 @@ line, path {fill: none;stroke: rgb(0, 0, 0);}
           el.appendChild(customStyle)
 
           saveSvgAsPng.saveSvgAsPng(el, `${title || "untitled"}.png`, {
-            selectorRemap(selector) {
+            selectorRemap(selector: any) {
               if ([".c3 path, .c3 line", ".c3 line, .c3 path"].includes(selector)) {
                 return "path, line"
               }
@@ -126,7 +126,7 @@ line, path {fill: none;stroke: rgb(0, 0, 0);}
           })
         }
         return chart.destroy()
-      })
+      });
     }
     chartOptions.onrendered = _.debounce(_.once(onRender), 1000)
     const c3 = require("c3")

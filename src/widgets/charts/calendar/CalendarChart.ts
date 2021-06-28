@@ -23,11 +23,11 @@ Design is:
 
 */
 export default CalendarChart = class CalendarChart extends Chart {
-  cleanDesign(design, schema) {
+  cleanDesign(design: any, schema: any) {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
-    design = produce(design, (draft) => {
+    design = produce(design, (draft: any) => {
       // Fill in defaults
       draft.version = design.version || 1
 
@@ -51,7 +51,7 @@ export default CalendarChart = class CalendarChart extends Chart {
     return design
   }
 
-  validateDesign(design, schema) {
+  validateDesign(design: any, schema: any) {
     const axisBuilder = new AxisBuilder({ schema })
 
     // Check that has table
@@ -75,7 +75,7 @@ export default CalendarChart = class CalendarChart extends Chart {
     return error
   }
 
-  isEmpty(design) {
+  isEmpty(design: any) {
     return !design.dateAxis || !design.valueAxis
   }
 
@@ -86,7 +86,7 @@ export default CalendarChart = class CalendarChart extends Chart {
   //   design: design
   //   onDesignChange: function
   //   filters: array of filters
-  createDesignerElement(options) {
+  createDesignerElement(options: any) {
     // Require here to prevent server require problems
     const CalendarChartDesignerComponent = require("./CalendarChartDesignerComponent")
 
@@ -95,7 +95,7 @@ export default CalendarChart = class CalendarChart extends Chart {
       design: this.cleanDesign(options.design, options.schema),
       dataSource: options.dataSource,
       filters: options.filter,
-      onDesignChange: (design) => {
+      onDesignChange: (design: any) => {
         // Clean design
         design = this.cleanDesign(design, options.schema)
         return options.onDesignChange(design)
@@ -110,7 +110,7 @@ export default CalendarChart = class CalendarChart extends Chart {
   // dataSource: data source to get data from
   // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   // callback: (error, data)
-  getData(design, schema, dataSource, filters, callback) {
+  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
     const exprCompiler = new ExprCompiler(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
@@ -173,7 +173,7 @@ export default CalendarChart = class CalendarChart extends Chart {
   //   width, height: size of the chart view
   //   scope: current scope of the view element
   //   onScopeChange: called when scope changes with new scope
-  createViewElement(options) {
+  createViewElement(options: any) {
     // Require here to prevent server require problems
     const CalendarChartViewComponent = require("./CalendarChartViewComponent")
 
@@ -194,14 +194,14 @@ export default CalendarChart = class CalendarChart extends Chart {
     return React.createElement(CalendarChartViewComponent, props)
   }
 
-  createDataTable(design, schema, dataSource, data) {
+  createDataTable(design: any, schema: any, dataSource: any, data: any) {
     const header = ["Date", "Value"]
     const rows = _.map(data, (row) => [moment(row.date).format("YYYY-MM-DD"), row.value])
     return [header].concat(rows)
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design, schema) {
+  getFilterableTables(design: any, schema: any) {
     return _.compact([design.table])
   }
 

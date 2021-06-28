@@ -18,7 +18,7 @@ export default ImageUploaderComponent = (function () {
       // existing UID of the image if available
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -29,7 +29,7 @@ export default ImageUploaderComponent = (function () {
       }
     }
 
-    onFileDrop = (files) => {
+    onFileDrop = (files: any) => {
       this.setState({ files, uploading: true })
 
       this.xhr = new XMLHttpRequest()
@@ -44,7 +44,7 @@ export default ImageUploaderComponent = (function () {
       return this.setState({ uid: id })
     }
 
-    uploadProgress = (e) => {
+    uploadProgress = (e: any) => {
       if (!this.progressBar) {
         return
       }
@@ -57,7 +57,7 @@ export default ImageUploaderComponent = (function () {
       }
     }
 
-    uploadComplete = (e) => {
+    uploadComplete = (e: any) => {
       if (e.target.status === 200) {
         this.setState({ uploading: false, files: null, editing: false })
         return this.props.onUpload(this.state.uid)
@@ -67,7 +67,7 @@ export default ImageUploaderComponent = (function () {
     }
 
     createId() {
-      return uuid().replace(/-/g, "")
+      return uuid().replace(/-/g, "");
     }
 
     renderUploader() {
@@ -89,7 +89,7 @@ export default ImageUploaderComponent = (function () {
                 R("div", {
                   className: "progress-bar",
                   style: { width: "0%" },
-                  ref: (c) => {
+                  ref: (c: any) => {
                     return (this.progressBar = c)
                   }
                 })
@@ -98,7 +98,7 @@ export default ImageUploaderComponent = (function () {
         ),
 
         this.state.uid ? R("a", { onClick: () => this.setState({ editing: false }) }, "Cancel") : undefined
-      )
+      );
     }
 
     renderPreview() {

@@ -55,7 +55,7 @@ export default DatagridViewComponent = (function () {
       this.defaultProps = { pageSize: 100 }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
       this.state = {
         rows: [],
@@ -65,7 +65,7 @@ export default DatagridViewComponent = (function () {
       }
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
       // If design or filters changed, delete all rows
       // TODO won't this reload on column resize?
       if (!_.isEqual(nextProps.design, this.props.design) || !_.isEqual(nextProps.filters, this.props.filters)) {
@@ -97,7 +97,7 @@ export default DatagridViewComponent = (function () {
         loadState.offset,
         loadState.limit,
         loadState.filters,
-        (error, newRows) => {
+        (error: any, newRows: any) => {
           if (error) {
             console.error(error)
             alert("Error loading data")
@@ -114,7 +114,7 @@ export default DatagridViewComponent = (function () {
             return this.setState({ rows, entirelyLoaded: newRows.length < this.props.pageSize })
           }
         }
-      )
+      );
     }
 
     // Reloads all data
@@ -122,7 +122,7 @@ export default DatagridViewComponent = (function () {
       return this.setState({ rows: [], entirelyLoaded: false })
     }
 
-    deleteRow(rowIndex, callback) {
+    deleteRow(rowIndex: any, callback: any) {
       const newRows = this.state.rows.slice()
       _.pullAt(newRows, rowIndex)
       this.setState({ rows: newRows })
@@ -130,13 +130,13 @@ export default DatagridViewComponent = (function () {
     }
 
     // Reload a single row
-    reloadRow(rowIndex, callback) {
+    reloadRow(rowIndex: any, callback: any) {
       return this.props.datagridDataSource.getRows(
         this.props.design,
         rowIndex,
         1,
         this.props.filters,
-        (error, rows) => {
+        (error: any, rows: any) => {
           if (error || !rows[0]) {
             console.error(error)
             alert("Error loading data")
@@ -150,10 +150,10 @@ export default DatagridViewComponent = (function () {
           this.setState({ rows: newRows })
           return callback()
         }
-      )
+      );
     }
 
-    handleColumnResize = (newColumnWidth, columnKey) => {
+    handleColumnResize = (newColumnWidth: any, columnKey: any) => {
       // Find index of column
       const columnIndex = _.findIndex(this.props.design.columns, { id: columnKey })
 
@@ -168,7 +168,7 @@ export default DatagridViewComponent = (function () {
       return this.props.onDesignChange(_.extend({}, this.props.design, { columns }))
     }
 
-    handleCellClick = (rowIndex, columnIndex) => {
+    handleCellClick = (rowIndex: any, columnIndex: any) => {
       // Ignore if already editing
       if (this.state.editingCell?.rowIndex === rowIndex && this.state.editingCell?.columnIndex === columnIndex) {
         return
@@ -210,7 +210,7 @@ export default DatagridViewComponent = (function () {
         this.props.design.table,
         this.state.rows[rowIndex].id,
         column.expr,
-        (error, canEdit) => {
+        (error: any, canEdit: any) => {
           // TODO handle error
           if (error) {
             throw error
@@ -221,7 +221,7 @@ export default DatagridViewComponent = (function () {
             return this.setState({ editingCell: { rowIndex, columnIndex } })
           }
         }
-      )
+      );
     }
 
     // Called to save
@@ -237,15 +237,15 @@ export default DatagridViewComponent = (function () {
       const value = this.editCellComp.getValue()
 
       return this.setState({ savingCell: true }, () => {
-        return this.props.updateCell(this.props.design.table, rowId, expr, value, (error) => {
+        return this.props.updateCell(this.props.design.table, rowId, expr, value, (error: any) => {
           // TODO handle error
 
           // Reload row
           return this.reloadRow(this.state.editingCell.rowIndex, () => {
             return this.setState({ editingCell: null, savingCell: false })
           })
-        })
-      })
+        });
+      });
     }
 
     handleCancelEdit = () => {
@@ -253,24 +253,24 @@ export default DatagridViewComponent = (function () {
     }
 
     // Called with current ref edit. Save
-    refEditCell = (comp) => {
+    refEditCell = (comp: any) => {
       return (this.editCellComp = comp)
     }
 
-    handleRowDoubleClick = (ev, rowIndex) => {
+    handleRowDoubleClick = (ev: any, rowIndex: any) => {
       if (this.props.onRowDoubleClick != null && this.state.rows[rowIndex].id) {
         return this.props.onRowDoubleClick(this.props.design.table, this.state.rows[rowIndex].id, rowIndex)
       }
     }
 
-    handleRowClick = (ev, rowIndex) => {
+    handleRowClick = (ev: any, rowIndex: any) => {
       if (this.props.onRowClick != null && this.state.rows[rowIndex].id) {
         return this.props.onRowClick(this.props.design.table, this.state.rows[rowIndex].id, rowIndex)
       }
     }
 
     // Render a single cell. exprType is passed in for performance purposes and is calculated once per column
-    renderCell = (column, columnIndex, exprType, cellProps) => {
+    renderCell = (column: any, columnIndex: any, exprType: any, cellProps: any) => {
       // If rendering placeholder row
       if (cellProps.rowIndex >= this.state.rows.length) {
         // Load next tick as cannot update while rendering
@@ -344,7 +344,7 @@ export default DatagridViewComponent = (function () {
     }
 
     // Render a single column
-    renderColumn(column, columnIndex) {
+    renderColumn(column: any, columnIndex: any) {
       const exprUtils = new ExprUtils(this.props.schema)
 
       // Get expression type

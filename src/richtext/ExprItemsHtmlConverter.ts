@@ -22,7 +22,7 @@ export default ExprItemsHtmlConverter = class ExprItemsHtmlConverter extends Ite
   // summarizeExprs shows summaries of expressions, not values
   // namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
   // locale: locale to use e.g. "en"
-  constructor(schema, designMode, exprValues, summarizeExprs, namedStrings, locale) {
+  constructor(schema: any, designMode: any, exprValues: any, summarizeExprs: any, namedStrings: any, locale: any) {
     super(namedStrings)
 
     this.schema = schema
@@ -34,7 +34,7 @@ export default ExprItemsHtmlConverter = class ExprItemsHtmlConverter extends Ite
 
   // Converts an item that is not an element to html. Override in subclass.
   // To be reversible, should contain data-embed which contains JSON of item
-  convertSpecialItemToHtml(item) {
+  convertSpecialItemToHtml(item: any) {
     let html = ""
 
     if (item.type === "expr") {
@@ -93,30 +93,29 @@ export default ExprItemsHtmlConverter = class ExprItemsHtmlConverter extends Ite
     return html
   }
 
-  convertElemToItems(elem) {
+  convertElemToItems(elem: any) {
     const items = super.convertElemToItems(elem)
 
     // Ensure exprs have unique ids
     const takenIds = {}
-    var uniqueify = (items) =>
-      (() => {
-        const result = []
-        for (let item of items) {
-          if (item.type === "expr") {
-            if (takenIds[item.id]) {
-              item.id = uuid()
-            }
-            takenIds[item.id] = true
+    var uniqueify = (items: any) => (() => {
+      const result = []
+      for (let item of items) {
+        if (item.type === "expr") {
+          if (takenIds[item.id]) {
+            item.id = uuid()
           }
-
-          if (item.items) {
-            result.push(uniqueify(item.items))
-          } else {
-            result.push(undefined)
-          }
+          takenIds[item.id] = true
         }
-        return result
-      })()
+
+        if (item.items) {
+          result.push(uniqueify(item.items))
+        } else {
+          result.push(undefined)
+        }
+      }
+      return result
+    })()
 
     uniqueify(items)
 

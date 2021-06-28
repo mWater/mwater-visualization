@@ -84,7 +84,7 @@ export default ColorPaletteCollectionComponent = (function () {
       ]
     }
 
-    onPaletteSelected = (index) => {
+    onPaletteSelected = (index: any) => {
       // Generate color map
       const scheme = ColorSchemeFactory.createColorScheme({
         type: ColorPaletteCollectionComponent.palettes[index].type,

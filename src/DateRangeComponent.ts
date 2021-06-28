@@ -21,7 +21,7 @@ export default DateRangeComponent = (function () {
       // true if for datetime, not date
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -30,7 +30,7 @@ export default DateRangeComponent = (function () {
       }
     }
 
-    toMoment(value) {
+    toMoment(value: any) {
       if (!value) {
         return null
       }
@@ -42,7 +42,7 @@ export default DateRangeComponent = (function () {
       }
     }
 
-    fromMoment(value) {
+    fromMoment(value: any) {
       if (!value) {
         return null
       }
@@ -58,7 +58,7 @@ export default DateRangeComponent = (function () {
       return this.setState({ dropdownOpen: false })
     }
 
-    handleStartChange = (value) => {
+    handleStartChange = (value: any) => {
       // Go to start of day if datetime
       if (this.props.datetime) {
         value = moment(value)
@@ -73,7 +73,7 @@ export default DateRangeComponent = (function () {
       }
     }
 
-    handleEndChange = (value) => {
+    handleEndChange = (value: any) => {
       // Go to end of day if datetime
       if (this.props.datetime) {
         value = moment(value)
@@ -90,7 +90,7 @@ export default DateRangeComponent = (function () {
       return this.setState({ dropdownOpen: false })
     }
 
-    handlePreset = (preset) => {
+    handlePreset = (preset: any) => {
       // Go to start/end of day if datetime
       let end, start
       if (this.props.datetime) {

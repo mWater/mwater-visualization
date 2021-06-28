@@ -24,13 +24,13 @@ export default OrderBysDesignerComponent = (function () {
       this.defaultProps = { orderBys: [] }
     }
 
-    handleChange = (index, orderBy) => {
+    handleChange = (index: any, orderBy: any) => {
       const orderBys = this.props.orderBys.slice()
       orderBys[index] = orderBy
       return this.props.onChange(orderBys)
     }
 
-    handleRemove = (index) => {
+    handleRemove = (index: any) => {
       const orderBys = this.props.orderBys.slice()
       orderBys.splice(index, 1)
       return this.props.onChange(orderBys)
@@ -89,11 +89,11 @@ class OrderByDesignerComponent extends React.Component {
     // Current table
   }
 
-  handleExprChange = (expr) => {
+  handleExprChange = (expr: any) => {
     return this.props.onChange(_.extend({}, this.props.orderBy, { expr }))
   }
 
-  handleDirectionChange = (ev) => {
+  handleDirectionChange = (ev: any) => {
     return this.props.onChange(_.extend({}, this.props.orderBy, { direction: ev.target.checked ? "desc" : "asc" }))
   }
 

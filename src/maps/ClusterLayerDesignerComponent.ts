@@ -28,29 +28,29 @@ export default ClusterLayerDesignerComponent = (function () {
     }
 
     // Apply updates to design
-    update(updates) {
+    update(updates: any) {
       return this.props.onDesignChange(_.extend({}, this.props.design, updates))
     }
 
     // Update axes with specified changes
-    updateAxes(changes) {
+    updateAxes(changes: any) {
       const axes = _.extend({}, this.props.design.axes, changes)
       return this.update({ axes })
     }
 
-    handleTableChange = (table) => {
+    handleTableChange = (table: any) => {
       return this.update({ table })
     }
-    handleGeometryAxisChange = (axis) => {
+    handleGeometryAxisChange = (axis: any) => {
       return this.updateAxes({ geometry: axis })
     }
-    handleFilterChange = (expr) => {
+    handleFilterChange = (expr: any) => {
       return this.update({ filter: expr })
     }
-    handleTextColorChange = (color) => {
+    handleTextColorChange = (color: any) => {
       return this.update({ textColor: color })
     }
-    handleFillColorChange = (color) => {
+    handleFillColorChange = (color: any) => {
       return this.update({ fillColor: color })
     }
 

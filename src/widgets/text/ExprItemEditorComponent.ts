@@ -26,7 +26,7 @@ export default ExprItemEditorComponent = (function () {
       // Table that is filtered to have one row
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       // Keep table in state as it can be set before the expression
@@ -35,16 +35,16 @@ export default ExprItemEditorComponent = (function () {
       }
     }
 
-    handleTableChange = (table) => {
+    handleTableChange = (table: any) => {
       return this.setState({ table })
     }
 
-    handleExprChange = (expr) => {
+    handleExprChange = (expr: any) => {
       const exprItem = _.extend({}, this.props.exprItem, { expr })
       return this.props.onChange(exprItem)
     }
 
-    handleIncludeLabelChange = (ev) => {
+    handleIncludeLabelChange = (ev: any) => {
       const exprItem = _.extend({}, this.props.exprItem, {
         includeLabel: ev.target.checked,
         labelText: ev.target.checked ? this.props.exprItem.labelText : undefined
@@ -52,12 +52,12 @@ export default ExprItemEditorComponent = (function () {
       return this.props.onChange(exprItem)
     }
 
-    handleLabelTextChange = (ev) => {
+    handleLabelTextChange = (ev: any) => {
       const exprItem = _.extend({}, this.props.exprItem, { labelText: ev.target.value || null })
       return this.props.onChange(exprItem)
     }
 
-    handleFormatChange = (ev) => {
+    handleFormatChange = (ev: any) => {
       const exprItem = _.extend({}, this.props.exprItem, { format: ev.target.value || null })
       return this.props.onChange(exprItem)
     }

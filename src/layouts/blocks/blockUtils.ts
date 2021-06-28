@@ -5,7 +5,7 @@ import uuid from "uuid"
 
 // When block is dropped on it. side is top, left, bottom, right)
 // returns new root block
-export function dropBlock(rootBlock, sourceBlock, targetBlock, side) {
+export function dropBlock(rootBlock: any, sourceBlock: any, targetBlock: any, side: any) {
   // Handle root case, only dropping on bottom
   let blocks, index
   if (targetBlock.type === "root" && rootBlock.id === targetBlock.id) {
@@ -94,7 +94,7 @@ export function dropBlock(rootBlock, sourceBlock, targetBlock, side) {
 
 // Updates a block
 // returns new root block
-export function updateBlock(rootBlock, block) {
+export function updateBlock(rootBlock: any, block: any) {
   // If vertical or horizontal
   if (["vertical", "horizontal", "root"].includes(rootBlock.type)) {
     let { blocks } = rootBlock
@@ -119,7 +119,7 @@ export function updateBlock(rootBlock, block) {
 
 // When block is removed
 // returns new root block
-export function removeBlock(rootBlock, block) {
+export function removeBlock(rootBlock: any, block: any) {
   // If vertical or horizontal
   if (["vertical", "horizontal", "root"].includes(rootBlock.type)) {
     let { blocks } = rootBlock
@@ -144,7 +144,7 @@ export function removeBlock(rootBlock, block) {
 }
 
 // Clean blocks, simplifying as needed
-export function cleanBlock(rootBlock) {
+export function cleanBlock(rootBlock: any) {
   // If vertical or horizontal
   if (["vertical", "horizontal", "root"].includes(rootBlock.type)) {
     let { blocks } = rootBlock

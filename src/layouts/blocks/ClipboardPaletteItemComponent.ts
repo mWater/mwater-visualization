@@ -70,11 +70,11 @@ class ClipboardPaletteItemComponent extends React.Component {
 ClipboardPaletteItemComponent.initClass()
 
 const blockTargetSpec = {
-  canDrop(props, monitor) {
+  canDrop(props: any, monitor: any) {
     return true
   },
 
-  drop(props, monitor, component) {
+  drop(props: any, monitor: any, component: any) {
     // Check that not from a nested one
     if (monitor.didDrop()) {
       return
@@ -84,7 +84,7 @@ const blockTargetSpec = {
   }
 }
 
-function collectTarget(connect, monitor) {
+function collectTarget(connect: any, monitor: any) {
   return {
     connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver({ shallow: true }),

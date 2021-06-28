@@ -5,7 +5,7 @@ import pako from "pako"
 /*
 Gzips and base64 encodes JSON object if larger than 100 bytes
 */
-export default function (json) {
+export default function (json: any) {
   const str = JSON.stringify(json)
   if (str && str.length > 100) {
     return btoa(pako.deflate(str, { to: "string" }))

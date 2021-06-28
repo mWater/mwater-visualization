@@ -32,35 +32,35 @@ export default BufferLayerDesignerComponent = (function () {
     }
 
     // Apply updates to design
-    update(updates) {
+    update(updates: any) {
       return this.props.onDesignChange(_.extend({}, this.props.design, updates))
     }
 
     // Update axes with specified changes
-    updateAxes(changes) {
+    updateAxes(changes: any) {
       const axes = _.extend({}, this.props.design.axes, changes)
       return this.update({ axes })
     }
 
-    handleTableChange = (table) => {
+    handleTableChange = (table: any) => {
       return this.update({ table })
     }
-    handleRadiusChange = (radius) => {
+    handleRadiusChange = (radius: any) => {
       return this.update({ radius })
     }
-    handleGeometryAxisChange = (axis) => {
+    handleGeometryAxisChange = (axis: any) => {
       return this.updateAxes({ geometry: axis })
     }
-    handleFilterChange = (expr) => {
+    handleFilterChange = (expr: any) => {
       return this.update({ filter: expr })
     }
-    handleColorChange = (color) => {
+    handleColorChange = (color: any) => {
       return this.update({ color })
     }
-    handleColorAxisChange = (axis) => {
+    handleColorAxisChange = (axis: any) => {
       return this.updateAxes({ color: axis })
     }
-    handleFillOpacityChange = (fillOpacity) => {
+    handleFillOpacityChange = (fillOpacity: any) => {
       return this.update({ fillOpacity: fillOpacity / 100 })
     }
 

@@ -9,7 +9,7 @@ const R = React.createElement
 import AxisBuilder from "../src/axes/AxisBuilder"
 import canonical from "canonical-json"
 
-function compare(actual, expected) {
+function compare(actual: any, expected: any) {
   return assert.equal(
     canonical(actual),
     canonical(expected),

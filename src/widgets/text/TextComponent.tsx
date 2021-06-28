@@ -47,19 +47,19 @@ export default TextComponent = (function () {
       )
     }
 
-    handleItemsChange = (items) => {
+    handleItemsChange = (items: any) => {
       const design = _.extend({}, this.props.design, { items })
       return this.props.onDesignChange(design)
     }
 
-    handleInsertExpr = (item) => {
+    handleInsertExpr = (item: any) => {
       const html = '<div data-embed="' + _.escape(JSON.stringify(item)) + '"></div>'
 
       return this.editor.pasteHTML(html)
     }
 
-    replaceItem(item) {
-      var replaceItemInItems = (items, item) =>
+    replaceItem(item: any) {
+      var replaceItemInItems = (items: any, item: any) =>
         _.map(items, function (i) {
           if (i.id === item.id) {
             return item
@@ -74,14 +74,14 @@ export default TextComponent = (function () {
       return this.props.onDesignChange(_.extend({}, this.props.design, { items }))
     }
 
-    handleItemClick = (item) => {
-      return this.exprUpdateModal.open(item, (item) => {
+    handleItemClick = (item: any) => {
+      return this.exprUpdateModal.open(item, (item: any) => {
         // Replace in items
         return this.replaceItem(item)
-      })
+      });
     }
 
-    handleAddExpr = (ev) => {
+    handleAddExpr = (ev: any) => {
       ev.preventDefault()
       return this.exprInsertModal.open()
     }
@@ -99,7 +99,7 @@ export default TextComponent = (function () {
       return [
         R(ExprInsertModalComponent, {
           key: "exprInsertModal",
-          ref: (c) => {
+          ref: (c: any) => {
             return (this.exprInsertModal = c)
           },
           schema: this.props.schema,
@@ -109,17 +109,17 @@ export default TextComponent = (function () {
         }),
         R(ExprUpdateModalComponent, {
           key: "exprUpdateModal",
-          ref: (c) => {
+          ref: (c: any) => {
             return (this.exprUpdateModal = c)
           },
           schema: this.props.schema,
           dataSource: this.props.dataSource,
           singleRowTable: this.props.singleRowTable
         })
-      ]
+      ];
     }
 
-    refRichTextComponent = (c) => {
+    refRichTextComponent = (c: any) => {
       return (this.editor = c)
     }
 

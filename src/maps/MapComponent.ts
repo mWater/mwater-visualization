@@ -46,7 +46,7 @@ export default MapComponent = (function () {
       this.contextTypes = { locale: PropTypes.string }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
       this.state = {
         undoStack: new UndoStack().push(props.design),
@@ -55,7 +55,7 @@ export default MapComponent = (function () {
       }
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
       // Save on stack
       this.setState({ undoStack: this.state.undoStack.push(nextProps.design) })
 
@@ -148,7 +148,7 @@ export default MapComponent = (function () {
       )
     }
 
-    handleDesignChange = (design) => {
+    handleDesignChange = (design: any) => {
       if (this.props.onDesignChange) {
         return this.props.onDesignChange(design)
       } else {

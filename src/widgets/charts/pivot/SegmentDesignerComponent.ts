@@ -28,7 +28,7 @@ export default SegmentDesignerComponent = (function () {
       // array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -47,7 +47,7 @@ export default SegmentDesignerComponent = (function () {
     }
 
     // Updates segment with the specified changes
-    update(changes) {
+    update(changes: any) {
       const segment = _.extend({}, this.props.segment, changes)
       return this.props.onChange(segment)
     }
@@ -61,23 +61,23 @@ export default SegmentDesignerComponent = (function () {
       return this.setState({ mode: "multiple" })
     }
 
-    handleValueAxisChange = (valueAxis) => {
+    handleValueAxisChange = (valueAxis: any) => {
       return this.update({ valueAxis })
     }
 
-    handleLabelChange = (ev) => {
+    handleLabelChange = (ev: any) => {
       return this.update({ label: ev.target.value })
     }
 
-    handleFilterChange = (filter) => {
+    handleFilterChange = (filter: any) => {
       return this.update({ filter })
     }
 
-    handleOrderExprChange = (orderExpr) => {
+    handleOrderExprChange = (orderExpr: any) => {
       return this.update({ orderExpr })
     }
 
-    handleOrderDirChange = (orderDir) => {
+    handleOrderDirChange = (orderDir: any) => {
       return this.update({ orderDir })
     }
 
@@ -127,7 +127,7 @@ export default SegmentDesignerComponent = (function () {
           help: this.state.mode === "multiple" ? `Optional label for the ${this.props.segmentType}s` : undefined
         },
         R("input", {
-          ref: (elem) => {
+          ref: (elem: any) => {
             return (this.labelElem = elem)
           },
           type: "text",
@@ -135,7 +135,7 @@ export default SegmentDesignerComponent = (function () {
           value: this.props.segment.label || "",
           onChange: this.handleLabelChange
         })
-      )
+      );
     }
 
     renderValueAxis() {
@@ -228,11 +228,11 @@ export default SegmentDesignerComponent = (function () {
               "Shade filler cells: ",
               R(ColorComponent, {
                 color: this.props.segment.fillerColor,
-                onChange: (color) => this.update({ fillerColor: color })
+                onChange: (color: any) => this.update({ fillerColor: color })
               })
             )
           : undefined
-      )
+      );
     }
 
     renderBorders() {
@@ -246,21 +246,21 @@ export default SegmentDesignerComponent = (function () {
         R(BorderComponent, {
           value: this.props.segment.borderBefore,
           defaultValue: 2,
-          onChange: (value) => this.update({ borderBefore: value })
+          onChange: (value: any) => this.update({ borderBefore: value })
         }),
         R("div", { key: "within" }, "Within: "),
         R(BorderComponent, {
           value: this.props.segment.borderWithin,
           defaultValue: 1,
-          onChange: (value) => this.update({ borderWithin: value })
+          onChange: (value: any) => this.update({ borderWithin: value })
         }),
         R("div", { key: "after" }, this.props.segmentType === "row" ? "Bottom: " : "Right: "),
         R(BorderComponent, {
           value: this.props.segment.borderAfter,
           defaultValue: 2,
-          onChange: (value) => this.update({ borderAfter: value })
+          onChange: (value: any) => this.update({ borderAfter: value })
         })
-      )
+      );
     }
 
     renderOrderExpr() {

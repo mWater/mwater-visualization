@@ -32,29 +32,29 @@ export default LayeredChartLayerDesignerComponent = (function () {
       // array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
     }
 
-    isLayerPolar(layer) {
+    isLayerPolar(layer: any) {
       return ["pie", "donut"].includes(layer.type || this.props.design.type)
     }
 
-    doesLayerNeedGrouping(layer) {
+    doesLayerNeedGrouping(layer: any) {
       return !["scatter"].includes(layer.type || this.props.design.type)
     }
 
     // Determine if x-axis required
-    isXAxisRequired(layer) {
+    isXAxisRequired(layer: any) {
       return !this.isLayerPolar(layer)
     }
 
-    getAxisTypes(layer, axisKey) {
+    getAxisTypes(layer: any, axisKey: any) {
       return LayeredChartUtils.getAxisTypes(this.props.design, layer, axisKey)
     }
 
-    getAxisLabel(icon, label) {
+    getAxisLabel(icon: any, label: any) {
       return R("span", null, R("span", { className: "glyphicon glyphicon-" + icon }), " " + label)
     }
 
     // Determine icon/label for color axis
-    getXAxisLabel(layer) {
+    getXAxisLabel(layer: any) {
       if (this.props.design.transpose) {
         return this.getAxisLabel("resize-vertical", "Vertical Axis")
       } else {
@@ -63,7 +63,7 @@ export default LayeredChartLayerDesignerComponent = (function () {
     }
 
     // Determine icon/label for color axis
-    getYAxisLabel(layer) {
+    getYAxisLabel(layer: any) {
       if (this.isLayerPolar(layer)) {
         return this.getAxisLabel("repeat", "Angle Axis")
       } else if (this.props.design.transpose) {
@@ -74,7 +74,7 @@ export default LayeredChartLayerDesignerComponent = (function () {
     }
 
     // Determine icon/label for color axis
-    getColorAxisLabel(layer) {
+    getColorAxisLabel(layer: any) {
       if (this.isLayerPolar(layer)) {
         return this.getAxisLabel("text-color", "Label Axis")
       } else {
@@ -83,25 +83,25 @@ export default LayeredChartLayerDesignerComponent = (function () {
     }
 
     // Updates layer with the specified changes
-    updateLayer(changes) {
+    updateLayer(changes: any) {
       const layer = _.extend({}, this.props.design.layers[this.props.index], changes)
       return this.props.onChange(layer)
     }
 
     // Update axes with specified changes
-    updateAxes(changes) {
+    updateAxes(changes: any) {
       const axes = _.extend({}, this.props.design.layers[this.props.index].axes, changes)
       return this.updateLayer({ axes })
     }
 
-    handleNameChange = (ev) => {
+    handleNameChange = (ev: any) => {
       return this.updateLayer({ name: ev.target.value })
     }
-    handleTableChange = (table) => {
+    handleTableChange = (table: any) => {
       return this.updateLayer({ table })
     }
 
-    handleXAxisChange = (axis) => {
+    handleXAxisChange = (axis: any) => {
       const layer = this.props.design.layers[this.props.index]
       const axesChanges = { x: axis }
 
@@ -113,12 +113,12 @@ export default LayeredChartLayerDesignerComponent = (function () {
       return this.updateAxes(axesChanges)
     }
 
-    handleXColorMapChange = (xColorMap) => {
+    handleXColorMapChange = (xColorMap: any) => {
       const layer = this.props.design.layers[this.props.index]
       return this.updateLayer({ xColorMap })
     }
 
-    handleColorAxisChange = (axis) => {
+    handleColorAxisChange = (axis: any) => {
       const layer = this.props.design.layers[this.props.index]
       const axesChanges = { color: axis }
 
@@ -130,22 +130,22 @@ export default LayeredChartLayerDesignerComponent = (function () {
       return this.updateAxes(axesChanges)
     }
 
-    handleYAxisChange = (axis) => {
+    handleYAxisChange = (axis: any) => {
       return this.updateAxes({ y: axis })
     }
-    handleFilterChange = (filter) => {
+    handleFilterChange = (filter: any) => {
       return this.updateLayer({ filter })
     }
-    handleColorChange = (color) => {
+    handleColorChange = (color: any) => {
       return this.updateLayer({ color })
     }
-    handleCumulativeChange = (ev) => {
+    handleCumulativeChange = (ev: any) => {
       return this.updateLayer({ cumulative: ev.target.checked })
     }
-    handleTrendlineChange = (ev) => {
+    handleTrendlineChange = (ev: any) => {
       return this.updateLayer({ trendline: ev.target.checked ? "linear" : undefined })
     }
-    handleStackedChange = (ev) => {
+    handleStackedChange = (ev: any) => {
       return this.updateLayer({ stacked: ev.target.checked })
     }
 

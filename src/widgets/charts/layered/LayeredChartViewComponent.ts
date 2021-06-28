@@ -34,7 +34,7 @@ export default LayeredChartViewComponent = (function () {
       // e.g. "en"
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -61,11 +61,11 @@ export default LayeredChartViewComponent = (function () {
       }
     }
 
-    handleHeaderChange = (header) => {
+    handleHeaderChange = (header: any) => {
       return this.props.onDesignChange(_.extend({}, this.props.design, { header }))
     }
 
-    handleFooterChange = (footer) => {
+    handleFooterChange = (footer: any) => {
       return this.props.onDesignChange(_.extend({}, this.props.design, { footer }))
     }
 
@@ -152,7 +152,7 @@ class C3ChartComponent extends React.Component {
     // e.g. "en"
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     // Create throttled createChart
@@ -164,7 +164,7 @@ class C3ChartComponent extends React.Component {
     return this.updateScope()
   }
 
-  createChart = (props) => {
+  createChart = (props: any) => {
     if (this.chart) {
       this.chart.destroy()
     }
@@ -187,7 +187,7 @@ class C3ChartComponent extends React.Component {
     return (this.chart = c3.generate(chartOptions))
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps: any, prevState: any) {
     // Check if schema, data or design (except for header + footer) changed
     let changed = false
 
@@ -246,7 +246,7 @@ class C3ChartComponent extends React.Component {
     d3.select(el)
       .selectAll(".c3-chart-bar .c3-bar, .c3-chart-line .c3-circle")
       // Highlight only scoped
-      .style("opacity", (d, i) => {
+      .style("opacity", (d: any, i: any) => {
         let scope
         const dataPoint = this.lookupDataPoint(dataMap, d)
         if (dataPoint) {
@@ -274,7 +274,7 @@ class C3ChartComponent extends React.Component {
     return d3
       .select(el)
       .selectAll(".c3-chart-arcs .c3-chart-arc")
-      .style("opacity", (d, i) => {
+      .style("opacity", (d: any, i: any) => {
         let scope
         const dataPoint = this.lookupDataPoint(dataMap, d)
         if (dataPoint) {
@@ -292,11 +292,11 @@ class C3ChartComponent extends React.Component {
           // Not scoped
           return 1
         }
-      })
+      });
   }
 
   // Gets a data point { layerIndex, row } from a d3 object (d)
-  lookupDataPoint(dataMap, d) {
+  lookupDataPoint(dataMap: any, d: any) {
     let dataPoint
     if (d.data) {
       d = d.data
@@ -319,7 +319,7 @@ class C3ChartComponent extends React.Component {
     return compiler.createDataMap(this.props.design, this.props.data)
   }
 
-  handleDataClick = (d) => {
+  handleDataClick = (d: any) => {
     // Get data map
     const dataMap = this.getDataMap()
 

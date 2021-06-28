@@ -31,7 +31,7 @@ export default CategoryMapComponent = (function () {
       // True to start expanded
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -39,12 +39,12 @@ export default CategoryMapComponent = (function () {
       }
     }
 
-    handleReorder = (map) => {
+    handleReorder = (map: any) => {
       const order = _.pluck(map, "value")
       return this.props.onChange(update(this.props.axis, { drawOrder: { $set: order } }))
     }
 
-    handleColorChange = (value, color) => {
+    handleColorChange = (value: any, color: any) => {
       // Delete if present for value
       const colorMap = _.filter(this.props.axis.colorMap, (item) => item.value !== value)
 
@@ -56,7 +56,7 @@ export default CategoryMapComponent = (function () {
       return this.props.onChange(update(this.props.axis, { colorMap: { $set: colorMap } }))
     }
 
-    handleExcludeChange = (value, ev) => {
+    handleExcludeChange = (value: any, ev: any) => {
       let excludedValues
       if (ev.target.checked) {
         excludedValues = _.difference(this.props.axis.excludedValues, [value])
@@ -68,7 +68,7 @@ export default CategoryMapComponent = (function () {
     }
 
     // Gets the current color value if known
-    lookupColor(value) {
+    lookupColor(value: any) {
       const item = _.find(this.props.axis.colorMap, (item) => item.value === value)
       if (item) {
         return item.color
@@ -76,14 +76,14 @@ export default CategoryMapComponent = (function () {
       return null
     }
 
-    handleNullLabelChange = (e) => {
+    handleNullLabelChange = (e: any) => {
       const name = prompt("Enter label for none value", this.props.axis.nullLabel || "None")
       if (name) {
         return this.props.onChange(update(this.props.axis, { nullLabel: { $set: name } }))
       }
     }
 
-    handleCategoryLabelChange = (category, e) => {
+    handleCategoryLabelChange = (category: any, e: any) => {
       let { label } = category
       if (this.props.axis.categoryLabels) {
         label = this.props.axis.categoryLabels[JSON.stringify(category.value)] || label
@@ -93,18 +93,18 @@ export default CategoryMapComponent = (function () {
       if (name != null) {
         if (name) {
           return this.props.onChange(
-            produce(this.props.axis, (draft) => {
+            produce(this.props.axis, (draft: any) => {
               draft.categoryLabels = draft.categoryLabels || {}
               draft.categoryLabels[JSON.stringify(category.value)] = name
             })
-          )
+          );
         } else {
           return this.props.onChange(
-            produce(this.props.axis, (draft) => {
+            produce(this.props.axis, (draft: any) => {
               draft.categoryLabels = draft.categoryLabels || {}
               delete draft.categoryLabels[JSON.stringify(category.value)]
             })
-          )
+          );
         }
       }
     }
@@ -113,7 +113,7 @@ export default CategoryMapComponent = (function () {
       return this.setState({ collapsed: !this.state.collapsed })
     }
 
-    renderLabel(category) {
+    renderLabel(category: any) {
       let { label } = category
       if (this.props.axis.categoryLabels) {
         label = this.props.axis.categoryLabels[JSON.stringify(category.value)] || label
@@ -136,7 +136,7 @@ export default CategoryMapComponent = (function () {
     }
 
     // Category is { value: category value, label: category label }
-    renderCategory = (category, index, connectDragSource, connectDragPreview, connectDropTarget) => {
+    renderCategory = (category: any, index: any, connectDragSource: any, connectDragPreview: any, connectDropTarget: any) => {
       const labelStyle = {
         verticalAlign: "middle",
         marginLeft: 5
@@ -178,7 +178,7 @@ export default CategoryMapComponent = (function () {
               R(ColorComponent, {
                 key: "color",
                 color: this.lookupColor(category.value),
-                onChange: (color) => this.handleColorChange(category.value, color)
+                onChange: (color: any) => this.handleColorChange(category.value, color)
               })
             )
           : undefined,

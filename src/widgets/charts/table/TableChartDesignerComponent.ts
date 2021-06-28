@@ -30,34 +30,34 @@ export default TableChartDesignerComponent = (function () {
     }
 
     // Updates design with the specified changes
-    updateDesign(changes) {
+    updateDesign(changes: any) {
       const design = _.extend({}, this.props.design, changes)
       return this.props.onDesignChange(design)
     }
 
-    handleTitleTextChange = (ev) => {
+    handleTitleTextChange = (ev: any) => {
       return this.updateDesign({ titleText: ev.target.value })
     }
-    handleTableChange = (table) => {
+    handleTableChange = (table: any) => {
       return this.updateDesign({ table })
     }
-    handleFilterChange = (filter) => {
+    handleFilterChange = (filter: any) => {
       return this.updateDesign({ filter })
     }
-    handleOrderingsChange = (orderings) => {
+    handleOrderingsChange = (orderings: any) => {
       return this.updateDesign({ orderings })
     }
-    handleLimitChange = (limit) => {
+    handleLimitChange = (limit: any) => {
       return this.updateDesign({ limit })
     }
 
-    handleColumnChange = (index, column) => {
+    handleColumnChange = (index: any, column: any) => {
       const columns = this.props.design.columns.slice()
       columns[index] = column
       return this.updateDesign({ columns })
     }
 
-    handleRemoveColumn = (index) => {
+    handleRemoveColumn = (index: any) => {
       const columns = this.props.design.columns.slice()
       columns.splice(index, 1)
       return this.updateDesign({ columns })
@@ -100,7 +100,7 @@ export default TableChartDesignerComponent = (function () {
       )
     }
 
-    renderColumn = (column, index, connectDragSource, connectDragPreview, connectDropTarget) => {
+    renderColumn = (column: any, index: any, connectDragSource: any, connectDragPreview: any, connectDropTarget: any) => {
       const style = {
         borderTop: "solid 1px #EEE",
         paddingTop: 10,
@@ -126,7 +126,7 @@ export default TableChartDesignerComponent = (function () {
       )
     }
 
-    handleReorder = (map) => {
+    handleReorder = (map: any) => {
       return this.updateDesign({ columns: map })
     }
 
@@ -268,26 +268,26 @@ class TableChartColumnDesignerComponent extends React.Component {
   }
 
   // Updates column with the specified changes
-  updateColumn(changes) {
+  updateColumn(changes: any) {
     const column = _.extend({}, this.props.design.columns[this.props.index], changes)
     return this.props.onChange(column)
   }
 
-  updateTextAxis(changes) {
+  updateTextAxis(changes: any) {
     const textAxis = _.extend({}, this.props.design.columns[this.props.index].textAxis, changes)
     return this.updateColumn({ textAxis })
   }
 
-  handleExprChange = (expr) => {
+  handleExprChange = (expr: any) => {
     return this.updateTextAxis({ expr })
   }
-  handleHeaderTextChange = (ev) => {
+  handleHeaderTextChange = (ev: any) => {
     return this.updateColumn({ headerText: ev.target.value })
   }
-  handleAggrChange = (aggr) => {
+  handleAggrChange = (aggr: any) => {
     return this.updateTextAxis({ aggr })
   }
-  handleFormatChange = (ev) => {
+  handleFormatChange = (ev: any) => {
     return this.updateColumn({ format: ev.target.value })
   }
 

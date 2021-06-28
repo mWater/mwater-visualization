@@ -6,13 +6,13 @@ import _ from "lodash"
 // Builds a csv string from an array of arrays
 export default CsvBuilder = class CsvBuilder {
   // Table is a 2d array [row][column]
-  build(table) {
+  build(table: any) {
     return this._stringifyCsv(table, this._csvifyValue)
   }
 
   // Third-party code START
-  _stringifyCsv(table, replacer) {
-    replacer = replacer || ((r, c, v) => v)
+  _stringifyCsv(table: any, replacer: any) {
+    replacer = replacer || ((r: any, c: any, v: any) => v)
 
     let csv = ""
     const rr = table.length
@@ -43,7 +43,7 @@ export default CsvBuilder = class CsvBuilder {
     return csv
   }
 
-  _csvifyValue(r, c, value) {
+  _csvifyValue(r: any, c: any, value: any) {
     if (value == null) {
       return ""
     }

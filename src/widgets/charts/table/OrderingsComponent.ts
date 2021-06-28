@@ -30,13 +30,13 @@ export default OrderingsComponent = (function () {
       return this.props.onOrderingsChange(orderings)
     }
 
-    handleOrderingRemove = (index) => {
+    handleOrderingRemove = (index: any) => {
       const orderings = this.props.orderings.slice()
       orderings.splice(index, 1)
       return this.props.onOrderingsChange(orderings)
     }
 
-    handleOrderingChange = (index, ordering) => {
+    handleOrderingChange = (index: any, ordering: any) => {
       const orderings = this.props.orderings.slice()
       orderings[index] = ordering
       return this.props.onOrderingsChange(orderings)
@@ -83,16 +83,16 @@ class OrderingComponent extends React.Component {
     // Current table
   }
 
-  handleAxisChange = (axis) => {
+  handleAxisChange = (axis: any) => {
     return this.props.onOrderingChange(_.extend({}, this.props.ordering, { axis }))
   }
 
-  handleExprChange = (expr) => {
+  handleExprChange = (expr: any) => {
     const axis = _.extend({}, this.props.ordering.axis || {}, { expr })
     return this.handleAxisChange(axis)
   }
 
-  handleDirectionChange = (ev) => {
+  handleDirectionChange = (ev: any) => {
     return this.props.onOrderingChange(
       _.extend({}, this.props.ordering, { direction: ev.target.checked ? "desc" : "asc" })
     )

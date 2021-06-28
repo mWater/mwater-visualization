@@ -5,13 +5,13 @@ import _ from "lodash"
 
 // Immutable undo/redo stack. Mutation operations return a new copy
 export default UndoStack = class UndoStack {
-  constructor(undoStack, redoStack) {
+  constructor(undoStack: any, redoStack: any) {
     this.undoStack = undoStack || []
     this.redoStack = redoStack || []
   }
 
   // Add a value to the stack
-  push(value) {
+  push(value: any) {
     // No trivial pushes
     if (_.isEqual(this.getValue(), value)) {
       return this
@@ -19,7 +19,7 @@ export default UndoStack = class UndoStack {
 
     const undoStack = this.undoStack.slice()
     undoStack.push(value)
-    const redoStack = []
+    const redoStack: any = []
 
     return new UndoStack(undoStack, redoStack)
   }

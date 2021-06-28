@@ -37,7 +37,7 @@ export default DatagridDesignerComponent = (function () {
       // Call with props { schema, dataSource, globalFilters, filterableTables, onChange, nullIfIrrelevant }. Displays a component to edit global filters
     }
 
-    handleTableChange = (table) => {
+    handleTableChange = (table: any) => {
       const design = {
         table,
         columns: []
@@ -46,19 +46,19 @@ export default DatagridDesignerComponent = (function () {
       return this.props.onDesignChange(design)
     }
 
-    handleColumnsChange = (columns) => {
+    handleColumnsChange = (columns: any) => {
       return this.props.onDesignChange(update(this.props.design, { columns: { $set: columns } }))
     }
 
-    handleFilterChange = (filter) => {
+    handleFilterChange = (filter: any) => {
       return this.props.onDesignChange(update(this.props.design, { filter: { $set: filter } }))
     }
 
-    handleGlobalFiltersChange = (globalFilters) => {
+    handleGlobalFiltersChange = (globalFilters: any) => {
       return this.props.onDesignChange(update(this.props.design, { globalFilters: { $set: globalFilters } }))
     }
 
-    handleOrderBysChange = (orderBys) => {
+    handleOrderBysChange = (orderBys: any) => {
       return this.props.onDesignChange(update(this.props.design, { orderBys: { $set: orderBys } }))
     }
 
@@ -131,8 +131,7 @@ export default DatagridDesignerComponent = (function () {
               { style: { marginBottom: 200 } },
               R(QuickfiltersDesignComponent, {
                 design: this.props.design.quickfilters,
-                onDesignChange: (design) =>
-                  this.props.onDesignChange(update(this.props.design, { quickfilters: { $set: design } })),
+                onDesignChange: (design: any) => this.props.onDesignChange(update(this.props.design, { quickfilters: { $set: design } })),
                 schema: this.props.schema,
                 dataSource: this.props.dataSource,
                 tables: [this.props.design.table]
@@ -152,7 +151,7 @@ export default DatagridDesignerComponent = (function () {
             )
           }
         ]
-      })
+      });
     }
 
     render() {
@@ -215,7 +214,7 @@ class ColumnsDesignerComponent extends React.Component {
     // Called when columns changes
   }
 
-  handleColumnChange = (columnIndex, column) => {
+  handleColumnChange = (columnIndex: any, column: any) => {
     const columns = this.props.columns.slice()
 
     // Handle remove
@@ -275,7 +274,7 @@ class ColumnsDesignerComponent extends React.Component {
     return this.props.onColumnsChange([])
   }
 
-  renderColumn = (column, columnIndex, connectDragSource, connectDragPreview, connectDropTarget) => {
+  renderColumn = (column: any, columnIndex: any, connectDragSource: any, connectDragPreview: any, connectDropTarget: any) => {
     return R(ColumnDesignerComponent, {
       key: columnIndex,
       schema: this.props.schema,
@@ -371,15 +370,15 @@ class ColumnDesignerComponent extends React.Component {
     // Connect drop target
   }
 
-  handleExprChange = (expr) => {
+  handleExprChange = (expr: any) => {
     return this.props.onColumnChange(update(this.props.column, { expr: { $set: expr } }))
   }
 
-  handleLabelChange = (label) => {
+  handleLabelChange = (label: any) => {
     return this.props.onColumnChange(update(this.props.column, { label: { $set: label } }))
   }
 
-  handleFormatChange = (ev) => {
+  handleFormatChange = (ev: any) => {
     return this.props.onColumnChange(update(this.props.column, { format: { $set: ev.target.value } }))
   }
 
@@ -549,7 +548,7 @@ class ColumnDesignerComponent extends React.Component {
           className: "form-control",
           placeholder: exprUtils.summarizeExpr(this.props.column.expr),
           value: this.props.column.label,
-          onChange: (ev) => this.handleLabelChange(ev.target.value)
+          onChange: (ev: any) => this.handleLabelChange(ev.target.value)
         })
       ),
 

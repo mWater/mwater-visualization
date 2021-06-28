@@ -28,14 +28,14 @@ export default SettingsModalComponent = (function () {
       // Call with props { schema, dataSource, globalFilters, onChange, nullIfIrrelevant }. Displays a component to edit global filters
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
       this.state = {
         design: null // Set when being edited
       }
     }
 
-    show(design) {
+    show(design: any) {
       return this.setState({ design })
     }
 
@@ -47,16 +47,16 @@ export default SettingsModalComponent = (function () {
     handleCancel = () => {
       return this.setState({ design: null })
     }
-    handleDesignChange = (design) => {
+    handleDesignChange = (design: any) => {
       return this.setState({ design })
     }
 
-    handleFiltersChange = (filters) => {
+    handleFiltersChange = (filters: any) => {
       const design = _.extend({}, this.state.design, { filters })
       return this.handleDesignChange(design)
     }
 
-    handleGlobalFiltersChange = (globalFilters) => {
+    handleGlobalFiltersChange = (globalFilters: any) => {
       const design = _.extend({}, this.state.design, { globalFilters })
       return this.handleDesignChange(design)
     }
@@ -97,8 +97,7 @@ export default SettingsModalComponent = (function () {
           filterableTables.length > 0
             ? R(QuickfiltersDesignComponent, {
                 design: this.state.design.quickfilters,
-                onDesignChange: (design) =>
-                  this.handleDesignChange(update(this.state.design, { quickfilters: { $set: design } })),
+                onDesignChange: (design: any) => this.handleDesignChange(update(this.state.design, { quickfilters: { $set: design } })),
                 schema: this.props.schema,
                 dataSource: this.props.dataSource,
                 tables: filterableTables
@@ -162,7 +161,7 @@ export default SettingsModalComponent = (function () {
             "Enable Implicit Filtering (leave unchecked for new dashboards)"
           )
         )
-      )
+      );
     }
   }
   SettingsModalComponent.initClass()

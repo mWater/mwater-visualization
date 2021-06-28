@@ -40,17 +40,17 @@ export default MapDesignerComponent = (function () {
       }
     }
 
-    handleAttributionChange = (text) => {
+    handleAttributionChange = (text: any) => {
       const design = _.extend({}, this.props.design, { attribution: text })
       return this.props.onDesignChange(design)
     }
 
-    handleAutoBoundsChange = (value) => {
+    handleAutoBoundsChange = (value: any) => {
       const design = _.extend({}, this.props.design, { autoBounds: value })
       return this.props.onDesignChange(design)
     }
 
-    handleShowLayerSwitcherChange = (value) => {
+    handleShowLayerSwitcherChange = (value: any) => {
       const design = _.extend({}, this.props.design, { showLayerSwitcher: value })
       return this.props.onDesignChange(design)
     }
@@ -59,7 +59,7 @@ export default MapDesignerComponent = (function () {
       return this.props.onDesignChange(MapUtils.convertToClusterMap(this.props.design))
     }
 
-    handleInitialLegendDisplayChange = (value) => {
+    handleInitialLegendDisplayChange = (value: any) => {
       const design = _.extend({}, this.props.design, { initialLegendDisplay: value })
       return this.props.onDesignChange(design)
     }
@@ -208,7 +208,7 @@ class AttributionComponent extends React.Component {
     this.defaultProps = { text: null }
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     this.state = {
@@ -216,7 +216,7 @@ class AttributionComponent extends React.Component {
     }
   }
 
-  handleTextChange = (e) => {
+  handleTextChange = (e: any) => {
     return this.props.onTextChange(e.target.value)
   }
 
@@ -265,7 +265,7 @@ class AdvancedOptionsComponent extends React.Component {
     }
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     this.state = {
@@ -301,10 +301,10 @@ class AdvancedOptionsComponent extends React.Component {
           style: { display: "inline-block" },
           placeholder: "None",
           value: this.props.design.maxZoom,
-          onChange: (v) => this.props.onDesignChange(_.extend({}, this.props.design, { maxZoom: v }))
+          onChange: (v: any) => this.props.onDesignChange(_.extend({}, this.props.design, { maxZoom: v }))
         })
       )
-    )
+    );
   }
 }
 AdvancedOptionsComponent.initClass()

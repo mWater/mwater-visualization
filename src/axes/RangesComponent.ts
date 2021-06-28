@@ -25,7 +25,7 @@ export default RangesComponent = (function () {
       }
     }
 
-    handleRangeChange = (index, range) => {
+    handleRangeChange = (index: any, range: any) => {
       const ranges = this.props.xform.ranges.slice()
       ranges[index] = range
       return this.props.onChange(update(this.props.xform, { ranges: { $set: ranges } }))
@@ -37,13 +37,13 @@ export default RangesComponent = (function () {
       return this.props.onChange(update(this.props.xform, { ranges: { $set: ranges } }))
     }
 
-    handleRemoveRange = (index) => {
+    handleRemoveRange = (index: any) => {
       const ranges = this.props.xform.ranges.slice()
       ranges.splice(index, 1)
       return this.props.onChange(update(this.props.xform, { ranges: { $set: ranges } }))
     }
 
-    renderRange = (range, index, connectDragSource, connectDragPreview, connectDropTarget) => {
+    renderRange = (range: any, index: any, connectDragSource: any, connectDragPreview: any, connectDropTarget: any) => {
       return R(RangeComponent, {
         key: range.id,
         range,
@@ -55,7 +55,7 @@ export default RangesComponent = (function () {
       })
     }
 
-    handleReorder = (ranges) => {
+    handleReorder = (ranges: any) => {
       return this.props.onChange(update(this.props.xform, { ranges: { $set: ranges } }))
     }
 
@@ -121,11 +121,11 @@ class RangeComponent extends React.Component {
     //reorderable connector
   }
 
-  handleMinOpenChange = (minOpen) => {
+  handleMinOpenChange = (minOpen: any) => {
     return this.props.onChange(update(this.props.range, { minOpen: { $set: minOpen } }))
   }
 
-  handleMaxOpenChange = (maxOpen) => {
+  handleMaxOpenChange = (maxOpen: any) => {
     return this.props.onChange(update(this.props.range, { maxOpen: { $set: maxOpen } }))
   }
 
@@ -179,7 +179,7 @@ class RangeComponent extends React.Component {
               value: this.props.range.minValue,
               placeholder: "None",
               small: true,
-              onChange: (v) => this.props.onChange(update(this.props.range, { minValue: { $set: v } }))
+              onChange: (v: any) => this.props.onChange(update(this.props.range, { minValue: { $set: v } }))
             })
           ),
 
@@ -208,7 +208,7 @@ class RangeComponent extends React.Component {
               value: this.props.range.maxValue,
               placeholder: "None",
               small: true,
-              onChange: (v) => this.props.onChange(update(this.props.range, { maxValue: { $set: v } }))
+              onChange: (v: any) => this.props.onChange(update(this.props.range, { maxValue: { $set: v } }))
             })
           ),
 
@@ -220,8 +220,7 @@ class RangeComponent extends React.Component {
               className: "form-control input-sm",
               value: this.props.range.label || "",
               placeholder,
-              onChange: (ev) =>
-                this.props.onChange(update(this.props.range, { label: { $set: ev.target.value || null } }))
+              onChange: (ev: any) => this.props.onChange(update(this.props.range, { label: { $set: ev.target.value || null } }))
             })
           ),
 
@@ -236,7 +235,7 @@ class RangeComponent extends React.Component {
           )
         )
       )
-    )
+    );
   }
 }
 RangeComponent.initClass()

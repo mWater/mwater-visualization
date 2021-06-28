@@ -35,12 +35,12 @@ export default TextLiteralComponent = (function () {
       }
     }
 
-    handleSingleChange = (val) => {
+    handleSingleChange = (val: any) => {
       const value = val ? val.value || null : null // Blank is null
       return this.props.onChange(value)
     }
 
-    handleMultipleChange = (val) => {
+    handleMultipleChange = (val: any) => {
       const value = val ? _.pluck(val, "value") : []
 
       if (value.length > 0) {
@@ -50,7 +50,7 @@ export default TextLiteralComponent = (function () {
       }
     }
 
-    getOptions = (input, cb) => {
+    getOptions = (input: any, cb: any) => {
       // Determine type of expression
       let filters
       const exprUtils = new ExprUtils(this.props.schema)
@@ -102,7 +102,7 @@ export default TextLiteralComponent = (function () {
         filters,
         null,
         250,
-        (err, values) => {
+        (err: any, values: any) => {
           if (err) {
             return
           }
@@ -169,6 +169,6 @@ export default TextLiteralComponent = (function () {
   return TextLiteralComponent
 })()
 
-function escapeRegex(s) {
-  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
+function escapeRegex(s: any) {
+  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
 }

@@ -22,7 +22,7 @@ export default HorizontalBlockComponent = (function () {
       // Called with (block) when block is updated
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -42,7 +42,7 @@ export default HorizontalBlockComponent = (function () {
       return document.removeEventListener("mouseup", this.handleMouseUp)
     }
 
-    handleMouseDown = (index, ev) => {
+    handleMouseDown = (index: any, ev: any) => {
       // Prevent html5 drag
       ev.preventDefault()
 
@@ -57,7 +57,7 @@ export default HorizontalBlockComponent = (function () {
       return document.addEventListener("mouseup", this.handleMouseUp)
     }
 
-    handleMouseMove = (ev) => {
+    handleMouseMove = (ev: any) => {
       if (!this.state.dragInitialX) {
         this.setState({ dragInitialX: ev.clientX })
         return
@@ -78,7 +78,7 @@ export default HorizontalBlockComponent = (function () {
       return this.setState({ dragXOffset })
     }
 
-    handleMouseUp = (ev) => {
+    handleMouseUp = (ev: any) => {
       // Remove listeners
       document.removeEventListener("mousemove", this.handleMouseMove)
       document.removeEventListener("mouseup", this.handleMouseUp)
@@ -125,7 +125,7 @@ export default HorizontalBlockComponent = (function () {
         totalWeight += (this.props.block.weights || [])[index] || 1
       }
 
-      const percentages = []
+      const percentages: any = []
       for (
         index = 0, end1 = this.props.block.blocks.length, asc1 = 0 <= end1;
         asc1 ? index < end1 : index > end1;
@@ -165,13 +165,13 @@ export default HorizontalBlockComponent = (function () {
                     {
                       style: { width: `${percentages[index]}%`, verticalAlign: "top" },
                       key: block.id,
-                      ref: (c) => {
+                      ref: (c: any) => {
                         return (this.blockRefs[`block${index}`] = c)
                       }
                     },
                     this.props.renderBlock(block)
                   )
-                ]
+                ];
               })
             )
           )
@@ -200,16 +200,16 @@ export default HorizontalBlockComponent = (function () {
                 {
                   style: { width: `${percentages[index]}%`, verticalAlign: "top", display: "inline-block" },
                   key: block.id,
-                  ref: (c) => {
+                  ref: (c: any) => {
                     return (this.blockRefs[`block${index}`] = c)
                   },
                   className: "mwater-visualization-horizontal-block-item"
                 },
                 this.props.renderBlock(block)
               )
-            ]
+            ];
           })
-        )
+        );
       }
     }
   }

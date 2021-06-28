@@ -3,7 +3,7 @@
 // Misc utils for layered charts
 
 // Get possible types for axis of a layer
-export function getAxisTypes(design, layer, axis) {
+export function getAxisTypes(design: any, layer: any, axis: any) {
   // If categorical
   const layerType = layer.type || design.type
 

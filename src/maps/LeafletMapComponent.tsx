@@ -78,7 +78,7 @@ export default LeafletMapComponent = (function () {
     // Reload all tiles
     reload() {
       // TODO reload JSON tiles
-      return this.tileLayers.map((tileLayer) => tileLayer.redraw())
+      return this.tileLayers.map((tileLayer: any) => tileLayer.redraw());
     }
 
     // Get underlying leaflet map
@@ -98,7 +98,7 @@ export default LeafletMapComponent = (function () {
     }
 
     // Set bounds. Bounds are in { w, n, s, e } format. Padding is optional
-    setBounds(bounds, pad) {
+    setBounds(bounds: any, pad: any) {
       if (bounds) {
         // Ignore if same as current
         if (this.hasBounds) {
@@ -207,7 +207,7 @@ export default LeafletMapComponent = (function () {
       return this.updateMap()
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
       return this.updateMap(prevProps)
     }
 
@@ -220,7 +220,7 @@ export default LeafletMapComponent = (function () {
     //   contents: React element of contents
     //   location: lat/lng
     //   offset: x and y of offset
-    openPopup(options) {
+    openPopup(options: any) {
       const popupDiv = L.DomUtil.create("div", "")
       return ReactDOM.render(options.contents, popupDiv, () => {
         let popup
@@ -231,7 +231,7 @@ export default LeafletMapComponent = (function () {
       })
     }
 
-    updateMap(prevProps) {
+    updateMap(prevProps: any) {
       // Update size
       if (prevProps && (prevProps.width !== this.props.width || prevProps.height !== this.props.height)) {
         this.map.invalidateSize()
@@ -384,7 +384,7 @@ export default LeafletMapComponent = (function () {
         }
 
         if (this.props.layers) {
-          let layer
+          let layer: any
           this.tileLayers = []
           this.geoJsonLayers = []
 
@@ -460,24 +460,24 @@ export default LeafletMapComponent = (function () {
 
                 if (layer.onGridClick) {
                   ;((layer) => {
-                    return utfGridLayer.on("click", (ev) => {
+                    return utfGridLayer.on("click", (ev: any) => {
                       return layer.onGridClick(ev)
-                    })
+                    });
                   })(layer)
                 }
 
                 if (layer.onGridHover) {
                   result.push(
                     ((layer) => {
-                      utfGridLayer.on("mouseout", (ev) => {
+                      utfGridLayer.on("mouseout", (ev: any) => {
                         return layer.onGridHover(_.omit(ev, "data"))
                       })
-                      utfGridLayer.on("mouseover", (ev) => {
+                      utfGridLayer.on("mouseover", (ev: any) => {
                         return layer.onGridHover(ev)
                       })
-                      return utfGridLayer.on("mousemove", (ev) => {
+                      return utfGridLayer.on("mousemove", (ev: any) => {
                         return layer.onGridHover(ev)
-                      })
+                      });
                     })(layer)
                   )
                 } else {
@@ -488,7 +488,7 @@ export default LeafletMapComponent = (function () {
               }
             }
             return result
-          })()
+          })();
         }
       }
     }
@@ -502,12 +502,12 @@ export default LeafletMapComponent = (function () {
             React.cloneElement(this.props.legend, { zoom: this.map.getZoom() })
           : undefined,
         R("div", {
-          ref: (c) => {
+          ref: (c: any) => {
             return (this.mapElem = c)
           },
           style: { width: this.props.width, height: this.props.height }
         })
-      )
+      );
     }
   }
   LeafletMapComponent.initClass()

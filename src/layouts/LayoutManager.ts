@@ -13,26 +13,26 @@ export default LayoutManager = class LayoutManager {
   //  style: style to use for layout. null for default
   //  layoutOptions: layout options to use
   //  disableMaps: true to disable maps
-  renderLayout(options) {
+  renderLayout(options: any) {
     return null
   }
 
   // Tests if dashboard has any items
-  isEmpty(items) {
+  isEmpty(items: any) {
     return true
   }
 
   // Gets { type, design } of a widget
-  getWidgetTypeAndDesign(items, widgetId) {
+  getWidgetTypeAndDesign(items: any, widgetId: any) {
     return null
   }
 
   // Gets all widgets in items as array of { id, type, design }
-  getAllWidgets(items) {
+  getAllWidgets(items: any) {
     return []
   }
 
-  static createLayoutManager(type) {
+  static createLayoutManager(type: any) {
     // Default is old grid type
     type = type || "grid"
 
@@ -52,9 +52,9 @@ export default LayoutManager = class LayoutManager {
     }
 
     return {
-      addWidget(items, widgetType, widgetDesign) {
+      addWidget(items: any, widgetType: any, widgetDesign: any) {
         throw new Error("Not implemented")
       }
-    }
+    };
   }
 }

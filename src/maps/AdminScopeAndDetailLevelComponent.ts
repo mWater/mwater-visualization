@@ -25,7 +25,7 @@ export default AdminScopeAndDetailLevelComponent = (function () {
       // Called with (scope, scopeLevel, detailLevel)
     }
 
-    handleScopeChange = (scope, scopeLevel) => {
+    handleScopeChange = (scope: any, scopeLevel: any) => {
       if (scope) {
         // Detail level will be set by DetailLevelSelectComponent
         return this.props.onScopeAndDetailLevelChange(scope, scopeLevel, null)
@@ -34,7 +34,7 @@ export default AdminScopeAndDetailLevelComponent = (function () {
       }
     }
 
-    handleDetailLevelChange = (detailLevel) => {
+    handleDetailLevelChange = (detailLevel: any) => {
       return this.props.onScopeAndDetailLevelChange(this.props.scope, this.props.scopeLevel, detailLevel)
     }
 

@@ -46,7 +46,7 @@ export default FindReplaceModalComponent = (function () {
       // Called when values have been updated
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
       this.state = {
         open: false, // True if modal is open
@@ -113,7 +113,7 @@ export default FindReplaceModalComponent = (function () {
       this.setState({ progress: 0 })
       // Number completed (twice for each row, once to check can edit and other to perform)
       let completed = 0
-      return this.props.dataSource.performQuery(query, (error, rows) => {
+      return this.props.dataSource.performQuery(query, (error: any, rows: any) => {
         if (error) {
           this.setState({ progress: null })
           alert(`Error: ${error.message}`)
@@ -192,7 +192,7 @@ export default FindReplaceModalComponent = (function () {
             )
           }
         )
-      })
+      });
     }
 
     renderPreview() {
@@ -226,7 +226,7 @@ export default FindReplaceModalComponent = (function () {
         })
       })
 
-      return R(AutoSizeComponent, { injectWidth: true }, (size) => {
+      return R(AutoSizeComponent, { injectWidth: true }, (size: any) => {
         return R(DatagridViewComponent, {
           width: size.width,
           height: 400,
@@ -239,7 +239,7 @@ export default FindReplaceModalComponent = (function () {
           design,
           filters: this.props.filters
         })
-      })
+      });
     }
 
     renderContents() {

@@ -42,7 +42,7 @@ export default ExprCellComponent = (function () {
       return this.setState({ editing: true })
     }
 
-    renderImage(id) {
+    renderImage(id: any) {
       const url = this.props.dataSource.getImageUrl(id)
       return R("a", { href: url, key: id, target: "_blank", style: { paddingLeft: 5, paddingRight: 5 } }, "Image")
     }

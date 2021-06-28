@@ -7,11 +7,11 @@ import TestUtils from "react-addons-test-utils"
 const R = React.createElement
 
 export default TestComponent = class TestComponent {
-  constructor(elem) {
+  constructor(elem: any) {
     this.comp = TestUtils.renderIntoDocument(React.createElement(ComponentWrapper, { elem }))
   }
 
-  setElement(elem) {
+  setElement(elem: any) {
     return this.comp.setElement(elem)
   }
 
@@ -26,12 +26,12 @@ export default TestComponent = class TestComponent {
 
 // Wraps a react component, re-render
 class ComponentWrapper extends React.Component {
-  constructor(props) {
+  constructor(props: any) {
     super(props)
     this.state = { elem: this.props.elem }
   }
 
-  setElement = (elem) => {
+  setElement = (elem: any) => {
     return this.setState({ elem })
   }
 

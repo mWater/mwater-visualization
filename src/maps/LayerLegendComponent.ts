@@ -54,7 +54,7 @@ export default LayerLegendComponent = (function () {
     }
 
     render() {
-      let items
+      let items: any
       const axisBuilder = new AxisBuilder({ schema: this.props.schema })
       const categories = this.getCategories()
 

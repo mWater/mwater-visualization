@@ -38,7 +38,7 @@ export default PivotChartViewComponent = (function () {
       // e.g. "en"
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -48,15 +48,15 @@ export default PivotChartViewComponent = (function () {
       }
     }
 
-    handleHeaderChange = (header) => {
+    handleHeaderChange = (header: any) => {
       return this.props.onDesignChange(_.extend({}, this.props.design, { header }))
     }
 
-    handleFooterChange = (footer) => {
+    handleFooterChange = (footer: any) => {
       return this.props.onDesignChange(_.extend({}, this.props.design, { footer }))
     }
 
-    handleEditSection = (sectionId) => {
+    handleEditSection = (sectionId: any) => {
       // If intersection
       if (sectionId.match(":")) {
         return this.setState({
@@ -106,7 +106,7 @@ export default PivotChartViewComponent = (function () {
       return this.setState({ editIntersectionId: null, editIntersection: null })
     }
 
-    handleRemoveSegment = (segmentId) => {
+    handleRemoveSegment = (segmentId: any) => {
       const design = _.extend({}, this.props.design, {
         rows: PivotChartUtils.removeSegment(this.props.design.rows, segmentId),
         columns: PivotChartUtils.removeSegment(this.props.design.columns, segmentId)
@@ -115,7 +115,7 @@ export default PivotChartViewComponent = (function () {
       return this.props.onDesignChange(design)
     }
 
-    handleInsertBeforeSegment = (segmentId) => {
+    handleInsertBeforeSegment = (segmentId: any) => {
       const design = _.extend({}, this.props.design, {
         rows: PivotChartUtils.insertBeforeSegment(this.props.design.rows, segmentId),
         columns: PivotChartUtils.insertBeforeSegment(this.props.design.columns, segmentId)
@@ -124,7 +124,7 @@ export default PivotChartViewComponent = (function () {
       return this.props.onDesignChange(design)
     }
 
-    handleInsertAfterSegment = (segmentId) => {
+    handleInsertAfterSegment = (segmentId: any) => {
       const design = _.extend({}, this.props.design, {
         rows: PivotChartUtils.insertAfterSegment(this.props.design.rows, segmentId),
         columns: PivotChartUtils.insertAfterSegment(this.props.design.columns, segmentId)
@@ -133,7 +133,7 @@ export default PivotChartViewComponent = (function () {
       return this.props.onDesignChange(design)
     }
 
-    handleAddChildSegment = (segmentId) => {
+    handleAddChildSegment = (segmentId: any) => {
       const design = _.extend({}, this.props.design, {
         rows: PivotChartUtils.addChildSegment(this.props.design.rows, segmentId),
         columns: PivotChartUtils.addChildSegment(this.props.design.columns, segmentId)
@@ -142,7 +142,7 @@ export default PivotChartViewComponent = (function () {
       return this.props.onDesignChange(design)
     }
 
-    handleSummarizeSegment = (segmentId) => {
+    handleSummarizeSegment = (segmentId: any) => {
       const design = PivotChartUtils.summarizeSegment(this.props.design, segmentId, "Summary")
 
       return this.props.onDesignChange(design)
@@ -200,10 +200,10 @@ export default PivotChartViewComponent = (function () {
           schema: this.props.schema,
           dataSource: this.props.dataSource,
           segmentType,
-          onChange: (segment) => this.setState({ editSegment: segment }),
+          onChange: (segment: any) => this.setState({ editSegment: segment }),
           filters: this.props.filters
         })
-      )
+      );
     }
 
     renderEditIntersectionModal() {
@@ -223,10 +223,10 @@ export default PivotChartViewComponent = (function () {
           table: this.props.design.table,
           schema: this.props.schema,
           dataSource: this.props.dataSource,
-          onChange: (intersection) => this.setState({ editIntersection: intersection }),
+          onChange: (intersection: any) => this.setState({ editIntersection: intersection }),
           filters: this.props.filters
         })
-      )
+      );
     }
 
     render() {

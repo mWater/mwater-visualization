@@ -41,7 +41,7 @@ export default RichTextComponent = (function () {
       }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -49,7 +49,7 @@ export default RichTextComponent = (function () {
       }
     }
 
-    handleClick = (ev) => {
+    handleClick = (ev: any) => {
       // If click is in component or in palette component, ignore, otherwise remove focus
       if (
         !this.entireComponent.contains(ev.target) &&
@@ -60,7 +60,7 @@ export default RichTextComponent = (function () {
     }
 
     // Paste HTML in
-    pasteHTML(html) {
+    pasteHTML(html: any) {
       return this.contentEditable.pasteHTML(html)
     }
 
@@ -68,13 +68,13 @@ export default RichTextComponent = (function () {
       return this.contentEditable.focus()
     }
 
-    handleInsertExpr = (item) => {
+    handleInsertExpr = (item: any) => {
       const html = '<div data-embed="' + _.escape(JSON.stringify(item)) + '"></div>'
 
       return this.contentEditable.pasteHTML(html)
     }
 
-    handleSetFontSize = (size) => {
+    handleSetFontSize = (size: any) => {
       // Requires a selection
       let html = this.contentEditable.getSelectedHTML()
       if (!html) {
@@ -88,7 +88,7 @@ export default RichTextComponent = (function () {
       return this.contentEditable.pasteHTML(`<span style=\"font-size:${size}\">` + html + "</span>")
     }
 
-    handleSetFontColor = (color) => {
+    handleSetFontColor = (color: any) => {
       // Requires a selection
       const html = this.contentEditable.getSelectedHTML()
       if (!html) {
@@ -98,7 +98,7 @@ export default RichTextComponent = (function () {
       return this.handleCommand("foreColor", color)
     }
 
-    handleChange = (elem) => {
+    handleChange = (elem: any) => {
       const items = this.props.itemsHtmlConverter.convertElemToItems(elem)
 
       // Check if changed
@@ -118,7 +118,7 @@ export default RichTextComponent = (function () {
     }
 
     // Perform a command such as bold, underline, etc.
-    handleCommand = (command, param, ev) => {
+    handleCommand = (command: any, param: any, ev: any) => {
       // Don't lose focus
       ev?.preventDefault()
 
@@ -132,7 +132,7 @@ export default RichTextComponent = (function () {
       }
     }
 
-    handleCreateLink = (ev) => {
+    handleCreateLink = (ev: any) => {
       // Don't lose focus
       ev.preventDefault()
 
@@ -143,7 +143,7 @@ export default RichTextComponent = (function () {
       }
     }
 
-    handleEditorClick = (ev) => {
+    handleEditorClick = (ev: any) => {
       // Be sure focused
       if (!this.state.focused) {
         this.setState({ focused: true })
@@ -170,7 +170,9 @@ export default RichTextComponent = (function () {
       })
     }
 
-    renderPaletteContent = (schemeName, { edges }) => {
+    renderPaletteContent = (schemeName: any, {
+      edges
+    }: any) => {
       return R(
         "div",
         {
@@ -321,7 +323,7 @@ export default RichTextComponent = (function () {
       )
     }
 
-    refContentEditable = (c) => {
+    refContentEditable = (c: any) => {
       return (this.contentEditable = c)
     }
 

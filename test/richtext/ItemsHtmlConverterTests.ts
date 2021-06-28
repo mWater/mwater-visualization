@@ -5,15 +5,15 @@ import { assert } from "chai"
 import ItemsHtmlConverter from "../../src/richtext/ItemsHtmlConverter"
 import canonical from "canonical-json"
 
-function compare(actual, expected) {
+function compare(actual: any, expected: any) {
   return assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected))
 }
 
 describe("ItemsHtmlConverter", () =>
   describe("convertItemsToHtml", function () {
     before(function () {
-      return (this.convert = (items, html) =>
-        assert.equal(new ItemsHtmlConverter({ xyzzy: "magic" }).convertItemsToHtml(items), html))
+      return this.convert = (items: any, html: any) =>
+        assert.equal(new ItemsHtmlConverter({ xyzzy: "magic" }).convertItemsToHtml(items), html);
     })
 
     it("converts and escapes text", function () {

@@ -5,7 +5,7 @@ import { assert } from "chai"
 import MapUtils from "../../src/maps/MapUtils"
 import canonical from "canonical-json"
 
-function compare(actual, expected) {
+function compare(actual: any, expected: any) {
   return assert.equal(
     canonical(actual),
     canonical(expected),

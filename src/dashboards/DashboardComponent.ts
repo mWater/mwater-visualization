@@ -74,7 +74,7 @@ export default DashboardComponent = (function () {
       }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       const layoutOptions = getLayoutOptions(props.design)
@@ -98,7 +98,7 @@ export default DashboardComponent = (function () {
       return this.state.quickfiltersValues || []
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
       let { undoStack } = this.state
 
       // Clear stack if key changed
@@ -164,11 +164,11 @@ export default DashboardComponent = (function () {
       return this.setState({ refreshKey: this.state.refreshKey + 1 })
     }
 
-    handleStyleChange = (style) => {
+    handleStyleChange = (style: any) => {
       return this.props.onDesignChange(_.extend({}, this.props.design, { style: style || null }))
     }
 
-    handleDesignChange = (design) => {
+    handleDesignChange = (design: any) => {
       // If quickfilters have changed, reset values
       if (!_.isEqual(this.props.design.quickfilters, design.quickfilters)) {
         this.setState({ quickfiltersValues: null })
@@ -222,7 +222,7 @@ export default DashboardComponent = (function () {
       )
     }
 
-    renderStyleItem(style) {
+    renderStyleItem(style: any) {
       const isActive = (this.props.design.style || "default") === style
 
       const content = (() => {
@@ -367,15 +367,15 @@ export default DashboardComponent = (function () {
         dataSource: this.props.dataSource,
         quickfiltersDataSource: this.props.dashboardDataSource.getQuickfiltersDataSource(),
         values: this.state.quickfiltersValues,
-        onValuesChange: (values) => this.setState({ quickfiltersValues: values }),
+        onValuesChange: (values: any) => this.setState({ quickfiltersValues: values }),
         locks: this.props.quickfilterLocks,
         filters: this.getCompiledFilters(),
         hideTopBorder: this.props.hideTitleBar,
         onHide: () => this.setState({ hideQuickfilters: true })
-      })
+      });
     }
 
-    refDashboardView = (el) => {
+    refDashboardView = (el: any) => {
       return (this.dashboardView = el)
     }
 
@@ -434,7 +434,7 @@ export default DashboardComponent = (function () {
               onDesignChange: this.handleDesignChange,
               schema: this.props.schema,
               dataSource: this.props.dataSource,
-              ref: (c) => {
+              ref: (c: any) => {
                 return (this.settings = c)
               }
             })
@@ -452,7 +452,7 @@ export default DashboardComponent = (function () {
               })
             )
           : undefined
-      )
+      );
     }
   }
   DashboardComponent.initClass()

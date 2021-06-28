@@ -29,7 +29,7 @@ export default RegionSelectComponent = (function () {
       // Default for existing code
     }
 
-    handleChange = (id) => {
+    handleChange = (id: any) => {
       if (!id) {
         this.props.onChange(null, null)
         return
@@ -48,14 +48,14 @@ export default RegionSelectComponent = (function () {
       }
 
       // Execute query
-      return this.props.dataSource.performQuery(query, (err, rows) => {
+      return this.props.dataSource.performQuery(query, (err: any, rows: any) => {
         if (err) {
           console.log("Error getting regions: " + err?.message)
           return
         }
 
         return this.props.onChange(id, rows[0].level)
-      })
+      });
     }
 
     render() {

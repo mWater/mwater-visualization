@@ -9,12 +9,12 @@ import { DragSource } from "react-dnd"
 
 // Draggable sample that becomes a block when dragged on
 const sourceSpec = {
-  beginDrag(props, monitor, component) {
+  beginDrag(props: any, monitor: any, component: any) {
     return props.createDragItem()
   }
 }
 
-function collectSource(connect, monitor) {
+function collectSource(connect: any, monitor: any) {
   return {
     connectDragSource: connect.dragSource(),
     connectDragPreview: connect.dragPreview()
@@ -39,4 +39,4 @@ class DragSourceComponent extends React.Component {
 }
 DragSourceComponent.initClass()
 
-export default (type) => DragSource(type, sourceSpec, collectSource)(DragSourceComponent)
+export default (type: any) => DragSource(type, sourceSpec, collectSource)(DragSourceComponent);

@@ -28,12 +28,12 @@ export default EditPopupComponent = (function () {
       // Default popup filter joins
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
       this.state = { editing: false }
     }
 
-    handleItemsChange = (items) => {
+    handleItemsChange = (items: any) => {
       let popup = this.props.design.popup || {}
       popup = _.extend({}, popup, { items })
       const design = _.extend({}, this.props.design, { popup })
@@ -74,8 +74,7 @@ export default EditPopupComponent = (function () {
               defaultPopupFilterJoins: this.props.defaultPopupFilterJoins,
               popup: this.props.design.popup,
               design: this.props.design.popupFilterJoins,
-              onDesignChange: (popupFilterJoins) =>
-                this.props.onDesignChange(_.extend({}, this.props.design, { popupFilterJoins }))
+              onDesignChange: (popupFilterJoins: any) => this.props.onDesignChange(_.extend({}, this.props.design, { popupFilterJoins }))
             })
           : undefined,
 
@@ -88,7 +87,7 @@ export default EditPopupComponent = (function () {
                 style: "popup",
                 onItemsChange: this.handleItemsChange,
                 disableMaps: true,
-                renderWidget: (options) => {
+                renderWidget: (options: any) => {
                   const widget = WidgetFactory.createWidget(options.type)
 
                   const widgetDataSource = new DirectWidgetDataSource({
@@ -114,7 +113,7 @@ export default EditPopupComponent = (function () {
               })
             )
           : undefined
-      )
+      );
     }
   }
   EditPopupComponent.initClass()

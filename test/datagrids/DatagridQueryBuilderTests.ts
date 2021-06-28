@@ -7,7 +7,7 @@ import DatagridQueryBuilder from "../../src/datagrids/DatagridQueryBuilder"
 import canonical from "canonical-json"
 import { Schema } from "mwater-expressions"
 
-function compare(actual, expected) {
+function compare(actual: any, expected: any) {
   return assert.equal(
     canonical(actual),
     canonical(expected),

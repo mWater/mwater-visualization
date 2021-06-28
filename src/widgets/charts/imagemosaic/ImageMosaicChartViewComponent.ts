@@ -28,11 +28,11 @@ export default ImageMosaicChartViewComponent = (function () {
       // Called with (tableId, rowId) when item is clicked
     }
 
-    shouldComponentUpdate(prevProps) {
+    shouldComponentUpdate(prevProps: any) {
       return !_.isEqual(prevProps, this.props)
     }
 
-    handleClick = (primaryKey, image) => {
+    handleClick = (primaryKey: any, image: any) => {
       if (this.props.onRowClick) {
         return this.props.onRowClick(this.props.design.table, primaryKey)
       } else {
@@ -41,7 +41,7 @@ export default ImageMosaicChartViewComponent = (function () {
     }
 
     // Render a single image
-    renderImage = (primaryKey, image, imageManager) => {
+    renderImage = (primaryKey: any, image: any, imageManager: any) => {
       return R(
         LazyLoad,
         { key: image.id },
@@ -57,7 +57,7 @@ export default ImageMosaicChartViewComponent = (function () {
     }
 
     // Render images
-    renderImages(imageManager) {
+    renderImages(imageManager: any) {
       const imageElems = []
 
       // For each image
@@ -102,8 +102,8 @@ export default ImageMosaicChartViewComponent = (function () {
       const title = this.props.design.titleText
 
       const imageManager = {
-        getImageThumbnailUrl: (id, success, error) => success(this.props.dataSource.getImageUrl(id, 100)),
-        getImageUrl: (id, success, error) => success(this.props.dataSource.getImageUrl(id))
+        getImageThumbnailUrl: (id: any, success: any, error: any) => success(this.props.dataSource.getImageUrl(id, 100)),
+        getImageUrl: (id: any, success: any, error: any) => success(this.props.dataSource.getImageUrl(id))
       }
 
       return R(
@@ -112,13 +112,13 @@ export default ImageMosaicChartViewComponent = (function () {
         title ? R("p", { style: titleStyle }, title) : undefined,
 
         R(ImagePopupComponent, {
-          ref: (c) => {
+          ref: (c: any) => {
             return (this.imagePopup = c)
           },
           imageManager
         }),
         R("div", null, this.renderImages(imageManager))
-      )
+      );
     }
   }
   ImageMosaicChartViewComponent.initClass()

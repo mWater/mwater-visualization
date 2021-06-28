@@ -27,7 +27,7 @@ export default ScopeAndDetailLevelComponent = (function () {
       // Table name of regions
     }
 
-    handleScopeChange = (scope, scopeLevel) => {
+    handleScopeChange = (scope: any, scopeLevel: any) => {
       if (scope) {
         return this.props.onScopeAndDetailLevelChange(scope, scopeLevel, scopeLevel + 1)
       } else {
@@ -35,7 +35,7 @@ export default ScopeAndDetailLevelComponent = (function () {
       }
     }
 
-    handleDetailLevelChange = (detailLevel) => {
+    handleDetailLevelChange = (detailLevel: any) => {
       return this.props.onScopeAndDetailLevelChange(this.props.scope, this.props.scopeLevel, detailLevel)
     }
 

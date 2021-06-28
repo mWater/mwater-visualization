@@ -3,7 +3,7 @@
 import _ from "lodash"
 
 // Recursively inject table alias tableAlias for `{alias}`
-function injectTableAlias(jsonql, tableAlias) {
+function injectTableAlias(jsonql: any, tableAlias: any) {
   // Handle empty
   if (!jsonql) {
     return jsonql

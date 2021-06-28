@@ -30,7 +30,7 @@ export default MWaterAddRelatedIndicatorComponent = (function () {
       // e.g. "en"
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -79,7 +79,7 @@ export default MWaterAddRelatedIndicatorComponent = (function () {
     }
 
     // See if a property references the indicator
-    doesIndicatorReferenceTable(indicator, table) {
+    doesIndicatorReferenceTable(indicator: any, table: any) {
       for (let proplist of _.values(indicator.design.properties)) {
         for (let property of flattenProperties(proplist)) {
           if (property.idTable === table) {
@@ -91,7 +91,7 @@ export default MWaterAddRelatedIndicatorComponent = (function () {
       return false
     }
 
-    handleSelect = (table) => {
+    handleSelect = (table: any) => {
       // Mark as being added
       this.setState({ addingTables: _.union(this.state.addingTables, [table]) })
 
@@ -175,9 +175,9 @@ export default MWaterAddRelatedIndicatorComponent = (function () {
 })()
 
 // Flattens a nested list of properties
-function flattenProperties(properties) {
+function flattenProperties(properties: any) {
   // Flatten
-  let props = []
+  let props: any = []
   for (let prop of properties) {
     if (prop.contents) {
       props = props.concat(flattenProperties(prop.contents))
@@ -190,7 +190,7 @@ function flattenProperties(properties) {
 }
 
 // Filters text based on lower-case
-function filterMatches(filter, text) {
+function filterMatches(filter: any, text: any) {
   if (!filter) {
     return true
   }

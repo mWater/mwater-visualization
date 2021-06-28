@@ -6,7 +6,7 @@ import * as fixtures from "../fixtures"
 import DatagridUtils from "../../src/datagrids/DatagridUtils"
 import canonical from "canonical-json"
 
-function compare(actual, expected) {
+function compare(actual: any, expected: any) {
   return assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected))
 }
 

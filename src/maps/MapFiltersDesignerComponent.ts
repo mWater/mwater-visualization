@@ -27,12 +27,12 @@ export default MapFiltersDesignerComponent = (function () {
       // Call with props { schema, dataSource, globalFilters, filterableTables, onChange, nullIfIrrelevant }. Displays a component to edit global filters
     }
 
-    handleFiltersChange = (filters) => {
+    handleFiltersChange = (filters: any) => {
       const design = _.extend({}, this.props.design, { filters })
       return this.props.onDesignChange(design)
     }
 
-    handleGlobalFiltersChange = (globalFilters) => {
+    handleGlobalFiltersChange = (globalFilters: any) => {
       const design = _.extend({}, this.props.design, { globalFilters })
       return this.props.onDesignChange(design)
     }

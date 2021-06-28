@@ -6,7 +6,7 @@ let DashboardDataSource
 
 export default DashboardDataSource = class DashboardDataSource {
   // Gets the widget data source for a specific widget
-  getWidgetDataSource(widgetType, widgetId) {
+  getWidgetDataSource(widgetType: any, widgetId: any) {
     throw new Error("Not implemented")
   }
 

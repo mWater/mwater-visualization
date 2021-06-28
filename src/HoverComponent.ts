@@ -5,7 +5,7 @@ import React from "react"
 import ReactDOM from "react-dom"
 
 export default HoverComponent = class HoverComponent extends React.Component {
-  constructor(props) {
+  constructor(props: any) {
     super(props)
     this.state = { hovered: false }
   }
@@ -30,10 +30,10 @@ export default HoverComponent = class HoverComponent extends React.Component {
 
   render() {
     return React.cloneElement(React.Children.only(this.props.children), {
-      ref: (c) => {
+      ref: (c: any) => {
         return (this.main = c)
       },
       hovered: this.state.hovered
-    })
+    });
   }
 }

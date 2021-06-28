@@ -22,13 +22,12 @@ export default MarkerSymbolSelectComponent = (function () {
       // Create options
       const options = mapSymbols
 
-      const optionRenderer = (option) =>
-        R(
-          "span",
-          null,
-          R("i", { className: `fa fa-${option.value.substr(13)}` }), // Trim "font-awesome/"
-          ` ${option.label}`
-        )
+      const optionRenderer = (option: any) => R(
+        "span",
+        null,
+        R("i", { className: `fa fa-${option.value.substr(13)}` }), // Trim "font-awesome/"
+        ` ${option.label}`
+      )
 
       return R(
         "div",

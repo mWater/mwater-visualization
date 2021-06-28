@@ -26,7 +26,7 @@ export default FiltersDesignerComponent = (function () {
       // e.g. "en"
     }
 
-    handleFilterChange = (table, expr) => {
+    handleFilterChange = (table: any, expr: any) => {
       // Clean filter
       expr = new ExprCleaner(this.props.schema).cleanExpr(expr, { table })
 
@@ -36,7 +36,7 @@ export default FiltersDesignerComponent = (function () {
       return this.props.onFiltersChange(filters)
     }
 
-    renderFilterableTable = (table) => {
+    renderFilterableTable = (table: any) => {
       const name = ExprUtils.localizeString(this.props.schema.getTable(table).name, this.context.locale)
 
       return R(

@@ -15,7 +15,7 @@ export default ImagePopupComponent = (function () {
       this.propTypes = { imageManager: PropTypes.object.isRequired }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -25,10 +25,10 @@ export default ImagePopupComponent = (function () {
     }
 
     // Shows image object
-    show(image) {
-      return this.props.imageManager.getImageUrl(image.id, (url) => {
+    show(image: any) {
+      return this.props.imageManager.getImageUrl(image.id, (url: any) => {
         return this.setState({ image, url })
-      })
+      });
     }
 
     render() {

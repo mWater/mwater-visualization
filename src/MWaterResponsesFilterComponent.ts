@@ -36,7 +36,7 @@ export default MWaterResponsesFilterComponent = (function () {
     }
 
     // Set filters in most compact way possible
-    setFilters(filters) {
+    setFilters(filters: any) {
       if (filters.length === 0) {
         return this.props.onFilterChange(null)
       } else if (filters.length === 1) {
@@ -101,16 +101,16 @@ export default MWaterResponsesFilterComponent = (function () {
       return null
     }
 
-    handleSiteChange = (site) => {
+    handleSiteChange = (site: any) => {
       return this.handleChange(this.isFinal(), site)
     }
 
-    handleFinalChange = (final) => {
+    handleFinalChange = (final: any) => {
       return this.handleChange(final, this.getSiteValue())
     }
 
     // Recreate all filters
-    handleChange = (final, site) => {
+    handleChange = (final: any, site: any) => {
       // Strip all filters
       let filters = this.getFilters()
 

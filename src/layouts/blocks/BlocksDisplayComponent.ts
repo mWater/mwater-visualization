@@ -47,7 +47,7 @@ class BlocksDisplayComponent extends React.Component {
     // Set if can't paste current contents (usually because missing extra tables)
   }
 
-  handleBlockDrop = (sourceBlock, targetBlock, side) => {
+  handleBlockDrop = (sourceBlock: any, targetBlock: any, side: any) => {
     // Remove source from items
     let items = blockUtils.removeBlock(this.props.items, sourceBlock)
 
@@ -59,19 +59,19 @@ class BlocksDisplayComponent extends React.Component {
     return this.props.onItemsChange(items)
   }
 
-  handleBlockRemove = (block) => {
+  handleBlockRemove = (block: any) => {
     let items = blockUtils.removeBlock(this.props.items, block)
     items = blockUtils.cleanBlock(items)
     return this.props.onItemsChange(items)
   }
 
-  handleBlockUpdate = (block) => {
+  handleBlockUpdate = (block: any) => {
     let items = blockUtils.updateBlock(this.props.items, block)
     items = blockUtils.cleanBlock(items)
     return this.props.onItemsChange(items)
   }
 
-  renderBlock = (block, collapseColumns = false) => {
+  renderBlock = (block: any, collapseColumns = false) => {
     let elem = null
 
     switch (block.type) {
@@ -110,7 +110,7 @@ class BlocksDisplayComponent extends React.Component {
         break
 
       case "spacer":
-        elem = R(AutoSizeComponent, { injectWidth: true, key: block.id }, (size) => {
+        elem = R(AutoSizeComponent, { injectWidth: true, key: block.id }, (size: any) => {
           return R("div", {
             id: block.id,
             style: {
@@ -135,10 +135,9 @@ class BlocksDisplayComponent extends React.Component {
                 aspectRatio: block.aspectRatio,
                 onAspectRatioChange:
                   block.aspectRatio != null
-                    ? (aspectRatio) =>
-                        this.props.onItemsChange(
-                          blockUtils.updateBlock(this.props.items, _.extend({}, block, { aspectRatio }))
-                        )
+                    ? (aspectRatio: any) => this.props.onItemsChange(
+                    blockUtils.updateBlock(this.props.items, _.extend({}, block, { aspectRatio }))
+                  )
                     : undefined,
                 onBlockRemove: this.props.onItemsChange ? this.handleBlockDrop.bind(null, block) : undefined
               },
@@ -149,18 +148,17 @@ class BlocksDisplayComponent extends React.Component {
         break
 
       case "widget":
-        elem = R(AutoSizeComponent, { injectWidth: true, key: block.id }, (size) => {
+        elem = R(AutoSizeComponent, { injectWidth: true, key: block.id }, (size: any) => {
           return this.props.renderWidget({
             id: block.id,
             type: block.widgetType,
             design: block.design,
             onDesignChange: this.props.onItemsChange
-              ? (design) =>
-                  this.props.onItemsChange(blockUtils.updateBlock(this.props.items, _.extend({}, block, { design })))
+              ? (design: any) => this.props.onItemsChange(blockUtils.updateBlock(this.props.items, _.extend({}, block, { design })))
               : undefined,
             width: size.width,
             height: block.aspectRatio != null ? size.width / block.aspectRatio : undefined
-          })
+          });
         })
 
         if (this.props.onItemsChange) {
@@ -178,10 +176,9 @@ class BlocksDisplayComponent extends React.Component {
                 aspectRatio: block.aspectRatio,
                 onAspectRatioChange:
                   block.aspectRatio != null
-                    ? (aspectRatio) =>
-                        this.props.onItemsChange(
-                          blockUtils.updateBlock(this.props.items, _.extend({}, block, { aspectRatio }))
-                        )
+                    ? (aspectRatio: any) => this.props.onItemsChange(
+                    blockUtils.updateBlock(this.props.items, _.extend({}, block, { aspectRatio }))
+                  )
                     : undefined,
                 onBlockRemove: this.props.onItemsChange ? this.handleBlockDrop.bind(null, block) : undefined
               },
@@ -202,7 +199,7 @@ class BlocksDisplayComponent extends React.Component {
     )
   }
 
-  createBlockItem(block) {
+  createBlockItem(block: any) {
     // Add unique id
     return () => ({
       block: _.extend({}, block, { id: uuid() })
@@ -360,7 +357,7 @@ class BlocksDisplayComponent extends React.Component {
         )
       )
     } else {
-      return R(AutoSizeComponent, { injectWidth: true, injectHeight: true }, (size) => {
+      return R(AutoSizeComponent, { injectWidth: true, injectHeight: true }, (size: any) => {
         const outerParentStyle = { width: "100%", height: "100%", overflowX: "auto" }
         innerParentStyle = {}
 
@@ -407,7 +404,7 @@ class BlocksDisplayComponent extends React.Component {
             )
           )
         )
-      })
+      });
     }
   }
 }

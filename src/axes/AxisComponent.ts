@@ -58,7 +58,7 @@ export default AxisComponent = (function () {
       // e.g. "en"
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -66,7 +66,7 @@ export default AxisComponent = (function () {
       }
     }
 
-    isLoadNeeded(newProps, oldProps) {
+    isLoadNeeded(newProps: any, oldProps: any) {
       const hasColorChanged = !_.isEqual(
         _.omit(newProps.value, ["colorMap", "drawOrder"]),
         _.omit(oldProps.value, ["colorMap", "drawOrder"])
@@ -76,7 +76,7 @@ export default AxisComponent = (function () {
     }
 
     // Asynchronously get the categories of the axis, which requires a query when the field is a text field or other non-enum type
-    load(props, prevProps, callback) {
+    load(props: any, prevProps: any, callback: any) {
       const axisBuilder = new AxisBuilder({ schema: props.schema })
 
       // Clean axis first
@@ -139,7 +139,7 @@ export default AxisComponent = (function () {
         valuesQuery.where = whereClauses[0]
       }
 
-      return props.dataSource.performQuery(valuesQuery, (error, rows) => {
+      return props.dataSource.performQuery(valuesQuery, (error: any, rows: any) => {
         if (error) {
           return // Ignore errors
         }
@@ -147,10 +147,10 @@ export default AxisComponent = (function () {
         // Get categories (value + label)
         categories = axisBuilder.getCategories(axis, _.pluck(rows, "val"))
         return callback({ categories })
-      })
+      });
     }
 
-    handleExprChange = (expr) => {
+    handleExprChange = (expr: any) => {
       // If no expression, reset
       if (!expr) {
         this.props.onChange(null)
@@ -161,11 +161,11 @@ export default AxisComponent = (function () {
       return this.props.onChange(this.cleanAxis(_.extend({}, _.omit(this.props.value, ["drawOrder"]), { expr })))
     }
 
-    handleFormatChange = (ev) => {
+    handleFormatChange = (ev: any) => {
       return this.props.onChange(_.extend({}, this.props.value, { format: ev.target.value }))
     }
 
-    handleXformTypeChange = (type) => {
+    handleXformTypeChange = (type: any) => {
       // Remove
       let xform
       if (!type) {
@@ -208,13 +208,13 @@ export default AxisComponent = (function () {
       )
     }
 
-    handleXformChange = (xform) => {
+    handleXformChange = (xform: any) => {
       return this.props.onChange(
         this.cleanAxis(update(_.omit(this.props.value, ["drawOrder"]), { xform: { $set: xform } }))
       )
     }
 
-    cleanAxis(axis) {
+    cleanAxis(axis: any) {
       const axisBuilder = new AxisBuilder({ schema: this.props.schema })
       return axisBuilder.cleanAxis({
         axis,
@@ -224,7 +224,7 @@ export default AxisComponent = (function () {
       })
     }
 
-    renderXform(axis) {
+    renderXform(axis: any) {
       if (!axis) {
         return
       }
@@ -301,7 +301,7 @@ export default AxisComponent = (function () {
       }
     }
 
-    renderColorMap(axis) {
+    renderColorMap(axis: any) {
       if (!this.props.showColorMap || !axis || !axis.expr) {
         return null
       }
@@ -322,7 +322,7 @@ export default AxisComponent = (function () {
       ]
     }
 
-    renderExcludedValues(axis) {
+    renderExcludedValues(axis: any) {
       // Only if no color map and allows excluded values
       if (this.props.showColorMap || !axis || !axis.expr || !this.props.allowExcludedValues) {
         return null
@@ -348,7 +348,7 @@ export default AxisComponent = (function () {
       ]
     }
 
-    renderFormat(axis) {
+    renderFormat(axis: any) {
       const axisBuilder = new AxisBuilder({ schema: this.props.schema })
 
       const valueType = axisBuilder.getAxisType(axis)

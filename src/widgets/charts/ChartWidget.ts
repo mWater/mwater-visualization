@@ -14,7 +14,7 @@ import ui from "react-library/lib/bootstrap"
 
 // A widget which is a chart
 export default ChartWidget = class ChartWidget extends Widget {
-  constructor(chart) {
+  constructor(chart: any) {
     super()
     this.chart = chart
   }
@@ -32,7 +32,7 @@ export default ChartWidget = class ChartWidget extends Widget {
   //  width: width in pixels on screen
   //  height: height in pixels on screen
   //  onRowClick: Called with (tableId, rowId) when item is clicked
-  createViewElement(options) {
+  createViewElement(options: any) {
     return R(ChartWidgetComponent, {
       chart: this.chart,
       design: options.design,
@@ -55,7 +55,7 @@ export default ChartWidget = class ChartWidget extends Widget {
   //   dataSource: data source to get data from
   //   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   //   callback: (error, data)
-  getData(design, schema, dataSource, filters, callback) {
+  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
     // Clean design first
     design = this.chart.cleanDesign(design, schema)
 
@@ -63,7 +63,7 @@ export default ChartWidget = class ChartWidget extends Widget {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design, schema) {
+  getFilterableTables(design: any, schema: any) {
     // Clean design first
     design = this.chart.cleanDesign(design, schema)
 
@@ -107,7 +107,7 @@ class ChartWidgetComponent extends React.PureComponent {
     // e.g. "en"
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     this.state = {
@@ -119,7 +119,7 @@ class ChartWidgetComponent extends React.PureComponent {
   // Saves a csv file to disk
   handleSaveCsvFile = () => {
     // Get the data
-    return this.props.widgetDataSource.getData(this.props.design, this.props.filters, (err, data) => {
+    return this.props.widgetDataSource.getData(this.props.design, this.props.filters, (err: any, data: any) => {
       if (err) {
         return alert("Failed to get data")
       }
@@ -148,7 +148,7 @@ class ChartWidgetComponent extends React.PureComponent {
       // Require at use as causes server problems
       const FileSaver = require("file-saver")
       return FileSaver.saveAs(blob, "Exported Data.csv")
-    })
+    });
   }
 
   handleStartEditing = () => {
@@ -168,11 +168,11 @@ class ChartWidgetComponent extends React.PureComponent {
     return this.setState({ editDesign: null })
   }
 
-  handleEditDesignChange = (design) => {
+  handleEditDesignChange = (design: any) => {
     return this.setState({ editDesign: design })
   }
 
-  renderChart(design, onDesignChange, width, height) {
+  renderChart(design: any, onDesignChange: any, width: any, height: any) {
     return R(ChartViewComponent, {
       chart: this.props.chart,
       design,
@@ -209,7 +209,7 @@ class ChartWidgetComponent extends React.PureComponent {
       const chartHeight = this.props.height * (chartWidth / this.props.width)
       const chart = this.renderChart(
         this.state.editDesign,
-        (design) => this.setState({ editDesign: design }),
+        (design: any) => this.setState({ editDesign: design }),
         chartWidth,
         chartHeight,
         chartWidth

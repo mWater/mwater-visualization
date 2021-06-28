@@ -12,7 +12,7 @@ export default ItemsHtmlConverter = (function () {
   ItemsHtmlConverter = class ItemsHtmlConverter {
     static initClass() {
       // Check if blank (no text or special expressions)
-      this.isBlank = (items) => {
+      this.isBlank = (items: any) => {
         if (!items) {
           return true
         }
@@ -29,12 +29,12 @@ export default ItemsHtmlConverter = (function () {
       }
     }
     // namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings
-    constructor(namedStrings) {
+    constructor(namedStrings: any) {
       this.namedStrings = namedStrings
     }
 
     // Converts list of items to html
-    convertItemsToHtml(items) {
+    convertItemsToHtml(items: any) {
       let html = ""
 
       for (let item of items || []) {
@@ -112,13 +112,13 @@ export default ItemsHtmlConverter = (function () {
 
     // Converts an item that is not an element to html. Override in subclass.
     // To be reversible, should contain data-embed which contains JSON of item
-    convertSpecialItemToHtml(item) {
+    convertSpecialItemToHtml(item: any) {
       // To be implemented by subclasses
       return ""
     }
 
     // Converts an HTML DOM element to items
-    convertElemToItems(elem) {
+    convertElemToItems(elem: any) {
       // console.log elem.outerHTML
 
       // Walk DOM tree, adding strings and expressions

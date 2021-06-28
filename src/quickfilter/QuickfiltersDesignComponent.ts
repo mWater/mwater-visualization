@@ -28,7 +28,7 @@ export default QuickfiltersDesignComponent = (function () {
       this.defaultProps = { design: [] }
     }
 
-    handleDesignChange = (design) => {
+    handleDesignChange = (design: any) => {
       design = design.slice()
 
       // Update merged, clearing if not mergeable
@@ -46,7 +46,7 @@ export default QuickfiltersDesignComponent = (function () {
     }
 
     // Determine if quickfilter at index is mergeable with previous (same type, id table and enum values)
-    isMergeable(design, index) {
+    isMergeable(design: any, index: any) {
       if (index === 0) {
         return false
       }
@@ -84,7 +84,7 @@ export default QuickfiltersDesignComponent = (function () {
       return true
     }
 
-    renderQuickfilter(item, index) {
+    renderQuickfilter(item: any, index: any) {
       return R(QuickfilterDesignComponent, {
         key: index,
         design: item,
@@ -92,14 +92,14 @@ export default QuickfiltersDesignComponent = (function () {
         dataSource: this.props.dataSource,
         tables: this.props.tables,
         mergeable: this.isMergeable(this.props.design, index),
-        onChange: (newItem) => {
+        onChange: (newItem: any) => {
           const design = this.props.design.slice()
           design[index] = newItem
           return this.handleDesignChange(design)
         },
 
         onRemove: this.handleRemove.bind(null, index)
-      })
+      });
     }
 
     handleAdd = () => {
@@ -108,7 +108,7 @@ export default QuickfiltersDesignComponent = (function () {
       return this.props.onDesignChange(design)
     }
 
-    handleRemove = (index) => {
+    handleRemove = (index: any) => {
       const design = this.props.design.slice()
       design.splice(index, 1)
       return this.props.onDesignChange(design)
@@ -151,7 +151,7 @@ class QuickfilterDesignComponent extends React.Component {
     // List of possible table ids to use
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     // Store table to allow selecting table first, then expression
@@ -160,7 +160,7 @@ class QuickfilterDesignComponent extends React.Component {
     }
   }
 
-  handleTableChange = (table) => {
+  handleTableChange = (table: any) => {
     this.setState({ table })
     const design = {
       expr: null,
@@ -169,16 +169,16 @@ class QuickfilterDesignComponent extends React.Component {
     return this.props.onChange(design)
   }
 
-  handleExprChange = (expr) => {
+  handleExprChange = (expr: any) => {
     return this.props.onChange(update(this.props.design, { expr: { $set: expr } }))
   }
-  handleLabelChange = (ev) => {
+  handleLabelChange = (ev: any) => {
     return this.props.onChange(update(this.props.design, { label: { $set: ev.target.value } }))
   }
-  handleMergedChange = (merged) => {
+  handleMergedChange = (merged: any) => {
     return this.props.onChange(update(this.props.design, { merged: { $set: merged } }))
   }
-  handleMultiChange = (multi) => {
+  handleMultiChange = (multi: any) => {
     return this.props.onChange(update(this.props.design, { multi: { $set: multi } }))
   }
 

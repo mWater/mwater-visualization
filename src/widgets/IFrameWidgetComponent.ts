@@ -20,7 +20,7 @@ export default IFrameWidgetComponent = (function () {
       }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
       this.state = {
         // True when editing chart
@@ -51,7 +51,7 @@ export default IFrameWidgetComponent = (function () {
           type: "text",
           className: "form-control",
           value: this.state.editUrl || "",
-          onChange: (ev) => this.setState({ editUrl: ev.target.value })
+          onChange: (ev: any) => this.setState({ editUrl: ev.target.value })
         }),
         R("p", { className: "help-block" }, "e.g. https://www.youtube.com/embed/dQw4w9WgXcQ")
       )

@@ -6,7 +6,7 @@ let DashboardDataSource
 
 export default DashboardDataSource = class DashboardDataSource {
   // Gets the rows specified
-  getRows(design, offset, limit, filters, callback) {
+  getRows(design: any, offset: any, limit: any, filters: any, callback: any) {
     throw new Error("Not implemented")
   }
 

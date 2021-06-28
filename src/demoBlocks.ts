@@ -10,7 +10,7 @@ import DirectWidgetDataSource from "./widgets/DirectWidgetDataSource"
 import WidgetFactory from "./widgets/WidgetFactory"
 
 class DemoComponent extends React.Component {
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     this.state = {
@@ -26,16 +26,16 @@ class DemoComponent extends React.Component {
         apiUrl: this.props.apiUrl,
         client: this.props.client,
         user: this.props.user,
-        onExtraTablesChange: (extraTables) => this.setState({ extraTables }),
+        onExtraTablesChange: (extraTables: any) => this.setState({ extraTables }),
         extraTables: this.state.extraTables
       },
-      (error, config) => {
+      (error: any, config: any) => {
         if (error) {
           alert("Error: " + error.message)
           return null
         }
 
-        const renderWidget = (options) => {
+        const renderWidget = (options: any) => {
           // Passed
           //  type: type of the widget
           //  design: design of the widget
@@ -73,10 +73,10 @@ class DemoComponent extends React.Component {
         return R(BlocksDesignerComponent, {
           renderWidget,
           design: this.state.design,
-          onDesignChange: (design) => this.setState({ design })
-        })
+          onDesignChange: (design: any) => this.setState({ design })
+        });
       }
-    )
+    );
   }
 }
 

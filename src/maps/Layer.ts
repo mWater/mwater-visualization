@@ -24,22 +24,22 @@ export default Layer = class Layer {
   //   design: design of layer
   //   schema: schema to use
   //   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
-  getJsonQLCss(design, schema, filters) {
+  getJsonQLCss(design: any, schema: any, filters: any) {
     throw new Error("Not implemented")
   }
 
   // Gets the tile url for definition type "TileUrl"
-  getTileUrl(design, filters) {
+  getTileUrl(design: any, filters: any) {
     throw new Error("Not implemented")
   }
 
   // Gets the utf grid url for definition type "TileUrl"
-  getUtfGridUrl(design, filters) {
+  getUtfGridUrl(design: any, filters: any) {
     throw new Error("Not implemented")
   }
 
   // Gets the layer definition for "VectorTile" type
-  getVectorTile(design, filters) {
+  getVectorTile(design: any, filters: any) {
     throw new Error("Not implemented")
   }
 
@@ -62,31 +62,31 @@ export default Layer = class Layer {
   //     row: { tableId:, primaryKey: }  # row that was selected
   //     popup: React element to put into a popup
   //   }
-  onGridClick(ev, options) {
+  onGridClick(ev: any, options: any) {
     return null
   }
 
   // Gets the bounds of the layer as GeoJSON
-  getBounds(design, schema, dataSource, filters, callback) {
+  getBounds(design: any, schema: any, dataSource: any, filters: any, callback: any) {
     return callback(null)
   }
 
   // Get min and max zoom levels
-  getMinZoom(design) {
+  getMinZoom(design: any) {
     return null
   }
-  getMaxZoom(design) {
+  getMaxZoom(design: any) {
     return null
   }
 
   // Get the legend to be optionally displayed on the map. Returns
   // a React element
-  getLegend(design, schema, name, dataSource, locale, filters = []) {
+  getLegend(design: any, schema: any, name: any, dataSource: any, locale: any, filters = []) {
     return null
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design, schema) {
+  getFilterableTables(design: any, schema: any) {
     return []
   }
 
@@ -96,7 +96,7 @@ export default Layer = class Layer {
   }
 
   // True if layer is incomplete (e.g. brand new) and should be editable immediately
-  isIncomplete(design, schema) {
+  isIncomplete(design: any, schema: any) {
     return this.validateDesign(this.cleanDesign(design, schema), schema) != null
   }
 
@@ -107,17 +107,17 @@ export default Layer = class Layer {
   //   schema: schema to use
   //   dataSource: data source to use
   //   onDesignChange: function called when design changes
-  createDesignerElement(options) {
+  createDesignerElement(options: any) {
     throw new Error("Not implemented")
   }
 
   // Returns a cleaned design
-  cleanDesign(design, schema) {
+  cleanDesign(design: any, schema: any) {
     return design
   }
 
   // Validates design. Null if ok, message otherwise
-  validateDesign(design, schema) {
+  validateDesign(design: any, schema: any) {
     return null
   }
 
@@ -125,12 +125,12 @@ export default Layer = class Layer {
   //   design: design of layer
   //   schema: schema to use
   //   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
-  getKMLExportJsonQL(design, schema, filters) {
+  getKMLExportJsonQL(design: any, schema: any, filters: any) {
     throw new Error("Not implemented")
   }
 
   // Convenience function to get the bounds of a geometry expression with filters
-  getBoundsFromExpr(schema, dataSource, table, geometryExpr, filterExpr, filters, callback) {
+  getBoundsFromExpr(schema: any, dataSource: any, table: any, geometryExpr: any, filterExpr: any, filters: any, callback: any) {
     const exprCompiler = new ExprCompiler(schema)
     const compiledGeometryExpr = exprCompiler.compileExpr({ expr: geometryExpr, tableAlias: "main" })
 
@@ -186,7 +186,7 @@ export default Layer = class Layer {
       where
     }
 
-    return dataSource.performQuery(boundsQuery, (err, results) => {
+    return dataSource.performQuery(boundsQuery, (err: any, results: any) => {
       if (err) {
         return callback(err)
       } else {
@@ -216,6 +216,6 @@ export default Layer = class Layer {
 
         return callback(null, bounds)
       }
-    })
+    });
   }
 }

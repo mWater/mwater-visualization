@@ -31,7 +31,7 @@ export default TextWidgetComponent = (function () {
       // Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -43,9 +43,9 @@ export default TextWidgetComponent = (function () {
     }
 
     // Override to determine if a load is needed. Not called on mounting
-    isLoadNeeded(newProps, oldProps) {
+    isLoadNeeded(newProps: any, oldProps: any) {
       // Get expression items recursively
-      function getExprItems(items) {
+      function getExprItems(items: any) {
         let exprItems = []
         for (let item of items || []) {
           if (item.type === "expr") {
@@ -67,7 +67,7 @@ export default TextWidgetComponent = (function () {
     }
 
     // Call callback with state changes
-    load(props, prevProps, callback) {
+    load(props: any, prevProps: any, callback: any) {
       // Shortcut if no expressions in text widget
       const widget = new TextWidget()
       if (widget.getExprItems(props.design.items).length === 0) {
@@ -76,12 +76,12 @@ export default TextWidgetComponent = (function () {
       }
 
       // Get data
-      return props.widgetDataSource.getData(props.design, props.filters, (error, data) => {
+      return props.widgetDataSource.getData(props.design, props.filters, (error: any, data: any) => {
         return callback({ error, exprValues: data || {}, cacheExpiry: props.dataSource.getCacheExpiry() })
-      })
+      });
     }
 
-    scrollToTOCEntry(entryId) {
+    scrollToTOCEntry(entryId: any) {
       // Find entry in divComp
       const entries = this.divComp.querySelectorAll("h1,h2,h3,h4,h5,h6,h7,h8,h9")
 

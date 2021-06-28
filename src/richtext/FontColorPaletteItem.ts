@@ -20,14 +20,14 @@ export default FontColorPaletteItem = (function () {
       this.defaultProps = { position: "under" }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
       this.state = {
         open: false
       }
     }
 
-    handleMouseDown = (ev) => {
+    handleMouseDown = (ev: any) => {
       // Don't lose focus from editor
       ev.preventDefault()
       return this.setState({ open: !this.state.open })
@@ -64,7 +64,7 @@ export default FontColorPaletteItem = (function () {
                 "div",
                 { style: popupPosition },
                 R(ColorPaletteComponent, {
-                  onSetColor: (color) => {
+                  onSetColor: (color: any) => {
                     this.props.onSetColor(color)
                     return this.setState({ open: false })
                   }
@@ -74,7 +74,7 @@ export default FontColorPaletteItem = (function () {
 
           R("i", { className: "fa fa-tint" })
         )
-      )
+      );
     }
   }
   FontColorPaletteItem.initClass()
@@ -86,18 +86,18 @@ class ColorPaletteComponent extends React.Component {
     this.propTypes = { onSetColor: PropTypes.func.isRequired }
   }
 
-  renderColor(color) {
+  renderColor(color: any) {
     return R(
       "td",
       null,
       R("div", {
         style: { width: 16, height: 15, backgroundColor: color, margin: 1 },
-        onMouseDown: (ev) => {
+        onMouseDown: (ev: any) => {
           ev.preventDefault()
           return this.props.onSetColor(color)
         }
       })
-    )
+    );
   }
 
   render() {

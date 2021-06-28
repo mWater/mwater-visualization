@@ -34,7 +34,7 @@ export default AxisColorEditorComponent = (function () {
       }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -99,7 +99,7 @@ export default AxisColorEditorComponent = (function () {
       return this.setState({ mode: "normal" })
     }
 
-    handlePaletteChange = (palette) => {
+    handlePaletteChange = (palette: any) => {
       this.props.onChange(
         update(this.props.axis, { colorMap: { $set: palette }, drawOrder: { $set: _.pluck(palette, "value") } })
       )

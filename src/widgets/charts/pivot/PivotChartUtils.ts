@@ -6,8 +6,8 @@ import uuid from "uuid"
 // Misc utils for working with pivot charts
 
 // Get all paths through a set of segments (e.g. if a contains b, c, then [[a,b], [a,c]])
-export function getSegmentPaths(segments) {
-  let paths = []
+export function getSegmentPaths(segments: any) {
+  let paths: any = []
 
   // Use recursive
   for (var segment of segments) {
@@ -22,7 +22,7 @@ export function getSegmentPaths(segments) {
 }
 
 // Get all paths through a set of segments (e.g. if a contains b, c, then [[a,b], [a,c]])
-export function getAllSegments(segments) {
+export function getAllSegments(segments: any) {
   let allSegments = []
 
   // Use recursive
@@ -37,16 +37,16 @@ export function getAllSegments(segments) {
 }
 
 // Gets the id of the intersection of the two paths
-export function getIntersectionId(rowPath, columnPath) {
+export function getIntersectionId(rowPath: any, columnPath: any) {
   return `${_.pluck(rowPath, "id").join(",")}:${_.pluck(columnPath, "id").join(",")}`
 }
 
-export function findSegment(segments, id) {
+export function findSegment(segments: any, id: any) {
   return _.findWhere(exports.getAllSegments(segments), { id })
 }
 
 // Determine if can summarize segment (if segment before has a value axis and has no children)
-export function canSummarizeSegment(segments, id) {
+export function canSummarizeSegment(segments: any, id: any) {
   const prevSegment = findPreviousSegment(segments, id)
   if (prevSegment && prevSegment.valueAxis && !prevSegment.children?.[0]) {
     return true
@@ -56,7 +56,7 @@ export function canSummarizeSegment(segments, id) {
 }
 
 // Finds the segment before one with id
-function findPreviousSegment(segments, id) {
+function findPreviousSegment(segments: any, id: any) {
   // Find in list (shallow)
   const index = _.findIndex(segments, { id })
 
@@ -85,7 +85,7 @@ function findPreviousSegment(segments, id) {
 
 // Summarize a segment, returning a new copy of the design with
 // all intersections created.
-export function summarizeSegment(design, id, label) {
+export function summarizeSegment(design: any, id: any, label: any) {
   let columnPath, prevIntersection, prevSegment, rowPath, summaryIntersection
   design = _.cloneDeep(design)
 
@@ -153,7 +153,7 @@ export function summarizeSegment(design, id, label) {
 }
 
 // Recursively map segments, flattening and compacting
-function mapSegments(segments, mapFunc) {
+function mapSegments(segments: any, mapFunc: any) {
   segments = _.map(segments, mapFunc)
 
   // Map children
@@ -170,51 +170,51 @@ function mapSegments(segments, mapFunc) {
 }
 
 // Replace segment
-export function replaceSegment(segments, replacement) {
-  return mapSegments(segments, function (segment) {
+export function replaceSegment(segments: any, replacement: any) {
+  return mapSegments(segments, function (segment: any) {
     if (segment.id === replacement.id) {
       return replacement
     }
     return segment
-  })
+  });
 }
 
 // Remove segment
-export function removeSegment(segments, id) {
-  return mapSegments(segments, function (segment) {
+export function removeSegment(segments: any, id: any) {
+  return mapSegments(segments, function (segment: any) {
     if (segment.id === id) {
       return null
     }
     return segment
-  })
+  });
 }
 
 // Inserts before
-export function insertBeforeSegment(segments, id) {
-  return mapSegments(segments, function (segment) {
+export function insertBeforeSegment(segments: any, id: any) {
+  return mapSegments(segments, function (segment: any) {
     if (segment.id === id) {
       return [{ id: uuid() }, segment]
     }
     return segment
-  })
+  });
 }
 
 // Inserts after
-export function insertAfterSegment(segments, id) {
-  return mapSegments(segments, function (segment) {
+export function insertAfterSegment(segments: any, id: any) {
+  return mapSegments(segments, function (segment: any) {
     if (segment.id === id) {
       return [segment, { id: uuid() }]
     }
     return segment
-  })
+  });
 }
 
 // Adds child
-export function addChildSegment(segments, id) {
-  return mapSegments(segments, function (segment) {
+export function addChildSegment(segments: any, id: any) {
+  return mapSegments(segments, function (segment: any) {
     if (segment.id === id) {
       return _.extend({}, segment, { children: (segment.children || []).concat([{ id: uuid() }]) })
     }
     return segment
-  })
+  });
 }

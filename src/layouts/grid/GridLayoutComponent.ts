@@ -20,7 +20,7 @@ export default GridLayoutComponent = (function () {
       }
     }
 
-    renderPageBreaks(layoutEngine, layouts) {
+    renderPageBreaks(layoutEngine: any, layouts: any) {
       // Get height
       const height = layoutEngine.calculateHeight(layouts)
 

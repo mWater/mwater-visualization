@@ -22,11 +22,11 @@ Design is:
 
 */
 export default ImageMosaicChart = class ImageMosaicChart extends Chart {
-  cleanDesign(design, schema) {
+  cleanDesign(design: any, schema: any) {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
-    design = produce(design, (draft) => {
+    design = produce(design, (draft: any) => {
       // Fill in defaults
       draft.version = design.version || 1
 
@@ -44,7 +44,7 @@ export default ImageMosaicChart = class ImageMosaicChart extends Chart {
     return design
   }
 
-  validateDesign(design, schema) {
+  validateDesign(design: any, schema: any) {
     const axisBuilder = new AxisBuilder({ schema })
 
     // Check that has table
@@ -64,7 +64,7 @@ export default ImageMosaicChart = class ImageMosaicChart extends Chart {
     return error
   }
 
-  isEmpty(design) {
+  isEmpty(design: any) {
     return !design.imageAxis
   }
 
@@ -75,7 +75,7 @@ export default ImageMosaicChart = class ImageMosaicChart extends Chart {
   //   design: design
   //   onDesignChange: function
   //   filters: array of filters
-  createDesignerElement(options) {
+  createDesignerElement(options: any) {
     // Require here to prevent server require problems
     const ImageMosaicChartDesignerComponent = require("./ImageMosaicChartDesignerComponent")
 
@@ -84,7 +84,7 @@ export default ImageMosaicChart = class ImageMosaicChart extends Chart {
       design: this.cleanDesign(options.design, options.schema),
       dataSource: options.dataSource,
       filters: options.filters,
-      onDesignChange: (design) => {
+      onDesignChange: (design: any) => {
         // Clean design
         design = this.cleanDesign(design, options.schema)
         return options.onDesignChange(design)
@@ -99,7 +99,7 @@ export default ImageMosaicChart = class ImageMosaicChart extends Chart {
   // dataSource: data source to get data from
   // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   // callback: (error, data)
-  getData(design, schema, dataSource, filters, callback) {
+  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
     const exprCompiler = new ExprCompiler(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
@@ -161,7 +161,7 @@ export default ImageMosaicChart = class ImageMosaicChart extends Chart {
   //   scope: current scope of the view element
   //   onScopeChange: called when scope changes with new scope
   //   onRowClick: Called with (tableId, rowId) when item is clicked
-  createViewElement(options) {
+  createViewElement(options: any) {
     // Require here to prevent server require problems
     const ImageMosaicChartViewComponent = require("./ImageMosaicChartViewComponent")
 
@@ -183,7 +183,7 @@ export default ImageMosaicChart = class ImageMosaicChart extends Chart {
     return React.createElement(ImageMosaicChartViewComponent, props)
   }
 
-  createDataTable(design, schema, dataSource, data) {
+  createDataTable(design: any, schema: any, dataSource: any, data: any) {
     alert("Not available for Image Mosaics")
     return null
   }
@@ -204,7 +204,7 @@ export default ImageMosaicChart = class ImageMosaicChart extends Chart {
   // return table
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design, schema) {
+  getFilterableTables(design: any, schema: any) {
     return _.compact([design.table])
   }
 

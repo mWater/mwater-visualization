@@ -230,7 +230,10 @@ export function NewMapViewComponent(props: {
           newLayers.push({ layerViewId: layerView.id, layer: mapLayer })
         }
         newClickHandlers = newClickHandlers.concat(
-          vectorTileDef.mapLayersHandleClicks.map((mlid) => ({ layerViewId: layerView.id, mapLayerId: mlid }))
+          vectorTileDef.mapLayersHandleClicks.map((mlid: any) => ({
+            layerViewId: layerView.id,
+            mapLayerId: mlid
+          }))
         )
       } else {
         const tileUrl = props.mapDataSource.getLayerDataSource(layerView.id).getTileUrl(design, [])

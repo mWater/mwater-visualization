@@ -5,7 +5,7 @@ import { assert } from "chai"
 import DashboardUpgrader from "../src/dashboards/DashboardUpgrader"
 import canonical from "canonical-json"
 
-function compare(actual, expected) {
+function compare(actual: any, expected: any) {
   return assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected))
 }
 

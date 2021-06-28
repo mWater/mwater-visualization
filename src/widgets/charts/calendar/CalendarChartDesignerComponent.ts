@@ -27,22 +27,22 @@ export default CalendarChartDesignerComponent = (function () {
     }
 
     // Updates design with the specified changes
-    updateDesign(changes) {
+    updateDesign(changes: any) {
       const design = _.extend({}, this.props.design, changes)
       return this.props.onDesignChange(design)
     }
 
-    handleTitleTextChange = (ev) => {
+    handleTitleTextChange = (ev: any) => {
       return this.updateDesign({ titleText: ev.target.value })
     }
-    handleTableChange = (table) => {
+    handleTableChange = (table: any) => {
       return this.updateDesign({ table })
     }
-    handleFilterChange = (filter) => {
+    handleFilterChange = (filter: any) => {
       return this.updateDesign({ filter })
     }
 
-    handleDateAxisChange = (dateAxis) => {
+    handleDateAxisChange = (dateAxis: any) => {
       // Default value axis to count if date axis present
       if (!this.props.design.valueAxis && dateAxis) {
         // Create count expr
@@ -53,7 +53,7 @@ export default CalendarChartDesignerComponent = (function () {
       }
     }
 
-    handleValueAxisChange = (valueAxis) => {
+    handleValueAxisChange = (valueAxis: any) => {
       return this.updateDesign({ valueAxis })
     }
 

@@ -10,7 +10,7 @@ import { ExprCompiler } from "mwater-expressions"
 // For example, a given community has N water points. If communities are filtered, we want to filter water points as well since there is a
 // clear parent-child relationship (specifically, a single n-1 join between water points and communities)
 export default ImplicitFilterBuilder = class ImplicitFilterBuilder {
-  constructor(schema) {
+  constructor(schema: any) {
     this.schema = schema
   }
 
@@ -18,8 +18,8 @@ export default ImplicitFilterBuilder = class ImplicitFilterBuilder {
   // To be a useable join, must be only n-1 join between child and parent and child must be filterable table
   // filterableTables: array of table ids of filterable tables
   // Returns list of { table, column } of joins from child to parent
-  findJoins(filterableTables) {
-    let allJoins = []
+  findJoins(filterableTables: any) {
+    let allJoins: any = []
 
     // For each filterable table
     for (var filterableTable of filterableTables) {
@@ -51,7 +51,7 @@ export default ImplicitFilterBuilder = class ImplicitFilterBuilder {
   // filterableTables: array of table ids of filterable tables
   // filters: array of { table: table id, jsonql: JsonQL with {alias} for the table name to filter by } of explicit filters
   // returns similar array, but including any extra implicit filters
-  extendFilters(filterableTables, filters) {
+  extendFilters(filterableTables: any, filters: any) {
     const implicitFilters = []
 
     // Find joins

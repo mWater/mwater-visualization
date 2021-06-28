@@ -10,12 +10,12 @@ import _ from "lodash"
 //  filter: filter for other widgets in format { table: table id, jsonql: JsonQL with {alias} for the table name to filter by }
 //  data: internal, opaque data that the widget understands. opaque
 export default WidgetScoper = class WidgetScoper {
-  constructor(scopes) {
+  constructor(scopes: any) {
     this.scopes = scopes || {}
   }
 
   // Applies a scope to a particular widget. Filter will be applied to all others
-  applyScope(widgetId, scope) {
+  applyScope(widgetId: any, scope: any) {
     const data = {}
     data[widgetId] = scope
     const scopes = _.extend({}, this.scopes, data)
@@ -23,7 +23,7 @@ export default WidgetScoper = class WidgetScoper {
   }
 
   // Gets the scope of a widget
-  getScope(widgetId) {
+  getScope(widgetId: any) {
     if (this.scopes[widgetId]) {
       return this.scopes[widgetId]
     }
@@ -34,7 +34,7 @@ export default WidgetScoper = class WidgetScoper {
     return this.scopes
   }
 
-  getFilters(widgetId) {
+  getFilters(widgetId: any) {
     const filters = []
     for (let key in this.scopes) {
       const value = this.scopes[key]

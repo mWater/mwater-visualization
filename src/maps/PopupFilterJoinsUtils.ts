@@ -6,7 +6,7 @@ import { ExprUtils } from "mwater-expressions"
 
 // Utilities for popup filter joins. See PopupFilterJoins.md for further explanation.
 export default PopupFilterJoinsUtils = class PopupFilterJoinsUtils {
-  static createPopupFilters(popupFilterJoins, schema, layerTable, rowId, useWithin = false) {
+  static createPopupFilters(popupFilterJoins: any, schema: any, layerTable: any, rowId: any, useWithin = false) {
     const exprUtils = new ExprUtils(schema)
     const exprCompiler = new ExprCompiler(schema)
 
@@ -78,7 +78,7 @@ export default PopupFilterJoinsUtils = class PopupFilterJoinsUtils {
   }
 
   // Create default popup filter joins where the join is just the id (not used for choropleth since that needs to join to admin_regions)
-  static createDefaultPopupFilterJoins(table) {
+  static createDefaultPopupFilterJoins(table: any) {
     const popupFilterJoins = {}
 
     // Return id of row for a simple match

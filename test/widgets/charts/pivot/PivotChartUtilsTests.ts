@@ -5,7 +5,7 @@ import _ from "lodash"
 import * as PivotChartUtils from "../../../../src/widgets/charts/pivot/PivotChartUtils"
 import canonical from "canonical-json"
 
-function compare(actual, expected) {
+function compare(actual: any, expected: any) {
   return assert.equal(
     canonical(actual),
     canonical(expected),

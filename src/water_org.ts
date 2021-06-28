@@ -16,7 +16,7 @@ const R = React.createElement
 // saveDesignUrl (sets the current design)
 // design (initial design)
 // elemId (id of to render into)
-export function loadDashboard(options) {
+export function loadDashboard(options: any) {
   // First get the schema
   return $.get(options.schemaUrl, function (schemaYaml) {
     // Load the schema
@@ -26,7 +26,7 @@ export function loadDashboard(options) {
 
     // Create the data source
     const dataSource = new visualizationExports.CachingDataSource({
-      perform(query, cb) {
+      perform(query: any, cb: any) {
         const url = options.queryUrl.replace(/\{query\}/, encodeURIComponent(JSON.stringify(query)))
         return $.getJSON(url, (rows) => cb(null, rows)).fail(function (xhr) {
           console.error(xhr.responseText)
@@ -40,7 +40,7 @@ export function loadDashboard(options) {
 
     // Get the design
     return $.get(options.loadDesignUrl, function (designString) {
-      let design
+      let design: any
       if (designString) {
         design = JSON.parse(designString)
       } else {
@@ -56,7 +56,7 @@ export function loadDashboard(options) {
       }
 
       // Called to update the design and re-render
-      function updateDesign(newDesign) {
+      function updateDesign(newDesign: any) {
         design = newDesign
 
         // Save to database
@@ -78,8 +78,8 @@ export function loadDashboard(options) {
 
       // Initial render
       return render()
-    })
-  })
+    });
+  });
 }
 
 class TabbedDashboard extends React.Component {
@@ -91,7 +91,7 @@ class TabbedDashboard extends React.Component {
     }
   }
 
-  handleDesignChange = (index, design) => {
+  handleDesignChange = (index: any, design: any) => {
     const tabs = this.props.design.tabs.slice()
     tabs[index] = _.extend({}, tabs[index], { design })
     return this.props.onDesignChange(_.extend({}, this.props.design, { tabs }))
@@ -104,7 +104,7 @@ class TabbedDashboard extends React.Component {
     return this.props.onDesignChange(_.extend({}, this.props.design, { tabs }))
   }
 
-  handleRemoveTab = (index) => {
+  handleRemoveTab = (index: any) => {
     if (!confirm("Permanently remove this tab? This cannot be undone!")) {
       return
     }
@@ -114,7 +114,7 @@ class TabbedDashboard extends React.Component {
     return this.props.onDesignChange(_.extend({}, this.props.design, { tabs }))
   }
 
-  handleRenameTab = (index) => {
+  handleRenameTab = (index: any) => {
     let { name } = this.props.design.tabs[index]
     name = prompt("Name of tab", name)
     if (name) {
@@ -124,7 +124,7 @@ class TabbedDashboard extends React.Component {
     }
   }
 
-  createTab = (tab, index) => {
+  createTab = (tab: any, index: any) => {
     return {
       id: `${index}`,
       label: tab.name,

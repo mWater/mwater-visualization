@@ -20,16 +20,16 @@ export default BaseLayerDesignerComponent = (function () {
     }
 
     // Updates design with the specified changes
-    updateDesign(changes) {
+    updateDesign(changes: any) {
       const design = _.extend({}, this.props.design, changes)
       return this.props.onDesignChange(design)
     }
 
-    handleBaseLayerChange = (baseLayer) => {
+    handleBaseLayerChange = (baseLayer: any) => {
       return this.updateDesign({ baseLayer })
     }
 
-    renderBaseLayer(id, name) {
+    renderBaseLayer(id: any, name: any) {
       let className = "mwater-visualization-layer"
       if (id === this.props.design.baseLayer) {
         className += " checked"
@@ -47,7 +47,7 @@ export default BaseLayerDesignerComponent = (function () {
       )
     }
 
-    handleOpacityChange = (newValue) => {
+    handleOpacityChange = (newValue: any) => {
       return this.updateDesign({ baseLayerOpacity: newValue / 100 })
     }
 

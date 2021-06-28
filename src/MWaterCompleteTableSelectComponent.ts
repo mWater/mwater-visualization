@@ -50,11 +50,11 @@ export default MWaterCompleteTableSelectComponent = (function () {
       // e.g. "en"
     }
 
-    handleExtraTableAdd = (tableId) => {
+    handleExtraTableAdd = (tableId: any) => {
       return this.props.onExtraTablesChange(_.union(this.props.extraTables, [tableId]))
     }
 
-    handleExtraTableRemove = (tableId) => {
+    handleExtraTableRemove = (tableId: any) => {
       // Set to null if current table
       if (this.props.table === tableId) {
         this.props.onChange(null)
@@ -246,7 +246,7 @@ export default MWaterCompleteTableSelectComponent = (function () {
         }
 
         return false
-      })
+      });
     }
 
     render() {
@@ -313,7 +313,7 @@ class FormsListComponent extends React.Component {
     // e.g. "en"
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
     this.state = {
       forms: null,
@@ -370,7 +370,7 @@ class FormsListComponent extends React.Component {
     })
   }
 
-  handleTableRemove = (table) => {
+  handleTableRemove = (table: any) => {
     if (
       confirm(
         `Remove ${ExprUtils.localizeString(
@@ -383,7 +383,7 @@ class FormsListComponent extends React.Component {
     }
   }
 
-  searchRef = (comp) => {
+  searchRef = (comp: any) => {
     // Focus
     if (comp) {
       return comp.focus()
@@ -398,7 +398,7 @@ class FormsListComponent extends React.Component {
 
     // Filter forms
     if (this.state.search) {
-      const escapeRegExp = (s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
+      const escapeRegExp = (s: any) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
 
       const searchStringRegExp = new RegExp(escapeRegExp(this.state.search), "i")
 
@@ -452,7 +452,7 @@ class FormsListComponent extends React.Component {
               ref: this.searchRef,
               style: { maxWidth: "20em", marginBottom: 10 },
               value: this.state.search,
-              onChange: (ev) => this.setState({ search: ev.target.value })
+              onChange: (ev: any) => this.setState({ search: ev.target.value })
             }),
 
             R(uiComponents.OptionListComponent, {
@@ -463,7 +463,7 @@ class FormsListComponent extends React.Component {
               }))
             })
           ]
-    )
+    );
   }
 }
 FormsListComponent.initClass()
@@ -486,7 +486,7 @@ class IndicatorsListComponent extends React.Component {
     // e.g. "en"
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
     this.state = {
       indicators: null,
@@ -528,7 +528,7 @@ class IndicatorsListComponent extends React.Component {
     })
   }
 
-  handleTableRemove = (table) => {
+  handleTableRemove = (table: any) => {
     if (
       confirm(
         `Remove ${ExprUtils.localizeString(
@@ -541,14 +541,14 @@ class IndicatorsListComponent extends React.Component {
     }
   }
 
-  searchRef = (comp) => {
+  searchRef = (comp: any) => {
     // Focus
     if (comp) {
       return comp.focus()
     }
   }
 
-  handleSelect = (tableId) => {
+  handleSelect = (tableId: any) => {
     // Add table if not present
     if (!this.props.schema.getTable(tableId)) {
       this.props.onExtraTableAdd(tableId)
@@ -565,7 +565,7 @@ class IndicatorsListComponent extends React.Component {
 
     // Filter indicators
     if (this.state.search) {
-      const escapeRegExp = (s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
+      const escapeRegExp = (s: any) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
 
       const searchStringRegExp = new RegExp(escapeRegExp(this.state.search), "i")
 
@@ -590,7 +590,7 @@ class IndicatorsListComponent extends React.Component {
         schema: this.props.schema,
         onChange: this.props.onChange,
         onExtraTableAdd: this.props.onExtraTableAdd,
-        ref: (c) => {
+        ref: (c: any) => {
           return (this.addIndicatorConfirmPopup = c)
         }
       }),
@@ -628,7 +628,7 @@ class IndicatorsListComponent extends React.Component {
               ref: this.searchRef,
               style: { maxWidth: "20em", marginBottom: 10 },
               value: this.state.search,
-              onChange: (ev) => this.setState({ search: ev.target.value })
+              onChange: (ev: any) => this.setState({ search: ev.target.value })
             }),
 
             R(uiComponents.OptionListComponent, {
@@ -639,7 +639,7 @@ class IndicatorsListComponent extends React.Component {
               }))
             })
           ]
-    )
+    );
   }
 }
 IndicatorsListComponent.initClass()
@@ -656,7 +656,7 @@ class AddIndicatorConfirmPopupComponent extends React.Component {
     // e.g. "en"
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
     this.state = {
       visible: false,
@@ -664,7 +664,7 @@ class AddIndicatorConfirmPopupComponent extends React.Component {
     }
   }
 
-  show(indicatorTable) {
+  show(indicatorTable: any) {
     return this.setState({ visible: true, indicatorTable })
   }
 
@@ -753,7 +753,7 @@ class IssuesListComponent extends React.Component {
     // e.g. "en"
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
     this.state = {
       issueTypes: null,
@@ -792,7 +792,7 @@ class IssuesListComponent extends React.Component {
     })
   }
 
-  handleTableRemove = (table) => {
+  handleTableRemove = (table: any) => {
     if (
       confirm(
         `Remove ${ExprUtils.localizeString(
@@ -805,7 +805,7 @@ class IssuesListComponent extends React.Component {
     }
   }
 
-  searchRef = (comp) => {
+  searchRef = (comp: any) => {
     // Focus
     if (comp) {
       return comp.focus()
@@ -820,7 +820,7 @@ class IssuesListComponent extends React.Component {
 
     // Filter issueTypes
     if (this.state.search) {
-      const escapeRegExp = (s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
+      const escapeRegExp = (s: any) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
 
       const searchStringRegExp = new RegExp(escapeRegExp(this.state.search), "i")
 
@@ -874,7 +874,7 @@ class IssuesListComponent extends React.Component {
               ref: this.searchRef,
               style: { maxWidth: "20em", marginBottom: 10 },
               value: this.state.search,
-              onChange: (ev) => this.setState({ search: ev.target.value })
+              onChange: (ev: any) => this.setState({ search: ev.target.value })
             }),
 
             R(uiComponents.OptionListComponent, {
@@ -885,7 +885,7 @@ class IssuesListComponent extends React.Component {
               }))
             })
           ]
-    )
+    );
   }
 }
 IssuesListComponent.initClass()

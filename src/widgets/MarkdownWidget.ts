@@ -23,7 +23,7 @@ export default MarkdownWidget = class MarkdownWidget extends Widget {
   //  onDesignChange: called with new design. null/undefined for readonly
   //  width: width in pixels on screen
   //  height: height in pixels on screen
-  createViewElement(options) {
+  createViewElement(options: any) {
     return React.createElement(MarkdownWidgetComponent, {
       design: options.design,
       onDesignChange: options.onDesignChange,
@@ -49,7 +49,7 @@ class MarkdownWidgetComponent extends React.Component {
     }
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
     this.state = {
       // Design that is being edited. Change is propagated on closing window
@@ -66,7 +66,7 @@ class MarkdownWidgetComponent extends React.Component {
     return this.setState({ editDesign: null })
   }
 
-  handleEditDesignChange = (design) => {
+  handleEditDesignChange = (design: any) => {
     return this.setState({ editDesign: design })
   }
 
@@ -127,7 +127,7 @@ class MarkdownWidgetComponent extends React.Component {
     )
   }
 
-  renderContent(design) {
+  renderContent(design: any) {
     return React.createElement(MarkdownWidgetViewComponent, {
       design,
       width: this.props.width,
@@ -191,7 +191,7 @@ class MarkdownWidgetDesignerComponent extends React.Component {
     }
   }
 
-  handleMarkdownChange = (ev) => {
+  handleMarkdownChange = (ev: any) => {
     const design = _.extend({}, this.props.design, { markdown: ev.target.value })
     return this.props.onDesignChange(design)
   }

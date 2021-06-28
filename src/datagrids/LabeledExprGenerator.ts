@@ -6,7 +6,7 @@ import { ExprUtils } from "mwater-expressions"
 
 // Generates labeled expressions (expr, label and joins) for a table. Used to make a datagrid, do export or import.
 export default LabeledExprGenerator = class LabeledExprGenerator {
-  constructor(schema) {
+  constructor(schema: any) {
     this.schema = schema
   }
 
@@ -23,7 +23,7 @@ export default LabeledExprGenerator = class LabeledExprGenerator {
   //  multipleJoinCondition: optional boolean predicate to filter 1-n/n-n joins to include. Called with table id, join column object. Default is to not include those joins
   //  useConfidential: optional boolean to replace redacted columns with unredacted ones
   //  numberDuplicatesLabels: number duplicate label columns with " (1)", " (2)" , etc.
-  generate(table, options = {}) {
+  generate(table: any, options = {}) {
     _.defaults(options, {
       locale: null,
       headerFormat: "code",
@@ -38,7 +38,7 @@ export default LabeledExprGenerator = class LabeledExprGenerator {
     })
 
     // Create a label for a column
-    function createLabel(column, suffix) {
+    function createLabel(column: any, suffix: any) {
       // By header mode
       let label
       if (options.headerFormat === "code" && column.code) {
@@ -67,7 +67,7 @@ export default LabeledExprGenerator = class LabeledExprGenerator {
     }
 
     // Convert a table + schema column into multiple labeled expres
-    var convertColumn = (table, column, joins) => {
+    var convertColumn = (table: any, column: any, joins: any) => {
       // Filter if present
       let joinColumn
       if (options.columnFilter && !options.columnFilter(table, column)) {
@@ -140,17 +140,18 @@ export default LabeledExprGenerator = class LabeledExprGenerator {
           } else if (column.join.type === "n-1" && column.join.toTable.match(/^custom./)) {
             return this.schema
               .getColumns(column.join.toTable)
-              .filter((c) => c.id[0] === "c")
-              .map((c) => ({
-                expr: {
-                  type: "scalar",
-                  table,
-                  joins: [column.id],
-                  expr: { type: "field", table: column.join.toTable, column: c.id }
-                },
-                label: `${createLabel(column)} > ${createLabel(c)}`,
-                joins
-              }))
+              .filter((c: any) => c.id[0] === "c")
+              .map((c: any) => ({
+              expr: {
+                type: "scalar",
+                table,
+                joins: [column.id],
+                expr: { type: "field", table: column.join.toTable, column: c.id }
+              },
+
+              label: `${createLabel(column)} > ${createLabel(c)}`,
+              joins
+            }));
           } else {
             // use code, full name, or name of dest table
             joinColumn = this.schema.getColumn(column.join.toTable, "code")
@@ -182,7 +183,7 @@ export default LabeledExprGenerator = class LabeledExprGenerator {
           options.multipleJoinCondition &&
           options.multipleJoinCondition(table, column)
         ) {
-          let childExprs = []
+          let childExprs: any = []
 
           for (let childColumn of this.schema.getColumns(column.join.toTable)) {
             childExprs = childExprs.concat(convertColumn(column.join.toTable, childColumn, joins.concat([column.id])))
@@ -228,7 +229,7 @@ export default LabeledExprGenerator = class LabeledExprGenerator {
     }
 
     // For each column in form
-    let labeledExprs = []
+    let labeledExprs: any = []
     for (let column of this.schema.getColumns(table)) {
       // Convert column into labels and exprs
       labeledExprs = labeledExprs.concat(convertColumn(table, column, []))

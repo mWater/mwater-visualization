@@ -29,7 +29,7 @@ export default MWaterAddRelatedFormComponent = (function () {
       }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -38,7 +38,7 @@ export default MWaterAddRelatedFormComponent = (function () {
       }
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
       // If waiting and table has arrived, cancel waiting
       if (this.state.waitingForTable && nextProps.schema.getTable(this.state.waitingForTable)) {
         return this.setState({ waitingForTable: null })
@@ -49,7 +49,7 @@ export default MWaterAddRelatedFormComponent = (function () {
       return this.setState({ open: true })
     }
 
-    handleSelect = (table) => {
+    handleSelect = (table: any) => {
       this.setState({ open: false })
 
       // Wait for table if not in schema
@@ -100,7 +100,7 @@ class AddRelatedFormModalComponent extends React.Component {
     // e.g. "en"
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
     this.state = {
       items: null,
@@ -165,11 +165,11 @@ class AddRelatedFormModalComponent extends React.Component {
         ref: this.searchRef,
         style: { marginBottom: 10 },
         value: this.state.search,
-        onChange: (ev) => this.setState({ search: ev.target.value })
+        onChange: (ev: any) => this.setState({ search: ev.target.value })
       }),
 
       R(ui.OptionListComponent, { items })
-    )
+    );
   }
 
   render() {
@@ -186,6 +186,6 @@ class AddRelatedFormModalComponent extends React.Component {
 }
 AddRelatedFormModalComponent.initClass()
 
-function escapeRegex(s) {
-  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
+function escapeRegex(s: any) {
+  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
 }

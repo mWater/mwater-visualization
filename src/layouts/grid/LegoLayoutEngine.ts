@@ -5,20 +5,20 @@ import _ from "lodash"
 
 // Layout engine that places blocks like lego and displaces others out of the way
 export default LegoLayoutEngine = class LegoLayoutEngine {
-  constructor(width, blocksAcross) {
+  constructor(width: any, blocksAcross: any) {
     this.width = width
     this.blocksAcross = blocksAcross
     this.scale = this.width / this.blocksAcross
   }
 
   // Calculate the total height needed to fit all layouts plus one row
-  calculateHeight(layouts) {
+  calculateHeight(layouts: any) {
     const bottom = _.max(_.map(layouts, (l) => this.getLayoutBounds(l).y + this.getLayoutBounds(l).height))
     return bottom + this.scale
   }
 
   // Get the bounds of a layout (x, y, width, height)
-  getLayoutBounds(layout) {
+  getLayoutBounds(layout: any) {
     return {
       x: this.scale * layout.x,
       y: this.scale * layout.y,
@@ -28,7 +28,7 @@ export default LegoLayoutEngine = class LegoLayoutEngine {
   }
 
   // Converts a rectangle to a layout
-  rectToLayout(rect) {
+  rectToLayout(rect: any) {
     // Get snapped approximate location
     let x = Math.round(rect.x / this.scale)
     let y = Math.round(rect.y / this.scale)
@@ -65,7 +65,7 @@ export default LegoLayoutEngine = class LegoLayoutEngine {
   // layouts is lookup of id -> layout
   // priority is optional id to layout first
   // Returns layout lookup of id -> layout
-  performLayout(layouts, priority) {
+  performLayout(layouts: any, priority: any) {
     // Create list of placed layouts to avoid as placing new ones
     const placedLayouts = []
     const results = {}
@@ -104,7 +104,7 @@ export default LegoLayoutEngine = class LegoLayoutEngine {
   }
 
   // Adds a layout with the w and h (width and height in blocks)
-  appendLayout(layouts, w, h) {
+  appendLayout(layouts: any, w: any, h: any) {
     // Check if overlaps
     let layout = { x: 0, y: 0, w, h }
     while (_.any(_.values(layouts), (pl) => this.overlaps(pl, layout))) {
@@ -115,7 +115,7 @@ export default LegoLayoutEngine = class LegoLayoutEngine {
   }
 
   // Check if layouts overlap
-  overlaps(a, b) {
+  overlaps(a: any, b: any) {
     if (a.x + a.w <= b.x) {
       return false
     }
@@ -132,7 +132,7 @@ export default LegoLayoutEngine = class LegoLayoutEngine {
   }
 
   // Shifts layout right or down if no more room
-  shiftLayout(layout) {
+  shiftLayout(layout: any) {
     if (layout.x + layout.w < this.blocksAcross) {
       return { x: layout.x + 1, y: layout.y, w: layout.w, h: layout.h }
     }

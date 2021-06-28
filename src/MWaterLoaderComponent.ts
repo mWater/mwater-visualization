@@ -38,7 +38,7 @@ export default MWaterLoaderComponent = (function () {
       // Custom error formatter that returns React node or string, gets passed the error response from server
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
       this.state = {
         error: null,
@@ -50,7 +50,7 @@ export default MWaterLoaderComponent = (function () {
     }
 
     // Override to determine if a load is needed. Not called on mounting
-    isLoadNeeded(newProps, oldProps) {
+    isLoadNeeded(newProps: any, oldProps: any) {
       return !_.isEqual(
         _.pick(newProps, "apiUrl", "client", "user", "share", "asUser", "extraTables"),
         _.pick(oldProps, "apiUrl", "client", "user", "share", "asUser", "extraTables")
@@ -58,7 +58,7 @@ export default MWaterLoaderComponent = (function () {
     }
 
     // Call callback with state changes
-    load(props, prevProps, callback) {
+    load(props: any, prevProps: any, callback: any) {
       // Load schema and data source
       return mWaterLoader(
         {
@@ -68,7 +68,7 @@ export default MWaterLoaderComponent = (function () {
           asUser: props.asUser,
           extraTables: props.extraTables
         },
-        (error, config) => {
+        (error: any, config: any) => {
           if (error) {
             const defaultError = `Cannot load one of the forms that this depends on. Perhaps the administrator has not shared the form with you? Details: ${error.message}`
             if (this.props.errorFormatter) {
@@ -78,7 +78,7 @@ export default MWaterLoaderComponent = (function () {
           }
           return callback({ schema: config.schema, dataSource: config.dataSource })
         }
-      )
+      );
     }
 
     render() {

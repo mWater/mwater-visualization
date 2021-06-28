@@ -30,20 +30,20 @@ export default TileUrlLayer = class TileUrlLayer extends Layer {
   }
 
   // Gets the tile url for definition type "TileUrl"
-  getTileUrl(design, filters) {
+  getTileUrl(design: any, filters: any) {
     return design.tileUrl
   }
 
   // Gets the utf grid url for definition type "TileUrl"
-  getUtfGridUrl(design, filters) {
+  getUtfGridUrl(design: any, filters: any) {
     return null
   }
 
   // Get min and max zoom levels
-  getMinZoom(design) {
+  getMinZoom(design: any) {
     return design.minZoom
   }
-  getMaxZoom(design) {
+  getMaxZoom(design: any) {
     return design.maxZoom
   }
 
@@ -53,7 +53,7 @@ export default TileUrlLayer = class TileUrlLayer extends Layer {
   }
 
   // True if layer is incomplete (e.g. brand new) and should be editable immediately
-  isIncomplete(design, schema) {
+  isIncomplete(design: any, schema: any) {
     return this.validateDesign(this.cleanDesign(design, schema), schema) != null
   }
 
@@ -64,17 +64,17 @@ export default TileUrlLayer = class TileUrlLayer extends Layer {
   //   schema: schema to use
   //   dataSource: data source to use
   //   onDesignChange: function called when design changes
-  createDesignerElement(options) {
+  createDesignerElement(options: any) {
     return R(TileUrlLayerDesignerComponent, { design: options.design, onDesignChange: options.onDesignChange })
   }
 
   // Returns a cleaned design
-  cleanDesign(design, schema) {
+  cleanDesign(design: any, schema: any) {
     return design
   }
 
   // Validates design. Null if ok, message otherwise
-  validateDesign(design, schema) {
+  validateDesign(design: any, schema: any) {
     if (!design.tileUrl) {
       return "Missing Url"
     }
@@ -91,7 +91,7 @@ class TileUrlLayerDesignerComponent extends React.Component {
     // Called with new design
   }
 
-  handleTileUrlChange = (ev) => {
+  handleTileUrlChange = (ev: any) => {
     return this.props.onDesignChange(_.extend({}, this.props.design, { tileUrl: ev.target.value }))
   }
 

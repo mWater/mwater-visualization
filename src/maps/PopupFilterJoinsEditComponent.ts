@@ -28,7 +28,7 @@ export default PopupFilterJoinsEditComponent = (function () {
       // Called with new design
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -36,7 +36,7 @@ export default PopupFilterJoinsEditComponent = (function () {
       }
     }
 
-    handleExprChange = (table, expr) => {
+    handleExprChange = (table: any, expr: any) => {
       let design = this.props.design || this.props.defaultPopupFilterJoins
 
       design = _.clone(design)

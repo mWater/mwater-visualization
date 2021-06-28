@@ -6,7 +6,7 @@ import * as fixtures from "../../../fixtures"
 import TableChart from "../../../../src/widgets/charts/table/TableChart"
 import canonical from "canonical-json"
 
-function compare(actual, expected) {
+function compare(actual: any, expected: any) {
   return assert.equal(
     canonical(actual),
     canonical(expected),
@@ -18,7 +18,7 @@ describe("TableChart", function () {
   before(function () {
     this.schema = fixtures.simpleSchema()
     this.dataSource = {
-      performQuery: (query) => {
+      performQuery: (query: any) => {
         return (this.query = query)
       }
     }

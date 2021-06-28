@@ -29,12 +29,12 @@ export default MapLayersDesignerComponent = (function () {
     }
 
     // Updates design with the specified changes
-    updateDesign(changes) {
+    updateDesign(changes: any) {
       const design = _.extend({}, this.props.design, changes)
       return this.props.onDesignChange(design)
     }
 
-    handleLayerViewChange = (index, layerView) => {
+    handleLayerViewChange = (index: any, layerView: any) => {
       const layerViews = this.props.design.layerViews.slice()
 
       // Update self
@@ -52,17 +52,17 @@ export default MapLayersDesignerComponent = (function () {
       return this.updateDesign({ layerViews })
     }
 
-    handleRemoveLayerView = (index) => {
+    handleRemoveLayerView = (index: any) => {
       const layerViews = this.props.design.layerViews.slice()
       layerViews.splice(index, 1)
       return this.updateDesign({ layerViews })
     }
 
-    handleReorder = (layerList) => {
+    handleReorder = (layerList: any) => {
       return this.updateDesign({ layerViews: layerList })
     }
 
-    renderLayerView = (layerView, index, connectDragSource, connectDragPreview, connectDropTarget) => {
+    renderLayerView = (layerView: any, index: any, connectDragSource: any, connectDragPreview: any, connectDropTarget: any) => {
       const style = {
         padding: "10px 15px",
         border: "1px solid #ddd",
@@ -93,7 +93,7 @@ export default MapLayersDesignerComponent = (function () {
           schema: this.props.schema,
           dataSource: this.props.dataSource,
           layerView,
-          onLayerViewChange: (lv) => this.handleLayerViewChange(index, lv),
+          onLayerViewChange: (lv: any) => this.handleLayerViewChange(index, lv),
           onRemove: () => this.handleRemoveLayerView(index),
           connectDragSource,
           connectDragPreview,
@@ -101,7 +101,7 @@ export default MapLayersDesignerComponent = (function () {
           allowEditingLayer: this.props.allowEditingLayers,
           filters: _.compact(filters)
         })
-      )
+      );
     }
 
     render() {

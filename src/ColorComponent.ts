@@ -19,7 +19,7 @@ export default ColorComponent = (function () {
       }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
       this.state = { open: false, advanced: false }
     }
@@ -28,7 +28,7 @@ export default ColorComponent = (function () {
       return this.setState({ open: !this.state.open, advanced: false })
     }
 
-    handleClose = (color) => {
+    handleClose = (color: any) => {
       return this.props.onChange(color.hex)
     }
 

@@ -31,7 +31,7 @@ export default TableChartViewComponent = (function () {
       // Called with (tableId, rowId) when item is clicked
     }
 
-    shouldComponentUpdate(prevProps) {
+    shouldComponentUpdate(prevProps: any) {
       return !_.isEqual(prevProps, this.props)
     }
 
@@ -76,7 +76,7 @@ class TableContentsComponent extends React.Component {
     // e.g. "en"
   }
 
-  shouldComponentUpdate(prevProps) {
+  shouldComponentUpdate(prevProps: any) {
     if (prevProps.columns !== this.props.columns && !_.isEqual(prevProps.columns, this.props.columns)) {
       return true
     }
@@ -92,7 +92,7 @@ class TableContentsComponent extends React.Component {
     return false
   }
 
-  handleRowClick = (rowIndex) => {
+  handleRowClick = (rowIndex: any) => {
     const row = this.props.data.main[rowIndex]
 
     if (row && row.id && this.props.onRowClick) {
@@ -100,7 +100,7 @@ class TableContentsComponent extends React.Component {
     }
   }
 
-  renderHeaderCell(index) {
+  renderHeaderCell(index: any) {
     const axisBuilder = new AxisBuilder({ schema: this.props.schema })
     const column = this.props.columns[index]
 
@@ -120,12 +120,12 @@ class TableContentsComponent extends React.Component {
     )
   }
 
-  renderImage(id) {
+  renderImage(id: any) {
     const url = this.props.dataSource.getImageUrl(id)
     return R("a", { href: url, key: id, target: "_blank", style: { paddingLeft: 5, paddingRight: 5 } }, "Image")
   }
 
-  renderCell(rowIndex, columnIndex) {
+  renderCell(rowIndex: any, columnIndex: any) {
     let node
     const row = this.props.data.main[rowIndex]
     const column = this.props.columns[columnIndex]
@@ -179,7 +179,7 @@ class TableContentsComponent extends React.Component {
     return R("td", { key: columnIndex }, node)
   }
 
-  renderRow(index) {
+  renderRow(index: any) {
     return R(
       "tr",
       { key: index, onClick: this.handleRowClick.bind(null, index) },

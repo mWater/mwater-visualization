@@ -30,7 +30,7 @@ export default MapLayerViewDesignerComponent = (function () {
       // array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       const layer = LayerFactory.createLayer(this.props.layerView.type)
@@ -40,7 +40,7 @@ export default MapLayerViewDesignerComponent = (function () {
       }
     }
 
-    update(updates) {
+    update(updates: any) {
       return this.props.onLayerViewChange(_.extend({}, this.props.layerView, updates))
     }
 
@@ -48,18 +48,18 @@ export default MapLayerViewDesignerComponent = (function () {
       return this.update({ visible: !this.props.layerView.visible })
     }
 
-    handleHideLegend = (hideLegend) => {
+    handleHideLegend = (hideLegend: any) => {
       return this.update({ hideLegend })
     }
 
-    handleGroupChange = (group) => {
+    handleGroupChange = (group: any) => {
       return this.update({ group })
     }
 
     handleToggleEditing = () => {
       return this.setState({ editing: !this.state.editing })
     }
-    handleSaveEditing = (design) => {
+    handleSaveEditing = (design: any) => {
       return this.update({ design })
     }
 
@@ -163,7 +163,7 @@ export default MapLayerViewDesignerComponent = (function () {
       )
     }
 
-    handleOpacityChange = (newValue) => {
+    handleOpacityChange = (newValue: any) => {
       return this.update({ opacity: newValue / 100 })
     }
 

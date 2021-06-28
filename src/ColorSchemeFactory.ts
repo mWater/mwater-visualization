@@ -6,20 +6,20 @@ import d3Scale from "d3-scale"
 import brewer from "d3-scale-chromatic"
 import c_c from "color-mixer"
 
-function rgbStringToHex(rgbString) {
+function rgbStringToHex(rgbString: any) {
   const rgbArray = rgbString
     .substring(4, rgbString.length - 1)
     .split(",")
-    .map((item) => parseInt(item))
+    .map((item: any) => parseInt(item))
   const _color = new c_c.Color({ rgb: rgbArray })
   return _color.hex()
 }
 
-function generateCategoricalSet(set, number, reversed) {
+function generateCategoricalSet(set: any, number: any, reversed: any) {
   return __range__(0, number, false).map((i) => set[(reversed ? number - i - 1 : i) % set.length])
 }
 
-function generateSequentialSet(set, number, reversed) {
+function generateSequentialSet(set: any, number: any, reversed: any) {
   const color = d3Scale
     .scaleLinear()
     .domain([0, number - 1])
@@ -34,7 +34,7 @@ export default ColorSchemeFactory = class ColorSchemeFactory {
   //   type: string (type of the color scheme)
   //   number: int (number of colors to be generated)
   //   reversed: true to reversed
-  static createColorScheme(options) {
+  static createColorScheme(options: any) {
     switch (options.type) {
       case "schemeAccent":
         return generateCategoricalSet(brewer.schemeAccent, options.number, options.reversed)
@@ -112,7 +112,7 @@ export default ColorSchemeFactory = class ColorSchemeFactory {
   }
 
   // Create a color map for a series of categories. Null is treated specially and assumed to be last.
-  static createColorMapForCategories(categories, isCategorical) {
+  static createColorMapForCategories(categories: any, isCategorical: any) {
     let type
     if (isCategorical) {
       type = "schemeSet1"
@@ -135,7 +135,7 @@ export default ColorSchemeFactory = class ColorSchemeFactory {
   }
 }
 
-function __range__(left, right, inclusive) {
+function __range__(left: any, right: any, inclusive: any) {
   let range = []
   let ascending = left < right
   let end = !inclusive ? right : ascending ? right + 1 : right - 1

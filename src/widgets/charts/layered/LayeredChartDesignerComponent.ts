@@ -26,50 +26,50 @@ export default LayeredChartDesignerComponent = (function () {
     }
 
     // Determine if axes labels needed
-    areAxesLabelsNeeded(layer) {
+    areAxesLabelsNeeded(layer: any) {
       return !["pie", "donut"].includes(this.props.design.type)
     }
 
     // Updates design with the specified changes
-    updateDesign(changes) {
+    updateDesign(changes: any) {
       const design = _.extend({}, this.props.design, changes)
       return this.props.onDesignChange(design)
     }
 
-    handleTypeChange = (type) => {
+    handleTypeChange = (type: any) => {
       return this.updateDesign({ type })
     }
 
-    handleTransposeChange = (ev) => {
+    handleTransposeChange = (ev: any) => {
       return this.updateDesign({ transpose: ev.target.checked })
     }
 
-    handleStackedChange = (ev) => {
+    handleStackedChange = (ev: any) => {
       return this.updateDesign({ stacked: ev.target.checked })
     }
-    handleProportionalChange = (ev) => {
+    handleProportionalChange = (ev: any) => {
       return this.updateDesign({ proportional: ev.target.checked })
     }
-    handleLabelsChange = (ev) => {
+    handleLabelsChange = (ev: any) => {
       return this.updateDesign({ labels: ev.target.checked })
     }
-    handlePercentageVisibilityChange = (ev) => {
+    handlePercentageVisibilityChange = (ev: any) => {
       return this.updateDesign({ hidePercentage: ev.target.checked })
     }
-    handlePolarOrderChange = (ev) => {
+    handlePolarOrderChange = (ev: any) => {
       return this.updateDesign({ polarOrder: ev.target.checked ? "desc" : "natural" })
     }
-    handleYThresholdsChange = (yThresholds) => {
+    handleYThresholdsChange = (yThresholds: any) => {
       return this.updateDesign({ yThresholds })
     }
 
-    handleLayerChange = (index, layer) => {
+    handleLayerChange = (index: any, layer: any) => {
       const layers = this.props.design.layers.slice()
       layers[index] = layer
       return this.updateDesign({ layers })
     }
 
-    handleRemoveLayer = (index) => {
+    handleRemoveLayer = (index: any) => {
       const layers = this.props.design.layers.slice()
       layers.splice(index, 1)
       return this.updateDesign({ layers })
@@ -81,26 +81,26 @@ export default LayeredChartDesignerComponent = (function () {
       return this.updateDesign({ layers })
     }
 
-    handleXAxisLabelTextChange = (ev) => {
+    handleXAxisLabelTextChange = (ev: any) => {
       return this.updateDesign({ xAxisLabelText: ev.target.value })
     }
-    handleYAxisLabelTextChange = (ev) => {
+    handleYAxisLabelTextChange = (ev: any) => {
       return this.updateDesign({ yAxisLabelText: ev.target.value })
     }
 
-    handleToggleXAxisLabelClick = (ev) => {
+    handleToggleXAxisLabelClick = (ev: any) => {
       return this.updateDesign({ xAxisLabelText: this.props.design.xAxisLabelText != null ? null : "" })
     }
 
-    handleToggleYAxisLabelClick = (ev) => {
+    handleToggleYAxisLabelClick = (ev: any) => {
       return this.updateDesign({ yAxisLabelText: this.props.design.yAxisLabelText != null ? null : "" })
     }
 
-    handleYMinChange = (yMin) => {
+    handleYMinChange = (yMin: any) => {
       return this.updateDesign({ yMin })
     }
 
-    handleYMaxChange = (yMax) => {
+    handleYMaxChange = (yMax: any) => {
       return this.updateDesign({ yMax })
     }
 
@@ -197,7 +197,7 @@ export default LayeredChartDesignerComponent = (function () {
         R(uiComponents.ToggleEditComponent, {
           forceOpen: !this.props.design.type,
           label: current ? current.name : "",
-          editor: (onClose) => {
+          editor: (onClose: any) => {
             return R(uiComponents.OptionListComponent, {
               hint: "Select a Chart Type",
               items: _.map(chartTypes, (ct) => ({
@@ -212,10 +212,10 @@ export default LayeredChartDesignerComponent = (function () {
           }
         }),
         this.renderOptions()
-      )
+      );
     }
 
-    renderLayer = (index) => {
+    renderLayer = (index: any) => {
       const style = {
         paddingTop: 10,
         paddingBottom: 10
@@ -435,13 +435,13 @@ class ThresholdsComponent extends React.Component {
     return this.props.onThresholdsChange(thresholds)
   }
 
-  handleChange = (index, value) => {
+  handleChange = (index: any, value: any) => {
     const thresholds = (this.props.thresholds || []).slice()
     thresholds[index] = value
     return this.props.onThresholdsChange(thresholds)
   }
 
-  handleRemove = (index) => {
+  handleRemove = (index: any) => {
     const thresholds = (this.props.thresholds || []).slice()
     thresholds.splice(index, 1)
     return this.props.onThresholdsChange(thresholds)
@@ -519,7 +519,7 @@ class ThresholdComponent extends React.Component {
               { style: { verticalAlign: "middle", display: "inline-block" } },
               R(ColorComponent, {
                 color: this.props.threshold.highlightColor,
-                onChange: (v) => this.props.onThresholdChange(_.extend({}, this.props.threshold, { highlightColor: v }))
+                onChange: (v: any) => this.props.onThresholdChange(_.extend({}, this.props.threshold, { highlightColor: v }))
               })
             )
           )
@@ -530,12 +530,12 @@ class ThresholdComponent extends React.Component {
         { className: "btn btn-xs btn-link", onClick: this.props.onRemove },
         R("i", { className: "fa fa-remove" })
       )
-    )
+    );
   }
 }
 ThresholdComponent.initClass()
 
-function LabeledInlineComponent(props) {
+function LabeledInlineComponent(props: any) {
   return R(
     "div",
     { style: { display: "inline-block" } },

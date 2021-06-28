@@ -30,7 +30,7 @@ const widgetTypes = {
 
 // Creates widgets based on type
 export default WidgetFactory = class WidgetFactory {
-  static createWidget(type) {
+  static createWidget(type: any) {
     if (widgetTypes[type]) {
       return widgetTypes[type]
     }

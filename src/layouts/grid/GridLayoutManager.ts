@@ -11,13 +11,13 @@ import LegoLayoutEngine from "./LegoLayoutEngine"
 import AutoSizeComponent from "react-library/lib/AutoSizeComponent"
 
 export default GridLayoutManager = class GridLayoutManager extends LayoutManager {
-  renderPalette(width) {
+  renderPalette(width: any) {
     const PaletteItemComponent = require("./PaletteItemComponent")
 
     const createWidgetItem =
       (
-        type,
-        design // Add unique id
+        type: any,
+        design: any // Add unique id
       ) =>
       () => ({
         id: uuid(),
@@ -89,10 +89,10 @@ export default GridLayoutManager = class GridLayoutManager extends LayoutManager
   //  items: opaque items object that layout manager understands
   //  onItemsChange: Called when items changes
   //  renderWidget: called with ({ id:, type:, design:, onDesignChange:, width:, height:  })
-  renderLayout(options) {
+  renderLayout(options: any) {
     const GridLayoutComponent = require("./GridLayoutComponent")
 
-    return R(AutoSizeComponent, { injectWidth: true, injectHeight: true }, (size) => {
+    return R(AutoSizeComponent, { injectWidth: true, injectHeight: true }, (size: any) => {
       if (options.onItemsChange != null) {
         return R(
           "div",
@@ -125,21 +125,21 @@ export default GridLayoutManager = class GridLayoutManager extends LayoutManager
           })
         )
       }
-    })
+    });
   }
 
   // Tests if dashboard has any items
-  isEmpty(items) {
+  isEmpty(items: any) {
     return _.isEmpty(items)
   }
 
   // Gets { type, design } of a widget
-  getWidgetTypeAndDesign(items, widgetId) {
+  getWidgetTypeAndDesign(items: any, widgetId: any) {
     return items[widgetId]?.widget
   }
 
   // Gets all widgets in items as array of { type, design }
-  getAllWidgets(items) {
+  getAllWidgets(items: any) {
     const widgets = []
     for (let id in items) {
       const item = items[id]
@@ -150,7 +150,7 @@ export default GridLayoutManager = class GridLayoutManager extends LayoutManager
   }
 
   // Add a widget to the items
-  addWidget(items, widgetType, widgetDesign) {
+  addWidget(items: any, widgetType: any, widgetDesign: any) {
     // Find place for new item
     const layout = this.findOpenLayout(items, 12, 12)
 
@@ -173,7 +173,7 @@ export default GridLayoutManager = class GridLayoutManager extends LayoutManager
   }
 
   // Find a layout that the new widget fits in. width and height are in 24ths
-  findOpenLayout(items, width, height) {
+  findOpenLayout(items: any, width: any, height: any) {
     // Create layout engine
     // TODO create from design
     // TODO uses fake width

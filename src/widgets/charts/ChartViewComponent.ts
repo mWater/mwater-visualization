@@ -34,7 +34,7 @@ export default ChartViewComponent = (function () {
       // Called with (tableId, rowId) when item is clicked
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -55,7 +55,7 @@ export default ChartViewComponent = (function () {
       return this.updateData(this.props)
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
       if (
         !_.isEqual(nextProps.design, this.props.design) ||
         !_.isEqual(nextProps.filters, this.props.filters) ||
@@ -68,7 +68,7 @@ export default ChartViewComponent = (function () {
       }
     }
 
-    updateData(props) {
+    updateData(props: any) {
       // Clean design first (needed to validate properly)
       const design = props.chart.cleanDesign(props.design, props.schema)
 
@@ -81,12 +81,12 @@ export default ChartViewComponent = (function () {
       // Loading data
       this.setState({ dataLoading: true })
 
-      return this.loadData(props, (error, data) => {
+      return this.loadData(props, (error: any, data: any) => {
         return this.setState({ dataLoading: false, dataError: error, data, validDesign: design })
-      })
+      });
     }
 
-    loadData(props, callback) {
+    loadData(props: any, callback: any) {
       // Get data from widget data source
       return props.widgetDataSource.getData(props.design, props.filters, callback)
     }

@@ -5,7 +5,7 @@ import { assert } from "chai"
 import canonical from "canonical-json"
 import * as blockUtils from "../src/layouts/blocks/blockUtils"
 
-function compare(actual, expected) {
+function compare(actual: any, expected: any) {
   return assert.equal(
     canonical(actual),
     canonical(expected),

@@ -8,14 +8,14 @@ import MapUtils from "./MapUtils"
 
 // Calculates map bounds given layers by unioning together
 export default MapBoundsCalculator = class MapBoundsCalculator {
-  constructor(schema, dataSource) {
+  constructor(schema: any, dataSource: any) {
     this.schema = schema
     this.dataSource = dataSource
   }
 
   // Gets the bounds for the map. Null for whole world. Callback as { n:, s:, w:, e: }
-  getBounds(design, filters, callback) {
-    const allBounds = []
+  getBounds(design: any, filters: any, callback: any) {
+    const allBounds: any = []
 
     // For each layer
     return async.each(
@@ -40,7 +40,7 @@ export default MapBoundsCalculator = class MapBoundsCalculator {
         )
 
         // Get bounds, including filters from map
-        return layer.getBounds(layerDesign, this.schema, this.dataSource, allFilters, (error, bounds) => {
+        return layer.getBounds(layerDesign, this.schema, this.dataSource, allFilters, (error: any, bounds: any) => {
           if (error) {
             return cb(error)
           }
@@ -49,7 +49,7 @@ export default MapBoundsCalculator = class MapBoundsCalculator {
             allBounds.push(bounds)
           }
           return cb(null)
-        })
+        });
       },
       (error) => {
         if (error) {
@@ -68,6 +68,6 @@ export default MapBoundsCalculator = class MapBoundsCalculator {
           w: _.min(allBounds, "w").w
         })
       }
-    )
+    );
   }
 }

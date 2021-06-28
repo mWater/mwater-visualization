@@ -17,14 +17,14 @@ import TextWidget from "../../text/TextWidget"
 
 // See LayeredChart Design.md for the design
 export default LayeredChart = class LayeredChart extends Chart {
-  cleanDesign(design, schema) {
+  cleanDesign(design: any, schema: any) {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
     const compiler = new LayeredChartCompiler({ schema })
 
     const layers = design.layers || [{}]
 
-    return produce(design, (draft) => {
+    return produce(design, (draft: any) => {
       // Fill in defaults
       draft.version = design.version || 2
       draft.layers = layers
@@ -91,10 +91,10 @@ export default LayeredChart = class LayeredChart extends Chart {
           delete layer.trendline
         }
       }
-    })
+    });
   }
 
-  validateDesign(design, schema) {
+  validateDesign(design: any, schema: any) {
     let error
     let axisBuilder = new AxisBuilder({ schema })
     const compiler = new LayeredChartCompiler({ schema })
@@ -146,7 +146,7 @@ export default LayeredChart = class LayeredChart extends Chart {
     return error
   }
 
-  isEmpty(design) {
+  isEmpty(design: any) {
     return !design.layers || !design.layers[0] || !design.layers[0].table
   }
 
@@ -157,7 +157,7 @@ export default LayeredChart = class LayeredChart extends Chart {
   //   design: design
   //   onDesignChange: function
   //   filters: array of filters
-  createDesignerElement(options) {
+  createDesignerElement(options: any) {
     // Require here to prevent server require problems
     const LayeredChartDesignerComponent = require("./LayeredChartDesignerComponent")
     const props = {
@@ -165,7 +165,7 @@ export default LayeredChart = class LayeredChart extends Chart {
       dataSource: options.dataSource,
       design: this.cleanDesign(options.design, options.schema),
       filters: options.filters,
-      onDesignChange: (design) => {
+      onDesignChange: (design: any) => {
         // Clean design
         design = this.cleanDesign(design, options.schema)
         return options.onDesignChange(design)
@@ -180,7 +180,7 @@ export default LayeredChart = class LayeredChart extends Chart {
   // dataSource: data source to get data from
   // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   // callback: (error, data)
-  getData(design, schema, dataSource, filters, callback) {
+  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
     const compiler = new LayeredChartCompiler({ schema })
     const queries = compiler.createQueries(design, filters)
 
@@ -188,9 +188,9 @@ export default LayeredChart = class LayeredChart extends Chart {
     return async.map(
       _.pairs(queries),
       (item, cb) => {
-        return dataSource.performQuery(item[1], (err, rows) => {
+        return dataSource.performQuery(item[1], (err: any, rows: any) => {
           return cb(err, [item[0], rows])
-        })
+        });
       },
       (err, items) => {
         if (err) {
@@ -201,14 +201,14 @@ export default LayeredChart = class LayeredChart extends Chart {
 
         // Add header and footer data
         const textWidget = new TextWidget()
-        return textWidget.getData(design.header, schema, dataSource, filters, (error, headerData) => {
+        return textWidget.getData(design.header, schema, dataSource, filters, (error: any, headerData: any) => {
           if (error) {
             return callback(error)
           }
 
           data.header = headerData
 
-          return textWidget.getData(design.footer, schema, dataSource, filters, (error, footerData) => {
+          return textWidget.getData(design.footer, schema, dataSource, filters, (error: any, footerData: any) => {
             if (error) {
               return callback(error)
             }
@@ -216,10 +216,10 @@ export default LayeredChart = class LayeredChart extends Chart {
             data.footer = footerData
 
             return callback(null, data)
-          })
-        })
+          });
+        });
       }
-    )
+    );
   }
 
   // Create a view element for the chart
@@ -232,7 +232,7 @@ export default LayeredChart = class LayeredChart extends Chart {
   //   width, height: size of the chart view
   //   scope: current scope of the view element
   //   onScopeChange: called when scope changes with new scope
-  createViewElement(options) {
+  createViewElement(options: any) {
     const LayeredChartViewComponent = require("./LayeredChartViewComponent")
 
     // Create chart
@@ -253,17 +253,17 @@ export default LayeredChart = class LayeredChart extends Chart {
     return React.createElement(LayeredChartViewComponent, props)
   }
 
-  createDropdownItems(design, schema, widgetDataSource, filters) {
+  createDropdownItems(design: any, schema: any, widgetDataSource: any, filters: any) {
     // TODO validate design before allowing save
-    const save = (format) => {
+    const save = (format: any) => {
       design = this.cleanDesign(design, schema)
-      return widgetDataSource.getData(design, filters, (err, data) => {
+      return widgetDataSource.getData(design, filters, (err: any, data: any) => {
         if (err) {
           return alert("Unable to load data")
         } else {
           return LayeredChartSvgFileSaver.save(design, data, schema, format)
         }
-      })
+      });
     }
 
     // Don't save image of invalid design
@@ -277,7 +277,7 @@ export default LayeredChart = class LayeredChart extends Chart {
     ]
   }
 
-  createDataTable(design, schema, dataSource, data, locale) {
+  createDataTable(design: any, schema: any, dataSource: any, data: any, locale: any) {
     let table
     const axisBuilder = new AxisBuilder({ schema })
 
@@ -348,7 +348,7 @@ export default LayeredChart = class LayeredChart extends Chart {
   // else []
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design, schema) {
+  getFilterableTables(design: any, schema: any) {
     let filterableTables = _.uniq(_.compact(_.map(design.layers, (layer) => layer.table)))
 
     // Get filterable tables from header and footer

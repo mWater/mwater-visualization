@@ -14,7 +14,7 @@ export default ServerDatagridDataSource = class ServerDatagridDataSource extends
   //   share: share id to use for talking to mWater server
   //   datagridId: datagrid id to use on server
   //   rev: revision to use to allow caching
-  constructor(options) {
+  constructor(options: any) {
     super()
     this.options = options
   }
@@ -22,7 +22,7 @@ export default ServerDatagridDataSource = class ServerDatagridDataSource extends
   // Get the data that the widget needs. The widget should implement getData method (see above) to get the data from the server
   //  design: design of the widget. Ignored in the case of server-side rendering
   //  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
-  getRows(design, offset, limit, filters, callback) {
+  getRows(design: any, offset: any, limit: any, filters: any, callback: any) {
     const query = {
       client: this.options.client,
       share: this.options.share,
@@ -54,12 +54,12 @@ class ServerQuickfilterDataSource {
   //   share: share id to use for talking to mWater server
   //   datagridId: datagrid id to use on server
   //   rev: revision to use to allow caching
-  constructor(options) {
+  constructor(options: any) {
     this.options = options
   }
 
   // Gets the values of the quickfilter at index
-  getValues(index, expr, filters, offset, limit, callback) {
+  getValues(index: any, expr: any, filters: any, offset: any, limit: any, callback: any) {
     const query = {
       client: this.options.client,
       share: this.options.share,

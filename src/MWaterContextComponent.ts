@@ -50,7 +50,7 @@ export default MWaterContextComponent = (function () {
     getChildContext() {
       const context = {}
 
-      context.tableSelectElementFactory = (props) => {
+      context.tableSelectElementFactory = (props: any) => {
         return React.createElement(MWaterTableSelectComponent, {
           apiUrl: this.props.apiUrl,
           client: this.props.client,
@@ -69,7 +69,7 @@ export default MWaterContextComponent = (function () {
         context.addLayerElementFactory = this.props.addLayerElementFactory
       }
 
-      context.globalFiltersElementFactory = (props) => {
+      context.globalFiltersElementFactory = (props: any) => {
         if (props.nullIfIrrelevant && !_.any(props.filterableTables, (t) => t.match(/^entities./))) {
           return null
         }
@@ -77,7 +77,7 @@ export default MWaterContextComponent = (function () {
         return React.createElement(MWaterGlobalFiltersComponent, props)
       }
 
-      context.decorateScalarExprTreeSectionChildren = (options) => {
+      context.decorateScalarExprTreeSectionChildren = (options: any) => {
         // If related forms section of entities table
         if (options.tableId.match(/^entities\./) && options.section.id === "!related_forms") {
           return R(
@@ -119,7 +119,7 @@ export default MWaterContextComponent = (function () {
       }
 
       // Always match indicator section
-      context.isScalarExprTreeSectionMatch = (options) => {
+      context.isScalarExprTreeSectionMatch = (options: any) => {
         if (options.tableId.match(/^entities\./) && options.section.id === "!indicators") {
           return true
         }
@@ -127,7 +127,7 @@ export default MWaterContextComponent = (function () {
       }
 
       // Always open indicator section
-      context.isScalarExprTreeSectionInitiallyOpen = (options) => {
+      context.isScalarExprTreeSectionInitiallyOpen = (options: any) => {
         if (options.tableId.match(/^entities\./) && options.section.id === "!indicators") {
           return true
         }
@@ -137,7 +137,7 @@ export default MWaterContextComponent = (function () {
       return context
     }
 
-    handleAddTable = (table) => {
+    handleAddTable = (table: any) => {
       const extraTables = _.union(this.props.extraTables, [table])
       return this.props.onExtraTablesChange(extraTables)
     }

@@ -31,7 +31,7 @@ export default TOCWidget = class TOCWidget extends Widget {
   //  height: height in pixels on screen
   //  tocEntries: entries in the table of contents
   //  onScrollToTOCEntry: called with (widgetId, tocEntryId) to scroll to TOC entry
-  createViewElement(options) {
+  createViewElement(options: any) {
     return R(TOCWidgetComponent, {
       design: options.design,
       onDesignChange: options.onDesignChange,
@@ -68,7 +68,7 @@ class TOCWidgetComponent extends React.Component {
     }
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
     this.state = {
       editing: false // true if editing
@@ -162,11 +162,11 @@ class TOCWidgetViewComponent extends React.Component {
     }
   }
 
-  handleEntryClick = (tocEntry) => {
+  handleEntryClick = (tocEntry: any) => {
     return this.props.onScrollToTOCEntry?.(tocEntry.widgetId, tocEntry.id)
   }
 
-  renderTOCEntry(tocEntry, index) {
+  renderTOCEntry(tocEntry: any, index: any) {
     // Find indentation number (e.g "1.3.2") by counting # backwards that are same level with no level lower
     let level
     let indentation = ""
@@ -250,7 +250,7 @@ TOCWidgetViewComponent.initClass()
 
 // Designer for TOC widget options
 class TOCWidgetDesignerComponent extends React.Component {
-  constructor(...args) {
+  constructor(...args: any[]) {
     super(...args)
     this.update = this.update.bind(this)
   }
@@ -267,7 +267,7 @@ class TOCWidgetDesignerComponent extends React.Component {
     return update(this.props.design, this.props.onDesignChange, arguments)
   }
 
-  handleMarkdownChange = (ev) => {
+  handleMarkdownChange = (ev: any) => {
     const design = _.extend({}, this.props.design, { markdown: ev.target.value })
     return this.props.onDesignChange(design)
   }

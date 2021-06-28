@@ -23,7 +23,7 @@ export default DetailLevelSelectComponent = (function () {
       // Called with (detailLevel)
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
       this.state = { options: null }
     }
@@ -32,13 +32,13 @@ export default DetailLevelSelectComponent = (function () {
       return this.loadLevels(this.props)
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
       if (nextProps.scope !== this.props.scope) {
         return this.loadLevels(nextProps)
       }
     }
 
-    loadLevels(props) {
+    loadLevels(props: any) {
       // Get country id of scope
       let query = {
         type: "query",
@@ -52,7 +52,7 @@ export default DetailLevelSelectComponent = (function () {
       }
 
       // Execute query
-      return props.dataSource.performQuery(query, (err, rows) => {
+      return props.dataSource.performQuery(query, (err: any, rows: any) => {
         if (err) {
           alert("Error loading detail levels")
           return
@@ -77,7 +77,7 @@ export default DetailLevelSelectComponent = (function () {
         }
 
         // Execute query
-        return props.dataSource.performQuery(query, (err, rows) => {
+        return props.dataSource.performQuery(query, (err: any, rows: any) => {
           if (err) {
             alert("Error loading detail levels")
             return
@@ -96,8 +96,8 @@ export default DetailLevelSelectComponent = (function () {
             label: r.name
           }))
           return this.setState({ options })
-        })
-      })
+        });
+      });
     }
 
     render() {

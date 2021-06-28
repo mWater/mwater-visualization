@@ -22,7 +22,7 @@ const cleanDesignCache = new WeakCache()
 
 // See README.md for the design
 export default PivotChart = class PivotChart extends Chart {
-  cleanDesign(design, schema) {
+  cleanDesign(design: any, schema: any) {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
@@ -31,7 +31,7 @@ export default PivotChart = class PivotChart extends Chart {
       return design
     }
 
-    const cleanedDesign = produce(design, (draft) => {
+    const cleanedDesign = produce(design, (draft: any) => {
       // Fill in defaults
       draft.version = design.version || 1
       draft.rows = design.rows || []
@@ -51,7 +51,7 @@ export default PivotChart = class PivotChart extends Chart {
         }
 
         // Cleans a single segment
-        const cleanSegment = (segment) => {
+        const cleanSegment = (segment: any) => {
           if (segment.valueAxis) {
             segment.valueAxis = axisBuilder.cleanAxis({
               axis: segment.valueAxis ? original(segment.valueAxis) : null,
@@ -156,7 +156,7 @@ export default PivotChart = class PivotChart extends Chart {
     return cleanedDesign
   }
 
-  validateDesign(design, schema) {
+  validateDesign(design: any, schema: any) {
     let segment
     const axisBuilder = new AxisBuilder({ schema })
 
@@ -205,7 +205,7 @@ export default PivotChart = class PivotChart extends Chart {
     return false
   }
 
-  isEmpty(design) {
+  isEmpty(design: any) {
     return !design.table || design.rows.length === 0 || design.columns.length === 0
   }
 
@@ -226,7 +226,7 @@ export default PivotChart = class PivotChart extends Chart {
   //   design: design
   //   onDesignChange: function
   //   filters: array of filters
-  createDesignerElement(options) {
+  createDesignerElement(options: any) {
     // Require here to prevent server require problems
     const PivotChartDesignerComponent = require("./PivotChartDesignerComponent")
 
@@ -235,7 +235,7 @@ export default PivotChart = class PivotChart extends Chart {
       dataSource: options.dataSource,
       design: this.cleanDesign(options.design, options.schema),
       filters: options.filter,
-      onDesignChange: (design) => {
+      onDesignChange: (design: any) => {
         // Clean design
         design = this.cleanDesign(design, options.schema)
         return options.onDesignChange(design)
@@ -250,7 +250,7 @@ export default PivotChart = class PivotChart extends Chart {
   // dataSource: data source to get data from
   // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   // callback: (error, data)
-  getData(design, schema, dataSource, filters, callback) {
+  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
     const queryBuilder = new PivotChartQueryBuilder({ schema })
     const queries = queryBuilder.createQueries(design, filters)
 
@@ -258,9 +258,9 @@ export default PivotChart = class PivotChart extends Chart {
     return async.map(
       _.pairs(queries),
       (item, cb) => {
-        return dataSource.performQuery(item[1], (err, rows) => {
+        return dataSource.performQuery(item[1], (err: any, rows: any) => {
           return cb(err, [item[0], rows])
-        })
+        });
       },
       (err, items) => {
         if (err) {
@@ -271,14 +271,14 @@ export default PivotChart = class PivotChart extends Chart {
 
         // Add header and footer data
         const textWidget = new TextWidget()
-        return textWidget.getData(design.header, schema, dataSource, filters, (error, headerData) => {
+        return textWidget.getData(design.header, schema, dataSource, filters, (error: any, headerData: any) => {
           if (error) {
             return callback(error)
           }
 
           data.header = headerData
 
-          return textWidget.getData(design.footer, schema, dataSource, filters, (error, footerData) => {
+          return textWidget.getData(design.footer, schema, dataSource, filters, (error: any, footerData: any) => {
             if (error) {
               return callback(error)
             }
@@ -286,10 +286,10 @@ export default PivotChart = class PivotChart extends Chart {
             data.footer = footerData
 
             return callback(null, data)
-          })
-        })
+          });
+        });
       }
-    )
+    );
   }
 
   // Create a view element for the chart
@@ -303,7 +303,7 @@ export default PivotChart = class PivotChart extends Chart {
   //   scope: current scope of the view element
   //   onScopeChange: called when scope changes with new scope
   //   filters: array of filters
-  createViewElement(options) {
+  createViewElement(options: any) {
     const PivotChartViewComponent = require("./PivotChartViewComponent")
 
     // Create chart
@@ -325,11 +325,11 @@ export default PivotChart = class PivotChart extends Chart {
     return React.createElement(PivotChartViewComponent, props)
   }
 
-  createDropdownItems(design, schema, widgetDataSource, filters) {
+  createDropdownItems(design: any, schema: any, widgetDataSource: any, filters: any) {
     return []
   }
 
-  createDataTable(design, schema, dataSource, data, locale) {
+  createDataTable(design: any, schema: any, dataSource: any, data: any, locale: any) {
     // Create layout
     const layout = new PivotChartLayoutBuilder({ schema }).buildLayout(design, data, locale)
 
@@ -337,7 +337,7 @@ export default PivotChart = class PivotChart extends Chart {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design, schema) {
+  getFilterableTables(design: any, schema: any) {
     let filterableTables = design.table ? [design.table] : []
 
     // Get filterable tables from header and footer

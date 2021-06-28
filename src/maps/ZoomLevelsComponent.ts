@@ -18,7 +18,7 @@ export default ZoomLevelsComponent = (function () {
       }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -53,7 +53,7 @@ export default ZoomLevelsComponent = (function () {
             style: { display: "inline-block" },
             placeholder: "None",
             value: this.props.design.minZoom,
-            onChange: (v) => this.props.onDesignChange(_.extend({}, this.props.design, { minZoom: v }))
+            onChange: (v: any) => this.props.onDesignChange(_.extend({}, this.props.design, { minZoom: v }))
           })
         ),
 
@@ -67,10 +67,10 @@ export default ZoomLevelsComponent = (function () {
             style: { display: "inline-block" },
             placeholder: "None",
             value: this.props.design.maxZoom,
-            onChange: (v) => this.props.onDesignChange(_.extend({}, this.props.design, { maxZoom: v }))
+            onChange: (v: any) => this.props.onDesignChange(_.extend({}, this.props.design, { maxZoom: v }))
           })
         )
-      )
+      );
     }
   }
   ZoomLevelsComponent.initClass()

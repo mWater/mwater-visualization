@@ -41,7 +41,7 @@ export default MWaterTableSelectComponent = (function () {
       }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -49,7 +49,7 @@ export default MWaterTableSelectComponent = (function () {
       }
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
       // If received new schema with pending extra table, select it
       let table
       if (this.state.pendingExtraTable) {
@@ -86,7 +86,7 @@ export default MWaterTableSelectComponent = (function () {
       }
     }
 
-    handleChange = (tableId) => {
+    handleChange = (tableId: any) => {
       // Close toggle edit
       this.toggleEdit.close()
 
@@ -96,7 +96,7 @@ export default MWaterTableSelectComponent = (function () {
       }
     }
 
-    handleTableChange = (tableId) => {
+    handleTableChange = (tableId: any) => {
       // If not part of extra tables, add it and wait for new schema
       if (tableId && !this.props.schema.getTable(tableId)) {
         return this.setState({ pendingExtraTable: tableId }, () => {
@@ -133,7 +133,7 @@ export default MWaterTableSelectComponent = (function () {
           : undefined,
 
         R(uiComponents.ToggleEditComponent, {
-          ref: (c) => {
+          ref: (c: any) => {
             return (this.toggleEdit = c)
           },
           forceOpen: !this.props.table, // Must have table
@@ -155,7 +155,7 @@ export default MWaterTableSelectComponent = (function () {
               onFilterChange: this.props.onFilterChange
             })
           : undefined
-      )
+      );
     }
   }
   MWaterTableSelectComponent.initClass()
@@ -186,7 +186,7 @@ class EditModeTableSelectComponent extends React.Component {
     }
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     this.state = {
@@ -206,7 +206,7 @@ class EditModeTableSelectComponent extends React.Component {
     let tables = this.context.activeTables || []
 
     // Remove dead tables
-    tables = tables.filter((t) => this.props.schema.getTable(t) != null && !this.props.schema.getTable(t).deprecated)
+    tables = tables.filter((t: any) => this.props.schema.getTable(t) != null && !this.props.schema.getTable(t).deprecated)
     tables = _.union(
       tables,
       _.filter(_.pluck(this.props.schema.getTables(), "id"), (t) => t.match(/^responses:/))
@@ -239,7 +239,7 @@ class EditModeTableSelectComponent extends React.Component {
     return tables
   }
 
-  handleCompleteChange = (tableId) => {
+  handleCompleteChange = (tableId: any) => {
     this.setState({ completeMode: false })
     return this.props.onChange(tableId)
   }

@@ -25,9 +25,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 var L = require("leaflet")
 
 // Store last absorbed (data != null) event to prevent multiple layers from triggering click event
-var absorbedEvent = null
+var absorbedEvent: any = null
 
-function ajax(url, cb) {
+function ajax(url: any, cb: any) {
   // the following is from JavaScript: The Definitive Guide
   // and https://developer.mozilla.org/en-US/docs/DOM/XMLHttpRequest/Using_XMLHttpRequest_in_IE6
   if (window.XMLHttpRequest === undefined) {
@@ -74,7 +74,7 @@ module.exports = L.Layer.extend({
   //The thing the mouse is currently on
   _mouseOn: null,
 
-  initialize: function (url, options) {
+  initialize: function (url: any, options: any) {
     L.Util.setOptions(this, options)
 
     this._url = url
@@ -95,7 +95,7 @@ module.exports = L.Layer.extend({
     }
   },
 
-  onAdd: function (map) {
+  onAdd: function (map: any) {
     this._map = map
     this._container = this._map._container
 
@@ -116,7 +116,7 @@ module.exports = L.Layer.extend({
     }
   },
 
-  _click: function (e) {
+  _click: function (e: any) {
     var zoom = this._map.getZoom()
 
     if (zoom > this.options.maxZoom || zoom < this.options.minZoom) {
@@ -134,7 +134,7 @@ module.exports = L.Layer.extend({
 
     this.fire("click", obj)
   },
-  _move: function (e) {
+  _move: function (e: any) {
     var zoom = this._map.getZoom()
 
     if (zoom > this.options.maxZoom || zoom < this.options.minZoom) {
@@ -163,7 +163,7 @@ module.exports = L.Layer.extend({
     }
   },
 
-  _objectForEvent: function (e) {
+  _objectForEvent: function (e: any) {
     var map = this._map,
       point = map.project(e.latlng),
       tileSize = this.options.tileSize,
@@ -231,12 +231,12 @@ module.exports = L.Layer.extend({
     }
   },
 
-  _getSubdomain: function (x, y) {
+  _getSubdomain: function (x: any, y: any) {
     var index = Math.abs(x + y) % this.options.subdomains.length
     return this.options.subdomains[index]
   },
 
-  _loadTileP: function (zoom, x, y) {
+  _loadTileP: function (zoom: any, x: any, y: any) {
     var head = document.getElementsByTagName("head")[0],
       key = zoom + "_" + x + "_" + y,
       functionName = "lu_" + key,
@@ -261,7 +261,7 @@ module.exports = L.Layer.extend({
     script.setAttribute("type", "text/javascript")
     script.setAttribute("src", url)
 
-    window[wk][functionName] = function (data) {
+    window[wk][functionName] = function (data: any) {
       self._cache[key] = data
       delete window[wk][functionName]
       head.removeChild(script)
@@ -270,7 +270,7 @@ module.exports = L.Layer.extend({
     head.appendChild(script)
   },
 
-  _loadTile: function (zoom, x, y) {
+  _loadTile: function (zoom: any, x: any, y: any) {
     var url = L.Util.template(
       this._url,
       L.Util.extend(
@@ -286,12 +286,12 @@ module.exports = L.Layer.extend({
 
     var key = zoom + "_" + x + "_" + y
     var self = this
-    ajax(url, function (data) {
+    ajax(url, function (data: any) {
       self._cache[key] = data
     })
   },
 
-  _utfDecode: function (c) {
+  _utfDecode: function (c: any) {
     if (c >= 93) {
       c--
     }

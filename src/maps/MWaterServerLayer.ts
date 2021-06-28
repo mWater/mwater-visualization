@@ -31,7 +31,7 @@ export default MWaterServerLayer = class MWaterServerLayer extends Layer {
   //   null/undefined to do nothing
   //   [table id, primary key] to open a default system popup if one is present
   //   React element to put into a popup
-  onGridClick(ev, options) {
+  onGridClick(ev: any, options: any) {
     if (ev.data && ev.data.id) {
       return {
         row: { tableId: options.design.table, primaryKey: ev.data.id }
@@ -42,16 +42,16 @@ export default MWaterServerLayer = class MWaterServerLayer extends Layer {
   }
 
   // Get min and max zoom levels
-  getMinZoom(design) {
+  getMinZoom(design: any) {
     return design.minZoom
   }
-  getMaxZoom(design) {
+  getMaxZoom(design: any) {
     return design.maxZoom
   }
 
   // Get the legend to be optionally displayed on the map. Returns
   // a React element
-  getLegend(design, schema) {
+  getLegend(design: any, schema: any) {
     // Create loading legend component
     // TODO hardcoded
     const apiUrl = "https://api.mwater.co/v3/"
@@ -59,7 +59,7 @@ export default MWaterServerLayer = class MWaterServerLayer extends Layer {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design, schema) {
+  getFilterableTables(design: any, schema: any) {
     if (design.table) {
       return [design.table]
     } else {
@@ -73,12 +73,12 @@ export default MWaterServerLayer = class MWaterServerLayer extends Layer {
   }
 
   // Returns a cleaned design
-  cleanDesign(design, schema) {
+  cleanDesign(design: any, schema: any) {
     return design
   }
 
   // Validates design. Null if ok, message otherwise
-  validateDesign(design, schema) {
+  validateDesign(design: any, schema: any) {
     return null
   }
 }
@@ -89,7 +89,7 @@ class LoadingLegend extends React.Component {
     this.propTypes = { url: PropTypes.string }
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
     this.state = { html: "Loading..." }
   }
@@ -100,7 +100,7 @@ class LoadingLegend extends React.Component {
     })
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: any) {
     if (nextProps.url !== this.props.url) {
       return $.get(nextProps.url).done((data) => {
         return this.setState({ html: data })

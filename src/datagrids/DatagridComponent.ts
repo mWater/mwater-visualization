@@ -64,7 +64,7 @@ export default DatagridComponent = (function () {
       }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -270,11 +270,11 @@ export default DatagridComponent = (function () {
           quickfiltersDataSource: this.props.datagridDataSource.getQuickfiltersDataSource(),
           values: this.state.quickfiltersValues,
           table: this.props.design.table,
-          onValuesChange: (values) => this.setState({ quickfiltersValues: values }),
+          onValuesChange: (values: any) => this.setState({ quickfiltersValues: values }),
           locks: this.props.quickfilterLocks,
           filters: this.getCompiledFilters()
         })
-      )
+      );
     }
 
     // Renders the editor modal
@@ -287,7 +287,7 @@ export default DatagridComponent = (function () {
         schema: this.props.schema,
         dataSource: this.props.dataSource,
         design: this.props.design,
-        onDesignChange: (design) => {
+        onDesignChange: (design: any) => {
           // If quickfilters have changed, reset values
           if (!_.isEqual(this.props.design.quickfilters, design.quickfilters)) {
             this.setState({ quickfiltersValues: null })
@@ -298,12 +298,12 @@ export default DatagridComponent = (function () {
           return this.setState({ editingDesign: false })
         },
         onCancel: () => this.setState({ editingDesign: false })
-      })
+      });
     }
 
-    renderFindReplaceModal(filters) {
+    renderFindReplaceModal(filters: any) {
       return R(FindReplaceModalComponent, {
-        ref: (c) => {
+        ref: (c: any) => {
           return (this.findReplaceModal = c)
         },
         schema: this.props.schema,
@@ -317,7 +317,7 @@ export default DatagridComponent = (function () {
           // Reload
           return this.datagridView?.reload()
         }
-      })
+      });
     }
 
     render() {
@@ -344,13 +344,13 @@ export default DatagridComponent = (function () {
         this.renderEditor(),
         this.renderFindReplaceModal(filters),
 
-        R(AutoSizeComponent, { injectWidth: true, injectHeight: true }, (size) => {
+        R(AutoSizeComponent, { injectWidth: true, injectHeight: true }, (size: any) => {
           // Clean before displaying
           const design = new DatagridUtils(this.props.schema).cleanDesign(this.props.design)
 
           if (!new DatagridUtils(this.props.schema).validateDesign(design)) {
             return R(DatagridViewComponent, {
-              ref: (view) => {
+              ref: (view: any) => {
                 return (this.datagridView = view)
               },
               width: size.width - 1, // minus 1 px to test if it solves the jitter with scroll
@@ -366,7 +366,7 @@ export default DatagridComponent = (function () {
               onRowDoubleClick: this.props.onRowDoubleClick,
               canEditCell: this.state.cellEditingEnabled ? this.props.canEditValue : undefined,
               updateCell: this.state.cellEditingEnabled ? this.props.updateValue : undefined
-            })
+            });
           } else if (this.props.onDesignChange) {
             return R(
               "div",
@@ -377,7 +377,7 @@ export default DatagridComponent = (function () {
             return null
           }
         })
-      )
+      );
     }
   }
   DatagridComponent.initClass()
@@ -397,7 +397,7 @@ class DatagridEditorComponent extends React.Component {
     // Called when cancelled
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     this.state = {
@@ -420,9 +420,9 @@ class DatagridEditorComponent extends React.Component {
         schema: this.props.schema,
         dataSource: this.props.dataSource,
         design: this.state.design,
-        onDesignChange: (design) => this.setState({ design })
+        onDesignChange: (design: any) => this.setState({ design })
       })
-    )
+    );
   }
 }
 DatagridEditorComponent.initClass()

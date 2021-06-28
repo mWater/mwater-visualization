@@ -27,7 +27,7 @@ export default DropdownWidgetComponent = (function () {
       // A list of {label, icon, onClick} actions for the dropdown
     }
 
-    renderDropdownItem = (item, i) => {
+    renderDropdownItem = (item: any, i: any) => {
       return R(
         "li",
         { key: `${i}` },

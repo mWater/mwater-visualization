@@ -9,7 +9,7 @@ const R = React.createElement
 import DashboardUtils from "../../src/dashboards/DashboardUtils"
 import canonical from "canonical-json"
 
-function compare(actual, expected) {
+function compare(actual: any, expected: any) {
   return assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected))
 }
 

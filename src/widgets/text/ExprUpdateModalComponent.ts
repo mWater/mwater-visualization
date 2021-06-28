@@ -23,7 +23,7 @@ export default ExprUpdateModalComponent = (function () {
       // Table that is filtered to have one row
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -33,7 +33,7 @@ export default ExprUpdateModalComponent = (function () {
       }
     }
 
-    open(item, onUpdate) {
+    open(item: any, onUpdate: any) {
       return this.setState({ open: true, exprItem: item, onUpdate })
     }
 
@@ -59,10 +59,10 @@ export default ExprUpdateModalComponent = (function () {
           schema: this.props.schema,
           dataSource: this.props.dataSource,
           exprItem: this.state.exprItem,
-          onChange: (exprItem) => this.setState({ exprItem }),
+          onChange: (exprItem: any) => this.setState({ exprItem }),
           singleRowTable: this.props.singleRowTable
         })
-      )
+      );
     }
   }
   ExprUpdateModalComponent.initClass()

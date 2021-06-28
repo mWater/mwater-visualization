@@ -49,13 +49,13 @@ export default CalendarChartViewComponent = (function () {
       //the fill color for highlighted cell
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.axisBuilder = new AxisBuilder({ schema: props.schema }) // e.g. "en"
     }
 
-    shouldComponentUpdate(prevProps) {
+    shouldComponentUpdate(prevProps: any) {
       return !_.isEqual(_.omit(prevProps, "onScopeChange"), _.omit(this.props, "onScopeChange"))
     }
 
@@ -97,11 +97,11 @@ export default CalendarChartViewComponent = (function () {
       return this.redraw()
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
       return this.redraw()
     }
 
-    handleCellClick(cell, data) {
+    handleCellClick(cell: any, data: any) {
       if (this.props.scope?.data === data) {
         this.props.onScopeChange?.(null)
         return
@@ -145,13 +145,13 @@ export default CalendarChartViewComponent = (function () {
 
       const data = d3
         .nest()
-        .key((d) => d.date)
-        .rollup((d) => d[0].value)
+        .key((d: any) => d.date)
+        .rollup((d: any) => d[0].value)
         .map(this.props.data, d3.map)
 
       const tip = d3Tip()
         .attr("class", "d3-tip")
-        .html(function (d) {
+        .html(function (d: any) {
           const _date = moment(d)
 
           let title = "<p>" + _date.format("LL") + "</p>"
@@ -163,7 +163,7 @@ export default CalendarChartViewComponent = (function () {
       const color = d3
         .scaleQuantize()
         .domain([1, d3.max(data.values())])
-        .range(d3.range(10).map((d) => rgb.darker(d * 0.1).toString()))
+        .range(d3.range(10).map((d: any) => rgb.darker(d * 0.1).toString()))
 
       const yearGroupTranslateX = (this.props.width - cellSize * 53 - 16) / 2 + 16
 
@@ -183,9 +183,9 @@ export default CalendarChartViewComponent = (function () {
 
       svg
         .append("text")
-        .text((d, i) => d)
+        .text((d: any, i: any) => d)
         .attr("transform", "translate(-6," + cellSize * 3.5 + ")rotate(-90)")
-        .attr("font-size", function (d) {
+        .attr("font-size", function(this: any, d: any) {
           return Math.min(14, ((cellSize * 7) / this.getComputedTextLength()) * 14) + "px"
         })
         .style("text-anchor", "middle")
@@ -194,7 +194,7 @@ export default CalendarChartViewComponent = (function () {
 
       const rect = svg
         .selectAll(".calendar-chart-day")
-        .data((d) => d3.timeDays(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
+        .data((d: any) => d3.timeDays(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
         .enter()
         .append("rect")
         .attr("class", "calendar-chart-day")
@@ -203,9 +203,9 @@ export default CalendarChartViewComponent = (function () {
         .attr("stroke-width", this.props.monthsStrokeWidth)
         .attr("width", cellSize)
         .attr("height", cellSize)
-        .attr("x", (d) => d3.timeWeek.count(d3.timeYear(d), d) * cellSize)
-        .attr("y", (d) => d.getDay() * cellSize)
-        .on("mouseenter", function (d, i) {
+        .attr("x", (d: any) => d3.timeWeek.count(d3.timeYear(d), d) * cellSize)
+        .attr("y", (d: any) => d.getDay() * cellSize)
+        .on("mouseenter", function(this: any, d: any, i: any) {
           if (!_this.reloading) {
             return tip.show(d, i, this)
           }
@@ -213,7 +213,7 @@ export default CalendarChartViewComponent = (function () {
         .on("mouseleave", tip.hide)
         .datum(format)
 
-      rect.on("click", function (e) {
+      rect.on("click", function(this: any, e: any) {
         tip.hide()
         // tip.destroy()
         const selectedRect = d3.select(this)
@@ -221,8 +221,8 @@ export default CalendarChartViewComponent = (function () {
       })
 
       rect
-        .filter((d) => data.has(d))
-        .attr("fill", (d) => {
+        .filter((d: any) => data.has(d))
+        .attr("fill", (d: any) => {
           const _color = color(data.get(d))
 
           if (this.props.scope?.data === d) {
@@ -232,7 +232,7 @@ export default CalendarChartViewComponent = (function () {
           return _color
         })
 
-      function monthPath(t0) {
+      function monthPath(t0: any) {
         const t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0)
         const d0 = t0.getDay()
         const w0 = d3.timeWeek.count(d3.timeYear(t0), t0)
@@ -264,7 +264,7 @@ export default CalendarChartViewComponent = (function () {
 
       svg
         .selectAll(".calendar-chart-month")
-        .data((d) => d3.timeMonths(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
+        .data((d: any) => d3.timeMonths(new Date(d, 0, 1), new Date(d + 1, 0, 1)))
         .enter()
         .append("path")
         .attr("fill", "none")
@@ -300,7 +300,7 @@ export default CalendarChartViewComponent = (function () {
               "p",
               {
                 style: titleStyle,
-                ref: (c) => {
+                ref: (c: any) => {
                   return (this.title = c)
                 }
               },
@@ -308,11 +308,11 @@ export default CalendarChartViewComponent = (function () {
             )
           : undefined,
         R("div", {
-          ref: (c) => {
+          ref: (c: any) => {
             return (this.chart_container = c)
           }
         })
-      )
+      );
     }
   }
   CalendarChartViewComponent.initClass()

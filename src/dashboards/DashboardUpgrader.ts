@@ -7,7 +7,7 @@ import WidgetFactory from "../widgets/WidgetFactory"
 
 // Upgrades old dashboards to new ones (grid -> blocks)
 export default DashboardUpgrader = class DashboardUpgrader {
-  upgrade(design) {
+  upgrade(design: any) {
     // Get list of all items
     const items = _.clone(design.items)
 
@@ -17,7 +17,7 @@ export default DashboardUpgrader = class DashboardUpgrader {
       blocks: []
     }
 
-    function convertBlock(id, item) {
+    function convertBlock(id: any, item: any) {
       const widget = WidgetFactory.createWidget(item.widget.type)
 
       const block = {

@@ -11,12 +11,12 @@ export default DirectDatagridDataSource = class DirectDatagridDataSource {
   // options:
   //   schema: schema to use
   //   dataSource: data source to use
-  constructor(options) {
+  constructor(options: any) {
     this.options = options
   }
 
   // Gets the rows specified
-  getRows(design, offset, limit, filters, callback) {
+  getRows(design: any, offset: any, limit: any, filters: any, callback: any) {
     const queryBuilder = new DatagridQueryBuilder(this.options.schema)
 
     // Create query to get the page of rows at the specific offset
@@ -32,7 +32,7 @@ export default DirectDatagridDataSource = class DirectDatagridDataSource {
   // Gets the quickfilters data source
   getQuickfiltersDataSource() {
     return {
-      getValues: (index, expr, filters, offset, limit, callback) => {
+      getValues: (index: any, expr: any, filters: any, offset: any, limit: any, callback: any) => {
         // Perform query
         return QuickfilterUtils.findExprValues(
           expr,
@@ -44,6 +44,6 @@ export default DirectDatagridDataSource = class DirectDatagridDataSource {
           callback
         )
       }
-    }
+    };
   }
 }

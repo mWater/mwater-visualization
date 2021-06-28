@@ -19,7 +19,7 @@ export default BlocksLayoutManager = class BlocksLayoutManager extends LayoutMan
   //  clipboard: clipboard contents
   //  onClipboardChange: called when clipboard is changed
   //  cantPasteMesssage: message to display if clipboard can't be pasted into current dashboard
-  renderLayout(options) {
+  renderLayout(options: any) {
     const BlocksDisplayComponent = require("./BlocksDisplayComponent")
     return R(BlocksDisplayComponent, {
       items: options.items || { id: "root", type: "root", blocks: [] },
@@ -35,12 +35,12 @@ export default BlocksLayoutManager = class BlocksLayoutManager extends LayoutMan
   }
 
   // Tests if dashboard has any items
-  isEmpty(items) {
+  isEmpty(items: any) {
     return !items || items.blocks?.length === 0
   }
 
   // Gets { type, design } of a widget
-  getWidgetTypeAndDesign(items, widgetId) {
+  getWidgetTypeAndDesign(items: any, widgetId: any) {
     if (items.type === "widget" && items.id === widgetId) {
       return { type: items.widgetType, design: items.design }
     }
@@ -58,7 +58,7 @@ export default BlocksLayoutManager = class BlocksLayoutManager extends LayoutMan
   }
 
   // Gets all widgets in items as array of { id, type, design }
-  getAllWidgets(items) {
+  getAllWidgets(items: any) {
     if (items.type === "widget") {
       return [{ id: items.id, type: items.widgetType, design: items.design }]
     }
@@ -71,7 +71,7 @@ export default BlocksLayoutManager = class BlocksLayoutManager extends LayoutMan
   }
 
   // Add a widget, returning new items
-  addWidget(items, widgetType, widgetDesign) {
+  addWidget(items: any, widgetType: any, widgetDesign: any) {
     // Add to root block
     items = items || { type: "root", id: "root", blocks: [] }
     items.blocks.push({ type: "widget", id: uuid(), widgetType, design: widgetDesign, aspectRatio: 1.4 })

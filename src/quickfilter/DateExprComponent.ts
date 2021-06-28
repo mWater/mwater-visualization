@@ -21,7 +21,7 @@ export default DateExprComponent = (function () {
       // True to use datetime
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -30,7 +30,7 @@ export default DateExprComponent = (function () {
       }
     }
 
-    toMoment(value) {
+    toMoment(value: any) {
       if (!value) {
         return null
       }
@@ -42,7 +42,7 @@ export default DateExprComponent = (function () {
       }
     }
 
-    fromMoment(value) {
+    fromMoment(value: any) {
       if (!value) {
         return null
       }
@@ -54,7 +54,7 @@ export default DateExprComponent = (function () {
       }
     }
 
-    toLiteral(value) {
+    toLiteral(value: any) {
       if (this.props.datetime) {
         return { type: "literal", valueType: "datetime", value }
       } else {
@@ -66,7 +66,7 @@ export default DateExprComponent = (function () {
       return this.setState({ dropdownOpen: false })
     }
 
-    handleStartChange = (value) => {
+    handleStartChange = (value: any) => {
       // Clear end if after
       if (this.props.value?.exprs[1] && this.fromMoment(value) > this.props.value.exprs[1]?.value) {
         return this.props.onChange({ type: "op", op: "between", exprs: [this.toLiteral(this.fromMoment(value)), null] })
@@ -79,7 +79,7 @@ export default DateExprComponent = (function () {
       }
     }
 
-    handleEndChange = (value) => {
+    handleEndChange = (value: any) => {
       // Go to end of day if datetime
       if (this.props.datetime) {
         value = moment(value)
@@ -100,7 +100,7 @@ export default DateExprComponent = (function () {
       return this.setState({ dropdownOpen: false })
     }
 
-    handlePreset = (preset) => {
+    handlePreset = (preset: any) => {
       this.props.onChange({ type: "op", op: preset.id, exprs: [] })
       return this.setState({ dropdownOpen: false })
     }

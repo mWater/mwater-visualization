@@ -5,7 +5,7 @@ import _ from "lodash"
 import TextWidget from "../../src/widgets/text/TextWidget"
 import canonical from "canonical-json"
 
-function compare(actual, expected) {
+function compare(actual: any, expected: any) {
   return assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected))
 }
 

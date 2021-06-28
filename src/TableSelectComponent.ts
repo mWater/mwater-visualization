@@ -41,7 +41,7 @@ export default TableSelectComponent = (function () {
         label: this.props.value
           ? ExprUtils.localizeString(this.props.schema.getTable(this.props.value).name, this.context.locale)
           : R("i", null, "Select..."),
-        editor: (onClose) => {
+        editor: (onClose: any) => {
           return React.createElement(ui.OptionListComponent, {
             hint: "Select source to get data from",
             items: _.map(
@@ -57,7 +57,7 @@ export default TableSelectComponent = (function () {
             )
           })
         }
-      })
+      });
     }
   }
   TableSelectComponent.initClass()

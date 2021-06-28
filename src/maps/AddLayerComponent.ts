@@ -27,7 +27,7 @@ export default AddLayerComponent = (function () {
       // Can be overridden by setting addLayerElementFactory in context that takes ({schema: , dataSource, design, onDesignChange, layerNumber})
     }
 
-    handleAddLayer = (newLayer) => {
+    handleAddLayer = (newLayer: any) => {
       const layerView = {
         id: uuid(),
         name: newLayer.name,
@@ -44,7 +44,7 @@ export default AddLayerComponent = (function () {
       return this.handleAddLayerView(layerView)
     }
 
-    handleAddLayerView = (layerView) => {
+    handleAddLayerView = (layerView: any) => {
       // Add to list
       const layerViews = this.props.design.layerViews.slice()
       layerViews.push(layerView)

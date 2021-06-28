@@ -26,7 +26,7 @@ export default PopoverComponent = (function () {
       return this.updatePopover(null, this.props)
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
       if (
         !_.isEqual(prevProps.content, this.props.content) ||
         prevProps.visible !== this.props.visible ||
@@ -36,7 +36,7 @@ export default PopoverComponent = (function () {
       }
     }
 
-    updatePopover(props, oldProps) {
+    updatePopover(props: any, oldProps: any) {
       // Destroy old popover
       if (oldProps && oldProps.visible) {
         $(ReactDOM.findDOMNode(this)).popover("destroy")

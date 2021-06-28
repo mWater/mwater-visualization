@@ -39,7 +39,7 @@ const epsilon = 0.000000001
 // Understands axes. Contains methods to clean/validate etc. an axis of any type.
 export default AxisBuilder = class AxisBuilder {
   // Options are: schema
-  constructor(options) {
+  constructor(options: any) {
     this.schema = options.schema
     this.exprUtils = new ExprUtils(this.schema)
     this.exprCleaner = new ExprCleaner(this.schema)
@@ -52,7 +52,7 @@ export default AxisBuilder = class AxisBuilder {
   //  table: table that axis is to be for
   //  aggrNeed is "none", "optional" or "required"
   //  types: optional list of types to require it to be one of
-  cleanAxis(options) {
+  cleanAxis(options: any) {
     let aggrStatuses
     let { axis } = options
 
@@ -89,7 +89,7 @@ export default AxisBuilder = class AxisBuilder {
     const type = this.exprUtils.getExprType(expr)
 
     // Validate xform type
-    let xform = null
+    let xform: any = null
 
     if (axis.xform) {
       // Find valid xform
@@ -126,7 +126,7 @@ export default AxisBuilder = class AxisBuilder {
       }
     }
 
-    axis = produce(axis, (draft) => {
+    axis = produce(axis, (draft: any) => {
       draft.expr = expr
 
       if (axis.aggr) {
@@ -159,7 +159,7 @@ export default AxisBuilder = class AxisBuilder {
 
   // Checks whether an axis is valid
   //  axis: axis to validate
-  validateAxis(options) {
+  validateAxis(options: any) {
     // Nothing is ok
     if (!options.axis) {
       return
@@ -203,7 +203,7 @@ export default AxisBuilder = class AxisBuilder {
   }
 
   // Pass axis, tableAlias
-  compileAxis(options) {
+  compileAxis(options: any) {
     if (!options.axis) {
       return null
     }
@@ -387,7 +387,7 @@ export default AxisBuilder = class AxisBuilder {
   // expr is mwater expression on table
   // filterExpr is optional filter on values to include
   // Result can be null if no query could be computed
-  compileBinMinMax(expr, table, filterExpr, numBins) {
+  compileBinMinMax(expr: any, table: any, filterExpr: any, numBins: any) {
     const exprCompiler = new ExprCompiler(this.schema)
     const compiledExpr = exprCompiler.compileExpr({ expr, tableAlias: "binrange" })
 
@@ -455,7 +455,7 @@ export default AxisBuilder = class AxisBuilder {
 
   // Get underlying expression types that will give specified output expression types
   //  types: array of types
-  getExprTypes(types) {
+  getExprTypes(types: any) {
     if (!types) {
       return null
     }
@@ -473,7 +473,7 @@ export default AxisBuilder = class AxisBuilder {
   }
 
   // Gets the color for a value (if in colorMap)
-  getValueColor(axis, value) {
+  getValueColor(axis: any, value: any) {
     const item = _.find(axis.colorMap, (item) => item.value === value)
     if (item) {
       return item.color
@@ -483,7 +483,7 @@ export default AxisBuilder = class AxisBuilder {
 
   // Get all categories for a given axis type given the known values
   // Returns array of { value, label }
-  getCategories(axis, values, locale) {
+  getCategories(axis: any, values: any, locale: any) {
     let categories, current, end, format, hasNone, label, max, min, value, year
     const noneCategory = { value: null, label: axis.nullLabel || "None" }
 
@@ -827,7 +827,7 @@ export default AxisBuilder = class AxisBuilder {
   }
 
   // Get type of axis output
-  getAxisType(axis) {
+  getAxisType(axis: any) {
     if (!axis) {
       return null
     }
@@ -848,13 +848,13 @@ export default AxisBuilder = class AxisBuilder {
   }
 
   // Determines if axis is aggregate
-  isAxisAggr(axis) {
+  isAxisAggr(axis: any) {
     // Legacy support of axis.aggr
     return axis != null && (axis.aggr || this.exprUtils.getExprAggrStatus(axis.expr) === "aggregate")
   }
 
   // Determines if axis supports cumulative values (number, date or year-quarter)
-  doesAxisSupportCumulative(axis) {
+  doesAxisSupportCumulative(axis: any) {
     let needle
     return (
       ((needle = this.getAxisType(axis)), ["date", "number"].includes(needle)) || axis.xform?.type === "yearquarter"
@@ -862,7 +862,7 @@ export default AxisBuilder = class AxisBuilder {
   }
 
   // Converts a category to a string (uses label or override)
-  formatCategory(axis, category) {
+  formatCategory(axis: any, category: any) {
     const categoryLabel = axis.categoryLabels ? axis.categoryLabels[JSON.stringify(category.value)] : undefined
     if (categoryLabel) {
       return categoryLabel
@@ -872,7 +872,7 @@ export default AxisBuilder = class AxisBuilder {
   }
 
   // Summarize axis as a string
-  summarizeAxis(axis, locale) {
+  summarizeAxis(axis: any, locale: any) {
     if (!axis) {
       return "None"
     }
@@ -882,7 +882,7 @@ export default AxisBuilder = class AxisBuilder {
   // TODO add xform support
 
   // Get a string (or React DOM actually) representation of an axis value
-  formatValue(axis, value, locale, legacyPercentFormat) {
+  formatValue(axis: any, value: any, locale: any, legacyPercentFormat: any) {
     if (value == null) {
       return axis?.nullLabel || "None"
     }
@@ -950,7 +950,7 @@ export default AxisBuilder = class AxisBuilder {
 
   // Creates a filter (jsonql with {alias} for table name) based on a specific value
   // of the axis. Used to filter by a specific point/bar.
-  createValueFilter(axis, value) {
+  createValueFilter(axis: any, value: any) {
     if (value != null) {
       return {
         type: "op",
@@ -968,7 +968,7 @@ export default AxisBuilder = class AxisBuilder {
 
   // Creates a filter expression (mwater-expression) based on a specific value
   // of the axis. Used to filter by a specific point/bar.
-  createValueFilterExpr(axis, value) {
+  createValueFilterExpr(axis: any, value: any) {
     const axisExpr = this.convertAxisToExpr(axis)
     const axisExprType = this.exprUtils.getExprType(axisExpr)
 
@@ -989,7 +989,7 @@ export default AxisBuilder = class AxisBuilder {
     }
   }
 
-  isCategorical(axis) {
+  isCategorical(axis: any) {
     let type
     const nonCategoricalTypes = ["bin", "ranges", "date", "yearmonth", "floor"]
     if (axis.xform) {
@@ -1002,7 +1002,7 @@ export default AxisBuilder = class AxisBuilder {
   }
 
   // Converts an axis to an expression (mwater-expression)
-  convertAxisToExpr(axis) {
+  convertAxisToExpr(axis: any) {
     let { expr } = axis
     const { table } = expr
 

@@ -25,7 +25,7 @@ export default PivotChartDesignerComponent = (function () {
       // array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -34,12 +34,12 @@ export default PivotChartDesignerComponent = (function () {
     }
 
     // Updates design with the specified changes
-    updateDesign(changes) {
+    updateDesign(changes: any) {
       const design = _.extend({}, this.props.design, changes)
       return this.props.onDesignChange(design)
     }
 
-    handleTableChange = (table) => {
+    handleTableChange = (table: any) => {
       // Create default
       const row = { id: uuid(), label: "" }
       const column = { id: uuid(), label: "" }
@@ -55,19 +55,19 @@ export default PivotChartDesignerComponent = (function () {
       })
     }
 
-    handleColumnChange = (axis) => {
+    handleColumnChange = (axis: any) => {
       return this.updateDesign({ columns: [_.extend({}, this.props.design.columns[0], { valueAxis: axis })] })
     }
 
-    handleRowChange = (axis) => {
+    handleRowChange = (axis: any) => {
       return this.updateDesign({ rows: [_.extend({}, this.props.design.rows[0], { valueAxis: axis })] })
     }
 
-    handleFilterChange = (filter) => {
+    handleFilterChange = (filter: any) => {
       return this.updateDesign({ filter })
     }
 
-    handleIntersectionValueAxisChange = (valueAxis) => {
+    handleIntersectionValueAxisChange = (valueAxis: any) => {
       const intersectionId = `${this.props.design.rows[0].id}:${this.props.design.columns[0].id}`
 
       const intersections = {}

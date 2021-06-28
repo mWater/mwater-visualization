@@ -15,7 +15,7 @@ import querystring from "querystring"
 //   extraTables: Extra tables to load in schema. Forms are not loaded by default as they are too many
 //   localCaching: default true. False to disable local caching of queries
 // callback is called with (error, config) where config is { schema, dataSource }
-export default function (options, callback) {
+export default function (options: any, callback: any) {
   // Load schema
   const query = {}
   if (options.client) {

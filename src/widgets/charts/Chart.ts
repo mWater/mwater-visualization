@@ -5,17 +5,17 @@ let Chart
 
 export default Chart = class Chart {
   // Removes any invalid values from a design. Returns cleaned design
-  cleanDesign(design, schema) {
+  cleanDesign(design: any, schema: any) {
     throw new Error("Not implemented")
   }
 
   // Determines if design is valid. Null/undefined for yes, error string for no
-  validateDesign(design, schema) {
+  validateDesign(design: any, schema: any) {
     throw new Error("Not implemented")
   }
 
   // True if a design is empty and so to display the editor immediately
-  isEmpty(design) {
+  isEmpty(design: any) {
     return false
   }
 
@@ -40,7 +40,7 @@ export default Chart = class Chart {
   //   dataSource: dataSource to use
   //   design: design
   //   onDesignChange: function
-  createDesignerElement(options) {
+  createDesignerElement(options: any) {
     throw new Error("Not implemented")
   }
 
@@ -51,7 +51,7 @@ export default Chart = class Chart {
   //   dataSource: data source to get data from
   //   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   //   callback: (error, data)
-  getData(design, schema, dataSource, filters, callback) {
+  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
     throw new Error("Not implemented")
   }
 
@@ -66,7 +66,7 @@ export default Chart = class Chart {
   //   scope: current scope of the view element
   //   onScopeChange: called when scope changes with new scope
   //   onRowClick: Called with (tableId, rowId) when item is clicked
-  createViewElement(options) {
+  createViewElement(options: any) {
     throw new Error("Not implemented")
   }
 
@@ -76,17 +76,17 @@ export default Chart = class Chart {
   //   widgetDataSource: widget data source to use
   //   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   // Returns an empty list by default
-  createDropdownItems(design, schema, widgetDataSource, filters) {
+  createDropdownItems(design: any, schema: any, widgetDataSource: any, filters: any) {
     return []
   }
 
   // Creates a table form of the chart data. Array of arrays
-  createDataTable(design, schema, dataSource, data, locale) {
+  createDataTable(design: any, schema: any, dataSource: any, data: any, locale: any) {
     throw new Error("Not implemented")
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design, schema) {
+  getFilterableTables(design: any, schema: any) {
     throw new Error("Not implemented")
   }
 

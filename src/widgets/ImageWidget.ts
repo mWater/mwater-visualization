@@ -29,7 +29,7 @@ export default ImageWidget = class ImageWidget extends Widget {
   //  width: width in pixels on screen
   //  height: height in pixels on screen
   //  singleRowTable: optional table name of table that will be filtered to have a single row present. Widget designer should optionally account for this
-  createViewElement(options) {
+  createViewElement(options: any) {
     // Put here so ImageWidget can be created on server
     const ImageWidgetComponent = require("./ImageWidgetComponent")
 
@@ -52,7 +52,7 @@ export default ImageWidget = class ImageWidget extends Widget {
   //   dataSource: data source to get data from
   //   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   //   callback: (error, data)
-  getData(design, schema, dataSource, filters, callback) {
+  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
     if (!design.expr) {
       return callback(null)
     }
@@ -86,7 +86,7 @@ export default ImageWidget = class ImageWidget extends Widget {
     }
 
     // Execute query
-    return dataSource.performQuery(query, (error, rows) => {
+    return dataSource.performQuery(query, (error: any, rows: any) => {
       if (error) {
         return callback(error)
       } else {
@@ -103,7 +103,7 @@ export default ImageWidget = class ImageWidget extends Widget {
           return callback(null, value)
         }
       }
-    })
+    });
   }
 
   // Determine if widget is auto-height, which means that a vertical height is not required.
@@ -112,7 +112,7 @@ export default ImageWidget = class ImageWidget extends Widget {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design, schema) {
+  getFilterableTables(design: any, schema: any) {
     if (design.expr?.table) {
       return [design.expr.table]
     }

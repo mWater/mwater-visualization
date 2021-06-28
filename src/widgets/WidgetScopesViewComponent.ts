@@ -17,7 +17,7 @@ export default WidgetScopesViewComponent = (function () {
       // Called with id of scope to remove
     }
 
-    renderScope = (id, scope) => {
+    renderScope = (id: any, scope: any) => {
       const style = {
         cursor: "pointer",
         borderRadius: 4,

@@ -9,7 +9,7 @@
   "use strict"
   if (!("SVGPathSeg" in window)) {
     // Spec: http://www.w3.org/TR/SVG11/single-page.html#paths-InterfaceSVGPathSeg
-    window.SVGPathSeg = function (type, typeAsLetter, owningPathSegList) {
+    window.SVGPathSeg = function (type: any, typeAsLetter: any, owningPathSegList: any) {
       this.pathSegType = type
       this.pathSegTypeAsLetter = typeAsLetter
       this._owningPathSegList = owningPathSegList
@@ -41,7 +41,7 @@
       if (this._owningPathSegList) this._owningPathSegList.segmentChanged(this)
     }
 
-    window.SVGPathSegClosePath = function (owningPathSegList) {
+    window.SVGPathSegClosePath = function (owningPathSegList: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_CLOSEPATH, "z", owningPathSegList)
     }
     SVGPathSegClosePath.prototype = Object.create(SVGPathSeg.prototype)
@@ -55,7 +55,7 @@
       return new SVGPathSegClosePath(undefined)
     }
 
-    window.SVGPathSegMovetoAbs = function (owningPathSegList, x, y) {
+    window.SVGPathSegMovetoAbs = function (owningPathSegList: any, x: any, y: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_MOVETO_ABS, "M", owningPathSegList)
       this._x = x
       this._y = y
@@ -91,7 +91,7 @@
       enumerable: true
     })
 
-    window.SVGPathSegMovetoRel = function (owningPathSegList, x, y) {
+    window.SVGPathSegMovetoRel = function (owningPathSegList: any, x: any, y: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_MOVETO_REL, "m", owningPathSegList)
       this._x = x
       this._y = y
@@ -127,7 +127,7 @@
       enumerable: true
     })
 
-    window.SVGPathSegLinetoAbs = function (owningPathSegList, x, y) {
+    window.SVGPathSegLinetoAbs = function (owningPathSegList: any, x: any, y: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_LINETO_ABS, "L", owningPathSegList)
       this._x = x
       this._y = y
@@ -163,7 +163,7 @@
       enumerable: true
     })
 
-    window.SVGPathSegLinetoRel = function (owningPathSegList, x, y) {
+    window.SVGPathSegLinetoRel = function (owningPathSegList: any, x: any, y: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_LINETO_REL, "l", owningPathSegList)
       this._x = x
       this._y = y
@@ -199,7 +199,7 @@
       enumerable: true
     })
 
-    window.SVGPathSegCurvetoCubicAbs = function (owningPathSegList, x, y, x1, y1, x2, y2) {
+    window.SVGPathSegCurvetoCubicAbs = function (owningPathSegList: any, x: any, y: any, x1: any, y1: any, x2: any, y2: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS, "C", owningPathSegList)
       this._x = x
       this._y = y
@@ -293,7 +293,7 @@
       enumerable: true
     })
 
-    window.SVGPathSegCurvetoCubicRel = function (owningPathSegList, x, y, x1, y1, x2, y2) {
+    window.SVGPathSegCurvetoCubicRel = function (owningPathSegList: any, x: any, y: any, x1: any, y1: any, x2: any, y2: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_CURVETO_CUBIC_REL, "c", owningPathSegList)
       this._x = x
       this._y = y
@@ -387,7 +387,7 @@
       enumerable: true
     })
 
-    window.SVGPathSegCurvetoQuadraticAbs = function (owningPathSegList, x, y, x1, y1) {
+    window.SVGPathSegCurvetoQuadraticAbs = function (owningPathSegList: any, x: any, y: any, x1: any, y1: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_CURVETO_QUADRATIC_ABS, "Q", owningPathSegList)
       this._x = x
       this._y = y
@@ -445,7 +445,7 @@
       enumerable: true
     })
 
-    window.SVGPathSegCurvetoQuadraticRel = function (owningPathSegList, x, y, x1, y1) {
+    window.SVGPathSegCurvetoQuadraticRel = function (owningPathSegList: any, x: any, y: any, x1: any, y1: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_CURVETO_QUADRATIC_REL, "q", owningPathSegList)
       this._x = x
       this._y = y
@@ -503,7 +503,7 @@
       enumerable: true
     })
 
-    window.SVGPathSegArcAbs = function (owningPathSegList, x, y, r1, r2, angle, largeArcFlag, sweepFlag) {
+    window.SVGPathSegArcAbs = function (owningPathSegList: any, x: any, y: any, r1: any, r2: any, angle: any, largeArcFlag: any, sweepFlag: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_ARC_ABS, "A", owningPathSegList)
       this._x = x
       this._y = y
@@ -619,7 +619,7 @@
       enumerable: true
     })
 
-    window.SVGPathSegArcRel = function (owningPathSegList, x, y, r1, r2, angle, largeArcFlag, sweepFlag) {
+    window.SVGPathSegArcRel = function (owningPathSegList: any, x: any, y: any, r1: any, r2: any, angle: any, largeArcFlag: any, sweepFlag: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_ARC_REL, "a", owningPathSegList)
       this._x = x
       this._y = y
@@ -735,7 +735,7 @@
       enumerable: true
     })
 
-    window.SVGPathSegLinetoHorizontalAbs = function (owningPathSegList, x) {
+    window.SVGPathSegLinetoHorizontalAbs = function (owningPathSegList: any, x: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_LINETO_HORIZONTAL_ABS, "H", owningPathSegList)
       this._x = x
     }
@@ -760,7 +760,7 @@
       enumerable: true
     })
 
-    window.SVGPathSegLinetoHorizontalRel = function (owningPathSegList, x) {
+    window.SVGPathSegLinetoHorizontalRel = function (owningPathSegList: any, x: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_LINETO_HORIZONTAL_REL, "h", owningPathSegList)
       this._x = x
     }
@@ -785,7 +785,7 @@
       enumerable: true
     })
 
-    window.SVGPathSegLinetoVerticalAbs = function (owningPathSegList, y) {
+    window.SVGPathSegLinetoVerticalAbs = function (owningPathSegList: any, y: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_LINETO_VERTICAL_ABS, "V", owningPathSegList)
       this._y = y
     }
@@ -810,7 +810,7 @@
       enumerable: true
     })
 
-    window.SVGPathSegLinetoVerticalRel = function (owningPathSegList, y) {
+    window.SVGPathSegLinetoVerticalRel = function (owningPathSegList: any, y: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_LINETO_VERTICAL_REL, "v", owningPathSegList)
       this._y = y
     }
@@ -835,7 +835,7 @@
       enumerable: true
     })
 
-    window.SVGPathSegCurvetoCubicSmoothAbs = function (owningPathSegList, x, y, x2, y2) {
+    window.SVGPathSegCurvetoCubicSmoothAbs = function (owningPathSegList: any, x: any, y: any, x2: any, y2: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_CURVETO_CUBIC_SMOOTH_ABS, "S", owningPathSegList)
       this._x = x
       this._y = y
@@ -893,7 +893,7 @@
       enumerable: true
     })
 
-    window.SVGPathSegCurvetoCubicSmoothRel = function (owningPathSegList, x, y, x2, y2) {
+    window.SVGPathSegCurvetoCubicSmoothRel = function (owningPathSegList: any, x: any, y: any, x2: any, y2: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_CURVETO_CUBIC_SMOOTH_REL, "s", owningPathSegList)
       this._x = x
       this._y = y
@@ -951,7 +951,7 @@
       enumerable: true
     })
 
-    window.SVGPathSegCurvetoQuadraticSmoothAbs = function (owningPathSegList, x, y) {
+    window.SVGPathSegCurvetoQuadraticSmoothAbs = function (owningPathSegList: any, x: any, y: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_CURVETO_QUADRATIC_SMOOTH_ABS, "T", owningPathSegList)
       this._x = x
       this._y = y
@@ -987,7 +987,7 @@
       enumerable: true
     })
 
-    window.SVGPathSegCurvetoQuadraticSmoothRel = function (owningPathSegList, x, y) {
+    window.SVGPathSegCurvetoQuadraticSmoothRel = function (owningPathSegList: any, x: any, y: any) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_CURVETO_QUADRATIC_SMOOTH_REL, "t", owningPathSegList)
       this._x = x
       this._y = y
@@ -1086,7 +1086,7 @@
 
   if (!("SVGPathSegList" in window)) {
     // Spec: http://www.w3.org/TR/SVG11/single-page.html#paths-InterfaceSVGPathSegList
-    window.SVGPathSegList = function (pathElement) {
+    window.SVGPathSegList = function (pathElement: any) {
       this._pathElement = pathElement
       this._list = this._parsePath(this._pathElement.getAttribute("d"))
 
@@ -1140,10 +1140,10 @@
       this._updateListFromPathMutations(this._pathElementMutationObserver.takeRecords())
     }
 
-    SVGPathSegList.prototype._updateListFromPathMutations = function (mutationRecords) {
+    SVGPathSegList.prototype._updateListFromPathMutations = function (mutationRecords: any) {
       if (!this._pathElement) return
       var hasPathMutations = false
-      mutationRecords.forEach(function (record) {
+      mutationRecords.forEach(function (record: any) {
         if (record.attributeName == "d") hasPathMutations = true
       })
       if (hasPathMutations) this._list = this._parsePath(this._pathElement.getAttribute("d"))
@@ -1157,14 +1157,14 @@
     }
 
     // When a path segment changes the list needs to be synchronized back to the path element.
-    SVGPathSegList.prototype.segmentChanged = function (pathSeg) {
+    SVGPathSegList.prototype.segmentChanged = function (pathSeg: any) {
       this._writeListToPath()
     }
 
     SVGPathSegList.prototype.clear = function () {
       this._checkPathSynchronizedToList()
 
-      this._list.forEach(function (pathSeg) {
+      this._list.forEach(function (pathSeg: any) {
         pathSeg._owningPathSegList = null
       })
       this._list = []
@@ -1180,7 +1180,7 @@
       return newItem
     }
 
-    SVGPathSegList.prototype._checkValidIndex = function (index) {
+    SVGPathSegList.prototype._checkValidIndex = function (index: any) {
       if (isNaN(index) || index < 0 || index >= this.numberOfItems) throw "INDEX_SIZE_ERR"
     }
 
@@ -1244,10 +1244,10 @@
       return newItem
     }
 
-    SVGPathSegList._pathSegArrayAsString = function (pathSegArray) {
+    SVGPathSegList._pathSegArrayAsString = function (pathSegArray: any) {
       var string = ""
       var first = true
-      pathSegArray.forEach(function (pathSeg) {
+      pathSegArray.forEach(function (pathSeg: any) {
         if (first) {
           first = false
           string += pathSeg._asPathString()
@@ -1259,20 +1259,28 @@
     }
 
     // This closely follows SVGPathParser::parsePath from Source/core/svg/SVGPathParser.cpp.
-    SVGPathSegList.prototype._parsePath = function (string) {
+    SVGPathSegList.prototype._parsePath = function (string: any) {
       if (!string || string.length == 0) return []
 
       var owningPathSegList = this
 
-      var Builder = function () {
+      var Builder = function(this: any, this: any) {
         this.pathSegList = []
       }
 
-      Builder.prototype.appendSegment = function (pathSeg) {
+      Builder.prototype.appendSegment = function (pathSeg: any) {
         this.pathSegList.push(pathSeg)
       }
 
-      var Source = function (string) {
+      var Source = function(
+        this: any,
+        this: any,
+        this: any,
+        this: any,
+        this: any,
+        this: any,
+        string: any
+      ) {
         this._string = string
         this._currentIndex = 0
         this._endIndex = this._string.length
@@ -1319,7 +1327,7 @@
         return this._pathSegTypeFromChar(lookahead)
       }
 
-      Source.prototype._pathSegTypeFromChar = function (lookahead) {
+      Source.prototype._pathSegTypeFromChar = function (lookahead: any) {
         switch (lookahead) {
           case "Z":
           case "z":
@@ -1365,7 +1373,7 @@
         }
       }
 
-      Source.prototype._nextCommandHelper = function (lookahead, previousCommand) {
+      Source.prototype._nextCommandHelper = function (lookahead: any, previousCommand: any) {
         // Check for remaining coordinates in the current command.
         if (
           (lookahead == "+" || lookahead == "-" || lookahead == "." || (lookahead >= "0" && lookahead <= "9")) &&

@@ -6,7 +6,7 @@ import * as fixtures from "../../../fixtures"
 import PivotChartLayoutBuilder from "../../../../src/widgets/charts/pivot/PivotChartLayoutBuilder"
 import canonical from "canonical-json"
 
-function compare(actual, expected, message = "") {
+function compare(actual: any, expected: any, message = "") {
   return assert.equal(
     canonical(actual),
     canonical(expected),
@@ -15,7 +15,7 @@ function compare(actual, expected, message = "") {
 }
 
 // Plucks from layout
-function layoutPluck(layout, key) {
+function layoutPluck(layout: any, key: any) {
   return _.map(layout.rows, (row) => _.pluck(row.cells, key))
 }
 

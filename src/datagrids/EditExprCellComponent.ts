@@ -32,7 +32,7 @@ export default EditExprCellComponent = (function () {
       // Called when cancelled
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
       this.state = { value: props.value }
     }
@@ -46,7 +46,7 @@ export default EditExprCellComponent = (function () {
       return !_.isEqual(this.props.value, this.state.value)
     }
 
-    handleChange = (value) => {
+    handleChange = (value: any) => {
       return this.setState({ value })
     }
 
@@ -114,14 +114,14 @@ class TextEditComponent extends React.Component {
       "div",
       { style: { paddingTop: 3 } },
       R("input", {
-        ref: (c) => {
+        ref: (c: any) => {
           return (this.input = c)
         },
         type: "text",
         className: "form-control",
         value: this.props.value || "",
-        onChange: (ev) => this.props.onChange(ev.target.value || null),
-        onKeyUp: (ev) => {
+        onChange: (ev: any) => this.props.onChange(ev.target.value || null),
+        onKeyUp: (ev: any) => {
           if (ev.keyCode === 27) {
             this.props.onCancel()
           }
@@ -130,7 +130,7 @@ class TextEditComponent extends React.Component {
           }
         }
       })
-    )
+    );
   }
 }
 TextEditComponent.initClass()
@@ -152,7 +152,7 @@ class NumberEditComponent extends React.Component {
     return this.input?.focus()
   }
 
-  handleChange = (ev) => {
+  handleChange = (ev: any) => {
     if (ev.target.value) {
       return this.props.onChange(parseFloat(ev.target.value))
     } else {
@@ -165,7 +165,7 @@ class NumberEditComponent extends React.Component {
       "div",
       { style: { paddingTop: 3 } },
       R("input", {
-        ref: (c) => {
+        ref: (c: any) => {
           return (this.input = c)
         },
         type: "number",
@@ -173,7 +173,7 @@ class NumberEditComponent extends React.Component {
         className: "form-control",
         value: this.props.value != null ? this.props.value : "",
         onChange: this.handleChange,
-        onKeyUp: (ev) => {
+        onKeyUp: (ev: any) => {
           if (ev.keyCode === 27) {
             this.props.onCancel()
           }
@@ -182,7 +182,7 @@ class NumberEditComponent extends React.Component {
           }
         }
       })
-    )
+    );
   }
 }
 NumberEditComponent.initClass()
@@ -209,7 +209,7 @@ class EnumEditComponent extends React.Component {
         "select",
         {
           value: this.props.value || "",
-          onChange: (ev) => this.props.onChange(ev.target.value || null),
+          onChange: (ev: any) => this.props.onChange(ev.target.value || null),
           className: "form-control"
         },
         R("option", { key: "", value: "" }, ""),
@@ -217,7 +217,7 @@ class EnumEditComponent extends React.Component {
           return R("option", { key: ev.id, value: ev.id }, ExprUtils.localizeString(ev.name, this.props.locale))
         })
       )
-    )
+    );
   }
 }
 EnumEditComponent.initClass()

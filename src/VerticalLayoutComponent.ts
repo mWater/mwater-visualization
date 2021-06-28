@@ -21,13 +21,13 @@ export default VerticalLayoutComponent = (function () {
       // Fraction to allocate for fractional heights. Should total 1.0. Keyed by key
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
       this.state = { availableHeight: 0 }
       this.childRefs = {}
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
       if (nextProps.height !== this.props.height || !_.isEqual(nextProps.relativeHeights, this.props.relativeHeights)) {
         return this.recalculateSize(nextProps)
       }
@@ -37,7 +37,7 @@ export default VerticalLayoutComponent = (function () {
       return this.recalculateSize(this.props)
     }
 
-    recalculateSize(props) {
+    recalculateSize(props: any) {
       // Calculate available height
       let availableHeight = props.height
 
@@ -57,7 +57,7 @@ export default VerticalLayoutComponent = (function () {
     }
 
     // Get a subcomponent
-    getComponent(key) {
+    getComponent(key: any) {
       return this.childRefs[key]
     }
 
@@ -83,13 +83,13 @@ export default VerticalLayoutComponent = (function () {
                   "div",
                   {
                     style: { height },
-                    ref: (c) => {
+                    ref: (c: any) => {
                       return (this.childRefs[child.key] = c)
                     }
                   },
                   React.cloneElement(child, { height })
                 )
-              )
+              );
             }
             // Otherwise don't show until available height is known
             return null
@@ -97,14 +97,14 @@ export default VerticalLayoutComponent = (function () {
           return R(
             "div",
             {
-              ref: (c) => {
+              ref: (c: any) => {
                 return (this.childRefs[child.key] = c)
               }
             },
             child
-          )
+          );
         })
-      )
+      );
     }
   }
   VerticalLayoutComponent.initClass()

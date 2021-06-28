@@ -20,7 +20,7 @@ export default IFrameWidget = class IFrameWidget extends Widget {
   //  width: width in pixels on screen
   //  height: height in pixels on screen
   //  singleRowTable: optional table name of table that will be filtered to have a single row present. Widget designer should optionally account for this
-  createViewElement(options) {
+  createViewElement(options: any) {
     // Put here so IFrameWidget can be created on server
     const IFrameWidgetComponent = require("./IFrameWidgetComponent")
 

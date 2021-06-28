@@ -25,7 +25,7 @@ export default ExprInsertModalComponent = (function () {
       // Table that is filtered to have one row
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -38,7 +38,7 @@ export default ExprInsertModalComponent = (function () {
       return this.setState({ open: true, exprItem: { type: "expr", id: uuid() } })
     }
 
-    handleInsert = (ev) => {
+    handleInsert = (ev: any) => {
       if (!this.state.exprItem) {
         return
       }
@@ -66,10 +66,10 @@ export default ExprInsertModalComponent = (function () {
           schema: this.props.schema,
           dataSource: this.props.dataSource,
           exprItem: this.state.exprItem,
-          onChange: (exprItem) => this.setState({ exprItem }),
+          onChange: (exprItem: any) => this.setState({ exprItem }),
           singleRowTable: this.props.singleRowTable
         })
-      )
+      );
     }
   }
   ExprInsertModalComponent.initClass()

@@ -23,7 +23,7 @@ export default MWaterGlobalFiltersComponent = (function () {
       }
     }
 
-    handleRegionsChange = (regions) => {
+    handleRegionsChange = (regions: any) => {
       // Remove existing filter
       const globalFilters = _.filter(
         this.props.globalFilters || [],
@@ -43,7 +43,7 @@ export default MWaterGlobalFiltersComponent = (function () {
       return this.props.onChange(globalFilters)
     }
 
-    handleManagedByChange = (managedBy) => {
+    handleManagedByChange = (managedBy: any) => {
       // Remove existing filter
       const globalFilters = _.filter(
         this.props.globalFilters || [],

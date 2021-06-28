@@ -11,7 +11,7 @@ import { default as SwitchableTileUrlLayer } from "./SwitchableTileUrlLayer"
 import { default as GridLayer } from "./GridLayer"
 
 export default LayerFactory = class LayerFactory {
-  static createLayer(type) {
+  static createLayer(type: any) {
     switch (type) {
       case "MWaterServer":
         return new MWaterServerLayer()

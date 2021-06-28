@@ -63,7 +63,7 @@ export default OldMapViewComponent = (function () {
       this.contextTypes = { locale: PropTypes.string }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       const initialLegendDisplay = props.design.initialLegendDisplay || "open"
@@ -82,7 +82,7 @@ export default OldMapViewComponent = (function () {
       }
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps: any) {
       if (this.props.design.autoBounds) {
         // Autozoom if filters or autozoom changed
         if (
@@ -102,7 +102,7 @@ export default OldMapViewComponent = (function () {
     }
 
     performAutoZoom() {
-      return this.props.mapDataSource.getBounds(this.props.design, this.getCompiledFilters(), (error, bounds) => {
+      return this.props.mapDataSource.getBounds(this.props.design, this.getCompiledFilters(), (error: any, bounds: any) => {
         if (bounds) {
           this.leafletMap?.setBounds(bounds, 0.2)
 
@@ -111,10 +111,10 @@ export default OldMapViewComponent = (function () {
             return this.props.onDesignChange(_.extend({}, this.props.design, { bounds }))
           }
         }
-      })
+      });
     }
 
-    handleBoundsChange = (bounds) => {
+    handleBoundsChange = (bounds: any) => {
       // Ignore if readonly
       if (this.props.onDesignChange == null) {
         return
@@ -133,7 +133,7 @@ export default OldMapViewComponent = (function () {
       return this.props.onDesignChange(design)
     }
 
-    handleGridClick = (layerViewId, ev) => {
+    handleGridClick = (layerViewId: any, ev: any) => {
       const layerView = _.findWhere(this.props.design.layerViews, { id: layerViewId })
 
       // Create layer

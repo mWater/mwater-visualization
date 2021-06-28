@@ -29,7 +29,7 @@ export default PivotChartLayoutComponent = (function () {
       // Called with id of segment. Summarizes the segment
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
 
       this.state = {
@@ -42,7 +42,7 @@ export default PivotChartLayoutComponent = (function () {
 
     // Records the cell components. This is to be able to calculate the bounds of sections
     // to allow floating hover controls
-    recordCellComp = (rowIndex, columnIndex, comp) => {
+    recordCellComp = (rowIndex: any, columnIndex: any, comp: any) => {
       const key = `${rowIndex}:${columnIndex}`
       if (comp) {
         return (this.cellComps[key] = comp)
@@ -51,7 +51,7 @@ export default PivotChartLayoutComponent = (function () {
       }
     }
 
-    renderRow(row, rowIndex) {
+    renderRow(row: any, rowIndex: any) {
       return R(
         "tr",
         { key: rowIndex },
@@ -73,7 +73,7 @@ export default PivotChartLayoutComponent = (function () {
       )
     }
 
-    renderHoverPlusIcon = (key, x, y, onClick) => {
+    renderHoverPlusIcon = (key: any, x: any, y: any, onClick: any) => {
       // Render a plus box
       return R(
         "div",
@@ -99,7 +99,7 @@ export default PivotChartLayoutComponent = (function () {
       )
     }
 
-    renderHoverRemoveIcon = (key, x, y, onClick) => {
+    renderHoverRemoveIcon = (key: any, x: any, y: any, onClick: any) => {
       // Render a plus box
       return R(
         "div",
@@ -349,7 +349,7 @@ class LayoutCellComponent extends React.Component {
     }
   }
 
-  handleClick = (ev) => {
+  handleClick = (ev: any) => {
     // Ignore blanks
     const cell = this.props.layout.rows[this.props.rowIndex].cells[this.props.columnIndex]
     if (!cell.section) {
@@ -372,7 +372,7 @@ class LayoutCellComponent extends React.Component {
   }
 
   // Render an unconfigured cell
-  renderUnconfigured(cell) {
+  renderUnconfigured(cell: any) {
     return R(
       "span",
       { style: { fontSize: "90%" } },

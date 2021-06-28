@@ -23,7 +23,7 @@ import * as PivotChartUtils from "./PivotChartUtils"
 // each row containing only { value: }
 export default PivotChartQueryBuilder = class PivotChartQueryBuilder {
   // Pass in schema
-  constructor(options) {
+  constructor(options: any) {
     this.schema = options.schema
     this.exprUtils = new ExprUtils(this.schema)
     this.axisBuilder = new AxisBuilder({ schema: this.schema })
@@ -32,7 +32,7 @@ export default PivotChartQueryBuilder = class PivotChartQueryBuilder {
   // Create the queries needed for the chart.
   // extraFilters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. }
   // Queries are indexed by intersection id, as one query is made for each intersection
-  createQueries(design, extraFilters) {
+  createQueries(design: any, extraFilters: any) {
     let filter, intersectionId, relevantFilters, whereClauses
     const exprCompiler = new ExprCompiler(this.schema)
 

@@ -55,7 +55,7 @@ export default QuickfiltersComponent = (function () {
       }
     }
 
-    renderQuickfilter(item, index) {
+    renderQuickfilter(item: any, index: any) {
       // Skip if merged
       let onValueChange
       if (item.merged) {
@@ -85,7 +85,7 @@ export default QuickfiltersComponent = (function () {
         onValueChange = null
       } else {
         // Can change value if not locked
-        onValueChange = (v) => {
+        onValueChange = (v: any) => {
           values = (this.props.values || []).slice()
           values[index] = v
 
@@ -240,7 +240,7 @@ class EnumQuickfilterComponent extends React.Component {
     // e.g. "en"
   }
 
-  handleSingleChange = (val) => {
+  handleSingleChange = (val: any) => {
     if (val) {
       return this.props.onValueChange(val)
     } else {
@@ -248,7 +248,7 @@ class EnumQuickfilterComponent extends React.Component {
     }
   }
 
-  handleMultiChange = (val) => {
+  handleMultiChange = (val: any) => {
     if (val?.length > 0) {
       return this.props.onValueChange(_.pluck(val, "value"))
     } else {
@@ -256,7 +256,7 @@ class EnumQuickfilterComponent extends React.Component {
     }
   }
 
-  renderSingleSelect(options) {
+  renderSingleSelect(options: any) {
     return R(ReactSelect, {
       placeholder: "All",
       value: _.findWhere(options, { value: this.props.value }) || null,
@@ -275,7 +275,7 @@ class EnumQuickfilterComponent extends React.Component {
     })
   }
 
-  renderMultiSelect(options) {
+  renderMultiSelect(options: any) {
     return R(ReactSelect, {
       placeholder: "All",
       value: _.map(this.props.value, (v) => _.find(options, (o) => o.value === v)),

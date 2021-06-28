@@ -6,7 +6,7 @@ import * as fixtures from "./fixtures"
 import ImplicitFilterBuilder from "../src/ImplicitFilterBuilder"
 import canonical from "canonical-json"
 
-function compare(actual, expected) {
+function compare(actual: any, expected: any) {
   return assert.equal(
     canonical(actual),
     canonical(expected),

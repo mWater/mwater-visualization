@@ -21,7 +21,7 @@ export default Widget = class Widget {
   //  singleRowTable: optional table name of table that will be filtered to have a single row present. Widget designer should optionally account for this
   //  onRowClick: Called with (tableId, rowId) when item is clicked
   //  namedStrings: optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
-  createViewElement(options) {
+  createViewElement(options: any) {
     throw new Error("Not implemented")
   }
 
@@ -31,7 +31,7 @@ export default Widget = class Widget {
   //   dataSource: data source to get data from
   //   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   //   callback: (error, data)
-  getData(design, schema, dataSource, filters, callback) {
+  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
     throw new Error("Not implemented")
   }
 
@@ -41,13 +41,13 @@ export default Widget = class Widget {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design, schema) {
+  getFilterableTables(design: any, schema: any) {
     return []
   }
 
   // Get table of contents entries for the widget, entries that should be displayed in the TOC.
   // returns `[{ id: "id that is unique within widget", text: "text of TOC entry", level: 1, 2, etc. }]
-  getTOCEntries(design, namedStrings) {
+  getTOCEntries(design: any, namedStrings: any) {
     return []
   }
 }

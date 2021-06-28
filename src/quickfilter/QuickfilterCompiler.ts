@@ -8,7 +8,7 @@ import { ExprUtils } from "mwater-expressions"
 
 // Compiles quickfilter values into filters.
 export default QuickfilterCompiler = class QuickfilterCompiler {
-  constructor(schema) {
+  constructor(schema: any) {
     this.schema = schema
   }
 
@@ -17,7 +17,7 @@ export default QuickfilterCompiler = class QuickfilterCompiler {
   // locks is array of locked quickfilters. Overrides values
   // Returns array of filters { table: table id, jsonql: JsonQL with {alias} for the table name to filter by }
   // See README for values
-  compile(design, values, locks) {
+  compile(design: any, values: any, locks: any) {
     if (!design) {
       return []
     }
@@ -79,7 +79,7 @@ export default QuickfilterCompiler = class QuickfilterCompiler {
     return filters
   }
 
-  compileToFilterExpr(expr, value, multi) {
+  compileToFilterExpr(expr: any, value: any, multi: any) {
     // Get type of expr
     const type = new ExprUtils(this.schema).getExprType(expr)
     const idTable = new ExprUtils(this.schema).getExprIdTable(expr)

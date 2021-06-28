@@ -44,7 +44,7 @@ module.exports = L.TileLayer.extend({
     this.loadMetadata()
   },
 
-  tile2quad: function (x, y, z) {
+  tile2quad: function (x: any, y: any, z) {
     var quad = ""
     for (var i = z; i > 0; i--) {
       var digit = 0
@@ -56,7 +56,7 @@ module.exports = L.TileLayer.extend({
     return quad
   },
 
-  getTileUrl: function (p, z) {
+  getTileUrl: function (p: any, z) {
     var zoom = this._getZoomForUrl()
     var subdomains = this.options.subdomains,
       s = this.options.subdomains[Math.abs((p.x + p.y) % subdomains.length)]

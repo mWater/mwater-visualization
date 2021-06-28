@@ -13,7 +13,7 @@ import { injectTableAlias } from "mwater-expressions"
 // subtable index is included as subtable. -1 for main table so it sorts first
 // Warning: mwater-server requires this directly!
 export default DatagridQueryBuilder = class DatagridQueryBuilder {
-  constructor(schema) {
+  constructor(schema: any) {
     this.schema = schema
   }
 
@@ -23,7 +23,7 @@ export default DatagridQueryBuilder = class DatagridQueryBuilder {
   //  limit: limit rows
   //  extraFilters: array of additional filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. }
   //  fillSubtableRows: repeat main level values in subtable rows instead of leaving blank
-  createQuery(design, options = {}) {
+  createQuery(design: any, options = {}) {
     // Create query to get the page of rows at the specific offset
     // Handle simple case
     if (!design.subtables || design.subtables.length === 0) {
@@ -34,7 +34,7 @@ export default DatagridQueryBuilder = class DatagridQueryBuilder {
   }
 
   // Simple query with no subtables
-  createSimpleQuery(design, options) {
+  createSimpleQuery(design: any, options: any) {
     let column, expr, i
     const exprUtils = new ExprUtils(this.schema)
     const exprCompiler = new ExprCompiler(this.schema)
@@ -127,7 +127,7 @@ export default DatagridQueryBuilder = class DatagridQueryBuilder {
   }
 
   // Query with subtables
-  createComplexQuery(design, options) {
+  createComplexQuery(design: any, options: any) {
     // Queries to union
     let column, direction, i, index, subtable
     const unionQueries = []
@@ -193,7 +193,7 @@ export default DatagridQueryBuilder = class DatagridQueryBuilder {
   }
 
   // Create the main query (not joined to subtables) part of the overall complex query. See tests for more details
-  createComplexMainQuery(design, options) {
+  createComplexMainQuery(design: any, options: any) {
     let expr, i, type
     const exprCompiler = new ExprCompiler(this.schema)
     const exprCleaner = new ExprCleaner(this.schema)
@@ -283,7 +283,7 @@ export default DatagridQueryBuilder = class DatagridQueryBuilder {
   }
 
   // Create one subtable query part of the overall complex query. See tests for more details
-  createComplexSubtableQuery(design, options, subtable, subtableIndex) {
+  createComplexSubtableQuery(design: any, options: any, subtable: any, subtableIndex: any) {
     let expr, i
     const exprUtils = new ExprUtils(this.schema)
     const exprCompiler = new ExprCompiler(this.schema)
@@ -381,7 +381,7 @@ export default DatagridQueryBuilder = class DatagridQueryBuilder {
   // Get expressions to order main query by
   // isAggr is true if any column or ordering is aggregate.
   // If so, only use explicit ordering
-  getMainOrderByExprs(design, isAggr = false) {
+  getMainOrderByExprs(design: any, isAggr = false) {
     const exprCompiler = new ExprCompiler(this.schema)
     const exprCleaner = new ExprCleaner(this.schema)
 
@@ -416,7 +416,7 @@ export default DatagridQueryBuilder = class DatagridQueryBuilder {
   // Get directions to order main query by (asc/desc)
   // isAggr is true if any column or ordering is aggregate.
   // If so, only use explicit ordering
-  getMainOrderByDirections(design, isAggr = false) {
+  getMainOrderByDirections(design: any, isAggr = false) {
     const directions = []
 
     // First explicit order bys
@@ -439,7 +439,7 @@ export default DatagridQueryBuilder = class DatagridQueryBuilder {
   }
 
   // Get expressions to order subtable query by
-  getSubtableOrderByExprs(design, subtable) {
+  getSubtableOrderByExprs(design: any, subtable: any) {
     let expr
     const exprUtils = new ExprUtils(this.schema)
     const exprCompiler = new ExprCompiler(this.schema)
@@ -470,7 +470,7 @@ export default DatagridQueryBuilder = class DatagridQueryBuilder {
   }
 
   // Get directions to order subtable query by (asc/desc)
-  getSubtableOrderByDirections(design, subtable) {
+  getSubtableOrderByDirections(design: any, subtable: any) {
     const exprUtils = new ExprUtils(this.schema)
 
     // Get subtable actual table
@@ -495,7 +495,7 @@ export default DatagridQueryBuilder = class DatagridQueryBuilder {
   }
 
   // Get types of expressions to order subtable query by.
-  getSubtableOrderByExprTypes(design, subtable) {
+  getSubtableOrderByExprTypes(design: any, subtable: any) {
     const exprUtils = new ExprUtils(this.schema)
 
     // Get subtable actual table
@@ -521,7 +521,7 @@ export default DatagridQueryBuilder = class DatagridQueryBuilder {
   }
 
   // Create the select for a column in JsonQL format
-  createColumnSelect(column, columnIndex, subtable, fillSubtableRows) {
+  createColumnSelect(column: any, columnIndex: any, subtable: any, fillSubtableRows: any) {
     const exprUtils = new ExprUtils(this.schema)
     const exprCleaner = new ExprCleaner(this.schema)
 
@@ -568,7 +568,7 @@ export default DatagridQueryBuilder = class DatagridQueryBuilder {
   }
 
   // Create selects to load given a design
-  createSimpleSelects(design, isAggr) {
+  createSimpleSelects(design: any, isAggr: any) {
     let selects = []
 
     // Primary key if not aggr
@@ -595,7 +595,7 @@ export default DatagridQueryBuilder = class DatagridQueryBuilder {
   }
 
   // Create a null expression, but cast to correct type. See https://github.com/mWater/mwater-visualization/issues/183
-  createNullExpr(exprType) {
+  createNullExpr(exprType: any) {
     switch (exprType) {
       // Geometry is as textual geojson
       case "text":
@@ -620,7 +620,7 @@ export default DatagridQueryBuilder = class DatagridQueryBuilder {
   }
 
   // Determine if main is aggregate
-  isMainAggr(design) {
+  isMainAggr(design: any) {
     const exprUtils = new ExprUtils(this.schema)
 
     for (let column of design.columns) {

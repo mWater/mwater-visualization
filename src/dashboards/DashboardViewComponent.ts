@@ -61,7 +61,7 @@ export default DashboardViewComponent = (function () {
       return { locale: this.props.design.locale }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
       this.state = {
         widgetScoper: new WidgetScoper() // Empty scoping
@@ -94,21 +94,21 @@ export default DashboardViewComponent = (function () {
       return this.forceUpdate()
     }
 
-    handleScopeChange = (id, scope) => {
+    handleScopeChange = (id: any, scope: any) => {
       return this.setState({ widgetScoper: this.state.widgetScoper.applyScope(id, scope) })
     }
 
-    handleRemoveScope = (id) => {
+    handleRemoveScope = (id: any) => {
       return this.setState({ widgetScoper: this.state.widgetScoper.applyScope(id, null) })
     }
 
-    handleItemsChange = (items) => {
+    handleItemsChange = (items: any) => {
       const design = _.extend({}, this.props.design, { items })
       return this.props.onDesignChange(design)
     }
 
     // Handle a change of the clipboard and determine which tables the clipboard block uses
-    handleClipboardChange = (block) => {
+    handleClipboardChange = (block: any) => {
       try {
         // If empty, just set it
         if (!block) {
@@ -164,7 +164,7 @@ export default DashboardViewComponent = (function () {
     }
 
     // Get list of TOC entries
-    getTOCEntries(layoutManager) {
+    getTOCEntries(layoutManager: any) {
       const entries = []
 
       for (let { id, type, design } of layoutManager.getAllWidgets(this.props.design.items)) {
@@ -178,7 +178,7 @@ export default DashboardViewComponent = (function () {
       return entries
     }
 
-    handleScrollToTOCEntry = (widgetId, entryId) => {
+    handleScrollToTOCEntry = (widgetId: any, entryId: any) => {
       const widgetComp = this.widgetComps[widgetId]
       if (!widgetComp) {
         return
@@ -195,7 +195,7 @@ export default DashboardViewComponent = (function () {
       })
     }
 
-    compRef = (widgetId, comp) => {
+    compRef = (widgetId: any, comp: any) => {
       return (this.widgetComps[widgetId] = comp)
     }
 
@@ -219,7 +219,7 @@ export default DashboardViewComponent = (function () {
         cantPasteMessage = "Dashboard is missing one or more data sources needed for the copied item."
       }
 
-      const renderWidget = (options) => {
+      const renderWidget = (options: any) => {
         const widget = WidgetFactory.createWidget(options.type)
 
         // Get filters (passed in plus dashboard widget scoper filters)

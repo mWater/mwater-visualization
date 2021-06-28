@@ -31,7 +31,7 @@ class DraggableBlockComponent extends React.Component {
     // the drag preview connector, supplied by React DND
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     this.state = {
@@ -106,7 +106,7 @@ class DraggableBlockComponent extends React.Component {
 DraggableBlockComponent.initClass()
 
 // Gets the drop side (top, left, right, bottom)
-function getDropSide(monitor, component) {
+function getDropSide(monitor: any, component: any) {
   // Get underlying component
   let pos
   const blockComponent = component.getDecoratedComponentInstance()
@@ -147,7 +147,7 @@ function getDropSide(monitor, component) {
 
 const blockTargetSpec = {
   // Called when an block hovers over this component
-  hover(props, monitor, component) {
+  hover(props: any, monitor: any, component: any) {
     // Hovering over self does nothing
     let side
     const hoveringId = monitor.getItem().block.id
@@ -166,7 +166,7 @@ const blockTargetSpec = {
     return component.getDecoratedComponentInstance().setState({ hoverSide: side })
   },
 
-  canDrop(props, monitor) {
+  canDrop(props: any, monitor: any) {
     const hoveringId = monitor.getItem().block.id
     const myId = props.block.id
     if (hoveringId === myId) {
@@ -176,7 +176,7 @@ const blockTargetSpec = {
     return true
   },
 
-  drop(props, monitor, component) {
+  drop(props: any, monitor: any, component: any) {
     if (monitor.didDrop()) {
       return
     }
@@ -187,18 +187,18 @@ const blockTargetSpec = {
 }
 
 const blockSourceSpec = {
-  beginDrag(props, monitor, component) {
+  beginDrag(props: any, monitor: any, component: any) {
     return {
       block: props.block
     }
   },
 
-  isDragging(props, monitor) {
+  isDragging(props: any, monitor: any) {
     return props.block.id === monitor.getItem().block.id
   }
 }
 
-function collectTarget(connect, monitor) {
+function collectTarget(connect: any, monitor: any) {
   return {
     connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver({ shallow: true }),
@@ -206,7 +206,7 @@ function collectTarget(connect, monitor) {
   }
 }
 
-function collectSource(connect, monitor) {
+function collectSource(connect: any, monitor: any) {
   return {
     connectDragSource: connect.dragSource(),
     connectDragPreview: connect.dragPreview(),

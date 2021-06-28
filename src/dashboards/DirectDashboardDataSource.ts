@@ -14,12 +14,12 @@ export default DirectDashboardDataSource = class DirectDashboardDataSource {
   //   dataSource: data source to use
   //   apiUrl: API url to use for talking to mWater server
   //   client: client id to use for talking to mWater server
-  constructor(options) {
+  constructor(options: any) {
     this.options = options
   }
 
   // Gets the widget data source for a specific widget
-  getWidgetDataSource(widgetType, widgetId) {
+  getWidgetDataSource(widgetType: any, widgetId: any) {
     const widget = WidgetFactory.createWidget(widgetType)
     return new DirectWidgetDataSource({
       apiUrl: this.options.apiUrl,
@@ -33,7 +33,7 @@ export default DirectDashboardDataSource = class DirectDashboardDataSource {
   // Gets the quickfilters data source
   getQuickfiltersDataSource() {
     return {
-      getValues: (index, expr, filters, offset, limit, callback) => {
+      getValues: (index: any, expr: any, filters: any, offset: any, limit: any, callback: any) => {
         // Perform query
         return QuickfilterUtils.findExprValues(
           expr,
@@ -45,6 +45,6 @@ export default DirectDashboardDataSource = class DirectDashboardDataSource {
           callback
         )
       }
-    }
+    };
   }
 }

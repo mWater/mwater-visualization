@@ -26,7 +26,7 @@ export default TextWidget = class TextWidget extends Widget {
   //  height: height in pixels on screen
   //  singleRowTable: optional table name of table that will be filtered to have a single row present. Widget designer should optionally account for this
   //  namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
-  createViewElement(options) {
+  createViewElement(options: any) {
     // Put here so TextWidget can be created on server
     const TextWidgetComponent = require("./TextWidgetComponent")
 
@@ -51,9 +51,9 @@ export default TextWidget = class TextWidget extends Widget {
   //   dataSource: data source to get data from
   //   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   //   callback: (error, data)
-  getData(design, schema, dataSource, filters, callback) {
+  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
     // Evaluates a single exprItem
-    const evalExprItem = (exprItem, cb) => {
+    const evalExprItem = (exprItem: any, cb: any) => {
       let query, whereClauses
       if (!exprItem.expr) {
         return cb(null)
@@ -141,7 +141,7 @@ export default TextWidget = class TextWidget extends Widget {
       }
 
       // Execute query
-      return dataSource.performQuery(query, (error, rows) => {
+      return dataSource.performQuery(query, (error: any, rows: any) => {
         if (error) {
           return cb(error)
         } else {
@@ -152,7 +152,7 @@ export default TextWidget = class TextWidget extends Widget {
             return cb(null, rows[0].value)
           }
         }
-      })
+      });
     }
 
     // Map of value by id
@@ -161,14 +161,14 @@ export default TextWidget = class TextWidget extends Widget {
     return async.each(
       this.getExprItems(design.items),
       (exprItem, cb) => {
-        return evalExprItem(exprItem, (error, value) => {
+        return evalExprItem(exprItem, (error: any, value: any) => {
           if (error) {
             return cb(error)
           } else {
             exprValues[exprItem.id] = value
             return cb(null)
           }
-        })
+        });
       },
       (error) => {
         if (error) {
@@ -177,7 +177,7 @@ export default TextWidget = class TextWidget extends Widget {
           return callback(null, exprValues)
         }
       }
-    )
+    );
   }
 
   // Determine if widget is auto-height, which means that a vertical height is not required.
@@ -186,7 +186,7 @@ export default TextWidget = class TextWidget extends Widget {
   }
 
   // Get expression items recursively
-  getExprItems(items) {
+  getExprItems(items: any) {
     let exprItems = []
     for (let item of items || []) {
       if (item.type === "expr") {
@@ -200,7 +200,7 @@ export default TextWidget = class TextWidget extends Widget {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design, schema) {
+  getFilterableTables(design: any, schema: any) {
     const exprItems = this.getExprItems(design.items)
 
     let filterableTables = _.map(exprItems, (exprItem) => exprItem.expr?.table)
@@ -212,12 +212,12 @@ export default TextWidget = class TextWidget extends Widget {
   // Get table of contents entries for the widget, entries that should be displayed in the TOC.
   // returns `[{ id: "id that is unique within widget", text: "text of TOC entry", level: 1, 2, etc. }]
   // For simplicity, the h1, h2, etc. have ids of 0, 1, 2 in the order they appear. h1, h2 will be given ids 0, 1 respectively.
-  getTOCEntries(design, namedStrings) {
+  getTOCEntries(design: any, namedStrings: any) {
     // Find all items that are h1, h2, etc
-    const entries = []
+    const entries: any = []
 
     // Convert items into flat text
-    function flattenText(items) {
+    function flattenText(items: any) {
       let text = _.map(items, function (item) {
         if (_.isString(item)) {
           return item
@@ -228,31 +228,30 @@ export default TextWidget = class TextWidget extends Widget {
       }).join("")
 
       // Handle named strings
-      return (text = text.replace(/\{\{.+?\}\}/g, (match) => {
+      return text = text.replace(/\{\{.+?\}\}/g, (match: any) => {
         const name = match.substr(2, match.length - 4)
         if (namedStrings && namedStrings[name] != null) {
           return namedStrings[name]
         } else {
           return match
         }
-      }))
+      });
     }
 
-    var findRecursive = (items) =>
-      (() => {
-        const result = []
-        for (let item of items || []) {
-          if (item?.type === "element" && item.tag.match(/^h[1-9]$/)) {
-            entries.push({ id: entries.length, level: parseInt(item.tag.substr(1)), text: flattenText(item.items) })
-          }
-          if (item?.items) {
-            result.push(findRecursive(item.items))
-          } else {
-            result.push(undefined)
-          }
+    var findRecursive = (items: any) => (() => {
+      const result = []
+      for (let item of items || []) {
+        if (item?.type === "element" && item.tag.match(/^h[1-9]$/)) {
+          entries.push({ id: entries.length, level: parseInt(item.tag.substr(1)), text: flattenText(item.items) })
         }
-        return result
-      })()
+        if (item?.items) {
+          result.push(findRecursive(item.items))
+        } else {
+          result.push(undefined)
+        }
+      }
+      return result
+    })()
 
     findRecursive(design.items)
 

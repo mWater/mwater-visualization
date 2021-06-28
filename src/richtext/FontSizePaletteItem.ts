@@ -19,20 +19,20 @@ export default FontSizePaletteItem = (function () {
       this.defaultProps = { position: "under" }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
       this.state = {
         open: false
       }
     }
 
-    handleMouseDown = (ev) => {
+    handleMouseDown = (ev: any) => {
       // Don't lose focus from editor
       ev.preventDefault()
       return this.setState({ open: !this.state.open })
     }
 
-    renderSize(label, value) {
+    renderSize(label: any, value: any) {
       return R(
         "div",
         {
@@ -118,18 +118,18 @@ class ColorPaletteComponent extends React.Component {
     this.propTypes = { onSetColor: PropTypes.func.isRequired }
   }
 
-  renderColor(color) {
+  renderColor(color: any) {
     return R(
       "td",
       null,
       R("div", {
         style: { width: 16, height: 15, backgroundColor: color, margin: 1 },
-        onMouseDown: (ev) => {
+        onMouseDown: (ev: any) => {
           ev.preventDefault()
           return this.props.onSetColor.bind(null, color)
         }
       })
-    )
+    );
   }
 
   render() {

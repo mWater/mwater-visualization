@@ -65,7 +65,7 @@ $(function () {
 })
 
 class RichTextPane extends React.Component {
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     this.state = {
@@ -73,7 +73,7 @@ class RichTextPane extends React.Component {
     }
   }
 
-  handleInsert = (ev) => {
+  handleInsert = (ev: any) => {
     ev.preventDefault()
     return this.editor.pasteHTML("x")
   }
@@ -91,20 +91,20 @@ class RichTextPane extends React.Component {
       "div",
       { style: { paddingTop: 100 } },
       R(RichTextComponent, {
-        ref: (c) => {
+        ref: (c: any) => {
           return (this.editor = c)
         },
         items: this.state.items,
-        onItemsChange: (items) => this.setState({ items }),
+        onItemsChange: (items: any) => this.setState({ items }),
         itemsHtmlConverter: new ItemsHtmlConverter(),
         extraPaletteButtons: this.renderExtraButtons()
       })
-    )
+    );
   }
 }
 
 class MWaterDashboardPane extends React.Component {
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     this.state = {
@@ -124,7 +124,7 @@ class MWaterDashboardPane extends React.Component {
     })
   }
 
-  handleDesignChange = (design) => {}
+  handleDesignChange = (design: any) => {}
   // @setState(design: design, extraTables: )
   // console.log JSON.stringify(design, null, 2)
 
@@ -140,9 +140,9 @@ class MWaterDashboardPane extends React.Component {
         client: this.props.client,
         user: this.props.user,
         share: this.props.share,
-        onExtraTablesChange: (extraTables) => this.setState({ extraTables }),
+        onExtraTablesChange: (extraTables: any) => this.setState({ extraTables }),
         extraTables: this.state.extraTables,
-        errorFormatter: (err, defaultError) => {
+        errorFormatter: (err: any, defaultError: any) => {
           if (!err.form) {
             return defaultError
           }
@@ -151,7 +151,7 @@ Perhaps the administrator of the survey has not shared it with you? \
 The survey was created by ${err.form.created_by}`
         }
       },
-      (error, config) => {
+      (error: any, config: any) => {
         if (error) {
           return R("div", { className: "alert alert-danger" }, error)
         }
@@ -178,12 +178,12 @@ The survey was created by ${err.form.created_by}`
           })
         )
       }
-    )
+    );
   }
 }
 
 class MWaterDirectDashboardPane extends React.Component {
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     this.state = {
@@ -200,13 +200,13 @@ class MWaterDirectDashboardPane extends React.Component {
     }
   }
 
-  handleDesignChange = (design) => {
+  handleDesignChange = (design: any) => {
     this.setState({ design })
     // console.log JSON.stringify(design, null, 2)
     return window.localStorage.setItem("MWaterDirectDashboardPane.design", JSON.stringify(design))
   }
 
-  handleExtraTablesChange = (extraTables) => {
+  handleExtraTablesChange = (extraTables: any) => {
     this.setState({ extraTables })
     return window.localStorage.setItem("MWaterDirectDashboardPane.extraTables", JSON.stringify(extraTables))
   }
@@ -221,7 +221,7 @@ class MWaterDirectDashboardPane extends React.Component {
         onExtraTablesChange: this.handleExtraTablesChange,
         extraTables: this.state.extraTables
       },
-      (error, config) => {
+      (error: any, config: any) => {
         if (error) {
           alert("Error: " + error.message)
           return null
@@ -246,11 +246,11 @@ class MWaterDirectDashboardPane extends React.Component {
             titleElem: "Sample",
             // quickfilterLocks: [{ expr: { type: "field", table: "entities.water_point", column: "type" }, value: "Protected dug well" }]
             namedStrings: { branding: "mWater" },
-            onRowClick: (table, rowId) => alert(`Row clicked: ${table} ${rowId}`)
+            onRowClick: (table: any, rowId: any) => alert(`Row clicked: ${table} ${rowId}`)
           })
-        )
+        );
       }
-    )
+    );
   }
 }
 
@@ -259,7 +259,7 @@ const mapId = "5e9a90f0f52e4690b42378534752ebfc"
 const share = "testshareid"
 
 class MWaterMapPane extends React.Component {
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     this.state = {
@@ -276,7 +276,7 @@ class MWaterMapPane extends React.Component {
     })
   }
 
-  handleDesignChange = (design) => {
+  handleDesignChange = (design: any) => {
     this.setState({ design })
     return console.log(JSON.stringify(design, null, 2))
   }
@@ -293,9 +293,9 @@ class MWaterMapPane extends React.Component {
         client: this.props.client,
         user: this.props.user,
         extraTables: this.state.extraTables,
-        onExtraTablesChange: (extraTables) => this.setState({ extraTables })
+        onExtraTablesChange: (extraTables: any) => this.setState({ extraTables })
       },
-      (error, config) => {
+      (error: any, config: any) => {
         // Create map url source
 
         //      mapDataSource = new DirectMapDataSource({ apiUrl: @props.apiUrl, client: @props.client, schema: config.schema, mapDesign: @state.design })
@@ -315,17 +315,17 @@ class MWaterMapPane extends React.Component {
             design: this.state.design,
             mapDataSource,
             onDesignChange: this.handleDesignChange,
-            onRowClick: (tableId, rowId) => alert(`${tableId}:${rowId}`),
+            onRowClick: (tableId: any, rowId: any) => alert(`${tableId}:${rowId}`),
             titleElem: "Sample"
           })
-        )
+        );
       }
-    )
+    );
   }
 }
 
 class MWaterDirectMapPane extends React.Component {
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     this.state = {
@@ -338,13 +338,13 @@ class MWaterDirectMapPane extends React.Component {
     }
   }
 
-  handleDesignChange = (design) => {
+  handleDesignChange = (design: any) => {
     this.setState({ design })
     // console.log JSON.stringify(design, null, 2)
     return window.localStorage.setItem("MWaterDirectMapPane.design", JSON.stringify(design))
   }
 
-  handleExtraTablesChange = (extraTables) => {
+  handleExtraTablesChange = (extraTables: any) => {
     this.setState({ extraTables })
     return window.localStorage.setItem("MWaterDirectMapPane.extraTables", JSON.stringify(extraTables))
   }
@@ -359,7 +359,7 @@ class MWaterDirectMapPane extends React.Component {
         extraTables: this.state.extraTables,
         onExtraTablesChange: this.handleExtraTablesChange
       },
-      (error, config) => {
+      (error: any, config: any) => {
         // Create map url source
         const mapDataSource = new DirectMapDataSource({
           apiUrl: this.props.apiUrl,
@@ -378,17 +378,17 @@ class MWaterDirectMapPane extends React.Component {
             design: this.state.design,
             mapDataSource,
             onDesignChange: this.handleDesignChange,
-            onRowClick: (tableId, rowId) => console.log(`Click ${tableId}:${rowId}`),
+            onRowClick: (tableId: any, rowId: any) => console.log(`Click ${tableId}:${rowId}`),
             titleElem: "Sample"
           })
-        )
+        );
       }
-    )
+    );
   }
 }
 
 class MWaterDatagridPane extends React.Component {
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     this.state = {
@@ -397,7 +397,7 @@ class MWaterDatagridPane extends React.Component {
     }
   }
 
-  handleDesignChange = (design) => {
+  handleDesignChange = (design: any) => {
     this.setState({ design })
     return console.log(JSON.stringify(design, null, 2))
   }
@@ -409,10 +409,10 @@ class MWaterDatagridPane extends React.Component {
         apiUrl: this.props.apiUrl,
         client: this.props.client,
         user: this.props.user,
-        onExtraTablesChange: (extraTables) => this.setState({ extraTables }),
+        onExtraTablesChange: (extraTables: any) => this.setState({ extraTables }),
         extraTables: this.state.extraTables
       },
-      (error, config) => {
+      (error: any, config: any) => {
         const datagridDataSource = new DirectDatagridDataSource({
           schema: config.schema,
           dataSource: config.dataSource
@@ -432,22 +432,22 @@ class MWaterDatagridPane extends React.Component {
               return console.log(arguments)
             }.bind(this),
             // Called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
-            canEditValue: (tableId, rowId, expr, callback) => callback(null, true),
-            updateValue: (tableId, rowId, expr, value, callback) => {
+            canEditValue: (tableId: any, rowId: any, expr: any, callback: any) => callback(null, true),
+            updateValue: (tableId: any, rowId: any, expr: any, value: any, callback: any) => {
               console.log(value)
               return setTimeout(() => {
                 return callback(null)
               }, 500)
             }
           })
-        )
+        );
       }
-    )
+    );
   }
 }
 
 class WaterOrgDashboardPane extends React.Component {
-  constructor(props) {
+  constructor(props: any) {
     super(props)
 
     this.state = {
@@ -468,7 +468,7 @@ class WaterOrgDashboardPane extends React.Component {
     })
   }
 
-  handleDesignChange = (design) => {
+  handleDesignChange = (design: any) => {
     this.setState({ design })
     return console.log(JSON.stringify(design, null, 2))
   }
@@ -663,25 +663,25 @@ var datagridDesign = {
 // Caching data source for mWater. Requires jQuery
 MWaterDataSource = class MWaterDataSource extends DataSource {
   // Caching allows server to send cached results
-  constructor(apiUrl, client, caching = true) {
+  constructor(apiUrl: any, client: any, caching = true) {
     super()
     this.apiUrl = apiUrl
     this.client = client
     this.caching = caching
   }
 
-  performQuery(query, cb) {
+  performQuery(query: any, cb: any) {
     // If no callback, use promise
     if (!cb) {
       return new Promise((resolve, reject) => {
-        return this.performQuery(jsonql, (error, rows) => {
+        return this.performQuery(jsonql, (error: any, rows: any) => {
           if (error) {
             return reject(error)
           } else {
             return resolve(rows)
           }
-        })
-      })
+        });
+      });
     }
 
     let url = this.apiUrl + "jsonql?jsonql=" + encodeURIComponent(JSON.stringify(query))

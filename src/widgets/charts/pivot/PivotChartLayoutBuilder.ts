@@ -15,15 +15,15 @@ const maxColumns = 50
 // See PivotChart Design.md for more detauls
 export default PivotChartLayoutBuilder = class PivotChartLayoutBuilder {
   // Pass in schema
-  constructor(options) {
+  constructor(options: any) {
     this.schema = options.schema
     this.exprUtils = new ExprUtils(this.schema)
     this.axisBuilder = new AxisBuilder({ schema: this.schema })
   }
 
-  buildLayout(design, data, locale) {
+  buildLayout(design: any, data: any, locale: any) {
     // Create empty layout
-    let cell, cells, column, columnIndex, depth, i, layoutRow, refCell, rowIndex, segment
+    let cell, cells, column, columnIndex, depth: any, i, layoutRow, refCell, rowIndex, segment
     let asc, end
     let asc6, end6
     let asc8, end8
@@ -34,13 +34,13 @@ export default PivotChartLayoutBuilder = class PivotChartLayoutBuilder {
     }
 
     // Get all columns
-    let columns = []
+    let columns: any = []
     for (segment of design.columns) {
       columns = columns.concat(this.getRowsOrColumns(false, segment, data, locale))
     }
 
     // Get all rows
-    let rows = []
+    let rows: any = []
     for (segment of design.rows) {
       rows = rows.concat(this.getRowsOrColumns(true, segment, data, locale))
     }
@@ -396,7 +396,7 @@ export default PivotChartLayoutBuilder = class PivotChartLayoutBuilder {
   // Build a cell which is the intersection of a row and column, where row and column are nested arrays
   // from getRowsOrColumns
   // dataIndexed is created above. See there for format
-  buildIntersectionCell(design, dataIndexed, locale, row, column) {
+  buildIntersectionCell(design: any, dataIndexed: any, locale: any, row: any, column: any) {
     // Get intersection id
     let i, part, text
     const intersectionId = PivotChartUtils.getIntersectionId(
@@ -474,7 +474,7 @@ export default PivotChartLayoutBuilder = class PivotChartLayoutBuilder {
   }
 
   // Determine summarize value for unconfigured cells
-  setupSummarize(design, layout) {
+  setupSummarize(design: any, layout: any) {
     return __range__(0, layout.rows[0].cells.length, false).map((columnIndex) =>
       (() => {
         const result = []
@@ -501,15 +501,15 @@ export default PivotChartLayoutBuilder = class PivotChartLayoutBuilder {
   }
 
   // Determine borders, mutating cells
-  setupBorders(layout) {
+  setupBorders(layout: any) {
     // Set up borders for row and column cells
     let cell, columnIndex, rowIndex
     let asc, end
     let asc2, end2
-    const borderTops = [] // Array of border top information for intersections. index is layout row number
-    const borderBottoms = [] // Array of border bottom information for intersections. index is layout row number
-    const borderLefts = [] // Array of border left information for intersections. index is layout column number
-    const borderRights = [] // Array of border right information for intersections. index is layout column number
+    const borderTops: any = [] // Array of border top information for intersections. index is layout row number
+    const borderBottoms: any = [] // Array of border bottom information for intersections. index is layout row number
+    const borderLefts: any = [] // Array of border left information for intersections. index is layout column number
+    const borderRights: any = [] // Array of border right information for intersections. index is layout column number
 
     for (
       columnIndex = 0, end = layout.rows[0].cells.length, asc = 0 <= end;
@@ -694,14 +694,14 @@ export default PivotChartLayoutBuilder = class PivotChartLayoutBuilder {
   // For segments with no children, there will be an array of single value array entries (array of array)
   // data is lookup of query results by intersection id
   // parentSegments are ancestry of current segment, starting with root
-  getRowsOrColumns(isRow, segment, data, locale, parentSegments = [], parentValues = []) {
+  getRowsOrColumns(isRow: any, segment: any, data: any, locale: any, parentSegments = [], parentValues = []) {
     // If no axis, categories are just null
     let categories, value
     if (!segment.valueAxis) {
       categories = [{ value: null, label: segment.label }]
     } else {
       // Find all values (needed for category finding of axis)
-      let allValues = []
+      let allValues: any = []
 
       // To find all values, first need all intersections that are relevant
       for (let intersectionId in data) {
@@ -809,7 +809,7 @@ export default PivotChartLayoutBuilder = class PivotChartLayoutBuilder {
   }
 }
 
-function __range__(left, right, inclusive) {
+function __range__(left: any, right: any, inclusive: any) {
   let range = []
   let ascending = left < right
   let end = !inclusive ? right : ascending ? right + 1 : right - 1

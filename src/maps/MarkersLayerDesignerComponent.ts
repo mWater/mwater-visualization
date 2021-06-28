@@ -32,41 +32,41 @@ export default MarkersLayerDesignerComponent = (function () {
     }
 
     // Apply updates to design
-    update(updates) {
+    update(updates: any) {
       return this.props.onDesignChange(_.extend({}, this.props.design, updates))
     }
 
     // Update axes with specified changes
-    updateAxes(changes) {
+    updateAxes(changes: any) {
       const axes = _.extend({}, this.props.design.axes, changes)
       return this.update({ axes })
     }
 
-    handleTableChange = (table) => {
+    handleTableChange = (table: any) => {
       return this.update({ table })
     }
-    handleGeometryAxisChange = (axis) => {
+    handleGeometryAxisChange = (axis: any) => {
       return this.updateAxes({ geometry: axis })
     }
-    handleColorAxisChange = (axis) => {
+    handleColorAxisChange = (axis: any) => {
       return this.updateAxes({ color: axis })
     }
-    handleFilterChange = (expr) => {
+    handleFilterChange = (expr: any) => {
       return this.update({ filter: expr })
     }
-    handleColorChange = (color) => {
+    handleColorChange = (color: any) => {
       return this.update({ color })
     }
-    handleSymbolChange = (symbol) => {
+    handleSymbolChange = (symbol: any) => {
       return this.update({ symbol })
     }
-    handleNameChange = (e) => {
+    handleNameChange = (e: any) => {
       return this.update({ name: e.target.value })
     }
-    handleMarkerSizeChange = (markerSize) => {
+    handleMarkerSizeChange = (markerSize: any) => {
       return this.update({ markerSize })
     }
-    handleLineWidthChange = (lineWidth) => {
+    handleLineWidthChange = (lineWidth: any) => {
       return this.update({ lineWidth })
     }
 

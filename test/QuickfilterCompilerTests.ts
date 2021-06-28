@@ -6,7 +6,7 @@ import _ from "lodash"
 import QuickfilterCompiler from "../src/quickfilter/QuickfilterCompiler"
 import canonical from "canonical-json"
 
-function compare(actual, expected) {
+function compare(actual: any, expected: any) {
   return assert.equal(canonical(actual), canonical(expected))
 }
 

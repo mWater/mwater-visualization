@@ -21,7 +21,7 @@ export default ImagelistCarouselComponent = (function () {
       }
     }
 
-    constructor(props) {
+    constructor(props: any) {
       super(props)
       this.state = {
         activeImage: _.findIndex(this.props.imagelist, { cover: true })
@@ -45,7 +45,7 @@ export default ImagelistCarouselComponent = (function () {
       }
     }
 
-    renderImage(img, i, imageManager) {
+    renderImage(img: any, i: any, imageManager: any) {
       return R(
         "div",
         { className: `item ${i === this.state.activeImage ? "active" : ""}`, style: { height: this.props.height } },
@@ -53,14 +53,14 @@ export default ImagelistCarouselComponent = (function () {
       )
     }
 
-    renderImages(imageManager) {
-      return this.props.imagelist.map((imageObj, i) => this.renderImage(imageObj, i, imageManager))
+    renderImages(imageManager: any) {
+      return this.props.imagelist.map((imageObj: any, i: any) => this.renderImage(imageObj, i, imageManager));
     }
 
     render() {
       const imageManager = {
-        getImageThumbnailUrl: (id, success, error) => success(this.props.widgetDataSource.getImageUrl(id, 100)),
-        getImageUrl: (id, success, error) => success(this.props.widgetDataSource.getImageUrl(id, 640))
+        getImageThumbnailUrl: (id: any, success: any, error: any) => success(this.props.widgetDataSource.getImageUrl(id, 100)),
+        getImageUrl: (id: any, success: any, error: any) => success(this.props.widgetDataSource.getImageUrl(id, 640))
       }
 
       if (this.props.imagelist.length === 1) {

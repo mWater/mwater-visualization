@@ -10,7 +10,7 @@ export default DirectWidgetDataSource = class DirectWidgetDataSource {
   //   dataSource: general data source
   //   apiUrl: API url to use for talking to mWater server. Not needed if no map widgets
   //   client: client id to use for talking to mWater server. Not needed if no map widgets
-  constructor(options) {
+  constructor(options: any) {
     this.options = options
   }
 
@@ -18,13 +18,13 @@ export default DirectWidgetDataSource = class DirectWidgetDataSource {
   //  design: design of the widget. Ignored in the case of server-side rendering
   //  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   //  callback: (error, data)
-  getData(design, filters, callback) {
+  getData(design: any, filters: any, callback: any) {
     return this.options.widget.getData(design, this.options.schema, this.options.dataSource, filters, callback)
   }
 
   // For map widgets, the following is required
   //  design: design of the widget. Ignored in the case of server-side rendering
-  getMapDataSource(design) {
+  getMapDataSource(design: any) {
     const DirectMapDataSource = require("../maps/DirectMapDataSource").default
     return new DirectMapDataSource({
       apiUrl: this.options.apiUrl,
@@ -37,7 +37,7 @@ export default DirectWidgetDataSource = class DirectWidgetDataSource {
 
   // Get the url to download an image (by id from an image or imagelist column)
   // Height, if specified, is minimum height needed. May return larger image
-  getImageUrl(imageId, height) {
+  getImageUrl(imageId: any, height: any) {
     return this.options.dataSource.getImageUrl(imageId, height)
   }
 }

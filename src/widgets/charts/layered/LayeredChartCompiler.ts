@@ -11,31 +11,31 @@ import d3Format from "d3-format"
 const commaFormatter = d3Format.format(",")
 const compactFormatter = d3Format.format("~s")
 
-function pieLabelValueFormatter(format, hidePercent = false) {
-  function percent(ratio) {
+function pieLabelValueFormatter(format: any, hidePercent = false) {
+  function percent(ratio: any) {
     if (hidePercent) {
       return ""
     } else {
       return `(${d3Format.format(".1%")(ratio)})`
     }
   }
-  return function (value, ratio, id) {
+  return function (value: any, ratio: any, id: any) {
     if (format[id]) {
       return `${format[id](value)} ${percent(ratio)}`
     } else {
       return `${d3Format.format(",")(value)} ${percent(ratio)}`
     }
-  }
+  };
 }
 
-function labelValueFormatter(format) {
-  return function (value, ratio, id) {
+function labelValueFormatter(format: any) {
+  return function (value: any, ratio: any, id: any) {
     if (format[id]) {
       return format[id](value)
     } else {
       return value
     }
-  }
+  };
 }
 
 const defaultColors = [
@@ -64,7 +64,7 @@ const defaultColors = [
 // Compiles various parts of a layered chart (line, bar, scatter, spline, area) to C3.js format
 export default LayeredChartCompiler = class LayeredChartCompiler {
   // Pass in schema
-  constructor(options) {
+  constructor(options: any) {
     this.schema = options.schema
     this.exprUtils = new ExprUtils(this.schema)
     this.axisBuilder = new AxisBuilder({ schema: this.schema })
@@ -72,7 +72,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
 
   // Create the queries needed for the chart.
   // extraFilters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. }
-  createQueries(design, extraFilters) {
+  createQueries(design: any, extraFilters: any) {
     const exprCompiler = new ExprCompiler(this.schema)
 
     const queries = {}
@@ -178,7 +178,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
   }
 
   // Create data map of "{layer name}" or "{layer name}:{index}" to { layerIndex, row }
-  createDataMap(design, data) {
+  createDataMap(design: any, data: any) {
     return this.compileData(design, data).dataMap
   }
 
@@ -189,7 +189,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
   //   width: chart width
   //   height: chart height
   //   locale: locale to use
-  createChartOptions(options) {
+  createChartOptions(options: any) {
     const c3Data = this.compileData(options.design, options.data, options.locale)
     // Pick first format to use as the tick formatter
     let tickFormatter = _.keys(c3Data.format).length > 0 ? c3Data.format[_.keys(c3Data.format)[0]] : commaFormatter
@@ -312,7 +312,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
     return chartDesign
   }
 
-  isCategoricalX(design) {
+  isCategoricalX(design: any) {
     // Check if categorical x axis (bar charts always are)
     let categoricalX = design.type === "bar" || _.any(design.layers, (l) => l.type === "bar")
 
@@ -332,7 +332,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
 
   // Compiles data part of C3 chart, including data map back to original data
   // Outputs: columns, types, names, colors. Also dataMap which is a map of "layername:index" to { layerIndex, row }
-  compileData(design, data, locale) {
+  compileData(design: any, data: any, locale: any) {
     // If polar chart (no x axis)
     if (["pie", "donut"].includes(design.type) || _.any(design.layers, (l) => ["pie", "donut"].includes(l.type))) {
       return this.compileDataPolar(design, data, locale)
@@ -346,9 +346,9 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
   }
 
   // Compiles data for a polar chart (pie/donut) with no x axis
-  compileDataPolar(design, data, locale) {
+  compileDataPolar(design: any, data: any, locale: any) {
     let order
-    const columns = []
+    const columns: any = []
     const types = {}
     const names = {}
     const dataMap = {}
@@ -383,15 +383,14 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
           types[series] = this.getLayerType(design, layerIndex)
           names[series] = this.axisBuilder.formatValue(layer.axes.color, row.color, locale, true)
           dataMap[series] = { layerIndex, row }
-          format[series] = (value) =>
-            value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
+          format[series] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
           // Get specific color if present
           const color = this.axisBuilder.getValueColor(layer.axes.color, row.color)
           //color = color or layer.color
           if (color) {
             return (colors[series] = color)
           }
-        })
+        });
       } else {
         // Create a single series
         const row = data[`layer${layerIndex}`][0]
@@ -403,8 +402,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
           // Name is name of entire layer
           names[series] = layer.name || (design.layers.length === 1 ? "Value" : `Series ${layerIndex + 1}`)
           dataMap[series] = { layerIndex, row }
-          format[series] = (value) =>
-            value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
+          format[series] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
 
           // Set color if present
           if (layer.color) {
@@ -439,16 +437,16 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
   }
 
   // Compiles data for a chart like line or scatter that does not have a categorical x axis
-  compileDataNonCategorical(design, data, locale) {
-    const columns = []
+  compileDataNonCategorical(design: any, data: any, locale: any) {
+    const columns: any = []
     const types = {}
     const names = {}
     const dataMap = {}
     const colors = {}
     const xs = {}
-    let groups = []
+    let groups: any = []
     const format = {}
-    const legendHide = [] // Which series to hide
+    const legendHide: any = [] // Which series to hide
     const classes = {} // Custom classes to add to series
 
     const xType = this.axisBuilder.getAxisType(design.layers[0].axes.x)
@@ -508,13 +506,12 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
           types[seriesY] = this.getLayerType(design, layerIndex)
           names[seriesY] = this.axisBuilder.formatValue(layer.axes.color, colorValue, locale, true)
           xs[seriesY] = seriesX
-          format[seriesY] = (value) =>
-            value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
+          format[seriesY] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
 
           return _.each(rows, (row, rowIndex) => {
             return (dataMap[`${seriesY}:${rowIndex}`] = { layerIndex, row })
           })
-        })
+        });
       } else {
         // One series for x values, one for y
         const seriesX = `${layerIndex}:x`
@@ -530,8 +527,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
         names[seriesY] = layer.name || (design.layers.length === 1 ? "Value" : `Series ${layerIndex + 1}`)
         xs[seriesY] = seriesX
         colors[seriesY] = layer.color || defaultColors[layerIndex]
-        format[seriesY] = (value) =>
-          value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
+        format[seriesY] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
 
         // Add data map for each row
         _.each(layerData, (row, rowIndex) => {
@@ -547,8 +543,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
           xs[trendlineSeries] = seriesX
           colors[trendlineSeries] = layer.color || defaultColors[layerIndex]
           legendHide.push(trendlineSeries) // Hide in legend
-          format[trendlineSeries] = (value) =>
-            value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
+          format[trendlineSeries] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
           // Set dots as invisible in CSS and line as dashed
           return (classes[trendlineSeries] = "trendline")
         }
@@ -581,7 +576,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
   }
 
   // Numbers sometimes arrive as strings from database. Fix by parsing
-  fixStringYValues(rows) {
+  fixStringYValues(rows: any) {
     for (let row of rows) {
       if (_.isString(row.y)) {
         row.y = parseFloat(row.y)
@@ -591,7 +586,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
   }
 
   // Flatten if x-type is enumset. e.g. if one row has x = ["a", "b"], make into two rows with x="a" and x="b", summing if already exists
-  flattenRowData(rows) {
+  flattenRowData(rows: any) {
     const flatRows = []
     for (var row of rows) {
       // Handle null
@@ -626,29 +621,29 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
     return flatRows
   }
 
-  compileDataCategorical(design, data, locale) {
-    let categoryXs
+  compileDataCategorical(design: any, data: any, locale: any) {
+    let categoryXs: any
     const columns = []
     const types = {}
     const names = {}
     const dataMap = {}
     const colors = {}
     const xs = {}
-    let groups = []
+    let groups: any = []
     const format = {}
     const colorOverrides = {} // Mapping of "<layer>:<index>" to color if overridden
-    const legendHide = [] // Which series to hide
+    const legendHide: any = [] // Which series to hide
     const classes = {} // Custom classes to add to series
 
     // Get all values of the x-axis, taking into account values that might be missing
     const xAxis = _.extend({}, design.layers[0].axes.x)
-    const nullLabel = _.first(_.compact(design.layers.map((l) => l.axes.x.nullLabel)))
+    const nullLabel = _.first(_.compact(design.layers.map((l: any) => l.axes.x.nullLabel)))
     xAxis.nullLabel = nullLabel
 
     const xType = this.axisBuilder.getAxisType(xAxis)
 
     // Get all known values from all layers
-    let xValues = []
+    let xValues: any = []
     _.each(design.layers, (layer, layerIndex) => {
       // Get data of layer
       const layerData = data[`layer${layerIndex}`]
@@ -680,7 +675,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
     // For each layer
     _.each(design.layers, (layer, layerIndex) => {
       // Get data of layer
-      let column, series
+      let column, series: any
       let layerData = data[`layer${layerIndex}`]
 
       // Fix string y values
@@ -765,9 +760,8 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
             types[series] = this.getLayerType(design, layerIndex)
             names[series] = this.axisBuilder.formatValue(layer.axes.color, colorValue, locale, true)
             xs[series] = "x"
-            return (format[series] = (value) =>
-              value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : "")
-          })
+            return format[series] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : "";
+          });
         } else {
           //c3 acts funny when there is a split axis but no data
           series = `${layerIndex}:dumm`
@@ -777,8 +771,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
           types[series] = this.getLayerType(design, layerIndex)
           names[series] = this.axisBuilder.formatValue(layer.axes.color, null, locale, true)
           xs[series] = "x"
-          return (format[series] = (value) =>
-            value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : "")
+          return format[series] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : "";
         }
       } else {
         // One series for y
@@ -814,8 +807,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
         names[series] = layer.name || (design.layers.length === 1 ? "Value" : `Series ${layerIndex + 1}`)
         xs[series] = "x"
         colors[series] = layer.color || defaultColors[layerIndex]
-        format[series] = (value) =>
-          value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
+        format[series] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
 
         // Add trendline
         if (layer.trendline === "linear") {
@@ -833,8 +825,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
           xs[trendlineSeries] = "x"
           colors[trendlineSeries] = layer.color || defaultColors[layerIndex]
           legendHide.push(trendlineSeries) // Hide in legend
-          format[trendlineSeries] = (value) =>
-            value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
+          format[trendlineSeries] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
           // Set dots as invisible in CSS and line as dashed
           return (classes[trendlineSeries] = "trendline")
         }
@@ -865,7 +856,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
     if (design.proportional) {
       // Calculate total for each x
       let column, i
-      const xtotals = []
+      const xtotals: any = []
       for (column of columns) {
         // Skip x column
         var asc, end
@@ -912,7 +903,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
       titleText: this.compileTitleText(design, locale),
       order: null, // Use order of data for stacking
       format,
-      color: (color, d) => {
+      color: (color: any, d: any) => {
         // Handle overall series color which calls with a non-object for d
         if (typeof d !== "object") {
           // Overall series is not changed in color
@@ -934,32 +925,32 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
 
         return color
       }
-    }
+    };
   }
 
   // Compile an expression
-  compileExpr(expr) {
+  compileExpr(expr: any) {
     const exprCompiler = new ExprCompiler(this.schema)
     return exprCompiler.compileExpr({ expr, tableAlias: "main" })
   }
 
   // Get layer type, defaulting to overall type
-  getLayerType(design, layerIndex) {
+  getLayerType(design: any, layerIndex: any) {
     return design.layers[layerIndex].type || design.type
   }
 
   // Determine if layer required grouping by x (and color)
-  doesLayerNeedGrouping(design, layerIndex) {
+  doesLayerNeedGrouping(design: any, layerIndex: any) {
     return this.getLayerType(design, layerIndex) !== "scatter"
   }
 
   // Determine if layer can use x axis
-  canLayerUseXExpr(design, layerIndex) {
+  canLayerUseXExpr(design: any, layerIndex: any) {
     let needle
     return (needle = this.getLayerType(design, layerIndex)), !["pie", "donut"].includes(needle)
   }
 
-  isXAxisRequired(design, layerIndex) {
+  isXAxisRequired(design: any, layerIndex: any) {
     let needle
     return _.any(
       design.layers,
@@ -967,12 +958,12 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
     )
   }
 
-  isColorAxisRequired(design, layerIndex) {
+  isColorAxisRequired(design: any, layerIndex: any) {
     let needle
     return (needle = this.getLayerType(design, layerIndex)), ["pie", "donut"].includes(needle)
   }
 
-  compileDefaultTitleText(design, locale) {
+  compileDefaultTitleText(design: any, locale: any) {
     // Don't default this for now
     return ""
   }
@@ -981,26 +972,26 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
   // else
   //   return @compileYAxisLabelText(design) + " by " + @axisBuilder.summarizeAxis(design.layers[0].axes.color)
 
-  compileDefaultYAxisLabelText(design, locale) {
+  compileDefaultYAxisLabelText(design: any, locale: any) {
     return this.axisBuilder.summarizeAxis(design.layers[0].axes.y, locale)
   }
 
-  compileDefaultXAxisLabelText(design, locale) {
+  compileDefaultXAxisLabelText(design: any, locale: any) {
     return this.axisBuilder.summarizeAxis(design.layers[0].axes.x, locale)
   }
 
-  compileTitleText(design, locale) {
+  compileTitleText(design: any, locale: any) {
     return design.titleText || this.compileDefaultTitleText(design, locale)
   }
 
-  compileYAxisLabelText(design, locale) {
+  compileYAxisLabelText(design: any, locale: any) {
     if (design.yAxisLabelText === "") {
       return this.compileDefaultYAxisLabelText(design, locale)
     }
     return design.yAxisLabelText
   }
 
-  compileXAxisLabelText(design, locale) {
+  compileXAxisLabelText(design: any, locale: any) {
     if (design.xAxisLabelText === "") {
       return this.compileDefaultXAxisLabelText(design, locale)
     }
@@ -1010,7 +1001,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
   // Create a scope based on a row of a layer
   // Scope data is relevant data from row that uniquely identifies scope
   // plus a layer index
-  createScope(design, layerIndex, row, locale) {
+  createScope(design: any, layerIndex: any, row: any, locale: any) {
     let filter, filterExpr
     const expressionBuilder = new ExprUtils(this.schema)
 
@@ -1111,7 +1102,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
   }
 
   // Converts a series of rows to have cumulative y axis, separating out by color axis if present
-  makeRowsCumulative(rows) {
+  makeRowsCumulative(rows: any) {
     // Indexed by color
     const totals = {}
 
@@ -1136,7 +1127,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
 }
 
 // Clean out nbsp (U+00A0) as it causes c3 errors
-function cleanString(str) {
+function cleanString(str: any) {
   if (!str) {
     return str
   }
@@ -1144,7 +1135,7 @@ function cleanString(str) {
 }
 
 // Calculate a linear regression, returning a series of y values that match the x values
-function calculateLinearRegression(ys, xs) {
+function calculateLinearRegression(ys: any, xs: any) {
   // If xs are dates, convert to numbers
   if (_.isString(xs[0])) {
     xs = _.map(xs, (x) => Date.parse(x))
