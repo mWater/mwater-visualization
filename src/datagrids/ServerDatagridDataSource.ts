@@ -1,10 +1,10 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
-let ServerDatagridDataSource;
-import $ from 'jquery';
-import querystring from 'querystring';
-import DatagridDataSource from './DatagridDataSource';
-import compressJson from '../compressJson';
+let ServerDatagridDataSource
+import $ from "jquery"
+import querystring from "querystring"
+import DatagridDataSource from "./DatagridDataSource"
+import compressJson from "../compressJson"
 
 // Uses mWater server to get datagrid data to allow sharing with unprivileged users
 export default ServerDatagridDataSource = class ServerDatagridDataSource extends DatagridDataSource {
@@ -15,8 +15,8 @@ export default ServerDatagridDataSource = class ServerDatagridDataSource extends
   //   datagridId: datagrid id to use on server
   //   rev: revision to use to allow caching
   constructor(options) {
-    super();
-    this.options = options;
+    super()
+    this.options = options
   }
 
   // Get the data that the widget needs. The widget should implement getData method (see above) to get the data from the server
@@ -30,22 +30,22 @@ export default ServerDatagridDataSource = class ServerDatagridDataSource extends
       rev: this.options.rev,
       offset,
       limit
-    };
+    }
 
-    const url = this.options.apiUrl + `datagrids/${this.options.datagridId}/data?` + querystring.stringify(query);
+    const url = this.options.apiUrl + `datagrids/${this.options.datagridId}/data?` + querystring.stringify(query)
 
-    return $.getJSON(url, data => {
-      return callback(null, data);
-  }).fail(xhr => {
-      console.log(xhr.responseText);
-      return callback(new Error(xhr.responseText));
-    });
+    return $.getJSON(url, (data) => {
+      return callback(null, data)
+    }).fail((xhr) => {
+      console.log(xhr.responseText)
+      return callback(new Error(xhr.responseText))
+    })
   }
 
   getQuickfiltersDataSource() {
-    return new ServerQuickfilterDataSource(this.options);
+    return new ServerQuickfilterDataSource(this.options)
   }
-};
+}
 
 class ServerQuickfilterDataSource {
   // options:
@@ -55,7 +55,7 @@ class ServerQuickfilterDataSource {
   //   datagridId: datagrid id to use on server
   //   rev: revision to use to allow caching
   constructor(options) {
-    this.options = options;
+    this.options = options
   }
 
   // Gets the values of the quickfilter at index
@@ -67,15 +67,18 @@ class ServerQuickfilterDataSource {
       offset,
       limit,
       rev: this.options.rev
-    };
+    }
 
-    const url = this.options.apiUrl + `datagrids/${this.options.datagridId}/quickfilters/${index}/values?` + querystring.stringify(query);
+    const url =
+      this.options.apiUrl +
+      `datagrids/${this.options.datagridId}/quickfilters/${index}/values?` +
+      querystring.stringify(query)
 
-    return $.getJSON(url, data => {
-      return callback(null, data);
-  }).fail(xhr => {
-      console.log(xhr.responseText);
-      return callback(new Error(xhr.responseText));
-    });
+    return $.getJSON(url, (data) => {
+      return callback(null, data)
+    }).fail((xhr) => {
+      console.log(xhr.responseText)
+      return callback(new Error(xhr.responseText))
+    })
   }
 }

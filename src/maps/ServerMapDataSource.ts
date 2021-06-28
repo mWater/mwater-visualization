@@ -1,9 +1,9 @@
 import { injectTableAlias, Schema } from "mwater-expressions"
 import { JsonQLFilter } from "../JsonQLFilter"
-import compressJson from '../compressJson'
+import compressJson from "../compressJson"
 import { MapDesign, MapLayerView } from "./MapDesign"
-import querystring from 'querystring'
-import $ from 'jquery'
+import querystring from "querystring"
+import $ from "jquery"
 import _ from "lodash"
 import { MapDataSource } from "./MapDataSource"
 import { MapLayerDataSource } from "./MapLayerDataSource"
@@ -37,7 +37,6 @@ interface ServerMapLayerDataSourceOptions extends ServerMapDataSourceOptions {
   layerView: MapLayerView
 }
 
-
 /** Get map urls for map stored on server */
 export default class ServerMapDataSource implements MapDataSource {
   options: ServerMapDataSourceOptions
@@ -59,7 +58,11 @@ export default class ServerMapDataSource implements MapDataSource {
   }
 
   // Gets the bounds for the map. Null for no opinion. Callback as { n:, s:, w:, e: }
-  getBounds(design: MapDesign, filters: JsonQLFilter[], callback: (error: any, bounds?: { w: number, n: number, e: number, s: number } | null) => void): void {
+  getBounds(
+    design: MapDesign,
+    filters: JsonQLFilter[],
+    callback: (error: any, bounds?: { w: number; n: number; e: number; s: number } | null) => void
+  ): void {
     const query = {
       client: this.options.client,
       share: this.options.share,
@@ -71,7 +74,7 @@ export default class ServerMapDataSource implements MapDataSource {
 
     $.getJSON(url, (data: any) => {
       return callback(null, data)
-    }).fail(xhr => {
+    }).fail((xhr) => {
       console.log(xhr.responseText)
       return callback(new Error(xhr.responseText))
     })
@@ -111,7 +114,7 @@ class ServerLayerDataSource implements MapLayerDataSource {
       return layer.getTileUrl(this.options.layerView.design, filters)
     }
 
-    return this.createUrl(filters, "png"); 
+    return this.createUrl(filters, "png")
   }
 
   // Get the url for the interactivity tiles with the specified filters applied
@@ -130,19 +133,23 @@ class ServerLayerDataSource implements MapLayerDataSource {
       return layer.getUtfGridUrl(this.options.layerView.design, filters)
     }
 
-    return this.createUrl(filters, "grid.json"); 
+    return this.createUrl(filters, "grid.json")
   }
 
   /** Get the url for vector tile source with an expiry time. Only for layers of type "VectorTile"
    * @param createdAfter ISO 8601 timestamp requiring that tile source on server is created after specified datetime
    */
-  async getVectorTileUrl(layerDesign: any, filters: JsonQLFilter[], createdAfter: string): Promise<{ url: string, expires: string }> {
+  async getVectorTileUrl(
+    layerDesign: any,
+    filters: JsonQLFilter[],
+    createdAfter: string
+  ): Promise<{ url: string; expires: string }> {
     const qs = querystring.stringify({
       client: this.options.client,
       share: this.options.share
     })
 
-    const url =  `${this.options.apiUrl}vector_tiles/create_token/maps/${this.options.mapId}/layers/${this.options.layerView.id}?${qs}`
+    const url = `${this.options.apiUrl}vector_tiles/create_token/maps/${this.options.mapId}/layers/${this.options.layerView.id}?${qs}`
 
     const request: {
       createdAfter?: string
@@ -155,12 +162,12 @@ class ServerLayerDataSource implements MapLayerDataSource {
       filters: compressJson(filters || [])
     }
 
-    const response = await fetch(url, { 
+    const response = await fetch(url, {
       method: "POST",
       body: JSON.stringify(request),
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        Accept: "application/json",
+        "Content-Type": "application/json"
       }
     })
 
@@ -173,7 +180,7 @@ class ServerLayerDataSource implements MapLayerDataSource {
   }
 
   // Gets widget data source for a popup widget
-  getPopupWidgetDataSource(design: any, widgetId: string) { 
+  getPopupWidgetDataSource(design: any, widgetId: string) {
     return new ServerMapLayerPopupWidgetDataSource({
       apiUrl: this.options.apiUrl,
       client: this.options.client,
@@ -225,12 +232,12 @@ class ServerLayerDataSource implements MapLayerDataSource {
     if (this.options.share) {
       url += `&share=${this.options.share}`
     }
-      
+
     // Add where for any relevant filters
-    const relevantFilters = _.where(filters, {table: design.table})
+    const relevantFilters = _.where(filters, { table: design.table })
 
     // If any, create and
-    const whereClauses = _.map(relevantFilters, f => injectTableAlias(f.jsonql, "main"))
+    const whereClauses = _.map(relevantFilters, (f) => injectTableAlias(f.jsonql, "main"))
 
     // Wrap if multiple
     if (whereClauses.length > 1) {
@@ -239,7 +246,7 @@ class ServerLayerDataSource implements MapLayerDataSource {
       where = whereClauses[0]
     }
 
-    if (where) { 
+    if (where) {
       url += "&where=" + encodeURIComponent(compressJson(where))
     }
 
@@ -296,11 +303,14 @@ class ServerMapLayerPopupWidgetDataSource implements WidgetDataSource {
       rev: this.options.rev
     }
 
-    const url = this.options.apiUrl + `maps/${this.options.mapId}/layers/${this.options.layerId}/widgets/${this.options.popupWidgetId}/data?` + querystring.stringify(query)
+    const url =
+      this.options.apiUrl +
+      `maps/${this.options.mapId}/layers/${this.options.layerId}/widgets/${this.options.popupWidgetId}/data?` +
+      querystring.stringify(query)
 
-    return $.getJSON(url, data => {
+    return $.getJSON(url, (data) => {
       return callback(null, data)
-  }).fail(xhr => {
+    }).fail((xhr) => {
       console.log(xhr.responseText)
       return callback(new Error(xhr.responseText))
     })
@@ -317,4 +327,3 @@ class ServerMapLayerPopupWidgetDataSource implements WidgetDataSource {
     return url
   }
 }
-  

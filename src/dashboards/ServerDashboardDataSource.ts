@@ -1,15 +1,15 @@
-import _ from 'lodash'
-import $ from 'jquery'
+import _ from "lodash"
+import $ from "jquery"
 import { DataSource, Expr, injectTableAlias } from "mwater-expressions"
 import { JsonQLFilter } from "../JsonQLFilter"
-import querystring from 'querystring'
+import querystring from "querystring"
 import { QuickfiltersDataSource } from "../quickfilter/QuickfiltersDataSource"
-import { MapDesign, MapLayerView } from '../maps/MapDesign'
-import { MapDataSource } from '../maps/MapDataSource'
-import { MapLayerDataSource } from '../maps/MapLayerDataSource'
-import LayerFactory from '../maps/LayerFactory'
-import { WidgetDataSource } from '../widgets/WidgetDataSource'
-import compressJson from '../compressJson'
+import { MapDesign, MapLayerView } from "../maps/MapDesign"
+import { MapDataSource } from "../maps/MapDataSource"
+import { MapLayerDataSource } from "../maps/MapLayerDataSource"
+import LayerFactory from "../maps/LayerFactory"
+import { WidgetDataSource } from "../widgets/WidgetDataSource"
+import compressJson from "../compressJson"
 
 interface ServerDashboardDataSourceOptions {
   /** API url to use for talking to mWater server */
@@ -74,7 +74,14 @@ class ServerQuickfilterDataSource implements QuickfiltersDataSource {
   }
 
   // Gets the values of the quickfilter at index
-  getValues(index: number, expr: Expr, filters: JsonQLFilter[], offset: number, limit: number, callback: (error: any, values?: any[]) => void): void {
+  getValues(
+    index: number,
+    expr: Expr,
+    filters: JsonQLFilter[],
+    offset: number,
+    limit: number,
+    callback: (error: any, values?: any[]) => void
+  ): void {
     const query = {
       client: this.options.client,
       share: this.options.share,
@@ -84,26 +91,31 @@ class ServerQuickfilterDataSource implements QuickfiltersDataSource {
       rev: this.options.rev
     }
 
-    const url = this.options.apiUrl + `dashboards/${this.options.dashboardId}/quickfilters/${index}/values?` + querystring.stringify(query)
+    const url =
+      this.options.apiUrl +
+      `dashboards/${this.options.dashboardId}/quickfilters/${index}/values?` +
+      querystring.stringify(query)
 
     const headers = {}
     const cacheExpiry = this.options.dataSource.getCacheExpiry()
     if (cacheExpiry) {
       const seconds = Math.floor((new Date().getTime() - cacheExpiry) / 1000)
-      headers['Cache-Control'] = `max-age=${seconds}`
+      headers["Cache-Control"] = `max-age=${seconds}`
     }
 
-    $.ajax({ 
+    $.ajax({
       dataType: "json",
       method: "GET",
       url,
       headers
-    }).done(data => {
-      return callback(null, data)
-  }).fail(xhr => {
-      console.log(xhr.responseText)
-      return callback(new Error(xhr.responseText))
     })
+      .done((data) => {
+        return callback(null, data)
+      })
+      .fail((xhr) => {
+        console.log(xhr.responseText)
+        return callback(new Error(xhr.responseText))
+      })
   }
 }
 
@@ -133,26 +145,31 @@ class ServerWidgetDataSource {
       rev: this.options.rev
     }
 
-    const url = this.options.apiUrl + `dashboards/${this.options.dashboardId}/widgets/${this.options.widgetId}/data?` + querystring.stringify(query)
+    const url =
+      this.options.apiUrl +
+      `dashboards/${this.options.dashboardId}/widgets/${this.options.widgetId}/data?` +
+      querystring.stringify(query)
 
     const headers = {}
     const cacheExpiry = this.options.dataSource.getCacheExpiry()
     if (cacheExpiry) {
       const seconds = Math.floor((new Date().getTime() - cacheExpiry) / 1000)
-      headers['Cache-Control'] = `max-age=${seconds}`
+      headers["Cache-Control"] = `max-age=${seconds}`
     }
 
-    return $.ajax({ 
+    return $.ajax({
       dataType: "json",
       method: "GET",
       url,
       headers
-    }).done(data => {
-      return callback(null, data)
-  }).fail(xhr => {
-      console.log(xhr.responseText)
-      return callback(new Error(xhr.responseText))
     })
+      .done((data) => {
+        return callback(null, data)
+      })
+      .fail((xhr) => {
+        console.log(xhr.responseText)
+        return callback(new Error(xhr.responseText))
+      })
   }
 
   // For map widgets, the following is required
@@ -172,7 +189,7 @@ class ServerWidgetDataSource {
   }
 }
 
-class ServerWidgetMapDataSource implements MapDataSource { 
+class ServerWidgetMapDataSource implements MapDataSource {
   options: ServerWidgetMapDataSourceOptions
 
   // options:
@@ -200,7 +217,11 @@ class ServerWidgetMapDataSource implements MapDataSource {
   }
 
   // Gets the bounds for the map. Null for no opinion. Callback as { n:, s:, w:, e: }
-  getBounds(design: MapDesign, filters: JsonQLFilter[], callback: (error: any, bounds?: { w: number, n: number, e: number, s: number } | null) => void) {
+  getBounds(
+    design: MapDesign,
+    filters: JsonQLFilter[],
+    callback: (error: any, bounds?: { w: number; n: number; e: number; s: number } | null) => void
+  ) {
     const query = {
       client: this.options.client,
       share: this.options.share,
@@ -208,26 +229,31 @@ class ServerWidgetMapDataSource implements MapDataSource {
       rev: this.options.rev
     }
 
-    const url = this.options.apiUrl + `dashboards/${this.options.dashboardId}/widgets/${this.options.widgetId}/bounds?` + querystring.stringify(query)
+    const url =
+      this.options.apiUrl +
+      `dashboards/${this.options.dashboardId}/widgets/${this.options.widgetId}/bounds?` +
+      querystring.stringify(query)
 
     const headers = {}
     const cacheExpiry = this.options.dataSource.getCacheExpiry()
     if (cacheExpiry) {
       const seconds = Math.floor((new Date().getTime() - cacheExpiry) / 1000)
-      headers['Cache-Control'] = `max-age=${seconds}`
+      headers["Cache-Control"] = `max-age=${seconds}`
     }
 
-    $.ajax({ 
+    $.ajax({
       dataType: "json",
       method: "GET",
       url,
       headers
-    }).done(data => {
-      return callback(null, data)
-    }).fail(xhr => {
-      console.log(xhr.responseText)
-      return callback(new Error(xhr.responseText))
     })
+      .done((data) => {
+        return callback(null, data)
+      })
+      .fail((xhr) => {
+        console.log(xhr.responseText)
+        return callback(new Error(xhr.responseText))
+      })
   }
 }
 
@@ -253,10 +279,10 @@ class ServerWidgetLayerDataSource implements MapLayerDataSource {
   constructor(options: ServerWidgetLayerDataSourceOptions) {
     this.options = options
   }
- 
+
   // Get the url for the image tiles with the specified filters applied
   // Called with (design, filters) where design is the layer design and filters are filters to apply. Returns URL
-  getTileUrl(design: any, filters: JsonQLFilter[]) { 
+  getTileUrl(design: any, filters: JsonQLFilter[]) {
     // Handle special cases
     if (this.options.layerView.type === "MWaterServer") {
       return this.createLegacyUrl(this.options.layerView.design, "png", filters)
@@ -275,7 +301,7 @@ class ServerWidgetLayerDataSource implements MapLayerDataSource {
 
   // Get the url for the interactivity tiles with the specified filters applied
   // Called with (design, filters) where design is the layer design and filters are filters to apply. Returns URL
-  getUtfGridUrl(design: any, filters: JsonQLFilter[]) { 
+  getUtfGridUrl(design: any, filters: JsonQLFilter[]) {
     // Handle special cases
     if (this.options.layerView.type === "MWaterServer") {
       return this.createLegacyUrl(this.options.layerView.design, "grid.json", filters)
@@ -295,13 +321,17 @@ class ServerWidgetLayerDataSource implements MapLayerDataSource {
   /** Get the url for vector tile source with an expiry time. Only for layers of type "VectorTile"
    * @param createdAfter ISO 8601 timestamp requiring that tile source on server is created after specified datetime
    */
-  async getVectorTileUrl(layerDesign: any, filters: JsonQLFilter[], createdAfter: string): Promise<{ url: string, expires: string }> {
+  async getVectorTileUrl(
+    layerDesign: any,
+    filters: JsonQLFilter[],
+    createdAfter: string
+  ): Promise<{ url: string; expires: string }> {
     const qs = querystring.stringify({
       client: this.options.client,
       share: this.options.share
     })
 
-    const url =  `${this.options.apiUrl}vector_tiles/create_token/dashboards/${this.options.dashboardId}/widgets/${this.options.widgetId}/layers/${this.options.layerView.id}?${qs}`
+    const url = `${this.options.apiUrl}vector_tiles/create_token/dashboards/${this.options.dashboardId}/widgets/${this.options.widgetId}/layers/${this.options.layerView.id}?${qs}`
 
     const request: {
       createdAfter?: string
@@ -314,12 +344,12 @@ class ServerWidgetLayerDataSource implements MapLayerDataSource {
       filters: compressJson(filters || [])
     }
 
-    const response = await fetch(url, { 
+    const response = await fetch(url, {
       method: "POST",
       body: JSON.stringify(request),
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        Accept: "application/json",
+        "Content-Type": "application/json"
       }
     })
 
@@ -332,7 +362,7 @@ class ServerWidgetLayerDataSource implements MapLayerDataSource {
   }
 
   // Gets widget data source for a popup widget
-  getPopupWidgetDataSource(design: any, widgetId: string) { 
+  getPopupWidgetDataSource(design: any, widgetId: string) {
     return new ServerWidgetLayerPopupWidgetDataSource({ ...this.options, popupWidgetId: widgetId })
   }
 
@@ -384,12 +414,12 @@ class ServerWidgetLayerDataSource implements MapLayerDataSource {
     if (this.options.share) {
       url += `&share=${this.options.share}`
     }
-      
+
     // Add where for any relevant filters
-    const relevantFilters = _.where(filters, {table: design.table})
+    const relevantFilters = _.where(filters, { table: design.table })
 
     // If any, create and
-    const whereClauses = _.map(relevantFilters, f => injectTableAlias(f.jsonql, "main"))
+    const whereClauses = _.map(relevantFilters, (f) => injectTableAlias(f.jsonql, "main"))
 
     // Wrap if multiple
     if (whereClauses.length > 1) {
@@ -398,7 +428,7 @@ class ServerWidgetLayerDataSource implements MapLayerDataSource {
       where = whereClauses[0]
     }
 
-    if (where) { 
+    if (where) {
       url += "&where=" + encodeURIComponent(compressJson(where))
     }
 
@@ -444,26 +474,31 @@ class ServerWidgetLayerPopupWidgetDataSource implements WidgetDataSource {
       rev: this.options.rev
     }
 
-    const url = this.options.apiUrl + `dashboards/${this.options.dashboardId}/widgets/${this.options.widgetId}/layers/${this.options.layerView.id}/widgets/${this.options.popupWidgetId}/data?` + querystring.stringify(query)
+    const url =
+      this.options.apiUrl +
+      `dashboards/${this.options.dashboardId}/widgets/${this.options.widgetId}/layers/${this.options.layerView.id}/widgets/${this.options.popupWidgetId}/data?` +
+      querystring.stringify(query)
 
     const headers = {}
     const cacheExpiry = this.options.dataSource.getCacheExpiry()
     if (cacheExpiry) {
       const seconds = Math.floor((new Date().getTime() - cacheExpiry) / 1000)
-      headers['Cache-Control'] = `max-age=${seconds}`
+      headers["Cache-Control"] = `max-age=${seconds}`
     }
 
-    $.ajax({ 
+    $.ajax({
       dataType: "json",
       method: "GET",
       url,
       headers
-    }).done(data => {
-      return callback(null, data)
-  }).fail(xhr => {
-      console.log(xhr.responseText)
-      return callback(new Error(xhr.responseText))
     })
+      .done((data) => {
+        return callback(null, data)
+      })
+      .fail((xhr) => {
+        console.log(xhr.responseText)
+        return callback(new Error(xhr.responseText))
+      })
   }
 
   /** For map widgets, the following is required */
@@ -482,4 +517,3 @@ class ServerWidgetLayerPopupWidgetDataSource implements WidgetDataSource {
     return url
   }
 }
-  

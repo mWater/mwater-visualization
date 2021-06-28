@@ -1,21 +1,30 @@
-import _ from 'lodash'
-import { ExprCompiler, ExprUtils, injectTableAlias, DataSource, Expr, Schema, FieldExpr, OpExpr } from 'mwater-expressions'
-import { JsonQLFilter } from '..'
-import { JsonQLQuery, JsonQLSelectQuery } from 'jsonql'
+import _ from "lodash"
+import {
+  ExprCompiler,
+  ExprUtils,
+  injectTableAlias,
+  DataSource,
+  Expr,
+  Schema,
+  FieldExpr,
+  OpExpr
+} from "mwater-expressions"
+import { JsonQLFilter } from ".."
+import { JsonQLQuery, JsonQLSelectQuery } from "jsonql"
 
 /** Perform query to find quickfilter values for text and text[] expressions
  * text[] expressions are tricky as they need a special query
  * In order to filter the text[] queries, filters must use table "value" and filter on no column
  */
 export function findExprValues(
-    expr: Expr, 
-    schema: Schema, 
-    dataSource: DataSource, 
-    filters: JsonQLFilter[] | undefined, 
-    offset: number | undefined, 
-    limit: number | undefined, 
-    callback: (err: any, values?: string[]) => void) {
-
+  expr: Expr,
+  schema: Schema,
+  dataSource: DataSource,
+  filters: JsonQLFilter[] | undefined,
+  offset: number | undefined,
+  limit: number | undefined,
+  callback: (err: any, values?: string[]) => void
+) {
   const exprCompiler = new ExprCompiler(schema)
   const exprUtils = new ExprUtils(schema)
 
@@ -28,13 +37,11 @@ export function findExprValues(
   let query: JsonQLSelectQuery
 
   if (exprType == "text") {
-    // select distinct <compiled expr> as value from <table> where <filters> order by 1 offset limit 
+    // select distinct <compiled expr> as value from <table> where <filters> order by 1 offset limit
     query = {
       type: "query",
       distinct: true,
-      selects: [
-        { type: "select", expr: exprCompiler.compileExpr({ expr, tableAlias: "main" }), alias: "value" }
-      ],
+      selects: [{ type: "select", expr: exprCompiler.compileExpr({ expr, tableAlias: "main" }), alias: "value" }],
       from: exprCompiler.compileTable(table, "main"),
       where: {
         type: "op",
@@ -47,36 +54,35 @@ export function findExprValues(
     }
 
     // Add filters if present
-    for (const filter of (filters || [])) {
+    for (const filter of filters || []) {
       if (filter.table == table) {
         // TODO Type this properly
-        (query.where as any).exprs.push(injectTableAlias(filter.jsonql, "main"))
+        ;(query.where as any).exprs.push(injectTableAlias(filter.jsonql, "main"))
       }
     }
-  }
-  else if (exprType == "text[]") {
-    // select distinct value from 
+  } else if (exprType == "text[]") {
+    // select distinct value from
     // <table> as main cross join jsonb_array_elements_text(<compiled expr>) as value
-    // where value like 'abc%' 
+    // where value like 'abc%'
     // order by 1
     query = {
       type: "query",
       distinct: true,
-      selects: [
-        { type: "select", expr: { type: "field", tableAlias: "value" }, alias: "value" }
-      ],
+      selects: [{ type: "select", expr: { type: "field", tableAlias: "value" }, alias: "value" }],
       from: {
         type: "join",
         kind: "cross",
         left: exprCompiler.compileTable(table, "main"),
         right: {
           type: "subexpr",
-          expr: { type: "op", op: "jsonb_array_elements_text", exprs: [
-            { type: "op", op: "to_jsonb", exprs: [exprCompiler.compileExpr({ expr, tableAlias: "main" })] }
-          ]},
+          expr: {
+            type: "op",
+            op: "jsonb_array_elements_text",
+            exprs: [{ type: "op", op: "to_jsonb", exprs: [exprCompiler.compileExpr({ expr, tableAlias: "main" })] }]
+          },
           alias: "value"
         }
-      },        
+      },
       where: {
         type: "op",
         op: "and",
@@ -88,18 +94,17 @@ export function findExprValues(
     }
 
     // Add filters if present. Value filters must be for pseudo-table "_values_" on column "value"
-    for (const filter of (filters || [])) {
+    for (const filter of filters || []) {
       if (filter.table == table) {
         // TODO Type this properly
-        (query.where as any).exprs.push(injectTableAlias(filter.jsonql, "main"))
+        ;(query.where as any).exprs.push(injectTableAlias(filter.jsonql, "main"))
       }
       if (filter.table == "value") {
         // TODO Type this properly
-        (query.where as any).exprs.push(injectTableAlias(filter.jsonql, "value"))
+        ;(query.where as any).exprs.push(injectTableAlias(filter.jsonql, "value"))
       }
     }
-  }
-  else {
+  } else {
     return callback(new Error(`Filter type ${exprType} not supported`))
   }
 
@@ -107,7 +112,7 @@ export function findExprValues(
   dataSource.performQuery(query, (err, rows) => {
     if (err) {
       callback(err)
-      return 
+      return
     }
 
     // Filter null and blank

@@ -77,10 +77,9 @@
 
 //   createQueries: (design) -> { a: "querya", b: "queryb" }
 
-//   # Options include 
+//   # Options include
 //   # design: design of the component
 //   # data: results from queries
 //   # width, height: size of the chart view
 //   createViewElement: (options) ->
 //     return R 'div', null, JSON.stringify(options.data)
-

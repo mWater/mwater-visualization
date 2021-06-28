@@ -1,83 +1,95 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
-let FontSizePaletteItem;
-import PropTypes from 'prop-types';
-import React from 'react';
-const R = React.createElement;
-import _ from 'lodash';
-import ClickOutHandler from 'react-onclickout';
+let FontSizePaletteItem
+import PropTypes from "prop-types"
+import React from "react"
+const R = React.createElement
+import _ from "lodash"
+import ClickOutHandler from "react-onclickout"
 
 // Palette item that allows picking a size from dropdown
-export default FontSizePaletteItem = (function() {
+export default FontSizePaletteItem = (function () {
   FontSizePaletteItem = class FontSizePaletteItem extends React.Component {
     static initClass() {
       this.propTypes = {
-        onSetSize: PropTypes.func.isRequired,  // Called with "125%", etc.
+        onSetSize: PropTypes.func.isRequired, // Called with "125%", etc.
         position: PropTypes.string // should the popup be under or over?
-      };
-  
-      this.defaultProps =
-        {position: "under"};
+      }
+
+      this.defaultProps = { position: "under" }
     }
 
     constructor(props) {
-      super(props);
+      super(props)
       this.state = {
         open: false
-      };
+      }
     }
 
-    handleMouseDown = ev => { 
+    handleMouseDown = (ev) => {
       // Don't lose focus from editor
-      ev.preventDefault();
-      return this.setState({open: !this.state.open});
-    };
+      ev.preventDefault()
+      return this.setState({ open: !this.state.open })
+    }
 
     renderSize(label, value) {
-      return R('div', { 
-        className: "font-size-palette-menu-item",
-        onMouseDown: ev => { 
-          ev.preventDefault();
-          this.props.onSetSize(value);
-          return this.setState({open: false});
+      return R(
+        "div",
+        {
+          className: "font-size-palette-menu-item",
+          onMouseDown: (ev) => {
+            ev.preventDefault()
+            this.props.onSetSize(value)
+            return this.setState({ open: false })
+          },
+          key: value
         },
-        key: value
-      },
-          label);
+        label
+      )
     }
 
     renderSizes() {
-      return R('div', null,
+      return R(
+        "div",
+        null,
         this.renderSize("Tiny", "50%"),
         this.renderSize("Small", "66%"),
         this.renderSize("Normal", "100%"),
         this.renderSize("Large", "150%"),
-        this.renderSize("Huge", "200%"));
+        this.renderSize("Huge", "200%")
+      )
     }
 
     render() {
       const popupPosition = {
-        position: 'absolute',
+        position: "absolute",
         left: 0,
         zIndex: 1000,
         backgroundColor: "white",
         border: "solid 1px #AAA",
         borderRadius: 3
-      };
-
-      if (this.props.position === "under") {
-        popupPosition['top'] = 26;
-      } else { 
-        popupPosition['bottom'] = 26;
       }
 
-      return R(ClickOutHandler, {onClickOut: (() => this.setState({open: false}))},
-        R('div', { 
-          className: "mwater-visualization-text-palette-item",
-          onMouseDown: this.handleMouseDown,
-          style: { position: "relative" }
-        },
-            R('style', null, `\
+      if (this.props.position === "under") {
+        popupPosition["top"] = 26
+      } else {
+        popupPosition["bottom"] = 26
+      }
+
+      return R(
+        ClickOutHandler,
+        { onClickOut: () => this.setState({ open: false }) },
+        R(
+          "div",
+          {
+            className: "mwater-visualization-text-palette-item",
+            onMouseDown: this.handleMouseDown,
+            style: { position: "relative" }
+          },
+          R(
+            "style",
+            null,
+            `\
 .font-size-palette-menu-item {
   color: black;
   background-color: white;
@@ -89,37 +101,35 @@ export default FontSizePaletteItem = (function() {
   background-color: #DDD;
 }\
 `
-            ),
-            this.state.open ?
-              R('div', {style: popupPosition},
-                this.renderSizes()) : undefined,
+          ),
+          this.state.open ? R("div", { style: popupPosition }, this.renderSizes()) : undefined,
 
-            R('i', {className: "fa fa-arrows-v"}))
-      );
+          R("i", { className: "fa fa-arrows-v" })
+        )
+      )
     }
-  };
-  FontSizePaletteItem.initClass();
-  return FontSizePaletteItem;
-})();
-
+  }
+  FontSizePaletteItem.initClass()
+  return FontSizePaletteItem
+})()
 
 class ColorPaletteComponent extends React.Component {
   static initClass() {
-    this.propTypes =
-      {onSetColor: PropTypes.func.isRequired};
+    this.propTypes = { onSetColor: PropTypes.func.isRequired }
   }
 
   renderColor(color) {
-    return R('td', null,
-      R('div', { 
+    return R(
+      "td",
+      null,
+      R("div", {
         style: { width: 16, height: 15, backgroundColor: color, margin: 1 },
-        onMouseDown: ev => {
-          ev.preventDefault();
-          return this.props.onSetColor.bind(null, color);
+        onMouseDown: (ev) => {
+          ev.preventDefault()
+          return this.props.onSetColor.bind(null, color)
         }
-      }
-      )
-    );
+      })
+    )
   }
 
   render() {
@@ -132,36 +142,65 @@ class ColorPaletteComponent extends React.Component {
       "#0000FF", // blue
       "#9900FF", // purple
       "#FF00FF" // magenta
-    ];
-    return R('div', {style: { padding: 5 }},
-      R('table', null,
-        R('tbody', null,
+    ]
+    return R(
+      "div",
+      { style: { padding: 5 } },
+      R(
+        "table",
+        null,
+        R(
+          "tbody",
+          null,
           // Grey shades
-          R('tr', null,
-            _.map(_.range(0, 8), i => {
-              return this.renderColor(Color({r: (i * 255) / 7, g: (i * 255) / 7, b: (i * 255) / 7}).hex());
+          R(
+            "tr",
+            null,
+            _.map(_.range(0, 8), (i) => {
+              return this.renderColor(Color({ r: (i * 255) / 7, g: (i * 255) / 7, b: (i * 255) / 7 }).hex())
             })
           ),
-          R('tr', {style: { height: 5 }}),
+          R("tr", { style: { height: 5 } }),
           // Base colors
-          R('tr', null,
-            _.map(baseColors, c => this.renderColor(c))),
-          R('tr', {style: { height: 5 }}),
-          R('tr', null,
-            _.map(baseColors, c => this.renderColor(Color(c).lighten(0.7).hex()))),
-          R('tr', null,
-            _.map(baseColors, c => this.renderColor(Color(c).lighten(0.5).hex()))),
-          R('tr', null,
-            _.map(baseColors, c => this.renderColor(Color(c).lighten(0.3).hex()))),
-          R('tr', null,
-            _.map(baseColors, c => this.renderColor(Color(c).darken(0.3).hex()))),
-          R('tr', null,
-            _.map(baseColors, c => this.renderColor(Color(c).darken(0.5).hex()))),
-          R('tr', null,
-            _.map(baseColors, c => this.renderColor(Color(c).darken(0.7).hex())))
+          R(
+            "tr",
+            null,
+            _.map(baseColors, (c) => this.renderColor(c))
+          ),
+          R("tr", { style: { height: 5 } }),
+          R(
+            "tr",
+            null,
+            _.map(baseColors, (c) => this.renderColor(Color(c).lighten(0.7).hex()))
+          ),
+          R(
+            "tr",
+            null,
+            _.map(baseColors, (c) => this.renderColor(Color(c).lighten(0.5).hex()))
+          ),
+          R(
+            "tr",
+            null,
+            _.map(baseColors, (c) => this.renderColor(Color(c).lighten(0.3).hex()))
+          ),
+          R(
+            "tr",
+            null,
+            _.map(baseColors, (c) => this.renderColor(Color(c).darken(0.3).hex()))
+          ),
+          R(
+            "tr",
+            null,
+            _.map(baseColors, (c) => this.renderColor(Color(c).darken(0.5).hex()))
+          ),
+          R(
+            "tr",
+            null,
+            _.map(baseColors, (c) => this.renderColor(Color(c).darken(0.7).hex()))
+          )
         )
       )
-    );
+    )
   }
 }
-ColorPaletteComponent.initClass();
+ColorPaletteComponent.initClass()

@@ -1,18 +1,18 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
-let TextWidget;
-import React from 'react';
-const R = React.createElement;
-import _ from 'lodash';
-import async from 'async';
-import { ExprUtils } from 'mwater-expressions';
-import { ExprCompiler } from 'mwater-expressions';
-import { ExprCleaner } from 'mwater-expressions';
-import { injectTableAlias } from 'mwater-expressions';
-import Widget from '../Widget';
+let TextWidget
+import React from "react"
+const R = React.createElement
+import _ from "lodash"
+import async from "async"
+import { ExprUtils } from "mwater-expressions"
+import { ExprCompiler } from "mwater-expressions"
+import { ExprCleaner } from "mwater-expressions"
+import { injectTableAlias } from "mwater-expressions"
+import Widget from "../Widget"
 
 export default TextWidget = class TextWidget extends Widget {
-  // Creates a React element that is a view of the widget 
+  // Creates a React element that is a view of the widget
   // options:
   //  schema: schema to use
   //  dataSource: data source to use
@@ -28,8 +28,8 @@ export default TextWidget = class TextWidget extends Widget {
   //  namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
   createViewElement(options) {
     // Put here so TextWidget can be created on server
-    const TextWidgetComponent = require('./TextWidgetComponent');
-    
+    const TextWidgetComponent = require("./TextWidgetComponent")
+
     return R(TextWidgetComponent, {
       schema: options.schema,
       dataSource: options.dataSource,
@@ -42,8 +42,7 @@ export default TextWidget = class TextWidget extends Widget {
       singleRowTable: options.singleRowTable,
       namedStrings: options.namedStrings,
       ref: options.widgetRef
-    }
-    );
+    })
   }
 
   // Get the data that the widget needs. This will be called on the server, typically.
@@ -55,146 +54,159 @@ export default TextWidget = class TextWidget extends Widget {
   getData(design, schema, dataSource, filters, callback) {
     // Evaluates a single exprItem
     const evalExprItem = (exprItem, cb) => {
-      let query, whereClauses;
+      let query, whereClauses
       if (!exprItem.expr) {
-        return cb(null);
+        return cb(null)
       }
 
-      const {
-        table
-      } = exprItem.expr;
+      const { table } = exprItem.expr
 
       // If table doesn't exist, return null
       if (table && !schema.getTable(table)) {
-        return cb(null);
+        return cb(null)
       }
 
-      const exprCompiler = new ExprCompiler(schema);
-      const exprUtils = new ExprUtils(schema);
+      const exprCompiler = new ExprCompiler(schema)
+      const exprUtils = new ExprUtils(schema)
 
       // Clean expression
-      const exprCleaner = new ExprCleaner(schema);
-      let expr = exprCleaner.cleanExpr(exprItem.expr, {aggrStatuses: ["individual", "literal", "aggregate"]});
+      const exprCleaner = new ExprCleaner(schema)
+      let expr = exprCleaner.cleanExpr(exprItem.expr, { aggrStatuses: ["individual", "literal", "aggregate"] })
 
       // Get relevant filters
       if (table) {
-        const relevantFilters = _.where(filters || [], {table});
-        whereClauses = _.map(relevantFilters, f => injectTableAlias(f.jsonql, "main")); 
-      } else { 
-        whereClauses = [];
+        const relevantFilters = _.where(filters || [], { table })
+        whereClauses = _.map(relevantFilters, (f) => injectTableAlias(f.jsonql, "main"))
+      } else {
+        whereClauses = []
       }
 
       // In case of "sum where"/"count where", extract where clause to make faster
-      if (expr?.op === 'sum where') {
-        whereClauses.push(exprCompiler.compileExpr({expr: expr.exprs[1], tableAlias: "main"}));
-        expr = { type: "op", table: expr.table, op: "sum", exprs: [expr.exprs[0]] };
-      } else if (expr?.op === 'count where') {
-        whereClauses.push(exprCompiler.compileExpr({expr: expr.exprs[0], tableAlias: "main"}));
-        expr = { type: "op", table: expr.table, op: "count", exprs: [] };
+      if (expr?.op === "sum where") {
+        whereClauses.push(exprCompiler.compileExpr({ expr: expr.exprs[1], tableAlias: "main" }))
+        expr = { type: "op", table: expr.table, op: "sum", exprs: [expr.exprs[0]] }
+      } else if (expr?.op === "count where") {
+        whereClauses.push(exprCompiler.compileExpr({ expr: expr.exprs[0], tableAlias: "main" }))
+        expr = { type: "op", table: expr.table, op: "count", exprs: [] }
       }
 
-      let compiledExpr = exprCompiler.compileExpr({expr, tableAlias: "main"});
-      const exprType = exprUtils.getExprType(expr);
+      let compiledExpr = exprCompiler.compileExpr({ expr, tableAlias: "main" })
+      const exprType = exprUtils.getExprType(expr)
 
       // Handle special case of geometry, converting to GeoJSON
       if (exprType === "geometry") {
         // Convert to 4326 (lat/long). Force ::geometry for null
-        compiledExpr = { type: "op", op: "::jsonb", exprs: [
-          { type: "op", op: "ST_AsGeoJSON", exprs: [{ type: "op", op: "ST_Transform", exprs: [{ type: "op", op: "::geometry", exprs: [compiledExpr]}, 4326] }] }
-        ]};
+        compiledExpr = {
+          type: "op",
+          op: "::jsonb",
+          exprs: [
+            {
+              type: "op",
+              op: "ST_AsGeoJSON",
+              exprs: [
+                {
+                  type: "op",
+                  op: "ST_Transform",
+                  exprs: [{ type: "op", op: "::geometry", exprs: [compiledExpr] }, 4326]
+                }
+              ]
+            }
+          ]
+        }
       }
 
-      const aggrStatus = exprUtils.getExprAggrStatus(expr);
-      if ((aggrStatus === "individual") || (aggrStatus === "literal")) {
+      const aggrStatus = exprUtils.getExprAggrStatus(expr)
+      if (aggrStatus === "individual" || aggrStatus === "literal") {
         // Get two distinct examples to know if unique if not aggregate
         query = {
           distinct: true,
-          selects: [
-            { type: "select", expr: compiledExpr, alias: "value" }
-          ],
+          selects: [{ type: "select", expr: compiledExpr, alias: "value" }],
           from: table ? exprCompiler.compileTable(table, "main") : undefined,
           limit: 2
-        };
-      } else { 
+        }
+      } else {
         query = {
-          selects: [
-            { type: "select", expr: compiledExpr, alias: "value" }
-          ],
+          selects: [{ type: "select", expr: compiledExpr, alias: "value" }],
           from: table ? exprCompiler.compileTable(table, "main") : undefined
-        };
+        }
       }
 
-      whereClauses = _.compact(whereClauses);
+      whereClauses = _.compact(whereClauses)
 
       // Wrap if multiple
       if (whereClauses.length > 1) {
-        query.where = { type: "op", op: "and", exprs: whereClauses };
+        query.where = { type: "op", op: "and", exprs: whereClauses }
       } else {
-        query.where = whereClauses[0];
+        query.where = whereClauses[0]
       }
 
       // Execute query
       return dataSource.performQuery(query, (error, rows) => {
         if (error) {
-          return cb(error);
+          return cb(error)
         } else {
           // If multiple, use null
           if (rows.length !== 1) {
-            return cb(null, null);
-          } else { 
-            return cb(null, rows[0].value);
+            return cb(null, null)
+          } else {
+            return cb(null, rows[0].value)
           }
         }
-      });
-    };
+      })
+    }
 
     // Map of value by id
-    const exprValues = {};
+    const exprValues = {}
 
-    return async.each(this.getExprItems(design.items), (exprItem, cb) => {
-      return evalExprItem(exprItem, (error, value) => {
+    return async.each(
+      this.getExprItems(design.items),
+      (exprItem, cb) => {
+        return evalExprItem(exprItem, (error, value) => {
+          if (error) {
+            return cb(error)
+          } else {
+            exprValues[exprItem.id] = value
+            return cb(null)
+          }
+        })
+      },
+      (error) => {
         if (error) {
-          return cb(error);
+          return callback(error)
         } else {
-          exprValues[exprItem.id] = value;
-          return cb(null);
+          return callback(null, exprValues)
         }
-        });
-    }
-    , error => {
-      if (error) {
-        return callback(error);
-      } else {
-        return callback(null, exprValues);
       }
-    });
+    )
   }
 
   // Determine if widget is auto-height, which means that a vertical height is not required.
-  isAutoHeight() { return true; }
+  isAutoHeight() {
+    return true
+  }
 
   // Get expression items recursively
   getExprItems(items) {
-    let exprItems = [];
-    for (let item of (items || [])) {
+    let exprItems = []
+    for (let item of items || []) {
       if (item.type === "expr") {
-        exprItems.push(item);
+        exprItems.push(item)
       }
       if (item.items) {
-        exprItems = exprItems.concat(this.getExprItems(item.items));
+        exprItems = exprItems.concat(this.getExprItems(item.items))
       }
     }
-    return exprItems;
+    return exprItems
   }
 
   // Get a list of table ids that can be filtered on
   getFilterableTables(design, schema) {
-    const exprItems = this.getExprItems(design.items);
+    const exprItems = this.getExprItems(design.items)
 
-    let filterableTables = _.map(exprItems, exprItem => exprItem.expr?.table);
+    let filterableTables = _.map(exprItems, (exprItem) => exprItem.expr?.table)
 
-    filterableTables = _.uniq(_.compact(filterableTables));
-    return filterableTables;
+    filterableTables = _.uniq(_.compact(filterableTables))
+    return filterableTables
   }
 
   // Get table of contents entries for the widget, entries that should be displayed in the TOC.
@@ -202,48 +214,48 @@ export default TextWidget = class TextWidget extends Widget {
   // For simplicity, the h1, h2, etc. have ids of 0, 1, 2 in the order they appear. h1, h2 will be given ids 0, 1 respectively.
   getTOCEntries(design, namedStrings) {
     // Find all items that are h1, h2, etc
-    const entries = [];
+    const entries = []
 
     // Convert items into flat text
     function flattenText(items) {
-      let text = _.map(items, function(item) {
+      let text = _.map(items, function (item) {
         if (_.isString(item)) {
-          return item;
+          return item
         }
         if (item?.items) {
-          return flattenText(item.items);
+          return flattenText(item.items)
         }
-        }).join("");
+      }).join("")
 
       // Handle named strings
-      return text = text.replace(/\{\{.+?\}\}/g, match => {
-        const name = match.substr(2, match.length - 4);
-        if (namedStrings && (namedStrings[name] != null)) {
-          return namedStrings[name];
+      return (text = text.replace(/\{\{.+?\}\}/g, (match) => {
+        const name = match.substr(2, match.length - 4)
+        if (namedStrings && namedStrings[name] != null) {
+          return namedStrings[name]
         } else {
-          return match;
+          return match
         }
-        });
+      }))
     }
 
-
-    var findRecursive = items => (() => {
-      const result = [];
-      for (let item of (items || [])) {
-        if ((item?.type === "element") && item.tag.match(/^h[1-9]$/)) {
-          entries.push({ id: entries.length, level: parseInt(item.tag.substr(1)), text: flattenText(item.items) });
+    var findRecursive = (items) =>
+      (() => {
+        const result = []
+        for (let item of items || []) {
+          if (item?.type === "element" && item.tag.match(/^h[1-9]$/)) {
+            entries.push({ id: entries.length, level: parseInt(item.tag.substr(1)), text: flattenText(item.items) })
+          }
+          if (item?.items) {
+            result.push(findRecursive(item.items))
+          } else {
+            result.push(undefined)
+          }
         }
-        if (item?.items) {
-          result.push(findRecursive(item.items));
-        } else {
-          result.push(undefined);
-        }
-      }
-      return result;
-    })();
+        return result
+      })()
 
-    findRecursive(design.items);
+    findRecursive(design.items)
 
-    return entries;
+    return entries
   }
-};
+}

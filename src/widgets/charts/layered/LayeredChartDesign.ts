@@ -38,7 +38,7 @@ export interface LayeredChartDesign {
   footer?: TextWidgetDesign
 
   /** array of { value:, label:, color: } thresholds to draw on y-axis. Only for non-polar. Color takes effect if y > threshold */
-  yThresholds?: { value: number, label: string, color: string }[]
+  yThresholds?: { value: number; label: string; color: string }[]
 
   /** order of pie/donut charts. Default is "desc" (if undefined). Can be "desc", "asc", "natural" */
   polarOrder?: "desc" | "asc" | "natural"

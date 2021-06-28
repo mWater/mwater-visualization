@@ -1,7 +1,7 @@
-import { JsonQLQuery } from "jsonql";
+import { JsonQLQuery } from "jsonql"
 
 export interface LayerDefinition {
-  layers: Array<{ 
+  layers: Array<{
     /** Layer id */
     id: string
     /** jsonql that includes "the_webmercator_geom" as a column */
@@ -11,12 +11,16 @@ export interface LayerDefinition {
   /** carto css */
   css: string
 
-  interactivity?: { 
+  interactivity?: {
     /** id of layer */
-    layer: string, 
+    layer: string
     /** array of field names */
-    fields: string[] 
+    fields: string[]
   }
 }
 
-export type OnGridClickResults = { scope?: any, row?: { tableId: string, primaryKey: any }, popup?: React.ReactElement<{}> } | null
+export type OnGridClickResults = {
+  scope?: any
+  row?: { tableId: string; primaryKey: any }
+  popup?: React.ReactElement<{}>
+} | null

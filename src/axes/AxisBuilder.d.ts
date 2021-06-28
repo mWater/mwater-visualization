@@ -1,6 +1,6 @@
-import { Schema } from "mwater-expressions";
-import { Axis } from "./Axis";
-import { JsonQLExpr } from "jsonql";
+import { Schema } from "mwater-expressions"
+import { Axis } from "./Axis"
+import { JsonQLExpr } from "jsonql"
 
 type AggrNeed = "none" | "optional" | "required"
 
@@ -14,7 +14,7 @@ declare class AxisBuilder {
      aggrNeed is "none", "optional" or "required"
      types: optional list of types to require it to be one of
   */
-  cleanAxis(options: { axis: Axis | null, table?: string | null, aggrNeed?: AggrNeed, types?: string[] }): Axis
+  cleanAxis(options: { axis: Axis | null; table?: string | null; aggrNeed?: AggrNeed; types?: string[] }): Axis
 
   /** Checks whether an axis is valid 
     options:
@@ -25,12 +25,12 @@ declare class AxisBuilder {
   /**
    * Compile an axis to JsonQL
    */
-  compileAxis(options: { axis: Axis, tableAlias: string }): JsonQLExpr
+  compileAxis(options: { axis: Axis; tableAlias: string }): JsonQLExpr
 
   /** Get all categories for a given axis type given the known values
    * Returns array of { value, label }
    */
-  getCategories(axis: Axis, values: any[], locale?: string): { value: any, label: string }[]
+  getCategories(axis: Axis, values: any[], locale?: string): { value: any; label: string }[]
 }
 
 export = AxisBuilder

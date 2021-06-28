@@ -13,9 +13,9 @@
 //     @state = { design: @props.initialDesign }
 
 //   componentDidMount: ->
-//     visualization_mwater.setup { 
+//     visualization_mwater.setup {
 //       apiUrl: @props.apiUrl
-//       client: @props.client 
+//       client: @props.client
 //       onMarkerClick: (table, id) => alert("#{table}:#{id}")
 //     }, (err, results) =>
 //       if err
@@ -26,7 +26,7 @@
 //   handleDesignChange: (design) =>
 //     @setState(design: design)
 //     console.log JSON.stringify(design, null, 2)
-    
+
 //   render: ->
 //     if not @state.schema
 //       return R 'div', null, "Loading..."
@@ -54,8 +54,8 @@
 //       maxZoom: options.maxZoom
 //     }
 //   }
-  
-//   layerViews.push { 
+
+//   layerViews.push {
 //     id: uuid()
 //     name: options.name
 //     visible: options.visible == true
@@ -112,7 +112,7 @@
 //   },
 //   "visible": true,
 //   "opacity": 1
-// }  
+// }
 
 // design = {
 //   baseLayer: "bing_road"
@@ -120,7 +120,6 @@
 //   filters: {}
 //   bounds: { w: 0, n: 0, e: 40, s: -25 }
 // }
-
 
 // $ ->
 //   # sample = React.createElement(MapDemoComponent, initialDesign: design, apiUrl: "http://localhost:1234/v3/")

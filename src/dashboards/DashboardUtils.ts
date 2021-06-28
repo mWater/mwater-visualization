@@ -19,7 +19,7 @@ export function getFilterableTables(design: DashboardDesign, schema: Schema) {
   }
 
   // Remove non-existant tables
-  filterableTables = _.filter(_.uniq(filterableTables), table => schema.getTable(table))
+  filterableTables = _.filter(_.uniq(filterableTables), (table) => schema.getTable(table))
 
   return filterableTables
 }
@@ -40,14 +40,14 @@ export function getCompiledFilters(design: DashboardDesign, schema: Schema, filt
     expr = object[table]
     expr = exprCleaner.cleanExpr(expr, { table })
 
-    jsonql = exprCompiler.compileExpr({expr, tableAlias: "{alias}"})
+    jsonql = exprCompiler.compileExpr({ expr, tableAlias: "{alias}" })
     if (jsonql) {
       compiledFilters.push({ table, jsonql })
     }
   }
 
   // Add global filters
-  for (let filter of (design.globalFilters || [])) {
+  for (let filter of design.globalFilters || []) {
     for (table of filterableTables) {
       // Check if exists and is correct type
       const column = schema.getColumn(table, filter.columnId)
@@ -66,7 +66,7 @@ export function getCompiledFilters(design: DashboardDesign, schema: Schema, filt
       // Clean expr
       expr = exprCleaner.cleanExpr(expr, { table })
 
-      jsonql = exprCompiler.compileExpr({expr, tableAlias: "{alias}"})
+      jsonql = exprCompiler.compileExpr({ expr, tableAlias: "{alias}" })
       if (jsonql) {
         compiledFilters.push({ table, jsonql })
       }

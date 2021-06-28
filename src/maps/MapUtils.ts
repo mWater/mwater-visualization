@@ -10,17 +10,17 @@ import { MapDesign } from "./MapDesign"
 export interface MapScope {
   name: string
   filter: JsonQLFilter
-  data: { layerViewId: string, data: any }
+  data: { layerViewId: string; data: any }
 }
 
 // Check if can convert to a cluster map. Only maps containing marker views can be
 export function canConvertToClusterMap(design: MapDesign) {
-  return _.any(design.layerViews, lv => lv.type === "Markers")
+  return _.any(design.layerViews, (lv) => lv.type === "Markers")
 }
 
 // Convert to a cluster map
 export function convertToClusterMap(design: MapDesign) {
-  const layerViews = _.map(design.layerViews, lv => {
+  const layerViews = _.map(design.layerViews, (lv) => {
     if (lv.type !== "Markers") {
       return lv
     }
@@ -31,7 +31,7 @@ export function convertToClusterMap(design: MapDesign) {
     lv.type = "Cluster"
     lv.design = {
       table: lv.design.table,
-      axes: { geometry: (lv.design.axes != null ? lv.design.axes.geometry : undefined) },
+      axes: { geometry: lv.design.axes != null ? lv.design.axes.geometry : undefined },
       filter: lv.design.filter,
       fillColor: lv.design.color,
       minZoom: lv.design.minZoom,
@@ -41,7 +41,7 @@ export function convertToClusterMap(design: MapDesign) {
     return lv
   })
 
-  return _.extend({}, design, {layerViews})
+  return _.extend({}, design, { layerViews })
 }
 
 // Get ids of filterable tables
@@ -56,12 +56,16 @@ export function getFilterableTables(design: MapDesign, schema: Schema) {
   }
 
   // Remove non-existant tables
-  filterableTables = _.filter(filterableTables, table => schema.getTable(table))
+  filterableTables = _.filter(filterableTables, (table) => schema.getTable(table))
   return filterableTables
 }
 
 // Compile map filters with global filters
-export function getCompiledFilters(design: MapDesign, schema: Schema, filterableTables: string[]): { table: string, jsonql: JsonQLExpr }[] {
+export function getCompiledFilters(
+  design: MapDesign,
+  schema: Schema,
+  filterableTables: string[]
+): { table: string; jsonql: JsonQLExpr }[] {
   const exprCompiler = new ExprCompiler(schema)
   const exprCleaner = new ExprCleaner(schema)
   const exprUtils = new ExprUtils(schema)
@@ -71,14 +75,14 @@ export function getCompiledFilters(design: MapDesign, schema: Schema, filterable
   // Compile filters to JsonQL expected by layers
   for (const table in design.filters || {}) {
     const expr = design.filters[table]
-    const jsonql = exprCompiler.compileExpr({expr, tableAlias: "{alias}"})
+    const jsonql = exprCompiler.compileExpr({ expr, tableAlias: "{alias}" })
     if (jsonql) {
       compiledFilters.push({ table, jsonql })
     }
   }
 
   // Add global filters
-  for (let filter of (design.globalFilters || [])) {
+  for (let filter of design.globalFilters || []) {
     for (const table of filterableTables) {
       // Check if exists and is correct type
       const column = schema.getColumn(table, filter.columnId)
@@ -97,7 +101,7 @@ export function getCompiledFilters(design: MapDesign, schema: Schema, filterable
       // Clean expr
       expr = exprCleaner.cleanExpr(expr, { table })
 
-      const jsonql = exprCompiler.compileExpr({expr, tableAlias: "{alias}"})
+      const jsonql = exprCompiler.compileExpr({ expr, tableAlias: "{alias}" })
       if (jsonql) {
         compiledFilters.push({ table, jsonql })
       }

@@ -1,52 +1,52 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
-let LayerFactory;
-import MWaterServerLayer from './MWaterServerLayer';
-import { default as MarkersLayer } from './MarkersLayer';
-import { default as BufferLayer } from './BufferLayer';
-import { default as ChoroplethLayer } from './ChoroplethLayer';
-import { default as ClusterLayer } from './ClusterLayer';
-import TileUrlLayer from './TileUrlLayer';
-import { default as SwitchableTileUrlLayer } from './SwitchableTileUrlLayer';
-import { default as GridLayer } from './GridLayer';
+let LayerFactory
+import MWaterServerLayer from "./MWaterServerLayer"
+import { default as MarkersLayer } from "./MarkersLayer"
+import { default as BufferLayer } from "./BufferLayer"
+import { default as ChoroplethLayer } from "./ChoroplethLayer"
+import { default as ClusterLayer } from "./ClusterLayer"
+import TileUrlLayer from "./TileUrlLayer"
+import { default as SwitchableTileUrlLayer } from "./SwitchableTileUrlLayer"
+import { default as GridLayer } from "./GridLayer"
 
 export default LayerFactory = class LayerFactory {
   static createLayer(type) {
     switch (type) {
       case "MWaterServer":
-        return new MWaterServerLayer();
-        break;
+        return new MWaterServerLayer()
+        break
 
       case "Markers":
-        return new MarkersLayer();
-        break;
+        return new MarkersLayer()
+        break
 
       case "Buffer":
-        return new BufferLayer();
-        break;
+        return new BufferLayer()
+        break
 
       // Uses a legacy type name
       case "AdminChoropleth":
-        return new ChoroplethLayer();
-        break;
+        return new ChoroplethLayer()
+        break
 
       case "Cluster":
-        return new ClusterLayer();
-        break;
+        return new ClusterLayer()
+        break
 
       case "TileUrl":
-        return new TileUrlLayer();
-        break;
+        return new TileUrlLayer()
+        break
 
       case "SwitchableTileUrl":
-        return new SwitchableTileUrlLayer();
-        break;
+        return new SwitchableTileUrlLayer()
+        break
 
       case "Grid":
-        return new GridLayer();
-        break;
+        return new GridLayer()
+        break
     }
 
-    throw new Error(`Unknown type ${type}`);
+    throw new Error(`Unknown type ${type}`)
   }
-};
+}

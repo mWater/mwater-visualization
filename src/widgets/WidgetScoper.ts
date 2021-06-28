@@ -1,7 +1,7 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
-let WidgetScoper;
-import _ from 'lodash';
+let WidgetScoper
+import _ from "lodash"
 
 // Scopes widgets, applying scope that a widget specifies to itself and the filter to other
 // widgets. Immutable.
@@ -11,40 +11,42 @@ import _ from 'lodash';
 //  data: internal, opaque data that the widget understands. opaque
 export default WidgetScoper = class WidgetScoper {
   constructor(scopes) {
-    this.scopes = scopes || {};
+    this.scopes = scopes || {}
   }
 
   // Applies a scope to a particular widget. Filter will be applied to all others
   applyScope(widgetId, scope) {
-    const data = {};
-    data[widgetId] = scope;
-    const scopes = _.extend({}, this.scopes, data);
-    return new WidgetScoper(scopes);
+    const data = {}
+    data[widgetId] = scope
+    const scopes = _.extend({}, this.scopes, data)
+    return new WidgetScoper(scopes)
   }
 
   // Gets the scope of a widget
   getScope(widgetId) {
     if (this.scopes[widgetId]) {
-      return this.scopes[widgetId];
+      return this.scopes[widgetId]
     }
   }
 
   // Gets lookup of scopes by widget id
-  getScopes() { return this.scopes; }
+  getScopes() {
+    return this.scopes
+  }
 
   getFilters(widgetId) {
-    const filters = [];
+    const filters = []
     for (let key in this.scopes) {
-      const value = this.scopes[key];
-      if ((key !== widgetId) && value && value.filter) {
-        filters.push(value.filter);
+      const value = this.scopes[key]
+      if (key !== widgetId && value && value.filter) {
+        filters.push(value.filter)
       }
     }
 
-    return filters;
+    return filters
   }
 
   reset() {
-    return new WidgetScoper();
+    return new WidgetScoper()
   }
-};
+}

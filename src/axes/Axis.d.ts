@@ -1,4 +1,4 @@
-import { Expr } from "mwater-expressions";
+import { Expr } from "mwater-expressions"
 
 /** Axis
 

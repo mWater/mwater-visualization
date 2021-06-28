@@ -18,10 +18,10 @@ export interface DatagridDesign {
   subtables?: DatagridDesignSubtable[]
 
   /** array of { expr: expression to order on, direction: "asc"/"desc" } */
-  orderBys?: { expr: Expr, direction: "asc" | "desc" }[]
+  orderBys?: { expr: Expr; direction: "asc" | "desc" }[]
 
   /** array of quick filters (user-selectable filters). See quickfilter/README.md TODO */
-  quickfilters?: any 
+  quickfilters?: any
 
   /** true to show row numbers */
   showRowNumbers?: boolean
@@ -41,7 +41,7 @@ export interface DatagridDesignColumn {
   subtable?: string | null
 
   /** width of column in pixels */
-  width: number 
+  width: number
 
   /** type of the column */
   type: "expr"
@@ -66,7 +66,7 @@ export interface DatagridDesignSubtable {
   filter?: Expr
 
   /** array of { expr: expression to order on, direction: "asc"/"desc" } */
-  orderBys: { expr: Expr, direction: "asc" | "desc" }[]
+  orderBys: { expr: Expr; direction: "asc" | "desc" }[]
 }
 
 /** Global Filters

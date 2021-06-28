@@ -8,22 +8,30 @@ import AxisBuilder from "../axes/AxisBuilder"
 import { ClusterLayerDesign } from "./ClusterLayerDesign"
 import Layer, { VectorTileDef } from "./Layer"
 
-const LayerLegendComponent = require('./LayerLegendComponent')
+const LayerLegendComponent = require("./LayerLegendComponent")
 
 export default class ClusterLayer extends Layer<ClusterLayerDesign> {
   /** Gets the type of layer definition */
-  getLayerDefinitionType(): "VectorTile" { return "VectorTile" }
+  getLayerDefinitionType(): "VectorTile" {
+    return "VectorTile"
+  }
 
-  getVectorTile(design: ClusterLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
+  getVectorTile(
+    design: ClusterLayerDesign,
+    sourceId: string,
+    schema: Schema,
+    filters: JsonQLFilter[],
+    opacity: number
+  ): VectorTileDef {
     const jsonql = this.createJsonQL(design, schema, filters)
 
     const mapLayers: mapboxgl.AnyLayer[] = []
 
     mapLayers.push({
-      'id': `${sourceId}:circles-single`,
-      'type': 'circle',
-      'source': sourceId,
-      'source-layer': 'clusters',
+      id: `${sourceId}:circles-single`,
+      type: "circle",
+      source: sourceId,
+      "source-layer": "clusters",
       paint: {
         "circle-color": design.fillColor || "#337ab7",
         "circle-opacity": opacity,
@@ -32,45 +40,43 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
         "circle-stroke-opacity": 0.6 * opacity,
         "circle-radius": 5
       },
-      filter: ['==', ["to-number", ['get', 'cnt']], 1]
+      filter: ["==", ["to-number", ["get", "cnt"]], 1]
     })
 
     mapLayers.push({
-      'id': `${sourceId}:circles-multiple`,
-      'type': 'circle',
-      'source': sourceId,
-      'source-layer': 'clusters',
+      id: `${sourceId}:circles-multiple`,
+      type: "circle",
+      source: sourceId,
+      "source-layer": "clusters",
       paint: {
         "circle-color": design.fillColor || "#337ab7",
         "circle-opacity": opacity,
         "circle-stroke-color": "white",
         "circle-stroke-width": 4,
         "circle-stroke-opacity": 0.6 * opacity,
-        "circle-radius": ["to-number", ['get', 'size']]
+        "circle-radius": ["to-number", ["get", "size"]]
       },
-      filter: ['>', ["to-number", ['get', 'cnt']], 1]
+      filter: [">", ["to-number", ["get", "cnt"]], 1]
     })
 
     mapLayers.push({
-      'id': `${sourceId}:labels`,
-      'type': 'symbol',
-      'source': sourceId,
-      'source-layer': 'clusters',
+      id: `${sourceId}:labels`,
+      type: "symbol",
+      source: sourceId,
+      "source-layer": "clusters",
       layout: {
-        "text-field": ['get', 'cnt'],
+        "text-field": ["get", "cnt"],
         "text-size": 10
       },
       paint: {
-        "text-color": (design.textColor || "white"),
+        "text-color": design.textColor || "white",
         "text-opacity": 1
       },
-      filter: ['>', ["to-number", ['get', 'cnt']], 1]
+      filter: [">", ["to-number", ["get", "cnt"]], 1]
     })
 
     return {
-      sourceLayers: [
-        { id: "clusters", jsonql: jsonql }
-      ],
+      sourceLayers: [{ id: "clusters", jsonql: jsonql }],
       ctes: [],
       mapLayers: mapLayers,
       mapLayersHandleClicks: [`${sourceId}:circles-single`, `${sourceId}:circles-multiple`]
@@ -78,12 +84,20 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
   }
 
   createJsonQL(design: ClusterLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery {
-    const axisBuilder = new AxisBuilder({schema})
+    const axisBuilder = new AxisBuilder({ schema })
     const exprCompiler = new ExprCompiler(schema)
 
     // Expression of scale and envelope from tile table
-    const scaleExpr: JsonQLExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "scale" }, from: { type: "table", table: "tile", alias: "tile" }}
-    const envelopeExpr: JsonQLExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
+    const scaleExpr: JsonQLExpr = {
+      type: "scalar",
+      expr: { type: "field", tableAlias: "tile", column: "scale" },
+      from: { type: "table", table: "tile", alias: "tile" }
+    }
+    const envelopeExpr: JsonQLExpr = {
+      type: "scalar",
+      expr: { type: "field", tableAlias: "tile", column: "envelope" },
+      from: { type: "table", table: "tile", alias: "tile" }
+    }
 
     /*
     Query:
@@ -117,7 +131,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     */
 
     // Compile geometry axis
-    let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "main"})
+    let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry, tableAlias: "main" })
 
     // ST_Centroid(ST_Collect(<geometry axis>))
     let centerExpr: JsonQLExpr = {
@@ -133,19 +147,35 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     }
 
     // round(ST_XMin(<geometry axis) / (tile.scale / 6))
-    const gridXExpr: JsonQLExpr = { type: "op", op: "round", exprs: [
-      { type: "op", op: "/", exprs: [
-        { type: "op", op: "ST_XMin", exprs: [geometryExpr] },
-        { type: "op", op: "/", exprs: [scaleExpr, 6]}
-      ]}
-    ]}
+    const gridXExpr: JsonQLExpr = {
+      type: "op",
+      op: "round",
+      exprs: [
+        {
+          type: "op",
+          op: "/",
+          exprs: [
+            { type: "op", op: "ST_XMin", exprs: [geometryExpr] },
+            { type: "op", op: "/", exprs: [scaleExpr, 6] }
+          ]
+        }
+      ]
+    }
 
-    const gridYExpr: JsonQLExpr = { type: "op", op: "round", exprs: [
-      { type: "op", op: "/", exprs: [
-        { type: "op", op: "ST_YMin", exprs: [geometryExpr] },
-        { type: "op", op: "/", exprs: [scaleExpr, 6]}
-      ]}
-    ]}
+    const gridYExpr: JsonQLExpr = {
+      type: "op",
+      op: "round",
+      exprs: [
+        {
+          type: "op",
+          op: "/",
+          exprs: [
+            { type: "op", op: "ST_YMin", exprs: [geometryExpr] },
+            { type: "op", op: "/", exprs: [scaleExpr, 6] }
+          ]
+        }
+      ]
+    }
 
     // Create inner query
     const innerQuery: JsonQLQuery = {
@@ -165,21 +195,18 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       {
         type: "op",
         op: "&&",
-        exprs: [
-          geometryExpr,
-          envelopeExpr
-        ]
+        exprs: [geometryExpr, envelopeExpr]
       }
     ]
 
     // Then add filters baked into layer
     if (design.filter) {
-      whereClauses.push(exprCompiler.compileExpr({expr: design.filter || null, tableAlias: "main"}))
+      whereClauses.push(exprCompiler.compileExpr({ expr: design.filter || null, tableAlias: "main" }))
     }
 
     // Then add extra filters passed in, if relevant
     // Get relevant filters
-    const relevantFilters = _.where(filters, {table: design.table})
+    const relevantFilters = _.where(filters, { table: design.table })
     for (let filter of relevantFilters) {
       whereClauses.push(injectTableAlias(filter.jsonql, "main"))
     }
@@ -194,7 +221,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     }
 
     // Create next level
-    // select 
+    // select
     // ST_ClusterDBSCAN(center, (tile.scale / 8), 1) over () as clust,
     // sub1.center as center,
     // cnt as cnt from () as innerquery
@@ -221,26 +248,34 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
 
     // Create final level
     // ST_AsMVTGeom(ST_Centroid(ST_Collect(center)), tile.envelope) as the_geom_webmercator,
-    // sum(cnt) as cnt, 
-    // log(sum(cnt)) * 3 + 7 as size from 
+    // sum(cnt) as cnt,
+    // log(sum(cnt)) * 3 + 7 as size from
 
     // ST_AsMVTGeom(ST_Centroid(ST_Collect(center)), tile.envelope)
-    const centerExpr2: JsonQLExpr = { type: "op", op: "ST_AsMVTGeom", exprs: [
-      {
-        type: "op",
-        op: "ST_Centroid",
-        exprs: [
-          {
-            type: "op",
-            op: "ST_Collect",
-            exprs: [{ type: "field", tableAlias: "inner2query", column: "center" }]
-          }
-        ]
-      },
-      envelopeExpr
-    ]}
+    const centerExpr2: JsonQLExpr = {
+      type: "op",
+      op: "ST_AsMVTGeom",
+      exprs: [
+        {
+          type: "op",
+          op: "ST_Centroid",
+          exprs: [
+            {
+              type: "op",
+              op: "ST_Collect",
+              exprs: [{ type: "field", tableAlias: "inner2query", column: "center" }]
+            }
+          ]
+        },
+        envelopeExpr
+      ]
+    }
 
-    const cntExpr: JsonQLExpr = { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "inner2query", column: "cnt" }] }
+    const cntExpr: JsonQLExpr = {
+      type: "op",
+      op: "sum",
+      exprs: [{ type: "field", tableAlias: "inner2query", column: "cnt" }]
+    }
 
     const sizeExpr: JsonQLExpr = {
       type: "op",
@@ -257,10 +292,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
         //###{ type: "select", expr: { type: "literal", value: 12 }, alias: "size" }
       ],
       from: { type: "subquery", query: inner2Query, alias: "inner2query" },
-      groupBy: [
-        { type: "field", tableAlias: "inner2query", column: "clust" },
-        envelopeExpr
-      ]
+      groupBy: [{ type: "field", tableAlias: "inner2query", column: "clust" }, envelopeExpr]
     }
 
     return query
@@ -291,7 +323,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
   }
 
   createMapnikJsonQL(design: ClusterLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery {
-    const axisBuilder = new AxisBuilder({schema})
+    const axisBuilder = new AxisBuilder({ schema })
     const exprCompiler = new ExprCompiler(schema)
 
     /*
@@ -326,7 +358,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     */
 
     // Compile geometry axis
-    let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "main"})
+    let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry, tableAlias: "main" })
 
     // ST_Centroid(ST_Collect(<geometry axis>))
     let centerExpr: JsonQLExpr = {
@@ -341,19 +373,35 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       ]
     }
 
-    const gridXExpr: JsonQLExpr =  { type: "op", op: "round", exprs: [
-      { type: "op", op: "/", exprs: [
-        { type: "op", op: "ST_XMin", exprs: [geometryExpr] },
-        { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_width!" }, 40]}
-      ]}
-    ]}
+    const gridXExpr: JsonQLExpr = {
+      type: "op",
+      op: "round",
+      exprs: [
+        {
+          type: "op",
+          op: "/",
+          exprs: [
+            { type: "op", op: "ST_XMin", exprs: [geometryExpr] },
+            { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_width!" }, 40] }
+          ]
+        }
+      ]
+    }
 
-    const gridYExpr: JsonQLExpr =  { type: "op", op: "round", exprs: [
-      { type: "op", op: "/", exprs: [
-        { type: "op", op: "ST_YMin", exprs: [geometryExpr] },
-        { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_height!" }, 5]}
-      ]}
-    ]}
+    const gridYExpr: JsonQLExpr = {
+      type: "op",
+      op: "round",
+      exprs: [
+        {
+          type: "op",
+          op: "/",
+          exprs: [
+            { type: "op", op: "ST_YMin", exprs: [geometryExpr] },
+            { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_height!" }, 5] }
+          ]
+        }
+      ]
+    }
 
     // Create inner query
     const innerQuery: JsonQLQuery = {
@@ -373,21 +421,18 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       {
         type: "op",
         op: "&&",
-        exprs: [
-          geometryExpr,
-          { type: "token", token: "!bbox!" }
-        ]
+        exprs: [geometryExpr, { type: "token", token: "!bbox!" }]
       }
     ]
 
     // Then add filters baked into layer
     if (design.filter) {
-      whereClauses.push(exprCompiler.compileExpr({expr: design.filter || null, tableAlias: "main"}))
+      whereClauses.push(exprCompiler.compileExpr({ expr: design.filter || null, tableAlias: "main" }))
     }
 
     // Then add extra filters passed in, if relevant
     // Get relevant filters
-    const relevantFilters = _.where(filters, {table: design.table})
+    const relevantFilters = _.where(filters, { table: design.table })
     for (let filter of relevantFilters) {
       whereClauses.push(injectTableAlias(filter.jsonql, "main"))
     }
@@ -402,7 +447,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     }
 
     // Create next level
-    // select 
+    // select
     // ST_ClusterDBSCAN(center, (!pixel_width!*30 + !pixel_height!*30)/2, 1) over () as clust,
     // sub1.center as center,
     // cnt as cnt from () as innerquery
@@ -411,12 +456,21 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       op: "ST_ClusterDBSCAN",
       exprs: [
         { type: "field", tableAlias: "innerquery", column: "center" },
-        { type: "op", op: "/", exprs: [
-          { type: "op", op: "+", exprs: [
-            { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_width!" }, 30] },
-            { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_height!" }, 30] }
-            ]}
-          , 2]},
+        {
+          type: "op",
+          op: "/",
+          exprs: [
+            {
+              type: "op",
+              op: "+",
+              exprs: [
+                { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_width!" }, 30] },
+                { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_height!" }, 30] }
+              ]
+            },
+            2
+          ]
+        },
         1
       ],
       over: {}
@@ -434,8 +488,8 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
 
     // Create final level
     // ST_Centroid(ST_Collect(center)) as the_geom_webmercator,
-    // sum(cnt) as cnt, 
-    // log(sum(cnt)) * 6 + 14 as size from 
+    // sum(cnt) as cnt,
+    // log(sum(cnt)) * 6 + 14 as size from
 
     // ST_Centroid(ST_Collect(center))
     centerExpr = {
@@ -450,7 +504,11 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       ]
     }
 
-    const cntExpr: JsonQLExpr = { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "inner2query", column: "cnt" }] }
+    const cntExpr: JsonQLExpr = {
+      type: "op",
+      op: "sum",
+      exprs: [{ type: "field", tableAlias: "inner2query", column: "cnt" }]
+    }
 
     const sizeExpr: JsonQLExpr = {
       type: "op",
@@ -473,7 +531,8 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
   }
 
   createCss(design: ClusterLayerDesign, schema: Schema) {
-    const css = `\
+    const css =
+      `\
 #layer0 [cnt>1] {
   marker-width: [size];
   marker-line-color: white;
@@ -482,14 +541,18 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
   marker-placement: point;
   marker-type: ellipse;
   marker-allow-overlap: true;
-  marker-fill: ` + (design.fillColor || "#337ab7") + `;
+  marker-fill: ` +
+      (design.fillColor || "#337ab7") +
+      `;
 }
 
 #layer0::l1 [cnt>1] { 
   text-name: [cnt];
   text-face-name: 'Arial Bold';
   text-allow-overlap: true;
-  text-fill: ` + (design.textColor || "white") + `;
+  text-fill: ` +
+      (design.textColor || "white") +
+      `;
 }
 
 #layer0 [cnt=1] {
@@ -500,7 +563,9 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
   marker-placement: point;
   marker-type: ellipse;
   marker-allow-overlap: true;
-  marker-fill: ` + (design.fillColor || "#337ab7") + `;
+  marker-fill: ` +
+      (design.fillColor || "#337ab7") +
+      `;
 }\
 `
 
@@ -605,49 +670,79 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
   //     return null
 
   // Gets the bounds of the layer as GeoJSON
-  getBounds(design: ClusterLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any) {
-    return this.getBoundsFromExpr(schema, dataSource, design.table, design.axes.geometry.expr, design.filter || null, filters, callback)
+  getBounds(
+    design: ClusterLayerDesign,
+    schema: Schema,
+    dataSource: DataSource,
+    filters: JsonQLFilter[],
+    callback: any
+  ) {
+    return this.getBoundsFromExpr(
+      schema,
+      dataSource,
+      design.table,
+      design.axes.geometry.expr,
+      design.filter || null,
+      filters,
+      callback
+    )
   }
 
-  getMinZoom(design: ClusterLayerDesign) { return design.minZoom; }
+  getMinZoom(design: ClusterLayerDesign) {
+    return design.minZoom
+  }
 
-  getMaxZoom(design: ClusterLayerDesign) { return design.maxZoom || 21; }
+  getMaxZoom(design: ClusterLayerDesign) {
+    return design.maxZoom || 21
+  }
 
   // Get the legend to be optionally displayed on the map. Returns
   // a React element
-  getLegend(design: ClusterLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[] = []) {
+  getLegend(
+    design: ClusterLayerDesign,
+    schema: Schema,
+    name: string,
+    dataSource: DataSource,
+    locale: string,
+    filters: JsonQLFilter[] = []
+  ) {
     const _filters = filters.slice()
     if (design.filter != null) {
       const exprCompiler = new ExprCompiler(schema)
-      const jsonql = exprCompiler.compileExpr({expr: design.filter, tableAlias: "{alias}"})
+      const jsonql = exprCompiler.compileExpr({ expr: design.filter, tableAlias: "{alias}" })
       if (jsonql) {
         _filters.push({ table: (design.filter as any).table, jsonql })
       }
     }
-    const axisBuilder = new AxisBuilder({schema})
+    const axisBuilder = new AxisBuilder({ schema })
     return React.createElement(LayerLegendComponent, {
       schema,
       defaultColor: design.fillColor || "#337ab7",
-      symbol: 'font-awesome/circle',
+      symbol: "font-awesome/circle",
       name,
       dataSource,
       filters: _.compact(_filters),
       locale
-    }
-    )
+    })
   }
 
   // Get a list of table ids that can be filtered on
   getFilterableTables(design: ClusterLayerDesign, schema: Schema) {
-    if (design.table) { return [design.table]; } else { return []; }
+    if (design.table) {
+      return [design.table]
+    } else {
+      return []
+    }
   }
 
   // True if layer can be edited
-  isEditable() { return true; }
+  isEditable() {
+    return true
+  }
 
   // True if layer is incomplete (e.g. brand new) and should be editable immediately
   isIncomplete(design: ClusterLayerDesign, schema: Schema) {
-    return (this.validateDesign(design, schema) != null)
+    return this.validateDesign(design, schema) != null
   }
 
   // Creates a design element with specified options
@@ -665,7 +760,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     filters: JsonQLFilter[]
   }): React.ReactElement<{}> {
     // Require here to prevent server require problems
-    const ClusterLayerDesignerComponent = require('./ClusterLayerDesignerComponent')
+    const ClusterLayerDesignerComponent = require("./ClusterLayerDesignerComponent")
 
     // Clean on way in and out
     return React.createElement(ClusterLayerDesignerComponent, {
@@ -682,25 +777,30 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
   // Returns a cleaned design
   cleanDesign(design: ClusterLayerDesign, schema: Schema) {
     const exprCleaner = new ExprCleaner(schema)
-    const axisBuilder = new AxisBuilder({schema})
+    const axisBuilder = new AxisBuilder({ schema })
 
-    design = produce(design, draft => {
+    design = produce(design, (draft) => {
       // Default colors
       draft.textColor = design.textColor || "white"
       draft.fillColor = design.fillColor || "#337ab7"
 
       draft.axes = design.axes || {}
 
-      draft.axes.geometry = axisBuilder.cleanAxis({axis: (draft.axes.geometry ? original(draft.axes.geometry) || null : null), table: design.table, types: ['geometry'], aggrNeed: "none"})
+      draft.axes.geometry = axisBuilder.cleanAxis({
+        axis: draft.axes.geometry ? original(draft.axes.geometry) || null : null,
+        table: design.table,
+        types: ["geometry"],
+        aggrNeed: "none"
+      })
 
-      draft.filter = exprCleaner.cleanExpr(design.filter || null, { table: design.table }); 
+      draft.filter = exprCleaner.cleanExpr(design.filter || null, { table: design.table })
     })
     return design
   }
 
   // Validates design. Null if ok, message otherwise
   validateDesign(design: ClusterLayerDesign, schema: Schema) {
-    const axisBuilder = new AxisBuilder({schema})
+    const axisBuilder = new AxisBuilder({ schema })
     const exprValidator = new ExprValidator(schema)
 
     if (!design.table) {
@@ -711,14 +811,18 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       return "Missing axes"
     }
 
-    let error = axisBuilder.validateAxis({axis: design.axes.geometry})
-    if (error) { return error; }
+    let error = axisBuilder.validateAxis({ axis: design.axes.geometry })
+    if (error) {
+      return error
+    }
 
     // Validate filter
     error = exprValidator.validateExpr(design.filter || null)
-    if (error) { return error; }
+    if (error) {
+      return error
+    }
 
     return null
   }
 }
-  // TODO NO KML SUPPORT
+// TODO NO KML SUPPORT

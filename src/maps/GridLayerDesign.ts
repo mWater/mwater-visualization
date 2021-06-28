@@ -25,7 +25,7 @@ export default interface GridLayerDesign {
 
   /** expression to get geometry to map to a grid */
   geometryExpr: Expr
-  
+
   /** color axis of how to color grid */
   colorAxis: Axis
 
@@ -44,10 +44,10 @@ export default interface GridLayerDesign {
 
   // /** customizable filtering for popup. See PopupFilterJoins.md. Only when region mode is "indirect"  */
   // popupFilterJoins: any
-  
+
   /** minimum zoom level */
   minZoom?: number
 
   /** maximum zoom level */
-  maxZoom?: number 
+  maxZoom?: number
 }

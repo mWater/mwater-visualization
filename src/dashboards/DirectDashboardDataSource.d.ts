@@ -1,5 +1,5 @@
 import DashboardDataSource from "./DashboardDataSource"
-import { Schema, DataSource } from "mwater-expressions";
+import { Schema, DataSource } from "mwater-expressions"
 
 /** Uses direct DataSource queries */
 export default class DirectDashboardDataSource extends DashboardDataSource {
@@ -18,4 +18,3 @@ export default class DirectDashboardDataSource extends DashboardDataSource {
     client?: string
   })
 }
-  

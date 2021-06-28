@@ -1,11 +1,11 @@
-import { Schema, DataSource, Expr } from "mwater-expressions";
-import { JsonQLFilter } from "../index";
-import { OnGridClickResults } from "./maps";
-import { ReactNode } from "react";
-import { JsonQLQuery } from "jsonql";
+import { Schema, DataSource, Expr } from "mwater-expressions"
+import { JsonQLFilter } from "../index"
+import { OnGridClickResults } from "./maps"
+import { ReactNode } from "react"
+import { JsonQLQuery } from "jsonql"
 
 export interface JsonQLCssLayerDefinition {
-  layers: Array<{ 
+  layers: Array<{
     /** Layer id */
     id: string
     /** jsonql that includes "the_webmercator_geom" as a column */
@@ -15,11 +15,11 @@ export interface JsonQLCssLayerDefinition {
   /** carto css */
   css: string
 
-  interactivity?: { 
+  interactivity?: {
     /** id of layer */
-    layer: string, 
+    layer: string
     /** array of field names */
-    fields: string[] 
+    fields: string[]
   }
 }
 
@@ -46,32 +46,45 @@ export default class Layer<LayerDesign> {
    * @param sourceId id of the source. Should be prefixed to sublayers with a colon (prefix:id)
    * @param opacity opacity of the layer, which MapBox does not allow to be implemented for a whole layer (https://github.com/mapbox/mapbox-gl-js/issues/4090)
    */
-  getVectorTile(design: LayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef
+  getVectorTile(
+    design: LayerDesign,
+    sourceId: string,
+    schema: Schema,
+    filters: JsonQLFilter[],
+    opacity: number
+  ): VectorTileDef
 
-  /**  
-   * Called when the interactivity grid is clicked. 
+  /**
+   * Called when the interactivity grid is clicked.
    * arguments:
    *   ev: { data: interactivty data e.g. `{ id: 123 }` }
-   *   options: 
+   *   options:
    *     design: design of layer
    *     schema: schema to use
    *     dataSource: data source to use
    *     layerDataSource: layer data source
    *     scopeData: current scope data if layer is scoping
    *     filters: compiled filters to apply to the popup
-   * 
+   *
    * Returns:
-   *   null/undefined 
+   *   null/undefined
    *   or
    *   {
    *     scope: scope to apply ({ name, filter, data })
    *     row: { tableId:, primaryKey: }  # row that was selected
    *     popup: React element to put into a popup
    */
-  onGridClick(ev: { data: any, event: any }, options: OnGridClickOptions<LayerDesign>): OnGridClickResults
+  onGridClick(ev: { data: any; event: any }, options: OnGridClickOptions<LayerDesign>): OnGridClickResults
 
   /** Get the legend to be optionally displayed on the map. Returns a React element */
-  getLegend(design: LayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): ReactNode
+  getLegend(
+    design: LayerDesign,
+    schema: Schema,
+    name: string,
+    dataSource: DataSource,
+    locale: string,
+    filters: JsonQLFilter[]
+  ): ReactNode
 
   /** Get min zoom level */
   getMinZoom(design: LayerDesign): number | null | undefined
@@ -80,7 +93,13 @@ export default class Layer<LayerDesign> {
   getMaxZoom(design: LayerDesign): number | null | undefined
 
   /** Gets the bounds of the layer as GeoJSON */
-  getBounds(design: LayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: (err: any, bounds: { n: number, s: number, e: number, w: number } | null) => void): void
+  getBounds(
+    design: LayerDesign,
+    schema: Schema,
+    dataSource: DataSource,
+    filters: JsonQLFilter[],
+    callback: (err: any, bounds: { n: number; s: number; e: number; w: number } | null) => void
+  ): void
 
   // # Get the legend to be optionally displayed on the map. Returns
   // # a React element
@@ -117,7 +136,15 @@ export default class Layer<LayerDesign> {
   // getKMLExportJsonQL: (design, schema, filters) ->
 
   /** Convenience function to get the bounds of a geometry expression with filters */
-  getBoundsFromExpr(schema: Schema, dataSource: DataSource, table: string, geometryExpr: Expr, filterExpr: Expr, filters: JsonQLFilter[], callback: (err: any, bounds: any) => void): void
+  getBoundsFromExpr(
+    schema: Schema,
+    dataSource: DataSource,
+    table: string,
+    geometryExpr: Expr,
+    filterExpr: Expr,
+    filters: JsonQLFilter[],
+    callback: (err: any, bounds: any) => void
+  ): void
 }
 
 export interface OnGridClickOptions<LayerDesign> {
@@ -159,7 +186,7 @@ export interface VectorTileSourceLayer {
   /** Unique id of the source layer */
   id: string
 
-  /** Query that produces the source layer, without the ST_AsMVT but with the ST_AsMVTGeom. 
+  /** Query that produces the source layer, without the ST_AsMVT but with the ST_AsMVTGeom.
    * References CTE called tile which has x, y, z and envelope.
    */
   jsonql: JsonQLQuery

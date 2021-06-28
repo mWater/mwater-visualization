@@ -1,24 +1,32 @@
-import _ from 'lodash'
-import React from 'react'
+import _ from "lodash"
+import React from "react"
 
-import { original, produce } from 'immer'
+import { original, produce } from "immer"
 
-import Layer, { OnGridClickOptions, VectorTileDef } from './Layer'
-import { ExprCompiler, ExprCleaner, injectTableAlias, Schema, DataSource, ExprValidator } from 'mwater-expressions'
-import AxisBuilder from '../axes/AxisBuilder'
-import { OnGridClickResults } from './maps'
-import { JsonQLFilter } from '../index'
-import { JsonQLExpr, JsonQLQuery, JsonQLScalar, JsonQLSelect, JsonQLSelectQuery } from 'jsonql'
-import { MarkersLayerDesign } from './MarkersLayerDesign'
-import { compileColorMapToMapbox } from './mapboxUtils'
-const LayerLegendComponent = require('./LayerLegendComponent')
-const PopupFilterJoinsUtils = require('./PopupFilterJoinsUtils')
+import Layer, { OnGridClickOptions, VectorTileDef } from "./Layer"
+import { ExprCompiler, ExprCleaner, injectTableAlias, Schema, DataSource, ExprValidator } from "mwater-expressions"
+import AxisBuilder from "../axes/AxisBuilder"
+import { OnGridClickResults } from "./maps"
+import { JsonQLFilter } from "../index"
+import { JsonQLExpr, JsonQLQuery, JsonQLScalar, JsonQLSelect, JsonQLSelectQuery } from "jsonql"
+import { MarkersLayerDesign } from "./MarkersLayerDesign"
+import { compileColorMapToMapbox } from "./mapboxUtils"
+const LayerLegendComponent = require("./LayerLegendComponent")
+const PopupFilterJoinsUtils = require("./PopupFilterJoinsUtils")
 
 export default class MarkersLayer extends Layer<MarkersLayerDesign> {
   /** Gets the type of layer definition */
-  getLayerDefinitionType(): "VectorTile" { return "VectorTile" }
+  getLayerDefinitionType(): "VectorTile" {
+    return "VectorTile"
+  }
 
-  getVectorTile(design: MarkersLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
+  getVectorTile(
+    design: MarkersLayerDesign,
+    sourceId: string,
+    schema: Schema,
+    filters: JsonQLFilter[],
+    opacity: number
+  ): VectorTileDef {
     const jsonql = this.createJsonQL(design, schema, filters)
 
     const mapLayers: mapboxgl.AnyLayer[] = []
@@ -28,58 +36,60 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
 
     // Add polygons
     mapLayers.push({
-      'id': `${sourceId}:polygons`,
-      'type': 'fill',
-      'source': sourceId,
-      'source-layer': 'main',
+      id: `${sourceId}:polygons`,
+      type: "fill",
+      source: sourceId,
+      "source-layer": "main",
       paint: {
         "fill-color": color,
-        "fill-opacity": 0.25 * opacity,
+        "fill-opacity": 0.25 * opacity
       },
-      filter: ['any', 
-        ['==', ["get", "geometry_type"], 'ST_Polygon'],
-        ['==', ["get", "geometry_type"], 'ST_MultiPolygon']]
+      filter: [
+        "any",
+        ["==", ["get", "geometry_type"], "ST_Polygon"],
+        ["==", ["get", "geometry_type"], "ST_MultiPolygon"]
+      ]
     })
 
     // Add polygon outlines and lines
     mapLayers.push({
-      'id': `${sourceId}:polygon-outlines`,
-      'type': 'line',
-      'source': sourceId,
-      'source-layer': 'main',
+      id: `${sourceId}:polygon-outlines`,
+      type: "line",
+      source: sourceId,
+      "source-layer": "main",
       paint: {
         "line-color": color,
-        "line-width": (design.lineWidth != null) ? design.lineWidth : 3,
+        "line-width": design.lineWidth != null ? design.lineWidth : 3,
         "line-opacity": opacity
       },
-      filter: ['any', 
-        ['==', ["get", "geometry_type"], 'ST_Polygon'],
-        ['==', ["get", "geometry_type"], 'ST_MultiPolygon']]
+      filter: [
+        "any",
+        ["==", ["get", "geometry_type"], "ST_Polygon"],
+        ["==", ["get", "geometry_type"], "ST_MultiPolygon"]
+      ]
     })
-    
+
     // Add lines
     mapLayers.push({
-      'id': `${sourceId}:lines`,
-      'type': 'line',
-      'source': sourceId,
-      'source-layer': 'main',
+      id: `${sourceId}:lines`,
+      type: "line",
+      source: sourceId,
+      "source-layer": "main",
       paint: {
         "line-color": color,
-        "line-width": (design.lineWidth != null) ? design.lineWidth : 3,
+        "line-width": design.lineWidth != null ? design.lineWidth : 3,
         "line-opacity": opacity
       },
-      filter: ['any', 
-        ['==', ["get", "geometry_type"], 'ST_Linestring']
-      ]
+      filter: ["any", ["==", ["get", "geometry_type"], "ST_Linestring"]]
     })
 
     // Add markers
     if (!design.symbol) {
       mapLayers.push({
-        'id': `${sourceId}:points`,
-        'type': 'circle',
-        'source': sourceId,
-        'source-layer': 'main',
+        id: `${sourceId}:points`,
+        type: "circle",
+        source: sourceId,
+        "source-layer": "main",
         paint: {
           "circle-color": color,
           "circle-opacity": 0.8 * opacity,
@@ -88,15 +98,14 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
           "circle-stroke-opacity": 0.5 * opacity,
           "circle-radius": (design.markerSize || 10) / 2
         },
-        filter: ['==', ["get", "geometry_type"], 'ST_Point']
+        filter: ["==", ["get", "geometry_type"], "ST_Point"]
       })
-    }
-    else {
+    } else {
       mapLayers.push({
-        'id': `${sourceId}:points`,
-        'type': 'symbol',
-        'source': sourceId,
-        'source-layer': 'main',
+        id: `${sourceId}:points`,
+        type: "symbol",
+        source: sourceId,
+        "source-layer": "main",
         layout: {
           "icon-image": design.symbol,
           "icon-allow-overlap": true,
@@ -106,54 +115,83 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
           "icon-color": color,
           "icon-opacity": opacity
         },
-        filter: ['==', ["get", "geometry_type"], 'ST_Point']
+        filter: ["==", ["get", "geometry_type"], "ST_Point"]
       })
     }
 
     return {
-      sourceLayers: [
-        { id: "main", jsonql }
-      ],
+      sourceLayers: [{ id: "main", jsonql }],
       ctes: [],
       minZoom: design.minZoom,
       maxZoom: design.maxZoom,
       mapLayers: mapLayers,
-      mapLayersHandleClicks: [`${sourceId}:polygons`, `${sourceId}:polygon-outlines`, `${sourceId}:lines`, `${sourceId}:points`]
+      mapLayersHandleClicks: [
+        `${sourceId}:polygons`,
+        `${sourceId}:polygon-outlines`,
+        `${sourceId}:lines`,
+        `${sourceId}:points`
+      ]
     }
   }
 
   createJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
-    const axisBuilder = new AxisBuilder({schema})
+    const axisBuilder = new AxisBuilder({ schema })
     const exprCompiler = new ExprCompiler(schema)
 
     // Expression of scale and envelope from tile table
-    const scaleExpr: JsonQLScalar = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "scale" }, from: { type: "table", table: "tile", alias: "tile" }}
-    const envelopeExpr: JsonQLScalar = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
+    const scaleExpr: JsonQLScalar = {
+      type: "scalar",
+      expr: { type: "field", tableAlias: "tile", column: "scale" },
+      from: { type: "table", table: "tile", alias: "tile" }
+    }
+    const envelopeExpr: JsonQLScalar = {
+      type: "scalar",
+      expr: { type: "field", tableAlias: "tile", column: "envelope" },
+      from: { type: "table", table: "tile", alias: "tile" }
+    }
 
     // Compile geometry axis
-    let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "innerquery"})
+    let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry, tableAlias: "innerquery" })
 
     // row_number() over (partition by st_snaptogrid(location, tile.scale / 150, tile.scale / 150)) AS r
     const cluster: JsonQLSelect = {
       type: "select",
-      expr: { 
-        type: "op", 
-        op: "row_number", 
-        exprs: [], 
-        over: { partitionBy: [
-          { type: "op", op: "round", exprs: [
-            { type: "op", op: "/", exprs: [
-              { type: "op", op: "ST_XMin", exprs: [geometryExpr] },
-              { type: "op", op: "/", exprs: [scaleExpr, 150]}
-            ]}
-          ]},
-          { type: "op", op: "round", exprs: [
-            { type: "op", op: "/", exprs: [
-              { type: "op", op: "ST_YMin", exprs: [geometryExpr] },
-              { type: "op", op: "/", exprs: [scaleExpr, 150]}
-            ]}
-          ]}
-        ]}
+      expr: {
+        type: "op",
+        op: "row_number",
+        exprs: [],
+        over: {
+          partitionBy: [
+            {
+              type: "op",
+              op: "round",
+              exprs: [
+                {
+                  type: "op",
+                  op: "/",
+                  exprs: [
+                    { type: "op", op: "ST_XMin", exprs: [geometryExpr] },
+                    { type: "op", op: "/", exprs: [scaleExpr, 150] }
+                  ]
+                }
+              ]
+            },
+            {
+              type: "op",
+              op: "round",
+              exprs: [
+                {
+                  type: "op",
+                  op: "/",
+                  exprs: [
+                    { type: "op", op: "ST_YMin", exprs: [geometryExpr] },
+                    { type: "op", op: "/", exprs: [scaleExpr, 150] }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
       },
       alias: "r"
     }
@@ -162,7 +200,11 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     const innerquery: JsonQLSelectQuery = {
       type: "query",
       selects: [
-        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(design.table)!.primaryKey }, alias: "id" }, // main primary key as id
+        {
+          type: "select",
+          expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(design.table)!.primaryKey },
+          alias: "id"
+        }, // main primary key as id
         { type: "select", expr: geometryExpr, alias: "the_geom_webmercator" }, // geometry as the_geom_webmercator
         cluster
       ],
@@ -171,7 +213,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
 
     // Add color select if color axis
     if (design.axes.color) {
-      const colorExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "innerquery"})
+      const colorExpr = axisBuilder.compileAxis({ axis: design.axes.color, tableAlias: "innerquery" })
       innerquery.selects.push({ type: "select", expr: colorExpr, alias: "color" })
     }
 
@@ -180,21 +222,18 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
       {
         type: "op",
         op: "&&",
-        exprs: [
-          geometryExpr,
-          envelopeExpr
-        ]
+        exprs: [geometryExpr, envelopeExpr]
       }
     ]
 
     // Then add filters baked into layer
     if (design.filter) {
-      whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "innerquery"}))
+      whereClauses.push(exprCompiler.compileExpr({ expr: design.filter, tableAlias: "innerquery" }))
     }
 
     // Then add extra filters passed in, if relevant
     // Get relevant filters
-    const relevantFilters = _.where(filters, {table: design.table})
+    const relevantFilters = _.where(filters, { table: design.table })
     for (let filter of relevantFilters) {
       whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
     }
@@ -212,20 +251,41 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     const outerquery: JsonQLQuery = {
       type: "query",
       selects: [
-        { type: "select", expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "innerquery", column: "id" }]}, alias: "id" }, // innerquery._id::text as id
-        { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [
-          { type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" },
-          envelopeExpr
-        ]}, alias: "the_geom_webmercator" }, // innerquery.the_geom_webmercator as the_geom_webmercator
-        { type: "select", expr: { type: "op", op: "ST_GeometryType", exprs: [{ type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }] }, alias: "geometry_type" } // ST_GeometryType(innerquery.the_geom_webmercator) as geometry_type
+        {
+          type: "select",
+          expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "innerquery", column: "id" }] },
+          alias: "id"
+        }, // innerquery._id::text as id
+        {
+          type: "select",
+          expr: {
+            type: "op",
+            op: "ST_AsMVTGeom",
+            exprs: [{ type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }, envelopeExpr]
+          },
+          alias: "the_geom_webmercator"
+        }, // innerquery.the_geom_webmercator as the_geom_webmercator
+        {
+          type: "select",
+          expr: {
+            type: "op",
+            op: "ST_GeometryType",
+            exprs: [{ type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }]
+          },
+          alias: "geometry_type"
+        } // ST_GeometryType(innerquery.the_geom_webmercator) as geometry_type
       ],
       from: { type: "subquery", query: innerquery, alias: "innerquery" },
-      where: { type: "op", op: "<=", exprs: [{ type: "field", tableAlias: "innerquery", column: "r" }, 3]}
+      where: { type: "op", op: "<=", exprs: [{ type: "field", tableAlias: "innerquery", column: "r" }, 3] }
     }
 
     // Add color select if color axis
     if (design.axes.color) {
-      outerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "innerquery", column: "color" }, alias: "color" }); // innerquery.color as color
+      outerquery.selects.push({
+        type: "select",
+        expr: { type: "field", tableAlias: "innerquery", column: "color" },
+        alias: "color"
+      }) // innerquery.color as color
     }
 
     return outerquery
@@ -261,33 +321,51 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
   }
 
   createMapnikJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery {
-    const axisBuilder = new AxisBuilder({schema})
+    const axisBuilder = new AxisBuilder({ schema })
     const exprCompiler = new ExprCompiler(schema)
 
     // Compile geometry axis
-    let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "innerquery"})
+    let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry, tableAlias: "innerquery" })
 
     // row_number() over (partition by round(ST_XMin(location)/!pixel_width!*5), round(ST_YMin(location)/!pixel_height!*5)) AS r
     const cluster: JsonQLSelect = {
       type: "select",
-      expr: { 
-        type: "op", 
-        op: "row_number", 
-        exprs: [], 
-        over: { partitionBy: [
-          { type: "op", op: "round", exprs: [
-            { type: "op", op: "/", exprs: [
-              { type: "op", op: "ST_XMin", exprs: [geometryExpr] },
-              { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_width!" }, 5]}
-            ]}
-          ]},
-          { type: "op", op: "round", exprs: [
-            { type: "op", op: "/", exprs: [
-              { type: "op", op: "ST_YMin", exprs: [geometryExpr] },
-              { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_height!" }, 5]}
-            ]}
-          ]},
-        ]}
+      expr: {
+        type: "op",
+        op: "row_number",
+        exprs: [],
+        over: {
+          partitionBy: [
+            {
+              type: "op",
+              op: "round",
+              exprs: [
+                {
+                  type: "op",
+                  op: "/",
+                  exprs: [
+                    { type: "op", op: "ST_XMin", exprs: [geometryExpr] },
+                    { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_width!" }, 5] }
+                  ]
+                }
+              ]
+            },
+            {
+              type: "op",
+              op: "round",
+              exprs: [
+                {
+                  type: "op",
+                  op: "/",
+                  exprs: [
+                    { type: "op", op: "ST_YMin", exprs: [geometryExpr] },
+                    { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_height!" }, 5] }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
       },
       alias: "r"
     }
@@ -296,7 +374,11 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     const innerquery: JsonQLSelectQuery = {
       type: "query",
       selects: [
-        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(design.table)!.primaryKey }, alias: "id" }, // main primary key as id
+        {
+          type: "select",
+          expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(design.table)!.primaryKey },
+          alias: "id"
+        }, // main primary key as id
         { type: "select", expr: geometryExpr, alias: "the_geom_webmercator" }, // geometry as the_geom_webmercator
         cluster
       ],
@@ -305,7 +387,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
 
     // Add color select if color axis
     if (design.axes.color) {
-      const colorExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "innerquery"})
+      const colorExpr = axisBuilder.compileAxis({ axis: design.axes.color, tableAlias: "innerquery" })
       innerquery.selects.push({ type: "select", expr: colorExpr, alias: "color" })
     }
 
@@ -314,21 +396,18 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
       {
         type: "op",
         op: "&&",
-        exprs: [
-          geometryExpr,
-          { type: "token", token: "!bbox!" }
-        ]
+        exprs: [geometryExpr, { type: "token", token: "!bbox!" }]
       }
     ]
 
     // Then add filters baked into layer
     if (design.filter) {
-      whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "innerquery"}))
+      whereClauses.push(exprCompiler.compileExpr({ expr: design.filter, tableAlias: "innerquery" }))
     }
 
     // Then add extra filters passed in, if relevant
     // Get relevant filters
-    const relevantFilters = _.where(filters, {table: design.table})
+    const relevantFilters = _.where(filters, { table: design.table })
     for (let filter of relevantFilters) {
       whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
     }
@@ -346,17 +425,37 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     const outerquery: JsonQLQuery = {
       type: "query",
       selects: [
-        { type: "select", expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "innerquery", column: "id" }]}, alias: "id" }, // innerquery._id::text as id
-        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }, alias: "the_geom_webmercator" }, // innerquery.the_geom_webmercator as the_geom_webmercator
-        { type: "select", expr: { type: "op", op: "ST_GeometryType", exprs: [{ type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }] }, alias: "geometry_type" } // ST_GeometryType(innerquery.the_geom_webmercator) as geometry_type
+        {
+          type: "select",
+          expr: { type: "op", op: "::text", exprs: [{ type: "field", tableAlias: "innerquery", column: "id" }] },
+          alias: "id"
+        }, // innerquery._id::text as id
+        {
+          type: "select",
+          expr: { type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" },
+          alias: "the_geom_webmercator"
+        }, // innerquery.the_geom_webmercator as the_geom_webmercator
+        {
+          type: "select",
+          expr: {
+            type: "op",
+            op: "ST_GeometryType",
+            exprs: [{ type: "field", tableAlias: "innerquery", column: "the_geom_webmercator" }]
+          },
+          alias: "geometry_type"
+        } // ST_GeometryType(innerquery.the_geom_webmercator) as geometry_type
       ],
       from: { type: "subquery", query: innerquery, alias: "innerquery" },
-      where: { type: "op", op: "<=", exprs: [{ type: "field", tableAlias: "innerquery", column: "r" }, 3]}
+      where: { type: "op", op: "<=", exprs: [{ type: "field", tableAlias: "innerquery", column: "r" }, 3] }
     }
 
     // Add color select if color axis
     if (design.axes.color) {
-      outerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "innerquery", column: "color" }, alias: "color" }); // innerquery.color as color
+      outerquery.selects.push({
+        type: "select",
+        expr: { type: "field", tableAlias: "innerquery", column: "color" },
+        alias: "color"
+      }) // innerquery.color as color
     }
 
     return outerquery
@@ -376,23 +475,38 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
     }
 
     // Should only display markers when it is a point geometry
-    css += `\
+    css +=
+      `\
 #layer0[geometry_type='ST_Point'] {
-  marker-fill: ` + (design.color || "#666666") + `;
-marker-width: ` + (design.markerSize || 10) + `;
+  marker-fill: ` +
+      (design.color || "#666666") +
+      `;
+marker-width: ` +
+      (design.markerSize || 10) +
+      `;
 marker-line-color: white;\
-` + stroke + `\
+` +
+      stroke +
+      `\
 marker-line-opacity: 0.6;
 marker-placement: point;\
-` + symbol + `\
+` +
+      symbol +
+      `\
   marker-allow-overlap: true;
 }
 #layer0 {
-  line-color: ` + (design.color || "#666666") + `;
-line-width: ` + ((design.lineWidth != null) ? design.lineWidth : "3") + `;
+  line-color: ` +
+      (design.color || "#666666") +
+      `;
+line-width: ` +
+      (design.lineWidth != null ? design.lineWidth : "3") +
+      `;
 }
 #layer0[geometry_type='ST_Polygon'],#layer0[geometry_type='ST_MultiPolygon'] {
-  polygon-fill: ` + (design.color || "#666666") + `;
+  polygon-fill: ` +
+      (design.color || "#666666") +
+      `;
   polygon-opacity: 0.25;
 }
 \
@@ -403,15 +517,33 @@ line-width: ` + ((design.lineWidth != null) ? design.lineWidth : "3") + `;
       for (let item of design.axes.color.colorMap) {
         // If invisible
         if (_.includes(design.axes.color.excludedValues || [], item.value)) {
-          css += `\
-#layer0[color=` + JSON.stringify(item.value) + `] { line-opacity: 0; marker-line-opacity: 0; marker-fill-opacity: 0; polygon-opacity: 0; }\
-`;  
+          css +=
+            `\
+#layer0[color=` +
+            JSON.stringify(item.value) +
+            `] { line-opacity: 0; marker-line-opacity: 0; marker-fill-opacity: 0; polygon-opacity: 0; }\
+`
         } else {
-          css += `\
-#layer0[color=` + JSON.stringify(item.value) + '] { line-color: ' + item.color + ` }
-#layer0[color=` + JSON.stringify(item.value) + '][geometry_type=\'ST_Point\'] { marker-fill: ' + item.color + ` }
-#layer0[color=` + JSON.stringify(item.value) + '][geometry_type=\'ST_Polygon\'],#layer0[color=' + JSON.stringify(item.value) + `][geometry_type='ST_MultiPolygon'] { 
-polygon-fill: ` + item.color + `;\
+          css +=
+            `\
+#layer0[color=` +
+            JSON.stringify(item.value) +
+            "] { line-color: " +
+            item.color +
+            ` }
+#layer0[color=` +
+            JSON.stringify(item.value) +
+            "][geometry_type='ST_Point'] { marker-fill: " +
+            item.color +
+            ` }
+#layer0[color=` +
+            JSON.stringify(item.value) +
+            "][geometry_type='ST_Polygon'],#layer0[color=" +
+            JSON.stringify(item.value) +
+            `][geometry_type='ST_MultiPolygon'] { 
+polygon-fill: ` +
+            item.color +
+            `;\
 }\
 `
         }
@@ -440,12 +572,10 @@ polygon-fill: ` + item.color + `;\
   //     row: { tableId:, primaryKey: }  # row that was selected
   //     popup: React element to put into a popup
   //   }
-  onGridClick(ev: { data: any, event: any }, clickOptions: OnGridClickOptions<MarkersLayerDesign>): OnGridClickResults {
+  onGridClick(ev: { data: any; event: any }, clickOptions: OnGridClickOptions<MarkersLayerDesign>): OnGridClickResults {
     // TODO abstract most to base class
     if (ev.data && ev.data.id) {
-      const {
-        table
-      } = clickOptions.design
+      const { table } = clickOptions.design
       const results: OnGridClickResults = {}
 
       // Scope toggle item if ctrl-click
@@ -460,10 +590,15 @@ polygon-fill: ` + item.color + `;\
         // Create filter for rows
         const filter = {
           table,
-          jsonql: { type: "op", op: "=", modifier: "any", exprs: [
-            { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table)!.primaryKey },
-            { type: "literal", value: ids }
-          ]}
+          jsonql: {
+            type: "op",
+            op: "=",
+            modifier: "any",
+            exprs: [
+              { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table)!.primaryKey },
+              { type: "literal", value: ids }
+            ]
+          }
         }
 
         // Scope to item
@@ -481,11 +616,17 @@ polygon-fill: ` + item.color + `;\
       // Popup
       if (clickOptions.design.popup && !ev.event.originalEvent.shiftKey) {
         // Create filter using popupFilterJoins
-        const popupFilterJoins = clickOptions.design.popupFilterJoins || PopupFilterJoinsUtils.createDefaultPopupFilterJoins(table)
-        const popupFilters = PopupFilterJoinsUtils.createPopupFilters(popupFilterJoins, clickOptions.schema, table, ev.data.id)
+        const popupFilterJoins =
+          clickOptions.design.popupFilterJoins || PopupFilterJoinsUtils.createDefaultPopupFilterJoins(table)
+        const popupFilters = PopupFilterJoinsUtils.createPopupFilters(
+          popupFilterJoins,
+          clickOptions.schema,
+          table,
+          ev.data.id
+        )
 
-        const BlocksLayoutManager = require('../layouts/blocks/BlocksLayoutManager')
-        const WidgetFactory = require('../widgets/WidgetFactory')
+        const BlocksLayoutManager = require("../layouts/blocks/BlocksLayoutManager")
+        const WidgetFactory = require("../widgets/WidgetFactory")
 
         results.popup = new BlocksLayoutManager().renderLayout({
           items: clickOptions.design.popup.items,
@@ -496,7 +637,10 @@ polygon-fill: ` + item.color + `;\
             const filters = clickOptions.filters.concat(popupFilters)
 
             // Get data source for widget
-            const widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(clickOptions.design, options.id)
+            const widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(
+              clickOptions.design,
+              options.id
+            )
 
             return widget.createViewElement({
               schema: clickOptions.schema,
@@ -511,7 +655,7 @@ polygon-fill: ` + item.color + `;\
               height: options.height
             })
           }
-          })
+        })
       } else if (!ev.event.originalEvent.shiftKey) {
         results.row = { tableId: table, primaryKey: ev.data.id }
       }
@@ -523,44 +667,77 @@ polygon-fill: ` + item.color + `;\
   }
 
   // Gets the bounds of the layer as GeoJSON
-  getBounds(design: MarkersLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any) {
-    return this.getBoundsFromExpr(schema, dataSource, design.table, design.axes.geometry.expr, design.filter || null, filters, callback)
+  getBounds(
+    design: MarkersLayerDesign,
+    schema: Schema,
+    dataSource: DataSource,
+    filters: JsonQLFilter[],
+    callback: any
+  ) {
+    return this.getBoundsFromExpr(
+      schema,
+      dataSource,
+      design.table,
+      design.axes.geometry.expr,
+      design.filter || null,
+      filters,
+      callback
+    )
   }
 
   // Get min and max zoom levels
-  getMinZoom(design: MarkersLayerDesign) { return design.minZoom; }
-  getMaxZoom(design: MarkersLayerDesign) { return design.maxZoom || 21; }
+  getMinZoom(design: MarkersLayerDesign) {
+    return design.minZoom
+  }
+  getMaxZoom(design: MarkersLayerDesign) {
+    return design.maxZoom || 21
+  }
 
   // Get the legend to be optionally displayed on the map. Returns
   // a React element
-  getLegend(design: MarkersLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]) {
+  getLegend(
+    design: MarkersLayerDesign,
+    schema: Schema,
+    name: string,
+    dataSource: DataSource,
+    locale: string,
+    filters: JsonQLFilter[]
+  ) {
     const _filters = filters.slice()
     if (design.filter != null) {
       const exprCompiler = new ExprCompiler(schema)
-      const jsonql = exprCompiler.compileExpr({expr: design.filter, tableAlias: "{alias}"})
+      const jsonql = exprCompiler.compileExpr({ expr: design.filter, tableAlias: "{alias}" })
       if (jsonql) {
         _filters.push({ table: (design.filter as any).table, jsonql })
       }
     }
-        
-    const axisBuilder = new AxisBuilder({schema})
+
+    const axisBuilder = new AxisBuilder({ schema })
     return React.createElement(LayerLegendComponent, {
       schema,
       defaultColor: design.color,
-      symbol: design.symbol || 'font-awesome/circle',
+      symbol: design.symbol || "font-awesome/circle",
       markerSize: design.markerSize,
       name,
       dataSource,
       filters: _.compact(_filters),
-      axis: axisBuilder.cleanAxis({axis: design.axes.color || null, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none"}),
+      axis: axisBuilder.cleanAxis({
+        axis: design.axes.color || null,
+        table: design.table,
+        types: ["enum", "text", "boolean", "date"],
+        aggrNeed: "none"
+      }),
       locale
-    }
-    )
+    })
   }
 
   // Get a list of table ids that can be filtered on
   getFilterableTables(design: MarkersLayerDesign, schema: Schema): string[] {
-    if (design.table) { return [design.table] } else { return [] }
+    if (design.table) {
+      return [design.table]
+    } else {
+      return []
+    }
   }
 
   // True if layer can be edited
@@ -583,7 +760,7 @@ polygon-fill: ` + item.color + `;\
     filters: JsonQLFilter[]
   }): React.ReactElement<{}> {
     // Require here to prevent server require problems
-    const MarkersLayerDesignerComponent = require('./MarkersLayerDesignerComponent')
+    const MarkersLayerDesignerComponent = require("./MarkersLayerDesignerComponent")
 
     // Clean on way in and out
     return React.createElement(MarkersLayerDesignerComponent, {
@@ -600,7 +777,7 @@ polygon-fill: ` + item.color + `;\
   // Returns a cleaned design
   cleanDesign(design: MarkersLayerDesign, schema: Schema): MarkersLayerDesign {
     const exprCleaner = new ExprCleaner(schema)
-    const axisBuilder = new AxisBuilder({schema})
+    const axisBuilder = new AxisBuilder({ schema })
 
     // Migrate legacy sublayers
     if (design.sublayers) {
@@ -608,12 +785,22 @@ polygon-fill: ` + item.color + `;\
       delete design.sublayers
     }
 
-    design = produce(design, draft => {
+    design = produce(design, (draft) => {
       draft.axes = design.axes || {}
       draft.color = design.color || "#0088FF"
 
-      draft.axes.geometry = axisBuilder.cleanAxis({axis: (draft.axes.geometry ? original(draft.axes.geometry) || null : null), table: design.table, types: ['geometry'], aggrNeed: "none"})
-      draft.axes.color = axisBuilder.cleanAxis({axis: (draft.axes.color ? original(draft.axes.color) || null : null), table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none"})
+      draft.axes.geometry = axisBuilder.cleanAxis({
+        axis: draft.axes.geometry ? original(draft.axes.geometry) || null : null,
+        table: design.table,
+        types: ["geometry"],
+        aggrNeed: "none"
+      })
+      draft.axes.color = axisBuilder.cleanAxis({
+        axis: draft.axes.color ? original(draft.axes.color) || null : null,
+        table: design.table,
+        types: ["enum", "text", "boolean", "date"],
+        aggrNeed: "none"
+      })
 
       draft.filter = exprCleaner.cleanExpr(design.filter || null, { table: draft.table })
     })
@@ -623,7 +810,7 @@ polygon-fill: ` + item.color + `;\
 
   // Validates design. Null if ok, message otherwise
   validateDesign(design: MarkersLayerDesign, schema: Schema) {
-    const axisBuilder = new AxisBuilder({schema})
+    const axisBuilder = new AxisBuilder({ schema })
     const exprValidator = new ExprValidator(schema)
 
     if (!design.table) {
@@ -634,39 +821,49 @@ polygon-fill: ` + item.color + `;\
       return "Missing axes"
     }
 
-    let error = axisBuilder.validateAxis({axis: design.axes.geometry})
-    if (error) { return error; }
+    let error = axisBuilder.validateAxis({ axis: design.axes.geometry })
+    if (error) {
+      return error
+    }
 
     // Validate color
-    error = axisBuilder.validateAxis({axis: design.axes.color || null })
-    if (error) { return error; }
+    error = axisBuilder.validateAxis({ axis: design.axes.color || null })
+    if (error) {
+      return error
+    }
 
     // Check that doesn't compile to null (persistent bug that haven't been able to track down)
-    if (!axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "innerquery"})) {
+    if (!axisBuilder.compileAxis({ axis: design.axes.geometry, tableAlias: "innerquery" })) {
       return "Null geometry axis"
     }
 
     // Validate filter
     error = exprValidator.validateExpr(design.filter || null)
-    if (error) { return error; }
+    if (error) {
+      return error
+    }
 
     return null
   }
 
   createKMLExportJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
-    const axisBuilder = new AxisBuilder({schema})
+    const axisBuilder = new AxisBuilder({ schema })
     const exprCompiler = new ExprCompiler(schema)
 
     // Compile geometry axis
-    let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "innerquery"})
+    let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry, tableAlias: "innerquery" })
 
     // Select _id, location and clustered row number
     const innerquery: JsonQLSelectQuery = {
       type: "query",
       selects: [
-        { type: "select", expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(design.table)!.primaryKey }, alias: "id" }, // main primary key as id
-        { type: "select", expr: { type: "op", op: "ST_XMIN", exprs: [geometryExpr]}, alias: "longitude" }, // innerquery.the_geom_webmercator as the_geom_webmercator
-        { type: "select", expr: { type: "op", op: "ST_YMIN", exprs: [geometryExpr]}, alias: "latitude" } // innerquery.the_geom_webmercator as the_geom_webmercator
+        {
+          type: "select",
+          expr: { type: "field", tableAlias: "innerquery", column: schema.getTable(design.table)!.primaryKey },
+          alias: "id"
+        }, // main primary key as id
+        { type: "select", expr: { type: "op", op: "ST_XMIN", exprs: [geometryExpr] }, alias: "longitude" }, // innerquery.the_geom_webmercator as the_geom_webmercator
+        { type: "select", expr: { type: "op", op: "ST_YMIN", exprs: [geometryExpr] }, alias: "latitude" } // innerquery.the_geom_webmercator as the_geom_webmercator
       ],
       from: exprCompiler.compileTable(design.table, "innerquery")
     }
@@ -677,14 +874,18 @@ polygon-fill: ` + item.color + `;\
       const column = schema.getColumn(design.table, field)
 
       if (column) {
-        innerquery.selects.push({ type: "select", expr: { type: "field", tableAlias: "innerquery", column: field }, alias: field })
+        innerquery.selects.push({
+          type: "select",
+          expr: { type: "field", tableAlias: "innerquery", column: field },
+          alias: field
+        })
       }
     }
 
     // Add color select if color axis
     if (design.axes.color) {
-      const colorExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "innerquery"})
-      const valueExpr = exprCompiler.compileExpr({expr: design.axes.color.expr, tableAlias: "innerquery"})
+      const colorExpr = axisBuilder.compileAxis({ axis: design.axes.color, tableAlias: "innerquery" })
+      const valueExpr = exprCompiler.compileExpr({ expr: design.axes.color.expr, tableAlias: "innerquery" })
       innerquery.selects.push({ type: "select", expr: colorExpr, alias: "color" })
       innerquery.selects.push({ type: "select", expr: valueExpr, alias: "value" })
     }
@@ -694,12 +895,12 @@ polygon-fill: ` + item.color + `;\
 
     // Then add filters baked into layer
     if (design.filter) {
-      whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "innerquery"}))
+      whereClauses.push(exprCompiler.compileExpr({ expr: design.filter, tableAlias: "innerquery" }))
     }
 
     // Then add extra filters passed in, if relevant
     // Get relevant filters
-    const relevantFilters = _.where(filters, {table: design.table})
+    const relevantFilters = _.where(filters, { table: design.table })
     for (let filter of relevantFilters) {
       whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
     }
@@ -719,9 +920,7 @@ polygon-fill: ` + item.color + `;\
   createKMLExportStyleInfo(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
     let symbol
     if (design.symbol) {
-      ({
-        symbol
-      } = design)
+      ;({ symbol } = design)
     } else {
       symbol = "font-awesome/circle"
     }

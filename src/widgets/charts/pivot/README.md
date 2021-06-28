@@ -6,8 +6,8 @@ The pivot chart (pivot table) allows building of a complex pivot table with nest
 
 ### Segment
 
-Segments are the building block of pivot tables. Each is either on the row or column axis. They represent one expression (enum/text) that 
-is analyzed. 
+Segments are the building block of pivot tables. Each is either on the row or column axis. They represent one expression (enum/text) that
+is analyzed.
 
 Segments can be nested to allow sub-division and are ordered.
 
@@ -23,53 +23,53 @@ Either a segment or intersection or blank area. Always a rectangle. Id is like i
 ## Design
 
 design:
-  header: text widget design to display in header
-  footer: text widget design to display in header
+header: text widget design to display in header
+footer: text widget design to display in header
 
-  table: table of pivot chart
-  rows: array of segments that make up rows
-  columns: array of segments that make up columns
-  intersections: lookup of intersection id (e.g. "rowid:columnid" or "rowid,rowid:columnid,columnid" etc.) to intersection
-  filter: optional logical expression to filter by
-  striping: "columns"/"rows" to put in light striping
+table: table of pivot chart
+rows: array of segments that make up rows
+columns: array of segments that make up columns
+intersections: lookup of intersection id (e.g. "rowid:columnid" or "rowid,rowid:columnid,columnid" etc.) to intersection
+filter: optional logical expression to filter by
+striping: "columns"/"rows" to put in light striping
 
 segment:
-  id: id of segment
-  label: optional label of segment
-  valueAxis: enum/text axis that determines values. Optional.
-  children: array of child segments if any. Optional
-  
-  orderExpr: optional aggregate ordering expression
-  orderDir: "asc" (default)/ "desc"
+id: id of segment
+label: optional label of segment
+valueAxis: enum/text axis that determines values. Optional.
+children: array of child segments if any. Optional
 
-  fillerColor: color of filler for intersections that are filler type
+orderExpr: optional aggregate ordering expression
+orderDir: "asc" (default)/ "desc"
 
-  filter: optional logical expression to filter by (filters all intersections related to it)
+fillerColor: color of filler for intersections that are filler type
 
-  bold: true if bold (values and label)
-  italic: true if italic
-  valueLabelBold: true if label alone is bold (only when has valueAxis and label)
+filter: optional logical expression to filter by (filters all intersections related to it)
 
-  borderBefore: weight of border before segment (0 = none, 1 = light, 2 = medium (default), 3 = heavy)
-  borderWithin: weight of border within segment (0 = none, 1 = light (default), 2 = medium, 3 = heavy)
-  borderAfter: weight of border after segment (0 = none, 1 = light, 2 = medium (default), 3 = heavy)
+bold: true if bold (values and label)
+italic: true if italic
+valueLabelBold: true if label alone is bold (only when has valueAxis and label)
+
+borderBefore: weight of border before segment (0 = none, 1 = light, 2 = medium (default), 3 = heavy)
+borderWithin: weight of border within segment (0 = none, 1 = light (default), 2 = medium, 3 = heavy)
+borderAfter: weight of border after segment (0 = none, 1 = light, 2 = medium (default), 3 = heavy)
 
 intersection:
-  valueAxis: axis that determines value to display in cells. Must be aggregate
+valueAxis: axis that determines value to display in cells. Must be aggregate
 
-  filter: optional logical expression to filter by
+filter: optional logical expression to filter by
 
-  backgroundColorAxis: color axis for background of cells
-  backgroundColorOpacity: fractional background opacity
-  backgroundColor: color of background if no color axis
+backgroundColorAxis: color axis for background of cells
+backgroundColorOpacity: fractional background opacity
+backgroundColor: color of background if no color axis
 
-  backgroundColorConditions: array of conditional colors that override axis and background color
-    Each contains: { condition: aggregate boolean expression, color: color value }
+backgroundColorConditions: array of conditional colors that override axis and background color
+Each contains: { condition: aggregate boolean expression, color: color value }
 
-  bold: true if bold
-  italic: true if italic
+bold: true if bold
+italic: true if italic
 
-## Rendering 
+## Rendering
 
 Rendering a pivot chart is first done by getting the data for each intersection (see PivotChartQueryBuilder).
 
@@ -80,45 +80,45 @@ the list of rows and cells.
 
 Layout format is as follows:
 
-  rows: array of rows
-  striping: "columns"/"rows" to put in light striping
-  tooManyRows: true if row limit exceeded
-  tooManyColumns: true if column limit exceeded
+rows: array of rows
+striping: "columns"/"rows" to put in light striping
+tooManyRows: true if row limit exceeded
+tooManyColumns: true if column limit exceeded
 
 row:
-  cells: array of cells
+cells: array of cells
 
-cell: 
-  type: row/column/blank/intersection. See below
-  subtype: value/filler/label/valueLabel. See below
-  text: text content of cell
-  align: left/center/right
+cell:
+type: row/column/blank/intersection. See below
+subtype: value/filler/label/valueLabel. See below
+text: text content of cell
+align: left/center/right
 
-  section: section id (see above)
-  sectionTop: true if cell is on top edge of section
-  sectionBottom: true if cell is on bottom edge of section
-  sectionLeft: true if cell is on left edge of section
-  sectionRight: true if cell is on right edge of section
+section: section id (see above)
+sectionTop: true if cell is on top edge of section
+sectionBottom: true if cell is on bottom edge of section
+sectionLeft: true if cell is on left edge of section
+sectionRight: true if cell is on right edge of section
 
-  segment: segment if a row or column cell
+segment: segment if a row or column cell
 
-  borderLeft: weight of border (0 = none, 1 = light, 2 = medium, 3 = heavy)
-  borderRight: weight of border (0 = none, 1 = light, 2 = medium, 3 = heavy)
-  borderTop: weight of border (0 = none, 1 = light, 2 = medium, 3 = heavy)
-  borderBottom: weight of border (0 = none, 1 = light, 2 = medium, 3 = heavy)
-  
-  bold: true if bold
-  italic: true if italic
-  indent: number of units to indent cell
-  
-  backgroundColor: background color of cell
+borderLeft: weight of border (0 = none, 1 = light, 2 = medium, 3 = heavy)
+borderRight: weight of border (0 = none, 1 = light, 2 = medium, 3 = heavy)
+borderTop: weight of border (0 = none, 1 = light, 2 = medium, 3 = heavy)
+borderBottom: weight of border (0 = none, 1 = light, 2 = medium, 3 = heavy)
 
-  rowSpan: if spans more than one row. Next n-1 cells below will be type "skip"
-  columnSpan: if spans more than one column. Next n-1 cells will be type "skip"
-  skip: true if should skip cell because of row/column span
+bold: true if bold
+italic: true if italic
+indent: number of units to indent cell
 
-  unconfigured: true if cell is a placeholder that needs to be configured
-  summarize: true if cell is unconfigured and can be turned into a summary
+backgroundColor: background color of cell
+
+rowSpan: if spans more than one row. Next n-1 cells below will be type "skip"
+columnSpan: if spans more than one column. Next n-1 cells will be type "skip"
+skip: true if should skip cell because of row/column span
+
+unconfigured: true if cell is a placeholder that needs to be configured
+summarize: true if cell is unconfigured and can be turned into a summary
 
 ### Cell types
 
@@ -133,7 +133,3 @@ value: data-driven value
 label: label row/column
 valueLabel: header for values (rows and columns that have value and label)
 filler: intersection cells that have no data but fill space for row label
-
-
-
-

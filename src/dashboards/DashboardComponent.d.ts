@@ -2,7 +2,7 @@ import React, { ReactNode } from "react"
 import { DashboardDesign } from "./DashboardDesign"
 import { Schema, DataSource } from "mwater-expressions"
 import { JsonQLFilter } from "../JsonQLFilter"
-import DashboardDataSource from './DashboardDataSource'
+import DashboardDataSource from "./DashboardDataSource"
 
 /** Dashboard component that includes an action bar at the top
  * Manages undo stack and quickfilter value
@@ -15,7 +15,7 @@ export default class DashboardComponent extends React.Component<{
   schema: Schema
   dataSource: DataSource
   /** dashboard data source */
-  dashboardDataSource: DashboardDataSource  
+  dashboardDataSource: DashboardDataSource
 
   /** Extra element to include in title at left */
   titleElem?: ReactNode

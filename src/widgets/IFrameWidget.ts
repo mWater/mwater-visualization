@@ -1,13 +1,13 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
-let IFrameWidget;
-import React from 'react';
-const R = React.createElement;
-import _ from 'lodash';
-import Widget from './Widget';
+let IFrameWidget
+import React from "react"
+const R = React.createElement
+import _ from "lodash"
+import Widget from "./Widget"
 
 export default IFrameWidget = class IFrameWidget extends Widget {
-  // Creates a React element that is a view of the widget 
+  // Creates a React element that is a view of the widget
   // options:
   //  schema: schema to use
   //  dataSource: data source to use
@@ -22,17 +22,18 @@ export default IFrameWidget = class IFrameWidget extends Widget {
   //  singleRowTable: optional table name of table that will be filtered to have a single row present. Widget designer should optionally account for this
   createViewElement(options) {
     // Put here so IFrameWidget can be created on server
-    const IFrameWidgetComponent = require('./IFrameWidgetComponent');
-    
+    const IFrameWidgetComponent = require("./IFrameWidgetComponent")
+
     return R(IFrameWidgetComponent, {
       design: options.design,
       onDesignChange: options.onDesignChange,
       width: options.width,
       height: options.height
-    }
-    );
+    })
   }
 
   // Determine if widget is auto-height, which means that a vertical height is not required.
-  isAutoHeight() { return false; }
-};
+  isAutoHeight() {
+    return false
+  }
+}

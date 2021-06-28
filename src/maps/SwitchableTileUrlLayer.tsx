@@ -1,9 +1,9 @@
-import _ from 'lodash';
-import Layer from './Layer';
-import { LocalizedString, Schema, DataSource } from 'mwater-expressions';
-import { JsonQLFilter } from '../index';
-import React from 'react';
-import dompurify from 'dompurify'
+import _ from "lodash"
+import Layer from "./Layer"
+import { LocalizedString, Schema, DataSource } from "mwater-expressions"
+import { JsonQLFilter } from "../index"
+import React from "react"
+import dompurify from "dompurify"
 
 /**
  * Layer that is composed of multiple tile urls that can be switched between
@@ -28,7 +28,7 @@ export interface SwitchableTileUrlLayerDesign {
 /** One option that can be selected with its own urls */
 interface SwitchableOption {
   /** Unique id of the option */
-  id: string 
+  id: string
 
   /** Name of the option */
   name: string
@@ -45,8 +45,8 @@ interface SwitchableOption {
 
 /** Layer that has multiple tile urls that it can display. Switchable but not editable */
 export default class SwitchableTileUrlLayer extends Layer<SwitchableTileUrlLayerDesign> {
-  getLayerDefinitionType(): "TileUrl" { 
-    return "TileUrl" 
+  getLayerDefinitionType(): "TileUrl" {
+    return "TileUrl"
   }
 
   getMinZoom(design: SwitchableTileUrlLayerDesign) {
@@ -60,7 +60,7 @@ export default class SwitchableTileUrlLayer extends Layer<SwitchableTileUrlLayer
   /** Gets the tile url for definition type "TileUrl" */
   getTileUrl(design: SwitchableTileUrlLayerDesign, filters: JsonQLFilter[]): string | null {
     // Find active option
-    const option = design.options.find(d => d.id === design.activeOption)
+    const option = design.options.find((d) => d.id === design.activeOption)
     if (!option) {
       return null
     }
@@ -71,7 +71,7 @@ export default class SwitchableTileUrlLayer extends Layer<SwitchableTileUrlLayer
   /** Gets the utf grid url for definition type "TileUrl" */
   getUtfGridUrl(design: SwitchableTileUrlLayerDesign, filters: JsonQLFilter[]): string | null {
     // Find active option
-    const option = design.options.find(d => d.id === design.activeOption)
+    const option = design.options.find((d) => d.id === design.activeOption)
     if (!option) {
       return null
     }
@@ -79,19 +79,26 @@ export default class SwitchableTileUrlLayer extends Layer<SwitchableTileUrlLayer
     return option.utfGridUrl || null
   }
 
-  getLegend(design: SwitchableTileUrlLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]) {
+  getLegend(
+    design: SwitchableTileUrlLayerDesign,
+    schema: Schema,
+    name: string,
+    dataSource: DataSource,
+    locale: string,
+    filters: JsonQLFilter[]
+  ) {
     // Find active option
-    const option = design.options.find(d => d.id === design.activeOption)
+    const option = design.options.find((d) => d.id === design.activeOption)
     if (!option || !option.legendUrl) {
       return null
     }
 
-    return <HtmlUrlLegend url={option.legendUrl} name={name}/>
+    return <HtmlUrlLegend url={option.legendUrl} name={name} />
   }
 
   /** True if layer can be edited */
   isEditable() {
-    return true;
+    return true
   }
 
   // Creates a design element with specified options
@@ -109,14 +116,14 @@ export default class SwitchableTileUrlLayer extends Layer<SwitchableTileUrlLayer
     filters: JsonQLFilter[]
   }): React.ReactElement<{}> {
     // Require here to prevent server require problems
-    const SwitchableTileUrlLayerDesigner = require('./SwitchableTileUrlLayerDesigner').default;
+    const SwitchableTileUrlLayerDesigner = require("./SwitchableTileUrlLayerDesigner").default
 
     return React.createElement(SwitchableTileUrlLayerDesigner, {
       design: options.design,
       onDesignChange: (design: SwitchableTileUrlLayerDesign) => {
-        return options.onDesignChange(design);
+        return options.onDesignChange(design)
       }
-    });
+    })
   }
 }
 
@@ -150,15 +157,16 @@ class HtmlUrlLegend extends React.Component<HtmlUrlLegendProps, HtmlUrlLegendSta
 
   loadLegend() {
     const url = this.props.url.replace(/\{name\}/, encodeURIComponent(this.props.name))
-    window.fetch(url)
-      .then(response => response.text())
-      .then(html => {
+    window
+      .fetch(url)
+      .then((response) => response.text())
+      .then((html) => {
         const safeHtml = dompurify.sanitize(html)
         this.setState({ html: safeHtml })
       })
   }
 
   render() {
-    return <div dangerouslySetInnerHTML={{ __html: this.state.html }}/>
+    return <div dangerouslySetInnerHTML={{ __html: this.state.html }} />
   }
 }

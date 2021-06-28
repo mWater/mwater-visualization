@@ -1,8 +1,8 @@
-import { DataSource, Schema } from "mwater-expressions";
+import { DataSource, Schema } from "mwater-expressions"
 import { JsonQLFilter } from "../JsonQLFilter"
-import { MapDataSource } from "../maps/MapDataSource";
-import Widget from "./Widget";
-import { WidgetDataSource } from "./WidgetDataSource";
+import { MapDataSource } from "../maps/MapDataSource"
+import Widget from "./Widget"
+import { WidgetDataSource } from "./WidgetDataSource"
 
 export default class DirectWidgetDataSource implements WidgetDataSource {
   constructor(options: {
@@ -28,7 +28,7 @@ export default class DirectWidgetDataSource implements WidgetDataSource {
   /** For map widgets, the following is required */
   getMapDataSource(design: any): MapDataSource
 
-  /** Get the url to download an image (by id from an image or imagelist column) 
+  /** Get the url to download an image (by id from an image or imagelist column)
    * Height, if specified, is minimum height needed. May return larger image */
   getImageUrl(imageId: string, height?: number): string
 }

@@ -1,43 +1,45 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
-import _ from 'lodash';
-import { assert } from 'chai';
-import * as fixtures from '../fixtures';
-import DatagridQueryBuilder from '../../src/datagrids/DatagridQueryBuilder';
-import canonical from 'canonical-json';
-import { Schema } from 'mwater-expressions';
+import _ from "lodash"
+import { assert } from "chai"
+import * as fixtures from "../fixtures"
+import DatagridQueryBuilder from "../../src/datagrids/DatagridQueryBuilder"
+import canonical from "canonical-json"
+import { Schema } from "mwater-expressions"
 
 function compare(actual, expected) {
   return assert.equal(
     canonical(actual),
     canonical(expected),
     "\n" + canonical(actual) + "\n" + canonical(expected) + "\n"
-  );
+  )
 }
 
-describe("DatagridQueryBuilder", function() {
-  before(function() {
-    this.schema = fixtures.simpleSchema();
-    this.qb = new DatagridQueryBuilder(this.schema);
+describe("DatagridQueryBuilder", function () {
+  before(function () {
+    this.schema = fixtures.simpleSchema()
+    this.qb = new DatagridQueryBuilder(this.schema)
 
-    this.exprText = { type: "field", table: "t1", column: "text" };
-    return this.exprNumber = { type: "field", table: "t1", column: "number" };});
-    // @exprDate = { type: "field", table: "t1", column: "date" }
-    // @exprEnum = { type: "field", table: "t1", column: "enum" }
-    // @exprInvalid = { type: "field", table: "t1", column: "NONSUCH" }
+    this.exprText = { type: "field", table: "t1", column: "text" }
+    return (this.exprNumber = { type: "field", table: "t1", column: "number" })
+  })
+  // @exprDate = { type: "field", table: "t1", column: "date" }
+  // @exprEnum = { type: "field", table: "t1", column: "enum" }
+  // @exprInvalid = { type: "field", table: "t1", column: "NONSUCH" }
 
-
-  it("creates simple query", function() {
+  it("creates simple query", function () {
     const design = {
       table: "t1",
-      columns: [{
-        id: "cid1",
-        type: "expr",
-        expr: this.exprText
-      }]
-    };
+      columns: [
+        {
+          id: "cid1",
+          type: "expr",
+          expr: this.exprText
+        }
+      ]
+    }
 
-    const jsonql = this.qb.createQuery(design, { limit: null, offset: null });
+    const jsonql = this.qb.createQuery(design, { limit: null, offset: null })
     return compare(jsonql, {
       type: "query",
       selects: [
@@ -49,30 +51,30 @@ describe("DatagridQueryBuilder", function() {
         { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "s0" }
       ],
       from: { type: "table", table: "t1", alias: "main" },
-      orderBy: [
-        { ordinal: 3, direction: "asc" }
-      ],
+      orderBy: [{ ordinal: 3, direction: "asc" }],
       limit: null,
       offset: null
-    });
-});
+    })
+  })
 
-  it("creates simple query with natural ordering", function() {
-    const schemaJson = _.cloneDeep(this.schema.toJSON());
-    schemaJson.tables[0].ordering = "number";
-    const schema = new Schema(schemaJson);
-    const qb = new DatagridQueryBuilder(schema);
+  it("creates simple query with natural ordering", function () {
+    const schemaJson = _.cloneDeep(this.schema.toJSON())
+    schemaJson.tables[0].ordering = "number"
+    const schema = new Schema(schemaJson)
+    const qb = new DatagridQueryBuilder(schema)
 
     const design = {
       table: "t1",
-      columns: [{
-        id: "cid1",
-        type: "expr",
-        expr: this.exprText
-      }]
-    };
+      columns: [
+        {
+          id: "cid1",
+          type: "expr",
+          expr: this.exprText
+        }
+      ]
+    }
 
-    const jsonql = qb.createQuery(design, { limit: null, offset: null });
+    const jsonql = qb.createQuery(design, { limit: null, offset: null })
     return compare(jsonql, {
       type: "query",
       selects: [
@@ -92,18 +94,19 @@ describe("DatagridQueryBuilder", function() {
       ],
       limit: null,
       offset: null
-    });
-});
+    })
+  })
 
-
-  it("creates filtered simple query", function() {
+  it("creates filtered simple query", function () {
     const design = {
       table: "t1",
-      columns: [{
-        id: "cid1",
-        type: "expr",
-        expr: this.exprText
-      }],
+      columns: [
+        {
+          id: "cid1",
+          type: "expr",
+          expr: this.exprText
+        }
+      ],
       filter: {
         type: "op",
         op: "=",
@@ -112,9 +115,9 @@ describe("DatagridQueryBuilder", function() {
           { type: "literal", valueType: "number", value: 1 }
         ]
       }
-    };
+    }
 
-    const jsonql = this.qb.createQuery(design, { limit: null, offset: null });
+    const jsonql = this.qb.createQuery(design, { limit: null, offset: null })
     return compare(jsonql, {
       type: "query",
       selects: [
@@ -134,28 +137,26 @@ describe("DatagridQueryBuilder", function() {
           { type: "literal", value: 1 }
         ]
       },
-      orderBy: [
-        { ordinal: 3, direction: "asc" }
-      ],
+      orderBy: [{ ordinal: 3, direction: "asc" }],
       limit: null,
       offset: null
-    });
-});
+    })
+  })
 
-  it("creates ordered query", function() {
+  it("creates ordered query", function () {
     const design = {
       table: "t1",
-      columns: [{
-        id: "cid1",
-        type: "expr",
-        expr: this.exprText
-      }],
-      orderBys: [
-        { expr: this.exprNumber, direction: "desc" }
-      ]
-    };
+      columns: [
+        {
+          id: "cid1",
+          type: "expr",
+          expr: this.exprText
+        }
+      ],
+      orderBys: [{ expr: this.exprNumber, direction: "desc" }]
+    }
 
-    const jsonql = this.qb.createQuery(design, { limit: null, offset: null });
+    const jsonql = this.qb.createQuery(design, { limit: null, offset: null })
     return compare(jsonql, {
       type: "query",
       selects: [
@@ -175,35 +176,41 @@ describe("DatagridQueryBuilder", function() {
       ],
       limit: null,
       offset: null
-    });
-});
+    })
+  })
 
-  it("allows aggregate select", function() {
+  it("allows aggregate select", function () {
     const design = {
       table: "t1",
-      columns: [{
-        id: "cid1",
-        type: "expr",
-        expr: { table: "t1", type: "op", op: "sum", exprs: [this.exprNumber] }
-      }]
-    };
+      columns: [
+        {
+          id: "cid1",
+          type: "expr",
+          expr: { table: "t1", type: "op", op: "sum", exprs: [this.exprNumber] }
+        }
+      ]
+    }
 
-    const jsonql = this.qb.createQuery(design, { limit: null, offset: null });
+    const jsonql = this.qb.createQuery(design, { limit: null, offset: null })
     return compare(jsonql, {
       type: "query",
       selects: [
         // Includes column
-        { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "c0" }
+        {
+          type: "select",
+          expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] },
+          alias: "c0"
+        }
       ],
       from: { type: "table", table: "t1", alias: "main" },
       orderBy: [],
       groupBy: [],
       limit: null,
       offset: null
-    });
-});
+    })
+  })
 
-  it("allows aggregate select with group by", function() {
+  it("allows aggregate select with group by", function () {
     const design = {
       table: "t1",
       columns: [
@@ -218,14 +225,18 @@ describe("DatagridQueryBuilder", function() {
           expr: this.exprText
         }
       ]
-    };
+    }
 
-    const jsonql = this.qb.createQuery(design, { limit: null, offset: null });
+    const jsonql = this.qb.createQuery(design, { limit: null, offset: null })
     return compare(jsonql, {
       type: "query",
       selects: [
         // Includes columns
-        { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "c0" },
+        {
+          type: "select",
+          expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] },
+          alias: "c0"
+        },
         // Includes columns
         { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "c1" }
       ],
@@ -234,10 +245,10 @@ describe("DatagridQueryBuilder", function() {
       groupBy: [2],
       limit: null,
       offset: null
-    });
-});
+    })
+  })
 
-  it("allows aggregate select with order by grouped", function() {
+  it("allows aggregate select with order by grouped", function () {
     const design = {
       table: "t1",
       columns: [
@@ -247,17 +258,19 @@ describe("DatagridQueryBuilder", function() {
           expr: { table: "t1", type: "op", op: "sum", exprs: [this.exprNumber] }
         }
       ],
-      orderBys: [
-        { expr: this.exprText, direction: "desc" }
-      ]
-    };
+      orderBys: [{ expr: this.exprText, direction: "desc" }]
+    }
 
-    const jsonql = this.qb.createQuery(design, { limit: null, offset: null });
+    const jsonql = this.qb.createQuery(design, { limit: null, offset: null })
     return compare(jsonql, {
       type: "query",
       selects: [
         // Includes columns
-        { type: "select", expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] }, alias: "c0" },
+        {
+          type: "select",
+          expr: { type: "op", op: "sum", exprs: [{ type: "field", tableAlias: "main", column: "number" }] },
+          alias: "c0"
+        },
         // Includes order
         { type: "select", expr: { type: "field", tableAlias: "main", column: "text" }, alias: "s0" }
       ],
@@ -266,28 +279,29 @@ describe("DatagridQueryBuilder", function() {
       groupBy: [2],
       limit: null,
       offset: null
-    });
-});
+    })
+  })
 
-
-  it("creates adds extra filter query", function() {
+  it("creates adds extra filter query", function () {
     const design = {
       table: "t1",
-      columns: [{
-        id: "cid1",
-        type: "expr",
-        expr: this.exprText
-      }]
-    };
+      columns: [
+        {
+          id: "cid1",
+          type: "expr",
+          expr: this.exprText
+        }
+      ]
+    }
 
     const extraFilters = [
-      { 
+      {
         table: "t1",
-        jsonql: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "text" }, "hello" ]}
+        jsonql: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "text" }, "hello"] }
       }
-    ];
+    ]
 
-    const jsonql = this.qb.createQuery(design, { limit: null, offset: null, extraFilters });
+    const jsonql = this.qb.createQuery(design, { limit: null, offset: null, extraFilters })
     return compare(jsonql, {
       type: "query",
       selects: [
@@ -299,21 +313,17 @@ describe("DatagridQueryBuilder", function() {
         { type: "select", expr: { type: "field", tableAlias: "main", column: "primary" }, alias: "s0" }
       ],
       from: { type: "table", table: "t1", alias: "main" },
-      where: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "main", column: "text" }, "hello" ]},
-      orderBy: [
-        { ordinal: 3, direction: "asc" }
-      ],
+      where: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "main", column: "text" }, "hello"] },
+      orderBy: [{ ordinal: 3, direction: "asc" }],
       limit: null,
       offset: null
-    });
-});
+    })
+  })
 
-  return it("adds subtable", function() {
+  return it("adds subtable", function () {
     const design = {
       table: "t1",
-      subtables: [
-        { id: "st1", joins: ["1-2"] }
-      ],
+      subtables: [{ id: "st1", joins: ["1-2"] }],
       columns: [
         {
           id: "cid1",
@@ -327,9 +337,9 @@ describe("DatagridQueryBuilder", function() {
           expr: { type: "field", table: "t1", column: "number" }
         }
       ]
-    };
+    }
 
-    const jsonql = this.qb.createQuery(design, { limit: null, offset: null });
+    const jsonql = this.qb.createQuery(design, { limit: null, offset: null })
 
     // Should union all main query and then inner join query. Sorts by main sorts, then subtable id, then subtable sorts
     /*
@@ -368,7 +378,7 @@ describe("DatagridQueryBuilder", function() {
         { type: "select", expr: { type: "op", op: "::decimal", exprs: [null] }, alias: "c1" }
       ],
       from: { type: "table", table: "t1", alias: "main" }
-    };
+    }
 
     const innerst = {
       type: "query",
@@ -394,15 +404,18 @@ describe("DatagridQueryBuilder", function() {
         on: {
           type: "op",
           op: "=",
-          exprs: [{ type: "field", tableAlias: "st", column: "t1" }, { type: "field", tableAlias: "main", column: "primary" }]
+          exprs: [
+            { type: "field", tableAlias: "st", column: "t1" },
+            { type: "field", tableAlias: "main", column: "primary" }
+          ]
         }
       }
-    };
+    }
 
     const unioned = {
       type: "union all",
       queries: [innermain, innerst]
-    };
+    }
 
     // Now take the columns and do the sorting
     return compare(jsonql, {
@@ -427,6 +440,6 @@ describe("DatagridQueryBuilder", function() {
       ],
       limit: null,
       offset: null
-    });
-});
-});
+    })
+  })
+})

@@ -5,4 +5,3 @@ export interface TextWidgetDesign {
   /** "title" for title block. default is "default" */
   style?: "title" | "default"
 }
-

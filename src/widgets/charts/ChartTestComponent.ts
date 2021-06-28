@@ -20,8 +20,8 @@
 //         @props.chart.createViewElement(design: @state.design, data: data, width: 300, height: 300)
 //       R 'div', className: "col-xs-6",
 //         @props.chart.createDesignerElement(design: @state.design, onChange: @handleDesignChange)
-    
-// data = {"main":[{"x":"broken","y":"48520"},{"x":null,"y":"2976"},{"x":"ok","y":"173396"},{"x":"maint","y":"12103"},{"x":"missing","y":"3364"}]}    
+
+// data = {"main":[{"x":"broken","y":"48520"},{"x":null,"y":"2976"},{"x":"ok","y":"173396"},{"x":"maint","y":"12103"},{"x":"missing","y":"3364"}]}
 
 // design = {
 //   "aesthetics": {

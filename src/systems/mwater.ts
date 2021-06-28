@@ -2,5 +2,5 @@
 // Sanity-check the conversion and remove this comment.
 
 export function setup() {
-  throw new Error("USING WRONG VERSION OF VISUALIZATION");
+  throw new Error("USING WRONG VERSION OF VISUALIZATION")
 }

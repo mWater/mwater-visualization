@@ -1,115 +1,139 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
-let TextComponent;
-import PropTypes from 'prop-types';
-import React from 'react';
-const R = React.createElement;
-import _ from 'lodash';
-import RichTextComponent from '../../richtext/RichTextComponent';
-import ExprInsertModalComponent from './ExprInsertModalComponent';
-import ExprUpdateModalComponent from './ExprUpdateModalComponent';
-import ExprItemsHtmlConverter from '../../richtext/ExprItemsHtmlConverter';
+let TextComponent
+import PropTypes from "prop-types"
+import React from "react"
+const R = React.createElement
+import _ from "lodash"
+import RichTextComponent from "../../richtext/RichTextComponent"
+import ExprInsertModalComponent from "./ExprInsertModalComponent"
+import ExprUpdateModalComponent from "./ExprUpdateModalComponent"
+import ExprItemsHtmlConverter from "../../richtext/ExprItemsHtmlConverter"
 
 // Text component which is provided with the data it needs, rather than loading it.
 // Used by TextWidgetComponent and also by other components that embed text fields
-export default TextComponent = (function() {
+export default TextComponent = (function () {
   TextComponent = class TextComponent extends React.Component {
     static initClass() {
-      this.propTypes = { 
+      this.propTypes = {
         design: PropTypes.object.isRequired,
         onDesignChange: PropTypes.func, // Called with new design. null/undefined for readonly
-      
+
         schema: PropTypes.object.isRequired,
         dataSource: PropTypes.object.isRequired, // Data source to use for chart
         exprValues: PropTypes.object.isRequired, // Expression values
-  
+
         width: PropTypes.number,
         height: PropTypes.number,
-  
-        singleRowTable: PropTypes.string,  // Table that is filtered to have one row
+
+        singleRowTable: PropTypes.string, // Table that is filtered to have one row
         namedStrings: PropTypes.object // Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
-      };
-  
-      this.contextTypes =
-        {locale: PropTypes.string};
-        // e.g. "en"
+      }
+
+      this.contextTypes = { locale: PropTypes.string }
+      // e.g. "en"
     }
 
     createItemsHtmlConverter() {
       return new ExprItemsHtmlConverter(
-        this.props.schema, 
-        (this.props.onDesignChange != null), 
-        this.props.exprValues, 
+        this.props.schema,
+        this.props.onDesignChange != null,
+        this.props.exprValues,
         // Display summaries if in design more and singleRowTable is set
-        (this.props.onDesignChange != null) && (this.props.singleRowTable != null),
+        this.props.onDesignChange != null && this.props.singleRowTable != null,
         // Only replace named strings if not editing
-        (this.props.onDesignChange == null) ? this.props.namedStrings : undefined,
+        this.props.onDesignChange == null ? this.props.namedStrings : undefined,
         this.context.locale
-      );
+      )
     }
 
-    handleItemsChange = items => {
-      const design = _.extend({}, this.props.design, {items});
-      return this.props.onDesignChange(design);
-    };
+    handleItemsChange = (items) => {
+      const design = _.extend({}, this.props.design, { items })
+      return this.props.onDesignChange(design)
+    }
 
-    handleInsertExpr = item => {
-      const html = '<div data-embed="' + _.escape(JSON.stringify(item)) + '"></div>';
+    handleInsertExpr = (item) => {
+      const html = '<div data-embed="' + _.escape(JSON.stringify(item)) + '"></div>'
 
-      return this.editor.pasteHTML(html);
-    };
+      return this.editor.pasteHTML(html)
+    }
 
     replaceItem(item) {
-      var replaceItemInItems = (items, item) => _.map(items, function(i) {
-        if (i.id === item.id) {
-          return item;
-        } else if (i.items) {
-          return _.extend({}, i, {items: replaceItemInItems(i.items, item)});
-        } else {
-          return i;
-        }
-        });
+      var replaceItemInItems = (items, item) =>
+        _.map(items, function (i) {
+          if (i.id === item.id) {
+            return item
+          } else if (i.items) {
+            return _.extend({}, i, { items: replaceItemInItems(i.items, item) })
+          } else {
+            return i
+          }
+        })
 
-      const items = replaceItemInItems(this.props.design.items || [], item);
-      return this.props.onDesignChange(_.extend({}, this.props.design, {items}));
+      const items = replaceItemInItems(this.props.design.items || [], item)
+      return this.props.onDesignChange(_.extend({}, this.props.design, { items }))
     }
 
-    handleItemClick = item => {
-      return this.exprUpdateModal.open(item, item => {
+    handleItemClick = (item) => {
+      return this.exprUpdateModal.open(item, (item) => {
         // Replace in items
-        return this.replaceItem(item);
-      });
-    };
+        return this.replaceItem(item)
+      })
+    }
 
-    handleAddExpr = ev => {
-      ev.preventDefault();
-      return this.exprInsertModal.open();
-    };
+    handleAddExpr = (ev) => {
+      ev.preventDefault()
+      return this.exprInsertModal.open()
+    }
 
     renderExtraPaletteButtons() {
-      return R('div', {key: "expr", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleAddExpr},
-        R('i', {className: "fa fa-plus"}),
-        " Field");
+      return R(
+        "div",
+        { key: "expr", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleAddExpr },
+        R("i", { className: "fa fa-plus" }),
+        " Field"
+      )
     }
 
     renderModals() {
       return [
-        R(ExprInsertModalComponent, {key: "exprInsertModal", ref: (c => { return this.exprInsertModal = c; }), schema: this.props.schema, dataSource: this.props.dataSource, onInsert: this.handleInsertExpr, singleRowTable: this.props.singleRowTable}),
-        R(ExprUpdateModalComponent, {key: "exprUpdateModal", ref: (c => { return this.exprUpdateModal = c; }), schema: this.props.schema, dataSource: this.props.dataSource, singleRowTable: this.props.singleRowTable})
-      ];
+        R(ExprInsertModalComponent, {
+          key: "exprInsertModal",
+          ref: (c) => {
+            return (this.exprInsertModal = c)
+          },
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          onInsert: this.handleInsertExpr,
+          singleRowTable: this.props.singleRowTable
+        }),
+        R(ExprUpdateModalComponent, {
+          key: "exprUpdateModal",
+          ref: (c) => {
+            return (this.exprUpdateModal = c)
+          },
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          singleRowTable: this.props.singleRowTable
+        })
+      ]
     }
 
-    refRichTextComponent = c => { return this.editor = c; };
+    refRichTextComponent = (c) => {
+      return (this.editor = c)
+    }
 
     render() {
-      const style = { 
+      const style = {
         position: "relative"
-      };
+      }
 
-      style.width = this.props.width;
-      style.height = this.props.height;
+      style.width = this.props.width
+      style.height = this.props.height
 
-      return R('div', null,
+      return R(
+        "div",
+        null,
         this.renderModals(),
         R(RichTextComponent, {
           ref: this.refRichTextComponent,
@@ -119,13 +143,12 @@ export default TextComponent = (function() {
           onItemsChange: this.props.onDesignChange ? this.handleItemsChange : undefined,
           onItemClick: this.handleItemClick,
           itemsHtmlConverter: this.createItemsHtmlConverter(),
-          includeHeadings: (this.props.design.style === "default") || !this.props.design.style,
+          includeHeadings: this.props.design.style === "default" || !this.props.design.style,
           extraPaletteButtons: this.renderExtraPaletteButtons()
-        }
-        )
-      );
+        })
+      )
     }
-  };
-  TextComponent.initClass();
-  return TextComponent;
-})();
+  }
+  TextComponent.initClass()
+  return TextComponent
+})()

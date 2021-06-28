@@ -3,7 +3,7 @@ import { MapDataSource } from "../maps/MapDataSource"
 import { MapDesign } from "../maps/MapDesign"
 
 /** Interface for a widget data source that gives the widget access to the data it needs, even if that data is not directly available from the data source
- * For example, Alice might share a widget with Bob. Bob can't access the data directly that Alice sees (since it's private), but he can use the widget 
+ * For example, Alice might share a widget with Bob. Bob can't access the data directly that Alice sees (since it's private), but he can use the widget
  * data source to get it, as the server will return the exact data he needs for the widget, since the server has a copy of the design of the widget.
  */
 export interface WidgetDataSource {
@@ -17,7 +17,7 @@ export interface WidgetDataSource {
   /** For map widgets, the following is required */
   getMapDataSource?(design: MapDesign): MapDataSource
 
-  /** Get the url to download an image (by id from an image or imagelist column) 
+  /** Get the url to download an image (by id from an image or imagelist column)
    * Height, if specified, is minimum height needed. May return larger image */
   getImageUrl(imageId: string, height?: number): string
 }

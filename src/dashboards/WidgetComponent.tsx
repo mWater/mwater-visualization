@@ -1,19 +1,19 @@
-import { Schema, DataSource } from "mwater-expressions";
-import { useMemo, useRef } from "react";
-import { JsonQLFilter } from "../JsonQLFilter";
-import WidgetFactory from "../widgets/WidgetFactory";
-import { WidgetScope } from "../WidgetScope";
-import DashboardDataSource from "./DashboardDataSource";
+import { Schema, DataSource } from "mwater-expressions"
+import { useMemo, useRef } from "react"
+import { JsonQLFilter } from "../JsonQLFilter"
+import WidgetFactory from "../widgets/WidgetFactory"
+import { WidgetScope } from "../WidgetScope"
+import DashboardDataSource from "./DashboardDataSource"
 
-/** 
- * Component which renders a widget and ensures that props do not change 
+/**
+ * Component which renders a widget and ensures that props do not change
  * unnecessarily.
  */
 export function WidgetComponent(props: {
   /** Widget id */
   id: string
   /** Widget type */
-  type: string 
+  type: string
 
   /** Widget design */
   design: any
@@ -67,22 +67,18 @@ export function WidgetComponent(props: {
   refreshKey?: any
 }) {
   // Get and stabilize widget data source
-  // TODO!!! There is a global problem with DashboardDataSources being re-created on each render. 
+  // TODO!!! There is a global problem with DashboardDataSources being re-created on each render.
   // TODO!!! This now only uses the type of the dashboard data source. They should be more stable in the future.
-  const widgetDataSource = useMemo(() => props.dashboardDataSource.getWidgetDataSource(props.type, props.id), [
-    props.dashboardDataSource.constructor, 
-    props.type, 
-    props.id,
-    props.schema,
-    props.dataSource,
-    props.refreshKey
-  ])
+  const widgetDataSource = useMemo(
+    () => props.dashboardDataSource.getWidgetDataSource(props.type, props.id),
+    [props.dashboardDataSource.constructor, props.type, props.id, props.schema, props.dataSource, props.refreshKey]
+  )
 
   const widget = WidgetFactory.createWidget(props.type)
 
   // Stabilize functions
   const onDesignChange = useStabilizeFunction(props.onDesignChange)
-  const onRowClick = useStabilizeFunction(props.onRowClick) || undefined  
+  const onRowClick = useStabilizeFunction(props.onRowClick) || undefined
   const onScopeChange = useStabilizeFunction(props.onScopeChange)!
   const widgetRef = useStabilizeFunction(props.widgetRef)!
 
@@ -92,7 +88,7 @@ export function WidgetComponent(props: {
 
   return widget.createViewElement({
     schema: props.schema,
-    dataSource: props.dataSource, 
+    dataSource: props.dataSource,
     widgetDataSource,
     design: props.design,
     scope,
@@ -123,7 +119,6 @@ function useStabilizeFunction<T extends Function>(func: T | undefined | null): T
   const stableRef = useRef<T>(stableCallback as any)
   return func ? stableRef.current : undefined
 }
-
 
 /** Always returns the same value of stringifies the same to prevent unnecessary re-rendering */
 function useStabilizeValue<T>(value: T): T {

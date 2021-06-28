@@ -105,10 +105,9 @@ There are several styles of block layouts:
   padding-bottom: 15px;
 }
 
-
 /* GREYBG */
 .mwater-visualization-block-parent-outer-greybg {
-  background-color: #DDD;
+  background-color: #ddd;
 }
 
 .mwater-visualization-block-parent-inner-greybg {
@@ -130,10 +129,9 @@ There are several styles of block layouts:
 
   /* Add a border on printing */
   .mwater-visualization-block-parent-outer-greybg .mwater-visualization-block {
-    border: solid 1px #AAA;
+    border: solid 1px #aaa;
   }
 }
-
 
 .mwater-visualization-block-parent-outer-greybg .mwater-visualization-block {
   margin: 9px;
@@ -143,9 +141,8 @@ There are several styles of block layouts:
 }
 
 .mwater-visualization-block-parent-outer-greybg .mwater-visualization-block-spacer {
-  background-color: #DDD;
+  background-color: #ddd;
 }
-
 
 /* STORY */
 .mwater-visualization-block-parent-outer-story {
@@ -171,7 +168,7 @@ There are several styles of block layouts:
   font-style: normal;
   font-weight: normal;
   word-wrap: break-word;
- -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased;
   line-height: 33px;
 }
 
@@ -216,7 +213,8 @@ There are several styles of block layouts:
 
 @media only screen and (max-width: 1000px) {
   /* Fill screen when small */
-  .mwater-visualization-block-parent-outer-story.mwater-visualization-block-viewing .mwater-visualization-horizontal-block-item {
+  .mwater-visualization-block-parent-outer-story.mwater-visualization-block-viewing
+    .mwater-visualization-horizontal-block-item {
     width: 100% !important;
   }
 

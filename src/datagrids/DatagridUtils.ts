@@ -24,13 +24,13 @@ export default class DatagridUtils {
     }
 
     // Clean columns
-    design = produce(design, draft => {
+    design = produce(design, (draft) => {
       for (let column of draft.columns) {
         if (column.type === "expr") {
           // Determine if subtable
           var table
           if (column.subtable) {
-            const subtable = _.findWhere(design.subtables!, {id: column.subtable})
+            const subtable = _.findWhere(design.subtables!, { id: column.subtable })
 
             // Now get destination table
             table = new ExprUtils(this.schema).followJoins(design.table!, subtable!.joins)
@@ -38,14 +38,16 @@ export default class DatagridUtils {
             table = design.table!
           }
 
-          column.expr = exprCleaner.cleanExpr((column.expr ? original(column.expr) || null : null), { table, aggrStatuses: ["individual", "literal", "aggregate"] })
+          column.expr = exprCleaner.cleanExpr(column.expr ? original(column.expr) || null : null, {
+            table,
+            aggrStatuses: ["individual", "literal", "aggregate"]
+          })
         }
       }
-
     })
     return design
   }
-  
+
   validateDesign(design: DatagridDesign) {
     if (!design.table) {
       return "Missing table"
@@ -58,7 +60,9 @@ export default class DatagridUtils {
     // Validate column exprs
     for (const column of design.columns) {
       if (column.expr) {
-        const error = new ExprValidator(this.schema).validateExpr(column.expr, { aggrStatuses: ["individual", "literal", "aggregate"] })
+        const error = new ExprValidator(this.schema).validateExpr(column.expr, {
+          aggrStatuses: ["individual", "literal", "aggregate"]
+        })
         if (error) {
           return error
         }

@@ -1,6 +1,6 @@
-import { LiteralType } from "mwater-expressions";
-import { format as d3Format } from 'd3-format'
-import { fromLatLon } from 'utm'
+import { LiteralType } from "mwater-expressions"
+import { format as d3Format } from "d3-format"
+import { fromLatLon } from "utm"
 
 /** Option for list of format options */
 export interface FormatOption {
@@ -19,7 +19,7 @@ export function getFormatOptions(type: LiteralType): FormatOption[] | null {
     return [
       { value: "", label: "Plain: 1234.567" },
       { value: ",", label: "Normal: 1,234.567" },
-      { value: ",.0f", label: "Rounded: 1,234"  },
+      { value: ",.0f", label: "Rounded: 1,234" },
       { value: ",.2f", label: "Two decimals: 1,234.56" },
       { value: "$,.2f", label: "Currency: $1,234.56" },
       { value: "$,.0f", label: "Currency rounded: $1,234" },
@@ -34,7 +34,7 @@ export function getFormatOptions(type: LiteralType): FormatOption[] | null {
       { value: "UTM", label: "UTM" }
     ]
   }
-  
+
   return null
 }
 
@@ -51,10 +51,16 @@ export function getDefaultFormat(type: LiteralType): string {
   throw new Error("Not supported")
 }
 
-/** Format a value of a specified type as a string. For historical reasons, 
+/** Format a value of a specified type as a string. For historical reasons,
  * LayeredCharts multiply by 100 before adding the % sign. Set legacyPercentFormat to true to replicate
  */
-export function formatValue(type: LiteralType, value: any, format: string | null | undefined, locale?: string, legacyPercentFormat?: boolean): string {
+export function formatValue(
+  type: LiteralType,
+  value: any,
+  format: string | null | undefined,
+  locale?: string,
+  legacyPercentFormat?: boolean
+): string {
   if (value == null) {
     return ""
   }
@@ -71,7 +77,7 @@ export function formatValue(type: LiteralType, value: any, format: string | null
 
     return d3Format(format)(value)
   }
-  
+
   if (type == "geometry") {
     if (format == "UTM") {
       if (value.type == "Point") {
@@ -89,18 +95,15 @@ export function formatValue(type: LiteralType, value: any, format: string | null
         return `${zoneNum}${zoneLetter} ${easting.toFixed(0)} ${northing.toFixed(0)}`
       }
       return value.type
-    }
-    else {
+    } else {
       // Display as lat/lng if Point, otherwise type
       if (value.type == "Point") {
         return `${value.coordinates[1].toFixed(6)}, ${value.coordinates[0].toFixed(6)}`
-      }
-      else {
+      } else {
         return value.type
       }
     }
-  }
-  else {
+  } else {
     // Should not happen
     return value + ""
   }

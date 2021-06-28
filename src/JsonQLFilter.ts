@@ -1,4 +1,4 @@
-import { JsonQLExpr } from "jsonql";
+import { JsonQLExpr } from "jsonql"
 
 /** Filter on a table, defined in JsonQL */
 export interface JsonQLFilter {

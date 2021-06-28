@@ -1,5 +1,5 @@
-import { Expr } from "mwater-expressions";
-import { Axis } from "../axes/Axis";
+import { Expr } from "mwater-expressions"
+import { Axis } from "../axes/Axis"
 
 /**
  * Layer that is composed of regions colored. Now extended to any other regions as well, so name
@@ -7,7 +7,7 @@ import { Axis } from "../axes/Axis";
  */
 export default interface ChoroplethLayerDesign {
   /**
-   * Mode of map made from regions. 
+   * Mode of map made from regions.
    * "plain": no axes, just displays regions
    * "indirect": default. Uses a table that has a region id in it. axes are from the table
    * "direct": axes are non-aggregate and based on the regions table
@@ -31,7 +31,7 @@ export default interface ChoroplethLayerDesign {
 
   /** expression to get admin region id for calculations. Only if regionMode = "indirect" */
   adminRegionExpr?: Expr
-  
+
   /** axes (see below) */
   axes: {
     /** color axis. If in region mode "indirect", aggregate on table, if in region mode "direct", from region table, non-aggregate */
@@ -66,5 +66,5 @@ export default interface ChoroplethLayerDesign {
   minZoom?: number
 
   /** maximum zoom level */
-  maxZoom?: number 
+  maxZoom?: number
 }

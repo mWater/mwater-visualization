@@ -1,5 +1,5 @@
 import { ReactNode, Component } from "react"
-import L, { PathOptions, CircleMarkerOptions } from 'leaflet'
+import L, { PathOptions, CircleMarkerOptions } from "leaflet"
 
 // import { GeoJsonObject } from "geojson";
 type GeoJsonObject = any
@@ -14,21 +14,21 @@ export interface MapBounds {
 /** Layer that is loaded from a tile url */
 export interface TileLayer {
   /** Url in leaflet format */
-  tileUrl: string 
+  tileUrl: string
   /** Url of interactivity grid */
   utfGridUrl?: string
   /** Visibility */
   visible: boolean
   /** 0-1 */
-  opacity: number 
+  opacity: number
   /** Function that is called when grid layer is clicked. Passed { data } */
   onGridClick?: (ev: { data: any }) => void
   /** Function that is called when grid layer is hovered. Passed { data } */
   onGridHover?: (ev: { data: any }) => void
   /** Minimum zoom level  */
-  minZoom?: number 
+  minZoom?: number
   /** Maximum zoom level */
-  maxZoom?: number 
+  maxZoom?: number
 }
 
 /** Layer that contains GeoJSON objects to display */
@@ -38,7 +38,7 @@ export interface GeoJsonLayer {
 
   /** Optional key for click events */
   key?: any
-  
+
   /** Style for all but points */
   style?: PathOptions
 
@@ -58,33 +58,33 @@ interface Props {
   baseLayerId: "bing_road" | "bing_aerial" | "cartodb_positron" | "cartodb_dark_matter" | "white"
   /** Optional opacity 0-1 */
   baseLayerOpacity?: number
-  
+
   /** Initial bounds. Fit world if none */
   initialBounds?: MapBounds
-  
+
   /**  Required width in any css units */
-  width: any 
+  width: any
   /**  Required height in any css units */
-  height: any 
-  
+  height: any
+
   /** Called with bounds in w, n, s, e format when bounds change */
-  onBoundsChange?: (bounds: { w: number, n: number, s: number, e: number }) => void
-  
+  onBoundsChange?: (bounds: { w: number; n: number; s: number; e: number }) => void
+
   /** List of layers */
   layers: MapLayer[]
-  
+
   /** Legend. Will have zoom injected */
   legend?: ReactNode
-  
+
   /** Whether the map be draggable with mouse/touch or not. Default true */
-  dragging?: boolean         
+  dragging?: boolean
   /** Whether the map can be zoomed by touch-dragging with two fingers. Default true */
-  touchZoom?: boolean         
+  touchZoom?: boolean
   /** Whether the map can be zoomed by using the mouse wheel. Default true */
-  scrollWheelZoom?: boolean   
+  scrollWheelZoom?: boolean
   /** Whether the map responds to keyboard. Default true */
-  keyboard?: boolean          
-  
+  keyboard?: boolean
+
   /** Maximum zoom level */
   maxZoom?: number
 
@@ -92,16 +92,16 @@ interface Props {
   minZoom?: number
 
   /** User defined attributions */
-  extraAttribution?: string 
-  
+  extraAttribution?: string
+
   /** True to add loading spinner */
-  loadingSpinner?: boolean       
-  
+  loadingSpinner?: boolean
+
   /** True to show scale control */
   scaleControl?: boolean
-  
+
   /** Set to display a Leaflet popup control */
-  popup?: {         
+  popup?: {
     lat: number
     lng: number
     contents: ReactNode

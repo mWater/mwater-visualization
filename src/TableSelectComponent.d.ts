@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { Schema, Expr } from "mwater-expressions";
+import * as React from "react"
+import { Schema, Expr } from "mwater-expressions"
 
 declare class TableSelectComponent extends React.Component<{
   schema: Schema

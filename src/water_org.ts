@@ -1,13 +1,13 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
-import $ from 'jquery';
-import PropTypes from 'prop-types';
-import _ from 'lodash';
-import visualization, * as visualizationExports from './index';
-import jsyaml from 'js-yaml';
-import TabbedComponent from 'react-library/lib/TabbedComponent';
-import React from 'react';
-const R = React.createElement;
+import $ from "jquery"
+import PropTypes from "prop-types"
+import _ from "lodash"
+import visualization, * as visualizationExports from "./index"
+import jsyaml from "js-yaml"
+import TabbedComponent from "react-library/lib/TabbedComponent"
+import React from "react"
+const R = React.createElement
 
 // Pass in:
 // schemaUrl (yaml schema url)
@@ -17,56 +17,52 @@ const R = React.createElement;
 // design (initial design)
 // elemId (id of to render into)
 export function loadDashboard(options) {
-  // First get the schema 
-  return $.get(options.schemaUrl, function(schemaYaml) {
+  // First get the schema
+  return $.get(options.schemaUrl, function (schemaYaml) {
     // Load the schema
-    const schema = new visualization.Schema();
-    const schemaJson = jsyaml.safeLoad(schemaYaml);
-    schema.loadFromJSON(schemaJson);
+    const schema = new visualization.Schema()
+    const schemaJson = jsyaml.safeLoad(schemaYaml)
+    schema.loadFromJSON(schemaJson)
 
     // Create the data source
     const dataSource = new visualizationExports.CachingDataSource({
-        perform(query, cb) {
-          const url = options.queryUrl.replace(/\{query\}/, encodeURIComponent(JSON.stringify(query)));
-          return $.getJSON(url, rows => cb(null, rows)).fail(function(xhr) {
-            console.error(xhr.responseText);
-            return cb(new Error(xhr.responseText));
-          });
-        }
-      });
+      perform(query, cb) {
+        const url = options.queryUrl.replace(/\{query\}/, encodeURIComponent(JSON.stringify(query)))
+        return $.getJSON(url, (rows) => cb(null, rows)).fail(function (xhr) {
+          console.error(xhr.responseText)
+          return cb(new Error(xhr.responseText))
+        })
+      }
+    })
 
     // Create the widget factory
-    const widgetFactory = new visualizationExports.WidgetFactory({ schema, dataSource });
+    const widgetFactory = new visualizationExports.WidgetFactory({ schema, dataSource })
 
     // Get the design
-    return $.get(options.loadDesignUrl, function(designString) {
-      let design;
+    return $.get(options.loadDesignUrl, function (designString) {
+      let design
       if (designString) {
-        design = JSON.parse(designString);
+        design = JSON.parse(designString)
       } else {
         // Use default
-        ({
-          design
-        } = options);
+        ;({ design } = options)
       }
 
-      // Convert to tabs if not already 
+      // Convert to tabs if not already
       if (!design.tabs) {
         design = {
-          tabs: [
-            { name: "Main", design }
-          ]
-        };
+          tabs: [{ name: "Main", design }]
+        }
       }
 
       // Called to update the design and re-render
       function updateDesign(newDesign) {
-        design = newDesign;
+        design = newDesign
 
         // Save to database
-        $.post(options.saveDesignUrl, { userdata: JSON.stringify(design) });
+        $.post(options.saveDesignUrl, { userdata: JSON.stringify(design) })
 
-        return render();
+        return render()
       }
 
       // Render the dashboard
@@ -75,61 +71,58 @@ export function loadDashboard(options) {
           design,
           widgetFactory,
           onDesignChange: updateDesign
-        }
-        );
+        })
 
-        return ReactDOM.render(elem, document.getElementById(options.elemId));
+        return ReactDOM.render(elem, document.getElementById(options.elemId))
       }
 
       // Initial render
-      return render();
-    });
-  });
+      return render()
+    })
+  })
 }
 
 class TabbedDashboard extends React.Component {
   static initClass() {
-    this.propTypes = { 
+    this.propTypes = {
       design: PropTypes.object.isRequired,
       onDesignChange: PropTypes.func.isRequired,
       widgetFactory: PropTypes.object.isRequired
-    };
+    }
   }
 
   handleDesignChange = (index, design) => {
-    const tabs = this.props.design.tabs.slice();
-    tabs[index] = _.extend({}, tabs[index], {design});
-    return this.props.onDesignChange(_.extend({}, this.props.design, {tabs}));
-  };
+    const tabs = this.props.design.tabs.slice()
+    tabs[index] = _.extend({}, tabs[index], { design })
+    return this.props.onDesignChange(_.extend({}, this.props.design, { tabs }))
+  }
 
   handleAddTab = () => {
-    const tabs = this.props.design.tabs.slice();
+    const tabs = this.props.design.tabs.slice()
     // Add new dashboard
-    tabs.push({ name: "Untitled", design: { items: {} } });
-    return this.props.onDesignChange(_.extend({}, this.props.design, {tabs}));
-  };
+    tabs.push({ name: "Untitled", design: { items: {} } })
+    return this.props.onDesignChange(_.extend({}, this.props.design, { tabs }))
+  }
 
-  handleRemoveTab = index => {
+  handleRemoveTab = (index) => {
     if (!confirm("Permanently remove this tab? This cannot be undone!")) {
-      return;
+      return
     }
 
-    const tabs = this.props.design.tabs.slice();
-    tabs.splice(index, 1);
-    return this.props.onDesignChange(_.extend({}, this.props.design, {tabs}));
-  };
+    const tabs = this.props.design.tabs.slice()
+    tabs.splice(index, 1)
+    return this.props.onDesignChange(_.extend({}, this.props.design, { tabs }))
+  }
 
-  handleRenameTab = index => {
-    let {
-      name
-    } = this.props.design.tabs[index];
-    name = prompt("Name of tab", name);
+  handleRenameTab = (index) => {
+    let { name } = this.props.design.tabs[index]
+    name = prompt("Name of tab", name)
     if (name) {
-      const tabs = this.props.design.tabs.slice();
-      tabs[index] = _.extend({}, tabs[index], {name});
-      return this.props.onDesignChange(_.extend({}, this.props.design, {tabs}));
+      const tabs = this.props.design.tabs.slice()
+      tabs[index] = _.extend({}, tabs[index], { name })
+      return this.props.onDesignChange(_.extend({}, this.props.design, { tabs }))
     }
-  };
+  }
 
   createTab = (tab, index) => {
     return {
@@ -140,20 +133,26 @@ class TabbedDashboard extends React.Component {
         widgetFactory: this.props.widgetFactory,
         onDesignChange: this.handleDesignChange.bind(null, index),
         extraTitleButtonsElem: [
-          R('a', {key: "renametab", className: "btn btn-link btn-sm", onClick: this.handleRenameTab.bind(null, index)},
-            R('span', {className: "glyphicon glyphicon-pencil"}),
-            " Rename Tab"),
+          R(
+            "a",
+            { key: "renametab", className: "btn btn-link btn-sm", onClick: this.handleRenameTab.bind(null, index) },
+            R("span", { className: "glyphicon glyphicon-pencil" }),
+            " Rename Tab"
+          ),
           " ",
-          R('a', {key: "removetab", className: "btn btn-link btn-sm", onClick: this.handleRemoveTab.bind(null, index)},
-            R('span', {className: "glyphicon glyphicon-remove"}),
-            " Remove Tab")
+          R(
+            "a",
+            { key: "removetab", className: "btn btn-link btn-sm", onClick: this.handleRemoveTab.bind(null, index) },
+            R("span", { className: "glyphicon glyphicon-remove" }),
+            " Remove Tab"
+          )
         ]
       })
-    };
-  };
+    }
+  }
 
   createTabs() {
-    return _.map(this.props.design.tabs, this.createTab);
+    return _.map(this.props.design.tabs, this.createTab)
   }
 
   render() {
@@ -161,8 +160,7 @@ class TabbedDashboard extends React.Component {
       tabs: this.createTabs(),
       initialTabId: "0",
       onAddTab: this.handleAddTab
-    }
-      );
+    })
   }
 }
-TabbedDashboard.initClass();
+TabbedDashboard.initClass()

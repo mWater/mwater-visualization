@@ -1,103 +1,110 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
-let PopupFilterJoinsEditComponent;
-import PropTypes from 'prop-types';
-import _ from 'lodash';
-import React from 'react';
-const R = React.createElement;
+let PopupFilterJoinsEditComponent
+import PropTypes from "prop-types"
+import _ from "lodash"
+import React from "react"
+const R = React.createElement
 
-import { ExprComponent } from "mwater-expressions-ui";
-import { ExprUtils } from 'mwater-expressions';
-import { ExprCompiler } from 'mwater-expressions';
-import DashboardUtils from '../dashboards/DashboardUtils';
+import { ExprComponent } from "mwater-expressions-ui"
+import { ExprUtils } from "mwater-expressions"
+import { ExprCompiler } from "mwater-expressions"
+import DashboardUtils from "../dashboards/DashboardUtils"
 
 // Designer for popup filter joins (see PopupFilterJoins.md)
-export default PopupFilterJoinsEditComponent = (function() {
+export default PopupFilterJoinsEditComponent = (function () {
   PopupFilterJoinsEditComponent = class PopupFilterJoinsEditComponent extends React.Component {
     static initClass() {
       this.propTypes = {
         schema: PropTypes.object.isRequired, // Schema to use
         dataSource: PropTypes.object.isRequired,
-        table: PropTypes.string.isRequired,  // table of the row that the popup will be for
+        table: PropTypes.string.isRequired, // table of the row that the popup will be for
         idTable: PropTypes.string.isRequired, // table of the row that join is to. Usually same as table except for choropleth maps
         defaultPopupFilterJoins: PropTypes.object.isRequired, // Default popup filter joins
-        popup: PropTypes.object.isRequired,  // Design of the popup this is for
-        design: PropTypes.object,            // popup filter joins object
+        popup: PropTypes.object.isRequired, // Design of the popup this is for
+        design: PropTypes.object, // popup filter joins object
         onDesignChange: PropTypes.func.isRequired
-      };
-       // Called with new design
+      }
+      // Called with new design
     }
 
     constructor(props) {
-      super(props);
+      super(props)
 
       this.state = {
         expanded: false
-      };
+      }
     }
 
-    handleExprChange = (table, expr) => { 
-      let design = this.props.design || this.props.defaultPopupFilterJoins;
+    handleExprChange = (table, expr) => {
+      let design = this.props.design || this.props.defaultPopupFilterJoins
 
-      design = _.clone(design);
-      design[table] = expr;
-      return this.props.onDesignChange(design);
-    };
+      design = _.clone(design)
+      design[table] = expr
+      return this.props.onDesignChange(design)
+    }
 
     render() {
       if (!this.state.expanded) {
-        return R('a', {className: "btn btn-link", onClick: (() => this.setState({expanded: true}))},
-          "Advanced Popup Options");
+        return R(
+          "a",
+          { className: "btn btn-link", onClick: () => this.setState({ expanded: true }) },
+          "Advanced Popup Options"
+        )
       }
 
       // Get filterable tables of popup
-      const popupDashboard = { items: this.props.popup.items, layout: "blocks" };
-      let filterableTables = DashboardUtils.getFilterableTables(popupDashboard, this.props.schema);
+      const popupDashboard = { items: this.props.popup.items, layout: "blocks" }
+      let filterableTables = DashboardUtils.getFilterableTables(popupDashboard, this.props.schema)
 
       // Always include self as first
-      filterableTables = [this.props.table].concat(_.without(filterableTables, this.props.table));
+      filterableTables = [this.props.table].concat(_.without(filterableTables, this.props.table))
 
       // Get popupFilterJoins
-      const popupFilterJoins = this.props.design || this.props.defaultPopupFilterJoins;
+      const popupFilterJoins = this.props.design || this.props.defaultPopupFilterJoins
 
-      return R('div', null,
-        R('div', {className: "text-muted"}, 
-          "Optional connections for other tables to filtering the popup"),
-        R('table', {className: "table table-condensed table-bordered"},
-          R('thead', null,
-            R('tr', null,
-              R('th', null, "Data Source"),
-              R('th', null, "Connection"))
-          ),
-          R('tbody', null,
-            _.map(filterableTables, filterableTable => {
-              return R('tr', {key: filterableTable},
-                R('td', {style: { verticalAlign: "middle" }}, 
-                  ExprUtils.localizeString(this.props.schema.getTable(filterableTable)?.name)),
-                R('td', null,
+      return R(
+        "div",
+        null,
+        R("div", { className: "text-muted" }, "Optional connections for other tables to filtering the popup"),
+        R(
+          "table",
+          { className: "table table-condensed table-bordered" },
+          R("thead", null, R("tr", null, R("th", null, "Data Source"), R("th", null, "Connection"))),
+          R(
+            "tbody",
+            null,
+            _.map(filterableTables, (filterableTable) => {
+              return R(
+                "tr",
+                { key: filterableTable },
+                R(
+                  "td",
+                  { style: { verticalAlign: "middle" } },
+                  ExprUtils.localizeString(this.props.schema.getTable(filterableTable)?.name)
+                ),
+                R(
+                  "td",
+                  null,
                   R(ExprComponent, {
                     schema: this.props.schema,
                     dataSource: this.props.dataSource,
                     table: filterableTable,
                     value: popupFilterJoins[filterableTable],
                     onChange: this.handleExprChange.bind(null, filterableTable),
-                    types: this.props.table === this.props.idTable ? ["id", "id[]"] : ["id"],  // TODO support id[] some day for admin choropleth maps too
+                    types: this.props.table === this.props.idTable ? ["id", "id[]"] : ["id"], // TODO support id[] some day for admin choropleth maps too
                     idTable: this.props.idTable,
                     preferLiteral: false,
                     placeholder: "None"
-                  }
-                  )
+                  })
                 )
-              );
+              )
             })
           )
         )
-      );
+      )
     }
-  };
-  PopupFilterJoinsEditComponent.initClass();
-  return PopupFilterJoinsEditComponent;
-})();
-
-        
-    
+  }
+  PopupFilterJoinsEditComponent.initClass()
+  return PopupFilterJoinsEditComponent
+})()

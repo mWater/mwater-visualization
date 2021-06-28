@@ -1,4 +1,3 @@
-import LayoutManager from "../LayoutManager";
+import LayoutManager from "../LayoutManager"
 
-export default class BlocksLayoutManager extends LayoutManager {
-}
+export default class BlocksLayoutManager extends LayoutManager {}

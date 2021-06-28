@@ -1,38 +1,55 @@
-import _ from 'lodash'
-import React from 'react'
+import _ from "lodash"
+import React from "react"
 
-import Layer, { VectorTileDef } from './Layer'
-import { ExprUtils, ExprCompiler, ExprCleaner, injectTableAlias, Schema, Expr, DataSource, ExprValidator } from 'mwater-expressions'
-import AxisBuilder from '../axes/AxisBuilder'
-import { LayerDefinition, OnGridClickResults } from './maps'
-import { JsonQLFilter } from '../index'
-import GridLayerDesign from './GridLayerDesign'
-import produce from 'immer'
-import { Axis } from '../axes/Axis'
-import { JsonQLExpr, JsonQLQuery, JsonQLScalar } from 'jsonql'
-import { compileColorMapToMapbox } from './mapboxUtils'
-const LayerLegendComponent = require('./LayerLegendComponent')
+import Layer, { VectorTileDef } from "./Layer"
+import {
+  ExprUtils,
+  ExprCompiler,
+  ExprCleaner,
+  injectTableAlias,
+  Schema,
+  Expr,
+  DataSource,
+  ExprValidator
+} from "mwater-expressions"
+import AxisBuilder from "../axes/AxisBuilder"
+import { LayerDefinition, OnGridClickResults } from "./maps"
+import { JsonQLFilter } from "../index"
+import GridLayerDesign from "./GridLayerDesign"
+import produce from "immer"
+import { Axis } from "../axes/Axis"
+import { JsonQLExpr, JsonQLQuery, JsonQLScalar } from "jsonql"
+import { compileColorMapToMapbox } from "./mapboxUtils"
+const LayerLegendComponent = require("./LayerLegendComponent")
 
 /** Layer which is a grid of squares or flat-topped hexagons. Depends on "Grid Functions.sql" having been run */
 export default class GridLayer extends Layer<GridLayerDesign> {
   /** Gets the type of layer definition */
-  getLayerDefinitionType(): "VectorTile" { return "VectorTile" }
+  getLayerDefinitionType(): "VectorTile" {
+    return "VectorTile"
+  }
 
-  getVectorTile(design: GridLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
+  getVectorTile(
+    design: GridLayerDesign,
+    sourceId: string,
+    schema: Schema,
+    filters: JsonQLFilter[],
+    opacity: number
+  ): VectorTileDef {
     const jsonql = this.createJsonQL(design, schema, filters)
 
     const mapLayers: mapboxgl.AnyLayer[] = []
 
     // If color axes, add color conditions
     const color = compileColorMapToMapbox(design.colorAxis, "transparent")
-    
+
     mapLayers.push({
-      'id': `${sourceId}:fill`,
-      'type': 'fill',
-      'source': sourceId,
-      'source-layer': 'grid',
+      id: `${sourceId}:fill`,
+      type: "fill",
+      source: sourceId,
+      "source-layer": "grid",
       paint: {
-        'fill-opacity': design.fillOpacity! * opacity,
+        "fill-opacity": design.fillOpacity! * opacity,
         "fill-color": color,
         "fill-outline-color": "transparent"
       }
@@ -40,10 +57,10 @@ export default class GridLayer extends Layer<GridLayerDesign> {
 
     if (design.borderStyle == "color") {
       mapLayers.push({
-        'id': `${sourceId}:line`,
-        'type': 'line',
-        'source': sourceId,
-        'source-layer': 'grid',
+        id: `${sourceId}:line`,
+        type: "line",
+        source: sourceId,
+        "source-layer": "grid",
         paint: {
           "line-color": color,
           // Make darker if fill opacity is higher
@@ -54,9 +71,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     }
 
     return {
-      sourceLayers: [
-        { id: "grid", jsonql: jsonql }
-      ],
+      sourceLayers: [{ id: "grid", jsonql: jsonql }],
       ctes: [],
       mapLayers: mapLayers,
       mapLayersHandleClicks: [`${sourceId}:fill`]
@@ -68,9 +83,17 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     const exprCompiler = new ExprCompiler(schema)
 
     // Expression of scale and envelope from tile table
-    const scaleExpr = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "scale" }, from: { type: "table", table: "tile", alias: "tile" }}
-    const envelopeExpr: JsonQLScalar = { type: "scalar", expr: { type: "field", tableAlias: "tile", column: "envelope" }, from: { type: "table", table: "tile", alias: "tile" }}
-    
+    const scaleExpr = {
+      type: "scalar",
+      expr: { type: "field", tableAlias: "tile", column: "scale" },
+      from: { type: "table", table: "tile", alias: "tile" }
+    }
+    const envelopeExpr: JsonQLScalar = {
+      type: "scalar",
+      expr: { type: "field", tableAlias: "tile", column: "envelope" },
+      from: { type: "table", table: "tile", alias: "tile" }
+    }
+
     const pixelWidth = { type: "op", op: "/", exprs: [scaleExpr, 768] }
 
     /* Compile to a query like this:
@@ -85,25 +108,25 @@ export default class GridLayer extends Layer<GridLayerDesign> {
         on data.q = grid.q and data.r = grid.r 
     */
     const compiledGeometryExpr = exprCompiler.compileExpr({ expr: design.geometryExpr, tableAlias: "innerquery" })
-    const colorExpr = axisBuilder.compileAxis({axis: design.colorAxis, tableAlias: "innerquery"})
+    const colorExpr = axisBuilder.compileAxis({ axis: design.colorAxis, tableAlias: "innerquery" })
     let compiledSizeExpr: JsonQLExpr
-    
+
     if (design.shape == "hex") {
       // Hex needs distance from center to points
-      compiledSizeExpr = design.sizeUnits == "pixels" ? 
-        { type: "op", op: "*", exprs: [pixelWidth, design.size! / 1.73205] } as JsonQLExpr
-        : { type: "literal", value: design.size! / 1.73205 } as JsonQLExpr
-    }
-    else if (design.shape == "square") {
+      compiledSizeExpr =
+        design.sizeUnits == "pixels"
+          ? ({ type: "op", op: "*", exprs: [pixelWidth, design.size! / 1.73205] } as JsonQLExpr)
+          : ({ type: "literal", value: design.size! / 1.73205 } as JsonQLExpr)
+    } else if (design.shape == "square") {
       // Square needs distance from center to center
-      compiledSizeExpr = design.sizeUnits == "pixels" ? 
-        { type: "op", op: "*", exprs: [pixelWidth, design.size!] } as JsonQLExpr
-        : { type: "literal", value: design.size! } as JsonQLExpr
-    }
-    else {
+      compiledSizeExpr =
+        design.sizeUnits == "pixels"
+          ? ({ type: "op", op: "*", exprs: [pixelWidth, design.size!] } as JsonQLExpr)
+          : ({ type: "literal", value: design.size! } as JsonQLExpr)
+    } else {
       throw new Error("Unknown shape")
     }
-     
+
     // Create inner query
     const innerQuery: JsonQLQuery = {
       type: "query",
@@ -116,11 +139,19 @@ export default class GridLayer extends Layer<GridLayerDesign> {
         type: "join",
         kind: "inner",
         left: { type: "table", table: design.table!, alias: "innerquery" },
-        right: { type: "subexpr", expr: { type: "op", op: `mwater_${design.shape}_xy_to_qr`, exprs: [
-          { type: "op", op: "ST_XMin", exprs: [compiledGeometryExpr] },
-          { type: "op", op: "ST_YMin", exprs: [compiledGeometryExpr] },
-          compiledSizeExpr
-        ]}, alias: "qr"},
+        right: {
+          type: "subexpr",
+          expr: {
+            type: "op",
+            op: `mwater_${design.shape}_xy_to_qr`,
+            exprs: [
+              { type: "op", op: "ST_XMin", exprs: [compiledGeometryExpr] },
+              { type: "op", op: "ST_YMin", exprs: [compiledGeometryExpr] },
+              compiledSizeExpr
+            ]
+          },
+          alias: "qr"
+        },
         on: { type: "literal", value: true }
       },
       groupBy: [1, 2]
@@ -131,23 +162,17 @@ export default class GridLayer extends Layer<GridLayerDesign> {
       {
         type: "op",
         op: "&&",
-        exprs: [
-          compiledGeometryExpr,
-          { type: "op", op: "ST_Expand", exprs: [
-            envelopeExpr,
-            compiledSizeExpr
-          ]}
-        ]
+        exprs: [compiledGeometryExpr, { type: "op", op: "ST_Expand", exprs: [envelopeExpr, compiledSizeExpr] }]
       }
     ]
 
     // Then add filters
     if (design.filter) {
-      whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "innerquery"}))
+      whereClauses.push(exprCompiler.compileExpr({ expr: design.filter, tableAlias: "innerquery" }))
     }
 
     // Then add extra filters passed in, if relevant
-    const relevantFilters = _.where(filters, {table: design.table})
+    const relevantFilters = _.where(filters, { table: design.table })
     for (let filter of relevantFilters) {
       whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
     }
@@ -161,26 +186,38 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     const query: JsonQLQuery = {
       type: "query",
       selects: [
-        { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [
-          { type: "op", op: `mwater_${design.shape}_make`, exprs: [
-            { type: "field", tableAlias: "grid", column: "q" },
-            { type: "field", tableAlias: "grid", column: "r" },
-            compiledSizeExpr
-          ]},
-          envelopeExpr
-          ]}
-        , alias: "the_geom_webmercator" },
+        {
+          type: "select",
+          expr: {
+            type: "op",
+            op: "ST_AsMVTGeom",
+            exprs: [
+              {
+                type: "op",
+                op: `mwater_${design.shape}_make`,
+                exprs: [
+                  { type: "field", tableAlias: "grid", column: "q" },
+                  { type: "field", tableAlias: "grid", column: "r" },
+                  compiledSizeExpr
+                ]
+              },
+              envelopeExpr
+            ]
+          },
+          alias: "the_geom_webmercator"
+        },
         { type: "select", expr: { type: "field", tableAlias: "data", column: "color" }, alias: "color" }
       ],
       from: {
         type: "join",
         kind: "left",
-        left: { type: "subexpr", expr: { type: "op", op: `mwater_${design.shape}_grid`, exprs: [
-          envelopeExpr,
-          compiledSizeExpr
-        ]}, alias: "grid" },
+        left: {
+          type: "subexpr",
+          expr: { type: "op", op: `mwater_${design.shape}_grid`, exprs: [envelopeExpr, compiledSizeExpr] },
+          alias: "grid"
+        },
         right: { type: "subquery", query: innerQuery, alias: "data" },
-        // on data.q = grid.q and data.r = grid.r 
+        // on data.q = grid.q and data.r = grid.r
         on: {
           type: "op",
           op: "and",
@@ -250,25 +287,25 @@ export default class GridLayer extends Layer<GridLayerDesign> {
         on data.q = grid.q and data.r = grid.r 
     */
     const compiledGeometryExpr = exprCompiler.compileExpr({ expr: design.geometryExpr, tableAlias: "innerquery" })
-    const colorExpr = axisBuilder.compileAxis({axis: design.colorAxis, tableAlias: "innerquery"})
+    const colorExpr = axisBuilder.compileAxis({ axis: design.colorAxis, tableAlias: "innerquery" })
     let compiledSizeExpr: JsonQLExpr
-    
+
     if (design.shape == "hex") {
       // Hex needs distance from center to points
-      compiledSizeExpr = design.sizeUnits == "pixels" ? 
-        { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_width!" }, design.size! / 1.73205] }
-        : { type: "literal", value: design.size! / 1.73205 }
-    }
-    else if (design.shape == "square") {
+      compiledSizeExpr =
+        design.sizeUnits == "pixels"
+          ? { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_width!" }, design.size! / 1.73205] }
+          : { type: "literal", value: design.size! / 1.73205 }
+    } else if (design.shape == "square") {
       // Square needs distance from center to center
-      compiledSizeExpr = design.sizeUnits == "pixels" ? 
-        { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_width!" }, design.size!] }
-        : { type: "literal", value: design.size! }
-    }
-    else {
+      compiledSizeExpr =
+        design.sizeUnits == "pixels"
+          ? { type: "op", op: "*", exprs: [{ type: "token", token: "!pixel_width!" }, design.size!] }
+          : { type: "literal", value: design.size! }
+    } else {
       throw new Error("Unknown shape")
     }
-     
+
     // Create inner query
     const innerQuery: JsonQLQuery = {
       type: "query",
@@ -281,11 +318,19 @@ export default class GridLayer extends Layer<GridLayerDesign> {
         type: "join",
         kind: "inner",
         left: { type: "table", table: design.table!, alias: "innerquery" },
-        right: { type: "subexpr", expr: { type: "op", op: `mwater_${design.shape}_xy_to_qr`, exprs: [
-          { type: "op", op: "ST_XMin", exprs: [compiledGeometryExpr] },
-          { type: "op", op: "ST_YMin", exprs: [compiledGeometryExpr] },
-          compiledSizeExpr
-        ]}, alias: "qr"},
+        right: {
+          type: "subexpr",
+          expr: {
+            type: "op",
+            op: `mwater_${design.shape}_xy_to_qr`,
+            exprs: [
+              { type: "op", op: "ST_XMin", exprs: [compiledGeometryExpr] },
+              { type: "op", op: "ST_YMin", exprs: [compiledGeometryExpr] },
+              compiledSizeExpr
+            ]
+          },
+          alias: "qr"
+        },
         on: { type: "literal", value: true }
       },
       groupBy: [1, 2]
@@ -298,21 +343,18 @@ export default class GridLayer extends Layer<GridLayerDesign> {
         op: "&&",
         exprs: [
           compiledGeometryExpr,
-          { type: "op", op: "ST_Expand", exprs: [
-            { type: "token", token: "!bbox!" },
-            compiledSizeExpr
-          ]}
+          { type: "op", op: "ST_Expand", exprs: [{ type: "token", token: "!bbox!" }, compiledSizeExpr] }
         ]
       }
     ]
 
     // Then add filters
     if (design.filter) {
-      whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "innerquery"}))
+      whereClauses.push(exprCompiler.compileExpr({ expr: design.filter, tableAlias: "innerquery" }))
     }
 
     // Then add extra filters passed in, if relevant
-    const relevantFilters = _.where(filters, {table: design.table})
+    const relevantFilters = _.where(filters, { table: design.table })
     for (let filter of relevantFilters) {
       whereClauses.push(injectTableAlias(filter.jsonql, "innerquery"))
     }
@@ -326,22 +368,35 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     const query: JsonQLQuery = {
       type: "query",
       selects: [
-        { type: "select", expr: { type: "op", op: `mwater_${design.shape}_make`, exprs: [
-          { type: "field", tableAlias: "grid", column: "q" },
-          { type: "field", tableAlias: "grid", column: "r" },
-          compiledSizeExpr
-        ]}, alias: "the_geom_webmercator" },
+        {
+          type: "select",
+          expr: {
+            type: "op",
+            op: `mwater_${design.shape}_make`,
+            exprs: [
+              { type: "field", tableAlias: "grid", column: "q" },
+              { type: "field", tableAlias: "grid", column: "r" },
+              compiledSizeExpr
+            ]
+          },
+          alias: "the_geom_webmercator"
+        },
         { type: "select", expr: { type: "field", tableAlias: "data", column: "color" }, alias: "color" }
       ],
       from: {
         type: "join",
         kind: "left",
-        left: { type: "subexpr", expr: { type: "op", op: `mwater_${design.shape}_grid`, exprs: [
-          { type: "token", token: "!bbox!" },
-          compiledSizeExpr
-        ]}, alias: "grid" },
+        left: {
+          type: "subexpr",
+          expr: {
+            type: "op",
+            op: `mwater_${design.shape}_grid`,
+            exprs: [{ type: "token", token: "!bbox!" }, compiledSizeExpr]
+          },
+          alias: "grid"
+        },
         right: { type: "subquery", query: innerQuery, alias: "data" },
-        // on data.q = grid.q and data.r = grid.r 
+        // on data.q = grid.q and data.r = grid.r
         on: {
           type: "op",
           op: "and",
@@ -371,31 +426,41 @@ export default class GridLayer extends Layer<GridLayerDesign> {
   }
 
   createCss(design: GridLayerDesign, schema: Schema, filters: JsonQLFilter[]): string {
-    let css = `
+    let css =
+      `
 #layer0 {
-  polygon-opacity: ` + design.fillOpacity + `;
-  ` + (design.borderStyle == "color" ? `line-opacity: ` + (1 - (1 - design.fillOpacity!) / 2) + `; ` : `line-width: 0;`) + `
+  polygon-opacity: ` +
+      design.fillOpacity +
+      `;
+  ` +
+      (design.borderStyle == "color"
+        ? `line-opacity: ` + (1 - (1 - design.fillOpacity!) / 2) + `; `
+        : `line-width: 0;`) +
+      `
   polygon-fill: transparent;
 }
 \
 `
-  if (!design.colorAxis) {
-    throw new Error("Color axis not set")
-  }
+    if (!design.colorAxis) {
+      throw new Error("Color axis not set")
+    }
     // If color axes, add color conditions
     if (design.colorAxis.colorMap) {
       for (let item of design.colorAxis.colorMap) {
         // If invisible
-        if (design.colorAxis.excludedValues && _.any(design.colorAxis.excludedValues, ev => ev === item.value)) {
+        if (design.colorAxis.excludedValues && _.any(design.colorAxis.excludedValues, (ev) => ev === item.value)) {
           css += `#layer0 [color=${JSON.stringify(item.value)}] { 
             line-color: transparent; 
             line-opacity: 0; 
             polygon-opacity: 0; 
             polygon-fill: transparent; 
-          }\n`;  
+          }\n`
         } else {
-          css += `#layer0 [color=${JSON.stringify(item.value)}] { 
-            ` + (design.borderStyle == "color" ? `line-color: ${item.color};` : "") + ` 
+          css +=
+            `#layer0 [color=${JSON.stringify(item.value)}] { 
+            ` +
+            (design.borderStyle == "color" ? `line-color: ${item.color};` : "") +
+            ` 
             polygon-fill: ${item.color}; 
           }\n`
         }
@@ -406,20 +471,20 @@ export default class GridLayer extends Layer<GridLayerDesign> {
   }
 
   // TODO
-  // /**  
-  //  * Called when the interactivity grid is clicked. 
+  // /**
+  //  * Called when the interactivity grid is clicked.
   //  * arguments:
   //  *   ev: { data: interactivty data e.g. `{ id: 123 }` }
-  //  *   clickOptions: 
+  //  *   clickOptions:
   //  *     design: design of layer
   //  *     schema: schema to use
   //  *     dataSource: data source to use
   //  *     layerDataSource: layer data source
   //  *     scopeData: current scope data if layer is scoping
   //  *     filters: compiled filters to apply to the popup
-  //  * 
+  //  *
   //  * Returns:
-  //  *   null/undefined 
+  //  *   null/undefined
   //  *   or
   //  *   {
   //  *     scope: scope to apply ({ name, filter, data })
@@ -534,38 +599,55 @@ export default class GridLayer extends Layer<GridLayerDesign> {
   // }
 
   // Get min and max zoom levels
-  getMinZoom(design: GridLayerDesign) { 
+  getMinZoom(design: GridLayerDesign) {
     // Determine if too zoomed out to safely display (zoom 6 at 20000 is limit)
     if (design.sizeUnits === "meters") {
       const minSafeZoom = Math.log2(1280000.0 / (design.size || 1000))
       if (design.minZoom) {
         return Math.max(design.minZoom, minSafeZoom)
-      }
-      else {
+      } else {
         return minSafeZoom
       }
     }
-    return design.minZoom; 
+    return design.minZoom
   }
-  getMaxZoom(design: GridLayerDesign) { return design.maxZoom || 21; }
+  getMaxZoom(design: GridLayerDesign) {
+    return design.maxZoom || 21
+  }
 
   /** Get the legend to be optionally displayed on the map. Returns
    * a React element */
-  getLegend(design: GridLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]) {
-    const axisBuilder = new AxisBuilder({schema})
+  getLegend(
+    design: GridLayerDesign,
+    schema: Schema,
+    name: string,
+    dataSource: DataSource,
+    locale: string,
+    filters: JsonQLFilter[]
+  ) {
+    const axisBuilder = new AxisBuilder({ schema })
 
     return React.createElement(LayerLegendComponent, {
       schema,
       name,
       dataSource,
-      axis: axisBuilder.cleanAxis({axis: design.colorAxis!, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"}),
+      axis: axisBuilder.cleanAxis({
+        axis: design.colorAxis!,
+        table: design.table,
+        types: ["enum", "text", "boolean", "date"],
+        aggrNeed: "required"
+      }),
       locale
     })
   }
 
   // Get a list of table ids that can be filtered on
   getFilterableTables(design: GridLayerDesign, schema: Schema): string[] {
-    if (design.table) { return [design.table] } else { return [] }
+    if (design.table) {
+      return [design.table]
+    } else {
+      return []
+    }
   }
 
   /** True if layer can be edited */
@@ -593,20 +675,25 @@ export default class GridLayer extends Layer<GridLayerDesign> {
       // Remove extreme sizes
       if (draft.size != null && draft.size < 10 && draft.sizeUnits == "pixels") {
         draft.size = 10
-      } 
-  
+      }
+
       // Clean geometry (no idea why the cast is needed. TS is giving strange error)
       if (draft.geometryExpr) {
         draft.geometryExpr = exprCleaner.cleanExpr(design.geometryExpr, { table: draft.table, types: ["geometry"] })
       }
-  
-      draft.fillOpacity = (draft.fillOpacity != null) ? draft.fillOpacity : 0.75
+
+      draft.fillOpacity = draft.fillOpacity != null ? draft.fillOpacity : 0.75
 
       draft.borderStyle = draft.borderStyle || "none"
-  
+
       // Clean the axis
       if (draft.colorAxis) {
-        draft.colorAxis = axisBuilder.cleanAxis({ axis: design.colorAxis, table: draft.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "required"})
+        draft.colorAxis = axisBuilder.cleanAxis({
+          axis: design.colorAxis,
+          table: draft.table,
+          types: ["enum", "text", "boolean", "date"],
+          aggrNeed: "required"
+        })
       }
 
       // Clean filter
@@ -629,7 +716,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     if (!design.table) {
       return "Missing table"
     }
-    if (!design.geometryExpr || (exprUtils.getExprType(design.geometryExpr) !== "geometry")) {
+    if (!design.geometryExpr || exprUtils.getExprType(design.geometryExpr) !== "geometry") {
       return "Missing geometry expr"
     }
     if (!design.size || !design.sizeUnits) {
@@ -639,13 +726,17 @@ export default class GridLayer extends Layer<GridLayerDesign> {
       return "Missing color axis"
     }
 
-    error = axisBuilder.validateAxis({ axis: (design.colorAxis as Axis) })
-    if (error) { return error; }
+    error = axisBuilder.validateAxis({ axis: design.colorAxis as Axis })
+    if (error) {
+      return error
+    }
 
     // Validate filter
     error = exprValidator.validateExpr(design.filter || null)
-    if (error) { return error; }
-    
+    if (error) {
+      return error
+    }
+
     return null
   }
 
@@ -664,7 +755,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     filters: JsonQLFilter[]
   }): React.ReactElement<{}> {
     // Require here to prevent server require problems
-    const GridLayerDesigner = require('./GridLayerDesigner').default
+    const GridLayerDesigner = require("./GridLayerDesigner").default
 
     // Clean on way in and out
     return React.createElement(GridLayerDesigner, {

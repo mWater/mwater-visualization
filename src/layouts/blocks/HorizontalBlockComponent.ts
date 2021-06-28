@@ -1,177 +1,221 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
-let HorizontalBlockComponent;
-import PropTypes from 'prop-types';
-import _ from 'lodash';
-import React from 'react';
-const R = React.createElement;
+let HorizontalBlockComponent
+import PropTypes from "prop-types"
+import _ from "lodash"
+import React from "react"
+const R = React.createElement
 
-import DraggableBlockComponent from "./DraggableBlockComponent";
+import DraggableBlockComponent from "./DraggableBlockComponent"
 
-export default HorizontalBlockComponent = (function() {
+export default HorizontalBlockComponent = (function () {
   HorizontalBlockComponent = class HorizontalBlockComponent extends React.Component {
     static initClass() {
       this.propTypes = {
         block: PropTypes.object.isRequired,
         collapseColumns: PropTypes.bool,
         renderBlock: PropTypes.func.isRequired,
-        onBlockDrop: PropTypes.func,   // Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
+        onBlockDrop: PropTypes.func, // Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
         onBlockRemove: PropTypes.func, // Called with (block) when block is removed
         onBlockUpdate: PropTypes.func
-      };
-       // Called with (block) when block is updated
+      }
+      // Called with (block) when block is updated
     }
 
     constructor(props) {
-      super(props);
+      super(props)
 
       this.state = {
-        dragIndex: null,       // index of splitter being dragged
-        dragInitialX: null,    // Initial drag x
-        dragXOffset: null,     // Offset of drag (pixels dragged from start)
+        dragIndex: null, // index of splitter being dragged
+        dragInitialX: null, // Initial drag x
+        dragXOffset: null, // Offset of drag (pixels dragged from start)
         leftSize: null,
         rightSize: null
-      };
+      }
 
-      this.blockRefs = {};
+      this.blockRefs = {}
     }
 
     componentWillUnmount() {
       // Remove listeners
-      document.removeEventListener("mousemove", this.handleMouseMove);
-      return document.removeEventListener("mouseup", this.handleMouseUp);
+      document.removeEventListener("mousemove", this.handleMouseMove)
+      return document.removeEventListener("mouseup", this.handleMouseUp)
     }
 
     handleMouseDown = (index, ev) => {
       // Prevent html5 drag
-      ev.preventDefault();
+      ev.preventDefault()
 
       // Get sizes of two blocks
-      this.setState({dragIndex: index, leftSize: this.blockRefs[`block${index}`].offsetWidth, rightSize: this.blockRefs[`block${index + 1}`].offsetWidth});
+      this.setState({
+        dragIndex: index,
+        leftSize: this.blockRefs[`block${index}`].offsetWidth,
+        rightSize: this.blockRefs[`block${index + 1}`].offsetWidth
+      })
 
-      document.addEventListener("mousemove", this.handleMouseMove);
-      return document.addEventListener("mouseup", this.handleMouseUp);
-    };
+      document.addEventListener("mousemove", this.handleMouseMove)
+      return document.addEventListener("mouseup", this.handleMouseUp)
+    }
 
-    handleMouseMove = ev => {
+    handleMouseMove = (ev) => {
       if (!this.state.dragInitialX) {
-        this.setState({dragInitialX: ev.clientX});
-        return;
+        this.setState({ dragInitialX: ev.clientX })
+        return
       }
-  
-      let dragXOffset = ev.clientX - this.state.dragInitialX;
+
+      let dragXOffset = ev.clientX - this.state.dragInitialX
 
       // Can't make left block too small
-      if (dragXOffset < (-this.state.leftSize + 100)) {
-        dragXOffset = -this.state.leftSize + 100;
+      if (dragXOffset < -this.state.leftSize + 100) {
+        dragXOffset = -this.state.leftSize + 100
       }
 
       // Can't make right block too small
-      if (dragXOffset > (this.state.rightSize - 100)) {
-        dragXOffset = this.state.rightSize - 100;
+      if (dragXOffset > this.state.rightSize - 100) {
+        dragXOffset = this.state.rightSize - 100
       }
 
-      return this.setState({dragXOffset});
-    };
+      return this.setState({ dragXOffset })
+    }
 
-    handleMouseUp = ev => {
+    handleMouseUp = (ev) => {
       // Remove listeners
-      document.removeEventListener("mousemove", this.handleMouseMove);
-      document.removeEventListener("mouseup", this.handleMouseUp);
+      document.removeEventListener("mousemove", this.handleMouseMove)
+      document.removeEventListener("mouseup", this.handleMouseUp)
 
       // Determine weights of two blocks
-      const weights = (this.props.block.weights || []);
-      const newLeftSize = this.state.leftSize + this.state.dragXOffset;
-      const newRightSize = this.state.rightSize - this.state.dragXOffset;
+      const weights = this.props.block.weights || []
+      const newLeftSize = this.state.leftSize + this.state.dragXOffset
+      const newRightSize = this.state.rightSize - this.state.dragXOffset
 
       // Get current weights
-      const leftWeight = (weights[this.state.dragIndex] || 1);
-      const rightWeight = (weights[this.state.dragIndex + 1] || 1);
+      const leftWeight = weights[this.state.dragIndex] || 1
+      const rightWeight = weights[this.state.dragIndex + 1] || 1
 
-      weights[this.state.dragIndex] = ((leftWeight + rightWeight) * newLeftSize) / (newLeftSize + newRightSize); 
-      weights[this.state.dragIndex + 1] = ((leftWeight + rightWeight) * newRightSize) / (newLeftSize + newRightSize); 
+      weights[this.state.dragIndex] = ((leftWeight + rightWeight) * newLeftSize) / (newLeftSize + newRightSize)
+      weights[this.state.dragIndex + 1] = ((leftWeight + rightWeight) * newRightSize) / (newLeftSize + newRightSize)
 
-      const block = _.extend({}, this.props.block, {weights});
-      this.props.onBlockUpdate(block);
+      const block = _.extend({}, this.props.block, { weights })
+      this.props.onBlockUpdate(block)
 
-      return this.setState({dragIndex: null, dragInitialX: null, dragXOffset: null});
-    };
+      return this.setState({ dragIndex: null, dragInitialX: null, dragXOffset: null })
+    }
 
     render() {
       // Handle simple case of collapseColumns (no editing allowed)
-      let index, weight;
-      let asc, end;
-      let asc1, end1;
+      let index, weight
+      let asc, end
+      let asc1, end1
       if (this.props.collapseColumns) {
-        return R('div', null,
-          _.map(this.props.block.blocks, (block, index) => this.props.renderBlock(block, true)));
+        return R(
+          "div",
+          null,
+          _.map(this.props.block.blocks, (block, index) => this.props.renderBlock(block, true))
+        )
       }
 
       // Calculate widths (percentages)
-      let totalWeight = 0;
-      for (index = 0, end = this.props.block.blocks.length, asc = 0 <= end; asc ? index < end : index > end; asc ? index++ : index--) {
-        weight = (this.props.block.weights || [])[index] || 1;
-        totalWeight += (this.props.block.weights || [])[index] || 1;
+      let totalWeight = 0
+      for (
+        index = 0, end = this.props.block.blocks.length, asc = 0 <= end;
+        asc ? index < end : index > end;
+        asc ? index++ : index--
+      ) {
+        weight = (this.props.block.weights || [])[index] || 1
+        totalWeight += (this.props.block.weights || [])[index] || 1
       }
 
-      const percentages = [];
-      for (index = 0, end1 = this.props.block.blocks.length, asc1 = 0 <= end1; asc1 ? index < end1 : index > end1; asc1 ? index++ : index--) {
-        weight = (this.props.block.weights || [])[index] || 1;
-        percentages[index] = (weight * 100) / totalWeight;
+      const percentages = []
+      for (
+        index = 0, end1 = this.props.block.blocks.length, asc1 = 0 <= end1;
+        asc1 ? index < end1 : index > end1;
+        asc1 ? index++ : index--
+      ) {
+        weight = (this.props.block.weights || [])[index] || 1
+        percentages[index] = (weight * 100) / totalWeight
       }
 
       if (this.props.onBlockUpdate != null) {
-        let elem = R('table', {style: { width: "100%", tableLayout: "fixed", position: "relative", paddingTop: 5 }, className: "mwater-visualization-horizontal-block"}, // Add padding to allow dropping
-          R('tbody', null,
-            R('tr', null,
+        let elem = R(
+          "table",
+          {
+            style: { width: "100%", tableLayout: "fixed", position: "relative", paddingTop: 5 },
+            className: "mwater-visualization-horizontal-block"
+          }, // Add padding to allow dropping
+          R(
+            "tbody",
+            null,
+            R(
+              "tr",
+              null,
               _.map(this.props.block.blocks, (block, index) => {
                 return [
-                  (index > 0) && (this.props.onBlockUpdate != null) ?
-                    R('td', { 
-                      style: { width: 5, position: "relative", left: this.state.dragXOffset },
-                      key: `splitter${index}`,
-                      className: `mwater-visualization-horizontal-block-splitter ${(index - 1) === this.state.dragIndex ? "active" : ""}`,
-                      onMouseDown: this.handleMouseDown.bind(null, index - 1)
-                    }
-                    ) : undefined,
-                  R('td', { 
-                    style: { width: `${percentages[index]}%`, verticalAlign: "top" }, 
-                    key: block.id, 
-                    ref: (c => { return this.blockRefs[`block${index}`] = c; })
-                  },
-                      this.props.renderBlock(block))
-                ];
-            }))));              
+                  index > 0 && this.props.onBlockUpdate != null
+                    ? R("td", {
+                        style: { width: 5, position: "relative", left: this.state.dragXOffset },
+                        key: `splitter${index}`,
+                        className: `mwater-visualization-horizontal-block-splitter ${
+                          index - 1 === this.state.dragIndex ? "active" : ""
+                        }`,
+                        onMouseDown: this.handleMouseDown.bind(null, index - 1)
+                      })
+                    : undefined,
+                  R(
+                    "td",
+                    {
+                      style: { width: `${percentages[index]}%`, verticalAlign: "top" },
+                      key: block.id,
+                      ref: (c) => {
+                        return (this.blockRefs[`block${index}`] = c)
+                      }
+                    },
+                    this.props.renderBlock(block)
+                  )
+                ]
+              })
+            )
+          )
+        )
 
         // Allow dropping
-        elem = R(DraggableBlockComponent, { 
-          block: this.props.block,
-          onBlockDrop: this.props.onBlockDrop
-        },
-            elem);
+        elem = R(
+          DraggableBlockComponent,
+          {
+            block: this.props.block,
+            onBlockDrop: this.props.onBlockDrop
+          },
+          elem
+        )
 
-        return elem;
-
-      } else {  // Simplify in this case for printing
-        return R('div', {className: "mwater-visualization-horizontal-block"},
+        return elem
+      } else {
+        // Simplify in this case for printing
+        return R(
+          "div",
+          { className: "mwater-visualization-horizontal-block" },
           _.map(this.props.block.blocks, (block, index) => {
             return [
-              R('div', { 
-                style: { width: `${percentages[index]}%`, verticalAlign: "top", display: "inline-block" }, 
-                key: block.id, 
-                ref: (c => { return this.blockRefs[`block${index}`] = c; }),
-                className: "mwater-visualization-horizontal-block-item"
-              },
-                  this.props.renderBlock(block))
-            ];
-        }));
+              R(
+                "div",
+                {
+                  style: { width: `${percentages[index]}%`, verticalAlign: "top", display: "inline-block" },
+                  key: block.id,
+                  ref: (c) => {
+                    return (this.blockRefs[`block${index}`] = c)
+                  },
+                  className: "mwater-visualization-horizontal-block-item"
+                },
+                this.props.renderBlock(block)
+              )
+            ]
+          })
+        )
       }
     }
-  };
-  HorizontalBlockComponent.initClass();
-  return HorizontalBlockComponent;              
-})();
-
+  }
+  HorizontalBlockComponent.initClass()
+  return HorizontalBlockComponent
+})()
 
 // handleAspectMouseDown: (ev) =>
 //   # Get height of overall block
@@ -199,7 +243,7 @@ export default HorizontalBlockComponent = (function() {
 
 // renderAspectDrag: ->
 //   if @state.aspectDragY?
-//     lineStyle = { 
+//     lineStyle = {
 //       position: "absolute"
 //       borderTop: "solid 3px #38D"
 //       top: @state.aspectDragY
@@ -237,4 +281,3 @@ export default HorizontalBlockComponent = (function() {
 //     elem = @props.connectDragPreview(elem)
 
 //   return elem
-

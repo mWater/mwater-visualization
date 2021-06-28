@@ -1,5 +1,5 @@
-import { Expr } from "mwater-expressions";
-import { JsonQLFilter } from "./JsonQLFilter";
+import { Expr } from "mwater-expressions"
+import { JsonQLFilter } from "./JsonQLFilter"
 
 /** Scope that a particular widget can apply when a part of it is clicked */
 export interface WidgetScope {

@@ -13,7 +13,14 @@ export default class LayoutManager {
     onItemsChange: (items: any) => void
 
     /** called with ({ id:, type:, design:, onDesignChange:, width:, height:  }) */
-    renderWidget: (options: { id: string, type: string, design: any, onDesignChange: (design: any) => void, width: number, height: number }) => ReactElement
+    renderWidget: (options: {
+      id: string
+      type: string
+      design: any
+      onDesignChange: (design: any) => void
+      width: number
+      height: number
+    }) => ReactElement
 
     /** style to use for layout. null for default */
     style: string | null
@@ -38,10 +45,10 @@ export default class LayoutManager {
   isEmpty(items: any): boolean
 
   /** Gets { type, design } of a widget */
-  getWidgetTypeAndDesign(items: any, widgetId: string): { type: string, design: any }
+  getWidgetTypeAndDesign(items: any, widgetId: string): { type: string; design: any }
 
   /** Gets all widgets in items as array of { id, type, design } */
-  getAllWidgets(items: any): { id: string, type: string, design: any }[]
+  getAllWidgets(items: any): { id: string; type: string; design: any }[]
 
   static createLayoutManager(type: string): LayoutManager
 

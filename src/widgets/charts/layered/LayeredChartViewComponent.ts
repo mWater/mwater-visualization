@@ -1,77 +1,82 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
-let LayeredChartViewComponent;
-import PropTypes from 'prop-types';
-import _ from 'lodash';
-import React from 'react';
-import ReactDOM from 'react-dom';
-const R = React.createElement;
+let LayeredChartViewComponent
+import PropTypes from "prop-types"
+import _ from "lodash"
+import React from "react"
+import ReactDOM from "react-dom"
+const R = React.createElement
 
-import { ExprUtils } from 'mwater-expressions';
-import LayeredChartCompiler from './LayeredChartCompiler';
-import TextComponent from '../../text/TextComponent';
-import d3 from 'd3';
+import { ExprUtils } from "mwater-expressions"
+import LayeredChartCompiler from "./LayeredChartCompiler"
+import TextComponent from "../../text/TextComponent"
+import d3 from "d3"
 
 // Displays a layered chart
-export default LayeredChartViewComponent = (function() {
+export default LayeredChartViewComponent = (function () {
   LayeredChartViewComponent = class LayeredChartViewComponent extends React.Component {
     static initClass() {
-      this.propTypes = { 
+      this.propTypes = {
         schema: PropTypes.object.isRequired,
         dataSource: PropTypes.object.isRequired,
         design: PropTypes.object.isRequired,
         data: PropTypes.object.isRequired,
         onDesignChange: PropTypes.func,
-  
+
         width: PropTypes.number.isRequired,
         height: PropTypes.number.isRequired,
-  
+
         scope: PropTypes.any, // scope of the widget (when the widget self-selects a particular scope)
         onScopeChange: PropTypes.func // called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
-      };
-  
-      this.contextTypes =
-        {locale: PropTypes.string};
-        // e.g. "en"
+      }
+
+      this.contextTypes = { locale: PropTypes.string }
+      // e.g. "en"
     }
 
     constructor(props) {
-      super(props);
+      super(props)
 
       this.state = {
-        headerHeight: null,  // Height of header 
-        footerHeight: null  // Height of footer
-      };
+        headerHeight: null, // Height of header
+        footerHeight: null // Height of footer
+      }
     }
 
-    componentDidMount() { 
-      return this.updateHeights();
+    componentDidMount() {
+      return this.updateHeights()
     }
 
     componentDidUpdate() {
-      return this.updateHeights();
+      return this.updateHeights()
     }
 
     updateHeights() {
       // Calculate header and footer heights
-      if (this.header && (this.state.headerHeight !== this.header.offsetHeight)) {
-        this.setState({headerHeight: this.header.offsetHeight});
+      if (this.header && this.state.headerHeight !== this.header.offsetHeight) {
+        this.setState({ headerHeight: this.header.offsetHeight })
       }
-      if (this.footer && (this.state.footerHeight !== this.footer.offsetHeight)) {
-        return this.setState({footerHeight: this.footer.offsetHeight});
+      if (this.footer && this.state.footerHeight !== this.footer.offsetHeight) {
+        return this.setState({ footerHeight: this.footer.offsetHeight })
       }
     }
 
-    handleHeaderChange = header => {
-      return this.props.onDesignChange(_.extend({}, this.props.design, {header}));
-    };
+    handleHeaderChange = (header) => {
+      return this.props.onDesignChange(_.extend({}, this.props.design, { header }))
+    }
 
-    handleFooterChange = footer => {
-      return this.props.onDesignChange(_.extend({}, this.props.design, {footer}));
-    };
+    handleFooterChange = (footer) => {
+      return this.props.onDesignChange(_.extend({}, this.props.design, { footer }))
+    }
 
     renderHeader() {
-      return R('div', {ref: (c => { return this.header = c; })},
+      return R(
+        "div",
+        {
+          ref: (c) => {
+            return (this.header = c)
+          }
+        },
         R(TextComponent, {
           design: this.props.design.header,
           onDesignChange: this.props.onDesignChange ? this.handleHeaderChange : undefined,
@@ -79,13 +84,18 @@ export default LayeredChartViewComponent = (function() {
           dataSource: this.props.dataSource,
           exprValues: this.props.data.header || {},
           width: this.props.width
-        }
-        )
-      );
+        })
+      )
     }
 
     renderFooter() {
-      return R('div', {ref: (c => { return this.footer = c; })},
+      return R(
+        "div",
+        {
+          ref: (c) => {
+            return (this.footer = c)
+          }
+        },
         R(TextComponent, {
           design: this.props.design.footer,
           onDesignChange: this.props.onDesignChange ? this.handleFooterChange : undefined,
@@ -93,118 +103,123 @@ export default LayeredChartViewComponent = (function() {
           dataSource: this.props.dataSource,
           exprValues: this.props.data.footer || {},
           width: this.props.width
-        }
-        )
-      );
+        })
+      )
     }
 
     render() {
-      return R('div', {style: { width: this.props.width, height: this.props.height }},
+      return R(
+        "div",
+        { style: { width: this.props.width, height: this.props.height } },
         this.renderHeader(),
-        (this.state.headerHeight != null) && (this.state.footerHeight != null) ?
-          R(C3ChartComponent, { 
-            schema: this.props.schema,
-            design: this.props.design,
-            data: this.props.data,
-            onDesignChange: this.props.onDesignChange,
-            width: this.props.width,
-            height: this.props.height - this.state.headerHeight - this.state.footerHeight,
-            scope: this.props.scope,
-            onScopeChange: this.props.onScopeChange,
-            locale: this.context.locale
-          }
-          ) : undefined,
-        this.renderFooter());
+        this.state.headerHeight != null && this.state.footerHeight != null
+          ? R(C3ChartComponent, {
+              schema: this.props.schema,
+              design: this.props.design,
+              data: this.props.data,
+              onDesignChange: this.props.onDesignChange,
+              width: this.props.width,
+              height: this.props.height - this.state.headerHeight - this.state.footerHeight,
+              scope: this.props.scope,
+              onScopeChange: this.props.onScopeChange,
+              locale: this.context.locale
+            })
+          : undefined,
+        this.renderFooter()
+      )
     }
-  };
-  LayeredChartViewComponent.initClass();
-  return LayeredChartViewComponent;
-})();
+  }
+  LayeredChartViewComponent.initClass()
+  return LayeredChartViewComponent
+})()
 
 // Displays the inner C3 component itself
 class C3ChartComponent extends React.Component {
   static initClass() {
-    this.propTypes = { 
+    this.propTypes = {
       schema: PropTypes.object.isRequired,
       design: PropTypes.object.isRequired,
       data: PropTypes.object.isRequired,
       onDesignChange: PropTypes.func,
-  
+
       width: PropTypes.number.isRequired,
       height: PropTypes.number.isRequired,
-  
+
       scope: PropTypes.any, // scope of the widget (when the widget self-selects a particular scope)
       onScopeChange: PropTypes.func, // called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
       locale: PropTypes.string
-    };
-      // e.g. "en"
+    }
+    // e.g. "en"
   }
 
   constructor(props) {
-    super(props);
+    super(props)
 
     // Create throttled createChart
-    this.throttledCreateChart = _.throttle(this.createChart, 1000);
+    this.throttledCreateChart = _.throttle(this.createChart, 1000)
   }
 
   componentDidMount() {
-    this.createChart(this.props);
-    return this.updateScope();
+    this.createChart(this.props)
+    return this.updateScope()
   }
 
-  createChart = props => {
+  createChart = (props) => {
     if (this.chart) {
-      this.chart.destroy();
+      this.chart.destroy()
     }
 
-    const compiler = new LayeredChartCompiler({schema: props.schema});
+    const compiler = new LayeredChartCompiler({ schema: props.schema })
     const chartOptions = compiler.createChartOptions({
       design: this.props.design,
       data: this.props.data,
       width: this.props.width,
       height: this.props.height,
       locale: this.props.locale
-    });
-    
-    chartOptions.bindto = this.chartDiv;
-    chartOptions.data.onclick = this.handleDataClick;
-    // Update scope after rendering. Needs a delay to make it happen
-    chartOptions.onrendered = () => _.defer(this.updateScope);
+    })
 
-    const c3 = require('c3');
-    return this.chart = c3.generate(chartOptions);
-  };
+    chartOptions.bindto = this.chartDiv
+    chartOptions.data.onclick = this.handleDataClick
+    // Update scope after rendering. Needs a delay to make it happen
+    chartOptions.onrendered = () => _.defer(this.updateScope)
+
+    const c3 = require("c3")
+    return (this.chart = c3.generate(chartOptions))
+  }
 
   componentDidUpdate(prevProps, prevState) {
     // Check if schema, data or design (except for header + footer) changed
-    let changed = false;
+    let changed = false
 
-    changed = changed || (prevProps.schema !== this.props.schema);
-    changed = changed || !_.isEqual(prevProps.data, this.props.data);
-    changed = changed || (prevProps.locale !== this.props.locale); 
-    changed = changed || ((prevProps.design !== this.props.design) && !_.isEqual(_.omit(prevProps.design, "header", "footer"), _.omit(this.props.design, "header", "footer")));
+    changed = changed || prevProps.schema !== this.props.schema
+    changed = changed || !_.isEqual(prevProps.data, this.props.data)
+    changed = changed || prevProps.locale !== this.props.locale
+    changed =
+      changed ||
+      (prevProps.design !== this.props.design &&
+        !_.isEqual(_.omit(prevProps.design, "header", "footer"), _.omit(this.props.design, "header", "footer")))
 
     if (changed) {
-      const newCompiler = new LayeredChartCompiler({schema: this.props.schema});
+      const newCompiler = new LayeredChartCompiler({ schema: this.props.schema })
       const newChartOptions = newCompiler.createChartOptions({
         design: this.props.design,
         data: this.props.data,
         width: this.props.width,
         height: this.props.height,
         locale: this.props.locale
-      });
-    
+      })
+
       // TODO check if only data changed
       // Use throttled update to bypass https://github.com/mWater/mwater-visualization/issues/92
-      return this.throttledCreateChart(this.props);
-    // Check if size alone changed
-    } else if ((this.props.width !== prevProps.width) || (this.props.height !== prevProps.height)) {
-      this.chart.resize({width: this.props.width, height: this.props.height});
-      this.updateScope();
-      return;
-    // Check scope
+      return this.throttledCreateChart(this.props)
+      // Check if size alone changed
+    } else if (this.props.width !== prevProps.width || this.props.height !== prevProps.height) {
+      this.chart.resize({ width: this.props.width, height: this.props.height })
+      this.updateScope()
+      return
+      // Check scope
     } else if (!_.isEqual(this.props.scope, prevProps.scope)) {
-      return this.updateScope();
+      return this.updateScope()
     }
   }
 
@@ -215,7 +230,7 @@ class C3ChartComponent extends React.Component {
   //   return
 
   // # Reload data
-  // @chart.load({ 
+  // @chart.load({
   //   json: @prepareData(nextProps.data).main
   //   keys: { x: "x", value: ["y"] }
   //   names: { y: 'Value' } # Name the data
@@ -223,108 +238,113 @@ class C3ChartComponent extends React.Component {
 
   // Update scoped value
   updateScope = () => {
-    const dataMap = this.getDataMap();
-    const compiler = new LayeredChartCompiler({schema: this.props.schema});
-    const el = this.chartDiv;
+    const dataMap = this.getDataMap()
+    const compiler = new LayeredChartCompiler({ schema: this.props.schema })
+    const el = this.chartDiv
 
     // Handle line and bar charts
     d3.select(el)
       .selectAll(".c3-chart-bar .c3-bar, .c3-chart-line .c3-circle")
       // Highlight only scoped
-      .style("opacity", (d,i) => {
-        let scope;
-        const dataPoint = this.lookupDataPoint(dataMap, d);
+      .style("opacity", (d, i) => {
+        let scope
+        const dataPoint = this.lookupDataPoint(dataMap, d)
         if (dataPoint) {
-          scope = compiler.createScope(this.props.design, dataPoint.layerIndex, dataPoint.row, this.props.locale);
+          scope = compiler.createScope(this.props.design, dataPoint.layerIndex, dataPoint.row, this.props.locale)
         }
 
         // Determine if scoped
-        if (scope && this.props.scope) { 
+        if (scope && this.props.scope) {
           if (_.isEqual(this.props.scope.data, scope.data)) {
-            return 1;
+            return 1
           } else {
-            return 0.3;
+            return 0.3
           }
         } else {
           // Not scoped
-          if (dataPoint?.row.y !== null) { return 1; } else { return 0; }
+          if (dataPoint?.row.y !== null) {
+            return 1
+          } else {
+            return 0
+          }
         }
-      });
+      })
 
     // Handle pie charts
-    return d3.select(el)
+    return d3
+      .select(el)
       .selectAll(".c3-chart-arcs .c3-chart-arc")
       .style("opacity", (d, i) => {
-        let scope;
-        const dataPoint = this.lookupDataPoint(dataMap, d);
+        let scope
+        const dataPoint = this.lookupDataPoint(dataMap, d)
         if (dataPoint) {
-          scope = compiler.createScope(this.props.design, dataPoint.layerIndex, dataPoint.row, this.props.locale);
+          scope = compiler.createScope(this.props.design, dataPoint.layerIndex, dataPoint.row, this.props.locale)
         }
 
         // Determine if scoped
-        if (this.props.scope) { 
+        if (this.props.scope) {
           if (_.isEqual(this.props.scope.data, scope.data)) {
-            return 1;
+            return 1
           } else {
-            return 0.3;
+            return 0.3
           }
         } else {
           // Not scoped
-          return 1;
+          return 1
         }
-        });
-  };
+      })
+  }
 
   // Gets a data point { layerIndex, row } from a d3 object (d)
   lookupDataPoint(dataMap, d) {
-    let dataPoint;
-    if (d.data) { 
-      d = d.data;
-    }
-      
-    // Lookup layer and row. If pie/donut, index is always zero
-    const isPolarChart = ['pie', 'donut'].includes(this.props.design.type);
-    if (isPolarChart) {
-      dataPoint = dataMap[`${d.id}`];
-    } else {
-      dataPoint = dataMap[`${d.id}:${d.index}`];
+    let dataPoint
+    if (d.data) {
+      d = d.data
     }
 
-    return dataPoint;
+    // Lookup layer and row. If pie/donut, index is always zero
+    const isPolarChart = ["pie", "donut"].includes(this.props.design.type)
+    if (isPolarChart) {
+      dataPoint = dataMap[`${d.id}`]
+    } else {
+      dataPoint = dataMap[`${d.id}:${d.index}`]
+    }
+
+    return dataPoint
   }
 
   getDataMap() {
     // Get data map
-    const compiler = new LayeredChartCompiler({schema: this.props.schema});
-    return compiler.createDataMap(this.props.design, this.props.data);
+    const compiler = new LayeredChartCompiler({ schema: this.props.schema })
+    return compiler.createDataMap(this.props.design, this.props.data)
   }
 
-  handleDataClick = d => {
+  handleDataClick = (d) => {
     // Get data map
-    const dataMap = this.getDataMap();
+    const dataMap = this.getDataMap()
 
     // Look up data point
-    const dataPoint = this.lookupDataPoint(dataMap, d);
+    const dataPoint = this.lookupDataPoint(dataMap, d)
     if (!dataPoint) {
-      return;
+      return
     }
 
     // Create scope
-    const compiler = new LayeredChartCompiler({schema: this.props.schema});
-    const scope = compiler.createScope(this.props.design, dataPoint.layerIndex, dataPoint.row, this.props.locale);
+    const compiler = new LayeredChartCompiler({ schema: this.props.schema })
+    const scope = compiler.createScope(this.props.design, dataPoint.layerIndex, dataPoint.row, this.props.locale)
 
     // If same scope data, remove scope
-    if (this.props.scope && _.isEqual(scope.data, this.props.scope.data)) { 
-      this.props.onScopeChange?.(null);
-      return;
+    if (this.props.scope && _.isEqual(scope.data, this.props.scope.data)) {
+      this.props.onScopeChange?.(null)
+      return
     }
 
-    return this.props.onScopeChange?.(scope);
-  };
+    return this.props.onScopeChange?.(scope)
+  }
 
   componentWillUnmount() {
     if (this.chart) {
-      return this.chart.destroy();
+      return this.chart.destroy()
     }
   }
 
@@ -336,7 +356,11 @@ class C3ChartComponent extends React.Component {
     // css += ".c3-chart-arc text { font-size: #{scale * 13}px; }\n"
     // css += ".c3-title { font-size: #{scale * 14}px; }\n"
 
-    return R('div', {ref: c => { return this.chartDiv = c; }});
+    return R("div", {
+      ref: (c) => {
+        return (this.chartDiv = c)
+      }
+    })
   }
 }
-C3ChartComponent.initClass();
+C3ChartComponent.initClass()

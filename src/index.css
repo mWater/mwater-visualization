@@ -68,7 +68,8 @@
 }
 
 /* Hide trendline dots and text */
-.c3-target-trendline .c3-circles, .c3-target-trendline .c3-texts {
+.c3-target-trendline .c3-circles,
+.c3-target-trendline .c3-texts {
   opacity: 0;
 }
 

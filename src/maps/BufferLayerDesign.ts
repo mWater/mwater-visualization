@@ -1,4 +1,3 @@
-
 import { Expr } from "mwater-expressions"
 import { Axis } from "../axes/Axis"
 
@@ -35,7 +34,7 @@ export interface BufferLayerDesign {
   maxZoom?: number
 
   /** contains items: which is BlocksLayoutManager items. Will be displayed when the circle is clicked */
-  popup: any 
+  popup: any
 
   /** customizable filtering for popup. See PopupFilterJoins.md */
   popupFilterJoins: any

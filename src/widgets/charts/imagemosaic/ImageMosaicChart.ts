@@ -1,16 +1,16 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
-let ImageMosaicChart;
-import _ from 'lodash';
-import React from 'react';
-const R = React.createElement;
-import { default as produce } from 'immer';
-import { original } from 'immer';
-import { injectTableAlias } from 'mwater-expressions';
-import Chart from '../Chart';
-import { ExprCleaner } from 'mwater-expressions';
-import { ExprCompiler } from 'mwater-expressions';
-import AxisBuilder from '../../../axes/AxisBuilder';
+let ImageMosaicChart
+import _ from "lodash"
+import React from "react"
+const R = React.createElement
+import { default as produce } from "immer"
+import { original } from "immer"
+import { injectTableAlias } from "mwater-expressions"
+import Chart from "../Chart"
+import { ExprCleaner } from "mwater-expressions"
+import { ExprCompiler } from "mwater-expressions"
+import AxisBuilder from "../../../axes/AxisBuilder"
 
 /*
 Design is:
@@ -23,80 +23,85 @@ Design is:
 */
 export default ImageMosaicChart = class ImageMosaicChart extends Chart {
   cleanDesign(design, schema) {
-    const exprCleaner = new ExprCleaner(schema);
-    const axisBuilder = new AxisBuilder({schema});
+    const exprCleaner = new ExprCleaner(schema)
+    const axisBuilder = new AxisBuilder({ schema })
 
-    design = produce(design, draft => {
+    design = produce(design, (draft) => {
       // Fill in defaults
-      draft.version = design.version || 1;
+      draft.version = design.version || 1
 
       // Clean axis
-      draft.imageAxis = axisBuilder.cleanAxis({axis: design.imageAxis, table: design.table, aggrNeed: "none", types: ["image", "imagelist"]});
+      draft.imageAxis = axisBuilder.cleanAxis({
+        axis: design.imageAxis,
+        table: design.table,
+        aggrNeed: "none",
+        types: ["image", "imagelist"]
+      })
 
       // Clean filter
-      draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ["boolean"] });
-    });
-    return design;
+      draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ["boolean"] })
+    })
+    return design
   }
 
   validateDesign(design, schema) {
-    const axisBuilder = new AxisBuilder({schema});
+    const axisBuilder = new AxisBuilder({ schema })
 
     // Check that has table
     if (!design.table) {
-      return "Missing data source";
+      return "Missing data source"
     }
 
     // Check that has axes
-    let error = null;
+    let error = null
 
     if (!design.imageAxis) {
-      error = error || "Missing image";
+      error = error || "Missing image"
     }
 
-    error = error || axisBuilder.validateAxis({axis: design.imageAxis});
+    error = error || axisBuilder.validateAxis({ axis: design.imageAxis })
 
-    return error;
+    return error
   }
 
   isEmpty(design) {
-    return !design.imageAxis;
+    return !design.imageAxis
   }
 
   // Creates a design element with specified options
   // options include:
   //   schema: schema to use
   //   dataSource: dataSource to use
-  //   design: design 
+  //   design: design
   //   onDesignChange: function
   //   filters: array of filters
   createDesignerElement(options) {
     // Require here to prevent server require problems
-    const ImageMosaicChartDesignerComponent = require('./ImageMosaicChartDesignerComponent');
+    const ImageMosaicChartDesignerComponent = require("./ImageMosaicChartDesignerComponent")
 
     const props = {
       schema: options.schema,
       design: this.cleanDesign(options.design, options.schema),
       dataSource: options.dataSource,
       filters: options.filters,
-      onDesignChange: design => {
+      onDesignChange: (design) => {
         // Clean design
-        design = this.cleanDesign(design, options.schema);
-        return options.onDesignChange(design);
+        design = this.cleanDesign(design, options.schema)
+        return options.onDesignChange(design)
       }
-    };
-    return React.createElement(ImageMosaicChartDesignerComponent, props);
+    }
+    return React.createElement(ImageMosaicChartDesignerComponent, props)
   }
 
-  // Get data for the chart asynchronously 
+  // Get data for the chart asynchronously
   // design: design of the chart
   // schema: schema to use
   // dataSource: data source to get data from
   // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   // callback: (error, data)
   getData(design, schema, dataSource, filters, callback) {
-    const exprCompiler = new ExprCompiler(schema);
-    const axisBuilder = new AxisBuilder({schema});
+    const exprCompiler = new ExprCompiler(schema)
+    const axisBuilder = new AxisBuilder({ schema })
 
     // Create shell of query
     const query = {
@@ -104,46 +109,46 @@ export default ImageMosaicChart = class ImageMosaicChart extends Chart {
       selects: [],
       from: exprCompiler.compileTable(design.table, "main"),
       limit: 500
-    };
+    }
 
     // Add image axis
-    const imageExpr = axisBuilder.compileAxis({axis: design.imageAxis, tableAlias: "main"});
+    const imageExpr = axisBuilder.compileAxis({ axis: design.imageAxis, tableAlias: "main" })
 
-    query.selects.push({ 
+    query.selects.push({
       type: "select",
       expr: imageExpr,
-      alias: "image" 
-    });
+      alias: "image"
+    })
 
     // Add primary key
-    query.selects.push({ 
+    query.selects.push({
       type: "select",
       expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table).primaryKey },
-      alias: "id" 
-    });
+      alias: "id"
+    })
 
     // Get relevant filters
-    filters = _.where(filters || [], {table: design.table});
-    let whereClauses = _.map(filters, f => injectTableAlias(f.jsonql, "main")); 
+    filters = _.where(filters || [], { table: design.table })
+    let whereClauses = _.map(filters, (f) => injectTableAlias(f.jsonql, "main"))
 
     // Compile filter
     if (design.filter) {
-      whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "main"}));
+      whereClauses.push(exprCompiler.compileExpr({ expr: design.filter, tableAlias: "main" }))
     }
 
     // Add null filter for image
-    whereClauses.push({ type: "op", op: "is not null", exprs: [imageExpr] });
+    whereClauses.push({ type: "op", op: "is not null", exprs: [imageExpr] })
 
-    whereClauses = _.compact(whereClauses);
+    whereClauses = _.compact(whereClauses)
 
     // Wrap if multiple
     if (whereClauses.length > 1) {
-      query.where = { type: "op", op: "and", exprs: whereClauses };
+      query.where = { type: "op", op: "and", exprs: whereClauses }
     } else {
-      query.where = whereClauses[0];
+      query.where = whereClauses[0]
     }
 
-    return dataSource.performQuery(query, callback);
+    return dataSource.performQuery(query, callback)
   }
 
   // Create a view element for the chart
@@ -158,7 +163,7 @@ export default ImageMosaicChart = class ImageMosaicChart extends Chart {
   //   onRowClick: Called with (tableId, rowId) when item is clicked
   createViewElement(options) {
     // Require here to prevent server require problems
-    const ImageMosaicChartViewComponent = require('./ImageMosaicChartViewComponent');
+    const ImageMosaicChartViewComponent = require("./ImageMosaicChartViewComponent")
 
     // Create chart
     const props = {
@@ -173,36 +178,38 @@ export default ImageMosaicChart = class ImageMosaicChart extends Chart {
       scope: options.scope,
       onScopeChange: options.onScopeChange,
       onRowClick: options.onRowClick
-    };
+    }
 
-    return React.createElement(ImageMosaicChartViewComponent, props);
+    return React.createElement(ImageMosaicChartViewComponent, props)
   }
 
   createDataTable(design, schema, dataSource, data) {
-    alert("Not available for Image Mosaics");
-    return null;
+    alert("Not available for Image Mosaics")
+    return null
   }
-    // TODO
-    // renderHeaderCell = (column) =>
-    //   column.headerText or @axisBuilder.summarizeAxis(column.textAxis)
+  // TODO
+  // renderHeaderCell = (column) =>
+  //   column.headerText or @axisBuilder.summarizeAxis(column.textAxis)
 
-    // header = _.map(design.columns, renderHeaderCell)
-    // table = [header]
-    // renderRow = (record) =>
-    //   renderCell = (column, columnIndex) =>
-    //     value = record["c#{columnIndex}"]
-    //     return @axisBuilder.formatValue(column.textAxis, value)
+  // header = _.map(design.columns, renderHeaderCell)
+  // table = [header]
+  // renderRow = (record) =>
+  //   renderCell = (column, columnIndex) =>
+  //     value = record["c#{columnIndex}"]
+  //     return @axisBuilder.formatValue(column.textAxis, value)
 
-    //   return _.map(design.columns, renderCell)
+  //   return _.map(design.columns, renderCell)
 
-    // table = table.concat(_.map(data.main, renderRow))
-    // return table
+  // table = table.concat(_.map(data.main, renderRow))
+  // return table
 
   // Get a list of table ids that can be filtered on
   getFilterableTables(design, schema) {
-    return _.compact([design.table]);
+    return _.compact([design.table])
   }
 
   // Get the chart placeholder icon. fa-XYZ or glyphicon-XYZ
-  getPlaceholderIcon() { return "fa-th"; }
-};
+  getPlaceholderIcon() {
+    return "fa-th"
+  }
+}

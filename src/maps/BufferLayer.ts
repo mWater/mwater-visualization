@@ -8,11 +8,11 @@ import AxisBuilder from "../axes/AxisBuilder"
 import { BufferLayerDesign } from "./BufferLayerDesign"
 import Layer, { OnGridClickOptions, VectorTileDef } from "./Layer"
 import { OnGridClickResults } from "./maps"
-import { compileColorMapToMapbox } from './mapboxUtils'
+import { compileColorMapToMapbox } from "./mapboxUtils"
 
-const LegendGroup = require('./LegendGroup')
-const LayerLegendComponent = require('./LayerLegendComponent')
-const PopupFilterJoinsUtils = require('./PopupFilterJoinsUtils')
+const LegendGroup = require("./LegendGroup")
+const LayerLegendComponent = require("./LayerLegendComponent")
+const PopupFilterJoinsUtils = require("./PopupFilterJoinsUtils")
 
 /*
 Layer which draws a buffer around geometries (i.e. a radius circle around points)
@@ -37,23 +37,31 @@ axes:
 */
 export default class BufferLayer extends Layer<BufferLayerDesign> {
   /** Gets the type of layer definition */
-  getLayerDefinitionType(): "VectorTile" { return "VectorTile" }
+  getLayerDefinitionType(): "VectorTile" {
+    return "VectorTile"
+  }
 
-  getVectorTile(design: BufferLayerDesign, sourceId: string, schema: Schema, filters: JsonQLFilter[], opacity: number): VectorTileDef {
+  getVectorTile(
+    design: BufferLayerDesign,
+    sourceId: string,
+    schema: Schema,
+    filters: JsonQLFilter[],
+    opacity: number
+  ): VectorTileDef {
     const jsonql = this.createJsonQL(design, schema, filters)
 
     const mapLayers: mapboxgl.AnyLayer[] = []
 
     // If color axes, add color conditions
     const color = compileColorMapToMapbox(design.axes.color, design.color || "transparent")
-    
+
     mapLayers.push({
-      'id': `${sourceId}:fill`,
-      'type': 'fill',
-      'source': sourceId,
-      'source-layer': 'circles',
+      id: `${sourceId}:fill`,
+      type: "fill",
+      source: sourceId,
+      "source-layer": "circles",
       paint: {
-        'fill-opacity': design.fillOpacity * opacity,
+        "fill-opacity": design.fillOpacity * opacity,
         "fill-color": color,
         "fill-outline-color": "transparent"
       }
@@ -74,11 +82,8 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     //   })
     // }
 
-
     return {
-      sourceLayers: [
-        { id: "circles", jsonql: jsonql }
-      ],
+      sourceLayers: [{ id: "circles", jsonql: jsonql }],
       ctes: [],
       mapLayers: mapLayers,
       mapLayersHandleClicks: [`${sourceId}:fill`]
@@ -87,12 +92,15 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
 
   createJsonQL(design: BufferLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery {
     let colorExpr: JsonQLExpr
-    const axisBuilder = new AxisBuilder({schema})
+    const axisBuilder = new AxisBuilder({ schema })
     const exprCompiler = new ExprCompiler(schema)
 
     // Expression for the envelope of the tile
-    const envelopeExpr: JsonQLExpr = { type: "scalar", from: { type: "table", table: "tile", alias: "tile" },
-      expr: { type: "field", tableAlias: "tile", column: "envelope" } }
+    const envelopeExpr: JsonQLExpr = {
+      type: "scalar",
+      from: { type: "table", table: "tile", alias: "tile" },
+      expr: { type: "field", tableAlias: "tile", column: "envelope" }
+    }
 
     /*
     Query:
@@ -116,20 +124,28 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     */
 
     // Compile geometry axis
-    let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "main"})
+    let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry, tableAlias: "main" })
 
-    // radius / cos(st_ymax(st_transform(geometryExpr, 4326)) * 0.017453293) 
+    // radius / cos(st_ymax(st_transform(geometryExpr, 4326)) * 0.017453293)
     const bufferAmountExpr: JsonQLExpr = {
       type: "op",
       op: "/",
       exprs: [
         design.radius,
-        { type: "op", op: "cos", exprs: [
-          { type: "op", op: "*", exprs: [
-            { type: "op", op: "ST_YMax", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326]}] },
-            0.017453293
-          ]}
-        ]}
+        {
+          type: "op",
+          op: "cos",
+          exprs: [
+            {
+              type: "op",
+              op: "*",
+              exprs: [
+                { type: "op", op: "ST_YMax", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326] }] },
+                0.017453293
+              ]
+            }
+          ]
+        }
       ]
     }
 
@@ -140,13 +156,21 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     }
 
     const selects: JsonQLSelect[] = [
-      { type: "select", expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table)!.primaryKey }, alias: "id" }, // main primary key as id
-      { type: "select", expr: { type: "op", op: "ST_AsMVTGeom", exprs: [bufferExpr, envelopeExpr]}, alias: "the_geom_webmercator" },
+      {
+        type: "select",
+        expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table)!.primaryKey },
+        alias: "id"
+      }, // main primary key as id
+      {
+        type: "select",
+        expr: { type: "op", op: "ST_AsMVTGeom", exprs: [bufferExpr, envelopeExpr] },
+        alias: "the_geom_webmercator"
+      }
     ]
 
     // Add color select if color axis
     if (design.axes.color) {
-      colorExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "main"})
+      colorExpr = axisBuilder.compileAxis({ axis: design.axes.color, tableAlias: "main" })
       selects.push({ type: "select", expr: colorExpr, alias: "color" })
     }
 
@@ -172,19 +196,25 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
       type: "op",
       op: "ST_Transform",
       exprs: [
-        { type: "op", op: "ST_Expand", exprs: [
-          { type: "op", op: "ST_Intersection", exprs: [
-            { type: "op", op: "ST_Transform", exprs: [
-              envelopeExpr,
-              4326
-              ]},
-            { type: "op", op: "ST_Expand", exprs: [
-              { type: "op", op: "ST_MakeEnvelope", exprs: [-180, -85, 180, 85, 4326] },
-              -radiusDeg
-              ]}
-            ]},
-          radiusDeg
-          ]},
+        {
+          type: "op",
+          op: "ST_Expand",
+          exprs: [
+            {
+              type: "op",
+              op: "ST_Intersection",
+              exprs: [
+                { type: "op", op: "ST_Transform", exprs: [envelopeExpr, 4326] },
+                {
+                  type: "op",
+                  op: "ST_Expand",
+                  exprs: [{ type: "op", op: "ST_MakeEnvelope", exprs: [-180, -85, 180, 85, 4326] }, -radiusDeg]
+                }
+              ]
+            },
+            radiusDeg
+          ]
+        },
         3857
       ]
     }
@@ -195,21 +225,18 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
       {
         type: "op",
         op: "&&",
-        exprs: [
-          geometryExpr,
-          boundingBox
-        ]
+        exprs: [geometryExpr, boundingBox]
       }
     ]
 
     // Then add filters baked into layer
     if (design.filter) {
-      whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "main"}))
+      whereClauses.push(exprCompiler.compileExpr({ expr: design.filter, tableAlias: "main" }))
     }
 
     // Then add extra filters passed in, if relevant
     // Get relevant filters
-    const relevantFilters = _.where(filters, {table: design.table})
+    const relevantFilters = _.where(filters, { table: design.table })
     for (let filter of relevantFilters) {
       whereClauses.push(injectTableAlias(filter.jsonql, "main"))
     }
@@ -231,7 +258,10 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
 
       const cases = _.map(categories, (category, i) => {
         return {
-          when: (category.value != null) ? { type: "op", op: "=", exprs: [colorExpr, category.value] } as JsonQLExpr : { type: "op", op: "is null", exprs: [colorExpr] } as JsonQLExpr,
+          when:
+            category.value != null
+              ? ({ type: "op", op: "=", exprs: [colorExpr, category.value] } as JsonQLExpr)
+              : ({ type: "op", op: "is null", exprs: [colorExpr] } as JsonQLExpr),
           then: order.indexOf(category.value) || -1
         }
       })
@@ -278,7 +308,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
 
   createMapnikJsonQL(design: BufferLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
     let colorExpr: JsonQLExpr
-    const axisBuilder = new AxisBuilder({schema})
+    const axisBuilder = new AxisBuilder({ schema })
     const exprCompiler = new ExprCompiler(schema)
 
     /*
@@ -304,7 +334,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     */
 
     // Compile geometry axis
-    let geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "main"})
+    let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry, tableAlias: "main" })
 
     // radius * 2 / (!pixel_width! * cos(st_ymin(st_transform(geometryExpr, 4326)) * 0.017453293) + 1 # add one to make always visible
     const widthExpr: JsonQLExpr = {
@@ -314,15 +344,33 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
         {
           type: "op",
           op: "/",
-          exprs: [{ type: "op", op: "*", exprs: [design.radius, 2] }, { type: "op", op: "*", exprs: [
-            { type: "op", op: "nullif", exprs: [{ type: "token", token: "!pixel_height!" }, 0] },
-            { type: "op", op: "cos", exprs: [
-              { type: "op", op: "*", exprs: [
-                { type: "op", op: "ST_YMIN", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326]}] },
-                0.017453293
-              ]}
-            ]}
-           ]}
+          exprs: [
+            { type: "op", op: "*", exprs: [design.radius, 2] },
+            {
+              type: "op",
+              op: "*",
+              exprs: [
+                { type: "op", op: "nullif", exprs: [{ type: "token", token: "!pixel_height!" }, 0] },
+                {
+                  type: "op",
+                  op: "cos",
+                  exprs: [
+                    {
+                      type: "op",
+                      op: "*",
+                      exprs: [
+                        {
+                          type: "op",
+                          op: "ST_YMIN",
+                          exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326] }]
+                        },
+                        0.017453293
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
           ]
         },
         2
@@ -330,14 +378,18 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     }
 
     const selects: JsonQLSelect[] = [
-      { type: "select", expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table)!.primaryKey }, alias: "id" }, // main primary key as id
+      {
+        type: "select",
+        expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table)!.primaryKey },
+        alias: "id"
+      }, // main primary key as id
       { type: "select", expr: geometryExpr, alias: "the_geom_webmercator" },
       { type: "select", expr: widthExpr, alias: "width" } // Width of circles
     ]
 
     // Add color select if color axis
     if (design.axes.color) {
-      colorExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "main"})
+      colorExpr = axisBuilder.compileAxis({ axis: design.axes.color, tableAlias: "main" })
       selects.push({ type: "select", expr: colorExpr, alias: "color" })
     }
 
@@ -362,19 +414,25 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
       type: "op",
       op: "ST_Transform",
       exprs: [
-        { type: "op", op: "ST_Expand", exprs: [
-          { type: "op", op: "ST_Intersection", exprs: [
-            { type: "op", op: "ST_Transform", exprs: [
-              { type: "token", token: "!bbox!" },
-              4326
-              ]},
-            { type: "op", op: "ST_Expand", exprs: [
-              { type: "op", op: "ST_MakeEnvelope", exprs: [-180, -85, 180, 85, 4326] },
-              -radiusDeg
-              ]}
-            ]},
-          radiusDeg
-          ]},
+        {
+          type: "op",
+          op: "ST_Expand",
+          exprs: [
+            {
+              type: "op",
+              op: "ST_Intersection",
+              exprs: [
+                { type: "op", op: "ST_Transform", exprs: [{ type: "token", token: "!bbox!" }, 4326] },
+                {
+                  type: "op",
+                  op: "ST_Expand",
+                  exprs: [{ type: "op", op: "ST_MakeEnvelope", exprs: [-180, -85, 180, 85, 4326] }, -radiusDeg]
+                }
+              ]
+            },
+            radiusDeg
+          ]
+        },
         3857
       ]
     }
@@ -385,21 +443,18 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
       {
         type: "op",
         op: "&&",
-        exprs: [
-          geometryExpr,
-          boundingBox
-        ]
+        exprs: [geometryExpr, boundingBox]
       }
     ]
 
     // Then add filters baked into layer
     if (design.filter) {
-      whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "main"}))
+      whereClauses.push(exprCompiler.compileExpr({ expr: design.filter, tableAlias: "main" }))
     }
 
     // Then add extra filters passed in, if relevant
     // Get relevant filters
-    const relevantFilters = _.where(filters, {table: design.table})
+    const relevantFilters = _.where(filters, { table: design.table })
     for (let filter of relevantFilters) {
       whereClauses.push(injectTableAlias(filter.jsonql, "main"))
     }
@@ -421,10 +476,13 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
 
       const cases = _.map(categories, (category, i) => {
         return {
-          when: (category.value != null) ? { type: "op", op: "=", exprs: [colorExpr, category.value] } as JsonQLExpr : { type: "op", op: "is null", exprs: [colorExpr] } as JsonQLExpr,
+          when:
+            category.value != null
+              ? ({ type: "op", op: "=", exprs: [colorExpr, category.value] } as JsonQLExpr)
+              : ({ type: "op", op: "is null", exprs: [colorExpr] } as JsonQLExpr),
           then: order.indexOf(category.value) || -1
         }
-    })
+      })
 
       if (cases.length > 0) {
         query.orderBy = [
@@ -443,15 +501,20 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
   }
 
   createCss(design: BufferLayerDesign, schema: Schema) {
-    let css = `\
+    let css =
+      `\
 #layer0 {
-  marker-fill-opacity: ` + design.fillOpacity + `;
+  marker-fill-opacity: ` +
+      design.fillOpacity +
+      `;
 marker-type: ellipse;
 marker-width: [width];
 marker-line-width: 0;
 marker-allow-overlap: true;
 marker-ignore-placement: true;
-marker-fill: ` + (design.color || "transparent") + `;
+marker-fill: ` +
+      (design.color || "transparent") +
+      `;
 }\
 `
 
@@ -460,7 +523,7 @@ marker-fill: ` + (design.color || "transparent") + `;
       for (let item of design.axes.color.colorMap) {
         // If invisible
         if ((design.axes.color.excludedValues || []).includes(item.value)) {
-          css += `#layer0 [color=${JSON.stringify(item.value)}] { marker-fill-opacity: 0; }\n`;  
+          css += `#layer0 [color=${JSON.stringify(item.value)}] { marker-fill-opacity: 0; }\n`
         } else {
           css += `#layer0 [color=${JSON.stringify(item.value)}] { marker-fill: ${item.color}; }\n`
         }
@@ -489,12 +552,10 @@ marker-fill: ` + (design.color || "transparent") + `;
   //     row: { tableId:, primaryKey: }  # row that was selected
   //     popup: React element to put into a popup
   //   }
-  onGridClick(ev: { data: any, event: any }, clickOptions: OnGridClickOptions<BufferLayerDesign>): OnGridClickResults {
+  onGridClick(ev: { data: any; event: any }, clickOptions: OnGridClickOptions<BufferLayerDesign>): OnGridClickResults {
     // TODO abstract most to base class
     if (ev.data && ev.data.id) {
-      const {
-        table
-      } = clickOptions.design
+      const { table } = clickOptions.design
       const results: OnGridClickResults = {}
 
       // Scope toggle item if ctrl-click
@@ -509,10 +570,15 @@ marker-fill: ` + (design.color || "transparent") + `;
         // Create filter for rows
         const filter = {
           table,
-          jsonql: { type: "op", op: "=", modifier: "any", exprs: [
-            { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table)!.primaryKey },
-            { type: "literal", value: ids }
-          ]}
+          jsonql: {
+            type: "op",
+            op: "=",
+            modifier: "any",
+            exprs: [
+              { type: "field", tableAlias: "{alias}", column: clickOptions.schema.getTable(table)!.primaryKey },
+              { type: "literal", value: ids }
+            ]
+          }
         }
 
         // Create filter expression for rows
@@ -542,11 +608,17 @@ marker-fill: ` + (design.color || "transparent") + `;
       // Popup
       if (clickOptions.design.popup && !ev.event.originalEvent.shiftKey) {
         // Create filter using popupFilterJoins
-        const popupFilterJoins = clickOptions.design.popupFilterJoins || PopupFilterJoinsUtils.createDefaultPopupFilterJoins(table)
-        const popupFilters = PopupFilterJoinsUtils.createPopupFilters(popupFilterJoins, clickOptions.schema, table, ev.data.id)
+        const popupFilterJoins =
+          clickOptions.design.popupFilterJoins || PopupFilterJoinsUtils.createDefaultPopupFilterJoins(table)
+        const popupFilters = PopupFilterJoinsUtils.createPopupFilters(
+          popupFilterJoins,
+          clickOptions.schema,
+          table,
+          ev.data.id
+        )
 
-        const BlocksLayoutManager = require('../layouts/blocks/BlocksLayoutManager')
-        const WidgetFactory = require('../widgets/WidgetFactory')
+        const BlocksLayoutManager = require("../layouts/blocks/BlocksLayoutManager")
+        const WidgetFactory = require("../widgets/WidgetFactory")
 
         results.popup = new BlocksLayoutManager().renderLayout({
           items: clickOptions.design.popup.items,
@@ -557,7 +629,10 @@ marker-fill: ` + (design.color || "transparent") + `;
             const filters = clickOptions.filters.concat(popupFilters)
 
             // Get data source for widget
-            const widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(clickOptions.design, options.id)
+            const widgetDataSource = clickOptions.layerDataSource.getPopupWidgetDataSource(
+              clickOptions.design,
+              options.id
+            )
 
             return widget.createViewElement({
               schema: clickOptions.schema,
@@ -572,7 +647,7 @@ marker-fill: ` + (design.color || "transparent") + `;
               height: options.height
             })
           }
-          })
+        })
       } else if (!ev.event.originalEvent.shiftKey) {
         results.row = { tableId: table, primaryKey: ev.data.id }
       }
@@ -586,10 +661,20 @@ marker-fill: ` + (design.color || "transparent") + `;
   // Gets the bounds of the layer as GeoJSON
   getBounds(design: BufferLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any) {
     // TODO technically should pad for the radius, but we always pad by 20% anyway so it should be fine
-    return this.getBoundsFromExpr(schema, dataSource, design.table, design.axes.geometry.expr, design.filter || null, filters, callback)
+    return this.getBoundsFromExpr(
+      schema,
+      dataSource,
+      design.table,
+      design.axes.geometry.expr,
+      design.filter || null,
+      filters,
+      callback
+    )
   }
 
-  getMinZoom(design: BufferLayerDesign) { return design.minZoom; }
+  getMinZoom(design: BufferLayerDesign) {
+    return design.minZoom
+  }
 
   // Removed as was making deceptively not present
   // # Get min and max zoom levels
@@ -604,45 +689,64 @@ marker-fill: ` + (design.color || "transparent") + `;
   //   else
   //     return design.minZoom
 
-  getMaxZoom(design: BufferLayerDesign) { return design.maxZoom || 21; }
+  getMaxZoom(design: BufferLayerDesign) {
+    return design.maxZoom || 21
+  }
 
   // Get the legend to be optionally displayed on the map. Returns
   // a React element
-  getLegend(design: BufferLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]) {
+  getLegend(
+    design: BufferLayerDesign,
+    schema: Schema,
+    name: string,
+    dataSource: DataSource,
+    locale: string,
+    filters: JsonQLFilter[]
+  ) {
     const _filters = filters.slice()
     if (design.filter != null) {
       const exprCompiler = new ExprCompiler(schema)
-      const jsonql = exprCompiler.compileExpr({expr: design.filter, tableAlias: "{alias}"})
+      const jsonql = exprCompiler.compileExpr({ expr: design.filter, tableAlias: "{alias}" })
       if (jsonql) {
         _filters.push({ table: (design.filter as any).table, jsonql })
       }
     }
-        
-    const axisBuilder = new AxisBuilder({schema})
+
+    const axisBuilder = new AxisBuilder({ schema })
     return React.createElement(LayerLegendComponent, {
       schema,
       name,
       dataSource,
       filters: _.compact(_filters),
-      axis: axisBuilder.cleanAxis({axis: design.axes.color, table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none"}),
+      axis: axisBuilder.cleanAxis({
+        axis: design.axes.color,
+        table: design.table,
+        types: ["enum", "text", "boolean", "date"],
+        aggrNeed: "none"
+      }),
       radiusLayer: true,
       defaultColor: design.color,
       locale
-    }
-    )
+    })
   }
 
   // Get a list of table ids that can be filtered on
   getFilterableTables(design: BufferLayerDesign, schema: Schema) {
-    if (design.table) { return [design.table]; } else { return []; }
+    if (design.table) {
+      return [design.table]
+    } else {
+      return []
+    }
   }
 
   // True if layer can be edited
-  isEditable() { return true; }
+  isEditable() {
+    return true
+  }
 
   // True if layer is incomplete (e.g. brand new) and should be editable immediately
   isIncomplete(design: BufferLayerDesign, schema: Schema) {
-    return (this.validateDesign(design, schema) != null)
+    return this.validateDesign(design, schema) != null
   }
 
   // Creates a design element with specified options
@@ -660,7 +764,7 @@ marker-fill: ` + (design.color || "transparent") + `;
     filters: JsonQLFilter[]
   }): React.ReactElement<{}> {
     // Require here to prevent server require problems
-    const BufferLayerDesignerComponent = require('./BufferLayerDesignerComponent')
+    const BufferLayerDesignerComponent = require("./BufferLayerDesignerComponent")
 
     // Clean on way in and out
     return React.createElement(BufferLayerDesignerComponent, {
@@ -677,18 +781,28 @@ marker-fill: ` + (design.color || "transparent") + `;
   // Returns a cleaned design
   cleanDesign(design: BufferLayerDesign, schema: Schema) {
     const exprCleaner = new ExprCleaner(schema)
-    const axisBuilder = new AxisBuilder({schema})
+    const axisBuilder = new AxisBuilder({ schema })
 
-    design = produce(design, draft => {
+    design = produce(design, (draft) => {
       // Default color
       draft.color = design.color || "#0088FF"
 
       draft.axes = design.axes || {}
       draft.radius = design.radius || 1000
-      draft.fillOpacity = (design.fillOpacity != null) ? design.fillOpacity : 0.5
+      draft.fillOpacity = design.fillOpacity != null ? design.fillOpacity : 0.5
 
-      draft.axes.geometry = axisBuilder.cleanAxis({axis: (draft.axes.geometry ? original(draft.axes.geometry) || null : null), table: design.table, types: ['geometry'], aggrNeed: "none"})
-      draft.axes.color = axisBuilder.cleanAxis({axis: (draft.axes.color ? original(draft.axes.color) || null : null), table: design.table, types: ['enum', 'text', 'boolean','date'], aggrNeed: "none"})
+      draft.axes.geometry = axisBuilder.cleanAxis({
+        axis: draft.axes.geometry ? original(draft.axes.geometry) || null : null,
+        table: design.table,
+        types: ["geometry"],
+        aggrNeed: "none"
+      })
+      draft.axes.color = axisBuilder.cleanAxis({
+        axis: draft.axes.color ? original(draft.axes.color) || null : null,
+        table: design.table,
+        types: ["enum", "text", "boolean", "date"],
+        aggrNeed: "none"
+      })
 
       draft.filter = exprCleaner.cleanExpr(design.filter || null, { table: design.table })
     })
@@ -698,14 +812,14 @@ marker-fill: ` + (design.color || "transparent") + `;
 
   // Validates design. Null if ok, message otherwise
   validateDesign(design: BufferLayerDesign, schema: Schema) {
-    const axisBuilder = new AxisBuilder({schema})
+    const axisBuilder = new AxisBuilder({ schema })
     const exprValidator = new ExprValidator(schema)
 
     if (!design.table) {
       return "Missing table"
     }
 
-    if ((design.radius == null)) {
+    if (design.radius == null) {
       return "Missing radius"
     }
 
@@ -713,40 +827,64 @@ marker-fill: ` + (design.color || "transparent") + `;
       return "Missing axes"
     }
 
-    let error = axisBuilder.validateAxis({axis: design.axes.geometry})
-    if (error) { return error; }
+    let error = axisBuilder.validateAxis({ axis: design.axes.geometry })
+    if (error) {
+      return error
+    }
 
-    error = axisBuilder.validateAxis({axis: design.axes.color})
-    if (error) { return error; }
+    error = axisBuilder.validateAxis({ axis: design.axes.color })
+    if (error) {
+      return error
+    }
 
     // Validate filter
     error = exprValidator.validateExpr(design.filter || null)
-    if (error) { return error; }
-    
+    if (error) {
+      return error
+    }
+
     return null
   }
 
   createKMLExportJsonQL(design: BufferLayerDesign, schema: Schema, filters: JsonQLFilter[]) {
     let colorExpr: JsonQLExpr
-    const axisBuilder = new AxisBuilder({schema})
+    const axisBuilder = new AxisBuilder({ schema })
     const exprCompiler = new ExprCompiler(schema)
     // Compile geometry axis
-    const geometryExpr = axisBuilder.compileAxis({axis: design.axes.geometry, tableAlias: "main"})
+    const geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry, tableAlias: "main" })
 
     // st_transform(st_buffer(st_transform(<geometry axis>, 4326)::geography, <radius>)::geometry, 3857) as the_geom_webmercator
     const bufferedGeometry: JsonQLExpr = {
-      type: "op", op: "ST_AsGeoJson", exprs: [
-        { type: "op", op: "::geometry", exprs: [
-          { type: "op", op: "ST_Buffer", exprs: [
-            { type: "op", op: "::geography", exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326] }] },
-            design.radius
-            ]}
-          ]}
+      type: "op",
+      op: "ST_AsGeoJson",
+      exprs: [
+        {
+          type: "op",
+          op: "::geometry",
+          exprs: [
+            {
+              type: "op",
+              op: "ST_Buffer",
+              exprs: [
+                {
+                  type: "op",
+                  op: "::geography",
+                  exprs: [{ type: "op", op: "ST_Transform", exprs: [geometryExpr, 4326] }]
+                },
+                design.radius
+              ]
+            }
+          ]
+        }
       ]
     }
 
     const selects: JsonQLSelect[] = [
-      { type: "select", expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table)!.primaryKey }, alias: "id" }, // main primary key as id
+      {
+        type: "select",
+        expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table)!.primaryKey },
+        alias: "id"
+      }, // main primary key as id
       { type: "select", expr: bufferedGeometry, alias: "the_geom_webmercator" }
     ]
 
@@ -762,8 +900,8 @@ marker-fill: ` + (design.color || "transparent") + `;
 
     // Add color select if color axis
     if (design.axes.color) {
-      const valueExpr = exprCompiler.compileExpr({expr: design.axes.color.expr, tableAlias: "main"})
-      colorExpr = axisBuilder.compileAxis({axis: design.axes.color, tableAlias: "main"})
+      const valueExpr = exprCompiler.compileExpr({ expr: design.axes.color.expr, tableAlias: "main" })
+      colorExpr = axisBuilder.compileAxis({ axis: design.axes.color, tableAlias: "main" })
       selects.push({ type: "select", expr: valueExpr, alias: "value" })
       selects.push({ type: "select", expr: colorExpr, alias: "color" })
     }
@@ -786,18 +924,16 @@ marker-fill: ` + (design.color || "transparent") + `;
     const radiusDeg = design.radius / 100000
 
     // Create filters. First ensure geometry and limit to bounding box
-    let whereClauses: JsonQLExpr[] = [
-      { type: "op", op: "is not null", exprs: [geometryExpr] }
-    ]
+    let whereClauses: JsonQLExpr[] = [{ type: "op", op: "is not null", exprs: [geometryExpr] }]
 
     // Then add filters baked into layer
     if (design.filter) {
-      whereClauses.push(exprCompiler.compileExpr({expr: design.filter, tableAlias: "main"}))
+      whereClauses.push(exprCompiler.compileExpr({ expr: design.filter, tableAlias: "main" }))
     }
 
     // Then add extra filters passed in, if relevant
     // Get relevant filters
-    const relevantFilters = _.where(filters, {table: design.table})
+    const relevantFilters = _.where(filters, { table: design.table })
     for (let filter of relevantFilters) {
       whereClauses.push(injectTableAlias(filter.jsonql, "main"))
     }
@@ -817,10 +953,13 @@ marker-fill: ` + (design.color || "transparent") + `;
 
       const cases = _.map(categories, (category, i) => {
         return {
-          when: (category.value != null) ? { type: "op", op: "=", exprs: [colorExpr, category.value] } as JsonQLExpr : { type: "op", op: "is null", exprs: [colorExpr] } as JsonQLExpr,
+          when:
+            category.value != null
+              ? ({ type: "op", op: "=", exprs: [colorExpr, category.value] } as JsonQLExpr)
+              : ({ type: "op", op: "is null", exprs: [colorExpr] } as JsonQLExpr),
           then: order.indexOf(category.value) || -1
         }
-    })
+      })
 
       if (cases.length > 0) {
         query.orderBy = [
@@ -849,7 +988,7 @@ marker-fill: ` + (design.color || "transparent") + `;
     }
 
     const layerDef = {
-      layers: [{ id: "layer0", jsonql: this.createKMLExportJsonQL(design, schema, filters) , style}]
+      layers: [{ id: "layer0", jsonql: this.createKMLExportJsonQL(design, schema, filters), style }]
     }
 
     return layerDef

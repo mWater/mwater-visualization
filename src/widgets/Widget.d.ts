@@ -1,8 +1,8 @@
-import { DataSource, Schema } from "mwater-expressions";
-import { ReactElement } from "react";
+import { DataSource, Schema } from "mwater-expressions"
+import { ReactElement } from "react"
 import { JsonQLFilter } from "../JsonQLFilter"
-import { WidgetScope } from "../WidgetScope";
-import { WidgetDataSource } from "./WidgetDataSource";
+import { WidgetScope } from "../WidgetScope"
+import { WidgetDataSource } from "./WidgetDataSource"
 
 export default class Widget {
   /** Creates a React element that is a view of the widget */
@@ -51,7 +51,13 @@ export default class Widget {
    *   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
    *   callback: (error, data)
    */
-  getData(design: any, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: (error: any, data?: any) => void): void
+  getData(
+    design: any,
+    schema: Schema,
+    dataSource: DataSource,
+    filters: JsonQLFilter[],
+    callback: (error: any, data?: any) => void
+  ): void
 
   /** Determine if widget is auto-height, which means that a vertical height is not required. */
   isAutoHeight(): boolean
@@ -59,8 +65,8 @@ export default class Widget {
   /** Get a list of table ids that can be filtered on */
   getFilterableTables(design: any, schema: Schema): string[]
 
-  /** Get table of contents entries for the widget, entries that should be displayed in the TOC. 
-   * returns `[{ id: "id that is unique within widget", text: "text of TOC entry", level: 1, 2, etc. }] 
+  /** Get table of contents entries for the widget, entries that should be displayed in the TOC.
+   * returns `[{ id: "id that is unique within widget", text: "text of TOC entry", level: 1, 2, etc. }]
    */
-  getTOCEntries(design: any, namedStrings: { [key: string]: string }): { id: string, text: string, level: number }[]
+  getTOCEntries(design: any, namedStrings: { [key: string]: string }): { id: string; text: string; level: number }[]
 }

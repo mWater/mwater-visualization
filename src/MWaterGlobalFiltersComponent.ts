@@ -1,17 +1,17 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
-let MWaterGlobalFiltersComponent;
-import PropTypes from 'prop-types';
-import _ from 'lodash';
-import React from 'react';
-const R = React.createElement;
+let MWaterGlobalFiltersComponent
+import PropTypes from "prop-types"
+import _ from "lodash"
+import React from "react"
+const R = React.createElement
 
-import querystring from 'querystring';
-import ui from 'react-library/lib/bootstrap';
-import { IdLiteralComponent } from 'mwater-expressions-ui';
+import querystring from "querystring"
+import ui from "react-library/lib/bootstrap"
+import { IdLiteralComponent } from "mwater-expressions-ui"
 
 // Control to edit the global filters (_managed_by and admin_region)
-export default MWaterGlobalFiltersComponent = (function() {
+export default MWaterGlobalFiltersComponent = (function () {
   MWaterGlobalFiltersComponent = class MWaterGlobalFiltersComponent extends React.Component {
     static initClass() {
       this.propTypes = {
@@ -20,53 +20,79 @@ export default MWaterGlobalFiltersComponent = (function() {
         filterableTables: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
         globalFilters: PropTypes.array,
         onChange: PropTypes.func.isRequired
-      };
+      }
     }
 
-    handleRegionsChange = regions => {
+    handleRegionsChange = (regions) => {
       // Remove existing filter
-      const globalFilters = _.filter(this.props.globalFilters || [], gf => !((gf.op === "within any") && (gf.columnId === "admin_region")));
+      const globalFilters = _.filter(
+        this.props.globalFilters || [],
+        (gf) => !(gf.op === "within any" && gf.columnId === "admin_region")
+      )
 
       // Add new filter if present
-      if (regions && (regions.length > 0)) {
-        globalFilters.push({ columnId: "admin_region", columnType: "id", op: "within any", exprs: [{ type: "literal", valueType: "id[]", idTable: "admin_regions", value: regions }] });
+      if (regions && regions.length > 0) {
+        globalFilters.push({
+          columnId: "admin_region",
+          columnType: "id",
+          op: "within any",
+          exprs: [{ type: "literal", valueType: "id[]", idTable: "admin_regions", value: regions }]
+        })
       }
 
-      return this.props.onChange(globalFilters);
-    };
+      return this.props.onChange(globalFilters)
+    }
 
-    handleManagedByChange = managedBy => {
+    handleManagedByChange = (managedBy) => {
       // Remove existing filter
-      const globalFilters = _.filter(this.props.globalFilters || [], gf => !((gf.op === "within") && (gf.columnId === "_managed_by")));
+      const globalFilters = _.filter(
+        this.props.globalFilters || [],
+        (gf) => !(gf.op === "within" && gf.columnId === "_managed_by")
+      )
 
       // Add new filter if present
       if (managedBy) {
-        globalFilters.push({ columnId: "_managed_by", columnType: "id", op: "within", exprs: [{ type: "literal", valueType: "id", idTable: "subjects", value: "group:" + managedBy }] });
+        globalFilters.push({
+          columnId: "_managed_by",
+          columnType: "id",
+          op: "within",
+          exprs: [{ type: "literal", valueType: "id", idTable: "subjects", value: "group:" + managedBy }]
+        })
       }
 
-      return this.props.onChange(globalFilters);
-    };
+      return this.props.onChange(globalFilters)
+    }
 
     render() {
       // Find managed by
-      let adminRegions, managedBy;
-      const managedByEntry = _.find(this.props.globalFilters, gf => (gf.op === "within") && (gf.columnId === "_managed_by"));
+      let adminRegions, managedBy
+      const managedByEntry = _.find(
+        this.props.globalFilters,
+        (gf) => gf.op === "within" && gf.columnId === "_managed_by"
+      )
       if (managedByEntry) {
-        managedBy = managedByEntry.exprs[0].value.split(":")[1];
+        managedBy = managedByEntry.exprs[0].value.split(":")[1]
       } else {
-        managedBy = null;
+        managedBy = null
       }
 
       // Find admin region
-      const adminRegionEntry = _.find(this.props.globalFilters, gf => (gf.op === "within any") && (gf.columnId === "admin_region"));
+      const adminRegionEntry = _.find(
+        this.props.globalFilters,
+        (gf) => gf.op === "within any" && gf.columnId === "admin_region"
+      )
       if (adminRegionEntry) {
-        adminRegions = adminRegionEntry.exprs[0].value;
+        adminRegions = adminRegionEntry.exprs[0].value
       } else {
-        adminRegions = null;
+        adminRegions = null
       }
 
-      return R('div', null,
-        R(ui.FormGroup, {label: "Only sites managed by", labelMuted: true}, 
+      return R(
+        "div",
+        null,
+        R(
+          ui.FormGroup,
+          { label: "Only sites managed by", labelMuted: true },
           R(IdLiteralComponent, {
             value: managedBy,
             onChange: this.handleManagedByChange,
@@ -76,9 +102,12 @@ export default MWaterGlobalFiltersComponent = (function() {
             placeholder: "All Organizations",
             multi: false,
             filter: { type: "field", tableAlias: "main", column: "canManageEntities" }
-          })),
+          })
+        ),
 
-        R(ui.FormGroup, {label: "Only sites located in", labelMuted: true}, 
+        R(
+          ui.FormGroup,
+          { label: "Only sites located in", labelMuted: true },
           R(IdLiteralComponent, {
             value: adminRegions,
             onChange: this.handleRegionsChange,
@@ -88,10 +117,11 @@ export default MWaterGlobalFiltersComponent = (function() {
             placeholder: "All Regions",
             multi: true,
             orderBy: [{ expr: { type: "field", tableAlias: "main", column: "level" }, direction: "asc" }]
-          })));
+          })
+        )
+      )
     }
-  };
-  MWaterGlobalFiltersComponent.initClass();
-  return MWaterGlobalFiltersComponent;
-})();
-
+  }
+  MWaterGlobalFiltersComponent.initClass()
+  return MWaterGlobalFiltersComponent
+})()

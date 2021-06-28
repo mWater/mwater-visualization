@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from "react"
 
 declare class ColorComponent extends React.Component<{
   color: string | null | undefined

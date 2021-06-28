@@ -4,7 +4,7 @@ import React from "react"
 import { JsonQLFilter } from "../JsonQLFilter"
 import { MapDesign } from "./MapDesign"
 import { MapDataSource } from "./MapDataSource"
-import { NewMapViewComponent } from './NewMapViewComponent'
+import { NewMapViewComponent } from "./NewMapViewComponent"
 import { MapScope } from "./MapUtils"
 import OldMapViewComponent from "./OldMapViewComponent"
 
@@ -36,16 +36,16 @@ export function MapViewComponent(props: {
   onScopeChange: (scope: MapScope | null) => void
 
   /** Whether the map be draggable with mouse/touch or not. Default true */
-  dragging?: boolean 
+  dragging?: boolean
 
   /** Whether the map can be zoomed by touch-dragging with two fingers. Default true */
-  touchZoom?: boolean 
+  touchZoom?: boolean
 
   /** Whether the map can be zoomed by using the mouse wheel. Default true */
   scrollWheelZoom?: boolean
 
   /** Whether changes to zoom level should be persisted. Default false  */
-  zoomLocked?: boolean 
+  zoomLocked?: boolean
 
   /** Locale to use */
   locale: string
@@ -54,6 +54,6 @@ export function MapViewComponent(props: {
   //   return <NewMapViewComponent {...props}/>
   // }
   // else {
-  return <OldMapViewComponent {...props}/>
+  return <OldMapViewComponent {...props} />
   // }
 }

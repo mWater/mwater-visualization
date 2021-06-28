@@ -1,261 +1,295 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
-let PivotChart;
-import _ from 'lodash';
-import React from 'react';
-const R = React.createElement;
-import async from 'async';
-import uuid from 'uuid';
-import { default as produce } from 'immer';
-import { original } from 'immer';
-import { WeakCache } from 'mwater-expressions';
-import Chart from '../Chart';
-import { ExprCleaner } from 'mwater-expressions';
-import AxisBuilder from '../../../axes/AxisBuilder';
-import TextWidget from '../../text/TextWidget';
-import * as PivotChartUtils from './PivotChartUtils';
-import PivotChartQueryBuilder from './PivotChartQueryBuilder';
-import PivotChartLayoutBuilder from './PivotChartLayoutBuilder';
+let PivotChart
+import _ from "lodash"
+import React from "react"
+const R = React.createElement
+import async from "async"
+import uuid from "uuid"
+import { default as produce } from "immer"
+import { original } from "immer"
+import { WeakCache } from "mwater-expressions"
+import Chart from "../Chart"
+import { ExprCleaner } from "mwater-expressions"
+import AxisBuilder from "../../../axes/AxisBuilder"
+import TextWidget from "../../text/TextWidget"
+import * as PivotChartUtils from "./PivotChartUtils"
+import PivotChartQueryBuilder from "./PivotChartQueryBuilder"
+import PivotChartLayoutBuilder from "./PivotChartLayoutBuilder"
 
 // Store true as a weakly cached value if a design is already clean
-const cleanDesignCache = new WeakCache();
+const cleanDesignCache = new WeakCache()
 
 // See README.md for the design
 export default PivotChart = class PivotChart extends Chart {
   cleanDesign(design, schema) {
-    const exprCleaner = new ExprCleaner(schema);
-    const axisBuilder = new AxisBuilder({schema});
+    const exprCleaner = new ExprCleaner(schema)
+    const axisBuilder = new AxisBuilder({ schema })
 
     // Use weak caching to improve performance of cleaning complex pivot charts
     if (cleanDesignCache.get([design, schema], []) === true) {
-      return design;
+      return design
     }
 
-    const cleanedDesign = produce(design, draft => { 
+    const cleanedDesign = produce(design, (draft) => {
       // Fill in defaults
-      draft.version = design.version || 1;
-      draft.rows = design.rows || [];
-      draft.columns = design.columns || [];
-      draft.intersections = design.intersections || {};
-      draft.header = design.header || { style: "footer", items: [] };
-      draft.footer = design.footer || { style: "footer", items: [] };
+      draft.version = design.version || 1
+      draft.rows = design.rows || []
+      draft.columns = design.columns || []
+      draft.intersections = design.intersections || {}
+      draft.header = design.header || { style: "footer", items: [] }
+      draft.footer = design.footer || { style: "footer", items: [] }
 
       if (design.table) {
         // Add default row and column
-        let intersectionId, segment;
+        let intersectionId, segment
         if (draft.rows.length === 0) {
-          draft.rows.push({ id: uuid() });
+          draft.rows.push({ id: uuid() })
         }
         if (draft.columns.length === 0) {
-          draft.columns.push({ id: uuid() });
+          draft.columns.push({ id: uuid() })
         }
 
         // Cleans a single segment
-        const cleanSegment = segment => {
+        const cleanSegment = (segment) => {
           if (segment.valueAxis) {
-            segment.valueAxis = axisBuilder.cleanAxis({axis: (segment.valueAxis ? original(segment.valueAxis) : null), table: design.table, aggrNeed: "none", types: ["enum", "text", "boolean", "date"]});
+            segment.valueAxis = axisBuilder.cleanAxis({
+              axis: segment.valueAxis ? original(segment.valueAxis) : null,
+              table: design.table,
+              aggrNeed: "none",
+              types: ["enum", "text", "boolean", "date"]
+            })
           }
 
           // Remove valueLabelBold if no valueAxis
           if (!segment.valueAxis) {
-            delete segment.valueLabelBold;
+            delete segment.valueLabelBold
           }
 
           if (segment.filter) {
-            segment.filter = exprCleaner.cleanExpr((segment.filter ? original(segment.filter) : null), { table: design.table, types: ["boolean"] });
+            segment.filter = exprCleaner.cleanExpr(segment.filter ? original(segment.filter) : null, {
+              table: design.table,
+              types: ["boolean"]
+            })
           }
 
           if (segment.orderExpr) {
-            return segment.orderExpr = exprCleaner.cleanExpr((segment.orderExpr ? original(segment.orderExpr) : null), { table: design.table, aggrStatuses: ["aggregate"], types: ["enum", "text", "boolean", "date", "datetime", "number"] });
+            return (segment.orderExpr = exprCleaner.cleanExpr(segment.orderExpr ? original(segment.orderExpr) : null, {
+              table: design.table,
+              aggrStatuses: ["aggregate"],
+              types: ["enum", "text", "boolean", "date", "datetime", "number"]
+            }))
           }
-        };
+        }
 
         // Clean all segments
         for (segment of PivotChartUtils.getAllSegments(draft.rows)) {
-          cleanSegment(segment);
+          cleanSegment(segment)
         }
-          
+
         for (segment of PivotChartUtils.getAllSegments(draft.columns)) {
-          cleanSegment(segment);
+          cleanSegment(segment)
         }
 
         // Clean all intersections
         for (intersectionId in draft.intersections) {
-          const intersection = draft.intersections[intersectionId];
+          const intersection = draft.intersections[intersectionId]
           if (intersection.valueAxis) {
-            intersection.valueAxis = axisBuilder.cleanAxis({axis: (intersection.valueAxis ? original(intersection.valueAxis) : null), table: design.table, aggrNeed: "required", types: ["enum", "text", "boolean", "date", "number"]});
+            intersection.valueAxis = axisBuilder.cleanAxis({
+              axis: intersection.valueAxis ? original(intersection.valueAxis) : null,
+              table: design.table,
+              aggrNeed: "required",
+              types: ["enum", "text", "boolean", "date", "number"]
+            })
           }
 
           if (intersection.backgroundColorAxis) {
-            intersection.backgroundColorAxis = axisBuilder.cleanAxis({axis: (intersection.backgroundColorAxis ? original(intersection.backgroundColorAxis) : null), table: design.table, aggrNeed: "required", types: ["enum", "text", "boolean", "date"]});
-            
-            if ((intersection.backgroundColorOpacity == null)) {
-              intersection.backgroundColorOpacity = 1;
+            intersection.backgroundColorAxis = axisBuilder.cleanAxis({
+              axis: intersection.backgroundColorAxis ? original(intersection.backgroundColorAxis) : null,
+              table: design.table,
+              aggrNeed: "required",
+              types: ["enum", "text", "boolean", "date"]
+            })
+
+            if (intersection.backgroundColorOpacity == null) {
+              intersection.backgroundColorOpacity = 1
             }
           }
 
           if (intersection.filter) {
-            intersection.filter = exprCleaner.cleanExpr((intersection.filter ? original(intersection.filter) : null), { table: design.table, types: ["boolean"] });
+            intersection.filter = exprCleaner.cleanExpr(intersection.filter ? original(intersection.filter) : null, {
+              table: design.table,
+              types: ["boolean"]
+            })
           }
         }
 
         // Get all intersection ids
-        const allIntersectionIds = [];
+        const allIntersectionIds = []
         for (let rowPath of PivotChartUtils.getSegmentPaths(design.rows || [])) {
           for (let columnPath of PivotChartUtils.getSegmentPaths(design.columns || [])) {
-            allIntersectionIds.push(PivotChartUtils.getIntersectionId(rowPath, columnPath));
+            allIntersectionIds.push(PivotChartUtils.getIntersectionId(rowPath, columnPath))
           }
         }
-        
+
         // Add missing intersections
         for (intersectionId of _.difference(allIntersectionIds, _.keys(design.intersections || {}))) {
-          draft.intersections[intersectionId] = {};
+          draft.intersections[intersectionId] = {}
         }
 
         // Remove extra intersections
         for (intersectionId of _.difference(_.keys(design.intersections || {}), allIntersectionIds)) {
-          delete draft.intersections[intersectionId];
+          delete draft.intersections[intersectionId]
         }
 
         // Clean filter
-        draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ['boolean'] });
-        return;
+        draft.filter = exprCleaner.cleanExpr(design.filter, { table: design.table, types: ["boolean"] })
+        return
       }
-    });
+    })
 
     // Cache if unchanged (and therefore clean)
     if (design === cleanedDesign) {
-      cleanDesignCache.set([design, schema], [], true);
+      cleanDesignCache.set([design, schema], [], true)
     }
 
-    return cleanedDesign;
+    return cleanedDesign
   }
 
   validateDesign(design, schema) {
-    let segment;
-    const axisBuilder = new AxisBuilder({schema});
+    let segment
+    const axisBuilder = new AxisBuilder({ schema })
 
     // Check that has table
     if (!design.table) {
-      return "Missing data source";
+      return "Missing data source"
     }
 
     // Check that has rows
     if (design.rows.length === 0) {
-      return "Missing rows";
+      return "Missing rows"
     }
 
     // Check that has columns
     if (design.columns.length === 0) {
-      return "Missing columns";
+      return "Missing columns"
     }
 
-    let error = null;
+    let error = null
 
     // Validate axes
     for (segment of PivotChartUtils.getAllSegments(design.rows)) {
       if (segment.valueAxis) {
-        error = error || axisBuilder.validateAxis({axis: segment.valueAxis});
+        error = error || axisBuilder.validateAxis({ axis: segment.valueAxis })
       }
     }
 
     for (segment of PivotChartUtils.getAllSegments(design.columns)) {
       if (segment.valueAxis) {
-        error = error || axisBuilder.validateAxis({axis: segment.valueAxis});
+        error = error || axisBuilder.validateAxis({ axis: segment.valueAxis })
       }
     }
 
     for (let intersectionId in design.intersections) {
-      const intersection = design.intersections[intersectionId];
+      const intersection = design.intersections[intersectionId]
       if (intersection.valueAxis) {
-        error = error || axisBuilder.validateAxis({axis: intersection.valueAxis});
+        error = error || axisBuilder.validateAxis({ axis: intersection.valueAxis })
       }
     }
 
-    return error;
+    return error
   }
 
   // Determine if widget is auto-height, which means that a vertical height is not required.
-  isAutoHeight() { return false; }
+  isAutoHeight() {
+    return false
+  }
 
   isEmpty(design) {
-    return !design.table || (design.rows.length === 0) || (design.columns.length === 0);
+    return !design.table || design.rows.length === 0 || design.columns.length === 0
   }
 
   // True if designer should have a preview pane to the left
-  hasDesignerPreview() { return false; }
+  hasDesignerPreview() {
+    return false
+  }
 
   // Label for the edit gear dropdown
-  getEditLabel() { return "Configure Table"; } 
+  getEditLabel() {
+    return "Configure Table"
+  }
 
   // Creates a design element with specified options
   // options include:
   //   schema: schema to use
   //   dataSource: dataSource to use
-  //   design: design 
+  //   design: design
   //   onDesignChange: function
   //   filters: array of filters
   createDesignerElement(options) {
     // Require here to prevent server require problems
-    const PivotChartDesignerComponent = require('./PivotChartDesignerComponent');
+    const PivotChartDesignerComponent = require("./PivotChartDesignerComponent")
 
     const props = {
       schema: options.schema,
       dataSource: options.dataSource,
       design: this.cleanDesign(options.design, options.schema),
       filters: options.filter,
-      onDesignChange: design => {
+      onDesignChange: (design) => {
         // Clean design
-        design = this.cleanDesign(design, options.schema);
-        return options.onDesignChange(design);
+        design = this.cleanDesign(design, options.schema)
+        return options.onDesignChange(design)
       }
-    };
-    return React.createElement(PivotChartDesignerComponent, props);
+    }
+    return React.createElement(PivotChartDesignerComponent, props)
   }
 
-  // Get data for the chart asynchronously 
+  // Get data for the chart asynchronously
   // design: design of the chart
   // schema: schema to use
   // dataSource: data source to get data from
   // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   // callback: (error, data)
   getData(design, schema, dataSource, filters, callback) {
-    const queryBuilder = new PivotChartQueryBuilder({schema});
-    const queries = queryBuilder.createQueries(design, filters);
+    const queryBuilder = new PivotChartQueryBuilder({ schema })
+    const queries = queryBuilder.createQueries(design, filters)
 
     // Run queries in parallel
-    return async.map(_.pairs(queries), (item, cb) => {
-      return dataSource.performQuery(item[1], (err, rows) => {
-        return cb(err, [item[0], rows]);
-        });
-    }
-    , (err, items) => {
-      if (err) {
-        return callback(err);
-      }
-
-      const data = _.object(items);
-
-      // Add header and footer data
-      const textWidget = new TextWidget();
-      return textWidget.getData(design.header, schema, dataSource, filters, (error, headerData) => {
-        if (error) {
-          return callback(error);
+    return async.map(
+      _.pairs(queries),
+      (item, cb) => {
+        return dataSource.performQuery(item[1], (err, rows) => {
+          return cb(err, [item[0], rows])
+        })
+      },
+      (err, items) => {
+        if (err) {
+          return callback(err)
         }
 
-        data.header = headerData;
+        const data = _.object(items)
 
-        return textWidget.getData(design.footer, schema, dataSource, filters, (error, footerData) => {
+        // Add header and footer data
+        const textWidget = new TextWidget()
+        return textWidget.getData(design.header, schema, dataSource, filters, (error, headerData) => {
           if (error) {
-            return callback(error);
+            return callback(error)
           }
 
-          data.footer = footerData;
-    
-          return callback(null, data);
-        });
-      });
-    });
+          data.header = headerData
+
+          return textWidget.getData(design.footer, schema, dataSource, filters, (error, footerData) => {
+            if (error) {
+              return callback(error)
+            }
+
+            data.footer = footerData
+
+            return callback(null, data)
+          })
+        })
+      }
+    )
   }
 
   // Create a view element for the chart
@@ -270,8 +304,8 @@ export default PivotChart = class PivotChart extends Chart {
   //   onScopeChange: called when scope changes with new scope
   //   filters: array of filters
   createViewElement(options) {
-    const PivotChartViewComponent = require('./PivotChartViewComponent');
-    
+    const PivotChartViewComponent = require("./PivotChartViewComponent")
+
     // Create chart
     const props = {
       schema: options.schema,
@@ -286,34 +320,36 @@ export default PivotChart = class PivotChart extends Chart {
       scope: options.scope,
       onScopeChange: options.onScopeChange,
       filters: options.filters
-    };
+    }
 
-    return React.createElement(PivotChartViewComponent, props);
+    return React.createElement(PivotChartViewComponent, props)
   }
 
   createDropdownItems(design, schema, widgetDataSource, filters) {
-    return [];
+    return []
   }
 
   createDataTable(design, schema, dataSource, data, locale) {
     // Create layout
-    const layout = new PivotChartLayoutBuilder({schema}).buildLayout(design, data, locale);
+    const layout = new PivotChartLayoutBuilder({ schema }).buildLayout(design, data, locale)
 
-    return _.map(layout.rows, row => _.map(row.cells, cell => cell.text));
+    return _.map(layout.rows, (row) => _.map(row.cells, (cell) => cell.text))
   }
 
   // Get a list of table ids that can be filtered on
   getFilterableTables(design, schema) {
-    let filterableTables = design.table ? [design.table] : [];
+    let filterableTables = design.table ? [design.table] : []
 
     // Get filterable tables from header and footer
-    const textWidget = new TextWidget();
-    filterableTables = _.union(filterableTables, textWidget.getFilterableTables(design.header, schema));
-    filterableTables = _.union(filterableTables, textWidget.getFilterableTables(design.footer, schema));
+    const textWidget = new TextWidget()
+    filterableTables = _.union(filterableTables, textWidget.getFilterableTables(design.header, schema))
+    filterableTables = _.union(filterableTables, textWidget.getFilterableTables(design.footer, schema))
 
-    return filterableTables;
+    return filterableTables
   }
 
   // Get the chart placeholder icon. fa-XYZ or glyphicon-XYZ
-  getPlaceholderIcon() { return "fa-magic"; }
-};
+  getPlaceholderIcon() {
+    return "fa-magic"
+  }
+}
