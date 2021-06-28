@@ -185,7 +185,7 @@ export default CalendarChartViewComponent = (function () {
         .append("text")
         .text((d: any, i: any) => d)
         .attr("transform", "translate(-6," + cellSize * 3.5 + ")rotate(-90)")
-        .attr("font-size", function (this: any, d: any) {
+        .attr("font-size", function (d: any) {
           return Math.min(14, ((cellSize * 7) / this.getComputedTextLength()) * 14) + "px"
         })
         .style("text-anchor", "middle")
@@ -205,7 +205,7 @@ export default CalendarChartViewComponent = (function () {
         .attr("height", cellSize)
         .attr("x", (d: any) => d3.timeWeek.count(d3.timeYear(d), d) * cellSize)
         .attr("y", (d: any) => d.getDay() * cellSize)
-        .on("mouseenter", function (this: any, d: any, i: any) {
+        .on("mouseenter", function (d: any, i: any) {
           if (!_this.reloading) {
             return tip.show(d, i, this)
           }
@@ -213,7 +213,7 @@ export default CalendarChartViewComponent = (function () {
         .on("mouseleave", tip.hide)
         .datum(format)
 
-      rect.on("click", function (this: any, e: any) {
+      rect.on("click", function (e: any) {
         tip.hide()
         // tip.destroy()
         const selectedRect = d3.select(this)

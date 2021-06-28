@@ -1298,7 +1298,7 @@
 
       var owningPathSegList = this
 
-      var Builder = function (this: any, this: any) {
+      var Builder = function () {
         this.pathSegList = []
       }
 
@@ -1306,7 +1306,7 @@
         this.pathSegList.push(pathSeg)
       }
 
-      var Source = function (this: any, this: any, this: any, this: any, this: any, this: any, string: any) {
+      var Source = function (string: any) {
         this._string = string
         this._currentIndex = 0
         this._endIndex = this._string.length

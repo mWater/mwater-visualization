@@ -289,7 +289,7 @@ module.exports = L.Control.extend({
   _addLayerListeners: function (map: any) {
     // Add listeners for begin and end of load to any layers already on the
     // map
-    map.eachLayer(function (this: any, this: any, this: any, layer: any) {
+    map.eachLayer(function (layer: any) {
       if (!layer.on) return
       layer.on(
         {
@@ -308,7 +308,7 @@ module.exports = L.Control.extend({
 
   _removeLayerListeners: function (map: any) {
     // Remove listeners for begin and end of load from all layers
-    map.eachLayer(function (this: any, this: any, this: any, layer: any) {
+    map.eachLayer(function (layer: any) {
       if (!layer.off) return
       layer.off(
         {
