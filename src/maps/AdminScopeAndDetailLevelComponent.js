@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let AdminScopeAndDetailLevelComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -11,12 +13,6 @@ import { default as ReactSelect } from 'react-select';
 // Scope and detail level setter for AdminChoropleth layers when using admin_regions
 export default AdminScopeAndDetailLevelComponent = (function() {
   AdminScopeAndDetailLevelComponent = class AdminScopeAndDetailLevelComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleScopeChange = this.handleScopeChange.bind(this);
-      this.handleDetailLevelChange = this.handleDetailLevelChange.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         schema: PropTypes.object.isRequired, // Schema to use
@@ -29,18 +25,18 @@ export default AdminScopeAndDetailLevelComponent = (function() {
        // Called with (scope, scopeLevel, detailLevel)
     }
 
-    handleScopeChange(scope, scopeLevel) {
+    handleScopeChange = (scope, scopeLevel) => {
       if (scope) {
         // Detail level will be set by DetailLevelSelectComponent
         return this.props.onScopeAndDetailLevelChange(scope, scopeLevel, null);
       } else {
         return this.props.onScopeAndDetailLevelChange(null, null, 0);
       }
-    }
+    };
 
-    handleDetailLevelChange(detailLevel) {
+    handleDetailLevelChange = detailLevel => {
       return this.props.onScopeAndDetailLevelChange(this.props.scope, this.props.scopeLevel, detailLevel);
-    }
+    };
 
     render() {
       const basicDetailLevelOptions = [{ value: 0, label: "Countries" }, { value: 1, label: "Level 1 (State/Province/District)" }];

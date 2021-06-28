@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -97,7 +99,7 @@ class DraggableBlockComponent extends React.Component {
 DraggableBlockComponent.initClass();
 
 // Gets the drop side (top, left, right, bottom)
-const getDropSide = function(monitor, component) {
+function getDropSide(monitor, component) {
   // Get underlying component
   let pos;
   const blockComponent = component.getDecoratedComponentInstance();
@@ -130,7 +132,7 @@ const getDropSide = function(monitor, component) {
   }
 
   return pos;
-};
+}
 
 const blockTargetSpec = {
   // Called when an block hovers over this component
@@ -185,18 +187,21 @@ const blockSourceSpec = {
   }
 };
 
-const collectTarget = (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver({ shallow: true }),
-  canDrop: monitor.canDrop()
-});
+function collectTarget(connect, monitor) {
+  return {
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver({ shallow: true }),
+    canDrop: monitor.canDrop()
+  };
+}
 
-
-const collectSource = (connect, monitor) => ({
-  connectDragSource: connect.dragSource(),
-  connectDragPreview: connect.dragPreview(),
-  isDragging: monitor.isDragging()
-});
+function collectSource(connect, monitor) {
+  return {
+    connectDragSource: connect.dragSource(),
+    connectDragPreview: connect.dragPreview(),
+    isDragging: monitor.isDragging()
+  };
+}
 
 
 export default _.flow(DragSource("visualization-block", blockSourceSpec, collectSource), DropTarget("visualization-block", blockTargetSpec, collectTarget))(DraggableBlockComponent);

@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let LabeledExprGenerator;
 import _ from 'lodash';
 import { ExprUtils } from 'mwater-expressions';
@@ -36,7 +38,7 @@ export default LabeledExprGenerator = class LabeledExprGenerator {
      });
 
     // Create a label for a column
-    const createLabel = function(column, suffix) {
+    function createLabel(column, suffix) {
       // By header mode
       let label;
       if ((options.headerFormat === "code") && column.code) {
@@ -61,7 +63,7 @@ export default LabeledExprGenerator = class LabeledExprGenerator {
       }
 
       return label;
-    };
+    }
 
     // Convert a table + schema column into multiple labeled expres
     var convertColumn = (table, column, joins) => {

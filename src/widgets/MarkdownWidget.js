@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let MarkdownWidget;
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -47,28 +49,25 @@ class MarkdownWidgetComponent extends React.Component {
   }
 
   constructor(props) {
-    this.handleStartEditing = this.handleStartEditing.bind(this);
-    this.handleEndEditing = this.handleEndEditing.bind(this);
-    this.handleEditDesignChange = this.handleEditDesignChange.bind(this);
     super(props);
     this.state = { 
       // Design that is being edited. Change is propagated on closing window
       editDesign: null
-    };  
+    };
   }
 
-  handleStartEditing() {
+  handleStartEditing = () => {
     return this.setState({editDesign: this.props.design});
-  }
+  };
 
-  handleEndEditing() {
+  handleEndEditing = () => {
     this.props.onDesignChange(this.state.editDesign);
     return this.setState({editDesign: null});
-  }
+  };
 
-  handleEditDesignChange(design) {
+  handleEditDesignChange = design => {
     return this.setState({editDesign: design});
-  }
+  };
 
   renderEditor() {
     if (!this.state.editDesign) {
@@ -157,11 +156,6 @@ class MarkdownWidgetViewComponent extends React.Component {
 MarkdownWidgetViewComponent.initClass();
 
 class MarkdownWidgetDesignerComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleMarkdownChange = this.handleMarkdownChange.bind(this);
-  }
-
   static initClass() { 
     this.propTypes = { 
       design: PropTypes.object.isRequired,
@@ -169,10 +163,10 @@ class MarkdownWidgetDesignerComponent extends React.Component {
     };
   }
 
-  handleMarkdownChange(ev) {
+  handleMarkdownChange = ev => {
     const design = _.extend({}, this.props.design, {markdown: ev.target.value});
     return this.props.onDesignChange(design);
-  }
+  };
 
   render() {
     return R('textarea', {className: "form-control", style: { width: "100%", height: "100%" }, value: this.props.design.markdown, onChange: this.handleMarkdownChange});

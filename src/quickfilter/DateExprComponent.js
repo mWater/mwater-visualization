@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let DateExprComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -20,11 +22,6 @@ export default DateExprComponent = (function() {
     }
 
     constructor(props) {
-      this.handleClickOut = this.handleClickOut.bind(this);
-      this.handleStartChange = this.handleStartChange.bind(this);
-      this.handleEndChange = this.handleEndChange.bind(this);
-      this.handlePreset = this.handlePreset.bind(this);
-      this.renderClear = this.renderClear.bind(this);
       super(props);
 
       this.state = {
@@ -65,20 +62,20 @@ export default DateExprComponent = (function() {
       }
     }
 
-    handleClickOut() {
+    handleClickOut = () => {
       return this.setState({dropdownOpen: false});
-    }
+    };
 
-    handleStartChange(value) {
+    handleStartChange = value => {
       // Clear end if after
       if (this.props.value?.exprs[1] && (this.fromMoment(value) > this.props.value.exprs[1]?.value)) {
         return this.props.onChange({ type: "op", op: "between", exprs: [this.toLiteral(this.fromMoment(value)), null]});
       } else {
         return this.props.onChange({ type: "op", op: "between", exprs: [this.toLiteral(this.fromMoment(value)), this.props.value?.exprs[1]]});
       }
-    }
+    };
 
-    handleEndChange(value) {
+    handleEndChange = value => {
       // Go to end of day if datetime
       if (this.props.datetime) {
         value = moment(value);
@@ -93,20 +90,20 @@ export default DateExprComponent = (function() {
       }
 
       return this.setState({dropdownOpen: false});
-    }
+    };
 
-    handlePreset(preset) {
+    handlePreset = preset => {
       this.props.onChange({ type: "op", op: preset.id, exprs: [] });
       return this.setState({dropdownOpen: false});
-    }
+    };
 
-    renderClear() {
+    renderClear = () => {
       return R('div', { 
         style: { position: "absolute", right: 10, top: 7, color: "#AAA" },
         onClick: (() => this.props.onChange(null))
       },
           R('i', {className: "fa fa-remove"}));
-    }
+    };
 
     renderSummary() {
       if (!this.props.value) {
@@ -190,7 +187,7 @@ export default DateExprComponent = (function() {
         )
       );
     }
-  
+
     render() {
       return R(ClickOutHandler, {onClickOut: this.handleClickOut},
         R('div', 

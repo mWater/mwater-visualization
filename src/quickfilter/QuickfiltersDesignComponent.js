@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let QuickfiltersDesignComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -12,13 +14,6 @@ import ui from 'react-library/lib/bootstrap';
 // Displays quick filters and allows their value to be modified
 export default QuickfiltersDesignComponent = (function() {
   QuickfiltersDesignComponent = class QuickfiltersDesignComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleDesignChange = this.handleDesignChange.bind(this);
-      this.handleAdd = this.handleAdd.bind(this);
-      this.handleRemove = this.handleRemove.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         design: PropTypes.array.isRequired,  // Design of quickfilters. See README.md
@@ -34,7 +29,7 @@ export default QuickfiltersDesignComponent = (function() {
         {design: []};
     }
 
-    handleDesignChange(design) {
+    handleDesignChange = design => {
       design = design.slice();
     
       // Update merged, clearing if not mergeable
@@ -45,7 +40,7 @@ export default QuickfiltersDesignComponent = (function() {
       }
 
       return this.props.onDesignChange(design);
-    }
+    };
 
     // Determine if quickfilter at index is mergeable with previous (same type, id table and enum values)
     isMergeable(design, index) {
@@ -104,17 +99,17 @@ export default QuickfiltersDesignComponent = (function() {
       });
     }
 
-    handleAdd() {
+    handleAdd = () => {
       // Add blank to end
       const design = this.props.design.concat([{ }]);
       return this.props.onDesignChange(design);
-    }
+    };
 
-    handleRemove(index) {
+    handleRemove = index => {
       const design = this.props.design.slice();
       design.splice(index, 1);
       return this.props.onDesignChange(design);
-    }
+    };
 
     render() {
       return R('div', null,
@@ -148,11 +143,6 @@ class QuickfilterDesignComponent extends React.Component {
   }
 
   constructor(props) {
-    this.handleTableChange = this.handleTableChange.bind(this);
-    this.handleExprChange = this.handleExprChange.bind(this);
-    this.handleLabelChange = this.handleLabelChange.bind(this);
-    this.handleMergedChange = this.handleMergedChange.bind(this);
-    this.handleMultiChange = this.handleMultiChange.bind(this);
     super(props);
 
     // Store table to allow selecting table first, then expression
@@ -161,19 +151,19 @@ class QuickfilterDesignComponent extends React.Component {
     };
   }
 
-  handleTableChange(table) { 
+  handleTableChange = table => { 
     this.setState({table});
     const design = {
       expr: null,
       label: null
     };
     return this.props.onChange(design);
-  }
+  };
 
-  handleExprChange(expr) { return this.props.onChange(update(this.props.design, { expr: { $set: expr }})); }
-  handleLabelChange(ev) { return this.props.onChange(update(this.props.design, { label: { $set: ev.target.value }})); }
-  handleMergedChange(merged) { return this.props.onChange(update(this.props.design, { merged: { $set: merged }})); }
-  handleMultiChange(multi) { return this.props.onChange(update(this.props.design, { multi: { $set: multi }})); }
+  handleExprChange = expr => { return this.props.onChange(update(this.props.design, { expr: { $set: expr }})); };
+  handleLabelChange = ev => { return this.props.onChange(update(this.props.design, { label: { $set: ev.target.value }})); };
+  handleMergedChange = merged => { return this.props.onChange(update(this.props.design, { merged: { $set: merged }})); };
+  handleMultiChange = multi => { return this.props.onChange(update(this.props.design, { multi: { $set: multi }})); };
 
   render() {
     // Determine type of expression

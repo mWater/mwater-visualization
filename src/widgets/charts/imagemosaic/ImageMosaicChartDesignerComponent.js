@@ -1,10 +1,12 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let ImageMosaicChartDesignerComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import React from 'react';
 const R = React.createElement;
 
-import ui from '../../../UIComponents';
+import * as ui from '../../../UIComponents';
 import { ExprUtils } from 'mwater-expressions';
 import AxisBuilder from '../../../axes/AxisBuilder';
 import AxisComponent from '../../../axes/AxisComponent';
@@ -13,14 +15,6 @@ import TableSelectComponent from '../../../TableSelectComponent';
 
 export default ImageMosaicChartDesignerComponent = (function() {
   ImageMosaicChartDesignerComponent = class ImageMosaicChartDesignerComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleTitleTextChange = this.handleTitleTextChange.bind(this);
-      this.handleTableChange = this.handleTableChange.bind(this);
-      this.handleFilterChange = this.handleFilterChange.bind(this);
-      this.handleImageAxisChange = this.handleImageAxisChange.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         design: PropTypes.object.isRequired,
@@ -38,10 +32,10 @@ export default ImageMosaicChartDesignerComponent = (function() {
       return this.props.onDesignChange(design);
     }
 
-    handleTitleTextChange(ev) {  return this.updateDesign({titleText: ev.target.value}); }
-    handleTableChange(table) { return this.updateDesign({table}); }
-    handleFilterChange(filter) { return this.updateDesign({filter}); }
-    handleImageAxisChange(imageAxis) { return this.updateDesign({imageAxis}); }
+    handleTitleTextChange = ev => {  return this.updateDesign({titleText: ev.target.value}); };
+    handleTableChange = table => { return this.updateDesign({table}); };
+    handleFilterChange = filter => { return this.updateDesign({filter}); };
+    handleImageAxisChange = imageAxis => { return this.updateDesign({imageAxis}); };
 
     renderTable() {
       return R('div', {className: "form-group"},

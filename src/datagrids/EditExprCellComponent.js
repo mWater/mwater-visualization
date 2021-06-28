@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let EditExprCellComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -31,7 +33,6 @@ export default EditExprCellComponent = (function() {
     }
 
     constructor(props) {
-      this.handleChange = this.handleChange.bind(this);
       super(props);
       this.state = { value: props.value };
     }
@@ -43,7 +44,7 @@ export default EditExprCellComponent = (function() {
       return !_.isEqual(this.props.value, this.state.value);
     }
 
-    handleChange(value) { return this.setState({value}); }
+    handleChange = value => { return this.setState({value}); };
 
     render() {
       const exprUtils = new ExprUtils(this.props.schema);
@@ -112,11 +113,6 @@ TextEditComponent.initClass();
 
 // Simple number box
 class NumberEditComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleChange = this.handleChange.bind(this);
-  }
-
   static initClass() {
     this.propTypes = {
       value: PropTypes.any,
@@ -132,13 +128,13 @@ class NumberEditComponent extends React.Component {
     return this.input?.focus();
   }
 
-  handleChange(ev) {
+  handleChange = ev => {
     if (ev.target.value) {
       return this.props.onChange(parseFloat(ev.target.value));
     } else {
       return this.props.onChange(null);
     }
-  }
+  };
 
   render() {
     return R('div', {style: { paddingTop: 3 }},

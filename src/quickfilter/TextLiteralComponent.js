@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let TextLiteralComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -12,13 +14,6 @@ import { injectTableAlias } from 'mwater-expressions';
 // The expression can be type `text` or `text[]`
 export default TextLiteralComponent = (function() {
   TextLiteralComponent = class TextLiteralComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleSingleChange = this.handleSingleChange.bind(this);
-      this.handleMultipleChange = this.handleMultipleChange.bind(this);
-      this.getOptions = this.getOptions.bind(this);
-    }
-
     static initClass() {
       this.propTypes = { 
         value: PropTypes.any,
@@ -38,12 +33,12 @@ export default TextLiteralComponent = (function() {
       };
     }
 
-    handleSingleChange(val) {
+    handleSingleChange = val => {
       const value = val ? (val.value || null) : null; // Blank is null
       return this.props.onChange(value);
-    }
+    };
 
-    handleMultipleChange(val) {
+    handleMultipleChange = val => {
       const value = val ? _.pluck(val, "value") : [];
 
       if (value.length > 0) {
@@ -51,9 +46,9 @@ export default TextLiteralComponent = (function() {
       } else {
         return this.props.onChange(null);
       }
-    }
+    };
 
-    getOptions(input, cb) {
+    getOptions = (input, cb) => {
       // Determine type of expression
       let filters;
       const exprUtils = new ExprUtils(this.props.schema);
@@ -113,7 +108,7 @@ export default TextLiteralComponent = (function() {
         })));
       });
       
-    }
+    };
 
     renderSingle() {
       const currentValue = this.props.value ? { value: this.props.value, label: this.props.value } : null;
@@ -170,4 +165,6 @@ export default TextLiteralComponent = (function() {
   return TextLiteralComponent;
 })();
 
-var escapeRegex = s => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+function escapeRegex(s) {
+  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}

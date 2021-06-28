@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let ClusterLayerDesignerComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -14,15 +16,6 @@ import ZoomLevelsComponent from './ZoomLevelsComponent';
 
 export default ClusterLayerDesignerComponent = (function() {
   ClusterLayerDesignerComponent = class ClusterLayerDesignerComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleTableChange = this.handleTableChange.bind(this);
-      this.handleGeometryAxisChange = this.handleGeometryAxisChange.bind(this);
-      this.handleFilterChange = this.handleFilterChange.bind(this);
-      this.handleTextColorChange = this.handleTextColorChange.bind(this);
-      this.handleFillColorChange = this.handleFillColorChange.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         schema: PropTypes.object.isRequired, // Schema to use
@@ -45,11 +38,11 @@ export default ClusterLayerDesignerComponent = (function() {
       return this.update({axes});
     }
 
-    handleTableChange(table) { return this.update({table}); }
-    handleGeometryAxisChange(axis) { return this.updateAxes({geometry: axis}); }
-    handleFilterChange(expr) { return this.update({filter: expr}); }
-    handleTextColorChange(color) { return this.update({textColor: color}); }
-    handleFillColorChange(color) { return this.update({fillColor: color}); }
+    handleTableChange = table => { return this.update({table}); };
+    handleGeometryAxisChange = axis => { return this.updateAxes({geometry: axis}); };
+    handleFilterChange = expr => { return this.update({filter: expr}); };
+    handleTextColorChange = color => { return this.update({textColor: color}); };
+    handleFillColorChange = color => { return this.update({fillColor: color}); };
 
     renderTable() {
       return R('div', {className: "form-group"},
@@ -66,7 +59,7 @@ export default ClusterLayerDesignerComponent = (function() {
             onFilterChange: this.handleFilterChange
           })));
     }
-  
+
     renderGeometryAxis() {
       if (!this.props.design.table) {
         return;

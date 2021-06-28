@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let ImagelistCarouselComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -20,8 +22,6 @@ export default ImagelistCarouselComponent = (function() {
     }
 
     constructor(props) {
-      this.handleLeft = this.handleLeft.bind(this);
-      this.handleRight = this.handleRight.bind(this);
       super(props);
       this.state = {
         activeImage: _.findIndex(this.props.imagelist, { cover: true })
@@ -31,19 +31,19 @@ export default ImagelistCarouselComponent = (function() {
       }
     }
 
-    handleLeft() {
+    handleLeft = () => {
       if (this.props.imagelist && (this.props.imagelist.length > 0)) {
         const activeImage = ((this.state.activeImage - 1) + this.props.imagelist.length) % this.props.imagelist.length;
         return this.setState({activeImage});
       }
-    }
+    };
 
-    handleRight() {
+    handleRight = () => {
       if (this.props.imagelist && (this.props.imagelist.length > 0)) {
         const activeImage = (this.state.activeImage + 1 + this.props.imagelist.length) % this.props.imagelist.length;
         return this.setState({activeImage});
       }
-    }
+    };
 
     renderImage(img, i, imageManager) {
       return R('div', {className: `item ${i === this.state.activeImage ? "active" : ""}`, style: {height: this.props.height}},

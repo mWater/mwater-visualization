@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let PopupFilterJoinsUtils;
 import { ExprCompiler } from 'mwater-expressions';
 import { ExprUtils } from 'mwater-expressions';

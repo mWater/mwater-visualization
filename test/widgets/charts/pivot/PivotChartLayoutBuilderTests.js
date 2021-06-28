@@ -1,12 +1,23 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import { assert } from 'chai';
 import _ from 'lodash';
-import fixtures from '../../../fixtures';
+import * as fixtures from '../../../fixtures';
 import PivotChartLayoutBuilder from '../../../../src/widgets/charts/pivot/PivotChartLayoutBuilder';
 import canonical from 'canonical-json';
-const compare = (actual, expected, message = "") => assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n" + message);
+
+function compare(actual, expected, message = "") {
+  return assert.equal(
+    canonical(actual),
+    canonical(expected),
+    "\n" + canonical(actual) + "\n" + canonical(expected) + "\n" + message
+  );
+}
 
 // Plucks from layout 
-const layoutPluck = (layout, key) => _.map(layout.rows, row => _.pluck(row.cells, key));
+function layoutPluck(layout, key) {
+  return _.map(layout.rows, row => _.pluck(row.cells, key));
+}
 
 describe("PivotChartLayoutBuilder", function() {
   before(function() {

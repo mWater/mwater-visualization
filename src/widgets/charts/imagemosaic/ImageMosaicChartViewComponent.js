@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let ImageMosaicChartViewComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -12,12 +14,6 @@ import ImagePopupComponent from './ImagePopupComponent';
 // creates a d3 calendar visualization
 export default ImageMosaicChartViewComponent = (function() {
   ImageMosaicChartViewComponent = class ImageMosaicChartViewComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleClick = this.handleClick.bind(this);
-      this.renderImage = this.renderImage.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         design: PropTypes.object.isRequired, // Design of chart
@@ -36,16 +32,16 @@ export default ImageMosaicChartViewComponent = (function() {
       return !_.isEqual(prevProps, this.props);
     }
 
-    handleClick(primaryKey, image) { 
+    handleClick = (primaryKey, image) => { 
       if (this.props.onRowClick) {
         return this.props.onRowClick(this.props.design.table, primaryKey);
       } else {
         return this.imagePopup?.show(image);
       }
-    }
+    };
 
     // Render a single image
-    renderImage(primaryKey, image, imageManager) {
+    renderImage = (primaryKey, image, imageManager) => {
       return R(LazyLoad, {key: image.id},
         R(RotationAwareImageComponent, { 
           imageManager, 
@@ -57,7 +53,7 @@ export default ImageMosaicChartViewComponent = (function() {
         }
         )
       );
-    }
+    };
 
     // Render images
     renderImages(imageManager) {

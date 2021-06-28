@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let LayeredChartViewComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -34,8 +36,6 @@ export default LayeredChartViewComponent = (function() {
     }
 
     constructor(props) {
-      this.handleHeaderChange = this.handleHeaderChange.bind(this);
-      this.handleFooterChange = this.handleFooterChange.bind(this);
       super(props);
 
       this.state = {
@@ -62,13 +62,13 @@ export default LayeredChartViewComponent = (function() {
       }
     }
 
-    handleHeaderChange(header) {
+    handleHeaderChange = header => {
       return this.props.onDesignChange(_.extend({}, this.props.design, {header}));
-    }
+    };
 
-    handleFooterChange(footer) {
+    handleFooterChange = footer => {
       return this.props.onDesignChange(_.extend({}, this.props.design, {footer}));
-    }
+    };
 
     renderHeader() {
       return R('div', {ref: (c => { return this.header = c; })},
@@ -141,9 +141,6 @@ class C3ChartComponent extends React.Component {
   }
 
   constructor(props) {
-    this.createChart = this.createChart.bind(this);
-    this.updateScope = this.updateScope.bind(this);
-    this.handleDataClick = this.handleDataClick.bind(this);
     super(props);
 
     // Create throttled createChart
@@ -155,7 +152,7 @@ class C3ChartComponent extends React.Component {
     return this.updateScope();
   }
 
-  createChart(props) {
+  createChart = props => {
     if (this.chart) {
       this.chart.destroy();
     }
@@ -176,7 +173,7 @@ class C3ChartComponent extends React.Component {
 
     const c3 = require('c3');
     return this.chart = c3.generate(chartOptions);
-  }
+  };
 
   componentDidUpdate(prevProps, prevState) {
     // Check if schema, data or design (except for header + footer) changed
@@ -211,21 +208,21 @@ class C3ChartComponent extends React.Component {
     }
   }
 
-    // if not _.isEqual(@props.data, nextProps.data)
-    //   # # If length of data is different, re-create chart
-    //   # if @props.data.main.length != nextProps.data.main.length
-    //   @createChart(nextProps)
-    //   return
+  // if not _.isEqual(@props.data, nextProps.data)
+  //   # # If length of data is different, re-create chart
+  //   # if @props.data.main.length != nextProps.data.main.length
+  //   @createChart(nextProps)
+  //   return
 
-      // # Reload data
-      // @chart.load({ 
-      //   json: @prepareData(nextProps.data).main
-      //   keys: { x: "x", value: ["y"] }
-      //   names: { y: 'Value' } # Name the data
-      // })
+  // # Reload data
+  // @chart.load({ 
+  //   json: @prepareData(nextProps.data).main
+  //   keys: { x: "x", value: ["y"] }
+  //   names: { y: 'Value' } # Name the data
+  // })
 
   // Update scoped value
-  updateScope() {
+  updateScope = () => {
     const dataMap = this.getDataMap();
     const compiler = new LayeredChartCompiler({schema: this.props.schema});
     const el = this.chartDiv;
@@ -276,7 +273,7 @@ class C3ChartComponent extends React.Component {
           return 1;
         }
         });
-  }
+  };
 
   // Gets a data point { layerIndex, row } from a d3 object (d)
   lookupDataPoint(dataMap, d) {
@@ -302,7 +299,7 @@ class C3ChartComponent extends React.Component {
     return compiler.createDataMap(this.props.design, this.props.data);
   }
 
-  handleDataClick(d) {
+  handleDataClick = d => {
     // Get data map
     const dataMap = this.getDataMap();
 
@@ -323,7 +320,7 @@ class C3ChartComponent extends React.Component {
     }
 
     return this.props.onScopeChange?.(scope);
-  }
+  };
 
   componentWillUnmount() {
     if (this.chart) {

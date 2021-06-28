@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let DecoratedBlockComponent;
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -23,9 +25,6 @@ export default DecoratedBlockComponent = (function() {
     }
 
     constructor(props) {
-      this.handleAspectMouseDown = this.handleAspectMouseDown.bind(this);
-      this.handleMouseMove = this.handleMouseMove.bind(this);
-      this.handleMouseUp = this.handleMouseUp.bind(this);
       super(props);
 
       this.state = {
@@ -41,7 +40,7 @@ export default DecoratedBlockComponent = (function() {
       return document.removeEventListener("mouseup", this.handleMouseUp);
     }
 
-    handleAspectMouseDown(ev) {
+    handleAspectMouseDown = ev => {
       // Prevent html5 drag
       ev.preventDefault();
 
@@ -50,9 +49,9 @@ export default DecoratedBlockComponent = (function() {
 
       document.addEventListener("mousemove", this.handleMouseMove);
       return document.addEventListener("mouseup", this.handleMouseUp);
-    }
+    };
 
-    handleMouseMove(ev) {
+    handleMouseMove = ev => {
       if (this.state.initialClientY != null) {
         const aspectDragY = (this.state.initialAspectDragY + ev.clientY) - this.state.initialClientY;
         if (aspectDragY > 20) {
@@ -61,9 +60,9 @@ export default DecoratedBlockComponent = (function() {
       } else {
         return this.setState({initialClientY: ev.clientY});
       }
-    }
+    };
 
-    handleMouseUp(ev) {
+    handleMouseUp = ev => {
       // Remove listeners
       document.removeEventListener("mousemove", this.handleMouseMove);
       document.removeEventListener("mouseup", this.handleMouseUp);
@@ -71,7 +70,7 @@ export default DecoratedBlockComponent = (function() {
       // Fire new aspect ratio
       this.props.onAspectRatioChange(this.props.aspectRatio / (this.state.aspectDragY / this.state.initialAspectDragY));
       return this.setState({aspectDragY: null, initialAspectDragY: null, initialClientY: null});
-    }
+    };
 
     renderAspectDrag() {
       if (this.state.aspectDragY != null) {
@@ -87,7 +86,7 @@ export default DecoratedBlockComponent = (function() {
         return null;
       }
     }
-  
+
     render() {
       const elem = R('div', {className: "mwater-visualization-decorated-block", style: this.props.style},
         this.props.children,

@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let LegendGroup;
 import PropTypes from 'prop-types';
 import React from 'react';

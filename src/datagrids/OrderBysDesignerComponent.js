@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let OrderBysDesignerComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -10,13 +12,6 @@ import { ExprComponent } from 'mwater-expressions-ui';
 // Edits an orderBys which is a list of expressions and directions. See README.md
 export default OrderBysDesignerComponent = (function() {
   OrderBysDesignerComponent = class OrderBysDesignerComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleChange = this.handleChange.bind(this);
-      this.handleRemove = this.handleRemove.bind(this);
-      this.handleAdd = this.handleAdd.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         schema: PropTypes.object.isRequired,     // schema to use
@@ -30,23 +25,23 @@ export default OrderBysDesignerComponent = (function() {
         {orderBys: []};
     }
 
-    handleChange(index, orderBy) {
+    handleChange = (index, orderBy) => {
       const orderBys = this.props.orderBys.slice();
       orderBys[index] = orderBy;
       return this.props.onChange(orderBys);
-    }
+    };
 
-    handleRemove(index) {
+    handleRemove = index => {
       const orderBys = this.props.orderBys.slice();
       orderBys.splice(index, 1);
       return this.props.onChange(orderBys);
-    }
+    };
 
-    handleAdd() {
+    handleAdd = () => {
       const orderBys = this.props.orderBys.slice();
       orderBys.push({ expr: null, direction: "asc" });
       return this.props.onChange(orderBys);
-    }
+    };
 
     render() {
       return R('div', null,
@@ -79,12 +74,6 @@ export default OrderBysDesignerComponent = (function() {
 })();
 
 class OrderByDesignerComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleExprChange = this.handleExprChange.bind(this);
-    this.handleDirectionChange = this.handleDirectionChange.bind(this);
-  }
-
   static initClass() {
     this.propTypes = { 
       orderBy: PropTypes.array.isRequired,
@@ -97,13 +86,13 @@ class OrderByDesignerComponent extends React.Component {
      // Current table
   }
 
-  handleExprChange(expr) {
+  handleExprChange = expr => {
     return this.props.onChange(_.extend({}, this.props.orderBy, {expr}));
-  }
+  };
 
-  handleDirectionChange(ev) {
+  handleDirectionChange = ev => {
     return this.props.onChange(_.extend({}, this.props.orderBy, {direction: ev.target.checked ? "desc" : "asc"}));
-  }
+  };
 
   render() {
     return R('div', {className: "row"},

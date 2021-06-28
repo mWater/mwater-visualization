@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let ExprCellComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -13,11 +15,6 @@ import { formatValue } from '../valueFormatter';
 // Cell that displays an expression column cell
 export default ExprCellComponent = (function() {
   ExprCellComponent = class ExprCellComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleClick = this.handleClick.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         schema: PropTypes.object.isRequired,     // schema to use
@@ -41,9 +38,9 @@ export default ExprCellComponent = (function() {
       };
     }
 
-    handleClick() {
+    handleClick = () => {
       return this.setState({editing: true});
-    }
+    };
 
     renderImage(id) {
       const url = this.props.dataSource.getImageUrl(id);

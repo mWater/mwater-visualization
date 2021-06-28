@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let RegionSelectComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -9,11 +11,6 @@ import { IdLiteralComponent } from 'mwater-expressions-ui';
 // Allows selecting of a single region
 export default RegionSelectComponent = (function() {
   RegionSelectComponent = class RegionSelectComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleChange = this.handleChange.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         schema: PropTypes.object.isRequired, // Schema to use
@@ -32,7 +29,7 @@ export default RegionSelectComponent = (function() {
         // Default for existing code
     }
 
-    handleChange(id) {
+    handleChange = id => {
       if (!id) {
         this.props.onChange(null, null);
         return;
@@ -57,7 +54,7 @@ export default RegionSelectComponent = (function() {
 
         return this.props.onChange(id, rows[0].level);
       });
-    }
+    };
 
     render() {
       let filter = null;

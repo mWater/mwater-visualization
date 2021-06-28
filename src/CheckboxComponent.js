@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let CheckboxComponent;
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -6,11 +8,6 @@ const R = React.createElement;
 // Pretty checkbox component
 export default CheckboxComponent = (function() {
   CheckboxComponent = class CheckboxComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleClick = this.handleClick.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         checked: PropTypes.bool, // True to check
@@ -20,14 +17,14 @@ export default CheckboxComponent = (function() {
        // Called with new value
     }
 
-    handleClick() {
+    handleClick = () => {
       if (this.props.onChange) { 
         this.props.onChange(!this.props.checked);
       }
       if (this.props.onClick) {
         return this.props.onClick();
       }
-    }
+    };
 
     render() {
       return R('div', { 

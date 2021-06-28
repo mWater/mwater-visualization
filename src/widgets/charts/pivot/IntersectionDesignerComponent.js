@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let IntersectionDesignerComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -18,11 +20,6 @@ export default IntersectionDesignerComponent = (function() {
     constructor(...args) {
       super(...args);
       this.update = this.update.bind(this);
-      this.handleBackgroundColorAxisChange = this.handleBackgroundColorAxisChange.bind(this);
-      this.handleBackgroundColorChange = this.handleBackgroundColorChange.bind(this);
-      this.handleBackgroundColorConditionsChange = this.handleBackgroundColorConditionsChange.bind(this);
-      this.handleBackgroundColorOpacityChange = this.handleBackgroundColorOpacityChange.bind(this);
-      this.handleFilterChange = this.handleFilterChange.bind(this);
     }
 
     static initClass() {
@@ -40,26 +37,26 @@ export default IntersectionDesignerComponent = (function() {
     // Updates intersection with the specified changes
     update() { return update(this.props.intersection, this.props.onChange, arguments); }
 
-    handleBackgroundColorAxisChange(backgroundColorAxis) { 
+    handleBackgroundColorAxisChange = backgroundColorAxis => { 
       const opacity = this.props.intersection.backgroundColorOpacity || 1;
       return this.update({backgroundColorAxis, backgroundColorOpacity: opacity});
-    }
+    };
 
-    handleBackgroundColorChange(backgroundColor) { 
+    handleBackgroundColorChange = backgroundColor => { 
       const opacity = this.props.intersection.backgroundColorOpacity || 1;
       return this.update({backgroundColor, backgroundColorOpacity: opacity});
-    }
+    };
 
-    handleBackgroundColorConditionsChange(backgroundColorConditions) {
+    handleBackgroundColorConditionsChange = backgroundColorConditions => {
       const opacity = this.props.intersection.backgroundColorOpacity || 1;
       return this.update({backgroundColorConditions, backgroundColorOpacity: opacity});
-    }
+    };
 
-    handleBackgroundColorOpacityChange(newValue) {
+    handleBackgroundColorOpacityChange = newValue => {
       return this.update({backgroundColorOpacity: newValue / 100});
-    }
+    };
 
-    handleFilterChange(filter) { return this.update({filter}); }
+    handleFilterChange = filter => { return this.update({filter}); };
 
     renderValueAxis() {
       return R(ui.FormGroup, { 
@@ -207,13 +204,6 @@ export default IntersectionDesignerComponent = (function() {
 
 // Displays background color conditions
 class BackgroundColorConditionsComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleAdd = this.handleAdd.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.handleRemove = this.handleRemove.bind(this);
-  }
-
   static initClass() {
     this.propTypes = { 
       colorConditions: PropTypes.array,
@@ -224,23 +214,23 @@ class BackgroundColorConditionsComponent extends React.Component {
     };
   }
 
-  handleAdd() {
+  handleAdd = () => {
     const colorConditions = (this.props.colorConditions || []).slice();
     colorConditions.push({});
     return this.props.onChange(colorConditions);
-  }
+  };
 
-  handleChange(index, colorCondition) {
+  handleChange = (index, colorCondition) => {
     const colorConditions = this.props.colorConditions.slice();
     colorConditions[index] = colorCondition;
     return this.props.onChange(colorConditions);
-  }
+  };
 
-  handleRemove(index) {
+  handleRemove = index => {
     const colorConditions = this.props.colorConditions.slice();
     colorConditions.splice(index, 1);
     return this.props.onChange(colorConditions);
-  }
+  };
 
   render() {
     // List conditions

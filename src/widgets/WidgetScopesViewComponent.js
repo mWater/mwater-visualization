@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let WidgetScopesViewComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -7,11 +9,6 @@ const R = React.createElement;
 // Shows widget scopes
 export default WidgetScopesViewComponent = (function() {
   WidgetScopesViewComponent = class WidgetScopesViewComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.renderScope = this.renderScope.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         scopes: PropTypes.object.isRequired, // lookup of id to scope (see WidgetScoper for definition)
@@ -20,7 +17,7 @@ export default WidgetScopesViewComponent = (function() {
        // Called with id of scope to remove
     }
 
-    renderScope(id, scope) {
+    renderScope = (id, scope) => {
       const style = {
         cursor: "pointer",
         borderRadius: 4,
@@ -41,7 +38,7 @@ export default WidgetScopesViewComponent = (function() {
         scope.name,
         " ",
         R('span', {className: "glyphicon glyphicon-remove"}));
-    }
+    };
 
     render() {
       const {

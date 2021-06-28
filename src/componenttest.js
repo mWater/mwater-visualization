@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import React from 'react';
 import ReactDOM from 'react-dom';
 const R = React.createElement;

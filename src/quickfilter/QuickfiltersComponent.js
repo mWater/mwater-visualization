@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let QuickfiltersComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -200,12 +202,6 @@ export default QuickfiltersComponent = (function() {
 
 // Quickfilter for an enum
 class EnumQuickfilterComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleSingleChange = this.handleSingleChange.bind(this);
-    this.handleMultiChange = this.handleMultiChange.bind(this);
-  }
-
   static initClass() {
     this.propTypes = {
       label: PropTypes.string,
@@ -226,21 +222,21 @@ class EnumQuickfilterComponent extends React.Component {
       // e.g. "en"
   }
 
-  handleSingleChange(val) {
+  handleSingleChange = val => {
     if (val) {
       return this.props.onValueChange(val);
     } else {
       return this.props.onValueChange(null);
     }
-  }
+  };
 
-  handleMultiChange(val) {
+  handleMultiChange = val => {
     if (val?.length > 0) {
       return this.props.onValueChange(_.pluck(val, "value"));
     } else {
       return this.props.onValueChange(null);
     }
-  }
+  };
 
   renderSingleSelect(options) {
     return R(ReactSelect, { 
@@ -256,7 +252,7 @@ class EnumQuickfilterComponent extends React.Component {
       }
     });
   }
-  
+
   renderMultiSelect(options) {
     return R(ReactSelect, { 
       placeholder: "All",

@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let FontSizePaletteItem;
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -19,18 +21,17 @@ export default FontSizePaletteItem = (function() {
     }
 
     constructor(props) {
-      this.handleMouseDown = this.handleMouseDown.bind(this);
       super(props);
       this.state = {
         open: false
       };
     }
 
-    handleMouseDown(ev) { 
+    handleMouseDown = ev => { 
       // Don't lose focus from editor
       ev.preventDefault();
       return this.setState({open: !this.state.open});
-    }
+    };
 
     renderSize(label, value) {
       return R('div', { 

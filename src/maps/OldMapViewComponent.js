@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let OldMapViewComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -61,8 +63,6 @@ export default OldMapViewComponent = (function() {
     }
 
     constructor(props) {
-      this.handleBoundsChange = this.handleBoundsChange.bind(this);
-      this.handleGridClick = this.handleGridClick.bind(this);
       super(props);
 
       const initialLegendDisplay = props.design.initialLegendDisplay || "open";
@@ -107,7 +107,7 @@ export default OldMapViewComponent = (function() {
         });
     }
 
-    handleBoundsChange(bounds) {
+    handleBoundsChange = bounds => {
       // Ignore if readonly
       if ((this.props.onDesignChange == null)) {
         return;
@@ -124,9 +124,9 @@ export default OldMapViewComponent = (function() {
 
       const design = _.extend({}, this.props.design, {bounds});
       return this.props.onDesignChange(design);
-    }
+    };
 
-    handleGridClick(layerViewId, ev) {
+    handleGridClick = (layerViewId, ev) => {
       const layerView = _.findWhere(this.props.design.layerViews, {id: layerViewId});
 
       // Create layer
@@ -175,7 +175,7 @@ export default OldMapViewComponent = (function() {
 
         return this.props.onScopeChange(scope);
       }
-    }
+    };
 
     // Get filters from extraFilters combined with map filters
     getCompiledFilters() {

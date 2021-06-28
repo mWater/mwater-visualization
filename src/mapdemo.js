@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 // React = require 'react'
 // ReactDOM = require 'react-dom'
 // R = React.createElement

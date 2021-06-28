@@ -1,8 +1,17 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import _ from 'lodash';
 import { assert } from 'chai';
 import ItemsHtmlConverter from '../../src/richtext/ItemsHtmlConverter';
 import canonical from 'canonical-json';
-const compare = (actual, expected) => assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected));
+
+function compare(actual, expected) {
+  return assert.equal(
+    canonical(actual),
+    canonical(expected),
+    "\n" + canonical(actual) + "\n" + canonical(expected)
+  );
+}
 
 describe("ItemsHtmlConverter", () => describe("convertItemsToHtml", function() {
   before(function() {

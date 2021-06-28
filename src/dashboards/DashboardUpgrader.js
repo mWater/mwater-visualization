@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let DashboardUpgrader;
 import _ from 'lodash';
 import uuid from 'uuid';
@@ -15,7 +17,7 @@ export default DashboardUpgrader = class DashboardUpgrader {
       blocks: []
     };
 
-    const convertBlock = function(id, item) {
+    function convertBlock(id, item) {
       const widget = WidgetFactory.createWidget(item.widget.type);
 
       const block = {
@@ -30,7 +32,7 @@ export default DashboardUpgrader = class DashboardUpgrader {
       }
 
       return block;
-    };
+    }
 
     // Scan horizontally
     let y = 0;

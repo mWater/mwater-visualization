@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import React from 'react';
@@ -7,7 +9,7 @@ import DraggableBlockComponent from "./DraggableBlockComponent";
 import DecoratedBlockComponent from '../DecoratedBlockComponent';
 import PaletteItemComponent from './PaletteItemComponent';
 import ClipboardPaletteItemComponent from './ClipboardPaletteItemComponent';
-import blockUtils from './blockUtils';
+import * as blockUtils from './blockUtils';
 import AutoSizeComponent from 'react-library/lib/AutoSizeComponent';
 import HorizontalBlockComponent from './HorizontalBlockComponent';
 import { getDefaultLayoutOptions } from '../../dashboards/layoutOptions';
@@ -17,14 +19,6 @@ Renders the complete layout of the blocks and also optionally a palette to the l
 that can be used to drag new items into the layout. Palette is only displayed if onItemsChange is not null
 */
 class BlocksDisplayComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleBlockDrop = this.handleBlockDrop.bind(this);
-    this.handleBlockRemove = this.handleBlockRemove.bind(this);
-    this.handleBlockUpdate = this.handleBlockUpdate.bind(this);
-    this.renderBlock = this.renderBlock.bind(this);
-  }
-
   static initClass() {
     this.propTypes = {
       items: PropTypes.object.isRequired,
@@ -53,7 +47,7 @@ class BlocksDisplayComponent extends React.Component {
       // Set if can't paste current contents (usually because missing extra tables)
   }
 
-  handleBlockDrop(sourceBlock, targetBlock, side) {
+  handleBlockDrop = (sourceBlock, targetBlock, side) => {
     // Remove source from items
     let items = blockUtils.removeBlock(this.props.items, sourceBlock);
 
@@ -63,21 +57,21 @@ class BlocksDisplayComponent extends React.Component {
     items = blockUtils.dropBlock(items, sourceBlock, targetBlock, side);
     items = blockUtils.cleanBlock(items);
     return this.props.onItemsChange(items);
-  }
+  };
 
-  handleBlockRemove(block) {
+  handleBlockRemove = block => {
     let items = blockUtils.removeBlock(this.props.items, block);
     items = blockUtils.cleanBlock(items);
     return this.props.onItemsChange(items);
-  }
+  };
 
-  handleBlockUpdate(block) {
+  handleBlockUpdate = block => {
     let items = blockUtils.updateBlock(this.props.items, block);
     items = blockUtils.cleanBlock(items);
     return this.props.onItemsChange(items);
-  }
+  };
 
-  renderBlock(block, collapseColumns = false) {
+  renderBlock = (block, collapseColumns = false) => {
     let elem = null;
 
     switch (block.type) {
@@ -181,7 +175,7 @@ class BlocksDisplayComponent extends React.Component {
     // Wrap block in padding
     return R('div', {key: block.id, className: `mwater-visualization-block mwater-visualization-block-${block.type}`},
       elem);
-  }
+  };
 
   createBlockItem(block) {
     // Add unique id

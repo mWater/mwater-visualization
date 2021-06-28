@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let MWaterGlobalFiltersComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -11,12 +13,6 @@ import { IdLiteralComponent } from 'mwater-expressions-ui';
 // Control to edit the global filters (_managed_by and admin_region)
 export default MWaterGlobalFiltersComponent = (function() {
   MWaterGlobalFiltersComponent = class MWaterGlobalFiltersComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleRegionsChange = this.handleRegionsChange.bind(this);
-      this.handleManagedByChange = this.handleManagedByChange.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         schema: PropTypes.object.isRequired, // Schema of the database
@@ -27,7 +23,7 @@ export default MWaterGlobalFiltersComponent = (function() {
       };
     }
 
-    handleRegionsChange(regions) {
+    handleRegionsChange = regions => {
       // Remove existing filter
       const globalFilters = _.filter(this.props.globalFilters || [], gf => !((gf.op === "within any") && (gf.columnId === "admin_region")));
 
@@ -37,9 +33,9 @@ export default MWaterGlobalFiltersComponent = (function() {
       }
 
       return this.props.onChange(globalFilters);
-    }
+    };
 
-    handleManagedByChange(managedBy) {
+    handleManagedByChange = managedBy => {
       // Remove existing filter
       const globalFilters = _.filter(this.props.globalFilters || [], gf => !((gf.op === "within") && (gf.columnId === "_managed_by")));
 
@@ -49,7 +45,7 @@ export default MWaterGlobalFiltersComponent = (function() {
       }
 
       return this.props.onChange(globalFilters);
-    }
+    };
 
     render() {
       // Find managed by

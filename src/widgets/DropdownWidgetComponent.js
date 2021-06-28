@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let DropdownWidgetComponent;
 import _ from 'lodash';
 import $ from 'jquery';
@@ -9,12 +11,6 @@ const R = React.createElement;
 // Widget wrapper that adds a dropdown menu in a gear floating
 export default DropdownWidgetComponent = (function() {
   DropdownWidgetComponent = class DropdownWidgetComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.renderDropdownItem = this.renderDropdownItem.bind(this);
-      this.closeMenu = this.closeMenu.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         width: PropTypes.any,    // Width specification
@@ -29,14 +25,14 @@ export default DropdownWidgetComponent = (function() {
        // A list of {label, icon, onClick} actions for the dropdown
     }
 
-    renderDropdownItem(item, i) {
+    renderDropdownItem = (item, i) => {
       return R('li', {key: `${i}`},
         R('a', {onClick: item.onClick},
           item.icon ? R('span', {className: `glyphicon glyphicon-${item.icon} text-muted`}) : undefined,
           item.icon ? " " : undefined,
           item.label)
       );
-    }
+    };
 
     renderDropdown() {
       if (this.props.dropdownItems.length === 0) {
@@ -63,9 +59,9 @@ export default DropdownWidgetComponent = (function() {
       );
     }
 
-    closeMenu() {
+    closeMenu = () => {
       return $(ReactDOM.findDOMNode(this)).find('[data-toggle="dropdown"]').parent().removeClass('open');
-    }
+    };
 
     render() {
       return R('div', {className: "mwater-visualization-simple-widget", onMouseLeave: this.closeMenu, style: { width: this.props.width, height: this.props.height }},

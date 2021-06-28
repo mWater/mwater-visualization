@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let BaseLayerDesignerComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -9,12 +11,6 @@ import PopoverHelpComponent from 'react-library/lib/PopoverHelpComponent';
 // Designer for config
 export default BaseLayerDesignerComponent = (function() {
   BaseLayerDesignerComponent = class BaseLayerDesignerComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleBaseLayerChange = this.handleBaseLayerChange.bind(this);
-      this.handleOpacityChange = this.handleOpacityChange.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         design: PropTypes.object.isRequired,  // See Map Design.md
@@ -29,9 +25,9 @@ export default BaseLayerDesignerComponent = (function() {
       return this.props.onDesignChange(design);
     }
 
-    handleBaseLayerChange(baseLayer) {
+    handleBaseLayerChange = baseLayer => {
       return this.updateDesign({baseLayer});
-    }
+    };
 
     renderBaseLayer(id, name) {
       let className = "mwater-visualization-layer";
@@ -48,9 +44,9 @@ export default BaseLayerDesignerComponent = (function() {
           name);
     }
 
-    handleOpacityChange(newValue) {
+    handleOpacityChange = newValue => {
       return this.updateDesign({baseLayerOpacity: newValue/100});
-    }
+    };
 
     renderOpacityControl() {
       let opacity;

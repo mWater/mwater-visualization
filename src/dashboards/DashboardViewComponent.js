@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let DashboardViewComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -57,14 +59,6 @@ export default DashboardViewComponent = (function() {
     getChildContext() { return { locale: this.props.design.locale }; }
 
     constructor(props) {
-      this.handleStorageChange = this.handleStorageChange.bind(this);
-      this.handleScopeChange = this.handleScopeChange.bind(this);
-      this.handleRemoveScope = this.handleRemoveScope.bind(this);
-      this.handleItemsChange = this.handleItemsChange.bind(this);
-      this.handleClipboardChange = this.handleClipboardChange.bind(this);
-      this.print = this.print.bind(this);
-      this.handleScrollToTOCEntry = this.handleScrollToTOCEntry.bind(this);
-      this.compRef = this.compRef.bind(this);
       super(props);
       this.state = {
         widgetScoper: new WidgetScoper() // Empty scoping
@@ -91,26 +85,25 @@ export default DashboardViewComponent = (function() {
       return window.addEventListener('storage', this.handleStorageChange);
     }
 
-    handleStorageChange() {
+    handleStorageChange = () => {
       return this.forceUpdate();
-    }
+    };
 
-
-    handleScopeChange(id, scope) { 
+    handleScopeChange = (id, scope) => { 
       return this.setState({widgetScoper: this.state.widgetScoper.applyScope(id, scope)});
-    }
+    };
 
-    handleRemoveScope(id) {
+    handleRemoveScope = id => {
       return this.setState({widgetScoper: this.state.widgetScoper.applyScope(id, null)});    
-    }
+    };
 
-    handleItemsChange(items) {
+    handleItemsChange = items => {
       const design = _.extend({}, this.props.design, {items});
       return this.props.onDesignChange(design);
-    }
+    };
 
     // Handle a change of the clipboard and determine which tables the clipboard block uses
-    handleClipboardChange(block) { 
+    handleClipboardChange = block => { 
       try {
         // If empty, just set it
         if (!block) {
@@ -128,7 +121,7 @@ export default DashboardViewComponent = (function() {
       } catch (err) {
         return alert("Clipboard not available");
       }
-    }
+    };
 
     getClipboardContents() {
       try {
@@ -139,14 +132,14 @@ export default DashboardViewComponent = (function() {
     }
 
     // Call to print the dashboard
-    print() {
+    print = () => {
       // Create element at 1080 wide (use as standard printing width)
       const elem = R('div', {style: { width: 1080 }}, 
         R(DashboardViewComponent, _.extend({}, this.props, { onDesignChange: null, printMode: true })));
     
       const printer = new ReactElementPrinter();
       return printer.print(elem, { delay: 5000 });
-    }
+    };
 
     // Get filters from props filters combined with dashboard filters
     getCompiledFilters() {
@@ -170,7 +163,7 @@ export default DashboardViewComponent = (function() {
       return entries;
     }
 
-    handleScrollToTOCEntry(widgetId, entryId) {
+    handleScrollToTOCEntry = (widgetId, entryId) => {
       const widgetComp = this.widgetComps[widgetId];
       if (!widgetComp) {
         return;
@@ -178,15 +171,15 @@ export default DashboardViewComponent = (function() {
 
       // Call scrollToTOCEntry if present
       return widgetComp.scrollToTOCEntry?.(entryId);
-    }
+    };
 
     renderScopes() {
       return R(WidgetScopesViewComponent, {scopes: this.state.widgetScoper.getScopes(), onRemoveScope: this.handleRemoveScope});
     }
 
-    compRef(widgetId, comp) {
+    compRef = (widgetId, comp) => {
       return this.widgetComps[widgetId] = comp;
-    }
+    };
 
     render() {
       let cantPasteMessage;

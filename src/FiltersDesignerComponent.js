@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let FiltersDesignerComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -11,12 +13,6 @@ import { ExprUtils } from 'mwater-expressions';
 // Filters are in format mwater-expression filter expression indexed by table. e.g. { sometable: logical expression, etc. }
 export default FiltersDesignerComponent = (function() {
   FiltersDesignerComponent = class FiltersDesignerComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleFilterChange = this.handleFilterChange.bind(this);
-      this.renderFilterableTable = this.renderFilterableTable.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         schema: PropTypes.object.isRequired, // Schema to use
@@ -31,7 +27,7 @@ export default FiltersDesignerComponent = (function() {
         // e.g. "en"
     }
 
-    handleFilterChange(table, expr) {
+    handleFilterChange = (table, expr) => {
       // Clean filter
       expr = new ExprCleaner(this.props.schema).cleanExpr(expr, { table });
 
@@ -39,9 +35,9 @@ export default FiltersDesignerComponent = (function() {
       filters[table] = expr;
 
       return this.props.onFiltersChange(filters);
-    }
+    };
 
-    renderFilterableTable(table) {
+    renderFilterableTable = table => {
       const name = ExprUtils.localizeString(this.props.schema.getTable(table).name, this.context.locale);
 
       return R('div', {key: table}, 
@@ -54,7 +50,7 @@ export default FiltersDesignerComponent = (function() {
           value: this.props.filters?.[table]
         })
       );
-    }
+    };
 
     render() {
       return R('div', null,

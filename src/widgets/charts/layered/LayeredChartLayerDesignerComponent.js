@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let LayeredChartLayerDesignerComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -9,29 +11,14 @@ import { FilterExprComponent } from "mwater-expressions-ui";
 import { ExprUtils } from 'mwater-expressions';
 import { ExprCompiler } from 'mwater-expressions';
 import ColorComponent from '../../../ColorComponent';
-import LayeredChartUtils from './LayeredChartUtils';
+import * as LayeredChartUtils from './LayeredChartUtils';
 import LayeredChartCompiler from './LayeredChartCompiler';
-import uiComponents from '../../../UIComponents';
+import * as uiComponents from '../../../UIComponents';
 import TableSelectComponent from '../../../TableSelectComponent';
 import ui from 'react-library/lib/bootstrap';
 
 export default LayeredChartLayerDesignerComponent = (function() {
   LayeredChartLayerDesignerComponent = class LayeredChartLayerDesignerComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleNameChange = this.handleNameChange.bind(this);
-      this.handleTableChange = this.handleTableChange.bind(this);
-      this.handleXAxisChange = this.handleXAxisChange.bind(this);
-      this.handleXColorMapChange = this.handleXColorMapChange.bind(this);
-      this.handleColorAxisChange = this.handleColorAxisChange.bind(this);
-      this.handleYAxisChange = this.handleYAxisChange.bind(this);
-      this.handleFilterChange = this.handleFilterChange.bind(this);
-      this.handleColorChange = this.handleColorChange.bind(this);
-      this.handleCumulativeChange = this.handleCumulativeChange.bind(this);
-      this.handleTrendlineChange = this.handleTrendlineChange.bind(this);
-      this.handleStackedChange = this.handleStackedChange.bind(this);
-    }
-
     static initClass() {
       this.propTypes = { 
         design: PropTypes.object.isRequired,
@@ -109,11 +96,10 @@ export default LayeredChartLayerDesignerComponent = (function() {
       return this.updateLayer({axes});
     }
 
-    handleNameChange(ev) {  return this.updateLayer({name: ev.target.value}); }
+    handleNameChange = ev => {  return this.updateLayer({name: ev.target.value}); };
+    handleTableChange = table => { return this.updateLayer({table}); };
 
-    handleTableChange(table) { return this.updateLayer({table}); }
-
-    handleXAxisChange(axis) { 
+    handleXAxisChange = axis => { 
       const layer = this.props.design.layers[this.props.index];
       const axesChanges = { x: axis };
     
@@ -123,14 +109,14 @@ export default LayeredChartLayerDesignerComponent = (function() {
       }
 
       return this.updateAxes(axesChanges);
-    }
+    };
 
-    handleXColorMapChange(xColorMap) {
+    handleXColorMapChange = xColorMap => {
       const layer = this.props.design.layers[this.props.index];
       return this.updateLayer({ xColorMap });
-    }
+    };
 
-    handleColorAxisChange(axis) { 
+    handleColorAxisChange = axis => { 
       const layer = this.props.design.layers[this.props.index];
       const axesChanges ={ color: axis };
     
@@ -140,19 +126,14 @@ export default LayeredChartLayerDesignerComponent = (function() {
       }
 
       return this.updateAxes(axesChanges);
-    }
+    };
 
-    handleYAxisChange(axis) { return this.updateAxes({y: axis}); }
-
-    handleFilterChange(filter) { return this.updateLayer({filter}); }
-
-    handleColorChange(color) { return this.updateLayer({color}); }
-
-    handleCumulativeChange(ev) { return this.updateLayer({cumulative: ev.target.checked}); }
-
-    handleTrendlineChange(ev) { return this.updateLayer({trendline: ev.target.checked ? "linear" : undefined}); }
-
-    handleStackedChange(ev) { return this.updateLayer({stacked: ev.target.checked}); }
+    handleYAxisChange = axis => { return this.updateAxes({y: axis}); };
+    handleFilterChange = filter => { return this.updateLayer({filter}); };
+    handleColorChange = color => { return this.updateLayer({color}); };
+    handleCumulativeChange = ev => { return this.updateLayer({cumulative: ev.target.checked}); };
+    handleTrendlineChange = ev => { return this.updateLayer({trendline: ev.target.checked ? "linear" : undefined}); };
+    handleStackedChange = ev => { return this.updateLayer({stacked: ev.target.checked}); };
 
     renderName() {
       const layer = this.props.design.layers[this.props.index];

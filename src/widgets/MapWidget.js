@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let MapWidget;
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -71,16 +73,13 @@ class MapWidgetComponent extends React.Component {
   }
 
   constructor(props) {
-    this.handleStartEditing = this.handleStartEditing.bind(this);
-    this.handleEndEditing = this.handleEndEditing.bind(this);
-    this.handleEditDesignChange = this.handleEditDesignChange.bind(this);
     super(props);
     this.state = { 
       // Design that is being edited. Change is propagated on closing window
       editDesign: null,
 
       transientDesign: props.design  // Temporary design for read-only maps
-    };  
+    };
   }
 
   componentDidUpdate(prevProps) {
@@ -89,18 +88,18 @@ class MapWidgetComponent extends React.Component {
     }
   }
 
-  handleStartEditing() {
+  handleStartEditing = () => {
     return this.setState({editDesign: this.props.design});
-  }
+  };
 
-  handleEndEditing() {
+  handleEndEditing = () => {
     this.props.onDesignChange(this.state.editDesign);
     return this.setState({editDesign: null});
-  }
+  };
 
-  handleEditDesignChange(design) {
+  handleEditDesignChange = design => {
     return this.setState({editDesign: design});
-  }
+  };
 
   renderEditor() {
     if (!this.state.editDesign) {

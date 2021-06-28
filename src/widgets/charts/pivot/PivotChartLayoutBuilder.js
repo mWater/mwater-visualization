@@ -1,9 +1,11 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let PivotChartLayoutBuilder;
 import _ from 'lodash';
 import { ExprUtils } from 'mwater-expressions';
 import AxisBuilder from '../../../axes/AxisBuilder';
 import Color from 'color';
-import PivotChartUtils from './PivotChartUtils';
+import * as PivotChartUtils from './PivotChartUtils';
 import canonical from 'canonical-json';
 
 const maxRows = 500;

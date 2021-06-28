@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let BinsComponent;
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -114,7 +116,12 @@ export default BinsComponent = (function() {
 })();
 
 
-var LabeledInlineComponent = props => R('div', {style: { display: "inline-block" }},
-  R('label', {className: "text-muted"}, props.label),
-  props.children);
+function LabeledInlineComponent(props) {
+  return R(
+    'div',
+    {style: { display: "inline-block" }},
+    R('label', {className: "text-muted"}, props.label),
+    props.children
+  );
+}
 

@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let LayerFactory;
 import MWaterServerLayer from './MWaterServerLayer';
 import { default as MarkersLayer } from './MarkersLayer';

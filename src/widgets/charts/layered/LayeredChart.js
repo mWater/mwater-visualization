@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let LayeredChart;
 import _ from 'lodash';
 import React from 'react';
@@ -10,7 +12,7 @@ import LayeredChartCompiler from './LayeredChartCompiler';
 import { ExprCleaner } from 'mwater-expressions';
 import AxisBuilder from '../../../axes/AxisBuilder';
 import LayeredChartSvgFileSaver from './LayeredChartSvgFileSaver';
-import LayeredChartUtils from './LayeredChartUtils';
+import * as LayeredChartUtils from './LayeredChartUtils';
 import TextWidget from '../../text/TextWidget';
 
 // See LayeredChart Design.md for the design

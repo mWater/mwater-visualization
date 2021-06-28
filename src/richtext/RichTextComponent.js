@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let RichTextComponent;
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -40,18 +42,6 @@ export default RichTextComponent = (function() {
     }
 
     constructor(props) {
-      this.handleClick = this.handleClick.bind(this);
-      this.handleInsertExpr = this.handleInsertExpr.bind(this);
-      this.handleSetFontSize = this.handleSetFontSize.bind(this);
-      this.handleSetFontColor = this.handleSetFontColor.bind(this);
-      this.handleChange = this.handleChange.bind(this);
-      this.handleFocus = this.handleFocus.bind(this);
-      this.handleBlur = this.handleBlur.bind(this);
-      this.handleCommand = this.handleCommand.bind(this);
-      this.handleCreateLink = this.handleCreateLink.bind(this);
-      this.handleEditorClick = this.handleEditorClick.bind(this);
-      this.renderPaletteContent = this.renderPaletteContent.bind(this);
-      this.refContentEditable = this.refContentEditable.bind(this);
       super(props);
 
       this.state = {
@@ -59,12 +49,12 @@ export default RichTextComponent = (function() {
       };
     }
 
-    handleClick(ev) {
+    handleClick = ev => {
       // If click is in component or in palette component, ignore, otherwise remove focus
       if (!this.entireComponent.contains(ev.target) && (!this.paletteComponent || !this.paletteComponent.contains(ev.target))) {
         return this.setState({focused: false});
       }
-    }
+    };
 
     // Paste HTML in
     pasteHTML(html) {
@@ -75,13 +65,13 @@ export default RichTextComponent = (function() {
       return this.contentEditable.focus();
     }
 
-    handleInsertExpr(item) {
+    handleInsertExpr = item => {
       const html = '<div data-embed="' + _.escape(JSON.stringify(item)) + '"></div>';
 
       return this.contentEditable.pasteHTML(html);
-    }
+    };
 
-    handleSetFontSize(size) {
+    handleSetFontSize = size => {
       // Requires a selection
       let html = this.contentEditable.getSelectedHTML();
       if (!html) {
@@ -93,9 +83,9 @@ export default RichTextComponent = (function() {
       html = html.replace(/font-size:\s*\d+%;?/g, "");
 
       return this.contentEditable.pasteHTML(`<span style=\"font-size:${size}\">` + html + "</span>");
-    }
+    };
 
-    handleSetFontColor(color) {
+    handleSetFontColor = color => {
       // Requires a selection
       const html = this.contentEditable.getSelectedHTML();
       if (!html) {
@@ -103,9 +93,9 @@ export default RichTextComponent = (function() {
       }
 
       return this.handleCommand("foreColor", color);
-    }
+    };
 
-    handleChange(elem) {
+    handleChange = elem => {
       const items =  this.props.itemsHtmlConverter.convertElemToItems(elem);
 
       // Check if changed
@@ -115,13 +105,13 @@ export default RichTextComponent = (function() {
         // Re-render as HTML may have been mangled and needs a round-trip
         return this.forceUpdate();
       }
-    }
+    };
 
-    handleFocus() { return this.setState({focused: true}); }
-    handleBlur() { return this.setState({focused: false}); }  
+    handleFocus = () => { return this.setState({focused: true}); };
+    handleBlur = () => { return this.setState({focused: false}); };
 
     // Perform a command such as bold, underline, etc.
-    handleCommand(command, param, ev) {
+    handleCommand = (command, param, ev) => {
       // Don't lose focus
       ev?.preventDefault();
 
@@ -133,9 +123,9 @@ export default RichTextComponent = (function() {
       } else {
         return document.execCommand(command, false, param);
       }
-    }
+    };
 
-    handleCreateLink(ev) {
+    handleCreateLink = ev => {
       // Don't lose focus
       ev.preventDefault();
 
@@ -144,9 +134,9 @@ export default RichTextComponent = (function() {
       if (url) {
         return document.execCommand("createLink", false, url);
       }
-    }
+    };
 
-    handleEditorClick(ev) {
+    handleEditorClick = ev => {
       // Be sure focused
       if (!this.state.focused) {
         this.setState({focused: true});
@@ -158,7 +148,7 @@ export default RichTextComponent = (function() {
           return this.props.onItemClick?.(item);
         }
       }
-    }
+    };
 
     createHtml() {
       return this.props.itemsHtmlConverter.convertItemsToHtml(this.props.items);
@@ -168,7 +158,7 @@ export default RichTextComponent = (function() {
       return R(FloatAffixed, {style: {zIndex: 9999}, edges: "over,under,left,right", align: "center", render: this.renderPaletteContent});
     }
 
-    renderPaletteContent(schemeName, {edges}) {
+    renderPaletteContent = (schemeName, {edges}) => {
       return R('div', {key: "palette", className: "mwater-visualization-text-palette", ref: (c => { return this.paletteComponent = c; })},
           R('div', {key: "bold", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleCommand.bind(null, "bold", null)},
             R('b', null, "B")),
@@ -204,10 +194,10 @@ export default RichTextComponent = (function() {
           R('div', {key: "removeFormat", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleCommand.bind(null, "removeFormat", null), style: { paddingLeft: 5, paddingRight: 5 }},
             R('img', {src: removeFormatIcon, style: { height: 20 }})),
           this.props.extraPaletteButtons);
-    }
+    };
 
-    refContentEditable(c) { return this.contentEditable = c; }
-    
+    refContentEditable = c => { return this.contentEditable = c; };
+
     renderHtml() {
       if (this.props.onItemsChange != null) {
         return R('div', {key: "contents", style: this.props.style, className: this.props.className},

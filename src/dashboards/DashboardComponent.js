@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let DashboardComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -70,20 +72,6 @@ export default DashboardComponent = (function() {
     }; }
 
     constructor(props) {
-      this.getQuickfilterValues = this.getQuickfilterValues.bind(this);
-      this.handlePrint = this.handlePrint.bind(this);
-      this.handleUndo = this.handleUndo.bind(this);
-      this.handleRedo = this.handleRedo.bind(this);
-      this.handleSaveDesignFile = this.handleSaveDesignFile.bind(this);
-      this.handleSettings = this.handleSettings.bind(this);
-      this.handleToggleEditing = this.handleToggleEditing.bind(this);
-      this.handleOpenLayoutOptions = this.handleOpenLayoutOptions.bind(this);
-      this.handleRefreshData = this.handleRefreshData.bind(this);
-      this.handleStyleChange = this.handleStyleChange.bind(this);
-      this.handleDesignChange = this.handleDesignChange.bind(this);
-      this.handleShowQuickfilters = this.handleShowQuickfilters.bind(this);
-      this.handleUpgrade = this.handleUpgrade.bind(this);
-      this.refDashboardView = this.refDashboardView.bind(this);
       super(props);
 
       const layoutOptions = getLayoutOptions(props.design);
@@ -99,9 +87,9 @@ export default DashboardComponent = (function() {
     }
 
     // Get the values of the quick filters
-    getQuickfilterValues() {
+    getQuickfilterValues = () => {
       return this.state.quickfiltersValues || [];
-    }
+    };
 
     componentWillReceiveProps(nextProps) {
       let {
@@ -127,68 +115,68 @@ export default DashboardComponent = (function() {
       }
     }
 
-    handlePrint() {
+    handlePrint = () => {
       return this.dashboardView.print();
-    }
+    };
 
-    handleUndo() { 
+    handleUndo = () => { 
       const undoStack = this.state.undoStack.undo();
 
       // We need to use callback as state is applied later
       return this.setState({undoStack}, () => this.props.onDesignChange(undoStack.getValue()));
-    }
+    };
 
-    handleRedo() {
+    handleRedo = () => {
       const undoStack = this.state.undoStack.redo();
 
       // We need to use callback as state is applied later
       return this.setState({undoStack}, () => this.props.onDesignChange(undoStack.getValue()));
-    }
+    };
 
     // Saves a json file to disk
-    handleSaveDesignFile() {
+    handleSaveDesignFile = () => {
       // Make a blob and save
       const blob = new Blob([JSON.stringify(this.props.design, null, 2)], {type: "text/json"});
       // Require at use as causes server problems
       const FileSaver = require('file-saver');
       return FileSaver.saveAs(blob, "Dashboard.json");
-    }
+    };
 
-    handleSettings() {
+    handleSettings = () => {
       return this.settings.show(this.props.design);
-    }
+    };
 
-    handleToggleEditing() {
+    handleToggleEditing = () => {
       return this.setState({editing: !this.state.editing});
-    }
+    };
 
-    handleOpenLayoutOptions() {
+    handleOpenLayoutOptions = () => {
       return this.setState({layoutOptionsOpen: true});
-    }
+    };
 
-    handleRefreshData() {
+    handleRefreshData = () => {
       this.props.dataSource.clearCache?.();
       return this.setState({refreshKey: this.state.refreshKey + 1});
-    }
+    };
 
-    handleStyleChange(style) {
+    handleStyleChange = style => {
       return this.props.onDesignChange(_.extend({}, this.props.design, { style: style || null }));
-    }
+    };
 
-    handleDesignChange(design) {
+    handleDesignChange = design => {
       // If quickfilters have changed, reset values
       if (!_.isEqual(this.props.design.quickfilters, design.quickfilters)) {
         this.setState({quickfiltersValues: null});
       }
 
       return this.props.onDesignChange(design);
-    }
-  
-    handleShowQuickfilters() { 
-      return this.setState({hideQuickfilters: false});
-    }
+    };
 
-    handleUpgrade() {
+    handleShowQuickfilters = () => { 
+      return this.setState({hideQuickfilters: false});
+    };
+
+    handleUpgrade = () => {
       if (!confirm("This will upgrade your dashboard to the new kind with enhanced features. You can click Undo immediately afterwards if you wish to revert it. Continue?")) {
         return;
       }
@@ -197,7 +185,7 @@ export default DashboardComponent = (function() {
       this.props.onDesignChange(design);
 
       return alert("Upgrade completed. Some widgets may need to be resized. Click Undo to revert back to old dashboard style.");
-    }
+    };
 
     // Get filters from props filters combined with dashboard filters
     getCompiledFilters() {
@@ -310,9 +298,9 @@ export default DashboardComponent = (function() {
       });
     }
 
-    refDashboardView(el) {
+    refDashboardView = el => {
       return this.dashboardView = el;
-    }
+    };
 
     render() {
       let filters = this.props.filters || [];

@@ -1,8 +1,10 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let TableSelectComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import ui from './UIComponents';
+import * as ui from './UIComponents';
 import { ExprUtils } from "mwater-expressions";
 const R = React.createElement;
 

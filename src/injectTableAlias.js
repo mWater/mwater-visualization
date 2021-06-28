@@ -1,7 +1,9 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import _ from 'lodash';
 
 // Recursively inject table alias tableAlias for `{alias}` 
-var injectTableAlias = function(jsonql, tableAlias) {
+function injectTableAlias(jsonql, tableAlias) {
   // Handle empty
   if (!jsonql) {
     return jsonql;
@@ -24,6 +26,6 @@ var injectTableAlias = function(jsonql, tableAlias) {
 
   // Recurse object keys
   return _.mapValues(jsonql, value => injectTableAlias(value, tableAlias));
-};
+}
 
 export default injectTableAlias;

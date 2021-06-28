@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let TileUrlLayer;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -80,11 +82,6 @@ export default TileUrlLayer = class TileUrlLayer extends Layer {
 
 
 class TileUrlLayerDesignerComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleTileUrlChange = this.handleTileUrlChange.bind(this);
-  }
-
   static initClass() {
     this.propTypes = {
       design: PropTypes.object.isRequired,  // Design of the marker layer
@@ -93,9 +90,9 @@ class TileUrlLayerDesignerComponent extends React.Component {
      // Called with new design
   }
 
-  handleTileUrlChange(ev) {
+  handleTileUrlChange = ev => {
     return this.props.onDesignChange(_.extend({}, this.props.design, {tileUrl: ev.target.value}));
-  }
+  };
 
   render() {
     // Readonly is non-editable and shows only description

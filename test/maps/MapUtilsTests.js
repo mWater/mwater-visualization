@@ -1,8 +1,17 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import _ from 'lodash';
 import { assert } from 'chai';
 import MapUtils from '../../src/maps/MapUtils';
 import canonical from 'canonical-json';
-const compare = (actual, expected) => assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n");
+
+function compare(actual, expected) {
+  return assert.equal(
+    canonical(actual),
+    canonical(expected),
+    "\n" + canonical(actual) + "\n" + canonical(expected) + "\n"
+  );
+}
 
 describe("MapUtils", function() {
   beforeEach(function() {

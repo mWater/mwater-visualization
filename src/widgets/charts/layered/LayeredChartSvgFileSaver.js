@@ -1,10 +1,12 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import _ from 'lodash';
 import $ from 'jquery';
 import saveSvgAsPng from 'save-svg-as-png';
 import LayeredChartCompiler from './LayeredChartCompiler';
 
 // Get the css rules corresponding to .c3 directly out of the document object
-const getC3Css = () => {
+function getC3Css() {
   const css = [];
   if (document.styleSheets) {
     for (let sheet of document.styleSheets) {
@@ -19,10 +21,10 @@ const getC3Css = () => {
     }
   }
   return css.join('\n');
-};
+}
 
 // Get the svg XML text straight from the DOM node, adding the css styling to it as a <style> element
-const getC3String = c3Node => {
+function getC3String(c3Node) {
   // Log SVG with stylesheet info
   // First get the svg DOM node and make a copy as an XML doc
   const svgStr = c3Node.outerHTML;
@@ -47,16 +49,16 @@ const getC3String = c3Node => {
   // Serialize
   const svgFinalStr = new XMLSerializer().serializeToString(xml);
   return svgFinalStr;
-};
+}
 
 // Creates the svg string and saves that to file
-const saveSvgToFile = function(containerDiv, title) {
+function saveSvgToFile(containerDiv, title) {
   const svgFinalStr = getC3String(containerDiv.firstChild);
   const blob = new Blob([svgFinalStr], {type: "image/svg+xml"});
   // Require at use as causes server problems
   const FileSaver = require('file-saver');
   return FileSaver.saveAs(blob, (title || "unnamed-chart") + ".svg");
-};
+}
 
 // Saves svg files from layered charts
 // design: design of the chart

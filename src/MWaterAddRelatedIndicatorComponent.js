@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let MWaterAddRelatedIndicatorComponent;
 import $ from 'jquery';
 import PropTypes from 'prop-types';
@@ -8,7 +10,7 @@ const R = React.createElement;
 import moment from 'moment';
 import querystring from 'querystring';
 import { ExprUtils } from 'mwater-expressions';
-import ui from './UIComponents';
+import * as ui from './UIComponents';
 
 // List of indicators related to an entity
 export default MWaterAddRelatedIndicatorComponent = (function() {
@@ -30,7 +32,6 @@ export default MWaterAddRelatedIndicatorComponent = (function() {
     }
 
     constructor(props) {
-      this.handleSelect = this.handleSelect.bind(this);
       super(props);
 
       this.state = { 
@@ -78,12 +79,12 @@ export default MWaterAddRelatedIndicatorComponent = (function() {
       return false;
     }
 
-    handleSelect(table) {
+    handleSelect = table => {
       // Mark as being added
       this.setState({addingTables: _.union(this.state.addingTables, [table])});
 
       return this.props.onSelect(table);
-    }
+    };
 
     render() {
       // Filter out ones that are known and not recently added
@@ -141,7 +142,7 @@ export default MWaterAddRelatedIndicatorComponent = (function() {
 })();
 
 // Flattens a nested list of properties
-var flattenProperties = function(properties) {
+function flattenProperties(properties) {
   // Flatten
   let props = [];
   for (let prop of properties) {
@@ -153,10 +154,10 @@ var flattenProperties = function(properties) {
   }
 
   return props;
-};
+}
 
 // Filters text based on lower-case
-var filterMatches = function(filter, text) {
+function filterMatches(filter, text) {
   if (!filter) {
     return true;
   }
@@ -169,4 +170,4 @@ var filterMatches = function(filter, text) {
     return true;
   }
   return false;
-};
+}

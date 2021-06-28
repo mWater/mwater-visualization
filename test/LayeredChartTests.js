@@ -1,10 +1,18 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import _ from 'lodash';
 import { assert } from 'chai';
-import fixtures from './fixtures';
+import * as fixtures from './fixtures';
 import LayeredChart from '../src/widgets/charts/layered/LayeredChart';
 import canonical from 'canonical-json';
 
-const compare = (actual, expected) => assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected));
+function compare(actual, expected) {
+  return assert.equal(
+    canonical(actual),
+    canonical(expected),
+    "\n" + canonical(actual) + "\n" + canonical(expected)
+  );
+}
 
 describe("LayeredChart", function() {
   before(function() {

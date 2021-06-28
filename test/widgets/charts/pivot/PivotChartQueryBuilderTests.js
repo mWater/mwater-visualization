@@ -1,9 +1,18 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import { assert } from 'chai';
-import fixtures from '../../../fixtures';
+import * as fixtures from '../../../fixtures';
 import _ from 'lodash';
 import PivotChartQueryBuilder from '../../../../src/widgets/charts/pivot/PivotChartQueryBuilder';
 import canonical from 'canonical-json';
-const compare = (actual, expected) => assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n");
+
+function compare(actual, expected) {
+  return assert.equal(
+    canonical(actual),
+    canonical(expected),
+    "\n" + canonical(actual) + "\n" + canonical(expected) + "\n"
+  );
+}
 
 describe("PivotChartQueryBuilder", function() {
   before(function() {

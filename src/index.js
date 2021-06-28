@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import "leaflet/dist/leaflet.css";
 import "fixed-data-table-2/dist/fixed-data-table.min.css";
 import "rc-slider/assets/index.css";

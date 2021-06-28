@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let DatagridComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -11,7 +13,12 @@ import { ExprCompiler } from 'mwater-expressions';
 import { ExprCleaner } from 'mwater-expressions';
 import DatagridViewComponent from './DatagridViewComponent';
 import DatagridDesignerComponent from './DatagridDesignerComponent';
-import { default as DatagridUtils } from './DatagridUtils';
+import DatagridUtils1 from './DatagridUtils';
+
+const {
+  default: DatagridUtils
+} = DatagridUtils1;
+
 import QuickfiltersComponent from '../quickfilter/QuickfiltersComponent';
 import QuickfilterCompiler from '../quickfilter/QuickfilterCompiler';
 import FindReplaceModalComponent from './FindReplaceModalComponent';
@@ -58,10 +65,6 @@ export default DatagridComponent = (function() {
     }
 
     constructor(props) {
-      this.getQuickfilterValues = this.getQuickfilterValues.bind(this);
-      this.getQuickfilterFilters = this.getQuickfilterFilters.bind(this);
-      this.handleCellEditingToggle = this.handleCellEditingToggle.bind(this);
-      this.handleEdit = this.handleEdit.bind(this);
       super(props);
 
       this.state = {
@@ -96,16 +99,16 @@ export default DatagridComponent = (function() {
     }
 
     // Get the values of the quick filters
-    getQuickfilterValues() {
+    getQuickfilterValues = () => {
       return this.state.quickfiltersValues || [];
-    }
+    };
 
     // Get filters that are applied by the quickfilters
-    getQuickfilterFilters() {
+    getQuickfilterFilters = () => {
       return new QuickfilterCompiler(this.props.schema).compile(this.props.design.quickfilters, this.state.quickfiltersValues, this.props.quickfilterLocks);
-    }
+    };
 
-    handleCellEditingToggle() {
+    handleCellEditingToggle = () => {
       if (this.state.cellEditingEnabled) {
         return this.setState({cellEditingEnabled: false});
       } else {
@@ -113,11 +116,11 @@ export default DatagridComponent = (function() {
           return this.setState({cellEditingEnabled: true});
         }
       }
-    }
+    };
 
-    handleEdit() {
+    handleEdit = () => {
       return this.setState({editingDesign: true});
-    }
+    };
 
     // Get datagrid filter compiled for quickfilter filtering
     getCompiledFilters() {

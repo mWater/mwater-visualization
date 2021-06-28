@@ -1,7 +1,9 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import $ from 'jquery';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import visualization from './index';
+import visualization, * as visualizationExports from './index';
 import jsyaml from 'js-yaml';
 import TabbedComponent from 'react-library/lib/TabbedComponent';
 import React from 'react';
@@ -23,7 +25,7 @@ export function loadDashboard(options) {
     schema.loadFromJSON(schemaJson);
 
     // Create the data source
-    const dataSource = new visualization.CachingDataSource({
+    const dataSource = new visualizationExports.CachingDataSource({
         perform(query, cb) {
           const url = options.queryUrl.replace(/\{query\}/, encodeURIComponent(JSON.stringify(query)));
           return $.getJSON(url, rows => cb(null, rows)).fail(function(xhr) {
@@ -34,7 +36,7 @@ export function loadDashboard(options) {
       });
 
     // Create the widget factory
-    const widgetFactory = new visualization.WidgetFactory({ schema, dataSource });
+    const widgetFactory = new visualizationExports.WidgetFactory({ schema, dataSource });
 
     // Get the design
     return $.get(options.loadDesignUrl, function(designString) {
@@ -58,17 +60,17 @@ export function loadDashboard(options) {
       }
 
       // Called to update the design and re-render
-      const updateDesign = function(newDesign) {
+      function updateDesign(newDesign) {
         design = newDesign;
 
         // Save to database
         $.post(options.saveDesignUrl, { userdata: JSON.stringify(design) });
 
         return render();
-      };
+      }
 
       // Render the dashboard
-      var render = function() {
+      function render() {
         const elem = R(TabbedDashboard, {
           design,
           widgetFactory,
@@ -77,7 +79,7 @@ export function loadDashboard(options) {
         );
 
         return ReactDOM.render(elem, document.getElementById(options.elemId));
-      };
+      }
 
       // Initial render
       return render();
@@ -86,15 +88,6 @@ export function loadDashboard(options) {
 }
 
 class TabbedDashboard extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleDesignChange = this.handleDesignChange.bind(this);
-    this.handleAddTab = this.handleAddTab.bind(this);
-    this.handleRemoveTab = this.handleRemoveTab.bind(this);
-    this.handleRenameTab = this.handleRenameTab.bind(this);
-    this.createTab = this.createTab.bind(this);
-  }
-
   static initClass() {
     this.propTypes = { 
       design: PropTypes.object.isRequired,
@@ -103,20 +96,20 @@ class TabbedDashboard extends React.Component {
     };
   }
 
-  handleDesignChange(index, design) {
+  handleDesignChange = (index, design) => {
     const tabs = this.props.design.tabs.slice();
     tabs[index] = _.extend({}, tabs[index], {design});
     return this.props.onDesignChange(_.extend({}, this.props.design, {tabs}));
-  }
+  };
 
-  handleAddTab() {
+  handleAddTab = () => {
     const tabs = this.props.design.tabs.slice();
     // Add new dashboard
     tabs.push({ name: "Untitled", design: { items: {} } });
     return this.props.onDesignChange(_.extend({}, this.props.design, {tabs}));
-  }
+  };
 
-  handleRemoveTab(index) {
+  handleRemoveTab = index => {
     if (!confirm("Permanently remove this tab? This cannot be undone!")) {
       return;
     }
@@ -124,9 +117,9 @@ class TabbedDashboard extends React.Component {
     const tabs = this.props.design.tabs.slice();
     tabs.splice(index, 1);
     return this.props.onDesignChange(_.extend({}, this.props.design, {tabs}));
-  }
+  };
 
-  handleRenameTab(index) {
+  handleRenameTab = index => {
     let {
       name
     } = this.props.design.tabs[index];
@@ -136,13 +129,13 @@ class TabbedDashboard extends React.Component {
       tabs[index] = _.extend({}, tabs[index], {name});
       return this.props.onDesignChange(_.extend({}, this.props.design, {tabs}));
     }
-  }
+  };
 
-  createTab(tab, index) {
+  createTab = (tab, index) => {
     return {
       id: `${index}`,
       label: tab.name,
-      elem: R(visualization.DashboardComponent, {
+      elem: R(visualizationExports.DashboardComponent, {
         design: tab.design,
         widgetFactory: this.props.widgetFactory,
         onDesignChange: this.handleDesignChange.bind(null, index),
@@ -157,7 +150,7 @@ class TabbedDashboard extends React.Component {
         ]
       })
     };
-  }
+  };
 
   createTabs() {
     return _.map(this.props.design.tabs, this.createTab);

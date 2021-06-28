@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let IFrameWidgetComponent;
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -19,24 +21,22 @@ export default IFrameWidgetComponent = (function() {
     }
 
     constructor(props) {
-      this.handleStartEditing = this.handleStartEditing.bind(this);
-      this.handleEndEditing = this.handleEndEditing.bind(this);
       super(props);
       this.state = { 
         // True when editing chart
         editing: false,
         editUrl: null
-      };  
+      };
     }
 
-    handleStartEditing() {
+    handleStartEditing = () => {
       return this.setState({editing: true, editUrl: this.props.design.url});
-    }
+    };
 
-    handleEndEditing() {
+    handleEndEditing = () => {
       this.setState({editing: false});
       return this.props.onDesignChange(_.extend({}, this.props.design, {url: this.state.editUrl}));
-    }
+    };
 
     renderEditor() {
       if (!this.state.editing) {
@@ -63,8 +63,8 @@ export default IFrameWidgetComponent = (function() {
       return R('div', {className: "mwater-visualization-widget-placeholder", onClick: this.handleStartEditing},
         R(ui.Icon, {id: "fa-youtube-play"}));
     }
-      // R 'div', style: { position: "absolute", bottom: @props.height / 2, left: 0, right: 0, textAlign: "center" },
-      //   R 'a', className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Configure"
+    // R 'div', style: { position: "absolute", bottom: @props.height / 2, left: 0, right: 0, textAlign: "center" },
+    //   R 'a', className: "btn btn-link", onClick: @handleStartEditing, "Click Here to Configure"
 
     render() {
       const dropdownItems = [];

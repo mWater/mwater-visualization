@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let TextComponent;
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -12,15 +14,6 @@ import ExprItemsHtmlConverter from '../../richtext/ExprItemsHtmlConverter';
 // Used by TextWidgetComponent and also by other components that embed text fields
 export default TextComponent = (function() {
   TextComponent = class TextComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleItemsChange = this.handleItemsChange.bind(this);
-      this.handleInsertExpr = this.handleInsertExpr.bind(this);
-      this.handleItemClick = this.handleItemClick.bind(this);
-      this.handleAddExpr = this.handleAddExpr.bind(this);
-      this.refRichTextComponent = this.refRichTextComponent.bind(this);
-    }
-
     static initClass() {
       this.propTypes = { 
         design: PropTypes.object.isRequired,
@@ -55,16 +48,16 @@ export default TextComponent = (function() {
       );
     }
 
-    handleItemsChange(items) {
+    handleItemsChange = items => {
       const design = _.extend({}, this.props.design, {items});
       return this.props.onDesignChange(design);
-    }
+    };
 
-    handleInsertExpr(item) {
+    handleInsertExpr = item => {
       const html = '<div data-embed="' + _.escape(JSON.stringify(item)) + '"></div>';
 
       return this.editor.pasteHTML(html);
-    }
+    };
 
     replaceItem(item) {
       var replaceItemInItems = (items, item) => _.map(items, function(i) {
@@ -81,17 +74,17 @@ export default TextComponent = (function() {
       return this.props.onDesignChange(_.extend({}, this.props.design, {items}));
     }
 
-    handleItemClick(item) {
+    handleItemClick = item => {
       return this.exprUpdateModal.open(item, item => {
         // Replace in items
         return this.replaceItem(item);
       });
-    }
+    };
 
-    handleAddExpr(ev) {
+    handleAddExpr = ev => {
       ev.preventDefault();
       return this.exprInsertModal.open();
-    }
+    };
 
     renderExtraPaletteButtons() {
       return R('div', {key: "expr", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleAddExpr},
@@ -105,9 +98,9 @@ export default TextComponent = (function() {
         R(ExprUpdateModalComponent, {key: "exprUpdateModal", ref: (c => { return this.exprUpdateModal = c; }), schema: this.props.schema, dataSource: this.props.dataSource, singleRowTable: this.props.singleRowTable})
       ];
     }
-  
-    refRichTextComponent(c) { return this.editor = c; }
-  
+
+    refRichTextComponent = c => { return this.editor = c; };
+
     render() {
       const style = { 
         position: "relative"

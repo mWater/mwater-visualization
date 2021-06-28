@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let PivotChartViewComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -8,7 +10,7 @@ const R = React.createElement;
 import ActionCancelModalComponent from 'react-library/lib/ActionCancelModalComponent';
 import { ExprUtils } from 'mwater-expressions';
 import TextComponent from '../../text/TextComponent';
-import PivotChartUtils from './PivotChartUtils';
+import * as PivotChartUtils from './PivotChartUtils';
 import PivotChartLayoutComponent from './PivotChartLayoutComponent';
 import PivotChartLayoutBuilder from './PivotChartLayoutBuilder';
 import SegmentDesignerComponent from './SegmentDesignerComponent';
@@ -38,18 +40,6 @@ export default PivotChartViewComponent = (function() {
     }
 
     constructor(props) {
-      this.handleHeaderChange = this.handleHeaderChange.bind(this);
-      this.handleFooterChange = this.handleFooterChange.bind(this);
-      this.handleEditSection = this.handleEditSection.bind(this);
-      this.handleSaveEditSegment = this.handleSaveEditSegment.bind(this);
-      this.handleCancelEditSegment = this.handleCancelEditSegment.bind(this);
-      this.handleSaveEditIntersection = this.handleSaveEditIntersection.bind(this);
-      this.handleCancelEditIntersection = this.handleCancelEditIntersection.bind(this);
-      this.handleRemoveSegment = this.handleRemoveSegment.bind(this);
-      this.handleInsertBeforeSegment = this.handleInsertBeforeSegment.bind(this);
-      this.handleInsertAfterSegment = this.handleInsertAfterSegment.bind(this);
-      this.handleAddChildSegment = this.handleAddChildSegment.bind(this);
-      this.handleSummarizeSegment = this.handleSummarizeSegment.bind(this);
       super(props);
 
       this.state = {
@@ -59,15 +49,15 @@ export default PivotChartViewComponent = (function() {
       };
     }
 
-    handleHeaderChange(header) {
+    handleHeaderChange = header => {
       return this.props.onDesignChange(_.extend({}, this.props.design, {header}));
-    }
+    };
 
-    handleFooterChange(footer) {
+    handleFooterChange = footer => {
       return this.props.onDesignChange(_.extend({}, this.props.design, {footer}));
-    }
+    };
 
-    handleEditSection(sectionId) {
+    handleEditSection = sectionId => {
       // If intersection
       if (sectionId.match(":")) {
         return this.setState({editIntersectionId: sectionId, editIntersection: this.props.design.intersections[sectionId] || {}});
@@ -76,9 +66,9 @@ export default PivotChartViewComponent = (function() {
         const segment = PivotChartUtils.findSegment(this.props.design.rows, sectionId) || PivotChartUtils.findSegment(this.props.design.columns, sectionId);
         return this.setState({editSegment: segment});
       }
-    }
+    };
 
-    handleSaveEditSegment() {
+    handleSaveEditSegment = () => {
       // Always has label when saved
       let segment = this.state.editSegment;
 
@@ -93,66 +83,66 @@ export default PivotChartViewComponent = (function() {
 
       this.props.onDesignChange(design);
       return this.setState({editSegment: null});
-    }
+    };
 
-    handleCancelEditSegment() {
+    handleCancelEditSegment = () => {
       return this.setState({editSegment: null});
-    }
+    };
 
-    handleSaveEditIntersection() {
+    handleSaveEditIntersection = () => {
       const intersections = _.clone(this.props.design.intersections);
       intersections[this.state.editIntersectionId] = this.state.editIntersection;
 
       const design = _.extend({}, this.props.design, {intersections});
       this.props.onDesignChange(design);
       return this.setState({editIntersectionId: null, editIntersection: null});
-    }
+    };
 
-    handleCancelEditIntersection() {
+    handleCancelEditIntersection = () => {
       return this.setState({editIntersectionId: null, editIntersection: null});
-    }
+    };
 
-    handleRemoveSegment(segmentId) {
+    handleRemoveSegment = segmentId => {
       const design = _.extend({}, this.props.design, {
         rows: PivotChartUtils.removeSegment(this.props.design.rows, segmentId),
         columns: PivotChartUtils.removeSegment(this.props.design.columns, segmentId)
         });
 
       return this.props.onDesignChange(design);
-    }
+    };
 
-    handleInsertBeforeSegment(segmentId) {
+    handleInsertBeforeSegment = segmentId => {
       const design = _.extend({}, this.props.design, {
         rows: PivotChartUtils.insertBeforeSegment(this.props.design.rows, segmentId),
         columns: PivotChartUtils.insertBeforeSegment(this.props.design.columns, segmentId)
         });
 
       return this.props.onDesignChange(design);
-    }
+    };
 
-    handleInsertAfterSegment(segmentId) {
+    handleInsertAfterSegment = segmentId => {
       const design = _.extend({}, this.props.design, {
         rows: PivotChartUtils.insertAfterSegment(this.props.design.rows, segmentId),
         columns: PivotChartUtils.insertAfterSegment(this.props.design.columns, segmentId)
         });
 
       return this.props.onDesignChange(design);
-    }
+    };
 
-    handleAddChildSegment(segmentId) {
+    handleAddChildSegment = segmentId => {
       const design = _.extend({}, this.props.design, {
         rows: PivotChartUtils.addChildSegment(this.props.design.rows, segmentId),
         columns: PivotChartUtils.addChildSegment(this.props.design.columns, segmentId)
         });
 
       return this.props.onDesignChange(design);
-    }
+    };
 
-    handleSummarizeSegment(segmentId) {
+    handleSummarizeSegment = segmentId => {
       const design = PivotChartUtils.summarizeSegment(this.props.design, segmentId, "Summary");
 
       return this.props.onDesignChange(design);
-    }
+    };
 
     renderHeader() {
       return R('div', {style: { paddingLeft: 10, paddingRight: 10 }},

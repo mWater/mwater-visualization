@@ -1,5 +1,7 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import { assert } from 'chai';
-import fixtures from './fixtures';
+import * as fixtures from './fixtures';
 import _ from 'lodash';
 import React from 'react';
 const R = React.createElement;
@@ -7,7 +9,13 @@ const R = React.createElement;
 import AxisBuilder from '../src/axes/AxisBuilder';
 import canonical from 'canonical-json';
 
-const compare = (actual, expected) => assert.equal(canonical(actual), canonical(expected), "\ngot:" + canonical(actual) + "\nexp:" + canonical(expected));
+function compare(actual, expected) {
+  return assert.equal(
+    canonical(actual),
+    canonical(expected),
+    "\ngot:" + canonical(actual) + "\nexp:" + canonical(expected)
+  );
+}
 
 describe("AxisBuilder", function() {
   before(function() {

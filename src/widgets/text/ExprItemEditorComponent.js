@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let ExprItemEditorComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -25,11 +27,6 @@ export default ExprItemEditorComponent = (function() {
     }
 
     constructor(props) {
-      this.handleTableChange = this.handleTableChange.bind(this);
-      this.handleExprChange = this.handleExprChange.bind(this);
-      this.handleIncludeLabelChange = this.handleIncludeLabelChange.bind(this);
-      this.handleLabelTextChange = this.handleLabelTextChange.bind(this);
-      this.handleFormatChange = this.handleFormatChange.bind(this);
       super(props);
 
       // Keep table in state as it can be set before the expression
@@ -38,27 +35,27 @@ export default ExprItemEditorComponent = (function() {
       };
     }
 
-    handleTableChange(table) { return this.setState({table}); }
+    handleTableChange = table => { return this.setState({table}); };
 
-    handleExprChange(expr) {
+    handleExprChange = expr => {
       const exprItem = _.extend({}, this.props.exprItem, {expr});
       return this.props.onChange(exprItem);
-    }
+    };
 
-    handleIncludeLabelChange(ev) {
+    handleIncludeLabelChange = ev => {
       const exprItem = _.extend({}, this.props.exprItem, {includeLabel: ev.target.checked, labelText: ev.target.checked ? this.props.exprItem.labelText : undefined});
       return this.props.onChange(exprItem);
-    }
+    };
 
-    handleLabelTextChange(ev) {
+    handleLabelTextChange = ev => {
       const exprItem = _.extend({}, this.props.exprItem, {labelText: ev.target.value || null});
       return this.props.onChange(exprItem);
-    }
+    };
 
-    handleFormatChange(ev) {
+    handleFormatChange = ev => {
       const exprItem = _.extend({}, this.props.exprItem, {format: ev.target.value || null});
       return this.props.onChange(exprItem);
-    }
+    };
 
     renderFormat() {
       const exprUtils = new ExprUtils(this.props.schema);

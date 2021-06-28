@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let TextWidget;
 import React from 'react';
 const R = React.createElement;
@@ -203,7 +205,7 @@ export default TextWidget = class TextWidget extends Widget {
     const entries = [];
 
     // Convert items into flat text
-    var flattenText = function(items) {
+    function flattenText(items) {
       let text = _.map(items, function(item) {
         if (_.isString(item)) {
           return item;
@@ -222,7 +224,7 @@ export default TextWidget = class TextWidget extends Widget {
           return match;
         }
         });
-    };
+    }
 
 
     var findRecursive = items => (() => {

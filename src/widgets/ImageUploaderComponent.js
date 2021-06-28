@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let ImageUploaderComponent;
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -17,10 +19,6 @@ export default ImageUploaderComponent = (function() {
     }
 
     constructor(props) {
-      this.onFileDrop = this.onFileDrop.bind(this);
-      this.uploadProgress = this.uploadProgress.bind(this);
-      this.uploadComplete = this.uploadComplete.bind(this);
-      this.handleChangeImage = this.handleChangeImage.bind(this);
       super(props);
 
       this.state = {
@@ -30,8 +28,8 @@ export default ImageUploaderComponent = (function() {
         editing: props.uid ? false : true
       };
     }
-  
-    onFileDrop(files) {
+
+    onFileDrop = files => {
       this.setState({files, uploading: true});
 
       this.xhr = new XMLHttpRequest();
@@ -44,9 +42,9 @@ export default ImageUploaderComponent = (function() {
       this.xhr.open("POST", this.props.dataSource.getImageUrl(id));
       this.xhr.send(fd);
       return this.setState({uid: id});
-    }
+    };
 
-    uploadProgress(e) {
+    uploadProgress = e => {
       if (!this.progressBar) {
         return;
       }
@@ -57,19 +55,19 @@ export default ImageUploaderComponent = (function() {
       } else {
         return this.progressBar.style.width = "100%";
       }
-    }
+    };
 
-    uploadComplete(e) {
+    uploadComplete = e => {
       if (e.target.status === 200) {
         this.setState({uploading: false, files: null, editing: false});
         return this.props.onUpload(this.state.uid);
       } else {
         return alert(`Upload failed: ${e.target.responseText}`);
       }
-    }
+    };
 
     createId() { return uuid().replace(/-/g, ""); }
-  
+
     renderUploader() {
       return R('div', null,
         R(Dropzone, {
@@ -105,9 +103,9 @@ export default ImageUploaderComponent = (function() {
         R('a', {className: 'btn btn-default', onClick: this.handleChangeImage}, "Change"));
     }
 
-    handleChangeImage() {
+    handleChangeImage = () => {
       return this.setState({editing: true});
-    }
+    };
 
     render() {
       return R('div', null,

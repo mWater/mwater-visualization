@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let ChartWidget;
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -106,21 +108,16 @@ class ChartWidgetComponent extends React.PureComponent {
   }
 
   constructor(props) {
-    this.handleSaveCsvFile = this.handleSaveCsvFile.bind(this);
-    this.handleStartEditing = this.handleStartEditing.bind(this);
-    this.handleEndEditing = this.handleEndEditing.bind(this);
-    this.handleCancelEditing = this.handleCancelEditing.bind(this);
-    this.handleEditDesignChange = this.handleEditDesignChange.bind(this);
     super(props);
-    
+
     this.state = { 
       // Design that is being edited. Change is propagated on closing window
       editDesign: null
-    };  
+    };
   }
 
   // Saves a csv file to disk
-  handleSaveCsvFile() {
+  handleSaveCsvFile = () => {
     // Get the data
     return this.props.widgetDataSource.getData(this.props.design, this.props.filters, (err, data) => {
       if (err) {  
@@ -146,28 +143,28 @@ class ChartWidgetComponent extends React.PureComponent {
       const FileSaver = require('file-saver');
       return FileSaver.saveAs(blob, "Exported Data.csv");
     });
-  }
+  };
 
-  handleStartEditing() {
+  handleStartEditing = () => {
     // Can't edit if already editing
     if (this.state.editDesign) {
       return;
     }
     return this.setState({editDesign: this.props.design});
-  }
+  };
 
-  handleEndEditing() {
+  handleEndEditing = () => {
     this.props.onDesignChange(this.state.editDesign);
     return this.setState({editDesign: null});
-  }
+  };
 
-  handleCancelEditing() {
+  handleCancelEditing = () => {
     return this.setState({editDesign: null});
-  }
+  };
 
-  handleEditDesignChange(design) {
+  handleEditDesignChange = design => {
     return this.setState({editDesign: design});
-  }
+  };
 
   renderChart(design, onDesignChange, width, height) {
     return R(ChartViewComponent, { 

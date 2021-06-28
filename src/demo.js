@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -6,7 +8,7 @@ import querystring from 'querystring';
 import $ from 'jquery';
 import { Schema } from 'mwater-expressions';
 import { DataSource } from 'mwater-expressions';
-import visualization from './index';
+import * as visualization from './index';
 
 // CalendarChartViewComponent = require './widgets/charts/CalendarChartViewComponent'
 
@@ -61,7 +63,6 @@ $(function() {
 
 class RichTextPane extends React.Component {
   constructor(props) {
-    this.handleInsert = this.handleInsert.bind(this);
     super(props);
 
     this.state = {
@@ -69,10 +70,10 @@ class RichTextPane extends React.Component {
     };
   }
 
-  handleInsert(ev) {
+  handleInsert = ev => {
     ev.preventDefault();
     return this.editor.pasteHTML("x");
-  }
+  };
 
   renderExtraButtons() {
     return R('div', {key: "x", className: "mwater-visualization-text-palette-item", onMouseDown: this.handleInsert},
@@ -95,7 +96,6 @@ class RichTextPane extends React.Component {
 
 class MWaterDashboardPane extends React.Component {
   constructor(props) {
-    this.handleDesignChange = this.handleDesignChange.bind(this);
     super(props);
 
     this.state = {
@@ -112,10 +112,10 @@ class MWaterDashboardPane extends React.Component {
     });
   }
 
-  handleDesignChange(design) {}
-    // @setState(design: design, extraTables: )
-    // console.log JSON.stringify(design, null, 2)
-    
+  handleDesignChange = design => {};
+  // @setState(design: design, extraTables: )
+  // console.log JSON.stringify(design, null, 2)
+
   render() {
     if (!this.state.design) {
       return R('div', null, "Loading...");
@@ -161,8 +161,6 @@ The survey was created by ${err.form.created_by}`;
 
 class MWaterDirectDashboardPane extends React.Component {
   constructor(props) {
-    this.handleDesignChange = this.handleDesignChange.bind(this);
-    this.handleExtraTablesChange = this.handleExtraTablesChange.bind(this);
     super(props);
 
     this.state = {
@@ -175,16 +173,16 @@ class MWaterDirectDashboardPane extends React.Component {
     };
   }
 
-  handleDesignChange(design) {
+  handleDesignChange = design => {
     this.setState({design});
     // console.log JSON.stringify(design, null, 2)
     return window.localStorage.setItem("MWaterDirectDashboardPane.design", JSON.stringify(design));
-  }
+  };
 
-  handleExtraTablesChange(extraTables) {
+  handleExtraTablesChange = extraTables => {
     this.setState({extraTables});
     return window.localStorage.setItem("MWaterDirectDashboardPane.extraTables", JSON.stringify(extraTables));
-  }
+  };
 
   render() {
     return React.createElement(MWaterLoaderComponent, {
@@ -228,7 +226,6 @@ const share = "testshareid";
 
 class MWaterMapPane extends React.Component {
   constructor(props) {
-    this.handleDesignChange = this.handleDesignChange.bind(this);
     super(props);
 
     this.state = {
@@ -245,10 +242,10 @@ class MWaterMapPane extends React.Component {
     });
   }
 
-  handleDesignChange(design) {
+  handleDesignChange = design => {
     this.setState({design});
     return console.log(JSON.stringify(design, null, 2));
-  }
+  };
 
   render() {
     if (!this.state.design) {
@@ -283,8 +280,6 @@ class MWaterMapPane extends React.Component {
 
 class MWaterDirectMapPane extends React.Component {
   constructor(props) {
-    this.handleDesignChange = this.handleDesignChange.bind(this);
-    this.handleExtraTablesChange = this.handleExtraTablesChange.bind(this);
     super(props);
 
     this.state = {
@@ -293,16 +288,16 @@ class MWaterDirectMapPane extends React.Component {
     };
   }
 
-  handleDesignChange(design) {
+  handleDesignChange = design => {
     this.setState({design});
     // console.log JSON.stringify(design, null, 2)
     return window.localStorage.setItem("MWaterDirectMapPane.design", JSON.stringify(design));
-  }
+  };
 
-  handleExtraTablesChange(extraTables) {
+  handleExtraTablesChange = extraTables => {
     this.setState({extraTables});
     return window.localStorage.setItem("MWaterDirectMapPane.extraTables", JSON.stringify(extraTables));
-  }
+  };
 
   render() {
     return React.createElement(MWaterLoaderComponent, {
@@ -331,7 +326,6 @@ class MWaterDirectMapPane extends React.Component {
 
 class MWaterDatagridPane extends React.Component {
   constructor(props) {
-    this.handleDesignChange = this.handleDesignChange.bind(this);
     super(props);
 
     this.state = {
@@ -340,10 +334,10 @@ class MWaterDatagridPane extends React.Component {
     };
   }
 
-  handleDesignChange(design) {
+  handleDesignChange = design => {
     this.setState({design});
     return console.log(JSON.stringify(design, null, 2));
-  }
+  };
 
   render() {
     return R(MWaterLoaderComponent, {
@@ -383,7 +377,6 @@ class MWaterDatagridPane extends React.Component {
 
 class WaterOrgDashboardPane extends React.Component {
   constructor(props) {
-    this.handleDesignChange = this.handleDesignChange.bind(this);
     super(props);
 
     this.state = {
@@ -404,10 +397,10 @@ class WaterOrgDashboardPane extends React.Component {
     });
   }
 
-  handleDesignChange(design) {
+  handleDesignChange = design => {
     this.setState({design});
     return console.log(JSON.stringify(design, null, 2));
-  }
+  };
 
   render() {
     if (!this.state.schema) {

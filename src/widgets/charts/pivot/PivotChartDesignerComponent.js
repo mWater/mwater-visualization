@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let PivotChartDesignerComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -24,11 +26,6 @@ export default PivotChartDesignerComponent = (function() {
     }
 
     constructor(props) {
-      this.handleTableChange = this.handleTableChange.bind(this);
-      this.handleColumnChange = this.handleColumnChange.bind(this);
-      this.handleRowChange = this.handleRowChange.bind(this);
-      this.handleFilterChange = this.handleFilterChange.bind(this);
-      this.handleIntersectionValueAxisChange = this.handleIntersectionValueAxisChange.bind(this);
       super(props);
 
       this.state = {
@@ -42,7 +39,7 @@ export default PivotChartDesignerComponent = (function() {
       return this.props.onDesignChange(design);
     }
 
-    handleTableChange(table) { 
+    handleTableChange = table => { 
       // Create default
       const row = { id: uuid(), label: "" };
       const column = { id: uuid(), label: "" };
@@ -56,25 +53,25 @@ export default PivotChartDesignerComponent = (function() {
         columns: [column],
         intersections
       });
-    }
+    };
 
-    handleColumnChange(axis) {
+    handleColumnChange = axis => {
       return this.updateDesign({columns: [_.extend({}, this.props.design.columns[0], {valueAxis: axis})]});
-    }
+    };
 
-    handleRowChange(axis) {
+    handleRowChange = axis => {
       return this.updateDesign({rows: [_.extend({}, this.props.design.rows[0], {valueAxis: axis})]});
-    }
+    };
 
-    handleFilterChange(filter) { return this.updateDesign({filter}); }
+    handleFilterChange = filter => { return this.updateDesign({filter}); };
 
-    handleIntersectionValueAxisChange(valueAxis) {
+    handleIntersectionValueAxisChange = valueAxis => {
       const intersectionId = `${this.props.design.rows[0].id}:${this.props.design.columns[0].id}`;
 
       const intersections = {};
       intersections[intersectionId] = { valueAxis };
       return this.updateDesign({intersections});
-    }
+    };
 
     renderTable() {
       return R('div', {className: "form-group"},

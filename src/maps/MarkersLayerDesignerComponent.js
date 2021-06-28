@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let MarkersLayerDesignerComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -18,19 +20,6 @@ import ui from 'react-library/lib/bootstrap';
 // Designer for a markers layer
 export default MarkersLayerDesignerComponent = (function() {
   MarkersLayerDesignerComponent = class MarkersLayerDesignerComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleTableChange = this.handleTableChange.bind(this);
-      this.handleGeometryAxisChange = this.handleGeometryAxisChange.bind(this);
-      this.handleColorAxisChange = this.handleColorAxisChange.bind(this);
-      this.handleFilterChange = this.handleFilterChange.bind(this);
-      this.handleColorChange = this.handleColorChange.bind(this);
-      this.handleSymbolChange = this.handleSymbolChange.bind(this);
-      this.handleNameChange = this.handleNameChange.bind(this);
-      this.handleMarkerSizeChange = this.handleMarkerSizeChange.bind(this);
-      this.handleLineWidthChange = this.handleLineWidthChange.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         schema: PropTypes.object.isRequired, // Schema to use
@@ -53,15 +42,15 @@ export default MarkersLayerDesignerComponent = (function() {
       return this.update({axes});
     }
 
-    handleTableChange(table) { return this.update({table}); }
-    handleGeometryAxisChange(axis) { return this.updateAxes({geometry: axis}); }
-    handleColorAxisChange(axis) { return this.updateAxes({color: axis}); }
-    handleFilterChange(expr) { return this.update({filter: expr}); }
-    handleColorChange(color) { return this.update({color}); }
-    handleSymbolChange(symbol) { return this.update({symbol}); }
-    handleNameChange(e) { return this.update({name: e.target.value}); }
-    handleMarkerSizeChange(markerSize) { return this.update({markerSize}); }
-    handleLineWidthChange(lineWidth) { return this.update({lineWidth}); }
+    handleTableChange = table => { return this.update({table}); };
+    handleGeometryAxisChange = axis => { return this.updateAxes({geometry: axis}); };
+    handleColorAxisChange = axis => { return this.updateAxes({color: axis}); };
+    handleFilterChange = expr => { return this.update({filter: expr}); };
+    handleColorChange = color => { return this.update({color}); };
+    handleSymbolChange = symbol => { return this.update({symbol}); };
+    handleNameChange = e => { return this.update({name: e.target.value}); };
+    handleMarkerSizeChange = markerSize => { return this.update({markerSize}); };
+    handleLineWidthChange = lineWidth => { return this.update({lineWidth}); };
 
     renderTable() {
       return R('div', {className: "form-group"},
@@ -78,7 +67,7 @@ export default MarkersLayerDesignerComponent = (function() {
             onFilterChange: this.handleFilterChange
           })));
     }
-  
+
     renderGeometryAxis() {
       if (!this.props.design.table) {
         return;

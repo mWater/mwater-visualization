@@ -1,11 +1,19 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import _ from 'lodash';
 import { assert } from 'chai';
-import fixtures from '../fixtures';
+import * as fixtures from '../fixtures';
 import DatagridQueryBuilder from '../../src/datagrids/DatagridQueryBuilder';
 import canonical from 'canonical-json';
 import { Schema } from 'mwater-expressions';
 
-const compare = (actual, expected) => assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n");
+function compare(actual, expected) {
+  return assert.equal(
+    canonical(actual),
+    canonical(expected),
+    "\n" + canonical(actual) + "\n" + canonical(expected) + "\n"
+  );
+}
 
 describe("DatagridQueryBuilder", function() {
   before(function() {

@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let HorizontalBlockComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -21,9 +23,6 @@ export default HorizontalBlockComponent = (function() {
     }
 
     constructor(props) {
-      this.handleMouseDown = this.handleMouseDown.bind(this);
-      this.handleMouseMove = this.handleMouseMove.bind(this);
-      this.handleMouseUp = this.handleMouseUp.bind(this);
       super(props);
 
       this.state = {
@@ -42,8 +41,8 @@ export default HorizontalBlockComponent = (function() {
       document.removeEventListener("mousemove", this.handleMouseMove);
       return document.removeEventListener("mouseup", this.handleMouseUp);
     }
-    
-    handleMouseDown(index, ev) {
+
+    handleMouseDown = (index, ev) => {
       // Prevent html5 drag
       ev.preventDefault();
 
@@ -52,9 +51,9 @@ export default HorizontalBlockComponent = (function() {
 
       document.addEventListener("mousemove", this.handleMouseMove);
       return document.addEventListener("mouseup", this.handleMouseUp);
-    }
+    };
 
-    handleMouseMove(ev) {
+    handleMouseMove = ev => {
       if (!this.state.dragInitialX) {
         this.setState({dragInitialX: ev.clientX});
         return;
@@ -73,9 +72,9 @@ export default HorizontalBlockComponent = (function() {
       }
 
       return this.setState({dragXOffset});
-    }
+    };
 
-    handleMouseUp(ev) {
+    handleMouseUp = ev => {
       // Remove listeners
       document.removeEventListener("mousemove", this.handleMouseMove);
       document.removeEventListener("mouseup", this.handleMouseUp);
@@ -96,7 +95,7 @@ export default HorizontalBlockComponent = (function() {
       this.props.onBlockUpdate(block);
 
       return this.setState({dragIndex: null, dragInitialX: null, dragXOffset: null});
-    }
+    };
 
     render() {
       // Handle simple case of collapseColumns (no editing allowed)

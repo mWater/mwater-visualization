@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let MWaterServerLayer;
 import $ from 'jquery';
 import PropTypes from 'prop-types';

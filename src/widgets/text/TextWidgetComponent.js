@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let TextWidgetComponent;
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -41,9 +43,9 @@ export default TextWidgetComponent = (function() {
     }
 
     // Override to determine if a load is needed. Not called on mounting
-    isLoadNeeded(newProps, oldProps) { 
+    isLoadNeeded(newProps, oldProps) {
       // Get expression items recursively
-      var getExprItems = function(items) {
+      function getExprItems(items) {
         let exprItems = [];
         for (let item of (items || [])) {
           if (item.type === "expr") {
@@ -54,7 +56,7 @@ export default TextWidgetComponent = (function() {
           }
         }
         return exprItems;    
-      };
+      }
 
       // Reload if filters or expressions have changed or cache expiry
       return !_.isEqual(newProps.filters, oldProps.filters) || !_.isEqual(getExprItems(newProps.design.items), getExprItems(oldProps.design.items)) || (newProps.dataSource.getCacheExpiry() !== this.state.cacheExpiry);

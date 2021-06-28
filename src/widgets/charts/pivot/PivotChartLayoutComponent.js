@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let PivotChartLayoutComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -28,10 +30,6 @@ export default PivotChartLayoutComponent = (function() {
     }
 
     constructor(props) {
-      this.recordCellComp = this.recordCellComp.bind(this);
-      this.renderHoverPlusIcon = this.renderHoverPlusIcon.bind(this);
-      this.renderHoverRemoveIcon = this.renderHoverRemoveIcon.bind(this);
-      this.renderHoverControls = this.renderHoverControls.bind(this);
       super(props);
 
       this.state = {
@@ -44,14 +42,14 @@ export default PivotChartLayoutComponent = (function() {
 
     // Records the cell components. This is to be able to calculate the bounds of sections
     // to allow floating hover controls
-    recordCellComp(rowIndex, columnIndex, comp) {
+    recordCellComp = (rowIndex, columnIndex, comp) => {
       const key = `${rowIndex}:${columnIndex}`;
       if (comp) {
         return this.cellComps[key] = comp;
       } else {
         return delete this.cellComps[key];
       }
-    }
+    };
 
     renderRow(row, rowIndex) {
       return R('tr', {key: rowIndex},
@@ -72,7 +70,7 @@ export default PivotChartLayoutComponent = (function() {
       );
     }
 
-    renderHoverPlusIcon(key, x, y, onClick) {
+    renderHoverPlusIcon = (key, x, y, onClick) => {
       // Render a plus box
       return R('div', { key, onClick, style: { 
         position: "absolute",
@@ -90,9 +88,9 @@ export default PivotChartLayoutComponent = (function() {
       }
     },
         R(ui.Icon, {id: "fa-plus"}));
-    }
+    };
 
-    renderHoverRemoveIcon(key, x, y, onClick) {
+    renderHoverRemoveIcon = (key, x, y, onClick) => {
       // Render a plus box
       return R('div', { key, onClick, style: { 
         position: "absolute",
@@ -110,10 +108,10 @@ export default PivotChartLayoutComponent = (function() {
       }
     },
         R(ui.Icon, {id: "fa-remove"}));
-    }
+    };
 
     // Render floating hover controls
-    renderHoverControls() {
+    renderHoverControls = () => {
       let key, maxX, maxY, minY;
       if (!this.state.hoverSection) {
         return; 
@@ -180,7 +178,7 @@ export default PivotChartLayoutComponent = (function() {
       }
 
       return R('div', {key: "hover-controls"}, controls);
-    }
+    };
 
     render() {
       return R('div', { 
@@ -249,11 +247,6 @@ export default PivotChartLayoutComponent = (function() {
 
 // Single layout cell
 class LayoutCellComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleClick = this.handleClick.bind(this);
-  }
-
   static initClass() {
     this.propTypes = {
       layout: PropTypes.object.isRequired,  // See PivotChart Design.md
@@ -266,7 +259,7 @@ class LayoutCellComponent extends React.Component {
     };
   }
 
-  handleClick(ev) {
+  handleClick = ev => {
     // Ignore blanks
     const cell = this.props.layout.rows[this.props.rowIndex].cells[this.props.columnIndex];
     if (!cell.section) {
@@ -281,7 +274,7 @@ class LayoutCellComponent extends React.Component {
     if (this.props.onEditSection) {
       return this.props.onEditSection();
     }
-  }
+  };
 
   // Gets cell component
   getTdComponent() { return this.tdComponent; }

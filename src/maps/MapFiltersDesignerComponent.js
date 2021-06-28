@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let MapFiltersDesignerComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -13,12 +15,6 @@ import MapUtils from './MapUtils';
 // Designer for filters for a map
 export default MapFiltersDesignerComponent = (function() {
   MapFiltersDesignerComponent = class MapFiltersDesignerComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleFiltersChange = this.handleFiltersChange.bind(this);
-      this.handleGlobalFiltersChange = this.handleGlobalFiltersChange.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         schema: PropTypes.object.isRequired, // Schema to use
@@ -32,15 +28,15 @@ export default MapFiltersDesignerComponent = (function() {
        // Call with props { schema, dataSource, globalFilters, filterableTables, onChange, nullIfIrrelevant }. Displays a component to edit global filters
     }
 
-    handleFiltersChange(filters) {
+    handleFiltersChange = filters => {
       const design = _.extend({}, this.props.design, {filters});
       return this.props.onDesignChange(design);
-    }
+    };
 
-    handleGlobalFiltersChange(globalFilters) {
+    handleGlobalFiltersChange = globalFilters => {
       const design = _.extend({}, this.props.design, {globalFilters});
       return this.props.onDesignChange(design);
-    }
+    };
 
     render() {
       // Get filterable tables

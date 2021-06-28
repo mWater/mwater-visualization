@@ -1,9 +1,17 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import { assert } from 'chai';
 import _ from 'lodash';
 import TextWidget from '../../src/widgets/text/TextWidget';
 import canonical from 'canonical-json';
 
-const compare = (actual, expected) => assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected));
+function compare(actual, expected) {
+  return assert.equal(
+    canonical(actual),
+    canonical(expected),
+    "\n" + canonical(actual) + "\n" + canonical(expected)
+  );
+}
 
 describe("TextWidget", () => describe("getTOCEntries", function() {
   it("gets simple h1, h2", function() {

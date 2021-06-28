@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let RangesComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -13,15 +15,6 @@ import ReorderableListComponent from "react-library/lib/reorderable/ReorderableL
 // Allows setting of ranges 
 export default RangesComponent = (function() {
   RangesComponent = class RangesComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleRangeChange = this.handleRangeChange.bind(this);
-      this.handleAddRange = this.handleAddRange.bind(this);
-      this.handleRemoveRange = this.handleRemoveRange.bind(this);
-      this.renderRange = this.renderRange.bind(this);
-      this.handleReorder = this.handleReorder.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         schema: PropTypes.object.isRequired, 
@@ -32,25 +25,25 @@ export default RangesComponent = (function() {
       };
     }
 
-    handleRangeChange(index, range) {
+    handleRangeChange = (index, range) => {
       const ranges = this.props.xform.ranges.slice();
       ranges[index] = range;
       return this.props.onChange(update(this.props.xform, { ranges: { $set: ranges }}));
-    }
+    };
 
-    handleAddRange() {
+    handleAddRange = () => {
       const ranges = this.props.xform.ranges.slice();
       ranges.push({ id: uuid(), minOpen: false, maxOpen: true });
       return this.props.onChange(update(this.props.xform, { ranges: { $set: ranges }}));
-    }
+    };
 
-    handleRemoveRange(index) {
+    handleRemoveRange = index => {
       const ranges = this.props.xform.ranges.slice();
       ranges.splice(index, 1);
       return this.props.onChange(update(this.props.xform, { ranges: { $set: ranges }}));
-    }
+    };
 
-    renderRange(range, index, connectDragSource, connectDragPreview, connectDropTarget) {
+    renderRange = (range, index, connectDragSource, connectDragPreview, connectDropTarget) => {
       return R(RangeComponent, {
         key: range.id,
         range,
@@ -61,11 +54,11 @@ export default RangesComponent = (function() {
         connectDropTarget
       }
       );
-    }
+    };
 
-    handleReorder(ranges) {
+    handleReorder = ranges => {
       return this.props.onChange(update(this.props.xform, { ranges: { $set: ranges }}));
-    }
+    };
 
     render() {
       return R('div', null,
@@ -105,12 +98,6 @@ export default RangesComponent = (function() {
 
 // Single range (row)
 class RangeComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleMinOpenChange = this.handleMinOpenChange.bind(this);
-    this.handleMaxOpenChange = this.handleMaxOpenChange.bind(this);
-  }
-
   static initClass() {
     this.propTypes = {
       range: PropTypes.object.isRequired,   // Range to edit
@@ -123,13 +110,13 @@ class RangeComponent extends React.Component {
      //reorderable connector
   }
 
-  handleMinOpenChange(minOpen) {
+  handleMinOpenChange = minOpen => {
     return this.props.onChange(update(this.props.range, { minOpen: { $set: minOpen }}));
-  }
+  };
 
-  handleMaxOpenChange(maxOpen) {
+  handleMaxOpenChange = maxOpen => {
     return this.props.onChange(update(this.props.range, { maxOpen: { $set: maxOpen }}));
-  }
+  };
 
   render() {
     let placeholder = "";

@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let DatagridViewComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -53,15 +55,6 @@ export default DatagridViewComponent = (function() {
     }
 
     constructor(props) {
-      this.reload = this.reload.bind(this);
-      this.handleColumnResize = this.handleColumnResize.bind(this);
-      this.handleCellClick = this.handleCellClick.bind(this);
-      this.handleSaveEdit = this.handleSaveEdit.bind(this);
-      this.handleCancelEdit = this.handleCancelEdit.bind(this);
-      this.refEditCell = this.refEditCell.bind(this);
-      this.handleRowDoubleClick = this.handleRowDoubleClick.bind(this);
-      this.handleRowClick = this.handleRowClick.bind(this);
-      this.renderCell = this.renderCell.bind(this);
       super(props);
       this.state = {
         rows: [],
@@ -118,9 +111,9 @@ export default DatagridViewComponent = (function() {
     }
 
     // Reloads all data
-    reload() {
+    reload = () => {
       return this.setState({rows: [], entirelyLoaded: false});    
-    }
+    };
 
 
     deleteRow(rowIndex, callback) {
@@ -148,7 +141,7 @@ export default DatagridViewComponent = (function() {
       });
     }
 
-    handleColumnResize(newColumnWidth, columnKey) {
+    handleColumnResize = (newColumnWidth, columnKey) => {
       // Find index of column
       const columnIndex = _.findIndex(this.props.design.columns, { id: columnKey });
 
@@ -161,9 +154,9 @@ export default DatagridViewComponent = (function() {
       columns[columnIndex] = column;
 
       return this.props.onDesignChange(_.extend({}, this.props.design, { columns }));
-    }
+    };
 
-    handleCellClick(rowIndex, columnIndex) {
+    handleCellClick = (rowIndex, columnIndex) => {
       // Ignore if already editing
       if ((this.state.editingCell?.rowIndex === rowIndex) && (this.state.editingCell?.columnIndex === columnIndex)) {
         return; 
@@ -212,10 +205,10 @@ export default DatagridViewComponent = (function() {
           return this.setState({editingCell: { rowIndex, columnIndex }});
         }
       });
-    }
+    };
 
     // Called to save 
-    handleSaveEdit() {
+    handleSaveEdit = () => {
       // Ignore if not changed
       if (!this.editCellComp || !this.editCellComp.hasChanged()) {
         this.setState({editingCell: null, savingCell: false});
@@ -238,31 +231,31 @@ export default DatagridViewComponent = (function() {
           });
         });
       });
-    }
+    };
 
-    handleCancelEdit() {
+    handleCancelEdit = () => {
       return this.setState({editingCell: null, savingCell: false});
-    }
+    };
 
     // Called with current ref edit. Save
-    refEditCell(comp) {
+    refEditCell = comp => {
       return this.editCellComp = comp;
-    }
+    };
 
-    handleRowDoubleClick(ev, rowIndex) {
+    handleRowDoubleClick = (ev, rowIndex) => {
       if ((this.props.onRowDoubleClick != null) && this.state.rows[rowIndex].id) {
         return this.props.onRowDoubleClick(this.props.design.table, this.state.rows[rowIndex].id, rowIndex);
       }
-    }
-  
-    handleRowClick(ev, rowIndex) {
+    };
+
+    handleRowClick = (ev, rowIndex) => {
       if ((this.props.onRowClick != null) && this.state.rows[rowIndex].id) {
         return this.props.onRowClick(this.props.design.table, this.state.rows[rowIndex].id, rowIndex);
       }
-    }
+    };
 
     // Render a single cell. exprType is passed in for performance purposes and is calculated once per column
-    renderCell(column, columnIndex, exprType, cellProps) {
+    renderCell = (column, columnIndex, exprType, cellProps) => {
       // If rendering placeholder row
       if (cellProps.rowIndex >= this.state.rows.length) {
         // Load next tick as cannot update while rendering
@@ -331,7 +324,7 @@ export default DatagridViewComponent = (function() {
         }
         );
       }
-    }
+    };
 
     // Render a single column
     renderColumn(column, columnIndex) {

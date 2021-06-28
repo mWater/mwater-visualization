@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let TableChartDesignerComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -18,20 +20,6 @@ import { getDefaultFormat } from '../../../valueFormatter';
 
 export default TableChartDesignerComponent = (function() {
   TableChartDesignerComponent = class TableChartDesignerComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleTitleTextChange = this.handleTitleTextChange.bind(this);
-      this.handleTableChange = this.handleTableChange.bind(this);
-      this.handleFilterChange = this.handleFilterChange.bind(this);
-      this.handleOrderingsChange = this.handleOrderingsChange.bind(this);
-      this.handleLimitChange = this.handleLimitChange.bind(this);
-      this.handleColumnChange = this.handleColumnChange.bind(this);
-      this.handleRemoveColumn = this.handleRemoveColumn.bind(this);
-      this.handleAddColumn = this.handleAddColumn.bind(this);
-      this.renderColumn = this.renderColumn.bind(this);
-      this.handleReorder = this.handleReorder.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         design: PropTypes.object.isRequired,
@@ -47,29 +35,29 @@ export default TableChartDesignerComponent = (function() {
       return this.props.onDesignChange(design);
     }
 
-    handleTitleTextChange(ev) {  return this.updateDesign({titleText: ev.target.value}); }
-    handleTableChange(table) { return this.updateDesign({table}); }
-    handleFilterChange(filter) { return this.updateDesign({filter}); }
-    handleOrderingsChange(orderings) { return this.updateDesign({orderings}); }
-    handleLimitChange(limit) { return this.updateDesign({limit}); }
+    handleTitleTextChange = ev => {  return this.updateDesign({titleText: ev.target.value}); };
+    handleTableChange = table => { return this.updateDesign({table}); };
+    handleFilterChange = filter => { return this.updateDesign({filter}); };
+    handleOrderingsChange = orderings => { return this.updateDesign({orderings}); };
+    handleLimitChange = limit => { return this.updateDesign({limit}); };
 
-    handleColumnChange(index, column) {
+    handleColumnChange = (index, column) => {
       const columns = this.props.design.columns.slice();
       columns[index] = column;
       return this.updateDesign({columns});
-    }
+    };
 
-    handleRemoveColumn(index) {
+    handleRemoveColumn = index => {
       const columns = this.props.design.columns.slice();
       columns.splice(index, 1);
       return this.updateDesign({columns});
-    }
+    };
 
-    handleAddColumn() {
+    handleAddColumn = () => {
       const columns = this.props.design.columns.slice();
       columns.push({id: uuid()});
       return this.updateDesign({columns});
-    }
+    };
 
     renderTable() {
       return R('div', {className: "form-group"},
@@ -93,7 +81,7 @@ export default TableChartDesignerComponent = (function() {
         R('input', {type: "text", className: "form-control input-sm", value: this.props.design.titleText, onChange: this.handleTitleTextChange, placeholder: "Untitled"}));
     }
 
-    renderColumn(column, index, connectDragSource, connectDragPreview, connectDropTarget) {
+    renderColumn = (column, index, connectDragSource, connectDragPreview, connectDropTarget) => {
       const style = {
         borderTop: "solid 1px #EEE",
         paddingTop: 10,
@@ -110,11 +98,11 @@ export default TableChartDesignerComponent = (function() {
           onRemove: this.handleRemoveColumn.bind(null, index),
           connectDragSource
           }))));
-    }
+    };
 
-    handleReorder(map) {
+    handleReorder = map => {
       return this.updateDesign({columns: map});
-    }
+    };
 
     renderColumns() {
       if (!this.props.design.table) {
@@ -134,9 +122,9 @@ export default TableChartDesignerComponent = (function() {
           " Add Column")
       );
     }
-      // return R 'div', className: "form-group",
-      //   _.map(@props.design.columns, (column, i) => @renderColumn(i))
-      //
+    // return R 'div', className: "form-group",
+    //   _.map(@props.design.columns, (column, i) => @renderColumn(i))
+    //
 
     renderOrderings() {
       // If no table, hide
@@ -222,14 +210,6 @@ export default TableChartDesignerComponent = (function() {
 })();
 
 class TableChartColumnDesignerComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleExprChange = this.handleExprChange.bind(this);
-    this.handleHeaderTextChange = this.handleHeaderTextChange.bind(this);
-    this.handleAggrChange = this.handleAggrChange.bind(this);
-    this.handleFormatChange = this.handleFormatChange.bind(this);
-  }
-
   static initClass() {
     this.propTypes = {
       design: PropTypes.object.isRequired,
@@ -256,11 +236,10 @@ class TableChartColumnDesignerComponent extends React.Component {
     return this.updateColumn({textAxis});
   }
 
-  handleExprChange(expr) { return this.updateTextAxis({expr}); }
-  handleHeaderTextChange(ev) { return this.updateColumn({headerText: ev.target.value}); }
-  handleAggrChange(aggr) { return this.updateTextAxis({aggr}); }
-
-  handleFormatChange(ev) { return this.updateColumn({format: ev.target.value}); }
+  handleExprChange = expr => { return this.updateTextAxis({expr}); };
+  handleHeaderTextChange = ev => { return this.updateColumn({headerText: ev.target.value}); };
+  handleAggrChange = aggr => { return this.updateTextAxis({aggr}); };
+  handleFormatChange = ev => { return this.updateColumn({format: ev.target.value}); };
 
   renderRemove() {
     if (this.props.design.columns.length > 1) {

@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -9,12 +11,6 @@ import { DropTarget } from 'react-dnd';
 
 // Clipboard item in a palette that has special properties
 class ClipboardPaletteItemComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.createItem = this.createItem.bind(this);
-    this.handleClear = this.handleClear.bind(this);
-  }
-
   static initClass() {
     this.propTypes = {
       clipboard: PropTypes.object,
@@ -24,16 +20,16 @@ class ClipboardPaletteItemComponent extends React.Component {
       // Set if can't paste current contents (usually because missing extra tables)
   }
 
-  createItem() {
+  createItem = () => {
     // Add unique id
     return { block: _.extend({}, this.props.clipboard, {id: uuid()}) };
-  }
+  };
 
-  handleClear() {
+  handleClear = () => {
     if (confirm("Clear clipboard?")) {
       return this.props.onClipboardChange(null);
     }
-  }
+  };
 
   render() {
     let elem = this.props.connectDropTarget(
@@ -79,10 +75,12 @@ const blockTargetSpec = {
   }
 };
 
-const collectTarget = (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver({ shallow: true }),
-  canDrop: monitor.canDrop()
-});
+function collectTarget(connect, monitor) {
+  return {
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver({ shallow: true }),
+    canDrop: monitor.canDrop()
+  };
+}
 
 export default _.flow(DropTarget("visualization-block", blockTargetSpec, collectTarget))(ClipboardPaletteItemComponent);

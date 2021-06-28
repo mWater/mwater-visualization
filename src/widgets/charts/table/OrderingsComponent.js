@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let OrderingsComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -11,13 +13,6 @@ import { ExprComponent } from "mwater-expressions-ui";
 // NOTE: no longer uses complete axis, just the expr
 export default OrderingsComponent = (function() {
   OrderingsComponent = class OrderingsComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleAdd = this.handleAdd.bind(this);
-      this.handleOrderingRemove = this.handleOrderingRemove.bind(this);
-      this.handleOrderingChange = this.handleOrderingChange.bind(this);
-    }
-
     static initClass() {
       this.propTypes = { 
         orderings: PropTypes.array.isRequired,
@@ -29,23 +24,23 @@ export default OrderingsComponent = (function() {
        // Current table
     }
 
-    handleAdd() {
+    handleAdd = () => {
       const orderings = this.props.orderings.slice();
       orderings.push({ axis: null, direction: "asc" });
       return this.props.onOrderingsChange(orderings);
-    }
+    };
 
-    handleOrderingRemove(index) {
+    handleOrderingRemove = index => {
       const orderings = this.props.orderings.slice();
       orderings.splice(index, 1);
       return this.props.onOrderingsChange(orderings);
-    }
+    };
 
-    handleOrderingChange(index, ordering) {
+    handleOrderingChange = (index, ordering) => {
       const orderings = this.props.orderings.slice();
       orderings[index] = ordering;
       return this.props.onOrderingsChange(orderings);
-    }
+    };
 
     render() {
       return R('div', null,
@@ -71,13 +66,6 @@ export default OrderingsComponent = (function() {
 })();
 
 class OrderingComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleAxisChange = this.handleAxisChange.bind(this);
-    this.handleExprChange = this.handleExprChange.bind(this);
-    this.handleDirectionChange = this.handleDirectionChange.bind(this);
-  }
-
   static initClass() {
     this.propTypes = { 
       ordering: PropTypes.object.isRequired,
@@ -90,18 +78,18 @@ class OrderingComponent extends React.Component {
      // Current table
   }
 
-  handleAxisChange(axis) {
+  handleAxisChange = axis => {
     return this.props.onOrderingChange(_.extend({}, this.props.ordering, {axis}));
-  }
+  };
 
-  handleExprChange(expr) {
+  handleExprChange = expr => {
     const axis = _.extend({}, this.props.ordering.axis || {}, {expr});
     return this.handleAxisChange(axis);
-  }
+  };
 
-  handleDirectionChange(ev) {
+  handleDirectionChange = ev => {
     return this.props.onOrderingChange(_.extend({}, this.props.ordering, {direction: ev.target.checked ? "desc" : "asc"}));
-  }
+  };
 
   render() {
     return R('div', {style: { marginLeft: 5 }},

@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 
 
 // Data source for a dashboard that allows client-server model that supports sharing of dashboards

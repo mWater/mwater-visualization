@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let MapComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -44,10 +46,6 @@ export default MapComponent = (function() {
     }
 
     constructor(props) {
-      this.handleUndo = this.handleUndo.bind(this);
-      this.handleRedo = this.handleRedo.bind(this);
-      this.handleZoomLockClick = this.handleZoomLockClick.bind(this);
-      this.handleDesignChange = this.handleDesignChange.bind(this);
       super(props);
       this.state = { 
         undoStack: new UndoStack().push(props.design), 
@@ -65,28 +63,28 @@ export default MapComponent = (function() {
       }
     }
 
-    handleUndo() { 
+    handleUndo = () => { 
       const undoStack = this.state.undoStack.undo();
 
       // We need to use callback as state is applied later
       return this.setState({undoStack}, () => this.props.onDesignChange(undoStack.getValue()));
-    }
+    };
 
-    handleRedo() {
+    handleRedo = () => {
       const undoStack = this.state.undoStack.redo();
 
       // We need to use callback as state is applied later
       return this.setState({undoStack}, () => this.props.onDesignChange(undoStack.getValue()));
-    }
+    };
 
     // Gets the current design, whether prop or transient
     getDesign() {
       return this.state.transientDesign || this.props.design;
     }
-  
-    handleZoomLockClick() { 
+
+    handleZoomLockClick = () => { 
       return this.setState({zoomLocked: !this.state.zoomLocked});
-    }
+    };
 
     renderActionLinks() {
       return R('div', null,
@@ -115,13 +113,13 @@ export default MapComponent = (function() {
         this.props.titleElem);
     }
 
-    handleDesignChange(design) {
+    handleDesignChange = design => {
       if (this.props.onDesignChange) {
         return this.props.onDesignChange(design);
       } else {
         return this.setState({transientDesign: design});
       }
-    }
+    };
 
     getDesign() {
       if (this.props.onDesignChange) {

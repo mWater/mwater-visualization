@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let DatagridQueryBuilder;
 import _ from 'lodash';
 import { ExprCompiler } from "mwater-expressions";

@@ -1,10 +1,12 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let MWaterTableSelectComponent;
 import _ from 'lodash';
 import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
 const R = React.createElement;
-import uiComponents from './UIComponents';
+import * as uiComponents from './UIComponents';
 import { ExprUtils } from "mwater-expressions";
 import MWaterResponsesFilterComponent from './MWaterResponsesFilterComponent';
 import ModalPopupComponent from 'react-library/lib/ModalPopupComponent';
@@ -40,8 +42,6 @@ export default MWaterTableSelectComponent = (function() {
     }
 
     constructor(props) {
-      this.handleChange = this.handleChange.bind(this);
-      this.handleTableChange = this.handleTableChange.bind(this);
       super(props);
 
       this.state = {
@@ -75,7 +75,7 @@ export default MWaterTableSelectComponent = (function() {
       }
     }
 
-    handleChange(tableId) {
+    handleChange = tableId => {
       // Close toggle edit
       this.toggleEdit.close();
 
@@ -83,9 +83,9 @@ export default MWaterTableSelectComponent = (function() {
       if (tableId !== this.props.table) {
         return this.props.onChange(tableId);
       }
-    }
+    };
 
-    handleTableChange(tableId) {
+    handleTableChange = tableId => {
       // If not part of extra tables, add it and wait for new schema
       if (tableId && !this.props.schema.getTable(tableId)) {
         return this.setState({pendingExtraTable: tableId}, () => {
@@ -94,7 +94,7 @@ export default MWaterTableSelectComponent = (function() {
       } else {
         return this.handleChange(tableId);
       }
-    }
+    };
 
     render() {
       const editor = R(EditModeTableSelectComponent, {
@@ -166,8 +166,6 @@ class EditModeTableSelectComponent extends React.Component {
   }
 
   constructor(props) {
-    this.handleShowMore = this.handleShowMore.bind(this);
-    this.handleCompleteChange = this.handleCompleteChange.bind(this);
     super(props);
 
     this.state = {
@@ -176,9 +174,9 @@ class EditModeTableSelectComponent extends React.Component {
     };
   }
 
-  handleShowMore() {
+  handleShowMore = () => {
     return this.setState({completeMode: true});
-  }
+  };
 
   // Get list of tables that should be included in shortlist
   // This is all active tables and all responses tables in schema (so as to include rosters) and all extra tables
@@ -215,10 +213,10 @@ class EditModeTableSelectComponent extends React.Component {
     return tables;
   }
 
-  handleCompleteChange(tableId) {
+  handleCompleteChange = tableId => {
     this.setState({completeMode: false});
     return this.props.onChange(tableId);
-  }
+  };
 
   render() {
     const items = _.map(this.getTableShortlist(), tableId => {

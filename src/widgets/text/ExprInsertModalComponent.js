@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let ExprInsertModalComponent;
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -24,7 +26,6 @@ export default ExprInsertModalComponent = (function() {
     }
 
     constructor(props) {
-      this.handleInsert = this.handleInsert.bind(this);
       super(props);
 
       this.state = {
@@ -37,7 +38,7 @@ export default ExprInsertModalComponent = (function() {
       return this.setState({open: true, exprItem: { type: "expr", id: uuid() }});
     }
 
-    handleInsert(ev) {
+    handleInsert = ev => {
       if (!this.state.exprItem) {
         return;
       }
@@ -46,7 +47,7 @@ export default ExprInsertModalComponent = (function() {
       return this.setState({open: false}, () => {
         return this.props.onInsert(this.state.exprItem);
       });
-    }
+    };
 
     render() {
       if (!this.state.open) {

@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let ImageWidgetComponent;
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -19,11 +21,6 @@ import ImagelistCarouselComponent from './ImagelistCarouselComponent';
 
 export default ImageWidgetComponent = (function() {
   ImageWidgetComponent = class ImageWidgetComponent extends AsyncLoadComponent {
-    constructor(...args) {
-      super(...args);
-      this.handleStartEditing = this.handleStartEditing.bind(this);
-    }
-
     static initClass() {
       this.propTypes = { 
         design: PropTypes.object.isRequired,
@@ -54,10 +51,10 @@ export default ImageWidgetComponent = (function() {
         return callback({error, data });
       });
     }
-    
-    handleStartEditing() {
+
+    handleStartEditing = () => {
       return this.editor.edit();
-    }
+    };
 
     // Render a link to start editing
     renderEditLink() {
@@ -172,17 +169,6 @@ class ImageWidgetDesignComponent extends React.Component {
   }
 
   constructor(props) {
-    this.edit = this.edit.bind(this);
-    this.handleImageUrlChange = this.handleImageUrlChange.bind(this);
-    this.handleUrlChange = this.handleUrlChange.bind(this);
-    this.handleFileUpload = this.handleFileUpload.bind(this);
-    this.handleExpressionChange = this.handleExpressionChange.bind(this);
-    this.handleTableChange = this.handleTableChange.bind(this);
-    this.handleCaptionChange = this.handleCaptionChange.bind(this);
-    this.handleRotationChange = this.handleRotationChange.bind(this);
-    this.handleCaptionPositionChange = this.handleCaptionPositionChange.bind(this);
-    this.handleSave = this.handleSave.bind(this);
-    this.handleCancel = this.handleCancel.bind(this);
     super(props);
 
     this.state = {
@@ -204,7 +190,7 @@ class ImageWidgetDesignComponent extends React.Component {
     };
   }
 
-  edit() {
+  edit = () => {
     this.setCurrentTab();
     const state = {
       editing: true,
@@ -219,7 +205,7 @@ class ImageWidgetDesignComponent extends React.Component {
     };
 
     return this.setState(state);
-  }
+  };
 
   setCurrentTab() {
     let tab = "upload";
@@ -230,13 +216,13 @@ class ImageWidgetDesignComponent extends React.Component {
     return this.setState({currentTab: tab});
   }
 
-  handleImageUrlChange(e) {
+  handleImageUrlChange = e => {
     return this.setState({imageUrl: e.target.value, uid: null, expr: null});
-  }
+  };
 
-  handleUrlChange(e) {
+  handleUrlChange = e => {
     return this.setState({url: e.target.value});
-  }
+  };
 
   renderUploadEditor() {
     return R('div', null,
@@ -249,20 +235,20 @@ class ImageWidgetDesignComponent extends React.Component {
       this.renderRotation());
   }
 
-  handleFileUpload(uid) {
+  handleFileUpload = uid => {
     return this.setState({imageUrl: null, uid, expr: null});
-  }
+  };
 
-  handleExpressionChange(expr) {
+  handleExpressionChange = expr => {
     return this.setState({imageUrl: null, uid: null, expr, url: null});
-  }
+  };
 
-  handleTableChange(table) { return this.setState({table}); }
-  handleCaptionChange(ev) { return this.setState({caption: ev.target.value}); }
-  handleRotationChange(rotation) { return this.setState({rotation}); }
-  handleCaptionPositionChange(captionPosition) { return this.setState({captionPosition}); }
+  handleTableChange = table => { return this.setState({table}); };
+  handleCaptionChange = ev => { return this.setState({caption: ev.target.value}); };
+  handleRotationChange = rotation => { return this.setState({rotation}); };
+  handleCaptionPositionChange = captionPosition => { return this.setState({captionPosition}); };
 
-  handleSave() {
+  handleSave = () => {
     this.setState({editing: false});
     const updates = {
       imageUrl: this.state.imageUrl,
@@ -275,12 +261,12 @@ class ImageWidgetDesignComponent extends React.Component {
     };
 
     return this.props.onDesignChange(_.extend({}, this.props.design, updates));
-  }
+  };
 
-  handleCancel() {
+  handleCancel = () => {
     this.setCurrentTab();
     return this.setState({editing: false, imageUrl: null, url: null, uid: null, expr: null, table: null, files: null, uploading: false, captionPosition: null});
-  }
+  };
 
   renderExpressionEditor() {
     return R('div', {className: "form-group"},

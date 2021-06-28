@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let DatagridDesignerComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -23,15 +25,6 @@ import { getDefaultFormat } from '../valueFormatter';
 // Designer for the datagrid. Currenly allows only single-table designs (no subtable rows)
 export default DatagridDesignerComponent = (function() {
   DatagridDesignerComponent = class DatagridDesignerComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleTableChange = this.handleTableChange.bind(this);
-      this.handleColumnsChange = this.handleColumnsChange.bind(this);
-      this.handleFilterChange = this.handleFilterChange.bind(this);
-      this.handleGlobalFiltersChange = this.handleGlobalFiltersChange.bind(this);
-      this.handleOrderBysChange = this.handleOrderBysChange.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         schema: PropTypes.object.isRequired,     // schema to use
@@ -45,30 +38,30 @@ export default DatagridDesignerComponent = (function() {
        // Call with props { schema, dataSource, globalFilters, filterableTables, onChange, nullIfIrrelevant }. Displays a component to edit global filters
     }
 
-    handleTableChange(table) {
+    handleTableChange = table => {
       const design = {
         table,
         columns: []
       };
 
       return this.props.onDesignChange(design);
-    }
+    };
 
-    handleColumnsChange(columns) {
+    handleColumnsChange = columns => {
       return this.props.onDesignChange(update(this.props.design, {columns: { $set: columns }}));
-    }
+    };
 
-    handleFilterChange(filter) {
+    handleFilterChange = filter => {
       return this.props.onDesignChange(update(this.props.design, {filter: { $set: filter }}));
-    }
+    };
 
-    handleGlobalFiltersChange(globalFilters) {
+    handleGlobalFiltersChange = globalFilters => {
       return this.props.onDesignChange(update(this.props.design, {globalFilters: { $set: globalFilters }}));
-    }
+    };
 
-    handleOrderBysChange(orderBys) {
+    handleOrderBysChange = orderBys => {
       return this.props.onDesignChange(update(this.props.design, {orderBys: { $set: orderBys }}));
-    }
+    };
 
     // Render the tabs of the designer
     renderTabs() {
@@ -192,16 +185,6 @@ DatagridOptionsComponent.initClass();
 
 // Columns list
 class ColumnsDesignerComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleColumnChange = this.handleColumnChange.bind(this);
-    this.handleAddColumn = this.handleAddColumn.bind(this);
-    this.handleAddIdColumn = this.handleAddIdColumn.bind(this);
-    this.handleAddDefaultColumns = this.handleAddDefaultColumns.bind(this);
-    this.handleRemoveAllColumns = this.handleRemoveAllColumns.bind(this);
-    this.renderColumn = this.renderColumn.bind(this);
-  }
-
   static initClass() {
     this.propTypes = {
       schema: PropTypes.object.isRequired,     // schema to use
@@ -213,7 +196,7 @@ class ColumnsDesignerComponent extends React.Component {
      // Called when columns changes
   }
 
-  handleColumnChange(columnIndex, column) {
+  handleColumnChange = (columnIndex, column) => {
     const columns = this.props.columns.slice();
 
     // Handle remove
@@ -227,22 +210,22 @@ class ColumnsDesignerComponent extends React.Component {
     }
 
     return this.props.onColumnsChange(columns);
-  }
+  };
 
-  handleAddColumn() {
+  handleAddColumn = () => {
     const columns = this.props.columns.slice();
     columns.push({ id: uuid(), type: "expr", width: 150 });
     return this.props.onColumnsChange(columns);
-  }
+  };
 
-  handleAddIdColumn() {
+  handleAddIdColumn = () => {
     const columns = this.props.columns.slice();
     // TODO we should display label when available but without breaking Peter's id downloads. Need format field to indicate raw id.
     columns.push({ id: uuid(), type: "expr", width: 150, expr: { type: "id", table: this.props.table }, label: "Unique Id" });
     return this.props.onColumnsChange(columns);
-  }
+  };
 
-  handleAddDefaultColumns() {
+  handleAddDefaultColumns = () => {
     // Create labeled expressions
     const labeledExprs = new LabeledExprGenerator(this.props.schema).generate(this.props.table, {
       headerFormat: "text"
@@ -261,13 +244,19 @@ class ColumnsDesignerComponent extends React.Component {
 
     columns = this.props.columns.concat(columns);
     return this.props.onColumnsChange(columns);
-  }
+  };
 
-  handleRemoveAllColumns() {
+  handleRemoveAllColumns = () => {
     return this.props.onColumnsChange([]);
-  }
+  };
 
-  renderColumn(column, columnIndex, connectDragSource, connectDragPreview, connectDropTarget) {
+  renderColumn = (
+    column,
+    columnIndex,
+    connectDragSource,
+    connectDragPreview,
+    connectDropTarget
+  ) => {
     return R(ColumnDesignerComponent, {
       key: columnIndex,
       schema: this.props.schema,
@@ -280,7 +269,7 @@ class ColumnsDesignerComponent extends React.Component {
       connectDropTarget
     }
     );
-  }
+  };
 
   render() {
     return R('div', {style: { height: "auto",overflowY: "auto",  overflowX: "hidden" }},
@@ -335,16 +324,6 @@ ColumnsDesignerComponent.initClass();
 
 // Column item
 class ColumnDesignerComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleExprChange = this.handleExprChange.bind(this);
-    this.handleLabelChange = this.handleLabelChange.bind(this);
-    this.handleFormatChange = this.handleFormatChange.bind(this);
-    this.handleSplitEnumset = this.handleSplitEnumset.bind(this);
-    this.handleSplitGeometry = this.handleSplitGeometry.bind(this);
-    this.render = this.render.bind(this);
-  }
-
   static initClass() {
     this.propTypes = {
       schema: PropTypes.object.isRequired,     // schema to use
@@ -359,19 +338,19 @@ class ColumnDesignerComponent extends React.Component {
      // Connect drop target
   }
 
-  handleExprChange(expr) {
+  handleExprChange = expr => {
     return this.props.onColumnChange(update(this.props.column, {expr: { $set: expr }}));
-  }
+  };
 
-  handleLabelChange(label) {
+  handleLabelChange = label => {
     return this.props.onColumnChange(update(this.props.column, {label: { $set: label }}));
-  }
+  };
 
-  handleFormatChange(ev) {
+  handleFormatChange = ev => {
     return this.props.onColumnChange(update(this.props.column, {format: { $set: ev.target.value }}));
-  }
+  };
 
-  handleSplitEnumset() {
+  handleSplitEnumset = () => {
     const exprUtils = new ExprUtils(this.props.schema);
 
     return this.props.onColumnChange(_.map(exprUtils.getExprEnumValues(this.props.column.expr), enumVal => {
@@ -390,9 +369,9 @@ class ColumnDesignerComponent extends React.Component {
         }
       };
     }));
-  }
+  };
 
-  handleSplitGeometry() {
+  handleSplitGeometry = () => {
     return this.props.onColumnChange([
       {
         id: uuid(),
@@ -417,7 +396,7 @@ class ColumnDesignerComponent extends React.Component {
         }
       }
     ]);
-  }
+  };
 
   // Render options to split a column, such as an enumset to booleans or geometry to lat/lng
   renderSplit() {
@@ -458,7 +437,7 @@ class ColumnDesignerComponent extends React.Component {
     );
   }
 
-  render() {
+  render = () => {
     const exprUtils = new ExprUtils(this.props.schema);
     const exprValidator = new ExprValidator(this.props.schema);
 
@@ -514,6 +493,6 @@ class ColumnDesignerComponent extends React.Component {
     );
 
     return this.props.connectDropTarget(this.props.connectDragPreview(elem));
-  }
+  };
 }
 ColumnDesignerComponent.initClass();

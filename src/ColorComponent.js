@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let ColorComponent;
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -18,36 +20,31 @@ export default ColorComponent = (function() {
     }
 
     constructor(props) {
-      this.handleClick = this.handleClick.bind(this);
-      this.handleClose = this.handleClose.bind(this);
-      this.handleReset = this.handleReset.bind(this);
-      this.handleTransparent = this.handleTransparent.bind(this);
-      this.handleAdvanced = this.handleAdvanced.bind(this);
       super(props);
       this.state = { open: false, advanced: false };
     }
 
-    handleClick() {
+    handleClick = () => {
       return this.setState({open: !this.state.open, advanced: false});
-    }
+    };
 
-    handleClose(color) {
+    handleClose = color => {
       return this.props.onChange(color.hex);
-    }
+    };
 
-    handleReset() {
+    handleReset = () => {
       this.setState({open: false});
       return this.props.onChange(null);
-    }
+    };
 
-    handleTransparent() {
+    handleTransparent = () => {
       this.setState({open: false});
       return this.props.onChange("transparent");
-    }
+    };
 
-    handleAdvanced() {
+    handleAdvanced = () => {
       return this.setState({advanced: !this.state.advanced});
-    }
+    };
 
     render() {
       const style = {

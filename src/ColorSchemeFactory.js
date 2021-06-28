@@ -1,24 +1,28 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let ColorSchemeFactory;
 import _ from 'lodash';
 import d3Scale from 'd3-scale';
 import brewer from 'd3-scale-chromatic';
 import c_c from 'color-mixer';
 
-const rgbStringToHex = function(rgbString) {
+function rgbStringToHex(rgbString) {
   const rgbArray = rgbString.substring(4,rgbString.length-1).split(',').map(item => parseInt(item));
   const _color = new c_c.Color({rgb: rgbArray});
   return _color.hex();
-};
+}
 
-const generateCategoricalSet = (set, number, reversed) => __range__(0, number, false).map((i) => set[(reversed ? number - i - 1 : i) % set.length]);
+function generateCategoricalSet(set, number, reversed) {
+  return __range__(0, number, false).map((i) => set[(reversed ? number - i - 1 : i) % set.length]);
+}
 
-const generateSequentialSet = function(set, number, reversed) {
+function generateSequentialSet(set, number, reversed) {
   const color = d3Scale.scaleLinear()
     .domain([0,number-1])
     .range([0,1]);
   const colors = (__range__(0, number, false).map((i) => set(color((reversed ? number - i - 1 : i)))));
   return _.map(colors, color => rgbStringToHex(color));
-};
+}
 
 export default ColorSchemeFactory = class ColorSchemeFactory {
   // creates a color scheme

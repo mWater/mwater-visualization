@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let TOCWidget;
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -64,17 +66,14 @@ class TOCWidgetComponent extends React.Component {
   }
 
   constructor(props) {
-    this.handleStartEditing = this.handleStartEditing.bind(this);
-    this.handleEndEditing = this.handleEndEditing.bind(this);
     super(props);
     this.state = { 
       editing: false // true if editing
-    };  
+    };
   }
 
-  handleStartEditing() { return this.setState({editing: true}); }
-
-  handleEndEditing() { return this.setState({editing: false}); }
+  handleStartEditing = () => { return this.setState({editing: true}); };
+  handleEndEditing = () => { return this.setState({editing: false}); };
 
   renderEditor() {
     if (!this.state.editing) {
@@ -131,11 +130,6 @@ TOCWidgetComponent.initClass();
 
 // Displays the contents of the widget
 class TOCWidgetViewComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleEntryClick = this.handleEntryClick.bind(this);
-  }
-
   static initClass() {
     this.propTypes = {
       design: PropTypes.object.isRequired, // Design of chart
@@ -154,9 +148,9 @@ class TOCWidgetViewComponent extends React.Component {
     };
   }
 
-  handleEntryClick(tocEntry) {
+  handleEntryClick = tocEntry => {
     return this.props.onScrollToTOCEntry?.(tocEntry.widgetId, tocEntry.id);
-  }
+  };
 
   renderTOCEntry(tocEntry, index) {
     // Find indentation number (e.g "1.3.2") by counting # backwards that are same level with no level lower
@@ -225,7 +219,6 @@ class TOCWidgetDesignerComponent extends React.Component {
   constructor(...args) {
     super(...args);
     this.update = this.update.bind(this);
-    this.handleMarkdownChange = this.handleMarkdownChange.bind(this);
   }
 
   static initClass() { 
@@ -238,10 +231,10 @@ class TOCWidgetDesignerComponent extends React.Component {
   // Updates design with the specified changes
   update() { return update(this.props.design, this.props.onDesignChange, arguments); }
 
-  handleMarkdownChange(ev) {
+  handleMarkdownChange = ev => {
     const design = _.extend({}, this.props.design, {markdown: ev.target.value});
     return this.props.onDesignChange(design);
-  }
+  };
 
   render() {
     return R('div', null,

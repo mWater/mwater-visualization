@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let MapLayerViewDesignerComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -29,14 +31,6 @@ export default MapLayerViewDesignerComponent = (function() {
     }
 
     constructor(props) {
-      this.handleVisibleClick = this.handleVisibleClick.bind(this);
-      this.handleHideLegend = this.handleHideLegend.bind(this);
-      this.handleGroupChange = this.handleGroupChange.bind(this);
-      this.handleToggleEditing = this.handleToggleEditing.bind(this);
-      this.handleSaveEditing = this.handleSaveEditing.bind(this);
-      this.handleRename = this.handleRename.bind(this);
-      this.handleOpacityChange = this.handleOpacityChange.bind(this);
-      this.handleRemove = this.handleRemove.bind(this);
       super(props);
 
       const layer = LayerFactory.createLayer(this.props.layerView.type);
@@ -50,29 +44,29 @@ export default MapLayerViewDesignerComponent = (function() {
       return this.props.onLayerViewChange(_.extend({}, this.props.layerView, updates));
     }
 
-    handleVisibleClick() {
+    handleVisibleClick = () => {
       return this.update({visible: !this.props.layerView.visible});
-    }
+    };
 
-    handleHideLegend(hideLegend) {
+    handleHideLegend = hideLegend => {
       return this.update({hideLegend});
-    }
+    };
 
-    handleGroupChange(group) {
+    handleGroupChange = group => {
       return this.update({group});
-    }
+    };
 
-    handleToggleEditing() { return this.setState({editing: !this.state.editing}); }
-    handleSaveEditing(design) { return this.update({design}); }
+    handleToggleEditing = () => { return this.setState({editing: !this.state.editing}); };
+    handleSaveEditing = design => { return this.update({design}); };
 
-    handleRename() {
+    handleRename = () => {
       if (this.props.allowEditingLayer) {
         const name = prompt("Enter new name", this.props.layerView.name);
         if (name) {
           return this.update({name});
         }
       }
-    }
+    };
 
     renderVisible() {
       if (this.props.layerView.visible) {
@@ -133,15 +127,15 @@ export default MapLayerViewDesignerComponent = (function() {
             ]));
     }
 
-    handleOpacityChange(newValue) {
+    handleOpacityChange = newValue => {
       return this.update({opacity: newValue/100});
-    }
+    };
 
-    handleRemove() {
+    handleRemove = () => {
       if (confirm("Delete layer?")) {
         return this.props.onRemove();
       }
-    }
+    };
 
     renderOpacityControl() {
       return R('div', {className: 'form-group', style: { paddingTop: 10 }},

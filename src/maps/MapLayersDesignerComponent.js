@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let MapLayersDesignerComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -14,14 +16,6 @@ import { ExprCleaner } from "mwater-expressions";
 // Designer for layer selection in the map
 export default MapLayersDesignerComponent = (function() {
   MapLayersDesignerComponent = class MapLayersDesignerComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleLayerViewChange = this.handleLayerViewChange.bind(this);
-      this.handleRemoveLayerView = this.handleRemoveLayerView.bind(this);
-      this.handleReorder = this.handleReorder.bind(this);
-      this.renderLayerView = this.renderLayerView.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         schema: PropTypes.object.isRequired, // Schema to use
@@ -40,7 +34,7 @@ export default MapLayersDesignerComponent = (function() {
       return this.props.onDesignChange(design);
     }
 
-    handleLayerViewChange(index, layerView) {
+    handleLayerViewChange = (index, layerView) => {
       const layerViews = this.props.design.layerViews.slice();
 
       // Update self
@@ -56,19 +50,19 @@ export default MapLayersDesignerComponent = (function() {
       }
 
       return this.updateDesign({layerViews});
-    }
+    };
 
-    handleRemoveLayerView(index) {
+    handleRemoveLayerView = index => {
       const layerViews = this.props.design.layerViews.slice();
       layerViews.splice(index, 1);
       return this.updateDesign({layerViews});
-    }
+    };
 
-    handleReorder(layerList) {
+    handleReorder = layerList => {
       return this.updateDesign({layerViews: layerList});
-    }
+    };
 
-    renderLayerView(layerView, index, connectDragSource, connectDragPreview, connectDropTarget) {
+    renderLayerView = (layerView, index, connectDragSource, connectDragPreview, connectDropTarget) => {
       const style = {
         padding: "10px 15px",
         border: "1px solid #ddd",
@@ -107,7 +101,7 @@ export default MapLayersDesignerComponent = (function() {
         }
         )
       );
-    }
+    };
 
     render() {
       return R('div', {className: "form-group"},

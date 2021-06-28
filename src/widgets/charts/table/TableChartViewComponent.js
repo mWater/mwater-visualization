@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let TableChartViewComponent;
 import $ from 'jquery';
 import PropTypes from 'prop-types';
@@ -58,11 +60,6 @@ export default TableChartViewComponent = (function() {
 })();
 
 class TableContentsComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleRowClick = this.handleRowClick.bind(this);
-  }
-
   static initClass() {
     this.propTypes = {
       columns: PropTypes.array.isRequired, // Columns of chart
@@ -95,13 +92,13 @@ class TableContentsComponent extends React.Component {
     return false;
   }
 
-  handleRowClick(rowIndex) {
+  handleRowClick = rowIndex => {
     const row = this.props.data.main[rowIndex];  
 
     if (row && row.id && this.props.onRowClick) {
       return this.props.onRowClick(this.props.table, row.id);
     }
-  }
+  };
 
   renderHeaderCell(index) {
     const axisBuilder = new AxisBuilder({schema: this.props.schema});

@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let AddLayerComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -11,12 +13,6 @@ import LayerFactory from './LayerFactory';
 // Can be overridden by context of addLayerElementFactory which is called with all props
 export default AddLayerComponent = (function() {
   AddLayerComponent = class AddLayerComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleAddLayer = this.handleAddLayer.bind(this);
-      this.handleAddLayerView = this.handleAddLayerView.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         layerNumber: PropTypes.number.isRequired,  // Number of layers that already exist
@@ -32,7 +28,7 @@ export default AddLayerComponent = (function() {
         // Can be overridden by setting addLayerElementFactory in context that takes ({schema: , dataSource, design, onDesignChange, layerNumber})
     }
 
-    handleAddLayer(newLayer) {
+    handleAddLayer = newLayer => {
       const layerView = {
         id: uuid(),
         name: newLayer.name,
@@ -47,16 +43,16 @@ export default AddLayerComponent = (function() {
       layerView.design = layer.cleanDesign(newLayer.design, this.props.schema);
 
       return this.handleAddLayerView(layerView);
-    }
+    };
 
-    handleAddLayerView(layerView) {
+    handleAddLayerView = layerView => {
       // Add to list
       const layerViews = this.props.design.layerViews.slice();
       layerViews.push(layerView);
 
       const design = _.extend({}, this.props.design, {layerViews});
       return this.props.onDesignChange(design);
-    }
+    };
 
     render() {
       if (this.context.addLayerElementFactory) {

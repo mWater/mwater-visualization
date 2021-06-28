@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let MWaterAddRelatedFormComponent;
 import $ from 'jquery';
 import PropTypes from 'prop-types';
@@ -9,7 +11,7 @@ import moment from 'moment';
 import ModalPopupComponent from 'react-library/lib/ModalPopupComponent';
 import querystring from 'querystring';
 import { ExprUtils } from 'mwater-expressions';
-import ui from './UIComponents';
+import * as ui from './UIComponents';
 import formUtils from 'mwater-forms/lib/formUtils'; // TODO requireing this directly because of bizarre backbone issue
 
 // Link that when clicked popup up a modal window allowing user to select a form
@@ -28,8 +30,6 @@ export default MWaterAddRelatedFormComponent = (function() {
     }
 
     constructor(props) {
-      this.handleOpen = this.handleOpen.bind(this);
-      this.handleSelect = this.handleSelect.bind(this);
       super(props);
 
       this.state = { 
@@ -45,11 +45,11 @@ export default MWaterAddRelatedFormComponent = (function() {
       }
     }
 
-    handleOpen() {
+    handleOpen = () => {
       return this.setState({open: true});
-    }
+    };
 
-    handleSelect(table) {
+    handleSelect = table => {
       this.setState({open: false});
 
       // Wait for table if not in schema
@@ -58,7 +58,7 @@ export default MWaterAddRelatedFormComponent = (function() {
       }
 
       return this.props.onSelect(table);
-    }
+    };
 
     render() {
       return R('div', null,
@@ -190,4 +190,6 @@ class AddRelatedFormModalComponent extends React.Component {
 }
 AddRelatedFormModalComponent.initClass();
 
-var escapeRegex = s => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+function escapeRegex(s) {
+  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}

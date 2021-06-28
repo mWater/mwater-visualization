@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let SegmentDesignerComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -27,13 +29,6 @@ export default SegmentDesignerComponent = (function() {
     }
 
     constructor(props) {
-      this.handleSingleMode = this.handleSingleMode.bind(this);
-      this.handleMultipleMode = this.handleMultipleMode.bind(this);
-      this.handleValueAxisChange = this.handleValueAxisChange.bind(this);
-      this.handleLabelChange = this.handleLabelChange.bind(this);
-      this.handleFilterChange = this.handleFilterChange.bind(this);
-      this.handleOrderExprChange = this.handleOrderExprChange.bind(this);
-      this.handleOrderDirChange = this.handleOrderDirChange.bind(this);
       super(props);
 
       this.state = {
@@ -57,32 +52,32 @@ export default SegmentDesignerComponent = (function() {
       return this.props.onChange(segment);
     }
 
-    handleSingleMode() {
+    handleSingleMode = () => {
       this.update({valueAxis: null});
       return this.setState({mode: "single"});
-    }
+    };
 
-    handleMultipleMode() {
+    handleMultipleMode = () => {
       return this.setState({mode: "multiple"});
-    }
+    };
 
-    handleValueAxisChange(valueAxis) { return this.update({valueAxis}); }
+    handleValueAxisChange = valueAxis => { return this.update({valueAxis}); };
 
-    handleLabelChange(ev) {
+    handleLabelChange = ev => {
       return this.update({label: ev.target.value});
-    }
+    };
 
-    handleFilterChange(filter) {
+    handleFilterChange = filter => {
       return this.update({filter});
-    }
+    };
 
-    handleOrderExprChange(orderExpr) {
+    handleOrderExprChange = orderExpr => {
       return this.update({orderExpr});
-    }
+    };
 
-    handleOrderDirChange(orderDir) {
+    handleOrderDirChange = orderDir => {
       return this.update({orderDir});
-    }
+    };
 
     renderMode() {
       return R(ui.FormGroup, { 

@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let CalendarChartViewComponent;
 import $ from 'jquery';
 import PropTypes from 'prop-types';
@@ -220,7 +222,7 @@ export default CalendarChartViewComponent = (function() {
           return _color;
         });
 
-      const monthPath = function(t0) {
+      function monthPath(t0) {
         const t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0);
         const d0 = t0.getDay();
         const w0 = d3.timeWeek.count(d3.timeYear(t0), t0);
@@ -232,7 +234,7 @@ export default CalendarChartViewComponent = (function() {
           "H" + (w1 * cellSize) + "V" + ((d1 + 1) * cellSize) +
           "H" + ((w1 + 1) * cellSize) + "V" + 0 +
           "H" + ((w0 + 1) * cellSize) + "Z";
-      };
+      }
 
       svg.selectAll(".calendar-chart-month")
         .data( d => d3.timeMonths(new Date(d, 0, 1), new Date(d + 1, 0, 1)))

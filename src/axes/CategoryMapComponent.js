@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let CategoryMapComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -30,13 +32,6 @@ export default CategoryMapComponent = (function() {
     }
 
     constructor(props) {
-      this.handleReorder = this.handleReorder.bind(this);
-      this.handleColorChange = this.handleColorChange.bind(this);
-      this.handleExcludeChange = this.handleExcludeChange.bind(this);
-      this.handleNullLabelChange = this.handleNullLabelChange.bind(this);
-      this.handleCategoryLabelChange = this.handleCategoryLabelChange.bind(this);
-      this.handleToggle = this.handleToggle.bind(this);
-      this.renderCategory = this.renderCategory.bind(this);
       super(props);
 
       this.state = {
@@ -44,12 +39,12 @@ export default CategoryMapComponent = (function() {
       };
     }
 
-    handleReorder(map) {
+    handleReorder = map => {
       const order = _.pluck(map, "value");
       return this.props.onChange(update(this.props.axis, { drawOrder: { $set: order }}));
-    }
+    };
 
-    handleColorChange(value, color) {
+    handleColorChange = (value, color) => {
       // Delete if present for value
       const colorMap = _.filter(this.props.axis.colorMap, item => item.value !== value);
 
@@ -59,9 +54,9 @@ export default CategoryMapComponent = (function() {
       }
 
       return this.props.onChange(update(this.props.axis, { colorMap: { $set: colorMap }}));
-    }
+    };
 
-    handleExcludeChange(value, ev) {
+    handleExcludeChange = (value, ev) => {
       let excludedValues;
       if (ev.target.checked) {
         excludedValues = _.difference(this.props.axis.excludedValues, [value]);
@@ -70,7 +65,7 @@ export default CategoryMapComponent = (function() {
       }
 
       return this.props.onChange(update(this.props.axis, { excludedValues: { $set: excludedValues }}));
-    }
+    };
 
     // Gets the current color value if known
     lookupColor(value) {
@@ -81,14 +76,14 @@ export default CategoryMapComponent = (function() {
       return null;
     }
 
-    handleNullLabelChange(e) {
+    handleNullLabelChange = e => {
       const name = prompt("Enter label for none value", this.props.axis.nullLabel || "None");
       if (name) {
         return this.props.onChange(update(this.props.axis, { nullLabel: { $set: name }}));
       }
-    }
+    };
 
-    handleCategoryLabelChange(category, e) {
+    handleCategoryLabelChange = (category, e) => {
       let {
         label
       } = category;
@@ -110,11 +105,11 @@ export default CategoryMapComponent = (function() {
           }));
         }
       }
-    }
+    };
 
-    handleToggle() {
+    handleToggle = () => {
       return this.setState({collapsed: !this.state.collapsed});
-    }
+    };
 
     renderLabel(category) {
       let {
@@ -135,7 +130,7 @@ export default CategoryMapComponent = (function() {
     }
 
     // Category is { value: category value, label: category label }
-    renderCategory(category, index, connectDragSource, connectDragPreview, connectDropTarget) {
+    renderCategory = (category, index, connectDragSource, connectDragPreview, connectDropTarget) => {
       const labelStyle = {
         verticalAlign: 'middle',
         marginLeft: 5
@@ -191,7 +186,7 @@ export default CategoryMapComponent = (function() {
       }
 
       return elem;
-    }
+    };
 
     renderReorderable() {
       const drawOrder = this.props.axis.drawOrder || _.pluck(this.props.axis.colorMap, "value");

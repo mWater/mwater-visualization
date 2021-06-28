@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let AxisComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -11,7 +13,7 @@ import { ExprCompiler } from 'mwater-expressions';
 import { LinkComponent } from 'mwater-expressions-ui';
 import AxisBuilder from './AxisBuilder';
 import update from 'update-object';
-import ui from '../UIComponents';
+import * as ui from '../UIComponents';
 import BinsComponent from './BinsComponent';
 import RangesComponent from './RangesComponent';
 import AxisColorEditorComponent from './AxisColorEditorComponent';
@@ -58,10 +60,6 @@ export default AxisComponent = (function() {
     }
 
     constructor(props) {
-      this.handleExprChange = this.handleExprChange.bind(this);
-      this.handleFormatChange = this.handleFormatChange.bind(this);
-      this.handleXformTypeChange = this.handleXformTypeChange.bind(this);
-      this.handleXformChange = this.handleXformChange.bind(this);
       super(props);
 
       this.state = {
@@ -147,7 +145,7 @@ export default AxisComponent = (function() {
       });
     }
 
-    handleExprChange(expr) {
+    handleExprChange = expr => {
       // If no expression, reset
       if (!expr) {
         this.props.onChange(null);
@@ -156,13 +154,13 @@ export default AxisComponent = (function() {
 
       // Set expression and clear xform
       return this.props.onChange(this.cleanAxis(_.extend({}, _.omit(this.props.value, ["drawOrder"]), { expr })));
-    }
+    };
 
-    handleFormatChange(ev) {
+    handleFormatChange = ev => {
       return this.props.onChange(_.extend({}, this.props.value, { format: ev.target.value }));
-    }
+    };
 
-    handleXformTypeChange(type) {
+    handleXformTypeChange = type => {
       // Remove
       let xform;
       if (!type) {
@@ -200,11 +198,11 @@ export default AxisComponent = (function() {
       }
 
       return this.props.onChange(update(_.omit(this.props.value, ["colorMap", "drawOrder"]), { xform: { $set: xform }}));
-    }
+    };
 
-    handleXformChange(xform) {
+    handleXformChange = xform => {
       return this.props.onChange(this.cleanAxis(update(_.omit(this.props.value, ["drawOrder"]), { xform: { $set: xform } })));
-    }
+    };
 
     cleanAxis(axis) {
       const axisBuilder = new AxisBuilder({schema: this.props.schema});

@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let PopupFilterJoinsEditComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -27,7 +29,6 @@ export default PopupFilterJoinsEditComponent = (function() {
     }
 
     constructor(props) {
-      this.handleExprChange = this.handleExprChange.bind(this);
       super(props);
 
       this.state = {
@@ -35,13 +36,13 @@ export default PopupFilterJoinsEditComponent = (function() {
       };
     }
 
-    handleExprChange(table, expr) { 
+    handleExprChange = (table, expr) => { 
       let design = this.props.design || this.props.defaultPopupFilterJoins;
 
       design = _.clone(design);
       design[table] = expr;
       return this.props.onDesignChange(design);
-    }
+    };
 
     render() {
       if (!this.state.expanded) {

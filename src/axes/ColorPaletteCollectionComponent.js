@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let ColorPaletteCollectionComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -8,12 +10,6 @@ import ColorSchemeFactory from '../ColorSchemeFactory';
 
 export default ColorPaletteCollectionComponent = (function() {
   ColorPaletteCollectionComponent = class ColorPaletteCollectionComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.onPaletteSelected = this.onPaletteSelected.bind(this);
-      this.renderCancel = this.renderCancel.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         onPaletteSelected: PropTypes.func.isRequired,
@@ -89,7 +85,7 @@ export default ColorPaletteCollectionComponent = (function() {
         ];
     }
 
-    onPaletteSelected(index) {
+    onPaletteSelected = index => {
       // Generate color map
       const scheme = ColorSchemeFactory.createColorScheme({
         type: ColorPaletteCollectionComponent.palettes[index].type,
@@ -103,14 +99,14 @@ export default ColorPaletteCollectionComponent = (function() {
         color: category.value === null ? "#aaaaaa" : scheme[i % scheme.length]
       }));
       return this.props.onPaletteSelected(colorMap);
-    }
+    };
 
-    renderCancel() {
+    renderCancel = () => {
       if (this.props.axis.colorMap) {
         return R('div', null,
           R('a', {style: { cursor: "pointer" }, onClick: this.props.onCancel, key: "cancel-customize"}, "Cancel"));
       }
-    }
+    };
 
     render() {
       return R('div', null,
@@ -133,11 +129,6 @@ export default ColorPaletteCollectionComponent = (function() {
 })();
 
 class ColorPaletteComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleSelect = this.handleSelect.bind(this);
-  }
-
   static initClass() {
     this.propTypes = {
       index: PropTypes.number.isRequired,
@@ -150,9 +141,9 @@ class ColorPaletteComponent extends React.Component {
       {number: 6};
   }
 
-  handleSelect() {
+  handleSelect = () => {
     return this.props.onPaletteSelected(this.props.index);
-  }
+  };
 
   render() {
     return R('div', {onClick: this.handleSelect ,className: "axis-palette"},

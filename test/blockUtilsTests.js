@@ -1,9 +1,17 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import _ from 'lodash';
 import { assert } from 'chai';
 import canonical from 'canonical-json';
-import blockUtils from '../src/layouts/blocks/blockUtils';
+import * as blockUtils from '../src/layouts/blocks/blockUtils';
 
-const compare = (actual, expected) => assert.equal(canonical(actual), canonical(expected), "\n" + canonical(actual) + "\n" + canonical(expected) + "\n");
+function compare(actual, expected) {
+  return assert.equal(
+    canonical(actual),
+    canonical(expected),
+    "\n" + canonical(actual) + "\n" + canonical(expected) + "\n"
+  );
+}
 
 describe("blockUtils", function() {
   it("updates nested block", function() {

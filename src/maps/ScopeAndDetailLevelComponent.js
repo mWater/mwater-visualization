@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let ScopeAndDetailLevelComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -12,12 +14,6 @@ import ui from 'react-library/lib/bootstrap';
 // Generic scope and detail level setter for AdminChoropleth layers 
 export default ScopeAndDetailLevelComponent = (function() {
   ScopeAndDetailLevelComponent = class ScopeAndDetailLevelComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleScopeChange = this.handleScopeChange.bind(this);
-      this.handleDetailLevelChange = this.handleDetailLevelChange.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         schema: PropTypes.object.isRequired, // Schema to use
@@ -31,17 +27,17 @@ export default ScopeAndDetailLevelComponent = (function() {
        // Table name of regions
     }
 
-    handleScopeChange(scope, scopeLevel) {
+    handleScopeChange = (scope, scopeLevel) => {
       if (scope) {
         return this.props.onScopeAndDetailLevelChange(scope, scopeLevel, scopeLevel + 1);
       } else {
         return this.props.onScopeAndDetailLevelChange(null, null, 0);
       }
-    }
+    };
 
-    handleDetailLevelChange(detailLevel) {
+    handleDetailLevelChange = detailLevel => {
       return this.props.onScopeAndDetailLevelChange(this.props.scope, this.props.scopeLevel, detailLevel);
-    }
+    };
 
     render() {
       // Determine number of levels by looking for levelN field

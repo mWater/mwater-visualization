@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let ButtonToggleComponent, OptionListComponent, SectionComponent, SwitchViewComponent, ToggleEditComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -73,11 +75,6 @@ export { _OptionListComponent as OptionListComponent };
 
 // Single option
 class OptionComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleClick = this.handleClick.bind(this);
-  }
-
   static initClass() {
     this.propTypes = {
       name: PropTypes.string,
@@ -88,10 +85,10 @@ class OptionComponent extends React.Component {
               // Displays X to right if present
   }
 
-  handleClick(ev) {
+  handleClick = ev => {
     ev.stopPropagation();
     return this.props.onRemove();
-  }
+  };
 
   render() {
     return R('div', {className: "mwater-visualization-big-option", onClick: this.props.onClick},
@@ -116,7 +113,6 @@ let _SwitchViewComponent = SwitchViewComponent = (function() {
     }
 
     constructor(props) {
-      this.refCallback = this.refCallback.bind(this);
       super(props);
       this.state = { 
         measuring: false
@@ -131,10 +127,10 @@ let _SwitchViewComponent = SwitchViewComponent = (function() {
     }
 
     // Save components
-    refCallback(id, comp) { 
+    refCallback = (id, comp) => { 
       this.comps = this.comps || {};
       return this.comps[id] = comp;
-    }
+    };
 
     componentDidUpdate(prevProps, prevState) {
       // If measuring, get the heights to interpolate
@@ -215,33 +211,29 @@ let _ToggleEditComponent = ToggleEditComponent = (function() {
     }
 
     constructor(props) {
-      this.close = this.close.bind(this);
-      this.open = this.open.bind(this);
-      this.handleToggle = this.handleToggle.bind(this);
-      this.editorRef = this.editorRef.bind(this);
       super(props);
       this.state = { open: props.initiallyOpen || false };
     }
 
-    close() {
+    close = () => {
       // Save height of editor
       if (this.editorComp) {
         this.editorHeight = ReactDOM.findDOMNode(this.editorComp).clientHeight;
       }
 
       return this.setState({open: false});
-    }
+    };
 
-    open() {
+    open = () => {
       return this.setState({open: true});
-    }
-  
-    handleToggle() { 
+    };
+
+    handleToggle = () => { 
       return this.setState({open: !this.state.open});
-    }
+    };
 
     // Save editor comp
-    editorRef(editorComp) { return this.editorComp = editorComp; }
+    editorRef = editorComp => { return this.editorComp = editorComp; };
 
     render() {
       let {

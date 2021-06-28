@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import _ from 'lodash';
 import uuid from 'uuid';
 
@@ -54,7 +56,7 @@ export function canSummarizeSegment(segments, id) {
 }
 
 // Finds the segment before one with id
-var findPreviousSegment = function(segments, id) {
+function findPreviousSegment(segments, id) {
   // Find in list (shallow)
   const index = _.findIndex(segments, { id });
 
@@ -79,7 +81,7 @@ var findPreviousSegment = function(segments, id) {
   }
 
   return false;
-};
+}
 
 // Summarize a segment, returning a new copy of the design with
 // all intersections created.
@@ -149,7 +151,7 @@ export function summarizeSegment(design, id, label) {
 }
 
 // Recursively map segments, flattening and compacting
-var mapSegments = function(segments, mapFunc) {
+function mapSegments(segments, mapFunc) {
   segments = _.map(segments, mapFunc);
 
   // Map children
@@ -163,7 +165,7 @@ var mapSegments = function(segments, mapFunc) {
 
   // Flatten and compact
   return _.compact(_.flatten(segments));
-};
+}
 
 // Replace segment
 export function replaceSegment(segments, replacement) {

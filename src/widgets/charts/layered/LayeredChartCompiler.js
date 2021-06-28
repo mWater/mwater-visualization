@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let LayeredChartCompiler;
 import _ from 'lodash';
 import { ExprCompiler } from 'mwater-expressions';
@@ -8,15 +10,19 @@ import d3Format from 'd3-format';
 
 const commaFormatter = d3Format.format(",");
 const compactFormatter = d3Format.format("~s");
-const pieLabelValueFormatter = function(format, hidePercent = false) { 
-  const percent = function(ratio) { if (hidePercent) { return ""; } else { return `(${d3Format.format('.1%')(ratio)})`; } };
+
+function pieLabelValueFormatter(format, hidePercent = false) {
+  function percent(ratio) { if (hidePercent) { return ""; } else { return `(${d3Format.format('.1%')(ratio)})`; } }
   return function(value, ratio, id) { 
     if (format[id]) { return `${format[id](value)} ${percent(ratio)}`; } else { return `${d3Format.format(",")(value)} ${percent(ratio)}`; }
   };
-};
-const labelValueFormatter = format => (function(value, ratio, id) { 
-  if (format[id]) { return format[id](value); } else { return value; }
-});
+}
+
+function labelValueFormatter(format) {
+  return function(value, ratio, id) { 
+    if (format[id]) { return format[id](value); } else { return value; }
+  };
+}
 
 const defaultColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5'];
 
@@ -1032,15 +1038,15 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
 };
 
 // Clean out nbsp (U+00A0) as it causes c3 errors
-var cleanString = function(str) {
+function cleanString(str) {
   if (!str) {
     return str;
   }
   return str.replace("\u00A0", " ");
-};
+}
 
 // Calculate a linear regression, returning a series of y values that match the x values
-var calculateLinearRegression = function(ys, xs) {
+function calculateLinearRegression(ys, xs) {
   // If xs are dates, convert to numbers
   if (_.isString(xs[0])) {
     xs = _.map(xs, x => Date.parse(x));
@@ -1070,4 +1076,4 @@ var calculateLinearRegression = function(ys, xs) {
   const intercept = ((sumY * sumXX) - (sumX * sumXY)) / den;
 
   return _.map(xs, x => (x * slope) + intercept);
-};
+}

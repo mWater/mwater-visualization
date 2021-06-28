@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let MWaterResponsesFilterComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -11,13 +13,6 @@ import ui from 'react-library/lib/bootstrap';
 // by latest for each site type linked to responses.
 export default MWaterResponsesFilterComponent = (function() {
   MWaterResponsesFilterComponent = class MWaterResponsesFilterComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleSiteChange = this.handleSiteChange.bind(this);
-      this.handleFinalChange = this.handleFinalChange.bind(this);
-      this.handleChange = this.handleChange.bind(this);
-    }
-
     static initClass() {
       this.propTypes = { 
         schema: PropTypes.object.isRequired,
@@ -87,16 +82,16 @@ export default MWaterResponsesFilterComponent = (function() {
       return null;
     }
 
-    handleSiteChange(site) {
+    handleSiteChange = site => {
       return this.handleChange(this.isFinal(), site);
-    }
+    };
 
-    handleFinalChange(final) {
+    handleFinalChange = final => {
       return this.handleChange(final, this.getSiteValue());
-    }
+    };
 
     // Recreate all filters
-    handleChange(final, site) {
+    handleChange = (final, site) => {
       // Strip all filters
       let filters = this.getFilters();
 
@@ -119,7 +114,7 @@ export default MWaterResponsesFilterComponent = (function() {
       }
 
       return this.setFilters(filters);
-    }
+    };
 
     render() {
       // Get site columns

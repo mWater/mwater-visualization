@@ -1,10 +1,12 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let PivotChartQueryBuilder;
 import _ from 'lodash';
 import { ExprCompiler } from 'mwater-expressions';
 import { ExprUtils } from 'mwater-expressions';
 import AxisBuilder from '../../../axes/AxisBuilder';
 import { injectTableAlias } from 'mwater-expressions';
-import PivotChartUtils from './PivotChartUtils';
+import * as PivotChartUtils from './PivotChartUtils';
 
 // Builds pivot table queries. 
 // Result is flat list for each intersection with each row being data for a single cell

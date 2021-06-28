@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let MapDesignerComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -18,15 +20,6 @@ import ui from 'react-library/lib/bootstrap';
 
 export default MapDesignerComponent = (function() {
   MapDesignerComponent = class MapDesignerComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleAttributionChange = this.handleAttributionChange.bind(this);
-      this.handleAutoBoundsChange = this.handleAutoBoundsChange.bind(this);
-      this.handleShowLayerSwitcherChange = this.handleShowLayerSwitcherChange.bind(this);
-      this.handleConvertToClusterMap = this.handleConvertToClusterMap.bind(this);
-      this.handleInitialLegendDisplayChange = this.handleInitialLegendDisplayChange.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         schema: PropTypes.object.isRequired, // Schema to use
@@ -46,29 +39,29 @@ export default MapDesignerComponent = (function() {
       activeTables: MapUtils.getFilterableTables(this.props.design, this.props.schema)
     }; }
 
-    handleAttributionChange(text) {
+    handleAttributionChange = text => {
       const design = _.extend({}, this.props.design, {attribution: text});
       return this.props.onDesignChange(design);
-    }
+    };
 
-    handleAutoBoundsChange(value) {
+    handleAutoBoundsChange = value => {
       const design = _.extend({}, this.props.design, {autoBounds: value});
       return this.props.onDesignChange(design);
-    }
+    };
 
-    handleShowLayerSwitcherChange(value) {
+    handleShowLayerSwitcherChange = value => {
       const design = _.extend({}, this.props.design, {showLayerSwitcher: value});
       return this.props.onDesignChange(design);
-    }
+    };
 
-    handleConvertToClusterMap() {
+    handleConvertToClusterMap = () => {
       return this.props.onDesignChange(MapUtils.convertToClusterMap(this.props.design)); 
-    }
+    };
 
-    handleInitialLegendDisplayChange(value) {
+    handleInitialLegendDisplayChange = value => {
       const design = _.extend({}, this.props.design, {initialLegendDisplay: value});
       return this.props.onDesignChange(design);
-    }
+    };
 
     renderOptionsTab() {
       return R('div', null,
@@ -192,9 +185,6 @@ class AttributionComponent extends React.Component {
   }
 
   constructor(props) {
-    this.handleTextChange = this.handleTextChange.bind(this);
-    this.handleClickOut = this.handleClickOut.bind(this);
-    this.handleTextClick = this.handleTextClick.bind(this);
     super(props);
 
     this.state = {
@@ -202,22 +192,22 @@ class AttributionComponent extends React.Component {
     };
   }
 
-  handleTextChange(e) {
+  handleTextChange = e => {
     return this.props.onTextChange(e.target.value);
-  }
+  };
 
-  handleClickOut() {
+  handleClickOut = () => {
     return this.setState({editing: false});
-  }
+  };
 
   renderEditor() {
     return R(ClickOutHandler, {onClickOut: this.handleClickOut},
       R('input', { onChange: this.handleTextChange, value: this.props.text, className: 'form-control'}));
   }
 
-  handleTextClick() {
+  handleTextClick = () => {
     return this.setState({editing: true});
-  }
+  };
 
   render() {
     let elem = R('div', {style: { marginLeft: 5 }}, 

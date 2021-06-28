@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let DateRangeComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -20,11 +22,6 @@ export default DateRangeComponent = (function() {
     }
 
     constructor(props) {
-      this.handleClickOut = this.handleClickOut.bind(this);
-      this.handleStartChange = this.handleStartChange.bind(this);
-      this.handleEndChange = this.handleEndChange.bind(this);
-      this.handlePreset = this.handlePreset.bind(this);
-      this.renderClear = this.renderClear.bind(this);
       super(props);
 
       this.state = {
@@ -57,11 +54,11 @@ export default DateRangeComponent = (function() {
       }
     }
 
-    handleClickOut() {
+    handleClickOut = () => {
       return this.setState({dropdownOpen: false});
-    }
+    };
 
-    handleStartChange(value) {
+    handleStartChange = value => {
       // Go to start of day if datetime
       if (this.props.datetime) {
         value = moment(value);
@@ -74,9 +71,9 @@ export default DateRangeComponent = (function() {
       } else {
         return this.props.onChange([this.fromMoment(value), this.props.value?.[1]]);
       }
-    }
+    };
 
-    handleEndChange(value) {
+    handleEndChange = value => {
       // Go to end of day if datetime
       if (this.props.datetime) {
         value = moment(value);
@@ -91,9 +88,9 @@ export default DateRangeComponent = (function() {
       }
 
       return this.setState({dropdownOpen: false});
-    }
+    };
 
-    handlePreset(preset) {
+    handlePreset = preset => {
       // Go to start/end of day if datetime
       let end, start;
       if (this.props.datetime) {
@@ -108,7 +105,7 @@ export default DateRangeComponent = (function() {
 
       this.props.onChange([this.fromMoment(start), this.fromMoment(end)]);
       return this.setState({dropdownOpen: false});
-    }
+    };
 
     getPresets() {
       const presets = [
@@ -124,13 +121,13 @@ export default DateRangeComponent = (function() {
       return presets;
     }
 
-    renderClear() {
+    renderClear = () => {
       return R('div', { 
         style: { position: "absolute", right: 10, top: 7, color: "#AAA" },
         onClick: (() => this.props.onChange(null))
       },
           R('i', {className: "fa fa-remove"}));
-    }
+    };
 
     renderSummary() {
       if (!this.props.value) {

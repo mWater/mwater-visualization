@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import React from 'react';
@@ -12,10 +14,12 @@ const sourceSpec = {
   }
 };
 
-const collectSource = (connect, monitor) => ({
-  connectDragSource: connect.dragSource(),
-  connectDragPreview: connect.dragPreview()
-});
+function collectSource(connect, monitor) {
+  return {
+    connectDragSource: connect.dragSource(),
+    connectDragPreview: connect.dragPreview()
+  };
+}
 
 // Simple drag source that runs a function to get the drag item.
 class DragSourceComponent extends React.Component {

@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let MWaterContextComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -13,11 +15,6 @@ import MWaterGlobalFiltersComponent from './MWaterGlobalFiltersComponent';
 // and several other context items
 export default MWaterContextComponent = (function() {
   MWaterContextComponent = class MWaterContextComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleAddTable = this.handleAddTable.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         apiUrl: PropTypes.string.isRequired,
@@ -49,7 +46,7 @@ export default MWaterContextComponent = (function() {
         isScalarExprTreeSectionMatch: PropTypes.func
       };
     }
-  
+
     getChildContext() {
       const context = {};
 
@@ -140,10 +137,10 @@ export default MWaterContextComponent = (function() {
       return context;
     }
 
-    handleAddTable(table) {
+    handleAddTable = table => {
       const extraTables = _.union(this.props.extraTables, [table]);
       return this.props.onExtraTablesChange(extraTables);
-    }
+    };
 
     render() {
       return this.props.children;

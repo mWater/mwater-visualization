@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -40,9 +42,11 @@ const moveSpec = {
   }
 };
 
-const moveCollect = (connect, monitor) => ({
-  connectMoveHandle: connect.dragSource()
-});
+function moveCollect(connect, monitor) {
+  return {
+    connectMoveHandle: connect.dragSource()
+  };
+}
 
 const MoveLayoutComponent = DragSource("block-move", moveSpec, moveCollect)(LayoutComponent);
 
@@ -55,9 +59,11 @@ const resizeSpec = {
   }
 };
 
-const resizeCollect = (connect, monitor) => ({
-  connectResizeHandle: connect.dragSource()
-});
+function resizeCollect(connect, monitor) {
+  return {
+    connectResizeHandle: connect.dragSource()
+  };
+}
 
 const MoveResizeLayoutComponent = DragSource("block-resize", resizeSpec, resizeCollect)(MoveLayoutComponent);
 
@@ -76,9 +82,6 @@ class Container extends React.Component {
   }
 
   constructor(props) {
-    this.handleRemove = this.handleRemove.bind(this);
-    this.handleWidgetDesignChange = this.handleWidgetDesignChange.bind(this);
-    this.renderItem = this.renderItem.bind(this);
     super(props);
     this.state = { moveHover: null, resizeHover: null };
   }
@@ -118,7 +121,7 @@ class Container extends React.Component {
 
     return this.props.onItemsChange(items);
   }
-  
+
   // Called when a block is dropped
   dropMoveLayout(dropInfo) { 
     // Get rectangle of dropped block
@@ -131,7 +134,7 @@ class Container extends React.Component {
 
     return this.dropLayout(dropInfo.dragInfo.id, droppedRect, dropInfo.dragInfo.widget);
   }
-  
+
   dropResizeLayout(dropInfo) {
     // Get rectangle of hovered block
     const droppedRect = {
@@ -154,13 +157,13 @@ class Container extends React.Component {
     }
   }
 
-  handleRemove(id) {
+  handleRemove = id => {
     // Update item layouts
     const items = _.omit(this.props.items, id);
     return this.props.onItemsChange(items);
-  }
+  };
 
-  handleWidgetDesignChange(id, widgetDesign) {
+  handleWidgetDesignChange = (id, widgetDesign) => {
     let {
       widget
     } = this.props.items[id];
@@ -173,7 +176,7 @@ class Container extends React.Component {
     items[id] = item;
 
     return this.props.onItemsChange(items);
-  }
+  };
 
   renderPlaceholder(bounds) {
     return R('div', { key: "placeholder", style: { 
@@ -192,7 +195,7 @@ class Container extends React.Component {
 
   // Render a particular layout. Allow visible to be false so that 
   // dragged elements can retain state
-  renderItem(id, item, layout, visible=true) {
+  renderItem = (id, item, layout, visible=true) => {
     // Calculate bounds
     const bounds = this.props.layoutEngine.getLayoutBounds(layout);
 
@@ -240,7 +243,7 @@ class Container extends React.Component {
       React.createElement(MoveResizeLayoutComponent, { dragInfo, canDrag: (this.props.onItemsChange != null) }, 
         elem)
     );
-  }
+  };
 
   // Calculate a lookup of layouts incorporating hover info
   calculateLayouts(props, state) {
@@ -396,10 +399,12 @@ const targetSpec = {
   }
 };
 
-const targetCollect = (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget(),
-  isOver: monitor.isOver(),
-  clientOffset: monitor.getClientOffset()
-});
+function targetCollect(connect, monitor) {
+  return {
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver(),
+    clientOffset: monitor.getClientOffset()
+  };
+}
 
 export default DropTarget(["block-move", "block-resize"], targetSpec, targetCollect)(Container);

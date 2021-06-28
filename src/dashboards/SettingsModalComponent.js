@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let SettingsModalComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -28,11 +30,6 @@ export default SettingsModalComponent = (function() {
     }
 
     constructor(props) {
-      this.handleSave = this.handleSave.bind(this);
-      this.handleCancel = this.handleCancel.bind(this);
-      this.handleDesignChange = this.handleDesignChange.bind(this);
-      this.handleFiltersChange = this.handleFiltersChange.bind(this);
-      this.handleGlobalFiltersChange = this.handleGlobalFiltersChange.bind(this);
       super(props);
       this.state = { 
         design: null // Set when being edited
@@ -43,24 +40,23 @@ export default SettingsModalComponent = (function() {
       return this.setState({design});
     }
 
-    handleSave() {
+    handleSave = () => {
       this.props.onDesignChange(this.state.design);
       return this.setState({design: null});
-    }
+    };
 
-    handleCancel() { return this.setState({design: null}); }
+    handleCancel = () => { return this.setState({design: null}); };
+    handleDesignChange = design => { return this.setState({design}); };
 
-    handleDesignChange(design) { return this.setState({design}); }
-
-    handleFiltersChange(filters) {
+    handleFiltersChange = filters => {
       const design = _.extend({}, this.state.design, {filters});
       return this.handleDesignChange(design);
-    }
+    };
 
-    handleGlobalFiltersChange(globalFilters) {
+    handleGlobalFiltersChange = globalFilters => {
       const design = _.extend({}, this.state.design, {globalFilters});
       return this.handleDesignChange(design);
-    }
+    };
 
     render() {
       // Don't show if not editing

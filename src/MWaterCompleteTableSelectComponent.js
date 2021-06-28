@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let MWaterCompleteTableSelectComponent;
 import _ from 'lodash';
 import $ from 'jquery';
@@ -6,7 +8,7 @@ import React from 'react';
 const R = React.createElement;
 import querystring from 'querystring';
 import TabbedComponent from 'react-library/lib/TabbedComponent';
-import uiComponents from './UIComponents';
+import * as uiComponents from './UIComponents';
 import { ExprUtils } from "mwater-expressions";
 import moment from 'moment';
 import ModalPopupComponent from 'react-library/lib/ModalPopupComponent';
@@ -30,12 +32,6 @@ const sitesOrder = {
 // Allows selection of a table. Is the complete list mode of tables
 export default MWaterCompleteTableSelectComponent = (function() {
   MWaterCompleteTableSelectComponent = class MWaterCompleteTableSelectComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleExtraTableAdd = this.handleExtraTableAdd.bind(this);
-      this.handleExtraTableRemove = this.handleExtraTableRemove.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         apiUrl: PropTypes.string.isRequired, // Url to hit api
@@ -55,18 +51,18 @@ export default MWaterCompleteTableSelectComponent = (function() {
         // e.g. "en"
     }
 
-    handleExtraTableAdd(tableId) {
+    handleExtraTableAdd = tableId => {
       return this.props.onExtraTablesChange(_.union(this.props.extraTables, [tableId]));
-    }
+    };
 
-    handleExtraTableRemove(tableId) {
+    handleExtraTableRemove = tableId => {
       // Set to null if current table
       if (this.props.table === tableId) {
         this.props.onChange(null);
       }
 
       return this.props.onExtraTablesChange(_.without(this.props.extraTables, tableId));
-    }
+    };
 
     renderSites() {
       let table;
@@ -137,7 +133,7 @@ export default MWaterCompleteTableSelectComponent = (function() {
       }
       );
     }
-    
+
     renderSweetSense() {
       let sweetSenseTables = this.getSweetSenseTables();
 
@@ -312,8 +308,6 @@ class FormsListComponent extends React.Component {
   }
 
   constructor(props) {
-    this.handleTableRemove = this.handleTableRemove.bind(this);
-    this.searchRef = this.searchRef.bind(this);
     super(props);
     this.state = { 
       forms: null, 
@@ -357,18 +351,18 @@ class FormsListComponent extends React.Component {
     });
   }
 
-  handleTableRemove(table) {
+  handleTableRemove = table => {
     if (confirm(`Remove ${ExprUtils.localizeString(table.name, this.context.locale)}? Any widgets that depend on it will no longer work properly.`)) {
       return this.props.onExtraTableRemove(table.id);
     }
-  }
+  };
 
-  searchRef(comp) {
+  searchRef = comp => {
     // Focus
     if (comp) {
       return comp.focus();
     }
-  }
+  };
 
   render() {
     let forms;
@@ -466,9 +460,6 @@ class IndicatorsListComponent extends React.Component {
   }
 
   constructor(props) {
-    this.handleTableRemove = this.handleTableRemove.bind(this);
-    this.searchRef = this.searchRef.bind(this);
-    this.handleSelect = this.handleSelect.bind(this);
     super(props);
     this.state = { 
       indicators: null, 
@@ -504,27 +495,27 @@ class IndicatorsListComponent extends React.Component {
     });
   }
 
-  handleTableRemove(table) {
+  handleTableRemove = table => {
     if (confirm(`Remove ${ExprUtils.localizeString(table.name, this.context.locale)}? Any widgets that depend on it will no longer work properly.`)) {
       return this.props.onExtraTableRemove(table.id);
     }
-  }
+  };
 
-  searchRef(comp) {
+  searchRef = comp => {
     // Focus
     if (comp) {
       return comp.focus();
     }
-  }
+  };
 
-  handleSelect(tableId) {
+  handleSelect = tableId => {
     // Add table if not present
     if (!this.props.schema.getTable(tableId)) {
       this.props.onExtraTableAdd(tableId);
     }
 
     return this.addIndicatorConfirmPopup.show(tableId);
-  }
+  };
 
   render() {
     let indicators;
@@ -711,8 +702,6 @@ class IssuesListComponent extends React.Component {
   }
 
   constructor(props) {
-    this.handleTableRemove = this.handleTableRemove.bind(this);
-    this.searchRef = this.searchRef.bind(this);
     super(props);
     this.state = { 
       issueTypes: null, 
@@ -746,18 +735,18 @@ class IssuesListComponent extends React.Component {
     });
   }
 
-  handleTableRemove(table) {
+  handleTableRemove = table => {
     if (confirm(`Remove ${ExprUtils.localizeString(table.name, this.context.locale)}? Any widgets that depend on it will no longer work properly.`)) {
       return this.props.onExtraTableRemove(table.id);
     }
-  }
+  };
 
-  searchRef(comp) {
+  searchRef = comp => {
     // Focus
     if (comp) {
       return comp.focus();
     }
-  }
+  };
 
   render() {
     let issueTypes;

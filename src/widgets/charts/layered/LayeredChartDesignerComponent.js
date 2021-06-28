@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let LayeredChartDesignerComponent;
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -6,34 +8,12 @@ const R = React.createElement;
 import LayeredChartLayerDesignerComponent from './LayeredChartLayerDesignerComponent';
 import LayeredChartCompiler from './LayeredChartCompiler';
 import TabbedComponent from 'react-library/lib/TabbedComponent';
-import uiComponents from '../../../UIComponents';
+import * as uiComponents from '../../../UIComponents';
 import ColorComponent from '../../../ColorComponent';
 import ui from 'react-library/lib/bootstrap';
 
 export default LayeredChartDesignerComponent = (function() {
   LayeredChartDesignerComponent = class LayeredChartDesignerComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleTypeChange = this.handleTypeChange.bind(this);
-      this.handleTransposeChange = this.handleTransposeChange.bind(this);
-      this.handleStackedChange = this.handleStackedChange.bind(this);
-      this.handleProportionalChange = this.handleProportionalChange.bind(this);
-      this.handleLabelsChange = this.handleLabelsChange.bind(this);
-      this.handlePercentageVisibilityChange = this.handlePercentageVisibilityChange.bind(this);
-      this.handlePolarOrderChange = this.handlePolarOrderChange.bind(this);
-      this.handleYThresholdsChange = this.handleYThresholdsChange.bind(this);
-      this.handleLayerChange = this.handleLayerChange.bind(this);
-      this.handleRemoveLayer = this.handleRemoveLayer.bind(this);
-      this.handleAddLayer = this.handleAddLayer.bind(this);
-      this.handleXAxisLabelTextChange = this.handleXAxisLabelTextChange.bind(this);
-      this.handleYAxisLabelTextChange = this.handleYAxisLabelTextChange.bind(this);
-      this.handleToggleXAxisLabelClick = this.handleToggleXAxisLabelClick.bind(this);
-      this.handleToggleYAxisLabelClick = this.handleToggleYAxisLabelClick.bind(this);
-      this.handleYMinChange = this.handleYMinChange.bind(this);
-      this.handleYMaxChange = this.handleYMaxChange.bind(this);
-      this.renderLayer = this.renderLayer.bind(this);
-    }
-
     static initClass() {
       this.propTypes = { 
         design: PropTypes.object.isRequired,
@@ -56,58 +36,57 @@ export default LayeredChartDesignerComponent = (function() {
       return this.props.onDesignChange(design);
     }
 
-    handleTypeChange(type) {
+    handleTypeChange = type => {
       return this.updateDesign({type});
-    }
+    };
 
-    handleTransposeChange(ev) {
+    handleTransposeChange = ev => {
       return this.updateDesign({transpose: ev.target.checked});
-    }
+    };
 
-    handleStackedChange(ev) { return this.updateDesign({stacked: ev.target.checked}); }
-    handleProportionalChange(ev) { return this.updateDesign({proportional: ev.target.checked}); }
-    handleLabelsChange(ev) { return this.updateDesign({labels: ev.target.checked}); }
-    handlePercentageVisibilityChange(ev) { return this.updateDesign({hidePercentage: ev.target.checked}); }
-    handlePolarOrderChange(ev) { return this.updateDesign({polarOrder: ev.target.checked ? "desc" : "natural"}); }
+    handleStackedChange = ev => { return this.updateDesign({stacked: ev.target.checked}); };
+    handleProportionalChange = ev => { return this.updateDesign({proportional: ev.target.checked}); };
+    handleLabelsChange = ev => { return this.updateDesign({labels: ev.target.checked}); };
+    handlePercentageVisibilityChange = ev => { return this.updateDesign({hidePercentage: ev.target.checked}); };
+    handlePolarOrderChange = ev => { return this.updateDesign({polarOrder: ev.target.checked ? "desc" : "natural"}); };
+    handleYThresholdsChange = yThresholds => { return this.updateDesign({yThresholds}); };
 
-    handleYThresholdsChange(yThresholds) { return this.updateDesign({yThresholds}); }
-
-    handleLayerChange(index, layer) {
+    handleLayerChange = (index, layer) => {
       const layers = this.props.design.layers.slice();
       layers[index] = layer;
       return this.updateDesign({layers});
-    }
+    };
 
-    handleRemoveLayer(index) {
+    handleRemoveLayer = index => {
       const layers = this.props.design.layers.slice();
       layers.splice(index, 1);
       return this.updateDesign({layers});
-    }
+    };
 
-    handleAddLayer() {
+    handleAddLayer = () => {
       const layers = this.props.design.layers.slice();
       layers.push({});
       return this.updateDesign({layers});
-    }
+    };
 
-    handleXAxisLabelTextChange(ev) {  return this.updateDesign({xAxisLabelText: ev.target.value}); }
-    handleYAxisLabelTextChange(ev) {  return this.updateDesign({yAxisLabelText: ev.target.value}); }
+    handleXAxisLabelTextChange = ev => {  return this.updateDesign({xAxisLabelText: ev.target.value}); };
+    handleYAxisLabelTextChange = ev => {  return this.updateDesign({yAxisLabelText: ev.target.value}); };
 
-    handleToggleXAxisLabelClick(ev) {
+    handleToggleXAxisLabelClick = ev => {
       return this.updateDesign({xAxisLabelText: (this.props.design.xAxisLabelText != null) ? null : ""});
-    }
+    };
 
-    handleToggleYAxisLabelClick(ev) {
+    handleToggleYAxisLabelClick = ev => {
       return this.updateDesign({yAxisLabelText: (this.props.design.yAxisLabelText != null) ? null : ""});
-    }
+    };
 
-    handleYMinChange(yMin) {
+    handleYMinChange = yMin => {
       return this.updateDesign({yMin});
-    }
+    };
 
-    handleYMaxChange(yMax) {
+    handleYMaxChange = yMax => {
       return this.updateDesign({yMax});
-    }
+    };
 
     renderLabels() {
       if (!this.props.design.type) {
@@ -175,7 +154,7 @@ export default LayeredChartDesignerComponent = (function() {
         this.renderOptions());
     }
 
-    renderLayer(index) {
+    renderLayer = index => {
       const style = {
         paddingTop: 10,
         paddingBottom: 10
@@ -191,7 +170,7 @@ export default LayeredChartDesignerComponent = (function() {
           onRemove: this.handleRemoveLayer.bind(null, index)
           })
       );
-    }
+    };
 
     renderLayers() {
       if (!this.props.design.type) {
@@ -251,7 +230,7 @@ export default LayeredChartDesignerComponent = (function() {
               "Descending Order")
           ] : undefined);
     }
-        
+
 
     renderThresholds() {
       // Doesn't apply to polar
@@ -317,13 +296,6 @@ export default LayeredChartDesignerComponent = (function() {
 
 // Thresholds are lines that are added at certain values
 class ThresholdsComponent extends React.Component {
-  constructor(...args) {
-    super(...args);
-    this.handleAdd = this.handleAdd.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.handleRemove = this.handleRemove.bind(this);
-  }
-
   static initClass() {
     this.propTypes = { 
       thresholds: PropTypes.arrayOf(PropTypes.shape({value: PropTypes.number, label: PropTypes.string, highlightColor: PropTypes.string})),
@@ -333,23 +305,23 @@ class ThresholdsComponent extends React.Component {
        // True to show highlight color
   }
 
-  handleAdd() {
+  handleAdd = () => {
     const thresholds = (this.props.thresholds || []).slice();
     thresholds.push({ value: null, label: "", highlightColor: null });
     return this.props.onThresholdsChange(thresholds);
-  }
+  };
 
-  handleChange(index, value) {
+  handleChange = (index, value) => {
     const thresholds = (this.props.thresholds || []).slice();
     thresholds[index] = value;
     return this.props.onThresholdsChange(thresholds);
-  }
+  };
 
-  handleRemove(index) {
+  handleRemove = index => {
     const thresholds = (this.props.thresholds || []).slice();
     thresholds.splice(index, 1);
     return this.props.onThresholdsChange(thresholds);
-  }
+  };
 
   render() {
     return R('div', null,
@@ -397,7 +369,12 @@ class ThresholdComponent extends React.Component {
 }
 ThresholdComponent.initClass();
 
-var LabeledInlineComponent = props => R('div', {style: { display: "inline-block" }},
-  R('label', {className: "text-muted"}, props.label),
-  " ",
-  props.children);
+function LabeledInlineComponent(props) {
+  return R(
+    'div',
+    {style: { display: "inline-block" }},
+    R('label', {className: "text-muted"}, props.label),
+    " ",
+    props.children
+  );
+}

@@ -1,11 +1,11 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let HoverComponent;
 import React from 'react';
 import ReactDOM from 'react-dom';
 
 export default HoverComponent = class HoverComponent extends React.Component {
   constructor(props) {
-    this.onOver = this.onOver.bind(this);
-    this.onOut = this.onOut.bind(this);
     super(props);
     this.state = { hovered: false };
   }
@@ -20,13 +20,13 @@ export default HoverComponent = class HoverComponent extends React.Component {
     return ReactDOM.findDOMNode(this.main).removeEventListener("mouseout", this.onOut);
   }
 
-  onOver() {
+  onOver = () => {
     return this.setState({hovered: true});
-  }
+  };
 
-  onOut() {
+  onOut = () => {
     return this.setState({hovered: false});
-  }
+  };
 
   render() {
     return React.cloneElement(React.Children.only(this.props.children), {ref: (c => { return this.main = c; }), hovered: this.state.hovered});

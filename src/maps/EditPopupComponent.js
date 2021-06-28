@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let EditPopupComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -27,23 +29,21 @@ export default EditPopupComponent = (function() {
     }
 
     constructor(props) {
-      this.handleItemsChange = this.handleItemsChange.bind(this);
-      this.handleRemovePopup = this.handleRemovePopup.bind(this);
       super(props);
       this.state = { editing: false };
     }
 
-    handleItemsChange(items) {
+    handleItemsChange = items => {
       let popup = this.props.design.popup || {};
       popup = _.extend({}, popup, {items});
       const design = _.extend({}, this.props.design, {popup});
       return this.props.onDesignChange(design);
-    }
+    };
 
-    handleRemovePopup() {
+    handleRemovePopup = () => {
       const design = _.omit(this.props.design, "popup");
       return this.props.onDesignChange(design);
-    }
+    };
 
     render() {
       return R('div', null, 

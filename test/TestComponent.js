@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let TestComponent;
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -26,14 +28,13 @@ export default TestComponent = class TestComponent {
 // Wraps a react component, re-render
 class ComponentWrapper extends React.Component {
   constructor(props) {
-    this.setElement = this.setElement.bind(this);
     super(props);
     this.state = { elem: this.props.elem };
   }
 
-  setElement(elem) {
+  setElement = elem => {
     return this.setState({elem});
-  }
+  };
 
   getComponent() {
     return this.refs.comp;

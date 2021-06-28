@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let AxisColorEditorComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -33,10 +35,6 @@ export default AxisColorEditorComponent = (function() {
     }
 
     constructor(props) {
-      this.handleSelectPalette = this.handleSelectPalette.bind(this);
-      this.handleResetPalette = this.handleResetPalette.bind(this);
-      this.handlePaletteChange = this.handlePaletteChange.bind(this);
-      this.handleCancelCustomize = this.handleCancelCustomize.bind(this);
       super(props);
 
       this.state = {
@@ -80,11 +78,11 @@ export default AxisColorEditorComponent = (function() {
       }
     }
 
-    handleSelectPalette() {
+    handleSelectPalette = () => {
       return this.setState({mode: "palette"});
-    }
+    };
 
-    handleResetPalette() {
+    handleResetPalette = () => {
       // Completely reset
       const colorMap = _.map(this.props.categories, (category, i) => ({
         value: category.value,
@@ -93,16 +91,16 @@ export default AxisColorEditorComponent = (function() {
       
       this.handlePaletteChange(colorMap);
       return this.setState({mode: "normal"});
-    }
+    };
 
-    handlePaletteChange(palette) {
+    handlePaletteChange = palette => {
       this.props.onChange(update(this.props.axis, { colorMap: { $set: palette }, drawOrder: { $set: _.pluck(palette, "value") }}));
       return this.setState({mode: "normal"});
-    }
+    };
 
-    handleCancelCustomize() {
+    handleCancelCustomize = () => {
       return this.setState({mode: "normal"});
-    }
+    };
 
     renderPreview() {
       return R('div', {className: "axis-palette"},

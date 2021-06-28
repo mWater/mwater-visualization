@@ -1,10 +1,12 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let CalendarChartDesignerComponent;
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import React from 'react';
 const R = React.createElement;
 
-import ui from '../../../UIComponents';
+import * as ui from '../../../UIComponents';
 import { ExprUtils } from 'mwater-expressions';
 import AxisBuilder from '../../../axes/AxisBuilder';
 import AxisComponent from '../../../axes/AxisComponent';
@@ -13,15 +15,6 @@ import TableSelectComponent from '../../../TableSelectComponent';
 
 export default CalendarChartDesignerComponent = (function() {
   CalendarChartDesignerComponent = class CalendarChartDesignerComponent extends React.Component {
-    constructor(...args) {
-      super(...args);
-      this.handleTitleTextChange = this.handleTitleTextChange.bind(this);
-      this.handleTableChange = this.handleTableChange.bind(this);
-      this.handleFilterChange = this.handleFilterChange.bind(this);
-      this.handleDateAxisChange = this.handleDateAxisChange.bind(this);
-      this.handleValueAxisChange = this.handleValueAxisChange.bind(this);
-    }
-
     static initClass() {
       this.propTypes = {
         design: PropTypes.object.isRequired,
@@ -39,11 +32,11 @@ export default CalendarChartDesignerComponent = (function() {
       return this.props.onDesignChange(design);
     }
 
-    handleTitleTextChange(ev) {  return this.updateDesign({titleText: ev.target.value}); }
-    handleTableChange(table) { return this.updateDesign({table}); }
-    handleFilterChange(filter) { return this.updateDesign({filter}); }
-  
-    handleDateAxisChange(dateAxis) { 
+    handleTitleTextChange = ev => {  return this.updateDesign({titleText: ev.target.value}); };
+    handleTableChange = table => { return this.updateDesign({table}); };
+    handleFilterChange = filter => { return this.updateDesign({filter}); };
+
+    handleDateAxisChange = dateAxis => { 
       // Default value axis to count if date axis present
       if (!this.props.design.valueAxis && dateAxis) {
         // Create count expr
@@ -52,8 +45,9 @@ export default CalendarChartDesignerComponent = (function() {
       } else {
         return this.updateDesign({dateAxis});
       }
-    }
-    handleValueAxisChange(valueAxis) { return this.updateDesign({valueAxis}); }
+    };
+
+    handleValueAxisChange = valueAxis => { return this.updateDesign({valueAxis}); };
 
     renderTable() {
       return R('div', {className: "form-group"},

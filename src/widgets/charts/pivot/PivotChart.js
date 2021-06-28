@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 let PivotChart;
 import _ from 'lodash';
 import React from 'react';
@@ -11,7 +13,7 @@ import Chart from '../Chart';
 import { ExprCleaner } from 'mwater-expressions';
 import AxisBuilder from '../../../axes/AxisBuilder';
 import TextWidget from '../../text/TextWidget';
-import PivotChartUtils from './PivotChartUtils';
+import * as PivotChartUtils from './PivotChartUtils';
 import PivotChartQueryBuilder from './PivotChartQueryBuilder';
 import PivotChartLayoutBuilder from './PivotChartLayoutBuilder';
 

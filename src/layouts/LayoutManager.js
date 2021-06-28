@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 // Responsible for laying out items, rendering widgets and holding them in a data structure that is layout manager specific
 let LayoutManager;
 
