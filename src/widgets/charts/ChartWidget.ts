@@ -76,33 +76,39 @@ export default ChartWidget = class ChartWidget extends Widget {
   }
 }
 
+interface ChartWidgetComponentProps {
+  /** schema to use */
+  schema: any
+  /** data source to use */
+  dataSource: any
+  widgetDataSource: any
+  /** Chart object to use */
+  chart: any
+  /** Design of chart */
+  design: any
+  /** null/undefined for readonly */
+  onDesignChange?: any
+  /** Data source to use for chart */
+  dataSource: any
+  width?: number
+  height?: number
+  /** scope of the widget (when the widget self-selects a particular scope) */
+  scope?: any
+  /** array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct */
+  filters?: any
+  /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
+  onScopeChange?: any
+  /** Called with (tableId, rowId) when item is clicked */
+  onRowClick?: any
+  /** Connects move handle for dragging (see WidgetContainerComponent) TODO REMOVE */
+  connectMoveHandle?: any
+  /** Connects resize handle for dragging (see WidgetContainerComponent) TODO REMOVE */
+  connectResizeHandle?: any
+}
+
 // Complete chart widget
-class ChartWidgetComponent extends React.PureComponent {
+class ChartWidgetComponent extends React.PureComponent<ChartWidgetComponentProps> {
   static initClass() {
-    this.propTypes = {
-      schema: PropTypes.object.isRequired, // schema to use
-      dataSource: PropTypes.object.isRequired, // data source to use
-      widgetDataSource: PropTypes.object.isRequired,
-
-      chart: PropTypes.object.isRequired, // Chart object to use
-
-      design: PropTypes.object.isRequired, // Design of chart
-      onDesignChange: PropTypes.func, // null/undefined for readonly
-      dataSource: PropTypes.object.isRequired, // Data source to use for chart
-
-      width: PropTypes.number,
-      height: PropTypes.number,
-
-      scope: PropTypes.any, // scope of the widget (when the widget self-selects a particular scope)
-      filters: PropTypes.array, // array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
-      onScopeChange: PropTypes.func, // called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
-
-      onRowClick: PropTypes.func, // Called with (tableId, rowId) when item is clicked
-
-      connectMoveHandle: PropTypes.func, // Connects move handle for dragging (see WidgetContainerComponent) TODO REMOVE
-      connectResizeHandle: PropTypes.func // Connects resize handle for dragging (see WidgetContainerComponent) TODO REMOVE
-    }
-
     this.contextTypes = { locale: PropTypes.string }
     // e.g. "en"
   }
@@ -148,7 +154,7 @@ class ChartWidgetComponent extends React.PureComponent {
       // Require at use as causes server problems
       const FileSaver = require("file-saver")
       return FileSaver.saveAs(blob, "Exported Data.csv")
-    });
+    })
   }
 
   handleStartEditing = () => {

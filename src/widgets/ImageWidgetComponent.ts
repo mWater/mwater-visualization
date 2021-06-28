@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let ImageWidgetComponent
 import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
@@ -19,166 +16,172 @@ import TableSelectComponent from "../TableSelectComponent"
 import ImageUploaderComponent from "./ImageUploaderComponent"
 import ImagelistCarouselComponent from "./ImagelistCarouselComponent"
 
-export default ImageWidgetComponent = (function () {
-  ImageWidgetComponent = class ImageWidgetComponent extends AsyncLoadComponent {
-    static initClass() {
-      this.propTypes = {
-        design: PropTypes.object.isRequired,
-        onDesignChange: PropTypes.func, // Called with new design. null/undefined for readonly
-        filters: PropTypes.array,
+interface ImageWidgetComponentProps {
+  design: any
+  /** Called with new design. null/undefined for readonly */
+  onDesignChange?: any
+  filters?: any
+  schema: any
+  /** Data source to use for widget */
+  dataSource: any
+  widgetDataSource: any
+  width?: number
+  height?: number
+  singleRowTable?: string
+}
 
-        schema: PropTypes.object.isRequired,
-        dataSource: PropTypes.object.isRequired, // Data source to use for widget
-        widgetDataSource: PropTypes.object.isRequired,
+export default class ImageWidgetComponent extends AsyncLoadComponent<ImageWidgetComponentProps> {
+  // Override to determine if a load is needed. Not called on mounting
+  isLoadNeeded(newProps: any, oldProps: any) {
+    return (
+      newProps.design.expr &&
+      (!_.isEqual(newProps.design.expr, oldProps.design.expr) || !_.isEqual(newProps.filters, oldProps.filters))
+    )
+  }
 
-        width: PropTypes.number,
-        height: PropTypes.number,
+  // Call callback with state changes
+  load(props: any, prevProps: any, callback: any) {
+    // Get data
+    return props.widgetDataSource.getData(props.design, props.filters, (error: any, data: any) => {
+      return callback({ error, data })
+    })
+  }
 
-        singleRowTable: PropTypes.string
-      }
-      // Table that is filtered to have one row
-    }
+  handleStartEditing = () => {
+    return this.editor.edit()
+  }
 
-    // Override to determine if a load is needed. Not called on mounting
-    isLoadNeeded(newProps: any, oldProps: any) {
-      return (
-        newProps.design.expr &&
-        (!_.isEqual(newProps.design.expr, oldProps.design.expr) || !_.isEqual(newProps.filters, oldProps.filters))
-      )
-    }
+  // Render a link to start editing
+  renderEditLink() {
+    return R(
+      "div",
+      { className: "mwater-visualization-widget-placeholder", onClick: this.handleStartEditing },
+      R("i", { className: "icon fa fa-image" })
+    )
+  }
 
-    // Call callback with state changes
-    load(props: any, prevProps: any, callback: any) {
-      // Get data
-      return props.widgetDataSource.getData(props.design, props.filters, (error: any, data: any) => {
-        return callback({ error, data })
-      });
-    }
+  renderEditor() {
+    return R(ImageWidgetDesignComponent, {
+      ref: (c: any) => {
+        return (this.editor = c)
+      },
+      key: "editor",
+      design: this.props.design,
+      onDesignChange: this.props.onDesignChange,
+      schema: this.props.schema,
+      dataSource: this.props.dataSource
+    })
+  }
 
-    handleStartEditing = () => {
-      return this.editor.edit()
-    }
-
-    // Render a link to start editing
-    renderEditLink() {
-      return R(
-        "div",
-        { className: "mwater-visualization-widget-placeholder", onClick: this.handleStartEditing },
-        R("i", { className: "icon fa fa-image" })
-      )
-    }
-
-    renderEditor() {
-      return R(ImageWidgetDesignComponent, {
-        ref: (c: any) => {
-          return (this.editor = c)
-        },
-        key: "editor",
-        design: this.props.design,
-        onDesignChange: this.props.onDesignChange,
-        schema: this.props.schema,
-        dataSource: this.props.dataSource
-      });
-    }
-
-    renderExpression() {
-      if (this.state.loading) {
-        return R("span", null, "Loading")
-      } else if (this.state.data) {
-        // Make into array if not
-        if (!_.isArray(this.state.data)) {
-          return R(AutoSizeComponent, { injectHeight: true }, (size: any) => {
-            return R(ImagelistCarouselComponent, {
-              widgetDataSource: this.props.widgetDataSource,
-              imagelist: [this.state.data],
-              height: size.height
-            })
-          });
-        } else {
-          return R(AutoSizeComponent, { injectHeight: true }, (size: any) => {
-            return R(ImagelistCarouselComponent, {
-              widgetDataSource: this.props.widgetDataSource,
-              imagelist: this.state.data,
-              height: size.height
-            })
-          });
-        }
-      }
-    }
-
-    renderContent() {
-      if (this.props.design.imageUrl || this.props.design.uid) {
-        // Determine approximate height
-        let imageHeight = null
-
-        if (this.props.height <= 160) {
-          imageHeight = 160
-        } else if (this.props.height <= 320) {
-          imageHeight = 320
-        } else if (this.props.height <= 640) {
-          imageHeight = 640
-        } else if (this.props.height <= 1280) {
-          imageHeight = 1280
-        }
-
-        const source =
-          this.props.design.imageUrl || this.props.widgetDataSource.getImageUrl(this.props.design.uid, imageHeight)
-        return R(RotatedImageComponent, {
-          imgUrl: source,
-          url: this.props.design.url,
-          rotation: this.props.design.rotation
+  renderExpression() {
+    if (this.state.loading) {
+      return R("span", null, "Loading")
+    } else if (this.state.data) {
+      // Make into array if not
+      if (!_.isArray(this.state.data)) {
+        return R(AutoSizeComponent, { injectHeight: true }, (size: any) => {
+          return R(ImagelistCarouselComponent, {
+            widgetDataSource: this.props.widgetDataSource,
+            imagelist: [this.state.data],
+            height: size.height
+          })
         })
       } else {
-        return this.renderExpression()
+        return R(AutoSizeComponent, { injectHeight: true }, (size: any) => {
+          return R(ImagelistCarouselComponent, {
+            widgetDataSource: this.props.widgetDataSource,
+            imagelist: this.state.data,
+            height: size.height
+          })
+        })
       }
     }
+  }
 
-    render() {
-      const dropdownItems = []
-      if (this.props.onDesignChange != null) {
-        dropdownItems.push({ label: "Edit", icon: "pencil", onClick: this.handleStartEditing })
+  renderContent() {
+    if (this.props.design.imageUrl || this.props.design.uid) {
+      // Determine approximate height
+      let imageHeight = null
+
+      if (this.props.height <= 160) {
+        imageHeight = 160
+      } else if (this.props.height <= 320) {
+        imageHeight = 320
+      } else if (this.props.height <= 640) {
+        imageHeight = 640
+      } else if (this.props.height <= 1280) {
+        imageHeight = 1280
       }
 
-      const captionPosition = this.props.design.captionPosition || "bottom"
-
-      return R(
-        DropdownWidgetComponent,
-        {
-          width: this.props.width,
-          height: this.props.height,
-          dropdownItems
-        },
-        this.renderEditor(),
-        !this.props.design.imageUrl && !this.props.design.expr && !this.props.design.uid && this.props.onDesignChange
-          ? this.renderEditLink()
-          : R(
-              "div",
-              {
-                className: "mwater-visualization-image-widget",
-                style: { position: "relative", width: this.props.width, height: this.props.height }
-              },
-              captionPosition === "top" ? R("div", { className: "caption" }, this.props.design.caption) : undefined,
-              R("div", { className: "image" }, this.renderContent()),
-              captionPosition === "bottom" ? R("div", { className: "caption" }, this.props.design.caption) : undefined
-            )
-      )
+      const source =
+        this.props.design.imageUrl || this.props.widgetDataSource.getImageUrl(this.props.design.uid, imageHeight)
+      return R(RotatedImageComponent, {
+        imgUrl: source,
+        url: this.props.design.url,
+        rotation: this.props.design.rotation
+      })
+    } else {
+      return this.renderExpression()
     }
   }
-  ImageWidgetComponent.initClass()
-  return ImageWidgetComponent
-})()
 
-class ImageWidgetDesignComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      design: PropTypes.object.isRequired,
-      onDesignChange: PropTypes.func, // Called with new design. null/undefined for readonly
-      schema: PropTypes.object.isRequired,
-      dataSource: PropTypes.object.isRequired
+  render() {
+    const dropdownItems = []
+    if (this.props.onDesignChange != null) {
+      dropdownItems.push({ label: "Edit", icon: "pencil", onClick: this.handleStartEditing })
     }
-    // Data source to use for widget
-  }
 
+    const captionPosition = this.props.design.captionPosition || "bottom"
+
+    return R(
+      DropdownWidgetComponent,
+      {
+        width: this.props.width,
+        height: this.props.height,
+        dropdownItems
+      },
+      this.renderEditor(),
+      !this.props.design.imageUrl && !this.props.design.expr && !this.props.design.uid && this.props.onDesignChange
+        ? this.renderEditLink()
+        : R(
+            "div",
+            {
+              className: "mwater-visualization-image-widget",
+              style: { position: "relative", width: this.props.width, height: this.props.height }
+            },
+            captionPosition === "top" ? R("div", { className: "caption" }, this.props.design.caption) : undefined,
+            R("div", { className: "image" }, this.renderContent()),
+            captionPosition === "bottom" ? R("div", { className: "caption" }, this.props.design.caption) : undefined
+          )
+    )
+  }
+}
+
+interface ImageWidgetDesignComponentProps {
+  design: any
+  /** Called with new design. null/undefined for readonly */
+  onDesignChange?: any
+  schema: any
+  dataSource: any
+}
+
+interface ImageWidgetDesignComponentState {
+  imageUrl: any
+  url: any
+  uid: any
+  expr: any
+  caption: any
+  rotation: any
+  captionPosition: any
+  table: any
+  editing: any
+  currentTab: any
+}
+
+class ImageWidgetDesignComponent extends React.Component<
+  ImageWidgetDesignComponentProps,
+  ImageWidgetDesignComponentState
+> {
   constructor(props: any) {
     super(props)
 
@@ -459,21 +462,18 @@ class ImageWidgetDesignComponent extends React.Component {
     )
   }
 }
-ImageWidgetDesignComponent.initClass()
+
+interface RotatedImageComponentProps {
+  /** Url of the image */
+  imgUrl: string
+  rotation?: number
+  onClick?: any
+  caption?: string
+  url?: string
+}
 
 // Image which is rotated by x degrees (0, 90, 180, 270)
-class RotatedImageComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      imgUrl: PropTypes.string.isRequired, // Url of the image
-      rotation: PropTypes.number,
-      onClick: PropTypes.func,
-      caption: PropTypes.string,
-      url: PropTypes.string
-    }
-    // Url to be opened when the image is clicked
-  }
-
+class RotatedImageComponent extends React.Component<RotatedImageComponentProps> {
   render() {
     return R(AutoSizeComponent, { injectWidth: true, injectHeight: true }, (size: any) => {
       const imageStyle = {}
@@ -516,7 +516,6 @@ class RotatedImageComponent extends React.Component {
       } else {
         return R("a", { href: this.props.url, target: "_blank" }, img)
       }
-    });
+    })
   }
 }
-RotatedImageComponent.initClass()

@@ -99,7 +99,7 @@ class RichTextPane extends React.Component {
         itemsHtmlConverter: new ItemsHtmlConverter(),
         extraPaletteButtons: this.renderExtraButtons()
       })
-    );
+    )
   }
 }
 
@@ -178,7 +178,7 @@ The survey was created by ${err.form.created_by}`
           })
         )
       }
-    );
+    )
   }
 }
 
@@ -248,9 +248,9 @@ class MWaterDirectDashboardPane extends React.Component {
             namedStrings: { branding: "mWater" },
             onRowClick: (table: any, rowId: any) => alert(`Row clicked: ${table} ${rowId}`)
           })
-        );
+        )
       }
-    );
+    )
   }
 }
 
@@ -318,9 +318,9 @@ class MWaterMapPane extends React.Component {
             onRowClick: (tableId: any, rowId: any) => alert(`${tableId}:${rowId}`),
             titleElem: "Sample"
           })
-        );
+        )
       }
-    );
+    )
   }
 }
 
@@ -381,9 +381,9 @@ class MWaterDirectMapPane extends React.Component {
             onRowClick: (tableId: any, rowId: any) => console.log(`Click ${tableId}:${rowId}`),
             titleElem: "Sample"
           })
-        );
+        )
       }
-    );
+    )
   }
 }
 
@@ -440,9 +440,9 @@ class MWaterDatagridPane extends React.Component {
               }, 500)
             }
           })
-        );
+        )
       }
-    );
+    )
   }
 }
 
@@ -680,8 +680,8 @@ MWaterDataSource = class MWaterDataSource extends DataSource {
           } else {
             return resolve(rows)
           }
-        });
-      });
+        })
+      })
     }
 
     let url = this.apiUrl + "jsonql?jsonql=" + encodeURIComponent(JSON.stringify(query))

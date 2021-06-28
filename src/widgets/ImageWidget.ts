@@ -103,7 +103,7 @@ export default ImageWidget = class ImageWidget extends Widget {
           return callback(null, value)
         }
       }
-    });
+    })
   }
 
   // Determine if widget is auto-height, which means that a vertical height is not required.

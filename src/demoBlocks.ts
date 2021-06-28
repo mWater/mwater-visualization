@@ -74,9 +74,9 @@ class DemoComponent extends React.Component {
           renderWidget,
           design: this.state.design,
           onDesignChange: (design: any) => this.setState({ design })
-        });
+        })
       }
-    );
+    )
   }
 }
 

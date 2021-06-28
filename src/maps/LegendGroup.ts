@@ -1,73 +1,68 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let LegendGroup
 import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import _ from "lodash"
 
-export default LegendGroup = (function () {
-  LegendGroup = class LegendGroup extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        items: PropTypes.array,
-        radiusLayer: PropTypes.bool,
-        defaultColor: PropTypes.string,
-        name: PropTypes.string,
-        symbol: PropTypes.string,
-        markerSize: PropTypes.number
-      }
+interface LegendGroupProps {
+  items?: any
+  radiusLayer?: boolean
+  defaultColor?: string
+  name?: string
+  symbol?: string
+  markerSize?: number
+}
 
-      this.defaultProps = {
-        items: [],
-        radiusLayer: false,
-        symbol: null
-      }
-    }
-
-    render() {
-      return R(
-        "div",
-        { style: { marginBottom: 5 } },
-        React.createElement(LegendItem, {
-          hasChildren: this.props.items.length > 0,
-          symbol: this.props.symbol,
-          markerSize: this.props.markerSize,
-          color: this.props.defaultColor,
-          name: this.props.name,
-          key: this.props.name,
-          radiusLayer: this.props.radiusLayer
-        }),
-        _.map(this.props.items, (item) => {
-          return React.createElement(LegendItem, {
-            isChild: true,
-            symbol: this.props.symbol,
-            markerSize: this.props.markerSize,
-            color: item.color,
-            name: item.name,
-            key: item.name,
-            radiusLayer: this.props.radiusLayer
-          })
-        })
-      )
+export default class LegendGroup extends React.Component<LegendGroupProps> {
+  static initClass() {
+    this.defaultProps = {
+      items: [],
+      radiusLayer: false,
+      symbol: null
     }
   }
-  LegendGroup.initClass()
-  return LegendGroup
-})()
 
-class LegendItem extends React.Component {
+  render() {
+    return R(
+      "div",
+      { style: { marginBottom: 5 } },
+      React.createElement(LegendItem, {
+        hasChildren: this.props.items.length > 0,
+        symbol: this.props.symbol,
+        markerSize: this.props.markerSize,
+        color: this.props.defaultColor,
+        name: this.props.name,
+        key: this.props.name,
+        radiusLayer: this.props.radiusLayer
+      }),
+      _.map(this.props.items, (item) => {
+        return React.createElement(LegendItem, {
+          isChild: true,
+          symbol: this.props.symbol,
+          markerSize: this.props.markerSize,
+          color: item.color,
+          name: item.name,
+          key: item.name,
+          radiusLayer: this.props.radiusLayer
+        })
+      })
+    )
+  }
+}
+
+LegendGroup.initClass()
+
+interface LegendItemProps {
+  color?: string
+  name?: string
+  radiusLayer?: boolean
+  symbol?: string
+  markerSize?: number
+  hasChildren?: boolean
+  isChild?: boolean
+}
+
+class LegendItem extends React.Component<LegendItemProps> {
   static initClass() {
-    this.propTypes = {
-      color: PropTypes.string,
-      name: PropTypes.string,
-      radiusLayer: PropTypes.bool,
-      symbol: PropTypes.string,
-      markerSize: PropTypes.number,
-      hasChildren: PropTypes.bool,
-      isChild: PropTypes.bool
-    }
-
     this.defaultProps = {
       radiusLayer: false,
       hasChildren: false,

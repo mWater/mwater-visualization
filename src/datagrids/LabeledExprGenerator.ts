@@ -142,16 +142,16 @@ export default LabeledExprGenerator = class LabeledExprGenerator {
               .getColumns(column.join.toTable)
               .filter((c: any) => c.id[0] === "c")
               .map((c: any) => ({
-              expr: {
-                type: "scalar",
-                table,
-                joins: [column.id],
-                expr: { type: "field", table: column.join.toTable, column: c.id }
-              },
+                expr: {
+                  type: "scalar",
+                  table,
+                  joins: [column.id],
+                  expr: { type: "field", table: column.join.toTable, column: c.id }
+                },
 
-              label: `${createLabel(column)} > ${createLabel(c)}`,
-              joins
-            }));
+                label: `${createLabel(column)} > ${createLabel(c)}`,
+                joins
+              }))
           } else {
             // use code, full name, or name of dest table
             joinColumn = this.schema.getColumn(column.join.toTable, "code")

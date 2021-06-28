@@ -9,17 +9,15 @@ import { DragSource } from "react-dnd"
 import { DropTarget } from "react-dnd"
 import DecoratedBlockComponent from "../DecoratedBlockComponent"
 
+interface LayoutComponentProps {
+  /** Opaque information to be used when a block is dragged */
+  dragInfo: any
+  canDrag: boolean
+}
+
 // Render a child element as draggable, resizable block, injecting handle connectors
 // to child element
-class LayoutComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      dragInfo: PropTypes.object.isRequired, // Opaque information to be used when a block is dragged
-      canDrag: PropTypes.bool.isRequired
-    }
-    // True if draggable
-  }
-
+class LayoutComponent extends React.Component<LayoutComponentProps> {
   render() {
     if (this.props.canDrag) {
       return React.cloneElement(React.Children.only(this.props.children), {
@@ -31,7 +29,6 @@ class LayoutComponent extends React.Component {
     }
   }
 }
-LayoutComponent.initClass()
 
 const moveSpec = {
   beginDrag(props: any, monitor: any, component: any) {
@@ -67,20 +64,26 @@ function resizeCollect(connect: any, monitor: any) {
 
 const MoveResizeLayoutComponent = DragSource("block-resize", resizeSpec, resizeCollect)(MoveLayoutComponent)
 
-// Container contains layouts to layout. It renders widgets at the correct location.
-class Container extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      layoutEngine: PropTypes.object.isRequired,
-      items: PropTypes.object.isRequired, // Lookup of id -> { widget:, layout: }
-      onItemsChange: PropTypes.func, // Called with lookup of id -> { widget:, layout: }
-      renderWidget: PropTypes.func.isRequired, // Renders a widget
-      width: PropTypes.number.isRequired, // width in pixels
-      connectDropTarget: PropTypes.func.isRequired
-    }
-    // Injected by react-dnd wrapper
-  }
+interface ContainerProps {
+  layoutEngine: any
+  /** Lookup of id -> { widget:, layout: } */
+  items: any
+  /** Called with lookup of id -> { widget:, layout: } */
+  onItemsChange?: any
+  /** Renders a widget */
+  renderWidget: any
+  /** width in pixels */
+  width: number
+  connectDropTarget: any
+}
 
+interface ContainerState {
+  moveHover: any
+  resizeHover: any
+}
+
+// Container contains layouts to layout. It renders widgets at the correct location.
+class Container extends React.Component<ContainerProps, ContainerState> {
   constructor(props: any) {
     super(props)
     this.state = { moveHover: null, resizeHover: null }
@@ -363,7 +366,6 @@ class Container extends React.Component {
     return this.props.connectDropTarget(R("div", { style }, this.renderItems(this.props.items)))
   }
 }
-Container.initClass()
 
 const targetSpec = {
   drop(props: any, monitor: any, component: any) {

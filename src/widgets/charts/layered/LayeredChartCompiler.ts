@@ -25,7 +25,7 @@ function pieLabelValueFormatter(format: any, hidePercent = false) {
     } else {
       return `${d3Format.format(",")(value)} ${percent(ratio)}`
     }
-  };
+  }
 }
 
 function labelValueFormatter(format: any) {
@@ -35,7 +35,7 @@ function labelValueFormatter(format: any) {
     } else {
       return value
     }
-  };
+  }
 }
 
 const defaultColors = [
@@ -383,14 +383,15 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
           types[series] = this.getLayerType(design, layerIndex)
           names[series] = this.axisBuilder.formatValue(layer.axes.color, row.color, locale, true)
           dataMap[series] = { layerIndex, row }
-          format[series] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
+          format[series] = (value: any) =>
+            value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
           // Get specific color if present
           const color = this.axisBuilder.getValueColor(layer.axes.color, row.color)
           //color = color or layer.color
           if (color) {
             return (colors[series] = color)
           }
-        });
+        })
       } else {
         // Create a single series
         const row = data[`layer${layerIndex}`][0]
@@ -402,7 +403,8 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
           // Name is name of entire layer
           names[series] = layer.name || (design.layers.length === 1 ? "Value" : `Series ${layerIndex + 1}`)
           dataMap[series] = { layerIndex, row }
-          format[series] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
+          format[series] = (value: any) =>
+            value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
 
           // Set color if present
           if (layer.color) {
@@ -506,12 +508,13 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
           types[seriesY] = this.getLayerType(design, layerIndex)
           names[seriesY] = this.axisBuilder.formatValue(layer.axes.color, colorValue, locale, true)
           xs[seriesY] = seriesX
-          format[seriesY] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
+          format[seriesY] = (value: any) =>
+            value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
 
           return _.each(rows, (row, rowIndex) => {
             return (dataMap[`${seriesY}:${rowIndex}`] = { layerIndex, row })
           })
-        });
+        })
       } else {
         // One series for x values, one for y
         const seriesX = `${layerIndex}:x`
@@ -527,7 +530,8 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
         names[seriesY] = layer.name || (design.layers.length === 1 ? "Value" : `Series ${layerIndex + 1}`)
         xs[seriesY] = seriesX
         colors[seriesY] = layer.color || defaultColors[layerIndex]
-        format[seriesY] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
+        format[seriesY] = (value: any) =>
+          value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
 
         // Add data map for each row
         _.each(layerData, (row, rowIndex) => {
@@ -543,7 +547,8 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
           xs[trendlineSeries] = seriesX
           colors[trendlineSeries] = layer.color || defaultColors[layerIndex]
           legendHide.push(trendlineSeries) // Hide in legend
-          format[trendlineSeries] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
+          format[trendlineSeries] = (value: any) =>
+            value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
           // Set dots as invisible in CSS and line as dashed
           return (classes[trendlineSeries] = "trendline")
         }
@@ -760,8 +765,9 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
             types[series] = this.getLayerType(design, layerIndex)
             names[series] = this.axisBuilder.formatValue(layer.axes.color, colorValue, locale, true)
             xs[series] = "x"
-            return format[series] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : "";
-          });
+            return (format[series] = (value: any) =>
+              value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : "")
+          })
         } else {
           //c3 acts funny when there is a split axis but no data
           series = `${layerIndex}:dumm`
@@ -771,7 +777,8 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
           types[series] = this.getLayerType(design, layerIndex)
           names[series] = this.axisBuilder.formatValue(layer.axes.color, null, locale, true)
           xs[series] = "x"
-          return format[series] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : "";
+          return (format[series] = (value: any) =>
+            value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : "")
         }
       } else {
         // One series for y
@@ -807,7 +814,8 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
         names[series] = layer.name || (design.layers.length === 1 ? "Value" : `Series ${layerIndex + 1}`)
         xs[series] = "x"
         colors[series] = layer.color || defaultColors[layerIndex]
-        format[series] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
+        format[series] = (value: any) =>
+          value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
 
         // Add trendline
         if (layer.trendline === "linear") {
@@ -825,7 +833,8 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
           xs[trendlineSeries] = "x"
           colors[trendlineSeries] = layer.color || defaultColors[layerIndex]
           legendHide.push(trendlineSeries) // Hide in legend
-          format[trendlineSeries] = (value: any) => value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
+          format[trendlineSeries] = (value: any) =>
+            value != null ? this.axisBuilder.formatValue(layer.axes.y, value, locale, true) : ""
           // Set dots as invisible in CSS and line as dashed
           return (classes[trendlineSeries] = "trendline")
         }
@@ -925,7 +934,7 @@ export default LayeredChartCompiler = class LayeredChartCompiler {
 
         return color
       }
-    };
+    }
   }
 
   // Compile an expression

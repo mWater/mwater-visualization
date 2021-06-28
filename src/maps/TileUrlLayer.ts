@@ -82,15 +82,13 @@ export default TileUrlLayer = class TileUrlLayer extends Layer {
   }
 }
 
-class TileUrlLayerDesignerComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      design: PropTypes.object.isRequired, // Design of the marker layer
-      onDesignChange: PropTypes.func.isRequired
-    }
-    // Called with new design
-  }
+interface TileUrlLayerDesignerComponentProps {
+  /** Design of the marker layer */
+  design: any
+  onDesignChange: any
+}
 
+class TileUrlLayerDesignerComponent extends React.Component<TileUrlLayerDesignerComponentProps> {
   handleTileUrlChange = (ev: any) => {
     return this.props.onDesignChange(_.extend({}, this.props.design, { tileUrl: ev.target.value }))
   }
@@ -114,4 +112,3 @@ class TileUrlLayerDesignerComponent extends React.Component {
     )
   }
 }
-TileUrlLayerDesignerComponent.initClass()

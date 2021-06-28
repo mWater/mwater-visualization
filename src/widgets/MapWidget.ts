@@ -50,27 +50,33 @@ export default MapWidget = class MapWidget extends Widget {
   }
 }
 
-class MapWidgetComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      schema: PropTypes.object.isRequired, // Schema to use
-      dataSource: PropTypes.object.isRequired, // Data source to use
-      widgetDataSource: PropTypes.object.isRequired,
+interface MapWidgetComponentProps {
+  /** Schema to use */
+  schema: any
+  /** Data source to use */
+  dataSource: any
+  widgetDataSource: any
+  /** See Map Design.md */
+  design: any
+  /** Called with new design.  null/undefined for readonly */
+  onDesignChange?: any
+  width?: number
+  height?: number
+  /** scope of the widget (when the widget self-selects a particular scope) */
+  scope?: any
+  /** array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct */
+  filters?: any
+  /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
+  onScopeChange?: any
+  onRowClick?: any
+}
 
-      design: PropTypes.object.isRequired, // See Map Design.md
-      onDesignChange: PropTypes.func, // Called with new design.  null/undefined for readonly
+interface MapWidgetComponentState {
+  editDesign: any
+  transientDesign: any
+}
 
-      width: PropTypes.number,
-      height: PropTypes.number,
-
-      scope: PropTypes.any, // scope of the widget (when the widget self-selects a particular scope)
-      filters: PropTypes.array, // array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
-      onScopeChange: PropTypes.func, // called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
-      onRowClick: PropTypes.func
-    }
-    // Called with (tableId, rowId) when item is clicked
-  }
-
+class MapWidgetComponent extends React.Component<MapWidgetComponentProps, MapWidgetComponentState> {
   constructor(props: any) {
     super(props)
     this.state = {
@@ -214,4 +220,3 @@ class MapWidgetComponent extends React.Component {
     )
   }
 }
-MapWidgetComponent.initClass()

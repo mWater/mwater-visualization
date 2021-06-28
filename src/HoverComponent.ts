@@ -34,6 +34,6 @@ export default HoverComponent = class HoverComponent extends React.Component {
         return (this.main = c)
       },
       hovered: this.state.hovered
-    });
+    })
   }
 }

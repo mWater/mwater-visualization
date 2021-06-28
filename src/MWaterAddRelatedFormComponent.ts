@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let MWaterAddRelatedFormComponent
 import $ from "jquery"
 import PropTypes from "prop-types"
 import _ from "lodash"
@@ -14,88 +11,103 @@ import { ExprUtils } from "mwater-expressions"
 import * as ui from "./UIComponents"
 import formUtils from "mwater-forms/lib/formUtils" // TODO requireing this directly because of bizarre backbone issue
 
+interface MWaterAddRelatedFormComponentProps {
+  table: string
+  apiUrl: string
+  client?: string
+  /** User id */
+  user?: string
+  /** Called with table id e.g. responses:someid */
+  onSelect: any
+  schema: any
+}
+
+interface MWaterAddRelatedFormComponentState {
+  waitingForTable: any
+  open: any
+}
+
 // Link that when clicked popup up a modal window allowing user to select a form
 // with an Entity/Site question to the extraTables
-export default MWaterAddRelatedFormComponent = (function () {
-  MWaterAddRelatedFormComponent = class MWaterAddRelatedFormComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        table: PropTypes.string.isRequired,
-        apiUrl: PropTypes.string.isRequired,
-        client: PropTypes.string,
-        user: PropTypes.string, // User id
-        onSelect: PropTypes.func.isRequired, // Called with table id e.g. responses:someid
-        schema: PropTypes.object.isRequired
-      }
-    }
+export default class MWaterAddRelatedFormComponent extends React.Component<
+  MWaterAddRelatedFormComponentProps,
+  MWaterAddRelatedFormComponentState
+> {
+  constructor(props: any) {
+    super(props)
 
-    constructor(props: any) {
-      super(props)
-
-      this.state = {
-        open: false,
-        waitingForTable: null // Set to table id that is being waited for as the result of being selected
-      }
-    }
-
-    componentWillReceiveProps(nextProps: any) {
-      // If waiting and table has arrived, cancel waiting
-      if (this.state.waitingForTable && nextProps.schema.getTable(this.state.waitingForTable)) {
-        return this.setState({ waitingForTable: null })
-      }
-    }
-
-    handleOpen = () => {
-      return this.setState({ open: true })
-    }
-
-    handleSelect = (table: any) => {
-      this.setState({ open: false })
-
-      // Wait for table if not in schema
-      if (!this.props.schema.getTable(table)) {
-        this.setState({ waitingForTable: table })
-      }
-
-      return this.props.onSelect(table)
-    }
-
-    render() {
-      return R(
-        "div",
-        null,
-        this.state.waitingForTable
-          ? R("div", null, R("i", { className: "fa fa-spin fa-spinner" }), " Adding...")
-          : R("a", { className: "btn btn-link", onClick: this.handleOpen }, "+ Add Related Survey"),
-        this.state.open
-          ? R(AddRelatedFormModalComponent, {
-              table: this.props.table,
-              apiUrl: this.props.apiUrl,
-              client: this.props.client,
-              user: this.props.user,
-              onSelect: this.handleSelect,
-              onCancel: () => this.setState({ open: false })
-            })
-          : undefined
-      )
+    this.state = {
+      open: false,
+      waitingForTable: null // Set to table id that is being waited for as the result of being selected
     }
   }
-  MWaterAddRelatedFormComponent.initClass()
-  return MWaterAddRelatedFormComponent
-})()
 
-// Actual modal that displays the
-class AddRelatedFormModalComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      table: PropTypes.string.isRequired,
-      apiUrl: PropTypes.string.isRequired,
-      client: PropTypes.string,
-      user: PropTypes.string, // User id
-      onSelect: PropTypes.func.isRequired, // Called with table id e.g. responses:someid
-      onCancel: PropTypes.func.isRequired // When modal is closed
+  componentWillReceiveProps(nextProps: any) {
+    // If waiting and table has arrived, cancel waiting
+    if (this.state.waitingForTable && nextProps.schema.getTable(this.state.waitingForTable)) {
+      return this.setState({ waitingForTable: null })
+    }
+  }
+
+  handleOpen = () => {
+    return this.setState({ open: true })
+  }
+
+  handleSelect = (table: any) => {
+    this.setState({ open: false })
+
+    // Wait for table if not in schema
+    if (!this.props.schema.getTable(table)) {
+      this.setState({ waitingForTable: table })
     }
 
+    return this.props.onSelect(table)
+  }
+
+  render() {
+    return R(
+      "div",
+      null,
+      this.state.waitingForTable
+        ? R("div", null, R("i", { className: "fa fa-spin fa-spinner" }), " Adding...")
+        : R("a", { className: "btn btn-link", onClick: this.handleOpen }, "+ Add Related Survey"),
+      this.state.open
+        ? R(AddRelatedFormModalComponent, {
+            table: this.props.table,
+            apiUrl: this.props.apiUrl,
+            client: this.props.client,
+            user: this.props.user,
+            onSelect: this.handleSelect,
+            onCancel: () => this.setState({ open: false })
+          })
+        : undefined
+    )
+  }
+}
+
+interface AddRelatedFormModalComponentProps {
+  table: string
+  apiUrl: string
+  client?: string
+  /** User id */
+  user?: string
+  /** Called with table id e.g. responses:someid */
+  onSelect: any
+  /** When modal is closed */
+  onCancel: any
+}
+
+interface AddRelatedFormModalComponentState {
+  items: any
+  search: any
+}
+
+// Actual modal that displays the
+class AddRelatedFormModalComponent extends React.Component<
+  AddRelatedFormModalComponentProps,
+  AddRelatedFormModalComponentState
+> {
+  static initClass() {
     this.contextTypes = { locale: PropTypes.string }
     // e.g. "en"
   }
@@ -169,7 +181,7 @@ class AddRelatedFormModalComponent extends React.Component {
       }),
 
       R(ui.OptionListComponent, { items })
-    );
+    )
   }
 
   render() {
@@ -187,5 +199,5 @@ class AddRelatedFormModalComponent extends React.Component {
 AddRelatedFormModalComponent.initClass()
 
 function escapeRegex(s: any) {
-  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
 }

@@ -83,12 +83,16 @@ export default MWaterServerLayer = class MWaterServerLayer extends Layer {
   }
 }
 
-// Simple class to load legend from server
-class LoadingLegend extends React.Component {
-  static initClass() {
-    this.propTypes = { url: PropTypes.string }
-  }
+interface LoadingLegendProps {
+  url?: string
+}
 
+interface LoadingLegendState {
+  html: any
+}
+
+// Simple class to load legend from server
+class LoadingLegend extends React.Component<LoadingLegendProps, LoadingLegendState> {
   constructor(props: any) {
     super(props)
     this.state = { html: "Loading..." }
@@ -115,4 +119,3 @@ class LoadingLegend extends React.Component {
     })
   }
 }
-LoadingLegend.initClass()

@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let LayeredChartViewComponent
 import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
@@ -12,146 +9,149 @@ import LayeredChartCompiler from "./LayeredChartCompiler"
 import TextComponent from "../../text/TextComponent"
 import d3 from "d3"
 
+interface LayeredChartViewComponentProps {
+  schema: any
+  dataSource: any
+  design: any
+  data: any
+  onDesignChange?: any
+  width: number
+  height: number
+  /** scope of the widget (when the widget self-selects a particular scope) */
+  scope?: any
+  /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
+  onScopeChange?: any
+}
+
+interface LayeredChartViewComponentState {
+  headerHeight: any
+  footerHeight: any
+}
+
 // Displays a layered chart
-export default LayeredChartViewComponent = (function () {
-  LayeredChartViewComponent = class LayeredChartViewComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        schema: PropTypes.object.isRequired,
-        dataSource: PropTypes.object.isRequired,
-        design: PropTypes.object.isRequired,
-        data: PropTypes.object.isRequired,
-        onDesignChange: PropTypes.func,
-
-        width: PropTypes.number.isRequired,
-        height: PropTypes.number.isRequired,
-
-        scope: PropTypes.any, // scope of the widget (when the widget self-selects a particular scope)
-        onScopeChange: PropTypes.func // called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
-      }
-
-      this.contextTypes = { locale: PropTypes.string }
-      // e.g. "en"
-    }
-
-    constructor(props: any) {
-      super(props)
-
-      this.state = {
-        headerHeight: null, // Height of header
-        footerHeight: null // Height of footer
-      }
-    }
-
-    componentDidMount() {
-      return this.updateHeights()
-    }
-
-    componentDidUpdate() {
-      return this.updateHeights()
-    }
-
-    updateHeights() {
-      // Calculate header and footer heights
-      if (this.header && this.state.headerHeight !== this.header.offsetHeight) {
-        this.setState({ headerHeight: this.header.offsetHeight })
-      }
-      if (this.footer && this.state.footerHeight !== this.footer.offsetHeight) {
-        return this.setState({ footerHeight: this.footer.offsetHeight })
-      }
-    }
-
-    handleHeaderChange = (header: any) => {
-      return this.props.onDesignChange(_.extend({}, this.props.design, { header }))
-    }
-
-    handleFooterChange = (footer: any) => {
-      return this.props.onDesignChange(_.extend({}, this.props.design, { footer }))
-    }
-
-    renderHeader() {
-      return R(
-        "div",
-        {
-          ref: (c) => {
-            return (this.header = c)
-          }
-        },
-        R(TextComponent, {
-          design: this.props.design.header,
-          onDesignChange: this.props.onDesignChange ? this.handleHeaderChange : undefined,
-          schema: this.props.schema,
-          dataSource: this.props.dataSource,
-          exprValues: this.props.data.header || {},
-          width: this.props.width
-        })
-      )
-    }
-
-    renderFooter() {
-      return R(
-        "div",
-        {
-          ref: (c) => {
-            return (this.footer = c)
-          }
-        },
-        R(TextComponent, {
-          design: this.props.design.footer,
-          onDesignChange: this.props.onDesignChange ? this.handleFooterChange : undefined,
-          schema: this.props.schema,
-          dataSource: this.props.dataSource,
-          exprValues: this.props.data.footer || {},
-          width: this.props.width
-        })
-      )
-    }
-
-    render() {
-      return R(
-        "div",
-        { style: { width: this.props.width, height: this.props.height } },
-        this.renderHeader(),
-        this.state.headerHeight != null && this.state.footerHeight != null
-          ? R(C3ChartComponent, {
-              schema: this.props.schema,
-              design: this.props.design,
-              data: this.props.data,
-              onDesignChange: this.props.onDesignChange,
-              width: this.props.width,
-              height: this.props.height - this.state.headerHeight - this.state.footerHeight,
-              scope: this.props.scope,
-              onScopeChange: this.props.onScopeChange,
-              locale: this.context.locale
-            })
-          : undefined,
-        this.renderFooter()
-      )
-    }
-  }
-  LayeredChartViewComponent.initClass()
-  return LayeredChartViewComponent
-})()
-
-// Displays the inner C3 component itself
-class C3ChartComponent extends React.Component {
+export default class LayeredChartViewComponent extends React.Component<
+  LayeredChartViewComponentProps,
+  LayeredChartViewComponentState
+> {
   static initClass() {
-    this.propTypes = {
-      schema: PropTypes.object.isRequired,
-      design: PropTypes.object.isRequired,
-      data: PropTypes.object.isRequired,
-      onDesignChange: PropTypes.func,
-
-      width: PropTypes.number.isRequired,
-      height: PropTypes.number.isRequired,
-
-      scope: PropTypes.any, // scope of the widget (when the widget self-selects a particular scope)
-      onScopeChange: PropTypes.func, // called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
-      locale: PropTypes.string
-    }
+    this.contextTypes = { locale: PropTypes.string }
     // e.g. "en"
   }
 
+  constructor(props: any) {
+    super(props)
+
+    this.state = {
+      headerHeight: null, // Height of header
+      footerHeight: null // Height of footer
+    }
+  }
+
+  componentDidMount() {
+    return this.updateHeights()
+  }
+
+  componentDidUpdate() {
+    return this.updateHeights()
+  }
+
+  updateHeights() {
+    // Calculate header and footer heights
+    if (this.header && this.state.headerHeight !== this.header.offsetHeight) {
+      this.setState({ headerHeight: this.header.offsetHeight })
+    }
+    if (this.footer && this.state.footerHeight !== this.footer.offsetHeight) {
+      return this.setState({ footerHeight: this.footer.offsetHeight })
+    }
+  }
+
+  handleHeaderChange = (header: any) => {
+    return this.props.onDesignChange(_.extend({}, this.props.design, { header }))
+  }
+
+  handleFooterChange = (footer: any) => {
+    return this.props.onDesignChange(_.extend({}, this.props.design, { footer }))
+  }
+
+  renderHeader() {
+    return R(
+      "div",
+      {
+        ref: (c) => {
+          return (this.header = c)
+        }
+      },
+      R(TextComponent, {
+        design: this.props.design.header,
+        onDesignChange: this.props.onDesignChange ? this.handleHeaderChange : undefined,
+        schema: this.props.schema,
+        dataSource: this.props.dataSource,
+        exprValues: this.props.data.header || {},
+        width: this.props.width
+      })
+    )
+  }
+
+  renderFooter() {
+    return R(
+      "div",
+      {
+        ref: (c) => {
+          return (this.footer = c)
+        }
+      },
+      R(TextComponent, {
+        design: this.props.design.footer,
+        onDesignChange: this.props.onDesignChange ? this.handleFooterChange : undefined,
+        schema: this.props.schema,
+        dataSource: this.props.dataSource,
+        exprValues: this.props.data.footer || {},
+        width: this.props.width
+      })
+    )
+  }
+
+  render() {
+    return R(
+      "div",
+      { style: { width: this.props.width, height: this.props.height } },
+      this.renderHeader(),
+      this.state.headerHeight != null && this.state.footerHeight != null
+        ? R(C3ChartComponent, {
+            schema: this.props.schema,
+            design: this.props.design,
+            data: this.props.data,
+            onDesignChange: this.props.onDesignChange,
+            width: this.props.width,
+            height: this.props.height - this.state.headerHeight - this.state.footerHeight,
+            scope: this.props.scope,
+            onScopeChange: this.props.onScopeChange,
+            locale: this.context.locale
+          })
+        : undefined,
+      this.renderFooter()
+    )
+  }
+}
+
+LayeredChartViewComponent.initClass()
+
+interface C3ChartComponentProps {
+  schema: any
+  design: any
+  data: any
+  onDesignChange?: any
+  width: number
+  height: number
+  /** scope of the widget (when the widget self-selects a particular scope) */
+  scope?: any
+  /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
+  onScopeChange?: any
+  locale?: string
+}
+
+// Displays the inner C3 component itself
+class C3ChartComponent extends React.Component<C3ChartComponentProps> {
   constructor(props: any) {
     super(props)
 
@@ -292,7 +292,7 @@ class C3ChartComponent extends React.Component {
           // Not scoped
           return 1
         }
-      });
+      })
   }
 
   // Gets a data point { layerIndex, row } from a d3 object (d)
@@ -363,4 +363,3 @@ class C3ChartComponent extends React.Component {
     })
   }
 }
-C3ChartComponent.initClass()

@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let DatagridDesignerComponent
 import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
@@ -22,167 +19,168 @@ import ui from "react-library/lib/bootstrap"
 import { getFormatOptions } from "../valueFormatter"
 import { getDefaultFormat } from "../valueFormatter"
 
+interface DatagridDesignerComponentProps {
+  /** schema to use */
+  schema: any
+  /** dataSource to use */
+  dataSource: any
+  /** Design of datagrid. See README.md of this folder */
+  design: any
+  /** Called when design changes */
+  onDesignChange: any
+}
+
 // Designer for the datagrid. Currenly allows only single-table designs (no subtable rows)
-export default DatagridDesignerComponent = (function () {
-  DatagridDesignerComponent = class DatagridDesignerComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        schema: PropTypes.object.isRequired, // schema to use
-        dataSource: PropTypes.object.isRequired, // dataSource to use
-        design: PropTypes.object.isRequired, // Design of datagrid. See README.md of this folder
-        onDesignChange: PropTypes.func.isRequired // Called when design changes
-      }
+export default class DatagridDesignerComponent extends React.Component<DatagridDesignerComponentProps> {
+  static initClass() {
+    this.contextTypes = { globalFiltersElementFactory: PropTypes.func }
+    // Call with props { schema, dataSource, globalFilters, filterableTables, onChange, nullIfIrrelevant }. Displays a component to edit global filters
+  }
 
-      this.contextTypes = { globalFiltersElementFactory: PropTypes.func }
-      // Call with props { schema, dataSource, globalFilters, filterableTables, onChange, nullIfIrrelevant }. Displays a component to edit global filters
+  handleTableChange = (table: any) => {
+    const design = {
+      table,
+      columns: []
     }
 
-    handleTableChange = (table: any) => {
-      const design = {
-        table,
-        columns: []
-      }
+    return this.props.onDesignChange(design)
+  }
 
-      return this.props.onDesignChange(design)
-    }
+  handleColumnsChange = (columns: any) => {
+    return this.props.onDesignChange(update(this.props.design, { columns: { $set: columns } }))
+  }
 
-    handleColumnsChange = (columns: any) => {
-      return this.props.onDesignChange(update(this.props.design, { columns: { $set: columns } }))
-    }
+  handleFilterChange = (filter: any) => {
+    return this.props.onDesignChange(update(this.props.design, { filter: { $set: filter } }))
+  }
 
-    handleFilterChange = (filter: any) => {
-      return this.props.onDesignChange(update(this.props.design, { filter: { $set: filter } }))
-    }
+  handleGlobalFiltersChange = (globalFilters: any) => {
+    return this.props.onDesignChange(update(this.props.design, { globalFilters: { $set: globalFilters } }))
+  }
 
-    handleGlobalFiltersChange = (globalFilters: any) => {
-      return this.props.onDesignChange(update(this.props.design, { globalFilters: { $set: globalFilters } }))
-    }
+  handleOrderBysChange = (orderBys: any) => {
+    return this.props.onDesignChange(update(this.props.design, { orderBys: { $set: orderBys } }))
+  }
 
-    handleOrderBysChange = (orderBys: any) => {
-      return this.props.onDesignChange(update(this.props.design, { orderBys: { $set: orderBys } }))
-    }
-
-    // Render the tabs of the designer
-    renderTabs() {
-      return R(TabbedComponent, {
-        initialTabId: "columns",
-        tabs: [
-          {
-            id: "columns",
-            label: "Columns",
-            elem: R(ColumnsDesignerComponent, {
+  // Render the tabs of the designer
+  renderTabs() {
+    return R(TabbedComponent, {
+      initialTabId: "columns",
+      tabs: [
+        {
+          id: "columns",
+          label: "Columns",
+          elem: R(ColumnsDesignerComponent, {
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            table: this.props.design.table,
+            columns: this.props.design.columns,
+            onColumnsChange: this.handleColumnsChange
+          })
+        },
+        {
+          id: "filter",
+          label: "Filter",
+          // Here because of modal scroll issue
+          elem: R(
+            "div",
+            { style: { marginBottom: 200 } },
+            R(FilterExprComponent, {
               schema: this.props.schema,
               dataSource: this.props.dataSource,
               table: this.props.design.table,
-              columns: this.props.design.columns,
-              onColumnsChange: this.handleColumnsChange
+              value: this.props.design.filter,
+              onChange: this.handleFilterChange
+            }),
+            this.context.globalFiltersElementFactory
+              ? R(
+                  "div",
+                  { style: { marginTop: 20 } },
+                  this.context.globalFiltersElementFactory({
+                    schema: this.props.schema,
+                    dataSource: this.props.dataSource,
+                    filterableTables: [this.props.design.table],
+                    globalFilters: this.props.design.globalFilters,
+                    onChange: this.handleGlobalFiltersChange,
+                    nullIfIrrelevant: true
+                  })
+                )
+              : undefined
+          )
+        },
+        {
+          id: "order",
+          label: "Sorting",
+          elem: R(
+            "div",
+            { style: { marginBottom: 200 } },
+            R(OrderBysDesignerComponent, {
+              schema: this.props.schema,
+              dataSource: this.props.dataSource,
+              table: this.props.design.table,
+              orderBys: this.props.design.orderBys,
+              onChange: this.handleOrderBysChange
             })
-          },
-          {
-            id: "filter",
-            label: "Filter",
-            // Here because of modal scroll issue
-            elem: R(
-              "div",
-              { style: { marginBottom: 200 } },
-              R(FilterExprComponent, {
-                schema: this.props.schema,
-                dataSource: this.props.dataSource,
-                table: this.props.design.table,
-                value: this.props.design.filter,
-                onChange: this.handleFilterChange
-              }),
-              this.context.globalFiltersElementFactory
-                ? R(
-                    "div",
-                    { style: { marginTop: 20 } },
-                    this.context.globalFiltersElementFactory({
-                      schema: this.props.schema,
-                      dataSource: this.props.dataSource,
-                      filterableTables: [this.props.design.table],
-                      globalFilters: this.props.design.globalFilters,
-                      onChange: this.handleGlobalFiltersChange,
-                      nullIfIrrelevant: true
-                    })
-                  )
-                : undefined
-            )
-          },
-          {
-            id: "order",
-            label: "Sorting",
-            elem: R(
-              "div",
-              { style: { marginBottom: 200 } },
-              R(OrderBysDesignerComponent, {
-                schema: this.props.schema,
-                dataSource: this.props.dataSource,
-                table: this.props.design.table,
-                orderBys: this.props.design.orderBys,
-                onChange: this.handleOrderBysChange
-              })
-            )
-          },
-          {
-            id: "quickfilters",
-            label: "Quickfilters",
-            elem: R(
-              "div",
-              { style: { marginBottom: 200 } },
-              R(QuickfiltersDesignComponent, {
-                design: this.props.design.quickfilters,
-                onDesignChange: (design: any) => this.props.onDesignChange(update(this.props.design, { quickfilters: { $set: design } })),
-                schema: this.props.schema,
-                dataSource: this.props.dataSource,
-                tables: [this.props.design.table]
-              })
-            )
-          },
-          {
-            id: "options",
-            label: "Options",
-            elem: R(
-              "div",
-              { style: { marginBottom: 200 } },
-              R(DatagridOptionsComponent, {
-                design: this.props.design,
-                onDesignChange: this.props.onDesignChange
-              })
-            )
-          }
-        ]
-      });
-    }
-
-    render() {
-      return R(
-        "div",
-        null,
-        R("label", null, "Data Source:"),
-        R(TableSelectComponent, {
-          schema: this.props.schema,
-          value: this.props.design.table,
-          onChange: this.handleTableChange
-        }),
-
-        this.props.design.table ? this.renderTabs() : undefined
-      )
-    }
+          )
+        },
+        {
+          id: "quickfilters",
+          label: "Quickfilters",
+          elem: R(
+            "div",
+            { style: { marginBottom: 200 } },
+            R(QuickfiltersDesignComponent, {
+              design: this.props.design.quickfilters,
+              onDesignChange: (design: any) =>
+                this.props.onDesignChange(update(this.props.design, { quickfilters: { $set: design } })),
+              schema: this.props.schema,
+              dataSource: this.props.dataSource,
+              tables: [this.props.design.table]
+            })
+          )
+        },
+        {
+          id: "options",
+          label: "Options",
+          elem: R(
+            "div",
+            { style: { marginBottom: 200 } },
+            R(DatagridOptionsComponent, {
+              design: this.props.design,
+              onDesignChange: this.props.onDesignChange
+            })
+          )
+        }
+      ]
+    })
   }
-  DatagridDesignerComponent.initClass()
-  return DatagridDesignerComponent
-})()
+
+  render() {
+    return R(
+      "div",
+      null,
+      R("label", null, "Data Source:"),
+      R(TableSelectComponent, {
+        schema: this.props.schema,
+        value: this.props.design.table,
+        onChange: this.handleTableChange
+      }),
+
+      this.props.design.table ? this.renderTabs() : undefined
+    )
+  }
+}
+
+DatagridDesignerComponent.initClass()
+
+interface DatagridOptionsComponentProps {
+  /** Datagrid design. See README.md */
+  design: any
+  onDesignChange: any
+}
 
 // Datagrid Options
-class DatagridOptionsComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      design: PropTypes.object.isRequired, // Datagrid design. See README.md
-      onDesignChange: PropTypes.func.isRequired
-    }
-    // Called when design changes
-  }
-
+class DatagridOptionsComponent extends React.Component<DatagridOptionsComponentProps> {
   render() {
     return R(
       ui.FormGroup,
@@ -199,21 +197,19 @@ class DatagridOptionsComponent extends React.Component {
     )
   }
 }
-DatagridOptionsComponent.initClass()
+interface ColumnsDesignerComponentProps {
+  /** schema to use */
+  schema: any
+  /** dataSource to use */
+  dataSource: any
+  table: string
+  /** Columns list See README.md of this folder */
+  columns: any
+  onColumnsChange: any
+}
 
 // Columns list
-class ColumnsDesignerComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      schema: PropTypes.object.isRequired, // schema to use
-      dataSource: PropTypes.object.isRequired, // dataSource to use
-      table: PropTypes.string.isRequired,
-      columns: PropTypes.array.isRequired, // Columns list See README.md of this folder
-      onColumnsChange: PropTypes.func.isRequired
-    }
-    // Called when columns changes
-  }
-
+class ColumnsDesignerComponent extends React.Component<ColumnsDesignerComponentProps> {
   handleColumnChange = (columnIndex: any, column: any) => {
     const columns = this.props.columns.slice()
 
@@ -274,7 +270,13 @@ class ColumnsDesignerComponent extends React.Component {
     return this.props.onColumnsChange([])
   }
 
-  renderColumn = (column: any, columnIndex: any, connectDragSource: any, connectDragPreview: any, connectDropTarget: any) => {
+  renderColumn = (
+    column: any,
+    columnIndex: any,
+    connectDragSource: any,
+    connectDragPreview: any,
+    connectDropTarget: any
+  ) => {
     return R(ColumnDesignerComponent, {
       key: columnIndex,
       schema: this.props.schema,
@@ -352,24 +354,25 @@ class ColumnsDesignerComponent extends React.Component {
     )
   }
 }
-ColumnsDesignerComponent.initClass()
+interface ColumnDesignerComponentProps {
+  /** schema to use */
+  schema: any
+  /** dataSource to use */
+  dataSource: any
+  table: string
+  /** Column See README.md of this folder */
+  column: any
+  /** Called when column changes. Null to remove. Array to replace with multiple entries */
+  onColumnChange: any
+  /** Connect drag source (handle) here */
+  connectDragSource: any
+  /** Connect drag preview here */
+  connectDragPreview: any
+  connectDropTarget: any
+}
 
 // Column item
-class ColumnDesignerComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      schema: PropTypes.object.isRequired, // schema to use
-      dataSource: PropTypes.object.isRequired, // dataSource to use
-      table: PropTypes.string.isRequired,
-      column: PropTypes.object.isRequired, // Column See README.md of this folder
-      onColumnChange: PropTypes.func.isRequired, // Called when column changes. Null to remove. Array to replace with multiple entries
-      connectDragSource: PropTypes.func.isRequired, // Connect drag source (handle) here
-      connectDragPreview: PropTypes.func.isRequired, // Connect drag preview here
-      connectDropTarget: PropTypes.func.isRequired
-    }
-    // Connect drop target
-  }
-
+class ColumnDesignerComponent extends React.Component<ColumnDesignerComponentProps> {
   handleExprChange = (expr: any) => {
     return this.props.onColumnChange(update(this.props.column, { expr: { $set: expr } }))
   }
@@ -566,4 +569,3 @@ class ColumnDesignerComponent extends React.Component {
     return this.props.connectDropTarget(this.props.connectDragPreview(elem))
   }
 }
-ColumnDesignerComponent.initClass()

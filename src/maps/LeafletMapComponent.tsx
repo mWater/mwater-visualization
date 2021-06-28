@@ -78,7 +78,7 @@ export default LeafletMapComponent = (function () {
     // Reload all tiles
     reload() {
       // TODO reload JSON tiles
-      return this.tileLayers.map((tileLayer: any) => tileLayer.redraw());
+      return this.tileLayers.map((tileLayer: any) => tileLayer.redraw())
     }
 
     // Get underlying leaflet map
@@ -462,7 +462,7 @@ export default LeafletMapComponent = (function () {
                   ;((layer) => {
                     return utfGridLayer.on("click", (ev: any) => {
                       return layer.onGridClick(ev)
-                    });
+                    })
                   })(layer)
                 }
 
@@ -477,7 +477,7 @@ export default LeafletMapComponent = (function () {
                       })
                       return utfGridLayer.on("mousemove", (ev: any) => {
                         return layer.onGridHover(ev)
-                      });
+                      })
                     })(layer)
                   )
                 } else {
@@ -488,7 +488,7 @@ export default LeafletMapComponent = (function () {
               }
             }
             return result
-          })();
+          })()
         }
       }
     }
@@ -507,7 +507,7 @@ export default LeafletMapComponent = (function () {
           },
           style: { width: this.props.width, height: this.props.height }
         })
-      );
+      )
     }
   }
   LeafletMapComponent.initClass()

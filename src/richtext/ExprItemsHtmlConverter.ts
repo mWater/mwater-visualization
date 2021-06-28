@@ -98,24 +98,25 @@ export default ExprItemsHtmlConverter = class ExprItemsHtmlConverter extends Ite
 
     // Ensure exprs have unique ids
     const takenIds = {}
-    var uniqueify = (items: any) => (() => {
-      const result = []
-      for (let item of items) {
-        if (item.type === "expr") {
-          if (takenIds[item.id]) {
-            item.id = uuid()
+    var uniqueify = (items: any) =>
+      (() => {
+        const result = []
+        for (let item of items) {
+          if (item.type === "expr") {
+            if (takenIds[item.id]) {
+              item.id = uuid()
+            }
+            takenIds[item.id] = true
           }
-          takenIds[item.id] = true
-        }
 
-        if (item.items) {
-          result.push(uniqueify(item.items))
-        } else {
-          result.push(undefined)
+          if (item.items) {
+            result.push(uniqueify(item.items))
+          } else {
+            result.push(undefined)
+          }
         }
-      }
-      return result
-    })()
+        return result
+      })()
 
     uniqueify(items)
 

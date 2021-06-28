@@ -176,7 +176,7 @@ export function replaceSegment(segments: any, replacement: any) {
       return replacement
     }
     return segment
-  });
+  })
 }
 
 // Remove segment
@@ -186,7 +186,7 @@ export function removeSegment(segments: any, id: any) {
       return null
     }
     return segment
-  });
+  })
 }
 
 // Inserts before
@@ -196,7 +196,7 @@ export function insertBeforeSegment(segments: any, id: any) {
       return [{ id: uuid() }, segment]
     }
     return segment
-  });
+  })
 }
 
 // Inserts after
@@ -206,7 +206,7 @@ export function insertAfterSegment(segments: any, id: any) {
       return [segment, { id: uuid() }]
     }
     return segment
-  });
+  })
 }
 
 // Adds child
@@ -216,5 +216,5 @@ export function addChildSegment(segments: any, id: any) {
       return _.extend({}, segment, { children: (segment.children || []).concat([{ id: uuid() }]) })
     }
     return segment
-  });
+  })
 }

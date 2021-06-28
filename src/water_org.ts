@@ -78,19 +78,17 @@ export function loadDashboard(options: any) {
 
       // Initial render
       return render()
-    });
-  });
+    })
+  })
 }
 
-class TabbedDashboard extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      design: PropTypes.object.isRequired,
-      onDesignChange: PropTypes.func.isRequired,
-      widgetFactory: PropTypes.object.isRequired
-    }
-  }
+interface TabbedDashboardProps {
+  design: any
+  onDesignChange: any
+  widgetFactory: any
+}
 
+class TabbedDashboard extends React.Component<TabbedDashboardProps> {
   handleDesignChange = (index: any, design: any) => {
     const tabs = this.props.design.tabs.slice()
     tabs[index] = _.extend({}, tabs[index], { design })
@@ -163,4 +161,3 @@ class TabbedDashboard extends React.Component {
     })
   }
 }
-TabbedDashboard.initClass()

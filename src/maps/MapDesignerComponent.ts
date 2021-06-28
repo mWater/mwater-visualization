@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let MapDesignerComponent
 import _ from "lodash"
 import PropTypes from "prop-types"
 import React from "react"
@@ -18,193 +15,200 @@ import MapUtils from "./MapUtils"
 import { ExprCompiler } from "mwater-expressions"
 import ui from "react-library/lib/bootstrap"
 
-export default MapDesignerComponent = (function () {
-  MapDesignerComponent = class MapDesignerComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        schema: PropTypes.object.isRequired, // Schema to use
-        dataSource: PropTypes.object.isRequired, // Data source to use
-        design: PropTypes.object.isRequired, // See Map Design.md
-        onDesignChange: PropTypes.func.isRequired, // Called with new design
-        filters: PropTypes.array // array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
-      }
+interface MapDesignerComponentProps {
+  /** Schema to use */
+  schema: any
+  /** Data source to use */
+  dataSource: any
+  /** See Map Design.md */
+  design: any
+  /** Called with new design */
+  onDesignChange: any
+  /** array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct */
+  filters?: any
+}
 
-      this.childContextTypes = { activeTables: PropTypes.arrayOf(PropTypes.string.isRequired) }
-      // List of tables (ids) being used. Use this to present an initially short list to select from
-    }
+export default class MapDesignerComponent extends React.Component<MapDesignerComponentProps> {
+  static initClass() {
+    this.childContextTypes = { activeTables: PropTypes.arrayOf(PropTypes.string.isRequired) }
+    // List of tables (ids) being used. Use this to present an initially short list to select from
+  }
 
-    getChildContext() {
-      return {
-        // Pass active tables down to table select components so they can present a shorter list
-        activeTables: MapUtils.getFilterableTables(this.props.design, this.props.schema)
-      }
-    }
-
-    handleAttributionChange = (text: any) => {
-      const design = _.extend({}, this.props.design, { attribution: text })
-      return this.props.onDesignChange(design)
-    }
-
-    handleAutoBoundsChange = (value: any) => {
-      const design = _.extend({}, this.props.design, { autoBounds: value })
-      return this.props.onDesignChange(design)
-    }
-
-    handleShowLayerSwitcherChange = (value: any) => {
-      const design = _.extend({}, this.props.design, { showLayerSwitcher: value })
-      return this.props.onDesignChange(design)
-    }
-
-    handleConvertToClusterMap = () => {
-      return this.props.onDesignChange(MapUtils.convertToClusterMap(this.props.design))
-    }
-
-    handleInitialLegendDisplayChange = (value: any) => {
-      const design = _.extend({}, this.props.design, { initialLegendDisplay: value })
-      return this.props.onDesignChange(design)
-    }
-
-    renderOptionsTab() {
-      return R(
-        "div",
-        null,
-        R(BaseLayerDesignerComponent, {
-          design: this.props.design,
-          onDesignChange: this.props.onDesignChange
-        }),
-
-        R(
-          CheckboxComponent,
-          {
-            checked: this.props.design.autoBounds,
-            onChange: this.handleAutoBoundsChange
-          },
-          R(
-            "span",
-            { className: "text-muted" },
-            "Automatic zoom ",
-            R(
-              PopoverHelpComponent,
-              { placement: "left" },
-              "Automatically zoom to the complete data whenever the map is loaded or the filters change"
-            )
-          )
-        ),
-
-        R(
-          CheckboxComponent,
-          {
-            checked: this.props.design.showLayerSwitcher,
-            onChange: this.handleShowLayerSwitcherChange
-          },
-          R(
-            "span",
-            { className: "text-muted" },
-            "Show Layer Switcher ",
-            R(PopoverHelpComponent, { placement: "left" }, "Show a control in the map allowing switching layers")
-          )
-        ),
-
-        R(
-          ui.FormGroup,
-          { label: "Initial Legend Display", labelMuted: true },
-          R(ui.Select, {
-            value: this.props.design.initialLegendDisplay || "open",
-            onChange: this.handleInitialLegendDisplayChange,
-            options: [
-              { value: "open", label: "Open" },
-              { value: "closed", label: "Closed" },
-              { value: "closedIfSmall", label: "Open if wide enough" }
-            ],
-            style: { width: "auto" }
-          })
-        ),
-
-        MapUtils.canConvertToClusterMap(this.props.design)
-          ? R(
-              "div",
-              { key: "tocluster" },
-              R(
-                "a",
-                { onClick: this.handleConvertToClusterMap, className: "btn btn-link btn-sm" },
-                "Convert to cluster map"
-              )
-            )
-          : undefined,
-
-        R(AttributionComponent, {
-          text: this.props.design.attribution,
-          onTextChange: this.handleAttributionChange
-        }),
-
-        R("br"),
-
-        R(AdvancedOptionsComponent, {
-          design: this.props.design,
-          onDesignChange: this.props.onDesignChange
-        })
-      )
-    }
-
-    render() {
-      const filters = (this.props.filters || []).concat(
-        MapUtils.getCompiledFilters(
-          this.props.design,
-          this.props.schema,
-          MapUtils.getFilterableTables(this.props.design, this.props.schema)
-        )
-      )
-
-      return R(
-        "div",
-        { style: { padding: 5 } },
-        R(TabbedComponent, {
-          initialTabId: "layers",
-          tabs: [
-            {
-              id: "layers",
-              label: [R("i", { className: "fa fa-bars" }), " Layers"],
-              elem: R(MapLayersDesignerComponent, {
-                schema: this.props.schema,
-                dataSource: this.props.dataSource,
-                design: this.props.design,
-                onDesignChange: this.props.onDesignChange,
-                allowEditingLayers: true,
-                filters: _.compact(filters)
-              })
-            },
-            {
-              id: "filters",
-              label: [R("i", { className: "fa fa-filter" }), " Filters"],
-              elem: R(MapFiltersDesignerComponent, {
-                schema: this.props.schema,
-                dataSource: this.props.dataSource,
-                design: this.props.design,
-                onDesignChange: this.props.onDesignChange
-              })
-            },
-            {
-              id: "options",
-              label: [R("i", { className: "fa fa-cog" }), " Options"],
-              elem: this.renderOptionsTab()
-            }
-          ]
-        })
-      )
+  getChildContext() {
+    return {
+      // Pass active tables down to table select components so they can present a shorter list
+      activeTables: MapUtils.getFilterableTables(this.props.design, this.props.schema)
     }
   }
-  MapDesignerComponent.initClass()
-  return MapDesignerComponent
-})()
+
+  handleAttributionChange = (text: any) => {
+    const design = _.extend({}, this.props.design, { attribution: text })
+    return this.props.onDesignChange(design)
+  }
+
+  handleAutoBoundsChange = (value: any) => {
+    const design = _.extend({}, this.props.design, { autoBounds: value })
+    return this.props.onDesignChange(design)
+  }
+
+  handleShowLayerSwitcherChange = (value: any) => {
+    const design = _.extend({}, this.props.design, { showLayerSwitcher: value })
+    return this.props.onDesignChange(design)
+  }
+
+  handleConvertToClusterMap = () => {
+    return this.props.onDesignChange(MapUtils.convertToClusterMap(this.props.design))
+  }
+
+  handleInitialLegendDisplayChange = (value: any) => {
+    const design = _.extend({}, this.props.design, { initialLegendDisplay: value })
+    return this.props.onDesignChange(design)
+  }
+
+  renderOptionsTab() {
+    return R(
+      "div",
+      null,
+      R(BaseLayerDesignerComponent, {
+        design: this.props.design,
+        onDesignChange: this.props.onDesignChange
+      }),
+
+      R(
+        CheckboxComponent,
+        {
+          checked: this.props.design.autoBounds,
+          onChange: this.handleAutoBoundsChange
+        },
+        R(
+          "span",
+          { className: "text-muted" },
+          "Automatic zoom ",
+          R(
+            PopoverHelpComponent,
+            { placement: "left" },
+            "Automatically zoom to the complete data whenever the map is loaded or the filters change"
+          )
+        )
+      ),
+
+      R(
+        CheckboxComponent,
+        {
+          checked: this.props.design.showLayerSwitcher,
+          onChange: this.handleShowLayerSwitcherChange
+        },
+        R(
+          "span",
+          { className: "text-muted" },
+          "Show Layer Switcher ",
+          R(PopoverHelpComponent, { placement: "left" }, "Show a control in the map allowing switching layers")
+        )
+      ),
+
+      R(
+        ui.FormGroup,
+        { label: "Initial Legend Display", labelMuted: true },
+        R(ui.Select, {
+          value: this.props.design.initialLegendDisplay || "open",
+          onChange: this.handleInitialLegendDisplayChange,
+          options: [
+            { value: "open", label: "Open" },
+            { value: "closed", label: "Closed" },
+            { value: "closedIfSmall", label: "Open if wide enough" }
+          ],
+          style: { width: "auto" }
+        })
+      ),
+
+      MapUtils.canConvertToClusterMap(this.props.design)
+        ? R(
+            "div",
+            { key: "tocluster" },
+            R(
+              "a",
+              { onClick: this.handleConvertToClusterMap, className: "btn btn-link btn-sm" },
+              "Convert to cluster map"
+            )
+          )
+        : undefined,
+
+      R(AttributionComponent, {
+        text: this.props.design.attribution,
+        onTextChange: this.handleAttributionChange
+      }),
+
+      R("br"),
+
+      R(AdvancedOptionsComponent, {
+        design: this.props.design,
+        onDesignChange: this.props.onDesignChange
+      })
+    )
+  }
+
+  render() {
+    const filters = (this.props.filters || []).concat(
+      MapUtils.getCompiledFilters(
+        this.props.design,
+        this.props.schema,
+        MapUtils.getFilterableTables(this.props.design, this.props.schema)
+      )
+    )
+
+    return R(
+      "div",
+      { style: { padding: 5 } },
+      R(TabbedComponent, {
+        initialTabId: "layers",
+        tabs: [
+          {
+            id: "layers",
+            label: [R("i", { className: "fa fa-bars" }), " Layers"],
+            elem: R(MapLayersDesignerComponent, {
+              schema: this.props.schema,
+              dataSource: this.props.dataSource,
+              design: this.props.design,
+              onDesignChange: this.props.onDesignChange,
+              allowEditingLayers: true,
+              filters: _.compact(filters)
+            })
+          },
+          {
+            id: "filters",
+            label: [R("i", { className: "fa fa-filter" }), " Filters"],
+            elem: R(MapFiltersDesignerComponent, {
+              schema: this.props.schema,
+              dataSource: this.props.dataSource,
+              design: this.props.design,
+              onDesignChange: this.props.onDesignChange
+            })
+          },
+          {
+            id: "options",
+            label: [R("i", { className: "fa fa-cog" }), " Options"],
+            elem: this.renderOptionsTab()
+          }
+        ]
+      })
+    )
+  }
+}
+
+MapDesignerComponent.initClass()
+
+interface AttributionComponentProps {
+  text?: string
+  onTextChange: any
+}
+
+interface AttributionComponentState {
+  editing: any
+}
 
 // Attribution inline editing
-class AttributionComponent extends React.Component {
+class AttributionComponent extends React.Component<AttributionComponentProps, AttributionComponentState> {
   static initClass() {
-    this.propTypes = {
-      text: PropTypes.string,
-      onTextChange: PropTypes.func.isRequired
-    }
-
     this.defaultProps = { text: null }
   }
 
@@ -256,15 +260,17 @@ class AttributionComponent extends React.Component {
 }
 AttributionComponent.initClass()
 
-// Advanced options control
-class AdvancedOptionsComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      design: PropTypes.object.isRequired,
-      onDesignChange: PropTypes.func.isRequired
-    }
-  }
+interface AdvancedOptionsComponentProps {
+  design: any
+  onDesignChange: any
+}
 
+interface AdvancedOptionsComponentState {
+  expanded: any
+}
+
+// Advanced options control
+class AdvancedOptionsComponent extends React.Component<AdvancedOptionsComponentProps, AdvancedOptionsComponentState> {
   constructor(props: any) {
     super(props)
 
@@ -304,7 +310,6 @@ class AdvancedOptionsComponent extends React.Component {
           onChange: (v: any) => this.props.onDesignChange(_.extend({}, this.props.design, { maxZoom: v }))
         })
       )
-    );
+    )
   }
 }
-AdvancedOptionsComponent.initClass()

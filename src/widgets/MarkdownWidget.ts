@@ -38,17 +38,20 @@ export default MarkdownWidget = class MarkdownWidget extends Widget {
   }
 }
 
-class MarkdownWidgetComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      design: PropTypes.object.isRequired, // See Map Design.md
-      onDesignChange: PropTypes.func, // Called with new design. null/undefined for readonly
+interface MarkdownWidgetComponentProps {
+  /** See Map Design.md */
+  design: any
+  /** Called with new design. null/undefined for readonly */
+  onDesignChange?: any
+  width?: number
+  height?: number
+}
 
-      width: PropTypes.number,
-      height: PropTypes.number
-    }
-  }
+interface MarkdownWidgetComponentState {
+  editDesign: any
+}
 
+class MarkdownWidgetComponent extends React.Component<MarkdownWidgetComponentProps, MarkdownWidgetComponentState> {
   constructor(props: any) {
     super(props)
     this.state = {
@@ -158,18 +161,15 @@ class MarkdownWidgetComponent extends React.Component {
     )
   }
 }
-MarkdownWidgetComponent.initClass()
 
-class MarkdownWidgetViewComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      design: PropTypes.object.isRequired, // Design of chart
+interface MarkdownWidgetViewComponentProps {
+  /** Design of chart */
+  design: any
+  width?: number
+  height?: number
+}
 
-      width: PropTypes.number,
-      height: PropTypes.number
-    }
-  }
-
+class MarkdownWidgetViewComponent extends React.Component<MarkdownWidgetViewComponentProps> {
   render() {
     return R("div", {
       style: {
@@ -181,16 +181,13 @@ class MarkdownWidgetViewComponent extends React.Component {
     })
   }
 }
-MarkdownWidgetViewComponent.initClass()
 
-class MarkdownWidgetDesignerComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      design: PropTypes.object.isRequired,
-      onDesignChange: PropTypes.func.isRequired
-    }
-  }
+interface MarkdownWidgetDesignerComponentProps {
+  design: any
+  onDesignChange: any
+}
 
+class MarkdownWidgetDesignerComponent extends React.Component<MarkdownWidgetDesignerComponentProps> {
   handleMarkdownChange = (ev: any) => {
     const design = _.extend({}, this.props.design, { markdown: ev.target.value })
     return this.props.onDesignChange(design)
@@ -205,4 +202,3 @@ class MarkdownWidgetDesignerComponent extends React.Component {
     })
   }
 }
-MarkdownWidgetDesignerComponent.initClass()

@@ -1,67 +1,60 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let PopoverComponent
 import _ from "lodash"
 import $ from "jquery"
 import PropTypes from "prop-types"
 import React from "react"
 import ReactDOM from "react-dom"
 
+interface PopoverComponentProps {
+  /** contents of popover */
+  content: any
+  /** See http://getbootstrap.com/javascript/#popovers */
+  placement?: string
+  visible: boolean
+}
+
 // Wraps a child with an optional popover
-export default PopoverComponent = (function () {
-  PopoverComponent = class PopoverComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        content: PropTypes.node.isRequired, // contents of popover
-        placement: PropTypes.string, // See http://getbootstrap.com/javascript/#popovers
-        visible: PropTypes.bool.isRequired
-      }
-    }
+export default class PopoverComponent extends React.Component<PopoverComponentProps> {
+  componentDidMount() {
+    return this.updatePopover(this.props, null)
+  }
 
-    componentDidMount() {
-      return this.updatePopover(this.props, null)
-    }
+  componentWillUnmount() {
+    return this.updatePopover(null, this.props)
+  }
 
-    componentWillUnmount() {
-      return this.updatePopover(null, this.props)
-    }
-
-    componentDidUpdate(prevProps: any) {
-      if (
-        !_.isEqual(prevProps.content, this.props.content) ||
-        prevProps.visible !== this.props.visible ||
-        prevProps.placement !== this.props.placement
-      ) {
-        return this.updatePopover(this.props, prevProps)
-      }
-    }
-
-    updatePopover(props: any, oldProps: any) {
-      // Destroy old popover
-      if (oldProps && oldProps.visible) {
-        $(ReactDOM.findDOMNode(this)).popover("destroy")
-      }
-
-      if (props && props.visible) {
-        const div = document.createElement("div")
-        return ReactDOM.render(this.props.content, div, () => {
-          $(ReactDOM.findDOMNode(this)).popover({
-            content() {
-              return $(div)
-            },
-            html: true,
-            trigger: "manual",
-            placement: this.props.placement
-          })
-          return $(ReactDOM.findDOMNode(this)).popover("show")
-        })
-      }
-    }
-
-    render() {
-      return React.Children.only(this.props.children)
+  componentDidUpdate(prevProps: any) {
+    if (
+      !_.isEqual(prevProps.content, this.props.content) ||
+      prevProps.visible !== this.props.visible ||
+      prevProps.placement !== this.props.placement
+    ) {
+      return this.updatePopover(this.props, prevProps)
     }
   }
-  PopoverComponent.initClass()
-  return PopoverComponent
-})()
+
+  updatePopover(props: any, oldProps: any) {
+    // Destroy old popover
+    if (oldProps && oldProps.visible) {
+      $(ReactDOM.findDOMNode(this)).popover("destroy")
+    }
+
+    if (props && props.visible) {
+      const div = document.createElement("div")
+      return ReactDOM.render(this.props.content, div, () => {
+        $(ReactDOM.findDOMNode(this)).popover({
+          content() {
+            return $(div)
+          },
+          html: true,
+          trigger: "manual",
+          placement: this.props.placement
+        })
+        return $(ReactDOM.findDOMNode(this)).popover("show")
+      })
+    }
+  }
+
+  render() {
+    return React.Children.only(this.props.children)
+  }
+}

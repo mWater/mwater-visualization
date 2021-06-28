@@ -126,7 +126,7 @@ line, path {fill: none;stroke: rgb(0, 0, 0);}
           })
         }
         return chart.destroy()
-      });
+      })
     }
     chartOptions.onrendered = _.debounce(_.once(onRender), 1000)
     const c3 = require("c3")

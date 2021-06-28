@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let TableChartViewComponent
 import $ from "jquery"
 import PropTypes from "prop-types"
 import _ from "lodash"
@@ -12,66 +9,65 @@ import AxisBuilder from "../../../axes/AxisBuilder"
 import { ExprUtils } from "mwater-expressions"
 import { formatValue } from "../../../valueFormatter"
 
-export default TableChartViewComponent = (function () {
-  TableChartViewComponent = class TableChartViewComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        design: PropTypes.object.isRequired, // Design of chart
-        data: PropTypes.object.isRequired, // Data that the table has requested
+interface TableChartViewComponentProps {
+  /** Design of chart */
+  design: any
+  /** Data that the table has requested */
+  data: any
+  /** Schema to use */
+  schema: any
+  width?: number
+  height?: number
+  /** scope of the widget (when the widget self-selects a particular scope) */
+  scope?: any
+  /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
+  onScopeChange?: any
+  onRowClick?: any
+}
 
-        schema: PropTypes.object.isRequired, // Schema to use
-        width: PropTypes.number,
-        height: PropTypes.number,
-
-        scope: PropTypes.any, // scope of the widget (when the widget self-selects a particular scope)
-        onScopeChange: PropTypes.func, // called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
-
-        onRowClick: PropTypes.func
-      }
-      // Called with (tableId, rowId) when item is clicked
-    }
-
-    shouldComponentUpdate(prevProps: any) {
-      return !_.isEqual(prevProps, this.props)
-    }
-
-    render() {
-      const style = {
-        width: this.props.width,
-        height: this.props.height
-      }
-
-      return R(
-        "div",
-        { style, className: "overflow-auto-except-print" },
-        R("div", { style: { fontWeight: "bold", textAlign: "center" } }, this.props.design.titleText),
-        R(TableContentsComponent, {
-          columns: this.props.design.columns,
-          table: this.props.design.table,
-          data: this.props.data,
-          schema: this.props.schema,
-          dataSource: this.props.dataSource,
-          onRowClick: this.props.onRowClick
-        })
-      )
-    }
+export default class TableChartViewComponent extends React.Component<TableChartViewComponentProps> {
+  shouldComponentUpdate(prevProps: any) {
+    return !_.isEqual(prevProps, this.props)
   }
-  TableChartViewComponent.initClass()
-  return TableChartViewComponent
-})()
 
-class TableContentsComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      columns: PropTypes.array.isRequired, // Columns of chart
-      data: PropTypes.object.isRequired, // Data that the table has requested
-      schema: PropTypes.object.isRequired, // Schema to use
-      dataSource: PropTypes.object.isRequired, // Data source to use
-      table: PropTypes.string.isRequired,
-
-      onRowClick: PropTypes.func // Called with (tableId, rowId) when item is clicked
+  render() {
+    const style = {
+      width: this.props.width,
+      height: this.props.height
     }
 
+    return R(
+      "div",
+      { style, className: "overflow-auto-except-print" },
+      R("div", { style: { fontWeight: "bold", textAlign: "center" } }, this.props.design.titleText),
+      R(TableContentsComponent, {
+        columns: this.props.design.columns,
+        table: this.props.design.table,
+        data: this.props.data,
+        schema: this.props.schema,
+        dataSource: this.props.dataSource,
+        onRowClick: this.props.onRowClick
+      })
+    )
+  }
+}
+
+interface TableContentsComponentProps {
+  /** Columns of chart */
+  columns: any
+  /** Data that the table has requested */
+  data: any
+  /** Schema to use */
+  schema: any
+  /** Data source to use */
+  dataSource: any
+  table: string
+  /** Called with (tableId, rowId) when item is clicked */
+  onRowClick?: any
+}
+
+class TableContentsComponent extends React.Component<TableContentsComponentProps> {
+  static initClass() {
     this.contextTypes = { locale: PropTypes.string }
     // e.g. "en"
   }

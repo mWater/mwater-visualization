@@ -212,7 +212,7 @@ export default LayeredChartDesignerComponent = (function () {
           }
         }),
         this.renderOptions()
-      );
+      )
     }
 
     renderLayer = (index: any) => {
@@ -519,7 +519,8 @@ class ThresholdComponent extends React.Component {
               { style: { verticalAlign: "middle", display: "inline-block" } },
               R(ColorComponent, {
                 color: this.props.threshold.highlightColor,
-                onChange: (v: any) => this.props.onThresholdChange(_.extend({}, this.props.threshold, { highlightColor: v }))
+                onChange: (v: any) =>
+                  this.props.onThresholdChange(_.extend({}, this.props.threshold, { highlightColor: v }))
               })
             )
           )
@@ -530,7 +531,7 @@ class ThresholdComponent extends React.Component {
         { className: "btn btn-xs btn-link", onClick: this.props.onRemove },
         R("i", { className: "fa fa-remove" })
       )
-    );
+    )
   }
 }
 ThresholdComponent.initClass()

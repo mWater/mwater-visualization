@@ -170,9 +170,7 @@ export default RichTextComponent = (function () {
       })
     }
 
-    renderPaletteContent = (schemeName: any, {
-      edges
-    }: any) => {
+    renderPaletteContent = (schemeName: any, { edges }: any) => {
       return R(
         "div",
         {

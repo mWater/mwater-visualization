@@ -125,7 +125,7 @@ export default GridLayoutManager = class GridLayoutManager extends LayoutManager
           })
         )
       }
-    });
+    })
   }
 
   // Tests if dashboard has any items

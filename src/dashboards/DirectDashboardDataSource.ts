@@ -45,6 +45,6 @@ export default DirectDashboardDataSource = class DirectDashboardDataSource {
           callback
         )
       }
-    };
+    }
   }
 }

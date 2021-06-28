@@ -274,7 +274,7 @@ export default DatagridComponent = (function () {
           locks: this.props.quickfilterLocks,
           filters: this.getCompiledFilters()
         })
-      );
+      )
     }
 
     // Renders the editor modal
@@ -298,7 +298,7 @@ export default DatagridComponent = (function () {
           return this.setState({ editingDesign: false })
         },
         onCancel: () => this.setState({ editingDesign: false })
-      });
+      })
     }
 
     renderFindReplaceModal(filters: any) {
@@ -317,7 +317,7 @@ export default DatagridComponent = (function () {
           // Reload
           return this.datagridView?.reload()
         }
-      });
+      })
     }
 
     render() {
@@ -366,7 +366,7 @@ export default DatagridComponent = (function () {
               onRowDoubleClick: this.props.onRowDoubleClick,
               canEditCell: this.state.cellEditingEnabled ? this.props.canEditValue : undefined,
               updateCell: this.state.cellEditingEnabled ? this.props.updateValue : undefined
-            });
+            })
           } else if (this.props.onDesignChange) {
             return R(
               "div",
@@ -377,7 +377,7 @@ export default DatagridComponent = (function () {
             return null
           }
         })
-      );
+      )
     }
   }
   DatagridComponent.initClass()
@@ -422,7 +422,7 @@ class DatagridEditorComponent extends React.Component {
         design: this.state.design,
         onDesignChange: (design: any) => this.setState({ design })
       })
-    );
+    )
   }
 }
 DatagridEditorComponent.initClass()

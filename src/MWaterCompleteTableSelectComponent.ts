@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let MWaterCompleteTableSelectComponent
 import _ from "lodash"
 import $ from "jquery"
 import PropTypes from "prop-types"
@@ -29,286 +26,296 @@ const sitesOrder = {
   "entities.waste_disposal_site": 11
 }
 
+interface MWaterCompleteTableSelectComponentProps {
+  /** Url to hit api */
+  apiUrl: string
+  /** Optional client */
+  client?: string
+  schema: any
+  /** User id */
+  user?: string
+  table?: string
+  /** Called with table selected */
+  onChange: any
+  extraTables: any
+  onExtraTablesChange: any
+}
+
 // Allows selection of a table. Is the complete list mode of tables
-export default MWaterCompleteTableSelectComponent = (function () {
-  MWaterCompleteTableSelectComponent = class MWaterCompleteTableSelectComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        apiUrl: PropTypes.string.isRequired, // Url to hit api
-        client: PropTypes.string, // Optional client
-        schema: PropTypes.object.isRequired,
-        user: PropTypes.string, // User id
+export default class MWaterCompleteTableSelectComponent extends React.Component<MWaterCompleteTableSelectComponentProps> {
+  static initClass() {
+    this.contextTypes = { locale: PropTypes.string }
+    // e.g. "en"
+  }
 
-        table: PropTypes.string,
-        onChange: PropTypes.func.isRequired, // Called with table selected
+  handleExtraTableAdd = (tableId: any) => {
+    return this.props.onExtraTablesChange(_.union(this.props.extraTables, [tableId]))
+  }
 
-        extraTables: PropTypes.array.isRequired,
-        onExtraTablesChange: PropTypes.func.isRequired
+  handleExtraTableRemove = (tableId: any) => {
+    // Set to null if current table
+    if (this.props.table === tableId) {
+      this.props.onChange(null)
+    }
+
+    return this.props.onExtraTablesChange(_.without(this.props.extraTables, tableId))
+  }
+
+  renderSites() {
+    let table
+    let types = []
+
+    for (table of this.props.schema.getTables()) {
+      if (table.deprecated) {
+        continue
       }
 
-      this.contextTypes = { locale: PropTypes.string }
-      // e.g. "en"
-    }
-
-    handleExtraTableAdd = (tableId: any) => {
-      return this.props.onExtraTablesChange(_.union(this.props.extraTables, [tableId]))
-    }
-
-    handleExtraTableRemove = (tableId: any) => {
-      // Set to null if current table
-      if (this.props.table === tableId) {
-        this.props.onChange(null)
+      if (!table.id.match(/^entities\./)) {
+        continue
       }
 
-      return this.props.onExtraTablesChange(_.without(this.props.extraTables, tableId))
+      types.push(table.id)
     }
 
-    renderSites() {
-      let table
-      let types = []
+    // Sort by order if present
+    types = _.sortBy(types, (type) => sitesOrder[type] || 999)
 
-      for (table of this.props.schema.getTables()) {
-        if (table.deprecated) {
-          continue
-        }
-
-        if (!table.id.match(/^entities\./)) {
-          continue
-        }
-
-        types.push(table.id)
-      }
-
-      // Sort by order if present
-      types = _.sortBy(types, (type) => sitesOrder[type] || 999)
-
-      return R(uiComponents.OptionListComponent, {
-        items: _.compact(
-          _.map(types, (tableId) => {
-            table = this.props.schema.getTable(tableId)
-            return {
-              name: ExprUtils.localizeString(table.name, this.context.locale),
-              desc: ExprUtils.localizeString(table.desc, this.context.locale),
-              onClick: this.props.onChange.bind(null, table.id)
-            }
-          })
-        )
-      })
-    }
-
-    renderForms() {
-      return R(FormsListComponent, {
-        schema: this.props.schema,
-        client: this.props.client,
-        apiUrl: this.props.apiUrl,
-        user: this.props.user,
-        onChange: this.props.onChange,
-        extraTables: this.props.extraTables,
-        onExtraTableAdd: this.handleExtraTableAdd,
-        onExtraTableRemove: this.handleExtraTableRemove
-      })
-    }
-
-    renderIndicators() {
-      return R(IndicatorsListComponent, {
-        schema: this.props.schema,
-        client: this.props.client,
-        apiUrl: this.props.apiUrl,
-        user: this.props.user,
-        onChange: this.props.onChange,
-        extraTables: this.props.extraTables,
-        onExtraTableAdd: this.handleExtraTableAdd,
-        onExtraTableRemove: this.handleExtraTableRemove
-      })
-    }
-
-    renderIssues() {
-      return R(IssuesListComponent, {
-        schema: this.props.schema,
-        client: this.props.client,
-        apiUrl: this.props.apiUrl,
-        user: this.props.user,
-        onChange: this.props.onChange,
-        extraTables: this.props.extraTables,
-        onExtraTableAdd: this.handleExtraTableAdd,
-        onExtraTableRemove: this.handleExtraTableRemove
-      })
-    }
-
-    renderSweetSense() {
-      let sweetSenseTables = this.getSweetSenseTables()
-
-      sweetSenseTables = _.sortBy(sweetSenseTables, (table) => table.name.en)
-      return R(uiComponents.OptionListComponent, {
-        items: _.map(sweetSenseTables, (table) => {
+    return R(uiComponents.OptionListComponent, {
+      items: _.compact(
+        _.map(types, (tableId) => {
+          table = this.props.schema.getTable(tableId)
           return {
             name: ExprUtils.localizeString(table.name, this.context.locale),
             desc: ExprUtils.localizeString(table.desc, this.context.locale),
             onClick: this.props.onChange.bind(null, table.id)
           }
-        })
-      })
-    }
-
-    renderTablesets() {
-      return R(MWaterCustomTablesetListComponent, {
-        schema: this.props.schema,
-        client: this.props.client,
-        apiUrl: this.props.apiUrl,
-        user: this.props.user,
-        onChange: this.props.onChange,
-        extraTables: this.props.extraTables,
-        onExtraTableAdd: this.handleExtraTableAdd,
-        onExtraTableRemove: this.handleExtraTableRemove,
-        locale: this.context.locale
-      })
-    }
-
-    renderMetrics() {
-      return R(MWaterMetricsTableListComponent, {
-        schema: this.props.schema,
-        client: this.props.client,
-        apiUrl: this.props.apiUrl,
-        user: this.props.user,
-        onChange: this.props.onChange,
-        extraTables: this.props.extraTables,
-        onExtraTableAdd: this.handleExtraTableAdd,
-        onExtraTableRemove: this.handleExtraTableRemove,
-        locale: this.context.locale
-      })
-    }
-
-    renderOther() {
-      let otherTables = _.filter(this.props.schema.getTables(), (table) => {
-        // Remove deprecated
-        if (table.deprecated) {
-          return false
-        }
-
-        // Remove sites
-        if (table.id.match(/^entities\./)) {
-          return false
-        }
-
-        // sweetsense tables
-        if (table.id.match(/^sweetsense/)) {
-          return false
-        }
-
-        // Remove responses
-        if (table.id.match(/^responses:/)) {
-          return false
-        }
-
-        // Remove indicators
-        if (table.id.match(/^indicator_values:/)) {
-          return false
-        }
-
-        // Remove issues
-        if (table.id.match(/^(issues|issue_events):/)) {
-          return false
-        }
-
-        // Remove custom tablesets
-        if (table.id.match(/^custom\./)) {
-          return false
-        }
-
-        // Remove metrics
-        if (table.id.match(/^metric:/)) {
-          return false
-        }
-
-        return true
-      })
-
-      otherTables = _.sortBy(otherTables, (table) => table.name.en)
-      return R(uiComponents.OptionListComponent, {
-        items: _.map(otherTables, (table) => {
-          return {
-            name: ExprUtils.localizeString(table.name, this.context.locale),
-            desc: ExprUtils.localizeString(table.desc, this.context.locale),
-            onClick: this.props.onChange.bind(null, table.id)
-          }
-        })
-      })
-    }
-
-    getSweetSenseTables() {
-      return _.filter(this.props.schema.getTables(), (table) => {
-        if (table.deprecated) {
-          return false
-        }
-
-        if (table.id.match(/^sweetsense/)) {
-          return true
-        }
-
-        return false
-      });
-    }
-
-    render() {
-      const sweetSenseTables = this.getSweetSenseTables()
-
-      const tabs = [
-        { id: "sites", label: [R("i", { className: "fa fa-map-marker" }), " Sites"], elem: this.renderSites() },
-        { id: "forms", label: [R("i", { className: "fa fa-th-list" }), " Surveys"], elem: this.renderForms() },
-        {
-          id: "indicators",
-          label: [R("i", { className: "fa fa-check-circle" }), " Indicators"],
-          elem: this.renderIndicators()
-        },
-        {
-          id: "issues",
-          label: [R("i", { className: "fa fa-exclamation-circle" }), " Issues"],
-          elem: this.renderIssues()
-        },
-        { id: "tablesets", label: [R("i", { className: "fa fa-table" }), " Tables"], elem: this.renderTablesets() },
-        { id: "metrics", label: [R("i", { className: "fa fa-line-chart" }), " Metrics"], elem: this.renderMetrics() }
-      ]
-
-      if (sweetSenseTables.length > 0) {
-        tabs.push({ id: "sensors", label: " Sensors", elem: this.renderSweetSense() })
-      }
-
-      tabs.push({ id: "other", label: "Advanced", elem: this.renderOther() })
-
-      return R(
-        "div",
-        null,
-        R(
-          "div",
-          { className: "text-muted" },
-          "Select data from sites, surveys or an advanced category below. Indicators can be found within their associated site types."
-        ),
-
-        R(TabbedComponent, {
-          tabs,
-          initialTabId: "sites"
         })
       )
-    }
+    })
   }
-  MWaterCompleteTableSelectComponent.initClass()
-  return MWaterCompleteTableSelectComponent
-})()
+
+  renderForms() {
+    return R(FormsListComponent, {
+      schema: this.props.schema,
+      client: this.props.client,
+      apiUrl: this.props.apiUrl,
+      user: this.props.user,
+      onChange: this.props.onChange,
+      extraTables: this.props.extraTables,
+      onExtraTableAdd: this.handleExtraTableAdd,
+      onExtraTableRemove: this.handleExtraTableRemove
+    })
+  }
+
+  renderIndicators() {
+    return R(IndicatorsListComponent, {
+      schema: this.props.schema,
+      client: this.props.client,
+      apiUrl: this.props.apiUrl,
+      user: this.props.user,
+      onChange: this.props.onChange,
+      extraTables: this.props.extraTables,
+      onExtraTableAdd: this.handleExtraTableAdd,
+      onExtraTableRemove: this.handleExtraTableRemove
+    })
+  }
+
+  renderIssues() {
+    return R(IssuesListComponent, {
+      schema: this.props.schema,
+      client: this.props.client,
+      apiUrl: this.props.apiUrl,
+      user: this.props.user,
+      onChange: this.props.onChange,
+      extraTables: this.props.extraTables,
+      onExtraTableAdd: this.handleExtraTableAdd,
+      onExtraTableRemove: this.handleExtraTableRemove
+    })
+  }
+
+  renderSweetSense() {
+    let sweetSenseTables = this.getSweetSenseTables()
+
+    sweetSenseTables = _.sortBy(sweetSenseTables, (table) => table.name.en)
+    return R(uiComponents.OptionListComponent, {
+      items: _.map(sweetSenseTables, (table) => {
+        return {
+          name: ExprUtils.localizeString(table.name, this.context.locale),
+          desc: ExprUtils.localizeString(table.desc, this.context.locale),
+          onClick: this.props.onChange.bind(null, table.id)
+        }
+      })
+    })
+  }
+
+  renderTablesets() {
+    return R(MWaterCustomTablesetListComponent, {
+      schema: this.props.schema,
+      client: this.props.client,
+      apiUrl: this.props.apiUrl,
+      user: this.props.user,
+      onChange: this.props.onChange,
+      extraTables: this.props.extraTables,
+      onExtraTableAdd: this.handleExtraTableAdd,
+      onExtraTableRemove: this.handleExtraTableRemove,
+      locale: this.context.locale
+    })
+  }
+
+  renderMetrics() {
+    return R(MWaterMetricsTableListComponent, {
+      schema: this.props.schema,
+      client: this.props.client,
+      apiUrl: this.props.apiUrl,
+      user: this.props.user,
+      onChange: this.props.onChange,
+      extraTables: this.props.extraTables,
+      onExtraTableAdd: this.handleExtraTableAdd,
+      onExtraTableRemove: this.handleExtraTableRemove,
+      locale: this.context.locale
+    })
+  }
+
+  renderOther() {
+    let otherTables = _.filter(this.props.schema.getTables(), (table) => {
+      // Remove deprecated
+      if (table.deprecated) {
+        return false
+      }
+
+      // Remove sites
+      if (table.id.match(/^entities\./)) {
+        return false
+      }
+
+      // sweetsense tables
+      if (table.id.match(/^sweetsense/)) {
+        return false
+      }
+
+      // Remove responses
+      if (table.id.match(/^responses:/)) {
+        return false
+      }
+
+      // Remove indicators
+      if (table.id.match(/^indicator_values:/)) {
+        return false
+      }
+
+      // Remove issues
+      if (table.id.match(/^(issues|issue_events):/)) {
+        return false
+      }
+
+      // Remove custom tablesets
+      if (table.id.match(/^custom\./)) {
+        return false
+      }
+
+      // Remove metrics
+      if (table.id.match(/^metric:/)) {
+        return false
+      }
+
+      return true
+    })
+
+    otherTables = _.sortBy(otherTables, (table) => table.name.en)
+    return R(uiComponents.OptionListComponent, {
+      items: _.map(otherTables, (table) => {
+        return {
+          name: ExprUtils.localizeString(table.name, this.context.locale),
+          desc: ExprUtils.localizeString(table.desc, this.context.locale),
+          onClick: this.props.onChange.bind(null, table.id)
+        }
+      })
+    })
+  }
+
+  getSweetSenseTables() {
+    return _.filter(this.props.schema.getTables(), (table) => {
+      if (table.deprecated) {
+        return false
+      }
+
+      if (table.id.match(/^sweetsense/)) {
+        return true
+      }
+
+      return false
+    })
+  }
+
+  render() {
+    const sweetSenseTables = this.getSweetSenseTables()
+
+    const tabs = [
+      { id: "sites", label: [R("i", { className: "fa fa-map-marker" }), " Sites"], elem: this.renderSites() },
+      { id: "forms", label: [R("i", { className: "fa fa-th-list" }), " Surveys"], elem: this.renderForms() },
+      {
+        id: "indicators",
+        label: [R("i", { className: "fa fa-check-circle" }), " Indicators"],
+        elem: this.renderIndicators()
+      },
+      {
+        id: "issues",
+        label: [R("i", { className: "fa fa-exclamation-circle" }), " Issues"],
+        elem: this.renderIssues()
+      },
+      { id: "tablesets", label: [R("i", { className: "fa fa-table" }), " Tables"], elem: this.renderTablesets() },
+      { id: "metrics", label: [R("i", { className: "fa fa-line-chart" }), " Metrics"], elem: this.renderMetrics() }
+    ]
+
+    if (sweetSenseTables.length > 0) {
+      tabs.push({ id: "sensors", label: " Sensors", elem: this.renderSweetSense() })
+    }
+
+    tabs.push({ id: "other", label: "Advanced", elem: this.renderOther() })
+
+    return R(
+      "div",
+      null,
+      R(
+        "div",
+        { className: "text-muted" },
+        "Select data from sites, surveys or an advanced category below. Indicators can be found within their associated site types."
+      ),
+
+      R(TabbedComponent, {
+        tabs,
+        initialTabId: "sites"
+      })
+    )
+  }
+}
+
+MWaterCompleteTableSelectComponent.initClass()
+
+interface FormsListComponentProps {
+  /** Url to hit api */
+  apiUrl: string
+  /** Optional client */
+  client?: string
+  schema: any
+  /** User id */
+  user?: string
+  /** Called with table selected */
+  onChange: any
+  extraTables: any
+  onExtraTableAdd: any
+  onExtraTableRemove: any
+}
+
+interface FormsListComponentState {
+  error: any
+  search: any
+  forms: any
+}
 
 // Searchable list of forms
-class FormsListComponent extends React.Component {
+class FormsListComponent extends React.Component<FormsListComponentProps, FormsListComponentState> {
   static initClass() {
-    this.propTypes = {
-      apiUrl: PropTypes.string.isRequired, // Url to hit api
-      client: PropTypes.string, // Optional client
-      schema: PropTypes.object.isRequired,
-      user: PropTypes.string, // User id
-      onChange: PropTypes.func.isRequired, // Called with table selected
-      extraTables: PropTypes.array.isRequired,
-      onExtraTableAdd: PropTypes.func.isRequired,
-      onExtraTableRemove: PropTypes.func.isRequired
-    }
-
     this.contextTypes = { locale: PropTypes.string }
     // e.g. "en"
   }
@@ -463,25 +470,35 @@ class FormsListComponent extends React.Component {
               }))
             })
           ]
-    );
+    )
   }
 }
 FormsListComponent.initClass()
 
-// Searchable list of indicators
-class IndicatorsListComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      apiUrl: PropTypes.string.isRequired, // Url to hit api
-      client: PropTypes.string, // Optional client
-      schema: PropTypes.object.isRequired,
-      user: PropTypes.string, // User id
-      onChange: PropTypes.func.isRequired, // Called with table selected
-      extraTables: PropTypes.array.isRequired,
-      onExtraTableAdd: PropTypes.func.isRequired,
-      onExtraTableRemove: PropTypes.func.isRequired
-    }
+interface IndicatorsListComponentProps {
+  /** Url to hit api */
+  apiUrl: string
+  /** Optional client */
+  client?: string
+  schema: any
+  /** User id */
+  user?: string
+  /** Called with table selected */
+  onChange: any
+  extraTables: any
+  onExtraTableAdd: any
+  onExtraTableRemove: any
+}
 
+interface IndicatorsListComponentState {
+  error: any
+  search: any
+  indicators: any
+}
+
+// Searchable list of indicators
+class IndicatorsListComponent extends React.Component<IndicatorsListComponentProps, IndicatorsListComponentState> {
+  static initClass() {
     this.contextTypes = { locale: PropTypes.string }
     // e.g. "en"
   }
@@ -639,19 +656,28 @@ class IndicatorsListComponent extends React.Component {
               }))
             })
           ]
-    );
+    )
   }
 }
 IndicatorsListComponent.initClass()
 
-class AddIndicatorConfirmPopupComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      schema: PropTypes.object.isRequired,
-      onChange: PropTypes.func.isRequired, // Called with table selected
-      onExtraTableAdd: PropTypes.func.isRequired
-    }
+interface AddIndicatorConfirmPopupComponentProps {
+  schema: any
+  /** Called with table selected */
+  onChange: any
+  onExtraTableAdd: any
+}
 
+interface AddIndicatorConfirmPopupComponentState {
+  indicatorTable: any
+  visible: any
+}
+
+class AddIndicatorConfirmPopupComponent extends React.Component<
+  AddIndicatorConfirmPopupComponentProps,
+  AddIndicatorConfirmPopupComponentState
+> {
+  static initClass() {
     this.contextTypes = { locale: PropTypes.string }
     // e.g. "en"
   }
@@ -735,20 +761,30 @@ are certain that you want to use the raw indicator table`
 }
 AddIndicatorConfirmPopupComponent.initClass()
 
-// Searchable list of issue types
-class IssuesListComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      apiUrl: PropTypes.string.isRequired, // Url to hit api
-      client: PropTypes.string, // Optional client
-      schema: PropTypes.object.isRequired,
-      user: PropTypes.string, // User id
-      onChange: PropTypes.func.isRequired, // Called with table selected
-      extraTables: PropTypes.array.isRequired,
-      onExtraTableAdd: PropTypes.func.isRequired,
-      onExtraTableRemove: PropTypes.func.isRequired
-    }
+interface IssuesListComponentProps {
+  /** Url to hit api */
+  apiUrl: string
+  /** Optional client */
+  client?: string
+  schema: any
+  /** User id */
+  user?: string
+  /** Called with table selected */
+  onChange: any
+  extraTables: any
+  onExtraTableAdd: any
+  onExtraTableRemove: any
+}
 
+interface IssuesListComponentState {
+  error: any
+  search: any
+  issueTypes: any
+}
+
+// Searchable list of issue types
+class IssuesListComponent extends React.Component<IssuesListComponentProps, IssuesListComponentState> {
+  static initClass() {
     this.contextTypes = { locale: PropTypes.string }
     // e.g. "en"
   }
@@ -885,7 +921,7 @@ class IssuesListComponent extends React.Component {
               }))
             })
           ]
-    );
+    )
   }
 }
 IssuesListComponent.initClass()

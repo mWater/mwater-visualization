@@ -24,8 +24,8 @@ export default CachingDataSource = class CachingDataSource extends DataSource {
           } else {
             return resolve(rows)
           }
-        });
-      });
+        })
+      })
     }
 
     const cacheKey = JSON.stringify(query)
@@ -41,6 +41,6 @@ export default CachingDataSource = class CachingDataSource extends DataSource {
       }
 
       return cb(err, rows)
-    });
+    })
   }
 }

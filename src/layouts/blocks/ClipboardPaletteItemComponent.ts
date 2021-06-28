@@ -9,17 +9,14 @@ import uuid from "uuid"
 const DragSourceComponent = require("../DragSourceComponent")("visualization-block")
 import { DropTarget } from "react-dnd"
 
-// Clipboard item in a palette that has special properties
-class ClipboardPaletteItemComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      clipboard: PropTypes.object,
-      onClipboardChange: PropTypes.func,
-      cantPasteMessage: PropTypes.string
-    }
-    // Set if can't paste current contents (usually because missing extra tables)
-  }
+interface ClipboardPaletteItemComponentProps {
+  clipboard?: any
+  onClipboardChange?: any
+  cantPasteMessage?: string
+}
 
+// Clipboard item in a palette that has special properties
+class ClipboardPaletteItemComponent extends React.Component<ClipboardPaletteItemComponentProps> {
   createItem = () => {
     // Add unique id
     return { block: _.extend({}, this.props.clipboard, { id: uuid() }) }
@@ -67,8 +64,6 @@ class ClipboardPaletteItemComponent extends React.Component {
     return elem
   }
 }
-ClipboardPaletteItemComponent.initClass()
-
 const blockTargetSpec = {
   canDrop(props: any, monitor: any) {
     return true

@@ -152,7 +152,7 @@ export default TextWidget = class TextWidget extends Widget {
             return cb(null, rows[0].value)
           }
         }
-      });
+      })
     }
 
     // Map of value by id
@@ -168,7 +168,7 @@ export default TextWidget = class TextWidget extends Widget {
             exprValues[exprItem.id] = value
             return cb(null)
           }
-        });
+        })
       },
       (error) => {
         if (error) {
@@ -177,7 +177,7 @@ export default TextWidget = class TextWidget extends Widget {
           return callback(null, exprValues)
         }
       }
-    );
+    )
   }
 
   // Determine if widget is auto-height, which means that a vertical height is not required.
@@ -228,30 +228,31 @@ export default TextWidget = class TextWidget extends Widget {
       }).join("")
 
       // Handle named strings
-      return text = text.replace(/\{\{.+?\}\}/g, (match: any) => {
+      return (text = text.replace(/\{\{.+?\}\}/g, (match: any) => {
         const name = match.substr(2, match.length - 4)
         if (namedStrings && namedStrings[name] != null) {
           return namedStrings[name]
         } else {
           return match
         }
-      });
+      }))
     }
 
-    var findRecursive = (items: any) => (() => {
-      const result = []
-      for (let item of items || []) {
-        if (item?.type === "element" && item.tag.match(/^h[1-9]$/)) {
-          entries.push({ id: entries.length, level: parseInt(item.tag.substr(1)), text: flattenText(item.items) })
+    var findRecursive = (items: any) =>
+      (() => {
+        const result = []
+        for (let item of items || []) {
+          if (item?.type === "element" && item.tag.match(/^h[1-9]$/)) {
+            entries.push({ id: entries.length, level: parseInt(item.tag.substr(1)), text: flattenText(item.items) })
+          }
+          if (item?.items) {
+            result.push(findRecursive(item.items))
+          } else {
+            result.push(undefined)
+          }
         }
-        if (item?.items) {
-          result.push(findRecursive(item.items))
-        } else {
-          result.push(undefined)
-        }
-      }
-      return result
-    })()
+        return result
+      })()
 
     findRecursive(design.items)
 

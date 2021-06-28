@@ -199,7 +199,15 @@
       enumerable: true
     })
 
-    window.SVGPathSegCurvetoCubicAbs = function (owningPathSegList: any, x: any, y: any, x1: any, y1: any, x2: any, y2: any) {
+    window.SVGPathSegCurvetoCubicAbs = function (
+      owningPathSegList: any,
+      x: any,
+      y: any,
+      x1: any,
+      y1: any,
+      x2: any,
+      y2: any
+    ) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_CURVETO_CUBIC_ABS, "C", owningPathSegList)
       this._x = x
       this._y = y
@@ -293,7 +301,15 @@
       enumerable: true
     })
 
-    window.SVGPathSegCurvetoCubicRel = function (owningPathSegList: any, x: any, y: any, x1: any, y1: any, x2: any, y2: any) {
+    window.SVGPathSegCurvetoCubicRel = function (
+      owningPathSegList: any,
+      x: any,
+      y: any,
+      x1: any,
+      y1: any,
+      x2: any,
+      y2: any
+    ) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_CURVETO_CUBIC_REL, "c", owningPathSegList)
       this._x = x
       this._y = y
@@ -503,7 +519,16 @@
       enumerable: true
     })
 
-    window.SVGPathSegArcAbs = function (owningPathSegList: any, x: any, y: any, r1: any, r2: any, angle: any, largeArcFlag: any, sweepFlag: any) {
+    window.SVGPathSegArcAbs = function (
+      owningPathSegList: any,
+      x: any,
+      y: any,
+      r1: any,
+      r2: any,
+      angle: any,
+      largeArcFlag: any,
+      sweepFlag: any
+    ) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_ARC_ABS, "A", owningPathSegList)
       this._x = x
       this._y = y
@@ -619,7 +644,16 @@
       enumerable: true
     })
 
-    window.SVGPathSegArcRel = function (owningPathSegList: any, x: any, y: any, r1: any, r2: any, angle: any, largeArcFlag: any, sweepFlag: any) {
+    window.SVGPathSegArcRel = function (
+      owningPathSegList: any,
+      x: any,
+      y: any,
+      r1: any,
+      r2: any,
+      angle: any,
+      largeArcFlag: any,
+      sweepFlag: any
+    ) {
       SVGPathSeg.call(this, SVGPathSeg.PATHSEG_ARC_REL, "a", owningPathSegList)
       this._x = x
       this._y = y
@@ -1264,7 +1298,7 @@
 
       var owningPathSegList = this
 
-      var Builder = function(this: any, this: any) {
+      var Builder = function (this: any, this: any) {
         this.pathSegList = []
       }
 
@@ -1272,15 +1306,7 @@
         this.pathSegList.push(pathSeg)
       }
 
-      var Source = function(
-        this: any,
-        this: any,
-        this: any,
-        this: any,
-        this: any,
-        this: any,
-        string: any
-      ) {
+      var Source = function (this: any, this: any, this: any, this: any, this: any, this: any, string: any) {
         this._string = string
         this._currentIndex = 0
         this._endIndex = this._string.length

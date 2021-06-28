@@ -78,7 +78,7 @@ export default TextComponent = (function () {
       return this.exprUpdateModal.open(item, (item: any) => {
         // Replace in items
         return this.replaceItem(item)
-      });
+      })
     }
 
     handleAddExpr = (ev: any) => {
@@ -116,7 +116,7 @@ export default TextComponent = (function () {
           dataSource: this.props.dataSource,
           singleRowTable: this.props.singleRowTable
         })
-      ];
+      ]
     }
 
     refRichTextComponent = (c: any) => {

@@ -9,28 +9,32 @@ const R = React.createElement
 import { DragSource } from "react-dnd"
 import { DropTarget } from "react-dnd"
 
+interface DraggableBlockComponentProps {
+  /** Block to display */
+  block: any
+  /** Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right */
+  onBlockDrop: any
+  /** Merge in style */
+  style?: any
+  /** True to only allow dropping at bottom (root block) */
+  onlyBottom?: boolean
+  /** Injected by React-dnd */
+  isDragging: boolean
+  /** internally used to check if an item is over the current component */
+  isOver: boolean
+  /** the drag source connector, supplied by React DND */
+  connectDragSource: any
+  /** the drop target connector, supplied by React DND */
+  connectDropTarget: any
+  connectDragPreview: any
+}
+
+interface DraggableBlockComponentState {
+  hoverSide: any
+}
+
 // Block which can be dragged around in block layout.
-class DraggableBlockComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      block: PropTypes.object.isRequired, // Block to display
-
-      onBlockDrop: PropTypes.func.isRequired, // Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
-      style: PropTypes.object, // Merge in style
-
-      onlyBottom: PropTypes.bool, // True to only allow dropping at bottom (root block)
-
-      // Injected by React-dnd
-      isDragging: PropTypes.bool.isRequired, // internally used for tracking if an item is being dragged
-      isOver: PropTypes.bool.isRequired, // internally used to check if an item is over the current component
-
-      connectDragSource: PropTypes.func.isRequired, // the drag source connector, supplied by React DND
-      connectDropTarget: PropTypes.func.isRequired, // the drop target connector, supplied by React DND
-      connectDragPreview: PropTypes.func.isRequired
-    }
-    // the drag preview connector, supplied by React DND
-  }
-
+class DraggableBlockComponent extends React.Component<DraggableBlockComponentProps, DraggableBlockComponentState> {
   constructor(props: any) {
     super(props)
 
@@ -103,7 +107,6 @@ class DraggableBlockComponent extends React.Component {
     )
   }
 }
-DraggableBlockComponent.initClass()
 
 // Gets the drop side (top, left, right, bottom)
 function getDropSide(monitor: any, component: any) {

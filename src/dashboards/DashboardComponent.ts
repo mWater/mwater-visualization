@@ -372,7 +372,7 @@ export default DashboardComponent = (function () {
         filters: this.getCompiledFilters(),
         hideTopBorder: this.props.hideTitleBar,
         onHide: () => this.setState({ hideQuickfilters: true })
-      });
+      })
     }
 
     refDashboardView = (el: any) => {
@@ -452,7 +452,7 @@ export default DashboardComponent = (function () {
               })
             )
           : undefined
-      );
+      )
     }
   }
   DashboardComponent.initClass()

@@ -263,7 +263,7 @@ export default TableChart = class TableChart extends Chart {
       query.where = whereClauses[0]
     }
 
-    return dataSource.performQuery(query, (error: any, data: any) => callback(error, { main: data }));
+    return dataSource.performQuery(query, (error: any, data: any) => callback(error, { main: data }))
   }
 
   // Create a view element for the chart

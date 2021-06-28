@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let EditExprCellComponent
 import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
@@ -9,101 +6,100 @@ import moment from "moment"
 import { ExprUtils } from "mwater-expressions"
 import { Cell } from "fixed-data-table-2"
 
+interface EditExprCellComponentProps {
+  /** schema to use */
+  schema: any
+  /** dataSource to use */
+  dataSource: any
+  /** Locale to use */
+  locale?: string
+  width: number
+  height: number
+  value?: any
+  expr: any
+  /** Called when save is requested (e.g. enter in text box) */
+  onSave: any
+  onCancel: any
+}
+
+interface EditExprCellComponentState {
+  value: any
+}
+
 // Cell allows editing an expression column cell
 // Store edited value here to prevent slow re-render of entire datagrid
-export default EditExprCellComponent = (function () {
-  EditExprCellComponent = class EditExprCellComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        schema: PropTypes.object.isRequired, // schema to use
-        dataSource: PropTypes.object.isRequired, // dataSource to use
-
-        locale: PropTypes.string, // Locale to use
-
-        width: PropTypes.number.isRequired,
-        height: PropTypes.number.isRequired,
-
-        value: PropTypes.any,
-        expr: PropTypes.object.isRequired,
-
-        onSave: PropTypes.func.isRequired, // Called when save is requested (e.g. enter in text box)
-        onCancel: PropTypes.func.isRequired
-      }
-      // Called when cancelled
-    }
-
-    constructor(props: any) {
-      super(props)
-      this.state = { value: props.value }
-    }
-
-    getValue() {
-      return this.state.value
-    }
-
-    // Check if edit value has changed
-    hasChanged() {
-      return !_.isEqual(this.props.value, this.state.value)
-    }
-
-    handleChange = (value: any) => {
-      return this.setState({ value })
-    }
-
-    render() {
-      const exprUtils = new ExprUtils(this.props.schema)
-
-      // Get expression type
-      const exprType = exprUtils.getExprType(this.props.expr)
-
-      switch (exprType) {
-        case "text":
-          return R(TextEditComponent, {
-            value: this.state.value,
-            onChange: this.handleChange,
-            onSave: this.props.onSave,
-            onCancel: this.props.onCancel
-          })
-          break
-        case "number":
-          return R(NumberEditComponent, {
-            value: this.state.value,
-            onChange: this.handleChange,
-            onSave: this.props.onSave,
-            onCancel: this.props.onCancel
-          })
-          break
-        case "enum":
-          return R(EnumEditComponent, {
-            value: this.state.value,
-            onChange: this.handleChange,
-            enumValues: exprUtils.getExprEnumValues(this.props.expr),
-            onSave: this.props.onSave,
-            onCancel: this.props.onCancel,
-            locale: this.props.locale
-          })
-          break
-      }
-
-      throw new Error(`Unsupported type ${exprType} for editing`)
-    }
+export default class EditExprCellComponent extends React.Component<
+  EditExprCellComponentProps,
+  EditExprCellComponentState
+> {
+  constructor(props: any) {
+    super(props)
+    this.state = { value: props.value }
   }
-  EditExprCellComponent.initClass()
-  return EditExprCellComponent
-})()
+
+  getValue() {
+    return this.state.value
+  }
+
+  // Check if edit value has changed
+  hasChanged() {
+    return !_.isEqual(this.props.value, this.state.value)
+  }
+
+  handleChange = (value: any) => {
+    return this.setState({ value })
+  }
+
+  render() {
+    const exprUtils = new ExprUtils(this.props.schema)
+
+    // Get expression type
+    const exprType = exprUtils.getExprType(this.props.expr)
+
+    switch (exprType) {
+      case "text":
+        return R(TextEditComponent, {
+          value: this.state.value,
+          onChange: this.handleChange,
+          onSave: this.props.onSave,
+          onCancel: this.props.onCancel
+        })
+        break
+      case "number":
+        return R(NumberEditComponent, {
+          value: this.state.value,
+          onChange: this.handleChange,
+          onSave: this.props.onSave,
+          onCancel: this.props.onCancel
+        })
+        break
+      case "enum":
+        return R(EnumEditComponent, {
+          value: this.state.value,
+          onChange: this.handleChange,
+          enumValues: exprUtils.getExprEnumValues(this.props.expr),
+          onSave: this.props.onSave,
+          onCancel: this.props.onCancel,
+          locale: this.props.locale
+        })
+        break
+    }
+
+    throw new Error(`Unsupported type ${exprType} for editing`)
+  }
+}
+
+interface TextEditComponentProps {
+  value?: any
+  /** Called with new value */
+  onChange: any
+  /** Called when enter is pressed */
+  onSave: any
+  onCancel: any
+}
 
 // Simple text box
-class TextEditComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      value: PropTypes.any,
-      onChange: PropTypes.func.isRequired, // Called with new value
-      onSave: PropTypes.func.isRequired, // Called when enter is pressed
-      onCancel: PropTypes.func.isRequired
-    }
-    // Called when cancelled
-  }
-
+class TextEditComponent extends React.Component<TextEditComponentProps> {
   componentDidMount() {
     // Focus when created
     return this.input?.focus()
@@ -130,23 +126,21 @@ class TextEditComponent extends React.Component {
           }
         }
       })
-    );
+    )
   }
 }
-TextEditComponent.initClass()
+
+interface NumberEditComponentProps {
+  value?: any
+  /** Called with new value */
+  onChange: any
+  /** Called when enter is pressed */
+  onSave: any
+  onCancel: any
+}
 
 // Simple number box
-class NumberEditComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      value: PropTypes.any,
-      onChange: PropTypes.func.isRequired, // Called with new value
-      onSave: PropTypes.func.isRequired, // Called when enter is pressed
-      onCancel: PropTypes.func.isRequired
-    }
-    // Called when cancelled
-  }
-
+class NumberEditComponent extends React.Component<NumberEditComponentProps> {
   componentDidMount() {
     // Focus when created
     return this.input?.focus()
@@ -182,25 +176,24 @@ class NumberEditComponent extends React.Component {
           }
         }
       })
-    );
+    )
   }
 }
-NumberEditComponent.initClass()
+
+interface EnumEditComponentProps {
+  value?: any
+  enumValues: any
+  /** Locale to use */
+  locale?: string
+  /** Called with new value */
+  onChange: any
+  /** Called when enter is pressed */
+  onSave: any
+  onCancel: any
+}
 
 // Simple enum box
-class EnumEditComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      value: PropTypes.any,
-      enumValues: PropTypes.array.isRequired,
-      locale: PropTypes.string, // Locale to use
-      onChange: PropTypes.func.isRequired, // Called with new value
-      onSave: PropTypes.func.isRequired, // Called when enter is pressed
-      onCancel: PropTypes.func.isRequired
-    }
-    // Called when cancelled
-  }
-
+class EnumEditComponent extends React.Component<EnumEditComponentProps> {
   render() {
     return R(
       "div",
@@ -217,7 +210,6 @@ class EnumEditComponent extends React.Component {
           return R("option", { key: ev.id, value: ev.id }, ExprUtils.localizeString(ev.name, this.props.locale))
         })
       )
-    );
+    )
   }
 }
-EnumEditComponent.initClass()

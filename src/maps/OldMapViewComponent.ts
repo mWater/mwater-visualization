@@ -102,16 +102,20 @@ export default OldMapViewComponent = (function () {
     }
 
     performAutoZoom() {
-      return this.props.mapDataSource.getBounds(this.props.design, this.getCompiledFilters(), (error: any, bounds: any) => {
-        if (bounds) {
-          this.leafletMap?.setBounds(bounds, 0.2)
+      return this.props.mapDataSource.getBounds(
+        this.props.design,
+        this.getCompiledFilters(),
+        (error: any, bounds: any) => {
+          if (bounds) {
+            this.leafletMap?.setBounds(bounds, 0.2)
 
-          // Also record if editable as part of bounds
-          if (this.props.onDesignChange != null) {
-            return this.props.onDesignChange(_.extend({}, this.props.design, { bounds }))
+            // Also record if editable as part of bounds
+            if (this.props.onDesignChange != null) {
+              return this.props.onDesignChange(_.extend({}, this.props.design, { bounds }))
+            }
           }
         }
-      });
+      )
     }
 
     handleBoundsChange = (bounds: any) => {

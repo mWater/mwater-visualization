@@ -14,39 +14,28 @@ import AutoSizeComponent from "react-library/lib/AutoSizeComponent"
 import HorizontalBlockComponent from "./HorizontalBlockComponent"
 import { getDefaultLayoutOptions } from "../../dashboards/layoutOptions"
 
+interface BlocksDisplayComponentProps {
+  items: any
+  onItemsChange?: any
+  /** Stylesheet to use. null for default */
+  style?: string
+  /** layout options to use */
+  layoutOptions?: any
+  /** Renders a widget. Passed (options) */
+  renderWidget: any
+  /** True to prevent maps */
+  disableMaps?: boolean
+  /** Including onClipboardChange adds a clipboard palette item that can be used to copy and paste widgets */
+  clipboard?: any
+  onClipboardChange?: any
+  cantPasteMessage?: string
+}
+
 /*
 Renders the complete layout of the blocks and also optionally a palette to the left
 that can be used to drag new items into the layout. Palette is only displayed if onItemsChange is not null
 */
-class BlocksDisplayComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      items: PropTypes.object.isRequired,
-      onItemsChange: PropTypes.func,
-
-      style: PropTypes.string, // Stylesheet to use. null for default
-      layoutOptions: PropTypes.object, // layout options to use
-
-      // Renders a widget. Passed (options)
-      //  id: id of widget
-      //  type: type of the widget
-      //  design: design of the widget
-      //  onDesignChange: called with new design of widget
-      //  width: width to render. null for auto
-      //  height: height to render. null for auto
-      renderWidget: PropTypes.func.isRequired,
-
-      // True to prevent maps
-      disableMaps: PropTypes.bool,
-
-      // Including onClipboardChange adds a clipboard palette item that can be used to copy and paste widgets
-      clipboard: PropTypes.object,
-      onClipboardChange: PropTypes.func,
-      cantPasteMessage: PropTypes.string
-    }
-    // Set if can't paste current contents (usually because missing extra tables)
-  }
-
+class BlocksDisplayComponent extends React.Component<BlocksDisplayComponentProps> {
   handleBlockDrop = (sourceBlock: any, targetBlock: any, side: any) => {
     // Remove source from items
     let items = blockUtils.removeBlock(this.props.items, sourceBlock)
@@ -135,9 +124,10 @@ class BlocksDisplayComponent extends React.Component {
                 aspectRatio: block.aspectRatio,
                 onAspectRatioChange:
                   block.aspectRatio != null
-                    ? (aspectRatio: any) => this.props.onItemsChange(
-                    blockUtils.updateBlock(this.props.items, _.extend({}, block, { aspectRatio }))
-                  )
+                    ? (aspectRatio: any) =>
+                        this.props.onItemsChange(
+                          blockUtils.updateBlock(this.props.items, _.extend({}, block, { aspectRatio }))
+                        )
                     : undefined,
                 onBlockRemove: this.props.onItemsChange ? this.handleBlockDrop.bind(null, block) : undefined
               },
@@ -154,11 +144,12 @@ class BlocksDisplayComponent extends React.Component {
             type: block.widgetType,
             design: block.design,
             onDesignChange: this.props.onItemsChange
-              ? (design: any) => this.props.onItemsChange(blockUtils.updateBlock(this.props.items, _.extend({}, block, { design })))
+              ? (design: any) =>
+                  this.props.onItemsChange(blockUtils.updateBlock(this.props.items, _.extend({}, block, { design })))
               : undefined,
             width: size.width,
             height: block.aspectRatio != null ? size.width / block.aspectRatio : undefined
-          });
+          })
         })
 
         if (this.props.onItemsChange) {
@@ -176,9 +167,10 @@ class BlocksDisplayComponent extends React.Component {
                 aspectRatio: block.aspectRatio,
                 onAspectRatioChange:
                   block.aspectRatio != null
-                    ? (aspectRatio: any) => this.props.onItemsChange(
-                    blockUtils.updateBlock(this.props.items, _.extend({}, block, { aspectRatio }))
-                  )
+                    ? (aspectRatio: any) =>
+                        this.props.onItemsChange(
+                          blockUtils.updateBlock(this.props.items, _.extend({}, block, { aspectRatio }))
+                        )
                     : undefined,
                 onBlockRemove: this.props.onItemsChange ? this.handleBlockDrop.bind(null, block) : undefined
               },
@@ -404,26 +396,22 @@ class BlocksDisplayComponent extends React.Component {
             )
           )
         )
-      });
+      })
     }
   }
 }
-BlocksDisplayComponent.initClass()
-
 export default BlocksDisplayComponent
 
-class RootBlockComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      block: PropTypes.object.isRequired,
-      collapseColumns: PropTypes.bool,
-      renderBlock: PropTypes.func.isRequired,
-      onBlockDrop: PropTypes.func, // Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
-      onBlockRemove: PropTypes.func
-    }
-    // Called with (block) when block is removed
-  }
+interface RootBlockComponentProps {
+  block: any
+  collapseColumns?: boolean
+  renderBlock: any
+  /** Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right */
+  onBlockDrop?: any
+  onBlockRemove?: any
+}
 
+class RootBlockComponent extends React.Component<RootBlockComponentProps> {
   render() {
     const elem = R(
       "div",
@@ -450,20 +438,16 @@ class RootBlockComponent extends React.Component {
     }
   }
 }
-RootBlockComponent.initClass()
+interface VerticalBlockComponentProps {
+  block: any
+  collapseColumns?: boolean
+  renderBlock: any
+  /** Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right */
+  onBlockDrop?: any
+  onBlockRemove?: any
+}
 
-class VerticalBlockComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      block: PropTypes.object.isRequired,
-      collapseColumns: PropTypes.bool,
-      renderBlock: PropTypes.func.isRequired,
-      onBlockDrop: PropTypes.func, // Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right
-      onBlockRemove: PropTypes.func
-    }
-    // Called with (block) when block is removed
-  }
-
+class VerticalBlockComponent extends React.Component<VerticalBlockComponentProps> {
   render() {
     return R(
       "div",
@@ -474,4 +458,3 @@ class VerticalBlockComponent extends React.Component {
     )
   }
 }
-VerticalBlockComponent.initClass()

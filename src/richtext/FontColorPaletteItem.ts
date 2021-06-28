@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let FontColorPaletteItem
 import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
@@ -8,84 +5,91 @@ import _ from "lodash"
 import ClickOutHandler from "react-onclickout"
 import Color from "color"
 
+interface FontColorPaletteItemProps {
+  /** Called with "#FF8800", etc. */
+  onSetColor: any
+  /** should the popup be under or over? */
+  position?: string
+}
+
+interface FontColorPaletteItemState {
+  open: any
+}
+
 // Palette item that allows picking a color
-export default FontColorPaletteItem = (function () {
-  FontColorPaletteItem = class FontColorPaletteItem extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        onSetColor: PropTypes.func.isRequired, // Called with "#FF8800", etc.
-        position: PropTypes.string // should the popup be under or over?
-      }
-
-      this.defaultProps = { position: "under" }
-    }
-
-    constructor(props: any) {
-      super(props)
-      this.state = {
-        open: false
-      }
-    }
-
-    handleMouseDown = (ev: any) => {
-      // Don't lose focus from editor
-      ev.preventDefault()
-      return this.setState({ open: !this.state.open })
-    }
-
-    render() {
-      const popupPosition = {
-        position: "absolute",
-        left: 0,
-        zIndex: 1000,
-        backgroundColor: "white",
-        border: "solid 1px #AAA",
-        borderRadius: 3
-      }
-
-      if (this.props.position === "under") {
-        popupPosition["top"] = 26
-      } else {
-        popupPosition["bottom"] = 26
-      }
-
-      return R(
-        ClickOutHandler,
-        { onClickOut: () => this.setState({ open: false }) },
-        R(
-          "div",
-          {
-            className: "mwater-visualization-text-palette-item",
-            onMouseDown: this.handleMouseDown,
-            style: { position: "relative" }
-          },
-          this.state.open
-            ? R(
-                "div",
-                { style: popupPosition },
-                R(ColorPaletteComponent, {
-                  onSetColor: (color: any) => {
-                    this.props.onSetColor(color)
-                    return this.setState({ open: false })
-                  }
-                })
-              )
-            : undefined,
-
-          R("i", { className: "fa fa-tint" })
-        )
-      );
-    }
-  }
-  FontColorPaletteItem.initClass()
-  return FontColorPaletteItem
-})()
-
-class ColorPaletteComponent extends React.Component {
+export default class FontColorPaletteItem extends React.Component<
+  FontColorPaletteItemProps,
+  FontColorPaletteItemState
+> {
   static initClass() {
-    this.propTypes = { onSetColor: PropTypes.func.isRequired }
+    this.defaultProps = { position: "under" }
   }
 
+  constructor(props: any) {
+    super(props)
+    this.state = {
+      open: false
+    }
+  }
+
+  handleMouseDown = (ev: any) => {
+    // Don't lose focus from editor
+    ev.preventDefault()
+    return this.setState({ open: !this.state.open })
+  }
+
+  render() {
+    const popupPosition = {
+      position: "absolute",
+      left: 0,
+      zIndex: 1000,
+      backgroundColor: "white",
+      border: "solid 1px #AAA",
+      borderRadius: 3
+    }
+
+    if (this.props.position === "under") {
+      popupPosition["top"] = 26
+    } else {
+      popupPosition["bottom"] = 26
+    }
+
+    return R(
+      ClickOutHandler,
+      { onClickOut: () => this.setState({ open: false }) },
+      R(
+        "div",
+        {
+          className: "mwater-visualization-text-palette-item",
+          onMouseDown: this.handleMouseDown,
+          style: { position: "relative" }
+        },
+        this.state.open
+          ? R(
+              "div",
+              { style: popupPosition },
+              R(ColorPaletteComponent, {
+                onSetColor: (color: any) => {
+                  this.props.onSetColor(color)
+                  return this.setState({ open: false })
+                }
+              })
+            )
+          : undefined,
+
+        R("i", { className: "fa fa-tint" })
+      )
+    )
+  }
+}
+
+FontColorPaletteItem.initClass()
+
+interface ColorPaletteComponentProps {
+  onSetColor: any
+}
+
+class ColorPaletteComponent extends React.Component<ColorPaletteComponentProps> {
   renderColor(color: any) {
     return R(
       "td",
@@ -97,7 +101,7 @@ class ColorPaletteComponent extends React.Component {
           return this.props.onSetColor(color)
         }
       })
-    );
+    )
   }
 
   render() {
@@ -171,4 +175,3 @@ class ColorPaletteComponent extends React.Component {
     )
   }
 }
-ColorPaletteComponent.initClass()

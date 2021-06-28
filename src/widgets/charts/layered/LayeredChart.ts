@@ -91,7 +91,7 @@ export default LayeredChart = class LayeredChart extends Chart {
           delete layer.trendline
         }
       }
-    });
+    })
   }
 
   validateDesign(design: any, schema: any) {
@@ -190,7 +190,7 @@ export default LayeredChart = class LayeredChart extends Chart {
       (item, cb) => {
         return dataSource.performQuery(item[1], (err: any, rows: any) => {
           return cb(err, [item[0], rows])
-        });
+        })
       },
       (err, items) => {
         if (err) {
@@ -216,10 +216,10 @@ export default LayeredChart = class LayeredChart extends Chart {
             data.footer = footerData
 
             return callback(null, data)
-          });
-        });
+          })
+        })
       }
-    );
+    )
   }
 
   // Create a view element for the chart
@@ -263,7 +263,7 @@ export default LayeredChart = class LayeredChart extends Chart {
         } else {
           return LayeredChartSvgFileSaver.save(design, data, schema, format)
         }
-      });
+      })
     }
 
     // Don't save image of invalid design

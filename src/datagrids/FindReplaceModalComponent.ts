@@ -192,7 +192,7 @@ export default FindReplaceModalComponent = (function () {
             )
           }
         )
-      });
+      })
     }
 
     renderPreview() {
@@ -239,7 +239,7 @@ export default FindReplaceModalComponent = (function () {
           design,
           filters: this.props.filters
         })
-      });
+      })
     }
 
     renderContents() {

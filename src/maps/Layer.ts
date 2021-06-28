@@ -130,7 +130,15 @@ export default Layer = class Layer {
   }
 
   // Convenience function to get the bounds of a geometry expression with filters
-  getBoundsFromExpr(schema: any, dataSource: any, table: any, geometryExpr: any, filterExpr: any, filters: any, callback: any) {
+  getBoundsFromExpr(
+    schema: any,
+    dataSource: any,
+    table: any,
+    geometryExpr: any,
+    filterExpr: any,
+    filters: any,
+    callback: any
+  ) {
     const exprCompiler = new ExprCompiler(schema)
     const compiledGeometryExpr = exprCompiler.compileExpr({ expr: geometryExpr, tableAlias: "main" })
 
@@ -216,6 +224,6 @@ export default Layer = class Layer {
 
         return callback(null, bounds)
       }
-    });
+    })
   }
 }

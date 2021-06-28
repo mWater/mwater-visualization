@@ -49,7 +49,7 @@ export default MapBoundsCalculator = class MapBoundsCalculator {
             allBounds.push(bounds)
           }
           return cb(null)
-        });
+        })
       },
       (error) => {
         if (error) {
@@ -68,6 +68,6 @@ export default MapBoundsCalculator = class MapBoundsCalculator {
           w: _.min(allBounds, "w").w
         })
       }
-    );
+    )
   }
 }

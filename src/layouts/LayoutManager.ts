@@ -55,6 +55,6 @@ export default LayoutManager = class LayoutManager {
       addWidget(items: any, widgetType: any, widgetDesign: any) {
         throw new Error("Not implemented")
       }
-    };
+    }
   }
 }

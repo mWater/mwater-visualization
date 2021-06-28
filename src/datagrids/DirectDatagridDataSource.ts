@@ -44,6 +44,6 @@ export default DirectDatagridDataSource = class DirectDatagridDataSource {
           callback
         )
       }
-    };
+    }
   }
 }

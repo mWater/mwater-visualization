@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let PivotChartDesignerComponent
 import _ from "lodash"
 import PropTypes from "prop-types"
 import React from "react"
@@ -11,235 +8,235 @@ import { FilterExprComponent } from "mwater-expressions-ui"
 import TableSelectComponent from "../../../TableSelectComponent"
 import AxisComponent from "../../../axes/AxisComponent"
 
+interface PivotChartDesignerComponentProps {
+  design: any
+  schema: any
+  dataSource: any
+  onDesignChange: any
+  filters?: any
+}
+
+interface PivotChartDesignerComponentState {
+  isNew: any
+}
+
 // Designer for overall chart. Has a special setup mode first time it is run
-export default PivotChartDesignerComponent = (function () {
-  PivotChartDesignerComponent = class PivotChartDesignerComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        design: PropTypes.object.isRequired,
-        schema: PropTypes.object.isRequired,
-        dataSource: PropTypes.object.isRequired,
-        onDesignChange: PropTypes.func.isRequired,
-        filters: PropTypes.array
-      }
-      // array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+export default class PivotChartDesignerComponent extends React.Component<
+  PivotChartDesignerComponentProps,
+  PivotChartDesignerComponentState
+> {
+  constructor(props: any) {
+    super(props)
+
+    this.state = {
+      isNew: !props.design.table // True if new pivot table
     }
+  }
 
-    constructor(props: any) {
-      super(props)
+  // Updates design with the specified changes
+  updateDesign(changes: any) {
+    const design = _.extend({}, this.props.design, changes)
+    return this.props.onDesignChange(design)
+  }
 
-      this.state = {
-        isNew: !props.design.table // True if new pivot table
-      }
-    }
+  handleTableChange = (table: any) => {
+    // Create default
+    const row = { id: uuid(), label: "" }
+    const column = { id: uuid(), label: "" }
 
-    // Updates design with the specified changes
-    updateDesign(changes: any) {
-      const design = _.extend({}, this.props.design, changes)
-      return this.props.onDesignChange(design)
-    }
+    const intersections = {}
+    intersections[`${row.id}:${column.id}`] = { valueAxis: { expr: { type: "op", op: "count", table, exprs: [] } } }
 
-    handleTableChange = (table: any) => {
-      // Create default
-      const row = { id: uuid(), label: "" }
-      const column = { id: uuid(), label: "" }
+    return this.updateDesign({
+      table,
+      rows: [row],
+      columns: [column],
+      intersections
+    })
+  }
 
-      const intersections = {}
-      intersections[`${row.id}:${column.id}`] = { valueAxis: { expr: { type: "op", op: "count", table, exprs: [] } } }
+  handleColumnChange = (axis: any) => {
+    return this.updateDesign({ columns: [_.extend({}, this.props.design.columns[0], { valueAxis: axis })] })
+  }
 
-      return this.updateDesign({
-        table,
-        rows: [row],
-        columns: [column],
-        intersections
+  handleRowChange = (axis: any) => {
+    return this.updateDesign({ rows: [_.extend({}, this.props.design.rows[0], { valueAxis: axis })] })
+  }
+
+  handleFilterChange = (filter: any) => {
+    return this.updateDesign({ filter })
+  }
+
+  handleIntersectionValueAxisChange = (valueAxis: any) => {
+    const intersectionId = `${this.props.design.rows[0].id}:${this.props.design.columns[0].id}`
+
+    const intersections = {}
+    intersections[intersectionId] = { valueAxis }
+    return this.updateDesign({ intersections })
+  }
+
+  renderTable() {
+    return R(
+      "div",
+      { className: "form-group" },
+      R("label", { className: "text-muted" }, R("i", { className: "fa fa-database" }), " ", "Data Source"),
+      ": ",
+      R(TableSelectComponent, {
+        schema: this.props.schema,
+        value: this.props.design.table,
+        onChange: this.handleTableChange,
+        filter: this.props.design.filter,
+        onFilterChange: this.handleFilterChange
       })
+    )
+  }
+
+  renderFilter() {
+    // If no table, hide
+    if (!this.props.design.table) {
+      return null
     }
 
-    handleColumnChange = (axis: any) => {
-      return this.updateDesign({ columns: [_.extend({}, this.props.design.columns[0], { valueAxis: axis })] })
-    }
-
-    handleRowChange = (axis: any) => {
-      return this.updateDesign({ rows: [_.extend({}, this.props.design.rows[0], { valueAxis: axis })] })
-    }
-
-    handleFilterChange = (filter: any) => {
-      return this.updateDesign({ filter })
-    }
-
-    handleIntersectionValueAxisChange = (valueAxis: any) => {
-      const intersectionId = `${this.props.design.rows[0].id}:${this.props.design.columns[0].id}`
-
-      const intersections = {}
-      intersections[intersectionId] = { valueAxis }
-      return this.updateDesign({ intersections })
-    }
-
-    renderTable() {
-      return R(
+    return R(
+      "div",
+      { className: "form-group" },
+      R("label", { className: "text-muted" }, R("span", { className: "glyphicon glyphicon-filter" }), " ", "Filters"),
+      R(
         "div",
-        { className: "form-group" },
-        R("label", { className: "text-muted" }, R("i", { className: "fa fa-database" }), " ", "Data Source"),
-        ": ",
-        R(TableSelectComponent, {
+        { style: { marginLeft: 8 } },
+        R(FilterExprComponent, {
           schema: this.props.schema,
-          value: this.props.design.table,
-          onChange: this.handleTableChange,
-          filter: this.props.design.filter,
-          onFilterChange: this.handleFilterChange
+          dataSource: this.props.dataSource,
+          onChange: this.handleFilterChange,
+          table: this.props.design.table,
+          value: this.props.design.filter
         })
       )
+    )
+  }
+
+  renderStriping() {
+    // If no table, hide
+    if (!this.props.design.table) {
+      return null
     }
 
-    renderFilter() {
-      // If no table, hide
-      if (!this.props.design.table) {
-        return null
-      }
+    return R(
+      ui.FormGroup,
+      {
+        labelMuted: true,
+        label: "Striping"
+      },
+      R(
+        "label",
+        { key: "none", className: "radio-inline" },
+        R("input", {
+          type: "radio",
+          checked: !this.props.design.striping,
+          onClick: () => this.updateDesign({ striping: null })
+        }),
+        "None"
+      ),
 
-      return R(
-        "div",
-        { className: "form-group" },
-        R("label", { className: "text-muted" }, R("span", { className: "glyphicon glyphicon-filter" }), " ", "Filters"),
-        R(
-          "div",
-          { style: { marginLeft: 8 } },
-          R(FilterExprComponent, {
-            schema: this.props.schema,
-            dataSource: this.props.dataSource,
-            onChange: this.handleFilterChange,
-            table: this.props.design.table,
-            value: this.props.design.filter
-          })
-        )
+      R(
+        "label",
+        { key: "columns", className: "radio-inline" },
+        R("input", {
+          type: "radio",
+          checked: this.props.design.striping === "columns",
+          onClick: () => this.updateDesign({ striping: "columns" })
+        }),
+        "Columns"
+      ),
+
+      R(
+        "label",
+        { key: "rows", className: "radio-inline" },
+        R("input", {
+          type: "radio",
+          checked: this.props.design.striping === "rows",
+          onClick: () => this.updateDesign({ striping: "rows" })
+        }),
+        "Rows"
       )
-    }
+    )
+  }
 
-    renderStriping() {
-      // If no table, hide
-      if (!this.props.design.table) {
-        return null
-      }
+  // Show setup options
+  renderSetup() {
+    const intersectionId = `${this.props.design.rows[0].id}:${this.props.design.columns[0].id}`
 
-      return R(
+    return R(
+      "div",
+      null,
+      R(
         ui.FormGroup,
         {
           labelMuted: true,
-          label: "Striping"
+          label: "Columns",
+          help: "Field to optionally make columns out of"
         },
-        R(
-          "label",
-          { key: "none", className: "radio-inline" },
-          R("input", {
-            type: "radio",
-            checked: !this.props.design.striping,
-            onClick: () => this.updateDesign({ striping: null })
-          }),
-          "None"
-        ),
+        R(AxisComponent, {
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          table: this.props.design.table,
+          types: ["enum", "text", "boolean", "date"],
+          aggrNeed: "none",
+          value: this.props.design.columns[0].valueAxis,
+          onChange: this.handleColumnChange,
+          filters: this.props.filters
+        })
+      ),
 
-        R(
-          "label",
-          { key: "columns", className: "radio-inline" },
-          R("input", {
-            type: "radio",
-            checked: this.props.design.striping === "columns",
-            onClick: () => this.updateDesign({ striping: "columns" })
-          }),
-          "Columns"
-        ),
+      R(
+        ui.FormGroup,
+        {
+          labelMuted: true,
+          label: "Rows",
+          help: "Field to optionally make rows out of"
+        },
+        R(AxisComponent, {
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          table: this.props.design.table,
+          types: ["enum", "text", "boolean", "date"],
+          aggrNeed: "none",
+          value: this.props.design.rows[0].valueAxis,
+          onChange: this.handleRowChange,
+          filters: this.props.filters
+        })
+      ),
 
-        R(
-          "label",
-          { key: "rows", className: "radio-inline" },
-          R("input", {
-            type: "radio",
-            checked: this.props.design.striping === "rows",
-            onClick: () => this.updateDesign({ striping: "rows" })
-          }),
-          "Rows"
-        )
+      R(
+        ui.FormGroup,
+        {
+          labelMuted: true,
+          label: "Value",
+          help: "Field show in cells"
+        },
+        R(AxisComponent, {
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          table: this.props.design.table,
+          types: ["enum", "text", "boolean", "date", "number"],
+          aggrNeed: "required",
+          value: this.props.design.intersections[intersectionId].valueAxis,
+          onChange: this.handleIntersectionValueAxisChange,
+          showFormat: true,
+          filters: this.props.filters
+        })
       )
-    }
-
-    // Show setup options
-    renderSetup() {
-      const intersectionId = `${this.props.design.rows[0].id}:${this.props.design.columns[0].id}`
-
-      return R(
-        "div",
-        null,
-        R(
-          ui.FormGroup,
-          {
-            labelMuted: true,
-            label: "Columns",
-            help: "Field to optionally make columns out of"
-          },
-          R(AxisComponent, {
-            schema: this.props.schema,
-            dataSource: this.props.dataSource,
-            table: this.props.design.table,
-            types: ["enum", "text", "boolean", "date"],
-            aggrNeed: "none",
-            value: this.props.design.columns[0].valueAxis,
-            onChange: this.handleColumnChange,
-            filters: this.props.filters
-          })
-        ),
-
-        R(
-          ui.FormGroup,
-          {
-            labelMuted: true,
-            label: "Rows",
-            help: "Field to optionally make rows out of"
-          },
-          R(AxisComponent, {
-            schema: this.props.schema,
-            dataSource: this.props.dataSource,
-            table: this.props.design.table,
-            types: ["enum", "text", "boolean", "date"],
-            aggrNeed: "none",
-            value: this.props.design.rows[0].valueAxis,
-            onChange: this.handleRowChange,
-            filters: this.props.filters
-          })
-        ),
-
-        R(
-          ui.FormGroup,
-          {
-            labelMuted: true,
-            label: "Value",
-            help: "Field show in cells"
-          },
-          R(AxisComponent, {
-            schema: this.props.schema,
-            dataSource: this.props.dataSource,
-            table: this.props.design.table,
-            types: ["enum", "text", "boolean", "date", "number"],
-            aggrNeed: "required",
-            value: this.props.design.intersections[intersectionId].valueAxis,
-            onChange: this.handleIntersectionValueAxisChange,
-            showFormat: true,
-            filters: this.props.filters
-          })
-        )
-      )
-    }
-
-    render() {
-      return R(
-        "div",
-        null,
-        this.renderTable(),
-        this.state.isNew && this.props.design.table ? this.renderSetup() : undefined,
-        this.renderFilter(),
-        this.renderStriping()
-      )
-    }
+    )
   }
-  PivotChartDesignerComponent.initClass()
-  return PivotChartDesignerComponent
-})()
+
+  render() {
+    return R(
+      "div",
+      null,
+      this.renderTable(),
+      this.state.isNew && this.props.design.table ? this.renderSetup() : undefined,
+      this.renderFilter(),
+      this.renderStriping()
+    )
+  }
+}

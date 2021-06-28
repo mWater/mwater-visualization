@@ -1,123 +1,124 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let FontSizePaletteItem
 import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import _ from "lodash"
 import ClickOutHandler from "react-onclickout"
 
+interface FontSizePaletteItemProps {
+  /** Called with "125%", etc. */
+  onSetSize: any
+  /** should the popup be under or over? */
+  position?: string
+}
+
+interface FontSizePaletteItemState {
+  open: any
+}
+
 // Palette item that allows picking a size from dropdown
-export default FontSizePaletteItem = (function () {
-  FontSizePaletteItem = class FontSizePaletteItem extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        onSetSize: PropTypes.func.isRequired, // Called with "125%", etc.
-        position: PropTypes.string // should the popup be under or over?
-      }
+export default class FontSizePaletteItem extends React.Component<FontSizePaletteItemProps, FontSizePaletteItemState> {
+  static initClass() {
+    this.defaultProps = { position: "under" }
+  }
 
-      this.defaultProps = { position: "under" }
+  constructor(props: any) {
+    super(props)
+    this.state = {
+      open: false
+    }
+  }
+
+  handleMouseDown = (ev: any) => {
+    // Don't lose focus from editor
+    ev.preventDefault()
+    return this.setState({ open: !this.state.open })
+  }
+
+  renderSize(label: any, value: any) {
+    return R(
+      "div",
+      {
+        className: "font-size-palette-menu-item",
+        onMouseDown: (ev) => {
+          ev.preventDefault()
+          this.props.onSetSize(value)
+          return this.setState({ open: false })
+        },
+        key: value
+      },
+      label
+    )
+  }
+
+  renderSizes() {
+    return R(
+      "div",
+      null,
+      this.renderSize("Tiny", "50%"),
+      this.renderSize("Small", "66%"),
+      this.renderSize("Normal", "100%"),
+      this.renderSize("Large", "150%"),
+      this.renderSize("Huge", "200%")
+    )
+  }
+
+  render() {
+    const popupPosition = {
+      position: "absolute",
+      left: 0,
+      zIndex: 1000,
+      backgroundColor: "white",
+      border: "solid 1px #AAA",
+      borderRadius: 3
     }
 
-    constructor(props: any) {
-      super(props)
-      this.state = {
-        open: false
-      }
+    if (this.props.position === "under") {
+      popupPosition["top"] = 26
+    } else {
+      popupPosition["bottom"] = 26
     }
 
-    handleMouseDown = (ev: any) => {
-      // Don't lose focus from editor
-      ev.preventDefault()
-      return this.setState({ open: !this.state.open })
-    }
-
-    renderSize(label: any, value: any) {
-      return R(
+    return R(
+      ClickOutHandler,
+      { onClickOut: () => this.setState({ open: false }) },
+      R(
         "div",
         {
-          className: "font-size-palette-menu-item",
-          onMouseDown: (ev) => {
-            ev.preventDefault()
-            this.props.onSetSize(value)
-            return this.setState({ open: false })
-          },
-          key: value
+          className: "mwater-visualization-text-palette-item",
+          onMouseDown: this.handleMouseDown,
+          style: { position: "relative" }
         },
-        label
-      )
-    }
-
-    renderSizes() {
-      return R(
-        "div",
-        null,
-        this.renderSize("Tiny", "50%"),
-        this.renderSize("Small", "66%"),
-        this.renderSize("Normal", "100%"),
-        this.renderSize("Large", "150%"),
-        this.renderSize("Huge", "200%")
-      )
-    }
-
-    render() {
-      const popupPosition = {
-        position: "absolute",
-        left: 0,
-        zIndex: 1000,
-        backgroundColor: "white",
-        border: "solid 1px #AAA",
-        borderRadius: 3
-      }
-
-      if (this.props.position === "under") {
-        popupPosition["top"] = 26
-      } else {
-        popupPosition["bottom"] = 26
-      }
-
-      return R(
-        ClickOutHandler,
-        { onClickOut: () => this.setState({ open: false }) },
         R(
-          "div",
-          {
-            className: "mwater-visualization-text-palette-item",
-            onMouseDown: this.handleMouseDown,
-            style: { position: "relative" }
-          },
-          R(
-            "style",
-            null,
-            `\
+          "style",
+          null,
+          `\
 .font-size-palette-menu-item {
-  color: black;
-  background-color: white;
-  text-align: left;
-  padding: 5px 15px 5px 15px;
-  cursor: pointer;
+color: black;
+background-color: white;
+text-align: left;
+padding: 5px 15px 5px 15px;
+cursor: pointer;
 }
 .font-size-palette-menu-item:hover {
-  background-color: #DDD;
+background-color: #DDD;
 }\
 `
-          ),
-          this.state.open ? R("div", { style: popupPosition }, this.renderSizes()) : undefined,
+        ),
+        this.state.open ? R("div", { style: popupPosition }, this.renderSizes()) : undefined,
 
-          R("i", { className: "fa fa-arrows-v" })
-        )
+        R("i", { className: "fa fa-arrows-v" })
       )
-    }
+    )
   }
-  FontSizePaletteItem.initClass()
-  return FontSizePaletteItem
-})()
+}
 
-class ColorPaletteComponent extends React.Component {
-  static initClass() {
-    this.propTypes = { onSetColor: PropTypes.func.isRequired }
-  }
+FontSizePaletteItem.initClass()
 
+interface ColorPaletteComponentProps {
+  onSetColor: any
+}
+
+class ColorPaletteComponent extends React.Component<ColorPaletteComponentProps> {
   renderColor(color: any) {
     return R(
       "td",
@@ -129,7 +130,7 @@ class ColorPaletteComponent extends React.Component {
           return this.props.onSetColor.bind(null, color)
         }
       })
-    );
+    )
   }
 
   render() {
@@ -203,4 +204,3 @@ class ColorPaletteComponent extends React.Component {
     )
   }
 }
-ColorPaletteComponent.initClass()

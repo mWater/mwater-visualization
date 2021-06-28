@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let QuickfiltersDesignComponent
 import _ from "lodash"
 import PropTypes from "prop-types"
 import React from "react"
@@ -11,146 +8,145 @@ import { ExprComponent } from "mwater-expressions-ui"
 import { ExprUtils } from "mwater-expressions"
 import ui from "react-library/lib/bootstrap"
 
+interface QuickfiltersDesignComponentProps {
+  /** Design of quickfilters. See README.md */
+  design: any
+  /** Called when design changes */
+  onDesignChange: any
+  schema: any
+  dataSource: any
+  /** List of possible table ids to use */
+  tables: any
+}
+
 // Displays quick filters and allows their value to be modified
-export default QuickfiltersDesignComponent = (function () {
-  QuickfiltersDesignComponent = class QuickfiltersDesignComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        design: PropTypes.array.isRequired, // Design of quickfilters. See README.md
-        onDesignChange: PropTypes.func.isRequired, // Called when design changes
-
-        schema: PropTypes.object.isRequired,
-        dataSource: PropTypes.object.isRequired,
-
-        tables: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired // List of possible table ids to use
-      }
-
-      this.defaultProps = { design: [] }
-    }
-
-    handleDesignChange = (design: any) => {
-      design = design.slice()
-
-      // Update merged, clearing if not mergeable
-      for (
-        let index = 0, end = design.length, asc = 0 <= end;
-        asc ? index < end : index > end;
-        asc ? index++ : index--
-      ) {
-        if (design[index].merged && !this.isMergeable(design, index)) {
-          design[index] = _.extend({}, design[index], { merged: false })
-        }
-      }
-
-      return this.props.onDesignChange(design)
-    }
-
-    // Determine if quickfilter at index is mergeable with previous (same type, id table and enum values)
-    isMergeable(design: any, index: any) {
-      if (index === 0) {
-        return false
-      }
-
-      const exprUtils = new ExprUtils(this.props.schema)
-
-      const type = exprUtils.getExprType(design[index].expr)
-      const prevType = exprUtils.getExprType(design[index - 1].expr)
-
-      const idTable = exprUtils.getExprIdTable(design[index].expr)
-      const prevIdTable = exprUtils.getExprIdTable(design[index - 1].expr)
-
-      const enumValues = exprUtils.getExprEnumValues(design[index].expr)
-      const prevEnumValues = exprUtils.getExprEnumValues(design[index - 1].expr)
-
-      const multi = design[index].multi || false
-      const prevMulti = design[index - 1].multi || false
-
-      if (multi !== prevMulti) {
-        return false
-      }
-
-      if (!type || type !== prevType) {
-        return false
-      }
-
-      if (idTable !== prevIdTable) {
-        return false
-      }
-
-      if (enumValues && !_.isEqual(_.pluck(enumValues, "id"), _.pluck(prevEnumValues, "id"))) {
-        return false
-      }
-
-      return true
-    }
-
-    renderQuickfilter(item: any, index: any) {
-      return R(QuickfilterDesignComponent, {
-        key: index,
-        design: item,
-        schema: this.props.schema,
-        dataSource: this.props.dataSource,
-        tables: this.props.tables,
-        mergeable: this.isMergeable(this.props.design, index),
-        onChange: (newItem: any) => {
-          const design = this.props.design.slice()
-          design[index] = newItem
-          return this.handleDesignChange(design)
-        },
-
-        onRemove: this.handleRemove.bind(null, index)
-      });
-    }
-
-    handleAdd = () => {
-      // Add blank to end
-      const design = this.props.design.concat([{}])
-      return this.props.onDesignChange(design)
-    }
-
-    handleRemove = (index: any) => {
-      const design = this.props.design.slice()
-      design.splice(index, 1)
-      return this.props.onDesignChange(design)
-    }
-
-    render() {
-      return R(
-        "div",
-        null,
-        _.map(this.props.design, (item, index) => this.renderQuickfilter(item, index)),
-
-        this.props.tables.length > 0
-          ? R(
-              "button",
-              { type: "button", className: "btn btn-sm btn-default", onClick: this.handleAdd },
-              R("span", { className: "glyphicon glyphicon-plus" }),
-              " Add Quick Filter"
-            )
-          : undefined
-      )
-    }
-  }
-  QuickfiltersDesignComponent.initClass()
-  return QuickfiltersDesignComponent
-})()
-
-class QuickfilterDesignComponent extends React.Component {
+export default class QuickfiltersDesignComponent extends React.Component<QuickfiltersDesignComponentProps> {
   static initClass() {
-    this.propTypes = {
-      design: PropTypes.object.isRequired, // Design of a single quickfilters. See README.md
-      onChange: PropTypes.func.isRequired,
-      onRemove: PropTypes.func.isRequired,
-      mergeable: PropTypes.bool, // True if can be merged
-
-      schema: PropTypes.object.isRequired,
-      dataSource: PropTypes.object.isRequired,
-
-      tables: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired
-    }
-    // List of possible table ids to use
+    this.defaultProps = { design: [] }
   }
 
+  handleDesignChange = (design: any) => {
+    design = design.slice()
+
+    // Update merged, clearing if not mergeable
+    for (let index = 0, end = design.length, asc = 0 <= end; asc ? index < end : index > end; asc ? index++ : index--) {
+      if (design[index].merged && !this.isMergeable(design, index)) {
+        design[index] = _.extend({}, design[index], { merged: false })
+      }
+    }
+
+    return this.props.onDesignChange(design)
+  }
+
+  // Determine if quickfilter at index is mergeable with previous (same type, id table and enum values)
+  isMergeable(design: any, index: any) {
+    if (index === 0) {
+      return false
+    }
+
+    const exprUtils = new ExprUtils(this.props.schema)
+
+    const type = exprUtils.getExprType(design[index].expr)
+    const prevType = exprUtils.getExprType(design[index - 1].expr)
+
+    const idTable = exprUtils.getExprIdTable(design[index].expr)
+    const prevIdTable = exprUtils.getExprIdTable(design[index - 1].expr)
+
+    const enumValues = exprUtils.getExprEnumValues(design[index].expr)
+    const prevEnumValues = exprUtils.getExprEnumValues(design[index - 1].expr)
+
+    const multi = design[index].multi || false
+    const prevMulti = design[index - 1].multi || false
+
+    if (multi !== prevMulti) {
+      return false
+    }
+
+    if (!type || type !== prevType) {
+      return false
+    }
+
+    if (idTable !== prevIdTable) {
+      return false
+    }
+
+    if (enumValues && !_.isEqual(_.pluck(enumValues, "id"), _.pluck(prevEnumValues, "id"))) {
+      return false
+    }
+
+    return true
+  }
+
+  renderQuickfilter(item: any, index: any) {
+    return R(QuickfilterDesignComponent, {
+      key: index,
+      design: item,
+      schema: this.props.schema,
+      dataSource: this.props.dataSource,
+      tables: this.props.tables,
+      mergeable: this.isMergeable(this.props.design, index),
+      onChange: (newItem: any) => {
+        const design = this.props.design.slice()
+        design[index] = newItem
+        return this.handleDesignChange(design)
+      },
+
+      onRemove: this.handleRemove.bind(null, index)
+    })
+  }
+
+  handleAdd = () => {
+    // Add blank to end
+    const design = this.props.design.concat([{}])
+    return this.props.onDesignChange(design)
+  }
+
+  handleRemove = (index: any) => {
+    const design = this.props.design.slice()
+    design.splice(index, 1)
+    return this.props.onDesignChange(design)
+  }
+
+  render() {
+    return R(
+      "div",
+      null,
+      _.map(this.props.design, (item, index) => this.renderQuickfilter(item, index)),
+
+      this.props.tables.length > 0
+        ? R(
+            "button",
+            { type: "button", className: "btn btn-sm btn-default", onClick: this.handleAdd },
+            R("span", { className: "glyphicon glyphicon-plus" }),
+            " Add Quick Filter"
+          )
+        : undefined
+    )
+  }
+}
+
+QuickfiltersDesignComponent.initClass()
+
+interface QuickfilterDesignComponentProps {
+  /** Design of a single quickfilters. See README.md */
+  design: any
+  onChange: any
+  onRemove: any
+  /** True if can be merged */
+  mergeable?: boolean
+  schema: any
+  dataSource: any
+  tables: any
+}
+
+interface QuickfilterDesignComponentState {
+  table: any
+}
+
+class QuickfilterDesignComponent extends React.Component<
+  QuickfilterDesignComponentProps,
+  QuickfilterDesignComponentState
+> {
   constructor(props: any) {
     super(props)
 
@@ -270,14 +266,13 @@ class QuickfilterDesignComponent extends React.Component {
     )
   }
 }
-QuickfilterDesignComponent.initClass()
+
+interface RemovableComponentProps {
+  onRemove: any
+}
 
 // Floats an x to the right on hover
-class RemovableComponent extends React.Component {
-  static initClass() {
-    this.propTypes = { onRemove: PropTypes.func.isRequired }
-  }
-
+class RemovableComponent extends React.Component<RemovableComponentProps> {
   render() {
     return R(
       "div",
@@ -295,4 +290,3 @@ class RemovableComponent extends React.Component {
     )
   }
 }
-RemovableComponent.initClass()

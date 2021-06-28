@@ -78,7 +78,7 @@ export default MWaterLoaderComponent = (function () {
           }
           return callback({ schema: config.schema, dataSource: config.dataSource })
         }
-      );
+      )
     }
 
     render() {

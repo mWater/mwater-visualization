@@ -260,7 +260,7 @@ export default PivotChart = class PivotChart extends Chart {
       (item, cb) => {
         return dataSource.performQuery(item[1], (err: any, rows: any) => {
           return cb(err, [item[0], rows])
-        });
+        })
       },
       (err, items) => {
         if (err) {
@@ -286,10 +286,10 @@ export default PivotChart = class PivotChart extends Chart {
             data.footer = footerData
 
             return callback(null, data)
-          });
-        });
+          })
+        })
       }
-    );
+    )
   }
 
   // Create a view element for the chart

@@ -114,7 +114,7 @@ export default DatagridViewComponent = (function () {
             return this.setState({ rows, entirelyLoaded: newRows.length < this.props.pageSize })
           }
         }
-      );
+      )
     }
 
     // Reloads all data
@@ -150,7 +150,7 @@ export default DatagridViewComponent = (function () {
           this.setState({ rows: newRows })
           return callback()
         }
-      );
+      )
     }
 
     handleColumnResize = (newColumnWidth: any, columnKey: any) => {
@@ -221,7 +221,7 @@ export default DatagridViewComponent = (function () {
             return this.setState({ editingCell: { rowIndex, columnIndex } })
           }
         }
-      );
+      )
     }
 
     // Called to save
@@ -244,8 +244,8 @@ export default DatagridViewComponent = (function () {
           return this.reloadRow(this.state.editingCell.rowIndex, () => {
             return this.setState({ editingCell: null, savingCell: false })
           })
-        });
-      });
+        })
+      })
     }
 
     handleCancelEdit = () => {

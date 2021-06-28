@@ -170,5 +170,5 @@ export default TextLiteralComponent = (function () {
 })()
 
 function escapeRegex(s: any) {
-  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+  return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
 }

@@ -21,22 +21,18 @@ function collectSource(connect: any, monitor: any) {
   }
 }
 
+interface DragSourceComponentProps {
+  /** Created DnD item when dragged. */
+  createDragItem: any
+  /** the drag source connector, supplied by React DND */
+  connectDragSource: any
+  connectDragPreview: any
+}
+
 // Simple drag source that runs a function to get the drag item.
-class DragSourceComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      createDragItem: PropTypes.func.isRequired, // Created DnD item when dragged.
-
-      connectDragSource: PropTypes.func.isRequired, // the drag source connector, supplied by React DND
-      connectDragPreview: PropTypes.func.isRequired
-    }
-    // the drag preview connector, supplied by React DND
-  }
-
+class DragSourceComponent extends React.Component<DragSourceComponentProps> {
   render() {
     return this.props.connectDragPreview(this.props.connectDragSource(this.props.children))
   }
 }
-DragSourceComponent.initClass()
-
-export default (type: any) => DragSource(type, sourceSpec, collectSource)(DragSourceComponent);
+export default (type: any) => DragSource(type, sourceSpec, collectSource)(DragSourceComponent)

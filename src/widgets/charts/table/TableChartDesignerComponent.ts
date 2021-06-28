@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let TableChartDesignerComponent
 import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
@@ -18,251 +15,245 @@ import ui from "react-library/lib/bootstrap"
 import { getFormatOptions } from "../../../valueFormatter"
 import { getDefaultFormat } from "../../../valueFormatter"
 
-export default TableChartDesignerComponent = (function () {
-  TableChartDesignerComponent = class TableChartDesignerComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        design: PropTypes.object.isRequired,
-        schema: PropTypes.object.isRequired,
-        dataSource: PropTypes.object.isRequired,
-        onDesignChange: PropTypes.func.isRequired
-      }
-    }
+interface TableChartDesignerComponentProps {
+  design: any
+  schema: any
+  dataSource: any
+  onDesignChange: any
+}
 
-    // Updates design with the specified changes
-    updateDesign(changes: any) {
-      const design = _.extend({}, this.props.design, changes)
-      return this.props.onDesignChange(design)
-    }
-
-    handleTitleTextChange = (ev: any) => {
-      return this.updateDesign({ titleText: ev.target.value })
-    }
-    handleTableChange = (table: any) => {
-      return this.updateDesign({ table })
-    }
-    handleFilterChange = (filter: any) => {
-      return this.updateDesign({ filter })
-    }
-    handleOrderingsChange = (orderings: any) => {
-      return this.updateDesign({ orderings })
-    }
-    handleLimitChange = (limit: any) => {
-      return this.updateDesign({ limit })
-    }
-
-    handleColumnChange = (index: any, column: any) => {
-      const columns = this.props.design.columns.slice()
-      columns[index] = column
-      return this.updateDesign({ columns })
-    }
-
-    handleRemoveColumn = (index: any) => {
-      const columns = this.props.design.columns.slice()
-      columns.splice(index, 1)
-      return this.updateDesign({ columns })
-    }
-
-    handleAddColumn = () => {
-      const columns = this.props.design.columns.slice()
-      columns.push({ id: uuid() })
-      return this.updateDesign({ columns })
-    }
-
-    renderTable() {
-      return R(
-        "div",
-        { className: "form-group" },
-        R("label", { className: "text-muted" }, R("i", { className: "fa fa-database" }), " ", "Data Source"),
-        ": ",
-        R(TableSelectComponent, {
-          schema: this.props.schema,
-          value: this.props.design.table,
-          onChange: this.handleTableChange,
-          filter: this.props.design.filter,
-          onFilterChange: this.handleFilterChange
-        })
-      )
-    }
-
-    renderTitle() {
-      return R(
-        "div",
-        { className: "form-group" },
-        R("label", { className: "text-muted" }, "Title"),
-        R("input", {
-          type: "text",
-          className: "form-control input-sm",
-          value: this.props.design.titleText,
-          onChange: this.handleTitleTextChange,
-          placeholder: "Untitled"
-        })
-      )
-    }
-
-    renderColumn = (column: any, index: any, connectDragSource: any, connectDragPreview: any, connectDropTarget: any) => {
-      const style = {
-        borderTop: "solid 1px #EEE",
-        paddingTop: 10,
-        paddingBottom: 10
-      }
-
-      return connectDragPreview(
-        connectDropTarget(
-          R(
-            "div",
-            { key: index, style },
-            React.createElement(TableChartColumnDesignerComponent, {
-              design: this.props.design,
-              schema: this.props.schema,
-              dataSource: this.props.dataSource,
-              index,
-              onChange: this.handleColumnChange.bind(null, index),
-              onRemove: this.handleRemoveColumn.bind(null, index),
-              connectDragSource
-            })
-          )
-        )
-      )
-    }
-
-    handleReorder = (map: any) => {
-      return this.updateDesign({ columns: map })
-    }
-
-    renderColumns() {
-      if (!this.props.design.table) {
-        return
-      }
-
-      return R(
-        "div",
-        null,
-        R(ReorderableListComponent, {
-          items: this.props.design.columns,
-          onReorder: this.handleReorder,
-          renderItem: this.renderColumn,
-          getItemId: (item) => item.id
-        }),
-        R(
-          "button",
-          { className: "btn btn-default btn-sm", type: "button", onClick: this.handleAddColumn },
-          R("span", { className: "glyphicon glyphicon-plus" }),
-          " Add Column"
-        )
-      )
-    }
-    // return R 'div', className: "form-group",
-    //   _.map(@props.design.columns, (column, i) => @renderColumn(i))
-    //
-
-    renderOrderings() {
-      // If no table, hide
-      if (!this.props.design.table) {
-        return null
-      }
-
-      return R(
-        "div",
-        { className: "form-group" },
-        R(
-          "label",
-          { className: "text-muted" },
-          R("span", { className: "glyphicon glyphicon-sort-by-attributes" }),
-          " ",
-          "Ordering"
-        ),
-        R(
-          "div",
-          { style: { marginLeft: 8 } },
-          React.createElement(OrderingsComponent, {
-            schema: this.props.schema,
-            dataSource: this.props.dataSource,
-            orderings: this.props.design.orderings,
-            onOrderingsChange: this.handleOrderingsChange,
-            table: this.props.design.table
-          })
-        )
-      )
-    }
-
-    renderFilter() {
-      // If no table, hide
-      if (!this.props.design.table) {
-        return null
-      }
-
-      return R(
-        "div",
-        { className: "form-group" },
-        R("label", { className: "text-muted" }, R("span", { className: "glyphicon glyphicon-filter" }), " ", "Filters"),
-        R(
-          "div",
-          { style: { marginLeft: 8 } },
-          React.createElement(FilterExprComponent, {
-            schema: this.props.schema,
-            dataSource: this.props.dataSource,
-            onChange: this.handleFilterChange,
-            table: this.props.design.table,
-            value: this.props.design.filter
-          })
-        )
-      )
-    }
-
-    renderLimit() {
-      // If no table, hide
-      if (!this.props.design.table) {
-        return null
-      }
-
-      return R(
-        "div",
-        { className: "form-group" },
-        R("label", { className: "text-muted" }, "Maximum Number of Rows (up to 1000)"),
-        R(
-          "div",
-          { style: { marginLeft: 8 } },
-          R(ui.NumberInput, {
-            value: this.props.design.limit,
-            onChange: this.handleLimitChange,
-            decimal: false,
-            placeholder: "1000"
-          })
-        )
-      )
-    }
-
-    render() {
-      return R(
-        "div",
-        null,
-        this.renderTable(),
-        this.renderColumns(),
-        this.props.design.table ? R("hr") : undefined,
-        this.renderOrderings(),
-        this.renderFilter(),
-        this.renderLimit(),
-        R("hr"),
-        this.renderTitle()
-      )
-    }
+export default class TableChartDesignerComponent extends React.Component<TableChartDesignerComponentProps> {
+  // Updates design with the specified changes
+  updateDesign(changes: any) {
+    const design = _.extend({}, this.props.design, changes)
+    return this.props.onDesignChange(design)
   }
-  TableChartDesignerComponent.initClass()
-  return TableChartDesignerComponent
-})()
 
-class TableChartColumnDesignerComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      design: PropTypes.object.isRequired,
-      schema: PropTypes.object.isRequired,
-      dataSource: PropTypes.object.isRequired,
-      index: PropTypes.number.isRequired,
-      onChange: PropTypes.func.isRequired,
-      onRemove: PropTypes.func.isRequired
+  handleTitleTextChange = (ev: any) => {
+    return this.updateDesign({ titleText: ev.target.value })
+  }
+  handleTableChange = (table: any) => {
+    return this.updateDesign({ table })
+  }
+  handleFilterChange = (filter: any) => {
+    return this.updateDesign({ filter })
+  }
+  handleOrderingsChange = (orderings: any) => {
+    return this.updateDesign({ orderings })
+  }
+  handleLimitChange = (limit: any) => {
+    return this.updateDesign({ limit })
+  }
+
+  handleColumnChange = (index: any, column: any) => {
+    const columns = this.props.design.columns.slice()
+    columns[index] = column
+    return this.updateDesign({ columns })
+  }
+
+  handleRemoveColumn = (index: any) => {
+    const columns = this.props.design.columns.slice()
+    columns.splice(index, 1)
+    return this.updateDesign({ columns })
+  }
+
+  handleAddColumn = () => {
+    const columns = this.props.design.columns.slice()
+    columns.push({ id: uuid() })
+    return this.updateDesign({ columns })
+  }
+
+  renderTable() {
+    return R(
+      "div",
+      { className: "form-group" },
+      R("label", { className: "text-muted" }, R("i", { className: "fa fa-database" }), " ", "Data Source"),
+      ": ",
+      R(TableSelectComponent, {
+        schema: this.props.schema,
+        value: this.props.design.table,
+        onChange: this.handleTableChange,
+        filter: this.props.design.filter,
+        onFilterChange: this.handleFilterChange
+      })
+    )
+  }
+
+  renderTitle() {
+    return R(
+      "div",
+      { className: "form-group" },
+      R("label", { className: "text-muted" }, "Title"),
+      R("input", {
+        type: "text",
+        className: "form-control input-sm",
+        value: this.props.design.titleText,
+        onChange: this.handleTitleTextChange,
+        placeholder: "Untitled"
+      })
+    )
+  }
+
+  renderColumn = (column: any, index: any, connectDragSource: any, connectDragPreview: any, connectDropTarget: any) => {
+    const style = {
+      borderTop: "solid 1px #EEE",
+      paddingTop: 10,
+      paddingBottom: 10
     }
 
+    return connectDragPreview(
+      connectDropTarget(
+        R(
+          "div",
+          { key: index, style },
+          React.createElement(TableChartColumnDesignerComponent, {
+            design: this.props.design,
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            index,
+            onChange: this.handleColumnChange.bind(null, index),
+            onRemove: this.handleRemoveColumn.bind(null, index),
+            connectDragSource
+          })
+        )
+      )
+    )
+  }
+
+  handleReorder = (map: any) => {
+    return this.updateDesign({ columns: map })
+  }
+
+  renderColumns() {
+    if (!this.props.design.table) {
+      return
+    }
+
+    return R(
+      "div",
+      null,
+      R(ReorderableListComponent, {
+        items: this.props.design.columns,
+        onReorder: this.handleReorder,
+        renderItem: this.renderColumn,
+        getItemId: (item) => item.id
+      }),
+      R(
+        "button",
+        { className: "btn btn-default btn-sm", type: "button", onClick: this.handleAddColumn },
+        R("span", { className: "glyphicon glyphicon-plus" }),
+        " Add Column"
+      )
+    )
+  }
+  // return R 'div', className: "form-group",
+  //   _.map(@props.design.columns, (column, i) => @renderColumn(i))
+  //
+
+  renderOrderings() {
+    // If no table, hide
+    if (!this.props.design.table) {
+      return null
+    }
+
+    return R(
+      "div",
+      { className: "form-group" },
+      R(
+        "label",
+        { className: "text-muted" },
+        R("span", { className: "glyphicon glyphicon-sort-by-attributes" }),
+        " ",
+        "Ordering"
+      ),
+      R(
+        "div",
+        { style: { marginLeft: 8 } },
+        React.createElement(OrderingsComponent, {
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          orderings: this.props.design.orderings,
+          onOrderingsChange: this.handleOrderingsChange,
+          table: this.props.design.table
+        })
+      )
+    )
+  }
+
+  renderFilter() {
+    // If no table, hide
+    if (!this.props.design.table) {
+      return null
+    }
+
+    return R(
+      "div",
+      { className: "form-group" },
+      R("label", { className: "text-muted" }, R("span", { className: "glyphicon glyphicon-filter" }), " ", "Filters"),
+      R(
+        "div",
+        { style: { marginLeft: 8 } },
+        React.createElement(FilterExprComponent, {
+          schema: this.props.schema,
+          dataSource: this.props.dataSource,
+          onChange: this.handleFilterChange,
+          table: this.props.design.table,
+          value: this.props.design.filter
+        })
+      )
+    )
+  }
+
+  renderLimit() {
+    // If no table, hide
+    if (!this.props.design.table) {
+      return null
+    }
+
+    return R(
+      "div",
+      { className: "form-group" },
+      R("label", { className: "text-muted" }, "Maximum Number of Rows (up to 1000)"),
+      R(
+        "div",
+        { style: { marginLeft: 8 } },
+        R(ui.NumberInput, {
+          value: this.props.design.limit,
+          onChange: this.handleLimitChange,
+          decimal: false,
+          placeholder: "1000"
+        })
+      )
+    )
+  }
+
+  render() {
+    return R(
+      "div",
+      null,
+      this.renderTable(),
+      this.renderColumns(),
+      this.props.design.table ? R("hr") : undefined,
+      this.renderOrderings(),
+      this.renderFilter(),
+      this.renderLimit(),
+      R("hr"),
+      this.renderTitle()
+    )
+  }
+}
+
+interface TableChartColumnDesignerComponentProps {
+  design: any
+  schema: any
+  dataSource: any
+  index: number
+  onChange: any
+  onRemove: any
+}
+
+class TableChartColumnDesignerComponent extends React.Component<TableChartColumnDesignerComponentProps> {
+  static initClass() {
     this.contextTypes = { locale: PropTypes.string }
     // e.g. "en"
   }
