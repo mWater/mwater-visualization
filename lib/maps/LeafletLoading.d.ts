@@ -1,1 +1,42 @@
-export {};
+import "./LeafletLoading.css";
+import L from 'leaflet';
+declare const _default: (new (...args: any[]) => {
+    options: {
+        delayIndicator: null;
+        position: string;
+        separate: boolean;
+        zoomControl: null;
+        spinjs: boolean;
+        spin: {
+            lines: number;
+            length: number;
+            width: number;
+            radius: number;
+            rotate: number;
+            top: string;
+        };
+    };
+    initialize: (options: any) => void;
+    onAdd: (map: any) => any;
+    onRemove: (map: any) => void;
+    removeFrom: (map: any) => any | undefined;
+    addLoader: (id: any) => void;
+    removeLoader: (id: any) => void;
+    updateIndicator: () => void;
+    isLoading: () => boolean;
+    _countLoaders: () => number;
+    _showIndicator: () => void;
+    _hideIndicator: () => void;
+    _getLastControlButton: () => any;
+    _handleLoading: (e: any) => void;
+    _handleBaseLayerChange: (e: any) => void;
+    _handleLoad: (e: any) => void;
+    getEventId: (e: any) => any;
+    _layerAdd: (e: any) => void;
+    _layerRemove: (e: any) => void;
+    _addLayerListeners: (map: any) => void;
+    _removeLayerListeners: (map: any) => void;
+    _addMapListeners: (map: any) => void;
+    _removeMapListeners: (map: any) => void;
+}) & typeof L.Control;
+export default _default;

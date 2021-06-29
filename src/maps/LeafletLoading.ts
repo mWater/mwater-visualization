@@ -1,4 +1,4 @@
-require("./LeafletLoading.css")
+import "./LeafletLoading.css"
 import L from 'leaflet'
 
 // FROM: https://github.com/ebrelsford/Leaflet.loading
@@ -31,7 +31,7 @@ THE SOFTWARE.
  * loading or when map-related AJAX requests are taking place.
  */
 
-module.exports = L.Control.extend({
+export default L.Control.extend({
   options: {
     delayIndicator: null,
     position: "topleft",
