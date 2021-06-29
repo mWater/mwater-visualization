@@ -1,7 +1,3 @@
-import { Schema, DataSource, Expr } from "mwater-expressions"
-import { ReactElement } from "react"
-import React from "react"
-
 export {
   default as LeafletMapComponent,
   MapBounds,
@@ -40,36 +36,8 @@ export { default as DatagridUtils } from "./datagrids/DatagridUtils"
 export * from "./maps/MapViewComponent"
 export { MapScope } from "./maps/MapUtils"
 
-export class MWaterLoaderComponent extends React.Component<{
-  apiUrl: string
-  client?: string
-  share?: string
-  /**  user id of logged in user */
-  user?: string
-  /**  Load schema as a specific user (for shared dashboards, etc) */
-  asUser?: string
-  /**  Extra tables to load in schema. Forms are not loaded by default as they are too many */
-  extraTables?: string[]
-  /**  Called when extra tables are changed and schema will be reloaded */
-  onExtraTablesChange?: (extraTables: string[]) => void
-  /**  Override default add layer component. See AddLayerComponent for details */
-  addLayerElementFactory?: any
-  children: (error: any, config: { schema: Schema; dataSource: DataSource }) => ReactElement<any>
-}> {}
-
-export class MWaterContextComponent extends React.Component<{
-  apiUrl: string
-  client?: string
-  /**  user id of logged in user */
-  user?: string
-  schema: Schema
-  /**  Extra tables to load in schema. Forms are not loaded by default as they are too many */
-  extraTables?: string[]
-  /**  Called when extra tables are changed and schema will be reloaded */
-  onExtraTablesChange?: (extraTables: string[]) => void
-  /**  Override default add layer component. See AddLayerComponent for details */
-  addLayerElementFactory?: any
-}> {}
+export { default as MWaterLoaderComponent } from './MWaterLoaderComponent'
+export { default as MWaterContextComponent } from './MWaterContextComponent'
 
 export { default as mWaterLoader } from "./mWaterLoader"
 

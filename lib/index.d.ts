@@ -1,6 +1,3 @@
-import { Schema, DataSource } from "mwater-expressions";
-import { ReactElement } from "react";
-import React from "react";
 export { default as LeafletMapComponent, MapBounds, TileLayer, GeoJsonLayer, MapLayer } from "./maps/LeafletMapComponent";
 export { default as DateRangeComponent } from "./DateRangeComponent";
 export { default as RegionSelectComponent } from "./maps/RegionSelectComponent";
@@ -20,40 +17,8 @@ export { default as Widget } from "./widgets/Widget";
 export { default as DatagridUtils } from "./datagrids/DatagridUtils";
 export * from "./maps/MapViewComponent";
 export { MapScope } from "./maps/MapUtils";
-export declare class MWaterLoaderComponent extends React.Component<{
-    apiUrl: string;
-    client?: string;
-    share?: string;
-    /**  user id of logged in user */
-    user?: string;
-    /**  Load schema as a specific user (for shared dashboards, etc) */
-    asUser?: string;
-    /**  Extra tables to load in schema. Forms are not loaded by default as they are too many */
-    extraTables?: string[];
-    /**  Called when extra tables are changed and schema will be reloaded */
-    onExtraTablesChange?: (extraTables: string[]) => void;
-    /**  Override default add layer component. See AddLayerComponent for details */
-    addLayerElementFactory?: any;
-    children: (error: any, config: {
-        schema: Schema;
-        dataSource: DataSource;
-    }) => ReactElement<any>;
-}> {
-}
-export declare class MWaterContextComponent extends React.Component<{
-    apiUrl: string;
-    client?: string;
-    /**  user id of logged in user */
-    user?: string;
-    schema: Schema;
-    /**  Extra tables to load in schema. Forms are not loaded by default as they are too many */
-    extraTables?: string[];
-    /**  Called when extra tables are changed and schema will be reloaded */
-    onExtraTablesChange?: (extraTables: string[]) => void;
-    /**  Override default add layer component. See AddLayerComponent for details */
-    addLayerElementFactory?: any;
-}> {
-}
+export { default as MWaterLoaderComponent } from './MWaterLoaderComponent';
+export { default as MWaterContextComponent } from './MWaterContextComponent';
 export { default as mWaterLoader } from "./mWaterLoader";
 export { default as DirectWidgetDataSource } from "./widgets/DirectWidgetDataSource";
 import "leaflet/dist/leaflet.css";
