@@ -43,10 +43,7 @@ interface MWaterCompleteTableSelectComponentProps {
 
 // Allows selection of a table. Is the complete list mode of tables
 export default class MWaterCompleteTableSelectComponent extends React.Component<MWaterCompleteTableSelectComponentProps> {
-  static initClass() {
-    this.contextTypes = { locale: PropTypes.string }
-    // e.g. "en"
-  }
+  static contextTypes = { locale: PropTypes.string }
 
   handleExtraTableAdd = (tableId: any) => {
     return this.props.onExtraTablesChange(_.union(this.props.extraTables, [tableId]))
@@ -290,8 +287,6 @@ export default class MWaterCompleteTableSelectComponent extends React.Component<
   }
 }
 
-MWaterCompleteTableSelectComponent.initClass()
-
 interface FormsListComponentProps {
   /** Url to hit api */
   apiUrl: string
@@ -315,10 +310,7 @@ interface FormsListComponentState {
 
 // Searchable list of forms
 class FormsListComponent extends React.Component<FormsListComponentProps, FormsListComponentState> {
-  static initClass() {
-    this.contextTypes = { locale: PropTypes.string }
-    // e.g. "en"
-  }
+  static contextTypes = { locale: PropTypes.string }
 
   constructor(props: any) {
     super(props)
@@ -473,7 +465,6 @@ class FormsListComponent extends React.Component<FormsListComponentProps, FormsL
     )
   }
 }
-FormsListComponent.initClass()
 
 interface IndicatorsListComponentProps {
   /** Url to hit api */
@@ -498,10 +489,7 @@ interface IndicatorsListComponentState {
 
 // Searchable list of indicators
 class IndicatorsListComponent extends React.Component<IndicatorsListComponentProps, IndicatorsListComponentState> {
-  static initClass() {
-    this.contextTypes = { locale: PropTypes.string }
-    // e.g. "en"
-  }
+  static contextTypes = { locale: PropTypes.string }
 
   constructor(props: any) {
     super(props)
@@ -659,7 +647,6 @@ class IndicatorsListComponent extends React.Component<IndicatorsListComponentPro
     )
   }
 }
-IndicatorsListComponent.initClass()
 
 interface AddIndicatorConfirmPopupComponentProps {
   schema: any
@@ -677,10 +664,7 @@ class AddIndicatorConfirmPopupComponent extends React.Component<
   AddIndicatorConfirmPopupComponentProps,
   AddIndicatorConfirmPopupComponentState
 > {
-  static initClass() {
-    this.contextTypes = { locale: PropTypes.string }
-    // e.g. "en"
-  }
+  static contextTypes = { locale: PropTypes.string }
 
   constructor(props: any) {
     super(props)
@@ -759,7 +743,6 @@ are certain that you want to use the raw indicator table`
     )
   }
 }
-AddIndicatorConfirmPopupComponent.initClass()
 
 interface IssuesListComponentProps {
   /** Url to hit api */
@@ -784,10 +767,7 @@ interface IssuesListComponentState {
 
 // Searchable list of issue types
 class IssuesListComponent extends React.Component<IssuesListComponentProps, IssuesListComponentState> {
-  static initClass() {
-    this.contextTypes = { locale: PropTypes.string }
-    // e.g. "en"
-  }
+  static contextTypes = { locale: PropTypes.string }
 
   constructor(props: any) {
     super(props)
@@ -924,4 +904,3 @@ class IssuesListComponent extends React.Component<IssuesListComponentProps, Issu
     )
   }
 }
-IssuesListComponent.initClass()

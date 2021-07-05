@@ -24,42 +24,40 @@ import FindReplaceModalComponent from "./FindReplaceModalComponent"
 // Design should be cleaned already before being passed in (see DatagridUtils)
 export default DatagridComponent = (function () {
   DatagridComponent = class DatagridComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        schema: PropTypes.object.isRequired, // schema to use
-        dataSource: PropTypes.object.isRequired, // dataSource to use
-        datagridDataSource: PropTypes.object.isRequired, // datagrid dataSource to use
+    static propTypes = {
+      schema: PropTypes.object.isRequired, // schema to use
+      dataSource: PropTypes.object.isRequired, // dataSource to use
+      datagridDataSource: PropTypes.object.isRequired, // datagrid dataSource to use
 
-        design: PropTypes.object.isRequired, // Design of datagrid. See README.md of this folder
-        onDesignChange: PropTypes.func, // Called when design changes
+      design: PropTypes.object.isRequired, // Design of datagrid. See README.md of this folder
+      onDesignChange: PropTypes.func, // Called when design changes
 
-        titleElem: PropTypes.node, // Extra element to include in title at left
-        extraTitleButtonsElem: PropTypes.node, // Extra elements to add to right
+      titleElem: PropTypes.node, // Extra element to include in title at left
+      extraTitleButtonsElem: PropTypes.node, // Extra elements to add to right
 
-        // Check if expression of table row is editable
-        // If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
-        canEditValue: PropTypes.func,
+      // Check if expression of table row is editable
+      // If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
+      canEditValue: PropTypes.func,
 
-        // Update table row expression with a new value
-        // Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
-        updateValue: PropTypes.func,
+      // Update table row expression with a new value
+      // Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
+      updateValue: PropTypes.func,
 
-        // Called when row is clicked with (tableId, rowId)
-        onRowClick: PropTypes.func,
+      // Called when row is clicked with (tableId, rowId)
+      onRowClick: PropTypes.func,
 
-        // Called when row is double-clicked with (tableId, rowId)
-        onRowDoubleClick: PropTypes.func,
+      // Called when row is double-clicked with (tableId, rowId)
+      onRowDoubleClick: PropTypes.func,
 
-        quickfilterLocks: PropTypes.array, // Locked quickfilter values. See README in quickfilters
+      quickfilterLocks: PropTypes.array, // Locked quickfilter values. See README in quickfilters
 
-        // Filters to add to the datagrid
-        filters: PropTypes.arrayOf(
-          PropTypes.shape({
-            table: PropTypes.string.isRequired, // id table to filter
-            jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
-          })
-        )
-      }
+      // Filters to add to the datagrid
+      filters: PropTypes.arrayOf(
+        PropTypes.shape({
+          table: PropTypes.string.isRequired, // id table to filter
+          jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
+        })
+      )
     }
 
     constructor(props: any) {
@@ -378,21 +376,17 @@ export default DatagridComponent = (function () {
       )
     }
   }
-  DatagridComponent.initClass()
   return DatagridComponent
 })()
 
 // Popup editor
 class DatagridEditorComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      schema: PropTypes.object.isRequired, // schema to use
-      dataSource: PropTypes.object.isRequired, // dataSource to use
-      design: PropTypes.object.isRequired, // Design of datagrid. See README.md of this folder
-      onDesignChange: PropTypes.func.isRequired, // Called when design changes
-      onCancel: PropTypes.func.isRequired
-    }
-    // Called when cancelled
+  static propTypes = {
+    schema: PropTypes.object.isRequired, // schema to use
+    dataSource: PropTypes.object.isRequired, // dataSource to use
+    design: PropTypes.object.isRequired, // Design of datagrid. See README.md of this folder
+    onDesignChange: PropTypes.func.isRequired, // Called when design changes
+    onCancel: PropTypes.func.isRequired
   }
 
   constructor(props: any) {
@@ -423,4 +417,3 @@ class DatagridEditorComponent extends React.Component {
     )
   }
 }
-DatagridEditorComponent.initClass()

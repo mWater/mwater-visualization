@@ -14,7 +14,10 @@ interface RegionSelectComponentProps {
     maxLevel?: number;
 }
 export default class RegionSelectComponent extends React.Component<RegionSelectComponentProps> {
-    static initClass(): void;
+    static defaultProps: {
+        placeholder: string;
+        regionsTable: string;
+    };
     handleChange: (id: any) => any;
     render(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 }

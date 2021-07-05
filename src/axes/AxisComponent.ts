@@ -51,16 +51,13 @@ interface AxisComponentProps {
 
 // Axis component that allows designing of an axis
 export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps> {
-  static initClass() {
-    this.defaultProps = {
-      reorderable: false,
-      allowExcludedValues: false,
-      autosetColors: true
-    }
-
-    this.contextTypes = { locale: PropTypes.string }
-    // e.g. "en"
+  static defaultProps = {
+    reorderable: false,
+    allowExcludedValues: false,
+    autosetColors: true
   }
+
+  static contextTypes = { locale: PropTypes.string }
 
   constructor(props: any) {
     super(props)
@@ -422,5 +419,3 @@ export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps
     )
   }
 }
-
-AxisComponent.initClass()

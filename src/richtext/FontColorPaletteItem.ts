@@ -21,9 +21,7 @@ export default class FontColorPaletteItem extends React.Component<
   FontColorPaletteItemProps,
   FontColorPaletteItemState
 > {
-  static initClass() {
-    this.defaultProps = { position: "under" }
-  }
+  static defaultProps = { position: "under" }
 
   constructor(props: any) {
     super(props)
@@ -82,8 +80,6 @@ export default class FontColorPaletteItem extends React.Component<
     )
   }
 }
-
-FontColorPaletteItem.initClass()
 
 interface ColorPaletteComponentProps {
   onSetColor: any

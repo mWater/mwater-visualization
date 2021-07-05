@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 interface MapFiltersDesignerComponentProps {
     /** Schema to use */
@@ -10,7 +11,9 @@ interface MapFiltersDesignerComponentProps {
     onDesignChange: any;
 }
 export default class MapFiltersDesignerComponent extends React.Component<MapFiltersDesignerComponentProps> {
-    static initClass(): void;
+    static contextTypes: {
+        globalFiltersElementFactory: PropTypes.Requireable<(...args: any[]) => any>;
+    };
     handleFiltersChange: (filters: any) => any;
     handleGlobalFiltersChange: (globalFilters: any) => any;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement> | null;

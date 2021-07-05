@@ -13,18 +13,15 @@ import { ExprUtils } from "mwater-expressions"
 // Filters are in format mwater-expression filter expression indexed by table. e.g. { sometable: logical expression, etc. }
 export default FiltersDesignerComponent = (function () {
   FiltersDesignerComponent = class FiltersDesignerComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        schema: PropTypes.object.isRequired, // Schema to use
-        dataSource: PropTypes.object.isRequired, // Data source to use
-        filterableTables: PropTypes.arrayOf(PropTypes.string), // Tables that can be filtered on. Should only include tables that actually exist
-        filters: PropTypes.object,
-        onFiltersChange: PropTypes.func.isRequired // Called with new filters
-      }
-
-      this.contextTypes = { locale: PropTypes.string }
-      // e.g. "en"
+    static propTypes = {
+      schema: PropTypes.object.isRequired, // Schema to use
+      dataSource: PropTypes.object.isRequired, // Data source to use
+      filterableTables: PropTypes.arrayOf(PropTypes.string), // Tables that can be filtered on. Should only include tables that actually exist
+      filters: PropTypes.object,
+      onFiltersChange: PropTypes.func.isRequired // Called with new filters
     }
+
+    static contextTypes = { locale: PropTypes.string }
 
     handleFilterChange = (table: any, expr: any) => {
       // Clean filter
@@ -57,6 +54,5 @@ export default FiltersDesignerComponent = (function () {
       return R("div", null, _.map(this.props.filterableTables, this.renderFilterableTable))
     }
   }
-  FiltersDesignerComponent.initClass()
   return FiltersDesignerComponent
 })()

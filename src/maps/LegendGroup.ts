@@ -13,12 +13,10 @@ interface LegendGroupProps {
 }
 
 export default class LegendGroup extends React.Component<LegendGroupProps> {
-  static initClass() {
-    this.defaultProps = {
-      items: [],
-      radiusLayer: false,
-      symbol: null
-    }
+  static defaultProps = {
+    items: [],
+    radiusLayer: false,
+    symbol: null
   }
 
   render() {
@@ -49,8 +47,6 @@ export default class LegendGroup extends React.Component<LegendGroupProps> {
   }
 }
 
-LegendGroup.initClass()
-
 interface LegendItemProps {
   color?: string
   name?: string
@@ -62,12 +58,10 @@ interface LegendItemProps {
 }
 
 class LegendItem extends React.Component<LegendItemProps> {
-  static initClass() {
-    this.defaultProps = {
-      radiusLayer: false,
-      hasChildren: false,
-      isChild: false
-    }
+  static defaultProps = {
+    radiusLayer: false,
+    hasChildren: false,
+    isChild: false
   }
 
   renderSymbol() {
@@ -125,4 +119,3 @@ class LegendItem extends React.Component<LegendItemProps> {
     )
   }
 }
-LegendItem.initClass()

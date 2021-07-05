@@ -17,51 +17,49 @@ import { default as LegendComponent } from "./LegendComponent"
 // Component that displays just the map
 export default OldMapViewComponent = (function () {
   OldMapViewComponent = class OldMapViewComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        schema: PropTypes.object.isRequired, // Schema to use
-        dataSource: PropTypes.object.isRequired, // data source to use
+    static propTypes = {
+      schema: PropTypes.object.isRequired, // Schema to use
+      dataSource: PropTypes.object.isRequired, // data source to use
 
-        // Url source for the map
-        mapDataSource: PropTypes.shape({
-          // Gets the data source for a layer
-          getLayerDataSource: PropTypes.func.isRequired,
+      // Url source for the map
+      mapDataSource: PropTypes.shape({
+        // Gets the data source for a layer
+        getLayerDataSource: PropTypes.func.isRequired,
 
-          // Gets the bounds for the map. Null for no opinion. Callback as { n:, s:, w:, e: }
-          getBounds: PropTypes.func.isRequired
-        }).isRequired,
+        // Gets the bounds for the map. Null for no opinion. Callback as { n:, s:, w:, e: }
+        getBounds: PropTypes.func.isRequired
+      }).isRequired,
 
-        design: PropTypes.object.isRequired, // See Map Design.md
-        onDesignChange: PropTypes.func, // Called with new design. null/undefined to ignore bounds changes
+      design: PropTypes.object.isRequired, // See Map Design.md
+      onDesignChange: PropTypes.func, // Called with new design. null/undefined to ignore bounds changes
 
-        width: PropTypes.number, // Width in pixels
-        height: PropTypes.number, // Height in pixels
+      width: PropTypes.number, // Width in pixels
+      height: PropTypes.number, // Height in pixels
 
-        onRowClick: PropTypes.func, // Called with (tableId, rowId) when item is clicked
+      onRowClick: PropTypes.func, // Called with (tableId, rowId) when item is clicked
 
-        extraFilters: PropTypes.arrayOf(
-          PropTypes.shape({
-            table: PropTypes.string.isRequired,
-            jsonql: PropTypes.object.isRequired
-          })
-        ), // Extra filters to apply to view
+      extraFilters: PropTypes.arrayOf(
+        PropTypes.shape({
+          table: PropTypes.string.isRequired,
+          jsonql: PropTypes.object.isRequired
+        })
+      ), // Extra filters to apply to view
 
-        // scope of the map (when a layer self-selects a particular scope)
-        scope: PropTypes.shape({
-          name: PropTypes.string.isRequired,
-          filter: PropTypes.shape({ table: PropTypes.string.isRequired, jsonql: PropTypes.object.isRequired }),
-          data: PropTypes.shape({ layerViewId: PropTypes.string.isRequired, data: PropTypes.any }).isRequired
-        }),
-        onScopeChange: PropTypes.func, // called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
+      // scope of the map (when a layer self-selects a particular scope)
+      scope: PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        filter: PropTypes.shape({ table: PropTypes.string.isRequired, jsonql: PropTypes.object.isRequired }),
+        data: PropTypes.shape({ layerViewId: PropTypes.string.isRequired, data: PropTypes.any }).isRequired
+      }),
+      onScopeChange: PropTypes.func, // called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
 
-        dragging: PropTypes.bool, // Whether the map be draggable with mouse/touch or not. Default true
-        touchZoom: PropTypes.bool, // Whether the map can be zoomed by touch-dragging with two fingers. Default true
-        scrollWheelZoom: PropTypes.bool, // Whether the map can be zoomed by using the mouse wheel. Default true
-        zoomLocked: PropTypes.bool // Whether changes to zoom level should be persisted. Default false
-      }
-
-      this.contextTypes = { locale: PropTypes.string }
+      dragging: PropTypes.bool, // Whether the map be draggable with mouse/touch or not. Default true
+      touchZoom: PropTypes.bool, // Whether the map can be zoomed by touch-dragging with two fingers. Default true
+      scrollWheelZoom: PropTypes.bool, // Whether the map can be zoomed by using the mouse wheel. Default true
+      zoomLocked: PropTypes.bool // Whether changes to zoom level should be persisted. Default false
     }
+
+    static contextTypes = { locale: PropTypes.string }
 
     constructor(props: any) {
       super(props)
@@ -329,7 +327,6 @@ export default OldMapViewComponent = (function () {
       )
     }
   }
-  OldMapViewComponent.initClass()
   return OldMapViewComponent
 })()
 

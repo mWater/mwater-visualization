@@ -67,10 +67,7 @@ interface TableContentsComponentProps {
 }
 
 class TableContentsComponent extends React.Component<TableContentsComponentProps> {
-  static initClass() {
-    this.contextTypes = { locale: PropTypes.string }
-    // e.g. "en"
-  }
+  static contextTypes = { locale: PropTypes.string }
 
   shouldComponentUpdate(prevProps: any) {
     if (prevProps.columns !== this.props.columns && !_.isEqual(prevProps.columns, this.props.columns)) {
@@ -200,90 +197,3 @@ class TableContentsComponent extends React.Component<TableContentsComponentProps
     )
   }
 }
-TableContentsComponent.initClass()
-
-//   renderHeaderCell: (index) ->
-//     axisBuilder = new AxisBuilder(schema: @props.schema)
-//     column = @props.design.columns[index]
-
-//     text = column.headerText or axisBuilder.summarizeAxis(column.textAxis, @context.locale)
-//     R 'th', {key: index},
-//       text
-
-//   renderHeader: ->
-//     R 'thead', null,
-//       R 'tr', { style: { position: "relative"}, ref: "tableHeader"},
-//         _.map(@props.design.columns, (column, i) => @renderHeaderCell(i))
-
-//   renderCell: (rowIndex, columnIndex) ->
-//     row = @props.data.main[rowIndex]
-//     column = @props.design.columns[columnIndex]
-
-//     # Get value
-//     value = row["c#{columnIndex}"]
-
-//     # Convert to string
-//     axisBuilder = new AxisBuilder(schema: @props.schema)
-//     str = axisBuilder.formatValue(column.textAxis, value, @context.locale)
-//     return R('td', key: columnIndex, str)
-
-//   renderRow: (index) ->
-//     R 'tr', key: index,
-//       _.map(@props.design.columns, (column, i) => @renderCell(index, i))
-
-//   componentDidUpdate: (prevProps, prevState) ->
-//     @calculateHeadersWidth()
-
-//   componentDidMount: ->
-//     @calculateHeadersWidth()
-
-//   calculateHeadersWidth: ->
-//     tr = $(@refs.tableBody).find("tr").first()
-//     headers = $(@refs.tableHeader).find("th")
-//     body = $(@refs.tableBody)
-//     bodyContainer = $(@refs.tableBodyContainer)
-
-//     tr.find("td").each (i, el) =>
-//       cellWIdth = $(el).width()
-//       headers.eq(i).width(cellWIdth)
-
-//       if headers.eq(i).width() != cellWIdth
-//         @setColumnWidth(i, headers.eq(i).width())
-
-//     height = @props.height - $(@refs.title).outerHeight() - $(@refs.tableHeader).outerHeight()
-//     bodyContainer.height(height)
-
-//   setColumnWidth: (column,width) ->
-//     body = $(@refs.tableBody)
-//     body.find('tr').each (i, el) ->
-//       $(el).find('td').eq(column).width(width)
-
-//   renderBody: ->
-// #    height = @props.height - $(@refs.title).outerHeight()
-// #    tbodyStyle =
-
-//     R 'tbody', { ref: "tableBody"},
-//       _.map(@props.data.main, (row, i) => @renderRow(i))
-
-//   shouldComponentUpdate: (prevProps) ->
-//     not _.isEqual(prevProps, @props)
-
-//   render: ->
-//     style = {
-//       width: @props.width
-//       height: @props.height
-//     }
-
-//     containerStyle =
-//       overflow: "auto"
-//       height: height
-
-//     height = @props.height - $(@refs.title).outerHeight() - 25
-
-//     return R 'div', style: style, className: "overflow-auto-except-print",
-//       R 'div', {style: { fontWeight: "bold", textAlign: "center" }, ref: "title"}, @props.design.titleText
-//       R 'table', className: "table table-condensed table-hover", style: { fontSize: "10pt", marginBottom: 0 },
-//         @renderHeader()
-//       R 'div', {ref: "tableBodyContainer", style: containerStyle},
-//         R 'table', className: "table table-condensed table-hover", style: { fontSize: "10pt" },
-//           @renderBody()

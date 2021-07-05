@@ -22,12 +22,9 @@ interface RegionSelectComponentProps {
 
 // Allows selecting of a single region
 export default class RegionSelectComponent extends React.Component<RegionSelectComponentProps> {
-  static initClass() {
-    this.defaultProps = {
-      placeholder: "All Countries",
-      regionsTable: "admin_regions"
-    }
-    // Default for existing code
+  static defaultProps = {
+    placeholder: "All Countries",
+    regionsTable: "admin_regions"
   }
 
   handleChange = (id: any) => {
@@ -81,5 +78,3 @@ export default class RegionSelectComponent extends React.Component<RegionSelectC
     })
   }
 }
-
-RegionSelectComponent.initClass()

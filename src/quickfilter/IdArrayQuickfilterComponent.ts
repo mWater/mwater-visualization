@@ -12,28 +12,26 @@ import { IdLiteralComponent } from "mwater-expressions-ui"
 // Quickfilter for an id[]
 export default IdArrayQuickfilterComponent = (function () {
   IdArrayQuickfilterComponent = class IdArrayQuickfilterComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        label: PropTypes.string.isRequired,
-        schema: PropTypes.object.isRequired,
-        dataSource: PropTypes.object.isRequired,
+    static propTypes = {
+      label: PropTypes.string.isRequired,
+      schema: PropTypes.object.isRequired,
+      dataSource: PropTypes.object.isRequired,
 
-        expr: PropTypes.object.isRequired,
-        index: PropTypes.number.isRequired,
+      expr: PropTypes.object.isRequired,
+      index: PropTypes.number.isRequired,
 
-        value: PropTypes.any, // Current value of quickfilter (state of filter selected)
-        onValueChange: PropTypes.func, // Called when value changes
+      value: PropTypes.any, // Current value of quickfilter (state of filter selected)
+      onValueChange: PropTypes.func, // Called when value changes
 
-        multi: PropTypes.bool, // true to display multiple values
+      multi: PropTypes.bool, // true to display multiple values
 
-        // Filters to add to the quickfilter to restrict values
-        filters: PropTypes.arrayOf(
-          PropTypes.shape({
-            table: PropTypes.string.isRequired, // id table to filter
-            jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
-          })
-        )
-      }
+      // Filters to add to the quickfilter to restrict values
+      filters: PropTypes.arrayOf(
+        PropTypes.shape({
+          table: PropTypes.string.isRequired, // id table to filter
+          jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
+        })
+      )
     }
 
     render() {
@@ -64,6 +62,5 @@ export default IdArrayQuickfilterComponent = (function () {
       )
     }
   }
-  IdArrayQuickfilterComponent.initClass()
   return IdArrayQuickfilterComponent
 })()

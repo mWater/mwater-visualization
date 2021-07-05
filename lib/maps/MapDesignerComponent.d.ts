@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 interface MapDesignerComponentProps {
     /** Schema to use */
@@ -12,7 +13,9 @@ interface MapDesignerComponentProps {
     filters?: any;
 }
 export default class MapDesignerComponent extends React.Component<MapDesignerComponentProps> {
-    static initClass(): void;
+    static childContextTypes: {
+        activeTables: PropTypes.Requireable<string[]>;
+    };
     getChildContext(): {
         activeTables: string[];
     };

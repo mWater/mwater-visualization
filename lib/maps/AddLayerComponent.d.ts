@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 interface AddLayerComponentProps {
     /** Number of layers that already exist */
@@ -11,7 +12,9 @@ interface AddLayerComponentProps {
     dataSource: any;
 }
 export default class AddLayerComponent extends React.Component<AddLayerComponentProps> {
-    static initClass(): void;
+    static contextTypes: {
+        addLayerElementFactory: PropTypes.Requireable<(...args: any[]) => any>;
+    };
     handleAddLayer: (newLayer: any) => any;
     handleAddLayerView: (layerView: any) => any;
     render(): any;

@@ -11,7 +11,9 @@ interface OrderBysDesignerComponentProps {
     onChange: any;
 }
 export default class OrderBysDesignerComponent extends React.Component<OrderBysDesignerComponentProps> {
-    static initClass(): void;
+    static defaultProps: {
+        orderBys: never[];
+    };
     handleChange: (index: any, orderBy: any) => any;
     handleRemove: (index: any) => any;
     handleAdd: () => any;

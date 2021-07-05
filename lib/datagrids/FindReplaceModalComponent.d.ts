@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent";
 declare const _default: {
@@ -37,7 +38,18 @@ declare const _default: {
         componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
         UNSAFE_componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
     };
-    initClass(): void;
+    propTypes: {
+        schema: PropTypes.Validator<object>;
+        dataSource: PropTypes.Validator<object>;
+        design: PropTypes.Validator<object>;
+        filters: PropTypes.Requireable<(PropTypes.InferProps<{
+            table: PropTypes.Validator<string>;
+            jsonql: PropTypes.Validator<object>;
+        }> | null | undefined)[]>;
+        canEditValue: PropTypes.Requireable<(...args: any[]) => any>;
+        updateValue: PropTypes.Requireable<(...args: any[]) => any>;
+        onUpdate: PropTypes.Requireable<(...args: any[]) => any>;
+    };
     contextType?: React.Context<any> | undefined;
 };
 export default _default;

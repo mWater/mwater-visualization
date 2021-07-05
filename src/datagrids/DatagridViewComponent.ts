@@ -17,43 +17,41 @@ import EditExprCellComponent from "./EditExprCellComponent"
 // Design should be cleaned already before being passed in (see DatagridUtils)
 export default DatagridViewComponent = (function () {
   DatagridViewComponent = class DatagridViewComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        width: PropTypes.number.isRequired, // Width of control
-        height: PropTypes.number.isRequired, // Height of control
-        pageSize: PropTypes.number,
+    static propTypes = {
+      width: PropTypes.number.isRequired, // Width of control
+      height: PropTypes.number.isRequired, // Height of control
+      pageSize: PropTypes.number,
 
-        schema: PropTypes.object.isRequired, // schema to use
-        dataSource: PropTypes.object.isRequired, // dataSource to use
-        datagridDataSource: PropTypes.object.isRequired, // datagrid dataSource to use
+      schema: PropTypes.object.isRequired, // schema to use
+      dataSource: PropTypes.object.isRequired, // dataSource to use
+      datagridDataSource: PropTypes.object.isRequired, // datagrid dataSource to use
 
-        design: PropTypes.object.isRequired, // Design of datagrid. See README.md of this folder
-        onDesignChange: PropTypes.func, // Called when design changes
+      design: PropTypes.object.isRequired, // Design of datagrid. See README.md of this folder
+      onDesignChange: PropTypes.func, // Called when design changes
 
-        filters: PropTypes.arrayOf(
-          PropTypes.shape({
-            table: PropTypes.string.isRequired, // id table to filter
-            jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
-          })
-        ),
+      filters: PropTypes.arrayOf(
+        PropTypes.shape({
+          table: PropTypes.string.isRequired, // id table to filter
+          jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
+        })
+      ),
 
-        // Check if cell is editable
-        // If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
-        canEditCell: PropTypes.func,
+      // Check if cell is editable
+      // If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
+      canEditCell: PropTypes.func,
 
-        // Update cell value
-        // Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
-        updateCell: PropTypes.func,
+      // Update cell value
+      // Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
+      updateCell: PropTypes.func,
 
-        // Called when row is double-clicked with (tableId, rowId, rowIndex)
-        onRowDoubleClick: PropTypes.func,
+      // Called when row is double-clicked with (tableId, rowId, rowIndex)
+      onRowDoubleClick: PropTypes.func,
 
-        // Called when a row is clicked with (tableId, rowId, rowIndex)
-        onRowClick: PropTypes.func
-      }
-
-      this.defaultProps = { pageSize: 100 }
+      // Called when a row is clicked with (tableId, rowId, rowIndex)
+      onRowClick: PropTypes.func
     }
+
+    static defaultProps = { pageSize: 100 }
 
     constructor(props: any) {
       super(props)
@@ -410,6 +408,5 @@ export default DatagridViewComponent = (function () {
       )
     }
   }
-  DatagridViewComponent.initClass()
   return DatagridViewComponent
 })()

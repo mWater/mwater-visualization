@@ -25,25 +25,23 @@ export default class MWaterContextComponent extends React.Component<{
   /**  Override default add layer component. See AddLayerComponent for details */
   addLayerElementFactory?: any
 }> {
-  static initClass() {
-    this.childContextTypes = {
-      tableSelectElementFactory: PropTypes.func, // Call with props of TableSelectComponent
-      addLayerElementFactory: PropTypes.func, // Call with props of AddLayerComponent
-      globalFiltersElementFactory: PropTypes.func, // Call with props { schema, dataSource, filterableTables, globalFilters, onChange, nullIfIrrelevant }.
-      // Displays a component to edit global filters. nullIfIrrelevant causes null element if not applicable to filterableTables
+  static childContextTypes = {
+    tableSelectElementFactory: PropTypes.func, // Call with props of TableSelectComponent
+    addLayerElementFactory: PropTypes.func, // Call with props of AddLayerComponent
+    globalFiltersElementFactory: PropTypes.func, // Call with props { schema, dataSource, filterableTables, globalFilters, onChange, nullIfIrrelevant }.
+    // Displays a component to edit global filters. nullIfIrrelevant causes null element if not applicable to filterableTables
 
-      // Decorates sections (the children element, specifically) in the expression picker
-      decorateScalarExprTreeSectionChildren: PropTypes.func,
+    // Decorates sections (the children element, specifically) in the expression picker
+    decorateScalarExprTreeSectionChildren: PropTypes.func,
 
-      // Function to override initial open state of a section. Passed { tableId: id of table, section: section object from schema, filter: optional string filter }
-      // Should return true to set initially open
-      isScalarExprTreeSectionInitiallyOpen: PropTypes.func,
+    // Function to override initial open state of a section. Passed { tableId: id of table, section: section object from schema, filter: optional string filter }
+    // Should return true to set initially open
+    isScalarExprTreeSectionInitiallyOpen: PropTypes.func,
 
-      // Function to override filtering of a section. Passed { tableId: id of table, section: section object from schema, filter: optional string filter }
-      // Should return null for default, true to include, false to exclude
-      isScalarExprTreeSectionMatch: PropTypes.func
-    }
-  }    
+    // Function to override filtering of a section. Passed { tableId: id of table, section: section object from schema, filter: optional string filter }
+    // Should return null for default, true to include, false to exclude
+    isScalarExprTreeSectionMatch: PropTypes.func
+  }
 
   getChildContext() {
     const context: any = {}
@@ -144,5 +142,3 @@ export default class MWaterContextComponent extends React.Component<{
     return this.props.children
   }
 }
-
-MWaterContextComponent.initClass()

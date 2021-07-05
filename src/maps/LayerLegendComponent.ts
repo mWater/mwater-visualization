@@ -22,9 +22,7 @@ interface LayerLegendComponentProps {
 
 // wraps the legends for a layer
 export default class LayerLegendComponent extends React.Component<LayerLegendComponentProps> {
-  static initClass() {
-    this.defaultProps = { radiusLayer: false }
-  }
+  static defaultProps = { radiusLayer: false }
 
   getCategories() {
     const axisBuilder = new AxisBuilder({ schema: this.props.schema })
@@ -88,5 +86,3 @@ export default class LayerLegendComponent extends React.Component<LayerLegendCom
     })
   }
 }
-
-LayerLegendComponent.initClass()

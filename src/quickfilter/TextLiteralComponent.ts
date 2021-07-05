@@ -14,25 +14,23 @@ import { injectTableAlias } from "mwater-expressions"
 // The expression can be type `text` or `text[]`
 export default TextLiteralComponent = (function () {
   TextLiteralComponent = class TextLiteralComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        value: PropTypes.any,
-        onChange: PropTypes.func,
+    static propTypes = {
+      value: PropTypes.any,
+      onChange: PropTypes.func,
 
-        schema: PropTypes.object.isRequired,
-        quickfiltersDataSource: PropTypes.object.isRequired, // See QuickfiltersDataSource
-        expr: PropTypes.object.isRequired,
-        index: PropTypes.number.isRequired,
-        multi: PropTypes.bool, // true to display multiple values
+      schema: PropTypes.object.isRequired,
+      quickfiltersDataSource: PropTypes.object.isRequired, // See QuickfiltersDataSource
+      expr: PropTypes.object.isRequired,
+      index: PropTypes.number.isRequired,
+      multi: PropTypes.bool, // true to display multiple values
 
-        // Filters to add to the component to restrict values
-        filters: PropTypes.arrayOf(
-          PropTypes.shape({
-            table: PropTypes.string.isRequired, // id table to filter
-            jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
-          })
-        )
-      }
+      // Filters to add to the component to restrict values
+      filters: PropTypes.arrayOf(
+        PropTypes.shape({
+          table: PropTypes.string.isRequired, // id table to filter
+          jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
+        })
+      )
     }
 
     handleSingleChange = (val: any) => {
@@ -165,7 +163,6 @@ export default TextLiteralComponent = (function () {
       return R("div", { style: { width: "100%" } }, this.props.multi ? this.renderMultiple() : this.renderSingle())
     }
   }
-  TextLiteralComponent.initClass()
   return TextLiteralComponent
 })()
 

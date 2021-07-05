@@ -4,6 +4,6 @@ declare const _default: {
         convertElemToItems(elem: any): any;
         convertItemsToHtml(items: any): string;
     };
-    initClass(): void;
+    isBlank: (items: any) => any;
 };
 export default _default;

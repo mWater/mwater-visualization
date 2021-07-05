@@ -13,72 +13,70 @@ interface ColorPaletteCollectionComponentProps {
 }
 
 export default class ColorPaletteCollectionComponent extends React.Component<ColorPaletteCollectionComponentProps> {
-  static initClass() {
-    this.palettes = [
-      { type: "schemeSet1", reversed: false },
-      { type: "schemeSet2", reversed: false },
-      { type: "schemeSet3", reversed: false },
-      { type: "schemeAccent", reversed: false },
-      { type: "schemeDark2", reversed: false },
-      { type: "schemePaired", reversed: false },
-      { type: "schemePastel1", reversed: false },
-      { type: "schemePastel2", reversed: false },
-      { type: "interpolateSpectral", reversed: false },
-      { type: "interpolateSpectral", reversed: true },
-      { type: "interpolateBlues", reversed: false },
-      { type: "interpolateBlues", reversed: true },
-      { type: "interpolateGreens", reversed: false },
-      { type: "interpolateGreens", reversed: true },
-      { type: "interpolateGreys", reversed: false },
-      { type: "interpolateGreys", reversed: true },
-      { type: "interpolateOranges", reversed: false },
-      { type: "interpolateOranges", reversed: true },
-      { type: "interpolatePurples", reversed: false },
-      { type: "interpolatePurples", reversed: true },
-      { type: "interpolateReds", reversed: false },
-      { type: "interpolateReds", reversed: true },
-      { type: "interpolateBuGn", reversed: false },
-      { type: "interpolateBuGn", reversed: true },
-      { type: "interpolateBuPu", reversed: false },
-      { type: "interpolateBuPu", reversed: true },
-      { type: "interpolateGnBu", reversed: false },
-      { type: "interpolateGnBu", reversed: true },
-      { type: "interpolateOrRd", reversed: false },
-      { type: "interpolateOrRd", reversed: true },
-      { type: "interpolatePuBuGn", reversed: false },
-      { type: "interpolatePuBuGn", reversed: true },
-      { type: "interpolatePuBu", reversed: false },
-      { type: "interpolatePuBu", reversed: true },
-      { type: "interpolatePuRd", reversed: false },
-      { type: "interpolatePuRd", reversed: true },
-      { type: "interpolateRdPu", reversed: false },
-      { type: "interpolateRdPu", reversed: true },
-      { type: "interpolateYlGnBu", reversed: false },
-      { type: "interpolateYlGnBu", reversed: true },
-      { type: "interpolateYlGn", reversed: false },
-      { type: "interpolateYlGn", reversed: true },
-      { type: "interpolateYlOrBr", reversed: false },
-      { type: "interpolateYlOrBr", reversed: true },
-      { type: "interpolateYlOrRd", reversed: false },
-      { type: "interpolateYlOrRd", reversed: true },
-      { type: "interpolateBrBG", reversed: false },
-      { type: "interpolateBrBG", reversed: true },
-      { type: "interpolatePRGn", reversed: false },
-      { type: "interpolatePRGn", reversed: true },
-      { type: "interpolatePiYG", reversed: false },
-      { type: "interpolatePiYG", reversed: true },
-      { type: "interpolatePuOr", reversed: false },
-      { type: "interpolatePuOr", reversed: true },
-      { type: "interpolateRdBu", reversed: false },
-      { type: "interpolateRdBu", reversed: true },
-      { type: "interpolateRdGy", reversed: false },
-      { type: "interpolateRdGy", reversed: true },
-      { type: "interpolateRdYlBu", reversed: false },
-      { type: "interpolateRdYlBu", reversed: true },
-      { type: "interpolateRdYlGn", reversed: false },
-      { type: "interpolateRdYlGn", reversed: true }
-    ]
-  }
+  static palettes = [
+    { type: "schemeSet1", reversed: false },
+    { type: "schemeSet2", reversed: false },
+    { type: "schemeSet3", reversed: false },
+    { type: "schemeAccent", reversed: false },
+    { type: "schemeDark2", reversed: false },
+    { type: "schemePaired", reversed: false },
+    { type: "schemePastel1", reversed: false },
+    { type: "schemePastel2", reversed: false },
+    { type: "interpolateSpectral", reversed: false },
+    { type: "interpolateSpectral", reversed: true },
+    { type: "interpolateBlues", reversed: false },
+    { type: "interpolateBlues", reversed: true },
+    { type: "interpolateGreens", reversed: false },
+    { type: "interpolateGreens", reversed: true },
+    { type: "interpolateGreys", reversed: false },
+    { type: "interpolateGreys", reversed: true },
+    { type: "interpolateOranges", reversed: false },
+    { type: "interpolateOranges", reversed: true },
+    { type: "interpolatePurples", reversed: false },
+    { type: "interpolatePurples", reversed: true },
+    { type: "interpolateReds", reversed: false },
+    { type: "interpolateReds", reversed: true },
+    { type: "interpolateBuGn", reversed: false },
+    { type: "interpolateBuGn", reversed: true },
+    { type: "interpolateBuPu", reversed: false },
+    { type: "interpolateBuPu", reversed: true },
+    { type: "interpolateGnBu", reversed: false },
+    { type: "interpolateGnBu", reversed: true },
+    { type: "interpolateOrRd", reversed: false },
+    { type: "interpolateOrRd", reversed: true },
+    { type: "interpolatePuBuGn", reversed: false },
+    { type: "interpolatePuBuGn", reversed: true },
+    { type: "interpolatePuBu", reversed: false },
+    { type: "interpolatePuBu", reversed: true },
+    { type: "interpolatePuRd", reversed: false },
+    { type: "interpolatePuRd", reversed: true },
+    { type: "interpolateRdPu", reversed: false },
+    { type: "interpolateRdPu", reversed: true },
+    { type: "interpolateYlGnBu", reversed: false },
+    { type: "interpolateYlGnBu", reversed: true },
+    { type: "interpolateYlGn", reversed: false },
+    { type: "interpolateYlGn", reversed: true },
+    { type: "interpolateYlOrBr", reversed: false },
+    { type: "interpolateYlOrBr", reversed: true },
+    { type: "interpolateYlOrRd", reversed: false },
+    { type: "interpolateYlOrRd", reversed: true },
+    { type: "interpolateBrBG", reversed: false },
+    { type: "interpolateBrBG", reversed: true },
+    { type: "interpolatePRGn", reversed: false },
+    { type: "interpolatePRGn", reversed: true },
+    { type: "interpolatePiYG", reversed: false },
+    { type: "interpolatePiYG", reversed: true },
+    { type: "interpolatePuOr", reversed: false },
+    { type: "interpolatePuOr", reversed: true },
+    { type: "interpolateRdBu", reversed: false },
+    { type: "interpolateRdBu", reversed: true },
+    { type: "interpolateRdGy", reversed: false },
+    { type: "interpolateRdGy", reversed: true },
+    { type: "interpolateRdYlBu", reversed: false },
+    { type: "interpolateRdYlBu", reversed: true },
+    { type: "interpolateRdYlGn", reversed: false },
+    { type: "interpolateRdYlGn", reversed: true }
+  ]
 
   onPaletteSelected = (index: any) => {
     // Generate color map
@@ -131,8 +129,6 @@ export default class ColorPaletteCollectionComponent extends React.Component<Col
   }
 }
 
-ColorPaletteCollectionComponent.initClass()
-
 interface ColorPaletteComponentProps {
   index: number
   colorSet: any
@@ -141,9 +137,7 @@ interface ColorPaletteComponentProps {
 }
 
 class ColorPaletteComponent extends React.Component<ColorPaletteComponentProps> {
-  static initClass() {
-    this.defaultProps = { number: 6 }
-  }
+  static defaultProps = { number: 6 }
 
   handleSelect = () => {
     return this.props.onPaletteSelected(this.props.index)
@@ -165,4 +159,3 @@ class ColorPaletteComponent extends React.Component<ColorPaletteComponentProps> 
     )
   }
 }
-ColorPaletteComponent.initClass()

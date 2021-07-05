@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 interface TableSelectComponentProps {
     schema: any;
@@ -10,7 +11,11 @@ interface TableSelectComponentProps {
     onFilterChange?: any;
 }
 export default class TableSelectComponent extends React.Component<TableSelectComponentProps> {
-    static initClass(): void;
+    static contextTypes: {
+        tableSelectElementFactory: PropTypes.Requireable<(...args: any[]) => any>;
+        locale: PropTypes.Requireable<string>;
+        activeTables: PropTypes.Requireable<string[]>;
+    };
     render(): any;
 }
 export {};

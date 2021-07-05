@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 declare const _default: {
     new (props: {} | Readonly<{}>): {
@@ -54,7 +55,16 @@ declare const _default: {
         componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
         UNSAFE_componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
     };
-    initClass(): void;
+    propTypes: {
+        schema: PropTypes.Validator<object>;
+        dataSource: PropTypes.Validator<object>;
+        filterableTables: PropTypes.Requireable<(string | null | undefined)[]>;
+        filters: PropTypes.Requireable<object>;
+        onFiltersChange: PropTypes.Validator<(...args: any[]) => any>;
+    };
+    contextTypes: {
+        locale: PropTypes.Requireable<string>;
+    };
     contextType?: React.Context<any> | undefined;
 };
 export default _default;

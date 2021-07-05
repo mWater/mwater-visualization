@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
 interface SettingsModalComponentProps {
@@ -9,7 +10,9 @@ interface SettingsModalComponentState {
     design: any;
 }
 export default class SettingsModalComponent extends React.Component<SettingsModalComponentProps, SettingsModalComponentState> {
-    static initClass(): void;
+    static contextTypes: {
+        globalFiltersElementFactory: PropTypes.Requireable<(...args: any[]) => any>;
+    };
     constructor(props: any);
     show(design: any): void;
     handleSave: () => void;

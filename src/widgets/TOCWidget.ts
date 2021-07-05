@@ -49,23 +49,21 @@ export default TOCWidget = class TOCWidget extends Widget {
 }
 
 class TOCWidgetComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      design: PropTypes.object.isRequired, // See Map Design.md
-      onDesignChange: PropTypes.func, // Called with new design. null/undefined for readonly
+  static propTypes = {
+    design: PropTypes.object.isRequired, // See Map Design.md
+    onDesignChange: PropTypes.func, // Called with new design. null/undefined for readonly
 
-      width: PropTypes.number,
-      height: PropTypes.number,
-      tocEntries: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.any,
-          widgetId: PropTypes.string.isRequired,
-          level: PropTypes.number.isRequired,
-          text: PropTypes.string.isRequired
-        })
-      ),
-      onScrollToTOCEntry: PropTypes.func
-    }
+    width: PropTypes.number,
+    height: PropTypes.number,
+    tocEntries: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.any,
+        widgetId: PropTypes.string.isRequired,
+        level: PropTypes.number.isRequired,
+        text: PropTypes.string.isRequired
+      })
+    ),
+    onScrollToTOCEntry: PropTypes.func
   }
 
   constructor(props: any) {
@@ -138,28 +136,25 @@ class TOCWidgetComponent extends React.Component {
     )
   }
 }
-TOCWidgetComponent.initClass()
 
 // Displays the contents of the widget
 class TOCWidgetViewComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      design: PropTypes.object.isRequired, // Design of chart
-      onDesignChange: PropTypes.func, // Called with new design. null/undefined for readonly
+  static propTypes = {
+    design: PropTypes.object.isRequired, // Design of chart
+    onDesignChange: PropTypes.func, // Called with new design. null/undefined for readonly
 
-      width: PropTypes.number,
-      height: PropTypes.number,
+    width: PropTypes.number,
+    height: PropTypes.number,
 
-      tocEntries: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.any,
-          widgetId: PropTypes.string.isRequired,
-          level: PropTypes.number.isRequired,
-          text: PropTypes.string.isRequired
-        })
-      ),
-      onScrollToTOCEntry: PropTypes.func
-    }
+    tocEntries: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.any,
+        widgetId: PropTypes.string.isRequired,
+        level: PropTypes.number.isRequired,
+        text: PropTypes.string.isRequired
+      })
+    ),
+    onScrollToTOCEntry: PropTypes.func
   }
 
   handleEntryClick = (tocEntry: any) => {
@@ -246,7 +241,6 @@ class TOCWidgetViewComponent extends React.Component {
     )
   }
 }
-TOCWidgetViewComponent.initClass()
 
 // Designer for TOC widget options
 class TOCWidgetDesignerComponent extends React.Component {
@@ -255,11 +249,9 @@ class TOCWidgetDesignerComponent extends React.Component {
     this.update = this.update.bind(this)
   }
 
-  static initClass() {
-    this.propTypes = {
-      design: PropTypes.object.isRequired,
-      onDesignChange: PropTypes.func.isRequired
-    }
+  static propTypes = {
+    design: PropTypes.object.isRequired,
+    onDesignChange: PropTypes.func.isRequired
   }
 
   // Updates design with the specified changes
@@ -313,16 +305,13 @@ class TOCWidgetDesignerComponent extends React.Component {
     )
   }
 }
-TOCWidgetDesignerComponent.initClass()
 
 // Allows setting border heaviness
 class BorderComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      value: PropTypes.number,
-      defaultValue: PropTypes.number,
-      onChange: PropTypes.func.isRequired
-    }
+  static propTypes = {
+    value: PropTypes.number,
+    defaultValue: PropTypes.number,
+    onChange: PropTypes.func.isRequired
   }
 
   render() {
@@ -338,4 +327,3 @@ class BorderComponent extends React.Component {
     )
   }
 }
-BorderComponent.initClass()

@@ -9,7 +9,9 @@ interface FontSizePaletteItemState {
     open: any;
 }
 export default class FontSizePaletteItem extends React.Component<FontSizePaletteItemProps, FontSizePaletteItemState> {
-    static initClass(): void;
+    static defaultProps: {
+        position: string;
+    };
     constructor(props: any);
     handleMouseDown: (ev: any) => void;
     renderSize(label: any, value: any): React.DetailedReactHTMLElement<{

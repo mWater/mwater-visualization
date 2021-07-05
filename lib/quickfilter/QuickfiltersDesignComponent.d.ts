@@ -10,7 +10,9 @@ interface QuickfiltersDesignComponentProps {
     tables: any;
 }
 export default class QuickfiltersDesignComponent extends React.Component<QuickfiltersDesignComponentProps> {
-    static initClass(): void;
+    static defaultProps: {
+        design: never[];
+    };
     handleDesignChange: (design: any) => any;
     isMergeable(design: any, index: any): boolean;
     renderQuickfilter(item: any, index: any): React.CElement<any, QuickfilterDesignComponent>;

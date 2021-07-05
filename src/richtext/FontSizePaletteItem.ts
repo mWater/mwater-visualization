@@ -17,9 +17,7 @@ interface FontSizePaletteItemState {
 
 // Palette item that allows picking a size from dropdown
 export default class FontSizePaletteItem extends React.Component<FontSizePaletteItemProps, FontSizePaletteItemState> {
-  static initClass() {
-    this.defaultProps = { position: "under" }
-  }
+  static defaultProps = { position: "under" }
 
   constructor(props: any) {
     super(props)
@@ -111,8 +109,6 @@ background-color: #DDD;
     )
   }
 }
-
-FontSizePaletteItem.initClass()
 
 interface ColorPaletteComponentProps {
   onSetColor: any

@@ -9,7 +9,9 @@ interface FontColorPaletteItemState {
     open: any;
 }
 export default class FontColorPaletteItem extends React.Component<FontColorPaletteItemProps, FontColorPaletteItemState> {
-    static initClass(): void;
+    static defaultProps: {
+        position: string;
+    };
     constructor(props: any);
     handleMouseDown: (ev: any) => void;
     render(): React.CElement<{

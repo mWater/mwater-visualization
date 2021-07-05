@@ -108,10 +108,7 @@ interface ChartWidgetComponentProps {
 
 // Complete chart widget
 class ChartWidgetComponent extends React.PureComponent<ChartWidgetComponentProps> {
-  static initClass() {
-    this.contextTypes = { locale: PropTypes.string }
-    // e.g. "en"
-  }
+  static contextTypes = { locale: PropTypes.string }
 
   constructor(props: any) {
     super(props)
@@ -339,4 +336,3 @@ class ChartWidgetComponent extends React.PureComponent<ChartWidgetComponentProps
     )
   }
 }
-ChartWidgetComponent.initClass()

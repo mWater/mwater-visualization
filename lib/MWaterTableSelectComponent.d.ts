@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 interface MWaterTableSelectComponentProps {
     /** Url to hit api */
@@ -20,7 +21,10 @@ interface MWaterTableSelectComponentState {
     pendingExtraTable: any;
 }
 export default class MWaterTableSelectComponent extends React.Component<MWaterTableSelectComponentProps, MWaterTableSelectComponentState> {
-    static initClass(): void;
+    static contextTypes: {
+        locale: PropTypes.Requireable<string>;
+        activeTables: PropTypes.Requireable<string[]>;
+    };
     constructor(props: any);
     componentWillReceiveProps(nextProps: any): any;
     handleChange: (tableId: any) => any;

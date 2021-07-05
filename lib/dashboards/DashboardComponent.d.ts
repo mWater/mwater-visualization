@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 declare const _default: {
     new (props: any): {
@@ -77,7 +78,33 @@ declare const _default: {
         componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
         UNSAFE_componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
     };
-    initClass(): void;
+    propTypes: {
+        design: PropTypes.Validator<object>;
+        onDesignChange: PropTypes.Requireable<(...args: any[]) => any>;
+        schema: PropTypes.Validator<object>;
+        dataSource: PropTypes.Validator<object>;
+        dashboardDataSource: PropTypes.Validator<object>;
+        titleElem: PropTypes.Requireable<PropTypes.ReactNodeLike>;
+        extraTitleButtonsElem: PropTypes.Requireable<PropTypes.ReactNodeLike>;
+        undoStackKey: PropTypes.Requireable<any>;
+        printScaling: PropTypes.Requireable<boolean>;
+        onRowClick: PropTypes.Requireable<(...args: any[]) => any>;
+        namedStrings: PropTypes.Requireable<object>;
+        quickfilterLocks: PropTypes.Requireable<any[]>;
+        quickfiltersValues: PropTypes.Requireable<any[]>;
+        filters: PropTypes.Requireable<(PropTypes.InferProps<{
+            table: PropTypes.Validator<string>;
+            jsonql: PropTypes.Validator<object>;
+        }> | null | undefined)[]>;
+        hideTitleBar: PropTypes.Requireable<boolean>;
+    };
+    defaultProps: {
+        printScaling: boolean;
+    };
+    childContextTypes: {
+        locale: PropTypes.Requireable<string>;
+        activeTables: PropTypes.Requireable<string[]>;
+    };
     contextType?: React.Context<any> | undefined;
 };
 export default _default;

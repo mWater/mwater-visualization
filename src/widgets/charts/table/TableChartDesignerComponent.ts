@@ -253,10 +253,7 @@ interface TableChartColumnDesignerComponentProps {
 }
 
 class TableChartColumnDesignerComponent extends React.Component<TableChartColumnDesignerComponentProps> {
-  static initClass() {
-    this.contextTypes = { locale: PropTypes.string }
-    // e.g. "en"
-  }
+  static contextTypes = { locale: PropTypes.string }
 
   // Updates column with the specified changes
   updateColumn(changes: any) {
@@ -383,4 +380,3 @@ class TableChartColumnDesignerComponent extends React.Component<TableChartColumn
     )
   }
 }
-TableChartColumnDesignerComponent.initClass()

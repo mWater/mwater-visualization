@@ -21,10 +21,7 @@ interface AddLayerComponentProps {
 // Dropdown to add a new layer.
 // Can be overridden by context of addLayerElementFactory which is called with all props
 export default class AddLayerComponent extends React.Component<AddLayerComponentProps> {
-  static initClass() {
-    this.contextTypes = { addLayerElementFactory: PropTypes.func }
-    // Can be overridden by setting addLayerElementFactory in context that takes ({schema: , dataSource, design, onDesignChange, layerNumber})
-  }
+  static contextTypes = { addLayerElementFactory: PropTypes.func }
 
   handleAddLayer = (newLayer: any) => {
     const layerView = {
@@ -120,5 +117,3 @@ export default class AddLayerComponent extends React.Component<AddLayerComponent
     )
   }
 }
-
-AddLayerComponent.initClass()

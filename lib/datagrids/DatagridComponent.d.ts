@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
 declare const _default: {
@@ -82,12 +83,35 @@ declare const _default: {
         componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
         UNSAFE_componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
     };
-    initClass(): void;
+    propTypes: {
+        schema: PropTypes.Validator<object>;
+        dataSource: PropTypes.Validator<object>;
+        datagridDataSource: PropTypes.Validator<object>;
+        design: PropTypes.Validator<object>;
+        onDesignChange: PropTypes.Requireable<(...args: any[]) => any>;
+        titleElem: PropTypes.Requireable<PropTypes.ReactNodeLike>;
+        extraTitleButtonsElem: PropTypes.Requireable<PropTypes.ReactNodeLike>;
+        canEditValue: PropTypes.Requireable<(...args: any[]) => any>;
+        updateValue: PropTypes.Requireable<(...args: any[]) => any>;
+        onRowClick: PropTypes.Requireable<(...args: any[]) => any>;
+        onRowDoubleClick: PropTypes.Requireable<(...args: any[]) => any>;
+        quickfilterLocks: PropTypes.Requireable<any[]>;
+        filters: PropTypes.Requireable<(PropTypes.InferProps<{
+            table: PropTypes.Validator<string>;
+            jsonql: PropTypes.Validator<object>;
+        }> | null | undefined)[]>;
+    };
     contextType?: React.Context<any> | undefined;
 };
 export default _default;
 declare class DatagridEditorComponent extends React.Component {
-    static initClass(): void;
+    static propTypes: {
+        schema: PropTypes.Validator<object>;
+        dataSource: PropTypes.Validator<object>;
+        design: PropTypes.Validator<object>;
+        onDesignChange: PropTypes.Validator<(...args: any[]) => any>;
+        onCancel: PropTypes.Validator<(...args: any[]) => any>;
+    };
     constructor(props: any);
     render(): React.CElement<{
         title?: React.ReactNode;

@@ -32,10 +32,7 @@ interface DatagridDesignerComponentProps {
 
 // Designer for the datagrid. Currenly allows only single-table designs (no subtable rows)
 export default class DatagridDesignerComponent extends React.Component<DatagridDesignerComponentProps> {
-  static initClass() {
-    this.contextTypes = { globalFiltersElementFactory: PropTypes.func }
-    // Call with props { schema, dataSource, globalFilters, filterableTables, onChange, nullIfIrrelevant }. Displays a component to edit global filters
-  }
+  static contextTypes = { globalFiltersElementFactory: PropTypes.func }
 
   handleTableChange = (table: any) => {
     const design = {
@@ -170,8 +167,6 @@ export default class DatagridDesignerComponent extends React.Component<DatagridD
     )
   }
 }
-
-DatagridDesignerComponent.initClass()
 
 interface DatagridOptionsComponentProps {
   /** Datagrid design. See README.md */

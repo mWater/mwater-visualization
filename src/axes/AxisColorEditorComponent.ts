@@ -36,11 +36,9 @@ export default class AxisColorEditorComponent extends React.Component<
   AxisColorEditorComponentProps,
   AxisColorEditorComponentState
 > {
-  static initClass() {
-    this.defaultProps = {
-      reorderable: false,
-      autosetColors: true
-    }
+  static defaultProps = {
+    reorderable: false,
+    autosetColors: true
   }
 
   constructor(props: any) {
@@ -202,5 +200,3 @@ export default class AxisColorEditorComponent extends React.Component<
     )
   }
 }
-
-AxisColorEditorComponent.initClass()

@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 declare const _default: {
     new (props: {} | Readonly<{}>): {
@@ -64,7 +65,27 @@ declare const _default: {
         componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
         UNSAFE_componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
     };
-    initClass(): void;
+    propTypes: {
+        design: PropTypes.Requireable<(PropTypes.InferProps<{
+            expr: PropTypes.Validator<object>;
+            label: PropTypes.Requireable<string>;
+        }> | null | undefined)[]>;
+        values: PropTypes.Requireable<any[]>;
+        onValuesChange: PropTypes.Validator<(...args: any[]) => any>;
+        locks: PropTypes.Requireable<(PropTypes.InferProps<{
+            expr: PropTypes.Validator<object>;
+            value: PropTypes.Requireable<any>;
+        }> | null | undefined)[]>;
+        schema: PropTypes.Validator<object>;
+        dataSource: PropTypes.Validator<object>;
+        quickfiltersDataSource: PropTypes.Validator<object>;
+        filters: PropTypes.Requireable<(PropTypes.InferProps<{
+            table: PropTypes.Validator<string>;
+            jsonql: PropTypes.Validator<object>;
+        }> | null | undefined)[]>;
+        hideTopBorder: PropTypes.Requireable<boolean>;
+        onHide: PropTypes.Requireable<(...args: any[]) => any>;
+    };
     contextType?: React.Context<any> | undefined;
 };
 export default _default;

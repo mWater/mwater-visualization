@@ -14,15 +14,12 @@ import ui from "react-library/lib/bootstrap"
 
 export default LayeredChartDesignerComponent = (function () {
   LayeredChartDesignerComponent = class LayeredChartDesignerComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        design: PropTypes.object.isRequired,
-        schema: PropTypes.object.isRequired,
-        dataSource: PropTypes.object.isRequired,
-        onDesignChange: PropTypes.func.isRequired,
-        filters: PropTypes.array
-      }
-      // array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
+    static propTypes = {
+      design: PropTypes.object.isRequired,
+      schema: PropTypes.object.isRequired,
+      dataSource: PropTypes.object.isRequired,
+      onDesignChange: PropTypes.func.isRequired,
+      filters: PropTypes.array
     }
 
     // Determine if axes labels needed
@@ -412,21 +409,17 @@ export default LayeredChartDesignerComponent = (function () {
       })
     }
   }
-  LayeredChartDesignerComponent.initClass()
   return LayeredChartDesignerComponent
 })()
 
 // Thresholds are lines that are added at certain values
 class ThresholdsComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      thresholds: PropTypes.arrayOf(
-        PropTypes.shape({ value: PropTypes.number, label: PropTypes.string, highlightColor: PropTypes.string })
-      ),
-      onThresholdsChange: PropTypes.func.isRequired,
-      showHighlightColor: PropTypes.bool.isRequired
-    }
-    // True to show highlight color
+  static propTypes = {
+    thresholds: PropTypes.arrayOf(
+      PropTypes.shape({ value: PropTypes.number, label: PropTypes.string, highlightColor: PropTypes.string })
+    ),
+    onThresholdsChange: PropTypes.func.isRequired,
+    showHighlightColor: PropTypes.bool.isRequired
   }
 
   handleAdd = () => {
@@ -469,18 +462,14 @@ class ThresholdsComponent extends React.Component {
     )
   }
 }
-ThresholdsComponent.initClass()
 
 class ThresholdComponent extends React.Component {
-  static initClass() {
-    this.propTypes = {
-      threshold: PropTypes.shape({ value: PropTypes.number, label: PropTypes.string, highlightColor: PropTypes.string })
-        .isRequired,
-      onThresholdChange: PropTypes.func.isRequired,
-      onRemove: PropTypes.func.isRequired,
-      showHighlightColor: PropTypes.bool.isRequired
-    }
-    // True to show highlight color
+  static propTypes = {
+    threshold: PropTypes.shape({ value: PropTypes.number, label: PropTypes.string, highlightColor: PropTypes.string })
+      .isRequired,
+    onThresholdChange: PropTypes.func.isRequired,
+    onRemove: PropTypes.func.isRequired,
+    showHighlightColor: PropTypes.bool.isRequired
   }
 
   render() {
@@ -534,7 +523,6 @@ class ThresholdComponent extends React.Component {
     )
   }
 }
-ThresholdComponent.initClass()
 
 function LabeledInlineComponent(props: any) {
   return R(

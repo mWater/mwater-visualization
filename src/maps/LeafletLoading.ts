@@ -1,5 +1,5 @@
 import "./LeafletLoading.css"
-import L from 'leaflet'
+import L from "leaflet"
 
 // FROM: https://github.com/ebrelsford/Leaflet.loading
 /*

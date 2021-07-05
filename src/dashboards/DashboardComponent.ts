@@ -25,43 +25,40 @@ import { getLayoutOptions } from "./layoutOptions"
 // Manages undo stack and quickfilter value
 export default DashboardComponent = (function () {
   DashboardComponent = class DashboardComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        design: PropTypes.object.isRequired,
-        onDesignChange: PropTypes.func, // If not set, readonly
-        schema: PropTypes.object.isRequired,
-        dataSource: PropTypes.object.isRequired,
-        dashboardDataSource: PropTypes.object.isRequired, // dashboard data source
+    static propTypes = {
+      design: PropTypes.object.isRequired,
+      onDesignChange: PropTypes.func, // If not set, readonly
+      schema: PropTypes.object.isRequired,
+      dataSource: PropTypes.object.isRequired,
+      dashboardDataSource: PropTypes.object.isRequired, // dashboard data source
 
-        titleElem: PropTypes.node, // Extra element to include in title at left
-        extraTitleButtonsElem: PropTypes.node, // Extra elements to add to right
-        undoStackKey: PropTypes.any, // Key that changes when the undo stack should be reset. Usually a document id or suchlike
-        printScaling: PropTypes.bool, // True to scale for printing
+      titleElem: PropTypes.node, // Extra element to include in title at left
+      extraTitleButtonsElem: PropTypes.node, // Extra elements to add to right
+      undoStackKey: PropTypes.any, // Key that changes when the undo stack should be reset. Usually a document id or suchlike
+      printScaling: PropTypes.bool, // True to scale for printing
 
-        onRowClick: PropTypes.func, // Called with (tableId, rowId) when item is clicked
-        namedStrings: PropTypes.object, // Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+      onRowClick: PropTypes.func, // Called with (tableId, rowId) when item is clicked
+      namedStrings: PropTypes.object, // Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
-        quickfilterLocks: PropTypes.array, // Locked quickfilter values. See README in quickfilters
-        quickfiltersValues: PropTypes.array, // Initial quickfilter values
+      quickfilterLocks: PropTypes.array, // Locked quickfilter values. See README in quickfilters
+      quickfiltersValues: PropTypes.array, // Initial quickfilter values
 
-        // Filters to add to the dashboard
-        filters: PropTypes.arrayOf(
-          PropTypes.shape({
-            table: PropTypes.string.isRequired, // id table to filter
-            jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
-          })
-        ),
+      // Filters to add to the dashboard
+      filters: PropTypes.arrayOf(
+        PropTypes.shape({
+          table: PropTypes.string.isRequired, // id table to filter
+          jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
+        })
+      ),
 
-        hideTitleBar: PropTypes.bool // True to hide title bar and related controls
-      }
+      hideTitleBar: PropTypes.bool // True to hide title bar and related controls
+    }
 
-      this.defaultProps = { printScaling: true }
+    static defaultProps = { printScaling: true }
 
-      this.childContextTypes = {
-        locale: PropTypes.string,
-        activeTables: PropTypes.arrayOf(PropTypes.string.isRequired)
-      }
-      // List of tables (ids) being used. Use this to present an initially short list to select from
+    static childContextTypes = {
+      locale: PropTypes.string,
+      activeTables: PropTypes.arrayOf(PropTypes.string.isRequired)
     }
 
     getChildContext() {
@@ -455,6 +452,5 @@ export default DashboardComponent = (function () {
       )
     }
   }
-  DashboardComponent.initClass()
   return DashboardComponent
 })()

@@ -23,38 +23,36 @@ import { WidgetComponent } from "./WidgetComponent"
 // Handles scoping and stores the state of scope
 export default DashboardViewComponent = (function () {
   DashboardViewComponent = class DashboardViewComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        schema: PropTypes.object.isRequired, // schema to use
-        dataSource: PropTypes.object.isRequired, // data source to use. Only used when designing, for display uses dashboardDataSource
-        dashboardDataSource: PropTypes.object.isRequired, // dashboard data source
+    static propTypes = {
+      schema: PropTypes.object.isRequired, // schema to use
+      dataSource: PropTypes.object.isRequired, // data source to use. Only used when designing, for display uses dashboardDataSource
+      dashboardDataSource: PropTypes.object.isRequired, // dashboard data source
 
-        design: PropTypes.object.isRequired,
-        onDesignChange: PropTypes.func, // Leave unset for readonly
+      design: PropTypes.object.isRequired,
+      onDesignChange: PropTypes.func, // Leave unset for readonly
 
-        onRowClick: PropTypes.func, // Called with (tableId, rowId) when item is clicked
-        namedStrings: PropTypes.object, // Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+      onRowClick: PropTypes.func, // Called with (tableId, rowId) when item is clicked
+      namedStrings: PropTypes.object, // Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
 
-        // Filters to add to the dashboard (includes extra filters and any quickfilters from the dashboard component. Does not include dashboard level filters)
-        filters: PropTypes.arrayOf(
-          PropTypes.shape({
-            table: PropTypes.string.isRequired, // id table to filter
-            jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
-          })
-        ),
+      // Filters to add to the dashboard (includes extra filters and any quickfilters from the dashboard component. Does not include dashboard level filters)
+      filters: PropTypes.arrayOf(
+        PropTypes.shape({
+          table: PropTypes.string.isRequired, // id table to filter
+          jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
+        })
+      ),
 
-        // Entry to scroll to initially when dashboard is loaded
-        initialTOCEntryScroll: PropTypes.shape({ widgetId: PropTypes.string.isRequired, entryId: PropTypes.any }),
+      // Entry to scroll to initially when dashboard is loaded
+      initialTOCEntryScroll: PropTypes.shape({ widgetId: PropTypes.string.isRequired, entryId: PropTypes.any }),
 
-        // True to hide scope display
-        hideScopes: PropTypes.bool,
+      // True to hide scope display
+      hideScopes: PropTypes.bool,
 
-        // True to render in print mode (prevents odd clipping issue)
-        printMode: PropTypes.bool
-      }
-
-      this.childContextTypes = { locale: PropTypes.string }
+      // True to render in print mode (prevents odd clipping issue)
+      printMode: PropTypes.bool
     }
+
+    static childContextTypes = { locale: PropTypes.string }
 
     // Pass locale down. Both here and DashboardViewComponent to ensure that quickfilters also get context
     getChildContext() {
@@ -288,6 +286,5 @@ export default DashboardViewComponent = (function () {
       )
     }
   }
-  DashboardViewComponent.initClass()
   return DashboardViewComponent
 })()

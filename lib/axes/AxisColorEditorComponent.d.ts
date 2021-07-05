@@ -20,7 +20,10 @@ interface AxisColorEditorComponentState {
     mode: any;
 }
 export default class AxisColorEditorComponent extends React.Component<AxisColorEditorComponentProps, AxisColorEditorComponentState> {
-    static initClass(): void;
+    static defaultProps: {
+        reorderable: boolean;
+        autosetColors: boolean;
+    };
     constructor(props: any);
     componentWillMount(): void;
     componentDidUpdate(): void;

@@ -1,5 +1,5 @@
 import "./LeafletLoading.css";
-import L from 'leaflet';
+import L from "leaflet";
 declare const _default: (new (...args: any[]) => {
     options: {
         delayIndicator: null;

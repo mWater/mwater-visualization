@@ -26,10 +26,7 @@ export default class SettingsModalComponent extends React.Component<
   SettingsModalComponentProps,
   SettingsModalComponentState
 > {
-  static initClass() {
-    this.contextTypes = { globalFiltersElementFactory: PropTypes.func }
-    // Call with props { schema, dataSource, globalFilters, onChange, nullIfIrrelevant }. Displays a component to edit global filters
-  }
+  static contextTypes = { globalFiltersElementFactory: PropTypes.func }
 
   constructor(props: any) {
     super(props)
@@ -168,5 +165,3 @@ export default class SettingsModalComponent extends React.Component<
     )
   }
 }
-
-SettingsModalComponent.initClass()

@@ -39,10 +39,7 @@ export default class PivotChartViewComponent extends React.Component<
   PivotChartViewComponentProps,
   PivotChartViewComponentState
 > {
-  static initClass() {
-    this.contextTypes = { locale: PropTypes.string }
-    // e.g. "en"
-  }
+  static contextTypes = { locale: PropTypes.string }
 
   constructor(props: any) {
     super(props)
@@ -267,5 +264,3 @@ export default class PivotChartViewComponent extends React.Component<
     )
   }
 }
-
-PivotChartViewComponent.initClass()

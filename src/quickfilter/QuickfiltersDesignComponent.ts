@@ -21,9 +21,7 @@ interface QuickfiltersDesignComponentProps {
 
 // Displays quick filters and allows their value to be modified
 export default class QuickfiltersDesignComponent extends React.Component<QuickfiltersDesignComponentProps> {
-  static initClass() {
-    this.defaultProps = { design: [] }
-  }
+  static defaultProps = { design: [] }
 
   handleDesignChange = (design: any) => {
     design = design.slice()
@@ -124,8 +122,6 @@ export default class QuickfiltersDesignComponent extends React.Component<Quickfi
     )
   }
 }
-
-QuickfiltersDesignComponent.initClass()
 
 interface QuickfilterDesignComponentProps {
   /** Design of a single quickfilters. See README.md */

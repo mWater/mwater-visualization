@@ -32,10 +32,7 @@ export default class MWaterAddRelatedIndicatorComponent extends React.Component<
   MWaterAddRelatedIndicatorComponentProps,
   MWaterAddRelatedIndicatorComponentState
 > {
-  static initClass() {
-    this.contextTypes = { locale: PropTypes.string }
-    // e.g. "en"
-  }
+  static contextTypes = { locale: PropTypes.string }
 
   constructor(props: any) {
     super(props)
@@ -177,8 +174,6 @@ export default class MWaterAddRelatedIndicatorComponent extends React.Component<
     )
   }
 }
-
-MWaterAddRelatedIndicatorComponent.initClass()
 
 // Flattens a nested list of properties
 function flattenProperties(properties: any) {

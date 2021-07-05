@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 interface PivotChartViewComponentProps {
     schema: any;
@@ -19,7 +20,9 @@ interface PivotChartViewComponentState {
     editIntersection: any;
 }
 export default class PivotChartViewComponent extends React.Component<PivotChartViewComponentProps, PivotChartViewComponentState> {
-    static initClass(): void;
+    static contextTypes: {
+        locale: PropTypes.Requireable<string>;
+    };
     constructor(props: any);
     handleHeaderChange: (header: any) => any;
     handleFooterChange: (footer: any) => any;

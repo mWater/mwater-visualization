@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 interface LayeredChartViewComponentProps {
     schema: any;
@@ -17,7 +18,9 @@ interface LayeredChartViewComponentState {
     footerHeight: any;
 }
 export default class LayeredChartViewComponent extends React.Component<LayeredChartViewComponentProps, LayeredChartViewComponentState> {
-    static initClass(): void;
+    static contextTypes: {
+        locale: PropTypes.Requireable<string>;
+    };
     constructor(props: any);
     componentDidMount(): void;
     componentDidUpdate(): void;

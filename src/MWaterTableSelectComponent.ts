@@ -36,13 +36,11 @@ export default class MWaterTableSelectComponent extends React.Component<
   MWaterTableSelectComponentProps,
   MWaterTableSelectComponentState
 > {
-  static initClass() {
-    this.contextTypes = {
-      locale: PropTypes.string, // e.g. "en"
+  static contextTypes = {
+    locale: PropTypes.string, // e.g. "en"
 
-      // Optional list of tables (ids) being used. Use this to present an initially short list to select from
-      activeTables: PropTypes.arrayOf(PropTypes.string.isRequired)
-    }
+    // Optional list of tables (ids) being used. Use this to present an initially short list to select from
+    activeTables: PropTypes.arrayOf(PropTypes.string.isRequired)
   }
 
   constructor(props: any) {
@@ -163,8 +161,6 @@ export default class MWaterTableSelectComponent extends React.Component<
   }
 }
 
-MWaterTableSelectComponent.initClass()
-
 interface EditModeTableSelectComponentProps {
   /** Url to hit api */
   apiUrl: string
@@ -189,13 +185,11 @@ class EditModeTableSelectComponent extends React.Component<
   EditModeTableSelectComponentProps,
   EditModeTableSelectComponentState
 > {
-  static initClass() {
-    this.contextTypes = {
-      locale: PropTypes.string, // e.g. "en"
+  static contextTypes = {
+    locale: PropTypes.string, // e.g. "en"
 
-      // Optional list of tables (ids) being used. Use this to present an initially short list to select from
-      activeTables: PropTypes.arrayOf(PropTypes.string.isRequired)
-    }
+    // Optional list of tables (ids) being used. Use this to present an initially short list to select from
+    activeTables: PropTypes.arrayOf(PropTypes.string.isRequired)
   }
 
   constructor(props: any) {
@@ -320,4 +314,3 @@ class EditModeTableSelectComponent extends React.Component<
     )
   }
 }
-EditModeTableSelectComponent.initClass()

@@ -19,31 +19,28 @@ import { injectTableAlias } from "mwater-expressions"
 // Modal to perform find/replace on datagrid
 export default FindReplaceModalComponent = (function () {
   FindReplaceModalComponent = class FindReplaceModalComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        schema: PropTypes.object.isRequired, // schema to use
-        dataSource: PropTypes.object.isRequired, // dataSource to use
+    static propTypes = {
+      schema: PropTypes.object.isRequired, // schema to use
+      dataSource: PropTypes.object.isRequired, // dataSource to use
 
-        design: PropTypes.object.isRequired, // Design of datagrid. See README.md of this folder
+      design: PropTypes.object.isRequired, // Design of datagrid. See README.md of this folder
 
-        filters: PropTypes.arrayOf(
-          PropTypes.shape({
-            table: PropTypes.string.isRequired, // id table to filter
-            jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
-          })
-        ),
+      filters: PropTypes.arrayOf(
+        PropTypes.shape({
+          table: PropTypes.string.isRequired, // id table to filter
+          jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
+        })
+      ),
 
-        // Check if expression of table row is editable
-        // If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
-        canEditValue: PropTypes.func,
+      // Check if expression of table row is editable
+      // If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
+      canEditValue: PropTypes.func,
 
-        // Update table row expression with a new value
-        // Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
-        updateValue: PropTypes.func,
+      // Update table row expression with a new value
+      // Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
+      updateValue: PropTypes.func,
 
-        onUpdate: PropTypes.func
-      }
-      // Called when values have been updated
+      onUpdate: PropTypes.func
     }
 
     constructor(props: any) {
@@ -371,6 +368,5 @@ export default FindReplaceModalComponent = (function () {
       )
     }
   }
-  FindReplaceModalComponent.initClass()
   return FindReplaceModalComponent
 })()

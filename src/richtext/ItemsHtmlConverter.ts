@@ -10,24 +10,22 @@ import _ from "lodash"
 //  elements can contain style (object), href, target
 export default ItemsHtmlConverter = (function () {
   ItemsHtmlConverter = class ItemsHtmlConverter {
-    static initClass() {
-      // Check if blank (no text or special expressions)
-      this.isBlank = (items: any) => {
-        if (!items) {
-          return true
-        }
-
-        return _.all(items, (item) => {
-          if (_.isString(item)) {
-            return item.length === 0
-          }
-          if (_.isObject(item) && item.type === "element") {
-            return this.isBlank(item.items)
-          }
-          return false
-        })
+    static isBlank = (items: any) => {
+      if (!items) {
+        return true
       }
+
+      return _.all(items, (item) => {
+        if (_.isString(item)) {
+          return item.length === 0
+        }
+        if (_.isObject(item) && item.type === "element") {
+          return this.isBlank(item.items)
+        }
+        return false
+      })
     }
+
     // namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings
     constructor(namedStrings: any) {
       this.namedStrings = namedStrings
@@ -200,7 +198,6 @@ export default ItemsHtmlConverter = (function () {
       return items
     }
   }
-  ItemsHtmlConverter.initClass()
   return ItemsHtmlConverter
 })()
 

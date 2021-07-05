@@ -20,9 +20,7 @@ interface OrderBysDesignerComponentProps {
 
 // Edits an orderBys which is a list of expressions and directions. See README.md
 export default class OrderBysDesignerComponent extends React.Component<OrderBysDesignerComponentProps> {
-  static initClass() {
-    this.defaultProps = { orderBys: [] }
-  }
+  static defaultProps = { orderBys: [] }
 
   handleChange = (index: any, orderBy: any) => {
     const orderBys = this.props.orderBys.slice()
@@ -72,8 +70,6 @@ export default class OrderBysDesignerComponent extends React.Component<OrderBysD
     )
   }
 }
-
-OrderBysDesignerComponent.initClass()
 
 interface OrderByDesignerComponentProps {
   orderBy: any

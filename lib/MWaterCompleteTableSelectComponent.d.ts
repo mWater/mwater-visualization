@@ -1,4 +1,5 @@
 /// <reference types="jquery" />
+import PropTypes from "prop-types";
 import React from "react";
 import * as uiComponents from "./UIComponents";
 interface MWaterCompleteTableSelectComponentProps {
@@ -16,7 +17,9 @@ interface MWaterCompleteTableSelectComponentProps {
     onExtraTablesChange: any;
 }
 export default class MWaterCompleteTableSelectComponent extends React.Component<MWaterCompleteTableSelectComponentProps> {
-    static initClass(): void;
+    static contextTypes: {
+        locale: PropTypes.Requireable<string>;
+    };
     handleExtraTableAdd: (tableId: any) => any;
     handleExtraTableRemove: (tableId: any) => any;
     renderSites(): React.CElement<{
@@ -94,7 +97,9 @@ interface FormsListComponentState {
     forms: any;
 }
 declare class FormsListComponent extends React.Component<FormsListComponentProps, FormsListComponentState> {
-    static initClass(): void;
+    static contextTypes: {
+        locale: PropTypes.Requireable<string>;
+    };
     constructor(props: any);
     componentDidMount(): JQuery.jqXHR<any>;
     handleTableRemove: (table: any) => any;
@@ -123,7 +128,9 @@ interface IndicatorsListComponentState {
     indicators: any;
 }
 declare class IndicatorsListComponent extends React.Component<IndicatorsListComponentProps, IndicatorsListComponentState> {
-    static initClass(): void;
+    static contextTypes: {
+        locale: PropTypes.Requireable<string>;
+    };
     constructor(props: any);
     componentDidMount(): JQuery.jqXHR<any>;
     handleTableRemove: (table: any) => any;
@@ -153,7 +160,9 @@ interface IssuesListComponentState {
     issueTypes: any;
 }
 declare class IssuesListComponent extends React.Component<IssuesListComponentProps, IssuesListComponentState> {
-    static initClass(): void;
+    static contextTypes: {
+        locale: PropTypes.Requireable<string>;
+    };
     constructor(props: any);
     componentDidMount(): JQuery.jqXHR<any>;
     handleTableRemove: (table: any) => any;

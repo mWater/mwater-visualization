@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent";
 declare const _default: {
@@ -11,7 +12,19 @@ declare const _default: {
 };
 export default _default;
 declare class TOCWidgetComponent extends React.Component {
-    static initClass(): void;
+    static propTypes: {
+        design: PropTypes.Validator<object>;
+        onDesignChange: PropTypes.Requireable<(...args: any[]) => any>;
+        width: PropTypes.Requireable<number>;
+        height: PropTypes.Requireable<number>;
+        tocEntries: PropTypes.Requireable<(PropTypes.InferProps<{
+            id: PropTypes.Requireable<any>;
+            widgetId: PropTypes.Validator<string>;
+            level: PropTypes.Validator<number>;
+            text: PropTypes.Validator<string>;
+        }> | null | undefined)[]>;
+        onScrollToTOCEntry: PropTypes.Requireable<(...args: any[]) => any>;
+    };
     constructor(props: any);
     handleStartEditing: () => void;
     handleEndEditing: () => void;

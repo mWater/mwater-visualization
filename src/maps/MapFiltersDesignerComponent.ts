@@ -22,10 +22,7 @@ interface MapFiltersDesignerComponentProps {
 
 // Designer for filters for a map
 export default class MapFiltersDesignerComponent extends React.Component<MapFiltersDesignerComponentProps> {
-  static initClass() {
-    this.contextTypes = { globalFiltersElementFactory: PropTypes.func }
-    // Call with props { schema, dataSource, globalFilters, filterableTables, onChange, nullIfIrrelevant }. Displays a component to edit global filters
-  }
+  static contextTypes = { globalFiltersElementFactory: PropTypes.func }
 
   handleFiltersChange = (filters: any) => {
     const design = _.extend({}, this.props.design, { filters })
@@ -96,5 +93,3 @@ export default class MapFiltersDesignerComponent extends React.Component<MapFilt
     )
   }
 }
-
-MapFiltersDesignerComponent.initClass()

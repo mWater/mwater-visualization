@@ -33,10 +33,7 @@ export default class LayeredChartViewComponent extends React.Component<
   LayeredChartViewComponentProps,
   LayeredChartViewComponentState
 > {
-  static initClass() {
-    this.contextTypes = { locale: PropTypes.string }
-    // e.g. "en"
-  }
+  static contextTypes = { locale: PropTypes.string }
 
   constructor(props: any) {
     super(props)
@@ -133,8 +130,6 @@ export default class LayeredChartViewComponent extends React.Component<
     )
   }
 }
-
-LayeredChartViewComponent.initClass()
 
 interface C3ChartComponentProps {
   schema: any

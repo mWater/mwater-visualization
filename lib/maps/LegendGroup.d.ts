@@ -8,7 +8,11 @@ interface LegendGroupProps {
     markerSize?: number;
 }
 export default class LegendGroup extends React.Component<LegendGroupProps> {
-    static initClass(): void;
+    static defaultProps: {
+        items: never[];
+        radiusLayer: boolean;
+        symbol: null;
+    };
     render(): React.DetailedReactHTMLElement<{
         style: {
             marginBottom: number;

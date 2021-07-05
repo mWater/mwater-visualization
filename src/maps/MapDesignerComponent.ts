@@ -29,10 +29,7 @@ interface MapDesignerComponentProps {
 }
 
 export default class MapDesignerComponent extends React.Component<MapDesignerComponentProps> {
-  static initClass() {
-    this.childContextTypes = { activeTables: PropTypes.arrayOf(PropTypes.string.isRequired) }
-    // List of tables (ids) being used. Use this to present an initially short list to select from
-  }
+  static childContextTypes = { activeTables: PropTypes.arrayOf(PropTypes.string.isRequired) }
 
   getChildContext() {
     return {
@@ -195,8 +192,6 @@ export default class MapDesignerComponent extends React.Component<MapDesignerCom
   }
 }
 
-MapDesignerComponent.initClass()
-
 interface AttributionComponentProps {
   text?: string
   onTextChange: any
@@ -208,9 +203,7 @@ interface AttributionComponentState {
 
 // Attribution inline editing
 class AttributionComponent extends React.Component<AttributionComponentProps, AttributionComponentState> {
-  static initClass() {
-    this.defaultProps = { text: null }
-  }
+  static defaultProps = { text: null }
 
   constructor(props: any) {
     super(props)
@@ -258,7 +251,6 @@ class AttributionComponent extends React.Component<AttributionComponentProps, At
     return elem
   }
 }
-AttributionComponent.initClass()
 
 interface AdvancedOptionsComponentProps {
   design: any

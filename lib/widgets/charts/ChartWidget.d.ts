@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
 import ChartViewComponent from "./ChartViewComponent";
@@ -42,7 +43,9 @@ interface ChartWidgetComponentProps {
     connectResizeHandle?: any;
 }
 declare class ChartWidgetComponent extends React.PureComponent<ChartWidgetComponentProps> {
-    static initClass(): void;
+    static contextTypes: {
+        locale: PropTypes.Requireable<string>;
+    };
     constructor(props: any);
     handleSaveCsvFile: () => any;
     handleStartEditing: () => void;

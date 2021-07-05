@@ -16,35 +16,33 @@ import PopoverHelpComponent from "react-library/lib/PopoverHelpComponent"
 // Map with designer on right
 export default MapComponent = (function () {
   MapComponent = class MapComponent extends React.Component {
-    static initClass() {
-      this.propTypes = {
-        schema: PropTypes.object.isRequired,
-        dataSource: PropTypes.object.isRequired, // Data source to use
+    static propTypes = {
+      schema: PropTypes.object.isRequired,
+      dataSource: PropTypes.object.isRequired, // Data source to use
 
-        // Data source for the map
-        mapDataSource: PropTypes.shape({
-          // Gets the data source for a layer
-          getLayerDataSource: PropTypes.func.isRequired
-        }).isRequired,
+      // Data source for the map
+      mapDataSource: PropTypes.shape({
+        // Gets the data source for a layer
+        getLayerDataSource: PropTypes.func.isRequired
+      }).isRequired,
 
-        design: PropTypes.object.isRequired,
-        onDesignChange: PropTypes.func, // Null/undefined for readonly
+      design: PropTypes.object.isRequired,
+      onDesignChange: PropTypes.func, // Null/undefined for readonly
 
-        onRowClick: PropTypes.func, // Called with (tableId, rowId) when item is clicked
+      onRowClick: PropTypes.func, // Called with (tableId, rowId) when item is clicked
 
-        extraFilters: PropTypes.arrayOf(
-          PropTypes.shape({
-            table: PropTypes.string.isRequired,
-            jsonql: PropTypes.object.isRequired
-          })
-        ), // Extra filters to apply to view
+      extraFilters: PropTypes.arrayOf(
+        PropTypes.shape({
+          table: PropTypes.string.isRequired,
+          jsonql: PropTypes.object.isRequired
+        })
+      ), // Extra filters to apply to view
 
-        titleElem: PropTypes.node, // Extra element to include in title at left
-        extraTitleButtonsElem: PropTypes.node // Extra elements to add to right
-      }
-
-      this.contextTypes = { locale: PropTypes.string }
+      titleElem: PropTypes.node, // Extra element to include in title at left
+      extraTitleButtonsElem: PropTypes.node // Extra elements to add to right
     }
+
+    static contextTypes = { locale: PropTypes.string }
 
     constructor(props: any) {
       super(props)
@@ -227,6 +225,5 @@ export default MapComponent = (function () {
       )
     }
   }
-  MapComponent.initClass()
   return MapComponent
 })()

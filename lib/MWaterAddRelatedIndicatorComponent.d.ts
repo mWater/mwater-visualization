@@ -1,4 +1,5 @@
 /// <reference types="jquery" />
+import PropTypes from "prop-types";
 import React from "react";
 interface MWaterAddRelatedIndicatorComponentProps {
     table: string;
@@ -17,7 +18,9 @@ interface MWaterAddRelatedIndicatorComponentState {
     indicators: any;
 }
 export default class MWaterAddRelatedIndicatorComponent extends React.Component<MWaterAddRelatedIndicatorComponentProps, MWaterAddRelatedIndicatorComponentState> {
-    static initClass(): void;
+    static contextTypes: {
+        locale: PropTypes.Requireable<string>;
+    };
     constructor(props: any);
     componentDidMount(): JQuery.jqXHR<any>;
     doesIndicatorReferenceTable(indicator: any, table: any): boolean;

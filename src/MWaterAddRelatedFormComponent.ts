@@ -107,10 +107,7 @@ class AddRelatedFormModalComponent extends React.Component<
   AddRelatedFormModalComponentProps,
   AddRelatedFormModalComponentState
 > {
-  static initClass() {
-    this.contextTypes = { locale: PropTypes.string }
-    // e.g. "en"
-  }
+  static contextTypes = { locale: PropTypes.string }
 
   constructor(props: any) {
     super(props)
@@ -196,7 +193,6 @@ class AddRelatedFormModalComponent extends React.Component<
     )
   }
 }
-AddRelatedFormModalComponent.initClass()
 
 function escapeRegex(s: any) {
   return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")

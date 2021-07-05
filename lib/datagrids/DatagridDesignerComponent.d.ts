@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 import TabbedComponent from "react-library/lib/TabbedComponent";
 interface DatagridDesignerComponentProps {
@@ -11,7 +12,9 @@ interface DatagridDesignerComponentProps {
     onDesignChange: any;
 }
 export default class DatagridDesignerComponent extends React.Component<DatagridDesignerComponentProps> {
-    static initClass(): void;
+    static contextTypes: {
+        globalFiltersElementFactory: PropTypes.Requireable<(...args: any[]) => any>;
+    };
     handleTableChange: (table: any) => any;
     handleColumnsChange: (columns: any) => any;
     handleFilterChange: (filter: any) => any;

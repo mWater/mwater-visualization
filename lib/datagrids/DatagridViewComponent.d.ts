@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import React from "react";
 declare const _default: {
     new (props: any): {
@@ -61,7 +62,27 @@ declare const _default: {
         componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
         UNSAFE_componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
     };
-    initClass(): void;
+    propTypes: {
+        width: PropTypes.Validator<number>;
+        height: PropTypes.Validator<number>;
+        pageSize: PropTypes.Requireable<number>;
+        schema: PropTypes.Validator<object>;
+        dataSource: PropTypes.Validator<object>;
+        datagridDataSource: PropTypes.Validator<object>;
+        design: PropTypes.Validator<object>;
+        onDesignChange: PropTypes.Requireable<(...args: any[]) => any>;
+        filters: PropTypes.Requireable<(PropTypes.InferProps<{
+            table: PropTypes.Validator<string>;
+            jsonql: PropTypes.Validator<object>;
+        }> | null | undefined)[]>;
+        canEditCell: PropTypes.Requireable<(...args: any[]) => any>;
+        updateCell: PropTypes.Requireable<(...args: any[]) => any>;
+        onRowDoubleClick: PropTypes.Requireable<(...args: any[]) => any>;
+        onRowClick: PropTypes.Requireable<(...args: any[]) => any>;
+    };
+    defaultProps: {
+        pageSize: number;
+    };
     contextType?: React.Context<any> | undefined;
 };
 export default _default;

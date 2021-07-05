@@ -14,28 +14,31 @@ import MWaterContextComponent from "./MWaterContextComponent"
 // Loads an mWater schema from the server and creates child with schema and dataSource
 // Also creates a tableSelectElementFactory context to allow selecting of a table in an mWater-friendly way
 // and several other context items
-export default class MWaterLoaderComponent extends AsyncLoadComponent<{
-  apiUrl: string
-  client?: string
-  share?: string
-  /**  user id of logged in user */
-  user?: string
-  /**  Load schema as a specific user (for shared dashboards, etc) */
-  asUser?: string
-  /**  Extra tables to load in schema. Forms are not loaded by default as they are too many */
-  extraTables?: string[]
-  /**  Called when extra tables are changed and schema will be reloaded */
-  onExtraTablesChange?: (extraTables: string[]) => void
-  /**  Override default add layer component. See AddLayerComponent for details */
-  addLayerElementFactory?: any
-  children: (error: any, config: { schema: Schema; dataSource: DataSource }) => ReactElement<any>
-  /** Custom error formatter that returns React node or string, gets passed the error response from server */
-  errorFormatter: (data: any, defaultError: string) => string
-}, {
-  error: any
-  schema: Schema | null
-  dataSource: DataSource | null
-}> {
+export default class MWaterLoaderComponent extends AsyncLoadComponent<
+  {
+    apiUrl: string
+    client?: string
+    share?: string
+    /**  user id of logged in user */
+    user?: string
+    /**  Load schema as a specific user (for shared dashboards, etc) */
+    asUser?: string
+    /**  Extra tables to load in schema. Forms are not loaded by default as they are too many */
+    extraTables?: string[]
+    /**  Called when extra tables are changed and schema will be reloaded */
+    onExtraTablesChange?: (extraTables: string[]) => void
+    /**  Override default add layer component. See AddLayerComponent for details */
+    addLayerElementFactory?: any
+    children: (error: any, config: { schema: Schema; dataSource: DataSource }) => ReactElement<any>
+    /** Custom error formatter that returns React node or string, gets passed the error response from server */
+    errorFormatter: (data: any, defaultError: string) => string
+  },
+  {
+    error: any
+    schema: Schema | null
+    dataSource: DataSource | null
+  }
+> {
   mounted: boolean
 
   constructor(props: any) {
@@ -105,4 +108,3 @@ export default class MWaterLoaderComponent extends AsyncLoadComponent<{
     )
   }
 }
-  
