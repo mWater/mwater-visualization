@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let PivotChartLayoutBuilder
 import _ from "lodash"
 import { ExprUtils } from "mwater-expressions"
 import AxisBuilder from "../../../axes/AxisBuilder"
@@ -13,7 +10,7 @@ const maxColumns = 50
 
 // Builds pivot table layout from the design and data
 // See PivotChart Design.md for more detauls
-export default PivotChartLayoutBuilder = class PivotChartLayoutBuilder {
+export default class PivotChartLayoutBuilder {
   // Pass in schema
   constructor(options: any) {
     this.schema = options.schema

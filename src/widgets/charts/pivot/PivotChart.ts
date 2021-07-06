@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let PivotChart
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
@@ -21,7 +18,7 @@ import PivotChartLayoutBuilder from "./PivotChartLayoutBuilder"
 const cleanDesignCache = new WeakCache()
 
 // See README.md for the design
-export default PivotChart = class PivotChart extends Chart {
+export default class PivotChart extends Chart {
   cleanDesign(design: any, schema: any) {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })

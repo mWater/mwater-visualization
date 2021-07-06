@@ -1,18 +1,16 @@
 import PropTypes from "prop-types";
 import React from "react";
+import Widget from "./../Widget";
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
 import ChartViewComponent from "./ChartViewComponent";
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent";
-declare const _default: {
-    new (chart: any): {
-        createViewElement(options: any): React.CElement<any, ChartWidgetComponent>;
-        getData(design: any, schema: any, dataSource: any, filters: any, callback: any): any;
-        getFilterableTables(design: any, schema: any): any;
-        isAutoHeight(): any;
-        getTOCEntries(design: any, namedStrings: any): never[];
-    };
-};
-export default _default;
+export default class ChartWidget extends Widget {
+    constructor(chart: any);
+    createViewElement(options: any): React.CElement<any, ChartWidgetComponent>;
+    getData(design: any, schema: any, dataSource: any, filters: any, callback: any): any;
+    getFilterableTables(design: any, schema: any): any;
+    isAutoHeight(): any;
+}
 interface ChartWidgetComponentProps {
     /** schema to use */
     schema: any;
@@ -82,3 +80,4 @@ declare class ChartWidgetComponent extends React.PureComponent<ChartWidgetCompon
         };
     }, HTMLElement>;
 }
+export {};

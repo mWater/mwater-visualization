@@ -1,13 +1,10 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let BlocksLayoutManager
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
 import uuid from "uuid"
 import LayoutManager from "../LayoutManager"
 
-export default BlocksLayoutManager = class BlocksLayoutManager extends LayoutManager {
+export default class BlocksLayoutManager extends LayoutManager {
   // Renders the layout as a react element
   // options:
   //  items: opaque items object that layout manager understands

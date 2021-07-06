@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let TOCWidget
 import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
@@ -16,7 +13,7 @@ import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 //   header: text of header. Defaults to "Contents"
 //   borderWeight: border weight. Defaults to 0=None. 1=light, 2=medium, 3=heavy
 //   numbering: true/false for prepending numbering to entries (e.g. 3.4.1)
-export default TOCWidget = class TOCWidget extends Widget {
+export default class TOCWidget extends Widget {
   // Creates a React element that is a view of the widget
   // options:
   //  schema: schema to use

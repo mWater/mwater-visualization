@@ -1,13 +1,10 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let ServerDatagridDataSource
 import $ from "jquery"
 import querystring from "querystring"
 import DatagridDataSource from "./DatagridDataSource"
 import compressJson from "../compressJson"
 
 // Uses mWater server to get datagrid data to allow sharing with unprivileged users
-export default ServerDatagridDataSource = class ServerDatagridDataSource extends DatagridDataSource {
+export default class ServerDatagridDataSource extends DatagridDataSource {
   // options:
   //   apiUrl: API url to use for talking to mWater server
   //   client: client id to use for talking to mWater server

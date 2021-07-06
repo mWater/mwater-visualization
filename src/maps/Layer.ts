@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let Layer
 import _ from "lodash"
 import AxisBuilder from "../axes/AxisBuilder"
 import { ExprCompiler } from "mwater-expressions"
@@ -8,7 +5,7 @@ import { injectTableAlias } from "mwater-expressions"
 import { default as bbox } from "@turf/bbox"
 
 // Defines a layer for a map which has all the logic for rendering the specific data to be viewed
-export default Layer = class Layer {
+export default class Layer {
   // Gets the type of layer definition ("JsonQLCss"/"TileUrl"/"VectorTile")
   getLayerDefinitionType() {
     return "JsonQLCss"

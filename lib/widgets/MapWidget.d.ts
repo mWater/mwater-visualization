@@ -1,15 +1,10 @@
 import React from "react";
+import Widget from "./Widget";
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent";
-declare const _default: {
-    new (): {
-        createViewElement(options: any): React.CElement<any, MapWidgetComponent>;
-        getFilterableTables(design: any, schema: any): string[];
-        getData(design: any, schema: any, dataSource: any, filters: any, callback: any): void;
-        isAutoHeight(): boolean;
-        getTOCEntries(design: any, namedStrings: any): never[];
-    };
-};
-export default _default;
+export default class MapWidget extends Widget {
+    createViewElement(options: any): React.CElement<any, MapWidgetComponent>;
+    getFilterableTables(design: any, schema: any): string[];
+}
 interface MapWidgetComponentProps {
     /** Schema to use */
     schema: any;
@@ -56,3 +51,4 @@ declare class MapWidgetComponent extends React.Component<MapWidgetComponentProps
     }, HTMLElement>;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
+export {};

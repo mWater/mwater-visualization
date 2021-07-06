@@ -1,13 +1,10 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let DirectDashboardDataSource
 import WidgetFactory from "../widgets/WidgetFactory"
 import DirectWidgetDataSource from "../widgets/DirectWidgetDataSource"
 import LayoutManager from "../layouts/LayoutManager"
 import * as QuickfilterUtils from "../quickfilter/QuickfilterUtils"
 
 // Uses direct DataSource queries
-export default DirectDashboardDataSource = class DirectDashboardDataSource {
+export default class DirectDashboardDataSource {
   // Create dashboard data source that uses direct jsonql calls
   // options:
   //   schema: schema to use

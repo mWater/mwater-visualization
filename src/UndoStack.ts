@@ -1,10 +1,7 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let UndoStack
 import _ from "lodash"
 
 // Immutable undo/redo stack. Mutation operations return a new copy
-export default UndoStack = class UndoStack {
+export default class UndoStack {
   constructor(undoStack: any, redoStack: any) {
     this.undoStack = undoStack || []
     this.redoStack = redoStack || []

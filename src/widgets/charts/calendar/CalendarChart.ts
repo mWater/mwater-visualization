@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let CalendarChart
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
@@ -22,7 +19,7 @@ Design is:
   filter: optional logical expression to filter by
 
 */
-export default CalendarChart = class CalendarChart extends Chart {
+export default class CalendarChart extends Chart {
   cleanDesign(design: any, schema: any) {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })

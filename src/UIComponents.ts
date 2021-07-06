@@ -102,8 +102,12 @@ interface SwitchViewComponentProps {
   viewId: string
 }
 
+interface SwitchViewComponentState {
+  measuring: any
+}
+
 // Switches views smoothly
-export class SwitchViewComponent extends React.Component<SwitchViewComponentProps> {
+export class SwitchViewComponent extends React.Component<SwitchViewComponentProps, SwitchViewComponentState> {
   constructor(props: any) {
     super(props)
     this.state = {
@@ -203,9 +207,13 @@ interface ToggleEditComponentProps {
   onRemove?: any
 }
 
+interface ToggleEditComponentState {
+  open: any
+}
+
 // Shows as editable link that can be clicked to open
 // Editor can be node or can be function that takes onClose function as first parameter
-export class ToggleEditComponent extends React.Component<ToggleEditComponentProps> {
+export class ToggleEditComponent extends React.Component<ToggleEditComponentProps, ToggleEditComponentState> {
   constructor(props: any) {
     super(props)
     this.state = { open: props.initiallyOpen || false }

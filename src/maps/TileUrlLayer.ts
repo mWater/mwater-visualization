@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let TileUrlLayer
 import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
@@ -22,7 +19,7 @@ Design is:
   maxZoom: optional max zoom level
   readonly: if true, hides url and prevents editing
 */
-export default TileUrlLayer = class TileUrlLayer extends Layer {
+export default class TileUrlLayer extends Layer {
   // Gets the type of layer definition ("JsonQLCss"/"TileUrl")
   getLayerDefinitionType() {
     return "TileUrl"

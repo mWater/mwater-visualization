@@ -1,12 +1,9 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let DirectDatagridDataSource
 import DatagridDataSource from "./DatagridDataSource"
 import DatagridQueryBuilder from "./DatagridQueryBuilder"
 import * as QuickfilterUtils from "../quickfilter/QuickfilterUtils"
 
 // Uses direct DataSource queries
-export default DirectDatagridDataSource = class DirectDatagridDataSource {
+export default class DirectDatagridDataSource {
   // Create dashboard data source that uses direct jsonql calls
   // options:
   //   schema: schema to use

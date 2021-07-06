@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let DatagridQueryBuilder
 import _ from "lodash"
 import { ExprCompiler } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
@@ -12,7 +9,7 @@ import { injectTableAlias } from "mwater-expressions"
 // primary key is included as id
 // subtable index is included as subtable. -1 for main table so it sorts first
 // Warning: mwater-server requires this directly!
-export default DatagridQueryBuilder = class DatagridQueryBuilder {
+export default class DatagridQueryBuilder {
   constructor(schema: any) {
     this.schema = schema
   }

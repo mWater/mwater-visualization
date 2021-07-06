@@ -1,5 +1,3 @@
-declare const _default: {
-    new (): {};
-    createWidget(type: any): any;
-};
-export default _default;
+export default class WidgetFactory {
+    static createWidget(type: any): any;
+}

@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let GridLayoutManager
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
@@ -10,7 +7,7 @@ import LayoutManager from "../LayoutManager"
 import LegoLayoutEngine from "./LegoLayoutEngine"
 import AutoSizeComponent from "react-library/lib/AutoSizeComponent"
 
-export default GridLayoutManager = class GridLayoutManager extends LayoutManager {
+export default class GridLayoutManager extends LayoutManager {
   renderPalette(width: any) {
     const PaletteItemComponent = require("./PaletteItemComponent").default
 

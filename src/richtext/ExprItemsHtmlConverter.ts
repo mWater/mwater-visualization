@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let ExprItemsHtmlConverter
 import _ from "lodash"
 import ItemsHtmlConverter from "./ItemsHtmlConverter"
 import { ExprUtils } from "mwater-expressions"
@@ -16,7 +13,7 @@ import { canFormatType } from "../valueFormatter"
 //  string (html text)
 //  { type: "element", tag: "h1", items: [nested items] }
 //  { type: "expr", id: unique id, expr: expression, includeLabel: true to include label, labelText: override label text, format: d3 format if number }
-export default ExprItemsHtmlConverter = class ExprItemsHtmlConverter extends ItemsHtmlConverter {
+export default class ExprItemsHtmlConverter extends ItemsHtmlConverter {
   // designMode is true to display in design mode (exprs as blocks)
   // exprValues is map of expr id to value
   // summarizeExprs shows summaries of expressions, not values

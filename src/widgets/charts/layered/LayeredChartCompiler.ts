@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let LayeredChartCompiler
 import _ from "lodash"
 import { ExprCompiler } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
@@ -62,7 +59,7 @@ const defaultColors = [
 ]
 
 // Compiles various parts of a layered chart (line, bar, scatter, spline, area) to C3.js format
-export default LayeredChartCompiler = class LayeredChartCompiler {
+export default class LayeredChartCompiler {
   // Pass in schema
   constructor(options: any) {
     this.schema = options.schema

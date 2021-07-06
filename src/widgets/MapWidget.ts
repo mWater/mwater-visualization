@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let MapWidget
 import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
@@ -12,7 +9,7 @@ import LayerFactory from "../maps/LayerFactory"
 import * as MapUtils from "../maps/MapUtils"
 
 // Design is the map design specified in maps/Map Design.md
-export default MapWidget = class MapWidget extends Widget {
+export default class MapWidget extends Widget {
   // Creates a React element that is a view of the widget
   // options:
   //  schema: schema to use

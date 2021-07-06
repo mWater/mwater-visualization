@@ -1,10 +1,7 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let LegoLayoutEngine
 import _ from "lodash"
 
 // Layout engine that places blocks like lego and displaces others out of the way
-export default LegoLayoutEngine = class LegoLayoutEngine {
+export default class LegoLayoutEngine {
   constructor(width: any, blocksAcross: any) {
     this.width = width
     this.blocksAcross = blocksAcross

@@ -1,11 +1,9 @@
-declare const _default: {
-    new (undoStack: any, redoStack: any): {
-        push(value: any): any;
-        canUndo(): boolean;
-        canRedo(): boolean;
-        undo(): any;
-        redo(): any;
-        getValue(): unknown;
-    };
-};
-export default _default;
+export default class UndoStack {
+    constructor(undoStack: any, redoStack: any);
+    push(value: any): UndoStack;
+    canUndo(): boolean;
+    canRedo(): boolean;
+    undo(): UndoStack;
+    redo(): UndoStack;
+    getValue(): unknown;
+}

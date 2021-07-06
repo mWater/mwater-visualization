@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let ImplicitFilterBuilder
 import _ from "lodash"
 import { injectTableAlias } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
@@ -9,7 +6,7 @@ import { ExprCompiler } from "mwater-expressions"
 // extends the filters to all filterable tables with a single 1-n relationship.
 // For example, a given community has N water points. If communities are filtered, we want to filter water points as well since there is a
 // clear parent-child relationship (specifically, a single n-1 join between water points and communities)
-export default ImplicitFilterBuilder = class ImplicitFilterBuilder {
+export default class ImplicitFilterBuilder {
   constructor(schema: any) {
     this.schema = schema
   }

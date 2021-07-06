@@ -1,13 +1,10 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let MapBoundsCalculator
 import _ from "lodash"
 import async from "async"
 import LayerFactory from "./LayerFactory"
 import * as MapUtils from "./MapUtils"
 
 // Calculates map bounds given layers by unioning together
-export default MapBoundsCalculator = class MapBoundsCalculator {
+export default class MapBoundsCalculator {
   constructor(schema: any, dataSource: any) {
     this.schema = schema
     this.dataSource = dataSource

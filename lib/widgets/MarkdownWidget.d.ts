@@ -1,15 +1,10 @@
 import React from "react";
+import Widget from "./Widget";
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent";
-declare const _default: {
-    new (): {
-        createViewElement(options: any): React.CElement<any, MarkdownWidgetComponent>;
-        isAutoHeight(): boolean;
-        getData(design: any, schema: any, dataSource: any, filters: any, callback: any): void;
-        getFilterableTables(design: any, schema: any): never[];
-        getTOCEntries(design: any, namedStrings: any): never[];
-    };
-};
-export default _default;
+export default class MarkdownWidget extends Widget {
+    createViewElement(options: any): React.CElement<any, MarkdownWidgetComponent>;
+    isAutoHeight(): boolean;
+}
 interface MarkdownWidgetComponentProps {
     /** See Map Design.md */
     design: any;
@@ -56,3 +51,4 @@ declare class MarkdownWidgetViewComponent extends React.Component<MarkdownWidget
         };
     }, HTMLElement>;
 }
+export {};

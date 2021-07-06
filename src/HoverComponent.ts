@@ -1,10 +1,7 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let HoverComponent
 import React from "react"
 import ReactDOM from "react-dom"
 
-export default HoverComponent = class HoverComponent extends React.Component {
+export default class HoverComponent extends React.Component {
   constructor(props: any) {
     super(props)
     this.state = { hovered: false }

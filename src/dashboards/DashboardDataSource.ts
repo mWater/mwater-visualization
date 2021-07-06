@@ -1,10 +1,4 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-
-// Data source for a dashboard that allows client-server model that supports sharing of dashboards
-let DashboardDataSource
-
-export default DashboardDataSource = class DashboardDataSource {
+export default class DashboardDataSource {
   // Gets the widget data source for a specific widget
   getWidgetDataSource(widgetType: any, widgetId: any) {
     throw new Error("Not implemented")

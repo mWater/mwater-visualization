@@ -1,9 +1,4 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-// Get widget data directly from the dataSource
-let DirectWidgetDataSource
-
-export default DirectWidgetDataSource = class DirectWidgetDataSource {
+export default class DirectWidgetDataSource {
   // options:
   //   widget: widget object
   //   schema: schema to use

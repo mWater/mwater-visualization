@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let MWaterServerLayer
 import $ from "jquery"
 import PropTypes from "prop-types"
 import Layer from "./Layer"
@@ -17,7 +14,7 @@ const R = React.createElement
 // table: table to filter on (e.g. entities.water_point)
 // minZoom: optional minimum zoom
 // maxZoom: optional maximum zoom
-export default MWaterServerLayer = class MWaterServerLayer extends Layer {
+export default class MWaterServerLayer extends Layer {
   // Called when the interactivity grid is clicked.
   // arguments:
   //   ev: { data: interactivty data e.g. `{ id: 123 }` }

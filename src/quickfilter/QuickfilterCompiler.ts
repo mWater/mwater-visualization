@@ -1,13 +1,10 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let QuickfilterCompiler
 import _ from "lodash"
 import { ExprCompiler } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 
 // Compiles quickfilter values into filters.
-export default QuickfilterCompiler = class QuickfilterCompiler {
+export default class QuickfilterCompiler {
   constructor(schema: any) {
     this.schema = schema
   }

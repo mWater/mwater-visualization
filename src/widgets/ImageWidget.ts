@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let ImageWidget
 import React from "react"
 const R = React.createElement
 import _ from "lodash"
@@ -15,7 +12,7 @@ import Widget from "./Widget"
 // caption: string caption
 // rotation: optional rotation in degrees for imageUrl or uid
 // captionPosition: "top"/"bottom". Defaults to "bottom"
-export default ImageWidget = class ImageWidget extends Widget {
+export default class ImageWidget extends Widget {
   // Creates a React element that is a view of the widget
   // options:
   //  schema: schema to use

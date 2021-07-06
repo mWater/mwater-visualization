@@ -1,16 +1,11 @@
 import PropTypes from "prop-types";
 import React from "react";
+import Widget from "./Widget";
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent";
-declare const _default: {
-    new (): {
-        createViewElement(options: any): React.CElement<any, TOCWidgetComponent>;
-        isAutoHeight(): boolean;
-        getData(design: any, schema: any, dataSource: any, filters: any, callback: any): void;
-        getFilterableTables(design: any, schema: any): never[];
-        getTOCEntries(design: any, namedStrings: any): never[];
-    };
-};
-export default _default;
+export default class TOCWidget extends Widget {
+    createViewElement(options: any): React.CElement<any, TOCWidgetComponent>;
+    isAutoHeight(): boolean;
+}
 declare class TOCWidgetComponent extends React.Component {
     static propTypes: {
         design: PropTypes.Validator<object>;
@@ -41,3 +36,4 @@ declare class TOCWidgetComponent extends React.Component {
         onDoubleClick: () => void;
     }, HTMLElement>;
 }
+export {};

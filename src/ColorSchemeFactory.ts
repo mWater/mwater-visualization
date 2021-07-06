@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let ColorSchemeFactory
 import _ from "lodash"
 import * as d3Scale from "d3-scale"
 import * as brewer from "d3-scale-chromatic"
@@ -28,7 +25,7 @@ function generateSequentialSet(set: any, number: any, reversed: any) {
   return _.map(colors, (color) => rgbStringToHex(color))
 }
 
-export default ColorSchemeFactory = class ColorSchemeFactory {
+export default class ColorSchemeFactory {
   // creates a color scheme
   // options:
   //   type: string (type of the color scheme)

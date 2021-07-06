@@ -1,10 +1,4 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-
-// Data source for a datagrid that allows client-server model that supports sharing of datagrids
-let DashboardDataSource
-
-export default DashboardDataSource = class DashboardDataSource {
+export default class DashboardDataSource {
   // Gets the rows specified
   getRows(design: any, offset: any, limit: any, filters: any, callback: any) {
     throw new Error("Not implemented")

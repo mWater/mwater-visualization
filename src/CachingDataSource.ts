@@ -1,12 +1,9 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let CachingDataSource
 import { DataSource } from "mwater-expressions"
 import LRU from "lru-cache"
 
 // Data source that caches requests. Designed to be simple for implementation
 // Pass in option of perform which is function with signature (query, cb) where cb is called with (null, rows) on success
-export default CachingDataSource = class CachingDataSource extends DataSource {
+export default class CachingDataSource extends DataSource {
   constructor(options: any) {
     super()
     this.perform = options.perform

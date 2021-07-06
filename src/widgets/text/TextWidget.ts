@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let TextWidget
 import React from "react"
 const R = React.createElement
 import _ from "lodash"
@@ -11,7 +8,7 @@ import { ExprCleaner } from "mwater-expressions"
 import { injectTableAlias } from "mwater-expressions"
 import Widget from "../Widget"
 
-export default TextWidget = class TextWidget extends Widget {
+export default class TextWidget extends Widget {
   // Creates a React element that is a view of the widget
   // options:
   //  schema: schema to use

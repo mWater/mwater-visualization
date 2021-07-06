@@ -1,10 +1,7 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let CsvBuilder
 import _ from "lodash"
 
 // Builds a csv string from an array of arrays
-export default CsvBuilder = class CsvBuilder {
+export default class CsvBuilder {
   // Table is a 2d array [row][column]
   build(table: any) {
     return this._stringifyCsv(table, this._csvifyValue)

@@ -1,11 +1,8 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let LabeledExprGenerator
 import _ from "lodash"
 import { ExprUtils } from "mwater-expressions"
 
 // Generates labeled expressions (expr, label and joins) for a table. Used to make a datagrid, do export or import.
-export default LabeledExprGenerator = class LabeledExprGenerator {
+export default class LabeledExprGenerator {
   constructor(schema: any) {
     this.schema = schema
   }

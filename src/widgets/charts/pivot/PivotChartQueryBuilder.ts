@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let PivotChartQueryBuilder
 import _ from "lodash"
 import { ExprCompiler } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
@@ -21,7 +18,7 @@ import * as PivotChartUtils from "./PivotChartUtils"
 // Also produces queries needed to order row/column segments when ordered
 // These are indexed by the segment id and contain the values in order (already asc/desc corrected)
 // each row containing only { value: }
-export default PivotChartQueryBuilder = class PivotChartQueryBuilder {
+export default class PivotChartQueryBuilder {
   // Pass in schema
   constructor(options: any) {
     this.schema = options.schema

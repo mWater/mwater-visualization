@@ -1,12 +1,9 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let DashboardUpgrader
 import _ from "lodash"
 import uuid from "uuid"
 import WidgetFactory from "../widgets/WidgetFactory"
 
 // Upgrades old dashboards to new ones (grid -> blocks)
-export default DashboardUpgrader = class DashboardUpgrader {
+export default class DashboardUpgrader {
   upgrade(design: any) {
     // Get list of all items
     const items = _.clone(design.items)

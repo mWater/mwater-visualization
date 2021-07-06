@@ -1,6 +1,4 @@
-declare const _default: {
-    new (schema: any): {
-        generate(table: any, options?: {}): unknown[];
-    };
-};
-export default _default;
+export default class LabeledExprGenerator {
+    constructor(schema: any);
+    generate(table: any, options?: {}): unknown[];
+}

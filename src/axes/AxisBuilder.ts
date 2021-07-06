@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let AxisBuilder
 import _ from "lodash"
 import uuid from "uuid"
 import { ExprCompiler } from "mwater-expressions"
@@ -37,7 +34,7 @@ const xforms = [
 const epsilon = 0.000000001
 
 // Understands axes. Contains methods to clean/validate etc. an axis of any type.
-export default AxisBuilder = class AxisBuilder {
+export default class AxisBuilder {
   // Options are: schema
   constructor(options: any) {
     this.schema = options.schema

@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let TableChart
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
@@ -36,7 +33,7 @@ ordering:
   direction: "asc"/"desc"
 
 */
-export default TableChart = class TableChart extends Chart {
+export default class TableChart extends Chart {
   cleanDesign(design: any, schema: any) {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })

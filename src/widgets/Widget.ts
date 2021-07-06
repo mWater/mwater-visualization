@@ -1,11 +1,4 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-
-// All logic needed to display and design a particular widget
-// Scopes are a feature of widgets that allow a widget to apply filters to another widget. See WidgetScoper for more details
-let Widget
-
-export default Widget = class Widget {
+export default class Widget {
   // Creates a React element that is a view of the widget
   // options:
   //  schema: schema to use

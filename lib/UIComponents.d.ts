@@ -40,7 +40,10 @@ interface SwitchViewComponentProps {
     views: any;
     viewId: string;
 }
-export declare class SwitchViewComponent extends React.Component<SwitchViewComponentProps> {
+interface SwitchViewComponentState {
+    measuring: any;
+}
+export declare class SwitchViewComponent extends React.Component<SwitchViewComponentProps, SwitchViewComponentState> {
     constructor(props: any);
     componentWillReceiveProps(nextProps: any): void;
     refCallback: (id: any, comp: any) => any;
@@ -58,7 +61,10 @@ interface ToggleEditComponentProps {
     editor: any;
     onRemove?: any;
 }
-export declare class ToggleEditComponent extends React.Component<ToggleEditComponentProps> {
+interface ToggleEditComponentState {
+    open: any;
+}
+export declare class ToggleEditComponent extends React.Component<ToggleEditComponentProps, ToggleEditComponentState> {
     constructor(props: any);
     close: () => void;
     open: () => void;

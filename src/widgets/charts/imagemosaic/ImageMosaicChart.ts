@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let ImageMosaicChart
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
@@ -21,7 +18,7 @@ Design is:
   filter: optional logical expression to filter by
 
 */
-export default ImageMosaicChart = class ImageMosaicChart extends Chart {
+export default class ImageMosaicChart extends Chart {
   cleanDesign(design: any, schema: any) {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })

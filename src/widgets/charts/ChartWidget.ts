@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let ChartWidget
 import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
@@ -13,7 +10,7 @@ import ModalWindowComponent from "react-library/lib/ModalWindowComponent"
 import ui from "react-library/lib/bootstrap"
 
 // A widget which is a chart
-export default ChartWidget = class ChartWidget extends Widget {
+export default class ChartWidget extends Widget {
   constructor(chart: any) {
     super()
     this.chart = chart

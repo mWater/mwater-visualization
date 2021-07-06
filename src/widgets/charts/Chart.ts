@@ -1,9 +1,4 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-// Common interface for all charts
-let Chart
-
-export default Chart = class Chart {
+export default class Chart {
   // Removes any invalid values from a design. Returns cleaned design
   cleanDesign(design: any, schema: any) {
     throw new Error("Not implemented")

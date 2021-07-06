@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let WidgetFactory
 import ChartWidget from "./charts/ChartWidget"
 import LayeredChart from "./charts/layered/LayeredChart"
 import TableChart from "./charts/table/TableChart"
@@ -29,7 +26,7 @@ const widgetTypes = {
 }
 
 // Creates widgets based on type
-export default WidgetFactory = class WidgetFactory {
+export default class WidgetFactory {
   static createWidget(type: any) {
     if (widgetTypes[type]) {
       return widgetTypes[type]

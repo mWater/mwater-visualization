@@ -1,11 +1,8 @@
 import React from "react";
+import ExprItemsHtmlConverter from "../../richtext/ExprItemsHtmlConverter";
 declare const _default: {
     new (props: {} | Readonly<{}>): {
-        createItemsHtmlConverter(): {
-            convertSpecialItemToHtml(item: any): string;
-            convertElemToItems(elem: any): any;
-            convertItemsToHtml(items: any): string;
-        };
+        createItemsHtmlConverter(): ExprItemsHtmlConverter;
         handleItemsChange: (items: any) => any;
         handleInsertExpr: (item: any) => any;
         replaceItem(item: any): any;
@@ -43,11 +40,7 @@ declare const _default: {
         UNSAFE_componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
     };
     new (props: {}, context: any): {
-        createItemsHtmlConverter(): {
-            convertSpecialItemToHtml(item: any): string;
-            convertElemToItems(elem: any): any;
-            convertItemsToHtml(items: any): string;
-        };
+        createItemsHtmlConverter(): ExprItemsHtmlConverter;
         handleItemsChange: (items: any) => any;
         handleInsertExpr: (item: any) => any;
         replaceItem(item: any): any;

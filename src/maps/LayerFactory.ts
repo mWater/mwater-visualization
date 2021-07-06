@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let LayerFactory
 import MWaterServerLayer from "./MWaterServerLayer"
 import { default as MarkersLayer } from "./MarkersLayer"
 import { default as BufferLayer } from "./BufferLayer"
@@ -10,7 +7,7 @@ import TileUrlLayer from "./TileUrlLayer"
 import { default as SwitchableTileUrlLayer } from "./SwitchableTileUrlLayer"
 import { default as GridLayer } from "./GridLayer"
 
-export default LayerFactory = class LayerFactory {
+export default class LayerFactory {
   static createLayer(type: any) {
     switch (type) {
       case "MWaterServer":

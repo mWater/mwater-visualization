@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let WidgetScoper
 import _ from "lodash"
 
 // Scopes widgets, applying scope that a widget specifies to itself and the filter to other
@@ -9,7 +6,7 @@ import _ from "lodash"
 //  name: human-readable name for the scope/filter
 //  filter: filter for other widgets in format { table: table id, jsonql: JsonQL with {alias} for the table name to filter by }
 //  data: internal, opaque data that the widget understands. opaque
-export default WidgetScoper = class WidgetScoper {
+export default class WidgetScoper {
   constructor(scopes: any) {
     this.scopes = scopes || {}
   }

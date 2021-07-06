@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let MarkdownWidget
 import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
@@ -10,7 +7,7 @@ import DropdownWidgetComponent from "./DropdownWidgetComponent"
 import Markdown from "markdown-it"
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent"
 
-export default MarkdownWidget = class MarkdownWidget extends Widget {
+export default class MarkdownWidget extends Widget {
   // Creates a React element that is a view of the widget
   // options:
   //  schema: schema to use

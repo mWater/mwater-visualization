@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let LayeredChart
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
@@ -16,7 +13,7 @@ import * as LayeredChartUtils from "./LayeredChartUtils"
 import TextWidget from "../../text/TextWidget"
 
 // See LayeredChart Design.md for the design
-export default LayeredChart = class LayeredChart extends Chart {
+export default class LayeredChart extends Chart {
   cleanDesign(design: any, schema: any) {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })

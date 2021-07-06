@@ -1,12 +1,9 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let IFrameWidget
 import React from "react"
 const R = React.createElement
 import _ from "lodash"
 import Widget from "./Widget"
 
-export default IFrameWidget = class IFrameWidget extends Widget {
+export default class IFrameWidget extends Widget {
   // Creates a React element that is a view of the widget
   // options:
   //  schema: schema to use
