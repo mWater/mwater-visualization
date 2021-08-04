@@ -121,7 +121,7 @@ class ChartWidgetComponent extends React.PureComponent<ChartWidgetComponentProps
     // Get the data
     return this.props.widgetDataSource.getData(this.props.design, this.props.filters, (err: any, data: any) => {
       if (err) {
-        return alert("Failed to get data")
+        return alert("Failed to get data: " + err.message)
       }
 
       // Create data table

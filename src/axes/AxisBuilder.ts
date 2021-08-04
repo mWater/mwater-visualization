@@ -10,6 +10,7 @@ import React from "react"
 const R = React.createElement
 import { default as produce } from "immer"
 import { formatValue } from "../valueFormatter"
+import { Axis } from "./Axis"
 
 const xforms = [
   { type: "bin", input: "number", output: "enum" },
@@ -879,7 +880,7 @@ export default class AxisBuilder {
   // TODO add xform support
 
   // Get a string (or React DOM actually) representation of an axis value
-  formatValue(axis: any, value: any, locale: any, legacyPercentFormat: any) {
+  formatValue(axis: Axis, value: any, locale: string, legacyPercentFormat?: any) {
     if (value == null) {
       return axis?.nullLabel || "None"
     }

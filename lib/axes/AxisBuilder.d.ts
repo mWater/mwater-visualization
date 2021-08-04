@@ -1,3 +1,4 @@
+import { Axis } from "./Axis";
 export default class AxisBuilder {
     constructor(options: any);
     cleanAxis(options: any): any;
@@ -72,7 +73,7 @@ export default class AxisBuilder {
     doesAxisSupportCumulative(axis: any): boolean;
     formatCategory(axis: any, category: any): any;
     summarizeAxis(axis: any, locale: any): any;
-    formatValue(axis: any, value: any, locale: any, legacyPercentFormat: any): any;
+    formatValue(axis: Axis, value: any, locale: string, legacyPercentFormat?: any): any;
     createValueFilter(axis: any, value: any): {
         type: string;
         op: string;

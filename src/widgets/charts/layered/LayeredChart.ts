@@ -6,11 +6,12 @@ import { default as produce } from "immer"
 import { original } from "immer"
 import Chart from "../Chart"
 import LayeredChartCompiler from "./LayeredChartCompiler"
-import { ExprCleaner } from "mwater-expressions"
+import { DataSource, ExprCleaner, Schema } from "mwater-expressions"
 import AxisBuilder from "../../../axes/AxisBuilder"
 import LayeredChartSvgFileSaver from "./LayeredChartSvgFileSaver"
 import * as LayeredChartUtils from "./LayeredChartUtils"
 import TextWidget from "../../text/TextWidget"
+import { LayeredChartDesign } from "./LayeredChartDesign"
 
 // See LayeredChart Design.md for the design
 export default class LayeredChart extends Chart {
@@ -274,19 +275,21 @@ export default class LayeredChart extends Chart {
     ]
   }
 
-  createDataTable(design: any, schema: any, dataSource: any, data: any, locale: any) {
-    let table
+  createDataTable(design: LayeredChartDesign, schema: Schema, dataSource: DataSource, data: any, locale: string) {
+    let table: any[][] = []
     const axisBuilder = new AxisBuilder({ schema })
 
-    // Export only first layer
     const headers = []
 
-    // for layer, data of
-    let xAdded = false
-    for (let layer of design.layers) {
-      if (layer.axes.x && !xAdded) {
+    // Only allow if either all layers have x axis or one layer
+    if (!design.layers.every(layer => layer.axes.x != null) && design.layers.length > 1) {
+      throw new Error("Cannot export multi-layer charts without x axis")
+    }
+
+    for (let layerNum = 0 ; layerNum < design.layers.length ; layerNum++) {
+      const layer = design.layers[layerNum]
+      if (layer.axes.x && layerNum == 0) {
         headers.push(axisBuilder.summarizeAxis(layer.axes.x, locale))
-        xAdded = true
       }
       if (layer.axes.color) {
         headers.push(axisBuilder.summarizeAxis(layer.axes.color, locale))
@@ -294,55 +297,50 @@ export default class LayeredChart extends Chart {
       if (layer.axes.y) {
         headers.push(axisBuilder.summarizeAxis(layer.axes.y, locale))
       }
-      table = [headers]
     }
+    table.push(headers)
 
-    let k = 0
-    for (let row of data.layer0) {
+    for (let rowNum = 0 ; rowNum < data.layer0.length; rowNum++) {
       const r = []
-      xAdded = false
-      for (let j = 0, end = design.layers.length - 1, asc = 0 <= end; asc ? j <= end : j >= end; asc ? j++ : j--) {
-        const _row = data[`layer${j}`][k]
-        if (design.layers[j].axes.x && !xAdded) {
-          r.push(axisBuilder.formatValue(design.layers[j].axes.x, _row.x, locale))
-          xAdded = true
+
+      for (let layerNum = 0 ; layerNum < design.layers.length ; layerNum++) {
+        const layer = design.layers[layerNum]
+
+        let layerRow
+        if (layerNum == 0) {
+          // If first layer, use the row
+          layerRow = data[`layer${layerNum}`][rowNum]
         }
-        if (design.layers[j].axes.color) {
-          r.push(axisBuilder.formatValue(design.layers[j].axes.color, _row.color, locale))
+        else {
+          // Find the row with the same x value
+          layerRow = _.find(data[`layer${layerNum}`], (r: any) => r.x == data["layer0"][rowNum].x)
         }
-        if (design.layers[j].axes.y) {
-          r.push(axisBuilder.formatValue(design.layers[j].axes.y, _row.y, locale))
+
+        if (layer.axes.x && layerNum == 0) {
+          r.push(axisBuilder.formatValue(layer.axes.x, layerRow.x, locale))
+        }
+        if (layer.axes.color) {
+          if (layerRow) {
+            r.push(axisBuilder.formatValue(layer.axes.color, layerRow.color, locale))
+          }
+          else {
+            r.push(null)
+          }
+        }
+        if (layer.axes.y) {
+          if (layerRow) {
+            r.push(axisBuilder.formatValue(layer.axes.y, layerRow.y, locale))
+          }
+          else {
+            r.push(null)
+          }
         }
       }
-
-      k++
+    
       table.push(r)
     }
-
-    // k = 0
-    // for layer, layerData of data
-    //   xAdded = false
-    //   r = []
-    //   for row in layerData
-    //     if design.layers[k].axes.x and not xAdded
-    //       r.push(axisBuilder.formatValue(design.layers[k].axes.x, row.x, locale))
-    //       xAdded = true
-    //     if design.layers[k].axes.color
-    //       r.push(axisBuilder.formatValue(design.layers[k].axes.color, row.color, locale))
-    //     if design.layers[k].axes.y
-    //       r.push(axisBuilder.formatValue(design.layers[k].axes.y, row.y, locale))
-
-    //   table.push(r)
-    //   k++
-    return table
+    return table   
   }
-  //   if data.length > 0
-  //   fields = Object.getOwnPropertyNames(data[0])
-  //   table = [fields] # header
-  //   renderRow = (record) ->
-  //      _.map(fields, (field) -> record[field])
-  //   table.concat(_.map(data, renderRow))
-  // else []
 
   // Get a list of table ids that can be filtered on
   getFilterableTables(design: any, schema: any) {
