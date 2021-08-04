@@ -221,62 +221,47 @@ module.exports = class LayeredChart extends Chart
   createDataTable: (design, schema, dataSource, data, locale) ->
     axisBuilder = new AxisBuilder(schema: schema)
 
-    # Export only first layer
+    # Only allow if either all layers have x axis or one layer
+    if not design.layers.every((layer) => layer.axes.x?) and design.layers.length > 1
+      throw new Error("Cannot export multi-layer charts without x axis")
+
     headers = []
 
-    # for layer, data of 
-    xAdded = false
-    for layer in design.layers
-      if layer.axes.x and not xAdded
+    for layer, i in design.layers
+      if layer.axes.x and i == 0
         headers.push(axisBuilder.summarizeAxis(layer.axes.x, locale))
-        xAdded = true
       if layer.axes.color
         headers.push(axisBuilder.summarizeAxis(layer.axes.color, locale))
       if layer.axes.y
         headers.push(axisBuilder.summarizeAxis(layer.axes.y, locale))
       table = [headers]
 
-    k = 0
-    for row in data.layer0
+    for row, rowNum in data.layer0
       r = []
-      xAdded = false
-      for j in [0..design.layers.length-1]
-        _row = data["layer#{j}"][k]
-        if design.layers[j].axes.x and not xAdded
-          r.push(axisBuilder.formatValue(design.layers[j].axes.x, _row.x, locale))
-          xAdded = true
-        if design.layers[j].axes.color
-          r.push(axisBuilder.formatValue(design.layers[j].axes.color, _row.color, locale))
-        if design.layers[j].axes.y
-          r.push(axisBuilder.formatValue(design.layers[j].axes.y, _row.y, locale))
+
+      for layer, layerNum in design.layers
+        if layerNum == 0 
+          # If first layer, use the row
+          layerRow = data["layer#{layerNum}"][rowNum]
+        else
+          # Find the row with the same x value
+          layerRow = _.find(data["layer#{layerNum}"], (r) => r.x == data["layer0"][rowNum].x)
+
+        if layer.axes.x and layerNum == 0
+          r.push(axisBuilder.formatValue(layer.axes.x, layerRow.x, locale))
+        if layer.axes.color
+          if layerRow
+            r.push(axisBuilder.formatValue(layer.axes.color, layerRow.color, locale))
+          else
+            r.push(null)
+        if layer.axes.y
+          if layerRow
+            r.push(axisBuilder.formatValue(layer.axes.y, layerRow.y, locale))
+          else
+            r.push(null)
       
-      k++
       table.push(r)
-
-    # k = 0
-    # for layer, layerData of data
-    #   xAdded = false
-    #   r = []
-    #   for row in layerData
-    #     if design.layers[k].axes.x and not xAdded
-    #       r.push(axisBuilder.formatValue(design.layers[k].axes.x, row.x, locale))
-    #       xAdded = true
-    #     if design.layers[k].axes.color
-    #       r.push(axisBuilder.formatValue(design.layers[k].axes.color, row.color, locale))
-    #     if design.layers[k].axes.y
-    #       r.push(axisBuilder.formatValue(design.layers[k].axes.y, row.y, locale))
-        
-    #   table.push(r)
-    #   k++
     return table
-  #   if data.length > 0
-  #   fields = Object.getOwnPropertyNames(data[0])
-  #   table = [fields] # header
-  #   renderRow = (record) ->
-  #      _.map(fields, (field) -> record[field])
-  #   table.concat(_.map(data, renderRow))
-  # else []
-
 
   # Get a list of table ids that can be filtered on
   getFilterableTables: (design, schema) ->

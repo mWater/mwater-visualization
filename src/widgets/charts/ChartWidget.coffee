@@ -107,7 +107,7 @@ class ChartWidgetComponent extends React.PureComponent
     # Get the data
     @props.widgetDataSource.getData(@props.design, @props.filters, (err, data) =>
       if err  
-        return alert("Failed to get data")
+        return alert("Failed to get data: " + err.message)
 
       # Create data table
       table = @props.chart.createDataTable(@props.design, @props.schema, @props.dataSource, data, @context.locale)
