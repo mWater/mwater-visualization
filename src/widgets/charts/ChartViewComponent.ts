@@ -1,6 +1,5 @@
 import _ from "lodash"
-import PropTypes from "prop-types"
-import React from "react"
+import React, { CSSProperties } from "react"
 const R = React.createElement
 import asyncLatest from "async-latest"
 
@@ -27,11 +26,11 @@ interface ChartViewComponentProps {
 }
 
 interface ChartViewComponentState {
-  cacheExpiry: any
-  dataLoading: any
-  validDesign: any
-  dataError: any
-  data: any
+  cacheExpiry?: any
+  dataLoading?: any
+  validDesign?: any
+  dataError?: any
+  data?: any
 }
 
 // Inner view part of the chart widget. Uses a query data loading component
@@ -56,7 +55,7 @@ export default class ChartViewComponent extends React.Component<ChartViewCompone
   }
 
   componentDidMount() {
-    return this.updateData(this.props)
+    this.updateData(this.props)
   }
 
   componentWillReceiveProps(nextProps: any) {
@@ -68,7 +67,7 @@ export default class ChartViewComponent extends React.Component<ChartViewCompone
       // Save new cache expiry
       this.setState({ cacheExpiry: nextProps.dataSource.getCacheExpiry() })
 
-      return this.updateData(nextProps)
+      this.updateData(nextProps)
     }
   }
 
@@ -85,14 +84,14 @@ export default class ChartViewComponent extends React.Component<ChartViewCompone
     // Loading data
     this.setState({ dataLoading: true })
 
-    return this.loadData(props, (error: any, data: any) => {
-      return this.setState({ dataLoading: false, dataError: error, data, validDesign: design })
+    this.loadData(props, (error: any, data: any) => {
+      this.setState({ dataLoading: false, dataError: error, data, validDesign: design })
     })
   }
 
   loadData(props: any, callback: any) {
     // Get data from widget data source
-    return props.widgetDataSource.getData(props.design, props.filters, callback)
+    props.widgetDataSource.getData(props.design, props.filters, callback)
   }
 
   renderSpinner() {
@@ -104,7 +103,7 @@ export default class ChartViewComponent extends React.Component<ChartViewCompone
   }
 
   render() {
-    const style = { width: this.props.width, height: this.props.height }
+    const style: CSSProperties = { width: this.props.width, height: this.props.height }
 
     // Faded if loading
     if (this.state.dataLoading) {
