@@ -81,10 +81,14 @@ export default class ChartViewComponent extends React.Component<ChartViewCompone
       return
     }
 
-    // Loading data
-    this.setState({ dataLoading: true })
+    // Set loading data after interval to prevent unnecessary refresh
+    const dataLoadingTimeout = setTimeout(() => {
+      this.setState({ dataLoading: true })
+    }, 100)
 
     this.loadData(props, (error: any, data: any) => {
+      // Prevent setting data loading if ready
+      clearTimeout(dataLoadingTimeout)
       this.setState({ dataLoading: false, dataError: error, data, validDesign: design })
     })
   }

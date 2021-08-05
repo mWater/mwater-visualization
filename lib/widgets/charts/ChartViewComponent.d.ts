@@ -21,18 +21,18 @@ interface ChartViewComponentProps {
     onRowClick?: any;
 }
 interface ChartViewComponentState {
-    cacheExpiry: any;
-    dataLoading: any;
-    validDesign: any;
-    dataError: any;
-    data: any;
+    cacheExpiry?: any;
+    dataLoading?: any;
+    validDesign?: any;
+    dataError?: any;
+    data?: any;
 }
 export default class ChartViewComponent extends React.Component<ChartViewComponentProps, ChartViewComponentState> {
     constructor(props: any);
-    componentDidMount(): any;
-    componentWillReceiveProps(nextProps: any): any;
-    updateData(props: any): any;
-    loadData(props: any, callback: any): any;
+    componentDidMount(): void;
+    componentWillReceiveProps(nextProps: any): void;
+    updateData(props: any): void;
+    loadData(props: any, callback: any): void;
     renderSpinner(): React.DetailedReactHTMLElement<{
         style: {
             position: "absolute";
@@ -46,10 +46,7 @@ export default class ChartViewComponent extends React.Component<ChartViewCompone
     render(): React.DetailedReactHTMLElement<{
         className: string;
     }, HTMLElement> | React.DetailedReactHTMLElement<{
-        style: {
-            width: number | undefined;
-            height: number | undefined;
-        };
+        style: React.CSSProperties;
     }, HTMLElement>;
 }
 export {};
