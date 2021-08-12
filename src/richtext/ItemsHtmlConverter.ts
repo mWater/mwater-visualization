@@ -16,7 +16,7 @@ export default class ItemsHtmlConverter {
         return item.length === 0
       }
       if (_.isObject(item) && item.type === "element") {
-        return this.isBlank(item.items)
+        return ItemsHtmlConverter.isBlank(item.items)
       }
       return false
     })
