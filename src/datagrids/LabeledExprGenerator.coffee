@@ -77,7 +77,7 @@ module.exports = class LabeledExprGenerator
         if options.useJoinIds
           return [
             {
-              expr: { type: "scalar", table: table, joins: [column.id], expr: { type: "id", table: column.join.toTable } }
+              expr: { type: "scalar", table: table, joins: [column.id], expr: { type: "id", table: column.idTable } }
               label: createLabel(column)
               joins: joins
             }
