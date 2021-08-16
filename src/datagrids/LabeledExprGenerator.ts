@@ -1,26 +1,57 @@
 import _ from "lodash"
-import { ExprUtils } from "mwater-expressions"
+import { Column, Expr, ExprUtils, LocalizedString, Schema } from "mwater-expressions"
 
-// Generates labeled expressions (expr, label and joins) for a table. Used to make a datagrid, do export or import.
+/** Expression with a label attached */
+export interface LabeledExpr {
+  expr: Expr
+  label: string
+  /** Which joins from the originating table to get to expression */
+  joins: string[]
+}
+
+export interface LabeledExprGeneratorOptions {
+  /** e.g. "en". Uses _base by default, then en [null] */
+  locale?: string
+
+  /** "text", "code" or "both" ["code"] */
+  headerFormat?: "text" | "code" | "both"
+
+  /** "name" or "code" ["name"] */
+  enumFormat?: "name" | "code"
+
+  /** split geometry into lat/lng [false] */
+  splitLatLng?: boolean
+
+  /** split enumset into true/false expressions [false] */
+  splitEnumset?: boolean
+
+  /** use ids of n-1 joins, not the code/name/etc [false] */
+  useJoinIds?: boolean
+
+  /** optional boolean predicate to filter columns included. Called with table id, column object */
+  columnFilter?: (tableId: string, column: Column) => boolean
+
+  /** optional boolean predicate to filter 1-n/n-n joins to include. Called with table id, join column object. Default is to not include those joins */
+  multipleJoinCondition?: (tableId: string, column: Column) => boolean
+
+  /** optional boolean to replace redacted columns with unredacted ones */
+  useConfidential?: boolean
+
+  /** number duplicate label columns with " (1)", " (2)" , etc. */
+  numberDuplicatesLabels?: boolean
+}
+
+/** Generates labeled expressions (expr, label and joins) for a table. Used to make a datagrid, do export or import. */
 export default class LabeledExprGenerator {
-  constructor(schema: any) {
+  schema: Schema
+
+  constructor(schema: Schema) {
     this.schema = schema
   }
 
   // Generate labeled exprs, an array of ({ expr: mwater expression, label: plain string, joins: array of join column ids to get to current table. Usually []. Only present for 1-n joins })
   // table is id of table to generate from
-  // options are: [default]
-  //  locale: e.g. "en". Uses _base by default, then en [null]
-  //  headerFormat: "text", "code" or "both" ["code"]
-  //  enumFormat: "name" or "code" ["name"]
-  //  splitLatLng: split geometry into lat/lng [false]
-  //  splitEnumset: split enumset into true/false expressions [false]
-  //  useJoinIds: use ids of n-1 joins, not the code/name/etc [false]
-  //  columnFilter: optional boolean predicate to filter columns included. Called with table id, column object
-  //  multipleJoinCondition: optional boolean predicate to filter 1-n/n-n joins to include. Called with table id, join column object. Default is to not include those joins
-  //  useConfidential: optional boolean to replace redacted columns with unredacted ones
-  //  numberDuplicatesLabels: number duplicate label columns with " (1)", " (2)" , etc.
-  generate(table: any, options = {}) {
+  generate(table: string, options: LabeledExprGeneratorOptions = {}): LabeledExpr[] {
     _.defaults(options, {
       locale: null,
       headerFormat: "code",
@@ -35,7 +66,7 @@ export default class LabeledExprGenerator {
     })
 
     // Create a label for a column
-    function createLabel(column: any, suffix: any) {
+    function createLabel(column: Column, suffix?: LocalizedString | string) {
       // By header mode
       let label
       if (options.headerFormat === "code" && column.code) {
@@ -64,7 +95,7 @@ export default class LabeledExprGenerator {
     }
 
     // Convert a table + schema column into multiple labeled expres
-    var convertColumn = (table: any, column: any, joins: any) => {
+    var convertColumn = (table: string, column: Column, joins: string[]) => {
       // Filter if present
       let joinColumn
       if (options.columnFilter && !options.columnFilter(table, column)) {
@@ -91,17 +122,17 @@ export default class LabeledExprGenerator {
         if (options.useJoinIds) {
           return [
             {
-              expr: { type: "scalar", table, joins: [column.id], expr: { type: "id", table: column.join.toTable } },
+              expr: { type: "scalar", table, joins: [column.id], expr: { type: "id", table: column.idTable } },
               label: createLabel(column),
               joins
             }
           ]
         } else {
           // use code, full name, or name of dest table
-          joinColumn = this.schema.getColumn(column.idTable, "code")
-          joinColumn = joinColumn || this.schema.getColumn(column.idTable, "full_name")
-          joinColumn = joinColumn || this.schema.getColumn(column.idTable, "name")
-          joinColumn = joinColumn || this.schema.getColumn(column.idTable, "username")
+          joinColumn = this.schema.getColumn(column.idTable!, "code")
+          joinColumn = joinColumn || this.schema.getColumn(column.idTable!, "full_name")
+          joinColumn = joinColumn || this.schema.getColumn(column.idTable!, "name")
+          joinColumn = joinColumn || this.schema.getColumn(column.idTable!, "username")
           if (joinColumn) {
             return [
               {
@@ -123,27 +154,27 @@ export default class LabeledExprGenerator {
 
       if (column.type === "join") {
         // If n-1, 1-1 join, create scalar
-        if (["n-1", "1-1"].includes(column.join.type)) {
+        if (["n-1", "1-1"].includes(column.join!.type)) {
           // Use id if that option is enabled
           if (options.useJoinIds) {
             return [
               {
-                expr: { type: "scalar", table, joins: [column.id], expr: { type: "id", table: column.join.toTable } },
+                expr: { type: "scalar", table, joins: [column.id], expr: { type: "id", table: column.join!.toTable } },
                 label: createLabel(column),
                 joins
               }
             ]
             // add cascading ref question
-          } else if (column.join.type === "n-1" && column.join.toTable.match(/^custom./)) {
+          } else if (column.join!.type === "n-1" && column.join!.toTable.match(/^custom./)) {
             return this.schema
-              .getColumns(column.join.toTable)
+              .getColumns(column.join!.toTable)
               .filter((c: any) => c.id[0] === "c")
               .map((c: any) => ({
                 expr: {
                   type: "scalar",
                   table,
                   joins: [column.id],
-                  expr: { type: "field", table: column.join.toTable, column: c.id }
+                  expr: { type: "field", table: column.join!.toTable, column: c.id }
                 },
 
                 label: `${createLabel(column)} > ${createLabel(c)}`,
@@ -151,10 +182,10 @@ export default class LabeledExprGenerator {
               }))
           } else {
             // use code, full name, or name of dest table
-            joinColumn = this.schema.getColumn(column.join.toTable, "code")
-            joinColumn = joinColumn || this.schema.getColumn(column.join.toTable, "full_name")
-            joinColumn = joinColumn || this.schema.getColumn(column.join.toTable, "name")
-            joinColumn = joinColumn || this.schema.getColumn(column.join.toTable, "username")
+            joinColumn = this.schema.getColumn(column.join!.toTable, "code")
+            joinColumn = joinColumn || this.schema.getColumn(column.join!.toTable, "full_name")
+            joinColumn = joinColumn || this.schema.getColumn(column.join!.toTable, "name")
+            joinColumn = joinColumn || this.schema.getColumn(column.join!.toTable, "username")
             if (joinColumn) {
               return [
                 {
@@ -162,7 +193,7 @@ export default class LabeledExprGenerator {
                     type: "scalar",
                     table,
                     joins: [column.id],
-                    expr: { type: "field", table: column.join.toTable, column: joinColumn.id }
+                    expr: { type: "field", table: column.join!.toTable, column: joinColumn.id }
                   },
                   label: createLabel(column),
                   joins
@@ -176,14 +207,14 @@ export default class LabeledExprGenerator {
 
         // If 1-n/n-1, convert each child
         if (
-          ["1-n", "n-n"].includes(column.join.type) &&
+          ["1-n", "n-n"].includes(column.join!.type) &&
           options.multipleJoinCondition &&
           options.multipleJoinCondition(table, column)
         ) {
           let childExprs: any = []
 
-          for (let childColumn of this.schema.getColumns(column.join.toTable)) {
-            childExprs = childExprs.concat(convertColumn(column.join.toTable, childColumn, joins.concat([column.id])))
+          for (let childColumn of this.schema.getColumns(column.join!.toTable)) {
+            childExprs = childExprs.concat(convertColumn(column.join!.toTable, childColumn, joins.concat([column.id])))
           }
 
           return childExprs
@@ -204,7 +235,7 @@ export default class LabeledExprGenerator {
         ]
       } else if (column.type === "enumset" && options.splitEnumset) {
         // Split into one for each enumset value
-        return _.map(column.enumValues, (ev) => {
+        return _.map(column.enumValues!, (ev) => {
           return {
             expr: {
               table,
@@ -215,7 +246,7 @@ export default class LabeledExprGenerator {
                 { type: "literal", valueType: "enumset", value: [ev.id] }
               ]
             },
-            label: createLabel(column, options.enumFormat === "text" ? ev.name : ev.code || ev.name),
+            label: createLabel(column, options.enumFormat === "name" ? ev.name : ev.code || ev.name),
             joins
           }
         })
@@ -226,7 +257,7 @@ export default class LabeledExprGenerator {
     }
 
     // For each column in form
-    let labeledExprs: any = []
+    let labeledExprs: LabeledExpr[] = []
     for (let column of this.schema.getColumns(table)) {
       // Convert column into labels and exprs
       labeledExprs = labeledExprs.concat(convertColumn(table, column, []))
