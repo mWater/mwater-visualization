@@ -3,7 +3,7 @@ import _ from "lodash"
 import React from "react"
 const R = React.createElement
 
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 import update from "react-library/lib/update"
 import { default as Rcslider } from "rc-slider"
 import AxisComponent from "../../../axes/AxisComponent"

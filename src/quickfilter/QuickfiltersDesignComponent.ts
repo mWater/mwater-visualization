@@ -6,7 +6,7 @@ import update from "update-object"
 import TableSelectComponent from "../TableSelectComponent"
 import { ExprComponent } from "mwater-expressions-ui"
 import { ExprUtils } from "mwater-expressions"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 
 interface QuickfiltersDesignComponentProps {
   /** Design of quickfilters. See README.md */

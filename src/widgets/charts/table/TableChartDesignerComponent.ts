@@ -11,7 +11,7 @@ import { FilterExprComponent } from "mwater-expressions-ui"
 import OrderingsComponent from "./OrderingsComponent"
 import TableSelectComponent from "../../../TableSelectComponent"
 import ReorderableListComponent from "react-library/lib/reorderable/ReorderableListComponent"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 import { getFormatOptions } from "../../../valueFormatter"
 import { getDefaultFormat } from "../../../valueFormatter"
 

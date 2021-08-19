@@ -3,7 +3,7 @@ import React from "react"
 const R = React.createElement
 import _ from "lodash"
 import classNames from "classnames"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 import uuid from "uuid"
 import Dropzone from "react-dropzone"
 import AsyncLoadComponent from "react-library/lib/AsyncLoadComponent"

@@ -6,7 +6,7 @@ const R = React.createElement
 import { ExprUtils } from "mwater-expressions"
 import RegionSelectComponent from "./RegionSelectComponent"
 import DetailLevelSelectComponent from "./DetailLevelSelectComponent"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 
 interface ScopeAndDetailLevelComponentProps {
   /** Schema to use */

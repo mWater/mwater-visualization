@@ -3,7 +3,7 @@ import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import uuid from "uuid"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 import { FilterExprComponent } from "mwater-expressions-ui"
 import TableSelectComponent from "../../../TableSelectComponent"
 import AxisComponent from "../../../axes/AxisComponent"

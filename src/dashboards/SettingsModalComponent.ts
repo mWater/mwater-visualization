@@ -4,7 +4,7 @@ import React from "react"
 const R = React.createElement
 import update from "update-object"
 import languages from "languages"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 import { default as ReactSelect } from "react-select"
 import * as DashboardUtils from "./DashboardUtils"
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent"

@@ -12,7 +12,7 @@ import GridLayerDesign from "./GridLayerDesign"
 import { JsonQLFilter } from "../index"
 import EditPopupComponent from "./EditPopupComponent"
 import ZoomLevelsComponent from "./ZoomLevelsComponent"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 import { Axis } from "../axes/Axis"
 import PopoverHelpComponent from "react-library/lib/PopoverHelpComponent"
 

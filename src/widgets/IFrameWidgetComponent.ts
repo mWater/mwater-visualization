@@ -2,7 +2,7 @@ import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import _ from "lodash"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 import DropdownWidgetComponent from "./DropdownWidgetComponent"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 

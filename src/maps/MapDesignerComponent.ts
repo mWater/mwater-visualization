@@ -13,7 +13,7 @@ import BaseLayerDesignerComponent from "./BaseLayerDesignerComponent"
 import PopoverHelpComponent from "react-library/lib/PopoverHelpComponent"
 import * as MapUtils from "./MapUtils"
 import { ExprCompiler } from "mwater-expressions"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 
 interface MapDesignerComponentProps {
   /** Schema to use */

@@ -15,7 +15,7 @@ import LabeledExprGenerator from "./LabeledExprGenerator"
 import TableSelectComponent from "../TableSelectComponent"
 import uuid from "uuid"
 import update from "update-object"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 import { getFormatOptions } from "../valueFormatter"
 import { getDefaultFormat } from "../valueFormatter"
 

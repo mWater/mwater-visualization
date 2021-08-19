@@ -7,7 +7,7 @@ import CsvBuilder from "./../../CsvBuilder"
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent"
 import ChartViewComponent from "./ChartViewComponent"
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 
 // A widget which is a chart
 export default class ChartWidget extends Widget {

@@ -5,7 +5,7 @@ const R = React.createElement
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent"
 import { default as Rcslider } from "rc-slider"
 import LayerFactory from "./LayerFactory"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 import PopoverHelpComponent from "react-library/lib/PopoverHelpComponent"
 
 interface MapLayerViewDesignerComponentProps {

@@ -12,7 +12,7 @@ import EditPopupComponent from "./EditPopupComponent"
 import ZoomLevelsComponent from "./ZoomLevelsComponent"
 import MarkerSymbolSelectComponent from "./MarkerSymbolSelectComponent"
 import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 
 interface MarkersLayerDesignerComponentProps {
   /** Schema to use */

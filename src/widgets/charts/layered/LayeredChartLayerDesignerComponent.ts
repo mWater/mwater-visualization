@@ -12,7 +12,7 @@ import * as LayeredChartUtils from "./LayeredChartUtils"
 import LayeredChartCompiler from "./LayeredChartCompiler"
 import * as uiComponents from "../../../UIComponents"
 import TableSelectComponent from "../../../TableSelectComponent"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 
 interface LayeredChartLayerDesignerComponentProps {
   design: any

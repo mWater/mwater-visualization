@@ -13,7 +13,7 @@ import ChoroplethLayerDesign from "./ChoroplethLayerDesign"
 import { JsonQLFilter } from "../index"
 import EditPopupComponent from "./EditPopupComponent"
 import ZoomLevelsComponent from "./ZoomLevelsComponent"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 import { Axis } from "../axes/Axis"
 
 import AdminScopeAndDetailLevelComponent from "./AdminScopeAndDetailLevelComponent"

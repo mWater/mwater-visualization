@@ -4,7 +4,7 @@ import React from "react"
 const R = React.createElement
 
 import querystring from "querystring"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 import { IdLiteralComponent } from "mwater-expressions-ui"
 
 interface MWaterGlobalFiltersComponentProps {

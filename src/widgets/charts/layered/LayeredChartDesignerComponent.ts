@@ -7,7 +7,7 @@ import LayeredChartCompiler from "./LayeredChartCompiler"
 import TabbedComponent from "react-library/lib/TabbedComponent"
 import * as uiComponents from "../../../UIComponents"
 import ColorComponent from "../../../ColorComponent"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 
 export default class LayeredChartDesignerComponent extends React.Component {
   static propTypes = {

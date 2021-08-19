@@ -1,5 +1,5 @@
 import React from "react";
-import ui from "react-library/lib/bootstrap";
+import * as ui from "react-library/lib/bootstrap";
 interface PivotChartDesignerComponentProps {
     design: any;
     schema: any;
