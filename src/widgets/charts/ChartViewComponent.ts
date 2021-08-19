@@ -1,28 +1,40 @@
 import _ from "lodash"
+import { DataSource, Schema } from "mwater-expressions"
 import React, { CSSProperties } from "react"
+import { JsonQLFilter } from "../../JsonQLFilter"
+import { WidgetScope } from "../../WidgetScope"
+import { WidgetDataSource } from "../WidgetDataSource"
+import Chart from "./Chart"
 const R = React.createElement
-import asyncLatest from "async-latest"
 
 interface ChartViewComponentProps {
   /** Chart object to use */
-  chart: any
+  chart: Chart
+
   /** Design of chart */
   design: any
+
   /** When design change */
-  onDesignChange?: any
-  schema: any
+  onDesignChange?: (design: any) => void
+
+  schema: Schema
   /** Data source to use for chart */
-  dataSource: any
-  widgetDataSource: any
+  dataSource: DataSource
+
+  widgetDataSource: WidgetDataSource
   width?: number
   height?: number
+
   /** scope of the widget (when the widget self-selects a particular scope) */
-  scope?: any
+  scope?: WidgetScope
+
   /** array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias }. Use injectAlias to correct */
-  filters?: any
+  filters?: JsonQLFilter[]
+
   /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
-  onScopeChange?: any
-  onRowClick?: any
+  onScopeChange?: (scope: WidgetScope) => void
+
+  onRowClick?: (tableId: string, rowId: any) => void
 }
 
 interface ChartViewComponentState {
@@ -33,11 +45,12 @@ interface ChartViewComponentState {
   data?: any
 }
 
-// Inner view part of the chart widget. Uses a query data loading component
-// to handle loading and continues to display old data if design becomes
-// invalid
+/** Inner view part of the chart widget. Uses a query data loading component
+ * to handle loading and continues to display old data if design becomes
+ * invalid
+ */
 export default class ChartViewComponent extends React.Component<ChartViewComponentProps, ChartViewComponentState> {
-  constructor(props: any) {
+  constructor(props: ChartViewComponentProps) {
     super(props)
 
     this.state = {
@@ -48,35 +61,32 @@ export default class ChartViewComponent extends React.Component<ChartViewCompone
       cacheExpiry: props.dataSource.getCacheExpiry() // Save cache expiry to see if changes
     }
 
-    // Ensure that only one load at a time
-    this.loadData = asyncLatest(this.loadData, { serial: true })
-
     this.state = {}
   }
 
   componentDidMount() {
-    this.updateData(this.props)
+    this.updateData()
   }
 
-  componentWillReceiveProps(nextProps: any) {
+  componentDidUpdate(prevProps: ChartViewComponentProps) {
     if (
-      !_.isEqual(nextProps.design, this.props.design) ||
-      !_.isEqual(nextProps.filters, this.props.filters) ||
-      nextProps.dataSource.getCacheExpiry() !== this.state.cacheExpiry
+      !_.isEqual(prevProps.design, this.props.design) ||
+      !_.isEqual(prevProps.filters, this.props.filters) ||
+      this.props.dataSource.getCacheExpiry() !== this.state.cacheExpiry
     ) {
       // Save new cache expiry
-      this.setState({ cacheExpiry: nextProps.dataSource.getCacheExpiry() })
+      this.setState({ cacheExpiry: this.props.dataSource.getCacheExpiry() })
 
-      this.updateData(nextProps)
+      this.updateData()
     }
   }
 
-  updateData(props: any) {
+  updateData() {
     // Clean design first (needed to validate properly)
-    const design = props.chart.cleanDesign(props.design, props.schema)
+    const design = this.props.chart.cleanDesign(this.props.design, this.props.schema)
 
     // If design is not valid, do nothing as can't query invalid design
-    const errors = props.chart.validateDesign(design, props.schema)
+    const errors = this.props.chart.validateDesign(design, this.props.schema)
     if (errors) {
       return
     }
@@ -86,16 +96,18 @@ export default class ChartViewComponent extends React.Component<ChartViewCompone
       this.setState({ dataLoading: true })
     }, 100)
 
-    this.loadData(props, (error: any, data: any) => {
+    // Store props to check if changed
+    const loadingProps = this.props
+
+    this.props.widgetDataSource.getData(design, this.props.filters || [], (error, data) => {
       // Prevent setting data loading if ready
       clearTimeout(dataLoadingTimeout)
-      this.setState({ dataLoading: false, dataError: error, data, validDesign: design })
-    })
-  }
 
-  loadData(props: any, callback: any) {
-    // Get data from widget data source
-    props.widgetDataSource.getData(props.design, props.filters, callback)
+      // Only update if latest
+      if (loadingProps == this.props) {
+        this.setState({ dataLoading: false, dataError: error, data, validDesign: design })
+      }
+    })
   }
 
   renderSpinner() {

@@ -1,3 +1,5 @@
+import { ReactNode } from "react"
+
 export default class Chart {
   // Removes any invalid values from a design. Returns cleaned design
   cleanDesign(design: any, schema: any) {
@@ -5,7 +7,7 @@ export default class Chart {
   }
 
   // Determines if design is valid. Null/undefined for yes, error string for no
-  validateDesign(design: any, schema: any) {
+  validateDesign(design: any, schema: any): null | undefined | string {
     throw new Error("Not implemented")
   }
 
@@ -61,7 +63,7 @@ export default class Chart {
   //   scope: current scope of the view element
   //   onScopeChange: called when scope changes with new scope
   //   onRowClick: Called with (tableId, rowId) when item is clicked
-  createViewElement(options: any) {
+  createViewElement(options: any): ReactNode {
     throw new Error("Not implemented")
   }
 

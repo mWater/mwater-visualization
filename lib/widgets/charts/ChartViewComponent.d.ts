@@ -1,24 +1,29 @@
+import { DataSource, Schema } from "mwater-expressions";
 import React from "react";
+import { JsonQLFilter } from "../../JsonQLFilter";
+import { WidgetScope } from "../../WidgetScope";
+import { WidgetDataSource } from "../WidgetDataSource";
+import Chart from "./Chart";
 interface ChartViewComponentProps {
     /** Chart object to use */
-    chart: any;
+    chart: Chart;
     /** Design of chart */
     design: any;
     /** When design change */
-    onDesignChange?: any;
-    schema: any;
+    onDesignChange?: (design: any) => void;
+    schema: Schema;
     /** Data source to use for chart */
-    dataSource: any;
-    widgetDataSource: any;
+    dataSource: DataSource;
+    widgetDataSource: WidgetDataSource;
     width?: number;
     height?: number;
     /** scope of the widget (when the widget self-selects a particular scope) */
-    scope?: any;
+    scope?: WidgetScope;
     /** array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias }. Use injectAlias to correct */
-    filters?: any;
+    filters?: JsonQLFilter[];
     /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
-    onScopeChange?: any;
-    onRowClick?: any;
+    onScopeChange?: (scope: WidgetScope) => void;
+    onRowClick?: (tableId: string, rowId: any) => void;
 }
 interface ChartViewComponentState {
     cacheExpiry?: any;
@@ -27,12 +32,15 @@ interface ChartViewComponentState {
     dataError?: any;
     data?: any;
 }
+/** Inner view part of the chart widget. Uses a query data loading component
+ * to handle loading and continues to display old data if design becomes
+ * invalid
+ */
 export default class ChartViewComponent extends React.Component<ChartViewComponentProps, ChartViewComponentState> {
-    constructor(props: any);
+    constructor(props: ChartViewComponentProps);
     componentDidMount(): void;
-    componentWillReceiveProps(nextProps: any): void;
-    updateData(props: any): void;
-    loadData(props: any, callback: any): void;
+    componentDidUpdate(prevProps: ChartViewComponentProps): void;
+    updateData(): void;
     renderSpinner(): React.DetailedReactHTMLElement<{
         style: {
             position: "absolute";
