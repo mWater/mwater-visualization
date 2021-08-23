@@ -5,7 +5,7 @@ import sinon from "sinon"
 import enzyme from "enzyme"
 import { assert } from "chai"
 import { Schema } from "mwater-expressions"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 import { IdLiteralComponent } from "mwater-expressions-ui"
 import MWaterGlobalFiltersComponent from "../src/MWaterGlobalFiltersComponent"
 

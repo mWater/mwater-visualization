@@ -5,7 +5,7 @@ import sinon from "sinon"
 import enzyme from "enzyme"
 import { assert } from "chai"
 import { Schema } from "mwater-expressions"
-import ui from "react-library/lib/bootstrap"
+import * as ui from "react-library/lib/bootstrap"
 import MWaterResponsesFilterComponent from "../src/MWaterResponsesFilterComponent"
 
 enzyme.configure({ adapter: new (require("enzyme-adapter-react-16"))() }) // Configure enzyme for react 16

@@ -19,12 +19,5 @@ export default class FindReplaceModalComponent extends React.Component {
     performReplace(): any;
     renderPreview(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
     renderContents(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-    render(): React.CElement<{
-        header?: React.ReactNode;
-        footer?: React.ReactNode;
-        size?: "small" | "normal" | "full" | "large" | undefined;
-        width?: number | undefined;
-        showCloseX?: boolean | undefined;
-        onClose?: (() => void) | undefined;
-    }, ModalPopupComponent> | null;
+    render(): React.CElement<any, ModalPopupComponent> | null;
 }
