@@ -30,8 +30,8 @@ export default class PivotChartDesignerComponent extends React.Component<PivotCh
         hint?: React.ReactNode;
         help?: React.ReactNode;
         hasSuccess?: boolean | undefined;
-        hasWarnings?: boolean | undefined;
-        hasErrors?: boolean | undefined;
+        hasWarning?: boolean | undefined;
+        hasError?: boolean | undefined;
     }, ui.FormGroup> | null;
     renderSetup(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;

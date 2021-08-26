@@ -37,6 +37,8 @@ interface ChartViewComponentState {
  * invalid
  */
 export default class ChartViewComponent extends React.Component<ChartViewComponentProps, ChartViewComponentState> {
+    /** Ordinal of update (0, 1, 2...) to ensure using latest */
+    updateSeq: number;
     constructor(props: ChartViewComponentProps);
     componentDidMount(): void;
     componentDidUpdate(prevProps: ChartViewComponentProps): void;

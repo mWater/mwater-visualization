@@ -21,7 +21,13 @@ declare class MarkdownWidgetComponent extends React.Component<MarkdownWidgetComp
     handleStartEditing: () => void;
     handleEndEditing: () => void;
     handleEditDesignChange: (design: any) => void;
-    renderEditor(): React.CElement<any, ModalWindowComponent> | null;
+    renderEditor(): React.CElement<{
+        isOpen: boolean;
+        onRequestClose?: (() => void) | undefined;
+        backgroundColor?: string | undefined;
+        outerPadding?: number | undefined;
+        innerPadding?: number | undefined;
+    }, ModalWindowComponent> | null;
     renderContent(design: any): React.CElement<MarkdownWidgetViewComponentProps, MarkdownWidgetViewComponent>;
     render(): React.DetailedReactHTMLElement<{
         onDoubleClick: () => void;

@@ -22,8 +22,8 @@ export default class IntersectionDesignerComponent extends React.Component<Inter
         hint?: React.ReactNode;
         help?: React.ReactNode;
         hasSuccess?: boolean | undefined;
-        hasWarnings?: boolean | undefined;
-        hasErrors?: boolean | undefined;
+        hasWarning?: boolean | undefined;
+        hasError?: boolean | undefined;
     }, ui.FormGroup>;
     renderNullValue(): React.CElement<{
         label: React.ReactNode;
@@ -31,8 +31,8 @@ export default class IntersectionDesignerComponent extends React.Component<Inter
         hint?: React.ReactNode;
         help?: React.ReactNode;
         hasSuccess?: boolean | undefined;
-        hasWarnings?: boolean | undefined;
-        hasErrors?: boolean | undefined;
+        hasWarning?: boolean | undefined;
+        hasError?: boolean | undefined;
     }, ui.FormGroup> | undefined;
     renderFilter(): React.CElement<{
         label: React.ReactNode;
@@ -40,8 +40,8 @@ export default class IntersectionDesignerComponent extends React.Component<Inter
         hint?: React.ReactNode;
         help?: React.ReactNode;
         hasSuccess?: boolean | undefined;
-        hasWarnings?: boolean | undefined;
-        hasErrors?: boolean | undefined;
+        hasWarning?: boolean | undefined;
+        hasError?: boolean | undefined;
     }, ui.FormGroup>;
     renderStyling(): React.CElement<{
         label: React.ReactNode;
@@ -49,8 +49,8 @@ export default class IntersectionDesignerComponent extends React.Component<Inter
         hint?: React.ReactNode;
         help?: React.ReactNode;
         hasSuccess?: boolean | undefined;
-        hasWarnings?: boolean | undefined;
-        hasErrors?: boolean | undefined;
+        hasWarning?: boolean | undefined;
+        hasError?: boolean | undefined;
     }, ui.FormGroup>;
     renderBackgroundColorConditions(): React.CElement<BackgroundColorConditionsComponentProps, BackgroundColorConditionsComponent>;
     renderBackgroundColorAxis(): React.CElement<{
@@ -59,8 +59,8 @@ export default class IntersectionDesignerComponent extends React.Component<Inter
         hint?: React.ReactNode;
         help?: React.ReactNode;
         hasSuccess?: boolean | undefined;
-        hasWarnings?: boolean | undefined;
-        hasErrors?: boolean | undefined;
+        hasWarning?: boolean | undefined;
+        hasError?: boolean | undefined;
     }, ui.FormGroup>;
     renderBackgroundColor(): React.CElement<{
         label: React.ReactNode;
@@ -68,8 +68,8 @@ export default class IntersectionDesignerComponent extends React.Component<Inter
         hint?: React.ReactNode;
         help?: React.ReactNode;
         hasSuccess?: boolean | undefined;
-        hasWarnings?: boolean | undefined;
-        hasErrors?: boolean | undefined;
+        hasWarning?: boolean | undefined;
+        hasError?: boolean | undefined;
     }, ui.FormGroup> | undefined;
     renderBackgroundColorOpacityControl(): React.CElement<{
         label: React.ReactNode;
@@ -77,8 +77,8 @@ export default class IntersectionDesignerComponent extends React.Component<Inter
         hint?: React.ReactNode;
         help?: React.ReactNode;
         hasSuccess?: boolean | undefined;
-        hasWarnings?: boolean | undefined;
-        hasErrors?: boolean | undefined;
+        hasWarning?: boolean | undefined;
+        hasError?: boolean | undefined;
     }, ui.FormGroup> | undefined;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
@@ -99,8 +99,8 @@ declare class BackgroundColorConditionsComponent extends React.Component<Backgro
         hint?: React.ReactNode;
         help?: React.ReactNode;
         hasSuccess?: boolean | undefined;
-        hasWarnings?: boolean | undefined;
-        hasErrors?: boolean | undefined;
+        hasWarning?: boolean | undefined;
+        hasError?: boolean | undefined;
     }, ui.FormGroup>;
 }
 export {};

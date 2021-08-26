@@ -46,7 +46,14 @@ export default class OldMapViewComponent extends React.Component {
     handleGridClick: (layerViewId: any, ev: any) => any;
     getCompiledFilters(): any;
     renderLegend(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
-    renderPopup(): React.CElement<any, ModalPopupComponent> | null;
+    renderPopup(): React.CElement<{
+        header?: React.ReactNode;
+        footer?: React.ReactNode;
+        size?: "small" | "normal" | "full" | "large" | undefined;
+        width?: number | undefined;
+        showCloseX?: boolean | undefined;
+        onClose?: (() => void) | undefined;
+    }, ModalPopupComponent> | null;
     render(): React.DetailedReactHTMLElement<{
         style: {
             width: any;

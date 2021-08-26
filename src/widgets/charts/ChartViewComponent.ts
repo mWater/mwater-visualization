@@ -50,8 +50,13 @@ interface ChartViewComponentState {
  * invalid
  */
 export default class ChartViewComponent extends React.Component<ChartViewComponentProps, ChartViewComponentState> {
+  /** Ordinal of update (0, 1, 2...) to ensure using latest */
+  updateSeq: number
+
   constructor(props: ChartViewComponentProps) {
     super(props)
+
+    this.updateSeq = 0
 
     this.state = {
       validDesign: null, // last valid design
@@ -91,20 +96,22 @@ export default class ChartViewComponent extends React.Component<ChartViewCompone
       return
     }
 
+    this.updateSeq += 1
+
     // Set loading data after interval to prevent unnecessary refresh
     const dataLoadingTimeout = setTimeout(() => {
       this.setState({ dataLoading: true })
     }, 100)
 
-    // Store props to check if changed
-    const loadingProps = this.props
+    // Store updateSeq to check if latest
+    const loadingUpdateSeq = this.updateSeq
 
     this.props.widgetDataSource.getData(design, this.props.filters || [], (error, data) => {
       // Prevent setting data loading if ready
       clearTimeout(dataLoadingTimeout)
 
       // Only update if latest
-      if (loadingProps == this.props) {
+      if (loadingUpdateSeq == this.updateSeq) {
         this.setState({ dataLoading: false, dataError: error, data, validDesign: design })
       }
     })
