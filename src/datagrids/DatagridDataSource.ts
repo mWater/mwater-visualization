@@ -1,11 +1,21 @@
-export default class DashboardDataSource {
-  // Gets the rows specified
-  getRows(design: any, offset: any, limit: any, filters: any, callback: any) {
+import { Row } from "mwater-expressions"
+import { DatagridDesign, JsonQLFilter } from ".."
+import { QuickfiltersDataSource } from "../quickfilter/QuickfiltersDataSource"
+
+export default class DatagridDataSource {
+  /** Gets the rows specified */
+  getRows(
+    design: DatagridDesign,
+    offset: number,
+    limit: number,
+    filters: JsonQLFilter[] | undefined,
+    callback: (error: any, rows: Row[]) => void
+  ): void {
     throw new Error("Not implemented")
   }
 
-  // Gets the quickfilters data source
-  getQuickfiltersDataSource() {
+  /** Gets the quickfilters data source */
+  getQuickfiltersDataSource(): QuickfiltersDataSource {
     throw new Error("Not implemented")
   }
 }

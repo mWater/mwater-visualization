@@ -5,7 +5,7 @@ const R = React.createElement
 import uuid from "uuid"
 import AsyncLoadComponent from "react-library/lib/AsyncLoadComponent"
 import { ExprComponent } from "mwater-expressions-ui"
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, LiteralType, Schema } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import { LinkComponent } from "mwater-expressions-ui"
 import AxisBuilder from "./AxisBuilder"
@@ -18,20 +18,19 @@ import CategoryMapComponent from "./CategoryMapComponent"
 import { injectTableAlias } from "mwater-expressions"
 import { getFormatOptions } from "../valueFormatter"
 import { getDefaultFormat } from "../valueFormatter"
+import { JsonQLFilter } from "../JsonQLFilter"
+import { Axis } from "./Axis"
 
 interface AxisComponentProps {
-  /** schema to use */
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   /** Table to use */
   table: string
   /** Optional types to limit to */
-  types?: any
-  aggrNeed: any
-  /** See Axis Design.md */
-  value?: any
-  /** Called when changes */
-  onChange: any
+  types?: LiteralType[]
+  aggrNeed: "none" | "optional" | "required"
+  value?: Axis
+  onChange: (axis: Axis) => void
   /** Makes this a required value */
   required?: boolean
   /** Shows the color map */
@@ -42,15 +41,15 @@ interface AxisComponentProps {
   autosetColors?: boolean
   /** True to allow excluding of values via checkboxes */
   allowExcludedValues?: boolean
-  defaultColor?: string
+  defaultColor?: string | null
   /** Show format control for numeric values */
   showFormat?: boolean
-  /** array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct */
-  filters?: any
+  /** Filters to apply */
+  filters?: JsonQLFilter[]
 }
 
 // Axis component that allows designing of an axis
-export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps> {
+export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps, { categories: any }> {
   static defaultProps = {
     reorderable: false,
     allowExcludedValues: false,

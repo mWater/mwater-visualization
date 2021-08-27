@@ -36,7 +36,7 @@ export default class GridLayer extends Layer<GridLayerDesign> {
     /** Returns a cleaned design */
     cleanDesign(design: GridLayerDesign, schema: Schema): GridLayerDesign;
     /** Validates design. Null if ok, message otherwise */
-    validateDesign(design: GridLayerDesign, schema: Schema): any;
+    validateDesign(design: GridLayerDesign, schema: Schema): string | null;
     createDesignerElement(options: {
         design: GridLayerDesign;
         schema: Schema;

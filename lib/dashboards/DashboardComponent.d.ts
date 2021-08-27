@@ -1,26 +1,55 @@
 import PropTypes from "prop-types";
-import React from "react";
-export default class DashboardComponent extends React.Component {
-    static propTypes: {
-        design: PropTypes.Validator<object>;
-        onDesignChange: PropTypes.Requireable<(...args: any[]) => any>;
-        schema: PropTypes.Validator<object>;
-        dataSource: PropTypes.Validator<object>;
-        dashboardDataSource: PropTypes.Validator<object>;
-        titleElem: PropTypes.Requireable<PropTypes.ReactNodeLike>;
-        extraTitleButtonsElem: PropTypes.Requireable<PropTypes.ReactNodeLike>;
-        undoStackKey: PropTypes.Requireable<any>;
-        printScaling: PropTypes.Requireable<boolean>;
-        onRowClick: PropTypes.Requireable<(...args: any[]) => any>;
-        namedStrings: PropTypes.Requireable<object>;
-        quickfilterLocks: PropTypes.Requireable<any[]>;
-        quickfiltersValues: PropTypes.Requireable<any[]>;
-        filters: PropTypes.Requireable<(PropTypes.InferProps<{
-            table: PropTypes.Validator<string>;
-            jsonql: PropTypes.Validator<object>;
-        }> | null | undefined)[]>;
-        hideTitleBar: PropTypes.Requireable<boolean>;
+import React, { ReactNode } from "react";
+import { DataSource, Schema } from "mwater-expressions";
+import UndoStack from "../UndoStack";
+import DashboardViewComponent from "./DashboardViewComponent";
+import { DashboardDesign } from "./DashboardDesign";
+import DashboardDataSource from "./DashboardDataSource";
+import { JsonQLFilter } from "..";
+export interface DashboardComponentProps {
+    design: DashboardDesign;
+    /** If not set, readonly */
+    onDesignChange?: (design: DashboardDesign) => void;
+    schema: Schema;
+    dataSource: DataSource;
+    /** dashboard data source */
+    dashboardDataSource: DashboardDataSource;
+    /** Extra element to include in title at left */
+    titleElem?: ReactNode;
+    /** Extra elements to add to right */
+    extraTitleButtonsElem?: ReactNode;
+    /** Key that changes when the undo stack should be reset. Usually a document id or suchlike */
+    undoStackKey?: any;
+    /** True to scale for printing */
+    printScaling?: boolean;
+    /** Called with (tableId, rowId) when item is clicked */
+    onRowClick?: (tableId: string, rowId: any) => void;
+    /** Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget */
+    namedStrings?: {
+        [key: string]: string;
     };
+    /** Locked quickfilter values. See README in quickfilters */
+    quickfilterLocks?: any[];
+    /** Initial quickfilter values */
+    quickfiltersValues?: any[];
+    /** Filters to add to the dashboard */
+    filters?: JsonQLFilter[];
+    /** True to hide title bar and related controls */
+    hideTitleBar?: boolean;
+}
+export interface DashboardComponentState {
+    undoStack: UndoStack;
+    quickfiltersValues: any[];
+    editing: boolean;
+    layoutOptionsOpen: boolean;
+    hideQuickfilters: boolean;
+    refreshKey: number;
+}
+/** Dashboard component that includes an action bar at the top
+ * Manages undo stack and quickfilter value
+ */
+export default class DashboardComponent extends React.Component<DashboardComponentProps, DashboardComponentState> {
+    dashboardView: DashboardViewComponent | null;
     static defaultProps: {
         printScaling: boolean;
     };
@@ -29,13 +58,13 @@ export default class DashboardComponent extends React.Component {
         activeTables: PropTypes.Requireable<string[]>;
     };
     getChildContext(): {
-        locale: any;
+        locale: string | undefined;
         activeTables: string[];
     };
     constructor(props: any);
-    getQuickfilterValues: () => any;
+    getQuickfilterValues: () => any[];
     componentWillReceiveProps(nextProps: any): void;
-    handlePrint: () => any;
+    handlePrint: () => void;
     handleUndo: () => void;
     handleRedo: () => void;
     handleSaveDesignFile: () => any;
@@ -43,8 +72,8 @@ export default class DashboardComponent extends React.Component {
     handleToggleEditing: () => void;
     handleOpenLayoutOptions: () => void;
     handleRefreshData: () => void;
-    handleStyleChange: (style: any) => any;
-    handleDesignChange: (design: any) => any;
+    handleStyleChange: (style: any) => void;
+    handleDesignChange: (design: any) => void;
     handleShowQuickfilters: () => void;
     handleUpgrade: () => void;
     getCompiledFilters(): {

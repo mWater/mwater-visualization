@@ -41,7 +41,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
         filters: JsonQLFilter[];
     }): React.ReactElement<{}>;
     cleanDesign(design: MarkersLayerDesign, schema: Schema): MarkersLayerDesign;
-    validateDesign(design: MarkersLayerDesign, schema: Schema): any;
+    validateDesign(design: MarkersLayerDesign, schema: Schema): string | null;
     createKMLExportJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLSelectQuery;
     createKMLExportStyleInfo(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]): any;
     getKMLExportJsonQL(design: MarkersLayerDesign, schema: Schema, filters: JsonQLFilter[]): {

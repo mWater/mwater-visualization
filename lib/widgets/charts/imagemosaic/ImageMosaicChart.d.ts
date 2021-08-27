@@ -2,7 +2,7 @@ import React from "react";
 import Chart from "../Chart";
 export default class ImageMosaicChart extends Chart {
     cleanDesign(design: any, schema: any): any;
-    validateDesign(design: any, schema: any): any;
+    validateDesign(design: any, schema: any): string | null;
     isEmpty(design: any): boolean;
     createDesignerElement(options: any): React.FunctionComponentElement<{
         schema: any;

@@ -42,7 +42,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
         filters: JsonQLFilter[];
     }): React.ReactElement<{}>;
     cleanDesign(design: BufferLayerDesign, schema: Schema): BufferLayerDesign;
-    validateDesign(design: BufferLayerDesign, schema: Schema): any;
+    validateDesign(design: BufferLayerDesign, schema: Schema): string | null;
     createKMLExportJsonQL(design: BufferLayerDesign, schema: Schema, filters: JsonQLFilter[]): import("jsonql").JsonQLSelectQuery;
     getKMLExportJsonQL(design: BufferLayerDesign, schema: Schema, filters: JsonQLFilter[]): {
         layers: {

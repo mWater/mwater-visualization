@@ -33,5 +33,5 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
         filters: JsonQLFilter[];
     }): React.ReactElement<{}>;
     cleanDesign(design: ClusterLayerDesign, schema: Schema): ClusterLayerDesign;
-    validateDesign(design: ClusterLayerDesign, schema: Schema): any;
+    validateDesign(design: ClusterLayerDesign, schema: Schema): string | null;
 }

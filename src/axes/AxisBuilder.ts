@@ -1,6 +1,6 @@
 import _ from "lodash"
 import uuid from "uuid"
-import { ExprCompiler } from "mwater-expressions"
+import { AggrStatus, ExprCompiler, Schema } from "mwater-expressions"
 import { ExprValidator } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
@@ -11,6 +11,7 @@ const R = React.createElement
 import { default as produce } from "immer"
 import { formatValue } from "../valueFormatter"
 import { Axis } from "./Axis"
+import { JsonQLExpr } from "jsonql"
 
 const xforms = [
   { type: "bin", input: "number", output: "enum" },
@@ -31,37 +32,46 @@ const xforms = [
   { type: "week", input: "datetime", output: "enum" }
 ]
 
+type AggrNeed = "none" | "optional" | "required"
+
 // Small number to prevent width_bucket errors on auto binning with only one value
 const epsilon = 0.000000001
 
 // Understands axes. Contains methods to clean/validate etc. an axis of any type.
 export default class AxisBuilder {
+  schema: Schema
+  exprUtils: ExprUtils
+  exprCleaner: ExprCleaner
+  exprValidator: ExprValidator
+
   // Options are: schema
-  constructor(options: any) {
+  constructor(options: { schema: Schema }) {
     this.schema = options.schema
     this.exprUtils = new ExprUtils(this.schema)
     this.exprCleaner = new ExprCleaner(this.schema)
     this.exprValidator = new ExprValidator(this.schema)
   }
 
-  // Clean an axis with respect to a specific table
-  // Options:
-  //  axis: axis to clean
-  //  table: table that axis is to be for
-  //  aggrNeed is "none", "optional" or "required"
-  //  types: optional list of types to require it to be one of
-  cleanAxis(options: any) {
-    let aggrStatuses
+  /** Clean an axis with respect to a specific table
+    options:
+     axis: axis to clean
+     table: table that axis is to be for
+     aggrNeed is "none", "optional" or "required"
+     types: optional list of types to require it to be one of
+  */
+  cleanAxis(options: { axis: Axis | null; table?: string | null; aggrNeed?: AggrNeed; types?: string[] }): Axis | null {
+    let aggrStatuses: AggrStatus[] | undefined = undefined
     let { axis } = options
 
     if (!axis) {
-      return
+      return null
     }
 
     let { expr } = axis
 
     // Move aggr inside since aggr is deprecated at axis level DEPRECATED
     if (axis.aggr && axis.expr) {
+      // @ts-ignore
       expr = { type: "op", op: axis.aggr, table: axis.expr.table, exprs: axis.aggr !== "count" ? [axis.expr] : [] }
     }
 
@@ -93,7 +103,7 @@ export default class AxisBuilder {
       // Find valid xform
       xform = _.find(xforms, function (xf) {
         // xform type must match
-        if (xf.type !== axis.xform.type) {
+        if (xf.type !== axis!.xform!.type) {
           return false
         }
 
@@ -112,7 +122,7 @@ export default class AxisBuilder {
 
     // If no xform and using an xform would allow satisfying output types, pick first
     if (!xform && options.types && type && !options.types.includes(type)) {
-      xform = _.find(xforms, (xf) => xf.input === type && options.types.includes(xf.output))
+      xform = _.find(xforms, (xf) => xf.input === type && options.types!.includes(xf.output))
       if (!xform) {
         // Unredeemable if no xform possible and cannot use count to get number
         if (options.aggrNeed === "none") {
@@ -127,13 +137,13 @@ export default class AxisBuilder {
     axis = produce(axis, (draft: any) => {
       draft.expr = expr
 
-      if (axis.aggr) {
+      if (axis!.aggr) {
         delete draft.aggr
       }
 
-      if (!xform && axis.xform) {
+      if (!xform && axis!.xform) {
         delete draft.xform
-      } else if (xform && (!axis.xform || axis.xform.type !== xform.type)) {
+      } else if (xform && (!axis!.xform || axis!.xform.type !== xform.type)) {
         draft.xform = { type: xform.type }
       }
 
@@ -155,12 +165,14 @@ export default class AxisBuilder {
     return axis
   }
 
-  // Checks whether an axis is valid
-  //  axis: axis to validate
-  validateAxis(options: any) {
+  /** Checks whether an axis is valid 
+    options:
+     axis: axis to validate
+  */
+  validateAxis(options: { axis: Axis | null }): string | null {
     // Nothing is ok
     if (!options.axis) {
-      return
+      return null
     }
 
     // Validate expression (allow all statuses since we don't know aggregation)
@@ -198,10 +210,13 @@ export default class AxisBuilder {
         }
       }
     }
+    return null
   }
 
-  // Pass axis, tableAlias
-  compileAxis(options: any) {
+  /**
+   * Compile an axis to JsonQL
+   */
+  compileAxis(options: { axis: Axis; tableAlias: string }): JsonQLExpr {
     if (!options.axis) {
       return null
     }
@@ -479,9 +494,10 @@ export default class AxisBuilder {
     return null
   }
 
-  // Get all categories for a given axis type given the known values
-  // Returns array of { value, label }
-  getCategories(axis: any, values: any, locale: any) {
+  /** Get all categories for a given axis type given the known values
+   * Returns array of { value, label }
+   */
+  getCategories(axis: Axis, values: any[], locale?: string): { value: any; label: string }[] {
     let categories, current, end, format, hasNone, label, max, min, value, year
     const noneCategory = { value: null, label: axis.nullLabel || "None" }
 

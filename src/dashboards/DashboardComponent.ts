@@ -1,9 +1,9 @@
 import PropTypes from "prop-types"
 import _ from "lodash"
-import React from "react"
+import React, { ReactNode } from "react"
 const R = React.createElement
 
-import { ExprCompiler } from "mwater-expressions"
+import { DataSource, ExprCompiler, Schema } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
 import UndoStack from "../UndoStack"
 import * as DashboardUtils from "./DashboardUtils"
@@ -17,38 +17,65 @@ import DashboardUpgrader from "./DashboardUpgrader"
 import { LayoutOptionsComponent } from "./LayoutOptionsComponent"
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent"
 import { getLayoutOptions } from "./layoutOptions"
+import { DashboardDesign } from "./DashboardDesign"
+import DashboardDataSource from "./DashboardDataSource"
+import { JsonQLFilter } from ".."
 
-// Dashboard component that includes an action bar at the top
-// Manages undo stack and quickfilter value
-export default class DashboardComponent extends React.Component {
-  static propTypes = {
-    design: PropTypes.object.isRequired,
-    onDesignChange: PropTypes.func, // If not set, readonly
-    schema: PropTypes.object.isRequired,
-    dataSource: PropTypes.object.isRequired,
-    dashboardDataSource: PropTypes.object.isRequired, // dashboard data source
+export interface DashboardComponentProps {
+  design: DashboardDesign
+  /** If not set, readonly */
+  onDesignChange?: (design: DashboardDesign) => void
 
-    titleElem: PropTypes.node, // Extra element to include in title at left
-    extraTitleButtonsElem: PropTypes.node, // Extra elements to add to right
-    undoStackKey: PropTypes.any, // Key that changes when the undo stack should be reset. Usually a document id or suchlike
-    printScaling: PropTypes.bool, // True to scale for printing
+  schema: Schema
+  dataSource: DataSource
+  /** dashboard data source */
+  dashboardDataSource: DashboardDataSource
 
-    onRowClick: PropTypes.func, // Called with (tableId, rowId) when item is clicked
-    namedStrings: PropTypes.object, // Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
+  /** Extra element to include in title at left */
+  titleElem?: ReactNode
 
-    quickfilterLocks: PropTypes.array, // Locked quickfilter values. See README in quickfilters
-    quickfiltersValues: PropTypes.array, // Initial quickfilter values
+  /** Extra elements to add to right */
+  extraTitleButtonsElem?: ReactNode
 
-    // Filters to add to the dashboard
-    filters: PropTypes.arrayOf(
-      PropTypes.shape({
-        table: PropTypes.string.isRequired, // id table to filter
-        jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
-      })
-    ),
+  /** Key that changes when the undo stack should be reset. Usually a document id or suchlike */
+  undoStackKey?: any
 
-    hideTitleBar: PropTypes.bool // True to hide title bar and related controls
-  }
+  /** True to scale for printing */
+  printScaling?: boolean
+
+  /** Called with (tableId, rowId) when item is clicked */
+  onRowClick?: (tableId: string, rowId: any) => void
+
+  /** Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget */
+  namedStrings?: { [key: string]: string }
+
+  /** Locked quickfilter values. See README in quickfilters */
+  quickfilterLocks?: any[]
+
+  /** Initial quickfilter values */
+  quickfiltersValues?: any[]
+
+  /** Filters to add to the dashboard */
+  filters?: JsonQLFilter[]
+
+  /** True to hide title bar and related controls */
+  hideTitleBar?: boolean  
+}
+
+export interface DashboardComponentState {
+  undoStack: UndoStack
+  quickfiltersValues: any[]
+  editing: boolean
+  layoutOptionsOpen: boolean
+  hideQuickfilters: boolean
+  refreshKey: number
+}
+
+/** Dashboard component that includes an action bar at the top
+ * Manages undo stack and quickfilter value
+ */
+ export default class DashboardComponent extends React.Component<DashboardComponentProps, DashboardComponentState> {
+  dashboardView: DashboardViewComponent | null
 
   static defaultProps = { printScaling: true }
 
@@ -113,7 +140,7 @@ export default class DashboardComponent extends React.Component {
   }
 
   handlePrint = () => {
-    return this.dashboardView.print()
+    return this.dashboardView!.print()
   }
 
   handleUndo = () => {

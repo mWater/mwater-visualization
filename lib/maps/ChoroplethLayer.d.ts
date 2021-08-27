@@ -58,7 +58,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     /** True if layer can be edited */
     isEditable(): boolean;
     cleanDesign(design: ChoroplethLayerDesign, schema: Schema): ChoroplethLayerDesign;
-    validateDesign(design: ChoroplethLayerDesign, schema: Schema): any;
+    validateDesign(design: ChoroplethLayerDesign, schema: Schema): string | null;
     createDesignerElement(options: {
         design: ChoroplethLayerDesign;
         schema: Schema;

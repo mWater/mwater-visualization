@@ -2,7 +2,10 @@ import _ from "lodash"
 
 // Immutable undo/redo stack. Mutation operations return a new copy
 export default class UndoStack {
-  constructor(undoStack: any, redoStack: any) {
+  undoStack: any[]
+  redoStack: any[]
+
+  constructor(undoStack?: any, redoStack?: any) {
     this.undoStack = undoStack || []
     this.redoStack = redoStack || []
   }

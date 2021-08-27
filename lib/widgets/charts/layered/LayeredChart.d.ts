@@ -4,7 +4,7 @@ import { DataSource, Schema } from "mwater-expressions";
 import { LayeredChartDesign } from "./LayeredChartDesign";
 export default class LayeredChart extends Chart {
     cleanDesign(design: any, schema: any): <Base extends (draft: any) => void>(base?: Base | undefined, ...rest: unknown[]) => any;
-    validateDesign(design: any, schema: any): any;
+    validateDesign(design: any, schema: any): string | null | undefined;
     isEmpty(design: any): boolean;
     createDesignerElement(options: any): React.FunctionComponentElement<{
         schema: any;

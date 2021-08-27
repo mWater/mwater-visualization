@@ -2,7 +2,7 @@ import React from "react";
 import Chart from "../Chart";
 export default class PivotChart extends Chart {
     cleanDesign(design: any, schema: any): any;
-    validateDesign(design: any, schema: any): any;
+    validateDesign(design: any, schema: any): string | null;
     isAutoHeight(): boolean;
     isEmpty(design: any): boolean;
     hasDesignerPreview(): boolean;

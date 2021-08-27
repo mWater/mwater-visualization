@@ -33,7 +33,16 @@ export interface Axis {
    * `ranges`: convert to ranges. type enum. `ranges` is array of { id (unique id), label (optional label), minValue (null for none), maxValue (null for none), minOpen (true for >, false for >=), maxOpen (true for <, false for <=) }
    * `floor`: convert to floor. type enum
    */
-  xform?: "bin" | "date" | "year" | "yearmonth" | "month" | "week" | "ranges" | "yearweek" | "yearquarter" | "floor"
+  xform?: {
+    type: "bin" | "date" | "year" | "yearmonth" | "month" | "week" | "ranges" | "yearweek" | "yearquarter" | "floor"
+    numBins?: number
+    min?: number
+    max?: number
+    excludeUpper?: boolean
+    excludeLower?: boolean
+    ranges?: { id: string, label?: string, minValue: number | null, maxValue: number | null, minOpen: boolean, maxOpen: boolean }[]
+  }
+
   colorMap?: ColorMap
   /** optional array of category values which define the order in which categories should be rendered */
   drawOrder?: any[]
@@ -46,6 +55,9 @@ export interface Axis {
 
   excludedValues?: any[]
   format?: string
+
+  /** @deprecated */
+  aggr?: string
 }
 /**
  * Color map

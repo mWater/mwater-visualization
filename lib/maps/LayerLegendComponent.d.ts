@@ -17,7 +17,7 @@ export default class LayerLegendComponent extends React.Component<LayerLegendCom
     };
     getCategories(): {
         value: any;
-        label: any;
+        label: string;
     }[] | undefined;
     render(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 }
