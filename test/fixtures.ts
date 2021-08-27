@@ -75,6 +75,25 @@ export function simpleSchema() {
     ]
   })
 
+  schema = schema.addTable({
+    id: "t3",
+    name: { en: "T3" },
+    primaryKey: "primary",
+    ordering: "number",
+    contents: [
+      { id: "t3", name: { en: "T3" }, type: "uuid" },
+      { id: "text", name: { en: "Text" }, type: "text" },
+      { id: "number", name: { en: "Number" }, type: "number" },
+      {
+        id: "3-1",
+        name: { en: "T3->T1" },
+        type: "id",
+        idTable: "t1",
+        jsonql: { type: "field", tableAlias: "{alias}", column: "t1"}
+      }
+    ]
+  })
+
   return schema
 }
 

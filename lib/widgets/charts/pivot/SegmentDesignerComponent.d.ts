@@ -30,8 +30,8 @@ export default class SegmentDesignerComponent extends React.Component<SegmentDes
         hint?: React.ReactNode;
         help?: React.ReactNode;
         hasSuccess?: boolean | undefined;
-        hasWarnings?: boolean | undefined;
-        hasErrors?: boolean | undefined;
+        hasWarning?: boolean | undefined;
+        hasError?: boolean | undefined;
     }, ui.FormGroup>;
     renderLabel(): React.CElement<{
         label: React.ReactNode;
@@ -39,8 +39,8 @@ export default class SegmentDesignerComponent extends React.Component<SegmentDes
         hint?: React.ReactNode;
         help?: React.ReactNode;
         hasSuccess?: boolean | undefined;
-        hasWarnings?: boolean | undefined;
-        hasErrors?: boolean | undefined;
+        hasWarning?: boolean | undefined;
+        hasError?: boolean | undefined;
     }, ui.FormGroup>;
     renderValueAxis(): React.CElement<{
         label: React.ReactNode;
@@ -48,8 +48,8 @@ export default class SegmentDesignerComponent extends React.Component<SegmentDes
         hint?: React.ReactNode;
         help?: React.ReactNode;
         hasSuccess?: boolean | undefined;
-        hasWarnings?: boolean | undefined;
-        hasErrors?: boolean | undefined;
+        hasWarning?: boolean | undefined;
+        hasError?: boolean | undefined;
     }, ui.FormGroup>;
     renderFilter(): React.CElement<{
         label: React.ReactNode;
@@ -57,8 +57,8 @@ export default class SegmentDesignerComponent extends React.Component<SegmentDes
         hint?: React.ReactNode;
         help?: React.ReactNode;
         hasSuccess?: boolean | undefined;
-        hasWarnings?: boolean | undefined;
-        hasErrors?: boolean | undefined;
+        hasWarning?: boolean | undefined;
+        hasError?: boolean | undefined;
     }, ui.FormGroup>;
     renderStyling(): React.CElement<{
         label: React.ReactNode;
@@ -66,8 +66,8 @@ export default class SegmentDesignerComponent extends React.Component<SegmentDes
         hint?: React.ReactNode;
         help?: React.ReactNode;
         hasSuccess?: boolean | undefined;
-        hasWarnings?: boolean | undefined;
-        hasErrors?: boolean | undefined;
+        hasWarning?: boolean | undefined;
+        hasError?: boolean | undefined;
     }, ui.FormGroup>;
     renderBorders(): React.CElement<{
         label: React.ReactNode;
@@ -75,8 +75,8 @@ export default class SegmentDesignerComponent extends React.Component<SegmentDes
         hint?: React.ReactNode;
         help?: React.ReactNode;
         hasSuccess?: boolean | undefined;
-        hasWarnings?: boolean | undefined;
-        hasErrors?: boolean | undefined;
+        hasWarning?: boolean | undefined;
+        hasError?: boolean | undefined;
     }, ui.FormGroup>;
     renderOrderExpr(): React.CElement<{
         label: React.ReactNode;
@@ -84,8 +84,8 @@ export default class SegmentDesignerComponent extends React.Component<SegmentDes
         hint?: React.ReactNode;
         help?: React.ReactNode;
         hasSuccess?: boolean | undefined;
-        hasWarnings?: boolean | undefined;
-        hasErrors?: boolean | undefined;
+        hasWarning?: boolean | undefined;
+        hasError?: boolean | undefined;
     }, ui.FormGroup>;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }

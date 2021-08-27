@@ -10,6 +10,12 @@ interface ImagePopupComponentState {
 export default class ImagePopupComponent extends React.Component<ImagePopupComponentProps, ImagePopupComponentState> {
     constructor(props: any);
     show(image: any): any;
-    render(): React.CElement<any, ModalWindowComponent> | null;
+    render(): React.CElement<{
+        isOpen: boolean;
+        onRequestClose?: (() => void) | undefined;
+        backgroundColor?: string | undefined;
+        outerPadding?: number | undefined;
+        innerPadding?: number | undefined;
+    }, ModalWindowComponent> | null;
 }
 export {};
