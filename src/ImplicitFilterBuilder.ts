@@ -62,7 +62,6 @@ export default class ImplicitFilterBuilder {
         filters,
         (f) => {
           const column = this.schema.getColumn(join.table, join.column)
-          console.log(column)
           return f.table === (column.type === "join" ? column.join.toTable: column.idTable) && f.jsonql
         }
       )
