@@ -25,6 +25,11 @@ describe("ImplicitFilterBuilder", function () {
     return compare(joins, [{ table: "t2", column: "2-1" }])
   })
 
+  it("finds ID join if child filterable", function () {
+    const joins = this.builder.findJoins(["t1", "t3"])
+    return compare(joins, [{ table: "t3", column: "3-1" }])
+  })
+
   it("finds nothing if child not filterable", function () {
     const joins = this.builder.findJoins(["t1"])
     return compare(joins, [])
@@ -71,6 +76,67 @@ describe("ImplicitFilterBuilder", function () {
                         exprs: [
                           { type: "field", tableAlias: "explicit", column: "primary" },
                           { type: "field", tableAlias: "{alias}", column: "t1" }
+                        ]
+                      },
+                      // Filter
+                      { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "explicit", column: "number" }, 3] }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              type: "op",
+              op: "is null",
+              exprs: [{ type: "field", tableAlias: "{alias}", column: "t1" }]
+            }
+          ]
+        }
+      }
+    ])
+  })
+
+  it("extends filter for ID joins", function () {
+    const filters = [
+      {
+        table: "t1",
+        jsonql: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "number" }, 3] }
+      }
+    ]
+
+    const extFilters = this.builder.extendFilters(["t1", "t3"], filters)
+
+    return compare(extFilters, [
+      {
+        table: "t1",
+        jsonql: { type: "op", op: "=", exprs: [{ type: "field", tableAlias: "{alias}", column: "number" }, 3] }
+      },
+      // Uses exists where
+      {
+        table: "t3",
+        jsonql: {
+          type: "op",
+          op: "or",
+          exprs: [
+            {
+              type: "op",
+              op: "exists",
+              exprs: [
+                {
+                  type: "query",
+                  selects: [],
+                  from: { type: "table", table: "t1", alias: "explicit" },
+                  where: {
+                    type: "op",
+                    op: "and",
+                    exprs: [
+                      // Join
+                      {
+                        type: "op",
+                        op: "=",
+                        exprs: [
+                          { type: "field", tableAlias: "{alias}", column: "t1" },
+                          { type: "field", tableAlias: "explicit", column: "primary" }
                         ]
                       },
                       // Filter

@@ -28,11 +28,11 @@ export default class ImplicitFilterBuilder {
       // Find n-1 joins to another filterable table that are not self-references
       let joins = _.filter(
         this.schema.getColumns(filterableTable),
-        (column) => column.type === "join" && column.join.type === "n-1" && column.join.toTable !== filterableTable
+        (column) => (column.type === "join" && column.join.type === "n-1" && column.join.toTable !== filterableTable) || (column.type === "id" && column.idTable !== filterableTable)
       )
 
       // Only keep if singular
-      joins = _.flatten(_.filter(_.values(_.groupBy(joins, (join) => join.join.toTable)), (list) => list.length === 1))
+      joins = _.flatten(_.filter(_.values(_.groupBy(joins, (join) => join.type === "id" ? join.idTable: join.join.toTable)), (list) => list.length === 1))
       allJoins = allJoins.concat(
         _.map(joins, (join) => ({
           table: filterableTable,
@@ -60,7 +60,11 @@ export default class ImplicitFilterBuilder {
     for (var join of joins) {
       const parentFilters = _.filter(
         filters,
-        (f) => f.table === this.schema.getColumn(join.table, join.column).join.toTable && f.jsonql
+        (f) => {
+          const column = this.schema.getColumn(join.table, join.column)
+          console.log(column)
+          return f.table === (column.type === "join" ? column.join.toTable: column.idTable) && f.jsonql
+        }
       )
       if (parentFilters.length === 0) {
         continue
@@ -83,7 +87,7 @@ export default class ImplicitFilterBuilder {
                   type: "query",
                   // select null
                   selects: [],
-                  from: { type: "table", table: joinColumn.join.toTable, alias: "explicit" },
+                  from: { type: "table", table: joinColumn.type === "id" ? joinColumn.idTable : joinColumn.join.toTable, alias: "explicit" },
                   where: {
                     type: "op",
                     op: "and",
