@@ -9,38 +9,50 @@ import DatagridViewComponent from "./DatagridViewComponent"
 import DirectDatagridDataSource from "./DirectDatagridDataSource"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 import { ExprComponent } from "mwater-expressions-ui"
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, Expr, ExprCleaner, ExprUtils, Schema } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import { injectTableAlias } from "mwater-expressions"
+import { DatagridDesign, JsonQLFilter } from ".."
+import { expr } from "jquery"
+import { JsonQLQuery, JsonQLSelectQuery } from "jsonql"
+
+interface FindReplaceModalComponentProps {
+  schema: Schema
+  dataSource: DataSource
+
+  design: DatagridDesign
+
+  filters?: JsonQLFilter[]
+
+  // Check if expression of table row is editable
+  // If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
+  canEditValue?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, canEdit?: boolean) => void) => void
+
+  // Update table row expression with a new value
+  // Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
+  updateValue?: (tableId: string, rowId: any, expr: Expr, value: any, callback: (error: any) => void) => void
+
+  onUpdate: () => void
+}
+
+interface FindReplaceModalComponentState {
+  /** True if modal is open */
+  open: boolean
+  /** Column id to replace */
+  replaceColumn: string | null
+  /** Replace with expression */
+  withExpr: Expr
+  /** Condition expr */
+  conditionExpr: Expr
+  /** 0-100 when working */
+  progress: null | number
+}
 
 // Modal to perform find/replace on datagrid
-export default class FindReplaceModalComponent extends React.Component {
-  static propTypes = {
-    schema: PropTypes.object.isRequired, // schema to use
-    dataSource: PropTypes.object.isRequired, // dataSource to use
-
-    design: PropTypes.object.isRequired, // Design of datagrid. See README.md of this folder
-
-    filters: PropTypes.arrayOf(
-      PropTypes.shape({
-        table: PropTypes.string.isRequired, // id table to filter
-        jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
-      })
-    ),
-
-    // Check if expression of table row is editable
-    // If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
-    canEditValue: PropTypes.func,
-
-    // Update table row expression with a new value
-    // Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
-    updateValue: PropTypes.func,
-
-    onUpdate: PropTypes.func
-  }
-
+export default class FindReplaceModalComponent extends React.Component<FindReplaceModalComponentProps, FindReplaceModalComponentState> {
   constructor(props: any) {
     super(props)
+
     this.state = {
       open: false, // True if modal is open
       replaceColumn: null, // Column id to replace
@@ -57,12 +69,15 @@ export default class FindReplaceModalComponent extends React.Component {
   performReplace() {
     const exprUtils = new ExprUtils(this.props.schema)
     const exprCompiler = new ExprCompiler(this.props.schema)
+    const exprCleaner = new ExprCleaner(this.props.schema)
+
+    const design = this.props.design
 
     // Get expr of replace column
-    const replaceExpr = _.findWhere(this.props.design.columns, { id: this.state.replaceColumn }).expr
+    const replaceExpr = _.findWhere(this.props.design.columns, { id: this.state.replaceColumn })!.expr
 
     // Get ids and with value, filtered by filters, design.filter and conditionExpr (if present)
-    const query = {
+    const query: JsonQLSelectQuery = {
       type: "query",
       selects: [
         {
@@ -70,7 +85,7 @@ export default class FindReplaceModalComponent extends React.Component {
           expr: {
             type: "field",
             tableAlias: "main",
-            column: this.props.schema.getTable(this.props.design.table).primaryKey
+            column: this.props.schema.getTable(this.props.design.table!)!.primaryKey
           },
           alias: "id"
         },
@@ -92,6 +107,28 @@ export default class FindReplaceModalComponent extends React.Component {
     // Filter by conditionExpr
     if (this.state.conditionExpr) {
       wheres.push(exprCompiler.compileExpr({ expr: this.state.conditionExpr, tableAlias: "main" }))
+    }
+
+    // Add global filters
+    for (let filter of design.globalFilters || []) {
+      // Check if exists and is correct type
+      const column = this.props.schema.getColumn(design.table!, filter.columnId)
+      if (!column) {
+        continue
+      }
+
+      const columnExpr: Expr = { type: "field", table: design.table!, column: column.id }
+      if (exprUtils.getExprType(columnExpr) !== filter.columnType) {
+        continue
+      }
+
+      // Create expr
+      let expr: Expr = { type: "op", op: filter.op, table: design.table!, exprs: [columnExpr].concat(filter.exprs) }
+
+      // Clean expr
+      expr = exprCleaner.cleanExpr(expr, { table: design.table! })
+
+      wheres.push(exprCompiler.compileExpr({ expr, tableAlias: "main" }))
     }
 
     // Add extra filters
