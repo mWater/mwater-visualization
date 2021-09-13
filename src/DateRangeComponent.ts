@@ -8,9 +8,12 @@ import { default as DatePicker } from "react-datepicker"
 
 interface DateRangeComponentProps {
   /** Array of [start date, end date] in iso 8601 format */
-  value?: any
+  value: [string | null, string | null] | null
+
   /** Array of [start date, end date] in iso 8601 format */
-  onChange: any
+  onChange: (value: [string | null, string | null]) => void
+
+  /** true if for datetime, not date   */
   datetime?: boolean
 }
 

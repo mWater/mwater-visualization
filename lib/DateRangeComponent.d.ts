@@ -2,9 +2,10 @@ import React from "react";
 import moment from "moment";
 interface DateRangeComponentProps {
     /** Array of [start date, end date] in iso 8601 format */
-    value?: any;
+    value: [string | null, string | null] | null;
     /** Array of [start date, end date] in iso 8601 format */
-    onChange: any;
+    onChange: (value: [string | null, string | null]) => void;
+    /** true if for datetime, not date   */
     datetime?: boolean;
 }
 interface DateRangeComponentState {
@@ -16,7 +17,7 @@ export default class DateRangeComponent extends React.Component<DateRangeCompone
     toMoment(value: any): moment.Moment | null;
     fromMoment(value: any): any;
     handleClickOut: () => void;
-    handleStartChange: (value: any) => any;
+    handleStartChange: (value: any) => void;
     handleEndChange: (value: any) => void;
     handlePreset: (preset: any) => void;
     getPresets(): {
@@ -30,7 +31,7 @@ export default class DateRangeComponent extends React.Component<DateRangeCompone
             top: number;
             color: "#AAA";
         };
-        onClick: () => any;
+        onClick: () => void;
     }, HTMLElement>;
     renderSummary(): string | React.DetailedReactHTMLElement<{
         className: string;

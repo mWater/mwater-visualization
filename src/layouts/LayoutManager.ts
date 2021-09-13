@@ -1,33 +1,64 @@
+import { ReactElement, ReactNode } from "react"
+import { BlocksLayoutOptions } from "../dashboards/layoutOptions"
+
+/** Responsible for laying out items, rendering widgets and holding them in a data structure that is layout manager specific */
 export default class LayoutManager {
-  // Renders the layout as a react element
-  // options:
-  //  width: width of layout
-  //  items: opaque items object that layout manager understands
-  //  onItemsChange: Called when items changes
-  //  renderWidget: called with ({ id:, type:, design:, onDesignChange:, width:, height:  })
-  //  style: style to use for layout. null for default
-  //  layoutOptions: layout options to use
-  //  disableMaps: true to disable maps
-  renderLayout(options: any) {
+  /** Renders the layout as a react element */
+  renderLayout(options: {
+    /** width of layout */
+    width: number
+    /** opaque items object that layout manager understands */
+    items: any
+    /** Called when items changes */
+    onItemsChange: (items: any) => void
+
+    /** called with ({ id:, type:, design:, onDesignChange:, width:, height:  }) */
+    renderWidget: (options: {
+      id: string
+      type: string
+      design: any
+      onDesignChange: (design: any) => void
+      width: number
+      height: number
+    }) => ReactElement
+
+    /** style to use for layout. null for default */
+    style: string | null
+
+    /** layout options to use */
+    layoutOptions: BlocksLayoutOptions | null
+
+    /** true to disable maps */
+    disableMaps?: boolean
+
+    /** clipboard contents */
+    clipboard: any
+
+    /** called when clipboard is changed */
+    onClipboardChange: (clipboard: any) => void
+
+    /** message to display if clipboard can't be pasted into current dashboard */
+    cantPasteMesssage: string
+  }): ReactNode {
     return null
   }
 
-  // Tests if dashboard has any items
-  isEmpty(items: any) {
+  /** Tests if dashboard has any items */
+  isEmpty(items: any): boolean {
     return true
   }
 
-  // Gets { type, design } of a widget
-  getWidgetTypeAndDesign(items: any, widgetId: any) {
-    return null
+  /** Gets { type, design } of a widget */
+  getWidgetTypeAndDesign(items: any, widgetId: string): { type: string; design: any } {
+    throw new Error("Not implemented")
   }
 
-  // Gets all widgets in items as array of { id, type, design }
-  getAllWidgets(items: any) {
+  /** Gets all widgets in items as array of { id, type, design } */
+  getAllWidgets(items: any): { id: string; type: string; design: any }[] {
     return []
   }
 
-  static createLayoutManager(type: any) {
+  static createLayoutManager(type: string): LayoutManager {
     // Default is old grid type
     type = type || "grid"
 
@@ -45,11 +76,9 @@ export default class LayoutManager {
       default:
         throw new Error(`Unknown layout manager type ${type}`)
     }
-
-    return {
-      addWidget(items: any, widgetType: any, widgetDesign: any) {
-        throw new Error("Not implemented")
-      }
-    }
+  }
+ 
+  addWidget(items: any, widgetType: string, widgetDesign: any): any {
+    throw new Error("Not implemented")
   }
 }
