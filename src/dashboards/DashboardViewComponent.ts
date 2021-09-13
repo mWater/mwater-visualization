@@ -1,13 +1,11 @@
 import _ from "lodash"
 import PropTypes from "prop-types"
-import React from "react"
+import React, { CSSProperties } from "react"
 const R = React.createElement
 
-import uuid from "uuid"
 import ImplicitFilterBuilder from "../ImplicitFilterBuilder"
 import * as DashboardUtils from "./DashboardUtils"
-import { ExprCompiler } from "mwater-expressions"
-import { ExprCleaner } from "mwater-expressions"
+import { DataSource, Schema } from "mwater-expressions"
 import WidgetFactory from "../widgets/WidgetFactory"
 import WidgetScoper from "../widgets/WidgetScoper"
 import ReactElementPrinter from "react-library/lib/ReactElementPrinter"
@@ -15,40 +13,48 @@ import LayoutManager from "../layouts/LayoutManager"
 import WidgetScopesViewComponent from "../widgets/WidgetScopesViewComponent"
 import { getLayoutOptions } from "./layoutOptions"
 import { WidgetComponent } from "./WidgetComponent"
+import { DashboardDataSource, DashboardDesign, JsonQLFilter } from ".."
+
+export interface DashboardViewComponentProps {
+  /** schema to use */
+  schema: Schema
+  /** data source to use. Only used when designing, for display uses dashboardDataSource */
+  dataSource: DataSource
+  /** dashboard data source */
+  dashboardDataSource: DashboardDataSource
+
+  design: DashboardDesign
+
+  /** Leave unset for readonly */
+  onDesignChange?: (design: DashboardDesign) => void
+
+  /** Called with (tableId, rowId) when item is clicked */
+  onRowClick?: (tableId: string, rowId: any) => void
+
+  /** Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget */
+  namedStrings?: { [key: string]: string }
+
+  /** Filters to add to the dashboard (includes extra filters and any quickfilters from the dashboard component. Does not include dashboard level filters) */
+  filters?: JsonQLFilter[]
+
+  /** Entry to scroll to initially when dashboard is loaded */
+  initialTOCEntryScroll?: { widgetId: string; entryId: any }
+
+  /** True to hide scope display */
+  hideScopes?: boolean
+
+  /** True to render in print mode (prevents odd clipping issue) */
+  printMode?: boolean
+
+  /** Change to force a refresh */
+  refreshKey?: any
+}
 
 // Displays a dashboard, handling removing of widgets. No title bar or other decorations.
 // Handles scoping and stores the state of scope
-export default class DashboardViewComponent extends React.Component {
-  static propTypes = {
-    schema: PropTypes.object.isRequired, // schema to use
-    dataSource: PropTypes.object.isRequired, // data source to use. Only used when designing, for display uses dashboardDataSource
-    dashboardDataSource: PropTypes.object.isRequired, // dashboard data source
-
-    design: PropTypes.object.isRequired,
-    onDesignChange: PropTypes.func, // Leave unset for readonly
-
-    onRowClick: PropTypes.func, // Called with (tableId, rowId) when item is clicked
-    namedStrings: PropTypes.object, // Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
-
-    // Filters to add to the dashboard (includes extra filters and any quickfilters from the dashboard component. Does not include dashboard level filters)
-    filters: PropTypes.arrayOf(
-      PropTypes.shape({
-        table: PropTypes.string.isRequired, // id table to filter
-        jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
-      })
-    ),
-
-    // Entry to scroll to initially when dashboard is loaded
-    initialTOCEntryScroll: PropTypes.shape({ widgetId: PropTypes.string.isRequired, entryId: PropTypes.any }),
-
-    // True to hide scope display
-    hideScopes: PropTypes.bool,
-
-    // True to render in print mode (prevents odd clipping issue)
-    printMode: PropTypes.bool
-  }
-
+export default class DashboardViewComponent extends React.Component<DashboardViewComponentProps, { widgetScoper: WidgetScoper }> {
   static childContextTypes = { locale: PropTypes.string }
+  widgetComps: { [widgetId: string]: any }
 
   // Pass locale down. Both here and DashboardViewComponent to ensure that quickfilters also get context
   getChildContext() {
@@ -69,8 +75,8 @@ export default class DashboardViewComponent extends React.Component {
       // Getting heights of widgets properly requires a 0 length timeout
       setTimeout(() => {
         return this.handleScrollToTOCEntry(
-          this.props.initialTOCEntryScroll.widgetId,
-          this.props.initialTOCEntryScroll.entryId
+          this.props.initialTOCEntryScroll!.widgetId,
+          this.props.initialTOCEntryScroll!.entryId
         )
       }, 0)
     }
@@ -97,8 +103,8 @@ export default class DashboardViewComponent extends React.Component {
   }
 
   handleItemsChange = (items: any) => {
-    const design = _.extend({}, this.props.design, { items })
-    return this.props.onDesignChange(design)
+    const design = _.extend({}, this.props.design, { items }) as DashboardDesign
+    return this.props.onDesignChange!(design)
   }
 
   // Handle a change of the clipboard and determine which tables the clipboard block uses
@@ -209,7 +215,7 @@ export default class DashboardViewComponent extends React.Component {
     const clipboardContents = this.getClipboardContents()
 
     // Check if can't paste because of missing table
-    if (clipboardContents && !_.all(clipboardContents.tables, (table) => this.props.schema.getTable(table))) {
+    if (clipboardContents && !_.all(clipboardContents.tables, (table: string) => this.props.schema.getTable(table))) {
       cantPasteMessage = "Dashboard is missing one or more data sources needed for the copied item."
     }
 
@@ -252,7 +258,7 @@ export default class DashboardViewComponent extends React.Component {
       return widgetElem
     }
 
-    const style = {
+    const style: CSSProperties = {
       height: "100%",
       position: "relative"
     }

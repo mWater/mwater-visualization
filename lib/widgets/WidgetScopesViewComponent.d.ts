@@ -1,5 +1,5 @@
 import React from "react";
-interface WidgetScopesViewComponentProps {
+export interface WidgetScopesViewComponentProps {
     /** lookup of id to scope (see WidgetScoper for definition) */
     scopes: any;
     onRemoveScope: any;
@@ -24,4 +24,3 @@ export default class WidgetScopesViewComponent extends React.Component<WidgetSco
         className: string;
     }, HTMLElement> | null;
 }
-export {};

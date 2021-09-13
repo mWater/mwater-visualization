@@ -7,7 +7,9 @@ import _ from "lodash"
 //  filter: filter for other widgets in format { table: table id, jsonql: JsonQL with {alias} for the table name to filter by }
 //  data: internal, opaque data that the widget understands. opaque
 export default class WidgetScoper {
-  constructor(scopes: any) {
+  scopes: any
+  
+  constructor(scopes?: any) {
     this.scopes = scopes || {}
   }
 

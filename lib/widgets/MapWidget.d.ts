@@ -35,13 +35,7 @@ declare class MapWidgetComponent extends React.Component<MapWidgetComponentProps
     handleStartEditing: () => void;
     handleEndEditing: () => void;
     handleEditDesignChange: (design: any) => void;
-    renderEditor(): React.CElement<{
-        isOpen: boolean;
-        onRequestClose?: (() => void) | undefined;
-        backgroundColor?: string | undefined;
-        outerPadding?: number | undefined;
-        innerPadding?: number | undefined;
-    }, ModalWindowComponent> | null;
+    renderEditor(): React.CElement<any, ModalWindowComponent> | null;
     renderContent(design: any, onDesignChange: any, width: any, height: any): React.DetailedReactHTMLElement<{
         style: {
             width: any;

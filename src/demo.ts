@@ -660,50 +660,6 @@ var datagridDesign = {
   ]
 }
 
-// Caching data source for mWater. Requires jQuery
-MWaterDataSource = class MWaterDataSource extends DataSource {
-  // Caching allows server to send cached results
-  constructor(apiUrl: any, client: any, caching = true) {
-    super()
-    this.apiUrl = apiUrl
-    this.client = client
-    this.caching = caching
-  }
-
-  performQuery(query: any, cb: any) {
-    // If no callback, use promise
-    if (!cb) {
-      return new Promise((resolve, reject) => {
-        return this.performQuery(jsonql, (error: any, rows: any) => {
-          if (error) {
-            return reject(error)
-          } else {
-            return resolve(rows)
-          }
-        })
-      })
-    }
-
-    let url = this.apiUrl + "jsonql?jsonql=" + encodeURIComponent(JSON.stringify(query))
-    if (this.client) {
-      url += `&client=${this.client}`
-    }
-
-    // Setup caching
-    const headers = {}
-    if (!this.caching) {
-      headers["Cache-Control"] = "no-cache"
-    }
-
-    return $.ajax({ dataType: "json", url, headers })
-      .done((rows) => {
-        return cb(null, rows)
-      })
-      .fail((xhr) => {
-        return cb(new Error(xhr.responseText))
-      })
-  }
-}
 
 // mapDesign = {
 //   "baseLayer": "bing_road",

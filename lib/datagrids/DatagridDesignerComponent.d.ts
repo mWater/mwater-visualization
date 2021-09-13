@@ -20,18 +20,7 @@ export default class DatagridDesignerComponent extends React.Component<DatagridD
     handleFilterChange: (filter: any) => any;
     handleGlobalFiltersChange: (globalFilters: any) => any;
     handleOrderBysChange: (orderBys: any) => any;
-    renderTabs(): React.CElement<{
-        tabs: {
-            id: string;
-            label: React.ReactNode;
-            elem: React.ReactNode;
-            onRemove?: (() => void) | undefined;
-        }[];
-        initialTabId?: string | undefined;
-        tabId?: string | undefined;
-        onAddTab?: (() => void) | undefined;
-        onTabClick?: ((tabId: string) => void) | undefined;
-    }, TabbedComponent>;
+    renderTabs(): React.CElement<any, TabbedComponent>;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
 export {};

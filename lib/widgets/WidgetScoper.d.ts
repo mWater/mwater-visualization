@@ -1,5 +1,6 @@
 export default class WidgetScoper {
-    constructor(scopes: any);
+    scopes: any;
+    constructor(scopes?: any);
     applyScope(widgetId: any, scope: any): WidgetScoper;
     getScope(widgetId: any): any;
     getScopes(): any;

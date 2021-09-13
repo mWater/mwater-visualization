@@ -2,16 +2,36 @@ import WidgetFactory from "../widgets/WidgetFactory"
 import DirectWidgetDataSource from "../widgets/DirectWidgetDataSource"
 import LayoutManager from "../layouts/LayoutManager"
 import * as QuickfilterUtils from "../quickfilter/QuickfilterUtils"
+import DashboardDataSource from "./DashboardDataSource"
+import { Schema, DataSource } from "mwater-expressions"
 
-// Uses direct DataSource queries
-export default class DirectDashboardDataSource {
-  // Create dashboard data source that uses direct jsonql calls
-  // options:
-  //   schema: schema to use
-  //   dataSource: data source to use
-  //   apiUrl: API url to use for talking to mWater server
-  //   client: client id to use for talking to mWater server
-  constructor(options: any) {
+/** Uses direct DataSource queries */
+export default class DirectDashboardDataSource extends DashboardDataSource {
+  options: {
+    /** schema to use */
+    schema: any
+    /** data source to use */
+    dataSource: any
+    /** API url to use for talking to mWater server */
+    apiUrl?: string | undefined
+    /** client id to use for talking to mWater server */
+    client?: string | undefined
+  }
+  /** Create dashboard data source that uses direct jsonql calls */
+  constructor(options: {
+    /** schema to use */
+    schema: Schema
+
+    /** data source to use */
+    dataSource: DataSource
+
+    /** API url to use for talking to mWater server */
+    apiUrl?: string
+
+    /** client id to use for talking to mWater server */
+    client?: string
+  }) {
+    super()
     this.options = options
   }
 

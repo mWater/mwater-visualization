@@ -3,7 +3,7 @@ import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 
-interface WidgetScopesViewComponentProps {
+export interface WidgetScopesViewComponentProps {
   /** lookup of id to scope (see WidgetScoper for definition) */
   scopes: any
   onRemoveScope: any

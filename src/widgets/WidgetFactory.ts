@@ -10,6 +10,7 @@ import ImageWidget from "./ImageWidget"
 import MapWidget from "./MapWidget"
 import IFrameWidget from "./IFrameWidget"
 import TOCWidget from "./TOCWidget"
+import Widget from "./Widget"
 
 const widgetTypes = {
   LayeredChart: new ChartWidget(new LayeredChart()),
@@ -27,7 +28,7 @@ const widgetTypes = {
 
 // Creates widgets based on type
 export default class WidgetFactory {
-  static createWidget(type: any) {
+  static createWidget(type: string): Widget {
     if (widgetTypes[type]) {
       return widgetTypes[type]
     }

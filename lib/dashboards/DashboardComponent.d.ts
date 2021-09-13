@@ -76,10 +76,7 @@ export default class DashboardComponent extends React.Component<DashboardCompone
     handleDesignChange: (design: any) => void;
     handleShowQuickfilters: () => void;
     handleUpgrade: () => void;
-    getCompiledFilters(): {
-        table: string;
-        jsonql: string | number | true | import("jsonql").JsonQLLiteral | import("jsonql").JsonQLOp | import("jsonql").JsonQLCase | import("jsonql").JsonQLScalar | import("jsonql").JsonQLField | import("jsonql").JsonQLToken;
-    }[];
+    getCompiledFilters(): JsonQLFilter[];
     renderEditingSwitch(): React.DetailedReactHTMLElement<{
         key: string;
         className: string;

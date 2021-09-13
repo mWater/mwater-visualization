@@ -1,5 +1,6 @@
 import _ from "lodash"
 import { Expr, ExprCleaner, ExprCompiler, ExprUtils, FieldExpr, Schema } from "mwater-expressions"
+import { JsonQLFilter } from ".."
 import LayoutManager from "../layouts/LayoutManager"
 import WidgetFactory from "../widgets/WidgetFactory"
 import { DashboardDesign } from "./DashboardDesign"
@@ -25,7 +26,7 @@ export function getFilterableTables(design: DashboardDesign, schema: Schema) {
 }
 
 /** Get filters from props filters combined with dashboard filters */
-export function getCompiledFilters(design: DashboardDesign, schema: Schema, filterableTables: string[]) {
+export function getCompiledFilters(design: DashboardDesign, schema: Schema, filterableTables: string[]): JsonQLFilter[] {
   let expr: Expr, jsonql, table
   const exprCompiler = new ExprCompiler(schema)
   const exprCleaner = new ExprCleaner(schema)

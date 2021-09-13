@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { Schema, DataSource } from "mwater-expressions";
 import { JsonQLFilter } from "../JsonQLFilter";
 import { WidgetScope } from "../WidgetScope";
@@ -49,4 +50,4 @@ export declare function WidgetComponent(props: {
     onScrollToTOCEntry?: (widgetId: string, tocEntryId: string) => void;
     /** Change to force a refresh */
     refreshKey?: any;
-}): any;
+}): import("react").ReactElement<any, string | ((props: any) => import("react").ReactElement<any, string | any | (new (props: any) => import("react").Component<any, any, any>)> | null) | (new (props: any) => import("react").Component<any, any, any>)>;
