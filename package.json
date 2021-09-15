@@ -80,6 +80,7 @@
   },
   "devDependencies": {
     "@kadira/storybook": "^2.21.0",
+    "@types/d3": "^5.16.4",
     "@types/d3-format": "^1.4.1",
     "@types/dompurify": "0.0.32",
     "@types/jquery": "^3.5.5",

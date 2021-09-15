@@ -1,30 +1,43 @@
 import _ from "lodash"
 import React from "react"
-const R = React.createElement
 import moment from "moment"
 import { default as produce } from "immer"
-import { injectTableAlias } from "mwater-expressions"
+import { DataSource, Expr, injectTableAlias, Schema } from "mwater-expressions"
 import Chart from "../Chart"
 import { ExprCleaner } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import AxisBuilder from "../../../axes/AxisBuilder"
+import { JsonQLSelectQuery } from "jsonql"
+import { Axis } from "../../../axes/Axis"
+import { JsonQLFilter } from "../../.."
 
-/*
-Design is:
-  
-  table: table to use for data source
-  titleText: title text
-  dateAxis: date axis to use
-  valueAxis: axis for value
-  filter: optional logical expression to filter by
+export interface CalendarChartDesign {
+  /** table to use for data source */
+  table: string
 
-*/
+  /** title text */
+  titleText: string
+
+  /** date axis to use */
+  dateAxis: Axis | null
+
+  /** axis for value */
+  valueAxis: Axis | null
+
+  /** optional logical expression to filter by */
+  filter: Expr
+
+  /** Version of chart */
+  version?: number
+}
+
+/** Chart with a calendar by day */
 export default class CalendarChart extends Chart {
-  cleanDesign(design: any, schema: any) {
+  cleanDesign(design: CalendarChartDesign, schema: Schema) {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
-    design = produce(design, (draft: any) => {
+    design = produce(design, draft => {
       // Fill in defaults
       draft.version = design.version || 1
 
@@ -48,7 +61,7 @@ export default class CalendarChart extends Chart {
     return design
   }
 
-  validateDesign(design: any, schema: any) {
+  validateDesign(design: CalendarChartDesign, schema: Schema) {
     const axisBuilder = new AxisBuilder({ schema })
 
     // Check that has table
@@ -72,7 +85,7 @@ export default class CalendarChart extends Chart {
     return error
   }
 
-  isEmpty(design: any) {
+  isEmpty(design: CalendarChartDesign) {
     return !design.dateAxis || !design.valueAxis
   }
 
@@ -107,12 +120,12 @@ export default class CalendarChart extends Chart {
   // dataSource: data source to get data from
   // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   // callback: (error, data)
-  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
+  getData(design: CalendarChartDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any) {
     const exprCompiler = new ExprCompiler(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
     // Create shell of query
-    const query = {
+    const query: JsonQLSelectQuery = {
       type: "query",
       selects: [],
       from: exprCompiler.compileTable(design.table, "main"),
@@ -122,7 +135,7 @@ export default class CalendarChart extends Chart {
     }
 
     // Add date axis
-    const dateExpr = axisBuilder.compileAxis({ axis: design.dateAxis, tableAlias: "main" })
+    const dateExpr = axisBuilder.compileAxis({ axis: design.dateAxis!, tableAlias: "main" })
 
     query.selects.push({
       type: "select",
@@ -133,7 +146,7 @@ export default class CalendarChart extends Chart {
     // Add value axis
     query.selects.push({
       type: "select",
-      expr: axisBuilder.compileAxis({ axis: design.valueAxis, tableAlias: "main" }),
+      expr: axisBuilder.compileAxis({ axis: design.valueAxis!, tableAlias: "main" }),
       alias: "value"
     })
 
@@ -193,7 +206,7 @@ export default class CalendarChart extends Chart {
 
   createDataTable(design: any, schema: any, dataSource: any, data: any) {
     const header = ["Date", "Value"]
-    const rows = _.map(data, (row) => [moment(row.date).format("YYYY-MM-DD"), row.value])
+    const rows = _.map(data, (row: any) => [moment(row.date).format("YYYY-MM-DD"), row.value])
     return [header].concat(rows)
   }
 
