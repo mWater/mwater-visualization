@@ -40,7 +40,7 @@ export default class CalendarChart extends Chart {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
-    design = produce(design, draft => {
+    design = produce(design, (draft) => {
       // Fill in defaults
       draft.version = design.version || 1
 
@@ -203,7 +203,7 @@ export default class CalendarChart extends Chart {
 
       scope: options.scope,
       onScopeChange: options.onScopeChange,
-      cellStrokeColor: "#DDD",
+      cellStrokeColor: "#DDD"
     }
 
     return React.createElement(CalendarChartViewComponent, props)

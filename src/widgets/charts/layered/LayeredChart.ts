@@ -282,11 +282,11 @@ export default class LayeredChart extends Chart {
     const headers = []
 
     // Only allow if either all layers have x axis or one layer
-    if (!design.layers.every(layer => layer.axes.x != null) && design.layers.length > 1) {
+    if (!design.layers.every((layer) => layer.axes.x != null) && design.layers.length > 1) {
       throw new Error("Cannot export multi-layer charts without x axis")
     }
 
-    for (let layerNum = 0 ; layerNum < design.layers.length ; layerNum++) {
+    for (let layerNum = 0; layerNum < design.layers.length; layerNum++) {
       const layer = design.layers[layerNum]
       if (layer.axes.x && layerNum == 0) {
         headers.push(axisBuilder.summarizeAxis(layer.axes.x, locale))
@@ -300,18 +300,17 @@ export default class LayeredChart extends Chart {
     }
     table.push(headers)
 
-    for (let rowNum = 0 ; rowNum < data.layer0.length; rowNum++) {
+    for (let rowNum = 0; rowNum < data.layer0.length; rowNum++) {
       const r = []
 
-      for (let layerNum = 0 ; layerNum < design.layers.length ; layerNum++) {
+      for (let layerNum = 0; layerNum < design.layers.length; layerNum++) {
         const layer = design.layers[layerNum]
 
         let layerRow
         if (layerNum == 0) {
           // If first layer, use the row
           layerRow = data[`layer${layerNum}`][rowNum]
-        }
-        else {
+        } else {
           // Find the row with the same x value
           layerRow = _.find(data[`layer${layerNum}`], (r: any) => r.x == data["layer0"][rowNum].x)
         }
@@ -322,24 +321,22 @@ export default class LayeredChart extends Chart {
         if (layer.axes.color) {
           if (layerRow) {
             r.push(axisBuilder.formatValue(layer.axes.color, layerRow.color, locale))
-          }
-          else {
+          } else {
             r.push(null)
           }
         }
         if (layer.axes.y) {
           if (layerRow) {
             r.push(axisBuilder.formatValue(layer.axes.y, layerRow.y, locale))
-          }
-          else {
+          } else {
             r.push(null)
           }
         }
       }
-    
+
       table.push(r)
     }
-    return table   
+    return table
   }
 
   // Get a list of table ids that can be filtered on

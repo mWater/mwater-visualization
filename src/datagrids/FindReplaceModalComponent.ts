@@ -49,7 +49,10 @@ interface FindReplaceModalComponentState {
 }
 
 // Modal to perform find/replace on datagrid
-export default class FindReplaceModalComponent extends React.Component<FindReplaceModalComponentProps, FindReplaceModalComponentState> {
+export default class FindReplaceModalComponent extends React.Component<
+  FindReplaceModalComponentProps,
+  FindReplaceModalComponentState
+> {
   constructor(props: any) {
     super(props)
 

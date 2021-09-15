@@ -16,7 +16,7 @@ interface CalendarChartDesignerComponentProps {
   design: CalendarChartDesign
   schema: any
   dataSource: any
-  onDesignChange: (design: CalendarChartDesign) => void 
+  onDesignChange: (design: CalendarChartDesign) => void
   filters?: any
 }
 
@@ -176,7 +176,6 @@ export default class CalendarChartDesignerComponent extends React.Component<Cale
       )
     )
   }
-
 
   render() {
     return R(

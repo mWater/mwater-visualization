@@ -10,6 +10,6 @@ export default class DashboardDataSource {
 
   /** Gets the quickfilters data source */
   getQuickfiltersDataSource(): QuickfiltersDataSource {
-    throw new Error("Not implemented")    
+    throw new Error("Not implemented")
   }
 }

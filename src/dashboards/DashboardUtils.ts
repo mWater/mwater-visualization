@@ -26,7 +26,11 @@ export function getFilterableTables(design: DashboardDesign, schema: Schema) {
 }
 
 /** Get filters from props filters combined with dashboard filters */
-export function getCompiledFilters(design: DashboardDesign, schema: Schema, filterableTables: string[]): JsonQLFilter[] {
+export function getCompiledFilters(
+  design: DashboardDesign,
+  schema: Schema,
+  filterableTables: string[]
+): JsonQLFilter[] {
   let expr: Expr, jsonql, table
   const exprCompiler = new ExprCompiler(schema)
   const exprCleaner = new ExprCleaner(schema)

@@ -17,7 +17,7 @@ interface CalendarChartViewComponentProps {
   design: CalendarChartDesign // Design of chart
 
   /** Data that the chart has requested. In format [{ date: <YYYY-MM-DD>, value: <number value> }, { date: ... }...] */
-  data: { date: string, value: number }[] 
+  data: { date: string; value: number }[]
   schema: Schema
 
   width: number
@@ -33,7 +33,7 @@ interface CalendarChartViewComponentProps {
   monthsStrokeWidth?: number
 
   /** the day cell stroke color */
-  cellStrokeColor?: string 
+  cellStrokeColor?: string
 
   highlightCellFillColor?: string
 }

@@ -660,7 +660,6 @@ var datagridDesign = {
   ]
 }
 
-
 // mapDesign = {
 //   "baseLayer": "bing_road",
 //   "layerViews": [

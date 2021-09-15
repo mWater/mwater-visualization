@@ -77,7 +77,7 @@ export default class LayoutManager {
         throw new Error(`Unknown layout manager type ${type}`)
     }
   }
- 
+
   addWidget(items: any, widgetType: string, widgetDesign: any): any {
     throw new Error("Not implemented")
   }

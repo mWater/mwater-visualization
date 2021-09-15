@@ -40,7 +40,14 @@ export interface Axis {
     max?: number
     excludeUpper?: boolean
     excludeLower?: boolean
-    ranges?: { id: string, label?: string, minValue: number | null, maxValue: number | null, minOpen: boolean, maxOpen: boolean }[]
+    ranges?: {
+      id: string
+      label?: string
+      minValue: number | null
+      maxValue: number | null
+      minOpen: boolean
+      maxOpen: boolean
+    }[]
   }
 
   colorMap?: ColorMap

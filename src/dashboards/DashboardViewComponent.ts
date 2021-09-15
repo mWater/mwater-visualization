@@ -54,7 +54,10 @@ export interface DashboardViewComponentProps {
  * Displays a dashboard, handling removing of widgets. No title bar or other decorations.
  * Handles scoping and stores the state of scope
  */
-export default class DashboardViewComponent extends React.Component<DashboardViewComponentProps, { widgetScoper: WidgetScoper }> {
+export default class DashboardViewComponent extends React.Component<
+  DashboardViewComponentProps,
+  { widgetScoper: WidgetScoper }
+> {
   static childContextTypes = { locale: PropTypes.string }
   widgetComps: { [widgetId: string]: any }
 

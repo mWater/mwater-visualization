@@ -59,7 +59,7 @@ export interface DashboardComponentProps {
   filters?: JsonQLFilter[]
 
   /** True to hide title bar and related controls */
-  hideTitleBar?: boolean  
+  hideTitleBar?: boolean
 }
 
 export interface DashboardComponentState {
@@ -74,7 +74,7 @@ export interface DashboardComponentState {
 /** Dashboard component that includes an action bar at the top
  * Manages undo stack and quickfilter value
  */
- export default class DashboardComponent extends React.Component<DashboardComponentProps, DashboardComponentState> {
+export default class DashboardComponent extends React.Component<DashboardComponentProps, DashboardComponentState> {
   dashboardView: DashboardViewComponent | null
 
   static defaultProps = { printScaling: true }

@@ -8,7 +8,7 @@ import _ from "lodash"
 //  data: internal, opaque data that the widget understands. opaque
 export default class WidgetScoper {
   scopes: any
-  
+
   constructor(scopes?: any) {
     this.scopes = scopes || {}
   }
