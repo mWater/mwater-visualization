@@ -1,4 +1,4 @@
-import { Schema } from "mwater-expressions";
+import { Expr, Schema } from "mwater-expressions";
 import { ExprValidator } from "mwater-expressions";
 import { ExprUtils } from "mwater-expressions";
 import { ExprCleaner } from "mwater-expressions";
@@ -113,20 +113,8 @@ export default class AxisBuilder {
     formatCategory(axis: any, category: any): any;
     summarizeAxis(axis: any, locale: any): string;
     formatValue(axis: Axis, value: any, locale: string, legacyPercentFormat?: any): any;
-    createValueFilter(axis: any, value: any): {
-        type: string;
-        op: string;
-        exprs: (string | number | boolean | import("jsonql").JsonQLOp | import("jsonql").JsonQLCase | import("jsonql").JsonQLScalar | import("jsonql").JsonQLField | import("jsonql").JsonQLToken | {
-            type: string;
-            value: any;
-        } | null)[];
-    };
-    createValueFilterExpr(axis: any, value: any): {
-        table: any;
-        type: string;
-        op: string;
-        exprs: any[];
-    };
+    createValueFilter(axis: any, value: any): JsonQLExpr;
+    createValueFilterExpr(axis: any, value: any): Expr;
     isCategorical(axis: any): boolean;
     convertAxisToExpr(axis: any): any;
 }

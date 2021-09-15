@@ -9,30 +9,32 @@ import AxisBuilder from "../../../axes/AxisBuilder"
 import AxisComponent from "../../../axes/AxisComponent"
 import { FilterExprComponent } from "mwater-expressions-ui"
 import TableSelectComponent from "../../../TableSelectComponent"
+import ColorComponent from "../../../ColorComponent"
+import { CalendarChartDesign } from "./CalendarChart"
 
 interface CalendarChartDesignerComponentProps {
-  design: any
+  design: CalendarChartDesign
   schema: any
   dataSource: any
-  onDesignChange: any
+  onDesignChange: (design: CalendarChartDesign) => void 
   filters?: any
 }
 
 export default class CalendarChartDesignerComponent extends React.Component<CalendarChartDesignerComponentProps> {
   // Updates design with the specified changes
   updateDesign(changes: any) {
-    const design = _.extend({}, this.props.design, changes)
-    return this.props.onDesignChange(design)
+    const design = _.extend({}, this.props.design, changes) as CalendarChartDesign
+    this.props.onDesignChange(design)
   }
 
   handleTitleTextChange = (ev: any) => {
-    return this.updateDesign({ titleText: ev.target.value })
+    this.updateDesign({ titleText: ev.target.value })
   }
   handleTableChange = (table: any) => {
-    return this.updateDesign({ table })
+    this.updateDesign({ table })
   }
   handleFilterChange = (filter: any) => {
-    return this.updateDesign({ filter })
+    this.updateDesign({ filter })
   }
 
   handleDateAxisChange = (dateAxis: any) => {
@@ -40,14 +42,18 @@ export default class CalendarChartDesignerComponent extends React.Component<Cale
     if (!this.props.design.valueAxis && dateAxis) {
       // Create count expr
       const valueAxis = { expr: { type: "op", op: "count", table: this.props.design.table, exprs: [] }, xform: null }
-      return this.updateDesign({ dateAxis, valueAxis })
+      this.updateDesign({ dateAxis, valueAxis })
     } else {
-      return this.updateDesign({ dateAxis })
+      this.updateDesign({ dateAxis })
     }
   }
 
   handleValueAxisChange = (valueAxis: any) => {
-    return this.updateDesign({ valueAxis })
+    this.updateDesign({ valueAxis })
+  }
+
+  handleCellColorChange = (cellColor: any) => {
+    this.updateDesign({ cellColor })
   }
 
   renderTable() {
@@ -149,6 +155,29 @@ export default class CalendarChartDesignerComponent extends React.Component<Cale
     )
   }
 
+  renderCellColor() {
+    return R(
+      "div",
+      { className: "form-group" },
+      R(
+        "label",
+        { className: "text-muted" },
+        R("span", { className: "glyphicon glyphicon glyphicon-tint" }),
+        "Cell Color"
+      ),
+
+      R(
+        "div",
+        null,
+        R(ColorComponent, {
+          color: this.props.design.cellColor || "#FDAE61",
+          onChange: this.handleCellColorChange
+        })
+      )
+    )
+  }
+
+
   render() {
     return R(
       "div",
@@ -157,6 +186,7 @@ export default class CalendarChartDesignerComponent extends React.Component<Cale
       this.renderDateAxis(),
       this.renderValueAxis(),
       this.renderFilter(),
+      this.renderCellColor(),
       R("hr"),
       this.renderTitle()
     )

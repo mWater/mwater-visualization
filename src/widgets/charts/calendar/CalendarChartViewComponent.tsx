@@ -15,6 +15,7 @@ import { WidgetScope } from "../../.."
 
 interface CalendarChartViewComponentProps {
   design: CalendarChartDesign // Design of chart
+
   /** Data that the chart has requested. In format [{ date: <YYYY-MM-DD>, value: <number value> }, { date: ... }...] */
   data: { date: string, value: number }[] 
   schema: Schema
@@ -31,8 +32,6 @@ interface CalendarChartViewComponentProps {
   monthsStrokeColor?: string
   monthsStrokeWidth?: number
 
-  /** the day cell color */
-  cellColor?: string 
   /** the day cell stroke color */
   cellStrokeColor?: string 
 
@@ -44,7 +43,6 @@ export default class CalendarChartViewComponent extends React.Component<Calendar
   static defaultProps = {
     monthsStrokeColor: "#222",
     monthsStrokeWidth: 1,
-    cellColor: "#FDAE61",
     highlightCellFillColor: "#000000"
   }
 
@@ -136,11 +134,11 @@ export default class CalendarChartViewComponent extends React.Component<Calendar
     const cellSize = this.getCellSize()
     const height = Math.ceil(cellSize * 7) + 7
     const format = d3.timeFormat("%Y-%m-%d")
-    const percent = d3.format(".1%")
-    const cellStroke = this.props.cellStrokeColor || this.props.cellColor
+    const cellColor = this.props.design.cellColor || "#FDAE61"
+    const cellStroke = this.props.cellStrokeColor || cellColor
     const self = this
 
-    const rgb = d3.rgb(this.props.cellColor!)
+    const rgb = d3.rgb(cellColor)
     const years = this.getYears()
 
     // Don't draw if no years

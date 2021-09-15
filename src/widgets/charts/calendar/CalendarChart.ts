@@ -27,13 +27,16 @@ export interface CalendarChartDesign {
   /** optional logical expression to filter by */
   filter: Expr
 
+  /** Optional cell color (default "#FDAE61") */
+  cellColor?: string
+
   /** Version of chart */
   version?: number
 }
 
 /** Chart with a calendar by day */
 export default class CalendarChart extends Chart {
-  cleanDesign(design: CalendarChartDesign, schema: Schema) {
+  cleanDesign(design: CalendarChartDesign, schema: Schema): CalendarChartDesign {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
@@ -187,10 +190,12 @@ export default class CalendarChart extends Chart {
     // Require here to prevent server require problems
     const CalendarChartViewComponent = require("./CalendarChartViewComponent").default
 
+    const design = this.cleanDesign(options.design, options.schema)
+
     // Create chart
     const props = {
       schema: options.schema,
-      design: this.cleanDesign(options.design, options.schema),
+      design,
       data: options.data,
 
       width: options.width,
@@ -198,7 +203,7 @@ export default class CalendarChart extends Chart {
 
       scope: options.scope,
       onScopeChange: options.onScopeChange,
-      cellStrokeColor: "#DDD"
+      cellStrokeColor: "#DDD",
     }
 
     return React.createElement(CalendarChartViewComponent, props)
