@@ -1,4 +1,3 @@
-import { JsonQLFilter } from "../JsonQLFilter";
 import { Quickfilter } from "../quickfilter/Quickfilter";
 import { LiteralType, Expr } from "mwater-expressions";
 import { BlocksLayoutOptions, DashboardTheme } from "./layoutOptions";
@@ -18,7 +17,9 @@ export interface DashboardDesign {
     /** Options for layout including responsiveness, scaling, etc */
     layoutOptions?: BlocksLayoutOptions;
     /** filter expression indexed by table. e.g. { sometable: logical expression, etc. } */
-    filters?: JsonQLFilter[];
+    filters?: {
+        [tableId: string]: Expr;
+    };
     /** optional locale (e.g. "fr") to use for display */
     locale?: string;
     /** true to enable implicit filtering (see ImplicitFilterBuilder). Defaults to true for older dashboards. */

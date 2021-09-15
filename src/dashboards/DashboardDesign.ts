@@ -24,7 +24,7 @@ export interface DashboardDesign {
   layoutOptions?: BlocksLayoutOptions
 
   /** filter expression indexed by table. e.g. { sometable: logical expression, etc. } */
-  filters?: JsonQLFilter[]
+  filters?: { [tableId: string]: Expr }
 
   /** optional locale (e.g. "fr") to use for display */
   locale?: string
