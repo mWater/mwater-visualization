@@ -1,5 +1,5 @@
 import _ from "lodash"
-import mapboxgl from "mapbox-gl"
+import maplibregl from "maplibre-gl"
 import { DataSource, Schema } from "mwater-expressions"
 import React, { CSSProperties, ReactNode, useEffect, useState } from "react"
 import { useRef } from "react"
@@ -15,7 +15,7 @@ import {
   MapScope
 } from "./MapUtils"
 
-import "mapbox-gl/dist/mapbox-gl.css"
+// import "maplibre-gl/src/"
 import "./NewMapViewComponent.css"
 import { LayerSwitcherComponent } from "./LayerSwitcherComponent"
 import LegendComponent from "./LegendComponent"
@@ -66,7 +66,7 @@ export function NewMapViewComponent(props: {
   /** Locale to use */
   locale: string
 }) {
-  const [map, setMap] = useState<mapboxgl.Map>()
+  const [map, setMap] = useState<maplibregl.Map>()
   const divRef = useRef<HTMLDivElement | null>(null)
 
   /** Increments when a new user style is being generated. Indicates that
@@ -324,7 +324,7 @@ export function NewMapViewComponent(props: {
 
   // Load map and symbols
   useEffect(() => {
-    const m = new mapboxgl.Map({
+    const m = new maplibregl.Map({
       container: divRef.current!,
       accessToken: "pk.eyJ1IjoiZ3Jhc3NpY2siLCJhIjoiY2ozMzU1N3ZoMDA3ZDJxbzh0aTRtOTRoeSJ9.fFWBZ88vbdezyhfw-I-fag",
       bounds: props.design.bounds
@@ -333,14 +333,19 @@ export function NewMapViewComponent(props: {
       scrollZoom: props.scrollWheelZoom === false ? false : true,
       dragPan: props.dragging === false ? false : true,
       touchZoomRotate: props.touchZoom === false ? false : true,
-      attributionControl: false
+      attributionControl: false,
+      style: {
+        version: 8,
+        layers: [],
+        sources: {}
+      }
     })
 
     // Add zoom controls to the map.
-    m.addControl(new mapboxgl.NavigationControl({}), "top-left")
+    m.addControl(new maplibregl.NavigationControl({}), "top-left")
 
     // Add scale control
-    const scale = new mapboxgl.ScaleControl({
+    const scale = new maplibregl.ScaleControl({
       unit: "metric"
     })
     m.addControl(scale)

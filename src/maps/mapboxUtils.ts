@@ -1,9 +1,8 @@
-import { Expression } from "mapbox-gl"
 import { Axis } from "../axes/Axis"
 
 /** Compile a color mapped axis to mapbox format case statement */
 export function compileColorMapToMapbox(axis: Axis | undefined, defaultColor: string) {
-  let compiled: Expression | string
+  let compiled: any[] | string
 
   if (axis && axis.colorMap) {
     const excludedValues = axis.excludedValues || []
