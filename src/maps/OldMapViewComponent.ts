@@ -3,58 +3,58 @@ import _ from "lodash"
 import React from "react"
 const R = React.createElement
 import LeafletMapComponent from "./LeafletMapComponent"
-import { ExprUtils } from "mwater-expressions"
-import { ExprCompiler } from "mwater-expressions"
+import { ExprUtils, Schema, DataSource } from "mwater-expressions"
 import LayerFactory from "./LayerFactory"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 import * as MapUtils from "./MapUtils"
 import { LayerSwitcherComponent } from "./LayerSwitcherComponent"
 import { default as LegendComponent } from "./LegendComponent"
+import { JsonQLFilter } from "../JsonQLFilter"
+import { MapDesign } from "./MapDesign"
+import { MapDataSource } from "./MapDataSource"
+import { MapScope } from "./MapUtils"
+
+interface OldMapViewComponentProps {
+  schema: Schema
+  dataSource: DataSource
+  mapDataSource: MapDataSource
+
+  design: MapDesign
+  onDesignChange?: (design: MapDesign) => void
+
+  /** Width in pixels */
+  width: number
+
+  /** Height in pixels */
+  height: number
+
+  /** Called with (tableId, rowId) when item is clicked */
+  onRowClick?: (tableId: string, rowId: any) => void
+
+  /** Extra filters to apply to view */
+  extraFilters?: JsonQLFilter[]
+
+  /** scope of the map (when a layer self-selects a particular scope) */
+  scope?: MapScope
+
+  /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
+  onScopeChange: (scope: MapScope | null) => void
+
+  /** Whether the map be draggable with mouse/touch or not. Default true */
+  dragging?: boolean
+
+  /** Whether the map can be zoomed by touch-dragging with two fingers. Default true */
+  touchZoom?: boolean
+
+  /** Whether the map can be zoomed by using the mouse wheel. Default true */
+  scrollWheelZoom?: boolean
+
+  /** Whether changes to zoom level should be persisted. Default false  */
+  zoomLocked?: boolean
+}
 
 // Component that displays just the map
-export default class OldMapViewComponent extends React.Component {
-  static propTypes = {
-    schema: PropTypes.object.isRequired, // Schema to use
-    dataSource: PropTypes.object.isRequired, // data source to use
-
-    // Url source for the map
-    mapDataSource: PropTypes.shape({
-      // Gets the data source for a layer
-      getLayerDataSource: PropTypes.func.isRequired,
-
-      // Gets the bounds for the map. Null for no opinion. Callback as { n:, s:, w:, e: }
-      getBounds: PropTypes.func.isRequired
-    }).isRequired,
-
-    design: PropTypes.object.isRequired, // See Map Design.md
-    onDesignChange: PropTypes.func, // Called with new design. null/undefined to ignore bounds changes
-
-    width: PropTypes.number, // Width in pixels
-    height: PropTypes.number, // Height in pixels
-
-    onRowClick: PropTypes.func, // Called with (tableId, rowId) when item is clicked
-
-    extraFilters: PropTypes.arrayOf(
-      PropTypes.shape({
-        table: PropTypes.string.isRequired,
-        jsonql: PropTypes.object.isRequired
-      })
-    ), // Extra filters to apply to view
-
-    // scope of the map (when a layer self-selects a particular scope)
-    scope: PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      filter: PropTypes.shape({ table: PropTypes.string.isRequired, jsonql: PropTypes.object.isRequired }),
-      data: PropTypes.shape({ layerViewId: PropTypes.string.isRequired, data: PropTypes.any }).isRequired
-    }),
-    onScopeChange: PropTypes.func, // called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details
-
-    dragging: PropTypes.bool, // Whether the map be draggable with mouse/touch or not. Default true
-    touchZoom: PropTypes.bool, // Whether the map can be zoomed by touch-dragging with two fingers. Default true
-    scrollWheelZoom: PropTypes.bool, // Whether the map can be zoomed by using the mouse wheel. Default true
-    zoomLocked: PropTypes.bool // Whether changes to zoom level should be persisted. Default false
-  }
-
+export default class OldMapViewComponent extends React.Component<OldMapViewComponentProps> {
   static contextTypes = { locale: PropTypes.string }
 
   constructor(props: any) {
