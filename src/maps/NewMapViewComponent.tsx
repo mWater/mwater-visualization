@@ -20,6 +20,9 @@ import "./NewMapViewComponent.css"
 import { LayerSwitcherComponent } from "./LayerSwitcherComponent"
 import LegendComponent from "./LegendComponent"
 
+import darkMatter from './map-styles/dark-matter.json'
+import positron from './map-styles/positron.json'
+
 type LayerClickHandlerEvent = mapboxgl.MapMouseEvent & {
   features?: mapboxgl.MapboxGeoJSONFeature[] | undefined
 } & mapboxgl.EventData
@@ -379,34 +382,34 @@ export function NewMapViewComponent(props: {
       return
     }
 
-    let style: string | undefined
-    if (props.design.baseLayer == "cartodb_positron") {
-      style = "light-v10"
-    } else if (props.design.baseLayer == "cartodb_dark_matter") {
-      style = "dark-v10"
-    } else if (props.design.baseLayer == "bing_road") {
-      style = "streets-v11"
-    } else if (props.design.baseLayer == "bing_aerial") {
-      style = "satellite-streets-v11"
+    function loadStyle(styleUrl: string) {
+      // Load style
+      fetch(styleUrl)
+        .then((response) => response.json())
+        .then((styleData: mapboxgl.Style) => {
+          // Set style and update layers
+          setBaseStyle(styleData)
+        })
     }
 
-    if (!style) {
+    if (props.design.baseLayer == "cartodb_positron") {
+      setBaseStyle(positron as any)
+      return
+    } else if (props.design.baseLayer == "cartodb_dark_matter") {
+      setBaseStyle(darkMatter as any)
+      return
+    } else if (props.design.baseLayer == "bing_road") {
+      loadStyle("https://api.maptiler.com/maps/streets/style.json?key=K5i6tDA2NhSkq80oO102")
+    } else if (props.design.baseLayer == "bing_aerial") {
+      loadStyle("https://api.maptiler.com/maps/hybrid/style.json?key=K5i6tDA2NhSkq80oO102")
+    }
+    else if (props.design.baseLayer == "blank") {
       setBaseStyle({
         version: 8,
         layers: [],
         sources: {}
       })
-      return
     }
-
-    // Load style
-    const styleUrl = `https://api.mapbox.com/styles/v1/mapbox/${style}?access_token=pk.eyJ1IjoiZ3Jhc3NpY2siLCJhIjoiY2ozMzU1N3ZoMDA3ZDJxbzh0aTRtOTRoeSJ9.fFWBZ88vbdezyhfw-I-fag`
-    fetch(styleUrl)
-      .then((response) => response.json())
-      .then((styleData: mapboxgl.Style) => {
-        // Set style and update layers
-        setBaseStyle(styleData)
-      })
   }, [map, props.design.baseLayer])
 
   // Update user layers
