@@ -15,7 +15,7 @@ import {
   MapScope
 } from "./MapUtils"
 
-// import "maplibre-gl/src/"
+import "maplibre-gl/dist/maplibre-gl.css"
 import "./NewMapViewComponent.css"
 import { LayerSwitcherComponent } from "./LayerSwitcherComponent"
 import LegendComponent from "./LegendComponent"
