@@ -50,10 +50,10 @@ export function MapViewComponent(props: {
   /** Locale to use */
   locale: string
 }) {
-  // if (window.localStorage.getItem("newmaps") == "true") {
-  //   return <NewMapViewComponent {...props}/>
-  // }
-  // else {
-  return <OldMapViewComponent {...props} />
-  // }
+  if (window.localStorage.getItem("maptech") == "maplibre") {
+    return <NewMapViewComponent {...props}/>
+  }
+  else {
+    return <OldMapViewComponent {...props} />
+  }
 }
