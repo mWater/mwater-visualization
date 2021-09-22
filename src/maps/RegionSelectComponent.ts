@@ -1,18 +1,18 @@
-import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
 
 import { IdLiteralComponent } from "mwater-expressions-ui"
+import { DataSource, Schema } from "mwater-expressions"
+import { JsonQLExpr } from "jsonql"
 
 interface RegionSelectComponentProps {
-  /** Schema to use */
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   /** _id of region */
-  region?: number
-  /** Called with (_id, level) */
-  onChange: any
+  region: number | null
+  onChange: (region: number | null, level: number | null) => void
+  /** Default "All Countries" */
   placeholder?: string
   /** e.g. "admin_regions" */
   regionsTable: string
@@ -57,7 +57,7 @@ export default class RegionSelectComponent extends React.Component<RegionSelectC
   }
 
   render() {
-    let filter = null
+    let filter: JsonQLExpr | undefined = undefined
     if (this.props.maxLevel != null) {
       filter = {
         type: "op",

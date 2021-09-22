@@ -1,23 +1,30 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
 import $ from "jquery"
 import _ from "lodash"
-import { Schema } from "mwater-expressions"
+import { DataSource, Schema } from "mwater-expressions"
 import MWaterDataSource from "mwater-expressions/lib/MWaterDataSource"
 import querystring from "querystring"
 
-// Loads a schema and data source that is specific to mWater server
-// options:
-//   apiUrl: e.g. "https://api.mwater.co/v3/". required
-//   client: client id if logged in. optional
-//   share: share if using a share to get schema. optional
-//   asUser: Load schema as a specific user (for shared dashboards, etc). optional
-//   extraTables: Extra tables to load in schema. Forms are not loaded by default as they are too many
-//   localCaching: default true. False to disable local caching of queries
-// callback is called with (error, config) where config is { schema, dataSource }
-export default function (options: any, callback: any) {
+
+/** Loads a schema and data source that is specific to mWater server */
+export default function mWaterLoader(
+  options: {
+    /** e.g. "https://api.mwater.co/v3/". required */
+    apiUrl: string
+    /** client id if logged in. optional */
+    client?: string
+    /** share if using a share to get schema. optional */
+    share?: string
+    /** Load schema as a specific user (for shared dashboards, etc). optional */
+    asUser?: string
+    /** Extra tables to load in schema. Forms are not loaded by default as they are too many */
+    extraTables: string[]
+    /** False to disable local caching of queries. Default true */
+    localCaching?: boolean
+  },
+  callback: (error: any, config?: { schema: Schema; dataSource: DataSource }) => void
+): void {
   // Load schema
-  const query = {}
+  const query: any = {}
   if (options.client) {
     query.client = options.client
   }
@@ -33,7 +40,7 @@ export default function (options: any, callback: any) {
 
   const url = options.apiUrl + "schema?" + querystring.stringify(query)
 
-  return $.getJSON(url, (schemaJson) => {
+  $.getJSON(url, (schemaJson) => {
     const schema = new Schema(schemaJson)
     const dataSource = new MWaterDataSource(options.apiUrl, options.client, {
       serverCaching: false,

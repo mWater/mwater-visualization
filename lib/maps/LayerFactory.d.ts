@@ -1,3 +1,5 @@
+import Layer from "./Layer";
+/** Creates a layer */
 export default class LayerFactory {
-    static createLayer(type: any): any;
+    static createLayer(type: string): Layer<any>;
 }

@@ -66,7 +66,7 @@ declare class ServerWidgetLayerDataSource implements MapLayerDataSource {
     options: ServerWidgetLayerDataSourceOptions;
     constructor(options: ServerWidgetLayerDataSourceOptions);
     getTileUrl(design: any, filters: JsonQLFilter[]): any;
-    getUtfGridUrl(design: any, filters: JsonQLFilter[]): any;
+    getUtfGridUrl(design: any, filters: JsonQLFilter[]): string | null;
     /** Get the url for vector tile source with an expiry time. Only for layers of type "VectorTile"
      * @param createdAfter ISO 8601 timestamp requiring that tile source on server is created after specified datetime
      */

@@ -59,7 +59,7 @@ export default class MapLayerViewDesignerComponent extends React.Component<MapLa
             cursor: "pointer";
         };
     }, HTMLElement>;
-    renderEditor(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+    renderEditor(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
     renderLayerEditToggle(): React.DetailedReactHTMLElement<{
         key: string;
         style: {

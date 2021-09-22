@@ -3,16 +3,34 @@ import async from "async"
 import LayerFactory from "./LayerFactory"
 import * as MapUtils from "./MapUtils"
 
-// Calculates map bounds given layers by unioning together
+import { DataSource, Schema } from "mwater-expressions"
+import { JsonQLFilter } from "../JsonQLFilter"
+import { MapDesign } from "./MapDesign"
+
+interface Bounds {
+  n: number
+  e: number
+  s: number
+  w: number
+}
+
+/** Calculates map bounds given layers by unioning together */
 export default class MapBoundsCalculator {
-  constructor(schema: any, dataSource: any) {
+  schema: Schema
+  dataSource: DataSource
+
+  constructor(schema: Schema, dataSource: DataSource) {
     this.schema = schema
     this.dataSource = dataSource
   }
 
-  // Gets the bounds for the map. Null for whole world. Callback as { n:, s:, w:, e: }
-  getBounds(design: any, filters: any, callback: any) {
-    const allBounds: any = []
+  /** Gets the bounds for the map. Null for whole world. Callback as { n:, s:, w:, e: } */
+  getBounds(
+    design: MapDesign,
+    filters: JsonQLFilter[],
+    callback: (error: any, bounds?: { w: number; n: number; e: number; s: number } | null) => void
+  ): void {
+    const allBounds: Bounds[] = []
 
     // For each layer
     return async.each(

@@ -6,9 +6,11 @@ import { default as ClusterLayer } from "./ClusterLayer"
 import TileUrlLayer from "./TileUrlLayer"
 import { default as SwitchableTileUrlLayer } from "./SwitchableTileUrlLayer"
 import { default as GridLayer } from "./GridLayer"
+import Layer from "./Layer"
 
+/** Creates a layer */
 export default class LayerFactory {
-  static createLayer(type: any) {
+  static createLayer(type: string): Layer<any> {
     switch (type) {
       case "MWaterServer":
         return new MWaterServerLayer()
