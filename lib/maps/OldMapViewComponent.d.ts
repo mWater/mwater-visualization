@@ -1,57 +1,62 @@
 import PropTypes from "prop-types";
-import React from "react";
+import React, { ReactNode } from "react";
+import LeafletMapComponent from "./LeafletMapComponent";
+import { Schema, DataSource } from "mwater-expressions";
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent";
-export default class OldMapViewComponent extends React.Component {
-    static propTypes: {
-        schema: PropTypes.Validator<object>;
-        dataSource: PropTypes.Validator<object>;
-        mapDataSource: PropTypes.Validator<PropTypes.InferProps<{
-            getLayerDataSource: PropTypes.Validator<(...args: any[]) => any>;
-            getBounds: PropTypes.Validator<(...args: any[]) => any>;
-        }>>;
-        design: PropTypes.Validator<object>;
-        onDesignChange: PropTypes.Requireable<(...args: any[]) => any>;
-        width: PropTypes.Requireable<number>;
-        height: PropTypes.Requireable<number>;
-        onRowClick: PropTypes.Requireable<(...args: any[]) => any>;
-        extraFilters: PropTypes.Requireable<(PropTypes.InferProps<{
-            table: PropTypes.Validator<string>;
-            jsonql: PropTypes.Validator<object>;
-        }> | null | undefined)[]>;
-        scope: PropTypes.Requireable<PropTypes.InferProps<{
-            name: PropTypes.Validator<string>;
-            filter: PropTypes.Requireable<PropTypes.InferProps<{
-                table: PropTypes.Validator<string>;
-                jsonql: PropTypes.Validator<object>;
-            }>>;
-            data: PropTypes.Validator<PropTypes.InferProps<{
-                layerViewId: PropTypes.Validator<string>;
-                data: PropTypes.Requireable<any>;
-            }>>;
-        }>>;
-        onScopeChange: PropTypes.Requireable<(...args: any[]) => any>;
-        dragging: PropTypes.Requireable<boolean>;
-        touchZoom: PropTypes.Requireable<boolean>;
-        scrollWheelZoom: PropTypes.Requireable<boolean>;
-        zoomLocked: PropTypes.Requireable<boolean>;
-    };
+import { JsonQLFilter } from "../JsonQLFilter";
+import { MapDesign } from "./MapDesign";
+import { MapDataSource } from "./MapDataSource";
+import { MapScope } from "./MapUtils";
+interface OldMapViewComponentProps {
+    schema: Schema;
+    dataSource: DataSource;
+    mapDataSource: MapDataSource;
+    design: MapDesign;
+    onDesignChange?: (design: MapDesign) => void;
+    /** Width in pixels */
+    width: number;
+    /** Height in pixels */
+    height: number;
+    /** Called with (tableId, rowId) when item is clicked */
+    onRowClick?: (tableId: string, rowId: any) => void;
+    /** Extra filters to apply to view */
+    extraFilters?: JsonQLFilter[];
+    /** scope of the map (when a layer self-selects a particular scope) */
+    scope?: MapScope;
+    /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
+    onScopeChange: (scope: MapScope | null) => void;
+    /** Whether the map be draggable with mouse/touch or not. Default true */
+    dragging?: boolean;
+    /** Whether the map can be zoomed by touch-dragging with two fingers. Default true */
+    touchZoom?: boolean;
+    /** Whether the map can be zoomed by using the mouse wheel. Default true */
+    scrollWheelZoom?: boolean;
+    /** Whether changes to zoom level should be persisted. Default false  */
+    zoomLocked?: boolean;
+}
+export default class OldMapViewComponent extends React.Component<OldMapViewComponentProps, {
+    popupContents: ReactNode;
+    legendHidden: boolean;
+}> {
     static contextTypes: {
         locale: PropTypes.Requireable<string>;
     };
+    leafletMap?: LeafletMapComponent;
     constructor(props: any);
-    componentDidMount(): any;
-    componentDidUpdate(prevProps: any): any;
-    performAutoZoom(): any;
-    handleBoundsChange: (bounds: any) => any;
-    handleGridClick: (layerViewId: any, ev: any) => any;
-    getCompiledFilters(): any;
+    componentDidMount(): void;
+    componentDidUpdate(prevProps: any): void;
+    performAutoZoom(): void;
+    handleBoundsChange: (bounds: any) => void;
+    handleGridClick: (layerViewId: any, ev: any) => void;
+    getCompiledFilters(): JsonQLFilter[];
     renderLegend(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
     renderPopup(): React.CElement<any, ModalPopupComponent> | null;
     render(): React.DetailedReactHTMLElement<{
         style: {
-            width: any;
-            height: any;
+            width: number;
+            height: number;
             position: "relative";
         };
     }, HTMLElement>;
 }
+export {};

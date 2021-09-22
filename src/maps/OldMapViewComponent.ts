@@ -1,6 +1,6 @@
 import PropTypes from "prop-types"
 import _ from "lodash"
-import React from "react"
+import React, { ReactNode } from "react"
 const R = React.createElement
 import LeafletMapComponent from "./LeafletMapComponent"
 import { ExprUtils, Schema, DataSource } from "mwater-expressions"
@@ -54,8 +54,13 @@ interface OldMapViewComponentProps {
 }
 
 // Component that displays just the map
-export default class OldMapViewComponent extends React.Component<OldMapViewComponentProps> {
+export default class OldMapViewComponent extends React.Component<OldMapViewComponentProps, {
+  popupContents: ReactNode
+  legendHidden: boolean
+}> {
   static contextTypes = { locale: PropTypes.string }
+
+  leafletMap?: LeafletMapComponent
 
   constructor(props: any) {
     super(props)
@@ -126,12 +131,12 @@ export default class OldMapViewComponent extends React.Component<OldMapViewCompo
       return
     }
 
-    const design = _.extend({}, this.props.design, { bounds })
+    const design = _.extend({}, this.props.design, { bounds }) as MapDesign
     return this.props.onDesignChange(design)
   }
 
   handleGridClick = (layerViewId: any, ev: any) => {
-    const layerView = _.findWhere(this.props.design.layerViews, { id: layerViewId })
+    const layerView = _.findWhere(this.props.design.layerViews, { id: layerViewId })!
 
     // Create layer
     const layer = LayerFactory.createLayer(layerView.type)
@@ -145,7 +150,7 @@ export default class OldMapViewComponent extends React.Component<OldMapViewCompo
       schema: this.props.schema,
       dataSource: this.props.dataSource,
       layerDataSource: this.props.mapDataSource.getLayerDataSource(layerViewId),
-      scopeData: this.props.scope?.data?.layerViewId === layerViewId ? this.props.scope.data.data : undefined,
+      scopeData: this.props.scope?.data?.layerViewId === layerViewId ? this.props.scope!.data.data : undefined,
       filters: this.getCompiledFilters()
     })
 

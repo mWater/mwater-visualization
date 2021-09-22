@@ -64,4 +64,5 @@ export { default as RichTextComponent } from "./richtext/RichTextComponent";
 export { default as ItemsHtmlConverter } from "./richtext/ItemsHtmlConverter";
 export { default as DropdownWidgetComponent } from "./widgets/DropdownWidgetComponent";
 export { default as QuickfilterCompiler } from "./quickfilter/QuickfilterCompiler";
+export { ToggleEditComponent, OptionListComponent } from './UIComponents';
 import "./pathseg-polyfill";

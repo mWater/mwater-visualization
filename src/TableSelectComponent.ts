@@ -2,18 +2,18 @@ import _ from "lodash"
 import PropTypes from "prop-types"
 import React from "react"
 import * as ui from "./UIComponents"
-import { ExprUtils } from "mwater-expressions"
+import { Expr, ExprUtils, Schema } from "mwater-expressions"
 const R = React.createElement
 
-interface TableSelectComponentProps {
-  schema: any
+export interface TableSelectComponentProps {
+  schema: Schema
   /** Current table id */
   value?: string
   /** Newly selected table id */
-  onChange: any
+  onChange: (tableId: string) => void
   /** Some table select components (not the default) can also perform filtering. Include these props to enable this */
-  filter?: any
-  onFilterChange?: any
+  filter?: Expr
+  onFilterChange?: (filter: Expr) => void
 }
 
 export default class TableSelectComponent extends React.Component<TableSelectComponentProps> {
@@ -34,7 +34,7 @@ export default class TableSelectComponent extends React.Component<TableSelectCom
     return React.createElement(ui.ToggleEditComponent, {
       forceOpen: !this.props.value,
       label: this.props.value
-        ? ExprUtils.localizeString(this.props.schema.getTable(this.props.value).name, this.context.locale)
+        ? ExprUtils.localizeString(this.props.schema.getTable(this.props.value)?.name || "(not found)", this.context.locale)
         : R("i", null, "Select..."),
       editor: (onClose: any) => {
         return React.createElement(ui.OptionListComponent, {
