@@ -4,7 +4,7 @@ import { JsonQLFilter } from "../JsonQLFilter";
 import { MapDesign } from "./MapDesign";
 import { MapDataSource } from "./MapDataSource";
 import { MapScope } from "./MapUtils";
-import "mapbox-gl/dist/mapbox-gl.css";
+import "maplibre-gl/dist/maplibre-gl.css";
 import "./NewMapViewComponent.css";
 /** Component that displays just the map */
 export declare function NewMapViewComponent(props: {
