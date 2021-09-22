@@ -4,7 +4,7 @@ const R = React.createElement
 
 import { IdLiteralComponent } from "mwater-expressions-ui"
 import { DataSource, Schema } from "mwater-expressions"
-import { JsonQLExpr } from "jsonql"
+import { JsonQLExpr, JsonQLSelectQuery } from "jsonql"
 
 interface RegionSelectComponentProps {
   schema: Schema
@@ -34,7 +34,7 @@ export default class RegionSelectComponent extends React.Component<RegionSelectC
     }
 
     // Look up level
-    const query = {
+    const query: JsonQLSelectQuery = {
       type: "query",
       selects: [{ type: "select", expr: { type: "field", tableAlias: "main", column: "level" }, alias: "level" }],
       from: { type: "table", table: this.props.regionsTable, alias: "main" },
