@@ -1,5 +1,5 @@
 import PropTypes from "prop-types"
-import React from "react"
+import React, { CSSProperties } from "react"
 const R = React.createElement
 
 import ClickOutHandler from "react-onclickout"
@@ -7,8 +7,8 @@ import { SketchPicker } from "react-color"
 import { SwatchesPicker } from "react-color"
 
 interface ColorComponentProps {
-  color?: string
-  onChange?: any
+  color: string | null | undefined
+  onChange: (value: string | null) => void
 }
 
 interface ColorComponentState {
@@ -46,12 +46,12 @@ export default class ColorComponent extends React.Component<ColorComponentProps,
   }
 
   render() {
-    const style = {
+    const style: CSSProperties = {
       height: 20,
       width: 20,
       border: "solid 2px #888",
       borderRadius: 4,
-      backgroundColor: this.props.color,
+      backgroundColor: this.props.color || undefined,
       cursor: "pointer",
       display: "inline-block"
     }

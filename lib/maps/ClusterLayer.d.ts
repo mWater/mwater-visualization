@@ -18,7 +18,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     };
     createMapnikJsonQL(design: ClusterLayerDesign, schema: Schema, filters: JsonQLFilter[]): JsonQLQuery;
     createCss(design: ClusterLayerDesign, schema: Schema): string;
-    getBounds(design: ClusterLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): any;
+    getBounds(design: ClusterLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): void;
     getMinZoom(design: ClusterLayerDesign): number | undefined;
     getMaxZoom(design: ClusterLayerDesign): number;
     getLegend(design: ClusterLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters?: JsonQLFilter[]): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;

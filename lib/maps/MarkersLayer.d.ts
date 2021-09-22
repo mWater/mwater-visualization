@@ -27,7 +27,7 @@ export default class MarkersLayer extends Layer<MarkersLayerDesign> {
         data: any;
         event: any;
     }, clickOptions: OnGridClickOptions<MarkersLayerDesign>): OnGridClickResults;
-    getBounds(design: MarkersLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): any;
+    getBounds(design: MarkersLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): void;
     getMinZoom(design: MarkersLayerDesign): number | undefined;
     getMaxZoom(design: MarkersLayerDesign): number;
     getLegend(design: MarkersLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;

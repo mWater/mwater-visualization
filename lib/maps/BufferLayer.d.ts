@@ -27,7 +27,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
         data: any;
         event: any;
     }, clickOptions: OnGridClickOptions<BufferLayerDesign>): OnGridClickResults;
-    getBounds(design: BufferLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): any;
+    getBounds(design: BufferLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): void;
     getMinZoom(design: BufferLayerDesign): number | undefined;
     getMaxZoom(design: BufferLayerDesign): number;
     getLegend(design: BufferLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;

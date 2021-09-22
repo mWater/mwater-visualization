@@ -50,7 +50,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
         data: any;
         event: any;
     }, clickOptions: OnGridClickOptions<ChoroplethLayerDesign>): OnGridClickResults;
-    getBounds(design: ChoroplethLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): any;
+    getBounds(design: ChoroplethLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): void;
     getMinZoom(design: ChoroplethLayerDesign): number | undefined;
     getMaxZoom(design: ChoroplethLayerDesign): number;
     getLegend(design: ChoroplethLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;

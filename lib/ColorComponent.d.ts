@@ -1,7 +1,7 @@
 import React from "react";
 interface ColorComponentProps {
-    color?: string;
-    onChange?: any;
+    color: string | null | undefined;
+    onChange: (value: string | null) => void;
 }
 interface ColorComponentState {
     open: any;
@@ -10,9 +10,9 @@ interface ColorComponentState {
 export default class ColorComponent extends React.Component<ColorComponentProps, ColorComponentState> {
     constructor(props: any);
     handleClick: () => void;
-    handleClose: (color: any) => any;
-    handleReset: () => any;
-    handleTransparent: () => any;
+    handleClose: (color: any) => void;
+    handleReset: () => void;
+    handleTransparent: () => void;
     handleAdvanced: () => void;
     render(): React.DetailedReactHTMLElement<{
         style: {
