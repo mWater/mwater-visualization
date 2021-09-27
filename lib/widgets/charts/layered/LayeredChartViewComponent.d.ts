@@ -21,12 +21,14 @@ export default class LayeredChartViewComponent extends React.Component<LayeredCh
     static contextTypes: {
         locale: PropTypes.Requireable<string>;
     };
+    header: HTMLElement | null;
+    footer: HTMLElement | null;
     constructor(props: any);
     componentDidMount(): void;
-    componentDidUpdate(): void;
+    componentDidUpdate(prevProps: LayeredChartViewComponentProps): void;
     updateHeights(): void;
-    handleHeaderChange: (header: any) => any;
-    handleFooterChange: (footer: any) => any;
+    handleHeaderChange: (header: any) => void;
+    handleFooterChange: (footer: any) => void;
     renderHeader(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
     renderFooter(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
     render(): React.DetailedReactHTMLElement<{

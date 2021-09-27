@@ -34,6 +34,8 @@ export default class LayeredChartViewComponent extends React.Component<
   LayeredChartViewComponentState
 > {
   static contextTypes = { locale: PropTypes.string }
+  header: HTMLElement | null
+  footer: HTMLElement | null
 
   constructor(props: any) {
     super(props)
@@ -45,11 +47,16 @@ export default class LayeredChartViewComponent extends React.Component<
   }
 
   componentDidMount() {
-    return this.updateHeights()
+    this.updateHeights()
   }
 
-  componentDidUpdate() {
-    return this.updateHeights()
+  componentDidUpdate(prevProps: LayeredChartViewComponentProps) {
+    // Check props to prevent odd infinite loop https://reactjs.org/docs/error-decoder.html/?invariant=185
+    if (this.props.design != prevProps.design || 
+      this.props.height != prevProps.height ||
+      this.props.width != prevProps.width) {
+      this.updateHeights()
+    }
   }
 
   updateHeights() {
@@ -58,16 +65,16 @@ export default class LayeredChartViewComponent extends React.Component<
       this.setState({ headerHeight: this.header.offsetHeight })
     }
     if (this.footer && this.state.footerHeight !== this.footer.offsetHeight) {
-      return this.setState({ footerHeight: this.footer.offsetHeight })
+      this.setState({ footerHeight: this.footer.offsetHeight })
     }
   }
 
   handleHeaderChange = (header: any) => {
-    return this.props.onDesignChange(_.extend({}, this.props.design, { header }))
+    this.props.onDesignChange(_.extend({}, this.props.design, { header }))
   }
 
   handleFooterChange = (footer: any) => {
-    return this.props.onDesignChange(_.extend({}, this.props.design, { footer }))
+    this.props.onDesignChange(_.extend({}, this.props.design, { footer }))
   }
 
   renderHeader() {
