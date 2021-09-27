@@ -1,8 +1,5 @@
 import $ from "jquery"
-import PropTypes from "prop-types"
 import Layer from "./Layer"
-import { ExprCompiler } from "mwater-expressions"
-import { injectTableAlias } from "mwater-expressions"
 import React from "react"
 const R = React.createElement
 
@@ -14,7 +11,7 @@ const R = React.createElement
 // table: table to filter on (e.g. entities.water_point)
 // minZoom: optional minimum zoom
 // maxZoom: optional maximum zoom
-export default class MWaterServerLayer extends Layer {
+export default class MWaterServerLayer extends Layer<any> {
   // Called when the interactivity grid is clicked.
   // arguments:
   //   ev: { data: interactivty data e.g. `{ id: 123 }` }

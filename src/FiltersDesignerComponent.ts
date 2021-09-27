@@ -3,20 +3,23 @@ import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import { FilterExprComponent } from "mwater-expressions-ui"
-import { ExprCleaner } from "mwater-expressions"
+import { DataSource, Expr, ExprCleaner, Schema } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
+
+export interface FiltersDesignerComponentProps {
+  /** Schema to use */
+  schema: Schema 
+  /** Data source to use */
+  dataSource: DataSource 
+  /** Tables that can be filtered on. Should only include tables that actually exist */
+  filterableTables?: string[] 
+  filters?: { [tableId: string]: Expr }
+  onFiltersChange: (filters: { [tableId: string]: Expr }) => void
+}
 
 // Designer for filters of multiple tables. Used for maps and dashboards
 // Filters are in format mwater-expression filter expression indexed by table. e.g. { sometable: logical expression, etc. }
-export default class FiltersDesignerComponent extends React.Component {
-  static propTypes = {
-    schema: PropTypes.object.isRequired, // Schema to use
-    dataSource: PropTypes.object.isRequired, // Data source to use
-    filterableTables: PropTypes.arrayOf(PropTypes.string), // Tables that can be filtered on. Should only include tables that actually exist
-    filters: PropTypes.object,
-    onFiltersChange: PropTypes.func.isRequired // Called with new filters
-  }
-
+export default class FiltersDesignerComponent extends React.Component<FiltersDesignerComponentProps> {
   static contextTypes = { locale: PropTypes.string }
 
   handleFilterChange = (table: any, expr: any) => {
@@ -30,7 +33,7 @@ export default class FiltersDesignerComponent extends React.Component {
   }
 
   renderFilterableTable = (table: any) => {
-    const name = ExprUtils.localizeString(this.props.schema.getTable(table).name, this.context.locale)
+    const name = ExprUtils.localizeString(this.props.schema.getTable(table)!.name, this.context.locale)
 
     return R(
       "div",
@@ -47,6 +50,6 @@ export default class FiltersDesignerComponent extends React.Component {
   }
 
   render() {
-    return R("div", null, _.map(this.props.filterableTables, this.renderFilterableTable))
+    return R("div", null, _.map(this.props.filterableTables || [], this.renderFilterableTable))
   }
 }

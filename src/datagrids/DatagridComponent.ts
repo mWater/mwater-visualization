@@ -1,11 +1,11 @@
 import PropTypes from "prop-types"
 import _ from "lodash"
-import React from "react"
+import React, { ReactNode } from "react"
 const R = React.createElement
 
 import AutoSizeComponent from "react-library/lib/AutoSizeComponent"
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent"
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, Expr, ExprUtils, Schema } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
 import DatagridViewComponent from "./DatagridViewComponent"
@@ -15,48 +15,66 @@ import DatagridUtils from "./DatagridUtils"
 import QuickfiltersComponent from "../quickfilter/QuickfiltersComponent"
 import QuickfilterCompiler from "../quickfilter/QuickfilterCompiler"
 import FindReplaceModalComponent from "./FindReplaceModalComponent"
+import DatagridDataSource from "./DatagridDataSource"
+import { DatagridDesign, JsonQLFilter } from ".."
+
+export interface DatagridComponentProps {
+  /** schema to use */
+  schema: Schema 
+
+  /** dataSource to use */
+  dataSource: DataSource 
+
+  /** datagrid dataSource to use */
+  datagridDataSource: DatagridDataSource
+
+  design: DatagridDesign
+  /** Called when design changes */
+  onDesignChange?: (design: DatagridDesign) => void 
+
+  /** Extra element to include in title at left */
+  titleElem?: ReactNode 
+  /** Extra elements to add to right */
+  extraTitleButtonsElem?: ReactNode
+
+  // Check if expression of table row is editable
+  // If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
+  canEditValue?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, canEdit?: boolean) => void) => void
+
+  /** Update table row expression with a new value
+   * Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
+   */
+  updateValue?: (tableId: string, rowId: any, expr: Expr, value: any, callback: (error: any) => void) => void
+
+  /** Called when row is clicked with (tableId, rowId) */
+  onRowClick?: (tableId: string, rowId: any) => void
+
+  /** Called when row is double-clicked with (tableId, rowId) */
+  onRowDoubleClick?: (tableId: string, rowId: any) => void
+
+  /** Locked quickfilter values. See README in quickfilters */
+  quickfilterLocks?: any[] 
+
+  // Filters to add to the datagrid
+  filters?: JsonQLFilter[]
+}
 
 // Datagrid with decorations
 // See README.md for description of datagrid format
 // Design should be cleaned already before being passed in (see DatagridUtils)
-export default class DatagridComponent extends React.Component {
-  static propTypes = {
-    schema: PropTypes.object.isRequired, // schema to use
-    dataSource: PropTypes.object.isRequired, // dataSource to use
-    datagridDataSource: PropTypes.object.isRequired, // datagrid dataSource to use
+export default class DatagridComponent extends React.Component<DatagridComponentProps, {
+  /** is design being edited */
+  editingDesign: boolean
+  /** True if cells can be edited directly */
+  cellEditingEnabled: boolean
+  /** Height of quickfilters */
+  quickfiltersHeight: number | null
+  quickfiltersValues: null | any[]
+}> {
+  datagridView?: DatagridViewComponent | null
+  quickfilters?: QuickfiltersComponent | null
 
-    design: PropTypes.object.isRequired, // Design of datagrid. See README.md of this folder
-    onDesignChange: PropTypes.func, // Called when design changes
-
-    titleElem: PropTypes.node, // Extra element to include in title at left
-    extraTitleButtonsElem: PropTypes.node, // Extra elements to add to right
-
-    // Check if expression of table row is editable
-    // If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
-    canEditValue: PropTypes.func,
-
-    // Update table row expression with a new value
-    // Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
-    updateValue: PropTypes.func,
-
-    // Called when row is clicked with (tableId, rowId)
-    onRowClick: PropTypes.func,
-
-    // Called when row is double-clicked with (tableId, rowId)
-    onRowDoubleClick: PropTypes.func,
-
-    quickfilterLocks: PropTypes.array, // Locked quickfilter values. See README in quickfilters
-
-    // Filters to add to the datagrid
-    filters: PropTypes.arrayOf(
-      PropTypes.shape({
-        table: PropTypes.string.isRequired, // id table to filter
-        jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
-      })
-    )
-  }
-
-  constructor(props: any) {
+  constructor(props: DatagridComponentProps) {
     super(props)
 
     this.state = {
@@ -256,7 +274,7 @@ export default class DatagridComponent extends React.Component {
         }
       },
       R(QuickfiltersComponent, {
-        design: this.props.design.quickfilters,
+        design: this.props.design.quickfilters!,
         schema: this.props.schema,
         dataSource: this.props.dataSource,
         quickfiltersDataSource: this.props.datagridDataSource.getQuickfiltersDataSource(),
@@ -342,7 +360,7 @@ export default class DatagridComponent extends React.Component {
 
         if (!new DatagridUtils(this.props.schema).validateDesign(design)) {
           return R(DatagridViewComponent, {
-            ref: (view: any) => {
+            ref: (view: DatagridViewComponent | null) => {
               return (this.datagridView = view)
             },
             width: size.width - 1, // minus 1 px to test if it solves the jitter with scroll

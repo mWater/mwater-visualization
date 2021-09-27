@@ -1,7 +1,7 @@
 /// <reference types="jquery" />
 import Layer from "./Layer";
 import React from "react";
-export default class MWaterServerLayer extends Layer {
+export default class MWaterServerLayer extends Layer<any> {
     onGridClick(ev: any, options: any): {
         row: {
             tableId: any;
