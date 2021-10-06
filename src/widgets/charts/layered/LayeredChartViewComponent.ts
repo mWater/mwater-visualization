@@ -55,6 +55,7 @@ export default class LayeredChartViewComponent extends React.Component<
     if (this.props.design != prevProps.design || 
       this.props.height != prevProps.height ||
       this.props.width != prevProps.width) {
+      console.log(`componentDidUpdate: ${this.props.height} vs ${prevProps.height} and ${this.props.width} vs ${prevProps.width}`)
       this.updateHeights()
     }
   }
@@ -62,9 +63,11 @@ export default class LayeredChartViewComponent extends React.Component<
   updateHeights() {
     // Calculate header and footer heights
     if (this.header && this.state.headerHeight !== this.header.offsetHeight) {
+      console.log(`headerHeight: ${this.state.headerHeight} vs ${this.header.offsetHeight} => ${this.header.offsetHeight}`)
       this.setState({ headerHeight: this.header.offsetHeight })
     }
     if (this.footer && this.state.footerHeight !== this.footer.offsetHeight) {
+      console.log(`footerHeight: ${this.state.footerHeight} vs ${this.footer.offsetHeight} => ${this.footer.offsetHeight}`)
       this.setState({ footerHeight: this.footer.offsetHeight })
     }
   }
