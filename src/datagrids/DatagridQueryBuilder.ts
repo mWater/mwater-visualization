@@ -1,5 +1,6 @@
+import { JsonQLQuery, JsonQLSelect, JsonQLSelectQuery } from "jsonql"
 import _ from "lodash"
-import { ExprCompiler } from "mwater-expressions"
+import { Expr, ExprCompiler, Schema } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 import { injectTableAlias } from "mwater-expressions"
@@ -10,7 +11,9 @@ import { injectTableAlias } from "mwater-expressions"
 // subtable index is included as subtable. -1 for main table so it sorts first
 // Warning: mwater-server requires this directly!
 export default class DatagridQueryBuilder {
-  constructor(schema: any) {
+  schema: Schema
+
+  constructor(schema: Schema) {
     this.schema = schema
   }
 
@@ -20,7 +23,7 @@ export default class DatagridQueryBuilder {
   //  limit: limit rows
   //  extraFilters: array of additional filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. }
   //  fillSubtableRows: repeat main level values in subtable rows instead of leaving blank
-  createQuery(design: any, options = {}) {
+  createQuery(design: any, options = {}): JsonQLQuery {
     // Create query to get the page of rows at the specific offset
     // Handle simple case
     if (!design.subtables || design.subtables.length === 0) {
@@ -31,7 +34,7 @@ export default class DatagridQueryBuilder {
   }
 
   // Simple query with no subtables
-  createSimpleQuery(design: any, options: any) {
+  createSimpleQuery(design: any, options: any): JsonQLQuery {
     let column, expr, i
     const exprUtils = new ExprUtils(this.schema)
     const exprCompiler = new ExprCompiler(this.schema)
@@ -39,7 +42,7 @@ export default class DatagridQueryBuilder {
 
     const isAggr = this.isMainAggr(design)
 
-    const query = {
+    const query: JsonQLSelectQuery = {
       type: "query",
       selects: this.createSimpleSelects(design, isAggr),
       from: { type: "table", table: design.table, alias: "main" },
@@ -63,7 +66,7 @@ export default class DatagridQueryBuilder {
         continue
       }
 
-      const columnExpr = { type: "field", table: design.table, column: column.id }
+      const columnExpr: Expr = { type: "field", table: design.table, column: column.id }
       if (exprUtils.getExprType(columnExpr) !== filter.columnType) {
         continue
       }
@@ -124,7 +127,7 @@ export default class DatagridQueryBuilder {
   }
 
   // Query with subtables
-  createComplexQuery(design: any, options: any) {
+  createComplexQuery(design: any, options: any): JsonQLQuery {
     // Queries to union
     let column, direction, i, index, subtable
     const unionQueries = []
@@ -190,7 +193,7 @@ export default class DatagridQueryBuilder {
   }
 
   // Create the main query (not joined to subtables) part of the overall complex query. See tests for more details
-  createComplexMainQuery(design: any, options: any) {
+  createComplexMainQuery(design: any, options: any): JsonQLQuery {
     let expr, i, type
     const exprCompiler = new ExprCompiler(this.schema)
     const exprCleaner = new ExprCleaner(this.schema)
@@ -565,7 +568,7 @@ export default class DatagridQueryBuilder {
   }
 
   // Create selects to load given a design
-  createSimpleSelects(design: any, isAggr: any) {
+  createSimpleSelects(design: any, isAggr: any): JsonQLSelect[] {
     let selects = []
 
     // Primary key if not aggr
