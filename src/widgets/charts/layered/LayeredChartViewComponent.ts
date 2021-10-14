@@ -157,7 +157,11 @@ interface C3ChartComponentProps {
 
 // Displays the inner C3 component itself
 class C3ChartComponent extends React.Component<C3ChartComponentProps> {
-  constructor(props: any) {
+  throttledCreateChart: ((props: C3ChartComponentProps) => any) & _.Cancelable
+  chart: any
+  chartDiv: any
+
+  constructor(props: C3ChartComponentProps) {
     super(props)
 
     // Create throttled createChart
@@ -169,13 +173,13 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
     return this.updateScope()
   }
 
-  createChart = (props: any) => {
+  createChart = (props: C3ChartComponentProps) => {
     if (this.chart) {
       this.chart.destroy()
     }
 
     const compiler = new LayeredChartCompiler({ schema: props.schema })
-    const chartOptions = compiler.createChartOptions({
+    const chartOptions: any = compiler.createChartOptions({
       design: this.props.design,
       data: this.props.data,
       width: this.props.width,
@@ -189,7 +193,7 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
     chartOptions.onrendered = () => _.defer(this.updateScope)
 
     const c3 = require("c3")
-    return (this.chart = c3.generate(chartOptions))
+    this.chart = c3.generate(chartOptions)
   }
 
   componentDidUpdate(prevProps: any, prevState: any) {
