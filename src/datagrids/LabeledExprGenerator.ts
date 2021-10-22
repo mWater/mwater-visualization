@@ -11,7 +11,7 @@ export interface LabeledExpr {
 
 export interface LabeledExprGeneratorOptions {
   /** e.g. "en". Uses _base by default, then en [null] */
-  locale?: string
+  locale?: string | null
 
   /** "text", "code" or "both" ["code"] */
   headerFormat?: "text" | "code" | "both"
@@ -39,6 +39,9 @@ export interface LabeledExprGeneratorOptions {
 
   /** number duplicate label columns with " (1)", " (2)" , etc. */
   numberDuplicatesLabels?: boolean
+
+  /** Override how a column is processed. Return array if processed, null to pass through */
+  overrideColumn?: (tableId: string, column: Column) => null | LabeledExpr[]
 }
 
 /** Generates labeled expressions (expr, label and joins) for a table. Used to make a datagrid, do export or import. */
@@ -117,6 +120,14 @@ export default class LabeledExprGenerator {
         return []
       }
 
+      // Override handling
+      if (options.overrideColumn) {
+        const result = options.overrideColumn(table, column)
+        if (result) {
+          return result
+        }
+      }
+
       if (column.type === "id") {
         // Use id if that option is enabled
         if (options.useJoinIds) {
@@ -164,11 +175,11 @@ export default class LabeledExprGenerator {
                 joins
               }
             ]
-            // add cascading ref question
+          // Support cascading ref question
           } else if (column.join!.type === "n-1" && column.join!.toTable.match(/^custom./)) {
             return this.schema
               .getColumns(column.join!.toTable)
-              .filter((c: any) => c.id[0] === "c")
+              .filter((c: any) => c.id[0] !== "_")
               .map((c: any) => ({
                 expr: {
                   type: "scalar",

@@ -8,7 +8,7 @@ export interface LabeledExpr {
 }
 export interface LabeledExprGeneratorOptions {
     /** e.g. "en". Uses _base by default, then en [null] */
-    locale?: string;
+    locale?: string | null;
     /** "text", "code" or "both" ["code"] */
     headerFormat?: "text" | "code" | "both";
     /** "name" or "code" ["name"] */
@@ -27,6 +27,8 @@ export interface LabeledExprGeneratorOptions {
     useConfidential?: boolean;
     /** number duplicate label columns with " (1)", " (2)" , etc. */
     numberDuplicatesLabels?: boolean;
+    /** Override how a column is processed. Return array if processed, null to pass through */
+    overrideColumn?: (tableId: string, column: Column) => null | LabeledExpr[];
 }
 /** Generates labeled expressions (expr, label and joins) for a table. Used to make a datagrid, do export or import. */
 export default class LabeledExprGenerator {
