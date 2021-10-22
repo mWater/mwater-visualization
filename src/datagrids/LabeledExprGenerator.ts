@@ -41,7 +41,7 @@ export interface LabeledExprGeneratorOptions {
   numberDuplicatesLabels?: boolean
 
   /** Override how a column is processed. Return array if processed, null to pass through */
-  overrideColumn?: (tableId: string, column: Column, joins: string[]) => null | LabeledExpr[]
+  overrideColumn?: (tableId: string, column: Column, joins: string[], label: string) => null | LabeledExpr[]
 }
 
 /** Generates labeled expressions (expr, label and joins) for a table. Used to make a datagrid, do export or import. */
@@ -122,7 +122,7 @@ export default class LabeledExprGenerator {
 
       // Override handling
       if (options.overrideColumn) {
-        const result = options.overrideColumn(table, column, joins)
+        const result = options.overrideColumn(table, column, joins, createLabel(column))
         if (result) {
           return result
         }
