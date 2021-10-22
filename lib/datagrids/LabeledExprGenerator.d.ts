@@ -28,7 +28,7 @@ export interface LabeledExprGeneratorOptions {
     /** number duplicate label columns with " (1)", " (2)" , etc. */
     numberDuplicatesLabels?: boolean;
     /** Override how a column is processed. Return array if processed, null to pass through */
-    overrideColumn?: (tableId: string, column: Column) => null | LabeledExpr[];
+    overrideColumn?: (tableId: string, column: Column, joins: string[]) => null | LabeledExpr[];
 }
 /** Generates labeled expressions (expr, label and joins) for a table. Used to make a datagrid, do export or import. */
 export default class LabeledExprGenerator {
