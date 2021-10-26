@@ -21,8 +21,9 @@ interface TextLiteralComponentProps {
   filters?: JsonQLFilter[]
 }
 
-// Displays a combo box that allows selecting single or multiple text values from an expression
-// The expression can be type `text` or `text[]`
+/** Displays a combo box that allows selecting single or multiple text values from an expression
+ * The expression can be type `text` or `text[]`
+ */
 export default class TextLiteralComponent extends React.Component<TextLiteralComponentProps> {
   handleSingleChange = (val: any) => {
     const value = val ? val.value || null : null // Blank is null
