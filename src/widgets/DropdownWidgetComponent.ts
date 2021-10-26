@@ -21,7 +21,7 @@ export default class DropdownWidgetComponent extends React.Component<DropdownWid
       { key: `${i}` },
       R(
         "a",
-        { onClick: item.onClick },
+        { className: "dropdown-item", onClick: item.onClick },
         item.icon ? R("span", { className: `glyphicon glyphicon-${item.icon} text-muted` }) : undefined,
         item.icon ? " " : undefined,
         item.label
@@ -65,7 +65,7 @@ export default class DropdownWidgetComponent extends React.Component<DropdownWid
   }
 
   closeMenu = () => {
-    return $(ReactDOM.findDOMNode(this)).find('[data-toggle="dropdown"]').parent().removeClass("open")
+    return $(ReactDOM.findDOMNode(this)).find('[data-bs-toggle="dropdown"]').parent().removeClass("open")
   }
 
   render() {

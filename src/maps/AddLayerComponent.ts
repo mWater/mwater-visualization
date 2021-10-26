@@ -98,7 +98,7 @@ export default class AddLayerComponent extends React.Component<AddLayerComponent
       { style: { margin: 5 }, key: "addLayer", className: "btn-group" },
       R(
         "button",
-        { type: "button", "data-toggle": "dropdown", className: "btn btn-primary dropdown-toggle" },
+        { type: "button", "data-bs-toggle": "dropdown", className: "btn btn-primary dropdown-toggle" },
         R("span", { className: "glyphicon glyphicon-plus" }),
         " Add Layer ",
         R("span", { className: "caret" })
@@ -110,7 +110,7 @@ export default class AddLayerComponent extends React.Component<AddLayerComponent
           return R(
             "li",
             { key: "" + i },
-            R("a", { onClick: this.handleAddLayer.bind(null, layer) }, layer.label || layer.name)
+            R("a", { className: "dropdown-item", onClick: this.handleAddLayer.bind(null, layer) }, layer.label || layer.name)
           )
         })
       )
