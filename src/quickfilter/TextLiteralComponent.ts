@@ -42,7 +42,8 @@ export default class TextLiteralComponent extends React.Component<TextLiteralCom
 
   getOptions = (input: any, cb: any) => {
     // Determine type of expression
-    let filters
+    const filters = (this.props.filters || []).slice()
+
     const exprUtils = new ExprUtils(this.props.schema)
     const exprType = exprUtils.getExprType(this.props.expr)
 
@@ -51,7 +52,6 @@ export default class TextLiteralComponent extends React.Component<TextLiteralCom
 
     // Add filter for input (simple if just text)
     if (exprType === "text") {
-      filters = this.props.filters || []
       if (input) {
         filters.push({
           table: this.props.expr.table,
@@ -67,10 +67,9 @@ export default class TextLiteralComponent extends React.Component<TextLiteralCom
       }
     } else if (exprType === "text[]") {
       // Special filter for text[]
-      filters = this.props.filters || []
       if (input) {
         filters.push({
-          table: "_values_",
+          table: "values",
           jsonql: {
             type: "op",
             op: "~*",

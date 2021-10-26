@@ -68,7 +68,7 @@ export function findExprValues(
     query = {
       type: "query",
       distinct: true,
-      selects: [{ type: "select", expr: { type: "field", tableAlias: "value" }, alias: "value" }],
+      selects: [{ type: "select", expr: { type: "field", tableAlias: "values" }, alias: "value" }],
       from: {
         type: "join",
         kind: "cross",
@@ -80,7 +80,7 @@ export function findExprValues(
             op: "jsonb_array_elements_text",
             exprs: [{ type: "op", op: "to_jsonb", exprs: [exprCompiler.compileExpr({ expr, tableAlias: "main" })] }]
           },
-          alias: "value"
+          alias: "values"
         }
       },
       where: {
@@ -93,15 +93,15 @@ export function findExprValues(
       offset: offset
     }
 
-    // Add filters if present. Value filters must be for pseudo-table "_values_" on column "value"
+    // Add filters if present. Value filters must be for pseudo-table "values" on column "value"
     for (const filter of filters || []) {
       if (filter.table == table) {
         // TODO Type this properly
         ;(query.where as any).exprs.push(injectTableAlias(filter.jsonql, "main"))
       }
-      if (filter.table == "value") {
+      if (filter.table == "values") {
         // TODO Type this properly
-        ;(query.where as any).exprs.push(injectTableAlias(filter.jsonql, "value"))
+        ;(query.where as any).exprs.push(injectTableAlias(filter.jsonql, "values"))
       }
     }
   } else {

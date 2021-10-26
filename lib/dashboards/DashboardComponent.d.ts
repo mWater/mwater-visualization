@@ -3,6 +3,7 @@ import React, { ReactNode } from "react";
 import { DataSource, Schema } from "mwater-expressions";
 import UndoStack from "../UndoStack";
 import DashboardViewComponent from "./DashboardViewComponent";
+import QuickfiltersComponent from "../quickfilter/QuickfiltersComponent";
 import { DashboardDesign } from "./DashboardDesign";
 import DashboardDataSource from "./DashboardDataSource";
 import { JsonQLFilter } from "..";
@@ -100,7 +101,7 @@ export default class DashboardComponent extends React.Component<DashboardCompone
             padding: number;
         };
     }, HTMLElement>;
-    renderQuickfilter(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+    renderQuickfilter(): React.CElement<import("../quickfilter/QuickfiltersComponent").QuickfiltersComponentProps, QuickfiltersComponent>;
     refDashboardView: (el: any) => any;
     render(): React.DetailedReactHTMLElement<{
         style: {
