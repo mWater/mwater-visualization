@@ -54,10 +54,13 @@ interface OldMapViewComponentProps {
 }
 
 // Component that displays just the map
-export default class OldMapViewComponent extends React.Component<OldMapViewComponentProps, {
-  popupContents: ReactNode
-  legendHidden: boolean
-}> {
+export default class OldMapViewComponent extends React.Component<
+  OldMapViewComponentProps,
+  {
+    popupContents: ReactNode
+    legendHidden: boolean
+  }
+> {
   static contextTypes = { locale: PropTypes.string }
 
   leafletMap?: LeafletMapComponent

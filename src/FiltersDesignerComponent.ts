@@ -8,11 +8,11 @@ import { ExprUtils } from "mwater-expressions"
 
 export interface FiltersDesignerComponentProps {
   /** Schema to use */
-  schema: Schema 
+  schema: Schema
   /** Data source to use */
-  dataSource: DataSource 
+  dataSource: DataSource
   /** Tables that can be filtered on. Should only include tables that actually exist */
-  filterableTables?: string[] 
+  filterableTables?: string[]
   filters?: { [tableId: string]: Expr }
   onFiltersChange: (filters: { [tableId: string]: Expr }) => void
 }

@@ -20,20 +20,20 @@ import { DatagridDesign, JsonQLFilter } from ".."
 
 export interface DatagridComponentProps {
   /** schema to use */
-  schema: Schema 
+  schema: Schema
 
   /** dataSource to use */
-  dataSource: DataSource 
+  dataSource: DataSource
 
   /** datagrid dataSource to use */
   datagridDataSource: DatagridDataSource
 
   design: DatagridDesign
   /** Called when design changes */
-  onDesignChange?: (design: DatagridDesign) => void 
+  onDesignChange?: (design: DatagridDesign) => void
 
   /** Extra element to include in title at left */
-  titleElem?: ReactNode 
+  titleElem?: ReactNode
   /** Extra elements to add to right */
   extraTitleButtonsElem?: ReactNode
 
@@ -53,7 +53,7 @@ export interface DatagridComponentProps {
   onRowDoubleClick?: (tableId: string, rowId: any) => void
 
   /** Locked quickfilter values. See README in quickfilters */
-  quickfilterLocks?: any[] 
+  quickfilterLocks?: any[]
 
   // Filters to add to the datagrid
   filters?: JsonQLFilter[]
@@ -62,15 +62,18 @@ export interface DatagridComponentProps {
 // Datagrid with decorations
 // See README.md for description of datagrid format
 // Design should be cleaned already before being passed in (see DatagridUtils)
-export default class DatagridComponent extends React.Component<DatagridComponentProps, {
-  /** is design being edited */
-  editingDesign: boolean
-  /** True if cells can be edited directly */
-  cellEditingEnabled: boolean
-  /** Height of quickfilters */
-  quickfiltersHeight: number | null
-  quickfiltersValues: null | any[]
-}> {
+export default class DatagridComponent extends React.Component<
+  DatagridComponentProps,
+  {
+    /** is design being edited */
+    editingDesign: boolean
+    /** True if cells can be edited directly */
+    cellEditingEnabled: boolean
+    /** Height of quickfilters */
+    quickfiltersHeight: number | null
+    quickfiltersValues: null | any[]
+  }
+> {
   datagridView?: DatagridViewComponent | null
   quickfilters?: QuickfiltersComponent | null
 

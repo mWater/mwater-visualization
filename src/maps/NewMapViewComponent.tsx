@@ -20,8 +20,8 @@ import "./NewMapViewComponent.css"
 import { LayerSwitcherComponent } from "./LayerSwitcherComponent"
 import LegendComponent from "./LegendComponent"
 
-import darkMatter from './map-styles/dark-matter.json'
-import positron from './map-styles/positron.json'
+import darkMatter from "./map-styles/dark-matter.json"
+import positron from "./map-styles/positron.json"
 
 type LayerClickHandlerEvent = mapboxgl.MapMouseEvent & {
   features?: mapboxgl.MapboxGeoJSONFeature[] | undefined
@@ -402,8 +402,7 @@ export function NewMapViewComponent(props: {
       loadStyle("https://api.maptiler.com/maps/streets/style.json?key=K5i6tDA2NhSkq80oO102")
     } else if (props.design.baseLayer == "bing_aerial") {
       loadStyle("https://api.maptiler.com/maps/hybrid/style.json?key=K5i6tDA2NhSkq80oO102")
-    }
-    else if (props.design.baseLayer == "blank") {
+    } else if (props.design.baseLayer == "blank") {
       setBaseStyle({
         version: 8,
         layers: [],

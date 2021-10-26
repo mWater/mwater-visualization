@@ -4,7 +4,6 @@ import { DataSource, Schema } from "mwater-expressions"
 import MWaterDataSource from "mwater-expressions/lib/MWaterDataSource"
 import querystring from "querystring"
 
-
 /** Loads a schema and data source that is specific to mWater server */
 export default function mWaterLoader(
   options: {

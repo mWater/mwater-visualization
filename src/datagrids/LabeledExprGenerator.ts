@@ -175,7 +175,7 @@ export default class LabeledExprGenerator {
                 joins
               }
             ]
-          // Support cascading ref question
+            // Support cascading ref question
           } else if (column.join!.type === "n-1" && column.join!.toTable.match(/^custom./)) {
             return this.schema
               .getColumns(column.join!.toTable)

@@ -34,7 +34,10 @@ export default class TableSelectComponent extends React.Component<TableSelectCom
     return React.createElement(ui.ToggleEditComponent, {
       forceOpen: !this.props.value,
       label: this.props.value
-        ? ExprUtils.localizeString(this.props.schema.getTable(this.props.value)?.name || "(not found)", this.context.locale)
+        ? ExprUtils.localizeString(
+            this.props.schema.getTable(this.props.value)?.name || "(not found)",
+            this.context.locale
+          )
         : R("i", null, "Select..."),
       editor: (onClose: any) => {
         return React.createElement(ui.OptionListComponent, {

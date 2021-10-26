@@ -1,34 +1,29 @@
 import _ from "lodash"
-import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import { default as AsyncReactSelect } from "react-select/async"
 import { ExprCompiler } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
-import { injectTableAlias } from "mwater-expressions"
+import { JsonQLFilter } from "../JsonQLFilter"
+
+interface TextLiteralComponentProps {
+  value?: any
+  onChange?: any
+  schema: any
+  /** See QuickfiltersDataSource */
+  quickfiltersDataSource: any
+  expr: any
+  index: number
+  /** true to display multiple values */
+  multi?: boolean
+
+  /** Filters to add to restrict quick filter data to */
+  filters?: JsonQLFilter[]
+}
 
 // Displays a combo box that allows selecting single or multiple text values from an expression
 // The expression can be type `text` or `text[]`
-export default class TextLiteralComponent extends React.Component {
-  static propTypes = {
-    value: PropTypes.any,
-    onChange: PropTypes.func,
-
-    schema: PropTypes.object.isRequired,
-    quickfiltersDataSource: PropTypes.object.isRequired, // See QuickfiltersDataSource
-    expr: PropTypes.object.isRequired,
-    index: PropTypes.number.isRequired,
-    multi: PropTypes.bool, // true to display multiple values
-
-    // Filters to add to the component to restrict values
-    filters: PropTypes.arrayOf(
-      PropTypes.shape({
-        table: PropTypes.string.isRequired, // id table to filter
-        jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
-      })
-    )
-  }
-
+export default class TextLiteralComponent extends React.Component<TextLiteralComponentProps> {
   handleSingleChange = (val: any) => {
     const value = val ? val.value || null : null // Blank is null
     return this.props.onChange(value)

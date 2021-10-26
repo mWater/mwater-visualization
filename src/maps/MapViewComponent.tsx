@@ -51,9 +51,8 @@ export function MapViewComponent(props: {
   locale: string
 }) {
   if (window.localStorage.getItem("maptech") == "maplibre") {
-    return <NewMapViewComponent {...props}/>
-  }
-  else {
+    return <NewMapViewComponent {...props} />
+  } else {
     return <OldMapViewComponent {...props} />
   }
 }

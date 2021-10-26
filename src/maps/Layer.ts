@@ -111,7 +111,7 @@ export default class Layer<LayerDesign> {
    * @param sourceId id of the source. Should be prefixed to sublayers with a colon (prefix:id)
    * @param opacity opacity of the layer, which MapBox does not allow to be implemented for a whole layer (https://github.com/mapbox/mapbox-gl-js/issues/4090)
    */
-   getVectorTile(
+  getVectorTile(
     design: LayerDesign,
     sourceId: string,
     schema: Schema,
@@ -235,7 +235,7 @@ export default class Layer<LayerDesign> {
     geometryExpr: Expr,
     filterExpr: Expr,
     filters: JsonQLFilter[],
-    callback: (err: any, bounds?: { n: number, e: number, w: number, s: number } | null) => void
+    callback: (err: any, bounds?: { n: number; e: number; w: number; s: number } | null) => void
   ): void {
     const exprCompiler = new ExprCompiler(schema)
     const compiledGeometryExpr = exprCompiler.compileExpr({ expr: geometryExpr, tableAlias: "main" })
