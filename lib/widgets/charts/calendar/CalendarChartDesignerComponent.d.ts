@@ -1,18 +1,21 @@
 import React from "react";
+import * as ui from "../../../UIComponents";
+import { CalendarChartDesign } from "./CalendarChart";
 interface CalendarChartDesignerComponentProps {
-    design: any;
+    design: CalendarChartDesign;
     schema: any;
     dataSource: any;
-    onDesignChange: any;
+    onDesignChange: (design: CalendarChartDesign) => void;
     filters?: any;
 }
 export default class CalendarChartDesignerComponent extends React.Component<CalendarChartDesignerComponentProps> {
-    updateDesign(changes: any): any;
-    handleTitleTextChange: (ev: any) => any;
-    handleTableChange: (table: any) => any;
-    handleFilterChange: (filter: any) => any;
-    handleDateAxisChange: (dateAxis: any) => any;
-    handleValueAxisChange: (valueAxis: any) => any;
+    updateDesign(changes: any): void;
+    handleTitleTextChange: (ev: any) => void;
+    handleTableChange: (table: any) => void;
+    handleFilterChange: (filter: any) => void;
+    handleDateAxisChange: (dateAxis: any) => void;
+    handleValueAxisChange: (valueAxis: any) => void;
+    handleCellColorChange: (cellColor: any) => void;
     renderTable(): React.DetailedReactHTMLElement<{
         className: string;
     }, HTMLElement>;
@@ -22,16 +25,11 @@ export default class CalendarChartDesignerComponent extends React.Component<Cale
     renderFilter(): React.DetailedReactHTMLElement<{
         className: string;
     }, HTMLElement> | null;
-    renderDateAxis(): React.CElement<{
-        label: string;
-    }, React.Component<{
-        label: string;
-    }, any, any>> | undefined;
-    renderValueAxis(): React.CElement<{
-        label: string;
-    }, React.Component<{
-        label: string;
-    }, any, any>> | undefined;
+    renderDateAxis(): React.CElement<ui.SectionComponentProps, ui.SectionComponent> | undefined;
+    renderValueAxis(): React.CElement<ui.SectionComponentProps, ui.SectionComponent> | undefined;
+    renderCellColor(): React.DetailedReactHTMLElement<{
+        className: string;
+    }, HTMLElement>;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
 export {};

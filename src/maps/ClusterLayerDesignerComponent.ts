@@ -53,7 +53,7 @@ export default class ClusterLayerDesignerComponent extends React.Component<Clust
   renderTable() {
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, R("i", { className: "fa fa-database" }), " ", "Data Source"),
       R(
         "div",
@@ -74,7 +74,7 @@ export default class ClusterLayerDesignerComponent extends React.Component<Clust
       return
     }
 
-    const title = R("span", null, R("span", { className: "glyphicon glyphicon-map-marker" }), " Locations to Cluster")
+    const title = R("span", null, R("span", { className: "fas fa-map-marker-alt" }), " Locations to Cluster")
 
     const filters = _.clone(this.props.filters) || []
 
@@ -88,7 +88,7 @@ export default class ClusterLayerDesignerComponent extends React.Component<Clust
 
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, title),
       R(
         "div",
@@ -114,13 +114,8 @@ export default class ClusterLayerDesignerComponent extends React.Component<Clust
 
     return R(
       "div",
-      { className: "form-group" },
-      R(
-        "label",
-        { className: "text-muted" },
-        R("span", { className: "glyphicon glyphicon glyphicon-tint" }),
-        "Text Color"
-      ),
+      { className: "mb-3" },
+      R("label", { className: "text-muted" }, R("span", { className: "fas fa-tint" }), "Text Color"),
 
       R(
         "div",
@@ -140,13 +135,8 @@ export default class ClusterLayerDesignerComponent extends React.Component<Clust
 
     return R(
       "div",
-      { className: "form-group" },
-      R(
-        "label",
-        { className: "text-muted" },
-        R("span", { className: "glyphicon glyphicon glyphicon-tint" }),
-        "Marker Color"
-      ),
+      { className: "mb-3" },
+      R("label", { className: "text-muted" }, R("span", { className: "fas fa-tint" }), "Marker Color"),
 
       R(
         "div",
@@ -167,8 +157,8 @@ export default class ClusterLayerDesignerComponent extends React.Component<Clust
 
     return R(
       "div",
-      { className: "form-group" },
-      R("label", { className: "text-muted" }, R("span", { className: "glyphicon glyphicon-filter" }), " Filters"),
+      { className: "mb-3" },
+      R("label", { className: "text-muted" }, R("span", { className: "fas fa-filter" }), " Filters"),
       R(
         "div",
         { style: { marginLeft: 8 } },

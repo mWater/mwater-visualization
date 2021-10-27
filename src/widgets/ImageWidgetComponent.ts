@@ -309,7 +309,7 @@ class ImageWidgetDesignComponent extends React.Component<
   renderExpressionEditor() {
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, R("i", { className: "fa fa-database" }), " ", "Data Source"),
       ": ",
       R(TableSelectComponent, { schema: this.props.schema, value: this.state.table, onChange: this.handleTableChange }),
@@ -318,7 +318,7 @@ class ImageWidgetDesignComponent extends React.Component<
       this.state.table
         ? R(
             "div",
-            { className: "form-group" },
+            { className: "mb-3" },
             R("label", { className: "text-muted" }, "Field"),
             ": ",
             R(ExprComponent, {
@@ -366,7 +366,7 @@ class ImageWidgetDesignComponent extends React.Component<
   renderImageUrlEditor() {
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", null, "URL of image"),
       R("input", {
         type: "text",
@@ -374,7 +374,7 @@ class ImageWidgetDesignComponent extends React.Component<
         value: this.state.imageUrl || "",
         onChange: this.handleImageUrlChange
       }),
-      R("p", { className: "help-block" }, "e.g. http://somesite.com/image.jpg"),
+      R("div", { className: "form-text text-muted" }, "e.g. http://somesite.com/image.jpg"),
       this.renderRotation()
     )
   }
@@ -382,7 +382,7 @@ class ImageWidgetDesignComponent extends React.Component<
   renderUrlEditor() {
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", null, "URL to open"),
       R("input", {
         type: "text",
@@ -390,8 +390,8 @@ class ImageWidgetDesignComponent extends React.Component<
         value: this.state.url || "",
         onChange: this.handleUrlChange
       }),
-      R("p", { className: "help-block" }, "e.g. http://somesite.com/"),
-      R("p", { className: "help-block" }, "When clicked on image, this link will open in a new tab")
+      R("div", { className: "form-text text-muted" }, "e.g. http://somesite.com/"),
+      R("div", { className: "form-text text-muted" }, "When clicked on image, this link will open in a new tab")
     )
   }
 
@@ -405,7 +405,7 @@ class ImageWidgetDesignComponent extends React.Component<
       null,
       R(
         "div",
-        { className: "form-group" },
+        { className: "mb-3" },
         R("label", null, "Caption"),
         R("input", {
           type: "text",
@@ -419,7 +419,7 @@ class ImageWidgetDesignComponent extends React.Component<
       this.state.caption
         ? R(
             "div",
-            { className: "form-group" },
+            { className: "mb-3" },
             R("label", null, "Caption position"),
             R(ui.Select, {
               options: [
@@ -448,7 +448,11 @@ class ImageWidgetDesignComponent extends React.Component<
       "div",
       null,
       R("button", { key: "save", type: "button", className: "btn btn-primary", onClick: this.handleSave }, "Save"),
-      R("button", { key: "cancel", type: "button", className: "btn btn-default", onClick: this.handleCancel }, "Cancel")
+      R(
+        "button",
+        { key: "cancel", type: "button", className: "btn btn-secondary", onClick: this.handleCancel },
+        "Cancel"
+      )
     )
 
     return R(

@@ -232,7 +232,7 @@ export default class OldMapViewComponent extends React.Component<
       R(
         "div",
         { style: { textAlign: "right", marginTop: 10 } },
-        R("button", { className: "btn btn-default", onClick: () => this.setState({ popupContents: null }) }, "Close")
+        R("button", { className: "btn btn-secondary", onClick: () => this.setState({ popupContents: null }) }, "Close")
       )
     )
   }

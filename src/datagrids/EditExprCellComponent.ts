@@ -203,7 +203,7 @@ class EnumEditComponent extends React.Component<EnumEditComponentProps> {
         {
           value: this.props.value || "",
           onChange: (ev: any) => this.props.onChange(ev.target.value || null),
-          className: "form-control"
+          className: "form-select"
         },
         R("option", { key: "", value: "" }, ""),
         _.map(this.props.enumValues, (ev) => {

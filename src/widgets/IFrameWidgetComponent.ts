@@ -48,7 +48,7 @@ export default class IFrameWidgetComponent extends React.Component<
 
     const content = R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", null, "URL to embed"),
       R("input", {
         type: "text",
@@ -56,7 +56,7 @@ export default class IFrameWidgetComponent extends React.Component<
         value: this.state.editUrl || "",
         onChange: (ev: any) => this.setState({ editUrl: ev.target.value })
       }),
-      R("p", { className: "help-block" }, "e.g. https://www.youtube.com/embed/dQw4w9WgXcQ")
+      R("div", { className: "form-text text-muted" }, "e.g. https://www.youtube.com/embed/dQw4w9WgXcQ")
     )
 
     return R(

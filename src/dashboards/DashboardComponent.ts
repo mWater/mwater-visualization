@@ -236,7 +236,7 @@ export default class DashboardComponent extends React.Component<DashboardCompone
         className: `btn btn-primary btn-sm ${this.state.editing ? "active" : ""}`,
         onClick: this.handleToggleEditing
       },
-      R("span", { className: "glyphicon glyphicon-pencil" }),
+      R("span", { className: "fas fa-pencil-alt" }),
       this.state.editing ? " Editing" : " Edit"
     )
   }
@@ -249,27 +249,19 @@ export default class DashboardComponent extends React.Component<DashboardCompone
         case "default":
           return [
             R("h4", { key: "name", className: "list-group-item-heading" }, "Classic Dashboard"),
-            R(
-              "p",
-              { key: "description", className: "list-group-item-text" },
-              "Ideal for data display with minimal text"
-            )
+            R("p", { key: "description", className: "" }, "Ideal for data display with minimal text")
           ]
         case "greybg":
           return [
             R("h4", { key: "name", className: "list-group-item-heading" }, "Framed Dashboard"),
-            R(
-              "p",
-              { key: "description", className: "list-group-item-text" },
-              "Each widget is white on a grey background"
-            )
+            R("p", { key: "description", className: "" }, "Each widget is white on a grey background")
           ]
         case "story":
           return [
             R("h4", { key: "name", className: "list-group-item-heading" }, "Story"),
             R(
               "p",
-              { key: "description", className: "list-group-item-text" },
+              { key: "description", className: "" },
               "Ideal for data-driven storytelling with lots of text. Responsive and mobile-friendly"
             )
           ]
@@ -316,7 +308,7 @@ export default class DashboardComponent extends React.Component<DashboardCompone
                 className: `btn btn-link btn-sm ${!this.state.undoStack.canUndo() ? "disabled" : ""}`,
                 onClick: this.handleUndo
               },
-              R("span", { className: "glyphicon glyphicon-triangle-left" }),
+              R("span", { className: "fas fa-caret-left" }),
               R("span", { className: "hide-600px" }, " Undo")
             ),
             " ",
@@ -327,7 +319,7 @@ export default class DashboardComponent extends React.Component<DashboardCompone
                 className: `btn btn-link btn-sm ${!this.state.undoStack.canRedo() ? "disabled" : ""}`,
                 onClick: this.handleRedo
               },
-              R("span", { className: "glyphicon glyphicon-triangle-right" }),
+              R("span", { className: "fas fa-caret-right" }),
               R("span", { className: "hide-600px" }, " Redo")
             )
           ]
@@ -335,13 +327,13 @@ export default class DashboardComponent extends React.Component<DashboardCompone
       R(
         "a",
         { key: "print", className: "btn btn-link btn-sm", onClick: this.handlePrint },
-        R("span", { className: "glyphicon glyphicon-print" }),
+        R("span", { className: "fas fa-print" }),
         R("span", { className: "hide-600px" }, " Print")
       ),
       R(
         "a",
         { key: "refresh", className: "btn btn-link btn-sm", onClick: this.handleRefreshData },
-        R("span", { className: "glyphicon glyphicon-refresh" }),
+        R("span", { className: "fas fa-sync" }),
         R("span", { className: "hide-600px" }, " Refresh")
       ),
       this.state.hideQuickfilters && this.props.design.quickfilters && this.props.design.quickfilters.length > 0
@@ -360,7 +352,7 @@ export default class DashboardComponent extends React.Component<DashboardCompone
         ? R(
             "a",
             { key: "settings", className: "btn btn-link btn-sm", onClick: this.handleSettings },
-            R("span", { className: "glyphicon glyphicon-cog" }),
+            R("span", { className: "fas fa-cog" }),
             R("span", { className: "hide-600px" }, " Settings")
           )
         : undefined,

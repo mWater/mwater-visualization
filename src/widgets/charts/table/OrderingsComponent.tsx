@@ -4,6 +4,7 @@ import React from "react"
 const R = React.createElement
 
 import { ExprComponent } from "mwater-expressions-ui"
+import { Checkbox } from "react-library/lib/bootstrap"
 
 interface OrderingsComponentProps {
   orderings: any
@@ -52,8 +53,8 @@ export default class OrderingsComponent extends React.Component<OrderingsCompone
 
       R(
         "button",
-        { type: "button", className: "btn btn-sm btn-default", onClick: this.handleAdd, key: "add" },
-        R("span", { className: "glyphicon glyphicon-plus" }),
+        { type: "button", className: "btn btn-sm btn-secondary", onClick: this.handleAdd, key: "add" },
+        R("span", { className: "fas fa-plus" }),
         " Add Ordering"
       )
     )
@@ -79,10 +80,8 @@ class OrderingComponent extends React.Component<OrderingComponentProps> {
     return this.handleAxisChange(axis)
   }
 
-  handleDirectionChange = (ev: any) => {
-    return this.props.onOrderingChange(
-      _.extend({}, this.props.ordering, { direction: ev.target.checked ? "desc" : "asc" })
-    )
+  handleDirectionChange = (value: any) => {
+    return this.props.onOrderingChange(_.extend({}, this.props.ordering, { direction: value ? "desc" : "asc" }))
   }
 
   render() {
@@ -94,8 +93,8 @@ class OrderingComponent extends React.Component<OrderingComponentProps> {
         { style: { textAlign: "right" } },
         R(
           "button",
-          { className: "btn btn-xs btn-link", type: "button", onClick: this.props.onOrderingRemove },
-          R("span", { className: "glyphicon glyphicon-remove" })
+          { className: "btn btn-sm btn-link", type: "button", onClick: this.props.onOrderingRemove },
+          R("span", { className: "fas fa-times" })
         )
       ),
       R(ExprComponent, {
@@ -110,20 +109,9 @@ class OrderingComponent extends React.Component<OrderingComponentProps> {
       R(
         "div",
         null,
-        R(
-          "div",
-          { className: "checkbox-inline" },
-          R(
-            "label",
-            null,
-            R("input", {
-              type: "checkbox",
-              checked: this.props.ordering.direction === "desc",
-              onChange: this.handleDirectionChange
-            }),
-            "Reverse"
-          )
-        )
+        <Checkbox inline value={this.props.ordering.direction === "desc"} onChange={this.handleDirectionChange}>
+          Reverse
+        </Checkbox>
       )
     )
   }

@@ -110,7 +110,7 @@ export default class MapLayersDesignerComponent extends React.Component<MapLayer
   render() {
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       this.props.design.layerViews.length > 0
         ? R(
             "div",

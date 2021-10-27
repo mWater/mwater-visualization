@@ -133,7 +133,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
 
   renderRegionMode() {
     return (
-      <div className="form-group">
+      <div className="mb-3">
         <label className="text-muted">Mode</label>
         <div style={{ marginLeft: 10 }}>
           <ui.Radio
@@ -172,7 +172,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     }
 
     return (
-      <div className="form-group">
+      <div className="mb-3">
         <label className="text-muted">
           <i className="fa fa-database" />
           {" Data Source"}
@@ -197,13 +197,13 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     const regionsTable = this.props.design.regionsTable || "admin_regions"
 
     return (
-      <div className="form-group">
+      <div className="mb-3">
         <label className="text-muted">Regions Type</label>
         <div style={{ marginLeft: 8 }}>
           <select
             value={regionsTable}
             onChange={(ev) => this.handleRegionsTableChange(ev.target.value)}
-            className="form-control"
+            className="form-select"
           >
             <option value="admin_regions">Administrative Regions (from mWater global database)</option>
             <option disabled>── Custom regions (special regions uploaded for specific purposes) ──</option>
@@ -230,9 +230,9 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     const regionsTable = this.props.design.regionsTable || "admin_regions"
 
     return (
-      <div className="form-group">
+      <div className="mb-3">
         <label className="text-muted">
-          <i className="glyphicon glyphicon-map-marker" />
+          <i className="fas fa-map-marker-alt" />
           {" Location"}
         </label>
         <div style={{ marginLeft: 8 }}>
@@ -278,21 +278,10 @@ export default class ChoroplethLayerDesigner extends React.Component<{
   renderDisplayNames() {
     return R(
       "div",
-      { className: "form-group" },
-      R(
-        "div",
-        { className: "checkbox" },
-        R(
-          "label",
-          null,
-          R("input", {
-            type: "checkbox",
-            checked: this.props.design.displayNames,
-            onChange: (ev) => this.handleDisplayNamesChange(ev.target.checked)
-          }),
-          "Display Region Names"
-        )
-      )
+      { className: "mb-3" },
+      <ui.Checkbox value={this.props.design.displayNames} onChange={(value) => this.handleDisplayNamesChange(value)}>
+        Display Region Names
+      </ui.Checkbox>
     )
   }
 
@@ -304,13 +293,8 @@ export default class ChoroplethLayerDesigner extends React.Component<{
 
     return R(
       "div",
-      { className: "form-group" },
-      R(
-        "label",
-        { className: "text-muted" },
-        R("span", { className: "glyphicon glyphicon glyphicon-tint" }),
-        "Fill Color"
-      ),
+      { className: "mb-3" },
+      R("label", { className: "text-muted" }, R("span", { className: "fas fa-tint" }), "Fill Color"),
 
       R(
         "div",
@@ -350,13 +334,8 @@ export default class ChoroplethLayerDesigner extends React.Component<{
         null,
         R(
           "div",
-          { className: "form-group" },
-          R(
-            "label",
-            { className: "text-muted" },
-            R("span", { className: "glyphicon glyphicon glyphicon-tint" }),
-            "Color By Data"
-          ),
+          { className: "mb-3" },
+          R("label", { className: "text-muted" }, R("span", { className: "fas fa-tint" }), "Color By Data"),
 
           R(AxisComponent, {
             schema: this.props.schema,
@@ -407,13 +386,8 @@ export default class ChoroplethLayerDesigner extends React.Component<{
         null,
         R(
           "div",
-          { className: "form-group" },
-          R(
-            "label",
-            { className: "text-muted" },
-            R("span", { className: "glyphicon glyphicon glyphicon-tint" }),
-            "Color By Data"
-          ),
+          { className: "mb-3" },
+          R("label", { className: "text-muted" }, R("span", { className: "fas fa-tint" }), "Color By Data"),
 
           R(AxisComponent, {
             schema: this.props.schema,
@@ -457,7 +431,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
   renderFillOpacity() {
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R(
         "label",
         { className: "text-muted" },
@@ -478,13 +452,8 @@ export default class ChoroplethLayerDesigner extends React.Component<{
   renderBorderColor() {
     return R(
       "div",
-      { className: "form-group" },
-      R(
-        "label",
-        { className: "text-muted" },
-        R("span", { className: "glyphicon glyphicon glyphicon-tint" }),
-        "Border Color"
-      ),
+      { className: "mb-3" },
+      R("label", { className: "text-muted" }, R("span", { className: "fas fa-tint" }), "Border Color"),
 
       R(
         "div",
@@ -505,8 +474,8 @@ export default class ChoroplethLayerDesigner extends React.Component<{
 
     return R(
       "div",
-      { className: "form-group" },
-      R("label", { className: "text-muted" }, R("span", { className: "glyphicon glyphicon-filter" }), " Filters"),
+      { className: "mb-3" },
+      R("label", { className: "text-muted" }, R("span", { className: "fas fa-filter" }), " Filters"),
       R(
         "div",
         { style: { marginLeft: 8 } },

@@ -106,7 +106,7 @@ export const MWaterCustomTablesetListComponent = (props: {
       <div key={ts.code}>
         {alreadyIncluded ? (
           <div style={{ float: "right" }}>
-            <button className="btn btn-xs btn-link" type="button" onClick={() => handleRemove(ts)}>
+            <button className="btn btn-sm btn-link" type="button" onClick={() => handleRemove(ts)}>
               <i className="fa fa-remove" />
             </button>
           </div>

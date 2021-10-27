@@ -168,7 +168,7 @@ export default class DateRangeComponent extends React.Component<DateRangeCompone
       },
       R(
         "ul",
-        { className: "nav nav-pills nav-stacked" },
+        { className: "nav nav-pills nav-justified" },
         _.map(this.getPresets(), (preset) => {
           return R(
             "li",
@@ -254,7 +254,6 @@ export default class DateRangeComponent extends React.Component<DateRangeCompone
         R(
           "div",
           {
-            className: "form-control",
             style: { width: 220 },
             onClick: () => this.setState({ dropdownOpen: true, custom: false })
           },

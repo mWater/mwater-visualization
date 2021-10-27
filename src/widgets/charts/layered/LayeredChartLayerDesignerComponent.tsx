@@ -13,6 +13,7 @@ import LayeredChartCompiler from "./LayeredChartCompiler"
 import * as uiComponents from "../../../UIComponents"
 import TableSelectComponent from "../../../TableSelectComponent"
 import * as ui from "react-library/lib/bootstrap"
+import { Checkbox } from "react-library/lib/bootstrap"
 
 interface LayeredChartLayerDesignerComponentProps {
   design: any
@@ -132,14 +133,14 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
   handleColorChange = (color: any) => {
     return this.updateLayer({ color })
   }
-  handleCumulativeChange = (ev: any) => {
-    return this.updateLayer({ cumulative: ev.target.checked })
+  handleCumulativeChange = (value: any) => {
+    return this.updateLayer({ cumulative: value })
   }
-  handleTrendlineChange = (ev: any) => {
-    return this.updateLayer({ trendline: ev.target.checked ? "linear" : undefined })
+  handleTrendlineChange = (value: any) => {
+    return this.updateLayer({ trendline: value ? "linear" : undefined })
   }
-  handleStackedChange = (ev: any) => {
-    return this.updateLayer({ stacked: ev.target.checked })
+  handleStackedChange = (value: any) => {
+    return this.updateLayer({ stacked: value })
   }
 
   renderName() {
@@ -150,7 +151,7 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
     const placeholder = this.props.design.layers.length === 1 ? "Value" : `Series ${this.props.index + 1}`
     return R("input", {
       type: "text",
-      className: "form-control input-sm",
+      className: "form-control form-control-sm",
       value: layer.name,
       onChange: this.handleNameChange,
       placeholder
@@ -161,8 +162,8 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
     if (this.props.design.layers.length > 1) {
       return R(
         "button",
-        { className: "btn btn-xs btn-link pull-right", type: "button", onClick: this.props.onRemove },
-        R("span", { className: "glyphicon glyphicon-remove" })
+        { className: "btn btn-sm btn-link float-right", type: "button", onClick: this.props.onRemove },
+        R("span", { className: "fas fa-times" })
       )
     }
   }
@@ -239,7 +240,7 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
 
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, title),
       R(
         "div",
@@ -271,7 +272,7 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
 
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, title),
       R(
         "div",
@@ -307,12 +308,9 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
     return R(
       "div",
       { key: "cumulative" },
-      R(
-        "label",
-        { className: "checkbox-inline" },
-        R("input", { type: "checkbox", checked: layer.cumulative, onChange: this.handleCumulativeChange }),
-        "Cumulative"
-      )
+      <Checkbox inline value={layer.cumulative} onChange={this.handleCumulativeChange}>
+        Cumulative
+      </Checkbox>
     )
   }
 
@@ -328,12 +326,9 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
     return R(
       "div",
       { key: "trendline" },
-      R(
-        "label",
-        { className: "checkbox-inline" },
-        R("input", { type: "checkbox", checked: layer.trendline === "linear", onChange: this.handleTrendlineChange }),
-        "Show linear trendline"
-      )
+      <Checkbox value={layer.trendline === "linear"} onChange={this.handleTrendlineChange}>
+        Show linear trendline
+      </Checkbox>
     )
   }
 
@@ -347,12 +342,9 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
       return R(
         "div",
         { key: "stacked" },
-        R(
-          "label",
-          { className: "checkbox-inline" },
-          R("input", { type: "checkbox", checked: stacked, onChange: this.handleStackedChange }),
-          "Stacked"
-        )
+        <Checkbox value={stacked} onChange={this.handleStackedChange}>
+          Stacked
+        </Checkbox>
       )
     }
 
@@ -371,7 +363,7 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
 
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, layer.axes.color ? "Default Color" : "Color"),
       R(
         "div",
@@ -395,8 +387,8 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
 
     return R(
       "div",
-      { className: "form-group" },
-      R("label", { className: "text-muted" }, R("span", { className: "glyphicon glyphicon-filter" }), " ", "Filters"),
+      { className: "mb-3" },
+      R("label", { className: "text-muted" }, R("span", { className: "fas fa-filter" }), " ", "Filters"),
       R(
         "div",
         { style: { marginLeft: 8 } },

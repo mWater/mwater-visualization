@@ -5,7 +5,7 @@ const R = React.createElement
 import * as motion from "react-motion"
 import { LinkComponent } from "mwater-expressions-ui"
 
-interface SectionComponentProps {
+export interface SectionComponentProps {
   icon?: string
   label?: any
 }
@@ -87,8 +87,8 @@ export class OptionComponent extends React.Component<OptionComponentProps> {
       this.props.onRemove
         ? R(
             "button",
-            { type: "button", className: "btn btn-link btn-xs pull-right", onClick: this.handleClick },
-            R("span", { className: "glyphicon glyphicon-remove" })
+            { type: "button", className: "btn btn-link btn-sm float-right", onClick: this.handleClick },
+            R("span", { className: "fas fa-times" })
           )
         : undefined,
       R("div", { style: { fontWeight: "bold" } }, this.props.name),
@@ -270,7 +270,7 @@ export class ButtonToggleComponent extends React.Component<ButtonToggleComponent
   render() {
     return R(
       "div",
-      { className: "btn-group btn-group-xs" },
+      { className: "btn-group btn-group-sm" },
       _.map(this.props.options, (option, i) => {
         return R(
           "button",

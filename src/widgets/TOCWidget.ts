@@ -188,7 +188,7 @@ class TOCWidgetViewComponent extends React.Component {
       { key: index, style: { paddingLeft: tocEntry.level * 8 - 8 } },
       R(
         "a",
-        { onClick: this.handleEntryClick.bind(null, tocEntry), style: { cursor: "pointer" } },
+        { className: "link-plain", onClick: this.handleEntryClick.bind(null, tocEntry) },
         indentation,
         R("span", null, tocEntry.text)
       )

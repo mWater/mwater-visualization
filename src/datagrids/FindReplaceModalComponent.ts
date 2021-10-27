@@ -308,7 +308,7 @@ export default class FindReplaceModalComponent extends React.Component<
       null,
       R(
         "div",
-        { key: "replace", className: "form-group" },
+        { key: "replace", className: "mb-3" },
         R("label", null, "Column with data to replace: "),
         R(ReactSelect, {
           options: replaceColumnOptions,
@@ -329,7 +329,7 @@ export default class FindReplaceModalComponent extends React.Component<
 
           return R(
             "div",
-            { key: "with", className: "form-group" },
+            { key: "with", className: "mb-3" },
             R("label", null, "Value to replace data with: "),
             R(ExprComponent, {
               schema: this.props.schema,
@@ -349,7 +349,7 @@ export default class FindReplaceModalComponent extends React.Component<
 
       R(
         "div",
-        { key: "condition", className: "form-group" },
+        { key: "condition", className: "mb-3" },
         R("label", null, "Only in rows that (optional):"),
         R(ExprComponent, {
           schema: this.props.schema,
@@ -383,7 +383,7 @@ export default class FindReplaceModalComponent extends React.Component<
               key: "cancel",
               type: "button",
               onClick: () => this.setState({ open: false }),
-              className: "btn btn-default"
+              className: "btn btn-secondary"
             },
             "Cancel"
           ),

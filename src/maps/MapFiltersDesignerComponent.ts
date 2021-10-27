@@ -46,7 +46,7 @@ export default class MapFiltersDesignerComponent extends React.Component<MapFilt
       null,
       R(
         "div",
-        { className: "form-group" },
+        { className: "mb-3" },
         R(
           "label",
           { className: "text-muted" },
@@ -74,7 +74,7 @@ export default class MapFiltersDesignerComponent extends React.Component<MapFilt
       this.context.globalFiltersElementFactory
         ? R(
             "div",
-            { className: "form-group" },
+            { className: "mb-3" },
             R("label", { className: "text-muted" }, "Global Filters "),
 
             R(

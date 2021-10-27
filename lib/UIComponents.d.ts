@@ -1,5 +1,5 @@
 import React from "react";
-interface SectionComponentProps {
+export interface SectionComponentProps {
     icon?: string;
     label?: any;
 }

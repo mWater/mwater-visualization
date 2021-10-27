@@ -17,7 +17,7 @@ export default class ExprItemEditorComponent extends React.Component<ExprItemEdi
     constructor(props: any);
     handleTableChange: (table: any) => void;
     handleExprChange: (expr: any) => any;
-    handleIncludeLabelChange: (ev: any) => any;
+    handleIncludeLabelChange: (value: any) => any;
     handleLabelTextChange: (ev: any) => any;
     handleFormatChange: (ev: any) => any;
     renderFormat(): React.DetailedReactHTMLElement<{

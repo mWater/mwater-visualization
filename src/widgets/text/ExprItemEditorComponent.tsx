@@ -8,6 +8,7 @@ import { ExprComponent } from "mwater-expressions-ui"
 import TableSelectComponent from "../../TableSelectComponent"
 import { getFormatOptions } from "../../valueFormatter"
 import { getDefaultFormat } from "../../valueFormatter"
+import { Checkbox } from "react-library/lib/bootstrap"
 
 interface ExprItemEditorComponentProps {
   /** Schema to use */
@@ -48,10 +49,10 @@ export default class ExprItemEditorComponent extends React.Component<
     return this.props.onChange(exprItem)
   }
 
-  handleIncludeLabelChange = (ev: any) => {
+  handleIncludeLabelChange = (value: any) => {
     const exprItem = _.extend({}, this.props.exprItem, {
-      includeLabel: ev.target.checked,
-      labelText: ev.target.checked ? this.props.exprItem.labelText : undefined
+      includeLabel: value,
+      labelText: value ? this.props.exprItem.labelText : undefined
     })
     return this.props.onChange(exprItem)
   }
@@ -77,14 +78,14 @@ export default class ExprItemEditorComponent extends React.Component<
 
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, "Format"),
       ": ",
       R(
         "select",
         {
           value: this.props.exprItem.format != null ? this.props.exprItem.format : getDefaultFormat(exprType),
-          className: "form-control",
+          className: "form-select",
           style: { width: "auto", display: "inline-block" },
           onChange: this.handleFormatChange
         },
@@ -99,7 +100,7 @@ export default class ExprItemEditorComponent extends React.Component<
       { style: { paddingBottom: 200 } },
       R(
         "div",
-        { className: "form-group" },
+        { className: "mb-3" },
         R("label", { className: "text-muted" }, R("i", { className: "fa fa-database" }), " ", "Data Source"),
         ": ",
         R(TableSelectComponent, {
@@ -113,7 +114,7 @@ export default class ExprItemEditorComponent extends React.Component<
       this.state.table
         ? R(
             "div",
-            { className: "form-group" },
+            { className: "mb-3" },
             R("label", { className: "text-muted" }, "Field"),
             ": ",
             R(ExprComponent, {
@@ -131,17 +132,14 @@ export default class ExprItemEditorComponent extends React.Component<
       this.state.table && this.props.exprItem.expr
         ? R(
             "div",
-            { className: "form-group" },
-            R(
-              "label",
-              { key: "includeLabel" },
-              R("input", {
-                type: "checkbox",
-                checked: this.props.exprItem.includeLabel,
-                onChange: this.handleIncludeLabelChange
-              }),
-              " Include Label"
-            ),
+            { className: "mb-3" },
+            <Checkbox
+              key="includeLabel"
+              value={this.props.exprItem.includeLabel}
+              onChange={this.handleIncludeLabelChange}
+            >
+              Include Label
+            </Checkbox>,
 
             this.props.exprItem.includeLabel
               ? R("input", {

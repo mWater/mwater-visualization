@@ -229,7 +229,7 @@ export default class DatagridComponent extends React.Component<
         className: "btn btn-primary",
         onClick: this.handleEdit
       },
-      R("span", { className: "glyphicon glyphicon-cog" }),
+      R("span", { className: "fas fa-cog" }),
       " ",
       "Settings"
     )

@@ -8,6 +8,7 @@ import AxisComponent from "../../../axes/AxisComponent"
 import ColorComponent from "../../../ColorComponent"
 import { ExprComponent } from "mwater-expressions-ui"
 import { FilterExprComponent } from "mwater-expressions-ui"
+import { Radio } from "react-library/lib/bootstrap"
 
 interface SegmentDesignerComponentProps {
   segment: any
@@ -49,13 +50,9 @@ export default class SegmentDesignerComponent extends React.Component<
     return this.props.onChange(segment)
   }
 
-  handleSingleMode = () => {
+  handleMode = (mode: any) => {
     this.update({ valueAxis: null })
-    return this.setState({ mode: "single" })
-  }
-
-  handleMultipleMode = () => {
-    return this.setState({ mode: "multiple" })
+    return this.setState({ mode })
   }
 
   handleValueAxisChange = (valueAxis: any) => {
@@ -85,33 +82,17 @@ export default class SegmentDesignerComponent extends React.Component<
         labelMuted: true,
         label: "Type"
       },
-      R(
-        "div",
-        { key: "single", className: "radio" },
-        R(
-          "label",
-          null,
-          R("input", { type: "radio", checked: this.state.mode === "single", onChange: this.handleSingleMode }),
-          `Single ${this.props.segmentType}`,
-          R(
-            "span",
-            { className: "text-muted" },
-            ` - used for summary ${this.props.segmentType}s and empty ${this.props.segmentType}s`
-          )
-        )
-      ),
+      <ui.Radio key="single" value={this.state.mode} radioValue={"single"} onChange={this.handleMode}>
+        {`Single ${this.props.segmentType}`}
+        <span className="text-muted">
+          {` - used for summary ${this.props.segmentType}s and empty ${this.props.segmentType}s`}
+        </span>
+      </ui.Radio>,
 
-      R(
-        "div",
-        { key: "multiple", className: "radio" },
-        R(
-          "label",
-          null,
-          R("input", { type: "radio", checked: this.state.mode === "multiple", onChange: this.handleMultipleMode }),
-          `Multiple ${this.props.segmentType}s`,
-          R("span", { className: "text-muted" }, " - disaggregate data by a field")
-        )
-      )
+      <ui.Radio key="multiple" value={this.state.mode} radioValue={"multiple"} onChange={this.handleMode}>
+        {`Multiple ${this.props.segmentType}s`}
+        <span className="text-muted">{` - disaggregate data by a field`}</span>
+      </ui.Radio>
     )
   }
 
@@ -186,49 +167,45 @@ export default class SegmentDesignerComponent extends React.Component<
         labelMuted: true,
         label: "Styling"
       },
-      R(
-        "label",
-        { className: "checkbox-inline", key: "bold" },
-        R("input", {
-          type: "checkbox",
-          checked: this.props.segment.bold === true,
-          onChange: (ev) => this.update({ bold: ev.target.checked })
-        }),
-        "Bold"
-      ),
-      R(
-        "label",
-        { className: "checkbox-inline", key: "italic" },
-        R("input", {
-          type: "checkbox",
-          checked: this.props.segment.italic === true,
-          onChange: (ev) => this.update({ italic: ev.target.checked })
-        }),
-        "Italic"
-      ),
-      this.props.segment.valueAxis && this.props.segment.label
-        ? R(
-            "label",
-            { className: "checkbox-inline", key: "valueLabelBold" },
-            R("input", {
-              type: "checkbox",
-              checked: this.props.segment.valueLabelBold === true,
-              onChange: (ev) => this.update({ valueLabelBold: ev.target.checked })
-            }),
-            "Header Bold"
-          )
+      <div>
+        <ui.Checkbox
+          key="bold"
+          inline
+          value={this.props.segment.bold === true}
+          onChange={(value) => this.update({ bold: value })}
+        >
+          Bold
+        </ui.Checkbox>
+        <ui.Checkbox
+          key="italic"
+          inline
+          value={this.props.segment.italic === true}
+          onChange={(value) => this.update({ italic: value })}
+        >
+          Italic
+        </ui.Checkbox>
+        this.props.segment.valueAxis && this.props.segment.label ?{" "}
+        <ui.Checkbox
+          key="valueLabelBold"
+          inline
+          value={this.props.segment.valueLabelBold === true}
+          onChange={(value) => this.update({ valueLabelBold: value })}
+        >
+          Header Bold
+        </ui.Checkbox>
         : undefined,
-      this.props.segment.valueAxis && this.props.segment.label
-        ? R(
-            "div",
-            { style: { paddingTop: 5 } },
-            "Shade filler cells: ",
-            R(ColorComponent, {
-              color: this.props.segment.fillerColor,
-              onChange: (color: any) => this.update({ fillerColor: color })
-            })
-          )
-        : undefined
+        {this.props.segment.valueAxis && this.props.segment.label
+          ? R(
+              "div",
+              { style: { paddingTop: 5 } },
+              "Shade filler cells: ",
+              R(ColorComponent, {
+                color: this.props.segment.fillerColor,
+                onChange: (color: any) => this.update({ fillerColor: color })
+              })
+            )
+          : undefined}
+      </div>
     )
   }
 
@@ -336,30 +313,18 @@ class BorderComponent extends React.Component<BorderComponentProps> {
     return R(
       "span",
       null,
-      R(
-        "label",
-        { className: "radio-inline" },
-        R("input", { type: "radio", checked: value === 0, onClick: () => this.props.onChange(0) }),
-        "None"
-      ),
-      R(
-        "label",
-        { className: "radio-inline" },
-        R("input", { type: "radio", checked: value === 1, onClick: () => this.props.onChange(1) }),
-        "Light"
-      ),
-      R(
-        "label",
-        { className: "radio-inline" },
-        R("input", { type: "radio", checked: value === 2, onClick: () => this.props.onChange(2) }),
-        "Medium"
-      ),
-      R(
-        "label",
-        { className: "radio-inline" },
-        R("input", { type: "radio", checked: value === 3, onClick: () => this.props.onChange(3) }),
-        "Heavy"
-      )
+      <Radio inline value={value} radioValue={0} onChange={this.props.onChange(0)}>
+        None
+      </Radio>,
+      <Radio inline value={value} radioValue={1} onChange={this.props.onChange(1)}>
+        Light
+      </Radio>,
+      <Radio inline value={value} radioValue={2} onChange={this.props.onChange(2)}>
+        Medium
+      </Radio>,
+      <Radio inline value={value} radioValue={3} onChange={this.props.onChange(3)}>
+        Heavy
+      </Radio>
     )
   }
 }

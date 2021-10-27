@@ -31,7 +31,7 @@ export default class ZoomLevelsComponent extends React.Component<ZoomLevelsCompo
         null,
         R(
           "a",
-          { className: "btn btn-link btn-xs", onClick: () => this.setState({ expanded: true }) },
+          { className: "btn btn-link btn-sm", onClick: () => this.setState({ expanded: true }) },
           "Advanced options..."
         )
       )
@@ -39,7 +39,7 @@ export default class ZoomLevelsComponent extends React.Component<ZoomLevelsCompo
 
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, "Advanced"),
       R(
         "div",

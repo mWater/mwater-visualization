@@ -77,7 +77,6 @@ export default class MapLayerViewDesignerComponent extends React.Component<MapLa
     renderDeleteLayer(): React.DetailedReactHTMLElement<{
         style: {
             float: "right";
-            cursor: "pointer";
             marginLeft: number;
         };
         key: string;

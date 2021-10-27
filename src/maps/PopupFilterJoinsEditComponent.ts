@@ -75,7 +75,7 @@ export default class PopupFilterJoinsEditComponent extends React.Component<
       R("div", { className: "text-muted" }, "Optional connections for other tables to filtering the popup"),
       R(
         "table",
-        { className: "table table-condensed table-bordered" },
+        { className: "table table-sm table-bordered" },
         R("thead", null, R("tr", null, R("th", null, "Data Source"), R("th", null, "Connection"))),
         R(
           "tbody",

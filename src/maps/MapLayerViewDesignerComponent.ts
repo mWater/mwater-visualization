@@ -133,7 +133,7 @@ export default class MapLayerViewDesignerComponent extends React.Component<
       { className: "hover-display-parent", onClick: this.handleRename, style: { cursor: "pointer" } },
       this.props.layerView.name,
       " ",
-      R("span", { className: "hover-display-child glyphicon glyphicon-pencil text-muted" })
+      R("span", { className: "hover-display-child fas fa-pencil-alt text-muted" })
     )
   }
 
@@ -162,7 +162,7 @@ export default class MapLayerViewDesignerComponent extends React.Component<
       { key: "edit", style: { marginBottom: this.state.editing ? 10 : undefined } },
       R(
         "a",
-        { onClick: this.handleToggleEditing, style: { fontSize: 12, cursor: "pointer" } },
+        { className: "link-plain", onClick: this.handleToggleEditing, style: { fontSize: 12 } },
         this.state.editing
           ? [R("i", { className: "fa fa-caret-up" }), " Close"]
           : [R("i", { className: "fa fa-cog" }), " Customize..."]
@@ -183,7 +183,7 @@ export default class MapLayerViewDesignerComponent extends React.Component<
   renderOpacityControl() {
     return R(
       "div",
-      { className: "form-group", style: { paddingTop: 10 } },
+      { className: "mb-3", style: { paddingTop: 10 } },
       R(
         "label",
         { className: "text-muted" },
@@ -207,8 +207,8 @@ export default class MapLayerViewDesignerComponent extends React.Component<
   renderDeleteLayer() {
     return R(
       "div",
-      { style: { float: "right", cursor: "pointer", marginLeft: 10 }, key: "delete" },
-      R("a", { onClick: this.handleRemove }, R("i", { className: "fa fa-remove" }))
+      { style: { float: "right", marginLeft: 10 }, key: "delete" },
+      R("a", { className: "link-plain", onClick: this.handleRemove }, R("i", { className: "fa fa-remove" }))
     )
   }
 

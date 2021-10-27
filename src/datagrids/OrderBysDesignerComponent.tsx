@@ -5,6 +5,7 @@ const R = React.createElement
 
 import { ExprUtils } from "mwater-expressions"
 import { ExprComponent } from "mwater-expressions-ui"
+import { Checkbox } from "react-library/lib/bootstrap"
 
 interface OrderBysDesignerComponentProps {
   /** schema to use */
@@ -64,7 +65,7 @@ export default class OrderBysDesignerComponent extends React.Component<OrderBysD
           className: "btn btn-link",
           onClick: this.handleAdd
         },
-        R("span", { className: "glyphicon glyphicon-plus" }),
+        R("span", { className: "fas fa-plus" }),
         " Add Ordering"
       )
     )
@@ -85,8 +86,8 @@ class OrderByDesignerComponent extends React.Component<OrderByDesignerComponentP
     return this.props.onChange(_.extend({}, this.props.orderBy, { expr }))
   }
 
-  handleDirectionChange = (ev: any) => {
-    return this.props.onChange(_.extend({}, this.props.orderBy, { direction: ev.target.checked ? "desc" : "asc" }))
+  handleDirectionChange = (value: any) => {
+    return this.props.onChange(_.extend({}, this.props.orderBy, { direction: value ? "desc" : "asc" }))
   }
 
   render() {
@@ -109,28 +110,17 @@ class OrderByDesignerComponent extends React.Component<OrderByDesignerComponentP
       R(
         "div",
         { className: "col-xs-3" },
-        R(
-          "div",
-          { className: "checkbox-inline" },
-          R(
-            "label",
-            null,
-            R("input", {
-              type: "checkbox",
-              checked: this.props.orderBy.direction === "desc",
-              onChange: this.handleDirectionChange
-            }),
-            "Reverse"
-          )
-        )
+        <Checkbox inline value={this.props.orderBy.direction === "desc"} onChange={this.handleDirectionChange}>
+          Reverse
+        </Checkbox>
       ),
       R(
         "div",
         { className: "col-xs-1" },
         R(
           "button",
-          { className: "btn btn-xs btn-link", type: "button", onClick: this.props.onRemove },
-          R("span", { className: "glyphicon glyphicon-remove" })
+          { className: "btn btn-sm btn-link", type: "button", onClick: this.props.onRemove },
+          R("span", { className: "fas fa-times" })
         )
       )
     )

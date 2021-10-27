@@ -358,14 +358,14 @@ export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps
 
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, "Format"),
       ": ",
       R(
         "select",
         {
           value: axis.format != null ? axis.format : getDefaultFormat(valueType),
-          className: "form-control",
+          className: "form-select",
           style: { width: "auto", display: "inline-block" },
           onChange: this.handleFormatChange
         },

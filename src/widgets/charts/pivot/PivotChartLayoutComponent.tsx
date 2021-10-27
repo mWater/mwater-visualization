@@ -376,11 +376,11 @@ class LayoutCellComponent extends React.Component {
     return R(
       "span",
       { style: { fontSize: "90%" } },
-      R("a", { style: { cursor: "pointer" }, onClick: this.props.onEditSection }, "Edit"),
+      R("a", { className: "link-plain", onClick: this.props.onEditSection }, "Edit"),
       cell.summarize
         ? [
             R("span", { className: "text-muted" }, " / "),
-            R("a", { style: { cursor: "pointer" }, onClick: this.props.onSummarizeSegment }, "Summarize")
+            R("a", { className: "link-plain", onClick: this.props.onSummarizeSegment }, "Summarize")
           ]
         : undefined
     )

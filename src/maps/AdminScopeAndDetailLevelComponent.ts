@@ -46,7 +46,7 @@ export default class AdminScopeAndDetailLevelComponent extends React.Component<A
       null,
       R(
         "div",
-        { className: "form-group" },
+        { className: "mb-3" },
         R("label", { className: "text-muted" }, "Region to Map"),
         R(RegionSelectComponent, {
           region: this.props.scope,
@@ -59,7 +59,7 @@ export default class AdminScopeAndDetailLevelComponent extends React.Component<A
         if (this.props.scope != null && this.props.detailLevel != null) {
           return R(
             "div",
-            { className: "form-group" },
+            { className: "mb-3" },
             R("label", { className: "text-muted" }, "Detail Level"),
             R(DetailLevelSelectComponent, {
               scope: this.props.scope,
@@ -74,7 +74,7 @@ export default class AdminScopeAndDetailLevelComponent extends React.Component<A
           // Case of whole world. Allow selecting country or admin level 1
           return R(
             "div",
-            { className: "form-group" },
+            { className: "mb-3" },
             R("label", { className: "text-muted" }, "Detail Level"),
             R(ReactSelect, {
               value: _.findWhere(basicDetailLevelOptions, { value: this.props.detailLevel }) || null,

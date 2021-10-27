@@ -33,6 +33,8 @@ export interface LayeredChartDesign {
     }[];
     /** order of pie/donut charts. Default is "desc" (if undefined). Can be "desc", "asc", "natural" */
     polarOrder?: "desc" | "asc" | "natural";
+    /** True to hide percentage for pie/donut */
+    hidePercentage?: boolean;
     /** optional maximum for y axis */
     yMax?: number;
     /** optional minimum for y axis */

@@ -159,14 +159,14 @@ export default class AxisColorEditorComponent extends React.Component<
               null,
               R(
                 "a",
-                { style: { cursor: "pointer" }, onClick: this.handleSelectPalette, key: "select-palette" },
+                { className: "link-plain", onClick: this.handleSelectPalette, key: "select-palette" },
                 "Change color scheme"
               ),
               !this.props.autosetColors
                 ? R(
                     "a",
                     {
-                      style: { cursor: "pointer", marginLeft: 10 },
+                      className: "btn btn-sm btn-link",
                       onClick: this.handleResetPalette,
                       key: "reset-palette"
                     },

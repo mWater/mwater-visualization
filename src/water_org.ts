@@ -134,14 +134,14 @@ class TabbedDashboard extends React.Component<TabbedDashboardProps> {
           R(
             "a",
             { key: "renametab", className: "btn btn-link btn-sm", onClick: this.handleRenameTab.bind(null, index) },
-            R("span", { className: "glyphicon glyphicon-pencil" }),
+            R("span", { className: "fas fa-pencil-alt" }),
             " Rename Tab"
           ),
           " ",
           R(
             "a",
             { key: "removetab", className: "btn btn-link btn-sm", onClick: this.handleRemoveTab.bind(null, index) },
-            R("span", { className: "glyphicon glyphicon-remove" }),
+            R("span", { className: "fas fa-times" }),
             " Remove Tab"
           )
         ]

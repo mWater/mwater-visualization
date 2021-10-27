@@ -44,12 +44,8 @@ export default class DropdownWidgetComponent extends React.Component<DropdownWid
 
     const elem = R(
       "div",
-      { style: dropdownStyle, "data-toggle": "dropdown" },
-      R(
-        "div",
-        { className: "mwater-visualization-simple-widget-gear-button" },
-        R("span", { className: "glyphicon glyphicon-cog" })
-      )
+      { style: dropdownStyle, "data-bs-toggle": "dropdown" },
+      R("div", { className: "mwater-visualization-simple-widget-gear-button" }, R("span", { className: "fas fa-cog" }))
     )
 
     return R(
@@ -58,7 +54,7 @@ export default class DropdownWidgetComponent extends React.Component<DropdownWid
       elem,
       R(
         "ul",
-        { className: "dropdown-menu dropdown-menu-right", style: { top: 25 } },
+        { className: "dropdown-menu dropdown-menu-end", style: { top: 25 } },
         _.map(this.props.dropdownItems, this.renderDropdownItem)
       )
     )

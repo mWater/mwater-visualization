@@ -198,7 +198,7 @@ export default class QuickfiltersComponent extends React.Component<QuickfiltersC
       this.props.onHide
         ? R(
             "button",
-            { className: "btn btn-xs btn-link", onClick: this.props.onHide },
+            { className: "btn btn-sm btn-link", onClick: this.props.onHide },
             R("i", { className: "fa fa-angle-double-up" })
           )
         : undefined

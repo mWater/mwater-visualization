@@ -297,10 +297,10 @@ class ColumnsDesignerComponent extends React.Component<ColumnsDesignerComponentP
           {
             key: "addAll",
             type: "button",
-            className: "btn btn-link btn-xs",
+            className: "btn btn-link btn-sm",
             onClick: this.handleAddDefaultColumns
           },
-          R("span", { className: "glyphicon glyphicon-plus" }),
+          R("span", { className: "fas fa-plus" }),
           " Add Default Columns"
         ),
         R(
@@ -308,10 +308,10 @@ class ColumnsDesignerComponent extends React.Component<ColumnsDesignerComponentP
           {
             key: "removeAll",
             type: "button",
-            className: "btn btn-link btn-xs",
+            className: "btn btn-link btn-sm",
             onClick: this.handleRemoveAllColumns
           },
-          R("span", { className: "glyphicon glyphicon-remove" }),
+          R("span", { className: "fas fa-times" }),
           " Remove All Columns"
         )
       ),
@@ -331,7 +331,7 @@ class ColumnsDesignerComponent extends React.Component<ColumnsDesignerComponentP
           className: "btn btn-link",
           onClick: this.handleAddColumn
         },
-        R("span", { className: "glyphicon glyphicon-plus" }),
+        R("span", { className: "fas fa-plus" }),
         " Add Column"
       ),
 
@@ -343,7 +343,7 @@ class ColumnsDesignerComponent extends React.Component<ColumnsDesignerComponentP
           className: "btn btn-link",
           onClick: this.handleAddIdColumn
         },
-        R("span", { className: "glyphicon glyphicon-plus" }),
+        R("span", { className: "fas fa-plus" }),
         " Add Unique Id (advanced)"
       )
     )
@@ -436,7 +436,7 @@ class ColumnDesignerComponent extends React.Component<ColumnDesignerComponentPro
       case "enumset":
         return R(
           "a",
-          { className: "btn btn-xs btn-link", onClick: this.handleSplitEnumset },
+          { className: "btn btn-sm btn-link", onClick: this.handleSplitEnumset },
           R("i", { className: "fa fa-chain-broken" }),
           " Split by options"
         )
@@ -444,7 +444,7 @@ class ColumnDesignerComponent extends React.Component<ColumnDesignerComponentPro
       case "geometry":
         return R(
           "a",
-          { className: "btn btn-xs btn-link", onClick: this.handleSplitGeometry },
+          { className: "btn btn-sm btn-link", onClick: this.handleSplitGeometry },
           R("i", { className: "fa fa-chain-broken" }),
           " Split by lat/lng"
         )
@@ -465,14 +465,14 @@ class ColumnDesignerComponent extends React.Component<ColumnDesignerComponentPro
 
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, "Format"),
       ": ",
       R(
         "select",
         {
           value: this.props.column.format != null ? this.props.column.format : getDefaultFormat(exprType),
-          className: "form-control",
+          className: "form-select",
           style: { width: "auto", display: "inline-block" },
           onChange: this.handleFormatChange
         },
@@ -555,8 +555,8 @@ class ColumnDesignerComponent extends React.Component<ColumnDesignerComponentPro
         { className: "col-xs-1" },
         R(
           "a",
-          { onClick: this.props.onColumnChange.bind(null, null) },
-          R("span", { className: "glyphicon glyphicon-remove" })
+          { className: "link-plain", onClick: this.props.onColumnChange.bind(null, null) },
+          R("span", { className: "fas fa-times" })
         )
       )
     )

@@ -11,6 +11,7 @@ interface BinsComponentState {
     guessing: any;
 }
 export default class BinsComponent extends React.Component<BinsComponentProps, BinsComponentState> {
+    unmounted?: boolean;
     constructor(props: any);
     componentDidMount(): any;
     componentWillUnmount(): boolean;

@@ -58,7 +58,7 @@ export default class ScopeAndDetailLevelComponent extends React.Component<ScopeA
       null,
       R(
         "div",
-        { className: "form-group" },
+        { className: "mb-3" },
         R("label", { className: "text-muted" }, "Region to Map"),
         R(RegionSelectComponent, {
           region: this.props.scope,
@@ -72,7 +72,7 @@ export default class ScopeAndDetailLevelComponent extends React.Component<ScopeA
       ),
       R(
         "div",
-        { className: "form-group" },
+        { className: "mb-3" },
         R("label", { className: "text-muted" }, "Detail Level"),
         R(ui.Select, {
           value: this.props.detailLevel,

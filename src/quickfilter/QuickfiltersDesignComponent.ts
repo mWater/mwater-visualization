@@ -114,8 +114,8 @@ export default class QuickfiltersDesignComponent extends React.Component<Quickfi
       this.props.tables.length > 0
         ? R(
             "button",
-            { type: "button", className: "btn btn-sm btn-default", onClick: this.handleAdd },
-            R("span", { className: "glyphicon glyphicon-plus" }),
+            { type: "button", className: "btn btn-sm btn-link", onClick: this.handleAdd },
+            R("span", { className: "fas fa-plus" }),
             " Add Quick Filter"
           )
         : undefined
@@ -183,13 +183,13 @@ class QuickfilterDesignComponent extends React.Component<
       { onRemove: this.props.onRemove },
       R(
         "div",
-        { className: "panel panel-default" },
+        { className: "card" },
         R(
           "div",
-          { className: "panel-body" },
+          { className: "card-body" },
           R(
             "div",
-            { className: "form-group", key: "table" },
+            { className: "mb-3", key: "table" },
             R("label", { className: "text-muted" }, "Data Source"),
             R(ui.Select, {
               value: this.state.table,
@@ -204,7 +204,7 @@ class QuickfilterDesignComponent extends React.Component<
 
           R(
             "div",
-            { className: "form-group", key: "expr" },
+            { className: "mb-3", key: "expr" },
             R("label", { className: "text-muted" }, "Filter By"),
             R(
               "div",
@@ -223,11 +223,11 @@ class QuickfilterDesignComponent extends React.Component<
           this.props.design.expr
             ? R(
                 "div",
-                { className: "form-group", key: "label" },
+                { className: "mb-3", key: "label" },
                 R("label", { className: "text-muted" }, "Label"),
                 R("input", {
                   type: "text",
-                  className: "form-control input-sm",
+                  className: "form-control form-control-sm",
                   value: this.props.design.label || "",
                   onChange: this.handleLabelChange,
                   placeholder: "Optional Label"
@@ -279,8 +279,8 @@ class RemovableComponent extends React.Component<RemovableComponentProps> {
         { style: { flex: "0 0 auto", alignSelf: "center" }, className: "hover-display-child", key: "remove" },
         R(
           "a",
-          { onClick: this.props.onRemove, style: { fontSize: "80%", cursor: "pointer", marginLeft: 5 } },
-          R("span", { className: "glyphicon glyphicon-remove" })
+          { className: "link-plain", onClick: this.props.onRemove, style: { fontSize: "80%", marginLeft: 5 } },
+          R("span", { className: "fas fa-times" })
         )
       )
     )

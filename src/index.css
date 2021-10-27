@@ -1,5 +1,12 @@
 @import "./layout-styles.css";
 
+/** Plain link with cursor pointer. Can be span or a */
+.link-plain {
+  color: var(--bs-primary);
+  cursor: pointer;
+  text-decoration: none;
+}
+
 /* For https://github.com/Hacker0x01/react-datepicker/issues/624 */
 .react-datepicker {
   font-size: 1em;
@@ -431,19 +438,19 @@
   vertical-align: middle;
 }
 
-.image-carousel-component .item {
+.image-carousel-component .carousel-item {
   text-align: center;
   white-space: nowrap;
 }
 
-.image-carousel-component .item:before {
+.image-carousel-component .carousel-item:before {
   content: " ";
   display: inline-block;
   height: 100%;
   vertical-align: middle;
 }
 
-.image-carousel-component .item img {
+.image-carousel-component .carousel-item img {
   vertical-align: middle;
   display: inline-block;
 }

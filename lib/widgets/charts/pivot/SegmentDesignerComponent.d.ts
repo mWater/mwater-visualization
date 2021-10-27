@@ -17,8 +17,7 @@ export default class SegmentDesignerComponent extends React.Component<SegmentDes
     constructor(props: any);
     componentDidMount(): any;
     update(changes: any): any;
-    handleSingleMode: () => void;
-    handleMultipleMode: () => void;
+    handleMode: (mode: any) => void;
     handleValueAxisChange: (valueAxis: any) => any;
     handleLabelChange: (ev: any) => any;
     handleFilterChange: (filter: any) => any;

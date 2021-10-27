@@ -78,7 +78,7 @@ export default class PivotChartDesignerComponent extends React.Component<
   renderTable() {
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, R("i", { className: "fa fa-database" }), " ", "Data Source"),
       ": ",
       R(TableSelectComponent, {
@@ -99,8 +99,8 @@ export default class PivotChartDesignerComponent extends React.Component<
 
     return R(
       "div",
-      { className: "form-group" },
-      R("label", { className: "text-muted" }, R("span", { className: "glyphicon glyphicon-filter" }), " ", "Filters"),
+      { className: "mb-3" },
+      R("label", { className: "text-muted" }, R("span", { className: "fas fa-filter" }), " ", "Filters"),
       R(
         "div",
         { style: { marginLeft: 8 } },
@@ -127,38 +127,35 @@ export default class PivotChartDesignerComponent extends React.Component<
         labelMuted: true,
         label: "Striping"
       },
-      R(
-        "label",
-        { key: "none", className: "radio-inline" },
-        R("input", {
-          type: "radio",
-          checked: !this.props.design.striping,
-          onClick: () => this.updateDesign({ striping: null })
-        }),
-        "None"
-      ),
+      <ui.Radio
+        key="none"
+        inline
+        radioValue={null}
+        value={this.props.design.striping || null}
+        onChange={(value) => this.updateDesign({ striping: value })}
+      >
+        None
+      </ui.Radio>,
 
-      R(
-        "label",
-        { key: "columns", className: "radio-inline" },
-        R("input", {
-          type: "radio",
-          checked: this.props.design.striping === "columns",
-          onClick: () => this.updateDesign({ striping: "columns" })
-        }),
-        "Columns"
-      ),
+      <ui.Radio
+        key="columns"
+        inline
+        radioValue={"columns"}
+        value={this.props.design.striping}
+        onChange={(value) => this.updateDesign({ striping: value })}
+      >
+        Columns
+      </ui.Radio>,
 
-      R(
-        "label",
-        { key: "rows", className: "radio-inline" },
-        R("input", {
-          type: "radio",
-          checked: this.props.design.striping === "rows",
-          onClick: () => this.updateDesign({ striping: "rows" })
-        }),
-        "Rows"
-      )
+      <ui.Radio
+        key="rows"
+        inline
+        value={this.props.design.striping}
+        radioValue={"rows"}
+        onChange={(value) => this.updateDesign({ striping: value })}
+      >
+        Rows
+      </ui.Radio>
     )
   }
 

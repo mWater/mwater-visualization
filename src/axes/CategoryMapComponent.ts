@@ -124,13 +124,17 @@ export default class CategoryMapComponent extends React.Component<
     if (category.value != null) {
       return R(
         "a",
-        { onClick: this.handleCategoryLabelChange.bind(null, category), style: { cursor: "pointer" } },
+        {
+          className: "link-plain",
+          onClick: this.handleCategoryLabelChange.bind(null, category),
+          style: { cursor: "pointer" }
+        },
         label
       )
     } else {
       return R(
         "a",
-        { onClick: this.handleNullLabelChange, style: { cursor: "pointer" } },
+        { className: "link-plain", onClick: this.handleNullLabelChange, style: { cursor: "pointer" } },
         label,
         R("span", { style: { fontSize: 12, marginLeft: 4 } }, "(click to change label for none value)")
       )
@@ -238,13 +242,23 @@ export default class CategoryMapComponent extends React.Component<
       return R(
         "div",
         null,
-        R("a", { onClick: this.handleToggle }, "Show Values ", R("i", { className: "fa fa-caret-down" }))
+        R(
+          "a",
+          { className: "link-plain", onClick: this.handleToggle },
+          "Show Values ",
+          R("i", { className: "fa fa-caret-down" })
+        )
       )
     } else {
       return R(
         "div",
         null,
-        R("a", { onClick: this.handleToggle }, "Hide Values ", R("i", { className: "fa fa-caret-up" }))
+        R(
+          "a",
+          { className: "link-plain", onClick: this.handleToggle },
+          "Hide Values ",
+          R("i", { className: "fa fa-caret-up" })
+        )
       )
     }
   }

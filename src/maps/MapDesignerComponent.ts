@@ -245,7 +245,7 @@ class AttributionComponent extends React.Component<AttributionComponentProps, At
     )
 
     if (this.props.text || this.state.editing) {
-      elem = R("div", { className: "form-group" }, R("label", { className: "text-muted" }, "Attribution"), elem)
+      elem = R("div", { className: "mb-3" }, R("label", { className: "text-muted" }, "Attribution"), elem)
     }
 
     return elem
@@ -278,7 +278,7 @@ class AdvancedOptionsComponent extends React.Component<AdvancedOptionsComponentP
         null,
         R(
           "a",
-          { className: "btn btn-link btn-xs", onClick: () => this.setState({ expanded: true }) },
+          { className: "btn btn-link btn-sm", onClick: () => this.setState({ expanded: true }) },
           "Advanced options..."
         )
       )
@@ -286,7 +286,7 @@ class AdvancedOptionsComponent extends React.Component<AdvancedOptionsComponentP
 
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, "Advanced"),
 
       R(

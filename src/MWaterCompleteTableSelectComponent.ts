@@ -445,7 +445,7 @@ class FormsListComponent extends React.Component<FormsListComponentProps, FormsL
         : [
             R("input", {
               type: "text",
-              className: "form-control input-sm",
+              className: "form-control form-control-sm",
               placeholder: "Search...",
               key: "search",
               ref: this.searchRef,
@@ -627,7 +627,7 @@ class IndicatorsListComponent extends React.Component<IndicatorsListComponentPro
         : [
             R("input", {
               type: "text",
-              className: "form-control input-sm",
+              className: "form-control form-control-sm",
               placeholder: "Search...",
               key: "search",
               ref: this.searchRef,
@@ -722,7 +722,7 @@ are certain that you want to use the raw indicator table`
       R(
         "div",
         null,
-        R("a", { onClick: this.props.onChange.bind(null, this.state.indicatorTable) }, "Use Raw Indicator")
+        R("a", { className: "link-plain", onClick: this.props.onChange.bind(null, this.state.indicatorTable) }, "Use Raw Indicator")
       )
     )
   }
@@ -884,7 +884,7 @@ class IssuesListComponent extends React.Component<IssuesListComponentProps, Issu
         : [
             R("input", {
               type: "text",
-              className: "form-control input-sm",
+              className: "form-control form-control-sm",
               placeholder: "Search...",
               key: "search",
               ref: this.searchRef,

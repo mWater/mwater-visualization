@@ -5,6 +5,7 @@ import update from "update-object"
 import { ExprUtils } from "mwater-expressions"
 import AxisBuilder from "./AxisBuilder"
 import NumberInputComponent from "react-library/lib/NumberInputComponent"
+import { Checkbox } from "react-library/lib/bootstrap"
 
 interface BinsComponentProps {
   schema: any
@@ -21,6 +22,8 @@ interface BinsComponentState {
 
 // Allows setting of bins (min, max and number). Computes defaults if not present
 export default class BinsComponent extends React.Component<BinsComponentProps, BinsComponentState> {
+  unmounted?: boolean
+
   constructor(props: any) {
     super(props)
 
@@ -135,34 +138,22 @@ export default class BinsComponent extends React.Component<BinsComponentProps, B
           }
         })()
       ),
-      this.props.xform.min != null && this.props.xform.max != null && this.props.xform.numBins
-        ? R(
-            "div",
-            { key: "excludes" },
-            R(
-              "label",
-              { className: "checkbox-inline", key: "lower" },
-              R("input", {
-                type: "checkbox",
-                checked: !this.props.xform.excludeLower,
-                onChange: (ev) =>
-                  this.props.onChange(update(this.props.xform, { excludeLower: { $set: !ev.target.checked } }))
-              }),
-              `Include < ${this.props.xform.min}`
-            ),
-            R(
-              "label",
-              { className: "checkbox-inline", key: "upper" },
-              R("input", {
-                type: "checkbox",
-                checked: !this.props.xform.excludeUpper,
-                onChange: (ev) =>
-                  this.props.onChange(update(this.props.xform, { excludeUpper: { $set: !ev.target.checked } }))
-              }),
-              `Include > ${this.props.xform.max}`
-            )
-          )
-        : undefined
+      this.props.xform.min != null && this.props.xform.max != null && this.props.xform.numBins ? (
+        <div key="excludes">
+          <Checkbox
+            key="lower"
+            inline
+            value={!this.props.xform.excludeLower}
+            onChange={(value) => this.props.onChange(update(this.props.xform, { excludeLower: { $set: !value } }))}
+          >{`Include < ${this.props.xform.min}`}</Checkbox>
+          <Checkbox
+            key="upper"
+            inline
+            value={!this.props.xform.excludeUpper}
+            onChange={(value) => this.props.onChange(update(this.props.xform, { excludeUpper: { $set: !value } }))}
+          >{`Include > ${this.props.xform.max}`}</Checkbox>
+        </div>
+      ) : undefined
     )
   }
 }

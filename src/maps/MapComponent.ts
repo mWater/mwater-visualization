@@ -103,7 +103,7 @@ export default class MapComponent extends React.Component {
                 className: `btn btn-link btn-sm ${!this.state.undoStack.canUndo() ? "disabled" : ""}`,
                 onClick: this.handleUndo
               },
-              R("span", { className: "glyphicon glyphicon-triangle-left" }),
+              R("span", { className: "fas fa-caret-left" }),
               R("span", { className: "hide-600px" }, " Undo")
             ),
             " ",
@@ -114,7 +114,7 @@ export default class MapComponent extends React.Component {
                 className: `btn btn-link btn-sm ${!this.state.undoStack.canRedo() ? "disabled" : ""}`,
                 onClick: this.handleRedo
               },
-              R("span", { className: "glyphicon glyphicon-triangle-right" }),
+              R("span", { className: "fas fa-caret-right" }),
               R("span", { className: "hide-600px" }, " Redo")
             )
           ]

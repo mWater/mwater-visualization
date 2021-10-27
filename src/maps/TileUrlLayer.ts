@@ -97,7 +97,7 @@ class TileUrlLayerDesignerComponent extends React.Component<TileUrlLayerDesigner
 
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, "Url (containing {z}, {x} and {y})"),
       R("input", {
         type: "text",

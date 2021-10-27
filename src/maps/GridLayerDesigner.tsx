@@ -93,7 +93,7 @@ export default class GridLayerDesigner extends React.Component<{
 
   renderShape() {
     return (
-      <div className="form-group">
+      <div className="mb-3">
         <label className="text-muted">Grid Type</label>
         <div style={{ marginLeft: 10 }}>
           <ui.Toggle<"square" | "hex" | undefined>
@@ -113,7 +113,7 @@ export default class GridLayerDesigner extends React.Component<{
 
   renderSize() {
     return (
-      <div className="form-group">
+      <div className="mb-3">
         <label className="text-muted">Size</label>
         <div style={{ marginLeft: 10 }}>
           <div style={{ display: "inline-block" }}>
@@ -144,7 +144,7 @@ export default class GridLayerDesigner extends React.Component<{
 
   renderTable() {
     return (
-      <div className="form-group">
+      <div className="mb-3">
         <label className="text-muted">
           <i className="fa fa-database" />
           {" Data Source"}
@@ -167,9 +167,9 @@ export default class GridLayerDesigner extends React.Component<{
     }
 
     return (
-      <div className="form-group">
+      <div className="mb-3">
         <label className="text-muted">
-          <i className="glyphicon glyphicon-map-marker" />
+          <i className="fas fa-map-marker-alt" />
           {" Location"}
         </label>
         <div style={{ marginLeft: 8 }}>
@@ -209,13 +209,8 @@ export default class GridLayerDesigner extends React.Component<{
       null,
       R(
         "div",
-        { className: "form-group" },
-        R(
-          "label",
-          { className: "text-muted" },
-          R("span", { className: "glyphicon glyphicon glyphicon-tint" }),
-          "Color By Data"
-        ),
+        { className: "mb-3" },
+        R("label", { className: "text-muted" }, R("span", { className: "fas fa-tint" }), "Color By Data"),
 
         R(AxisComponent, {
           schema: this.props.schema,
@@ -236,7 +231,7 @@ export default class GridLayerDesigner extends React.Component<{
   renderFillOpacity() {
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, "Fill Opacity (%)"),
       ": ",
       R(Rcslider, {
@@ -252,7 +247,7 @@ export default class GridLayerDesigner extends React.Component<{
 
   renderBorderStyle() {
     return (
-      <div className="form-group">
+      <div className="mb-3">
         <label className="text-muted">Border Style</label>
         <div style={{ marginLeft: 10 }}>
           <ui.Toggle<"none" | "color" | undefined>
@@ -277,8 +272,8 @@ export default class GridLayerDesigner extends React.Component<{
 
     return R(
       "div",
-      { className: "form-group" },
-      R("label", { className: "text-muted" }, R("span", { className: "glyphicon glyphicon-filter" }), " Filters"),
+      { className: "mb-3" },
+      R("label", { className: "text-muted" }, R("span", { className: "fas fa-filter" }), " Filters"),
       R(
         "div",
         { style: { marginLeft: 8 } },

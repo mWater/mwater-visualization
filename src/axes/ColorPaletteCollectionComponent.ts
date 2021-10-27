@@ -101,7 +101,7 @@ export default class ColorPaletteCollectionComponent extends React.Component<Col
       return R(
         "div",
         null,
-        R("a", { style: { cursor: "pointer" }, onClick: this.props.onCancel, key: "cancel-customize" }, "Cancel")
+        R("a", { className: "link-plain", onClick: this.props.onCancel, key: "cancel-customize" }, "Cancel")
       )
     }
   }

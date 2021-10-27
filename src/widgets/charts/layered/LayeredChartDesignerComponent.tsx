@@ -8,24 +8,28 @@ import TabbedComponent from "react-library/lib/TabbedComponent"
 import * as uiComponents from "../../../UIComponents"
 import ColorComponent from "../../../ColorComponent"
 import * as ui from "react-library/lib/bootstrap"
+import { Checkbox } from "react-library/lib/bootstrap"
+import { DataSource, Schema } from "mwater-expressions"
+import { LayeredChartDesign } from "./LayeredChartDesign"
+import { JsonQLFilter } from "../../.."
 
-export default class LayeredChartDesignerComponent extends React.Component {
-  static propTypes = {
-    design: PropTypes.object.isRequired,
-    schema: PropTypes.object.isRequired,
-    dataSource: PropTypes.object.isRequired,
-    onDesignChange: PropTypes.func.isRequired,
-    filters: PropTypes.array
-  }
+export interface LayeredChartDesignerComponentProps {
+  design: LayeredChartDesign
+  schema: Schema
+  dataSource: DataSource
+  onDesignChange: (design: LayeredChartDesign) => void
+  filters?: JsonQLFilter[]
+}
 
+export default class LayeredChartDesignerComponent extends React.Component<LayeredChartDesignerComponentProps> {
   // Determine if axes labels needed
-  areAxesLabelsNeeded(layer: any) {
+  areAxesLabelsNeeded() {
     return !["pie", "donut"].includes(this.props.design.type)
   }
 
   // Updates design with the specified changes
   updateDesign(changes: any) {
-    const design = _.extend({}, this.props.design, changes)
+    const design = _.extend({}, this.props.design, changes) as LayeredChartDesign
     return this.props.onDesignChange(design)
   }
 
@@ -33,24 +37,24 @@ export default class LayeredChartDesignerComponent extends React.Component {
     return this.updateDesign({ type })
   }
 
-  handleTransposeChange = (ev: any) => {
-    return this.updateDesign({ transpose: ev.target.checked })
+  handleTransposeChange = (value: any) => {
+    return this.updateDesign({ transpose: value })
   }
 
-  handleStackedChange = (ev: any) => {
-    return this.updateDesign({ stacked: ev.target.checked })
+  handleStackedChange = (value: any) => {
+    return this.updateDesign({ stacked: value })
   }
-  handleProportionalChange = (ev: any) => {
-    return this.updateDesign({ proportional: ev.target.checked })
+  handleProportionalChange = (value: any) => {
+    return this.updateDesign({ proportional: value })
   }
-  handleLabelsChange = (ev: any) => {
-    return this.updateDesign({ labels: ev.target.checked })
+  handleLabelsChange = (value: any) => {
+    return this.updateDesign({ labels: value })
   }
-  handlePercentageVisibilityChange = (ev: any) => {
-    return this.updateDesign({ hidePercentage: ev.target.checked })
+  handlePercentageVisibilityChange = (value: any) => {
+    return this.updateDesign({ hidePercentage: value })
   }
-  handlePolarOrderChange = (ev: any) => {
-    return this.updateDesign({ polarOrder: ev.target.checked ? "desc" : "natural" })
+  handlePolarOrderChange = (value: any) => {
+    return this.updateDesign({ polarOrder: value ? "desc" : "natural" })
   }
   handleYThresholdsChange = (yThresholds: any) => {
     return this.updateDesign({ yThresholds })
@@ -70,7 +74,7 @@ export default class LayeredChartDesignerComponent extends React.Component {
 
   handleAddLayer = () => {
     const layers = this.props.design.layers.slice()
-    layers.push({})
+    layers.push({} as any)
     return this.updateDesign({ layers })
   }
 
@@ -107,11 +111,11 @@ export default class LayeredChartDesignerComponent extends React.Component {
     return R(
       "div",
       null,
-      R("p", { className: "help-block" }, "To edit title of chart, click on it directly"),
+      R("div", { className: "form-text text-muted" }, "To edit title of chart, click on it directly"),
       this.areAxesLabelsNeeded()
         ? R(
             "div",
-            { className: "form-group" },
+            { className: "mb-3" },
             R(
               "span",
               null,
@@ -123,17 +127,17 @@ export default class LayeredChartDesignerComponent extends React.Component {
               " ",
               R(
                 "button",
-                { className: "btn btn-default btn-xs", onClick: this.handleToggleXAxisLabelClick },
+                { className: "btn btn-secondary btn-sm", onClick: this.handleToggleXAxisLabelClick },
                 this.props.design.xAxisLabelText != null ? "Hide" : "Show"
               )
             ),
             this.props.design.xAxisLabelText != null
               ? R("input", {
                   type: "text",
-                  className: "form-control input-sm",
+                  className: "form-control form-control-sm",
                   value: this.props.design.xAxisLabelText,
                   onChange: this.handleXAxisLabelTextChange,
-                  placeholder: compiler.compileDefaultXAxisLabelText(this.props.design)
+                  placeholder: compiler.compileDefaultXAxisLabelText(this.props.design, "en")
                 })
               : undefined
           )
@@ -141,7 +145,7 @@ export default class LayeredChartDesignerComponent extends React.Component {
       this.areAxesLabelsNeeded()
         ? R(
             "div",
-            { className: "form-group" },
+            { className: "mb-3" },
             R(
               "span",
               null,
@@ -153,14 +157,14 @@ export default class LayeredChartDesignerComponent extends React.Component {
               " ",
               R(
                 "button",
-                { className: "btn btn-default btn-xs", onClick: this.handleToggleYAxisLabelClick },
+                { className: "btn btn-secondary btn-sm", onClick: this.handleToggleYAxisLabelClick },
                 this.props.design.yAxisLabelText != null ? "Hide" : "Show"
               )
             ),
             this.props.design.yAxisLabelText != null
               ? R("input", {
                   type: "text",
-                  className: "form-control input-sm",
+                  className: "form-control form-control-sm",
                   value: this.props.design.yAxisLabelText,
                   onChange: this.handleYAxisLabelTextChange,
                   placeholder: compiler.compileDefaultYAxisLabelText(this.props.design)
@@ -242,7 +246,7 @@ export default class LayeredChartDesignerComponent extends React.Component {
         ? R(
             "button",
             { className: "btn btn-link", type: "button", onClick: this.handleAddLayer },
-            R("span", { className: "glyphicon glyphicon-plus" }),
+            R("span", { className: "fas fa-plus" }),
             " Add Another Series"
           )
         : undefined
@@ -264,64 +268,44 @@ export default class LayeredChartDesignerComponent extends React.Component {
     // Don't include if transpose
     const canTranspose = !["pie", "donut"].includes(design.type)
 
-    return R(
-      "div",
-      { className: "text-muted" },
-      canTranspose
-        ? R(
-            "label",
-            { className: "checkbox-inline", key: "transpose" },
-            R("input", { type: "checkbox", checked: design.transpose, onChange: this.handleTransposeChange }),
-            "Horizontal"
-          )
-        : undefined,
-      canStack
-        ? R(
-            "label",
-            { className: "checkbox-inline", key: "stacked" },
-            R("input", { type: "checkbox", checked: design.stacked, onChange: this.handleStackedChange }),
-            "Stacked"
-          )
-        : undefined,
-      canStack
-        ? R(
-            "label",
-            { className: "checkbox-inline", key: "proportional" },
-            R("input", { type: "checkbox", checked: design.proportional, onChange: this.handleProportionalChange }),
-            "Proportional"
-          )
-        : undefined,
+    return [
       R(
-        "label",
-        { className: "checkbox-inline", key: "labels" },
-        R("input", { type: "checkbox", checked: design.labels || false, onChange: this.handleLabelsChange }),
-        "Show Values"
+        "div",
+        { className: "text-muted" },
+        canTranspose ? (
+          <Checkbox inline key="transpose" value={design.transpose} onChange={this.handleTransposeChange}>
+            Horizontal
+          </Checkbox>
+        ) : undefined,
+        canStack ? (
+          <Checkbox inline key="stacked" value={design.stacked} onChange={this.handleStackedChange}>
+            Stacked
+          </Checkbox>
+        ) : undefined,
+        canStack ? (
+          <Checkbox inline key="proportional" value={design.proportional} onChange={this.handleProportionalChange}>
+            Proportional
+          </Checkbox>
+        ) : undefined,
+        <Checkbox inline key="labels" value={design.labels || false} onChange={this.handleLabelsChange}>
+          Show Values
+        </Checkbox>
       ),
       ["pie", "donut"].includes(design.type)
         ? [
-            R(
-              "label",
-              { className: "checkbox-inline", key: "polarOrder" },
-              R("input", {
-                type: "checkbox",
-                checked: design.hidePercentage,
-                onChange: this.handlePercentageVisibilityChange
-              }),
-              "Hide Percentage"
-            ),
-            R(
-              "label",
-              { className: "checkbox-inline", key: "polarOrder" },
-              R("input", {
-                type: "checkbox",
-                checked: (design.polarOrder || "desc") === "desc",
-                onChange: this.handlePolarOrderChange
-              }),
-              "Descending Order"
-            )
+            <Checkbox key="polarOrder" value={design.hidePercentage} onChange={this.handlePercentageVisibilityChange}>
+              Hide Percentage
+            </Checkbox>,
+            <Checkbox
+              key="polarOrder"
+              value={(design.polarOrder || "desc") === "desc"}
+              onChange={this.handlePolarOrderChange}
+            >
+              Descending Order
+            </Checkbox>
           ]
         : undefined
-    )
+    ]
   }
 
   renderThresholds() {
@@ -337,6 +321,7 @@ export default class LayeredChartDesignerComponent extends React.Component {
         })
       )
     }
+    return null
   }
 
   renderYRange() {
@@ -449,7 +434,7 @@ class ThresholdsComponent extends React.Component {
 
       R(
         "button",
-        { type: "button", className: "btn btn-xs btn-link", onClick: this.handleAdd },
+        { type: "button", className: "btn btn-sm btn-link", onClick: this.handleAdd },
         R("i", { className: "fa fa-plus" }),
         " Add Y Threshold"
       )
@@ -511,7 +496,7 @@ class ThresholdComponent extends React.Component {
       "  ",
       R(
         "button",
-        { className: "btn btn-xs btn-link", onClick: this.props.onRemove },
+        { className: "btn btn-sm btn-link", onClick: this.props.onRemove },
         R("i", { className: "fa fa-remove" })
       )
     )

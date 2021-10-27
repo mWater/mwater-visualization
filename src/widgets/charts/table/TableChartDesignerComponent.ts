@@ -66,7 +66,7 @@ export default class TableChartDesignerComponent extends React.Component<TableCh
   renderTable() {
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, R("i", { className: "fa fa-database" }), " ", "Data Source"),
       ": ",
       R(TableSelectComponent, {
@@ -82,11 +82,11 @@ export default class TableChartDesignerComponent extends React.Component<TableCh
   renderTitle() {
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, "Title"),
       R("input", {
         type: "text",
-        className: "form-control input-sm",
+        className: "form-control form-control-sm",
         value: this.props.design.titleText,
         onChange: this.handleTitleTextChange,
         placeholder: "Untitled"
@@ -140,8 +140,8 @@ export default class TableChartDesignerComponent extends React.Component<TableCh
       }),
       R(
         "button",
-        { className: "btn btn-default btn-sm", type: "button", onClick: this.handleAddColumn },
-        R("span", { className: "glyphicon glyphicon-plus" }),
+        { className: "btn btn-secondary btn-sm", type: "button", onClick: this.handleAddColumn },
+        R("span", { className: "fas fa-plus" }),
         " Add Column"
       )
     )
@@ -158,14 +158,8 @@ export default class TableChartDesignerComponent extends React.Component<TableCh
 
     return R(
       "div",
-      { className: "form-group" },
-      R(
-        "label",
-        { className: "text-muted" },
-        R("span", { className: "glyphicon glyphicon-sort-by-attributes" }),
-        " ",
-        "Ordering"
-      ),
+      { className: "mb-3" },
+      R("label", { className: "text-muted" }, R("span", { className: "fas fa-sort-amount-down" }), " ", "Ordering"),
       R(
         "div",
         { style: { marginLeft: 8 } },
@@ -188,8 +182,8 @@ export default class TableChartDesignerComponent extends React.Component<TableCh
 
     return R(
       "div",
-      { className: "form-group" },
-      R("label", { className: "text-muted" }, R("span", { className: "glyphicon glyphicon-filter" }), " ", "Filters"),
+      { className: "mb-3" },
+      R("label", { className: "text-muted" }, R("span", { className: "fas fa-filter" }), " ", "Filters"),
       R(
         "div",
         { style: { marginLeft: 8 } },
@@ -212,7 +206,7 @@ export default class TableChartDesignerComponent extends React.Component<TableCh
 
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, "Maximum Number of Rows (up to 1000)"),
       R(
         "div",
@@ -283,8 +277,8 @@ class TableChartColumnDesignerComponent extends React.Component<TableChartColumn
     if (this.props.design.columns.length > 1) {
       return R(
         "button",
-        { className: "btn btn-xs btn-link pull-right", type: "button", onClick: this.props.onRemove },
-        R("span", { className: "glyphicon glyphicon-remove" })
+        { className: "btn btn-sm btn-link float-right", type: "button", onClick: this.props.onRemove },
+        R("span", { className: "fas fa-times" })
       )
     }
   }
@@ -324,14 +318,14 @@ class TableChartColumnDesignerComponent extends React.Component<TableChartColumn
 
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, "Format"),
       ": ",
       R(
         "select",
         {
           value: column.format != null ? column.format : getDefaultFormat(exprType),
-          className: "form-control",
+          className: "form-select",
           style: { width: "auto", display: "inline-block" },
           onChange: this.handleFormatChange
         },
@@ -353,7 +347,7 @@ class TableChartColumnDesignerComponent extends React.Component<TableChartColumn
       ": ",
       R("input", {
         type: "text",
-        className: "form-control input-sm",
+        className: "form-control form-control-sm",
         style: { display: "inline-block", width: "15em" },
         value: column.headerText,
         onChange: this.handleHeaderTextChange,

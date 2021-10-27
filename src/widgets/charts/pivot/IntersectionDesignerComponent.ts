@@ -306,10 +306,10 @@ class BackgroundColorConditionComponent extends React.Component<BackgroundColorC
   render() {
     return R(
       "div",
-      { className: "panel panel-default" },
+      { className: "card" },
       R(
         "div",
-        { className: "panel-body" },
+        { className: "card-body" },
         R(
           ui.FormGroup,
           {

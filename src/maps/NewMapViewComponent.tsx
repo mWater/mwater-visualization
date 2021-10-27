@@ -571,7 +571,7 @@ export function NewMapViewComponent(props: {
         {/* Render in fixed height div so that dashboard doesn't collapse to nothing */}
         <div style={{ height: "80vh" }}>{popupContents}</div>
         <div style={{ textAlign: "right", marginTop: 10 }}>
-          <button className="btn btn-default" onClick={() => setPopupContents(null)}>
+          <button className="btn btn-secondary" onClick={() => setPopupContents(null)}>
             Close
           </button>
         </div>

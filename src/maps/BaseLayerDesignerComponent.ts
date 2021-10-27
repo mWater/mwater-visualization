@@ -55,7 +55,7 @@ export default class BaseLayerDesignerComponent extends React.Component<BaseLaye
 
     return R(
       "div",
-      { className: "form-group", style: { paddingTop: 10 } },
+      { className: "mb-3", style: { paddingTop: 10 } },
       R("label", { className: "text-muted" }, R("span", null, `Opacity: ${Math.round(opacity * 100)}%`)),
       R(
         "div",
@@ -75,7 +75,7 @@ export default class BaseLayerDesignerComponent extends React.Component<BaseLaye
   render() {
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, "Background Map"),
 
       R(

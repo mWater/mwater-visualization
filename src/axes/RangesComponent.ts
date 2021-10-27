@@ -91,7 +91,7 @@ export default class RangesComponent extends React.Component<RangesComponentProp
       R(
         "button",
         { className: "btn btn-link btn-sm", type: "button", onClick: this.handleAddRange },
-        R("span", { className: "glyphicon glyphicon-plus" }),
+        R("span", { className: "fas fa-plus" }),
         " Add Range"
       )
     )
@@ -208,7 +208,7 @@ class RangeComponent extends React.Component<RangeComponentProps> {
             { key: "label" },
             R("input", {
               type: "text",
-              className: "form-control input-sm",
+              className: "form-control form-control-sm",
               value: this.props.range.label || "",
               placeholder,
               onChange: (ev: any) =>
@@ -221,8 +221,8 @@ class RangeComponent extends React.Component<RangeComponentProps> {
             { key: "remove" },
             R(
               "button",
-              { className: "btn btn-xs btn-link", type: "button", onClick: this.props.onRemove },
-              R("span", { className: "glyphicon glyphicon-remove" })
+              { className: "btn btn-sm btn-link", type: "button", onClick: this.props.onRemove },
+              R("span", { className: "fas fa-times" })
             )
           )
         )

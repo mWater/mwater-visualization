@@ -33,7 +33,7 @@ export default class WidgetScopesViewComponent extends React.Component<WidgetSco
       { key: id, style, onClick: this.props.onRemoveScope.bind(null, id) },
       scope.name,
       " ",
-      R("span", { className: "glyphicon glyphicon-remove" })
+      R("span", { className: "fas fa-times" })
     )
   }
 
@@ -46,7 +46,7 @@ export default class WidgetScopesViewComponent extends React.Component<WidgetSco
     return R(
       "div",
       { className: "alert alert-info" },
-      R("span", { className: "glyphicon glyphicon-filter" }),
+      R("span", { className: "fas fa-filter" }),
       " Filters: ",
       _.map(_.keys(scopes), (id) => this.renderScope(id, scopes[id]))
     )

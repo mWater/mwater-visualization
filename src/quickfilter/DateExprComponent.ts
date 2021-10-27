@@ -161,7 +161,7 @@ export default class DateExprComponent extends React.Component<DateExprComponent
       },
       R(
         "ul",
-        { className: "nav nav-pills nav-stacked" },
+        { className: "nav nav-pills nav-justified" },
         _.map(presets, (preset) => {
           return R(
             "li",
@@ -247,7 +247,6 @@ export default class DateExprComponent extends React.Component<DateExprComponent
         R(
           "div",
           {
-            className: "form-control",
             style: { width: 220, height: 36 },
             onClick: () => this.setState({ dropdownOpen: true, custom: false })
           },

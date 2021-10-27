@@ -26,7 +26,7 @@ export default class MarkerSymbolSelectComponent extends React.Component<MarkerS
 
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, R("span", { className: "fa fa-star" }), " ", "Symbol"),
       R(ReactSelect, {
         placeholder: "Circle",

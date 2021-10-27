@@ -32,7 +32,7 @@ export default class MapControlComponent extends React.Component<MapControlCompo
 
       R(
         "div",
-        { className: "form-group" },
+        { className: "mb-3" },
         R("label", { className: "text-muted" }, "Map Style"),
 
         R(BaseLayerDesignerComponent, {

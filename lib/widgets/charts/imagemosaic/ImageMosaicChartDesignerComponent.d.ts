@@ -1,4 +1,5 @@
 import React from "react";
+import * as ui from "../../../UIComponents";
 interface ImageMosaicChartDesignerComponentProps {
     design: any;
     schema: any;
@@ -21,11 +22,7 @@ export default class ImageMosaicChartDesignerComponent extends React.Component<I
     renderFilter(): React.DetailedReactHTMLElement<{
         className: string;
     }, HTMLElement> | null;
-    renderImageAxis(): React.CElement<{
-        label: string;
-    }, React.Component<{
-        label: string;
-    }, any, any>> | undefined;
+    renderImageAxis(): React.CElement<ui.SectionComponentProps, ui.SectionComponent> | undefined;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
 export {};

@@ -24,6 +24,7 @@ export default class CategoryMapComponent extends React.Component<CategoryMapCom
     handleCategoryLabelChange: (category: any, e: any) => any;
     handleToggle: () => void;
     renderLabel(category: any): React.DetailedReactHTMLElement<{
+        className: string;
         onClick: any;
         style: {
             cursor: "pointer";

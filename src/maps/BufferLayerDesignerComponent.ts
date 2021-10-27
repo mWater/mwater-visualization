@@ -63,7 +63,7 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
   renderTable() {
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, R("i", { className: "fa fa-database" }), " ", "Data Source"),
       R(
         "div",
@@ -84,7 +84,7 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
       return
     }
 
-    const title = R("span", null, R("span", { className: "glyphicon glyphicon-map-marker" }), " Circle Centers")
+    const title = R("span", null, R("span", { className: "fas fa-map-marker-alt" }), " Circle Centers")
 
     const filters = _.clone(this.props.filters) || []
 
@@ -98,7 +98,7 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
 
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, title),
       R(
         "div",
@@ -120,7 +120,7 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
   renderRadius() {
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, "Radius (meters)"),
       ": ",
       React.createElement(NumberInputComponent, {
@@ -151,13 +151,8 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
       !this.props.design.axes.color
         ? R(
             "div",
-            { className: "form-group" },
-            R(
-              "label",
-              { className: "text-muted" },
-              R("span", { className: "glyphicon glyphicon glyphicon-tint" }),
-              "Circle Color"
-            ),
+            { className: "mb-3" },
+            R("label", { className: "text-muted" }, R("span", { className: "fas fa-tint" }), "Circle Color"),
 
             R(
               "div",
@@ -172,13 +167,8 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
 
       R(
         "div",
-        { className: "form-group" },
-        R(
-          "label",
-          { className: "text-muted" },
-          R("span", { className: "glyphicon glyphicon glyphicon-tint" }),
-          "Color By Data"
-        ),
+        { className: "mb-3" },
+        R("label", { className: "text-muted" }, R("span", { className: "fas fa-tint" }), "Color By Data"),
 
         R(AxisComponent, {
           schema: this.props.schema,
@@ -200,7 +190,7 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
   renderFillOpacity() {
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, "Circle Opacity (%)"),
       ": ",
       React.createElement(Rcslider, {
@@ -222,8 +212,8 @@ export default class BufferLayerDesignerComponent extends React.Component<Buffer
 
     return R(
       "div",
-      { className: "form-group" },
-      R("label", { className: "text-muted" }, R("span", { className: "glyphicon glyphicon-filter" }), " Filters"),
+      { className: "mb-3" },
+      R("label", { className: "text-muted" }, R("span", { className: "fas fa-filter" }), " Filters"),
       R(
         "div",
         { style: { marginLeft: 8 } },

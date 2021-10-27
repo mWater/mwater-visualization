@@ -50,7 +50,10 @@ export default class ImagelistCarouselComponent extends React.Component<
   renderImage(img: any, i: any, imageManager: any) {
     return R(
       "div",
-      { className: `item ${i === this.state.activeImage ? "active" : ""}`, style: { height: this.props.height } },
+      {
+        className: `carousel-item ${i === this.state.activeImage ? "active" : ""}`,
+        style: { height: this.props.height }
+      },
       R(RotationAwareImageComponent, { imageManager, image: img })
     )
   }
@@ -82,10 +85,10 @@ export default class ImagelistCarouselComponent extends React.Component<
       },
       this.props.imagelist.length < 10
         ? R(
-            "ol",
+            "div",
             { className: "carousel-indicators" },
             _.map(this.props.imagelist, (img, i) => {
-              return R("li", { className: i === this.state.activeImage ? "active" : undefined })
+              return R("button", { className: i === this.state.activeImage ? "active" : undefined })
             })
           )
         : undefined,
@@ -94,14 +97,14 @@ export default class ImagelistCarouselComponent extends React.Component<
       R("div", { className: "carousel-inner" }, this.renderImages(imageManager)),
 
       R(
-        "a",
-        { className: "left carousel-control" },
-        R("span", { className: "glyphicon glyphicon-chevron-left", onClick: this.handleLeft })
+        "button",
+        { className: "carousel-control-prev", onClick: this.handleLeft },
+        R("span", { className: "carousel-control-prev-icon" })
       ),
       R(
-        "a",
-        { className: "right carousel-control" },
-        R("span", { className: "glyphicon glyphicon-chevron-right", onClick: this.handleRight })
+        "button",
+        { className: "carousel-control-next", onClick: this.handleRight },
+        R("span", { className: "carousel-control-next-icon" })
       )
     )
   }

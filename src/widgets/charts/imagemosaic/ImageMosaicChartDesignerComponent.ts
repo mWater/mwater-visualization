@@ -41,7 +41,7 @@ export default class ImageMosaicChartDesignerComponent extends React.Component<I
   renderTable() {
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, R("i", { className: "fa fa-database" }), " ", "Data Source"),
       ": ",
       R(TableSelectComponent, {
@@ -57,11 +57,11 @@ export default class ImageMosaicChartDesignerComponent extends React.Component<I
   renderTitle() {
     return R(
       "div",
-      { className: "form-group" },
+      { className: "mb-3" },
       R("label", { className: "text-muted" }, "Title"),
       R("input", {
         type: "text",
-        className: "form-control input-sm",
+        className: "form-control form-control-sm",
         value: this.props.design.titleText,
         onChange: this.handleTitleTextChange,
         placeholder: "Untitled"
@@ -77,8 +77,8 @@ export default class ImageMosaicChartDesignerComponent extends React.Component<I
 
     return R(
       "div",
-      { className: "form-group" },
-      R("label", { className: "text-muted" }, R("span", { className: "glyphicon glyphicon-filter" }), " ", "Filters"),
+      { className: "mb-3" },
+      R("label", { className: "text-muted" }, R("span", { className: "fas fa-filter" }), " ", "Filters"),
       R(
         "div",
         { style: { marginLeft: 8 } },
