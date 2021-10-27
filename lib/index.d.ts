@@ -28,6 +28,7 @@ import "./layouts/decorated-block.css";
 import "react-datepicker/dist/react-datepicker.css";
 import "c3/c3.css";
 import "./index.css";
+import "./layout-styles.css";
 export { default as CachingDataSource } from "./CachingDataSource";
 export { default as UndoStack } from "./UndoStack";
 export { default as DashboardViewComponent } from "./dashboards/DashboardViewComponent";
