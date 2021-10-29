@@ -96,7 +96,7 @@ class OrderByDesignerComponent extends React.Component<OrderByDesignerComponentP
       { className: "row" },
       R(
         "div",
-        { className: "col-xs-7" },
+        { className: "col-7" },
         R(ExprComponent, {
           schema: this.props.schema,
           dataSource: this.props.dataSource,
@@ -109,14 +109,14 @@ class OrderByDesignerComponent extends React.Component<OrderByDesignerComponentP
       ),
       R(
         "div",
-        { className: "col-xs-3" },
+        { className: "col-3" },
         <Checkbox inline value={this.props.orderBy.direction === "desc"} onChange={this.handleDirectionChange}>
           Reverse
         </Checkbox>
       ),
       R(
         "div",
-        { className: "col-xs-1" },
+        { className: "col-1" },
         R(
           "button",
           { className: "btn btn-sm btn-link", type: "button", onClick: this.props.onRemove },

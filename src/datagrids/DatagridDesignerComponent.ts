@@ -517,13 +517,13 @@ class ColumnDesignerComponent extends React.Component<ColumnDesignerComponentPro
       { className: "row" },
       R(
         "div",
-        { className: "col-xs-1" },
+        { className: "col-1" },
         this.props.connectDragSource(R("span", { className: "text-muted fa fa-bars" }))
       ),
 
       R(
         "div",
-        { className: "col-xs-6" }, // style: { border: "solid 1px #DDD", padding: 4 },
+        { className: "col-6" }, // style: { border: "solid 1px #DDD", padding: 4 },
         R(ExprComponent, {
           schema: this.props.schema,
           dataSource: this.props.dataSource,
@@ -540,7 +540,7 @@ class ColumnDesignerComponent extends React.Component<ColumnDesignerComponentPro
 
       R(
         "div",
-        { className: "col-xs-4" },
+        { className: "col-4" },
         R("input", {
           type: "text",
           className: "form-control",
@@ -552,7 +552,7 @@ class ColumnDesignerComponent extends React.Component<ColumnDesignerComponentPro
 
       R(
         "div",
-        { className: "col-xs-1" },
+        { className: "col-1" },
         R(
           "a",
           { className: "link-plain", onClick: this.props.onColumnChange.bind(null, null) },
