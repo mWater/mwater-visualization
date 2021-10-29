@@ -168,7 +168,7 @@ export default class DateRangeComponent extends React.Component<DateRangeCompone
       },
       R(
         "ul",
-        { className: "nav nav-pills nav-justified" },
+        { className: "nav nav-pills flex-column" },
         _.map(this.getPresets(), (preset) => {
           return R(
             "li",

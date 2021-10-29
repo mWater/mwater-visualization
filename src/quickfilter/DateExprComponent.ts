@@ -161,7 +161,7 @@ export default class DateExprComponent extends React.Component<DateExprComponent
       },
       R(
         "ul",
-        { className: "nav nav-pills nav-justified" },
+        { className: "nav nav-pills flex-column" },
         _.map(presets, (preset) => {
           return R(
             "li",
