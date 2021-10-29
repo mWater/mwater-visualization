@@ -1,13 +1,16 @@
+import { Schema } from "mwater-expressions"
+import { JsonQLFilter } from "../JsonQLFilter"
+import { Quickfilter, QuickfilterLock } from "./Quickfilter"
+
+/** Compiles quickfilter values into filters */
 export default class QuickfilterCompiler {
-    constructor(schema: any);
-    compile(design: any, values: any, locks: any): {
-        table: any;
-        jsonql: string | number | boolean | import("jsonql").JsonQLLiteral | import("jsonql").JsonQLOp | import("jsonql").JsonQLCase | import("jsonql").JsonQLScalar | import("jsonql").JsonQLField | import("jsonql").JsonQLToken;
-    }[];
-    compileToFilterExpr(expr: any, value: any, multi: any): {
-        type: string;
-        op: any;
-        table: any;
-        exprs: any[];
-    } | null;
+  constructor(schema: Schema)
+
+  /** design is array of quickfilters (see README.md)
+   * values is array of values
+   * locks is array of locked quickfilters. Overrides values
+   * Returns array of filters { table: table id, jsonql: JsonQL with {alias} for the table name to filter by }
+   * See README for values
+   */
+  compile(design: Quickfilter[], values: any[] | null, locks: QuickfilterLock[]): JsonQLFilter[]
 }

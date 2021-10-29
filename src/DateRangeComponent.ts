@@ -172,14 +172,14 @@ export default class DateRangeComponent extends React.Component<DateRangeCompone
         _.map(this.getPresets(), (preset) => {
           return R(
             "li",
-            null,
-            R("a", { style: { padding: 5 }, onClick: this.handlePreset.bind(null, preset) }, preset.label)
+            { className: "nav-item" },
+            R("a", { className: "nav-link", style: { padding: 5 }, onClick: this.handlePreset.bind(null, preset) }, preset.label)
           )
         }),
         R(
           "li",
-          null,
-          R("a", { style: { padding: 5 }, onClick: () => this.setState({ custom: true }) }, "Custom Date Range...")
+          { className: "nav-item" },
+          R("a", { className: "nav-link", style: { padding: 5 }, onClick: () => this.setState({ custom: true }) }, "Custom Date Range...")
         )
       )
     )
