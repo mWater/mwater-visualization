@@ -162,7 +162,7 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
     if (this.props.design.layers.length > 1) {
       return R(
         "button",
-        { className: "btn btn-sm btn-link float-right", type: "button", onClick: this.props.onRemove },
+        { className: "btn btn-sm btn-link float-end", type: "button", onClick: this.props.onRemove },
         R("span", { className: "fas fa-times" })
       )
     }

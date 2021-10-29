@@ -87,7 +87,7 @@ export class OptionComponent extends React.Component<OptionComponentProps> {
       this.props.onRemove
         ? R(
             "button",
-            { type: "button", className: "btn btn-link btn-sm float-right", onClick: this.handleClick },
+            { type: "button", className: "btn btn-link btn-sm float-end", onClick: this.handleClick },
             R("span", { className: "fas fa-times" })
           )
         : undefined,
