@@ -1,20 +1,25 @@
 import _ from "lodash"
-import { ExprCompiler } from "mwater-expressions"
+import { ExprCompiler, Schema } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
+import { JsonQLFilter } from "../JsonQLFilter"
+import { Quickfilter, QuickfilterLock } from "./Quickfilter"
 
-// Compiles quickfilter values into filters.
+/** Compiles quickfilter values into filters */
 export default class QuickfilterCompiler {
-  constructor(schema: any) {
+  schema: Schema
+  
+  constructor(schema: Schema) {
     this.schema = schema
   }
 
-  // design is array of quickfilters (see README.md)
-  // values is array of values
-  // locks is array of locked quickfilters. Overrides values
-  // Returns array of filters { table: table id, jsonql: JsonQL with {alias} for the table name to filter by }
-  // See README for values
-  compile(design: any, values: any, locks: any) {
+  /** design is array of quickfilters (see README.md)
+   * values is array of values
+   * locks is array of locked quickfilters. Overrides values
+   * Returns array of filters { table: table id, jsonql: JsonQL with {alias} for the table name to filter by }
+   * See README for values
+   */
+  compile(design: Quickfilter[], values: any[] | null, locks: QuickfilterLock[]): JsonQLFilter[] {
     if (!design) {
       return []
     }
