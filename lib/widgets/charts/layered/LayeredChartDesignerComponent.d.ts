@@ -41,9 +41,9 @@ export default class LayeredChartDesignerComponent extends React.Component<Layer
         key: any;
     }, HTMLElement>;
     renderLayers(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement> | undefined;
-    renderOptions(): (JSX.Element[] | React.DetailedReactHTMLElement<{
+    renderOptions(): React.DetailedReactHTMLElement<{
         className: string;
-    }, HTMLElement> | undefined)[] | undefined;
+    }, HTMLElement>[] | undefined;
     renderThresholds(): React.CElement<uiComponents.SectionComponentProps, uiComponents.SectionComponent> | null;
     renderYRange(): React.CElement<uiComponents.SectionComponentProps, uiComponents.SectionComponent> | undefined;
     render(): React.CElement<any, TabbedComponent>;

@@ -290,7 +290,7 @@ export default class LayeredChartDesignerComponent extends React.Component<Layer
         <Checkbox inline key="labels" value={design.labels || false} onChange={this.handleLabelsChange}>
           Show Values
         </Checkbox>
-      ),
+      ,
       ["pie", "donut"].includes(design.type)
         ? [
             <Checkbox key="polarOrder" inline value={design.hidePercentage} onChange={this.handlePercentageVisibilityChange}>
@@ -306,7 +306,8 @@ export default class LayeredChartDesignerComponent extends React.Component<Layer
             </Checkbox>
           ]
         : undefined
-    ]
+      ]
+    )
   }
 
   renderThresholds() {
