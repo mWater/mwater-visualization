@@ -293,11 +293,12 @@ export default class LayeredChartDesignerComponent extends React.Component<Layer
       ),
       ["pie", "donut"].includes(design.type)
         ? [
-            <Checkbox key="polarOrder" value={design.hidePercentage} onChange={this.handlePercentageVisibilityChange}>
+            <Checkbox key="polarOrder" inline value={design.hidePercentage} onChange={this.handlePercentageVisibilityChange}>
               Hide Percentage
             </Checkbox>,
             <Checkbox
               key="polarOrder"
+              inline 
               value={(design.polarOrder || "desc") === "desc"}
               onChange={this.handlePolarOrderChange}
             >
