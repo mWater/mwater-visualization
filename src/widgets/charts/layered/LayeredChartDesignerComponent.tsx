@@ -268,8 +268,7 @@ export default class LayeredChartDesignerComponent extends React.Component<Layer
     // Don't include if transpose
     const canTranspose = !["pie", "donut"].includes(design.type)
 
-    return [
-      R(
+    return R(
         "div",
         { className: "text-muted" },
         canTranspose ? (
@@ -306,7 +305,6 @@ export default class LayeredChartDesignerComponent extends React.Component<Layer
             </Checkbox>
           ]
         : undefined
-      ]
     )
   }
 
