@@ -15,10 +15,7 @@ export default class LayerLegendComponent extends React.Component<LayerLegendCom
     static defaultProps: {
         radiusLayer: boolean;
     };
-    getCategories(): {
-        value: any;
-        label: string;
-    }[] | undefined;
+    getCategories(): import("../axes/Axis").AxisCategory[] | undefined;
     render(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 }
 export {};

@@ -5,9 +5,7 @@ const R = React.createElement
 import uuid from "uuid"
 import AsyncLoadComponent from "react-library/lib/AsyncLoadComponent"
 import { ExprComponent } from "mwater-expressions-ui"
-import { DataSource, ExprUtils, LiteralType, Schema } from "mwater-expressions"
-import { ExprCompiler } from "mwater-expressions"
-import { LinkComponent } from "mwater-expressions-ui"
+import { DataSource, ExprUtils, LiteralType, OpExpr, Schema } from "mwater-expressions"
 import AxisBuilder from "./AxisBuilder"
 import update from "update-object"
 import * as ui from "../UIComponents"
@@ -20,6 +18,8 @@ import { getFormatOptions } from "../valueFormatter"
 import { getDefaultFormat } from "../valueFormatter"
 import { JsonQLFilter } from "../JsonQLFilter"
 import { Axis } from "./Axis"
+import produce from "immer"
+import { JsonQLSelectQuery } from "jsonql"
 
 interface AxisComponentProps {
   schema: Schema
@@ -30,7 +30,7 @@ interface AxisComponentProps {
   types?: LiteralType[]
   aggrNeed: "none" | "optional" | "required"
   value?: Axis
-  onChange: (axis: Axis) => void
+  onChange: (axis: Axis | null) => void
   /** Makes this a required value */
   required?: boolean
   /** Shows the color map */
@@ -49,7 +49,7 @@ interface AxisComponentProps {
 }
 
 // Axis component that allows designing of an axis
-export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps, { categories: any }> {
+export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps, { categories: any, loading: boolean }> {
   static defaultProps = {
     reorderable: false,
     allowExcludedValues: false,
@@ -62,6 +62,7 @@ export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps
     super(props)
 
     this.state = {
+      loading: false,
       categories: null // Categories of the axis. Loaded whenever axis is changed
     }
   }
@@ -114,21 +115,21 @@ export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps
     }
 
     // If no table, cannot query
-    if (!axis.expr.table) {
+    if (!axis.expr || !((axis.expr as OpExpr)!.table)) {
       callback({ categories: [] })
       return
     }
 
     // If no categories, we need values as input
-    const valuesQuery = {
+    const valuesQuery: JsonQLSelectQuery = {
       type: "query",
       selects: [{ type: "select", expr: axisBuilder.compileAxis({ axis, tableAlias: "main" }), alias: "val" }],
-      from: { type: "table", table: axis.expr.table, alias: "main" },
+      from: { type: "table", table: (axis.expr as OpExpr)!.table!, alias: "main" },
       groupBy: [1],
       limit: 50
     }
 
-    const filters = _.where(this.props.filters || [], { table: axis.expr.table })
+    const filters = _.where(this.props.filters || [], { table: (axis.expr as OpExpr)!.table })
     let whereClauses = _.map(filters, (f) => injectTableAlias(f.jsonql, "main"))
     whereClauses = _.compact(whereClauses)
 
@@ -203,7 +204,11 @@ export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps
       }
     }
 
-    return this.props.onChange(update(_.omit(this.props.value, ["colorMap", "drawOrder"]), { xform: { $set: xform } }))
+    return this.props.onChange(produce(this.props.value!, draft => {
+      delete draft.colorMap
+      delete draft.drawOrder
+      draft.xform = xform
+    }))
   }
 
   handleXformChange = (xform: any) => {

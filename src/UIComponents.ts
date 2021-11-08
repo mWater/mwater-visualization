@@ -277,7 +277,7 @@ export class ButtonToggleComponent extends React.Component<ButtonToggleComponent
           {
             type: "button",
             key: option.value,
-            className: option.value === this.props.value ? "btn btn-default active" : "btn btn-default",
+            className: option.value === this.props.value ? "btn btn-primary active" : "btn btn-outline-primary",
             onClick: this.props.onChange.bind(null, option.value)
           },
           option.label

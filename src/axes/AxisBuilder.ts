@@ -1,6 +1,6 @@
 import _ from "lodash"
 import uuid from "uuid"
-import { AggrStatus, Expr, ExprCompiler, Schema } from "mwater-expressions"
+import { AggrStatus, Expr, ExprCompiler, FieldExpr, Schema } from "mwater-expressions"
 import { ExprValidator } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
@@ -10,7 +10,7 @@ import React from "react"
 const R = React.createElement
 import { default as produce } from "immer"
 import { formatValue } from "../valueFormatter"
-import { Axis } from "./Axis"
+import { Axis, AxisCategory } from "./Axis"
 import { JsonQLExpr } from "jsonql"
 
 const xforms = [
@@ -89,7 +89,7 @@ export default class AxisBuilder {
     }
 
     // Clean expression
-    expr = this.exprCleaner.cleanExpr(expr, { table: options.table, aggrStatuses })
+    expr = this.exprCleaner.cleanExpr(expr, { table: options.table || undefined, aggrStatuses })
     if (!expr) {
       return null
     }
@@ -227,7 +227,7 @@ export default class AxisBuilder {
       expr = {
         type: "op",
         op: options.axis.aggr,
-        table: expr.table,
+        table: (expr as FieldExpr).table,
         exprs: options.axis.aggr !== "count" ? [expr] : []
       }
     }
@@ -238,8 +238,8 @@ export default class AxisBuilder {
     // Bin
     if (options.axis.xform) {
       if (options.axis.xform.type === "bin") {
-        const { min } = options.axis.xform
-        let { max } = options.axis.xform
+        const min = options.axis.xform.min!
+        let max = options.axis.xform.max!
         // Add epsilon to prevent width_bucket from crashing
         if (max === min) {
           max += epsilon
@@ -253,7 +253,7 @@ export default class AxisBuilder {
         if (options.axis.xform.excludeUpper) {
           const thresholds = _.map(
             _.range(0, options.axis.xform.numBins),
-            (bin) => min + ((max - min) * bin) / options.axis.xform.numBins
+            (bin) => min + ((max - min) * bin) / options.axis.xform!.numBins!
           )
           thresholds.push(max + epsilon)
           compiledExpr = {
@@ -268,7 +268,7 @@ export default class AxisBuilder {
           compiledExpr = {
             type: "op",
             op: "width_bucket",
-            exprs: [compiledExpr, min, max, options.axis.xform.numBins]
+            exprs: [compiledExpr, min, max, options.axis.xform.numBins!]
           }
         }
       }
@@ -331,9 +331,9 @@ export default class AxisBuilder {
 
       // Ranges
       if (options.axis.xform.type === "ranges") {
-        const cases = []
-        for (let range of options.axis.xform.ranges) {
-          const whens = []
+        const cases: { when: JsonQLExpr, then: JsonQLExpr }[] = []
+        for (let range of options.axis.xform.ranges!) {
+          const whens: JsonQLExpr[] = []
           if (range.minValue != null) {
             if (range.minOpen) {
               whens.push({ type: "op", op: ">", exprs: [compiledExpr, range.minValue] })
@@ -413,7 +413,7 @@ export default class AxisBuilder {
     const maxExpr = { type: "op", op: "max", exprs: [{ type: "field", tableAlias: "inner", column: "val" }] }
 
     // Only include not null values
-    let where = {
+    let where: JsonQLExpr = {
       type: "op",
       op: "is not null",
       exprs: [compiledExpr]
@@ -486,8 +486,8 @@ export default class AxisBuilder {
   }
 
   // Gets the color for a value (if in colorMap)
-  getValueColor(axis: any, value: any) {
-    const item = _.find(axis.colorMap, (item) => item.value === value)
+  getValueColor(axis: Axis, value: any) {
+    const item = _.find(axis.colorMap || [], (item) => item.value === value)
     if (item) {
       return item.color
     }
@@ -497,13 +497,13 @@ export default class AxisBuilder {
   /** Get all categories for a given axis type given the known values
    * Returns array of { value, label }
    */
-  getCategories(axis: Axis, values: any[], locale?: string): { value: any; label: string }[] {
-    let categories, current, end, format, hasNone, label, max, min, value, year
+  getCategories(axis: Axis, values: any[], locale?: string): AxisCategory[] {
+    let categories: AxisCategory[], current, end, format, hasNone, label, max, min, value, year
     const noneCategory = { value: null, label: axis.nullLabel || "None" }
 
     // Handle ranges
     if (axis.xform && axis.xform.type === "ranges") {
-      return _.map(axis.xform.ranges, (range) => {
+      return (_.map(axis.xform.ranges || [], (range) => {
         let label = range.label || ""
         if (!label) {
           if (range.minValue != null) {
@@ -529,8 +529,8 @@ export default class AxisBuilder {
         return {
           value: range.id,
           label
-        }
-      }).concat([noneCategory])
+        } 
+      }) as AxisCategory[]).concat([noneCategory])
     }
 
     // Handle binning
@@ -549,7 +549,7 @@ export default class AxisBuilder {
         return [
           { value: 0, label: `< ${min}` },
           { value: 1, label: `= ${min}` },
-          { value: axis.xform.numBins + 1, label: `> ${min}` },
+          { value: axis.xform.numBins! + 1, label: `> ${min}` },
           noneCategory
         ]
       }
@@ -575,7 +575,7 @@ export default class AxisBuilder {
       }
 
       if (!axis.xform.excludeUpper) {
-        categories.push({ value: axis.xform.numBins + 1, label: `> ${format(max)}` })
+        categories.push({ value: axis.xform.numBins! + 1, label: `> ${format(max)}` })
       }
 
       categories.push(noneCategory)
@@ -761,14 +761,17 @@ export default class AxisBuilder {
         if (quarter === "1") {
           label = `${year} Jan-Mar`
         }
-        if (quarter === "2") {
+        else if (quarter === "2") {
           label = `${year} Apr-Jun`
         }
-        if (quarter === "3") {
+        else if (quarter === "3") {
           label = `${year} Jul-Sep`
         }
-        if (quarter === "4") {
+        else if (quarter === "4") {
           label = `${year} Oct-Dec`
+        }
+        else { 
+          label = ""
         }
         categories.push({ value, label })
         current.add(1, "quarters")
@@ -789,10 +792,10 @@ export default class AxisBuilder {
       case "enum":
       case "enumset":
         // If enum, return enum values
-        return _.map(this.exprUtils.getExprEnumValues(axis.expr), (ev) => ({
+        return (_.map(this.exprUtils.getExprEnumValues(axis.expr)!, (ev) => ({
           value: ev.id,
           label: ExprUtils.localizeString(ev.name, locale)
-        })).concat([noneCategory])
+        })) as { value: any, label: string }[]).concat([noneCategory])
         break
       case "text":
         // Return unique values
@@ -854,7 +857,7 @@ export default class AxisBuilder {
     const type = this.exprUtils.getExprType(axis.expr)
 
     if (axis.xform) {
-      const xform = _.findWhere(xforms, { type: axis.xform.type, input: type })
+      const xform = _.findWhere(xforms, { type: axis.xform.type, input: type })!
       return xform.output
     }
 
@@ -869,10 +872,8 @@ export default class AxisBuilder {
 
   // Determines if axis supports cumulative values (number, date or year-quarter)
   doesAxisSupportCumulative(axis: any) {
-    let needle
-    return (
-      ((needle = this.getAxisType(axis)), ["date", "number"].includes(needle)) || axis.xform?.type === "yearquarter"
-    )
+    const axisType = this.getAxisType(axis)
+    return axisType == "date" || axisType == "number" || axis.xform?.type === "yearquarter"
   }
 
   // Converts a category to a string (uses label or override)
@@ -932,14 +933,11 @@ export default class AxisBuilder {
     switch (type) {
       case "text":
         return value
-        break
       case "number":
         var num = parseFloat(value)
         return formatValue(type, num, axis.format, locale, legacyPercentFormat)
-        break
       case "geometry":
         return formatValue(type, value, axis.format, locale, legacyPercentFormat)
-        break
       case "text[]":
         // Parse if string
         if (_.isString(value)) {
@@ -948,15 +946,12 @@ export default class AxisBuilder {
         return R(
           "div",
           null,
-          _.map(value, (v, i) => R("div", { key: i }, v))
+          _.map(value as string[], (v, i) => R("div", { key: i }, v))
         )
-        break
       case "date":
         return moment(value, moment.ISO_8601).format("ll")
-        break
       case "datetime":
         return moment(value, moment.ISO_8601).format("lll")
-        break
     }
 
     return "" + value

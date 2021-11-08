@@ -2,7 +2,7 @@ import { Expr, Schema } from "mwater-expressions";
 import { ExprValidator } from "mwater-expressions";
 import { ExprUtils } from "mwater-expressions";
 import { ExprCleaner } from "mwater-expressions";
-import { Axis } from "./Axis";
+import { Axis, AxisCategory } from "./Axis";
 import { JsonQLExpr } from "jsonql";
 declare type AggrNeed = "none" | "optional" | "required";
 export default class AxisBuilder {
@@ -84,11 +84,7 @@ export default class AxisBuilder {
                     table: any;
                     alias: string;
                 };
-                where: {
-                    type: string;
-                    op: string;
-                    exprs: (string | number | true | import("jsonql").JsonQLLiteral | import("jsonql").JsonQLOp | import("jsonql").JsonQLCase | import("jsonql").JsonQLScalar | import("jsonql").JsonQLField | import("jsonql").JsonQLToken)[];
-                };
+                where: import("jsonql").JsonQLOp;
             };
             alias: string;
         };
@@ -99,14 +95,11 @@ export default class AxisBuilder {
         };
     } | null;
     getExprTypes(types: any): any;
-    getValueColor(axis: any, value: any): any;
+    getValueColor(axis: Axis, value: any): string | null;
     /** Get all categories for a given axis type given the known values
      * Returns array of { value, label }
      */
-    getCategories(axis: Axis, values: any[], locale?: string): {
-        value: any;
-        label: string;
-    }[];
+    getCategories(axis: Axis, values: any[], locale?: string): AxisCategory[];
     getAxisType(axis: any): string | null;
     isAxisAggr(axis: any): any;
     doesAxisSupportCumulative(axis: any): boolean;

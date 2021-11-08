@@ -32,22 +32,7 @@ export interface Axis {
      * `ranges`: convert to ranges. type enum. `ranges` is array of { id (unique id), label (optional label), minValue (null for none), maxValue (null for none), minOpen (true for >, false for >=), maxOpen (true for <, false for <=) }
      * `floor`: convert to floor. type enum
      */
-    xform?: {
-        type: "bin" | "date" | "year" | "yearmonth" | "month" | "week" | "ranges" | "yearweek" | "yearquarter" | "floor";
-        numBins?: number;
-        min?: number;
-        max?: number;
-        excludeUpper?: boolean;
-        excludeLower?: boolean;
-        ranges?: {
-            id: string;
-            label?: string;
-            minValue: number | null;
-            maxValue: number | null;
-            minOpen: boolean;
-            maxOpen: boolean;
-        }[];
-    };
+    xform?: AxisXform;
     colorMap?: ColorMap;
     /** optional array of category values which define the order in which categories should be rendered */
     drawOrder?: any[];
@@ -68,8 +53,28 @@ export interface Axis {
  * The color map is kept in sync with the values of the axis after transformation.
  * The order is not important.
  */
-export declare type ColorMap = [ColorMapItem];
+export declare type ColorMap = ColorMapItem[];
 export interface ColorMapItem {
     value: any;
-    color: string;
+    color: string | null;
+}
+export interface AxisCategory {
+    label: string;
+    value: any;
+}
+export interface AxisXform {
+    type: "bin" | "date" | "year" | "yearmonth" | "month" | "week" | "ranges" | "yearweek" | "yearquarter" | "floor";
+    numBins?: number;
+    min?: number;
+    max?: number;
+    excludeUpper?: boolean;
+    excludeLower?: boolean;
+    ranges?: {
+        id: string;
+        label?: string;
+        minValue: number | null;
+        maxValue: number | null;
+        minOpen: boolean;
+        maxOpen: boolean;
+    }[];
 }

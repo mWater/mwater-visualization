@@ -1,22 +1,26 @@
-import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
 import CategoryMapComponent from "./CategoryMapComponent"
 import ColorSchemeFactory from "../ColorSchemeFactory"
 import ColorPaletteCollectionComponent from "./ColorPaletteCollectionComponent"
-import update from "update-object"
 import AxisBuilder from "./AxisBuilder"
+import produce from "immer"
+import { Axis, AxisCategory, ColorMap } from "./Axis"
+import { Schema } from "mwater-expressions"
 
 interface AxisColorEditorComponentProps {
-  schema: any
-  axis: any
+  schema: Schema
+  axis: Axis
   /** Called with new axis */
-  onChange: any
+  onChange: (axis: Axis) => void
+
   /** Categories of the axis */
-  categories?: any
+  categories?: AxisCategory[]
+
   /** is the color map reorderable */
   reorderable?: boolean
+
   defaultColor?: string
   /** True to allow excluding of values via checkboxes */
   allowExcludedValues?: boolean
@@ -97,7 +101,7 @@ export default class AxisColorEditorComponent extends React.Component<
 
   handleResetPalette = () => {
     // Completely reset
-    const colorMap = _.map(this.props.categories, (category, i) => ({
+    const colorMap = _.map(this.props.categories || [], (category, i) => ({
       value: category.value,
       color: null
     }))
@@ -106,33 +110,36 @@ export default class AxisColorEditorComponent extends React.Component<
     return this.setState({ mode: "normal" })
   }
 
-  handlePaletteChange = (palette: any) => {
+  handlePaletteChange = (palette: ColorMap) => {
     this.props.onChange(
-      update(this.props.axis, { colorMap: { $set: palette }, drawOrder: { $set: _.pluck(palette, "value") } })
+      produce(this.props.axis, draft => { 
+        draft.colorMap = palette
+        draft.drawOrder = _.pluck(palette, "value")
+      })
     )
-    return this.setState({ mode: "normal" })
+    this.setState({ mode: "normal" })
   }
 
   handleCancelCustomize = () => {
     return this.setState({ mode: "normal" })
   }
 
-  renderPreview() {
-    return R(
-      "div",
-      { className: "axis-palette" },
-      _.map(this.props.categories.slice(0, 6), (category, i) => {
-        const color = _.find(this.props.axis.colorMap, { value: category.value })
-        const cellStyle = {
-          display: "inline-block",
-          height: 20,
-          width: 20,
-          backgroundColor: color ? color.color : this.props.defaultColor
-        }
-        return R("div", { style: cellStyle, key: i }, " ")
-      })
-    )
-  }
+  // renderPreview() {
+  //   return R(
+  //     "div",
+  //     { className: "axis-palette" },
+  //     _.map(this.props.categories.slice(0, 6), (category, i) => {
+  //       const color = _.find(this.props.axis.colorMap, { value: category.value })
+  //       const cellStyle = {
+  //         display: "inline-block",
+  //         height: 20,
+  //         width: 20,
+  //         backgroundColor: color ? color.color : this.props.defaultColor
+  //       }
+  //       return R("div", { style: cellStyle, key: i }, " ")
+  //     })
+  //   )
+  // }
 
   render() {
     return R(
@@ -149,6 +156,7 @@ export default class AxisColorEditorComponent extends React.Component<
             })
           }
         }
+        return null
       })(),
       this.state.mode === "normal"
         ? R(

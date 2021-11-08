@@ -1,11 +1,13 @@
 import React from "react";
+import { Axis, AxisCategory, ColorMap } from "./Axis";
+import { Schema } from "mwater-expressions";
 interface AxisColorEditorComponentProps {
-    schema: any;
-    axis: any;
+    schema: Schema;
+    axis: Axis;
     /** Called with new axis */
-    onChange: any;
+    onChange: (axis: Axis) => void;
     /** Categories of the axis */
-    categories?: any;
+    categories?: AxisCategory[];
     /** is the color map reorderable */
     reorderable?: boolean;
     defaultColor?: string;
@@ -30,11 +32,8 @@ export default class AxisColorEditorComponent extends React.Component<AxisColorE
     updateColorMap(): void;
     handleSelectPalette: () => void;
     handleResetPalette: () => void;
-    handlePaletteChange: (palette: any) => void;
+    handlePaletteChange: (palette: ColorMap) => void;
     handleCancelCustomize: () => void;
-    renderPreview(): React.DetailedReactHTMLElement<{
-        className: string;
-    }, HTMLElement>;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
 export {};
