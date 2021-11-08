@@ -136,6 +136,7 @@ export default class BinsComponent extends React.Component<BinsComponentProps, B
           } else if (this.props.xform.min == null || this.props.xform.max == null || !this.props.xform.numBins) {
             return R("span", { className: "text-danger", style: { paddingLeft: 10 } }, "Min and max are required")
           }
+          return null
         })()
       ),
       this.props.xform.min != null && this.props.xform.max != null && this.props.xform.numBins ? (

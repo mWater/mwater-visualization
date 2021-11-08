@@ -3,7 +3,7 @@ import _ from "lodash"
 import React from "react"
 const R = React.createElement
 
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, LiteralType, Schema } from "mwater-expressions"
 import { ExprValidator } from "mwater-expressions"
 import TabbedComponent from "react-library/lib/TabbedComponent"
 import { ExprComponent } from "mwater-expressions-ui"
@@ -18,6 +18,7 @@ import update from "update-object"
 import * as ui from "react-library/lib/bootstrap"
 import { getFormatOptions } from "../valueFormatter"
 import { getDefaultFormat } from "../valueFormatter"
+import { DatagridDesignColumn } from "./DatagridDesign"
 
 interface DatagridDesignerComponentProps {
   /** schema to use */
@@ -266,7 +267,7 @@ class ColumnsDesignerComponent extends React.Component<ColumnsDesignerComponentP
   }
 
   renderColumn = (
-    column: any,
+    column: DatagridDesignColumn,
     columnIndex: any,
     connectDragSource: any,
     connectDragPreview: any,
@@ -320,7 +321,7 @@ class ColumnsDesignerComponent extends React.Component<ColumnsDesignerComponentP
         items: this.props.columns,
         onReorder: this.props.onColumnsChange,
         renderItem: this.renderColumn,
-        getItemId: (item) => item.id
+        getItemId: (item: DatagridDesignColumn) => item.id
       }),
 
       R(
@@ -351,14 +352,16 @@ class ColumnsDesignerComponent extends React.Component<ColumnsDesignerComponentP
 }
 interface ColumnDesignerComponentProps {
   /** schema to use */
-  schema: any
+  schema: Schema
   /** dataSource to use */
-  dataSource: any
+  dataSource: DataSource
+
   table: string
+  
   /** Column See README.md of this folder */
-  column: any
+  column: DatagridDesignColumn
   /** Called when column changes. Null to remove. Array to replace with multiple entries */
-  onColumnChange: any
+  onColumnChange: (column: DatagridDesignColumn | null | DatagridDesignColumn[]) => void
   /** Connect drag source (handle) here */
   connectDragSource: any
   /** Connect drag preview here */
@@ -384,7 +387,7 @@ class ColumnDesignerComponent extends React.Component<ColumnDesignerComponentPro
     const exprUtils = new ExprUtils(this.props.schema)
 
     return this.props.onColumnChange(
-      _.map(exprUtils.getExprEnumValues(this.props.column.expr), (enumVal) => {
+      _.map(exprUtils.getExprEnumValues(this.props.column.expr)!, (enumVal) => {
         return {
           id: uuid(),
           type: "expr",
@@ -457,6 +460,9 @@ class ColumnDesignerComponent extends React.Component<ColumnDesignerComponentPro
   renderFormat() {
     const exprUtils = new ExprUtils(this.props.schema)
     const exprType = exprUtils.getExprType(this.props.column.expr)
+    if (!exprType) {
+      return null
+    }
 
     const formats = getFormatOptions(exprType)
     if (!formats) {
@@ -489,7 +495,7 @@ class ColumnDesignerComponent extends React.Component<ColumnDesignerComponentPro
     const type = exprUtils.getExprType(this.props.column.expr)
 
     // Determine allowed types
-    const allowedTypes = [
+    const allowedTypes: LiteralType[] = [
       "text",
       "number",
       "enum",

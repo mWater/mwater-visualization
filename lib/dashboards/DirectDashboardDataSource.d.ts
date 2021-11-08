@@ -9,7 +9,7 @@ export default class DirectDashboardDataSource extends DashboardDataSource {
         /** data source to use */
         dataSource: any;
         /** API url to use for talking to mWater server */
-        apiUrl?: string | undefined;
+        apiUrl: string;
         /** client id to use for talking to mWater server */
         client?: string | undefined;
     };
@@ -20,7 +20,7 @@ export default class DirectDashboardDataSource extends DashboardDataSource {
         /** data source to use */
         dataSource: DataSource;
         /** API url to use for talking to mWater server */
-        apiUrl?: string;
+        apiUrl: string;
         /** client id to use for talking to mWater server */
         client?: string;
     });

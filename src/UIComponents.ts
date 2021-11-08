@@ -258,7 +258,7 @@ export class ToggleEditComponent extends React.Component<ToggleEditComponentProp
   }
 }
 
-interface ButtonToggleComponentProps {
+export interface ButtonToggleComponentProps {
   value?: any
   /** List of layers */
   options: any

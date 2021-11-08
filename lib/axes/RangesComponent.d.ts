@@ -1,9 +1,11 @@
 import React from "react";
+import { AxisXform } from "./Axis";
+import { Expr, Schema } from "mwater-expressions";
 interface RangesComponentProps {
-    schema: any;
+    schema: Schema;
     /** Expression for computing min/max */
-    expr: any;
-    xform: any;
+    expr: Expr;
+    xform: AxisXform;
     onChange: any;
 }
 export default class RangesComponent extends React.Component<RangesComponentProps> {

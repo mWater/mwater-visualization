@@ -148,7 +148,7 @@ export default class SettingsModalComponent extends React.Component<
         R(ReactSelect, {
           value: _.findWhere(localeOptions, { value: this.state.design.locale || "en" }) || null,
           options: localeOptions,
-          onChange: (locale) => this.handleDesignChange(update(this.state.design, { locale: { $set: locale.value } }))
+          onChange: (locale: any) => this.handleDesignChange(update(this.state.design, { locale: { $set: locale.value } }))
         }),
 
         R("h4", { style: { paddingTop: 10 } }, "Advanced"),

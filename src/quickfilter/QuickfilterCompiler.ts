@@ -19,7 +19,7 @@ export default class QuickfilterCompiler {
    * Returns array of filters { table: table id, jsonql: JsonQL with {alias} for the table name to filter by }
    * See README for values
    */
-  compile(design: Quickfilter[], values: any[] | null, locks: QuickfilterLock[]): JsonQLFilter[] {
+  compile(design: Quickfilter[], values: any[] | null, locks: QuickfilterLock[] | null | undefined): JsonQLFilter[] {
     if (!design) {
       return []
     }
@@ -30,7 +30,7 @@ export default class QuickfilterCompiler {
       // Determine if locked
       var value
       var item = design[index]
-      const lock = _.find(locks, (lock) => _.isEqual(lock.expr, item.expr))
+      const lock = _.find(locks || [], (lock) => _.isEqual(lock.expr, item.expr))
 
       // Determine value
       if (lock) {

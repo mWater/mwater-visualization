@@ -2,19 +2,20 @@ import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
-import { ExprCompiler } from "mwater-expressions"
+import { ExprCompiler, Schema } from "mwater-expressions"
 import AxisBuilder from "./AxisBuilder"
 import update from "update-object"
 import ColorComponent from "../ColorComponent"
 import { ExprUtils } from "mwater-expressions"
 import ReorderableListComponent from "react-library/lib/reorderable/ReorderableListComponent"
 import { default as produce } from "immer"
+import { Axis, AxisCategory } from "./Axis"
 
 interface CategoryMapComponentProps {
-  schema: any
-  axis: any
-  onChange: any
-  categories?: any
+  schema: Schema
+  axis: Axis
+  onChange: (axis: Axis) => void
+  categories?: AxisCategory[]
   reorderable?: boolean
   /** True to allow editing the color map */
   showColorMap?: boolean
@@ -48,7 +49,7 @@ export default class CategoryMapComponent extends React.Component<
 
   handleColorChange = (value: any, color: any) => {
     // Delete if present for value
-    const colorMap = _.filter(this.props.axis.colorMap, (item) => item.value !== value)
+    const colorMap = _.filter(this.props.axis.colorMap || [], (item) => item.value !== value)
 
     // Add if color present
     if (color) {
@@ -61,9 +62,9 @@ export default class CategoryMapComponent extends React.Component<
   handleExcludeChange = (value: any, ev: any) => {
     let excludedValues
     if (ev.target.checked) {
-      excludedValues = _.difference(this.props.axis.excludedValues, [value])
+      excludedValues = _.difference(this.props.axis.excludedValues || [], [value])
     } else {
-      excludedValues = _.union(this.props.axis.excludedValues, [value])
+      excludedValues = _.union(this.props.axis.excludedValues || [], [value])
     }
 
     return this.props.onChange(update(this.props.axis, { excludedValues: { $set: excludedValues } }))
@@ -71,7 +72,7 @@ export default class CategoryMapComponent extends React.Component<
 
   // Gets the current color value if known
   lookupColor(value: any) {
-    const item = _.find(this.props.axis.colorMap, (item) => item.value === value)
+    const item = _.find(this.props.axis.colorMap || [], (item) => item.value === value)
     if (item) {
       return item.color
     }
@@ -144,10 +145,10 @@ export default class CategoryMapComponent extends React.Component<
   // Category is { value: category value, label: category label }
   renderCategory = (
     category: any,
-    index: any,
-    connectDragSource: any,
-    connectDragPreview: any,
-    connectDropTarget: any
+    index?: any,
+    connectDragSource?: any,
+    connectDragPreview?: any,
+    connectDropTarget?: any
   ) => {
     const labelStyle = {
       verticalAlign: "middle",
@@ -178,7 +179,7 @@ export default class CategoryMapComponent extends React.Component<
         ? R("input", {
             type: "checkbox",
             style: { marginLeft: 5, marginBottom: 5, verticalAlign: "middle" },
-            checked: !_.includes(this.props.axis.excludedValues, category.value),
+            checked: !_.includes(this.props.axis.excludedValues || [], category.value),
             onChange: this.handleExcludeChange.bind(null, category.value)
           })
         : undefined,
@@ -209,9 +210,9 @@ export default class CategoryMapComponent extends React.Component<
   }
 
   renderReorderable() {
-    const drawOrder = this.props.axis.drawOrder || _.pluck(this.props.axis.colorMap, "value")
+    const drawOrder = this.props.axis.drawOrder || _.pluck(this.props.axis.colorMap || [], "value")
 
-    const orderedCategories = _.sortBy(this.props.categories, (category) => {
+    const orderedCategories = _.sortBy(this.props.categories || [], (category) => {
       return _.indexOf(drawOrder, category.value)
     })
 
@@ -223,7 +224,7 @@ export default class CategoryMapComponent extends React.Component<
         items: orderedCategories,
         onReorder: this.handleReorder,
         renderItem: this.renderCategory,
-        getItemId: (item) => item.value
+        getItemId: (item: AxisCategory) => item.value
       })
     )
   }
@@ -233,7 +234,7 @@ export default class CategoryMapComponent extends React.Component<
       "div",
       null,
       this.renderToggle(),
-      _.map(this.props.categories, (category) => this.renderCategory(category))
+      _.map(this.props.categories || [], (category) => this.renderCategory(category))
     )
   }
 

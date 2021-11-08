@@ -50,6 +50,7 @@ export interface DatagridDesignColumn {
   expr: Expr
 
   /** Format for formattable types (number and geometry) */
+  format?: string
 }
 
 export interface DatagridDesignSubtable {

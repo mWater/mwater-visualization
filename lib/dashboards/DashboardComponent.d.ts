@@ -4,6 +4,7 @@ import { DataSource, Schema } from "mwater-expressions";
 import UndoStack from "../UndoStack";
 import DashboardViewComponent from "./DashboardViewComponent";
 import QuickfiltersComponent from "../quickfilter/QuickfiltersComponent";
+import SettingsModalComponent from "./SettingsModalComponent";
 import { DashboardDesign } from "./DashboardDesign";
 import DashboardDataSource from "./DashboardDataSource";
 import { JsonQLFilter } from "..";
@@ -40,7 +41,7 @@ export interface DashboardComponentProps {
 }
 export interface DashboardComponentState {
     undoStack: UndoStack;
-    quickfiltersValues: any[];
+    quickfiltersValues: any[] | null;
     editing: boolean;
     layoutOptionsOpen: boolean;
     hideQuickfilters: boolean;
@@ -58,6 +59,7 @@ export default class DashboardComponent extends React.Component<DashboardCompone
         locale: PropTypes.Requireable<string>;
         activeTables: PropTypes.Requireable<string[]>;
     };
+    settings: SettingsModalComponent | null;
     getChildContext(): {
         locale: string | undefined;
         activeTables: string[];
@@ -68,8 +70,8 @@ export default class DashboardComponent extends React.Component<DashboardCompone
     handlePrint: () => void;
     handleUndo: () => void;
     handleRedo: () => void;
-    handleSaveDesignFile: () => any;
-    handleSettings: () => any;
+    handleSaveDesignFile: () => void;
+    handleSettings: () => void;
     handleToggleEditing: () => void;
     handleOpenLayoutOptions: () => void;
     handleRefreshData: () => void;

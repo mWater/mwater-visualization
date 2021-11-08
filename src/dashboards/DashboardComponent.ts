@@ -64,7 +64,7 @@ export interface DashboardComponentProps {
 
 export interface DashboardComponentState {
   undoStack: UndoStack
-  quickfiltersValues: any[]
+  quickfiltersValues: any[] | null
   editing: boolean
   layoutOptionsOpen: boolean
   hideQuickfilters: boolean
@@ -83,6 +83,8 @@ export default class DashboardComponent extends React.Component<DashboardCompone
     locale: PropTypes.string,
     activeTables: PropTypes.arrayOf(PropTypes.string.isRequired)
   }
+
+  settings: SettingsModalComponent | null
 
   getChildContext() {
     return {
@@ -135,26 +137,26 @@ export default class DashboardComponent extends React.Component<DashboardCompone
     }
 
     if (nextProps.onDesignChange == null) {
-      return this.setState({ editing: false })
+      this.setState({ editing: false })
     }
   }
 
   handlePrint = () => {
-    return this.dashboardView!.print()
+    this.dashboardView!.print()
   }
 
   handleUndo = () => {
     const undoStack = this.state.undoStack.undo()
 
     // We need to use callback as state is applied later
-    return this.setState({ undoStack }, () => this.props.onDesignChange(undoStack.getValue()))
+    this.setState({ undoStack }, () => this.props.onDesignChange!(undoStack.getValue()))
   }
 
   handleRedo = () => {
     const undoStack = this.state.undoStack.redo()
 
     // We need to use callback as state is applied later
-    return this.setState({ undoStack }, () => this.props.onDesignChange(undoStack.getValue()))
+    this.setState({ undoStack }, () => this.props.onDesignChange!(undoStack.getValue()))
   }
 
   // Saves a json file to disk
@@ -163,28 +165,28 @@ export default class DashboardComponent extends React.Component<DashboardCompone
     const blob = new Blob([JSON.stringify(this.props.design, null, 2)], { type: "text/json" })
     // Require at use as causes server problems
     const FileSaver = require("file-saver")
-    return FileSaver.saveAs(blob, "Dashboard.json")
+    FileSaver.saveAs(blob, "Dashboard.json")
   }
 
   handleSettings = () => {
-    return this.settings.show(this.props.design)
+    this.settings!.show(this.props.design)
   }
 
   handleToggleEditing = () => {
-    return this.setState({ editing: !this.state.editing })
+    this.setState({ editing: !this.state.editing })
   }
 
   handleOpenLayoutOptions = () => {
-    return this.setState({ layoutOptionsOpen: true })
+    this.setState({ layoutOptionsOpen: true })
   }
 
   handleRefreshData = () => {
     this.props.dataSource.clearCache?.()
-    return this.setState({ refreshKey: this.state.refreshKey + 1 })
+    this.setState({ refreshKey: this.state.refreshKey + 1 })
   }
 
   handleStyleChange = (style: any) => {
-    return this.props.onDesignChange(_.extend({}, this.props.design, { style: style || null }))
+    this.props.onDesignChange!(_.extend({}, this.props.design, { style: style || null }))
   }
 
   handleDesignChange = (design: any) => {
@@ -193,7 +195,7 @@ export default class DashboardComponent extends React.Component<DashboardCompone
       this.setState({ quickfiltersValues: null })
     }
 
-    return this.props.onDesignChange(design)
+    this.props.onDesignChange!(design)
   }
 
   handleShowQuickfilters = () => {
@@ -210,9 +212,9 @@ export default class DashboardComponent extends React.Component<DashboardCompone
     }
 
     const design = new DashboardUpgrader().upgrade(this.props.design)
-    this.props.onDesignChange(design)
+    this.props.onDesignChange!(design)
 
-    return alert(
+    alert(
       "Upgrade completed. Some widgets may need to be resized. Click Undo to revert back to old dashboard style."
     )
   }
@@ -266,6 +268,7 @@ export default class DashboardComponent extends React.Component<DashboardCompone
             )
           ]
       }
+      return null
     })()
 
     return R(
@@ -373,11 +376,11 @@ export default class DashboardComponent extends React.Component<DashboardCompone
 
   renderQuickfilter() {
     return R(QuickfiltersComponent, {
-      design: this.props.design.quickfilters,
+      design: this.props.design.quickfilters || [],
       schema: this.props.schema,
       dataSource: this.props.dataSource,
       quickfiltersDataSource: this.props.dashboardDataSource.getQuickfiltersDataSource(),
-      values: this.state.quickfiltersValues,
+      values: this.state.quickfiltersValues || undefined,
       onValuesChange: (values: any) => this.setState({ quickfiltersValues: values }),
       locks: this.props.quickfilterLocks,
       filters: this.getCompiledFilters(),
@@ -396,7 +399,7 @@ export default class DashboardComponent extends React.Component<DashboardCompone
     // Compile quickfilters
     filters = filters.concat(
       new QuickfilterCompiler(this.props.schema).compile(
-        this.props.design.quickfilters,
+        this.props.design.quickfilters || [],
         this.state.quickfiltersValues,
         this.props.quickfilterLocks
       )
@@ -445,8 +448,8 @@ export default class DashboardComponent extends React.Component<DashboardCompone
             onDesignChange: this.handleDesignChange,
             schema: this.props.schema,
             dataSource: this.props.dataSource,
-            ref: (c: any) => {
-              return (this.settings = c)
+            ref: (c: SettingsModalComponent | null) => {
+              this.settings = c
             }
           })
         : undefined,
@@ -456,7 +459,7 @@ export default class DashboardComponent extends React.Component<DashboardCompone
             { isOpen: true, outerPadding: 10, innerPadding: 10 },
             R(LayoutOptionsComponent, {
               design: this.props.design,
-              onDesignChange: this.props.onDesignChange,
+              onDesignChange: this.props.onDesignChange!,
               onClose: () => this.setState({ layoutOptionsOpen: false }),
               dashboardView: readonlyDashboardView,
               quickfiltersView: this.renderQuickfilter()

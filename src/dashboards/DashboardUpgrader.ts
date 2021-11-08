@@ -1,14 +1,15 @@
 import _ from "lodash"
 import uuid from "uuid"
+import { DashboardDesign } from ".."
 import WidgetFactory from "../widgets/WidgetFactory"
 
 // Upgrades old dashboards to new ones (grid -> blocks)
 export default class DashboardUpgrader {
-  upgrade(design: any) {
+  upgrade(design: any): DashboardDesign {
     // Get list of all items
     const items = _.clone(design.items)
 
-    const newItems = {
+    const newItems: any = {
       id: "root",
       type: "root",
       blocks: []
@@ -17,7 +18,7 @@ export default class DashboardUpgrader {
     function convertBlock(id: any, item: any) {
       const widget = WidgetFactory.createWidget(item.widget.type)
 
-      const block = {
+      const block: any = {
         type: "widget",
         widgetType: item.widget.type,
         design: item.widget.design,

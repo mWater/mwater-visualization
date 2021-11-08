@@ -205,7 +205,7 @@ export default class DashboardViewComponent extends React.Component<
   }
 
   render() {
-    let cantPasteMessage
+    let cantPasteMessage = ""
     const layoutManager = LayoutManager.createLayoutManager(this.props.design.layout)
 
     const compiledFilters = this.getCompiledFilters()
@@ -283,7 +283,7 @@ export default class DashboardViewComponent extends React.Component<
       layoutManager.renderLayout({
         items: this.props.design.items,
         onItemsChange: this.props.onDesignChange != null ? this.handleItemsChange : undefined,
-        style: this.props.design.style,
+        style: this.props.design.style || null,
         layoutOptions: getLayoutOptions(this.props.design),
         renderWidget,
         clipboard: clipboardContents?.block,

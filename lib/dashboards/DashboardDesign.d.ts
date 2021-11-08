@@ -9,7 +9,7 @@ export interface DashboardDesign {
     /** dashboard items. Format depends on layout of dashboard. See layouts/.../README.md */
     items: any;
     /** array of quick filters (user-selectable filters). See quickfilter/README.md */
-    quickfilters: Quickfilter[];
+    quickfilters?: Quickfilter[];
     /** layout engine to use (`blocks` is new default)  */
     layout: "blocks" | "grid";
     /** optional theme to use */
@@ -23,7 +23,7 @@ export interface DashboardDesign {
     /** optional locale (e.g. "fr") to use for display */
     locale?: string;
     /** true to enable implicit filtering (see ImplicitFilterBuilder). Defaults to true for older dashboards. */
-    implicitFiltersEnabled: boolean;
+    implicitFiltersEnabled?: boolean;
     /** array of global filters. See below. */
     globalFilters?: GlobalFilter[];
 }

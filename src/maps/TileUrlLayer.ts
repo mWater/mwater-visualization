@@ -11,6 +11,13 @@ import { ExprCleaner } from "mwater-expressions"
 import AxisBuilder from "../axes/AxisBuilder"
 import LegendGroup from "./LegendGroup"
 
+export interface TileUrlLayerDesign {
+  tileUrl: string
+  minZoom?: number
+  maxZoom?: number
+  readonly?: boolean
+}
+
 /*
 Layer that is a custom Leaflet-style url tile layer
 Design is:
@@ -19,9 +26,9 @@ Design is:
   maxZoom: optional max zoom level
   readonly: if true, hides url and prevents editing
 */
-export default class TileUrlLayer extends Layer {
+export default class TileUrlLayer extends Layer<TileUrlLayerDesign> {
   // Gets the type of layer definition ("JsonQLCss"/"TileUrl")
-  getLayerDefinitionType() {
+  getLayerDefinitionType(): "TileUrl" {
     return "TileUrl"
   }
 

@@ -1,9 +1,11 @@
 import React from "react";
+import { Schema } from "mwater-expressions";
+import { Axis, AxisCategory } from "./Axis";
 interface CategoryMapComponentProps {
-    schema: any;
-    axis: any;
-    onChange: any;
-    categories?: any;
+    schema: Schema;
+    axis: Axis;
+    onChange: (axis: Axis) => void;
+    categories?: AxisCategory[];
     reorderable?: boolean;
     /** True to allow editing the color map */
     showColorMap?: boolean;
@@ -16,12 +18,12 @@ interface CategoryMapComponentState {
 }
 export default class CategoryMapComponent extends React.Component<CategoryMapComponentProps, CategoryMapComponentState> {
     constructor(props: any);
-    handleReorder: (map: any) => any;
-    handleColorChange: (value: any, color: any) => any;
-    handleExcludeChange: (value: any, ev: any) => any;
-    lookupColor(value: any): any;
-    handleNullLabelChange: (e: any) => any;
-    handleCategoryLabelChange: (category: any, e: any) => any;
+    handleReorder: (map: any) => void;
+    handleColorChange: (value: any, color: any) => void;
+    handleExcludeChange: (value: any, ev: any) => void;
+    lookupColor(value: any): string | null;
+    handleNullLabelChange: (e: any) => void;
+    handleCategoryLabelChange: (category: any, e: any) => void;
     handleToggle: () => void;
     renderLabel(category: any): React.DetailedReactHTMLElement<{
         className: string;
@@ -30,7 +32,7 @@ export default class CategoryMapComponent extends React.Component<CategoryMapCom
             cursor: "pointer";
         };
     }, HTMLElement>;
-    renderCategory: (category: any, index: any, connectDragSource: any, connectDragPreview: any, connectDropTarget: any) => React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+    renderCategory: (category: any, index?: any, connectDragSource?: any, connectDragPreview?: any, connectDropTarget?: any) => React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
     renderReorderable(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
     renderNonReorderable(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
     renderToggle(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;

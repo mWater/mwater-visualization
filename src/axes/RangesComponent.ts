@@ -8,31 +8,33 @@ import { LinkComponent } from "mwater-expressions-ui"
 import AxisBuilder from "./AxisBuilder"
 import NumberInputComponent from "react-library/lib/NumberInputComponent"
 import ReorderableListComponent from "react-library/lib/reorderable/ReorderableListComponent"
+import { AxisXform, AxisXformRange } from "./Axis"
+import { Expr, Schema } from "mwater-expressions"
 
 interface RangesComponentProps {
-  schema: any
+  schema: Schema
   /** Expression for computing min/max */
-  expr: any
-  xform: any
+  expr: Expr
+  xform: AxisXform
   onChange: any
 }
 
 // Allows setting of ranges
 export default class RangesComponent extends React.Component<RangesComponentProps> {
   handleRangeChange = (index: any, range: any) => {
-    const ranges = this.props.xform.ranges.slice()
+    const ranges = this.props.xform.ranges!.slice()
     ranges[index] = range
     return this.props.onChange(update(this.props.xform, { ranges: { $set: ranges } }))
   }
 
   handleAddRange = () => {
-    const ranges = this.props.xform.ranges.slice()
+    const ranges = this.props.xform.ranges!.slice()
     ranges.push({ id: uuid(), minOpen: false, maxOpen: true })
     return this.props.onChange(update(this.props.xform, { ranges: { $set: ranges } }))
   }
 
   handleRemoveRange = (index: any) => {
-    const ranges = this.props.xform.ranges.slice()
+    const ranges = this.props.xform.ranges!.slice()
     ranges.splice(index, 1)
     return this.props.onChange(update(this.props.xform, { ranges: { $set: ranges } }))
   }
@@ -60,7 +62,7 @@ export default class RangesComponent extends React.Component<RangesComponentProp
       R(
         "table",
         null,
-        this.props.xform.ranges.length > 0
+        this.props.xform.ranges!.length > 0
           ? R(
               "thead",
               null,
@@ -78,10 +80,10 @@ export default class RangesComponent extends React.Component<RangesComponentProp
           : undefined,
 
         React.createElement(ReorderableListComponent, {
-          items: this.props.xform.ranges,
+          items: this.props.xform.ranges!,
           onReorder: this.handleReorder,
           renderItem: this.renderRange,
-          getItemId: (range) => range.id,
+          getItemId: (range: AxisXformRange) => range.id,
           element: R("tbody", null)
         })
       ),

@@ -10,6 +10,7 @@ import { MapLayerDataSource } from "../maps/MapLayerDataSource"
 import LayerFactory from "../maps/LayerFactory"
 import { WidgetDataSource } from "../widgets/WidgetDataSource"
 import compressJson from "../compressJson"
+import TileUrlLayer from "../maps/TileUrlLayer"
 
 interface ServerDashboardDataSourceOptions {
   /** API url to use for talking to mWater server */
@@ -293,7 +294,7 @@ class ServerWidgetLayerDataSource implements MapLayerDataSource {
 
     // If layer has tiles url directly available
     if (layer.getLayerDefinitionType() === "TileUrl") {
-      return layer.getTileUrl(this.options.layerView.design, filters)
+      return (layer as TileUrlLayer).getTileUrl(this.options.layerView.design, filters)
     }
 
     return this.createUrl(filters, "png")

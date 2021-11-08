@@ -12,7 +12,7 @@ export interface DashboardDesign {
   items: any // TODO
 
   /** array of quick filters (user-selectable filters). See quickfilter/README.md */
-  quickfilters: Quickfilter[]
+  quickfilters?: Quickfilter[]
 
   /** layout engine to use (`blocks` is new default)  */
   layout: "blocks" | "grid"
@@ -30,7 +30,7 @@ export interface DashboardDesign {
   locale?: string
 
   /** true to enable implicit filtering (see ImplicitFilterBuilder). Defaults to true for older dashboards. */
-  implicitFiltersEnabled: boolean
+  implicitFiltersEnabled?: boolean
 
   /** array of global filters. See below. */
   globalFilters?: GlobalFilter[]

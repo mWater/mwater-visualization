@@ -1,7 +1,13 @@
 import React from "react";
 import Layer from "./Layer";
-export default class TileUrlLayer extends Layer {
-    getLayerDefinitionType(): string;
+export interface TileUrlLayerDesign {
+    tileUrl: string;
+    minZoom?: number;
+    maxZoom?: number;
+    readonly?: boolean;
+}
+export default class TileUrlLayer extends Layer<TileUrlLayerDesign> {
+    getLayerDefinitionType(): "TileUrl";
     getTileUrl(design: any, filters: any): any;
     getUtfGridUrl(design: any, filters: any): null;
     getMinZoom(design: any): any;

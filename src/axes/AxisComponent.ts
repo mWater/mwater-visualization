@@ -5,7 +5,7 @@ const R = React.createElement
 import uuid from "uuid"
 import AsyncLoadComponent from "react-library/lib/AsyncLoadComponent"
 import { ExprComponent } from "mwater-expressions-ui"
-import { DataSource, ExprUtils, LiteralType, OpExpr, Schema } from "mwater-expressions"
+import { AggrStatus, DataSource, ExprUtils, LiteralType, OpExpr, Schema } from "mwater-expressions"
 import AxisBuilder from "./AxisBuilder"
 import update from "update-object"
 import * as ui from "../UIComponents"
@@ -17,7 +17,7 @@ import { injectTableAlias } from "mwater-expressions"
 import { getFormatOptions } from "../valueFormatter"
 import { getDefaultFormat } from "../valueFormatter"
 import { JsonQLFilter } from "../JsonQLFilter"
-import { Axis } from "./Axis"
+import { Axis, AxisXform, AxisXformRange } from "./Axis"
 import produce from "immer"
 import { JsonQLSelectQuery } from "jsonql"
 
@@ -159,34 +159,39 @@ export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps
     }
 
     // Set expression and clear xform
-    return this.props.onChange(this.cleanAxis(_.extend({}, _.omit(this.props.value, ["drawOrder"]), { expr })))
+    return this.props.onChange(this.cleanAxis(_.extend({}, _.omit(this.props.value || {}, ["drawOrder"]), { expr })))
   }
 
   handleFormatChange = (ev: any) => {
-    return this.props.onChange(_.extend({}, this.props.value, { format: ev.target.value }))
+    return this.props.onChange(produce(this.props.value!, draft => { draft.format = ev.target.value }))
   }
 
   handleXformTypeChange = (type: any) => {
     // Remove
-    let xform
+    let xform: AxisXform
     if (!type) {
-      this.props.onChange(_.omit(this.props.value, ["xform", "colorMap", "drawOrder"]))
+      this.props.onChange(produce(this.props.value!, draft => {
+        delete draft.xform
+        delete draft.colorMap
+        delete draft.drawOrder
+      }))
+      return
     }
 
     // Save bins if going from bins to custom ranges and has ranges
     if (
       type === "ranges" &&
-      this.props.value.xform?.type === "bin" &&
-      this.props.value.xform.min != null &&
-      this.props.value.xform.max != null &&
-      this.props.value.xform.min !== this.props.value.xform.max &&
-      this.props.value.xform.numBins
+      this.props.value!.xform?.type === "bin" &&
+      this.props.value!.xform.min != null &&
+      this.props.value!.xform.max != null &&
+      this.props.value!.xform.min !== this.props.value!.xform.max &&
+      this.props.value!.xform.numBins
     ) {
-      const { min } = this.props.value.xform
-      const { max } = this.props.value.xform
-      const { numBins } = this.props.value.xform
+      const { min } = this.props.value!.xform
+      const { max } = this.props.value!.xform
+      const { numBins } = this.props.value!.xform
 
-      const ranges = [{ id: uuid(), maxValue: min, minOpen: false, maxOpen: true }]
+      const ranges: AxisXformRange[] = [{ id: uuid(), maxValue: min, minOpen: false, maxOpen: true }]
       for (let i = 1, end1 = numBins, asc = 1 <= end1; asc ? i <= end1 : i >= end1; asc ? i++ : i--) {
         const start = ((i - 1) / numBins) * (max - min) + min
         const end = (i / numBins) * (max - min) + min
@@ -213,7 +218,7 @@ export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps
 
   handleXformChange = (xform: any) => {
     return this.props.onChange(
-      this.cleanAxis(update(_.omit(this.props.value, ["drawOrder"]), { xform: { $set: xform } }))
+      this.cleanAxis(update(_.omit(this.props.value!, ["drawOrder"]), { xform: { $set: xform } }))
     )
   }
 
@@ -229,7 +234,7 @@ export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps
 
   renderXform(axis: any) {
     if (!axis) {
-      return
+      return null
     }
 
     if (axis.xform && ["bin", "ranges", "floor"].includes(axis.xform.type)) {
@@ -302,6 +307,7 @@ export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps
           onChange: this.handleXformTypeChange
         })
     }
+    return null
   }
 
   renderColorMap(axis: any) {
@@ -355,6 +361,9 @@ export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps
     const axisBuilder = new AxisBuilder({ schema: this.props.schema })
 
     const valueType = axisBuilder.getAxisType(axis)
+    if (!valueType) {
+      return null
+    }
 
     const formats = getFormatOptions(valueType)
     if (!formats) {
@@ -380,7 +389,7 @@ export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps
   }
 
   render() {
-    let aggrStatuses
+    let aggrStatuses: AggrStatus[]
     const axisBuilder = new AxisBuilder({ schema: this.props.schema })
 
     // Clean before render
@@ -412,7 +421,7 @@ export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps
           types: axisBuilder.getExprTypes(this.props.types),
           // preventRemove: @props.required
           onChange: this.handleExprChange,
-          value: this.props.value ? this.props.value.expr : undefined,
+          value: this.props.value ? this.props.value.expr : null,
           aggrStatuses
         })
       ),

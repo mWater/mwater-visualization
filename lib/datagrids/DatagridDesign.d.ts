@@ -36,6 +36,8 @@ export interface DatagridDesignColumn {
     type: "expr";
     /** Expression */
     expr: Expr;
+    /** Format for formattable types (number and geometry) */
+    format?: string;
 }
 export interface DatagridDesignSubtable {
     /** unique id of the subtable (not the id of the table, just a unique id) */

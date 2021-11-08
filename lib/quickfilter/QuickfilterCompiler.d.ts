@@ -11,7 +11,7 @@ export default class QuickfilterCompiler {
      * Returns array of filters { table: table id, jsonql: JsonQL with {alias} for the table name to filter by }
      * See README for values
      */
-    compile(design: Quickfilter[], values: any[] | null, locks: QuickfilterLock[]): JsonQLFilter[];
+    compile(design: Quickfilter[], values: any[] | null, locks: QuickfilterLock[] | null | undefined): JsonQLFilter[];
     compileToFilterExpr(expr: any, value: any, multi: any): {
         type: string;
         op: any;

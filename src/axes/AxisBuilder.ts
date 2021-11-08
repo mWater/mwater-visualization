@@ -1,6 +1,6 @@
 import _ from "lodash"
 import uuid from "uuid"
-import { AggrStatus, Expr, ExprCompiler, FieldExpr, Schema } from "mwater-expressions"
+import { AggrStatus, Expr, ExprCompiler, FieldExpr, LiteralType, Schema } from "mwater-expressions"
 import { ExprValidator } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
@@ -13,7 +13,7 @@ import { formatValue } from "../valueFormatter"
 import { Axis, AxisCategory } from "./Axis"
 import { JsonQLExpr } from "jsonql"
 
-const xforms = [
+const xforms: { type: string, input: LiteralType, output: LiteralType }[] = [
   { type: "bin", input: "number", output: "enum" },
   { type: "ranges", input: "number", output: "enum" },
   { type: "floor", input: "number", output: "enum" },
@@ -844,7 +844,7 @@ export default class AxisBuilder {
   }
 
   // Get type of axis output
-  getAxisType(axis: any) {
+  getAxisType(axis: any): LiteralType | null {
     if (!axis) {
       return null
     }

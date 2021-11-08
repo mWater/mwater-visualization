@@ -1,4 +1,4 @@
-import { Expr, Schema } from "mwater-expressions";
+import { Expr, LiteralType, Schema } from "mwater-expressions";
 import { ExprValidator } from "mwater-expressions";
 import { ExprUtils } from "mwater-expressions";
 import { ExprCleaner } from "mwater-expressions";
@@ -100,7 +100,7 @@ export default class AxisBuilder {
      * Returns array of { value, label }
      */
     getCategories(axis: Axis, values: any[], locale?: string): AxisCategory[];
-    getAxisType(axis: any): string | null;
+    getAxisType(axis: any): LiteralType | null;
     isAxisAggr(axis: any): any;
     doesAxisSupportCumulative(axis: any): boolean;
     formatCategory(axis: any, category: any): any;

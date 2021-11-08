@@ -69,12 +69,13 @@ export interface AxisXform {
     max?: number;
     excludeUpper?: boolean;
     excludeLower?: boolean;
-    ranges?: {
-        id: string;
-        label?: string;
-        minValue: number | null;
-        maxValue: number | null;
-        minOpen: boolean;
-        maxOpen: boolean;
-    }[];
+    ranges?: AxisXformRange[];
+}
+export interface AxisXformRange {
+    id: string;
+    label?: string;
+    minValue?: number | null;
+    maxValue?: number | null;
+    minOpen: boolean;
+    maxOpen: boolean;
 }

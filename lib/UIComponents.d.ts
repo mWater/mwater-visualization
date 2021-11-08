@@ -72,7 +72,7 @@ export declare class ToggleEditComponent extends React.Component<ToggleEditCompo
     editorRef: (editorComp: any) => any;
     render(): React.CElement<any, SwitchViewComponent>;
 }
-interface ButtonToggleComponentProps {
+export interface ButtonToggleComponentProps {
     value?: any;
     /** List of layers */
     options: any;

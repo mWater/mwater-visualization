@@ -6,11 +6,13 @@ export default class LayoutManager {
   /** Renders the layout as a react element */
   renderLayout(options: {
     /** width of layout */
-    width: number
+    width?: number
+
     /** opaque items object that layout manager understands */
     items: any
+
     /** Called when items changes */
-    onItemsChange: (items: any) => void
+    onItemsChange?: (items: any) => void
 
     /** called with ({ id:, type:, design:, onDesignChange:, width:, height:  }) */
     renderWidget: (options: {
@@ -38,7 +40,7 @@ export default class LayoutManager {
     onClipboardChange: (clipboard: any) => void
 
     /** message to display if clipboard can't be pasted into current dashboard */
-    cantPasteMesssage: string
+    cantPasteMessage: string
   }): ReactNode {
     return null
   }

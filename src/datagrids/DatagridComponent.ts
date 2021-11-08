@@ -5,7 +5,7 @@ const R = React.createElement
 
 import AutoSizeComponent from "react-library/lib/AutoSizeComponent"
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent"
-import { DataSource, Expr, ExprUtils, Schema } from "mwater-expressions"
+import { DataSource, Expr, ExprUtils, FieldExpr, Schema } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
 import DatagridViewComponent from "./DatagridViewComponent"
@@ -75,7 +75,8 @@ export default class DatagridComponent extends React.Component<
   }
 > {
   datagridView?: DatagridViewComponent | null
-  quickfilters?: QuickfiltersComponent | null
+  quickfilters?: HTMLElement | null
+  findReplaceModal: FindReplaceModalComponent | null
 
   constructor(props: DatagridComponentProps) {
     super(props)
@@ -140,19 +141,19 @@ export default class DatagridComponent extends React.Component<
   }
 
   // Get datagrid filter compiled for quickfilter filtering
-  getCompiledFilters() {
+  getCompiledFilters(): JsonQLFilter[] {
     let jsonql
     const exprCompiler = new ExprCompiler(this.props.schema)
     const exprUtils = new ExprUtils(this.props.schema)
     const exprCleaner = new ExprCleaner(this.props.schema)
 
-    const compiledFilters = []
+    const compiledFilters: JsonQLFilter[] = []
 
     if (this.props.design.filter) {
       jsonql = exprCompiler.compileExpr({ expr: this.props.design.filter, tableAlias: "{alias}" })
       if (jsonql) {
         compiledFilters.push({
-          table: this.props.design.table,
+          table: this.props.design.table!,
           jsonql
         })
       }
@@ -161,31 +162,31 @@ export default class DatagridComponent extends React.Component<
     // Add global filters
     for (let filter of this.props.design.globalFilters || []) {
       // Check if exists and is correct type
-      const column = this.props.schema.getColumn(this.props.design.table, filter.columnId)
+      const column = this.props.schema.getColumn(this.props.design.table!, filter.columnId)
       if (!column) {
         continue
       }
 
-      const columnExpr = { type: "field", table: this.props.design.table, column: column.id }
+      const columnExpr: Expr = { type: "field", table: this.props.design.table!, column: column.id }
       if (exprUtils.getExprType(columnExpr) !== filter.columnType) {
         continue
       }
 
       // Create expr
-      let expr = {
+      let expr: Expr = {
         type: "op",
         op: filter.op,
-        table: this.props.design.table,
-        exprs: [columnExpr].concat(filter.exprs)
+        table: this.props.design.table!,
+        exprs: [columnExpr as Expr].concat(filter.exprs)
       }
 
       // Clean expr
-      expr = exprCleaner.cleanExpr(expr, { table: this.props.design.table })
+      expr = exprCleaner.cleanExpr(expr, { table: this.props.design.table! })
 
       jsonql = exprCompiler.compileExpr({ expr, tableAlias: "{alias}" })
       if (jsonql) {
         compiledFilters.push({
-          table: this.props.design.table,
+          table: this.props.design.table!,
           jsonql
         })
       }
@@ -245,7 +246,7 @@ export default class DatagridComponent extends React.Component<
       {
         key: "findreplace",
         className: "btn btn-link btn-sm",
-        onClick: () => this.findReplaceModal.show()
+        onClick: () => this.findReplaceModal!.show()
       },
       "Find/Replace"
     )
@@ -273,7 +274,7 @@ export default class DatagridComponent extends React.Component<
       {
         style: { position: "absolute", top: 40, left: 0, right: 0 },
         ref: (c) => {
-          return (this.quickfilters = c)
+          this.quickfilters = c
         }
       },
       R(QuickfiltersComponent, {
@@ -281,8 +282,7 @@ export default class DatagridComponent extends React.Component<
         schema: this.props.schema,
         dataSource: this.props.dataSource,
         quickfiltersDataSource: this.props.datagridDataSource.getQuickfiltersDataSource(),
-        values: this.state.quickfiltersValues,
-        table: this.props.design.table,
+        values: this.state.quickfiltersValues || [],
         onValuesChange: (values: any) => this.setState({ quickfiltersValues: values }),
         locks: this.props.quickfilterLocks,
         filters: this.getCompiledFilters()
@@ -306,7 +306,7 @@ export default class DatagridComponent extends React.Component<
           this.setState({ quickfiltersValues: null })
         }
 
-        this.props.onDesignChange(design)
+        this.props.onDesignChange!(design)
 
         return this.setState({ editingDesign: false })
       },
@@ -316,8 +316,8 @@ export default class DatagridComponent extends React.Component<
 
   renderFindReplaceModal(filters: any) {
     return R(FindReplaceModalComponent, {
-      ref: (c: any) => {
-        return (this.findReplaceModal = c)
+      ref: (c: FindReplaceModalComponent | null) => {
+        this.findReplaceModal = c
       },
       schema: this.props.schema,
       dataSource: this.props.dataSource,
@@ -351,20 +351,20 @@ export default class DatagridComponent extends React.Component<
           paddingTop: 40 + (this.state.quickfiltersHeight || 0)
         }
       },
-      this.renderTitleBar(filters),
+      this.renderTitleBar(),
       this.renderQuickfilter(),
 
       this.renderEditor(),
       this.renderFindReplaceModal(filters),
 
-      R(AutoSizeComponent, { injectWidth: true, injectHeight: true }, (size: any) => {
+      R(AutoSizeComponent, { injectWidth: true, injectHeight: true } as any, (size: any) => {
         // Clean before displaying
         const design = new DatagridUtils(this.props.schema).cleanDesign(this.props.design)
 
         if (!new DatagridUtils(this.props.schema).validateDesign(design)) {
           return R(DatagridViewComponent, {
             ref: (view: DatagridViewComponent | null) => {
-              return (this.datagridView = view)
+              this.datagridView = view
             },
             width: size.width - 1, // minus 1 px to test if it solves the jitter with scroll
             height: size.height - 1,
@@ -394,17 +394,17 @@ export default class DatagridComponent extends React.Component<
   }
 }
 
-// Popup editor
-class DatagridEditorComponent extends React.Component {
-  static propTypes = {
-    schema: PropTypes.object.isRequired, // schema to use
-    dataSource: PropTypes.object.isRequired, // dataSource to use
-    design: PropTypes.object.isRequired, // Design of datagrid. See README.md of this folder
-    onDesignChange: PropTypes.func.isRequired, // Called when design changes
-    onCancel: PropTypes.func.isRequired
-  }
+interface DatagridEditorComponentProps {
+  schema: Schema
+  dataSource: DataSource
+  design: DatagridDesign
+  onDesignChange: (design: DatagridDesign) => void
+  onCancel: () => void
+}
 
-  constructor(props: any) {
+/** Popup editor */
+class DatagridEditorComponent extends React.Component<DatagridEditorComponentProps, { design: DatagridDesign }> {
+  constructor(props: DatagridEditorComponentProps) {
     super(props)
 
     this.state = {

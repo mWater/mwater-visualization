@@ -20,16 +20,6 @@ export default class SettingsModalComponent extends React.Component<SettingsModa
     handleDesignChange: (design: any) => void;
     handleFiltersChange: (filters: any) => void;
     handleGlobalFiltersChange: (globalFilters: any) => void;
-    render(): React.CElement<{
-        title?: React.ReactNode;
-        actionLabel?: React.ReactNode;
-        cancelLabel?: React.ReactNode;
-        deleteLabel?: React.ReactNode;
-        onAction?: (() => void) | undefined;
-        onCancel?: (() => void) | undefined;
-        onDelete?: (() => void) | undefined;
-        size?: "full" | "large" | undefined;
-        actionBusy?: boolean | undefined;
-    }, ActionCancelModalComponent> | null;
+    render(): React.CElement<import("react-library/lib/ActionCancelModalComponent").ActionCancelModalComponentProps, ActionCancelModalComponent> | null;
 }
 export {};

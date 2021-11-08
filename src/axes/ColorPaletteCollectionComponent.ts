@@ -4,11 +4,12 @@ import React from "react"
 const R = React.createElement
 
 import ColorSchemeFactory from "../ColorSchemeFactory"
+import { Axis, AxisCategory } from "./Axis"
 
 interface ColorPaletteCollectionComponentProps {
   onPaletteSelected: any
-  axis: any
-  categories: any
+  axis: Axis
+  categories: AxisCategory[]
   onCancel: any
 }
 
@@ -104,6 +105,7 @@ export default class ColorPaletteCollectionComponent extends React.Component<Col
         R("a", { className: "link-plain", onClick: this.props.onCancel, key: "cancel-customize" }, "Cancel")
       )
     }
+    return null
   }
 
   render() {

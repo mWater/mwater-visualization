@@ -1,41 +1,59 @@
-import PropTypes from "prop-types";
-import React from "react";
+import React, { ReactNode } from "react";
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
-export default class DatagridComponent extends React.Component {
-    static propTypes: {
-        schema: PropTypes.Validator<object>;
-        dataSource: PropTypes.Validator<object>;
-        datagridDataSource: PropTypes.Validator<object>;
-        design: PropTypes.Validator<object>;
-        onDesignChange: PropTypes.Requireable<(...args: any[]) => any>;
-        titleElem: PropTypes.Requireable<PropTypes.ReactNodeLike>;
-        extraTitleButtonsElem: PropTypes.Requireable<PropTypes.ReactNodeLike>;
-        canEditValue: PropTypes.Requireable<(...args: any[]) => any>;
-        updateValue: PropTypes.Requireable<(...args: any[]) => any>;
-        onRowClick: PropTypes.Requireable<(...args: any[]) => any>;
-        onRowDoubleClick: PropTypes.Requireable<(...args: any[]) => any>;
-        quickfilterLocks: PropTypes.Requireable<any[]>;
-        filters: PropTypes.Requireable<(PropTypes.InferProps<{
-            table: PropTypes.Validator<string>;
-            jsonql: PropTypes.Validator<object>;
-        }> | null | undefined)[]>;
-    };
-    constructor(props: any);
-    reload(): any;
+import { DataSource, Expr, Schema } from "mwater-expressions";
+import DatagridViewComponent from "./DatagridViewComponent";
+import FindReplaceModalComponent from "./FindReplaceModalComponent";
+import DatagridDataSource from "./DatagridDataSource";
+import { DatagridDesign, JsonQLFilter } from "..";
+export interface DatagridComponentProps {
+    /** schema to use */
+    schema: Schema;
+    /** dataSource to use */
+    dataSource: DataSource;
+    /** datagrid dataSource to use */
+    datagridDataSource: DatagridDataSource;
+    design: DatagridDesign;
+    /** Called when design changes */
+    onDesignChange?: (design: DatagridDesign) => void;
+    /** Extra element to include in title at left */
+    titleElem?: ReactNode;
+    /** Extra elements to add to right */
+    extraTitleButtonsElem?: ReactNode;
+    canEditValue?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, canEdit?: boolean) => void) => void;
+    /** Update table row expression with a new value
+     * Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
+     */
+    updateValue?: (tableId: string, rowId: any, expr: Expr, value: any, callback: (error: any) => void) => void;
+    /** Called when row is clicked with (tableId, rowId) */
+    onRowClick?: (tableId: string, rowId: any) => void;
+    /** Called when row is double-clicked with (tableId, rowId) */
+    onRowDoubleClick?: (tableId: string, rowId: any) => void;
+    /** Locked quickfilter values. See README in quickfilters */
+    quickfilterLocks?: any[];
+    filters?: JsonQLFilter[];
+}
+export default class DatagridComponent extends React.Component<DatagridComponentProps, {
+    /** is design being edited */
+    editingDesign: boolean;
+    /** True if cells can be edited directly */
+    cellEditingEnabled: boolean;
+    /** Height of quickfilters */
+    quickfiltersHeight: number | null;
+    quickfiltersValues: null | any[];
+}> {
+    datagridView?: DatagridViewComponent | null;
+    quickfilters?: HTMLElement | null;
+    findReplaceModal: FindReplaceModalComponent | null;
+    constructor(props: DatagridComponentProps);
+    reload(): void | undefined;
     componentDidMount(): void;
     componentDidUpdate(): void;
     updateHeight(): void;
-    getQuickfilterValues: () => any;
-    getQuickfilterFilters: () => {
-        table: any;
-        jsonql: string | number | boolean | import("jsonql").JsonQLLiteral | import("jsonql").JsonQLOp | import("jsonql").JsonQLCase | import("jsonql").JsonQLScalar | import("jsonql").JsonQLField | import("jsonql").JsonQLToken;
-    }[];
+    getQuickfilterValues: () => any[];
+    getQuickfilterFilters: () => JsonQLFilter[];
     handleCellEditingToggle: () => void;
     handleEdit: () => void;
-    getCompiledFilters(): {
-        table: any;
-        jsonql: string | number | true | import("jsonql").JsonQLLiteral | import("jsonql").JsonQLOp | import("jsonql").JsonQLCase | import("jsonql").JsonQLScalar | import("jsonql").JsonQLField | import("jsonql").JsonQLToken;
-    }[];
+    getCompiledFilters(): JsonQLFilter[];
     renderCellEdit(): React.DetailedReactHTMLElement<{
         key: string;
         className: string;
@@ -49,7 +67,7 @@ export default class DatagridComponent extends React.Component {
     renderFindReplace(): React.DetailedReactHTMLElement<{
         key: string;
         className: string;
-        onClick: () => any;
+        onClick: () => void;
     }, HTMLElement> | null;
     renderTitleBar(): React.DetailedReactHTMLElement<{
         style: {
@@ -68,38 +86,31 @@ export default class DatagridComponent extends React.Component {
             left: number;
             right: number;
         };
-        ref: (c: HTMLElement | null) => HTMLElement | null;
+        ref: (c: HTMLElement | null) => void;
     }, HTMLElement>;
-    renderEditor(): React.CElement<any, DatagridEditorComponent> | undefined;
-    renderFindReplaceModal(filters: any): React.CElement<any, any>;
+    renderEditor(): React.CElement<DatagridEditorComponentProps, DatagridEditorComponent> | undefined;
+    renderFindReplaceModal(filters: any): React.CElement<any, FindReplaceModalComponent>;
     render(): React.DetailedReactHTMLElement<{
         style: {
             width: string;
             height: string;
             position: "relative";
-            paddingTop: any;
+            paddingTop: number;
         };
     }, HTMLElement>;
 }
-declare class DatagridEditorComponent extends React.Component {
-    static propTypes: {
-        schema: PropTypes.Validator<object>;
-        dataSource: PropTypes.Validator<object>;
-        design: PropTypes.Validator<object>;
-        onDesignChange: PropTypes.Validator<(...args: any[]) => any>;
-        onCancel: PropTypes.Validator<(...args: any[]) => any>;
-    };
-    constructor(props: any);
-    render(): React.CElement<{
-        title?: React.ReactNode;
-        actionLabel?: React.ReactNode;
-        cancelLabel?: React.ReactNode;
-        deleteLabel?: React.ReactNode;
-        onAction?: (() => void) | undefined;
-        onCancel?: (() => void) | undefined;
-        onDelete?: (() => void) | undefined;
-        size?: "full" | "large" | undefined;
-        actionBusy?: boolean | undefined;
-    }, ActionCancelModalComponent>;
+interface DatagridEditorComponentProps {
+    schema: Schema;
+    dataSource: DataSource;
+    design: DatagridDesign;
+    onDesignChange: (design: DatagridDesign) => void;
+    onCancel: () => void;
+}
+/** Popup editor */
+declare class DatagridEditorComponent extends React.Component<DatagridEditorComponentProps, {
+    design: DatagridDesign;
+}> {
+    constructor(props: DatagridEditorComponentProps);
+    render(): React.CElement<import("react-library/lib/ActionCancelModalComponent").ActionCancelModalComponentProps, ActionCancelModalComponent>;
 }
 export {};
