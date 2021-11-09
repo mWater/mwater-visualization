@@ -1,4 +1,5 @@
 import React from "react";
+import { Cell } from "fixed-data-table-2";
 interface ExprCellComponentProps {
     /** schema to use */
     schema: any;
@@ -28,24 +29,6 @@ export default class ExprCellComponent extends React.Component<ExprCellComponent
             paddingRight: number;
         };
     }, HTMLElement>;
-    render(): React.CElement<{
-        width: number;
-        height: number;
-        onClick: any;
-        style: {
-            whiteSpace: string;
-            textAlign: string;
-            opacity: number | undefined;
-        };
-    }, React.Component<{
-        width: number;
-        height: number;
-        onClick: any;
-        style: {
-            whiteSpace: string;
-            textAlign: string;
-            opacity: number | undefined;
-        };
-    }, any, any>>;
+    render(): React.CElement<import("fixed-data-table-2").CellProps, Cell>;
 }
 export {};

@@ -1,64 +1,70 @@
-import PropTypes from "prop-types";
 import React from "react";
-export default class DatagridViewComponent extends React.Component {
-    static propTypes: {
-        width: PropTypes.Validator<number>;
-        height: PropTypes.Validator<number>;
-        pageSize: PropTypes.Requireable<number>;
-        schema: PropTypes.Validator<object>;
-        dataSource: PropTypes.Validator<object>;
-        datagridDataSource: PropTypes.Validator<object>;
-        design: PropTypes.Validator<object>;
-        onDesignChange: PropTypes.Requireable<(...args: any[]) => any>;
-        filters: PropTypes.Requireable<(PropTypes.InferProps<{
-            table: PropTypes.Validator<string>;
-            jsonql: PropTypes.Validator<object>;
-        }> | null | undefined)[]>;
-        canEditCell: PropTypes.Requireable<(...args: any[]) => any>;
-        updateCell: PropTypes.Requireable<(...args: any[]) => any>;
-        onRowDoubleClick: PropTypes.Requireable<(...args: any[]) => any>;
-        onRowClick: PropTypes.Requireable<(...args: any[]) => any>;
-    };
+import { Column } from "fixed-data-table-2";
+import { DataSource, Expr, Schema } from "mwater-expressions";
+import DatagridDataSource from "./DatagridDataSource";
+import { DatagridDesign, JsonQLFilter } from "..";
+export interface DatagridViewComponentProps {
+    /** Width of control */
+    width: number;
+    /** Height of control */
+    height: number;
+    pageSize?: number;
+    schema: Schema;
+    dataSource: DataSource;
+    datagridDataSource: DatagridDataSource;
+    design: DatagridDesign;
+    onDesignChange?: (design: DatagridDesign) => void;
+    filters?: JsonQLFilter[];
+    /** Check if cell is editable
+     * If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
+     */
+    canEditCell?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, editable: boolean) => void) => void;
+    /** Update cell value
+     * Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
+     */
+    updateCell?: (tableId: string, rowId: any, expr: Expr, value: any, callback: (error: any) => void) => void;
+    /** Called when row is double-clicked with (tableId, rowId, rowIndex) */
+    onRowDoubleClick?: (tableId: string, rowId: any, rowIndex: number) => void;
+    /** Called when a row is clicked with (tableId, rowId, rowIndex) */
+    onRowClick?: (tableId: string, rowId: any, rowIndex: number) => void;
+}
+export interface DatagridViewComponentState {
+    rows: any[];
+    entirelyLoaded: boolean;
+    /** set to { rowIndex: 0, 1, 2, columnIndex: 0, 1, 2... } if editing a cell */
+    editingCell: {
+        rowIndex: number;
+        columnIndex: number;
+    } | null;
+    savingCell: boolean;
+}
+interface LoadState {
+    design: DatagridDesign;
+    offset: number;
+    limit: number;
+    filters?: JsonQLFilter[];
+}
+export default class DatagridViewComponent extends React.Component<DatagridViewComponentProps, DatagridViewComponentState> {
     static defaultProps: {
         pageSize: number;
     };
-    constructor(props: any);
-    componentWillReceiveProps(nextProps: any): void;
-    loadMoreRows(): any;
+    loadState: LoadState | null;
+    constructor(props: DatagridViewComponentProps);
+    componentWillReceiveProps(nextProps: DatagridViewComponentProps): void;
+    loadMoreRows(): void;
     reload: () => void;
     deleteRow(rowIndex: any, callback: any): any;
-    reloadRow(rowIndex: any, callback: any): any;
-    handleColumnResize: (newColumnWidth: any, columnKey: any) => any;
-    handleCellClick: (rowIndex: any, columnIndex: any) => any;
+    reloadRow(rowIndex: any, callback: any): void;
+    handleColumnResize: (newColumnWidth: any, columnKey: any) => void;
+    handleCellClick: (rowIndex: any, columnIndex: any) => void;
     handleSaveEdit: () => void;
     handleCancelEdit: () => void;
-    refEditCell: (comp: any) => any;
-    handleRowDoubleClick: (ev: any, rowIndex: any) => any;
-    handleRowClick: (ev: any, rowIndex: any) => any;
-    renderCell: (column: any, columnIndex: any, exprType: any, cellProps: any) => React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> | React.CElement<any, any> | undefined;
-    renderColumn(column: any, columnIndex: any): React.ReactSVGElement;
-    renderColumns(): React.ReactSVGElement[];
-    render(): React.CElement<{
-        rowsCount: any;
-        rowHeight: number;
-        headerHeight: number;
-        width: any;
-        height: any;
-        onRowDoubleClick: (ev: any, rowIndex: any) => any;
-        onRowClick: (ev: any, rowIndex: any) => any;
-        isColumnResizing: boolean;
-        allowCellsRecycling: boolean;
-        onColumnResizeEndCallback: (newColumnWidth: any, columnKey: any) => any;
-    }, React.Component<{
-        rowsCount: any;
-        rowHeight: number;
-        headerHeight: number;
-        width: any;
-        height: any;
-        onRowDoubleClick: (ev: any, rowIndex: any) => any;
-        onRowClick: (ev: any, rowIndex: any) => any;
-        isColumnResizing: boolean;
-        allowCellsRecycling: boolean;
-        onColumnResizeEndCallback: (newColumnWidth: any, columnKey: any) => any;
-    }, any, any>>;
+    refEditCell: (comp: any) => void;
+    handleRowDoubleClick: (ev: any, rowIndex: any) => void;
+    handleRowClick: (ev: any, rowIndex: any) => void;
+    renderCell: (column: any, columnIndex: any, exprType: any, cellProps: any) => React.CElement<any, any> | undefined;
+    renderColumn(column: any, columnIndex: any): React.CElement<import("fixed-data-table-2").ColumnProps, Column>;
+    renderColumns(): React.CElement<import("fixed-data-table-2").ColumnProps, Column>[];
+    render(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 }
+export {};
