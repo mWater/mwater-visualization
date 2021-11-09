@@ -37,7 +37,7 @@ export default class BlocksLayoutManager extends LayoutManager {
   }
 
   // Gets { type, design } of a widget
-  getWidgetTypeAndDesign(items: any, widgetId: any) {
+  getWidgetTypeAndDesign(items: any, widgetId: any): { type: string, design: any } | null {
     if (items.type === "widget" && items.id === widgetId) {
       return { type: items.widgetType, design: items.design }
     }
@@ -55,7 +55,7 @@ export default class BlocksLayoutManager extends LayoutManager {
   }
 
   // Gets all widgets in items as array of { id, type, design }
-  getAllWidgets(items: any) {
+  getAllWidgets(items: any): { id: string; type: string; design: any }[] {
     if (items.type === "widget") {
       return [{ id: items.id, type: items.widgetType, design: items.design }]
     }

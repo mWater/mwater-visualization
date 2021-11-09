@@ -195,7 +195,7 @@ class DirectLayerDataSource implements MapLayerDataSource {
     const layer = LayerFactory.createLayer(this.options.layerView.type)
 
     // Get widget
-    ;({ type, design } = new BlocksLayoutManager().getWidgetTypeAndDesign(design.popup.items, widgetId))
+    ;({ type, design } = new BlocksLayoutManager().getWidgetTypeAndDesign(design.popup.items, widgetId)!)
 
     // Create widget
     const widget = WidgetFactory.createWidget(type)

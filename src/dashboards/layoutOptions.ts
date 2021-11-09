@@ -23,7 +23,7 @@ export interface BlocksLayoutOptions {
 }
 
 /** Get default layout options for a theme */
-export function getDefaultLayoutOptions(theme: DashboardTheme | undefined): BlocksLayoutOptions {
+export function getDefaultLayoutOptions(theme?: DashboardTheme | undefined): BlocksLayoutOptions {
   theme = theme || "default"
 
   return {

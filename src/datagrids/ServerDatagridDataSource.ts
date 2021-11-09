@@ -2,16 +2,36 @@ import $ from "jquery"
 import querystring from "querystring"
 import DatagridDataSource from "./DatagridDataSource"
 import compressJson from "../compressJson"
+import { DatagridDesign } from ".."
 
-// Uses mWater server to get datagrid data to allow sharing with unprivileged users
+export interface ServerDatagridDataSourceOptions {
+  /** API url to use for talking to mWater server */
+  apiUrl: string
+
+  /** client id to use for talking to mWater server */
+  client?: string
+
+  /** share id to use for talking to mWater server */
+  share?: string
+
+  /** datagrid id to use on server */
+  datagridId: string
+
+  /** revision to use to allow caching */
+  rev?: number
+}
+
+/** Uses mWater server to get datagrid data to allow sharing with unprivileged users */
 export default class ServerDatagridDataSource extends DatagridDataSource {
+  options: ServerDatagridDataSourceOptions
+
   // options:
   //   apiUrl: API url to use for talking to mWater server
   //   client: client id to use for talking to mWater server
   //   share: share id to use for talking to mWater server
   //   datagridId: datagrid id to use on server
   //   rev: revision to use to allow caching
-  constructor(options: any) {
+  constructor(options: ServerDatagridDataSourceOptions) {
     super()
     this.options = options
   }
@@ -19,7 +39,7 @@ export default class ServerDatagridDataSource extends DatagridDataSource {
   // Get the data that the widget needs. The widget should implement getData method (see above) to get the data from the server
   //  design: design of the widget. Ignored in the case of server-side rendering
   //  filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
-  getRows(design: any, offset: any, limit: any, filters: any, callback: any) {
+  getRows(design: DatagridDesign, offset: any, limit: any, filters: any, callback: any) {
     const query = {
       client: this.options.client,
       share: this.options.share,
@@ -44,14 +64,32 @@ export default class ServerDatagridDataSource extends DatagridDataSource {
   }
 }
 
+interface ServerQuickfilterDataSourceOptions {
+  /** API url to use for talking to mWater server */
+  apiUrl: string
+
+  /** client id to use for talking to mWater server */
+  client?: string
+
+  /** share id to use for talking to mWater server */
+  share?: string
+
+  /** datagrid id to use on server */
+  datagridId: string
+
+  /** revision to use to allow caching */
+  rev?: number
+}
+
 class ServerQuickfilterDataSource {
+  options: ServerQuickfilterDataSourceOptions
   // options:
   //   apiUrl: API url to use for talking to mWater server
   //   client: client id to use for talking to mWater server
   //   share: share id to use for talking to mWater server
   //   datagridId: datagrid id to use on server
   //   rev: revision to use to allow caching
-  constructor(options: any) {
+  constructor(options: ServerQuickfilterDataSourceOptions) {
     this.options = options
   }
 

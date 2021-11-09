@@ -51,7 +51,7 @@ export default class LayoutManager {
   }
 
   /** Gets { type, design } of a widget */
-  getWidgetTypeAndDesign(items: any, widgetId: string): { type: string; design: any } {
+  getWidgetTypeAndDesign(items: any, widgetId: string): { type: string; design: any } | null {
     throw new Error("Not implemented")
   }
 

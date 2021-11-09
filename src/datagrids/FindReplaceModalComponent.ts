@@ -98,7 +98,7 @@ export default class FindReplaceModalComponent extends React.Component<
           alias: "withValue"
         }
       ],
-      from: { type: "table", table: this.props.design.table, alias: "main" }
+      from: { type: "table", table: this.props.design.table!, alias: "main" }
     }
 
     // Filter by filter
@@ -126,7 +126,7 @@ export default class FindReplaceModalComponent extends React.Component<
       }
 
       // Create expr
-      let expr: Expr = { type: "op", op: filter.op, table: design.table!, exprs: [columnExpr].concat(filter.exprs) }
+      let expr: Expr = { type: "op", op: filter.op, table: design.table!, exprs: [columnExpr as Expr].concat(filter.exprs) }
 
       // Clean expr
       expr = exprCleaner.cleanExpr(expr, { table: design.table! })
@@ -146,7 +146,7 @@ export default class FindReplaceModalComponent extends React.Component<
     this.setState({ progress: 0 })
     // Number completed (twice for each row, once to check can edit and other to perform)
     let completed = 0
-    return this.props.dataSource.performQuery(query, (error: any, rows: any) => {
+    return this.props.dataSource.performQuery(query, (error, rows) => {
       if (error) {
         this.setState({ progress: null })
         alert(`Error: ${error.message}`)
@@ -164,29 +164,29 @@ export default class FindReplaceModalComponent extends React.Component<
           }
 
           // Prevent stack overflow
-          return _.defer(() => {
+          _.defer(() => {
             // First half
             completed += 1
             this.setState({ progress: (completed * 50) / rows.length })
 
-            return this.props.canEditValue(this.props.design.table, row.id, replaceExpr, cb)
+            this.props.canEditValue!(this.props.design.table!, row.id, replaceExpr, cb)
           })
         },
-        (error, canEdits) => {
+        (error, canEdits?: boolean[]) => {
           if (error) {
             this.setState({ progress: null })
             alert(`Error: ${error.message}`)
             return
           }
 
-          if (!_.all(canEdits)) {
+          if (!_.all(canEdits!)) {
             this.setState({ progress: null })
             alert("You do not have permission to replace all values")
             return
           }
 
           // Confirm
-          if (!confirm(`Replace ${canEdits.length} values? This cannot be undone.`)) {
+          if (!confirm(`Replace ${canEdits!.length} values? This cannot be undone.`)) {
             this.setState({ progress: null })
             return
           }
@@ -203,12 +203,12 @@ export default class FindReplaceModalComponent extends React.Component<
               }
 
               // Prevent stack overflow
-              return _.defer(() => {
+              _.defer(() => {
                 // First half
                 completed += 1
                 this.setState({ progress: (completed * 50) / rows.length })
 
-                return this.props.updateValue(this.props.design.table, row.id, replaceExpr, row.withValue, cb)
+                this.props.updateValue!(this.props.design.table!, row.id, replaceExpr, row.withValue, cb)
               })
             },
             (error) => {
@@ -259,7 +259,7 @@ export default class FindReplaceModalComponent extends React.Component<
       })
     })
 
-    return R(AutoSizeComponent, { injectWidth: true }, (size: any) => {
+    return R(AutoSizeComponent, { injectWidth: true } as any, (size: any) => {
       return R(DatagridViewComponent, {
         width: size.width,
         height: 400,
@@ -313,7 +313,7 @@ export default class FindReplaceModalComponent extends React.Component<
         R(ReactSelect, {
           options: replaceColumnOptions,
           value: _.findWhere(replaceColumnOptions, { value: this.state.replaceColumn }) || null,
-          onChange: (opt) => this.setState({ replaceColumn: opt.value }),
+          onChange: (opt: any) => this.setState({ replaceColumn: opt.value }),
           placeholder: "Select Column...",
           styles: {
             // Keep menu above fixed data table headers
@@ -325,7 +325,7 @@ export default class FindReplaceModalComponent extends React.Component<
       (() => {
         if (this.state.replaceColumn) {
           // Get expr of replace column
-          const replaceExpr = _.findWhere(this.props.design.columns, { id: this.state.replaceColumn }).expr
+          const replaceExpr = _.findWhere(this.props.design.columns, { id: this.state.replaceColumn })!.expr
 
           return R(
             "div",
@@ -334,17 +334,18 @@ export default class FindReplaceModalComponent extends React.Component<
             R(ExprComponent, {
               schema: this.props.schema,
               dataSource: this.props.dataSource,
-              table: this.props.design.table,
+              table: this.props.design.table!,
               value: this.state.withExpr,
               onChange: (value) => this.setState({ withExpr: value }),
-              types: [exprUtils.getExprType(replaceExpr)],
-              enumValues: exprUtils.getExprEnumValues(replaceExpr),
-              idTable: exprUtils.getExprIdTable(replaceExpr),
+              types: [exprUtils.getExprType(replaceExpr)!],
+              enumValues: exprUtils.getExprEnumValues(replaceExpr) || undefined,
+              idTable: exprUtils.getExprIdTable(replaceExpr) || undefined,
               preferLiteral: true,
               placeholder: "(Blank)"
             })
           )
         }
+        return null
       })(),
 
       R(
@@ -354,7 +355,7 @@ export default class FindReplaceModalComponent extends React.Component<
         R(ExprComponent, {
           schema: this.props.schema,
           dataSource: this.props.dataSource,
-          table: this.props.design.table,
+          table: this.props.design.table!,
           value: this.state.conditionExpr,
           onChange: (value) => this.setState({ conditionExpr: value }),
           types: ["boolean"],

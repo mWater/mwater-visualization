@@ -2,7 +2,7 @@
 // Sanity-check the conversion and remove this comment.
 import PropTypes from "prop-types"
 import _ from "lodash"
-import React from "react"
+import React, { CSSProperties } from "react"
 const R = React.createElement
 import uuid from "uuid"
 import DraggableBlockComponent from "./DraggableBlockComponent"
@@ -99,7 +99,7 @@ class BlocksDisplayComponent extends React.Component<BlocksDisplayComponentProps
         break
 
       case "spacer":
-        elem = R(AutoSizeComponent, { injectWidth: true, key: block.id }, (size: any) => {
+        elem = R(AutoSizeComponent, { injectWidth: true, key: block.id } as any, (size: any) => {
           return R("div", {
             id: block.id,
             style: {
@@ -138,7 +138,7 @@ class BlocksDisplayComponent extends React.Component<BlocksDisplayComponentProps
         break
 
       case "widget":
-        elem = R(AutoSizeComponent, { injectWidth: true, key: block.id }, (size: any) => {
+        elem = R(AutoSizeComponent, { injectWidth: true, key: block.id } as any, (size: any) => {
           return this.props.renderWidget({
             id: block.id,
             type: block.widgetType,
@@ -317,7 +317,7 @@ class BlocksDisplayComponent extends React.Component<BlocksDisplayComponentProps
   }
 
   render() {
-    let innerParentStyle
+    let innerParentStyle: CSSProperties
     const layoutOptions = this.props.layoutOptions || getDefaultLayoutOptions()
     if (this.props.onItemsChange) {
       innerParentStyle = {}
@@ -349,8 +349,8 @@ class BlocksDisplayComponent extends React.Component<BlocksDisplayComponentProps
         )
       )
     } else {
-      return R(AutoSizeComponent, { injectWidth: true, injectHeight: true }, (size: any) => {
-        const outerParentStyle = { width: "100%", height: "100%", overflowX: "auto" }
+      return R(AutoSizeComponent, { injectWidth: true, injectHeight: true } as any, (size: any) => {
+        const outerParentStyle: CSSProperties = { width: "100%", height: "100%", overflowX: "auto" }
         innerParentStyle = {}
 
         // Remove padding if small

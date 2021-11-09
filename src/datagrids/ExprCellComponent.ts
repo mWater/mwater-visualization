@@ -3,7 +3,7 @@ import _ from "lodash"
 import React from "react"
 const R = React.createElement
 import moment from "moment"
-import { DataSource, ExprUtils, Schema } from "mwater-expressions"
+import { DataSource, ExprUtils, LiteralType, Schema } from "mwater-expressions"
 import { default as Linkify } from "react-linkify"
 import { Cell } from "fixed-data-table-2"
 import { canFormatType } from "../valueFormatter"
@@ -16,7 +16,8 @@ export interface ExprCellComponentProps {
   dataSource: DataSource
   /** Locale to use */
   locale?: string
-  exprType?: string
+
+  exprType: LiteralType
   /** Optional format */
   format?: string
   width: number
@@ -77,7 +78,7 @@ export default class ExprCellComponent extends React.Component<ExprCellComponent
             node = this.renderImage(value.id)
             break
           case "imagelist":
-            node = _.map(value, (v) => this.renderImage(v.id))
+            node = _.map(value, (v: any) => this.renderImage(v.id))
             break
           default:
             node = "" + value
