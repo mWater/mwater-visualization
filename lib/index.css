@@ -494,3 +494,8 @@
 .mapboxgl-map * {
   outline: none;
 }
+
+/* For https://github.com/mWater/mwater-blue/issues/92 */
+.leaflet-top, .leaflet-bottom {
+  z-index: 900;
+}
