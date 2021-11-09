@@ -1,13 +1,14 @@
 import React from "react";
 import AsyncLoadComponent from "react-library/lib/AsyncLoadComponent";
+import { DataSource, Schema } from "mwater-expressions";
 interface TextWidgetComponentProps {
     design: any;
     /** Called with new design. null/undefined for readonly */
     onDesignChange?: any;
     filters?: any;
-    schema: any;
+    schema: Schema;
     /** Data source to use for chart */
-    dataSource: any;
+    dataSource: DataSource;
     widgetDataSource: any;
     width?: number;
     height?: number;

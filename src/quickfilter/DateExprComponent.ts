@@ -166,13 +166,21 @@ export default class DateExprComponent extends React.Component<DateExprComponent
           return R(
             "li",
             { className: "nav-item" },
-            R("a", { className: "nav-link", style: { padding: 5 }, onClick: this.handlePreset.bind(null, preset) }, preset.name)
+            R(
+              "a",
+              { className: "nav-link", style: { padding: 5 }, onClick: this.handlePreset.bind(null, preset) },
+              preset.name
+            )
           )
         }),
         R(
           "li",
           { className: "nav-item" },
-          R("a", { className: "nav-link", style: { padding: 5 }, onClick: () => this.setState({ custom: true }) }, "Custom Date Range...")
+          R(
+            "a",
+            { className: "nav-link", style: { padding: 5 }, onClick: () => this.setState({ custom: true }) },
+            "Custom Date Range..."
+          )
         )
       )
     )

@@ -1,10 +1,11 @@
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
 interface ExprUpdateModalComponentProps {
     /** Schema to use */
-    schema: any;
+    schema: Schema;
     /** Data source to use to get values */
-    dataSource: any;
+    dataSource: DataSource;
     singleRowTable?: string;
 }
 interface ExprUpdateModalComponentState {

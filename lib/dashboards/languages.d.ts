@@ -1,1 +1,1 @@
-declare module "languages";
+declare module "languages"

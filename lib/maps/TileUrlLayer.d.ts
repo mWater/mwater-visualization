@@ -1,5 +1,6 @@
 import React from "react";
 import Layer from "./Layer";
+import { Schema } from "mwater-expressions";
 export interface TileUrlLayerDesign {
     tileUrl: string;
     minZoom?: number;
@@ -13,10 +14,10 @@ export default class TileUrlLayer extends Layer<TileUrlLayerDesign> {
     getMinZoom(design: any): any;
     getMaxZoom(design: any): any;
     isEditable(): boolean;
-    isIncomplete(design: any, schema: any): boolean;
+    isIncomplete(design: any, schema: Schema): boolean;
     createDesignerElement(options: any): React.CElement<TileUrlLayerDesignerComponentProps, TileUrlLayerDesignerComponent>;
-    cleanDesign(design: any, schema: any): any;
-    validateDesign(design: any, schema: any): "Missing Url" | null;
+    cleanDesign(design: any, schema: Schema): any;
+    validateDesign(design: any, schema: Schema): "Missing Url" | null;
 }
 interface TileUrlLayerDesignerComponentProps {
     /** Design of the marker layer */

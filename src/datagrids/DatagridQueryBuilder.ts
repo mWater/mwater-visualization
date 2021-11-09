@@ -263,7 +263,12 @@ export default class DatagridQueryBuilder {
       }
 
       // Create expr
-      let expr: Expr = { type: "op", op: filter.op, table: design.table!, exprs: [columnExpr as Expr].concat(filter.exprs) }
+      let expr: Expr = {
+        type: "op",
+        op: filter.op,
+        table: design.table!,
+        exprs: [columnExpr as Expr].concat(filter.exprs)
+      }
 
       // Clean expr
       expr = exprCleaner.cleanExpr(expr, { table: design.table! })
@@ -352,7 +357,12 @@ export default class DatagridQueryBuilder {
         kind: "inner",
         left: { type: "table", table: design.table!, alias: "main" },
         right: { type: "table", table: subtableTable, alias: "st" },
-        on: exprCompiler.compileJoin(design.table!, this.schema.getColumn(design.table!, subtable.joins[0])!, "main", "st")
+        on: exprCompiler.compileJoin(
+          design.table!,
+          this.schema.getColumn(design.table!, subtable.joins[0])!,
+          "main",
+          "st"
+        )
       }
     }
 
@@ -527,7 +537,12 @@ export default class DatagridQueryBuilder {
   }
 
   /** Create the select for a column in JsonQL format */
-  createColumnSelect(column: DatagridDesignColumn, columnIndex: any, subtable?: any, fillSubtableRows?: any): JsonQLSelect {
+  createColumnSelect(
+    column: DatagridDesignColumn,
+    columnIndex: any,
+    subtable?: any,
+    fillSubtableRows?: any
+  ): JsonQLSelect {
     const exprUtils = new ExprUtils(this.schema)
     const exprCleaner = new ExprCleaner(this.schema)
 

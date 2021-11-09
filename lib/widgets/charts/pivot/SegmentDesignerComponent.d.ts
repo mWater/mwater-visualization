@@ -1,10 +1,11 @@
 import React from "react";
 import * as ui from "react-library/lib/bootstrap";
+import { DataSource, Schema } from "mwater-expressions";
 interface SegmentDesignerComponentProps {
     segment: any;
     table: string;
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
     /** "row" or "column" */
     segmentType: string;
     onChange: any;

@@ -1,10 +1,11 @@
 import React from "react";
 import * as ui from "../../../UIComponents";
+import { DataSource, Schema } from "mwater-expressions";
 import { CalendarChartDesign } from "./CalendarChart";
 interface CalendarChartDesignerComponentProps {
     design: CalendarChartDesign;
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
     onDesignChange: (design: CalendarChartDesign) => void;
     filters?: any;
 }

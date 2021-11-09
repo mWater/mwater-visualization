@@ -1,9 +1,10 @@
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 interface OrderBysDesignerComponentProps {
     /** schema to use */
-    schema: any;
+    schema: Schema;
     /** dataSource to use */
-    dataSource: any;
+    dataSource: DataSource;
     table: string;
     /** Columns list See README.md of this folder */
     orderBys: any;

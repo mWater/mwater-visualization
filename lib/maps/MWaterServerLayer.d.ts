@@ -1,6 +1,7 @@
 /// <reference types="jquery" />
 import Layer from "./Layer";
 import React from "react";
+import { Schema } from "mwater-expressions";
 export default class MWaterServerLayer extends Layer<any> {
     onGridClick(ev: any, options: any): {
         row: {
@@ -10,11 +11,11 @@ export default class MWaterServerLayer extends Layer<any> {
     } | null;
     getMinZoom(design: any): any;
     getMaxZoom(design: any): any;
-    getLegend(design: any, schema: any): React.CElement<any, LoadingLegend>;
-    getFilterableTables(design: any, schema: any): any[];
+    getLegend(design: any, schema: Schema): React.CElement<any, LoadingLegend>;
+    getFilterableTables(design: any, schema: Schema): any[];
     isEditable(): boolean;
-    cleanDesign(design: any, schema: any): any;
-    validateDesign(design: any, schema: any): null;
+    cleanDesign(design: any, schema: Schema): any;
+    validateDesign(design: any, schema: Schema): null;
 }
 interface LoadingLegendProps {
     url?: string;

@@ -3,7 +3,7 @@ import { ExprValidator } from "mwater-expressions";
 import { ExprUtils } from "mwater-expressions";
 import { ExprCleaner } from "mwater-expressions";
 import { Axis, AxisCategory } from "./Axis";
-import { JsonQLExpr } from "jsonql";
+import { JsonQLExpr, JsonQLSelectQuery } from "jsonql";
 declare type AggrNeed = "none" | "optional" | "required";
 export default class AxisBuilder {
     schema: Schema;
@@ -40,60 +40,7 @@ export default class AxisBuilder {
         axis: Axis;
         tableAlias: string;
     }): JsonQLExpr;
-    compileBinMinMax(expr: any, table: any, filterExpr: any, numBins: any): {
-        type: string;
-        selects: {
-            type: string;
-            expr: {
-                type: string;
-                op: string;
-                exprs: {
-                    type: string;
-                    tableAlias: string;
-                    column: string;
-                }[];
-            };
-            alias: string;
-        }[];
-        from: {
-            type: string;
-            query: {
-                type: string;
-                selects: ({
-                    type: string;
-                    expr: string | number | true | import("jsonql").JsonQLLiteral | import("jsonql").JsonQLOp | import("jsonql").JsonQLCase | import("jsonql").JsonQLScalar | import("jsonql").JsonQLField | import("jsonql").JsonQLToken;
-                    alias: string;
-                    over?: undefined;
-                } | {
-                    type: string;
-                    expr: {
-                        type: string;
-                        op: string;
-                        exprs: any[];
-                    };
-                    over: {
-                        orderBy: {
-                            expr: string | number | true | import("jsonql").JsonQLLiteral | import("jsonql").JsonQLOp | import("jsonql").JsonQLCase | import("jsonql").JsonQLScalar | import("jsonql").JsonQLField | import("jsonql").JsonQLToken;
-                            direction: string;
-                        }[];
-                    };
-                    alias: string;
-                })[];
-                from: {
-                    type: string;
-                    table: any;
-                    alias: string;
-                };
-                where: import("jsonql").JsonQLOp;
-            };
-            alias: string;
-        };
-        where: {
-            type: string;
-            op: string;
-            exprs: any[];
-        };
-    } | null;
+    compileBinMinMax(expr: any, table: any, filterExpr: any, numBins: any): JsonQLSelectQuery | null;
     getExprTypes(types: any): any;
     getValueColor(axis: Axis, value: any): string | null;
     /** Get all categories for a given axis type given the known values

@@ -1,9 +1,10 @@
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 import EditPopupComponent from "./EditPopupComponent";
 interface BufferLayerDesignerComponentProps {
     /** Schema to use */
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
     /** Design of the design */
     design: any;
     /** Called with new design */

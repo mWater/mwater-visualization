@@ -1,11 +1,12 @@
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 interface QuickfiltersDesignComponentProps {
     /** Design of quickfilters. See README.md */
     design: any;
     /** Called when design changes */
     onDesignChange: any;
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
     /** List of possible table ids to use */
     tables: any;
 }
@@ -27,8 +28,8 @@ interface QuickfilterDesignComponentProps {
     onRemove: any;
     /** True if can be merged */
     mergeable?: boolean;
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
     tables: any;
 }
 interface QuickfilterDesignComponentState {

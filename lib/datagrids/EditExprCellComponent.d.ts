@@ -1,9 +1,10 @@
 import React from "react";
-interface EditExprCellComponentProps {
+import { DataSource, EnumValue, Schema } from "mwater-expressions";
+export interface EditExprCellComponentProps {
     /** schema to use */
-    schema: any;
+    schema: Schema;
     /** dataSource to use */
-    dataSource: any;
+    dataSource: DataSource;
     /** Locale to use */
     locale?: string;
     width: number;
@@ -33,7 +34,8 @@ interface TextEditComponentProps {
     onCancel: any;
 }
 declare class TextEditComponent extends React.Component<TextEditComponentProps> {
-    componentDidMount(): any;
+    input: HTMLInputElement | null;
+    componentDidMount(): void | undefined;
     render(): React.DetailedReactHTMLElement<{
         style: {
             paddingTop: number;
@@ -42,7 +44,7 @@ declare class TextEditComponent extends React.Component<TextEditComponentProps> 
 }
 interface EnumEditComponentProps {
     value?: any;
-    enumValues: any;
+    enumValues: EnumValue[];
     /** Locale to use */
     locale?: string;
     /** Called with new value */

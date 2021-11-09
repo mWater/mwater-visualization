@@ -1,16 +1,18 @@
 import React from "react";
 import Widget from "./Widget";
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent";
+import { DataSource, Schema } from "mwater-expressions";
+import { WidgetDataSource } from "./WidgetDataSource";
 export default class MapWidget extends Widget {
     createViewElement(options: any): React.CElement<any, MapWidgetComponent>;
-    getFilterableTables(design: any, schema: any): string[];
+    getFilterableTables(design: any, schema: Schema): string[];
 }
 interface MapWidgetComponentProps {
     /** Schema to use */
-    schema: any;
+    schema: Schema;
     /** Data source to use */
-    dataSource: any;
-    widgetDataSource: any;
+    dataSource: DataSource;
+    widgetDataSource: WidgetDataSource;
     /** See Map Design.md */
     design: any;
     /** Called with new design.  null/undefined for readonly */

@@ -214,9 +214,7 @@ export default class DashboardComponent extends React.Component<DashboardCompone
     const design = new DashboardUpgrader().upgrade(this.props.design)
     this.props.onDesignChange!(design)
 
-    alert(
-      "Upgrade completed. Some widgets may need to be resized. Click Undo to revert back to old dashboard style."
-    )
+    alert("Upgrade completed. Some widgets may need to be resized. Click Undo to revert back to old dashboard style.")
   }
 
   // Get filters from props filters combined with dashboard filters

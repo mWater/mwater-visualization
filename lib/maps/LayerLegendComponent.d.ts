@@ -1,6 +1,7 @@
 import React from "react";
+import { Schema } from "mwater-expressions";
 interface LayerLegendComponentProps {
-    schema: any;
+    schema: Schema;
     name: string;
     radiusLayer?: boolean;
     axis?: any;

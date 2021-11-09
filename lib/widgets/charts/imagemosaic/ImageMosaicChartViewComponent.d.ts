@@ -1,11 +1,12 @@
 import React from "react";
+import { DataSource } from "mwater-expressions";
 interface ImageMosaicChartViewComponentProps {
     /** Design of chart */
     design: any;
     /** Data that the chart has requested. In format  [image: {image data or imagelist data}] */
     data: any;
     /** Data source to use */
-    dataSource: any;
+    dataSource: DataSource;
     width?: number;
     height?: number;
     onRowClick?: any;

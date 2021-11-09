@@ -1,7 +1,8 @@
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 interface BinsComponentProps {
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
     /** Expression for computing min/max */
     expr: any;
     xform: any;
@@ -13,7 +14,7 @@ interface BinsComponentState {
 export default class BinsComponent extends React.Component<BinsComponentProps, BinsComponentState> {
     unmounted?: boolean;
     constructor(props: any);
-    componentDidMount(): any;
+    componentDidMount(): void;
     componentWillUnmount(): boolean;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }

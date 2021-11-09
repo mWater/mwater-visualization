@@ -1,6 +1,8 @@
 import React from "react";
-import { Column } from "fixed-data-table-2";
+import { Table, Column, Cell } from "fixed-data-table-2";
 import { DataSource, Expr, Schema } from "mwater-expressions";
+import ExprCellComponent from "./ExprCellComponent";
+import EditExprCellComponent from "./EditExprCellComponent";
 import DatagridDataSource from "./DatagridDataSource";
 import { DatagridDesign, JsonQLFilter } from "..";
 export interface DatagridViewComponentProps {
@@ -18,7 +20,7 @@ export interface DatagridViewComponentProps {
     /** Check if cell is editable
      * If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
      */
-    canEditCell?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, editable: boolean) => void) => void;
+    canEditCell?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, editable?: boolean) => void) => void;
     /** Update cell value
      * Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
      */
@@ -49,6 +51,7 @@ export default class DatagridViewComponent extends React.Component<DatagridViewC
         pageSize: number;
     };
     loadState: LoadState | null;
+    editCellComp: EditExprCellComponent | null;
     constructor(props: DatagridViewComponentProps);
     componentWillReceiveProps(nextProps: DatagridViewComponentProps): void;
     loadMoreRows(): void;
@@ -59,12 +62,12 @@ export default class DatagridViewComponent extends React.Component<DatagridViewC
     handleCellClick: (rowIndex: any, columnIndex: any) => void;
     handleSaveEdit: () => void;
     handleCancelEdit: () => void;
-    refEditCell: (comp: any) => void;
+    refEditCell: (comp: EditExprCellComponent | null) => void;
     handleRowDoubleClick: (ev: any, rowIndex: any) => void;
     handleRowClick: (ev: any, rowIndex: any) => void;
-    renderCell: (column: any, columnIndex: any, exprType: any, cellProps: any) => React.CElement<any, any> | undefined;
+    renderCell: (column: any, columnIndex: any, exprType: any, cellProps: any) => React.CElement<import("fixed-data-table-2").CellProps, Cell> | React.CElement<any, EditExprCellComponent> | React.CElement<import("./ExprCellComponent").ExprCellComponentProps, ExprCellComponent> | null;
     renderColumn(column: any, columnIndex: any): React.CElement<import("fixed-data-table-2").ColumnProps, Column>;
     renderColumns(): React.CElement<import("fixed-data-table-2").ColumnProps, Column>[];
-    render(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+    render(): React.CElement<import("fixed-data-table-2").TableProps, Table>;
 }
 export {};

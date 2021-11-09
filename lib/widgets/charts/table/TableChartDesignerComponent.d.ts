@@ -1,8 +1,9 @@
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 interface TableChartDesignerComponentProps {
     design: any;
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
     onDesignChange: any;
 }
 export default class TableChartDesignerComponent extends React.Component<TableChartDesignerComponentProps> {

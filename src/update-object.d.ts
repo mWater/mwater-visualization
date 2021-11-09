@@ -1,1 +1,1 @@
-declare module "update-object";
+declare module "update-object"

@@ -1,9 +1,10 @@
 import React from "react";
 import * as ui from "react-library/lib/bootstrap";
+import { DataSource, Schema } from "mwater-expressions";
 interface PivotChartDesignerComponentProps {
     design: any;
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
     onDesignChange: any;
     filters?: any;
 }

@@ -2,12 +2,13 @@
 import PropTypes from "prop-types";
 import React from "react";
 import * as uiComponents from "./UIComponents";
+import { Schema } from "mwater-expressions";
 interface MWaterCompleteTableSelectComponentProps {
     /** Url to hit api */
     apiUrl: string;
     /** Optional client */
     client?: string;
-    schema: any;
+    schema: Schema;
     /** User id */
     user?: string;
     table?: string;
@@ -28,7 +29,7 @@ export default class MWaterCompleteTableSelectComponent extends React.Component<
             desc?: string | undefined;
             onClick: () => void;
             onRemove?: (() => void) | undefined;
-        }[];
+        }[]; /** Called with table selected */
         hint?: string | undefined;
     }, uiComponents.OptionListComponent>;
     renderForms(): React.CElement<any, FormsListComponent>;
@@ -40,12 +41,12 @@ export default class MWaterCompleteTableSelectComponent extends React.Component<
             desc?: string | undefined;
             onClick: () => void;
             onRemove?: (() => void) | undefined;
-        }[];
+        }[]; /** Called with table selected */
         hint?: string | undefined;
     }, uiComponents.OptionListComponent>;
     renderTablesets(): React.FunctionComponentElement<{
         apiUrl: string;
-        schema: import("mwater-expressions").Schema;
+        schema: Schema;
         client?: string | undefined;
         user?: string | undefined;
         onChange: (tableId: string | null) => void;
@@ -56,7 +57,7 @@ export default class MWaterCompleteTableSelectComponent extends React.Component<
     }>;
     renderMetrics(): React.FunctionComponentElement<{
         apiUrl: string;
-        schema: import("mwater-expressions").Schema;
+        schema: Schema;
         client?: string | undefined;
         user?: string | undefined;
         onChange: (tableId: string | null) => void;
@@ -71,10 +72,10 @@ export default class MWaterCompleteTableSelectComponent extends React.Component<
             desc?: string | undefined;
             onClick: () => void;
             onRemove?: (() => void) | undefined;
-        }[];
+        }[]; /** Called with table selected */
         hint?: string | undefined;
     }, uiComponents.OptionListComponent>;
-    getSweetSenseTables(): unknown[];
+    getSweetSenseTables(): import("mwater-expressions").Table[];
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
 interface FormsListComponentProps {
@@ -82,7 +83,7 @@ interface FormsListComponentProps {
     apiUrl: string;
     /** Optional client */
     client?: string;
-    schema: any;
+    schema: Schema;
     /** User id */
     user?: string;
     /** Called with table selected */
@@ -113,7 +114,7 @@ interface IndicatorsListComponentProps {
     apiUrl: string;
     /** Optional client */
     client?: string;
-    schema: any;
+    schema: Schema;
     /** User id */
     user?: string;
     /** Called with table selected */
@@ -145,7 +146,7 @@ interface IssuesListComponentProps {
     apiUrl: string;
     /** Optional client */
     client?: string;
-    schema: any;
+    schema: Schema;
     /** User id */
     user?: string;
     /** Called with table selected */

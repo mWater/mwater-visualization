@@ -1,4 +1,5 @@
 import React from "react";
+import { Schema } from "mwater-expressions";
 interface MWaterAddRelatedFormComponentProps {
     table: string;
     apiUrl: string;
@@ -7,7 +8,7 @@ interface MWaterAddRelatedFormComponentProps {
     user?: string;
     /** Called with table id e.g. responses:someid */
     onSelect: any;
-    schema: any;
+    schema: Schema;
 }
 interface MWaterAddRelatedFormComponentState {
     waitingForTable: any;

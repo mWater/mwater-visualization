@@ -136,7 +136,7 @@ export default class Layer<LayerDesign> {
     cleanDesign(design: LayerDesign, schema: Schema): LayerDesign;
     /** Validates design. Null if ok, message otherwise */
     validateDesign(design: LayerDesign, schema: Schema): string | null;
-    getKMLExportJsonQL(design: any, schema: any, filters: any): void;
+    getKMLExportJsonQL(design: any, schema: Schema, filters: any): void;
     /** Convenience function to get the bounds of a geometry expression with filters */
     getBoundsFromExpr(schema: Schema, dataSource: DataSource, table: string, geometryExpr: Expr, filterExpr: Expr, filters: JsonQLFilter[], callback: (err: any, bounds?: {
         n: number;

@@ -1,6 +1,7 @@
 import React from "react";
+import { Schema } from "mwater-expressions";
 interface MWaterResponsesFilterComponentProps {
-    schema: any;
+    schema: Schema;
     /** responses:xyz */
     table: string;
     filter?: any;
@@ -28,7 +29,7 @@ export default class MWaterResponsesFilterComponent extends React.Component<MWat
         })[];
     };
     isFinal(): boolean;
-    getSiteValue(): any;
+    getSiteValue(): string | null;
     handleSiteChange: (site: any) => any;
     handleFinalChange: (final: any) => any;
     handleChange: (final: any, site: any) => any;

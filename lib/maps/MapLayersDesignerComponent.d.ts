@@ -1,8 +1,9 @@
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 interface MapLayersDesignerComponentProps {
     /** Schema to use */
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
     /** See Map Design.md */
     design: any;
     /** Called with new design */

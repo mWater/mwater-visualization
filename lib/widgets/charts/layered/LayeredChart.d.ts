@@ -2,9 +2,10 @@ import React from "react";
 import Chart from "../Chart";
 import { DataSource, Schema } from "mwater-expressions";
 import { LayeredChartDesign } from "./LayeredChartDesign";
+import { WidgetDataSource } from "../../WidgetDataSource";
 export default class LayeredChart extends Chart {
-    cleanDesign(design: any, schema: any): <Base extends (draft: any) => void>(base?: Base | undefined, ...rest: unknown[]) => any;
-    validateDesign(design: any, schema: any): string | null | undefined;
+    cleanDesign(design: any, schema: Schema): <Base extends (draft: any) => void>(base?: Base | undefined, ...rest: unknown[]) => any;
+    validateDesign(design: any, schema: Schema): string | null | undefined;
     isEmpty(design: any): boolean;
     createDesignerElement(options: any): React.FunctionComponentElement<{
         schema: any;
@@ -13,14 +14,14 @@ export default class LayeredChart extends Chart {
         filters: any;
         onDesignChange: (design: any) => any;
     }>;
-    getData(design: any, schema: any, dataSource: any, filters: any, callback: any): void;
+    getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any): void;
     createViewElement(options: any): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
-    createDropdownItems(design: any, schema: any, widgetDataSource: any, filters: any): {
+    createDropdownItems(design: any, schema: Schema, widgetDataSource: WidgetDataSource, filters: any): {
         label: string;
         icon: string;
         onClick: any;
     }[];
     createDataTable(design: LayeredChartDesign, schema: Schema, dataSource: DataSource, data: any, locale: string): any[][];
-    getFilterableTables(design: any, schema: any): any[];
+    getFilterableTables(design: any, schema: Schema): any[];
     getPlaceholderIcon(): string;
 }

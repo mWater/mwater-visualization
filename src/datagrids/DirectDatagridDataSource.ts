@@ -5,13 +5,13 @@ import { DataSource, Schema } from "mwater-expressions"
 
 // Uses direct DataSource queries
 export default class DirectDatagridDataSource {
-  options: { schema: Schema, dataSource: DataSource }
-  
+  options: { schema: Schema; dataSource: DataSource }
+
   // Create dashboard data source that uses direct jsonql calls
   // options:
   //   schema: schema to use
   //   dataSource: data source to use
-  constructor(options: { schema: Schema, dataSource: DataSource }) {
+  constructor(options: { schema: Schema; dataSource: DataSource }) {
     this.options = options
   }
 

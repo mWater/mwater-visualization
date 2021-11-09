@@ -10,7 +10,7 @@ import { DatagridDesign, JsonQLFilter } from ".."
 
 export interface DatagridViewComponentProps {
   /** Width of control */
-  width: number 
+  width: number
 
   /** Height of control */
   height: number
@@ -48,7 +48,7 @@ export interface DatagridViewComponentState {
   entirelyLoaded: boolean
 
   /** set to { rowIndex: 0, 1, 2, columnIndex: 0, 1, 2... } if editing a cell */
-  editingCell: { rowIndex: number, columnIndex: number } | null
+  editingCell: { rowIndex: number; columnIndex: number } | null
 
   savingCell: boolean
 }
@@ -63,7 +63,10 @@ interface LoadState {
 // Datagrid table itself without decorations such as edit button etc.
 // See README.md for description of datagrid format
 // Design should be cleaned already before being passed in (see DatagridUtils)
-export default class DatagridViewComponent extends React.Component<DatagridViewComponentProps, DatagridViewComponentState> {
+export default class DatagridViewComponent extends React.Component<
+  DatagridViewComponentProps,
+  DatagridViewComponentState
+> {
   static defaultProps = { pageSize: 100 }
 
   loadState: LoadState | null

@@ -1,8 +1,10 @@
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 import Chart from "../Chart";
+import { WidgetDataSource } from "../../WidgetDataSource";
 export default class PivotChart extends Chart {
-    cleanDesign(design: any, schema: any): any;
-    validateDesign(design: any, schema: any): string | null;
+    cleanDesign(design: any, schema: Schema): any;
+    validateDesign(design: any, schema: Schema): string | null;
     isAutoHeight(): boolean;
     isEmpty(design: any): boolean;
     hasDesignerPreview(): boolean;
@@ -14,10 +16,10 @@ export default class PivotChart extends Chart {
         filters: any;
         onDesignChange: (design: any) => any;
     }>;
-    getData(design: any, schema: any, dataSource: any, filters: any, callback: any): void;
+    getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any): void;
     createViewElement(options: any): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
-    createDropdownItems(design: any, schema: any, widgetDataSource: any, filters: any): never[];
-    createDataTable(design: any, schema: any, dataSource: any, data: any, locale: any): any[][];
-    getFilterableTables(design: any, schema: any): any[];
+    createDropdownItems(design: any, schema: Schema, widgetDataSource: WidgetDataSource, filters: any): never[];
+    createDataTable(design: any, schema: Schema, dataSource: DataSource, data: any, locale: any): any[][];
+    getFilterableTables(design: any, schema: Schema): any[];
     getPlaceholderIcon(): string;
 }

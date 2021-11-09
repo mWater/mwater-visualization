@@ -1,11 +1,12 @@
 import PropTypes from "prop-types";
 import React from "react";
+import { Schema } from "mwater-expressions";
 interface MWaterTableSelectComponentProps {
     /** Url to hit api */
     apiUrl: string;
     /** Optional client */
     client?: string;
-    schema: any;
+    schema: Schema;
     /** User id */
     user?: string;
     table?: string;

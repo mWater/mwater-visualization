@@ -1,5 +1,7 @@
+import { Schema } from "mwater-expressions";
 export default class ImplicitFilterBuilder {
-    constructor(schema: any);
+    schema: Schema;
+    constructor(schema: Schema);
     findJoins(filterableTables: any): any;
     extendFilters(filterableTables: any, filters: any): any;
 }

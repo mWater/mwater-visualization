@@ -1,9 +1,10 @@
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 import * as uiComponents from "../../../UIComponents";
 interface LayeredChartLayerDesignerComponentProps {
     design: any;
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
     index: number;
     onChange: any;
     onRemove: any;

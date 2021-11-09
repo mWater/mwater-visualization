@@ -722,7 +722,11 @@ are certain that you want to use the raw indicator table`
       R(
         "div",
         null,
-        R("a", { className: "link-plain", onClick: this.props.onChange.bind(null, this.state.indicatorTable) }, "Use Raw Indicator")
+        R(
+          "a",
+          { className: "link-plain", onClick: this.props.onChange.bind(null, this.state.indicatorTable) },
+          "Use Raw Indicator"
+        )
       )
     )
   }

@@ -1,8 +1,9 @@
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 interface DetailLevelSelectComponentProps {
     /** Schema to use */
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
     /** admin region */
     scope: string;
     /** admin region */

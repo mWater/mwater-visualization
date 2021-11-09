@@ -1,9 +1,10 @@
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 interface ExprInsertModalComponentProps {
     /** Schema to use */
-    schema: any;
+    schema: Schema;
     /** Data source to use to get values */
-    dataSource: any;
+    dataSource: DataSource;
     /** Called with expr item to insert */
     onInsert: any;
     singleRowTable?: string;

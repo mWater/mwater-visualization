@@ -1,10 +1,11 @@
 import PropTypes from "prop-types";
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 interface MapFiltersDesignerComponentProps {
     /** Schema to use */
-    schema: any;
+    schema: Schema;
     /** Data source to use */
-    dataSource: any;
+    dataSource: DataSource;
     /** See Map Design.md */
     design: any;
     /** Called with new design */

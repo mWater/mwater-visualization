@@ -5,9 +5,9 @@ import { Schema, DataSource } from "mwater-expressions";
 export default class DirectDashboardDataSource extends DashboardDataSource {
     options: {
         /** schema to use */
-        schema: any;
+        schema: Schema;
         /** data source to use */
-        dataSource: any;
+        dataSource: DataSource;
         /** API url to use for talking to mWater server */
         apiUrl: string;
         /** client id to use for talking to mWater server */

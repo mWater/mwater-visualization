@@ -11,9 +11,9 @@ const R = React.createElement
 import { default as produce } from "immer"
 import { formatValue } from "../valueFormatter"
 import { Axis, AxisCategory } from "./Axis"
-import { JsonQLExpr } from "jsonql"
+import { JsonQLExpr, JsonQLSelectQuery } from "jsonql"
 
-const xforms: { type: string, input: LiteralType, output: LiteralType }[] = [
+const xforms: { type: string; input: LiteralType; output: LiteralType }[] = [
   { type: "bin", input: "number", output: "enum" },
   { type: "ranges", input: "number", output: "enum" },
   { type: "floor", input: "number", output: "enum" },
@@ -331,7 +331,7 @@ export default class AxisBuilder {
 
       // Ranges
       if (options.axis.xform.type === "ranges") {
-        const cases: { when: JsonQLExpr, then: JsonQLExpr }[] = []
+        const cases: { when: JsonQLExpr; then: JsonQLExpr }[] = []
         for (let range of options.axis.xform.ranges!) {
           const whens: JsonQLExpr[] = []
           if (range.minValue != null) {
@@ -409,8 +409,16 @@ export default class AxisBuilder {
     }
 
     // Create expression that selects the min or max
-    const minExpr = { type: "op", op: "min", exprs: [{ type: "field", tableAlias: "inner", column: "val" }] }
-    const maxExpr = { type: "op", op: "max", exprs: [{ type: "field", tableAlias: "inner", column: "val" }] }
+    const minExpr: JsonQLExpr = {
+      type: "op",
+      op: "min",
+      exprs: [{ type: "field", tableAlias: "inner", column: "val" }]
+    }
+    const maxExpr: JsonQLExpr = {
+      type: "op",
+      op: "max",
+      exprs: [{ type: "field", tableAlias: "inner", column: "val" }]
+    }
 
     // Only include not null values
     let where: JsonQLExpr = {
@@ -427,7 +435,7 @@ export default class AxisBuilder {
       }
     }
 
-    const query = {
+    const query: JsonQLSelectQuery = {
       type: "query",
       selects: [
         { type: "select", expr: minExpr, alias: "min" },
@@ -444,10 +452,10 @@ export default class AxisBuilder {
               expr: {
                 type: "op",
                 op: "ntile",
-                exprs: [numBins + 2]
-              },
-              over: {
-                orderBy: [{ expr: compiledExpr, direction: "asc" }]
+                exprs: [numBins + 2],
+                over: {
+                  orderBy: [{ expr: compiledExpr, direction: "asc" }]
+                }
               },
               alias: "ntilenum"
             }
@@ -503,34 +511,36 @@ export default class AxisBuilder {
 
     // Handle ranges
     if (axis.xform && axis.xform.type === "ranges") {
-      return (_.map(axis.xform.ranges || [], (range) => {
-        let label = range.label || ""
-        if (!label) {
-          if (range.minValue != null) {
-            if (range.minOpen) {
-              label = `> ${range.minValue}`
-            } else {
-              label = `>= ${range.minValue}`
+      return (
+        _.map(axis.xform.ranges || [], (range) => {
+          let label = range.label || ""
+          if (!label) {
+            if (range.minValue != null) {
+              if (range.minOpen) {
+                label = `> ${range.minValue}`
+              } else {
+                label = `>= ${range.minValue}`
+              }
+            }
+
+            if (range.maxValue != null) {
+              if (label) {
+                label += " and "
+              }
+              if (range.maxOpen) {
+                label += `< ${range.maxValue}`
+              } else {
+                label += `<= ${range.maxValue}`
+              }
             }
           }
 
-          if (range.maxValue != null) {
-            if (label) {
-              label += " and "
-            }
-            if (range.maxOpen) {
-              label += `< ${range.maxValue}`
-            } else {
-              label += `<= ${range.maxValue}`
-            }
+          return {
+            value: range.id,
+            label
           }
-        }
-
-        return {
-          value: range.id,
-          label
-        } 
-      }) as AxisCategory[]).concat([noneCategory])
+        }) as AxisCategory[]
+      ).concat([noneCategory])
     }
 
     // Handle binning
@@ -760,17 +770,13 @@ export default class AxisBuilder {
         year = current.format("YYYY")
         if (quarter === "1") {
           label = `${year} Jan-Mar`
-        }
-        else if (quarter === "2") {
+        } else if (quarter === "2") {
           label = `${year} Apr-Jun`
-        }
-        else if (quarter === "3") {
+        } else if (quarter === "3") {
           label = `${year} Jul-Sep`
-        }
-        else if (quarter === "4") {
+        } else if (quarter === "4") {
           label = `${year} Oct-Dec`
-        }
-        else { 
+        } else {
           label = ""
         }
         categories.push({ value, label })
@@ -792,10 +798,12 @@ export default class AxisBuilder {
       case "enum":
       case "enumset":
         // If enum, return enum values
-        return (_.map(this.exprUtils.getExprEnumValues(axis.expr)!, (ev) => ({
-          value: ev.id,
-          label: ExprUtils.localizeString(ev.name, locale)
-        })) as { value: any, label: string }[]).concat([noneCategory])
+        return (
+          _.map(this.exprUtils.getExprEnumValues(axis.expr)!, (ev) => ({
+            value: ev.id,
+            label: ExprUtils.localizeString(ev.name, locale)
+          })) as { value: any; label: string }[]
+        ).concat([noneCategory])
         break
       case "text":
         // Return unique values

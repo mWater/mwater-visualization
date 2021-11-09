@@ -1,6 +1,7 @@
 /// <reference types="jquery" />
 import PropTypes from "prop-types";
 import React from "react";
+import { Schema } from "mwater-expressions";
 interface MWaterAddRelatedIndicatorComponentProps {
     table: string;
     apiUrl: string;
@@ -9,7 +10,7 @@ interface MWaterAddRelatedIndicatorComponentProps {
     user?: string;
     /** Called with table id e.g. indicator_values:someid */
     onSelect: any;
-    schema: any;
+    schema: Schema;
     /** String filter */
     filter?: string;
 }

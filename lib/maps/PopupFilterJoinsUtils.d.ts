@@ -1,4 +1,5 @@
-export declare function createPopupFilters(popupFilterJoins: any, schema: any, layerTable: any, rowId: any, useWithin?: boolean): ({
+import { Schema } from "mwater-expressions";
+export declare function createPopupFilters(popupFilterJoins: any, schema: Schema, layerTable: any, rowId: any, useWithin?: boolean): ({
     table: string;
     jsonql: import("jsonql").JsonQLExpr;
 } | {

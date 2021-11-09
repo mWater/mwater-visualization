@@ -1,9 +1,10 @@
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 interface MWaterGlobalFiltersComponentProps {
     /** Schema of the database */
-    schema: any;
+    schema: Schema;
     /** Data source to use to get values */
-    dataSource: any;
+    dataSource: DataSource;
     filterableTables: any;
     globalFilters?: any;
     onChange: any;

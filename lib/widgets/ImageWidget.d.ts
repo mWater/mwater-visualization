@@ -1,4 +1,5 @@
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 import Widget from "./Widget";
 export default class ImageWidget extends Widget {
     createViewElement(options: any): React.CElement<{
@@ -22,7 +23,7 @@ export default class ImageWidget extends Widget {
         height: any;
         singleRowTable: any;
     }, any, any>>;
-    getData(design: any, schema: any, dataSource: any, filters: any, callback: any): any;
+    getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any): any;
     isAutoHeight(): boolean;
-    getFilterableTables(design: any, schema: any): any[];
+    getFilterableTables(design: any, schema: Schema): any[];
 }

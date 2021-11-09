@@ -112,7 +112,7 @@ export default class AxisColorEditorComponent extends React.Component<
 
   handlePaletteChange = (palette: ColorMap) => {
     this.props.onChange(
-      produce(this.props.axis, draft => { 
+      produce(this.props.axis, (draft) => {
         draft.colorMap = palette
         draft.drawOrder = _.pluck(palette, "value")
       })

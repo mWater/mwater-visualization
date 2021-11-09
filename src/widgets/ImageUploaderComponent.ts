@@ -102,7 +102,9 @@ export default class ImageUploaderComponent extends React.Component<
           : R("div", null, "Drop file here or click to select file")
       ),
 
-      this.state.uid ? R("a", { className: "link-plain", onClick: () => this.setState({ editing: false }) }, "Cancel") : undefined
+      this.state.uid
+        ? R("a", { className: "link-plain", onClick: () => this.setState({ editing: false }) }, "Cancel")
+        : undefined
     )
   }
 

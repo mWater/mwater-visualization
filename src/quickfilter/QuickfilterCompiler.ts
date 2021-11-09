@@ -8,7 +8,7 @@ import { Quickfilter, QuickfilterLock } from "./Quickfilter"
 /** Compiles quickfilter values into filters */
 export default class QuickfilterCompiler {
   schema: Schema
-  
+
   constructor(schema: Schema) {
     this.schema = schema
   }

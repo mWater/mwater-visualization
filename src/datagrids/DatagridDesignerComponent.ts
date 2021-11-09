@@ -358,7 +358,7 @@ interface ColumnDesignerComponentProps {
   dataSource: DataSource
 
   table: string
-  
+
   /** Column See README.md of this folder */
   column: DatagridDesignColumn
   /** Called when column changes. Null to remove. Array to replace with multiple entries */
@@ -522,11 +522,7 @@ class ColumnDesignerComponent extends React.Component<ColumnDesignerComponentPro
     const elem = R(
       "div",
       { className: "row" },
-      R(
-        "div",
-        { className: "col-1" },
-        this.props.connectDragSource(R("span", { className: "text-muted fa fa-bars" }))
-      ),
+      R("div", { className: "col-1" }, this.props.connectDragSource(R("span", { className: "text-muted fa fa-bars" }))),
 
       R(
         "div",

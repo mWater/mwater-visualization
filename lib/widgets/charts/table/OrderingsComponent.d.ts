@@ -1,9 +1,10 @@
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 interface OrderingsComponentProps {
     orderings: any;
     onOrderingsChange: any;
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
     table?: string;
 }
 export default class OrderingsComponent extends React.Component<OrderingsComponentProps> {

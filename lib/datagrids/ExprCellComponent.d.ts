@@ -1,10 +1,11 @@
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 import { Cell } from "fixed-data-table-2";
-interface ExprCellComponentProps {
+export interface ExprCellComponentProps {
     /** schema to use */
-    schema: any;
+    schema: Schema;
     /** dataSource to use */
-    dataSource: any;
+    dataSource: DataSource;
     /** Locale to use */
     locale?: string;
     exprType?: string;
@@ -21,7 +22,7 @@ interface ExprCellComponentProps {
 export default class ExprCellComponent extends React.Component<ExprCellComponentProps> {
     handleClick: () => void;
     renderImage(id: any): React.DetailedReactHTMLElement<{
-        href: any;
+        href: string;
         key: any;
         target: string;
         style: {
@@ -31,4 +32,3 @@ export default class ExprCellComponent extends React.Component<ExprCellComponent
     }, HTMLElement>;
     render(): React.CElement<import("fixed-data-table-2").CellProps, Cell>;
 }
-export {};

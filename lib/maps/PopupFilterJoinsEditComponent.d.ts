@@ -1,8 +1,9 @@
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 interface PopupFilterJoinsEditComponentProps {
     /** Schema to use */
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
     /** table of the row that the popup will be for */
     table: string;
     /** table of the row that join is to. Usually same as table except for choropleth maps */

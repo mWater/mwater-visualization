@@ -269,35 +269,39 @@ export default class LayeredChartDesignerComponent extends React.Component<Layer
     const canTranspose = !["pie", "donut"].includes(design.type)
 
     return R(
-        "div",
-        { className: "text-muted" },
-        canTranspose ? (
-          <Checkbox inline key="transpose" value={design.transpose} onChange={this.handleTransposeChange}>
-            Horizontal
-          </Checkbox>
-        ) : undefined,
-        canStack ? (
-          <Checkbox inline key="stacked" value={design.stacked} onChange={this.handleStackedChange}>
-            Stacked
-          </Checkbox>
-        ) : undefined,
-        canStack ? (
-          <Checkbox inline key="proportional" value={design.proportional} onChange={this.handleProportionalChange}>
-            Proportional
-          </Checkbox>
-        ) : undefined,
-        <Checkbox inline key="labels" value={design.labels || false} onChange={this.handleLabelsChange}>
-          Show Values
+      "div",
+      { className: "text-muted" },
+      canTranspose ? (
+        <Checkbox inline key="transpose" value={design.transpose} onChange={this.handleTransposeChange}>
+          Horizontal
         </Checkbox>
-      ,
+      ) : undefined,
+      canStack ? (
+        <Checkbox inline key="stacked" value={design.stacked} onChange={this.handleStackedChange}>
+          Stacked
+        </Checkbox>
+      ) : undefined,
+      canStack ? (
+        <Checkbox inline key="proportional" value={design.proportional} onChange={this.handleProportionalChange}>
+          Proportional
+        </Checkbox>
+      ) : undefined,
+      <Checkbox inline key="labels" value={design.labels || false} onChange={this.handleLabelsChange}>
+        Show Values
+      </Checkbox>,
       ["pie", "donut"].includes(design.type)
         ? [
-            <Checkbox key="polarOrder" inline value={design.hidePercentage} onChange={this.handlePercentageVisibilityChange}>
+            <Checkbox
+              key="polarOrder"
+              inline
+              value={design.hidePercentage}
+              onChange={this.handlePercentageVisibilityChange}
+            >
               Hide Percentage
             </Checkbox>,
             <Checkbox
               key="polarOrder"
-              inline 
+              inline
               value={(design.polarOrder || "desc") === "desc"}
               onChange={this.handlePolarOrderChange}
             >

@@ -1,7 +1,8 @@
+import { DataSource } from "mwater-expressions";
 import React from "react";
 interface ImageUploaderComponentProps {
     /** Data source to use for chart */
-    dataSource: any;
+    dataSource: DataSource;
     /** callback for when upload is successful */
     onUpload: any;
     uid?: string;

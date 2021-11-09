@@ -49,7 +49,10 @@ interface AxisComponentProps {
 }
 
 // Axis component that allows designing of an axis
-export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps, { categories: any, loading: boolean }> {
+export default class AxisComponent extends AsyncLoadComponent<
+  AxisComponentProps,
+  { categories: any; loading: boolean }
+> {
   static defaultProps = {
     reorderable: false,
     allowExcludedValues: false,
@@ -115,7 +118,7 @@ export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps
     }
 
     // If no table, cannot query
-    if (!axis.expr || !((axis.expr as OpExpr)!.table)) {
+    if (!axis.expr || !(axis.expr as OpExpr)!.table) {
       callback({ categories: [] })
       return
     }
@@ -163,18 +166,24 @@ export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps
   }
 
   handleFormatChange = (ev: any) => {
-    return this.props.onChange(produce(this.props.value!, draft => { draft.format = ev.target.value }))
+    return this.props.onChange(
+      produce(this.props.value!, (draft) => {
+        draft.format = ev.target.value
+      })
+    )
   }
 
   handleXformTypeChange = (type: any) => {
     // Remove
     let xform: AxisXform
     if (!type) {
-      this.props.onChange(produce(this.props.value!, draft => {
-        delete draft.xform
-        delete draft.colorMap
-        delete draft.drawOrder
-      }))
+      this.props.onChange(
+        produce(this.props.value!, (draft) => {
+          delete draft.xform
+          delete draft.colorMap
+          delete draft.drawOrder
+        })
+      )
       return
     }
 
@@ -209,11 +218,13 @@ export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps
       }
     }
 
-    return this.props.onChange(produce(this.props.value!, draft => {
-      delete draft.colorMap
-      delete draft.drawOrder
-      draft.xform = xform
-    }))
+    return this.props.onChange(
+      produce(this.props.value!, (draft) => {
+        delete draft.colorMap
+        delete draft.drawOrder
+        draft.xform = xform
+      })
+    )
   }
 
   handleXformChange = (xform: any) => {

@@ -1,11 +1,13 @@
 import React from "react";
+import { Schema } from "mwater-expressions";
 import { JsonQLFilter } from "../JsonQLFilter";
+import { QuickfiltersDataSource } from "./QuickfiltersDataSource";
 interface TextLiteralComponentProps {
     value?: any;
     onChange?: any;
-    schema: any;
+    schema: Schema;
     /** See QuickfiltersDataSource */
-    quickfiltersDataSource: any;
+    quickfiltersDataSource: QuickfiltersDataSource;
     expr: any;
     index: number;
     /** true to display multiple values */

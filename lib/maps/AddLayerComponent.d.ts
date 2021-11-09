@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 interface AddLayerComponentProps {
     /** Number of layers that already exist */
     layerNumber: number;
@@ -8,8 +9,8 @@ interface AddLayerComponentProps {
     /** Called with new design */
     onDesignChange: any;
     /** Schema to use */
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
 }
 export default class AddLayerComponent extends React.Component<AddLayerComponentProps> {
     static contextTypes: {

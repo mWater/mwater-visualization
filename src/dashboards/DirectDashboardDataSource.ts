@@ -10,7 +10,7 @@ export default class DirectDashboardDataSource extends DashboardDataSource {
   options: {
     /** schema to use */
     schema: Schema
-    
+
     /** data source to use */
     dataSource: DataSource
 

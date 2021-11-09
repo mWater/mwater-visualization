@@ -1,10 +1,11 @@
 import PropTypes from "prop-types";
 import React from "react";
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
+import { DataSource, Schema } from "mwater-expressions";
 interface SettingsModalComponentProps {
     onDesignChange: any;
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
 }
 interface SettingsModalComponentState {
     design: any;

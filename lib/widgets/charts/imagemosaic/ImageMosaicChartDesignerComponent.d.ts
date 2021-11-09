@@ -1,9 +1,10 @@
 import React from "react";
 import * as ui from "../../../UIComponents";
+import { DataSource, Schema } from "mwater-expressions";
 interface ImageMosaicChartDesignerComponentProps {
     design: any;
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
     onDesignChange: any;
     filters?: any;
 }

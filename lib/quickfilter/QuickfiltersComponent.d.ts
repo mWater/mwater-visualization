@@ -34,9 +34,9 @@ export default class QuickfiltersComponent extends React.Component<QuickfiltersC
 }
 interface TextQuickfilterComponentProps {
     label: string;
-    schema: any;
+    schema: Schema;
     /** See QuickfiltersDataSource */
-    quickfiltersDataSource: any;
+    quickfiltersDataSource: QuickfiltersDataSource;
     expr: any;
     index: number;
     /** Current value of quickfilter (state of filter selected) */
@@ -58,7 +58,7 @@ declare class TextQuickfilterComponent extends React.Component<TextQuickfilterCo
 }
 interface DateQuickfilterComponentProps {
     label?: string;
-    schema: any;
+    schema: Schema;
     expr: any;
     /** Current value of quickfilter (state of filter selected) */
     value?: any;

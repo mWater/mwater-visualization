@@ -1,11 +1,12 @@
 import React from "react";
+import { Schema } from "mwater-expressions";
 interface TableChartViewComponentProps {
     /** Design of chart */
     design: any;
     /** Data that the table has requested */
     data: any;
     /** Schema to use */
-    schema: any;
+    schema: Schema;
     width?: number;
     height?: number;
     /** scope of the widget (when the widget self-selects a particular scope) */

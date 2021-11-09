@@ -33,7 +33,7 @@ export default class CalendarChart extends Chart {
     }>;
     getData(design: CalendarChartDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): void;
     createViewElement(options: any): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
-    createDataTable(design: any, schema: any, dataSource: any, data: any): string[][];
-    getFilterableTables(design: any, schema: any): any[];
+    createDataTable(design: any, schema: Schema, dataSource: DataSource, data: any): string[][];
+    getFilterableTables(design: any, schema: Schema): any[];
     getPlaceholderIcon(): string;
 }

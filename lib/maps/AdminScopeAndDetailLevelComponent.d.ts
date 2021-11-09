@@ -1,8 +1,9 @@
 import React from "react";
+import { DataSource, Schema } from "mwater-expressions";
 interface AdminScopeAndDetailLevelComponentProps {
     /** Schema to use */
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
     /** admin region that is outside bounds. null for whole world */
     scope?: string;
     /** level of scope region. null for whole world */

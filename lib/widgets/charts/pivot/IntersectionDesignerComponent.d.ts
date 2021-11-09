@@ -1,10 +1,11 @@
 import React from "react";
 import * as ui from "react-library/lib/bootstrap";
+import { DataSource, Schema } from "mwater-expressions";
 interface IntersectionDesignerComponentProps {
     intersection: any;
     table: string;
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
     onChange: any;
     filters?: any;
 }
@@ -85,8 +86,8 @@ export default class IntersectionDesignerComponent extends React.Component<Inter
 interface BackgroundColorConditionsComponentProps {
     colorConditions?: any;
     table: string;
-    schema: any;
-    dataSource: any;
+    schema: Schema;
+    dataSource: DataSource;
     onChange: any;
 }
 declare class BackgroundColorConditionsComponent extends React.Component<BackgroundColorConditionsComponentProps> {
