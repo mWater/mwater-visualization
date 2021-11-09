@@ -8,11 +8,12 @@ import BlocksLayoutManager from "../layouts/blocks/BlocksLayoutManager"
 import WidgetFactory from "../widgets/WidgetFactory"
 import DirectWidgetDataSource from "../widgets/DirectWidgetDataSource"
 import PopupFilterJoinsEditComponent from "./PopupFilterJoinsEditComponent"
+import { DataSource, Schema } from "mwater-expressions"
 
 interface EditPopupComponentProps {
   /** Schema to use */
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   /** Design of the marker layer */
   design: any
   /** Called with new design */

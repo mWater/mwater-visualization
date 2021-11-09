@@ -4,7 +4,7 @@ import React from "react"
 const R = React.createElement
 
 import Layer from "./Layer"
-import { ExprCompiler } from "mwater-expressions"
+import { ExprCompiler, Schema } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 import { injectTableAlias } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
@@ -56,7 +56,7 @@ export default class TileUrlLayer extends Layer<TileUrlLayerDesign> {
   }
 
   // True if layer is incomplete (e.g. brand new) and should be editable immediately
-  isIncomplete(design: any, schema: any) {
+  isIncomplete(design: any, schema: Schema) {
     return this.validateDesign(this.cleanDesign(design, schema), schema) != null
   }
 
@@ -72,12 +72,12 @@ export default class TileUrlLayer extends Layer<TileUrlLayerDesign> {
   }
 
   // Returns a cleaned design
-  cleanDesign(design: any, schema: any) {
+  cleanDesign(design: any, schema: Schema) {
     return design
   }
 
   // Validates design. Null if ok, message otherwise
-  validateDesign(design: any, schema: any) {
+  validateDesign(design: any, schema: Schema) {
     if (!design.tileUrl) {
       return "Missing Url"
     }

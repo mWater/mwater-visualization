@@ -7,6 +7,7 @@ import AxisBuilder from "../../../axes/AxisBuilder"
 import { LazyLoadComponent as LazyLoad } from "react-lazy-load-image-component"
 import RotationAwareImageComponent from "mwater-forms/lib/RotationAwareImageComponent"
 import ImagePopupComponent from "./ImagePopupComponent"
+import { DataSource } from "mwater-expressions"
 
 interface ImageMosaicChartViewComponentProps {
   /** Design of chart */
@@ -14,7 +15,7 @@ interface ImageMosaicChartViewComponentProps {
   /** Data that the chart has requested. In format  [image: {image data or imagelist data}] */
   data: any
   /** Data source to use */
-  dataSource: any
+  dataSource: DataSource
   width?: number
   height?: number
   onRowClick?: any

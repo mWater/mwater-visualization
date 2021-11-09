@@ -4,7 +4,7 @@ import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import * as uiComponents from "./UIComponents"
-import { ExprUtils } from "mwater-expressions"
+import { ExprUtils, Schema } from "mwater-expressions"
 import MWaterResponsesFilterComponent from "./MWaterResponsesFilterComponent"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 import MWaterCompleteTableSelectComponent from "./MWaterCompleteTableSelectComponent"
@@ -14,7 +14,7 @@ interface MWaterTableSelectComponentProps {
   apiUrl: string
   /** Optional client */
   client?: string
-  schema: any
+  schema: Schema
   /** User id */
   user?: string
   table?: string
@@ -166,7 +166,7 @@ interface EditModeTableSelectComponentProps {
   apiUrl: string
   /** Optional client */
   client?: string
-  schema: any
+  schema: Schema
   /** User id */
   user?: string
   table?: string

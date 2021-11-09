@@ -223,7 +223,7 @@ export default class Layer<LayerDesign> {
   //   design: design of layer
   //   schema: schema to use
   //   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to put in table alias
-  getKMLExportJsonQL(design: any, schema: any, filters: any) {
+  getKMLExportJsonQL(design: any, schema: Schema, filters: any) {
     throw new Error("Not implemented")
   }
 

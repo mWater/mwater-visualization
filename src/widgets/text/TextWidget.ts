@@ -2,7 +2,7 @@ import React from "react"
 const R = React.createElement
 import _ from "lodash"
 import async from "async"
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
 import { injectTableAlias } from "mwater-expressions"
@@ -48,7 +48,7 @@ export default class TextWidget extends Widget {
   //   dataSource: data source to get data from
   //   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   //   callback: (error, data)
-  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
+  getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any) {
     // Evaluates a single exprItem
     const evalExprItem = (exprItem: any, cb: any) => {
       let query, whereClauses
@@ -197,7 +197,7 @@ export default class TextWidget extends Widget {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design: any, schema: any) {
+  getFilterableTables(design: any, schema: Schema) {
     const exprItems = this.getExprItems(design.items)
 
     let filterableTables = _.map(exprItems, (exprItem) => exprItem.expr?.table)

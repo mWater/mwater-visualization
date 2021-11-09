@@ -209,14 +209,14 @@ export default class CalendarChart extends Chart {
     return React.createElement(CalendarChartViewComponent, props)
   }
 
-  createDataTable(design: any, schema: any, dataSource: any, data: any) {
+  createDataTable(design: any, schema: Schema, dataSource: DataSource, data: any) {
     const header = ["Date", "Value"]
     const rows = _.map(data, (row: any) => [moment(row.date).format("YYYY-MM-DD"), row.value])
     return [header].concat(rows)
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design: any, schema: any) {
+  getFilterableTables(design: any, schema: Schema) {
     return _.compact([design.table])
   }
 

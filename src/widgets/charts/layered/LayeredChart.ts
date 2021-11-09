@@ -12,10 +12,11 @@ import LayeredChartSvgFileSaver from "./LayeredChartSvgFileSaver"
 import * as LayeredChartUtils from "./LayeredChartUtils"
 import TextWidget from "../../text/TextWidget"
 import { LayeredChartDesign } from "./LayeredChartDesign"
+import { WidgetDataSource } from "../../WidgetDataSource"
 
 // See LayeredChart Design.md for the design
 export default class LayeredChart extends Chart {
-  cleanDesign(design: any, schema: any) {
+  cleanDesign(design: any, schema: Schema) {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
     const compiler = new LayeredChartCompiler({ schema })
@@ -92,7 +93,7 @@ export default class LayeredChart extends Chart {
     })
   }
 
-  validateDesign(design: any, schema: any) {
+  validateDesign(design: any, schema: Schema) {
     let error
     let axisBuilder = new AxisBuilder({ schema })
     const compiler = new LayeredChartCompiler({ schema })
@@ -178,7 +179,7 @@ export default class LayeredChart extends Chart {
   // dataSource: data source to get data from
   // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   // callback: (error, data)
-  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
+  getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any) {
     const compiler = new LayeredChartCompiler({ schema })
     const queries = compiler.createQueries(design, filters)
 
@@ -251,7 +252,7 @@ export default class LayeredChart extends Chart {
     return React.createElement(LayeredChartViewComponent, props)
   }
 
-  createDropdownItems(design: any, schema: any, widgetDataSource: any, filters: any) {
+  createDropdownItems(design: any, schema: Schema, widgetDataSource: WidgetDataSource, filters: any) {
     // TODO validate design before allowing save
     const save = (format: any) => {
       design = this.cleanDesign(design, schema)
@@ -340,7 +341,7 @@ export default class LayeredChart extends Chart {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design: any, schema: any) {
+  getFilterableTables(design: any, schema: Schema) {
     let filterableTables = _.uniq(_.compact(_.map(design.layers, (layer) => layer.table)))
 
     // Get filterable tables from header and footer

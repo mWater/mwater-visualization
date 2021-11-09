@@ -6,12 +6,13 @@ const R = React.createElement
 import querystring from "querystring"
 import * as ui from "react-library/lib/bootstrap"
 import { IdLiteralComponent } from "mwater-expressions-ui"
+import { DataSource, Schema } from "mwater-expressions"
 
 interface MWaterGlobalFiltersComponentProps {
   /** Schema of the database */
-  schema: any
+  schema: Schema
   /** Data source to use to get values */
-  dataSource: any
+  dataSource: DataSource
   filterableTables: any
   globalFilters?: any
   onChange: any

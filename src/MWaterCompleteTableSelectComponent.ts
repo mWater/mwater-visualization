@@ -6,7 +6,7 @@ const R = React.createElement
 import querystring from "querystring"
 import TabbedComponent from "react-library/lib/TabbedComponent"
 import * as uiComponents from "./UIComponents"
-import { ExprUtils } from "mwater-expressions"
+import { ExprUtils, Schema } from "mwater-expressions"
 import moment from "moment"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 import { MWaterCustomTablesetListComponent } from "./MWaterCustomTablesetListComponent"
@@ -31,7 +31,7 @@ interface MWaterCompleteTableSelectComponentProps {
   apiUrl: string
   /** Optional client */
   client?: string
-  schema: any
+  schema: Schema
   /** User id */
   user?: string
   table?: string
@@ -292,7 +292,7 @@ interface FormsListComponentProps {
   apiUrl: string
   /** Optional client */
   client?: string
-  schema: any
+  schema: Schema
   /** User id */
   user?: string
   /** Called with table selected */
@@ -471,7 +471,7 @@ interface IndicatorsListComponentProps {
   apiUrl: string
   /** Optional client */
   client?: string
-  schema: any
+  schema: Schema
   /** User id */
   user?: string
   /** Called with table selected */
@@ -649,7 +649,7 @@ class IndicatorsListComponent extends React.Component<IndicatorsListComponentPro
 }
 
 interface AddIndicatorConfirmPopupComponentProps {
-  schema: any
+  schema: Schema
   /** Called with table selected */
   onChange: any
   onExtraTableAdd: any
@@ -749,7 +749,7 @@ interface IssuesListComponentProps {
   apiUrl: string
   /** Optional client */
   client?: string
-  schema: any
+  schema: Schema
   /** User id */
   user?: string
   /** Called with table selected */

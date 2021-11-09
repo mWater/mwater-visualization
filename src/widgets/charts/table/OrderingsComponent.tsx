@@ -5,12 +5,13 @@ const R = React.createElement
 
 import { ExprComponent } from "mwater-expressions-ui"
 import { Checkbox } from "react-library/lib/bootstrap"
+import { DataSource, Schema } from "mwater-expressions"
 
 interface OrderingsComponentProps {
   orderings: any
   onOrderingsChange: any
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   table?: string
 }
 
@@ -65,8 +66,8 @@ interface OrderingComponentProps {
   ordering: any
   onOrderingChange: any
   onOrderingRemove: any
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   table?: string
 }
 

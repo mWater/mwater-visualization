@@ -29,7 +29,7 @@ export interface DatagridViewComponentProps {
   /** Check if cell is editable
    * If present, called with (tableId, rowId, expr, callback). Callback should be called with (error, true/false)
    */
-  canEditCell?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, editable: boolean) => void) => void
+  canEditCell?: (tableId: string, rowId: any, expr: Expr, callback: (error: any, editable?: boolean) => void) => void
 
   /** Update cell value
    * Called with (tableId, rowId, expr, value, callback). Callback should be called with (error)
@@ -67,6 +67,7 @@ export default class DatagridViewComponent extends React.Component<DatagridViewC
   static defaultProps = { pageSize: 100 }
 
   loadState: LoadState | null
+  editCellComp: EditExprCellComponent | null
 
   constructor(props: DatagridViewComponentProps) {
     super(props)
@@ -246,40 +247,40 @@ export default class DatagridViewComponent extends React.Component<DatagridViewC
       return
     }
 
-    const rowId = this.state.rows[this.state.editingCell.rowIndex].id
-    const { expr } = this.props.design.columns[this.state.editingCell.columnIndex]
+    const rowId = this.state.rows[this.state.editingCell!.rowIndex].id
+    const { expr } = this.props.design.columns[this.state.editingCell!.columnIndex]
     const value = this.editCellComp.getValue()
 
-    return this.setState({ savingCell: true }, () => {
-      return this.props.updateCell(this.props.design.table, rowId, expr, value, (error: any) => {
+    this.setState({ savingCell: true }, () => {
+      this.props.updateCell!(this.props.design.table!, rowId, expr, value, (error: any) => {
         // TODO handle error
 
         // Reload row
-        return this.reloadRow(this.state.editingCell.rowIndex, () => {
-          return this.setState({ editingCell: null, savingCell: false })
+        this.reloadRow(this.state.editingCell!.rowIndex, () => {
+          this.setState({ editingCell: null, savingCell: false })
         })
       })
     })
   }
 
   handleCancelEdit = () => {
-    return this.setState({ editingCell: null, savingCell: false })
+    this.setState({ editingCell: null, savingCell: false })
   }
 
   // Called with current ref edit. Save
-  refEditCell = (comp: any) => {
+  refEditCell = (comp: EditExprCellComponent | null) => {
     this.editCellComp = comp
   }
 
   handleRowDoubleClick = (ev: any, rowIndex: any) => {
     if (this.props.onRowDoubleClick != null && this.state.rows[rowIndex].id) {
-      return this.props.onRowDoubleClick(this.props.design.table, this.state.rows[rowIndex].id, rowIndex)
+      this.props.onRowDoubleClick(this.props.design.table!, this.state.rows[rowIndex].id, rowIndex)
     }
   }
 
   handleRowClick = (ev: any, rowIndex: any) => {
     if (this.props.onRowClick != null && this.state.rows[rowIndex].id) {
-      return this.props.onRowClick(this.props.design.table, this.state.rows[rowIndex].id, rowIndex)
+      this.props.onRowClick(this.props.design.table!, this.state.rows[rowIndex].id, rowIndex)
     }
   }
 
@@ -289,7 +290,7 @@ export default class DatagridViewComponent extends React.Component<DatagridViewC
     if (cellProps.rowIndex >= this.state.rows.length) {
       // Load next tick as cannot update while rendering
       _.defer(() => {
-        return this.loadMoreRows()
+        this.loadMoreRows()
       })
       return R(Cell, cellProps, R("i", { className: "fa fa-spinner fa-spin" }))
     }
@@ -355,6 +356,8 @@ export default class DatagridViewComponent extends React.Component<DatagridViewC
         onClick: this.handleCellClick.bind(null, cellProps.rowIndex, columnIndex)
       })
     }
+
+    return null
   }
 
   // Render a single column
@@ -417,7 +420,6 @@ export default class DatagridViewComponent extends React.Component<DatagridViewC
         onRowDoubleClick: this.handleRowDoubleClick,
         onRowClick: this.handleRowClick,
         isColumnResizing: false,
-        allowCellsRecycling: true,
         onColumnResizeEndCallback: this.handleColumnResize
       },
       this.renderColumns()

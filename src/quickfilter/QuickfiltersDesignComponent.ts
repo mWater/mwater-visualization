@@ -5,7 +5,7 @@ const R = React.createElement
 import update from "update-object"
 import TableSelectComponent from "../TableSelectComponent"
 import { ExprComponent } from "mwater-expressions-ui"
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import * as ui from "react-library/lib/bootstrap"
 
 interface QuickfiltersDesignComponentProps {
@@ -13,8 +13,8 @@ interface QuickfiltersDesignComponentProps {
   design: any
   /** Called when design changes */
   onDesignChange: any
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   /** List of possible table ids to use */
   tables: any
 }
@@ -130,8 +130,8 @@ interface QuickfilterDesignComponentProps {
   onRemove: any
   /** True if can be merged */
   mergeable?: boolean
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   tables: any
 }
 

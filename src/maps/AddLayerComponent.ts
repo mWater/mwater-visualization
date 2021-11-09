@@ -5,6 +5,7 @@ const R = React.createElement
 
 import uuid from "uuid"
 import LayerFactory from "./LayerFactory"
+import { DataSource, Schema } from "mwater-expressions"
 
 interface AddLayerComponentProps {
   /** Number of layers that already exist */
@@ -14,8 +15,8 @@ interface AddLayerComponentProps {
   /** Called with new design */
   onDesignChange: any
   /** Schema to use */
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
 }
 
 // Dropdown to add a new layer.

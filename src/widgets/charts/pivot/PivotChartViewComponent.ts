@@ -5,7 +5,7 @@ import ReactDOM from "react-dom"
 const R = React.createElement
 
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent"
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import TextComponent from "../../text/TextComponent"
 import * as PivotChartUtils from "./PivotChartUtils"
 import PivotChartLayoutComponent from "./PivotChartLayoutComponent"
@@ -14,8 +14,8 @@ import SegmentDesignerComponent from "./SegmentDesignerComponent"
 import IntersectionDesignerComponent from "./IntersectionDesignerComponent"
 
 interface PivotChartViewComponentProps {
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   design: any
   data: any
   onDesignChange?: any

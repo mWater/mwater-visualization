@@ -5,7 +5,7 @@ const R = React.createElement
 import AxisComponent from "../../../axes/AxisComponent"
 import AxisBuilder from "../../../axes/AxisBuilder"
 import { FilterExprComponent } from "mwater-expressions-ui"
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import ColorComponent from "../../../ColorComponent"
 import * as LayeredChartUtils from "./LayeredChartUtils"
@@ -17,8 +17,8 @@ import { Checkbox } from "react-library/lib/bootstrap"
 
 interface LayeredChartLayerDesignerComponentProps {
   design: any
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   index: number
   onChange: any
   onRemove: any

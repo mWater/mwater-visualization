@@ -4,7 +4,7 @@ import React from "react"
 const R = React.createElement
 
 import * as ui from "../../../UIComponents"
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import AxisBuilder from "../../../axes/AxisBuilder"
 import AxisComponent from "../../../axes/AxisComponent"
 import { FilterExprComponent } from "mwater-expressions-ui"
@@ -12,8 +12,8 @@ import TableSelectComponent from "../../../TableSelectComponent"
 
 interface ImageMosaicChartDesignerComponentProps {
   design: any
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   onDesignChange: any
   filters?: any
 }

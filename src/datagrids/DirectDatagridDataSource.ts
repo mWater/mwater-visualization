@@ -1,14 +1,17 @@
 import DatagridDataSource from "./DatagridDataSource"
 import DatagridQueryBuilder from "./DatagridQueryBuilder"
 import * as QuickfilterUtils from "../quickfilter/QuickfilterUtils"
+import { DataSource, Schema } from "mwater-expressions"
 
 // Uses direct DataSource queries
 export default class DirectDatagridDataSource {
+  options: { schema: Schema, dataSource: DataSource }
+  
   // Create dashboard data source that uses direct jsonql calls
   // options:
   //   schema: schema to use
   //   dataSource: data source to use
-  constructor(options: any) {
+  constructor(options: { schema: Schema, dataSource: DataSource }) {
     this.options = options
   }
 

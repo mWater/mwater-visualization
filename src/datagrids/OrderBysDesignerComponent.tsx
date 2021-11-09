@@ -3,15 +3,15 @@ import _ from "lodash"
 import React from "react"
 const R = React.createElement
 
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import { ExprComponent } from "mwater-expressions-ui"
 import { Checkbox } from "react-library/lib/bootstrap"
 
 interface OrderBysDesignerComponentProps {
   /** schema to use */
-  schema: any
+  schema: Schema
   /** dataSource to use */
-  dataSource: any
+  dataSource: DataSource
   table: string
   /** Columns list See README.md of this folder */
   orderBys: any
@@ -76,8 +76,8 @@ interface OrderByDesignerComponentProps {
   orderBy: any
   onChange: any
   onRemove: any
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   table?: string
 }
 

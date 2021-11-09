@@ -3,7 +3,7 @@ import React from "react"
 const R = React.createElement
 import { default as produce } from "immer"
 import { original } from "immer"
-import { injectTableAlias } from "mwater-expressions"
+import { DataSource, injectTableAlias, Schema } from "mwater-expressions"
 import Chart from "../Chart"
 import { ExprCleaner } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
@@ -19,7 +19,7 @@ Design is:
 
 */
 export default class ImageMosaicChart extends Chart {
-  cleanDesign(design: any, schema: any) {
+  cleanDesign(design: any, schema: Schema) {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
@@ -41,7 +41,7 @@ export default class ImageMosaicChart extends Chart {
     return design
   }
 
-  validateDesign(design: any, schema: any) {
+  validateDesign(design: any, schema: Schema) {
     const axisBuilder = new AxisBuilder({ schema })
 
     // Check that has table
@@ -96,7 +96,7 @@ export default class ImageMosaicChart extends Chart {
   // dataSource: data source to get data from
   // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   // callback: (error, data)
-  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
+  getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any) {
     const exprCompiler = new ExprCompiler(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
@@ -180,7 +180,7 @@ export default class ImageMosaicChart extends Chart {
     return React.createElement(ImageMosaicChartViewComponent, props)
   }
 
-  createDataTable(design: any, schema: any, dataSource: any, data: any) {
+  createDataTable(design: any, schema: Schema, dataSource: DataSource, data: any) {
     alert("Not available for Image Mosaics")
     return null
   }
@@ -201,7 +201,7 @@ export default class ImageMosaicChart extends Chart {
   // return table
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design: any, schema: any) {
+  getFilterableTables(design: any, schema: Schema) {
     return _.compact([design.table])
   }
 

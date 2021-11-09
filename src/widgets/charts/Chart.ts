@@ -1,13 +1,15 @@
+import { DataSource, Schema } from "mwater-expressions"
 import { ReactNode } from "react"
+import { WidgetDataSource } from "../WidgetDataSource"
 
 export default class Chart {
   // Removes any invalid values from a design. Returns cleaned design
-  cleanDesign(design: any, schema: any) {
+  cleanDesign(design: any, schema: Schema) {
     throw new Error("Not implemented")
   }
 
   // Determines if design is valid. Null/undefined for yes, error string for no
-  validateDesign(design: any, schema: any): null | undefined | string {
+  validateDesign(design: any, schema: Schema): null | undefined | string {
     throw new Error("Not implemented")
   }
 
@@ -48,7 +50,7 @@ export default class Chart {
   //   dataSource: data source to get data from
   //   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   //   callback: (error, data)
-  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
+  getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any) {
     throw new Error("Not implemented")
   }
 
@@ -73,17 +75,17 @@ export default class Chart {
   //   widgetDataSource: widget data source to use
   //   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   // Returns an empty list by default
-  createDropdownItems(design: any, schema: any, widgetDataSource: any, filters: any) {
+  createDropdownItems(design: any, schema: Schema, widgetDataSource: WidgetDataSource, filters: any) {
     return []
   }
 
   // Creates a table form of the chart data. Array of arrays
-  createDataTable(design: any, schema: any, dataSource: any, data: any, locale: any) {
+  createDataTable(design: any, schema: Schema, dataSource: DataSource, data: any, locale: any) {
     throw new Error("Not implemented")
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design: any, schema: any) {
+  getFilterableTables(design: any, schema: Schema) {
     throw new Error("Not implemented")
   }
 

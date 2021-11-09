@@ -1,6 +1,6 @@
 import _ from "lodash"
 import ItemsHtmlConverter from "./ItemsHtmlConverter"
-import { ExprUtils } from "mwater-expressions"
+import { ExprUtils, Schema } from "mwater-expressions"
 import uuid from "uuid"
 import utm from "utm"
 import { formatValue } from "../valueFormatter"
@@ -19,7 +19,7 @@ export default class ExprItemsHtmlConverter extends ItemsHtmlConverter {
   // summarizeExprs shows summaries of expressions, not values
   // namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
   // locale: locale to use e.g. "en"
-  constructor(schema: any, designMode: any, exprValues: any, summarizeExprs: any, namedStrings: any, locale: any) {
+  constructor(schema: Schema, designMode: any, exprValues: any, summarizeExprs: any, namedStrings: any, locale: any) {
     super(namedStrings)
 
     this.schema = schema

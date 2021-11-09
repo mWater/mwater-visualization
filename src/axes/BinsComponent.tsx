@@ -2,14 +2,14 @@ import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import update from "update-object"
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import AxisBuilder from "./AxisBuilder"
 import NumberInputComponent from "react-library/lib/NumberInputComponent"
 import { Checkbox } from "react-library/lib/bootstrap"
 
 interface BinsComponentProps {
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   /** Expression for computing min/max */
   expr: any
   xform: any

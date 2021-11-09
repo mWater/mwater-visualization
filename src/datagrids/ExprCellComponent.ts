@@ -3,17 +3,17 @@ import _ from "lodash"
 import React from "react"
 const R = React.createElement
 import moment from "moment"
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import { default as Linkify } from "react-linkify"
 import { Cell } from "fixed-data-table-2"
 import { canFormatType } from "../valueFormatter"
 import { formatValue } from "../valueFormatter"
 
-interface ExprCellComponentProps {
+export interface ExprCellComponentProps {
   /** schema to use */
-  schema: any
+  schema: Schema
   /** dataSource to use */
-  dataSource: any
+  dataSource: DataSource
   /** Locale to use */
   locale?: string
   exprType?: string

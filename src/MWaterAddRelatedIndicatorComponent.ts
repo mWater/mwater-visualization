@@ -6,7 +6,7 @@ const R = React.createElement
 
 import moment from "moment"
 import querystring from "querystring"
-import { ExprUtils } from "mwater-expressions"
+import { ExprUtils, Schema } from "mwater-expressions"
 import * as ui from "./UIComponents"
 
 interface MWaterAddRelatedIndicatorComponentProps {
@@ -17,7 +17,7 @@ interface MWaterAddRelatedIndicatorComponentProps {
   user?: string
   /** Called with table id e.g. indicator_values:someid */
   onSelect: any
-  schema: any
+  schema: Schema
   /** String filter */
   filter?: string
 }

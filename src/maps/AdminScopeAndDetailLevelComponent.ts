@@ -6,11 +6,12 @@ const R = React.createElement
 import RegionSelectComponent from "./RegionSelectComponent"
 import DetailLevelSelectComponent from "./DetailLevelSelectComponent"
 import { default as ReactSelect } from "react-select"
+import { DataSource, Schema } from "mwater-expressions"
 
 interface AdminScopeAndDetailLevelComponentProps {
   /** Schema to use */
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   /** admin region that is outside bounds. null for whole world */
   scope?: string
   /** level of scope region. null for whole world */

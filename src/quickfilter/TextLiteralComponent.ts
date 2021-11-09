@@ -2,16 +2,17 @@ import _ from "lodash"
 import React from "react"
 const R = React.createElement
 import { default as AsyncReactSelect } from "react-select/async"
-import { ExprCompiler } from "mwater-expressions"
+import { ExprCompiler, Schema } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 import { JsonQLFilter } from "../JsonQLFilter"
+import { QuickfiltersDataSource } from "./QuickfiltersDataSource"
 
 interface TextLiteralComponentProps {
   value?: any
   onChange?: any
-  schema: any
+  schema: Schema
   /** See QuickfiltersDataSource */
-  quickfiltersDataSource: any
+  quickfiltersDataSource: QuickfiltersDataSource
   expr: any
   index: number
   /** true to display multiple values */

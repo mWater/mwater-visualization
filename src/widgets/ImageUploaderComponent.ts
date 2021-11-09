@@ -1,3 +1,4 @@
+import { DataSource } from "mwater-expressions"
 import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
@@ -6,7 +7,7 @@ import uuid from "uuid"
 
 interface ImageUploaderComponentProps {
   /** Data source to use for chart */
-  dataSource: any
+  dataSource: DataSource
   /** callback for when upload is successful */
   onUpload: any
   uid?: string

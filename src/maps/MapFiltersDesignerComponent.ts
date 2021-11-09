@@ -3,7 +3,7 @@ import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import { FilterExprComponent } from "mwater-expressions-ui"
-import { ExprCleaner } from "mwater-expressions"
+import { DataSource, ExprCleaner, Schema } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 import PopoverHelpComponent from "react-library/lib/PopoverHelpComponent"
 import FiltersDesignerComponent from "../FiltersDesignerComponent"
@@ -11,9 +11,9 @@ import * as MapUtils from "./MapUtils"
 
 interface MapFiltersDesignerComponentProps {
   /** Schema to use */
-  schema: any
+  schema: Schema
   /** Data source to use */
-  dataSource: any
+  dataSource: DataSource
   /** See Map Design.md */
   design: any
   /** Called with new design */

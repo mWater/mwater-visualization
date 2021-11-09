@@ -2,7 +2,7 @@ import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import { ExprComponent } from "mwater-expressions-ui"
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent"
 import TableSelectComponent from "../../TableSelectComponent"
@@ -10,9 +10,9 @@ import ExprItemEditorComponent from "./ExprItemEditorComponent"
 
 interface ExprUpdateModalComponentProps {
   /** Schema to use */
-  schema: any
+  schema: Schema
   /** Data source to use to get values */
-  dataSource: any
+  dataSource: DataSource
   singleRowTable?: string
 }
 

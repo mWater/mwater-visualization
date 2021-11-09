@@ -4,7 +4,7 @@ const R = React.createElement
 import uuid from "uuid"
 import { default as produce } from "immer"
 import { original } from "immer"
-import { injectTableAlias } from "mwater-expressions"
+import { DataSource, injectTableAlias, Schema } from "mwater-expressions"
 import Chart from "../Chart"
 import { ExprUtils } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
@@ -34,7 +34,7 @@ ordering:
 
 */
 export default class TableChart extends Chart {
-  cleanDesign(design: any, schema: any) {
+  cleanDesign(design: any, schema: Schema) {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
@@ -90,7 +90,7 @@ export default class TableChart extends Chart {
     return design
   }
 
-  validateDesign(design: any, schema: any) {
+  validateDesign(design: any, schema: Schema) {
     const axisBuilder = new AxisBuilder({ schema })
 
     // Check that has table
@@ -152,7 +152,7 @@ export default class TableChart extends Chart {
   // dataSource: data source to get data from
   // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   // callback: (error, data)
-  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
+  getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any) {
     let column
     const exprUtils = new ExprUtils(schema)
     const exprCompiler = new ExprCompiler(schema)
@@ -292,7 +292,7 @@ export default class TableChart extends Chart {
     return React.createElement(TableChartViewComponent, props)
   }
 
-  createDataTable(design: any, schema: any, dataSource: any, data: any, locale: any) {
+  createDataTable(design: any, schema: Schema, dataSource: DataSource, data: any, locale: any) {
     let exprUtils = new ExprUtils(schema)
 
     const renderHeaderCell = (column: any) => {
@@ -333,7 +333,7 @@ export default class TableChart extends Chart {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design: any, schema: any) {
+  getFilterableTables(design: any, schema: Schema) {
     return _.compact([design.table])
   }
 

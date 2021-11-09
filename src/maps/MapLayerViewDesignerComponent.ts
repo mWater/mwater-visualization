@@ -7,11 +7,12 @@ import { default as Rcslider } from "rc-slider"
 import LayerFactory from "./LayerFactory"
 import * as ui from "react-library/lib/bootstrap"
 import PopoverHelpComponent from "react-library/lib/PopoverHelpComponent"
+import { DataSource, Schema } from "mwater-expressions"
 
 interface MapLayerViewDesignerComponentProps {
   /** Schema to use */
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   /** See Map Design.md */
   layerView: any
   /** Called with new layer view */

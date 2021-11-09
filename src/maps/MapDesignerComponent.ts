@@ -12,14 +12,14 @@ import MapFiltersDesignerComponent from "./MapFiltersDesignerComponent"
 import BaseLayerDesignerComponent from "./BaseLayerDesignerComponent"
 import PopoverHelpComponent from "react-library/lib/PopoverHelpComponent"
 import * as MapUtils from "./MapUtils"
-import { ExprCompiler } from "mwater-expressions"
+import { DataSource, ExprCompiler, Schema } from "mwater-expressions"
 import * as ui from "react-library/lib/bootstrap"
 
 interface MapDesignerComponentProps {
   /** Schema to use */
-  schema: any
+  schema: Schema
   /** Data source to use */
-  dataSource: any
+  dataSource: DataSource
   /** See Map Design.md */
   design: any
   /** Called with new design */

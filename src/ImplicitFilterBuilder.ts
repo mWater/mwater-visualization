@@ -1,5 +1,5 @@
 import _ from "lodash"
-import { injectTableAlias } from "mwater-expressions"
+import { injectTableAlias, Schema } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 
 // Given a series of explicit filters on tables (array of { table: table id, jsonql: JsonQL with {alias} for the table name to filter by })
@@ -7,7 +7,8 @@ import { ExprCompiler } from "mwater-expressions"
 // For example, a given community has N water points. If communities are filtered, we want to filter water points as well since there is a
 // clear parent-child relationship (specifically, a single n-1 join between water points and communities)
 export default class ImplicitFilterBuilder {
-  constructor(schema: any) {
+  schema: Schema
+  constructor(schema: Schema) {
     this.schema = schema
   }
 

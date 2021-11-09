@@ -3,7 +3,7 @@ import _ from "lodash"
 import React from "react"
 const R = React.createElement
 import { FilterExprComponent } from "mwater-expressions-ui"
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import AxisComponent from "./../axes/AxisComponent"
 import ColorComponent from "../ColorComponent"
@@ -16,8 +16,8 @@ import * as ui from "react-library/lib/bootstrap"
 
 interface MarkersLayerDesignerComponentProps {
   /** Schema to use */
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   /** Design of the marker layer */
   design: any
   /** Called with new design */

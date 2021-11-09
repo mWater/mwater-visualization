@@ -3,7 +3,7 @@ import _ from "lodash"
 import React from "react"
 const R = React.createElement
 
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import { ExprComponent } from "mwater-expressions-ui"
 import TableSelectComponent from "../../TableSelectComponent"
 import { getFormatOptions } from "../../valueFormatter"
@@ -12,9 +12,9 @@ import { Checkbox } from "react-library/lib/bootstrap"
 
 interface ExprItemEditorComponentProps {
   /** Schema to use */
-  schema: any
+  schema: Schema
   /** Data source to use to get values */
-  dataSource: any
+  dataSource: DataSource
   /** Expression item to edit */
   exprItem: any
   /** Called with expr item */

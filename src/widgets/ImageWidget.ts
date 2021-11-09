@@ -1,7 +1,7 @@
 import React from "react"
 const R = React.createElement
 import _ from "lodash"
-import { ExprCompiler } from "mwater-expressions"
+import { DataSource, ExprCompiler, Schema } from "mwater-expressions"
 import { injectTableAlias } from "mwater-expressions"
 import Widget from "./Widget"
 
@@ -49,7 +49,7 @@ export default class ImageWidget extends Widget {
   //   dataSource: data source to get data from
   //   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   //   callback: (error, data)
-  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
+  getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any) {
     if (!design.expr) {
       return callback(null)
     }
@@ -109,7 +109,7 @@ export default class ImageWidget extends Widget {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design: any, schema: any) {
+  getFilterableTables(design: any, schema: Schema) {
     if (design.expr?.table) {
       return [design.expr.table]
     }

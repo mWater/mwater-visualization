@@ -3,11 +3,11 @@ import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 
-import { ExprUtils } from "mwater-expressions"
+import { ExprUtils, Schema } from "mwater-expressions"
 import * as ui from "react-library/lib/bootstrap"
 
 interface MWaterResponsesFilterComponentProps {
-  schema: any
+  schema: Schema
   /** responses:xyz */
   table: string
   filter?: any

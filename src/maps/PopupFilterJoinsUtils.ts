@@ -1,8 +1,8 @@
-import { ExprCompiler } from "mwater-expressions"
+import { ExprCompiler, Schema } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 
 // Utilities for popup filter joins. See PopupFilterJoins.md for further explanation.
-export function createPopupFilters(popupFilterJoins: any, schema: any, layerTable: any, rowId: any, useWithin = false) {
+export function createPopupFilters(popupFilterJoins: any, schema: Schema, layerTable: any, rowId: any, useWithin = false) {
   const exprUtils = new ExprUtils(schema)
   const exprCompiler = new ExprCompiler(schema)
 

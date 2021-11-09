@@ -10,11 +10,12 @@ import * as DashboardUtils from "./DashboardUtils"
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent"
 import QuickfiltersDesignComponent from "../quickfilter/QuickfiltersDesignComponent"
 import FiltersDesignerComponent from "../FiltersDesignerComponent"
+import { DataSource, Schema } from "mwater-expressions"
 
 interface SettingsModalComponentProps {
   onDesignChange: any
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
 }
 
 interface SettingsModalComponentState {

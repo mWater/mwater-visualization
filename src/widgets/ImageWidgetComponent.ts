@@ -15,16 +15,18 @@ import { ExprComponent } from "mwater-expressions-ui"
 import TableSelectComponent from "../TableSelectComponent"
 import ImageUploaderComponent from "./ImageUploaderComponent"
 import ImagelistCarouselComponent from "./ImagelistCarouselComponent"
+import { DataSource, Schema } from "mwater-expressions"
+import { WidgetDataSource } from "./WidgetDataSource"
 
 interface ImageWidgetComponentProps {
   design: any
   /** Called with new design. null/undefined for readonly */
   onDesignChange?: any
   filters?: any
-  schema: any
+  schema: Schema
   /** Data source to use for widget */
-  dataSource: any
-  widgetDataSource: any
+  dataSource: DataSource
+  widgetDataSource: WidgetDataSource
   width?: number
   height?: number
   singleRowTable?: string
@@ -161,8 +163,8 @@ interface ImageWidgetDesignComponentProps {
   design: any
   /** Called with new design. null/undefined for readonly */
   onDesignChange?: any
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
 }
 
 interface ImageWidgetDesignComponentState {

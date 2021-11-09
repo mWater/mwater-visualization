@@ -4,11 +4,12 @@ const R = React.createElement
 
 import MapLayersDesignerComponent from "./MapLayersDesignerComponent"
 import BaseLayerDesignerComponent from "./BaseLayerDesignerComponent"
+import { DataSource, Schema } from "mwater-expressions"
 
 interface MapControlComponentProps {
   /** Schema to use */
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   /** See Map Design.md */
   design: any
   onDesignChange: any

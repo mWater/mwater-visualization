@@ -208,7 +208,7 @@ export default class QuickfiltersComponent extends React.Component<QuickfiltersC
 
 interface EnumQuickfilterComponentProps {
   label?: string
-  schema: any
+  schema: Schema
   /** true to display multiple values */
   multi?: boolean
   /** Current value of quickfilter (state of filter selected) */
@@ -305,9 +305,9 @@ class EnumQuickfilterComponent extends React.Component<EnumQuickfilterComponentP
 
 interface TextQuickfilterComponentProps {
   label: string
-  schema: any
+  schema: Schema
   /** See QuickfiltersDataSource */
-  quickfiltersDataSource: any
+  quickfiltersDataSource: QuickfiltersDataSource
   expr: any
   index: number
   /** Current value of quickfilter (state of filter selected) */
@@ -349,7 +349,7 @@ class TextQuickfilterComponent extends React.Component<TextQuickfilterComponentP
 
 interface DateQuickfilterComponentProps {
   label?: string
-  schema: any
+  schema: Schema
   expr: any
   /** Current value of quickfilter (state of filter selected) */
   value?: any
@@ -379,9 +379,9 @@ class DateQuickfilterComponent extends React.Component<DateQuickfilterComponentP
 
 interface TextArrayQuickfilterComponentProps {
   label: string
-  schema: any
+  schema: Schema
   /** See QuickfiltersDataSource */
-  quickfiltersDataSource: any
+  quickfiltersDataSource: QuickfiltersDataSource
   expr: any
   index: number
   /** Current value of quickfilter (state of filter selected) */

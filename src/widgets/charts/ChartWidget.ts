@@ -8,6 +8,8 @@ import ActionCancelModalComponent from "react-library/lib/ActionCancelModalCompo
 import ChartViewComponent from "./ChartViewComponent"
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent"
 import * as ui from "react-library/lib/bootstrap"
+import { DataSource, Schema } from "mwater-expressions"
+import { WidgetDataSource } from "../WidgetDataSource"
 
 // A widget which is a chart
 export default class ChartWidget extends Widget {
@@ -52,7 +54,7 @@ export default class ChartWidget extends Widget {
   //   dataSource: data source to get data from
   //   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   //   callback: (error, data)
-  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
+  getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any) {
     // Clean design first
     design = this.chart.cleanDesign(design, schema)
 
@@ -60,7 +62,7 @@ export default class ChartWidget extends Widget {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design: any, schema: any) {
+  getFilterableTables(design: any, schema: Schema) {
     // Clean design first
     design = this.chart.cleanDesign(design, schema)
 
@@ -75,18 +77,16 @@ export default class ChartWidget extends Widget {
 
 interface ChartWidgetComponentProps {
   /** schema to use */
-  schema: any
+  schema: Schema
   /** data source to use */
-  dataSource: any
-  widgetDataSource: any
+  dataSource: DataSource
+  widgetDataSource: WidgetDataSource
   /** Chart object to use */
   chart: any
   /** Design of chart */
   design: any
   /** null/undefined for readonly */
   onDesignChange?: any
-  /** Data source to use for chart */
-  dataSource: any
   width?: number
   height?: number
   /** scope of the widget (when the widget self-selects a particular scope) */

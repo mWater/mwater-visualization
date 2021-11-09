@@ -19,16 +19,17 @@ import * as ui from "react-library/lib/bootstrap"
 import { getFormatOptions } from "../valueFormatter"
 import { getDefaultFormat } from "../valueFormatter"
 import { DatagridDesignColumn } from "./DatagridDesign"
+import { DatagridDesign } from ".."
 
 interface DatagridDesignerComponentProps {
   /** schema to use */
-  schema: any
+  schema: Schema
   /** dataSource to use */
-  dataSource: any
+  dataSource: DataSource
   /** Design of datagrid. See README.md of this folder */
-  design: any
+  design: DatagridDesign
   /** Called when design changes */
-  onDesignChange: any
+  onDesignChange: (design: DatagridDesign) => void
 }
 
 // Designer for the datagrid. Currenly allows only single-table designs (no subtable rows)
@@ -195,9 +196,9 @@ class DatagridOptionsComponent extends React.Component<DatagridOptionsComponentP
 }
 interface ColumnsDesignerComponentProps {
   /** schema to use */
-  schema: any
+  schema: Schema
   /** dataSource to use */
-  dataSource: any
+  dataSource: DataSource
   table: string
   /** Columns list See README.md of this folder */
   columns: any

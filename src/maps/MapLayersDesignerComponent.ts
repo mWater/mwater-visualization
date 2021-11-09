@@ -7,13 +7,13 @@ import LayerFactory from "./LayerFactory"
 import AddLayerComponent from "./AddLayerComponent"
 import MapLayerViewDesignerComponent from "./MapLayerViewDesignerComponent"
 import ReorderableListComponent from "react-library/lib/reorderable/ReorderableListComponent"
-import { ExprCompiler } from "mwater-expressions"
+import { DataSource, ExprCompiler, Schema } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
 
 interface MapLayersDesignerComponentProps {
   /** Schema to use */
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   /** See Map Design.md */
   design: any
   /** Called with new design */

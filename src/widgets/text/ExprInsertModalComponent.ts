@@ -3,7 +3,7 @@ import React from "react"
 const R = React.createElement
 
 import uuid from "uuid"
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import { ExprComponent } from "mwater-expressions-ui"
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent"
 import TableSelectComponent from "../../TableSelectComponent"
@@ -11,9 +11,9 @@ import ExprItemEditorComponent from "./ExprItemEditorComponent"
 
 interface ExprInsertModalComponentProps {
   /** Schema to use */
-  schema: any
+  schema: Schema
   /** Data source to use to get values */
-  dataSource: any
+  dataSource: DataSource
   /** Called with expr item to insert */
   onInsert: any
   singleRowTable?: string

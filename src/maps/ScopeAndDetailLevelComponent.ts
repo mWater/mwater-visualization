@@ -3,15 +3,15 @@ import _ from "lodash"
 import React from "react"
 const H = React.DOM
 const R = React.createElement
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import RegionSelectComponent from "./RegionSelectComponent"
 import DetailLevelSelectComponent from "./DetailLevelSelectComponent"
 import * as ui from "react-library/lib/bootstrap"
 
 interface ScopeAndDetailLevelComponentProps {
   /** Schema to use */
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   /** admin region that is outside bounds. null for whole world */
   scope?: string
   /** level of scope region. null for whole world */

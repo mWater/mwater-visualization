@@ -5,7 +5,7 @@ import async from "async"
 import uuid from "uuid"
 import { default as produce } from "immer"
 import { original } from "immer"
-import { WeakCache } from "mwater-expressions"
+import { DataSource, Schema, WeakCache } from "mwater-expressions"
 import Chart from "../Chart"
 import { ExprCleaner } from "mwater-expressions"
 import AxisBuilder from "../../../axes/AxisBuilder"
@@ -13,13 +13,14 @@ import TextWidget from "../../text/TextWidget"
 import * as PivotChartUtils from "./PivotChartUtils"
 import PivotChartQueryBuilder from "./PivotChartQueryBuilder"
 import PivotChartLayoutBuilder from "./PivotChartLayoutBuilder"
+import { WidgetDataSource } from "../../WidgetDataSource"
 
 // Store true as a weakly cached value if a design is already clean
 const cleanDesignCache = new WeakCache()
 
 // See README.md for the design
 export default class PivotChart extends Chart {
-  cleanDesign(design: any, schema: any) {
+  cleanDesign(design: any, schema: Schema) {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
@@ -153,7 +154,7 @@ export default class PivotChart extends Chart {
     return cleanedDesign
   }
 
-  validateDesign(design: any, schema: any) {
+  validateDesign(design: any, schema: Schema) {
     let segment
     const axisBuilder = new AxisBuilder({ schema })
 
@@ -247,7 +248,7 @@ export default class PivotChart extends Chart {
   // dataSource: data source to get data from
   // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   // callback: (error, data)
-  getData(design: any, schema: any, dataSource: any, filters: any, callback: any) {
+  getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any) {
     const queryBuilder = new PivotChartQueryBuilder({ schema })
     const queries = queryBuilder.createQueries(design, filters)
 
@@ -322,11 +323,11 @@ export default class PivotChart extends Chart {
     return React.createElement(PivotChartViewComponent, props)
   }
 
-  createDropdownItems(design: any, schema: any, widgetDataSource: any, filters: any) {
+  createDropdownItems(design: any, schema: Schema, widgetDataSource: WidgetDataSource, filters: any) {
     return []
   }
 
-  createDataTable(design: any, schema: any, dataSource: any, data: any, locale: any) {
+  createDataTable(design: any, schema: Schema, dataSource: DataSource, data: any, locale: any) {
     // Create layout
     const layout = new PivotChartLayoutBuilder({ schema }).buildLayout(design, data, locale)
 
@@ -334,7 +335,7 @@ export default class PivotChart extends Chart {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design: any, schema: any) {
+  getFilterableTables(design: any, schema: Schema) {
     let filterableTables = design.table ? [design.table] : []
 
     // Get filterable tables from header and footer

@@ -1,6 +1,7 @@
 import $ from "jquery"
 import Layer from "./Layer"
 import React from "react"
+import { Schema } from "mwater-expressions"
 const R = React.createElement
 
 // TODO DEPRECATED. REPLACE WITH REAL MARKER AND BUFFER LAYERS
@@ -45,7 +46,7 @@ export default class MWaterServerLayer extends Layer<any> {
 
   // Get the legend to be optionally displayed on the map. Returns
   // a React element
-  getLegend(design: any, schema: any) {
+  getLegend(design: any, schema: Schema) {
     // Create loading legend component
     // TODO hardcoded
     const apiUrl = "https://api.mwater.co/v3/"
@@ -53,7 +54,7 @@ export default class MWaterServerLayer extends Layer<any> {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design: any, schema: any) {
+  getFilterableTables(design: any, schema: Schema) {
     if (design.table) {
       return [design.table]
     } else {
@@ -67,12 +68,12 @@ export default class MWaterServerLayer extends Layer<any> {
   }
 
   // Returns a cleaned design
-  cleanDesign(design: any, schema: any) {
+  cleanDesign(design: any, schema: Schema) {
     return design
   }
 
   // Validates design. Null if ok, message otherwise
-  validateDesign(design: any, schema: any) {
+  validateDesign(design: any, schema: Schema) {
     return null
   }
 }

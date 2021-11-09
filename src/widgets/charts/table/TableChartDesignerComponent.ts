@@ -3,7 +3,7 @@ import _ from "lodash"
 import React from "react"
 const R = React.createElement
 import uuid from "uuid"
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import AxisBuilder from "../../../axes/AxisBuilder"
 import { LinkComponent } from "mwater-expressions-ui"
 import { ExprComponent } from "mwater-expressions-ui"
@@ -17,8 +17,8 @@ import { getDefaultFormat } from "../../../valueFormatter"
 
 interface TableChartDesignerComponentProps {
   design: any
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   onDesignChange: any
 }
 
@@ -239,8 +239,8 @@ export default class TableChartDesignerComponent extends React.Component<TableCh
 
 interface TableChartColumnDesignerComponentProps {
   design: any
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   index: number
   onChange: any
   onRemove: any

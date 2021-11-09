@@ -10,12 +10,13 @@ import AxisComponent from "../../../axes/AxisComponent"
 import ColorComponent from "../../../ColorComponent"
 import { FilterExprComponent } from "mwater-expressions-ui"
 import { ExprComponent } from "mwater-expressions-ui"
+import { DataSource, Schema } from "mwater-expressions"
 
 interface IntersectionDesignerComponentProps {
   intersection: any
   table: string
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   onChange: any
   filters?: any
 }
@@ -229,8 +230,8 @@ export default class IntersectionDesignerComponent extends React.Component<Inter
 interface BackgroundColorConditionsComponentProps {
   colorConditions?: any
   table: string
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   onChange: any
 }
 
@@ -286,8 +287,8 @@ class BackgroundColorConditionsComponent extends React.Component<BackgroundColor
 interface BackgroundColorConditionComponentProps {
   colorCondition: any
   table: string
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   onChange: any
 }
 

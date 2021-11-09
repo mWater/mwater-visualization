@@ -4,7 +4,7 @@ import React from "react"
 const R = React.createElement
 
 import { FilterExprComponent } from "mwater-expressions-ui"
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import NumberInputComponent from "react-library/lib/NumberInputComponent"
 import AxisComponent from "./../axes/AxisComponent"
@@ -17,8 +17,8 @@ import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
 
 interface BufferLayerDesignerComponentProps {
   /** Schema to use */
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   /** Design of the design */
   design: any
   /** Called with new design */

@@ -4,6 +4,7 @@ import _ from "lodash"
 import $ from "jquery"
 import saveSvgAsPng from "save-svg-as-png"
 import LayeredChartCompiler from "./LayeredChartCompiler"
+import { Schema } from "mwater-expressions"
 
 // Get the css rules corresponding to .c3 directly out of the document object
 function getC3Css() {
@@ -67,7 +68,7 @@ function saveSvgToFile(containerDiv: any, title: any) {
 // schema: the chart's schema
 // format: "svg" or "png"
 export default {
-  save(design: any, data: any, schema: any, format: any) {
+  save(design: any, data: any, schema: Schema, format: any) {
     const compiler = new LayeredChartCompiler({ schema })
     const props = {
       design,

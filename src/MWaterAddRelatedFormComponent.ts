@@ -7,7 +7,7 @@ const R = React.createElement
 import moment from "moment"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 import querystring from "querystring"
-import { ExprUtils } from "mwater-expressions"
+import { ExprUtils, Schema } from "mwater-expressions"
 import * as ui from "./UIComponents"
 import * as formUtils from "mwater-forms/lib/formUtils" // TODO requireing this directly because of bizarre backbone issue
 
@@ -19,7 +19,7 @@ interface MWaterAddRelatedFormComponentProps {
   user?: string
   /** Called with table id e.g. responses:someid */
   onSelect: any
-  schema: any
+  schema: Schema
 }
 
 interface MWaterAddRelatedFormComponentState {

@@ -4,11 +4,11 @@ import _ from "lodash"
 const R = React.createElement
 import AxisBuilder from "../axes/AxisBuilder"
 import LegendGroup from "./LegendGroup"
-import { ExprUtils } from "mwater-expressions"
+import { ExprUtils, Schema, Schema } from "mwater-expressions"
 import { injectTableAlias } from "mwater-expressions"
 
 interface LayerLegendComponentProps {
-  schema: any
+  schema: Schema
   name: string
   radiusLayer?: boolean
   axis?: any

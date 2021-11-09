@@ -1,16 +1,13 @@
-import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
-import moment from "moment"
-import { ExprUtils } from "mwater-expressions"
-import { Cell } from "fixed-data-table-2"
+import { DataSource, EnumValue, ExprUtils, Schema } from "mwater-expressions"
 
-interface EditExprCellComponentProps {
+export interface EditExprCellComponentProps {
   /** schema to use */
-  schema: any
+  schema: Schema
   /** dataSource to use */
-  dataSource: any
+  dataSource: DataSource
   /** Locale to use */
   locale?: string
   width: number
@@ -47,7 +44,7 @@ export default class EditExprCellComponent extends React.Component<
   }
 
   handleChange = (value: any) => {
-    return this.setState({ value })
+    this.setState({ value })
   }
 
   render() {
@@ -64,7 +61,6 @@ export default class EditExprCellComponent extends React.Component<
           onSave: this.props.onSave,
           onCancel: this.props.onCancel
         })
-        break
       case "number":
         return R(NumberEditComponent, {
           value: this.state.value,
@@ -72,17 +68,15 @@ export default class EditExprCellComponent extends React.Component<
           onSave: this.props.onSave,
           onCancel: this.props.onCancel
         })
-        break
       case "enum":
         return R(EnumEditComponent, {
           value: this.state.value,
           onChange: this.handleChange,
-          enumValues: exprUtils.getExprEnumValues(this.props.expr),
+          enumValues: exprUtils.getExprEnumValues(this.props.expr)!,
           onSave: this.props.onSave,
           onCancel: this.props.onCancel,
           locale: this.props.locale
         })
-        break
     }
 
     throw new Error(`Unsupported type ${exprType} for editing`)
@@ -100,6 +94,8 @@ interface TextEditComponentProps {
 
 // Simple text box
 class TextEditComponent extends React.Component<TextEditComponentProps> {
+  input: HTMLInputElement | null
+
   componentDidMount() {
     // Focus when created
     return this.input?.focus()
@@ -110,8 +106,8 @@ class TextEditComponent extends React.Component<TextEditComponentProps> {
       "div",
       { style: { paddingTop: 3 } },
       R("input", {
-        ref: (c: any) => {
-          return (this.input = c)
+        ref: (c: HTMLInputElement | null) => {
+          this.input = c
         },
         type: "text",
         className: "form-control",
@@ -141,6 +137,8 @@ interface NumberEditComponentProps {
 
 // Simple number box
 class NumberEditComponent extends React.Component<NumberEditComponentProps> {
+  input: HTMLInputElement | null
+
   componentDidMount() {
     // Focus when created
     return this.input?.focus()
@@ -182,7 +180,7 @@ class NumberEditComponent extends React.Component<NumberEditComponentProps> {
 
 interface EnumEditComponentProps {
   value?: any
-  enumValues: any
+  enumValues: EnumValue[]
   /** Locale to use */
   locale?: string
   /** Called with new value */

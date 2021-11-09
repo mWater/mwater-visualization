@@ -4,14 +4,14 @@ import React from "react"
 import ReactDOM from "react-dom"
 const R = React.createElement
 
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import LayeredChartCompiler from "./LayeredChartCompiler"
 import TextComponent from "../../text/TextComponent"
 import * as d3 from "d3"
 
 interface LayeredChartViewComponentProps {
-  schema: any
-  dataSource: any
+  schema: Schema
+  dataSource: DataSource
   design: any
   data: any
   onDesignChange?: any
@@ -150,7 +150,7 @@ export default class LayeredChartViewComponent extends React.Component<
 }
 
 interface C3ChartComponentProps {
-  schema: any
+  schema: Schema
   design: any
   data: any
   onDesignChange?: any

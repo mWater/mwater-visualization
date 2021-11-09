@@ -6,7 +6,7 @@ const R = React.createElement
 import moment from "moment"
 import { default as Linkify } from "react-linkify"
 import AxisBuilder from "../../../axes/AxisBuilder"
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import { formatValue } from "../../../valueFormatter"
 
 interface TableChartViewComponentProps {
@@ -15,7 +15,7 @@ interface TableChartViewComponentProps {
   /** Data that the table has requested */
   data: any
   /** Schema to use */
-  schema: any
+  schema: Schema
   width?: number
   height?: number
   /** scope of the widget (when the widget self-selects a particular scope) */
@@ -58,9 +58,9 @@ interface TableContentsComponentProps {
   /** Data that the table has requested */
   data: any
   /** Schema to use */
-  schema: any
+  schema: Schema
   /** Data source to use */
-  dataSource: any
+  dataSource: DataSource
   table: string
   /** Called with (tableId, rowId) when item is clicked */
   onRowClick?: any

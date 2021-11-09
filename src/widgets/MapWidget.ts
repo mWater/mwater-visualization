@@ -7,6 +7,8 @@ import DropdownWidgetComponent from "./DropdownWidgetComponent"
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent"
 import LayerFactory from "../maps/LayerFactory"
 import * as MapUtils from "../maps/MapUtils"
+import { DataSource, Schema } from "mwater-expressions"
+import { WidgetDataSource } from "./WidgetDataSource"
 
 // Design is the map design specified in maps/Map Design.md
 export default class MapWidget extends Widget {
@@ -41,7 +43,7 @@ export default class MapWidget extends Widget {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design: any, schema: any) {
+  getFilterableTables(design: any, schema: Schema) {
     // Get filterable tables
     return MapUtils.getFilterableTables(design, schema)
   }
@@ -49,10 +51,10 @@ export default class MapWidget extends Widget {
 
 interface MapWidgetComponentProps {
   /** Schema to use */
-  schema: any
+  schema: Schema
   /** Data source to use */
-  dataSource: any
-  widgetDataSource: any
+  dataSource: DataSource
+  widgetDataSource: WidgetDataSource
   /** See Map Design.md */
   design: any
   /** Called with new design.  null/undefined for readonly */
