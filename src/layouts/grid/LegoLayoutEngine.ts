@@ -2,6 +2,10 @@ import _ from "lodash"
 
 // Layout engine that places blocks like lego and displaces others out of the way
 export default class LegoLayoutEngine {
+  width: any
+  blocksAcross: any
+  scale: number
+  
   constructor(width: any, blocksAcross: any) {
     this.width = width
     this.blocksAcross = blocksAcross

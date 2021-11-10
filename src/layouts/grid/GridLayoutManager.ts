@@ -89,7 +89,7 @@ export default class GridLayoutManager extends LayoutManager {
   renderLayout(options: any) {
     const GridLayoutComponent = require("./GridLayoutComponent").default
 
-    return R(AutoSizeComponent, { injectWidth: true, injectHeight: true }, (size: any) => {
+    return R(AutoSizeComponent, { injectWidth: true, injectHeight: true } as any, (size: any) => {
       if (options.onItemsChange != null) {
         return R(
           "div",
@@ -177,7 +177,7 @@ export default class GridLayoutManager extends LayoutManager {
     const layoutEngine = new LegoLayoutEngine(100, 24)
 
     // Get existing layouts
-    const layouts = _.pluck(_.values(items), "layout")
+    const layouts = _.pluck(_.values(items) as any, "layout")
 
     // Find place for new item
     return layoutEngine.appendLayout(layouts, width, height)

@@ -1,5 +1,5 @@
 import React from "react";
-import { DataSource, Schema } from "mwater-expressions";
+import { DataSource, LiteralType, Schema } from "mwater-expressions";
 import { Cell } from "fixed-data-table-2";
 export interface ExprCellComponentProps {
     /** schema to use */
@@ -8,7 +8,7 @@ export interface ExprCellComponentProps {
     dataSource: DataSource;
     /** Locale to use */
     locale?: string;
-    exprType?: string;
+    exprType: LiteralType;
     /** Optional format */
     format?: string;
     width: number;

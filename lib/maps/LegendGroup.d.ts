@@ -1,10 +1,10 @@
 import React from "react";
-interface LegendGroupProps {
+export interface LegendGroupProps {
     items?: any;
     radiusLayer?: boolean;
     defaultColor?: string;
     name?: string;
-    symbol?: string;
+    symbol?: string | null;
     markerSize?: number;
 }
 export default class LegendGroup extends React.Component<LegendGroupProps> {
@@ -19,4 +19,3 @@ export default class LegendGroup extends React.Component<LegendGroupProps> {
         };
     }, HTMLElement>;
 }
-export {};

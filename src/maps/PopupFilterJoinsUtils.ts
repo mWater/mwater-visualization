@@ -1,5 +1,6 @@
-import { ExprCompiler, Schema } from "mwater-expressions"
+import { Expr, ExprCompiler, Schema } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
+import { JsonQLFilter } from ".."
 
 // Utilities for popup filter joins. See PopupFilterJoins.md for further explanation.
 export function createPopupFilters(
@@ -8,11 +9,11 @@ export function createPopupFilters(
   layerTable: any,
   rowId: any,
   useWithin = false
-) {
+): JsonQLFilter[] {
   const exprUtils = new ExprUtils(schema)
   const exprCompiler = new ExprCompiler(schema)
 
-  const filters = []
+  const filters: JsonQLFilter[] = []
 
   // For each filter join
   for (let table in popupFilterJoins) {
@@ -25,7 +26,7 @@ export function createPopupFilters(
       // For simple id type
       if (exprType === "id") {
         // Compile filter
-        const filterExpr = {
+        const filterExpr: Expr = {
           type: "op",
           op: "within",
           table,
@@ -48,7 +49,7 @@ export function createPopupFilters(
       //   filters.push(exprCompiler.compileExpr(expr: filterExpr, tableAlias: "{alias}"))
     } else {
       // For simple id type
-      var filter
+      var filter: JsonQLFilter
       if (exprType === "id") {
         filter = {
           table,

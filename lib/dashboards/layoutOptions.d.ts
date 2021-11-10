@@ -15,5 +15,5 @@ export interface BlocksLayoutOptions {
     hideQuickfiltersWidth: number | null;
 }
 /** Get default layout options for a theme */
-export declare function getDefaultLayoutOptions(theme: DashboardTheme | undefined): BlocksLayoutOptions;
+export declare function getDefaultLayoutOptions(theme?: DashboardTheme | undefined): BlocksLayoutOptions;
 export declare function getLayoutOptions(design: DashboardDesign): BlocksLayoutOptions;

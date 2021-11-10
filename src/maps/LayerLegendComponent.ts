@@ -4,14 +4,14 @@ import _ from "lodash"
 const R = React.createElement
 import AxisBuilder from "../axes/AxisBuilder"
 import LegendGroup from "./LegendGroup"
-import { ExprUtils, Schema, Schema } from "mwater-expressions"
-import { injectTableAlias } from "mwater-expressions"
+import { ExprUtils, Schema } from "mwater-expressions"
+import { Axis } from "../axes/Axis"
 
-interface LayerLegendComponentProps {
+export interface LayerLegendComponentProps {
   schema: Schema
   name: string
   radiusLayer?: boolean
-  axis?: any
+  axis?: Axis
   symbol?: string
   markerSize?: number
   defaultColor?: string
@@ -54,14 +54,14 @@ export default class LayerLegendComponent extends React.Component<LayerLegendCom
     const categories = this.getCategories()
 
     if (this.props.axis && this.props.axis.colorMap) {
-      items = _.map(categories, (category) => {
+      items = _.map(categories || [], (category) => {
         // Exclude if excluded
-        if (_.includes(this.props.axis.excludedValues, category.value)) {
+        if (_.includes(this.props.axis!.excludedValues || [], category.value)) {
           return null
         }
 
         const label = axisBuilder.formatCategory(this.props.axis, category)
-        const color = _.find(this.props.axis.colorMap, { value: category.value })
+        const color = _.find(this.props.axis!.colorMap!, { value: category.value })
         if (color) {
           return { color: color.color, name: label }
         } else {

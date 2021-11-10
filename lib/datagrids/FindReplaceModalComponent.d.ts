@@ -1,4 +1,5 @@
 import React from "react";
+import AutoSizeComponent from "react-library/lib/AutoSizeComponent";
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent";
 import { DataSource, Expr, Schema } from "mwater-expressions";
 import { DatagridDesign, JsonQLFilter } from "..";
@@ -27,7 +28,7 @@ export default class FindReplaceModalComponent extends React.Component<FindRepla
     constructor(props: any);
     show(): void;
     performReplace(): void;
-    renderPreview(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+    renderPreview(): React.CElement<import("react-library/lib/AutoSizeComponent").AutoSizeComponentProps, AutoSizeComponent>;
     renderContents(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
     render(): React.CElement<any, ModalPopupComponent> | null;
 }

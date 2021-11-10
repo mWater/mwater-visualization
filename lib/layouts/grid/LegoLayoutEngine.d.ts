@@ -1,6 +1,9 @@
 export default class LegoLayoutEngine {
+    width: any;
+    blocksAcross: any;
+    scale: number;
     constructor(width: any, blocksAcross: any);
-    calculateHeight(layouts: any): any;
+    calculateHeight(layouts: any): number;
     getLayoutBounds(layout: any): {
         x: number;
         y: number;

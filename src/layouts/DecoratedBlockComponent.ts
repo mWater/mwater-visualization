@@ -16,6 +16,7 @@ interface DecoratedBlockComponentProps {
   /** Set to allow changing aspect ratio */
   aspectRatio?: number
   onAspectRatioChange?: any
+  isDragging: boolean
 }
 
 interface DecoratedBlockComponentState {
@@ -77,7 +78,7 @@ export default class DecoratedBlockComponent extends React.Component<
     document.removeEventListener("mouseup", this.handleMouseUp)
 
     // Fire new aspect ratio
-    this.props.onAspectRatioChange(this.props.aspectRatio / (this.state.aspectDragY / this.state.initialAspectDragY))
+    this.props.onAspectRatioChange(this.props.aspectRatio! / (this.state.aspectDragY / this.state.initialAspectDragY))
     return this.setState({ aspectDragY: null, initialAspectDragY: null, initialClientY: null })
   }
 

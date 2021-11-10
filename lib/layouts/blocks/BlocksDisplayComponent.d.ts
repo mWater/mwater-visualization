@@ -1,8 +1,10 @@
 import React from "react";
+import AutoSizeComponent from "react-library/lib/AutoSizeComponent";
 import HorizontalBlockComponent from "./HorizontalBlockComponent";
+import { LayoutBlock } from "./blockUtils";
 interface BlocksDisplayComponentProps {
-    items: any;
-    onItemsChange?: any;
+    items: LayoutBlock;
+    onItemsChange?: (items: LayoutBlock) => void;
     /** Stylesheet to use. null for default */
     style?: string;
     /** layout options to use */
@@ -17,9 +19,9 @@ interface BlocksDisplayComponentProps {
     cantPasteMessage?: string;
 }
 declare class BlocksDisplayComponent extends React.Component<BlocksDisplayComponentProps> {
-    handleBlockDrop: (sourceBlock: any, targetBlock: any, side: any) => any;
-    handleBlockRemove: (block: any) => any;
-    handleBlockUpdate: (block: any) => any;
+    handleBlockDrop: (sourceBlock: any, targetBlock: any, side: "top" | "left" | "right" | "bottom") => void;
+    handleBlockRemove: (block: any) => void;
+    handleBlockUpdate: (block: any) => void;
     renderBlock: (block: any, collapseColumns?: boolean) => React.CElement<RootBlockComponentProps, RootBlockComponent> | React.CElement<any, HorizontalBlockComponent> | React.DetailedReactHTMLElement<{
         key: any;
         className: string;
@@ -37,7 +39,7 @@ declare class BlocksDisplayComponent extends React.Component<BlocksDisplayCompon
             left: number;
         };
     }, HTMLElement>;
-    render(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> | React.DetailedReactHTMLElement<{
+    render(): React.CElement<import("react-library/lib/AutoSizeComponent").AutoSizeComponentProps, AutoSizeComponent> | React.DetailedReactHTMLElement<{
         style: {
             width: string;
             height: string;

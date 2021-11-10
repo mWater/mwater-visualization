@@ -10,12 +10,12 @@ interface RegionSelectComponentProps {
   schema: Schema
   dataSource: DataSource
   /** _id of region */
-  region: number | null
+  region: number | null | undefined
   onChange: (region: number | null, level: number | null) => void
   /** Default "All Countries" */
   placeholder?: string
   /** e.g. "admin_regions" */
-  regionsTable: string
+  regionsTable?: string
   /** Maximum region level allowed */
   maxLevel?: number
 }

@@ -1,6 +1,7 @@
 import React from "react";
+import { LayoutBlock } from "./blockUtils";
 interface HorizontalBlockComponentProps {
-    block: any;
+    block: LayoutBlock;
     collapseColumns?: boolean;
     renderBlock: any;
     /** Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right */
@@ -17,13 +18,14 @@ interface HorizontalBlockComponentState {
     dragIndex: any;
 }
 export default class HorizontalBlockComponent extends React.Component<HorizontalBlockComponentProps, HorizontalBlockComponentState> {
+    blockRefs: {
+        [blockId: string]: HTMLElement | null;
+    };
     constructor(props: any);
     componentWillUnmount(): void;
     handleMouseDown: (index: any, ev: any) => void;
     handleMouseMove: (ev: any) => void;
     handleMouseUp: (ev: any) => void;
-    render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement> | React.DetailedReactHTMLElement<{
-        className: string;
-    }, HTMLElement>;
+    render(): React.ReactElement<any, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)>;
 }
 export {};

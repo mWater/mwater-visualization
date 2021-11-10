@@ -13,6 +13,7 @@ import { compileColorMapToMapbox } from "./mapboxUtils"
 import LegendGroup from "./LegendGroup"
 import LayerLegendComponent from "./LayerLegendComponent"
 import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
+import { AnyLayer } from "maplibre-gl"
 
 /*
 Layer which draws a buffer around geometries (i.e. a radius circle around points)
@@ -50,10 +51,10 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
   ): VectorTileDef {
     const jsonql = this.createJsonQL(design, schema, filters)
 
-    const mapLayers: mapboxgl.AnyLayer[] = []
+    const mapLayers: AnyLayer[] = []
 
     // If color axes, add color conditions
-    const color = compileColorMapToMapbox(design.axes.color, design.color || "transparent")
+    const color = compileColorMapToMapbox(design.axes.color || undefined, design.color || "transparent")
 
     mapLayers.push({
       id: `${sourceId}:fill`,
@@ -124,7 +125,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     */
 
     // Compile geometry axis
-    let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry, tableAlias: "main" })
+    let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry!, tableAlias: "main" })
 
     // radius / cos(st_ymax(st_transform(geometryExpr, 4326)) * 0.017453293)
     const bufferAmountExpr: JsonQLExpr = {
@@ -334,7 +335,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     */
 
     // Compile geometry axis
-    let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry, tableAlias: "main" })
+    let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry!, tableAlias: "main" })
 
     // radius * 2 / (!pixel_width! * cos(st_ymin(st_transform(geometryExpr, 4326)) * 0.017453293) + 1 # add one to make always visible
     const widthExpr: JsonQLExpr = {
@@ -665,7 +666,7 @@ marker-fill: ` +
       schema,
       dataSource,
       design.table,
-      design.axes.geometry.expr,
+      design.axes.geometry!.expr,
       design.filter || null,
       filters,
       callback
@@ -716,14 +717,13 @@ marker-fill: ` +
     return React.createElement(LayerLegendComponent, {
       schema,
       name,
-      dataSource,
       filters: _.compact(_filters),
       axis: axisBuilder.cleanAxis({
         axis: design.axes.color,
         table: design.table,
         types: ["enum", "text", "boolean", "date"],
         aggrNeed: "none"
-      }),
+      })!,
       radiusLayer: true,
       defaultColor: design.color,
       locale
@@ -851,7 +851,7 @@ marker-fill: ` +
     const axisBuilder = new AxisBuilder({ schema })
     const exprCompiler = new ExprCompiler(schema)
     // Compile geometry axis
-    const geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry, tableAlias: "main" })
+    const geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry!, tableAlias: "main" })
 
     // st_transform(st_buffer(st_transform(<geometry axis>, 4326)::geography, <radius>)::geometry, 3857) as the_geom_webmercator
     const bufferedGeometry: JsonQLExpr = {

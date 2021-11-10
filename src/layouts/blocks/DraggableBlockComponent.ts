@@ -2,7 +2,7 @@
 // Sanity-check the conversion and remove this comment.
 import _ from "lodash"
 import PropTypes from "prop-types"
-import React from "react"
+import React, { CSSProperties } from "react"
 import ReactDOM from "react-dom"
 const R = React.createElement
 
@@ -44,7 +44,7 @@ class DraggableBlockComponent extends React.Component<DraggableBlockComponentPro
   }
 
   renderHover() {
-    const lineStyle = { position: "absolute" }
+    const lineStyle: CSSProperties = { position: "absolute" }
 
     // Show
     if (this.props.isOver) {
@@ -83,7 +83,7 @@ class DraggableBlockComponent extends React.Component<DraggableBlockComponentPro
   }
 
   render() {
-    const style = {}
+    const style: CSSProperties = {}
 
     // Hide if dragging
     if (this.props.isDragging) {
@@ -98,7 +98,7 @@ class DraggableBlockComponent extends React.Component<DraggableBlockComponentPro
           "div",
           { style: { position: "relative" } },
           this.renderHover(),
-          React.cloneElement(React.Children.only(this.props.children), {
+          React.cloneElement(React.Children.only(this.props.children!) as any, {
             connectMoveHandle: this.props.connectDragSource,
             connectDragPreview: this.props.connectDragPreview
           })
@@ -115,7 +115,7 @@ function getDropSide(monitor: any, component: any) {
   const blockComponent = component.getDecoratedComponentInstance()
 
   // Get bounds of component
-  const hoverBoundingRect = ReactDOM.findDOMNode(blockComponent).getBoundingClientRect()
+  const hoverBoundingRect = (ReactDOM.findDOMNode(blockComponent)! as Element).getBoundingClientRect()
 
   const clientOffset = monitor.getClientOffset()
 

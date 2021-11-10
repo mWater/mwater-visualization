@@ -13,7 +13,7 @@ interface AdminScopeAndDetailLevelComponentProps {
   schema: Schema
   dataSource: DataSource
   /** admin region that is outside bounds. null for whole world */
-  scope?: string
+  scope?: number
   /** level of scope region. null for whole world */
   scopeLevel?: number
   /** Detail level within scope region */
@@ -80,10 +80,11 @@ export default class AdminScopeAndDetailLevelComponent extends React.Component<A
             R(ReactSelect, {
               value: _.findWhere(basicDetailLevelOptions, { value: this.props.detailLevel }) || null,
               options: basicDetailLevelOptions,
-              onChange: (opt) => this.handleDetailLevelChange(opt.value)
+              onChange: (opt: any) => this.handleDetailLevelChange(opt.value)
             })
           )
         }
+        return null
       })()
     )
   }

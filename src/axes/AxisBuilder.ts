@@ -505,7 +505,7 @@ export default class AxisBuilder {
   /** Get all categories for a given axis type given the known values
    * Returns array of { value, label }
    */
-  getCategories(axis: Axis, values: any[], locale?: string): AxisCategory[] {
+  getCategories(axis: Axis, values: any[] | null, locale?: string): AxisCategory[] {
     let categories: AxisCategory[], current, end, format, hasNone, label, max, min, value, year
     const noneCategory = { value: null, label: axis.nullLabel || "None" }
 
@@ -596,9 +596,9 @@ export default class AxisBuilder {
     // Handle floor
     if (axis.xform && axis.xform.type === "floor") {
       // Get min and max
-      min = _.min(_.filter(values, (v) => v != null))
-      max = _.max(_.filter(values, (v) => v != null))
-      const hasNull = _.filter(values, (v) => v == null).length > 0
+      min = _.min(_.filter(values || [], (v) => v != null))
+      max = _.max(_.filter(values || [], (v) => v != null))
+      const hasNull = _.filter(values || [], (v) => v == null).length > 0
       if (!_.isFinite(min) || !_.isFinite(max)) {
         return [noneCategory]
       }
@@ -635,7 +635,7 @@ export default class AxisBuilder {
       ]
 
       // Add none if needed
-      if (_.any(values, (v) => v == null)) {
+      if (_.any(values || [], (v) => v == null)) {
         categories.push(noneCategory)
       }
 
@@ -653,7 +653,7 @@ export default class AxisBuilder {
       }
 
       // Add none if needed
-      if (_.any(values, (v) => v == null)) {
+      if (_.any(values || [], (v) => v == null)) {
         categories.push(noneCategory)
       }
 
@@ -662,8 +662,8 @@ export default class AxisBuilder {
 
     if (axis.xform && axis.xform.type === "year") {
       let asc1, end2
-      hasNone = _.any(values, (v) => v == null)
-      values = _.compact(values)
+      hasNone = _.any(values || [], (v) => v == null)
+      values = _.compact(values || [])
       if (values.length === 0) {
         return [noneCategory]
       }
@@ -688,8 +688,8 @@ export default class AxisBuilder {
     }
 
     if (axis.xform && axis.xform.type === "yearmonth") {
-      hasNone = _.any(values, (v) => v == null)
-      values = _.compact(values)
+      hasNone = _.any(values || [], (v) => v == null)
+      values = _.compact(values || [])
       if (values.length === 0) {
         return [noneCategory]
       }
@@ -719,8 +719,8 @@ export default class AxisBuilder {
     }
 
     if (axis.xform && axis.xform.type === "yearweek") {
-      hasNone = _.any(values, (v) => v == null)
-      values = _.compact(values)
+      hasNone = _.any(values || [], (v) => v == null)
+      values = _.compact(values || [])
       if (values.length === 0) {
         return [noneCategory]
       }
@@ -750,8 +750,8 @@ export default class AxisBuilder {
     }
 
     if (axis.xform && axis.xform.type === "yearquarter") {
-      hasNone = _.any(values, (v) => v == null)
-      values = _.compact(values)
+      hasNone = _.any(values || [], (v) => v == null)
+      values = _.compact(values || [])
       if (values.length === 0) {
         return [noneCategory]
       }
@@ -807,8 +807,8 @@ export default class AxisBuilder {
         break
       case "text":
         // Return unique values
-        hasNone = _.any(values, (v) => v == null)
-        categories = _.map(_.compact(_.uniq(values)).sort(), (v) => ({
+        hasNone = _.any(values || [], (v) => v == null)
+        categories = _.map(_.compact(_.uniq(values || [])).sort(), (v) => ({
           value: v,
           label: v || "None"
         }))
@@ -823,7 +823,7 @@ export default class AxisBuilder {
         return [{ value: true, label: "True" }, { value: false, label: "False" }, noneCategory]
         break
       case "date":
-        values = _.compact(values)
+        values = _.compact(values || [])
         if (values.length === 0) {
           return [noneCategory]
         }

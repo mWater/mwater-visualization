@@ -23,9 +23,9 @@ import LegendComponent from "./LegendComponent"
 import darkMatter from "./map-styles/dark-matter.json"
 import positron from "./map-styles/positron.json"
 
-type LayerClickHandlerEvent = mapboxgl.MapMouseEvent & {
-  features?: mapboxgl.MapboxGeoJSONFeature[] | undefined
-} & mapboxgl.EventData
+type LayerClickHandlerEvent = maplibregl.MapMouseEvent & {
+  features?: maplibregl.MapboxGeoJSONFeature[] | undefined
+} & maplibregl.EventData
 
 /** Component that displays just the map */
 export function NewMapViewComponent(props: {
@@ -78,10 +78,10 @@ export function NewMapViewComponent(props: {
   const userStyleIncrRef = useRef(0)
 
   /** Style of the base layer */
-  const [baseStyle, setBaseStyle] = useState<mapboxgl.Style>()
+  const [baseStyle, setBaseStyle] = useState<maplibregl.Style>()
 
   /** Style of user layers */
-  const [userStyle, setUserStyle] = useState<mapboxgl.Style>()
+  const [userStyle, setUserStyle] = useState<maplibregl.Style>()
 
   /** Busy incrementable counter. Is busy if > 0 */
   const [busy, setBusy] = useState(0)
@@ -187,8 +187,8 @@ export function NewMapViewComponent(props: {
     const scopedCompiledFilters = props.scope ? compiledFilters.concat([props.scope.filter]) : compiledFilters
 
     // Sources to add
-    const newSources: { [id: string]: mapboxgl.AnySourceData } = {}
-    const newLayers: { layerViewId: string | null; layer: mapboxgl.AnyLayer }[] = []
+    const newSources: { [id: string]: maplibregl.AnySourceData } = {}
+    const newLayers: { layerViewId: string | null; layer: maplibregl.AnyLayer }[] = []
 
     // Mapbox layers with click handlers. Each is in format
     let newClickHandlers: { layerViewId: string; mapLayerId: string }[] = []
@@ -386,7 +386,7 @@ export function NewMapViewComponent(props: {
       // Load style
       fetch(styleUrl)
         .then((response) => response.json())
-        .then((styleData: mapboxgl.Style) => {
+        .then((styleData: maplibregl.Style) => {
           // Set style and update layers
           setBaseStyle(styleData)
         })
@@ -424,7 +424,7 @@ export function NewMapViewComponent(props: {
     }
 
     // Create background layer to simulate base layer opacity
-    const baseLayerOpacityLayer: mapboxgl.AnyLayer = {
+    const baseLayerOpacityLayer: maplibregl.AnyLayer = {
       id: "baseLayerOpacity",
       type: "background",
       paint: {
@@ -443,7 +443,7 @@ export function NewMapViewComponent(props: {
 
     layers = layers.concat(userStyle.layers || [])
 
-    const style: mapboxgl.Style = {
+    const style: maplibregl.Style = {
       ...baseStyle,
       sources: {
         ...baseStyle.sources,

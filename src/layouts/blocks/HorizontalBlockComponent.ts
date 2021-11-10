@@ -1,12 +1,12 @@
-import PropTypes from "prop-types"
 import _ from "lodash"
-import React from "react"
+import React, { ReactElement } from "react"
+import { LayoutBlock } from "./blockUtils"
 const R = React.createElement
 
 import DraggableBlockComponent from "./DraggableBlockComponent"
 
 interface HorizontalBlockComponentProps {
-  block: any
+  block: LayoutBlock
   collapseColumns?: boolean
   renderBlock: any
   /** Called with (sourceBlock, targetBlock, side) when block is dropped on it. side is top, left, bottom, right */
@@ -28,6 +28,8 @@ export default class HorizontalBlockComponent extends React.Component<
   HorizontalBlockComponentProps,
   HorizontalBlockComponentState
 > {
+  blockRefs: { [blockId: string]: HTMLElement | null }
+
   constructor(props: any) {
     super(props)
 
@@ -55,8 +57,8 @@ export default class HorizontalBlockComponent extends React.Component<
     // Get sizes of two blocks
     this.setState({
       dragIndex: index,
-      leftSize: this.blockRefs[`block${index}`].offsetWidth,
-      rightSize: this.blockRefs[`block${index + 1}`].offsetWidth
+      leftSize: this.blockRefs[`block${index}`]!.offsetWidth,
+      rightSize: this.blockRefs[`block${index + 1}`]!.offsetWidth
     })
 
     document.addEventListener("mousemove", this.handleMouseMove)
@@ -116,14 +118,14 @@ export default class HorizontalBlockComponent extends React.Component<
       return R(
         "div",
         null,
-        _.map(this.props.block.blocks, (block, index) => this.props.renderBlock(block, true))
+        _.map(this.props.block.blocks!, (block, index) => this.props.renderBlock(block, true))
       )
     }
 
     // Calculate widths (percentages)
     let totalWeight = 0
     for (
-      index = 0, end = this.props.block.blocks.length, asc = 0 <= end;
+      index = 0, end = this.props.block.blocks!.length, asc = 0 <= end;
       asc ? index < end : index > end;
       asc ? index++ : index--
     ) {
@@ -133,7 +135,7 @@ export default class HorizontalBlockComponent extends React.Component<
 
     const percentages: any = []
     for (
-      index = 0, end1 = this.props.block.blocks.length, asc1 = 0 <= end1;
+      index = 0, end1 = this.props.block.blocks!.length, asc1 = 0 <= end1;
       asc1 ? index < end1 : index > end1;
       asc1 ? index++ : index--
     ) {
@@ -142,7 +144,7 @@ export default class HorizontalBlockComponent extends React.Component<
     }
 
     if (this.props.onBlockUpdate != null) {
-      let elem = R(
+      let elem: ReactElement = R(
         "table",
         {
           style: { width: "100%", tableLayout: "fixed", position: "relative", paddingTop: 5 },
@@ -154,7 +156,7 @@ export default class HorizontalBlockComponent extends React.Component<
           R(
             "tr",
             null,
-            _.map(this.props.block.blocks, (block, index) => {
+            _.map(this.props.block.blocks!, (block, index) => {
               return [
                 index > 0 && this.props.onBlockUpdate != null
                   ? R("td", {
@@ -199,7 +201,7 @@ export default class HorizontalBlockComponent extends React.Component<
       return R(
         "div",
         { className: "mwater-visualization-horizontal-block" },
-        _.map(this.props.block.blocks, (block, index) => {
+        _.map(this.props.block.blocks!, (block, index) => {
           return [
             R(
               "div",

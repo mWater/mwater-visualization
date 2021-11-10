@@ -13,10 +13,11 @@ import * as blockUtils from "./blockUtils"
 import AutoSizeComponent from "react-library/lib/AutoSizeComponent"
 import HorizontalBlockComponent from "./HorizontalBlockComponent"
 import { getDefaultLayoutOptions } from "../../dashboards/layoutOptions"
+import { LayoutBlock } from "./blockUtils"
 
 interface BlocksDisplayComponentProps {
-  items: any
-  onItemsChange?: any
+  items: LayoutBlock
+  onItemsChange?: (items: LayoutBlock) => void
   /** Stylesheet to use. null for default */
   style?: string
   /** layout options to use */
@@ -36,28 +37,28 @@ Renders the complete layout of the blocks and also optionally a palette to the l
 that can be used to drag new items into the layout. Palette is only displayed if onItemsChange is not null
 */
 class BlocksDisplayComponent extends React.Component<BlocksDisplayComponentProps> {
-  handleBlockDrop = (sourceBlock: any, targetBlock: any, side: any) => {
+  handleBlockDrop = (sourceBlock: any, targetBlock: any, side: "top" | "left" | "right" | "bottom") => {
     // Remove source from items
-    let items = blockUtils.removeBlock(this.props.items, sourceBlock)
+    let items = blockUtils.removeBlock(this.props.items, sourceBlock)!
 
     // Remove source from target also
     targetBlock = blockUtils.removeBlock(targetBlock, sourceBlock)
 
     items = blockUtils.dropBlock(items, sourceBlock, targetBlock, side)
     items = blockUtils.cleanBlock(items)
-    return this.props.onItemsChange(items)
+    return this.props.onItemsChange!(items)
   }
 
   handleBlockRemove = (block: any) => {
-    let items = blockUtils.removeBlock(this.props.items, block)
+    let items = blockUtils.removeBlock(this.props.items, block)!
     items = blockUtils.cleanBlock(items)
-    return this.props.onItemsChange(items)
+    return this.props.onItemsChange!(items)
   }
 
   handleBlockUpdate = (block: any) => {
-    let items = blockUtils.updateBlock(this.props.items, block)
+    let items = blockUtils.updateBlock(this.props.items, block)!
     items = blockUtils.cleanBlock(items)
-    return this.props.onItemsChange(items)
+    return this.props.onItemsChange!(items)
   }
 
   renderBlock = (block: any, collapseColumns = false) => {
@@ -125,11 +126,11 @@ class BlocksDisplayComponent extends React.Component<BlocksDisplayComponentProps
                 onAspectRatioChange:
                   block.aspectRatio != null
                     ? (aspectRatio: any) =>
-                        this.props.onItemsChange(
+                        this.props.onItemsChange!(
                           blockUtils.updateBlock(this.props.items, _.extend({}, block, { aspectRatio }))
                         )
                     : undefined,
-                onBlockRemove: this.props.onItemsChange ? this.handleBlockDrop.bind(null, block) : undefined
+                onBlockRemove: this.props.onItemsChange != null ? this.handleBlockDrop.bind(null, block) : undefined
               },
               elem
             )
@@ -145,7 +146,7 @@ class BlocksDisplayComponent extends React.Component<BlocksDisplayComponentProps
             design: block.design,
             onDesignChange: this.props.onItemsChange
               ? (design: any) =>
-                  this.props.onItemsChange(blockUtils.updateBlock(this.props.items, _.extend({}, block, { design })))
+                  this.props.onItemsChange!(blockUtils.updateBlock(this.props.items, _.extend({}, block, { design })))
               : undefined,
             width: size.width,
             height: block.aspectRatio != null ? size.width / block.aspectRatio : undefined
@@ -168,11 +169,11 @@ class BlocksDisplayComponent extends React.Component<BlocksDisplayComponentProps
                 onAspectRatioChange:
                   block.aspectRatio != null
                     ? (aspectRatio: any) =>
-                        this.props.onItemsChange(
+                        this.props.onItemsChange!(
                           blockUtils.updateBlock(this.props.items, _.extend({}, block, { aspectRatio }))
                         )
                     : undefined,
-                onBlockRemove: this.props.onItemsChange ? this.handleBlockDrop.bind(null, block) : undefined
+                onBlockRemove: this.props.onItemsChange != null ? this.handleBlockDrop.bind(null, block) : undefined
               },
               elem
             )

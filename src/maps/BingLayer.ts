@@ -23,7 +23,7 @@ TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF TH
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-var L = require("leaflet")
+import L from "leaflet"
 
 module.exports = L.TileLayer.extend({
   options: {
@@ -35,7 +35,7 @@ module.exports = L.TileLayer.extend({
     maxNativeZoom: 19
   },
 
-  initialize: function (key, options) {
+  initialize: function (key: any, options: any) {
     L.Util.setOptions(this, options)
 
     this._key = key
@@ -44,7 +44,7 @@ module.exports = L.TileLayer.extend({
     this.loadMetadata()
   },
 
-  tile2quad: function (x: any, y: any, z) {
+  tile2quad: function (x: any, y: any, z: any) {
     var quad = ""
     for (var i = z; i > 0; i--) {
       var digit = 0
@@ -56,7 +56,7 @@ module.exports = L.TileLayer.extend({
     return quad
   },
 
-  getTileUrl: function (p: any, z) {
+  getTileUrl: function (p: any, z: any) {
     var zoom = this._getZoomForUrl()
     var subdomains = this.options.subdomains,
       s = this.options.subdomains[Math.abs((p.x + p.y) % subdomains.length)]
@@ -69,11 +69,11 @@ module.exports = L.TileLayer.extend({
   loadMetadata: function () {
     var _this = this
     var cbid = "_bing_metadata_" + L.Util.stamp(this)
-    window[cbid] = function (meta) {
+    window[cbid] = function (meta: any) {
       _this.meta = meta
       window[cbid] = undefined
       var e = document.getElementById(cbid)
-      e.parentNode.removeChild(e)
+      e!.parentNode!.removeChild(e!)
       if (meta.errorDetails) {
         return
       }
@@ -106,7 +106,7 @@ module.exports = L.TileLayer.extend({
         var p = r.imageryProviders[i]
         for (var j = 0; j < p.coverageAreas.length; j++) {
           var c = p.coverageAreas[j]
-          var coverage = { zoomMin: c.zoomMin, zoomMax: c.zoomMax, active: false }
+          var coverage: any = { zoomMin: c.zoomMin, zoomMax: c.zoomMax, active: false }
           var bounds = new L.LatLngBounds(
             new L.LatLng(c.bbox[0] + 0.01, c.bbox[1] + 0.01),
             new L.LatLng(c.bbox[2] - 0.01, c.bbox[3] - 0.01)
@@ -123,7 +123,7 @@ module.exports = L.TileLayer.extend({
   _update: function () {
     if (this._url === null || !this._map) return
     this._update_attribution()
-    L.TileLayer.prototype._update.apply(this, [])
+    ;(L.TileLayer.prototype as any)._update.apply(this, [])
   },
 
   _update_attribution: function () {
@@ -141,7 +141,7 @@ module.exports = L.TileLayer.extend({
     }
   },
 
-  onRemove: function (map) {
+  onRemove: function (map: any) {
     if (this._providers) {
       for (var i = 0; i < this._providers.length; i++) {
         var p = this._providers[i]

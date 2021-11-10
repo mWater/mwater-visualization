@@ -23,7 +23,14 @@ export default class BlocksLayoutManager extends LayoutManager {
         cantPasteMessage: any;
     }, any, any>>;
     isEmpty(items: any): boolean;
-    getWidgetTypeAndDesign(items: any, widgetId: any): any;
-    getAllWidgets(items: any): any;
+    getWidgetTypeAndDesign(items: any, widgetId: any): {
+        type: string;
+        design: any;
+    } | null;
+    getAllWidgets(items: any): {
+        id: string;
+        type: string;
+        design: any;
+    }[];
     addWidget(items: any, widgetType: any, widgetDesign: any): any;
 }

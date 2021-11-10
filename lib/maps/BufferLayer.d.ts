@@ -5,6 +5,7 @@ import { JsonQLFilter } from "../JsonQLFilter";
 import { BufferLayerDesign } from "./BufferLayerDesign";
 import Layer, { OnGridClickOptions, VectorTileDef } from "./Layer";
 import { OnGridClickResults } from "./maps";
+import LayerLegendComponent from "./LayerLegendComponent";
 export default class BufferLayer extends Layer<BufferLayerDesign> {
     /** Gets the type of layer definition */
     getLayerDefinitionType(): "VectorTile";
@@ -30,7 +31,7 @@ export default class BufferLayer extends Layer<BufferLayerDesign> {
     getBounds(design: BufferLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): void;
     getMinZoom(design: BufferLayerDesign): number | undefined;
     getMaxZoom(design: BufferLayerDesign): number;
-    getLegend(design: BufferLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+    getLegend(design: BufferLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): React.CElement<import("./LayerLegendComponent").LayerLegendComponentProps, LayerLegendComponent>;
     getFilterableTables(design: BufferLayerDesign, schema: Schema): string[];
     isEditable(): boolean;
     isIncomplete(design: BufferLayerDesign, schema: Schema): boolean;

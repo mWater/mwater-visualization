@@ -6,6 +6,7 @@ const R = React.createElement
 import uuid from "uuid"
 import LayerFactory from "./LayerFactory"
 import { DataSource, Schema } from "mwater-expressions"
+import { MapLayerView } from ".."
 
 interface AddLayerComponentProps {
   /** Number of layers that already exist */
@@ -25,13 +26,14 @@ export default class AddLayerComponent extends React.Component<AddLayerComponent
   static contextTypes = { addLayerElementFactory: PropTypes.func }
 
   handleAddLayer = (newLayer: any) => {
-    const layerView = {
+    const layerView: MapLayerView = {
       id: uuid(),
       name: newLayer.name,
       desc: "",
       type: newLayer.type,
       visible: true,
-      opacity: 1
+      opacity: 1,
+      design: null
     }
 
     // Clean design to make valid

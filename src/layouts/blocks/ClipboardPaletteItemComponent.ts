@@ -1,7 +1,4 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
 import _ from "lodash"
-import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import uuid from "uuid"
@@ -13,6 +10,8 @@ interface ClipboardPaletteItemComponentProps {
   clipboard?: any
   onClipboardChange?: any
   cantPasteMessage?: string
+  connectDropTarget: any
+  isOver: boolean
 }
 
 // Clipboard item in a palette that has special properties

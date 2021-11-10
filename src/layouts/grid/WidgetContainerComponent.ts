@@ -1,7 +1,7 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
 import PropTypes from "prop-types"
-import React from "react"
+import React, { CSSProperties } from "react"
 import ReactDOM from "react-dom"
 import _ from "lodash"
 const R = React.createElement
@@ -13,6 +13,8 @@ interface LayoutComponentProps {
   /** Opaque information to be used when a block is dragged */
   dragInfo: any
   canDrag: boolean
+  connectMoveHandle: any
+  connectResizeHandle: any
 }
 
 // Render a child element as draggable, resizable block, injecting handle connectors
@@ -20,7 +22,7 @@ interface LayoutComponentProps {
 class LayoutComponent extends React.Component<LayoutComponentProps> {
   render() {
     if (this.props.canDrag) {
-      return React.cloneElement(React.Children.only(this.props.children), {
+      return React.cloneElement(React.Children.only(this.props.children!) as any, {
         connectMoveHandle: this.props.connectMoveHandle,
         connectResizeHandle: this.props.connectResizeHandle
       })
@@ -119,7 +121,7 @@ class Container extends React.Component<ContainerProps, ContainerState> {
 
     // Update item layouts
     items = _.mapValues(items, (item, id) => {
-      return _.extend({}, item, { layout: layouts[id] })
+      return _.extend({}, item, { layout: layouts[id!] })
     })
 
     return this.props.onItemsChange(items)
@@ -154,8 +156,8 @@ class Container extends React.Component<ContainerProps, ContainerState> {
     // Reset hover if not over
     if (!nextProps.isOver && (this.state.moveHover || this.state.resizeHover)) {
       // Defer to prevent "Cannot dispatch in the middle of a dispatch." error
-      return _.defer(() => {
-        return this.setState({ moveHover: null, resizeHover: null })
+      _.defer(() => {
+        this.setState({ moveHover: null, resizeHover: null })
       })
     }
   }
@@ -190,8 +192,7 @@ class Container extends React.Component<ContainerProps, ContainerState> {
         height: bounds.height,
         border: "dashed 3px #AAA",
         borderRadius: 5,
-        padding: 5,
-        position: "absolute"
+        padding: 5
       }
     })
   }
@@ -203,7 +204,7 @@ class Container extends React.Component<ContainerProps, ContainerState> {
     const bounds = this.props.layoutEngine.getLayoutBounds(layout)
 
     // Position absolutely
-    const style = {
+    const style: CSSProperties = {
       position: "absolute",
       left: bounds.x,
       top: bounds.y
@@ -347,10 +348,6 @@ class Container extends React.Component<ContainerProps, ContainerState> {
       return true
     }
 
-    if (!_.isEqual(this.props.elems, nextProps.elems)) {
-      return true
-    }
-
     return false
   }
 
@@ -370,7 +367,7 @@ class Container extends React.Component<ContainerProps, ContainerState> {
 const targetSpec = {
   drop(props: any, monitor: any, component: any) {
     if (monitor.getItemType() === "block-move") {
-      const rect = ReactDOM.findDOMNode(component).getBoundingClientRect()
+      const rect = (ReactDOM.findDOMNode(component) as Element).getBoundingClientRect()
       component.dropMoveLayout({
         dragInfo: monitor.getItem(),
         x:
@@ -393,7 +390,7 @@ const targetSpec = {
   },
   hover(props: any, monitor: any, component: any) {
     if (monitor.getItemType() === "block-move") {
-      const rect = ReactDOM.findDOMNode(component).getBoundingClientRect()
+      const rect = (ReactDOM.findDOMNode(component) as Element).getBoundingClientRect()
       component.setMoveHover({
         dragInfo: monitor.getItem(),
         x:

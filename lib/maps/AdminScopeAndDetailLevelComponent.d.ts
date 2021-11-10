@@ -5,7 +5,7 @@ interface AdminScopeAndDetailLevelComponentProps {
     schema: Schema;
     dataSource: DataSource;
     /** admin region that is outside bounds. null for whole world */
-    scope?: string;
+    scope?: number;
     /** level of scope region. null for whole world */
     scopeLevel?: number;
     /** Detail level within scope region */

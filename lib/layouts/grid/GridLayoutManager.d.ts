@@ -1,5 +1,6 @@
 import React from "react";
 import LayoutManager from "../LayoutManager";
+import AutoSizeComponent from "react-library/lib/AutoSizeComponent";
 export default class GridLayoutManager extends LayoutManager {
     renderPalette(width: any): React.DetailedReactHTMLElement<{
         className: string;
@@ -11,7 +12,7 @@ export default class GridLayoutManager extends LayoutManager {
             width: number;
         };
     }, HTMLElement>;
-    renderLayout(options: any): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+    renderLayout(options: any): React.CElement<import("react-library/lib/AutoSizeComponent").AutoSizeComponentProps, AutoSizeComponent>;
     isEmpty(items: any): boolean;
     getWidgetTypeAndDesign(items: any, widgetId: any): any;
     getAllWidgets(items: any): {

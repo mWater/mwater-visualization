@@ -12,6 +12,7 @@ import { JsonQLCssLayerDefinition, VectorTileCTE, VectorTileSourceLayer } from "
 import compressJson from "../compressJson"
 import querystring from "querystring"
 import { MapLayerDataSource } from "./MapLayerDataSource"
+import TileUrlLayer from "./TileUrlLayer"
 
 interface DirectMapDataSourceOptions {
   /** schema to use */
@@ -157,7 +158,7 @@ class DirectLayerDataSource implements MapLayerDataSource {
 
     // If layer has tiles url directly available
     if (layer.getLayerDefinitionType() === "TileUrl") {
-      return layer.getTileUrl(design, filters)
+      return (layer as TileUrlLayer).getTileUrl(design, filters)
     }
 
     // Get JsonQLCss

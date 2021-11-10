@@ -1,10 +1,12 @@
 import React from "react";
+import LegendGroup from "./LegendGroup";
 import { Schema } from "mwater-expressions";
-interface LayerLegendComponentProps {
+import { Axis } from "../axes/Axis";
+export interface LayerLegendComponentProps {
     schema: Schema;
     name: string;
     radiusLayer?: boolean;
-    axis?: any;
+    axis?: Axis;
     symbol?: string;
     markerSize?: number;
     defaultColor?: string;
@@ -17,6 +19,5 @@ export default class LayerLegendComponent extends React.Component<LayerLegendCom
         radiusLayer: boolean;
     };
     getCategories(): import("../axes/Axis").AxisCategory[] | undefined;
-    render(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+    render(): React.CElement<import("./LegendGroup").LegendGroupProps, LegendGroup>;
 }
-export {};

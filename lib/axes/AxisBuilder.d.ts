@@ -46,7 +46,7 @@ export default class AxisBuilder {
     /** Get all categories for a given axis type given the known values
      * Returns array of { value, label }
      */
-    getCategories(axis: Axis, values: any[], locale?: string): AxisCategory[];
+    getCategories(axis: Axis, values: any[] | null, locale?: string): AxisCategory[];
     getAxisType(axis: any): LiteralType | null;
     isAxisAggr(axis: any): any;
     doesAxisSupportCumulative(axis: any): boolean;

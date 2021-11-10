@@ -13,6 +13,7 @@ interface DecoratedBlockComponentProps {
     /** Set to allow changing aspect ratio */
     aspectRatio?: number;
     onAspectRatioChange?: any;
+    isDragging: boolean;
 }
 interface DecoratedBlockComponentState {
     initialClientY: any;

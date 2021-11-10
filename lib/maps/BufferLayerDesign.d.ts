@@ -7,9 +7,9 @@ export interface BufferLayerDesign {
     /** axes (see below) */
     axes: {
         /** where to draw buffers around */
-        geometry: Axis;
+        geometry: Axis | null;
         /** color axis */
-        color: Axis;
+        color: Axis | null;
     };
     /** optional logical expression to filter by */
     filter?: Expr;

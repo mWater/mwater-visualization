@@ -38,7 +38,7 @@ export default class LayoutManager {
     getWidgetTypeAndDesign(items: any, widgetId: string): {
         type: string;
         design: any;
-    };
+    } | null;
     /** Gets all widgets in items as array of { id, type, design } */
     getAllWidgets(items: any): {
         id: string;

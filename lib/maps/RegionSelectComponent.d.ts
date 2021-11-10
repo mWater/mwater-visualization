@@ -1,16 +1,15 @@
 import React from "react";
-import { IdLiteralComponent } from "mwater-expressions-ui";
 import { DataSource, Schema } from "mwater-expressions";
 interface RegionSelectComponentProps {
     schema: Schema;
     dataSource: DataSource;
     /** _id of region */
-    region: number | null;
+    region: number | null | undefined;
     onChange: (region: number | null, level: number | null) => void;
     /** Default "All Countries" */
     placeholder?: string;
     /** e.g. "admin_regions" */
-    regionsTable: string;
+    regionsTable?: string;
     /** Maximum region level allowed */
     maxLevel?: number;
 }
@@ -20,6 +19,6 @@ export default class RegionSelectComponent extends React.Component<RegionSelectC
         regionsTable: string;
     };
     handleChange: (id: any) => void;
-    render(): React.CElement<import("mwater-expressions-ui/lib/IdLiteralComponent").IdLiteralComponentProps, IdLiteralComponent>;
+    render(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
 }
 export {};
