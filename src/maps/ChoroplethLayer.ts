@@ -23,6 +23,7 @@ import { JsonQLExpr, JsonQLOp, JsonQLQuery, JsonQLScalar } from "jsonql"
 import { compileColorMapToMapbox } from "./mapboxUtils"
 import LayerLegendComponent from "./LayerLegendComponent"
 import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
+import { AnyLayer } from "maplibre-gl"
 
 export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
   /** Gets the type of layer definition */
@@ -203,7 +204,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     }
 
     // Create layers
-    const mapLayers: mapboxgl.AnyLayer[] = []
+    const mapLayers: AnyLayer[] = []
 
     mapLayers.push({
       id: `${sourceId}:polygon-fill`,
@@ -537,7 +538,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     const color = compileColorMapToMapbox(design.axes.color, design.color || "transparent")
 
     // Create layers
-    const mapLayers: mapboxgl.AnyLayer[] = []
+    const mapLayers: AnyLayer[] = []
 
     mapLayers.push({
       id: `${sourceId}:polygon-fill`,
@@ -760,7 +761,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     const color = compileColorMapToMapbox(design.axes.color, design.color || "transparent")
 
     // Create layers
-    const mapLayers: mapboxgl.AnyLayer[] = []
+    const mapLayers: AnyLayer[] = []
 
     mapLayers.push({
       id: `${sourceId}:polygon-fill`,
@@ -1437,15 +1438,14 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     return React.createElement(LayerLegendComponent, {
       schema,
       name,
-      dataSource,
       filters: _.compact(_filters),
       axis: axisBuilder.cleanAxis({
         axis: design.axes.color || null,
         table: axisTable,
         types: ["enum", "text", "boolean", "date"],
         aggrNeed: "required"
-      }),
-      defaultColor: design.color,
+      }) || undefined,
+      defaultColor: design.color || undefined,
       locale
     })
   }

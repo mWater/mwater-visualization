@@ -257,7 +257,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
       return R(AdminScopeAndDetailLevelComponent, {
         schema: this.props.schema,
         dataSource: this.props.dataSource,
-        scope: this.props.design.scope,
+        scope: this.props.design.scope as number | undefined,
         scopeLevel: this.props.design.scopeLevel || 0,
         detailLevel: this.props.design.detailLevel,
         onScopeAndDetailLevelChange: this.handleScopeAndDetailLevelChange
@@ -266,7 +266,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
       return R(ScopeAndDetailLevelComponent, {
         schema: this.props.schema,
         dataSource: this.props.dataSource,
-        scope: this.props.design.scope,
+        scope: this.props.design.scope as string | undefined,
         scopeLevel: this.props.design.scopeLevel,
         detailLevel: this.props.design.detailLevel,
         onScopeAndDetailLevelChange: this.handleScopeAndDetailLevelChange,

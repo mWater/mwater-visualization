@@ -1,4 +1,3 @@
-import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
@@ -8,7 +7,7 @@ import DetailLevelSelectComponent from "./DetailLevelSelectComponent"
 import { default as ReactSelect } from "react-select"
 import { DataSource, Schema } from "mwater-expressions"
 
-interface AdminScopeAndDetailLevelComponentProps {
+export interface AdminScopeAndDetailLevelComponentProps {
   /** Schema to use */
   schema: Schema
   dataSource: DataSource

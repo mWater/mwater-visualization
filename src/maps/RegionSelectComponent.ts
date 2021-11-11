@@ -10,7 +10,7 @@ interface RegionSelectComponentProps {
   schema: Schema
   dataSource: DataSource
   /** _id of region */
-  region: number | null | undefined
+  region: string | number | null | undefined
   onChange: (region: number | null, level: number | null) => void
   /** Default "All Countries" */
   placeholder?: string
@@ -37,7 +37,7 @@ export default class RegionSelectComponent extends React.Component<RegionSelectC
     const query: JsonQLSelectQuery = {
       type: "query",
       selects: [{ type: "select", expr: { type: "field", tableAlias: "main", column: "level" }, alias: "level" }],
-      from: { type: "table", table: this.props.regionsTable, alias: "main" },
+      from: { type: "table", table: this.props.regionsTable!, alias: "main" },
       where: {
         type: "op",
         op: "=",
@@ -69,7 +69,7 @@ export default class RegionSelectComponent extends React.Component<RegionSelectC
     return R(IdLiteralComponent, {
       value: this.props.region,
       onChange: this.handleChange,
-      idTable: this.props.regionsTable,
+      idTable: this.props.regionsTable!,
       schema: this.props.schema,
       dataSource: this.props.dataSource,
       placeholder: this.props.placeholder,

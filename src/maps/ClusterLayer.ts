@@ -8,6 +8,7 @@ import AxisBuilder from "../axes/AxisBuilder"
 import { ClusterLayerDesign } from "./ClusterLayerDesign"
 import Layer, { VectorTileDef } from "./Layer"
 import LayerLegendComponent from "./LayerLegendComponent"
+import { AnyLayer } from "maplibre-gl"
 
 export default class ClusterLayer extends Layer<ClusterLayerDesign> {
   /** Gets the type of layer definition */
@@ -24,7 +25,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
   ): VectorTileDef {
     const jsonql = this.createJsonQL(design, schema, filters)
 
-    const mapLayers: mapboxgl.AnyLayer[] = []
+    const mapLayers: AnyLayer[] = []
 
     mapLayers.push({
       id: `${sourceId}:circles-single`,
@@ -130,7 +131,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     */
 
     // Compile geometry axis
-    let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry, tableAlias: "main" })
+    let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry!, tableAlias: "main" })
 
     // ST_Centroid(ST_Collect(<geometry axis>))
     let centerExpr: JsonQLExpr = {
@@ -357,7 +358,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
     */
 
     // Compile geometry axis
-    let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry, tableAlias: "main" })
+    let geometryExpr = axisBuilder.compileAxis({ axis: design.axes.geometry!, tableAlias: "main" })
 
     // ST_Centroid(ST_Collect(<geometry axis>))
     let centerExpr: JsonQLExpr = {
@@ -680,7 +681,7 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       schema,
       dataSource,
       design.table,
-      design.axes.geometry.expr,
+      design.axes.geometry!.expr,
       design.filter || null,
       filters,
       callback
@@ -719,7 +720,6 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       defaultColor: design.fillColor || "#337ab7",
       symbol: "font-awesome/circle",
       name,
-      dataSource,
       filters: _.compact(_filters),
       locale
     })

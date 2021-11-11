@@ -3,37 +3,35 @@ import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import { default as AsyncReactSelect } from "react-select/async"
-import { ExprUtils } from "mwater-expressions"
+import { DataSource, Expr, ExprUtils, Schema } from "mwater-expressions"
 import { IdLiteralComponent } from "mwater-expressions-ui"
+import { JsonQLFilter } from ".."
+
+export interface IdArrayQuickfilterComponentProps {
+  label: string
+  schema: Schema
+  dataSource: DataSource
+
+  expr: Expr
+  index: number
+
+  /** Current value of quickfilter (state of filter selected) */
+  value: any
+  onValueChange: (value: any) => void
+
+  /** true to display multiple values */
+  multi?: boolean 
+
+  // Filters to add to the quickfilter to restrict values
+  filters?: JsonQLFilter[]
+}
 
 // Quickfilter for an id[]
-export default class IdArrayQuickfilterComponent extends React.Component {
-  static propTypes = {
-    label: PropTypes.string.isRequired,
-    schema: PropTypes.object.isRequired,
-    dataSource: PropTypes.object.isRequired,
-
-    expr: PropTypes.object.isRequired,
-    index: PropTypes.number.isRequired,
-
-    value: PropTypes.any, // Current value of quickfilter (state of filter selected)
-    onValueChange: PropTypes.func, // Called when value changes
-
-    multi: PropTypes.bool, // true to display multiple values
-
-    // Filters to add to the quickfilter to restrict values
-    filters: PropTypes.arrayOf(
-      PropTypes.shape({
-        table: PropTypes.string.isRequired, // id table to filter
-        jsonql: PropTypes.object.isRequired // jsonql filter with {alias} for tableAlias
-      })
-    )
-  }
-
+export default class IdArrayQuickfilterComponent extends React.Component<IdArrayQuickfilterComponentProps> {
   render() {
     // Determine table
     const exprUtils = new ExprUtils(this.props.schema)
-    const idTable = exprUtils.getExprIdTable(this.props.expr)
+    const idTable = exprUtils.getExprIdTable(this.props.expr)!
 
     return R(
       "div",

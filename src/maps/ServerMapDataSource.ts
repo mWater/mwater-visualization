@@ -9,6 +9,7 @@ import { MapDataSource } from "./MapDataSource"
 import { MapLayerDataSource } from "./MapLayerDataSource"
 import LayerFactory from "./LayerFactory"
 import { WidgetDataSource } from "../widgets/WidgetDataSource"
+import TileUrlLayer from "./TileUrlLayer"
 
 interface ServerMapDataSourceOptions {
   /** schema to use */
@@ -111,7 +112,7 @@ class ServerLayerDataSource implements MapLayerDataSource {
 
     // If layer has tiles url directly available
     if (layer.getLayerDefinitionType() === "TileUrl") {
-      return layer.getTileUrl(this.options.layerView.design, filters)
+      return (layer as TileUrlLayer).getTileUrl(this.options.layerView.design, filters)
     }
 
     return this.createUrl(filters, "png")

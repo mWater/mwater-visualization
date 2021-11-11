@@ -8,7 +8,7 @@ const R = React.createElement
 export interface TableSelectComponentProps {
   schema: Schema
   /** Current table id */
-  value?: string
+  value?: string | null
   /** Newly selected table id */
   onChange: (tableId: string) => void
   /** Some table select components (not the default) can also perform filtering. Include these props to enable this */

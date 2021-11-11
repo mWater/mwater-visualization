@@ -1,5 +1,4 @@
 import _ from "lodash"
-import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import moment from "moment"
@@ -222,8 +221,8 @@ export default class DateExprComponent extends React.Component<DateExprComponent
             inline: true,
             selectsStart: true,
             selected: startDate,
-            startDate,
-            endDate,
+            startDate: startDate || undefined,
+            endDate: endDate || undefined,
             showYearDropdown: true,
             onChange: this.handleStartChange
           })
@@ -235,8 +234,8 @@ export default class DateExprComponent extends React.Component<DateExprComponent
             inline: true,
             selectsEnd: true,
             selected: endDate,
-            startDate,
-            endDate,
+            startDate: startDate || undefined,
+            endDate: endDate || undefined,
             showYearDropdown: true,
             onChange: this.handleEndChange
           })

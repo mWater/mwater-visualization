@@ -22,24 +22,12 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 */
-var L = require("leaflet")
+import L from "leaflet"
 
 // Store last absorbed (data != null) event to prevent multiple layers from triggering click event
 var absorbedEvent: any = null
 
 function ajax(url: any, cb: any) {
-  // the following is from JavaScript: The Definitive Guide
-  // and https://developer.mozilla.org/en-US/docs/DOM/XMLHttpRequest/Using_XMLHttpRequest_in_IE6
-  if (window.XMLHttpRequest === undefined) {
-    window.XMLHttpRequest = function () {
-      /*global ActiveXObject:true */
-      try {
-        return new ActiveXObject("Microsoft.XMLHTTP")
-      } catch (e) {
-        throw new Error("XMLHttpRequest is not supported")
-      }
-    }
-  }
   var response,
     request = new XMLHttpRequest()
   request.open("GET", url)
@@ -87,7 +75,7 @@ module.exports = L.Layer.extend({
       i++
     }
     this._windowKey = "lu" + i
-    window[this._windowKey] = {}
+    ;(window as any)[this._windowKey] = {}
 
     var subdomains = this.options.subdomains
     if (typeof this.options.subdomains === "string") {
@@ -124,7 +112,7 @@ module.exports = L.Layer.extend({
     }
 
     // Get object for event
-    obj = this._objectForEvent(e)
+    var obj = this._objectForEvent(e)
 
     // Ignore if event has been dealt with
     if (e === absorbedEvent) return

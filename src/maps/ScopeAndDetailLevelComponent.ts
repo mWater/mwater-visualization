@@ -1,21 +1,18 @@
-import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
-const H = React.DOM
 const R = React.createElement
 import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import RegionSelectComponent from "./RegionSelectComponent"
-import DetailLevelSelectComponent from "./DetailLevelSelectComponent"
 import * as ui from "react-library/lib/bootstrap"
 
-interface ScopeAndDetailLevelComponentProps {
+export interface ScopeAndDetailLevelComponentProps {
   /** Schema to use */
   schema: Schema
   dataSource: DataSource
   /** admin region that is outside bounds. null for whole world */
   scope?: string
   /** level of scope region. null for whole world */
-  scopeLevel?: number
+  scopeLevel?: number | null
   /** Detail level within scope region */
   detailLevel?: number
   /** Called with (scope, scopeLevel, detailLevel) */
