@@ -1,4 +1,3 @@
-import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import _ from "lodash"
@@ -105,97 +104,6 @@ background-color: #DDD;
         this.state.open ? R("div", { style: popupPosition }, this.renderSizes()) : undefined,
 
         R("i", { className: "fa fa-arrows-v" })
-      )
-    )
-  }
-}
-
-interface ColorPaletteComponentProps {
-  onSetColor: any
-}
-
-class ColorPaletteComponent extends React.Component<ColorPaletteComponentProps> {
-  renderColor(color: any) {
-    return R(
-      "td",
-      null,
-      R("div", {
-        style: { width: 16, height: 15, backgroundColor: color, margin: 1 },
-        onMouseDown: (ev: any) => {
-          ev.preventDefault()
-          return this.props.onSetColor.bind(null, color)
-        }
-      })
-    )
-  }
-
-  render() {
-    const baseColors = [
-      "#FF0000", // red
-      "#FFAA00", // orange
-      "#FFFF00", // yellow
-      "#00FF00", // green
-      "#00FFFF", // cyan
-      "#0000FF", // blue
-      "#9900FF", // purple
-      "#FF00FF" // magenta
-    ]
-    return R(
-      "div",
-      { style: { padding: 5 } },
-      R(
-        "table",
-        null,
-        R(
-          "tbody",
-          null,
-          // Grey shades
-          R(
-            "tr",
-            null,
-            _.map(_.range(0, 8), (i) => {
-              return this.renderColor(Color({ r: (i * 255) / 7, g: (i * 255) / 7, b: (i * 255) / 7 }).hex())
-            })
-          ),
-          R("tr", { style: { height: 5 } }),
-          // Base colors
-          R(
-            "tr",
-            null,
-            _.map(baseColors, (c) => this.renderColor(c))
-          ),
-          R("tr", { style: { height: 5 } }),
-          R(
-            "tr",
-            null,
-            _.map(baseColors, (c) => this.renderColor(Color(c).lighten(0.7).hex()))
-          ),
-          R(
-            "tr",
-            null,
-            _.map(baseColors, (c) => this.renderColor(Color(c).lighten(0.5).hex()))
-          ),
-          R(
-            "tr",
-            null,
-            _.map(baseColors, (c) => this.renderColor(Color(c).lighten(0.3).hex()))
-          ),
-          R(
-            "tr",
-            null,
-            _.map(baseColors, (c) => this.renderColor(Color(c).darken(0.3).hex()))
-          ),
-          R(
-            "tr",
-            null,
-            _.map(baseColors, (c) => this.renderColor(Color(c).darken(0.5).hex()))
-          ),
-          R(
-            "tr",
-            null,
-            _.map(baseColors, (c) => this.renderColor(Color(c).darken(0.7).hex()))
-          )
-        )
       )
     )
   }

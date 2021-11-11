@@ -1,12 +1,22 @@
 import _ from "lodash"
 
+export type HtmlItem = string | HtmlItemElement
+export interface HtmlItemElement {
+  type: "element"
+  tag: string
+  items?: HtmlItem[]
+  style?: any
+  href?: string
+  target?: string
+}
+
 // Converts items (JSON contents of rich text) to HTML and back to allow editing
 // Items are array of:
 //  string (html text)
 //  { type: "element", tag: "h1", items: [nested items] }
 //  elements can contain style (object), href, target
 export default class ItemsHtmlConverter {
-  static isBlank = (items: any) => {
+  static isBlank = (items: HtmlItem[] | undefined): boolean => {
     if (!items) {
       return true
     }
@@ -22,8 +32,10 @@ export default class ItemsHtmlConverter {
     })
   }
 
+  namedStrings: { [key: string]: string } | undefined
+
   // namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings
-  constructor(namedStrings: any) {
+  constructor(namedStrings?: { [key: string]: string }) {
     this.namedStrings = namedStrings
   }
 
@@ -112,7 +124,7 @@ export default class ItemsHtmlConverter {
   }
 
   // Converts an HTML DOM element to items
-  convertElemToItems(elem: any) {
+  convertElemToItems(elem: any): HtmlItem[] {
     // console.log elem.outerHTML
 
     // Walk DOM tree, adding strings and expressions
@@ -141,7 +153,7 @@ export default class ItemsHtmlConverter {
           continue
         }
 
-        const item = { type: "element", tag, items: this.convertElemToItems(node) }
+        const item: HtmlItemElement = { type: "element", tag, items: this.convertElemToItems(node) }
 
         // Add style
         if (node.style != null) {

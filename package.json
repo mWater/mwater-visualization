@@ -30,7 +30,7 @@
     "c3": "^0.7.20",
     "canonical-json": "0.0.4",
     "classnames": "^2.2.5",
-    "color": "^1.0.3",
+    "color": "^3.2.1",
     "color-mixer": "^1.0.0",
     "d3-format": "^1.4.5",
     "d3-scale": "^1.0.3",
@@ -80,6 +80,7 @@
   },
   "devDependencies": {
     "@kadira/storybook": "^2.21.0",
+    "@types/color": "^3.0.2",
     "@types/d3": "^5.16.4",
     "@types/d3-format": "^1.4.1",
     "@types/dompurify": "0.0.32",

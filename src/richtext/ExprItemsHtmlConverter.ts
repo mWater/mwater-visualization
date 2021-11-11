@@ -1,8 +1,7 @@
 import _ from "lodash"
 import ItemsHtmlConverter from "./ItemsHtmlConverter"
-import { ExprUtils, Schema } from "mwater-expressions"
+import { Expr, ExprUtils, Schema } from "mwater-expressions"
 import uuid from "uuid"
-import utm from "utm"
 import { formatValue } from "../valueFormatter"
 import { canFormatType } from "../valueFormatter"
 
@@ -14,12 +13,18 @@ import { canFormatType } from "../valueFormatter"
 //  { type: "element", tag: "h1", items: [nested items] }
 //  { type: "expr", id: unique id, expr: expression, includeLabel: true to include label, labelText: override label text, format: d3 format if number }
 export default class ExprItemsHtmlConverter extends ItemsHtmlConverter {
+  schema: Schema
+  designMode: boolean
+  exprValues: { [id: string]: Expr }
+  summarizeExprs: boolean
+  locale: string | undefined
+  
   // designMode is true to display in design mode (exprs as blocks)
   // exprValues is map of expr id to value
   // summarizeExprs shows summaries of expressions, not values
   // namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
   // locale: locale to use e.g. "en"
-  constructor(schema: Schema, designMode: any, exprValues: any, summarizeExprs: any, namedStrings: any, locale: any) {
+  constructor(schema: Schema, designMode: boolean, exprValues: { [id: string]: Expr }, summarizeExprs: boolean, namedStrings?: { [key: string]: string }, locale?: string) {
     super(namedStrings)
 
     this.schema = schema
@@ -53,7 +58,7 @@ export default class ExprItemsHtmlConverter extends ItemsHtmlConverter {
           const exprType = exprUtils.getExprType(item.expr)
 
           // Format if can format
-          if (canFormatType(exprType)) {
+          if (exprType && canFormatType(exprType)) {
             text = formatValue(exprType, value, item.format)
           } else {
             text = exprUtils.stringifyExprLiteral(item.expr, value, this.locale)
@@ -95,25 +100,20 @@ export default class ExprItemsHtmlConverter extends ItemsHtmlConverter {
 
     // Ensure exprs have unique ids
     const takenIds = {}
-    var uniqueify = (items: any) =>
-      (() => {
-        const result = []
-        for (let item of items) {
-          if (item.type === "expr") {
-            if (takenIds[item.id]) {
-              item.id = uuid()
-            }
-            takenIds[item.id] = true
+    var uniqueify = (items: any) => {
+      for (let item of items) {
+        if (item.type === "expr") {
+          if (takenIds[item.id]) {
+            item.id = uuid()
           }
-
-          if (item.items) {
-            result.push(uniqueify(item.items))
-          } else {
-            result.push(undefined)
-          }
+          takenIds[item.id] = true
         }
-        return result
-      })()
+
+        if (item.items) {
+          uniqueify(item.items)
+        }
+      } 
+    }
 
     uniqueify(items)
 

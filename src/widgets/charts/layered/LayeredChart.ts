@@ -7,12 +7,13 @@ import { original } from "immer"
 import Chart from "../Chart"
 import LayeredChartCompiler from "./LayeredChartCompiler"
 import { DataSource, ExprCleaner, Schema } from "mwater-expressions"
-import AxisBuilder from "../../../axes/AxisBuilder"
+import AxisBuilder, { AggrNeed } from "../../../axes/AxisBuilder"
 import LayeredChartSvgFileSaver from "./LayeredChartSvgFileSaver"
 import * as LayeredChartUtils from "./LayeredChartUtils"
 import TextWidget from "../../text/TextWidget"
 import { LayeredChartDesign } from "./LayeredChartDesign"
 import { WidgetDataSource } from "../../WidgetDataSource"
+import { JsonQLFilter } from "../../.."
 
 // See LayeredChart Design.md for the design
 export default class LayeredChart extends Chart {
@@ -55,7 +56,7 @@ export default class LayeredChart extends Chart {
 
         for (let axisKey in layer.axes) {
           // Determine what aggregation axis requires
-          var aggrNeed
+          var aggrNeed: AggrNeed
           const axis = layer.axes[axisKey]
           if (axisKey === "y" && compiler.doesLayerNeedGrouping(draft, layerId)) {
             aggrNeed = "required"
@@ -93,7 +94,7 @@ export default class LayeredChart extends Chart {
     })
   }
 
-  validateDesign(design: any, schema: Schema) {
+  validateDesign(design: LayeredChartDesign, schema: Schema) {
     let error
     let axisBuilder = new AxisBuilder({ schema })
     const compiler = new LayeredChartCompiler({ schema })
@@ -179,7 +180,7 @@ export default class LayeredChart extends Chart {
   // dataSource: data source to get data from
   // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   // callback: (error, data)
-  getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any) {
+  getData(design: any, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[] | null, callback: any) {
     const compiler = new LayeredChartCompiler({ schema })
     const queries = compiler.createQueries(design, filters)
 

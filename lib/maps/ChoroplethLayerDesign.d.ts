@@ -27,9 +27,9 @@ export default interface ChoroplethLayerDesign {
     /** axes (see below) */
     axes: {
         /** color axis. If in region mode "indirect", aggregate on table, if in region mode "direct", from region table, non-aggregate */
-        color?: Axis;
+        color?: Axis | null;
         /** overrides the nameLabels to display text on each region. If in region mode "indirect", aggregate on table, if in region mode "direct", from region table, non-aggregate */
-        label?: Axis;
+        label?: Axis | null;
     };
     /** optional logical expression to filter by. Only when region mode is "indirect" */
     filter?: Expr;

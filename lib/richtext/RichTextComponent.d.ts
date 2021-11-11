@@ -1,83 +1,84 @@
-import React from "react";
-declare const _default: {
-    new (props: any): {
-        handleClick: (ev: any) => void;
-        pasteHTML(html: any): any;
-        focus(): any;
-        handleInsertExpr: (item: any) => any;
-        handleSetFontSize: (size: any) => any;
-        handleSetFontColor: (color: any) => boolean | void;
-        handleChange: (elem: any) => any;
-        handleFocus: () => void;
-        handleBlur: () => void;
-        handleCommand: (command: any, param: any, ev: any) => boolean;
-        handleCreateLink: (ev: any) => boolean | undefined;
-        handleEditorClick: (ev: any) => any;
-        createHtml(): any;
-        renderPalette(): React.CElement<{
-            style: {
-                zIndex: number;
-            };
-            edges: string;
-            align: string;
-            render: (schemeName: any, { edges }: any) => React.DetailedReactHTMLElement<{
-                key: string;
-                className: string;
-                ref: (c: HTMLElement | null) => HTMLElement | null;
-            }, HTMLElement>;
-        }, React.Component<{
-            style: {
-                zIndex: number;
-            };
-            edges: string;
-            align: string;
-            render: (schemeName: any, { edges }: any) => React.DetailedReactHTMLElement<{
-                key: string;
-                className: string;
-                ref: (c: HTMLElement | null) => HTMLElement | null;
-            }, HTMLElement>;
-        }, any, any>>;
-        renderPaletteContent: (schemeName: any, { edges }: any) => React.DetailedReactHTMLElement<{
+import React, { ReactNode } from "react";
+import { ContentEditableComponent } from "mwater-expressions-ui";
+import ItemsHtmlConverter, { HtmlItem } from "./ItemsHtmlConverter";
+export interface RichTextComponentProps {
+    items?: HtmlItem[];
+    onItemsChange: (items: HtmlItem[]) => void;
+    onItemClick?: (item: HtmlItem) => void;
+    /** Optional className of editor wrapper */
+    className?: string;
+    /** Optional style of editor wrapper */
+    style?: any;
+    /** Converter to use for editing */
+    itemsHtmlConverter?: ItemsHtmlConverter;
+    /** True (default) to include heading h1, h2 in palette */
+    includeHeadings?: boolean;
+    /** Extra buttons to put in palette */
+    extraPaletteButtons?: ReactNode;
+}
+export default class RichTextComponent extends React.Component<RichTextComponentProps, {
+    focused: boolean;
+}> {
+    static defaultProps: {
+        includeHeadings: boolean;
+        items: never[];
+        itemsHtmlConverter: ItemsHtmlConverter;
+    };
+    entireComponent: HTMLElement | null;
+    contentEditable: ContentEditableComponent | null;
+    paletteComponent: HTMLElement | null;
+    constructor(props: any);
+    handleClick: (ev: any) => void;
+    pasteHTML(html: any): void;
+    focus(): void;
+    handleInsertExpr: (item: any) => void;
+    handleSetFontSize: (size: any) => any;
+    handleSetFontColor: (color: any) => void;
+    handleChange: (elem: any) => void;
+    handleFocus: () => void;
+    handleBlur: () => void;
+    handleCommand: (command: any, param: any, ev?: any) => boolean;
+    handleCreateLink: (ev: any) => void;
+    handleEditorClick: (ev: any) => void;
+    createHtml(): string;
+    renderPalette(): React.CElement<{
+        style: {
+            zIndex: number;
+        };
+        edges: string;
+        align: string;
+        render: (schemeName: any, { edges }: any) => React.DetailedReactHTMLElement<{
             key: string;
             className: string;
-            ref: (c: HTMLElement | null) => HTMLElement | null;
+            ref: (c: HTMLElement | null) => void;
         }, HTMLElement>;
-        refContentEditable: (c: any) => any;
-        renderHtml(): React.DetailedReactHTMLElement<{
-            key: string;
-            style: any;
-            className: any;
-        }, HTMLElement>;
-        render(): React.DetailedReactHTMLElement<{
-            style: {
-                position: "relative";
-            };
-            ref: (c: HTMLElement | null) => HTMLElement | null;
-        }, HTMLElement>;
-        context: any;
-        setState<K extends never>(state: {} | ((prevState: Readonly<{}>, props: Readonly<{}>) => {} | Pick<{}, K> | null) | Pick<{}, K> | null, callback?: (() => void) | undefined): void;
-        forceUpdate(callback?: (() => void) | undefined): void;
-        readonly props: Readonly<{}> & Readonly<{
-            children?: React.ReactNode;
-        }>;
-        state: Readonly<{}>;
-        refs: {
-            [key: string]: React.ReactInstance;
+    }, React.Component<{
+        style: {
+            zIndex: number;
         };
-        componentDidMount?(): void;
-        shouldComponentUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): boolean;
-        componentWillUnmount?(): void;
-        componentDidCatch?(error: Error, errorInfo: React.ErrorInfo): void;
-        getSnapshotBeforeUpdate?(prevProps: Readonly<{}>, prevState: Readonly<{}>): any;
-        componentDidUpdate?(prevProps: Readonly<{}>, prevState: Readonly<{}>, snapshot?: any): void;
-        componentWillMount?(): void;
-        UNSAFE_componentWillMount?(): void;
-        componentWillReceiveProps?(nextProps: Readonly<{}>, nextContext: any): void;
-        UNSAFE_componentWillReceiveProps?(nextProps: Readonly<{}>, nextContext: any): void;
-        componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
-        UNSAFE_componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
-    };
-    initClass(): void;
-    contextType?: React.Context<any> | undefined;
-};
-export default _default;
+        edges: string;
+        align: string;
+        render: (schemeName: any, { edges }: any) => React.DetailedReactHTMLElement<{
+            key: string;
+            className: string;
+            ref: (c: HTMLElement | null) => void;
+        }, HTMLElement>;
+    }, any, any>>;
+    renderPaletteContent: (schemeName: any, { edges }: any) => React.DetailedReactHTMLElement<{
+        key: string;
+        className: string;
+        ref: (c: HTMLElement | null) => void;
+    }, HTMLElement>;
+    refContentEditable: (c: ContentEditableComponent | null) => void;
+    renderHtml(): React.DetailedReactHTMLElement<{
+        key: string;
+        style: any;
+        className: string | undefined;
+    }, HTMLElement>;
+    render(): React.DetailedReactHTMLElement<{
+        style: {
+            position: "relative";
+        };
+        ref: (c: HTMLElement | null) => void;
+    }, HTMLElement>;
+}

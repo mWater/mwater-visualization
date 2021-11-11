@@ -2,12 +2,13 @@ import _ from "lodash"
 import React from "react"
 const R = React.createElement
 import { default as produce } from "immer"
-import { original } from "immer"
 import { DataSource, injectTableAlias, Schema } from "mwater-expressions"
 import Chart from "../Chart"
 import { ExprCleaner } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import AxisBuilder from "../../../axes/AxisBuilder"
+import { JsonQLSelectQuery } from "jsonql"
+import { JsonQLFilter } from "../../.."
 
 /*
 Design is:
@@ -96,12 +97,12 @@ export default class ImageMosaicChart extends Chart {
   // dataSource: data source to get data from
   // filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   // callback: (error, data)
-  getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any) {
+  getData(design: any, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[] | null, callback: any) {
     const exprCompiler = new ExprCompiler(schema)
     const axisBuilder = new AxisBuilder({ schema })
 
     // Create shell of query
-    const query = {
+    const query: JsonQLSelectQuery = {
       type: "query",
       selects: [],
       from: exprCompiler.compileTable(design.table, "main"),
@@ -120,7 +121,7 @@ export default class ImageMosaicChart extends Chart {
     // Add primary key
     query.selects.push({
       type: "select",
-      expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table).primaryKey },
+      expr: { type: "field", tableAlias: "main", column: schema.getTable(design.table)!.primaryKey },
       alias: "id"
     })
 

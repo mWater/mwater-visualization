@@ -4,7 +4,7 @@ import { ExprUtils } from "mwater-expressions";
 import { ExprCleaner } from "mwater-expressions";
 import { Axis, AxisCategory } from "./Axis";
 import { JsonQLExpr, JsonQLSelectQuery } from "jsonql";
-declare type AggrNeed = "none" | "optional" | "required";
+export declare type AggrNeed = "none" | "optional" | "required";
 export default class AxisBuilder {
     schema: Schema;
     exprUtils: ExprUtils;
@@ -31,7 +31,7 @@ export default class AxisBuilder {
        axis: axis to validate
     */
     validateAxis(options: {
-        axis: Axis | null;
+        axis: Axis | null | undefined;
     }): string | null;
     /**
      * Compile an axis to JsonQL
@@ -58,4 +58,3 @@ export default class AxisBuilder {
     isCategorical(axis: any): boolean;
     convertAxisToExpr(axis: any): any;
 }
-export {};

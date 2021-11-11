@@ -1,10 +1,11 @@
 import React from "react";
+import { IdLiteralComponent } from "mwater-expressions-ui";
 import { DataSource, Schema } from "mwater-expressions";
 interface RegionSelectComponentProps {
     schema: Schema;
     dataSource: DataSource;
     /** _id of region */
-    region: number | null | undefined;
+    region: string | number | null | undefined;
     onChange: (region: number | null, level: number | null) => void;
     /** Default "All Countries" */
     placeholder?: string;
@@ -19,6 +20,6 @@ export default class RegionSelectComponent extends React.Component<RegionSelectC
         regionsTable: string;
     };
     handleChange: (id: any) => void;
-    render(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+    render(): React.CElement<import("mwater-expressions-ui/lib/IdLiteralComponent").IdLiteralComponentProps, IdLiteralComponent>;
 }
 export {};

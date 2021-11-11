@@ -5,7 +5,7 @@ import React from "react"
 const R = React.createElement
 import moment from "moment"
 import AxisBuilder from "../../../axes/AxisBuilder"
-import { ExprUtils, Schema } from "mwater-expressions"
+import { Schema } from "mwater-expressions"
 import * as d3 from "d3"
 
 // Require d3-tip to use it

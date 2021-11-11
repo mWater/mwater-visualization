@@ -32,7 +32,7 @@ const xforms: { type: string; input: LiteralType; output: LiteralType }[] = [
   { type: "week", input: "datetime", output: "enum" }
 ]
 
-type AggrNeed = "none" | "optional" | "required"
+export type AggrNeed = "none" | "optional" | "required"
 
 // Small number to prevent width_bucket errors on auto binning with only one value
 const epsilon = 0.000000001
@@ -169,7 +169,7 @@ export default class AxisBuilder {
     options:
      axis: axis to validate
   */
-  validateAxis(options: { axis: Axis | null }): string | null {
+  validateAxis(options: { axis: Axis | null | undefined }): string | null {
     // Nothing is ok
     if (!options.axis) {
       return null

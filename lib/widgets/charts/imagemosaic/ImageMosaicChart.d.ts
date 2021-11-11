@@ -1,6 +1,7 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
 import Chart from "../Chart";
+import { JsonQLFilter } from "../../..";
 export default class ImageMosaicChart extends Chart {
     cleanDesign(design: any, schema: Schema): any;
     validateDesign(design: any, schema: Schema): string | null;
@@ -12,7 +13,7 @@ export default class ImageMosaicChart extends Chart {
         filters: any;
         onDesignChange: (design: any) => any;
     }>;
-    getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any): Promise<import("mwater-expressions").Row[]> & void;
+    getData(design: any, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[] | null, callback: any): void;
     createViewElement(options: any): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
     createDataTable(design: any, schema: Schema, dataSource: DataSource, data: any): null;
     getFilterableTables(design: any, schema: Schema): any[];

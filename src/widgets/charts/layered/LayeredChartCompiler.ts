@@ -1,9 +1,12 @@
 import _ from "lodash"
-import { ExprCompiler } from "mwater-expressions"
+import { ExprCompiler, Schema } from "mwater-expressions"
 import { ExprUtils } from "mwater-expressions"
 import AxisBuilder from "../../../axes/AxisBuilder"
 import { injectTableAlias } from "mwater-expressions"
 import * as d3Format from "d3-format"
+import { JsonQLFilter } from "../../.."
+import { LayeredChartDesign } from "./LayeredChartDesign"
+import { JsonQLQuery, JsonQLSelectQuery } from "jsonql"
 
 const commaFormatter = d3Format.format(",")
 const compactFormatter = d3Format.format("~s")
@@ -60,16 +63,22 @@ const defaultColors = [
 
 // Compiles various parts of a layered chart (line, bar, scatter, spline, area) to C3.js format
 export default class LayeredChartCompiler {
+  schema: Schema
+  exprUtils: ExprUtils
+  axisBuilder: AxisBuilder
+  
   // Pass in schema
-  constructor(options: any) {
+  constructor(options: { schema: Schema }) {
     this.schema = options.schema
     this.exprUtils = new ExprUtils(this.schema)
     this.axisBuilder = new AxisBuilder({ schema: this.schema })
   }
 
-  // Create the queries needed for the chart.
-  // extraFilters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. }
-  createQueries(design: any, extraFilters: any) {
+  /** Create the queries needed for the chart.
+   * extraFilters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. }
+   * @returns queries indexed by layerX
+   */
+  createQueries(design: LayeredChartDesign, extraFilters?: JsonQLFilter[] | null): { [key: string]: JsonQLQuery } {
     const exprCompiler = new ExprCompiler(this.schema)
 
     const queries = {}
@@ -89,7 +98,7 @@ export default class LayeredChartCompiler {
       }
 
       // Create shell of query
-      const query = {
+      const query: JsonQLSelectQuery = {
         type: "query",
         selects: [],
         from: exprCompiler.compileTable(layer.table, "main"),
@@ -122,20 +131,20 @@ export default class LayeredChartCompiler {
 
       // Sort by x and color
       if (layer.axes.x || layer.axes.color) {
-        query.orderBy.push({ ordinal: 1 })
+        query.orderBy!.push({ ordinal: 1 })
       }
       if (layer.axes.x && layer.axes.color) {
-        query.orderBy.push({ ordinal: 2 })
+        query.orderBy!.push({ ordinal: 2 })
       }
 
       // If grouping type
       if (this.doesLayerNeedGrouping(design, layerIndex)) {
         if (layer.axes.x || layer.axes.color) {
-          query.groupBy.push(1)
+          query.groupBy!.push(1)
         }
 
         if (layer.axes.x && layer.axes.color) {
-          query.groupBy.push(2)
+          query.groupBy!.push(2)
         }
       }
 

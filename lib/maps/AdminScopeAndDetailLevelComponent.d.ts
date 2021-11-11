@@ -1,6 +1,6 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-interface AdminScopeAndDetailLevelComponentProps {
+export interface AdminScopeAndDetailLevelComponentProps {
     /** Schema to use */
     schema: Schema;
     dataSource: DataSource;
@@ -17,4 +17,3 @@ export default class AdminScopeAndDetailLevelComponent extends React.Component<A
     handleDetailLevelChange: (detailLevel: any) => any;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
-export {};

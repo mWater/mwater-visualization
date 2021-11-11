@@ -5,6 +5,7 @@ import { LayerDefinition, OnGridClickResults } from "./maps";
 import { JsonQLFilter } from "../index";
 import ChoroplethLayerDesign from "./ChoroplethLayerDesign";
 import { JsonQLQuery } from "jsonql";
+import LayerLegendComponent from "./LayerLegendComponent";
 export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     /** Gets the type of layer definition */
     getLayerDefinitionType(): "VectorTile";
@@ -53,7 +54,7 @@ export default class ChoroplethLayer extends Layer<ChoroplethLayerDesign> {
     getBounds(design: ChoroplethLayerDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): void;
     getMinZoom(design: ChoroplethLayerDesign): number | undefined;
     getMaxZoom(design: ChoroplethLayerDesign): number;
-    getLegend(design: ChoroplethLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+    getLegend(design: ChoroplethLayerDesign, schema: Schema, name: string, dataSource: DataSource, locale: string, filters: JsonQLFilter[]): React.CElement<import("./LayerLegendComponent").LayerLegendComponentProps, LayerLegendComponent>;
     getFilterableTables(design: ChoroplethLayerDesign, schema: Schema): string[];
     /** True if layer can be edited */
     isEditable(): boolean;

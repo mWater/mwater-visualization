@@ -7,7 +7,7 @@ export interface ClusterLayerDesign {
     /** axes (see below) */
     axes: {
         /** locations to cluster */
-        geometry: Axis;
+        geometry: Axis | null;
     };
     /** optional logical expression to filter by */
     filter?: Expr;

@@ -8,7 +8,7 @@ export interface QuickfiltersDataSource {
     index: number,
     expr: Expr,
     filters: JsonQLFilter[],
-    offset: number,
+    offset: number | null,
     limit: number,
     callback: (error: any, values?: any[]) => void
   ): void

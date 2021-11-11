@@ -1,4 +1,3 @@
-import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
@@ -128,7 +127,7 @@ export default class CalendarChartDesignerComponent extends React.Component<Cale
         required: true,
         value: this.props.design.dateAxis,
         onChange: this.handleDateAxisChange,
-        filters: this.props.filter
+        filters: this.props.filters
       })
     )
   }
@@ -150,7 +149,7 @@ export default class CalendarChartDesignerComponent extends React.Component<Cale
         required: true,
         value: this.props.design.valueAxis,
         onChange: this.handleValueAxisChange,
-        filters: this.props.filter
+        filters: this.props.filters
       })
     )
   }

@@ -1,6 +1,23 @@
+import { Schema } from "mwater-expressions";
+import { ExprUtils } from "mwater-expressions";
+import AxisBuilder from "../../../axes/AxisBuilder";
+import { JsonQLFilter } from "../../..";
+import { LayeredChartDesign } from "./LayeredChartDesign";
+import { JsonQLQuery } from "jsonql";
 export default class LayeredChartCompiler {
-    constructor(options: any);
-    createQueries(design: any, extraFilters: any): {};
+    schema: Schema;
+    exprUtils: ExprUtils;
+    axisBuilder: AxisBuilder;
+    constructor(options: {
+        schema: Schema;
+    });
+    /** Create the queries needed for the chart.
+     * extraFilters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. }
+     * @returns queries indexed by layerX
+     */
+    createQueries(design: LayeredChartDesign, extraFilters?: JsonQLFilter[] | null): {
+        [key: string]: JsonQLQuery;
+    };
     createDataMap(design: any, data: any): {};
     createChartOptions(options: any): {
         data: {
@@ -142,8 +159,8 @@ export default class LayeredChartCompiler {
     isXAxisRequired(design: any, layerIndex: any): boolean;
     isColorAxisRequired(design: any, layerIndex: any): boolean;
     compileDefaultTitleText(design: any, locale: any): string;
-    compileDefaultYAxisLabelText(design: any, locale: any): any;
-    compileDefaultXAxisLabelText(design: any, locale: any): any;
+    compileDefaultYAxisLabelText(design: any, locale: any): string;
+    compileDefaultXAxisLabelText(design: any, locale: any): string;
     compileTitleText(design: any, locale: any): any;
     compileYAxisLabelText(design: any, locale: any): any;
     compileXAxisLabelText(design: any, locale: any): any;
@@ -151,9 +168,37 @@ export default class LayeredChartCompiler {
         name: string;
         filter: {
             table: any;
-            jsonql: any;
+            jsonql: {
+                type: string;
+                op: string;
+                exprs: (string | number | boolean | import("jsonql").JsonQLLiteral | import("jsonql").JsonQLOp | import("jsonql").JsonQLCase | import("jsonql").JsonQLScalar | import("jsonql").JsonQLField | import("jsonql").JsonQLToken | {
+                    type: string;
+                    op: string;
+                    exprs: {
+                        type: string;
+                        op: string;
+                        exprs: import("jsonql").JsonQLExpr[];
+                    }[];
+                } | null)[];
+            };
+        } | {
+            table: any;
+            jsonql: string | number | boolean | import("jsonql").JsonQLLiteral | import("jsonql").JsonQLOp | import("jsonql").JsonQLCase | import("jsonql").JsonQLScalar | import("jsonql").JsonQLField | import("jsonql").JsonQLToken | {
+                type: string;
+                op: string;
+                exprs: {
+                    type: string;
+                    op: string;
+                    exprs: import("jsonql").JsonQLExpr[];
+                }[];
+            } | null;
         };
-        filterExpr: any;
+        filterExpr: import("mwater-expressions").LiteralExpr | import("mwater-expressions").FieldExpr | import("mwater-expressions").OpExpr | import("mwater-expressions").IdExpr | import("mwater-expressions").ScalarExpr | import("mwater-expressions").CaseExpr | import("mwater-expressions").ScoreExpr | import("mwater-expressions").BuildEnumsetExpr | import("mwater-expressions").VariableExpr | import("mwater-expressions").ExtensionExpr | import("mwater-expressions").LegacyComparisonExpr | import("mwater-expressions").LegacyCountExpr | {
+            table: any;
+            type: string;
+            op: string;
+            exprs: any[];
+        } | null;
         data: {
             layerIndex: any;
         };

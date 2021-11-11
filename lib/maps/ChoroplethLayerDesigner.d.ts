@@ -4,6 +4,8 @@ import ChoroplethLayerDesign from "./ChoroplethLayerDesign";
 import { JsonQLFilter } from "../index";
 import EditPopupComponent from "./EditPopupComponent";
 import { Axis } from "../axes/Axis";
+import AdminScopeAndDetailLevelComponent from "./AdminScopeAndDetailLevelComponent";
+import ScopeAndDetailLevelComponent from "./ScopeAndDetailLevelComponent";
 export default class ChoroplethLayerDesigner extends React.Component<{
     schema: Schema;
     dataSource: DataSource;
@@ -29,7 +31,7 @@ export default class ChoroplethLayerDesigner extends React.Component<{
     renderTable(): JSX.Element | null;
     renderRegionsTable(): JSX.Element;
     renderAdminRegionExpr(): JSX.Element | null;
-    renderScopeAndDetailLevel(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+    renderScopeAndDetailLevel(): React.CElement<import("./AdminScopeAndDetailLevelComponent").AdminScopeAndDetailLevelComponentProps, AdminScopeAndDetailLevelComponent> | React.CElement<import("./ScopeAndDetailLevelComponent").ScopeAndDetailLevelComponentProps, ScopeAndDetailLevelComponent>;
     renderDisplayNames(): React.DetailedReactHTMLElement<{
         className: string;
     }, HTMLElement>;

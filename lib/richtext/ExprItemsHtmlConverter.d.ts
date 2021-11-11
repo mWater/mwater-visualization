@@ -1,7 +1,18 @@
 import ItemsHtmlConverter from "./ItemsHtmlConverter";
-import { Schema } from "mwater-expressions";
+import { Expr, Schema } from "mwater-expressions";
 export default class ExprItemsHtmlConverter extends ItemsHtmlConverter {
-    constructor(schema: Schema, designMode: any, exprValues: any, summarizeExprs: any, namedStrings: any, locale: any);
+    schema: Schema;
+    designMode: boolean;
+    exprValues: {
+        [id: string]: Expr;
+    };
+    summarizeExprs: boolean;
+    locale: string | undefined;
+    constructor(schema: Schema, designMode: boolean, exprValues: {
+        [id: string]: Expr;
+    }, summarizeExprs: boolean, namedStrings?: {
+        [key: string]: string;
+    }, locale?: string);
     convertSpecialItemToHtml(item: any): string;
-    convertElemToItems(elem: any): any;
+    convertElemToItems(elem: any): import("./ItemsHtmlConverter").HtmlItem[];
 }
