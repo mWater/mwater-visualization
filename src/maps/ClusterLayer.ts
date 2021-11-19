@@ -815,6 +815,11 @@ export default class ClusterLayer extends Layer<ClusterLayerDesign> {
       return error
     }
 
+    // Check type of axis (prevents blank axes)
+    if (axisBuilder.getAxisType(design.axes.geometry) != "geometry") {
+      return "Geometry axis required"
+    }
+
     // Validate filter
     error = exprValidator.validateExpr(design.filter || null)
     if (error) {
