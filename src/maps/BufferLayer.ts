@@ -832,6 +832,11 @@ marker-fill: ` +
       return error
     }
 
+    // Check type of axis (prevents blank axes)
+    if (axisBuilder.getAxisType(design.axes.geometry) != "geometry") {
+      return "Geometry axis required"
+    }
+
     error = axisBuilder.validateAxis({ axis: design.axes.color })
     if (error) {
       return error
