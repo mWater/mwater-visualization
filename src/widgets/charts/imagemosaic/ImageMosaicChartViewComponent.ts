@@ -1,9 +1,7 @@
-import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
 
-import AxisBuilder from "../../../axes/AxisBuilder"
 import { LazyLoadComponent as LazyLoad } from "react-lazy-load-image-component"
 import RotationAwareImageComponent from "mwater-forms/lib/RotationAwareImageComponent"
 import ImagePopupComponent from "./ImagePopupComponent"

@@ -150,7 +150,7 @@ export default class CalendarChartViewComponent extends React.Component<Calendar
       .nest()
       .key((d: any) => d.date)
       .rollup((d: any) => d[0].value)
-      .map(this.props.data, d3.map)
+      .map(this.props.data)
 
     const tip = d3Tip()
       .attr("class", "d3-tip")
@@ -166,7 +166,7 @@ export default class CalendarChartViewComponent extends React.Component<Calendar
     const color = d3
       .scaleQuantize()
       .domain([1, d3.max(data.values())])
-      .range(d3.range(10).map((d: any) => rgb.darker(d * 0.1).toString()))
+      .range(d3.range(10).map((d: any) => rgb.darker(d * 0.1).toString()) as any[])
 
     const yearGroupTranslateX = (this.props.width - cellSize * 53 - 16) / 2 + 16
 
@@ -226,10 +226,10 @@ export default class CalendarChartViewComponent extends React.Component<Calendar
     rect
       .filter((d: any) => data.has(d))
       .attr("fill", (d: any) => {
-        const _color = color(data.get(d))
+        const _color = color(data.get(d))!
 
         if (this.props.scope?.data === d) {
-          return this.props.highlightCellFillColor
+          return this.props.highlightCellFillColor!
         }
 
         return _color

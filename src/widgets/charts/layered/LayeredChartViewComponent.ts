@@ -8,11 +8,12 @@ import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import LayeredChartCompiler from "./LayeredChartCompiler"
 import TextComponent from "../../text/TextComponent"
 import * as d3 from "d3"
+import { LayeredChartDesign } from "./LayeredChartDesign"
 
 interface LayeredChartViewComponentProps {
   schema: Schema
   dataSource: DataSource
-  design: any
+  design: LayeredChartDesign
   data: any
   onDesignChange?: any
   width: number
@@ -97,7 +98,7 @@ export default class LayeredChartViewComponent extends React.Component<
         }
       },
       R(TextComponent, {
-        design: this.props.design.header,
+        design: this.props.design.header!,
         onDesignChange: this.props.onDesignChange ? this.handleHeaderChange : undefined,
         schema: this.props.schema,
         dataSource: this.props.dataSource,
@@ -116,7 +117,7 @@ export default class LayeredChartViewComponent extends React.Component<
         }
       },
       R(TextComponent, {
-        design: this.props.design.footer,
+        design: this.props.design.footer!,
         onDesignChange: this.props.onDesignChange ? this.handleFooterChange : undefined,
         schema: this.props.schema,
         dataSource: this.props.dataSource,
@@ -299,7 +300,7 @@ class C3ChartComponent extends React.Component<C3ChartComponentProps> {
         }
 
         // Determine if scoped
-        if (this.props.scope) {
+        if (this.props.scope && scope) {
           if (_.isEqual(this.props.scope.data, scope.data)) {
             return 1
           } else {

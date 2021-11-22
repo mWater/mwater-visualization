@@ -1,5 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
 import _ from "lodash"
 import $ from "jquery"
 import saveSvgAsPng from "save-svg-as-png"

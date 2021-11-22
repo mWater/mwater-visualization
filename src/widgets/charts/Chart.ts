@@ -75,7 +75,7 @@ export default class Chart {
   //   widgetDataSource: widget data source to use
   //   filters: array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct
   // Returns an empty list by default
-  createDropdownItems(design: any, schema: Schema, widgetDataSource: WidgetDataSource, filters: any) {
+  createDropdownItems(design: any, schema: Schema, widgetDataSource: WidgetDataSource, filters: any): { label: ReactNode, icon?: string, onClick: () => void }[] {
     return []
   }
 

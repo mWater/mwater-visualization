@@ -6,7 +6,7 @@ import { default as produce } from "immer"
 import { original } from "immer"
 import Chart from "../Chart"
 import LayeredChartCompiler from "./LayeredChartCompiler"
-import { DataSource, ExprCleaner, Schema } from "mwater-expressions"
+import { DataSource, ExprCleaner, Row, Schema } from "mwater-expressions"
 import AxisBuilder, { AggrNeed } from "../../../axes/AxisBuilder"
 import LayeredChartSvgFileSaver from "./LayeredChartSvgFileSaver"
 import * as LayeredChartUtils from "./LayeredChartUtils"
@@ -14,10 +14,11 @@ import TextWidget from "../../text/TextWidget"
 import { LayeredChartDesign } from "./LayeredChartDesign"
 import { WidgetDataSource } from "../../WidgetDataSource"
 import { JsonQLFilter } from "../../.."
+import { JsonQLQuery } from "jsonql"
 
 // See LayeredChart Design.md for the design
 export default class LayeredChart extends Chart {
-  cleanDesign(design: any, schema: Schema) {
+  cleanDesign(design: LayeredChartDesign, schema: Schema): LayeredChartDesign {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
     const compiler = new LayeredChartCompiler({ schema })
@@ -187,17 +188,17 @@ export default class LayeredChart extends Chart {
     // Run queries in parallel
     return async.map(
       _.pairs(queries),
-      (item, cb) => {
+      (item: [string, JsonQLQuery], cb) => {
         return dataSource.performQuery(item[1], (err: any, rows: any) => {
           return cb(err, [item[0], rows])
         })
       },
-      (err, items) => {
+      (err, items: [string, Row[]][]) => {
         if (err) {
           return callback(err)
         }
 
-        const data = _.object(items)
+        const data = _.object(items) as any
 
         // Add header and footer data
         const textWidget = new TextWidget()
@@ -342,7 +343,7 @@ export default class LayeredChart extends Chart {
   }
 
   // Get a list of table ids that can be filtered on
-  getFilterableTables(design: any, schema: Schema) {
+  getFilterableTables(design: LayeredChartDesign, schema: Schema) {
     let filterableTables = _.uniq(_.compact(_.map(design.layers, (layer) => layer.table)))
 
     // Get filterable tables from header and footer

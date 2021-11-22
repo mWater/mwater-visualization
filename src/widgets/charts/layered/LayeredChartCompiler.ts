@@ -338,7 +338,7 @@ export default class LayeredChartCompiler {
 
   // Compiles data part of C3 chart, including data map back to original data
   // Outputs: columns, types, names, colors. Also dataMap which is a map of "layername:index" to { layerIndex, row }
-  compileData(design: any, data: any, locale: any) {
+  compileData(design: LayeredChartDesign, data: any, locale?: string) {
     // If polar chart (no x axis)
     if (["pie", "donut"].includes(design.type) || _.any(design.layers, (l) => ["pie", "donut"].includes(l.type))) {
       return this.compileDataPolar(design, data, locale)
@@ -987,19 +987,19 @@ export default class LayeredChartCompiler {
   // else
   //   return @compileYAxisLabelText(design) + " by " + @axisBuilder.summarizeAxis(design.layers[0].axes.color)
 
-  compileDefaultYAxisLabelText(design: any, locale: any) {
+  compileDefaultYAxisLabelText(design: any, locale?: string) {
     return this.axisBuilder.summarizeAxis(design.layers[0].axes.y, locale)
   }
 
-  compileDefaultXAxisLabelText(design: any, locale: any) {
+  compileDefaultXAxisLabelText(design: any, locale?: string) {
     return this.axisBuilder.summarizeAxis(design.layers[0].axes.x, locale)
   }
 
-  compileTitleText(design: any, locale: any) {
+  compileTitleText(design: any, locale?: string) {
     return design.titleText || this.compileDefaultTitleText(design, locale)
   }
 
-  compileYAxisLabelText(design: any, locale: any) {
+  compileYAxisLabelText(design: any, locale?: string) {
     if (design.yAxisLabelText === "") {
       return this.compileDefaultYAxisLabelText(design, locale)
     }
