@@ -1,13 +1,9 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
 import _ from "lodash"
-import PropTypes from "prop-types"
 import React, { CSSProperties } from "react"
 import ReactDOM from "react-dom"
 const R = React.createElement
 
-import { DragSource } from "react-dnd"
-import { DropTarget } from "react-dnd"
+import { DragSource, DropTarget } from "react-dnd"
 
 interface DraggableBlockComponentProps {
   /** Block to display */

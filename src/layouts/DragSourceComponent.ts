@@ -1,6 +1,5 @@
 import _ from "lodash"
 import React from "react"
-const R = React.createElement
 
 import { DragSource } from "react-dnd"
 
