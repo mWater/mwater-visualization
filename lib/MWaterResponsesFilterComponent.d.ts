@@ -1,6 +1,6 @@
 import React from "react";
 import { Schema } from "mwater-expressions";
-interface MWaterResponsesFilterComponentProps {
+export interface MWaterResponsesFilterComponentProps {
     schema: Schema;
     /** responses:xyz */
     table: string;
@@ -40,4 +40,3 @@ export default class MWaterResponsesFilterComponent extends React.Component<MWat
         };
     }, HTMLElement>;
 }
-export {};

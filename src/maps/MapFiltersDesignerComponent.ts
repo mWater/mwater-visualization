@@ -9,7 +9,7 @@ import PopoverHelpComponent from "react-library/lib/PopoverHelpComponent"
 import FiltersDesignerComponent from "../FiltersDesignerComponent"
 import * as MapUtils from "./MapUtils"
 
-interface MapFiltersDesignerComponentProps {
+export interface MapFiltersDesignerComponentProps {
   /** Schema to use */
   schema: Schema
   /** Data source to use */

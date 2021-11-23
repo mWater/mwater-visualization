@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-interface AddLayerComponentProps {
+export interface AddLayerComponentProps {
     /** Number of layers that already exist */
     layerNumber: number;
     /** See Map Design.md */
@@ -20,4 +20,3 @@ export default class AddLayerComponent extends React.Component<AddLayerComponent
     handleAddLayerView: (layerView: any) => any;
     render(): any;
 }
-export {};

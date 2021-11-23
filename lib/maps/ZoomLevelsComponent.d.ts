@@ -1,5 +1,5 @@
 import React from "react";
-interface ZoomLevelsComponentProps {
+export interface ZoomLevelsComponentProps {
     design: any;
     onDesignChange: any;
 }

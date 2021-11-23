@@ -1,10 +1,11 @@
 import PropTypes from "prop-types";
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-interface LayeredChartViewComponentProps {
+import { LayeredChartDesign } from "./LayeredChartDesign";
+export interface LayeredChartViewComponentProps {
     schema: Schema;
     dataSource: DataSource;
-    design: any;
+    design: LayeredChartDesign;
     data: any;
     onDesignChange?: any;
     width: number;

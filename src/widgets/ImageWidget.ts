@@ -3,7 +3,7 @@ const R = React.createElement
 import _ from "lodash"
 import { DataSource, ExprCompiler, Schema } from "mwater-expressions"
 import { injectTableAlias } from "mwater-expressions"
-import Widget from "./Widget"
+import Widget, { CreateViewElementOptions } from "./Widget"
 
 // Image widget. Design is:
 // imageUrl: arbitrary url of image if using url
@@ -26,7 +26,7 @@ export default class ImageWidget extends Widget {
   //  width: width in pixels on screen
   //  height: height in pixels on screen
   //  singleRowTable: optional table name of table that will be filtered to have a single row present. Widget designer should optionally account for this
-  createViewElement(options: any) {
+  createViewElement(options: CreateViewElementOptions) {
     // Put here so ImageWidget can be created on server
     const ImageWidgetComponent = require("./ImageWidgetComponent").default
 

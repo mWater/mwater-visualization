@@ -7,7 +7,7 @@ import TextWidget from "./TextWidget"
 import AsyncLoadComponent from "react-library/lib/AsyncLoadComponent"
 import { DataSource, Schema } from "mwater-expressions"
 
-interface TextWidgetComponentProps {
+export interface TextWidgetComponentProps {
   design: any
   /** Called with new design. null/undefined for readonly */
   onDesignChange?: any

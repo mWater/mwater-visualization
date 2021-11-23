@@ -1,4 +1,3 @@
-import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
@@ -8,7 +7,7 @@ import * as ui from "react-library/lib/bootstrap"
 import { IdLiteralComponent } from "mwater-expressions-ui"
 import { DataSource, Schema } from "mwater-expressions"
 
-interface MWaterGlobalFiltersComponentProps {
+export interface MWaterGlobalFiltersComponentProps {
   /** Schema of the database */
   schema: Schema
   /** Data source to use to get values */

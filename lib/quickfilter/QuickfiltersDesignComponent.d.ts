@@ -1,6 +1,6 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-interface QuickfiltersDesignComponentProps {
+export interface QuickfiltersDesignComponentProps {
     /** Design of quickfilters. See README.md */
     design: any;
     /** Called when design changes */

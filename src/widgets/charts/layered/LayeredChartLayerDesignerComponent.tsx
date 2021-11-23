@@ -15,7 +15,7 @@ import TableSelectComponent from "../../../TableSelectComponent"
 import * as ui from "react-library/lib/bootstrap"
 import { Checkbox } from "react-library/lib/bootstrap"
 
-interface LayeredChartLayerDesignerComponentProps {
+export interface LayeredChartLayerDesignerComponentProps {
   design: any
   schema: Schema
   dataSource: DataSource

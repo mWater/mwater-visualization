@@ -4,7 +4,7 @@ const R = React.createElement
 
 const DragSourceComponent = require("../DragSourceComponent").default("block-move")
 
-interface PaletteItemComponentProps {
+export interface PaletteItemComponentProps {
   /** Create the drag item */
   createItem: any
   title?: any

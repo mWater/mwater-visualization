@@ -1,12 +1,12 @@
 import React from "react";
-interface ImagelistCarouselComponentProps {
+export interface ImagelistCarouselComponentProps {
     /** Array of { id, cover: true/false } */
     imagelist?: any;
     widgetDataSource: any;
     height?: number;
 }
 interface ImagelistCarouselComponentState {
-    activeImage: any;
+    activeImage: number;
 }
 export default class ImagelistCarouselComponent extends React.Component<ImagelistCarouselComponentProps, ImagelistCarouselComponentState> {
     constructor(props: any);

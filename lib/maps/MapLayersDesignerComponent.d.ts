@@ -1,6 +1,6 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-interface MapLayersDesignerComponentProps {
+export interface MapLayersDesignerComponentProps {
     /** Schema to use */
     schema: Schema;
     dataSource: DataSource;
@@ -29,4 +29,3 @@ export default class MapLayersDesignerComponent extends React.Component<MapLayer
         className: string;
     }, HTMLElement>;
 }
-export {};

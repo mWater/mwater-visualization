@@ -1,5 +1,5 @@
 import React from "react";
-interface MarkerSymbolSelectComponentProps {
+export interface MarkerSymbolSelectComponentProps {
     symbol?: string;
     onChange: any;
 }
@@ -8,4 +8,3 @@ export default class MarkerSymbolSelectComponent extends React.Component<MarkerS
         className: string;
     }, HTMLElement>;
 }
-export {};

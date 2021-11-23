@@ -1,6 +1,6 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-interface ClusterLayerDesignerComponentProps {
+export interface ClusterLayerDesignerComponentProps {
     /** Schema to use */
     schema: Schema;
     dataSource: DataSource;
@@ -35,4 +35,3 @@ export default class ClusterLayerDesignerComponent extends React.Component<Clust
     }, HTMLElement> | null;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
-export {};

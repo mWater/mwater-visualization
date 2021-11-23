@@ -1,5 +1,5 @@
 import React from "react";
-interface CheckboxComponentProps {
+export interface CheckboxComponentProps {
     /** True to check */
     checked?: boolean;
     /** Called when clicked */
@@ -13,4 +13,3 @@ export default class CheckboxComponent extends React.Component<CheckboxComponent
         onClick: () => any;
     }, HTMLElement>;
 }
-export {};

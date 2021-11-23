@@ -1,9 +1,9 @@
 import PropTypes from "prop-types";
 import React from "react";
-import Widget from "./Widget";
+import Widget, { CreateViewElementOptions } from "./Widget";
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent";
 export default class TOCWidget extends Widget {
-    createViewElement(options: any): React.CElement<any, TOCWidgetComponent>;
+    createViewElement(options: CreateViewElementOptions): React.CElement<any, TOCWidgetComponent>;
     isAutoHeight(): boolean;
 }
 declare class TOCWidgetComponent extends React.Component {
@@ -23,7 +23,7 @@ declare class TOCWidgetComponent extends React.Component {
     constructor(props: any);
     handleStartEditing: () => void;
     handleEndEditing: () => void;
-    renderEditor(): React.CElement<any, ModalPopupComponent> | null;
+    renderEditor(): React.CElement<import("react-library/lib/ModalPopupComponent").ModalPopupComponentProps, ModalPopupComponent> | null;
     renderContent(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
     render(): React.DetailedReactHTMLElement<{
         onDoubleClick: () => void;

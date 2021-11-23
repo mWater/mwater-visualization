@@ -4,7 +4,7 @@ import PropTypes from "prop-types"
 import React from "react"
 import ReactDOM from "react-dom"
 
-interface PopoverComponentProps {
+export interface PopoverComponentProps {
   /** contents of popover */
   content: any
   /** See http://getbootstrap.com/javascript/#popovers */

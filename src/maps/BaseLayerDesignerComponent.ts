@@ -5,7 +5,7 @@ const R = React.createElement
 import { default as Rcslider } from "rc-slider"
 import PopoverHelpComponent from "react-library/lib/PopoverHelpComponent"
 
-interface BaseLayerDesignerComponentProps {
+export interface BaseLayerDesignerComponentProps {
   /** See Map Design.md */
   design: any
   onDesignChange: any

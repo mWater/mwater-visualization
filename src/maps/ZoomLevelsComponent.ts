@@ -4,7 +4,7 @@ const R = React.createElement
 
 import NumberInputComponent from "react-library/lib/NumberInputComponent"
 
-interface ZoomLevelsComponentProps {
+export interface ZoomLevelsComponentProps {
   design: any
   onDesignChange: any
 }

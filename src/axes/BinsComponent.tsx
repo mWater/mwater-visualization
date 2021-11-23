@@ -7,7 +7,7 @@ import AxisBuilder from "./AxisBuilder"
 import NumberInputComponent from "react-library/lib/NumberInputComponent"
 import { Checkbox } from "react-library/lib/bootstrap"
 
-interface BinsComponentProps {
+export interface BinsComponentProps {
   schema: Schema
   dataSource: DataSource
   /** Expression for computing min/max */

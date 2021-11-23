@@ -21,7 +21,7 @@ import { getDefaultFormat } from "../valueFormatter"
 import { DatagridDesignColumn } from "./DatagridDesign"
 import { DatagridDesign } from ".."
 
-interface DatagridDesignerComponentProps {
+export interface DatagridDesignerComponentProps {
   /** schema to use */
   schema: Schema
   /** dataSource to use */

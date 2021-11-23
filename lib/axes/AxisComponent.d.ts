@@ -7,7 +7,7 @@ import AxisColorEditorComponent from "./AxisColorEditorComponent";
 import CategoryMapComponent from "./CategoryMapComponent";
 import { JsonQLFilter } from "../JsonQLFilter";
 import { Axis } from "./Axis";
-interface AxisComponentProps {
+export interface AxisComponentProps {
     schema: Schema;
     dataSource: DataSource;
     /** Table to use */
@@ -61,4 +61,3 @@ export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps
     }, HTMLElement> | null;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
-export {};

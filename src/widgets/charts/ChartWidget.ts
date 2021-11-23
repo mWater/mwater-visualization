@@ -1,7 +1,7 @@
 import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
-import Widget from "./../Widget"
+import Widget, { CreateViewElementOptions } from "./../Widget"
 import DropdownWidgetComponent from "./../DropdownWidgetComponent"
 import CsvBuilder from "./../../CsvBuilder"
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent"
@@ -31,7 +31,7 @@ export default class ChartWidget extends Widget {
   //  width: width in pixels on screen
   //  height: height in pixels on screen
   //  onRowClick: Called with (tableId, rowId) when item is clicked
-  createViewElement(options: any) {
+  createViewElement(options: CreateViewElementOptions) {
     return R(ChartWidgetComponent, {
       chart: this.chart,
       design: options.design,

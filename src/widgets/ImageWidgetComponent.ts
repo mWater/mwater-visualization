@@ -18,7 +18,7 @@ import ImagelistCarouselComponent from "./ImagelistCarouselComponent"
 import { DataSource, Schema } from "mwater-expressions"
 import { WidgetDataSource } from "./WidgetDataSource"
 
-interface ImageWidgetComponentProps {
+export interface ImageWidgetComponentProps {
   design: any
   /** Called with new design. null/undefined for readonly */
   onDesignChange?: any

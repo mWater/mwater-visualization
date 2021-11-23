@@ -7,7 +7,7 @@ import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import { ExprComponent } from "mwater-expressions-ui"
 import { Checkbox } from "react-library/lib/bootstrap"
 
-interface OrderBysDesignerComponentProps {
+export interface OrderBysDesignerComponentProps {
   /** schema to use */
   schema: Schema
   /** dataSource to use */

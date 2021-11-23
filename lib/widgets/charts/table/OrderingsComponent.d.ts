@@ -1,6 +1,6 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-interface OrderingsComponentProps {
+export interface OrderingsComponentProps {
     orderings: any;
     onOrderingsChange: any;
     schema: Schema;
@@ -13,4 +13,3 @@ export default class OrderingsComponent extends React.Component<OrderingsCompone
     handleOrderingChange: (index: any, ordering: any) => any;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
-export {};

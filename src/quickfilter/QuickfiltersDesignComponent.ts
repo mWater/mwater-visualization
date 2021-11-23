@@ -8,7 +8,7 @@ import { ExprComponent } from "mwater-expressions-ui"
 import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import * as ui from "react-library/lib/bootstrap"
 
-interface QuickfiltersDesignComponentProps {
+export interface QuickfiltersDesignComponentProps {
   /** Design of quickfilters. See README.md */
   design: any
   /** Called when design changes */

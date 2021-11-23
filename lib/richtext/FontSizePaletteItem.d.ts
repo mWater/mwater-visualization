@@ -1,5 +1,5 @@
 import React from "react";
-interface FontSizePaletteItemProps {
+export interface FontSizePaletteItemProps {
     /** Called with "125%", etc. */
     onSetSize: any;
     /** should the popup be under or over? */

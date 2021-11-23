@@ -21,7 +21,7 @@ import { Axis, AxisXform, AxisXformRange } from "./Axis"
 import produce from "immer"
 import { JsonQLSelectQuery } from "jsonql"
 
-interface AxisComponentProps {
+export interface AxisComponentProps {
   schema: Schema
   dataSource: DataSource
   /** Table to use */

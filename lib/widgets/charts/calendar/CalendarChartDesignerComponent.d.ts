@@ -2,7 +2,7 @@ import React from "react";
 import * as ui from "../../../UIComponents";
 import { DataSource, Schema } from "mwater-expressions";
 import { CalendarChartDesign } from "./CalendarChart";
-interface CalendarChartDesignerComponentProps {
+export interface CalendarChartDesignerComponentProps {
     design: CalendarChartDesign;
     schema: Schema;
     dataSource: DataSource;
@@ -33,4 +33,3 @@ export default class CalendarChartDesignerComponent extends React.Component<Cale
     }, HTMLElement>;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
-export {};

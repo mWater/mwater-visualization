@@ -1,5 +1,5 @@
 import React from "react";
-interface GridLayoutComponentProps {
+export interface GridLayoutComponentProps {
     width: number;
     items?: any;
     onItemsChange?: any;
@@ -19,6 +19,5 @@ export default class GridLayoutComponent extends React.Component<GridLayoutCompo
             height: string;
             position: string;
         };
-    }, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)>;
+    }, string | React.JSXElementConstructor<any>>;
 }
-export {};

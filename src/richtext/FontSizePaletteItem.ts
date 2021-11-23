@@ -3,7 +3,7 @@ const R = React.createElement
 import _ from "lodash"
 import ClickOutHandler from "react-onclickout"
 
-interface FontSizePaletteItemProps {
+export interface FontSizePaletteItemProps {
   /** Called with "125%", etc. */
   onSetSize: any
   /** should the popup be under or over? */

@@ -6,7 +6,7 @@ import uuid from "uuid"
 const DragSourceComponent = require("../DragSourceComponent").default("visualization-block")
 import { DropTarget } from "react-dnd"
 
-interface ClipboardPaletteItemComponentProps {
+export interface ClipboardPaletteItemComponentProps {
   clipboard?: any
   onClipboardChange?: any
   cantPasteMessage?: string

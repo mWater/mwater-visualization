@@ -3,6 +3,7 @@ import { Axis } from "../../../axes/Axis";
 import { TextWidgetDesign } from "../../text/TextWidgetDesign";
 /** Design for a layered chart */
 export interface LayeredChartDesign {
+    version: number;
     /** Type of chart (overall) */
     type: "bar" | "line" | "spline" | "scatter" | "area" | "pie" | "donut";
     /** array of layers */

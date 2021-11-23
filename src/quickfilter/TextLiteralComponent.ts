@@ -7,7 +7,7 @@ import { ExprUtils } from "mwater-expressions"
 import { JsonQLFilter } from "../JsonQLFilter"
 import { QuickfiltersDataSource } from "./QuickfiltersDataSource"
 
-interface TextLiteralComponentProps {
+export interface TextLiteralComponentProps {
   value?: any
   onChange?: any
   schema: Schema

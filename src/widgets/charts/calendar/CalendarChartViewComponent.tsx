@@ -13,7 +13,7 @@ import { default as d3Tip } from "d3-tip"
 import { CalendarChartDesign } from "./CalendarChart"
 import { WidgetScope } from "../../.."
 
-interface CalendarChartViewComponentProps {
+export interface CalendarChartViewComponentProps {
   design: CalendarChartDesign // Design of chart
 
   /** Data that the chart has requested. In format [{ date: <YYYY-MM-DD>, value: <number value> }, { date: ... }...] */

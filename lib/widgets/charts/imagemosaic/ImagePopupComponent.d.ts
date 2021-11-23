@@ -1,6 +1,6 @@
 import React from "react";
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent";
-interface ImagePopupComponentProps {
+export interface ImagePopupComponentProps {
     imageManager: any;
 }
 interface ImagePopupComponentState {
@@ -10,6 +10,6 @@ interface ImagePopupComponentState {
 export default class ImagePopupComponent extends React.Component<ImagePopupComponentProps, ImagePopupComponentState> {
     constructor(props: any);
     show(image: any): any;
-    render(): React.CElement<any, ModalWindowComponent> | null;
+    render(): React.CElement<import("react-library/lib/ModalWindowComponent").ModalWindowComponentProps, ModalWindowComponent> | null;
 }
 export {};

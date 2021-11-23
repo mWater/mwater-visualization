@@ -1,7 +1,7 @@
 import React from "react";
 import { IdLiteralComponent } from "mwater-expressions-ui";
 import { DataSource, Schema } from "mwater-expressions";
-interface RegionSelectComponentProps {
+export interface RegionSelectComponentProps {
     schema: Schema;
     dataSource: DataSource;
     /** _id of region */
@@ -22,4 +22,3 @@ export default class RegionSelectComponent extends React.Component<RegionSelectC
     handleChange: (id: any) => void;
     render(): React.CElement<import("mwater-expressions-ui/lib/IdLiteralComponent").IdLiteralComponentProps, IdLiteralComponent>;
 }
-export {};

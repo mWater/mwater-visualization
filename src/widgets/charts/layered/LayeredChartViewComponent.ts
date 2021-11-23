@@ -10,7 +10,7 @@ import TextComponent from "../../text/TextComponent"
 import * as d3 from "d3"
 import { LayeredChartDesign } from "./LayeredChartDesign"
 
-interface LayeredChartViewComponentProps {
+export interface LayeredChartViewComponentProps {
   schema: Schema
   dataSource: DataSource
   design: LayeredChartDesign

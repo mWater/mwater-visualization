@@ -47,7 +47,7 @@ export interface GeoJsonLayer {
     nonInteractive?: boolean;
 }
 export declare type MapLayer = TileLayer | GeoJsonLayer;
-interface Props {
+export interface Props {
     baseLayerId: "bing_road" | "bing_aerial" | "cartodb_positron" | "cartodb_dark_matter" | "white";
     /** Optional opacity 0-1 */
     baseLayerOpacity?: number;

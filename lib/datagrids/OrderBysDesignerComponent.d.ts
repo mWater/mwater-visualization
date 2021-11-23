@@ -1,6 +1,6 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-interface OrderBysDesignerComponentProps {
+export interface OrderBysDesignerComponentProps {
     /** schema to use */
     schema: Schema;
     /** dataSource to use */
@@ -20,4 +20,3 @@ export default class OrderBysDesignerComponent extends React.Component<OrderBysD
     handleAdd: () => any;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
-export {};

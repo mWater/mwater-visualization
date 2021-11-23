@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
 import { DataSource, Schema } from "mwater-expressions";
-interface SettingsModalComponentProps {
+export interface SettingsModalComponentProps {
     onDesignChange: any;
     schema: Schema;
     dataSource: DataSource;

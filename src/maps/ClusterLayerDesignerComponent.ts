@@ -11,7 +11,7 @@ import ColorComponent from "../ColorComponent"
 import TableSelectComponent from "../TableSelectComponent"
 import ZoomLevelsComponent from "./ZoomLevelsComponent"
 
-interface ClusterLayerDesignerComponentProps {
+export interface ClusterLayerDesignerComponentProps {
   /** Schema to use */
   schema: Schema
   dataSource: DataSource

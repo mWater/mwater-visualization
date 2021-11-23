@@ -1,5 +1,5 @@
 import React from "react";
-interface VerticalLayoutComponentProps {
+export interface VerticalLayoutComponentProps {
     height: number;
     relativeHeights: any;
 }

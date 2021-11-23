@@ -1,8 +1,7 @@
-import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 
-interface CheckboxComponentProps {
+export interface CheckboxComponentProps {
   /** True to check */
   checked?: boolean
   /** Called when clicked */

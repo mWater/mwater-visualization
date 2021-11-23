@@ -1,4 +1,3 @@
-import $ from "jquery"
 import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
@@ -9,7 +8,7 @@ import AxisBuilder from "../../../axes/AxisBuilder"
 import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import { formatValue } from "../../../valueFormatter"
 
-interface TableChartViewComponentProps {
+export interface TableChartViewComponentProps {
   /** Design of chart */
   design: any
   /** Data that the table has requested */

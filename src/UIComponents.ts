@@ -66,7 +66,7 @@ export class OptionListComponent extends React.Component<{
   }
 }
 
-interface OptionComponentProps {
+export interface OptionComponentProps {
   name?: string
   desc?: string
   onClick: any
@@ -96,7 +96,7 @@ export class OptionComponent extends React.Component<OptionComponentProps> {
     )
   }
 }
-interface SwitchViewComponentProps {
+export interface SwitchViewComponentProps {
   /** Map of view id to view element */
   views: any
   viewId: string
@@ -199,7 +199,7 @@ export class SwitchViewComponent extends React.Component<SwitchViewComponentProp
   }
 }
 
-interface ToggleEditComponentProps {
+export interface ToggleEditComponentProps {
   forceOpen?: boolean
   initiallyOpen?: boolean
   label: any

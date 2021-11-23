@@ -9,7 +9,7 @@ import * as ui from "react-library/lib/bootstrap"
 import PopoverHelpComponent from "react-library/lib/PopoverHelpComponent"
 import { DataSource, Schema } from "mwater-expressions"
 
-interface MapLayerViewDesignerComponentProps {
+export interface MapLayerViewDesignerComponentProps {
   /** Schema to use */
   schema: Schema
   dataSource: DataSource

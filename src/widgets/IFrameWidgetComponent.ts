@@ -6,7 +6,7 @@ import * as ui from "react-library/lib/bootstrap"
 import DropdownWidgetComponent from "./DropdownWidgetComponent"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 
-interface IFrameWidgetComponentProps {
+export interface IFrameWidgetComponentProps {
   design: any
   /** Called with new design. null/undefined for readonly */
   onDesignChange?: any
@@ -109,6 +109,7 @@ export default class IFrameWidgetComponent extends React.Component<
             return this.renderEditLink()
           }
         }
+        return null
       })()
     )
   }

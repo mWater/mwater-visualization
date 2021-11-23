@@ -1,16 +1,16 @@
 import React from "react";
-import Widget from "./Widget";
+import Widget, { CreateViewElementOptions } from "./Widget";
 export default class IFrameWidget extends Widget {
-    createViewElement(options: any): React.CElement<{
-        design: any;
-        onDesignChange: any;
-        width: any;
-        height: any;
+    createViewElement(options: CreateViewElementOptions): React.CElement<{
+        design: object;
+        onDesignChange: ((design: object) => void) | null | undefined;
+        width: number | undefined;
+        height: number | undefined;
     }, React.Component<{
-        design: any;
-        onDesignChange: any;
-        width: any;
-        height: any;
+        design: object;
+        onDesignChange: ((design: object) => void) | null | undefined;
+        width: number | undefined;
+        height: number | undefined;
     }, any, any>>;
     isAutoHeight(): boolean;
 }

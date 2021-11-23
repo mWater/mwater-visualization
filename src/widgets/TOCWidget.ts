@@ -4,7 +4,7 @@ const R = React.createElement
 import _ from "lodash"
 import * as ui from "react-library/lib/bootstrap"
 import update from "react-library/lib/update"
-import Widget from "./Widget"
+import Widget, { CreateViewElementOptions } from "./Widget"
 import DropdownWidgetComponent from "./DropdownWidgetComponent"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 
@@ -28,7 +28,7 @@ export default class TOCWidget extends Widget {
   //  height: height in pixels on screen
   //  tocEntries: entries in the table of contents
   //  onScrollToTOCEntry: called with (widgetId, tocEntryId) to scroll to TOC entry
-  createViewElement(options: any) {
+  createViewElement(options: CreateViewElementOptions) {
     return R(TOCWidgetComponent, {
       design: options.design,
       onDesignChange: options.onDesignChange,

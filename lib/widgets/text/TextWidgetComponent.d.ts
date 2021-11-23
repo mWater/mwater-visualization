@@ -1,7 +1,7 @@
 import React from "react";
 import AsyncLoadComponent from "react-library/lib/AsyncLoadComponent";
 import { DataSource, Schema } from "mwater-expressions";
-interface TextWidgetComponentProps {
+export interface TextWidgetComponentProps {
     design: any;
     /** Called with new design. null/undefined for readonly */
     onDesignChange?: any;
@@ -23,4 +23,3 @@ export default class TextWidgetComponent extends AsyncLoadComponent<TextWidgetCo
     scrollToTOCEntry(entryId: any): any;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
-export {};

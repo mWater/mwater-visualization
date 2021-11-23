@@ -13,7 +13,7 @@ import PivotChartLayoutBuilder from "./PivotChartLayoutBuilder"
 import SegmentDesignerComponent from "./SegmentDesignerComponent"
 import IntersectionDesignerComponent from "./IntersectionDesignerComponent"
 
-interface PivotChartViewComponentProps {
+export interface PivotChartViewComponentProps {
   schema: Schema
   dataSource: DataSource
   design: any

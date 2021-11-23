@@ -1,30 +1,30 @@
 import PropTypes from "prop-types";
 import React from "react";
-import Widget from "./../Widget";
+import Widget, { CreateViewElementOptions } from "./../Widget";
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
 import ChartViewComponent from "./ChartViewComponent";
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent";
+import { DataSource, Schema } from "mwater-expressions";
+import { WidgetDataSource } from "../WidgetDataSource";
 export default class ChartWidget extends Widget {
     constructor(chart: any);
-    createViewElement(options: any): React.CElement<any, ChartWidgetComponent>;
-    getData(design: any, schema: any, dataSource: any, filters: any, callback: any): any;
-    getFilterableTables(design: any, schema: any): any;
+    createViewElement(options: CreateViewElementOptions): React.CElement<any, ChartWidgetComponent>;
+    getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any): any;
+    getFilterableTables(design: any, schema: Schema): any;
     isAutoHeight(): any;
 }
 interface ChartWidgetComponentProps {
     /** schema to use */
-    schema: any;
+    schema: Schema;
     /** data source to use */
-    dataSource: any;
-    widgetDataSource: any;
+    dataSource: DataSource;
+    widgetDataSource: WidgetDataSource;
     /** Chart object to use */
     chart: any;
     /** Design of chart */
     design: any;
     /** null/undefined for readonly */
     onDesignChange?: any;
-    /** Data source to use for chart */
-    dataSource: any;
     width?: number;
     height?: number;
     /** scope of the widget (when the widget self-selects a particular scope) */
@@ -45,29 +45,13 @@ declare class ChartWidgetComponent extends React.PureComponent<ChartWidgetCompon
         locale: PropTypes.Requireable<string>;
     };
     constructor(props: any);
-    handleSaveCsvFile: () => any;
+    handleSaveCsvFile: () => void;
     handleStartEditing: () => void;
     handleEndEditing: () => void;
     handleCancelEditing: () => void;
     handleEditDesignChange: (design: any) => void;
-    renderChart(design: any, onDesignChange: any, width: any, height: any): React.CElement<any, ChartViewComponent>;
-    renderEditor(): React.CElement<{
-        isOpen: boolean;
-        onRequestClose?: (() => void) | undefined;
-        backgroundColor?: string | undefined;
-        outerPadding?: number | undefined;
-        innerPadding?: number | undefined;
-    }, ModalWindowComponent> | React.CElement<{
-        title?: React.ReactNode;
-        actionLabel?: React.ReactNode;
-        cancelLabel?: React.ReactNode;
-        deleteLabel?: React.ReactNode;
-        onAction?: (() => void) | undefined;
-        onCancel?: (() => void) | undefined;
-        onDelete?: (() => void) | undefined;
-        size?: "full" | "large" | undefined;
-        actionBusy?: boolean | undefined;
-    }, ActionCancelModalComponent> | null;
+    renderChart(design: any, onDesignChange: any, width: any, height: any): React.CElement<import("./ChartViewComponent").ChartViewComponentProps, ChartViewComponent>;
+    renderEditor(): React.CElement<import("react-library/lib/ModalWindowComponent").ModalWindowComponentProps, ModalWindowComponent> | React.CElement<import("react-library/lib/ActionCancelModalComponent").ActionCancelModalComponentProps, ActionCancelModalComponent> | null;
     renderEditLink(): React.DetailedReactHTMLElement<{
         className: string;
         onClick: () => void;

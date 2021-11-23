@@ -14,7 +14,7 @@ import MarkerSymbolSelectComponent from "./MarkerSymbolSelectComponent"
 import * as PopupFilterJoinsUtils from "./PopupFilterJoinsUtils"
 import * as ui from "react-library/lib/bootstrap"
 
-interface MarkersLayerDesignerComponentProps {
+export interface MarkersLayerDesignerComponentProps {
   /** Schema to use */
   schema: Schema
   dataSource: DataSource

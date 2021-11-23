@@ -1,8 +1,8 @@
 import React from "react";
-import Widget from "./Widget";
+import Widget, { CreateViewElementOptions } from "./Widget";
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent";
 export default class MarkdownWidget extends Widget {
-    createViewElement(options: any): React.CElement<any, MarkdownWidgetComponent>;
+    createViewElement(options: CreateViewElementOptions): React.CElement<any, MarkdownWidgetComponent>;
     isAutoHeight(): boolean;
 }
 interface MarkdownWidgetComponentProps {
@@ -21,7 +21,7 @@ declare class MarkdownWidgetComponent extends React.Component<MarkdownWidgetComp
     handleStartEditing: () => void;
     handleEndEditing: () => void;
     handleEditDesignChange: (design: any) => void;
-    renderEditor(): React.CElement<any, ModalWindowComponent> | null;
+    renderEditor(): React.CElement<import("react-library/lib/ModalWindowComponent").ModalWindowComponentProps, ModalWindowComponent> | null;
     renderContent(design: any): React.CElement<MarkdownWidgetViewComponentProps, MarkdownWidgetViewComponent>;
     render(): React.DetailedReactHTMLElement<{
         onDoubleClick: () => void;

@@ -12,7 +12,7 @@ import QuickfiltersDesignComponent from "../quickfilter/QuickfiltersDesignCompon
 import FiltersDesignerComponent from "../FiltersDesignerComponent"
 import { DataSource, Schema } from "mwater-expressions"
 
-interface SettingsModalComponentProps {
+export interface SettingsModalComponentProps {
   onDesignChange: any
   schema: Schema
   dataSource: DataSource

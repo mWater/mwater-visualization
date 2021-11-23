@@ -5,7 +5,7 @@ const R = React.createElement
 import { default as ReactSelect } from "react-select"
 import { mapSymbols } from "./mapSymbols"
 
-interface MarkerSymbolSelectComponentProps {
+export interface MarkerSymbolSelectComponentProps {
   symbol?: string
   onChange: any
 }

@@ -1,5 +1,5 @@
 import React from "react";
-interface BaseLayerDesignerComponentProps {
+export interface BaseLayerDesignerComponentProps {
     /** See Map Design.md */
     design: any;
     onDesignChange: any;
@@ -26,4 +26,3 @@ export default class BaseLayerDesignerComponent extends React.Component<BaseLaye
         className: string;
     }, HTMLElement>;
 }
-export {};

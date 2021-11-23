@@ -9,7 +9,7 @@ import produce from "immer"
 import { Axis, AxisCategory, ColorMap } from "./Axis"
 import { Schema } from "mwater-expressions"
 
-interface AxisColorEditorComponentProps {
+export interface AxisColorEditorComponentProps {
   schema: Schema
   axis: Axis
   /** Called with new axis */

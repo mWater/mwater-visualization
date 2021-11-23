@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-interface PivotChartViewComponentProps {
+export interface PivotChartViewComponentProps {
     schema: Schema;
     dataSource: DataSource;
     design: any;

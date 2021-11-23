@@ -3,7 +3,7 @@ import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
 import TabbedComponent from "react-library/lib/TabbedComponent";
 import { DatagridDesign } from "..";
-interface DatagridDesignerComponentProps {
+export interface DatagridDesignerComponentProps {
     /** schema to use */
     schema: Schema;
     /** dataSource to use */
@@ -25,4 +25,3 @@ export default class DatagridDesignerComponent extends React.Component<DatagridD
     renderTabs(): React.CElement<any, TabbedComponent>;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
-export {};

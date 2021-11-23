@@ -1,7 +1,7 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
 import ActionCancelModalComponent from "react-library/lib/ActionCancelModalComponent";
-interface ExprUpdateModalComponentProps {
+export interface ExprUpdateModalComponentProps {
     /** Schema to use */
     schema: Schema;
     /** Data source to use to get values */

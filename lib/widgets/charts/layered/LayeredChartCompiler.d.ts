@@ -91,7 +91,7 @@ export default class LayeredChartCompiler {
         };
     };
     isCategoricalX(design: any): boolean;
-    compileData(design: any, data: any, locale: any): {
+    compileData(design: LayeredChartDesign, data: any, locale?: string): {
         columns: any;
         types: {};
         names: {};
@@ -159,10 +159,10 @@ export default class LayeredChartCompiler {
     isXAxisRequired(design: any, layerIndex: any): boolean;
     isColorAxisRequired(design: any, layerIndex: any): boolean;
     compileDefaultTitleText(design: any, locale: any): string;
-    compileDefaultYAxisLabelText(design: any, locale: any): string;
-    compileDefaultXAxisLabelText(design: any, locale: any): string;
-    compileTitleText(design: any, locale: any): any;
-    compileYAxisLabelText(design: any, locale: any): any;
+    compileDefaultYAxisLabelText(design: any, locale?: string): string;
+    compileDefaultXAxisLabelText(design: any, locale?: string): string;
+    compileTitleText(design: any, locale?: string): any;
+    compileYAxisLabelText(design: any, locale?: string): any;
     compileXAxisLabelText(design: any, locale: any): any;
     createScope(design: any, layerIndex: any, row: any, locale: any): {
         name: string;

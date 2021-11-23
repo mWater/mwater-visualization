@@ -16,7 +16,7 @@ import { DatagridDesign, JsonQLFilter } from ".."
 import { expr } from "jquery"
 import { JsonQLQuery, JsonQLSelectQuery } from "jsonql"
 
-interface FindReplaceModalComponentProps {
+export interface FindReplaceModalComponentProps {
   schema: Schema
   dataSource: DataSource
 

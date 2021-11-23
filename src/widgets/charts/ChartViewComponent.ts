@@ -7,7 +7,7 @@ import { WidgetDataSource } from "../WidgetDataSource"
 import Chart from "./Chart"
 const R = React.createElement
 
-interface ChartViewComponentProps {
+export interface ChartViewComponentProps {
   /** Chart object to use */
   chart: Chart
 
@@ -32,7 +32,7 @@ interface ChartViewComponentProps {
   filters?: JsonQLFilter[]
 
   /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
-  onScopeChange?: (scope: WidgetScope) => void
+  onScopeChange?: (scope: WidgetScope | null) => void
 
   onRowClick?: (tableId: string, rowId: any) => void
 }

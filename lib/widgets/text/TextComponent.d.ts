@@ -1,83 +1,48 @@
+import PropTypes from "prop-types";
 import React from "react";
+import RichTextComponent from "../../richtext/RichTextComponent";
+import ExprInsertModalComponent from "./ExprInsertModalComponent";
+import ExprUpdateModalComponent from "./ExprUpdateModalComponent";
 import ExprItemsHtmlConverter from "../../richtext/ExprItemsHtmlConverter";
-declare const _default: {
-    new (props: {} | Readonly<{}>): {
-        createItemsHtmlConverter(): ExprItemsHtmlConverter;
-        handleItemsChange: (items: any) => any;
-        handleInsertExpr: (item: any) => any;
-        replaceItem(item: any): any;
-        handleItemClick: (item: any) => any;
-        handleAddExpr: (ev: any) => any;
-        renderExtraPaletteButtons(): React.DetailedReactHTMLElement<{
-            key: string;
-            className: string;
-            onMouseDown: (ev: any) => any;
-        }, HTMLElement>;
-        renderModals(): React.CElement<any, any>[];
-        refRichTextComponent: (c: any) => any;
-        render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-        context: any;
-        setState<K extends never>(state: {} | ((prevState: Readonly<{}>, props: Readonly<{}>) => {} | Pick<{}, K> | null) | Pick<{}, K> | null, callback?: (() => void) | undefined): void;
-        forceUpdate(callback?: (() => void) | undefined): void;
-        readonly props: Readonly<{}> & Readonly<{
-            children?: React.ReactNode;
-        }>;
-        state: Readonly<{}>;
-        refs: {
-            [key: string]: React.ReactInstance;
-        };
-        componentDidMount?(): void;
-        shouldComponentUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): boolean;
-        componentWillUnmount?(): void;
-        componentDidCatch?(error: Error, errorInfo: React.ErrorInfo): void;
-        getSnapshotBeforeUpdate?(prevProps: Readonly<{}>, prevState: Readonly<{}>): any;
-        componentDidUpdate?(prevProps: Readonly<{}>, prevState: Readonly<{}>, snapshot?: any): void;
-        componentWillMount?(): void;
-        UNSAFE_componentWillMount?(): void;
-        componentWillReceiveProps?(nextProps: Readonly<{}>, nextContext: any): void;
-        UNSAFE_componentWillReceiveProps?(nextProps: Readonly<{}>, nextContext: any): void;
-        componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
-        UNSAFE_componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
+import { TextWidgetDesign } from "./TextWidgetDesign";
+import { DataSource, Schema } from "mwater-expressions";
+export interface TextComponentProps {
+    design: TextWidgetDesign;
+    onDesignChange?: (design: TextWidgetDesign) => void;
+    schema: Schema;
+    dataSource: DataSource;
+    /** Expression values */
+    exprValues: {
+        [key: string]: any;
     };
-    new (props: {}, context: any): {
-        createItemsHtmlConverter(): ExprItemsHtmlConverter;
-        handleItemsChange: (items: any) => any;
-        handleInsertExpr: (item: any) => any;
-        replaceItem(item: any): any;
-        handleItemClick: (item: any) => any;
-        handleAddExpr: (ev: any) => any;
-        renderExtraPaletteButtons(): React.DetailedReactHTMLElement<{
-            key: string;
-            className: string;
-            onMouseDown: (ev: any) => any;
-        }, HTMLElement>;
-        renderModals(): React.CElement<any, any>[];
-        refRichTextComponent: (c: any) => any;
-        render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-        context: any;
-        setState<K extends never>(state: {} | ((prevState: Readonly<{}>, props: Readonly<{}>) => {} | Pick<{}, K> | null) | Pick<{}, K> | null, callback?: (() => void) | undefined): void;
-        forceUpdate(callback?: (() => void) | undefined): void;
-        readonly props: Readonly<{}> & Readonly<{
-            children?: React.ReactNode;
-        }>;
-        state: Readonly<{}>;
-        refs: {
-            [key: string]: React.ReactInstance;
-        };
-        componentDidMount?(): void;
-        shouldComponentUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): boolean;
-        componentWillUnmount?(): void;
-        componentDidCatch?(error: Error, errorInfo: React.ErrorInfo): void;
-        getSnapshotBeforeUpdate?(prevProps: Readonly<{}>, prevState: Readonly<{}>): any;
-        componentDidUpdate?(prevProps: Readonly<{}>, prevState: Readonly<{}>, snapshot?: any): void;
-        componentWillMount?(): void;
-        UNSAFE_componentWillMount?(): void;
-        componentWillReceiveProps?(nextProps: Readonly<{}>, nextContext: any): void;
-        UNSAFE_componentWillReceiveProps?(nextProps: Readonly<{}>, nextContext: any): void;
-        componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
-        UNSAFE_componentWillUpdate?(nextProps: Readonly<{}>, nextState: Readonly<{}>, nextContext: any): void;
+    width?: number;
+    height?: number;
+    /** Table that is filtered to have one row */
+    singleRowTable?: string;
+    /** Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget */
+    namedStrings?: {
+        [key: string]: string;
     };
-    initClass(): void;
-    contextType?: React.Context<any> | undefined;
-};
-export default _default;
+}
+export default class TextComponent extends React.Component<TextComponentProps> {
+    static contextTypes: {
+        locale: PropTypes.Requireable<string>;
+    };
+    exprInsertModal: ExprInsertModalComponent | null;
+    exprUpdateModal: ExprUpdateModalComponent | null;
+    editor: RichTextComponent | null;
+    createItemsHtmlConverter(): ExprItemsHtmlConverter;
+    handleItemsChange: (items: any) => void;
+    handleInsertExpr: (item: any) => void;
+    replaceItem(item: any): void;
+    handleItemClick: (item: any) => void;
+    handleAddExpr: (ev: any) => void;
+    renderExtraPaletteButtons(): React.DetailedReactHTMLElement<{
+        key: string;
+        className: string;
+        onMouseDown: (ev: any) => void;
+    }, HTMLElement>;
+    renderModals(): (React.CElement<any, ExprInsertModalComponent> | React.CElement<any, ExprUpdateModalComponent>)[];
+    refRichTextComponent: (c: RichTextComponent | null) => void;
+    render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+}

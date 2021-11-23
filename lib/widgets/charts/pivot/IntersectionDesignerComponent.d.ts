@@ -1,7 +1,7 @@
 import React from "react";
 import * as ui from "react-library/lib/bootstrap";
 import { DataSource, Schema } from "mwater-expressions";
-interface IntersectionDesignerComponentProps {
+export interface IntersectionDesignerComponentProps {
     intersection: any;
     table: string;
     schema: Schema;

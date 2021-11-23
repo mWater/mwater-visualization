@@ -3,7 +3,7 @@ import React from "react"
 const R = React.createElement
 import { default as produce } from "immer"
 import { DataSource, injectTableAlias, Schema } from "mwater-expressions"
-import Chart from "../Chart"
+import Chart, { ChartCreateViewElementOptions } from "../Chart"
 import { ExprCleaner } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import AxisBuilder from "../../../axes/AxisBuilder"
@@ -159,7 +159,7 @@ export default class ImageMosaicChart extends Chart {
   //   scope: current scope of the view element
   //   onScopeChange: called when scope changes with new scope
   //   onRowClick: Called with (tableId, rowId) when item is clicked
-  createViewElement(options: any) {
+  createViewElement(options: ChartCreateViewElementOptions) {
     // Require here to prevent server require problems
     const ImageMosaicChartViewComponent = require("./ImageMosaicChartViewComponent").default
 

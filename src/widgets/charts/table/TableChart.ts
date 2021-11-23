@@ -5,7 +5,7 @@ import uuid from "uuid"
 import { default as produce } from "immer"
 import { original } from "immer"
 import { DataSource, injectTableAlias, Schema } from "mwater-expressions"
-import Chart from "../Chart"
+import Chart, { ChartCreateViewElementOptions } from "../Chart"
 import { ExprUtils } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import AxisBuilder from "../../../axes/AxisBuilder"
@@ -272,7 +272,7 @@ export default class TableChart extends Chart {
   //   scope: current scope of the view element
   //   onScopeChange: called when scope changes with new scope
   //   onRowClick: Called with (tableId, rowId) when item is clicked
-  createViewElement(options: any) {
+  createViewElement(options: ChartCreateViewElementOptions) {
     // Create chart
     const props = {
       schema: options.schema,

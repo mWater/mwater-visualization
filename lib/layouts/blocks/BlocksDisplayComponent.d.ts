@@ -2,7 +2,7 @@ import React from "react";
 import AutoSizeComponent from "react-library/lib/AutoSizeComponent";
 import HorizontalBlockComponent from "./HorizontalBlockComponent";
 import { LayoutBlock } from "./blockUtils";
-interface BlocksDisplayComponentProps {
+export interface BlocksDisplayComponentProps {
     items: LayoutBlock;
     onItemsChange?: (items: LayoutBlock) => void;
     /** Stylesheet to use. null for default */

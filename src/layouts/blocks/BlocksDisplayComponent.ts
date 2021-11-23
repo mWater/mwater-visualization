@@ -15,7 +15,7 @@ import HorizontalBlockComponent from "./HorizontalBlockComponent"
 import { getDefaultLayoutOptions } from "../../dashboards/layoutOptions"
 import { LayoutBlock } from "./blockUtils"
 
-interface BlocksDisplayComponentProps {
+export interface BlocksDisplayComponentProps {
   items: LayoutBlock
   onItemsChange?: (items: LayoutBlock) => void
   /** Stylesheet to use. null for default */

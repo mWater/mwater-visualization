@@ -11,7 +11,7 @@ import { FilterExprComponent } from "mwater-expressions-ui"
 import { Radio } from "react-library/lib/bootstrap"
 import { DataSource, Schema } from "mwater-expressions"
 
-interface SegmentDesignerComponentProps {
+export interface SegmentDesignerComponentProps {
   segment: any
   table: string
   schema: Schema

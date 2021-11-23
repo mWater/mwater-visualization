@@ -6,7 +6,7 @@ const R = React.createElement
 import { ExprUtils, Schema } from "mwater-expressions"
 import * as ui from "react-library/lib/bootstrap"
 
-interface MWaterResponsesFilterComponentProps {
+export interface MWaterResponsesFilterComponentProps {
   schema: Schema
   /** responses:xyz */
   table: string

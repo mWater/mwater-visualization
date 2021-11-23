@@ -6,7 +6,7 @@ import { IdLiteralComponent } from "mwater-expressions-ui"
 import { DataSource, Schema } from "mwater-expressions"
 import { JsonQLExpr, JsonQLSelectQuery } from "jsonql"
 
-interface RegionSelectComponentProps {
+export interface RegionSelectComponentProps {
   schema: Schema
   dataSource: DataSource
   /** _id of region */

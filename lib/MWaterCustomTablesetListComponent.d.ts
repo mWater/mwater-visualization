@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { Schema } from "mwater-expressions";
 /** Searchable list of custom tables */
 export declare const MWaterCustomTablesetListComponent: (props: {

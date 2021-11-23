@@ -9,7 +9,7 @@ import TableSelectComponent from "../../../TableSelectComponent"
 import AxisComponent from "../../../axes/AxisComponent"
 import { DataSource, Schema } from "mwater-expressions"
 
-interface PivotChartDesignerComponentProps {
+export interface PivotChartDesignerComponentProps {
   design: any
   schema: Schema
   dataSource: DataSource

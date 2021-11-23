@@ -4,7 +4,7 @@ import AxisBuilder from "../../../axes/AxisBuilder";
 import { Schema } from "mwater-expressions";
 import { CalendarChartDesign } from "./CalendarChart";
 import { WidgetScope } from "../../..";
-interface CalendarChartViewComponentProps {
+export interface CalendarChartViewComponentProps {
     design: CalendarChartDesign;
     /** Data that the chart has requested. In format [{ date: <YYYY-MM-DD>, value: <number value> }, { date: ... }...] */
     data: {
@@ -52,6 +52,5 @@ export default class CalendarChartViewComponent extends React.Component<Calendar
             shapeRendering: string;
             lineHeight: number;
         };
-    }, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)>;
+    }, string | React.JSXElementConstructor<any>>;
 }
-export {};

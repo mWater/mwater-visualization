@@ -22,7 +22,7 @@ export declare class OptionListComponent extends React.Component<{
 }> {
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
-interface OptionComponentProps {
+export interface OptionComponentProps {
     name?: string;
     desc?: string;
     onClick: any;
@@ -35,7 +35,7 @@ export declare class OptionComponent extends React.Component<OptionComponentProp
         onClick: any;
     }, HTMLElement>;
 }
-interface SwitchViewComponentProps {
+export interface SwitchViewComponentProps {
     /** Map of view id to view element */
     views: any;
     viewId: string;
@@ -54,7 +54,7 @@ export declare class SwitchViewComponent extends React.Component<SwitchViewCompo
         style: {};
     }, any, any>>;
 }
-interface ToggleEditComponentProps {
+export interface ToggleEditComponentProps {
     forceOpen?: boolean;
     initiallyOpen?: boolean;
     label: any;

@@ -9,7 +9,7 @@ import ActionCancelModalComponent from "react-library/lib/ActionCancelModalCompo
 import TableSelectComponent from "../../TableSelectComponent"
 import ExprItemEditorComponent from "./ExprItemEditorComponent"
 
-interface ExprInsertModalComponentProps {
+export interface ExprInsertModalComponentProps {
   /** Schema to use */
   schema: Schema
   /** Data source to use to get values */

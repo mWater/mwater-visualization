@@ -1,5 +1,5 @@
 import React from "react";
-interface FontColorPaletteItemProps {
+export interface FontColorPaletteItemProps {
     /** Called with "#FF8800", etc. */
     onSetColor: any;
     /** should the popup be under or over? */

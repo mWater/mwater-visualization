@@ -1,6 +1,6 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-interface MapControlComponentProps {
+export interface MapControlComponentProps {
     /** Schema to use */
     schema: Schema;
     dataSource: DataSource;
@@ -15,4 +15,3 @@ export default class MapControlComponent extends React.Component<MapControlCompo
         };
     }, HTMLElement>;
 }
-export {};

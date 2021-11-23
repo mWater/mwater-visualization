@@ -2,7 +2,7 @@ import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import _ from "lodash"
-import Widget from "./Widget"
+import Widget, { CreateViewElementOptions } from "./Widget"
 import DropdownWidgetComponent from "./DropdownWidgetComponent"
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent"
 import LayerFactory from "../maps/LayerFactory"
@@ -25,7 +25,7 @@ export default class MapWidget extends Widget {
   //  width: width in pixels on screen
   //  height: height in pixels on screen
   //  onRowClick: Called with (tableId, rowId) when item is clicked
-  createViewElement(options: any) {
+  createViewElement(options: CreateViewElementOptions) {
     return React.createElement(MapWidgetComponent, {
       schema: options.schema,
       dataSource: options.dataSource,

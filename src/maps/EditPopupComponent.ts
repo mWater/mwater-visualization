@@ -10,7 +10,7 @@ import DirectWidgetDataSource from "../widgets/DirectWidgetDataSource"
 import PopupFilterJoinsEditComponent from "./PopupFilterJoinsEditComponent"
 import { DataSource, Schema } from "mwater-expressions"
 
-interface EditPopupComponentProps {
+export interface EditPopupComponentProps {
   /** Schema to use */
   schema: Schema
   dataSource: DataSource

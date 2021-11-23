@@ -1,6 +1,6 @@
 import React from "react";
 import { Axis, AxisCategory } from "./Axis";
-interface ColorPaletteCollectionComponentProps {
+export interface ColorPaletteCollectionComponentProps {
     onPaletteSelected: any;
     axis: Axis;
     categories: AxisCategory[];
@@ -15,4 +15,3 @@ export default class ColorPaletteCollectionComponent extends React.Component<Col
     renderCancel: () => React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement> | null;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
-export {};

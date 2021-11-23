@@ -1,6 +1,6 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-interface MWaterGlobalFiltersComponentProps {
+export interface MWaterGlobalFiltersComponentProps {
     /** Schema of the database */
     schema: Schema;
     /** Data source to use to get values */
@@ -14,4 +14,3 @@ export default class MWaterGlobalFiltersComponent extends React.Component<MWater
     handleManagedByChange: (managedBy: any) => any;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
-export {};

@@ -11,7 +11,7 @@ import TableSelectComponent from "../../../TableSelectComponent"
 import ColorComponent from "../../../ColorComponent"
 import { CalendarChartDesign } from "./CalendarChart"
 
-interface CalendarChartDesignerComponentProps {
+export interface CalendarChartDesignerComponentProps {
   design: CalendarChartDesign
   schema: Schema
   dataSource: DataSource

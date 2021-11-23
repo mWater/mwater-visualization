@@ -5,7 +5,7 @@ const R = React.createElement
 
 import DraggableBlockComponent from "./DraggableBlockComponent"
 
-interface HorizontalBlockComponentProps {
+export interface HorizontalBlockComponentProps {
   block: LayoutBlock
   collapseColumns?: boolean
   renderBlock: any

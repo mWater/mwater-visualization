@@ -11,7 +11,7 @@ import ReorderableListComponent from "react-library/lib/reorderable/ReorderableL
 import { AxisXform, AxisXformRange } from "./Axis"
 import { Expr, Schema } from "mwater-expressions"
 
-interface RangesComponentProps {
+export interface RangesComponentProps {
   schema: Schema
   /** Expression for computing min/max */
   expr: Expr

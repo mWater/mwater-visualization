@@ -14,7 +14,7 @@ import { MapDesign } from "./MapDesign"
 import { MapDataSource } from "./MapDataSource"
 import { MapScope } from "./MapUtils"
 
-interface OldMapViewComponentProps {
+export interface OldMapViewComponentProps {
   schema: Schema
   dataSource: DataSource
   mapDataSource: MapDataSource

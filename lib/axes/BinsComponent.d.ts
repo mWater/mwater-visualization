@@ -1,6 +1,6 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-interface BinsComponentProps {
+export interface BinsComponentProps {
     schema: Schema;
     dataSource: DataSource;
     /** Expression for computing min/max */

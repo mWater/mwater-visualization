@@ -9,7 +9,7 @@ import MWaterResponsesFilterComponent from "./MWaterResponsesFilterComponent"
 import ModalPopupComponent from "react-library/lib/ModalPopupComponent"
 import MWaterCompleteTableSelectComponent from "./MWaterCompleteTableSelectComponent"
 
-interface MWaterTableSelectComponentProps {
+export interface MWaterTableSelectComponentProps {
   /** Url to hit api */
   apiUrl: string
   /** Optional client */

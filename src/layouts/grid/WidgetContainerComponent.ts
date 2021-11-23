@@ -5,7 +5,7 @@ const R = React.createElement
 import { DragSource, DropTarget } from "react-dnd"
 import DecoratedBlockComponent from "../DecoratedBlockComponent"
 
-interface LayoutComponentProps {
+export interface LayoutComponentProps {
   /** Opaque information to be used when a block is dragged */
   dragInfo: any
   canDrag: boolean

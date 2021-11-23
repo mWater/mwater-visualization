@@ -5,7 +5,7 @@ import ReactDOM from "react-dom"
 const R = React.createElement
 import _ from "lodash"
 
-interface VerticalLayoutComponentProps {
+export interface VerticalLayoutComponentProps {
   height: number
   relativeHeights: any
 }

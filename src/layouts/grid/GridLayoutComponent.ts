@@ -5,7 +5,7 @@ const R = React.createElement
 import WidgetContainerComponent from "./WidgetContainerComponent"
 import LegoLayoutEngine from "./LegoLayoutEngine"
 
-interface GridLayoutComponentProps {
+export interface GridLayoutComponentProps {
   width: number
   items?: any
   onItemsChange?: any

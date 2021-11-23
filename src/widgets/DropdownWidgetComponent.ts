@@ -1,11 +1,10 @@
 import _ from "lodash"
 import $ from "jquery"
-import PropTypes from "prop-types"
 import React from "react"
 import ReactDOM from "react-dom"
 const R = React.createElement
 
-interface DropdownWidgetComponentProps {
+export interface DropdownWidgetComponentProps {
   /** Width specification */
   width?: any
   /** Height specification */
@@ -61,7 +60,7 @@ export default class DropdownWidgetComponent extends React.Component<DropdownWid
   }
 
   closeMenu = () => {
-    return $(ReactDOM.findDOMNode(this)).find('[data-bs-toggle="dropdown"]').parent().removeClass("open")
+    return $(ReactDOM.findDOMNode(this) as Element).find('[data-bs-toggle="dropdown"]').parent().removeClass("open")
   }
 
   render() {

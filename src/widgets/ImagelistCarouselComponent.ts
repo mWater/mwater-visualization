@@ -1,5 +1,4 @@
 import _ from "lodash"
-import PropTypes from "prop-types"
 
 // Carousel component for images. Starts with cover photo
 import React from "react"
@@ -7,7 +6,7 @@ import React from "react"
 const R = React.createElement
 import RotationAwareImageComponent from "mwater-forms/lib/RotationAwareImageComponent"
 
-interface ImagelistCarouselComponentProps {
+export interface ImagelistCarouselComponentProps {
   /** Array of { id, cover: true/false } */
   imagelist?: any
   widgetDataSource: any
@@ -15,7 +14,7 @@ interface ImagelistCarouselComponentProps {
 }
 
 interface ImagelistCarouselComponentState {
-  activeImage: any
+  activeImage: number
 }
 
 // Bootstrap carousel for an image list
@@ -25,11 +24,10 @@ export default class ImagelistCarouselComponent extends React.Component<
 > {
   constructor(props: any) {
     super(props)
+
+    const activeImage = _.findIndex(this.props.imagelist, { cover: true })
     this.state = {
-      activeImage: _.findIndex(this.props.imagelist, { cover: true })
-    }
-    if (this.state.activeImage < 0) {
-      this.state.activeImage = 0
+      activeImage: activeImage < 0 ? 0 : activeImage
     }
   }
 

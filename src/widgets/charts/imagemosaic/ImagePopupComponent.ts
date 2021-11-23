@@ -4,7 +4,7 @@ const R = React.createElement
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent"
 import RotationAwareImageComponent from "mwater-forms/lib/RotationAwareImageComponent"
 
-interface ImagePopupComponentProps {
+export interface ImagePopupComponentProps {
   imageManager: any
 }
 

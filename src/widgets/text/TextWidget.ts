@@ -6,7 +6,7 @@ import { DataSource, ExprUtils, Schema } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
 import { injectTableAlias } from "mwater-expressions"
-import Widget from "../Widget"
+import Widget, { CreateViewElementOptions } from "../Widget"
 
 export default class TextWidget extends Widget {
   // Creates a React element that is a view of the widget
@@ -23,7 +23,7 @@ export default class TextWidget extends Widget {
   //  height: height in pixels on screen
   //  singleRowTable: optional table name of table that will be filtered to have a single row present. Widget designer should optionally account for this
   //  namedStrings: Optional lookup of string name to value. Used for {{branding}} and other replacement strings in text widget
-  createViewElement(options: any) {
+  createViewElement(options: CreateViewElementOptions) {
     // Put here so TextWidget can be created on server
     const TextWidgetComponent = require("./TextWidgetComponent").default
 

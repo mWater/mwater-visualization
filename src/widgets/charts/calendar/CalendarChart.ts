@@ -3,7 +3,7 @@ import React from "react"
 import moment from "moment"
 import { default as produce } from "immer"
 import { DataSource, Expr, injectTableAlias, Schema } from "mwater-expressions"
-import Chart from "../Chart"
+import Chart, { ChartCreateViewElementOptions } from "../Chart"
 import { ExprCleaner } from "mwater-expressions"
 import { ExprCompiler } from "mwater-expressions"
 import AxisBuilder from "../../../axes/AxisBuilder"
@@ -186,7 +186,7 @@ export default class CalendarChart extends Chart {
   //   width, height: size of the chart view
   //   scope: current scope of the view element
   //   onScopeChange: called when scope changes with new scope
-  createViewElement(options: any) {
+  createViewElement(options: ChartCreateViewElementOptions) {
     // Require here to prevent server require problems
     const CalendarChartViewComponent = require("./CalendarChartViewComponent").default
 

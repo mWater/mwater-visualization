@@ -5,7 +5,7 @@ import moment from "moment"
 import ClickOutHandler from "react-onclickout"
 import { default as DatePicker } from "react-datepicker"
 
-interface DateExprComponentProps {
+export interface DateExprComponentProps {
   /** Current value of quickfilter (state of filter selected) */
   value?: any
   /** Called when value changes */

@@ -1,6 +1,6 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-import Chart from "../Chart";
+import Chart, { ChartCreateViewElementOptions } from "../Chart";
 import { WidgetDataSource } from "../../WidgetDataSource";
 export default class PivotChart extends Chart {
     cleanDesign(design: any, schema: Schema): any;
@@ -17,7 +17,7 @@ export default class PivotChart extends Chart {
         onDesignChange: (design: any) => any;
     }>;
     getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any): void;
-    createViewElement(options: any): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+    createViewElement(options: ChartCreateViewElementOptions): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
     createDropdownItems(design: any, schema: Schema, widgetDataSource: WidgetDataSource, filters: any): never[];
     createDataTable(design: any, schema: Schema, dataSource: DataSource, data: any, locale: any): any[][];
     getFilterableTables(design: any, schema: Schema): any[];

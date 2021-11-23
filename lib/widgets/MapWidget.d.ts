@@ -1,10 +1,10 @@
 import React from "react";
-import Widget from "./Widget";
+import Widget, { CreateViewElementOptions } from "./Widget";
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent";
 import { DataSource, Schema } from "mwater-expressions";
 import { WidgetDataSource } from "./WidgetDataSource";
 export default class MapWidget extends Widget {
-    createViewElement(options: any): React.CElement<any, MapWidgetComponent>;
+    createViewElement(options: CreateViewElementOptions): React.CElement<any, MapWidgetComponent>;
     getFilterableTables(design: any, schema: Schema): string[];
 }
 interface MapWidgetComponentProps {
@@ -37,7 +37,7 @@ declare class MapWidgetComponent extends React.Component<MapWidgetComponentProps
     handleStartEditing: () => void;
     handleEndEditing: () => void;
     handleEditDesignChange: (design: any) => void;
-    renderEditor(): React.CElement<any, ModalWindowComponent> | null;
+    renderEditor(): React.CElement<import("react-library/lib/ModalWindowComponent").ModalWindowComponentProps, ModalWindowComponent> | null;
     renderContent(design: any, onDesignChange: any, width: any, height: any): React.DetailedReactHTMLElement<{
         style: {
             width: any;

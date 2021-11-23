@@ -1,6 +1,6 @@
 import React from "react";
 import { Schema } from "mwater-expressions";
-interface TableChartViewComponentProps {
+export interface TableChartViewComponentProps {
     /** Design of chart */
     design: any;
     /** Data that the table has requested */
@@ -25,4 +25,3 @@ export default class TableChartViewComponent extends React.Component<TableChartV
         className: string;
     }, HTMLElement>;
 }
-export {};

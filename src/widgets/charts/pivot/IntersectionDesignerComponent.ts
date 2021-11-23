@@ -12,7 +12,7 @@ import { FilterExprComponent } from "mwater-expressions-ui"
 import { ExprComponent } from "mwater-expressions-ui"
 import { DataSource, Schema } from "mwater-expressions"
 
-interface IntersectionDesignerComponentProps {
+export interface IntersectionDesignerComponentProps {
   intersection: any
   table: string
   schema: Schema

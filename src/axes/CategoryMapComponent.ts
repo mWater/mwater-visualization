@@ -11,7 +11,7 @@ import ReorderableListComponent from "react-library/lib/reorderable/ReorderableL
 import { default as produce } from "immer"
 import { Axis, AxisCategory } from "./Axis"
 
-interface CategoryMapComponentProps {
+export interface CategoryMapComponentProps {
   schema: Schema
   axis: Axis
   onChange: (axis: Axis) => void

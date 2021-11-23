@@ -10,7 +10,7 @@ import ReorderableListComponent from "react-library/lib/reorderable/ReorderableL
 import { DataSource, ExprCompiler, Schema } from "mwater-expressions"
 import { ExprCleaner } from "mwater-expressions"
 
-interface MapLayersDesignerComponentProps {
+export interface MapLayersDesignerComponentProps {
   /** Schema to use */
   schema: Schema
   dataSource: DataSource

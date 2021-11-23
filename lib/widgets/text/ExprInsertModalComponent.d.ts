@@ -1,6 +1,6 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-interface ExprInsertModalComponentProps {
+export interface ExprInsertModalComponentProps {
     /** Schema to use */
     schema: Schema;
     /** Data source to use to get values */

@@ -10,7 +10,7 @@ import AxisComponent from "../../../axes/AxisComponent"
 import { FilterExprComponent } from "mwater-expressions-ui"
 import TableSelectComponent from "../../../TableSelectComponent"
 
-interface ImageMosaicChartDesignerComponentProps {
+export interface ImageMosaicChartDesignerComponentProps {
   design: any
   schema: Schema
   dataSource: DataSource

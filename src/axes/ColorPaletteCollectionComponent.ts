@@ -6,7 +6,7 @@ const R = React.createElement
 import ColorSchemeFactory from "../ColorSchemeFactory"
 import { Axis, AxisCategory } from "./Axis"
 
-interface ColorPaletteCollectionComponentProps {
+export interface ColorPaletteCollectionComponentProps {
   onPaletteSelected: any
   axis: Axis
   categories: AxisCategory[]

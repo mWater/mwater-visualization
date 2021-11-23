@@ -6,7 +6,7 @@ const R = React.createElement
 import { default as ReactSelect } from "react-select"
 import { DataSource, Schema } from "mwater-expressions"
 
-interface DetailLevelSelectComponentProps {
+export interface DetailLevelSelectComponentProps {
   /** Schema to use */
   schema: Schema
   dataSource: DataSource

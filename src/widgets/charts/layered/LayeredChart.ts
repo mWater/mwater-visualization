@@ -4,7 +4,7 @@ const R = React.createElement
 import async from "async"
 import { default as produce } from "immer"
 import { original } from "immer"
-import Chart from "../Chart"
+import Chart, { ChartCreateViewElementOptions } from "../Chart"
 import LayeredChartCompiler from "./LayeredChartCompiler"
 import { DataSource, ExprCleaner, Row, Schema } from "mwater-expressions"
 import AxisBuilder, { AggrNeed } from "../../../axes/AxisBuilder"
@@ -233,7 +233,7 @@ export default class LayeredChart extends Chart {
   //   width, height: size of the chart view
   //   scope: current scope of the view element
   //   onScopeChange: called when scope changes with new scope
-  createViewElement(options: any) {
+  createViewElement(options: ChartCreateViewElementOptions) {
     const LayeredChartViewComponent = require("./LayeredChartViewComponent").default
 
     // Create chart

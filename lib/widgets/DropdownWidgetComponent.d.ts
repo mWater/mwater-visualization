@@ -1,5 +1,5 @@
 import React from "react";
-interface DropdownWidgetComponentProps {
+export interface DropdownWidgetComponentProps {
     /** Width specification */
     width?: any;
     /** Height specification */
@@ -16,15 +16,14 @@ export default class DropdownWidgetComponent extends React.Component<DropdownWid
             cursor: string;
             zIndex: number;
         };
-    }, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)> | null;
-    closeMenu: () => any;
+    }, string | React.JSXElementConstructor<any>> | null;
+    closeMenu: () => JQuery<HTMLElement>;
     render(): React.DetailedReactHTMLElement<{
         className: string;
-        onMouseLeave: () => any;
+        onMouseLeave: () => JQuery<HTMLElement>;
         style: {
             width: any;
             height: any;
         };
     }, HTMLElement>;
 }
-export {};

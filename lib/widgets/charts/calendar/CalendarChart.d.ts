@@ -1,6 +1,6 @@
 import React from "react";
 import { DataSource, Expr, Schema } from "mwater-expressions";
-import Chart from "../Chart";
+import Chart, { ChartCreateViewElementOptions } from "../Chart";
 import { Axis } from "../../../axes/Axis";
 import { JsonQLFilter } from "../../..";
 export interface CalendarChartDesign {
@@ -32,7 +32,7 @@ export default class CalendarChart extends Chart {
         onDesignChange: (design: any) => any;
     }>;
     getData(design: CalendarChartDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any): void;
-    createViewElement(options: any): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+    createViewElement(options: ChartCreateViewElementOptions): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
     createDataTable(design: any, schema: Schema, dataSource: DataSource, data: any): string[][];
     getFilterableTables(design: any, schema: Schema): any[];
     getPlaceholderIcon(): string;

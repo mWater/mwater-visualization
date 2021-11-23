@@ -15,7 +15,7 @@ import * as MapUtils from "./MapUtils"
 import { DataSource, ExprCompiler, Schema } from "mwater-expressions"
 import * as ui from "react-library/lib/bootstrap"
 
-interface MapDesignerComponentProps {
+export interface MapDesignerComponentProps {
   /** Schema to use */
   schema: Schema
   /** Data source to use */

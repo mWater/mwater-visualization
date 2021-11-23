@@ -6,7 +6,7 @@ import moment from "moment"
 import ClickOutHandler from "react-onclickout"
 import { default as DatePicker } from "react-datepicker"
 
-interface DateRangeComponentProps {
+export interface DateRangeComponentProps {
   /** Array of [start date, end date] in iso 8601 format */
   value: [string | null, string | null] | null
 

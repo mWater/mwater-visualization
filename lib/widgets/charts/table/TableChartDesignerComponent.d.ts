@@ -1,6 +1,6 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-interface TableChartDesignerComponentProps {
+export interface TableChartDesignerComponentProps {
     design: any;
     schema: Schema;
     dataSource: DataSource;
@@ -36,4 +36,3 @@ export default class TableChartDesignerComponent extends React.Component<TableCh
     }, HTMLElement> | null;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
-export {};

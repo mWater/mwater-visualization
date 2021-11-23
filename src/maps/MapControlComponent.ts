@@ -6,7 +6,7 @@ import MapLayersDesignerComponent from "./MapLayersDesignerComponent"
 import BaseLayerDesignerComponent from "./BaseLayerDesignerComponent"
 import { DataSource, Schema } from "mwater-expressions"
 
-interface MapControlComponentProps {
+export interface MapControlComponentProps {
   /** Schema to use */
   schema: Schema
   dataSource: DataSource

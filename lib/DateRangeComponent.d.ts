@@ -1,6 +1,6 @@
 import React from "react";
 import moment from "moment";
-interface DateRangeComponentProps {
+export interface DateRangeComponentProps {
     /** Array of [start date, end date] in iso 8601 format */
     value: [string | null, string | null] | null;
     /** Array of [start date, end date] in iso 8601 format */

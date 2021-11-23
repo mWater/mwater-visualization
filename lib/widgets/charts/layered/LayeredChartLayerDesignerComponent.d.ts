@@ -1,7 +1,7 @@
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
 import * as uiComponents from "../../../UIComponents";
-interface LayeredChartLayerDesignerComponentProps {
+export interface LayeredChartLayerDesignerComponentProps {
     design: any;
     schema: Schema;
     dataSource: DataSource;
@@ -63,4 +63,3 @@ export default class LayeredChartLayerDesignerComponent extends React.Component<
     }, HTMLElement> | null;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
-export {};

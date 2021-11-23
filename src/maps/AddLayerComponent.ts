@@ -8,7 +8,7 @@ import LayerFactory from "./LayerFactory"
 import { DataSource, Schema } from "mwater-expressions"
 import { MapLayerView } from ".."
 
-interface AddLayerComponentProps {
+export interface AddLayerComponentProps {
   /** Number of layers that already exist */
   layerNumber: number
   /** See Map Design.md */

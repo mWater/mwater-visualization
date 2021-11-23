@@ -2,7 +2,7 @@ import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 
-interface DecoratedBlockComponentProps {
+export interface DecoratedBlockComponentProps {
   /** Style to add to outer div */
   style?: any
   /** Called when block is removed */

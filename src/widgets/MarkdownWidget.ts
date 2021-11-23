@@ -2,7 +2,7 @@ import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import _ from "lodash"
-import Widget from "./Widget"
+import Widget, { CreateViewElementOptions } from "./Widget"
 import DropdownWidgetComponent from "./DropdownWidgetComponent"
 import Markdown from "markdown-it"
 import ModalWindowComponent from "react-library/lib/ModalWindowComponent"
@@ -20,7 +20,7 @@ export default class MarkdownWidget extends Widget {
   //  onDesignChange: called with new design. null/undefined for readonly
   //  width: width in pixels on screen
   //  height: height in pixels on screen
-  createViewElement(options: any) {
+  createViewElement(options: CreateViewElementOptions) {
     return React.createElement(MarkdownWidgetComponent, {
       design: options.design,
       onDesignChange: options.onDesignChange,

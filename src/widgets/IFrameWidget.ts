@@ -1,7 +1,7 @@
 import React from "react"
 const R = React.createElement
 import _ from "lodash"
-import Widget from "./Widget"
+import Widget, { CreateViewElementOptions } from "./Widget"
 
 export default class IFrameWidget extends Widget {
   // Creates a React element that is a view of the widget
@@ -17,7 +17,7 @@ export default class IFrameWidget extends Widget {
   //  width: width in pixels on screen
   //  height: height in pixels on screen
   //  singleRowTable: optional table name of table that will be filtered to have a single row present. Widget designer should optionally account for this
-  createViewElement(options: any) {
+  createViewElement(options: CreateViewElementOptions) {
     // Put here so IFrameWidget can be created on server
     const IFrameWidgetComponent = require("./IFrameWidgetComponent").default
 

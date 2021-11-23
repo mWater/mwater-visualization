@@ -4,7 +4,7 @@ import { JsonQLFilter } from "../../JsonQLFilter";
 import { WidgetScope } from "../../WidgetScope";
 import { WidgetDataSource } from "../WidgetDataSource";
 import Chart from "./Chart";
-interface ChartViewComponentProps {
+export interface ChartViewComponentProps {
     /** Chart object to use */
     chart: Chart;
     /** Design of chart */
@@ -22,7 +22,7 @@ interface ChartViewComponentProps {
     /** array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias }. Use injectAlias to correct */
     filters?: JsonQLFilter[];
     /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
-    onScopeChange?: (scope: WidgetScope) => void;
+    onScopeChange?: (scope: WidgetScope | null) => void;
     onRowClick?: (tableId: string, rowId: any) => void;
 }
 interface ChartViewComponentState {

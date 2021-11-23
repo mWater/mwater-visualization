@@ -1,6 +1,6 @@
 import React from "react";
 import moment from "moment";
-interface DateExprComponentProps {
+export interface DateExprComponentProps {
     /** Current value of quickfilter (state of filter selected) */
     value?: any;
     /** Called when value changes */

@@ -4,12 +4,10 @@ import _ from "lodash"
 import React from "react"
 const R = React.createElement
 
-import moment from "moment"
 import querystring from "querystring"
 import { ExprUtils, Schema } from "mwater-expressions"
-import * as ui from "./UIComponents"
 
-interface MWaterAddRelatedIndicatorComponentProps {
+export interface MWaterAddRelatedIndicatorComponentProps {
   table: string
   apiUrl: string
   client?: string

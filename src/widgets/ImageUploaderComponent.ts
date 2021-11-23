@@ -1,11 +1,10 @@
 import { DataSource } from "mwater-expressions"
-import PropTypes from "prop-types"
 import React from "react"
 const R = React.createElement
 import Dropzone from "react-dropzone"
 import uuid from "uuid"
 
-interface ImageUploaderComponentProps {
+export interface ImageUploaderComponentProps {
   /** Data source to use for chart */
   dataSource: DataSource
   /** callback for when upload is successful */

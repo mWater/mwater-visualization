@@ -15,7 +15,7 @@ import * as ui from "react-library/lib/bootstrap"
 import { getFormatOptions } from "../../../valueFormatter"
 import { getDefaultFormat } from "../../../valueFormatter"
 
-interface TableChartDesignerComponentProps {
+export interface TableChartDesignerComponentProps {
   design: any
   schema: Schema
   dataSource: DataSource

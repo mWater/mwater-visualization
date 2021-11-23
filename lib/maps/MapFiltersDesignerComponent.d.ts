@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-interface MapFiltersDesignerComponentProps {
+export interface MapFiltersDesignerComponentProps {
     /** Schema to use */
     schema: Schema;
     /** Data source to use */
@@ -19,4 +19,3 @@ export default class MapFiltersDesignerComponent extends React.Component<MapFilt
     handleGlobalFiltersChange: (globalFilters: any) => any;
     render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement> | null;
 }
-export {};

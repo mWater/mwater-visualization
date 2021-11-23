@@ -1,5 +1,5 @@
 import React from "react";
-interface PaletteItemComponentProps {
+export interface PaletteItemComponentProps {
     /** Create the drag item */
     createItem: any;
     title?: any;
@@ -12,4 +12,3 @@ export default class PaletteItemComponent extends React.Component<PaletteItemCom
         createDragItem: any;
     }, any, any>>;
 }
-export {};

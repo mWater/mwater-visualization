@@ -7,7 +7,7 @@ import { JsonQLFilter } from "../JsonQLFilter";
 import { MapDesign } from "./MapDesign";
 import { MapDataSource } from "./MapDataSource";
 import { MapScope } from "./MapUtils";
-interface OldMapViewComponentProps {
+export interface OldMapViewComponentProps {
     schema: Schema;
     dataSource: DataSource;
     mapDataSource: MapDataSource;
@@ -50,7 +50,7 @@ export default class OldMapViewComponent extends React.Component<OldMapViewCompo
     handleGridClick: (layerViewId: any, ev: any) => void;
     getCompiledFilters(): JsonQLFilter[];
     renderLegend(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
-    renderPopup(): React.CElement<any, ModalPopupComponent> | null;
+    renderPopup(): React.CElement<import("react-library/lib/ModalPopupComponent").ModalPopupComponentProps, ModalPopupComponent> | null;
     render(): React.DetailedReactHTMLElement<{
         style: {
             width: number;
@@ -59,4 +59,3 @@ export default class OldMapViewComponent extends React.Component<OldMapViewCompo
         };
     }, HTMLElement>;
 }
-export {};

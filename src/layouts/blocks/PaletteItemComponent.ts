@@ -3,7 +3,7 @@ const R = React.createElement
 
 const DragSourceComponent = require("../DragSourceComponent").default("visualization-block")
 
-interface PaletteItemComponentProps {
+export interface PaletteItemComponentProps {
   /** Create the drag item */
   createItem: any
   title?: any

@@ -6,7 +6,7 @@ import uuid from "uuid"
 import { default as produce } from "immer"
 import { original } from "immer"
 import { DataSource, Schema, WeakCache } from "mwater-expressions"
-import Chart from "../Chart"
+import Chart, { ChartCreateViewElementOptions } from "../Chart"
 import { ExprCleaner } from "mwater-expressions"
 import AxisBuilder from "../../../axes/AxisBuilder"
 import TextWidget from "../../text/TextWidget"
@@ -301,7 +301,7 @@ export default class PivotChart extends Chart {
   //   scope: current scope of the view element
   //   onScopeChange: called when scope changes with new scope
   //   filters: array of filters
-  createViewElement(options: any) {
+  createViewElement(options: ChartCreateViewElementOptions) {
     const PivotChartViewComponent = require("./PivotChartViewComponent").default
 
     // Create chart

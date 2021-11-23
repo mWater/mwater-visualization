@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
-interface MapDesignerComponentProps {
+export interface MapDesignerComponentProps {
     /** Schema to use */
     schema: Schema;
     /** Data source to use */
@@ -32,4 +32,3 @@ export default class MapDesignerComponent extends React.Component<MapDesignerCom
         };
     }, HTMLElement>;
 }
-export {};
