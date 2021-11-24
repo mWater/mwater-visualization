@@ -29,7 +29,7 @@ export default class MWaterCompleteTableSelectComponent extends React.Component<
             desc?: string | undefined;
             onClick: () => void;
             onRemove?: (() => void) | undefined;
-        }[]; /** Called with table selected */
+        }[];
         hint?: string | undefined;
     }, uiComponents.OptionListComponent>;
     renderForms(): React.CElement<any, FormsListComponent>;
@@ -41,7 +41,7 @@ export default class MWaterCompleteTableSelectComponent extends React.Component<
             desc?: string | undefined;
             onClick: () => void;
             onRemove?: (() => void) | undefined;
-        }[]; /** Called with table selected */
+        }[];
         hint?: string | undefined;
     }, uiComponents.OptionListComponent>;
     renderTablesets(): React.FunctionComponentElement<{
@@ -72,7 +72,7 @@ export default class MWaterCompleteTableSelectComponent extends React.Component<
             desc?: string | undefined;
             onClick: () => void;
             onRemove?: (() => void) | undefined;
-        }[]; /** Called with table selected */
+        }[];
         hint?: string | undefined;
     }, uiComponents.OptionListComponent>;
     getSweetSenseTables(): import("mwater-expressions").Table[];

@@ -272,7 +272,7 @@ export default class AxisComponent extends AsyncLoadComponent<
       return R(
         "div",
         null,
-        R(ui.ButtonToggleComponent, {
+        R(ui.RadioToggleComponent, {
           value: axis.xform ? axis.xform.type : null,
           options: [
             { value: "bin", label: "Equal Bins" },
@@ -290,7 +290,7 @@ export default class AxisComponent extends AsyncLoadComponent<
 
     switch (exprType) {
       case "date":
-        return R(ui.ButtonToggleComponent, {
+        return R(ui.RadioToggleComponent, {
           value: axis.xform ? axis.xform.type : null,
           options: [
             { value: null, label: "Exact Date" },
@@ -304,7 +304,7 @@ export default class AxisComponent extends AsyncLoadComponent<
           onChange: this.handleXformTypeChange
         })
       case "datetime":
-        return R(ui.ButtonToggleComponent, {
+        return R(ui.RadioToggleComponent, {
           value: axis.xform ? axis.xform.type : null,
           options: [
             { value: "date", label: "Date" },

@@ -7,7 +7,7 @@ export interface SegmentDesignerComponentProps {
     schema: Schema;
     dataSource: DataSource;
     /** "row" or "column" */
-    segmentType: string;
+    segmentType: "row" | "column";
     onChange: any;
     filters?: any;
 }
@@ -15,8 +15,9 @@ interface SegmentDesignerComponentState {
     mode: any;
 }
 export default class SegmentDesignerComponent extends React.Component<SegmentDesignerComponentProps, SegmentDesignerComponentState> {
+    labelElem: HTMLInputElement | null;
     constructor(props: any);
-    componentDidMount(): any;
+    componentDidMount(): void | undefined;
     update(changes: any): any;
     handleMode: (mode: any) => void;
     handleValueAxisChange: (valueAxis: any) => any;

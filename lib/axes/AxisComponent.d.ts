@@ -53,7 +53,7 @@ export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps
     handleXformTypeChange: (type: any) => void;
     handleXformChange: (xform: any) => void;
     cleanAxis(axis: any): Axis | null;
-    renderXform(axis: any): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement> | React.CElement<ui.ButtonToggleComponentProps, ui.ButtonToggleComponent> | null;
+    renderXform(axis: any): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement> | React.CElement<ui.RadioToggleComponentProps, ui.RadioToggleComponent> | null;
     renderColorMap(axis: any): (React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement> | React.CElement<any, AxisColorEditorComponent>)[] | null;
     renderExcludedValues(axis: any): (React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement> | React.CElement<any, CategoryMapComponent>)[] | null;
     renderFormat(axis: any): React.DetailedReactHTMLElement<{

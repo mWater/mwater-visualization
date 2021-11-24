@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 export interface SectionComponentProps {
     icon?: string;
     label?: any;
@@ -72,15 +72,17 @@ export declare class ToggleEditComponent extends React.Component<ToggleEditCompo
     editorRef: (editorComp: any) => any;
     render(): React.CElement<any, SwitchViewComponent>;
 }
-export interface ButtonToggleComponentProps {
+export interface RadioToggleComponentProps {
     value?: any;
     /** List of layers */
-    options: any;
+    options: {
+        value: any;
+        label: ReactNode;
+    }[];
     onChange: any;
 }
-export declare class ButtonToggleComponent extends React.Component<ButtonToggleComponentProps> {
-    render(): React.DetailedReactHTMLElement<{
-        className: string;
-    }, HTMLElement>;
+/** Switch between several values as a series of radio buttons */
+export declare class RadioToggleComponent extends React.Component<RadioToggleComponentProps> {
+    render(): React.DetailedReactHTMLElement<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 }
 export {};

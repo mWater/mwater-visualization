@@ -1,9 +1,10 @@
 import _ from "lodash"
-import React from "react"
+import React, { ReactNode } from "react"
 import ReactDOM from "react-dom"
 const R = React.createElement
 import * as motion from "react-motion"
 import { LinkComponent } from "mwater-expressions-ui"
+import { Radio } from "react-library/lib/bootstrap"
 
 export interface SectionComponentProps {
   icon?: string
@@ -258,27 +259,27 @@ export class ToggleEditComponent extends React.Component<ToggleEditComponentProp
   }
 }
 
-export interface ButtonToggleComponentProps {
+export interface RadioToggleComponentProps {
   value?: any
   /** List of layers */
-  options: any
+  options: { value: any, label: ReactNode }[]
   onChange: any
 }
 
-// Switch between several values as a series of radio buttons
-export class ButtonToggleComponent extends React.Component<ButtonToggleComponentProps> {
+/** Switch between several values as a series of radio buttons */
+export class RadioToggleComponent extends React.Component<RadioToggleComponentProps> {
   render() {
     return R(
       "div",
-      { className: "btn-group btn-group-sm" },
+      null,
       _.map(this.props.options, (option, i) => {
         return R(
-          "button",
+          Radio,
           {
-            type: "button",
-            key: option.value,
-            className: option.value === this.props.value ? "btn btn-primary active" : "btn btn-outline-primary",
-            onClick: this.props.onChange.bind(null, option.value)
+            value: this.props.value,
+            radioValue: option.value,
+            inline: true,
+            onChange: this.props.onChange
           },
           option.label
         )

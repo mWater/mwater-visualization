@@ -2,8 +2,9 @@ import React from "react";
 import { DataSource, Schema } from "mwater-expressions";
 import Chart, { ChartCreateViewElementOptions } from "../Chart";
 import { WidgetDataSource } from "../../WidgetDataSource";
+import { PivotChartDesign } from "./PivotChartDesign";
 export default class PivotChart extends Chart {
-    cleanDesign(design: any, schema: Schema): any;
+    cleanDesign(design: PivotChartDesign, schema: Schema): PivotChartDesign;
     validateDesign(design: any, schema: Schema): string | null;
     isAutoHeight(): boolean;
     isEmpty(design: any): boolean;
@@ -12,7 +13,7 @@ export default class PivotChart extends Chart {
     createDesignerElement(options: any): React.FunctionComponentElement<{
         schema: any;
         dataSource: any;
-        design: any;
+        design: PivotChartDesign;
         filters: any;
         onDesignChange: (design: any) => any;
     }>;
