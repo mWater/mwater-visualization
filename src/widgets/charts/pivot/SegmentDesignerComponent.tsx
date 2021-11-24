@@ -17,7 +17,7 @@ export interface SegmentDesignerComponentProps {
   schema: Schema
   dataSource: DataSource
   /** "row" or "column" */
-  segmentType: string
+  segmentType: "row" | "column"
   onChange: any
   filters?: any
 }
@@ -31,6 +31,8 @@ export default class SegmentDesignerComponent extends React.Component<
   SegmentDesignerComponentProps,
   SegmentDesignerComponentState
 > {
+  labelElem: HTMLInputElement | null
+
   constructor(props: any) {
     super(props)
 
@@ -106,8 +108,8 @@ export default class SegmentDesignerComponent extends React.Component<
         help: this.state.mode === "multiple" ? `Optional label for the ${this.props.segmentType}s` : undefined
       },
       R("input", {
-        ref: (elem: any) => {
-          return (this.labelElem = elem)
+        ref: (elem: HTMLInputElement | null) => {
+          this.labelElem = elem
         },
         type: "text",
         className: "form-control",
@@ -185,7 +187,7 @@ export default class SegmentDesignerComponent extends React.Component<
         >
           Italic
         </ui.Checkbox>
-        this.props.segment.valueAxis && this.props.segment.label ?{" "}
+        { this.props.segment.valueAxis && this.props.segment.label ? 
         <ui.Checkbox
           key="valueLabelBold"
           inline
@@ -194,7 +196,7 @@ export default class SegmentDesignerComponent extends React.Component<
         >
           Header Bold
         </ui.Checkbox>
-        : undefined,
+        : undefined}
         {this.props.segment.valueAxis && this.props.segment.label
           ? R(
               "div",
@@ -314,16 +316,16 @@ class BorderComponent extends React.Component<BorderComponentProps> {
     return R(
       "span",
       null,
-      <Radio inline value={value} radioValue={0} onChange={this.props.onChange(0)}>
+      <Radio inline value={value} radioValue={0} onChange={() => this.props.onChange(0)}>
         None
       </Radio>,
-      <Radio inline value={value} radioValue={1} onChange={this.props.onChange(1)}>
+      <Radio inline value={value} radioValue={1} onChange={() => this.props.onChange(1)}>
         Light
       </Radio>,
-      <Radio inline value={value} radioValue={2} onChange={this.props.onChange(2)}>
+      <Radio inline value={value} radioValue={2} onChange={() => this.props.onChange(2)}>
         Medium
       </Radio>,
-      <Radio inline value={value} radioValue={3} onChange={this.props.onChange(3)}>
+      <Radio inline value={value} radioValue={3} onChange={() => this.props.onChange(3)}>
         Heavy
       </Radio>
     )

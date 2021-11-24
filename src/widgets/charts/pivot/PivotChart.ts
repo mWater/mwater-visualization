@@ -14,13 +14,14 @@ import * as PivotChartUtils from "./PivotChartUtils"
 import PivotChartQueryBuilder from "./PivotChartQueryBuilder"
 import PivotChartLayoutBuilder from "./PivotChartLayoutBuilder"
 import { WidgetDataSource } from "../../WidgetDataSource"
+import { PivotChartDesign } from "./PivotChartDesign"
 
 // Store true as a weakly cached value if a design is already clean
 const cleanDesignCache = new WeakCache()
 
 // See README.md for the design
 export default class PivotChart extends Chart {
-  cleanDesign(design: any, schema: Schema) {
+  cleanDesign(design: PivotChartDesign, schema: Schema) {
     const exprCleaner = new ExprCleaner(schema)
     const axisBuilder = new AxisBuilder({ schema })
 

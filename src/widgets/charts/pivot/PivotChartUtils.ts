@@ -2,6 +2,7 @@
 // Sanity-check the conversion and remove this comment.
 import _ from "lodash"
 import uuid from "uuid"
+import { PivotChartSegment } from "./PivotChartDesign"
 
 // Misc utils for working with pivot charts
 
@@ -153,7 +154,7 @@ export function summarizeSegment(design: any, id: any, label: any) {
 }
 
 // Recursively map segments, flattening and compacting
-function mapSegments(segments: any, mapFunc: any) {
+function mapSegments(segments: PivotChartSegment[], mapFunc: any): PivotChartSegment[] {
   segments = _.map(segments, mapFunc)
 
   // Map children
@@ -200,7 +201,7 @@ export function insertBeforeSegment(segments: any, id: any) {
 }
 
 // Inserts after
-export function insertAfterSegment(segments: any, id: any) {
+export function insertAfterSegment(segments: any, id: any): PivotChartSegment[] {
   return mapSegments(segments, function (segment: any) {
     if (segment.id === id) {
       return [segment, { id: uuid() }]
@@ -210,7 +211,7 @@ export function insertAfterSegment(segments: any, id: any) {
 }
 
 // Adds child
-export function addChildSegment(segments: any, id: any) {
+export function addChildSegment(segments: any, id: any): PivotChartSegment[] {
   return mapSegments(segments, function (segment: any) {
     if (segment.id === id) {
       return _.extend({}, segment, { children: (segment.children || []).concat([{ id: uuid() }]) })

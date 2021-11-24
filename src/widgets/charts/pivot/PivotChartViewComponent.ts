@@ -12,20 +12,28 @@ import PivotChartLayoutComponent from "./PivotChartLayoutComponent"
 import PivotChartLayoutBuilder from "./PivotChartLayoutBuilder"
 import SegmentDesignerComponent from "./SegmentDesignerComponent"
 import IntersectionDesignerComponent from "./IntersectionDesignerComponent"
+import { JsonQLFilter, WidgetScope } from "../../.."
+import { PivotChartDesign } from "./PivotChartDesign"
 
 export interface PivotChartViewComponentProps {
   schema: Schema
   dataSource: DataSource
-  design: any
+
+  design: PivotChartDesign
+  onDesignChange?: (design: PivotChartDesign) => void
+
   data: any
-  onDesignChange?: any
   width: number
+  height?: number
+
   /** scope of the widget (when the widget self-selects a particular scope) */
-  scope?: any
+  scope?: WidgetScope
+
   /** called with (scope) as a scope to apply to self and filter to apply to other widgets. See WidgetScoper for details */
-  onScopeChange?: any
+  onScopeChange?: (scope: WidgetScope | null) => void
+
   /** array of filters to apply. Each is { table: table id, jsonql: jsonql condition with {alias} for tableAlias. Use injectAlias to correct */
-  filters?: any
+  filters?: JsonQLFilter[]
 }
 
 interface PivotChartViewComponentState {
@@ -52,11 +60,11 @@ export default class PivotChartViewComponent extends React.Component<
   }
 
   handleHeaderChange = (header: any) => {
-    return this.props.onDesignChange(_.extend({}, this.props.design, { header }))
+    return this.props.onDesignChange!(_.extend({}, this.props.design, { header }))
   }
 
   handleFooterChange = (footer: any) => {
-    return this.props.onDesignChange(_.extend({}, this.props.design, { footer }))
+    return this.props.onDesignChange!(_.extend({}, this.props.design, { footer }))
   }
 
   handleEditSection = (sectionId: any) => {
@@ -88,7 +96,7 @@ export default class PivotChartViewComponent extends React.Component<
       columns: PivotChartUtils.replaceSegment(this.props.design.columns, segment)
     })
 
-    this.props.onDesignChange(design)
+    this.props.onDesignChange!(design)
     return this.setState({ editSegment: null })
   }
 
@@ -101,7 +109,7 @@ export default class PivotChartViewComponent extends React.Component<
     intersections[this.state.editIntersectionId] = this.state.editIntersection
 
     const design = _.extend({}, this.props.design, { intersections })
-    this.props.onDesignChange(design)
+    this.props.onDesignChange!(design)
     return this.setState({ editIntersectionId: null, editIntersection: null })
   }
 
@@ -115,7 +123,7 @@ export default class PivotChartViewComponent extends React.Component<
       columns: PivotChartUtils.removeSegment(this.props.design.columns, segmentId)
     })
 
-    return this.props.onDesignChange(design)
+    return this.props.onDesignChange!(design)
   }
 
   handleInsertBeforeSegment = (segmentId: any) => {
@@ -124,16 +132,16 @@ export default class PivotChartViewComponent extends React.Component<
       columns: PivotChartUtils.insertBeforeSegment(this.props.design.columns, segmentId)
     })
 
-    return this.props.onDesignChange(design)
+    return this.props.onDesignChange!(design)
   }
 
   handleInsertAfterSegment = (segmentId: any) => {
-    const design = _.extend({}, this.props.design, {
+    const design = { ...this.props.design, 
       rows: PivotChartUtils.insertAfterSegment(this.props.design.rows, segmentId),
       columns: PivotChartUtils.insertAfterSegment(this.props.design.columns, segmentId)
-    })
+    }
 
-    return this.props.onDesignChange(design)
+    return this.props.onDesignChange!(design)
   }
 
   handleAddChildSegment = (segmentId: any) => {
@@ -142,13 +150,13 @@ export default class PivotChartViewComponent extends React.Component<
       columns: PivotChartUtils.addChildSegment(this.props.design.columns, segmentId)
     })
 
-    return this.props.onDesignChange(design)
+    return this.props.onDesignChange!(design)
   }
 
   handleSummarizeSegment = (segmentId: any) => {
     const design = PivotChartUtils.summarizeSegment(this.props.design, segmentId, "Summary")
 
-    return this.props.onDesignChange(design)
+    return this.props.onDesignChange!(design)
   }
 
   renderHeader() {
@@ -193,7 +201,7 @@ export default class PivotChartViewComponent extends React.Component<
     return R(
       ActionCancelModalComponent,
       {
-        header: `Edit ${segmentType}`,
+        title: `Edit ${segmentType}`,
         onAction: this.handleSaveEditSegment,
         onCancel: this.handleCancelEditSegment
       },
@@ -217,7 +225,7 @@ export default class PivotChartViewComponent extends React.Component<
     return R(
       ActionCancelModalComponent,
       {
-        header: "Edit Value",
+        title: "Edit Value",
         onAction: this.handleSaveEditIntersection,
         onCancel: this.handleCancelEditIntersection
       },
