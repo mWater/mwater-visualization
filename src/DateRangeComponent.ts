@@ -263,6 +263,7 @@ export default class DateRangeComponent extends React.Component<DateRangeCompone
           "div",
           {
             style: { width: 220 },
+            className: "form-control",
             onClick: () => this.setState({ dropdownOpen: true, custom: false })
           },
           this.renderSummary()
