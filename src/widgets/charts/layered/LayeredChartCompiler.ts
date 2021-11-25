@@ -6,7 +6,7 @@ import { injectTableAlias } from "mwater-expressions"
 import * as d3Format from "d3-format"
 
 const commaFormatter = d3Format.format(",")
-const compactFormatter = d3Format.format("~s")
+const compactFormatter = d3Format.format(".4")
 
 function pieLabelValueFormatter(format: any, hidePercent = false) {
   function percent(ratio: any) {
