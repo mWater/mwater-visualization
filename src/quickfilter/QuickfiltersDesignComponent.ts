@@ -183,7 +183,7 @@ class QuickfilterDesignComponent extends React.Component<
       { onRemove: this.props.onRemove },
       R(
         "div",
-        { className: "card" },
+        { className: "card mb-3" },
         R(
           "div",
           { className: "card-body" },

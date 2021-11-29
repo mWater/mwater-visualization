@@ -325,28 +325,30 @@ class ColumnsDesignerComponent extends React.Component<ColumnsDesignerComponentP
         getItemId: (item: DatagridDesignColumn) => item.id
       }),
 
-      R(
-        "button",
-        {
-          key: "add",
-          type: "button",
-          className: "btn btn-link",
-          onClick: this.handleAddColumn
-        },
-        R("span", { className: "fas fa-plus" }),
-        " Add Column"
-      ),
+      R("div", { className: "p-2" },
+        R(
+          "button",
+          {
+            key: "add",
+            type: "button",
+            className: "btn btn-link",
+            onClick: this.handleAddColumn
+          },
+          R("span", { className: "fas fa-plus" }),
+          " Add Column"
+        ),
 
-      R(
-        "button",
-        {
-          key: "add-id",
-          type: "button",
-          className: "btn btn-link",
-          onClick: this.handleAddIdColumn
-        },
-        R("span", { className: "fas fa-plus" }),
-        " Add Unique Id (advanced)"
+        R(
+          "button",
+          {
+            key: "add-id",
+            type: "button",
+            className: "btn btn-link",
+            onClick: this.handleAddIdColumn
+          },
+          R("span", { className: "fas fa-plus" }),
+          " Add Unique Id (advanced)"
+        )
       )
     )
   }

@@ -307,7 +307,7 @@ class BackgroundColorConditionComponent extends React.Component<BackgroundColorC
   render() {
     return R(
       "div",
-      { className: "card" },
+      { className: "card mb-3" },
       R(
         "div",
         { className: "card-body" },
