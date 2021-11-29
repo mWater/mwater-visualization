@@ -88,7 +88,7 @@ export default class ItemsHtmlConverter {
 
         // Add href
         if (item.href) {
-          attrs += ' href="' + _.escape(item.href) + '"'
+          attrs += ' href="' + item.href + '"'
         }
 
         // Add target

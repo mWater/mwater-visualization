@@ -9,7 +9,7 @@ import { LayeredChartDesign } from "./LayeredChartDesign"
 import { JsonQLQuery, JsonQLSelectQuery } from "jsonql"
 
 const commaFormatter = d3Format.format(",")
-const compactFormatter = d3Format.format("~s")
+const compactFormatter = d3Format.format(".4")
 
 function pieLabelValueFormatter(format: any, hidePercent = false) {
   function percent(ratio: any) {
