@@ -254,7 +254,7 @@ export default class DateExprComponent extends React.Component<DateExprComponent
         R(
           "div",
           {
-            style: { width: 220, height: 36 },
+            style: { width: 220, height: 36, paddingTop: "0.5rem" },
             className: "form-control",
             onClick: () => this.setState({ dropdownOpen: true, custom: false })
           },
