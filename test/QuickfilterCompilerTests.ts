@@ -64,10 +64,9 @@ describe("QuickfilterCompiler", function () {
         jsonql: {
           type: "op",
           op: "=",
-          modifier: "any",
           exprs: [
             { type: "field", tableAlias: "{alias}", column: "enum" },
-            { type: "literal", value: ["a"] }
+            { type: "literal", value: "a" }
           ]
         }
       }

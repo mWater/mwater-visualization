@@ -225,7 +225,7 @@ export default class OldMapViewComponent extends React.Component<
       {
         onClose: () => this.setState({ popupContents: null }),
         showCloseX: true,
-        size: "large"
+        size: "x-large"
       },
       // Render in fixed height div so that dashboard doesn't collapse to nothing
       R("div", { style: { height: "80vh" } }, this.state.popupContents),

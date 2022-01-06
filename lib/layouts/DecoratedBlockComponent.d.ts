@@ -35,7 +35,7 @@ export default class DecoratedBlockComponent extends React.Component<DecoratedBl
             right: number;
         };
         key: string;
-    }, string | React.JSXElementConstructor<any>> | null;
+    }, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)> | null;
     render(): React.DetailedReactHTMLElement<{
         className: string;
         style: any;

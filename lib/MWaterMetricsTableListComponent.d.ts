@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { Schema } from "mwater-expressions";
 /** Searchable list of metric tables */
 export declare const MWaterMetricsTableListComponent: (props: {

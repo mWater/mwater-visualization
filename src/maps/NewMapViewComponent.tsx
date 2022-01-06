@@ -567,7 +567,7 @@ export function NewMapViewComponent(props: {
     }
 
     return (
-      <ModalPopupComponent onClose={() => setPopupContents(null)} showCloseX size="large">
+      <ModalPopupComponent onClose={() => setPopupContents(null)} showCloseX size="x-large">
         {/* Render in fixed height div so that dashboard doesn't collapse to nothing */}
         <div style={{ height: "80vh" }}>{popupContents}</div>
         <div style={{ textAlign: "right", marginTop: 10 }}>

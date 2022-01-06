@@ -1,3 +1,4 @@
+/// <reference types="jquery" />
 import React from "react";
 export interface DropdownWidgetComponentProps {
     /** Width specification */
@@ -16,7 +17,7 @@ export default class DropdownWidgetComponent extends React.Component<DropdownWid
             cursor: string;
             zIndex: number;
         };
-    }, string | React.JSXElementConstructor<any>> | null;
+    }, string | ((props: any) => React.ReactElement<any, string | any | (new (props: any) => React.Component<any, any, any>)> | null) | (new (props: any) => React.Component<any, any, any>)> | null;
     closeMenu: () => JQuery<HTMLElement>;
     render(): React.DetailedReactHTMLElement<{
         className: string;

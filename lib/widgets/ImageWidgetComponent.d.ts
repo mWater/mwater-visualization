@@ -17,7 +17,7 @@ export interface ImageWidgetComponentProps {
     singleRowTable?: string;
 }
 export default class ImageWidgetComponent extends AsyncLoadComponent<ImageWidgetComponentProps> {
-    isLoadNeeded(newProps: any, oldProps: any): any;
+    isLoadNeeded(newProps: any, oldProps: any): boolean;
     load(props: any, prevProps: any, callback: any): any;
     handleStartEditing: () => any;
     renderEditLink(): React.DetailedReactHTMLElement<{
