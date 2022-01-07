@@ -806,7 +806,6 @@ export default class AxisBuilder {
             label: ExprUtils.localizeString(ev.name, options.locale)
           })) as { value: any; label: string }[]
         ).concat([noneCategory])
-        break
       case "text":
         // Return unique values
         hasNone = _.any(values || [], (v) => v == null)
@@ -819,11 +818,9 @@ export default class AxisBuilder {
         }
 
         return categories
-        break
       case "boolean":
         // Return unique values
         return [{ value: true, label: "True" }, { value: false, label: "False" }, noneCategory]
-        break
       case "date":
         values = _.compact(values || [])
         if (values.length === 0) {
@@ -847,7 +844,6 @@ export default class AxisBuilder {
         }
         categories.push(noneCategory)
         return categories
-        break
     }
 
     return []
