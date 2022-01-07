@@ -505,7 +505,9 @@ export default class AxisBuilder {
   /** Get all categories for a given axis type given the known values
    * Returns array of { value, label }
    */
-  getCategories(axis: Axis, values: any[] | null, locale?: string): AxisCategory[] {
+  getCategories(axis: Axis, values?: any[] | null, options: {
+    locale?: string
+  } = {}): AxisCategory[] {
     let categories: AxisCategory[], current, end, format, hasNone, label, max, min, value, year
     const noneCategory = { value: null, label: axis.nullLabel || "None" }
 
@@ -801,7 +803,7 @@ export default class AxisBuilder {
         return (
           _.map(this.exprUtils.getExprEnumValues(axis.expr)!, (ev) => ({
             value: ev.id,
-            label: ExprUtils.localizeString(ev.name, locale)
+            label: ExprUtils.localizeString(ev.name, options.locale)
           })) as { value: any; label: string }[]
         ).concat([noneCategory])
         break
@@ -913,7 +915,7 @@ export default class AxisBuilder {
     const type = this.getAxisType(axis)
 
     // If has categories, use those
-    const categories = this.getCategories(axis, [value], locale)
+    const categories = this.getCategories(axis, [value], { locale })
     if (categories.length > 0) {
       if (type === "enumset") {
         // Parse if string

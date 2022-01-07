@@ -7,6 +7,7 @@ import * as d3Format from "d3-format"
 import { JsonQLFilter } from "../../.."
 import { LayeredChartDesign } from "./LayeredChartDesign"
 import { JsonQLQuery, JsonQLSelectQuery } from "jsonql"
+import { Axis } from "../../../axes/Axis"
 
 const commaFormatter = d3Format.format(",")
 const compactFormatter = d3Format.format(".4")
@@ -368,7 +369,7 @@ export default class LayeredChartCompiler {
         let layerData = data[`layer${layerIndex}`]
 
         // Categories will be in form [{ value, label }]
-        const categories = this.axisBuilder.getCategories(layer.axes.color, _.pluck(layerData, "color"), locale)
+        const categories = this.axisBuilder.getCategories(layer.axes.color, _.pluck(layerData, "color"), { locale })
 
         // Get indexed ordering of categories (lookup from value to index) without removing excluded values
         const categoryOrder = _.zipObject(_.map(categories, (c, i) => [c.value, i]))
@@ -479,7 +480,7 @@ export default class LayeredChartCompiler {
 
         // Sort color values by category order:
         // Get categories
-        const categories = this.axisBuilder.getCategories(layer.axes.color, colorValues, locale)
+        const categories = this.axisBuilder.getCategories(layer.axes.color, colorValues, { locale })
 
         // Get indexed ordering of categories (lookup from value to index) without removing excluded values
         const categoryOrder = _.zipObject(_.map(categories, (c, i) => [c.value, i]))
@@ -647,8 +648,8 @@ export default class LayeredChartCompiler {
     const classes = {} // Custom classes to add to series
 
     // Get all values of the x-axis, taking into account values that might be missing
-    const xAxis = _.extend({}, design.layers[0].axes.x)
-    const nullLabel = _.first(_.compact(design.layers.map((l: any) => l.axes.x.nullLabel)))
+    const xAxis: Axis = _.extend({}, design.layers[0].axes.x)
+    const nullLabel: string | undefined = _.first(_.compact(design.layers.map((l: any) => l.axes.x.nullLabel)))
     xAxis.nullLabel = nullLabel
 
     const xType = this.axisBuilder.getAxisType(xAxis)
@@ -662,7 +663,7 @@ export default class LayeredChartCompiler {
     })
 
     // Categories will be in form [{ value, label }]
-    let categories = this.axisBuilder.getCategories(xAxis, xValues, locale)
+    let categories = this.axisBuilder.getCategories(xAxis, xValues, { locale })
 
     // Get indexed ordering of categories (lookup from value to index) without removing excluded values
     const categoryOrder = _.zipObject(_.map(categories, (c, i) => [c.value, i]))
@@ -717,7 +718,7 @@ export default class LayeredChartCompiler {
 
         // Sort color values by category order:
         // Get categories
-        const colorCategories = this.axisBuilder.getCategories(layer.axes.color, colorValues, locale)
+        const colorCategories = this.axisBuilder.getCategories(layer.axes.color, colorValues, { locale })
 
         // Get indexed ordering of categories (lookup from value to index) without removing excluded values
         const colorCategoryOrder = _.zipObject(_.map(colorCategories, (c, i) => [c.value, i]))

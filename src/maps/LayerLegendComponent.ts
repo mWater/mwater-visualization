@@ -32,7 +32,7 @@ export default class LayerLegendComponent extends React.Component<LayerLegendCom
     }
 
     // Get categories (value + label)
-    const categories = axisBuilder.getCategories(this.props.axis, null, this.props.locale)
+    const categories = axisBuilder.getCategories(this.props.axis, null, { locale: this.props.locale })
 
     // Just "None" and so doesn't count
     if (_.any(categories, (category) => category.value != null)) {
@@ -45,7 +45,7 @@ export default class LayerLegendComponent extends React.Component<LayerLegendCom
     }
 
     // If no categories, use values from color map as input
-    return axisBuilder.getCategories(this.props.axis, _.pluck(this.props.axis.colorMap, "value"), this.props.locale)
+    return axisBuilder.getCategories(this.props.axis, _.pluck(this.props.axis.colorMap, "value"), { locale: this.props.locale })
   }
 
   render() {

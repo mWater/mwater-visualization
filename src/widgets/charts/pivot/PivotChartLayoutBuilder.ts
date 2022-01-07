@@ -1,9 +1,10 @@
 import _ from "lodash"
-import { ExprUtils } from "mwater-expressions"
+import { ExprUtils, Schema } from "mwater-expressions"
 import AxisBuilder from "../../../axes/AxisBuilder"
 import Color from "color"
 import * as PivotChartUtils from "./PivotChartUtils"
 import canonical from "canonical-json"
+import { PivotChartDesign } from "./PivotChartDesign"
 
 const maxRows = 500
 const maxColumns = 50
@@ -11,33 +12,39 @@ const maxColumns = 50
 // Builds pivot table layout from the design and data
 // See PivotChart Design.md for more detauls
 export default class PivotChartLayoutBuilder {
+  schema: Schema
+  exprUtils: ExprUtils
+  axisBuilder: AxisBuilder
+
   // Pass in schema
-  constructor(options: any) {
+  constructor(options: {
+    schema: Schema
+  }) {
     this.schema = options.schema
     this.exprUtils = new ExprUtils(this.schema)
     this.axisBuilder = new AxisBuilder({ schema: this.schema })
   }
 
-  buildLayout(design: any, data: any, locale: any) {
+  buildLayout(design: PivotChartDesign, data: any, locale: any) {
     // Create empty layout
     let cell, cells, column, columnIndex, depth: any, i, layoutRow, refCell, rowIndex, segment
     let asc, end
     let asc6, end6
     let asc8, end8
     let asc10, end10
-    const layout = {
+    const layout: any = {
       rows: [],
       striping: design.striping
     }
 
     // Get all columns
-    let columns: any = []
+    let columns: any[] = []
     for (segment of design.columns) {
       columns = columns.concat(this.getRowsOrColumns(false, segment, data, locale))
     }
 
     // Get all rows
-    let rows: any = []
+    let rows: any[] = []
     for (segment of design.rows) {
       rows = rows.concat(this.getRowsOrColumns(true, segment, data, locale))
     }
@@ -393,7 +400,7 @@ export default class PivotChartLayoutBuilder {
   // Build a cell which is the intersection of a row and column, where row and column are nested arrays
   // from getRowsOrColumns
   // dataIndexed is created above. See there for format
-  buildIntersectionCell(design: any, dataIndexed: any, locale: any, row: any, column: any) {
+  buildIntersectionCell(design: PivotChartDesign, dataIndexed: any, locale: string, row: any, column: any) {
     // Get intersection id
     let i, part, text
     const intersectionId = PivotChartUtils.getIntersectionId(
@@ -747,7 +754,7 @@ export default class PivotChartLayoutBuilder {
       }
 
       // Get categories, mapping label
-      categories = _.map(this.axisBuilder.getCategories(segment.valueAxis, allValues, locale), (category) => {
+      categories = _.map(this.axisBuilder.getCategories(segment.valueAxis, allValues, { locale }), (category) => {
         return { value: category.value, label: this.axisBuilder.formatCategory(segment.valueAxis, category) }
       })
 
