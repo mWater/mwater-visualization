@@ -46,6 +46,9 @@ export interface AxisComponentProps {
   showFormat?: boolean
   /** Filters to apply */
   filters?: JsonQLFilter[]
+
+  /** True to initially collapse categories */
+  collapseCategories?: boolean
 }
 
 // Axis component that allows designing of an axis
@@ -337,7 +340,7 @@ export default class AxisComponent extends AsyncLoadComponent<
         defaultColor: this.props.defaultColor,
         allowExcludedValues: this.props.allowExcludedValues,
         autosetColors: this.props.autosetColors,
-        initiallyExpanded: true
+        initiallyExpanded: this.props.collapseCategories !== true
       })
     ]
   }
@@ -363,7 +366,7 @@ export default class AxisComponent extends AsyncLoadComponent<
         reorderable: false,
         showColorMap: false,
         allowExcludedValues: true,
-        initiallyExpanded: true
+        initiallyExpanded: this.props.collapseCategories !== true
       })
     ]
   }

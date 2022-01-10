@@ -869,6 +869,25 @@ export default class AxisBuilder {
       case "enum":
       case "enumset":
         // If enum, return enum values
+        // NOTE: Assumes enumset values are flattened out first
+        if (options.onlyValuesPresent) {
+          categories = []
+          const flatValues = _.flatten(values || [], true)
+          for (const ev of this.exprUtils.getExprEnumValues(axis.expr)!) {
+            if (flatValues.includes(ev.id)) {
+              categories.push({
+                value: ev.id,
+                label: ExprUtils.localizeString(ev.name, options.locale)
+              })
+            }
+          }
+          if (hasNone) {
+            categories.push(noneCategory)
+          }
+    
+          return categories
+        }
+
         return (
           _.map(this.exprUtils.getExprEnumValues(axis.expr)!, (ev) => ({
             value: ev.id,

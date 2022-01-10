@@ -32,6 +32,8 @@ export interface AxisComponentProps {
     showFormat?: boolean;
     /** Filters to apply */
     filters?: JsonQLFilter[];
+    /** True to initially collapse categories */
+    collapseCategories?: boolean;
 }
 export default class AxisComponent extends AsyncLoadComponent<AxisComponentProps, {
     categories: any;

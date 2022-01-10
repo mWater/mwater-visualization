@@ -10,9 +10,11 @@ import { ExprComponent } from "mwater-expressions-ui"
 import { FilterExprComponent } from "mwater-expressions-ui"
 import { Radio } from "react-library/lib/bootstrap"
 import { DataSource, Schema } from "mwater-expressions"
+import { AxisBuilder } from "../../.."
+import { PivotChartSegment } from "./PivotChartDesign"
 
 export interface SegmentDesignerComponentProps {
-  segment: any
+  segment: PivotChartSegment
   table: string
   schema: Schema
   dataSource: DataSource
@@ -60,6 +62,10 @@ export default class SegmentDesignerComponent extends React.Component<
 
   handleValueAxisChange = (valueAxis: any) => {
     return this.update({ valueAxis })
+  }
+
+  handleValueAxisOnlyValuesPresentChange = (valueAxisOnlyValuesPresent: boolean) => {
+    return this.update({ valueAxisOnlyValuesPresent })
   }
 
   handleLabelChange = (ev: any) => {
@@ -120,29 +126,36 @@ export default class SegmentDesignerComponent extends React.Component<
   }
 
   renderValueAxis() {
-    return R(
-      ui.FormGroup,
-      {
-        labelMuted: true,
-        label: "Field",
-        help: "Field to disaggregate data by"
-      },
-      R(
-        "div",
-        { style: { marginLeft: 8 } },
-        R(AxisComponent, {
-          schema: this.props.schema,
-          dataSource: this.props.dataSource,
-          table: this.props.table,
-          types: ["enum", "text", "boolean", "date"],
-          aggrNeed: "none",
-          value: this.props.segment.valueAxis,
-          onChange: this.handleValueAxisChange,
-          allowExcludedValues: true,
-          filters: this.props.filters
-        })
-      )
-    )
+    // Get type of axis
+    const axisBuilder = new AxisBuilder({ schema: this.props.schema })
+
+    const axisType = axisBuilder.getAxisType(this.props.segment.valueAxis)
+    const allowValueAxisOnlyValuesPresent = axisType == "enum" || axisType == "enumset" || axisType == "date"
+
+    return <ui.FormGroup labelMuted label="Field" help="Field to disaggregate data by">
+      <div style={{ marginLeft: 8 }}>
+        {
+          R(AxisComponent, {
+            schema: this.props.schema,
+            dataSource: this.props.dataSource,
+            table: this.props.table,
+            types: ["enum", "text", "boolean", "date"],
+            aggrNeed: "none",
+            value: this.props.segment.valueAxis,
+            onChange: this.handleValueAxisChange,
+            allowExcludedValues: true,
+            filters: this.props.filters,
+            collapseCategories: true
+          })
+        }
+        { allowValueAxisOnlyValuesPresent ?
+          <ui.Checkbox
+            value={this.props.segment.valueAxisOnlyValuesPresent}
+            onChange={this.handleValueAxisOnlyValuesPresentChange}
+          >Only show values actually present</ui.Checkbox>
+        : null }
+      </div>
+    </ui.FormGroup>
   }
 
   renderFilter() {

@@ -29,6 +29,8 @@ export interface PivotChartSegment {
     label?: string;
     /** enum/text axis that determines values. Optional. */
     valueAxis?: Axis;
+    /** Limit date-type and enum fields to values actually present */
+    valueAxisOnlyValuesPresent?: boolean;
     /** array of child segments if any. Optional */
     children?: PivotChartSegment[];
     /** optional aggregate ordering expression */

@@ -757,7 +757,7 @@ export default class PivotChartLayoutBuilder {
       }
 
       // Get categories, mapping label
-      categories = _.map(this.axisBuilder.getCategories(segment.valueAxis, allValues, { locale }), (category) => {
+      categories = _.map(this.axisBuilder.getCategories(segment.valueAxis, allValues, { locale, onlyValuesPresent: segment.valueAxisOnlyValuesPresent }), (category) => {
         return { value: category.value, label: this.axisBuilder.formatCategory(segment.valueAxis, category) }
       })
 

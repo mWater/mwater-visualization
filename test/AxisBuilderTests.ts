@@ -598,12 +598,34 @@ describe("AxisBuilder", function () {
       ])
     })
 
+    it("gets limited enum", function () {
+      const categories = this.ab.getCategories(this.axisEnum, ["a", null], { onlyValuesPresent: true })
+      compare(categories, [
+        { value: "a", label: "A" },
+        { value: null, label: "None" }
+      ])
+    })
+
     it("gets enumset", function () {
       const categories = this.ab.getCategories(this.axisEnumset, ["a"])
       compare(categories, [
         { value: "a", label: "A" },
         { value: "b", label: "B" },
         { value: null, label: "None" }
+      ])
+    })
+
+    it("gets limited enumset", function () {
+      const categories = this.ab.getCategories(this.axisEnumset, ["a"], { onlyValuesPresent: true })
+      compare(categories, [
+        { value: "a", label: "A" }
+      ])
+    })
+
+    it("gets limited enumset with array", function () {
+      const categories = this.ab.getCategories(this.axisEnumset, [["a"]], { onlyValuesPresent: true })
+      compare(categories, [
+        { value: "a", label: "A" }
       ])
     })
 
