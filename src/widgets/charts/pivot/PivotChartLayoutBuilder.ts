@@ -4,10 +4,12 @@ import AxisBuilder from "../../../axes/AxisBuilder"
 import Color from "color"
 import * as PivotChartUtils from "./PivotChartUtils"
 import canonical from "canonical-json"
-import { PivotChartDesign } from "./PivotChartDesign"
+import { PivotChartDesign, PivotChartSegment } from "./PivotChartDesign"
 
 const maxRows = 500
 const maxColumns = 50
+
+export type PivotChartData = { [intersectionId: string]: any[] }
 
 // Builds pivot table layout from the design and data
 // See PivotChart Design.md for more detauls
@@ -25,7 +27,7 @@ export default class PivotChartLayoutBuilder {
     this.axisBuilder = new AxisBuilder({ schema: this.schema })
   }
 
-  buildLayout(design: PivotChartDesign, data: any, locale: any) {
+  buildLayout(design: PivotChartDesign, data: PivotChartData, locale: string) {
     // Create empty layout
     let cell, cells, column, columnIndex, depth: any, i, layoutRow, refCell, rowIndex, segment
     let asc, end
@@ -38,13 +40,13 @@ export default class PivotChartLayoutBuilder {
     }
 
     // Get all columns
-    let columns: any[] = []
+    let columns: any[][] = []
     for (segment of design.columns) {
       columns = columns.concat(this.getRowsOrColumns(false, segment, data, locale))
     }
 
     // Get all rows
-    let rows: any[] = []
+    let rows: any[][] = []
     for (segment of design.rows) {
       rows = rows.concat(this.getRowsOrColumns(true, segment, data, locale))
     }
@@ -698,7 +700,8 @@ export default class PivotChartLayoutBuilder {
   // For segments with no children, there will be an array of single value array entries (array of array)
   // data is lookup of query results by intersection id
   // parentSegments are ancestry of current segment, starting with root
-  getRowsOrColumns(isRow: any, segment: any, data: any, locale: any, parentSegments = [], parentValues = []) {
+  getRowsOrColumns(isRow: any, segment: PivotChartSegment, data: { [intersectionId: string]: any[] }, locale: string, parentSegments: PivotChartSegment[] = [], parentValues: any[] = []): 
+    { segment: PivotChartSegment, label: string, value: any }[][] {
     // If no axis, categories are just null
     let categories, value
     if (!segment.valueAxis) {
@@ -761,7 +764,7 @@ export default class PivotChartLayoutBuilder {
       // Filter excluded values
       categories = _.filter(
         categories,
-        (category) => !(segment.valueAxis.excludedValues || []).includes(category.value)
+        (category) => !(segment.valueAxis!.excludedValues || []).includes(category.value)
       )
 
       // Always have placeholder category
