@@ -80,6 +80,7 @@
   },
   "devDependencies": {
     "@kadira/storybook": "^2.21.0",
+    "@types/chai": "^4.3.0",
     "@types/color": "^3.0.2",
     "@types/d3": "^5.16.4",
     "@types/d3-format": "^1.4.1",

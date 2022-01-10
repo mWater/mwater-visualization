@@ -46,7 +46,13 @@ export default class AxisBuilder {
     /** Get all categories for a given axis type given the known values
      * Returns array of { value, label }
      */
-    getCategories(axis: Axis, values: any[] | null, locale?: string): AxisCategory[];
+    getCategories(axis: Axis, values?: any[] | null, options?: {
+        locale?: string;
+        /** If true, only create categories for values that are present. Requires values to be set.
+         * Enums normally get all possible values and dates get every range.
+         */
+        onlyValuesPresent?: boolean;
+    }): AxisCategory[];
     getAxisType(axis: any): LiteralType | null;
     isAxisAggr(axis: any): any;
     doesAxisSupportCumulative(axis: any): boolean;

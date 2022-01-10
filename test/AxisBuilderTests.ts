@@ -1,5 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
 import { assert } from "chai"
 import * as fixtures from "./fixtures"
 import _ from "lodash"
@@ -8,9 +6,10 @@ const R = React.createElement
 
 import AxisBuilder from "../src/axes/AxisBuilder"
 import canonical from "canonical-json"
+import { Axis } from "../src/axes/Axis"
 
 function compare(actual: any, expected: any) {
-  return assert.equal(
+  assert.equal(
     canonical(actual),
     canonical(expected),
     "\ngot:" + canonical(actual) + "\nexp:" + canonical(expected)
@@ -34,13 +33,13 @@ describe("AxisBuilder", function () {
     this.axisEnum = { expr: this.exprEnum }
     this.axisEnumset = { expr: this.exprEnumset }
     this.axisText = { expr: this.exprText }
-    return (this.axisTextarr = { expr: this.exprTextarr })
+    this.axisTextarr = { expr: this.exprTextarr }
   })
 
   describe("compileAxis", function () {
     it("compiles simple expr", function () {
       const jql = this.ab.compileAxis({ axis: this.axisNumber, tableAlias: "T1" })
-      return assert(
+      assert(
         _.isEqual(jql, {
           type: "field",
           tableAlias: "T1",
@@ -56,7 +55,7 @@ describe("AxisBuilder", function () {
       }
 
       const jql = this.ab.compileAxis({ axis: this.axisNumberSum, tableAlias: "T1" })
-      return assert(
+      assert(
         _.isEqual(jql, {
           type: "op",
           op: "sum",
@@ -78,7 +77,7 @@ describe("AxisBuilder", function () {
       }
 
       const jql = this.ab.compileAxis({ axis, tableAlias: "T1" })
-      return assert(
+      assert(
         _.isEqual(jql, {
           type: "op",
           op: "width_bucket",
@@ -103,7 +102,7 @@ describe("AxisBuilder", function () {
       }
 
       const jql = this.ab.compileAxis({ axis, tableAlias: "T1" })
-      return assert(
+      assert(
         _.isEqual(jql, {
           type: "op",
           op: "width_bucket",
@@ -133,7 +132,7 @@ describe("AxisBuilder", function () {
       }
 
       const jql = this.ab.compileAxis({ axis, tableAlias: "T1" })
-      return assert(
+      assert(
         _.isEqual(jql, {
           type: "op",
           op: "substr",
@@ -158,7 +157,7 @@ describe("AxisBuilder", function () {
       }
 
       const jql = this.ab.compileAxis({ axis, tableAlias: "T1" })
-      return assert(
+      assert(
         _.isEqual(jql, {
           type: "op",
           op: "rpad",
@@ -191,7 +190,7 @@ describe("AxisBuilder", function () {
       }
 
       const jql = this.ab.compileAxis({ axis, tableAlias: "T1" })
-      return assert(
+      assert(
         _.isEqual(jql, {
           type: "op",
           op: "rpad",
@@ -224,7 +223,7 @@ describe("AxisBuilder", function () {
       }
 
       const jql = this.ab.compileAxis({ axis, tableAlias: "T1" })
-      return assert(
+      assert(
         _.isEqual(jql, {
           type: "op",
           op: "substr",
@@ -249,7 +248,7 @@ describe("AxisBuilder", function () {
       }
 
       const jql = this.ab.compileAxis({ axis, tableAlias: "T1" })
-      return assert(
+      assert(
         _.isEqual(jql, {
           type: "op",
           op: "to_char",
@@ -266,7 +265,7 @@ describe("AxisBuilder", function () {
       }
 
       const jql = this.ab.compileAxis({ axis, tableAlias: "T1" })
-      return assert(
+      assert(
         _.isEqual(jql, {
           type: "op",
           op: "to_char",
@@ -288,7 +287,7 @@ describe("AxisBuilder", function () {
       }
 
       const jql = this.ab.compileAxis({ axis, tableAlias: "T1" })
-      return assert(
+      assert(
         _.isEqual(jql, {
           type: "case",
           cases: [
@@ -339,7 +338,7 @@ describe("AxisBuilder", function () {
       }
 
       axis = this.ab.cleanAxis({ axis, table: "t1", aggrNeed: "optional" })
-      return compare(axis, {
+      compare(axis, {
         expr: { type: "op", op: "+", table: "t1", exprs: [{ type: "field", table: "t1", column: "number" }, null] }
       })
     })
@@ -351,7 +350,7 @@ describe("AxisBuilder", function () {
       }
 
       axis = this.ab.cleanAxis({ axis, table: "t1", aggrNeed: "optional" })
-      return assert(!axis)
+      assert(!axis)
     })
 
     it("removes bin xform if wrong input type", function () {
@@ -361,7 +360,7 @@ describe("AxisBuilder", function () {
       }
 
       axis = this.ab.cleanAxis({ axis, table: "t1", aggrNeed: "optional" })
-      return assert(!axis.xform)
+      assert(!axis.xform)
     })
 
     it("removes bin xform if wrong output type", function () {
@@ -371,7 +370,7 @@ describe("AxisBuilder", function () {
       }
 
       axis = this.ab.cleanAxis({ axis, table: "t1", types: ["number"], aggrNeed: "optional" })
-      return assert(!axis.xform)
+      assert(!axis.xform)
     })
 
     it("removes ranges xform if wrong input type", function () {
@@ -387,7 +386,7 @@ describe("AxisBuilder", function () {
       }
 
       axis = this.ab.cleanAxis({ axis, table: "t1", aggrNeed: "optional" })
-      return assert(!axis.xform)
+      assert(!axis.xform)
     })
 
     it("removes ranges xform if wrong output type", function () {
@@ -403,16 +402,16 @@ describe("AxisBuilder", function () {
       }
 
       axis = this.ab.cleanAxis({ axis, table: "t1", types: ["number"], aggrNeed: "optional" })
-      return assert(!axis.xform)
+      assert(!axis.xform)
     })
 
     it("defaults bin xform", function () {
-      let axis = {
+      let axis: Axis = {
         expr: this.exprNumber
       }
 
       axis = this.ab.cleanAxis({ axis, table: "t1", types: ["enum"], aggrNeed: "optional" })
-      return assert.equal(axis.xform.type, "bin")
+      assert.equal(axis.xform!.type, "bin")
     })
 
     it("remove if not possible to get type", function () {
@@ -423,7 +422,7 @@ describe("AxisBuilder", function () {
         "Number can be binned to enum"
       ) // Can get enum via binning
 
-      return assert(
+      assert(
         !this.ab.cleanAxis({ axis: { expr: this.exprText }, table: "t1", types: ["number"], aggrNeed: "none" }),
         "No aggr allowed"
       )
@@ -440,7 +439,7 @@ describe("AxisBuilder", function () {
         expr: this.exprNumber,
         xform: { type: "bin", numBins: 10, min: 2, max: 8 }
       }
-      return assert(!this.ab.validateAxis({ axis }))
+      assert(!this.ab.validateAxis({ axis }))
     })
 
     return it("requires valid min/max bin xform", function () {
@@ -448,28 +447,28 @@ describe("AxisBuilder", function () {
         expr: this.exprNumber,
         xform: { type: "bin", numBins: 10, min: 2, max: 1 }
       }
-      return assert(this.ab.validateAxis({ axis }))
+      assert(this.ab.validateAxis({ axis }))
     })
   })
 
   describe("getExprTypes", function () {
     it("does not add any if aggr allowed and number out", function () {
       assert.notInclude(this.ab.getExprTypes(["number"], "optional"), "datetime")
-      return assert.notInclude(this.ab.getExprTypes(["number"], "required"), "datetime")
+      assert.notInclude(this.ab.getExprTypes(["number"], "required"), "datetime")
     })
 
     return it("adds number if binnable", function () {
-      return assert.include(this.ab.getExprTypes(["enum"], "optional"), "number")
+      assert.include(this.ab.getExprTypes(["enum"], "optional"), "number")
     })
   })
 
   describe("getAxisType", function () {
     it("passes through if no aggr or xform", function () {
-      return assert.equal(this.ab.getAxisType(this.axisNumber), "number")
+      assert.equal(this.ab.getAxisType(this.axisNumber), "number")
     })
 
     it("converts count aggr to number", function () {
-      return assert.equal(this.ab.getAxisType(this.axisNumberCount), "number")
+      assert.equal(this.ab.getAxisType(this.axisNumberCount), "number")
     })
 
     it("xforms bin", function () {
@@ -477,7 +476,7 @@ describe("AxisBuilder", function () {
         expr: this.exprNumber,
         xform: { type: "bin", numBins: 10, min: 2, max: 8 }
       }
-      return assert.equal(this.ab.getAxisType(axis), "enum")
+      assert.equal(this.ab.getAxisType(axis), "enum")
     })
 
     it("xforms ranges", function () {
@@ -491,7 +490,7 @@ describe("AxisBuilder", function () {
           ]
         }
       }
-      return assert.equal(this.ab.getAxisType(axis), "enum")
+      assert.equal(this.ab.getAxisType(axis), "enum")
     })
 
     return it("xforms date", function () {
@@ -499,17 +498,17 @@ describe("AxisBuilder", function () {
         expr: this.exprDatetime,
         xform: { type: "date" }
       }
-      return assert.equal(this.ab.getAxisType(axis), "date")
+      assert.equal(this.ab.getAxisType(axis), "date")
     })
   })
 
   describe("formatValue", function () {
     it("formats None", function () {
-      return assert.equal(this.ab.formatValue(this.axisNumber, null), "None")
+      assert.equal(this.ab.formatValue(this.axisNumber, null), "None")
     })
 
     it("formats None overriden", function () {
-      return assert.equal(this.ab.formatValue(_.extend({}, this.axisNumber, { nullLabel: "xyz" }), null), "xyz")
+      assert.equal(this.ab.formatValue(_.extend({}, this.axisNumber, { nullLabel: "xyz" }), null), "xyz")
     })
 
     it("formats axes with categories", function () {
@@ -517,38 +516,38 @@ describe("AxisBuilder", function () {
         expr: this.exprNumber,
         xform: { type: "bin", numBins: 3, min: 1, max: 4 }
       }
-      return assert.equal(this.ab.formatValue(axis, 0), "< 1")
+      assert.equal(this.ab.formatValue(axis, 0), "< 1")
     })
 
     it("formats enum", function () {
-      return assert.equal(this.ab.formatValue(this.axisEnum, "a"), "A")
+      assert.equal(this.ab.formatValue(this.axisEnum, "a"), "A")
     })
 
     it("formats enum overridden", function () {
-      return assert.equal(
+      assert.equal(
         this.ab.formatValue(_.extend({}, this.axisEnum, { categoryLabels: { '"a"': "A2" } }), "a"),
         "A2"
       )
     })
 
     it("formats enumset", function () {
-      return assert.equal(this.ab.formatValue(this.axisEnumset, ["a", "b"]), "A, B")
+      assert.equal(this.ab.formatValue(this.axisEnumset, ["a", "b"]), "A, B")
     })
 
     it("formats enumset overridden", function () {
-      return assert.equal(
+      assert.equal(
         this.ab.formatValue(_.extend({}, this.axisEnumset, { categoryLabels: { '"a"': "A2" } }), ["a", "b"]),
         "A2, B"
       )
     })
 
     it("converts to string", function () {
-      return assert.equal(this.ab.formatValue(this.axisNumber, 2), "2")
+      assert.equal(this.ab.formatValue(this.axisNumber, 2), "2")
     })
 
     it("adds decimal separator", function () {
       assert.equal(this.ab.formatValue(this.axisNumber, 123456), "123,456")
-      return assert.equal(this.ab.formatValue(this.axisNumber, "123456"), "123,456", "Should parse string")
+      assert.equal(this.ab.formatValue(this.axisNumber, "123456"), "123,456", "Should parse string")
     })
 
     it("wraps text[]", function () {
@@ -556,7 +555,7 @@ describe("AxisBuilder", function () {
         this.ab.formatValue(this.axisTextarr, ["a", "b"]),
         R("div", null, R("div", { key: 0 }, "a"), R("div", { key: 1 }, "b"))
       )
-      return compare(
+      compare(
         this.ab.formatValue(this.axisTextarr, JSON.stringify(["a", "b"])),
         R("div", null, R("div", { key: 0 }, "a"), R("div", { key: 1 }, "b"))
       )
@@ -564,7 +563,7 @@ describe("AxisBuilder", function () {
 
     return it("formats numbers", function () {
       const axisNumberFormatted = { expr: this.exprNumber, format: ",.2f" }
-      return assert.equal(this.ab.formatValue(axisNumberFormatted, "1234"), "1,234.00")
+      assert.equal(this.ab.formatValue(axisNumberFormatted, "1234"), "1,234.00")
     })
   })
 
@@ -577,7 +576,7 @@ describe("AxisBuilder", function () {
           { value: "b", color: "#00FF00" }
         ]
       }
-      return assert.equal(this.ab.getValueColor(axis, "b"), "#00FF00")
+      assert.equal(this.ab.getValueColor(axis, "b"), "#00FF00")
     })
 
     return it("handles missing", function () {
@@ -585,14 +584,14 @@ describe("AxisBuilder", function () {
         expr: this.exprEnum,
         colorMap: [{ value: "a", color: "#FF0000" }]
       }
-      return assert(!this.ab.getValueColor(axis, "b"))
+      assert(!this.ab.getValueColor(axis, "b"))
     })
   })
 
   return describe("getCategories", function () {
     it("gets enum", function () {
       const categories = this.ab.getCategories(this.axisEnum, ["a"])
-      return compare(categories, [
+      compare(categories, [
         { value: "a", label: "A" },
         { value: "b", label: "B" },
         { value: null, label: "None" }
@@ -601,7 +600,7 @@ describe("AxisBuilder", function () {
 
     it("gets enumset", function () {
       const categories = this.ab.getCategories(this.axisEnumset, ["a"])
-      return compare(categories, [
+      compare(categories, [
         { value: "a", label: "A" },
         { value: "b", label: "B" },
         { value: null, label: "None" }
@@ -621,7 +620,7 @@ describe("AxisBuilder", function () {
 
     it("gets text values", function () {
       const categories = this.ab.getCategories(this.axisText, ["a", "b", "a", "c"])
-      return compare(categories, [
+      compare(categories, [
         { value: "a", label: "a" },
         { value: "b", label: "b" },
         { value: "c", label: "c" }
@@ -630,7 +629,7 @@ describe("AxisBuilder", function () {
 
     it("gets text values with none", function () {
       const categories = this.ab.getCategories(this.axisText, ["a", "b", "a", "c", null])
-      return compare(categories, [
+      compare(categories, [
         { value: "a", label: "a" },
         { value: "b", label: "b" },
         { value: "c", label: "c" },
@@ -640,7 +639,7 @@ describe("AxisBuilder", function () {
 
     it("gets empty list for number", function () {
       const categories = this.ab.getCategories(this.axisNumber, [1.2, 1.4])
-      return compare(categories, [])
+      compare(categories, [])
     })
 
     it("gets bins by name", function () {
@@ -650,7 +649,7 @@ describe("AxisBuilder", function () {
       }
 
       const categories = this.ab.getCategories(axis, [])
-      return compare(categories, [
+      compare(categories, [
         { value: 0, label: "< 1" },
         { value: 1, label: "1 - 2" },
         { value: 2, label: "2 - 3" },
@@ -661,7 +660,7 @@ describe("AxisBuilder", function () {
     })
 
     it("gets bins by name with exclusions", function () {
-      let axis = {
+      let axis: Axis = {
         expr: this.exprNumber,
         xform: { type: "bin", numBins: 3, min: 1, max: 4, excludeLower: true }
       }
@@ -681,7 +680,7 @@ describe("AxisBuilder", function () {
       }
 
       categories = this.ab.getCategories(axis, [])
-      return compare(categories, [
+      compare(categories, [
         { value: 0, label: "< 1" },
         { value: 1, label: "1 - 2" },
         { value: 2, label: "2 - 3" },
@@ -703,7 +702,7 @@ describe("AxisBuilder", function () {
       }
 
       const categories = this.ab.getCategories(axis, [])
-      return compare(categories, [
+      compare(categories, [
         { value: "a", label: ">= 0 and < 50" },
         { value: "b", label: "High" },
         { value: null, label: "None" }
@@ -717,7 +716,7 @@ describe("AxisBuilder", function () {
       }
 
       const categories = this.ab.getCategories(axis, [2.5, 4.5])
-      return compare(categories, [
+      compare(categories, [
         { value: 2, label: "2" },
         { value: 3, label: "3" },
         { value: 4, label: "4" }
@@ -730,8 +729,8 @@ describe("AxisBuilder", function () {
         xform: { type: "month" }
       }
 
-      const categories = this.ab.getCategories(axis, ["2010-02-01", null])
-      return compare(categories, [
+      const categories = this.ab.getCategories(axis, ["02", null])
+      compare(categories, [
         { value: "01", label: "January" },
         { value: "02", label: "February" },
         { value: "03", label: "March" },
@@ -748,6 +747,19 @@ describe("AxisBuilder", function () {
       ])
     })
 
+    it("gets limited months", function () {
+      const axis = {
+        expr: this.exprDate,
+        xform: { type: "month" }
+      }
+
+      const categories = this.ab.getCategories(axis, ["02", null], { onlyValuesPresent: true })
+      compare(categories, [
+        { value: "02", label: "February" },
+        { value: null, label: "None" }
+      ])
+    })
+
     it("gets years", function () {
       const axis = {
         expr: this.exprDate,
@@ -755,10 +767,24 @@ describe("AxisBuilder", function () {
       }
 
       const categories = this.ab.getCategories(axis, ["2010-01-01", "2013-01-01", null])
-      return compare(categories, [
+      compare(categories, [
         { value: "2010-01-01", label: "2010" },
         { value: "2011-01-01", label: "2011" },
         { value: "2012-01-01", label: "2012" },
+        { value: "2013-01-01", label: "2013" },
+        { value: null, label: "None" }
+      ])
+    })
+
+    it("gets limited years", function () {
+      const axis = {
+        expr: this.exprDate,
+        xform: { type: "year" }
+      }
+
+      const categories = this.ab.getCategories(axis, ["2010-01-01", "2013-01-01", null], { onlyValuesPresent: true })
+      compare(categories, [
+        { value: "2010-01-01", label: "2010" },
         { value: "2013-01-01", label: "2013" },
         { value: null, label: "None" }
       ])
@@ -771,9 +797,23 @@ describe("AxisBuilder", function () {
       }
 
       const categories = this.ab.getCategories(axis, ["2010-01-01", "2010-03-01", null])
-      return compare(categories, [
+      compare(categories, [
         { value: "2010-01-01", label: "Jan 2010" },
         { value: "2010-02-01", label: "Feb 2010" },
+        { value: "2010-03-01", label: "Mar 2010" },
+        { value: null, label: "None" }
+      ])
+    })
+
+    it("gets limited yearmonths", function () {
+      const axis = {
+        expr: this.exprDate,
+        xform: { type: "yearmonth" }
+      }
+
+      const categories = this.ab.getCategories(axis, ["2010-01-01", "2010-03-01", null], { onlyValuesPresent: true })
+      compare(categories, [
+        { value: "2010-01-01", label: "Jan 2010" },
         { value: "2010-03-01", label: "Mar 2010" },
         { value: null, label: "None" }
       ])
@@ -786,9 +826,23 @@ describe("AxisBuilder", function () {
       }
 
       const categories = this.ab.getCategories(axis, ["2010-51", "2011-01", null])
-      return compare(categories, [
+      compare(categories, [
         { value: "2010-51", label: "2010-51" },
         { value: "2010-52", label: "2010-52" },
+        { value: "2011-01", label: "2011-01" },
+        { value: null, label: "None" }
+      ])
+    })
+
+    it("gets limited yearweeks", function () {
+      const axis = {
+        expr: this.exprDate,
+        xform: { type: "yearweek" }
+      }
+
+      const categories = this.ab.getCategories(axis, ["2010-51", "2011-01", null], { onlyValuesPresent: true })
+      compare(categories, [
+        { value: "2010-51", label: "2010-51" },
         { value: "2011-01", label: "2011-01" },
         { value: null, label: "None" }
       ])
@@ -801,7 +855,7 @@ describe("AxisBuilder", function () {
       }
 
       const categories = this.ab.getCategories(axis, ["2010-2", "2011-1", null])
-      return compare(categories, [
+      compare(categories, [
         { value: "2010-2", label: "2010 Apr-Jun" },
         { value: "2010-3", label: "2010 Jul-Sep" },
         { value: "2010-4", label: "2010 Oct-Dec" },
@@ -810,16 +864,43 @@ describe("AxisBuilder", function () {
       ])
     })
 
-    return it("gets days", function () {
+    it("gets limited yearquarters", function () {
+      const axis = {
+        expr: this.exprDate,
+        xform: { type: "yearquarter" }
+      }
+
+      const categories = this.ab.getCategories(axis, ["2010-2", "2011-1", null], { onlyValuesPresent: true })
+      compare(categories, [
+        { value: "2010-2", label: "2010 Apr-Jun" },
+        { value: "2011-1", label: "2011 Jan-Mar" },
+        { value: null, label: "None" }
+      ])
+    })
+
+    it("gets days", function () {
       const axis = {
         expr: this.exprDate
       }
 
       const categories = this.ab.getCategories(axis, ["2010-01-30", "2010-02-02", null])
-      return compare(categories, [
+      compare(categories, [
         { value: "2010-01-30", label: "Jan 30, 2010" },
         { value: "2010-01-31", label: "Jan 31, 2010" },
         { value: "2010-02-01", label: "Feb 1, 2010" },
+        { value: "2010-02-02", label: "Feb 2, 2010" },
+        { value: null, label: "None" }
+      ])
+    })
+
+    it("gets limited days", function () {
+      const axis = {
+        expr: this.exprDate
+      }
+
+      const categories = this.ab.getCategories(axis, ["2010-01-30", "2010-02-02", null], { onlyValuesPresent: true })
+      compare(categories, [
+        { value: "2010-01-30", label: "Jan 30, 2010" },
         { value: "2010-02-02", label: "Feb 2, 2010" },
         { value: null, label: "None" }
       ])

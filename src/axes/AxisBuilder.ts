@@ -507,9 +507,14 @@ export default class AxisBuilder {
    */
   getCategories(axis: Axis, values?: any[] | null, options: {
     locale?: string
+    /** If true, only create categories for values that are present. Requires values to be set.
+     * Enums normally get all possible values and dates get every range.
+     */
+    onlyValuesPresent?: boolean
   } = {}): AxisCategory[] {
-    let categories: AxisCategory[], current, end, format, hasNone, label, max, min, value, year
+    let categories: AxisCategory[], current, end, format, label, max, min, value, year
     const noneCategory = { value: null, label: axis.nullLabel || "None" }
+    const hasNone = _.any(values || [], (v) => v == null)
 
     // Handle ranges
     if (axis.xform && axis.xform.type === "ranges") {
@@ -600,7 +605,6 @@ export default class AxisBuilder {
       // Get min and max
       min = _.min(_.filter(values || [], (v) => v != null))
       max = _.max(_.filter(values || [], (v) => v != null))
-      const hasNull = _.filter(values || [], (v) => v == null).length > 0
       if (!_.isFinite(min) || !_.isFinite(max)) {
         return [noneCategory]
       }
@@ -614,7 +618,7 @@ export default class AxisBuilder {
       for (value of _.range(Math.floor(min), Math.floor(max) + 1)) {
         categories.push({ value, label: "" + value })
       }
-      if (hasNull) {
+      if (hasNone) {
         categories.push(noneCategory)
       }
       return categories
@@ -637,8 +641,13 @@ export default class AxisBuilder {
       ]
 
       // Add none if needed
-      if (_.any(values || [], (v) => v == null)) {
+      if (hasNone) {
         categories.push(noneCategory)
+      }
+
+      // Filter out other values
+      if (options.onlyValuesPresent) {
+        categories = categories.filter(c => (values || []).includes(c.value))
       }
 
       return categories
@@ -655,8 +664,13 @@ export default class AxisBuilder {
       }
 
       // Add none if needed
-      if (_.any(values || [], (v) => v == null)) {
+      if (hasNone) {
         categories.push(noneCategory)
+      }
+
+      // Filter out other values
+      if (options.onlyValuesPresent) {
+        categories = categories.filter(c => (values || []).includes(c.value))
       }
 
       return categories
@@ -664,10 +678,20 @@ export default class AxisBuilder {
 
     if (axis.xform && axis.xform.type === "year") {
       let asc1, end2
-      hasNone = _.any(values || [], (v) => v == null)
       values = _.compact(values || [])
       if (values.length === 0) {
         return [noneCategory]
+      }
+
+      if (options.onlyValuesPresent) {
+        // Sort and take only present
+        categories = _.sortBy(values, item => item).map(value => ({ value, label: value.substring(0, 4) }))
+
+        if (hasNone) {
+          categories.push(noneCategory)
+        }
+  
+        return categories
       }
 
       // Get min and max
@@ -690,10 +714,20 @@ export default class AxisBuilder {
     }
 
     if (axis.xform && axis.xform.type === "yearmonth") {
-      hasNone = _.any(values || [], (v) => v == null)
       values = _.compact(values || [])
       if (values.length === 0) {
         return [noneCategory]
+      }
+
+      if (options.onlyValuesPresent) {
+        // Sort and take only present
+        categories = _.sortBy(values, item => item).map(value => ({ value, label: moment(value, "YYYY-MM-DD").format("MMM YYYY") }))
+
+        if (hasNone) {
+          categories.push(noneCategory)
+        }
+  
+        return categories
       }
 
       // Get min and max
@@ -721,10 +755,20 @@ export default class AxisBuilder {
     }
 
     if (axis.xform && axis.xform.type === "yearweek") {
-      hasNone = _.any(values || [], (v) => v == null)
       values = _.compact(values || [])
       if (values.length === 0) {
         return [noneCategory]
+      }
+
+      if (options.onlyValuesPresent) {
+        // Sort and take only present
+        categories = _.sortBy(values, item => item).map(value => ({ value, label: value }))
+
+        if (hasNone) {
+          categories.push(noneCategory)
+        }
+  
+        return categories
       }
 
       // Get min and max
@@ -752,10 +796,35 @@ export default class AxisBuilder {
     }
 
     if (axis.xform && axis.xform.type === "yearquarter") {
-      hasNone = _.any(values || [], (v) => v == null)
       values = _.compact(values || [])
       if (values.length === 0) {
         return [noneCategory]
+      }
+
+      if (options.onlyValuesPresent) {
+        // Sort and take only present
+        categories = _.sortBy(values, item => item).map(value => {
+          const year = value.substr(0, 4)
+          const quarter = value.substr(value.length - 1, 1)
+          if (quarter === "1") {
+            label = `${year} Jan-Mar`
+          } else if (quarter === "2") {
+            label = `${year} Apr-Jun`
+          } else if (quarter === "3") {
+            label = `${year} Jul-Sep`
+          } else if (quarter === "4") {
+            label = `${year} Oct-Dec`
+          } else {
+            label = ""
+          }
+          return { value, label }
+        })
+
+        if (hasNone) {
+          categories.push(noneCategory)
+        }
+  
+        return categories
       }
 
       // Get min and max
@@ -808,7 +877,6 @@ export default class AxisBuilder {
         ).concat([noneCategory])
       case "text":
         // Return unique values
-        hasNone = _.any(values || [], (v) => v == null)
         categories = _.map(_.compact(_.uniq(values || [])).sort(), (v) => ({
           value: v,
           label: v || "None"
@@ -827,6 +895,17 @@ export default class AxisBuilder {
           return [noneCategory]
         }
 
+        if (options.onlyValuesPresent) {
+          // Sort and take only present
+          categories = _.sortBy(values, item => item).map(value => ({ value, label: moment(value, "YYYY-MM-DD").format("ll") }))
+  
+          if (hasNone) {
+            categories.push(noneCategory)
+          }
+    
+          return categories
+        }
+  
         // Get min and max
         min = values.sort()[0]
         max = values.sort().slice(-1)[0]
@@ -842,7 +921,9 @@ export default class AxisBuilder {
             break
           }
         }
-        categories.push(noneCategory)
+        if (hasNone) {
+          categories.push(noneCategory)
+        }
         return categories
     }
 
