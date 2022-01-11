@@ -12,6 +12,7 @@ import { Radio } from "react-library/lib/bootstrap"
 import { DataSource, Schema } from "mwater-expressions"
 import { AxisBuilder } from "../../.."
 import { PivotChartSegment } from "./PivotChartDesign"
+import PopoverHelpComponent from "react-library/lib/PopoverHelpComponent"
 
 export interface SegmentDesignerComponentProps {
   segment: PivotChartSegment
@@ -152,7 +153,13 @@ export default class SegmentDesignerComponent extends React.Component<
           <ui.Checkbox
             value={this.props.segment.valueAxisOnlyValuesPresent}
             onChange={this.handleValueAxisOnlyValuesPresentChange}
-          >Only show values actually present</ui.Checkbox>
+          >
+            Only show values actually present
+            <PopoverHelpComponent placement="bottom">
+              Limits values to those that are present in the data, as opposed
+              to all choices or all dates within range
+            </PopoverHelpComponent>
+          </ui.Checkbox>
         : null }
       </div>
     </ui.FormGroup>
