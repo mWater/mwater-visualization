@@ -154,7 +154,7 @@ export default class SegmentDesignerComponent extends React.Component<
             value={this.props.segment.valueAxisOnlyValuesPresent}
             onChange={this.handleValueAxisOnlyValuesPresentChange}
           >
-            Only show values actually present
+            Only show values actually present&nbsp;
             <PopoverHelpComponent placement="bottom">
               Limits values to those that are present in the data, as opposed
               to all choices or all dates within range
