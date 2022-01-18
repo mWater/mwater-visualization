@@ -3,7 +3,7 @@ import Layer from "./Layer"
 import { LocalizedString, Schema, DataSource } from "mwater-expressions"
 import { JsonQLFilter } from "../index"
 import React from "react"
-import dompurify from "dompurify"
+import { HtmlUrlLegend } from "./HtmlUrlLegend"
 
 /**
  * Layer that is composed of multiple tile urls that can be switched between
@@ -93,7 +93,8 @@ export default class SwitchableTileUrlLayer extends Layer<SwitchableTileUrlLayer
       return null
     }
 
-    return <HtmlUrlLegend url={option.legendUrl} name={name} />
+    const url = option.legendUrl.replace(/\{name\}/, encodeURIComponent(name))
+    return <HtmlUrlLegend url={url} />
   }
 
   /** True if layer can be edited */
@@ -127,46 +128,3 @@ export default class SwitchableTileUrlLayer extends Layer<SwitchableTileUrlLayer
   }
 }
 
-interface HtmlUrlLegendProps {
-  url: string
-  name: string
-}
-
-interface HtmlUrlLegendState {
-  html: string
-}
-
-/** Loads a html legend and sanitizes it from a url */
-class HtmlUrlLegend extends React.Component<HtmlUrlLegendProps, HtmlUrlLegendState> {
-  constructor(props: HtmlUrlLegendProps) {
-    super(props)
-    this.state = {
-      html: ""
-    }
-  }
-
-  componentDidMount() {
-    this.loadLegend()
-  }
-
-  componentDidUpdate(prevProps: HtmlUrlLegendProps) {
-    if (prevProps.url !== this.props.url) {
-      this.loadLegend()
-    }
-  }
-
-  loadLegend() {
-    const url = this.props.url.replace(/\{name\}/, encodeURIComponent(this.props.name))
-    window
-      .fetch(url)
-      .then((response) => response.text())
-      .then((html) => {
-        const safeHtml = dompurify.sanitize(html)
-        this.setState({ html: safeHtml })
-      })
-  }
-
-  render() {
-    return <div dangerouslySetInnerHTML={{ __html: this.state.html }} />
-  }
-}

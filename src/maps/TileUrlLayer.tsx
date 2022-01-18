@@ -1,30 +1,34 @@
-import PropTypes from "prop-types"
 import _ from "lodash"
 import React from "react"
 const R = React.createElement
 
 import Layer from "./Layer"
-import { ExprCompiler, Schema } from "mwater-expressions"
-import { ExprUtils } from "mwater-expressions"
-import { injectTableAlias } from "mwater-expressions"
-import { ExprCleaner } from "mwater-expressions"
-import AxisBuilder from "../axes/AxisBuilder"
-import LegendGroup from "./LegendGroup"
+import { DataSource, ExprCompiler, Schema } from "mwater-expressions"
+import { JsonQLFilter } from "../JsonQLFilter"
+import { HtmlUrlLegend } from "./HtmlUrlLegend"
+import { FormGroup, TextInput } from "react-library/lib/bootstrap"
 
 export interface TileUrlLayerDesign {
+  /** Url with {s}, {z}, {x}, {y} */
   tileUrl: string
+  /** optional min zoom level */
   minZoom?: number
+  /** optional max zoom level */
   maxZoom?: number
+  /** if true, hides url and prevents editing */
   readonly?: boolean
+  /** Url to get legend html from. */
+  legendUrl?: string
 }
 
 /*
 Layer that is a custom Leaflet-style url tile layer
 Design is:
-  tileUrl: Url with {s}, {z}, {x}, {y}
-  minZoom: optional min zoom level
+  tileUrl: 
+  minZoom: 
   maxZoom: optional max zoom level
-  readonly: if true, hides url and prevents editing
+  readonly: 
+  legendUrl: 
 */
 export default class TileUrlLayer extends Layer<TileUrlLayerDesign> {
   // Gets the type of layer definition ("JsonQLCss"/"TileUrl")
@@ -60,6 +64,22 @@ export default class TileUrlLayer extends Layer<TileUrlLayerDesign> {
     return this.validateDesign(this.cleanDesign(design, schema), schema) != null
   }
 
+  getLegend(
+    design: TileUrlLayerDesign,
+    schema: Schema,
+    name: string,
+    dataSource: DataSource,
+    locale: string,
+    filters: JsonQLFilter[]
+  ) {
+    // Find active option
+    if (!design.legendUrl) {
+      return null
+    }
+
+    return <HtmlUrlLegend url={design.legendUrl} />
+  }
+
   // Creates a design element with specified options.
   // Design should be cleaned on the way in and on way out.
   // options:
@@ -87,13 +107,17 @@ export default class TileUrlLayer extends Layer<TileUrlLayerDesign> {
 
 interface TileUrlLayerDesignerComponentProps {
   /** Design of the marker layer */
-  design: any
-  onDesignChange: any
+  design: TileUrlLayerDesign
+  onDesignChange: (design: TileUrlLayerDesign) => void
 }
 
 class TileUrlLayerDesignerComponent extends React.Component<TileUrlLayerDesignerComponentProps> {
-  handleTileUrlChange = (ev: any) => {
-    return this.props.onDesignChange(_.extend({}, this.props.design, { tileUrl: ev.target.value }))
+  handleTileUrlChange = (tileUrl: string) => {
+    return this.props.onDesignChange({ ...this.props.design, tileUrl })
+  }
+
+  handleLegendUrlChange = (legendUrl: string) => {
+    return this.props.onDesignChange({ ...this.props.design, legendUrl })
   }
 
   render() {
@@ -102,16 +126,17 @@ class TileUrlLayerDesignerComponent extends React.Component<TileUrlLayerDesigner
       return null
     }
 
-    return R(
-      "div",
-      { className: "mb-3" },
-      R("label", { className: "text-muted" }, "Url (containing {z}, {x} and {y})"),
-      R("input", {
-        type: "text",
-        className: "form-control",
-        value: this.props.design.tileUrl || "",
-        onChange: this.handleTileUrlChange
-      })
-    )
+    return <div className="mb-3">
+      <FormGroup label="Url (containing {z}, {x} and {y})" labelMuted>
+        <TextInput
+          value={this.props.design.tileUrl}
+          onChange={this.handleTileUrlChange} />
+      </FormGroup>
+      <FormGroup label="Optional URL of Legend" labelMuted>
+        <TextInput
+          value={this.props.design.legendUrl || ""}
+          onChange={this.handleLegendUrlChange} />
+      </FormGroup>
+    </div>
   }
 }
