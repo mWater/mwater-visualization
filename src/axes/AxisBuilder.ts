@@ -685,7 +685,7 @@ export default class AxisBuilder {
 
       if (options.onlyValuesPresent) {
         // Sort and take only present
-        categories = _.sortBy(values, item => item).map(value => ({ value, label: value.substring(0, 4) }))
+        categories = _.sortBy(_.uniq(values), item => item).map(value => ({ value, label: value.substring(0, 4) }))
 
         if (hasNone) {
           categories.push(noneCategory)
@@ -721,7 +721,7 @@ export default class AxisBuilder {
 
       if (options.onlyValuesPresent) {
         // Sort and take only present
-        categories = _.sortBy(values, item => item).map(value => ({ value, label: moment(value, "YYYY-MM-DD").format("MMM YYYY") }))
+        categories = _.sortBy(_.uniq(values), item => item).map(value => ({ value, label: moment(value, "YYYY-MM-DD").format("MMM YYYY") }))
 
         if (hasNone) {
           categories.push(noneCategory)
@@ -762,7 +762,7 @@ export default class AxisBuilder {
 
       if (options.onlyValuesPresent) {
         // Sort and take only present
-        categories = _.sortBy(values, item => item).map(value => ({ value, label: value }))
+        categories = _.sortBy(_.uniq(values), item => item).map(value => ({ value, label: value }))
 
         if (hasNone) {
           categories.push(noneCategory)
@@ -803,7 +803,7 @@ export default class AxisBuilder {
 
       if (options.onlyValuesPresent) {
         // Sort and take only present
-        categories = _.sortBy(values, item => item).map(value => {
+        categories = _.sortBy(_.uniq(values), item => item).map(value => {
           const year = value.substr(0, 4)
           const quarter = value.substr(value.length - 1, 1)
           if (quarter === "1") {
@@ -916,7 +916,7 @@ export default class AxisBuilder {
 
         if (options.onlyValuesPresent) {
           // Sort and take only present
-          categories = _.sortBy(values, item => item).map(value => ({ value, label: moment(value, "YYYY-MM-DD").format("ll") }))
+          categories = _.sortBy(_.uniq(values), item => item).map(value => ({ value, label: moment(value, "YYYY-MM-DD").format("ll") }))
   
           if (hasNone) {
             categories.push(noneCategory)

@@ -599,7 +599,7 @@ describe("AxisBuilder", function () {
     })
 
     it("gets limited enum", function () {
-      const categories = this.ab.getCategories(this.axisEnum, ["a", null], { onlyValuesPresent: true })
+      const categories = this.ab.getCategories(this.axisEnum, ["a", "a", null], { onlyValuesPresent: true })
       compare(categories, [
         { value: "a", label: "A" },
         { value: null, label: "None" }
@@ -616,7 +616,7 @@ describe("AxisBuilder", function () {
     })
 
     it("gets limited enumset", function () {
-      const categories = this.ab.getCategories(this.axisEnumset, ["a"], { onlyValuesPresent: true })
+      const categories = this.ab.getCategories(this.axisEnumset, ["a", "a"], { onlyValuesPresent: true })
       compare(categories, [
         { value: "a", label: "A" }
       ])
@@ -775,7 +775,7 @@ describe("AxisBuilder", function () {
         xform: { type: "month" }
       }
 
-      const categories = this.ab.getCategories(axis, ["02", null], { onlyValuesPresent: true })
+      const categories = this.ab.getCategories(axis, ["02", "02", null], { onlyValuesPresent: true })
       compare(categories, [
         { value: "02", label: "February" },
         { value: null, label: "None" }
@@ -804,7 +804,7 @@ describe("AxisBuilder", function () {
         xform: { type: "year" }
       }
 
-      const categories = this.ab.getCategories(axis, ["2010-01-01", "2013-01-01", null], { onlyValuesPresent: true })
+      const categories = this.ab.getCategories(axis, ["2010-01-01", "2013-01-01", "2013-01-01", null], { onlyValuesPresent: true })
       compare(categories, [
         { value: "2010-01-01", label: "2010" },
         { value: "2013-01-01", label: "2013" },
@@ -833,7 +833,7 @@ describe("AxisBuilder", function () {
         xform: { type: "yearmonth" }
       }
 
-      const categories = this.ab.getCategories(axis, ["2010-01-01", "2010-03-01", null], { onlyValuesPresent: true })
+      const categories = this.ab.getCategories(axis, ["2010-01-01", "2010-03-01", "2010-03-01", null], { onlyValuesPresent: true })
       compare(categories, [
         { value: "2010-01-01", label: "Jan 2010" },
         { value: "2010-03-01", label: "Mar 2010" },
@@ -862,7 +862,7 @@ describe("AxisBuilder", function () {
         xform: { type: "yearweek" }
       }
 
-      const categories = this.ab.getCategories(axis, ["2010-51", "2011-01", null], { onlyValuesPresent: true })
+      const categories = this.ab.getCategories(axis, ["2010-51", "2011-01", "2011-01", null], { onlyValuesPresent: true })
       compare(categories, [
         { value: "2010-51", label: "2010-51" },
         { value: "2011-01", label: "2011-01" },
@@ -892,7 +892,7 @@ describe("AxisBuilder", function () {
         xform: { type: "yearquarter" }
       }
 
-      const categories = this.ab.getCategories(axis, ["2010-2", "2011-1", null], { onlyValuesPresent: true })
+      const categories = this.ab.getCategories(axis, ["2010-2", "2011-1", "2011-1", null], { onlyValuesPresent: true })
       compare(categories, [
         { value: "2010-2", label: "2010 Apr-Jun" },
         { value: "2011-1", label: "2011 Jan-Mar" },
@@ -920,7 +920,7 @@ describe("AxisBuilder", function () {
         expr: this.exprDate
       }
 
-      const categories = this.ab.getCategories(axis, ["2010-01-30", "2010-02-02", null], { onlyValuesPresent: true })
+      const categories = this.ab.getCategories(axis, ["2010-01-30", "2010-02-02", "2010-02-02", null], { onlyValuesPresent: true })
       compare(categories, [
         { value: "2010-01-30", label: "Jan 30, 2010" },
         { value: "2010-02-02", label: "Feb 2, 2010" },

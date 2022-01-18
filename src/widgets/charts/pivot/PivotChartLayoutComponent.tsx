@@ -186,7 +186,7 @@ export default PivotChartLayoutComponent = (function () {
           this.renderHoverPlusIcon(
             "bottom",
             (minX + maxX) / 2,
-            maxY,
+            maxY - 2,
             this.props.onInsertAfterSegment.bind(null, this.state.hoverSection)
           )
         )
