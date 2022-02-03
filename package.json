@@ -29,7 +29,7 @@
     "backbone": "~1.1.2",
     "c3": "^0.7.20",
     "canonical-json": "0.0.4",
-    "classnames": "^2.2.5",
+    "classnames": "^2.3.1",
     "color": "^3.2.1",
     "color-mixer": "^1.0.0",
     "d3-format": "^1.4.5",

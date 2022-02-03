@@ -1,17 +1,40 @@
 import React from "react"
 const R = React.createElement
 import _ from "lodash"
-import { DataSource, ExprCompiler, Schema } from "mwater-expressions"
+import { DataSource, Expr, ExprCompiler, FieldExpr, Schema } from "mwater-expressions"
 import { injectTableAlias } from "mwater-expressions"
 import Widget, { CreateViewElementOptions } from "./Widget"
+import { JsonQLQuery, JsonQLSelectQuery } from "jsonql"
+import { JsonQLFilter } from ".."
 
-// Image widget. Design is:
-// imageUrl: arbitrary url of image if using url
-// uid: uid of image if on server
-// expr: image or imagelist expression if using expression
-// caption: string caption
-// rotation: optional rotation in degrees for imageUrl or uid
-// captionPosition: "top"/"bottom". Defaults to "bottom"
+/** Image widget. Design is */
+export interface ImageWidgetDesign {
+  /** arbitrary url of image if using url */
+  imageUrl?: string | null
+
+  /** uid of image if on server */
+  uid?: string | null
+
+  /** image or imagelist expression if using expression */
+  expr?: Expr
+  
+  /** string caption */
+  caption?: string | null
+
+  /** optional rotation in degrees for imageUrl or uid */
+  rotation?: number
+
+  /** "top"/"bottom". Defaults to "bottom" */
+  captionPosition?: "top" | "bottom"
+
+  /** Optional URL to open when clicked */
+  url?: string
+
+  /** Opens URL in same tab if true*/
+  openUrlInSameTab?: boolean
+}
+
+
 export default class ImageWidget extends Widget {
   // Creates a React element that is a view of the widget
   // options:
@@ -49,19 +72,20 @@ export default class ImageWidget extends Widget {
   //   dataSource: data source to get data from
   //   filters: array of { table: table id, jsonql: jsonql condition with {alias} for tableAlias }
   //   callback: (error, data)
-  getData(design: any, schema: Schema, dataSource: DataSource, filters: any, callback: any) {
+  getData(design: ImageWidgetDesign, schema: Schema, dataSource: DataSource, filters: JsonQLFilter[], callback: any) {
     if (!design.expr) {
       return callback(null)
     }
 
-    const { table } = design.expr
+    const { table } = (design.expr as FieldExpr)
 
     const exprCompiler = new ExprCompiler(schema)
 
     const imageExpr = exprCompiler.compileExpr({ expr: design.expr, tableAlias: "main" })
 
     // Get distinct to only show if single row match
-    const query = {
+    const query: JsonQLSelectQuery = {
+      type: "query",
       distinct: true,
       selects: [{ type: "select", expr: imageExpr, alias: "value" }],
       from: { type: "table", table, alias: "main" },

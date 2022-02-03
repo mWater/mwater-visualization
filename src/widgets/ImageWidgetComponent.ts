@@ -1,11 +1,9 @@
-import PropTypes from "prop-types"
-import React from "react"
+import React, { CSSProperties } from "react"
 const R = React.createElement
 import _ from "lodash"
 import classNames from "classnames"
 import * as ui from "react-library/lib/bootstrap"
 import uuid from "uuid"
-import Dropzone from "react-dropzone"
 import AsyncLoadComponent from "react-library/lib/AsyncLoadComponent"
 import AutoSizeComponent from "react-library/lib/AutoSizeComponent"
 import DropdownWidgetComponent from "./DropdownWidgetComponent"
@@ -17,32 +15,35 @@ import ImageUploaderComponent from "./ImageUploaderComponent"
 import ImagelistCarouselComponent from "./ImagelistCarouselComponent"
 import { DataSource, Schema } from "mwater-expressions"
 import { WidgetDataSource } from "./WidgetDataSource"
+import { ImageWidgetDesign } from "./ImageWidget"
 
 export interface ImageWidgetComponentProps {
-  design: any
+  design: ImageWidgetDesign
   /** Called with new design. null/undefined for readonly */
-  onDesignChange?: any
+  onDesignChange?: (design: ImageWidgetDesign) => void
   filters?: any
   schema: Schema
   /** Data source to use for widget */
   dataSource: DataSource
   widgetDataSource: WidgetDataSource
-  width?: number
-  height?: number
+  width: number
+  height: number
   singleRowTable?: string
 }
 
-export default class ImageWidgetComponent extends AsyncLoadComponent<ImageWidgetComponentProps> {
+export default class ImageWidgetComponent extends AsyncLoadComponent<ImageWidgetComponentProps, { data: any, loading: boolean }> {
+  editor: ImageWidgetDesignComponent | null
+
   // Override to determine if a load is needed. Not called on mounting
-  isLoadNeeded(newProps: any, oldProps: any) {
+  isLoadNeeded(newProps: ImageWidgetComponentProps, oldProps: ImageWidgetComponentProps) {
     return (
-      newProps.design.expr &&
+      newProps.design.expr != null &&
       (!_.isEqual(newProps.design.expr, oldProps.design.expr) || !_.isEqual(newProps.filters, oldProps.filters))
     )
   }
 
   // Call callback with state changes
-  load(props: any, prevProps: any, callback: any) {
+  load(props: ImageWidgetComponentProps, prevProps: ImageWidgetComponentProps, callback: any) {
     // Get data
     return props.widgetDataSource.getData(props.design, props.filters, (error: any, data: any) => {
       return callback({ error, data })
@@ -50,7 +51,7 @@ export default class ImageWidgetComponent extends AsyncLoadComponent<ImageWidget
   }
 
   handleStartEditing = () => {
-    return this.editor.edit()
+    this.editor?.edit()
   }
 
   // Render a link to start editing
@@ -64,8 +65,8 @@ export default class ImageWidgetComponent extends AsyncLoadComponent<ImageWidget
 
   renderEditor() {
     return R(ImageWidgetDesignComponent, {
-      ref: (c: any) => {
-        return (this.editor = c)
+      ref: (c: ImageWidgetDesignComponent | null) => {
+        this.editor = c
       },
       key: "editor",
       design: this.props.design,
@@ -98,12 +99,13 @@ export default class ImageWidgetComponent extends AsyncLoadComponent<ImageWidget
         })
       }
     }
+    return null
   }
 
   renderContent() {
     if (this.props.design.imageUrl || this.props.design.uid) {
       // Determine approximate height
-      let imageHeight = null
+      let imageHeight = undefined
 
       if (this.props.height <= 160) {
         imageHeight = 160
@@ -116,10 +118,11 @@ export default class ImageWidgetComponent extends AsyncLoadComponent<ImageWidget
       }
 
       const source =
-        this.props.design.imageUrl || this.props.widgetDataSource.getImageUrl(this.props.design.uid, imageHeight)
+        this.props.design.imageUrl || this.props.widgetDataSource.getImageUrl(this.props.design.uid!, imageHeight)
       return R(RotatedImageComponent, {
         imgUrl: source,
         url: this.props.design.url,
+        openUrlInSameTab: this.props.design.openUrlInSameTab,
         rotation: this.props.design.rotation
       })
     } else {
@@ -178,6 +181,11 @@ interface ImageWidgetDesignComponentState {
   table: any
   editing: any
   currentTab: any
+  data: any
+  error: any
+  files: any
+  uploading: boolean
+  openUrlInSameTab?: boolean
 }
 
 class ImageWidgetDesignComponent extends React.Component<
@@ -217,7 +225,8 @@ class ImageWidgetDesignComponent extends React.Component<
       caption: this.props.design.caption,
       rotation: this.props.design.rotation,
       captionPosition: this.props.design.captionPosition,
-      url: this.props.design.url
+      url: this.props.design.url,
+      openUrlInSameTab: this.props.design.openUrlInSameTab
     }
 
     return this.setState(state)
@@ -277,6 +286,9 @@ class ImageWidgetDesignComponent extends React.Component<
   handleCaptionPositionChange = (captionPosition: any) => {
     return this.setState({ captionPosition })
   }
+  handleOpenUrlInSameTabChange = (openUrlInSameTab?: boolean) => {
+    return this.setState({ openUrlInSameTab: !openUrlInSameTab })
+  }
 
   handleSave = () => {
     this.setState({ editing: false })
@@ -287,7 +299,8 @@ class ImageWidgetDesignComponent extends React.Component<
       expr: this.state.expr,
       caption: this.state.caption,
       rotation: this.state.rotation,
-      captionPosition: this.state.captionPosition
+      captionPosition: this.state.captionPosition,
+      openUrlInSameTab: this.state.openUrlInSameTab
     }
 
     return this.props.onDesignChange(_.extend({}, this.props.design, updates))
@@ -393,6 +406,14 @@ class ImageWidgetDesignComponent extends React.Component<
         onChange: this.handleUrlChange
       }),
       R("div", { className: "form-text text-muted" }, "e.g. http://somesite.com/"),
+      (this.state.url ?
+        R("div", null,
+          R(ui.Checkbox, {
+            value: !this.state.openUrlInSameTab, 
+            onChange: this.handleOpenUrlInSameTabChange
+          }, "Open link in new tab")
+        )
+      : null),
       R("div", { className: "form-text text-muted" }, "When clicked on image, this link will open in a new tab")
     )
   }
@@ -449,7 +470,7 @@ class ImageWidgetDesignComponent extends React.Component<
     const footer = R(
       "div",
       null,
-      R("button", { key: "save", type: "button", className: "btn btn-primary", onClick: this.handleSave }, "Save"),
+      R("button", { key: "save", type: "button", className: "btn btn-primary me-2", onClick: this.handleSave }, "Save"),
       R(
         "button",
         { key: "cancel", type: "button", className: "btn btn-secondary", onClick: this.handleCancel },
@@ -461,7 +482,6 @@ class ImageWidgetDesignComponent extends React.Component<
       ModalPopupComponent,
       {
         header: "Image",
-        scrollDisabled: true,
         footer
       },
       content
@@ -476,13 +496,14 @@ interface RotatedImageComponentProps {
   onClick?: any
   caption?: string
   url?: string
+  openUrlInSameTab?: boolean
 }
 
 // Image which is rotated by x degrees (0, 90, 180, 270)
 class RotatedImageComponent extends React.Component<RotatedImageComponentProps> {
   render() {
     return R(AutoSizeComponent, { injectWidth: true, injectHeight: true }, (size: any) => {
-      const imageStyle = {}
+      const imageStyle: CSSProperties = {}
       const containerStyle = {}
 
       // These css classes are defined in mwater-forms
@@ -520,7 +541,7 @@ class RotatedImageComponent extends React.Component<RotatedImageComponentProps> 
       if (!this.props.url) {
         return img
       } else {
-        return R("a", { href: this.props.url, target: "_blank" }, img)
+        return R("a", { href: this.props.url, target: (this.props.openUrlInSameTab ? undefined : "_blank") }, img)
       }
     })
   }
