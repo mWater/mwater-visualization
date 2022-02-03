@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 import MapControlComponent from "./MapControlComponent";
+import AutoSizeComponent from "react-library/lib/AutoSizeComponent";
 export default class MapComponent extends React.Component {
     static propTypes: {
         schema: PropTypes.Validator<object>;
@@ -39,7 +40,7 @@ export default class MapComponent extends React.Component {
         };
     }, HTMLElement>;
     handleDesignChange: (design: any) => any;
-    renderView(): React.DetailedReactHTMLElement<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+    renderView(): React.CElement<import("react-library/lib/AutoSizeComponent").AutoSizeComponentProps, AutoSizeComponent>;
     renderDesigner(): React.CElement<import("./MapControlComponent").MapControlComponentProps, MapControlComponent>;
     render(): React.DetailedReactHTMLElement<{
         style: {
